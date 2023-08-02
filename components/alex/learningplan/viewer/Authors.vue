@@ -1,0 +1,103 @@
+<template>
+  <v-row align="center" dense class="px-0" style="z-index: 2;position: relative;">
+    <v-menu offset-y open-on-hover :z-index="2" style="z-index: 2;position: relative;">
+      <template #activator="{ on, attrs }">
+        <div v-bind="attrs" v-on="on">
+          <v-badge
+            :content="`+${coAuthors.length}`"
+            :value="coAuthors.length"
+            color="accent"
+            bordered
+            overlap
+          >
+            <app-user-avatar :user="author" />
+          </v-badge>
+        </div>
+      </template>
+      <v-container fluid color="white" style="z-index: 2;">
+        <v-row>
+          <v-col cols="12">
+            <app-user-avatar :user="author" />
+            <span> {{ author.fullname }} </span>
+          </v-col>
+          <v-col
+            v-for="(coauthor, i) in coAuthors"
+            :key="`coauthor-avatar-${i}`"
+            cols="12"
+          >
+            <app-user-avatar :user="coauthor" />
+            <span> {{ coauthor.fullname }} </span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-menu>
+    <v-col cols="8" class="ml-1">
+      <div class="avatar-info-section">
+        <p>
+          {{ author.fullname + coAuthorsText(coAuthors) }}
+        </p>
+        <div style="display: flex;">
+          <span
+            >Atualizado em:
+            {{
+              new Date(structure.updatedAt).toLocaleDateString('pt-BR')
+            }}</span
+          >
+        </div>
+      </div>
+    </v-col>
+  </v-row>
+</template>
+
+<script>
+
+export default {
+  props: {
+    structure: {
+      type: Object,
+      required: true,
+    },
+    author: {
+      type: Object,
+      required: true,
+    },
+    coAuthors: {
+      type: Array,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+    };
+  },
+  methods: {
+    coAuthorsText(coAuthors) {
+      if (coAuthors.length < 1) {
+        return '';
+      } else if (coAuthors.length > 1) {
+        return ` e mais ${coAuthors.length} pessoas`;
+      } else {
+        return ` e mais ${coAuthors.length} pessoa`;
+      }
+    },
+  },
+};
+</script>
+<style lang="scss" scoped>
+
+.avatar-info-section {
+  margin-left: 8px;
+
+  p {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  span {
+    font-size: 13px;
+  }
+
+}
+
+</style>

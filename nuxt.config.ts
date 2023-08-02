@@ -1,4 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true }
-})
+  pages: true,
+  devtools: { enabled: true },
+  css: ["vuetify/lib/styles/main.sass"],
+  build: {
+    transpile: ["vuetify"],
+  },
+  modules: ["@pinia/nuxt", "@nuxtjs/strapi"],
+  pinia: {
+    autoImports: ["defineStore", "storeToRefs"],
+  },
+  strapi: {
+    url: process.env.STRAPI_URL || "http://localhost:1337",
+  },
+  imports: {
+    dirs: ["stores", "models"],
+  },
+});

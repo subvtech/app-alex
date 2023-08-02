@@ -1,5 +1,5 @@
 <template>
   <div>
-    <NuxtPage />
+    <v-card> jdkjfksdjfk </v-card>
   </div>
 </template>

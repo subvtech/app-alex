@@ -23,5 +23,12 @@
     "nuxt": "^3.6.5",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@nuxtjs/strapi": "^1.9.3",
+    "@pinia/nuxt": "^0.4.11",
+    "pinia": "^2.1.6",
+    "sass": "^1.64.2",
+    "vuetify": "^3.3.11"
   }
 }
