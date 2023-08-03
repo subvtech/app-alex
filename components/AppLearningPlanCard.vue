@@ -31,7 +31,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-row justify="end" align="center" class="pa-2">
-          <v-btn text color="accent" nuxt :to="viewPlanUrl"> Visualizar </v-btn>
+          <v-btn color="accent" nuxt :to="viewPlanUrl"> Visualizar </v-btn>
         </v-row>
       </v-card-actions>
     </v-card>

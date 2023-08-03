@@ -25,6 +25,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.27.2",
     "@nuxtjs/strapi": "^1.9.3",
     "@pinia/nuxt": "^0.4.11",
     "pinia": "^2.1.6",

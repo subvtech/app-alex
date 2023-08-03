@@ -1,5 +1,5 @@
 <template>
-  <v-autocomplete 
+  <v-autocomplete
     v-model="selectedUsers"
     :items="users"
     :loading="loadingUsers"
@@ -19,39 +19,39 @@
     :reverse="false"
     small-chips
     @input="onInput"
-    >
-      <template #selection="data">
-        <v-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          small
-          @click="data.select"
-          @click:close="remove(data.item)"
-        >
-          <v-avatar left>
-            <v-img v-if="data.item.avatar" :src="data.item.avatar.url"></v-img>
-            <v-img v-else src="/images/not-found.png"></v-img>
-          </v-avatar>
-          {{ getReducedName(data.item.fullname) }}
-        </v-chip>
-      </template>
-      <template #item="data">
-        <v-list-item-avatar>
-          <img v-if="data.item.avatar" :src="data.item.avatar.url">
-          <img v-else src="/images/not-found.png">
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title> {{ data.item.fullname }} </v-list-item-title>
-          <v-list-item-subtitle> {{ data.item.email }} </v-list-item-subtitle>
-        </v-list-item-content>
-      </template>
+  >
+    <template #selection="data">
+      <v-chip
+        v-bind="data.attrs"
+        :input-value="data.selected"
+        close
+        small
+        @click="data.select"
+        @click:close="remove(data.item)"
+      >
+        <v-avatar left>
+          <v-img v-if="data.item.avatar" :src="data.item.avatar.url"></v-img>
+          <v-img v-else src="/images/not-found.png"></v-img>
+        </v-avatar>
+        {{ getReducedName(data.item.fullname) }}
+      </v-chip>
+    </template>
+    <template #item="data">
+      <v-list-item-avatar>
+        <img v-if="data.item.avatar" :src="data.item.avatar.url" />
+        <img v-else src="/images/not-found.png" />
+      </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title> {{ data.item.fullname }} </v-list-item-title>
+        <v-list-item-subtitle> {{ data.item.email }} </v-list-item-subtitle>
+      </v-list-item-content>
+    </template>
   </v-autocomplete>
 </template>
 
 <script>
-
-import { stringify } from 'qs'
+import { stringify } from 'qs';
+const user = useStrapiUser();
 
 export default {
   props: ['value'],
@@ -60,26 +60,24 @@ export default {
       users: [],
       selectedUsers: [],
       loadingUsers: false,
-      search: "",
-
+      search: '',
     };
   },
 
-  computed: {
-  },
+  computed: {},
 
   watch: {
     search: {
-      async handler(search = "") {
+      async handler(search = '') {
         await this.searchUsers(search);
-      }
+      },
     },
     async value() {
       await this.loadUsers();
-    }
+    },
   },
   async created() {
-    await this.loadUsers()
+    await this.loadUsers();
   },
   methods: {
     async loadUsers() {
@@ -88,50 +86,44 @@ export default {
         await this.searchUsers('', this.value);
       }
     },
-    async searchUsers(search = "", ids = []) {
-      if ((!search || search.length < 3) && !ids.length) return
-      this.loadingUsers = true
+    async searchUsers(search = '', ids = []) {
+      if ((!search || search.length < 3) && !ids.length) return;
+      this.loadingUsers = true;
 
-      const queryIds = { _where: { id: ids } }
-
+      const queryIds = { _where: { id: ids } };
 
       const querySearch = {
         _where: {
-          id_ne: this.$strapi.user.id,
-          _or: [
-            { email_contains: search },
-            { fullname_contains: search },
-          ]
-        }
-      }
+          id_ne: user.id,
+          _or: [{ email_contains: search }, { fullname_contains: search }],
+        },
+      };
 
-      const query = stringify(ids.length ? queryIds : querySearch)
+      const query = stringify(ids.length ? queryIds : querySearch);
 
       this.users = await this.$strapi.$http.$get(`/users?${query}&_limit=20`);
 
-      this.loadingUsers = false
+      this.loadingUsers = false;
     },
     remove(item) {
-      this.selectedUsers = this.selectedUsers.filter(u => u !== item.id);
+      this.selectedUsers = this.selectedUsers.filter((u) => u !== item.id);
     },
     getReducedName(fullname = '') {
-      if (!fullname) return ''
-      const names = fullname.split(' ')
+      if (!fullname) return '';
+      const names = fullname.split(' ');
 
       if (names.length === 1) {
-        return fullname
+        return fullname;
       }
 
-      return `${names[0]} ${names[names.length - 1]}`
-
+      return `${names[0]} ${names[names.length - 1]}`;
     },
     onInput() {
-      this.search = ''
-      this.$emit('input', this.selectedUsers)
-    }
-  }
+      this.search = '';
+      this.$emit('input', this.selectedUsers);
+    },
+  },
 };
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

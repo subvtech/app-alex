@@ -13,14 +13,14 @@
 
 <script>
 export default {
-  name: "AlexTextFieldPrimaryBackground",
+  name: 'AlexTextFieldPrimaryBackground',
   props: {
     value: {
       type: String,
     },
     rules: {
       type: Array,
-      default:() => []
+      default: () => [],
     },
     label: {
       type: String,
@@ -36,7 +36,7 @@ export default {
     required: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   data() {
     return {
@@ -46,13 +46,12 @@ export default {
   watch: {
     value(v) {
       this.inputValue = v;
-    }
+    },
   },
 };
 </script>
 
 <style scoped lang="scss">
-
 ::v-deep .theme--light.v-label,
 ::v-deep .theme--light.v-input input,
 ::v-deep .theme--light.v-input textarea,
@@ -75,5 +74,4 @@ export default {
   border-style: solid;
   border-width: 2px;
 }
-
 </style>

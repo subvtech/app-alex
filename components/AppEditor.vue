@@ -4,6 +4,7 @@
 
 <script>
 import { i18n } from '~/assets/editor-i18n';
+import { create, find } from '@nuxtjs/strapi';
 const pkgs = {};
 
 if (process.client) {
@@ -124,6 +125,8 @@ if (process.client) {
   };
 }
 
+const token = useStrapiToken()
+
 const { EditorJS, tools } = pkgs;
 
 export default {
@@ -156,8 +159,7 @@ export default {
 
           formData.append('files', file, file.name);
 
-          return this.$strapi.$http
-            .$post('/upload', formData)
+          return create('/upload', formData)
             .then(([res]) => {
               const url = res.url;
               return { success: 1, file: { url } };
@@ -175,7 +177,7 @@ export default {
     tools.attaches = {
       class: require('@editorjs/attaches'),
       config: {
-        endpoint: `/api/upload-file?token=${this.$strapi.getToken()}`,
+        endpoint: `/api/upload-file?token=${token}`,
         buttonText: 'Selecionar arquivo',
         errorMessage: 'Erro no upload do arquivo',
       },
@@ -223,7 +225,7 @@ export default {
 }
 
 /* stylelint-disable */
- .editorjs >>> .ce-block__content,
+.editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
   /* max-width: 64rem; */
   max-width: 100%;
