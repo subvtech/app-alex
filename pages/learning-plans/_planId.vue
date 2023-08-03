@@ -11,7 +11,7 @@
       <v-tab
         v-if="!isTrailRoute"
         nuxt
-        :to="`/learning-plans/${$route.params.planId}/trails`"
+        :to="`/learning-plans/${route.params.planId}/trails`"
         replace
       >
         Trilhas de aprendizagem
@@ -19,7 +19,7 @@
       <v-tab
         v-if="!isTrailRoute"
         nuxt
-        :to="`/learning-plans/${$route.params.planId}/tasks`"
+        :to="`/learning-plans/${route.params.planId}/tasks`"
         replace
       >
         Tarefas
@@ -27,7 +27,7 @@
       <v-tab
         v-if="!isTrailRoute"
         nuxt
-        :to="`/learning-plans/${$route.params.planId}/settings`"
+        :to="`/learning-plans/${route.params.planId}/settings`"
         replace
       >
         Opções do Plano
@@ -37,7 +37,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import getData from '~/mixins/getData';
 import access from '~/mixins/access';
 
@@ -47,11 +47,12 @@ export default {
   data() {
     return {
       planTitle: '',
+      route: useRoute(),
     };
   },
   computed: {
     generalInfoLink() {
-      const { trailId, planId } = this.$route.params;
+      const { trailId, planId } = this.route.params;
       return this.isTrailRoute
         ? `/learning-plans/${planId}/trails/${trailId}`
         : `/learning-plans/${planId}`;

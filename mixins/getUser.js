@@ -1,7 +1,7 @@
 import * as queries from '~/assets/queries';
 
 export default {
-  async asyncData({ error, params, route, $strapi }) {
+  async asyncData({ error, params, route }) {
     const graphql = useStrapiGraphQL();
     
     try {

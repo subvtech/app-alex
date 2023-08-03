@@ -78,6 +78,7 @@
 import form from '~/mixins/form';
 import FacebookSvg from '~/assets/svg/facebook.svg';
 
+const router = useRouter();
 export default {
   name: 'LoginPage',
   mixins: [form],
@@ -107,7 +108,7 @@ export default {
 
     if (user) {
       this.$strapi.setUser(user);
-      this.$router.push('/');
+      router.push('/');
     }
 
     this.logging = false;
@@ -126,7 +127,7 @@ export default {
           window.saveToken(jwt);
         }
 
-        this.$router.push('/');
+        router.push('/');
       } catch (error) {
         this.logging = false;
         this.$error('Email ou Senha inválido(s)');
@@ -153,27 +154,33 @@ export default {
   height: 100%;
   position: absolute;
   top: 0;
+
   &-imagem {
     background: #f0f0f0 !important;
     left: 0;
     width: calc(100% - 600px);
+
     &-imagem {
       height: 80vh;
     }
   }
+
   &-acesso {
     background: #001529 !important;
     right: 0;
     overflow: auto;
     width: 600px;
+
     &-alex-logo {
       width: 100px;
     }
   }
+
   &-text {
     font-family: 'Montserrat';
     font-weight: 500 !important;
   }
+
   &-btn {
     align-items: center;
     background: #00d3ec !important;
@@ -188,11 +195,13 @@ export default {
     margin: 10px 0;
     justify-content: center;
     width: 100%;
+
     &:hover {
       color: #001529;
       background-color: #00b8cc;
       border-color: #00b8cc;
     }
+
     &:active {
       color: #001529;
       background-color: #00a3b7;

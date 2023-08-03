@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main class="secondary">
-      <AppSnackbar></AppSnackbar>
+      <!-- <AppSnackbar></AppSnackbar> -->
       <v-container>
         <Nuxt />
       </v-container>

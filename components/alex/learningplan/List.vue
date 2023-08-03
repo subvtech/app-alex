@@ -4,7 +4,12 @@
       <v-col cols="12">
         <v-row justify="space-between" align="center">
           <v-col v-if="learningPlans.length" cols="3">
-            <v-text-field :label="searchText" outlined background-color="white" dense />
+            <v-text-field
+              :label="searchText"
+              outlined
+              background-color="white"
+              dense
+            />
           </v-col>
           <v-btn color="accent" @click="openModal = true">
             {{ newButtonText }}
@@ -12,8 +17,15 @@
         </v-row>
       </v-col>
       <v-row>
-        <v-col v-for="(learningPlan, i) in learningPlans" :key="`plan-${i}`" cols="3">
-          <app-learning-plan-card :learning-plan="learningPlan" :view-plan-url="getPlanUrl(learningPlan)" />
+        <v-col
+          v-for="(learningPlan, i) in learningPlans"
+          :key="`plan-${i}`"
+          cols="3"
+        >
+          <app-learning-plan-card
+            :learning-plan="learningPlan"
+            :view-plan-url="getPlanUrl(learningPlan)"
+          />
         </v-col>
       </v-row>
     </v-row>
@@ -23,16 +35,34 @@
           <v-card-title>{{ createPanText }}</v-card-title>
           <v-row justify="start" class="pa-5" dense>
             <v-col cols="12">
-              <v-text-field v-model="creationForm.title" :rules="rules.title" label="Título*" outlined />
+              <v-text-field
+                v-model="creationForm.title"
+                :rules="rules.title"
+                label="Título*"
+                outlined
+              />
             </v-col>
             <v-col cols="12">
-              <v-file-input v-model="creationForm.image" :rules="rules.image" accept="image/png, image/jpeg"
-                label="Imagem Principal" prepend-inner-icon="mdi-camera" prepend-icon="" outlined chips />
+              <v-file-input
+                v-model="creationForm.image"
+                :rules="rules.image"
+                accept="image/png, image/jpeg"
+                label="Imagem Principal"
+                prepend-inner-icon="mdi-camera"
+                prepend-icon=""
+                outlined
+                chips
+              />
             </v-col>
             <v-col cols="12">
               <v-row justify="center">
                 <v-btn class="mr-3" @click="cancelCreation">Cancelar</v-btn>
-                <v-btn color="primary" :disabled="!formValid" :loading="saving" type="submit">
+                <v-btn
+                  color="primary"
+                  :disabled="!formValid"
+                  :loading="saving"
+                  type="submit"
+                >
                   Criar
                 </v-btn>
               </v-row>
@@ -44,9 +74,10 @@
   </v-container>
 </template>
 <script>
-import { formRules } from "@/helpers/utils";
+import { formRules } from '@/helpers/utils';
 const { requiredRule, min5CharactersRule } = formRules;
 
+const router = useRouter();
 export default {
   props: {
     learningPlans: {
@@ -56,7 +87,7 @@ export default {
     parentLearningPlan: {
       type: Object,
       default: () => null,
-    }
+    },
   },
   data() {
     return {
@@ -68,34 +99,31 @@ export default {
       },
       creationForm: {
         title: '',
-        image: null
+        image: null,
       },
       saving: false,
     };
   },
   computed: {
-
     searchText() {
       return this.parentLearningPlan
         ? 'Buscar trilha de aprendizagem'
-        : 'Buscar plano de aprendizagem'
+        : 'Buscar plano de aprendizagem';
     },
     newButtonText() {
-      return this.parentLearningPlan
-        ? 'NOVA TRILHA'
-        : 'NOVO PLANO'
+      return this.parentLearningPlan ? 'NOVA TRILHA' : 'NOVO PLANO';
     },
     createPanText() {
       return this.parentLearningPlan
         ? 'Criar Trilha de Aprenziagem'
-        : 'Criar Plano de Aprendizagem'
-    }
+        : 'Criar Plano de Aprendizagem';
+    },
   },
   methods: {
     getPlanUrl(learningPlan) {
       return this.parentLearningPlan
         ? `/learning-plans/${this.parentLearningPlan.id}/trails/${learningPlan.id}`
-        : `/learning-plans/${learningPlan.id}`
+        : `/learning-plans/${learningPlan.id}`;
     },
     cancelCreation() {
       this.openModal = false;
@@ -108,8 +136,7 @@ export default {
       const { image, title } = this.creationForm;
       const parts = ['', 'learningplans'];
       const formData = new FormData();
-
-      const { $http, user } = this.$strapi;
+      const user = useStrapiUser();
       const isTrail = !!this.parentLearningPlan;
       const parentPlanId = (this.parentLearningPlan || {}).id;
       const data = { title, author: user.id };
@@ -129,12 +156,11 @@ export default {
         const method = '$post';
         const res = await $http[method](url, formData);
 
-        this.$router.push(
+        router.push(
           isTrail
             ? `/learning-plans/${parentPlanId}/trails/${res.id}`
-            : `/learning-plans/${res.id}`
+            : `/learning-plans/${res.id}`,
         );
-
       } catch (err) {
         this.saving = false;
         this.$error(err);
@@ -142,6 +168,6 @@ export default {
         this.saving = false;
       }
     },
-  }
-}
+  },
+};
 </script>

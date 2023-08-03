@@ -5,10 +5,21 @@
         <v-btn color="white" class="mr-1" @click="$emit('back')">
           Cancelar
         </v-btn>
-        <v-btn color="accent" class="mr-1" :loading="saving" :disabled="!updateFormValid" @click="() => save()">
+        <v-btn
+          color="accent"
+          class="mr-1"
+          :loading="saving"
+          :disabled="!updateFormValid"
+          @click="() => save()"
+        >
           Salvar
         </v-btn>
-        <v-btn v-if="!data.isTrail" color="accent" :loading="saving" @click="openModal = true">
+        <v-btn
+          v-if="!data.isTrail"
+          color="accent"
+          :loading="saving"
+          @click="openModal = true"
+        >
           Criar Versão
         </v-btn>
       </v-row>
@@ -19,7 +30,10 @@
         <v-form v-model="updateFormValid">
           <v-row>
             <v-col cols="3">
-              <alex-inputs-image-preview v-if="loadedImage" v-model="updateForm.image" />
+              <alex-inputs-image-preview
+                v-if="loadedImage"
+                v-model="updateForm.image"
+              />
             </v-col>
             <v-col cols="9">
               <v-row dense>
@@ -27,9 +41,9 @@
                   <v-text-field
                     v-model="updateForm.title"
                     :rules="updateRules.title"
-                    label="Nome do Plano" 
+                    label="Nome do Plano"
                     dense
-                    outlined 
+                    outlined
                   />
                 </v-col>
                 <v-col cols="12" class="pa-0">
@@ -41,7 +55,7 @@
                     dense
                     no-resize
                     auto-grow
-                    outlined 
+                    outlined
                   />
                 </v-col>
               </v-row>
@@ -60,17 +74,32 @@
       <app-editor ref="editor" :data="data.structure[0] || {}" />
       <v-dialog v-model="openModal" width="60%">
         <v-card class="pa-3">
-
           <v-card-title>Criar Versão</v-card-title>
-          <v-form ref="createForm" v-model="formTagCreationValid" @submit.prevent="save(tag)">
+          <v-form
+            ref="createForm"
+            v-model="formTagCreationValid"
+            @submit.prevent="save(tag)"
+          >
             <v-row justify="start" class="pa-5" dense>
               <v-col cols="12">
-                <v-text-field v-model="tag" :rules="tagRules" label="Versão" outlined />
+                <v-text-field
+                  v-model="tag"
+                  :rules="tagRules"
+                  label="Versão"
+                  outlined
+                />
               </v-col>
               <v-col cols="12">
                 <v-row justify="center">
-                  <v-btn class="mr-3" @click="cancelTagCreation">Cancelar</v-btn>
-                  <v-btn color="primary" :disabled="!formTagCreationValid" :loading="saving" type="submit">
+                  <v-btn class="mr-3" @click="cancelTagCreation"
+                    >Cancelar</v-btn
+                  >
+                  <v-btn
+                    color="primary"
+                    :disabled="!formTagCreationValid"
+                    :loading="saving"
+                    type="submit"
+                  >
                     Criar
                   </v-btn>
                 </v-row>
@@ -84,7 +113,7 @@
 </template>
 
 <script>
-import { formRules, createFileFromUrl } from "@/helpers/utils";
+import { formRules, createFileFromUrl } from '@/helpers/utils';
 const { requiredRule, min5CharactersRule } = formRules;
 
 const isObjectID = require('is-object-id');
@@ -128,28 +157,32 @@ export default {
   },
   methods: {
     async loadUpdateForm() {
-      const { title, description, image, coauthors, tags } = this.data
-      this.updateForm = { title, description }
+      const { title, description, image, coauthors, tags } = this.data;
+      this.updateForm = { title, description };
 
       if (coauthors && coauthors.length) {
-        this.updateForm.coauthors = coauthors.map(c => c.id)
+        this.updateForm.coauthors = coauthors.map((c) => c.id);
       }
 
       if (tags && tags.length) {
-        this.updateForm.tags = tags
+        this.updateForm.tags = tags;
       }
 
       if (image && !this.loadedImage) {
-        const imageFile = await createFileFromUrl(image.url, image.name, image.ext)
-        this.updateForm.image = imageFile
+        const imageFile = await createFileFromUrl(
+          image.url,
+          image.name,
+          image.ext,
+        );
+        this.updateForm.image = imageFile;
       }
 
       this.loadedImage = true;
     },
     async save(tag = '') {
       if (!this.updateForm) return;
-
-      const { planId, trailId } = this.$route.params;
+      const route = useRoute();
+      const { planId, trailId } = route.params;
       const { instance } = this.$refs.editor;
 
       this.saving = true;
@@ -169,9 +202,16 @@ export default {
 
         const { title, description, image, coauthors, tags } = this.updateForm;
 
-        const tagsIds = tags.map(t => t.id);
+        const tagsIds = tags.map((t) => t.id);
 
-        const data = { title, description, structure, tag, coauthors, tags: tagsIds }
+        const data = {
+          title,
+          description,
+          structure,
+          tag,
+          coauthors,
+          tags: tagsIds,
+        };
         const formData = new FormData();
 
         formData.append('data', JSON.stringify(data));
@@ -203,12 +243,11 @@ export default {
       this.confirmLeave = false;
       this.visible = false;
     },
-    doNothing() { },
+    doNothing() {},
     cancelTagCreation() {
       this.openModal = false;
       this.$refs.createForm.reset();
-    }
+    },
   },
-
 };
 </script>

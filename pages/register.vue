@@ -36,7 +36,7 @@
         <v-btn
           type="primary"
           class="mt-6 mx-auto"
-          @click="$router.push('/login')"
+          @click="router.push('/login')"
         >
           Voltar
         </v-btn>
@@ -166,6 +166,7 @@
 import FacebookSvg from '~/assets/svg/facebook.svg';
 import form from '~/mixins/form';
 
+const { register } = useStrapiAuth();
 const { find } = useStrapi();
 const user = useStrapiUser();
 
@@ -180,8 +181,13 @@ type FormDataType = {
   institution: string;
 };
 
-type Institutions =
-  { id: String; value: String; sigla: String; text: String; tipo: String; }
+type Institutions = {
+  id: String;
+  value: String;
+  sigla: String;
+  text: String;
+  tipo: String;
+};
 
 export default {
   name: 'RegisterPage',
@@ -296,12 +302,12 @@ export default {
       };
 
       try {
-        const { user } = await this.$strapi.register(userData);
+        const { user } = await register(userData);
 
         if (user.blocked) {
           this.$error('Usuário bloqueado!');
         } else if (user.confirmed) {
-          this.$router.push('/');
+          this.router.push('/');
         } else {
           this.checkEmail = true;
         }
