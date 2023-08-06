@@ -1,6 +1,16 @@
 <template>
-  <v-row align="center" dense class="px-0" style="z-index: 2;position: relative;">
-    <v-menu offset-y open-on-hover :z-index="2" style="z-index: 2;position: relative;">
+  <v-row
+    align="center"
+    dense
+    class="px-0"
+    style="z-index: 2; position: relative"
+  >
+    <v-menu
+      offset-y
+      open-on-hover
+      :z-index="2"
+      style="z-index: 2; position: relative"
+    >
       <template #activator="{ on, attrs }">
         <div v-bind="attrs" v-on="on">
           <v-badge
@@ -14,7 +24,7 @@
           </v-badge>
         </div>
       </template>
-      <v-container fluid color="white" style="z-index: 2;">
+      <v-container fluid color="white" style="z-index: 2">
         <v-row>
           <v-col cols="12">
             <app-user-avatar :user="author" />
@@ -36,7 +46,7 @@
         <p>
           {{ author.fullname + coAuthorsText(coAuthors) }}
         </p>
-        <div style="display: flex;">
+        <div style="display: flex">
           <span
             >Atualizado em:
             {{
@@ -49,42 +59,36 @@
   </v-row>
 </template>
 
-<script>
+<script setup lang="ts">
+import { User } from 'models/user.model';
 
-export default {
-  props: {
-    structure: {
-      type: Object,
-      required: true,
-    },
-    author: {
-      type: Object,
-      required: true,
-    },
-    coAuthors: {
-      type: Array,
-      default: () => [],
-    },
+const props = defineProps({
+  structure: {
+    type: Object,
+    required: true,
   },
-  data() {
-    return {
-    };
+  author: {
+    type: Object,
+    required: true,
   },
-  methods: {
-    coAuthorsText(coAuthors) {
-      if (coAuthors.length < 1) {
-        return '';
-      } else if (coAuthors.length > 1) {
-        return ` e mais ${coAuthors.length} pessoas`;
-      } else {
-        return ` e mais ${coAuthors.length} pessoa`;
-      }
-    },
+  coAuthors: {
+    type: Array as unknown as PropType<User>,
+    default: () => [],
   },
+});
+const { structure, author, coAuthors } = toRefs(props);
+
+const coAuthorsText = (coAuthors) => {
+  if (coAuthors.length < 1) {
+    return '';
+  } else if (coAuthors.length > 1) {
+    return ` e mais ${coAuthors.length} pessoas`;
+  } else {
+    return ` e mais ${coAuthors.length} pessoa`;
+  }
 };
 </script>
 <style lang="scss" scoped>
-
 .avatar-info-section {
   margin-left: 8px;
 
@@ -97,7 +101,5 @@ export default {
   span {
     font-size: 13px;
   }
-
 }
-
 </style>

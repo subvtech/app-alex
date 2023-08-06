@@ -5,7 +5,7 @@
         <div align="center">
           <img
             alt="Recupere sua senha com email"
-            src="../../static/images/imagem_forgot.png"
+            src="../static/images/imagem_forgot.png"
             class="card-imagem-imagem my-5"
           />
         </div>
@@ -14,19 +14,22 @@
     <v-col>
       <v-card v-if="checkEmail" class="card card-forgot px-10">
         <div align="center">
-          <v-img src="../static/images/alex.svg" class="card-forgot-alex-logo my-15" />
+          <v-img
+            src="../static/images/alex.svg"
+            class="card-forgot-alex-logo my-15"
+          />
         </div>
         <v-card class="card-forgot-aviso px-5 py-3">
-          <v-card-title class="white--text my-2">
+          <v-card-title class="text-white my-2">
             Recuperação enviada!
           </v-card-title>
-          <v-card-text class="white--text my-2">
+          <v-card-text class="text-white my-2">
             Enviamos instruições para o e-mail <strong>{{ email }}</strong
             >. Acesse e siga o que foi informado.
           </v-card-text>
         </v-card>
         <v-card-text class="text--white my-5">
-          <nuxt-link to="/login" class="white--text">
+          <nuxt-link to="/login" class="text-white">
             Voltar para o login
           </nuxt-link>
         </v-card-text>
@@ -39,10 +42,10 @@
             class="card-forgot-alex-logo my-15"
           />
         </div>
-        <v-card-title class="white--text my-2">
+        <v-card-title class="text-white my-2">
           Esqueceu sua senha?
         </v-card-title>
-        <v-card-subtitle class="white--text my-2">
+        <v-card-subtitle class="text-white my-2">
           Digite seu e-mail e enviaremos instruções
         </v-card-subtitle>
         <v-form @submit.prevent="submit">
@@ -60,53 +63,37 @@
             Recuperar senha
           </v-btn>
         </v-form>
-        <v-card-text class="white--text mt-6 mb-10">
+        <v-card-text class="text-white mt-6 mb-10">
           Lembrou da senha?
-          <nuxt-link to="/login" class="white--text"> Acesse aqui </nuxt-link>
+          <nuxt-link to="/login" class="text-white"> Acesse aqui </nuxt-link>
         </v-card-text>
       </v-card>
     </v-col>
   </v-row>
 </template>
 
-<script>
-import form from '~/mixins/form';
+<script setup lang="ts">
+const { forgotPassword } = useStrapiAuth();
 
-export default {
-  name: 'ForgotPage',
-  mixins: [form],
-  layout: 'auth',
-  data() {
-    return {
-      sending: false,
-      checkEmail: false,
-      email: '',
-      emailRules: [
-        (v) => !!v || 'Email é necessário',
-        (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
-      ],
-    };
-  },
-  methods: {
-    async submit() {
-      const email = { email: this.email };
-      this.sending = true;
+let sending = ref(false);
+let checkEmail = ref(false);
+let email = ref('');
+let emailRules = [
+  (v) => !!v || 'Email é necessário',
+  (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
+];
+const submit = async () => {
+  sending.value = true;
 
-      try {
-        const { ok } = await this.$strapi.forgotPassword(email);
+  try {
+    await forgotPassword({ email: email.value });
 
-        if (ok) {
-          this.checkEmail = true;
-          this.sending = false;
-        } else {
-          throw new Error('Ocorreu um erro desconhecido. :/');
-        }
-      } catch (error) {
-        this.sending = false;
-        this.$error(error);
-      }
-    },
-  },
+    checkEmail.value = true;
+    sending.value = false;
+  } catch (error) {
+    sending.value = false;
+    this.$error(error);
+  }
 };
 </script>
 

@@ -2,7 +2,7 @@
   <v-dialog v-model="visible" class="modal-document" width="98%">
     <v-card class="modal-document">
       <v-card-title>
-        {{ isLoading ? "Carregando..." : title }}
+        {{ isLoading ? 'Carregando...' : title }}
       </v-card-title>
       <div class="pdf-app-container">
         <vue-pdf-app theme="dark" :pdf="url"></vue-pdf-app>
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import "~/assets/css/pdf-icons.css";
+import '~/assets/css/pdf-icons.css';
 
 // import Loader from './AppLoader.vue';
 
@@ -36,11 +36,11 @@ export default {
   props: {
     url: {
       type: String,
-      default: "",
+      default: '',
     },
     title: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   data() {
@@ -54,7 +54,7 @@ export default {
       return this.isElectronEnv()
         ? // eslint-disable-next-line no-undef
           `file://${__resources}/locale.txt`
-        : "/locale.txt";
+        : '/locale.txt';
     },
   },
   methods: {

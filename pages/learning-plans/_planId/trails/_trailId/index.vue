@@ -5,14 +5,10 @@
   />
 </template>
 
-<script>
+<script setup lang="ts">
+import { useGetData } from '~/composables/getData';
+import { useAccess } from '~/composables/access';
 
-import getData from "~/mixins/getData";
-import access from "~/mixins/access";
-
-export default {
-    name: "LearningPlansTrailIdIndex",
-    mixins: [getData, access],
-
-}
+const hasAccess = useAccess();
+const { learningPlan } = useGetData();
 </script>

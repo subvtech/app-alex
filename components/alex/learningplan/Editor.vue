@@ -115,7 +115,7 @@
 <script>
 import { formRules, createFileFromUrl } from '@/helpers/utils';
 const { requiredRule, min5CharactersRule } = formRules;
-
+import { update } from '@nuxtjs/strapi';
 const isObjectID = require('is-object-id');
 
 export default {
@@ -220,7 +220,7 @@ export default {
           formData.append('files.image', image, image.name);
         }
 
-        await this.$strapi.update('learningplans', trailId || planId, formData);
+        await update('learningplans', trailId || planId, formData);
 
         this.$success('Dados salvos com sucesso!');
         this.$emit('updated');

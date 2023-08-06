@@ -2,17 +2,14 @@
   <alex-learningplan-page
     :learning-plan="learningPlan"
     :has-permission="hasAccess('learningplan', 'update')"
-    @updated="reloadLearningPlanData"
+    @updated="loadPlan"
   />
 </template>
 
-<script>
+<script setup lang="ts">
+import { useGetData } from '~/composables/getData';
+import { useAccess } from '~/composables/access';
 
-import getData from "~/mixins/getData";
-import access from "~/mixins/access";
-
-export default {
-  name: "LearningPlansPlanIdIndex",
-  mixins: [getData, access],
-}
+const hasAccess = useAccess();
+const { learningPlan, loadPlan } = useGetData();
 </script>

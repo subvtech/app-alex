@@ -2,19 +2,15 @@
   <alex-learningplan-list
     :learning-plans="learningPlan.trails"
     :parent-learning-plan="learningPlan"
-    @updated="reloadLearningPlanData"
+    @updated="loadPlan"
   />
 
 </template>
 
-<script>
+<script setup lang="ts">
+import { useGetData } from '~/composables/getData';
+import { useAccess } from '~/composables/access';
 
-import getData from "~/mixins/getData";
-import access from "~/mixins/access";
+const {learningPlan, loadPlan} = useGetData()
 
-export default {
-    name: "LearningPlansTrailsIndex",
-    mixins: [getData, access],
-
-}
 </script>

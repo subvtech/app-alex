@@ -8,28 +8,13 @@
     </v-row>
     <v-tabs v-if="!isTrailRoute" class="mb-5">
       <v-tab nuxt :to="generalInfoLink" replace> Geral </v-tab>
-      <v-tab
-        v-if="!isTrailRoute"
-        nuxt
-        :to="`/learning-plans/${route.params.planId}/trails`"
-        replace
-      >
+      <v-tab v-if="!isTrailRoute" nuxt :to="`/learning-plans/${route.params.planId}/trails`" replace>
         Trilhas de aprendizagem
       </v-tab>
-      <v-tab
-        v-if="!isTrailRoute"
-        nuxt
-        :to="`/learning-plans/${route.params.planId}/tasks`"
-        replace
-      >
+      <v-tab v-if="!isTrailRoute" nuxt :to="`/learning-plans/${route.params.planId}/tasks`" replace>
         Tarefas
       </v-tab>
-      <v-tab
-        v-if="!isTrailRoute"
-        nuxt
-        :to="`/learning-plans/${route.params.planId}/settings`"
-        replace
-      >
+      <v-tab v-if="!isTrailRoute" nuxt :to="`/learning-plans/${route.params.planId}/settings`" replace>
         Opções do Plano
       </v-tab>
     </v-tabs>
@@ -37,31 +22,25 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import getData from '~/mixins/getData';
-import access from '~/mixins/access';
+<script setup lang="ts">
+import { useGetData } from '~/composables/getData';
+import { useAccess } from '~/composables/access';
 
-export default {
-  name: 'LearningPlansPlanIdIndex',
-  mixins: [getData, access],
-  data() {
-    return {
-      planTitle: '',
-      route: useRoute(),
-    };
-  },
-  computed: {
-    generalInfoLink() {
-      const { trailId, planId } = this.route.params;
-      return this.isTrailRoute
-        ? `/learning-plans/${planId}/trails/${trailId}`
-        : `/learning-plans/${planId}`;
-    },
-  },
-  methods: {
-    onLoadedChild(learningPlan) {
-      this.planTitle = learningPlan.title;
-    },
-  },
-};
+const {isTrailRoute, handleBack} = useGetData()
+const hasAccess = useAccess()
+const route = useRoute()
+
+const planTitle = ref('');
+
+const generalInfoLink = computed(() => {
+  const { trailId, planId } = route.params;
+  return isTrailRoute
+    ? `/learning-plans/${planId}/trails/${trailId}`
+    : `/learning-plans/${planId}`;
+})
+
+const onLoadedChild = (learningPlan) => {
+  planTitle.value = learningPlan.title;
+}
+
 </script>

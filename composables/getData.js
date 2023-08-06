@@ -89,7 +89,6 @@ export const useGetData = () => {
   }
 
   const reloadParams = {
-    $strapi: this.$strapi,
     params: route.params,
   };
 
@@ -101,5 +100,5 @@ export const useGetData = () => {
       }
     })
     .catch(() => {});
-  return { learningPlan, breadcrumb, handleBack };
+  return { learningPlan, breadcrumb, loadPlan, handleBack, isTrailRoute, userInitials };
 };

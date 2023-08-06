@@ -3,7 +3,7 @@
     <img :src="user.avatar.url" :alt="user.fullname" />
   </v-avatar>
   <v-avatar v-else color="accent">
-    <span class="white--text text-h5">{{ userInitials }}</span>
+    <span class="text-white text-h5">{{ userInitials }}</span>
   </v-avatar>
 </template>
 <script>

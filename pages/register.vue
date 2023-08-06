@@ -5,7 +5,7 @@
         <div align="center">
           <img
             alt="Crie sua conta"
-            src="/images/imagem_register.png"
+            src="../static/images/imagem_register.png"
             class="card-imagem-imagem my-5"
           />
         </div>
@@ -16,14 +16,14 @@
         <div align="center">
           <v-img
             alt="Alex"
-            src="/images/alex.svg"
+            src="../static/images/alex.svg"
             class="card-register-alex-logo my-15"
           />
         </div>
-        <v-card-title class="white--text my-2">
+        <v-card-title class="text-white my-2">
           Usuário cadastrado com sucesso!
         </v-card-title>
-        <v-card-subtitle class="white--text my-2">
+        <v-card-subtitle class="text-white my-2">
           {{
             isProfessor
               ? 'Um administrador irá validar seu cadastro.'
@@ -49,10 +49,10 @@
             class="card-register-alex-logo my-12"
           />
         </div>
-        <v-card-title class="white--text my-2">
+        <v-card-title class="text-white my-2">
           Inicie uma nova experiência!
         </v-card-title>
-        <v-card-subtitle class="white--text my-2">
+        <v-card-subtitle class="text-white my-2">
           Crie uma conta e comece seus estudos
         </v-card-subtitle>
         <v-form v-model="isFormValid" @submit.prevent="submit">
@@ -153,22 +153,20 @@
             Criar Conta
           </v-btn>
         </v-form>
-        <v-card-text class="white--text mt-6 mb-10">
+        <v-card-text class="text-white mt-6 mb-10">
           Já possui conta?
-          <nuxt-link to="/login" class="white--text"> Acesse aqui </nuxt-link>
+          <nuxt-link to="/login" class="text-white"> Acesse aqui </nuxt-link>
         </v-card-text>
       </v-card>
     </v-col>
   </v-row>
 </template>
 
-<script lang="ts">
-import FacebookSvg from '~/assets/svg/facebook.svg';
-import form from '~/mixins/form';
+<script setup lang="ts">
 
 const { register } = useStrapiAuth();
 const { find } = useStrapi();
-const user = useStrapiUser();
+const router = useRouter();
 
 type FormDataType = {
   fullname: string;
@@ -181,7 +179,7 @@ type FormDataType = {
   institution: string;
 };
 
-type Institutions = {
+type InstitutionsType = {
   id: String;
   value: String;
   sigla: String;
@@ -189,135 +187,123 @@ type Institutions = {
   tipo: String;
 };
 
-export default {
-  name: 'RegisterPage',
-  mixins: [form],
-  layout: 'auth',
-  asyncData({ req = {} }: any) {
-    return {
-      host: process.server ? (req.headers || {}).host : location.host,
-      formData: {
-        fullname: '',
-        username: '',
-        email: '',
-        cpf: '',
-        password1: '',
-        password2: '',
-        yourRole: '',
-        institution: '',
-      } as FormDataType,
-      showPassword: false,
-      showConfirmPassword: false,
-      fullnameRules: [(v) => !!v || 'Nome completo é necessário'],
-      usernameRules: [(v) => !!v || 'Usuário é necessário'],
-      emailRules: [
-        (v) => !!v || 'Email é necessário',
-        (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
-      ],
-      cpfRules: [
-        (v) => !!v || 'CPF é necessário',
-        (v) => v.length === 11 || 'CPF contem 11 caracteres',
-      ],
-      passwordRules: [(v) => !!v || 'Senha é necessária'],
-    };
-  },
-  data() {
-    return {
-      FacebookSvg,
-      checkEmail: false,
-      isFormValid: false,
-      registering: false,
-      fetching: false,
-      institutions: [],
-      search: null,
-      timeoutSearch: null,
-      roles: [
-        { text: 'Sou Aluno', value: 'Aluno' },
-        { text: 'Sou Professor', value: 'Professor' },
-      ],
-    };
-  },
-  computed: {
-    isProfessor() {
-      return this.role === 'Professor';
-    },
-    confirmPasswordRules() {
-      return [
-        (v) => !!v || 'Senha é necessária',
-        (v) => v === this.formData.password1 || 'Senha diferentes',
-      ];
-    },
-  },
-  watch: {
-    async search(value) {
-      await this.fetchInstitutions(value);
-    },
-  },
-  methods: {
-    async fetchInstitutions(instValue) {
-      this.fetching = true;
-      try {
-        const res = await find(
-          `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
-        );
-        const resultArr = (res.data.length > 0 ? res.data : []).map(
-          (r: any) => {
-            return {
-              id: r.id,
-              value: r.nome,
-              sigla: r.sigla,
-              text: r.nome,
-              tipo: r.tipo,
-            };
-          },
-        );
+let FacebookSvg = ref();
+let checkEmail = ref(false);
+let isFormValid = ref(false);
+let registering = ref(false);
+let fetching = ref(false);
+let institutions = ref<InstitutionsType[]>([]);
+let search = ref(null);
+let timeoutSearch = ref(null);
+let roles = ref([
+  { text: 'Sou Aluno', value: 'Aluno' },
+  { text: 'Sou Professor', value: 'Professor' },
+]);
 
-        this.institutions = resultArr;
-      } catch (error) {
-        console.log({ error });
-        this.$error('Ocorreu um erro na busca.');
-      }
-      this.fetching = false;
-    },
+const formData = ref<FormDataType>({
+  fullname: '',
+  username: '',
+  email: '',
+  cpf: '',
+  password1: '',
+  password2: '',
+  yourRole: '',
+  institution: '',
+});
 
-    async submit() {
-      this.registering = true;
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
-      const { cpf, email, password1, username, fullname, institution } =
-        this.formData;
+const fullnameRules = [(v) => !!v || 'Nome completo é necessário'];
+const usernameRules = [(v) => !!v || 'Usuário é necessário'];
 
-      if (!institution) {
-        this.$error('Selecione sua instituição.');
-        return;
-      }
+const emailRules = [
+  (v: any) => !!v || 'Email é necessário',
+  (v: string) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
+];
 
-      const userData = {
-        cpf,
-        email,
-        password: password1,
-        username,
-        fullname,
-        institution: [institution],
-        isProfessor: this.isProfessor,
+const cpfRules = [
+  (v: any) => !!v || 'CPF é necessário',
+  (v: string | any[]) => v.length === 11 || 'CPF contem 11 caracteres',
+];
+
+const passwordRules = [(v) => !!v || 'Senha é necessária'];
+
+const isProfessor = computed(() => {
+  return formData.value.yourRole === 'Professor';
+});
+
+const confirmPasswordRules = computed(() => {
+  return [
+    (v: any) => !!v || 'Senha é necessária',
+    (v: any) => v === formData.value.password1 || 'Senha diferentes',
+  ];
+});
+
+const fetchInstitutions = async (instValue: any) => {
+  fetching.value = true;
+  try {
+    const res = await find(
+      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
+    );
+    const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
+      return {
+        id: r.id,
+        value: r.nome,
+        sigla: r.sigla,
+        text: r.nome,
+        tipo: r.tipo,
       };
+    });
 
-      try {
-        const { user } = await register(userData);
-
-        if (user.blocked) {
-          this.$error('Usuário bloqueado!');
-        } else if (user.confirmed) {
-          this.router.push('/');
-        } else {
-          this.checkEmail = true;
-        }
-      } catch (error) {
-        this.registering = false;
-        this.$error(error);
-      }
-    },
-  },
+    institutions.value = resultArr;
+  } catch (error) {
+    console.log({ error });
+    this.$error('Ocorreu um erro na busca.');
+  }
+  fetching.value = false;
 };
+
+const submit = async () => {
+  registering.value = true;
+
+  const { cpf, email, password1, username, fullname, institution } =
+    formData.value;
+
+  if (!institution) {
+    this.$error('Selecione sua instituição.');
+    return;
+  }
+
+  const userData = {
+    cpf,
+    email,
+    password: password1,
+    username,
+    fullname,
+    institution: [institution],
+    isProfessor: isProfessor.value,
+  };
+
+  try {
+    const { user } = await register(userData);
+
+    if (user.value!.blocked) {
+      this.$error('Usuário bloqueado!');
+    } else if (user.value!.confirmed) {
+      router.push('/');
+    } else {
+      checkEmail.value = true;
+    }
+  } catch (error) {
+    registering.value = false;
+    this.$error(error);
+  }
+};
+/*
+watch(d, async (value) => {
+  await fetchInstitutions(value);
+});*/
 </script>
 
 <style scoped lang="scss">

@@ -2,12 +2,8 @@
   <v-container fluid> asdasda </v-container>
 </template>
 
-<script lang="ts">
-import getData from '../../../mixins/getData';
-import access from '../../../mixins/access';
+<script setup lang="ts">
+import { useGetData } from '~/composables/getData';
+import { useAccess } from '~/composables/access';
 
-export default {
-  name: 'LearningPlansPlanIdIndex',
-  mixins: [getData, access],
-};
 </script>

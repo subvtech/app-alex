@@ -14,16 +14,16 @@
     <v-col>
       <v-card class="card card-acesso px-10">
         <div align="center">
-          <v-img
+          <img
             alt="Alex"
             src="../../static/images/alex.svg"
             class="card-acesso-alex-logo my-15"
           />
         </div>
-        <v-card-title class="white--text my-2">
+        <v-card-title class="text-white my-2">
           Bem vindo a plataforma ALEX!
         </v-card-title>
-        <v-card-subtitle class="white--text my-2">
+        <v-card-subtitle class="text-white my-2">
           Acesse sua conta e continue com seus estudos
         </v-card-subtitle>
         <v-form ref="form" @submit.prevent="submit">
@@ -52,20 +52,20 @@
           />
           <v-checkbox
             v-model="checkbox"
-            class="white--text"
+            class="text-white"
             label="Lembrar dados"
             dark
           ></v-checkbox>
-          <nuxt-link to="/forgot" class="white--text my-4">
+          <nuxt-link to="/forgot" class="text-white my-4">
             Esqueceu sua senha?
           </nuxt-link>
           <v-btn block class="card-btn" type="submit" :loading="logging">
             Entrar
           </v-btn>
         </v-form>
-        <v-card-text class="white--text mt-6 mb-10">
+        <v-card-text class="text-white mt-6 mb-10">
           Ainda não possui conta?
-          <nuxt-link to="/register" class="white--text">
+          <nuxt-link to="/register" class="text-white">
             Crie sua conta
           </nuxt-link>
         </v-card-text>
@@ -74,34 +74,26 @@
   </v-row>
 </template>
 
-<script>
-import form from '~/mixins/form';
-import FacebookSvg from '~/assets/svg/facebook.svg';
-
+<script setup lang="ts">
+const { login } = useStrapiAuth()
 const router = useRouter();
-export default {
-  name: 'LoginPage',
-  mixins: [form],
-  layout: 'auth',
-  data() {
-    return {
-      FacebookSvg,
-      logging: false,
-      email: '',
-      emailRules: [
-        (v) => !!v || 'Email é necessário',
-        (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
-      ],
-      password: '',
-      passwordRules: [(v) => !!v || 'Senha é necessário'],
-      passwordVisible: false,
-      checkbox: false,
-    };
-  },
-  mounted() {
-    this.logging = true;
 
-    let user;
+const logging = ref(false);
+const passwordVisible = ref(false);
+const checkbox = ref(false);
+
+const email = ref('');
+const password = ref('');
+const emailRules=  [
+        (v) => !!v || 'Email é necessário',
+        (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido' ]
+const passwordRules= [(v) => !!v || 'Senha é necessário'];
+     
+
+onMounted(() => {
+  logging.value = true;
+
+  let user;
     if (process.env.isElectronEnv) {
       user = window.getCurrentUser();
     }
@@ -111,16 +103,17 @@ export default {
       router.push('/');
     }
 
-    this.logging = false;
-  },
-  methods: {
-    async submit() {
-      this.logging = true;
+    logging.value = false;
+})
+
+
+const submit = async () => {
+      logging.value = true;
 
       try {
-        const { jwt } = await this.$strapi.login({
-          identifier: this.email,
-          password: this.password,
+        const { jwt } = await login({
+          identifier: email.value,
+          password: password.value,
         });
 
         if (process.env.isElectronEnv) {
@@ -129,12 +122,10 @@ export default {
 
         router.push('/');
       } catch (error) {
-        this.logging = false;
+        logging.value = false;
         this.$error('Email ou Senha inválido(s)');
       }
-    },
-  },
-};
+    }
 </script>
 
 <style scoped lang="scss">

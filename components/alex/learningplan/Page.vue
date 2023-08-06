@@ -17,7 +17,7 @@
       />
       <v-dialog v-model="visible" width="500">
         <v-card>
-          <v-card-title class="primary white--text">
+          <v-card-title class="primary text-white">
             Sair do Editor?
           </v-card-title>
 

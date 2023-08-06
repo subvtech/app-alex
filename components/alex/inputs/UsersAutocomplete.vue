@@ -52,6 +52,7 @@
 <script>
 import { stringify } from 'qs';
 const user = useStrapiUser();
+const { find } = useStrapi();
 
 export default {
   props: ['value'],
@@ -101,7 +102,7 @@ export default {
 
       const query = stringify(ids.length ? queryIds : querySearch);
 
-      this.users = await this.$strapi.$http.$get(`/users?${query}&_limit=20`);
+      this.users = await find(`/users?${query}&_limit=20`);
 
       this.loadingUsers = false;
     },
