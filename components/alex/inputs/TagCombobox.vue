@@ -79,87 +79,85 @@
   </v-combobox>
 </template>
 
-<script>
+<script setup lang="ts">
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
-const graphql = useStrapiGraphQL()
+const graphql = useStrapiGraphQL();
 
-export default {
-  props: ['value'],
-  data() {
-    return {
-      tags: [],
-      selectedTags: [],
-      loadingTags: false,
-      disabled: false,
-      search: '',
-    };
+const props = defineProps(['value']);
+const { value } = toRefs(props);
+
+const tags = ref([]);
+const selectedTags = ref([]);
+const loadingTags = ref(false);
+const disabled = ref(false);
+const search = ref('');
+
+watch(
+  () => search,
+  async () => {
+    await searchTags(search.value);
   },
+);
 
-  computed: {},
-
-  watch: {
-    search: {
-      async handler(search = '') {
-        await this.searchTags(search);
-      },
-    },
-    async value() {
-      await this.loadTags();
-    },
+watch(
+  () => value,
+  async () => {
+    await loadTags();
   },
-  async created() {
-    await this.loadTags();
-  },
-  methods: {
-    async loadTags() {
-      if (this.value && this.value.length) {
-        this.selectedTags = this.value;
-        await this.searchTags(
-          '',
-          this.value.map((t) => t.id),
-        );
-      }
-    },
-    async searchTags(search = '', ids = []) {
-      if ((!search || search.length < 3) && !ids.length) return;
-      this.loadingTags = true;
+);
+onMounted(async () => {
+  await loadTags();
+});
 
-      // const
-      const query = {
-        query: ids.length ? queries.tagsByids : queries.tags,
-        variables: ids.length ? { ids } : { search },
-      };
+const loadTags = async () => {
+  if (value && value.value.length) {
+    selectedTags.value = value.value;
+    await searchTags(
+      '',
+      value.value.map((t) => t.id),
+    );
+  }
+};
 
-      this.tags = (await graphql(query)).tags;
+const searchTags = async (search = '', ids: string[] = []) => {
+  if ((!search || search.length < 3) && !ids.length) return;
+  loadingTags.value = true;
 
-      this.loadingTags = false;
-    },
-    remove(item) {
-      if (this.disabled) return;
-      this.selectedTags = this.selectedTags.filter((t) => t.id !== item.id);
-    },
-    async onInput() {
-      this.search = '';
+  // const
+  const props = {
+    query: ids.length ? queries.tagsByids : queries.tags,
+    variables: ids.length ? { ids } : { search },
+  };
 
-      await this.checkForNewTags();
-      this.$emit('input', this.selectedTags);
-    },
-    async checkForNewTags() {
-      const newTags = this.selectedTags.filter((tag) => !tag.tag);
+  tags.value = (await graphql(props.query, props.variables)).tags;
 
-      if (newTags.length) {
-        this.disabled = true;
-        const newTagIdx = this.selectedTags.findIndex((tag) => !tag.tag);
+  loadingTags.value = false;
+};
 
-        const tag = await create('tags', { tag: newTags[0] });
+const remove = (item) => {
+  if (disabled.value) return;
+  selectedTags.value = selectedTags.value.filter((t) => t.id !== item.id);
+};
+const onInput = async () => {
+  search.value = '';
 
-        this.selectedTags[newTagIdx] = tag;
+  await checkForNewTags();
+  this.$emit('input', selectedTags.value);
+};
+const checkForNewTags = async () => {
+  const newTags = selectedTags.value.filter((tag) => !tag.tag);
 
-        this.disabled = false;
-      }
-    },
-  },
+  if (newTags.length) {
+    disabled.value = true;
+    const newTagIdx = selectedTags.value.findIndex((tag) => !tag.tag);
+
+    const tag = await create('tags', { tag: newTags[0] });
+
+    selectedTags.value[newTagIdx] = tag;
+
+    disabled.value = false;
+  }
 };
 </script>
 
