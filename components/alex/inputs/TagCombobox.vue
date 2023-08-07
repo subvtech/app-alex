@@ -31,10 +31,10 @@
         @click="data.select"
         @click:close="remove(data.item)"
       >
-        <template v-if="data.item.tag">
-          {{ data.item.tag }}
+        <template v-if="data.item.raw.tag">
+          {{ data.item.raw.tag }}
           <v-icon
-            v-if="data.item.verified"
+            v-if="data.item.raw.verified"
             color="green"
             small
             title="Tag Verificada Alex"
@@ -56,9 +56,9 @@
     <template #item="data">
       <v-list-item-content>
         <v-list-item-title>
-          {{ data.item.tag }}
+          {{ data.item }}
           <v-icon
-            v-if="data.item.verified"
+            v-if="data.item.raw.verified"
             color="green"
             title="Tag Verificada Alex"
             >mdi-check-decagram</v-icon
@@ -80,6 +80,7 @@
 </template>
 
 <script setup lang="ts">
+import { Tag } from 'models/tag.model';
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
 const graphql = useStrapiGraphQL();
@@ -87,8 +88,8 @@ const graphql = useStrapiGraphQL();
 const props = defineProps(['value']);
 const { value } = toRefs(props);
 
-const tags = ref([]);
-const selectedTags = ref([]);
+const tags: globalThis.Ref<Tag[]> = ref([]);
+const selectedTags: globalThis.Ref<Tag[]> = ref([]);
 const loadingTags = ref(false);
 const disabled = ref(false);
 const search = ref('');
@@ -130,7 +131,7 @@ const searchTags = async (search = '', ids: string[] = []) => {
     variables: ids.length ? { ids } : { search },
   };
 
-  tags.value = (await graphql(props.query, props.variables)).tags;
+  tags.value = (await graphql<Tag>(props.query, props.variables)).tags;
 
   loadingTags.value = false;
 };
@@ -152,7 +153,7 @@ const checkForNewTags = async () => {
     disabled.value = true;
     const newTagIdx = selectedTags.value.findIndex((tag) => !tag.tag);
 
-    const tag = await create('tags', { tag: newTags[0] });
+    const tag = (await create('tags', { tag: newTags[0] })).data.attributes.tag;
 
     selectedTags.value[newTagIdx] = tag;
 

@@ -49,81 +49,75 @@
   </v-autocomplete>
 </template>
 
-<script>
+<script setup lang="ts">
+import { User } from 'models/user.model';
 import { stringify } from 'qs';
 const user = useStrapiUser();
 const { find } = useStrapi();
 
-export default {
-  props: ['value'],
-  data() {
-    return {
-      users: [],
-      selectedUsers: [],
-      loadingUsers: false,
-      search: '',
-    };
-  },
+const props = defineProps(['value']);
+const { value } = toRefs(props);
 
-  computed: {},
+const users: globalThis.Ref<User[]> = ref([]);
+const selectedUsers: globalThis.Ref<User[]> = ref([]);
+const loadingUsers = ref(false);
+const search = ref('');
 
-  watch: {
-    search: {
-      async handler(search = '') {
-        await this.searchUsers(search);
-      },
+watch(
+  () => search.value,
+  async () => await searchUsers(search.value),
+);
+watch(
+  () => value!.value,
+  async () => await loadUsers(),
+);
+
+onMounted(async () => await loadUsers());
+
+const loadUsers = async () => {
+  if (value!.value && value?.value.length) {
+    selectedUsers.value = value.value;
+    await searchUsers('', value.value);
+  }
+};
+
+const searchUsers = async (search = '', ids = []) => {
+  if ((!search || search.length < 3) && !ids.length) return;
+  loadingUsers.value = true;
+
+  const queryIds = { _where: { id: ids } };
+
+  const querySearch = {
+    _where: {
+      id_ne: user.value!.id,
+      _or: [{ email_contains: search }, { fullname_contains: search }],
     },
-    async value() {
-      await this.loadUsers();
-    },
-  },
-  async created() {
-    await this.loadUsers();
-  },
-  methods: {
-    async loadUsers() {
-      if (this.value && this.value.length) {
-        this.selectedUsers = this.value;
-        await this.searchUsers('', this.value);
-      }
-    },
-    async searchUsers(search = '', ids = []) {
-      if ((!search || search.length < 3) && !ids.length) return;
-      this.loadingUsers = true;
+  };
 
-      const queryIds = { _where: { id: ids } };
+  const query = stringify(ids.length ? queryIds : querySearch);
 
-      const querySearch = {
-        _where: {
-          id_ne: user.id,
-          _or: [{ email_contains: search }, { fullname_contains: search }],
-        },
-      };
+  users.value = (await find<User>(`/users?${query}&_limit=20`)).data;
 
-      const query = stringify(ids.length ? queryIds : querySearch);
+  loadingUsers.value = false;
+};
+const remove = (item) => {
+  selectedUsers.value = selectedUsers.value.filter((u) => u !== item.id);
+};
 
-      this.users = await find(`/users?${query}&_limit=20`);
+const getReducedName = (fullname = '') => {
+  if (!fullname) return '';
+  const names = fullname.split(' ');
 
-      this.loadingUsers = false;
-    },
-    remove(item) {
-      this.selectedUsers = this.selectedUsers.filter((u) => u !== item.id);
-    },
-    getReducedName(fullname = '') {
-      if (!fullname) return '';
-      const names = fullname.split(' ');
+  if (names.length === 1) {
+    return fullname;
+  }
 
-      if (names.length === 1) {
-        return fullname;
-      }
+  return `${names[0]} ${names[names.length - 1]}`;
+};
 
-      return `${names[0]} ${names[names.length - 1]}`;
-    },
-    onInput() {
-      this.search = '';
-      this.$emit('input', this.selectedUsers);
-    },
-  },
+const onInput = () => {
+  search.value = '';
+  this.$emit('input', selectedUsers.value);
 };
 </script>
 
