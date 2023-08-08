@@ -38,15 +38,7 @@
   </v-hover>
 </template>
 <script setup lang="ts">
-interface LearningPlan {
-  title: string;
-  image: any;
-  structure: any[];
-  trails: any[];
-  author: any[];
-  isVisible: boolean;
-  description: string;
-}
+import { LearningPlan } from 'models/learningPlan.model';
 
 const props = defineProps({
   learningPlan: {

@@ -73,101 +73,107 @@
     </v-dialog>
   </v-container>
 </template>
-<script>
+<script setup lang="ts">
+import {LearningPlan} from '~/models/learningPlan.model';
 import { formRules } from '@/helpers/utils';
 const { requiredRule, min5CharactersRule } = formRules;
 
 const router = useRouter();
-export default {
-  props: {
-    learningPlans: {
-      type: Array,
-      required: true,
-    },
-    parentLearningPlan: {
-      type: Object,
-      default: () => null,
-    },
+
+const props = defineProps({
+  learningPlans: {
+    type: Array as PropType<LearningPlan[]>,
+    required: true,
   },
-  data() {
-    return {
-      openModal: false,
-      formValid: false,
-      rules: {
-        title: [requiredRule, min5CharactersRule],
-        image: [],
-      },
-      creationForm: {
-        title: '',
-        image: null,
-      },
-      saving: false,
-    };
+  parentLearningPlan: {
+    type: Object,
+    default: () => null,
   },
-  computed: {
-    searchText() {
-      return this.parentLearningPlan
-        ? 'Buscar trilha de aprendizagem'
-        : 'Buscar plano de aprendizagem';
-    },
-    newButtonText() {
-      return this.parentLearningPlan ? 'NOVA TRILHA' : 'NOVO PLANO';
-    },
-    createPanText() {
-      return this.parentLearningPlan
-        ? 'Criar Trilha de Aprenziagem'
-        : 'Criar Plano de Aprendizagem';
-    },
-  },
-  methods: {
-    getPlanUrl(learningPlan) {
-      return this.parentLearningPlan
-        ? `/learning-plans/${this.parentLearningPlan.id}/trails/${learningPlan.id}`
-        : `/learning-plans/${learningPlan.id}`;
-    },
-    cancelCreation() {
-      this.openModal = false;
-      this.$refs.createForm.reset();
-    },
-    async submit() {
-      if (!this.formValid) return;
-      this.saving = true;
+});
 
-      const { image, title } = this.creationForm;
-      const parts = ['', 'learningplans'];
-      const formData = new FormData();
-      const user = useStrapiUser();
-      const isTrail = !!this.parentLearningPlan;
-      const parentPlanId = (this.parentLearningPlan || {}).id;
-      const data = { title, author: user.id };
+const { learningPlans, parentLearningPlan } = toRefs(props);
 
-      if (isTrail) {
-        data.learningplan = this.parentLearningPlan.id;
-      }
+const openModal = ref(false);
+const formValid = ref(false);
+const rules = ref({
+  title: [requiredRule, min5CharactersRule],
+  image: [],
+});
 
-      formData.append('data', JSON.stringify(data));
+const creationForm: globalThis.Ref<{
+  title: string;
+  image: null | any;
+}> = ref({
+  title: '',
+  image: null,
+});
+const saving = ref(false);
 
-      if (image) {
-        formData.append('files.image', image, image.name);
-      }
+const createForm = ref();
 
-      try {
-        const url = parts.join('/');
-        const method = '$post';
-        const res = await $http[method](url, formData);
+const searchText = computed(() => {
+  return parentLearningPlan.value
+    ? 'Buscar trilha de aprendizagem'
+    : 'Buscar plano de aprendizagem';
+});
 
-        router.push(
-          isTrail
-            ? `/learning-plans/${parentPlanId}/trails/${res.id}`
-            : `/learning-plans/${res.id}`,
-        );
-      } catch (err) {
-        this.saving = false;
-        this.$error(err);
-      } finally {
-        this.saving = false;
-      }
-    },
-  },
+const newButtonText = computed(() => {
+  return parentLearningPlan.value ? 'NOVA TRILHA' : 'NOVO PLANO';
+});
+
+const createPanText = computed(() => {
+  return parentLearningPlan.value
+    ? 'Criar Trilha de Aprenziagem'
+    : 'Criar Plano de Aprendizagem';
+});
+
+const getPlanUrl = (learningPlan) => {
+  return parentLearningPlan.value
+    ? `/learning-plans/${parentLearningPlan.value.id}/trails/${learningPlan.id}`
+    : `/learning-plans/${learningPlan.id}`;
+};
+const cancelCreation = () => {
+  openModal.value = false;
+  createForm.value.reset();
+};
+
+const submit = async () => {
+  if (!formValid.value) return;
+  saving.value = true;
+
+  const { image, title } = creationForm.value;
+  const parts = ['', 'learningplans'];
+  const formData = new FormData();
+  const user = useStrapiUser();
+  const isTrail = !!parentLearningPlan.value;
+  const parentPlanId = (parentLearningPlan.value || {}).id;
+  const data = { title, author: user.value?.id, learningplan: undefined };
+
+  if (isTrail) {
+    data.learningplan = parentLearningPlan.value.id;
+  }
+
+  formData.append('data', JSON.stringify(data));
+
+  if (image) {
+    formData.append('files.image', image, image.name);
+  }
+
+  try {
+    const url = parts.join('/');
+    const method = '$post';
+    const res = await $http[method](url, formData);
+
+    router.push(
+      isTrail
+        ? `/learning-plans/${parentPlanId}/trails/${res.id}`
+        : `/learning-plans/${res.id}`,
+    );
+  } catch (err) {
+    saving.value = false;
+    this.$error(err);
+  } finally {
+    saving.value = false;
+  }
 };
 </script>

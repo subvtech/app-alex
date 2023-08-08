@@ -9,22 +9,23 @@
           align="center"
           justify="start"
         >
-            <v-col cols="12">
-              <v-btn v-if="hasPermission" color="primary" @click="$emit('edit')">
-                Clique Aqui para adicionar conteúdo
-              </v-btn>
-              <span v-else>Sem conteúdo</span>
-            </v-col>
+          <v-col cols="12">
+            <v-btn v-if="hasPermission" color="primary" @click="$emit('edit')">
+              Clique Aqui para adicionar conteúdo
+            </v-btn>
+            <span v-else>Sem conteúdo</span>
+          </v-col>
         </v-row>
         <div v-else>
           <v-row
             v-if="author"
-            dense class="pa-0"
+            dense
+            class="pa-0"
             justify="space-between"
             align="center"
-            style="z-index: 2;"
+            style="z-index: 2"
           >
-            <v-col cols="10" style="z-index: 2;position: relative;">
+            <v-col cols="10" style="z-index: 2; position: relative">
               <alex-learningplan-viewer-authors
                 :structure="structure"
                 :author="author"
@@ -67,12 +68,15 @@
                   >
                     {{ data.text | unescape }}
                   </component>
-                  <v-row v-else-if="['image', 'imageUrl'].includes(type)" justify="center">
+                  <v-row
+                    v-else-if="['image', 'imageUrl'].includes(type)"
+                    justify="center"
+                  >
                     <img
                       :src="getImageLink(data, downloaded)"
                       :alt="data.caption || 'Image'"
                       :title="data.caption || ''"
-                      style="max-width:800px;"
+                      style="max-width: 800px"
                       class="object-cover w-full m-auto p-4 shadow viewable-image"
                     />
                   </v-row>
@@ -194,7 +198,15 @@
       </v-card>
     </v-col>
     <v-col cols="3">
-      <div style="position: sticky;z-index: 2;top: 10%;overflow: hidden;text-overflow: ellipsis;">
+      <div
+        style="
+          position: sticky;
+          z-index: 2;
+          top: 10%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        "
+      >
         <v-btn text @click="onTabClick({ id: 'learning-plan-card' })">
           Voltar para o Topo
           <v-icon>mdi-arrow-up</v-icon>
@@ -202,18 +214,16 @@
         <v-tabs
           v-model="headerTabSelected"
           vertical
-          style="text-overflow: ellipsis;"
-
-          >
+          style="text-overflow: ellipsis"
+        >
           <v-tab
-            v-for="(header) in headersBlocks"
+            v-for="header in headersBlocks"
             :key="`header-tab-${header.id}`"
             :title="header.data.text"
-            style="justify-content: start;text-overflow: ellipsis;"
+            style="justify-content: start; text-overflow: ellipsis"
             :class="`ml-${(header.data.level - 1) * 3}`"
             @click="onTabClick(header)"
             @change="changeTabOnIntersect = true"
-
           >
             <div>
               {{ header.data.text.trim() | unescape }}
@@ -225,102 +235,120 @@
   </v-row>
 </template>
 
-<script>
-import 'prismjs'
-import 'prismjs/themes/prism.css'
-import Prism from 'vue-prism-component'
+<script setup lang="ts">
+import 'prismjs';
+import 'prismjs/themes/prism.css';
+import Prism from 'vue-prism-component';
 import * as video from '~/helpers/video';
 import 'viewerjs/dist/viewer.css';
+
+const props = defineProps({
+  hasPermission: Boolean,
+  structure: {
+    type: Object,
+    default: undefined,
+  },
+  selectedBlocks: {
+    type: Array,
+    default: () => [],
+  },
+  askToEditIfEmptyBlocks: {
+    type: Boolean,
+    default: true,
+  },
+  selectBlocks: {
+    type: Boolean,
+    default: false,
+  },
+  author: {
+    type: Object,
+    default: undefined,
+  },
+  coAuthors: {
+    type: Array,
+    default: () => [],
+  },
+});
+
+const {
+  askToEditIfEmptyBlocks,
+  coAuthors,
+  selectBlocks,
+  selectedBlocks,
+  author,
+  structure,
+  hasPermission,
+} = toRefs(props);
+
+const video = ref();
+const blocks = ref((structure?.value || {}).blocks || []);
+const checkedBlocks = ref([]);
+const headerTabSelected = ref(null);
+const changeTabOnIntersect = ref(true);
+
+const headersBlocks = computed(() => {
+  return blocks.value.filter((b) => b.type === 'header');
+});
+
+onMounted(() => {
+  checkedBlocks.value = selectedBlocks.value;
+});
+
+watch(
+  () => structure?.value,
+  () => {
+    blocks.value = (structure!.value || {}).blocks || [];
+  },
+);
+
+watch(
+  () => selectedBlocks.value,
+  () => {
+    checkedBlocks.value = selectedBlocks.value;
+  },
+);
+
+const isElectronEnv = () => {
+  return process.env.isElectronEnv;
+};
+const getImageLink = (image, downloaded) => {
+  if (downloaded) {
+    const path = (image.file || {}).downloadedUrl || image.downloadedUrl;
+    return `file://${path}`;
+  }
+
+  return (image.file || {}).url || image.url;
+};
+
+const show = () => {
+  const viewer = this.$el.querySelector('.viewable-image').$viewer;
+  viewer.show();
+};
+
+const handleIntersect = (entries, _observer) => {
+  const intersectingElement = entries[0];
+
+  if (intersectingElement.isIntersecting) {
+    const id = intersectingElement.target.id;
+    const headerId = id.split('-')[1];
+
+    const index = headersBlocks.value.map((h) => h.id).indexOf(headerId);
+
+    headerTabSelected.value = index;
+  }
+};
+
+const onTabClick = (header) => {
+  changeTabOnIntersect.value = false;
+  this.$vuetify.goTo(`#header-${header.id}`);
+};
 
 export default {
   components: {
     Prism,
   },
-  props: {
-    hasPermission: Boolean,
-    structure: {
-      type: Object,
-      default: undefined,
-    },
-    selectedBlocks: {
-      type: Array,
-      default: () => [],
-    },
-    askToEditIfEmptyBlocks: {
-      type: Boolean,
-      default: true,
-    },
-    selectBlocks: {
-      type: Boolean,
-      default: false,
-    },
-    author: {
-      type: Object,
-      default: undefined,
-    },
-    coAuthors: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      video,
-      blocks: (this.structure || {}).blocks || [],
-      checkedBlocks: [],
-      headerTabSelected: null,
-      changeTabOnIntersect: true,
-    };
-  },
-  computed: {
-    headersBlocks() {
-      return this.blocks.filter((b) => b.type === 'header');
-    }
-  },
-  watch: {
-    structure() {
-      this.blocks = (this.structure || {}).blocks || [];
-    },
-    selectedBlocks() {
-      this.checkedBlocks = this.selectedBlocks;
-    },
-  },
-  created() {
-    this.checkedBlocks = this.selectedBlocks;
-  },
-  methods: {
-    isElectronEnv() {
-      return process.env.isElectronEnv;
-    },
-    getImageLink(image, downloaded) {
-      if (downloaded) {
-        const path = (image.file || {}).downloadedUrl || image.downloadedUrl;
-        return `file://${path}`;
-      }
 
-      return (image.file || {}).url || image.url;
-    },
-    show() {
-      const viewer = this.$el.querySelector('.viewable-image').$viewer;
-      viewer.show();
-    },
-    handleIntersect(entries, _observer){
-      const intersectingElement = entries[0]
-
-      if(intersectingElement.isIntersecting){
-        const id = intersectingElement.target.id
-        const headerId = id.split("-")[1]
-
-        const index = this.headersBlocks.map(h => h.id).indexOf(headerId)
-
-        this.headerTabSelected = index;
-      }
-    },
-    onTabClick(header) {
-      this.changeTabOnIntersect = false;
-      this.$vuetify.goTo(`#header-${header.id}`);
-    },
-  },
+  methods: {},
 };
 </script>
 <style scoped>
@@ -377,5 +405,4 @@ export default {
 .content div:first-child .customHeader {
   margin-top: 0;
 } */
-
 </style>

@@ -112,142 +112,150 @@
   </v-row>
 </template>
 
-<script>
+<script setup lang="ts">
 import { formRules, createFileFromUrl } from '@/helpers/utils';
 const { requiredRule, min5CharactersRule } = formRules;
-import { update } from '@nuxtjs/strapi';
+
+import { Tag } from 'models/tag.model';
+import { User } from 'models/user.model';
 const isObjectID = require('is-object-id');
+const { update } = useStrapi();
+const props = defineProps(['data']);
 
-export default {
-  props: ['data'], // eslint-disable-line
+const { data } = toRefs(props);
 
-  data() {
-    return {
-      openModal: false,
-      saving: false,
-      visible: false,
-      confirmLeave: null,
-      formTagCreationValid: false,
-      modalType: '',
-      tag: '',
-      tagRules: [requiredRule, min5CharactersRule],
-      updateFormValid: false,
-      loadedImage: false,
-      updateRules: {
-        title: [requiredRule, min5CharactersRule],
-        image: [],
-        description: [],
-      },
-      updateForm: {
-        title: '',
-        image: null,
-        description: '',
-        coauthors: [],
-        tags: [],
-      },
+const openModal = ref(false);
+const saving = ref(false);
+const visible = ref(false);
+const confirmLeave = ref<Boolean | null>(null);
+const formTagCreationValid = ref(false);
+const modalType = ref('');
+
+const editor = ref();
+const createForm = ref();
+const tag = ref('');
+const tagRules = ref([requiredRule, min5CharactersRule]);
+const updateFormValid = ref(false);
+const loadedImage = ref(false);
+const updateRules = ref({
+  title: [requiredRule, min5CharactersRule],
+  image: [],
+  description: [],
+});
+const updateForm: globalThis.Ref<{
+  title: string;
+  image: File | null;
+  description: string;
+  coauthors: User[];
+  tags: Tag[];
+}> = ref({
+  title: '',
+  image: null,
+  description: '',
+  coauthors: [],
+  tags: [],
+});
+
+watch(
+  () => data!.value,
+  async () => await loadUpdateForm(),
+);
+onMounted(async () => await loadUpdateForm());
+
+const loadUpdateForm = async () => {
+  const { title, description, image, coauthors, tags } = data!.value;
+  updateForm.value = {
+    title,
+    description,
+    image: null,
+    coauthors: [],
+    tags: [],
+  };
+
+  if (coauthors && coauthors.length) {
+    updateForm.value.coauthors = coauthors.map((c) => c.id);
+  }
+
+  if (tags && tags.length) {
+    updateForm.value.tags = tags;
+  }
+
+  if (image && !loadedImage.value) {
+    const imageFile = await createFileFromUrl(image.url, image.name, image.ext);
+    updateForm.value.image = imageFile;
+  }
+
+  loadedImage.value = true;
+};
+
+const save = async (tag = '') => {
+  if (!updateForm.value) return;
+  const route = useRoute();
+  const { planId, trailId } = route.params;
+  const { instance } = editor.value;
+
+  saving.value = true;
+
+  try {
+    const structure = await instance.save();
+
+    structure.blocks = structure.blocks.map((block, idx) => {
+      if (!isObjectID(block.id)) {
+        delete block.id;
+      }
+
+      block.order = idx + 1;
+
+      return block;
+    });
+
+    const { title, description, image, coauthors, tags } = updateForm.value;
+
+    const tagsIds = tags.map((t) => t.id);
+
+    const data = {
+      title,
+      description,
+      structure,
+      tag,
+      coauthors,
+      tags: tagsIds,
     };
-  },
-  watch: {
-    async data() {
-      await this.loadUpdateForm();
-    },
-  },
-  async created() {
-    await this.loadUpdateForm();
-  },
-  methods: {
-    async loadUpdateForm() {
-      const { title, description, image, coauthors, tags } = this.data;
-      this.updateForm = { title, description };
+    const formData = new FormData();
 
-      if (coauthors && coauthors.length) {
-        this.updateForm.coauthors = coauthors.map((c) => c.id);
-      }
+    formData.append('data', JSON.stringify(data));
 
-      if (tags && tags.length) {
-        this.updateForm.tags = tags;
-      }
+    if (image) {
+      formData.append('files.image', image, image.name);
+    }
 
-      if (image && !this.loadedImage) {
-        const imageFile = await createFileFromUrl(
-          image.url,
-          image.name,
-          image.ext,
-        );
-        this.updateForm.image = imageFile;
-      }
+    await update('learningplans', trailId || planId, formData);
 
-      this.loadedImage = true;
-    },
-    async save(tag = '') {
-      if (!this.updateForm) return;
-      const route = useRoute();
-      const { planId, trailId } = route.params;
-      const { instance } = this.$refs.editor;
+    this.$success('Dados salvos com sucesso!');
+    this.$emit('updated');
+  } catch (err) {
+    this.$error(err);
+  } finally {
+    openModal.value = false;
+    saving.value = false;
+    visible.value = false;
+  }
+};
 
-      this.saving = true;
-
-      try {
-        const structure = await instance.save();
-
-        structure.blocks = structure.blocks.map((block, idx) => {
-          if (!isObjectID(block.id)) {
-            delete block.id;
-          }
-
-          block.order = idx + 1;
-
-          return block;
-        });
-
-        const { title, description, image, coauthors, tags } = this.updateForm;
-
-        const tagsIds = tags.map((t) => t.id);
-
-        const data = {
-          title,
-          description,
-          structure,
-          tag,
-          coauthors,
-          tags: tagsIds,
-        };
-        const formData = new FormData();
-
-        formData.append('data', JSON.stringify(data));
-
-        if (image) {
-          formData.append('files.image', image, image.name);
-        }
-
-        await update('learningplans', trailId || planId, formData);
-
-        this.$success('Dados salvos com sucesso!');
-        this.$emit('updated');
-      } catch (err) {
-        this.$error(err);
-      } finally {
-        this.openModal = false;
-        this.saving = false;
-        this.visible = false;
-      }
-    },
-    showModal() {
-      this.visible = true;
-    },
-    confirmLeaveAction() {
-      this.confirmLeave = true;
-      this.visible = false;
-    },
-    cancelLeaveAction() {
-      this.confirmLeave = false;
-      this.visible = false;
-    },
-    doNothing() {},
-    cancelTagCreation() {
-      this.openModal = false;
-      this.$refs.createForm.reset();
-    },
-  },
+const showModal = () => {
+  visible.value = true;
+};
+const confirmLeaveAction = () => {
+  confirmLeave.value = true;
+  visible.value = false;
+};
+const cancelLeaveAction = () => {
+  confirmLeave.value = false;
+  visible.value = false;
+};
+const doNothing = () => {};
+const cancelTagCreation = () => {
+  openModal.value = false;
+  createForm.value.reset();
 };
 </script>
