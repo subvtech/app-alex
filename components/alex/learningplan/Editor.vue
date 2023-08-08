@@ -229,7 +229,7 @@ const save = async (tag = '') => {
       formData.append('files.image', image, image.name);
     }
 
-    await update('learningplans', trailId || planId, formData);
+    await update('learningplans', trailId || planId, formData as any);
 
     this.$success('Dados salvos com sucesso!');
     this.$emit('updated');

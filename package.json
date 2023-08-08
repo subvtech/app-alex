@@ -30,6 +30,7 @@
     "@pinia/nuxt": "^0.4.11",
     "pinia": "^2.1.6",
     "sass": "^1.64.2",
+    "vue-prism-component": "^2.0.0",
     "vuetify": "^3.3.11"
   }
 }

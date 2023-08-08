@@ -8,13 +8,28 @@
     </v-row>
     <v-tabs v-if="!isTrailRoute" class="mb-5">
       <v-tab nuxt :to="generalInfoLink" replace> Geral </v-tab>
-      <v-tab v-if="!isTrailRoute" nuxt :to="`/learning-plans/${route.params.planId}/trails`" replace>
+      <v-tab
+        v-if="!isTrailRoute"
+        nuxt
+        :to="`/learning-plans/${route.params.planId}/trails`"
+        replace
+      >
         Trilhas de aprendizagem
       </v-tab>
-      <v-tab v-if="!isTrailRoute" nuxt :to="`/learning-plans/${route.params.planId}/tasks`" replace>
+      <v-tab
+        v-if="!isTrailRoute"
+        nuxt
+        :to="`/learning-plans/${route.params.planId}/tasks`"
+        replace
+      >
         Tarefas
       </v-tab>
-      <v-tab v-if="!isTrailRoute" nuxt :to="`/learning-plans/${route.params.planId}/settings`" replace>
+      <v-tab
+        v-if="!isTrailRoute"
+        nuxt
+        :to="`/learning-plans/${route.params.planId}/settings`"
+        replace
+      >
         Opções do Plano
       </v-tab>
     </v-tabs>
@@ -23,12 +38,9 @@
 </template>
 
 <script setup lang="ts">
-import { useGetData } from '~/composables/getData';
-import { useAccess } from '~/composables/access';
-
-const {isTrailRoute, handleBack} = useGetData()
-const hasAccess = useAccess()
-const route = useRoute()
+const { isTrailRoute, handleBack } = useGetData();
+//const hasAccess = useAccess()
+const route = useRoute();
 
 const planTitle = ref('');
 
@@ -37,10 +49,9 @@ const generalInfoLink = computed(() => {
   return isTrailRoute
     ? `/learning-plans/${planId}/trails/${trailId}`
     : `/learning-plans/${planId}`;
-})
+});
 
 const onLoadedChild = (learningPlan) => {
   planTitle.value = learningPlan.title;
-}
-
+};
 </script>

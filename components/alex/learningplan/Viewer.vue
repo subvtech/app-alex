@@ -92,7 +92,7 @@
                     <video
                       v-if="isElectronEnv() && downloaded"
                       controls
-                      crossorigin
+                      crossorigin=""
                       playsinline
                       :data-poster="
                         data.meta.image
@@ -207,7 +207,7 @@
           text-overflow: ellipsis;
         "
       >
-        <v-btn text @click="onTabClick({ id: 'learning-plan-card' })">
+        <v-btn text="" @click="onTabClick({ id: 'learning-plan-card' })">
           Voltar para o Topo
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
@@ -241,15 +241,17 @@ import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 import * as video from '~/helpers/video';
 import 'viewerjs/dist/viewer.css';
+import { User } from 'models/user.model';
+import { Block } from 'models/block.model';
 
 const props = defineProps({
   hasPermission: Boolean,
   structure: {
     type: Object,
-    default: undefined,
+    required: true
   },
   selectedBlocks: {
-    type: Array,
+    type: Array as PropType<Block[]>,
     default: () => [],
   },
   askToEditIfEmptyBlocks: {
@@ -261,11 +263,10 @@ const props = defineProps({
     default: false,
   },
   author: {
-    type: Object,
-    default: undefined,
+    type: Object as PropType<User>,
   },
   coAuthors: {
-    type: Array,
+    type: Array as PropType<User[]>,
     default: () => [],
   },
 });
@@ -280,9 +281,9 @@ const {
   hasPermission,
 } = toRefs(props);
 
-const video = ref();
+const videoRef = ref();
 const blocks = ref((structure?.value || {}).blocks || []);
-const checkedBlocks = ref([]);
+const checkedBlocks: globalThis.Ref<Block[]> = ref([]);
 const headerTabSelected = ref(null);
 const changeTabOnIntersect = ref(true);
 
@@ -309,8 +310,9 @@ watch(
 );
 
 const isElectronEnv = () => {
-  return process.env.isElectronEnv;
+  return !!process.env.isElectronEnv;
 };
+
 const getImageLink = (image, downloaded) => {
   if (downloaded) {
     const path = (image.file || {}).downloadedUrl || image.downloadedUrl;
@@ -346,9 +348,7 @@ const onTabClick = (header) => {
 export default {
   components: {
     Prism,
-  },
-
-  methods: {},
+  }
 };
 </script>
 <style scoped>

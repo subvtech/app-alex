@@ -1,4 +1,4 @@
-import hasAccess from '~/helpers/hasAcess';
+import hasAccess from '~/helpers/hasAccess';
 
 export const useAccess = (entity, action) => {
   const user = useStrapiUser();

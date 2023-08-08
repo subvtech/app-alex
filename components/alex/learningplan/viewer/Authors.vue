@@ -68,11 +68,11 @@ const props = defineProps({
     required: true,
   },
   author: {
-    type: Object,
+    type: Object as PropType<User>,
     required: true,
   },
   coAuthors: {
-    type: Array as unknown as PropType<User>,
+    type: Array as PropType<User[]>,
     default: () => [],
   },
 });
