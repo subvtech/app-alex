@@ -11,44 +11,40 @@
   </v-text-field>
 </template>
 
-<script>
-export default {
-  name: 'AlexTextFieldPrimaryBackground',
-  props: {
-    value: {
-      type: String,
-    },
-    rules: {
-      type: Array,
-      default: () => [],
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    color: {
-      type: String,
-    },
-    outlined: {
-      type: Boolean,
-      default: false,
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
+<script setup lang="ts">
+const props = defineProps({
+  value: {
+    type: String,
   },
-  data() {
-    return {
-      inputValue: null,
-    };
+  rules: {
+    type: Array as PropType<any>,
+    default: () => [],
   },
-  watch: {
-    value(v) {
-      this.inputValue = v;
-    },
+  label: {
+    type: String,
+    required: true,
   },
-};
+  color: {
+    type: String,
+  },
+  outlined: {
+    type: Boolean,
+    default: false,
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const { label, outlined, required, rules, color, value } = toRefs(props);
+
+const inputValue = ref();
+
+watch(
+  () => value!.value,
+  (v) => (inputValue.value = v),
+);
 </script>
 
 <style scoped lang="scss">

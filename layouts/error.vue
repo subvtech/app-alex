@@ -10,30 +10,24 @@
   </v-app>
 </template>
 
-<script>
-export default {
-  name: 'EmptyLayout',
-  layout: 'empty',
-  props: {
-    error: {
-      type: Object,
-      default: null,
-    },
+<script setup lang="ts">
+// layout: 'empty'
+const props = defineProps({
+  error: {
+    type: Object,
+    default: null,
   },
-  data() {
-    return {
-      pageNotFound: '404 Not Found',
-      otherError: 'An error occurred',
-    };
-  },
-  head() {
-    const title =
-      this.error.statusCode === 404 ? this.pageNotFound : this.otherError;
-    return {
-      title,
-    };
-  },
-};
+});
+const { error } = toRefs(props);
+const pageNotFound = ref('404 Not Found');
+const otherError = ref('An error occurred');
+function head() {
+  const title =
+    error.value.statusCode === 404 ? pageNotFound.value : otherError.value;
+  return {
+    title,
+  };
+}
 </script>
 
 <style scoped>

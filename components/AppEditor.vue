@@ -2,9 +2,9 @@
   <div id="editorjs" class="editorjs w-full p-6 sm:p-16" />
 </template>
 
-<script>
+<script setup lang="ts">
 import { i18n } from '~/assets/editor-i18n';
-import { create, find } from '@nuxtjs/strapi';
+const { create, find } = useStrapi();
 const pkgs = {};
 
 if (process.client) {
@@ -125,86 +125,83 @@ if (process.client) {
   };
 }
 
-const token = useStrapiToken()
+const token = useStrapiToken();
 
 const { EditorJS, tools } = pkgs;
 
-export default {
-  name: 'AppEditor',
-  props: {
-    data: {
-      type: Object,
-      default: () => ({}),
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
+const { data } = toRefs(props);
+const planData = computed(() => {
+  const data2 = data.value;
+
+  data2.blocks = data.value.blocks.map((d) => {
+    if (!d.tunes) {
+      delete d.tunes;
+    }
+    return d;
+  });
+
+  return data2;
+});
+onMounted(() => {
+  tools.image.config = {
+    uploader: {
+      uploadByFile: (file) => {
+        const formData = new FormData();
+
+        formData.append('files', file, file.name);
+
+        return create('/upload', formData)
+          .then(([res]) => {
+            const url = res.url;
+            return { success: 1, file: { url } };
+          })
+          .catch((err) => {
+            this.$error(err);
+          });
+      },
     },
-  },
-  computed: {
-    planData() {
-      const data = this.data;
+  };
 
-      data.blocks = this.data.blocks.map((d) => {
-        if (!d.tunes) {
-          delete d.tunes;
-        }
-        return d;
-      });
+  const DragDrop = require('editorjs-drag-drop');
+  const Undo = require('editorjs-undo');
 
-      return data;
+  tools.attaches = {
+    class: require('@editorjs/attaches'),
+    config: {
+      endpoint: `/api/upload-file?token=${token}`,
+      buttonText: 'Selecionar arquivo',
+      errorMessage: 'Erro no upload do arquivo',
     },
-  },
-  mounted() {
-    tools.image.config = {
-      uploader: {
-        uploadByFile: (file) => {
-          const formData = new FormData();
+  };
 
-          formData.append('files', file, file.name);
+  this.instance = new EditorJS({
+    tools,
+    i18n,
+    minHeight: 400,
+    autofocus: true,
+    data: planData.value,
+    holder: 'editorjs',
+    logLevel: 'ERROR',
+    placeholder: 'Clique para iniciar...',
+    onReady: () => {
+      /* eslint-disable-next-line */
+      new DragDrop(this.instance);
 
-          return create('/upload', formData)
-            .then(([res]) => {
-              const url = res.url;
-              return { success: 1, file: { url } };
-            })
-            .catch((err) => {
-              this.$error(err);
-            });
-        },
-      },
-    };
+      /* eslint-disable-next-line */
+      new Undo({ editor: this.instance });
 
-    const DragDrop = require('editorjs-drag-drop');
-    const Undo = require('editorjs-undo');
-
-    tools.attaches = {
-      class: require('@editorjs/attaches'),
-      config: {
-        endpoint: `/api/upload-file?token=${token}`,
-        buttonText: 'Selecionar arquivo',
-        errorMessage: 'Erro no upload do arquivo',
-      },
-    };
-
-    this.instance = new EditorJS({
-      tools,
-      i18n,
-      minHeight: 400,
-      autofocus: true,
-      data: this.planData,
-      holder: 'editorjs',
-      logLevel: 'ERROR',
-      placeholder: 'Clique para iniciar...',
-      onReady: () => {
-        /* eslint-disable-next-line */
-        new DragDrop(this.instance);
-
-        /* eslint-disable-next-line */
-        new Undo({ editor: this.instance });
-
-        this.$emit('ready');
-      },
-      onChange: () => this.$emit('change'),
-    });
-  },
-};
+      this.$emit('ready');
+    },
+    onChange: () => this.$emit('change'),
+  });
+});
 </script>
 
 <style scoped>

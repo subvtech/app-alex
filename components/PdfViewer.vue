@@ -12,59 +12,40 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup lang="ts">
 import '~/assets/css/pdf-icons.css';
 
 // import Loader from './AppLoader.vue';
 
 // import VuePdfApp from 'vue-pdf-app'
+const props = defineProps({
+  url: {
+    type: String,
+    default: '',
+  },
+  title: {
+    type: String,
+    default: '',
+  },
+});
 
-export default {
-  components: {
-    // VuePdfApp,
-    // VuePdfApp: () => ({
-    //   component: new Promise((resolve, _reject) => {
-    //     return setTimeout(
-    //       () =>
-    //         resolve(import(/* webpackChunkName: "pdf-viewer" */ 'vue-pdf-app')),
-    //       3000
-    //     );
-    //   }),
-    //   loading: Loader,
-    // }),
-  },
-  props: {
-    url: {
-      type: String,
-      default: '',
-    },
-    title: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      isLoading: false,
-      visible: false,
-    };
-  },
-  computed: {
-    locale() {
-      return this.isElectronEnv()
-        ? // eslint-disable-next-line no-undef
-          `file://${__resources}/locale.txt`
-        : '/locale.txt';
-    },
-  },
-  methods: {
-    handleModal(value) {
-      this.visible = value;
-    },
-    isElectronEnv() {
-      return process.env.isElectronEnv;
-    },
-  },
+const { title, url } = toRefs(props);
+
+const isLoading = ref(false);
+const visible = ref(false);
+
+const locale = computed(() => {
+  return isElectronEnv()
+    ? // eslint-disable-next-line no-undef
+      `file://${__resources}/locale.txt`
+    : '/locale.txt';
+});
+
+const handleModal = (value) => {
+  visible.value = value;
+};
+const isElectronEnv = () => {
+  return process.env.isElectronEnv;
 };
 </script>
 

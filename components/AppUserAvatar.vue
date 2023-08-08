@@ -6,24 +6,19 @@
     <span class="text-white text-h5">{{ userInitials }}</span>
   </v-avatar>
 </template>
-<script>
-import { getFullnameInitials } from "@/helpers/utils";
+<script setup lang="ts">
+import { getFullnameInitials } from '@/helpers/utils';
+import { User } from 'models/user.model';
+const props = defineProps({
+  user: {
+    type: Object as PropType<User>,
+    required: true,
+  },
+});
 
-export default {
-  name: "AppUserAvatar",
-  props: {
-    user: {
-      type: Object,
-      required: true,
-    },
-  },
-  data() {
-    return {};
-  },
-  computed: {
-    userInitials() {
-      return getFullnameInitials(this.user.fullname);
-    },
-  },
-};
+const { user } = toRefs(props);
+
+const userInitials = computed(() => {
+  return getFullnameInitials(user.value.fullname);
+});
 </script>
