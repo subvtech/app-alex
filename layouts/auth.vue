@@ -3,17 +3,13 @@
     <v-main class="secondary">
       <!-- <AppSnackbar></AppSnackbar> -->
       <v-container>
-        <Nuxt />
+        <slot />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
-<script>
-export default {
-  name: 'AlexAuth',
-};
-</script>
+<script setup lang="ts"></script>
 <style lang="scss">
 html,
 body {

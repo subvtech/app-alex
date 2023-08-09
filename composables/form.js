@@ -1,7 +1,6 @@
 function isValidCpf(val) {
   val = val.replace(/\D/g, '');
-  
-  if (val == '00000000000') return false;
+  if (val === '00000000000') return false;
 
   let sum;
   let left;
@@ -11,16 +10,16 @@ function isValidCpf(val) {
     sum = sum + parseInt(val.substring(i - 1, i)) * (11 - i);
   left = (sum * 10) % 11;
 
-  if (left == 10 || left == 11) left = 0;
-  if (left != parseInt(val.substring(9, 10))) return false;
+  if (left === 10 || left === 11) left = 0;
+  if (left !== parseInt(val.substring(9, 10))) return false;
 
   sum = 0;
   for (i = 1; i <= 10; i++)
     sum = sum + parseInt(val.substring(i - 1, i)) * (12 - i);
   left = (sum * 10) % 11;
 
-  if (left == 10 || left == 11) left = 0;
-  if (left != parseInt(val.substring(10, 11))) return false;
+  if (left === 10 || left === 11) left = 0;
+  if (left !== parseInt(val.substring(10, 11))) return false;
   return true;
 }
 

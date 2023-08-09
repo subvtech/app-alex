@@ -45,7 +45,7 @@
         <div align="center">
           <v-img
             alt="Alex"
-            src="/images/alex.svg"
+            src="../static/images/alex.svg"
             class="card-register-alex-logo my-12"
           />
         </div>
@@ -163,6 +163,12 @@
 </template>
 
 <script setup lang="ts">
+import { useMessageStore } from '~/stores/message';
+
+const messageStore = useMessageStore();
+definePageMeta({
+  layout: 'auth',
+});
 
 const { register } = useStrapiAuth();
 const { find } = useStrapi();
@@ -187,15 +193,14 @@ type InstitutionsType = {
   tipo: String;
 };
 
-let FacebookSvg = ref();
-let checkEmail = ref(false);
-let isFormValid = ref(false);
-let registering = ref(false);
-let fetching = ref(false);
-let institutions = ref<InstitutionsType[]>([]);
-let search = ref(null);
-let timeoutSearch = ref(null);
-let roles = ref([
+const checkEmail = ref(false);
+const isFormValid = ref(false);
+const registering = ref(false);
+const fetching = ref(false);
+const institutions = ref<InstitutionsType[]>([]);
+const search = ref(null);
+const timeoutSearch = ref(null);
+const roles = ref([
   { text: 'Sou Aluno', value: 'Aluno' },
   { text: 'Sou Professor', value: 'Professor' },
 ]);
@@ -259,7 +264,7 @@ const fetchInstitutions = async (instValue: any) => {
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
-    this.$error('Ocorreu um erro na busca.');
+    messageStore.message = 'Ocorreu um erro na busca.';
   }
   fetching.value = false;
 };
@@ -271,7 +276,7 @@ const submit = async () => {
     formData.value;
 
   if (!institution) {
-    this.$error('Selecione sua instituição.');
+    messageStore.message = 'Selecione sua instituição.';
     return;
   }
 
@@ -289,7 +294,7 @@ const submit = async () => {
     const { user } = await register(userData);
 
     if (user.value!.blocked) {
-      this.$error('Usuário bloqueado!');
+      messageStore.message = 'Usuário bloqueado!';
     } else if (user.value!.confirmed) {
       router.push('/');
     } else {
@@ -297,13 +302,16 @@ const submit = async () => {
     }
   } catch (error) {
     registering.value = false;
-    this.$error(error);
+    messageStore.message = error as string;
   }
 };
-/*
-watch(d, async (value) => {
-  await fetchInstitutions(value);
-});*/
+
+watch(
+  () => search,
+  async (value) => {
+    await fetchInstitutions(value);
+  },
+);
 </script>
 
 <style scoped lang="scss">
@@ -312,27 +320,33 @@ watch(d, async (value) => {
   height: 100%;
   position: absolute;
   top: 0;
+
   &-imagem {
     background: #f0f0f0 !important;
     left: 0;
     width: calc(100% - 600px);
+
     &-imagem {
       height: 80vh;
     }
   }
+
   &-register {
     background: #001529 !important;
     right: 0;
     overflow: auto;
     width: 600px;
+
     &-alex-logo {
       width: 100px;
     }
   }
+
   &-text {
     font-family: 'Montserrat';
     font-weight: 500 !important;
   }
+
   &-btn {
     align-items: center;
     background: #00d3ec !important;
@@ -347,11 +361,13 @@ watch(d, async (value) => {
     margin: 10px 0;
     justify-content: center;
     width: 100%;
+
     &:hover {
       color: #001529;
       background-color: #00b8cc;
       border-color: #00b8cc;
     }
+
     &:active {
       color: #001529;
       background-color: #00a3b7;

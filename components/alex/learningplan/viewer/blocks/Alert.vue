@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const { alertBlock } = toRefs(props);
-let alertType = computed(() => {
+const alertType = computed(() => {
   if (['warning', 'success', 'info'].includes(alertBlock.value.type)) {
     return alertBlock.value.type;
   } else if (alertBlock.value.type === 'danger') {

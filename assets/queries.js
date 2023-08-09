@@ -1,56 +1,117 @@
 const editorAttrs = `
-  id
   title
   description
-
-  tags {
-    id
-    tag
-    verified
-  }
-
-  structure: structures(limit: 1, sort: "createdAt:desc") {
-    id
-    time
-    updatedAt
-    version
-
-    blocks(sort: "order:asc") {
-      id
-      order
-      type
-      data
-      tunes
-    }
-  }
-  author { id username fullname avatar { id url } }
-  coauthors { id username fullname avatar { id url } }
-
-  default_class: classes_learning_plans(
-    limit: 1,
-    where: {class: {default: true}}
-  ) {
-
-    id
-    class {
-      id
-      name
-      default
-      active
-      start_at
-      end_at
-    }
-
-  }
-
-  image { id name url ext }
   isVisible
+  image {
+    data {
+      id
+      attributes {
+        url
+        name
+      }
+    }
+  }
+  tags {
+    data {
+      id
+      attributes {
+        tag
+        verified
+      }
+    }
+  }
+  structure: structures(pagination: {limit: 1}, sort: "createdAt:desc") {
+    data {
+      id
+      attributes {
+        time
+        updatedAt
+        version
+        blocks(sort: "order") {
+          data {
+            id
+            attributes {
+              order
+              type
+              data
+              tunes
+            }
+          }
+        }
+      }
+    }
+  }
+  author {
+    data {
+      id
+      attributes {
+        username
+        fullname
+        avatar {
+          data {
+            id
+            attributes {
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+  coauthors {
+    data {
+      id
+      attributes {
+        username
+        fullname
+        avatar {
+          data {
+            id
+            attributes {
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+  default_class: classes_learning_plans(filters: {class: {default: {eq: true}}},pagination: {limit: 1}) {
+    data {
+      id
+      attributes {
+        class {
+          data {
+            id
+            attributes {
+              name
+              default
+              active
+              start_at
+              end_at
+            }
+          }
+        }
+      }
+    }
+  }
+  
 `;
 
 const planAttrs = `
-  ${editorAttrs}
-  trails { ${editorAttrs} }
-  users { id username avatar { id url } }
+ data {
+  id 
+  attributes {
+    ${editorAttrs}
+    trails {
+      data {
+        id
+        attributes {
+          ${editorAttrs}
+        }
+      }
+    }
+  }
+ }
 `;
 
 export const learningplan = `
@@ -63,7 +124,7 @@ export const learningplan = `
 
 export const learningplans = `
   query {
-    learningplans(where: {learningplan_null: true}) {
+    learningplans(filters: {learningplan: {id: {null: true}}) {
       ${planAttrs}
     }
   }
@@ -71,7 +132,7 @@ export const learningplans = `
 
 export const authorLearningPlans = `
   query($author_id: ID!) {
-    learningplans(where: {learningplan_null: true, author: $author_id}) {
+    learningplans(filters: {learningplan: {id: {null: true}}, author: {id: {eq: $author_id}}}) {
       ${planAttrs}
     }
   }
@@ -79,7 +140,7 @@ export const authorLearningPlans = `
 
 export const filteredLearningplans = `
   query($q: JSON) {
-    learningplans(where: $q) {
+    learningplans(filters: $q) {
       ${planAttrs}
     }
   }
@@ -88,7 +149,12 @@ export const filteredLearningplans = `
 export const trail = `
   query ($id: ID!, $lp_id: ID!) {
     trail: learningplan(id: $id) {
-      ${editorAttrs}
+      data {
+        id
+        attributes {
+          ${editorAttrs}
+        }
+      }
     }
 
     learningplan(id: $lp_id) {
@@ -117,13 +183,24 @@ export const alluser = `
 
 export const user = `
   query($q: JSON) {
-    users(where: $q) {
-      id
-      username
-      fullname
-      role { name }
-      learningplans(where: {learningplan_null: true}) {
-        ${planAttrs}
+    users(filters: $q) { 
+      data { 
+        id
+        attributes {
+          username
+          fullname
+          role { 
+            data {
+              id
+              attributes {
+                name 
+              }
+            }
+          }
+          learningplans(filters: {learningplan: {id: {null: true}}) {
+            ${planAttrs}
+          }
+        }
       }
     }
   }
@@ -221,13 +298,15 @@ export const tasksFromUserClass = `
 
 export const userPlanClasses = `
   query($plan_id: ID!, $user_id: ID!) {
-    classes(
-      where: {
-        classes_learning_plans: {learningplan: $plan_id},
-        classes_users: {user: $user_id}
+    classes (filters: {classes_learning_plans: {learningplan: {id: {eq: $plan_id}}}, classes_users: {id: {eq: $user_id}}}){
+      data {
+        id
+        attributes {
+          active
+        
+        }
+        
       }
-    ) {
-      id
     }
   }
 `;
@@ -240,7 +319,7 @@ export const tags = `
       verified
     }
   }
-`
+`;
 
 export const tagsByids = `
   query($ids: [ID]! ) {
@@ -250,4 +329,4 @@ export const tagsByids = `
       verified
     }
   }
-`
+`;

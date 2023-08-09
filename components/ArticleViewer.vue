@@ -15,6 +15,8 @@
   </v-dialog>
 </template>
 <script setup lang="ts">
+import { useMessageStore } from '~/stores/message';
+const messageStore = useMessageStore();
 const props = defineProps({
   url: {
     default: '',
@@ -26,7 +28,7 @@ const { url } = toRefs(props);
 const isLoading = ref(false);
 const visible = ref(false);
 const title = ref('');
-const contentContainer = ref()
+const contentContainer = ref();
 
 const handleModal = (value) => {
   visible.value = value;
@@ -39,12 +41,12 @@ const parsePage = async () => {
       url: url.value,
     });
     if (res.data.error) {
-      this.$error('Ocorreu um erro no processamento da página.');
+      messageStore.message = 'Ocorreu um erro no processamento da página.';
     }
     contentContainer.value.innerHTML = res.data.content;
     title.value = res.data.title;
   } catch (error) {
-    this.$error('Ocorreu um erro no processamento da página.');
+    messageStore.message = 'Ocorreu um erro no processamento da página.';
   }
   isLoading.value = false;
 };

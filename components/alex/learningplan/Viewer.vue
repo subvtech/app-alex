@@ -66,7 +66,7 @@
                         : 'center'
                     "
                   >
-                    {{ data.text | unescape }}
+                    {{ unescape(data.text) }}
                   </component>
                   <v-row
                     v-else-if="['image', 'imageUrl'].includes(type)"
@@ -226,7 +226,7 @@
             @change="changeTabOnIntersect = true"
           >
             <div>
-              {{ header.data.text.trim() | unescape }}
+              {{ unescape(header.data.text.trim()) }}
             </div>
           </v-tab>
         </v-tabs>
@@ -243,12 +243,13 @@ import * as video from '~/helpers/video';
 import 'viewerjs/dist/viewer.css';
 import { User } from 'models/user.model';
 import { Block } from 'models/block.model';
+import { unescape } from '@/helpers/html-escaper';
 
 const props = defineProps({
   hasPermission: Boolean,
   structure: {
     type: Object,
-    required: true
+    required: true,
   },
   selectedBlocks: {
     type: Array as PropType<Block[]>,
@@ -281,7 +282,7 @@ const {
   hasPermission,
 } = toRefs(props);
 
-const videoRef = ref();
+// const videoRef = ref();
 const blocks = ref((structure?.value || {}).blocks || []);
 const checkedBlocks: globalThis.Ref<Block[]> = ref([]);
 const headerTabSelected = ref(null);
@@ -296,14 +297,14 @@ onMounted(() => {
 });
 
 watch(
-  () => structure?.value,
+  () => structure,
   () => {
     blocks.value = (structure!.value || {}).blocks || [];
   },
 );
 
 watch(
-  () => selectedBlocks.value,
+  () => selectedBlocks,
   () => {
     checkedBlocks.value = selectedBlocks.value;
   },
@@ -322,11 +323,12 @@ const getImageLink = (image, downloaded) => {
   return (image.file || {}).url || image.url;
 };
 
+/*
 const show = () => {
   const viewer = this.$el.querySelector('.viewable-image').$viewer;
   viewer.show();
 };
-
+*/
 const handleIntersect = (entries, _observer) => {
   const intersectingElement = entries[0];
 
@@ -340,14 +342,12 @@ const handleIntersect = (entries, _observer) => {
   }
 };
 
-const onTabClick = (header) => {
+const onTabClick = ({ id }: { id: string }) => {
   changeTabOnIntersect.value = false;
-  this.$vuetify.goTo(`#header-${header.id}`);
-};
+  const el = document.getElementById(id);
 
-export default {
-  components: {
-    Prism,
+  if (el) {
+    el.scrollIntoView();
   }
 };
 </script>

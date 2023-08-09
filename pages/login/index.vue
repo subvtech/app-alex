@@ -75,7 +75,13 @@
 </template>
 
 <script setup lang="ts">
-const { login } = useStrapiAuth()
+import { useMessageStore } from '~/stores/message';
+
+const messageStore = useMessageStore();
+definePageMeta({
+  layout: 'auth',
+});
+const { login } = useStrapiAuth();
 const router = useRouter();
 
 const logging = ref(false);
@@ -84,48 +90,27 @@ const checkbox = ref(false);
 
 const email = ref('');
 const password = ref('');
-const emailRules=  [
-        (v) => !!v || 'Email é necessário',
-        (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido' ]
-const passwordRules= [(v) => !!v || 'Senha é necessário'];
-     
-
-onMounted(() => {
-  logging.value = true;
-
-  let user;
-    if (process.env.isElectronEnv) {
-      user = window.getCurrentUser();
-    }
-
-    if (user) {
-      this.$strapi.setUser(user);
-      router.push('/');
-    }
-
-    logging.value = false;
-})
-
+const emailRules = [
+  (v) => !!v || 'Email é necessário',
+  (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
+];
+const passwordRules = [(v) => !!v || 'Senha é necessário'];
 
 const submit = async () => {
-      logging.value = true;
+  logging.value = true;
 
-      try {
-        const { jwt } = await login({
-          identifier: email.value,
-          password: password.value,
-        });
+  try {
+    await login({
+      identifier: email.value,
+      password: password.value,
+    });
 
-        if (process.env.isElectronEnv) {
-          window.saveToken(jwt);
-        }
-
-        router.push('/');
-      } catch (error) {
-        logging.value = false;
-        this.$error('Email ou Senha inválido(s)');
-      }
-    }
+    router.push('/');
+  } catch (error) {
+    logging.value = false;
+    messageStore.message = 'Email ou Senha inválido(s)';
+  }
+};
 </script>
 
 <style scoped lang="scss">

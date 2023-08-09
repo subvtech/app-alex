@@ -42,7 +42,7 @@ const { label, outlined, required, rules, color, value } = toRefs(props);
 const inputValue = ref();
 
 watch(
-  () => value!.value,
+  () => value,
   (v) => (inputValue.value = v),
 );
 </script>

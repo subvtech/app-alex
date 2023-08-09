@@ -23,14 +23,17 @@
     <template #selection="data">
       <v-chip
         v-bind="data.item.raw.attributes"
-        :input-value="data.selected"
+        :input-value="data.item.raw.attributes"
         close
         small
-        @click="data.select"
+        @click="data.item.select"
         @click:close="remove(data.item)"
       >
         <v-avatar left>
-          <v-img v-if="data.item.raw.attributes.avatar" :src="data.item.raw.attributes.avatar.url"></v-img>
+          <v-img
+            v-if="data.item.raw.attributes.avatar"
+            :src="data.item.raw.attributes.avatar.url"
+          ></v-img>
           <v-img v-else src="/images/not-found.png"></v-img>
         </v-avatar>
         {{ getReducedName(data.item.raw.attributes.fullname) }}
@@ -38,12 +41,19 @@
     </template>
     <template #item="data">
       <v-list-item-avatar>
-        <img v-if="data.item.raw.attributes.avatar" :src="data.item.raw.attributes.avatar.url" />
+        <img
+          v-if="data.item.raw.attributes.avatar"
+          :src="data.item.raw.attributes.avatar.url"
+        />
         <img v-else src="/images/not-found.png" />
       </v-list-item-avatar>
       <v-list-item-content>
-        <v-list-item-title> {{ data.item.raw.attributes.fullname }} </v-list-item-title>
-        <v-list-item-subtitle> {{ data.item.raw.attributes.email }} </v-list-item-subtitle>
+        <v-list-item-title>
+          {{ data.item.raw.attributes.fullname }}
+        </v-list-item-title>
+        <v-list-item-subtitle>
+          {{ data.item.raw.attributes.email }}
+        </v-list-item-subtitle>
       </v-list-item-content>
     </template>
   </v-autocomplete>
@@ -51,25 +61,26 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { User } from 'models/user.model';
 import { stringify } from 'qs';
+import { User } from 'models/user.model';
+
 const user = useStrapiUser();
 const { find } = useStrapi();
 
 const props = defineProps(['value']);
 const { value } = toRefs(props);
 
-const users: globalThis.Ref<Strapi4ResponseData<User>[]> = ref([]);
+const users = ref<Strapi4ResponseData<User>[]>([]);
 const selectedUsers: globalThis.Ref<User[]> = ref([]);
 const loadingUsers = ref(false);
 const search = ref('');
 
 watch(
-  () => search.value,
+  () => search,
   async () => await searchUsers(search.value),
 );
 watch(
-  () => value!.value,
+  () => value,
   async () => await loadUsers(),
 );
 

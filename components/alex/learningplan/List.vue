@@ -74,24 +74,27 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import {LearningPlan} from '~/models/learningPlan.model';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import { LearningPlan } from '~/models/learningPlan.model';
 import { formRules } from '@/helpers/utils';
+import { useMessageStore } from '~/stores/message';
+
+const messageStore = useMessageStore();
 const { requiredRule, min5CharactersRule } = formRules;
 
+const strapi = useStrapiClient();
 const router = useRouter();
 
 const props = defineProps({
   learningPlans: {
-    type: Array as PropType<LearningPlan[]>,
+    type: Array as PropType<Strapi4ResponseData<LearningPlan>[]>,
     required: true,
   },
   parentLearningPlan: {
-    type: Object,
+    type: Object as PropType<Strapi4ResponseData<LearningPlan>>,
     default: () => null,
   },
 });
-
-const { learningPlans, parentLearningPlan } = toRefs(props);
 
 const openModal = ref(false);
 const formValid = ref(false);
@@ -100,10 +103,10 @@ const rules = ref({
   image: [],
 });
 
-const creationForm: globalThis.Ref<{
+const creationForm = ref<{
   title: string;
   image: null | any;
-}> = ref({
+}>({
   title: '',
   image: null,
 });
@@ -112,24 +115,24 @@ const saving = ref(false);
 const createForm = ref();
 
 const searchText = computed(() => {
-  return parentLearningPlan.value
+  return props.parentLearningPlan
     ? 'Buscar trilha de aprendizagem'
     : 'Buscar plano de aprendizagem';
 });
 
 const newButtonText = computed(() => {
-  return parentLearningPlan.value ? 'NOVA TRILHA' : 'NOVO PLANO';
+  return props.parentLearningPlan ? 'NOVA TRILHA' : 'NOVO PLANO';
 });
 
 const createPanText = computed(() => {
-  return parentLearningPlan.value
+  return props.parentLearningPlan
     ? 'Criar Trilha de Aprenziagem'
     : 'Criar Plano de Aprendizagem';
 });
 
 const getPlanUrl = (learningPlan) => {
-  return parentLearningPlan.value
-    ? `/learning-plans/${parentLearningPlan.value.id}/trails/${learningPlan.id}`
+  return props.parentLearningPlan
+    ? `/learning-plans/${props.parentLearningPlan.id}/trails/${learningPlan.id}`
     : `/learning-plans/${learningPlan.id}`;
 };
 const cancelCreation = () => {
@@ -142,27 +145,30 @@ const submit = async () => {
   saving.value = true;
 
   const { image, title } = creationForm.value;
-  const parts = ['', 'learningplans'];
+
   const formData = new FormData();
   const user = useStrapiUser();
-  const isTrail = !!parentLearningPlan.value;
-  const parentPlanId = (parentLearningPlan.value || {}).id;
-  const data = { title, author: user.value?.id, learningplan: undefined };
+  const isTrail = !!props.parentLearningPlan;
+  const parentPlanId = (props.parentLearningPlan || {}).id;
+  const data: any = { title, author: user.value?.id, learningplan: undefined };
 
   if (isTrail) {
-    data.learningplan = parentLearningPlan.value.id;
+    data.learningplan = props.parentLearningPlan.id;
   }
 
   formData.append('data', JSON.stringify(data));
 
   if (image) {
-    formData.append('files.image', image, image.name);
+    formData.append('files.image', image[0], image[0].name);
   }
 
   try {
-    const url = parts.join('/');
-    const method = '$post';
-    const res = await $http[method](url, formData);
+    const res = await strapi<LearningPlan>('learningplans', {
+      method: 'POST',
+      body: formData,
+    });
+
+    console.log(res);
 
     router.push(
       isTrail
@@ -171,7 +177,7 @@ const submit = async () => {
     );
   } catch (err) {
     saving.value = false;
-    this.$error(err);
+    messageStore.message = err as string;
   } finally {
     saving.value = false;
   }

@@ -4,6 +4,8 @@
 
 <script setup lang="ts">
 import { i18n } from '~/assets/editor-i18n';
+import { useMessageStore } from '~/stores/message';
+const messageStore = useMessageStore();
 const { create, find } = useStrapi();
 const pkgs = {};
 
@@ -163,7 +165,7 @@ onMounted(() => {
             return { success: 1, file: { url } };
           })
           .catch((err) => {
-            this.$error(err);
+            messageStore.message = err;
           });
       },
     },

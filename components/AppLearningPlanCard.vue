@@ -17,15 +17,16 @@
         </v-img>
       </v-row>
 
-      <v-card-title :title="learningPlan.title" class="plan-title">
-        {{ learningPlan.title }}
+      <v-card-title :title="learningPlan.attributes.title" class="plan-title">
+        {{ learningPlan.attributes.title }}
       </v-card-title>
 
       <v-card-subtitle class="subtitle mt-4">
         <div class="description">{{ getDescriptionHtml }}</div>
 
         <div class="mt-2">
-          {{ (learningPlan.trails || []).length }} trilhas existentes
+          {{ (learningPlan.attributes.trails.data || []).length }} trilhas
+          existentes
         </div>
       </v-card-subtitle>
       <v-divider></v-divider>
@@ -38,33 +39,37 @@
   </v-hover>
 </template>
 <script setup lang="ts">
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
+
+const strapiUrl = useStrapiUrl();
+const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
 
 const props = defineProps({
   learningPlan: {
-    type: Object as () => LearningPlan,
+    type: Object as () => Strapi4ResponseData<LearningPlan>,
     required: true,
   },
   viewPlanUrl: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
 const getImageUrl = computed(() => {
-  return props.learningPlan.image
-    ? props.learningPlan.image.url
-    : "/images/not-found.png";
+  return props.learningPlan.attributes.image.data
+    ? `${strapiBaseUrl.value}${props.learningPlan.attributes.image.data.attributes.url}`
+    : '/images/not-found.png';
 });
 
 const getImageName = computed(() => {
-  return props.learningPlan.image
-    ? props.learningPlan.image.name
-    : "Sem Imagem";
+  return props.learningPlan.attributes.image.data
+    ? props.learningPlan.attributes.image.data.attributes.name
+    : 'Sem Imagem';
 });
 
 const getDescriptionHtml = computed(() => {
-  return props.learningPlan.description || "---";
+  return props.learningPlan.attributes.description || '---';
 });
 </script>
 <style scoped lang="scss">

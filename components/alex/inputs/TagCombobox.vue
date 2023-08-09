@@ -1,7 +1,7 @@
 <template>
   <v-combobox
-    v-model="selectedTags"
-    :items="tags"
+    v-model="selectedTags!.data"
+    :items="tags!.data"
     :loading="loadingTags"
     label="Adicionar Tags"
     prepend-inner-icon="mdi-plus-circle"
@@ -24,17 +24,19 @@
   >
     <template #selection="data">
       <v-chip
-        v-bind="data.attrs"
-        :input-value="data.selected"
+        v-bind="data.item.raw.attributes"
+        :input-value="data.item.raw.attributes.verified"
         close
         small
-        @click="data.select"
+        @click="
+          data.item.raw.attributes.verified = !data.item.raw.attributes.verified
+        "
         @click:close="remove(data.item)"
       >
-        <template v-if="data.item.raw.tag">
-          {{ data.item.raw.tag }}
+        <template v-if="data.item.raw.attributes.tag">
+          {{ data.item.raw.attributes.tag }}
           <v-icon
-            v-if="data.item.raw.verified"
+            v-if="data.item.raw.attributes.verified"
             color="green"
             small
             title="Tag Verificada Alex"
@@ -58,7 +60,7 @@
         <v-list-item-title>
           {{ data.item }}
           <v-icon
-            v-if="data.item.raw.verified"
+            v-if="data.item.raw.attributes.verified"
             color="green"
             title="Tag Verificada Alex"
             >mdi-check-decagram</v-icon
@@ -80,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { Tag } from 'models/tag.model';
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
@@ -88,8 +91,8 @@ const graphql = useStrapiGraphQL();
 const props = defineProps(['value']);
 const { value } = toRefs(props);
 
-const tags: globalThis.Ref<Tag[]> = ref([]);
-const selectedTags: globalThis.Ref<Tag[]> = ref([]);
+const tags = ref<Strapi4ResponseMany<Tag>>();
+const selectedTags = ref<Strapi4ResponseMany<Tag>>();
 const loadingTags = ref(false);
 const disabled = ref(false);
 const search = ref('');
@@ -131,14 +134,20 @@ const searchTags = async (search = '', ids: string[] = []) => {
     variables: ids.length ? { ids } : { search },
   };
 
-  tags.value = (await graphql<Tag>(props.query, props.variables)).tags;
+  tags.value = await graphql<Strapi4ResponseMany<Tag>>(
+    props.query,
+    props.variables,
+  );
 
   loadingTags.value = false;
 };
 
 const remove = (item) => {
   if (disabled.value) return;
-  selectedTags.value = selectedTags.value.filter((t) => t.id !== item.id);
+  selectedTags.value = {
+    data: selectedTags.value!.data.filter((t) => t.id !== item.id),
+    meta: selectedTags.value!.meta,
+  };
 };
 const onInput = async () => {
   search.value = '';
@@ -147,15 +156,17 @@ const onInput = async () => {
   this.$emit('input', selectedTags.value);
 };
 const checkForNewTags = async () => {
-  const newTags = selectedTags.value.filter((tag) => !tag.tag);
+  const newTags = selectedTags.value!.data.filter((tag) => !tag.attributes.tag);
 
   if (newTags.length) {
     disabled.value = true;
-    const newTagIdx = selectedTags.value.findIndex((tag) => !tag.tag);
+    const newTagIdx = selectedTags.value!.data.findIndex(
+      (tag) => !tag.attributes.tag,
+    );
 
     const tag = (await create('tags', { tag: newTags[0] })).data.attributes.tag;
 
-    selectedTags.value[newTagIdx] = tag;
+    selectedTags.value![newTagIdx] = tag;
 
     disabled.value = false;
   }

@@ -38,7 +38,7 @@
         <div align="center">
           <v-img
             alt="Alex"
-            src="~/static/images/alex.svg"
+            src="../static/images/alex.svg"
             class="card-forgot-alex-logo my-15"
           />
         </div>
@@ -73,12 +73,18 @@
 </template>
 
 <script setup lang="ts">
-const { forgotPassword } = useStrapiAuth();
+import { useMessageStore } from '~/stores/message';
 
-let sending = ref(false);
-let checkEmail = ref(false);
-let email = ref('');
-let emailRules = [
+const messageStore = useMessageStore();
+const { forgotPassword } = useStrapiAuth();
+definePageMeta({
+  layout: 'auth',
+});
+
+const sending = ref(false);
+const checkEmail = ref(false);
+const email = ref('');
+const emailRules = [
   (v) => !!v || 'Email é necessário',
   (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
 ];
@@ -92,7 +98,7 @@ const submit = async () => {
     sending.value = false;
   } catch (error) {
     sending.value = false;
-    this.$error(error);
+    messageStore.message = error as string;
   }
 };
 </script>

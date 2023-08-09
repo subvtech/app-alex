@@ -8,5 +8,5 @@ export interface ClassesLearningPlan {
   class: Class;
   learningplan: LearningPlan;
   version: Version;
-  tasks: Task[]
+  tasks: Task[];
 }

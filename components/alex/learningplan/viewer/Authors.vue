@@ -11,8 +11,8 @@
       :z-index="2"
       style="z-index: 2; position: relative"
     >
-      <template #activator="{ on, attrs }">
-        <div v-bind="attrs" v-on="on">
+      <template #activator="{ isActive, props }">
+        <div v-bind="props" v-on="isActive">
           <v-badge
             :content="`+${coAuthors.length}`"
             :value="coAuthors.length"
@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { User } from 'models/user.model';
 
-const props = defineProps({
+const props2 = defineProps({
   structure: {
     type: Object,
     required: true,
@@ -76,7 +76,7 @@ const props = defineProps({
     default: () => [],
   },
 });
-const { structure, author, coAuthors } = toRefs(props);
+const { structure, author, coAuthors } = toRefs(props2);
 
 const coAuthorsText = (coAuthors) => {
   if (coAuthors.length < 1) {

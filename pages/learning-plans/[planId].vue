@@ -38,8 +38,12 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth',
+});
+
 const { isTrailRoute, handleBack } = useGetData();
-//const hasAccess = useAccess()
+
 const route = useRoute();
 
 const planTitle = ref('');

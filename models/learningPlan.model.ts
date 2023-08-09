@@ -1,25 +1,32 @@
+import {
+  Strapi4ResponseMany,
+  Strapi4ResponseSingle,
+} from '@nuxtjs/strapi/dist/runtime/types';
 import { ClassesLearningPlan } from './classesLearningPlan.model';
 import { Structure } from './structure.model';
 import { Tag } from './tag.model';
-import { Trail } from './trail.model';
 import { User } from './user.model';
 import { Version } from './version.model';
+import { Upload } from './upload.model';
+import { Class } from './class.model';
 
 export interface LearningPlan {
   id: number;
   title: string;
-  author: User;
+  author: Strapi4ResponseSingle<User>;
   users: User[];
-  image: any;
+  image: Strapi4ResponseSingle<Upload>;
   isVisible: boolean;
-  trails_old: Trail[];
-  learningplan: LearningPlan;
-  trails: LearningPlan[];
-  structures: Structure[];
-  versions: Version[];
+  learningplan?: Strapi4ResponseSingle<LearningPlan>;
+  trails: Strapi4ResponseMany<LearningPlan>;
+  structures?: Strapi4ResponseMany<Structure>;
+  structure?: Strapi4ResponseMany<Structure>;
+  versions: Strapi4ResponseMany<Version>;
   classes_learning_plans: ClassesLearningPlan;
-  coauthors: User[];
+  coauthors: Strapi4ResponseMany<User>;
   approved_grade: Number;
   description: string;
-  tags: Tag[];
+  tags: Strapi4ResponseMany<Tag>;
+  userClasses?: Strapi4ResponseMany<Class>;
+  isTrail?: boolean;
 }

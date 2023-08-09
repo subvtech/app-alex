@@ -113,11 +113,14 @@
 </template>
 
 <script setup lang="ts">
+import { useMessageStore } from '~/stores/message';
+import { Tag } from 'models/tag.model';
+import { User } from 'models/user.model';
 import { formRules, createFileFromUrl } from '@/helpers/utils';
 const { requiredRule, min5CharactersRule } = formRules;
 
-import { Tag } from 'models/tag.model';
-import { User } from 'models/user.model';
+const messageStore = useMessageStore();
+
 const isObjectID = require('is-object-id');
 const { update } = useStrapi();
 const props = defineProps(['data']);
@@ -157,7 +160,7 @@ const updateForm: globalThis.Ref<{
 });
 
 watch(
-  () => data!.value,
+  () => data,
   async () => await loadUpdateForm(),
 );
 onMounted(async () => await loadUpdateForm());
@@ -231,10 +234,10 @@ const save = async (tag = '') => {
 
     await update('learningplans', trailId || planId, formData as any);
 
-    this.$success('Dados salvos com sucesso!');
+    messageStore.message = 'Dados salvos com sucesso!';
     this.$emit('updated');
   } catch (err) {
-    this.$error(err);
+    messageStore.message = err as string;
   } finally {
     openModal.value = false;
     saving.value = false;
