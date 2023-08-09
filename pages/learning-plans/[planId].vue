@@ -33,7 +33,7 @@
         Opções do Plano
       </v-tab>
     </v-tabs>
-    <NuxtChild @loaded="onLoadedChild" />
+    <NuxtPage @loaded="onLoadedChild" />
   </v-container>
 </template>
 
