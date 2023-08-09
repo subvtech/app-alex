@@ -2,10 +2,10 @@
   <v-container fluid>
     <alex-learningplan-viewer
       v-if="!editing"
-      :structure="learningPlan.structures[0]"
+      :structure="props.learningPlan.attributes.structure?.data[0]!"
       :has-permission="hasPermission"
-      :author="learningPlan.author"
-      :co-authors="learningPlan.coauthors"
+      :author="learningPlan.attributes.author.data"
+      :co-authors="learningPlan.attributes.coauthors.data"
       @edit="editing = true"
     />
     <template v-else>
@@ -40,11 +40,12 @@
 </template>
 
 <script setup lang="ts">
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
 
 const props = defineProps({
   learningPlan: {
-    type: Object as PropType<LearningPlan>,
+    type: Object as PropType<Strapi4ResponseData<LearningPlan>>,
     required: true,
   },
 
@@ -52,8 +53,6 @@ const props = defineProps({
     type: Boolean,
   },
 });
-
-const { learningPlan, hasPermission } = toRefs(props);
 
 const editing = ref(false);
 const visible = ref(false);

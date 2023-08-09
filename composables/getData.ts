@@ -1,4 +1,5 @@
 import {
+  Strapi4ResponseData,
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
@@ -11,7 +12,7 @@ import { Class } from 'models/class.model';
 export const useGetData = () => {
   const user = useStrapiUser<User>();
   const breadcrumb = ref<any[]>([]);
-  const learningPlan = ref<Strapi4ResponseSingle<LearningPlan>>();
+  const learningPlan = ref<Strapi4ResponseData<LearningPlan>>();
   const router = useRouter();
   const route = useRoute();
   const graphql = useStrapiGraphQL();
@@ -46,9 +47,9 @@ export const useGetData = () => {
         };
       }>(query, vars);
 
-      const data = res.data[model];
+      const data = res.data[model].data;
 
-      data.data.attributes.userClasses = (
+      data.attributes.userClasses = (
         await graphql<{ data: { classes: Strapi4ResponseMany<Class> } }>(
           queries.userPlanClasses,
           {
@@ -66,7 +67,7 @@ export const useGetData = () => {
       if (trailId) {
         labelTitle = res.data.learningplan.data.attributes.title;
       } else {
-        labelTitle = data.data.attributes.title;
+        labelTitle = data.attributes.title;
       }
 
       const breadcrumb = [
@@ -81,11 +82,11 @@ export const useGetData = () => {
         breadcrumb.push({ to: `${slug}/trails`, label: 'Trilhas' });
         breadcrumb.push({
           to: `${slug}/trails/${trailId}`,
-          label: data.data.attributes.title,
+          label: data.attributes.title,
         });
       }
 
-      data.data.attributes.isTrail = !!trailId;
+      data.attributes.isTrail = !!trailId;
       return { breadcrumb, learningPlan: data };
     } catch (err: any) {
       throwError && console.log(err.message);

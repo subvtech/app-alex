@@ -1,6 +1,6 @@
 <template>
   <alex-learningplan-page
-    :learning-plan="learningPlan"
+    :learning-plan="learningPlan!"
     :has-permission="hasAccess"
     @updated="loadPlan"
   />

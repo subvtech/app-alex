@@ -3,7 +3,7 @@
     <v-col cols="9">
       <v-card id="header-learning-plan-card" elevation="0" class="pa-4">
         <v-row
-          v-if="!blocks.length && askToEditIfEmptyBlocks"
+          v-if="!blocks.data.length && askToEditIfEmptyBlocks"
           dense
           class="pa-0"
           align="center"
@@ -38,10 +38,10 @@
           </v-row>
           <v-row dense class="pa-0">
             <v-col
-              v-for="({ type, tunes, data, downloaded, id }, idx) in blocks"
+              v-for="({ attributes, id }, idx) in blocks.data"
               :key="idx"
               v-viewer="{ navbar: false, scalable: false }"
-              :cols="type === 'attaches' ? 4 : 12"
+              :cols="attributes.order === 'attaches' ? 4 : 12"
               class="flex flex-col my-4 pa-1"
               style="z-index: 1"
             >
@@ -239,16 +239,19 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import { PropType } from 'nuxt/dist/app/compat/capi';
 import * as video from '~/helpers/video';
 import 'viewerjs/dist/viewer.css';
 import { User } from 'models/user.model';
 import { Block } from 'models/block.model';
 import { unescape } from '@/helpers/html-escaper';
+import { Structure } from 'models/structure.model';
 
 const props = defineProps({
   hasPermission: Boolean,
   structure: {
-    type: Object,
+    type: Object as PropType<Strapi4ResponseData<Structure>>,
     required: true,
   },
   selectedBlocks: {
@@ -264,32 +267,24 @@ const props = defineProps({
     default: false,
   },
   author: {
-    type: Object as PropType<User>,
+    type: Object as PropType<Strapi4ResponseData<User>>,
+    default: null,
   },
   coAuthors: {
-    type: Array as PropType<User[]>,
+    type: Array as PropType<Strapi4ResponseData<User>[]>,
     default: () => [],
   },
 });
 
-const {
-  askToEditIfEmptyBlocks,
-  coAuthors,
-  selectBlocks,
-  selectedBlocks,
-  author,
-  structure,
-  hasPermission,
-} = toRefs(props);
-
 // const videoRef = ref();
-const blocks = ref((structure?.value || {}).blocks || []);
+const blocks = computed(() => props.structure.attributes.blocks);
+
 const checkedBlocks: globalThis.Ref<Block[]> = ref([]);
 const headerTabSelected = ref(null);
 const changeTabOnIntersect = ref(true);
 
 const headersBlocks = computed(() => {
-  return blocks.value.filter((b) => b.type === 'header');
+  return blocks.value.data.filter((b: any) => b.attributes.type === 'header');
 });
 
 onMounted(() => {
