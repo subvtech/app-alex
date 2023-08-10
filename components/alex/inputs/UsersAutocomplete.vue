@@ -1,6 +1,7 @@
 <template>
   <v-autocomplete
     v-model="selectedUsers"
+    v-model:search-input="search"
     :items="users"
     :loading="loadingUsers"
     label="Adicionar Colaboradores"
@@ -15,20 +16,12 @@
     cache-items
     item-value="id"
     :item-text="(item) => `${item.fullname} ${item.email}`"
-    :search-input.sync="search"
     :reverse="false"
     small-chips
     @input="onInput"
   >
-    <template #selection="data">
-      <v-chip
-        v-bind="data.item.raw.attributes"
-        :input-value="data.item.raw.attributes"
-        close
-        small
-        @click="data.item.select"
-        @click:close="remove(data.item)"
-      >
+    <template #chip="data">
+      <v-chip v-bind="data.props" close small @click:close="remove(data.item)">
         <v-avatar left>
           <v-img
             v-if="data.item.raw.attributes.avatar"
@@ -67,11 +60,18 @@ import { User } from 'models/user.model';
 const user = useStrapiUser();
 const { find } = useStrapi();
 
-const props = defineProps(['value']);
+const props = defineProps({
+  value: {
+    type: Array<number>,
+    required: true,
+  },
+});
 const { value } = toRefs(props);
 
+const emit = defineEmits(['input']);
+
 const users = ref<Strapi4ResponseData<User>[]>([]);
-const selectedUsers: globalThis.Ref<User[]> = ref([]);
+const selectedUsers: globalThis.Ref<number[]> = ref([]);
 const loadingUsers = ref(false);
 const search = ref('');
 
@@ -87,13 +87,13 @@ watch(
 onMounted(async () => await loadUsers());
 
 const loadUsers = async () => {
-  if (value!.value && value?.value.length) {
+  if (value.value && value.value.length) {
     selectedUsers.value = value.value;
     await searchUsers('', value.value);
   }
 };
 
-const searchUsers = async (search = '', ids = []) => {
+const searchUsers = async (search = '', ids: number[] = []) => {
   if ((!search || search.length < 3) && !ids.length) return;
   loadingUsers.value = true;
 
@@ -129,7 +129,7 @@ const getReducedName = (fullname = '') => {
 
 const onInput = () => {
   search.value = '';
-  this.$emit('input', selectedUsers.value);
+  emit('input', selectedUsers.value);
 };
 </script>
 

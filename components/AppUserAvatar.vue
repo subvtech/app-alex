@@ -16,9 +16,7 @@ const props = defineProps({
   },
 });
 
-const { user } = toRefs(props);
-
 const userInitials = computed(() => {
-  return getFullnameInitials(user.value.fullname);
+  return getFullnameInitials(props.user.fullname);
 });
 </script>

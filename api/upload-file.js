@@ -1,9 +1,9 @@
-require('dotenv').config();
+import 'dotenv/config';
 
-const express = require('express');
-const fileUpload = require('express-fileupload');
-const Strapi = require('strapi-sdk-javascript').default;
-const FormData = require('form-data');
+import express from 'express';
+import fileUpload from 'express-fileupload';
+import Strapi from 'strapi-sdk-js';
+import FormData from 'form-data';
 
 const { STRAPI_URL } = process.env;
 const strapi = new Strapi(STRAPI_URL);

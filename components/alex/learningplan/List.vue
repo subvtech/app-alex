@@ -77,7 +77,6 @@
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from '~/models/learningPlan.model';
 import { formRules } from '@/helpers/utils';
-import { useMessageStore } from '~/stores/message';
 
 const messageStore = useMessageStore();
 const { requiredRule, min5CharactersRule } = formRules;

@@ -15,7 +15,6 @@
   </v-dialog>
 </template>
 <script setup lang="ts">
-import { useMessageStore } from '~/stores/message';
 const messageStore = useMessageStore();
 const props = defineProps({
   url: {
@@ -37,8 +36,11 @@ const handleModal = (value) => {
 const parsePage = async () => {
   isLoading.value = true;
   try {
-    const res = await this.$http.$post(`${location.origin}/api/parse-url`, {
-      url: url.value,
+    const res: any = await $fetch(`/api/parse-url`, {
+      method: 'POST',
+      body: JSON.stringify({
+        url: url.value,
+      }),
     });
     if (res.data.error) {
       messageStore.message = 'Ocorreu um erro no processamento da página.';

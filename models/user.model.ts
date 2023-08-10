@@ -15,4 +15,5 @@ export interface User {
   isProfessor: boolean;
   tags: Tag[];
   avatar: any;
+  role: any;
 }

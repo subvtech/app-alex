@@ -50,7 +50,9 @@
           <span
             >Atualizado em:
             {{
-              new Date(structure.updatedAt).toLocaleDateString('pt-BR')
+              new Date(structure.attributes.updatedAt).toLocaleDateString(
+                'pt-BR',
+              )
             }}</span
           >
         </div>
@@ -62,10 +64,11 @@
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { User } from 'models/user.model';
+import { Structure } from 'models/structure.model';
 
 const props2 = defineProps({
   structure: {
-    type: Object,
+    type: Object as PropType<Strapi4ResponseData<Structure>>,
     required: true,
   },
   author: {
@@ -77,7 +80,6 @@ const props2 = defineProps({
     default: () => [],
   },
 });
-const { structure, author, coAuthors } = toRefs(props2);
 
 const coAuthorsText = (coAuthors) => {
   if (coAuthors.length < 1) {

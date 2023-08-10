@@ -4,15 +4,15 @@
       v-if="!editing"
       :structure="props.learningPlan.attributes.structure?.data[0]!"
       :has-permission="props.hasPermission"
-      :author="props.learningPlan.attributes.author"
-      :co-authors="props.learningPlan.attributes.coauthors"
+      :author="props.learningPlan.attributes.author.data"
+      :co-authors="props.learningPlan.attributes.coauthors.data"
       @edit="editing = true"
     />
     <template v-else>
       <alex-learningplan-editor
         :data="props.learningPlan"
         @back="onEditorBack"
-        @updated="$emit('updated')"
+        @updated="emit('updated')"
       />
       <v-dialog v-model="visible" width="500">
         <v-card>
@@ -43,6 +43,8 @@
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
 
+const emit = defineEmits(['updated']);
+
 const props = defineProps({
   learningPlan: {
     type: Object as PropType<Strapi4ResponseData<LearningPlan>>,
@@ -53,8 +55,6 @@ const props = defineProps({
     type: Boolean,
   },
 });
-
-console.log(props.learningPlan);
 
 const editing = ref(false);
 const visible = ref(false);

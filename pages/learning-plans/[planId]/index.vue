@@ -12,7 +12,6 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const hasAccess = useAccess('learningplan', 'update');
+const hasAccess = useAccess(['professor']);
 const { learningPlan, loadPlan } = useGetData();
-console.log('learningPlan', learningPlan.value);
 </script>

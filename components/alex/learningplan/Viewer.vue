@@ -13,7 +13,7 @@
             <v-btn
               v-if="props.hasPermission"
               color="primary"
-              @click="$emit('edit')"
+              @click="emit('edit')"
             >
               Clique Aqui para adicionar conteúdo
             </v-btn>
@@ -32,20 +32,20 @@
             <v-col cols="10" style="z-index: 2; position: relative">
               <alex-learningplan-viewer-authors
                 :structure="structure"
-                :author="props.author.data"
-                :co-authors="props.coAuthors.data"
+                :author="props.author"
+                :co-authors="props.coAuthors"
               />
             </v-col>
-            <v-btn v-if="props.hasPermission" icon @click="$emit('edit')">
+            <v-btn v-if="props.hasPermission" icon @click="emit('edit')">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </v-row>
           <v-row dense class="pa-0">
             <v-col
-              v-for="({ attributes }, idx) in blocks"
+              v-for="({ attributes, id }, idx) in blocks"
               :key="idx"
               v-viewer="{ navbar: false, scalable: false }"
-              :cols="attributes.order === 'attaches' ? 4 : 12"
+              :cols="attributes.type === 'attaches' ? 4 : 12"
               class="flex flex-col my-4 pa-1"
               style="z-index: 1"
             >
@@ -53,8 +53,8 @@
                 <v-col v-if="props.selectBlocks" :cols="1">
                   <v-checkbox
                     v-model="checkedBlocks"
-                    :value="attributes.id"
-                    @input="$emit('block-selected', checkedBlocks)"
+                    :value="id"
+                    @input="emit('block-selected', checkedBlocks)"
                   />
                 </v-col>
                 <v-col :cols="props.selectBlocks ? 11 : 12">
@@ -259,11 +259,7 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-import {
-  Strapi4ResponseData,
-  Strapi4ResponseMany,
-  Strapi4ResponseSingle,
-} from '@nuxtjs/strapi/dist/runtime/types';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { PropType } from 'nuxt/dist/app/compat/capi';
 import * as video from '~/helpers/video';
 import 'viewerjs/dist/viewer.css';
@@ -279,7 +275,7 @@ const props = defineProps({
     required: true,
   },
   selectedBlocks: {
-    type: Array as PropType<Block[]>,
+    type: Array as PropType<Strapi4ResponseData<Block>[]>,
     default: () => [],
   },
   askToEditIfEmptyBlocks: {
@@ -291,17 +287,19 @@ const props = defineProps({
     default: false,
   },
   author: {
-    type: Object as PropType<Strapi4ResponseSingle<User>>,
+    type: Object as PropType<Strapi4ResponseData<User>>,
     default: null,
   },
   coAuthors: {
-    type: Object as PropType<Strapi4ResponseMany<User>>,
+    type: Array as PropType<Strapi4ResponseData<User>[]>,
     default: () => [],
   },
 });
 
+const emit = defineEmits(['edit', 'block-selected']);
+
 // const videoRef = ref();
-const blocks = ref<Strapi4ResponseData<Block>[]>([]);
+// const blocks = ref<Strapi4ResponseData<Block>[]>([]);
 
 const checkedBlocks = ref<Block[]>([]);
 const headerTabSelected = ref<number | null>(null);
@@ -312,22 +310,27 @@ const headersBlocks = computed(() => {
 });
 
 onMounted(() => {
-  checkedBlocks.value = props.selectedBlocks;
+  // checkedBlocks.value = props.selectedBlocks;
 });
 
-watch(
-  () => props.structure,
-  () => {
-    blocks.value = (props.structure.attributes.blocks || {}).data || [];
-  },
-);
+const blocks = computed(() => {
+  console.log(props.structure);
+  return props.structure?.attributes?.blocks?.data || [];
+});
 
-watch(
-  () => props.selectedBlocks,
-  () => {
-    checkedBlocks.value = props.selectedBlocks;
-  },
-);
+// watch(
+//   () => props.structure,
+//   () => {
+//     blocks.value = (props.structure.attributes.blocks || {}).data || [];
+//   },
+// );
+
+// watch(
+//   () => props.selectedBlocks,
+//   () => {
+//     checkedBlocks.value = props.selectedBlocks;
+//   },
+// );
 
 const isElectronEnv = () => {
   return !!process.env.isElectronEnv;

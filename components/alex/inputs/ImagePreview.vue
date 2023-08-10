@@ -14,7 +14,7 @@
       accept="image/png, image/jpeg"
       style="display: none"
       :clearable="false"
-      @change="$emit('input', image)"
+      @change="emit('input', image)"
     />
     <v-col cols="12" class="text-center text-caption pb-0">
       Somente imagens do tipo JPG, JPEG ou PNG são permitidos.
@@ -35,6 +35,8 @@
 <script setup lang="ts">
 const props = defineProps(['value']);
 const { value } = toRefs(props);
+
+const emit = defineEmits(['input']);
 
 const image = ref();
 const uploader = ref();

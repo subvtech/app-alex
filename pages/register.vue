@@ -131,9 +131,9 @@
 
           <v-autocomplete
             v-model="formData.institution"
+            v-model:search-input="search"
             :loading="fetching"
             :items="institutions"
-            :search-input.sync="search"
             item-text="text"
             item-value="id"
             label="Instituição de Ensino"
@@ -163,8 +163,6 @@
 </template>
 
 <script setup lang="ts">
-import { useMessageStore } from '~/stores/message';
-
 const messageStore = useMessageStore();
 definePageMeta({
   layout: 'auth',
@@ -199,12 +197,12 @@ const registering = ref(false);
 const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
 const search = ref(null);
-const timeoutSearch = ref(null);
-const roles = ref([
+// const timeoutSearch = ref(null);
+/* const roles = ref([
   { text: 'Sou Aluno', value: 'Aluno' },
   { text: 'Sou Professor', value: 'Professor' },
 ]);
-
+*/
 const formData = ref<FormDataType>({
   fullname: '',
   username: '',
@@ -216,8 +214,8 @@ const formData = ref<FormDataType>({
   institution: '',
 });
 
-const showPassword = ref(false);
-const showConfirmPassword = ref(false);
+// const showPassword = ref(false);
+// const showConfirmPassword = ref(false);
 
 const fullnameRules = [(v) => !!v || 'Nome completo é necessário'];
 const usernameRules = [(v) => !!v || 'Usuário é necessário'];

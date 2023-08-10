@@ -8,6 +8,7 @@ const editorAttrs = `
       attributes {
         url
         name
+        ext
       }
     }
   }

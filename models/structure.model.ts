@@ -13,4 +13,5 @@ export interface Structure {
   time: Number;
   blocks: Strapi4ResponseMany<Block>;
   versioning: Version;
+  updatedAt: string;
 }
