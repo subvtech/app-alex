@@ -14,7 +14,7 @@
     <v-col>
       <v-card v-if="checkEmail" class="card card-register px-10">
         <div align="center">
-          <v-img
+          <img
             alt="Alex"
             src="../static/images/alex.svg"
             class="card-register-alex-logo my-15"
@@ -26,28 +26,26 @@
         <v-card-subtitle class="text-white my-2">
           {{
             isProfessor
-              ? 'Um administrador irá validar seu cadastro.'
-              : 'Um link de ativação foi enviado para o seu email.'
+              ? "Um administrador irá validar seu cadastro."
+              : "Um link de ativação foi enviado para o seu email."
           }}
         </v-card-subtitle>
         <p v-if="!isProfessor" slot="description" class="text-gray-500">
           Obs.: Verifique sua caixa de SPAM.
         </p>
-        <v-btn
-          type="primary"
-          class="mt-6 mx-auto"
-          @click="router.push('/login')"
-        >
+        <v-btn type="primary" class="mt-6 mx-auto" @click="router.push('/login')">
           Voltar
         </v-btn>
       </v-card>
       <v-card v-else class="card card-register px-10">
         <div align="center">
-          <v-img
+          <img
             alt="Alex"
             src="../static/images/alex.svg"
             class="card-register-alex-logo my-12"
           />
+          <!-- Por algum motivo o v-img tá requisitando as imagens desta url http://localhost:3000/static/images/imagem_login.png e dá 404-->
+          <!-- já o img nativo requistia desta url http://localhost:3000/_nuxt/static/images/imagem_login.png funcionando-->
         </div>
         <v-card-title class="text-white my-2">
           Inicie uma nova experiência!
@@ -61,7 +59,7 @@
             :rules="fullnameRules"
             label="Nome completo"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             outlined
             required
@@ -71,7 +69,7 @@
             :rules="usernameRules"
             label="Nome de usuário"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             outlined
             required
@@ -81,7 +79,7 @@
             :rules="emailRules"
             label="E-mail"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             outlined
             required
@@ -92,7 +90,7 @@
             type="number"
             label="CPF"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             outlined
             required
@@ -102,7 +100,7 @@
             :rules="passwordRules"
             label="Senha"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             outlined
             required
@@ -112,7 +110,7 @@
             :rules="confirmPasswordRules"
             label="Confirmar Senha"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             outlined
             required
@@ -122,7 +120,7 @@
             v-model="formData.yourRole"
             row
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
           >
             <v-radio label="Estudante" value="Estudante"></v-radio>
@@ -138,7 +136,7 @@
             item-value="id"
             label="Instituição de Ensino"
             color="white"
-            class="my-4"
+            class="my-4 text-secondary"
             dark
             cache-items
           ></v-autocomplete>
@@ -163,11 +161,11 @@
 </template>
 
 <script setup lang="ts">
-import { useMessageStore } from '~/stores/message';
+import { useMessageStore } from "~/stores/message";
 
 const messageStore = useMessageStore();
 definePageMeta({
-  layout: 'auth',
+  layout: "auth",
 });
 
 const { register } = useStrapiAuth();
@@ -201,47 +199,47 @@ const institutions = ref<InstitutionsType[]>([]);
 const search = ref(null);
 const timeoutSearch = ref(null);
 const roles = ref([
-  { text: 'Sou Aluno', value: 'Aluno' },
-  { text: 'Sou Professor', value: 'Professor' },
+  { text: "Sou Aluno", value: "Aluno" },
+  { text: "Sou Professor", value: "Professor" },
 ]);
 
 const formData = ref<FormDataType>({
-  fullname: '',
-  username: '',
-  email: '',
-  cpf: '',
-  password1: '',
-  password2: '',
-  yourRole: '',
-  institution: '',
+  fullname: "",
+  username: "",
+  email: "",
+  cpf: "",
+  password1: "",
+  password2: "",
+  yourRole: "",
+  institution: "",
 });
 
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-const fullnameRules = [(v) => !!v || 'Nome completo é necessário'];
-const usernameRules = [(v) => !!v || 'Usuário é necessário'];
+const fullnameRules = [(v) => !!v || "Nome completo é necessário"];
+const usernameRules = [(v) => !!v || "Usuário é necessário"];
 
 const emailRules = [
-  (v: any) => !!v || 'Email é necessário',
-  (v: string) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
+  (v: any) => !!v || "Email é necessário",
+  (v: string) => /.+@.+\..+/.test(v) || "Adicione um e-mail valido",
 ];
 
 const cpfRules = [
-  (v: any) => !!v || 'CPF é necessário',
-  (v: string | any[]) => v.length === 11 || 'CPF contem 11 caracteres',
+  (v: any) => !!v || "CPF é necessário",
+  (v: string | any[]) => v.length === 11 || "CPF contem 11 caracteres",
 ];
 
-const passwordRules = [(v) => !!v || 'Senha é necessária'];
+const passwordRules = [(v) => !!v || "Senha é necessária"];
 
 const isProfessor = computed(() => {
-  return formData.value.yourRole === 'Professor';
+  return formData.value.yourRole === "Professor";
 });
 
 const confirmPasswordRules = computed(() => {
   return [
-    (v: any) => !!v || 'Senha é necessária',
-    (v: any) => v === formData.value.password1 || 'Senha diferentes',
+    (v: any) => !!v || "Senha é necessária",
+    (v: any) => v === formData.value.password1 || "Senha diferentes",
   ];
 });
 
@@ -249,7 +247,7 @@ const fetchInstitutions = async (instValue: any) => {
   fetching.value = true;
   try {
     const res = await find(
-      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
+      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`
     );
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
@@ -264,7 +262,7 @@ const fetchInstitutions = async (instValue: any) => {
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
-    messageStore.message = 'Ocorreu um erro na busca.';
+    messageStore.message = "Ocorreu um erro na busca.";
   }
   fetching.value = false;
 };
@@ -272,11 +270,10 @@ const fetchInstitutions = async (instValue: any) => {
 const submit = async () => {
   registering.value = true;
 
-  const { cpf, email, password1, username, fullname, institution } =
-    formData.value;
+  const { cpf, email, password1, username, fullname, institution } = formData.value;
 
   if (!institution) {
-    messageStore.message = 'Selecione sua instituição.';
+    messageStore.message = "Selecione sua instituição.";
     return;
   }
 
@@ -294,9 +291,9 @@ const submit = async () => {
     const { user } = await register(userData);
 
     if (user.value!.blocked) {
-      messageStore.message = 'Usuário bloqueado!';
+      messageStore.message = "Usuário bloqueado!";
     } else if (user.value!.confirmed) {
-      router.push('/');
+      router.push("/");
     } else {
       checkEmail.value = true;
     }
@@ -310,7 +307,7 @@ watch(
   () => search,
   async (value) => {
     await fetchInstitutions(value);
-  },
+  }
 );
 </script>
 
@@ -343,7 +340,7 @@ watch(
   }
 
   &-text {
-    font-family: 'Montserrat';
+    font-family: "Montserrat";
     font-weight: 500 !important;
   }
 
@@ -352,7 +349,7 @@ watch(
     background: #00d3ec !important;
     border-radius: 6px;
     display: flex;
-    font-family: 'Montserrat';
+    font-family: "Montserrat";
     font-size: 15px;
     font-weight: 600;
     flex-direction: row;

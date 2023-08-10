@@ -5,9 +5,15 @@ import * as directives from 'vuetify/directives';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const vuetify = createVuetify({
+    defaults: {
+      VTextField: {
+        variant: 'outlined',
+      },
+    },
     components,
     directives,
     theme: {
+      defaultTheme: 'light',
       themes: {
         light: {
           dark: false,
