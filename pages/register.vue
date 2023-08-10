@@ -217,30 +217,17 @@ const formData = ref<FormDataType>({
 // const showPassword = ref(false);
 // const showConfirmPassword = ref(false);
 
-const fullnameRules = [(v) => !!v || 'Nome completo é necessário'];
-const usernameRules = [(v) => !!v || 'Usuário é necessário'];
-
-const emailRules = [
-  (v: any) => !!v || 'Email é necessário',
-  (v: string) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
-];
-
-const cpfRules = [
-  (v: any) => !!v || 'CPF é necessário',
-  (v: string | any[]) => v.length === 11 || 'CPF contem 11 caracteres',
-];
-
-const passwordRules = [(v) => !!v || 'Senha é necessária'];
+const {
+  fullnameRules,
+  usernameRules,
+  emailRules,
+  cpfRules,
+  passwordRules,
+  confirmPasswordRules,
+} = useFormRules(formData.value);
 
 const isProfessor = computed(() => {
   return formData.value.yourRole === 'Professor';
-});
-
-const confirmPasswordRules = computed(() => {
-  return [
-    (v: any) => !!v || 'Senha é necessária',
-    (v: any) => v === formData.value.password1 || 'Senha diferentes',
-  ];
 });
 
 const fetchInstitutions = async (instValue: any) => {
