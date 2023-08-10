@@ -99,6 +99,7 @@ export const useGetData = () => {
 
   loadPlan(reloadParams, false)
     .then((result) => {
+      console.log('getData', result);
       if (result) {
         learningPlan.value = result.learningPlan;
         breadcrumb.value = result.breadcrumb;

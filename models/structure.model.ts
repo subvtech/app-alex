@@ -2,7 +2,7 @@ import {
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
-import { Block } from 'typescript';
+import { Block } from './block.model';
 import { LearningPlan } from './learningPlan.model';
 import { Version } from './version.model';
 

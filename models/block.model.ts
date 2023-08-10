@@ -3,8 +3,9 @@ import { Structure } from './structure.model';
 export interface Block {
   id: number;
   type: string;
-  data: Object;
-  order: Number;
-  tunes: Object;
+  data: any;
+  order: any;
+  tunes: any;
+  downloaded: boolean;
   structure: Structure;
 }

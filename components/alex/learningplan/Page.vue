@@ -3,14 +3,14 @@
     <alex-learningplan-viewer
       v-if="!editing"
       :structure="props.learningPlan.attributes.structure?.data[0]!"
-      :has-permission="hasPermission"
-      :author="learningPlan.attributes.author.data"
-      :co-authors="learningPlan.attributes.coauthors.data"
+      :has-permission="props.hasPermission"
+      :author="props.learningPlan.attributes.author"
+      :co-authors="props.learningPlan.attributes.coauthors"
       @edit="editing = true"
     />
     <template v-else>
       <alex-learningplan-editor
-        :data="learningPlan"
+        :data="props.learningPlan"
         @back="onEditorBack"
         @updated="$emit('updated')"
       />
@@ -53,6 +53,8 @@ const props = defineProps({
     type: Boolean,
   },
 });
+
+console.log(props.learningPlan);
 
 const editing = ref(false);
 const visible = ref(false);

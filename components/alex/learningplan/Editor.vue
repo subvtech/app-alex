@@ -126,7 +126,7 @@ const { update } = useStrapi();
 const props = defineProps(['data']);
 
 const { data } = toRefs(props);
-
+console.log('data', data);
 const openModal = ref(false);
 const saving = ref(false);
 const visible = ref(false);
@@ -235,7 +235,7 @@ const save = async (tag = '') => {
     await update('learningplans', trailId || planId, formData as any);
 
     messageStore.message = 'Dados salvos com sucesso!';
-    this.$emit('updated');
+    //this.$emit('updated');
   } catch (err) {
     messageStore.message = err as string;
   } finally {

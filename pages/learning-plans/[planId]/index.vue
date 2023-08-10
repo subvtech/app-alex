@@ -1,6 +1,7 @@
 <template>
   <alex-learningplan-page
-    :learning-plan="learningPlan!"
+    v-if="learningPlan"
+    :learning-plan="learningPlan"
     :has-permission="hasAccess"
     @updated="loadPlan"
   />
@@ -13,4 +14,5 @@ definePageMeta({
 
 const hasAccess = useAccess('learningplan', 'update');
 const { learningPlan, loadPlan } = useGetData();
+console.log('learningPlan', learningPlan.value);
 </script>
