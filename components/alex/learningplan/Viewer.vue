@@ -3,14 +3,18 @@
     <v-col cols="9">
       <v-card id="header-learning-plan-card" elevation="0" class="pa-4">
         <v-row
-          v-if="!blocks.data.length && askToEditIfEmptyBlocks"
+          v-if="!blocks.length && askToEditIfEmptyBlocks"
           dense
           class="pa-0"
           align="center"
           justify="start"
         >
           <v-col cols="12">
-            <v-btn v-if="hasPermission" color="primary" @click="$emit('edit')">
+            <v-btn
+              v-if="props.hasPermission"
+              color="primary"
+              @click="emit('edit')"
+            >
               Clique Aqui para adicionar conteúdo
             </v-btn>
             <span v-else>Sem conteúdo</span>
@@ -18,7 +22,7 @@
         </v-row>
         <div v-else>
           <v-row
-            v-if="author"
+            v-if="props.author"
             dense
             class="pa-0"
             justify="space-between"
@@ -28,167 +32,183 @@
             <v-col cols="10" style="z-index: 2; position: relative">
               <alex-learningplan-viewer-authors
                 :structure="structure"
-                :author="author"
-                :co-authors="coAuthors"
+                :author="props.author"
+                :co-authors="props.coAuthors"
               />
             </v-col>
-            <v-btn v-if="hasPermission" icon @click="$emit('edit')">
+            <v-btn v-if="props.hasPermission" icon @click="emit('edit')">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </v-row>
           <v-row dense class="pa-0">
             <v-col
-              v-for="({ attributes, id }, idx) in blocks.data"
+              v-for="({ attributes, id }, idx) in blocks"
               :key="idx"
               v-viewer="{ navbar: false, scalable: false }"
-              :cols="attributes.order === 'attaches' ? 4 : 12"
+              :cols="attributes.type === 'attaches' ? 4 : 12"
               class="flex flex-col my-4 pa-1"
               style="z-index: 1"
             >
               <v-row>
-                <v-col v-if="selectBlocks" :cols="1">
+                <v-col v-if="props.selectBlocks" :cols="1">
                   <v-checkbox
                     v-model="checkedBlocks"
                     :value="id"
-                    @input="$emit('block-selected', checkedBlocks)"
+                    @input="emit('block-selected', checkedBlocks)"
                   />
                 </v-col>
-                <v-col :cols="selectBlocks ? 11 : 12">
-                  <hr v-if="type === 'delimiter'" />
+                <v-col :cols="props.selectBlocks ? 11 : 12">
+                  <hr v-if="attributes.type === 'delimiter'" />
                   <component
-                    :is="`h${data.level}`"
-                    v-else-if="type === 'header'"
-                    :id="`header-${id}`"
+                    :is="`h${attributes.data.level}`"
+                    v-else-if="attributes.type === 'header'"
+                    :id="`header-${attributes.id}`"
                     v-intersect="handleIntersect"
                     :class="
-                      tunes && tunes.alignmentBlockTune
-                        ? tunes.alignmentBlockTune.alignment
+                      attributes.tunes && attributes.tunes.alignmentBlockTune
+                        ? attributes.tunes.alignmentBlockTune.alignment
                         : 'center'
                     "
                   >
-                    {{ unescape(data.text) }}
+                    {{ unescape(attributes.data.text) }}
                   </component>
                   <v-row
-                    v-else-if="['image', 'imageUrl'].includes(type)"
+                    v-else-if="['image', 'imageUrl'].includes(attributes.type)"
                     justify="center"
                   >
                     <img
-                      :src="getImageLink(data, downloaded)"
-                      :alt="data.caption || 'Image'"
-                      :title="data.caption || ''"
+                      :src="
+                        getImageLink(attributes.data, attributes.downloaded)
+                      "
+                      :alt="attributes.data.caption || 'Image'"
+                      :title="attributes.data.caption || ''"
                       style="max-width: 800px"
                       class="object-cover w-full m-auto p-4 shadow viewable-image"
                     />
                   </v-row>
                   <vue-plyr
                     v-else-if="
-                      type === 'link' &&
-                      data.meta &&
-                      typeof data.meta.domain === 'string' &&
-                      video.isVideo(data.meta.domain) &&
-                      video.getEmbedID(data.link)
+                      attributes.type === 'link' &&
+                      attributes.data.meta &&
+                      typeof attributes.data.meta.domain === 'string' &&
+                      video.isVideo(attributes.data.meta.domain) &&
+                      video.getEmbedID(attributes.data.link)
                     "
                   >
                     <video
-                      v-if="isElectronEnv() && downloaded"
+                      v-if="isElectronEnv() && attributes.downloaded"
                       controls
                       crossorigin=""
                       playsinline
                       :data-poster="
-                        data.meta.image
-                          ? `file://${data.meta.image.downloadedUrl}`
+                        attributes.data.meta.image
+                          ? `file://${attributes.data.meta.image.downloadedUrl}`
                           : ''
                       "
                     >
                       <source
-                        :src="`file://${data.downloadedLink}`"
+                        :src="`file://${attributes.data.downloadedLink}`"
                         type="video/mp4"
                       />
                     </video>
                     <div
                       v-else
-                      :data-plyr-provider="video.getProvider(data.link)"
-                      :data-plyr-embed-id="video.getEmbedID(data.link)"
+                      :data-plyr-provider="
+                        video.getProvider(attributes.data.link)
+                      "
+                      :data-plyr-embed-id="
+                        video.getEmbedID(attributes.data.link)
+                      "
                     />
                   </vue-plyr>
 
                   <alex-learningplan-viewer-blocks-link
-                    v-else-if="type === 'link'"
-                    :link-block="data"
+                    v-else-if="attributes.type === 'link'"
+                    :link-block="attributes.data"
                     :is-desktop="isElectronEnv()"
-                    :is-downloaded="downloaded"
+                    :is-downloaded="attributes.downloaded"
                   />
 
                   <component
-                    :is="data.style === 'unordered' ? 'ul' : 'ol'"
-                    v-else-if="type === 'list'"
+                    :is="attributes.data.style === 'unordered' ? 'ul' : 'ol'"
+                    v-else-if="attributes.type === 'list'"
                   >
-                    <nested-list :items="data.items" :type="data.style" />
+                    <nested-list
+                      :items="attributes.data.items"
+                      :type="attributes.data.style"
+                    />
                   </component>
                   <!-- eslint-disable-next-line -->
                   <p
-                    v-else-if="type === 'paragraph'"
+                    v-else-if="attributes.type === 'paragraph'"
                     :class="
-                      tunes && tunes.alignmentBlockTune
-                        ? tunes.alignmentBlockTune.alignment
-                        : data.alignment
+                      attributes.tunes && attributes.tunes.alignmentBlockTune
+                        ? attributes.tunes.alignmentBlockTune.alignment
+                        : attributes.data.alignment
                     "
-                    v-html="data.text"
+                    v-html="attributes.data.text"
                   />
 
-                  <div v-else-if="type === 'quote'" :class="data.alignment">
+                  <div
+                    v-else-if="attributes.type === 'quote'"
+                    :class="attributes.data.alignment"
+                  >
                     <b
-                      ><p>"{{ data.text }}"</p></b
+                      ><p>"{{ attributes.data.text }}"</p></b
                     >
                     <i
-                      ><p>{{ data.caption }}</p></i
+                      ><p>{{ attributes.data.caption }}</p></i
                     >
                   </div>
 
                   <alex-learningplan-viewer-blocks-table
-                    v-else-if="type === 'table'"
-                    :table-block="data"
+                    v-else-if="attributes.type === 'table'"
+                    :table-block="attributes.data"
                   />
 
                   <alex-learningplan-viewer-blocks-attaches
-                    v-else-if="type === 'attaches'"
-                    :attaches-block="data"
+                    v-else-if="attributes.type === 'attaches'"
+                    :attaches-block="attributes.data"
                     :is-desktop="isElectronEnv()"
                   />
 
                   <alex-learningplan-viewer-blocks-alert
-                    v-else-if="type === 'alert'"
-                    :alert-block="data"
+                    v-else-if="attributes.type === 'alert'"
+                    :alert-block="attributes.data"
                   />
 
                   <alex-learningplan-viewer-blocks-warning
-                    v-else-if="type === 'warning'"
-                    :warning-block="data"
+                    v-else-if="attributes.type === 'warning'"
+                    :warning-block="attributes.data"
                   />
 
                   <prism
-                    v-else-if="type === 'code' && data.languageCode"
-                    :language="data.languageCode"
-                    :code="data.code"
+                    v-else-if="
+                      attributes.type === 'code' && attributes.data.languageCode
+                    "
+                    :language="attributes.data.languageCode"
+                    :code="attributes.data.code"
                   ></prism>
 
                   <a
-                    v-else-if="type === 'socialPost'"
+                    v-else-if="attributes.type === 'socialPost'"
                     rel="nofollow noindex noreferrer"
                     class="card-link"
                     target="_blank"
-                    :href="data.url"
+                    :href="attributes.data.url"
                   >
                     <div class="flex-1">
-                      <div class="font-bold">{{ data.caption }}</div>
-                      <p v-if="data.description" class="my-2">
-                        {{ data.description }}
+                      <div class="font-bold">{{ attributes.data.caption }}</div>
+                      <p v-if="attributes.data.description" class="my-2">
+                        {{ attributes.data.description }}
                       </p>
                       <span class="text-black text-opacity-50">
-                        {{ data.url }}
+                        {{ attributes.data.url }}
                       </span>
                     </div>
-                    <a-icon :type="data.socialMediaPlatform.toLowerCase()" />
+                    <a-icon
+                      :type="attributes.data.socialMediaPlatform.toLowerCase()"
+                    />
                   </a>
                 </v-col>
               </v-row>
@@ -207,7 +227,7 @@
           text-overflow: ellipsis;
         "
       >
-        <v-btn text="" @click="onTabClick({ id: 'learning-plan-card' })">
+        <v-btn text="" @click="onTabClick({ id: 'header-learning-plan-card' })">
           Voltar para o Topo
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
@@ -219,14 +239,14 @@
           <v-tab
             v-for="header in headersBlocks"
             :key="`header-tab-${header.id}`"
-            :title="header.data.text"
+            :title="header.attributes.data.text"
             style="justify-content: start; text-overflow: ellipsis"
-            :class="`ml-${(header.data.level - 1) * 3}`"
-            @click="onTabClick(header)"
+            :class="`ml-${(header.attributes.data.level - 1) * 3}`"
+            @click="onTabClick({ id: `header-tab-${header.id}` })"
             @change="changeTabOnIntersect = true"
           >
             <div>
-              {{ unescape(header.data.text.trim()) }}
+              {{ unescape(header.attributes.data.text.trim()) }}
             </div>
           </v-tab>
         </v-tabs>
@@ -255,7 +275,7 @@ const props = defineProps({
     required: true,
   },
   selectedBlocks: {
-    type: Array as PropType<Block[]>,
+    type: Array as PropType<Strapi4ResponseData<Block>[]>,
     default: () => [],
   },
   askToEditIfEmptyBlocks: {
@@ -276,34 +296,41 @@ const props = defineProps({
   },
 });
 
-// const videoRef = ref();
-const blocks = computed(() => props.structure.attributes.blocks);
+const emit = defineEmits(['edit', 'block-selected']);
 
-const checkedBlocks: globalThis.Ref<Block[]> = ref([]);
-const headerTabSelected = ref(null);
+// const videoRef = ref();
+// const blocks = ref<Strapi4ResponseData<Block>[]>([]);
+
+const checkedBlocks = ref<Block[]>([]);
+const headerTabSelected = ref<number | null>(null);
 const changeTabOnIntersect = ref(true);
 
 const headersBlocks = computed(() => {
-  return blocks.value.data.filter((b: any) => b.attributes.type === 'header');
+  return blocks.value.filter((b: any) => b.attributes.type === 'header');
 });
 
 onMounted(() => {
-  checkedBlocks.value = selectedBlocks.value;
+  // checkedBlocks.value = props.selectedBlocks;
 });
 
-watch(
-  () => structure,
-  () => {
-    blocks.value = (structure!.value || {}).blocks || [];
-  },
-);
+const blocks = computed(() => {
+  console.log(props.structure);
+  return props.structure?.attributes?.blocks?.data || [];
+});
 
-watch(
-  () => selectedBlocks,
-  () => {
-    checkedBlocks.value = selectedBlocks.value;
-  },
-);
+// watch(
+//   () => props.structure,
+//   () => {
+//     blocks.value = (props.structure.attributes.blocks || {}).data || [];
+//   },
+// );
+
+// watch(
+//   () => props.selectedBlocks,
+//   () => {
+//     checkedBlocks.value = props.selectedBlocks;
+//   },
+// );
 
 const isElectronEnv = () => {
   return !!process.env.isElectronEnv;

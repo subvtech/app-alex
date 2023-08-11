@@ -20,23 +20,23 @@
             bordered
             overlap
           >
-            <app-user-avatar :user="author" />
+            <app-user-avatar :user="author.attributes" />
           </v-badge>
         </div>
       </template>
       <v-container fluid color="white" style="z-index: 2">
         <v-row>
           <v-col cols="12">
-            <app-user-avatar :user="author" />
-            <span> {{ author.fullname }} </span>
+            <app-user-avatar :user="author.attributes" />
+            <span> {{ author.attributes.fullname }} </span>
           </v-col>
           <v-col
             v-for="(coauthor, i) in coAuthors"
             :key="`coauthor-avatar-${i}`"
             cols="12"
           >
-            <app-user-avatar :user="coauthor" />
-            <span> {{ coauthor.fullname }} </span>
+            <app-user-avatar :user="coauthor.attributes" />
+            <span> {{ coauthor.attributes.fullname }} </span>
           </v-col>
         </v-row>
       </v-container>
@@ -44,13 +44,15 @@
     <v-col cols="8" class="ml-1">
       <div class="avatar-info-section">
         <p>
-          {{ author.fullname + coAuthorsText(coAuthors) }}
+          {{ author.attributes.fullname + coAuthorsText(coAuthors) }}
         </p>
         <div style="display: flex">
           <span
             >Atualizado em:
             {{
-              new Date(structure.updatedAt).toLocaleDateString('pt-BR')
+              new Date(structure.attributes.updatedAt).toLocaleDateString(
+                'pt-BR',
+              )
             }}</span
           >
         </div>
@@ -60,23 +62,24 @@
 </template>
 
 <script setup lang="ts">
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { User } from 'models/user.model';
+import { Structure } from 'models/structure.model';
 
 const props2 = defineProps({
   structure: {
-    type: Object,
+    type: Object as PropType<Strapi4ResponseData<Structure>>,
     required: true,
   },
   author: {
-    type: Object as PropType<User>,
+    type: Object as PropType<Strapi4ResponseData<User>>,
     required: true,
   },
   coAuthors: {
-    type: Array as PropType<User[]>,
+    type: Array as PropType<Strapi4ResponseData<User>[]>,
     default: () => [],
   },
 });
-const { structure, author, coAuthors } = toRefs(props2);
 
 const coAuthorsText = (coAuthors) => {
   if (coAuthors.length < 1) {

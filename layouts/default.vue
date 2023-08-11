@@ -119,8 +119,6 @@ const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
 
-console.log(user.value);
-
 const profileMenuItems = ref([
   {
     title: 'Perfil',

@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import { useMessageStore } from '~/stores/message';
 const messageStore = useMessageStore();
 const { show, message, color } = storeToRefs(messageStore);
 </script>

@@ -72,7 +72,6 @@
 </template>
 
 <script setup lang="ts">
-import { useMessageStore } from "~/stores/message";
 const messageStore = useMessageStore();
 definePageMeta({
   layout: "auth",
@@ -80,17 +79,14 @@ definePageMeta({
 const { login } = useStrapiAuth();
 const router = useRouter();
 
+const { emailRules, passwordRules } = useFormRules();
+
 const logging = ref(false);
 const passwordVisible = ref(false);
 const checkbox = ref(false);
 
 const email = ref("");
 const password = ref("");
-const emailRules = [
-  (v) => !!v || "Email é necessário",
-  (v) => /.+@.+\..+/.test(v) || "Adicione um e-mail valido",
-];
-const passwordRules = [(v) => !!v || "Senha é necessário"];
 
 const submit = async () => {
   logging.value = true;

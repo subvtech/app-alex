@@ -1,6 +1,7 @@
 <template>
   <alex-learningplan-page
-    :learning-plan="learningPlan!"
+    v-if="learningPlan"
+    :learning-plan="learningPlan"
     :has-permission="hasAccess"
     @updated="loadPlan"
   />
@@ -11,6 +12,6 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const hasAccess = useAccess('learningplan', 'update');
+const hasAccess = useAccess(['professor']);
 const { learningPlan, loadPlan } = useGetData();
 </script>

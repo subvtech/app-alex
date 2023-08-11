@@ -6,7 +6,7 @@
     :color="color"
     :outlined="outlined"
     :required="required"
-    @input="$emit('input', inputValue)"
+    @input="emit('input', inputValue)"
   >
   </v-text-field>
 </template>
@@ -38,6 +38,7 @@ const props = defineProps({
 });
 
 const { label, outlined, required, rules, color, value } = toRefs(props);
+const emit = defineEmits(['input']);
 
 const inputValue = ref();
 

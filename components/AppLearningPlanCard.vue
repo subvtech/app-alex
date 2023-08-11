@@ -42,8 +42,8 @@
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
 
-const strapiUrl = useStrapiUrl();
-const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
+// const strapiUrl = useStrapiUrl();
+// const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
 
 const props = defineProps({
   learningPlan: {
@@ -58,7 +58,7 @@ const props = defineProps({
 
 const getImageUrl = computed(() => {
   return props.learningPlan.attributes.image.data
-    ? `${strapiBaseUrl.value}${props.learningPlan.attributes.image.data.attributes.url}`
+    ? useStrapiMedia(props.learningPlan.attributes.image.data.attributes.url)
     : '/images/not-found.png';
 });
 

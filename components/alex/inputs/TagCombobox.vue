@@ -1,7 +1,9 @@
 <template>
   <v-combobox
-    v-model="selectedTags!.data"
-    :items="tags!.data"
+    v-if="selectedTags && tags"
+    v-model="selectedTags"
+    v-model:search-input="search"
+    :items="tags"
     :loading="loadingTags"
     label="Adicionar Tags"
     prepend-inner-icon="mdi-plus-circle"
@@ -15,7 +17,6 @@
     cache-items
     item-value="id"
     item-text="tag"
-    :search-input.sync="search"
     :reverse="false"
     :clearable="!disabled"
     small-chips
@@ -82,17 +83,25 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import {
+  Strapi4ResponseData,
+  Strapi4ResponseMany,
+} from '@nuxtjs/strapi/dist/runtime/types';
+import { PropType } from 'nuxt/dist/app/compat/capi';
 import { Tag } from 'models/tag.model';
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
 const graphql = useStrapiGraphQL();
 
-const props = defineProps(['value']);
-const { value } = toRefs(props);
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<Strapi4ResponseData<Tag>[]>,
+    default: () => [],
+  },
+});
 
-const tags = ref<Strapi4ResponseMany<Tag>>();
-const selectedTags = ref<Strapi4ResponseMany<Tag>>();
+const tags = ref<Strapi4ResponseData<Tag>[]>([]);
+const selectedTags = ref<Strapi4ResponseData<Tag>[]>([]);
 const loadingTags = ref(false);
 const disabled = ref(false);
 const search = ref('');
@@ -104,8 +113,10 @@ watch(
   },
 );
 
+const emit = defineEmits(['update:modelValue']);
+
 watch(
-  () => value,
+  () => props.modelValue,
   async () => {
     await loadTags();
   },
@@ -115,16 +126,16 @@ onMounted(async () => {
 });
 
 const loadTags = async () => {
-  if (value && value.value.length) {
-    selectedTags.value = value.value;
+  if (props.modelValue && props.modelValue.length) {
+    selectedTags.value = props.modelValue;
     await searchTags(
       '',
-      value.value.map((t) => t.id),
+      props.modelValue.map((t) => t.id),
     );
   }
 };
 
-const searchTags = async (search = '', ids: string[] = []) => {
+const searchTags = async (search = '', ids: number[] = []) => {
   if ((!search || search.length < 3) && !ids.length) return;
   loadingTags.value = true;
 
@@ -134,37 +145,34 @@ const searchTags = async (search = '', ids: string[] = []) => {
     variables: ids.length ? { ids } : { search },
   };
 
-  tags.value = await graphql<Strapi4ResponseMany<Tag>>(
-    props.query,
-    props.variables,
-  );
+  tags.value = (
+    await graphql<Strapi4ResponseMany<Tag>>(props.query, props.variables)
+  ).data;
 
   loadingTags.value = false;
 };
 
 const remove = (item) => {
   if (disabled.value) return;
-  selectedTags.value = {
-    data: selectedTags.value!.data.filter((t) => t.id !== item.id),
-    meta: selectedTags.value!.meta,
-  };
+  selectedTags.value = selectedTags.value!.filter((t) => t.id !== item.id);
 };
 const onInput = async () => {
   search.value = '';
 
   await checkForNewTags();
-  this.$emit('input', selectedTags.value);
+  emit('update:modelValue', selectedTags.value);
 };
 const checkForNewTags = async () => {
-  const newTags = selectedTags.value!.data.filter((tag) => !tag.attributes.tag);
+  const newTags = selectedTags.value!.filter((tag) => !tag.attributes.tag);
 
   if (newTags.length) {
     disabled.value = true;
-    const newTagIdx = selectedTags.value!.data.findIndex(
+    const newTagIdx = selectedTags.value!.findIndex(
       (tag) => !tag.attributes.tag,
     );
 
-    const tag = (await create('tags', { tag: newTags[0] })).data.attributes.tag;
+    const tag = (await create<Tag>('tags', { tag: newTags[0].attributes.tag }))
+      .data;
 
     selectedTags.value![newTagIdx] = tag;
 

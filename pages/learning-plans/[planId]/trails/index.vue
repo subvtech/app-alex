@@ -1,6 +1,7 @@
 <template>
   <alex-learningplan-list
-    :learning-plans="learningPlan.trails"
+    v-if="learningPlan"
+    :learning-plans="learningPlan.attributes.trails.data"
     :parent-learning-plan="learningPlan"
     @updated="loadPlan"
   />

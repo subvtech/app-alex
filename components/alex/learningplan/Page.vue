@@ -3,16 +3,16 @@
     <alex-learningplan-viewer
       v-if="!editing"
       :structure="props.learningPlan.attributes.structure?.data[0]!"
-      :has-permission="hasPermission"
-      :author="learningPlan.attributes.author.data"
-      :co-authors="learningPlan.attributes.coauthors.data"
+      :has-permission="props.hasPermission"
+      :author="props.learningPlan.attributes.author.data"
+      :co-authors="props.learningPlan.attributes.coauthors.data"
       @edit="editing = true"
     />
     <template v-else>
       <alex-learningplan-editor
-        :data="learningPlan"
+        :data="props.learningPlan"
         @back="onEditorBack"
-        @updated="$emit('updated')"
+        @updated="emit('updated')"
       />
       <v-dialog v-model="visible" width="500">
         <v-card>
@@ -42,6 +42,8 @@
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
+
+const emit = defineEmits(['updated']);
 
 const props = defineProps({
   learningPlan: {

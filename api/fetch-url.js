@@ -1,13 +1,12 @@
-const express = require('express');
-const parser = require('@postlight/mercury-parser');
+import express from 'express';
+import { parse } from '@postlight/parser';
 
 const app = express();
 
 app.use(express.json());
 
 app.get('/api/fetch-url', function (req, res) {
-  parser
-    .parse(req.query.url)
+  parse(req.query.url)
     .then((data) => {
       const domain =
         data.domain && typeof data.domain === 'string' ? data.domain : '';
@@ -27,4 +26,4 @@ app.get('/api/fetch-url', function (req, res) {
     .catch(() => res.status(500).json({ success: 0 }));
 });
 
-module.exports = app;
+export default app;
