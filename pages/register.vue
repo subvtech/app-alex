@@ -12,148 +12,132 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card v-if="checkEmail" class="card card-register px-10">
+      <v-card class="card card-register px-10" align="center">
         <div align="center">
           <img
             alt="Alex"
             src="../static/images/alex.svg"
-            class="card-register-alex-logo my-15"
+            class="card-register-alex-logo mt-8 mb-4"
           />
         </div>
-        <v-card-title class="text-white my-2">
-          Usuário cadastrado com sucesso!
-        </v-card-title>
-        <v-card-subtitle class="text-white my-2">
-          {{
-            isProfessor
-              ? "Um administrador irá validar seu cadastro."
-              : "Um link de ativação foi enviado para o seu email."
-          }}
-        </v-card-subtitle>
-        <p v-if="!isProfessor" slot="description" class="text-gray-500">
-          Obs.: Verifique sua caixa de SPAM.
-        </p>
-        <v-btn type="primary" class="mt-6 mx-auto" @click="router.push('/login')">
-          Voltar
-        </v-btn>
-      </v-card>
-      <v-card v-else class="card card-register px-10">
-        <div align="center">
-          <img
-            alt="Alex"
-            src="../static/images/alex.svg"
-            class="card-register-alex-logo my-12"
-          />
-          <!-- Por algum motivo o v-img tá requisitando as imagens desta url http://localhost:3000/static/images/imagem_login.png e dá 404-->
-          <!-- já o img nativo requistia desta url http://localhost:3000/_nuxt/static/images/imagem_login.png funcionando-->
-        </div>
-        <v-card-title class="text-white my-2">
+        <v-card-title class="text-white title">
           Inicie uma nova experiência!
         </v-card-title>
-        <v-card-subtitle class="text-white my-2">
-          Crie uma conta e comece seus estudos
-        </v-card-subtitle>
-        <v-form v-model="isFormValid" @submit.prevent="submit">
-          <v-text-field
-            v-model="formData.fullname"
-            :rules="fullnameRules"
-            label="Nome completo"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.username"
-            :rules="usernameRules"
-            label="Nome de usuário"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.email"
-            :rules="emailRules"
-            label="E-mail"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.cpf"
-            :rules="cpfRules"
-            type="number"
-            label="CPF"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.password1"
-            :rules="passwordRules"
-            label="Senha"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.password2"
-            :rules="confirmPasswordRules"
-            label="Confirmar Senha"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            outlined
-            required
-          />
+        <steps :steps="3" :submit="teste" align="left">
+          <template #step1>
+            <v-card-subtitle class="text-white mb-8" align="center">
+              Crie uma conta e comece seus estudos
+            </v-card-subtitle>
 
-          <v-radio-group
-            v-model="formData.yourRole"
-            row
-            color="white"
-            class="my-4 text-secondary"
-            dark
-          >
-            <v-radio label="Estudante" value="Estudante"></v-radio>
-            <v-radio label="Professor" value="Professor"></v-radio>
-          </v-radio-group>
+            <v-text-field
+              v-model="formData.fullname"
+              :rules="fullnameRules"
+              label="Nome completo"
+              color="white"
+              class="text-secondary"
+              required
+            />
 
-          <v-autocomplete
-            v-model="formData.institution"
-            v-model:search-input="search"
-            :loading="fetching"
-            :items="institutions"
-            item-text="text"
-            item-value="id"
-            label="Instituição de Ensino"
-            color="white"
-            class="my-4 text-secondary"
-            dark
-            cache-items
-          ></v-autocomplete>
+            <v-text-field
+              v-model="formData.email"
+              :rules="emailRules"
+              label="E-mail"
+              color="white"
+              class="text-secondary"
+              required
+            />
+            <v-text-field
+              v-model="formData.cpf"
+              :rules="cpfRules"
+              type="number"
+              label="CPF"
+              color="white"
+              class="text-secondary"
+              :counter="11"
+              required
+            />
+          </template>
+          <template #step2>
+            <v-card-subtitle class="text-white mb-8" align="center">
+              Informe o tipo da sua conta
+            </v-card-subtitle>
+            <v-select
+              v-model="formData.yourRole"
+              class="text-secondary"
+              label="Tipo de Usuário"
+              :rules="userType"
+              variant="outlined"
+              required
+              :items="['Professor', 'Aluno']"
+            ></v-select>
+            <v-select
+              v-if="isProfessor"
+              v-model="formData.institution"
+              class="text-secondary"
+              label="Instituição de Ensino"
+              :rules="userType"
+              variant="outlined"
+              required
+              :items="['Instituto Federal de Alagoas - IFAL']"
+            ></v-select>
+          </template>
+          <template #step3>
+            <v-card-subtitle class="text-white mb-4" align="center">
+              Insira seus dados de acesso
+            </v-card-subtitle>
+            <v-text-field
+              v-model="formData.username"
+              :rules="usernameRules"
+              label="Nome de Usuário"
+              color="white"
+              class="my-3 text-secondary"
+              required
+              :hint="`${usernameUrl}${formData.username}`"
+              persistent-hint
+            />
 
-          <v-btn
-            block
-            class="card-btn"
-            type="submit"
-            :loading="registering"
-            :disabled="!isFormValid"
-          >
-            Criar Conta
-          </v-btn>
-        </v-form>
-        <v-card-text class="text-white mt-6 mb-10">
-          Já possui conta?
-          <nuxt-link to="/login" class="text-white"> Acesse aqui </nuxt-link>
+            <v-text-field
+              v-model="formData.password1"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="passwordRules"
+              :type="passwordVisible ? 'text' : 'password'"
+              class="text-secondary"
+              label="Senha"
+              variant="outlined"
+              theme="dark"
+              @click:append-inner="passwordVisible = !passwordVisible"
+            />
+            <v-text-field
+              v-model="formData.password2"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :rules="confirmPasswordRules"
+              :type="passwordVisible ? 'text' : 'password'"
+              class="text-secondary"
+              label="Confirme a senha"
+              variant="outlined"
+              required
+              @click:append-inner="passwordVisible = !passwordVisible"
+            />
+          </template>
+        </steps>
+        <div class="d-flex align-center text-white my-6">
+          <v-divider
+            color="secondary"
+            :thickness="1"
+            class="border-opacity-100"
+          ></v-divider>
+          <p class="mx-4">ou</p>
+          <v-divider
+            color="secondary"
+            :thickness="1"
+            class="border-opacity-100"
+          ></v-divider>
+        </div>
+        <v-card-text class="text-white font-bold haveAccount">
+          Se já possui conta,
+          <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
+            Acesse aqui
+          </nuxt-link>
         </v-card-text>
       </v-card>
     </v-col>
@@ -165,10 +149,6 @@ const messageStore = useMessageStore();
 definePageMeta({
   layout: "auth",
 });
-
-const { register } = useStrapiAuth();
-const { find } = useStrapi();
-const router = useRouter();
 
 type FormDataType = {
   fullname: string;
@@ -189,18 +169,16 @@ type InstitutionsType = {
   tipo: String;
 };
 
+const { register } = useStrapiAuth();
+const { find } = useStrapi();
+const router = useRouter();
+const usernameUrl = "https://app.projetoalex.cc/profile/";
 const checkEmail = ref(false);
-const isFormValid = ref(false);
 const registering = ref(false);
 const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
 const search = ref(null);
-// const timeoutSearch = ref(null);
-/* const roles = ref([
-  { text: 'Sou Aluno', value: 'Aluno' },
-  { text: 'Sou Professor', value: 'Professor' },
-]);
-*/
+
 const formData = ref<FormDataType>({
   fullname: "",
   username: "",
@@ -212,8 +190,7 @@ const formData = ref<FormDataType>({
   institution: "",
 });
 
-// const showPassword = ref(false);
-// const showConfirmPassword = ref(false);
+const passwordVisible = ref(false);
 
 const {
   fullnameRules,
@@ -222,6 +199,7 @@ const {
   cpfRules,
   passwordRules,
   confirmPasswordRules,
+  userType,
 } = useFormRules(formData.value);
 
 const isProfessor = computed(() => {
@@ -252,6 +230,9 @@ const fetchInstitutions = async (instValue: any) => {
   fetching.value = false;
 };
 
+const teste = () => {
+  console.log(formData.value);
+};
 const submit = async () => {
   registering.value = true;
 
@@ -318,9 +299,12 @@ watch(
     right: 0;
     overflow: auto;
     width: 600px;
-
+    display: flex;
+    flex-direction: column;
+    // gap: 1rem;
     &-alex-logo {
-      width: 100px;
+      width: 120px;
+      height: 40px;
     }
   }
 
@@ -357,10 +341,12 @@ watch(
     }
   }
 }
-
-.v-card__subtitle,
-.v-card__text,
-.v-card__title {
-  padding: 0;
+.haveAccount {
+  font-weight: 700;
+  &-link {
+    text-decoration: none;
+    color: #00d3ec !important;
+    font-size: 16px;
+  }
 }
 </style>

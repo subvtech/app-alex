@@ -35,10 +35,7 @@
             variant="outlined"
             required
           />
-          <!-- O color só altera quando está em foco -->
-          <!-- O bg-color o nome diz -->
-          <!-- O base-color altera só a borda-->
-          <!-- pra alterar tudo usei o text-secondary -->
+
           <v-text-field
             v-model="password"
             :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
@@ -50,7 +47,7 @@
             required
             @click:append-inner="passwordVisible = !passwordVisible"
           />
-          <!-- O checkbox tava invisível porque não tinha instalado os ícones do mdi -->
+
           <v-checkbox
             v-model="checkbox"
             class="text-white"
@@ -82,9 +79,9 @@ const router = useRouter();
 const { emailRules, passwordRules } = useFormRules();
 
 const logging = ref(false);
-const passwordVisible = ref(false);
 const checkbox = ref(false);
 
+const passwordVisible = ref(false);
 const email = ref("");
 const password = ref("");
 

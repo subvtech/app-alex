@@ -8,6 +8,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     defaults: {
       VTextField: {
         variant: 'outlined',
+        rounded: 'lg'
       },
     },
     components,

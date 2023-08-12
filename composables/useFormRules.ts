@@ -37,7 +37,7 @@ function isValidCpf(val) {
 export const useFormRules = (formData?: FormDataType) => {
   const fullnameRules = [(v) => !!v || 'Nome completo é necessário'];
   const usernameRules = [(v) => !!v || 'Usuário é necessário'];
-
+  const userType = [(v) => !!v || 'O tipo de usuário é necessário'];
   const emailRules = [
     (v) => !!v || 'Email é necessário',
     (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
@@ -66,5 +66,6 @@ export const useFormRules = (formData?: FormDataType) => {
     passwordRules,
     confirmPasswordRules,
     cpfRules,
+    userType
   };
 };

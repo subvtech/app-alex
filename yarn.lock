@@ -1583,6 +1583,15 @@
     hookable "^5.5.3"
     unhead "1.1.35"
 
+"@vee-validate/zod@^4.11.1":
+  version "4.11.1"
+  resolved "https://registry.yarnpkg.com/@vee-validate/zod/-/zod-4.11.1.tgz#0ce644db548f3240d4e6374b6342fc9021d124a9"
+  integrity sha512-BVzXTBxKE2ZcmwLytRBqju2lQg+OQl3c8E0pMEUbg2SIdsX4sKUnKMhqvap0+Iz9Xj8rDAhB/2hGAXWbe4yvpA==
+  dependencies:
+    type-fest "^4.0.0"
+    vee-validate "^4.11.1"
+    zod "^3.21.4"
+
 "@vercel/nft@^0.22.6":
   version "0.22.6"
   resolved "https://registry.yarnpkg.com/@vercel/nft/-/nft-0.22.6.tgz#edb30d300bb809c0945ea4c7b87e56f634885541"
@@ -7834,6 +7843,11 @@ type-fest@^2.11.2, type-fest@^2.13.0:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.19.0.tgz#88068015bb33036a598b952e55e9311a60fd3a9b"
   integrity sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==
 
+type-fest@^4.0.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.2.0.tgz#e259430307710e77721ecf6f545840acad72195f"
+  integrity sha512-5zknd7Dss75pMSED270A1RQS3KloqRJA9XbXLe0eCxyw7xXFb3rd+9B0UQ/0E+LQT6lnrLviEolYORlRWamn4w==
+
 type-is@~1.6.18:
   version "1.6.18"
   resolved "https://registry.yarnpkg.com/type-is/-/type-is-1.6.18.tgz#4e552cd05df09467dcbc4ef739de89f2cf37c131"
@@ -8158,6 +8172,14 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
+
+vee-validate@^4.11.1:
+  version "4.11.1"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.11.1.tgz#82fb210fb23660eaa3710b594e3de0b5017e997d"
+  integrity sha512-NGL2qrhoXAng+pZvu9dgQRhCuNBKeXcusdUloN3jnXUxbmLUCJV2kgleS5Jr7yF2iTWvDlDQd5m+Qp6cP1wSgw==
+  dependencies:
+    "@vue/devtools-api" "^6.5.0"
+    type-fest "^4.0.0"
 
 verror@1.10.0:
   version "1.10.0"
@@ -8590,3 +8612,8 @@ zip-stream@^4.1.0:
     archiver-utils "^2.1.0"
     compress-commons "^4.1.0"
     readable-stream "^3.6.0"
+
+zod@^3.21.4:
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.4.tgz#10882231d992519f0a10b5dd58a38c9dabbb64db"
+  integrity sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==
