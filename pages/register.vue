@@ -131,7 +131,7 @@
 
           <v-autocomplete
             v-model="formData.institution"
-            v-model:search-input="search"
+            @update:search-input="search"
             :loading="fetching"
             :items="institutions"
             item-text="text"
@@ -192,17 +192,39 @@ type InstitutionsType = {
 };
 
 const checkEmail = ref(false);
-const isFormValid = ref(false);
 const registering = ref(false);
 const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
-const search = ref(null);
+const search = ref('');
 // const timeoutSearch = ref(null);
 /* const roles = ref([
   { text: 'Sou Aluno', value: 'Aluno' },
   { text: 'Sou Professor', value: 'Professor' },
 ]);
 */
+
+const isFormValid = computed(() => {
+  return (
+    emailRules.every(
+      (rule) => typeof rule(formData.value.email) === 'boolean',
+    ) &&
+    passwordRules.every(
+      (rule) => typeof rule(formData.value.password1) === 'boolean',
+    ) &&
+    confirmPasswordRules.value.every(
+      (rule) => typeof rule(formData.value.password2) === 'boolean',
+    ) &&
+    cpfRules.every((rule) => typeof rule(formData.value.cpf) === 'boolean') &&
+    fullnameRules.every(
+      (rule) => typeof rule(formData.value.fullname) === 'boolean',
+    ) &&
+    usernameRules.every(
+      (rule) => typeof rule(formData.value.username) === 'boolean',
+    ) &&
+    formData.value.yourRole !== ''
+  );
+});
+
 const formData = ref<FormDataType>({
   fullname: '',
   username: '',
@@ -231,11 +253,13 @@ const isProfessor = computed(() => {
 });
 
 const fetchInstitutions = async (instValue: any) => {
+  console.log(instValue)
   fetching.value = true;
   try {
     const res = await find(
       `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
+    console.log('res', res)
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
@@ -262,6 +286,7 @@ const submit = async () => {
 
   if (!institution) {
     messageStore.message = 'Selecione sua instituição.';
+    registering.value = false;
     return;
   }
 
@@ -293,9 +318,12 @@ const submit = async () => {
 
 watch(
   () => search,
-  async (value) => {
-    await fetchInstitutions(value);
-  },
+  async (newValue, oldValue) => {
+    console.log(newValue);
+    if (newValue !== oldValue) {
+      await fetchInstitutions(newValue);
+    }
+  }
 );
 </script>
 
