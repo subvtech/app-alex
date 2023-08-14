@@ -23,7 +23,7 @@
         <v-card-title class="text-white title">
           Inicie uma nova experiência!
         </v-card-title>
-        <steps :steps="3" :submit="teste" align="left">
+        <alex-inputs-steps :steps="3" :submit="teste" align="left">
           <template #step1>
             <v-card-subtitle class="text-white mb-8" align="center">
               Crie uma conta e comece seus estudos
@@ -119,7 +119,7 @@
               @click:append-inner="passwordVisible = !passwordVisible"
             />
           </template>
-        </steps>
+        </alex-inputs-steps>
         <div class="d-flex align-center text-white my-6">
           <v-divider
             color="secondary"
@@ -147,7 +147,7 @@
 <script setup lang="ts">
 const messageStore = useMessageStore();
 definePageMeta({
-  layout: "auth",
+  layout: 'auth',
 });
 
 type FormDataType = {
@@ -172,7 +172,7 @@ type InstitutionsType = {
 const { register } = useStrapiAuth();
 const { find } = useStrapi();
 const router = useRouter();
-const usernameUrl = "https://app.projetoalex.cc/profile/";
+const usernameUrl = 'https://app.projetoalex.cc/profile/';
 const checkEmail = ref(false);
 const registering = ref(false);
 const fetching = ref(false);
@@ -180,14 +180,14 @@ const institutions = ref<InstitutionsType[]>([]);
 const search = ref(null);
 
 const formData = ref<FormDataType>({
-  fullname: "",
-  username: "",
-  email: "",
-  cpf: "",
-  password1: "",
-  password2: "",
-  yourRole: "",
-  institution: "",
+  fullname: '',
+  username: '',
+  email: '',
+  cpf: '',
+  password1: '',
+  password2: '',
+  yourRole: '',
+  institution: '',
 });
 
 const passwordVisible = ref(false);
@@ -203,14 +203,14 @@ const {
 } = useFormRules(formData.value);
 
 const isProfessor = computed(() => {
-  return formData.value.yourRole === "Professor";
+  return formData.value.yourRole === 'Professor';
 });
 
 const fetchInstitutions = async (instValue: any) => {
   fetching.value = true;
   try {
     const res = await find(
-      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`
+      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
@@ -225,7 +225,7 @@ const fetchInstitutions = async (instValue: any) => {
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
-    messageStore.message = "Ocorreu um erro na busca.";
+    messageStore.message = 'Ocorreu um erro na busca.';
   }
   fetching.value = false;
 };
@@ -236,10 +236,11 @@ const teste = () => {
 const submit = async () => {
   registering.value = true;
 
-  const { cpf, email, password1, username, fullname, institution } = formData.value;
+  const { cpf, email, password1, username, fullname, institution } =
+    formData.value;
 
   if (!institution) {
-    messageStore.message = "Selecione sua instituição.";
+    messageStore.message = 'Selecione sua instituição.';
     return;
   }
 
@@ -257,9 +258,9 @@ const submit = async () => {
     const { user } = await register(userData);
 
     if (user.value!.blocked) {
-      messageStore.message = "Usuário bloqueado!";
+      messageStore.message = 'Usuário bloqueado!';
     } else if (user.value!.confirmed) {
-      router.push("/");
+      router.push('/');
     } else {
       checkEmail.value = true;
     }
@@ -273,7 +274,7 @@ watch(
   () => search,
   async (value) => {
     await fetchInstitutions(value);
-  }
+  },
 );
 </script>
 
@@ -309,7 +310,7 @@ watch(
   }
 
   &-text {
-    font-family: "Montserrat";
+    font-family: 'Montserrat';
     font-weight: 500 !important;
   }
 
@@ -318,7 +319,7 @@ watch(
     background: #00d3ec !important;
     border-radius: 6px;
     display: flex;
-    font-family: "Montserrat";
+    font-family: 'Montserrat';
     font-size: 15px;
     font-weight: 600;
     flex-direction: row;
