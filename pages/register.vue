@@ -23,7 +23,7 @@
         <v-card-title class="text-white title">
           Inicie uma nova experiência!
         </v-card-title>
-        <alex-inputs-steps :steps="3" :submit="teste" align="left">
+        <alex-inputs-steps :steps="3" :submit="submit" align="left">
           <template #step1>
             <v-card-subtitle class="text-white mb-8" align="center">
               Crie uma conta e comece seus estudos
@@ -51,11 +51,12 @@
               :rules="cpfRules"
               type="number"
               label="CPF"
-              color="white"
+              color="#fff"
               class="text-secondary"
               :counter="11"
               required
             />
+            <p v-if="isTyping">typing</p>
           </template>
           <template #step2>
             <v-card-subtitle class="text-white mb-8" align="center">
@@ -70,16 +71,23 @@
               required
               :items="['Professor', 'Aluno']"
             ></v-select>
-            <v-select
+            <v-autocomplete
               v-if="isProfessor"
-              v-model="formData.institution"
-              class="text-secondary"
+              v-model="institution"
+              v-model:search="search"
+              @update:search-input="search"
+              :loading="fetching"
+              :items="institutions"
+              item-text="text"
+              item-value="value"
+              item-title="text"
               label="Instituição de Ensino"
-              :rules="userType"
+              color="white"
+              class="my-4 text-secondary"
               variant="outlined"
               required
-              :items="['Instituto Federal de Alagoas - IFAL']"
-            ></v-select>
+              cache-items
+            ></v-autocomplete>
           </template>
           <template #step3>
             <v-card-subtitle class="text-white mb-4" align="center">
@@ -104,7 +112,6 @@
               class="text-secondary"
               label="Senha"
               variant="outlined"
-              theme="dark"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
             <v-text-field
@@ -173,11 +180,11 @@ const { register } = useStrapiAuth();
 const { find } = useStrapi();
 const router = useRouter();
 const usernameUrl = 'https://app.projetoalex.cc/profile/';
-const checkEmail = ref(false);
 const registering = ref(false);
 const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
-const search = ref(null);
+const isTyping = ref(false);
+const search = ref('')
 
 const formData = ref<FormDataType>({
   fullname: '',
@@ -189,6 +196,8 @@ const formData = ref<FormDataType>({
   yourRole: '',
   institution: '',
 });
+
+const institution = ref('')
 
 const passwordVisible = ref(false);
 
@@ -210,18 +219,19 @@ const fetchInstitutions = async (instValue: any) => {
   fetching.value = true;
   try {
     const res = await find(
-      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
+      `institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
-        value: r.nome,
-        sigla: r.sigla,
-        text: r.nome,
-        tipo: r.tipo,
+        value: r.attributes.nome,
+        sigla: r.attributes.sigla,
+        text: r.attributes.nome,
+        tipo: r.attributes.tipo,
       };
     });
 
+    console.log(resultArr)
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
@@ -230,9 +240,6 @@ const fetchInstitutions = async (instValue: any) => {
   fetching.value = false;
 };
 
-const teste = () => {
-  console.log(formData.value);
-};
 const submit = async () => {
   registering.value = true;
 
@@ -240,7 +247,9 @@ const submit = async () => {
     formData.value;
 
   if (!institution) {
+    console.log('noinst')
     messageStore.message = 'Selecione sua instituição.';
+    registering.value = false;
     return;
   }
 
@@ -261,8 +270,6 @@ const submit = async () => {
       messageStore.message = 'Usuário bloqueado!';
     } else if (user.value!.confirmed) {
       router.push('/');
-    } else {
-      checkEmail.value = true;
     }
   } catch (error) {
     registering.value = false;
@@ -270,12 +277,23 @@ const submit = async () => {
   }
 };
 
-watch(
-  () => search,
-  async (value) => {
-    await fetchInstitutions(value);
-  },
-);
+watchEffect(async (onInvalidate) => {
+  
+  if (search.value?.length > 0) {
+    isTyping.value = true;
+    const getData = setTimeout( async () => {
+      isTyping.value = false;
+      await fetchInstitutions(search.value)
+    }, 500);
+
+    onInvalidate(() => {
+      clearInterval(getData);
+    });
+  }
+});
+
+
+
 </script>
 
 <style scoped lang="scss">
