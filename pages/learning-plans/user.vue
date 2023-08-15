@@ -24,6 +24,6 @@ const { data } = await useAsyncData('learningPlans', () => {
 });
 
 const learningPlans = computed(
-  () => data?.value?.data.learningplans.data ?? [],
+  () => data?.value?.data?.learningplans.data ?? [],
 );
 </script>

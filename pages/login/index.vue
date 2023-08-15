@@ -57,7 +57,15 @@
           <nuxt-link to="/forgot" class="text-white my-4">
             Esqueceu sua senha?
           </nuxt-link>
-          <v-btn block class="card-btn" type="submit" :loading="logging"> Entrar </v-btn>
+          <v-btn
+            block
+            :disabled="!isFormValid"
+            class="card-btn"
+            type="submit"
+            :loading="logging"
+          >
+            Entrar
+          </v-btn>
         </v-form>
         <v-card-text class="text-white mt-6 mb-10">
           Ainda não possui conta?
@@ -85,6 +93,13 @@ const passwordVisible = ref(false);
 const email = ref("");
 const password = ref("");
 
+const isFormValid = computed(() => {
+  return (
+    emailRules.every((rule) => typeof rule(email.value) === 'boolean') &&
+    passwordRules.every((rule) => typeof rule(password.value) === 'boolean')
+  );
+});
+
 const submit = async () => {
   logging.value = true;
 
@@ -96,6 +111,7 @@ const submit = async () => {
 
     router.push("/");
   } catch (error) {
+    console.log(error);
     logging.value = false;
     messageStore.message = "Email ou Senha inválido(s)";
   }

@@ -224,11 +224,13 @@ const isProfessor = computed(() => {
 });
 
 const fetchInstitutions = async (instValue: any) => {
+  console.log(instValue)
   fetching.value = true;
   try {
     const res = await find(
       `institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
+    console.log('res', res)
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,

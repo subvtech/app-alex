@@ -44,6 +44,8 @@ definePageMeta({
 
 const { isTrailRoute, handleBack } = useGetData();
 
+console.log('isTrailRoute', isTrailRoute.value);
+
 const route = useRoute();
 
 const planTitle = ref('');
@@ -55,6 +57,7 @@ const generalInfoLink = computed(() => {
     : `/learning-plans/${planId}`;
 });
 
+console.log('generalInfoLink', generalInfoLink.value);
 const onLoadedChild = (learningPlan) => {
   planTitle.value = learningPlan.title;
 };
