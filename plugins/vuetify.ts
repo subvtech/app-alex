@@ -8,7 +8,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     defaults: {
       VTextField: {
         variant: 'outlined',
-        rounded: 'lg'
+        rounded: 'lg',
       },
     },
     components,
@@ -24,8 +24,19 @@ export default defineNuxtPlugin((nuxtApp) => {
             secondary: '#F1F5F9',
             info: '#26A69A',
             warning: '#FFC107',
-            error: '#DD2C00',
-            success: '#00E676',
+            error: '#FF5252',
+            success: '#38C976',
+          },
+        },
+        dark: {
+          dark: true,
+          colors: {
+            primary: '#F1F5F9',
+            accent: '#00B8CC',
+            secondary: '#001529',
+            warning: '#FCC132',
+            error: '#FF5252',
+            success: '#38C976',
           },
         },
       },

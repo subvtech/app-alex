@@ -36,6 +36,7 @@
               color="white"
               class="text-secondary"
               required
+              theme="dark"
             />
 
             <v-text-field
@@ -45,6 +46,7 @@
               color="white"
               class="text-secondary"
               required
+              theme="dark"
             />
             <v-text-field
               v-model="formData.cpf"
@@ -54,6 +56,7 @@
               color="#fff"
               class="text-secondary"
               :counter="11"
+              theme="dark"
               required
             />
             <p v-if="isTyping">typing</p>
@@ -78,6 +81,7 @@
               @update:search-input="search"
               :loading="fetching"
               :items="institutions"
+              :rules="institutionRules"
               item-text="text"
               item-value="value"
               item-title="text"
@@ -98,10 +102,11 @@
               :rules="usernameRules"
               label="Nome de Usuário"
               color="white"
-              class="my-3 text-secondary"
+              class="my-1 text-secondary"
               required
               :hint="`${usernameUrl}${formData.username}`"
               persistent-hint
+              theme="dark"
             />
 
             <v-text-field
@@ -109,9 +114,10 @@
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="passwordRules"
               :type="passwordVisible ? 'text' : 'password'"
-              class="text-secondary"
+              class="my-1 text-secondary"
               label="Senha"
               variant="outlined"
+              theme="dark"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
             <v-text-field
@@ -119,10 +125,11 @@
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :rules="confirmPasswordRules"
               :type="passwordVisible ? 'text' : 'password'"
-              class="text-secondary"
+              class="my-1 mb-4 text-secondary"
               label="Confirme a senha"
               variant="outlined"
               required
+              theme="dark"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
           </template>
@@ -209,6 +216,7 @@ const {
   passwordRules,
   confirmPasswordRules,
   userType,
+  institutionRules
 } = useFormRules(formData.value);
 
 const isProfessor = computed(() => {
@@ -230,8 +238,6 @@ const fetchInstitutions = async (instValue: any) => {
         tipo: r.attributes.tipo,
       };
     });
-
-    console.log(resultArr)
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
@@ -278,7 +284,6 @@ const submit = async () => {
 };
 
 watchEffect(async (onInvalidate) => {
-  
   if (search.value?.length > 0) {
     isTyping.value = true;
     const getData = setTimeout( async () => {
