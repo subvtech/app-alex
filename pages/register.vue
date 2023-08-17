@@ -303,7 +303,7 @@ const submit = async (values: FormDataType) => {
     isProfessor: yourRole.toLowerCase() === 'professor',
   };
 
-  if (institution) userData.institution = institution;
+  if (institution && yourRole.toLowerCase() === 'professor') userData.institution = institution;
 
   try {
     const { user } = await register(userData);
