@@ -23,117 +23,113 @@
         <v-card-title class="text-white title">
           Inicie uma nova experiência!
         </v-card-title>
-        <alex-inputs-steps :steps="3" :submit="submit" align="left">
-          <template #step1>
+        <alex-inputs-stepper-form
+          :schemes="[schema1, schema2, schema3]"
+          :onSuccess="submit"
+          #default="{ activeStep, values }"
+          align="left"
+        >
+          <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
             <v-card-subtitle class="text-white mb-8" align="center">
               Crie uma conta e comece seus estudos
             </v-card-subtitle>
 
-            <v-text-field
-              v-model="formData.fullname"
-              :rules="fullnameRules"
+            <alex-inputs-stepper-field
               label="Nome completo"
+              name="fullname"
               color="white"
-              class="text-secondary"
-              required
+              class="my-3 text-secondary"
               theme="dark"
             />
 
-            <v-text-field
-              v-model="formData.email"
-              :rules="emailRules"
-              label="E-mail"
+            <alex-inputs-stepper-field
+              label="Email"
+              name="email"
               color="white"
-              class="text-secondary"
-              required
+              class="my-3 text-secondary"
               theme="dark"
             />
-            <v-text-field
-              v-model="formData.cpf"
-              :rules="cpfRules"
-              type="number"
+
+            <alex-inputs-stepper-field
               label="CPF"
-              color="#fff"
-              class="text-secondary"
-              :counter="11"
+              type="number"
+              name="cpf"
+              color="white"
+              class="my-3 text-secondary"
               theme="dark"
-              required
             />
-            <p v-if="isTyping">typing</p>
-          </template>
-          <template #step2>
+          </alex-inputs-stepper-step>
+          <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
             <v-card-subtitle class="text-white mb-8" align="center">
               Informe o tipo da sua conta
             </v-card-subtitle>
-            <v-select
-              v-model="formData.yourRole"
-              class="text-secondary"
+
+            <alex-inputs-stepper-field
+              name="yourRole"
+              color="white"
+              type-field="select"
+              class="my-3 text-secondary"
               label="Tipo de Usuário"
-              :rules="userType"
               variant="outlined"
-              required
-              :items="['Professor', 'Aluno']"
-            ></v-select>
-            <v-autocomplete
-              v-if="isProfessor"
-              v-model="institution"
+              :items="['professor', 'aluno']"
+            />
+
+            <alex-inputs-stepper-field
+              v-if="values?.yourRole?.toLowerCase() == 'professor'"
+              typeField="autocomplete"
+              name="institution"
               v-model:search="search"
-              @update:search-input="search"
               :loading="fetching"
               :items="institutions"
-              :rules="institutionRules"
               item-text="text"
               item-value="value"
               item-title="text"
               label="Instituição de Ensino"
               color="white"
-              class="my-4 text-secondary"
+              class="my-3 text-secondary"
               variant="outlined"
               required
               cache-items
-            ></v-autocomplete>
-          </template>
-          <template #step3>
-            <v-card-subtitle class="text-white mb-4" align="center">
+            />
+          </alex-inputs-stepper-step>
+          <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
+            <v-card-subtitle class="text-white mb-8" align="center">
               Insira seus dados de acesso
             </v-card-subtitle>
-            <v-text-field
-              v-model="formData.username"
-              :rules="usernameRules"
+
+            <alex-inputs-stepper-field
               label="Nome de Usuário"
+              name="username"
               color="white"
-              class="my-1 text-secondary"
-              required
-              :hint="`${usernameUrl}${formData.username}`"
-              persistent-hint
+              class="my-3 text-secondary"
               theme="dark"
+              :hint="`${usernameUrl}${values.username || ''}`"
+              persistent-hint
             />
 
-            <v-text-field
-              v-model="formData.password1"
-              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="passwordRules"
-              :type="passwordVisible ? 'text' : 'password'"
-              class="my-1 text-secondary"
+            <alex-inputs-stepper-field
               label="Senha"
-              variant="outlined"
-              theme="dark"
-              @click:append-inner="passwordVisible = !passwordVisible"
-            />
-            <v-text-field
-              v-model="formData.password2"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-              :rules="confirmPasswordRules"
               :type="passwordVisible ? 'text' : 'password'"
-              class="my-1 mb-4 text-secondary"
-              label="Confirme a senha"
-              variant="outlined"
-              required
+              name="password"
+              color="white"
+              class="my-3 text-secondary"
               theme="dark"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
-          </template>
-        </alex-inputs-steps>
+
+            <alex-inputs-stepper-field
+              label="Confirmar Senha"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="passwordVisible ? 'text' : 'password'"
+              name="confirmPassword"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+              @click:append-inner="passwordVisible = !passwordVisible"
+            />
+          </alex-inputs-stepper-step>
+        </alex-inputs-stepper-form>
         <div class="d-flex align-center text-white my-6">
           <v-divider
             color="secondary"
@@ -159,6 +155,10 @@
 </template>
 
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/yup';
+import * as yup from 'yup';
+import { isValidCpf } from '@/composables/useFormRules';
+
 const messageStore = useMessageStore();
 definePageMeta({
   layout: 'auth',
@@ -191,46 +191,48 @@ const registering = ref(false);
 const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
 const isTyping = ref(false);
-const search = ref('')
+const search = ref('');
 
-const formData = ref<FormDataType>({
-  fullname: '',
-  username: '',
-  email: '',
-  cpf: '',
-  password1: '',
-  password2: '',
-  yourRole: '',
-  institution: '',
+const schema1 = yup.object({
+  fullname: yup
+    .string()
+    .required('Nome completo é necessário')
+    .min(6, 'Mínimo de 6 caracteres')
+    .max(64, 'Máximo de 64 caracteres'),
+  email: yup.string().required('Email é necessário').email('Email inválido'),
+  cpf: yup
+    .string()
+    .required('CPF é necessário')
+    .length(11, 'CPF contém 11 caracteres')
+    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
 });
-
-const institution = ref('')
+const schema2 = yup.object({
+  yourRole: yup
+    .string()
+    .required('Tipo de Usuário é necessário').equals(['professor', 'aluno']),
+  institution: yup.string().optional(),
+});
+const schema3 = yup.object({
+  username: yup
+    .string()
+    .required('Nome de usuário é necessário')
+    .min(6, 'Mínimo de 6 caracteres')
+    .max(64, 'Máximo de 64 caracteres'),
+   password: yup.string().required('Senha é necessário'),
+  passwordConfirmation: yup.string()
+     .oneOf([yup.ref('password')], 'As senhas não são idênticas').required('Confirmar Senha é necessário')
+});
 
 const passwordVisible = ref(false);
 
-const {
-  fullnameRules,
-  usernameRules,
-  emailRules,
-  cpfRules,
-  passwordRules,
-  confirmPasswordRules,
-  userType,
-  institutionRules
-} = useFormRules(formData.value);
-
-const isProfessor = computed(() => {
-  return formData.value.yourRole === 'Professor';
-});
-
 const fetchInstitutions = async (instValue: any) => {
-  console.log(instValue)
+  console.log(instValue);
   fetching.value = true;
   try {
     const res = await find(
       `institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
-    console.log('res', res)
+    console.log('res', res);
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
@@ -248,14 +250,14 @@ const fetchInstitutions = async (instValue: any) => {
   fetching.value = false;
 };
 
-const submit = async () => {
+const submit = async (values: FormDataType) => {
   registering.value = true;
 
-  const { cpf, email, password1, username, fullname, institution } =
-    formData.value;
+  const { cpf, email, password1, username, fullname, institution, yourRole } =
+    values;
 
   if (!institution) {
-    console.log('noinst')
+    console.log('noinst');
     messageStore.message = 'Selecione sua instituição.';
     registering.value = false;
     return;
@@ -268,7 +270,7 @@ const submit = async () => {
     username,
     fullname,
     institution: [institution],
-    isProfessor: isProfessor.value,
+    isProfessor: yourRole.toLowerCase() === 'professor',
   };
 
   try {
@@ -288,9 +290,9 @@ const submit = async () => {
 watchEffect(async (onInvalidate) => {
   if (search.value?.length > 0) {
     isTyping.value = true;
-    const getData = setTimeout( async () => {
+    const getData = setTimeout(async () => {
       isTyping.value = false;
-      await fetchInstitutions(search.value)
+      await fetchInstitutions(search.value);
     }, 500);
 
     onInvalidate(() => {
@@ -298,9 +300,6 @@ watchEffect(async (onInvalidate) => {
     });
   }
 });
-
-
-
 </script>
 
 <style scoped lang="scss">

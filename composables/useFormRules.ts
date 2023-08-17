@@ -9,7 +9,7 @@ type FormDataType = {
   institution: string;
 };
 
-function isValidCpf(val) {
+export function isValidCpf(val) {
   val = val.replace(/\D/g, '');
   if (val === '00000000000') return false;
 
