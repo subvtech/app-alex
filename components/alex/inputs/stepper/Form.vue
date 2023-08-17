@@ -20,13 +20,15 @@
         color="accent"
         size="large"
       >
-        avançar
+        {{ (activeStep - 1 !== numberSteps - 1) ? "Avançar" : "Criar"}}
       </v-btn>
     </div>
+        <!-- :disabled="isValid" -->
   </v-form>
 </template>
 
 <script setup lang="ts">
+
 import { useForm } from 'vee-validate';
 const props = defineProps({
   onSuccess: {
@@ -41,18 +43,18 @@ const props = defineProps({
 const numberSteps = computed(() => props.schemes.length);
 const activeStep = ref(1);
 const validationSchema = computed(() => props.schemes[(activeStep.value - 1)]);
-const { value: { handleSubmit, errors, values }} = computed(() => useForm({
+const { handleSubmit, errors, values } =  useForm({
   validationSchema: validationSchema,
   keepValuesOnUnmount: true
-}))
-
+})
 const onSubmit = handleSubmit((values) => {
   if (activeStep.value - 1 !== numberSteps.value - 1) {
     activeStep.value++;
     return;
   }
-  console.log(values);
+  props.onSuccess(values)
 });
+const isValid = computed(() => !!Object.values(errors.value).length)
 
 const prevStep = () => {
   if (activeStep.value > 1) {
@@ -61,9 +63,9 @@ const prevStep = () => {
 };
 
 watchEffect(() => {
-console.log(validationSchema.value)
-  
+  console.log(isValid.value)
 })
+
 </script>
 
 <style scoped>.controls {

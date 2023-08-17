@@ -52,7 +52,6 @@
 
             <alex-inputs-stepper-field
               label="CPF"
-              type="number"
               name="cpf"
               color="white"
               class="my-3 text-secondary"
@@ -82,7 +81,7 @@
               :loading="fetching"
               :items="institutions"
               item-text="text"
-              item-value="value"
+              item-value="id"
               item-title="text"
               label="Instituição de Ensino"
               color="white"
@@ -155,7 +154,6 @@
 </template>
 
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/yup';
 import * as yup from 'yup';
 import { isValidCpf } from '@/composables/useFormRules';
 
@@ -169,8 +167,8 @@ type FormDataType = {
   username: string;
   email: string;
   cpf: string;
-  password1: string;
-  password2: string;
+  password: string;
+  confirmPassword: string;
   yourRole: string;
   institution: string;
 };
@@ -203,14 +201,22 @@ const schema1 = yup.object({
   cpf: yup
     .string()
     .required('CPF é necessário')
-    .length(11, 'CPF contém 11 caracteres')
-    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
+    // .length(11, 'CPF contém 11 caracteres')
+    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf))
+    .transform((v) => v.replace('-', '')),
 });
 const schema2 = yup.object({
   yourRole: yup
     .string()
-    .required('Tipo de Usuário é necessário').equals(['professor', 'aluno']),
-  institution: yup.string().optional(),
+    .required('Tipo de Usuário é necessário')
+    .equals(['professor', 'aluno']),
+  institution: yup
+    .number()
+    .optional()
+    .when('yourRole', {
+      is: 'professor',
+      then: (scheme) => scheme.required('Tipo de instituição é necessário'),
+    }),
 });
 const schema3 = yup.object({
   username: yup
@@ -218,21 +224,21 @@ const schema3 = yup.object({
     .required('Nome de usuário é necessário')
     .min(6, 'Mínimo de 6 caracteres')
     .max(64, 'Máximo de 64 caracteres'),
-   password: yup.string().required('Senha é necessário'),
-  passwordConfirmation: yup.string()
-     .oneOf([yup.ref('password')], 'As senhas não são idênticas').required('Confirmar Senha é necessário')
+  password: yup.string().required('Senha é necessário'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'As senhas não são idênticas')
+    .required('Confirmar Senha é necessário'),
 });
 
 const passwordVisible = ref(false);
 
 const fetchInstitutions = async (instValue: any) => {
-  console.log(instValue);
   fetching.value = true;
   try {
     const res = await find(
       `institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
-    console.log('res', res);
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
@@ -253,25 +259,33 @@ const fetchInstitutions = async (instValue: any) => {
 const submit = async (values: FormDataType) => {
   registering.value = true;
 
-  const { cpf, email, password1, username, fullname, institution, yourRole } =
+  const { cpf, email, password, username, fullname, institution, yourRole } =
     values;
 
-  if (!institution) {
-    console.log('noinst');
+  if (yourRole == 'professor' && !institution) {
     messageStore.message = 'Selecione sua instituição.';
     registering.value = false;
     return;
   }
 
-  const userData = {
+  const userData: {
+    cpf: string;
+    email: string;
+    password: string;
+    username: string;
+    fullname: string;
+    isProfessor: boolean;
+    institution?: string;
+  } = {
     cpf,
     email,
-    password: password1,
+    password,
     username,
     fullname,
-    institution: [institution],
     isProfessor: yourRole.toLowerCase() === 'professor',
   };
+
+  if (institution) userData.institution = institution;
 
   try {
     const { user } = await register(userData);
