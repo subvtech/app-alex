@@ -13,18 +13,24 @@
     </v-col>
     <v-col>
       <v-card class="card card-register px-10" align="center">
-        <div align="center">
+        <div align="center" class="card-register-images">
           <img
             alt="Alex"
             src="../static/images/alex.svg"
             class="card-register-alex-logo"
           />
+          <img
+            alt="EllipseTop"
+            src="../assets/svg/Ellipse.svg"
+            class="card-register-images-top-ellipse"
+          />
         </div>
-        <v-card-title class="text-white title">
+        <v-card-title class="text-white title ">
           Inicie uma nova experiência!
         </v-card-title>
         <alex-inputs-stepper-form
           :schemes="[schema1, schema2, schema3]"
+          :loading="registering"
           :onSuccess="submit"
           #default="{ activeStep, values }"
           align="left"
@@ -152,6 +158,7 @@
             Acesse aqui
           </nuxt-link>
         </v-card-text>
+      
       </v-card>
     </v-col>
   </v-row>
@@ -189,7 +196,6 @@ type InstitutionsType = {
   tipo: String;
 };
 
-const searchText = ref('');
 const { register } = useStrapiAuth();
 const { find } = useStrapi();
 const router = useRouter();
@@ -280,12 +286,6 @@ const submit = async (values: FormDataType) => {
   const { cpf, email, password, username, fullname, institution, yourRole } =
     values;
 
-  if (yourRole == 'professor' && !institution) {
-    messageStore.message = 'Selecione sua instituição.';
-    registering.value = false;
-    return;
-  }
-
   const userData: {
     cpf: string;
     email: string;
@@ -332,10 +332,6 @@ watchEffect(async (onInvalidate) => {
     });
   }
 });
-
-watchEffect(() => {
-  console.log(searchText.value);
-});
 </script>
 
 <style scoped lang="scss">
@@ -344,7 +340,6 @@ watchEffect(() => {
   height: 100%;
   position: absolute;
   top: 0;
-
   &-imagem {
     background: #f0f0f0 !important;
     left: 0;
@@ -358,7 +353,8 @@ watchEffect(() => {
   &-register {
     background: #001529 !important;
     right: 0;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     width: 600px;
     display: flex;
     flex-direction: column;
@@ -368,6 +364,27 @@ watchEffect(() => {
       width: 120px;
       height: 40px;
       margin-bottom: clamp(25px, 5vh, 60px);
+    }
+    &-images {
+      position: relative;
+      min-height: 50px;
+      user-select: none;
+      pointer-events: none;
+
+      &-top-ellipse {
+        width: 820px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        translate: -50%;
+      }
+      &-bottom-ellipse {
+        width: 820px;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        translate: -50%;
+      }
     }
   }
 
@@ -404,8 +421,11 @@ watchEffect(() => {
     }
   }
 }
+
 .haveAccount {
   font-weight: 700;
+  height: min-content !important;
+  flex: none;
   &-link {
     text-decoration: none;
     color: #00d3ec !important;
@@ -413,10 +433,24 @@ watchEffect(() => {
   }
 }
 
+.title {
+  font-size: 24px;
+}
+
 @media screen and (max-height: 800px) {
   .card-register {
     padding-top: clamp(25px, 8vh, 60px) !important;
     padding-bottom: clamp(25px, 8vh, 60px) !important;
   }
+  
+}
+@media screen and (max-height: 850px) {
+ .card-register-images-top-ellipse {
+        width: 700px;
+        bottom: -30px;
+        left: 50%;
+        translate: -50%;
+  }
+  
 }
 </style>

@@ -15,6 +15,8 @@
       </v-btn>
       <v-btn
         type="submit"
+        :disabled="!isValid"
+        :loading="loading"
         class="ml-auto"
         rounded="lg"
         color="accent"
@@ -23,7 +25,6 @@
         {{ (activeStep - 1 !== numberSteps - 1) ? "Avançar" : "Criar"}}
       </v-btn>
     </div>
-        <!-- :disabled="isValid" -->
   </v-form>
 </template>
 
@@ -39,11 +40,15 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  loading: {
+    type: Boolean,
+    required: false
+  }
 });
 const numberSteps = computed(() => props.schemes.length);
 const activeStep = ref(1);
 const validationSchema = computed(() => props.schemes[(activeStep.value - 1)]);
-const { handleSubmit, errors, values } =  useForm({
+const { handleSubmit, errors, values, controlledValues } =  useForm({
   validationSchema: validationSchema,
   keepValuesOnUnmount: true
 })
@@ -54,7 +59,7 @@ const onSubmit = handleSubmit((values) => {
   }
   props.onSuccess(values)
 });
-const isValid = computed(() => !!Object.values(errors.value).length)
+const isValid = computed(() => !Object.values(controlledValues.value).includes(undefined) && !Object.values(errors.value).length)
 
 const prevStep = () => {
   if (activeStep.value > 1) {
@@ -62,15 +67,17 @@ const prevStep = () => {
   }
 };
 
-watchEffect(() => {
-  console.log(errors.value)
-})
+
 
 </script>
 
 <style scoped>.controls {
   display: flex;
   width: 100%;
+}
+
+button[type="submit"]:disabled {
+  background-color: gray !important;
 }
 
 </style>
