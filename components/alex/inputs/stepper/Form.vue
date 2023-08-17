@@ -63,7 +63,7 @@ const prevStep = () => {
 };
 
 watchEffect(() => {
-  console.log(isValid.value)
+  console.log(errors.value)
 })
 
 </script>

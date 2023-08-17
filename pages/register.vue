@@ -17,7 +17,7 @@
           <img
             alt="Alex"
             src="../static/images/alex.svg"
-            class="card-register-alex-logo mt-8 mb-4"
+            class="card-register-alex-logo"
           />
         </div>
         <v-card-title class="text-white title">
@@ -129,7 +129,7 @@
             />
           </alex-inputs-stepper-step>
         </alex-inputs-stepper-form>
-        <div class="d-flex align-center text-white my-6">
+        <div class="d-flex align-center text-white my-12">
           <v-divider
             color="secondary"
             :thickness="1"
@@ -202,17 +202,17 @@ const schema1 = yup.object({
     .string()
     .required('CPF é necessário')
     // .length(11, 'CPF contém 11 caracteres')
-    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf))
-    .transform((v) => v.replace('-', '')),
+    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
 });
 const schema2 = yup.object({
   yourRole: yup
     .string()
     .required('Tipo de Usuário é necessário')
-    .equals(['professor', 'aluno']),
+    .oneOf(['professor', 'aluno'] as const),
   institution: yup
     .number()
     .optional()
+    .nullable()
     .when('yourRole', {
       is: 'professor',
       then: (scheme) => scheme.required('Tipo de instituição é necessário'),
@@ -224,7 +224,15 @@ const schema3 = yup.object({
     .required('Nome de usuário é necessário')
     .min(6, 'Mínimo de 6 caracteres')
     .max(64, 'Máximo de 64 caracteres'),
-  password: yup.string().required('Senha é necessário'),
+  password: yup
+    .string()
+    .required('Senha é necessário')
+    .matches(
+      /^(?=.*[A-Z]).{2,}$/gm,
+      'Pelo menos 2 letras maiúsculas necessárias',
+    ).matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+    .matches(/^(?=.*[a-z]).{1,}$/gm, 'Pelo menos 1 letra minúscula necessário')
+    .min(8, 'Mínimo de 8 caracteres'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'As senhas não são idênticas')
@@ -340,10 +348,12 @@ watchEffect(async (onInvalidate) => {
     width: 600px;
     display: flex;
     flex-direction: column;
+    padding: clamp(25px, 12vh, 90px) !important;
     // gap: 1rem;
     &-alex-logo {
       width: 120px;
       height: 40px;
+      margin-bottom: clamp(25px, 5vh, 60px);
     }
   }
 
@@ -386,6 +396,13 @@ watchEffect(async (onInvalidate) => {
     text-decoration: none;
     color: #00d3ec !important;
     font-size: 16px;
+  }
+}
+
+@media screen and (max-height: 800px) {
+  .card-register {
+    padding-top: clamp(25px, 8vh, 60px) !important;
+    padding-bottom: clamp(25px, 8vh, 60px) !important;
   }
 }
 </style>

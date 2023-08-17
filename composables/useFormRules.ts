@@ -46,10 +46,11 @@ export const useFormRules = (formData?: FormDataType) => {
   const passwordRules = [
     (v: string) => !!v || 'Senha é necessário',
     (v: string) =>
-      /^(.*[a-z]?)([A-Z])(.*[a-z]?)([A-Z])(.*[a-z]?)$/.test(v) ||
-      '2 caracteres maiúscula necessárias',
-    (v: string) => /^.*[0-9]$/.test(v) || 'Pelo menos 1 número necessário',
-    (v: string) => /^.*[a-z]$/.test(v) || 'Pelo menos 1 caractére minúsculo',
+      /^(?=.*[A-Z]).{2,}$/gm.test(v) || '2 caracteres maiúscula necessárias',
+    (v: string) =>
+      /^(?=.*\d).{1,}$/gm.test(v) || 'Pelo menos 1 número necessário',
+    (v: string) =>
+      /^(?=.*[a-z]).{1,}$/gm.test(v) || 'Pelo menos 1 caractére minúsculo',
   ];
 
   const confirmPasswordRules = computed(() => {
