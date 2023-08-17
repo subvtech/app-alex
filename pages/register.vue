@@ -56,6 +56,7 @@
               color="white"
               class="my-3 text-secondary"
               theme="dark"
+              v-maska:[options]
             />
           </alex-inputs-stepper-step>
           <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
@@ -70,7 +71,10 @@
               class="my-3 text-secondary"
               label="Tipo de Usuário"
               variant="outlined"
-              :items="['professor', 'aluno']"
+              :items="[
+                { title: 'Professor', value: 'professor' },
+                { title: 'Aluno', value: 'aluno' },
+              ]"
             />
 
             <alex-inputs-stepper-field
@@ -157,6 +161,10 @@
 import * as yup from 'yup';
 import { isValidCpf } from '@/composables/useFormRules';
 
+const options = reactive({
+  mask: '###.###.###-##',
+  eager: true,
+});
 const messageStore = useMessageStore();
 definePageMeta({
   layout: 'auth',
@@ -181,6 +189,7 @@ type InstitutionsType = {
   tipo: String;
 };
 
+const searchText = ref('');
 const { register } = useStrapiAuth();
 const { find } = useStrapi();
 const router = useRouter();
@@ -201,7 +210,7 @@ const schema1 = yup.object({
   cpf: yup
     .string()
     .required('CPF é necessário')
-    // .length(11, 'CPF contém 11 caracteres')
+    .length(14, 'CPF contém 11 caracteres')
     .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
 });
 const schema2 = yup.object({
@@ -230,7 +239,8 @@ const schema3 = yup.object({
     .matches(
       /^(?=.*[A-Z]).{2,}$/gm,
       'Pelo menos 2 letras maiúsculas necessárias',
-    ).matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+    )
+    .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
     .matches(/^(?=.*[a-z]).{1,}$/gm, 'Pelo menos 1 letra minúscula necessário')
     .min(8, 'Mínimo de 8 caracteres'),
   confirmPassword: yup
@@ -321,6 +331,10 @@ watchEffect(async (onInvalidate) => {
       clearInterval(getData);
     });
   }
+});
+
+watchEffect(() => {
+  console.log(searchText.value);
 });
 </script>
 
