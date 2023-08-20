@@ -1,63 +1,58 @@
-# Nuxt 3 Minimal Starter
+# Projeto Alex
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Menu
 
-## Setup
+- [O que eu preciso ter para rodar o projeto?](#o-que-eu-preciso-ter-para-rodar-o-projeto?)
+- [Ferramentas](#ferramentas)
+- [Como rodar o projeto na minha máquina?](#como-rodar-o-projeto-na-minha-máquina?)
+- [Tecnologias](#tecnologias)
 
-Make sure to install the dependencies:
+## O que eu preciso ter para rodar o projeto?
+
+- Node.js na versão 16 (Você pode usar o [NVM](https://github.com/nvm-sh/nvm) para gerenciar a versão do Node.js em sua máquina)
+- Editor de código da sua preferência - VSCode, Vim etc.
+
+## Ferramentas:
+
+- [PostgreSQL](https://www.postgresql.org/)(versão 10.23\*) instalado em sua máquina.
+
+  Obs.: Não precisa instalar o StackBlitz, nem pgAdmin4.
+
+![Untitled](https://github.com/maikaodev/stopwatch/assets/82960620/8c998f5d-45b1-495d-bcaa-bdf2b3464b4c)
+
+- Interface gráfica para banco de dados - [DBeaver](https://dbeaver.io/) ou outro de sua preferência.
+
+## Como rodar o projeto na minha máquina?
+
+Via HTTPS
 
 ```bash
-# npm
-npm install
+## Clone o projeto
+git clone http://gitlab.profbrenojac.com.br/projeto-alex/alex.git
 
-# pnpm
-pnpm install
+## Acesse a pasta do projeto
+cd alex/src/renderer2
 
-# yarn
-yarn install
-```
+## Instale as dependências
+yarn ou yarn install
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
+## Execute a aplicação
 yarn dev
+
+## Servidor rodando - http://localhost:3000/
 ```
 
-## Production
-
-Build the application for production:
+## .env
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
+STRAPI_URL=https://api-test.projetoalex.cc/
 ```
 
-Locally preview production build:
+## Tecnologias
 
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- [Typescript](https://www.typescriptlang.org/)
+- [Editor.js](https://editorjs.io/)
+- [Nuxt.js](https://nuxt.com/)
+- [Pinia](https://pinia.vuejs.org/)
+- [Vuetify](https://vuetifyjs.com/en/)
+- [Sass](https://sass-lang.com/)
