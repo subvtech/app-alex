@@ -1,3 +1,5 @@
+import * as yup from 'yup';
+
 type FormDataType = {
   fullname: string;
   username: string;
@@ -35,50 +37,77 @@ export function isValidCpf(val) {
 }
 
 export const useFormRules = (formData?: FormDataType) => {
-  const fullnameRules = [(v: string) => !!v || 'Nome completo é necessário'];
-  const usernameRules = [(v: string) => !!v || 'Usuário é necessário'];
-  const userType = [(v: string) => !!v || 'O tipo de usuário é necessário'];
-  const emailRules = [
-    (v: string) => !!v || 'Email é necessário',
-    (v: string) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
-  ];
-
-  const passwordRules = [
-    (v: string) => !!v || 'Senha é necessário',
-    (v: string) =>
-      /^(?=.*[A-Z]).{2,}$/gm.test(v) || '2 caracteres maiúscula necessárias',
-    (v: string) =>
-      /^(?=.*\d).{1,}$/gm.test(v) || 'Pelo menos 1 número necessário',
-    (v: string) =>
-      /^(?=.*[a-z]).{1,}$/gm.test(v) || 'Pelo menos 1 caractére minúsculo',
-  ];
-
-  const confirmPasswordRules = computed(() => {
-    const temp: ((v: any) => boolean | string)[] = [
-      (v: any) => !!v || 'Senha é necessária',
-    ];
-    if (formData)
-      temp.push((v: any) => v === formData.password1 || 'Senhas diferentes');
-    return temp;
+  const schema1 = yup.object({
+    fullname: yup
+      .string()
+      .required('Nome completo é necessário')
+      .min(6, 'Mínimo de 6 caracteres')
+      .max(64, 'Máximo de 64 caracteres'),
+    email: yup.string().required('Email é necessário').email('Email inválido'),
+    cpf: yup
+      .string()
+      .required('CPF é necessário')
+      .length(14, 'CPF contém 11 caracteres')
+      .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
   });
-
-  const cpfRules = [
-    (v: any) => !!v || 'CPF é necessário',
-    (v: string | any[]) => v.length === 11 || 'CPF contem 11 caracteres',
-    (v: any) => isValidCpf(v) || 'CPF inválido',
-  ];
-
-  const institutionRules = [
-    (v: string) => !!v || 'Instituição é necessário'
-  ]
+  const schema2 = yup.object({
+    yourRole: yup
+      .string()
+      .required('Tipo de Usuário é necessário')
+      .oneOf(['professor', 'aluno'] as const),
+    institution: yup
+      .number()
+      .optional()
+      .nullable()
+      .when('yourRole', {
+        is: 'professor',
+        then: (scheme) => scheme.required('Tipo de instituição é necessário'),
+      }),
+  });
+  const schema3 = yup.object({
+    username: yup
+      .string()
+      .required('Nome de usuário é necessário')
+      .min(6, 'Mínimo de 6 caracteres')
+      .max(64, 'Máximo de 64 caracteres'),
+    password: yup
+      .string()
+      .required('Senha é necessário')
+      .matches(
+        /^(?=.*[A-Z]).{2,}$/gm,
+        'Pelo menos 2 letras maiúsculas necessárias',
+      )
+      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+      .matches(
+        /^(?=.*[a-z]).{1,}$/gm,
+        'Pelo menos 1 letra minúscula necessário',
+      )
+      .min(8, 'Mínimo de 8 caracteres'),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref('password')], 'As senhas não são idênticas')
+      .required('Confirmar Senha é necessário'),
+  });
+  const loginSchema = {
+    email: yup.string().required('Email é necessário').email('Email inválido'),
+    password: yup
+      .string()
+      .required('Senha é necessário')
+      .matches(
+        /^(?=.*[A-Z]).{2,}$/gm,
+        'Pelo menos 2 letras maiúsculas necessárias',
+      )
+      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+      .matches(
+        /^(?=.*[a-z]).{1,}$/gm,
+        'Pelo menos 1 letra minúscula necessário',
+      )
+      .min(8, 'Mínimo de 8 caracteres'),
+  };
   return {
-    emailRules,
-    fullnameRules,
-    usernameRules,
-    passwordRules,
-    confirmPasswordRules,
-    cpfRules,
-    userType,
-    institutionRules,
+    schema1,
+    schema2,
+    schema3,
+    loginSchema
   };
 };

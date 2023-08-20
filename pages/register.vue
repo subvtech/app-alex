@@ -25,7 +25,7 @@
             class="card-register-images-top-ellipse"
           />
         </div>
-        <v-card-title class="text-white title ">
+        <v-card-title class="text-white title">
           Inicie uma nova experiência!
         </v-card-title>
         <alex-inputs-stepper-form
@@ -158,15 +158,13 @@
             Acesse aqui
           </nuxt-link>
         </v-card-text>
-      
       </v-card>
     </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
-import * as yup from 'yup';
-import { isValidCpf } from '@/composables/useFormRules';
+const { schema1, schema2, schema3 } = useFormRules();
 
 const options = reactive({
   mask: '###.###.###-##',
@@ -205,55 +203,6 @@ const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
 const isTyping = ref(false);
 const search = ref('');
-
-const schema1 = yup.object({
-  fullname: yup
-    .string()
-    .required('Nome completo é necessário')
-    .min(6, 'Mínimo de 6 caracteres')
-    .max(64, 'Máximo de 64 caracteres'),
-  email: yup.string().required('Email é necessário').email('Email inválido'),
-  cpf: yup
-    .string()
-    .required('CPF é necessário')
-    .length(14, 'CPF contém 11 caracteres')
-    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
-});
-const schema2 = yup.object({
-  yourRole: yup
-    .string()
-    .required('Tipo de Usuário é necessário')
-    .oneOf(['professor', 'aluno'] as const),
-  institution: yup
-    .number()
-    .optional()
-    .nullable()
-    .when('yourRole', {
-      is: 'professor',
-      then: (scheme) => scheme.required('Tipo de instituição é necessário'),
-    }),
-});
-const schema3 = yup.object({
-  username: yup
-    .string()
-    .required('Nome de usuário é necessário')
-    .min(6, 'Mínimo de 6 caracteres')
-    .max(64, 'Máximo de 64 caracteres'),
-  password: yup
-    .string()
-    .required('Senha é necessário')
-    .matches(
-      /^(?=.*[A-Z]).{2,}$/gm,
-      'Pelo menos 2 letras maiúsculas necessárias',
-    )
-    .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
-    .matches(/^(?=.*[a-z]).{1,}$/gm, 'Pelo menos 1 letra minúscula necessário')
-    .min(8, 'Mínimo de 8 caracteres'),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password')], 'As senhas não são idênticas')
-    .required('Confirmar Senha é necessário'),
-});
 
 const passwordVisible = ref(false);
 
@@ -303,7 +252,8 @@ const submit = async (values: FormDataType) => {
     isProfessor: yourRole.toLowerCase() === 'professor',
   };
 
-  if (institution && yourRole.toLowerCase() === 'professor') userData.institution = institution;
+  if (institution && yourRole.toLowerCase() === 'professor')
+    userData.institution = institution;
 
   try {
     const { user } = await register(userData);
@@ -442,15 +392,13 @@ watchEffect(async (onInvalidate) => {
     padding-top: clamp(25px, 8vh, 60px) !important;
     padding-bottom: clamp(25px, 8vh, 60px) !important;
   }
-  
 }
 @media screen and (max-height: 850px) {
- .card-register-images-top-ellipse {
-        width: 700px;
-        bottom: -30px;
-        left: 50%;
-        translate: -50%;
+  .card-register-images-top-ellipse {
+    width: 700px;
+    bottom: -30px;
+    left: 50%;
+    translate: -50%;
   }
-  
 }
 </style>

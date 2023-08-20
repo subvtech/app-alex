@@ -27,24 +27,22 @@
           Acesse sua conta e continue com seus estudos
         </v-card-subtitle>
         <v-form ref="form" @submit.prevent="submit">
-          <v-text-field
-            v-model="email"
-            :rules="emailRules"
-            label="E-mail"
-            class="my-4 text-secondary"
-            variant="outlined"
-            required
+          <alex-inputs-stepper-field
+            label="Email"
+            name="email"
+            color="white"
+            class="my-3 text-secondary"
+            theme="dark"
           />
 
-          <v-text-field
-            v-model="password"
-            :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :rules="passwordRules"
-            :type="passwordVisible ? 'text' : 'password'"
-            class="my-4 text-secondary"
+          <alex-inputs-stepper-field
             label="Senha"
-            variant="outlined"
-            required
+            :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="passwordVisible ? 'text' : 'password'"
+            name="password"
+            color="white"
+            class="my-3 text-secondary"
+            theme="dark"
             @click:append-inner="passwordVisible = !passwordVisible"
           />
 
@@ -59,7 +57,7 @@
           </nuxt-link>
           <v-btn
             block
-            :disabled="!isFormValid"
+            :disabled="!isValid"
             class="card-btn"
             type="submit"
             :loading="logging"
@@ -69,7 +67,9 @@
         </v-form>
         <v-card-text class="text-white mt-6 mb-10">
           Ainda não possui conta?
-          <nuxt-link to="/register" class="text-white"> Crie sua conta </nuxt-link>
+          <nuxt-link to="/register" class="text-white">
+            Crie sua conta
+          </nuxt-link>
         </v-card-text>
       </v-card>
     </v-col>
@@ -77,45 +77,50 @@
 </template>
 
 <script setup lang="ts">
-const messageStore = useMessageStore();
+import { useForm } from 'vee-validate';
+
 definePageMeta({
-  layout: "auth",
+  layout: 'auth',
 });
+
 const { login } = useStrapiAuth();
 const router = useRouter();
 
-const { emailRules, passwordRules } = useFormRules();
+const { loginSchema } = useFormRules();
+const messageStore = useMessageStore();
+
+const { handleSubmit, errors, values, controlledValues } = useForm({
+  validationSchema: loginSchema,
+  keepValuesOnUnmount: true,
+});
+
+const isValid = computed(
+  () =>
+    !Object.values(controlledValues.value).includes(undefined) &&
+    !Object.values(errors.value).length,
+);
 
 const logging = ref(false);
 const checkbox = ref(false);
 
 const passwordVisible = ref(false);
-const email = ref("");
-const password = ref("");
 
-const isFormValid = computed(() => {
-  return (
-    emailRules.every((rule) => typeof rule(email.value) === 'boolean') &&
-    passwordRules.every((rule) => typeof rule(password.value) === 'boolean')
-  );
-});
-
-const submit = async () => {
+const submit = handleSubmit(async () => {
   logging.value = true;
 
   try {
     await login({
-      identifier: email.value,
-      password: password.value,
+      identifier: values.email,
+      password: values.password,
     });
 
-    router.push("/");
+    router.push('/');
   } catch (error) {
     console.log(error);
     logging.value = false;
-    messageStore.message = "Email ou Senha inválido(s)";
+    messageStore.message = 'Email ou Senha inválido(s)';
   }
-};
+});
 </script>
 
 <style scoped lang="scss">
@@ -147,7 +152,7 @@ const submit = async () => {
   }
 
   &-text {
-    font-family: "Montserrat";
+    font-family: 'Montserrat';
     font-weight: 500 !important;
   }
 
@@ -156,7 +161,7 @@ const submit = async () => {
     background: #00d3ec !important;
     border-radius: 6px;
     display: flex;
-    font-family: "Montserrat";
+    font-family: 'Montserrat';
     font-size: 15px;
     font-weight: 600;
     flex-direction: row;
