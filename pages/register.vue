@@ -171,6 +171,7 @@ const options = reactive({
   eager: true,
 });
 const messageStore = useMessageStore();
+const walletStore = useWalletStore();
 definePageMeta({
   layout: 'auth',
 });
@@ -184,6 +185,7 @@ type FormDataType = {
   confirmPassword: string;
   yourRole: string;
   institution: string;
+  address?: string;
 };
 
 type InstitutionsType = {
@@ -243,12 +245,14 @@ const submit = async (values: FormDataType) => {
     fullname: string;
     isProfessor: boolean;
     institution?: string;
+    address?: string;
   } = {
     cpf,
     email,
     password,
     username,
     fullname,
+    address: walletStore.address ?? walletStore.address,
     isProfessor: yourRole.toLowerCase() === 'professor',
   };
 

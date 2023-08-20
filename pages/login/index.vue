@@ -111,6 +111,7 @@ const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const messageStore = useMessageStore();
+const walletStore = useWalletStore();
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -190,8 +191,10 @@ const metalogin = async () => {
       console.log(err);
       if (err.error.name === 'TokenExpiredError')
         messageStore.message = 'Token expirado, tente novamente.';
-      else
-        router.push({ path: '/register', state: { address: signer.address } });
+      else {
+        walletStore.address = signer.address;
+        router.push({ path: '/register' });
+      }
     }
   } catch (err: any) {
     messageStore.message = 'Metamask não detectada';
