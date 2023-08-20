@@ -9,7 +9,7 @@ type FormDataType = {
   institution: string;
 };
 
-function isValidCpf(val) {
+export function isValidCpf(val) {
   val = val.replace(/\D/g, '');
   if (val === '00000000000') return false;
 
@@ -35,15 +35,23 @@ function isValidCpf(val) {
 }
 
 export const useFormRules = (formData?: FormDataType) => {
-  const fullnameRules = [(v) => !!v || 'Nome completo é necessário'];
-  const usernameRules = [(v) => !!v || 'Usuário é necessário'];
-
+  const fullnameRules = [(v: string) => !!v || 'Nome completo é necessário'];
+  const usernameRules = [(v: string) => !!v || 'Usuário é necessário'];
+  const userType = [(v: string) => !!v || 'O tipo de usuário é necessário'];
   const emailRules = [
-    (v) => !!v || 'Email é necessário',
-    (v) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
+    (v: string) => !!v || 'Email é necessário',
+    (v: string) => /.+@.+\..+/.test(v) || 'Adicione um e-mail valido',
   ];
 
-  const passwordRules = [(v) => !!v || 'Senha é necessário'];
+  const passwordRules = [
+    (v: string) => !!v || 'Senha é necessário',
+    (v: string) =>
+      /^(?=.*[A-Z]).{2,}$/gm.test(v) || '2 caracteres maiúscula necessárias',
+    (v: string) =>
+      /^(?=.*\d).{1,}$/gm.test(v) || 'Pelo menos 1 número necessário',
+    (v: string) =>
+      /^(?=.*[a-z]).{1,}$/gm.test(v) || 'Pelo menos 1 caractére minúsculo',
+  ];
 
   const confirmPasswordRules = computed(() => {
     const temp: ((v: any) => boolean | string)[] = [
@@ -59,6 +67,10 @@ export const useFormRules = (formData?: FormDataType) => {
     (v: string | any[]) => v.length === 11 || 'CPF contem 11 caracteres',
     (v: any) => isValidCpf(v) || 'CPF inválido',
   ];
+
+  const institutionRules = [
+    (v: string) => !!v || 'Instituição é necessário'
+  ]
   return {
     emailRules,
     fullnameRules,
@@ -66,5 +78,7 @@ export const useFormRules = (formData?: FormDataType) => {
     passwordRules,
     confirmPasswordRules,
     cpfRules,
+    userType,
+    institutionRules,
   };
 };

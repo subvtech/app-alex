@@ -12,173 +12,178 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card v-if="checkEmail" class="card card-register px-10">
-        <div align="center">
-          <v-img
+      <v-card class="card card-register px-10" align="center">
+        <div align="center" class="card-register-images">
+          <img
             alt="Alex"
             src="../static/images/alex.svg"
-            class="card-register-alex-logo my-15"
+            class="card-register-alex-logo"
+          />
+          <img
+            alt="EllipseTop"
+            src="../assets/svg/Ellipse.svg"
+            class="card-register-images-top-ellipse"
           />
         </div>
-        <v-card-title class="text-white my-2">
-          Usuário cadastrado com sucesso!
-        </v-card-title>
-        <v-card-subtitle class="text-white my-2">
-          {{
-            isProfessor
-              ? 'Um administrador irá validar seu cadastro.'
-              : 'Um link de ativação foi enviado para o seu email.'
-          }}
-        </v-card-subtitle>
-        <p v-if="!isProfessor" slot="description" class="text-gray-500">
-          Obs.: Verifique sua caixa de SPAM.
-        </p>
-        <v-btn
-          type="primary"
-          class="mt-6 mx-auto"
-          @click="router.push('/login')"
-        >
-          Voltar
-        </v-btn>
-      </v-card>
-      <v-card v-else class="card card-register px-10">
-        <div align="center">
-          <v-img
-            alt="Alex"
-            src="../static/images/alex.svg"
-            class="card-register-alex-logo my-12"
-          />
-        </div>
-        <v-card-title class="text-white my-2">
+        <v-card-title class="text-white title ">
           Inicie uma nova experiência!
         </v-card-title>
-        <v-card-subtitle class="text-white my-2">
-          Crie uma conta e comece seus estudos
-        </v-card-subtitle>
-        <v-form v-model="isFormValid" @submit.prevent="submit">
-          <v-text-field
-            v-model="formData.fullname"
-            :rules="fullnameRules"
-            label="Nome completo"
-            color="white"
-            class="my-4"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.username"
-            :rules="usernameRules"
-            label="Nome de usuário"
-            color="white"
-            class="my-4"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.email"
-            :rules="emailRules"
-            label="E-mail"
-            color="white"
-            class="my-4"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.cpf"
-            :rules="cpfRules"
-            type="number"
-            label="CPF"
-            color="white"
-            class="my-4"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.password1"
-            :rules="passwordRules"
-            label="Senha"
-            color="white"
-            class="my-4"
-            dark
-            outlined
-            required
-          />
-          <v-text-field
-            v-model="formData.password2"
-            :rules="confirmPasswordRules"
-            label="Confirmar Senha"
-            color="white"
-            class="my-4"
-            dark
-            outlined
-            required
-          />
+        <alex-inputs-stepper-form
+          :schemes="[schema1, schema2, schema3]"
+          :loading="registering"
+          :onSuccess="submit"
+          #default="{ activeStep, values }"
+          align="left"
+        >
+          <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
+            <v-card-subtitle class="text-white mb-8" align="center">
+              Crie uma conta e comece seus estudos
+            </v-card-subtitle>
 
-          <v-radio-group
-            v-model="formData.yourRole"
-            row
-            color="white"
-            class="my-4"
-            dark
-          >
-            <v-radio label="Estudante" value="Estudante"></v-radio>
-            <v-radio label="Professor" value="Professor"></v-radio>
-          </v-radio-group>
+            <alex-inputs-stepper-field
+              label="Nome completo"
+              name="fullname"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+            />
 
-          <v-autocomplete
-            v-model="formData.institution"
-            @update:search-input="search"
-            :loading="fetching"
-            :items="institutions"
-            item-text="text"
-            item-value="id"
-            label="Instituição de Ensino"
-            color="white"
-            class="my-4"
-            dark
-            cache-items
-          ></v-autocomplete>
+            <alex-inputs-stepper-field
+              label="Email"
+              name="email"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+            />
 
-          <v-btn
-            block
-            class="card-btn"
-            type="submit"
-            :loading="registering"
-            :disabled="!isFormValid"
-          >
-            Criar Conta
-          </v-btn>
-        </v-form>
-        <v-card-text class="text-white mt-6 mb-10">
-          Já possui conta?
-          <nuxt-link to="/login" class="text-white"> Acesse aqui </nuxt-link>
+            <alex-inputs-stepper-field
+              label="CPF"
+              name="cpf"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+              v-maska:[options]
+            />
+          </alex-inputs-stepper-step>
+          <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
+            <v-card-subtitle class="text-white mb-8" align="center">
+              Informe o tipo da sua conta
+            </v-card-subtitle>
+
+            <alex-inputs-stepper-field
+              name="yourRole"
+              color="white"
+              type-field="select"
+              class="my-3 text-secondary"
+              label="Tipo de Usuário"
+              variant="outlined"
+              :items="[
+                { title: 'Professor', value: 'professor' },
+                { title: 'Aluno', value: 'aluno' },
+              ]"
+            />
+
+            <alex-inputs-stepper-field
+              v-if="values?.yourRole?.toLowerCase() == 'professor'"
+              typeField="autocomplete"
+              name="institution"
+              v-model:search="search"
+              :loading="fetching"
+              :items="institutions"
+              item-text="text"
+              item-value="id"
+              item-title="text"
+              label="Instituição de Ensino"
+              color="white"
+              class="my-3 text-secondary"
+              variant="outlined"
+              required
+              cache-items
+            />
+          </alex-inputs-stepper-step>
+          <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
+            <v-card-subtitle class="text-white mb-8" align="center">
+              Insira seus dados de acesso
+            </v-card-subtitle>
+
+            <alex-inputs-stepper-field
+              label="Nome de Usuário"
+              name="username"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+              :hint="`${usernameUrl}${values.username || ''}`"
+              persistent-hint
+            />
+
+            <alex-inputs-stepper-field
+              label="Senha"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="passwordVisible ? 'text' : 'password'"
+              name="password"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+              @click:append-inner="passwordVisible = !passwordVisible"
+            />
+
+            <alex-inputs-stepper-field
+              label="Confirmar Senha"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="passwordVisible ? 'text' : 'password'"
+              name="confirmPassword"
+              color="white"
+              class="my-3 text-secondary"
+              theme="dark"
+              @click:append-inner="passwordVisible = !passwordVisible"
+            />
+          </alex-inputs-stepper-step>
+        </alex-inputs-stepper-form>
+        <div class="d-flex align-center text-white my-12">
+          <v-divider
+            color="secondary"
+            :thickness="1"
+            class="border-opacity-100"
+          ></v-divider>
+          <p class="mx-4">ou</p>
+          <v-divider
+            color="secondary"
+            :thickness="1"
+            class="border-opacity-100"
+          ></v-divider>
+        </div>
+        <v-card-text class="text-white font-bold haveAccount">
+          Se já possui conta,
+          <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
+            Acesse aqui
+          </nuxt-link>
         </v-card-text>
+      
       </v-card>
     </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
+import * as yup from 'yup';
+import { isValidCpf } from '@/composables/useFormRules';
+
+const options = reactive({
+  mask: '###.###.###-##',
+  eager: true,
+});
 const messageStore = useMessageStore();
 definePageMeta({
   layout: 'auth',
 });
-
-const { register } = useStrapiAuth();
-const { find } = useStrapi();
-const router = useRouter();
 
 type FormDataType = {
   fullname: string;
   username: string;
   email: string;
   cpf: string;
-  password1: string;
-  password2: string;
+  password: string;
+  confirmPassword: string;
   yourRole: string;
   institution: string;
 };
@@ -191,85 +196,82 @@ type InstitutionsType = {
   tipo: String;
 };
 
-const checkEmail = ref(false);
+const { register } = useStrapiAuth();
+const { find } = useStrapi();
+const router = useRouter();
+const usernameUrl = 'https://app.projetoalex.cc/profile/';
 const registering = ref(false);
 const fetching = ref(false);
 const institutions = ref<InstitutionsType[]>([]);
+const isTyping = ref(false);
 const search = ref('');
-// const timeoutSearch = ref(null);
-/* const roles = ref([
-  { text: 'Sou Aluno', value: 'Aluno' },
-  { text: 'Sou Professor', value: 'Professor' },
-]);
-*/
 
-const isFormValid = computed(() => {
-  return (
-    emailRules.every(
-      (rule) => typeof rule(formData.value.email) === 'boolean',
-    ) &&
-    passwordRules.every(
-      (rule) => typeof rule(formData.value.password1) === 'boolean',
-    ) &&
-    confirmPasswordRules.value.every(
-      (rule) => typeof rule(formData.value.password2) === 'boolean',
-    ) &&
-    cpfRules.every((rule) => typeof rule(formData.value.cpf) === 'boolean') &&
-    fullnameRules.every(
-      (rule) => typeof rule(formData.value.fullname) === 'boolean',
-    ) &&
-    usernameRules.every(
-      (rule) => typeof rule(formData.value.username) === 'boolean',
-    ) &&
-    formData.value.yourRole !== ''
-  );
+const schema1 = yup.object({
+  fullname: yup
+    .string()
+    .required('Nome completo é necessário')
+    .min(6, 'Mínimo de 6 caracteres')
+    .max(64, 'Máximo de 64 caracteres'),
+  email: yup.string().required('Email é necessário').email('Email inválido'),
+  cpf: yup
+    .string()
+    .required('CPF é necessário')
+    .length(14, 'CPF contém 11 caracteres')
+    .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
+});
+const schema2 = yup.object({
+  yourRole: yup
+    .string()
+    .required('Tipo de Usuário é necessário')
+    .oneOf(['professor', 'aluno'] as const),
+  institution: yup
+    .number()
+    .optional()
+    .nullable()
+    .when('yourRole', {
+      is: 'professor',
+      then: (scheme) => scheme.required('Tipo de instituição é necessário'),
+    }),
+});
+const schema3 = yup.object({
+  username: yup
+    .string()
+    .required('Nome de usuário é necessário')
+    .min(6, 'Mínimo de 6 caracteres')
+    .max(64, 'Máximo de 64 caracteres'),
+  password: yup
+    .string()
+    .required('Senha é necessário')
+    .matches(
+      /^(?=.*[A-Z]).{2,}$/gm,
+      'Pelo menos 2 letras maiúsculas necessárias',
+    )
+    .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+    .matches(/^(?=.*[a-z]).{1,}$/gm, 'Pelo menos 1 letra minúscula necessário')
+    .min(8, 'Mínimo de 8 caracteres'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'As senhas não são idênticas')
+    .required('Confirmar Senha é necessário'),
 });
 
-const formData = ref<FormDataType>({
-  fullname: '',
-  username: '',
-  email: '',
-  cpf: '',
-  password1: '',
-  password2: '',
-  yourRole: '',
-  institution: '',
-});
-
-// const showPassword = ref(false);
-// const showConfirmPassword = ref(false);
-
-const {
-  fullnameRules,
-  usernameRules,
-  emailRules,
-  cpfRules,
-  passwordRules,
-  confirmPasswordRules,
-} = useFormRules(formData.value);
-
-const isProfessor = computed(() => {
-  return formData.value.yourRole === 'Professor';
-});
+const passwordVisible = ref(false);
 
 const fetchInstitutions = async (instValue: any) => {
-  console.log(instValue)
   fetching.value = true;
   try {
     const res = await find(
-      `/institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
+      `institutions?nome_contains=${instValue}&tipo=matriz&_limit=10`,
     );
-    console.log('res', res)
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
-        value: r.nome,
-        sigla: r.sigla,
-        text: r.nome,
-        tipo: r.tipo,
+        value: r.attributes.nome,
+        sigla: r.attributes.sigla,
+        text: r.attributes.nome,
+        tipo: r.attributes.tipo,
       };
     });
-
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
@@ -278,27 +280,30 @@ const fetchInstitutions = async (instValue: any) => {
   fetching.value = false;
 };
 
-const submit = async () => {
+const submit = async (values: FormDataType) => {
   registering.value = true;
 
-  const { cpf, email, password1, username, fullname, institution } =
-    formData.value;
+  const { cpf, email, password, username, fullname, institution, yourRole } =
+    values;
 
-  if (!institution) {
-    messageStore.message = 'Selecione sua instituição.';
-    registering.value = false;
-    return;
-  }
-
-  const userData = {
+  const userData: {
+    cpf: string;
+    email: string;
+    password: string;
+    username: string;
+    fullname: string;
+    isProfessor: boolean;
+    institution?: string;
+  } = {
     cpf,
     email,
-    password: password1,
+    password,
     username,
     fullname,
-    institution: [institution],
-    isProfessor: isProfessor.value,
+    isProfessor: yourRole.toLowerCase() === 'professor',
   };
+
+  if (institution && yourRole.toLowerCase() === 'professor') userData.institution = institution;
 
   try {
     const { user } = await register(userData);
@@ -307,8 +312,6 @@ const submit = async () => {
       messageStore.message = 'Usuário bloqueado!';
     } else if (user.value!.confirmed) {
       router.push('/');
-    } else {
-      checkEmail.value = true;
     }
   } catch (error) {
     registering.value = false;
@@ -316,15 +319,19 @@ const submit = async () => {
   }
 };
 
-watch(
-  () => search,
-  async (newValue, oldValue) => {
-    console.log(newValue);
-    if (newValue !== oldValue) {
-      await fetchInstitutions(newValue);
-    }
+watchEffect(async (onInvalidate) => {
+  if (search.value?.length > 0) {
+    isTyping.value = true;
+    const getData = setTimeout(async () => {
+      isTyping.value = false;
+      await fetchInstitutions(search.value);
+    }, 500);
+
+    onInvalidate(() => {
+      clearInterval(getData);
+    });
   }
-);
+});
 </script>
 
 <style scoped lang="scss">
@@ -333,7 +340,6 @@ watch(
   height: 100%;
   position: absolute;
   top: 0;
-
   &-imagem {
     background: #f0f0f0 !important;
     left: 0;
@@ -347,11 +353,38 @@ watch(
   &-register {
     background: #001529 !important;
     right: 0;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     width: 600px;
-
+    display: flex;
+    flex-direction: column;
+    padding: clamp(25px, 12vh, 90px) !important;
+    // gap: 1rem;
     &-alex-logo {
-      width: 100px;
+      width: 120px;
+      height: 40px;
+      margin-bottom: clamp(25px, 5vh, 60px);
+    }
+    &-images {
+      position: relative;
+      min-height: 50px;
+      user-select: none;
+      pointer-events: none;
+
+      &-top-ellipse {
+        width: 820px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        translate: -50%;
+      }
+      &-bottom-ellipse {
+        width: 820px;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        translate: -50%;
+      }
     }
   }
 
@@ -389,9 +422,35 @@ watch(
   }
 }
 
-.v-card__subtitle,
-.v-card__text,
-.v-card__title {
-  padding: 0;
+.haveAccount {
+  font-weight: 700;
+  height: min-content !important;
+  flex: none;
+  &-link {
+    text-decoration: none;
+    color: #00d3ec !important;
+    font-size: 16px;
+  }
+}
+
+.title {
+  font-size: 24px;
+}
+
+@media screen and (max-height: 800px) {
+  .card-register {
+    padding-top: clamp(25px, 8vh, 60px) !important;
+    padding-bottom: clamp(25px, 8vh, 60px) !important;
+  }
+  
+}
+@media screen and (max-height: 850px) {
+ .card-register-images-top-ellipse {
+        width: 700px;
+        bottom: -30px;
+        left: 50%;
+        translate: -50%;
+  }
+  
 }
 </style>
