@@ -5,7 +5,7 @@
         <div align="center">
           <img
             alt="Crie sua conta"
-            src="../static/images/imagem_register.png"
+            src="../static/images/SignUp.svg"
             class="card-imagem-imagem my-5"
           />
         </div>
