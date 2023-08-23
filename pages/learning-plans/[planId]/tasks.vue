@@ -2,7 +2,7 @@
   <v-container fluid> asdasda </v-container>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 definePageMeta({
   middleware: 'auth',
 });
