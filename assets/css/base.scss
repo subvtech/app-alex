@@ -5,6 +5,9 @@
 /*  font-display: swap;*/
 /*  src: url('~assets/fonts/FiraCode-Regular.ttf') format('truetype');*/
 /*}*/
+@use 'vuetify' with (
+   $body-font-family: 'Montserrat'
+);
 
 /* stylelint-enable */
 label.theme--dark + input:-webkit-autofill,
@@ -36,3 +39,4 @@ input[type='password']::-webkit-credentials-auto-fill-button {
   display: none !important;
   pointer-events: none;
 }
+
