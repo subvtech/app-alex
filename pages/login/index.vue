@@ -65,29 +65,53 @@
             Entrar
           </v-btn>
         </v-form>
-        <v-card-text class="text-white mt-6 mb-10">
+        <v-card-text class="text-white text-center mt-6 mb-10">
           Ainda não possui conta?
           <nuxt-link to="/register" class="text-white">
             Crie sua conta
           </nuxt-link>
         </v-card-text>
+        <div class="d-flex align-center text-white my-12">
+          <v-divider
+            color="secondary"
+            :thickness="1"
+            class="border-opacity-100"
+          ></v-divider>
+          <p class="mx-4">ou</p>
+          <v-divider
+            color="secondary"
+            :thickness="1"
+            class="border-opacity-100"
+          ></v-divider>
+        </div>
+        <v-btn
+          block
+          class="card-btn metamask"
+          @click="metalogin"
+          :loading="logging2"
+        >
+          <img src="../../static/images/metamask.png" alt="" />
+          <span>Acesse com a metamask</span>
+        </v-btn>
       </v-card>
     </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
+import { ethers } from 'ethers';
 import { useForm } from 'vee-validate';
 
 definePageMeta({
   layout: 'auth',
 });
-
-const { login } = useStrapiAuth();
+const { login, setToken, setUser } = useStrapiAuth();
+const { update, find, findOne } = useStrapi();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const messageStore = useMessageStore();
+const walletStore = useWalletStore();
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -101,8 +125,8 @@ const isValid = computed(
 );
 
 const logging = ref(false);
+const logging2 = ref(false);
 const checkbox = ref(false);
-
 const passwordVisible = ref(false);
 
 const submit = handleSubmit(async () => {
@@ -121,6 +145,64 @@ const submit = handleSubmit(async () => {
     messageStore.message = 'Email ou Senha inválido(s)';
   }
 });
+
+declare global {
+  interface Window {
+    ethereum: any;
+  }
+}
+
+function withTimeout(ms, promise) {
+  let timeout = new Promise((resolve, reject) => {
+    let id = setTimeout(() => {
+      clearTimeout(id);
+      reject(`Timed out in ${ms}ms.`);
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
+}
+
+const metalogin = async () => {
+  try {
+    logging2.value = true;
+    if (!window.ethereum) {
+      messageStore.message = 'Metamask não detectada';
+      messageStore.show = true;
+      return;
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+
+    const signer = await withTimeout(4000, provider.getSigner());
+
+    const data = ((await find('metamask-auth')).data as any).attributes;
+
+    const signedMessage = await signer.signMessage(data.token);
+
+    try {
+      const response: any = await update('metamask-auth', {
+        fields: { message: data.token, signedMessage, address: signer.address },
+      });
+      setToken(response.jwt);
+      setUser(response.user);
+      provider.destroy();
+      router.push('/');
+    } catch (err: any) {
+      console.log(err);
+      if (err.error.name === 'TokenExpiredError')
+        messageStore.message = 'Token expirado, tente novamente.';
+      else {
+        walletStore.address = signer.address;
+        router.push({ path: '/register' });
+      }
+    }
+  } catch (err: any) {
+    messageStore.message = 'Metamask não detectada';
+    messageStore.show = true;
+  } finally {
+    logging2.value = false;
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -154,6 +236,27 @@ const submit = handleSubmit(async () => {
   &-text {
     font-family: 'Montserrat';
     font-weight: 500 !important;
+  }
+
+  .metamask {
+    background-color: white !important;
+    display: flex;
+    align-items: center;
+    text-transform: none !important;
+    width: 306px;
+    min-width: 0px !important;
+    gap: 8px;
+    margin-inline: auto;
+
+    img {
+      height: 30px;
+      width: 30px;
+      margin-right: 10px;
+    }
+    span {
+      font-size: 16px;
+      font-family: 'Sen';
+    }
   }
 
   &-btn {
