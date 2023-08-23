@@ -23,8 +23,7 @@ ENV NODE_ENV=production
 
 EXPOSE 3000
 
-CMD yarn start -H 0.0.0.0
-
+CMD node .output/server/index.mjs
 
 
 
