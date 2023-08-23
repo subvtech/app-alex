@@ -21,8 +21,6 @@ before_script:
   - mkdir -p "${CI_PROJECT_DIR}"
   - cd "${CI_PROJECT_DIR}" q
   - git init
-  - echo "${CI_PROJECT_PATH}"
-  - echo "${DEPLOY_TOKEN}"
   - git remote add origin "https://gitlab+deploy-token-2:$DEPLOY_TOKEN@gitlab.profbrenojac.com.br/${CI_PROJECT_PATH}.git"
   - git fetch origin "${CI_COMMIT_SHA}"
   - git reset --hard FETCH_HEAD
