@@ -19,8 +19,10 @@ before_script:
   - export VERSION=$CI_COMMIT_SHORT_SHA
   - if [ -d "${CI_PROJECT_DIR}" ]; then rm -rf "${CI_PROJECT_DIR}"; fi
   - mkdir -p "${CI_PROJECT_DIR}"
-  - cd "${CI_PROJECT_DIR}"
+  - cd "${CI_PROJECT_DIR}" q
   - git init
+  - echo "${CI_PROJECT_PATH}"
+  - echo "${DEPLOY_TOKEN}"
   - git remote add origin "https://gitlab+deploy-token-2:$DEPLOY_TOKEN@gitlab.profbrenojac.com.br/${CI_PROJECT_PATH}.git"
   - git fetch origin "${CI_COMMIT_SHA}"
   - git reset --hard FETCH_HEAD
