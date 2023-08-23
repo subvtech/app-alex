@@ -46,7 +46,7 @@ deploy:
     name: bitnami/kubectl:1.26.4
     entrypoint: ['']
   script:
-    - kubectl config use-context projeto-alex/alex:app-alex-agent
+    - kubectl config use-context projeto-alex/app-alex:app-alex-agent
     - sed s/%VERSION%/$VERSION/g "kubernetes/alex-app2-$TAG.yaml" > deploy-alex-app2.yaml
     - kubectl apply --validate=false -f deploy-alex-app2.yaml -v=8
   only:
