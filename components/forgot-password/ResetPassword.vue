@@ -23,7 +23,7 @@
         rounded="lg"
         variant="outlined"
         density="comfortable"
-        :rules="validatePassword"
+        :rules="rules.password"
         type="password"
       >
       </v-text-field>
@@ -34,7 +34,7 @@
         rounded="lg"
         variant="outlined"
         density="comfortable"
-        :rules="validatePasswordConfirmation"
+        :rules="rules.passwordConfirmation"
         type="password"
       >
         <template #details>
@@ -56,7 +56,7 @@
         ALTERAR SENHA</v-btn
       >
     </v-form>
-    <orRow />
+    <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
       Lembrou da senha?
       <NuxtLink to="/login" class="text-accent text-decoration-none">
@@ -69,10 +69,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import orRow from './DividerRow.vue';
+import { passwordRules } from '@/helpers/utils';
+const {
+  charactersRule,
+  min8CharactersRule,
+  passwordConfirmationRule,
+  requiredRule,
+  requiredConfirmationRule,
+} = passwordRules;
 const messageStore = useMessageStore();
 const { resetPassword } = useStrapiAuth();
-
 const password = ref('');
 const passwordConfirmation = ref('');
 const validForm = ref(false);
@@ -83,30 +89,18 @@ const route = useRoute();
 
 const emit = defineEmits(['confirmation-message']);
 
-const validatePassword = ref([
-  (password) =>
-    password.length > 7 || 'A senha deve ter no mínimo 8 caracteres',
-  (password) =>
-    (/[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      /\d/.test(password) &&
-      /\W/.test(password)) ||
-    'A senha deve conter uma combinação de letras maiúsculas e minusculas, números e símbolos',
-  (password) => {
-    if (passwordConfirmation.value && password !== passwordConfirmation.value) {
-      return 'A confirmação deve ser igual à senha';
-    }
-    return true;
-  },
-]);
-
-const validatePasswordConfirmation = ref([
-  (passwordConfirmation) =>
-    passwordConfirmation === password.value ||
-    'A confirmação deve ser igual a senha',
-  (passwordConfirmation) =>
-    !!passwordConfirmation || 'A confirmação é obrigatória',
-]);
+const rules = ref({
+  password: [
+    requiredRule,
+    min8CharactersRule,
+    charactersRule,
+    (val) => passwordConfirmationRule(val, passwordConfirmation.value) || true,
+  ],
+  passwordConfirmation: [
+    requiredConfirmationRule,
+    (val) => passwordConfirmationRule(password.value, val) || true,
+  ],
+});
 
 const changePassword = async () => {
   loading.value = true;

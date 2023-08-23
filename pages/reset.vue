@@ -15,11 +15,11 @@
         sm="12"
         class="bg-primary px-16"
       >
-        <ResetPassword
+        <ForgotPasswordResetPassword
           v-if="!passwordChanged"
           @confirmation-message="handlePasswordChanged"
         />
-        <ConfirmationMessage
+        <ForgotPasswordConfirmationMessage
           v-else
           title="Senha alterada!"
           text="Sua nova senha foi definida com sucesso, volte para a tela de login e acesse o sistema."
@@ -31,8 +31,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import ResetPassword from '../components/forgotPassword/ResetPassword.vue';
-import ConfirmationMessage from '../components/forgotPassword/ConfirmationMessage.vue';
 const passwordChanged = ref(false);
 definePageMeta({
   layout: 'auth',

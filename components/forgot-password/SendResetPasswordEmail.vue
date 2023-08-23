@@ -22,7 +22,7 @@
         class="mb-6"
         variant="outlined"
         density="comfortable"
-        :rules="validateEmail"
+        :rules="emailRules"
       >
         <template #details>
           <span v-if="errorMessage" class="text-error w-100"
@@ -42,7 +42,7 @@
         >RECUPERAR SENHA</v-btn
       >
     </v-form>
-    <orRow />
+    <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
       Lembrou da senha?
       <NuxtLink to="/login" class="text-decoration-none text-accent"
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import orRow from './DividerRow.vue';
+const { emailRules } = useFormRules();
 const validForm = ref(false);
 const email = ref('');
 const form = ref(null);
@@ -62,10 +62,6 @@ const loading = ref(false);
 const errorMessage = ref(false);
 const messageStore = useMessageStore();
 const { forgotPassword } = useStrapiAuth();
-const validateEmail = ref([
-  (email) => /.+@.+\..+/.test(email) || 'Adicione um e-mail valido',
-]);
-
 const emit = defineEmits(['confirmation-message']);
 
 const sendEmail = async () => {

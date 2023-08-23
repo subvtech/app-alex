@@ -15,11 +15,11 @@
         sm="12"
         class="bg-primary px-16"
       >
-        <ForgotPasswordFirstStep
+        <ForgotPasswordSendResetPasswordEmail
           v-if="!emailSent"
           @confirmation-message="handleSentEmail"
         />
-        <ConfirmationMessage
+        <ForgotPasswordConfirmationMessage
           v-else
           title="Recuperação enviada!"
           text="Enviamos instruções para"
@@ -33,8 +33,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import ForgotPasswordFirstStep from '../components/forgotPassword/SendResetPasswordEmail.vue';
-import ConfirmationMessage from '../components/forgotPassword/ConfirmationMessage.vue';
 const emailSent = ref(false);
 const userEmail = ref('');
 definePageMeta({
