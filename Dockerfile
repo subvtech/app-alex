@@ -6,6 +6,8 @@ RUN apk update && \
   git \
   bash
 
+ARG strapi_url
+
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
 RUN chown -R alex:alex /opt/app
@@ -16,6 +18,8 @@ ADD --chown=alex:alex ./package.json ./yarn.lock ./
 RUN yarn --ignore-scripts
 
 ADD --chown=alex:alex . .
+
+ENV STRAPI_URL=$strapi_url
 
 RUN yarn build
 
