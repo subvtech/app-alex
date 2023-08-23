@@ -1,10 +1,5 @@
 <template>
-  <v-alert
-    border="bottom"
-    colored-border
-    type="warning"
-    elevation="2"
-  >
+  <v-alert border="bottom" colored-border type="warning" elevation="2">
     <div class="text-h5">
       {{ warningBlock.title }}
     </div>
@@ -12,19 +7,12 @@
   </v-alert>
 </template>
 
-<script>
-
-export default {
-  props: {
-    warningBlock: {
-      type: Object,
-      required: true,
-    },
+<script setup lang="ts">
+const props = defineProps({
+  warningBlock: {
+    required: true,
+    type: Object,
   },
-  data() {
-    return {
-    };
-  },
-};
+});
+const { warningBlock } = toRefs(props);
 </script>
-

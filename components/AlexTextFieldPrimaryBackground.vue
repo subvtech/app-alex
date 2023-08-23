@@ -6,53 +6,49 @@
     :color="color"
     :outlined="outlined"
     :required="required"
-    @input="$emit('input', inputValue)"
+    @input="emit('input', inputValue)"
   >
   </v-text-field>
 </template>
 
-<script>
-export default {
-  name: "AlexTextFieldPrimaryBackground",
-  props: {
-    value: {
-      type: String,
-    },
-    rules: {
-      type: Array,
-      default:() => []
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    color: {
-      type: String,
-    },
-    outlined: {
-      type: Boolean,
-      default: false,
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    }
+<script setup lang="ts">
+const props = defineProps({
+  value: {
+    type: String,
   },
-  data() {
-    return {
-      inputValue: null,
-    };
+  rules: {
+    type: Array as PropType<any>,
+    default: () => [],
   },
-  watch: {
-    value(v) {
-      this.inputValue = v;
-    }
+  label: {
+    type: String,
+    required: true,
   },
-};
+  color: {
+    type: String,
+  },
+  outlined: {
+    type: Boolean,
+    default: false,
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const { label, outlined, required, rules, color, value } = toRefs(props);
+const emit = defineEmits(['input']);
+
+const inputValue = ref();
+
+watch(
+  () => value,
+  (v) => (inputValue.value = v),
+);
 </script>
 
 <style scoped lang="scss">
-
 ::v-deep .theme--light.v-label,
 ::v-deep .theme--light.v-input input,
 ::v-deep .theme--light.v-input textarea,
@@ -75,5 +71,4 @@ export default {
   border-style: solid;
   border-width: 2px;
 }
-
 </style>

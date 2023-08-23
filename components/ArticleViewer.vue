@@ -2,7 +2,7 @@
   <v-dialog v-model="visible" width="95%">
     <v-card>
       <v-card-title>
-        {{ isLoading ? "Carregando..." : title }}
+        {{ isLoading ? 'Carregando...' : title }}
       </v-card-title>
       <div ref="contentContainer" class="content-container pa-10"></div>
       <v-skeleton-loader
@@ -14,42 +14,43 @@
     </v-card>
   </v-dialog>
 </template>
-<script>
-export default {
-  props: {
-    url: {
-      type: String,
-      default: "",
-    },
+<script setup lang="ts">
+const messageStore = useMessageStore();
+const props = defineProps({
+  url: {
+    default: '',
+    type: String,
   },
-  data() {
-    return {
-      isLoading: false,
-      visible: false,
-      title: "",
-    };
-  },
-  methods: {
-    handleModal(value) {
-      this.visible = value;
-    },
-    async parsePage() {
-      this.isLoading = true;
-      try {
-        const res = await this.$http.$post(`${location.origin}/api/parse-url`, {
-          url: this.url,
-        });
-        if (res.data.error) {
-          this.$error("Ocorreu um erro no processamento da página.");
-        }
-        this.$refs.contentContainer.innerHTML = res.data.content;
-        this.title = res.data.title;
-      } catch (error) {
-        this.$error("Ocorreu um erro no processamento da página.");
-      }
-      this.isLoading = false;
-    },
-  },
+});
+const { url } = toRefs(props);
+
+const isLoading = ref(false);
+const visible = ref(false);
+const title = ref('');
+const contentContainer = ref();
+
+const handleModal = (value) => {
+  visible.value = value;
+};
+
+const parsePage = async () => {
+  isLoading.value = true;
+  try {
+    const res: any = await $fetch(`/api/parse-url`, {
+      method: 'POST',
+      body: JSON.stringify({
+        url: url.value,
+      }),
+    });
+    if (res.data.error) {
+      messageStore.message = 'Ocorreu um erro no processamento da página.';
+    }
+    contentContainer.value.innerHTML = res.data.content;
+    title.value = res.data.title;
+  } catch (error) {
+    messageStore.message = 'Ocorreu um erro no processamento da página.';
+  }
+  isLoading.value = false;
 };
 </script>
 <style>

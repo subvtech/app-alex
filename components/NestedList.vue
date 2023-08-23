@@ -37,19 +37,17 @@
   </span>
 </template>
 
-<script>
-export default {
-  name: "NestedList",
-  props: {
-    type: {
-      type: String,
-      default: "ordered",
-    },
-    items: {
-      type: Array,
-    },
+<script setup lang="ts">
+const props = defineProps({
+  type: {
+    type: String,
+    default: 'ordered',
   },
-};
+  items: {
+    type: Array as unknown as PropType<{content: string}>,
+  },
+});
+const { type, items } = toRefs(props);
 </script>
 <style scoped>
 ol {
@@ -59,6 +57,6 @@ ol {
 
 li.ordered-item::before {
   counter-increment: section;
-  content: counters(section, ".") " ";
+  content: counters(section, '.') ' ';
 }
 </style>

@@ -1,6 +1,8 @@
 <template>
   <v-combobox
+    v-if="selectedTags && tags"
     v-model="selectedTags"
+    v-model:search-input="search"
     :items="tags"
     :loading="loadingTags"
     label="Adicionar Tags"
@@ -15,132 +17,168 @@
     cache-items
     item-value="id"
     item-text="tag"
-    :search-input.sync="search"
     :reverse="false"
     :clearable="!disabled"
     small-chips
     :readonly="disabled"
     @input="onInput"
-    >
-      <template #selection="data">
-        <v-chip
-          v-bind="data.attrs"
-          :input-value="data.selected"
-          close
-          small
-          @click="data.select"
-          @click:close="remove(data.item)"
-        >
-          <template v-if="data.item.tag">
-            {{ data.item.tag }} <v-icon v-if="data.item.verified" color="green" small title="Tag Verificada Alex">mdi-check-decagram</v-icon>
-          </template>
-          <template v-else>
-            {{ data.item }} <v-progress-circular class="ml-1" indeterminate color="primary" :size="11" :width="1" />
-          </template>
-        </v-chip>
-      </template>
-      <template #item="data">
+  >
+    <template #selection="data">
+      <v-chip
+        v-bind="data.item.raw.attributes"
+        :input-value="data.item.raw.attributes.verified"
+        close
+        small
+        @click="
+          data.item.raw.attributes.verified = !data.item.raw.attributes.verified
+        "
+        @click:close="remove(data.item)"
+      >
+        <template v-if="data.item.raw.attributes.tag">
+          {{ data.item.raw.attributes.tag }}
+          <v-icon
+            v-if="data.item.raw.attributes.verified"
+            color="green"
+            small
+            title="Tag Verificada Alex"
+            >mdi-check-decagram</v-icon
+          >
+        </template>
+        <template v-else>
+          {{ data.item }}
+          <v-progress-circular
+            class="ml-1"
+            indeterminate
+            color="primary"
+            :size="11"
+            :width="1"
+          />
+        </template>
+      </v-chip>
+    </template>
+    <template #item="data">
+      <v-list-item-content>
+        <v-list-item-title>
+          {{ data.item }}
+          <v-icon
+            v-if="data.item.raw.attributes.verified"
+            color="green"
+            title="Tag Verificada Alex"
+            >mdi-check-decagram</v-icon
+          >
+        </v-list-item-title>
+      </v-list-item-content>
+    </template>
+    <template #no-data>
+      <v-list-item>
         <v-list-item-content>
-          <v-list-item-title> 
-            {{ data.item.tag }} <v-icon v-if="data.item.verified" color="green" title="Tag Verificada Alex">mdi-check-decagram</v-icon> 
+          <v-list-item-title>
+            Nenhuma tag encontrada para "<strong>{{ search }}</strong
+            >". Aperte <kbd>enter</kbd> para criar uma tag nova
           </v-list-item-title>
         </v-list-item-content>
-      </template>
-      <template #no-data>
-        <v-list-item>
-          <v-list-item-content>
-            <v-list-item-title>
-              Nenhuma tag encontrada para "<strong>{{ search }}</strong>". Aperte <kbd>enter</kbd> para criar uma tag nova
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
+      </v-list-item>
+    </template>
   </v-combobox>
 </template>
 
-<script>
-
+<script setup lang="ts">
+import {
+  Strapi4ResponseData,
+  Strapi4ResponseMany,
+} from '@nuxtjs/strapi/dist/runtime/types';
+import { PropType } from 'nuxt/dist/app/compat/capi';
+import { Tag } from 'models/tag.model';
 import * as queries from '~/assets/queries';
+const { create } = useStrapi();
+const graphql = useStrapiGraphQL();
 
-export default {
-  props: ['value'],
-  data() {
-    return {
-      tags: [],
-      selectedTags: [],
-      loadingTags: false,
-      disabled: false,
-      search: "",
-
-    };
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<Strapi4ResponseData<Tag>[]>,
+    default: () => [],
   },
+});
 
-  computed: {
+const tags = ref<Strapi4ResponseData<Tag>[]>([]);
+const selectedTags = ref<Strapi4ResponseData<Tag>[]>([]);
+const loadingTags = ref(false);
+const disabled = ref(false);
+const search = ref('');
+
+watch(
+  () => search,
+  async () => {
+    await searchTags(search.value);
   },
+);
 
-  watch: {
-    search: {
-      async handler(search = "") {
-        await this.searchTags(search);
-      }
-    },
-    async value() {
-      await this.loadTags();
-    }
+const emit = defineEmits(['update:modelValue']);
+
+watch(
+  () => props.modelValue,
+  async () => {
+    await loadTags();
   },
-  async created() {
-    await this.loadTags()
-  },
-  methods: {
-    async loadTags() {
-      if (this.value && this.value.length) {
-        this.selectedTags = this.value;
-        await this.searchTags('', this.value.map(t => t.id));
-      }
-    },
-    async searchTags(search = "", ids = []) {
-      if ((!search || search.length < 3) && !ids.length) return
-      this.loadingTags = true
+);
+onMounted(async () => {
+  await loadTags();
+});
 
-      // const 
-      const query = {
-        query: ids.length ? queries.tagsByids : queries.tags,
-        variables: ids.length ? { ids } : { search }
-      }
+const loadTags = async () => {
+  if (props.modelValue && props.modelValue.length) {
+    selectedTags.value = props.modelValue;
+    await searchTags(
+      '',
+      props.modelValue.map((t) => t.id),
+    );
+  }
+};
 
-      this.tags = (await this.$strapi.graphql(query)).tags;
+const searchTags = async (search = '', ids: number[] = []) => {
+  if ((!search || search.length < 3) && !ids.length) return;
+  loadingTags.value = true;
 
-      this.loadingTags = false
-    },
-    remove(item) {
-      if (this.disabled) return;
-      this.selectedTags = this.selectedTags.filter(t => t.id !== item.id);
-    },
-    async onInput() {
-      this.search = ''
+  // const
+  const props = {
+    query: ids.length ? queries.tagsByids : queries.tags,
+    variables: ids.length ? { ids } : { search },
+  };
 
-      await this.checkForNewTags();
-      this.$emit('input', this.selectedTags)
-    },
-    async checkForNewTags() {
-      const newTags = this.selectedTags.filter(tag => !tag.tag);
-      
+  tags.value = (
+    await graphql<Strapi4ResponseMany<Tag>>(props.query, props.variables)
+  ).data;
 
-      if (newTags.length) {
-        this.disabled = true;
-        const newTagIdx = this.selectedTags.findIndex(tag => !tag.tag)
+  loadingTags.value = false;
+};
 
-        const tag = await this.$strapi.create('tags', { tag: newTags[0] })
+const remove = (item) => {
+  if (disabled.value) return;
+  selectedTags.value = selectedTags.value!.filter((t) => t.id !== item.id);
+};
+const onInput = async () => {
+  search.value = '';
 
-        this.selectedTags[newTagIdx] = tag;
+  await checkForNewTags();
+  emit('update:modelValue', selectedTags.value);
+};
+const checkForNewTags = async () => {
+  const newTags = selectedTags.value!.filter((tag) => !tag.attributes.tag);
 
-        this.disabled = false;
-      }
+  if (newTags.length) {
+    disabled.value = true;
+    const newTagIdx = selectedTags.value!.findIndex(
+      (tag) => !tag.attributes.tag,
+    );
 
-    }
+    const tag = (await create<Tag>('tags', { tag: newTags[0].attributes.tag }))
+      .data;
+
+    selectedTags.value![newTagIdx] = tag;
+
+    disabled.value = false;
   }
 };
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

@@ -41,58 +41,55 @@
         size="80"
         color="grey"
       >
-        <v-img  :src="imageLink" />
+        <v-img :src="imageLink" />
       </v-list-item-avatar>
     </v-list-item>
     <article-viewer
-      :ref="'articleViewer-' + linkBlock.id"
+      :ref="articleViewer"
       :data-key="linkBlock.id"
       :url="linkBlock.link"
     />
   </v-card>
 </template>
 
-<script>
+<script setup lang="ts">
+const props = defineProps({
+  linkBlock: {
+    type: Object,
+    required: true,
+  },
+  isDesktop: {
+    type: Boolean,
+    default: false,
+  },
+  isDownloaded: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-export default {
-  props: {
-    linkBlock: {
-      type: Object,
-      required: true,
-    },
-    isDesktop: {
-      type: Boolean,
-      default: false,
-    },
-    isDownloaded: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return {
-    };
-  },
-  computed: {
-    imageLink() {
-      return (this.isDesktop && this.isDownloaded)
-        ? `file://${this.linkBlock.meta.image ? this.linkBlock.meta.image.downloadedUrl : '' }`
-        : this.linkBlock.meta.image.url
-    },
-  },
-  methods: {
-    openArticleViewer() {
-      this.$refs[`articleViewer-${this.linkBlock.id}`].handleModal(true);
-      this.$refs[`articleViewer-${this.linkBlock.id}`].parsePage();
-    },
-     openFile(url) {
-      if (!this.isDesktop) {
-        return;
-      }
+const { isDesktop, linkBlock, isDownloaded } = toRefs(props);
 
-      window.openFile(url);
-    },
-  },
-};
+const articleViewer = ref();
+
+const imageLink = computed(() => {
+  return isDesktop.value && isDownloaded.value
+    ? `file://${
+        linkBlock.value.meta.image
+          ? linkBlock.value.meta.image.downloadedUrl
+          : ''
+      }`
+    : linkBlock.value.meta.image.url;
+});
+function openArticleViewer() {
+  articleViewer.value![linkBlock.value.id].handleModal(true);
+  articleViewer.value![linkBlock.value.id].parsePage();
+}
+function openFile(url) {
+  if (!isDesktop.value) {
+    return;
+  }
+
+  window.open(url);
+}
 </script>
-

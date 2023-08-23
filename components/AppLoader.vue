@@ -7,12 +7,5 @@
     asd
   </div>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      // indicator: <a-icon type="loading" style="font-size: 128px" spin />,
-    };
-  },
-};
+<script setup lang="ts">
 </script>

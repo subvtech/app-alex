@@ -1,0 +1,42 @@
+/*@font-face {*/
+/*  font-family: 'Fira Code';*/
+/*  font-style: normal;*/
+/*  font-weight: 400;*/
+/*  font-display: swap;*/
+/*  src: url('~assets/fonts/FiraCode-Regular.ttf') format('truetype');*/
+/*}*/
+@use 'vuetify' with (
+   $body-font-family: 'Montserrat'
+);
+
+/* stylelint-enable */
+label.theme--dark + input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #fff !important; /* inherit only works in Safari */
+  -webkit-text-size-adjust: inherit !important;
+}
+
+label.theme--light + input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #000 !important; /* inherit only works in Safari */
+  -webkit-text-size-adjust: inherit !important;
+}
+
+/* When dark theme, then make keychain icon white */
+label.theme--dark + input::-webkit-credentials-auto-fill-button {
+  background-color: #fff !important;
+}
+
+/* Hide credentials-auto-fill-button in password inputs, only visible on other inputs */
+input[type='password']::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
+

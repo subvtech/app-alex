@@ -2,13 +2,24 @@
   <v-row justify="center">
     <v-col cols="12">
       <v-row justify="end" class="mb-2">
-        <v-btn color="white" class="mr-1" @click="$emit('back')">
+        <v-btn color="white" class="mr-1" @click="emit('back')">
           Cancelar
         </v-btn>
-        <v-btn color="accent" class="mr-1" :loading="saving" :disabled="!updateFormValid" @click="() => save()">
+        <v-btn
+          color="accent"
+          class="mr-1"
+          :loading="saving"
+          :disabled="!updateFormValid"
+          @click="() => save()"
+        >
           Salvar
         </v-btn>
-        <v-btn v-if="!data.isTrail" color="accent" :loading="saving" @click="openModal = true">
+        <v-btn
+          v-if="!data.attributes.isTrail"
+          color="accent"
+          :loading="saving"
+          @click="openModal = true"
+        >
           Criar Versão
         </v-btn>
       </v-row>
@@ -19,7 +30,10 @@
         <v-form v-model="updateFormValid">
           <v-row>
             <v-col cols="3">
-              <alex-inputs-image-preview v-if="loadedImage" v-model="updateForm.image" />
+              <alex-inputs-image-preview
+                v-if="loadedImage"
+                v-model="updateForm.image"
+              />
             </v-col>
             <v-col cols="9">
               <v-row dense>
@@ -27,9 +41,9 @@
                   <v-text-field
                     v-model="updateForm.title"
                     :rules="updateRules.title"
-                    label="Nome do Plano" 
+                    label="Nome do Plano"
                     dense
-                    outlined 
+                    outlined
                   />
                 </v-col>
                 <v-col cols="12" class="pa-0">
@@ -41,14 +55,14 @@
                     dense
                     no-resize
                     auto-grow
-                    outlined 
+                    outlined
                   />
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="3" class="pt-0 pl-0">
+            <!-- <v-col cols="3" class="pt-0 pl-0">
               <alex-inputs-users-autocomplete v-model="updateForm.coauthors" />
-            </v-col>
+            </v-col> -->
             <v-col cols="9" class="pt-0">
               <alex-inputs-tag-combobox v-model="updateForm.tags" />
             </v-col>
@@ -57,20 +71,35 @@
       </v-card>
     </v-col>
     <v-col cols="11 " class="white pa-12">
-      <app-editor ref="editor" :data="data.structure[0] || {}" />
+      <app-editor ref="editor" :data="data.attributes.structure?.data[0]" />
       <v-dialog v-model="openModal" width="60%">
         <v-card class="pa-3">
-
           <v-card-title>Criar Versão</v-card-title>
-          <v-form ref="createForm" v-model="formTagCreationValid" @submit.prevent="save(tag)">
+          <v-form
+            ref="createForm"
+            v-model="formTagCreationValid"
+            @submit.prevent="save(tag)"
+          >
             <v-row justify="start" class="pa-5" dense>
               <v-col cols="12">
-                <v-text-field v-model="tag" :rules="tagRules" label="Versão" outlined />
+                <v-text-field
+                  v-model="tag"
+                  :rules="tagRules"
+                  label="Versão"
+                  outlined
+                />
               </v-col>
               <v-col cols="12">
                 <v-row justify="center">
-                  <v-btn class="mr-3" @click="cancelTagCreation">Cancelar</v-btn>
-                  <v-btn color="primary" :disabled="!formTagCreationValid" :loading="saving" type="submit">
+                  <v-btn class="mr-3" @click="cancelTagCreation"
+                    >Cancelar</v-btn
+                  >
+                  <v-btn
+                    color="primary"
+                    :disabled="!formTagCreationValid"
+                    :loading="saving"
+                    type="submit"
+                  >
                     Criar
                   </v-btn>
                 </v-row>
@@ -83,132 +112,162 @@
   </v-row>
 </template>
 
-<script>
-import { formRules, createFileFromUrl } from "@/helpers/utils";
+<script setup lang="ts">
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+
+import { Tag } from 'models/tag.model';
+import { formRules, createFileFromUrl } from '@/helpers/utils';
+import { LearningPlan } from 'models/learningPlan.model';
 const { requiredRule, min5CharactersRule } = formRules;
 
-const isObjectID = require('is-object-id');
+const emit = defineEmits(['back', 'updated']);
 
-export default {
-  props: ['data'], // eslint-disable-line
+const messageStore = useMessageStore();
+const { update } = useStrapi();
+const props = defineProps({
+  data: {
+    type: Object as PropType<Strapi4ResponseData<LearningPlan>>,
+    required: true,
+  },
+});
 
-  data() {
-    return {
-      openModal: false,
-      saving: false,
-      visible: false,
-      confirmLeave: null,
-      formTagCreationValid: false,
-      modalType: '',
-      tag: '',
-      tagRules: [requiredRule, min5CharactersRule],
-      updateFormValid: false,
-      loadedImage: false,
-      updateRules: {
-        title: [requiredRule, min5CharactersRule],
-        image: [],
-        description: [],
-      },
-      updateForm: {
-        title: '',
-        image: null,
-        description: '',
-        coauthors: [],
-        tags: [],
-      },
+// const { data } = toRefs(props);
+const openModal = ref(false);
+const saving = ref(false);
+const visible = ref(false);
+// const confirmLeave = ref<Boolean | null>(null);
+const formTagCreationValid = ref(false);
+// const modalType = ref('');
+
+const editor = ref();
+const createForm = ref();
+const tag = ref('');
+const tagRules = ref([requiredRule, min5CharactersRule]);
+const updateFormValid = ref(false);
+const loadedImage = ref(false);
+const updateRules = ref({
+  title: [requiredRule, min5CharactersRule],
+  image: [],
+  description: [],
+});
+const updateForm: globalThis.Ref<{
+  title: string;
+  image: File | null;
+  description: string;
+  coauthors: number[];
+  tags: Strapi4ResponseData<Tag>[];
+}> = ref({
+  title: '',
+  image: null,
+  description: '',
+  coauthors: [],
+  tags: [],
+});
+
+watch(
+  () => props.data,
+  async () => await loadUpdateForm(),
+);
+onMounted(async () => await loadUpdateForm());
+
+const loadUpdateForm = async () => {
+  const { title, description, image, coauthors, tags } = props.data.attributes;
+  updateForm.value = {
+    title,
+    description,
+    image: null,
+    coauthors: [],
+    tags: [],
+  };
+
+  if (coauthors && coauthors.data.length) {
+    updateForm.value.coauthors = coauthors.data.map((c) => c.id);
+  }
+
+  if (tags && tags.data.length) {
+    updateForm.value.tags = tags.data;
+  }
+
+  if (image.data && !loadedImage.value) {
+    const imageFile = await createFileFromUrl(
+      useStrapiMedia(image.data.attributes.url),
+      image.data.attributes.name,
+      image.data.attributes.ext,
+    );
+    updateForm.value.image = imageFile;
+  }
+
+  loadedImage.value = true;
+};
+
+const save = async (tag = '') => {
+  if (!updateForm.value) return;
+  const route = useRoute();
+  const { planId, trailId } = route.params;
+  const { instance } = editor.value;
+
+  saving.value = true;
+
+  try {
+    const structure = await instance.save();
+
+    structure.blocks = structure.blocks.map((block, idx) => {
+      if (isNaN(parseInt(block.id))) {
+        delete block.id;
+      }
+
+      block.order = idx + 1;
+
+      return block;
+    });
+
+    const { title, description, image, coauthors, tags } = updateForm.value;
+
+    const tagsIds = tags.map((t) => t.id);
+
+    const data = {
+      title,
+      description,
+      structure,
+      tag,
+      coauthors,
+      tags: tagsIds,
     };
-  },
-  watch: {
-    async data() {
-      await this.loadUpdateForm();
-    },
-  },
-  async created() {
-    await this.loadUpdateForm();
-  },
-  methods: {
-    async loadUpdateForm() {
-      const { title, description, image, coauthors, tags } = this.data
-      this.updateForm = { title, description }
+    const formData = new FormData();
 
-      if (coauthors && coauthors.length) {
-        this.updateForm.coauthors = coauthors.map(c => c.id)
-      }
+    formData.append('data', JSON.stringify(data));
 
-      if (tags && tags.length) {
-        this.updateForm.tags = tags
-      }
-
-      if (image && !this.loadedImage) {
-        const imageFile = await createFileFromUrl(image.url, image.name, image.ext)
-        this.updateForm.image = imageFile
-      }
-
-      this.loadedImage = true;
-    },
-    async save(tag = '') {
-      if (!this.updateForm) return;
-
-      const { planId, trailId } = this.$route.params;
-      const { instance } = this.$refs.editor;
-
-      this.saving = true;
-
-      try {
-        const structure = await instance.save();
-
-        structure.blocks = structure.blocks.map((block, idx) => {
-          if (!isObjectID(block.id)) {
-            delete block.id;
-          }
-
-          block.order = idx + 1;
-
-          return block;
-        });
-
-        const { title, description, image, coauthors, tags } = this.updateForm;
-
-        const tagsIds = tags.map(t => t.id);
-
-        const data = { title, description, structure, tag, coauthors, tags: tagsIds }
-        const formData = new FormData();
-
-        formData.append('data', JSON.stringify(data));
-
-        if (image) {
-          formData.append('files.image', image, image.name);
-        }
-
-        await this.$strapi.update('learningplans', trailId || planId, formData);
-
-        this.$success('Dados salvos com sucesso!');
-        this.$emit('updated');
-      } catch (err) {
-        this.$error(err);
-      } finally {
-        this.openModal = false;
-        this.saving = false;
-        this.visible = false;
-      }
-    },
-    showModal() {
-      this.visible = true;
-    },
-    confirmLeaveAction() {
-      this.confirmLeave = true;
-      this.visible = false;
-    },
-    cancelLeaveAction() {
-      this.confirmLeave = false;
-      this.visible = false;
-    },
-    doNothing() { },
-    cancelTagCreation() {
-      this.openModal = false;
-      this.$refs.createForm.reset();
+    if (image) {
+      formData.append('files.image', image, image.name);
     }
-  },
 
+    await update('learningplans', trailId || planId, formData as any);
+
+    messageStore.message = 'Dados salvos com sucesso!';
+    emit('updated');
+  } catch (err) {
+    messageStore.message = err as string;
+  } finally {
+    openModal.value = false;
+    saving.value = false;
+    visible.value = false;
+  }
+};
+
+// const showModal = () => {
+//   visible.value = true;
+// };
+// const confirmLeaveAction = () => {
+//   confirmLeave.value = true;
+//   visible.value = false;
+// };
+// const cancelLeaveAction = () => {
+//   confirmLeave.value = false;
+//   visible.value = false;
+// };
+// const doNothing = () => {};
+const cancelTagCreation = () => {
+  openModal.value = false;
+  createForm.value.reset();
 };
 </script>
