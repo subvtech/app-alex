@@ -2,9 +2,7 @@
   <v-app>
     <v-main class="secondary">
       <!-- <AppSnackbar></AppSnackbar> -->
-      <v-container>
-        <slot />
-      </v-container>
+      <slot />
     </v-main>
   </v-app>
 </template>
