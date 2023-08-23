@@ -2,22 +2,21 @@
   <v-container fluid>
     <alex-learningplan-viewer
       v-if="!editing"
-      :structure="learningPlan.structure[0]"
-      :has-permission="hasPermission"
-      :author="learningPlan.author"
-      :co-authors="learningPlan.coauthors"
+      :structure="props.learningPlan.attributes.structure?.data[0]!"
+      :has-permission="props.hasPermission"
+      :author="props.learningPlan.attributes.author.data"
+      :co-authors="props.learningPlan.attributes.coauthors.data"
       @edit="editing = true"
-
     />
     <template v-else>
       <alex-learningplan-editor
-        :data="learningPlan"
+        :data="props.learningPlan"
         @back="onEditorBack"
-        @updated="$emit('updated')"
+        @updated="emit('updated')"
       />
       <v-dialog v-model="visible" width="500">
         <v-card>
-          <v-card-title class="primary white--text">
+          <v-card-title class="primary text-white">
             Sair do Editor?
           </v-card-title>
 
@@ -29,15 +28,8 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              @click="cancelLeaveAction"
-            >
-              Cancelar
-            </v-btn>
-            <v-btn
-              color="primary"
-              @click="confirmLeaveAction"
-            >
+            <v-btn @click="cancelLeaveAction"> Cancelar </v-btn>
+            <v-btn color="primary" @click="confirmLeaveAction">
               Confirmar saída
             </v-btn>
           </v-card-actions>
@@ -47,53 +39,56 @@
   </v-container>
 </template>
 
-<script>
+<script setup lang="ts">
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import { LearningPlan } from 'models/learningPlan.model';
 
-export default {
-  beforeRouteLeave (_to, _from, next) {
-    if (!this.editing) return;
+const emit = defineEmits(['updated']);
 
-    this.visible = true;
-    this.waitForLeaveConfirmation(next);
+const props = defineProps({
+  learningPlan: {
+    type: Object as PropType<Strapi4ResponseData<LearningPlan>>,
+    required: true,
   },
-  props: {
-    learningPlan: {
-      type: Object,
-      required: true,
-    },
-    hasPermission: {
-      type: Boolean,
-    }
+
+  hasPermission: {
+    type: Boolean,
   },
-  data() {
-    return {
-      editing: false,
-      visible: false,
-      confirmLeave: null,
-    }
-  },
-  methods: {
-    onEditorBack() {
-      this.visible = true;
-      this.waitForLeaveConfirmation(null, true);
-    },
-    confirmLeaveAction() {
-      this.confirmLeave = true;
-      this.editing = false;
-      this.visible = false;
-    },
-    cancelLeaveAction() {
-      this.confirmLeave = false;
-      this.visible = false;
-    },
-    waitForLeaveConfirmation(next, onlyReset = false) {
-      if (this.confirmLeave !== null) {
-        this.confirmLeave = null;
-        if (!onlyReset) return next(this.confirmLeave);
-      } else {
-        setTimeout(() => this.waitForLeaveConfirmation(next, onlyReset), 500);
-      }
-    }
+});
+
+const editing = ref(false);
+const visible = ref(false);
+const confirmLeave = ref<Boolean | null>();
+
+const onEditorBack = () => {
+  visible.value = true;
+  waitForLeaveConfirmation(null, true);
+};
+
+const confirmLeaveAction = () => {
+  confirmLeave.value = true;
+  editing.value = false;
+  visible.value = false;
+};
+
+const cancelLeaveAction = () => {
+  confirmLeave.value = false;
+  visible.value = false;
+};
+
+const waitForLeaveConfirmation = (next, onlyReset = false) => {
+  if (confirmLeave.value !== null) {
+    confirmLeave.value = null;
+    if (!onlyReset) return next(confirmLeave.value);
+  } else {
+    setTimeout(() => waitForLeaveConfirmation(next, onlyReset), 500);
   }
-}
+};
+
+onBeforeRouteLeave((_to, _from, next) => {
+  if (!editing.value) return;
+
+  visible.value = true;
+  waitForLeaveConfirmation(next);
+});
 </script>

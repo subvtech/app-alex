@@ -4,7 +4,12 @@
       <v-col cols="12">
         <v-row justify="space-between" align="center">
           <v-col v-if="learningPlans.length" cols="3">
-            <v-text-field :label="searchText" outlined background-color="white" dense />
+            <v-text-field
+              :label="searchText"
+              outlined
+              background-color="white"
+              dense
+            />
           </v-col>
           <v-btn color="accent" @click="openModal = true">
             {{ newButtonText }}
@@ -12,8 +17,15 @@
         </v-row>
       </v-col>
       <v-row>
-        <v-col v-for="(learningPlan, i) in learningPlans" :key="`plan-${i}`" cols="3">
-          <app-learning-plan-card :learning-plan="learningPlan" :view-plan-url="getPlanUrl(learningPlan)" />
+        <v-col
+          v-for="(learningPlan, i) in learningPlans"
+          :key="`plan-${i}`"
+          cols="3"
+        >
+          <app-learning-plan-card
+            :learning-plan="learningPlan"
+            :view-plan-url="getPlanUrl(learningPlan)"
+          />
         </v-col>
       </v-row>
     </v-row>
@@ -23,16 +35,34 @@
           <v-card-title>{{ createPanText }}</v-card-title>
           <v-row justify="start" class="pa-5" dense>
             <v-col cols="12">
-              <v-text-field v-model="creationForm.title" :rules="rules.title" label="Título*" outlined />
+              <v-text-field
+                v-model="creationForm.title"
+                :rules="rules.title"
+                label="Título*"
+                outlined
+              />
             </v-col>
             <v-col cols="12">
-              <v-file-input v-model="creationForm.image" :rules="rules.image" accept="image/png, image/jpeg"
-                label="Imagem Principal" prepend-inner-icon="mdi-camera" prepend-icon="" outlined chips />
+              <v-file-input
+                v-model="creationForm.image"
+                :rules="rules.image"
+                accept="image/png, image/jpeg"
+                label="Imagem Principal"
+                prepend-inner-icon="mdi-camera"
+                prepend-icon=""
+                outlined
+                chips
+              />
             </v-col>
             <v-col cols="12">
               <v-row justify="center">
                 <v-btn class="mr-3" @click="cancelCreation">Cancelar</v-btn>
-                <v-btn color="primary" :disabled="!formValid" :loading="saving" type="submit">
+                <v-btn
+                  color="primary"
+                  :disabled="!formValid"
+                  :loading="saving"
+                  type="submit"
+                >
                   Criar
                 </v-btn>
               </v-row>
@@ -43,105 +73,112 @@
     </v-dialog>
   </v-container>
 </template>
-<script>
-import { formRules } from "@/helpers/utils";
+<script setup lang="ts">
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import { LearningPlan } from '~/models/learningPlan.model';
+import { formRules } from '@/helpers/utils';
+
+const messageStore = useMessageStore();
 const { requiredRule, min5CharactersRule } = formRules;
 
-export default {
-  props: {
-    learningPlans: {
-      type: Array,
-      required: true,
-    },
-    parentLearningPlan: {
-      type: Object,
-      default: () => null,
-    }
+const strapi = useStrapiClient();
+const router = useRouter();
+
+const props = defineProps({
+  learningPlans: {
+    type: Array as PropType<Strapi4ResponseData<LearningPlan>[]>,
+    required: true,
   },
-  data() {
-    return {
-      openModal: false,
-      formValid: false,
-      rules: {
-        title: [requiredRule, min5CharactersRule],
-        image: [],
-      },
-      creationForm: {
-        title: '',
-        image: null
-      },
-      saving: false,
-    };
+  parentLearningPlan: {
+    type: Object as PropType<Strapi4ResponseData<LearningPlan>>,
+    default: () => null,
   },
-  computed: {
+});
 
-    searchText() {
-      return this.parentLearningPlan
-        ? 'Buscar trilha de aprendizagem'
-        : 'Buscar plano de aprendizagem'
-    },
-    newButtonText() {
-      return this.parentLearningPlan
-        ? 'NOVA TRILHA'
-        : 'NOVO PLANO'
-    },
-    createPanText() {
-      return this.parentLearningPlan
-        ? 'Criar Trilha de Aprenziagem'
-        : 'Criar Plano de Aprendizagem'
-    }
-  },
-  methods: {
-    getPlanUrl(learningPlan) {
-      return this.parentLearningPlan
-        ? `/learning-plans/${this.parentLearningPlan.id}/trails/${learningPlan.id}`
-        : `/learning-plans/${learningPlan.id}`
-    },
-    cancelCreation() {
-      this.openModal = false;
-      this.$refs.createForm.reset();
-    },
-    async submit() {
-      if (!this.formValid) return;
-      this.saving = true;
+const openModal = ref(false);
+const formValid = ref(false);
+const rules = ref({
+  title: [requiredRule, min5CharactersRule],
+  image: [],
+});
 
-      const { image, title } = this.creationForm;
-      const parts = ['', 'learningplans'];
-      const formData = new FormData();
+const creationForm = ref<{
+  title: string;
+  image: null | any;
+}>({
+  title: '',
+  image: null,
+});
+const saving = ref(false);
 
-      const { $http, user } = this.$strapi;
-      const isTrail = !!this.parentLearningPlan;
-      const parentPlanId = (this.parentLearningPlan || {}).id;
-      const data = { title, author: user.id };
+const createForm = ref();
 
-      if (isTrail) {
-        data.learningplan = this.parentLearningPlan.id;
-      }
+const searchText = computed(() => {
+  return props.parentLearningPlan
+    ? 'Buscar trilha de aprendizagem'
+    : 'Buscar plano de aprendizagem';
+});
 
-      formData.append('data', JSON.stringify(data));
+const newButtonText = computed(() => {
+  return props.parentLearningPlan ? 'NOVA TRILHA' : 'NOVO PLANO';
+});
 
-      if (image) {
-        formData.append('files.image', image, image.name);
-      }
+const createPanText = computed(() => {
+  return props.parentLearningPlan
+    ? 'Criar Trilha de Aprenziagem'
+    : 'Criar Plano de Aprendizagem';
+});
 
-      try {
-        const url = parts.join('/');
-        const method = '$post';
-        const res = await $http[method](url, formData);
+const getPlanUrl = (learningPlan) => {
+  return props.parentLearningPlan
+    ? `/learning-plans/${props.parentLearningPlan.id}/trails/${learningPlan.id}`
+    : `/learning-plans/${learningPlan.id}`;
+};
+const cancelCreation = () => {
+  openModal.value = false;
+  createForm.value.reset();
+};
 
-        this.$router.push(
-          isTrail
-            ? `/learning-plans/${parentPlanId}/trails/${res.id}`
-            : `/learning-plans/${res.id}`
-        );
+const submit = async () => {
+  if (!formValid.value) return;
+  saving.value = true;
 
-      } catch (err) {
-        this.saving = false;
-        this.$error(err);
-      } finally {
-        this.saving = false;
-      }
-    },
+  const { image, title } = creationForm.value;
+
+  const formData = new FormData();
+  const user = useStrapiUser();
+  const isTrail = !!props.parentLearningPlan;
+  const parentPlanId = (props.parentLearningPlan || {}).id;
+  const data: any = { title, author: user.value?.id, learningplan: undefined };
+
+  if (isTrail) {
+    data.learningplan = props.parentLearningPlan.id;
   }
-}
+
+  formData.append('data', JSON.stringify(data));
+
+  if (image) {
+    formData.append('files.image', image[0], image[0].name);
+  }
+
+  try {
+    const res = await strapi<LearningPlan>('learningplans', {
+      method: 'POST',
+      body: formData,
+    });
+
+    console.log(res);
+
+    router.push(
+      isTrail
+        ? `/learning-plans/${parentPlanId}/trails/${res.id}`
+        : `/learning-plans/${res.id}`,
+    );
+  } catch (err) {
+    saving.value = false;
+    messageStore.message = err as string;
+  } finally {
+    saving.value = false;
+  }
+};
 </script>
