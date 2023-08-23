@@ -21,14 +21,14 @@
           />
         </div>
         <v-card-title class="text-white my-2">
-          Bem vindo a plataforma ALEX!
+          {{ $t('login.welcome') }}
         </v-card-title>
         <v-card-subtitle class="text-white my-2">
-          Acesse sua conta e continue com seus estudos
+          {{ $t('login.access') }}
         </v-card-subtitle>
         <v-form ref="form" @submit.prevent="submit">
           <alex-inputs-stepper-field
-            label="Email"
+            :label="$t('login.email')"
             name="email"
             color="white"
             class="my-3 text-secondary"
@@ -36,7 +36,7 @@
           />
 
           <alex-inputs-stepper-field
-            label="Senha"
+            :label="$t('login.password')"
             :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordVisible ? 'text' : 'password'"
             name="password"
@@ -50,10 +50,10 @@
             v-model="checkbox"
             class="text-white"
             color="accent"
-            label="Lembrar dados"
+            :label="$t('login.remember')"
           ></v-checkbox>
           <nuxt-link to="/forgot" class="text-white my-4">
-            Esqueceu sua senha?
+            {{ $t('login.forgot') }}
           </nuxt-link>
           <v-btn
             block
@@ -62,13 +62,13 @@
             type="submit"
             :loading="logging"
           >
-            Entrar
+            {{ $t('login.handleSubmit') }}
           </v-btn>
         </v-form>
         <v-card-text class="text-white text-center mt-6 mb-10">
-          Ainda não possui conta?
+          {{ $t('login.noAccount') }}
           <nuxt-link to="/register" class="text-white">
-            Crie sua conta
+            {{ $t('login.register') }}
           </nuxt-link>
         </v-card-text>
         <div class="d-flex align-center text-white my-12">
@@ -77,7 +77,7 @@
             :thickness="1"
             class="border-opacity-100"
           ></v-divider>
-          <p class="mx-4">ou</p>
+          <p class="mx-4">{{ $t('login.divider') }}</p>
           <v-divider
             color="secondary"
             :thickness="1"
@@ -91,7 +91,7 @@
           :loading="logging2"
         >
           <img src="../../static/images/metamask.png" alt="" />
-          <span>Acesse com a metamask</span>
+          <span>{{ $t('login.metamask') }}</span>
         </v-btn>
       </v-card>
     </v-col>
@@ -100,8 +100,9 @@
 
 <script setup lang="ts">
 import { ethers } from 'ethers';
+import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
-
+const i18n = useI18n();
 definePageMeta({
   layout: 'auth',
 });
@@ -142,7 +143,9 @@ const submit = handleSubmit(async () => {
   } catch (error) {
     console.log(error);
     logging.value = false;
-    messageStore.message = 'Email ou Senha inválido(s)';
+    messageStore.message = i18n.t('login.loginError');
+    messageStore.color = 'red';
+    messageStore.show = true;
   }
 });
 

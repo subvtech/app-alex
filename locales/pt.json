@@ -1,0 +1,128 @@
+{
+  "login": {
+    "welcome": "Bem-vindo a plataforma Alex!",
+    "access": "Acesse sua conta e continue com seus estudos",
+    "forgot": "Esqueceu a senha?",
+    "submit": "Entrar",
+    "email": "E-mail",
+    "noAccount": "Ainda não possui conta?",
+    "register": "Crie sua conta",
+    "remember": "Lembrar dados",
+    "password": "Senha",
+    "divider": "ou",
+    "metamask": "Acessar com a Metamask",
+    "loginError": "Email ou Senha inválido(s)"
+  },
+  "register": {
+    "title": "Inicie uma nova experiência!",
+    "subtitle1": "Crie uma conta e comece seus estudos",
+    "type": "Informe o tipo da sua conta",
+    "typeProfessor": "Professor",
+    "typeStudent": "Aluno",
+    "institution": "Instituição de Ensino",
+    "subtitle2": "Insira seus dados de acesso",
+    "username": "Nome de Usuário",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "divider": "ou",
+    "hasAccount": "Se já possui conta",
+    "login": "Acesse aqui",
+    "searchError": "Ocorreu um erro na busca.",
+    "blockedError": "Usuário bloqueado!"
+  },
+  "forgot": {
+    "recoverWithEmail": "Recupere sua senha com email",
+    "recoverSent": "Recuperação enviada!",
+    "recoverInfo": "Enviamos instruições para o e-mail { email }. Acesse e siga o que foi informado.",
+    "goBack": "Voltar para o login",
+    "forgotPassword": "Esqueceu sua senha?",
+    "email": "Digite seu e-mail e enviaremos instruções",
+    "recoverPassword": "Recuperar senha",
+    "login": "Lembrou da senha?"
+  },
+  "planId": {
+    "geral": "Geral",
+    "trails": "Trilhas de aprendizagem",
+    "assignments": "Tarefas",
+    "options": "Opções do Plano"
+  },
+  "errorLayout": {
+    "homePage": "Home",
+    "notFound": "404 Não Encontrado",
+    "other": "Um erro ocorreu"
+  },
+  "defaultLayout": {
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "logout": "Sair",
+    "dashboardsTitle": "DASHBOARDS",
+    "dashboard": "Dashboard",
+    "learningPlansTitle": "PLANOS DE APRENDIZAGEM",
+    "learningPlans": "Todos os planos",
+    "learningPlansUser": "Meus planos",
+    "classesTitle": "TURMAS",
+    "classes": "Minhas turmas",
+    "classesLinks": "Links ativos",
+    "isLoading": "Carregando..."
+  },
+
+  "articleViewer": {
+    "processingError": "Ocorreu um erro no processamento da página."
+  },
+  "appLearningPlanCard": {
+    "existingTrails": "{ data } trilhas existentes",
+    "show": "Visualizar",
+    "noImage": "Sem Imagem"
+  },
+  "viewer": {
+    "addContent": "Clique aqui para adicionar o conteúdo",
+    "noContent": "Sem conteúdo",
+    "backToTop": "Voltar para o Topo"
+  },
+  "page": {
+    "close": "Sair do Editor?",
+    "warning": "Você pode possuir alterações que não foram salvas. Deseja sair?",
+    "confirm": "Confirmar saída"
+  },
+  "list": {
+    "title": "Título*",
+    "image": "Imagem Principal",
+    "submit": "Criar",
+    "searchTrail": "Buscar trilhar de aprendizagem",
+    "searchPlan": "Buscar plano de aprendizagem",
+    "newTrail": "NOVA TRILHA",
+    "newPlan": "NOVO PLANO",
+    "createTrail": "Criar Trilha de Aprendizagem",
+    "createPlan": "Criar Plano de Aprendizagem"
+  },
+  "editor": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "version": "Versão",
+    "submit": "Criar",
+    "createVersion": "Criar Versão",
+    "formTitle": "Informações do plano",
+    "planTitle": "Nome do Plano",
+    "planDescription": "Descrição do Plano"
+  },
+  "authors": {
+    "updateAt": "Atualizado em { date }",
+    "coauthor": " e mais { coAuthorsLength } pessoa",
+    "coauthors": " e mais { coAuthorsLength } pessoas"
+  },
+  "link": {
+    "download": "Download"
+  },
+  "usersAutocomplete": {
+    "label": "Adicionar Colaboradores"
+  },
+  "tagCombobox": {
+    "label": "Adicionar Tags",
+    "verified": "Tag Verificada Alex",
+    "noTag": "Nenhuma tag encontrada para '{ search }'. Aperte { enter } para criar uma tag nova"
+  },
+  "imagePreview": {
+    "rules": "Somente imagens do tipo JPG, JPEG ou PNG são permitidos.",
+    "cover": "Alterar capa"
+  }
+}

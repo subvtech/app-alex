@@ -1,0 +1,128 @@
+{
+  "login": {
+    "welcome": "Welcome to Alex!",
+    "access": "Access your account and keep going with your studies",
+    "forgot": "Forgot password?",
+    "submit": "Enter",
+    "email": "Email",
+    "noAccount": "Don't have an account yet?",
+    "register": "Create your account",
+    "remember": "Remember me",
+    "password": "Password",
+    "divider": "or",
+    "metamask": "Login with Metamask",
+    "loginError": "Invalid email or invalid password, maybe both"
+  },
+  "register": {
+    "title": "Start a new experience!",
+    "subtitle1": "Create an account and start your studies",
+    "type": "Inform the type of your account",
+    "typeProfessor": "Professor",
+    "typeStudent": "Student",
+    "institution": "Teaching Institution",
+    "subtitle2": "Insert your access data",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "divider": "or",
+    "hasAccount": "If you already have an account",
+    "login": "Access here",
+    "searchError": "There was an error with your search.",
+    "blockedError": "Blocked User!"
+  },
+  "forgot": {
+    "recoverWithEmail": "Recover your password using your email",
+    "recoverSent": "Recover email sent!",
+    "recoverInfo": "We sent instructions to the email { email }. Find it and follow its instructions.",
+    "goBack": "Go back to login",
+    "forgotPassword": "Forgot password?",
+    "email": "Type your email and we'll send you instructions",
+    "recoverPassword": "Recover password",
+    "login": "Recalled your password?"
+  },
+  "planId": {
+    "geral": "General",
+    "trails": "Learning Trails",
+    "assignments": "Assignments",
+    "options": "Plan Options"
+  },
+  "errorLayout": {
+    "homePage": "Home",
+    "notFound": "404 Not Found",
+    "other": "An error has occurred"
+  },
+  "defaultLayout": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "dashboardsTitle": "DASHBOARDS",
+    "dashboard": "Dashboard",
+    "learningPlansTitle": "LEARNING PLANS",
+    "learningPlans": "All plans",
+    "learningPlansUser": "My plans",
+    "classesTitle": "CLASSES",
+    "classes": "My classes",
+    "classesLinks": "Active Links",
+    "isLoading": "Loading..."
+  },
+
+  "articleViewer": {
+    "processingError": "A error occurred while processing the page."
+  },
+  "appLearningPlanCard": {
+    "existingTrails": "{ data } existing trails",
+    "show": "Visualise",
+    "noImage": "No Image"
+  },
+  "viewer": {
+    "addContent": "Click here to add content",
+    "noContent": "No content",
+    "backToTop": "Go back to Top"
+  },
+  "page": {
+    "close": "Close the Editor?",
+    "warning": "You may have some changes that were not saved. Do you still want to leave?",
+    "confirm": "Confirm exit"
+  },
+  "list": {
+    "title": "Title*",
+    "image": "Main Image",
+    "submit": "Create",
+    "searchTrail": "Seach Learning trails trilhar de aprendizagem",
+    "searchPlan": "Search learning plan",
+    "newTrail": "NEW TRAIL",
+    "newPlan": "NEW PLAN",
+    "createTrail": "Create Learning Trail",
+    "createPlan": "Create Learning Plan"
+  },
+  "editor": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "version": "Version",
+    "submit": "Create",
+    "createVersion": "Create Version",
+    "formTitle": "Plan Information",
+    "planTitle": "Plan Name",
+    "planDescription": "Plan Description"
+  },
+  "authors": {
+    "updateAt": "Updated at { date }",
+    "coauthor": " and more { coAuthorsLength } person",
+    "coauthors": " and more { coAuthorsLength } people"
+  },
+  "link": {
+    "download": "Download"
+  },
+  "usersAutocomplete": {
+    "label": "Add Collaborators"
+  },
+  "tagCombobox": {
+    "label": "Add Tags",
+    "verified": "Alex Verified Tag",
+    "noTag": "No tag found to '{ search }'. Press { enter } to create a new tag"
+  },
+  "imagePreview": {
+    "rules": "Only the image formats JPG, JPEG and PNG are allowed.",
+    "cover": "Change cover"
+  }
+}
