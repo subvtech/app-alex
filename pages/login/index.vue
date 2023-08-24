@@ -4,7 +4,7 @@
       <v-card class="card card-imagem">
         <div align="center">
           <img
-            alt="Bem vindo ao Alex"
+            :alt="$t('login.alt')"
             src="../../static/images/imagem_login.png"
             class="card-imagem-imagem my-5"
           />

@@ -1,5 +1,6 @@
 {
   "login": {
+    "alt": "Welcome to Alex",
     "welcome": "Welcome to Alex!",
     "access": "Access your account and keep going with your studies",
     "forgot": "Forgot password?",
@@ -13,19 +14,27 @@
     "metamask": "Login with Metamask",
     "loginError": "Invalid email or invalid password, maybe both"
   },
+  "reset": {
+    "passwordChanged": "The password was updated!",
+    "info": "Your new password was successfuly set, please go back to the login page and try it out."
+  },
   "register": {
+    "alt": "Create your account",
     "title": "Start a new experience!",
     "subtitle1": "Create an account and start your studies",
     "type": "Inform the type of your account",
+    "userType": "User Type",
     "typeProfessor": "Professor",
     "typeStudent": "Student",
     "institution": "Teaching Institution",
     "subtitle2": "Insert your access data",
     "username": "Username",
+    "email": "Email",
+    "fullName": "Fullname",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "divider": "or",
-    "hasAccount": "If you already have an account",
+    "hasAccount": "If you already have an account,",
     "login": "Access here",
     "searchError": "There was an error with your search.",
     "blockedError": "Blocked User!"
@@ -33,15 +42,19 @@
   "forgot": {
     "recoverWithEmail": "Recover your password using your email",
     "recoverSent": "Recover email sent!",
-    "recoverInfo": "We sent instructions to the email { email }. Find it and follow its instructions.",
+    "recoverInfo": "We sent the instructions to",
+    "recoverInfo2": "Access you email and follow the provided instructions.",
     "goBack": "Go back to login",
     "forgotPassword": "Forgot password?",
     "email": "Type your email and we'll send you instructions",
     "recoverPassword": "Recover password",
     "login": "Recalled your password?"
   },
+  "trailId": {
+    "fail": "fail { learningPlan }"
+  },
   "planId": {
-    "geral": "General",
+    "general": "General",
     "trails": "Learning Trails",
     "assignments": "Assignments",
     "options": "Plan Options"
@@ -65,7 +78,45 @@
     "classesLinks": "Active Links",
     "isLoading": "Loading..."
   },
+  "useFormRules": {
+    "fullName": {
+      "required": "Full name is required",
+      "min": "At least 6 characters long",
+      "max": "At most 64 characters long"
+    },
+    "email": {
+      "required": "Email is required",
+      "invalid": "Invalid email"
+    },
+    "cpf": {
+      "required": "CPF is required",
+      "length": "Must be 11 characters long",
+      "invalid": "Invalid CPF"
+    },
 
+    "yourRole": {
+      "required": "User type is required"
+    },
+    "institution": {
+      "required": "Institution type is required"
+    },
+    "username": {
+      "required": "Username is required",
+      "min": "At least 6 characters long",
+      "max": "At most 64 characters long"
+    },
+    "password": {
+      "required": "Password is required",
+      "upperCase": "It must have at least 2 upper case letters",
+      "lowerCase": "It must have at least 1 lower case letter",
+      "number": "It must have at least 1 number",
+      "min": "At least 8 characters long"
+    },
+    "confirmPassword": {
+      "required": "Confirm Password is required",
+      "matchError": "The passwords do no match"
+    }
+  },
   "articleViewer": {
     "processingError": "A error occurred while processing the page."
   },
@@ -74,6 +125,22 @@
     "show": "Visualise",
     "noImage": "No Image"
   },
+  "sendResetPassword": {
+    "forgotPassword": "Forgot password?",
+    "enterEmail": "Type in your email and you'll send you the required instructions",
+    "email": "Email",
+    "emailError": "An error occorred while sending the recovery email, try again later",
+    "recoverPassword": "RECOVER PASSWORD",
+    "recalledPassword": "Recalled your password?",
+    "login": "Acess here",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "newPassword": "Register your new Password",
+    "enterPassword": "Enter the new Password in both fields",
+    "changePassword": "UPDATE PASSWORD",
+    "divider": "or"
+  },
+  
   "viewer": {
     "addContent": "Click here to add content",
     "noContent": "No content",

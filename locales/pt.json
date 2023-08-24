@@ -1,5 +1,6 @@
 {
   "login": {
+    "alt": "Bem-vindo ao Alex",
     "welcome": "Bem-vindo a plataforma Alex!",
     "access": "Acesse sua conta e continue com seus estudos",
     "forgot": "Esqueceu a senha?",
@@ -13,19 +14,27 @@
     "metamask": "Acessar com a Metamask",
     "loginError": "Email ou Senha inválido(s)"
   },
+  "reset": {
+    "passwordChanged": "Senha Alterada!",
+    "info": "Sua nova senha foi definida com sucesso, volte para a tela de login e acesse o sistema."
+  },
   "register": {
+    "alt": "Crie sua conta",
     "title": "Inicie uma nova experiência!",
     "subtitle1": "Crie uma conta e comece seus estudos",
     "type": "Informe o tipo da sua conta",
+    "userType": "Tipo de Usuário",
     "typeProfessor": "Professor",
     "typeStudent": "Aluno",
     "institution": "Instituição de Ensino",
     "subtitle2": "Insira seus dados de acesso",
     "username": "Nome de Usuário",
+    "fullName": "Nome completo",
+    "email": "E-mail",
     "password": "Senha",
     "confirmPassword": "Confirmar Senha",
     "divider": "ou",
-    "hasAccount": "Se já possui conta",
+    "hasAccount": "Se já possui conta,",
     "login": "Acesse aqui",
     "searchError": "Ocorreu um erro na busca.",
     "blockedError": "Usuário bloqueado!"
@@ -33,15 +42,19 @@
   "forgot": {
     "recoverWithEmail": "Recupere sua senha com email",
     "recoverSent": "Recuperação enviada!",
-    "recoverInfo": "Enviamos instruições para o e-mail { email }. Acesse e siga o que foi informado.",
+    "recoverInfo": "Enviamos instruções para",
+    "recoverInfo2": "Acesse seu e-mail e siga as instruções fornecidas.",
     "goBack": "Voltar para o login",
     "forgotPassword": "Esqueceu sua senha?",
     "email": "Digite seu e-mail e enviaremos instruções",
     "recoverPassword": "Recuperar senha",
     "login": "Lembrou da senha?"
   },
+  "trailId": {
+    "fail": "Falhou { learningPlan }"
+  },
   "planId": {
-    "geral": "Geral",
+    "general": "Geral",
     "trails": "Trilhas de aprendizagem",
     "assignments": "Tarefas",
     "options": "Opções do Plano"
@@ -65,7 +78,45 @@
     "classesLinks": "Links ativos",
     "isLoading": "Carregando..."
   },
+  "useFormRules": {
+    "fullName": {
+      "required": "Nome completo é necesário",
+      "min": "Mínimo de 6 caracteres",
+      "max": "Máximo de 64 caracteres"
+    },
+    "email": {
+      "required": "E-mail é necessário",
+      "invalid": "E-mail inválido."
+    },
+    "cpf": {
+      "required": "CPF é necessário",
+      "length": "CPF contém 11 caracteres",
+      "invalid": "CPF inválido."
+    },
 
+    "yourRole": {
+      "required": "Tipo de Usuário é necessário"
+    },
+    "institution": {
+      "required": "Tipo de instituição é necessário."
+    },
+    "username": {
+      "required": "Nome de usuário é necessário",
+      "min": "Mínimo de 6 caracteres",
+      "max": "Máximo de 64 caracteres"
+    },
+    "password": {
+      "required": "Senha é necessária",
+      "upperCase": "Pelo menos 2 letras maiúsculas necessárias",
+      "lowerCase": "Pelo menos 1 letra minúscula",
+      "number": "Pelo menos 1 número necessário",
+      "min": "Mínimo de 8 caracteres"
+    },
+    "confirmPassword": {
+      "required": "Confirma Senha é necessário",
+      "matchError": "As senhas não são idênticas"
+    }
+  },
   "articleViewer": {
     "processingError": "Ocorreu um erro no processamento da página."
   },
@@ -74,6 +125,22 @@
     "show": "Visualizar",
     "noImage": "Sem Imagem"
   },
+  "sendResetPassword": {
+    "forgotPassword": "Esqueceu a senha?",
+    "enterEmail": "Digite seu e-mail e enviaremos instruções",
+    "email": "E-mail",
+    "emailError": "Ocorreu um erro ao enviar o e-mail, tente novamente mais tarde",
+    "recoverPassword": "RECUPERAR SENHA",
+    "recalledPassword": "Lembrou da senha?",
+    "login": "acesse aqui!",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "newPassword": "Cadastre sua nova senha",
+    "enterPassword": "Digite sua nova senha e a confirmação",
+    "changePassword": "ALTERAR SENHA",
+    "divider": "ou"
+  },
+
   "viewer": {
     "addContent": "Clique aqui para adicionar o conteúdo",
     "noContent": "Sem conteúdo",

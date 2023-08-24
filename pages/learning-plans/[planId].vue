@@ -7,14 +7,16 @@
       <h1>{{ planTitle }}</h1>
     </v-row>
     <v-tabs v-if="!isTrailRoute" class="mb-5">
-      <v-tab nuxt :to="generalInfoLink" replace> Geral </v-tab>
+      <v-tab nuxt :to="generalInfoLink" replace>
+        {{ $t('planId.general') }}
+      </v-tab>
       <v-tab
         v-if="!isTrailRoute"
         nuxt
         :to="`/learning-plans/${route.params.planId}/trails`"
         replace
       >
-        Trilhas de aprendizagem
+        {{ $t('planId.trails') }}
       </v-tab>
       <v-tab
         v-if="!isTrailRoute"
@@ -22,7 +24,7 @@
         :to="`/learning-plans/${route.params.planId}/tasks`"
         replace
       >
-        Tarefas
+        {{ $t('planId.assignments') }}
       </v-tab>
       <v-tab
         v-if="!isTrailRoute"
@@ -30,7 +32,7 @@
         :to="`/learning-plans/${route.params.planId}/settings`"
         replace
       >
-        Opções do Plano
+        {{ $t('planId.options') }}
       </v-tab>
     </v-tabs>
     <NuxtPage @loaded="onLoadedChild" />

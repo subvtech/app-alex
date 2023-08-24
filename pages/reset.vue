@@ -21,8 +21,8 @@
         />
         <ForgotPasswordConfirmationMessage
           v-else
-          title="Senha alterada!"
-          text="Sua nova senha foi definida com sucesso, volte para a tela de login e acesse o sistema."
+          :title="$t('reset.passwordChanged')"
+          :text="$t('reset.info')"
         />
       </v-col>
     </v-row>

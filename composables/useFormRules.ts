@@ -1,5 +1,7 @@
 import * as yup from 'yup';
+import { useI18n } from 'vue-i18n';
 
+const i18n = useI18n();
 type FormDataType = {
   fullname: string;
   username: string;
@@ -37,13 +39,36 @@ export function isValidCpf(val) {
 }
 
 export const useFormRules = (formData?: FormDataType) => {
+  const emailRules = {
+    email: yup.string().required('Email é necessário').email('Email inválido'),
+  };
+
+  const passwordRules = {
+    password: yup
+      .string()
+      .required('Senha é necessário')
+      .matches(
+        /^(?=.*[A-Z]).{2,}$/gm,
+        'Pelo menos 2 letras maiúsculas necessárias',
+      )
+      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+      .matches(
+        /^(?=.*[a-z]).{1,}$/gm,
+        'Pelo menos 1 letra minúscula necessário',
+      )
+      .min(8, 'Mínimo de 8 caracteres'),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref('password')], 'As senhas não são idênticas')
+      .required('Confirmar Senha é necessário'),
+  };
   const schema1 = yup.object({
     fullname: yup
       .string()
       .required('Nome completo é necessário')
       .min(6, 'Mínimo de 6 caracteres')
       .max(64, 'Máximo de 64 caracteres'),
-    email: yup.string().required('Email é necessário').email('Email inválido'),
+    ...emailRules,
     cpf: yup
       .string()
       .required('CPF é necessário')
@@ -65,49 +90,24 @@ export const useFormRules = (formData?: FormDataType) => {
       }),
   });
   const schema3 = yup.object({
+    ...passwordRules,
     username: yup
       .string()
       .required('Nome de usuário é necessário')
       .min(6, 'Mínimo de 6 caracteres')
       .max(64, 'Máximo de 64 caracteres'),
-    password: yup
-      .string()
-      .required('Senha é necessário')
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        'Pelo menos 2 letras maiúsculas necessárias',
-      )
-      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        'Pelo menos 1 letra minúscula necessário',
-      )
-      .min(8, 'Mínimo de 8 caracteres'),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref('password')], 'As senhas não são idênticas')
-      .required('Confirmar Senha é necessário'),
   });
+
   const loginSchema = {
-    email: yup.string().required('Email é necessário').email('Email inválido'),
-    password: yup
-      .string()
-      .required('Senha é necessário')
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        'Pelo menos 2 letras maiúsculas necessárias',
-      )
-      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        'Pelo menos 1 letra minúscula necessário',
-      )
-      .min(8, 'Mínimo de 8 caracteres'),
+    ...emailRules,
+    password: passwordRules.password
   };
   return {
     schema1,
     schema2,
     schema3,
-    loginSchema
+    schema4: yup.object(passwordRules),
+    emailRules: yup.object(emailRules),
+    loginSchema,
   };
 };

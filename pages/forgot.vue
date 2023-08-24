@@ -21,10 +21,10 @@
         />
         <ForgotPasswordConfirmationMessage
           v-else
-          title="Recuperação enviada!"
-          text="Enviamos instruções para"
+          :title="$t('forgot.recoverSent')"
+          :text="$t('forgot.recoverInfo')"
           :email="userEmail"
-          text2=" Acesse o e-mail e siga as instruções fornecidas."
+          :text2="$t('forgot.recoverInfo2')"
         />
       </v-col>
     </v-row>

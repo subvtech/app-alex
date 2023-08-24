@@ -2,79 +2,81 @@
   <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
     <div class="mb-10">
       <p class="text-white text-h4 text-center font-weight-bold mb-4">
-        Esqueceu a senha?
+        {{ $t('sendResetPassword.forgotPassword') }}
       </p>
       <p class="text-white text-h6 font-weight-regular text-center my-2">
-        Digite seu e-mail e enviaremos instruções
+        D{{ $t('sendResetPassword.enterEmail') }}
       </p>
     </div>
     <v-form
       ref="form"
-      v-model="validForm"
       color="white"
       class="mb-10"
-      :update:modelValue="!validForm ? (errorMessage = false) : null"
-      @submit.prevent="sendEmail"
+      @submit.prevent="submit"
     >
-      <v-text-field
-        v-model="email"
-        label="Email"
-        class="mb-6"
-        variant="outlined"
-        density="comfortable"
-        :rules="emailRules"
-      >
-        <template #details>
-          <span v-if="errorMessage" class="text-error w-100"
-            >Ocorreu um erro ao enviar o e-mail, tente novamente mais
-            tarde.</span
-          >
-        </template>
-      </v-text-field>
+      <alex-inputs-stepper-field
+        :label="$t('sendResetPassword.email')"
+        name="email"
+        color="white"
+        class="my-3 text-secondary"
+        theme="dark"
+      />
+      <span v-if="errors" class="text-error w-100">{{
+        $t('sendResetPassword.emailError')
+      }}</span>
+
       <v-btn
-        :color="!validForm ? 'grey-darken-1' : 'accent'"
+        :color="!isValid ? 'grey-darken-1' : 'accent'"
         class="text-none text-white rounded-lg pa-5"
         block
         type="submit"
         size="large"
-        :disabled="!validForm"
+        :disabled="!isValid"
         :loading="loading"
-        >RECUPERAR SENHA</v-btn
+        >{{ $t('sendResetPassword.recoverPassword') }}</v-btn
       >
     </v-form>
     <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
-      Lembrou da senha?
+      >{{ $t('sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-decoration-none text-accent"
-        >acesse aqui!</NuxtLink
+        >>{{ $t('sendResetPassword.login') }}</NuxtLink
       >
     </p>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useForm } from 'vee-validate';
+
 const { emailRules } = useFormRules();
-const validForm = ref(false);
-const email = ref('');
 const form = ref(null);
 const loading = ref(false);
-const errorMessage = ref(false);
 const messageStore = useMessageStore();
 const { forgotPassword } = useStrapiAuth();
 const emit = defineEmits(['confirmation-message']);
 
-const sendEmail = async () => {
+const { handleSubmit, errors, values, controlledValues } = useForm({
+  validationSchema: emailRules,
+  keepValuesOnUnmount: true,
+});
+
+const isValid = computed(
+  () =>
+    !Object.values(controlledValues.value).includes(undefined) &&
+    !Object.values(errors.value).length,
+);
+const submit = handleSubmit(async () => {
   loading.value = true;
-  errorMessage.value = false;
   try {
-    await forgotPassword({ email: email.value });
-    emit('confirmation-message', email.value);
-    loading.value = false;
+    await forgotPassword({ email: values.email });
+    emit('confirmation-message', values.email);
   } catch (error) {
     messageStore.message = error as string;
-    errorMessage.value = true;
+    messageStore.color = 'red';
+    messageStore.show = true;
+  } finally {
     loading.value = false;
   }
-};
+});
 </script>

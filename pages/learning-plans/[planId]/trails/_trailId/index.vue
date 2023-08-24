@@ -5,7 +5,7 @@
     :has-permission="hasAccess"
   />
   <div v-else>
-    <span>fail {{ learningPlan }}</span>
+    <span>{{ $t('fail', { learningPlan: learningPlan }) }}</span>
   </div>
 </template>
 
@@ -14,6 +14,6 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const hasAccess = useAccess('learningplan', 'update');
+const hasAccess = useAccess();
 const { learningPlan } = useGetData();
 </script>

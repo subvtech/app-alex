@@ -4,7 +4,7 @@
       <v-card class="card card-imagem">
         <div align="center">
           <img
-            alt="Crie sua conta"
+            :alt="$t('register.alt')"
             src="../static/images/imagem_register.png"
             class="card-imagem-imagem my-5"
           />
@@ -26,7 +26,7 @@
           />
         </div>
         <v-card-title class="text-white title">
-          Inicie uma nova experiência!
+          {{ $t('register.title') }}
         </v-card-title>
         <alex-inputs-stepper-form
           :schemes="[schema1, schema2, schema3]"
@@ -37,11 +37,11 @@
         >
           <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
             <v-card-subtitle class="text-white mb-8" align="center">
-              Crie uma conta e comece seus estudos
+              {{ $t('register.subtitle1') }}
             </v-card-subtitle>
 
             <alex-inputs-stepper-field
-              label="Nome completo"
+              :label="$t('register.fullName')"
               name="fullname"
               color="white"
               class="my-3 text-secondary"
@@ -49,7 +49,7 @@
             />
 
             <alex-inputs-stepper-field
-              label="Email"
+              :label="$t('register.email')"
               name="email"
               color="white"
               class="my-3 text-secondary"
@@ -67,7 +67,7 @@
           </alex-inputs-stepper-step>
           <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
             <v-card-subtitle class="text-white mb-8" align="center">
-              Informe o tipo da sua conta
+              {{ $t('register.type') }}
             </v-card-subtitle>
 
             <alex-inputs-stepper-field
@@ -75,11 +75,11 @@
               color="white"
               type-field="select"
               class="my-3 text-secondary"
-              label="Tipo de Usuário"
+              :label="$t('register.userType')"
               variant="outlined"
               :items="[
-                { title: 'Professor', value: 'professor' },
-                { title: 'Aluno', value: 'aluno' },
+                { title: $t('register.typeProfessor'), value: 'professor' },
+                { title: $t('register.typeStudent'), value: 'aluno' },
               ]"
             />
 
@@ -93,7 +93,7 @@
               item-text="text"
               item-value="id"
               item-title="text"
-              label="Instituição de Ensino"
+              :label="$t('register.institution')"
               color="white"
               class="my-3 text-secondary"
               variant="outlined"
@@ -103,11 +103,11 @@
           </alex-inputs-stepper-step>
           <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
             <v-card-subtitle class="text-white mb-8" align="center">
-              Insira seus dados de acesso
+              {{ $t('register.subtitle2') }}
             </v-card-subtitle>
 
             <alex-inputs-stepper-field
-              label="Nome de Usuário"
+              :label="$t('register.username')"
               name="username"
               color="white"
               class="my-3 text-secondary"
@@ -117,7 +117,7 @@
             />
 
             <alex-inputs-stepper-field
-              label="Senha"
+              :label="$t('register.password')"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
@@ -128,7 +128,7 @@
             />
 
             <alex-inputs-stepper-field
-              label="Confirmar Senha"
+              :label="$t('register.confirmPassword')"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="confirmPassword"
@@ -145,7 +145,7 @@
             :thickness="1"
             class="border-opacity-100"
           ></v-divider>
-          <p class="mx-4">ou</p>
+          <p class="mx-4">{{ $t('register.divider') }}</p>
           <v-divider
             color="secondary"
             :thickness="1"
@@ -153,9 +153,9 @@
           ></v-divider>
         </div>
         <v-card-text class="text-white font-bold haveAccount">
-          Se já possui conta,
+          {{ $t('register.hasAccount') }}
           <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
-            Acesse aqui
+            {{ $t('register.login') }}
           </nuxt-link>
         </v-card-text>
       </v-card>
@@ -165,7 +165,8 @@
 
 <script setup lang="ts">
 const { schema1, schema2, schema3 } = useFormRules();
-
+import { useI18n } from 'vue-i18n';
+const i18n = useI18n();
 const options = reactive({
   mask: '###.###.###-##',
   eager: true,
@@ -226,7 +227,9 @@ const fetchInstitutions = async (instValue: any) => {
     institutions.value = resultArr;
   } catch (error) {
     console.log({ error });
-    messageStore.message = 'Ocorreu um erro na busca.';
+    messageStore.color = 'red';
+    messageStore.show = true;
+    messageStore.message = i18n.t('login.searchError');
   }
   fetching.value = false;
 };
@@ -263,7 +266,9 @@ const submit = async (values: FormDataType) => {
     const { user } = await register(userData);
 
     if (user.value!.blocked) {
-      messageStore.message = 'Usuário bloqueado!';
+      messageStore.color = 'red';
+      messageStore.show = true;
+      messageStore.message = i18n.t('login.blockedError');
     } else if (user.value!.confirmed) {
       router.push('/');
     }
