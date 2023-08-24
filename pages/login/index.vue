@@ -62,7 +62,7 @@
             type="submit"
             :loading="logging"
           >
-            {{ $t('login.handleSubmit') }}
+            {{ $t('login.submit') }}
           </v-btn>
         </v-form>
         <v-card-text class="text-white text-center mt-6 mb-10">
@@ -91,7 +91,7 @@
           :loading="logging2"
         >
           <img src="../../static/images/metamask.png" alt="" />
-          <span>{{ $t('login.metamask') }}</span>
+          <span>{{ $t('login.metamask.btn') }}</span>
         </v-btn>
       </v-card>
     </v-col>
@@ -99,20 +99,17 @@
 </template>
 
 <script setup lang="ts">
-import { ethers } from 'ethers';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
 const i18n = useI18n();
 definePageMeta({
   layout: 'auth',
 });
-const { login, setToken, setUser } = useStrapiAuth();
-const { update, find, findOne } = useStrapi();
+const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const messageStore = useMessageStore();
-const walletStore = useWalletStore();
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -129,6 +126,8 @@ const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
+
+const { metalogin } = useMetamask(logging2);
 
 const submit = handleSubmit(async () => {
   logging.value = true;
@@ -148,64 +147,6 @@ const submit = handleSubmit(async () => {
     messageStore.show = true;
   }
 });
-
-declare global {
-  interface Window {
-    ethereum: any;
-  }
-}
-
-function withTimeout(ms, promise) {
-  let timeout = new Promise((resolve, reject) => {
-    let id = setTimeout(() => {
-      clearTimeout(id);
-      reject(`Timed out in ${ms}ms.`);
-    }, ms);
-  });
-
-  return Promise.race([promise, timeout]);
-}
-
-const metalogin = async () => {
-  try {
-    logging2.value = true;
-    if (!window.ethereum) {
-      messageStore.message = 'Metamask não detectada';
-      messageStore.show = true;
-      return;
-    }
-    const provider = new ethers.BrowserProvider(window.ethereum);
-
-    const signer = await withTimeout(4000, provider.getSigner());
-
-    const data = ((await find('metamask-auth')).data as any).attributes;
-
-    const signedMessage = await signer.signMessage(data.token);
-
-    try {
-      const response: any = await update('metamask-auth', {
-        fields: { message: data.token, signedMessage, address: signer.address },
-      });
-      setToken(response.jwt);
-      setUser(response.user);
-      provider.destroy();
-      router.push('/');
-    } catch (err: any) {
-      console.log(err);
-      if (err.error.name === 'TokenExpiredError')
-        messageStore.message = 'Token expirado, tente novamente.';
-      else {
-        walletStore.address = signer.address;
-        router.push({ path: '/register' });
-      }
-    }
-  } catch (err: any) {
-    messageStore.message = 'Metamask não detectada';
-    messageStore.show = true;
-  } finally {
-    logging2.value = false;
-  }
-};
 </script>
 
 <style scoped lang="scss">

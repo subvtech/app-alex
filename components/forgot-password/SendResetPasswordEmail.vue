@@ -5,15 +5,10 @@
         {{ $t('sendResetPassword.forgotPassword') }}
       </p>
       <p class="text-white text-h6 font-weight-regular text-center my-2">
-        D{{ $t('sendResetPassword.enterEmail') }}
+        {{ $t('sendResetPassword.enterEmail') }}
       </p>
     </div>
-    <v-form
-      ref="form"
-      color="white"
-      class="mb-10"
-      @submit.prevent="submit"
-    >
+    <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
       <alex-inputs-stepper-field
         :label="$t('sendResetPassword.email')"
         name="email"
@@ -21,7 +16,7 @@
         class="my-3 text-secondary"
         theme="dark"
       />
-      <span v-if="errors" class="text-error w-100">{{
+      <span v-if="submitError" class="text-error w-100">{{
         $t('sendResetPassword.emailError')
       }}</span>
 
@@ -38,10 +33,10 @@
     </v-form>
     <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
-      >{{ $t('sendResetPassword.recalledPassword') }}
-      <NuxtLink to="/login" class="text-decoration-none text-accent"
-        >>{{ $t('sendResetPassword.login') }}</NuxtLink
-      >
+      {{ $t('sendResetPassword.recalledPassword') }}
+      <NuxtLink to="/login" class="text-decoration-none text-accent">{{
+        $t('sendResetPassword.login')
+      }}</NuxtLink>
     </p>
   </v-container>
 </template>
@@ -51,6 +46,7 @@ import { useForm } from 'vee-validate';
 
 const { emailRules } = useFormRules();
 const form = ref(null);
+const submitError = ref(false)
 const loading = ref(false);
 const messageStore = useMessageStore();
 const { forgotPassword } = useStrapiAuth();
@@ -72,6 +68,7 @@ const submit = handleSubmit(async () => {
     await forgotPassword({ email: values.email });
     emit('confirmation-message', values.email);
   } catch (error) {
+    submitError.value = true;
     messageStore.message = error as string;
     messageStore.color = 'red';
     messageStore.show = true;

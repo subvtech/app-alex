@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 import { useI18n } from 'vue-i18n';
 
-const i18n = useI18n();
 type FormDataType = {
   fullname: string;
   username: string;
@@ -39,46 +38,55 @@ export function isValidCpf(val) {
 }
 
 export const useFormRules = (formData?: FormDataType) => {
+  const i18n = useI18n();
   const emailRules = {
-    email: yup.string().required('Email é necessário').email('Email inválido'),
+    email: yup
+      .string()
+      .required(i18n.t('useFormRules.email.required'))
+      .email(i18n.t('useFormRules.email.invalid')),
   };
 
   const passwordRules = {
     password: yup
       .string()
-      .required('Senha é necessário')
+      .required(i18n.t('useFormRules.password.required'))
       .matches(
         /^(?=.*[A-Z]).{2,}$/gm,
-        'Pelo menos 2 letras maiúsculas necessárias',
+        i18n.t('useFormRules.password.upperCase'),
       )
-      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
+      .matches(/^(?=.*\d).{1,}$/gm, i18n.t('useFormRules.password.number'))
       .matches(
         /^(?=.*[a-z]).{1,}$/gm,
-        'Pelo menos 1 letra minúscula necessário',
+        i18n.t('useFormRules.password.upperCase'),
       )
-      .min(8, 'Mínimo de 8 caracteres'),
+      .min(8, i18n.t('useFormRules.password.min')),
     confirmPassword: yup
       .string()
-      .oneOf([yup.ref('password')], 'As senhas não são idênticas')
-      .required('Confirmar Senha é necessário'),
+      .oneOf(
+        [yup.ref('password')],
+        i18n.t('useFormRules.confirmPassword.matchError'),
+      )
+      .required(i18n.t('useFormRules.confirmPassword.required')),
   };
   const schema1 = yup.object({
     fullname: yup
       .string()
-      .required('Nome completo é necessário')
-      .min(6, 'Mínimo de 6 caracteres')
-      .max(64, 'Máximo de 64 caracteres'),
+      .required(i18n.t('useFormRules.fullname.required'))
+      .min(6, i18n.t('useFormRules.fullname.min'))
+      .max(64, i18n.t('useFormRules.fullname.max')),
     ...emailRules,
     cpf: yup
       .string()
-      .required('CPF é necessário')
-      .length(14, 'CPF contém 11 caracteres')
-      .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
+      .required(i18n.t('useFormRules.cpf.required'))
+      .length(14, i18n.t('useFormRules.cpf.length'))
+      .test('test-invalid-cpf', i18n.t('useFormRules.cpf.invalid'), (cpf) =>
+        isValidCpf(cpf),
+      ),
   });
   const schema2 = yup.object({
     yourRole: yup
       .string()
-      .required('Tipo de Usuário é necessário')
+      .required(i18n.t('useFormRules.yourRole.required'))
       .oneOf(['professor', 'aluno'] as const),
     institution: yup
       .number()
@@ -86,21 +94,22 @@ export const useFormRules = (formData?: FormDataType) => {
       .nullable()
       .when('yourRole', {
         is: 'professor',
-        then: (scheme) => scheme.required('Tipo de instituição é necessário'),
+        then: (scheme) =>
+          scheme.required(i18n.t('useFormRules.institution.required')),
       }),
   });
   const schema3 = yup.object({
     ...passwordRules,
     username: yup
       .string()
-      .required('Nome de usuário é necessário')
-      .min(6, 'Mínimo de 6 caracteres')
-      .max(64, 'Máximo de 64 caracteres'),
+      .required(i18n.t('useFormRules.username.required'))
+      .min(6, i18n.t('useFormRules.username.min'))
+      .max(64, i18n.t('useFormRules.username.max')),
   });
 
   const loginSchema = {
     ...emailRules,
-    password: passwordRules.password
+    password: passwordRules.password,
   };
   return {
     schema1,

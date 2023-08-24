@@ -11,7 +11,11 @@
     "remember": "Remember me",
     "password": "Password",
     "divider": "or",
-    "metamask": "Login with Metamask",
+    "metamask": {
+      "btn": "Login with Metamask",
+      "notFound": "Metamask wallet wasn't detected",
+      "tokenExpired": "Token expired, try again"
+    },
     "loginError": "Invalid email or invalid password, maybe both"
   },
   "reset": {

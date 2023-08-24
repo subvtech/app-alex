@@ -26,6 +26,18 @@ export async function createFileFromUrl(
   return file;
 }
 
+
+export function withTimeout(ms, promise) {
+  let timeout = new Promise((resolve, reject) => {
+    let id = setTimeout(() => {
+      clearTimeout(id);
+      reject(`Timed out in ${ms}ms.`);
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
+}
+
 export const passwordRules = {
   requiredRule: (val: string) => !!val || 'Senha é obrigatória',
   requiredConfirmationRule: (val: string) =>

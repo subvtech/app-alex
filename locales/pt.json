@@ -11,7 +11,11 @@
     "remember": "Lembrar dados",
     "password": "Senha",
     "divider": "ou",
-    "metamask": "Acessar com a Metamask",
+    "metamask": {
+      "btn": "Acessar com a Metamask",
+      "notFound": "Metamask not detected",
+      "tokenExpired": "Token expirado, tente novamente"
+    },
     "loginError": "Email ou Senha inválido(s)"
   },
   "reset": {
@@ -80,7 +84,7 @@
   },
   "useFormRules": {
     "fullName": {
-      "required": "Nome completo é necesário",
+      "required": "Nome completo é necessário",
       "min": "Mínimo de 6 caracteres",
       "max": "Máximo de 64 caracteres"
     },
@@ -174,7 +178,7 @@
     "planTitle": "Nome do Plano",
     "planDescription": "Descrição do Plano",
     "successMsg": "Dados salvos com sucesso!"
-},
+  },
   "authors": {
     "updatedAt": "Atualizado em: { date }",
     "coauthor": " e mais { coAuthorsLength } pessoa",
