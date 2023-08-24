@@ -16,7 +16,7 @@
   },
   "reset": {
     "passwordChanged": "The password was updated!",
-    "info": "Your new password was successfuly set, please go back to the login page and try it out."
+    "info": "Your new password was successfully set, please go back to the login page and try it out."
   },
   "register": {
     "alt": "Create your account",
@@ -140,11 +140,11 @@
     "changePassword": "UPDATE PASSWORD",
     "divider": "or"
   },
-  
   "viewer": {
     "addContent": "Click here to add content",
     "noContent": "No content",
-    "backToTop": "Go back to Top"
+    "backToTop": "Go back to Top",
+    "defaultAlt": "Image"
   },
   "page": {
     "close": "Close the Editor?",
@@ -159,6 +159,7 @@
     "searchPlan": "Search learning plan",
     "newTrail": "NEW TRAIL",
     "newPlan": "NEW PLAN",
+    "cancel": "Cancel",
     "createTrail": "Create Learning Trail",
     "createPlan": "Create Learning Plan"
   },
@@ -170,23 +171,27 @@
     "createVersion": "Create Version",
     "formTitle": "Plan Information",
     "planTitle": "Plan Name",
-    "planDescription": "Plan Description"
+    "planDescription": "Plan Description",
+    "successMsg": "Data successfully saved!"
   },
   "authors": {
-    "updateAt": "Updated at { date }",
-    "coauthor": " and more { coAuthorsLength } person",
-    "coauthors": " and more { coAuthorsLength } people"
+    "updatedAt": "Updated at { date }",
+    "coauthor": " and more { length } person",
+    "coauthors": " and more { length } people"
   },
   "link": {
-    "download": "Download"
+    "download": "Download",
+    "show": "Clear view"
   },
   "usersAutocomplete": {
     "label": "Add Collaborators"
   },
   "tagCombobox": {
     "label": "Add Tags",
-    "verified": "Alex Verified Tag",
-    "noTag": "No tag found to '{ search }'. Press { enter } to create a new tag"
+    "verified": "Verified Alex Tag",
+    "noTag": "No tags found for '",
+    "press": "'. Press ",
+    "newTag": " to create a new tag"
   },
   "imagePreview": {
     "rules": "Only the image formats JPG, JPEG and PNG are allowed.",

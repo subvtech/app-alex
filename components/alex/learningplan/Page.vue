@@ -17,11 +17,11 @@
       <v-dialog v-model="visible" width="500">
         <v-card>
           <v-card-title class="primary text-white">
-            Sair do Editor?
+            {{ $t('page.close') }}
           </v-card-title>
 
           <v-card-text class="mt-5">
-            Você pode possuir alterações que não foram salvas. Deseja sair?
+            {{ $t('page.warning') }}
           </v-card-text>
 
           <v-divider></v-divider>
@@ -30,7 +30,7 @@
             <v-spacer></v-spacer>
             <v-btn @click="cancelLeaveAction"> Cancelar </v-btn>
             <v-btn color="primary" @click="confirmLeaveAction">
-              Confirmar saída
+              {{ $t('page.confirm') }}
             </v-btn>
           </v-card-actions>
         </v-card>

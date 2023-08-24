@@ -5,7 +5,7 @@
     v-model:search-input="search"
     :items="tags"
     :loading="loadingTags"
-    label="Adicionar Tags"
+    :label="$t('tagCombobox.label')"
     prepend-inner-icon="mdi-plus-circle"
     append-icon="mdi-magnify"
     outlined
@@ -40,7 +40,7 @@
             v-if="data.item.raw.attributes.verified"
             color="green"
             small
-            title="Tag Verificada Alex"
+            :title="$t('tagCombobox.verified')"
             >mdi-check-decagram</v-icon
           >
         </template>
@@ -63,7 +63,7 @@
           <v-icon
             v-if="data.item.raw.attributes.verified"
             color="green"
-            title="Tag Verificada Alex"
+            :title="$t('tagCombobox.verified')"
             >mdi-check-decagram</v-icon
           >
         </v-list-item-title>
@@ -73,8 +73,10 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>
-            Nenhuma tag encontrada para "<strong>{{ search }}</strong
-            >". Aperte <kbd>enter</kbd> para criar uma tag nova
+            {{ $t('tagCombobox.noTag') }}<strong>{{ search }}</strong
+            > {{ $t('tagCombobox.press') }}
+            <kbd>enter</kbd>
+            {{ $t('tagCombobox.newTag') }}
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
