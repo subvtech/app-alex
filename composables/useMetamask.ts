@@ -9,7 +9,7 @@ declare global {
 }
 
 export const useMetamask = (logging) => {
-  const { update, find, findOne } = useStrapi();
+  const { update, find } = useStrapi();
   const { setToken, setUser } = useStrapiAuth();
 
   const router = useRouter();
@@ -48,7 +48,6 @@ export const useMetamask = (logging) => {
         provider.destroy();
         router.push('/');
       } catch (err: any) {
-        console.log(err);
         if (err.error.name === 'TokenExpiredError') {
           messageStore.message = i18n.t('login.metamask.tokenExpired');
           messageStore.color = 'red';

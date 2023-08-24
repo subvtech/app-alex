@@ -298,6 +298,7 @@ watchEffect(async (onInvalidate) => {
   border-radius: 0 !important;
   height: 100%;
   position: absolute;
+  font-family: 'Sen';
   top: 0;
   &-imagem {
     background: #f0f0f0 !important;

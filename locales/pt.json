@@ -7,10 +7,10 @@
     "submit": "Entrar",
     "email": "E-mail",
     "noAccount": "Ainda não possui conta?",
-    "register": "Crie sua conta",
+    "register": "Crie sua conta aqui!",
     "remember": "Lembrar dados",
     "password": "Senha",
-    "divider": "ou",
+    "divider": "OU",
     "metamask": {
       "btn": "Acessar com a Metamask",
       "notFound": "Metamask not detected",
@@ -37,7 +37,7 @@
     "email": "E-mail",
     "password": "Senha",
     "confirmPassword": "Confirmar Senha",
-    "divider": "ou",
+    "divider": "OU",
     "hasAccount": "Se já possui conta,",
     "login": "Acesse aqui",
     "searchError": "Ocorreu um erro na busca.",
@@ -142,7 +142,7 @@
     "newPassword": "Cadastre sua nova senha",
     "enterPassword": "Digite sua nova senha e a confirmação",
     "changePassword": "ALTERAR SENHA",
-    "divider": "ou"
+    "divider": "OU"
   },
 
   "viewer": {

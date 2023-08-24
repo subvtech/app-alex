@@ -71,9 +71,9 @@ export const useFormRules = (formData?: FormDataType) => {
   const schema1 = yup.object({
     fullname: yup
       .string()
-      .required(i18n.t('useFormRules.fullname.required'))
-      .min(6, i18n.t('useFormRules.fullname.min'))
-      .max(64, i18n.t('useFormRules.fullname.max')),
+      .required(i18n.t('useFormRules.fullName.required'))
+      .min(6, i18n.t('useFormRules.fullName.min'))
+      .max(64, i18n.t('useFormRules.fullName.max')),
     ...emailRules,
     cpf: yup
       .string()

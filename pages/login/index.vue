@@ -52,7 +52,7 @@
             color="accent"
             :label="$t('login.remember')"
           ></v-checkbox>
-          <nuxt-link to="/forgot" class="text-white my-4">
+          <nuxt-link to="/forgot" class="text-white my-4 text-decoration-none ">
             {{ $t('login.forgot') }}
           </nuxt-link>
           <v-btn
@@ -65,13 +65,13 @@
             {{ $t('login.submit') }}
           </v-btn>
         </v-form>
-        <v-card-text class="text-white text-center mt-6 mb-10">
+        <v-card-text class="text-white text-center mt-10 mb-10">
           {{ $t('login.noAccount') }}
-          <nuxt-link to="/register" class="text-white">
+          <nuxt-link to="/register" class="no-account text-decoration-none ">
             {{ $t('login.register') }}
           </nuxt-link>
         </v-card-text>
-        <div class="d-flex align-center text-white my-12">
+        <div class="d-flex align-center text-white mb-10">
           <v-divider
             color="secondary"
             :thickness="1"
@@ -154,6 +154,7 @@ const submit = handleSubmit(async () => {
   border-radius: 0 !important;
   height: 100%;
   position: absolute;
+  font-family: 'Sen';
   top: 0;
 
   &-imagem {
@@ -177,6 +178,14 @@ const submit = handleSubmit(async () => {
     }
   }
 
+  .no-account {
+    color: #00d3ec;
+    font-family: Sen;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px;
+  }
   &-text {
     font-family: 'Montserrat';
     font-weight: 500 !important;
@@ -191,6 +200,7 @@ const submit = handleSubmit(async () => {
     min-width: 0px !important;
     gap: 8px;
     margin-inline: auto;
+    padding: 12px;
 
     img {
       height: 30px;
@@ -200,6 +210,10 @@ const submit = handleSubmit(async () => {
     span {
       font-size: 16px;
       font-family: 'Sen';
+      font-style: normal;
+      letter-spacing: normal;
+      font-weight: bold;
+      line-height: 22px;
     }
   }
 
