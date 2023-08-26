@@ -5,7 +5,7 @@
         <div align="center">
           <img
             alt="Crie sua conta"
-            src="../static/images/SignUp.svg"
+            src="../../static/images/SignUp.svg"
             class="card-imagem-imagem my-5"
           />
         </div>
@@ -13,15 +13,15 @@
     </v-col>
     <v-col>
       <v-card class="card card-register px-10" align="center">
-        <div  class="card-register-images mb-auto">
+        <div class="card-register-images mb-auto">
           <img
             alt="Alex"
-            src="../static/images/alex.svg"
+            src="../../static/images/alex.svg"
             class="card-register-alex-logo"
           />
           <img
             alt="EllipseTop"
-            src="../assets/svg/Ellipse.svg"
+            src="../../assets/svg/Ellipse.svg"
             class="card-register-images-top-ellipse"
           />
         </div>
@@ -32,20 +32,20 @@
           rounded="lg"
           color="transparent"
           border="md opacity-100"
-          class="border-green pa-4 text-center mx-auto  mb-6 " 
+          class="border-green pa-4 text-center mx-auto mb-6"
         >
-          <h2 class="text-white text-h5 mb-2" align="left">Conta criada com sucesso!</h2>
+          <h2 class="text-white text-h5 mb-2" align="left" ref="el">
+            {{ value?.title }}
+          </h2>
 
-          <p class="mb-2 text-grey text-subtitle-1 " align="left" >
-            Um link de ativação foi enviado para o e-mail cadastrado, acesse e
-            realize a ativação da sua conta.
+          <p class="mb-2 text-grey text-subtitle-1" align="left">
+             {{  value?.paragraph }}
           </p>
-
-
-         
-        
         </v-sheet>
-        <nuxt-link to="/login" class="text-white haveAccount-link font-bold mb-auto">
+        <nuxt-link
+          to="/login"
+          class="text-white haveAccount-link font-bold mb-auto"
+        >
           <v-icon start icon="mdi-arrow-left"></v-icon>
           Voltar para o login
         </nuxt-link>
@@ -55,11 +55,11 @@
 </template>
 
 <script setup lang="ts">
-const messageStore = useMessageStore();
-const walletStore = useWalletStore();
 definePageMeta({
   layout: 'auth',
 });
+const { value } = useRouteStore<{title: string, paragraph: string}>()
+
 </script>
 
 <style scoped lang="scss">
@@ -95,7 +95,7 @@ definePageMeta({
     }
     &-images {
       position: relative;
-      min-height: 50px;
+      height: min-content;
       user-select: none;
       pointer-events: none;
 
@@ -115,10 +115,6 @@ definePageMeta({
       }
     }
   }
-
- 
-
- 
 }
 
 .haveAccount {
@@ -132,7 +128,7 @@ definePageMeta({
   }
 }
 .border-green {
-  border-color: #67B055 !important;
+  border-color: #67b055 !important;
 }
 .title {
   font-size: 24px;
