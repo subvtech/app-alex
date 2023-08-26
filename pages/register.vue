@@ -5,7 +5,7 @@
         <div align="center">
           <img
             alt="Crie sua conta"
-            src="../static/images/imagem_register.png"
+            src="../static/images/signUp.svg"
             class="card-imagem-imagem my-5"
           />
         </div>
@@ -165,13 +165,13 @@
 
 <script setup lang="ts">
 const { schema1, schema2, schema3 } = useFormRules();
-
 const options = reactive({
   mask: '###.###.###-##',
   eager: true,
 });
 const messageStore = useMessageStore();
-const walletStore = useWalletStore();
+const { setValue: setSuccessMessage } = useRouteStore();
+const { value: wallet } = useRouteStore<{address: string}>();
 definePageMeta({
   layout: 'auth',
 });
@@ -252,7 +252,7 @@ const submit = async (values: FormDataType) => {
     password,
     username,
     fullname,
-    address: walletStore.address ?? walletStore.address,
+    address: wallet?.address ?? wallet?.address,
     isProfessor: yourRole.toLowerCase() === 'professor',
   };
 
@@ -265,7 +265,12 @@ const submit = async (values: FormDataType) => {
     if (user.value!.blocked) {
       messageStore.message = 'Usuário bloqueado!';
     } else if (user.value!.confirmed) {
-      router.push('/');
+      setSuccessMessage({
+        title: 'Conta criada com sucesso!',
+        paragraph:
+          'Um link de ativação foi enviado para o e-mail cadastrado, acesse e realize a ativação da sua conta.',
+      }, true);
+      router.push('/success');
     }
   } catch (error) {
     registering.value = false;

@@ -111,7 +111,7 @@ const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const messageStore = useMessageStore();
-const walletStore = useWalletStore();
+const {value: wallet, setValue: setWallet} = useRouteStore<{address: string}>();
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -192,7 +192,7 @@ const metalogin = async () => {
       if (err.error.name === 'TokenExpiredError')
         messageStore.message = 'Token expirado, tente novamente.';
       else {
-        walletStore.address = signer.address;
+        setWallet({ address: signer.address })
         router.push({ path: '/register' });
       }
     }
