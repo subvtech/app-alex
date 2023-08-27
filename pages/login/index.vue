@@ -52,7 +52,7 @@
             color="accent"
             :label="$t('login.remember')"
           ></v-checkbox>
-          <nuxt-link to="/forgot" class="text-white my-4 text-decoration-none ">
+          <nuxt-link to="/forgot" class="text-white my-4 text-decoration-none">
             {{ $t('login.forgot') }}
           </nuxt-link>
           <v-btn
@@ -67,10 +67,11 @@
         </v-form>
         <v-card-text class="text-white text-center mt-10 mb-10">
           {{ $t('login.noAccount') }}
-          <nuxt-link to="/register" class="no-account text-decoration-none ">
+          <nuxt-link to="/register" class="no-account text-decoration-none">
             {{ $t('login.register') }}
           </nuxt-link>
         </v-card-text>
+
         <div class="d-flex align-center text-white mb-10">
           <v-divider
             color="secondary"
@@ -110,6 +111,7 @@ const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const messageStore = useMessageStore();
+const search = ref('');
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -121,6 +123,16 @@ const isValid = computed(
     !Object.values(controlledValues.value).includes(undefined) &&
     !Object.values(errors.value).length,
 );
+/*
+const loadMessages = async () => {
+  if (!i18n.availableLocales.includes(i18n.locale.value)) {
+    await loadLocaleMessages(i18n, i18n.locale.value);
+  }
+
+  // set i18n language
+  setI18nLanguage(i18n, i18n.locale.value);
+};
+*/
 
 const logging = ref(false);
 const logging2 = ref(false);

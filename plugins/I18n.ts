@@ -1,17 +1,5 @@
-import { createI18n } from 'vue-i18n';
-import en from '../locales/en.json';
-import pt from '../locales/pt.json';
-
-export default defineNuxtPlugin(({ vueApp }) => {
-  const i18n = createI18n({
-    legacy: false,
-    globalInjection: true,
-    locale: 'pt',
-    messages: {
-      en,
-      pt,
-    },
-  });
-
+export default defineNuxtPlugin(async ({ vueApp }) => {
+  const i18n = setupI18n({ locale: 'pt' });
+  await loadLocaleMessages(i18n, 'pt');
   vueApp.use(i18n);
 });
