@@ -60,7 +60,7 @@ definePageMeta({
   middleware: () => {
     const { value, successPage } = useRouteStore();
     if (!value || !successPage) {
-      return navigateTo('/register');
+      return navigateTo('/login');
     }
   },
 });
