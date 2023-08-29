@@ -15,7 +15,9 @@ export const useMetamask = (logging) => {
   const router = useRouter();
   const i18n = useI18n();
 
-  const walletStore = useWalletStore();
+  const { setValue: setWallet } = useRouteStore<{
+    address: string;
+  }>();
   const messageStore = useMessageStore();
 
   const metalogin = async () => {
@@ -53,7 +55,7 @@ export const useMetamask = (logging) => {
           messageStore.color = 'red';
           messageStore.show = true;
         } else {
-          walletStore.address = signer.address;
+          setWallet(signer.address)
           router.push({ path: '/register' });
         }
       }
