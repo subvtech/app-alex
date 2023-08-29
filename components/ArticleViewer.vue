@@ -2,7 +2,7 @@
   <v-dialog v-model="visible" width="95%">
     <v-card>
       <v-card-title>
-        {{ isLoading ? $t('defaultLayout.isLoading') : title }}
+        {{ isLoading ? $t('layouts.default.isLoading') : title }}
       </v-card-title>
       <div ref="contentContainer" class="content-container pa-10"></div>
       <v-skeleton-loader
@@ -46,7 +46,7 @@ const parsePage = async () => {
       }),
     });
     if (res.data.error) {
-      messageStore.message = i18n.t('articleViewer.processingError');
+      messageStore.message = i18n.t('components.articleViewer.processingError');
       messageStore.color = 'red';
       messageStore.show = true;
     }

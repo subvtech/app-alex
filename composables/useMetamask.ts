@@ -22,7 +22,7 @@ export const useMetamask = (logging) => {
     try {
       logging.value = true;
       if (!window.ethereum) {
-        messageStore.message = i18n.t('login.metamask.notFound');
+        messageStore.message = i18n.t('pages.login.metamask.notFound');
         messageStore.color = 'red';
         messageStore.show = true;
         return;
@@ -49,7 +49,7 @@ export const useMetamask = (logging) => {
         router.push('/');
       } catch (err: any) {
         if (err.error.name === 'TokenExpiredError') {
-          messageStore.message = i18n.t('login.metamask.tokenExpired');
+          messageStore.message = i18n.t('pages.login.metamask.tokenExpired');
           messageStore.color = 'red';
           messageStore.show = true;
         } else {

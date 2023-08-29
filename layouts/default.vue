@@ -123,56 +123,56 @@ const user = useStrapiUser<User>();
 
 const profileMenuItems = ref([
   {
-    title: i18n.t('defaultLayout.profile'),
+    title: i18n.t('layouts.default.profile'),
     to: '/user/profile',
   },
   {
-    title: i18n.t('defaultLayout.settings'),
+    title: i18n.t('layouts.default.settings'),
     to: '/user/settings',
   },
   {
-    title: i18n.t('defaultLayout.logout'),
+    title: i18n.t('layouts.default.logout'),
     logout: true,
   },
 ]);
 
 const menus = ref([
   {
-    title: i18n.t('defaultLayout.dashboardsTitle'),
+    title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
       {
         icon: 'mdi-star-outline',
-        title: i18n.t('defaultLayout.dashboard'),
+        title: i18n.t('layouts.default.dashboard'),
         to: '/dashboard',
       },
     ],
   },
   {
-    title: i18n.t('defaultLayout.learningPlansTitle'),
+    title: i18n.t('layouts.default.learningPlansTitle'),
     items: [
       {
         icon: 'mdi-star-outline',
-        title: i18n.t('defaultLayout.learningPlans'),
+        title: i18n.t('layouts.default.learningPlans'),
         to: '/learning-plans',
       },
       {
         icon: 'mdi-star-outline',
-        title: i18n.t('defaultLayout.learningPlansUser'),
+        title: i18n.t('layouts.default.learningPlansUser'),
         to: '/learning-plans/user',
       },
     ],
   },
   {
-    title: i18n.t('defaultLayout.classesTitle'),
+    title: i18n.t('layouts.default.classesTitle'),
     items: [
       {
         icon: 'mdi-star-outline',
-        title: i18n.t('defaultLayout.classes'),
+        title: i18n.t('layouts.default.classes'),
         to: '/classes',
       },
       {
         icon: 'mdi-star-outline',
-        title: i18n.t('defaultLayout.classesLinks'),
+        title: i18n.t('layouts.default.classesLinks'),
         to: '/classes/active-links',
       },
     ],

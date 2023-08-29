@@ -15,9 +15,9 @@
               color="primary"
               @click="emit('edit')"
             >
-             {{ $t('viewer.addContent') }}
+             {{ $t('components.viewer.addContent') }}
             </v-btn>
-            <span v-else>{{ $t('viewer.noContent') }}</span>
+            <span v-else>{{ $t('components.viewer.noContent') }}</span>
           </v-col>
         </v-row>
         <div v-else>
@@ -228,7 +228,7 @@
         "
       >
         <v-btn text="" @click="onTabClick({ id: 'header-learning-plan-card' })">
-          {{$t('viewer.backToTop')}}
+          {{$t('components.viewer.backToTop')}}
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
         <v-tabs

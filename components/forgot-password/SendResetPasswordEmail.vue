@@ -2,22 +2,22 @@
   <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
     <div class="mb-10">
       <p class="text-white text-h4 text-center font-weight-bold mb-4">
-        {{ t('forgotPassword') }}
+        {{ $t('components.sendResetPassword.forgotPassword') }}
       </p>
       <p class="text-white text-h6 font-weight-regular text-center my-2">
-        {{ t('enterEmail') }}
+        {{ $t('components.sendResetPassword.enterEmail') }}
       </p>
     </div>
     <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
       <alex-inputs-stepper-field
-        :label="t('email')"
+        :label="$t('components.sendResetPassword.email')"
         name="email"
         color="white"
         class="my-3 text-secondary"
         theme="dark"
       />
       <span v-if="submitError" class="text-error w-100">{{
-        t('emailError')
+        $t('components.sendResetPassword.emailError')
       }}</span>
 
       <v-btn
@@ -28,14 +28,14 @@
         size="large"
         :disabled="!isValid"
         :loading="loading"
-        >{{ t('recoverPassword') }}</v-btn
+        >{{ $t('components.sendResetPassword.recoverPassword') }}</v-btn
       >
     </v-form>
     <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
-      {{ t('recalledPassword') }}
+      {{ $t('components.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-decoration-none text-accent">{{
-        t('login')
+        $t('components.sendResetPassword.login')
       }}</NuxtLink>
     </p>
   </v-container>
@@ -43,9 +43,6 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-const { t } = useI18n({
-  inheritLocale: true,
-});
 const { emailRules } = useFormRules();
 const form = ref(null);
 const submitError = ref(false);
@@ -79,38 +76,3 @@ const submit = handleSubmit(async () => {
   }
 });
 </script>
-
-<i18n lang="json">
-{
-  "en": {
-    "forgotPassword": "Forgot password?",
-    "enterEmail": "Type in your email and you'll send you the required instructions",
-    "email": "Email",
-    "emailError": "An error occorred while sending the recovery email, try again later",
-    "recoverPassword": "RECOVER PASSWORD",
-    "recalledPassword": "Recalled your password?",
-    "login": "Acess here",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "newPassword": "Register your new Password",
-    "enterPassword": "Enter the new Password in both fields",
-    "changePassword": "UPDATE PASSWORD",
-    "divider": "or"
-  },
-  "pt": {
-    "forgotPassword": "Esqueceu a senha?",
-    "enterEmail": "Digite seu e-mail e enviaremos instruções",
-    "email": "E-mail",
-    "emailError": "Ocorreu um erro ao enviar o e-mail, tente novamente mais tarde",
-    "recoverPassword": "RECUPERAR SENHA",
-    "recalledPassword": "Lembrou da senha?",
-    "login": "acesse aqui!",
-    "password": "Senha",
-    "confirmPassword": "Confirmar Senha",
-    "newPassword": "Cadastre sua nova senha",
-    "enterPassword": "Digite sua nova senha e a confirmação",
-    "changePassword": "ALTERAR SENHA",
-    "divider": "OU"
-  }
-}
-</i18n>

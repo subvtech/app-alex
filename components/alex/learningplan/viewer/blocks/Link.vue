@@ -13,7 +13,7 @@
             rounded
             icon
             color="primary"
-            :title="$t('link.show')"
+            :title="$t('components.link.show')"
             @click.prevent="openArticleViewer"
           >
             <v-icon>mdi-eye</v-icon>
@@ -24,7 +24,7 @@
             rounded
             icon
             color="primary"
-            :title="$t('link.download')"
+            :title="$t('components.link.download')"
             @click.prevent="openFile(linkBlock.downloadedLink)"
           >
             <v-icon>mdi-download</v-icon>

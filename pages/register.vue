@@ -4,7 +4,7 @@
       <v-card class="card card-imagem">
         <div align="center">
           <img
-            :alt="$t('register.alt')"
+            :alt="$t('pages.register.alt')"
             src="../static/images/imagem_register.png"
             class="card-imagem-imagem my-5"
           />
@@ -26,7 +26,7 @@
           />
         </div>
         <v-card-title class="text-white title">
-          {{ $t('register.title') }}
+          {{ $t('pages.register.title') }}
         </v-card-title>
         <alex-inputs-stepper-form
           :schemes="[schema1, schema2, schema3]"
@@ -37,11 +37,11 @@
         >
           <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
             <v-card-subtitle class="text-white mb-8" align="center">
-              {{ $t('register.subtitle1') }}
+              {{ $t('pages.register.subtitle1') }}
             </v-card-subtitle>
 
             <alex-inputs-stepper-field
-              :label="$t('register.fullName')"
+              :label="$t('pages.register.fullName')"
               name="fullname"
               color="white"
               class="my-3 text-secondary"
@@ -49,7 +49,7 @@
             />
 
             <alex-inputs-stepper-field
-              :label="$t('register.email')"
+              :label="$t('pages.register.email')"
               name="email"
               color="white"
               class="my-3 text-secondary"
@@ -67,7 +67,7 @@
           </alex-inputs-stepper-step>
           <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
             <v-card-subtitle class="text-white mb-8" align="center">
-              {{ $t('register.type') }}
+              {{ $t('pages.register.type') }}
             </v-card-subtitle>
 
             <alex-inputs-stepper-field
@@ -75,11 +75,11 @@
               color="white"
               type-field="select"
               class="my-3 text-secondary"
-              :label="$t('register.userType')"
+              :label="$t('pages.register.userType')"
               variant="outlined"
               :items="[
-                { title: $t('register.typeProfessor'), value: 'professor' },
-                { title: $t('register.typeStudent'), value: 'aluno' },
+                { title: $t('pages.register.typeProfessor'), value: 'professor' },
+                { title: $t('pages.register.typeStudent'), value: 'aluno' },
               ]"
             />
 
@@ -93,7 +93,7 @@
               item-text="text"
               item-value="id"
               item-title="text"
-              :label="$t('register.institution')"
+              :label="$t('pages.register.institution')"
               color="white"
               class="my-3 text-secondary"
               variant="outlined"
@@ -103,11 +103,11 @@
           </alex-inputs-stepper-step>
           <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
             <v-card-subtitle class="text-white mb-8" align="center">
-              {{ $t('register.subtitle2') }}
+              {{ $t('pages.register.subtitle2') }}
             </v-card-subtitle>
 
             <alex-inputs-stepper-field
-              :label="$t('register.username')"
+              :label="$t('pages.register.username')"
               name="username"
               color="white"
               class="my-3 text-secondary"
@@ -117,7 +117,7 @@
             />
 
             <alex-inputs-stepper-field
-              :label="$t('register.password')"
+              :label="$t('pages.register.password')"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
@@ -128,7 +128,7 @@
             />
 
             <alex-inputs-stepper-field
-              :label="$t('register.confirmPassword')"
+              :label="$t('pages.register.confirmPassword')"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="confirmPassword"
@@ -145,7 +145,7 @@
             :thickness="1"
             class="border-opacity-100"
           ></v-divider>
-          <p class="mx-4">{{ $t('register.divider') }}</p>
+          <p class="mx-4">{{ $t('pages.register.divider') }}</p>
           <v-divider
             color="secondary"
             :thickness="1"
@@ -153,9 +153,9 @@
           ></v-divider>
         </div>
         <v-card-text class="text-white font-bold haveAccount">
-          {{ $t('register.hasAccount') }}
+          {{ $t('pages.register.hasAccount') }}
           <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
-            {{ $t('register.login') }}
+            {{ $t('pages.register.login') }}
           </nuxt-link>
         </v-card-text>
       </v-card>
@@ -229,7 +229,7 @@ const fetchInstitutions = async (instValue: any) => {
     console.log({ error });
     messageStore.color = 'red';
     messageStore.show = true;
-    messageStore.message = i18n.t('login.searchError');
+    messageStore.message = i18n.t('pages.login.searchError');
   }
   fetching.value = false;
 };
@@ -268,7 +268,7 @@ const submit = async (values: FormDataType) => {
     if (user.value!.blocked) {
       messageStore.color = 'red';
       messageStore.show = true;
-      messageStore.message = i18n.t('login.blockedError');
+      messageStore.message = i18n.t('pages.login.blockedError');
     } else if (user.value!.confirmed) {
       router.push('/');
     }

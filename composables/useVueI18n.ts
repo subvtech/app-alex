@@ -1,11 +1,10 @@
-import { type } from 'os';
-import { nextTick } from 'vue';
-import { createI18n, I18n } from 'vue-i18n';
+import { createI18n } from 'vue-i18n';
 
 export const SUPPORT_LOCALES = ['en', 'pt'];
 export let i18n = createI18n({
   locale: 'pt',
   legacy: false,
+  missingWarn: false,
   globalInjection: true,
 });
 const loadedLanguages: string[] = []; // our default language that is preloaded
@@ -52,11 +51,11 @@ export async function loadLanguageAsync(lang) {
   const register = (
     await import(`../assets/locales/${lang}/pages/register.json`)
   ).default;
-  const planId = (await import(`../assets/locales/${lang}/pages/login.json`))
+  const planId = (await import(`../assets/locales/${lang}/pages/planId.json`))
     .default;
-  const reset = (await import(`../assets/locales/${lang}/pages/register.json`))
+  const reset = (await import(`../assets/locales/${lang}/pages/reset.json`))
     .default;
-  const trailId = (await import(`../assets/locales/${lang}/pages/login.json`))
+  const trailId = (await import(`../assets/locales/${lang}/pages/trailId.json`))
     .default;
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
 

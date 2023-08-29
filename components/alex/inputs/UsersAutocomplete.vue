@@ -4,7 +4,7 @@
     v-model:search-input="search"
     :items="users"
     :loading="loadingUsers"
-    :label="$t('usersAutocomplete.label')"
+    :label="$t('components.usersAutocomplete.label')"
     prepend-inner-icon="mdi-plus-circle"
     append-icon="mdi-magnify"
     outlined

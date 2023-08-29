@@ -21,7 +21,7 @@
         />
         <ForgotPasswordConfirmationMessage
           v-else
-          :title="$t('r/pages.reset.passwordChanged')"
+          :title="$t('pages.reset.passwordChanged')"
           :text="$t('pages.reset.info')"
         />
       </v-col>

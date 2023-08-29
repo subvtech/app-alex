@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 const emailSent = ref(false);
 const userEmail = ref('');
 definePageMeta({

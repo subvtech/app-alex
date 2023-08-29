@@ -5,7 +5,7 @@
     v-model:search-input="search"
     :items="tags"
     :loading="loadingTags"
-    :label="$t('tagCombobox.label')"
+    :label="$t('components.tagCombobox.label')"
     prepend-inner-icon="mdi-plus-circle"
     append-icon="mdi-magnify"
     outlined
@@ -40,7 +40,7 @@
             v-if="data.item.raw.attributes.verified"
             color="green"
             small
-            :title="$t('tagCombobox.verified')"
+            :title="$t('components.tagCombobox.verified')"
             >mdi-check-decagram</v-icon
           >
         </template>
@@ -63,7 +63,7 @@
           <v-icon
             v-if="data.item.raw.attributes.verified"
             color="green"
-            :title="$t('tagCombobox.verified')"
+            :title="$t('components.tagCombobox.verified')"
             >mdi-check-decagram</v-icon
           >
         </v-list-item-title>
@@ -73,10 +73,10 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>
-            {{ $t('tagCombobox.noTag') }}<strong>{{ search }}</strong
-            > {{ $t('tagCombobox.press') }}
+            {{ $t('components.tagCombobox.noTag') }}<strong>{{ search }}</strong
+            > {{ $t('components.tagCombobox.press') }}
             <kbd>enter</kbd>
-            {{ $t('tagCombobox.newTag') }}
+            {{ $t('components.tagCombobox.newTag') }}
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>

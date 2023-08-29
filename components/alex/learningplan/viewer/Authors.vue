@@ -49,7 +49,7 @@
         <div style="display: flex">
           <span>
             {{
-              $t('authors.updatedAt', {
+              $t('components.authors.updatedAt', {
                 date: new Date(
                   structure.attributes.updatedAt,
                 ).toLocaleDateString('pt-BR'),
@@ -89,9 +89,9 @@ const coAuthorsText = (coAuthors) => {
   if (coAuthors.length < 1) {
     return '';
   } else if (coAuthors.length > 1) {
-    return i18n.t('authors.coauthors', { length: coAuthors.length });
+    return i18n.t('components.authors.coauthors', { length: coAuthors.length });
   } else {
-    return i18n.t('authors.coauthor', { length: coAuthors.length });
+    return i18n.t('components.authors.coauthor', { length: coAuthors.length });
   }
 };
 </script>

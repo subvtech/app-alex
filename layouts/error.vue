@@ -6,7 +6,7 @@
     <h1 v-else>
       {{ otherError }}
     </h1>
-    <NuxtLink to="/">{{ $t('errorLayour.homePage') }}</NuxtLink>
+    <NuxtLink to="/">{{ $t('layouts.error.homePage') }}</NuxtLink>
   </v-app>
 </template>
 
@@ -21,8 +21,8 @@ const props = defineProps({
   },
 });
 const { error } = toRefs(props);
-const pageNotFound = ref(i18n.t('errorLayout.notFound'));
-const otherError = ref(i18n.t('errorLayout.other'));
+const pageNotFound = ref(i18n.t('layouts.error.notFound'));
+const otherError = ref(i18n.t('layouts.error.other'));
 function head() {
   const title =
     error.value.statusCode === 404 ? pageNotFound.value : otherError.value;

@@ -38,7 +38,7 @@
               <v-text-field
                 v-model="creationForm.title"
                 :rules="rules.title"
-                :label="$t('list.title')"
+                :label="$t('components.list.title')"
                 outlined
               />
             </v-col>
@@ -47,7 +47,7 @@
                 v-model="creationForm.image"
                 :rules="rules.image"
                 accept="image/png, image/jpeg"
-                :label="$t('list.image')"
+                :label="$t('components.list.image')"
                 prepend-inner-icon="mdi-camera"
                 prepend-icon=""
                 outlined
@@ -57,7 +57,7 @@
             <v-col cols="12">
               <v-row justify="center">
                 <v-btn class="mr-3" @click="cancelCreation">{{
-                  $t('list.cancel')
+                  $t('components.list.cancel')
                 }}</v-btn>
                 <v-btn
                   color="primary"
@@ -65,7 +65,7 @@
                   :loading="saving"
                   type="submit"
                 >
-                  {{ $t('list.submit') }}
+                  {{ $t('components.list.submit') }}
                 </v-btn>
               </v-row>
             </v-col>
@@ -119,20 +119,20 @@ const createForm = ref();
 
 const searchText = computed(() => {
   return props.parentLearningPlan
-    ? i18n.t('list.searchTrail')
-    : i18n.t('list.searchPlan');
+    ? i18n.t('components.list.searchTrail')
+    : i18n.t('components.list.searchPlan');
 });
 
 const newButtonText = computed(() => {
   return props.parentLearningPlan
-    ? i18n.t('list.newTrail')
-    : i18n.t('list.newPlan');
+    ? i18n.t('components.list.newTrail')
+    : i18n.t('components.list.newPlan');
 });
 
 const createPanText = computed(() => {
   return props.parentLearningPlan
-    ? i18n.t('list.createTrail')
-    : i18n.t('list.createPlan');
+    ? i18n.t('components.list.createTrail')
+    : i18n.t('components.list.createPlan');
 });
 
 const getPlanUrl = (learningPlan) => {

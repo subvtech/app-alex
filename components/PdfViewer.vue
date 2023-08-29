@@ -2,7 +2,7 @@
   <v-dialog v-model="visible" class="modal-document" width="98%">
     <v-card class="modal-document">
       <v-card-title>
-        {{ isLoading ? $t('defaultLayout.isLoading') : title }}
+        {{ isLoading ? $t('layouts.default.isLoading') : title }}
       </v-card-title>
       <div class="pdf-app-container">
         <vue-pdf-app theme="dark" :pdf="url"></vue-pdf-app>

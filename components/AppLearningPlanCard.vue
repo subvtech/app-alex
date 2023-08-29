@@ -26,7 +26,7 @@
 
         <div class="mt-2">
           {{
-            $t('appLearningPlanCard.existingTrails', {
+            $t('components.appLearningPlanCard.existingTrails', {
               data: (learningPlan.attributes.trails.data || []).length,
             })
           }}
@@ -36,7 +36,7 @@
       <v-card-actions>
         <v-row justify="end" align="center" class="pa-2">
           <v-btn color="accent" nuxt :to="viewPlanUrl">
-            {{ $t('appLearningPlanCard.show') }}
+            {{ $t('components.appLearningPlanCard.show') }}
           </v-btn>
         </v-row>
       </v-card-actions>
@@ -72,7 +72,7 @@ const getImageUrl = computed(() => {
 const getImageName = computed(() => {
   return props.learningPlan.attributes.image.data
     ? props.learningPlan.attributes.image.data.attributes.name
-    : i18n.t('appLearningPlanCard.show');
+    : i18n.t('components.appLearningPlanCard.show');
 });
 
 const getDescriptionHtml = computed(() => {

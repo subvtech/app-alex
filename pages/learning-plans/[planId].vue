@@ -8,7 +8,7 @@
     </v-row>
     <v-tabs v-if="!isTrailRoute" class="mb-5">
       <v-tab nuxt :to="generalInfoLink" replace>
-        {{ $t('planId.general') }}
+        {{ $t('pages.planId.general') }}
       </v-tab>
       <v-tab
         v-if="!isTrailRoute"
@@ -16,7 +16,7 @@
         :to="`/learning-plans/${route.params.planId}/trails`"
         replace
       >
-        {{ $t('planId.trails') }}
+        {{ $t('pages.planId.trails') }}
       </v-tab>
       <v-tab
         v-if="!isTrailRoute"
@@ -24,7 +24,7 @@
         :to="`/learning-plans/${route.params.planId}/tasks`"
         replace
       >
-        {{ $t('planId.assignments') }}
+        {{ $t('pages.planId.assignments') }}
       </v-tab>
       <v-tab
         v-if="!isTrailRoute"
@@ -32,7 +32,7 @@
         :to="`/learning-plans/${route.params.planId}/settings`"
         replace
       >
-        {{ $t('planId.options') }}
+        {{ $t('pages.planId.options') }}
       </v-tab>
     </v-tabs>
     <NuxtPage @loaded="onLoadedChild" />
@@ -45,8 +45,6 @@ definePageMeta({
 });
 
 const { isTrailRoute, handleBack } = useGetData();
-
-console.log('isTrailRoute', isTrailRoute.value);
 
 const route = useRoute();
 

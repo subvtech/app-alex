@@ -5,7 +5,7 @@
     :has-permission="hasAccess"
   />
   <div v-else>
-    <span>{{ $t('fail', { learningPlan: learningPlan }) }}</span>
+    <span>{{ $t('pages.trailId.fail', { learningPlan: learningPlan }) }}</span>
   </div>
 </template>
 

@@ -55,18 +55,6 @@
           <nuxt-link to="/forgot" class="text-white my-4 text-decoration-none">
             {{ $t('pages.login.forgot') }}
           </nuxt-link>
-          <form>
-            <label for="locale-select" class="text-white"
-              >{{ $t('language') }}:
-            </label>
-            <select
-              id="locale-select"
-              @change="(e: any) => loadLanguageAsync(e.target.value)"
-            >
-              <option selected value="en">en</option>
-              <option value="pt">pt</option>
-            </select>
-          </form>
           <v-btn
             block
             :disabled="!isValid"
