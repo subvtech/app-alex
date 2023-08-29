@@ -4,7 +4,7 @@
       <v-card class="card card-imagem">
         <div align="center">
           <img
-            :alt="$t('login.alt')"
+            :alt="$t('pages.login.alt')"
             src="../../static/images/imagem_login.png"
             class="card-imagem-imagem my-5"
           />
@@ -21,14 +21,14 @@
           />
         </div>
         <v-card-title class="text-white my-2">
-          {{ $t('login.welcome') }}
+          {{ $t('pages.login.welcome') }}
         </v-card-title>
         <v-card-subtitle class="text-white my-2">
-          {{ $t('login.access') }}
+          {{ $t('pages.login.access') }}
         </v-card-subtitle>
         <v-form ref="form" @submit.prevent="submit">
           <alex-inputs-stepper-field
-            :label="$t('login.email')"
+            :label="$t('pages.login.email')"
             name="email"
             color="white"
             class="my-3 text-secondary"
@@ -36,7 +36,7 @@
           />
 
           <alex-inputs-stepper-field
-            :label="$t('login.password')"
+            :label="$t('pages.login.password')"
             :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordVisible ? 'text' : 'password'"
             name="password"
@@ -50,11 +50,23 @@
             v-model="checkbox"
             class="text-white"
             color="accent"
-            :label="$t('login.remember')"
+            :label="$t('pages.login.remember')"
           ></v-checkbox>
           <nuxt-link to="/forgot" class="text-white my-4 text-decoration-none">
-            {{ $t('login.forgot') }}
+            {{ $t('pages.login.forgot') }}
           </nuxt-link>
+          <form>
+            <label for="locale-select" class="text-white"
+              >{{ $t('language') }}:
+            </label>
+            <select
+              id="locale-select"
+              @change="(e: any) => loadLanguageAsync(e.target.value)"
+            >
+              <option selected value="en">en</option>
+              <option value="pt">pt</option>
+            </select>
+          </form>
           <v-btn
             block
             :disabled="!isValid"
@@ -62,13 +74,13 @@
             type="submit"
             :loading="logging"
           >
-            {{ $t('login.submit') }}
+            {{ $t('pages.login.submit') }}
           </v-btn>
         </v-form>
         <v-card-text class="text-white text-center mt-10 mb-10">
-          {{ $t('login.noAccount') }}
+          {{ $t('pages.login.noAccount') }}
           <nuxt-link to="/register" class="no-account text-decoration-none">
-            {{ $t('login.register') }}
+            {{ $t('pages.login.register') }}
           </nuxt-link>
         </v-card-text>
 
@@ -78,7 +90,7 @@
             :thickness="1"
             class="border-opacity-100"
           ></v-divider>
-          <p class="mx-4">{{ $t('login.divider') }}</p>
+          <p class="mx-4">{{ $t('pages.login.divider') }}</p>
           <v-divider
             color="secondary"
             :thickness="1"
@@ -92,7 +104,7 @@
           :loading="logging2"
         >
           <img src="../../static/images/metamask.png" alt="" />
-          <span>{{ $t('login.metamask.btn') }}</span>
+          <span>{{ $t('pages.login.metamask.btn') }}</span>
         </v-btn>
       </v-card>
     </v-col>
@@ -154,7 +166,7 @@ const submit = handleSubmit(async () => {
   } catch (error) {
     console.log(error);
     logging.value = false;
-    messageStore.message = i18n.t('login.loginError');
+    messageStore.message = i18n.t('pages.login.loginError');
     messageStore.color = 'red';
     messageStore.show = true;
   }

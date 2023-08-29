@@ -1,20 +1,28 @@
+import { type } from 'os';
 import { nextTick } from 'vue';
-import { createI18n } from 'vue-i18n';
+import { createI18n, I18n } from 'vue-i18n';
 
 export const SUPPORT_LOCALES = ['en', 'pt'];
+export let i18n = createI18n({
+  locale: 'pt',
+  legacy: false,
+  globalInjection: true,
+});
+const loadedLanguages: string[] = []; // our default language that is preloaded
 
-export function setupI18n(options = { locale: 'pt' }) {
-  const i18n = createI18n(options);
-  setI18nLanguage(i18n, options.locale);
-  return i18n;
-}
+export const setupI18n = (locale: string = 'pt') => {
+  setI18nLanguage(locale);
+  loadLanguageAsync(locale);
+};
 
-export function setI18nLanguage(i18n, locale) {
-  if (i18n.global) i18n = i18n.global;
-  if (i18n.mode === 'legacy') {
-    i18n.locale = locale;
+export function setI18nLanguage(locale) {
+  let mode = i18n.mode;
+  console.log(i18n);
+  if (mode === 'legacy') {
+    i18n.global.locale = locale;
   } else {
-    i18n.locale.value = locale;
+    console.log(mode);
+    i18n.global.locale.value = locale;
   }
   /**
    * NOTE:
@@ -26,15 +34,84 @@ export function setI18nLanguage(i18n, locale) {
   document.querySelector('html')!.setAttribute('lang', locale);
 }
 
-export async function loadLocaleMessages(i18n, locale) {
-  if (i18n.global) i18n = i18n.global;
-  // load locale messages with dynamic import
-  const messages = await import(
-    /* webpackChunkName: "locale-[request]" */ `../locales/${locale}.json`
-  );
-  console.log(i18n);
-  // set locale and locale message
-  i18n.setLocaleMessage(locale, messages.default);
+export async function loadLanguageAsync(lang) {
+  // If the same language
+  if (i18n.global.locale === lang) {
+    return Promise.resolve(setI18nLanguage(lang));
+  }
 
-  return nextTick();
+  // If the language was already loaded
+  if (loadedLanguages.includes(lang)) {
+    return Promise.resolve(setI18nLanguage(lang));
+  }
+
+  // If the language hasn't been loaded yet
+
+  const login = (await import(`../assets/locales/${lang}/pages/login.json`))
+    .default;
+  const register = (
+    await import(`../assets/locales/${lang}/pages/register.json`)
+  ).default;
+  const planId = (await import(`../assets/locales/${lang}/pages/login.json`))
+    .default;
+  const reset = (await import(`../assets/locales/${lang}/pages/register.json`))
+    .default;
+  const trailId = (await import(`../assets/locales/${lang}/pages/login.json`))
+    .default;
+  const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
+
+  const appLearningPlanCard = (
+    await import(
+      `../assets/locales/${lang}/components/appLearningPlanCard.json`
+    )
+  ).default;
+  const articleViewer = (
+    await import(`../assets/locales/${lang}/components/articleViewer.json`)
+  ).default;
+  const editor = (
+    await import(`../assets/locales/${lang}/components/editor.json`)
+  ).default;
+  const authors = (
+    await import(`../assets/locales/${lang}/components/authors.json`)
+  ).default;
+  const imagePreview = (
+    await import(`../assets/locales/${lang}/components/imagePreview.json`)
+  ).default;
+  const link = (await import(`../assets/locales/${lang}/components/link.json`))
+    .default;
+  const page = (await import(`../assets/locales/${lang}/components/page.json`))
+    .default;
+  const sendResetPassword = (
+    await import(`../assets/locales/${lang}/components/sendResetPassword.json`)
+  ).default;
+  const tagCombobox = (
+    await import(`../assets/locales/${lang}/components/tagCombobox.json`)
+  ).default;
+  const userAutocomplete = (
+    await import(`../assets/locales/${lang}/components/usersAutocomplete.json`)
+  ).default;
+  const viewer = (
+    await import(`../assets/locales/${lang}/components/viewer.json`)
+  ).default;
+
+  i18n.global.setLocaleMessage(lang, {
+    pages: { login, register, planId, reset, trailId },
+    rules,
+    components: {
+      appLearningPlanCard,
+      articleViewer,
+      editor,
+      authors,
+      imagePreview,
+      link,
+      page,
+      sendResetPassword,
+      tagCombobox,
+      userAutocomplete,
+      viewer,
+    },
+  });
+
+  loadedLanguages.push(lang);
+  return setI18nLanguage(lang);
 }

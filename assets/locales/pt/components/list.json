@@ -1,0 +1,12 @@
+{
+  "title": "Título*",
+  "image": "Imagem Principal",
+  "submit": "Criar",
+  "searchTrail": "Buscar trilhar de aprendizagem",
+  "searchPlan": "Buscar plano de aprendizagem",
+  "newTrail": "NOVA TRILHA",
+  "newPlan": "NOVO PLANO",
+  "cancel": "Cancelar",
+  "createTrail": "Criar Trilha de Aprendizagem",
+  "createPlan": "Criar Plano de Aprendizagem"
+}

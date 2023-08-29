@@ -21,10 +21,10 @@
         />
         <ForgotPasswordConfirmationMessage
           v-else
-          :title="$t('forgot.recoverSent')"
-          :text="$t('forgot.recoverInfo')"
+          :title="$t('pages.forgot.recoverSent')"
+          :text="$t('pages.forgot.recoverInfo')"
           :email="userEmail"
-          :text2="$t('forgot.recoverInfo2')"
+          :text2="$t('pages.forgot.recoverInfo2')"
         />
       </v-col>
     </v-row>

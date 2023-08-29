@@ -1,0 +1,5 @@
+{
+  "updatedAt": "Updated at { date }",
+  "coauthor": " and more { length } person",
+  "coauthors": " and more { length } people"
+}

@@ -42,51 +42,51 @@ export const useFormRules = (formData?: FormDataType) => {
   const emailRules = {
     email: yup
       .string()
-      .required(i18n.t('useFormRules.email.required'))
-      .email(i18n.t('useFormRules.email.invalid')),
+      .required(i18n.t('rules.email.required'))
+      .email(i18n.t('rules.email.invalid')),
   };
 
   const passwordRules = {
     password: yup
       .string()
-      .required(i18n.t('useFormRules.password.required'))
+      .required(i18n.t('rules.password.required'))
       .matches(
         /^(?=.*[A-Z]).{2,}$/gm,
-        i18n.t('useFormRules.password.upperCase'),
+        i18n.t('rules.password.upperCase'),
       )
-      .matches(/^(?=.*\d).{1,}$/gm, i18n.t('useFormRules.password.number'))
+      .matches(/^(?=.*\d).{1,}$/gm, i18n.t('rules.password.number'))
       .matches(
         /^(?=.*[a-z]).{1,}$/gm,
-        i18n.t('useFormRules.password.upperCase'),
+        i18n.t('rules.password.upperCase'),
       )
-      .min(8, i18n.t('useFormRules.password.min')),
+      .min(8, i18n.t('rules.password.min')),
     confirmPassword: yup
       .string()
       .oneOf(
         [yup.ref('password')],
-        i18n.t('useFormRules.confirmPassword.matchError'),
+        i18n.t('rules.confirmPassword.matchError'),
       )
-      .required(i18n.t('useFormRules.confirmPassword.required')),
+      .required(i18n.t('rules.confirmPassword.required')),
   };
   const schema1 = yup.object({
     fullname: yup
       .string()
-      .required(i18n.t('useFormRules.fullName.required'))
-      .min(6, i18n.t('useFormRules.fullName.min'))
-      .max(64, i18n.t('useFormRules.fullName.max')),
+      .required(i18n.t('rules.fullName.required'))
+      .min(6, i18n.t('rules.fullName.min'))
+      .max(64, i18n.t('rules.fullName.max')),
     ...emailRules,
     cpf: yup
       .string()
-      .required(i18n.t('useFormRules.cpf.required'))
-      .length(14, i18n.t('useFormRules.cpf.length'))
-      .test('test-invalid-cpf', i18n.t('useFormRules.cpf.invalid'), (cpf) =>
+      .required(i18n.t('rules.cpf.required'))
+      .length(14, i18n.t('rules.cpf.length'))
+      .test('test-invalid-cpf', i18n.t('rules.cpf.invalid'), (cpf) =>
         isValidCpf(cpf),
       ),
   });
   const schema2 = yup.object({
     yourRole: yup
       .string()
-      .required(i18n.t('useFormRules.yourRole.required'))
+      .required(i18n.t('rules.yourRole.required'))
       .oneOf(['professor', 'aluno'] as const),
     institution: yup
       .number()
@@ -95,16 +95,16 @@ export const useFormRules = (formData?: FormDataType) => {
       .when('yourRole', {
         is: 'professor',
         then: (scheme) =>
-          scheme.required(i18n.t('useFormRules.institution.required')),
+          scheme.required(i18n.t('rules.institution.required')),
       }),
   });
   const schema3 = yup.object({
     ...passwordRules,
     username: yup
       .string()
-      .required(i18n.t('useFormRules.username.required'))
-      .min(6, i18n.t('useFormRules.username.min'))
-      .max(64, i18n.t('useFormRules.username.max')),
+      .required(i18n.t('rules.username.required'))
+      .min(6, i18n.t('rules.username.min'))
+      .max(64, i18n.t('rules.username.max')),
   });
 
   const loginSchema = {
