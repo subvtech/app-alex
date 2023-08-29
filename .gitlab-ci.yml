@@ -1,0 +1,55 @@
+image:
+  name: docker:git
+  entrypoint: ['']
+
+services:
+  - name: docker:dind
+    alias: thedockerhost
+
+variables:
+  # Tell docker CLI how to talk to Docker daemon; see
+  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
+  DOCKER_HOST: tcp://thedockerhost:2375/
+  # Use the overlayfs driver for improved performance:
+  # DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ''
+
+before_script:
+  - export TAG=$([ $CI_COMMIT_BRANCH == "master" ] && echo "prod" || echo "test" )
+  - export VERSION=$CI_COMMIT_SHORT_SHA
+  - export STRAPI_URL=$([ $CI_COMMIT_BRANCH == "master" ] && echo "$STRAPI_URL" || echo "$STRAPI_TEST_URL" )
+  - if [ -d "${CI_PROJECT_DIR}" ]; then rm -rf "${CI_PROJECT_DIR}"; fi
+  - mkdir -p "${CI_PROJECT_DIR}"
+  - cd "${CI_PROJECT_DIR}"
+  - git init
+  - git remote add origin "https://gitlab+deploy-token-2:$DEPLOY_TOKEN@gitlab.profbrenojac.com.br/${CI_PROJECT_PATH}.git"
+  - git fetch origin "${CI_COMMIT_SHA}"
+  - git reset --hard FETCH_HEAD
+
+stages: # List of stages for jobs, and their order of execution
+  - build
+  - deploy
+  #- test
+
+build-app2: # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
+    - docker build -t "projetoalex/alex-app:v2-$TAG$VERSION" --build-arg strapi_url=$STRAPI_URL -f Dockerfile  .
+    - docker push "projetoalex/alex-app:v2-$TAG$VERSION"
+  only:
+    - master
+    - test
+
+deploy:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:1.26.4
+    entrypoint: ['']
+  script:
+    - kubectl config use-context projeto-alex/app-alex:app-alex-agent
+    - sed s/%VERSION%/$VERSION/g "kubernetes/alex-app2-$TAG.yaml" > deploy-alex-app2.yaml
+    - kubectl apply --validate=false -f deploy-alex-app2.yaml -v=8
+  only:
+    - master
+    - test

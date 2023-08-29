@@ -4,7 +4,7 @@
       <v-card class="card card-imagem">
         <div align="center">
           <img
-            alt="Bem vindo ao Alex"
+            :alt="$t('pages.login.alt')"
             src="../../static/images/imagem_login.png"
             class="card-imagem-imagem my-5"
           />
@@ -21,14 +21,14 @@
           />
         </div>
         <v-card-title class="text-white my-2">
-          Bem vindo a plataforma ALEX!
+          {{ $t('pages.login.welcome') }}
         </v-card-title>
         <v-card-subtitle class="text-white my-2">
-          Acesse sua conta e continue com seus estudos
+          {{ $t('pages.login.access') }}
         </v-card-subtitle>
         <v-form ref="form" @submit.prevent="submit">
           <alex-inputs-stepper-field
-            label="Email"
+            :label="$t('pages.login.email')"
             name="email"
             color="white"
             class="my-3 text-secondary"
@@ -36,7 +36,7 @@
           />
 
           <alex-inputs-stepper-field
-            label="Senha"
+            :label="$t('pages.login.password')"
             :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordVisible ? 'text' : 'password'"
             name="password"
@@ -50,10 +50,10 @@
             v-model="checkbox"
             class="text-white"
             color="accent"
-            label="Lembrar dados"
+            :label="$t('pages.login.remember')"
           ></v-checkbox>
-          <nuxt-link to="/forgot" class="text-white my-4">
-            Esqueceu sua senha?
+          <nuxt-link to="/forgot" class="text-white my-4 text-decoration-none">
+            {{ $t('pages.login.forgot') }}
           </nuxt-link>
           <v-btn
             block
@@ -62,22 +62,23 @@
             type="submit"
             :loading="logging"
           >
-            Entrar
+            {{ $t('pages.login.submit') }}
           </v-btn>
         </v-form>
-        <v-card-text class="text-white text-center mt-6 mb-10">
-          Ainda não possui conta?
-          <nuxt-link to="/register" class="text-white">
-            Crie sua conta
+        <v-card-text class="text-white text-center mt-10 mb-10">
+          {{ $t('pages.login.noAccount') }}
+          <nuxt-link to="/register" class="no-account text-decoration-none">
+            {{ $t('pages.login.register') }}
           </nuxt-link>
         </v-card-text>
-        <div class="d-flex align-center text-white my-12">
+
+        <div class="d-flex align-center text-white mb-10">
           <v-divider
             color="secondary"
             :thickness="1"
             class="border-opacity-100"
           ></v-divider>
-          <p class="mx-4">ou</p>
+          <p class="mx-4">{{ $t('pages.login.divider') }}</p>
           <v-divider
             color="secondary"
             :thickness="1"
@@ -91,7 +92,7 @@
           :loading="logging2"
         >
           <img src="../../static/images/metamask.png" alt="" />
-          <span>Acesse com a metamask</span>
+          <span>{{ $t('pages.login.metamask.btn') }}</span>
         </v-btn>
       </v-card>
     </v-col>
@@ -99,19 +100,18 @@
 </template>
 
 <script setup lang="ts">
-import { ethers } from 'ethers';
+import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
-
+const i18n = useI18n();
 definePageMeta({
   layout: 'auth',
 });
-const { login, setToken, setUser } = useStrapiAuth();
-const { update, find, findOne } = useStrapi();
+const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const messageStore = useMessageStore();
-const {value: wallet, setValue: setWallet} = useRouteStore<{address: string}>();
+
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -123,11 +123,23 @@ const isValid = computed(
     !Object.values(controlledValues.value).includes(undefined) &&
     !Object.values(errors.value).length,
 );
+/*
+const loadMessages = async () => {
+  if (!i18n.availableLocales.includes(i18n.locale.value)) {
+    await loadLocaleMessages(i18n, i18n.locale.value);
+  }
+
+  // set i18n language
+  setI18nLanguage(i18n, i18n.locale.value);
+};
+*/
 
 const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
+
+const { metalogin } = useMetamask(logging2);
 
 const submit = handleSubmit(async () => {
   logging.value = true;
@@ -142,67 +154,11 @@ const submit = handleSubmit(async () => {
   } catch (error) {
     console.log(error);
     logging.value = false;
-    messageStore.message = 'Email ou Senha inválido(s)';
+    messageStore.message = i18n.t('pages.login.loginError');
+    messageStore.color = 'red';
+    messageStore.show = true;
   }
 });
-
-declare global {
-  interface Window {
-    ethereum: any;
-  }
-}
-
-function withTimeout(ms, promise) {
-  let timeout = new Promise((resolve, reject) => {
-    let id = setTimeout(() => {
-      clearTimeout(id);
-      reject(`Timed out in ${ms}ms.`);
-    }, ms);
-  });
-
-  return Promise.race([promise, timeout]);
-}
-
-const metalogin = async () => {
-  try {
-    logging2.value = true;
-    if (!window.ethereum) {
-      messageStore.message = 'Metamask não detectada';
-      messageStore.show = true;
-      return;
-    }
-    const provider = new ethers.BrowserProvider(window.ethereum);
-
-    const signer = await withTimeout(4000, provider.getSigner());
-
-    const data = ((await find('metamask-auth')).data as any).attributes;
-
-    const signedMessage = await signer.signMessage(data.token);
-
-    try {
-      const response: any = await update('metamask-auth', {
-        fields: { message: data.token, signedMessage, address: signer.address },
-      });
-      setToken(response.jwt);
-      setUser(response.user);
-      provider.destroy();
-      router.push('/');
-    } catch (err: any) {
-      console.log(err);
-      if (err.error.name === 'TokenExpiredError')
-        messageStore.message = 'Token expirado, tente novamente.';
-      else {
-        setWallet({ address: signer.address })
-        router.push({ path: '/register' });
-      }
-    }
-  } catch (err: any) {
-    messageStore.message = 'Metamask não detectada';
-    messageStore.show = true;
-  } finally {
-    logging2.value = false;
-  }
-};
 </script>
 
 <style scoped lang="scss">
@@ -210,6 +166,7 @@ const metalogin = async () => {
   border-radius: 0 !important;
   height: 100%;
   position: absolute;
+  font-family: 'Sen';
   top: 0;
 
   &-imagem {
@@ -233,6 +190,14 @@ const metalogin = async () => {
     }
   }
 
+  .no-account {
+    color: #00d3ec;
+    font-family: Sen;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px;
+  }
   &-text {
     font-family: 'Montserrat';
     font-weight: 500 !important;
@@ -247,6 +212,7 @@ const metalogin = async () => {
     min-width: 0px !important;
     gap: 8px;
     margin-inline: auto;
+    padding: 12px;
 
     img {
       height: 30px;
@@ -256,6 +222,10 @@ const metalogin = async () => {
     span {
       font-size: 16px;
       font-family: 'Sen';
+      font-style: normal;
+      letter-spacing: normal;
+      font-weight: bold;
+      line-height: 22px;
     }
   }
 

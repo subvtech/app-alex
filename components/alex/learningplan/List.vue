@@ -38,7 +38,7 @@
               <v-text-field
                 v-model="creationForm.title"
                 :rules="rules.title"
-                label="Título*"
+                :label="$t('components.list.title')"
                 outlined
               />
             </v-col>
@@ -47,7 +47,7 @@
                 v-model="creationForm.image"
                 :rules="rules.image"
                 accept="image/png, image/jpeg"
-                label="Imagem Principal"
+                :label="$t('components.list.image')"
                 prepend-inner-icon="mdi-camera"
                 prepend-icon=""
                 outlined
@@ -56,14 +56,16 @@
             </v-col>
             <v-col cols="12">
               <v-row justify="center">
-                <v-btn class="mr-3" @click="cancelCreation">Cancelar</v-btn>
+                <v-btn class="mr-3" @click="cancelCreation">{{
+                  $t('components.list.cancel')
+                }}</v-btn>
                 <v-btn
                   color="primary"
                   :disabled="!formValid"
                   :loading="saving"
                   type="submit"
                 >
-                  Criar
+                  {{ $t('components.list.submit') }}
                 </v-btn>
               </v-row>
             </v-col>
@@ -77,6 +79,8 @@
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from '~/models/learningPlan.model';
 import { formRules } from '@/helpers/utils';
+import { useI18n } from 'vue-i18n';
+const i18n = useI18n();
 
 const messageStore = useMessageStore();
 const { requiredRule, min5CharactersRule } = formRules;
@@ -115,18 +119,20 @@ const createForm = ref();
 
 const searchText = computed(() => {
   return props.parentLearningPlan
-    ? 'Buscar trilha de aprendizagem'
-    : 'Buscar plano de aprendizagem';
+    ? i18n.t('components.list.searchTrail')
+    : i18n.t('components.list.searchPlan');
 });
 
 const newButtonText = computed(() => {
-  return props.parentLearningPlan ? 'NOVA TRILHA' : 'NOVO PLANO';
+  return props.parentLearningPlan
+    ? i18n.t('components.list.newTrail')
+    : i18n.t('components.list.newPlan');
 });
 
 const createPanText = computed(() => {
   return props.parentLearningPlan
-    ? 'Criar Trilha de Aprenziagem'
-    : 'Criar Plano de Aprendizagem';
+    ? i18n.t('components.list.createTrail')
+    : i18n.t('components.list.createPlan');
 });
 
 const getPlanUrl = (learningPlan) => {
@@ -177,6 +183,8 @@ const submit = async () => {
   } catch (err) {
     saving.value = false;
     messageStore.message = err as string;
+    messageStore.show = true;
+    messageStore.color = 'red';
   } finally {
     saving.value = false;
   }
