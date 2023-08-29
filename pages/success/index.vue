@@ -39,7 +39,7 @@
           </h2>
 
           <p class="mb-2 text-grey text-subtitle-1" align="left">
-             {{  value?.paragraph }}
+            {{ value?.paragraph }}
           </p>
         </v-sheet>
         <nuxt-link
@@ -57,9 +57,14 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
+  middleware: () => {
+    const { value, successPage } = useRouteStore();
+    if (!value || !successPage) {
+      return navigateTo('/register');
+    }
+  },
 });
-const { value } = useRouteStore<{title: string, paragraph: string}>()
-
+const { value } = useRouteStore<{ title: string; paragraph: string }>();
 </script>
 
 <style scoped lang="scss">
