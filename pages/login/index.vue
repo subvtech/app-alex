@@ -105,6 +105,7 @@ import { useForm } from 'vee-validate';
 const i18n = useI18n();
 definePageMeta({
   layout: 'auth',
+  middleware: 'control-access'
 });
 const { login } = useStrapiAuth();
 const router = useRouter();

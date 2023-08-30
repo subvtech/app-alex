@@ -34,6 +34,7 @@ import { ref } from 'vue';
 const passwordChanged = ref(false);
 definePageMeta({
   layout: 'auth',
+  middleware: 'control-access'
 });
 
 const handlePasswordChanged = () => {

@@ -35,6 +35,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
+  middleware: 'control-access'
 });
 const registeredUser = ref(false);
 const onRegisteredUser = () => {
