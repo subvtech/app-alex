@@ -1,9 +1,6 @@
 <template>
   <v-app>
-    <v-main class="secondary">
-      <!-- <AppSnackbar></AppSnackbar> -->
-      <slot />
-    </v-main>
+    <v-main class="secondary"> <AppSnackbar /> <slot /> </v-main>
   </v-app>
 </template>
 

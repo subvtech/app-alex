@@ -1,0 +1,39 @@
+{
+  "fullName": {
+    "required": "Full name is required",
+    "min": "At least 6 characters long",
+    "max": "At most 64 characters long"
+  },
+  "email": {
+    "required": "Email is required",
+    "invalid": "Invalid email"
+  },
+  "cpf": {
+    "required": "CPF is required",
+    "length": "Must be 11 characters long",
+    "invalid": "Invalid CPF"
+  },
+
+  "yourRole": {
+    "required": "User type is required"
+  },
+  "institution": {
+    "required": "Institution type is required"
+  },
+  "username": {
+    "required": "Username is required",
+    "min": "At least 6 characters long",
+    "max": "At most 64 characters long"
+  },
+  "password": {
+    "required": "Password is required",
+    "upperCase": "It must have at least 2 upper case letters",
+    "lowerCase": "It must have at least 1 lower case letter",
+    "number": "It must have at least 1 number",
+    "min": "At least 8 characters long"
+  },
+  "confirmPassword": {
+    "required": "Confirm Password is required",
+    "matchError": "The passwords do no match"
+  }
+}

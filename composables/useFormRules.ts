@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { useI18n } from 'vue-i18n';
 
 type FormDataType = {
   fullname: string;
@@ -37,23 +38,55 @@ export function isValidCpf(val) {
 }
 
 export const useFormRules = (formData?: FormDataType) => {
+  const i18n = useI18n();
+  const emailRules = {
+    email: yup
+      .string()
+      .required(i18n.t('rules.email.required'))
+      .email(i18n.t('rules.email.invalid')),
+  };
+
+  const passwordRules = {
+    password: yup
+      .string()
+      .required(i18n.t('rules.password.required'))
+      .matches(
+        /^(?=.*[A-Z]).{2,}$/gm,
+        i18n.t('rules.password.upperCase'),
+      )
+      .matches(/^(?=.*\d).{1,}$/gm, i18n.t('rules.password.number'))
+      .matches(
+        /^(?=.*[a-z]).{1,}$/gm,
+        i18n.t('rules.password.upperCase'),
+      )
+      .min(8, i18n.t('rules.password.min')),
+    confirmPassword: yup
+      .string()
+      .oneOf(
+        [yup.ref('password')],
+        i18n.t('rules.confirmPassword.matchError'),
+      )
+      .required(i18n.t('rules.confirmPassword.required')),
+  };
   const schema1 = yup.object({
     fullname: yup
       .string()
-      .required('Nome completo é necessário')
-      .min(6, 'Mínimo de 6 caracteres')
-      .max(64, 'Máximo de 64 caracteres'),
-    email: yup.string().required('Email é necessário').email('Email inválido'),
+      .required(i18n.t('rules.fullName.required'))
+      .min(6, i18n.t('rules.fullName.min'))
+      .max(64, i18n.t('rules.fullName.max')),
+    ...emailRules,
     cpf: yup
       .string()
-      .required('CPF é necessário')
-      .length(14, 'CPF contém 11 caracteres')
-      .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
+      .required(i18n.t('rules.cpf.required'))
+      .length(14, i18n.t('rules.cpf.length'))
+      .test('test-invalid-cpf', i18n.t('rules.cpf.invalid'), (cpf) =>
+        isValidCpf(cpf),
+      ),
   });
   const schema2 = yup.object({
     yourRole: yup
       .string()
-      .required('Tipo de Usuário é necessário')
+      .required(i18n.t('rules.yourRole.required'))
       .oneOf(['professor', 'aluno'] as const),
     institution: yup
       .number()
@@ -61,53 +94,29 @@ export const useFormRules = (formData?: FormDataType) => {
       .nullable()
       .when('yourRole', {
         is: 'professor',
-        then: (scheme) => scheme.required('Tipo de instituição é necessário'),
+        then: (scheme) =>
+          scheme.required(i18n.t('rules.institution.required')),
       }),
   });
   const schema3 = yup.object({
+    ...passwordRules,
     username: yup
       .string()
-      .required('Nome de usuário é necessário')
-      .min(6, 'Mínimo de 6 caracteres')
-      .max(64, 'Máximo de 64 caracteres'),
-    password: yup
-      .string()
-      .required('Senha é necessário')
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        'Pelo menos 2 letras maiúsculas necessárias',
-      )
-      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        'Pelo menos 1 letra minúscula necessário',
-      )
-      .min(8, 'Mínimo de 8 caracteres'),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref('password')], 'As senhas não são idênticas')
-      .required('Confirmar Senha é necessário'),
+      .required(i18n.t('rules.username.required'))
+      .min(6, i18n.t('rules.username.min'))
+      .max(64, i18n.t('rules.username.max')),
   });
+
   const loginSchema = {
-    email: yup.string().required('Email é necessário').email('Email inválido'),
-    password: yup
-      .string()
-      .required('Senha é necessário')
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        'Pelo menos 2 letras maiúsculas necessárias',
-      )
-      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        'Pelo menos 1 letra minúscula necessário',
-      )
-      .min(8, 'Mínimo de 8 caracteres'),
+    ...emailRules,
+    password: passwordRules.password,
   };
   return {
     schema1,
     schema2,
     schema3,
-    loginSchema
+    schema4: yup.object(passwordRules),
+    emailRules: yup.object(emailRules),
+    loginSchema,
   };
 };
