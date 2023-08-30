@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/strapi'],
+  modules: ['@pinia/nuxt', '@nuxtjs/strapi', 'nuxt-vitest'],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
   },
