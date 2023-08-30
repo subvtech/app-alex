@@ -77,7 +77,7 @@
               style="cursor: pointer"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <!-- <app-user-avatar :user="user" class="mr-2" /> -->
+              <app-user-avatar :user="user" class="mr-2" />
               <span>
                 {{ user?.fullname }}
               </span>
