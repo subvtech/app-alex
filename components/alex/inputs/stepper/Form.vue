@@ -4,6 +4,7 @@
     <div class="controls">
       <v-btn
         v-if="activeStep > 1"
+        :disabled="loading"
         type="button"
         rounded="lg"
         color="secondary"

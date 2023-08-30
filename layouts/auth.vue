@@ -14,4 +14,8 @@ body {
     font-family: 'Montserrat' !important;
   }
 }
+
+html {
+  overflow-y: auto !important
+}
 </style>

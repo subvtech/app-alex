@@ -51,6 +51,9 @@ export async function loadLanguageAsync(lang) {
   const register = (
     await import(`../assets/locales/${lang}/pages/register.json`)
   ).default;
+  const forgot = (
+    await import(`../assets/locales/${lang}/pages/forgot.json`)
+  ).default;
   const planId = (await import(`../assets/locales/${lang}/pages/planId.json`))
     .default;
   const reset = (await import(`../assets/locales/${lang}/pages/reset.json`))
@@ -94,7 +97,7 @@ export async function loadLanguageAsync(lang) {
   ).default;
 
   i18n.global.setLocaleMessage(lang, {
-    pages: { login, register, planId, reset, trailId },
+    pages: { login, register, planId, reset, trailId, forgot },
     rules,
     components: {
       appLearningPlanCard,
