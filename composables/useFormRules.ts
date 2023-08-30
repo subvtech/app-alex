@@ -50,22 +50,13 @@ export const useFormRules = (formData?: FormDataType) => {
     password: yup
       .string()
       .required(i18n.t('rules.password.required'))
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        i18n.t('rules.password.upperCase'),
-      )
+      .matches(/^\w*[A-Z]\w*[A-Z]\w*$/gm, i18n.t('rules.password.upperCase'))
       .matches(/^(?=.*\d).{1,}$/gm, i18n.t('rules.password.number'))
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        i18n.t('rules.password.upperCase'),
-      )
+      .matches(/^(?=.*[a-z]).{1,}$/gm, i18n.t('rules.password.upperCase'))
       .min(8, i18n.t('rules.password.min')),
     confirmPassword: yup
       .string()
-      .oneOf(
-        [yup.ref('password')],
-        i18n.t('rules.confirmPassword.matchError'),
-      )
+      .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))
       .required(i18n.t('rules.confirmPassword.required')),
   };
   const schema1 = yup.object({

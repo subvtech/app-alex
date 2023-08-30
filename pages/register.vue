@@ -172,7 +172,7 @@ const options = reactive({
   eager: true,
 });
 const messageStore = useMessageStore();
-const { setValue: setSuccessMessage } = useRouteStore();
+const { setPreviousPage } = useRouteStore();
 const { value: wallet } = useRouteStore<{address: string}>();
 definePageMeta({
   layout: 'auth',
@@ -271,11 +271,7 @@ const submit = async (values: FormDataType) => {
       messageStore.show = true;
       messageStore.message = i18n.t('pages.login.blockedError');
     } else if (user.value!.confirmed) {
-      setSuccessMessage({
-        title: 'Conta criada com sucesso!',
-        paragraph:
-          'Um link de ativação foi enviado para o e-mail cadastrado, acesse e realize a ativação da sua conta.',
-      }, true);
+      setPreviousPage('register');
       router.push('/success');
     }
   } catch (error) {

@@ -1,20 +1,23 @@
 import { UnwrapRef } from 'nuxt/dist/app/compat/capi';
 import { defineStore } from 'pinia';
+import type { RoutesNamesList } from '@typed-router';
 
 export const useRouteStore = <T>() =>
   defineStore('route', {
     state: (): {
       value: T | undefined;
-      successPage: boolean;
+      previousPage: RoutesNamesList | (string & {});
     } => ({
       value: undefined,
-      successPage: false,
+      previousPage: '',
     }),
 
     actions: {
-      setValue(value: UnwrapRef<T>, successPage?: boolean) {
+      setValue(value: UnwrapRef<T>) {
         this.value = value;
-        this.successPage = successPage ?? false;
+      },
+      setPreviousPage(previousPage: RoutesNamesList) {
+        this.previousPage = previousPage;
       },
     },
   })();

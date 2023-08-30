@@ -35,11 +35,11 @@
           class="border-green pa-4 text-center mx-auto mb-6"
         >
           <h2 class="text-white text-h5 mb-2" align="left" ref="el">
-            {{ value?.title }}
+            {{ $t(`pages.success.${previousPage}.title`) }}
           </h2>
 
           <p class="mb-2 text-grey text-subtitle-1" align="left">
-            {{ value?.paragraph }}
+            {{ $t(`pages.success.${previousPage}.subtitle`) }}
           </p>
         </v-sheet>
         <nuxt-link
@@ -47,7 +47,7 @@
           class="text-white haveAccount-link font-bold mb-auto"
         >
           <v-icon start icon="mdi-arrow-left"></v-icon>
-          Voltar para o login
+          {{ $t(`pages.success.${previousPage}.return`) }}
         </nuxt-link>
       </v-card>
     </v-col>
@@ -58,13 +58,13 @@
 definePageMeta({
   layout: 'auth',
   middleware: () => {
-    const { value, successPage } = useRouteStore();
-    if (!value || !successPage) {
+    const { previousPage } = useRouteStore();
+    if (!(['login', 'register', 'forgot'].includes(previousPage))) {
       return navigateTo('/login');
     }
   },
 });
-const { value } = useRouteStore<{ title: string; paragraph: string }>();
+const { previousPage } = useRouteStore<{ title: string; paragraph: string }>();
 </script>
 
 <style scoped lang="scss">
