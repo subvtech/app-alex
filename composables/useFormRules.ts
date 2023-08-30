@@ -66,7 +66,11 @@ export const useFormRules = (formData?: FormDataType) => {
       .required(i18n.t('rules.fullName.required'))
       .min(6, i18n.t('rules.fullName.min'))
       .max(64, i18n.t('rules.fullName.max'))
-  }
+      .matches(
+        /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
+        i18n.t('rules.fullname.onlyLetters'),
+      ),
+  };
 
   const cpfRules = {
     cpf: yup
