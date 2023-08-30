@@ -59,6 +59,7 @@ const onRegisteredUser = () => {
     background-position: 50% 100%;
   }
   &-bottom {
+    aspect-ratio: 4 / 1;
     background-image: url('../assets/svg/Ellipse.svg');
     background-size: 130%;
     background-position: top;

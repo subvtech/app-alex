@@ -18,4 +18,19 @@ body {
 html {
   overflow-y: auto !important
 }
+
+html::-webkit-scrollbar {
+  width: 16px;
+}
+
+
+html::-webkit-scrollbar-thumb {
+  background-color: #00B8CC;
+  border-radius: 999px;
+  border: 3px solid #010f1b;
+}
+
+html::-webkit-scrollbar-track { 
+  background-color: #010f1b;
+}
 </style>
