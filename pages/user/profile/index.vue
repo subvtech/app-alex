@@ -1,6 +1,6 @@
 <template>
   <div id="profile" class="w-100 d-flex" v-if="user">
-    <div class="header w-100">
+    <div class="header d-flex w-100">
       <span class="title h-">Perfil do usuário</span>
       <div class="pages d-flex h-100">
         <span class="go-back" style="cursor: pointer">Home</span>
@@ -43,6 +43,9 @@
         </span>
       </div>
     </div>
+    <div class="d-flex flex-wrap">
+      <profile-general v-if="links[0] === selectedOption" title="Detalhes" />
+    </div>
   </div>
 </template>
 
@@ -60,7 +63,7 @@ definePageMeta({
 
 const { id } = useStrapiUser<User>().value;
 user.value = await findOne<User>('users', id, { populate: '*' });
-console.log(typeof user.value, { user: user.value });
+console.log({ user: user.value });
 
 const selectedOption = ref('Visão geral');
 const links = ref([
@@ -80,14 +83,13 @@ const links = ref([
   height: 100%;
 
   .header {
-    display: flex;
     justify-content: flex-start;
     align-items: center;
     align-self: stretch;
     height: 44px;
 
     .title {
-      color: #5D6872;
+      color: #5d6872;
       font-size: 24px;
       font-weight: bold;
       line-height: 28px;
