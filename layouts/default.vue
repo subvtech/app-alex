@@ -77,7 +77,6 @@
               style="cursor: pointer"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <!-- <app-user-avatar :user="user" class="mr-2" /> -->
               <span>
                 {{ user?.fullname }}
               </span>
@@ -102,9 +101,7 @@
         <slot />
       </v-container>
     </v-main>
-    <!-- <v-footer :absolute="!fixed" app>
-        <span>&copy; {{ new Date().getFullYear() }}</span>
-      </v-footer> -->
+    
   </v-app>
 </template>
 
@@ -115,13 +112,11 @@ import { User } from 'models/user.model';
 const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
-// const fixed = ref(false);
-
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
 
-const profileMenuItems = ref([
+const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
     to: '/user/profile',
@@ -134,9 +129,9 @@ const profileMenuItems = ref([
     title: i18n.t('layouts.default.logout'),
     logout: true,
   },
-]);
+]
 
-const menus = ref([
+const menus = [
   {
     title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
@@ -177,12 +172,9 @@ const menus = ref([
       },
     ],
   },
-]);
+]
 
 const miniVariant = ref(false);
-
-// const title = ref('Alex');
-
 function onMenuClick(route = '', logout = false) {
   if (logout) {
     logoutUser();

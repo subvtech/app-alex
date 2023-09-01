@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n';
 
 export const SUPPORT_LOCALES = ['en', 'pt'];
-export let i18n = createI18n({
+export const i18n = createI18n({
   locale: 'pt',
   legacy: false,
   missingWarn: false,
@@ -43,75 +43,29 @@ export async function loadLanguageAsync(lang) {
   }
 
   // If the language hasn't been loaded yet
-
-  const login = (await import(`../assets/locales/${lang}/pages/login.json`))
-    .default;
-  const register = (
-    await import(`../assets/locales/${lang}/pages/register.json`)
-  ).default;
-  const forgot = (
-    await import(`../assets/locales/${lang}/pages/forgot.json`)
-  ).default;
-  const planId = (await import(`../assets/locales/${lang}/pages/planId.json`))
-    .default;
-  const reset = (await import(`../assets/locales/${lang}/pages/reset.json`))
-    .default;
-  const trailId = (await import(`../assets/locales/${lang}/pages/trailId.json`))
-    .default;
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-
-  const appLearningPlanCard = (
-    await import(
-      `../assets/locales/${lang}/components/appLearningPlanCard.json`
-    )
-  ).default;
-  const articleViewer = (
-    await import(`../assets/locales/${lang}/components/articleViewer.json`)
-  ).default;
-  const editor = (
-    await import(`../assets/locales/${lang}/components/editor.json`)
-  ).default;
-  const authors = (
-    await import(`../assets/locales/${lang}/components/authors.json`)
-  ).default;
-  const imagePreview = (
-    await import(`../assets/locales/${lang}/components/imagePreview.json`)
-  ).default;
-  const link = (await import(`../assets/locales/${lang}/components/link.json`))
-    .default;
-  const page = (await import(`../assets/locales/${lang}/components/page.json`))
-    .default;
-  const sendResetPassword = (
-    await import(`../assets/locales/${lang}/components/sendResetPassword.json`)
-  ).default;
-  const tagCombobox = (
-    await import(`../assets/locales/${lang}/components/tagCombobox.json`)
-  ).default;
-  const userAutocomplete = (
-    await import(`../assets/locales/${lang}/components/usersAutocomplete.json`)
-  ).default;
-  const viewer = (
-    await import(`../assets/locales/${lang}/components/viewer.json`)
-  ).default;
-
+  const pages = await useImportJson('pages', lang, ['login', 'register', 'planId', 'reset', 'trailId', 'forgot']);
+  const components = await useImportJson('components', lang, [
+    'appLearningPlanCard',
+    'articleViewer',
+    'editor',
+    'authors',
+    'imagePreview',
+    'link',
+    'page',
+    'sendResetPassword',
+    'tagCombobox',
+    'usersAutocomplete',
+    'viewer',
+  ]);
+  const layouts = await useImportJson('layouts', lang, ['default', 'error']);
   i18n.global.setLocaleMessage(lang, {
-    pages: { login, register, planId, reset, trailId, forgot },
+    pages,
     rules,
-    components: {
-      appLearningPlanCard,
-      articleViewer,
-      editor,
-      authors,
-      imagePreview,
-      link,
-      page,
-      sendResetPassword,
-      tagCombobox,
-      userAutocomplete,
-      viewer,
-    },
+    components,
+    layouts,
   });
-
+  console.log(pages)
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);
 }
