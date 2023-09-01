@@ -1,15 +1,20 @@
+import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
+import { ElementType } from './useUtils';
 
-export const SUPPORT_LOCALES = ['en', 'pt'];
+const { literalArray } = useUtils();
+export const SUPPORT_LOCALES = literalArray('en', 'pt');
+export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
 export const i18n = createI18n({
   locale: 'pt',
   legacy: false,
   missingWarn: false,
   globalInjection: true,
 });
+
 const loadedLanguages: string[] = []; // our default language that is preloaded
 
-export const setupI18n = (locale: string = 'pt') => {
+export const setupI18n = (locale: SUPPORT_LOCALES_TYPE = 'pt') => {
   setI18nLanguage(locale);
   loadLanguageAsync(locale);
 };
@@ -31,9 +36,12 @@ export function setI18nLanguage(locale) {
   document.querySelector('html')!.setAttribute('lang', locale);
 }
 
-export async function loadLanguageAsync(lang) {
+export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   // If the same language
-  if (i18n.global.locale === lang) {
+  if (
+    i18n.global.locale ===
+    (lang as unknown as WritableComputedRef<SUPPORT_LOCALES_TYPE>)
+  ) {
     return Promise.resolve(setI18nLanguage(lang));
   }
 
@@ -44,8 +52,15 @@ export async function loadLanguageAsync(lang) {
 
   // If the language hasn't been loaded yet
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-  const pages = await useImportJson('pages', lang, ['login', 'register', 'planId', 'reset', 'trailId', 'forgot']);
-  const components = await useImportJson('components', lang, [
+  const pages = await useImportLanguanges('pages', lang, [
+    'login',
+    'register',
+    'planId',
+    'reset',
+    'trailId',
+    'forgot',
+  ]);
+  const components = await useImportLanguanges('components', lang, [
     'appLearningPlanCard',
     'articleViewer',
     'editor',
@@ -58,14 +73,16 @@ export async function loadLanguageAsync(lang) {
     'usersAutocomplete',
     'viewer',
   ]);
-  const layouts = await useImportJson('layouts', lang, ['default', 'error']);
+  const layouts = await useImportLanguanges('layouts', lang, [
+    'default',
+    'error',
+  ]);
   i18n.global.setLocaleMessage(lang, {
     pages,
     rules,
     components,
     layouts,
   });
-  console.log(pages)
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);
 }

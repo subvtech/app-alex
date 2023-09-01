@@ -14,7 +14,7 @@
       <v-row justify="center" class="my-10">
         <div>
           <NuxtLink to="/">
-            <v-img src="/images/alex.svg" height="32" width="96" />
+            <img src="@/static/images/alex.svg" height="32" width="96" />
           </NuxtLink>
         </div>
       </v-row>
@@ -168,7 +168,7 @@ const menus = [
       {
         icon: 'mdi-star-outline',
         title: i18n.t('layouts.default.classesLinks'),
-        to: '/classes/active-links',
+        to: '/projects',
       },
     ],
   },
