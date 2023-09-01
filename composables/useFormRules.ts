@@ -68,7 +68,7 @@ export const useFormRules = (formData?: FormDataType) => {
       .max(64, i18n.t('rules.fullName.max'))
       .matches(
         /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
-        i18n.t('rules.fullname.onlyLetters'),
+        i18n.t('rules.fullName.onlyLetters'),
       ),
   };
 

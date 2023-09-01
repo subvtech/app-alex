@@ -67,6 +67,6 @@ const onRegisteredUser = () => {
 }
 
 .signUp {
-  width: clamp(550px, 65%, 870px);
+  width: clamp(550px, 65%, 50vw);
 }
 </style>

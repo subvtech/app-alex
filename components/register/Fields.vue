@@ -1,14 +1,20 @@
 <template>
-  <v-container  class="w-100 content  d-flex align-content-start justify-center maxW-200 ">
-    <v-card class="bg-transparent w-100 d-flex flex-column  justify-center" align="center" elevation="0">
-       <!-- <div class="logo"/> -->
+  <v-container
+    class="w-100 content d-flex align-content-start justify-center"
+  >
+    <v-card
+      class="bg-transparent w-100 d-flex flex-column justify-center"
+      align="center"
+      elevation="0"
+    >
       <v-card-title class="text-white title">
         {{ $t('pages.register.title') }}
       </v-card-title>
+
       <alex-inputs-stepper-form
         :schemes="[registerStep1, registerStep2, registerStep3]"
         :loading="registering"
-        :onSuccess="submit"
+        @onSuccess="submit"
         #default="{ activeStep, values }"
         align="left"
       >
@@ -60,23 +66,14 @@
             ]"
           />
 
-          <alex-inputs-stepper-field
+    
+          <alex-inputs-institutions
             v-if="values?.yourRole?.toLowerCase() == 'professor'"
-            typeField="autocomplete"
-            name="institution"
+            v-model:institutions="institutions"
             v-model:search="search"
-            :loading="fetching"
-            :items="institutions"
-            item-text="text"
-            item-value="id"
-            item-title="text"
-            :label="$t('pages.register.institution')"
-            color="white"
-            class="my-3 text-secondary"
-            variant="outlined"
-            required
-            cache-items
+            name="institution"
           />
+
         </alex-inputs-stepper-step>
         <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
           <v-card-subtitle class="text-white mb-8" align="center">
@@ -116,6 +113,7 @@
           />
         </alex-inputs-stepper-step>
       </alex-inputs-stepper-form>
+
       <div class="d-flex align-center text-white my-12">
         <v-divider
           color="secondary"
@@ -129,6 +127,7 @@
           class="border-opacity-100"
         ></v-divider>
       </div>
+
       <v-card-text class="text-white font-bold haveAccount">
         {{ $t('pages.register.hasAccount') }}
         <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
@@ -141,17 +140,24 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-const emit = defineEmits(['successMessage'])
-const { registerSchemas: {registerStep1, registerStep2, registerStep3}} = useFormRules();
+const emit = defineEmits(['successMessage']);
+const {
+  registerSchemas: { registerStep1, registerStep2, registerStep3 },
+} = useFormRules();
+const { setMessage } = useMessageStore();
+const { register } = useStrapiAuth();
+const { value: wallet } = useRouteStore<{ address: string }>();
+const i18n = useI18n();
 const cpfMask = reactive({
   mask: '###.###.###-##',
   eager: true,
 });
-const i18n = useI18n();
-const messageStore = useMessageStore();
-const { value: wallet } = useRouteStore<{ address: string }>();
-
-type FormDataType = {
+const usernameUrl = computed(() => window.location.host + '/profile/')
+const registering = ref(false);
+const institutions = ref([]);
+const search = ref('');
+const passwordVisible = ref(false);
+const submit = async (values: {
   fullname: string;
   username: string;
   email: string;
@@ -161,52 +167,7 @@ type FormDataType = {
   yourRole: string;
   institution: string;
   address?: string;
-};
-
-type InstitutionsType = {
-  id: String;
-  value: String;
-  sigla: String;
-  text: String;
-  tipo: String;
-};
-
-const { register } = useStrapiAuth();
-const { find } = useStrapi();
-const usernameUrl = 'https://app.projetoalex.cc/profile/';
-const registering = ref(false);
-const fetching = ref(false);
-const institutions = ref<InstitutionsType[]>([]);
-const isTyping = ref(false);
-const search = ref('');
-const passwordVisible = ref(false);
-
-const fetchInstitutions = async (institution: string) => {
-  fetching.value = true;
-  try {
-    const res = await find(
-      `institutions?nome_contains=${institution}&tipo=matriz&_limit=10`,
-    );
-    const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
-      return {
-        id: r.id,
-        value: r.attributes.nome,
-        sigla: r.attributes.sigla,
-        text: r.attributes.nome,
-        tipo: r.attributes.tipo,
-      };
-    });
-    institutions.value = resultArr;
-  } catch (error) {
-    console.log({ error });
-    messageStore.color = 'red';
-    messageStore.show = true;
-    messageStore.message = i18n.t('pages.login.searchError');
-  }
-  fetching.value = false;
-};
-
-const submit = async (values: FormDataType) => {
+}) => {
   registering.value = true;
 
   const { cpf, email, password, username, fullname, institution, yourRole } =
@@ -229,42 +190,26 @@ const submit = async (values: FormDataType) => {
     fullname,
     address: wallet?.address ?? wallet?.address,
     isProfessor: yourRole.toLowerCase() === 'professor',
+    institution: (institution && yourRole.toLowerCase() === 'professor') ? institution : undefined
   };
-
-  if (institution && yourRole.toLowerCase() === 'professor')
-    userData.institution = institution;
 
   try {
     const { user } = await register(userData);
 
     if (user.value!.blocked) {
-      messageStore.color = 'red';
-      messageStore.show = true;
-      messageStore.message = i18n.t('pages.login.blockedError');
+      setMessage(i18n.t('pages.login.blockedError'), 'red', true);
     } else if (user.value!.confirmed) {
-      // success
-      registering.value = false
-      emit('successMessage')
+      registering.value = false;
+      emit('successMessage');
     }
   } catch (error) {
+    setMessage(error as string);
+  } finally {
     registering.value = false;
-    messageStore.message = error as string;
   }
 };
 
-watchEffect(async (onInvalidate) => {
-  if (search.value?.length > 0) {
-    isTyping.value = true;
-    const getData = setTimeout(async () => {
-      isTyping.value = false;
-      await fetchInstitutions(search.value);
-    }, 500);
 
-    onInvalidate(() => {
-      clearInterval(getData);
-    });
-  }
-});
 </script>
 
 <style scoped lang="scss">
@@ -272,7 +217,6 @@ watchEffect(async (onInvalidate) => {
   width: 100%;
   height: clamp(150px, 20vh, 800px);
 }
-
 
 .content {
   padding: 32px 40px 32px 40px;
@@ -289,7 +233,6 @@ watchEffect(async (onInvalidate) => {
     font-size: 16px;
   }
 }
-
 
 @media screen and (min-width: 1100px) {
   .content {

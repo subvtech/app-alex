@@ -33,10 +33,6 @@
 
 import { useForm } from 'vee-validate';
 const props = defineProps({
-  onSuccess: {
-    type: Function,
-    required: true,
-  },
   schemes: {
     type: Array,
     required: true,
@@ -46,20 +42,25 @@ const props = defineProps({
     required: false
   }
 });
-const numberSteps = computed(() => props.schemes.length);
+
+const emit = defineEmits(['onSuccess'])
 const activeStep = ref(1);
+const numberSteps = computed(() => props.schemes.length);
 const validationSchema = computed(() => props.schemes[(activeStep.value - 1)]);
+
 const { handleSubmit, errors, values, controlledValues } =  useForm({
   validationSchema: validationSchema,
   keepValuesOnUnmount: true
 })
+
 const onSubmit = handleSubmit((values) => {
   if (activeStep.value - 1 !== numberSteps.value - 1) {
     activeStep.value++;
     return;
   }
-  props.onSuccess(values)
+  emit('onSuccess', values)
 });
+
 const isValid = computed(() => !Object.values(controlledValues.value).includes(undefined) && !Object.values(errors.value).length)
 
 const prevStep = () => {
@@ -67,7 +68,6 @@ const prevStep = () => {
     activeStep.value--;
   }
 };
-
 
 
 </script>

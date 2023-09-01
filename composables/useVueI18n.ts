@@ -16,11 +16,9 @@ export const setupI18n = (locale: string = 'pt') => {
 
 export function setI18nLanguage(locale) {
   let mode = i18n.mode;
-  console.log(i18n);
   if (mode === 'legacy') {
     i18n.global.locale = locale;
   } else {
-    console.log(mode);
     i18n.global.locale.value = locale;
   }
   /**
