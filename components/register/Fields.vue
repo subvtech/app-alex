@@ -1,13 +1,13 @@
 <template>
   <v-container
-    class="w-100 content d-flex align-content-start justify-center"
+    class=" content d-flex align-content-start justify-center "
   >
     <v-card
-      class="bg-transparent w-100 d-flex flex-column justify-center"
+      class="bg-transparent w-100 d-flex flex-column justify-start"
       align="center"
       elevation="0"
     >
-      <v-card-title class="text-white title">
+      <v-card-title class="text-sm-h6 text-white break-spaces">
         {{ $t('pages.register.title') }}
       </v-card-title>
 
@@ -19,7 +19,7 @@
         align="left"
       >
         <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
-          <v-card-subtitle class="text-white mb-8" align="center">
+          <v-card-subtitle class="text-white mb-8 break-spaces" align="center">
             {{ $t('pages.register.subtitle1') }}
           </v-card-subtitle>
 
@@ -49,7 +49,7 @@
           />
         </alex-inputs-stepper-step>
         <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
-          <v-card-subtitle class="text-white mb-8" align="center">
+          <v-card-subtitle class="text-white mb-8 break-spaces" align="center">
             {{ $t('pages.register.type') }}
           </v-card-subtitle>
 
@@ -76,7 +76,7 @@
 
         </alex-inputs-stepper-step>
         <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
-          <v-card-subtitle class="text-white mb-8" align="center">
+          <v-card-subtitle class="text-white  mb-8 break-spaces" align="center">
             {{ $t('pages.register.subtitle2') }}
           </v-card-subtitle>
 
@@ -220,7 +220,12 @@ const submit = async (values: {
 
 .content {
   padding: 32px 40px 32px 40px;
-  flex-grow: 1;
+  width: 100%;
+}
+
+.break-spaces {
+  white-space: break-spaces !important;
+  padding-inline: 0 !important;
 }
 
 .haveAccount {
@@ -234,6 +239,11 @@ const submit = async (values: {
   }
 }
 
+@media screen and (max-width: 500px) {
+  .content {
+    padding: 32px 32px 32px 32px;
+  }
+}
 @media screen and (min-width: 1100px) {
   .content {
     padding: 32px 64px 32px 64px;

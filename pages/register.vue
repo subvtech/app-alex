@@ -1,6 +1,6 @@
 <template>
-  <v-container class="fill-height pa-0 overflow-hidden" fluid>
-    <v-row class="fill-height">
+  <v-container class="pa-0 height-100" fluid>
+    <v-row class="fill-height w-100 ma-0">
       <v-col
         sm="0"
         md="7"
@@ -16,7 +16,7 @@
         md="5"
         lg="5"
         xl="4"
-        class="bg-primary pa-0 content d-flex flex-column"
+        class="bg-primary pa-0 content-field"
       >
         <div class="ellipse ellipse-top" />
         <SuccessMessage
@@ -44,29 +44,64 @@ const onRegisteredUser = () => {
 </script>
 
 <style scoped lang="scss">
-.content {
+.content-field {
   background-image: url('../assets/svg/Bubbles.svg');
   background-size: 100% 100%;
-  position: relative;
-  height: auto;
+  height: 100%;
+  overflow-y: scroll;
+  display: grid;
 }
+
+.height-100 {
+  height: 100vh !important;
+}
+
+.content-field {
+  overflow-y: auto !important
+}
+
+.content-field::-webkit-scrollbar {
+  width: 12px;
+}
+
+
+.content-field::-webkit-scrollbar-thumb {
+  background-color: #00B8CC;
+  border-radius: 999px;
+  border: 3px solid rgb(var(--v-theme-primary)) !important;;
+  
+}
+
+.content-field::-webkit-scrollbar-track { 
+  background-color: rgb(var(--v-theme-primary)) !important;
+}
+
 .ellipse {
   width: 100%;
   aspect-ratio: 4.4 / 1.3;
+  // min-height: 100px;
   &-top {
     background-image: url('../assets/svg/EllipseLogo.svg');
     background-size: 130%;
     background-position: 50% 100%;
   }
   &-bottom {
-    aspect-ratio: 4 / 1;
+    aspect-ratio: 4 / 0.9;
     background-image: url('../assets/svg/Ellipse.svg');
     background-size: 130%;
     background-position: top;
+    align-self: flex-end;
   }
 }
 
 .signUp {
   width: clamp(550px, 65%, 50vw);
 }
+
+@media screen and (max-width: 500px) {
+  .content-field::-webkit-scrollbar {
+  width: 8px;
+}
+}
+
 </style>
