@@ -2,7 +2,7 @@
   <v-container class="pa-0" fluid>
     <v-row>
       <v-col class="d-flex align-center">
-        <h6 class="text-h5 font-weight-bold">Projetos</h6>
+        <h5 class="text-h5 font-weight-bold">Projetos</h5>
         <v-divider
           vertical
           :thickness="3"
@@ -10,20 +10,20 @@
           class="ml-4"
           inset
         />
-        <v-breadcrumbs :items="breadcrumbs">
+        <v-breadcrumbs :items="breadcrumbs" density="compact">
           <template #divider>
             <v-icon icon="mdi-chevron-right" color="gray-300"></v-icon>
           </template>
         </v-breadcrumbs>
       </v-col>
       <v-col cols="auto" class="d-flex align-center">
-        <v-btn icon="mdi-plus" color="secondary-0" />
+        <v-btn icon="mdi-plus" color="secondary-0" size="small" />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col>
-        <v-container class="bg-white rounded-lg" fluid>
+        <v-container class="bg-white rounded-lg pa-6" fluid>
           <v-row>
             <v-col>
               <v-tabs
@@ -40,19 +40,27 @@
             <v-col cols="auto" class="d-flex align-center" style="gap: 8px"
               ><v-btn
                 icon="mdi-view-dashboard-outline"
-                color="primary-0"
+                color="primary-2"
                 variant="outlined"
                 size="small"
                 rounded="lg"
+                :max-width="smAndDown ? 40 : undefined"
               /><v-btn
-                prepend-icon="mdi-filter-variant"
-                color="primary-0"
+                :icon="smAndDown ? 'mdi-filter-variant' : undefined"
+                :prepend-icon="!smAndDown ? 'mdi-filter-variant' : undefined"
+                color="primary-2"
                 variant="outlined"
                 rounded="lg"
                 style="height: 40px"
-                >Filtros</v-btn
-              ></v-col
-            >
+                :text="!smAndDown ? 'Filtros' : undefined"
+                :max-width="smAndDown ? 40 : undefined"
+              />
+            </v-col>
+          </v-row>
+          <v-row class="pt-8">
+            <v-col>
+              <ProjectCard />
+            </v-col>
           </v-row>
         </v-container>
       </v-col>
@@ -61,6 +69,8 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify';
+
 const breadcrumbs = [
   {
     title: 'Home',
@@ -74,6 +84,7 @@ const breadcrumbs = [
   },
 ];
 const tab = ref<'all' | 'myProjects' | 'participating'>('all');
+const { smAndDown } = useDisplay();
 </script>
 
 <style scoped>

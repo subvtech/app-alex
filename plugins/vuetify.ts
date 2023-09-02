@@ -26,6 +26,26 @@ const newColors = {
   'gray-700': '#5A636D',
   'gray-800': '#454D54',
   'gray-900': '#30363B',
+  'success--2': '#6AE19F',
+  'success--1': '#40D984',
+  'success-0': '#26BF6B',
+  'success-1': '#1E9553',
+  'success-2': '#156A3B',
+  'error--2': '#F4A4A4',
+  'error--1': '#EE7777',
+  'error-0': '#E9494A',
+  'error-1': '#E31B1D',
+  'error-2': '#B61617',
+  'warning--2': '#FFCB99',
+  'warning--1': '#FFB166',
+  'warning-0': '#FF9733',
+  'warning-1': '#FF7D00',
+  'warning-2': '#CC6400',
+  'info--2': '#99DDFF',
+  'info--1': '#66CCFF',
+  'info-0': '#33BBFF',
+  'info-1': '#00AAFF',
+  'info-2': '#0088CC',
 };
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -35,6 +55,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         variant: 'outlined',
         rounded: 'lg',
       },
+      // VChip: {
+      //   variant
+      // }
     },
     components,
     directives,
