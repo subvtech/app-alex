@@ -11,7 +11,7 @@ const newColors = {
   'primary-2': '#001A33',
   'secondary--2': '#A3EDF5',
   'secondary--1': '#47D9EB',
-  'secondary--0': '#00B7CC',
+  'secondary-0': '#00B7CC',
   'secondary-1': '#008A99',
   'secondary-2': '#005C66',
   white: '#fff',
