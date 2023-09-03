@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ title: string; subtitle: string; icon: string }>();
+defineProps<{ title: string; subtitle: string | number; icon: string }>();
 </script>
 
 <style scoped>
