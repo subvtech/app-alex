@@ -84,7 +84,7 @@
               <ProjectCardIcon
                 title="Trilhas"
                 :subtitle="trailsCount"
-                icon="mdi-chevron-right"
+                icon="alex:trail"
               /> </v-col
             ><v-col>
               <ProjectCardIcon

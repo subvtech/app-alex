@@ -1,15 +1,18 @@
 import { h } from 'vue';
 import type { IconSet, IconProps } from 'vuetify';
-import tickIcon from './customSVGs/tickicon.vue';
-import closeIcon from './customSVGs/close-icon.vue';
+import trail from './Trail.vue';
 
 const alexAliases = {
-  tickIcon,
-  closeIcon,
+  trail,
 };
 
 const alexIcons: IconSet = {
-  component: (props: IconProps) => h(alexAliases[props.icon]),
+  component: (props: IconProps) =>
+    h(props.tag, [
+      h(alexAliases[props.icon as string], {
+        class: 'v-icon__svg',
+      }),
+    ]),
 };
 
 export { alexIcons /* aliases */ };

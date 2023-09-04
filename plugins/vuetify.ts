@@ -1,7 +1,8 @@
 import { createVuetify } from 'vuetify';
-
+import { mdi } from 'vuetify/iconsets/mdi';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
+import { alexIcons } from 'assets/icons';
 
 const newColors = {
   'primary--2': '#2E74B8',
@@ -55,9 +56,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         variant: 'outlined',
         rounded: 'lg',
       },
-      // VChip: {
-      //   variant
-      // }
     },
     components,
     directives,
@@ -89,6 +87,13 @@ export default defineNuxtPlugin((nuxtApp) => {
             ...newColors,
           },
         },
+      },
+    },
+    icons: {
+      defaultSet: 'mdi',
+      sets: {
+        mdi,
+        alex: alexIcons,
       },
     },
   });

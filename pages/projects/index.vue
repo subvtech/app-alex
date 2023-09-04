@@ -106,11 +106,20 @@ const breadcrumbs = [
     href: '/projects',
   },
 ];
-const tab = ref<'all' | 'myProjects' | 'participating'>('all');
 const { smAndDown } = useDisplay();
+const tab = ref<'all' | 'myProjects' | 'participating'>('all');
 const projects = [
   {
     id: 1,
+    title: 'Gerenciamento de projetos de redes de computadores',
+    subtitle:
+      '  Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
+    keyWords: ['Liderança', 'Liderança'],
+    facilitator: 'Glevson',
+    trails: 12,
+  },
+  {
+    id: 2,
     title: 'Gerenciamento de projetos de redes de computadores',
     subtitle:
       '  Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
