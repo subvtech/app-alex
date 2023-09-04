@@ -24,4 +24,8 @@ export default defineNuxtConfig({
   imports: {
     dirs: ['stores', 'models'],
   },
+  alias: {
+    '@': '/components',
+    '~': '/pages',
+  },
 });
