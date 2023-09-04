@@ -51,7 +51,7 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-column contacts pt-6 pb-4">
+      <div class="d-flex contacts pt-6 pb-4">
         <div
           class="d-flex align-center contact"
           v-for="contact in [
@@ -94,7 +94,7 @@
 
 <script setup lang="ts"></script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .boxes {
   align-items: flex-end;
   gap: 16px;
@@ -127,6 +127,7 @@
 .contacts {
   gap: 16px;
   border-bottom: 1px solid #eaeef1;
+  flex-direction: column;
   .contact {
     gap: 16px;
     .icon {
@@ -150,6 +151,15 @@
         font-weight: 400;
         line-height: 22px;
       }
+    }
+  }
+}
+@media (max-width: 800px) {
+  .contacts {
+    flex-wrap: wrap;
+    flex-direction: row;
+    .contact {
+      max-width: 130px;
     }
   }
 }

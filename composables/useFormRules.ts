@@ -104,10 +104,26 @@ export const useFormRules = (formData?: FormDataType) => {
       )
       .min(8, 'Mínimo de 8 caracteres'),
   };
+
+  const profileSchema = yup.object({
+    fullname: yup
+      .string()
+      .required('Nome completo é necessário')
+      .min(6, 'Mínimo de 6 caracteres')
+      .max(64, 'Máximo de 64 caracteres'),
+    phone: yup.string().required('Telefone é necessário'),
+    about: yup.string().min(12).max(500).required(),
+    cpf: yup
+      .string()
+      .required('CPF é necessário')
+      .length(14, 'CPF contém 11 caracteres')
+      .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
+  });
   return {
     schema1,
     schema2,
     schema3,
+    profileSchema,
     loginSchema
   };
 };

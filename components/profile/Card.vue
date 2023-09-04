@@ -1,5 +1,5 @@
 <template>
-  <div id="Card" class="d-flex flex-column">
+  <div id="Card" class="d-flex flex-column" :class="fullWidth ? 'w-100' : ''">
     <div class="foretitle d-flex pa-6">
       <span>{{ title }}</span>
     </div>
@@ -16,6 +16,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  fullWidth: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { title } = toRefs(props);
@@ -25,7 +29,7 @@ const { title } = toRefs(props);
 #Card {
   background-color: white;
   font-family: Sen;
-  min-width: 400px;
+  width: 450px;
   border-radius: 8px;
   .foretitle {
     align-items: center;
@@ -37,6 +41,11 @@ const { title } = toRefs(props);
       font-weight: 700;
       line-height: 24px;
     }
+  }
+}
+@media (max-width: 800px) {
+  #Card {
+    width: 100%;
   }
 }
 </style>

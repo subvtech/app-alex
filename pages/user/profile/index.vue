@@ -43,8 +43,42 @@
         </span>
       </div>
     </div>
-    <div class="d-flex flex-wrap">
-      <profile-general v-if="links[0] === selectedOption" title="Detalhes" />
+    <div
+      v-if="links[0] === selectedOption"
+      class="content-block d-flex justify-center flex-row"
+    >
+      <profile-general />
+      <div class="d-flex flex-column">
+        <profile-about />
+        <profile-institutional />
+      </div>
+    </div>
+    <div
+      v-if="links[1] === selectedOption"
+      class="content-block d-flex justify-center flex-row"
+    >
+      <profile-list />
+    </div>
+    <div
+      v-else-if="links[2] === selectedOption"
+      class="content-block d-flex justify-center flex-row"
+    ></div>
+    <div
+      v-else-if="links[3] === selectedOption"
+      class="content-block d-flex justify-center flex-row"
+    ></div>
+    <div
+      v-else-if="links[4] === selectedOption"
+      class="content-block d-flex justify-center flex-row"
+    >
+      <profile-events :url="strapiBaseUrl + user.avatar.url"/>
+    </div>
+    <div v-else class="content-block d-flex justify-center flex-row">
+      <profile-settings />
+      <div class="d-flex flex-column">
+        <profile-institutional />
+        <profile-security />
+      </div>
     </div>
   </div>
 </template>
@@ -229,6 +263,15 @@ const links = ref([
         color: #279ee3;
         border-bottom: 2px solid #279ee3;
       }
+    }
+  }
+
+  .content-block {
+    gap: 24px;
+  }
+  @media (max-width: 800px) {
+    .content-block {
+      flex-wrap: wrap;
     }
   }
 }
