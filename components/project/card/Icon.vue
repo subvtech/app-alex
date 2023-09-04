@@ -1,11 +1,13 @@
 <template>
   <div class="d-flex gap-2">
     <div class="icon-card">
-      <v-icon :icon="icon" size="large" color="gray-700" />
+      <v-icon :icon="icon" size="large" color="gray-800" />
     </div>
     <v-item-group>
-      <div class="texto-4">{{ title }}</div>
-      <div class="pa-0 text-card text-gray-700">{{ subtitle }}</div>
+      <div class="text-h7">
+        {{ title }}
+      </div>
+      <div class="pa-0 text-card text-gray-800">{{ subtitle }}</div>
     </v-item-group>
   </div>
 </template>
