@@ -21,10 +21,10 @@
         />
         <ForgotPasswordConfirmationMessage
           v-else
-          title="Recuperação enviada!"
-          text="Enviamos instruções para"
+          :title="$t('pages.forgot.recoverSent')"
+          :text="$t('pages.forgot.recoverInfo')"
           :email="userEmail"
-          text2=" Acesse o e-mail e siga as instruções fornecidas."
+          :text2="$t('pages.forgot.recoverInfo2')"
         />
       </v-col>
     </v-row>
@@ -32,11 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 const emailSent = ref(false);
 const userEmail = ref('');
 definePageMeta({
   layout: 'auth',
+  middleware: 'control-access'
 });
 
 const handleSentEmail = (email) => {

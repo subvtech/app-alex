@@ -1,0 +1,11 @@
+{
+  "cancel": "Cancelar",
+  "save": "Salvar",
+  "version": "Versão",
+  "submit": "Criar",
+  "createVersion": "Criar Versão",
+  "formTitle": "Informações do plano",
+  "planTitle": "Nome do Plano",
+  "planDescription": "Descrição do Plano",
+  "successMsg": "Dados salvos com sucesso!"
+}
