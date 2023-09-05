@@ -1,8 +1,7 @@
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
-import { ElementType } from './useUtils';
+import { ElementType, literalArray } from '@/helpers/utils';
 
-const { literalArray } = useUtils();
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
 export const i18n = createI18n({
@@ -12,7 +11,7 @@ export const i18n = createI18n({
   globalInjection: true,
 });
 
-const loadedLanguages: string[] = []; // our default language that is preloaded
+const loadedLanguages: SUPPORT_LOCALES_TYPE[] = []; // our default language that is preloaded
 
 export const setupI18n = (locale: SUPPORT_LOCALES_TYPE = 'pt') => {
   setI18nLanguage(locale);
@@ -52,7 +51,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
 
   // If the language hasn't been loaded yet
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-  const pages = await useImportLanguanges('pages', lang, [
+  const pages = await useImportLanguages('pages', lang, [
     'login',
     'register',
     'planId',
@@ -60,7 +59,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'trailId',
     'forgot',
   ]);
-  const components = await useImportLanguanges('components', lang, [
+  const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
     'articleViewer',
     'editor',
@@ -73,7 +72,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'usersAutocomplete',
     'viewer',
   ]);
-  const layouts = await useImportLanguanges('layouts', lang, [
+  const layouts = await useImportLanguages('layouts', lang, [
     'default',
     'error',
   ]);
