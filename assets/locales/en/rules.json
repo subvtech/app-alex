@@ -2,7 +2,8 @@
   "fullName": {
     "required": "Full name is required",
     "min": "At least 6 characters long",
-    "max": "At most 64 characters long"
+    "max": "At most 64 characters long",
+    "onlyLetters": "It must have only letters"
   },
   "email": {
     "required": "Email is required",

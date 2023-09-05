@@ -22,6 +22,7 @@
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
     "nuxt": "^3.6.5",
+    "nuxt-typed-router": "^3.3.1",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6"
   },

@@ -17,5 +17,9 @@
   "hasAccount": "If you already have an account,",
   "login": "Access here",
   "searchError": "There was an error with your search.",
-  "blockedError": "Blocked User!"
+  "blockedError": "Blocked User!",
+  "success": {
+    "title": "Account successfully created!",
+    "subtitle": "An activation link has been sent to your registered e-mail address. Go there and activate your account."
+  }
 }
