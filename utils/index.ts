@@ -1,3 +1,5 @@
+const extensions = literalArray('.jpeg', '.jpg', '.png', '.webp');
+
 export const getFullnameInitials = (fullname = '') => {
   const names = fullname.split(' ');
   const firstLetter = names[0][0].toUpperCase();
@@ -5,16 +7,10 @@ export const getFullnameInitials = (fullname = '') => {
   return `${firstLetter}${secondLetter}`;
 };
 
-export const formRules = {
-  requiredRule: (val: string) => !!val || 'Campo obrigatório',
-  min5CharactersRule: (val: string) =>
-    (val && val.length >= 5) || 'Mínimo de 5 caracteres',
-};
-
 export async function createFileFromUrl(
   url: string,
   name: string,
-  extension = '.jpg',
+  extension: ElementType<typeof extensions> | (string & {}) = '.jpg',
 ) {
   const response = await fetch(url);
   const data = await response.blob();
@@ -26,35 +22,16 @@ export async function createFileFromUrl(
   return file;
 }
 
-export function withTimeout(ms, promise) {
-  let timeout = new Promise((resolve, reject) => {
-    let id = setTimeout(() => {
+export function withTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
+  const timeout = new Promise((_, reject) => {
+    const id = setTimeout(() => {
       clearTimeout(id);
       reject(`Timed out in ${ms}ms.`);
     }, ms);
   });
 
-  return Promise.race([promise, timeout]);
+  return Promise.race([promise, timeout]) as Promise<T>;
 }
-
-export const passwordRules = {
-  requiredRule: (val: string) => !!val || 'Senha é obrigatória',
-  requiredConfirmationRule: (val: string) =>
-    !!val || 'Confirmação é obrigatória',
-  min8CharactersRule: (val: string) =>
-    (val && val.length >= 8) || 'A senha deve ter no mínimo 8 caracteres',
-  charactersRule: (val: string) =>
-    (/[A-Z]/.test(val) &&
-      /[a-z]/.test(val) &&
-      /\d/.test(val) &&
-      /\W/.test(val)) ||
-    'A senha deve conter uma combinação de letras maiúsculas e minusculas, números e símbolos',
-  passwordConfirmationRule: (val: string, confirmation: string) => {
-    if (confirmation) {
-      return val === confirmation || 'Senhas diferentes';
-    }
-  },
-};
 
 // Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
 export type ElementType<T extends ReadonlyArray<unknown>> =
@@ -65,3 +42,10 @@ export type ElementType<T extends ReadonlyArray<unknown>> =
 export function literalArray<T extends string>(...args: T[]): T[] {
   return args;
 }
+
+
+export const formRules = {
+  requiredRule: (val: string) => !!val || 'Campo obrigatório',
+  min5CharactersRule: (val: string) =>
+    (val && val.length >= 5) || 'Mínimo de 5 caracteres',
+};
