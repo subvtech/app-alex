@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
-import { useI18n } from 'vue-i18n';
+
 
 const i18n = useI18n();
 // const strapiUrl = useStrapiUrl();

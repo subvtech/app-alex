@@ -116,7 +116,7 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { useI18n } from 'vue-i18n';
+
 import { Tag } from 'models/tag.model';
 import { LearningPlan } from 'models/learningPlan.model';
 const { requiredRule, min5CharactersRule } = formRules;

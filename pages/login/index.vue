@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+
 import { useForm } from 'vee-validate';
 const i18n = useI18n();
 definePageMeta({

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useI18n } from 'vue-i18n';
+
 
 declare global {
   interface Window {
