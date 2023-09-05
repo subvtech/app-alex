@@ -1,0 +1,41 @@
+{
+  "fullName": {
+    "required": "Nome completo é necessário",
+    "min": "Mínimo de 6 caracteres",
+    "max": "Máximo de 64 caracteres",
+    "onlyLetters": "Deve conter apenas letras"
+    
+  },
+  "email": {
+    "required": "E-mail é necessário",
+    "invalid": "E-mail inválido."
+  },
+  "cpf": {
+    "required": "CPF é necessário",
+    "length": "CPF contém 11 caracteres",
+    "invalid": "CPF inválido."
+  },
+
+  "yourRole": {
+    "required": "Tipo de Usuário é necessário"
+  },
+  "institution": {
+    "required": "Tipo de instituição é necessário."
+  },
+  "username": {
+    "required": "Nome de usuário é necessário",
+    "min": "Mínimo de 6 caracteres",
+    "max": "Máximo de 64 caracteres"
+  },
+  "password": {
+    "required": "Senha é necessária",
+    "upperCase": "Pelo menos 2 letras maiúsculas necessárias",
+    "lowerCase": "Pelo menos 1 letra minúscula",
+    "number": "Pelo menos 1 número necessário",
+    "min": "Mínimo de 8 caracteres"
+  },
+  "confirmPassword": {
+    "required": "Confirma Senha é necessário",
+    "matchError": "As senhas não são idênticas"
+  }
+}

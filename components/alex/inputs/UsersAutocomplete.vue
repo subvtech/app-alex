@@ -4,7 +4,7 @@
     v-model:search-input="search"
     :items="users"
     :loading="loadingUsers"
-    label="Adicionar Colaboradores"
+    :label="$t('components.usersAutocomplete.label')"
     prepend-inner-icon="mdi-plus-circle"
     append-icon="mdi-magnify"
     outlined

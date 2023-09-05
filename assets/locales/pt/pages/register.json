@@ -1,0 +1,25 @@
+{
+  "alt": "Crie sua conta",
+  "title": "Inicie uma nova experiência!",
+  "subtitle1": "Crie uma conta e comece seus estudos",
+  "type": "Informe o tipo da sua conta",
+  "userType": "Tipo de Usuário",
+  "typeProfessor": "Professor",
+  "typeStudent": "Aluno",
+  "institution": "Instituição de Ensino",
+  "subtitle2": "Insira seus dados de acesso",
+  "username": "Nome de Usuário",
+  "fullName": "Nome completo",
+  "email": "E-mail",
+  "password": "Senha",
+  "confirmPassword": "Confirmar Senha",
+  "divider": "OU",
+  "hasAccount": "Se já possui conta,",
+  "login": "Acesse aqui",
+  "searchError": "Ocorreu um erro na busca.",
+  "blockedError": "Usuário bloqueado!",
+  "success": {
+    "title": "Conta criada com sucesso!",
+    "subtitle": "Um link de ativação foi enviado para o e-mail cadastrado, acesse e realize a ativação da sua conta."
+    }
+}

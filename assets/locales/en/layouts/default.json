@@ -1,0 +1,14 @@
+{
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  "dashboardsTitle": "DASHBOARDS",
+  "dashboard": "Dashboard",
+  "learningPlansTitle": "LEARNING PLANS",
+  "learningPlans": "All plans",
+  "learningPlansUser": "My plans",
+  "classesTitle": "CLASSES",
+  "classes": "My classes",
+  "classesLinks": "Active Links",
+  "isLoading": "Loading..."
+}

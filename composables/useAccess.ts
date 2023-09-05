@@ -1,4 +1,4 @@
-export const useAccess = async (roles = ['public']) => {
+export const useAccess = (roles = ['public']) => {
   const user: any = useStrapiUser();
   const userHasAccess = computed(
     () => !!toValue(roles).includes(user.value.role.type),

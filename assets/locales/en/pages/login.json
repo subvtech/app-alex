@@ -1,0 +1,19 @@
+{
+  "alt": "Welcome to Alex",
+  "welcome": "Welcome to Alex!",
+  "access": "Access your account and keep going with your studies",
+  "forgot": "Forgot password?",
+  "submit": "Enter",
+  "email": "Email",
+  "noAccount": "Don't have an account yet?",
+  "register": "Create your account",
+  "remember": "Remember me",
+  "password": "Password",
+  "divider": "or",
+  "metamask": {
+    "btn": "Login with Metamask",
+    "notFound": "Metamask wallet wasn't detected",
+    "tokenExpired": "Token expired, try again"
+  },
+  "loginError": "Invalid email or invalid password, maybe both"
+}

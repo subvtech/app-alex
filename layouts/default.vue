@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <!-- <AppSnackbar></AppSnackbar> -->
+    <AppSnackbar />
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
@@ -109,8 +109,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { User } from 'models/user.model';
 
+const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
 // const fixed = ref(false);
@@ -121,56 +123,56 @@ const user = useStrapiUser<User>();
 
 const profileMenuItems = ref([
   {
-    title: 'Perfil',
+    title: i18n.t('layouts.default.profile'),
     to: '/user/profile',
   },
   {
-    title: 'Configurações',
+    title: i18n.t('layouts.default.settings'),
     to: '/user/settings',
   },
   {
-    title: 'Sair',
+    title: i18n.t('layouts.default.logout'),
     logout: true,
   },
 ]);
 
 const menus = ref([
   {
-    title: 'DASHBOARDS',
+    title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
       {
         icon: 'mdi-star-outline',
-        title: 'Dashboard',
+        title: i18n.t('layouts.default.dashboard'),
         to: '/dashboard',
       },
     ],
   },
   {
-    title: 'PLANOS DE APRENDIZAGEM',
+    title: i18n.t('layouts.default.learningPlansTitle'),
     items: [
       {
         icon: 'mdi-star-outline',
-        title: 'Todos os planos',
+        title: i18n.t('layouts.default.learningPlans'),
         to: '/learning-plans',
       },
       {
         icon: 'mdi-star-outline',
-        title: 'Meus planos',
+        title: i18n.t('layouts.default.learningPlansUser'),
         to: '/learning-plans/user',
       },
     ],
   },
   {
-    title: 'TURMAS',
+    title: i18n.t('layouts.default.classesTitle'),
     items: [
       {
         icon: 'mdi-star-outline',
-        title: 'Minhas turmas',
+        title: i18n.t('layouts.default.classes'),
         to: '/classes',
       },
       {
         icon: 'mdi-star-outline',
-        title: 'Links ativos',
+        title: i18n.t('layouts.default.classesLinks'),
         to: '/classes/active-links',
       },
     ],

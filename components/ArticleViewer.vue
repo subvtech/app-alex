@@ -2,7 +2,7 @@
   <v-dialog v-model="visible" width="95%">
     <v-card>
       <v-card-title>
-        {{ isLoading ? 'Carregando...' : title }}
+        {{ isLoading ? $t('layouts.default.isLoading') : title }}
       </v-card-title>
       <div ref="contentContainer" class="content-container pa-10"></div>
       <v-skeleton-loader
@@ -15,6 +15,9 @@
   </v-dialog>
 </template>
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+const i18n = useI18n();
+
 const messageStore = useMessageStore();
 const props = defineProps({
   url: {
@@ -43,12 +46,16 @@ const parsePage = async () => {
       }),
     });
     if (res.data.error) {
-      messageStore.message = 'Ocorreu um erro no processamento da página.';
+      messageStore.message = i18n.t('components.articleViewer.processingError');
+      messageStore.color = 'red';
+      messageStore.show = true;
     }
     contentContainer.value.innerHTML = res.data.content;
     title.value = res.data.title;
   } catch (error) {
-    messageStore.message = 'Ocorreu um erro no processamento da página.';
+    messageStore.message = i18n.t('articleViewer.processingError');
+    messageStore.color = 'red';
+    messageStore.show = true;
   }
   isLoading.value = false;
 };

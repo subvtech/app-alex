@@ -1,6 +1,7 @@
 {
   "name": "nuxt-app",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -21,6 +22,7 @@
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
     "nuxt": "^3.6.5",
+    "nuxt-typed-router": "^3.3.1",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6"
   },
@@ -66,6 +68,7 @@
     "strapi-sdk-js": "^2.2.0",
     "v-viewer": "^1.6.4",
     "vee-validate": "^4.11.1",
+    "vue-i18n": "^9.2.2",
     "vue-plyr": "^7.0.0",
     "vue-prism-component": "^2.0.0",
     "vuetify": "^3.3.11",
