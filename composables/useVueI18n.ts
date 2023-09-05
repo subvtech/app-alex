@@ -1,26 +1,28 @@
+import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
+import { ElementType, literalArray } from '@/helpers/utils';
 
-export const SUPPORT_LOCALES = ['en', 'pt'];
-export let i18n = createI18n({
+export const SUPPORT_LOCALES = literalArray('en', 'pt');
+export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
+export const i18n = createI18n({
   locale: 'pt',
   legacy: false,
   missingWarn: false,
   globalInjection: true,
 });
-const loadedLanguages: string[] = []; // our default language that is preloaded
 
-export const setupI18n = (locale: string = 'pt') => {
+const loadedLanguages: SUPPORT_LOCALES_TYPE[] = []; // our default language that is preloaded
+
+export const setupI18n = (locale: SUPPORT_LOCALES_TYPE = 'pt') => {
   setI18nLanguage(locale);
   loadLanguageAsync(locale);
 };
 
 export function setI18nLanguage(locale) {
   let mode = i18n.mode;
-  console.log(i18n);
   if (mode === 'legacy') {
     i18n.global.locale = locale;
   } else {
-    console.log(mode);
     i18n.global.locale.value = locale;
   }
   /**
@@ -33,9 +35,12 @@ export function setI18nLanguage(locale) {
   document.querySelector('html')!.setAttribute('lang', locale);
 }
 
-export async function loadLanguageAsync(lang) {
+export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   // If the same language
-  if (i18n.global.locale === lang) {
+  if (
+    i18n.global.locale ===
+    (lang as unknown as WritableComputedRef<SUPPORT_LOCALES_TYPE>)
+  ) {
     return Promise.resolve(setI18nLanguage(lang));
   }
 
@@ -45,72 +50,38 @@ export async function loadLanguageAsync(lang) {
   }
 
   // If the language hasn't been loaded yet
-
-  const login = (await import(`../assets/locales/${lang}/pages/login.json`))
-    .default;
-  const register = (
-    await import(`../assets/locales/${lang}/pages/register.json`)
-  ).default;
-  const planId = (await import(`../assets/locales/${lang}/pages/planId.json`))
-    .default;
-  const reset = (await import(`../assets/locales/${lang}/pages/reset.json`))
-    .default;
-  const trailId = (await import(`../assets/locales/${lang}/pages/trailId.json`))
-    .default;
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-
-  const appLearningPlanCard = (
-    await import(
-      `../assets/locales/${lang}/components/appLearningPlanCard.json`
-    )
-  ).default;
-  const articleViewer = (
-    await import(`../assets/locales/${lang}/components/articleViewer.json`)
-  ).default;
-  const editor = (
-    await import(`../assets/locales/${lang}/components/editor.json`)
-  ).default;
-  const authors = (
-    await import(`../assets/locales/${lang}/components/authors.json`)
-  ).default;
-  const imagePreview = (
-    await import(`../assets/locales/${lang}/components/imagePreview.json`)
-  ).default;
-  const link = (await import(`../assets/locales/${lang}/components/link.json`))
-    .default;
-  const page = (await import(`../assets/locales/${lang}/components/page.json`))
-    .default;
-  const sendResetPassword = (
-    await import(`../assets/locales/${lang}/components/sendResetPassword.json`)
-  ).default;
-  const tagCombobox = (
-    await import(`../assets/locales/${lang}/components/tagCombobox.json`)
-  ).default;
-  const userAutocomplete = (
-    await import(`../assets/locales/${lang}/components/usersAutocomplete.json`)
-  ).default;
-  const viewer = (
-    await import(`../assets/locales/${lang}/components/viewer.json`)
-  ).default;
-
+  const pages = await useImportLanguages('pages', lang, [
+    'login',
+    'register',
+    'planId',
+    'reset',
+    'trailId',
+    'forgot',
+  ]);
+  const components = await useImportLanguages('components', lang, [
+    'appLearningPlanCard',
+    'articleViewer',
+    'editor',
+    'authors',
+    'imagePreview',
+    'link',
+    'page',
+    'sendResetPassword',
+    'tagCombobox',
+    'usersAutocomplete',
+    'viewer',
+  ]);
+  const layouts = await useImportLanguages('layouts', lang, [
+    'default',
+    'error',
+  ]);
   i18n.global.setLocaleMessage(lang, {
-    pages: { login, register, planId, reset, trailId },
+    pages,
     rules,
-    components: {
-      appLearningPlanCard,
-      articleViewer,
-      editor,
-      authors,
-      imagePreview,
-      link,
-      page,
-      sendResetPassword,
-      tagCombobox,
-      userAutocomplete,
-      viewer,
-    },
+    components,
+    layouts,
   });
-
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);
 }

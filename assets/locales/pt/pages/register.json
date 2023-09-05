@@ -17,5 +17,9 @@
   "hasAccount": "Se já possui conta,",
   "login": "Acesse aqui",
   "searchError": "Ocorreu um erro na busca.",
-  "blockedError": "Usuário bloqueado!"
+  "blockedError": "Usuário bloqueado!",
+  "success": {
+    "title": "Conta criada com sucesso!",
+    "subtitle": "Um link de ativação foi enviado para o e-mail cadastrado, acesse e realize a ativação da sua conta."
+    }
 }

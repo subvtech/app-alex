@@ -50,31 +50,29 @@ export const useFormRules = (formData?: FormDataType) => {
     password: yup
       .string()
       .required(i18n.t('rules.password.required'))
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        i18n.t('rules.password.upperCase'),
-      )
+      .matches(/^\w*[A-Z]\w*[A-Z]\w*$/gm, i18n.t('rules.password.upperCase'))
       .matches(/^(?=.*\d).{1,}$/gm, i18n.t('rules.password.number'))
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        i18n.t('rules.password.upperCase'),
-      )
+      .matches(/^(?=.*[a-z]).{1,}$/gm, i18n.t('rules.password.upperCase'))
       .min(8, i18n.t('rules.password.min')),
     confirmPassword: yup
       .string()
-      .oneOf(
-        [yup.ref('password')],
-        i18n.t('rules.confirmPassword.matchError'),
-      )
+      .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))
       .required(i18n.t('rules.confirmPassword.required')),
   };
-  const schema1 = yup.object({
+
+  const fullnameRules = {
     fullname: yup
       .string()
       .required(i18n.t('rules.fullName.required'))
       .min(6, i18n.t('rules.fullName.min'))
-      .max(64, i18n.t('rules.fullName.max')),
-    ...emailRules,
+      .max(64, i18n.t('rules.fullName.max'))
+      .matches(
+        /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
+        i18n.t('rules.fullName.onlyLetters'),
+      ),
+  };
+
+  const cpfRules = {
     cpf: yup
       .string()
       .required(i18n.t('rules.cpf.required'))
@@ -82,8 +80,15 @@ export const useFormRules = (formData?: FormDataType) => {
       .test('test-invalid-cpf', i18n.t('rules.cpf.invalid'), (cpf) =>
         isValidCpf(cpf),
       ),
+  };
+
+  const registerStep1 = yup.object({
+    ...fullnameRules,
+    ...emailRules,
+    ...cpfRules,
   });
-  const schema2 = yup.object({
+
+  const registerStep2 = yup.object({
     yourRole: yup
       .string()
       .required(i18n.t('rules.yourRole.required'))
@@ -98,7 +103,7 @@ export const useFormRules = (formData?: FormDataType) => {
           scheme.required(i18n.t('rules.institution.required')),
       }),
   });
-  const schema3 = yup.object({
+  const registerStep3 = yup.object({
     ...passwordRules,
     username: yup
       .string()
@@ -112,11 +117,12 @@ export const useFormRules = (formData?: FormDataType) => {
     password: passwordRules.password,
   };
   return {
-    schema1,
-    schema2,
-    schema3,
+    registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
     emailRules: yup.object(emailRules),
+    passwordRules,
+    fullnameRules,
+    cpfRules,
     loginSchema,
   };
 };

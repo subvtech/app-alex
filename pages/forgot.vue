@@ -36,6 +36,7 @@ const emailSent = ref(false);
 const userEmail = ref('');
 definePageMeta({
   layout: 'auth',
+  middleware: 'control-access'
 });
 
 const handleSentEmail = (email) => {
