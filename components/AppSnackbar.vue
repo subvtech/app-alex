@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar v-model="show" :color="color" top timeout="5000">
+  <v-snackbar v-if="message" v-model="show" :color="color" top timeout="5000">
     <v-row justify="space-between" align="center" class="pa-2">
       <span class="text-white font-weight-bold">{{ message }}</span>
       <v-btn role="button" @click="show = false">Fechar</v-btn>

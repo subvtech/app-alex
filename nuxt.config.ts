@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
@@ -15,12 +14,14 @@ export default defineNuxtConfig({
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
   },
+
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
+
   imports: {
     dirs: ['stores', 'models'],
   },

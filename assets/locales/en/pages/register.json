@@ -1,0 +1,25 @@
+{
+  "alt": "Create your account",
+  "title": "Start a new experience!",
+  "subtitle1": "Create an account and start your studies",
+  "type": "Inform the type of your account",
+  "userType": "User Type",
+  "typeProfessor": "Professor",
+  "typeStudent": "Student",
+  "institution": "Teaching Institution",
+  "subtitle2": "Insert your access data",
+  "username": "Username",
+  "email": "Email",
+  "fullName": "Fullname",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "divider": "or",
+  "hasAccount": "If you already have an account,",
+  "login": "Access here",
+  "searchError": "There was an error with your search.",
+  "blockedError": "Blocked User!",
+  "success": {
+    "title": "Account successfully created!",
+    "subtitle": "An activation link has been sent to your registered e-mail address. Go there and activate your account."
+  }
+}
