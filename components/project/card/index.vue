@@ -2,7 +2,6 @@
   <v-hover v-slot="{ props, isHovering }">
     <v-card
       max-width="350"
-      width="350"
       rounded="lg"
       flat
       style="gap: 16px; cursor: pointer; outline: 1px solid #0005"
@@ -84,13 +83,13 @@
               <ProjectCardIcon
                 title="Trilhas"
                 :subtitle="trailsCount"
-                icon="alex:trail"
+                :icon="{name: 'alex:trail'}"
               /> </v-col
             ><v-col>
               <ProjectCardIcon
                 title="Facilitador"
                 subtitle="Glevson"
-                icon="mdi-chevron-right"
+                :icon="{name: 'mdi-chevron-right'}"
               />
             </v-col>
           </v-row>
