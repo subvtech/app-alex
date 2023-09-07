@@ -51,13 +51,13 @@ export const MAIN_THEME = 'mainTheme';
 export const mainTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    primary: '#001529',
-    accent: '#00B8CC',
-    secondary: '#F1F5F9',
-    info: '#26A69A',
-    warning: '#FFC107',
-    error: '#FF5252',
-    success: '#38C976',
+    primary: AlexThemeColors['primary-2'],
+    accent: AlexThemeColors['secondary-0'],
+    secondary: AlexThemeColors['gray-blue'],
+    info: AlexThemeColors['info-0'],
+    warning: AlexThemeColors['warning-0'],
+    error: AlexThemeColors['error-0'],
+    success: AlexThemeColors['success-0'],
     ...AlexThemeColors,
   },
 };
@@ -68,12 +68,12 @@ export const MAIN_DARK_THEME = 'mainDarkTheme';
 export const mainDarkTheme: ThemeDefinition = {
   dark: true,
   colors: {
-    primary: '#F1F5F9',
-    accent: '#00B8CC',
-    secondary: '#001529',
-    warning: '#FCC132',
-    error: '#FF5252',
-    success: '#38C976',
+    primary: AlexThemeColors['gray-blue'],
+    accent: AlexThemeColors['secondary-0'],
+    secondary: AlexThemeColors['primary-2'],
+    warning: AlexThemeColors['warning-0'],
+    error: AlexThemeColors['error-0'],
+    success: AlexThemeColors['success-0'],
     ...AlexThemeColors,
   },
 };
