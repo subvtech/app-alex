@@ -13,12 +13,14 @@
       <v-col>
         <v-container class="bg-white rounded-lg pa-6" fluid>
           <v-row>
-            <v-col>
+            <v-col xs="9" sm="auto"  >
               <v-tabs
                 v-model="tab"
                 selected-class="selected-tab"
                 hide-slider
                 color="gray-900"
+                
+                :show-arrows="xs"
               >
                 <v-tab
                   value="all"
@@ -41,7 +43,7 @@
                 />
               </v-tabs>
             </v-col>
-            <v-col cols="auto" class="d-flex align-center" style="gap: 8px"
+            <v-col  xs="3" sm="auto"  class="d-flex align-center" style="gap: 8px"
               ><v-btn
                 icon="mdi-view-dashboard-outline"
                 color="primary-2"
@@ -106,7 +108,7 @@ const breadcrumbs = [
     href: '/projects',
   },
 ];
-const { smAndDown } = useDisplay();
+const { smAndDown, xs } = useDisplay();
 const tab = ref<'all' | 'myProjects' | 'participating'>('all');
 const projects = [
   {
