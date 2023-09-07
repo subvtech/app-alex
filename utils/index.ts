@@ -23,14 +23,14 @@ export async function createFileFromUrl(
 }
 
 export function withTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
-  const timeout = new Promise((_, reject) => {
+  const timeout = new Promise<T>((_, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id);
       reject(`Timed out in ${ms}ms.`);
     }, ms);
   });
 
-  return Promise.race([promise, timeout]) as Promise<T>;
+  return Promise.race([promise, timeout]);
 }
 
 // Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
@@ -42,7 +42,6 @@ export type ElementType<T extends ReadonlyArray<unknown>> =
 export function literalArray<T extends string>(...args: T[]): T[] {
   return args;
 }
-
 
 export const formRules = {
   requiredRule: (val: string) => !!val || 'Campo obrigatório',
