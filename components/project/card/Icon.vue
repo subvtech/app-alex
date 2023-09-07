@@ -1,7 +1,11 @@
 <template>
   <div class="d-flex gap-2">
     <div class="icon-card">
-      <v-icon :icon="icon" size="x-large" color="gray-800" />
+      <v-icon
+        :icon="icon.name"
+        :size="icon.size"
+        color="gray-800"
+      />
     </div>
     <v-item-group>
       <div class="pa-0 text-card text-gray-800 font-weight-bold">
@@ -13,7 +17,11 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ title: string; subtitle: string | number; icon: string }>();
+defineProps<{
+  title: string;
+  subtitle: string | number;
+  icon: { name: string; size?: string };
+}>();
 </script>
 
 <style scoped>
