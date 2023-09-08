@@ -1,7 +1,11 @@
+/* 
+  files with underscore _ won't be compiled.
+  we use this method to variables, components, colors.
+  the unique file that will be compiled is the index.scss.
+*/
 @use 'sass:math';
 @use 'sass:map';
 @use 'sass:meta';
-
 $body-font-family: 'Montserrat', sans-serif !default;
 $heading-font-family: $body-font-family !default;
 
@@ -120,7 +124,6 @@ $typography: map.deep-merge(
       'font-family': $heading-font-family,
       'text-transform': none,
     ),
-   
   ),
   $typography
 );

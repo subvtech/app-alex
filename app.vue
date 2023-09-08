@@ -11,5 +11,5 @@ import './assets/css/base.scss';
 </script>
 
 <style lang="scss">
-@use './assets/settings.scss'
+@use './assets/settings';
 </style>
