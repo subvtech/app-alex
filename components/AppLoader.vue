@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; justify-content: center; height: 100%;">
+  <div style="display: flex; justify-content: center; height: 100%">
     <!-- <a-spin style="margin: auto;">
       <a-icon slot="indicator" type="loading" style="font-size: 48px;" spin />
     </a-spin>
@@ -7,5 +7,4 @@
     asd
   </div>
 </template>
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
