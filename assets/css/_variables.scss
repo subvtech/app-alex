@@ -3,9 +3,8 @@
   we use this method to variables, components, colors.
   the unique file that will be compiled is the index.scss.
 */
-@use 'sass:math';
 @use 'sass:map';
-@use 'sass:meta';
+
 $body-font-family: 'Montserrat', sans-serif !default;
 $heading-font-family: $body-font-family !default;
 
