@@ -3,10 +3,27 @@
   we use this method to variables, components, colors.
   the unique file that will be compiled is the index.scss.
 */
+@use 'sass:math';
 @use 'sass:map';
+@use 'sass:meta';
 
 $body-font-family: 'Montserrat', sans-serif !default;
 $heading-font-family: $body-font-family !default;
+
+$spacer: 4px !default;
+$spacers-steps: 16 !default;
+
+$spacers: () !default;
+@if (meta.type-of($spacers) == list) {
+  @for $i from 0 through $spacers-steps {
+    $spacers: map.merge(
+      $spacers,
+      (
+        $i: $spacer * $i,
+      )
+    );
+  }
+}
 
 $typography: () !default;
 $typography: map.deep-merge(
