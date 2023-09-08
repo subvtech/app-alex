@@ -1,15 +1,13 @@
 <template>
-  <v-btn-group>
-    <template v-for="{ icon, value: itemValue } in items" :key="itemValue">
-      <slot
-        v-if="itemValue == modelValue"
-        :icon="icon"
-        :value="itemValue"
-        :click="() => onClick(itemValue, items)"
-      >
-      </slot>
-    </template>
-  </v-btn-group>
+  <template v-for="{ icon, value: itemValue } in items" :key="itemValue">
+    <slot
+      v-if="itemValue == modelValue"
+      :icon="icon"
+      :value="itemValue"
+      :click="() => onClick(itemValue, items)"
+    >
+    </slot>
+  </template>
 </template>
 
 <script setup lang="ts">
