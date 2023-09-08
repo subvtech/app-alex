@@ -5,4 +5,9 @@ export const defaults: DefaultsInstance = {
     variant: 'outlined',
     rounded: 'lg',
   },
+  VBreadcrumbs: {
+    VBreadcrumbsDivider: {
+      style: 'padding: 0',
+    },
+  },
 };

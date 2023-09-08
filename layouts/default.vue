@@ -97,7 +97,7 @@
       </v-menu>
     </v-app-bar>
     <v-main class="secondary bg-gray-blue">
-      <v-container style="width: 100%; max-width: 100%" class="pa-10">
+      <v-container style="width: 100%; max-width: 100%" class="pa-4 pa-sm-10">
         <slot />
       </v-container>
     </v-main>
