@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="user">
     <!-- <AppSnackbar></AppSnackbar> -->
     <v-navigation-drawer
       v-model="drawer"
@@ -14,14 +14,17 @@
       <v-row justify="center" class="my-10">
         <div>
           <NuxtLink to="/">
-            <v-img src="/images/alex.svg" height="32" width="96" />
+            <img
+              src="../static/images/alex.svg"
+              style="height: 32px; width: 96px"
+            />
           </NuxtLink>
         </div>
       </v-row>
       <div v-for="(menu, i) in menus" :key="`menu-${i}`">
         <v-subheader
           :key="`menu-${i}`"
-          class="accent--text"
+          class="accent-text"
           style="font-size: 12px; line-height: 15px"
         >
           {{ menu.title }}
@@ -31,18 +34,20 @@
             v-for="(item, j) in menu.items"
             :key="`menu-${i}-item-${j}`"
             :to="item.to"
+            class=""
             router
             exact
           >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
+            <div class="d-flex" style="gap: 16px">
+              <v-list-item-action>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-item-action>
+
               <v-list-item-title
                 class="font-weight-medium"
-                :text="item.title"
+                v-text="item.title"
               />
-            </v-list-item-content>
+            </div>
           </v-list-item>
         </v-list>
       </div>
@@ -55,7 +60,12 @@
         style="height: 42px; width: 115px"
       >
         <NuxtLink to="/">
-          <v-img src="/images/alex.svg" height="32" width="96" />
+          <v-img
+            src="../static/images/alex.svg"
+            alt="logo"
+            height="32"
+            width="96"
+          />
         </NuxtLink>
       </div>
       <v-spacer />
@@ -75,14 +85,15 @@
             <div
               v-bind="props"
               style="cursor: pointer"
+              class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
               <app-user-avatar :user="user" class="mr-2" />
-              <span>
+              <span class="fullname">
                 {{ user?.fullname }}
               </span>
 
-              <v-icon> mdi-chevron-down </v-icon>
+              <v-icon class="fullname"> mdi-chevron-down </v-icon>
             </div>
           </v-hover>
         </template>
@@ -121,7 +132,6 @@ const drawer = ref(true);
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
-
 const profileMenuItems = ref([
   {
     title: 'Perfil',
@@ -142,7 +152,7 @@ const menus = ref([
     title: 'DASHBOARDS',
     items: [
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-view-dashboard',
         title: 'Dashboard',
         to: '/dashboard',
       },
@@ -152,13 +162,18 @@ const menus = ref([
     title: 'PLANOS DE APRENDIZAGEM',
     items: [
       {
-        icon: 'mdi-star-outline',
-        title: 'Todos os planos',
+        icon: 'mdi-newspaper-variant-multiple-outline',
+        title: 'Cursos',
         to: '/learning-plans',
       },
       {
-        icon: 'mdi-star-outline',
-        title: 'Meus planos',
+        icon: 'mdi-newspaper-variant-multiple-outline',
+        title: 'Projetos',
+        to: '/learning-plans/user',
+      },
+      {
+        icon: 'mdi-folder-star-outline',
+        title: 'Planos salvos',
         to: '/learning-plans/user',
       },
     ],
@@ -167,13 +182,33 @@ const menus = ref([
     title: 'TURMAS',
     items: [
       {
-        icon: 'mdi-star-outline',
-        title: 'Minhas turmas',
+        icon: 'mdi-account-multiple-outline',
+        title: 'Todas as turmas',
         to: '/classes',
       },
       {
-        icon: 'mdi-star-outline',
-        title: 'Links ativos',
+        icon: 'mdi-account-multiple-outline',
+        title: 'Turmas salvas',
+        to: '/classes/active-links',
+      },
+    ],
+  },
+  {
+    title: 'ÁREA DO PROFESSOR',
+    items: [
+      {
+        icon: 'mdi-bookmark-box-multiple-outline',
+        title: 'Meus Planos',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-pencil-outline',
+        title: 'Turmas ministradas',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-school-outline',
+        title: 'Turmas matriculadas',
         to: '/classes/active-links',
       },
     ],
@@ -197,6 +232,7 @@ function logoutUser() {
   router.push('/login');
 }
 </script>
+
 <style lang="scss">
 html,
 body {
@@ -204,6 +240,23 @@ body {
 
   .v-application {
     font-family: 'Montserrat' !important;
+
+    .v-navigation-drawer__content {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    @media (max-width: 540px) {
+      .v-toolbar__content {
+        .user-block {
+          .fullname {
+            display: none;
+          }
+        }
+      }
+    }
   }
 }
 </style>

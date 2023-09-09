@@ -9,7 +9,12 @@
       </div>
     </div>
     <div class="user-block my-6">
-      <img class="cover" src="https://picsum.photos/1800/500" alt="" />
+      <img
+        v-if="user.cover"
+        class="cover"
+        :src="strapiBaseUrl + user.cover.url"
+        :alt="user.fullname"
+      />
       <div class="card">
         <div class="photo">
           <div class="avatar" v-if="user.avatar && user.avatar.url">
@@ -47,14 +52,14 @@
       v-if="links[0] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-general />
+      <profile-general :telephone="''" :email="user.email" />
       <div class="d-flex flex-column">
-        <profile-about />
-        <profile-institutional />
+        <profile-about :info="user.info" />
+        <profile-institutional :institutions="user.institutions" />
       </div>
     </div>
     <div
-      v-if="links[1] === selectedOption"
+      v-else-if="links[1] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
       <profile-list />
@@ -71,13 +76,14 @@
       v-else-if="links[4] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-events :url="strapiBaseUrl + user.avatar.url"/>
+      <profile-events :url="strapiBaseUrl + user.avatar.url" />
     </div>
     <div v-else class="content-block d-flex justify-center flex-row">
       <profile-settings />
       <div class="d-flex flex-column">
-        <profile-institutional />
-        <profile-security />
+        <profile-institutional :institutions="user.institutions" />
+        <profile-security :email="user.email" />
+        <profile-wallets />
       </div>
     </div>
   </div>
@@ -96,7 +102,15 @@ definePageMeta({
 });
 
 const { id } = useStrapiUser<User>().value;
-user.value = await findOne<User>('users', id, { populate: '*' });
+user.value = await findOne<User>('users', id, {
+  populate: [
+    'institutions.cover',
+    'cover',
+    'avatar',
+    'learningPlans',
+    'trails',
+  ],
+});
 console.log({ user: user.value });
 
 const selectedOption = ref('Visão geral');
@@ -158,11 +172,14 @@ const links = ref([
     display: flex;
     flex-direction: column;
     gap: 0px;
+    transition: all ease-in-out 1s;
+
     .card {
       display: flex;
       flex-direction: row;
       width: 100%;
       padding-inline: 40px;
+      transition: all ease-in-out 1s;
       gap: 12px;
 
       .photo {
@@ -247,6 +264,8 @@ const links = ref([
       gap: 24px;
       padding-inline: 24px;
       margin-top: 18px;
+      transition: all ease-in-out 1s;
+
       span {
         color: #5d6872;
         font-size: 16px;
@@ -269,6 +288,32 @@ const links = ref([
   .content-block {
     gap: 24px;
   }
+
+  @media (max-width: 590px) {
+    .user-block {
+      .menu {
+        gap: 24px;
+        overflow-x: auto;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .user-block {
+      .menu {
+        gap: 16px;
+        :first-child {
+          min-width: 73px;
+        }
+      }
+    }
+  }
+
   @media (max-width: 800px) {
     .content-block {
       flex-wrap: wrap;

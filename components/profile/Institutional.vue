@@ -2,25 +2,12 @@
   <profile-card title="Institucional" :full-width="true">
     <template v-slot:content>
       <div class="d-flex flex-wrap items">
-        <div
-          class="d-flex pa-4 item"
-          v-for="item in [
-            {
-              title: 'IFAL - Instituto Federal de Alagoas',
-              description: 'Campus Maceió',
-              icon: '',
-            },
-            {
-              title: 'IFAL - Instituto Federal de Alagoas',
-              description: 'Campus Maceió',
-              icon: '',
-            },
-          ]"
-        >
-          <img src="https://picsum.photos/900/900" :alt="item.title" />
+        <div class="d-flex pa-4 item" v-for="item in institutions">
+          <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
+
           <div class="d-flex flex-column">
-            <span>{{ item.title }}</span>
-            <p>{{ item.description }}</p>
+            <span>{{ item.acronym + '-' + item.name }}</span>
+            <p>{{ item.sector }}</p>
           </div>
         </div>
       </div>
@@ -28,7 +15,23 @@
   </profile-card>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+
+type Institution = {
+  name: string;
+  acronym: string;
+  sector: string;
+  cover: any;
+};
+const props = defineProps({
+  institutions: {
+    type: Array as PropType<Institution[]>,
+    required: true,
+  },
+});
+const { institutions } = toRefs(props);
+</script>
 
 <style scoped lang="scss">
 .items {

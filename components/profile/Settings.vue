@@ -13,12 +13,8 @@
             name="fullname"
             class=""
           />
-          <div class="d-flex">
-            <alex-inputs-stepper-field
-              label="Telefone"
-              name="phone"
-              class="mr-6"
-            />
+          <div class="block d-flex flex-wrap">
+            <alex-inputs-stepper-field label="Telefone" name="phone" />
 
             <alex-inputs-stepper-field label="CPF" name="cpf" />
           </div>
@@ -35,7 +31,6 @@
               Cancelar</v-btn
             >
             <v-btn class="btn ml-2" color="accent"> Salvar perfil </v-btn>
-           
           </div>
         </v-form>
       </div>
@@ -90,44 +85,12 @@ form {
     text-transform: none !important;
   }
 }
-
-.contacts {
-  gap: 16px;
-  border-bottom: 1px solid #eaeef1;
-  flex-direction: column;
-  .contact {
-    gap: 16px;
-    .icon {
-      width: 24px;
-      height: 24px;
-      path {
-        fill: #5d6872;
-      }
-    }
-    .field {
-      gap: 4px;
-      p {
-        color: #abb2b9;
-        font-size: 14px;
-        font-weight: 400;
-      }
-
-      span {
-        color: #5d6872;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 22px;
-      }
-    }
-  }
+.block {
+  gap: 24px;
 }
-@media (max-width: 800px) {
-  .contacts {
-    flex-wrap: wrap;
-    flex-direction: row;
-    .contact {
-      max-width: 130px;
-    }
+@media (max-width: 600px) {
+  .block {
+    flex-direction: column;
   }
 }
 </style>

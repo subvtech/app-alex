@@ -1,24 +1,9 @@
 <template>
   <profile-card class="mb-6" title="Sobre" :full-width="true">
     <template v-slot:content>
-      <text-area>
-        Professor e Pesquisador do Instituto Federal de Alagoas (IFAL), sendo
-        membro da Coordenação de Informática (CINFO) do Campus Maceió e fundador
-        do Núcleo de EXperiências em Aprendizagem (NEXA). Criador do projeto
-        ALEX, uma plataforma aprendizagem ativa e de educação híbrida que visa a
-        inclusão digital, renovação pedagógica e a promoção de processos de
-        ensino-aprendizagem até a última milha Doutorando em Engenharia
-        Industrial pela Universidade Federal da Bahia (UFBA), pesquisando sobre
-        métodos ativos de ensino-aprendizagem e educação híbrida em Engenharia e
-        Tecnologia. Desenvolve atividades de pesquisa com a comunidade ao redor
-        do IFAL, incluindo empresas e organizações sem fins de lucro. Fomenta a
-        integração da academia e o mercado de TI, através de abordagens ativas
-        de ensino-aprendizagem, centradas no estudante, procurando aproximar
-        estes dois mundos. Anteriormente, fez mestrado em Ciência da Computação
-        pelo Centro de Informática (CIn) da Universidade Federal de Pernambuco
-        (UFPE) em 2009, na área de Redes de Computadores (Redes Ad Hoc Móveis e
-        Mesh), e graduação em Sistemas de Informação pela Estácio-FAL.
-      </text-area>
+      <span class="info">
+      {{ info }}
+      </span>
     </template>
 
     <template v-slot:footer>
@@ -64,10 +49,19 @@
   </profile-card>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps({
+  info: {
+    type: String,
+    required: true,
+  },
+ 
+});
+
+const { info } = toRefs(props);</script>
 
 <style scoped lang="scss">
-text-area {
+.info {
   text-align: justify;
   text-justify: inter-word;
   align-self: stretch;
@@ -94,6 +88,9 @@ text-area {
     div {
       gap: 8px;
       .item {
+        font-size: 14px;
+        font-weight: 400;
+        color: #5d6872;
         padding-block: 10px;
         gap: 4px;
         border-radius: 99px;

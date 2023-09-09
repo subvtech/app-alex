@@ -7,7 +7,7 @@
           v-for="box in [
             {
               icon: 'mdi-bookmark-box-multiple-outline',
-              number: 9,
+              number: learningPlans.length,
               label: 'Cursos',
             },
             {
@@ -29,25 +29,18 @@
 
     <template v-slot:footer>
       <div class="d-flex flex-column contacts pt-6 pb-4">
-        <div
-          class="d-flex align-center contact"
-          v-for="contact in [
-            {
-              title: 'E-MAIL',
-              text: 'email@gmail.com',
-              icon: 'mdi-email-outline',
-            },
-            {
-              title: 'TELEFONE',
-              text: '(82) 99876-5432',
-              icon: 'mdi-phone-outline',
-            },
-          ]"
-        >
-          <v-icon color="#5D6872">{{ contact.icon }}</v-icon>
+        <div class="d-flex align-center contact">
+          <v-icon color="#5D6872">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
-            <p>{{ contact.title }}</p>
-            <span>{{ contact.text }}</span>
+            <p>EMAIL</p>
+            <span>{{ email }}</span>
+          </div>
+        </div>
+        <div v-if="telephone" class="d-flex align-center contact">
+          <v-icon color="#5D6872">mdi-phone-outline</v-icon>
+          <div class="d-flex flex-column justify-center align-start field">
+            <p>TELEFONE</p>
+            <span>{{ telephone }}</span>
           </div>
         </div>
       </div>
@@ -92,7 +85,24 @@
   </profile-card>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps({
+  email: {
+    type: String,
+    required: true,
+  },
+  telephone: {
+    type: String,
+    required: true,
+  },
+  learningPlans: {
+    type: Array,
+    default: () => []
+  }
+});
+
+const { email, telephone } = toRefs(props);
+</script>
 
 <style scoped lang="scss">
 .boxes {
@@ -100,6 +110,7 @@
   gap: 16px;
   align-self: stretch;
   border-bottom: 1px solid #eaeef1;
+  
   .box {
     min-width: 90px;
     min-height: 90px;
@@ -156,10 +167,8 @@
 }
 @media (max-width: 800px) {
   .contacts {
-    flex-wrap: wrap;
-    flex-direction: row;
+   
     .contact {
-      max-width: 130px;
     }
   }
 }

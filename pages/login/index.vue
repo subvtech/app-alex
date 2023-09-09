@@ -106,7 +106,7 @@ definePageMeta({
   layout: 'auth',
 });
 const { login, setToken, setUser } = useStrapiAuth();
-const { update, find, findOne } = useStrapi();
+const { create, find } = useStrapi();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
@@ -175,13 +175,15 @@ const metalogin = async () => {
 
     const signer = await withTimeout(4000, provider.getSigner());
 
-    const data = ((await find('metamask-auth')).data as any).attributes;
-
+    const data = (await find('wallets/auth')) as any;
+    console.log(data);
     const signedMessage = await signer.signMessage(data.token);
 
     try {
-      const response: any = await update('metamask-auth', {
-        fields: { message: data.token, signedMessage, address: signer.address },
+      const response: any = await create('wallets/auth', {
+        message: data.token,
+        signedMessage,
+        address: signer.address,
       });
       setToken(response.jwt);
       setUser(response.user);

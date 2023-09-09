@@ -5,7 +5,7 @@
         <div class="field d-flex w-100 justify-space-between">
           <div class="d-flex flex-column">
             <span>E-mail</span>
-            <p>dasdas@gmail.com</p>
+            <p>{{ email }}</p>
           </div>
           <v-btn
             class="btn ml-2"
@@ -28,7 +28,7 @@
             color="#5D6872"
             @click="editPassword = !editPassword"
             :text="editPassword ? 'Save senha' : 'Alterar senha'"
-            />
+          />
         </div>
       </div>
     </template>
@@ -38,6 +38,17 @@
 <script setup lang="ts">
 const editEmail = ref(false);
 const editPassword = ref(false);
+const props = defineProps({
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+  },
+});
+
+const { email, password } = toRefs(props);
 </script>
 
 <style scoped lang="scss">
@@ -46,6 +57,7 @@ const editPassword = ref(false);
   div {
     .btn {
       background-color: #eaeef1;
+      border: none;
       text-transform: none !important;
     }
     span {
