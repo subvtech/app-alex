@@ -1,11 +1,13 @@
 <template>
   <div id="profile" class="w-100 d-flex" v-if="user">
     <div class="header d-flex w-100">
-      <span class="title h-">Perfil do usuário</span>
+      <span class="title h-">{{ $t('pages.profile.title') }}</span>
       <div class="pages d-flex h-100">
-        <span class="go-back" style="cursor: pointer">Home</span>
+        <span class="go-back" style="cursor: pointer">{{
+          $t('pages.profile.home')
+        }}</span>
         <span class="go-back">></span>
-        <span class="current-page">Perfil do usuário</span>
+        <span class="current-page">{{ $t('pages.profile.title') }}</span>
       </div>
     </div>
     <div class="user-block my-6">
@@ -20,7 +22,11 @@
           <div class="avatar" v-if="user.avatar && user.avatar.url">
             <img :src="strapiBaseUrl + user.avatar.url" :alt="user.fullname" />
           </div>
-          <v-icon class="edit" color="black" small title="Editar"
+          <v-icon
+            class="edit"
+            color="black"
+            small
+            :title="$t('pages.profile.edit')"
             >mdi-pencil-outline</v-icon
           >
         </div>
@@ -34,7 +40,11 @@
           </div>
 
           <span class="role">
-            {{ user.isProfessor ? 'Professor' : 'Aluno' }}
+            {{
+              user.isProfessor
+                ? $t('pages.profile.teacher')
+                : $t('pages.profile.student')
+            }}
           </span>
         </div>
       </div>
@@ -91,7 +101,8 @@
 
 <script setup lang="ts">
 import { User } from '../../../models/user.model';
-
+import { useI18n } from 'vue-i18n';
+const i18n = useI18n();
 const { findOne } = useStrapi();
 const strapiUrl = useStrapiUrl();
 const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
@@ -113,14 +124,14 @@ user.value = await findOne<User>('users', id, {
 });
 console.log({ user: user.value });
 
-const selectedOption = ref('Visão geral');
+const selectedOption = ref(i18n.t('pages.profile.general'));
 const links = ref([
-  'Visão geral',
-  'Cursos',
-  'Projetos',
-  'Tarefas',
-  'Eventos',
-  'Configurações',
+  i18n.t('pages.profile.general'),
+  i18n.t('pages.profile.courses'),
+  i18n.t('pages.profile.projects'),
+  i18n.t('pages.profile.assignments'),
+  i18n.t('pages.profile.events'),
+  i18n.t('pages.profile.settings'),
 ]);
 </script>
 

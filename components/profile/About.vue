@@ -1,5 +1,5 @@
 <template>
-  <profile-card class="mb-6" title="Sobre" :full-width="true">
+  <profile-card class="mb-6" :title="$t('components.profile.about.title')" :full-width="true">
     <template v-slot:content>
       <span class="info">
       {{ info }}
@@ -12,26 +12,12 @@
           class="competence d-flex flex-column align-start pa-4"
           v-for="block in [
             {
-              title: 'Competências Gerais',
-              items: [
-                'Liderança',
-                'Liderança',
-                'Liderança',
-                'Liderança',
-                'Liderança',
-                'Liderança',
-              ],
+              title: $t('components.profile.about.general'),
+              items: tags,
             },
             {
-              title: 'Competências Técnicas',
-              items: [
-                'Inglês',
-                'Inglês',
-                'Inglês',
-                'Inglês',
-                'Inglês',
-                'Inglês',
-              ],
+              title: $t('components.profile.about.technical'),
+              items: tags,
             },
           ]"
         >
@@ -55,10 +41,14 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  tags: {
+    type: Array as PropType<{text: string}[]>,
+    default: () => []
+  }
  
 });
 
-const { info } = toRefs(props);</script>
+const { info, tags } = toRefs(props);</script>
 
 <style scoped lang="scss">
 .info {

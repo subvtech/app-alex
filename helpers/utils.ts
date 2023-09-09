@@ -29,6 +29,17 @@ export async function createFileFromUrl(
   return file;
 }
 
+export function withTimeout(ms, promise) {
+  let timeout = new Promise((resolve, reject) => {
+    let id = setTimeout(() => {
+      clearTimeout(id);
+      reject(`Timed out in ${ms}ms.`);
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
+}
+
 export const passwordRules = {
   requiredRule: (val: string) => !!val || 'Senha é obrigatória',
   requiredConfirmationRule: (val: string) =>
@@ -47,3 +58,13 @@ export const passwordRules = {
     }
   },
 };
+
+// Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
+export type ElementType<T extends ReadonlyArray<unknown>> =
+  T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+
+// Iinstead return of string[], gonna return a type of each element of array ex:
+// ['goiaba' | 'maconha'] =>  type = ('goiaba' | 'maconha')[]
+export function literalArray<T extends string>(...args: T[]): T[] {
+  return args;
+}

@@ -47,12 +47,13 @@
           {{ author.attributes.fullname + coAuthorsText(coAuthors) }}
         </p>
         <div style="display: flex">
-          <span
-            >Atualizado em:
+          <span>
             {{
-              new Date(structure.attributes.updatedAt).toLocaleDateString(
-                'pt-BR',
-              )
+              $t('components.learningPlan.authors.updatedAt', {
+                date: new Date(
+                  structure.attributes.updatedAt,
+                ).toLocaleDateString('pt-BR'),
+              })
             }}</span
           >
         </div>
@@ -63,8 +64,11 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { User } from 'models/user.model';
-import { Structure } from 'models/structure.model';
+import { useI18n } from 'vue-i18n';
+import { User } from '~/models/user.model';
+import { Structure } from '~/models/structure.model';
+
+const i18n = useI18n();
 
 const props2 = defineProps({
   structure: {
@@ -85,9 +89,9 @@ const coAuthorsText = (coAuthors) => {
   if (coAuthors.length < 1) {
     return '';
   } else if (coAuthors.length > 1) {
-    return ` e mais ${coAuthors.length} pessoas`;
+    return i18n.t('components.learningPlan.authors.coauthors', { length: coAuthors.length });
   } else {
-    return ` e mais ${coAuthors.length} pessoa`;
+    return i18n.t('components.learningPlan.authors.coauthor', { length: coAuthors.length });
   }
 };
 </script>

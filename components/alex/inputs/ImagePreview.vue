@@ -17,7 +17,7 @@
       @change="emit('input', image)"
     />
     <v-col cols="12" class="text-center text-caption pb-0">
-      Somente imagens do tipo JPG, JPEG ou PNG são permitidos.
+      {{ $t('components.imagePreview.rules') }}
     </v-col>
     <v-col cols="12" class="pt-0">
       <v-btn
@@ -26,7 +26,7 @@
         width="100%"
         @click="clickUploadBtn"
       >
-        Alterar capa
+        {{ $t('components.imagePreview.cover') }}
       </v-btn>
     </v-col>
   </v-row>

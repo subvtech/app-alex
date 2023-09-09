@@ -1,5 +1,5 @@
 <template>
-  <profile-card title="Informações pessoais" :full-width="true">
+  <profile-card :title="$t('components.settings.title')" :full-width="true">
     <template v-slot:content>
       <div>
         <v-form
@@ -9,17 +9,23 @@
           @submit.prevent="updateValues"
         >
           <alex-inputs-stepper-field
-            label="Nome completo"
+            :label="$t('components.settings.fullname')"
             name="fullname"
             class=""
           />
           <div class="block d-flex flex-wrap">
-            <alex-inputs-stepper-field label="Telefone" name="phone" />
+            <alex-inputs-stepper-field
+              :label="$t('components.settings.phone')"
+              name="phone"
+            />
 
-            <alex-inputs-stepper-field label="CPF" name="cpf" />
+            <alex-inputs-stepper-field
+              :label="$t('components.settings.cpf')"
+              name="cpf"
+            />
           </div>
           <alex-inputs-stepper-field
-            label="Sobre"
+            :label="$t('components.settings.about')"
             name="about"
             typeField="textarea"
             class=""
@@ -28,9 +34,11 @@
           />
           <div class="d-flex justify-end">
             <v-btn class="btn" color="accent" variant="outlined">
-              Cancelar</v-btn
+              {{ $t('components.settings.cancel') }}</v-btn
             >
-            <v-btn class="btn ml-2" color="accent"> Salvar perfil </v-btn>
+            <v-btn class="btn ml-2" color="accent">
+              {{ $t('components.settings.save') }}
+            </v-btn>
           </div>
         </v-form>
       </div>

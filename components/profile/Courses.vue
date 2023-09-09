@@ -1,13 +1,17 @@
 <template>
-  <profile-card class="mt-6" title="Cursos" :full-width="true">
+  <profile-card
+    class="mt-6"
+    :title="$t('components.courses.title')"
+    :full-width="true"
+  >
     <template v-slot:content>
       <div class="d-flex mb-6">
         <div class="d-flex flex-wrap align-center py-2 px-3 search">
           <v-icon color="#5D6872">mdi-magnify</v-icon>
-          <input type="text" placeholder="Buscar projetos" />
+          <input type="text" :placeholder="$t('components.courses.search')" />
         </div>
         <div class="d-flex align-center py-2 px-3 justify-space-between filter">
-          <p>Em andamentos</p>
+          <p>{{ $t('components.courses.ongoing') }}</p>
           <v-icon color="#5D6872">mdi-chevron-down</v-icon>
         </div>
       </div>
@@ -61,7 +65,7 @@
                   >
                 </div>
                 <div class="d-flex flex-column">
-                  <span>Facilitador</span>
+                  <span>{{ $t('components.courses.facilitator') }}</span>
                   <p>{{ item.username }}</p>
                 </div>
               </div>
@@ -74,7 +78,7 @@
                 </div>
 
                 <div class="d-flex flex-column">
-                  <span>Trilhas</span>
+                  <span>{{ $t('components.courses.trails') }}</span>
                   <p>{{ item.trails }}</p>
                 </div>
               </div>
@@ -108,7 +112,7 @@
   margin-left: 16px;
   width: 180px;
   cursor: pointer;
-  
+
   p {
     color: #5d6872;
     font-size: 14px;

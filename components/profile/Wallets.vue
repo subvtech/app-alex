@@ -1,10 +1,14 @@
 <template>
-  <profile-card class="mt-6" title="Carteira vinculada" :full-width="false">
+  <profile-card
+    class="mt-6"
+    :title="$t('components.wallets.title')"
+    :full-width="false"
+  >
     <template v-slot:content>
       <div class="item d-flex justify-space-between">
         <div class="d-flex align-center">
           <img src="../../static/images/metamask.png" alt="" />
-          <span>Metamask</span>
+          <span>{{ $t('components.wallets.metamask') }}</span>
         </div>
         <v-btn
           class="btn ml-2"
@@ -12,7 +16,7 @@
           size="large"
           color="#5D6872"
           @click=""
-          text="Desvincular"
+          :text="$t('components.wallets.unlink')"
         />
       </div>
     </template>
@@ -26,7 +30,7 @@ type Wallet = {
 };
 const props = defineProps({
   wallet: {
-    type: Object as PropType<Wallet>
+    type: Object as PropType<Wallet>,
   },
 });
 </script>

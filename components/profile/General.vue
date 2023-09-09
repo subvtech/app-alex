@@ -1,5 +1,5 @@
 <template>
-  <profile-card title="Detalhes">
+  <profile-card :title="$t('components.profile.general.title')">
     <template v-slot:content>
       <div class="boxes d-flex pb-6">
         <div
@@ -8,14 +8,18 @@
             {
               icon: 'mdi-bookmark-box-multiple-outline',
               number: learningPlans.length,
-              label: 'Cursos',
+              label: $t('components.profile.general.courses'),
             },
             {
               icon: 'mdi-newspaper-variant-multiple-outline',
               number: 20,
-              label: 'Projetos',
+              label: $t('components.profile.general.projects'),
             },
-            { icon: 'mdi-check-decagram', number: 62, label: 'Tarefas' },
+            {
+              icon: 'mdi-check-decagram',
+              number: 62,
+              label: $t('components.profile.general.courses'),
+            },
           ]"
         >
           <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
@@ -32,14 +36,14 @@
         <div class="d-flex align-center contact">
           <v-icon color="#5D6872">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
-            <p>EMAIL</p>
+            <p>{{ $t('components.profile.general.email') }}</p>
             <span>{{ email }}</span>
           </div>
         </div>
         <div v-if="telephone" class="d-flex align-center contact">
           <v-icon color="#5D6872">mdi-phone-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
-            <p>TELEFONE</p>
+            <p>{{ $t('components.profile.general.telephone') }}</p>
             <span>{{ telephone }}</span>
           </div>
         </div>
@@ -54,17 +58,17 @@
               icon: 'assets/svg/website.svg',
             },
             {
-              title: 'LINKEDIN',
+              title: $t('components.profile.general.linkedin'),
               text: '/jojo',
               icon: 'assets/svg/linkedin.svg',
             },
             {
-              title: 'INSTAGRAM',
+              title: $t('components.profile.general.instagram'),
               text: '@jojo',
               icon: 'assets/svg/instagram.svg',
             },
             {
-              title: 'YOUTUBE',
+              title: $t('components.profile.general.youtube'),
               text: '@jojotube',
               icon: 'assets/svg/youtube.svg',
             },
@@ -97,8 +101,8 @@ const props = defineProps({
   },
   learningPlans: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 });
 
 const { email, telephone } = toRefs(props);
@@ -110,7 +114,7 @@ const { email, telephone } = toRefs(props);
   gap: 16px;
   align-self: stretch;
   border-bottom: 1px solid #eaeef1;
-  
+
   .box {
     min-width: 90px;
     min-height: 90px;
@@ -167,7 +171,6 @@ const { email, telephone } = toRefs(props);
 }
 @media (max-width: 800px) {
   .contacts {
-   
     .contact {
     }
   }

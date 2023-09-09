@@ -4,7 +4,7 @@
       <div class="fields d-flex flex-column flex-wrap">
         <div class="field d-flex w-100 justify-space-between">
           <div class="d-flex flex-column">
-            <span>E-mail</span>
+            <span>{{ $t('components.security.email') }}</span>
             <p>{{ email }}</p>
           </div>
           <v-btn
@@ -13,12 +13,12 @@
             size="large"
             color="#5D6872"
             @click="editEmail = !editEmail"
-            :text="editEmail ? 'Save e-mail' : 'Alterar e-mail'"
+            :text="editEmail ? $t('components.security.saveEmail') : $t('components.security.editEmail')"
           />
         </div>
         <div class="field d-flex w-100 justify-space-between">
           <div class="d-flex flex-column">
-            <span>Senha</span>
+            <span>{{$t('components.security.password')}}</span>
             <input type="password" disabled value="dasdasdasda" />
           </div>
           <v-btn
@@ -27,7 +27,7 @@
             size="large"
             color="#5D6872"
             @click="editPassword = !editPassword"
-            :text="editPassword ? 'Save senha' : 'Alterar senha'"
+            :text="editPassword ? $t('components.security.savePassword') : $t('components.security.editPassword')"
           />
         </div>
       </div>

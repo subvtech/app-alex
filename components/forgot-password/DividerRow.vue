@@ -1,7 +1,7 @@
 <template>
   <div id="orRow" class="d-flex mb-10">
     <div class="orLine"></div>
-    <div id="orText">OU</div>
+    <div id="orText">{{ $t('components.forgot.sendResetPassword.divider') }}</div>
     <div class="orLine"></div>
   </div>
 </template>

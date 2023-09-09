@@ -1,0 +1,19 @@
+{
+  "alt": "Bem-vindo ao Alex",
+  "welcome": "Bem-vindo a plataforma Alex!",
+  "access": "Acesse sua conta e continue com seus estudos",
+  "forgot": "Esqueceu a senha?",
+  "submit": "Entrar",
+  "email": "E-mail",
+  "noAccount": "Ainda não possui conta?",
+  "register": "Crie sua conta aqui!",
+  "remember": "Lembrar dados",
+  "password": "Senha",
+  "divider": "OU",
+  "metamask": {
+    "btn": "Acessar com a Metamask",
+    "notFound": "Metamask not detected",
+    "tokenExpired": "Token expirado, tente novamente"
+  },
+  "loginError": "Email ou Senha inválido(s)"
+}

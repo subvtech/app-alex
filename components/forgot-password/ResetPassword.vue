@@ -2,121 +2,103 @@
   <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
     <div class="mb-10">
       <p class="text-white text-h4 text-center font-weight-bold mb-4">
-        Cadastre sua nova senha
+        {{ $t('components.forgot.sendResetPassword.newPassword') }}
       </p>
       <p class="text-white text-h6 font-weight-regular text-center my-2">
-        Digite sua nova senha e a confirmação
+        {{ $t('components.forgot.sendResetPassword.enterPassword') }}
       </p>
     </div>
     <v-form
       ref="form"
-      v-model="validForm"
       color="white"
       class="mb-10"
-      :update:modelValue="!validForm ? (errorMessage = false) : null"
       @submit.prevent="changePassword"
     >
-      <v-text-field
-        v-model="password"
-        label="Senha"
-        class="mb-2"
-        rounded="lg"
-        variant="outlined"
-        density="comfortable"
-        :rules="rules.password"
-        type="password"
-      >
-      </v-text-field>
-      <v-text-field
-        v-model="passwordConfirmation"
-        label="Confirmação"
-        class="mb-6"
-        rounded="lg"
-        variant="outlined"
-        density="comfortable"
-        :rules="rules.passwordConfirmation"
-        type="password"
-      >
-        <template #details>
-          <span v-if="errorMessage" class="text-error w-100"
-            >Ocorreu um erro ao alterar a senha, tente novamente mais tarde.
-            tarde.</span
-          >
-        </template>
-      </v-text-field>
+      <alex-inputs-stepper-field
+        :label="$t('components.forgot.sendResetPassword.password')"
+        name="password"
+        :type="passwordVisible ? 'text' : 'password'"
+        color="white"
+        class="my-3 text-secondary"
+        theme="dark"
+        @click:append-inner="passwordVisible = !passwordVisible"
+      />
+
+      <alex-inputs-stepper-field
+        :label="$t('components.forgot.sendResetPassword.confirmPassword')"
+        name="password"
+        :append-inner-icon="passwordVisible2 ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="passwordVisible2 ? 'text' : 'password'"
+        color="white"
+        class="my-3 text-secondary"
+        theme="dark"
+        @click:append-inner="passwordVisible2 = !passwordVisible2"
+      />
       <v-btn
-        :color="!validForm ? 'grey-darken-1' : 'accent'"
+        :color="!isValid ? 'grey-darken-1' : 'accent'"
         class="text-none text-white rounded-lg pa-5"
         block
         type="submit"
         size="large"
-        :disabled="!validForm"
+        :disabled="!isValid"
         :loading="loading"
       >
-        ALTERAR SENHA</v-btn
+        {{ $t('components.forgot.sendResetPassword.changePassword') }}</v-btn
       >
     </v-form>
     <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
-      Lembrou da senha?
+      {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-accent text-decoration-none">
-        acesse aqui!
+        {{ $t('components.forgot.sendResetPassword.login') }}
       </NuxtLink>
     </p>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { passwordRules } from '@/helpers/utils';
-const {
-  charactersRule,
-  min8CharactersRule,
-  passwordConfirmationRule,
-  requiredRule,
-  requiredConfirmationRule,
-} = passwordRules;
-const messageStore = useMessageStore();
+import { useForm } from 'vee-validate';
 const { resetPassword } = useStrapiAuth();
-const password = ref('');
-const passwordConfirmation = ref('');
-const validForm = ref(false);
+const messageStore = useMessageStore();
+
+const { schema4 } = useFormRules();
+
 const form = ref(null);
 const loading = ref(false);
-const errorMessage = ref(false);
+const passwordVisible = ref(false);
+const passwordVisible2 = ref(false);
+
 const route = useRoute();
 
 const emit = defineEmits(['confirmation-message']);
 
-const rules = ref({
-  password: [
-    requiredRule,
-    min8CharactersRule,
-    charactersRule,
-    (val) => passwordConfirmationRule(val, passwordConfirmation.value) || true,
-  ],
-  passwordConfirmation: [
-    requiredConfirmationRule,
-    (val) => passwordConfirmationRule(password.value, val) || true,
-  ],
+const { handleSubmit, errors, values, controlledValues } = useForm({
+  validationSchema: schema4,
+  keepValuesOnUnmount: true,
 });
 
-const changePassword = async () => {
+const isValid = computed(
+  () =>
+    !Object.values(controlledValues.value).includes(undefined) &&
+    !Object.values(errors.value).length,
+);
+
+const changePassword = handleSubmit(async () => {
   loading.value = true;
-  errorMessage.value = false;
   try {
     await resetPassword({
       code: route.query.code as string,
-      password: password.value,
-      passwordConfirmation: passwordConfirmation.value,
+      password: values.password,
+      passwordConfirmation: values.confirmPassword,
     });
     emit('confirmation-message');
-    loading.value = false;
   } catch (error) {
     messageStore.message = error as string;
-    errorMessage.value = true;
+    messageStore.color = 'red';
+    messageStore.show = true;
+  } finally {
     loading.value = false;
   }
-};
+});
 </script>
