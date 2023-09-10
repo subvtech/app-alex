@@ -87,33 +87,36 @@ const handleClick = async () => {
 .item {
   border-radius: 8px;
 
-  position: relative;
-  .tooltip-box {
-    position: absolute;
-    top: -20px;
-    left: 0px;
-
-    visibility: hidden;
-
-    background-color: #eaebec;
-    border: #828486 solid 1px;
-
-    border-radius: 2px;
-    z-index: 999;
-
-    transition: visibility 0s;
-    .tooltiptext {
-      font-size: 10px;
-      text-align: center;
-    }
-  }
-
-  &:hover {
+  .d-flex {
+    position: relative;
     .tooltip-box {
-      transition-delay: 1s;
-      visibility: visible;
+      position: absolute;
+      top: -20px;
+      left: 0px;
+
+      visibility: hidden;
+
+      background-color: #eaebec;
+      border: #828486 solid 1px;
+
+      border-radius: 2px;
+      z-index: 999;
+
+      transition: visibility 0s;
+      .tooltiptext {
+        font-size: 10px;
+        text-align: center;
+      }
+    }
+
+    &:hover {
+      .tooltip-box {
+        transition-delay: 1s;
+        visibility: visible;
+      }
     }
   }
+
   div {
     gap: 16px;
 

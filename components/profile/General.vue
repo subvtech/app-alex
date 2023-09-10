@@ -169,10 +169,4 @@ const { email, telephone } = toRefs(props);
     }
   }
 }
-@media (max-width: 800px) {
-  .contacts {
-    .contact {
-    }
-  }
-}
 </style>

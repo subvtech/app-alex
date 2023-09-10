@@ -65,14 +65,17 @@
       <profile-general :telephone="''" :email="user.email" />
       <div class="d-flex flex-column">
         <profile-about :info="user.info" />
-        <profile-institutional :institutions="user.institutions" />
+        <profile-institutional
+          :institutions="user.institutions"
+          :id="user.id"
+        />
       </div>
     </div>
     <div
       v-else-if="links[1] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-list />
+      <profile-courses />
     </div>
     <div
       v-else-if="links[2] === selectedOption"
@@ -98,7 +101,11 @@
         @update:user="async () => await updateUser()"
       />
       <div class="d-flex flex-column">
-        <profile-institutional :institutions="user.institutions" />
+        <profile-institutional
+          :institutions="user.institutions"
+          :id="user.id"
+          :canEdit="true"
+        />
         <profile-security
           :email="user.email"
           :id="user.id"
