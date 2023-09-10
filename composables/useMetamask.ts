@@ -69,22 +69,6 @@ export const useMetamask = (loading) => {
     }
   };
 
-  const getAddress: () => Promise<string> = async () => {
-    loading.value = true;
-    if (!window.ethereum) {
-      messageStore.message = i18n.t('pages.login.metamask.notFound');
-      messageStore.color = 'red';
-      messageStore.show = true;
-      return;
-    }
-    const provider = new ethers.BrowserProvider(window.ethereum);
-
-    const signer = await withTimeout(4000, provider.getSigner());
-
-    loading.value = false;
-    return signer.address;
-  };
-
   const linkWallet = async (user_id) => {
     try {
       loading.value = true;
@@ -129,5 +113,6 @@ export const useMetamask = (loading) => {
       loading.value = false;
     }
   };
-  return { metalogin, getAddress, linkWallet };
+  
+  return { metalogin, linkWallet };
 };

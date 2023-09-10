@@ -6,7 +6,10 @@
   >
     <template v-slot:content>
       <div class="item d-flex justify-space-between">
-        <div class="d-flex align-center">
+        <div class="d-flex relative align-center">
+          <div v-if="wallet" class="tooltip-box">
+            <span class="tooltiptext">{{ wallet.address }}</span>
+          </div>
           <img src="../../static/images/metamask.png" alt="" />
           <span>{{ $t('components.profile.wallets.metamask') }}</span>
         </div>
@@ -28,11 +31,11 @@
 </template>
 
 <script setup lang="ts">
-const { create, find, delete: _delete } = useStrapi();
+const { delete: _delete } = useStrapi();
 
 const loading = ref(false);
 
-const { linkWallet, getAddress } = useMetamask(loading);
+const { linkWallet } = useMetamask(loading);
 
 const emit = defineEmits(['update:user']);
 
@@ -83,6 +86,34 @@ const handleClick = async () => {
 <style scoped lang="scss">
 .item {
   border-radius: 8px;
+
+  position: relative;
+  .tooltip-box {
+    position: absolute;
+    top: -20px;
+    left: 0px;
+
+    visibility: hidden;
+
+    background-color: #eaebec;
+    border: #828486 solid 1px;
+
+    border-radius: 2px;
+    z-index: 999;
+
+    transition: visibility 0s;
+    .tooltiptext {
+      font-size: 10px;
+      text-align: center;
+    }
+  }
+
+  &:hover {
+    .tooltip-box {
+      transition-delay: 1s;
+      visibility: visible;
+    }
+  }
   div {
     gap: 16px;
 
