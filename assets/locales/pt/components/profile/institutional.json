@@ -1,4 +1,6 @@
 {
-    "title": "Institucional",
-    "remove": "remover"
+  "title": "Institucional",
+  "remove": "remover",
+  "add": "Adicionar",
+  "save": "Salvar"
 }

@@ -5,8 +5,11 @@
     :full-width="true"
   >
     <template v-slot:content>
-      <span class="info">
+      <span v-if="info && info !== ''" class="info">
         {{ info }}
+      </span>
+      <span v-else class="info" style="color: rgb(175, 175, 175)">
+        {{ $t('components.profile.about.placeholder') }}
       </span>
     </template>
 

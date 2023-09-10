@@ -1,6 +1,34 @@
 <template>
   <profile-card title="Institucional" :full-width="true">
     <template v-slot:content>
+      <v-btn
+        v-if="canEdit"
+        class="btn"
+        color="accent"
+        @click="showSearch"
+        variant="outlined"
+      >
+        {{
+          isAddingInstitution
+            ? $t('components.profile.institutional.save')
+            : $t('components.profile.institutional.add')
+        }}</v-btn
+      >
+
+      <alex-inputs-institutions
+        v-if="isAddingInstitution"
+        v-model:institutions="searchInstitutions"
+        v-model:search="search"
+        @update:search="
+          (event) => {
+            console.log({ searchInstitutions });
+            console.log({ search });
+            console.log({ event });
+          }
+        "
+        color="black"
+        name="institution"
+      />
       <div class="d-flex flex-wrap items">
         <div
           class="d-flex pa-4 align-center item"
@@ -14,13 +42,13 @@
           </div>
           <div v-if="canEdit" class="menu">
             <v-icon
-              @click="showDropdown = !showDropdown"
+              @click="showDeleteButton = !showDeleteButton"
               color="#6E7A87"
               style="cursor: pointer"
               >mdi-dots-vertical</v-icon
             >
             <v-icon
-              v-if="showDropdown"
+              v-if="showDeleteButton"
               class="remove"
               @click="removeInstitution(item.id)"
               color="red"
@@ -36,9 +64,7 @@
 </template>
 
 <script setup lang="ts">
-const { update } = useStrapi();
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-const showDropdown = ref(false);
+const { find, update } = useStrapi();
 
 type Institution = {
   name: string;
@@ -47,6 +73,13 @@ type Institution = {
   id: number;
   cover: any;
 };
+
+const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+const showDeleteButton = ref(false);
+const isAddingInstitution = ref(false);
+const searchInstitutions = ref<Institution[]>([]);
+const search = ref('');
+
 const props = defineProps({
   institutions: {
     type: Array as PropType<Institution[]>,
@@ -62,6 +95,31 @@ const props = defineProps({
   },
 });
 const { institutions } = toRefs(props);
+
+const showSearch = async () => {
+  console.log(search.value);
+  console.log(searchInstitutions.value);
+  if (isAddingInstitution.value) {
+    if (searchInstitutions.value.length > 0) {
+      const list = institutions.value.map((item) => item.id);
+
+      list.push(searchInstitutions.value[0].id);
+      const data = { institutions: list };
+      const url = useStrapiUrl() + '/users/' + props.id;
+      const options = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data }),
+      };
+
+      await fetch(url, options);
+    }
+
+    isAddingInstitution.value = false;
+  } else {
+    isAddingInstitution.value = true;
+  }
+};
 
 const removeInstitution = async (index) => {
   const list = institutions.value
@@ -80,6 +138,15 @@ const removeInstitution = async (index) => {
 </script>
 
 <style scoped lang="scss">
+.btn {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  text-transform: none !important;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 8px;
+}
 .items {
   gap: 24px;
   .item {

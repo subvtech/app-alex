@@ -3,14 +3,14 @@
     :name="name"
     v-model="value"
     :search="search"
-    @input="$emit('update:search', $event.target.value)"
+    @select="$emit('update:search', $event.target.value)"
     :loading="fetching"
     :items="institutions"
     item-text="text"
     item-value="id"
     item-title="text"
-    color="white"
-    class="my-3 text-secondary"
+    :color="color"
+    class="my-3"
     variant="outlined"
     required
     :label="$t('pages.register.institution')"
@@ -23,11 +23,11 @@ import { useI18n } from 'vue-i18n';
 import { useField } from 'vee-validate';
 
 type InstitutionsType = {
-  id: String;
-  value: String;
-  sigla: String;
-  text: String;
-  tipo: String;
+  name: string;
+  acronym: string;
+  sector: string;
+  id: number;
+  cover: any;
 };
 
 const props = defineProps({
@@ -42,6 +42,10 @@ const props = defineProps({
   name: {
     type: String,
     required: false,
+  },
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 const emit = defineEmits(['update:institutions', 'update:search']);
@@ -62,13 +66,13 @@ const fetchInstitutions = async (institution: string) => {
     const res = await find(
       `institutions?nome_contains=${institution}&tipo=matriz&_limit=10`,
     );
+
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
-        value: r.attributes.nome,
-        sigla: r.attributes.sigla,
-        text: r.attributes.nome,
-        tipo: r.attributes.tipo,
+        acronym: r.attributes.acronym,
+        text: r.attributes.name,
+        type: r.attributes.type,
       };
     });
     emit('update:institutions', resultArr);

@@ -1,16 +1,27 @@
 <template>
-  <profile-card :title="$t('components.profile.events.title')" :full-width="true">
+  <profile-card
+    :title="$t('components.profile.events.title')"
+    :full-width="true"
+  >
     <template v-slot:content>
       <div class="items d-flex flex-column">
         <div
           class="item d-flex flex-row align-center py-3 px-4"
           v-if="props.url"
           v-for="item in [
-            { username: 'Jojo', action: $t('components.profile.events.add'), time: '11:30 AM' },
-            { username: 'Jojo', action: $t('components.profile.events.add'), time: '11:30 AM' },
+            {
+              username: 'Jojo',
+              action: $t('components.profile.events.add'),
+              time: '11:30 AM',
+            },
+            {
+              username: 'Jojo',
+              action: $t('components.profile.events.add'),
+              time: '11:30 AM',
+            },
           ]"
         >
-          <img :src="props.url" :alt="item.username" />
+          <img v-if="props.url" :src="props.url" :alt="item.username" />
           <div class="">
             <span>{{ item.username + ' ' + item.action }}</span>
             <p>{{ item.time }}</p>
@@ -31,7 +42,7 @@ const props = defineProps({
 
 <style scoped lang="scss">
 .items {
-    gap: 16px;
+  gap: 16px;
   .item {
     border-radius: 8px;
     background-color: #f1f5f9;

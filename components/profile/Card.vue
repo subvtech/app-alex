@@ -28,6 +28,7 @@ const { title } = toRefs(props);
 <style lang="scss">
 #Card {
   background-color: white;
+  position: relative;
   font-family: Sen;
   width: 450px;
   border-radius: 8px;

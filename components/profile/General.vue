@@ -44,7 +44,7 @@
           <v-icon color="#5D6872">mdi-phone-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
             <p>{{ $t('components.profile.general.telephone') }}</p>
-            <span>{{ telephone }}</span>
+            <span>{{ mask.masked(telephone) }}</span>
           </div>
         </div>
       </div>
@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import { Mask } from 'maska';
 const props = defineProps({
   email: {
     type: String,
@@ -106,6 +107,8 @@ const props = defineProps({
 });
 
 const { email, telephone } = toRefs(props);
+
+const mask = new Mask({ mask: '(##) #####-####' });
 </script>
 
 <style scoped lang="scss">

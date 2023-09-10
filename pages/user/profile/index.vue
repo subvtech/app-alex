@@ -17,10 +17,25 @@
         :src="strapiBaseUrl + user.cover.url"
         :alt="user.fullname"
       />
+      <img
+        v-else
+        class="cover"
+        src="https://picsum.photos/800/800"
+        alt="cover picture"
+      />
       <div class="card">
         <div class="photo">
-          <div class="avatar" v-if="user.avatar && user.avatar.url">
-            <img :src="strapiBaseUrl + user.avatar.url" :alt="user.fullname" />
+          <div class="avatar">
+            <img
+              v-if="user.avatar && user.avatar.url"
+              :src="strapiBaseUrl + user.avatar.url"
+              :alt="user.fullname"
+            />
+            <img
+              v-else
+              src="https://picsum.photos/400/400"
+              alt="profile picture"
+            />
           </div>
           <v-icon
             class="edit"
@@ -62,8 +77,8 @@
       v-if="links[0] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-general :telephone="''" :email="user.email" />
-      <div class="d-flex flex-column">
+      <profile-general :telephone="user.phone" :email="user.email" />
+      <div class="d-flex flex-column w-100">
         <profile-about :info="user.info" />
         <profile-institutional
           :institutions="user.institutions"
@@ -89,7 +104,9 @@
       v-else-if="links[4] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-events :url="strapiBaseUrl + user.avatar.url" />
+      <profile-events
+        :url="user.avatar ? strapiBaseUrl + user.avatar.url : undefined"
+      />
     </div>
     <div v-else class="content-block d-flex justify-center flex-row">
       <profile-settings
