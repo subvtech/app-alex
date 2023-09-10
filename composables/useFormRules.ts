@@ -60,6 +60,14 @@ export const useFormRules = (formData?: FormDataType) => {
       .required(i18n.t('rules.confirmPassword.required')),
   };
 
+  const usernameRules = {
+    username: yup
+      .string()
+      .required(i18n.t('rules.username.required'))
+      .min(6, i18n.t('rules.username.min'))
+      .max(64, i18n.t('rules.username.max')),
+  };
+
   const fullnameRules = {
     fullname: yup
       .string()
@@ -82,6 +90,24 @@ export const useFormRules = (formData?: FormDataType) => {
       ),
   };
 
+  const aboutRules = {
+    info: yup
+      .string()
+      .min(12, i18n.t('rules.about.min'))
+      .max(4000, i18n.t('rules.about.max'))
+      .required(i18n.t('rules.about.required')),
+  };
+
+  const phoneRules = {
+    phone: yup
+      .string()
+      .matches(
+        /^\((?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\) (?:9[0-9])[0-9]{3}\-[0-9]{4}$/,
+        i18n.t('rules.phone.invalid'),
+      )
+      .required(i18n.t('rules.phone.required')),
+  };
+
   const registerStep1 = yup.object({
     ...fullnameRules,
     ...emailRules,
@@ -99,34 +125,13 @@ export const useFormRules = (formData?: FormDataType) => {
       .nullable()
       .when('yourRole', {
         is: 'professor',
-        then: (scheme) =>
-          scheme.required(i18n.t('rules.institution.required')),
+        then: (scheme) => scheme.required(i18n.t('rules.institution.required')),
       }),
   });
+
   const registerStep3 = yup.object({
     ...passwordRules,
-    username: yup
-      .string()
-      .required('Nome de usuário é necessário')
-      .min(6, 'Mínimo de 6 caracteres')
-      .max(64, 'Máximo de 64 caracteres'),
-    password: yup
-      .string()
-      .required('Senha é necessário')
-      .matches(
-        /^(?=.*[A-Z]).{2,}$/gm,
-        'Pelo menos 2 letras maiúsculas necessárias',
-      )
-      .matches(/^(?=.*\d).{1,}$/gm, 'Pelo menos 1 número necessário')
-      .matches(
-        /^(?=.*[a-z]).{1,}$/gm,
-        'Pelo menos 1 letra minúscula necessário',
-      )
-      .min(8, 'Mínimo de 8 caracteres'),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref('password')], 'As senhas não são idênticas')
-      .required('Confirmar Senha é necessário'),
+    ...usernameRules,
   });
   const loginSchema = {
     ...emailRules,
@@ -134,18 +139,10 @@ export const useFormRules = (formData?: FormDataType) => {
   };
 
   const profileSchema = yup.object({
-    fullname: yup
-      .string()
-      .required('Nome completo é necessário')
-      .min(6, 'Mínimo de 6 caracteres')
-      .max(64, 'Máximo de 64 caracteres'),
-    phone: yup.string().required('Telefone é necessário'),
-    about: yup.string().min(12).max(500).required(),
-    cpf: yup
-      .string()
-      .required('CPF é necessário')
-      .length(14, 'CPF contém 11 caracteres')
-      .test('test-invalid-cpf', 'CPF Inválido', (cpf) => isValidCpf(cpf)),
+    ...fullnameRules,
+    ...phoneRules,
+    ...aboutRules,
+    ...cpfRules,
   });
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },

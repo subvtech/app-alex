@@ -6,8 +6,8 @@
           class="item d-flex flex-row align-center py-3 px-4"
           v-if="props.url"
           v-for="item in [
-            { username: 'Jojo', action: $t('components.profile.about.add'), time: '11:30 AM' },
-            { username: 'Jojo', action: $t('components.profile.about.add'), time: '11:30 AM' },
+            { username: 'Jojo', action: $t('components.profile.events.add'), time: '11:30 AM' },
+            { username: 'Jojo', action: $t('components.profile.events.add'), time: '11:30 AM' },
           ]"
         >
           <img :src="props.url" :alt="item.username" />

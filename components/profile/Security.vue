@@ -2,10 +2,13 @@
   <profile-card class="mt-6" title="Segurança" :full-width="true">
     <template v-slot:content>
       <div class="fields d-flex flex-column flex-wrap">
-        <div class="field d-flex w-100 justify-space-between">
+        <v-form
+          @submit.prevent="updateEmail"
+          class="field d-flex w-100 justify-space-between"
+        >
           <div class="d-flex flex-column">
-            <span>{{ $t('components.security.email') }}</span>
-            <p>{{ email }}</p>
+            <span>{{ $t('components.profile.security.email') }}</span>
+            <p :contenteditable="editEmail">{{ email }}</p>
           </div>
           <v-btn
             class="btn ml-2"
@@ -13,21 +16,27 @@
             size="large"
             color="#5D6872"
             @click="editEmail = !editEmail"
-            :text="editEmail ? $t('components.security.saveEmail') : $t('components.security.editEmail')"
+            :text="
+              editEmail
+                ? $t('components.profile.security.saveEmail')
+                : $t('components.profile.security.editEmail')
+            "
           />
-        </div>
+        </v-form>
+
         <div class="field d-flex w-100 justify-space-between">
           <div class="d-flex flex-column">
-            <span>{{$t('components.security.password')}}</span>
+            <span>{{ $t('components.profile.security.password') }}</span>
             <input type="password" disabled value="dasdasdasda" />
           </div>
+
           <v-btn
             class="btn ml-2"
             variant="outlined"
             size="large"
             color="#5D6872"
             @click="editPassword = !editPassword"
-            :text="editPassword ? $t('components.security.savePassword') : $t('components.security.editPassword')"
+            :text="$t('components.profile.security.editPassword')"
           />
         </div>
       </div>
@@ -36,25 +45,57 @@
 </template>
 
 <script setup lang="ts">
+import { useForm } from 'vee-validate';
+
+const emit = defineEmits(['update:user']);
+const { emailRules } = useFormRules();
 const editEmail = ref(false);
 const editPassword = ref(false);
+const password = ref();
+
 const props = defineProps({
   email: {
     type: String,
     required: true,
   },
-  password: {
-    type: String,
+
+  id: {
+    type: Number,
+    required: true,
   },
 });
 
-const { email, password } = toRefs(props);
+const { email } = toRefs(props);
+
+const emailForm = useForm({
+  validationSchema: emailRules,
+  keepValuesOnUnmount: true,
+});
+
+const updateEmail = emailForm.handleSubmit(async () => {
+  const url = useStrapiUrl() + '/users/' + props.id;
+  const options = {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  };
+
+  await fetch(url, options);
+
+  emit('update:user', {});
+});
 </script>
 
 <style scoped lang="scss">
 .fields {
   gap: 24px;
-  div {
+  .field {
+    transition: all ease-in-out 1s;
+    .d-flex {
+      p {
+        outline: none;
+      }
+    }
     .btn {
       background-color: #eaeef1;
       border: none;

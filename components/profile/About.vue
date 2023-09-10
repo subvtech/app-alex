@@ -1,13 +1,17 @@
 <template>
-  <profile-card class="mb-6" :title="$t('components.profile.about.title')" :full-width="true">
+  <profile-card
+    class="mb-6"
+    :title="$t('components.profile.about.title')"
+    :full-width="true"
+  >
     <template v-slot:content>
       <span class="info">
-      {{ info }}
+        {{ info }}
       </span>
     </template>
 
     <template v-slot:footer>
-      <div class="footer d-flex flex-row pt-6">
+      <div v-if="tags.length > 0" class="footer d-flex flex-row pt-6">
         <div
           class="competence d-flex flex-column align-start pa-4"
           v-for="block in [
@@ -42,13 +46,13 @@ const props = defineProps({
     required: true,
   },
   tags: {
-    type: Array as PropType<{text: string}[]>,
-    default: () => []
-  }
- 
+    type: Array as PropType<{ text: string }[]>,
+    default: () => [],
+  },
 });
 
-const { info, tags } = toRefs(props);</script>
+const { info, tags } = toRefs(props);
+</script>
 
 <style scoped lang="scss">
 .info {

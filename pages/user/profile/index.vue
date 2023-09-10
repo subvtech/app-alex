@@ -34,7 +34,7 @@
         <div class="info">
           <div>
             <span class="fullname">
-              {{ user.fullname }}
+              {{ user.username }}
             </span>
             <span class="social"> @jojozap </span>
           </div>
@@ -89,11 +89,26 @@
       <profile-events :url="strapiBaseUrl + user.avatar.url" />
     </div>
     <div v-else class="content-block d-flex justify-center flex-row">
-      <profile-settings />
+      <profile-settings
+        :id="user.id"
+        :info="user.info"
+        :fullname="user.fullname"
+        :telephone="user.phone"
+        :cpf="user.cpf"
+        @update:user="async () => await updateUser()"
+      />
       <div class="d-flex flex-column">
         <profile-institutional :institutions="user.institutions" />
-        <profile-security :email="user.email" />
-        <profile-wallets />
+        <profile-security
+          :email="user.email"
+          :id="user.id"
+          @update:user="async () => await updateUser()"
+        />
+        <profile-wallets
+          :wallet="user.user_wallet"
+          :id="user.id"
+          @update:user="async () => await updateUser()"
+        />
       </div>
     </div>
   </div>
@@ -107,21 +122,30 @@ const { findOne } = useStrapi();
 const strapiUrl = useStrapiUrl();
 const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
 
+const messageStore = useMessageStore();
+
 const user = ref<any>();
 definePageMeta({
   middleware: 'auth',
 });
-
 const { id } = useStrapiUser<User>().value;
-user.value = await findOne<User>('users', id, {
-  populate: [
-    'institutions.cover',
-    'cover',
-    'avatar',
-    'learningPlans',
-    'trails',
-  ],
-});
+const updateUser = async () => {
+  user.value = await findOne<User>('users', id, {
+    populate: [
+      'institutions.cover',
+      'cover',
+      'avatar',
+      'learningPlans',
+      'trails',
+      'user_wallet',
+    ],
+  });
+
+  messageStore.message = 'done';
+  messageStore.color = 'green';
+  messageStore.show = true;
+};
+await updateUser();
 console.log({ user: user.value });
 
 const selectedOption = ref(i18n.t('pages.profile.general'));

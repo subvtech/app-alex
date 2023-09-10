@@ -1,5 +1,7 @@
 {
     "title": "Carteiras",
     "link": "Vincular Carteira",
-    "unlink": "Desvincular Carteira"
+    "unlink": "Desvincular Carteira",
+    "metamask": "Metamask",
+    "tokenExpired": "Tempo expirado, tente novamente"
 }

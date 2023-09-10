@@ -1,6 +1,6 @@
 <template>
   <v-app v-if="user">
-    <!-- <AppSnackbar></AppSnackbar> -->
+    <AppSnackbar />
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"

@@ -1,5 +1,7 @@
 {
   "title": "Wallets",
   "link": "Link Wallet",
-  "unlink": "Unlink Wallet"
+  "unlink": "Unlink Wallet",
+  "metamask": "Metamask",
+  "tokenExpired": "It took you too long, try again"
 }

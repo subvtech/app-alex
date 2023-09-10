@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { useI18n } from 'vue-i18n';
 import { withTimeout } from '../helpers/utils';
+import { user } from '~/assets/queries';
 
 declare global {
   interface Window {
@@ -8,7 +9,7 @@ declare global {
   }
 }
 
-export const useMetamask = (logging) => {
+export const useMetamask = (loading) => {
   const { create, find } = useStrapi();
   const { setToken, setUser } = useStrapiAuth();
 
@@ -22,7 +23,7 @@ export const useMetamask = (logging) => {
 
   const metalogin = async () => {
     try {
-      logging.value = true;
+      loading.value = true;
       if (!window.ethereum) {
         messageStore.message = i18n.t('pages.login.metamask.notFound');
         messageStore.color = 'red';
@@ -41,6 +42,7 @@ export const useMetamask = (logging) => {
           message: data.token,
           signedMessage,
           address: signer.address,
+          returnToken: true,
         });
         setToken(response.jwt);
         setUser(response.user);
@@ -63,8 +65,69 @@ export const useMetamask = (logging) => {
       messageStore.show = true;
       messageStore.color = 'red';
     } finally {
-      logging.value = false;
+      loading.value = false;
     }
   };
-  return { metalogin };
+
+  const getAddress: () => Promise<string> = async () => {
+    loading.value = true;
+    if (!window.ethereum) {
+      messageStore.message = i18n.t('pages.login.metamask.notFound');
+      messageStore.color = 'red';
+      messageStore.show = true;
+      return;
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+
+    const signer = await withTimeout(4000, provider.getSigner());
+
+    loading.value = false;
+    return signer.address;
+  };
+
+  const linkWallet = async (user_id) => {
+    try {
+      loading.value = true;
+      if (!window.ethereum) {
+        messageStore.message = i18n.t('pages.login.metamask.notFound');
+        messageStore.color = 'red';
+        messageStore.show = true;
+        return;
+      }
+      const provider = new ethers.BrowserProvider(window.ethereum);
+
+      const signer = await withTimeout(4000, provider.getSigner());
+
+      const data: any = await find('wallets/auth');
+      const signedMessage = await signer.signMessage(data.token);
+
+      try {
+        const response: any = await create('wallets/address', {
+          message: data.token,
+          signedMessage,
+          address: signer.address,
+          id: user_id
+        });
+        provider.destroy();
+        return response;
+      } catch (err: any) {
+        if (err.error.name === 'TokenExpiredError') {
+          messageStore.message = i18n.t(
+            'components.profile.wallets.tokenExpired',
+          );
+          messageStore.color = 'red';
+          messageStore.show = true;
+        }
+      }
+    } catch (err: any) {
+      messageStore.message = err.info
+        ? err.info.error.message
+        : err.error.message;
+      messageStore.show = true;
+      messageStore.color = 'red';
+    } finally {
+      loading.value = false;
+    }
+  };
+  return { metalogin, getAddress, linkWallet };
 };

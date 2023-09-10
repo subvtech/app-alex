@@ -1,5 +1,8 @@
 <template>
-  <profile-card :title="$t('components.settings.title')" :full-width="true">
+  <profile-card
+    :title="$t('components.profile.settings.title')"
+    :full-width="true"
+  >
     <template v-slot:content>
       <div>
         <v-form
@@ -9,35 +12,45 @@
           @submit.prevent="updateValues"
         >
           <alex-inputs-stepper-field
-            :label="$t('components.settings.fullname')"
+            :label="$t('components.profile.settings.fullname')"
+            :value="fullname"
             name="fullname"
             class=""
           />
           <div class="block d-flex flex-wrap">
             <alex-inputs-stepper-field
-              :label="$t('components.settings.phone')"
+              :label="$t('components.profile.settings.phone')"
+              :value="telephone"
               name="phone"
+              v-maska:[phoneMask]
             />
-
             <alex-inputs-stepper-field
-              :label="$t('components.settings.cpf')"
+              :label="$t('components.profile.settings.cpf')"
+              :value="cpf"
               name="cpf"
+              v-maska:[cpfMask]
             />
           </div>
           <alex-inputs-stepper-field
-            :label="$t('components.settings.about')"
-            name="about"
+            :label="$t('components.profile.settings.about')"
+            :value="info"
+            name="info"
             typeField="textarea"
             class=""
             color="black"
             variant="outlined"
           />
           <div class="d-flex justify-end">
-            <v-btn class="btn" color="accent" variant="outlined">
-              {{ $t('components.settings.cancel') }}</v-btn
+            <v-btn
+              class="btn"
+              color="accent"
+              @click="cancel"
+              variant="outlined"
             >
-            <v-btn class="btn ml-2" color="accent">
-              {{ $t('components.settings.save') }}
+              {{ $t('components.profile.settings.cancel') }}</v-btn
+            >
+            <v-btn class="btn ml-2" color="accent" type="submit">
+              {{ $t('components.profile.settings.save') }}
             </v-btn>
           </div>
         </v-form>
@@ -51,32 +64,77 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
+const { update } = useStrapi();
 const { profileSchema } = useFormRules();
-const loading = ref(false);
 const messageStore = useMessageStore();
+const emit = defineEmits(['update:user'])
+
+const loading = ref(false);
+
+const props = defineProps({
+  fullname: {
+    type: String,
+    required: true,
+  },
+  telephone: {
+    type: String,
+    default: '',
+  },
+  info: {
+    type: String,
+    required: true,
+  },
+  cpf: {
+    type: String,
+    required: true,
+  },
+  id: {
+    type: Number,
+    required: true,
+  },
+});
+
+const { fullname, telephone, cpf, info } = toRefs(props);
+
+const cpfMask = reactive({
+  mask: '###.###.###-##',
+  eager: true,
+});
+
+const phoneMask = {
+  mask: '(##) #####-####',
+  eager: true,
+};
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: profileSchema,
   keepValuesOnUnmount: true,
 });
 
-const isValid = computed(
-  () =>
-    !Object.values(controlledValues.value).includes(undefined) &&
-    !Object.values(errors.value).length,
-);
+const cancel = () => {
+  telephone.value = props.telephone;
+  fullname.value = props.fullname;
+  cpf.value = props.cpf;
+  info.value = props.info;
+};
 
 const updateValues = handleSubmit(async () => {
   loading.value = true;
+
+  const data = { ...values, phone: values.phone.replace(/[^0-9]/g, '') };
   try {
-    /*
-    await resetPassword({
-      code: route.query.code as string,
-      password: values.password,
-      passwordConfirmation: values.confirmPassword,
-    });
-    emit('confirmation-message');*/
+    const url = useStrapiUrl() + '/users/' + props.id;
+    const options = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data }),
+    };
+
+    await fetch(url, options);
+
+    emit('update:user', {})
   } catch (error) {
+    console.log(error);
     messageStore.message = error as string;
     messageStore.color = 'red';
     messageStore.show = true;

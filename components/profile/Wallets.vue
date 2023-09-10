@@ -1,22 +1,26 @@
 <template>
   <profile-card
     class="mt-6"
-    :title="$t('components.wallets.title')"
+    :title="$t('components.profile.wallets.title')"
     :full-width="false"
   >
     <template v-slot:content>
       <div class="item d-flex justify-space-between">
         <div class="d-flex align-center">
           <img src="../../static/images/metamask.png" alt="" />
-          <span>{{ $t('components.wallets.metamask') }}</span>
+          <span>{{ $t('components.profile.wallets.metamask') }}</span>
         </div>
         <v-btn
           class="btn ml-2"
           variant="outlined"
           size="large"
           color="#5D6872"
-          @click=""
-          :text="$t('components.wallets.unlink')"
+          @click="handleClick"
+          :text="
+            isWalletLinked
+              ? $t('components.profile.wallets.unlink')
+              : $t('components.profile.wallets.link')
+          "
         />
       </div>
     </template>
@@ -24,15 +28,56 @@
 </template>
 
 <script setup lang="ts">
+const { create, find, delete: _delete } = useStrapi();
+
+const loading = ref(false);
+
+const { linkWallet, getAddress } = useMetamask(loading);
+
+const emit = defineEmits(['update:user']);
+
+const messageStore = useMessageStore();
+
 type Wallet = {
-  title: string;
   address: string;
+  id: number;
 };
+
 const props = defineProps({
   wallet: {
     type: Object as PropType<Wallet>,
   },
+  id: {
+    type: Number,
+    required: true,
+  },
 });
+
+const { wallet } = toRefs(props);
+
+const isWalletLinked = ref(
+  props.wallet ? (props.wallet.address ? true : false) : false,
+);
+
+const handleClick = async () => {
+  try {
+    if (isWalletLinked.value) {
+      await _delete('user-wallets', props.wallet?.id);
+
+      isWalletLinked.value = false;
+    } else {
+      const result = await linkWallet(props.id);
+      wallet!.value = { id: result.wallet.id, address: result.wallet.address };
+      isWalletLinked.value = true;
+    }
+  } catch (err) {
+    messageStore.message = err as string;
+    messageStore.show = true;
+    messageStore.color = 'red';
+  }
+
+  emit('update:user', {});
+};
 </script>
 
 <style scoped lang="scss">

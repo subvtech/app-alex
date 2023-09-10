@@ -88,7 +88,7 @@
         <v-btn
           block
           class="card-btn metamask d-flex"
-          @click="metalogin"
+          @click="metalogin()"
           :loading="logging2"
         >
           <img src="../../static/images/metamask.png" alt="" />

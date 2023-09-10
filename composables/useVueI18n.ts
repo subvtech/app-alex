@@ -96,7 +96,6 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
       ? await import.meta.glob('../assets/locales/pt/**/*.json')
       : await import.meta.glob('../assets/locales/en/**/*.json'),
   );
-  console.log(translations);
   i18n.global.setLocaleMessage(lang, translations);
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);

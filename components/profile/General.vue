@@ -18,7 +18,7 @@
             {
               icon: 'mdi-check-decagram',
               number: 62,
-              label: $t('components.profile.general.courses'),
+              label: $t('components.profile.general.assignments'),
             },
           ]"
         >
