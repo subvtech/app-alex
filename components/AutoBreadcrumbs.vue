@@ -24,13 +24,7 @@ interface breadcrumb {
   href: string;
 }
 defineProps<{ breadcrumbs: breadcrumb[]; title?: string }>();
-// const route = useRoute();
-// const breadcrumbsArray = route.fullPath.split('/');
-// const transform = (pages: string[]) =>
-//   pages.map((page) => {
-//     if (page === '') return 'Home';
-//     return page;
-//   });
+
 </script>
 
 <style scoped></style>

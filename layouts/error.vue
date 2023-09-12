@@ -13,7 +13,6 @@
 <script setup lang="ts">
 
 const i18n = useI18n();
-// layout: 'empty'
 const props = defineProps({
   error: {
     type: Object,
