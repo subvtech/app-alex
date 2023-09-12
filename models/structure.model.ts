@@ -12,6 +12,6 @@ export interface Structure {
   learningplan?: Strapi4ResponseSingle<LearningPlan>;
   time: Number;
   blocks: Strapi4ResponseMany<Block>;
-  versioning: Version;
+  versioning?: Version;
   updatedAt: string;
 }
