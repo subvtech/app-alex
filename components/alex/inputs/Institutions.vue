@@ -3,7 +3,7 @@
     :name="name"
     v-model="value"
     :search="search"
-    @select="$emit('update:search', $event.target.value)"
+    @input="$emit('update:search', $event.target.value)"
     :loading="fetching"
     :items="institutions"
     item-text="text"
@@ -36,7 +36,7 @@ const props = defineProps({
     required: true,
   },
   institutions: {
-    type: Object as PropType<InstitutionsType[]>,
+    type: Array as PropType<InstitutionsType[]>,
     required: true,
   },
   name: {
@@ -48,12 +48,17 @@ const props = defineProps({
     default: 'white',
   },
 });
-const emit = defineEmits(['update:institutions', 'update:search']);
+const emit = defineEmits([
+  'update:institutions',
+  'update:value',
+  'update:search',
+]);
 
 const { value, errorMessage } = useField(
   () => props.name || 'institution',
   undefined,
 );
+
 const isTyping = ref(false);
 const fetching = ref(false);
 const { find } = useStrapi();
@@ -96,6 +101,10 @@ watchEffect(async (onInvalidate) => {
       clearInterval(getData);
     });
   }
+});
+
+watchEffect(() => {
+  emit('update:value', value.value as number - 1);
 });
 </script>
 

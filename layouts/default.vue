@@ -233,10 +233,8 @@ function logoutUser() {
 <style lang="scss">
 html,
 body {
-  font-family: 'Montserrat' !important;
-
   .v-application {
-    font-family: 'Montserrat' !important;
+    font-family: Sen !important;
 
     .v-navigation-drawer__content {
       -ms-overflow-style: none; /* IE and Edge */
@@ -245,11 +243,12 @@ body {
         display: none;
       }
     }
+
     @media (max-width: 540px) {
       .v-toolbar__content {
         .user-block {
           .fullname {
-            display: none;
+            font-family: Sen;
           }
         }
       }

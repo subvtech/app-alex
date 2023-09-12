@@ -47,11 +47,11 @@
         </div>
 
         <div class="info">
-          <div>
+          <div class="d-flex" style="gap: 8px">
             <span class="fullname">
-              {{ user.username }}
+              {{ user.fullname }}
             </span>
-            <span class="social"> @jojozap </span>
+            <span class="social">@{{ user.username }} </span>
           </div>
 
           <span class="role">
@@ -83,6 +83,7 @@
         <profile-institutional
           :institutions="user.institutions"
           :id="user.id"
+          @update:user="updateUser"
         />
       </div>
     </div>
@@ -115,23 +116,24 @@
         :fullname="user.fullname"
         :telephone="user.phone"
         :cpf="user.cpf"
-        @update:user="async () => await updateUser()"
+        @update:user="updateUser"
       />
       <div class="d-flex flex-column">
         <profile-institutional
           :institutions="user.institutions"
           :id="user.id"
           :canEdit="true"
+          @update:user="updateUser"
         />
         <profile-security
           :email="user.email"
           :id="user.id"
-          @update:user="async () => await updateUser()"
+          @update:user="updateUser"
         />
         <profile-wallets
           :wallet="user.user_wallet"
           :id="user.id"
-          @update:user="async () => await updateUser()"
+          @update:user="updateUser"
         />
       </div>
     </div>
@@ -153,7 +155,7 @@ definePageMeta({
   middleware: 'auth',
 });
 const { id } = useStrapiUser<User>().value;
-const updateUser = async () => {
+const updateUser = async (show = true) => {
   user.value = await findOne<User>('users', id, {
     populate: [
       'institutions.cover',
@@ -167,10 +169,9 @@ const updateUser = async () => {
 
   messageStore.message = 'done';
   messageStore.color = 'green';
-  messageStore.show = true;
+  messageStore.show = show;
 };
-await updateUser();
-console.log({ user: user.value });
+await updateUser(false);
 
 const selectedOption = ref(i18n.t('pages.profile.general'));
 const links = ref([

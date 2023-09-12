@@ -19,13 +19,7 @@
         v-if="isAddingInstitution"
         v-model:institutions="searchInstitutions"
         v-model:search="search"
-        @update:search="
-          (event) => {
-            console.log({ searchInstitutions });
-            console.log({ search });
-            console.log({ event });
-          }
-        "
+        @update:value="updateSelectedOption"
         color="black"
         name="institution"
       />
@@ -78,7 +72,10 @@ const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
 const showDeleteButton = ref(false);
 const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
+let selectedOption = ref(0);
 const search = ref('');
+
+const emit = defineEmits(['update:user']);
 
 const props = defineProps({
   institutions: {
@@ -96,14 +93,20 @@ const props = defineProps({
 });
 const { institutions } = toRefs(props);
 
+const updateSelectedOption = (event) => {
+  selectedOption.value = event;
+};
+
 const showSearch = async () => {
-  console.log(search.value);
-  console.log(searchInstitutions.value);
-  if (isAddingInstitution.value) {
+  if (isAddingInstitution.value && searchInstitutions.value) {
+    const temp = { ...searchInstitutions.value };
+   
     if (searchInstitutions.value.length > 0) {
       const list = institutions.value.map((item) => item.id);
 
-      list.push(searchInstitutions.value[0].id);
+      list.push(
+        { ...{ ...searchInstitutions.value }[selectedOption.value] }.id,
+      );
       const data = { institutions: list };
       const url = useStrapiUrl() + '/users/' + props.id;
       const options = {
@@ -113,6 +116,7 @@ const showSearch = async () => {
       };
 
       await fetch(url, options);
+      emit('update:user', {});
     }
 
     isAddingInstitution.value = false;
@@ -134,6 +138,7 @@ const removeInstitution = async (index) => {
   };
 
   await fetch(url, options);
+  emit('update:user', {});
 };
 </script>
 
