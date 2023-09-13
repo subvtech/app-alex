@@ -24,5 +24,11 @@ export default defineNuxtConfig({
 
   imports: {
     dirs: ['stores', 'models'],
+    presets: [
+      {
+        from: 'vue-i18n',
+        imports: ['useI18n'],
+      },
+    ],
   },
 });

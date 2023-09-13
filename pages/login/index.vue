@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+
 import { useForm } from 'vee-validate';
 const i18n = useI18n();
 definePageMeta({
@@ -201,7 +201,6 @@ const submit = handleSubmit(async () => {
     line-height: 24px;
   }
   &-text {
-    font-family: 'Montserrat';
     font-weight: 500 !important;
   }
 
@@ -235,7 +234,6 @@ const submit = handleSubmit(async () => {
     background: #00d3ec !important;
     border-radius: 6px;
     display: flex;
-    font-family: 'Montserrat';
     font-size: 15px;
     font-weight: 600;
     flex-direction: row;

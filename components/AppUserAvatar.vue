@@ -7,7 +7,6 @@
   </v-avatar>
 </template>
 <script setup lang="ts">
-import { getFullnameInitials } from '@/helpers/utils';
 import { User } from 'models/user.model';
 const { fetchUser } = useStrapiAuth();
 const user = await fetchUser();

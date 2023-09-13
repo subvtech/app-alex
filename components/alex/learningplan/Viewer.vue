@@ -91,8 +91,8 @@
                       attributes.type === 'link' &&
                       attributes.data.meta &&
                       typeof attributes.data.meta.domain === 'string' &&
-                      video.isVideo(attributes.data.meta.domain) &&
-                      video.getEmbedID(attributes.data.link)
+                      isVideo(attributes.data.meta.domain) &&
+                      getEmbedID(attributes.data.link)
                     "
                   >
                     <video
@@ -114,10 +114,10 @@
                     <div
                       v-else
                       :data-plyr-provider="
-                        video.getProvider(attributes.data.link)
+                        getProvider(attributes.data.link)
                       "
                       :data-plyr-embed-id="
-                        video.getEmbedID(attributes.data.link)
+                        getEmbedID(attributes.data.link)
                       "
                     />
                   </vue-plyr>
@@ -261,11 +261,9 @@ import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { PropType } from 'nuxt/dist/app/compat/capi';
-import * as video from '~/helpers/video';
 import 'viewerjs/dist/viewer.css';
 import { User } from '~/models/user.model';
 import { Block } from '~/models/block.model';
-import { unescape } from '@/helpers/html-escaper';
 import { Structure } from '~/models/structure.model';
 
 const props = defineProps({
@@ -428,3 +426,4 @@ const onTabClick = ({ id }: { id: string }) => {
   margin-top: 0;
 } */
 </style>
+utils/html-escaper
