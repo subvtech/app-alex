@@ -116,9 +116,7 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { useI18n } from 'vue-i18n';
 import { Tag } from '~/models/tag.model';
-import { formRules, createFileFromUrl } from '@/helpers/utils';
 import { LearningPlan } from '~/models/learningPlan.model';
 const { requiredRule, min5CharactersRule } = formRules;
 
@@ -207,7 +205,7 @@ const loadUpdateForm = async () => {
 const save = async (tag = '') => {
   if (!updateForm.value) return;
   const route = useRoute();
-  const { planId, trailId } = route.params;
+  const { planId, trailId } = route.params as {planId: string, trailId: string};
   const { instance } = editor.value;
 
   saving.value = true;

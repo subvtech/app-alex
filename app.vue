@@ -5,7 +5,6 @@
     </NuxtLayout>
   </div>
 </template>
-
 <script setup>
-import './assets/css/base.scss';
+import '@/assets/css/index.scss';
 </script>

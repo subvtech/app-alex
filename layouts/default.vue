@@ -14,10 +14,7 @@
       <v-row justify="center" class="my-10">
         <div>
           <NuxtLink to="/">
-            <img
-              src="../static/images/alex.svg"
-              style="height: 32px; width: 96px"
-            />
+            <img src="@/static/images/alex.svg" height="32" width="96" />
           </NuxtLink>
         </div>
       </v-row>
@@ -108,33 +105,26 @@
         </v-list>
       </v-menu>
     </v-app-bar>
-    <v-main class="secondary">
-      <v-container
-        style="background-color: #f1f5f9; max-width: 100%"
-        class="pa-10 w-100"
-      >
+    <v-main class="secondary bg-gray-blue">
+      <v-container style="width: 100%; max-width: 100%" class="pa-4 pa-sm-10">
         <slot />
       </v-container>
     </v-main>
-    <!-- <v-footer :absolute="!fixed" app>
-        <span>&copy; {{ new Date().getFullYear() }}</span>
-      </v-footer> -->
+    
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import { User } from '../models/user.model';
 
 const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
-// const fixed = ref(false);
-
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
-const profileMenuItems = ref([
+
+const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
     to: '/user/profile',
@@ -147,9 +137,9 @@ const profileMenuItems = ref([
     title: i18n.t('layouts.default.logout'),
     logout: true,
   },
-]);
+]
 
-const menus = ref([
+const menus = [
   {
     title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
@@ -206,16 +196,13 @@ const menus = ref([
       {
         icon: 'mdi-school-outline',
         title: i18n.t('layouts.default.classesLinks'),
-        to: '/classes/active-links',
+        to: '/projects',
       },
     ],
   },
-]);
+]
 
 const miniVariant = ref(false);
-
-// const title = ref('Alex');
-
 function onMenuClick(route = '', logout = false) {
   if (logout) {
     logoutUser();
@@ -231,28 +218,4 @@ function logoutUser() {
 </script>
 
 <style lang="scss">
-html,
-body {
-  .v-application {
-    font-family: Sen !important;
-
-    .v-navigation-drawer__content {
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-      &::-webkit-scrollbar {
-        display: none;
-      }
-    }
-
-    @media (max-width: 540px) {
-      .v-toolbar__content {
-        .user-block {
-          .fullname {
-            font-family: Sen;
-          }
-        }
-      }
-    }
-  }
-}
 </style>

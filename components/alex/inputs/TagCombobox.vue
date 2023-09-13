@@ -141,7 +141,6 @@ const searchTags = async (search = '', ids: number[] = []) => {
   if ((!search || search.length < 3) && !ids.length) return;
   loadingTags.value = true;
 
-  // const
   const props = {
     query: ids.length ? queries.tagsByids : queries.tags,
     variables: ids.length ? { ids } : { search },
