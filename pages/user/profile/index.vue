@@ -3,9 +3,11 @@
     <div class="header d-flex w-100">
       <span class="title h-">{{ $t('pages.profile.title') }}</span>
       <div class="pages d-flex h-100">
-        <span class="go-back" style="cursor: pointer">{{
-          $t('pages.profile.home')
-        }}</span>
+        <NuxtLink to="/" class="text-decoration-none">
+          <span class="go-back" style="cursor: pointer">{{
+            $t('pages.profile.home')
+          }}</span>
+        </NuxtLink>
         <span class="go-back">></span>
         <span class="current-page">{{ $t('pages.profile.title') }}</span>
       </div>
@@ -47,7 +49,7 @@
         </div>
 
         <div class="info">
-          <div class="d-flex" style="gap: 8px">
+          <div class="d-flex">
             <span class="fullname">
               {{ user.fullname }}
             </span>
@@ -237,6 +239,7 @@ const links = ref([
     .card {
       display: flex;
       flex-direction: row;
+      position: relative;
       width: 100%;
       padding-inline: 40px;
       transition: all ease-in-out 1s;
@@ -244,10 +247,14 @@ const links = ref([
 
       .photo {
         display: flex;
-        position: relative;
+        position: absolute;
+        bottom: 0px;
+        transition: all ease-in-out 1s;
+
         .avatar {
           display: flex;
           align-items: flex-end;
+
           img {
             max-width: 160px;
             max-height: 160px;
@@ -257,7 +264,7 @@ const links = ref([
             border-top-left-radius: 4px;
             border-top-right-radius: 4px;
             border: solid #fff;
-            margin-top: -80px;
+
             border-radius: 100%;
           }
         }
@@ -285,6 +292,8 @@ const links = ref([
         display: flex;
         flex-direction: column;
         margin-block: 16px;
+        margin-left: 160px;
+        transition: all ease-in-out 1s;
 
         .fullname {
           color: #001529;
@@ -325,6 +334,7 @@ const links = ref([
       padding-inline: 24px;
       margin-top: 18px;
       transition: all ease-in-out 1s;
+      align-items: center;
 
       span {
         color: #5d6872;
@@ -333,6 +343,7 @@ const links = ref([
         line-height: 22px;
         cursor: pointer;
         padding-block: 16px;
+        text-align: center;
         &:hover {
           color: #279ee3;
         }
@@ -349,6 +360,63 @@ const links = ref([
     gap: 24px;
   }
 
+  @media (max-width: 800px) {
+    .content-block {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .user-block {
+      .card {
+        .info {
+          margin-left: 125px;
+          :first-child {
+            gap: 8px;
+            flex-direction: column-reverse;
+          }
+        }
+        .photo {
+          max-width: 120px;
+          max-height: 120px;
+          bottom: 40px;
+          .avatar {
+            img {
+              max-width: 100%;
+              max-height: 100%;
+
+              margin-top: 0px;
+            }
+          }
+
+          .edit {
+            display: flex;
+            width: 32px;
+            height: 32px;
+            padding: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            right: 0px;
+            bottom: 15px;
+            position: absolute;
+            border-radius: 99px;
+            border: 1px solid #abb2b9;
+            background: #f1f5f9;
+            cursor: pointer;
+          }
+        }
+      }
+      .menu {
+        gap: 16px;
+        :first-child {
+          min-width: 73px;
+        }
+      }
+    }
+  }
+
   @media (max-width: 590px) {
     .user-block {
       .menu {
@@ -363,20 +431,49 @@ const links = ref([
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 450px) {
     .user-block {
-      .menu {
-        gap: 16px;
-        :first-child {
-          min-width: 73px;
+      .card {
+        .info {
+          width: 100%;
+          margin-left: 0px;
+
+          justify-content: space-between;
+          flex-direction: row;
+
+          :first-child {
+            flex-direction: column;
+            gap: 0px;
+            margin-top: 10px;
+          }
+
+          .fullname {
+            color: #001529;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: bold;
+            line-height: 28px;
+          }
+
+          .social {
+            color: #abb2b9;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 28px;
+          }
+        }
+        .photo {
+          bottom: 70px;
+          .avatar {
+            img {
+              max-width: 100%;
+              max-height: 100%;
+
+              margin-top: 0px;
+            }
+          }
         }
       }
-    }
-  }
-
-  @media (max-width: 800px) {
-    .content-block {
-      flex-wrap: wrap;
     }
   }
 }

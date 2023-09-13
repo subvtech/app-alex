@@ -244,11 +244,11 @@ body {
       }
     }
 
-    @media (max-width: 540px) {
+    @media (max-width: 550px) {
       .v-toolbar__content {
         .user-block {
           .fullname {
-            font-family: Sen;
+            display: none;
           }
         }
       }

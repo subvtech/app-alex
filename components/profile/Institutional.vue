@@ -25,24 +25,26 @@
       />
       <div class="d-flex flex-wrap items">
         <div
-          class="d-flex pa-4 align-center item"
+          class="d-flex pa-4 align-center justify-space-between w-100 item"
           v-for="(item, index) in institutions"
         >
-          <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
+          <div class="d-flex" style="gap: 12px">
+            <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
 
-          <div class="d-flex flex-column justify-center">
-            <span>{{ item.acronym + ' - ' + item.name }}</span>
-            <p>{{ item.sector }}</p>
+            <div class="d-flex flex-column justify-center">
+              <span>{{ item.acronym + ' - ' + item.name }}</span>
+              <p>{{ item.sector }}</p>
+            </div>
           </div>
-          <div v-if="canEdit" class="menu">
+          <div v-if="canEdit" class="options">
             <v-icon
-              @click="showDeleteButton = !showDeleteButton"
+              @click="updateShowDeleteButton(index)"
               color="#6E7A87"
               style="cursor: pointer"
               >mdi-dots-vertical</v-icon
             >
             <v-icon
-              v-if="showDeleteButton"
+              v-if="showDeleteButton.includes(index)"
               class="remove"
               @click="removeInstitution(item.id)"
               color="red"
@@ -69,7 +71,7 @@ type Institution = {
 };
 
 const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-const showDeleteButton = ref(false);
+const showDeleteButton = ref<number[]>([]);
 const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
 let selectedOption = ref(0);
@@ -97,10 +99,16 @@ const updateSelectedOption = (event) => {
   selectedOption.value = event;
 };
 
+const updateShowDeleteButton = (index: number) => {
+  showDeleteButton.value.includes(index)
+    ? showDeleteButton.value.splice(showDeleteButton.value.indexOf(index), 1)
+    : showDeleteButton.value.push(index);
+};
+
 const showSearch = async () => {
   if (isAddingInstitution.value && searchInstitutions.value) {
     const temp = { ...searchInstitutions.value };
-   
+
     if (searchInstitutions.value.length > 0) {
       const list = institutions.value.map((item) => item.id);
 
@@ -155,7 +163,7 @@ const removeInstitution = async (index) => {
 .items {
   gap: 24px;
   .item {
-    gap: 12px;
+    position: relative;
     color: #5d6872;
     line-height: 22px;
 
@@ -177,15 +185,23 @@ const removeInstitution = async (index) => {
       border: 1px solid #eaeef1;
     }
 
-    .menu {
-      position: relative;
-
+    .options {
       .remove {
         cursor: pointer;
 
         position: absolute;
-        top: -38px;
-        left: 18px;
+        top: 10px;
+        right: 10px;
+      }
+    }
+  }
+  @media (max-width: 600px) {
+    .item {
+      span {
+        font-size: 18px;
+      }
+      p {
+        font-size: 14px;
       }
     }
   }
