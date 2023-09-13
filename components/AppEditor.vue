@@ -1,6 +1,14 @@
 <template>
   <client-only>
-    <div id="editorjs" class="editorjs w-full p-6 sm:p-16" />
+    <v-container class="d-flex justify-space-around">
+      <v-btn @click="saveData">Save</v-btn>
+      <v-btn @click="loadData">Load</v-btn>
+    </v-container>
+    <div
+      id="editorjs"
+      class="w-full editorjs p-6 sm:p-16 bg-blue-grey-lighten-5 elevation-5"
+    />
+    <!-- <editor-js-plugins-link-popup /> -->
   </client-only>
 </template>
 
@@ -26,8 +34,12 @@ import Warning from '@editorjs/warning';
 import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from 'models/structure.model';
+import Embed from '@editorjs/embed';
+import CustomLinkTool from '../components/editorJsPlugins/LinkBlock.js';
+// import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import Carousel from '../components/editorJsPlugins/CarouselBlock.js';
+// import { Structure } from 'models/structure.model';
+import editorData from '../components/editorJsPlugins/editorData.js';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 import { Upload } from 'models/upload.model';
@@ -35,10 +47,8 @@ const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
-
 const token = useStrapiToken();
-
-const props = defineProps({
+/* const props = defineProps({
   data: {
     type: Object as PropType<Strapi4ResponseData<Structure>>,
     default: () => {},
@@ -46,18 +56,24 @@ const props = defineProps({
 });
 
 const planData = computed(() => {
-  const structure: any = { ...props.data.attributes, id: props.data.id };
-  structure.blocks = props.data.attributes.blocks.data.map((b) => {
-    if (!b.attributes.tunes) {
-      delete b.attributes.tunes;
-    }
-    return { ...b.attributes, id: b.id };
-  });
-  return structure;
+    const structure: any = { ...props.data.attributes, id: props.data.id };
+    structure.blocks = props.data.attributes.blocks.data.map((b) => {
+      if (!b.attributes.tunes) {
+        delete b.attributes.tunes;
+      }
+      return { ...b.attributes, id: b.id };
+    });
+    return structure;
+}); */
+
+const uploadBaseUrl = computed(() => {
+  const runtimeConfig = useRuntimeConfig();
+  return runtimeConfig.public.strapi.url;
 });
 
 onMounted(() => {
   instance.value = new EditorJS({
+    readOnly: false,
     tools: {
       delimiter: Delmiter,
       // embed: require('@editorjs/embed'),
@@ -74,17 +90,17 @@ onMounted(() => {
         class: Image,
         config: {
           uploader: {
-            uploadByFile: (file) => {
+            uploadByFile: (files) => {
               const formData = new FormData();
-
-              formData.append('files', file, file.name);
-
+              files.forEach((file) => {
+                formData.append('files', file, file.name);
+              });
               return strapiClient<Upload>('/upload', {
                 method: 'POST',
                 body: formData,
               })
                 .then((res) => {
-                  const url = res.url;
+                  const url = 'http://localhost:1337' + res[0].url;
                   return { success: 1, file: { url } };
                 })
                 .catch((err) => {
@@ -100,7 +116,7 @@ onMounted(() => {
         shortcut: 'CMD+SHIFT+C',
       },
       link: {
-        class: Link,
+        class: CustomLinkTool,
         config: {
           endpoint: '/api/fetch-url',
         },
@@ -122,14 +138,14 @@ onMounted(() => {
           captionPlaceholder: 'Autor da citação',
         },
       },
-      table: {
+      /*     table: {
         class: Table,
         // inlineToolbar: true,
         config: {
           rows: 2,
           cols: 3,
         },
-      },
+      }, */
       alignmentBlockTune: {
         class: AlignmentBlockTune,
         config: {
@@ -151,13 +167,13 @@ onMounted(() => {
           validate: false,
         },
       },
-      socialPost: SocialPost,
+      /*  socialPost: SocialPost,
       code: {
         class: Code,
         config: {
           placeholder: 'Escreva o código aqui...',
         },
-      },
+      }, */
       // code: require('editorjs-codemirror'),
       alert: {
         class: Alert,
@@ -190,11 +206,79 @@ onMounted(() => {
           errorMessage: 'Erro no upload do arquivo',
         },
       },
+      embed: Embed,
+      carousel: {
+        class: Carousel,
+        config: {
+          uploadBaseUrl: uploadBaseUrl.value,
+          handleFileSelected: (files) => {
+            const formData = new FormData();
+            files.forEach((file) => {
+              if (file instanceof File) {
+                formData.append('files', file, file.name);
+              } else if (typeof file === 'string' && file.startsWith('data:')) {
+                const base64Data = file.split(',')[1];
+                const binaryString = window.atob(base64Data);
+                const byteArray = new Uint8Array(binaryString.length);
+
+                for (let i = 0; i < binaryString.length; i++) {
+                  byteArray[i] = binaryString.charCodeAt(i);
+                }
+
+                let mimeType = 'image/png';
+                if (file.startsWith('data:image/jpeg')) {
+                  mimeType = 'image/jpeg';
+                }
+
+                const blob = new Blob([byteArray], { type: mimeType });
+                const imageFile = new File([blob], 'filename.png', {
+                  type: mimeType,
+                });
+                formData.append('files', imageFile, imageFile.name);
+              }
+            });
+
+            return strapiClient<Upload>('/upload', {
+              method: 'POST',
+              body: formData,
+            })
+              .then((res) => {
+                if (files.length > 1) {
+                  const url = res[0].url;
+                  const thumbnail = res[1].url;
+                  return { success: 1, url: { url }, thumbnail: { thumbnail } };
+                } else {
+                  const url = res[0].url;
+                  return { success: 1, url: { url } };
+                }
+              })
+              .catch((err) => {
+                messageStore.message = err;
+              });
+          },
+          handleDeletedFiles: async (file) => {
+            await strapiClient<Upload>('/upload/files', {
+              method: 'GET',
+            }).then((res) => {
+              const files = res;
+              const fileImage = files.find((f) => f.url === file.image);
+              strapiClient<Upload>(`/upload/files/${fileImage.id}`, {
+                method: 'DELETE',
+              });
+              if (file.video) {
+                const fileVideo = files.find((f) => f.url === file.video);
+                strapiClient<Upload>(`/upload/files/${fileVideo.id}`, {
+                  method: 'DELETE',
+                });
+              }
+            });
+          },
+        },
+      },
     },
     i18n,
     minHeight: 400,
     autofocus: true,
-    data: planData.value,
     holder: 'editorjs',
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
@@ -205,9 +289,23 @@ onMounted(() => {
       new Undo({ editor: instance.value });
       emit('ready');
     },
-    onChange: () => emit('change'),
   });
 });
+const loadData = () => {
+  instance.value.isReady.then(() => {
+    instance.value.render(editorData);
+  });
+};
+const saveData = () => {
+  instance.value
+    .save()
+    .then((outputData) => {
+      console.log('Article data: ', outputData);
+    })
+    .catch((error) => {
+      console.log('Saving failed: ', error);
+    });
+};
 </script>
 
 <style scoped>
@@ -231,6 +329,6 @@ onMounted(() => {
 .editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
   /* max-width: 64rem; */
-  max-width: 100%;
+  max-width: 80%;
 }
 </style>

@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
@@ -20,6 +21,9 @@ export default defineNuxtConfig({
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },
+  },
+  runtimeConfig: {
+    uploadBaseUrl: process.env.STRAPI_UPLOAD_URL || 'http://localhost:1337',
   },
   imports: {
     dirs: ['stores', 'models'],
