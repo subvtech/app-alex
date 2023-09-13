@@ -2,6 +2,7 @@
   <v-text-field v-if="typeField === 'text'" v-model="value" :error-messages="errorMessage"> </v-text-field>
   <v-autocomplete v-else-if="typeField === 'autocomplete'" v-model="value" :error-messages="errorMessage"> </v-autocomplete>
   <v-select v-else-if="typeField === 'select'" v-model="value" :error-messages="errorMessage"> </v-select>
+  <v-textarea v-else-if="typeField === 'textarea'" v-model="value" :error-messages="errorMessage"> </v-textarea>
 
 </template>
 
@@ -14,7 +15,7 @@ const props = defineProps({
         default: undefined,
     },
     typeField: {
-        type: String as PropType<'autocomplete' | 'text' | 'select'>,
+        type: String as PropType<'autocomplete' | 'text' | 'textarea' | 'select'>,
         default: 'text'
     },
     

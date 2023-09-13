@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="user">
     <AppSnackbar />
     <v-navigation-drawer
       v-model="drawer"
@@ -14,14 +14,17 @@
       <v-row justify="center" class="my-10">
         <div>
           <NuxtLink to="/">
-            <v-img src="/images/alex.svg" height="32" width="96" />
+            <img
+              src="../static/images/alex.svg"
+              style="height: 32px; width: 96px"
+            />
           </NuxtLink>
         </div>
       </v-row>
       <div v-for="(menu, i) in menus" :key="`menu-${i}`">
         <v-subheader
           :key="`menu-${i}`"
-          class="accent--text"
+          class="accent-text"
           style="font-size: 12px; line-height: 15px"
         >
           {{ menu.title }}
@@ -31,18 +34,20 @@
             v-for="(item, j) in menu.items"
             :key="`menu-${i}-item-${j}`"
             :to="item.to"
+            class=""
             router
             exact
           >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
+            <div class="d-flex" style="gap: 16px">
+              <v-list-item-action>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-item-action>
+
               <v-list-item-title
                 class="font-weight-medium"
-                :text="item.title"
+                v-text="item.title"
               />
-            </v-list-item-content>
+            </div>
           </v-list-item>
         </v-list>
       </div>
@@ -55,7 +60,12 @@
         style="height: 42px; width: 115px"
       >
         <NuxtLink to="/">
-          <v-img src="/images/alex.svg" height="32" width="96" />
+          <v-img
+            src="../static/images/alex.svg"
+            alt="logo"
+            height="32"
+            width="96"
+          />
         </NuxtLink>
       </div>
       <v-spacer />
@@ -75,14 +85,15 @@
             <div
               v-bind="props"
               style="cursor: pointer"
+              class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <!-- <app-user-avatar :user="user" class="mr-2" /> -->
-              <span>
+              <app-user-avatar :user="user" class="mr-2" />
+              <span class="fullname">
                 {{ user?.fullname }}
               </span>
 
-              <v-icon> mdi-chevron-down </v-icon>
+              <v-icon class="fullname"> mdi-chevron-down </v-icon>
             </div>
           </v-hover>
         </template>
@@ -98,7 +109,10 @@
       </v-menu>
     </v-app-bar>
     <v-main class="secondary">
-      <v-container style="width: 100%; max-width: 100%" class="pa-10">
+      <v-container
+        style="background-color: #f1f5f9; max-width: 100%"
+        class="pa-10 w-100"
+      >
         <slot />
       </v-container>
     </v-main>
@@ -110,7 +124,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { User } from 'models/user.model';
+import { User } from '../models/user.model';
 
 const i18n = useI18n();
 const clipped = ref(false);
@@ -120,7 +134,6 @@ const drawer = ref(true);
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
-
 const profileMenuItems = ref([
   {
     title: i18n.t('layouts.default.profile'),
@@ -141,7 +154,7 @@ const menus = ref([
     title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-view-dashboard',
         title: i18n.t('layouts.default.dashboard'),
         to: '/dashboard',
       },
@@ -151,12 +164,12 @@ const menus = ref([
     title: i18n.t('layouts.default.learningPlansTitle'),
     items: [
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-newspaper-variant-multiple-outline',
         title: i18n.t('layouts.default.learningPlans'),
         to: '/learning-plans',
       },
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-newspaper-variant-multiple-outline',
         title: i18n.t('layouts.default.learningPlansUser'),
         to: '/learning-plans/user',
       },
@@ -166,12 +179,32 @@ const menus = ref([
     title: i18n.t('layouts.default.classesTitle'),
     items: [
       {
-        icon: 'mdi-star-outline',
-        title: i18n.t('layouts.default.classes'),
+        icon: 'mdi-account-multiple-outline',
+        title: 'Todas as turmas',
         to: '/classes',
       },
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-account-multiple-outline',
+        title: 'Turmas salvas',
+        to: '/classes/active-links',
+      },
+    ],
+  },
+  {
+    title: 'ÁREA DO PROFESSOR',
+    items: [
+      {
+        icon: 'mdi-bookmark-box-multiple-outline',
+        title: 'Meus Planos',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-pencil-outline',
+        title: 'Turmas ministradas',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-school-outline',
         title: i18n.t('layouts.default.classesLinks'),
         to: '/classes/active-links',
       },
@@ -196,13 +229,30 @@ function logoutUser() {
   router.push('/login');
 }
 </script>
+
 <style lang="scss">
 html,
 body {
-  font-family: 'Montserrat' !important;
-
   .v-application {
-    font-family: 'Montserrat' !important;
+    font-family: Sen !important;
+
+    .v-navigation-drawer__content {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .v-toolbar__content {
+        .user-block {
+          .fullname {
+            font-family: Sen;
+          }
+        }
+      }
+    }
   }
 }
 </style>

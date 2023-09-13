@@ -87,8 +87,8 @@
         </div>
         <v-btn
           block
-          class="card-btn metamask"
-          @click="metalogin"
+          class="card-btn metamask d-flex"
+          @click="metalogin()"
           :loading="logging2"
         >
           <img src="../../static/images/metamask.png" alt="" />
@@ -107,7 +107,8 @@ definePageMeta({
   layout: 'auth',
   middleware: 'control-access'
 });
-const { login } = useStrapiAuth();
+const { login, setToken, setUser } = useStrapiAuth();
+const { create, find } = useStrapi();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
@@ -206,7 +207,6 @@ const submit = handleSubmit(async () => {
 
   .metamask {
     background-color: white !important;
-    display: flex;
     align-items: center;
     text-transform: none !important;
     width: 306px;
