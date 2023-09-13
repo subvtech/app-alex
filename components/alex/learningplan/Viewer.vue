@@ -15,9 +15,9 @@
               color="primary"
               @click="emit('edit')"
             >
-             {{ $t('components.viewer.addContent') }}
+             {{ $t('components.learningPlan.viewer.addContent') }}
             </v-btn>
-            <span v-else>{{ $t('components.viewer.noContent') }}</span>
+            <span v-else>{{ $t('components.learningPlan.viewer.noContent') }}</span>
           </v-col>
         </v-row>
         <div v-else>
@@ -228,7 +228,7 @@
         "
       >
         <v-btn text="" @click="onTabClick({ id: 'header-learning-plan-card' })">
-          {{$t('components.viewer.backToTop')}}
+          {{$t('components.learningPlan.viewer.backToTop')}}
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
         <v-tabs
@@ -262,9 +262,9 @@ import Prism from 'vue-prism-component';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { PropType } from 'nuxt/dist/app/compat/capi';
 import 'viewerjs/dist/viewer.css';
-import { User } from 'models/user.model';
-import { Block } from 'models/block.model';
-import { Structure } from 'models/structure.model';
+import { User } from '~/models/user.model';
+import { Block } from '~/models/block.model';
+import { Structure } from '~/models/structure.model';
 
 const props = defineProps({
   hasPermission: Boolean,

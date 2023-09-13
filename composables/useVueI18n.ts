@@ -13,9 +13,9 @@ export const i18n = createI18n({
 
 const loadedLanguages: SUPPORT_LOCALES_TYPE[] = []; // our default language that is preloaded
 
-export const setupI18n = (locale: SUPPORT_LOCALES_TYPE = 'pt') => {
+export const setupI18n = async (locale: SUPPORT_LOCALES_TYPE = 'pt') => {
   setI18nLanguage(locale);
-  loadLanguageAsync(locale);
+  await loadLanguageAsync(locale);
 };
 
 export function setI18nLanguage(locale) {
@@ -50,38 +50,53 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   }
 
   // If the language hasn't been loaded yet
-  const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-  const pages = await useImportLanguages('pages', lang, [
-    'login',
-    'register',
-    'planId',
-    'reset',
-    'trailId',
-    'forgot',
-  ]);
-  const components = await useImportLanguages('components', lang, [
-    'appLearningPlanCard',
-    'articleViewer',
-    'editor',
-    'authors',
-    'imagePreview',
-    'link',
-    'page',
-    'sendResetPassword',
-    'tagCombobox',
-    'usersAutocomplete',
-    'viewer',
-  ]);
-  const layouts = await useImportLanguages('layouts', lang, [
-    'default',
-    'error',
-  ]);
-  i18n.global.setLocaleMessage(lang, {
-    pages,
-    rules,
-    components,
-    layouts,
-  });
+  const loadFiles = async (pages) => {
+    const result = {};
+    for (const file of Object.keys(pages)) {
+      const pageData = await import(/* @vite-ignore */ file);
+
+      const [block, block2, block3] = file.substring(21).split('/');
+      if (block3) {
+        const innerGroup = block3.split('.')[0];
+        if (!result[block]) {
+          result[block] = {};
+        }
+
+        if (!result[block][block2]) {
+          result[block][block2] = {};
+        }
+
+        result[block][block2][innerGroup] = {
+          ...result[block][block2][innerGroup],
+          ...pageData.default,
+        };
+      } else if (block2) {
+        const subGroup = block2.split('.')[0];
+
+        if (!result[block]) {
+          result[block] = {};
+        }
+        result[block][subGroup] = {
+          ...result[block][subGroup],
+          ...pageData.default,
+        };
+      } else {
+        const subGroup = block.split('.')[0];
+        result[subGroup] = {
+          ...result[subGroup],
+          ...pageData.default,
+        };
+      }
+    }
+    return result;
+  };
+
+  const translations = await loadFiles(
+    lang === i18n.global.locale.value
+      ? await import.meta.glob('../assets/locales/pt/**/*.json')
+      : await import.meta.glob('../assets/locales/en/**/*.json'),
+  );
+  i18n.global.setLocaleMessage(lang, translations);
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);
 }

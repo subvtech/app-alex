@@ -2,22 +2,22 @@
   <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
     <div class="mb-10">
       <p class="text-white text-h4 text-center font-weight-bold mb-4">
-        {{ $t('components.sendResetPassword.forgotPassword') }}
+        {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
       </p>
       <p class="text-white text-h6 font-weight-regular text-center my-2">
-        {{ $t('components.sendResetPassword.enterEmail') }}
+        {{ $t('components.forgot.sendResetPassword.enterEmail') }}
       </p>
     </div>
     <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
       <alex-inputs-stepper-field
-        :label="$t('components.sendResetPassword.email')"
+        :label="$t('components.forgot.sendResetPassword.email')"
         name="email"
         color="white"
         class="my-3 text-secondary"
         theme="dark"
       />
       <span v-if="submitError" class="text-error w-100">{{
-        $t('components.sendResetPassword.emailError')
+        $t('components.forgot.sendResetPassword.emailError')
       }}</span>
 
       <v-btn
@@ -28,14 +28,14 @@
         size="large"
         :disabled="!isValid"
         :loading="loading"
-        >{{ $t('components.sendResetPassword.recoverPassword') }}</v-btn
+        >{{ $t('components.forgot.sendResetPassword.recoverPassword') }}</v-btn
       >
     </v-form>
     <ForgotPasswordDividerRow />
     <p class="text-center text-body-1">
-      {{ $t('components.sendResetPassword.recalledPassword') }}
+      {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-decoration-none text-accent">{{
-        $t('components.sendResetPassword.login')
+        $t('components.forgot.sendResetPassword.login')
       }}</NuxtLink>
     </p>
   </v-container>

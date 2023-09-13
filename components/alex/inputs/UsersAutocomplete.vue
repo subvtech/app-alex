@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { stringify } from 'qs';
-import { User } from 'models/user.model';
+import { User } from '../../../models/user.model';
 
 const user = useStrapiUser();
 const { find } = useStrapi();

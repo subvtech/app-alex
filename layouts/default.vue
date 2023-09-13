@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="user">
     <AppSnackbar />
     <v-navigation-drawer
       v-model="drawer"
@@ -21,7 +21,7 @@
       <div v-for="(menu, i) in menus" :key="`menu-${i}`">
         <v-subheader
           :key="`menu-${i}`"
-          class="accent--text"
+          class="accent-text"
           style="font-size: 12px; line-height: 15px"
         >
           {{ menu.title }}
@@ -31,18 +31,20 @@
             v-for="(item, j) in menu.items"
             :key="`menu-${i}-item-${j}`"
             :to="item.to"
+            class=""
             router
             exact
           >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
+            <div class="d-flex" style="gap: 16px">
+              <v-list-item-action>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-item-action>
+
               <v-list-item-title
                 class="font-weight-medium"
-                :text="item.title"
+                v-text="item.title"
               />
-            </v-list-item-content>
+            </div>
           </v-list-item>
         </v-list>
       </div>
@@ -55,7 +57,12 @@
         style="height: 42px; width: 115px"
       >
         <NuxtLink to="/">
-          <v-img src="/images/alex.svg" height="32" width="96" />
+          <v-img
+            src="../static/images/alex.svg"
+            alt="logo"
+            height="32"
+            width="96"
+          />
         </NuxtLink>
       </div>
       <v-spacer />
@@ -75,13 +82,15 @@
             <div
               v-bind="props"
               style="cursor: pointer"
+              class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <span>
+              <app-user-avatar :user="user" class="mr-2" />
+              <span class="fullname">
                 {{ user?.fullname }}
               </span>
 
-              <v-icon> mdi-chevron-down </v-icon>
+              <v-icon class="fullname"> mdi-chevron-down </v-icon>
             </div>
           </v-hover>
         </template>
@@ -106,8 +115,7 @@
 </template>
 
 <script setup lang="ts">
-
-import { User } from 'models/user.model';
+import { User } from '../models/user.model';
 
 const i18n = useI18n();
 const clipped = ref(false);
@@ -136,7 +144,7 @@ const menus = [
     title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-view-dashboard',
         title: i18n.t('layouts.default.dashboard'),
         to: '/dashboard',
       },
@@ -146,12 +154,12 @@ const menus = [
     title: i18n.t('layouts.default.learningPlansTitle'),
     items: [
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-newspaper-variant-multiple-outline',
         title: i18n.t('layouts.default.learningPlans'),
         to: '/learning-plans',
       },
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-newspaper-variant-multiple-outline',
         title: i18n.t('layouts.default.learningPlansUser'),
         to: '/learning-plans/user',
       },
@@ -161,12 +169,32 @@ const menus = [
     title: i18n.t('layouts.default.classesTitle'),
     items: [
       {
-        icon: 'mdi-star-outline',
-        title: i18n.t('layouts.default.classes'),
+        icon: 'mdi-account-multiple-outline',
+        title: 'Todas as turmas',
         to: '/classes',
       },
       {
-        icon: 'mdi-star-outline',
+        icon: 'mdi-account-multiple-outline',
+        title: 'Turmas salvas',
+        to: '/classes/active-links',
+      },
+    ],
+  },
+  {
+    title: 'ÁREA DO PROFESSOR',
+    items: [
+      {
+        icon: 'mdi-bookmark-box-multiple-outline',
+        title: 'Meus Planos',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-pencil-outline',
+        title: 'Turmas ministradas',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-school-outline',
         title: i18n.t('layouts.default.classesLinks'),
         to: '/projects',
       },
@@ -188,6 +216,6 @@ function logoutUser() {
   router.push('/login');
 }
 </script>
-<style lang="scss">
 
+<style lang="scss">
 </style>

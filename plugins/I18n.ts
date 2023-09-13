@@ -1,4 +1,4 @@
-export default defineNuxtPlugin(({ vueApp }) => {
-  setupI18n();
+export default defineNuxtPlugin(async ({ vueApp }) => {
+  await setupI18n();
   vueApp.use(i18n);
 });

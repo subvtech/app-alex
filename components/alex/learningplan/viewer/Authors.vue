@@ -49,7 +49,7 @@
         <div style="display: flex">
           <span>
             {{
-              $t('components.authors.updatedAt', {
+              $t('components.learningPlan.authors.updatedAt', {
                 date: new Date(
                   structure.attributes.updatedAt,
                 ).toLocaleDateString('pt-BR'),
@@ -64,9 +64,8 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-
-import { User } from 'models/user.model';
-import { Structure } from 'models/structure.model';
+import { User } from '~/models/user.model';
+import { Structure } from '~/models/structure.model';
 
 const i18n = useI18n();
 
@@ -89,9 +88,9 @@ const coAuthorsText = (coAuthors) => {
   if (coAuthors.length < 1) {
     return '';
   } else if (coAuthors.length > 1) {
-    return i18n.t('components.authors.coauthors', { length: coAuthors.length });
+    return i18n.t('components.learningPlan.authors.coauthors', { length: coAuthors.length });
   } else {
-    return i18n.t('components.authors.coauthor', { length: coAuthors.length });
+    return i18n.t('components.learningPlan.authors.coauthor', { length: coAuthors.length });
   }
 };
 </script>

@@ -3,7 +3,7 @@
     <v-col cols="12">
       <v-row justify="end" class="mb-2">
         <v-btn color="white" class="mr-1" @click="emit('back')">
-          {{ $t('components.editor.cancel') }}
+          {{ $t('components.learningPlan.editor.cancel') }}
         </v-btn>
         <v-btn
           color="accent"
@@ -20,14 +20,14 @@
           :loading="saving"
           @click="openModal = true"
         >
-          {{ $t('components.editor.createVersion') }}
+          {{ $t('components.learningPlan.editor.createVersion') }}
         </v-btn>
       </v-row>
     </v-col>
     <v-col cols="11" class="pa-0 mb-8">
       <v-card class="pa-5">
         <v-card-title class="pa-0 mb-6">
-          {{ $t('components.editor.formTitle') }}</v-card-title
+          {{ $t('components.learningPlan.editor.formTitle') }}</v-card-title
         >
         <v-form v-model="updateFormValid">
           <v-row>
@@ -43,7 +43,7 @@
                   <v-text-field
                     v-model="updateForm.title"
                     :rules="updateRules.title"
-                    :label="$t('components.editor.planTitle')"
+                    :label="$t('components.learningPlan.editor.planTitle')"
                     dense
                     outlined
                   />
@@ -53,7 +53,7 @@
                     v-model="updateForm.description"
                     :rules="updateRules.description"
                     rows="4"
-                    :label="$t('components.editor.planDescription')"
+                    :label="$t('components.learningPlan.editor.planDescription')"
                     dense
                     no-resize
                     auto-grow
@@ -87,7 +87,7 @@
                 <v-text-field
                   v-model="tag"
                   :rules="tagRules"
-                  :label="$t('components.editor.version')"
+                  :label="$t('components.learningPlan.editor.version')"
                   outlined
                 />
               </v-col>
@@ -102,7 +102,7 @@
                     :loading="saving"
                     type="submit"
                   >
-                    {{ $t('components.editor.submit') }}
+                    {{ $t('components.learningPlan.editor.submit') }}
                   </v-btn>
                 </v-row>
               </v-col>
@@ -116,9 +116,8 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-
-import { Tag } from 'models/tag.model';
-import { LearningPlan } from 'models/learningPlan.model';
+import { Tag } from '~/models/tag.model';
+import { LearningPlan } from '~/models/learningPlan.model';
 const { requiredRule, min5CharactersRule } = formRules;
 
 const i18n = useI18n();
@@ -246,7 +245,7 @@ const save = async (tag = '') => {
 
     await update('learningplans', trailId || planId, formData as any);
 
-    messageStore.message = i18n.t('components.editor.successMsg');
+    messageStore.message = i18n.t('components.learningPlan.editor.successMsg');
     messageStore.color = 'green';
     emit('updated');
   } catch (err) {

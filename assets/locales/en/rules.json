@@ -15,6 +15,18 @@
     "invalid": "Invalid CPF"
   },
 
+  "about": {
+    "required": "About is required",
+    "min": "At least 12 characters long",
+    "max": "At most 4000 characters long"
+  },
+
+  "phone": {
+    "required": "Phone is required",
+    "length": "Must be 11 characters long",
+    "invalid": "Invalid phone number"
+  },
+
   "yourRole": {
     "required": "User type is required"
   },

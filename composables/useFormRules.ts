@@ -60,6 +60,14 @@ export const useFormRules = (formData?: FormDataType) => {
       .required(i18n.t('rules.confirmPassword.required')),
   };
 
+  const usernameRules = {
+    username: yup
+      .string()
+      .required(i18n.t('rules.username.required'))
+      .min(6, i18n.t('rules.username.min'))
+      .max(64, i18n.t('rules.username.max')),
+  };
+
   const fullnameRules = {
     fullname: yup
       .string()
@@ -82,6 +90,24 @@ export const useFormRules = (formData?: FormDataType) => {
       ),
   };
 
+  const aboutRules = {
+    info: yup
+      .string()
+      .min(12, i18n.t('rules.about.min'))
+      .max(4000, i18n.t('rules.about.max'))
+      .required(i18n.t('rules.about.required')),
+  };
+
+  const phoneRules = {
+    phone: yup
+      .string()
+      .matches(
+        /^\((?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\) (?:9[0-9])[0-9]{3}\-[0-9]{4}$/,
+        i18n.t('rules.phone.invalid'),
+      )
+      .required(i18n.t('rules.phone.required')),
+  };
+
   const registerStep1 = yup.object({
     ...fullnameRules,
     ...emailRules,
@@ -99,23 +125,25 @@ export const useFormRules = (formData?: FormDataType) => {
       .nullable()
       .when('yourRole', {
         is: 'professor',
-        then: (scheme) =>
-          scheme.required(i18n.t('rules.institution.required')),
+        then: (scheme) => scheme.required(i18n.t('rules.institution.required')),
       }),
   });
+
   const registerStep3 = yup.object({
     ...passwordRules,
-    username: yup
-      .string()
-      .required(i18n.t('rules.username.required'))
-      .min(6, i18n.t('rules.username.min'))
-      .max(64, i18n.t('rules.username.max')),
+    ...usernameRules,
   });
-
   const loginSchema = {
     ...emailRules,
     password: passwordRules.password,
   };
+
+  const profileSchema = yup.object({
+    ...fullnameRules,
+    ...phoneRules,
+    ...aboutRules,
+    ...cpfRules,
+  });
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -123,6 +151,7 @@ export const useFormRules = (formData?: FormDataType) => {
     passwordRules,
     fullnameRules,
     cpfRules,
+    profileSchema,
     loginSchema,
   };
 };

@@ -2,8 +2,11 @@ const extensions = literalArray('.jpeg', '.jpg', '.png', '.webp');
 
 export const getFullnameInitials = (fullname = '') => {
   const names = fullname.split(' ');
-  const firstLetter = names[0][0].toUpperCase();
-  const secondLetter = names.length > 1 ? names[1][0].toUpperCase() : '';
+  const getInitial = (name) => (name ? name[0].toUpperCase() : '');
+
+  const firstLetter = getInitial(names[0]);
+  const secondLetter = getInitial(names[1]);
+
   return `${firstLetter}${secondLetter}`;
 };
 
