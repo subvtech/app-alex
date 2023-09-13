@@ -9,8 +9,8 @@
     item-text="text"
     item-value="id"
     item-title="text"
-    color="white"
-    class="my-3 text-secondary"
+    :color="color"
+    class="my-3"
     variant="outlined"
     required
     :label="$t('pages.register.institution')"
@@ -23,11 +23,11 @@ import { useI18n } from 'vue-i18n';
 import { useField } from 'vee-validate';
 
 type InstitutionsType = {
-  id: String;
-  value: String;
-  sigla: String;
-  text: String;
-  tipo: String;
+  name: string;
+  acronym: string;
+  sector: string;
+  id: number;
+  cover: any;
 };
 
 const props = defineProps({
@@ -36,20 +36,29 @@ const props = defineProps({
     required: true,
   },
   institutions: {
-    type: Object as PropType<InstitutionsType[]>,
+    type: Array as PropType<InstitutionsType[]>,
     required: true,
   },
   name: {
     type: String,
     required: false,
   },
+  color: {
+    type: String,
+    default: 'white',
+  },
 });
-const emit = defineEmits(['update:institutions', 'update:search']);
+const emit = defineEmits([
+  'update:institutions',
+  'update:value',
+  'update:search',
+]);
 
 const { value, errorMessage } = useField(
   () => props.name || 'institution',
   undefined,
 );
+
 const isTyping = ref(false);
 const fetching = ref(false);
 const { find } = useStrapi();
@@ -62,13 +71,13 @@ const fetchInstitutions = async (institution: string) => {
     const res = await find(
       `institutions?nome_contains=${institution}&tipo=matriz&_limit=10`,
     );
+
     const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
       return {
         id: r.id,
-        value: r.attributes.nome,
-        sigla: r.attributes.sigla,
-        text: r.attributes.nome,
-        tipo: r.attributes.tipo,
+        acronym: r.attributes.acronym,
+        text: r.attributes.name,
+        type: r.attributes.type,
       };
     });
     emit('update:institutions', resultArr);
@@ -92,6 +101,10 @@ watchEffect(async (onInvalidate) => {
       clearInterval(getData);
     });
   }
+});
+
+watchEffect(() => {
+  emit('update:value', value.value as number - 1);
 });
 </script>
 
