@@ -151,3 +151,21 @@ $flat-typography: () !default;
     (#{$type}: map.values($values))
   );
 }
+// $spacer: 4px !default;
+
+// $sizes: (
+//   'x-small',
+//   'small',
+//   'default',
+//   'large',
+//   'x-large'
+// ) !default;
+
+// $size-scale: $spacer * 2 !default;
+// $size-scales: (
+//   'x-small': -2,
+//   'small': -1,
+//   'default': 1,
+//   'large': 2,
+//   'x-large': 10
+// ) !default;

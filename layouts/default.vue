@@ -50,7 +50,7 @@
       </div>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app color="white">
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="text-gray-900"/>
       <div
         v-if="!drawer"
         class="primary pl-2 pt-1 rounded-pill"
