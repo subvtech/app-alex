@@ -1,7 +1,4 @@
 import { ethers } from 'ethers';
-import { useI18n } from 'vue-i18n';
-import { withTimeout } from '../helpers/utils';
-import { user } from '~/assets/queries';
 
 declare global {
   interface Window {
@@ -54,7 +51,7 @@ export const useMetamask = (loading) => {
           messageStore.color = 'red';
           messageStore.show = true;
         } else {
-          setWallet(signer.address);
+          setWallet({ address: signer.address });
           router.push({ path: '/register' });
         }
       }

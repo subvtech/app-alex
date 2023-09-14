@@ -64,7 +64,6 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { useI18n } from 'vue-i18n';
 import { User } from '~/models/user.model';
 import { Structure } from '~/models/structure.model';
 

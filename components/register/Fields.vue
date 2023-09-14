@@ -139,7 +139,6 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 const emit = defineEmits(['successMessage']);
 const {
   registerSchemas: { registerStep1, registerStep2, registerStep3 },
