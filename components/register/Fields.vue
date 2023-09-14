@@ -1,7 +1,5 @@
 <template>
-  <v-container
-    class=" content d-flex align-content-start justify-center "
-  >
+  <v-container class="content d-flex align-content-start justify-center">
     <v-card
       class="bg-transparent w-100 d-flex flex-column justify-start max-w-100"
       align="center"
@@ -10,17 +8,17 @@
       <v-card-title class="text-h3 text-white break-spaces">
         {{ $t('pages.register.title') }}
       </v-card-title>
-
-      <alex-inputs-stepper-form
-        :schemes="[registerStep1, registerStep2, registerStep3]"
-        :loading="registering"
+      <AlexInputsStepper
+        :steps-config="itemsStepper"
+        :submit-loading="registering"
         @onSuccess="submit"
-        #default="{ activeStep, values }"
         align="left"
-        
       >
-        <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
-          <v-card-subtitle class="text-white text-h6 mb-8 break-spaces" align="center">
+        <template #step1>
+          <v-card-subtitle
+            class="text-white text-h6 mb-8 break-spaces"
+            align="center"
+          >
             {{ $t('pages.register.subtitle1') }}
           </v-card-subtitle>
 
@@ -48,9 +46,12 @@
             theme="dark"
             v-maska:[cpfMask]
           />
-        </alex-inputs-stepper-step>
-        <alex-inputs-stepper-step :activeStep="activeStep" :step="2">
-          <v-card-subtitle class="text-white mb-8 break-spaces" align="center">
+        </template>
+        <template #step2="{ values }">
+          <v-card-subtitle
+            class="text-white text-h6 mb-8 break-spaces"
+            align="center"
+          >
             {{ $t('pages.register.type') }}
           </v-card-subtitle>
 
@@ -62,22 +63,26 @@
             :label="$t('pages.register.userType')"
             variant="outlined"
             :items="[
-              { title: $t('pages.register.typeProfessor'), value: 'professor' },
+              {
+                title: $t('pages.register.typeProfessor'),
+                value: 'professor',
+              },
               { title: $t('pages.register.typeStudent'), value: 'aluno' },
             ]"
           />
 
-    
           <alex-inputs-institutions
             v-if="values?.yourRole?.toLowerCase() == 'professor'"
             v-model:institutions="institutions"
             v-model:search="search"
             name="institution"
           />
-
-        </alex-inputs-stepper-step>
-        <alex-inputs-stepper-step :activeStep="activeStep" :step="3">
-          <v-card-subtitle class="text-white  mb-8 break-spaces" align="center">
+        </template>
+        <template #step3="{ values }">
+          <v-card-subtitle
+            class="text-white text-h6 mb-8 break-spaces"
+            align="center"
+          >
             {{ $t('pages.register.subtitle2') }}
           </v-card-subtitle>
 
@@ -112,8 +117,8 @@
             theme="dark"
             @click:append-inner="passwordVisible = !passwordVisible"
           />
-        </alex-inputs-stepper-step>
-      </alex-inputs-stepper-form>
+        </template>
+      </AlexInputsStepper>
 
       <div class="d-flex align-center text-white my-12">
         <v-divider
@@ -152,7 +157,12 @@ const cpfMask = reactive({
   mask: '###.###.###-##',
   eager: true,
 });
-const usernameUrl = computed(() => window.location.host + '/profile/')
+const itemsStepper = [
+  { scheme: registerStep1 },
+  { scheme: registerStep2 },
+  { scheme: registerStep3 },
+];
+const usernameUrl = computed(() => window.location.host + '/profile/');
 const registering = ref(false);
 const institutions = ref([]);
 const search = ref('');
@@ -190,7 +200,10 @@ const submit = async (values: {
     fullname,
     address: wallet?.address ?? wallet?.address,
     isProfessor: yourRole.toLowerCase() === 'professor',
-    institution: (institution && yourRole.toLowerCase() === 'professor') ? institution : undefined
+    institution:
+      institution && yourRole.toLowerCase() === 'professor'
+        ? institution
+        : undefined,
   };
 
   try {
@@ -208,8 +221,6 @@ const submit = async (values: {
     registering.value = false;
   }
 };
-
-
 </script>
 
 <style scoped lang="scss">
