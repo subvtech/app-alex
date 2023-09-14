@@ -2,10 +2,7 @@
   <profile-card class="mt-6" title="Segurança" :full-width="true">
     <template v-slot:content>
       <div class="fields d-flex flex-column flex-wrap">
-        <v-form
-          @submit.prevent="updateEmail"
-          class="field d-flex w-100 justify-space-between"
-        >
+        <v-form class="field d-flex w-100 justify-space-between">
           <div class="d-flex flex-column">
             <span>{{ $t('components.profile.security.email') }}</span>
             <p :contenteditable="editEmail">{{ email }}</p>
@@ -14,8 +11,9 @@
             class="btn ml-2"
             variant="outlined"
             size="large"
+            type="submit"
             color="#5D6872"
-            @click="editEmail = !editEmail"
+            @click="updateEmail"
             :text="
               editEmail
                 ? $t('components.profile.security.saveEmail')
@@ -67,16 +65,20 @@ const props = defineProps({
 
 const { email } = toRefs(props);
 
-const emailForm = useForm({
+const { handleSubmit } = useForm({
   validationSchema: emailRules,
   keepValuesOnUnmount: true,
 });
 
-const updateEmail = emailForm.handleSubmit(async () => {
+const updateEmail = handleSubmit(async () => {
+  editEmail.value = !editEmail.value;
+  console.log('click');
+  if (!editEmail.value) return;
   const url = useStrapiUrl() + '/users/' + props.id;
   const options = {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
+    Authentication: `Bearer ${useStrapiToken()}`,
     body: JSON.stringify({ email }),
   };
 

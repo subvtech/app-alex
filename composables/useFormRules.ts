@@ -50,10 +50,15 @@ export const useFormRules = (formData?: FormDataType) => {
     password: yup
       .string()
       .required(i18n.t('rules.password.required'))
-      .matches(/^\w*[A-Z]\w*[A-Z]\w*$/gm, i18n.t('rules.password.upperCase'))
-      .matches(/^(?=.*\d).{1,}$/gm, i18n.t('rules.password.number'))
-      .matches(/^(?=.*[a-z]).{1,}$/gm, i18n.t('rules.password.upperCase'))
+      .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
+      .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
+      .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
+      .matches(
+        /(?=.*[^a-zA-Z0-9])/,
+        'Must contain at least 1 special character',
+      )
       .min(8, i18n.t('rules.password.min')),
+
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))

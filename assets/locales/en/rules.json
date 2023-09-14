@@ -40,9 +40,10 @@
   },
   "password": {
     "required": "Password is required",
-    "upperCase": "It must have at least 2 upper case letters",
+    "upperCase": "It must have at least 1 upper case letter",
     "lowerCase": "It must have at least 1 lower case letter",
     "number": "It must have at least 1 number",
+    "character": "It must have at least 1 special character",
     "min": "At least 8 characters long"
   },
   "confirmPassword": {

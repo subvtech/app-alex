@@ -76,7 +76,7 @@ const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
 let selectedOption = ref(0);
 const search = ref('');
-
+const token = useStrapiToken();
 const emit = defineEmits(['update:user']);
 
 const props = defineProps({
@@ -107,23 +107,23 @@ const updateShowDeleteButton = (index: number) => {
 
 const showSearch = async () => {
   if (isAddingInstitution.value && searchInstitutions.value) {
-    const temp = { ...searchInstitutions.value };
-
     if (searchInstitutions.value.length > 0) {
       const list = institutions.value.map((item) => item.id);
 
       list.push(
         { ...{ ...searchInstitutions.value }[selectedOption.value] }.id,
       );
-      const data = { institutions: list };
+
       const url = useStrapiUrl() + '/users/' + props.id;
       const options = {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data }),
+        Authentication: `Bearer ${token}`,
+        body: JSON.stringify({ institutions: list }),
       };
 
       await fetch(url, options);
+
       emit('update:user', {});
     }
 
@@ -137,12 +137,13 @@ const removeInstitution = async (index) => {
   const list = institutions.value
     .map((item) => item.id)
     .filter((id) => id !== index);
-  const data = { institutions: list };
+
   const url = useStrapiUrl() + '/users/' + props.id;
   const options = {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data }),
+    Authentication: `Bearer ${token}`,
+    body: JSON.stringify({ institutions: list }),
   };
 
   await fetch(url, options);

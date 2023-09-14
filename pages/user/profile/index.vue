@@ -175,6 +175,7 @@ const updateUser = async (show = true) => {
 };
 await updateUser(false);
 
+
 const selectedOption = ref(i18n.t('pages.profile.general'));
 const links = ref([
   i18n.t('pages.profile.general'),
@@ -292,7 +293,7 @@ const links = ref([
         display: flex;
         flex-direction: column;
         margin-block: 16px;
-        margin-left: 160px;
+        margin-left: 170px;
         transition: all ease-in-out 1s;
 
         .fullname {
@@ -471,6 +472,69 @@ const links = ref([
 
               margin-top: 0px;
             }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 410px) {
+    .user-block {
+      .card {
+        .info {
+          width: 100%;
+          margin-left: 0px;
+
+          justify-content: space-between;
+          flex-direction: row;
+
+          :first-child {
+            flex-direction: column;
+            gap: 0px;
+            margin-top: 10px;
+          }
+
+          .fullname {
+            color: #001529;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: bold;
+            line-height: 28px;
+          }
+
+          .social {
+            color: #abb2b9;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 28px;
+          }
+        }
+        .photo {
+          bottom: 110px;
+          .avatar {
+            img {
+              max-width: 90%;
+              max-height: 90%;
+
+              margin-top: 0px;
+            }
+          }
+          .edit {
+            display: flex;
+            width: 24px;
+            height: 24px;
+            padding: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            right: 8px;
+            bottom: 15px;
+            position: absolute;
+            border-radius: 99px;
+            border: 1px solid #abb2b9;
+            background: #f1f5f9;
+            cursor: pointer;
           }
         }
       }

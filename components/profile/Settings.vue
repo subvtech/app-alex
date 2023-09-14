@@ -67,8 +67,7 @@ import { useForm } from 'vee-validate';
 const { update } = useStrapi();
 const { profileSchema } = useFormRules();
 const messageStore = useMessageStore();
-const emit = defineEmits(['update:user'])
-
+const emit = defineEmits(['update:user']);
 const loading = ref(false);
 
 const props = defineProps({
@@ -127,12 +126,13 @@ const updateValues = handleSubmit(async () => {
     const options = {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      Authentication: `Bearer ${useStrapiToken()}`,
       body: JSON.stringify({ ...data }),
     };
 
     await fetch(url, options);
 
-    emit('update:user', {})
+    emit('update:user', {});
   } catch (error) {
     console.log(error);
     messageStore.message = error as string;
