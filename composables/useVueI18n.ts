@@ -1,6 +1,6 @@
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
-import { ElementType, literalArray } from '@/helpers/utils';
+import { ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
