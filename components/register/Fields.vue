@@ -13,6 +13,7 @@
         :submit-loading="registering"
         @onSuccess="submit"
         align="left"
+        no-header
       >
         <template #step1>
           <v-card-subtitle
@@ -158,9 +159,9 @@ const cpfMask = reactive({
   eager: true,
 });
 const itemsStepper = [
-  { scheme: registerStep1 },
-  { scheme: registerStep2 },
-  { scheme: registerStep3 },
+  { title: 'step1' , subtitle: 'teste', scheme: registerStep1 },
+  { title: 'step2',subtitle: 'teste' , scheme: registerStep2 },
+  { title: 'step3', subtitle: 'teste', scheme: registerStep3 },
 ];
 const usernameUrl = computed(() => window.location.host + '/profile/');
 const registering = ref(false);

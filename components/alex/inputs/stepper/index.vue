@@ -1,5 +1,19 @@
 <template>
   <v-form @submit="onSubmit">
+    <div v-if="!noHeader" name="header" class="d-flex gap-4 py-3 px-1">
+      <AlexInputsStepperIndicator
+        v-for="config, index in stepsConfig"
+        :key="index"
+        :stepNumber="index + 1"
+        :active="index == activeStep - 1"
+        :checked="activeStep - 1 > index"
+        :title="config.title"
+        :subtitle="config.subtitle"
+        :icon="config.icon"
+        :disabled="false"
+        @onSelect="() => onSelectStep(index + 1)"
+      />
+    </div>
     <template v-for="(_, index) in stepsCounter">
       <slot
         v-if="index == activeStep - 1"
@@ -9,7 +23,7 @@
         :values="values"
       />
     </template>
-    <div v-if="!showControls" class="controls">
+    <div v-if="!showControls" class="step-controls">
       <v-btn
         v-if="activeStep > 1"
         :disabled="submitLoading"
@@ -30,20 +44,17 @@
         rounded="lg"
         color="accent"
         size="large"
-        :text="(activeStep == numberSteps) ? 'Criar' : 'Avançar' "
+        :text="activeStep == numberSteps ? 'Criar' : 'Avançar'"
       />
-      
     </div>
     <slot
       name="controls"
       :onPrevStep="onPrevStep"
       :isValid="isValid"
-      :isLastStep="(activeStep == numberSteps)"
+      :isLastStep="activeStep == numberSteps"
       :isFirstStep="activeStep == 1"
       :submitLoading="submitLoading"
     />
-    <!-- Controls Slots -->
-    <!-- isValid, onPrevStep, isFirstStep, isLastStep, loading -->
   </v-form>
 </template>
 
@@ -51,13 +62,21 @@
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 
+interface StepsConfig {
+  title: string;
+  subtitle?: string;
+  icon?: string;
+  scheme: yup.Schema;
+}
+
 // Props/events
 const props = withDefaults(
   defineProps<{
-    stepsConfig: { title?: string; scheme?: yup.Schema }[];
-    submitLoading: boolean;
+    stepsConfig: StepsConfig[];
+    submitLoading?: boolean;
+    noHeader?: boolean;
   }>(),
-  { submitLoading: false },
+  { submitLoading: false, noHeader: false },
 );
 const emit = defineEmits(['onSuccess']);
 
@@ -109,14 +128,17 @@ const onPrevStep = () => {
   }
 };
 
-watchEffect(() => {
-  console.log(numberSteps.value)
-  console.log(activeStep.value)
-})
+const onSelectStep = (step: number) => {
+  if (step > activeStep.value && !isValid.value) {
+    return
+  }
+
+   activeStep.value = step
+}
 </script>
 
 <style scoped>
-.controls {
+.step-controls {
   display: flex;
   width: 100%;
 }
