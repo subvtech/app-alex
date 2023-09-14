@@ -1,5 +1,5 @@
 <template>
-  <v-hover #default="{ isHovering, props }"  >
+  <v-hover #default="{ isHovering, props }">
     <div
       v-bind="props"
       class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer"
@@ -24,7 +24,10 @@
         </div>
       </div>
       <div class="d-flex flex-column align-start justify-center text-gray-300">
-        <div class="text-body-2" :class="useClasses(active, disabled, isHovering).title">
+        <div
+          class="text-body-2"
+          :class="useClasses(active, disabled, isHovering).title"
+        >
           {{ title }}
         </div>
         <div
@@ -40,15 +43,6 @@
 </template>
 
 <script setup lang="ts">
-// interface Props {
-//   title: string;
-//   subtitle?: string;
-//   icon?: string;
-//   stepNumber: string;
-//   checked?: boolean;
-//   active?: boolean;
-// }
-// const props = withDefaults(defineProps<Props>(), {checked: false, active: false})
 const emit = defineEmits(['onSelect']);
 const props = defineProps({
   title: {
@@ -62,10 +56,6 @@ const props = defineProps({
   active: { type: Boolean, default: false },
   disabled: { type: Boolean, default: true },
 });
-
-const activeClasses = computed(() =>
-  props.active ? 'bg-secondary-0 text-white' : 'bg-gray-blue text-gray-300',
-);
 
 const states = {
   hovering: {
@@ -97,7 +87,12 @@ const states = {
     container: '',
   },
 };
-const useClasses = (active: boolean, disabled: boolean, hovering?: boolean, click?: boolean) => {
+const useClasses = (
+  active: boolean,
+  disabled: boolean,
+  hovering?: boolean,
+  click?: boolean,
+) => {
   if (click) return states['click'];
   else if (hovering && !active && !disabled) return states['hovering'];
   else if (active) return states['active'];
@@ -117,6 +112,7 @@ const useClasses = (active: boolean, disabled: boolean, hovering?: boolean, clic
 }
 .w-fit {
   width: fit-content;
+  height: fit-content;
 }
 .cursor-pointer {
   cursor: pointer;
