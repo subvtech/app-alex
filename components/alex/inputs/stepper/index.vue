@@ -66,7 +66,7 @@ interface StepsConfig {
   title: string;
   subtitle?: string;
   icon?: string;
-  scheme: yup.Schema;
+  scheme?: yup.Schema;
 }
 
 // Props/events
