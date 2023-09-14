@@ -3,7 +3,7 @@
     <template v-slot:content>
       <div class="boxes d-flex pb-6">
         <div
-          class="box d-flex flex-column pa-4"
+          class="box d-flex pa-4"
           v-for="box in [
             {
               icon: 'mdi-bookmark-box-multiple-outline',
@@ -23,7 +23,7 @@
           ]"
         >
           <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
-          <div class="d-flex flex-column">
+          <div class="d-flex">
             <h6>{{ box.number }}</h6>
             <span>{{ box.label }}</span>
           </div>
@@ -119,6 +119,7 @@ const mask = new Mask({ mask: '(##) #####-####' });
   border-bottom: 1px solid #eaeef1;
 
   .box {
+    flex-direction: column;
     min-width: 90px;
     min-height: 90px;
     width: 33%;
@@ -128,16 +129,20 @@ const mask = new Mask({ mask: '(##) #####-####' });
     border: 1px solid #e1e4e7;
     background-color: #f1f5f9;
 
-    div h6 {
-      font-size: 24px;
-      color: #001529;
-    }
+    :last-child {
+      flex-direction: column;
 
-    div span {
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 22px;
-      color: #abb289;
+      h6 {
+        font-size: 24px;
+        color: #001529;
+      }
+
+      span {
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: #abb289;
+      }
     }
   }
 }
@@ -168,6 +173,33 @@ const mask = new Mask({ mask: '(##) #####-####' });
         font-size: 16px;
         font-weight: 400;
         line-height: 22px;
+      }
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  .boxes {
+    flex-direction: column;
+    .box {
+      flex-direction: row;
+      width: 100%;
+      
+      :last-child {
+        flex-direction: column-reverse;
+
+        p {
+          color: #abb2b9;
+          font-size: 14px;
+          font-weight: 400;
+        }
+
+        span {
+          color: #5d6872;
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 22px;
+        }
       }
     }
   }
