@@ -218,4 +218,28 @@ function logoutUser() {
 </script>
 
 <style lang="scss">
+html,
+body {
+  .v-application {
+    font-family: Sen !important;
+
+    .v-navigation-drawer__content {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .v-toolbar__content {
+        .user-block {
+          .fullname {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
 </style>
