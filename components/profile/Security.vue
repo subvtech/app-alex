@@ -1,9 +1,9 @@
 <template>
   <profile-card class="mt-6" title="Segurança" :full-width="true">
     <template v-slot:content>
-      <div class="fields d-flex flex-column flex-wrap">
-        <v-form class="field d-flex w-100 justify-space-between">
-          <div class="d-flex flex-column">
+      <div class="fields d-flex flex-wrap">
+        <v-form class="field d-flex w-100 align-center justify-space-between">
+          <div class="d-flex">
             <span>{{ $t('components.profile.security.email') }}</span>
             <p :contenteditable="editEmail">{{ email }}</p>
           </div>
@@ -20,10 +20,19 @@
                 : $t('components.profile.security.editEmail')
             "
           />
+
+          <div class="options">
+            <v-icon
+              @click="editEmail = !editEmail"
+              color="#6E7A87"
+              style="cursor: pointer"
+              >mdi-dots-vertical</v-icon
+            >
+          </div>
         </v-form>
 
-        <div class="field d-flex w-100 justify-space-between">
-          <div class="d-flex flex-column">
+        <div class="field d-flex w-100 align-center justify-space-between">
+          <div class="d-flex">
             <span>{{ $t('components.profile.security.password') }}</span>
             <input type="password" disabled value="dasdasdasda" />
           </div>
@@ -36,6 +45,14 @@
             @click="editPassword = !editPassword"
             :text="$t('components.profile.security.editPassword')"
           />
+          <div class="options">
+            <v-icon
+              @click="editPassword = !editPassword"
+              color="#6E7A87"
+              style="cursor: pointer"
+              >mdi-dots-vertical</v-icon
+            >
+          </div>
         </div>
       </div>
     </template>
@@ -92,8 +109,11 @@ const updateEmail = handleSubmit(async () => {
 .fields {
   gap: 24px;
   .field {
+    flex-direction: row;
     transition: all ease-in-out 1s;
-    .d-flex {
+
+    div {
+      flex-direction: column;
       p {
         outline: none;
       }
@@ -102,6 +122,9 @@ const updateEmail = handleSubmit(async () => {
       background-color: #eaeef1;
       border: none;
       text-transform: none !important;
+    }
+    .options {
+      display: none;
     }
     span {
       color: #5d6872;
@@ -122,6 +145,26 @@ const updateEmail = handleSubmit(async () => {
       font-size: 16px;
       font-weight: 400;
       line-height: 22px;
+    }
+  }
+
+  @media (max-width: 550px) {
+    .field {
+      //flex-direction: column;
+      div {
+        gap: 12px;
+        //flex-direction: row;
+        //justify-content: center;
+      }
+
+      .btn {
+        display: none;
+      }
+
+      .options {
+        display: block;
+        padding-inline: 0px;
+      }
     }
   }
 }

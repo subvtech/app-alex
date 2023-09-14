@@ -6,7 +6,7 @@
   >
     <template v-slot:content>
       <div class="item d-flex justify-space-between">
-        <div class="d-flex relative align-center">
+        <div class="label d-flex relative align-center">
           <div v-if="wallet" class="tooltip-box">
             <span class="tooltiptext">{{ wallet.address }}</span>
           </div>
@@ -25,6 +25,26 @@
               : $t('components.profile.wallets.link')
           "
         />
+
+        <v-btn
+          class="btn small ml-2"
+          :class="isWalletLinked ? 'unlink' : ''"
+          variant="outlined"
+          size="large"
+          color="#5D6872"
+          @click="handleClick"
+        >
+          <div v-if="wallet" class="tooltip-box">
+            <span class="tooltiptext">{{ wallet.address }}</span>
+          </div>
+          <img src="../../static/images/metamask.png" alt="" /><span>
+            {{
+              isWalletLinked
+                ? $t('components.profile.wallets.unlink')
+                : $t('components.profile.wallets.link')
+            }}
+          </span></v-btn
+        >
       </div>
     </template>
   </profile-card>
@@ -87,8 +107,9 @@ const handleClick = async () => {
 .item {
   border-radius: 8px;
 
-  .d-flex {
+  .label {
     position: relative;
+    gap: 16px;
     .tooltip-box {
       position: absolute;
       top: -20px;
@@ -115,10 +136,6 @@ const handleClick = async () => {
         visibility: visible;
       }
     }
-  }
-
-  div {
-    gap: 16px;
 
     img {
       max-width: 32px;
@@ -136,6 +153,69 @@ const handleClick = async () => {
     background-color: #eaeef1;
     border: none;
     text-transform: none !important;
+  }
+
+  .small {
+    display: none;
+  }
+}
+@media (max-width: 420px) {
+  .item {
+    flex-direction: column;
+    align-items: center;
+    .label {
+      display: none;
+      img {
+        display: none;
+      }
+      span {
+        display: none;
+      }
+    }
+    .btn {
+      display: none;
+    }
+
+    .small {
+      display: block;
+      img {
+        max-width: 32px;
+        max-height: 32px;
+      }
+      .tooltip-box {
+        position: absolute;
+        top: -20px;
+        left: 0px;
+
+        visibility: hidden;
+
+        background-color: #eaebec;
+        border: #828486 solid 1px;
+
+        border-radius: 2px;
+        z-index: 999;
+
+        transition: visibility 0s;
+        .tooltiptext {
+          font-size: 10px;
+          text-align: center;
+        }
+      }
+
+      &:hover {
+        background-color: rgb(162, 238, 187);
+        .tooltip-box {
+          transition-delay: 1s;
+          visibility: visible;
+        }
+      }
+    }
+
+    .unlink {
+      &:hover {
+        background-color: rgb(253, 145, 145);
+      }
+    }
   }
 }
 </style>

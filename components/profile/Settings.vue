@@ -4,7 +4,7 @@
     :full-width="true"
   >
     <template v-slot:content>
-      <div>
+      <div class="settings">
         <v-form
           ref="form"
           color="black"
@@ -66,6 +66,7 @@ import { useForm } from 'vee-validate';
 
 const { update } = useStrapi();
 const { profileSchema } = useFormRules();
+const token = useStrapiToken();
 const messageStore = useMessageStore();
 const emit = defineEmits(['update:user']);
 const loading = ref(false);
@@ -125,12 +126,14 @@ const updateValues = handleSubmit(async () => {
     const url = useStrapiUrl() + '/users/' + props.id;
     const options = {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      Authentication: `Bearer ${useStrapiToken()}`,
+      headers: {
+        'Content-Type': 'application/json',
+        Authentication: `Bearer ${token.value}`,
+      },
       body: JSON.stringify({ ...data }),
     };
-
-    await fetch(url, options);
+    await update('users', props.id, { ...data });
+    //await fetch(url, options);
 
     emit('update:user', {});
   } catch (error) {
@@ -145,18 +148,20 @@ const updateValues = handleSubmit(async () => {
 </script>
 
 <style scoped lang="scss">
-form {
-  gap: 24px;
-  .btn {
-    text-transform: none !important;
+.settings {
+  form {
+    gap: 24px;
+    .btn {
+      text-transform: none !important;
+    }
   }
-}
-.block {
-  gap: 24px;
-}
-@media (max-width: 600px) {
   .block {
-    flex-direction: column;
+    gap: 24px;
+  }
+  @media (max-width: 430px) {
+    .block {
+      flex-direction: column;
+    }
   }
 }
 </style>

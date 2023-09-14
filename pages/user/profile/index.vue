@@ -120,7 +120,7 @@
         :cpf="user.cpf"
         @update:user="updateUser"
       />
-      <div class="d-flex flex-column">
+      <div class="d-flex flex-column w-100">
         <profile-institutional
           :institutions="user.institutions"
           :id="user.id"
@@ -478,7 +478,7 @@ const links = ref([
     }
   }
 
-  @media (max-width: 410px) {
+  @media (max-width: 349px) {
     .user-block {
       .card {
         .info {

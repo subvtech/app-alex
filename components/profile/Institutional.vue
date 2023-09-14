@@ -60,8 +60,6 @@
 </template>
 
 <script setup lang="ts">
-const { find, update } = useStrapi();
-
 type Institution = {
   name: string;
   acronym: string;
@@ -117,10 +115,14 @@ const showSearch = async () => {
       const url = useStrapiUrl() + '/users/' + props.id;
       const options = {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        Authentication: `Bearer ${token}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authentication: `Bearer ${token.value}`,
+        },
+
         body: JSON.stringify({ institutions: list }),
       };
+      console.log({ token: token.value });
 
       await fetch(url, options);
 
@@ -141,8 +143,10 @@ const removeInstitution = async (index) => {
   const url = useStrapiUrl() + '/users/' + props.id;
   const options = {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    Authentication: `Bearer ${token}`,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authentication': `Bearer ${token.value}`,
+    },
     body: JSON.stringify({ institutions: list }),
   };
 
