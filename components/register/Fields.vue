@@ -3,11 +3,11 @@
     class=" content d-flex align-content-start justify-center "
   >
     <v-card
-      class="bg-transparent w-100 d-flex flex-column justify-start"
+      class="bg-transparent w-100 d-flex flex-column justify-start max-w-100"
       align="center"
       elevation="0"
     >
-      <v-card-title class="text-sm-h6 text-white break-spaces">
+      <v-card-title class="text-h3 text-white break-spaces">
         {{ $t('pages.register.title') }}
       </v-card-title>
 
@@ -17,9 +17,10 @@
         @onSuccess="submit"
         #default="{ activeStep, values }"
         align="left"
+        
       >
         <alex-inputs-stepper-step :activeStep="activeStep" :step="1">
-          <v-card-subtitle class="text-white mb-8 break-spaces" align="center">
+          <v-card-subtitle class="text-white text-h6 mb-8 break-spaces" align="center">
             {{ $t('pages.register.subtitle1') }}
           </v-card-subtitle>
 
@@ -236,6 +237,10 @@ const submit = async (values: {
     color: #00d3ec !important;
     font-size: 16px;
   }
+}
+
+.max-w-100 {
+  max-width: 400px;
 }
 
 @media screen and (max-width: 500px) {
