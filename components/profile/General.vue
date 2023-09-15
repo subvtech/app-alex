@@ -49,39 +49,20 @@
         </div>
       </div>
       <div class="d-flex contacts pt-6 pb-4">
-        <div
-          class="d-flex align-center contact"
-          v-for="contact in [
-            {
-              title: 'WEBSITE',
-              text: 'lattes.cnpq.br',
-              icon: 'assets/svg/website.svg',
-            },
-            {
-              title: $t('components.profile.general.linkedin'),
-              text: '/jojo',
-              icon: 'assets/svg/linkedin.svg',
-            },
-            {
-              title: $t('components.profile.general.instagram'),
-              text: '@jojo',
-              icon: 'assets/svg/instagram.svg',
-            },
-            {
-              title: $t('components.profile.general.youtube'),
-              text: '@jojotube',
-              icon: 'assets/svg/youtube.svg',
-            },
-          ]"
-        >
+        <div class="d-flex align-center contact" v-for="contact in socials">
           <img
             class="icon"
-            :alt="contact.title"
-            :src="`/_nuxt/${contact.icon}`"
+            :alt="contact.name"
+            :src="strapiBaseUrl + contact.icon.url"
           />
+
           <div class="d-flex flex-column justify-center align-start field">
-            <p>{{ contact.title }}</p>
-            <span>{{ contact.text }}</span>
+            <p>{{ contact.name.toUpperCase() }}</p>
+            <a :href="contact.url" target="_blank">{{
+              contact.url.split('/').length > 2
+                ? contact.url.split('/')[3]
+                : contact.name
+            }}</a>
           </div>
         </div>
       </div>
@@ -91,6 +72,14 @@
 
 <script setup lang="ts">
 import { Mask } from 'maska';
+
+const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+type Social = {
+  name: string;
+  url: string;
+  shortened: string;
+  icon: any;
+};
 const props = defineProps({
   email: {
     type: String,
@@ -103,6 +92,11 @@ const props = defineProps({
   learningPlans: {
     type: Array,
     default: () => [],
+  },
+
+  socials: {
+    type: Array as PropType<Social[]>,
+    required: true,
   },
 });
 
@@ -168,7 +162,8 @@ const mask = new Mask({ mask: '(##) #####-####' });
         font-weight: 400;
       }
 
-      span {
+      a {
+        cursor: pointer;
         color: #5d6872;
         font-size: 16px;
         font-weight: 400;
@@ -184,7 +179,7 @@ const mask = new Mask({ mask: '(##) #####-####' });
     .box {
       flex-direction: row;
       width: 100%;
-      
+
       :last-child {
         flex-direction: column-reverse;
 
