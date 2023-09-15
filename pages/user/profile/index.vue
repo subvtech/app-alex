@@ -39,13 +39,13 @@
               alt="profile picture"
             />
           </div>
-          <v-icon
+
+          <v-file-input
             class="edit"
-            color="black"
-            small
-            :title="$t('pages.profile.edit')"
-            >mdi-pencil-outline</v-icon
-          >
+            label="File input"
+            hide-input
+            prependIcon="mdi-pencil-outline"
+          ></v-file-input>
         </div>
 
         <div class="info">
@@ -79,7 +79,11 @@
       v-if="links[0] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-general :telephone="user.phone" :email="user.email" />
+      <profile-general
+        :socials="user.socials"
+        :telephone="user.phone"
+        :email="user.email"
+      />
       <div class="d-flex flex-column w-100">
         <profile-about :info="user.info" />
         <profile-institutional
@@ -120,7 +124,13 @@
         :cpf="user.cpf"
         @update:user="updateUser"
       />
-      <div class="d-flex flex-column">
+      <profile-socials
+        :id="user.id"
+        :socials="user.socials"
+        @update:user="updateUser"
+      />
+
+      <div class="d-flex flex-column w-100">
         <profile-institutional
           :institutions="user.institutions"
           :id="user.id"
@@ -164,17 +174,16 @@ const updateUser = async (show = true) => {
       'cover',
       'avatar',
       'learningPlans',
+      'socials.icon',
       'trails',
       'user_wallet',
     ],
   });
-
   messageStore.message = 'done';
   messageStore.color = 'green';
   messageStore.show = show;
 };
 await updateUser(false);
-
 
 const selectedOption = ref(i18n.t('pages.profile.general'));
 const links = ref([
@@ -271,21 +280,24 @@ const links = ref([
         }
 
         .edit {
-          display: flex;
+        
           width: 32px;
           height: 32px;
-          padding: 10px;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          gap: 10px;
+         
           right: 0px;
           bottom: 32px;
+          margin-top: 16px;
           position: absolute;
           border-radius: 99px;
           border: 1px solid #abb2b9;
           background: #f1f5f9;
           cursor: pointer;
+          :first-child {
+            margin-top: -9px;
+            margin-right: -80px;
+            margin-left: 1px;
+            text-decoration: none;
+          }
         }
       }
 
@@ -478,7 +490,7 @@ const links = ref([
     }
   }
 
-  @media (max-width: 410px) {
+  @media (max-width: 349px) {
     .user-block {
       .card {
         .info {
