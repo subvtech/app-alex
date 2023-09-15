@@ -1,6 +1,5 @@
 import * as yup from 'yup';
 
-
 type FormDataType = {
   fullname: string;
   username: string;
@@ -73,6 +72,41 @@ export const useFormRules = (formData?: FormDataType) => {
       .max(64, i18n.t('rules.username.max')),
   };
 
+  const socialsRules = {
+    name: yup
+      .array()
+      .of(
+        yup
+          .string()
+          .required(i18n.t('rules.name.required'))
+          .min(3, i18n.t('rules.name.min'))
+          .max(20, i18n.t('rules.name.max'))
+          .trim(),
+      ),
+    url: yup
+      .array()
+      .of(
+        yup
+          .string()
+          .required(i18n.t('rules.url.required'))
+          .min(4, i18n.t('rules.url.min'))
+          .max(64, i18n.t('rules.url.max'))
+          .trim(),
+      ),
+
+    nameLoose: yup
+      .string()
+      .min(3, i18n.t('rules.name.min'))
+      .max(20, i18n.t('rules.name.max'))
+      .trim(),
+
+    urlLoose: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .trim(),
+  };
+
   const fullnameRules = {
     fullname: yup
       .string()
@@ -100,7 +134,8 @@ export const useFormRules = (formData?: FormDataType) => {
       .string()
       .min(12, i18n.t('rules.about.min'))
       .max(4000, i18n.t('rules.about.max'))
-      .required(i18n.t('rules.about.required')),
+      .required(i18n.t('rules.about.required'))
+      .trim(),
   };
 
   const phoneRules = {
@@ -149,6 +184,10 @@ export const useFormRules = (formData?: FormDataType) => {
     ...aboutRules,
     ...cpfRules,
   });
+
+  const socialsSchema = yup.object({
+    ...socialsRules,
+  });
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -157,6 +196,7 @@ export const useFormRules = (formData?: FormDataType) => {
     fullnameRules,
     cpfRules,
     profileSchema,
+    socialsSchema,
     loginSchema,
   };
 };

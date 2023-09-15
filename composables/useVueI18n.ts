@@ -82,6 +82,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile/projects',
     'profile/security',
     'profile/settings',
+    'profile/socials',
     'profile/wallets',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [

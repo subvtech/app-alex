@@ -79,7 +79,11 @@
       v-if="links[0] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     >
-      <profile-general :telephone="user.phone" :email="user.email" />
+      <profile-general
+        :socials="user.socials"
+        :telephone="user.phone"
+        :email="user.email"
+      />
       <div class="d-flex flex-column w-100">
         <profile-about :info="user.info" />
         <profile-institutional
@@ -120,6 +124,12 @@
         :cpf="user.cpf"
         @update:user="updateUser"
       />
+      <profile-socials
+        :id="user.id"
+        :socials="user.socials"
+        @update:user="updateUser"
+      />
+
       <div class="d-flex flex-column w-100">
         <profile-institutional
           :institutions="user.institutions"
@@ -164,17 +174,16 @@ const updateUser = async (show = true) => {
       'cover',
       'avatar',
       'learningPlans',
+      'socials.icon',
       'trails',
       'user_wallet',
     ],
   });
-
   messageStore.message = 'done';
   messageStore.color = 'green';
   messageStore.show = show;
 };
 await updateUser(false);
-
 
 const selectedOption = ref(i18n.t('pages.profile.general'));
 const links = ref([

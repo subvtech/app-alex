@@ -49,5 +49,16 @@
   "confirmPassword": {
     "required": "Confirm Password is required",
     "matchError": "The passwords do no match"
+  },
+
+  "name": {
+    "required": "Nome is required",
+    "min": "At least 3 characters long",
+    "max": "At most 20 characters long"
+  },
+  "url": {
+    "required": "Url is required",
+    "min": "At least 3 characters long",
+    "max": "At most 64 characters long"
   }
 }

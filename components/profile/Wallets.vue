@@ -6,7 +6,7 @@
   >
     <template v-slot:content>
       <div class="item d-flex justify-space-between">
-        <div class="label d-flex relative align-center">
+        <div class="label d-flex align-center">
           <div v-if="wallet" class="tooltip-box">
             <span class="tooltiptext">{{ wallet.address }}</span>
           </div>
@@ -106,27 +106,30 @@ const handleClick = async () => {
 <style scoped lang="scss">
 .item {
   border-radius: 8px;
-
   .label {
-    position: relative;
     gap: 16px;
+    position: relative;
     .tooltip-box {
       position: absolute;
       top: -20px;
-      left: 0px;
 
       visibility: hidden;
 
       background-color: #eaebec;
       border: #828486 solid 1px;
-
+      color: rgb(93, 104, 114);
+      caret-color: rgb(93, 104, 114);
       border-radius: 2px;
       z-index: 999;
+      text-transform: none;
 
       transition: visibility 0s;
       .tooltiptext {
         font-size: 10px;
+        font-weight: 500;
         text-align: center;
+        color: rgb(93, 104, 114);
+        caret-color: rgb(93, 104, 114);
       }
     }
 
@@ -163,6 +166,7 @@ const handleClick = async () => {
   .item {
     flex-direction: column;
     align-items: center;
+
     .label {
       display: none;
       img {
@@ -185,8 +189,7 @@ const handleClick = async () => {
       .tooltip-box {
         position: absolute;
         top: -20px;
-        left: 0px;
-
+        margin-inline: auto;
         visibility: hidden;
 
         background-color: #eaebec;

@@ -1,5 +1,8 @@
 <template>
-  <profile-card title="Institucional" :full-width="true">
+  <profile-card
+    :title="$t('components.profile.institutional.title')"
+    :full-width="true"
+  >
     <template v-slot:content>
       <v-btn
         v-if="canEdit"
@@ -74,7 +77,7 @@ const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
 let selectedOption = ref(0);
 const search = ref('');
-const token = useStrapiToken();
+const client = useStrapiClient();
 const emit = defineEmits(['update:user']);
 
 const props = defineProps({
@@ -112,19 +115,10 @@ const showSearch = async () => {
         { ...{ ...searchInstitutions.value }[selectedOption.value] }.id,
       );
 
-      const url = useStrapiUrl() + '/users/' + props.id;
-      const options = {
+      await client(`/users/${props.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authentication: `Bearer ${token.value}`,
-        },
-
-        body: JSON.stringify({ institutions: list }),
-      };
-      console.log({ token: token.value });
-
-      await fetch(url, options);
+        body: { institutions: list },
+      });
 
       emit('update:user', {});
     }
@@ -140,17 +134,10 @@ const removeInstitution = async (index) => {
     .map((item) => item.id)
     .filter((id) => id !== index);
 
-  const url = useStrapiUrl() + '/users/' + props.id;
-  const options = {
+  await client(`/users/${props.id}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authentication': `Bearer ${token.value}`,
-    },
-    body: JSON.stringify({ institutions: list }),
-  };
-
-  await fetch(url, options);
+    body: { institutions: list },
+  });
   emit('update:user', {});
 };
 </script>
@@ -207,6 +194,14 @@ const removeInstitution = async (index) => {
       }
       p {
         font-size: 14px;
+      }
+    }
+  }
+
+  @media (max-width: 349px) {
+    .item {
+      img {
+        display: none;
       }
     }
   }

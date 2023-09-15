@@ -49,5 +49,15 @@
   "confirmPassword": {
     "required": "Confirma Senha é necessário",
     "matchError": "As senhas não são idênticas"
+  },
+  "name": {
+    "required": "Nome é necessário",
+    "min": "Mínimo de 3 caracteres",
+    "max": "Máximo de 20 caracteres"
+  },
+  "url": {
+    "required": "Url é necessário",
+    "min": "Mínimo de 3 caracteres",
+    "max": "Máximo de 64 caracteres"
   }
 }

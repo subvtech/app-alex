@@ -64,9 +64,8 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
-const { update } = useStrapi();
 const { profileSchema } = useFormRules();
-const token = useStrapiToken();
+const client = useStrapiClient();
 const messageStore = useMessageStore();
 const emit = defineEmits(['update:user']);
 const loading = ref(false);
@@ -121,19 +120,11 @@ const cancel = () => {
 const updateValues = handleSubmit(async () => {
   loading.value = true;
 
-  const data = { ...values, phone: values.phone.replace(/[^0-9]/g, '') };
   try {
-    const url = useStrapiUrl() + '/users/' + props.id;
-    const options = {
+    await client(`/users/${props.id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authentication: `Bearer ${token.value}`,
-      },
-      body: JSON.stringify({ ...data }),
-    };
-    await update('users', props.id, { ...data });
-    //await fetch(url, options);
+      body: { ...values, phone: values.phone.replace(/[^0-9]/g, '') },
+    });
 
     emit('update:user', {});
   } catch (error) {
