@@ -14,7 +14,20 @@
           class="item d-flex flex-row align-start w-100"
           v-for="(social, index) in socials"
         >
-          <img :src="strapiBaseUrl + social.icon.url" :alt="social.name" />
+          <div class="img-upload">
+            <label class="edit" :for="'file-input-' + social.name">
+              <img :src="strapiBaseUrl + social.icon.url" :alt="social.name" />
+            </label>
+
+            <input
+              class=""
+              style="display: none"
+              @input="async (e) => await updateSocialIcon(e, social.id, index)"
+              :id="'file-input-' + social.name"
+              type="file"
+              accept="image/png, image/jpeg, image/svg"
+            />
+          </div>
 
           <div class="d-flex flex-column w-100" style="gap: 8px">
             <alex-inputs-stepper-field
@@ -36,7 +49,21 @@
           </div>
         </div>
         <div class="item d-flex flex-row align-start w-100">
-          <img src="../../assets/svg/website.svg" alt="icon" />
+          <div class="img-upload">
+            <label class="edit" for="new-icon">
+              <img v-if="newIcon" :src="newIcon" alt="icon" />
+              <img v-else src="../../assets/svg/website.svg" alt="icon" />
+            </label>
+
+            <input
+              class=""
+              @input="uploadNewIcon"
+              style="display: none"
+              id="new-icon"
+              type="file"
+              accept="image/png, image/jpeg, image/svg"
+            />
+          </div>
 
           <div class="d-flex flex-column w-100" style="gap: 8px">
             <alex-inputs-stepper-field
@@ -77,9 +104,12 @@ const emit = defineEmits(['update:user']);
 const { socialsSchema } = useFormRules();
 
 const { create, update } = useStrapi();
-
+const client = useStrapiClient();
+const { updateImage } = useUploadedImage();
 const messageStore = useMessageStore();
 const loading = ref(false);
+
+const newIcon = ref<string | null>(null);
 
 type Social = {
   name: string;
@@ -113,8 +143,6 @@ const cancel = () => {
 
 const updateValues = handleSubmit(async () => {
   loading.value = true;
-  console.log({ controlledValues: controlledValues.value });
-  console.log({ values: values.value });
   try {
     const promises: any = [];
     props.socials.forEach((social, index) => {
@@ -125,13 +153,42 @@ const updateValues = handleSubmit(async () => {
         }),
       );
     });
-    if (controlledValues.value.nameLoose && controlledValues.value.urlLoose)
+    if (
+      controlledValues.value.nameLoose &&
+      controlledValues.value.urlLoose &&
+      newIcon.value
+    ) {
+      const formData = new FormData();
+      const response = await fetch(newIcon.value!);
+      const mimeType = response.headers.get('Content-Type');
+      const fileData = new File([await response.blob()], 'icon', {
+        type: mimeType!,
+      });
+
+      formData.append('files', fileData);
+
       promises.push(
-        create('socials', {
-          name: controlledValues.value.nameLoose,
-          url: controlledValues.value.urlLoose,
-        }),
+        client<any>('/upload', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((result) => {
+            create('socials', {
+              icon: result[0].id,
+              name: controlledValues.value.nameLoose,
+              url: controlledValues.value.urlLoose,
+              users_permissions_user: props.id,
+            })
+              .then((result2) => {})
+              .catch((err) => {
+                console.log(err);
+              });
+          })
+          .then((err) => {
+            console.log(err);
+          }),
       );
+    }
 
     await Promise.all(promises);
 
@@ -145,6 +202,18 @@ const updateValues = handleSubmit(async () => {
     loading.value = false;
   }
 });
+
+async function updateSocialIcon(event: any, iconId: number, index: number) {
+  const { updatedAt } = await updateImage(event, iconId);
+  const url = socials.value[index].icon.url.split('?');
+  if (url) socials.value[index].icon.url = url[0] + '?' + updatedAt;
+}
+
+async function uploadNewIcon(e: any) {
+  newIcon.value = URL.createObjectURL(e.target.files[0]);
+
+  //const { updatedAt } = await updateImage(event, user.value.avatar.id);
+}
 </script>
 
 <style scoped lang="scss">

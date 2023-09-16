@@ -168,6 +168,7 @@ const mask = new Mask({ mask: '(##) #####-####' });
         font-size: 16px;
         font-weight: 400;
         line-height: 22px;
+        text-decoration: none;
       }
     }
   }
