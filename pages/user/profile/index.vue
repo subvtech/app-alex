@@ -13,24 +13,50 @@
       </div>
     </div>
     <div class="user-block my-6">
-      <img
-        v-if="user.cover"
-        class="cover"
-        :src="strapiBaseUrl + user.cover.url"
-        :alt="user.fullname"
-      />
-      <img
-        v-else
-        class="cover"
-        src="https://picsum.photos/800/800"
-        alt="cover picture"
-      />
+      <div class="cover-block w-100">
+        <img
+          v-if="user.cover"
+          :src="strapiBaseUrl + cover"
+          :alt="user.fullname"
+        />
+        <img
+          v-else
+          class="cover"
+          src="https://picsum.photos/800/800"
+          alt="cover picture"
+        />
+        <div class="img-upload">
+          <label class="" for="cover-input">
+            <v-btn
+              class="btn"
+              @click="($refs.coverInput as any).click()"
+              size="large"
+              variant="outlined"
+            >
+              <v-icon class="icon" color="#6E7A87">mdi-pencil-outline</v-icon>
+
+              <p>{{ $t('pages.profile.cover') }}</p></v-btn
+            >
+          </label>
+
+          <input
+            class=""
+            @input="uploadCoverPicture"
+            style="display: none"
+            accept="image/png, image/jpeg"
+            ref="coverInput"
+            id="cover-input"
+            type="file"
+          />
+        </div>
+      </div>
+
       <div class="card">
         <div class="photo">
           <div class="avatar">
             <img
-              v-if="user.avatar && user.avatar.url"
-              :src="strapiBaseUrl + user.avatar.url"
+              v-if="avatar"
+              :src="strapiBaseUrl + avatar"
               :alt="user.fullname"
             />
             <img
@@ -39,13 +65,20 @@
               alt="profile picture"
             />
           </div>
+          <div class="img-upload">
+            <label class="edit" for="file-input">
+              <v-icon size="x-small">mdi-pencil-outline</v-icon>
+            </label>
 
-          <v-file-input
-            class="edit"
-            label="File input"
-            hide-input
-            prependIcon="mdi-pencil-outline"
-          ></v-file-input>
+            <input
+              class=""
+              @input="uploadProfilePicture"
+              style="display: none"
+              accept="image/png, image/jpeg"
+              id="file-input"
+              type="file"
+            />
+          </div>
         </div>
 
         <div class="info">
@@ -116,19 +149,21 @@
       />
     </div>
     <div v-else class="content-block d-flex justify-center flex-row">
-      <profile-settings
-        :id="user.id"
-        :info="user.info"
-        :fullname="user.fullname"
-        :telephone="user.phone"
-        :cpf="user.cpf"
-        @update:user="updateUser"
-      />
-      <profile-socials
-        :id="user.id"
-        :socials="user.socials"
-        @update:user="updateUser"
-      />
+      <div class="d-flex flex-column w-100">
+        <profile-settings
+          :id="user.id"
+          :info="user.info"
+          :fullname="user.fullname"
+          :telephone="user.phone"
+          :cpf="user.cpf"
+          @update:user="updateUser"
+        />
+        <profile-socials
+          :id="user.id"
+          :socials="user.socials"
+          @update:user="updateUser"
+        />
+      </div>
 
       <div class="d-flex flex-column w-100">
         <profile-institutional
@@ -161,12 +196,17 @@ const strapiUrl = useStrapiUrl();
 const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
 
 const messageStore = useMessageStore();
+const { updateImage } = useUploadedImage();
+const avatar = ref<string | null>(null);
+const cover = ref<string | null>(null);
+//const isLoading = ref(false);
 
 const user = ref<any>();
 definePageMeta({
   middleware: 'auth',
 });
 const { id } = useStrapiUser<User>().value;
+
 const updateUser = async (show = true) => {
   user.value = await findOne<User>('users', id, {
     populate: [
@@ -179,6 +219,9 @@ const updateUser = async (show = true) => {
       'user_wallet',
     ],
   });
+
+  avatar.value = user.value.avatar.url;
+  cover.value = user.value.cover.url;
   messageStore.message = 'done';
   messageStore.color = 'green';
   messageStore.show = show;
@@ -194,6 +237,18 @@ const links = ref([
   i18n.t('pages.profile.events'),
   i18n.t('pages.profile.settings'),
 ]);
+
+async function uploadProfilePicture(event: any) {
+  const { updatedAt } = await updateImage(event, user.value.avatar.id);
+  const url = avatar.value?.split('?');
+  if (url) avatar.value = url[0] + '?' + updatedAt;
+}
+
+async function uploadCoverPicture(event: any) {
+  const { updatedAt } = await updateImage(event, user.value.cover.id);
+  const url = cover.value?.split('?');
+  if (url) cover.value = url[0] + '?' + updatedAt;
+}
 </script>
 
 <style lang="scss">
@@ -279,24 +334,27 @@ const links = ref([
           }
         }
 
-        .edit {
-        
-          width: 32px;
-          height: 32px;
-         
+        .img-upload {
           right: 0px;
           bottom: 32px;
-          margin-top: 16px;
+
           position: absolute;
+
+          width: 32px;
+          height: 32px;
+
           border-radius: 99px;
           border: 1px solid #abb2b9;
           background: #f1f5f9;
-          cursor: pointer;
-          :first-child {
-            margin-top: -9px;
-            margin-right: -80px;
-            margin-left: 1px;
-            text-decoration: none;
+
+          .edit {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            cursor: pointer;
           }
         }
       }
@@ -332,15 +390,36 @@ const links = ref([
         }
       }
     }
-    .cover {
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 300px;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-    }
+    .cover-block {
+      position: relative;
+      img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        max-height: 300px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
 
+      .btn {
+        position: absolute;
+        min-width: 150px;
+        width: 13.7vw;
+        bottom: 24px;
+        right: 20px;
+        border-radius: 8px;
+        border: none;
+        color: #6e7a87;
+        height: 5vh;
+        background-color: #ebedef;
+        text-transform: none !important;
+
+        p {
+          margin-left: 0.5vw;
+          letter-spacing: 0.56px;
+        }
+      }
+    }
     .menu {
       border-top: 1px solid #eaeef1;
       gap: 24px;
@@ -371,6 +450,7 @@ const links = ref([
 
   .content-block {
     gap: 24px;
+    flex-direction: row;
   }
 
   @media (max-width: 800px) {
@@ -381,6 +461,31 @@ const links = ref([
 
   @media (max-width: 640px) {
     .user-block {
+      .cover-block {
+        position: relative;
+        img {
+          width: 100%;
+          height: auto;
+          max-width: 100%;
+          max-height: 300px;
+          border-top-left-radius: 8px;
+          border-top-right-radius: 8px;
+        }
+
+        .btn {
+          position: absolute;
+          min-width: 100px;
+        }
+
+        .icon {
+          display: none;
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+
       .card {
         .info {
           margin-left: 125px;
@@ -401,23 +506,12 @@ const links = ref([
               margin-top: 0px;
             }
           }
-
-          .edit {
-            display: flex;
-            width: 32px;
-            height: 32px;
-            padding: 10px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+          .img-upload {
             right: 0px;
-            bottom: 15px;
-            position: absolute;
-            border-radius: 99px;
-            border: 1px solid #abb2b9;
-            background: #f1f5f9;
-            cursor: pointer;
+            bottom: 20px;
+
+            width: 28px;
+            height: 28px;
           }
         }
       }
@@ -430,7 +524,7 @@ const links = ref([
     }
   }
 
-  @media (max-width: 590px) {
+  @media (max-width: 608px) {
     .user-block {
       .menu {
         gap: 24px;
@@ -485,6 +579,13 @@ const links = ref([
               margin-top: 0px;
             }
           }
+          .img-upload {
+            right: 0px;
+            bottom: 20px;
+
+            width: 24px;
+            height: 24px;
+          }
         }
       }
     }
@@ -522,7 +623,7 @@ const links = ref([
           }
         }
         .photo {
-          bottom: 110px;
+          bottom: 100px;
           .avatar {
             img {
               max-width: 90%;
@@ -531,22 +632,12 @@ const links = ref([
               margin-top: 0px;
             }
           }
-          .edit {
-            display: flex;
+          .img-upload {
+            right: 15px;
+            bottom: 10px;
+
             width: 24px;
             height: 24px;
-            padding: 10px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            right: 8px;
-            bottom: 15px;
-            position: absolute;
-            border-radius: 99px;
-            border: 1px solid #abb2b9;
-            background: #f1f5f9;
-            cursor: pointer;
           }
         }
       }
