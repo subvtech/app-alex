@@ -1,14 +1,14 @@
 {
-    "title": "Perfil do Usuário",
-    "home": "Home",
-    "edit": "Editar",
-    "teacher": "Professor",
-    "student": "Aluno",
-    "general": "Visão Geral",
-    "courses": "Cursos",
-    "projects": "Projetos",
-    "assignments": "Tarefas",
-    "events": "Eventos",
-    "settings": "Configurações"
-
+  "title": "Perfil do Usuário",
+  "home": "Home",
+  "edit": "Editar",
+  "teacher": "Professor",
+  "student": "Aluno",
+  "general": "Visão Geral",
+  "courses": "Cursos",
+  "projects": "Projetos",
+  "assignments": "Tarefas",
+  "events": "Eventos",
+  "settings": "Configurações",
+  "cover": "Alterar capa"
 }

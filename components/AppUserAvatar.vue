@@ -18,8 +18,6 @@ const props = defineProps({
   },
 });
 
-console.log({ user });
-
 const userInitials = computed(() => {
   return getFullnameInitials(props.user.fullname);
 });

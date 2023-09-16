@@ -89,7 +89,6 @@ const { handleSubmit } = useForm({
 
 const updateEmail = handleSubmit(async () => {
   editEmail.value = !editEmail.value;
-  console.log('click');
   if (!editEmail.value) return;
   const url = useStrapiUrl() + '/users/' + props.id;
   const options = {
