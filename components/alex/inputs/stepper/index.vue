@@ -23,7 +23,7 @@
         :values="values"
       />
     </template>
-    <div v-if="!showControls" class="step-controls">
+    <div v-if="!showControls" class="w-100 d-flex">
       <v-btn
         v-if="activeStep > 1"
         :disabled="submitLoading"
@@ -157,10 +157,6 @@ const onSelectStep = (step: number) => {
 </script>
 
 <style scoped>
-.step-controls {
-  display: flex;
-  width: 100%;
-}
 
 button[type='submit']:disabled {
   background-color: gray !important;
