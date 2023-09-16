@@ -2,7 +2,7 @@
   <v-hover #default="{ isHovering, props }">
     <div
       v-bind="props"
-      class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer"
+      class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer active"
       :class="useClasses(active, disabled, isHovering).container"
       @click="emit('onSelect')"
     >
@@ -11,8 +11,8 @@
         :class="useClasses(active, disabled, isHovering).bgNumber"
       >
         <v-icon
-          v-if="icon"
-          :icon="icon"
+          v-if="icon || completed"
+          :icon="completed ? 'mdi-check' : icon"
           :class="useClasses(active, disabled, isHovering).number"
         />
         <div
@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 const emit = defineEmits(['onSelect']);
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     required: true,
@@ -55,6 +55,7 @@ const props = defineProps({
   checked: { type: Boolean, default: false },
   active: { type: Boolean, default: false },
   disabled: { type: Boolean, default: true },
+  completed: { type: Boolean, default: false },
 });
 
 const states = {
@@ -62,8 +63,8 @@ const states = {
     title: 'text-gray-600',
     subtitle: 'text-gray-400',
     bgNumber: 'bg-gray-blue',
-    number: 'text-gray-400',
-    container: 'border-1-gray-blue elevation-1',
+    number: 'text-gray-400 number',
+    container: 'border-1-gray-blue elevation-4',
   },
   active: {
     title: 'text-gray-600',
@@ -76,7 +77,7 @@ const states = {
     title: 'text-gray-300',
     subtitle: 'text-gray-300',
     bgNumber: 'bg-gray-blue',
-    number: 'text-gray-300',
+    number: 'text-gray-300 ',
     container: '',
   },
   click: {
@@ -116,5 +117,8 @@ const useClasses = (
 }
 .cursor-pointer {
   cursor: pointer;
+}
+.active:active .number {
+  color: rgb(var(--v-theme-secondary-0)) !important
 }
 </style>

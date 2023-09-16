@@ -5,11 +5,15 @@
       align="center"
       elevation="0"
     >
-      <v-card-title class="text-h3 text-white break-spaces">
+      <v-card-title class="text-h3 sm-text-h2 text-white break-spaces">
         {{ $t('pages.register.title') }}
       </v-card-title>
-      <AlexInputsStepper
-        :steps-config="itemsStepper"
+      <alex-inputs-stepper
+        :steps-config="{
+          step1: { scheme: registerStep1 },
+          step2: { scheme: registerStep2 },
+          step3: { scheme: registerStep3 },
+        }"
         :submit-loading="registering"
         @onSuccess="submit"
         align="left"
@@ -17,7 +21,7 @@
       >
         <template #step1>
           <v-card-subtitle
-            class="text-white text-h6 mb-8 break-spaces"
+            class="text-white text-body-1 text-sm-subtitle-2 mb-8 break-spaces"
             align="center"
           >
             {{ $t('pages.register.subtitle1') }}
@@ -119,7 +123,7 @@
             @click:append-inner="passwordVisible = !passwordVisible"
           />
         </template>
-      </AlexInputsStepper>
+      </alex-inputs-stepper>
 
       <div class="d-flex align-center text-white my-12">
         <v-divider
@@ -158,11 +162,7 @@ const cpfMask = reactive({
   mask: '###.###.###-##',
   eager: true,
 });
-const itemsStepper = [
-  { title: 'step1' , subtitle: 'teste', scheme: registerStep1 },
-  { title: 'step2',subtitle: 'teste' , scheme: registerStep2 },
-  { title: 'step3', subtitle: 'teste', scheme: registerStep3 },
-];
+
 const usernameUrl = computed(() => window.location.host + '/profile/');
 const registering = ref(false);
 const institutions = ref([]);
@@ -252,7 +252,7 @@ const submit = async (values: {
 }
 
 .max-w-100 {
-  max-width: 400px;
+  max-width: 450px;
 }
 
 @media screen and (max-width: 500px) {
