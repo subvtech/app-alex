@@ -7,11 +7,11 @@
         :stepNumber="index + 1"
         :active="index == activeStep - 1"
         :checked="activeStep - 1 > index"
-        :title="title || 'Title'"
-        :subtitle="subtitle || 'Subtitle'"
+        :title="title"
+        :subtitle="subtitle"
         :icon="icon"
-        :disabled="false"
         :completed="completed"
+        :disabled="false"
         @onSelect="() => onSelectStep(index + 1)"
       />
     </div>
@@ -65,9 +65,9 @@ import * as yup from 'yup';
 interface StepsConfig {
   title: string;
   subtitle: string;
-  icon: string;
-  scheme: yup.Schema;
-  completed: boolean;
+  icon?: string;
+  scheme?: yup.Schema;
+  completed?: boolean;
 }
 
 type StepType<T extends string[], U> = Record<ElementType<T>, U>;
@@ -76,7 +76,7 @@ type StepType<T extends string[], U> = Record<ElementType<T>, U>;
 const props = withDefaults(
   defineProps<{
     noHeader?: boolean;
-    stepsConfig: StepType<typeof stepsCounter.value, Partial<StepsConfig>>;
+    stepsConfig?: StepType<typeof stepsCounter.value, Partial<StepsConfig>>;
     submitLoading?: boolean;
   }>(),
   { submitLoading: false, noHeader: false },
@@ -89,18 +89,31 @@ const showControls = computed(() => !!slots.controls);
 
 // Steps Logic
 const stepsCounter = computed(() =>
-  literalArray(
-    Object.entries(slots).map((slot) => slot[0]) as unknown as string,
-  ),
+  literalArray(...Object.entries(slots).map((slot) => slot[0])),
 );
 
 const activeStep = ref(1);
-const numberSteps = computed(() => stepsCounter.value[0].length);
-const stepsList = ref(Object.values(props.stepsConfig));
-
+const numberSteps = computed(() => stepsCounter.value.length);
+const stepsList = computed(() => {
+  const steps = {} as StepType<typeof stepsCounter.value, StepsConfig>;
+  stepsCounter.value.map(
+    (step) =>
+      (steps[step] = {
+        title: 'Title',
+        subtitle: 'Subtitle',
+        completed: false,
+      }),
+  );
+  if (props.stepsConfig) {
+    for (const step in steps) {
+      steps[step] = { ...steps[step], ...props.stepsConfig[step] };
+    }
+  }
+  return Object.values(steps);
+});
 // Steps Logic Get Schema
 const validationSchema = computed(() => {
-  const configStep = props.stepsConfig['step' + activeStep.value];
+  const configStep = stepsList.value[activeStep.value - 1];
   const emptyObject = yup.object({ empty: yup.string().optional().nullable() });
   return configStep && configStep.scheme ? configStep.scheme : emptyObject;
 });
@@ -113,7 +126,9 @@ const { handleSubmit, errors, values, controlledValues } = useForm({
 // Functions
 const onSubmit = handleSubmit((values) => {
   if (activeStep.value - 1 !== numberSteps.value - 1) {
-    stepsList.value[activeStep.value - 1].completed = true;
+    if (!props.noHeader) {
+      stepsList.value[activeStep.value - 1].completed = true;
+    }
     activeStep.value++;
     return;
   }
@@ -135,7 +150,9 @@ const isValid = computed(() => {
 const onPrevStep = () => {
   if (activeStep.value > 1) {
     activeStep.value--;
-    stepsList.value[activeStep.value - 1].completed = false;
+    if (!props.noHeader) {
+      stepsList.value[activeStep.value - 1].completed = false;
+    }
   }
 };
 
@@ -146,18 +163,30 @@ const onSelectStep = (step: number) => {
 
   if (step > activeStep.value) {
     stepsList.value[activeStep.value - 1].completed = true;
-    activeStep.value = step;
-  } else {
-    activeStep.value = step;
-    stepsList.value[activeStep.value - 1].completed = false;
   }
-  
 
+  activeStep.value = step;
+
+  // remove completed state if step == activestep
+  // if (step != activeStep.value) {
+  //   stepsList.value[activeStep.value - 1].completed = true
+  // }
+
+  // activeStep.value = step;
+
+  //  if (step == activeStep.value) {
+  //   stepsList.value[activeStep.value - 1].completed = false;
+  // }
 };
+
+watchEffect(() => {
+  if (!isValid) {
+    console.log('invalod')
+  }
+})
 </script>
 
 <style scoped>
-
 button[type='submit']:disabled {
   background-color: gray !important;
 }
