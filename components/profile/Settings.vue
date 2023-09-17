@@ -40,7 +40,7 @@
             color="black"
             variant="outlined"
           />
-          <div class="d-flex justify-end">
+          <div class="buttons d-flex justify-end">
             <v-btn
               class="btn"
               color="accent"
@@ -49,7 +49,7 @@
             >
               {{ $t('components.profile.settings.cancel') }}</v-btn
             >
-            <v-btn class="btn ml-2" color="accent" type="submit">
+            <v-btn class="btn" color="accent" type="submit">
               {{ $t('components.profile.settings.save') }}
             </v-btn>
           </div>
@@ -149,9 +149,17 @@ const updateValues = handleSubmit(async () => {
   .block {
     gap: 24px;
   }
+
+  .buttons {
+    gap: 8px;
+  }
   @media (max-width: 430px) {
     .block {
       flex-direction: column;
+    }
+
+    .buttons {
+      flex-direction: column-reverse;
     }
   }
 }

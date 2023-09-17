@@ -234,7 +234,7 @@ async function uploadNewIcon(e: any) {
   .block {
     gap: 12px;
     flex-direction: column-reverse;
-
+    width: 100%;
     .btn {
       width: 100%;
     }
