@@ -82,7 +82,7 @@
             />
           </div>
         </div>
-        <div class="block d-flex justify-end">
+        <div class="block d-flex">
           <v-btn class="btn" color="accent" @click="cancel" variant="outlined">
             {{ $t('components.profile.settings.cancel') }}</v-btn
           >
@@ -227,7 +227,13 @@ async function uploadNewIcon(e: any) {
 }
 
 .block {
+  width: 100%;
   gap: 8px;
+  justify-content: flex-end;
+  
+  .btn {
+    text-transform: none;
+  }
 }
 
 @media (max-width: 400px) {
