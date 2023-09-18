@@ -9,3 +9,8 @@
 <script setup>
 import './assets/css/base.scss';
 </script>
+<style>
+html {
+  overflow-y: auto;
+}
+</style>

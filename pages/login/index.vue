@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row id="login-page">
     <v-col>
       <v-card class="card card-imagem">
         <div align="center">
@@ -17,82 +17,100 @@
           <img
             alt="Alex"
             src="../../static/images/alex.svg"
-            class="card-acesso-alex-logo my-15"
+            class="card-acesso-alex-logo"
           />
         </div>
-        <v-card-title class="text-white my-2">
-          Bem vindo a plataforma ALEX!
-        </v-card-title>
-        <v-card-subtitle class="text-white my-2">
-          Acesse sua conta e continue com seus estudos
-        </v-card-subtitle>
-        <v-form ref="form" @submit.prevent="submit">
-          <alex-inputs-stepper-field
-            label="Email"
-            name="email"
-            color="white"
-            class="my-3 text-secondary"
-            theme="dark"
-          />
 
-          <alex-inputs-stepper-field
-            label="Senha"
-            :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="passwordVisible ? 'text' : 'password'"
-            name="password"
-            color="white"
-            class="my-3 text-secondary"
-            theme="dark"
-            @click:append-inner="passwordVisible = !passwordVisible"
-          />
+        <div class="form d-flex flex-column">
+          <div class="d-flex flex-column">
+            <v-card-title class="text-white text-center text-bold">
+              Bem vindo a plataforma ALEX!
+            </v-card-title>
+            <v-card-subtitle
+              class="text-white text-center px-16"
+              style="font-size: 1.25rem; white-space: normal"
+            >
+              Entre com seus dados cadastrados e continue seus estudos.
+            </v-card-subtitle>
+          </div>
+          <v-form ref="form" @submit.prevent="submit">
+            <alex-inputs-stepper-field
+              label="Email"
+              name="email"
+              color="white"
+              class="my-1 text-secondary"
+              theme="dark"
+            />
 
-          <v-checkbox
-            v-model="checkbox"
-            class="text-white"
-            color="accent"
-            label="Lembrar dados"
-          ></v-checkbox>
-          <nuxt-link to="/forgot" class="text-white my-4">
-            Esqueceu sua senha?
-          </nuxt-link>
+            <alex-inputs-stepper-field
+              label="Senha"
+              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="passwordVisible ? 'text' : 'password'"
+              name="password"
+              color="white"
+              class="my-1 text-secondary"
+              theme="dark"
+              @click:append-inner="passwordVisible = !passwordVisible"
+            />
+
+            <div
+              class="d-flex justify-between align-center mb-3"
+              style="height: 24px"
+            >
+              <v-checkbox
+                v-model="checkbox"
+                class="text-white"
+                color="accent"
+                label="Lembrar dados"
+              ></v-checkbox>
+              <nuxt-link
+                to="/forgot"
+                class="no-account text-decoration-none pb-4"
+              >
+                Esqueceu sua senha?
+              </nuxt-link>
+            </div>
+
+            <v-btn
+              block
+              :disabled="!isValid"
+              class="card-btn"
+              type="submit"
+              :loading="logging"
+            >
+              Entrar
+            </v-btn>
+          </v-form>
+          <v-card-text class="text-white text-center">
+            Ainda não possui conta?
+            <nuxt-link to="/register" class="no-account text-decoration-none">
+              Crie sua conta
+            </nuxt-link>
+          </v-card-text>
+          <div class="d-flex align-center text-white">
+            <v-divider
+              color="secondary"
+              :thickness="1"
+              class="border-opacity-100"
+            ></v-divider>
+            <p class="mx-4">ou</p>
+            <v-divider
+              color="secondary"
+              :thickness="1"
+              class="border-opacity-100"
+            ></v-divider>
+          </div>
+
           <v-btn
             block
-            :disabled="!isValid"
-            class="card-btn"
-            type="submit"
-            :loading="logging"
+            class="card-btn metamask d-flex"
+            @click="metalogin"
+            :loading="logging2"
           >
-            Entrar
+            <img src="../../static/images/metamask.png" alt="" />
+            <span>Acesse com a metamask</span>
           </v-btn>
-        </v-form>
-        <v-card-text class="text-white text-center mt-6 mb-10">
-          Ainda não possui conta?
-          <nuxt-link to="/register" class="text-white">
-            Crie sua conta
-          </nuxt-link>
-        </v-card-text>
-        <div class="d-flex align-center text-white my-12">
-          <v-divider
-            color="secondary"
-            :thickness="1"
-            class="border-opacity-100"
-          ></v-divider>
-          <p class="mx-4">ou</p>
-          <v-divider
-            color="secondary"
-            :thickness="1"
-            class="border-opacity-100"
-          ></v-divider>
         </div>
-        <v-btn
-          block
-          class="card-btn metamask d-flex"
-          @click="metalogin"
-          :loading="logging2"
-        >
-          <img src="../../static/images/metamask.png" alt="" />
-          <span>Acesse com a metamask</span>
-        </v-btn>
       </v-card>
     </v-col>
   </v-row>
@@ -206,90 +224,123 @@ const metalogin = async () => {
 </script>
 
 <style scoped lang="scss">
-.card {
-  border-radius: 0 !important;
-  height: 100%;
-  position: absolute;
-  top: 0;
+#login-page {
+  overflow-y: auto;
+  .card {
+    border-radius: 0 !important;
+    height: 100%;
+    position: absolute;
+    top: 0;
 
-  &-imagem {
-    background: #f0f0f0 !important;
-    left: 0;
-    width: calc(100% - 600px);
+    .form {
+      gap: 40px;
+    }
 
     &-imagem {
-      height: 80vh;
+      background: #f0f0f0 !important;
+      left: 0;
+      width: calc(100% - 600px);
+
+      &-imagem {
+        height: 80vh;
+      }
     }
-  }
 
-  &-acesso {
-    background: #001529 !important;
-    right: 0;
-    overflow: auto;
-    width: 600px;
+    &-acesso {
+      background: #001529 !important;
+      right: 0;
+      overflow: auto;
+      width: 600px;
 
-    &-alex-logo {
-      width: 100px;
+      &-alex-logo {
+        width: 100px;
+        margin-block: 60px;
+      }
     }
-  }
 
-  &-text {
-    font-family: 'Montserrat';
-    font-weight: 500 !important;
-  }
-
-  .metamask {
-    background-color: white !important;
-    align-items: center;
-    text-transform: none !important;
-    width: 306px;
-    min-width: 0px !important;
-    gap: 8px;
-    margin-inline: auto;
-
-    img {
-      height: 30px;
-      width: 30px;
-      margin-right: 10px;
-    }
-    span {
+    .no-account {
+      color: #00d3ec;
+      font-family: Sen;
       font-size: 16px;
-      font-family: 'Sen';
+      font-style: normal;
+      font-weight: 700;
+      line-height: 24px;
+    }
+
+    &-text {
+      font-family: 'Montserrat';
+      font-weight: 500 !important;
+    }
+
+    .metamask {
+      background-color: white !important;
+      align-items: center;
+      text-transform: none !important;
+      width: 306px;
+      min-width: 0px !important;
+      gap: 8px;
+      margin-inline: auto;
+
+      img {
+        height: 30px;
+        width: 30px;
+        margin-right: 10px;
+      }
+      span {
+        font-size: 16px;
+        font-family: 'Sen';
+      }
+    }
+
+    &-btn {
+      align-items: center;
+      background: #00d3ec !important;
+      border-radius: 6px;
+      display: flex;
+      font-family: 'Montserrat';
+      font-size: 15px;
+      font-weight: 600;
+      flex-direction: row;
+      height: 40px;
+      transition: 0.5s;
+      margin: 10px 0;
+      justify-content: center;
+      width: 100%;
+
+      &:hover {
+        color: #001529;
+        background-color: #00b8cc;
+        border-color: #00b8cc;
+      }
+
+      &:active {
+        color: #001529;
+        background-color: #00a3b7;
+        border-color: #00a3b7;
+      }
     }
   }
 
-  &-btn {
-    align-items: center;
-    background: #00d3ec !important;
-    border-radius: 6px;
-    display: flex;
-    font-family: 'Montserrat';
-    font-size: 15px;
-    font-weight: 600;
-    flex-direction: row;
-    height: 40px;
-    transition: 0.5s;
-    margin: 10px 0;
-    justify-content: center;
-    width: 100%;
-
-    &:hover {
-      color: #001529;
-      background-color: #00b8cc;
-      border-color: #00b8cc;
-    }
-
-    &:active {
-      color: #001529;
-      background-color: #00a3b7;
-      border-color: #00a3b7;
-    }
+  .v-card-subtitle,
+  .v-card-text,
+  .v-card-title {
+    padding: 0px;
+    margin: 0px;
   }
 }
 
-.v-card__subtitle,
-.v-card__text,
-.v-card__title {
-  padding: 0;
+@media (max-height: 700px) {
+  #login-page {
+    .card {
+      &-acesso {
+        &-alex-logo {
+          margin-block: 40px;
+        }
+      }
+      .form {
+        gap: 24px;
+      }
+    }
+  }
 }
 </style>
