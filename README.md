@@ -4,6 +4,7 @@
 
 - [O que eu preciso ter para rodar o projeto?](#o-que-eu-preciso-ter-para-rodar-o-projeto?)
 - [Ferramentas](#ferramentas)
+- [Criando um banco de dados](#criando-um-banco-de-dados)
 - [Como rodar o projeto na minha máquina?](#como-rodar-o-projeto-na-minha-máquina?)
 - [Tecnologias](#tecnologias)
 
@@ -21,6 +22,12 @@
 ![Untitled](https://github.com/maikaodev/stopwatch/assets/82960620/8c998f5d-45b1-495d-bcaa-bdf2b3464b4c)
 
 - Interface gráfica para banco de dados - [DBeaver](https://dbeaver.io/) ou outro de sua preferência.
+
+## Criando um banco de dados
+
+- Após a instalação do PostegreSQL e DBeaver crie um banco de dados:
+
+  Link da reunião: [Configurando o banco de dados](https://youtu.be/EFMM7Nun81Q?t=1449)
 
 ## Como rodar o projeto na minha máquina?
 
