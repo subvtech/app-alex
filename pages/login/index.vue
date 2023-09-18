@@ -28,7 +28,7 @@
             </v-card-title>
             <v-card-subtitle
               class="text-white text-center px-16"
-              style="font-size: 1.25rem; white-space: normal"
+              style="white-space: normal"
             >
               Entre com seus dados cadastrados e continue seus estudos.
             </v-card-subtitle>
@@ -65,7 +65,7 @@
               ></v-checkbox>
               <nuxt-link
                 to="/forgot"
-                class="no-account text-decoration-none pb-4"
+                class="no-account text-decoration-none pb-5"
               >
                 Esqueceu sua senha?
               </nuxt-link>
@@ -234,6 +234,10 @@ const metalogin = async () => {
 
     .form {
       gap: 40px;
+
+      .v-card-subtitle {
+        font-size: 1.25rem;
+      }
     }
 
     &-imagem {
@@ -339,6 +343,57 @@ const metalogin = async () => {
       }
       .form {
         gap: 24px;
+      }
+    }
+  }
+}
+
+@media (max-width: 601px) {
+  #login-page {
+    .card {
+      width: 100%;
+
+      .form {
+        .v-card-subtitle {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 490px) {
+  #login-page {
+    .card {
+      &-acesso {
+        &-alex-logo {
+          margin-block: 32px;
+        }
+      }
+      .v-card-subtitle {
+        font-size: 18px;
+      }
+      .form {
+        gap: 22px;
+      }
+    }
+  }
+}
+
+@media (max-width: 380px) {
+  #login-page {
+    .card {
+      &-acesso {
+        &-alex-logo {
+          margin-block: 32px;
+        }
+      }
+
+      .form {
+        gap: 22px;
+        .v-card-subtitle {
+          font-size: 1rem;
+        }
       }
     }
   }
