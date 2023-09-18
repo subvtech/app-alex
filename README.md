@@ -28,10 +28,7 @@ Via HTTPS
 
 ```bash
 ## Clone o projeto
-git clone http://gitlab.profbrenojac.com.br/projeto-alex/alex.git
-
-## Acesse a pasta do projeto
-cd alex/src/renderer2
+git clone http://gitlab.profbrenojac.com.br/projeto-alex/app-alex.git
 
 ## Instale as dependências
 yarn ou yarn install
@@ -56,3 +53,17 @@ STRAPI_URL=https://api-test.projetoalex.cc/
 - [Pinia](https://pinia.vuejs.org/)
 - [Vuetify](https://vuetifyjs.com/en/)
 - [Sass](https://sass-lang.com/)
+
+## Links úteis
+
+### Web:
+
+[Plataforma](https://app2-test.projetoalex.cc/login)
+
+[Landing page](https://projetoalex.cc/)
+
+### Protótipo:
+
+[Landing page](https://www.figma.com/file/h4R6uVqSLqUIK0hUE5HW41/ALEX---Style-Guide?type=design&node-id=0-1&mode=design&t=5vlQMej8oYkDZrQP-0)
+
+[Plataforma](https://www.figma.com/file/E3PKAjADQAMaDQin8XiaHR/ALEX---Interfaces?type=design&node-id=0-1&mode=design&t=f0MiSZ8TSaDwnBUv-0)
