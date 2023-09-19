@@ -2,26 +2,20 @@
   <vueper-slides
     ref="vueperslides1"
     class="no-shadow mb-3 rounded"
-    :slide-ratio="1 / 1.75"
+    :slide-ratio="1 / 2"
     :bullets="false"
     :arrows="false"
     :dragging-distance="200"
     :touchable="false"
     :autoplay="false"
     style="z-index: 0"
-    @slide="
-      $refs.vueperslides2 &&
-        $refs.vueperslides2.goToSlide($event.currentSlide.index, {
-          emit: false,
-        })
-    "
+    :alwaysRefreshClones="true"
   >
     <vueper-slide v-if="editMode" class="rounded">
       <template #content>
         <v-container
           class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-blue-grey-lighten-4"
           elevation="0"
-          style="border: 3px dashed #abb2b9"
         >
           <v-icon
             color="blue-grey-lighten-1"
@@ -39,13 +33,14 @@
       :image="!slide.video ? uploadBaseUrl + slide.image : null"
     >
       <template #content>
-        <vue-plyr v-if="slide.video">
-          <video
-            class="rounded w-100 fill-height video"
-            controls
-            :src="uploadBaseUrl + slide.video"
-          ></video>
-        </vue-plyr>
+        <video-player
+          v-if="slide.video"
+          class="w-100 fill-height video-js"
+          controls
+          :videoUrl="uploadBaseUrl + slide.video"
+          :data-poster="uploadBaseUrl + slide.image"
+          data-setup="{}"
+        ></video-player>
       </template>
     </vueper-slide>
   </vueper-slides>
@@ -87,15 +82,9 @@
           class="w-100 fill-height d-flex align-center justify-center rounded py-10"
           elevation="0"
           style="border: 3px dashed #abb2b9"
+          @click="openAddSlidesDialog"
         >
           <p color="blue-grey-darken-1" style="font-size: 30px">+</p>
-          <input
-            accept="image/*, video/*"
-            type="file"
-            class="w-100 h-100 bg-green inputFile"
-            title=""
-            @change="(file) => addSlide(file, -1)"
-          />
         </v-container>
       </template>
     </vueper-slide>
@@ -103,7 +92,13 @@
       v-for="slide in slides"
       :key="slide"
       :image="uploadBaseUrl + slide.image"
-      class="bg-blue-grey-lighten-4 rounded"
+      :class="
+        'bg-blue-grey-lighten-4 rounded' +
+        ($refs.vueperslides2 &&
+        $refs.vueperslides2.currentSlide.index === slides.indexOf(slide)
+          ? ' vueperslide-active'
+          : '')
+      "
       @click="
         $refs.vueperslides2 &&
           $refs.vueperslides2.goToSlide(
@@ -138,19 +133,20 @@
         </div>
         <div v-if="slide.video" class="rounded">
           <div class="pa-1 bg-grey video-play-icon rounded-xl">
-            <v-icon color="white" size="38px" icon="mdi-play"></v-icon>
+            <v-icon color="white" size="28px" icon="mdi-play"></v-icon>
           </div>
         </div>
       </template>
     </vueper-slide>
   </vueper-slides>
+  <InputFileModal ref="dialog" @uploadFiles="(f) => addSlide(f, -1)" />
 </template>
 
 <script>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
 import { ref, defineComponent } from 'vue';
-
+import VideoPlayer from './VideoJS.vue';
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -183,7 +179,7 @@ const captureVideoFrame = (file) => {
 };
 export default defineComponent({
   name: 'carousel-component',
-  components: { VueperSlides, VueperSlide },
+  components: { VueperSlides, VueperSlide, VideoPlayer },
   props: {
     slides: {
       type: Array,
@@ -212,15 +208,14 @@ export default defineComponent({
   },
   setup(props) {
     function newSlide(file, res) {
-      if (file.target.files[0].type.includes('image')) {
+      if (file.type.includes('image')) {
         return {
-          name: file.target.files[0].name,
+          name: file.name,
           image: res.url.url,
-          video: false,
         };
       } else {
         return {
-          name: file.target.files[0].name,
+          name: file.name,
           video: res.url.url,
           image: res.thumbnail.thumbnail,
         };
@@ -228,6 +223,10 @@ export default defineComponent({
     }
     // eslint-disable-next-line vue/no-setup-props-destructure
     const editMode = ref(!props.readOnly);
+    const dialog = ref(null);
+    const openAddSlidesDialog = () => {
+      dialog.value.openModal();
+    };
     // eslint-disable-next-line vue/no-setup-props-destructure
     const slides = ref([...props.slides]);
     const deleteSlide = (item) => {
@@ -236,22 +235,23 @@ export default defineComponent({
       props.onUpdateSlides(slides.value);
     };
     const addSlide = async (file, index) => {
-      if (file.target.files.length === 0) return;
-      const files = [file.target.files[0]];
-      if (file.target.files[0].type.includes('video')) {
-        await captureVideoFrame(file.target.files[0]).then((res) => {
-          files.push(res);
-        });
-      }
-      try {
-        await props.onSelectFile(files).then((res) => {
+      const filesArray = [...file];
+      for (const f of filesArray) {
+        const files = [f];
+        if (f.type.includes('video')) {
+          await captureVideoFrame(f).then((res) => {
+            files.push(res);
+          });
+        }
+        try {
+          const res = await props.onSelectFile(files);
           index === -1
-            ? slides.value.push(newSlide(file, res))
-            : (slides.value[index] = newSlide(file, res));
+            ? slides.value.push(newSlide(f, res))
+            : slides.value.splice(index, 1, newSlide(f, res));
           props.onUpdateSlides(slides.value);
-        });
-      } catch (error) {
-        console.log(error);
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
     const editSlide = (slide, file) => {
@@ -267,6 +267,8 @@ export default defineComponent({
       deleteSlide,
       addSlide,
       editSlide,
+      dialog,
+      openAddSlidesDialog,
     };
   },
 });
@@ -308,5 +310,21 @@ export default defineComponent({
   top: 75%;
   left: 80%;
   transform: translate(-50%, -50%);
+}
+@media (max-width: 800px) {
+  .video-play-icon {
+    left: 70%;
+  }
+}
+
+.vjs-sublime-skin .vjs-fullscreen-control {
+  border: 3px solid #fff;
+  box-sizing: border-box;
+  cursor: pointer;
+  margin-top: -7px;
+  top: 50%;
+  height: 14px;
+  width: 22px;
+  margin-right: 10px;
 }
 </style>

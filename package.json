@@ -30,6 +30,7 @@
     "nuxt-vitest": "^0.10.4",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6",
+    "video.js": "^8.5.2",
     "vitest": "0.33.0"
   },
   "dependencies": {
