@@ -1,5 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
@@ -12,18 +10,16 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/strapi'],
+  modules: ['@pinia/nuxt', '@nuxtjs/strapi', 'nuxt-vitest'],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
   },
+
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },
-  },
-  runtimeConfig: {
-    uploadBaseUrl: process.env.STRAPI_UPLOAD_URL || 'http://localhost:1337',
   },
   imports: {
     dirs: ['stores', 'models'],
