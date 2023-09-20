@@ -220,8 +220,8 @@ const updateUser = async (show = true) => {
     ],
   });
 
-  avatar.value = user.value.avatar.url;
-  cover.value = user.value.cover.url;
+  if (user.value.avatar) avatar.value = user.value.avatar.url;
+  if (user.value.cover) cover.value = user.value.cover.url;
   messageStore.message = 'done';
   messageStore.color = 'green';
   messageStore.show = show;
@@ -454,8 +454,6 @@ async function uploadCoverPicture(event: any) {
     flex-direction: row;
   }
 
-  
-
   @media (max-width: 1200px) {
     .user-block {
       .card {
@@ -561,14 +559,14 @@ async function uploadCoverPicture(event: any) {
       }
     }
     @media (max-height: 740px) {
-    .user-block {
-      .cover-block {
-        .btn {
-          height: 33px;
+      .user-block {
+        .cover-block {
+          .btn {
+            height: 33px;
+          }
         }
       }
     }
-  }
   }
 
   @media (max-width: 608px) {
@@ -619,13 +617,12 @@ async function uploadCoverPicture(event: any) {
   @media (max-width: 400px) {
     .user-block {
       .cover-block {
-       
         .icon {
           display: none;
         }
         .btn {
           right: 10px;
-          padding-inline: 2px;        
+          padding-inline: 2px;
           width: 110px;
           justify-content: center;
           p {
