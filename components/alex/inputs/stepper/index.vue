@@ -166,24 +166,8 @@ const onSelectStep = (step: number) => {
   }
 
   activeStep.value = step;
-
-  // remove completed state if step == activestep
-  // if (step != activeStep.value) {
-  //   stepsList.value[activeStep.value - 1].completed = true
-  // }
-
-  // activeStep.value = step;
-
-  //  if (step == activeStep.value) {
-  //   stepsList.value[activeStep.value - 1].completed = false;
-  // }
+ 
 };
-
-watchEffect(() => {
-  if (!isValid) {
-    console.log('invalod')
-  }
-})
 </script>
 
 <style scoped>
