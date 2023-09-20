@@ -52,10 +52,10 @@ export const useFormRules = (formData?: FormDataType) => {
       .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
       .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
       .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
-      .matches(
+      /*.matches(
         /(?=.*[^a-zA-Z0-9])/,
-        'Must contain at least 1 special character',
-      )
+        i18n.t('rules.password.character'),
+      )*/
       .min(8, i18n.t('rules.password.min')),
 
     confirmPassword: yup
