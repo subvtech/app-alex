@@ -6,6 +6,7 @@ import { alexIcons } from 'assets/icons';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const vuetify = createVuetify({
+    aliases,
     components,
     directives,
     defaults,
