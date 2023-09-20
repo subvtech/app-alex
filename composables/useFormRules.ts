@@ -49,14 +49,15 @@ export const useFormRules = (formData?: FormDataType) => {
     password: yup
       .string()
       .required(i18n.t('rules.password.required'))
-      .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
-      .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
-      .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
+      //.matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
+      //.matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
+      //.matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
       /*.matches(
         /(?=.*[^a-zA-Z0-9])/,
         i18n.t('rules.password.character'),
       )*/
-      .min(8, i18n.t('rules.password.min')),
+      //.min(8, i18n.t('rules.password.min'))
+      ,
 
     confirmPassword: yup
       .string()
