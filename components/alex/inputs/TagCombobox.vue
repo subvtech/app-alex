@@ -90,7 +90,7 @@ import {
   Strapi4ResponseMany,
 } from '@nuxtjs/strapi/dist/runtime/types';
 import { PropType } from 'nuxt/dist/app/compat/capi';
-import { Tag } from 'models/tag.model';
+import { Tag } from '~/models/tag.model';
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
 const graphql = useStrapiGraphQL();
@@ -141,7 +141,6 @@ const searchTags = async (search = '', ids: number[] = []) => {
   if ((!search || search.length < 3) && !ids.length) return;
   loadingTags.value = true;
 
-  // const
   const props = {
     query: ids.length ? queries.tagsByids : queries.tags,
     variables: ids.length ? { ids } : { search },

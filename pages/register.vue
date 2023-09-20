@@ -79,7 +79,6 @@ const onRegisteredUser = () => {
 .ellipse {
   width: 100%;
   aspect-ratio: 4.4 / 1.3;
-  // min-height: 100px;
   &-top {
     background-image: url('../assets/svg/EllipseLogo.svg');
     background-size: 130%;

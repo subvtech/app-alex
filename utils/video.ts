@@ -1,10 +1,10 @@
 const list = ['youtube'];
 
-export function isVideo(url) {
+export function isVideo(url: string) {
   return list.some((l) => url.includes(l));
 }
 
-export function getProvider(url) {
+export function getProvider(url: string) {
   let provider = '';
 
   if (isYoutubeVideo(url)) {
@@ -16,7 +16,7 @@ export function getProvider(url) {
   return provider;
 }
 
-export function getEmbedID(url) {
+export function getEmbedID(url: string) {
   const provider = getProvider(url);
 
   if (provider === 'vimeo') {
@@ -31,11 +31,11 @@ export function getEmbedID(url) {
   return (rx1.test(url) || rx2.test(url)) && (RegExp.$2 || RegExp.$1);
 }
 
-function isYoutubeVideo(url) {
+export function isYoutubeVideo(url: string) {
   return /youtu\.?be/.test(url);
 }
 
-function getVimeoId(url) {
+export function getVimeoId(url: string) {
   // Look for a string with 'vimeo', then whatever, then a
   // forward slash and a group of digits.
   const match = /vimeo.*\/(\d+)/i.exec(url);

@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
     '@mdi/font/css/materialdesignicons.min.css',
+    'assets/css/settings.scss',
   ],
   build: {
     transpile: ['vuetify'],
@@ -23,6 +24,12 @@ export default defineNuxtConfig({
   },
 
   imports: {
-    dirs: ['stores', 'models'],
+    dirs: ['stores', 'models', 'config'],
+    presets: [
+      {
+        from: 'vue-i18n',
+        imports: ['useI18n'],
+      },
+    ],
   },
 });

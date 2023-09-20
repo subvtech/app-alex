@@ -1,14 +1,13 @@
 <template>
-  <div id="orRow" class="mb-10">
+  <div id="orRow" class="d-flex mb-10">
     <div class="orLine"></div>
-    <div id="orText">{{ $t('components.sendResetPassword.divider') }}</div>
+    <div id="orText">{{ $t('components.forgot.sendResetPassword.divider') }}</div>
     <div class="orLine"></div>
   </div>
 </template>
 
 <style>
 #orRow {
-  display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
