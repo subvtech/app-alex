@@ -20,7 +20,6 @@
                 : $t('components.profile.security.editEmail')
             "
           />
-
           <div class="options">
             <v-icon
               @click="editEmail = !editEmail"
@@ -82,7 +81,7 @@ const props = defineProps({
 
 const { email } = toRefs(props);
 
-const { handleSubmit } = useForm({
+const { handleSubmit, errors: emailErrors } = useForm({
   validationSchema: emailRules,
   keepValuesOnUnmount: true,
 });
