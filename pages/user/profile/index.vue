@@ -366,19 +366,22 @@ async function uploadCoverPicture(event: any) {
         margin-left: 170px;
         transition: all ease-in-out 1s;
 
-        .fullname {
-          color: #001529;
-          font-size: 24px;
-          font-style: normal;
-          font-weight: bold;
-          line-height: 28px;
-        }
+        .d-flex {
+          gap: 8px;
+          .fullname {
+            color: #001529;
+            font-size: 24px;
+            font-style: normal;
+            font-weight: bold;
+            line-height: 28px;
+          }
 
-        .social {
-          color: #abb2b9;
-          font-size: 24px;
-          font-weight: 400;
-          line-height: 28px;
+          .social {
+            color: #abb2b9;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 28px;
+          }
         }
 
         .role {
@@ -395,7 +398,6 @@ async function uploadCoverPicture(event: any) {
       img {
         width: 100%;
         height: auto;
-        max-width: 100%;
         max-height: 300px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
@@ -403,19 +405,19 @@ async function uploadCoverPicture(event: any) {
 
       .btn {
         position: absolute;
-        min-width: 150px;
-        width: 13.7vw;
+        width: 153px;
         bottom: 24px;
         right: 20px;
         border-radius: 8px;
         border: none;
         color: #6e7a87;
-        height: 5vh;
+        height: 44px;
         background-color: #ebedef;
         text-transform: none !important;
 
         p {
-          margin-left: 0.5vw;
+          font-size: 14px;
+          margin-left: 8px;
           letter-spacing: 0.56px;
         }
       }
@@ -424,7 +426,6 @@ async function uploadCoverPicture(event: any) {
       border-top: 1px solid #eaeef1;
       gap: 24px;
       padding-inline: 24px;
-      margin-top: 18px;
       transition: all ease-in-out 1s;
       align-items: center;
 
@@ -453,6 +454,55 @@ async function uploadCoverPicture(event: any) {
     flex-direction: row;
   }
 
+  
+
+  @media (max-width: 1200px) {
+    .user-block {
+      .card {
+        margin-top: -2px;
+        .photo {
+          bottom: 15px;
+          .avatar {
+            img {
+              max-width: 120px;
+              max-height: 120px;
+            }
+          }
+          .img-upload {
+            bottom: 15px;
+            width: 24px;
+            height: 24px;
+          }
+        }
+
+        .info {
+          margin-left: 130px;
+          margin-block: 11px;
+          .d-flex {
+            gap: 8px;
+            .fullname {
+              color: #001529;
+              font-size: 20px;
+              font-style: normal;
+              font-weight: bold;
+              line-height: 28px;
+            }
+
+            .social {
+              color: #abb2b9;
+              font-size: 20px;
+              font-weight: 400;
+              line-height: 28px;
+            }
+          }
+          .role {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
   @media (max-width: 800px) {
     .content-block {
       flex-wrap: wrap;
@@ -477,10 +527,6 @@ async function uploadCoverPicture(event: any) {
           min-width: 100px;
         }
 
-        .icon {
-          display: none;
-        }
-
         p {
           font-size: 12px;
         }
@@ -488,30 +534,22 @@ async function uploadCoverPicture(event: any) {
 
       .card {
         .info {
-          margin-left: 125px;
-          :first-child {
-            gap: 8px;
-            flex-direction: column-reverse;
-          }
+          margin-left: 105px;
         }
         .photo {
-          max-width: 120px;
-          max-height: 120px;
-          bottom: 40px;
+          bottom: 20px;
           .avatar {
             img {
-              max-width: 100%;
-              max-height: 100%;
-
-              margin-top: 0px;
+              max-width: 100px;
+              max-height: 100px;
             }
           }
           .img-upload {
             right: 0px;
             bottom: 20px;
 
-            width: 28px;
-            height: 28px;
+            width: 20px;
+            height: 20px;
           }
         }
       }
@@ -522,6 +560,15 @@ async function uploadCoverPicture(event: any) {
         }
       }
     }
+    @media (max-height: 740px) {
+    .user-block {
+      .cover-block {
+        .btn {
+          height: 33px;
+        }
+      }
+    }
+  }
   }
 
   @media (max-width: 608px) {
@@ -542,16 +589,12 @@ async function uploadCoverPicture(event: any) {
     .user-block {
       .card {
         .info {
-          width: 100%;
-          margin-left: 0px;
-
           justify-content: space-between;
-          flex-direction: row;
+          flex-direction: column;
 
-          :first-child {
-            flex-direction: column;
+          .d-flex {
             gap: 0px;
-            margin-top: 10px;
+            flex-direction: column;
           }
 
           .fullname {
@@ -569,30 +612,27 @@ async function uploadCoverPicture(event: any) {
             line-height: 28px;
           }
         }
-        .photo {
-          bottom: 70px;
-          .avatar {
-            img {
-              max-width: 100%;
-              max-height: 100%;
-
-              margin-top: 0px;
-            }
-          }
-          .img-upload {
-            right: 0px;
-            bottom: 20px;
-
-            width: 24px;
-            height: 24px;
-          }
-        }
       }
     }
   }
 
-  @media (max-width: 349px) {
+  @media (max-width: 400px) {
     .user-block {
+      .cover-block {
+       
+        .icon {
+          display: none;
+        }
+        .btn {
+          right: 10px;
+          padding-inline: 2px;        
+          width: 110px;
+          justify-content: center;
+          p {
+            margin: 0px;
+          }
+        }
+      }
       .card {
         .info {
           width: 100%;
@@ -613,6 +653,7 @@ async function uploadCoverPicture(event: any) {
             font-style: normal;
             font-weight: bold;
             line-height: 28px;
+            min-width: 172px;
           }
 
           .social {
@@ -623,22 +664,7 @@ async function uploadCoverPicture(event: any) {
           }
         }
         .photo {
-          bottom: 100px;
-          .avatar {
-            img {
-              max-width: 90%;
-              max-height: 90%;
-
-              margin-top: 0px;
-            }
-          }
-          .img-upload {
-            right: 15px;
-            bottom: 10px;
-
-            width: 24px;
-            height: 24px;
-          }
+          bottom: 70px;
         }
       }
     }

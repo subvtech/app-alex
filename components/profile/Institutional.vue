@@ -18,6 +18,15 @@
         }}</v-btn
       >
 
+      <v-btn
+        v-if="canEdit"
+        class="small"
+        color="accent"
+        :icon="isAddingInstitution ? 'mdi-check-bold' : 'mdi-plus'"
+        @click="showSearch"
+        variant="outlined"
+      />
+
       <alex-inputs-institutions
         v-if="isAddingInstitution"
         v-model:institutions="searchInstitutions"
@@ -152,6 +161,15 @@ const removeInstitution = async (index) => {
   font-size: 14px;
   border-radius: 8px;
 }
+.small {
+  display: none;
+  position: absolute;
+  width: auto;
+  height: auto;
+  top: 20px;
+  right: 10px;
+  padding: 4px;
+}
 .items {
   gap: 24px;
   .item {
@@ -204,6 +222,16 @@ const removeInstitution = async (index) => {
         display: none;
       }
     }
+  }
+}
+
+@media (max-width: 400px) {
+  .btn {
+    display: none;
+  }
+
+  .small {
+    display: block;
   }
 }
 </style>
