@@ -7,7 +7,7 @@
   </v-avatar>
 </template>
 <script setup lang="ts">
-import { User } from 'models/user.model';
+import { User } from '@/models/user.model';
 const { fetchUser } = useStrapiAuth();
 const user = await fetchUser();
 

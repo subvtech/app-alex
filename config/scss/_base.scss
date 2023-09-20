@@ -27,3 +27,10 @@ input[type='password']::-webkit-credentials-auto-fill-button {
   display: none !important;
   pointer-events: none;
 }
+
+
+// v-btn
+.v-btn--icon.v-btn--density-default {
+  height: 44px !important;
+  width: 44px !important;
+}
