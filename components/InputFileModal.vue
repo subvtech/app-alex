@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="1024">
+  <v-dialog v-model="dialog" width="1024" persistent>
     <v-card class="pa-3">
       <v-card-title class="d-flex justify-space-between px-3">
         <span class="text-h5 font-weight-bold">Adicione Novos Slides</span>
@@ -43,26 +43,56 @@
           </v-col>
           <v-col cols="12" class="px-0">
             <v-text-field
-              placeholder="Insira o link"
               v-model="urlInput"
+              placeholder="Insira o link"
               variant="solo"
+              :error-messages="errors"
             >
-              <template v-slot:append-inner>
+              <template #append-inner>
                 <v-btn
                   icon="mdi-plus"
                   variant="text"
+                  type="submit"
                   @click="addUrl(urlInput)"
                 ></v-btn>
               </template>
             </v-text-field>
           </v-col>
-          <v-col cols="12" class="px-0">
-            <v-list v-if="slides.length > 0">
-              <p class="text-primary text-h6 font-weight-bold">Slides</p>
-              <!-- <v-list-item v-for="slide in slides" :key="slide"></v-list-item> -->
-              <v-list-item>
-                <span>Arquivos Carregados {{ slides.length }}</span>
-                <v-icon icon="mdi-file-multiple" color="accent" />
+          <v-col v-if="slides.length > 0" cols="12" class="px-0">
+            <p class="text-primary text-h6 font-weight-bold">Slides</p>
+            <v-list style="max-height: 250px">
+              <v-list-item v-for="(slide, i) in slides" :key="slide">
+                {{ i + 1 }} -
+                <v-icon class="mr-2">
+                  {{
+                    typeof slide === 'string'
+                      ? slide.startsWith('https://www.youtube.com') ||
+                        slide.startsWith('https://vimeo.com/')
+                        ? 'mdi-play-box'
+                        : 'mdi-image'
+                      : slide.type.includes('video')
+                      ? 'mdi-play-box'
+                      : 'mdi-image'
+                  }}</v-icon
+                >
+                <span>
+                  {{
+                    typeof slide == 'string'
+                      ? slide.startsWith('https://www.youtube.com')
+                        ? 'Youtube Video'
+                        : slide.startsWith('https://vimeo.com/')
+                        ? 'Vimeo Video'
+                        : 'Image URL'
+                      : slide.name
+                  }}
+                </span>
+                <template #append>
+                  <v-btn
+                    icon="mdi-close"
+                    variant="text"
+                    @click="removeSlide(i)"
+                  ></v-btn>
+                </template>
               </v-list-item>
             </v-list>
           </v-col>
@@ -71,15 +101,14 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          class="font-weight-bold"
-          elevation="1"
+          class="font-weight-bold text-grey"
+          variant="text"
           size="large"
           @click="dialog = false"
         >
-          Fechar
+          Cancelar
         </v-btn>
         <v-btn
-          elevation="10"
           class="bg-accent font-weight-bold"
           size="large"
           @click="upload()"
@@ -92,6 +121,8 @@
 </template>
 <script setup>
 import { ref } from 'vue';
+const messageStore = useMessageStore();
+
 const urlInput = ref('');
 const slides = ref([]);
 const dialog = ref(false);
@@ -110,6 +141,8 @@ const upload = () => {
 };
 
 const openModal = () => {
+  urlInput.value = '';
+  slides.value = [];
   dialog.value = true;
 };
 
@@ -124,13 +157,31 @@ const addSlides = (files) => {
     return slides.value.push(f);
   });
 };
+
 const addUrl = (url) => {
-  if (!url) return;
-  return slides.value.push(url);
+  if (url === '') return;
+  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com)\/.+/;
+  const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com)\/.+/;
+  const imageRegex =
+    /\.(jpg|jpeg|png|gif|bmp|svg|webp)|\/(jpg|jpeg|png|gif|bmp|svg|webp)/i;
+  if (!imageRegex.test(url)) {
+    if (!youtubeRegex.test(url) && !vimeoRegex.test(url)) {
+      messageStore.message = 'URL inválida';
+      messageStore.color = 'red';
+      messageStore.show = true;
+      return;
+    }
+  }
+  slides.value.push(url);
+  urlInput.value = '';
+};
+
+const removeSlide = (index) => {
+  slides.value.splice(index, 1);
 };
 </script>
 
-<style>
+<style scoped>
 #orRow {
   display: flex;
   justify-content: center;

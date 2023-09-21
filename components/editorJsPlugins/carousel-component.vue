@@ -9,7 +9,6 @@
     :touchable="false"
     :autoplay="false"
     style="z-index: 0"
-    :alwaysRefreshClones="true"
   >
     <vueper-slide v-if="editMode" class="rounded">
       <template #content>
@@ -27,19 +26,41 @@
     </vueper-slide>
 
     <vueper-slide
-      v-for="slide in slides"
+      v-for="(slide, i) in slides"
       :key="slide"
-      class="rounded"
-      :image="!slide.video ? uploadBaseUrl + slide.image : null"
+      :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
+      :image="
+        slide.type.includes('File') ? uploadBaseUrl + slide.image : slide.image
+      "
     >
       <template #content>
         <video-player
-          v-if="slide.video"
+          v-if="slide.type.includes('File') && slide.video"
           class="w-100 fill-height video-js"
           controls
-          :videoUrl="uploadBaseUrl + slide.video"
-          :data-poster="uploadBaseUrl + slide.image"
+          :options="{
+            poster: uploadBaseUrl + slide.image,
+            sources: [
+              {
+                src: uploadBaseUrl + slide.video,
+                type: 'video/mp4',
+              },
+            ],
+          }"
           data-setup="{}"
+        ></video-player>
+        <video-player
+          v-else-if="
+            slide.type.includes('youtube') || slide.type.includes('vimeo')
+          "
+          class="w-100 fill-height video-js"
+          controls
+          :data-setup="
+            JSON.stringify({
+              techOrder: [slide.type],
+              sources: [{ src: slide.video, type: `video/${slide.type}` }],
+            })
+          "
         ></video-player>
       </template>
     </vueper-slide>
@@ -67,7 +88,10 @@
       $refs.vueperslides1 &&
         $refs.vueperslides1.goToSlide($event.currentSlide.index, {
           emit: false,
-        })
+        }),
+        (activeSlide = editMode
+          ? $event.currentSlide.index - 1
+          : $event.currentSlide.index)
     "
   >
     <template #arrow-left>
@@ -89,16 +113,12 @@
       </template>
     </vueper-slide>
     <vueper-slide
-      v-for="slide in slides"
+      v-for="(slide, i) in slides"
       :key="slide"
-      :image="uploadBaseUrl + slide.image"
-      :class="
-        'bg-blue-grey-lighten-4 rounded' +
-        ($refs.vueperslides2 &&
-        $refs.vueperslides2.currentSlide.index === slides.indexOf(slide)
-          ? ' vueperslide-active'
-          : '')
+      :image="
+        slide.type.includes('File') ? uploadBaseUrl + slide.image : slide.image
       "
+      :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
       @click="
         $refs.vueperslides2 &&
           $refs.vueperslides2.goToSlide(
@@ -212,52 +232,91 @@ export default defineComponent({
         return {
           name: file.name,
           image: res.url.url,
+          type: 'FileImage',
         };
       } else {
         return {
           name: file.name,
           video: res.url.url,
           image: res.thumbnail.thumbnail,
+          type: 'FileVideo',
         };
       }
     }
     // eslint-disable-next-line vue/no-setup-props-destructure
     const editMode = ref(!props.readOnly);
     const dialog = ref(null);
+    const activeSlide = ref(0);
     const openAddSlidesDialog = () => {
       dialog.value.openModal();
     };
     // eslint-disable-next-line vue/no-setup-props-destructure
     const slides = ref([...props.slides]);
     const deleteSlide = (item) => {
-      props.onDeletedSlide(item);
+      if (item.type.includes('File')) {
+        props.onDeletedSlide(item);
+      }
       slides.value.splice(slides.value.indexOf(item), 1);
       props.onUpdateSlides(slides.value);
     };
-    const addSlide = async (file, index) => {
-      const filesArray = [...file];
-      for (const f of filesArray) {
-        const files = [f];
-        if (f.type.includes('video')) {
-          await captureVideoFrame(f).then((res) => {
-            files.push(res);
-          });
-        }
-        try {
-          const res = await props.onSelectFile(files);
-          index === -1
-            ? slides.value.push(newSlide(f, res))
-            : slides.value.splice(index, 1, newSlide(f, res));
-          props.onUpdateSlides(slides.value);
-        } catch (error) {
-          console.log(error);
+
+    const addSlide = async (slide, index) => {
+      const slidesArray = [...slide];
+      for (const s of slidesArray) {
+        if (typeof s === 'string') {
+          addSlideByUrl(s, index);
+        } else {
+          await addSlideByFile(s, index);
         }
       }
     };
-    const editSlide = (slide, file) => {
+
+    const addSlideByFile = async (f, index) => {
+      const files = [f];
+      if (f.type.includes('video')) {
+        await captureVideoFrame(f).then((res) => {
+          files.push(res);
+        });
+      }
+      try {
+        const res = await props.onSelectFile(files);
+        index === -1
+          ? slides.value.push(newSlide(f, res))
+          : slides.value.splice(index, 1, newSlide(f, res));
+        props.onUpdateSlides(slides.value);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const addSlideByUrl = (url) => {
+      if (
+        url.startsWith('https://www.youtube.com') ||
+        url.startsWith('https://vimeo.com/')
+      ) {
+        slides.value.push({
+          name: url,
+          video: url,
+          image: url.includes('www.youtube')
+            ? `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`
+            : `https://vumbnail.com/${url.split('vimeo.com/')[1]}.jpg`,
+          type: url.includes('www.youtube') ? 'youtube' : 'vimeo',
+        });
+      } else {
+        slides.value.push({
+          name: url,
+          image: url,
+          type: 'UrlImage',
+        });
+      }
+      props.onUpdateSlides(slides.value);
+    };
+
+    const editSlide = async (slide, file) => {
+      const f = file.target.files[0];
       const index = slides.value.indexOf(slide);
+      await addSlideByFile(f, index);
       props.onDeletedSlide(slide);
-      addSlide(file, index);
     };
 
     return {
@@ -269,6 +328,7 @@ export default defineComponent({
       editSlide,
       dialog,
       openAddSlidesDialog,
+      activeSlide,
     };
   },
 });
@@ -299,9 +359,8 @@ export default defineComponent({
   transition: all 1s;
 }
 
-.vueperslide--active {
+.vueperslide-active {
   opacity: 1;
-  border-color: #000;
   transform: scale(1);
 }
 

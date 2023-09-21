@@ -80,6 +80,7 @@ class CarouselBlock {
       },
     });
     app.use(vuetify);
+    app.use(i18n);
     app.use(VuePlyr, {
       plyr: {},
     });

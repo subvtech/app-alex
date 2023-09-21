@@ -30,7 +30,7 @@
     "nuxt-vitest": "^0.10.4",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6",
-    "video.js": "^8.5.2",
+    "video.js": "^7.21.5",
     "vitest": "0.33.0"
   },
   "dependencies": {
@@ -76,6 +76,8 @@
     "strapi-sdk-js": "^2.2.0",
     "v-viewer": "^1.6.4",
     "vee-validate": "^4.11.1",
+    "videojs-vimeo-tech": "^1.0.0",
+    "videojs-youtube": "^3.0.1",
     "vue-i18n": "^9.2.2",
     "vue-plyr": "^7.0.0",
     "vue-prism-component": "^2.0.0",
