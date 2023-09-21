@@ -375,15 +375,4 @@ export default defineComponent({
     left: 70%;
   }
 }
-
-.vjs-sublime-skin .vjs-fullscreen-control {
-  border: 3px solid #fff;
-  box-sizing: border-box;
-  cursor: pointer;
-  margin-top: -7px;
-  top: 50%;
-  height: 14px;
-  width: 22px;
-  margin-right: 10px;
-}
 </style>
