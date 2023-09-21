@@ -1,17 +1,13 @@
 <template>
-    <v-btn
+    <v-btn-secondary
       v-if="!hasCustomBtn"
       :icon="active.icon"
       :value="active.value"
       @click="onClick"
-      rounded="lg"
-      color="gray-blue"
-      density="comfortable"
-      flat
     />
     <slot
       v-else
-     :icon="active.icon"
+      :icon="active.icon"
       :value="active.value"
       :click="onClick"
     >
