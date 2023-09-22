@@ -1,30 +1,3 @@
-/*@font-face {*/
-/*  font-family: 'Fira Code';*/
-/*  font-style: normal;*/
-/*  font-weight: 400;*/
-/*  font-display: swap;*/
-/*  src: url('~assets/fonts/FiraCode-Regular.ttf') format('truetype');*/
-/*}*/
-
-@use 'vuetify' with (
-  $body-font-family: 'Montserrat'
-);
-@font-face {
-  font-family: 'Sen';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/Sen-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Sen';
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/Sen-Bold.ttf') format('truetype');
-}
-
-/* stylelint-enable */
 label.theme--dark + input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -53,4 +26,11 @@ input[type='password']::-webkit-credentials-auto-fill-button {
   visibility: hidden;
   display: none !important;
   pointer-events: none;
+}
+
+
+// v-btn
+.v-btn--icon.v-btn--density-default {
+  height: 44px !important;
+  width: 44px !important;
 }

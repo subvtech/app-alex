@@ -17,11 +17,11 @@
       <v-dialog v-model="visible" width="500">
         <v-card>
           <v-card-title class="primary text-white">
-            {{ $t('components.page.close') }}
+            {{ $t('components.learningPlan.page.close') }}
           </v-card-title>
 
           <v-card-text class="mt-5">
-            {{ $t('components.page.warning') }}
+            {{ $t('components.learningPlan.page.warning') }}
           </v-card-text>
 
           <v-divider></v-divider>
@@ -30,7 +30,7 @@
             <v-spacer></v-spacer>
             <v-btn @click="cancelLeaveAction"> Cancelar </v-btn>
             <v-btn color="primary" @click="confirmLeaveAction">
-              {{ $t('components.page.confirm') }}
+              {{ $t('components.learningPlan.page.confirm') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { LearningPlan } from 'models/learningPlan.model';
+import { LearningPlan } from '~/models/learningPlan.model';
 
 const emit = defineEmits(['updated']);
 
