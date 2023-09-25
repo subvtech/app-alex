@@ -2,7 +2,7 @@
   <vueper-slides
     ref="vueperslides1"
     class="no-shadow mb-3 rounded"
-    :slide-ratio="1 / 2"
+    :slide-ratio="1 / 2.5"
     :bullets="false"
     :arrows="false"
     :dragging-distance="200"
@@ -38,6 +38,7 @@
           v-if="slide.type.includes('File') && slide.video"
           class="w-100 fill-height video-js"
           controls
+          :is-active="activeSlide == i"
           :options="{
             poster: uploadBaseUrl + slide.image,
             sources: [
@@ -55,6 +56,7 @@
           "
           class="w-100 fill-height video-js"
           controls
+          :is-active="activeSlide == i"
           :data-setup="
             JSON.stringify({
               techOrder: [slide.type],
@@ -68,7 +70,7 @@
   <vueper-slides
     ref="vueperslides2"
     class="no-shadow"
-    :visible-slides="slides.length > 4 ? 5 : slides.length + 1"
+    :visible-slides="slides.length > 4 ? 5.5 : slides.length + 1"
     :slide-multiple="false"
     :gap="1"
     :slide-ratio="1 / 4"
@@ -79,8 +81,8 @@
     :autoplay="false"
     disable-arrows-on-edges
     :breakpoints="{
-      900: { visibleSlides: slides.length < 1 ? 0 : 3 },
-      600: { fixedHeight: '110px', visibleSlides: slides.length < 1 ? 0 : 3 },
+      900: { visibleSlides: slides.length < 1 ? 0 : 3.5 },
+      600: { fixedHeight: '80px', visibleSlides: slides.length < 1 ? 0 : 3.5 },
     }"
     fixedHeight="120px"
     style="z-index: 0"
@@ -128,7 +130,7 @@
     >
       <template #content>
         <div v-if="editMode" class="ma-2">
-          <v-btn icon="mdi-pencil-outline" class="editBtn">
+          <v-btn icon="mdi-pencil-outline" variant="text">
             <v-icon
               size="x-small"
               icon="mdi-pencil-outline"
@@ -159,14 +161,43 @@
       </template>
     </vueper-slide>
   </vueper-slides>
-  <InputFileModal ref="dialog" @uploadFiles="(f) => addSlide(f, -1)" />
+  <AlexInputsFileModal ref="dialog" @uploadFiles="(f) => addSlide(f, -1)" />
 </template>
 
-<script>
+<script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
-import { ref, defineComponent } from 'vue';
+import { ref, defineProps } from 'vue';
 import VideoPlayer from './VideoJS.vue';
+import { useMessageStore } from '~/stores/message';
+const messageStore = useMessageStore();
+const props = defineProps({
+  slides: {
+    type: Array,
+    default: () => [],
+  },
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+  onUpdateSlides: {
+    type: Function,
+    default: () => {},
+  },
+  onSelectFile: {
+    type: Function,
+    default: () => {},
+  },
+  onDeletedSlide: {
+    type: Function,
+    default: () => {},
+  },
+  uploadBaseUrl: {
+    type: String,
+    default: '',
+  },
+});
+
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -197,141 +228,98 @@ const captureVideoFrame = (file) => {
     });
   });
 };
-export default defineComponent({
-  name: 'carousel-component',
-  components: { VueperSlides, VueperSlide, VideoPlayer },
-  props: {
-    slides: {
-      type: Array,
-      default: () => [],
-    },
-    onUpdateSlides: {
-      type: Function,
-      default: () => {},
-    },
-    onSelectFile: {
-      type: Function,
-      default: () => {},
-    },
-    onDeletedSlide: {
-      type: Function,
-      default: () => {},
-    },
-    readOnly: {
-      type: Boolean,
-      default: false,
-    },
-    uploadBaseUrl: {
-      type: String,
-      default: '',
-    },
-  },
-  setup(props) {
-    function newSlide(file, res) {
-      if (file.type.includes('image')) {
-        return {
-          name: file.name,
-          image: res.url.url,
-          type: 'FileImage',
-        };
-      } else {
-        return {
-          name: file.name,
-          video: res.url.url,
-          image: res.thumbnail.thumbnail,
-          type: 'FileVideo',
-        };
-      }
-    }
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    const editMode = ref(!props.readOnly);
-    const dialog = ref(null);
-    const activeSlide = ref(0);
-    const openAddSlidesDialog = () => {
-      dialog.value.openModal();
-    };
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    const slides = ref([...props.slides]);
-    const deleteSlide = (item) => {
-      if (item.type.includes('File')) {
-        props.onDeletedSlide(item);
-      }
-      slides.value.splice(slides.value.indexOf(item), 1);
-      props.onUpdateSlides(slides.value);
-    };
 
-    const addSlide = async (slide, index) => {
-      const slidesArray = [...slide];
-      for (const s of slidesArray) {
-        if (typeof s === 'string') {
-          addSlideByUrl(s, index);
-        } else {
-          await addSlideByFile(s, index);
-        }
-      }
-    };
-
-    const addSlideByFile = async (f, index) => {
-      const files = [f];
-      if (f.type.includes('video')) {
-        await captureVideoFrame(f).then((res) => {
-          files.push(res);
-        });
-      }
-      try {
-        const res = await props.onSelectFile(files);
-        index === -1
-          ? slides.value.push(newSlide(f, res))
-          : slides.value.splice(index, 1, newSlide(f, res));
-        props.onUpdateSlides(slides.value);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const addSlideByUrl = (url) => {
-      if (
-        url.startsWith('https://www.youtube.com') ||
-        url.startsWith('https://vimeo.com/')
-      ) {
-        slides.value.push({
-          name: url,
-          video: url,
-          image: url.includes('www.youtube')
-            ? `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`
-            : `https://vumbnail.com/${url.split('vimeo.com/')[1]}.jpg`,
-          type: url.includes('www.youtube') ? 'youtube' : 'vimeo',
-        });
-      } else {
-        slides.value.push({
-          name: url,
-          image: url,
-          type: 'UrlImage',
-        });
-      }
-      props.onUpdateSlides(slides.value);
-    };
-
-    const editSlide = async (slide, file) => {
-      const f = file.target.files[0];
-      const index = slides.value.indexOf(slide);
-      await addSlideByFile(f, index);
-      props.onDeletedSlide(slide);
-    };
-
+function newSlide(file, res) {
+  if (file.type.includes('image')) {
     return {
-      // eslint-disable-next-line vue/no-dupe-keys
-      slides,
-      editMode,
-      deleteSlide,
-      addSlide,
-      editSlide,
-      dialog,
-      openAddSlidesDialog,
-      activeSlide,
+      name: file.name,
+      image: res.url.url,
+      type: 'FileImage',
     };
-  },
-});
+  } else {
+    return {
+      name: file.name,
+      video: res.url.url,
+      image: res.thumbnail.thumbnail,
+      type: 'FileVideo',
+    };
+  }
+}
+// eslint-disable-next-line vue/no-setup-props-destructure
+const editMode = ref(!props.readOnly);
+const dialog = ref(null);
+const activeSlide = ref(0);
+const openAddSlidesDialog = () => {
+  dialog.value.openModal();
+};
+// eslint-disable-next-line vue/no-setup-props-destructure
+const slides = ref([...props.slides]);
+const deleteSlide = (item) => {
+  if (item.type.includes('File')) {
+    props.onDeletedSlide(item);
+  }
+  slides.value.splice(slides.value.indexOf(item), 1);
+  props.onUpdateSlides(slides.value);
+};
+
+const addSlide = async (slide, index) => {
+  const slidesArray = [...slide];
+  for (const s of slidesArray) {
+    if (typeof s === 'string') {
+      addSlideByUrl(s, index);
+    } else {
+      await addSlideByFile(s, index);
+    }
+  }
+};
+
+const addSlideByFile = async (f, index) => {
+  const files = [f];
+  if (f.type.includes('video')) {
+    await captureVideoFrame(f).then((res) => {
+      files.push(res);
+    });
+  }
+  try {
+    const res = await props.onSelectFile(files);
+    index === -1
+      ? slides.value.push(newSlide(f, res))
+      : slides.value.splice(index, 1, newSlide(f, res));
+    props.onUpdateSlides(slides.value);
+  } catch (error) {
+    messageStore.message = error;
+  }
+};
+
+const addSlideByUrl = (url) => {
+  if (
+    url.startsWith('https://www.youtube.com') ||
+    url.startsWith('https://vimeo.com/')
+  ) {
+    slides.value.push({
+      name: url,
+      video: url,
+      image: url.includes('www.youtube')
+        ? `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`
+        : `https://vumbnail.com/${url.split('vimeo.com/')[1]}.jpg`,
+      type: url.includes('www.youtube') ? 'youtube' : 'vimeo',
+    });
+  } else {
+    slides.value.push({
+      name: url,
+      image: url,
+      type: 'UrlImage',
+    });
+  }
+  props.onUpdateSlides(slides.value);
+};
+
+const editSlide = async (slide, file) => {
+  const f = file.target.files[0];
+  const index = slides.value.indexOf(slide);
+  await addSlideByFile(f, index);
+  props.onDeletedSlide(slide);
+};
 </script>
 
 <style scoped>
@@ -369,6 +357,7 @@ export default defineComponent({
   top: 75%;
   left: 80%;
   transform: translate(-50%, -50%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 @media (max-width: 800px) {
   .video-play-icon {

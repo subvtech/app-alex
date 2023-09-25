@@ -3,7 +3,12 @@
     <v-card class="pa-3">
       <v-card-title class="d-flex justify-space-between px-3">
         <span class="text-h5 font-weight-bold">Adicione Novos Slides</span>
-        <v-btn variant="text" icon="mdi-close" @click="dialog = false" />
+        <v-btn
+          variant="text"
+          icon="mdi-close"
+          color="black"
+          @click="dialog = false"
+        />
       </v-card-title>
       <v-card-text>
         <v-row
@@ -47,12 +52,14 @@
               placeholder="Insira o link"
               variant="solo"
               :error-messages="errors"
+              @keydown.enter="addUrl(urlInput)"
             >
               <template #append-inner>
                 <v-btn
                   icon="mdi-plus"
                   variant="text"
                   type="submit"
+                  color="black"
                   @click="addUrl(urlInput)"
                 ></v-btn>
               </template>
@@ -67,7 +74,8 @@
                   {{
                     typeof slide === 'string'
                       ? slide.startsWith('https://www.youtube.com') ||
-                        slide.startsWith('https://vimeo.com/')
+                        slide.startsWith('https://vimeo.com/') ||
+                        slide.startsWith('https://youtu.be')
                         ? 'mdi-play-box'
                         : 'mdi-image'
                       : slide.type.includes('video')
@@ -78,7 +86,8 @@
                 <span>
                   {{
                     typeof slide == 'string'
-                      ? slide.startsWith('https://www.youtube.com')
+                      ? slide.startsWith('https://www.youtube.com') ||
+                        slide.startsWith('https://youtu.be')
                         ? 'Youtube Video'
                         : slide.startsWith('https://vimeo.com/')
                         ? 'Vimeo Video'
@@ -90,6 +99,7 @@
                   <v-btn
                     icon="mdi-close"
                     variant="text"
+                    color="black"
                     @click="removeSlide(i)"
                   ></v-btn>
                 </template>
@@ -104,6 +114,7 @@
           class="font-weight-bold text-grey"
           variant="text"
           size="large"
+          color="grey"
           @click="dialog = false"
         >
           Cancelar
@@ -111,6 +122,7 @@
         <v-btn
           class="bg-accent font-weight-bold"
           size="large"
+          color="white"
           @click="upload()"
         >
           Salvar
@@ -160,7 +172,8 @@ const addSlides = (files) => {
 
 const addUrl = (url) => {
   if (url === '') return;
-  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com)\/.+/;
+  // const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com)\/.+/;
+  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+/;
   const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com)\/.+/;
   const imageRegex =
     /\.(jpg|jpeg|png|gif|bmp|svg|webp)|\/(jpg|jpeg|png|gif|bmp|svg|webp)/i;

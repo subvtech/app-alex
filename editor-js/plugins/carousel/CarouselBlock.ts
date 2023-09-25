@@ -1,46 +1,28 @@
 import { createApp } from 'vue';
 import { createVuetify } from 'vuetify';
+import { mdi } from 'vuetify/iconsets/mdi';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-import VuePlyr from 'vue-plyr';
-import 'vue-plyr/dist/vue-plyr.css';
-import CarouselComponent from './carousel-component.vue';
+import { alexIcons } from 'assets/icons';
+import Carousel from './Carousel.vue';
 
 const vuetify = createVuetify({
-  defaults: {
-    VTextField: {
-      variant: 'outlined',
-      rounded: 'lg',
-    },
-  },
+  aliases,
   components,
   directives,
+  defaults,
   theme: {
-    defaultTheme: 'light',
+    defaultTheme: MAIN_THEME,
     themes: {
-      light: {
-        dark: false,
-        colors: {
-          primary: '#001529',
-          accent: '#00B8CC',
-          secondary: '#F1F5F9',
-          info: '#26A69A',
-          warning: '#FFC107',
-          error: '#FF5252',
-          success: '#38C976',
-        },
-      },
-      dark: {
-        dark: true,
-        colors: {
-          primary: '#F1F5F9',
-          accent: '#00B8CC',
-          secondary: '#001529',
-          warning: '#FCC132',
-          error: '#FF5252',
-          success: '#38C976',
-        },
-      },
+      mainTheme,
+      mainDarkTheme,
+    },
+  },
+  icons: {
+    defaultSet: 'mdi',
+    sets: {
+      mdi,
+      alex: alexIcons,
     },
   },
 });
@@ -61,7 +43,7 @@ class CarouselBlock {
 
   render() {
     this.wrapper = document.createElement('div');
-    const app = createApp(CarouselComponent, {
+    const app = createApp(Carousel, {
       slides: this.data.slides,
       readOnly: this.readOnly,
       uploadBaseUrl: this.config.uploadBaseUrl,
@@ -69,11 +51,7 @@ class CarouselBlock {
         this.data.slides = slides;
       },
       onSelectFile: async (file) => {
-        try {
-          return await this.config.handleFileSelected(file);
-        } catch (e) {
-          console.error(e);
-        }
+        return await this.config.handleFileSelected(file);
       },
       onDeletedSlide: (id) => {
         this.config.handleDeletedFiles(id);
@@ -81,9 +59,6 @@ class CarouselBlock {
     });
     app.use(vuetify);
     app.use(i18n);
-    app.use(VuePlyr, {
-      plyr: {},
-    });
     app.mount(this.wrapper);
 
     return this.wrapper;

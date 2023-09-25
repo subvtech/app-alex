@@ -10,40 +10,35 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue';
+<script setup>
+import { ref, onMounted, defineProps } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import 'videojs-vimeo-tech';
 import 'videojs-youtube';
 
-
-export default {
-  name: 'VideoPlayer',
-  props: {
-    options: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    dataSetup: {
-      type: Object,
-      default() {
-        return {};
-      },
+const props = defineProps({
+  options: {
+    type: Object,
+    default() {
+      return {};
     },
   },
-  setup(props) {
-    const videoPlayer = ref(null);
-    onMounted(() => {
-      videoPlayer.value = videojs(videoPlayer.value, props.options);
-    });
-    return {
-      videoPlayer,
-    };
+  dataSetup: {
+    type: Object,
+    default() {
+      return {};
+    },
   },
-};
+  isActive: {
+    type: Boolean,
+    default: false,
+  },
+});
+const videoPlayer = ref(null);
+onMounted(() => {
+  videoPlayer.value = videojs(videoPlayer.value, props.options);
+});
 </script>
 
 <style>

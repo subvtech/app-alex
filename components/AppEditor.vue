@@ -27,11 +27,11 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from 'models/structure.model';
-import Carousel from '../components/editorJsPlugins/CarouselBlock.js';
+import { Structure } from 'models/structure.model'
+import { Upload } from 'models/upload.model';
+import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
-import { Upload } from 'models/upload.model';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
@@ -308,6 +308,6 @@ onMounted(() => {
 .editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
   /* max-width: 64rem; */
-  max-width: 100%;
+  max-width: 95%;
 }
 </style>
