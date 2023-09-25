@@ -1,6 +1,7 @@
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
-import { ElementType, literalArray } from '@/helpers/utils';
+import { ElementType, literalArray } from '../utils';
+import { useImportLanguages } from './useImportedLanguages';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
@@ -56,21 +57,33 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'register',
     'planId',
     'reset',
+    'profile',
     'trailId',
     'forgot',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
     'articleViewer',
-    'editor',
-    'authors',
     'imagePreview',
-    'link',
-    'page',
-    'sendResetPassword',
     'tagCombobox',
     'usersAutocomplete',
-    'viewer',
+    'learningPlan/editor',
+    'learningPlan/authors',
+    'learningPlan/link',
+    'learningPlan/list',
+    'learningPlan/page',
+    'learningPlan/viewer',
+    'forgot/sendResetPassword',
+    'profile/about',
+    'profile/courses',
+    'profile/events',
+    'profile/general',
+    'profile/institutional',
+    'profile/projects',
+    'profile/security',
+    'profile/settings',
+    'profile/socials',
+    'profile/wallets',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

@@ -15,6 +15,18 @@
     "invalid": "Invalid CPF"
   },
 
+  "about": {
+    "required": "About is required",
+    "min": "At least 12 characters long",
+    "max": "At most 4000 characters long"
+  },
+
+  "phone": {
+    "required": "Phone is required",
+    "length": "Must be 11 characters long",
+    "invalid": "Invalid phone number"
+  },
+
   "yourRole": {
     "required": "User type is required"
   },
@@ -28,13 +40,25 @@
   },
   "password": {
     "required": "Password is required",
-    "upperCase": "It must have at least 2 upper case letters",
+    "upperCase": "It must have at least 1 upper case letter",
     "lowerCase": "It must have at least 1 lower case letter",
     "number": "It must have at least 1 number",
+    "character": "It must have at least 1 special character",
     "min": "At least 8 characters long"
   },
   "confirmPassword": {
     "required": "Confirm Password is required",
     "matchError": "The passwords do no match"
+  },
+
+  "name": {
+    "required": "Nome is required",
+    "min": "At least 3 characters long",
+    "max": "At most 20 characters long"
+  },
+  "url": {
+    "required": "Url is required",
+    "min": "At least 3 characters long",
+    "max": "At most 64 characters long"
   }
 }
