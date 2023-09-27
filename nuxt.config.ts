@@ -22,7 +22,6 @@ export default defineNuxtConfig({
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
-
   imports: {
     dirs: ['stores', 'models', 'config'],
     presets: [
