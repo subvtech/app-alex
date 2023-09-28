@@ -3,7 +3,7 @@
     <template v-slot:content>
       <div class="boxes d-flex pb-6">
         <div
-          class="box d-flex flex-column pa-4"
+          class="box d-flex pa-4"
           v-for="box in [
             {
               icon: 'mdi-bookmark-box-multiple-outline',
@@ -23,7 +23,7 @@
           ]"
         >
           <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
-          <div class="d-flex flex-column">
+          <div class="d-flex">
             <h6>{{ box.number }}</h6>
             <span>{{ box.label }}</span>
           </div>
@@ -49,39 +49,20 @@
         </div>
       </div>
       <div class="d-flex contacts pt-6 pb-4">
-        <div
-          class="d-flex align-center contact"
-          v-for="contact in [
-            {
-              title: 'WEBSITE',
-              text: 'lattes.cnpq.br',
-              icon: 'assets/svg/website.svg',
-            },
-            {
-              title: $t('components.profile.general.linkedin'),
-              text: '/jojo',
-              icon: 'assets/svg/linkedin.svg',
-            },
-            {
-              title: $t('components.profile.general.instagram'),
-              text: '@jojo',
-              icon: 'assets/svg/instagram.svg',
-            },
-            {
-              title: $t('components.profile.general.youtube'),
-              text: '@jojotube',
-              icon: 'assets/svg/youtube.svg',
-            },
-          ]"
-        >
+        <div class="d-flex align-center contact" v-for="contact in socials">
           <img
             class="icon"
-            :alt="contact.title"
-            :src="`/_nuxt/${contact.icon}`"
+            :alt="contact.name"
+            :src="strapiBaseUrl + contact.icon.url"
           />
+
           <div class="d-flex flex-column justify-center align-start field">
-            <p>{{ contact.title }}</p>
-            <span>{{ contact.text }}</span>
+            <p>{{ contact.name.toUpperCase() }}</p>
+            <a :href="contact.url" target="_blank">{{
+              contact.url.split('/').length > 2
+                ? contact.url.split('/')[3]
+                : contact.name
+            }}</a>
           </div>
         </div>
       </div>
@@ -91,6 +72,14 @@
 
 <script setup lang="ts">
 import { Mask } from 'maska';
+
+const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+type Social = {
+  name: string;
+  url: string;
+  shortened: string;
+  icon: any;
+};
 const props = defineProps({
   email: {
     type: String,
@@ -103,6 +92,11 @@ const props = defineProps({
   learningPlans: {
     type: Array,
     default: () => [],
+  },
+
+  socials: {
+    type: Array as PropType<Social[]>,
+    required: true,
   },
 });
 
@@ -119,6 +113,7 @@ const mask = new Mask({ mask: '(##) #####-####' });
   border-bottom: 1px solid #eaeef1;
 
   .box {
+    flex-direction: column;
     min-width: 90px;
     min-height: 90px;
     width: 33%;
@@ -128,16 +123,20 @@ const mask = new Mask({ mask: '(##) #####-####' });
     border: 1px solid #e1e4e7;
     background-color: #f1f5f9;
 
-    div h6 {
-      font-size: 24px;
-      color: #001529;
-    }
+    :last-child {
+      flex-direction: column;
 
-    div span {
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 22px;
-      color: #abb289;
+      h6 {
+        font-size: 24px;
+        color: #001529;
+      }
+
+      span {
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: #abb289;
+      }
     }
   }
 }
@@ -163,11 +162,40 @@ const mask = new Mask({ mask: '(##) #####-####' });
         font-weight: 400;
       }
 
-      span {
+      a {
+        cursor: pointer;
         color: #5d6872;
         font-size: 16px;
         font-weight: 400;
         line-height: 22px;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  .boxes {
+    flex-direction: column;
+    .box {
+      flex-direction: row;
+      width: 100%;
+
+      :last-child {
+        flex-direction: column-reverse;
+
+        p {
+          color: #abb2b9;
+          font-size: 14px;
+          font-weight: 400;
+        }
+
+        span {
+          color: #5d6872;
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 22px;
+        }
       }
     }
   }

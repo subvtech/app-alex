@@ -1,5 +1,8 @@
 <template>
-  <profile-card title="Institucional" :full-width="true">
+  <profile-card
+    :title="$t('components.profile.institutional.title')"
+    :full-width="true"
+  >
     <template v-slot:content>
       <v-btn
         v-if="canEdit"
@@ -15,6 +18,15 @@
         }}</v-btn
       >
 
+      <v-btn
+        v-if="canEdit"
+        class="small"
+        color="accent"
+        :icon="isAddingInstitution ? 'mdi-check-bold' : 'mdi-plus'"
+        @click="showSearch"
+        variant="outlined"
+      />
+
       <alex-inputs-institutions
         v-if="isAddingInstitution"
         v-model:institutions="searchInstitutions"
@@ -25,24 +37,26 @@
       />
       <div class="d-flex flex-wrap items">
         <div
-          class="d-flex pa-4 align-center item"
+          class="d-flex pa-4 align-center justify-space-between w-100 item"
           v-for="(item, index) in institutions"
         >
-          <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
+          <div class="d-flex" style="gap: 12px">
+            <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
 
-          <div class="d-flex flex-column justify-center">
-            <span>{{ item.acronym + ' - ' + item.name }}</span>
-            <p>{{ item.sector }}</p>
+            <div class="d-flex flex-column justify-center">
+              <span>{{ item.acronym + ' - ' + item.name }}</span>
+              <p>{{ item.sector }}</p>
+            </div>
           </div>
-          <div v-if="canEdit" class="menu">
+          <div v-if="canEdit" class="options">
             <v-icon
-              @click="showDeleteButton = !showDeleteButton"
+              @click="updateShowDeleteButton(index)"
               color="#6E7A87"
               style="cursor: pointer"
               >mdi-dots-vertical</v-icon
             >
             <v-icon
-              v-if="showDeleteButton"
+              v-if="showDeleteButton.includes(index)"
               class="remove"
               @click="removeInstitution(item.id)"
               color="red"
@@ -58,8 +72,6 @@
 </template>
 
 <script setup lang="ts">
-const { find, update } = useStrapi();
-
 type Institution = {
   name: string;
   acronym: string;
@@ -69,12 +81,12 @@ type Institution = {
 };
 
 const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-const showDeleteButton = ref(false);
+const showDeleteButton = ref<number[]>([]);
 const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
 let selectedOption = ref(0);
 const search = ref('');
-
+const client = useStrapiClient();
 const emit = defineEmits(['update:user']);
 
 const props = defineProps({
@@ -97,25 +109,26 @@ const updateSelectedOption = (event) => {
   selectedOption.value = event;
 };
 
+const updateShowDeleteButton = (index: number) => {
+  showDeleteButton.value.includes(index)
+    ? showDeleteButton.value.splice(showDeleteButton.value.indexOf(index), 1)
+    : showDeleteButton.value.push(index);
+};
+
 const showSearch = async () => {
   if (isAddingInstitution.value && searchInstitutions.value) {
-    const temp = { ...searchInstitutions.value };
-   
     if (searchInstitutions.value.length > 0) {
       const list = institutions.value.map((item) => item.id);
 
       list.push(
         { ...{ ...searchInstitutions.value }[selectedOption.value] }.id,
       );
-      const data = { institutions: list };
-      const url = useStrapiUrl() + '/users/' + props.id;
-      const options = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data }),
-      };
 
-      await fetch(url, options);
+      await client(`/users/${props.id}`, {
+        method: 'PUT',
+        body: { institutions: list },
+      });
+
       emit('update:user', {});
     }
 
@@ -129,15 +142,11 @@ const removeInstitution = async (index) => {
   const list = institutions.value
     .map((item) => item.id)
     .filter((id) => id !== index);
-  const data = { institutions: list };
-  const url = useStrapiUrl() + '/users/' + props.id;
-  const options = {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data }),
-  };
 
-  await fetch(url, options);
+  await client(`/users/${props.id}`, {
+    method: 'PUT',
+    body: { institutions: list },
+  });
   emit('update:user', {});
 };
 </script>
@@ -152,10 +161,19 @@ const removeInstitution = async (index) => {
   font-size: 14px;
   border-radius: 8px;
 }
+.small {
+  display: none;
+  position: absolute;
+  width: auto;
+  height: auto;
+  top: 20px;
+  right: 10px;
+  padding: 4px;
+}
 .items {
   gap: 24px;
   .item {
-    gap: 12px;
+    position: relative;
     color: #5d6872;
     line-height: 22px;
 
@@ -177,17 +195,43 @@ const removeInstitution = async (index) => {
       border: 1px solid #eaeef1;
     }
 
-    .menu {
-      position: relative;
-
+    .options {
       .remove {
         cursor: pointer;
 
         position: absolute;
-        top: -38px;
-        left: 18px;
+        top: 10px;
+        right: 10px;
       }
     }
+  }
+  @media (max-width: 600px) {
+    .item {
+      span {
+        font-size: 18px;
+      }
+      p {
+        font-size: 14px;
+      }
+    }
+  }
+
+  @media (max-width: 349px) {
+    .item {
+      img {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .btn {
+    display: none;
+  }
+
+  .small {
+    display: block;
   }
 }
 </style>
