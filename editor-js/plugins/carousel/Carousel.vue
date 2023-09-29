@@ -2,7 +2,7 @@
   <vueper-slides
     ref="vueperslides1"
     class="no-shadow mb-3 rounded"
-    :slide-ratio="1 / 2.5"
+    :slide-ratio="2 / 4"
     :bullets="false"
     :arrows="false"
     :dragging-distance="200"
@@ -40,6 +40,7 @@
           controls
           :is-active="activeSlide == i"
           :options="{
+            playbackRates: [0.5, 1, 1.5, 2],
             poster: uploadBaseUrl + slide.image,
             sources: [
               {
@@ -56,11 +57,19 @@
           "
           class="w-100 fill-height video-js"
           controls
+          :options="{
+            playbackRates: [0.5, 1, 1.5, 2],
+          }"
           :is-active="activeSlide == i"
           :data-setup="
             JSON.stringify({
               techOrder: [slide.type],
-              sources: [{ src: slide.video, type: `video/${slide.type}` }],
+              sources: [
+                {
+                  src: slide.video,
+                  type: `video/${slide.type}`,
+                },
+              ],
             })
           "
         ></video-player>
@@ -97,10 +106,20 @@
     "
   >
     <template #arrow-left>
-      <v-icon color="white" size="60px" icon="mdi-chevron-left" />
+      <v-icon
+        color="white"
+        size="60px"
+        icon="mdi-chevron-left"
+        class="arrow-icon"
+      />
     </template>
     <template #arrow-right>
-      <v-icon color="white" size="60px" icon="mdi-chevron-right" />
+      <v-icon
+        color="white"
+        size="60px"
+        icon="mdi-chevron-right"
+        class="arrow-icon"
+      />
     </template>
     <vueper-slide v-if="editMode">
       <template #content>
@@ -148,7 +167,7 @@
           <V-icon
             size="x-small"
             icon="mdi-trash-can-outline"
-            class="pa-3 ml-2 bg-red-lighten-5 rounded-lg"
+            class="pa-3 bg-red-lighten-5 rounded-lg"
             color="red"
             @click="deleteSlide(slide)"
           />
@@ -161,14 +180,15 @@
       </template>
     </vueper-slide>
   </vueper-slides>
-  <AlexInputsFileModal ref="dialog" @uploadFiles="(f) => addSlide(f, -1)" />
+  <FileModal ref="dialog" @uploadFiles="(f) => addSlide(f, -1)" />
 </template>
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
-import { ref, defineProps } from 'vue';
+import { ref } from 'vue';
 import VideoPlayer from './VideoJS.vue';
+import FileModal from './FileModal.vue';
 import { useMessageStore } from '~/stores/message';
 const messageStore = useMessageStore();
 const props = defineProps({
@@ -332,10 +352,6 @@ const editSlide = async (slide, file) => {
   width: 24px;
   height: 24px;
 }
-.thumbnails {
-  margin: auto;
-  max-width: 300px;
-}
 
 .vueperslide {
   transition: 0.3s ease-in-out;
@@ -359,6 +375,11 @@ const editSlide = async (slide, file) => {
   transform: translate(-50%, -50%);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
+
+.arrow-icon {
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+}
+
 @media (max-width: 800px) {
   .video-play-icon {
     left: 70%;

@@ -2,7 +2,9 @@
   <v-dialog v-model="dialog" width="1024" persistent>
     <v-card class="pa-3">
       <v-card-title class="d-flex justify-space-between px-3">
-        <span class="text-h5 font-weight-bold">Adicione Novos Slides</span>
+        <span class="text-h5 font-weight-bold"
+          >Adicione Novos Vídeos ou imagens à Playlist</span
+        >
         <v-btn
           variant="text"
           icon="mdi-close"
@@ -12,9 +14,14 @@
       </v-card-title>
       <v-card-text>
         <v-row
-          class="pa-5 rounded inputFile"
-          style="border: 2px dashed #00b8cc"
+          class="pa-5 rounded inputFile d-flex justify-center align-center drop-area"
+          style="border: 2px dashed #00b8cc; height: 150px"
+          :data-active="dragActive"
           @click="$refs.inputFile.click()"
+          @dragenter.prevent="dragActive = true"
+          @dragover.prevent="dragActive = true"
+          @dragleave.prevent="dragActive = false"
+          @drop.prevent="addSlides($event, 'drop'), (dragActive = false)"
         >
           <input
             ref="inputFile"
@@ -22,18 +29,29 @@
             type="file"
             class="d-none"
             multiple
-            @change="(file) => addSlides(file, -1)"
+            @change="(file) => addSlides(file, 'input')"
           />
-          <v-col cols="12" class="d-flex justify-center align-itens-center">
-            <v-icon icon="mdi-upload" class="pa-5 bg-accent rounded-xl" />
-          </v-col>
-          <v-col cols="12">
-            <p class="text-h5 font-weight-bold text-primary text-center">
-              Arraste e Solte ou
-              <strong class="text-accent">Selecione os arquivos</strong>
-              para fazer upload
-            </p>
-          </v-col>
+          <div>
+            <v-col cols="12" class="d-flex justify-center align-itens-center">
+              <v-icon icon="mdi-upload" class="pa-5 bg-accent rounded-xl" />
+            </v-col>
+            <v-col cols="12">
+              <p
+                v-if="!dragActive"
+                class="text-h5 font-weight-bold text-primary text-center"
+              >
+                Arraste e Solte ou
+                <strong class="text-accent">Selecione os arquivos</strong>
+                para fazer upload
+              </p>
+              <p
+                v-else
+                class="text-h5 font-weight-bold text-primary text-center drop-text"
+              >
+                Solte os arquivos aqui!
+              </p>
+            </v-col>
+          </div>
         </v-row>
         <div id="orRow" class="my-10">
           <div class="orLine bg-grey-lighten-2"></div>
@@ -66,7 +84,7 @@
             </v-text-field>
           </v-col>
           <v-col v-if="slides.length > 0" cols="12" class="px-0">
-            <p class="text-primary text-h6 font-weight-bold">Slides</p>
+            <p class="text-primary text-h6 font-weight-bold">Playlist</p>
             <v-list style="max-height: 250px">
               <v-list-item v-for="(slide, i) in slides" :key="slide">
                 {{ i + 1 }} -
@@ -138,6 +156,7 @@ const messageStore = useMessageStore();
 const urlInput = ref('');
 const slides = ref([]);
 const dialog = ref(false);
+const dragActive = ref(false);
 
 const emit = defineEmits({
   uploadFiles(slides) {
@@ -156,16 +175,26 @@ const openModal = () => {
   urlInput.value = '';
   slides.value = [];
   dialog.value = true;
+  dragActive.value = false;
 };
 
 defineExpose({
   openModal,
 });
 
-const addSlides = (files) => {
-  const filesArray = Array.from(files.target.files);
+const addSlides = (files, type) => {
+  const filesArray =
+    type === 'drop'
+      ? Array.from(files.dataTransfer.files)
+      : Array.from(files.target.files);
   if (filesArray.length === 0) return;
   filesArray.forEach((f) => {
+    if (!f.type.includes('video') && !f.type.includes('image')) {
+      messageStore.message = 'Formato de arquivo inválido';
+      messageStore.color = 'red';
+      messageStore.show = true;
+      return;
+    }
     return slides.value.push(f);
   });
 };
@@ -218,5 +247,16 @@ const removeSlide = (index) => {
 
 .inputFile {
   cursor: pointer;
+}
+
+.drop-area {
+  transition: 0.3s ease;
+  &[data-active='true'] {
+    display: block;
+    background-color: rgba(0, 184, 204, 0.1);
+  }
+}
+.drop-text {
+  pointer-events: none;
 }
 </style>
