@@ -1,7 +1,7 @@
 <template>
   <profile-card :title="$t('components.profile.general.title')">
     <template v-slot:content>
-      <div class="boxes d-flex pb-6">
+      <div class="boxes d-flex justify-center pb-6">
         <div
           class="box d-flex pa-4"
           v-for="box in [
@@ -32,7 +32,7 @@
     </template>
 
     <template v-slot:footer>
-      <div class="d-flex flex-column contacts pt-6 pb-4">
+      <div class="d-flex flex-column contacts py-6">
         <div class="d-flex align-center contact">
           <v-icon color="#5D6872">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
@@ -48,24 +48,6 @@
           </div>
         </div>
       </div>
-      <div class="d-flex contacts pt-6 pb-4">
-        <div class="d-flex align-center contact" v-for="contact in socials">
-          <img
-            class="icon"
-            :alt="contact.name"
-            :src="strapiBaseUrl + contact.icon.url"
-          />
-
-          <div class="d-flex flex-column justify-center align-start field">
-            <p>{{ contact.name.toUpperCase() }}</p>
-            <a :href="contact.url" target="_blank">{{
-              contact.url.split('/').length > 2
-                ? contact.url.split('/')[3]
-                : contact.name
-            }}</a>
-          </div>
-        </div>
-      </div>
     </template>
   </profile-card>
 </template>
@@ -73,14 +55,13 @@
 <script setup lang="ts">
 import { Mask } from 'maska';
 
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-type Social = {
-  name: string;
-  url: string;
-  shortened: string;
-  icon: any;
-};
+const { updateImage } = useUploadedImage();
+
 const props = defineProps({
+  id: {
+    type: Number,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -93,15 +74,19 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-
   socials: {
-    type: Array as PropType<Social[]>,
+    type: Array as PropType<any[]>,
     required: true,
+  },
+  canEdit: {
+    type: Boolean,
+    default: false,
   },
 });
 
-const { email, telephone } = toRefs(props);
+const { email, telephone, socials } = toRefs(props);
 
+const newIcon = ref<string | null>(null);
 const mask = new Mask({ mask: '(##) #####-####' });
 </script>
 
@@ -111,10 +96,11 @@ const mask = new Mask({ mask: '(##) #####-####' });
   gap: 16px;
   align-self: stretch;
   border-bottom: 1px solid #eaeef1;
-
+  min-width: 450px;
   .box {
     flex-direction: column;
     min-width: 90px;
+    max-width: 123px;
     min-height: 90px;
     width: 33%;
     gap: 16px;
@@ -140,22 +126,15 @@ const mask = new Mask({ mask: '(##) #####-####' });
     }
   }
 }
-
 .contacts {
   gap: 16px;
-  border-bottom: 1px solid #eaeef1;
+  //border-bottom: 1px solid #eaeef1;
   flex-direction: column;
+
   .contact {
     gap: 16px;
-    .icon {
-      width: 24px;
-      height: 24px;
-      path {
-        fill: #5d6872;
-      }
-    }
+
     .field {
-      gap: 4px;
       p {
         color: #abb2b9;
         font-size: 14px;
@@ -173,10 +152,17 @@ const mask = new Mask({ mask: '(##) #####-####' });
     }
   }
 }
+@media (max-width: 950px) {
+  .boxes {
+    min-width: 380px;
+  }
+}
 
 @media (max-width: 450px) {
   .boxes {
     flex-direction: column;
+    min-width: 0px;
+
     .box {
       flex-direction: row;
       width: 100%;

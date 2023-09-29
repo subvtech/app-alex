@@ -46,19 +46,15 @@ export const useFormRules = (formData?: FormDataType) => {
   };
 
   const passwordRules = {
-    password: yup
-      .string()
-      .required(i18n.t('rules.password.required'))
-      //.matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
-      //.matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
-      //.matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
-      /*.matches(
+    password: yup.string().required(i18n.t('rules.password.required')),
+    //.matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
+    //.matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
+    //.matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
+    /*.matches(
         /(?=.*[^a-zA-Z0-9])/,
         i18n.t('rules.password.character'),
       )*/
-      //.min(8, i18n.t('rules.password.min'))
-      ,
-
+    //.min(8, i18n.t('rules.password.min'))
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))
@@ -94,18 +90,6 @@ export const useFormRules = (formData?: FormDataType) => {
           .max(64, i18n.t('rules.url.max'))
           .trim(),
       ),
-
-    nameLoose: yup
-      .string()
-      .min(3, i18n.t('rules.name.min'))
-      .max(20, i18n.t('rules.name.max'))
-      .trim(),
-
-    urlLoose: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .trim(),
   };
 
   const fullnameRules = {
@@ -187,7 +171,20 @@ export const useFormRules = (formData?: FormDataType) => {
   });
 
   const socialsSchema = yup.object({
-    ...socialsRules,
+    name: yup
+      .string()
+      .min(3, i18n.t('rules.name.min'))
+      .max(20, i18n.t('rules.name.max'))
+      .required()
+      .trim(),
+
+    url: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .required()
+      .trim(),
+    index: yup.number(),
   });
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },

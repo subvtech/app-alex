@@ -110,13 +110,24 @@
     </div>
     <div
       v-if="links[0] === selectedOption"
-      class="content-block d-flex justify-center flex-row"
+      class="content-block d-flex justify-center flex-row w-100"
     >
-      <profile-general
-        :socials="user.socials"
-        :telephone="user.phone"
-        :email="user.email"
-      />
+      <div class="details d-flex flex-column w-100">
+        <profile-general
+          :id="user.id"
+          :socials="user.socials"
+          :telephone="user.phone"
+          :can-edit="canEdit"
+          :email="user.email"
+          @update:user="updateUser"
+        />
+        <profile-socials
+          :can-edit="canEdit"
+          :socials="user.socials"
+          :id="user.id"
+          @update:user="updateUser"
+        />
+      </div>
       <div class="d-flex flex-column w-100">
         <profile-about :info="user.info" />
         <profile-institutional
@@ -141,49 +152,14 @@
       class="content-block d-flex justify-center flex-row"
     ></div>
     <div
-      v-else-if="links[4] === selectedOption"
+      v-else
       class="content-block d-flex justify-center flex-row"
     >
       <profile-events
         :url="user.avatar ? strapiBaseUrl + user.avatar.url : undefined"
       />
     </div>
-    <div v-else class="content-block d-flex justify-center flex-row">
-      <div class="d-flex flex-column w-100">
-        <profile-settings
-          :id="user.id"
-          :info="user.info"
-          :fullname="user.fullname"
-          :telephone="user.phone"
-          :cpf="user.cpf"
-          @update:user="updateUser"
-        />
-        <profile-socials
-          :id="user.id"
-          :socials="user.socials"
-          @update:user="updateUser"
-        />
-      </div>
-
-      <div class="d-flex flex-column w-100">
-        <profile-institutional
-          :institutions="user.institutions"
-          :id="user.id"
-          :canEdit="true"
-          @update:user="updateUser"
-        />
-        <profile-security
-          :email="user.email"
-          :id="user.id"
-          @update:user="updateUser"
-        />
-        <profile-wallets
-          :wallet="user.user_wallet"
-          :id="user.id"
-          @update:user="updateUser"
-        />
-      </div>
-    </div>
+  
   </div>
 </template>
 
@@ -199,7 +175,7 @@ const messageStore = useMessageStore();
 const { updateImage } = useUploadedImage();
 const avatar = ref<string | null>(null);
 const cover = ref<string | null>(null);
-//const isLoading = ref(false);
+const canEdit = ref(true);
 
 const user = ref<any>();
 definePageMeta({
@@ -235,7 +211,6 @@ const links = ref([
   i18n.t('pages.profile.projects'),
   i18n.t('pages.profile.assignments'),
   i18n.t('pages.profile.events'),
-  i18n.t('pages.profile.settings'),
 ]);
 
 async function uploadProfilePicture(event: any) {
@@ -300,6 +275,7 @@ async function uploadCoverPicture(event: any) {
     flex-direction: column;
     gap: 0px;
     transition: all ease-in-out 1s;
+    max-width: 1612px;
 
     .card {
       display: flex;
@@ -395,12 +371,14 @@ async function uploadCoverPicture(event: any) {
     }
     .cover-block {
       position: relative;
+      max-width: 1612px;
       img {
         width: 100%;
         height: auto;
         max-height: 300px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
+        object-fit: cover;
       }
 
       .btn {
@@ -454,6 +432,10 @@ async function uploadCoverPicture(event: any) {
     flex-direction: row;
   }
 
+  .details {
+    max-width: 450px;
+  }
+
   @media (max-width: 1200px) {
     .user-block {
       .card {
@@ -504,6 +486,9 @@ async function uploadCoverPicture(event: any) {
   @media (max-width: 800px) {
     .content-block {
       flex-wrap: wrap;
+    }
+    .details {
+      max-width: none;
     }
   }
 

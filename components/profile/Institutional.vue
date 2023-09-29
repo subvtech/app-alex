@@ -2,6 +2,7 @@
   <profile-card
     :title="$t('components.profile.institutional.title')"
     :full-width="true"
+    style="max-width: 1138px"
   >
     <template v-slot:content>
       <v-btn

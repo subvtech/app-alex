@@ -3,6 +3,7 @@
     class="mb-6"
     :title="$t('components.profile.about.title')"
     :full-width="true"
+    style="max-width: 1138px"
   >
     <template v-slot:content>
       <span v-if="info && info !== ''" class="info">

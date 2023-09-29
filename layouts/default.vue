@@ -11,7 +11,7 @@
       dark
       class="d-flex flex-column pb-2 px-2"
     >
-      <v-row justify="center" class="my-4">
+      <v-row justify="center" class="my-4" style="max-height: 64px;">
         <div>
           <NuxtLink to="/">
             <img src="@/static/images/alex.svg" height="32" width="96" />
@@ -105,7 +105,7 @@
       </v-menu>
     </v-app-bar>
     <v-main class="secondary bg-gray-blue">
-      <v-container style="width: 100%; max-width: 100%" class="pa-4 pa-sm-10">
+      <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
     </v-main>
