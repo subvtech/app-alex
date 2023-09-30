@@ -1,9 +1,9 @@
 <template>
   <profile-card :title="$t('components.profile.general.title')">
     <template v-slot:content>
-      <div class="boxes d-flex justify-center pb-6">
+      <div class="boxes d-flex justify-center w-100 pb-6">
         <div
-          class="box d-flex pa-4"
+          class="box d-flex"
           v-for="box in [
             {
               icon: 'mdi-bookmark-box-multiple-outline',
@@ -91,96 +91,100 @@ const mask = new Mask({ mask: '(##) #####-####' });
 </script>
 
 <style scoped lang="scss">
-.boxes {
-  align-items: flex-end;
-  gap: 16px;
-  align-self: stretch;
-  border-bottom: 1px solid #eaeef1;
+#Card {
   min-width: 450px;
-  .box {
-    flex-direction: column;
-    min-width: 90px;
-    max-width: 123px;
-    min-height: 90px;
-    width: 33%;
-    gap: 16px;
-    align-items: flex-start;
-    border-radius: 8px;
-    border: 1px solid #e1e4e7;
-    background-color: #f1f5f9;
 
-    :last-child {
-      flex-direction: column;
-
-      h6 {
-        font-size: 24px;
-        color: #001529;
-      }
-
-      span {
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 22px;
-        color: #abb289;
-      }
-    }
-  }
-}
-.contacts {
-  gap: 16px;
-  //border-bottom: 1px solid #eaeef1;
-  flex-direction: column;
-
-  .contact {
-    gap: 16px;
-
-    .field {
-      p {
-        color: #abb2b9;
-        font-size: 14px;
-        font-weight: 400;
-      }
-
-      a {
-        cursor: pointer;
-        color: #5d6872;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 22px;
-        text-decoration: none;
-      }
-    }
-  }
-}
-@media (max-width: 950px) {
   .boxes {
-    min-width: 380px;
-  }
-}
-
-@media (max-width: 450px) {
-  .boxes {
-    flex-direction: column;
-    min-width: 0px;
-
+    gap: 16px;
+    border-bottom: 1px solid #eaeef1;
     .box {
-      flex-direction: row;
-      width: 100%;
+      flex-direction: column;
+      min-width: 90px;
+      max-width: 123px;
+      min-height: 90px;
+      width: 33%;
+      gap: 16px;
+      padding-inline: 16px;
+      padding-block: 16px;
+      align-items: flex-start;
+      border-radius: 8px;
+      border: 1px solid #e1e4e7;
+      background-color: #f1f5f9;
 
       :last-child {
-        flex-direction: column-reverse;
+        flex-direction: column;
 
+        h6 {
+          font-size: 24px;
+          color: #001529;
+        }
+
+        span {
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 135%; /* 21.6px */
+          letter-spacing: 0.32px;
+          color: #a0a8b1;
+        }
+      }
+    }
+  }
+  .contacts {
+    gap: 16px;
+    //border-bottom: 1px solid #eaeef1;
+    flex-direction: column;
+
+    .contact {
+      gap: 16px;
+
+      .field {
         p {
-          color: #abb2b9;
+          color: #6e7a87;
           font-size: 14px;
           font-weight: 400;
         }
 
         span {
-          color: #5d6872;
+          color: #6e7a87;
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 400;
           line-height: 22px;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  @media (max-width: 950px) {
+    min-width: 380px;
+  }
+
+  @media (max-width: 450px) {
+    min-width: 0px;
+    .boxes {
+      flex-direction: column;
+      align-items: center;
+      .box {
+        flex-direction: row;
+        width: 100%;
+        padding-inline: 0px;
+        padding-block: 0px;
+        justify-content: center;
+        align-items: center;
+        :last-child {
+          flex-direction: column-reverse;
+
+          p {
+            color: #abb2b9;
+            font-size: 14px;
+            font-weight: 400;
+          }
+
+          span {
+            color: #5d6872;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 22px;
+          }
         }
       }
     }

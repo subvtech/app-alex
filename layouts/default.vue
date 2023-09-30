@@ -11,7 +11,7 @@
       dark
       class="d-flex flex-column pb-2 px-2"
     >
-      <v-row justify="center" class="my-4" style="max-height: 64px;">
+      <v-row justify="center" class="my-4" style="max-height: 64px">
         <div>
           <NuxtLink to="/">
             <img src="@/static/images/alex.svg" height="32" width="96" />
@@ -223,6 +223,13 @@ function logoutUser() {
 <style lang="scss">
 html,
 body {
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   .v-application {
     font-family: Sen !important;
 

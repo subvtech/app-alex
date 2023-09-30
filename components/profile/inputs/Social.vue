@@ -6,9 +6,9 @@
     style="gap: 16px"
   >
     <div class="contact-item d-flex flex-col align-center w-100">
-      <div class="img-upload">
+      <div class="img-upload pa-1">
         <label
-          class="edit"
+          class="edit d-flex align-center"
           :for="isEditing || isAdding ? `new-icon-${social.id}` : ''"
         >
           <img
@@ -63,13 +63,10 @@
       </div>
 
       <div v-else class="d-flex align-center">
-        <div class="d-flex flex-column justify-center align-start field">
-          <p>{{ social.name.toUpperCase() }}</p>
-          <a :href="social.url" target="_blank">{{
-            social.url.split('/').length > 2
-              ? social.url.split('/')[3]
-              : social.name
-          }}</a>
+        <div class="d-flex flex-column justify-center align-center field">
+          <a :href="social.url" target="_blank">
+            {{ social.name.toUpperCase() }}
+          </a>
         </div>
       </div>
     </div>
@@ -272,8 +269,22 @@ async function uploadNewIcon(e: any) {
     transition: all ease-in-out 1s;
     width: 24px;
     height: 24px;
+   
     path {
       fill: #5d6872;
+    }
+  }
+
+  .img-upload {
+    border: 1px solid #D2D6DA;
+    border-radius: 8px;
+
+    .edit {
+      border: none;
+      
+      img {
+        border: none;
+      }
     }
   }
 
@@ -287,16 +298,10 @@ async function uploadNewIcon(e: any) {
   }
 
   .field {
-    p {
-      color: #abb2b9;
-      font-size: 14px;
-      font-weight: 400;
-    }
-
     a {
       cursor: pointer;
-      color: #5d6872;
-      font-size: 16px;
+      color: #abb2b9;
+      font-size: 14px;
       font-weight: 400;
       line-height: 22px;
       text-decoration: none;

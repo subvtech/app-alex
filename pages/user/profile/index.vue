@@ -345,7 +345,7 @@ async function uploadCoverPicture(event: any) {
         .d-flex {
           gap: 8px;
           .fullname {
-            color: #001529;
+            color: #0D4173;
             font-size: 24px;
             font-style: normal;
             font-weight: bold;
@@ -388,7 +388,7 @@ async function uploadCoverPicture(event: any) {
         right: 20px;
         border-radius: 8px;
         border: none;
-        color: #6e7a87;
+        color: #6e7a87 !important;        
         height: 44px;
         background-color: #ebedef;
         text-transform: none !important;
@@ -461,7 +461,6 @@ async function uploadCoverPicture(event: any) {
           .d-flex {
             gap: 8px;
             .fullname {
-              color: #001529;
               font-size: 20px;
               font-style: normal;
               font-weight: bold;
@@ -581,7 +580,6 @@ async function uploadCoverPicture(event: any) {
           }
 
           .fullname {
-            color: #001529;
             font-size: 20px;
             font-style: normal;
             font-weight: bold;
@@ -630,7 +628,6 @@ async function uploadCoverPicture(event: any) {
           }
 
           .fullname {
-            color: #001529;
             font-size: 20px;
             font-style: normal;
             font-weight: bold;
