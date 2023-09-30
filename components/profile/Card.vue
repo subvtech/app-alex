@@ -30,8 +30,8 @@ const { title } = toRefs(props);
   background-color: white;
   position: relative;
   font-family: Sen;
-  width: 450px;
   border-radius: 8px;
+
   .foretitle {
     align-items: center;
     align-self: stretch;

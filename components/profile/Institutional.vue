@@ -2,6 +2,7 @@
   <profile-card
     :title="$t('components.profile.institutional.title')"
     :full-width="true"
+    style="max-width: 1138px"
   >
     <template v-slot:content>
       <v-btn
@@ -35,7 +36,7 @@
         color="black"
         name="institution"
       />
-      <div class="d-flex flex-wrap items">
+      <div v-if="institutions.length > 0" class="d-flex flex-wrap items">
         <div
           class="d-flex pa-4 align-center justify-space-between w-100 item"
           v-for="(item, index) in institutions"
@@ -66,6 +67,12 @@
             </v-icon>
           </div>
         </div>
+      </div>
+      <div v-else class="d-flex flex-column justify-center align-center pa-6" style="gap: 16px">
+        <img src="../../assets/svg/EmptyInstitutional.svg" alt=""  style="height: 160px; width: 160px">
+        <span class="info text-center" style="color: rgb(175, 175, 175);">
+          {{ $t('components.profile.institutional.emptyInstitutional') }}
+        </span>
       </div>
     </template>
   </profile-card>

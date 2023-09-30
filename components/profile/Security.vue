@@ -1,5 +1,5 @@
 <template>
-  <profile-card class="mt-6" title="Segurança" :full-width="true">
+  <profile-card class="mt-6" :title="$t('components.profile.security.title')" :full-width="true">
     <template v-slot:content>
       <div class="fields d-flex flex-wrap">
         <v-form class="field d-flex w-100 align-center justify-space-between">
