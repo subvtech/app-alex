@@ -4,7 +4,7 @@
     :full-width="true"
   >
     <template v-slot:content>
-      <div>
+      <div class="settings">
         <v-form
           ref="form"
           color="black"
@@ -40,7 +40,7 @@
             color="black"
             variant="outlined"
           />
-          <div class="d-flex justify-end">
+          <div class="buttons d-flex justify-end">
             <v-btn
               class="btn"
               color="accent"
@@ -49,7 +49,7 @@
             >
               {{ $t('components.profile.settings.cancel') }}</v-btn
             >
-            <v-btn class="btn ml-2" color="accent" type="submit">
+            <v-btn class="btn" color="accent" type="submit">
               {{ $t('components.profile.settings.save') }}
             </v-btn>
           </div>
@@ -64,11 +64,10 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
-const { update } = useStrapi();
 const { profileSchema } = useFormRules();
+const client = useStrapiClient();
 const messageStore = useMessageStore();
-const emit = defineEmits(['update:user'])
-
+const emit = defineEmits(['update:user']);
 const loading = ref(false);
 
 const props = defineProps({
@@ -121,18 +120,13 @@ const cancel = () => {
 const updateValues = handleSubmit(async () => {
   loading.value = true;
 
-  const data = { ...values, phone: values.phone.replace(/[^0-9]/g, '') };
   try {
-    const url = useStrapiUrl() + '/users/' + props.id;
-    const options = {
+    await client(`/users/${props.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data }),
-    };
+      body: { ...values, phone: values.phone.replace(/[^0-9]/g, '') },
+    });
 
-    await fetch(url, options);
-
-    emit('update:user', {})
+    emit('update:user', {});
   } catch (error) {
     console.log(error);
     messageStore.message = error as string;
@@ -145,18 +139,28 @@ const updateValues = handleSubmit(async () => {
 </script>
 
 <style scoped lang="scss">
-form {
-  gap: 24px;
-  .btn {
-    text-transform: none !important;
+.settings {
+  form {
+    gap: 24px;
+    .btn {
+      text-transform: none !important;
+    }
   }
-}
-.block {
-  gap: 24px;
-}
-@media (max-width: 600px) {
   .block {
-    flex-direction: column;
+    gap: 24px;
+  }
+
+  .buttons {
+    gap: 8px;
+  }
+  @media (max-width: 430px) {
+    .block {
+      flex-direction: column;
+    }
+
+    .buttons {
+      flex-direction: column-reverse;
+    }
   }
 }
 </style>
