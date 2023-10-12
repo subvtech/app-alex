@@ -63,6 +63,10 @@ const props = defineProps({
 });
 
 const { info, tags } = toRefs(props);
+
+const cancel = () => {
+
+}
 </script>
 
 <style scoped lang="scss">

@@ -10,7 +10,7 @@
           <div v-if="wallet" class="tooltip-box">
             <span class="tooltiptext">{{ wallet.address }}</span>
           </div>
-          <img src="../../static/images/metamask.png" alt="" />
+          <img src="/images/metamask.png" alt="" />
           <span>{{ $t('components.profile.wallets.metamask') }}</span>
         </div>
         <v-btn
@@ -37,7 +37,7 @@
           <div v-if="wallet" class="tooltip-box">
             <span class="tooltiptext">{{ wallet.address }}</span>
           </div>
-          <img src="../../static/images/metamask.png" alt="" /><span>
+          <img src="/images/metamask.png" alt="" /><span>
             {{
               isWalletLinked
                 ? $t('components.profile.wallets.unlink')

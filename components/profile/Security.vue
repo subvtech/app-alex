@@ -86,6 +86,10 @@ const { handleSubmit, errors: emailErrors } = useForm({
   keepValuesOnUnmount: true,
 });
 
+const cancel = () => {
+
+}
+
 const updateEmail = handleSubmit(async () => {
   editEmail.value = !editEmail.value;
   if (!editEmail.value) return;

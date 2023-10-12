@@ -111,7 +111,9 @@ const props = defineProps({
   },
 });
 const { institutions } = toRefs(props);
+const cancel = () => {
 
+}
 const updateSelectedOption = (event) => {
   selectedOption.value = event;
 };

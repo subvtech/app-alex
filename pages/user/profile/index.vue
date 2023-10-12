@@ -14,38 +14,50 @@
     </div>
     <div class="user-block my-6">
       <div class="cover-block w-100">
-        <img
-          v-if="user.cover"
-          :src="strapiBaseUrl + cover"
-          :alt="user.fullname"
+        <NuxtImg
+          v-if="coverPicture"
+          class="cover"
+          ref="cover"
+          :src="strapiBaseUrl + coverPicture"
+          placeholder
         />
-        <img
+        <NuxtImg
           v-else
           class="cover"
-          src="https://picsum.photos/800/800"
-          alt="cover picture"
+          ref="cover"
+          src="https://picsum.photos/2200/500"
+          placeholder
         />
-        <div class="img-upload">
-          <label class="" for="cover-input">
+        <div v-if="canEdit" class="edit-cover d-flex align-center">
+          <div v-if="coverPicture" class="delete" @click="removeCoverPicture">
+            <v-icon class="big-icon" size="24" color="#6E7A87"
+              >mdi-trash-can-outline</v-icon
+            >
+            <v-icon class="small-icon" size="18" color="#6E7A87"
+              >mdi-trash-can-outline</v-icon
+            >
+          </div>
+          <label class="" for="coverInput">
             <v-btn
               class="btn"
               @click="($refs.coverInput as any).click()"
               size="large"
               variant="outlined"
             >
-              <v-icon class="icon" color="#6E7A87">mdi-pencil-outline</v-icon>
+              <v-icon class="icon" size="14" color="#6E7A87"
+                >mdi-pencil-outline</v-icon
+              >
 
               <p>{{ $t('pages.profile.cover') }}</p></v-btn
             >
           </label>
 
           <input
-            class=""
+            class="d-none"
             @input="uploadCoverPicture"
-            style="display: none"
             accept="image/png, image/jpeg"
             ref="coverInput"
-            id="cover-input"
+            id="coverInput"
             type="file"
           />
         </div>
@@ -53,31 +65,46 @@
 
       <div class="card">
         <div class="photo">
-          <div class="avatar">
-            <img
-              v-if="avatar"
-              :src="strapiBaseUrl + avatar"
+          <label v-if="profilePicture" class="avatar" for="file-input">
+            <NuxtImg
+              class="img"
+              :src="strapiBaseUrl + profilePicture"
               :alt="user.fullname"
             />
-            <img
-              v-else
-              src="https://picsum.photos/400/400"
-              alt="profile picture"
-            />
-          </div>
-          <div class="img-upload">
-            <label class="edit" for="file-input">
-              <v-icon size="x-small">mdi-pencil-outline</v-icon>
-            </label>
 
+            <v-icon class="d-none" size="x-large" color="#fff"
+              >mdi-pencil-outline</v-icon
+            >
             <input
-              class=""
+              class="d-none"
               @input="uploadProfilePicture"
-              style="display: none"
               accept="image/png, image/jpeg"
               id="file-input"
               type="file"
             />
+          </label>
+          <label v-else class="avatar" for="file-input">
+            <div
+              class="img d-flex justify-center align-center"
+              alt="profile picture"
+            >
+              <v-icon size="40" color="#B9BFC6">mdi-account-outline</v-icon>
+            </div>
+            <v-icon class="d-none" size="x-large" color="#fff">mdi-plus</v-icon>
+            <input
+              class="d-none"
+              @input="uploadProfilePicture"
+              accept="image/png, image/jpeg"
+              id="file-input"
+              type="file"
+            />
+          </label>
+          <div
+            v-if="canEdit && profilePicture"
+            class="delete"
+            @click="removeProfilePicture"
+          >
+            <v-icon size="x-small" color="#fff">mdi-trash-can-outline</v-icon>
           </div>
         </div>
 
@@ -124,6 +151,9 @@
         <profile-socials
           :can-edit="canEdit"
           :socials="user.socials"
+          :instagram="user.instagram"
+          :linkedin="user.linkedin"
+          :youtube="user.youtube"
           :id="user.id"
           @update:user="updateUser"
         />
@@ -151,15 +181,11 @@
       v-else-if="links[3] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     ></div>
-    <div
-      v-else
-      class="content-block d-flex justify-center flex-row"
-    >
+    <div v-else class="content-block d-flex justify-center flex-row">
       <profile-events
         :url="user.avatar ? strapiBaseUrl + user.avatar.url : undefined"
       />
     </div>
-  
   </div>
 </template>
 
@@ -168,13 +194,14 @@ import { User } from '../../../models/user.model';
 import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
 const { findOne } = useStrapi();
+const client = useStrapiClient();
 const strapiUrl = useStrapiUrl();
 const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
 
 const messageStore = useMessageStore();
-const { updateImage } = useUploadedImage();
-const avatar = ref<string | null>(null);
-const cover = ref<string | null>(null);
+const { updateImage, uploadImage, removeImage } = useUploadedImage();
+const profilePicture = ref<string | null>(null);
+const coverPicture = ref<string | null>(null);
 const canEdit = ref(true);
 
 const user = ref<any>();
@@ -190,14 +217,14 @@ const updateUser = async (show = true) => {
       'cover',
       'avatar',
       'learningPlans',
-      'socials.icon',
+      'socials',
       'trails',
       'user_wallet',
     ],
   });
 
-  if (user.value.avatar) avatar.value = user.value.avatar.url;
-  if (user.value.cover) cover.value = user.value.cover.url;
+  if (user.value.avatar) profilePicture.value = user.value.avatar.url;
+  if (user.value.cover) coverPicture.value = user.value.cover.url;
   messageStore.message = 'done';
   messageStore.color = 'green';
   messageStore.show = show;
@@ -214,15 +241,54 @@ const links = ref([
 ]);
 
 async function uploadProfilePicture(event: any) {
-  const { updatedAt } = await updateImage(event, user.value.avatar.id);
-  const url = avatar.value?.split('?');
-  if (url) avatar.value = url[0] + '?' + updatedAt;
+  if (user.value.avatar) {
+    const { updatedAt } = await updateImage(event, user.value.avatar.id);
+
+    const url = profilePicture.value?.split('?');
+    if (url) profilePicture.value = url[0] + '?' + updatedAt;
+  } else {
+    const temp = await uploadImage(event);
+    user.value.avatar = temp[0];
+    profilePicture.value = temp[0].url;
+    const result = await client(`/users/${user.value.id}`, {
+      method: 'PUT',
+      body: { avatar: temp[0].id },
+    });
+
+    console.log(result);
+  }
+}
+
+async function removeProfilePicture() {
+  const result = await removeImage(user.value.avatar.id);
+  console.log(result);
+  user.value.avatar = null;
+  profilePicture.value = null;
 }
 
 async function uploadCoverPicture(event: any) {
-  const { updatedAt } = await updateImage(event, user.value.cover.id);
-  const url = cover.value?.split('?');
-  if (url) cover.value = url[0] + '?' + updatedAt;
+  if (user.value.cover) {
+    const { updatedAt } = await updateImage(event, user.value.cover.id);
+    const url = coverPicture.value?.split('?');
+    if (url) coverPicture.value = url[0] + '?' + updatedAt;
+  } else {
+    const temp = await uploadImage(event);
+    user.value.cover = temp[0];
+    coverPicture.value = temp[0].url;
+    const result = await client(`/users/${user.value.id}`, {
+      method: 'PUT',
+      body: { cover: temp[0].id },
+    });
+
+    console.log(result);
+  }
+}
+
+async function removeCoverPicture() {
+  const result = await removeImage(user.value.cover.id);
+  console.log(result);
+  user.value.cover = null;
+  coverPicture.value = null;
 }
 </script>
 
@@ -294,44 +360,73 @@ async function uploadCoverPicture(event: any) {
 
         .avatar {
           display: flex;
-          align-items: flex-end;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          border: solid #fff;
+          border-radius: 100%;
 
-          img {
+          &:hover {
+            i {
+              display: block !important;
+              position: absolute;
+            }
+
+            .img {
+              filter: brightness(50%);
+              i {
+                display: none !important;
+              }
+            }
+          }
+          i {
+            transition: all ease-in-out 0.7s;
+          }
+          .img {
+            aspect-ratio: 1 / 1; /* defining the aspect ratio of the image */
+            object-fit: cover;
+          }
+
+          .img {
             max-width: 160px;
             max-height: 160px;
 
-            aspect-ratio: 1 / 1; /* defining the aspect ratio of the image */
-            object-fit: cover;
             border-top-left-radius: 4px;
             border-top-right-radius: 4px;
-            border: solid #fff;
 
+            transition: all ease-in-out 0.4s;
             border-radius: 100%;
+          }
+          div.img {
+            position: relative;
+            background-color: #ebedef;
+            width: 160px;
+            height: 160px;
+            i {
+              display: block !important;
+              position: absolute;
+            }
           }
         }
 
-        .img-upload {
+        .delete {
           right: 0px;
           bottom: 32px;
 
           position: absolute;
 
-          width: 32px;
-          height: 32px;
+          border-radius: 8px;
 
-          border-radius: 99px;
-          border: 1px solid #abb2b9;
-          background: #f1f5f9;
+          max-width: 32px;
+          max-height: 32px;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
 
-          .edit {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            cursor: pointer;
-          }
+          background: #e9494a;
+          cursor: pointer;
         }
       }
 
@@ -340,12 +435,13 @@ async function uploadCoverPicture(event: any) {
         flex-direction: column;
         margin-block: 16px;
         margin-left: 170px;
+        padding-left: 16px;
         transition: all ease-in-out 1s;
 
         .d-flex {
           gap: 8px;
           .fullname {
-            color: #0D4173;
+            color: #0d4173;
             font-size: 24px;
             font-style: normal;
             font-weight: bold;
@@ -372,31 +468,52 @@ async function uploadCoverPicture(event: any) {
     .cover-block {
       position: relative;
       max-width: 1612px;
-      img {
+      .cover {
         width: 100%;
         height: auto;
         max-height: 300px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
         object-fit: cover;
+        aspect-ratio: 1 / 1;
       }
 
-      .btn {
+      .edit-cover {
+        gap: 16px;
         position: absolute;
-        width: 153px;
         bottom: 24px;
         right: 20px;
-        border-radius: 8px;
-        border: none;
-        color: #6e7a87 !important;        
-        height: 44px;
-        background-color: #ebedef;
-        text-transform: none !important;
+        .btn {
+          width: 153px;
 
-        p {
-          font-size: 14px;
-          margin-left: 8px;
-          letter-spacing: 0.56px;
+          border-radius: 8px;
+          border: none;
+          color: #6e7a87 !important;
+          height: 44px;
+          background-color: #f1f5f9;
+          text-transform: none !important;
+
+          p {
+            font-size: 14px;
+            margin-left: 8px;
+            letter-spacing: 0.56px;
+          }
+        }
+        .delete {
+          width: 44px;
+          height: 44px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f1f5f9;
+
+          border-radius: 8px;
+
+          cursor: pointer;
+
+          .small-icon {
+            display: none;
+          }
         }
       }
     }
@@ -434,6 +551,7 @@ async function uploadCoverPicture(event: any) {
 
   .details {
     max-width: 450px;
+    gap: 24px;
   }
 
   @media (max-width: 1200px) {
@@ -443,12 +561,12 @@ async function uploadCoverPicture(event: any) {
         .photo {
           bottom: 15px;
           .avatar {
-            img {
+            .img {
               max-width: 120px;
               max-height: 120px;
             }
           }
-          .img-upload {
+          .delete {
             bottom: 15px;
             width: 24px;
             height: 24px;
@@ -490,12 +608,39 @@ async function uploadCoverPicture(event: any) {
       max-width: none;
     }
   }
+  @media (max-height: 740px) {
+    .user-block {
+      .cover-block {
+        .edit-cover {
+          .delete {
+            height: 33px;
+            width: 33px;
+            .small-icon {
+              display: block;
+            }
+            .big-icon {
+              display: none;
+            }
+          }
+
+          .btn {
+            height: 33px;
+          }
+        }
+      }
+      .card {
+        .photo {
+          bottom: 20px;
+        }
+      }
+    }
+  }
 
   @media (max-width: 640px) {
     .user-block {
       .cover-block {
         position: relative;
-        img {
+        .img {
           width: 100%;
           height: auto;
           max-width: 100%;
@@ -504,8 +649,7 @@ async function uploadCoverPicture(event: any) {
           border-top-right-radius: 8px;
         }
 
-        .btn {
-          position: absolute;
+        .edit-cover {
           min-width: 100px;
         }
 
@@ -519,16 +663,16 @@ async function uploadCoverPicture(event: any) {
           margin-left: 105px;
         }
         .photo {
-          bottom: 20px;
+          bottom: 22px;
           .avatar {
-            img {
+            .img {
               max-width: 100px;
               max-height: 100px;
             }
           }
-          .img-upload {
+          .delete {
             right: 0px;
-            bottom: 20px;
+            bottom: 22px;
 
             width: 20px;
             height: 20px;
@@ -539,15 +683,6 @@ async function uploadCoverPicture(event: any) {
         gap: 16px;
         :first-child {
           min-width: 73px;
-        }
-      }
-    }
-    @media (max-height: 740px) {
-      .user-block {
-        .cover-block {
-          .btn {
-            height: 33px;
-          }
         }
       }
     }
@@ -570,7 +705,11 @@ async function uploadCoverPicture(event: any) {
   @media (max-width: 450px) {
     .user-block {
       .card {
+        .photo {
+          bottom: 50px;
+        }
         .info {
+          padding-left: 10px;
           justify-content: space-between;
           flex-direction: column;
 
@@ -603,13 +742,15 @@ async function uploadCoverPicture(event: any) {
         .icon {
           display: none;
         }
-        .btn {
+        .edit-cover {
           right: 10px;
-          padding-inline: 2px;
-          width: 110px;
-          justify-content: center;
-          p {
-            margin: 0px;
+          .btn {
+            padding-inline: 2px;
+            width: 110px;
+            justify-content: center;
+            p {
+              margin: 0px;
+            }
           }
         }
       }

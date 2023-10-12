@@ -14,7 +14,7 @@
       <v-row justify="center" class="my-4" style="max-height: 64px">
         <div>
           <NuxtLink to="/">
-            <img src="@/static/images/alex.svg" height="32" width="96" />
+            <img src="/images/alex.svg" height="32" width="96" />
           </NuxtLink>
         </div>
       </v-row>
@@ -57,7 +57,7 @@
       >
         <NuxtLink to="/">
           <v-img
-            src="../static/images/alex.svg"
+            src="/images/alex.svg"
             alt="logo"
             height="32"
             width="96"
