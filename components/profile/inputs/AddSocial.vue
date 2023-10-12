@@ -68,10 +68,10 @@
       </div>
       <div
         v-if="selectedSocial"
-        class="d-flex flex-column px-6"
-        style="gap: 8px"
+        class="form d-flex align-center px-6"
+        style=""
       >
-        <div class="">
+        <div class="d-flex flex-column w-100" style="gap: 8px">
           <span>Qual o endereço do site?</span>
 
           <v-text-field
@@ -85,14 +85,14 @@
 
         <div
           v-if="selectedSocial === 'Outra rede'"
-          class="d-flex flex-column"
+          class="d-flex flex-column w-100"
           style="gap: 8px"
         >
           <span>Qual o nome do site?</span>
 
           <v-text-field
             v-model="value2"
-            name="url"
+            name="name"
             :error-messages="errorMessage2"
             color="black"
             variant="outlined"
@@ -103,7 +103,7 @@
 
     <div
       class="d-flex justify-end px-6 py-4"
-      style="gap: 8px; border-top: 1px solid #EBEDEF"
+      style="gap: 8px; border-top: 1px solid #ebedef"
     >
       <v-btn
         class="btn px-3"
@@ -176,6 +176,14 @@ const { value: value2, errorMessage: errorMessage2 } = useField(
   .btn {
     text-transform: none !important;
     height: 36px;
+  }
+}
+
+@media (max-width: 1350px) {
+  #Card {
+    .form {
+        flex-direction: column;
+    }
   }
 }
 @media (max-width: 800px) {

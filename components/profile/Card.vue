@@ -7,18 +7,33 @@
       <div class="foretitle d-flex py-6">
         <span>{{ title }}</span>
       </div>
-      <div v-if="isEditing" class="d-flex justify-end" style="gap: 8px">
+      <div v-if="isEditing" class="buttons d-flex justify-end">
         <v-btn
-          class="btn px-3"
+          class="btn"
           color="accent"
           @click="cancelledAction"
           variant="outlined"
         >
           {{ $t('components.profile.settings.cancel') }}</v-btn
         >
-        <v-btn class="btn px-3" color="accent" @click="save" type="submit">
+        <v-btn class="btn" color="accent" @click="save" type="submit">
           {{ $t('components.profile.settings.save') }}
         </v-btn>
+
+        <v-btn
+          class="hide rounded-circle"
+          color="accent"
+          @click="cancelledAction"
+          variant="outlined"
+          icon="mdi-cancel"
+        />
+        <v-btn
+          class="hide rounded-circle"
+          icon="mdi-check"
+          color="accent"
+          @click="save"
+          type="submit"
+        />
       </div>
       <div v-else @click="emit('toogle:isEditing')" style="cursor: pointer">
         <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
@@ -84,14 +99,37 @@ const cancelledAction = async () => {
       line-height: 24px;
     }
   }
+
+  .buttons {
+    gap: 8px;
+  }
   .btn {
     text-transform: none !important;
     height: 36px;
+    padding-inline: 12px;
+  }
+  .hide {
+    display: none;
   }
 }
 @media (max-width: 800px) {
   #Card {
     width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  #Card {
+    .buttons {
+      .btn {
+        display: none;
+      }
+      .hide {
+        display: flex;
+        height: 36px !important;
+        width: 36px !important;
+      }
+    }
   }
 }
 </style>

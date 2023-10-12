@@ -10,8 +10,11 @@
     <template class="d-flex w-100" v-slot:content>
       <div
         v-if="
-          (socials.length === 0 && !(instagram || youtube || linkedin)) ||
-          socials.length === deleteArray.length
+          socials.length === 0 ||
+          (socials.length === deleteArray.length &&
+            socials.every((item) =>
+              deleteArray.some((item2) => item.id === item2.socialId),
+            ))
         "
         class="empty d-flex flex-column justify-center align-center"
         style="gap: 16px"
@@ -32,12 +35,11 @@
           >
             <draggable
               class="d-flex flex-column contacts w-100"
-              :list="socials"
+              :list="sortedSocials"
               item-key="name"
               :disabled="!(isEditing && canEdit)"
               ghost-class="ghost"
-              @start="dragging = true"
-              @end="dragging = false"
+              @end="handleDrop"
               handle=".handle"
             >
               <template #item="{ element, index }">
@@ -45,11 +47,12 @@
                   :socialId="element.id"
                   :url="element.url"
                   :name="element.name"
+                  :index="index"
                   :key="index"
-                  :loading="loading"
                   :isLast="socials.length - 1 === index"
                   :canEdit="isEditing && canEdit"
-                  @social:delete="updateDeleteArray"
+                  @update:social="updateSocialMedia"
+                  @delete:social="updateDeleteArray"
                 />
               </template>
             </draggable>
@@ -79,30 +82,26 @@
 
 <script setup lang="ts">
 import draggable from 'vuedraggable';
-const loading = ref(false);
 
-const dragging = ref(false);
 const isEditing = ref(false);
 const isAdding = ref(false);
 const componentKey = ref(0);
 
 const emit = defineEmits(['update:user']);
-const client = useStrapiClient();
-const { create, delete: _delete } = useStrapi();
+const { create, update, delete: _delete } = useStrapi();
 
 const props = defineProps({
   socials: {
-    type: Array as PropType<any[]>,
+    type: Array as PropType<
+      {
+        id: number;
+        socialId: number;
+        url: string;
+        name: string;
+        index: number;
+      }[]
+    >,
     required: true,
-  },
-  instagram: {
-    type: String,
-  },
-  linkedin: {
-    type: String,
-  },
-  youtube: {
-    type: String,
   },
   canEdit: {
     type: Boolean,
@@ -114,62 +113,125 @@ const props = defineProps({
   },
 });
 
-const { id, socials, instagram, youtube, linkedin, canEdit } = toRefs(props);
+const { id, socials, canEdit } = toRefs(props);
 
 const missingSocials = ref<string[]>([]);
-const currentSocials = ref<any[]>([]);
+const sortedSocials = ref<
+  {
+    id: number;
+    socialId: number;
+    url: string;
+    name: string;
+    index: number;
+  }[]
+>([]);
+
+const sortSocials = () => {
+  sortedSocials.value = [...socials.value].sort((a, b) =>
+    a.index > b.index ? 1 : b.index > a.index ? -1 : 0,
+  );
+};
 
 onMounted(() => {
-  currentSocials.value = socials.value;
-  if (!instagram!.value) missingSocials.value.push('Instagram');
-  else currentSocials.value.push({ name: 'Instagram', url: instagram!.value });
-  if (!youtube!.value) missingSocials.value.push('Youtube');
-  else currentSocials.value.push({ name: 'Youtube', url: youtube!.value });
-  if (!linkedin!.value) missingSocials.value.push('Linkedin');
-  else currentSocials.value.push({ name: 'Linkedin', url: linkedin!.value });
+  sortSocials();
+  if (!socials.value.find((element) => element.name === 'instagram'))
+    missingSocials.value.push('Instagram');
+  if (!socials.value.find((element) => element.name === 'youtube'))
+    missingSocials.value.push('Youtube');
+  if (!socials.value.find((element) => element.name === 'linkedin'))
+    missingSocials.value.push('Linkedin');
   missingSocials.value.push('Outra rede');
 });
-const addSocial = async (e) => {
-  if (e.value2) {
+const addSocial = async ({ value, value2, selectedSocial }) => {
+  if (value2 === '') {
     await create('socials', {
-      name: e.value2,
-      url: e.value,
+      name: selectedSocial.toLowerCase(),
+      url: value,
+      index: socials.value.length,
       users_permissions_user: id.value,
     });
+    missingSocials.value = missingSocials.value.filter(
+      (e) => e !== selectedSocial,
+    );
   } else {
-    const body = {};
-    body[e.selectedSocial.toLowerCase()] = e.value;
-    await client(`/users/${props.id}`, {
-      method: 'PUT',
-      body,
+    await create('socials', {
+      name: value2,
+      url: value,
+      index: socials.value.length,
+      users_permissions_user: id.value,
     });
   }
+
   isAdding.value = false;
 
   emit('update:user');
 };
-const deleteArray = ref<number[]>([]);
-const updateDeleteArray = (e) => {
-  deleteArray.value.push(e.socialId);
+const deleteArray = ref<{ socialId: number; name: string }[]>([]);
+const updateArray = ref<
+  { socialId: number; url: string; name: string; index: number }[]
+>([]);
+
+const updateDeleteArray = ({ socialId, name }) => {
+  deleteArray.value.push({ socialId: socialId, name: name });
+};
+
+const updateSocialMedia = ({ socialId, name, url, index }) => {
+  const num = updateArray.value.findIndex((item) => item.socialId === socialId);
+
+  if (num !== -1) updateArray.value[num] = { socialId, name, url, index };
+  else updateArray.value.push({ socialId, name, url, index });
 };
 
 const save = async () => {
   const promises: Promise<any>[] = [];
-  const body = {};
+  const supported = ['youtube', 'linkedin', 'instagram'];
+  updateArray.value.forEach((item) => {
+    promises.push(update(`/socials/${item.socialId}`, item));
+  });
 
-  deleteArray.value.forEach((value) => {
-    promises.push(_delete(`/socials/${value}`));
+  deleteArray.value.forEach((item) => {
+    promises.push(_delete(`/socials/${item.socialId}`));
+    if (supported.includes(item.name))
+      missingSocials.value = [
+        item.name[0].toLocaleUpperCase() + item.name.slice(1),
+      ].concat(missingSocials.value);
   });
 
   if (promises.length === 0) return;
-  const res = await Promise.all(promises);
-
+  await Promise.all(promises);
+  deleteArray.value = [];
+  updateArray.value = [];
   emit('update:user');
 };
 
 const cancel = () => {
   componentKey.value = componentKey.value + 1;
   deleteArray.value = [];
+  sortedSocials.value = socials.value;
+};
+
+watch(
+  () => socials.value,
+  () => sortSocials(),
+  { deep: true },
+);
+
+const handleDrop = ({ oldIndex, newIndex }) => {
+  socials.value.forEach((element, i) => {
+    let temp = updateArray.value.findIndex(
+      (item) => element.id === item.socialId,
+    );
+    if (temp !== -1) {
+      updateArray.value[temp] = { ...updateArray.value[temp], index: i };
+    } else {
+      updateArray.value.push({
+        socialId: element.id,
+        url: element.url,
+        name: element.name,
+        index: i,
+      });
+    }
+  });
 };
 </script>
 

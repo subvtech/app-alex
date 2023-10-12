@@ -1,7 +1,7 @@
 <template>
   <div
-    class="flex-row align-center justify-space-between rounded-lg w-100"
-    :class="[isDeleted ? 'd-none' : 'd-flex', isLast ? '' : 'border-down']"
+    class="flex-row align-center justify-space-between w-100"
+    :class="[isDeleted ? 'd-none' : 'd-flex', index === 0 ? 'rounded-t-lg' : '', isLast ? 'rounded-b-lg' : 'border-down']"
     style="gap: 16px; overflow: hidden"
   >
     <div class="contact-item d-flex flex-col align-center w-100">
@@ -19,8 +19,7 @@
                 style="padding: 6px; border: 1px solid #d2d6da"
               >
                 <NuxtImg
-                  v-if="name"
-                  :src="name ? `/svg/${name}.svg` : '/svg/website.svg'"
+                  :src="isSupported ? `/svg/${name}.svg` : '/svg/website.svg'"
                   placeholder
                   style="width: 24px; height: 24px"
                 />
@@ -39,7 +38,7 @@
             </div>
             <v-icon
               v-if="canEdit"
-              class="mx-4"
+              class="trash"
               size="24"
               color="#E9494A"
               @click="deleteSocial"
@@ -52,9 +51,20 @@
           :class="canEdit ? '' : 'd-none'"
         >
           <v-text-field
+            v-if="!isSupported"
+            label="Qual o nome do site?"
+            v-model="value2"
+            name="name"
+            @input="emit('update:social', { socialId, name: value2, index })"
+            :error-messages="errorMessage2"
+            color="black"
+            variant="outlined"
+          />
+          <v-text-field
             label="Qual o endereço do site?"
             v-model="value"
             name="url"
+            @input="emit('update:social', { socialId, url: value, index })"
             :error-messages="errorMessage"
             color="black"
             variant="outlined"
@@ -66,17 +76,15 @@
 </template>
 
 <script setup lang="ts">
-import { useField, useForm } from 'vee-validate';
+import { useField } from 'vee-validate';
 
-const emit = defineEmits(['update:user', 'social:delete']);
-const { urlRules } = useFormRules();
-
-const { update, delete: _delete } = useStrapi();
-const messageStore = useMessageStore();
+const emit = defineEmits(['update:user', 'delete:social', 'update:social']);
+const { nameRules, urlRules } = useFormRules();
 
 const props = defineProps({
   socialId: {
     type: Number,
+    required: true,
   },
   url: {
     type: String,
@@ -86,13 +94,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  loading: {
-    type: Boolean,
+
+  index: {
+    type: Number,
     required: true,
-  },
-  icon: {
-    type: Boolean,
-    default: false,
   },
 
   canEdit: {
@@ -106,15 +111,28 @@ const props = defineProps({
   },
 });
 
-const { url, name, socialId, loading, icon, canEdit } = toRefs(props);
+const { url, name, socialId, index, canEdit } = toRefs(props);
 const isDeleted = ref(false);
 
 const { value, errorMessage } = useField('url', urlRules, {
   initialValue: url.value,
 });
+
+const { value: value2, errorMessage: errorMessage2 } = useField(
+  'name',
+  nameRules,
+  {
+    initialValue: name.value,
+  },
+);
+
+const isSupported = computed(() =>
+  ['youtube', 'linkedin', 'instagram'].includes(name.value),
+);
+
 const deleteSocial = async () => {
   isDeleted.value = true;
-  emit('social:delete', { socialId: socialId?.value, name: name.value });
+  emit('delete:social', { socialId: socialId?.value, name: name.value });
 };
 </script>
 
@@ -124,7 +142,6 @@ const deleteSocial = async () => {
 }
 
 .contact-item {
-  gap: 16px;
   position: relative;
   .handle {
     display: none;
@@ -140,6 +157,9 @@ const deleteSocial = async () => {
     .handle {
       display: block;
     }
+  }
+  .trash {
+    margin-inline: 24px;
   }
 
   .v-expansion-panel {
@@ -169,6 +189,39 @@ const deleteSocial = async () => {
 
     path {
       fill: #5d6872;
+    }
+  }
+}
+
+@media (max-width: 408px) {
+  .contact-item {
+    .handle {
+      left: 4px;
+    }
+    .trash {
+      margin-left: 0px;
+      margin-right: 12px;
+    }
+
+    .v-expansion-panel {
+      &-title {
+        padding-inline: 16px;
+        height: 52px;
+
+        &__overlay {
+          box-shadow: none !important;
+        }
+        div.d-flex {
+          gap: 12px;
+        }
+        &:hover {
+          padding-inline: 24px;
+        }
+      }
+
+      &-text__wrapper {
+        padding-block: 0px !important;
+      }
     }
   }
 }

@@ -151,9 +151,6 @@
         <profile-socials
           :can-edit="canEdit"
           :socials="user.socials"
-          :instagram="user.instagram"
-          :linkedin="user.linkedin"
-          :youtube="user.youtube"
           :id="user.id"
           @update:user="updateUser"
         />
