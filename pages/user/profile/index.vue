@@ -156,10 +156,16 @@
         />
       </div>
       <div class="d-flex flex-column w-100">
-        <profile-about :info="user.info" />
+        <profile-about
+          :info="user.user_descriptions"
+          :id="user.id"
+          :can-edit="canEdit"
+          @update:user="updateUser"
+        />
         <profile-institutional
           :institutions="user.institutions"
           :id="user.id"
+          :can-edit="canEdit"
           @update:user="updateUser"
         />
       </div>
@@ -216,6 +222,7 @@ const updateUser = async (show = true) => {
       'learningPlans',
       'socials',
       'trails',
+      'user_descriptions',
       'user_wallet',
     ],
   });

@@ -76,7 +76,6 @@ const emit = defineEmits(['toogle:isEditing']);
 
 const cancelledAction = async () => {
   emit('toogle:isEditing');
-  console.log(isEditing.value);
   cancel.value();
 };
 </script>

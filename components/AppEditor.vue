@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
-import Delmiter from '@editorjs/delimiter';
+import Delimiter from '@editorjs/delimiter';
 import Header from 'editorjs-header-with-anchor';
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
@@ -27,10 +27,10 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from 'models/structure.model';
+import { Structure } from '~/models/structure.model';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
-import { Upload } from 'models/upload.model';
+import { Upload } from '~/models/upload.model';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
@@ -59,7 +59,7 @@ const planData = computed(() => {
 onMounted(() => {
   instance.value = new EditorJS({
     tools: {
-      delimiter: Delmiter,
+      delimiter: Delimiter,
       // embed: require('@editorjs/embed'),
       header: {
         class: Header,
