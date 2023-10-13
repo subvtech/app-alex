@@ -56,7 +56,7 @@
         style="height: 42px; width: 115px"
       >
         <NuxtLink to="/">
-          <v-img
+          <NuxtImg
             src="/images/alex.svg"
             alt="logo"
             height="32"

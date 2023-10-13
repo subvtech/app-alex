@@ -124,6 +124,12 @@
             }}
           </span>
         </div>
+
+        <v-icon
+          @click="selectedOption = 'settings'"
+          style="position: absolute; right: 24px; top: 15px;"
+          >mdi-cog-outline</v-icon
+        >
       </div>
       <div class="menu d-flex">
         <span
@@ -162,6 +168,22 @@
           :can-edit="canEdit"
           @update:user="updateUser"
         />
+        <div>
+          <profile-competences
+            :title="$t('components.profile.competences.technical')"
+            :id="user.id"
+            :can-edit="canEdit"
+            :tags="user.tags"
+            @update:user="updateUser"
+          ></profile-competences>
+          <profile-competences
+            :title="$t('components.profile.competences.general')"
+            :id="user.id"
+            :can-edit="canEdit"
+            :tags="user.tags"
+            @update:user="updateUser"
+          ></profile-competences>
+        </div>
         <profile-institutional
           :institutions="user.institutions"
           :id="user.id"
@@ -184,9 +206,20 @@
       v-else-if="links[3] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     ></div>
-    <div v-else class="content-block d-flex justify-center flex-row">
+    <div
+      v-else-if="links[4] === selectedOption"
+      class="content-block d-flex justify-center flex-row"
+    >
       <profile-events
         :url="user.avatar ? strapiBaseUrl + user.avatar.url : undefined"
+      />
+    </div>
+    <div v-else class="content-block d-flex justify-center flex-row">
+      <profile-settings
+        :email="user.email"
+        :cpf="user.cpf"
+        :fullname="user.fullname"
+        :id="user.id"
       />
     </div>
   </div>
@@ -222,10 +255,12 @@ const updateUser = async (show = true) => {
       'learningPlans',
       'socials',
       'trails',
+      'tags',
       'user_descriptions',
       'user_wallet',
     ],
   });
+  console.log(user.value);
 
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;

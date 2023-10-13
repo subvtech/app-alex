@@ -2,11 +2,14 @@
   <profile-card
     :title="$t('components.profile.institutional.title')"
     :full-width="true"
-    style="max-width: 1138px"
+    :isEditing="isEditing && canEdit"
+    @toogle:isEditing="isEditing = !isEditing"
+    :cancel="() => {}"
+    :save="() => {}"
   >
     <template v-slot:content>
       <v-btn
-        v-if="canEdit"
+        v-if="isEditing && canEdit"
         class="btn"
         color="accent"
         @click="showSearch"
@@ -20,16 +23,16 @@
       >
 
       <v-btn
-        v-if="canEdit"
+        v-if="isEditing && canEdit"
         class="small"
         color="accent"
-        :icon="isAddingInstitution ? 'mdi-check-bold' : 'mdi-plus'"
+        :icon="isEditing && canEdit ? 'mdi-check-bold' : 'mdi-plus'"
         @click="showSearch"
         variant="outlined"
       />
 
       <alex-inputs-institutions
-        v-if="isAddingInstitution"
+        v-if="isEditing && canEdit"
         v-model:institutions="searchInstitutions"
         v-model:search="search"
         @update:value="updateSelectedOption"
@@ -42,8 +45,11 @@
           v-for="(item, index) in institutions"
         >
           <div class="d-flex" style="gap: 12px">
-            <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
-
+            <NuxtImg
+              :src="strapiBaseUrl + item.cover.url"
+              placeholder
+              style="height: 80px; width: 80px"
+            />
             <div class="d-flex flex-column justify-center">
               <span>{{ item.acronym + ' - ' + item.name }}</span>
               <p>{{ item.sector }}</p>
@@ -68,9 +74,17 @@
           </div>
         </div>
       </div>
-      <div v-else class="d-flex flex-column justify-center align-center pa-6" style="gap: 16px">
-        <img src="../../assets/svg/EmptyInstitutional.svg" alt=""  style="height: 160px; width: 160px">
-        <span class="info text-center" style="color: rgb(175, 175, 175);">
+      <div
+        v-else
+        class="d-flex flex-column justify-center align-center pa-6"
+        style="gap: 16px"
+      >
+        <NuxtImg
+          src="/svg/EmptyInstitutional.svg"
+          placeholder
+          style="height: 160px; width: 160px"
+        />
+        <span class="info text-center" style="color: rgb(175, 175, 175)">
           {{ $t('components.profile.institutional.emptyInstitutional') }}
         </span>
       </div>
@@ -93,6 +107,8 @@ const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
 let selectedOption = ref(0);
 const search = ref('');
+const isEditing = ref(false);
+
 const client = useStrapiClient();
 const emit = defineEmits(['update:user']);
 
@@ -111,9 +127,7 @@ const props = defineProps({
   },
 });
 const { institutions } = toRefs(props);
-const cancel = () => {
-
-}
+const cancel = () => {};
 const updateSelectedOption = (event) => {
   selectedOption.value = event;
 };

@@ -41,33 +41,6 @@
         />
       </client-only>
     </template>
-
-    <template v-slot:footer>
-      <div v-if="tags.length > 0" class="footer d-flex flex-row pt-6">
-        <div
-          class="competence d-flex flex-column align-start pa-4"
-          v-for="block in [
-            {
-              title: $t('components.profile.about.general'),
-              items: tags,
-            },
-            {
-              title: $t('components.profile.about.technical'),
-              items: tags,
-            },
-          ]"
-        >
-          <span class="title">{{ block.title }}</span>
-          <div class="d-flex flex-wrap justify-center">
-            <span
-              class="item d-flex justify-center align-center px-4"
-              v-for="item in block.items"
-              >{{ item }}</span
-            >
-          </div>
-        </div>
-      </div>
-    </template>
   </profile-card>
 </template>
 
@@ -91,13 +64,9 @@ const props = defineProps({
     required: true,
   },
   canEdit: { type: Boolean, required: true },
-  tags: {
-    type: Array as PropType<{ text: string }[]>,
-    default: () => [],
-  },
 });
 
-const { info, canEdit, id, tags } = toRefs(props);
+const { info, canEdit, id } = toRefs(props);
 const isEditing = ref(false);
 const cancel = () => {};
 const emit = defineEmits(['ready', 'update:user']);
@@ -114,7 +83,6 @@ onMounted(() => {
     },
     onChange: () => checkBlocksLimit(instance.value),
     i18n,
-
     autofocus: true,
     placeholder: 'Clique para iniciar...',
     holder: 'editorjs',
@@ -210,12 +178,13 @@ const toggleIsEditing = () => {
 </script>
 
 <style global lang="scss">
-
-#lockedEditor, #editorjs * {
-  max-width: 100% !important
+#lockedEditor,
+#editorjs * {
+  max-width: 100% !important;
 }
 
-#lockedEditor, #editorjs {
+#lockedEditor,
+#editorjs {
   max-width: 350px !important;
 }
 
@@ -242,35 +211,6 @@ const toggleIsEditing = () => {
     font-size: 16px;
     font-weight: 400;
     line-height: 22px;
-  }
-  .footer {
-    gap: 24px;
-
-    .competence {
-      gap: 16px;
-      border-radius: 8px;
-      border: 1px solid #eaeef1;
-
-      .title {
-        color: #5d6872;
-        font-size: 16px;
-        font-weight: bold;
-        line-height: 22px;
-      }
-
-      div {
-        gap: 8px;
-        .item {
-          font-size: 14px;
-          font-weight: 400;
-          color: #5d6872;
-          padding-block: 10px;
-          gap: 4px;
-          border-radius: 99px;
-          border: 1px solid #5d6872;
-        }
-      }
-    }
   }
 }
 </style>
