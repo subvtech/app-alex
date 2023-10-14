@@ -3,6 +3,7 @@
     class="mt-6"
     :title="$t('components.profile.wallets.title')"
     :full-width="false"
+    :showIcon="false"
   >
     <template v-slot:content>
       <div class="item d-flex justify-space-between">

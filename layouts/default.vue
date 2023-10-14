@@ -54,16 +54,7 @@
         v-if="!drawer"
         class="primary pl-2 pt-1 rounded-pill"
         style="height: 42px; width: 115px"
-      >
-        <NuxtLink to="/">
-          <NuxtImg
-            src="/images/alex.svg"
-            alt="logo"
-            height="32"
-            width="96"
-          />
-        </NuxtLink>
-      </div>
+      ></div>
       <v-spacer />
       <v-btn icon color="grey">
         <v-icon>mdi-magnify</v-icon>

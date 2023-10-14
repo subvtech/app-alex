@@ -1,7 +1,8 @@
 <template>
   <profile-card
     :title="$t('components.profile.general.title')"
-    :isEditing="isEditing && canEdit"
+    :isEditing="false"
+    :showIcon="false"
     @toogle:isEditing="isEditing = !isEditing"
   >
     <template v-slot:content>
@@ -108,7 +109,6 @@ const cancel = () => {};
     .box {
       flex-direction: column;
       min-width: 90px;
-      max-width: 123px;
       min-height: 90px;
       width: 33%;
       gap: 16px;

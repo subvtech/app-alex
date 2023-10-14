@@ -5,32 +5,9 @@
     :isEditing="isEditing && canEdit"
     @toogle:isEditing="isEditing = !isEditing"
     :cancel="() => {}"
-    :save="() => {}"
+    :save="showSearch"
   >
     <template v-slot:content>
-      <v-btn
-        v-if="isEditing && canEdit"
-        class="btn"
-        color="accent"
-        @click="showSearch"
-        variant="outlined"
-      >
-        {{
-          isAddingInstitution
-            ? $t('components.profile.institutional.save')
-            : $t('components.profile.institutional.add')
-        }}</v-btn
-      >
-
-      <v-btn
-        v-if="isEditing && canEdit"
-        class="small"
-        color="accent"
-        :icon="isEditing && canEdit ? 'mdi-check-bold' : 'mdi-plus'"
-        @click="showSearch"
-        variant="outlined"
-      />
-
       <alex-inputs-institutions
         v-if="isEditing && canEdit"
         v-model:institutions="searchInstitutions"
@@ -55,7 +32,7 @@
               <p>{{ item.sector }}</p>
             </div>
           </div>
-          <div v-if="canEdit" class="options">
+          <div v-if="isEditing && canEdit" class="options">
             <v-icon
               @click="updateShowDeleteButton(index)"
               color="#6E7A87"
@@ -139,7 +116,7 @@ const updateShowDeleteButton = (index: number) => {
 };
 
 const showSearch = async () => {
-  if (isAddingInstitution.value && searchInstitutions.value) {
+  if (searchInstitutions.value) {
     if (searchInstitutions.value.length > 0) {
       const list = institutions.value.map((item) => item.id);
 
@@ -170,7 +147,7 @@ const removeInstitution = async (index) => {
     method: 'PUT',
     body: { institutions: list },
   });
-  emit('update:user', {});
+  emit('update:user');
 };
 </script>
 

@@ -1,20 +1,19 @@
 <template>
   <profile-card
-    class="mb-6"
     :title="title"
     :isEditing="isEditing && canEdit"
     @toogle:isEditing="isEditing = !isEditing"
     :cancel="onCancel"
-    :save="() => {}"
+    :save="onSave"
     :full-width="true"
   >
     <template v-slot:content>
       <div class="footer d-flex flex-column">
         <div v-if="isEditing" class="d-flex flex-column" style="gap: 8px">
-          <span>{{ $t('components.profile.competences.technicalLabel') }}</span>
+          <span>{{ label }}</span>
           <v-autocomplete
-            placeholder="Digite uma competência"
-            :items="[...tags]"
+            :placeholder="placeholder"
+            :items="filteredTags"
             item-title="text"
             variant="outlined"
             hide-details
@@ -55,12 +54,22 @@
 const { create, find, update, delete: _delete } = useStrapi();
 
 const client = useStrapiClient();
+type Tag = { text: string; id: number; verified_by: any; isGeneral: boolean };
+
 const props = defineProps({
-  tags: {
-    type: Array as PropType<any[]>,
+  userTags: {
+    type: Array as PropType<Tag[]>,
     default: () => [],
   },
   title: {
+    type: String,
+    required: true,
+  },
+  label: {
+    type: String,
+    required: true,
+  },
+  placeholder: {
     type: String,
     required: true,
   },
@@ -68,65 +77,141 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  isGeneral: {
+    type: Boolean,
+    default: false,
+  },
   canEdit: { type: Boolean, required: true },
 });
 
-const { tags, canEdit, id } = toRefs(props);
+const { userTags, canEdit, id, isGeneral } = toRefs(props);
 const isEditing = ref(false);
 
-const selectedTags = ref<{ text: string }[]>([...tags.value]);
-const selectedTag = ref<{ text: string; id?: number } | null>(null);
-const allTags = ref<{ text: string; id?: number }[]>([]);
-onMounted(async () => {
-  const temp = await find(`tags?filters[verified_by][$nin]=${id.value}`, {});
-  console.log({ id: id.value });
-  console.log(temp);
-});
+const selectedTags = ref<{ text: string }[]>([]);
+const selectedTag = ref<Tag | null>(null);
+const allTags = ref<Tag[]>([]);
+const filteredTags = ref<Tag[]>([]);
 
-const promises = ref<Promise<any>[]>([]);
+const userTagsIds = ref<number[]>([]);
+
+onMounted(async () => {
+  const temp = await find(`tags`, { populate: 'verified_by' });
+
+  userTagsIds.value = userTags.value.map((item) => item.id);
+  allTags.value = temp.data.map((item) => {
+    return { ...item.attributes!, id: item.id };
+  }) as Tag[];
+
+  if (isGeneral.value) {
+    selectedTags.value = userTags.value.filter((item) => item.isGeneral);
+    filteredTags.value = allTags.value.filter(
+      (item) => !userTagsIds.value.includes(item.id) && item.isGeneral,
+    );
+  } else {
+    selectedTags.value = userTags.value.filter((item) => !item.isGeneral);
+    filteredTags.value = allTags.value.filter(
+      (item) => !userTagsIds.value.includes(item.id) && !item.isGeneral,
+    );
+  }
+});
+const createArray = ref<Tag[]>([]);
+const updateArray = ref<Tag[]>([]);
+const deleteArray = ref<Tag[]>([]);
 
 const populateSelectedTags = (newValue) => {
-  if (!selectedTag.value && newValue.text) {
-    if (!selectedTags.value.find((item) => item.text === newValue.text))
-      selectedTags.value.push(newValue);
+  const updateTags = (tag, isCreating = false) => {
+    if (selectedTags.value.find((item) => item.text === tag.text)) return;
+    selectedTags.value.push(tag);
+    filteredTags.value = filteredTags.value.filter(
+      (item) => item.text !== tag.text,
+    );
+    if (isCreating) createArray.value.push(tag);
+    else updateArray.value.push(tag);
+  };
+
+  if (!selectedTag.value && newValue.id) {
+    updateTags(newValue);
   } else if (
     selectedTag.value &&
     selectedTag.value.text &&
     selectedTag.value.text.length > 2
   ) {
-    if (
-      !selectedTags.value.find((item) => item.text === selectedTag.value!.text)
-    ) {
-      selectedTags.value.push(selectedTag.value);
-    }
+    updateTags(selectedTag.value, true);
   }
   selectedTag.value = null;
 };
 
-const removeItem = (text) => {
-  console.log('removeItem');
-  if (selectedTag.value && selectedTag.value.id) {
-    promises.value.push(
-      client(`/users/${props.id}`, {
-        method: 'PUT',
-        body: {
-          user_descriptions: tags.value.filter(
-            (item) => item.id !== selectedTag.value!.id,
-          ),
-        },
-      }),
-    );
+const removeItem = (tag) => {
+  if (userTags.value.find((item) => item.id === tag.id)) {
+    deleteArray.value.push(tag);
   }
-  selectedTags.value = selectedTags.value.filter((item) => item !== text);
+  selectedTags.value = selectedTags.value.filter(
+    (item) => item.text !== tag.text,
+  );
+
+  createArray.value = createArray.value.filter(
+    (item) => item.text !== tag.text,
+  );
+
+  updateArray.value = updateArray.value.filter(
+    (item) => item.text !== tag.text,
+  );
+
+  filteredTags.value.push(tag);
   selectedTag.value = null;
 };
 
 const handleInput = (e) => {
-  if (e.target.value.length > 1) selectedTag.value = { text: e.target.value };
+  if (e.target.value.length > 1)
+    selectedTag.value = { text: e.target.value } as Tag;
 };
 
-const onCancel = () => {
-  promises.value = [];
+const onCancel = async () => {
+  selectedTags.value = userTags.value;
+  deleteArray.value = [];
+  updateArray.value = [];
+  createArray.value = [];
+};
+
+const onSave = async () => {
+  const promises: Promise<any>[] = [];
+  const ids = allTags.value.map((item) => item.id);
+  createArray.value
+    .filter((item) => !ids.includes(item.id))
+    .forEach((item) => {
+      promises.push(
+        create('tags', {
+          ...item,
+          verified_by: id.value,
+          isGeneral: isGeneral.value,
+        }),
+      );
+    });
+  updateArray.value
+    .filter((item) => !userTagsIds.value.includes(item.id))
+    .forEach((item) => {
+      promises.push(
+        update(`tags/${item.id}`, {
+          verified_by: item.verified_by.data
+            ? item.verified_by.data.push(id.value)
+            : [id.value],
+        }),
+      );
+    });
+  deleteArray.value.forEach((element) => {
+    promises.push(
+      client(`/users/${props.id}`, {
+        method: 'PUT',
+        body: {
+          tags: userTags.value.filter((item) => item.id !== element.id),
+        },
+      }),
+    );
+  });
+  await Promise.all(promises);
+  deleteArray.value = [];
+  updateArray.value = [];
+  createArray.value = [];
 };
 
 watch(

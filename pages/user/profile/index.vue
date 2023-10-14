@@ -126,8 +126,8 @@
         </div>
 
         <v-icon
-          @click="selectedOption = 'settings'"
-          style="position: absolute; right: 24px; top: 15px;"
+          @click="showSettings = !showSettings"
+          style="position: absolute; right: 24px; top: 15px"
           >mdi-cog-outline</v-icon
         >
       </div>
@@ -142,7 +142,18 @@
       </div>
     </div>
     <div
-      v-if="links[0] === selectedOption"
+      v-if="showSettings"
+      class="content-block d-flex justify-center flex-row"
+    >
+      <profile-settings
+        :email="user.email"
+        :cpf="user.cpf"
+        :fullname="user.fullname"
+        :id="user.id"
+      />
+    </div>
+    <div
+      v-else-if="links[0] === selectedOption"
       class="content-block d-flex justify-center flex-row w-100"
     >
       <div class="details d-flex flex-column w-100">
@@ -150,7 +161,6 @@
           :id="user.id"
           :socials="user.socials"
           :telephone="user.phone"
-          :can-edit="canEdit"
           :email="user.email"
           @update:user="updateUser"
         />
@@ -168,19 +178,26 @@
           :can-edit="canEdit"
           @update:user="updateUser"
         />
-        <div>
+        <div class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences" style="gap: 24px">
           <profile-competences
-            :title="$t('components.profile.competences.technical')"
+            :title="$t('components.profile.competences.technical.title')"
+            :label="$t('components.profile.competences.technical.label')"
+            :placeholder="$t('components.profile.competences.technical.placeholder')"
             :id="user.id"
             :can-edit="canEdit"
-            :tags="user.tags"
+            :userTags="user.tags"
             @update:user="updateUser"
           ></profile-competences>
           <profile-competences
-            :title="$t('components.profile.competences.general')"
+            :title="$t('components.profile.competences.general.title')"
+            :label="$t('components.profile.competences.general.label')"
+            :placeholder="
+              $t('components.profile.competences.general.placeholder')
+            "
             :id="user.id"
             :can-edit="canEdit"
-            :tags="user.tags"
+            :userTags="user.tags"
+            :is-general="true"
             @update:user="updateUser"
           ></profile-competences>
         </div>
@@ -206,20 +223,9 @@
       v-else-if="links[3] === selectedOption"
       class="content-block d-flex justify-center flex-row"
     ></div>
-    <div
-      v-else-if="links[4] === selectedOption"
-      class="content-block d-flex justify-center flex-row"
-    >
+    <div v-else class="content-block d-flex justify-center flex-row">
       <profile-events
         :url="user.avatar ? strapiBaseUrl + user.avatar.url : undefined"
-      />
-    </div>
-    <div v-else class="content-block d-flex justify-center flex-row">
-      <profile-settings
-        :email="user.email"
-        :cpf="user.cpf"
-        :fullname="user.fullname"
-        :id="user.id"
       />
     </div>
   </div>
@@ -260,7 +266,6 @@ const updateUser = async (show = true) => {
       'user_wallet',
     ],
   });
-  console.log(user.value);
 
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
@@ -279,6 +284,8 @@ const links = ref([
   i18n.t('pages.profile.events'),
 ]);
 
+const showSettings = ref(false);
+
 async function uploadProfilePicture(event: any) {
   if (user.value.avatar) {
     const { updatedAt } = await updateImage(event, user.value.avatar.id);
@@ -289,12 +296,11 @@ async function uploadProfilePicture(event: any) {
     const temp = await uploadImage(event);
     user.value.avatar = temp[0];
     profilePicture.value = temp[0].url;
-    const result = await client(`/users/${user.value.id}`, {
+
+    await client(`/users/${user.value.id}`, {
       method: 'PUT',
       body: { avatar: temp[0].id },
     });
-
-    console.log(result);
   }
 }
 
@@ -380,7 +386,6 @@ async function removeCoverPicture() {
     flex-direction: column;
     gap: 0px;
     transition: all ease-in-out 1s;
-    max-width: 1612px;
 
     .card {
       display: flex;
@@ -506,7 +511,6 @@ async function removeCoverPicture() {
     }
     .cover-block {
       position: relative;
-      max-width: 1612px;
       .cover {
         width: 100%;
         height: auto;
@@ -593,6 +597,12 @@ async function removeCoverPicture() {
     gap: 24px;
   }
 
+  @media(max-width: 1410px){
+    .competences{
+      flex-direction: column;
+    }
+  }
+
   @media (max-width: 1200px) {
     .user-block {
       .card {
@@ -637,7 +647,11 @@ async function removeCoverPicture() {
         }
       }
     }
+   
+   
   }
+
+ 
 
   @media (max-width: 800px) {
     .content-block {

@@ -2,6 +2,7 @@
   <profile-card
     :title="$t('components.profile.settings.title')"
     :full-width="true"
+    :showIcon="false"
   >
     <template v-slot:content>
       <div class="settings">

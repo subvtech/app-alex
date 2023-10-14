@@ -1,6 +1,12 @@
 {
-  "technical": "Technical Competences",
-  "general": "General Competences",
-  "generalLabel": "What's the new General Competence?",
-  "technicalLabel": "What's the new Technical Competence?"
+  "technical": {
+    "title": "Technical competences",
+    "label": "What's the new Technical competence?",
+    "placeholder": "Type in a technical competence"
+  },
+  "general": {
+    "title": "General competences",
+    "label": "What's the new General Competence?",
+    "placeholder": "Type in a general competence"
+  }
 }

@@ -16,7 +16,7 @@
         >
           {{ $t('components.profile.settings.cancel') }}</v-btn
         >
-        <v-btn class="btn" color="accent" @click="save" type="submit">
+        <v-btn class="btn" color="accent" @click="savedAction" type="submit">
           {{ $t('components.profile.settings.save') }}
         </v-btn>
 
@@ -35,7 +35,11 @@
           type="submit"
         />
       </div>
-      <div v-else @click="emit('toogle:isEditing')" style="cursor: pointer">
+      <div
+        v-else-if="showIcon"
+        @click="emit('toogle:isEditing')"
+        style="cursor: pointer"
+      >
         <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
       </div>
     </div>
@@ -69,10 +73,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showIcon: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const { title, cancel, isEditing, save } = toRefs(props);
 const emit = defineEmits(['toogle:isEditing']);
+
+const savedAction = async () => {
+  emit('toogle:isEditing');
+  save.value();
+};
 
 const cancelledAction = async () => {
   emit('toogle:isEditing');

@@ -217,7 +217,7 @@ watch(
 );
 
 const handleDrop = ({ oldIndex, newIndex }) => {
-  socials.value.forEach((element, i) => {
+  sortedSocials.value.forEach((element, i) => {
     let temp = updateArray.value.findIndex(
       (item) => element.id === item.socialId,
     );
