@@ -2,14 +2,14 @@
   <v-hover #default="{ isHovering, props }">
     <div
       v-bind="props"
-      class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer active"
-      :class="useClasses(active, disabled, isHovering).container"
+      class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer"
+      :class="useClasses(click, active, disabled, isHovering).container"
       @click="emit('onSelect')"
     >
       <div
         class="step-indicator-number-icon rounded-lg"
-        :class="useClasses(active, disabled, isHovering).bgNumber"
-    >
+        :class="useClasses(click, active, disabled, isHovering).bgNumber"
+      >
         <v-icon
           v-if="icon || completed"
           :icon="completed ? 'mdi-check' : icon"
@@ -18,7 +18,7 @@
         <div
           v-else
           class="text-h4"
-          :class="useClasses(active, disabled, isHovering).number"
+          :class="useClasses(click, active, disabled, isHovering).number"
         >
           {{ stepNumber }}
         </div>
@@ -26,14 +26,14 @@
       <div class="d-flex flex-column align-start justify-center text-gray-300">
         <div
           class="text-body-2"
-          :class="useClasses(active, disabled, isHovering).title"
+          :class="useClasses(click, active, disabled, isHovering).title"
         >
           {{ title }}
         </div>
         <div
           v-if="subtitle"
           class="text-body-3"
-          :class="useClasses(active, disabled, isHovering).subtitle"
+          :class="useClasses(click, active, disabled, isHovering).subtitle"
         >
           {{ subtitle }}
         </div>
@@ -88,26 +88,32 @@ const states = {
     container: '',
   },
 };
+
 const useClasses = (
+  click: boolean,
   active: boolean,
   disabled: boolean,
-  hovering?: boolean,
-  click?: boolean,
+  hovering: boolean
 ) => {
   if (click) return states['click'];
-  else if (hovering && !active && !disabled) return states['hovering'];
   else if (active) return states['active'];
+  else if (hovering && disabled && !active) return states['hovering'];
+  else if (hovering && active) return states['active'];
   else return states['default'];
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 /* Personalize as classes de estilo conforme necessário */
 .step-indicator-number-icon {
   display: grid;
   place-items: center;
   width: 40px;
   height: 40px;
+}
+
+.step-indicator-number-icon:active {
+  background-color: aqua;
 }
 .border-1-gray-blue {
   outline: 1px solid rgb(var(--v-theme-gray-100));
@@ -119,8 +125,6 @@ const useClasses = (
 .cursor-pointer {
   cursor: pointer;
 }
-.active:active .number {
-  color: rgb(var(--v-theme-secondary-0)) !important;
-}
+
 /* Adicione suas personalizações de estilo aqui */
 </style>

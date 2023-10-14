@@ -9,9 +9,11 @@
           :title="item.title"
           :subtitle="item.subtitle"
           :stepNumber="item.step"
+          :active="currentStep == item.step"
+          :disabled="currentStep < item.step"
           :completed="currentStep > item.step"
           class="custom-style"
-          @onSelect="() => currentStep = item.step"
+          @onSelect="() => (currentStep = item.step)"
         />
       </div>
 
@@ -23,10 +25,14 @@
             <v-card-title>{{
               tutorialStepsData[currentStep - 1].title
             }}</v-card-title>
-            <div class="mt-5 ml-10 mb-15 px-5 text-justify" v-html="tutorialStepsData[currentStep-1].content"></div>
+            <div
+              class="mt-5 ml-10 mb-15 px-5 text-justify"
+              v-html="tutorialStepsData[currentStep - 1].content"
+            ></div>
             <alex-tutorial-stepper-actions
               v-if="!showControls"
-              class="d-flex py-10 px-5">
+              class="d-flex py-10 px-5"
+            >
               <v-btn
                 v-if="currentStep > 1 && showNextButton"
                 type="button"
@@ -47,7 +53,7 @@
                 size="large"
                 text="Avançar"
               />
-               <v-btn
+              <v-btn
                 v-if="!showNextButton"
                 class="next-step"
                 @click="restartTutorial"
@@ -55,16 +61,16 @@
                 color="accent"
                 size="large"
                 text="Reiniciar"
-               />
-                <v-btn
-                  v-if="!showNextButton"
-                  @click="finishTutorial"
-                  class="ml-auto"
-                  rounded="lg"
-                  color="accent"
-                  size="large"
-                  text="Finalizar"
-                />
+              />
+              <v-btn
+                v-if="!showNextButton"
+                @click="finishTutorial"
+                class="ml-auto"
+                rounded="lg"
+                color="accent"
+                size="large"
+                text="Finalizar"
+              />
               <slot
                 name="controls"
                 :onPrevStep="onPrevStep"
@@ -86,9 +92,7 @@ const { tutorialStepsData } = defineProps(['tutorialStepsData']);
 
 const currentStep = ref(1);
 
-const showSteps = computed(
-  () => currentStep.value <= tutorialStepsData.length,
-);
+const showSteps = computed(() => currentStep.value <= tutorialStepsData.length);
 const showNextButton = computed(
   () => currentStep.value < tutorialStepsData.length,
 );
