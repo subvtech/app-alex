@@ -29,27 +29,40 @@
           placeholder
         />
         <div v-if="canEdit" class="edit-cover d-flex align-center">
-          <div v-if="coverPicture" class="delete" @click="removeCoverPicture">
-            <v-icon class="big-icon" size="24" color="#6E7A87"
+          <v-btn
+            v-if="coverPicture"
+            class="btn remove"
+            @click="removeCoverPicture"
+            size="large"
+            icon
+            variant="outlined"
+          >
+            <v-icon class="icon" size="20" color="#6E7A87"
               >mdi-trash-can-outline</v-icon
             >
-            <v-icon class="small-icon" size="18" color="#6E7A87"
-              >mdi-trash-can-outline</v-icon
-            >
-          </div>
+          </v-btn>
+
           <label class="" for="coverInput">
             <v-btn
-              class="btn"
+              class="btn label"
               @click="($refs.coverInput as any).click()"
               size="large"
+              icon
               variant="outlined"
             >
-              <v-icon class="icon" size="14" color="#6E7A87"
+              <v-icon class="icon" size="20" color="#6E7A87"
                 >mdi-pencil-outline</v-icon
               >
 
               <p>{{ $t('pages.profile.cover') }}</p></v-btn
             >
+            <v-btn
+              class="btn label small"
+              @click="($refs.coverInput as any).click()"
+              size="large"
+              icon="mdi-pencil-outline"
+              variant="outlined"
+            />
           </label>
 
           <input
@@ -63,71 +76,79 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="photo">
-          <label v-if="profilePicture" class="avatar" for="file-input">
-            <NuxtImg
-              class="img"
-              :src="strapiBaseUrl + profilePicture"
-              :alt="user.fullname"
-            />
+      <div
+        class="d-flex justify-space-between align-center pl-sm-10 pr-xl-10 pr-md-8 pr-sm-6 pr-xs-4"
+        style="padding-left: 32px"
+      >
+        <div class="card">
+          <div class="photo">
+            <label v-if="profilePicture" class="avatar" for="file-input">
+              <NuxtImg
+                class="img"
+                :src="strapiBaseUrl + profilePicture"
+                :alt="user.fullname"
+              />
 
-            <v-icon class="d-none" size="x-large" color="#fff"
-              >mdi-pencil-outline</v-icon
-            >
-            <input
-              class="d-none"
-              @input="uploadProfilePicture"
-              accept="image/png, image/jpeg"
-              id="file-input"
-              type="file"
-            />
-          </label>
-          <label v-else class="avatar" for="file-input">
+              <v-icon class="d-none" size="x-large" color="#fff"
+                >mdi-pencil-outline</v-icon
+              >
+              <input
+                class="d-none"
+                @input="uploadProfilePicture"
+                accept="image/png, image/jpeg"
+                id="file-input"
+                type="file"
+              />
+            </label>
+            <label v-else class="avatar" for="file-input">
+              <div
+                class="img d-flex justify-center align-center"
+                alt="profile picture"
+              >
+                <v-icon size="40" color="#B9BFC6">mdi-account-outline</v-icon>
+              </div>
+              <v-icon class="d-none" size="x-large" color="#fff"
+                >mdi-plus</v-icon
+              >
+              <input
+                class="d-none"
+                @input="uploadProfilePicture"
+                accept="image/png, image/jpeg"
+                id="file-input"
+                type="file"
+              />
+            </label>
             <div
-              class="img d-flex justify-center align-center"
-              alt="profile picture"
+              v-if="canEdit && profilePicture"
+              class="delete"
+              @click="removeProfilePicture"
             >
-              <v-icon size="40" color="#B9BFC6">mdi-account-outline</v-icon>
+              <v-icon size="x-small" color="#fff">mdi-trash-can-outline</v-icon>
             </div>
-            <v-icon class="d-none" size="x-large" color="#fff">mdi-plus</v-icon>
-            <input
-              class="d-none"
-              @input="uploadProfilePicture"
-              accept="image/png, image/jpeg"
-              id="file-input"
-              type="file"
-            />
-          </label>
-          <div
-            v-if="canEdit && profilePicture"
-            class="delete"
-            @click="removeProfilePicture"
-          >
-            <v-icon size="x-small" color="#fff">mdi-trash-can-outline</v-icon>
           </div>
-        </div>
 
-        <div class="info">
-          <div class="d-flex">
-            <span class="fullname">
-              {{ user.fullname }}
+          <div class="info">
+            <div class="d-flex">
+              <span class="fullname">
+                {{ user.fullname }}
+              </span>
+              <span class="social">@{{ user.username }} </span>
+            </div>
+
+            <span class="role">
+              {{
+                user.isProfessor
+                  ? $t('pages.profile.teacher')
+                  : $t('pages.profile.student')
+              }}
             </span>
-            <span class="social">@{{ user.username }} </span>
           </div>
-
-          <span class="role">
-            {{
-              user.isProfessor
-                ? $t('pages.profile.teacher')
-                : $t('pages.profile.student')
-            }}
-          </span>
         </div>
 
         <v-icon
           @click="showSettings = !showSettings"
-          style="position: absolute; right: 24px; top: 15px"
+          class="mr-4 mr-md-3 mr-sm-3 mr-xs-2"
+          color="#6E7A87"
           >mdi-cog-outline</v-icon
         >
       </div>
@@ -178,11 +199,16 @@
           :can-edit="canEdit"
           @update:user="updateUser"
         />
-        <div class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences" style="gap: 24px">
+        <div
+          class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences"
+          style="gap: 24px"
+        >
           <profile-competences
             :title="$t('components.profile.competences.technical.title')"
             :label="$t('components.profile.competences.technical.label')"
-            :placeholder="$t('components.profile.competences.technical.placeholder')"
+            :placeholder="
+              $t('components.profile.competences.technical.placeholder')
+            "
             :id="user.id"
             :can-edit="canEdit"
             :userTags="user.tags"
@@ -324,14 +350,11 @@ async function uploadCoverPicture(event: any) {
       method: 'PUT',
       body: { cover: temp[0].id },
     });
-
-    console.log(result);
   }
 }
 
 async function removeCoverPicture() {
   const result = await removeImage(user.value.cover.id);
-  console.log(result);
   user.value.cover = null;
   coverPicture.value = null;
 }
@@ -392,7 +415,6 @@ async function removeCoverPicture() {
       flex-direction: row;
       position: relative;
       width: 100%;
-      padding-inline: 40px;
       transition: all ease-in-out 1s;
       gap: 12px;
 
@@ -526,7 +548,7 @@ async function removeCoverPicture() {
         position: absolute;
         bottom: 24px;
         right: 20px;
-        .btn {
+        .btn.label {
           width: 153px;
 
           border-radius: 8px;
@@ -542,16 +564,20 @@ async function removeCoverPicture() {
             letter-spacing: 0.56px;
           }
         }
-        .delete {
+        .btn.label.small {
+          width: 44px;
+          height: 44px;
+          display: none;
+        }
+        .btn.remove {
           width: 44px;
           height: 44px;
           display: flex;
           justify-content: center;
           align-items: center;
           background: #f1f5f9;
-
           border-radius: 8px;
-
+          border: none;
           cursor: pointer;
 
           .small-icon {
@@ -597,8 +623,8 @@ async function removeCoverPicture() {
     gap: 24px;
   }
 
-  @media(max-width: 1410px){
-    .competences{
+  @media (max-width: 1410px) {
+    .competences {
       flex-direction: column;
     }
   }
@@ -647,11 +673,7 @@ async function removeCoverPicture() {
         }
       }
     }
-   
-   
   }
-
- 
 
   @media (max-width: 800px) {
     .content-block {
@@ -665,19 +687,17 @@ async function removeCoverPicture() {
     .user-block {
       .cover-block {
         .edit-cover {
-          .delete {
-            height: 33px;
-            width: 33px;
-            .small-icon {
-              display: block;
-            }
-            .big-icon {
-              display: none;
-            }
-          }
-
           .btn {
-            height: 33px;
+            height: 33px !important;
+          }
+          .btn.remove {
+            width: 33px !important;
+          }
+          .btn.label {
+            width: 153px !important;
+          }
+          .btn.label.small {
+            width: 33px !important;
           }
         }
       }
@@ -792,18 +812,12 @@ async function removeCoverPicture() {
   @media (max-width: 400px) {
     .user-block {
       .cover-block {
-        .icon {
-          display: none;
-        }
         .edit-cover {
-          right: 10px;
-          .btn {
-            padding-inline: 2px;
-            width: 110px;
-            justify-content: center;
-            p {
-              margin: 0px;
-            }
+          .btn.label {
+            display: none;
+          }
+          .btn.label.small {
+            display: block;
           }
         }
       }

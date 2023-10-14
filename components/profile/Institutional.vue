@@ -4,7 +4,7 @@
     :full-width="true"
     :isEditing="isEditing && canEdit"
     @toogle:isEditing="isEditing = !isEditing"
-    :cancel="() => {}"
+    :cancel="onCancel"
     :save="showSearch"
   >
     <template v-slot:content>
@@ -17,39 +17,33 @@
         name="institution"
       />
       <div v-if="institutions.length > 0" class="d-flex flex-wrap items">
-        <div
-          class="d-flex pa-4 align-center justify-space-between w-100 item"
-          v-for="(item, index) in institutions"
+        <draggable
+          class="d-flex flex-column contacts w-100"
+          :list="sortedInstitutions"
+          item-key="name"
+          :disabled="!(isEditing && canEdit)"
+          :key="componentKey"
+          ghost-class="ghost"
+          @end="handleDrop"
+          handle=".handle"
         >
-          <div class="d-flex" style="gap: 12px">
-            <NuxtImg
-              :src="strapiBaseUrl + item.cover.url"
-              placeholder
-              style="height: 80px; width: 80px"
+          <template
+            class="d-flex pa-4 align-center justify-space-between w-100 item"
+            #item="{ element, index }"
+          >
+            <profile-inputs-institution
+              :canEdit="isEditing && canEdit"
+              :index="index"
+              :acronym="element.acronym"
+              :sector="element.sector"
+              :url="element.cover.url"
+              :institutionId="element.id"
+              :id="id"
+              :name="element.name"
+              @delete:institution="updateDeleteArray"
             />
-            <div class="d-flex flex-column justify-center">
-              <span>{{ item.acronym + ' - ' + item.name }}</span>
-              <p>{{ item.sector }}</p>
-            </div>
-          </div>
-          <div v-if="isEditing && canEdit" class="options">
-            <v-icon
-              @click="updateShowDeleteButton(index)"
-              color="#6E7A87"
-              style="cursor: pointer"
-              >mdi-dots-vertical</v-icon
-            >
-            <v-icon
-              v-if="showDeleteButton.includes(index)"
-              class="remove"
-              @click="removeInstitution(item.id)"
-              color="red"
-              size="small"
-            >
-              mdi-close-outline
-            </v-icon>
-          </div>
-        </div>
+          </template>
+        </draggable>
       </div>
       <div
         v-else
@@ -70,21 +64,23 @@
 </template>
 
 <script setup lang="ts">
+import draggable from 'vuedraggable';
+
 type Institution = {
   name: string;
   acronym: string;
   sector: string;
   id: number;
+  index: number;
   cover: any;
 };
 
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-const showDeleteButton = ref<number[]>([]);
 const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
 let selectedOption = ref(0);
 const search = ref('');
 const isEditing = ref(false);
+const componentKey = ref(0);
 
 const client = useStrapiClient();
 const emit = defineEmits(['update:user']);
@@ -103,16 +99,41 @@ const props = defineProps({
     default: false,
   },
 });
-const { institutions } = toRefs(props);
-const cancel = () => {};
+const { institutions, id, canEdit } = toRefs(props);
+
 const updateSelectedOption = (event) => {
   selectedOption.value = event;
 };
 
-const updateShowDeleteButton = (index: number) => {
-  showDeleteButton.value.includes(index)
-    ? showDeleteButton.value.splice(showDeleteButton.value.indexOf(index), 1)
-    : showDeleteButton.value.push(index);
+const sortedInstitutions = ref<Institution[]>([]);
+const updateArray = ref<Institution[]>([]);
+
+const sortInstitutions = () => {
+  sortedInstitutions.value = [...institutions.value].sort((a, b) =>
+    a.index > b.index ? 1 : b.index > a.index ? -1 : 0,
+  );
+};
+
+const deleteArray = ref<{ institutionId: number; name: string }[]>([]);
+
+onMounted(() => {
+  sortInstitutions();
+});
+
+const updateDeleteArray = ({ institutionId, name }) => {
+  deleteArray.value.push({ institutionId: institutionId, name: name });
+};
+
+const removeInstitution = async (index) => {
+  const list = institutions.value
+    .map((item) => item.id)
+    .filter((id) => id !== index);
+
+  await client(`/users/${id.value}`, {
+    method: 'PUT',
+    body: { institutions: list },
+  });
+  emit('update:user');
 };
 
 const showSearch = async () => {
@@ -138,16 +159,26 @@ const showSearch = async () => {
   }
 };
 
-const removeInstitution = async (index) => {
-  const list = institutions.value
-    .map((item) => item.id)
-    .filter((id) => id !== index);
-
-  await client(`/users/${props.id}`, {
-    method: 'PUT',
-    body: { institutions: list },
+const handleDrop = ({ oldIndex, newIndex }) => {
+  sortedInstitutions.value.forEach((element, i) => {
+    let temp = updateArray.value.findIndex((item) => element.id === item.id);
+    if (temp !== -1) {
+      updateArray.value[temp] = { ...updateArray.value[temp], index: i };
+    } else {
+      updateArray.value.push({
+        ...element,
+        index: i,
+      });
+    }
   });
-  emit('update:user');
+};
+
+const onSave = () => {};
+
+const onCancel = () => {
+  componentKey.value = componentKey.value + 1;
+  deleteArray.value = [];
+  sortedInstitutions.value = institutions.value;
 };
 </script>
 
@@ -172,57 +203,6 @@ const removeInstitution = async (index) => {
 }
 .items {
   gap: 24px;
-  .item {
-    position: relative;
-    color: #5d6872;
-    line-height: 22px;
-
-    border-radius: 8px;
-    border: 1px solid #eaeef1;
-    span {
-      font-size: 20px;
-      font-weight: 700;
-    }
-    p {
-      font-size: 16px;
-      font-weight: 400;
-    }
-    img {
-      width: 80px;
-      height: 80px;
-
-      border-radius: 8px;
-      border: 1px solid #eaeef1;
-    }
-
-    .options {
-      .remove {
-        cursor: pointer;
-
-        position: absolute;
-        top: 10px;
-        right: 10px;
-      }
-    }
-  }
-  @media (max-width: 600px) {
-    .item {
-      span {
-        font-size: 18px;
-      }
-      p {
-        font-size: 14px;
-      }
-    }
-  }
-
-  @media (max-width: 349px) {
-    .item {
-      img {
-        display: none;
-      }
-    }
-  }
 }
 
 @media (max-width: 400px) {
