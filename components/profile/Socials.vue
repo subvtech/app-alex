@@ -21,7 +21,7 @@
         style="gap: 16px"
       >
         <NuxtImg src="/svg/EmptySocials.svg" placeholder />
-        <span>{{ $t('components.profile.profile-socials.empty') }}</span>
+        <span>{{ $t('components.profile.socials.empty') }}</span>
       </div>
       <div v-else>
         <div

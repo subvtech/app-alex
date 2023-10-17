@@ -201,6 +201,7 @@
           @update:user="updateUser"
         />
         <profile-socials
+          v-if="user.socials.length !== 0 || canEdit"
           :can-edit="canEdit"
           :socials="user.socials"
           :id="user.id"
@@ -247,6 +248,7 @@
           ></profile-competences>
         </div>
         <profile-institutional
+          v-if="user.institutions.length !== 0 || canEdit"
           :institutions="user.institutions"
           :id="user.id"
           :can-edit="canEdit"
@@ -303,37 +305,29 @@ onBeforeMount(async () => {
 });
 
 const updateUser = async (show = true) => {
+  const populate = [
+    'institutions.cover',
+    'cover',
+    'avatar',
+    'learningPlans',
+    'socials',
+    'trails',
+    'role',
+    'tags',
+    'user_descriptions',
+    'user_wallet',
+  ];
   if (username === route.params.username) {
     canEdit.value = true;
     user.value = await findOne<User>('users', id, {
-      populate: [
-        'institutions.cover',
-        'cover',
-        'avatar',
-        'learningPlans',
-        'socials',
-        'trails',
-        'tags',
-        'user_descriptions',
-        'user_wallet',
-      ],
+      populate: populate,
     });
   } else {
     canEdit.value = false;
     user.value = (
       await find<User>('users', {
         filters: { username: route.params.username },
-        populate: [
-          'institutions.cover',
-          'cover',
-          'avatar',
-          'learningPlans',
-          'socials',
-          'trails',
-          'tags',
-          'user_descriptions',
-          'user_wallet',
-        ],
+        populate: populate,
       })
     )[0];
   }
