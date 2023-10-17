@@ -27,10 +27,11 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from '~/models/structure.model';
+import { Structure } from 'models/structure.model'
+import { Upload } from 'models/upload.model';
+import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
-import { Upload } from '~/models/upload.model';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
@@ -54,6 +55,11 @@ const planData = computed(() => {
     return { ...b.attributes, id: b.id };
   });
   return structure;
+});
+
+const uploadBaseUrl = computed(() => {
+  const runtimeConfig = useRuntimeConfig();
+  return runtimeConfig.public.strapi.url;
 });
 
 onMounted(() => {
@@ -190,6 +196,77 @@ onMounted(() => {
           errorMessage: 'Erro no upload do arquivo',
         },
       },
+      carousel: {
+        class: Carousel,
+        config: {
+          uploadBaseUrl: uploadBaseUrl.value,
+          handleFileSelected: (files) => {
+            const formData = new FormData();
+            files.forEach((file) => {
+              if (file instanceof File) {
+                formData.append('files', file, file.name);
+              } else if (typeof file === 'string' && file.startsWith('data:')) {
+                const base64Data = file.split(',')[1];
+                const binaryString = window.atob(base64Data);
+                const byteArray = new Uint8Array(binaryString.length);
+
+                for (let i = 0; i < binaryString.length; i++) {
+                  byteArray[i] = binaryString.charCodeAt(i);
+                }
+
+                let mimeType = 'image/png';
+                if (file.startsWith('data:image/jpeg')) {
+                  mimeType = 'image/jpeg';
+                }
+
+                const blob = new Blob([byteArray], { type: mimeType });
+                const fileName =
+                  files[0].name.slice(0, files[0].name.lastIndexOf('.')) +
+                  '.jpeg';
+                const imageFile = new File([blob], fileName, {
+                  type: mimeType,
+                });
+                formData.append('files', imageFile, imageFile.name);
+              }
+            });
+
+            return strapiClient<Upload>('/upload', {
+              method: 'POST',
+              body: formData,
+            })
+              .then((res) => {
+                if (files.length > 1) {
+                  const url = res[0].url;
+                  const thumbnail = res[1].url;
+                  return { success: 1, url: { url }, thumbnail: { thumbnail } };
+                } else {
+                  const url = res[0].url;
+                  return { success: 1, url: { url } };
+                }
+              })
+              .catch((err) => {
+                messageStore.message = err;
+              });
+          },
+          handleDeletedFiles: async (file) => {
+            await strapiClient<Upload>('/upload/files', {
+              method: 'GET',
+            }).then((res) => {
+              const files = res;
+              const fileImage = files.find((f) => f.url === file.image);
+              strapiClient<Upload>(`/upload/files/${fileImage.id}`, {
+                method: 'DELETE',
+              });
+              if (file.video) {
+                const fileVideo = files.find((f) => f.url === file.video);
+                strapiClient<Upload>(`/upload/files/${fileVideo.id}`, {
+                  method: 'DELETE',
+                });
+              }
+            });
+          },
+        },
+      },
     },
     i18n,
     minHeight: 400,
@@ -231,6 +308,6 @@ onMounted(() => {
 .editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
   /* max-width: 64rem; */
-  max-width: 100%;
+  max-width: 95%;
 }
 </style>
