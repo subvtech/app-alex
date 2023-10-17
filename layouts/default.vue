@@ -14,7 +14,7 @@
       <v-row justify="center" class="my-4" style="max-height: 64px">
         <div>
           <NuxtLink to="/">
-            <img src="@/static/images/alex.svg" height="32" width="96" />
+            <img src="/images/alex.svg" height="32" width="96" />
           </NuxtLink>
         </div>
       </v-row>
@@ -54,16 +54,7 @@
         v-if="!drawer"
         class="primary pl-2 pt-1 rounded-pill"
         style="height: 42px; width: 115px"
-      >
-        <NuxtLink to="/">
-          <v-img
-            src="../static/images/alex.svg"
-            alt="logo"
-            height="32"
-            width="96"
-          />
-        </NuxtLink>
-      </div>
+      ></div>
       <v-spacer />
       <v-btn icon color="grey">
         <v-icon>mdi-magnify</v-icon>
@@ -125,7 +116,7 @@ const user = useStrapiUser<User>();
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: '/user/profile',
+    to: `/user/${user.value.username}`,
   },
   {
     title: i18n.t('layouts.default.settings'),

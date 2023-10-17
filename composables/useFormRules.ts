@@ -69,29 +69,6 @@ export const useFormRules = (formData?: FormDataType) => {
       .max(64, i18n.t('rules.username.max')),
   };
 
-  const socialsRules = {
-    name: yup
-      .array()
-      .of(
-        yup
-          .string()
-          .required(i18n.t('rules.name.required'))
-          .min(3, i18n.t('rules.name.min'))
-          .max(20, i18n.t('rules.name.max'))
-          .trim(),
-      ),
-    url: yup
-      .array()
-      .of(
-        yup
-          .string()
-          .required(i18n.t('rules.url.required'))
-          .min(4, i18n.t('rules.url.min'))
-          .max(64, i18n.t('rules.url.max'))
-          .trim(),
-      ),
-  };
-
   const fullnameRules = {
     fullname: yup
       .string()
@@ -166,7 +143,6 @@ export const useFormRules = (formData?: FormDataType) => {
   const profileSchema = yup.object({
     ...fullnameRules,
     ...phoneRules,
-    ...aboutRules,
     ...cpfRules,
   });
 
@@ -184,8 +160,17 @@ export const useFormRules = (formData?: FormDataType) => {
       .max(64, i18n.t('rules.url.max'))
       .required()
       .trim(),
-    index: yup.number(),
   });
+
+  const urlSchema = yup.object({
+    url: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .required()
+      .trim(),
+  });
+
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -195,6 +180,19 @@ export const useFormRules = (formData?: FormDataType) => {
     cpfRules,
     profileSchema,
     socialsSchema,
+    nameRules: yup
+      .string()
+      .required(i18n.t('rules.name.required'))
+      .min(3, i18n.t('rules.name.min'))
+      .max(20, i18n.t('rules.name.max'))
+      .matches(/^((?!instagram\b)(?!linkedin\b)(?!youtube\b).)*/)
+      .trim(),
+    urlRules: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .required()
+      .trim(),
     loginSchema,
   };
 };

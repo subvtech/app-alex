@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
-import Delmiter from '@editorjs/delimiter';
+import Delimiter from '@editorjs/delimiter';
 import Header from 'editorjs-header-with-anchor';
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
@@ -65,7 +65,7 @@ const uploadBaseUrl = computed(() => {
 onMounted(() => {
   instance.value = new EditorJS({
     tools: {
-      delimiter: Delmiter,
+      delimiter: Delimiter,
       // embed: require('@editorjs/embed'),
       header: {
         class: Header,
