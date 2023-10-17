@@ -1,6 +1,8 @@
 <template>
   <div
-    :class="isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item'"
+    :class="
+      isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item'
+    "
   >
     <div class="d-flex" style="gap: 12px">
       <NuxtImg :src="strapiBaseUrl + url" placeholder />
@@ -29,7 +31,6 @@ const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
 
 const emit = defineEmits(['delete:institution']);
 
-
 const props = defineProps({
   url: {
     type: String,
@@ -57,27 +58,22 @@ const props = defineProps({
     required: true,
   },
 
-  id: {
-    type: Number,
-    required: true,
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
-
   institutionId: {
     type: Number,
     required: true,
   },
 });
 
-const { url, name, acronym, index, id, institutionId, sector, canEdit } =
+const { url, name, acronym, index, isDeleted, institutionId, sector, canEdit } =
   toRefs(props);
-const isDeleted = ref(false);
 
 const removeInstitution = async () => {
   isDeleted.value = true;
-  emit('delete:institution', {
-    institutionId: institutionId.value,
-    name: name.value,
-  });
+  emit('delete:institution', institutionId.value);
 };
 </script>
 

@@ -5,7 +5,7 @@
     :isEditing="isEditing && canEdit"
     @toogle:isEditing="isEditing = !isEditing"
     :cancel="onCancel"
-    :save="showSearch"
+    :save="onSave"
   >
     <template v-slot:content>
       <alex-inputs-institutions
@@ -16,7 +16,7 @@
         color="black"
         name="institution"
       />
-      <div v-if="institutions.length > 0" class="d-flex flex-wrap items">
+      <div v-if="sortedInstitutions.length > 0" class="d-flex flex-wrap items">
         <draggable
           class="d-flex flex-column contacts w-100"
           :list="sortedInstitutions"
@@ -24,7 +24,6 @@
           :disabled="!(isEditing && canEdit)"
           :key="componentKey"
           ghost-class="ghost"
-          @end="handleDrop"
           handle=".handle"
         >
           <template
@@ -38,8 +37,8 @@
               :sector="element.sector"
               :url="element.cover.url"
               :institutionId="element.id"
-              :id="id"
               :name="element.name"
+              :isDeleted="deleteArray.includes(element.id)"
               @delete:institution="updateDeleteArray"
             />
           </template>
@@ -75,9 +74,7 @@ type Institution = {
   cover: any;
 };
 
-const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
-let selectedOption = ref(0);
 const search = ref('');
 const isEditing = ref(false);
 const componentKey = ref(0);
@@ -99,86 +96,106 @@ const props = defineProps({
     default: false,
   },
 });
-const { institutions, id, canEdit } = toRefs(props);
+const { id, canEdit } = toRefs(props);
 
-const updateSelectedOption = (event) => {
-  selectedOption.value = event;
+const updateSelectedOption = (selectedId) => {
+  if (
+    searchInstitutions.value.length === 0 ||
+    isNaN(selectedId) ||
+    selectedId < 0
+  )
+    return;
+  if (
+    !sortedInstitutions.value.find(
+      (item) => item.id === searchInstitutions.value[selectedId].id,
+    )
+  ) {
+    sortedInstitutions.value.push(searchInstitutions.value[selectedId]);
+
+    if (
+      !institutionsIds.value.includes(searchInstitutions.value[selectedId].id)
+    )
+      institutionsIds.value.push(searchInstitutions.value[selectedId].id);
+
+    if (
+      deleteArray.value.find(
+        (id) => id === searchInstitutions.value[selectedId].id,
+      )
+    ) {
+      deleteArray.value = deleteArray.value.filter(
+        (id) => id !== searchInstitutions.value[selectedId].id,
+      );
+    }
+  } else if (
+    deleteArray.value.find(
+      (id) => id === searchInstitutions.value[selectedId].id,
+    )
+  ) {
+    deleteArray.value = deleteArray.value.filter(
+      (id) => id !== searchInstitutions.value[selectedId].id,
+    );
+  }
+
+  search.value = '';
 };
 
-const sortedInstitutions = ref<Institution[]>([]);
-const updateArray = ref<Institution[]>([]);
+const sortedInstitutions = ref<Institution[]>([...props.institutions]);
+const institutionsIds = ref<number[]>(
+  props.institutions.map((item) => item.id),
+);
+const deleteArray = ref<number[]>([]);
 
-const sortInstitutions = () => {
-  sortedInstitutions.value = [...institutions.value].sort((a, b) =>
-    a.index > b.index ? 1 : b.index > a.index ? -1 : 0,
-  );
+const updateDeleteArray = (id: number) => {
+  deleteArray.value.push(id);
+  institutionsIds.value = institutionsIds.value.filter((item) => item !== id);
 };
 
-const deleteArray = ref<{ institutionId: number; name: string }[]>([]);
-
-onMounted(() => {
-  sortInstitutions();
-});
-
-const updateDeleteArray = ({ institutionId, name }) => {
-  deleteArray.value.push({ institutionId: institutionId, name: name });
-};
-
-const removeInstitution = async (index) => {
-  const list = institutions.value
-    .map((item) => item.id)
-    .filter((id) => id !== index);
+const onSave = async () => {
+  const connectArray: {
+    id: number;
+    position: {
+      end?: boolean;
+      start?: boolean;
+      before?: number;
+      after?: number;
+    };
+  }[] = [];
+  if (sortedInstitutions.value.length !== 0) {
+    sortedInstitutions.value.slice(1).forEach((item, index) => {
+      if (!deleteArray.value.includes(sortedInstitutions.value[index].id)) {
+        connectArray.push({
+          id: item.id,
+          position: { after: sortedInstitutions.value[index].id },
+        });
+      }
+    });
+    if (!deleteArray.value.includes(sortedInstitutions.value[0].id)) {
+      if (sortedInstitutions.value.length <= deleteArray.value.length)
+        sortedInstitutions.value = [];
+      connectArray.push({
+        id: sortedInstitutions.value[0].id,
+        position: { start: true },
+      });
+    }
+  }
 
   await client(`/users/${id.value}`, {
     method: 'PUT',
-    body: { institutions: list },
+    body: {
+      institutions: {
+        connect: connectArray,
+        disconnect: deleteArray.value,
+      },
+    },
   });
   emit('update:user');
+  deleteArray.value = [];
 };
-
-const showSearch = async () => {
-  if (searchInstitutions.value) {
-    if (searchInstitutions.value.length > 0) {
-      const list = institutions.value.map((item) => item.id);
-
-      list.push(
-        { ...{ ...searchInstitutions.value }[selectedOption.value] }.id,
-      );
-
-      await client(`/users/${props.id}`, {
-        method: 'PUT',
-        body: { institutions: list },
-      });
-
-      emit('update:user', {});
-    }
-
-    isAddingInstitution.value = false;
-  } else {
-    isAddingInstitution.value = true;
-  }
-};
-
-const handleDrop = ({ oldIndex, newIndex }) => {
-  sortedInstitutions.value.forEach((element, i) => {
-    let temp = updateArray.value.findIndex((item) => element.id === item.id);
-    if (temp !== -1) {
-      updateArray.value[temp] = { ...updateArray.value[temp], index: i };
-    } else {
-      updateArray.value.push({
-        ...element,
-        index: i,
-      });
-    }
-  });
-};
-
-const onSave = () => {};
 
 const onCancel = () => {
   componentKey.value = componentKey.value + 1;
   deleteArray.value = [];
-  sortedInstitutions.value = institutions.value;
+  sortedInstitutions.value = [...props.institutions];
 };
 </script>
 

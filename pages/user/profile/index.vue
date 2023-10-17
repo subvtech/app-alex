@@ -292,6 +292,7 @@ const updateUser = async (show = true) => {
       'user_wallet',
     ],
   });
+  console.log({ user: user.value });
 
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
