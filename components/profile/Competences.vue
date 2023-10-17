@@ -30,6 +30,7 @@
         <div class="competences d-flex flex-column align-start">
           <div class="d-flex flex-wrap justify-center">
             <div
+              v-if="selectedTags.length !== 0"
               v-for="tag in selectedTags"
               class="item d-flex justify-center align-center"
             >
@@ -42,6 +43,9 @@
                 style="cursor: pointer"
                 >mdi-close</v-icon
               >
+            </div>
+            <div v-else class="item  d-flex justify-center align-center">
+              <span>{{ emptyMessage }}</span>
             </div>
           </div>
         </div>
@@ -69,6 +73,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  emptyMessage: { type: String, required: true },
   placeholder: {
     type: String,
     required: true,
@@ -242,7 +247,6 @@ watch(
           /* Body/P3 */
           font-size: 14px;
           font-weight: 400;
-          line-height: 135%; /* 18.9px */
           letter-spacing: 0.28px;
         }
       }

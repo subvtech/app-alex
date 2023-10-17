@@ -41,14 +41,14 @@
         <div class="d-flex align-center contact">
           <v-icon color="#5D6872">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
-            <p3>{{ $t('components.profile.general.email') }}</p3>
+            <p>{{ $t('components.profile.general.email') }}</p>
             <span>{{ email }}</span>
           </div>
         </div>
         <div v-if="telephone" class="d-flex align-center contact">
           <v-icon color="#5D6872">mdi-phone-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
-            <p3>{{ $t('components.profile.general.telephone') }}</p3>
+            <p>{{ $t('components.profile.general.telephone') }}</p>
             <span>{{ mask.masked(telephone) }}</span>
           </div>
         </div>
@@ -147,7 +147,7 @@ const cancel = () => {};
       gap: 16px;
 
       .field {
-        p3 {
+        p {
           color: #a0a8b1;
 
           font-size: 14px;

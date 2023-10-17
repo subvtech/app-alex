@@ -143,7 +143,6 @@ export const useFormRules = (formData?: FormDataType) => {
   const profileSchema = yup.object({
     ...fullnameRules,
     ...phoneRules,
-    ...aboutRules,
     ...cpfRules,
   });
 

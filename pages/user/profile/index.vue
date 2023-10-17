@@ -2,15 +2,6 @@
   <div id="profile" class="w-100 d-flex" v-if="user">
     <div class="header d-flex w-100">
       <span class="title h-">{{ $t('pages.profile.title') }}</span>
-      <div class="pages d-flex h-100">
-        <NuxtLink to="/" class="text-decoration-none">
-          <span class="go-back" style="cursor: pointer">{{
-            $t('pages.profile.home')
-          }}</span>
-        </NuxtLink>
-        <span class="go-back">></span>
-        <span class="current-page">{{ $t('pages.profile.title') }}</span>
-      </div>
     </div>
     <div class="user-block my-6">
       <div class="cover-block w-100">
@@ -120,10 +111,15 @@
             </label>
             <div
               v-if="canEdit && profilePicture"
-              class="delete"
+              class="delete d-flex justify-center align-center"
               @click="removeProfilePicture"
             >
-              <v-icon size="x-small" color="#fff">mdi-trash-can-outline</v-icon>
+              <v-icon class="small-icon" size="x-small" color="#fff"
+                >mdi-trash-can-outline</v-icon
+              >
+              <v-icon class="normal-icon" size="20" color="#fff"
+                >mdi-trash-can-outline</v-icon
+              >
             </div>
           </div>
 
@@ -209,6 +205,7 @@
             :placeholder="
               $t('components.profile.competences.technical.placeholder')
             "
+            :emptyMessage="$t('components.profile.competences.technical.empty')"
             :id="user.id"
             :can-edit="canEdit"
             :userTags="user.tags"
@@ -220,6 +217,7 @@
             :placeholder="
               $t('components.profile.competences.general.placeholder')
             "
+            :emptyMessage="$t('components.profile.competences.general.empty')"
             :id="user.id"
             :can-edit="canEdit"
             :userTags="user.tags"
@@ -404,6 +402,7 @@ async function removeCoverPicture() {
 
   .user-block {
     background-color: white;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     display: flex;
@@ -484,8 +483,8 @@ async function removeCoverPicture() {
 
           border-radius: 8px;
 
-          max-width: 32px;
-          max-height: 32px;
+          max-width: 28px;
+          max-height: 28px;
           width: 100%;
           height: 100%;
           display: flex;
@@ -494,6 +493,9 @@ async function removeCoverPicture() {
 
           background: #e9494a;
           cursor: pointer;
+          .small-icon {
+            display: none;
+          }
         }
       }
 
@@ -646,6 +648,14 @@ async function removeCoverPicture() {
             bottom: 15px;
             width: 24px;
             height: 24px;
+
+            .small-icon {
+              display: block;
+            }
+            .normal-icon {
+              display: none;
+              visibility: hidden;
+            }
           }
         }
 

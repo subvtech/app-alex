@@ -32,7 +32,6 @@
               v-maska:[cpfMask]
             />
           </div>
-
           <div class="buttons d-flex justify-end">
             <v-btn
               class="btn"
