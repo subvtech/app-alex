@@ -345,8 +345,6 @@ const updateUser = async (show = true) => {
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
-  console.log({ generalTags: generalTags.value });
-  console.log({ technicalTags: technicalTags.value });
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
   messageStore.message = 'done';
@@ -386,7 +384,6 @@ async function uploadProfilePicture(event: any) {
 
 async function removeProfilePicture() {
   const result = await removeImage(user.value.avatar.id);
-  console.log(result);
   user.value.avatar = null;
   profilePicture.value = null;
 }
