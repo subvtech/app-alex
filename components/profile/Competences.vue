@@ -3,6 +3,7 @@
     :title="title"
     :isEditing="isEditing && canEdit"
     @toogle:isEditing="isEditing = !isEditing"
+    :showIcon="canEdit"
     :cancel="onCancel"
     :save="onSave"
     :full-width="true"
@@ -44,7 +45,7 @@
                 >mdi-close</v-icon
               >
             </div>
-            <div v-else class="item  d-flex justify-center align-center">
+            <div v-else class="item d-flex justify-center align-center">
               <span>{{ emptyMessage }}</span>
             </div>
           </div>
@@ -92,7 +93,7 @@ const props = defineProps({
 const { userTags, canEdit, id, isGeneral } = toRefs(props);
 const isEditing = ref(false);
 
-const selectedTags = ref<{ text: string }[]>([]);
+const selectedTags = ref<{ text: string }[]>([...props.userTags]);
 const selectedTag = ref<Tag | null>(null);
 const allTags = ref<Tag[]>([]);
 const filteredTags = ref<Tag[]>([]);
@@ -100,7 +101,7 @@ const filteredTags = ref<Tag[]>([]);
 const userTagsIds = ref<number[]>([]);
 
 onMounted(async () => {
-  const temp = await find(`tags`, { populate: 'verified_by' });
+  const temp = await find('tags', { populate: 'verified_by' });
 
   userTagsIds.value = userTags.value.map((item) => item.id);
   allTags.value = temp.data.map((item) => {
@@ -108,12 +109,10 @@ onMounted(async () => {
   }) as Tag[];
 
   if (isGeneral.value) {
-    selectedTags.value = userTags.value.filter((item) => item.isGeneral);
     filteredTags.value = allTags.value.filter(
       (item) => !userTagsIds.value.includes(item.id) && item.isGeneral,
     );
   } else {
-    selectedTags.value = userTags.value.filter((item) => !item.isGeneral);
     filteredTags.value = allTags.value.filter(
       (item) => !userTagsIds.value.includes(item.id) && !item.isGeneral,
     );

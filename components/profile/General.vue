@@ -17,7 +17,7 @@
             },
             {
               icon: 'mdi-newspaper-variant-multiple-outline',
-              number: 20,
+              number: projects.length,
               label: $t('components.profile.general.projects'),
             },
             {
@@ -30,7 +30,7 @@
           <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
           <div class="d-flex">
             <h6>{{ box.number }}</h6>
-            <p1>{{ box.label }}</p1>
+            <p>{{ box.label }}</p>
           </div>
         </div>
       </div>
@@ -39,14 +39,14 @@
     <template v-slot:footer>
       <div class="d-flex flex-column contacts pt-6">
         <div class="d-flex align-center contact">
-          <v-icon color="#5D6872">mdi-email-outline</v-icon>
+          <v-icon color="#6E7A87">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
             <p>{{ $t('components.profile.general.email') }}</p>
             <span>{{ email }}</span>
           </div>
         </div>
         <div v-if="telephone" class="d-flex align-center contact">
-          <v-icon color="#5D6872">mdi-phone-outline</v-icon>
+          <v-icon color="#6E7A87">mdi-phone-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
             <p>{{ $t('components.profile.general.telephone') }}</p>
             <span>{{ mask.masked(telephone) }}</span>
@@ -79,6 +79,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  projects: {
+    type: Array,
+    default: () => [],
+  },
   socials: {
     type: Array as PropType<any[]>,
     required: true,
@@ -93,10 +97,9 @@ const { email, telephone, socials } = toRefs(props);
 
 const newIcon = ref<string | null>(null);
 const mask = new Mask({ mask: '(##) #####-####' });
-const isEditing = ref(false)
+const isEditing = ref(false);
 
 const cancel = () => {};
-
 </script>
 
 <style scoped lang="scss">
@@ -127,11 +130,11 @@ const cancel = () => {};
           color: #0d4173;
         }
 
-        p1 {
-          color: #a0a8b1;
-          font-size: 16px;
+        p {
+          color: #a0a8b1 !important;
+          font-size: 16px !important;
           font-style: normal;
-          font-weight: 400;
+          font-weight: 400 !important;
           line-height: 135%; /* 21.6px */
           letter-spacing: 0.64px;
         }
@@ -189,7 +192,7 @@ const cancel = () => {};
           align-items: center;
           gap: 8px;
 
-          p1 {
+          p {
             color: #0d4173;
             font-size: 14px;
             font-weight: 400;

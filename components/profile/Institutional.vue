@@ -3,6 +3,7 @@
     :title="$t('components.profile.institutional.title')"
     :full-width="true"
     :isEditing="isEditing && canEdit"
+    :showIcon="canEdit"
     @toogle:isEditing="isEditing = !isEditing"
     :cancel="onCancel"
     :save="onSave"

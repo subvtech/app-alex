@@ -1,8 +1,23 @@
 <template>
   <div id="profile" class="w-100 d-flex" v-if="user">
-    <div class="header d-flex w-100">
+    <div v-if="canEdit" class="header d-flex w-100">
       <span class="title h-">{{ $t('pages.profile.title') }}</span>
     </div>
+    <div v-else class="header d-flex w-100">
+      <span class="title h-">{{ $t('pages.profile.learningPlans') }}</span>
+      <div class="pages d-flex h-100">
+        <NuxtLink to="/" class="text-decoration-none">
+          <span class="go-back" style="cursor: pointer">{{
+            $t('pages.profile.home')
+          }}</span>
+        </NuxtLink>
+        <span class="go-back">></span>
+        <span class="current-page">{{
+          $t('pages.profile.learningPlans')
+        }}</span>
+      </div>
+    </div>
+
     <div class="user-block my-6">
       <div class="cover-block w-100">
         <NuxtImg
@@ -72,7 +87,7 @@
         style="padding-left: 32px"
       >
         <div class="card">
-          <div class="photo">
+          <div class="photo" :class="canEdit ? 'hover' : ''">
             <label v-if="profilePicture" class="avatar" for="file-input">
               <NuxtImg
                 class="img"
@@ -80,10 +95,11 @@
                 :alt="user.fullname"
               />
 
-              <v-icon class="d-none" size="x-large" color="#fff"
+              <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
                 >mdi-pencil-outline</v-icon
               >
               <input
+                v-if="canEdit"
                 class="d-none"
                 @input="uploadProfilePicture"
                 accept="image/png, image/jpeg"
@@ -98,10 +114,11 @@
               >
                 <v-icon size="40" color="#B9BFC6">mdi-account-outline</v-icon>
               </div>
-              <v-icon class="d-none" size="x-large" color="#fff"
+              <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
                 >mdi-plus</v-icon
               >
               <input
+                v-if="canEdit"
                 class="d-none"
                 @input="uploadProfilePicture"
                 accept="image/png, image/jpeg"
@@ -142,6 +159,7 @@
         </div>
 
         <v-icon
+          v-if="canEdit"
           @click="showSettings = !showSettings"
           class="mr-4 mr-md-3 mr-sm-3 mr-xs-2"
           color="#6E7A87"
@@ -159,12 +177,13 @@
       </div>
     </div>
     <div
-      v-if="showSettings"
+      v-if="showSettings && canEdit"
       class="content-block d-flex justify-center flex-row"
     >
       <profile-settings
         :email="user.email"
         :cpf="user.cpf"
+        :telephone="user.phone"
         :fullname="user.fullname"
         :id="user.id"
       />
@@ -200,6 +219,7 @@
           style="gap: 24px"
         >
           <profile-competences
+            v-if="technicalTags.length !== 0 || canEdit"
             :title="$t('components.profile.competences.technical.title')"
             :label="$t('components.profile.competences.technical.label')"
             :placeholder="
@@ -208,10 +228,11 @@
             :emptyMessage="$t('components.profile.competences.technical.empty')"
             :id="user.id"
             :can-edit="canEdit"
-            :userTags="user.tags"
+            :userTags="technicalTags"
             @update:user="updateUser"
           ></profile-competences>
           <profile-competences
+            v-if="generalTags.length !== 0 || canEdit"
             :title="$t('components.profile.competences.general.title')"
             :label="$t('components.profile.competences.general.label')"
             :placeholder="
@@ -220,7 +241,7 @@
             :emptyMessage="$t('components.profile.competences.general.empty')"
             :id="user.id"
             :can-edit="canEdit"
-            :userTags="user.tags"
+            :userTags="generalTags"
             :is-general="true"
             @update:user="updateUser"
           ></profile-competences>
@@ -256,50 +277,84 @@
 </template>
 
 <script setup lang="ts">
-import { User } from '../../../models/user.model';
+import { User } from '../../models/user.model';
 import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
-const { findOne } = useStrapi();
+const { find, findOne } = useStrapi();
 const client = useStrapiClient();
 const strapiUrl = useStrapiUrl();
 const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
-
+const route = useRoute();
+const router = useRouter();
 const messageStore = useMessageStore();
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const profilePicture = ref<string | null>(null);
 const coverPicture = ref<string | null>(null);
-const canEdit = ref(true);
+const canEdit = ref(false);
 
 const user = ref<any>();
 definePageMeta({
   middleware: 'auth',
 });
-const { id } = useStrapiUser<User>().value;
+const { id, username } = useStrapiUser<User>().value;
+
+onBeforeMount(async () => {
+  await updateUser(false);
+});
 
 const updateUser = async (show = true) => {
-  user.value = await findOne<User>('users', id, {
-    populate: [
-      'institutions.cover',
-      'cover',
-      'avatar',
-      'learningPlans',
-      'socials',
-      'trails',
-      'tags',
-      'user_descriptions',
-      'user_wallet',
-    ],
-  });
-  console.log({ user: user.value });
+  if (username === route.params.username) {
+    canEdit.value = true;
+    user.value = await findOne<User>('users', id, {
+      populate: [
+        'institutions.cover',
+        'cover',
+        'avatar',
+        'learningPlans',
+        'socials',
+        'trails',
+        'tags',
+        'user_descriptions',
+        'user_wallet',
+      ],
+    });
+  } else {
+    canEdit.value = false;
+    user.value = (
+      await find<User>('users', {
+        filters: { username: route.params.username },
+        populate: [
+          'institutions.cover',
+          'cover',
+          'avatar',
+          'learningPlans',
+          'socials',
+          'trails',
+          'tags',
+          'user_descriptions',
+          'user_wallet',
+        ],
+      })
+    )[0];
+  }
 
+  if (!user.value) {
+    router.push({ path: '/' });
+  }
+
+  generalTags.value = user.value.tags.filter((item) => item.isGeneral);
+  technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
+
+  console.log({ generalTags: generalTags.value });
+  console.log({ technicalTags: technicalTags.value });
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
   messageStore.message = 'done';
   messageStore.color = 'green';
   messageStore.show = show;
 };
-await updateUser(false);
-
+const generalTags = ref();
+const technicalTags = ref();
 const selectedOption = ref(i18n.t('pages.profile.general'));
 const links = ref([
   i18n.t('pages.profile.general'),
@@ -418,6 +473,24 @@ async function removeCoverPicture() {
       transition: all ease-in-out 1s;
       gap: 12px;
 
+      .hover {
+        .avatar {
+          &:hover {
+            i {
+              display: block !important;
+              position: absolute;
+            }
+
+            .img {
+              filter: brightness(50%);
+              i {
+                display: none !important;
+              }
+            }
+          }
+        }
+      }
+
       .photo {
         display: flex;
         position: absolute;
@@ -432,19 +505,6 @@ async function removeCoverPicture() {
           border: solid #fff;
           border-radius: 100%;
 
-          &:hover {
-            i {
-              display: block !important;
-              position: absolute;
-            }
-
-            .img {
-              filter: brightness(50%);
-              i {
-                display: none !important;
-              }
-            }
-          }
           i {
             transition: all ease-in-out 0.7s;
           }

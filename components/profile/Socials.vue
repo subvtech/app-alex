@@ -3,6 +3,7 @@
     :title="$t('components.profile.socials.title')"
     :cancel="cancel"
     :save="save"
+    :showIcon="canEdit"
     :isEditing="isEditing && canEdit"
     :full-width="true"
     @toogle:isEditing="isEditing = !isEditing"
@@ -19,8 +20,8 @@
         class="empty d-flex flex-column justify-center align-center"
         style="gap: 16px"
       >
-        <img src="../../assets/svg/EmptySocials.svg" alt="" />
-        <span>Nenhuma rede social adicionada</span>
+        <NuxtImg src="/svg/EmptySocials.svg" placeholder />
+        <span>{{ $t('components.profile.profile-socials.empty') }}</span>
       </div>
       <div v-else>
         <div
@@ -267,7 +268,7 @@ const handleDrop = ({ oldIndex, newIndex }) => {
     top: 0px;
     left: 0px;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 2000;
   }
 }
 

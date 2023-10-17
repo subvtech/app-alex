@@ -116,7 +116,7 @@ const user = useStrapiUser<User>();
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: '/user/profile',
+    to: `/user/${user.value.username}`,
   },
   {
     title: i18n.t('layouts.default.settings'),

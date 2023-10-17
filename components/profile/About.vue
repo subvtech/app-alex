@@ -3,6 +3,7 @@
     class="mb-6"
     :title="$t('components.profile.about.title')"
     :isEditing="isEditing && canEdit"
+    :showIcon="canEdit"
     @toogle:isEditing="toggleIsEditing"
     :cancel="cancel"
     :save="updateAbout"
