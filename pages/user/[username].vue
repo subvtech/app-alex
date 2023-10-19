@@ -23,8 +23,9 @@
         <NuxtImg
           v-if="coverPicture"
           class="cover"
+          provider="strapi"
           ref="cover"
-          :src="strapiBaseUrl + coverPicture"
+          :src="coverPicture"
           placeholder
         />
         <NuxtImg
@@ -91,7 +92,8 @@
             <label v-if="profilePicture" class="avatar" for="file-input">
               <NuxtImg
                 class="img"
-                :src="strapiBaseUrl + profilePicture"
+                provider="strapi"
+                :src="profilePicture"
                 :alt="user.fullname"
               />
 

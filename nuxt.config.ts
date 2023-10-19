@@ -15,6 +15,11 @@ export default defineNuxtConfig({
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
   },
+  image: {
+    strapi: {
+      baseURL: process.env.STRAPI_URL || 'http://localhost:1337/uploads',
+    },
+  },
 
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',

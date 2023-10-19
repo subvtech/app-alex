@@ -5,7 +5,7 @@
     "
   >
     <div class="d-flex" style="gap: 12px">
-      <NuxtImg :src="strapiBaseUrl + url" placeholder />
+      <NuxtImg provider="strapi" :src="url" placeholder />
       <div class="d-flex flex-column justify-center">
         <span>{{ acronym + ' - ' + name }}</span>
         <p>{{ sector }}</p>
