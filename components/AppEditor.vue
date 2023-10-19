@@ -27,8 +27,8 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from 'models/structure.model'
-import { Upload } from 'models/upload.model';
+import { Structure } from '../models/structure.model'
+import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
