@@ -1,7 +1,11 @@
 <template>
   <div
     class="flex-row align-center justify-space-between w-100"
-    :class="[isDeleted ? 'd-none' : 'd-flex', index === 0 ? 'rounded-t-lg' : '', isLast ? 'rounded-b-lg' : 'border-down']"
+    :class="[
+      isDeleted ? 'd-none' : 'd-flex',
+      index === 0 ? 'rounded-t-lg' : '',
+      isLast ? 'rounded-b-lg' : 'border-down',
+    ]"
     style="gap: 16px; overflow: hidden"
   >
     <div class="contact-item d-flex flex-col align-center w-100">
@@ -13,7 +17,12 @@
           </template>
           <div class="d-flex justify-space-between align-center w-100">
             <div class="d-flex align-center">
-              <NuxtImg v-if="canEdit" class="handle" src="/svg/menu.svg" placeholder />
+              <NuxtImg
+                v-if="canEdit"
+                class="handle"
+                src="/svg/menu.svg"
+                placeholder
+              />
               <div
                 class="d-flex justify-center align-center rounded-lg"
                 style="padding: 6px; border: 1px solid #d2d6da"

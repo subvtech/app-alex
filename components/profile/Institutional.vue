@@ -31,7 +31,7 @@
             class="d-flex pa-4 align-center justify-space-between w-100 item"
             #item="{ element, index }"
           >
-            <profile-inputs-institution
+            <profile-components-institution
               :canEdit="isEditing && canEdit"
               :index="index"
               :acronym="element.acronym"
