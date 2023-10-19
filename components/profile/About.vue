@@ -186,7 +186,7 @@ const toggleIsEditing = () => {
 
 #lockedEditor,
 #editorjs {
-  max-width: 350px !important;
+  max-width: 100% !important;
 }
 
 .cdx-block {
@@ -202,6 +202,10 @@ const toggleIsEditing = () => {
   #lockedEditor {
     .codex-editor__redactor {
       padding-bottom: 24px !important;
+
+      .ce-block__content{
+        margin: 0px;
+      }
     }
   }
   .info {
@@ -212,6 +216,13 @@ const toggleIsEditing = () => {
     font-size: 16px;
     font-weight: 400;
     line-height: 22px;
+  }
+}
+
+@media (max-width: 1200px) {
+  #lockedEditor,
+  #editorjs {
+    max-width: 350px !important;
   }
 }
 </style>

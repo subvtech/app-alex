@@ -27,8 +27,6 @@
 </template>
 
 <script setup lang="ts">
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-
 const emit = defineEmits(['delete:institution']);
 
 const props = defineProps({

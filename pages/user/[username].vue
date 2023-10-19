@@ -273,9 +273,7 @@
       class="content-block d-flex justify-center flex-row"
     ></div>
     <div v-else class="content-block d-flex justify-center flex-row">
-      <profile-events
-        :url="user.avatar ? strapiBaseUrl + user.avatar.url : undefined"
-      />
+      <profile-events :url="user.avatar ? user.avatar.url : undefined" />
     </div>
   </div>
 </template>
@@ -286,8 +284,6 @@ import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
 const { find, findOne } = useStrapi();
 const client = useStrapiClient();
-const strapiUrl = useStrapiUrl();
-const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
 const route = useRoute();
 const router = useRouter();
 const messageStore = useMessageStore();
@@ -605,7 +601,7 @@ async function removeCoverPicture() {
         bottom: 24px;
         right: 20px;
         .btn.label {
-          width: 153px;
+          width: 153px !important;
 
           border-radius: 8px;
           border: none;

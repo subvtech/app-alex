@@ -30,23 +30,21 @@
 
         <div class="competences d-flex flex-column align-start">
           <div class="d-flex flex-wrap justify-center">
-            <div
+            <profile-components-tag
               v-if="selectedTags.length !== 0"
-              v-for="tag in selectedTags"
-              class="item d-flex justify-center align-center"
-            >
-              <span>{{ tag.text }}</span>
-              <v-icon
-                v-if="isEditing"
-                size="16"
-                color="#6E7A87"
-                @click="removeItem(tag)"
-                style="cursor: pointer"
-                >mdi-close</v-icon
-              >
-            </div>
+              v-for="(tag, index) in selectedTags"
+              :isEditing="isEditing"
+              :key="index"
+              :text="tag.text"
+              :removeItem="removeItem(tag)"
+            />
+
             <div v-else class="item d-flex justify-center align-center">
-              <span>{{ emptyMessage }}</span>
+              <profile-components-tag
+                :isEditing="false"
+                :text="emptyMessage"
+                :removeItem="() => {}"
+              />
             </div>
           </div>
         </div>
@@ -234,21 +232,6 @@ watch(
 
     div {
       gap: 8px;
-      .item {
-        padding-inline: 8px;
-        gap: 4px;
-        height: 28px;
-        border-radius: 8px;
-        border: 1px solid var(--cinza-cinza-500, #8291a1);
-
-        span {
-          color: #6e7a87;
-          /* Body/P3 */
-          font-size: 14px;
-          font-weight: 400;
-          letter-spacing: 0.28px;
-        }
-      }
     }
   }
 }

@@ -42,13 +42,12 @@ import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from 'models/structure.model';
-import { Upload } from 'models/upload.model';
+import { Structure } from '../models/structure.model';
+import { Upload } from '../models/upload.model';
 import { dataLength } from 'ethers';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
 import Anchors from '../components/Anchors.vue';
-import editorData from '../editor-js/plugins/carousel/editorData';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 
@@ -313,19 +312,7 @@ const saveEditor = () => {
   });
 };
 
-const loadEditor = () => {
-  instance.value.isReady.then(() => {
-    instance.value.render(editorData);
-    editorData.blocks.forEach((block) => {
-      if (block.type === 'header' && block.data.anchor) {
-        anchors.value.push({
-          name: block.data.text,
-          link: `#${block.data.anchor}`,
-        });
-      }
-    });
-  });
-};
+const loadEditor = () => {};
 </script>
 
 <style scoped>

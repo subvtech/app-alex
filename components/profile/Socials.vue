@@ -44,7 +44,7 @@
               handle=".handle"
             >
               <template #item="{ element, index }">
-                <profile-inputs-social
+                <profile-components-social
                   :socialId="element.id"
                   :url="element.url"
                   :name="element.name"
@@ -71,7 +71,7 @@
         >
       </div>
       <div v-if="isAdding" class="add-social">
-        <profile-inputs-add-social
+        <profile-components-add-social
           @close:add-social="isAdding = false"
           @save:add-social="addSocial"
           :socials="missingSocials"
