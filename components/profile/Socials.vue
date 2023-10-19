@@ -1,246 +1,289 @@
 <template>
   <profile-card
-    class="mt-6"
     :title="$t('components.profile.socials.title')"
+    :cancel="cancel"
+    :save="save"
+    :showIcon="canEdit"
+    :isEditing="isEditing && canEdit"
     :full-width="true"
+    @toogle:isEditing="isEditing = !isEditing"
   >
-    <template v-slot:content>
-      <v-form
-        class="d-flex flex-column w-100 align-center"
-        style="gap: 24px"
-        @submit.prevent="updateValues"
+    <template class="d-flex w-100" v-slot:content>
+      <div
+        v-if="
+          socials.length === 0 ||
+          (socials.length === deleteArray.length &&
+            socials.every((item) =>
+              deleteArray.some((item2) => item.id === item2.socialId),
+            ))
+        "
+        class="empty d-flex flex-column justify-center align-center"
+        style="gap: 16px"
       >
+        <NuxtImg src="/svg/EmptySocials.svg" placeholder />
+        <span>{{ $t('components.profile.socials.empty') }}</span>
+      </div>
+      <div v-else>
         <div
-          class="item d-flex flex-row align-start w-100"
-          v-for="(social, index) in socials"
+          class="rounded-lg"
+          style="box-sizing: border-box; border: 1px solid #d2d6da"
         >
-          <div class="img-upload">
-            <label class="edit" :for="'file-input-' + social.name">
-              <img :src="strapiBaseUrl + social.icon.url" :alt="social.name" />
-            </label>
-
-            <input
-              class=""
-              style="display: none"
-              @input="async (e) => await updateSocialIcon(e, social.id, index)"
-              :id="'file-input-' + social.name"
-              type="file"
-              accept="image/png, image/jpeg, image/svg"
-            />
-          </div>
-
-          <div class="d-flex flex-column w-100" style="gap: 8px">
-            <alex-inputs-stepper-field
-              :label="social.name"
-              :value="social.name"
-              :name="`name.${index}`"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-            <alex-inputs-stepper-field
-              label="url"
-              :value="social.url"
-              :name="`url.${index}`"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-          </div>
-        </div>
-        <div class="item d-flex flex-row align-start w-100">
-          <div class="img-upload">
-            <label class="edit" for="new-icon">
-              <img v-if="newIcon" :src="newIcon" alt="icon" />
-              <img v-else src="../../assets/svg/website.svg" alt="icon" />
-            </label>
-
-            <input
-              class=""
-              @input="uploadNewIcon"
-              style="display: none"
-              id="new-icon"
-              type="file"
-              accept="image/png, image/jpeg, image/svg"
-            />
-          </div>
-
-          <div class="d-flex flex-column w-100" style="gap: 8px">
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.socials.newSocial')"
-              name="nameLoose"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.socials.newSocialUrl')"
-              name="urlLoose"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-          </div>
-        </div>
-        <div class="block d-flex">
-          <v-btn class="btn" color="accent" @click="cancel" variant="outlined">
-            {{ $t('components.profile.settings.cancel') }}</v-btn
+          <v-expansion-panels
+            class=""
+            variant="accordion"
+            theme="flat"
+            :key="componentKey"
           >
-          <v-btn class="btn" color="accent" type="submit">
-            {{ $t('components.profile.settings.save') }}
-          </v-btn>
+            <draggable
+              class="d-flex flex-column contacts w-100"
+              :list="sortedSocials"
+              item-key="name"
+              :disabled="!(isEditing && canEdit)"
+              ghost-class="ghost"
+              @end="handleDrop"
+              handle=".handle"
+            >
+              <template #item="{ element, index }">
+                <profile-inputs-social
+                  :socialId="element.id"
+                  :url="element.url"
+                  :name="element.name"
+                  :index="index"
+                  :key="index"
+                  :isLast="socials.length - 1 === index"
+                  :canEdit="isEditing && canEdit"
+                  @update:social="updateSocialMedia"
+                  @delete:social="updateDeleteArray"
+                />
+              </template>
+            </draggable>
+          </v-expansion-panels>
         </div>
-      </v-form>
+      </div>
+      <div v-if="isEditing && canEdit" class="d-flex justify-center mt-6">
+        <v-btn
+          class="btn"
+          @click="isAdding = true"
+          variant="outlined"
+          prepend-icon="mdi-plus"
+        >
+          {{ $t('components.profile.general.addSocial') }}</v-btn
+        >
+      </div>
+      <div v-if="isAdding" class="add-social">
+        <profile-inputs-add-social
+          @close:add-social="isAdding = false"
+          @save:add-social="addSocial"
+          :socials="missingSocials"
+        />
+      </div>
     </template>
   </profile-card>
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
+import draggable from 'vuedraggable';
 
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+const isEditing = ref(false);
+const isAdding = ref(false);
+const componentKey = ref(0);
 
 const emit = defineEmits(['update:user']);
-const { socialsSchema } = useFormRules();
-
-const { create, update } = useStrapi();
-const client = useStrapiClient();
-const { updateImage } = useUploadedImage();
-const messageStore = useMessageStore();
-const loading = ref(false);
-
-const newIcon = ref<string | null>(null);
-
-type Social = {
-  name: string;
-  url: string;
-  icon: any;
-  id: number;
-};
+const { create, update, delete: _delete } = useStrapi();
 
 const props = defineProps({
   socials: {
-    type: Array as PropType<Social[]>,
+    type: Array as PropType<
+      {
+        id: number;
+        socialId: number;
+        url: string;
+        name: string;
+        index: number;
+      }[]
+    >,
     required: true,
   },
-
+  canEdit: {
+    type: Boolean,
+    required: true,
+  },
   id: {
     type: Number,
     required: true,
   },
 });
 
-const { socials } = toRefs(props);
+const { id, socials, canEdit } = toRefs(props);
 
-const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: socialsSchema,
-  keepValuesOnUnmount: true,
-});
+const missingSocials = ref<string[]>([]);
+const sortedSocials = ref<
+  {
+    id: number;
+    socialId: number;
+    url: string;
+    name: string;
+    index: number;
+  }[]
+>([]);
 
-const cancel = () => {
-  socials.value = props.socials;
+const sortSocials = () => {
+  sortedSocials.value = [...socials.value].sort((a, b) =>
+    a.index > b.index ? 1 : b.index > a.index ? -1 : 0,
+  );
 };
 
-const updateValues = handleSubmit(async () => {
-  loading.value = true;
-  try {
-    const promises: any = [];
-    props.socials.forEach((social, index) => {
-      promises.push(
-        update('socials', social.id, {
-          name: controlledValues.value.name[index],
-          url: controlledValues.value.url[index],
-        }),
-      );
-    });
-    if (
-      controlledValues.value.nameLoose &&
-      controlledValues.value.urlLoose &&
-      newIcon.value
-    ) {
-      const formData = new FormData();
-      const response = await fetch(newIcon.value!);
-      const mimeType = response.headers.get('Content-Type');
-      const fileData = new File([await response.blob()], 'icon', {
-        type: mimeType!,
-      });
-
-      formData.append('files', fileData);
-
-      promises.push(
-        client<any>('/upload', {
-          method: 'POST',
-          body: formData,
-        })
-          .then((result) => {
-            create('socials', {
-              icon: result[0].id,
-              name: controlledValues.value.nameLoose,
-              url: controlledValues.value.urlLoose,
-              users_permissions_user: props.id,
-            })
-              .then((result2) => {})
-              .catch((err) => {
-                console.log(err);
-              });
-          })
-          .then((err) => {
-            console.log(err);
-          }),
-      );
-    }
-
-    await Promise.all(promises);
-
-    emit('update:user', {});
-  } catch (error) {
-    console.log(error);
-    messageStore.message = error as string;
-    messageStore.color = 'red';
-    messageStore.show = true;
-  } finally {
-    loading.value = false;
-  }
+onMounted(() => {
+  sortSocials();
+  if (!socials.value.find((element) => element.name === 'instagram'))
+    missingSocials.value.push('Instagram');
+  if (!socials.value.find((element) => element.name === 'youtube'))
+    missingSocials.value.push('Youtube');
+  if (!socials.value.find((element) => element.name === 'linkedin'))
+    missingSocials.value.push('Linkedin');
+  missingSocials.value.push('Outra rede');
 });
+const addSocial = async ({ value, value2, selectedSocial }) => {
+  if (value2 === '') {
+    await create('socials', {
+      name: selectedSocial.toLowerCase(),
+      url: value,
+      index: socials.value.length,
+      users_permissions_user: id.value,
+    });
+    missingSocials.value = missingSocials.value.filter(
+      (e) => e !== selectedSocial,
+    );
+  } else {
+    await create('socials', {
+      name: value2,
+      url: value,
+      index: socials.value.length,
+      users_permissions_user: id.value,
+    });
+  }
 
-async function updateSocialIcon(event: any, iconId: number, index: number) {
-  const { updatedAt } = await updateImage(event, iconId);
-  const url = socials.value[index].icon.url.split('?');
-  if (url) socials.value[index].icon.url = url[0] + '?' + updatedAt;
-}
+  isAdding.value = false;
 
-async function uploadNewIcon(e: any) {
-  newIcon.value = URL.createObjectURL(e.target.files[0]);
+  emit('update:user');
+};
+const deleteArray = ref<{ socialId: number; name: string }[]>([]);
+const updateArray = ref<
+  { socialId: number; url: string; name: string; index: number }[]
+>([]);
 
-  //const { updatedAt } = await updateImage(event, user.value.avatar.id);
-}
+const updateDeleteArray = ({ socialId, name }) => {
+  deleteArray.value.push({ socialId: socialId, name: name });
+};
+
+const updateSocialMedia = ({ socialId, name, url, index }) => {
+  const num = updateArray.value.findIndex((item) => item.socialId === socialId);
+
+  if (num !== -1) updateArray.value[num] = { socialId, name, url, index };
+  else updateArray.value.push({ socialId, name, url, index });
+};
+
+const save = async () => {
+  const promises: Promise<any>[] = [];
+  const supported = ['youtube', 'linkedin', 'instagram'];
+  updateArray.value.forEach((item) => {
+    promises.push(update(`/socials/${item.socialId}`, item));
+  });
+
+  deleteArray.value.forEach((item) => {
+    promises.push(_delete(`/socials/${item.socialId}`));
+    if (supported.includes(item.name))
+      missingSocials.value = [
+        item.name[0].toLocaleUpperCase() + item.name.slice(1),
+      ].concat(missingSocials.value);
+  });
+
+  if (promises.length === 0) return;
+  await Promise.all(promises);
+  deleteArray.value = [];
+  updateArray.value = [];
+  emit('update:user');
+};
+
+const cancel = () => {
+  componentKey.value = componentKey.value + 1;
+  deleteArray.value = [];
+  sortedSocials.value = socials.value;
+};
+
+watch(
+  () => socials.value,
+  () => sortSocials(),
+  { deep: true },
+);
+
+const handleDrop = ({ oldIndex, newIndex }) => {
+  sortedSocials.value.forEach((element, i) => {
+    let temp = updateArray.value.findIndex(
+      (item) => element.id === item.socialId,
+    );
+    if (temp !== -1) {
+      updateArray.value[temp] = { ...updateArray.value[temp], index: i };
+    } else {
+      updateArray.value.push({
+        socialId: element.id,
+        url: element.url,
+        name: element.name,
+        index: i,
+      });
+    }
+  });
+};
 </script>
 
 <style scoped lang="scss">
-.item {
-  gap: 24px;
-  img {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+#Card {
+  //border-bottom: 1px solid #eaeef1;
+  flex-direction: column;
+
+  .empty {
+    span {
+      color: #6e7a87;
+      text-align: center;
+      /* Body/P1 */
+
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 135%; /* 21.6px */
+      letter-spacing: 0.32px;
+    }
+  }
+
+  .add-social {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    left: 0px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
   }
 }
 
-.block {
-  width: 100%;
-  gap: 8px;
-  justify-content: flex-end;
-  
-  .btn {
-    text-transform: none;
-  }
+.btn {
+  text-transform: none;
+  color: #6e7a87 !important;
+  border-width: 0;
+  background-color: #f1f5f9;
+  font-weight: 700;
+  line-height: 135%; /* 18.9px */
+  letter-spacing: 0.28px;
 }
 
 @media (max-width: 400px) {
-  .block {
-    gap: 12px;
-    flex-direction: column-reverse;
-    width: 100%;
+  #Card {
     .btn {
       width: 100%;
     }
