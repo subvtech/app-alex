@@ -2,7 +2,7 @@
   <vueper-slides
     ref="vueperslides1"
     class="no-shadow mb-3 rounded"
-    :slide-ratio="1 / 2.5"
+    :slide-ratio="2 / 4"
     :bullets="false"
     :arrows="false"
     :dragging-distance="200"
@@ -40,6 +40,7 @@
           controls
           :is-active="activeSlide == i"
           :options="{
+            playbackRates: [0.5, 1, 1.5, 2],
             poster: uploadBaseUrl + slide.image,
             sources: [
               {
@@ -56,11 +57,19 @@
           "
           class="w-100 fill-height video-js"
           controls
+          :options="{
+            playbackRates: [0.5, 1, 1.5, 2],
+          }"
           :is-active="activeSlide == i"
           :data-setup="
             JSON.stringify({
               techOrder: [slide.type],
-              sources: [{ src: slide.video, type: `video/${slide.type}` }],
+              sources: [
+                {
+                  src: slide.video,
+                  type: `video/${slide.type}`,
+                },
+              ],
             })
           "
         ></video-player>
@@ -97,10 +106,11 @@
     "
   >
     <template #arrow-left>
-      <v-icon color="white" size="60px" icon="mdi-chevron-left" />
+      <v-icon color="black" icon="mdi-chevron-left" class="bg-white rounded" />
+      />
     </template>
     <template #arrow-right>
-      <v-icon color="white" size="60px" icon="mdi-chevron-right" />
+      <v-icon color="black" icon="mdi-chevron-right" class="bg-white rounded" />
     </template>
     <vueper-slide v-if="editMode">
       <template #content>
@@ -108,7 +118,7 @@
           class="w-100 fill-height d-flex align-center justify-center rounded py-10"
           elevation="0"
           style="border: 3px dashed #abb2b9"
-          @click="openAddSlidesDialog"
+          @click="openAddSlidesDialog(-1)"
         >
           <p color="blue-grey-darken-1" style="font-size: 30px">+</p>
         </v-container>
@@ -130,25 +140,22 @@
     >
       <template #content>
         <div v-if="editMode" class="ma-2">
-          <v-btn icon="mdi-pencil-outline" variant="text">
+          <v-btn
+            icon="mdi-pencil-outline"
+            variant="text"
+            @click="openAddSlidesDialog(i)"
+          >
             <v-icon
               size="x-small"
               icon="mdi-pencil-outline"
               class="bg-green-lighten-5 rounded-lg pa-3"
               color="green-lighten-1"
             />
-            <input
-              accept="image/*, video/*"
-              type="file"
-              class="w-100 h-100 bg-green inputFile"
-              title=""
-              @change="(file) => editSlide(slide, file)"
-            />
           </v-btn>
           <V-icon
             size="x-small"
             icon="mdi-trash-can-outline"
-            class="pa-3 ml-2 bg-red-lighten-5 rounded-lg"
+            class="pa-3 bg-red-lighten-5 rounded-lg"
             color="red"
             @click="deleteSlide(slide)"
           />
@@ -161,14 +168,15 @@
       </template>
     </vueper-slide>
   </vueper-slides>
-  <AlexInputsFileModal ref="dialog" @uploadFiles="(f) => addSlide(f, -1)" />
+  <FileModal ref="dialog" @upload-files="(f, index) => addSlide(f, index)" />
 </template>
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
-import { ref, defineProps } from 'vue';
+import { ref } from 'vue';
 import VideoPlayer from './VideoJS.vue';
+import FileModal from './FileModal.vue';
 import { useMessageStore } from '~/stores/message';
 const messageStore = useMessageStore();
 const props = defineProps({
@@ -249,8 +257,8 @@ function newSlide(file, res) {
 const editMode = ref(!props.readOnly);
 const dialog = ref(null);
 const activeSlide = ref(0);
-const openAddSlidesDialog = () => {
-  dialog.value.openModal();
+const openAddSlidesDialog = (index) => {
+  dialog.value.openModal(index);
 };
 // eslint-disable-next-line vue/no-setup-props-destructure
 const slides = ref([...props.slides]);
@@ -264,8 +272,11 @@ const deleteSlide = (item) => {
 
 const addSlide = async (slide, index) => {
   const slidesArray = [...slide];
+  if (index !== -1) {
+    props.onDeletedSlide(slides.value[index]);
+  }
   for (const s of slidesArray) {
-    if (typeof s === 'string') {
+    if (typeof s.url === 'string') {
       addSlideByUrl(s, index);
     } else {
       await addSlideByFile(s, index);
@@ -291,34 +302,31 @@ const addSlideByFile = async (f, index) => {
   }
 };
 
-const addSlideByUrl = (url) => {
+const addSlideByUrl = (slide, index) => {
+  let newSlide = {};
   if (
-    url.startsWith('https://www.youtube.com') ||
-    url.startsWith('https://vimeo.com/')
+    slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://vimeo.com/')
   ) {
-    slides.value.push({
-      name: url,
-      video: url,
-      image: url.includes('www.youtube')
-        ? `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`
-        : `https://vumbnail.com/${url.split('vimeo.com/')[1]}.jpg`,
-      type: url.includes('www.youtube') ? 'youtube' : 'vimeo',
-    });
+    newSlide = {
+      name: slide.name,
+      video: slide.url,
+      image: slide.url.includes('www.youtube')
+        ? `https://img.youtube.com/vi/${slide.url.split('v=')[1]}/0.jpg`
+        : `https://vumbnail.com/${slide.url.split('vimeo.com/')[1]}.jpg`,
+      type: slide.url.includes('www.youtube') ? 'youtube' : 'vimeo',
+    };
   } else {
-    slides.value.push({
-      name: url,
-      image: url,
+    newSlide = {
+      name: slide.name,
+      image: slide.url,
       type: 'UrlImage',
-    });
+    };
   }
+  index === -1
+    ? slides.value.push(newSlide)
+    : slides.value.splice(index, 1, newSlide);
   props.onUpdateSlides(slides.value);
-};
-
-const editSlide = async (slide, file) => {
-  const f = file.target.files[0];
-  const index = slides.value.indexOf(slide);
-  await addSlideByFile(f, index);
-  props.onDeletedSlide(slide);
 };
 </script>
 
@@ -331,10 +339,6 @@ const editSlide = async (slide, file) => {
 .editBtn {
   width: 24px;
   height: 24px;
-}
-.thumbnails {
-  margin: auto;
-  max-width: 300px;
 }
 
 .vueperslide {
@@ -359,6 +363,7 @@ const editSlide = async (slide, file) => {
   transform: translate(-50%, -50%);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
+
 @media (max-width: 800px) {
   .video-play-icon {
     left: 70%;
