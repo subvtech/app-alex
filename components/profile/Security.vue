@@ -1,5 +1,5 @@
 <template>
-  <profile-card class="mt-6" title="Segurança" :full-width="true">
+  <profile-card :title="$t('components.profile.security.title')" :showIcon="false" :full-width="true">
     <template v-slot:content>
       <div class="fields d-flex flex-wrap">
         <v-form class="field d-flex w-100 align-center justify-space-between">
@@ -85,6 +85,10 @@ const { handleSubmit, errors: emailErrors } = useForm({
   validationSchema: emailRules,
   keepValuesOnUnmount: true,
 });
+
+const cancel = () => {
+
+}
 
 const updateEmail = handleSubmit(async () => {
   editEmail.value = !editEmail.value;

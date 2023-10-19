@@ -6,7 +6,7 @@
         sm="6"
         class="justify-center align-center d-none d-md-flex pa-0"
       >
-        <img class="w-50" src="../static/images/imagem_forgot.png" />
+        <img class="w-50" src="/images/imagem_forgot.png" />
       </v-col>
       <v-col
         id="login-container"
@@ -44,7 +44,7 @@ const handlePasswordChanged = () => {
 
 <style scoped>
 #login-container {
-  background-image: url('../static/images/login-bg.svg');
+  background-image: url('/images/login-bg.svg');
   background-size: 100% 100%;
 }
 
