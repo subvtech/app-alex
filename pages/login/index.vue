@@ -5,7 +5,7 @@
         <div align="center">
           <img
             :alt="$t('pages.login.alt')"
-            src="../../static/images/imagem_login.png"
+            src="/images/imagem_login.png"
             class="card-imagem-imagem my-5"
           />
         </div>
@@ -16,7 +16,7 @@
         <div align="center">
           <img
             alt="Alex"
-            src="../../static/images/alex.svg"
+            src="/images/alex.svg"
             class="card-acesso-alex-logo"
           />
         </div>
@@ -111,7 +111,7 @@
             @click="metalogin"
             :loading="logging2"
           >
-            <img src="../../static/images/metamask.png" alt="" />
+            <img src="/images/metamask.png" alt="" />
             <span>{{ $t('pages.login.metamask.btn') }}</span>
           </v-btn>
         </div>
