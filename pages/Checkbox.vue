@@ -25,7 +25,7 @@
     <span>
       <div class="container" width="100%" height="47">
         <div class="inner-container">
-          <v-checkbox color="#00B7CC" indeterminate />
+          <v-checkbox indeterminate color="#00B7CC" value="#00B7CC" />
         </div>
         <div class="inner-text">
           <span>{{ label }}</span>
