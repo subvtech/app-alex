@@ -18,38 +18,42 @@
           </NuxtLink>
         </div>
       </v-row>
-      <!-- aqui começa o teste para o on boarding -->
       <div v-for="(menu, i) in menus" :key="`menu-${i}`">
-        <v-subheader :key="`menu-${i}`" class="subheader accent-text">
-          {{ menu.title }}
-        </v-subheader>
-        <v-list :key="`menu-${i}-list`">
-          <v-list-item
-            v-for="(item, j) in menu.items"
-            :key="`menu-${i}-item-${j}`"
-            :to="item.to"
-            class=""
-            router
-            exact
-          >
-            <div class="d-flex align-center" style="gap: 16px">
-              <v-list-item-action>
-                <v-icon color="#d2d6da">{{ item.icon }}</v-icon>
-              </v-list-item-action>
+        <div
+          :data-tour="menu.dataTour"
+          :class="{ 'active-step': menu.dataTour !== '' && isTourActive }"
+        >
+          <v-subheader :key="`menu-${i}`" class="subheader accent-text">
+            {{ menu.title }}
+          </v-subheader>
+          <v-list :key="`menu-${i}-list`">
+            <v-list-item
+              v-for="(item, j) in menu.items"
+              :key="`menu-${i}-item-${j}`"
+              :to="item.to"
+              class=""
+              router
+              exact
+            >
+              <div class="d-flex align-center" style="gap: 16px">
+                <v-list-item-action>
+                  <v-icon color="#d2d6da">{{ item.icon }}</v-icon>
+                </v-list-item-action>
 
-              <v-list-item-title
-                class="item-name font-weight-medium"
-                v-text="item.title"
-              />
-            </div>
-          </v-list-item>
-        </v-list>
+                <v-list-item-title
+                  class="item-name font-weight-medium"
+                  v-text="item.title"
+                />
+              </div>
+            </v-list-item>
+          </v-list>
+        </div>
       </div>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app color="white">
       <v-app-bar-nav-icon
-        @click.stop="drawer = !drawer"
         class="text-gray-900"
+        @click.stop="drawer = !drawer"
       />
       <div
         v-if="!drawer"
@@ -131,13 +135,13 @@ const isTourActive = ref(false); // Variável que vai definir se a tour está at
 const stepsData = [
   {
     id: 'step1',
-    title: 'Bem vindo(a) ao Projeto ALEX, esteja pronto para aprender e ensinar!',
+    title:
+      'Bem vindo(a) ao Projeto ALEX, esteja pronto para aprender e ensinar!',
     text: 'Iniciamos com a Dashboard, ela centraliza informações e atalhos para as funcionalidades do sistema',
     attachTo: {
       element: '[data-tour="step-dashboard"]',
       on: 'bottom',
     },
-    classes: 'example-step-extra-class',
     buttons: [
       {
         text: 'Avançar',
@@ -147,9 +151,9 @@ const stepsData = [
   },
   {
     id: 'step2',
-    text: 'Na área de planos de aprendizagem você acessa os planos criados por toda a comunidade ou planos que você criou ou nos quais está inserido',
+    text: 'Aqui você acessa os cursos e projetos criados por toda a comunidade',
     attachTo: {
-      element: '[data-tour="step-learning-plans"]',
+      element: '[data-tour="step-courses"]',
       on: 'bottom',
     },
     buttons: [
@@ -165,9 +169,9 @@ const stepsData = [
   },
   {
     id: 'step3',
-    text: 'Na área de turmas você acessa as turmas criadas por toda a comunidade ou turmas que você criou ou nas quais está inserido',
+    text: 'Aqui é sua área, você pode acessar seus planos e turmas e a sua lista de favoritos',
     attachTo: {
-      element: '[data-tour="step-all-classes"]',
+      element: '[data-tour="step-projects"]',
       on: 'bottom',
     },
     buttons: [
@@ -183,9 +187,9 @@ const stepsData = [
   },
   {
     id: 'step4',
-    text: 'Professores têm uma área especial para gerenciar seus planos e turmas',
+    text: 'Estamos ansiosos para te ajudar nesta jornada!',
     attachTo: {
-      element: '[data-tour="step-classes-links"]',
+      element: '[data-tour="step-user-area"]',
       on: 'bottom',
     },
     buttons: [
@@ -233,17 +237,18 @@ const profileMenuItems = [
 const menus = [
   {
     title: i18n.t('layouts.default.dashboardsTitle'),
+    dataTour: 'step-dashboard',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
         title: i18n.t('layouts.default.dashboard'),
-        dataTour: 'step-dashboard',
         to: '/dashboard',
       },
     ],
   },
   {
     title: i18n.t('layouts.default.BrowseOnAlex'),
+    dataTour: 'step-courses',
     items: [
       {
         icon: 'mdi-book-outline',
@@ -259,6 +264,7 @@ const menus = [
   },
   {
     title: i18n.t('layouts.default.userArea'),
+    dataTour: 'step-projects',
     items: [
       {
         icon: 'mdi-book-cog-outline',
@@ -279,6 +285,7 @@ const menus = [
   },
   {
     title: i18n.t('layouts.default.professorTitle'),
+    dataTour: '',
     items: [
       {
         icon: 'mdi-account-multiple-outline',
@@ -380,7 +387,9 @@ body {
 }
 
 .active-step {
-  background: rgb(46, 116, 184, 0.2);
+  background: none;
+  border-radius: 0.1rem;
+  border: 2px dotted #00b7cc;
   padding: 0.5rem;
 }
 
