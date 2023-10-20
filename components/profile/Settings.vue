@@ -2,9 +2,10 @@
   <profile-card
     :title="$t('components.profile.settings.title')"
     :full-width="true"
+    :showIcon="false"
   >
     <template v-slot:content>
-      <div>
+      <div class="settings">
         <v-form
           ref="form"
           color="black"
@@ -31,16 +32,7 @@
               v-maska:[cpfMask]
             />
           </div>
-          <alex-inputs-stepper-field
-            :label="$t('components.profile.settings.about')"
-            :value="info"
-            name="info"
-            typeField="textarea"
-            class=""
-            color="black"
-            variant="outlined"
-          />
-          <div class="d-flex justify-end">
+          <div class="buttons d-flex justify-end">
             <v-btn
               class="btn"
               color="accent"
@@ -49,7 +41,7 @@
             >
               {{ $t('components.profile.settings.cancel') }}</v-btn
             >
-            <v-btn class="btn ml-2" color="accent" type="submit">
+            <v-btn class="btn" color="accent" type="submit">
               {{ $t('components.profile.settings.save') }}
             </v-btn>
           </div>
@@ -59,16 +51,18 @@
 
     <template v-slot:footer> </template>
   </profile-card>
+  <div class="d-flex flex-column">
+    <profile-security :email="email" :id="id" /> <profile-wallets :id="id" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
-const { update } = useStrapi();
 const { profileSchema } = useFormRules();
+const client = useStrapiClient();
 const messageStore = useMessageStore();
-const emit = defineEmits(['update:user'])
-
+const emit = defineEmits(['update:user']);
 const loading = ref(false);
 
 const props = defineProps({
@@ -76,13 +70,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+  },
   telephone: {
     type: String,
     default: '',
-  },
-  info: {
-    type: String,
-    required: true,
   },
   cpf: {
     type: String,
@@ -94,7 +88,7 @@ const props = defineProps({
   },
 });
 
-const { fullname, telephone, cpf, info } = toRefs(props);
+const { fullname, email, telephone, cpf } = toRefs(props);
 
 const cpfMask = reactive({
   mask: '###.###.###-##',
@@ -115,24 +109,18 @@ const cancel = () => {
   telephone.value = props.telephone;
   fullname.value = props.fullname;
   cpf.value = props.cpf;
-  info.value = props.info;
 };
 
 const updateValues = handleSubmit(async () => {
   loading.value = true;
 
-  const data = { ...values, phone: values.phone.replace(/[^0-9]/g, '') };
   try {
-    const url = useStrapiUrl() + '/users/' + props.id;
-    const options = {
+    await client(`/users/${props.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data }),
-    };
+      body: { ...values, phone: values.phone.replace(/[^0-9]/g, '') },
+    });
 
-    await fetch(url, options);
-
-    emit('update:user', {})
+    emit('update:user', {});
   } catch (error) {
     console.log(error);
     messageStore.message = error as string;
@@ -145,18 +133,28 @@ const updateValues = handleSubmit(async () => {
 </script>
 
 <style scoped lang="scss">
-form {
-  gap: 24px;
-  .btn {
-    text-transform: none !important;
+.settings {
+  form {
+    gap: 24px;
+    .btn {
+      text-transform: none !important;
+    }
   }
-}
-.block {
-  gap: 24px;
-}
-@media (max-width: 600px) {
   .block {
-    flex-direction: column;
+    gap: 24px;
+  }
+
+  .buttons {
+    gap: 8px;
+  }
+  @media (max-width: 430px) {
+    .block {
+      flex-direction: column;
+    }
+
+    .buttons {
+      flex-direction: column-reverse;
+    }
   }
 }
 </style>

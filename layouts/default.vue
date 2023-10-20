@@ -9,52 +9,41 @@
       fixed
       app
       dark
-      class="pa-4"
+      class="d-flex flex-column pb-2 px-2"
     >
-      <v-row justify="center" class="my-10">
+      <v-row justify="center" class="my-4" style="max-height: 64px">
         <div>
           <NuxtLink to="/">
-            <img src="@/static/images/alex.svg" height="32" width="96" />
+            <img src="/images/alex.svg" height="32" width="96" />
           </NuxtLink>
         </div>
       </v-row>
       <!-- aqui começa o teste para o on boarding -->
       <div v-for="(menu, i) in menus" :key="`menu-${i}`">
-        <!-- aqui a div envolve os elementos que serão renderizados no menu -->
-        <div
-          :data-tour="menu.dataTour"
-          :class="{ 'active-step': menu.dataTour !== '' && isTourActive}"
-        >
-          <v-subheader
-            :key="`menu-${i}`"
-            class="accent-text"
-            style="font-size: 12px; line-height: 15px"
+        <v-subheader :key="`menu-${i}`" class="subheader accent-text">
+          {{ menu.title }}
+        </v-subheader>
+        <v-list :key="`menu-${i}-list`">
+          <v-list-item
+            v-for="(item, j) in menu.items"
+            :key="`menu-${i}-item-${j}`"
+            :to="item.to"
+            class=""
+            router
+            exact
           >
-            {{ menu.title }}
-          </v-subheader>
+            <div class="d-flex align-center" style="gap: 16px">
+              <v-list-item-action>
+                <v-icon color="#d2d6da">{{ item.icon }}</v-icon>
+              </v-list-item-action>
 
-          <v-list :key="`menu-${i}-list`">
-            <v-list-item
-              v-for="(item, j) in menu.items"
-              :key="`menu-${i}-item-${j}`"
-              :to="item.to"
-              class=""
-              router
-              exact
-            >
-              <div class="d-flex" style="gap: 16px">
-                <v-list-item-action>
-                  <v-icon>{{ item.icon }}</v-icon>
-                </v-list-item-action>
-
-                <v-list-item-title
-                  class="font-weight-medium"
-                  v-text="item.title"
-                />
-              </div>
-            </v-list-item>
-          </v-list>
-        </div>
+              <v-list-item-title
+                class="item-name font-weight-medium"
+                v-text="item.title"
+              />
+            </div>
+          </v-list-item>
+        </v-list>
       </div>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app color="white">
@@ -66,16 +55,7 @@
         v-if="!drawer"
         class="primary pl-2 pt-1 rounded-pill"
         style="height: 42px; width: 115px"
-      >
-        <NuxtLink to="/">
-          <v-img
-            src="../static/images/alex.svg"
-            alt="logo"
-            height="32"
-            width="96"
-          />
-        </NuxtLink>
-      </div>
+      ></div>
       <v-spacer />
       <v-btn icon color="grey">
         <v-icon>mdi-magnify</v-icon>
@@ -117,7 +97,7 @@
       </v-menu>
     </v-app-bar>
     <v-main class="secondary bg-gray-blue">
-      <v-container style="width: 100%; max-width: 100%" class="pa-4 pa-sm-10">
+      <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
     </v-main>
@@ -238,7 +218,7 @@ tour.on('cancel', () => {
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: '/user/profile',
+    to: `/user/${user.value.username}`,
   },
   {
     title: i18n.t('layouts.default.settings'),
@@ -255,7 +235,7 @@ const menus = [
     title: i18n.t('layouts.default.dashboardsTitle'),
     items: [
       {
-        icon: 'mdi-view-dashboard',
+        icon: 'mdi-view-dashboard-outline',
         title: i18n.t('layouts.default.dashboard'),
         dataTour: 'step-dashboard',
         to: '/dashboard',
@@ -263,58 +243,56 @@ const menus = [
     ],
   },
   {
-    title: i18n.t('layouts.default.learningPlansTitle'),
+    title: i18n.t('layouts.default.BrowseOnAlex'),
     items: [
       {
-        icon: 'mdi-newspaper-variant-multiple-outline',
-        title: i18n.t('layouts.default.learningPlans'),
-        dataTour: 'step-learning-plans',
+        icon: 'mdi-book-outline',
+        title: i18n.t('layouts.default.courses'),
         to: '/learning-plans',
       },
       {
-        icon: 'mdi-newspaper-variant-multiple-outline',
-        title: i18n.t('layouts.default.learningPlansUser'),
-        dataTour: 'step-learning-plans',
+        icon: 'mdi-clipboard-text-outline',
+        title: i18n.t('layouts.default.projects'),
         to: '/learning-plans/user',
       },
     ],
   },
   {
-    title: i18n.t('layouts.default.classesTitle'),
+    title: i18n.t('layouts.default.userArea'),
     items: [
       {
-        icon: 'mdi-account-multiple-outline',
-        title: 'Todas as turmas',
-        dataTour: 'step-all-classes',
+        icon: 'mdi-book-cog-outline',
+        title: i18n.t('layouts.default.myClasses'),
         to: '/classes',
       },
       {
-        icon: 'mdi-account-multiple-outline',
-        title: 'Turmas salvas',
-        dataTour: 'step-all-classes',
+        icon: 'mdi-clipboard-multiple-outline',
+        title: i18n.t('layouts.default.myProjects'),
+        to: '/classes/active-links',
+      },
+      {
+        icon: 'mdi-heart-outline',
+        title: i18n.t('layouts.default.favourites'),
         to: '/classes/active-links',
       },
     ],
   },
   {
-    title: 'ÁREA DO PROFESSOR',
+    title: i18n.t('layouts.default.professorTitle'),
     items: [
       {
-        icon: 'mdi-bookmark-box-multiple-outline',
-        title: 'Meus Planos',
-        dataTour: '',
+        icon: 'mdi-account-multiple-outline',
+        title: i18n.t('layouts.default.userList'),
         to: '/classes',
       },
       {
-        icon: 'mdi-pencil-outline',
-        title: 'Turmas ministradas',
-        dataTour: '',
+        icon: 'mdi-lock-outline',
+        title: i18n.t('layouts.default.accessControl'),
         to: '/classes',
       },
       {
-        icon: 'mdi-school-outline',
-        title: i18n.t('layouts.default.classesLinks'),
-        dataTour: 'step-classes-links',
+        icon: 'mdi-cog-outline',
+        title: i18n.t('layouts.default.settings'),
         to: '/projects',
       },
     ],
@@ -337,6 +315,61 @@ function logoutUser() {
 </script>
 
 <style lang="scss">
+html,
+body {
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .v-application {
+    font-family: Sen !important;
+
+    .v-navigation-drawer__content {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      gap: 24px;
+      display: flex;
+      flex-direction: column;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    .subheader {
+      color: #00b7cc;
+      padding-left: 16px;
+      padding-right: 8px;
+
+      /* Body/P6 */
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 135%; /* 16.2px */
+      letter-spacing: 0.48px;
+    }
+
+    .item-name {
+      color: #d2d6da;
+
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 135%; /* 18.9px */
+      letter-spacing: 0.56px;
+    }
+
+    @media (max-width: 550px) {
+      .v-toolbar__content {
+        .user-block {
+          .fullname {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
 .shepherd-step {
   z-index: 100000;
   background: #fff;

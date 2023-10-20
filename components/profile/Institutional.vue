@@ -1,80 +1,86 @@
 <template>
-  <profile-card title="Institucional" :full-width="true">
+  <profile-card
+    :title="$t('components.profile.institutional.title')"
+    :full-width="true"
+    :isEditing="isEditing && canEdit"
+    :showIcon="canEdit"
+    @toogle:isEditing="isEditing = !isEditing"
+    :cancel="onCancel"
+    :save="onSave"
+  >
     <template v-slot:content>
-      <v-btn
-        v-if="canEdit"
-        class="btn"
-        color="accent"
-        @click="showSearch"
-        variant="outlined"
-      >
-        {{
-          isAddingInstitution
-            ? $t('components.profile.institutional.save')
-            : $t('components.profile.institutional.add')
-        }}</v-btn
-      >
-
       <alex-inputs-institutions
-        v-if="isAddingInstitution"
+        v-if="isEditing && canEdit"
         v-model:institutions="searchInstitutions"
         v-model:search="search"
         @update:value="updateSelectedOption"
         color="black"
         name="institution"
       />
-      <div class="d-flex flex-wrap items">
-        <div
-          class="d-flex pa-4 align-center item"
-          v-for="(item, index) in institutions"
+      <div v-if="sortedInstitutions.length > 0" class="d-flex flex-wrap items">
+        <draggable
+          class="d-flex flex-column contacts w-100"
+          :list="sortedInstitutions"
+          item-key="name"
+          :disabled="!(isEditing && canEdit)"
+          :key="componentKey"
+          ghost-class="ghost"
+          handle=".handle"
         >
-          <img :src="strapiBaseUrl + item.cover.url" :alt="item.name" />
-
-          <div class="d-flex flex-column justify-center">
-            <span>{{ item.acronym + ' - ' + item.name }}</span>
-            <p>{{ item.sector }}</p>
-          </div>
-          <div v-if="canEdit" class="menu">
-            <v-icon
-              @click="showDeleteButton = !showDeleteButton"
-              color="#6E7A87"
-              style="cursor: pointer"
-              >mdi-dots-vertical</v-icon
-            >
-            <v-icon
-              v-if="showDeleteButton"
-              class="remove"
-              @click="removeInstitution(item.id)"
-              color="red"
-              size="small"
-            >
-              mdi-close-outline
-            </v-icon>
-          </div>
-        </div>
+          <template
+            class="d-flex pa-4 align-center justify-space-between w-100 item"
+            #item="{ element, index }"
+          >
+            <profile-components-institution
+              :canEdit="isEditing && canEdit"
+              :index="index"
+              :acronym="element.acronym"
+              :sector="element.sector"
+              :url="element.cover.url"
+              :institutionId="element.id"
+              :name="element.name"
+              :isDeleted="deleteArray.includes(element.id)"
+              @delete:institution="updateDeleteArray"
+            />
+          </template>
+        </draggable>
+      </div>
+      <div
+        v-else
+        class="d-flex flex-column justify-center align-center pa-6"
+        style="gap: 16px"
+      >
+        <NuxtImg
+          src="/svg/EmptyInstitutional.svg"
+          placeholder
+          style="height: 160px; width: 160px"
+        />
+        <span class="info text-center" style="color: rgb(175, 175, 175)">
+          {{ $t('components.profile.institutional.emptyInstitutional') }}
+        </span>
       </div>
     </template>
   </profile-card>
 </template>
 
 <script setup lang="ts">
-const { find, update } = useStrapi();
+import draggable from 'vuedraggable';
 
 type Institution = {
   name: string;
   acronym: string;
   sector: string;
   id: number;
+  index: number;
   cover: any;
 };
 
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-const showDeleteButton = ref(false);
-const isAddingInstitution = ref(false);
 const searchInstitutions = ref<Institution[]>([]);
-let selectedOption = ref(0);
 const search = ref('');
+const isEditing = ref(false);
+const componentKey = ref(0);
 
+const client = useStrapiClient();
 const emit = defineEmits(['update:user']);
 
 const props = defineProps({
@@ -91,54 +97,106 @@ const props = defineProps({
     default: false,
   },
 });
-const { institutions } = toRefs(props);
+const { id, canEdit } = toRefs(props);
 
-const updateSelectedOption = (event) => {
-  selectedOption.value = event;
-};
+const updateSelectedOption = (selectedId) => {
+  if (
+    searchInstitutions.value.length === 0 ||
+    isNaN(selectedId) ||
+    selectedId < 0
+  )
+    return;
+  if (
+    !sortedInstitutions.value.find(
+      (item) => item.id === searchInstitutions.value[selectedId].id,
+    )
+  ) {
+    sortedInstitutions.value.push(searchInstitutions.value[selectedId]);
 
-const showSearch = async () => {
-  if (isAddingInstitution.value && searchInstitutions.value) {
-    const temp = { ...searchInstitutions.value };
-   
-    if (searchInstitutions.value.length > 0) {
-      const list = institutions.value.map((item) => item.id);
+    if (
+      !institutionsIds.value.includes(searchInstitutions.value[selectedId].id)
+    )
+      institutionsIds.value.push(searchInstitutions.value[selectedId].id);
 
-      list.push(
-        { ...{ ...searchInstitutions.value }[selectedOption.value] }.id,
+    if (
+      deleteArray.value.find(
+        (id) => id === searchInstitutions.value[selectedId].id,
+      )
+    ) {
+      deleteArray.value = deleteArray.value.filter(
+        (id) => id !== searchInstitutions.value[selectedId].id,
       );
-      const data = { institutions: list };
-      const url = useStrapiUrl() + '/users/' + props.id;
-      const options = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data }),
-      };
-
-      await fetch(url, options);
-      emit('update:user', {});
     }
-
-    isAddingInstitution.value = false;
-  } else {
-    isAddingInstitution.value = true;
+  } else if (
+    deleteArray.value.find(
+      (id) => id === searchInstitutions.value[selectedId].id,
+    )
+  ) {
+    deleteArray.value = deleteArray.value.filter(
+      (id) => id !== searchInstitutions.value[selectedId].id,
+    );
   }
+
+  search.value = '';
 };
 
-const removeInstitution = async (index) => {
-  const list = institutions.value
-    .map((item) => item.id)
-    .filter((id) => id !== index);
-  const data = { institutions: list };
-  const url = useStrapiUrl() + '/users/' + props.id;
-  const options = {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...data }),
-  };
+const sortedInstitutions = ref<Institution[]>([...props.institutions]);
+const institutionsIds = ref<number[]>(
+  props.institutions.map((item) => item.id),
+);
+const deleteArray = ref<number[]>([]);
 
-  await fetch(url, options);
-  emit('update:user', {});
+const updateDeleteArray = (id: number) => {
+  deleteArray.value.push(id);
+  institutionsIds.value = institutionsIds.value.filter((item) => item !== id);
+};
+
+const onSave = async () => {
+  const connectArray: {
+    id: number;
+    position: {
+      end?: boolean;
+      start?: boolean;
+      before?: number;
+      after?: number;
+    };
+  }[] = [];
+  if (sortedInstitutions.value.length !== 0) {
+    sortedInstitutions.value.slice(1).forEach((item, index) => {
+      if (!deleteArray.value.includes(sortedInstitutions.value[index].id)) {
+        connectArray.push({
+          id: item.id,
+          position: { after: sortedInstitutions.value[index].id },
+        });
+      }
+    });
+    if (!deleteArray.value.includes(sortedInstitutions.value[0].id)) {
+      if (sortedInstitutions.value.length <= deleteArray.value.length)
+        sortedInstitutions.value = [];
+      connectArray.push({
+        id: sortedInstitutions.value[0].id,
+        position: { start: true },
+      });
+    }
+  }
+
+  await client(`/users/${id.value}`, {
+    method: 'PUT',
+    body: {
+      institutions: {
+        connect: connectArray,
+        disconnect: deleteArray.value,
+      },
+    },
+  });
+  emit('update:user');
+  deleteArray.value = [];
+};
+
+const onCancel = () => {
+  componentKey.value = componentKey.value + 1;
+  deleteArray.value = [];
+  sortedInstitutions.value = [...props.institutions];
 };
 </script>
 
@@ -152,42 +210,26 @@ const removeInstitution = async (index) => {
   font-size: 14px;
   border-radius: 8px;
 }
+.small {
+  display: none;
+  position: absolute;
+  width: auto;
+  height: auto;
+  top: 20px;
+  right: 10px;
+  padding: 4px;
+}
 .items {
   gap: 24px;
-  .item {
-    gap: 12px;
-    color: #5d6872;
-    line-height: 22px;
+}
 
-    border-radius: 8px;
-    border: 1px solid #eaeef1;
-    span {
-      font-size: 20px;
-      font-weight: 700;
-    }
-    p {
-      font-size: 16px;
-      font-weight: 400;
-    }
-    img {
-      width: 80px;
-      height: 80px;
+@media (max-width: 400px) {
+  .btn {
+    display: none;
+  }
 
-      border-radius: 8px;
-      border: 1px solid #eaeef1;
-    }
-
-    .menu {
-      position: relative;
-
-      .remove {
-        cursor: pointer;
-
-        position: absolute;
-        top: -38px;
-        left: 18px;
-      }
-    }
+  .small {
+    display: block;
   }
 }
 </style>

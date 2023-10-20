@@ -40,13 +40,24 @@
   },
   "password": {
     "required": "Senha é necessária",
-    "upperCase": "Pelo menos 2 letras maiúsculas necessárias",
+    "upperCase": "Pelo menos 1 letras maiúscula necessária",
     "lowerCase": "Pelo menos 1 letra minúscula",
     "number": "Pelo menos 1 número necessário",
+    "character": "Pelo menos 1 caractere especial é necessário",
     "min": "Mínimo de 8 caracteres"
   },
   "confirmPassword": {
     "required": "Confirma Senha é necessário",
     "matchError": "As senhas não são idênticas"
+  },
+  "name": {
+    "required": "Nome é necessário",
+    "min": "Mínimo de 3 caracteres",
+    "max": "Máximo de 20 caracteres"
+  },
+  "url": {
+    "required": "Url é necessário",
+    "min": "Mínimo de 4 caracteres",
+    "max": "Máximo de 64 caracteres"
   }
 }
