@@ -2,7 +2,7 @@
   <profile-card
     :title="$t('components.profile.socials.title')"
     :cancel="cancel"
-    :save="save"
+    :save="onSave"
     :showIcon="canEdit"
     :isEditing="isEditing && canEdit"
     :full-width="true"
@@ -10,13 +10,7 @@
   >
     <template class="d-flex w-100" v-slot:content>
       <div
-        v-if="
-          socials.length === 0 ||
-          (socials.length === deleteArray.length &&
-            socials.every((item) =>
-              deleteArray.some((item2) => item.id === item2.socialId),
-            ))
-        "
+        v-if="sortedSocials.length === 0"
         class="empty d-flex flex-column justify-center align-center"
         style="gap: 16px"
       >
@@ -40,8 +34,8 @@
               item-key="name"
               :disabled="!(isEditing && canEdit)"
               ghost-class="ghost"
-              @end="handleDrop"
               handle=".handle"
+              @end="isChanged = true"
             >
               <template #item="{ element, index }">
                 <profile-components-social
@@ -50,8 +44,11 @@
                   :name="element.name"
                   :index="index"
                   :key="index"
-                  :isLast="socials.length - 1 === index"
+                  :disabled="disabled"
+                  :isLast="sortedSocials.length - 1 === index"
                   :canEdit="isEditing && canEdit"
+                  :onError="() => (disabled = true)"
+                  :onSuccess="() => (disabled = false)"
                   @update:social="updateSocialMedia"
                   @delete:social="updateDeleteArray"
                 />
@@ -74,7 +71,7 @@
         <profile-components-add-social
           @close:add-social="isAdding = false"
           @save:add-social="addSocial"
-          :socials="missingSocials"
+          :socials="updatedMissingSocials"
         />
       </div>
     </template>
@@ -83,9 +80,12 @@
 
 <script setup lang="ts">
 import draggable from 'vuedraggable';
+const i18n = useI18n();
 
 const isEditing = ref(false);
 const isAdding = ref(false);
+const isChanged = ref(false);
+const disabled = ref(false);
 const componentKey = ref(0);
 
 const emit = defineEmits(['update:user']);
@@ -96,10 +96,8 @@ const props = defineProps({
     type: Array as PropType<
       {
         id: number;
-        socialId: number;
         url: string;
         name: string;
-        index: number;
       }[]
     >,
     required: true,
@@ -116,123 +114,165 @@ const props = defineProps({
 
 const { id, socials, canEdit } = toRefs(props);
 
-const missingSocials = ref<string[]>([]);
+const supported = ['youtube', 'linkedin', 'instagram'];
+
+const client = useStrapiClient();
+
 const sortedSocials = ref<
   {
-    id: number;
-    socialId: number;
+    id?: number;
     url: string;
     name: string;
-    index: number;
   }[]
->([]);
-
-const sortSocials = () => {
-  sortedSocials.value = [...socials.value].sort((a, b) =>
-    a.index > b.index ? 1 : b.index > a.index ? -1 : 0,
-  );
-};
+>([...socials.value]);
+const missingSocials = ref<string[]>([]);
+const updatedMissingSocials = ref<string[]>([]);
 
 onMounted(() => {
-  sortSocials();
-  if (!socials.value.find((element) => element.name === 'instagram'))
+  if (!sortedSocials.value.find((element) => element.name === 'instagram'))
     missingSocials.value.push('Instagram');
-  if (!socials.value.find((element) => element.name === 'youtube'))
+  if (!sortedSocials.value.find((element) => element.name === 'youtube'))
     missingSocials.value.push('Youtube');
-  if (!socials.value.find((element) => element.name === 'linkedin'))
+  if (!sortedSocials.value.find((element) => element.name === 'linkedin'))
     missingSocials.value.push('Linkedin');
-  missingSocials.value.push('Outra rede');
+  missingSocials.value.push(i18n.t('components.profile.socials.otherSocial'));
+  updatedMissingSocials.value = [...missingSocials.value];
 });
+
 const addSocial = async ({ value, value2, selectedSocial }) => {
-  if (value2 === '') {
-    await create('socials', {
-      name: selectedSocial.toLowerCase(),
-      url: value,
-      index: socials.value.length,
-      users_permissions_user: id.value,
-    });
-    missingSocials.value = missingSocials.value.filter(
+  const addedSocial = {
+    name: value2 === '' ? selectedSocial.toLowerCase() : value2,
+    url: value,
+    users_permissions_user: id.value,
+  };
+
+  if (supported.includes(selectedSocial.toLowerCase()))
+    updatedMissingSocials.value = updatedMissingSocials.value.filter(
       (e) => e !== selectedSocial,
     );
-  } else {
-    await create('socials', {
-      name: value2,
-      url: value,
-      index: socials.value.length,
-      users_permissions_user: id.value,
-    });
-  }
+  sortedSocials.value.push(addedSocial);
 
   isAdding.value = false;
-
-  emit('update:user');
+  isChanged.value = true;
 };
-const deleteArray = ref<{ socialId: number; name: string }[]>([]);
-const updateArray = ref<
-  { socialId: number; url: string; name: string; index: number }[]
->([]);
+const deleteArray = ref<number[]>([]);
+const updateArray = ref<{ socialId: number; url: string; name: string }[]>([]);
 
-const updateDeleteArray = ({ socialId, name }) => {
-  deleteArray.value.push({ socialId: socialId, name: name });
+const updateDeleteArray = ({ socialId, name, index }) => {
+  if (socialId) {
+    sortedSocials.value = sortedSocials.value.filter((item) => {
+      return item.id !== socialId;
+    });
+    deleteArray.value.push(socialId);
+  } else {
+    sortedSocials.value.splice(index, 1);
+  }
+  isChanged.value = true;
+  if (supported.includes(name))
+    updatedMissingSocials.value = [
+      name[0].toLocaleUpperCase() + name.slice(1),
+    ].concat(updatedMissingSocials.value);
 };
 
 const updateSocialMedia = ({ socialId, name, url, index }) => {
   const num = updateArray.value.findIndex((item) => item.socialId === socialId);
+  const updatedObject = {
+    ...sortedSocials.value[index],
+  };
+  if (name) updatedObject.name = name;
+  if (url) updatedObject.url = url;
 
-  if (num !== -1) updateArray.value[num] = { socialId, name, url, index };
-  else updateArray.value.push({ socialId, name, url, index });
+  sortedSocials.value[index] = updatedObject;
+  if (num !== -1) updateArray.value[num] = { socialId, name, url };
+  else updateArray.value.push({ socialId, name, url });
 };
-
-const save = async () => {
-  const promises: Promise<any>[] = [];
-  const supported = ['youtube', 'linkedin', 'instagram'];
-  updateArray.value.forEach((item) => {
-    promises.push(update(`/socials/${item.socialId}`, item));
-  });
-
-  deleteArray.value.forEach((item) => {
-    promises.push(_delete(`/socials/${item.socialId}`));
-    if (supported.includes(item.name))
-      missingSocials.value = [
-        item.name[0].toLocaleUpperCase() + item.name.slice(1),
-      ].concat(missingSocials.value);
-  });
-
-  if (promises.length === 0) return;
-  await Promise.all(promises);
+const resetArrays = () => {
   deleteArray.value = [];
   updateArray.value = [];
+  isChanged.value = false;
+};
+
+const onSave = async () => {
+  const promises: Promise<any>[] = [];
+
+  const connectArray: {
+    id: number;
+    position: {
+      end?: boolean;
+      start?: boolean;
+      before?: number;
+      after?: number;
+    };
+  }[] = [];
+  if (!isChanged.value) {
+    resetArrays();
+    return;
+  }
+  if (sortedSocials.value.length !== 0) {
+    sortedSocials.value.forEach((item, index) => {
+      const position =
+        index === 0
+          ? { start: true }
+          : index === sortedSocials.value.length - 1
+          ? { end: true }
+          : { after: sortedSocials.value[index - 1].id };
+      if (item.id) {
+        if (!deleteArray.value.includes(item.id)) {
+          connectArray.push({
+            id: item.id,
+            position,
+          });
+        }
+      } else {
+        promises.push(
+          create('socials', item).then((result) => {
+            sortedSocials.value[index].id = result.data.id;
+            connectArray.push({
+              id: result.data.id,
+              position,
+            });
+          }),
+        );
+      }
+    });
+  }
+
+  if (deleteArray.value.length !== 0) {
+    deleteArray.value.forEach((item) => {
+      promises.push(_delete(`/socials/${item}`));
+    });
+  }
+
+  if (connectArray.length !== 0)
+    promises.push(
+      client(`/users/${id.value}`, {
+        method: 'PUT',
+        body: {
+          socials: {
+            connect: connectArray,
+            disconnect: deleteArray.value,
+          },
+        },
+      }),
+    );
+
+  if (promises.length === 0) {
+    resetArrays();
+    return;
+  }
+  await Promise.all(promises);
+
+  resetArrays();
   emit('update:user');
 };
 
 const cancel = () => {
   componentKey.value = componentKey.value + 1;
   deleteArray.value = [];
-  sortedSocials.value = socials.value;
-};
-
-watch(
-  () => socials.value,
-  () => sortSocials(),
-  { deep: true },
-);
-
-const handleDrop = ({ oldIndex, newIndex }) => {
-  sortedSocials.value.forEach((element, i) => {
-    let temp = updateArray.value.findIndex(
-      (item) => element.id === item.socialId,
-    );
-    if (temp !== -1) {
-      updateArray.value[temp] = { ...updateArray.value[temp], index: i };
-    } else {
-      updateArray.value.push({
-        socialId: element.id,
-        url: element.url,
-        name: element.name,
-        index: i,
-      });
-    }
-  });
+  updateArray.value = [];
+  sortedSocials.value = [...socials.value];
+  isChanged.value = false;
+  updatedMissingSocials.value = [...missingSocials.value];
 };
 </script>
 

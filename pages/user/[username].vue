@@ -601,7 +601,7 @@ async function removeCoverPicture() {
         bottom: 24px;
         right: 20px;
         .btn.label {
-          width: 153px !important;
+          width: 153px;
 
           border-radius: 8px;
           border: none;
@@ -681,6 +681,8 @@ async function removeCoverPicture() {
     }
   }
 
+ 
+
   @media (max-width: 1200px) {
     .user-block {
       .card {
@@ -741,6 +743,15 @@ async function removeCoverPicture() {
     }
     .details {
       max-width: none;
+    }
+  }
+  @media (min-width: 400px) {
+    .cover-block {
+      .edit-cover {
+        .btn.label {
+          width: 153px !important;
+        }
+      }
     }
   }
   @media (max-height: 740px) {
