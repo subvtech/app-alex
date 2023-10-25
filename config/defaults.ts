@@ -4,7 +4,7 @@ import { VBtn } from 'vuetify/components';
 const VBtnPrimary = {
   flat: true,
   rounded: 'lg',
-  color: 'primary--2',
+  color: 'secondary-0',
 };
 
 export const defaults: DefaultsInstance = {
@@ -17,6 +17,7 @@ export const defaults: DefaultsInstance = {
       style: 'padding: 0',
     },
   },
+  VChip: { rounded: 'lg' },
   VBtn: VBtnPrimary,
   VBtnSecondary: {
     ...VBtnPrimary,
