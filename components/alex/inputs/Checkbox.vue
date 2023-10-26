@@ -10,6 +10,7 @@
         hide-details="auto"
         color="#00B7CC"
         width="18"
+        data-testid="input_da_chris"
       />
     </div>
     <div
