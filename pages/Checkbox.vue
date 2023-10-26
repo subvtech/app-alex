@@ -1,13 +1,13 @@
 <template>
-  <TailoredCheckbox :checkbox="checkbox1" />
-  <TailoredCheckbox :checkbox="checkbox2" />
-  <TailoredCheckbox :checkbox="checkbox3" />
-  <TailoredCheckbox :checkbox="checkbox4" />
-  <TailoredCheckbox :checkbox="checkbox5" />
-  <TailoredCheckbox :checkbox="checkbox6" />
-  <TailoredCheckbox :checkbox="checkbox7" />
-  <TailoredCheckbox :checkbox="checkbox8" />
-  <TailoredCheckbox :checkbox="checkbox9" />
+  <alex-inputs-checkbox :checkbox="checkbox1" />
+  <alex-inputs-checkbox :checkbox="checkbox2" />
+  <alex-inputs-checkbox :checkbox="checkbox3" />
+  <alex-inputs-checkbox :checkbox="checkbox4" />
+  <alex-inputs-checkbox :checkbox="checkbox5" />
+  <alex-inputs-checkbox :checkbox="checkbox6" />
+  <alex-inputs-checkbox :checkbox="checkbox7" />
+  <alex-inputs-checkbox :checkbox="checkbox8" />
+  <alex-inputs-checkbox :checkbox="checkbox9" />
 </template>
 <script setup>
 import { ref } from 'vue';

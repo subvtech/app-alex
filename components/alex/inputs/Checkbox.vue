@@ -1,6 +1,6 @@
 <template>
   <div class="container" width="113" max-width="fit-content" height="47">
-    <div class="checkbox-container mr-1 pa-0 mt-0 pink-500">
+    <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
         :class="{ 'input-checkbox': checkbox.indeterminate }"
         :model-value="checkbox.modelValue"
@@ -31,17 +31,24 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { defineProps } from 'vue';
 
-const props = defineProps({
+type Checkbox = {
+  label: string;
+  hint?: string;
+  modelValue: boolean;
+  indeterminate?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+};
+
+const Checkbox: CheckboxProps = defineProps({
   checkbox: {
     type: Object,
     required: true,
   },
 });
-
-const checkbox = props.checkbox;
 </script>
 <style scoped>
 div {
@@ -91,5 +98,7 @@ div {
 
 .input-checkbox {
   color: #00b7cc !important;
+  border-color: #a0a8b1 !important;
+  position: relative !important;
 }
 </style>
