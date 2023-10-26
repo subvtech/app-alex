@@ -82,7 +82,7 @@ const options1 = ref({
   openOnHover: true,
   closeOnContentClick: true,
   location: 'end',
-  isDarkTheme: false,
+  isDarkMode: false,
 });
 
 const options2 = ref({
@@ -90,6 +90,6 @@ const options2 = ref({
   openOnHover: false,
   closeOnContentClick: true,
   location: 'start',
-  isDarkTheme: true,
+  isDarkMode: true,
 });
 </script>
