@@ -5,9 +5,10 @@
       :open-on-hover="props.options.openOnHover"
       :close-on-content-click="props.options.closeOnContentClick"
       :location="props.options.location"
-      :dark="props.options.isDarkTheme"
+      :dark="props.options.isDarkMode"
       min-width="200"
       border-radius="8"
+      class="dropdown-menu"
     >
       <template v-slot:activator="{ props }">
         <v-btn
@@ -72,7 +73,7 @@ type Options = {
   openOnHover: boolean;
   closeOnContentClick: boolean;
   location: string;
-  isDarkTheme: boolean;
+  isDarkMode: boolean;
 };
 
 const props = defineProps({
@@ -85,7 +86,7 @@ const itemClasses = (item) => ({
   hover: item.isHover,
   warning: item.isWarning,
   disabled: item.isDisabled,
-  'dark-theme': props.options.isDarkTheme,
+  'dark-theme': props.options.isDarkMode,
 });
 </script>
 
@@ -95,6 +96,12 @@ div {
   font-weight: 700;
   font-size: 14px;
 }
+
+.dropdrown-menu {
+  border-radius: 8px;
+  min-width: 200px;
+  cursor: pointer;
+}
 .default {
   color: #6e7a87;
 }
@@ -103,20 +110,22 @@ div {
   background-color: white;
 }
 
-.default.dark-theme {
-  background-color: #001a33;
-}
-
 .hover {
   color: #30363b;
   background-color: #ebedef;
 }
 
+.dark-theme {
+  background-color: #001a33;
+}
+
+.v-list {
+  padding: 0;
+}
 .hover.dark-theme {
   color: #fff;
   background-color: #042749;
 }
-
 .warning {
   color: #e9494a;
 }
@@ -129,6 +138,4 @@ div {
   color: #e9494a;
   background-color: #042749;
 }
-
-
 </style>
