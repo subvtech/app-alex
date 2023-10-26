@@ -6,7 +6,7 @@
     :showIcon="canEdit"
     :isEditing="isEditing && canEdit"
     :full-width="true"
-    @toogle:isEditing="isEditing = !isEditing"
+    @toggle:isEditing="isEditing = !isEditing"
   >
     <template class="d-flex w-100" v-slot:content>
       <div

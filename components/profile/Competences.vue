@@ -2,7 +2,7 @@
   <profile-card
     :title="title"
     :isEditing="isEditing && canEdit"
-    @toogle:isEditing="isEditing = !isEditing"
+    @toggle:isEditing="isEditing = !isEditing"
     :showIcon="canEdit"
     :cancel="onCancel"
     :save="onSave"

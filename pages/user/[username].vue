@@ -334,6 +334,8 @@ const updateUser = async (show = true) => {
     router.push({ path: '/' });
   }
 
+  console.log({ user: user.value });
+
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
@@ -466,7 +468,7 @@ async function removeCoverPicture() {
         .avatar {
           &:hover {
             i {
-              display: block !important;
+              display: flex !important;
               position: absolute;
             }
 
@@ -518,7 +520,7 @@ async function removeCoverPicture() {
             width: 160px;
             height: 160px;
             i {
-              display: block !important;
+              display: flex !important;
               position: absolute;
             }
           }
@@ -544,6 +546,13 @@ async function removeCoverPicture() {
           cursor: pointer;
           .small-icon {
             display: none;
+          }
+
+          i {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            vertical-align: middle;
           }
         }
       }
@@ -681,8 +690,6 @@ async function removeCoverPicture() {
     }
   }
 
- 
-
   @media (max-width: 1200px) {
     .user-block {
       .card {
@@ -701,11 +708,18 @@ async function removeCoverPicture() {
             height: 24px;
 
             .small-icon {
-              display: block;
+              display: flex;
             }
             .normal-icon {
               display: none;
               visibility: hidden;
+            }
+
+            i {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              vertical-align: middle;
             }
           }
         }
@@ -820,6 +834,12 @@ async function removeCoverPicture() {
 
             width: 20px;
             height: 20px;
+            i {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              vertical-align: middle;
+            }
           }
         }
       }
