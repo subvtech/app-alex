@@ -25,21 +25,7 @@
 </template>
 <script setup lang="ts">
 import { defineProps } from 'vue';
-// type CheckboxProps = {
-//   label: string;
-//   hint?: string;
-//   modelValue: boolean;
-//   indeterminate?: boolean;
-//   disabled?: boolean;
-//   readonly?: boolean;
-// };
 
-// const Checkbox: CheckboxProps = defineProps({
-//   checkbox: {
-//     type: Object,
-//     required: true,
-//   },
-// });
 defineProps({
   label: {
     type: String,
