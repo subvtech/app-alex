@@ -1,94 +1,46 @@
 <template>
-  <alex-inputs-checkbox :checkbox="checkbox1" />
-  <alex-inputs-checkbox :checkbox="checkbox2" />
-  <alex-inputs-checkbox :checkbox="checkbox3" />
-  <alex-inputs-checkbox :checkbox="checkbox4" />
-  <alex-inputs-checkbox :checkbox="checkbox5" />
-  <alex-inputs-checkbox :checkbox="checkbox6" />
-  <alex-inputs-checkbox :checkbox="checkbox7" />
-  <alex-inputs-checkbox :checkbox="checkbox8" />
-  <alex-inputs-checkbox :checkbox="checkbox9" />
+  <alex-inputs-checkbox :model-value="true" label="Checkbox" hint="Hint" />
+  <alex-inputs-checkbox :model-value="false" label="Checkbox 2" hint="Hint 2" />
+  <alex-inputs-checkbox
+    :indeterminate="true"
+    label="Checkbox 3"
+    hint="Hint 3"
+  />
+  <alex-inputs-checkbox
+    :model-value="true"
+    :disabled="true"
+    label="Checkbox 4"
+    hint="Hint 4"
+  />
+  <alex-inputs-checkbox :disabled="true" label="Checkbox 5" hint="Hint 5" />
+  <alex-inputs-checkbox
+    :model-value="true"
+    :readonly="true"
+    label="Checkbox 6"
+    hint="Hint 6"
+  />
+  <alex-inputs-checkbox :readonly="true" label="Checkbox 7" hint="Hint 7" />
+  <alex-inputs-checkbox
+    :indeterminate="true"
+    :readonly="true"
+    label="Checkbox 8"
+    hint="Hint 8"
+  />
+  <alex-inputs-checkbox
+    :model-value="true"
+    label="Checkbox 9"
+    readonly="true"
+  />
 </template>
 <script setup>
 import { ref } from 'vue';
 
-const checkbox1 = ref({
-  modelValue: true,
-  label: 'Checkbox',
-  hint: 'True',
-  disabled: false,
-  readonly: false,
-  indeterminate: false,
-});
-
-const checkbox2 = ref({
-  modelValue: false,
-  label: 'Teste sem hint',
-  hint: '',
-  disabled: false,
-  readonly: false,
-  indeterminate: false,
-});
-
-const checkbox3 = ref({
-  modelValue: false,
-  label: 'Checkbox',
-  hint: 'Indeterminate and true',
-  disabled: false,
-  readonly: false,
-  indeterminate: true,
-});
-
-const checkbox4 = ref({
-  modelValue: false,
-  label: 'Checkbox',
-  hint: 'Disabled and false',
-  disabled: true,
-  readonly: false,
-  indeterminate: false,
-});
-
-const checkbox5 = ref({
-  modelValue: true,
-  label: 'Checkbox',
-  hint: 'Disabled and true',
-  disabled: true,
-  readonly: false,
-  indeterminate: false,
-});
-
-const checkbox6 = ref({
-  modelValue: true,
-  label: 'Checkbox',
-  hint: 'Disabled and indeterminate',
-  disabled: true,
-  readonly: false,
-  indeterminate: true,
-});
-
-const checkbox7 = ref({
-  label: 'Checkbox',
-  hint: 'Indeterminate and readonly',
-  disabled: false,
-  readonly: true,
-  indeterminate: true,
-});
-
-const checkbox8 = ref({
-  modelValue: true,
-  label: 'Checkbox',
-  hint: 'Readonly and true',
-  disabled: false,
-  readonly: true,
-  indeterminate: false,
-});
-
-const checkbox9 = ref({
-  modelValue: false,
-  label: 'Checkbox',
-  hint: 'Readonly and false',
-  disabled: false,
-  readonly: true,
-  indeterminate: false,
-});
+// const checkbox1 = ref({
+//   modelValue: true,
+//   label: 'Checkbox',
+//   hint: 'True',
+//   disabled: false,
+//   readonly: false,
+//   indeterminate: false,
+// });
 </script>
