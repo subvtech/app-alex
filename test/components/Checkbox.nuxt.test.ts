@@ -7,15 +7,18 @@ describe('Checkbox', () => {
   it('should render a true checkbox', () => {
     mountSuspended(Checkbox, {
       props: {
-        value: true,
-        indeterminate: true,
-        label: 'Checkbox',
+        Checkbox: {
+          label: 'Checkbox',
+          hint: '',
+          modelValue: true,
+          indeterminate: false,
+          disabled: false,
+          readonly: false,
+        },
       },
-      
     });
 
-
-    const inputCheckbox = screen.getByTestId('input_da_chris')
-    expect(inputCheckbox).toHaveClass('input-checkbox')
+    const inputCheckbox = screen.getByTestId('input_da_chris');
+    expect(inputCheckbox).toHaveClass('input-checkbox');
   });
 });
