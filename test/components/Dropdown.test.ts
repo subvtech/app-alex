@@ -11,7 +11,7 @@ describe('Dropdown', () => {
           openOnClick: true,
           closeOnContentClick: true,
           location: 'bottom',
-          isDarkMode: false,
+          isDarkMode: true,
         },
         items: [
           { id: 1, type: 'icon', icon: 'mdi-home', text: 'Home' },
@@ -22,7 +22,7 @@ describe('Dropdown', () => {
       },
     });
 
-    const inputDropdown = await screen.findByTestId('testing-dropdown');
-    expect(inputDropdown).toBeDefined();
+    const menuDropdown = await screen.findByTestId('testing-dropdown');
+    expect(menuDropdown).toBeDefined();
   });
 });
