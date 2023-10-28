@@ -29,8 +29,17 @@ input[type='password']::-webkit-credentials-auto-fill-button {
 }
 
 
-// v-btn
-.v-btn--icon.v-btn--density-default {
-  height: 44px !important;
-  width: 44px !important;
+
+// Reset extra px of icon button
+$btn-icon-density: (
+  'compact': -12px,
+  'comfortable': -8px,
+  'default': 0px,
+);
+
+@each $name, $size in $btn-icon-density {
+  .v-btn--icon.v-btn--density-#{$name} {
+    width: calc(var(--v-btn-height) + $size);
+    height: calc(var(--v-btn-height) + $size);
+  }
 }

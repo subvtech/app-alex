@@ -2,51 +2,52 @@
   <div class="container" width="113" max-width="fit-content" height="47">
     <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
-        :class="{ 'input-checkbox': checkbox.indeterminate }"
-        :model-value="checkbox.modelValue"
-        :indeterminate="checkbox.indeterminate"
-        :disabled="checkbox.disabled"
-        :readonly="checkbox.readonly"
+        :class="{ 'input-checkbox': indeterminate }"
+        :model-value="modelValue"
+        :indeterminate="indeterminate"
+        :disabled="disabled"
+        :readonly="readonly"
         hide-details="auto"
         color="#00B7CC"
         width="18"
+        data-testid="testing-checkbox"
       />
     </div>
-    <div
-      class="text-container"
-      :class="{ 'no-hint': !checkbox.hint }"
-      width="auto"
-    >
-      <span
-        class="title"
-        :class="{ 'gray-400': checkbox.disabled || checkbox.readonly }"
-        >{{ checkbox.label }}</span
-      >
-      <span
-        class="hint"
-        :class="{ 'gray-400': checkbox.disabled || checkbox.readonly }"
-      >
-        {{ checkbox.hint }}
+    <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
+      <span class="title" :class="{ 'gray-400': disabled || readonly }">{{
+        label
+      }}</span>
+      <span class="hint" :class="{ 'gray-400': disabled || readonly }">
+        {{ hint }}
       </span>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { defineProps } from 'vue';
-
-type Checkbox = {
-  label: string;
-  hint?: string;
-  modelValue: boolean;
-  indeterminate?: boolean;
-  disabled?: boolean;
-  readonly?: boolean;
-};
-
-const Checkbox: CheckboxProps = defineProps({
-  checkbox: {
-    type: Object,
-    required: true,
+defineProps({
+  label: {
+    type: String,
+    default: '',
+  },
+  hint: {
+    type: String,
+    default: '',
+  },
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  indeterminate: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>
