@@ -23,7 +23,7 @@
         ></v-btn>
       </template>
 
-      <v-list>
+      <v-list data-testid="dropdown-content">
         <v-list-item
           v-for="item in props.items"
           :key="item.id"
