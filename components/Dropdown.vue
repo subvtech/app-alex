@@ -9,6 +9,7 @@
       min-width="200"
       border-radius="8"
       class="dropdown-menu"
+      data-testid="testing-dropdown"
     >
       <template v-slot:activator="{ props }">
         <v-btn
