@@ -10,7 +10,7 @@
         hide-details="auto"
         color="#00B7CC"
         width="18"
-        data-testid="input_da_chris"
+        data-testid="testing-checkbox"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
