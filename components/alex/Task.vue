@@ -94,7 +94,6 @@ const props = defineProps({
 });
 
 const priorityText = computed(() => {
-  console.log(props.priority);
   switch (props.priority) {
     case 0:
       return 'optional';

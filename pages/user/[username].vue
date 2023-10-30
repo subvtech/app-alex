@@ -17,167 +17,23 @@
         }}</span>
       </div>
     </div>
-
-    <div class="user-block my-6">
-      <div class="cover-block w-100">
-        <NuxtImg
-          v-if="coverPicture"
-          class="cover"
-          provider="strapi"
-          ref="cover"
-          :src="coverPicture"
-          placeholder
-        />
-        <NuxtImg
-          v-else
-          class="cover"
-          ref="cover"
-          src="https://picsum.photos/2200/500"
-          placeholder
-        />
-        <div v-if="canEdit" class="edit-cover d-flex align-center">
-          <v-btn
-            v-if="coverPicture"
-            class="btn remove"
-            @click="removeCoverPicture"
-            size="large"
-            icon
-            variant="outlined"
-          >
-            <v-icon class="icon" size="20" color="#6E7A87"
-              >mdi-trash-can-outline</v-icon
-            >
-          </v-btn>
-
-          <label class="" for="coverInput">
-            <v-btn
-              class="btn label"
-              @click="($refs.coverInput as any).click()"
-              size="large"
-              icon
-              variant="outlined"
-            >
-              <v-icon class="icon" size="20" color="#6E7A87"
-                >mdi-pencil-outline</v-icon
-              >
-
-              <p>{{ $t('pages.profile.cover') }}</p></v-btn
-            >
-            <v-btn
-              class="btn label small"
-              @click="($refs.coverInput as any).click()"
-              size="large"
-              icon="mdi-pencil-outline"
-              variant="outlined"
-            />
-          </label>
-
-          <input
-            class="d-none"
-            @input="uploadCoverPicture"
-            accept="image/png, image/jpeg"
-            ref="coverInput"
-            id="coverInput"
-            type="file"
-          />
-        </div>
-      </div>
-
-      <div
-        class="d-flex justify-space-between align-center pl-sm-10 pr-xl-10 pr-md-8 pr-sm-6 pr-xs-4"
-        style="padding-left: 32px"
-      >
-        <div class="card">
-          <div class="photo" :class="canEdit ? 'hover' : ''">
-            <label v-if="profilePicture" class="avatar" for="file-input">
-              <NuxtImg
-                class="img"
-                provider="strapi"
-                :src="profilePicture"
-                :alt="user.fullname"
-              />
-
-              <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
-                >mdi-pencil-outline</v-icon
-              >
-              <input
-                v-if="canEdit"
-                class="d-none"
-                @input="uploadProfilePicture"
-                accept="image/png, image/jpeg"
-                id="file-input"
-                type="file"
-              />
-            </label>
-            <label v-else class="avatar" for="file-input">
-              <div
-                class="img d-flex justify-center align-center"
-                alt="profile picture"
-              >
-                <v-icon size="40" color="#B9BFC6">mdi-account-outline</v-icon>
-              </div>
-              <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
-                >mdi-plus</v-icon
-              >
-              <input
-                v-if="canEdit"
-                class="d-none"
-                @input="uploadProfilePicture"
-                accept="image/png, image/jpeg"
-                id="file-input"
-                type="file"
-              />
-            </label>
-            <div
-              v-if="canEdit && profilePicture"
-              class="delete d-flex justify-center align-center"
-              @click="removeProfilePicture"
-            >
-              <v-icon class="small-icon" size="x-small" color="#fff"
-                >mdi-trash-can-outline</v-icon
-              >
-              <v-icon class="normal-icon" size="20" color="#fff"
-                >mdi-trash-can-outline</v-icon
-              >
-            </div>
-          </div>
-
-          <div class="info">
-            <div class="d-flex">
-              <span class="fullname">
-                {{ user.fullname }}
-              </span>
-              <span class="social">@{{ user.username }} </span>
-            </div>
-
-            <span class="role">
-              {{
-                user.isProfessor
-                  ? $t('pages.profile.teacher')
-                  : $t('pages.profile.student')
-              }}
-            </span>
-          </div>
-        </div>
-
-        <v-icon
-          v-if="canEdit"
-          @click="showSettings = !showSettings"
-          class="mr-4 mr-md-3 mr-sm-3 mr-xs-2"
-          color="#6E7A87"
-          >mdi-cog-outline</v-icon
-        >
-      </div>
-      <div class="menu d-flex">
-        <span
-          :class="selectedOption === link ? 'selected' : ''"
-          @click="selectedOption = link"
-          v-for="link in links"
-        >
-          {{ link }}
-        </span>
-      </div>
-    </div>
+    <alex-banner
+      :can-edit="canEdit"
+      :cover-picture="user.cover"
+      :profile-picture="user.avatar"
+      :userId="user.id"
+      :selectedOption="selectedOption"
+      @selected:option="
+        (index) => {
+          selectedOption = index;
+        }
+      "
+      @display:settings="showSettings = !showSettings"
+      :is-professor="user.isProfessor"
+      :fullname="user.fullname"
+      :username="user.username"
+      :links="links"
+    />
     <div
       v-if="showSettings && canEdit"
       class="content-block d-flex justify-center flex-row"
@@ -190,90 +46,22 @@
         :id="user.id"
       />
     </div>
-    <div
-      v-else-if="links[0] === selectedOption"
-      class="content-block d-flex justify-center flex-row w-100"
-    >
-      <div class="details d-flex flex-column w-100">
-        <profile-general
-          :id="user.id"
-          :socials="user.socials"
-          :telephone="user.phone"
-          :email="user.email"
-          @update:user="updateUser"
-        />
-        <profile-socials
-          v-if="user.socials.length !== 0 || canEdit"
-          :can-edit="canEdit"
-          :socials="user.socials"
-          :id="user.id"
-          @update:user="updateUser"
-        />
-      </div>
-      <div class="d-flex flex-column w-100">
-        <profile-about
-          :info="user.user_descriptions"
-          :id="user.id"
-          :can-edit="canEdit"
-          @update:user="updateUser"
-        />
-        <div
-          class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences"
-          style="gap: 24px"
-        >
-          <profile-competences
-            v-if="technicalTags.length !== 0 || canEdit"
-            :title="$t('components.profile.competences.technical.title')"
-            :label="$t('components.profile.competences.technical.label')"
-            :placeholder="
-              $t('components.profile.competences.technical.placeholder')
-            "
-            :emptyMessage="$t('components.profile.competences.technical.empty')"
-            :id="user.id"
-            :can-edit="canEdit"
-            :userTags="technicalTags"
-            @update:user="updateUser"
-          ></profile-competences>
-          <profile-competences
-            v-if="generalTags.length !== 0 || canEdit"
-            :title="$t('components.profile.competences.general.title')"
-            :label="$t('components.profile.competences.general.label')"
-            :placeholder="
-              $t('components.profile.competences.general.placeholder')
-            "
-            :emptyMessage="$t('components.profile.competences.general.empty')"
-            :id="user.id"
-            :can-edit="canEdit"
-            :userTags="generalTags"
-            :is-general="true"
-            @update:user="updateUser"
-          ></profile-competences>
-        </div>
-        <profile-institutional
-          v-if="user.institutions.length !== 0 || canEdit"
-          :institutions="user.institutions"
-          :id="user.id"
-          :can-edit="canEdit"
-          @update:user="updateUser"
-        />
-      </div>
-    </div>
-    <div
-      v-else-if="links[1] === selectedOption"
-      class="content-block d-flex justify-center flex-row"
-    >
-      <profile-courses />
-    </div>
-    <div
-      v-else-if="links[2] === selectedOption"
-      class="content-block d-flex justify-center flex-row"
-    ></div>
-    <div
-      v-else-if="links[3] === selectedOption"
-      class="content-block d-flex justify-center flex-row"
-    ></div>
-    <div v-else class="content-block d-flex justify-center flex-row">
-      <profile-events :url="user.avatar ? user.avatar.url : undefined" />
+
+    <div v-else class="content-block d-flex justify-center flex-row w-100">
+      <component
+        :is="selectedComponent"
+        :url="user.avatar ? user.avatar.url : undefined"
+        :email="user.email"
+        :phone="user.phone"
+        :socials="user.socials"
+        :institutions="user.institutions"
+        :technicalTags="technicalTags"
+        :generalTags="generalTags"
+        :info="user.user_descriptions"
+        :user-id="user.id"
+        :can-edit="canEdit"
+        @update:user="updateUser"
+      />
     </div>
   </div>
 </template>
@@ -283,14 +71,25 @@ import { User } from '../../models/user.model';
 import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
 const { find, findOne } = useStrapi();
-const client = useStrapiClient();
+
 const route = useRoute();
 const router = useRouter();
 const messageStore = useMessageStore();
-const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const profilePicture = ref<string | null>(null);
 const coverPicture = ref<string | null>(null);
 const canEdit = ref(false);
+const showSettings = ref(false);
+
+const generalTags = ref();
+const technicalTags = ref();
+const selectedOption = ref(0);
+const links = ref([
+  i18n.t('pages.profile.general'),
+  i18n.t('pages.profile.courses'),
+  i18n.t('pages.profile.projects'),
+  i18n.t('pages.profile.assignments'),
+  i18n.t('pages.profile.events'),
+]);
 
 const user = ref<any>();
 definePageMeta({
@@ -298,6 +97,20 @@ definePageMeta({
 });
 const { id, username } = useStrapiUser<User>().value;
 
+const selectedComponent = computed(() => {
+  switch (selectedOption.value) {
+    case 0:
+      return resolveComponent('Profile-Components-General');
+    case 1:
+      return resolveComponent('Profile-Courses');
+    case 2:
+      return resolveComponent('Profile-Projects');
+    case 3:
+      return resolveComponent('Profile-Tasks');
+    default:
+      return resolveComponent('Profile-Events');
+  }
+});
 onBeforeMount(async () => {
   await updateUser(false);
 });
@@ -345,64 +158,6 @@ const updateUser = async (show = true) => {
   messageStore.color = 'green';
   messageStore.show = show;
 };
-const generalTags = ref();
-const technicalTags = ref();
-const selectedOption = ref(i18n.t('pages.profile.general'));
-const links = ref([
-  i18n.t('pages.profile.general'),
-  i18n.t('pages.profile.courses'),
-  i18n.t('pages.profile.projects'),
-  i18n.t('pages.profile.assignments'),
-  i18n.t('pages.profile.events'),
-]);
-
-const showSettings = ref(false);
-
-async function uploadProfilePicture(event: any) {
-  if (user.value.avatar) {
-    const { updatedAt } = await updateImage(event, user.value.avatar.id);
-
-    const url = profilePicture.value?.split('?');
-    if (url) profilePicture.value = url[0] + '?' + updatedAt;
-  } else {
-    const temp = await uploadImage(event);
-    user.value.avatar = temp[0];
-    profilePicture.value = temp[0].url;
-
-    await client(`/users/${user.value.id}`, {
-      method: 'PUT',
-      body: { avatar: temp[0].id },
-    });
-  }
-}
-
-async function removeProfilePicture() {
-  const result = await removeImage(user.value.avatar.id);
-  user.value.avatar = null;
-  profilePicture.value = null;
-}
-
-async function uploadCoverPicture(event: any) {
-  if (user.value.cover) {
-    const { updatedAt } = await updateImage(event, user.value.cover.id);
-    const url = coverPicture.value?.split('?');
-    if (url) coverPicture.value = url[0] + '?' + updatedAt;
-  } else {
-    const temp = await uploadImage(event);
-    user.value.cover = temp[0];
-    coverPicture.value = temp[0].url;
-    const result = await client(`/users/${user.value.id}`, {
-      method: 'PUT',
-      body: { cover: temp[0].id },
-    });
-  }
-}
-
-async function removeCoverPicture() {
-  const result = await removeImage(user.value.cover.id);
-  user.value.cover = null;
-  coverPicture.value = null;
-}
 </script>
 
 <style lang="scss">

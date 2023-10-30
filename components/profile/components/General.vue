@@ -1,7 +1,7 @@
 <template>
   <div class="details d-flex flex-column w-100">
     <profile-general
-      :id="id"
+      :userId="userId"
       :socials="socials"
       :telephone="phone"
       :email="email"
@@ -11,14 +11,14 @@
       v-if="socials.length !== 0 || canEdit"
       :can-edit="canEdit"
       :socials="socials"
-      :id="id"
+      :userId="userId"
       @update:user="emit('update:user')"
     />
   </div>
   <div class="d-flex flex-column w-100">
     <profile-about
       :info="info"
-      :id="id"
+      :userId="userId"
       :can-edit="canEdit"
       @update:user="emit('update:user')"
     />
@@ -34,7 +34,7 @@
           $t('components.profile.competences.technical.placeholder')
         "
         :emptyMessage="$t('components.profile.competences.technical.empty')"
-        :id="id"
+        :userId="userId"
         :can-edit="canEdit"
         :userTags="technicalTags"
         @update:user="emit('update:user')"
@@ -45,7 +45,7 @@
         :label="$t('components.profile.competences.general.label')"
         :placeholder="$t('components.profile.competences.general.placeholder')"
         :emptyMessage="$t('components.profile.competences.general.empty')"
-        :id="id"
+        :userId="userId"
         :can-edit="canEdit"
         :userTags="generalTags"
         :is-general="true"
@@ -55,7 +55,7 @@
     <profile-institutional
       v-if="institutions.length !== 0 || canEdit"
       :institutions="institutions"
-      :id="id"
+      :userId="userId"
       :can-edit="canEdit"
       @update:user="emit('update:user')"
     />
@@ -101,7 +101,7 @@ const props = defineProps({
     type: Array as PropType<OutputBlockData<string, any>[]>,
     required: true,
   },
-  id: {
+  userId: {
     type: Number,
     required: true,
   },

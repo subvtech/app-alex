@@ -2,23 +2,21 @@
   <div class="user-block my-6">
     <div class="cover-block w-100">
       <NuxtImg
-        v-if="coverPicture"
+        v-if="cover"
         class="cover"
         provider="strapi"
-        ref="cover"
-        :src="coverPicture.url"
+        :src="cover.url"
         placeholder
       />
       <NuxtImg
         v-else
         class="cover"
-        ref="cover"
         src="https://picsum.photos/2200/500"
         placeholder
       />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
-          v-if="coverPicture"
+          v-if="cover"
           class="btn remove"
           @click="removeCoverPicture"
           size="large"
@@ -63,19 +61,19 @@
         />
       </div>
     </div>
-
     <div
       class="d-flex justify-space-between align-center pl-sm-10 pr-xl-10 pr-md-8 pr-sm-6 pr-xs-4"
       style="padding-left: 32px"
     >
       <div class="card">
         <div class="photo" :class="canEdit ? 'hover' : ''">
-          <label v-if="profilePicture" class="avatar" for="file-input">
+          <label v-if="avatar" class="avatar" for="file-input">
             <NuxtImg
               class="img"
               provider="strapi"
-              :src="profilePicture.url"
+              :src="avatar.url"
               :alt="fullname"
+              placeholder
             />
 
             <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
@@ -110,7 +108,7 @@
             />
           </label>
           <div
-            v-if="canEdit && profilePicture"
+            v-if="canEdit && avatar"
             class="delete d-flex justify-center align-center"
             @click="removeProfilePicture"
           >
@@ -180,7 +178,7 @@ const props = defineProps({
     required: true,
   },
 
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
@@ -204,26 +202,21 @@ const props = defineProps({
   canEdit: { type: Boolean, required: true },
 });
 
-const {
-  coverPicture,
-  profilePicture,
-  selectedOption,
-  fullname,
-  username,
-  canEdit,
-  id,
-} = toRefs(props);
+const { selectedOption, fullname, username, canEdit, userId } = toRefs(props);
+
+const avatar = ref<{ id: number; url: string } | null>(props.profilePicture);
+const cover = ref<{ id: number; url: string } | null>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {
-  if (coverPicture.value) {
-    const { updatedAt } = await updateImage(event, coverPicture.value.id);
-    const url = coverPicture.value.url?.split('?');
-    if (url) coverPicture.value.url = url[0] + '?' + updatedAt;
+  if (cover.value) {
+    const { updatedAt } = await updateImage(event, cover.value.id);
+    const url = cover.value.url?.split('?');
+    if (url) cover.value.url = url[0] + '?' + updatedAt;
   } else {
     const temp = await uploadImage(event);
 
-    coverPicture.value = temp[0].url;
-    const result = await client(`/users/${props.id}`, {
+    cover.value = { url: temp[0].url, id: temp[0].id };
+    await client(`/users/${props.userId}`, {
       method: 'PUT',
       body: { cover: temp[0].id },
     });
@@ -231,22 +224,22 @@ async function uploadCoverPicture(event: any) {
 }
 
 async function removeCoverPicture() {
-  if (!props.coverPicture) return;
-  const result = await removeImage(props.coverPicture.id);
-  coverPicture.value = null;
+  if (!cover.value) return;
+  await removeImage(cover.value.id);
+  cover.value = null;
 }
 
 async function uploadProfilePicture(event: any) {
-  if (profilePicture.value) {
-    const { updatedAt } = await updateImage(event, profilePicture.value.id);
+  if (avatar.value) {
+    const { updatedAt } = await updateImage(event, avatar.value.id);
 
-    const url = profilePicture.value.url?.split('?');
-    if (url) profilePicture.value.url = url[0] + '?' + updatedAt;
+    const url = avatar.value.url?.split('?');
+    if (url) avatar.value.url = url[0] + '?' + updatedAt;
   } else {
     const temp = await uploadImage(event);
-    profilePicture.value = temp[0].url;
+    avatar.value = { url: temp[0].url, id: temp[0].id };
 
-    await client(`/users/${props.id}`, {
+    await client(`/users/${props.userId}`, {
       method: 'PUT',
       body: { avatar: temp[0].id },
     });
@@ -254,9 +247,9 @@ async function uploadProfilePicture(event: any) {
 }
 
 async function removeProfilePicture() {
-  if (!profilePicture.value) return;
-  const result = await removeImage(profilePicture.value.id);
-  profilePicture.value = null;
+  if (!avatar.value) return;
+  await removeImage(avatar.value.id);
+  avatar.value = null;
 }
 </script>
 

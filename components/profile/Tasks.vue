@@ -2,7 +2,7 @@
   <div id="tasks" class="d-flex flex-row">
     <div class="column">
       <draggable
-        class="d-flex flex-column pa-3 w-100"
+        class="d-flex flex-column pa-3 w-100 h-100"
         :list="tasks"
         group="tasks"
         handle=".handle"
@@ -25,7 +25,7 @@
     </div>
     <div class="column">
       <draggable
-        class="d-flex flex-column pa-3 h-100"
+        class="d-flex flex-column pa-3 w-100 h-100"
         style="gap: 8px"
         :list="tasks2"
         group="tasks"
