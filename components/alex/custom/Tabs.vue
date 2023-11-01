@@ -1,5 +1,5 @@
 <template>
-  <v-tabs class="mb-10 text-gray-800" color="accent">
+  <v-tabs class="text-gray-800" color="accent">
     <v-tab
       v-for="tab in tabs"
       :key="tab.value"
