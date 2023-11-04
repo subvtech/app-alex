@@ -110,3 +110,9 @@ const props = defineProps({
 
 const { info, canEdit, institutions } = toRefs(props);
 </script>
+
+<style scoped lang="scss">
+.details {
+  gap: 24px;
+}
+</style>

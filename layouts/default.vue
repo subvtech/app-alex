@@ -72,10 +72,16 @@
             <div
               v-bind="props"
               style="cursor: pointer"
-              class="user-block"
+              class="user-block d-flex align-center"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <app-user-avatar :user="user" class="mr-2" />
+              <app-user-avatar
+                :user-id="user.id"
+                :size="40"
+                :placeholder="user.fullname"
+                :profile-picture="user.avatar"
+                class="mr-2"
+              />
               <span class="fullname">
                 {{ user?.fullname }}
               </span>

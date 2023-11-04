@@ -22,19 +22,20 @@
       :cover-picture="user.cover"
       :profile-picture="user.avatar"
       :userId="user.id"
+      title="dasdasd"
+      floatBeneath
+      show-menu
+      start-date="25-15-2541"
+      end-date="12-25-3501"
       :selectedOption="selectedOption"
-      @selected:option="
-        (index) => {
-          selectedOption = index;
-          showSettings = false;
-        }
-      "
+      @select:option="selectOption"
       @display:settings="showSettings = !showSettings"
       :is-professor="user.isProfessor"
       :fullname="user.fullname"
       :username="user.username"
       :links="links"
     />
+    
     <div
       v-if="showSettings && canEdit"
       class="content-block d-flex justify-center flex-row"
@@ -51,7 +52,6 @@
     <div v-else class="content-block d-flex justify-center flex-row w-100">
       <component
         :is="selectedComponent"
-        :url="user.avatar ? user.avatar.url : undefined"
         :email="user.email"
         :phone="user.phone"
         :socials="user.socials"
@@ -159,6 +159,12 @@ const updateUser = async (show = true) => {
   messageStore.color = 'green';
   messageStore.show = show;
 };
+
+const selectOption = (index) => {
+  console.log({ selectedOption: selectedOption.value, index });
+  selectedOption.value = index;
+  showSettings.value = false;
+};
 </script>
 
 <style scoped lang="scss">
@@ -205,11 +211,6 @@ const updateUser = async (show = true) => {
   .content-block {
     gap: 24px;
     flex-direction: row;
-  }
-
-  .details {
-    max-width: 450px;
-    gap: 24px;
   }
 
   @media (max-width: 1410px) {
