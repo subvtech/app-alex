@@ -4,7 +4,7 @@
     style="height: 44px; justify-content: space-between"
   >
     <div class="d-flex grow align-center">
-      <a v-if="!noArrowBack" :href="items[items.length - 2].href">
+      <a v-if="!noBackArrow" :href="items[items.length - 2].href">
         <v-icon class="header__arrow" color="#6E7A87" style="cursor: pointer"
           >mdi-chevron-left</v-icon
         >
@@ -63,7 +63,7 @@ defineProps({
     type: String,
     default: 'Título da página',
   },
-  noArrowBack: {
+  noBackArrow: {
     type: Boolean,
     default: false,
   },
