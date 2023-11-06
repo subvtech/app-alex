@@ -2,10 +2,15 @@
   <div
     class="header d-flex align-center w-full"
     style="height: 44px; justify-content: space-between"
+    data-testid="header"
   >
     <div class="d-flex grow align-center">
-      <a v-if="!noBackArrow" :href="items[items.length - 2].href">
-        <v-icon class="header__arrow" color="#6E7A87" style="cursor: pointer"
+      <a
+        v-if="!noBackArrow"
+        :href="items[items.length - 2].href"
+        data-testid="back_arrow"
+      >
+        <v-icon class="header__arrow" data-testid="back_arrow" color="#6E7A87" style="cursor: pointer"
           >mdi-chevron-left</v-icon
         >
       </a>
@@ -30,6 +35,7 @@
     </div>
     <div class="header__button d-flex">
       <v-btn
+        data-testid="btn"
         :class="isTerciary ? 'terciary' : ''"
         height="44"
         width="103"
@@ -37,7 +43,9 @@
         :text="text"
         :icon="btnIcon"
         @click="dialog = true"
-        ><v-icon width="20" height="20"> {{ icon }} </v-icon>
+        ><v-icon data-testid="btn-icon" width="20" height="20">
+          {{ icon }}
+        </v-icon>
         <p class="ml-2">{{ text }}</p>
       </v-btn>
     </div>
