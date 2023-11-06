@@ -1,246 +1,117 @@
 <template>
-  <profile-card
-    class="mt-6"
-    :title="$t('components.profile.socials.title')"
-    :full-width="true"
+  <div
+    id="socials"
+    class="d-flex flex-column w-100 align-center px-6 pb-6"
+    style="gap: 24px; background-color: white"
   >
-    <template v-slot:content>
-      <v-form
-        class="d-flex flex-column w-100 align-center"
-        style="gap: 24px"
-        @submit.prevent="updateValues"
+    <div class="d-flex contacts w-100">
+      <div
+        class="contact d-flex"
+        v-for="(contact, index) in socials"
+        :key="contact.id"
       >
-        <div
-          class="item d-flex flex-row align-start w-100"
-          v-for="(social, index) in socials"
+        <profile-inputs-social
+          :social="contact"
+          :loading="loading"
+          :can-edit="canEdit"
+          @update:user="emit('update:user')"
+          :id="id"
+        />
+      </div>
+      <profile-inputs-social
+        v-if="isAdding"
+        :label1="$t('components.profile.socials.newSocial')"
+        :loading="loading"
+        :is-adding="isAdding"
+        :can-edit="canEdit"
+        @update:user="emit('update:user')"
+        @close:add-social="isAdding = false"
+        :id="id"
+        :social="{ name: '', url: '', id: -1, icon: '' }"
+        :label2="$t('components.profile.socials.newSocialUrl')"
+      />
+
+      <div v-else class="d-flex justify-center">
+        <v-btn
+          class="btn"
+          @click="isAdding = true"
+          variant="outlined"
+          prepend-icon="mdi-plus"
         >
-          <div class="img-upload">
-            <label class="edit" :for="'file-input-' + social.name">
-              <img :src="strapiBaseUrl + social.icon.url" :alt="social.name" />
-            </label>
-
-            <input
-              class=""
-              style="display: none"
-              @input="async (e) => await updateSocialIcon(e, social.id, index)"
-              :id="'file-input-' + social.name"
-              type="file"
-              accept="image/png, image/jpeg, image/svg"
-            />
-          </div>
-
-          <div class="d-flex flex-column w-100" style="gap: 8px">
-            <alex-inputs-stepper-field
-              :label="social.name"
-              :value="social.name"
-              :name="`name.${index}`"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-            <alex-inputs-stepper-field
-              label="url"
-              :value="social.url"
-              :name="`url.${index}`"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-          </div>
-        </div>
-        <div class="item d-flex flex-row align-start w-100">
-          <div class="img-upload">
-            <label class="edit" for="new-icon">
-              <img v-if="newIcon" :src="newIcon" alt="icon" />
-              <img v-else src="../../assets/svg/website.svg" alt="icon" />
-            </label>
-
-            <input
-              class=""
-              @input="uploadNewIcon"
-              style="display: none"
-              id="new-icon"
-              type="file"
-              accept="image/png, image/jpeg, image/svg"
-            />
-          </div>
-
-          <div class="d-flex flex-column w-100" style="gap: 8px">
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.socials.newSocial')"
-              name="nameLoose"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.socials.newSocialUrl')"
-              name="urlLoose"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-          </div>
-        </div>
-        <div class="block d-flex">
-          <v-btn class="btn" color="accent" @click="cancel" variant="outlined">
-            {{ $t('components.profile.settings.cancel') }}</v-btn
-          >
-          <v-btn class="btn" color="accent" type="submit">
-            {{ $t('components.profile.settings.save') }}
-          </v-btn>
-        </div>
-      </v-form>
-    </template>
-  </profile-card>
+          {{ $t('components.profile.general.addSocial') }}</v-btn
+        >
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
-
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
-
-const emit = defineEmits(['update:user']);
-const { socialsSchema } = useFormRules();
-
-const { create, update } = useStrapi();
-const client = useStrapiClient();
-const { updateImage } = useUploadedImage();
-const messageStore = useMessageStore();
 const loading = ref(false);
 
-const newIcon = ref<string | null>(null);
+const isAdding = ref(false);
 
-type Social = {
-  name: string;
-  url: string;
-  icon: any;
-  id: number;
-};
+const emit = defineEmits(['update:user']);
 
 const props = defineProps({
   socials: {
-    type: Array as PropType<Social[]>,
+    type: Array as PropType<any[]>,
     required: true,
   },
-
+  canEdit: {
+    type: Boolean,
+    required: true,
+  },
   id: {
     type: Number,
     required: true,
   },
 });
 
-const { socials } = toRefs(props);
+const { id, socials, canEdit } = toRefs(props);
 
-const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: socialsSchema,
-  keepValuesOnUnmount: true,
-});
-
-const cancel = () => {
-  socials.value = props.socials;
-};
-
-const updateValues = handleSubmit(async () => {
-  loading.value = true;
-  try {
-    const promises: any = [];
-    props.socials.forEach((social, index) => {
-      promises.push(
-        update('socials', social.id, {
-          name: controlledValues.value.name[index],
-          url: controlledValues.value.url[index],
-        }),
-      );
-    });
-    if (
-      controlledValues.value.nameLoose &&
-      controlledValues.value.urlLoose &&
-      newIcon.value
-    ) {
-      const formData = new FormData();
-      const response = await fetch(newIcon.value!);
-      const mimeType = response.headers.get('Content-Type');
-      const fileData = new File([await response.blob()], 'icon', {
-        type: mimeType!,
-      });
-
-      formData.append('files', fileData);
-
-      promises.push(
-        client<any>('/upload', {
-          method: 'POST',
-          body: formData,
-        })
-          .then((result) => {
-            create('socials', {
-              icon: result[0].id,
-              name: controlledValues.value.nameLoose,
-              url: controlledValues.value.urlLoose,
-              users_permissions_user: props.id,
-            })
-              .then((result2) => {})
-              .catch((err) => {
-                console.log(err);
-              });
-          })
-          .then((err) => {
-            console.log(err);
-          }),
-      );
-    }
-
-    await Promise.all(promises);
-
-    emit('update:user', {});
-  } catch (error) {
-    console.log(error);
-    messageStore.message = error as string;
-    messageStore.color = 'red';
-    messageStore.show = true;
-  } finally {
-    loading.value = false;
-  }
-});
-
-async function updateSocialIcon(event: any, iconId: number, index: number) {
-  const { updatedAt } = await updateImage(event, iconId);
-  const url = socials.value[index].icon.url.split('?');
-  if (url) socials.value[index].icon.url = url[0] + '?' + updatedAt;
-}
-
-async function uploadNewIcon(e: any) {
-  newIcon.value = URL.createObjectURL(e.target.files[0]);
-
-  //const { updatedAt } = await updateImage(event, user.value.avatar.id);
-}
+const isEditing = ref<number[]>([]);
 </script>
 
 <style scoped lang="scss">
-.item {
-  gap: 24px;
-  img {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-  }
-}
+.contacts {
+  gap: 16px;
+  //border-bottom: 1px solid #eaeef1;
+  flex-direction: column;
 
-.block {
-  width: 100%;
-  gap: 8px;
-  justify-content: flex-end;
-  
+  .contact {
+    gap: 16px;
+
+    .field {
+      p {
+        color: #abb2b9;
+        font-size: 14px;
+        font-weight: 400;
+      }
+
+      a {
+        cursor: pointer;
+        color: #5d6872;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        text-decoration: none;
+      }
+    }
+  }
+
   .btn {
     text-transform: none;
+    color: #6e7a87 !important;
+    border-width: 0;
+    background-color: #f1f5f9;
+    font-weight: 700;
+    line-height: 135%; /* 18.9px */
+    letter-spacing: 0.28px;
   }
 }
 
 @media (max-width: 400px) {
-  .block {
-    gap: 12px;
-    flex-direction: column-reverse;
-    width: 100%;
+  .contacts {
     .btn {
       width: 100%;
     }
