@@ -20,22 +20,27 @@
     <alex-banner
       :can-edit="canEdit"
       :cover-picture="user.cover"
+      :profile-picture-size="160"
       :profile-picture="user.avatar"
       :userId="user.id"
-      title="dasdasd"
-      floatBeneath
+      :can-delete="true"
       show-menu
-      start-date="25-15-2541"
-      end-date="12-25-3501"
+      show-role
+      show-border
+      float-beneath
+      distribution="fullname-username-role"
       :selectedOption="selectedOption"
       @select:option="selectOption"
       @display:settings="showSettings = !showSettings"
       :is-professor="user.isProfessor"
       :fullname="user.fullname"
+      fullnameStyle="color: #454D54;"
       :username="user.username"
+      usernameStyle="color: #A0A8B1;"
+      roleStyle="color: #A0A8B1;"
       :links="links"
     />
-    
+
     <div
       v-if="showSettings && canEdit"
       class="content-block d-flex justify-center flex-row"
@@ -148,8 +153,6 @@ const updateUser = async (show = true) => {
     router.push({ path: '/' });
   }
 
-  console.log({ user: user.value });
-
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
@@ -161,7 +164,6 @@ const updateUser = async (show = true) => {
 };
 
 const selectOption = (index) => {
-  console.log({ selectedOption: selectedOption.value, index });
   selectedOption.value = index;
   showSettings.value = false;
 };

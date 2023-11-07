@@ -4,6 +4,7 @@
       class="avatar"
       :class="[canEdit ? 'hover' : '']"
       :for="canEdit ? 'file-input' : ''"
+      :style="showBorder ? '' : 'border-width: 0px'"
     >
       <NuxtImg
         v-if="avatar"
@@ -19,7 +20,11 @@
       </v-avatar>
 
       <div class="edit" v-if="canEdit">
-        <v-icon v-if="avatar" class="d-none" size="x-large" color="#fff"
+        <v-icon
+          v-if="avatar"
+          class="d-none"
+          :size="smaller ? 'x-small' : 'x-large'"
+          color="#fff"
           >mdi-pencil-outline</v-icon
         >
         <v-icon v-else class="d-none" size="x-large" color="#fff"
@@ -36,16 +41,16 @@
     </label>
 
     <div
-      v-if="canEdit && avatar"
+      v-if="canEdit && canDelete && avatar"
       class="delete d-flex justify-center align-center"
       @click="removeProfilePicture"
+      :style="
+        smaller
+          ? 'max-width: 18px !important; max-height: 18px !important; right: -8px; bottom: -5px;'
+          : ''
+      "
     >
-      <v-icon class="small-icon" size="x-small" color="#fff"
-        >mdi-trash-can-outline</v-icon
-      >
-      <v-icon class="normal-icon" size="20" color="#fff"
-        >mdi-trash-can-outline</v-icon
-      >
+      <NuxtImg src="/svg/trash.svg" width="20" height="20" placeholder />
     </div>
   </div>
 </template>
@@ -53,6 +58,7 @@
 const client = useStrapiClient();
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 
+const userStore = useUserStore();
 const props = defineProps({
   userId: {
     type: Number,
@@ -70,14 +76,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  canDelete: {
+    type: Boolean,
+    default: false,
+  },
   size: { type: Number, default: 30 },
 
   profilePicture: {
     type: Object as PropType<{ url: string; id: number } | null>,
   },
 });
-console.log({ props });
-console.log({ profilePicture: props.profilePicture });
+
 const avatar = ref<{ id: number; url: string } | undefined | null>(
   props.profilePicture,
 );
@@ -97,17 +106,22 @@ async function uploadProfilePicture(event: any) {
       body: { avatar: temp[0].id },
     });
   }
+  userStore.profilePicture = avatar.value;
 }
 
 async function removeProfilePicture() {
-  console.log({ avatar: avatar.value });
   if (!avatar.value) return;
   await removeImage(avatar.value.id);
   avatar.value = null;
+  userStore.profilePicture = null;
 }
 
 const userInitials = computed(() => {
   return getFullnameInitials(props.placeholder);
+});
+
+const smaller = computed(() => {
+  return props.size < 100;
 });
 </script>
 
@@ -152,6 +166,7 @@ const userInitials = computed(() => {
   }
 
   .hover {
+    cursor: pointer;
     &:hover {
       .edit {
         display: flex !important;
@@ -184,19 +199,9 @@ const userInitials = computed(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-
+    vertical-align: middle;
     background: #e9494a;
     cursor: pointer;
-    .small-icon {
-      display: none;
-    }
-
-    i {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      vertical-align: middle;
-    }
   }
 }
 
@@ -234,14 +239,12 @@ const userInitials = computed(() => {
       .delete {
         right: 0px;
         bottom: 5px;
-        max-width: 20px;
-        max-height: 20px;
+        max-width: 14px;
+        max-height: 14px;
 
-        .normal-icon {
-          display: none !important;
-        }
-        .small-icon {
-          display: flex;
+        img {
+          max-width: 14px;
+          max-height: 14px;
         }
       }
     }
@@ -254,21 +257,33 @@ const userInitials = computed(() => {
       position: relative;
       .avatar {
         .img {
-          width: 70px !important;
-          height: 70px !important;
+          max-width: 70px !important;
+          max-height: 70px !important;
         }
       }
       .delete {
         right: 0px;
         bottom: 5px !important;
-        max-width: 20px;
-        max-height: 20px;
+        max-width: 14px;
+        max-height: 14px;
 
-        .normal-icon {
-          display: none !important;
+        img {
+          max-width: 12px;
+          max-height: 12px;
         }
-        .small-icon {
-          display: flex;
+      }
+    }
+  }
+}
+
+@media (max-width: 350px) {
+  .resize {
+    .avatar-block {
+      position: relative;
+      .avatar {
+        .img {
+          max-width: 50px !important;
+          max-height: 50px !important;
         }
       }
     }

@@ -79,8 +79,9 @@
                 :user-id="user.id"
                 :size="40"
                 :placeholder="user.fullname"
-                :profile-picture="user.avatar"
+                :profile-picture="profilePicture"
                 class="mr-2"
+                :key="myKey"
               />
               <span class="fullname">
                 {{ user?.fullname }}
@@ -111,14 +112,18 @@
 
 <script setup lang="ts">
 import { User } from '../models/user.model';
-
+const userStore = useUserStore();
 const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
-
+const myKey = ref(0);
+const { profilePicture } = storeToRefs(userStore);
+onBeforeMount(() => {
+  userStore.profilePicture = user.value.avatar;
+});
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
@@ -215,6 +220,9 @@ function logoutUser() {
   logout();
   router.push('/login');
 }
+watch(profilePicture, () => {
+  myKey.value++;
+});
 </script>
 
 <style lang="scss">

@@ -14,6 +14,15 @@
         src="https://picsum.photos/2200/500"
         placeholder
       />
+      <div
+        class="w-100 h-100"
+        style="top: 0; left: 0; opacity: 0.1; height: auto; position: absolute"
+        :style="
+          showShade
+            ? 'background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.24) 53.12%, rgba(0, 0, 0, 0.3) 61.46%, rgba(0, 0, 0, 0.6) 93.75%);'
+            : ''
+        "
+      ></div>
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
           v-if="cover"
@@ -23,9 +32,13 @@
           icon
           variant="outlined"
         >
-          <v-icon class="icon" size="20" color="#6E7A87"
-            >mdi-trash-can-outline</v-icon
-          >
+          <NuxtImg
+            src="/svg/trash-dark.svg"
+            style="color: #6e7a87"
+            width="24"
+            height="24"
+            placeholder
+          />
         </v-btn>
 
         <label class="" for="coverInput">
@@ -62,55 +75,37 @@
       </div>
     </div>
 
-    <div
-      v-if="startDate || endDate"
-      class="d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6 mt-4 mt-sm-6"
-      style="position: absolute; top: 0px"
-      :style="[
-        dateToTheLeft ? '' : 'right: 10px',
-        darkerBackground
-          ? 'background-color: rgba(0, 0, 0, 0.5); color: white'
-          : 'background-color: white; color: #232b32',
-      ]"
-    >
-      <div
-        v-if="startDate"
-        class="d-flex flex-column justify-center align-end"
-        :class="startDate && endDate ? 'mr-2 mr-sm-4' : ''"
-      >
-        <span style="font-size: 14px; letter-spacing: 0.28px">
-          {{ $t('pages.profile.startDate') }}</span
-        >
-        <span class="font-weight-bold">{{ startDate }}</span>
-      </div>
-      <v-divider v-if="startDate && endDate" vertical></v-divider>
-      <div
-        v-if="endDate"
-        class="d-flex flex-column justify-center align-start"
-        :class="startDate && endDate ? 'ml-2 ml-sm-4' : ''"
-      >
-        <span style="font-size: 14px; letter-spacing: 0.28px">
-          {{ $t('pages.profile.endDate') }}</span
-        ><span class="font-weight-bold">{{ endDate }}</span>
-      </div>
-    </div>
     <alex-info
       :can-edit="canEdit"
+      :can-delete="canDelete"
       :end-date="endDate"
       :start-date="startDate"
       :fullname="fullname"
-      :username="username + username"
+      :username="username"
       :title="title"
-      title-style="color: #000"
-      fullname-style="color: #454D54;"
-      show-role
+      :code="code"
+      :code-style="codeStyle"
+      :fullname-style="fullnameStyle"
+      :username-style="usernameStyle"
+      :role-style="roleStyle"
+      :title-style="titleStyle"
+      :avatar-block-style="avatarBlockStyle"
+      :title-above="titleAbove"
+      :float-beneath="floatBeneath"
+      :show-role="showRole"
+      :show-border="showBorder"
+      :show-settings="!settingsMenu"
+      :distribution="distribution"
+      :darker-background="darkerBackground"
+      :profile-picture-size="profilePictureSize"
       resize
       :user-id="userId"
       :profile-picture="profilePicture"
       :is-professor="isProfessor"
+      @display:settings="emit('display:settings')"
     />
 
-    <div v-if="showMenu" class="menu d-flex" style="z-index: 1">
+    <div v-if="showMenu" class="menu d-flex h-100" style="z-index: 1">
       <span
         v-for="(link, index) in links"
         class="font-weight-regular text-body-3 text-sm-body-2"
@@ -123,7 +118,7 @@
       </span>
 
       <v-spacer />
-      <div v-if="false">
+      <div v-if="settingsMenu">
         <v-icon
           v-if="canEdit"
           @click="emit('display:settings')"
@@ -131,46 +126,12 @@
           color="#6E7A87"
           >mdi-cog-outline</v-icon
         >
-        <v-btn
-          v-else-if="settingsPlaceholder"
-          class="d-flex px-3 mr-4 mr-md-3 mr-sm-3 mr-xs-2"
-          color="#fff"
-          @click="emit('alternative:settings')"
-        >
-          <NuxtImg
-            src="/svg/account-card.svg"
-            width="20"
-            height="20"
-            placeholder
-          />
-          <span
-            class="ml-2 font-weight-bold"
-            style="color: #00b7cc; text-transform: none"
-            >{{ settingsPlaceholder }}</span
-          ></v-btn
-        >
-        <v-btn
-          v-else
-          class="mr-4 mr-md-3 mr-sm-3 mr-xs-2"
-          @click="emit('alternative:settings')"
-          color="#fff"
-        >
-          <NuxtImg
-            src="/svg/account-card.svg"
-            width="20"
-            height="20"
-            placeholder
-        /></v-btn>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-const emit = defineEmits([
-  'select:option',
-  'alternative:settings',
-  'display:settings',
-]);
+const emit = defineEmits(['select:option', 'display:settings']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
 
@@ -183,13 +144,72 @@ const props = defineProps({
     type: Object as PropType<{ url: string; id: number } | null>,
     required: true,
   },
-
+  profilePictureSize: {
+    type: Number,
+    default: 50,
+  },
   darkerBackground: {
     type: Boolean,
-    default: true,
+    default: false,
+  },
+
+  titleAbove: {
+    type: Boolean,
+    default: false,
+  },
+  
+  distribution: {
+    type: String as PropType<
+      | 'single-row'
+      | 'single-column'
+      | 'fullname-username-role'
+      | 'fullname-role-username'
+      | 'username-fullname-role'
+      | 'username-role-fullname'
+    >,
+    default: 'fullname-username-role',
+  },
+
+  code: {
+    type: String,
+  },
+  fullnameStyle: {
+    type: String,
+  },
+  codeStyle: {
+    type: String,
+  },
+  roleStyle: {
+    type: String,
+  },
+  usernameStyle: {
+    type: String,
+  },
+  startDateStyle: {
+    type: String,
+  },
+  endDateStyle: {
+    type: String,
+  },
+
+  titleStyle: {
+    type: String,
+  },
+
+  avatarBlockStyle: {
+    type: String,
+  },
+
+  showBorder: {
+    type: Boolean,
+    default: false,
   },
 
   floatBeneath: {
+    type: Boolean,
+    default: false,
+  },
+  settingsMenu: {
     type: Boolean,
     default: false,
   },
@@ -212,10 +232,6 @@ const props = defineProps({
   updateProfilePicture: {
     type: Boolean,
     default: false,
-  },
-
-  settingsPlaceholder: {
-    type: String,
   },
 
   title: {
@@ -253,13 +269,10 @@ const props = defineProps({
   },
   isProfessor: { type: Boolean, default: false },
   canEdit: { type: Boolean, required: true },
+  canDelete: { type: Boolean, required: true },
 });
 
 const { selectedOption, fullname, username, canEdit, userId } = toRefs(props);
-
-function consoleHitOn() {
-  console.log('I got hit on');
-}
 
 const cover = ref<{ id: number; url: string } | null | undefined>(
   props.coverPicture,
@@ -355,6 +368,7 @@ async function removeCoverPicture() {
       position: absolute;
       bottom: 24px;
       right: 20px;
+      z-index: 10;
       .btn.label {
         width: 153px;
 
@@ -383,7 +397,6 @@ async function removeCoverPicture() {
         justify-content: center;
         align-items: center;
         background: #f1f5f9;
-        border-radius: 8px;
         border: none;
         cursor: pointer;
 
@@ -418,15 +431,6 @@ async function removeCoverPicture() {
   }
 }
 
-@media (min-width: 400px) {
-  .cover-block {
-    .edit-cover {
-      .btn.label {
-        width: 153px !important;
-      }
-    }
-  }
-}
 @media (max-height: 740px) {
   .user-block {
     .cover-block {
@@ -501,6 +505,9 @@ async function removeCoverPicture() {
 
 @media (max-width: 335px) {
   .user-block {
+    .cover-block {
+      max-height: 295px;
+    }
     .menu {
       gap: 24px;
       overflow-x: auto;
