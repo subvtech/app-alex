@@ -5,8 +5,7 @@
     </NuxtLayout>
   </div>
 </template>
-<style>
-html {
-  overflow-y: auto;
-}
+
+<style lang="scss">
+@use 'config/scss/index.scss'
 </style>
