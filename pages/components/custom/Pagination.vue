@@ -30,7 +30,43 @@
       <strong>length</strong> indicando o número de páginas que o componente
       deve ter e um <strong>v-model</strong> para o controle da pagina ativa.
     </p>
-    <div class="pa-4 w-100">
+    <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
+      <div>
+        <p class="text-h5 text-center">Props do componente</p>
+        <v-table variant="outline">
+          <thead>
+            <tr>
+              <th>Propriedade</th>
+              <th>Tipo</th>
+              <th>Obrigatório</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>length</td>
+              <td>Number</td>
+              <td class="text-center">
+                <v-icon icon="mdi-checkbox-marked" color="success" />
+              </td>
+            </tr>
+            <tr>
+              <td>total-visible</td>
+              <td>Number</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
+      <div>
+        <p class="text-h5 text-center">Exemplo</p>
+        <Prism class="bg-white pa-0">
+          {{ propsExample }}
+        </Prism>
+      </div>
+    </div>
+    <div class="w-100">
       <alex-custom-pagination :length="7" />
     </div>
     <div class="w-100">
@@ -105,10 +141,8 @@ ${firstExampleScript}
       menor que o número de páginas visíveis, o componente irá exibir todas as
       páginas normalmente.
     </p>
-    <div class="pa-4 d-flex w-100">
-      <div class="w-100">
-        <alex-custom-pagination :length="7" :total-visible="5" />
-      </div>
+    <div class="w-100">
+      <alex-custom-pagination :length="7" :total-visible="5" />
     </div>
     <div class="w-100">
       <div
@@ -202,6 +236,13 @@ const firstExampleTabs = [
     value: '2',
   },
 ];
+
+const propsExample = `
+<alex-custom-pagination 
+v-model="activePage" 
+:length="10" 
+:total-visible="5" />`;
+
 const firstExampleTemplate = ref(`
 <alex-custom-pagination v-model="activePage" :length="7" />
   `);
