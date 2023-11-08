@@ -2,12 +2,12 @@
   <v-expansion-panels variant="accordion" role="list">
     <transition-group name="list">
       <v-expansion-panel
-        v-for="(item, i) in list"
+        v-for="(item, index) in list"
         :key="item.id"
         role="listItem"
-        :class="over == i && dragging && dragFrom != item ? 'over' : ''"
-        @dragover="(e) => onDragOver(i, e)"
-        @dragend="() => finishDrag(item, i)"
+        :class="over == index && dragging && dragFrom != item ? 'over' : ''"
+        @dragover="(e) => onDragOver(index, e)"
+        @dragend="() => finishDrag(item, index)"
         @dragenter="(e) => e.preventDefault()"
       >
         <v-expansion-panel-title class="expand-panel">
@@ -26,7 +26,7 @@
             :icon="item.icon"
           />
           <p v-else class="text-gray-300 ml-2 mr-1 font-weight-bold">
-            {{ i + 1 }}.
+            {{ index + 1 }}.
           </p>
 
           <span
@@ -36,10 +36,10 @@
             <strong class="text-accent">
               {{ item.keyWord }}
             </strong>
-            {{ item.text }}
+            {{ item.title }}
           </span>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="deleteItem(i)">
+          <v-btn variant="text" @click="deleteItem(index)">
             <v-icon
               size="24px"
               icon="mdi-trash-can-outline"
@@ -48,7 +48,13 @@
           </v-btn>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="bg-white rounded">
-          <slot name="content" v-bind="item.contentData"></slot>
+          <slot
+            name="content"
+            v-bind="{
+              ...item.contentData,
+              index,
+            }"
+          ></slot>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </transition-group>
@@ -60,23 +66,39 @@ import { ref } from 'vue';
 const over = ref(-1);
 const dragFrom = ref({});
 const dragging = ref(false);
+const id = ref(0);
 
-const props = defineProps({
+const { data } = defineProps({
   data: {
     type: Array as PropType<
-      { text: string; keyWord?: string; icon?: string; contentData: object }[]
+      {
+        title?: string;
+        keyWord?: string;
+        icon?: string;
+        contentData?: object;
+        id?: number;
+      }[]
     >,
     default: () => [],
   },
 });
 
 const list = ref();
-
-onMounted(() => {
-  list.value = props.data.map((item, index) => {
-    return { ...item, id: index + 1 };
+list.value = data;
+watch(data, () => {
+  list.value.map((item) => {
+    if (!item.id) item.id = id.value += 1;
+    return item;
   });
 });
+
+onBeforeMount(() => {
+  list.value.map((item) => {
+    if (!item.id) item.id = id.value += 1;
+    return item;
+  });
+});
+
 const startDrag = (slide, e) => {
   const dragGhost = e.target.closest('.expand-panel');
   e.dataTransfer.effectAllowed = 'move';
