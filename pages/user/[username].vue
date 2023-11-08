@@ -25,6 +25,7 @@
       :userId="user.id"
       :can-delete="true"
       show-menu
+      show-profile-picture
       show-role
       show-border
       float-beneath

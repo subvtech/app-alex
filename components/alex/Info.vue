@@ -8,6 +8,7 @@
       darkerBackground && floatBeneath ? 'darker-bg rounded-t-0' : '',
       isMaxWidthReached ? 'breakpoint' : '',
     ]"
+    data-testid="info"
   >
     <span
       v-if="!titleAbove && title"
@@ -31,6 +32,7 @@
         :style="floatBeneath ? `max-height: ${profilePictureSize / 3}px` : ''"
       >
         <app-user-avatar
+          v-if="showProfilePicture"
           :show-border="showBorder"
           :profile-picture="profilePicture"
           :can-edit="canEdit"
@@ -71,6 +73,7 @@
             v-if="showRole"
             class="role ml-2 text-h6 text-sm-h5 text-md-h4"
             :style="roleStyle ?? 'color: white;'"
+            role="role"
           >
             {{
               isProfessor
@@ -150,6 +153,7 @@
         class="settings mx-1 py-1 px-1 mx-xs-2"
         :class="darkerBackground ? 'darker-bg' : ''"
         style="height: min-content; color: #6e7a87"
+        role="settings"
       >
         <v-icon @click="emit('display:settings')">mdi-cog-outline</v-icon>
       </div>
@@ -162,12 +166,16 @@ const emit = defineEmits(['display:settings']);
 const props = defineProps({
   profilePicture: {
     type: Object as PropType<{ url: string; id: number } | null>,
-    required: true,
   },
 
   userId: {
     type: Number,
     required: true,
+  },
+
+  showProfilePicture: {
+    type: Boolean,
+    default: false,
   },
 
   showBorder: {
@@ -274,7 +282,6 @@ const props = defineProps({
   },
   username: {
     type: String,
-    required: true,
   },
 
   isProfessor: { type: Boolean, default: false },

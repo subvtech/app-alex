@@ -1,5 +1,5 @@
 <template>
-  <div class="avatar-block">
+  <div class="avatar-block" role="avatar">
     <label
       class="avatar"
       :class="[canEdit ? 'hover' : '']"
@@ -14,12 +14,13 @@
         :width="size"
         :height="size"
         placeholder
+        data-testid="img-avatar"
       />
       <v-avatar class="img" v-else :size="size" color="accent">
         <span class="text-white text-h5">{{ userInitials }}</span>
       </v-avatar>
 
-      <div class="edit" v-if="canEdit">
+      <div class="edit" v-if="canEdit" role="edit">
         <v-icon
           v-if="avatar"
           class="d-none"
@@ -36,12 +37,14 @@
           accept="image/png, image/jpeg"
           id="file-input"
           type="file"
+          role="input"
         />
       </div>
     </label>
 
     <div
       v-if="canEdit && canDelete && avatar"
+      role="delete"
       class="delete d-flex justify-center align-center"
       @click="removeProfilePicture"
       :style="
@@ -55,10 +58,6 @@
   </div>
 </template>
 <script setup lang="ts">
-const client = useStrapiClient();
-const { updateImage, uploadImage, removeImage } = useUploadedImage();
-
-const userStore = useUserStore();
 const props = defineProps({
   userId: {
     type: Number,
@@ -91,34 +90,24 @@ const avatar = ref<{ id: number; url: string } | undefined | null>(
   props.profilePicture,
 );
 
-async function uploadProfilePicture(event: any) {
-  if (avatar.value) {
-    const { updatedAt } = await updateImage(event, avatar.value.id);
-
-    const url = avatar.value.url?.split('?');
-    if (url) avatar.value.url = url[0] + '?' + updatedAt;
-  } else {
-    const temp = await uploadImage(event);
-    avatar.value = { url: temp[0].url, id: temp[0].id };
-
-    await client(`/users/${props.userId}`, {
-      method: 'PUT',
-      body: { avatar: temp[0].id },
-    });
-  }
-  userStore.profilePicture = avatar.value;
-}
-
-async function removeProfilePicture() {
-  if (!avatar.value) return;
-  await removeImage(avatar.value.id);
-  avatar.value = null;
-  userStore.profilePicture = null;
-}
+const { removeProfilePicture, uploadProfilePicture } = useProfilePicture(
+  avatar,
+  props.userId,
+);
 
 const userInitials = computed(() => {
   return getFullnameInitials(props.placeholder);
 });
+
+const getFullnameInitials = (fullname = '') => {
+  const names = fullname.split(' ');
+  const getInitial = (name) => (name ? name[0].toUpperCase() : '');
+
+  const firstLetter = getInitial(names[0]);
+  const secondLetter = getInitial(names[1]);
+
+  return `${firstLetter}${secondLetter}`;
+};
 
 const smaller = computed(() => {
   return props.size < 100;

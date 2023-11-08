@@ -1,5 +1,5 @@
 <template>
-  <div class="user-block my-6" style="position: relative">
+  <div class="user-block my-6" style="position: relative" data-testid="banner">
     <div class="cover-block w-100">
       <NuxtImg
         v-if="cover"
@@ -7,12 +7,14 @@
         provider="strapi"
         :src="cover.url"
         placeholder
+        role="custom-cover"
       />
       <NuxtImg
         v-else
         class="cover"
         src="https://picsum.photos/2200/500"
         placeholder
+        role="default-cover"
       />
       <div
         class="w-100 h-100"
@@ -23,7 +25,7 @@
             : ''
         "
       ></div>
-      <div v-if="canEdit" class="edit-cover d-flex align-center">
+      <div v-if="canEdit" class="edit-cover d-flex align-center" >
         <v-btn
           v-if="cover"
           class="btn remove"
@@ -31,6 +33,7 @@
           size="large"
           icon
           variant="outlined"
+          role="delete-cover"
         >
           <NuxtImg
             src="/svg/trash-dark.svg"
@@ -41,7 +44,7 @@
           />
         </v-btn>
 
-        <label class="" for="coverInput">
+        <label class="" for="coverInput" data-testid="edit-cover">
           <v-btn
             class="btn label"
             @click="($refs.coverInput as any).click()"
@@ -76,6 +79,7 @@
     </div>
 
     <alex-info
+      :show-profile-picture="showProfilePicture"
       :can-edit="canEdit"
       :can-delete="canDelete"
       :end-date="endDate"
@@ -105,7 +109,7 @@
       @display:settings="emit('display:settings')"
     />
 
-    <div v-if="showMenu" class="menu d-flex h-100" style="z-index: 1">
+    <div v-if="showMenu" class="menu d-flex h-100" data-testid="menu" style="z-index: 1">
       <span
         v-for="(link, index) in links"
         class="font-weight-regular text-body-3 text-sm-body-2"
@@ -118,7 +122,7 @@
       </span>
 
       <v-spacer />
-      <div v-if="settingsMenu">
+      <div v-if="settingsMenu" data-testid="settings-menu">
         <v-icon
           v-if="canEdit"
           @click="emit('display:settings')"
@@ -140,9 +144,13 @@ const props = defineProps({
     type: Object as PropType<{ url: string; id: number } | null>,
   },
 
+  showProfilePicture: {
+    type: Boolean,
+    default: false,
+  },
+
   profilePicture: {
     type: Object as PropType<{ url: string; id: number } | null>,
-    required: true,
   },
   profilePictureSize: {
     type: Number,
@@ -157,7 +165,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  
+
   distribution: {
     type: String as PropType<
       | 'single-row'
