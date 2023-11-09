@@ -25,10 +25,13 @@
     :style="[
       clickable ? 'cursor: pointer' : '',
       icon ? 'gap: 0px !important' : '',
+      
     ]"
+    style="width: min-content"
+    data-testid="chip"
   >
     <div v-if="icon" style="display: inline-flex">
-      <v-icon :size="['x-small', 'small'].includes(size) ? 'medium' : '20'">{{
+      <v-icon :size="['x-small', 'small'].includes(size) ? 'medium' : '20'" data-testid="icon">{{
         icon
       }}</v-icon>
     </div>
@@ -40,6 +43,7 @@
         v-if="!(prependIcon || icon)"
         class="mr-1"
         :size="['x-small', 'small'].includes(size) ? 'medium' : '20'"
+        data-testid="dot"
         >mdi-circle-medium</v-icon
       >
 
@@ -166,8 +170,8 @@ const chip = ref(false);
   font-style: normal;
   font-weight: 400;
   letter-spacing: 0.32px;
-  max-width: 32px;
-  max-height: 32px;
+ 
+
   overflow: hidden;
 }
 .x-large.icon {
