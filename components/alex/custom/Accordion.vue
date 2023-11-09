@@ -7,7 +7,7 @@
         role="listItem"
         :class="over == index && dragging && dragFrom != item ? 'over' : ''"
         @dragover="(e) => onDragOver(index, e)"
-        @dragend="() => finishDrag(item, index)"
+        @dragend="() => finishDrag(item, index, list)"
         @dragenter="(e) => e.preventDefault()"
       >
         <v-expansion-panel-title class="expand-panel">
@@ -17,7 +17,12 @@
             icon="mdi-drag"
             color="gray-300"
             draggable="true"
-            @dragstart="(e) => startDrag(item, e)"
+            @dragstart="
+              (e) => {
+                const dragGhost = e.target.closest('.expand-panel');
+                startDrag(item, e, dragGhost);
+              }
+            "
           />
           <v-icon
             v-if="item.icon"
@@ -63,11 +68,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-const over = ref(-1);
-const dragFrom = ref({});
-const dragging = ref(false);
-const id = ref(0);
+import { useDragDrop } from '@/composables/useDragDrop';
 
+const id = ref(0);
 const { data } = defineProps({
   data: {
     type: Array as PropType<
@@ -99,32 +102,12 @@ onBeforeMount(() => {
   });
 });
 
-const startDrag = (slide, e) => {
-  const dragGhost = e.target.closest('.expand-panel');
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', slide);
-  dragging.value = true;
-  dragFrom.value = slide;
-  e.dataTransfer.setDragImage(dragGhost, 10, 10);
-};
-
-const finishDrag = (slide, pos) => {
-  if (over.value < 0 || pos < 0) return;
-  list.value.splice(pos, 1);
-  list.value.splice(over.value, 0, slide);
-  over.value = -1;
-  dragging.value = false;
-};
-
-const onDragOver = (pos, e) => {
-  over.value = pos;
-  e.dataTransfer.dropEffect = 'move';
-  e.preventDefault();
-};
-
 const deleteItem = (pos) => {
   list.value.splice(pos, 1);
 };
+
+const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
+  useDragDrop();
 </script>
 
 <style>
