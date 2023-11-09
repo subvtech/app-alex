@@ -1,37 +1,41 @@
 <template>
   <v-app v-if="user">
     <AppSnackbar />
-    <menu-drawable
-      :blocks="menus"
-      :clipped="clipped"
-      :hideDrawer="
+    <div
+      @click.stop="
         (e: any) => {
           drawer = !drawer;
         }
       "
-      :show="drawer"
-      :isPermanent="isPermanent"
     >
-      <template v-slot:header>
-        <div
-          class="my-4 w-100 d-flex"
-          :class="clipped ? '' : 'justify-center'"
-          style="max-height: 28px"
-        >
-          <div>
-            <NuxtLink to="/">
-              <img
-                v-if="clipped"
-                src="/images/alex-mini.svg"
-                height="28"
-                width="43"
-              />
-              <img v-else src="/images/alex.svg" height="28" width="84" />
-            </NuxtLink>
+      <alex-custom-drawable
+        :blocks="menus"
+        :clipped="clipped"
+        :show="drawer"
+        :permanent="isPermanent"
+      >
+        <template v-slot:header>
+          <div
+            class="my-4 w-100 d-flex"
+            :class="clipped ? '' : 'justify-center'"
+            style="max-height: 28px"
+          >
+            <div>
+              <NuxtLink to="/">
+                <img
+                  v-if="clipped"
+                  src="/images/alex-mini.svg"
+                  height="28"
+                  width="43"
+                />
+                <img v-else src="/images/alex.svg" height="28" width="84" />
+              </NuxtLink>
+            </div>
           </div>
-        </div>
-      </template>
-    </menu-drawable>
+        </template>
+      </alex-custom-drawable>
+    </div>
+
     <v-app-bar :clipped-left="clipped" fixed app color="white">
       <v-app-bar-nav-icon
         @click.stop="
@@ -111,7 +115,7 @@ import { User } from '../models/user.model';
 
 const i18n = useI18n();
 const clipped = ref(true);
-const drawer = ref(true);
+const drawer = ref(false);
 const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
