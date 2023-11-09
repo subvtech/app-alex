@@ -45,12 +45,13 @@
         </v-list>
       </div>
     </v-navigation-drawer>
-    <menu-horizontal-bar
-      :drawer="drawer"
-      :fixed="true"
+    <alex-custom-horizontal-bar
+      :drawer="true"
+      fixed
       :is-bell-active="false"
       :is-chat-active="false"
       :toggle-drawer="() => (drawer = !drawer)"
+      :menu-items="profileMenuItems"
       :reverse="false"
       :user="user"
     />
@@ -134,6 +135,22 @@ const menus = [
         to: '/projects',
       },
     ],
+  },
+];
+const profileMenuItems = [
+  {
+    title: i18n.t('layouts.default.profile'),
+    to: `/user/${user?.username}`,
+    logout: false,
+  },
+  {
+    title: i18n.t('layouts.default.settings'),
+    to: '/user/settings',
+    logout: false,
+  },
+  {
+    title: i18n.t('layouts.default.logout'),
+    logout: true,
   },
 ];
 

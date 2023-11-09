@@ -1,15 +1,12 @@
 <template>
-  <v-app-bar :fixed="fixed" app color="white" class="px-4">
+  <v-app-bar app color="white" class="px-4" data-testid="horizontal-bar">
     <div
       class="d-flex w-100 align-center"
       :class="reverse ? 'flex-row-reverse' : ''"
+      :role="reverse ? 'reversed' : ''"
     >
       <v-app-bar-nav-icon @click.stop="toggleDrawer" class="text-gray-900" />
-      <div
-        v-if="!drawer"
-        class="primary pl-2 pt-1 rounded-pill"
-        style="height: 42px; width: 115px"
-      ></div>
+
       <v-spacer />
       <v-btn icon color="#6E7A87" @click="emit('chat')">
         <NuxtImg
@@ -18,6 +15,7 @@
           "
           width="24"
           height="24"
+          role="chat-active"
         />
       </v-btn>
       <v-btn icon color="grey" @click="emit('alert')" class="mr-2">
@@ -26,6 +24,7 @@
           src="/svg/bell.svg"
           width="24"
           height="24"
+          role="bell-active"
         />
         <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
       </v-btn>
@@ -34,6 +33,7 @@
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
             <div
+              v-if="user"
               v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
@@ -44,8 +44,21 @@
                 class="mr-2"
               />
               <span class="fullname mr-1" style="cursor: pointer">
-                {{ user?.fullname }}
+                {{ user.fullname }}
               </span>
+
+              <v-icon color="#6E7A87" style="cursor: pointer">
+                mdi-chevron-down
+              </v-icon>
+            </div>
+            <div
+              v-else
+              v-bind="props"
+              class="user-block"
+              :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
+            >
+              <app-user-avatar :fullname="''" class="mr-2" />
+              <span class="fullname mr-1" style="cursor: pointer"> user </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
                 mdi-chevron-down
@@ -53,11 +66,11 @@
             </div>
           </v-hover>
         </template>
-        <v-list v-if="profileMenuItems">
+        <v-list v-if="menuItems">
           <v-list-item
-            v-for="(item, index) in profileMenuItems"
+            v-for="(item, index) in menuItems"
             :key="`profile-menu-item-${index}`"
-            @click="onMenuClick(item.to, item.logout)"
+            @click="onMenuClick(item.to ?? '/', item.logout)"
           >
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
@@ -77,17 +90,13 @@ const i18n = useI18n();
 const router = useRouter();
 
 const props = defineProps({
-  fixed: {
-    type: Boolean,
-    default: true,
-  },
-  drawer: {
-    type: Boolean,
-    default: false,
-  },
   user: {
     type: Object as PropType<User>,
-    required: true,
+  },
+
+  menuItems: {
+    type: Array as PropType<{ title: string; to?: string; logout: boolean }[]>,
+    default: [],
   },
 
   toggleDrawer: {
@@ -104,29 +113,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-
   reverse: {
     type: Boolean,
     default: false,
   },
 });
-
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${props.user.username}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
 
 function onMenuClick(route = '', logout = false) {
   if (logout) {
@@ -188,6 +179,7 @@ body {
     }
     .v-toolbar__content {
       .user-block {
+        min-width: 72px;
         .fullname {
           color: #6e7a87;
 
