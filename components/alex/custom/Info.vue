@@ -13,13 +13,16 @@
     <span
       v-if="!titleAbove && title"
       class="font-weight-bold text-h3 text-md-h2 mb-6"
-      :class="!floatBeneath ? (darkerBackground ? 'darker-bg' : '') : ''"
-      :style="[titleStyle ?? 'color: white;']"
+      :class="[
+        !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
+        
+      ]"
+      :style="[titleStyle ?? 'color: white;', floatBeneath && (startDate || endDate) ? 'margin-top: -25px; !important' : '',]"
       >{{ title }}</span
     >
     <div
       class="card d-flex flex-row justify-space-between w-100"
-      :class="[canEdit ? 'hover' : '']"
+      :class="[canEdit && userId ? 'hover' : '']"
       style="position: relative; background-color: transparent"
     >
       <div
@@ -35,14 +38,15 @@
           v-if="showProfilePicture"
           :show-border="showBorder"
           :profile-picture="profilePicture"
-          :can-edit="canEdit"
+          :can-edit="userId ? canEdit : false"
           :can-delete="canDelete"
           :size="profilePictureSize"
-          :user-id="userId"
+          :user-id="userId ?? -1"
           :placeholder="fullname ?? ''"
-          :style="
-            floatBeneath ? `transform: translateY(-${translateY}px);` : ''
-          "
+          :style="[
+            floatBeneath ? `transform: translateY(-${translateY}px);` : '',
+            avatarBlockStyle ?? '',
+          ]"
         />
         <div class="info" :class="[distribution, wrap ? 'flex-wrap' : '']">
           <span
@@ -105,7 +109,7 @@
             <span style="font-size: 14px; letter-spacing: 0.28px">
               {{ $t('pages.profile.startDate') }}</span
             >
-            <span class="font-weight-bold" style="min-width: 86px">{{
+            <span class="font-weight-bold" style="white-space: nowrap">{{
               startDate
             }}</span>
           </div>
@@ -127,7 +131,7 @@
           >
             <span style="font-size: 14px; letter-spacing: 0.28px">
               {{ $t('pages.profile.endDate') }}</span
-            ><span class="font-weight-bold" style="min-width: 86px">{{
+            ><span class="font-weight-bold" style="white-space: nowrap">{{
               endDate
             }}</span>
           </div>
@@ -170,7 +174,6 @@ const props = defineProps({
 
   userId: {
     type: Number,
-    required: true,
   },
 
   showProfilePicture: {
@@ -242,6 +245,10 @@ const props = defineProps({
   },
 
   codeStyle: {
+    type: String,
+  },
+
+  avatarBlockStyle: {
     type: String,
   },
 
@@ -399,6 +406,7 @@ async function copyToClipboard(text) {
 
 .float-beneath {
   flex-direction: column-reverse !important;
+  gap: 8px;
   .font-weight-bold.text-h3 {
     margin-top: -60px;
   }
@@ -425,7 +433,7 @@ async function copyToClipboard(text) {
   display: flex;
   flex-direction: row;
   transition: all ease-in-out 1s;
-  gap: 12px;
+  gap: 8px;
   .darker-bg {
     padding-inline: 8px;
     padding-block: 16px;
@@ -451,7 +459,6 @@ async function copyToClipboard(text) {
   flex-direction: row;
 
   transition: all ease-in-out 1s;
-  gap: 12px;
 
   .card {
     .single-row {
@@ -596,7 +603,7 @@ async function copyToClipboard(text) {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
   .float-beneath {
     .card {
       .resize {
@@ -674,7 +681,7 @@ async function copyToClipboard(text) {
     }
   }
 
-  @media (max-width: 469px) {
+  @media (max-width: 520px) {
     .float-beneath {
       .resize {
         display: flex;

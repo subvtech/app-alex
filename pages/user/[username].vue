@@ -17,7 +17,7 @@
         }}</span>
       </div>
     </div>
-    <alex-banner
+    <alex-custom-banner
       :can-edit="canEdit"
       :cover-picture="user.cover"
       :profile-picture-size="160"

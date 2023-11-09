@@ -4,7 +4,7 @@
       class="avatar"
       :class="[canEdit ? 'hover' : '']"
       :for="canEdit ? 'file-input' : ''"
-      :style="showBorder ? '' : 'border-width: 0px'"
+      :style="[avatarStyle ?? '', showBorder ? '' : 'border-width: 0px']"
     >
       <NuxtImg
         v-if="avatar"
@@ -24,7 +24,7 @@
         <v-icon
           v-if="avatar"
           class="d-none"
-          :size="smaller ? 'x-small' : 'x-large'"
+          :size="small ? 'x-small' : 'x-large'"
           color="#fff"
           >mdi-pencil-outline</v-icon
         >
@@ -47,13 +47,24 @@
       role="delete"
       class="delete d-flex justify-center align-center"
       @click="removeProfilePicture"
-      :style="
-        smaller
-          ? 'max-width: 18px !important; max-height: 18px !important; right: -8px; bottom: -5px;'
-          : ''
-      "
+      :class="[
+        xlarge
+          ? 'x-large'
+          : large
+          ? 'large'
+          : small
+          ? 'small'
+          : xsmall
+          ? 'x-small'
+          : 'xx-small',
+      ]"
     >
-      <NuxtImg src="/svg/trash.svg" width="20" height="20" placeholder />
+      <NuxtImg
+        src="/svg/trash.svg"
+        :width="small ? 20 : 14"
+        :height="small ? 20 : 14"
+        placeholder
+      />
     </div>
   </div>
 </template>
@@ -66,6 +77,9 @@ const props = defineProps({
   placeholder: {
     type: String,
     required: true,
+  },
+  avatarStyle: {
+    type: String,
   },
   showBorder: {
     type: Boolean,
@@ -109,13 +123,27 @@ const getFullnameInitials = (fullname = '') => {
   return `${firstLetter}${secondLetter}`;
 };
 
-const smaller = computed(() => {
-  return props.size < 100;
+const xsmall = computed(() => {
+  return props.size > 45;
+});
+
+const small = computed(() => {
+  return props.size > 60;
+});
+
+const large = computed(() => {
+  return props.size > 95;
+});
+
+const xlarge = computed(() => {
+  return props.size > 130;
 });
 </script>
 
 <style scoped lang="scss">
 .avatar-block {
+  position: relative;
+  width: min-content;
   .avatar {
     display: flex;
     justify-content: center;
@@ -174,9 +202,6 @@ const smaller = computed(() => {
   }
 
   .delete {
-    right: -3px;
-    bottom: 32px;
-
     position: absolute;
 
     border-radius: 8px;
@@ -191,6 +216,39 @@ const smaller = computed(() => {
     vertical-align: middle;
     background: #e9494a;
     cursor: pointer;
+
+    &.x-large {
+      bottom: 15px;
+      right: 0px;
+    }
+
+    &.large {
+      bottom: 10px;
+      right: -3px;
+      max-width: 24px !important;
+      max-height: 24px !important;
+    }
+
+    &.small {
+      max-width: 22px !important;
+      max-height: 22px !important;
+      bottom: 7px;
+      right: -3px;
+    }
+
+    &.x-small {
+      max-width: 16px !important;
+      max-height: 16px !important;
+      right: -3px;
+      bottom: 8px;
+    }
+
+    &.xx-small {
+      max-width: 16px !important;
+      max-height: 16px !important;
+      right: -5px;
+      bottom: 0px;
+    }
   }
 }
 

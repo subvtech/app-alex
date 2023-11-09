@@ -4,7 +4,7 @@
       <NuxtImg
         v-if="cover"
         class="cover"
-        provider="strapi"
+        :provider="imgFromStrapi ? 'strapi' : undefined"
         :src="cover.url"
         placeholder
         role="custom-cover"
@@ -25,9 +25,9 @@
             : ''
         "
       ></div>
-      <div v-if="canEdit" class="edit-cover d-flex align-center" >
+      <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
-          v-if="cover"
+          v-if="cover && imgFromStrapi"
           class="btn remove"
           @click="removeCoverPicture"
           size="large"
@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <alex-info
+    <alex-custom-info
       :show-profile-picture="showProfilePicture"
       :can-edit="canEdit"
       :can-delete="canDelete"
@@ -102,6 +102,8 @@
       :distribution="distribution"
       :darker-background="darkerBackground"
       :profile-picture-size="profilePictureSize"
+      :start-date-style="startDateStyle"
+      :end-date-style="endDateStyle"
       resize
       :user-id="userId"
       :profile-picture="profilePicture"
@@ -109,7 +111,12 @@
       @display:settings="emit('display:settings')"
     />
 
-    <div v-if="showMenu" class="menu d-flex h-100" data-testid="menu" style="z-index: 1">
+    <div
+      v-if="showMenu"
+      class="menu d-flex h-100"
+      data-testid="menu"
+      style="z-index: 1"
+    >
       <span
         v-for="(link, index) in links"
         class="font-weight-regular text-body-3 text-sm-body-2"
@@ -142,6 +149,11 @@ const client = useStrapiClient();
 const props = defineProps({
   coverPicture: {
     type: Object as PropType<{ url: string; id: number } | null>,
+  },
+
+  imgFromStrapi: {
+    type: Boolean,
+    default: true,
   },
 
   showProfilePicture: {
@@ -250,11 +262,9 @@ const props = defineProps({
 
   userId: {
     type: Number,
-    required: true,
   },
   fullname: {
     type: String,
-    required: true,
   },
   startDate: {
     type: String,
@@ -264,7 +274,6 @@ const props = defineProps({
   },
   username: {
     type: String,
-    required: true,
   },
   selectedOption: {
     type: Number,
@@ -276,8 +285,8 @@ const props = defineProps({
     default: [],
   },
   isProfessor: { type: Boolean, default: false },
-  canEdit: { type: Boolean, required: true },
-  canDelete: { type: Boolean, required: true },
+  canEdit: { type: Boolean, default: false },
+  canDelete: { type: Boolean, default: false },
 });
 
 const { selectedOption, fullname, username, canEdit, userId } = toRefs(props);
@@ -287,7 +296,7 @@ const cover = ref<{ id: number; url: string } | null | undefined>(
 );
 
 async function uploadCoverPicture(event: any) {
-  if (cover.value) {
+  if (cover.value && props.imgFromStrapi) {
     const { updatedAt } = await updateImage(event, cover.value.id);
     const url = cover.value.url?.split('?');
     if (url) cover.value.url = url[0] + '?' + updatedAt;

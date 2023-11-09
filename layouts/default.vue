@@ -122,12 +122,13 @@ const user = useStrapiUser<User>();
 const myKey = ref(0);
 const { profilePicture } = storeToRefs(userStore);
 onBeforeMount(() => {
+  if(user.value)
   userStore.profilePicture = user.value.avatar;
 });
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
+    to: user.value ? `/user/${user.value.username}` : '/',
   },
   {
     title: i18n.t('layouts.default.settings'),
