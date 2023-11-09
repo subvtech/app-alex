@@ -1,11 +1,23 @@
 <template>
-  <v-dialog width="640" v-model="isActive">
+  <v-dialog width="640" v-model="isActive" data-testid="dialog">
     <template v-slot:activator>
-      <v-btn @click="toggleDialog" text="Open Dialog"> </v-btn>
+      <v-btn
+        v-if="!overwriteActivator"
+        @click="toggleDialog"
+        text="Open Dialog"
+        :variant="btnVariant"
+      >
+      </v-btn>
+      <slot v-else name="activator" />
     </template>
 
     <template v-slot:default>
-      <v-card class="block" :class="extraPadding ? 'pa-10' : ''">
+      <v-card
+        v-if="!overwriteDefault"
+        class="block"
+        :class="extraPadding ? 'pa-10' : ''"
+        role="default"
+      >
         <v-card-title
           class="d-flex flex-row align-center px-6 py-0"
           style="height: 76px; gap: 16px; border-bottom: 1px solid #ebedef"
@@ -28,18 +40,15 @@
           >
         </v-card-title>
 
-        <v-card-text>
-          <slot name="content" />
-        </v-card-text>
-
         <v-card-actions
           class="py-4"
           style="gap: 8px; border-top: 1px solid #ebedef"
+          :role="prependIcon ? 'prepend' : ''"
         >
           <v-spacer />
 
           <v-btn
-            :prepend-icon="preprendIcon ? 'mdi-close' : ''"
+            :prepend-icon="prependIcon ? 'mdi-close' : ''"
             class="btn"
             color="#F1F5F9"
             @click="
@@ -54,7 +63,7 @@
             {{ $t('components.profile.settings.cancel') }}</v-btn
           >
           <v-btn
-            :prepend-icon="preprendIcon ? 'mdi-check' : ''"
+            :prepend-icon="prependIcon ? 'mdi-check' : ''"
             class="btn"
             color="#00B7CC"
             :variant="btnVariant"
@@ -64,6 +73,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <slot v-else name="default" />
     </template>
   </v-dialog>
 </template>
@@ -81,7 +91,16 @@ const props = defineProps({
     default: false,
   },
 
-  preprendIcon: {
+  prependIcon: {
+    type: Boolean,
+    default: false,
+  },
+
+  overwriteActivator: {
+    type: Boolean,
+    default: false,
+  },
+  overwriteDefault: {
     type: Boolean,
     default: false,
   },
@@ -103,7 +122,7 @@ const props = defineProps({
 
   title: {
     type: String,
-    required: true,
+    default: 'Dialog',
   },
 });
 
