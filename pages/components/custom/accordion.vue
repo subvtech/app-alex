@@ -55,6 +55,13 @@
           </thead>
           <tbody>
             <tr>
+              <td>show-positions</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
               <td>data</td>
               <td>Object</td>
               <td class="text-center">
@@ -85,6 +92,13 @@
             <tr>
               <td>data.contentData</td>
               <td>Object</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>data.positions</td>
+              <td>Boolean</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -173,11 +187,14 @@
     <p class="text-subtitle-2 text-gray-500">
       Caso deseje, você pode fazer uma lista enumerada e adicionar palavra
       chaves para cada um dos itens, para isso basta adicionar as propriedades
-      <strong>keyWord</strong> e não passar nenhum valor para a propriedade
-      <strong>icon</strong>.
+      <strong>keyWord</strong> e caso deseje exibir a numeração todos os itens,
+      basta adicionar a propriedade <strong> show-positions </strong> ao
+      componente ou caso deseje exibir ou ocultar a numeração itens epecificos,
+      basta passar a propriedade <strong>position</strong> como true ou false no
+      item desejado.
     </p>
     <div class="w-100">
-      <AlexCustomAccordion v-model:data="listVariant">
+      <AlexCustomAccordion v-model:data="listVariant" show-positions>
         <template #content="{ text }">
           <p class="text-h5">{{ text }}</p>
         </template>
@@ -273,7 +290,7 @@
     </p>
 
     <div class="w-100">
-      <AlexCustomAccordion v-model:data="listSlots">
+      <AlexCustomAccordion v-model:data="listSlots" show-positions>
         <template #content="{ index, text, image }">
           <v-text-field
             v-model="listSlots[index].title"
@@ -402,6 +419,7 @@ const listVariant = ref([
   {
     keyWord: 'Melhorar',
     title: 'o aprendizado do aluno por meio de metodologias funcionais',
+    ordered: true,
     contentData: {
       text: 'O objetivo do projeto é melhorar o aprendizado do aluno por meio de metodologias funcionais.',
     },
@@ -442,12 +460,14 @@ const listSlots = ref([
   {
     title: 'Image',
     icon: 'mdi-image',
+    position: false,
     contentData: {
       image: 'https://picsum.photos/400/400',
     },
   },
   {
     title: 'Video',
+    position: false,
     icon: 'mdi-video',
   },
 ]);
@@ -505,7 +525,7 @@ const list = ref([
 `;
 
 const secondExampleTemplate = `
-<AlexCustomAccordion v-model:data="list">
+<AlexCustomAccordion v-model:data="list" show-positions>
     <template #content="{ text }">
       <p class="text-h5">{{ text }}</p>
     </template>
@@ -540,20 +560,20 @@ const list = ref([
 `;
 
 const thirdExampleTemplate = `
-<AlexCustomAccordion v-model:data="list">
+<AlexCustomAccordion v-model:data="list" show-positions>
 <template #content="{ index, text, image }">
   <v-text-field
-    v-model="listSlots[index].title"
+    v-model="list[index].title"
     label="Titulo"
     placeholder="Insira um Titulo"
   />
   <v-text-field
-    v-model="listSlots[index].keyWord"
+    v-model="list[index].keyWord"
     label="KeyWord"
     placeholder="Insira uma keyWord"
   />
   <v-text-field
-    v-model="listSlots[index].icon"
+    v-model="list[index].icon"
     label="Ícone"
     placeholder="Insira um Ícone"
   />
@@ -583,12 +603,14 @@ const list = ref([
   {
     title: 'Image',
     icon: 'mdi-image',
+    position: false,
     contentData: {
       image: 'https://picsum.photos/400/400',
     },
   },
   {
     title: 'Video',
+    position: false,
     icon: 'mdi-video',
   },
 ])
