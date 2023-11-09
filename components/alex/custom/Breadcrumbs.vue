@@ -7,10 +7,12 @@
         ? `background-color: ${backgroundColor}`
         : 'background-color: transparent'
     "
+    data-testid="breadcrumbs"
   >
     <a
       v-if="arrowBack && items.length > 1"
       :href="items[items.length - 2].href"
+      role="goback"
     >
       <v-icon color="#6E7A87" style="cursor: pointer">mdi-chevron-left</v-icon>
     </a>
@@ -18,6 +20,8 @@
     <span
       class="title text-h4 text-sm-h3"
       style="display: inline-flex; flex-shrink: 0"
+      :style="titleStyle ?? ''"
+      role="title"
       >{{ title }}</span
     >
     <v-divider vertical class="pl-2" style="margin-block: auto; height: 24px" />
@@ -26,7 +30,8 @@
         <v-breadcrumbs-item
           :href="item.href"
           :disabled="item.disabled"
-          :style="item.disabled ? '' : 'cursor: pointer'"
+          :style="[item.disabled ? '' : 'cursor: pointer', itemStyle ?? '']"
+          :role="item.disabled ? 'breadcrumb-item-disabled' : 'breadcrumb-item'"
         >
           {{ item.text }}
         </v-breadcrumbs-item>
@@ -41,13 +46,15 @@ const props = defineProps({
     type: Array as PropType<
       { text: string; disabled: boolean; href: string }[]
     >,
-    required: true,
+    default: [],
   },
   arrowBack: {
     type: Boolean,
     default: true,
   },
   title: { type: String },
+  titleStyle: { type: String },
+  itemStyle: { type: String },
   backgroundColor: { type: String },
 });
 </script>
