@@ -3,7 +3,7 @@
     <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
         :class="{ 'input-checkbox': indeterminate }"
-        :model-value="modelValue"
+        :model-value="checked"
         :indeterminate="indeterminate"
         :disabled="disabled"
         :readonly="readonly"
@@ -33,7 +33,7 @@ defineProps({
     type: String,
     default: '',
   },
-  modelValue: {
+  checked: {
     type: Boolean,
     default: false,
   },
@@ -63,6 +63,7 @@ div {
   align-items: flex-end;
   width: fit-content;
   height: 47px;
+  border: none;
 }
 
 .text-container {
