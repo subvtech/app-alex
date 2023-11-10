@@ -1,10 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { renderSuspended, mockNuxtImport } from 'nuxt-vitest/utils';
+import { describe, it, expect } from 'vitest';
+import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
-import { vuetify } from '../../plugins/vuetify';
 import Drawable from '../../components/alex/custom/drawable.vue';
-
-
 
 describe('Drawable', async () => {
   const menus = [
@@ -33,7 +30,7 @@ describe('Drawable', async () => {
         },
       ],
     },
-  
+
     {
       title: 'title2',
       items: [
@@ -63,7 +60,6 @@ describe('Drawable', async () => {
   it('Drawable should be defined', async () => {
     const { unmount } = await renderSuspended(Drawable, {
       attrs: {},
-      
     });
     const bar = await screen.queryByTestId('drawable');
     expect(bar).not.toBeNull();
@@ -78,7 +74,6 @@ describe('Drawable', async () => {
         show: true,
         permanent: true,
       },
-      
     });
     const activeBell = await screen.getAllByRole('list-item');
     expect(activeBell.length).toBeGreaterThan(0);
@@ -94,7 +89,6 @@ describe('Drawable', async () => {
         show: true,
         permanent: true,
       },
-      
     });
     const activeBell = await screen.getAllByRole('icon');
     expect(activeBell.length).toBeGreaterThan(0);
@@ -109,7 +103,6 @@ describe('Drawable', async () => {
         show: true,
         permanent: true,
       },
-      
     });
     const activeBell = await screen.getAllByText('...');
     expect(activeBell.length).toBeGreaterThan(0);

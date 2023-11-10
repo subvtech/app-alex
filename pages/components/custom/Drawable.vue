@@ -17,7 +17,7 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/tabs/"
+          href="https://vuetifyjs.com/en/components/navigation-drawers/#usage"
           target="_blank"
           >vuetifyjs.com</a
         >
@@ -30,11 +30,26 @@
     </p>
     <div class="pa-4">
       <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, passado nenhuma propriedade ele exibe o
-        menu sem nenhum botão, apenas o ícone principal funciona.
+        Esse é o modelo mais simples, é necessário passar
+        <strong>not-fixed</strong> para que ele se atenha ao parent e
+        <strong>disappear</strong> para que ele suma quando não aberto. apenas o
+        ícone principal funciona.
       </p>
     </div>
-    <div class="w-100 d-flex">
+    <div
+      class="w-100 d-flex"
+      @click.stop="
+        (e: any) => {
+          drawer1 = !drawer1;
+        }
+      "
+    >
+      <alex-custom-drawable
+        not-fixed
+        disappear
+        :blocks="menuItems"
+        :show="drawer1"
+      />
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
         <v-btn
@@ -60,7 +75,20 @@
       Cada item do menu requer um icon, um título e um caminho.
     </p>
 
-    <div class="w-100">
+    <div
+      class="w-100 d-flex"
+      @click.stop="
+        (e: any) => {
+          drawer2 = !drawer2;
+        }
+      "
+    >
+      <alex-custom-drawable
+        not-fixed
+        disappear
+        :blocks="menuItems"
+        :show="drawer2"
+      />
       <prism>{{ examples[1] }}</prism>
       <v-btn
         class="copy-icon"
@@ -79,8 +107,8 @@
     </div>
 
     <p class="text-subtitle-2 text-gray-500">
-      É necessária usar um wrapper acima do componente para pegar cliques fora
-      do menu.
+      É sempre necessário usar um wrapper acima do componente para pegar cliques
+      fora do menu.
     </p>
 
     <div class="w-100">
@@ -107,7 +135,41 @@
       Existe o slot <strong>header</strong> que é posicionado acima dos items.
     </p>
 
-    <div class="w-100">
+    <div
+      class="w-100"
+      @click.stop="
+        (e: any) => {
+          drawer3 = !drawer3;
+        }
+      "
+    >
+      <alex-custom-drawable
+        :blocks="menuItems"
+        :clipped="true"
+        :show="drawer3"
+        not-fixed
+        disappear
+      >
+        <template v-slot:header>
+          <div
+            class="my-4 w-100 d-flex"
+            :class="true ? '' : 'justify-center'"
+            style="max-height: 28px"
+          >
+            <div>
+              <NuxtLink to="/">
+                <img
+                  v-if="true"
+                  src="/images/alex-mini.svg"
+                  height="28"
+                  width="43"
+                />
+                <img v-else src="/images/alex.svg" height="28" width="84" />
+              </NuxtLink>
+            </div>
+          </div>
+        </template>
+      </alex-custom-drawable>
       <div class="px-3" style="position: relative">
         <prism>{{ examples[3] }}</prism>
         <v-btn
@@ -129,10 +191,26 @@
     <h2 class="text-h3 text-gray-800">Variação</h2>
 
     <p class="text-subtitle-2 text-gray-500">
-      A propriedade clip controla se o menu é exibido em sua forma reduzida.
+      A propriedade <strong>clipper</strong> controla se o menu é exibido em sua
+      forma reduzida.
     </p>
     <div class="w-100">
-      <div class="px-3" style="position: relative">
+      <div
+        class="px-3"
+        @click.stop="
+          (e: any) => {
+            drawer4 = !drawer4;
+          }
+        "
+        style="position: relative"
+      >
+        <alex-custom-drawable
+          :blocks="menuItems"
+          :clipped="true"
+          :show="drawer4"
+          disappear
+          not-fixed
+        />
         <prism>{{ examples[4] }}</prism>
         <v-btn
           class="copy-icon"
@@ -153,7 +231,43 @@
     <h2 class="text-h2 text-gray-800">Uso Completo</h2>
     <div class="px-4 py-2 w-100 d-flex">
       <div class="w-100 bg-gray-100">
-        <div class="px-3" style="position: relative">
+        <div
+          class="px-3"
+          @click.stop="
+            (e: any) => {
+              drawer5 = !drawer5;
+            }
+          "
+          style="position: relative"
+        >
+          <alex-custom-drawable
+            :blocks="menuItems"
+            :clipped="clipped"
+            :show="drawer5"
+            disappear
+            not-fixed
+            :permanent="isPermanent"
+          >
+            <template v-slot:header>
+              <div
+                class="my-4 w-100 d-flex"
+                :class="clipped ? '' : 'justify-center'"
+                style="max-height: 28px"
+              >
+                <div>
+                  <NuxtLink to="/">
+                    <img
+                      v-if="clipped"
+                      src="/images/alex-mini.svg"
+                      height="28"
+                      width="43"
+                    />
+                    <img v-else src="/images/alex.svg" height="28" width="84" />
+                  </NuxtLink>
+                </div>
+              </div>
+            </template>
+          </alex-custom-drawable>
           <prism>{{ examples[5] }}</prism>
           <v-btn
             class="copy-icon"
@@ -215,38 +329,69 @@ definePageMeta({
   middleware: 'auth',
 });
 
+const menuItems = [
+  {
+    title: 'something',
+    items: [
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'dashboard',
+        to: '/dashboard',
+      },
+      {
+        icon: 'mdi-book-cog-outline',
+        title: 'classes',
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-account-outline',
+        title: 'users',
+        to: '/users',
+      },
+    ],
+  },
+];
+
+const drawer1 = ref(true);
+const drawer2 = ref(true);
+const drawer3 = ref(true);
+const drawer4 = ref(true);
+const drawer5 = ref(true);
+const clipped = ref(true);
+const isPermanent = ref(false);
+
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
-  `<alex-custom-drawable />`,
-  ` <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        :permanent="isPermanent"
-    />
+  `<alex-custom-drawable not-fixed disappear :show="drawer" :blocks="menuItems" />`,
+  `<alex-custom-drawable
+        not-fixed
+        disappear
+        :blocks="menuItems"
+        :show="drawer1"
+      />
     const menus = [
   {
     title: i18n.t('layouts.default.userArea'),
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
-        title: i18n.t('layouts.default.dashboard'),
+        title: 'dashboard',
         to: '/dashboard',
       },
       {
         icon: 'mdi-book-cog-outline',
-        title: i18n.t('layouts.default.myClasses'),
+        title: 'classes',
         to: '/classes',
       },
       {
         icon: 'mdi-clipboard-multiple-outline',
-        title: i18n.t('layouts.default.myProjects'),
+        title:'links',
         to: '/classes/active-links',
       },
       {
         icon: 'mdi-heart-outline',
-        title: i18n.t('layouts.default.favourites'),
+        title: 'favourites',
         to: '/classes/active-links',
       },
     ],
@@ -269,13 +414,7 @@ const examples = [
       </alex-custom-drawable>
     </div>
      `,
-  `   <div
-      @click.stop="
-        (e: any) => {
-          drawer = !drawer;
-        }
-      "
-    >
+  ` 
       <alex-custom-drawable
         :blocks="menus"
         :clipped="clipped"
@@ -302,17 +441,20 @@ const examples = [
           </div>
         </template>
       </alex-custom-drawable>
-    </div>`,
-  ` <alex-custom-drawable
-        :blocks="menus"
-        :clipped="true"
-        :show="drawer"
-        :permanent="isPermanent"
+   `,
+  `<alex-custom-drawable
+      :blocks="menuItems"
+      :clipped="true"
+      :show="drawer4"
+      disappear
+      not-fixed
     />`,
-  ` <alex-custom-drawable
+  `<alex-custom-drawable
         :blocks="menus"
         :clipped="clipped"
         :show="drawer"
+        disappear
+        not-fixed
         :permanent="isPermanent"
       >
         <template v-slot:header>
@@ -358,6 +500,20 @@ const propsDocumentation = [
     default: 'false',
     description:
       'Define se o menu é exibido em sua forma reduzida. Equivalente a usar rail=true',
+  },
+  {
+    name: 'notFixed',
+    type: 'Boolean',
+    default: 'false',
+    description:
+      'Define se o menu é exibido fixo na tela ou atrelado ao parent.',
+  },
+  {
+    name: 'disappear',
+    type: 'Boolean',
+    default: 'false',
+    description:
+      'Define se o menu some enquanto fechado.',
   },
 ];
 

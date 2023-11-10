@@ -5,9 +5,12 @@
     fixed
     :rail="clipped"
     app
-    dark
     data-testid="drawable"
     class="d-flex flex-column pb-2 px-2"
+    :class="[
+      notFixed ? 'not-fixed' : '',
+      disappear && !show ? 'disappear' : '',
+    ]"
   >
     <slot name="header" />
 
@@ -67,7 +70,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-
+  notFixed: {
+    type: Boolean,
+    default: false,
+  },
+  disappear: {
+    type: Boolean,
+    default: false,
+  },
   clipped: {
     type: Boolean,
     default: false,
@@ -78,6 +88,17 @@ const { blocks, show, clipped } = toRefs(props);
 </script>
 
 <style lang="scss">
+.not-fixed {
+  position: static !important;
+  translate: none !important;
+}
+.disappear {
+  z-index: -50 !important;
+  visibility: hidden !important;
+  transition: visibility 0.5s ease-in;
+  transition: translate 0.5s ease-in;
+}
+
 html,
 body {
   overflow-y: auto;

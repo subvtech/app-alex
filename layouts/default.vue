@@ -12,6 +12,7 @@
         :blocks="menus"
         :clipped="clipped"
         :show="drawer"
+        dark
         :permanent="isPermanent"
       >
         <template v-slot:header>
