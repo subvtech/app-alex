@@ -10,9 +10,14 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/strapi', 'nuxt-vitest'],
+  modules: ['@pinia/nuxt', '@nuxt/image', '@nuxtjs/strapi', 'nuxt-vitest'],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
+  },
+  image: {
+    strapi: {
+      baseURL: process.env.STRAPI_URL || 'http://localhost:1337/uploads',
+    },
   },
 
   strapi: {
@@ -21,7 +26,6 @@ export default defineNuxtConfig({
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
-
   imports: {
     dirs: ['stores', 'models', 'config'],
     presets: [

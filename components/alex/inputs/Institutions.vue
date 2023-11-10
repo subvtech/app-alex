@@ -8,10 +8,11 @@
     :items="institutions"
     item-text="text"
     item-value="id"
-    item-title="text"
+    item-title="name"
     :color="color"
     class="my-3"
     variant="outlined"
+    hide-no-data
     required
     :label="$t('pages.register.institution')"
     :error-messages="errorMessage"
@@ -19,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { useField } from 'vee-validate';
 
 type InstitutionsType = {
@@ -38,6 +38,11 @@ const props = defineProps({
   institutions: {
     type: Array as PropType<InstitutionsType[]>,
     required: true,
+  },
+
+  filterIds: {
+    type: Array as PropType<Number[]>,
+    default: [],
   },
   name: {
     type: String,
@@ -69,17 +74,22 @@ const fetchInstitutions = async (institution: string) => {
   fetching.value = true;
   try {
     const res = await find(
-      `institutions?nome_contains=${institution}&tipo=matriz&_limit=10`,
+      `institutions?populate=cover&nome_contains=${institution}&tipo=matriz&_limit=10`,
     );
 
-    const resultArr = (res.data.length > 0 ? res.data : []).map((r: any) => {
-      return {
-        id: r.id,
-        acronym: r.attributes.acronym,
-        text: r.attributes.name,
-        type: r.attributes.type,
-      };
-    });
+    const resultArr = (res.data.length > 0 ? res.data : [])
+      //.filter((r: any) => !props.filterIds.includes(r.id))
+      .map((r: any) => {
+        return {
+          id: r.id,
+          acronym: r.attributes.acronym,
+          name: r.attributes.name,
+          type: r.attributes.type,
+          cover: r.attributes.cover.data.attributes,
+          cnpj: r.attributes.cnpj,
+          sector: r.attributes.sector,
+        };
+      });
     emit('update:institutions', resultArr);
   } catch (error) {
     setMessage(i18n.t('pages.login.searchError'), 'red', true);
@@ -104,7 +114,7 @@ watchEffect(async (onInvalidate) => {
 });
 
 watchEffect(() => {
-  emit('update:value', value.value as number - 1);
+  emit('update:value', (value.value as number) - 1);
 });
 </script>
 
