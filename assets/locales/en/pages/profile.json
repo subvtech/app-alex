@@ -1,5 +1,5 @@
 {
-  "title": "User Profile",
+  "title": "My Profile",
   "home": "Home",
   "edit": "Edit",
   "teacher": "Teacher",
@@ -8,6 +8,7 @@
   "courses": "Courses",
   "projects": "Projects",
   "assignments": "Assignments",
+  "learningPlans": "Learning Plans",
   "events": "Events",
   "settings": "Settings",
   "cover": "Update cover"

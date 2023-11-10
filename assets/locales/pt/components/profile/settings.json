@@ -1,10 +1,9 @@
 {
-  "title": "Informações Pessoais",
-  "fullname": "Nome Completo",
-  "phone": "Telefone",
-  "about": "Sobre",
-  "cancel": "Cancelar",
-  "saveProfile": "Salvar Perfil",
-  "save": "Salvar",
-  "cpf": "CPF"
+    "title": "Informações Pessoais",
+    "fullname": "Nome Completo",
+    "phone": "Telefone",
+    "about": "Sobre",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "cpf": "CPF"
 }

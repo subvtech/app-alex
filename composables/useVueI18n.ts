@@ -75,6 +75,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'learningPlan/viewer',
     'forgot/sendResetPassword',
     'profile/about',
+    'profile/competences',
     'profile/courses',
     'profile/events',
     'profile/general',
