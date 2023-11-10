@@ -20,7 +20,7 @@ describe('Chip', async () => {
 
   it('text must be rendered', async () => {
     let text = 'Ich bin Jojo';
-    const { unmount } = await renderSuspended(Chip, {
+    const chipComponent = await renderSuspended(Chip, {
       attrs: {
         text,
       },
@@ -28,10 +28,10 @@ describe('Chip', async () => {
         plugins: [vuetify],
       },
     });
-    const textComponent = await screen.getByText(text);
+    const textComponent = await chipComponent.getByText(text);
     expect(textComponent).not.toBeNull();
 
-    unmount();
+    chipComponent.unmount();
   });
 
   it('Icon must be rendered', async () => {
