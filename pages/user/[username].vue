@@ -94,7 +94,7 @@
                 class="img"
                 provider="strapi"
                 :src="profilePicture"
-                :alt="user.fullname"
+                placeholder
               />
 
               <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
@@ -466,7 +466,7 @@ async function removeCoverPicture() {
         .avatar {
           &:hover {
             i {
-              display: block !important;
+              display: flex !important;
               position: absolute;
             }
 
@@ -518,7 +518,7 @@ async function removeCoverPicture() {
             width: 160px;
             height: 160px;
             i {
-              display: block !important;
+              display: flex !important;
               position: absolute;
             }
           }
@@ -544,6 +544,13 @@ async function removeCoverPicture() {
           cursor: pointer;
           .small-icon {
             display: none;
+          }
+
+          i {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            vertical-align: middle;
           }
         }
       }
@@ -601,7 +608,7 @@ async function removeCoverPicture() {
         bottom: 24px;
         right: 20px;
         .btn.label {
-          width: 153px !important;
+          width: 153px;
 
           border-radius: 8px;
           border: none;
@@ -699,11 +706,18 @@ async function removeCoverPicture() {
             height: 24px;
 
             .small-icon {
-              display: block;
+              display: flex;
             }
             .normal-icon {
               display: none;
               visibility: hidden;
+            }
+
+            i {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              vertical-align: middle;
             }
           }
         }
@@ -741,6 +755,15 @@ async function removeCoverPicture() {
     }
     .details {
       max-width: none;
+    }
+  }
+  @media (min-width: 400px) {
+    .cover-block {
+      .edit-cover {
+        .btn.label {
+          width: 153px !important;
+        }
+      }
     }
   }
   @media (max-height: 740px) {
@@ -809,6 +832,12 @@ async function removeCoverPicture() {
 
             width: 20px;
             height: 20px;
+            i {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              vertical-align: middle;
+            }
           }
         }
       }

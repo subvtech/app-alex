@@ -4,7 +4,7 @@
     :title="$t('components.profile.about.title')"
     :isEditing="isEditing && canEdit"
     :showIcon="canEdit"
-    @toogle:isEditing="toggleIsEditing"
+    @toggle:isEditing="toggleIsEditing"
     :cancel="cancel"
     :save="updateAbout"
     :full-width="true"
@@ -180,11 +180,6 @@ const toggleIsEditing = () => {
 
 <style global lang="scss">
 #lockedEditor,
-#editorjs * {
-  max-width: 100% !important;
-}
-
-#lockedEditor,
 #editorjs {
   max-width: 100% !important;
 }
@@ -194,20 +189,16 @@ const toggleIsEditing = () => {
   overflow-wrap: break-word;
 }
 #Card {
+  #lockedEditor,
   #editorjs {
     .codex-editor__redactor {
       padding-bottom: 24px !important;
     }
-  }
-  #lockedEditor {
-    .codex-editor__redactor {
-      padding-bottom: 24px !important;
-
-      .ce-block__content{
-        margin: 0px;
-      }
+    .ce-block__content {
+      margin: 0px;
     }
   }
+
   .info {
     text-align: justify;
     text-justify: inter-word;
@@ -219,10 +210,78 @@ const toggleIsEditing = () => {
   }
 }
 
-@media (max-width: 1200px) {
-  #lockedEditor,
-  #editorjs {
+@media (min-width: 800px) {
+  .ce-block__content {
+    max-width: 250px !important;
+  }
+}
+@media (min-width: 900px) {
+  .ce-block__content {
     max-width: 350px !important;
+  }
+}
+
+@media (min-width: 1000px) {
+  .ce-block__content {
+    max-width: 390px !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  .ce-block__content {
+    max-width: 500px !important;
+  }
+}
+@media (min-width: 1200px) {
+  .ce-block__content {
+    max-width: 600px !important;
+  }
+}
+@media (min-width: 1300px) {
+  .ce-block__content {
+    max-width: 450px !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  .ce-block__content {
+    max-width: 500px !important;
+  }
+}
+
+@media (min-width: 1500px) {
+  .ce-block__content {
+    max-width: 550px !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .ce-block__content {
+    max-width: 600px !important;
+  }
+}
+
+@media (min-width: 1700px) {
+  .ce-block__content {
+    max-width: 650px !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .ce-block__content {
+    max-width: 700px !important;
+  }
+}
+
+@media (min-width: 1900px) {
+  .ce-block__content {
+    max-width: 750px !important;
+  }
+}
+
+@media (min-width: 2000px) {
+  .ce-block__content {
+    max-width: 800px !important;
   }
 }
 </style>
