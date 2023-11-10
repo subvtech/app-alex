@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { renderSuspended, mockNuxtImport } from 'nuxt-vitest/utils';
+import { describe, it, expect } from 'vitest';
+import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
 import AppUserAvatar from '../../components/AppUserAvatar.vue';
@@ -62,7 +62,7 @@ describe('AppUserAvatar', async () => {
 describe('AppUserAvatar', () => {
   it('should display the profile picture if available', async () => {
     const size = 40;
-    const { unmount } = await renderSuspended(AppUserAvatar, {
+    const avatarComponent = await renderSuspended(AppUserAvatar, {
       attrs: {
         userId: 2,
         placeholder: 'Jojo Doe',
@@ -77,10 +77,10 @@ describe('AppUserAvatar', () => {
       },
     });
 
-    const profilePicture = await screen.queryByTestId('img-avatar');
+    const profilePicture = await avatarComponent.queryByTestId('img-avatar');
     expect(profilePicture).not.toBeNull();
 
-    const initials = await screen.queryByText('JD');
+    const initials = await avatarComponent.queryByText('JD');
     expect(initials).toBeNull();
     expect(profilePicture?.attributes.getNamedItem('width')?.value).toBe(
       size.toString(),
@@ -88,11 +88,11 @@ describe('AppUserAvatar', () => {
     expect(profilePicture?.attributes.getNamedItem('height')?.value).toBe(
       size.toString(),
     );
-    unmount();
+    avatarComponent.unmount();
   });
 
   it('edit option should not be displayed', async () => {
-    const { unmount } = await renderSuspended(AppUserAvatar, {
+    const avatarComponent = await renderSuspended(AppUserAvatar, {
       attrs: {
         userId: 2,
         placeholder: 'Jojo Doe',
@@ -105,11 +105,11 @@ describe('AppUserAvatar', () => {
         plugins: [vuetify],
       },
     });
-    const edit = await screen.queryByRole('edit');
+    const edit = await avatarComponent.queryByRole('edit');
     expect(edit).toBeNull();
 
-    const input = await screen.queryByRole('input');
+    const input = await avatarComponent.queryByRole('input');
     expect(input).toBeNull();
-    unmount();
+    avatarComponent.unmount();
   });
 });

@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
-import Info from '../../components/alex/Info.vue';
+import Info from '../../components/alex/custom/Info.vue';
 
 describe('Info', async () => {
   const title = 'title',
@@ -53,6 +53,56 @@ describe('Info', async () => {
     const fullnameComponent = await screen.queryByText(fullname);
     expect(fullnameComponent).not.toBeNull();
     unmount();
+  });
+
+  it('there should be a title', async () => {
+    const infoComponent = await renderSuspended(Info, {
+      attrs: {
+        userId: 2,
+        title,
+        fullname,
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+    const titleComponent = await infoComponent.queryByText(title);
+    expect(titleComponent).not.toBeNull();
+    infoComponent.unmount();
+  });
+
+  it('there should be a title above the user information', async () => {
+    const infoComponent = await renderSuspended(Info, {
+      attrs: {
+        userId: 2,
+        title,
+        titleAbove: true,
+        fullname,
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+    const titleComponent = await infoComponent.queryByRole('above');
+    expect(titleComponent).not.toBeNull();
+    infoComponent.unmount();
+  });
+
+
+  it('there should not be a title above the user information', async () => {
+    const infoComponent = await renderSuspended(Info, {
+      attrs: {
+        userId: 2,
+        title,
+        fullname,
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+    const titleComponent = await infoComponent.queryByRole('above');
+    expect(titleComponent).toBeNull();
+    infoComponent.unmount();
   });
 
   it('there should be a username', async () => {

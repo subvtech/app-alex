@@ -53,6 +53,7 @@
             v-if="titleAbove && title"
             class="font-weight-bold text-h3 text-md-h2 ml-2"
             :style="titleStyle ?? 'color: white;'"
+            role="above"
             >{{ title }}</span
           >
 

@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
-import Banner from '../../components/alex/Banner.vue';
+import Banner from '../../components/alex/custom/Banner.vue';
 
 describe('Banner', async () => {
   const title = 'title',
@@ -30,6 +30,24 @@ describe('Banner', async () => {
       const endDateComponent = await screen.queryByText(endDate);
       expect(endDateComponent).not.toBeNull();
       unmount();
+    });
+
+    it('startDate should be displayed correctly', async () => {
+      const bannerComponent= await renderSuspended(Banner, {
+        attrs: {
+          userId: 2,
+          canEdit: true,
+          isProfessor: false,
+          showRole: true,
+          startDate,
+        },
+        global: {
+          plugins: [vuetify],
+        },
+      });
+      const startDateComponent = await bannerComponent.queryByText(startDate);
+      expect(startDateComponent).not.toBeNull();
+      bannerComponent.unmount();
     });
 
     it('there should be a code', async () => {
