@@ -112,7 +112,8 @@
       <alex-custom-chip text="blue" :status="'blue'" />
       <alex-custom-chip text="dark" :status="'dark'" />
       <alex-custom-chip text="error" :status="'error'" />
-      <alex-custom-chip text="filled" :status="'filled'" />
+      <alex-custom-chip text="primary" :status="'primary'" />
+      <alex-custom-chip text="primary" :status="'secondary'" />
       <alex-custom-chip text="grey" :status="'grey'" />
       <alex-custom-chip text="success" :status="'success'" />
       <alex-custom-chip text="warning" :status="'warning'" />
@@ -143,7 +144,8 @@
       <alex-custom-chip text="blue" :status="'blue'" clickable />
       <alex-custom-chip text="dark" :status="'dark'" clickable />
       <alex-custom-chip text="error" :status="'error'" clickable />
-      <alex-custom-chip text="filled" :status="'filled'" clickable />
+      <alex-custom-chip text="primary" :status="'primary'" clickable />
+      <alex-custom-chip text="secondary" :status="'secondary'" clickable />
       <alex-custom-chip text="grey" :status="'grey'" clickable />
       <alex-custom-chip text="success" :status="'success'" clickable />
       <alex-custom-chip text="warning" :status="'warning'" clickable />
@@ -179,7 +181,8 @@
         <alex-custom-chip icon="mdi-book" :status="'blue'" />
         <alex-custom-chip icon="mdi-map" :status="'dark'" />
         <alex-custom-chip icon="mdi-book-outline" :status="'error'" />
-        <alex-custom-chip icon="mdi-book" :status="'filled'" />
+        <alex-custom-chip icon="mdi-account-outline" :status="'secondary'" />
+        <alex-custom-chip icon="mdi-book" :status="'primary'" />
         <alex-custom-chip icon="mdi-pencil" :status="'grey'" />
         <alex-custom-chip icon="mdi-box" :status="'success'" />
         <alex-custom-chip icon="mdi-close" :color="'#001A33'" />
@@ -235,7 +238,12 @@
         <alex-custom-chip
           text="mdi-account"
           prepend-icon="mdi-account"
-          :status="'filled'"
+          :status="'primary'"
+        />
+        <alex-custom-chip
+          text="mdi-account"
+          prepend-icon="mdi-account"
+          :status="'secondary'"
         />
         <alex-custom-chip
           text="mdi-pencil"
@@ -469,7 +477,7 @@ const propsDocumentation = [
 
   {
     name: 'status',
-    type: " 'warning' | 'success' | 'error' | 'blue' | 'grey' | 'dark' | 'filled'",
+    type: " 'warning' | 'success' | 'error' | 'blue' | 'grey' | 'dark' | 'secondary' | 'primary'",
 
     default: 'undefined',
     description:

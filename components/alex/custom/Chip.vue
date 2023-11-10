@@ -9,7 +9,9 @@
     :prepend-icon="prependIcon"
     :variant="
       status
-        ? ['outlined', 'elevated', 'text', 'plain'].includes(variant ?? '')
+        ? ['outlined', 'elevated', 'text', 'plain', 'filled'].includes(
+            variant ?? '',
+          )
           ? variant
           : 'outlined'
         : variant
@@ -25,13 +27,12 @@
     :style="[
       clickable ? 'cursor: pointer' : '',
       icon ? 'gap: 0px !important' : '',
-      
     ]"
     style="width: min-content"
     data-testid="chip"
   >
     <div v-if="icon" style="display: inline-flex" data-testid="icon">
-      <v-icon :size="['x-small', 'small'].includes(size) ? 'medium' : '20'" >{{
+      <v-icon :size="['x-small', 'small'].includes(size) ? 'medium' : '20'">{{
         icon
       }}</v-icon>
     </div>
@@ -82,7 +83,14 @@ const props = defineProps({
   },
   status: {
     type: String as PropType<
-      'warning' | 'success' | 'error' | 'blue' | 'grey' | 'dark' | 'filled'
+      | 'warning'
+      | 'success'
+      | 'error'
+      | 'blue'
+      | 'grey'
+      | 'dark'
+      | 'primary'
+      | 'secondary'
     >,
   },
   color: {
@@ -145,13 +153,49 @@ const chip = ref(false);
   color: #ffffff;
 }
 
-.filled {
+.primary {
   background-color: #d1f6fa;
   color: #008a99;
   border: 1px solid #008a99;
 
+  .disabled {
+    border: 1px solid #b9bfc6 !important;
+    background-color: #ebedef !important;
+  }
   &:hover {
     color: #005c66;
+  }
+
+  &:active {
+    background-color: #00b7cc;
+    color: #fff;
+    &:hover {
+      background-color: #47d9eb;
+      border: 1px solid #00b7cc;
+    }
+  }
+}
+
+.secondary {
+  background-color: #f1f5f9;
+  color: #6e7a87;
+  border: 1px solid #a0a8b1;
+
+  .disabled {
+    border: 1px solid #b9bfc6 !important;
+    background-color: #ebedef !important;
+  }
+  &:hover {
+    color: #005c66;
+    background-color: #ebedef;
+  }
+
+  &:active {
+    background-color: #30363b;
+    color: #fff;
+    &:hover {
+      background-color: #6e7a87;
+    }
   }
 }
 
@@ -169,7 +213,6 @@ const chip = ref(false);
   font-style: normal;
   font-weight: 400;
   letter-spacing: 0.32px;
- 
 
   overflow: hidden;
 }
