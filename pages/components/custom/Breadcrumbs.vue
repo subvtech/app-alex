@@ -71,8 +71,8 @@
         <alex-custom-breadcrumbs
           title="John Doe"
           :items="[
-            { disabled: false, text: 'text', href: '/' },
-            { disabled: false, text: 'fext2', href: '/dsd' },
+            { disabled: false, title: 'text', href: '/' },
+            { disabled: false, title: 'fext2', href: '/dsd' },
           ]"
         />
       </div>
@@ -107,8 +107,8 @@
           title="John Doe"
           background-color="#abb2b9"
           :items="[
-            { disabled: false, text: 'text', href: '/' },
-            { disabled: false, text: 'fext2', href: '/dsd' },
+            { disabled: false, title: 'text', href: '/' },
+            { disabled: false, title: 'fext2', href: '/dsd' },
           ]"
         />
       </div>
@@ -141,9 +141,9 @@
           title-style="color: red"
           item-style="font-size: 18px; !important"
           :items="[
-            { disabled: true, text: 'text', href: '/' },
-            { disabled: false, text: 'fext2', href: '/dsd' },
-            { disabled: true, text: 'text', href: '/' },
+            { disabled: true, title: 'text', href: '/' },
+            { disabled: false, title: 'fext2', href: '/dsd' },
+            { disabled: true, title: 'text', href: '/' },
           ]"
         />
         <div class="px-3" style="position: relative">
@@ -215,15 +215,15 @@ const examples = [
   `<alex-custom-breadcrumbs
     title="John Doe"
     :items="[
-          { disabled: false, text: 'text', href: '/' },
-          { disabled: false, text: 'fext2', href: '/dsd' },
+          { disabled: false, title: 'text', href: '/' },
+          { disabled: false, title: 'fext2', href: '/dsd' },
         ]",
     />`,
   `<alex-custom-breadcrumbs
     :arrow-back="false"
     :items="[
-      { disabled: false, text: 'text', href: '/' },
-      { disabled: false, text: 'text2', href: '/' },
+      { disabled: false, title: 'text', href: '/' },
+      { disabled: false, title: 'text2', href: '/' },
     ]"
     />
      `,
@@ -231,8 +231,8 @@ const examples = [
       title="John Doe"
       background-color="#abb2b9"
       :items="[
-        { disabled: false, text: 'text', href: '/' },
-        { disabled: false, text: 'fext2', href: '/dsd' },
+        { disabled: false, title: 'text', href: '/' },
+        { disabled: false, title: 'fext2', href: '/dsd' },
       ]"
     /> `,
   `<alex-custom-breadcrumbs
@@ -242,9 +242,9 @@ const examples = [
       title-style="color: red"
       item-style="font-size: 18px; !important"
       :items="[
-        { disabled: true, text: 'text', href: '/' },
-        { disabled: false, text: 'fext2', href: '/dsd' },
-        { disabled: true, text: 'text', href: '/' },
+        { disabled: true, title: 'text', href: '/' },
+        { disabled: false, title: 'fext2', href: '/dsd' },
+        { disabled: true, title: 'text', href: '/' },
       ]"
     />`,
 ];
@@ -252,7 +252,7 @@ const examples = [
 const propsDocumentation = [
   {
     name: 'items',
-    type: '{ text: string; disabled: boolean; href: string }[]',
+    type: '{ title: string; disabled: boolean; href: string }[]',
     default: '[]',
     description: 'O array de items a ser exibido.',
   },

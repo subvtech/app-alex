@@ -33,7 +33,7 @@
           :style="[item.disabled ? '' : 'cursor: pointer', itemStyle ?? '']"
           :role="item.disabled ? 'breadcrumb-item-disabled' : 'breadcrumb-item'"
         >
-          {{ item.text }}
+          {{ item.title }}
         </v-breadcrumbs-item>
       </template>
     </v-breadcrumbs>
@@ -44,7 +44,7 @@
 const props = defineProps({
   items: {
     type: Array as PropType<
-      { text: string; disabled: boolean; href: string }[]
+      { title: string; disabled: boolean; href: string }[]
     >,
     default: [],
   },

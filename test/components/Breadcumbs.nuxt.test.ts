@@ -11,8 +11,8 @@ describe('Breadcrumbs', async () => {
         title: 'Jojo',
 
         items: [
-          { disabled: false, text: 'text', href: '/' },
-          { disabled: false, text: 'fext2', href: '/dsd' },
+          { disabled: false, title: 'text', href: '/' },
+          { disabled: false, title: 'fext2', href: '/dsd' },
         ],
       },
       global: {
@@ -30,8 +30,8 @@ describe('Breadcrumbs', async () => {
         title: 'Jojo',
         arrowBack: false,
         items: [
-          { disabled: false, text: 'text', href: '/' },
-          { disabled: false, text: 'fext2', href: '/dsd' },
+          { disabled: false, title: 'text', href: '/' },
+          { disabled: false, title: 'fext2', href: '/dsd' },
         ],
       },
       global: {
@@ -47,7 +47,7 @@ describe('Breadcrumbs', async () => {
     const { unmount } = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
-        items: [{ disabled: false, text: 'text', href: '/' }],
+        items: [{ disabled: false, title: 'text', href: '/' }],
       },
       global: {
         plugins: [vuetify],
@@ -63,7 +63,7 @@ describe('Breadcrumbs', async () => {
     const { unmount } = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
-        items: [{ disabled: false, text: 'text', href: '/' }],
+        items: [{ disabled: false, title: 'text', href: '/' }],
       },
       global: {
         plugins: [vuetify],
@@ -82,7 +82,7 @@ describe('Breadcrumbs', async () => {
     const { unmount } = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
-        items: [{ disabled: false, text: 'text', href: '/' }],
+        items: [{ disabled: false, title: 'text', href: '/' }],
       },
       global: {
         plugins: [vuetify],
@@ -101,8 +101,8 @@ describe('Breadcrumbs', async () => {
       attrs: {
         title: 'Jojo',
         items: [
-          { disabled: true, text: 'text', href: '/' },
-          { disabled: false, text: 'text2', href: '/' },
+          { disabled: true, title: 'text', href: '/' },
+          { disabled: false, title: 'text2', href: '/' },
         ],
       },
       global: {
