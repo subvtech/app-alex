@@ -37,7 +37,7 @@
       </div>
       <div
         v-else-if="showIcon"
-        @click="emit('toogle:isEditing')"
+        @click="emit('toggle:isEditing')"
         style="cursor: pointer"
       >
         <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
@@ -80,15 +80,15 @@ const props = defineProps({
 });
 
 const { title, cancel, isEditing, save } = toRefs(props);
-const emit = defineEmits(['toogle:isEditing']);
+const emit = defineEmits(['toggle:isEditing']);
 
 const savedAction = async () => {
-  emit('toogle:isEditing');
+  emit('toggle:isEditing');
   save.value();
 };
 
 const cancelledAction = async () => {
-  emit('toogle:isEditing');
+  emit('toggle:isEditing');
   cancel.value();
 };
 </script>

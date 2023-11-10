@@ -1,24 +1,36 @@
 <template>
-  <v-avatar v-if="user.avatar && user.avatar.url">
-    <img :src="user.avatar.url" :alt="user.fullname" />
+  <v-avatar v-if="avatarUrl">
+    <NuxtImg class="img" provider="strapi" :src="avatarUrl" placeholder />
   </v-avatar>
   <v-avatar v-else color="accent">
     <span class="text-white text-h5">{{ userInitials }}</span>
   </v-avatar>
 </template>
 <script setup lang="ts">
-import { User } from '@/models/user.model';
-const { fetchUser } = useStrapiAuth();
-const user = await fetchUser();
-
 const props = defineProps({
-  user: {
-    type: Object as PropType<User>,
+  avatarUrl: {
+    type: String,
+    required: true,
+  },
+  fullname: {
+    type: String,
     required: true,
   },
 });
 
 const userInitials = computed(() => {
-  return getFullnameInitials(props.user.fullname);
+  return getFullnameInitials(props.fullname);
 });
 </script>
+
+<style scoped lang="scss">
+.v-avatar {
+  border: 1px solid #a0a8b1;
+}
+.img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  max-width: 100%;
+  max-height: 100%;
+}
+</style>

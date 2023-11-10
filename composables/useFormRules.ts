@@ -182,10 +182,10 @@ export const useFormRules = (formData?: FormDataType) => {
     socialsSchema,
     nameRules: yup
       .string()
-      .required(i18n.t('rules.name.required'))
       .min(3, i18n.t('rules.name.min'))
       .max(20, i18n.t('rules.name.max'))
       .matches(/^((?!instagram\b)(?!linkedin\b)(?!youtube\b).)*/)
+      .required(i18n.t('rules.name.required'))
       .trim(),
     urlRules: yup
       .string()

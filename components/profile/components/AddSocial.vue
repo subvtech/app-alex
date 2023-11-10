@@ -15,7 +15,7 @@
 
     <div class="pt-6 pb-1">
       <div class="d-flex flex-column px-6" style="gap: 8px">
-        <span>Qual o rede deseja adicionar?</span>
+        <span>{{ $t('components.profile.socials.addSocial') }}</span>
 
         <v-select
           label=""
@@ -44,7 +44,6 @@
               style="
                 color: #6e7a87;
                 /* Body/P4 */
-                font-family: Sen;
                 font-size: 14px;
                 font-style: normal;
                 font-weight: 700;
@@ -66,13 +65,9 @@
             </v-list-item> </template
         ></v-select>
       </div>
-      <div
-        v-if="selectedSocial"
-        class="form d-flex align-center px-6"
-        style=""
-      >
+      <div v-if="selectedSocial" class="form d-flex align-center px-6" style="">
         <div class="d-flex flex-column w-100" style="gap: 8px">
-          <span>Qual o endereço do site?</span>
+          <span>{{ $t('components.profile.socials.editSocialUrl') }}</span>
 
           <v-text-field
             v-model="value"
@@ -84,11 +79,11 @@
         </div>
 
         <div
-          v-if="selectedSocial === 'Outra rede'"
+          v-if="selectedSocial === $t('components.profile.socials.otherSocial')"
           class="d-flex flex-column w-100"
           style="gap: 8px"
         >
-          <span>Qual o nome do site?</span>
+          <span>{{ $t('components.profile.socials.editSocialName') }}</span>
 
           <v-text-field
             v-model="value2"
@@ -116,6 +111,14 @@
       <v-btn
         class="btn px-3"
         color="accent"
+        :disabled="
+          errorMessage ||
+          (selectedSocial === $t('components.profile.socials.otherSocial') &&
+            (errorMessage2 || value2 === '')) ||
+          value === ''
+            ? true
+            : false
+        "
         @click="emit('save:addSocial', { selectedSocial, value, value2 })"
         type="submit"
       >
@@ -182,7 +185,7 @@ const { value: value2, errorMessage: errorMessage2 } = useField(
 @media (max-width: 1350px) {
   #Card {
     .form {
-        flex-direction: column;
+      flex-direction: column;
     }
   }
 }

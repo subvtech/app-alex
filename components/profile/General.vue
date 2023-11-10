@@ -3,7 +3,7 @@
     :title="$t('components.profile.general.title')"
     :isEditing="false"
     :showIcon="false"
-    @toogle:isEditing="isEditing = !isEditing"
+    @toggle:isEditing="isEditing = !isEditing"
   >
     <template v-slot:content>
       <div class="boxes d-flex justify-center w-100 pb-6">
@@ -60,8 +60,6 @@
 <script setup lang="ts">
 import { Mask } from 'maska';
 
-const { updateImage } = useUploadedImage();
-
 const props = defineProps({
   id: {
     type: Number,
@@ -73,7 +71,6 @@ const props = defineProps({
   },
   telephone: {
     type: String,
-    required: true,
   },
   learningPlans: {
     type: Array,
