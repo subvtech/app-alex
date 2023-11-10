@@ -18,7 +18,7 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/tabs/"
+          href="https://vuetifyjs.com/en/api/v-app-bar/#links"
           target="_blank"
           >vuetifyjs.com</a
         >
@@ -31,11 +31,15 @@
     </p>
     <div class="pa-4">
       <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, passado nenhuma propriedade ele exibe o
-        esqueleto com um icone de usuário vazio, e nenhum dos botões funcionam
+        Esse é o modelo mais simples, passado nenhuma propriedade, é necessário
+        passar a prop <strong>not-fixed</strong>ele exibe o esqueleto com um
+        icone de usuário vazio, e nenhum dos botões funcionam
       </p>
     </div>
     <div class="w-100 d-flex">
+      <v-container>
+        <v-row align="center"><alex-custom-horizontalBar not-fixed /></v-row
+      ></v-container>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
         <v-btn
@@ -62,6 +66,28 @@
     </p>
 
     <div class="w-100">
+      <v-container>
+        <v-row align="center"
+          ><alex-custom-horizontal-bar
+            :toggle-drawer="() => {}"
+            :menu-items="[
+              {
+                title: 'profile',
+                to: '/',
+                logout: false,
+              },
+              {
+                title: 'settings',
+                to: '/user/settings',
+                logout: false,
+              },
+              { title: 'logout', logout: true },
+            ]"
+            not-fixed
+            :reverse="false"
+            :user="user"
+          /> </v-row
+      ></v-container>
       <prism>{{ examples[1] }}</prism>
       <v-btn
         class="copy-icon"
@@ -85,6 +111,20 @@
 
     <div class="w-100">
       <div class="px-3" style="position: relative">
+        <v-container>
+          <v-row align="center"
+            ><alex-custom-horizontalBar
+              :toggle-drawer="
+                () => {
+                  drawer = !drawer;
+                }
+              "
+              :menu-items="menuItems"
+              reverse
+              not-fixed
+              :user="user"
+            /> </v-row
+        ></v-container>
         <prism>{{ examples[2] }}</prism>
         <v-btn
           class="copy-icon"
@@ -109,7 +149,17 @@
     </p>
 
     <div class="w-100">
-      <div class="px-3" style="position: relative">
+      <div class="px-3">
+        <v-container>
+          <v-row align="center"
+            ><alex-custom-horizontalBar
+              :toggle-drawer="() => (drawer = !drawer)"
+              is-chat-active
+              is-bell-active
+              not-fixed
+              :menu-items="menuItems"
+            /> </v-row
+        ></v-container>
         <prism>{{ examples[3] }}</prism>
         <v-btn
           class="copy-icon"
@@ -131,7 +181,25 @@
     <h2 class="text-h2 text-gray-800">Uso Completo</h2>
     <div class="px-4 py-2 w-100 d-flex">
       <div class="w-100 bg-gray-100">
-        <div class="px-3" style="position: relative">
+        <div class="px-3">
+          <v-container>
+            <v-row align="center"
+              ><alex-custom-horizontalBar
+                :toggle-drawer="() => (drawer = !drawer)"
+                reverse
+                not-fixed
+                :user="user"
+                :is-chat-active="isChatActive"
+                :is-bell-active="isBellActive"
+                @alert="isBellActive = !isBellActive"
+                @chat="isChatActive = !isChatActive"
+                :menu-items="[
+                  { title: 'title1', to: '/', logout: false },
+                  { title: 'title2', to: '/', logout: false },
+                  { title: 'title3', to: '/', logout: false },
+                ]"
+              /> </v-row
+          ></v-container>
           <prism>{{ examples[4] }}</prism>
           <v-btn
             class="copy-icon"
@@ -212,37 +280,58 @@ import Prism from 'vue-prism-component';
 definePageMeta({
   middleware: 'auth',
 });
-
+const user: User = {
+  fullname: 'John Doe',
+  avatar: {
+    url: '',
+    id: 2,
+  },
+};
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
+const drawer = ref(false);
+const isChatActive = ref(false);
+const isBellActive = ref(false);
+
+const menuItems = [
+  {
+    title: 'profile',
+    to: '/',
+    logout: false,
+  },
+  {
+    title: 'settings',
+    to: '/user/settings',
+    logout: false,
+  },
+  { title: 'logout', logout: true },
+];
 const examples = [
-  `<alex-custom-horizontalBar />`,
-  ` <alex-custom-horizontal-bar
-      :toggle-drawer="() => (drawer = !drawer)"
-      :menu-items="profileMenuItems"
-      :reverse="false"
-      :user="user"
-    />
-    const profileMenuItems = [
-      {
-        title: i18n.t('layouts.default.profile'),
-        to: '/',
-        logout: false,
-      },
-      {
-        title: i18n.t('layouts.default.settings'),
-        to: '/user/settings',
-        logout: false,
-      },
-      {
-        title: i18n.t('layouts.default.logout'),
-        logout: true,
-      }
-    ]`,
+  `<alex-custom-horizontalBar not-fixed/>`,
+  `<alex-custom-horizontal-bar
+            :toggle-drawer="() => {}"
+            :menu-items="[
+              {
+                title: 'profile',
+                to: '/',
+                logout: false,
+              },
+              {
+                title: 'settings',
+                to: '/user/settings',
+                logout: false,
+              },
+              { title: 'logout', logout: true },
+            ]"
+            not-fixed
+            :reverse="false"
+            :user="user"
+          />`,
   `<alex-custom-horizontalBar
       :toggle-drawer="() => (drawer = !drawer)"
       :menu-items="profileMenuItems"
       reverse
+      not-fixed
       :user="user"
     />
      `,
@@ -250,24 +339,26 @@ const examples = [
       :toggle-drawer="() => (drawer = !drawer)"
       is-chat-active
       is-bell-active
+      not-fixed
       :menu-items="[
-        { title: 'title1'; to?: '/'; logout: false },
-        { title: 'title2'; to?: '/'; logout: false },
-        { title: 'title3'; to?: '/'; logout: false },
+        { title: 'title1', to: '/', logout: false },
+        { title: 'title2', to: '/', logout: false },
+        { title: 'title3', to: '/', logout: false },
       ]"
     /> `,
   `<alex-custom-horizontalBar
       :toggle-drawer="() => (drawer = !drawer)"
       reverse
+      not-fixed
       :user="user"
       :is-chat-active="isChatActive"
       :is-bell-active="isBellActive"
-      :@alert="isBellActive = !isBellActive"
-      :@chat="isChatActive = !isChatActive"
+      @alert="isBellActive = !isBellActive"
+      @chat="isChatActive = !isChatActive"
       :menu-items="[
-        { title: 'title1'; to?: '/'; logout: false },
-        { title: 'title2'; to?: '/'; logout: false },
-        { title: 'title3'; to?: '/'; logout: false },
+        { title: 'title1', to: '/', logout: false },
+        { title: 'title2', to: '/', logout: false },
+        { title: 'title3', to: '/', logout: false },
       ]"
     />`,
 ];
@@ -275,7 +366,7 @@ const examples = [
 const propsDocumentation = [
   {
     name: 'menu-items',
-    type: '{ title: string; to?: string; logout: boolean }[]',
+    type: '{ title: string; to: string; logout: boolean }[]',
     default: '[]',
     description: 'O array de items a ser exibido no dropdown-menu.',
   },
@@ -305,6 +396,14 @@ const propsDocumentation = [
     type: 'Boolean',
     default: 'false',
     description: 'Define se o icon chat-active é exibido',
+  },
+
+  {
+    name: 'notFixed',
+    type: 'Boolean',
+    default: 'false',
+    description:
+      'Define se o icon horizontal-bar é exibido fixo no topo da tela ou se é restrito ao parent',
   },
   {
     name: 'reverse',

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="white" class="px-4" data-testid="horizontal-bar">
+  <v-app-bar app color="white" class="px-4" :class="[notFixed ? 'not-fixed' : '']" data-testid="horizontal-bar">
     <div
       class="d-flex w-100 align-center"
       :class="reverse ? 'flex-row-reverse' : ''"
@@ -57,7 +57,7 @@
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <app-user-avatar :fullname="''" class="mr-2" />
+              <app-user-avatar :avatar-url="''" :fullname="''" class="mr-2" />
               <span class="fullname mr-1" style="cursor: pointer"> user </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
@@ -80,18 +80,21 @@
   </v-app-bar>
 </template>
 <script setup lang="ts">
-import { User } from '../../models/user.model';
+import { User } from '../../../models/user.model';
 
 const { logout } = useStrapiAuth();
 const emit = defineEmits(['alert', 'chat']);
-
-const i18n = useI18n();
 
 const router = useRouter();
 
 const props = defineProps({
   user: {
     type: Object as PropType<User>,
+  },
+
+  notFixed: {
+    type: Boolean,
+    default: false,
   },
 
   menuItems: {
@@ -201,5 +204,11 @@ body {
       }
     }
   }
+}
+
+.not-fixed {
+  position: static !important;
+  top: unset !important;
+  transform: none !important;
 }
 </style>
