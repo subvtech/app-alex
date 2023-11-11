@@ -32,77 +32,21 @@
                 <img v-else src="/images/alex.svg" height="28" width="84" />
               </NuxtLink>
             </div>
-          </div>
-        </template>
-      </alex-custom-drawable>
-    </div>
-
-    <v-app-bar :clipped-left="clipped" fixed app color="white">
-      <v-app-bar-nav-icon
-        @click.stop="
-          () => {
-            isPermanent = false;
-            clipped = false;
-            drawer = !drawer;
-          }
-        "
-        class="smaller text-gray-900"
-      />
-      <v-app-bar-nav-icon
-        @click.stop="
-          () => {
-            drawer = true;
-            isPermanent = true;
-            clipped = !clipped;
-          }
-        "
-        class="larger text-gray-900"
-      />
-      <div
-        v-if="!drawer"
-        class="primary pl-2 pt-1 rounded-pill"
-        style="height: 42px; width: 115px"
-      ></div>
-      <v-spacer />
-      <v-btn icon color="grey">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <v-btn icon color="grey">
-        <v-icon>mdi-chat-processing-outline</v-icon>
-      </v-btn>
-      <v-btn icon color="grey" class="mr-2">
-        <v-icon>mdi-bell-outline</v-icon>
-      </v-btn>
-
-      <v-menu offset-y nudge-bottom="10">
-        <template #activator="{ props }">
-          <v-hover v-slot="{ isHovering }">
-            <div
-              v-bind="props"
-              style="cursor: pointer"
-              class="user-block"
-              :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
-            >
-              <app-user-avatar :user="user" class="mr-2" />
-              <span class="fullname">
-                {{ user?.fullname }}
-              </span>
-
-              <v-icon class="fullname"> mdi-chevron-down </v-icon>
-            </div>
-          </v-hover>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="(item, index) in profileMenuItems"
-            :key="`profile-menu-item-${index}`"
-            @click="onMenuClick(item.to, item.logout)"
-          >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
-    </v-app-bar>
+      </div>
+    </v-navigation-drawer>
+    <alex-custom-horizontal-bar
+      :drawer="true"
+      fixed
+      :is-bell-active="false"
+      :is-chat-active="false"
+      :toggle-drawer="() => (drawer = !drawer)"
+      :menu-items="profileMenuItems"
+      :reverse="false"
+      :user="user"
+    />
+
     <v-main class="secondary bg-gray-blue">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
@@ -112,31 +56,10 @@
 </template>
 
 <script setup lang="ts">
-import { User } from '../models/user.model';
-
 const i18n = useI18n();
-const clipped = ref(true);
-const drawer = ref(false);
-const { logout } = useStrapiAuth();
-const router = useRouter();
+const clipped = ref(false);
+const drawer = ref(true);
 const user = useStrapiUser<User>();
-
-const isPermanent = ref(false);
-
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
 
 const menus = [
   {
@@ -207,19 +130,24 @@ const menus = [
     ],
   },
 ];
+const profileMenuItems = [
+  {
+    title: i18n.t('layouts.default.profile'),
+    to: `/user/${user?.username}`,
+    logout: false,
+  },
+  {
+    title: i18n.t('layouts.default.settings'),
+    to: '/user/settings',
+    logout: false,
+  },
+  {
+    title: i18n.t('layouts.default.logout'),
+    logout: true,
+  },
+];
 
-function onMenuClick(route = '', logout = false) {
-  if (logout) {
-    logoutUser();
-  } else {
-    router.push({ path: route });
-  }
-}
-
-function logoutUser() {
-  logout();
-  router.push('/login');
-}
+const miniVariant = ref(false);
 </script>
 
 <style scoped lang="scss">

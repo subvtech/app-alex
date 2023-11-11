@@ -58,16 +58,16 @@ const { create, update, delete: _delete } = useStrapi();
 const props = defineProps({
   info: {
     type: Array as PropType<OutputBlockData<string, any>[]>,
-    required: true,
+    default: [],
   },
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
   canEdit: { type: Boolean, required: true },
 });
 
-const { info, canEdit, id } = toRefs(props);
+const { info, canEdit } = toRefs(props);
 const isEditing = ref(false);
 const cancel = () => {};
 const emit = defineEmits(['ready', 'update:user']);
@@ -135,7 +135,7 @@ const updateAbout = async () => {
           update(`user-descriptions/${item.id}`, {
             data: instanceData.blocks[index].data,
             type: instanceData.blocks[index].type,
-            users_permissions_user: id.value,
+            users_permissions_user: props.userId,
             order: index,
           }),
         );
@@ -146,7 +146,7 @@ const updateAbout = async () => {
       create('user-descriptions', {
         data: item.data,
         type: item.type,
-        users_permissions_user: id.value,
+        users_permissions_user: props.userId,
         order: info.value.length + index,
       }),
     );
