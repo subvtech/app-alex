@@ -61,7 +61,7 @@
 import { Mask } from 'maska';
 
 const props = defineProps({
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
