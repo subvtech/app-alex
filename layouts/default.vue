@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="user">
+  <v-app v-if="user" >
     <AppSnackbar />
     <div
       @click.stop="
@@ -45,7 +45,7 @@
       :user="user"
     />
 
-    <v-main class="secondary bg-gray-blue">
+    <v-main class="secondary bg-gray-blue pt-16">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>

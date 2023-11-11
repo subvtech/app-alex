@@ -174,7 +174,7 @@
           :startDate="'2022-01-01'"
           :endDate="'2023-01-01'"
           :username="'johndoe'"
-          :selectedOption="0"
+          :selectedOption="selectedOption1"
           :links="['Link 1', 'Link 2', 'Link 3']"
           :isProfessor="false"
           :canEdit="true"
@@ -242,9 +242,9 @@
           :startDate="'2022-01-01'"
           :endDate="'2023-01-01'"
           :username="'johndoe'"
-          :selectedOption="0"
+          :selectedOption="selectedOption2"
           show-role
-          :links="['Link 1', 'Link 2', 'Link 3']"
+          :links="['Link 1', 'Link 2', 'Link 3', 'Link 4']"
           :isProfessor="false"
           :canEdit="true"
           :canDelete="false"
@@ -395,9 +395,12 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const customColor = ref('accent');
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
+
+const selectedOption1 = ref(0)
+const selectedOption2 = ref(0)
+
 const examples = [
   '<alex-custom-banner />',
   `<alex-custom-banner
@@ -450,46 +453,46 @@ const examples = [
     />`,
 
   `  <alex-custom-banner
-          :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
-          :imgFromStrapi="false"
-          :showProfilePicture="true"
-          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
-          :profilePictureSize="500"
-          :darkerBackground="false"
-          :titleAbove="false"
-          :distribution="'fullname-username-role'"
-          :code="'ABC123'"
-          :fullnameStyle="'font-weight-bold'"
-          :codeStyle="'color: red;'"
-          :roleStyle="'font-style: italic;'"
-          :usernameStyle="'color: blue;'"
-          :startDateStyle="'font-size: 12px;'"
-          :endDateStyle="'font-size: 12px;'"
-          :titleStyle="'font-size: 16px;'"
-          :avatarStyle="'border: 1px solid #ccc;'"
-          :showBorder="false"
-           float-beneath
-          :settingsMenu="false"
-          :dateToTheLeft="false"
-          :showShade="false"
-          :updateProfilePicture="false"
-          :title="'Software Engineer'"
-          :showMenu="true"
-          settings-icon="mdi-cog"
-          :userId="123"
-          :fullname="'John Doe'"
-          :startDate="'2022-01-01'"
-          :endDate="'2023-01-01'"
-          :username="'johndoe'"
-          :selectedOption="0"
-          show-role
-          :links="['Link 1', 'Link 2', 'Link 3']"
-          :isProfessor="false"
-          :canEdit="true"
-          :canDelete="false"
-          @select:option="() => {}"
-          @display:settings="() => {}"
-        />`,
+        :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
+        :imgFromStrapi="false"
+        :showProfilePicture="true"
+        :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
+        :profilePictureSize="500"
+        :darkerBackground="false"
+        :titleAbove="false"
+        :distribution="'fullname-username-role'"
+        :code="'ABC123'"
+        :fullnameStyle="'font-weight-bold'"
+        :codeStyle="'color: red;'"
+        :roleStyle="'font-style: italic;'"
+        :usernameStyle="'color: blue;'"
+        :startDateStyle="'font-size: 12px;'"
+        :endDateStyle="'font-size: 12px;'"
+        :titleStyle="'font-size: 16px;'"
+        :avatarStyle="'border: 1px solid #ccc;'"
+        :showBorder="false"
+          float-beneath
+        :settingsMenu="false"
+        :dateToTheLeft="false"
+        :showShade="false"
+        :updateProfilePicture="false"
+        :title="'Software Engineer'"
+        :showMenu="true"
+        settings-icon="mdi-cog"
+        :userId="123"
+        :fullname="'John Doe'"
+        :startDate="'2022-01-01'"
+        :endDate="'2023-01-01'"
+        :username="'johndoe'"
+        :selectedOption="0"
+        show-role
+        :links="['Link 1', 'Link 2', 'Link 3', 'Link 4']"
+        :isProfessor="false"
+        :canEdit="true"
+        :canDelete="false"
+        @select:option="() => {}"
+        @display:settings="() => {}"
+      />`,
 ];
 
 const propsDocumentation = [
