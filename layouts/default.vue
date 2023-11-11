@@ -45,63 +45,17 @@
         </v-list>
       </div>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="clipped" fixed app color="white">
-      <v-app-bar-nav-icon
-        @click.stop="drawer = !drawer"
-        class="text-gray-900"
-      />
-      <div
-        v-if="!drawer"
-        class="primary pl-2 pt-1 rounded-pill"
-        style="height: 42px; width: 115px"
-      ></div>
-      <v-spacer />
-      <v-btn icon color="grey">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <v-btn icon color="grey">
-        <v-icon>mdi-chat-processing-outline</v-icon>
-      </v-btn>
-      <v-btn icon color="grey" class="mr-2">
-        <v-icon>mdi-bell-outline</v-icon>
-      </v-btn>
+    <alex-custom-horizontal-bar
+      :drawer="true"
+      fixed
+      :is-bell-active="false"
+      :is-chat-active="false"
+      :toggle-drawer="() => (drawer = !drawer)"
+      :menu-items="profileMenuItems"
+      :reverse="false"
+      :user="user"
+    />
 
-      <v-menu offset-y nudge-bottom="10">
-        <template #activator="{ props }">
-          <v-hover v-slot="{ isHovering }">
-            <div
-              v-bind="props"
-              style="cursor: pointer"
-              class="user-block d-flex align-center"
-              :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
-            >
-              <app-user-avatar
-                :user-id="user.id"
-                :size="40"
-                :placeholder="user.fullname"
-                :profile-picture="profilePicture"
-                class="mr-2"
-                :key="myKey"
-              />
-              <span class="fullname">
-                {{ user?.fullname }}
-              </span>
-
-              <v-icon class="fullname"> mdi-chevron-down </v-icon>
-            </div>
-          </v-hover>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="(item, index) in profileMenuItems"
-            :key="`profile-menu-item-${index}`"
-            @click="onMenuClick(item.to, item.logout)"
-          >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
     <v-main class="secondary bg-gray-blue">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
@@ -111,34 +65,10 @@
 </template>
 
 <script setup lang="ts">
-import { User } from '../models/user.model';
-const userStore = useUserStore();
 const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
-const { logout } = useStrapiAuth();
-const router = useRouter();
 const user = useStrapiUser<User>();
-const myKey = ref(0);
-const { profilePicture } = storeToRefs(userStore);
-onBeforeMount(() => {
-  if(user.value)
-  userStore.profilePicture = user.value.avatar;
-});
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: user.value ? `/user/${user.value.username}` : '/',
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
 
 const menus = [
   {
@@ -207,23 +137,24 @@ const menus = [
     ],
   },
 ];
+const profileMenuItems = [
+  {
+    title: i18n.t('layouts.default.profile'),
+    to: `/user/${user?.username}`,
+    logout: false,
+  },
+  {
+    title: i18n.t('layouts.default.settings'),
+    to: '/user/settings',
+    logout: false,
+  },
+  {
+    title: i18n.t('layouts.default.logout'),
+    logout: true,
+  },
+];
 
 const miniVariant = ref(false);
-function onMenuClick(route = '', logout = false) {
-  if (logout) {
-    logoutUser();
-  } else {
-    router.push({ path: route });
-  }
-}
-
-function logoutUser() {
-  logout();
-  router.push('/login');
-}
-watch(profilePicture, () => {
-  myKey.value++;
-});
 </script>
 
 <style lang="scss">
