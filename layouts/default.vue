@@ -1,45 +1,36 @@
 <template>
   <v-app v-if="user">
     <AppSnackbar />
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      color="primary"
-      fixed
-      app
-      dark
-      class="d-flex flex-column pb-2 px-2"
+    <div
+      @click.stop="
+        (e: any) => {
+          drawer = !drawer;
+        }
+      "
     >
-      <v-row justify="center" class="my-4" style="max-height: 64px">
-        <div>
-          <NuxtLink to="/">
-            <img src="/images/alex.svg" height="32" width="96" />
-          </NuxtLink>
-        </div>
-      </v-row>
-      <div v-for="(menu, i) in menus" :key="`menu-${i}`">
-        <v-subheader :key="`menu-${i}`" class="subheader accent-text">
-          {{ menu.title }}
-        </v-subheader>
-        <v-list :key="`menu-${i}-list`">
-          <v-list-item
-            v-for="(item, j) in menu.items"
-            :key="`menu-${i}-item-${j}`"
-            :to="item.to"
-            class=""
-            router
-            exact
+      <alex-custom-drawable
+        :blocks="menus"
+        :clipped="clipped"
+        :show="drawer"
+        dark
+        :permanent="isPermanent"
+      >
+        <template v-slot:header>
+          <div
+            class="my-4 w-100 d-flex"
+            :class="clipped ? '' : 'justify-center'"
+            style="max-height: 28px"
           >
-            <div class="d-flex align-center" style="gap: 16px">
-              <v-list-item-action>
-                <v-icon color="#d2d6da">{{ item.icon }}</v-icon>
-              </v-list-item-action>
-
-              <v-list-item-title
-                class="item-name font-weight-medium"
-                v-text="item.title"
-              />
+            <div>
+              <NuxtLink to="/">
+                <img
+                  v-if="clipped"
+                  src="/images/alex-mini.svg"
+                  height="28"
+                  width="43"
+                />
+                <img v-else src="/images/alex.svg" height="28" width="84" />
+              </NuxtLink>
             </div>
           </v-list-item>
         </v-list>
@@ -72,33 +63,13 @@ const user = useStrapiUser<User>();
 
 const menus = [
   {
-    title: i18n.t('layouts.default.dashboardsTitle'),
+    title: i18n.t('layouts.default.userArea'),
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
         title: i18n.t('layouts.default.dashboard'),
         to: '/dashboard',
       },
-    ],
-  },
-  {
-    title: i18n.t('layouts.default.BrowseOnAlex'),
-    items: [
-      {
-        icon: 'mdi-book-outline',
-        title: i18n.t('layouts.default.courses'),
-        to: '/learning-plans',
-      },
-      {
-        icon: 'mdi-clipboard-text-outline',
-        title: i18n.t('layouts.default.projects'),
-        to: '/learning-plans/user',
-      },
-    ],
-  },
-  {
-    title: i18n.t('layouts.default.userArea'),
-    items: [
       {
         icon: 'mdi-book-cog-outline',
         title: i18n.t('layouts.default.myClasses'),
@@ -116,9 +87,31 @@ const menus = [
       },
     ],
   },
+
+  {
+    title: i18n.t('layouts.default.BrowseOnAlex'),
+    items: [
+      {
+        icon: 'mdi-book-outline',
+        title: i18n.t('layouts.default.courses'),
+        to: '/learning-plans',
+      },
+      {
+        icon: 'mdi-clipboard-text-outline',
+        title: i18n.t('layouts.default.projects'),
+        to: '/learning-plans/user',
+      },
+    ],
+  },
+
   {
     title: i18n.t('layouts.default.professorTitle'),
     items: [
+      {
+        icon: 'mdi-account-multiple-outline',
+        title: i18n.t('layouts.default.userList'),
+        to: '/classes',
+      },
       {
         icon: 'mdi-account-multiple-outline',
         title: i18n.t('layouts.default.userList'),
@@ -157,7 +150,7 @@ const profileMenuItems = [
 const miniVariant = ref(false);
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 html,
 body {
   overflow-y: auto;
@@ -168,30 +161,6 @@ body {
   }
 
   .v-application {
-    font-family: Sen !important;
-
-    .v-navigation-drawer__content {
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-      gap: 24px;
-      display: flex;
-      flex-direction: column;
-      &::-webkit-scrollbar {
-        display: none;
-      }
-    }
-    .subheader {
-      color: #00b7cc;
-      padding-left: 16px;
-      padding-right: 8px;
-
-      /* Body/P6 */
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 135%; /* 16.2px */
-      letter-spacing: 0.48px;
-    }
-
     .item-name {
       color: #d2d6da;
 
@@ -200,6 +169,22 @@ body {
       font-weight: 700;
       line-height: 135%; /* 18.9px */
       letter-spacing: 0.56px;
+    }
+
+    .smaller {
+      display: flex;
+    }
+    .larger {
+      display: none;
+    }
+
+    @media (min-width: 959px) {
+      .smaller {
+        display: none;
+      }
+      .larger {
+        display: flex;
+      }
     }
 
     @media (max-width: 550px) {
