@@ -6,18 +6,11 @@
       :close-on-content-click="props.options.closeOnContentClick"
       :location="props.options.location"
       :dark="props.options.isDarkMode"
-      min-width="200"
-      border-radius="8"
-      class="dropdown-menu"
       data-testid="testing-dropdown"
     >
       <template v-slot:activator="{ props }">
         <v-btn
-          style="
-            background-color: white !important;
-            box-shadow: none;
-            color: #4f4f4f !important;
-          "
+          class="dropdown-activator"
           icon="mdi-dots-vertical"
           v-bind="props"
         ></v-btn>
@@ -98,10 +91,16 @@ div {
   font-size: 14px;
 }
 
-.dropdrown-menu {
-  border-radius: 8px;
-  min-width: 200px;
-  cursor: pointer;
+.v-menu > .v-overlay__content > .v-card, .v-menu > .v-overlay__content > .v-sheet, .v-menu > .v-overlay__content > .v-list {
+  border-radius: 8px !important;
+  min-width: 200px !important;
+  cursor: pointer !important;
+}
+
+.dropdown-activator {
+  background-color: white !important;
+  box-shadow: none;
+  color: #4f4f4f !important;
 }
 .default {
   color: #6e7a87;
