@@ -94,7 +94,7 @@
                 class="img"
                 provider="strapi"
                 :src="profilePicture"
-                :alt="user.fullname"
+                placeholder
               />
 
               <v-icon v-if="canEdit" class="d-none" size="x-large" color="#fff"
@@ -333,8 +333,6 @@ const updateUser = async (show = true) => {
   if (!user.value) {
     router.push({ path: '/' });
   }
-
-  console.log({ user: user.value });
 
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
