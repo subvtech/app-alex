@@ -2,8 +2,8 @@
   <div class="avatar-block" role="avatar">
     <label
       class="avatar"
-      :class="[canEdit ? 'hover' : '']"
-      :for="canEdit ? 'file-input' : ''"
+      :class="[userIdCanEdit ? 'hover' : '']"
+      :for="userIdCanEdit ? 'file-input' : ''"
       :style="[avatarStyle ?? '', showBorder ? '' : 'border-width: 0px']"
     >
       <NuxtImg
@@ -20,7 +20,7 @@
         <span class="text-white text-h5">{{ userInitials }}</span>
       </v-avatar>
 
-      <div class="edit" v-if="canEdit" role="edit">
+      <div class="edit" v-if="userIdCanEdit" role="edit">
         <v-icon
           v-if="avatar"
           class="d-none"
@@ -43,7 +43,7 @@
     </label>
 
     <div
-      v-if="canEdit && canDelete && avatar"
+      v-if="userIdCanEdit && canDelete && avatar"
       role="delete"
       class="delete d-flex justify-center align-center"
       @click="removeProfilePicture"
@@ -59,20 +59,16 @@
           : 'xx-small',
       ]"
     >
-      <NuxtImg
-        src="/svg/trash.svg"
-        :width="small ? 20 : 14"
-        :height="small ? 20 : 14"
-        placeholder
-      />
+      <NuxtImg src="/svg/trash.svg" placeholder />
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { useProfilePicture } from '~/composables/useProfilePicture';
+
 const props = defineProps({
   userId: {
     type: Number,
-    required: true,
   },
   placeholder: {
     type: String,
@@ -112,6 +108,8 @@ const { removeProfilePicture, uploadProfilePicture } = useProfilePicture(
 const userInitials = computed(() => {
   return getFullnameInitials(props.placeholder);
 });
+
+const userIdCanEdit = computed(() => props.canEdit && props.userId);
 
 const getFullnameInitials = (fullname = '') => {
   const names = fullname.split(' ');
@@ -206,10 +204,6 @@ const xlarge = computed(() => {
 
     border-radius: 8px;
 
-    max-width: 28px;
-    max-height: 28px;
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -217,37 +211,56 @@ const xlarge = computed(() => {
     background: #e9494a;
     cursor: pointer;
 
+    bottom: 15px;
+    right: 0px;
     &.x-large {
+      width: 32px;
+      height: 32px;
       bottom: 15px;
-      right: 0px;
+      img {
+        width: 22px;
+        height: 22px;
+      }
     }
 
     &.large {
-      bottom: 10px;
-      right: -3px;
-      max-width: 24px !important;
-      max-height: 24px !important;
+      width: 28px;
+      height: 28px;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
     }
 
     &.small {
-      max-width: 22px !important;
-      max-height: 22px !important;
-      bottom: 7px;
-      right: -3px;
+      width: 24px;
+      height: 24px;
+
+      img {
+        width: 18px;
+        height: 18px;
+      }
     }
 
     &.x-small {
-      max-width: 16px !important;
-      max-height: 16px !important;
-      right: -3px;
-      bottom: 8px;
+      width: 20px;
+      height: 20px;
+
+      img {
+        width: 16px;
+        height: 16px;
+      }
     }
 
     &.xx-small {
-      max-width: 16px !important;
-      max-height: 16px !important;
-      right: -5px;
-      bottom: 0px;
+      width: 16px;
+      height: 16px;
+
+      img {
+        width: 12px;
+        height: 12px;
+      }
     }
   }
 }
@@ -263,11 +276,6 @@ const xlarge = computed(() => {
           width: 120px !important;
           height: 120px !important;
         }
-      }
-      .delete {
-        height: 24px;
-        width: 24px;
-        bottom: 15px !important;
       }
     }
   }
@@ -286,37 +294,51 @@ const xlarge = computed(() => {
       .delete {
         right: 0px;
         bottom: 5px;
-        max-width: 14px;
-        max-height: 14px;
+        &.x-large {
+          width: 28px;
+          height: 28px;
 
-        img {
-          max-width: 14px;
-          max-height: 14px;
+          img {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        &.large {
+          width: 26px;
+          height: 26px;
+          right: -2px;
+          img {
+            width: 18px;
+            height: 18px;
+          }
         }
       }
     }
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 404px) {
+ 
   .resize {
     .avatar-block {
       position: relative;
       .avatar {
         .img {
-          max-width: 70px !important;
-          max-height: 70px !important;
+          max-width: 75px !important;
+          max-height: 75px !important;
         }
       }
       .delete {
         right: 0px;
         bottom: 5px !important;
-        max-width: 14px;
-        max-height: 14px;
+
+        width: 24px !important;
+        height: 24px !important;
 
         img {
-          max-width: 12px;
-          max-height: 12px;
+          width: 16px !important;
+          height: 16px !important;
         }
       }
     }
@@ -329,8 +351,20 @@ const xlarge = computed(() => {
       position: relative;
       .avatar {
         .img {
-          max-width: 50px !important;
-          max-height: 50px !important;
+          max-width: 60px !important;
+          max-height: 60px !important;
+        }
+      }
+      .delete {
+        right: 0px;
+        bottom: 0px !important;
+
+        width: 20px !important;
+        height: 20px !important;
+
+        img {
+          width: 16px !important;
+          height: 16px !important;
         }
       }
     }

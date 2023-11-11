@@ -1,5 +1,5 @@
 <template>
-  <div id="profile" class="w-100 d-flex" v-if="user">
+  <div id="profile" class="w-100 d-flex overflow-x-hidden" v-if="user">
     <div v-if="canEdit" class="header d-flex w-100">
       <span class="title h-">{{ $t('pages.profile.title') }}</span>
     </div>

@@ -12,17 +12,20 @@
   >
     <span
       v-if="!titleAbove && title"
-      class="font-weight-bold text-h3 text-md-h2 mb-6"
+      class="title font-weight-bold text-h2 mb-4 mb-sm-6"
       :class="[
         !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
-        
+        startDateOrEndDate ? 'wrap' : '',
       ]"
-      :style="[titleStyle ?? 'color: white;', floatBeneath && (startDate || endDate) ? 'margin-top: -25px; !important' : '',]"
+      :style="[titleStyle ?? 'color: white;']"
       >{{ title }}</span
     >
     <div
       class="card d-flex flex-row justify-space-between w-100"
-      :class="[canEdit && userId ? 'hover' : '']"
+      :class="[
+        canEdit && userId ? 'hover' : '',
+        startDateOrEndDate ? 'wrap' : '',
+      ]"
       style="position: relative; background-color: transparent"
     >
       <div
@@ -32,7 +35,11 @@
           !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
         ]"
         style="align-self: flex-start"
-        :style="floatBeneath ? `max-height: ${profilePictureSize / 3}px` : ''"
+        :style="
+          floatBeneath && profilePictureSize
+            ? `max-height: ${profilePictureSize / 3}px`
+            : ''
+        "
       >
         <app-user-avatar
           v-if="showProfilePicture"
@@ -41,17 +48,18 @@
           :can-edit="userId ? canEdit : false"
           :can-delete="canDelete"
           :size="profilePictureSize"
+          :avatar-style="avatarStyle"
           :user-id="userId ?? -1"
           :placeholder="fullname ?? ''"
           :style="[
             floatBeneath ? `transform: translateY(-${translateY}px);` : '',
-            avatarBlockStyle ?? '',
           ]"
+          :class="startDate || endDate ? 'absolute' : ''"
         />
         <div class="info" :class="[distribution, wrap ? 'flex-wrap' : '']">
           <span
             v-if="titleAbove && title"
-            class="font-weight-bold text-h3 text-md-h2 ml-2"
+            class="title mt-0 font-weight-bold text-h2 ml-2"
             :style="titleStyle ?? 'color: white;'"
             role="above"
             >{{ title }}</span
@@ -88,79 +96,86 @@
           </span>
         </div>
       </div>
-      <div class="d-flex flex-column">
-        <div
-          v-if="startDate || endDate"
-          class="date d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
-          style="gap: 8px"
-          :style="[
-            !floatBeneath
-              ? darkerBackground
-                ? 'background-color: rgba(0, 0, 0, 0.5); color: white'
-                : 'background-color: white; color: #232b32'
-              : '',
-          ]"
-        >
+      <div class="extra d-flex">
+        <div class="block d-flex flex-column">
           <div
-            v-if="startDate"
-            class="d-flex flex-column justify-center align-end"
-            :class="startDate && endDate ? 'mr-2 mr-sm-4' : ''"
-            :style="startDateStyle ?? ''"
+            v-if="startDateOrEndDate"
+            class="date d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
+            style="gap: 8px"
+            :style="[
+              !floatBeneath
+                ? darkerBackground
+                  ? 'background-color: rgba(0, 0, 0, 0.5); color: white'
+                  : 'background-color: white; color: #232b32'
+                : '',
+            ]"
           >
-            <span style="font-size: 14px; letter-spacing: 0.28px">
-              {{ $t('pages.profile.startDate') }}</span
+            <div
+              v-if="startDate"
+              class="d-flex flex-column justify-center align-end"
+              :class="startDateAndEndDate ? 'mr-2 mr-sm-4' : ''"
+              :style="startDateStyle ?? ''"
             >
-            <span class="font-weight-bold" style="white-space: nowrap">{{
-              startDate
-            }}</span>
+              <span style="font-size: 14px; letter-spacing: 0.28px">
+                {{ $t('pages.profile.startDate') }}</span
+              >
+              <span class="font-weight-bold" style="white-space: nowrap">{{
+                startDate
+              }}</span>
+            </div>
+            <v-divider
+              v-if="startDateAndEndDate"
+              class="vertical"
+              vertical
+            ></v-divider>
+            <v-divider
+              v-if="startDateAndEndDate"
+              class="horizontal"
+              style="display: none"
+            ></v-divider>
+            <div
+              v-if="endDate"
+              class="d-flex flex-column justify-center align-start"
+              :class="startDateAndEndDate ? 'ml-2 ml-sm-4' : ''"
+              :style="endDateStyle ?? ''"
+            >
+              <span style="font-size: 14px; letter-spacing: 0.28px">
+                {{ $t('pages.profile.endDate') }}</span
+              ><span class="font-weight-bold" style="white-space: nowrap">{{
+                endDate
+              }}</span>
+            </div>
           </div>
-          <v-divider
-            v-if="startDate && endDate"
-            class="vertical"
-            vertical
-          ></v-divider>
-          <v-divider
-            v-if="startDate && endDate"
-            class="horizontal"
-            style="display: none"
-          ></v-divider>
+
           <div
-            v-if="endDate"
-            class="d-flex flex-column justify-center align-start"
-            :class="startDate && endDate ? 'ml-2 ml-sm-4' : ''"
-            :style="endDateStyle ?? ''"
+            v-if="code"
+            class="d-flex align-center py-1 py-sm-2 px-2 px-sm-4 mt-2 rounded-lg ml-4 ml-sm-6"
+            :class="[
+              !floatBeneath
+                ? darkerBackground
+                  ? 'darker-bg'
+                  : 'white-bg'
+                : '',
+              !titleAbove && title ? 'wrap' : '',
+            ]"
+            style="gap: 8px; cursor: pointer; align-self: flex-end"
+            :style="codeStyle ?? ''"
+            @click="copyToClipboard(code)"
           >
-            <span style="font-size: 14px; letter-spacing: 0.28px">
-              {{ $t('pages.profile.endDate') }}</span
-            ><span class="font-weight-bold" style="white-space: nowrap">{{
-              endDate
-            }}</span>
+            <v-icon style="flex-grow: 0" size="20">mdi-content-copy</v-icon>
+            <span style="flex-grow: 0">{{ code }}</span>
           </div>
         </div>
 
         <div
-          v-if="code"
-          class="d-flex align-center py-1 py-sm-2 px-2 px-sm-4 mt-2 rounded-lg ml-4 ml-sm-6"
-          :class="
-            !floatBeneath ? (darkerBackground ? 'darker-bg' : 'white-bg') : ''
-          "
-          style="gap: 8px; cursor: pointer; align-self: flex-end"
-          :style="codeStyle ?? ''"
-          @click="copyToClipboard(code)"
+          v-if="canEdit && showSettings"
+          class="settings mx-1 py-1 px-1 mx-xs-2"
+          :class="darkerBackground ? 'darker-bg' : ''"
+          style="height: min-content; color: #6e7a87"
+          role="settings"
         >
-          <v-icon style="flex-grow: 0" size="20">mdi-content-copy</v-icon>
-          <span style="flex-grow: 0">{{ code }}</span>
+          <v-icon @click="emit('display:settings')">{{ settingsIcon }}</v-icon>
         </div>
-      </div>
-
-      <div
-        v-if="canEdit && showSettings"
-        class="settings mx-1 py-1 px-1 mx-xs-2"
-        :class="darkerBackground ? 'darker-bg' : ''"
-        style="height: min-content; color: #6e7a87"
-        role="settings"
-      >
-        <v-icon @click="emit('display:settings')">mdi-cog-outline</v-icon>
       </div>
     </div>
   </div>
@@ -208,6 +223,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  settingsIcon: {
+    type: String,
+    default: 'mdi-cog-outline',
+  },
 
   titleAbove: {
     type: Boolean,
@@ -249,7 +268,7 @@ const props = defineProps({
     type: String,
   },
 
-  avatarBlockStyle: {
+  avatarStyle: {
     type: String,
   },
 
@@ -321,16 +340,24 @@ window.addEventListener('resize', () => {
   currentWidth.value = window.innerWidth;
 });
 
+const startDateAndEndDate = computed(() => {
+  return props.startDate && props.endDate;
+});
+
+const startDateOrEndDate = computed(() => {
+  return props.startDate || props.endDate;
+});
+
 const isMaxWidthReached = computed(() => {
   const { profilePictureSize } = props;
 
-  let temp = 550;
+  let temp = 500;
   if (profilePictureSize < 10) {
     temp = profilePictureSize * 40 + 250;
   } else if (profilePictureSize < 20) {
     temp = profilePictureSize * 20 + 250;
   } else if (profilePictureSize < 50) {
-    temp = profilePictureSize * 10 + 250;
+    temp = profilePictureSize * 13 + 300;
   } else if (profilePictureSize < 100) {
     temp = profilePictureSize * 5 + 200;
   } else if (profilePictureSize < 160) {
@@ -361,7 +388,7 @@ async function copyToClipboard(text) {
 }
 
 .breakpoint {
-  .float-beneath {
+  &.float-beneath {
     .resize {
       display: flex;
       align-items: center;
@@ -369,14 +396,10 @@ async function copyToClipboard(text) {
       .avatar-block {
         align-items: center;
       }
-
-      .info {
-        margin-left: 100px !important;
-      }
     }
   }
 
-  .float-cover {
+  &.float-cover {
     .resize {
       .avatar-block {
         .avatar {
@@ -387,20 +410,25 @@ async function copyToClipboard(text) {
         }
       }
     }
-  }
-
-  .date {
-    flex-direction: column;
-    .d-flex {
-      margin-right: 0px !important;
-      align-items: flex-end !important;
-      justify-content: flex-end !important;
-    }
-    .horizontal {
-      display: flex !important;
-    }
-    .vertical {
-      display: none !important;
+    .card {
+      .extra {
+        .d-flex.flex-column {
+          .date {
+            flex-direction: column;
+            .d-flex {
+              margin-right: 0px !important;
+              align-items: center !important;
+              justify-content: center !important;
+            }
+            .horizontal {
+              display: flex !important;
+            }
+            .vertical {
+              display: none !important;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -408,8 +436,12 @@ async function copyToClipboard(text) {
 .float-beneath {
   flex-direction: column-reverse !important;
   gap: 8px;
-  .font-weight-bold.text-h3 {
+
+  .title {
     margin-top: -60px;
+    &.wrap {
+      margin-top: -25px;
+    }
   }
   .d-flex {
     .d-flex.flex-row {
@@ -418,12 +450,17 @@ async function copyToClipboard(text) {
   }
 
   .card {
-    margin-block: 16px;
     flex-direction: column;
     align-self: start !important;
+    padding-block: 16px;
 
     .d-flex.flex-row {
       align-items: flex-start !important;
+
+      .avatar-block.absolute {
+        position: absolute;
+        top: -50px;
+      }
     }
   }
 }
@@ -440,14 +477,27 @@ async function copyToClipboard(text) {
     padding-block: 16px;
   }
 
-  .font-weight-bold.text-h3 {
+  .title {
     position: absolute;
-    bottom: 68px;
+    bottom: 62px;
   }
   .card {
     .d-flex.flex-row {
       .info {
         padding-left: 0px !important;
+      }
+    }
+
+    .extra {
+      align-items: flex-start;
+      flex-direction: row;
+      justify-content: flex-end;
+      flex-wrap: wrap-reverse;
+      align-self: flex-start;
+      gap: 4px;
+
+      .settings {
+        align-self: flex-end;
       }
     }
   }
@@ -604,20 +654,70 @@ async function copyToClipboard(text) {
   }
 }
 
+@media (max-width: 520px) {
+  .float-beneath {
+    .card.wrap {
+      flex-wrap: wrap;
+      .info {
+        margin-right: 40px;
+      }
+
+      .extra {
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .extra {
+        justify-content: flex-end;
+        .date {
+          position: absolute;
+          top: -300px;
+          right: 0px;
+        }
+
+        .d-flex.mt-2.align-center.wrap {
+          position: absolute;
+          bottom: -35px;
+          right: 8px;
+
+          span {
+            display: none;
+          }
+        }
+      }
+
+      .settings {
+        position: absolute;
+        right: 4px;
+        top: 12px;
+      }
+    }
+  }
+}
+
 @media (max-width: 480px) {
   .float-beneath {
     .card {
+      .d-flex.flex-row {
+        .avatar-block.absolute {
+          top: -30px !important;
+        }
+      }
+
+      &.wrap {
+        .extra {
+          justify-content: flex-end;
+
+          .d-flex.mt-2.align-center.wrap {
+            bottom: -10px;
+          }
+        }
+      }
+
       .resize {
         display: flex;
         align-items: center;
-
-        .avatar-block {
-          align-items: center;
-        }
-
-        .info {
-          margin-left: -80px !important;
-        }
       }
     }
   }
@@ -633,81 +733,111 @@ async function copyToClipboard(text) {
     }
   }
 
-  .font-weight-bold.text-h3 {
+  .title {
     font-size: 1rem !important;
   }
 }
 
-@media (max-width: 370px) {
-  .float-cover {
+@media (max-width: 450px) {
+  .float-beneath {
+    .title.wrap {
+      margin-top: 0px;
+      margin-right: 30px;
+    }
     .card {
-      .date {
-        margin-left: 0px !important;
+      .d-flex.flex-row {
+        max-height: unset !important;
+
+        .info {
+          margin-left: 0px !important;
+        }
+
+        .avatar-block.absolute {
+          top: -20px !important;
+        }
+
+        .avatar-block {
+          align-items: center;
+          position: absolute;
+          top: -15px;
+        }
+      }
+      &.wrap {
+        .extra {
+          .d-flex.mt-2.align-center.wrap {
+            bottom: -35px;
+          }
+        }
       }
     }
+  }
 
-    .settings {
-      position: absolute;
-      bottom: 140px;
-      right: 8px;
+  .float-cover {
+    .title {
+      margin-right: 50px;
+    }
+  }
+}
+
+@media (max-width: 404px) {
+  .float-beneath {
+    .card {
+      .d-flex.flex-row {
+        .info {
+          margin-left: 0px;
+        }
+
+        .avatar-block.absolute {
+          top: 0px !important;
+        }
+      }
+      .resize {
+        .avatar-block {
+          top: 10px;
+        }
+      }
+    }
+  }
+
+  .float-cover {
+    .card {
+      flex-wrap: wrap;
+      align-self: flex-start;
+      .d-flex.flex-row.align-center {
+        padding-left: 16px;
+      }
+      .extra {
+        width: 100%;
+        align-items: flex-end;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: wrap-reverse;
+
+        gap: 4px;
+      }
     }
   }
 }
 
 @media (max-width: 310px) {
   .card {
-    flex-wrap: wrap;
-    justify-content: center !important;
-    align-items: start !important;
-    align-self: start;
+    flex-direction: row !important;
+    align-items: flex-start;
     gap: 8px;
-    .date {
-      flex-direction: row;
-      margin-left: 0px !important;
-      .vertical {
-        display: block !important;
-      }
 
-      .horizontal {
-        display: none !important;
-      }
+    .info {
+      align-self: flex-start;
+    }
+
+    .settings {
+      justify-self: flex-start;
     }
   }
-}
 
-@media (max-height: 740px) {
   .float-beneath {
-    .avatar-block {
-      align-items: center;
-    }
-  }
-
-  @media (max-width: 520px) {
-    .float-beneath {
-      .resize {
-        display: flex;
-        align-items: center;
-
-        .avatar-block {
-          align-items: center;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 404px) {
-    .float-beneath {
-      .resize {
-        display: flex;
-        align-items: center;
-
-        .avatar-block {
-          align-items: center;
-        }
-
-        .info {
-          margin-left: 0px !important;
-        }
+    .resize {
+      .avatar-block {
+        top: 0px !important;
       }
     }
   }

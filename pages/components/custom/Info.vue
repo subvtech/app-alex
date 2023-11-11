@@ -327,8 +327,7 @@
           :title="'Software Engineer'"
           :userId="123"
           :fullname="'John Doe'"
-          :startDate="'2022-01-01'"
-          :endDate="'2023-01-01'"
+        
           :username="'johndoe'"
           :selectedOption="0"
           :links="['Link 1', 'Link 2', 'Link 3']"
@@ -570,6 +569,12 @@ const propsDocumentation = [
     type: 'Boolean',
     default: 'false',
     description: 'Exibir o ícone de configurações.',
+  },
+  {
+    name: 'settingsIcon',
+    type: 'String',
+    default: 'mdi-cog-outline',
+    description: 'O ícone que é exibido como o botão de settings.',
   },
   {
     name: 'floatBeneath',

@@ -89,6 +89,7 @@
       :title="title"
       :code="code"
       :code-style="codeStyle"
+      :settingsIcon="settingsIcon"
       :fullname-style="fullnameStyle"
       :username-style="usernameStyle"
       :role-style="roleStyle"
@@ -113,20 +114,23 @@
 
     <div
       v-if="showMenu"
-      class="menu d-flex h-100"
+      class="menu d-flex"
       data-testid="menu"
       style="z-index: 1"
     >
-      <span
+      <div
         v-for="(link, index) in links"
-        class="font-weight-regular text-body-3 text-sm-body-2"
         :class="selectedOption === index ? 'selected' : ''"
         @click="emit('select:option', index)"
-        :key="index"
-        style="letter-spacing: 0.32px !important"
       >
-        {{ link }}
-      </span>
+        <span
+          class="font-weight-regular"
+          :key="index"
+          style="letter-spacing: 0.32px !important"
+        >
+          {{ link }}
+        </span>
+      </div>
 
       <v-spacer />
       <div v-if="settingsMenu" data-testid="settings-menu">
@@ -135,7 +139,7 @@
           @click="emit('display:settings')"
           class="mr-4 mr-md-3 mr-sm-3 mr-xs-2"
           color="#6E7A87"
-          >mdi-cog-outline</v-icon
+          >{{ settingsIcon }}</v-icon
         >
       </div>
     </div>
@@ -188,6 +192,10 @@ const props = defineProps({
       | 'username-role-fullname'
     >,
     default: 'fullname-username-role',
+  },
+  settingsIcon: {
+    type: String,
+    default: 'mdi-cog-outline',
   },
 
   code: {
@@ -425,25 +433,36 @@ async function removeCoverPicture() {
   }
   .menu {
     border-top: 1px solid #eaeef1;
-    gap: 24px;
+    height: 46px;
     padding-inline: 24px;
     transition: all ease-in-out 1s;
-    align-items: center;
-
-    span {
-      color: #5d6872;
-      line-height: 22px;
-      padding-block: 16px;
-      text-align: center;
+    div {
+      height: 100%;
+      display: flex;
       cursor: pointer;
+      border-bottom: 2px solid transparent;
       &:hover {
         color: #279ee3;
+      }
+      span {
+        color: #454d54;
+        padding-inline: 16px;
+        letter-spacing: 0.32px;
+        font-size: 1rem;
+        min-width: max-content;
+        align-self: center;
+        text-align: center;
+
+        /* Body/P1 */
       }
     }
 
     .selected {
       color: #279ee3;
       border-bottom: 2px solid #279ee3;
+      span {
+        color: #279ee3;
+      }
     }
   }
 }
@@ -496,42 +515,33 @@ async function removeCoverPicture() {
         font-size: 12px;
       }
     }
-
-    .menu {
-      gap: 16px;
-      :first-child {
-        min-width: 79px;
-      }
-    }
   }
 }
 
 @media (max-width: 608px) {
   .user-block {
     .menu {
-      gap: 24px;
       overflow-x: auto;
       -ms-overflow-style: none; /* IE and Edge */
       scrollbar-width: none; /* Firefox */
       &::-webkit-scrollbar {
         display: none;
       }
+      div {
+        span {
+          font-size: 14px;
+        }
+      }
     }
   }
 }
 
-@media (max-width: 335px) {
+@media (max-width: 410px) {
   .user-block {
     .cover-block {
-      max-height: 295px;
-    }
-    .menu {
-      gap: 24px;
-      overflow-x: auto;
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-      &::-webkit-scrollbar {
-        display: none;
+      img {
+        height: 300px !important;
+        max-height: unset !important;
       }
     }
   }

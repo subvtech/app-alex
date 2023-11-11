@@ -50,7 +50,7 @@
         <alex-custom-banner />
       </div>
       <div class="px-3" style="position: relative">
-        <prism> {{ examples[0] }}</prism>
+        <prism class=""> {{ examples[0] }}</prism>
         <v-btn
           class="copy-icon"
           variant="text"
@@ -83,8 +83,8 @@
           :img-from-strapi="false"
         />
       </div>
-      <div class="mt-4 mb-8 w-50" style="position: relative">
-        <prism class="pr-10 h-100 overflow-auto"> {{ examples[1] }}</prism>
+      <div class="mt-4 mb-8 w-100" style="position: relative">
+        <prism class="h-100 overflow-auto"> {{ examples[1] }}</prism>
         <v-btn
           class="copy-icon mt-1 ml-4"
           variant="text"
@@ -136,6 +136,11 @@
     <h2 class="text-h2 text-gray-800">Uso Completo</h2>
     <div class="px-4 py-2 w-100 d-flex">
       <div class="w-100">
+        <p class="text-subtitle-2 text-gray-500 mb-14">
+          O componente <strong>alex-custom-info</strong> altera bastante a
+          maneira que o banner é exibido. Aqui é um exemplo com
+          <strong>float-beneath</strong> definido como falso
+        </p>
         <alex-custom-banner
           :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
           :imgFromStrapi="false"
@@ -153,7 +158,7 @@
           :startDateStyle="'font-size: 12px;'"
           :endDateStyle="'font-size: 12px;'"
           :titleStyle="'font-size: 16px;'"
-          :avatarBlockStyle="'border: 1px solid #ccc;'"
+          :avatarStyle="'border: 1px solid #ccc;'"
           :showBorder="false"
           :floatBeneath="false"
           :settingsMenu="false"
@@ -163,6 +168,7 @@
           :updateProfilePicture="false"
           :title="'Software Engineer'"
           :showMenu="true"
+          settings-icon="mdi-cog"
           :userId="123"
           :fullname="'John Doe'"
           :startDate="'2022-01-01'"
@@ -176,9 +182,94 @@
           @select:option="() => {}"
           @display:settings="() => {}"
         />
-        <prism class="bg-grey-lighten-5">
-          {{ examples[3] }}
-        </prism>
+        <div class="w-100" style="position: relative;">
+          <prism class="bg-grey-lighten-5">
+            {{ examples[3] }}
+          </prism>
+          <v-btn
+            class="copy-icon mt-1 ml-4"
+            variant="text"
+            color="gray-400"
+            @click="copyToClipboard(3)"
+          >
+            <v-icon
+              v-if="copiedIndex === 3"
+              size="x-large"
+              icon="mdi-clipboard-check-multiple-outline"
+              color="green-lighten-1"
+            />
+            <v-icon v-else size="x-large" icon="mdi-content-copy" />
+          </v-btn>
+        </div>
+      </div>
+    </div>
+    <div class="px-4 py-2 w-100 d-flex">
+      <div class="w-100">
+        <p class="text-subtitle-2 text-gray-500 mb-14">
+          O componente <strong>alex-custom-info</strong> altera bastante a
+          maneira que o banner é exibido. Aqui é um exemplo com
+          <strong>float-beneath</strong> definido como verdadeiro
+        </p>
+        <alex-custom-banner
+          :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
+          :imgFromStrapi="false"
+          :showProfilePicture="true"
+          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
+          :profilePictureSize="500"
+          :darkerBackground="false"
+          :titleAbove="false"
+          :distribution="'fullname-username-role'"
+          :code="'ABC123'"
+          :fullnameStyle="'font-weight-bold'"
+          :codeStyle="'color: red;'"
+          :roleStyle="'font-style: italic;'"
+          :usernameStyle="'color: blue;'"
+          :startDateStyle="'font-size: 12px;'"
+          :endDateStyle="'font-size: 12px;'"
+          :titleStyle="'font-size: 16px;'"
+          :avatarStyle="'border: 1px solid #ccc;'"
+          :showBorder="false"
+          float-beneath
+          :settingsMenu="false"
+          :dateToTheLeft="false"
+          :showShade="false"
+          :updateProfilePicture="false"
+          :title="'Software Engineer'"
+          :showMenu="true"
+          settings-icon="mdi-cog"
+          :userId="123"
+          :fullname="'John Doe'"
+          :startDate="'2022-01-01'"
+          :endDate="'2023-01-01'"
+          :username="'johndoe'"
+          :selectedOption="0"
+          show-role
+          :links="['Link 1', 'Link 2', 'Link 3']"
+          :isProfessor="false"
+          :canEdit="true"
+          :canDelete="false"
+          @select:option="() => {}"
+          @display:settings="() => {}"
+        />
+        <div class="w-100" style="position: relative;">
+          <prism class="bg-grey-lighten-5">
+            {{ examples[4] }}
+          </prism>
+          <v-btn
+            class="copy-icon mt-1 ml-4"
+            variant="text"
+            color="gray-400"
+            @click="copyToClipboard(4)"
+          >
+            <v-icon
+              v-if="copiedIndex === 4"
+              size="x-large"
+              icon="mdi-clipboard-check-multiple-outline"
+              color="green-lighten-1"
+            />
+            <v-icon v-else size="x-large" icon="mdi-content-copy" />
+          </v-btn>
+        </div>
       </div>
     </div>
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
@@ -326,6 +417,7 @@ const examples = [
       :titleAbove="false"
       :distribution="'fullname-username-role'"
       :code="'ABC123'"
+      settings-icon="mdi-cog"
       :fullnameStyle="'font-weight-bold'"
       :codeStyle="'color: red;'"
       :roleStyle="'font-style: italic;'"
@@ -333,7 +425,7 @@ const examples = [
       :startDateStyle="'font-size: 12px;'"
       :endDateStyle="'font-size: 12px;'"
       :titleStyle="'font-size: 16px;'"
-      :avatarBlockStyle="'border: 1px solid #ccc;'"
+      :avatarStyle="'border: 1px solid #ccc;'"
       :showBorder="false"
       :floatBeneath="false"
       :settingsMenu="false"
@@ -356,6 +448,48 @@ const examples = [
       @select:option="() => {}"
       @display:settings="() => {}"
     />`,
+
+  `  <alex-custom-banner
+          :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
+          :imgFromStrapi="false"
+          :showProfilePicture="true"
+          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
+          :profilePictureSize="500"
+          :darkerBackground="false"
+          :titleAbove="false"
+          :distribution="'fullname-username-role'"
+          :code="'ABC123'"
+          :fullnameStyle="'font-weight-bold'"
+          :codeStyle="'color: red;'"
+          :roleStyle="'font-style: italic;'"
+          :usernameStyle="'color: blue;'"
+          :startDateStyle="'font-size: 12px;'"
+          :endDateStyle="'font-size: 12px;'"
+          :titleStyle="'font-size: 16px;'"
+          :avatarStyle="'border: 1px solid #ccc;'"
+          :showBorder="false"
+           float-beneath
+          :settingsMenu="false"
+          :dateToTheLeft="false"
+          :showShade="false"
+          :updateProfilePicture="false"
+          :title="'Software Engineer'"
+          :showMenu="true"
+          settings-icon="mdi-cog"
+          :userId="123"
+          :fullname="'John Doe'"
+          :startDate="'2022-01-01'"
+          :endDate="'2023-01-01'"
+          :username="'johndoe'"
+          :selectedOption="0"
+          show-role
+          :links="['Link 1', 'Link 2', 'Link 3']"
+          :isProfessor="false"
+          :canEdit="true"
+          :canDelete="false"
+          @select:option="() => {}"
+          @display:settings="() => {}"
+        />`,
 ];
 
 const propsDocumentation = [
@@ -399,6 +533,13 @@ const propsDocumentation = [
     default: 'false',
     description:
       'Um boolean que indica se o usuário tem permissão de editar. Se igual a true é possível editar a capa, essa propriedade é repassada para alex-custom-input e app-user-avatar.',
+  },
+
+  {
+    name: 'settingsIcon',
+    type: 'String',
+    default: 'mdi-cog-outline',
+    description: 'O ícone que é exibido como o botão de settings.',
   },
 
   // Add other props here

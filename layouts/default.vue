@@ -32,15 +32,13 @@
                 <img v-else src="/images/alex.svg" height="28" width="84" />
               </NuxtLink>
             </div>
-          </v-list-item>
-        </v-list>
-      </div>
-    </v-navigation-drawer>
+          </div>
+        </template>
+      </alex-custom-drawable>
+    </div>
     <alex-custom-horizontal-bar
-      :drawer="true"
+      :drawer="drawer"
       fixed
-      :is-bell-active="false"
-      :is-chat-active="false"
       :toggle-drawer="() => (drawer = !drawer)"
       :menu-items="profileMenuItems"
       :reverse="false"
@@ -59,6 +57,7 @@
 const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
+const isPermanent = ref(false);
 const user = useStrapiUser<User>();
 
 const menus = [
@@ -130,10 +129,11 @@ const menus = [
     ],
   },
 ];
+
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: `/user/${user?.username}`,
+    to: `/user/${user.value.username}`,
     logout: false,
   },
   {

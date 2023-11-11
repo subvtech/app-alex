@@ -2,7 +2,7 @@
   <v-container
     class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
   >
-    <h1 class="text-h2 text-gray-800">Info</h1>
+    <h1 class="text-h2 text-gray-800">AppUserAvatar</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
       <strong class="bg-accent pa-1 rounded">app-user-avatar</strong>
@@ -19,7 +19,7 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/tabs/"
+          href="https://vuetifyjs.com/en/components/avatars/"
           target="_blank"
           >vuetifyjs.com</a
         >
@@ -27,15 +27,12 @@
     </div>
     <h2 class="text-h2 text-gray-800">Uso Básico</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Todas as propriedades são opcionais. Ele herda as propriedades de
-      <strong>app-user-avatar</strong>
-      aqui ilustraremos apenas as propriedades únicas ao
-      <strong>alex-custom-info</strong> juntamente com os comportamentos mais
-      comuns.
+      Todas as propriedades são opcionais com exceção do placeholder. aqui
+      ilustraremos apenas os comportamentos mais comuns.
     </p>
     <div class="pa-4">
       <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, passado nenhuma propriedade ele não exibe
+        Esse é o modelo mais simples, passado nenhuma propriedade a exceção do placeholder ele não exibe
         nada.
       </p>
     </div>
@@ -43,7 +40,7 @@
       <div
         class="d-flex my-2 rounded-lg align-center justify-space-between bg-gray-100 w-100 px-3 rounded-t"
       >
-        <app-user-avatar />
+        <app-user-avatar placeholder="" />
       </div>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
@@ -295,14 +292,14 @@ definePageMeta({
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
-  `<app-user-avatar />`,
+  `<app-user-avatar  placeholder/>`,
   `<app-user-avatar
-    :placeholder="John Doe"
+    :placeholder="'John Doe'"
     can-delete
     can-edit/>`,
   `<app-user-avatar
           :size="45"
-          placeholder="John Doe"
+          placeholder="'John Doe'"
           show-border
           can-delete
           can-edit
@@ -310,7 +307,7 @@ const examples = [
      `,
   `<app-user-avatar
           :size="45"
-          placeholder="John Doe"
+          placeholder="'John Doe'"
           show-border
           avatarStyle='border-color:red'
           can-delete
@@ -320,7 +317,7 @@ const examples = [
 
   `    <app-user-avatar
           :size="45"
-          placeholder="John Doe"
+          placeholder="'John Doe'"
           show-border
           avatarStyle='border-color:green'
           can-delete
@@ -339,7 +336,7 @@ const propsDocumentation = [
   {
     name: 'userId',
     type: 'Number',
-    default: '-1',
+    default: 'undefined',
     description: 'ID do usuário.',
   },
   {
