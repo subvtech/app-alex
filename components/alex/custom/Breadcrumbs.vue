@@ -9,8 +9,9 @@
     "
     data-testid="breadcrumbs"
   >
+  <div v-if="arrowBack">
     <a
-      v-if="arrowBack && items.length > 1"
+      v-if="items.length > 1"
       :href="items[items.length - 2].href"
       role="goback"
     >
@@ -25,6 +26,7 @@
       >{{ title }}</span
     >
     <v-divider vertical class="pl-2" style="margin-block: auto; height: 24px" />
+  </div>
     <v-breadcrumbs class="w-100 pl-0" :items="items" divider=">">
       <template v-slot:title="{ item }">
         <v-breadcrumbs-item
@@ -50,7 +52,7 @@ const props = defineProps({
   },
   arrowBack: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   title: { type: String },
   titleStyle: { type: String },
