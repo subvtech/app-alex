@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height pa-0 card" fluid>
+  <v-container class="fill-height pa-0 card overflow-hidden" fluid>
     <v-row class="fill-height">
       <v-col
         md="8"
@@ -36,7 +36,7 @@ const emailSent = ref(false);
 const userEmail = ref('');
 definePageMeta({
   layout: 'auth',
-  middleware: 'control-access'
+  middleware: 'control-access',
 });
 
 const handleSentEmail = (email) => {
@@ -55,7 +55,15 @@ const handleSentEmail = (email) => {
   width: 90% !important;
 }
 
+
 .mt-220 {
-  margin-top: 220px !important;
+  margin-top: 220px;
 }
+
+@media (max-height: 650px) {
+  .mt-220 {
+    margin-top: 110px !important;
+  }
+}
+
 </style>
