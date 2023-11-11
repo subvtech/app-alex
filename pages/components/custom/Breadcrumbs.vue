@@ -18,7 +18,7 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/tabs/"
+          href="https://vuetifyjs.com/en/components/breadcrumbs/"
           target="_blank"
           >vuetifyjs.com</a
         >
