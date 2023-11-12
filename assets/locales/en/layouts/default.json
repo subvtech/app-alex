@@ -14,5 +14,28 @@
   "userList": "User list",
   "accessControl": "Access control",
   "settings": "Settings",
-  "isLoading": "Loading..."
+  "isLoading": "Loading...",
+  "step1": {
+    "title": "Welcome to Project ALEX, be ready to learn and teach!",
+    "text": "We start with the Dashboard, it centralizes information and shortcuts to system features",
+    "nextButton": "Next"
+  },
+  "step2": {
+    "title": "Access Courses and Projects",
+    "text": "Here you can access the courses and projects created by the entire community",
+    "backButton": "Back",
+    "nextButton": "Next"
+  },
+  "step3": {
+    "title": "User Area",
+    "text": "This is your area, you can access your plans and classes and your favorites list",
+    "backButton": "Back",
+    "nextButton": "Next"
+  },
+  "step4": {
+    "title": "Are you ready to start?",
+    "text": "We are looking forward to helping you on this journey!",
+    "backButton": "Back",
+    "completeButton": "Finish"
+  }
 }
