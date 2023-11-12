@@ -34,7 +34,7 @@
       </div>
       <v-divider vertical class="divider ml-4 align-center" />
       <div class="header__breadcrumb">
-        <breadcrumbs :items="items" />
+        <alex-custom-breadcrumbs :items="items" />
       </div>
     </div>
     <div class="header__button d-flex">
@@ -94,7 +94,6 @@ defineProps({
 const items = [
   { title: 'Início', disabled: false, href: '/inicio' },
   { title: 'Página', disabled: false, href: '/pagina' },
-  { title: 'Nome da Página', disabled: true },
 ];
 </script>
 <style scoped lang="scss">
