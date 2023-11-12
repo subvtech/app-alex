@@ -24,7 +24,7 @@
         <v-icon
           v-if="avatar"
           class="d-none"
-          :size="small ? 'x-small' : 'x-large'"
+          :size="small ? 'small' : 'x-large'"
           color="#fff"
           >mdi-pencil-outline</v-icon
         >
@@ -64,15 +64,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useProfilePicture } from '~/composables/useProfilePicture';
+const userStore = useUserStore();
 
 const props = defineProps({
   userId: {
     type: Number,
   },
   placeholder: {
-    type: String,
-    required: true,
+    type: String as PropType<string | null>,
+    default: '',
   },
   avatarStyle: {
     type: String,
@@ -82,6 +82,10 @@ const props = defineProps({
     default: false,
   },
   canEdit: {
+    type: Boolean,
+    default: false,
+  },
+  trackCurrentUser: {
     type: Boolean,
     default: false,
   },
@@ -96,17 +100,21 @@ const props = defineProps({
   },
 });
 
-const avatar = ref<{ id: number; url: string } | undefined | null>(
-  props.profilePicture,
-);
+const { profilePicture, placeholder } = toRefs(props);
 
-const { removeProfilePicture, uploadProfilePicture } = useProfilePicture(
+const avatar = ref<{ url: string; id: number } | null | undefined>(
+  props.trackCurrentUser ? userStore.profilePicture : profilePicture?.value,
+);
+const fullname = ref<string | null | undefined>(placeholder.value);
+const { uploadProfilePicture, removeProfilePicture } = useProfilePicture(
   avatar,
   props.userId,
 );
 
 const userInitials = computed(() => {
-  return getFullnameInitials(props.placeholder);
+  return getFullnameInitials(
+    props.trackCurrentUser ? userStore.fullname ?? '' : fullname.value ?? '',
+  );
 });
 
 const userIdCanEdit = computed(() => props.canEdit && props.userId);
@@ -136,6 +144,16 @@ const large = computed(() => {
 const xlarge = computed(() => {
   return props.size > 130;
 });
+
+watch(
+  () => userStore.profilePicture,
+  () => {
+    if (props.trackCurrentUser) {
+      avatar!.value = userStore.profilePicture;
+      fullname.value = userStore.fullname;
+    }
+  },
+);
 </script>
 
 <style scoped lang="scss">
@@ -319,7 +337,6 @@ const xlarge = computed(() => {
 }
 
 @media (max-width: 404px) {
- 
   .resize {
     .avatar-block {
       position: relative;

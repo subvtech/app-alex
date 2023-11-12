@@ -32,8 +32,8 @@
     </p>
     <div class="pa-4">
       <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, passado nenhuma propriedade a exceção do placeholder ele não exibe
-        nada.
+        Esse é o modelo mais simples, passado nenhuma propriedade a exceção do
+        placeholder ele não exibe nada.
       </p>
     </div>
     <div class="w-100 d-flex">
@@ -171,6 +171,46 @@
       </div>
     </div>
 
+    <div class="w-100">
+      <p class="text-subtitle-2 text-gray-500 mb-14">
+        É possível travar <strong>app-user-avatar</strong> na photo do usuário
+        logado com <strong>trackCurrentUser</strong>
+      </p>
+      <div class="d-flex w-100">
+        <div
+          class="d-flex align-center rounded-lg my-2 justify-space-between bg-gray-100 w-100 px-3 rounded-t"
+          style="position: relative"
+        >
+          <app-user-avatar
+            :size="45"
+            placeholder="John Doe"
+            show-border
+            track-current-user
+            avatarStyle="border-color:blue"
+            can-delete
+            can-edit
+          />
+        </div>
+        <div class="px-3" style="position: relative">
+          <prism>{{ examples[4] }}</prism>
+          <v-btn
+            class="copy-icon"
+            variant="text"
+            color="gray-400"
+            @click="copyToClipboard(4)"
+          >
+            <v-icon
+              v-if="copiedIndex === 4"
+              size="x-large"
+              icon="mdi-clipboard-check-multiple-outline"
+              color="green-lighten-1"
+            />
+            <v-icon v-else size="x-large" icon="mdi-content-copy" />
+          </v-btn>
+        </div>
+      </div>
+    </div>
+
     <h2 class="text-h2 text-gray-800">Uso Completo</h2>
     <div class="px-4 py-2 w-100 d-flex">
       <div class="w-100 bg-gray-100">
@@ -183,15 +223,15 @@
           can-edit
         />
         <div class="px-3" style="position: relative">
-          <prism>{{ examples[4] }}</prism>
+          <prism>{{ examples[5] }}</prism>
           <v-btn
             class="copy-icon"
             variant="text"
             color="gray-400"
-            @click="copyToClipboard(4)"
+            @click="copyToClipboard(5)"
           >
             <v-icon
-              v-if="copiedIndex === 4"
+              v-if="copiedIndex === 5"
               size="x-large"
               icon="mdi-clipboard-check-multiple-outline"
               color="green-lighten-1"
@@ -314,15 +354,23 @@ const examples = [
           can-edit
         />
      `,
-
-  `    <app-user-avatar
-          :size="45"
-          placeholder="'John Doe'"
-          show-border
-          avatarStyle='border-color:green'
-          can-delete
-          can-edit
-        />`,
+  `<app-user-avatar
+      :size="45"
+      placeholder="John Doe"
+      show-border
+      track-current-user
+      avatarStyle="border-color:blue"
+      can-delete
+      can-edit
+    />`,
+  `<app-user-avatar
+      :size="45"
+      placeholder="'John Doe'"
+      show-border
+      avatarStyle='border-color:green'
+      can-delete
+      can-edit
+    />`,
 ];
 
 const propsDocumentation = [
@@ -357,6 +405,14 @@ const propsDocumentation = [
     type: 'Boolean',
     default: 'false',
     description: 'Mostrar borda ao redor da foto do perfil.',
+  },
+
+  {
+    name: 'trackCurrentUser',
+    type: 'Boolean',
+    default: 'false',
+    description:
+      'Ativa um watcher na photo do usuário logado, sempre que ela for atualizada esse componente também será atualizado.',
   },
 
   {

@@ -47,6 +47,7 @@
               <app-user-avatar
                 :profile-picture="user.avatar"
                 :placeholder="user.fullname"
+                track-current-user
                 show-border
                 avatar-style="border: 1px solid #A0A8B1;"
                 class="mr-2"

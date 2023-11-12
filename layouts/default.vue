@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="user" >
+  <v-app v-if="user">
     <AppSnackbar />
     <div
       @click.stop="
@@ -59,6 +59,12 @@ const clipped = ref(false);
 const drawer = ref(true);
 const isPermanent = ref(false);
 const user = useStrapiUser<User>();
+const userStore = useUserStore();
+
+onBeforeMount(() => {
+  userStore.profilePicture = user.value.avatar;
+  userStore.fullname = user.value.fullname;
+});
 
 const menus = [
   {

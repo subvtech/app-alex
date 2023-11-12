@@ -23,7 +23,7 @@
       :profile-picture-size="160"
       :profile-picture="user.avatar"
       :userId="user.id"
-      :can-delete="true"
+      can-delete
       show-menu
       show-profile-picture
       show-role
