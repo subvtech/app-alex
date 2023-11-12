@@ -2,7 +2,7 @@
   <profile-card
     :title="title"
     :isEditing="isEditing && canEdit"
-    @toogle:isEditing="isEditing = !isEditing"
+    @toggle:isEditing="isEditing = !isEditing"
     :showIcon="canEdit"
     :cancel="onCancel"
     :save="onSave"
@@ -77,7 +77,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
@@ -88,7 +88,7 @@ const props = defineProps({
   canEdit: { type: Boolean, required: true },
 });
 
-const { userTags, canEdit, id, isGeneral } = toRefs(props);
+const { userTags, canEdit, userId, isGeneral } = toRefs(props);
 const isEditing = ref(false);
 
 const selectedTags = ref<{ text: string }[]>([...props.userTags]);
@@ -184,7 +184,7 @@ const onSave = async () => {
       promises.push(
         create('tags', {
           ...item,
-          verified_by: id.value,
+          verified_by: userId.value,
           isGeneral: isGeneral.value,
         }),
       );
@@ -195,14 +195,14 @@ const onSave = async () => {
       promises.push(
         update(`tags/${item.id}`, {
           verified_by: item.verified_by.data
-            ? item.verified_by.data.push(id.value)
-            : [id.value],
+            ? item.verified_by.data.push(userId.value)
+            : [userId.value],
         }),
       );
     });
   deleteArray.value.forEach((element) => {
     promises.push(
-      client(`/users/${props.id}`, {
+      client(`/users/${props.userId}`, {
         method: 'PUT',
         body: {
           tags: userTags.value.filter((item) => item.id !== element.id),
