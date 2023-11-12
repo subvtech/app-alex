@@ -8,9 +8,10 @@
         :disabled="disabled"
         :readonly="readonly"
         hide-details="auto"
-        color="#00B7CC"
+        color="#00b7cc"
         width="18"
         data-testid="testing-checkbox"
+        @change="handleChange"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
@@ -50,6 +51,11 @@ defineProps({
     default: false,
   },
 });
+const emit = defineEmits(['update:checked', 'change']);
+
+const handleChange = (value) => {
+  emit('update:checked', value);
+};
 </script>
 <style scoped>
 div {
