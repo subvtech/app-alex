@@ -6,7 +6,6 @@ export function useOnBoarding(steps) {
   const { t } = useI18n();
   const tour = new Shepherd.Tour({
     useModalOverlay: true,
-    confirmCancel: true,
     defaultStepOptions: {
       cancelIcon: {
         enabled: true,
