@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import Shepherd from 'shepherd.js';
+import { useOnBoarding } from '@/composables/useOnBoarding';
 import { User } from '../models/user.model';
 
 const i18n = useI18n();
@@ -119,105 +119,82 @@ const { logout } = useStrapiAuth();
 const router = useRouter();
 const user = useStrapiUser<User>();
 
-const tour = new Shepherd.Tour({
-  useModalOverlay: true,
-  confirmCancel: true,
-  defaultStepOptions: {
-    arrow: true,
-    classes: 'shepherd-step',
-    scrollTo: true,
-    highlightClass: 'active-step',
-  },
-});
-
-const isTourActive = ref(false); // Variável que vai definir se a tour está ativa ou não pra controlar a classe que ativa o highlight nos elementos
-
-const stepsData = [
+const steps = [
   {
     id: 'step1',
-    title:
-      'Bem vindo(a) ao Projeto ALEX, esteja pronto para aprender e ensinar!',
-    text: 'Iniciamos com a Dashboard, ela centraliza informações e atalhos para as funcionalidades do sistema',
+    title: i18n.t('layouts.default.step1.title'),
+    text: i18n.t('layouts.default.step1.text'),
     attachTo: {
       element: '[data-tour="step-dashboard"]',
       on: 'bottom',
     },
     buttons: [
       {
-        text: 'Avançar',
-        action: tour.next,
+        text: i18n.t('layouts.default.step1.nextButton'),
+        action: 'next',
       },
     ],
   },
   {
     id: 'step2',
-    text: 'Aqui você acessa os cursos e projetos criados por toda a comunidade',
+    title: i18n.t('layouts.default.step2.title'),
+    text: i18n.t('layouts.default.step2.text'),
     attachTo: {
       element: '[data-tour="step-courses"]',
       on: 'bottom',
     },
     buttons: [
       {
-        text: 'Voltar',
-        action: tour.back,
+        text: i18n.t('layouts.default.step2.backButton'),
+        action: 'back',
       },
       {
-        text: 'Avançar',
-        action: tour.next,
+        text: i18n.t('layouts.default.step2.nextButton'),
+        action: 'next',
       },
     ],
   },
   {
     id: 'step3',
-    text: 'Aqui é sua área, você pode acessar seus planos e turmas e a sua lista de favoritos',
+    title: i18n.t('layouts.default.step3.title'),
+    text: i18n.t('layouts.default.step3.text'),
     attachTo: {
       element: '[data-tour="step-projects"]',
       on: 'bottom',
     },
     buttons: [
       {
-        text: 'Voltar',
-        action: tour.back,
+        text: i18n.t('layouts.default.step3.backButton'),
+        action: 'back',
       },
       {
-        text: 'Avançar',
-        action: tour.next,
+        text: i18n.t('layouts.default.step3.nextButton'),
+        action: 'next',
       },
     ],
   },
   {
     id: 'step4',
-    text: 'Estamos ansiosos para te ajudar nesta jornada!',
+    title: i18n.t('layouts.default.step4.title'),
+    text: i18n.t('layouts.default.step4.text'),
     attachTo: {
-      element: '[data-tour="step-user-area"]',
+      element: '[data-tour="step-projects"]',
       on: 'bottom',
     },
     buttons: [
       {
-        text: 'Voltar',
-        action: tour.back,
+        text: i18n.t('layouts.default.step4.backButton'),
+        action: 'back',
       },
       {
-        text: 'Finalizar',
-        action: tour.complete,
+        text: i18n.t('layouts.default.step4.completeButton'),
+        action: 'complete',
       },
     ],
   },
 ];
 
-onMounted(() => {
-  tour.addSteps(stepsData);
-  isTourActive.value = true;
-  tour.start();
-});
-
-tour.on('complete', () => {
-  isTourActive.value = false; // Define a variável como falsa pra tirar o highlight do menu (ou de outro possível local) quando a gente finaliza a tour
-});
-
-tour.on('cancel', () => {
-  isTourActive.value = false; // Define a variável como falsa pra tirar o highlight do menu (ou de outro possível local) quando a gente cancela a tour (com ESC)
-});
+const { tour, isTourActive } = useOnBoarding(steps);
 
 const profileMenuItems = [
   {
@@ -416,6 +393,21 @@ body {
   gap: 8px;
 }
 
+.shepherd-step .shepherd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shepherd-cancel-icon {
+  font-size: 25px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .shepherd-step button {
   background-color: #00b7cc;
   padding: 0.5rem;
