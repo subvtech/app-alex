@@ -2,6 +2,7 @@
   <profile-card
     :title="$t('components.profile.settings.title')"
     :full-width="true"
+    :showIcon="false"
   >
     <template v-slot:content>
       <div class="settings">
@@ -31,15 +32,6 @@
               v-maska:[cpfMask]
             />
           </div>
-          <alex-inputs-stepper-field
-            :label="$t('components.profile.settings.about')"
-            :value="info"
-            name="info"
-            typeField="textarea"
-            class=""
-            color="black"
-            variant="outlined"
-          />
           <div class="buttons d-flex justify-end">
             <v-btn
               class="btn"
@@ -59,6 +51,9 @@
 
     <template v-slot:footer> </template>
   </profile-card>
+  <div class="d-flex flex-column">
+    <profile-security :email="email" :id="id" /> <profile-wallets :id="id" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -75,13 +70,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+  },
   telephone: {
     type: String,
     default: '',
-  },
-  info: {
-    type: String,
-    required: true,
   },
   cpf: {
     type: String,
@@ -93,7 +88,7 @@ const props = defineProps({
   },
 });
 
-const { fullname, telephone, cpf, info } = toRefs(props);
+const { fullname, email, telephone, cpf } = toRefs(props);
 
 const cpfMask = reactive({
   mask: '###.###.###-##',
@@ -114,7 +109,6 @@ const cancel = () => {
   telephone.value = props.telephone;
   fullname.value = props.fullname;
   cpf.value = props.cpf;
-  info.value = props.info;
 };
 
 const updateValues = handleSubmit(async () => {

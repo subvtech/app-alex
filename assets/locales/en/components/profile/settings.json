@@ -1,9 +1,10 @@
 {
-    "title": "Personal Information",
-    "fullname": "Fullname",
-    "phone": "Phone",
-    "about": "About",
-    "cancel": "Cancel",
-    "save": "Save Profile",
-    "cpf": "CPF"
+  "title": "Personal Information",
+  "fullname": "Fullname",
+  "phone": "Phone",
+  "about": "About",
+  "cancel": "Cancel",
+  "saveProfile": "Save Profile",
+  "save": "Save",
+  "cpf": "CPF"
 }

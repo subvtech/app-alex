@@ -57,7 +57,6 @@ const generalInfoLink = computed(() => {
     : `/learning-plans/${planId}`;
 });
 
-console.log('generalInfoLink', generalInfoLink.value);
 const onLoadedChild = (learningPlan) => {
   planTitle.value = learningPlan.title;
 };
