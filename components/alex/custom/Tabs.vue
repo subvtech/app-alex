@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+const { vertical } = defineProps({
   tabs: {
     type: Array as PropType<
       { label: string; value: string; notification?: boolean }[]
@@ -30,11 +30,13 @@ defineProps({
     type: String,
     default: 'accent',
   },
-  direction: {
-    type: String as PropType<'horizontal' | 'vertical'>,
-    default: 'horizontal',
+  vertical: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const direction = vertical ? 'vertical' : 'horizontal';
 </script>
 
 <style>
