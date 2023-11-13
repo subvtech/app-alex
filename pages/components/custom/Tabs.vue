@@ -34,7 +34,64 @@
       <strong>v-model</strong> para o componente, para que ele possa controlar
       qual aba está ativa.
     </p>
-    <div class="pa-4">
+    <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
+      <div>
+        <p class="text-h5 text-center">Props do componente</p>
+        <v-table variant="outline">
+          <thead>
+            <tr>
+              <th>Propriedade</th>
+              <th>Tipo</th>
+              <th>Obrigatório</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>tabs</td>
+              <td>Object</td>
+              <td class="text-center">
+                <v-icon icon="mdi-checkbox-marked" color="success" />
+              </td>
+            </tr>
+            <tr>
+              <td>tabs.label</td>
+              <td>String</td>
+              <td class="text-center">
+                <v-icon icon="mdi-checkbox-marked" color="success" />
+              </td>
+            </tr>
+            <tr>
+              <td>tabs.value</td>
+              <td>String</td>
+              <td class="text-center">
+                <v-icon icon="mdi-checkbox-marked" color="success" />
+              </td>
+            </tr>
+            <tr>
+              <td>tabs.notification</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>vertical</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
+      <div>
+        <p class="text-h5 text-center">Exemplo</p>
+        <Prism class="bg-white pa-0" language="javascript">
+          {{ propsExample }}
+        </Prism>
+      </div>
+    </div>
+    <div>
       <alex-custom-tabs
         v-model="usageActivePage"
         :tabs="usageTabs"
@@ -115,7 +172,7 @@ ${firstExampleScript}
       <strong class="bg-accent pa-1 rounded">#00b7cc</strong>, mas você pode
       alterar essa cor, passando uma props com a cor desejada.
     </p>
-    <div class="pa-4 d-flex w-100 flex-column flex-sm-row">
+    <div class="d-flex w-100 flex-column flex-sm-row">
       <div class="w-100 w-sm-25">
         <alex-custom-tabs
           v-model="usageVariantActivePage"
@@ -200,7 +257,7 @@ ${firstExampleScript}
       <strong>notification </strong>, dentro do objeto que representa aquela
       aba.
     </p>
-    <div class="pa-4 w-100 d-flex">
+    <div class="w-100 d-flex">
       <div class="w-100">
         <alex-custom-tabs
           v-model="usageVariantActivePage"
@@ -280,15 +337,15 @@ ${thirdExampleScript}
     </div>
     <h2 class="text-h3 text-gray-800">Variante: Tabs na vertical</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Você pode alterar a direção das abas, passando a props
-      <strong> direction </strong> com o valor <strong> vertical </strong>.
+      Você pode alterar a orientação das abas, basta adicionar a props
+      <strong>vertical</strong>.
     </p>
-    <div class="pa-4">
+    <div>
       <div class="w-100">
         <alex-custom-tabs
           v-model="usageVariantActivePage"
           :tabs="usageTabs"
-          direction="vertical"
+          vertical
         ></alex-custom-tabs>
         <v-window v-model="usageVariantActivePage" class="mt-2">
           <v-window-item value="1"> Primeira pagina </v-window-item>
@@ -375,6 +432,7 @@ const thirdExampleActivePage = ref('1');
 const fourthExampleActivePage = ref('1');
 const usageActivePage = ref('1');
 const usageVariantActivePage = ref('1');
+
 const usageTabs = [
   {
     label: 'Home',
@@ -426,6 +484,21 @@ const exampleTabs = [
     value: '2',
   },
 ];
+
+const propsExample = `
+const tabs = [
+  { 
+    label: 'Home',
+    value: '1',
+    notification: true, },
+  { 
+    label: 'Profile',
+    value: '2', },
+  { 
+    label: 'Login',
+    value: '3',
+    notification: true, },
+]`;
 const firstExampleTemplate = ref(`
 <alex-custom-tabs v-model="activePage" :tabs="tabs" ></alex-custom-tabs> 
 <v-window v-model="activePage"> 
@@ -488,7 +561,7 @@ const tabs = [
        `);
 
 const fourthExampleTemplate = ref(`
-<alex-custom-tabs v-model="activePage" :tabs="tabs" direction="vertical" ></alex-custom-tabs> 
+<alex-custom-tabs v-model="activePage" :tabs="tabs" vertical ></alex-custom-tabs> 
 <v-window v-model="activePage"> 
     <v-window-item value="1"> Primeira pagina </v-window-item> 
     <v-window-item value="2"> Segunda Pagina </v-window-item> 
