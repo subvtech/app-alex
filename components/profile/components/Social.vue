@@ -1,20 +1,23 @@
 <template>
-  <div
+  <a
     class="flex-row align-center justify-space-between w-100"
     :class="[
       isDeleted ? 'd-none' : 'd-flex',
       index === 0 ? 'rounded-t-lg' : '',
       isLast ? 'rounded-b-lg' : 'border-down',
     ]"
-    style="gap: 16px; overflow: hidden"
+    :href="canEdit ? undefined : url"
+    target="_blank"
+    style="gap: 16px; overflow: hidden; text-decoration: none"
   >
     <div class="contact-item d-flex flex-col align-center w-100">
-      <v-expansion-panel class="" :elevation="0">
+      <v-expansion-panel class="" :disabled="disabled" :elevation="0">
         <v-expansion-panel-title class="d-flex justify-self-start">
           <template v-if="!canEdit" v-slot:actions>
             <v-icon>mdi-chevron-right</v-icon>
             <!-- Replace 'mdi-alert-circle' with your custom icon -->
           </template>
+
           <div class="d-flex justify-space-between align-center w-100">
             <div class="d-flex align-center">
               <NuxtImg
@@ -42,7 +45,7 @@
                   line-height: 135%; /* 18.9px */
                   letter-spacing: 0.28px;
                 "
-                >{{ name.toUpperCase() }}</span
+                >{{ props.name.toUpperCase() }}</span
               >
             </div>
             <v-icon
@@ -60,28 +63,40 @@
           :class="canEdit ? '' : 'd-none'"
         >
           <v-text-field
-            v-if="!isSupported"
-            label="Qual o nome do site?"
-            v-model="value2"
+            :label="$t('components.profile.socials.editSocialName')"
+            v-model="nameField.value.value"
+            class="mb-2"
             name="name"
-            @input="emit('update:social', { socialId, name: value2, index })"
-            :error-messages="errorMessage2"
+            @change="
+              emit('update:social', {
+                socialId,
+                name: nameField.value.value,
+                index,
+              })
+            "
+            :error-messages="nameField.errorMessage.value"
             color="black"
             variant="outlined"
           />
           <v-text-field
-            label="Qual o endereço do site?"
-            v-model="value"
+            :label="$t('components.profile.socials.editSocialUrl')"
+            v-model="urlField.value.value"
             name="url"
-            @input="emit('update:social', { socialId, url: value, index })"
-            :error-messages="errorMessage"
+            @input="
+              emit('update:social', {
+                socialId,
+                url: urlField.value.value,
+                index,
+              })
+            "
+            :error-messages="urlField.errorMessage.value"
             color="black"
             variant="outlined"
           />
         </v-expansion-panel-text>
       </v-expansion-panel>
     </div>
-  </div>
+  </a>
 </template>
 
 <script setup lang="ts">
@@ -93,7 +108,6 @@ const { nameRules, urlRules } = useFormRules();
 const props = defineProps({
   socialId: {
     type: Number,
-    required: true,
   },
   url: {
     type: String,
@@ -113,35 +127,54 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 
+  onError: {
+    type: Function,
+    required: true,
+  },
+  onSuccess: {
+    type: Function,
+    required: true,
+  },
   isLast: {
     type: Boolean,
     default: false,
   },
 });
 
-const { url, name, socialId, index, canEdit } = toRefs(props);
-const isDeleted = ref(false);
+const { url, socialId, index, name, canEdit } = toRefs(props);
 
-const { value, errorMessage } = useField('url', urlRules, {
+const isDeleted = ref(false);
+const urlField = useField('url', urlRules, {
   initialValue: url.value,
 });
 
-const { value: value2, errorMessage: errorMessage2 } = useField(
-  'name',
-  nameRules,
-  {
-    initialValue: name.value,
-  },
-);
+const nameField = useField('name', nameRules, {
+  initialValue: name.value,
+});
 
 const isSupported = computed(() =>
-  ['youtube', 'linkedin', 'instagram'].includes(name.value),
+  ['youtube', 'linkedin', 'instagram'].includes(props.name),
 );
 
+watchEffect(() => {
+  if (nameField.errorMessage.value || urlField.errorMessage.value) {
+    props.onError();
+  } else {
+    props.onSuccess();
+  }
+});
 const deleteSocial = async () => {
   isDeleted.value = true;
-  emit('delete:social', { socialId: socialId?.value, name: name.value });
+  emit('delete:social', {
+    socialId: socialId?.value,
+    name: name.value,
+    index: index.value,
+  });
 };
 </script>
 

@@ -4,7 +4,7 @@
     :full-width="true"
     :isEditing="isEditing && canEdit"
     :showIcon="canEdit"
-    @toogle:isEditing="isEditing = !isEditing"
+    @toggle:isEditing="isEditing = !isEditing"
     :cancel="onCancel"
     :save="onSave"
   >
@@ -88,7 +88,7 @@ const props = defineProps({
     type: Array as PropType<Institution[]>,
     required: true,
   },
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
@@ -97,7 +97,7 @@ const props = defineProps({
     default: false,
   },
 });
-const { id, canEdit } = toRefs(props);
+const { userId, canEdit } = toRefs(props);
 
 const updateSelectedOption = (selectedId) => {
   if (
@@ -180,7 +180,7 @@ const onSave = async () => {
     }
   }
 
-  await client(`/users/${id.value}`, {
+  await client(`/users/${userId.value}`, {
     method: 'PUT',
     body: {
       institutions: {
