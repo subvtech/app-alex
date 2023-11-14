@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
-import { screen, within } from '@testing-library/vue';
+import { screen, within, fireEvent } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
 
 import RadioButtonComponent from '../../components/Alex/inputs/radio-button.vue';
+let model = 'Test Value';
 
 describe('Pagination component', () => {
   it('should render the radio button component', async () => {
@@ -32,6 +33,7 @@ describe('Pagination component', () => {
             hint: 'hint opção 4',
           },
         ],
+        'onUpdate:modelValue': (e) => (model = e),
       },
       global: {
         plugins: [vuetify],
@@ -51,5 +53,11 @@ describe('Pagination component', () => {
     const radiogroup = await screen.findByRole('radiogroup');
     const hint = await within(radiogroup).findByText('hint opção 3');
     expect(hint).not.toBeNull();
+  });
+  it('Should set the v-model value to 2', async () => {
+    const radiogroup = await screen.findAllByRole('radiogroup');
+    const button = await within(radiogroup[0]).findByLabelText('Opção 2');
+    await fireEvent.click(button);
+    expect(model).toBe('2');
   });
 });
