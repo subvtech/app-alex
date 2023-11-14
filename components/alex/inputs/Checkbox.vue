@@ -3,14 +3,15 @@
     <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
         :class="{ 'input-checkbox': indeterminate }"
-        :model-value="modelValue"
+        :model-value="checked"
         :indeterminate="indeterminate"
         :disabled="disabled"
         :readonly="readonly"
         hide-details="auto"
-        color="#00B7CC"
+        color="#00b7cc"
         width="18"
         data-testid="testing-checkbox"
+        @change="handleChange"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
@@ -33,7 +34,7 @@ defineProps({
     type: String,
     default: '',
   },
-  modelValue: {
+  checked: {
     type: Boolean,
     default: false,
   },
@@ -50,6 +51,11 @@ defineProps({
     default: false,
   },
 });
+const emit = defineEmits(['update:checked', 'change']);
+
+const handleChange = (value) => {
+  emit('update:checked', value);
+};
 </script>
 <style scoped>
 div {
@@ -63,6 +69,7 @@ div {
   align-items: flex-end;
   width: fit-content;
   height: 47px;
+  border: none;
 }
 
 .text-container {
