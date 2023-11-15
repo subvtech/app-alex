@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Dropdown from '@/components/Dropdown.vue'; // Certifique-se de que o caminho do import está correto
+import Dropdown from '@/components/alex/inputs/Dropdown.vue';
 
 const items1 = ref([
   {
@@ -55,7 +55,7 @@ const items2 = ref([
     type: 'icon',
     icon: 'mdi-delete',
     text: 'Excluir',
-    isWarning: true,
+    class: 'warning',
   },
 ]);
 
