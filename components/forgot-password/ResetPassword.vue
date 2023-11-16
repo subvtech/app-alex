@@ -21,12 +21,13 @@
         color="white"
         class="my-3 text-secondary"
         theme="dark"
+        :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
         @click:append-inner="passwordVisible = !passwordVisible"
       />
 
       <alex-inputs-stepper-field
         :label="$t('components.forgot.sendResetPassword.confirmPassword')"
-        name="password"
+        name="confirmPassword"
         :append-inner-icon="passwordVisible2 ? 'mdi-eye' : 'mdi-eye-off'"
         :type="passwordVisible2 ? 'text' : 'password'"
         color="white"
@@ -47,7 +48,7 @@
       >
     </v-form>
     <ForgotPasswordDividerRow />
-    <p class="text-center text-body-1">
+    <p class="text-center text-body-1 mt-5">
       {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-accent text-decoration-none">
         {{ $t('components.forgot.sendResetPassword.login') }}
@@ -70,6 +71,9 @@ const passwordVisible = ref(false);
 const passwordVisible2 = ref(false);
 
 const route = useRoute();
+onBeforeMount(() => {
+  if (!route.query.code) navigateTo('/login');
+});
 
 const emit = defineEmits(['confirmation-message']);
 
@@ -92,13 +96,28 @@ const changePassword = handleSubmit(async () => {
       password: values.password,
       passwordConfirmation: values.confirmPassword,
     });
+    
     emit('confirmation-message');
   } catch (error) {
     messageStore.message = error as string;
     messageStore.color = 'red';
     messageStore.show = true;
+    navigateTo('/login');
   } finally {
     loading.value = false;
   }
 });
 </script>
+
+<style scoped lang="scss">
+@media (max-height: 700px) {
+  .v-container {
+    .mt-5 {
+      margin-top: 10px !important;
+    }
+    .mb-10 {
+      margin-bottom: 10px !important;
+    }
+  }
+}
+</style>

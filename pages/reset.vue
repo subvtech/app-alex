@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height pa-0 card" fluid>
+  <v-container class="fill-height pa-0 card overflow-hidden" fluid>
     <v-row class="fill-height">
       <v-col
         md="8"
@@ -9,12 +9,21 @@
         <img class="w-50" src="../static/images/imagem_forgot.png" />
       </v-col>
       <v-col
-        id="login-container"
+        id="reset-container"
         cols="12"
         md="4"
         sm="12"
         class="bg-primary px-16"
       >
+        <div class="mt-12 mt-sm-16" align="center">
+          <img
+            height="40"
+            width="120"
+            alt="Alex"
+            src="../static/images/alex.svg"
+            class="mt-8 mb-12 mb-sm-16"
+          />
+        </div>
         <ForgotPasswordResetPassword
           v-if="!passwordChanged"
           @confirmation-message="handlePasswordChanged"
@@ -34,7 +43,7 @@ import { ref } from 'vue';
 const passwordChanged = ref(false);
 definePageMeta({
   layout: 'auth',
-  middleware: 'control-access'
+  middleware: 'control-access',
 });
 
 const handlePasswordChanged = () => {
@@ -42,17 +51,22 @@ const handlePasswordChanged = () => {
 };
 </script>
 
-<style scoped>
-#login-container {
+<style scoped lang="scss">
+#reset-container {
   background-image: url('../static/images/login-bg.svg');
-  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.w-90 {
-  width: 90% !important;
-}
+@media (max-height: 700px) {
+  #reset-container {
+    div {
+      margin-top: 0px !important;
+    }
 
-.mt-220 {
-  margin-top: 220px !important;
+    div img.mt-8 {
+      margin-bottom: 24px !important;
+    }
+  }
 }
 </style>

@@ -114,18 +114,18 @@
 
           <alex-inputs-stepper-field
             :label="$t('pages.register.confirmPassword')"
-            :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="passwordVisible ? 'text' : 'password'"
+            :append-inner-icon="passwordVisible2 ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="passwordVisible2 ? 'text' : 'password'"
             name="confirmPassword"
             color="white"
             class="my-3 text-secondary"
             theme="dark"
-            @click:append-inner="passwordVisible = !passwordVisible"
+            @click:append-inner="passwordVisible2 = !passwordVisible2"
           />
         </template>
       </alex-inputs-stepper>
 
-      <div class="d-flex align-center text-white my-12">
+      <div class="d-flex align-center text-white my-10">
         <v-divider
           color="secondary"
           :thickness="1"
@@ -150,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['successMessage']);
+const emit = defineEmits(['success:message']);
 const {
   registerSchemas: { registerStep1, registerStep2, registerStep3 },
 } = useFormRules();
@@ -168,6 +168,7 @@ const registering = ref(false);
 const institutions = ref([]);
 const search = ref('');
 const passwordVisible = ref(false);
+const passwordVisible2 = ref(false);
 const submit = async (values: {
   fullname: string;
   username: string;
@@ -209,15 +210,14 @@ const submit = async (values: {
 
   try {
     const { user } = await register(userData);
-
-    if (user.value!.blocked) {
-      setMessage(i18n.t('pages.login.blockedError'), 'red', true);
-    } else if (user.value!.confirmed) {
-      registering.value = false;
-      emit('successMessage');
+    console.log({ user: user.value });
+    if (user.value && user.value.blocked) {
+      setMessage(i18n.t('pages.login.blocked'), 'red', true);
+    } else {
+      emit('success:message');
     }
-  } catch (error) {
-    setMessage(error as string);
+  } catch (err: any) {
+    setMessage(err.error.message, 'red', true);
   } finally {
     registering.value = false;
   }
@@ -225,11 +225,6 @@ const submit = async (values: {
 </script>
 
 <style scoped lang="scss">
-.logo {
-  width: 100%;
-  height: clamp(150px, 20vh, 800px);
-}
-
 .content {
   padding: 32px 40px 32px 40px;
   width: 100%;
@@ -253,6 +248,22 @@ const submit = async (values: {
 
 .max-w-100 {
   max-width: 450px;
+}
+
+@media (max-height: 700px) {
+  .my-3 {
+    margin-block: 6px !important;
+  }
+
+  .my-10 {
+    margin-block: 20px !important;
+  }
+  .haveAccount {
+    padding-top: 0px !important;
+  }
+  .content {
+    padding-top: 16px !important;
+  }
 }
 
 @media screen and (max-width: 500px) {

@@ -9,22 +9,31 @@
         <img class="w-50" src="../static/images/imagem_forgot.png" />
       </v-col>
       <v-col
-        id="login-container"
+        id="forgot-container"
         cols="12"
         md="4"
         sm="12"
         class="bg-primary px-16"
       >
+        <div class="mt-12 mt-sm-16" align="center">
+          <img
+            height="40"
+            width="120"
+            alt="Alex"
+            src="../static/images/alex.svg"
+            class="mt-8 mb-12 mb-sm-16"
+          />
+        </div>
         <ForgotPasswordSendResetPasswordEmail
           v-if="!emailSent"
           @confirmation-message="handleSentEmail"
         />
         <ForgotPasswordConfirmationMessage
           v-else
-          :title="$t('pages.forgot.recoverSent')"
-          :text="$t('pages.forgot.recoverInfo')"
+          :title="$t('pages.forgot.success.title')"
+          :text="$t('pages.forgot.success.subtitle1')"
           :email="userEmail"
-          :text2="$t('pages.forgot.recoverInfo2')"
+          :text2="$t('pages.forgot.success.subtitle2')"
         />
       </v-col>
     </v-row>
@@ -45,25 +54,18 @@ const handleSentEmail = (email) => {
 };
 </script>
 
-<style scoped>
-#login-container {
+<style scoped lang="scss">
+#forgot-container {
   background-image: url('../static/images/login-bg.svg');
-  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-.w-90 {
-  width: 90% !important;
-}
-
-
-.mt-220 {
-  margin-top: 220px;
-}
-
-@media (max-height: 650px) {
-  .mt-220 {
-    margin-top: 110px !important;
+@media (max-height: 700px) {
+  #forgot-container {
+    div {
+      margin-top: 0px !important;
+    }
   }
 }
-
 </style>
