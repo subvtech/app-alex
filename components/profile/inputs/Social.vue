@@ -27,7 +27,7 @@
             v-else
             class="icon"
             :class="isEditing ? 'upload' : ''"
-            :src="newIcon ? newIcon : strapiBaseUrl + social.icon.url"
+            :src="newIcon ? newIcon : strapiBaseUrl"
             :alt="social.name"
           />
         </label>

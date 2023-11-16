@@ -210,7 +210,6 @@ const submit = async (values: {
 
   try {
     const { user } = await register(userData);
-    console.log({ user: user.value });
     if (user.value && user.value.blocked) {
       setMessage(i18n.t('pages.login.blocked'), 'red', true);
     } else {
