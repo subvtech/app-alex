@@ -106,13 +106,13 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
 });
 
-const { id, socials, canEdit } = toRefs(props);
+const { userId, socials, canEdit } = toRefs(props);
 
 const supported = ['youtube', 'linkedin', 'instagram'];
 
@@ -143,7 +143,7 @@ const addSocial = async ({ value, value2, selectedSocial }) => {
   const addedSocial = {
     name: value2 === '' ? selectedSocial.toLowerCase() : value2,
     url: value,
-    users_permissions_user: id.value,
+    users_permissions_user: userId.value,
   };
 
   if (supported.includes(selectedSocial.toLowerCase()))
@@ -245,7 +245,7 @@ const onSave = async () => {
 
   if (connectArray.length !== 0)
     promises.push(
-      client(`/users/${id.value}`, {
+      client(`/users/${userId.value}`, {
         method: 'PUT',
         body: {
           socials: {

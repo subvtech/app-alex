@@ -11,5 +11,7 @@
   "learningPlans": "Learning Plans",
   "events": "Events",
   "settings": "Settings",
-  "cover": "Update cover"
+  "cover": "Update cover",
+  "startDate": "Start date",
+  "endDate": "End date"
 }

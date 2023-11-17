@@ -1,5 +1,11 @@
 <template>
-  <v-app-bar app color="white" class="px-4" :class="[notFixed ? 'not-fixed' : '']" data-testid="horizontal-bar">
+  <v-app-bar
+    app
+    color="white"
+    class="px-4"
+    :class="[notFixed ? 'not-fixed' : '']"
+    data-testid="horizontal-bar"
+  >
     <div
       class="d-flex w-100 align-center"
       :class="reverse ? 'flex-row-reverse' : ''"
@@ -39,8 +45,11 @@
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
               <app-user-avatar
-                :avatar-url="user.avatar ? user.avatar.url : user.avatar"
-                :fullname="user.fullname"
+                :profile-picture="user.avatar"
+                :placeholder="user.fullname"
+                track-current-user
+                show-border
+                avatar-style="border: 1px solid #A0A8B1;"
                 class="mr-2"
               />
               <span class="fullname mr-1" style="cursor: pointer">
@@ -57,7 +66,7 @@
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <app-user-avatar :avatar-url="''" :fullname="''" class="mr-2" />
+              <app-user-avatar :placeholder="''" class="mr-2" />
               <span class="fullname mr-1" style="cursor: pointer"> user </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
@@ -183,6 +192,8 @@ body {
     .v-toolbar__content {
       .user-block {
         min-width: 72px;
+        display: flex;
+        align-items: center;
         .fullname {
           color: #6e7a87;
 

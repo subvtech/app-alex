@@ -11,5 +11,7 @@
   "learningPlans": "Planos de Aprendizado",
   "events": "Eventos",
   "settings": "Configurações",
-  "cover": "Alterar capa"
+  "cover": "Alterar capa",
+  "startDate": "Início",
+  "endDate": "Término"
 }

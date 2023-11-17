@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
+    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start"
   >
     <h1 class="text-h2 text-gray-800">HorizontalBar</h1>
     <p class="text-subtitle-2 text-gray-500">
@@ -37,8 +37,8 @@
       </p>
     </div>
     <div class="w-100 d-flex">
-      <v-container>
-        <v-row align="center"><alex-custom-horizontalBar not-fixed /></v-row
+      <v-container class="p-0 m-0">
+        <v-row align="center"><alex-custom-horizontal-bar not-fixed /></v-row
       ></v-container>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
@@ -152,7 +152,7 @@
       <div class="px-3">
         <v-container>
           <v-row align="center"
-            ><alex-custom-horizontalBar
+            ><alex-custom-horizontal-bar
               :toggle-drawer="() => (drawer = !drawer)"
               is-chat-active
               is-bell-active
@@ -184,7 +184,7 @@
         <div class="px-3">
           <v-container>
             <v-row align="center"
-              ><alex-custom-horizontalBar
+              ><alex-custom-horizontal-bar
                 :toggle-drawer="() => (drawer = !drawer)"
                 reverse
                 not-fixed
@@ -283,7 +283,7 @@ definePageMeta({
 const user: User = {
   fullname: 'John Doe',
   avatar: {
-    url: '',
+    url: 'https://picsum.photos/1000/600',
     id: 2,
   },
 };
@@ -307,7 +307,7 @@ const menuItems = [
   { title: 'logout', logout: true },
 ];
 const examples = [
-  `<alex-custom-horizontalBar not-fixed/>`,
+  `<alex-custom-horizontal-bar not-fixed/>`,
   `<alex-custom-horizontal-bar
             :toggle-drawer="() => {}"
             :menu-items="[

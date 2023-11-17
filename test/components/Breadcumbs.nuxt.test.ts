@@ -6,7 +6,7 @@ import Breadcrumbs from '../../components/alex/custom/Breadcrumbs.vue';
 
 describe('Breadcrumbs', async () => {
   it('Breadcrumbs should be defined', async () => {
-    const { unmount } = await renderSuspended(Breadcrumbs, {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
 
@@ -19,9 +19,9 @@ describe('Breadcrumbs', async () => {
         plugins: [vuetify],
       },
     });
-    const breadcrumb = await screen.queryByTestId('breadcrumbs');
+    const breadcrumb = await breadcrumbsComponent.queryByTestId('breadcrumbs');
     expect(breadcrumb).not.toBeNull();
-    unmount();
+    breadcrumbsComponent.unmount();
   });
 
   it('arrow should be not displayed', async () => {
@@ -43,8 +43,8 @@ describe('Breadcrumbs', async () => {
 
     unmount();
   });
-  it('arrow should be not displayed', async () => {
-    const { unmount } = await renderSuspended(Breadcrumbs, {
+  it('arrow should be displayed', async () => {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
         items: [{ disabled: false, title: 'text', href: '/' }],
@@ -53,33 +53,94 @@ describe('Breadcrumbs', async () => {
         plugins: [vuetify],
       },
     });
-    const arrow = await screen.queryByRole('goback');
+    const arrow = await breadcrumbsComponent.queryByRole('goback');
     expect(arrow).toBeNull();
 
-    unmount();
+    breadcrumbsComponent.unmount();
   });
 
   it('should display the title', async () => {
-    const { unmount } = await renderSuspended(Breadcrumbs, {
+    const title = 'Jojo';
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
       attrs: {
-        title: 'Jojo',
+        title,
         items: [{ disabled: false, title: 'text', href: '/' }],
       },
       global: {
         plugins: [vuetify],
       },
     });
-    const title = await screen.queryByRole('title');
-    expect(title).not.toBeNull();
+    const titleComponent = await breadcrumbsComponent.queryByRole('title');
+    expect(titleComponent).not.toBeNull();
 
-    const titleText = await screen.queryByText('Jojo');
+    const titleText = await breadcrumbsComponent.queryByText(title);
     expect(titleText).not.toBeNull();
 
-    unmount();
+    breadcrumbsComponent.unmount();
   });
 
-  it('should display the items', async () => {
-    const { unmount } = await renderSuspended(Breadcrumbs, {
+  it('should not display any crumbdivider', async () => {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
+      attrs: {
+        title: 'Jojo',
+        arrowBack: true,
+        items: [{ disabled: true, title: 'text2', href: '/dd' }],
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const dividers = await breadcrumbsComponent.queryAllByText('>');
+    expect(dividers.length).toBe(0);
+
+    breadcrumbsComponent.unmount();
+  });
+
+  it('should display crumbdividers', async () => {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
+      attrs: {
+        title: 'Jojo',
+        items: [
+          { disabled: false, title: 'text', href: '/' },
+          { disabled: true, title: 'text2', href: '/dd' },
+        ],
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const dividers = await breadcrumbsComponent.queryAllByText('>');
+    expect(dividers.length).toBeGreaterThan(0);
+
+    breadcrumbsComponent.unmount();
+  });
+
+  it('should display custom crumbdividers', async () => {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
+      attrs: {
+        title: 'Jojo',
+        divider: '#',
+        items: [
+          { disabled: false, title: 'text', href: '/' },
+          { disabled: false, title: 'text', href: '/' },
+          { disabled: false, title: 'text', href: '/' },
+        ],
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const dividers = await breadcrumbsComponent.queryAllByText('#');
+    expect(dividers.length).toBeGreaterThan(0);
+
+    breadcrumbsComponent.unmount();
+  });
+
+  it('should display single item', async () => {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
         items: [{ disabled: false, title: 'text', href: '/' }],
@@ -88,16 +149,18 @@ describe('Breadcrumbs', async () => {
         plugins: [vuetify],
       },
     });
-    const title = await screen.queryByRole('breadcrumb-item');
-    expect(title).not.toBeNull();
+    const itemComponent =
+      await breadcrumbsComponent.queryByRole('breadcrumb-item');
+    expect(itemComponent).not.toBeNull();
 
-    const itemText = await screen.queryByText('text');
+    const itemText = await breadcrumbsComponent.queryByText('text');
     expect(itemText).not.toBeNull();
 
-    unmount();
+    breadcrumbsComponent.unmount();
   });
+
   it('should display disabled items', async () => {
-    const { unmount } = await renderSuspended(Breadcrumbs, {
+    const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
       attrs: {
         title: 'Jojo',
         items: [
@@ -109,9 +172,11 @@ describe('Breadcrumbs', async () => {
         plugins: [vuetify],
       },
     });
-    const title = await screen.queryByRole('breadcrumb-item-disabled');
+    const title = await breadcrumbsComponent.queryByRole(
+      'breadcrumb-item-disabled',
+    );
     expect(title).not.toBeNull();
 
-    unmount();
+    breadcrumbsComponent.unmount();
   });
 });
