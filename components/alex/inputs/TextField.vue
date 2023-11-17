@@ -1,5 +1,10 @@
 <template>
-  <v-text-field color="primary--2" rounded="lg"></v-text-field>
+  <v-text-field
+    color="primary--2"
+    rounded="lg"
+    role="textfield"
+    persistent-hint
+  ></v-text-field>
 </template>
 
 <style>

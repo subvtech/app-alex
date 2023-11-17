@@ -201,7 +201,7 @@ import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 const copiedValue = ref('');
 const activeExampleTabs = ref(['1']);
-const playgroundOptions = ref([0, 0, 0, 0]);
+const playgroundOptions = ref([false, false, false, true]);
 const playgroundValues = ref(['', '', '']);
 const playgroundDensities = ref('default');
 
@@ -209,7 +209,6 @@ const exampleTemplates = [
   `    <alex-inputs-text-field
       v-model="inputText"
       placeholder="Nome de Usuário"
-      class="w-100"
       prepend-inner-icon="mdi-account"
       clearable
       hint="Nome de usuário deve conter no mínimo X caracteres"
@@ -230,12 +229,8 @@ const exampleTabs = [
 ];
 
 const copyToClipboard = async (message, item) => {
-  try {
-    await navigator.clipboard.writeText(message);
-    copiedValue.value = item;
-  } catch (err) {
-    copiedValue.value = item;
-  }
+  await navigator.clipboard.writeText(message);
+  copiedValue.value = item;
 };
 </script>
 
