@@ -3,7 +3,7 @@ import { renderSuspended } from 'nuxt-vitest/utils';
 
 import { screen } from '@testing-library/vue';
 
-import AppSnackbar from '@/components/AppSnackbar.vue';
+import AppSnackbar from '../../components/AppSnackbar.vue';
 
 describe('AppSnackbar', () => {
   it('should be a button', async () => {

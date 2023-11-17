@@ -1,6 +1,6 @@
 <template>
   <div
-    class="breadcrumb-block d-flex align-center"
+    class="breadcrumb-block d-flex align-baseline"
     style="gap: 8px"
     :style="
       backgroundColor
@@ -9,23 +9,37 @@
     "
     data-testid="breadcrumbs"
   >
-    <a
-      v-if="arrowBack && items.length > 1"
-      :href="items[items.length - 2].href"
-      role="goback"
-    >
-      <v-icon color="#6E7A87" style="cursor: pointer">mdi-chevron-left</v-icon>
-    </a>
+    <div class="d-flex align-center">
+      <a
+        v-if="arrowBack && items.length > 1"
+        :href="items[items.length - 2].href"
+        role="goback"
+      >
+        <v-icon color="#6E7A87" style="cursor: pointer"
+          >mdi-chevron-left</v-icon
+        >
+      </a>
 
-    <span
-      class="title text-h4 text-sm-h3"
-      style="display: inline-flex; flex-shrink: 0"
-      :style="titleStyle ?? ''"
-      role="title"
-      >{{ title }}</span
+      <span
+        class="title text-h4 text-sm-h3"
+        :style="titleStyle ?? ''"
+        role="title"
+        >{{ title }}</span
+      >
+      <v-divider
+        vertical
+        :thickness="thickness"
+        class="pl-2"
+        style="margin-block: auto; height: 24px"
+        :style="barStyle ?? ''"
+      />
+    </div>
+    <v-breadcrumbs
+      class="w-100 pl-0"
+      :class="breadcrumbsVClasses ?? 'flex-wrap'"
+      :items="items"
+      :divider="divider"
     >
-    <v-divider vertical class="pl-2" style="margin-block: auto; height: 24px" />
-    <v-breadcrumbs class="w-100 pl-0" :items="items" divider=">">
       <template v-slot:title="{ item }">
         <v-breadcrumbs-item
           :href="item.href"
@@ -36,12 +50,16 @@
           {{ item.title }}
         </v-breadcrumbs-item>
       </template>
+      <template v-slot:divider>
+        <slot v-if="overwriteDivider" name="divider" />
+        <span v-else :style="itemStyle ?? ''">{{ divider }}</span>
+      </template>
     </v-breadcrumbs>
   </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   items: {
     type: Array as PropType<
       { title: string; disabled: boolean; href: string }[]
@@ -50,10 +68,26 @@ const props = defineProps({
   },
   arrowBack: {
     type: Boolean,
-    default: true,
+    default: false,
+  },
+  overwriteDivider: {
+    type: Boolean,
+    default: false,
+  },
+  breadcrumbsVClasses: {
+    type: String,
+  },
+  divider: {
+    type: String,
+    default: '>',
+  },
+  thickness: {
+    type: Number,
+    default: 2,
   },
   title: { type: String },
   titleStyle: { type: String },
+  barStyle: { type: String },
   itemStyle: { type: String },
   backgroundColor: { type: String },
 });
@@ -64,6 +98,7 @@ const props = defineProps({
   .title {
     color: #5d6872;
     font-weight: 700;
+    width: max-content;
   }
 
   .v-breadcrumbs-item {
@@ -91,14 +126,14 @@ const props = defineProps({
   .breadcrumb-block {
     gap: 6px;
     .title {
-      flex-shrink: unset !important;
+      width: unset !important;
     }
   }
 }
 
 @media (max-width: 340px) {
   .breadcrumb-block {
-    flex-wrap: wrap;
+    flex-wrap: wrap !important;
     gap: 6px;
   }
 }
