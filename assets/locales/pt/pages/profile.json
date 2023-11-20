@@ -1,5 +1,5 @@
 {
-  "title": "Perfil do Usuário",
+  "title": "Meu Perfil",
   "home": "Home",
   "edit": "Editar",
   "teacher": "Professor",
@@ -8,7 +8,10 @@
   "courses": "Cursos",
   "projects": "Projetos",
   "assignments": "Tarefas",
+  "learningPlans": "Planos de Aprendizado",
   "events": "Eventos",
   "settings": "Configurações",
-  "cover": "Alterar capa"
+  "cover": "Alterar capa",
+  "startDate": "Início",
+  "endDate": "Término"
 }

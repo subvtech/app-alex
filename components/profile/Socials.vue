@@ -1,246 +1,329 @@
 <template>
   <profile-card
-    class="mt-6"
     :title="$t('components.profile.socials.title')"
+    :cancel="cancel"
+    :save="onSave"
+    :showIcon="canEdit"
+    :isEditing="isEditing && canEdit"
     :full-width="true"
+    @toggle:isEditing="isEditing = !isEditing"
   >
-    <template v-slot:content>
-      <v-form
-        class="d-flex flex-column w-100 align-center"
-        style="gap: 24px"
-        @submit.prevent="updateValues"
+    <template class="d-flex w-100" v-slot:content>
+      <div
+        v-if="sortedSocials.length === 0"
+        class="empty d-flex flex-column justify-center align-center"
+        style="gap: 16px"
       >
+        <NuxtImg src="/svg/EmptySocials.svg" placeholder />
+        <span>{{ $t('components.profile.socials.empty') }}</span>
+      </div>
+      <div v-else>
         <div
-          class="item d-flex flex-row align-start w-100"
-          v-for="(social, index) in socials"
+          class="rounded-lg"
+          style="box-sizing: border-box; border: 1px solid #d2d6da"
         >
-          <div class="img-upload">
-            <label class="edit" :for="'file-input-' + social.name">
-              <img :src="strapiBaseUrl + social.icon.url" :alt="social.name" />
-            </label>
-
-            <input
-              class=""
-              style="display: none"
-              @input="async (e) => await updateSocialIcon(e, social.id, index)"
-              :id="'file-input-' + social.name"
-              type="file"
-              accept="image/png, image/jpeg, image/svg"
-            />
-          </div>
-
-          <div class="d-flex flex-column w-100" style="gap: 8px">
-            <alex-inputs-stepper-field
-              :label="social.name"
-              :value="social.name"
-              :name="`name.${index}`"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-            <alex-inputs-stepper-field
-              label="url"
-              :value="social.url"
-              :name="`url.${index}`"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-          </div>
-        </div>
-        <div class="item d-flex flex-row align-start w-100">
-          <div class="img-upload">
-            <label class="edit" for="new-icon">
-              <img v-if="newIcon" :src="newIcon" alt="icon" />
-              <img v-else src="../../assets/svg/website.svg" alt="icon" />
-            </label>
-
-            <input
-              class=""
-              @input="uploadNewIcon"
-              style="display: none"
-              id="new-icon"
-              type="file"
-              accept="image/png, image/jpeg, image/svg"
-            />
-          </div>
-
-          <div class="d-flex flex-column w-100" style="gap: 8px">
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.socials.newSocial')"
-              name="nameLoose"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.socials.newSocialUrl')"
-              name="urlLoose"
-              class=""
-              color="black"
-              variant="outlined"
-            />
-          </div>
-        </div>
-        <div class="block d-flex">
-          <v-btn class="btn" color="accent" @click="cancel" variant="outlined">
-            {{ $t('components.profile.settings.cancel') }}</v-btn
+          <v-expansion-panels
+            class=""
+            variant="accordion"
+            theme="flat"
+            :key="componentKey"
           >
-          <v-btn class="btn" color="accent" type="submit">
-            {{ $t('components.profile.settings.save') }}
-          </v-btn>
+            <draggable
+              class="d-flex flex-column contacts w-100"
+              :list="sortedSocials"
+              item-key="name"
+              :disabled="!(isEditing && canEdit)"
+              ghost-class="ghost"
+              handle=".handle"
+              @end="isChanged = true"
+            >
+              <template #item="{ element, index }">
+                <profile-components-social
+                  :socialId="element.id"
+                  :url="element.url"
+                  :name="element.name"
+                  :index="index"
+                  :key="index"
+                  :disabled="disabled"
+                  :isLast="sortedSocials.length - 1 === index"
+                  :canEdit="isEditing && canEdit"
+                  :onError="() => (disabled = true)"
+                  :onSuccess="() => (disabled = false)"
+                  @update:social="updateSocialMedia"
+                  @delete:social="updateDeleteArray"
+                />
+              </template>
+            </draggable>
+          </v-expansion-panels>
         </div>
-      </v-form>
+      </div>
+      <div v-if="isEditing && canEdit" class="d-flex justify-center mt-6">
+        <v-btn
+          class="btn"
+          @click="isAdding = true"
+          variant="outlined"
+          prepend-icon="mdi-plus"
+        >
+          {{ $t('components.profile.general.addSocial') }}</v-btn
+        >
+      </div>
+      <div v-if="isAdding" class="add-social">
+        <profile-components-add-social
+          @close:add-social="isAdding = false"
+          @save:add-social="addSocial"
+          :socials="updatedMissingSocials"
+        />
+      </div>
     </template>
   </profile-card>
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
+import draggable from 'vuedraggable';
+const i18n = useI18n();
 
-const strapiBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+const isEditing = ref(false);
+const isAdding = ref(false);
+const isChanged = ref(false);
+const disabled = ref(false);
+const componentKey = ref(0);
 
 const emit = defineEmits(['update:user']);
-const { socialsSchema } = useFormRules();
-
-const { create, update } = useStrapi();
-const client = useStrapiClient();
-const { updateImage } = useUploadedImage();
-const messageStore = useMessageStore();
-const loading = ref(false);
-
-const newIcon = ref<string | null>(null);
-
-type Social = {
-  name: string;
-  url: string;
-  icon: any;
-  id: number;
-};
+const { create, update, delete: _delete } = useStrapi();
 
 const props = defineProps({
   socials: {
-    type: Array as PropType<Social[]>,
+    type: Array as PropType<
+      {
+        id: number;
+        url: string;
+        name: string;
+      }[]
+    >,
     required: true,
   },
-
-  id: {
+  canEdit: {
+    type: Boolean,
+    required: true,
+  },
+  userId: {
     type: Number,
     required: true,
   },
 });
 
-const { socials } = toRefs(props);
+const { userId, socials, canEdit } = toRefs(props);
 
-const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: socialsSchema,
-  keepValuesOnUnmount: true,
+const supported = ['youtube', 'linkedin', 'instagram'];
+
+const client = useStrapiClient();
+
+const sortedSocials = ref<
+  {
+    id?: number;
+    url: string;
+    name: string;
+  }[]
+>([...socials.value]);
+const missingSocials = ref<string[]>([]);
+const updatedMissingSocials = ref<string[]>([]);
+
+onMounted(() => {
+  if (!sortedSocials.value.find((element) => element.name === 'instagram'))
+    missingSocials.value.push('Instagram');
+  if (!sortedSocials.value.find((element) => element.name === 'youtube'))
+    missingSocials.value.push('Youtube');
+  if (!sortedSocials.value.find((element) => element.name === 'linkedin'))
+    missingSocials.value.push('Linkedin');
+  missingSocials.value.push(i18n.t('components.profile.socials.otherSocial'));
+  updatedMissingSocials.value = [...missingSocials.value];
 });
 
-const cancel = () => {
-  socials.value = props.socials;
+const addSocial = async ({ value, value2, selectedSocial }) => {
+  const addedSocial = {
+    name: value2 === '' ? selectedSocial.toLowerCase() : value2,
+    url: value,
+    users_permissions_user: userId.value,
+  };
+
+  if (supported.includes(selectedSocial.toLowerCase()))
+    updatedMissingSocials.value = updatedMissingSocials.value.filter(
+      (e) => e !== selectedSocial,
+    );
+  sortedSocials.value.push(addedSocial);
+
+  isAdding.value = false;
+  isChanged.value = true;
+};
+const deleteArray = ref<number[]>([]);
+const updateArray = ref<{ socialId: number; url: string; name: string }[]>([]);
+
+const updateDeleteArray = ({ socialId, name, index }) => {
+  if (socialId) {
+    sortedSocials.value = sortedSocials.value.filter((item) => {
+      return item.id !== socialId;
+    });
+    deleteArray.value.push(socialId);
+  } else {
+    sortedSocials.value.splice(index, 1);
+  }
+  isChanged.value = true;
+  if (supported.includes(name))
+    updatedMissingSocials.value = [
+      name[0].toLocaleUpperCase() + name.slice(1),
+    ].concat(updatedMissingSocials.value);
 };
 
-const updateValues = handleSubmit(async () => {
-  loading.value = true;
-  try {
-    const promises: any = [];
-    props.socials.forEach((social, index) => {
-      promises.push(
-        update('socials', social.id, {
-          name: controlledValues.value.name[index],
-          url: controlledValues.value.url[index],
-        }),
-      );
-    });
-    if (
-      controlledValues.value.nameLoose &&
-      controlledValues.value.urlLoose &&
-      newIcon.value
-    ) {
-      const formData = new FormData();
-      const response = await fetch(newIcon.value!);
-      const mimeType = response.headers.get('Content-Type');
-      const fileData = new File([await response.blob()], 'icon', {
-        type: mimeType!,
-      });
+const updateSocialMedia = ({ socialId, name, url, index }) => {
+  const num = updateArray.value.findIndex((item) => item.socialId === socialId);
+  const updatedObject = {
+    ...sortedSocials.value[index],
+  };
+  if (name) updatedObject.name = name;
+  if (url) updatedObject.url = url;
 
-      formData.append('files', fileData);
+  sortedSocials.value[index] = updatedObject;
+  if (num !== -1) updateArray.value[num] = { socialId, name, url };
+  else updateArray.value.push({ socialId, name, url });
+};
+const resetArrays = () => {
+  deleteArray.value = [];
+  updateArray.value = [];
+  isChanged.value = false;
+};
 
-      promises.push(
-        client<any>('/upload', {
-          method: 'POST',
-          body: formData,
-        })
-          .then((result) => {
-            create('socials', {
-              icon: result[0].id,
-              name: controlledValues.value.nameLoose,
-              url: controlledValues.value.urlLoose,
-              users_permissions_user: props.id,
-            })
-              .then((result2) => {})
-              .catch((err) => {
-                console.log(err);
-              });
-          })
-          .then((err) => {
-            console.log(err);
-          }),
-      );
-    }
+const onSave = async () => {
+  const promises: Promise<any>[] = [];
 
-    await Promise.all(promises);
-
-    emit('update:user', {});
-  } catch (error) {
-    console.log(error);
-    messageStore.message = error as string;
-    messageStore.color = 'red';
-    messageStore.show = true;
-  } finally {
-    loading.value = false;
+  const connectArray: {
+    id: number;
+    position: {
+      end?: boolean;
+      start?: boolean;
+      before?: number;
+      after?: number;
+    };
+  }[] = [];
+  if (!isChanged.value) {
+    resetArrays();
+    return;
   }
-});
+  if (sortedSocials.value.length !== 0) {
+    sortedSocials.value.forEach((item, index) => {
+      const position =
+        index === 0
+          ? { start: true }
+          : index === sortedSocials.value.length - 1
+          ? { end: true }
+          : { after: sortedSocials.value[index - 1].id };
+      if (item.id) {
+        if (!deleteArray.value.includes(item.id)) {
+          connectArray.push({
+            id: item.id,
+            position,
+          });
+        }
+      } else {
+        promises.push(
+          create('socials', item).then((result) => {
+            sortedSocials.value[index].id = result.data.id;
+            connectArray.push({
+              id: result.data.id,
+              position,
+            });
+          }),
+        );
+      }
+    });
+  }
 
-async function updateSocialIcon(event: any, iconId: number, index: number) {
-  const { updatedAt } = await updateImage(event, iconId);
-  const url = socials.value[index].icon.url.split('?');
-  if (url) socials.value[index].icon.url = url[0] + '?' + updatedAt;
-}
+  if (deleteArray.value.length !== 0) {
+    deleteArray.value.forEach((item) => {
+      promises.push(_delete(`/socials/${item}`));
+    });
+  }
 
-async function uploadNewIcon(e: any) {
-  newIcon.value = URL.createObjectURL(e.target.files[0]);
+  if (connectArray.length !== 0)
+    promises.push(
+      client(`/users/${userId.value}`, {
+        method: 'PUT',
+        body: {
+          socials: {
+            connect: connectArray,
+            disconnect: deleteArray.value,
+          },
+        },
+      }),
+    );
 
-  //const { updatedAt } = await updateImage(event, user.value.avatar.id);
-}
+  if (promises.length === 0) {
+    resetArrays();
+    return;
+  }
+  await Promise.all(promises);
+
+  resetArrays();
+  emit('update:user');
+};
+
+const cancel = () => {
+  componentKey.value = componentKey.value + 1;
+  deleteArray.value = [];
+  updateArray.value = [];
+  sortedSocials.value = [...socials.value];
+  isChanged.value = false;
+  updatedMissingSocials.value = [...missingSocials.value];
+};
 </script>
 
 <style scoped lang="scss">
-.item {
-  gap: 24px;
-  img {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+#Card {
+  //border-bottom: 1px solid #eaeef1;
+  flex-direction: column;
+
+  .empty {
+    span {
+      color: #6e7a87;
+      text-align: center;
+      /* Body/P1 */
+
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 135%; /* 21.6px */
+      letter-spacing: 0.32px;
+    }
+  }
+
+  .add-social {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    left: 0px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
   }
 }
 
-.block {
-  width: 100%;
-  gap: 8px;
-  justify-content: flex-end;
-  
-  .btn {
-    text-transform: none;
-  }
+.btn {
+  text-transform: none;
+  color: #6e7a87 !important;
+  border-width: 0;
+  background-color: #f1f5f9;
+  font-weight: 700;
+  line-height: 135%; /* 18.9px */
+  letter-spacing: 0.28px;
 }
 
 @media (max-width: 400px) {
-  .block {
-    gap: 12px;
-    flex-direction: column-reverse;
-    width: 100%;
+  #Card {
     .btn {
       width: 100%;
     }
