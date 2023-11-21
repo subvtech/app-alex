@@ -1,0 +1,16 @@
+{
+    "type": {
+        "project": "Projeto",
+        "course": "Curso"
+    }, 
+    "configurations": "Configurações",
+    "visibility": {
+        "show": "Mostrar",
+        "hide": "Ocultar"
+    },
+    "trails": "Trilhas",
+    "facilitator": "Facilitador",
+    "hidden": "Oculto",
+    "options": "Opções",
+    "favorite": "Favoritar"
+}
