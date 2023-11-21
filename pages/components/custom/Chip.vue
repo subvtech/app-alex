@@ -31,11 +31,14 @@
     </p>
     <div class="pa-4">
       <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, o chip é exibido mas não há nada nele.
+        Esse é o modelo mais simples, apenas texto ou apenas o ícone.
       </p>
     </div>
     <div class="w-100 flex-column d-flex">
-      <alex-custom-chip />
+      <div class="d-flex" style="gap: 8px">
+        <alex-custom-chip text="text" />
+        <alex-custom-chip icon="mdi-bookmark" />
+      </div>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
         <v-btn
@@ -61,7 +64,6 @@
       Com a propriedade size se controla o tamanho do chips
     </p>
     <div class="w-100 d-flex" style="gap: 8px">
-      <alex-custom-chip text="x-large" :size="'x-large'" />
       <alex-custom-chip text="large" :size="'large'" />
       <alex-custom-chip text="medium" :size="'medium'" />
       <alex-custom-chip text="small" :size="'small'" />
@@ -89,17 +91,19 @@
     <h2 class="text-h3 text-gray-800">Cores</h2>
 
     <p class="text-subtitle-2 text-gray-500">
-      Com a propriedade color se controla as cores do chips
+      Com a propriedade color se controla as cores do chips, a cor reflete a cor
+      do texto, o background é um shade da cor escolhida
     </p>
     <div class="w-100 d-flex flex-wrap" style="gap: 8px">
-      <alex-custom-chip text="#001A33" :color="'#001A33'" />
-      <alex-custom-chip text="#15693B" :color="'#15693B'" />
+      <alex-custom-chip text="#FFFFFF" :color="'#FFFFFF'" />
+      <alex-custom-chip text="#6E7A87" :color="'#6E7A87'" />
+      <alex-custom-chip text="#156A3B" :color="'#156A3B'" />
       <alex-custom-chip text="#B61617" :color="'#B61617'" />
-      <alex-custom-chip text="#BFF2D6" :color="'#BFF2D6'" />
-      <alex-custom-chip text="#EBEDEF" :color="'#EBEDEF'" />
-      <alex-custom-chip text="green" :color="'green'" />
-      <alex-custom-chip text="primary" :color="'primary'" />
-      <alex-custom-chip text="secondary" :color="'secondary'" />
+      <alex-custom-chip text="#32DA3B" :color="'#32DA3B'" />
+      <alex-custom-chip text="#444857" :color="'#444857'" />
+      <alex-custom-chip text="#CC6400" :color="'#CC6400'" />
+      <alex-custom-chip text="#dd58ad" :color="'#dd58ad'" />
+      <alex-custom-chip text="#005C66" :color="'#005C66'" />
     </div>
 
     <h2 class="text-h3 text-gray-800">Status</h2>
@@ -113,7 +117,7 @@
       <alex-custom-chip text="dark" :status="'dark'" />
       <alex-custom-chip text="error" :status="'error'" />
       <alex-custom-chip text="primary" :status="'primary'" />
-      <alex-custom-chip text="primary" :status="'secondary'" />
+      <alex-custom-chip text="secondary" :status="'secondary'" />
       <alex-custom-chip text="grey" :status="'grey'" />
       <alex-custom-chip text="success" :status="'success'" />
       <alex-custom-chip text="warning" :status="'warning'" />
@@ -185,14 +189,14 @@
         <alex-custom-chip icon="mdi-book" :status="'primary'" />
         <alex-custom-chip icon="mdi-pencil" :status="'grey'" />
         <alex-custom-chip icon="mdi-box" :status="'success'" />
-        <alex-custom-chip icon="mdi-close" :color="'#001A33'" />
-        <alex-custom-chip icon="mdi-book" :color="'#15693B'" />
+        <alex-custom-chip icon="mdi-close" :color="'#005C66'" />
+        <alex-custom-chip icon="mdi-book" :color="'#156A3B'" />
         <alex-custom-chip icon="mdi-map" :color="'#B61617'" />
-        <alex-custom-chip icon="mdi-book-outline" :color="'#BFF2D6'" />
-        <alex-custom-chip icon="mdi-book" :color="'#EBEDEF'" />
-        <alex-custom-chip icon="mdi-pencil" :color="'green'" />
-        <alex-custom-chip icon="mdi-box" :color="'primary'" />
-        <alex-custom-chip icon="mdi-close" :color="'secondary'" />
+        <alex-custom-chip icon="mdi-book-outline" :color="'#6E7A87'" />
+        <alex-custom-chip icon="mdi-book" :color="'#CC6400'" />
+        <alex-custom-chip icon="mdi-pencil" :color="'#FFFFFF'" />
+        <alex-custom-chip icon="mdi-box" clickable :status="'primary'" />
+        <alex-custom-chip icon="mdi-close" clickable :status="'grey'" />
       </div>
       <div class="px-3" style="position: relative">
         <prism>{{ examples[5] }}</prism>
@@ -266,6 +270,11 @@
           :color="'#15693B'"
         />
         <alex-custom-chip
+          text="mdi-book"
+          prepend-icon="mdi-account-outline"
+          :color="'#005500'"
+        />
+        <alex-custom-chip
           text="mdi-map"
           prepend-icon="mdi-map"
           :color="'#B61617'"
@@ -324,7 +333,6 @@
           status="dark"
           clickable
           closable
-          append-icon="mdi-account-outline"
         />
         <div class="px-3" style="position: relative">
           <prism>{{ examples[7] }}</prism>
@@ -417,7 +425,8 @@ const model6 = ref(false);
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
-  `<alex-custom-chip/>`,
+  `<alex-custom-chip text="text"/>
+<alex-custom-chip icon="mdi-bookmark"/>`,
   `<alex-custom-chip text="large" :size="'large'" />
    `,
   `<alex-custom-chip text="#B61617" :color="'#B61617'" />`,
@@ -431,7 +440,6 @@ const examples = [
       status="dark"
       clickable
       closable
-      append-icon="mdi-account-outline"
     />`,
 ];
 
@@ -469,7 +477,7 @@ const propsDocumentation = [
   },
   {
     name: 'size',
-    type: "'x-small' | 'small' | 'medium' | 'large' | 'x-large'",
+    type: "'x-small' | 'small' | 'medium' | 'large'",
 
     default: 'medium',
     description: 'Define o tamanho do chip',
@@ -486,10 +494,11 @@ const propsDocumentation = [
 
   {
     name: 'color',
-    type: "'#B61617' | '#001A33' | '#EBEDEF' | '#BFF2D6' | '#15693B' | 'green' | 'secondary' | 'primary'",
+    type: 'String',
 
     default: 'undefined',
-    description: 'É uma cor, se definido ele define uma cor para o background',
+    description:
+      'É uma cor, se definido ele define uma cor para o texto, o background é um shade dessa cor.',
   },
   {
     name: 'variant',
