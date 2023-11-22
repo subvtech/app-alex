@@ -71,33 +71,18 @@ $variants: (error, success, info, warning);
   }
 }
 
-$otherVariants: (
-  primary: (
-    hover: 'secondary-1',
-    active: 'secondary-2',
-  ),
-  secondary: (
-    hover: 'gray-100',
-    active: 'gray-200',
-  ),
-  tertiary: (
-    hover: 'gray-200',
-    active: 'gray-300',
-  ),
-  text: (
-    hover: 'gray-100',
-    active: 'gray-200',
-  ),
-);
+$otherVariants:
+  'primary' 'secondary-1' 'secondary-2',
+  'secondary' 'gray-100' 'gray-200',
+  'tertiary' 'gray-200' 'gray-300',
+  'text' 'gray-blue' 'gray-100';
 
-@each $name, $value in $otherVariants {
-  @each $hover, $active in $value {
-    .#{$name}:hover {
-      background-color: rgb(var(--v-theme-#{$hover})) !important;
-    }
-    .#{$name}:active {
-      background-color: rgb(var(--v-theme-#{$active})) !important;
-    }
+@each $name, $hover, $active in $otherVariants {
+  .#{$name}:hover {
+    background-color: rgb(var(--v-theme-#{$hover})) !important;
+  }
+  .#{$name}:active {
+    background-color: rgb(var(--v-theme-#{$active})) !important;
   }
 }
 
