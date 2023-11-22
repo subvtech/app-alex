@@ -13,7 +13,8 @@
         <v-expansion-panel-title class="expand-panel">
           <v-icon
             data-testid="dragItem"
-            class="drag-icon"
+            size="16px"
+            class="drag-icon pa-2"
             icon="mdi-drag"
             color="gray-300"
             draggable="true"
@@ -46,7 +47,12 @@
             {{ item.title }}
           </span>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="deleteItem(index)">
+          <v-btn
+            class="mx-4 delete-btn"
+            variant="text"
+            size="36px"
+            @click="deleteItem(index)"
+          >
             <v-icon
               size="24px"
               icon="mdi-trash-can-outline"
@@ -144,6 +150,8 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 }
 
 .drag-icon {
+  position: absolute;
+  left: 12px;
   cursor: grab;
   transition: 0.3s ease;
   &:hover {
@@ -174,11 +182,18 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
   min-height: 60px !important;
 }
 
-.v-expansion-panel-title:hover {
+.v-expansion-panel-title:hover:not(:has(.delete-btn:hover)) {
   background-color: #ebedef !important;
 }
 
 .v-expansion-panel-title__overlay {
   display: none;
+}
+
+.delete-btn {
+  transition: all 0.3s ease;
+  &:hover {
+    background-color: #ebedef !important;
+  }
 }
 </style>
