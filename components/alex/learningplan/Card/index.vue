@@ -5,12 +5,14 @@
       :elevation="isHovering ? 4 : 0"
       :min-width="width.min"
       :max-width="width.max"
-      :class="isVertical ? 'vertical-grid' : 'horizontal-grid pa-2'"
+      :class="
+        isVertical ? 'vertical-grid' : 'horizontal-grid pa-2 column-gap-4'
+      "
       variant="outlined"
       color="gray-100"
       rounded="lg"
       class="grid bg-white"
-      @click="() => console.log('a')"
+      @click="() => emits('open')"
     >
       <div :class="{ rounded: !isVertical }" class="header">
         <v-img
@@ -19,7 +21,7 @@
           :class="{ grayscale: hide }"
           cover
           height="100%"
-          aspect-ratio="1.8"
+          aspect-ratio="2.5"
         />
 
         <alex-custom-chip
@@ -38,7 +40,7 @@
               v-if="hide"
               v-bind="props"
               class="hidden-icon"
-              size="x-large"
+              size="large"
               status="dark"
               icon="mdi-eye-off-outline"
               variant="elevated"
@@ -61,7 +63,7 @@
                     icon="mdi-cards-heart"
                     class="favorite"
                     :class="{ 'text-error-0': favorited }"
-                    @click="() => console.log('favoritar')"
+                    @click="() => emits('favorite')"
                   />
                 </template>
               </v-tooltip>
@@ -94,26 +96,30 @@
                 v-if="hide"
                 :title="$t('components.learningPlan.card.visibility.show')"
                 prepend-icon="mdi-eye-outline"
-                @click="() => console.log('mostrar')"
+                @click="() => emits('show')"
               />
               <v-list-item
                 v-else
                 :title="$t('components.learningPlan.card.visibility.hide')"
                 prepend-icon="mdi-eye-off-outline"
-                @click="() => console.log('Ocultar')"
+                @click="() => emits('hide')"
               />
               <v-list-item
                 :title="$t('components.learningPlan.card.configurations')"
                 prepend-icon="mdi-cog-outline"
-                @click="() => console.log('Configurações')"
+                @click="() => emits('configurations')"
               />
             </v-list>
           </v-menu>
         </div>
       </div>
       <div
-        class="d-flex flex-column pa-4 gap-4"
-        :class="{ 'grayscale-2': hide }"
+        class="d-flex flex-column gap-4"
+        :class="{
+          'grayscale-2': hide,
+          'py-2': !isVertical,
+          'pa-4': isVertical,
+        }"
       >
         <div class="d-flex flex-column pa-0 gap-2">
           <h5 class="text-h5 text-gray-900 ellipsis lines-2">{{ name }}</h5>
@@ -126,9 +132,12 @@
 
         <div class="d-flex gap-6 flex-wrap py-2">
           <alex-learningplan-card-info
-            icon="mdi-person"
+            :image="{
+              name: facilitator.name,
+              url: facilitator?.imageURL,
+            }"
             :title="$t('components.learningPlan.card.facilitator')"
-            :subtitle="facilitator"
+            :subtitle="facilitator.name"
           />
           <alex-learningplan-card-info
             icon="mdi-trails"
@@ -170,12 +179,12 @@
 
 <script setup lang="ts">
 interface LearningPlanCard {
-  type: 'project' | 'course' | (string & {});
   image: { url: string; alt?: string };
   name: string;
   description: string;
-  facilitator: string;
+  facilitator: { name: string; imageURL?: string };
   trailsNumber: number;
+  type?: 'project' | 'course' | (string & {});
   hide?: boolean;
   hideFavorited?: boolean;
   favorited?: boolean;
@@ -186,6 +195,7 @@ const props = withDefaults(defineProps<LearningPlanCard>(), {
   favorited: false,
   direction: 'VERTICAL',
   hide: false,
+  type: 'project',
 });
 const options = ref(false);
 const isVertical = computed(() => props.direction === 'VERTICAL');
@@ -194,6 +204,13 @@ const width = computed(() =>
     ? { min: 300, max: 400 }
     : { min: 688, max: 959 },
 );
+const emits = defineEmits([
+  'open',
+  'favorite',
+  'configurations',
+  'show',
+  'hide',
+]);
 </script>
 
 <style scoped lang="scss">
@@ -264,5 +281,9 @@ const width = computed(() =>
 .grayscale-2 {
   filter: grayscale(100%);
   opacity: 0.6;
+}
+
+.column-gap-4 {
+  column-gap: 16px;
 }
 </style>
