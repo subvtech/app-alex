@@ -59,13 +59,13 @@
     <h2 class="text-h3 text-gray-800">Adicionando propriedades básicas</h2>
 
     <p class="text-subtitle-2 text-gray-500">
-      Precisa adiciona o model <strong>isActive</strong> e função de
+      Precisa adiciona o model <strong>v-model</strong> e função de
       <strong>toggleDialog</strong>.
     </p>
     <alex-custom-dialog
       title="exemplo 2"
       :toggleDialog="() => (model1 = !model1)"
-      :isActive="model1"
+      v-model="model1"
     />
     <div class="w-100" style="position: relative">
       <prism>{{ examples[1] }}</prism>
@@ -93,7 +93,7 @@
       <alex-custom-dialog
         title="exemplo 3"
         :toggleDialog="() => (model2 = !model2)"
-        :isActive="model2"
+        v-model="model2"
         :btnVariant="'outlined'"
       />
       <div class="px-3" style="position: relative">
@@ -125,7 +125,7 @@
       <alex-custom-dialog
         title="exemplo 4"
         :toggleDialog="() => (model3 = !model3)"
-        :isActive="model3"
+        v-model="model3"
         :btnVariant="'outlined'"
         overwrite-activator
         ><template v-slot:activator>
@@ -159,7 +159,7 @@
       <alex-custom-dialog
         title="exemplo 5"
         :toggleDialog="() => (model4 = !model4)"
-        :isActive="model4"
+        v-model="model4"
         :btnVariant="'outlined'"
         overwrite-default
         ><template v-slot:default>
@@ -192,7 +192,7 @@
     <alex-custom-dialog
       title="exemplo 6"
       :toggleDialog="() => (model5 = !model5)"
-      :isActive="model5"
+      v-model="model5"
       :btnVariant="'text'"
     >
       <template v-slot:content>
@@ -227,7 +227,7 @@
     <alex-custom-dialog
       title="exemplo 7"
       :toggleDialog="() => (model6 = !model6)"
-      :isActive="model6"
+      v-model="model6"
       :btnVariant="'text'"
       extra-padding
     />
@@ -258,7 +258,7 @@
         <alex-custom-dialog
           title="exemplo completo"
           :toggleDialog="() => (model7 = !model7)"
-          :isActive="model7"
+          v-model="model7"
           :btnVariant="'text'"
           prepend-Icon
           extra-padding
@@ -351,7 +351,7 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const model1 = ref(false);
+const model1 = ref(true);
 const model2 = ref(false);
 const model3 = ref(false);
 const model4 = ref(false);
@@ -368,20 +368,20 @@ const examples = [
   `<alex-custom-dialog
       title="exemplo-2"
       :toggleDialog="() => model = !model"
-      :isActive="model"
+      v-model="model"
     />
    `,
   `  <alex-custom-dialog
         title="exemplo-3"
         :toggleDialog="() => model = !model"
-        :isActive="model"
+        v-model="model"
         :btnVariant="'outlined'"
       />
    `,
   `<alex-custom-dialog
         title="exemplo-4"
         :toggleDialog="() => (model = !model)"
-        :isActive="model"
+        v-model="model"
         :btnVariant="'outlined'"
         overwrite-activator
         ><template v-slot:activator>
@@ -391,7 +391,7 @@ const examples = [
   `<alex-custom-dialog
         title="exemplo-5"
         :toggleDialog="() => (model = !model)"
-        :isActive="model"
+        v-model="model"
         :btnVariant="'outlined'"
         overwrite-default
         ><template v-slot:default>
@@ -401,7 +401,7 @@ const examples = [
   `<alex-custom-dialog
       title="exemplo 6"
       :toggleDialog="() => (model5 = !model5)"
-      :isActive="model5"
+      v-model="model5"
       :btnVariant="'text'"
     >
       <template v-slot:content>
@@ -411,14 +411,14 @@ const examples = [
   `<alex-custom-dialog
         title="exemplo-6"
         :toggleDialog="() => (model = !model)"
-        :isActive="model"
+        v-model="model"
         extra-padding
        />`,
 
   `<alex-custom-dialog
           title="exemplo-7"
           :toggleDialog="() => (model = !model)"
-          :isActive="model"
+          v-model="model"
           :btnVariant="'text'"
           prepend-Icon
           extra-padding
@@ -427,7 +427,7 @@ const examples = [
   `<alex-custom-dialog
       title="exemplo-completo"
       :toggleDialog="() => (model = !model)"
-      :isActive="model"
+      v-model="model"
       :btnVariant="'text'"
       prepend-Icon
       extra-padding
@@ -442,7 +442,7 @@ const examples = [
 
 const propsDocumentation = [
   {
-    name: 'isActive',
+    name: 'v-model',
     type: 'Boolean',
     default: 'false',
     description: 'É o model que define se o v-dialog é exibido',
@@ -480,7 +480,7 @@ const propsDocumentation = [
     type: '() => void',
     default: '() => {}',
     description:
-      'Função do clique do botão de ativar e do de fechar o dialog. É necessário que ela altere o estado de isActive',
+      'Função do clique do botão de ativar e do de fechar o dialog. É necessário que ela altere o estado de v-model',
   },
 
   {

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="640" v-model="model" data-testid="dialog">
+  <v-dialog width="640" data-testid="dialog">
     <template v-slot:activator>
       <v-btn
         v-if="!overwriteActivator"
@@ -80,12 +80,7 @@
 
 <script setup lang="ts">
 const emit = defineEmits(['save', 'cancel']);
-const props = defineProps({
-  isActive: {
-    type: Boolean,
-    default: false,
-  },
-
+defineProps({
   extraPadding: {
     type: Boolean,
     default: false,
@@ -125,15 +120,6 @@ const props = defineProps({
     default: 'Dialog',
   },
 });
-
-const model = ref(props.isActive);
-
-watch(
-  () => props.isActive,
-  (value) => {
-    model.value = value;
-  },
-);
 </script>
 
 <style scoped lang="scss">
