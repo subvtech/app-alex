@@ -1,6 +1,6 @@
 <template>
   <v-navigation-drawer
-    v-model="show"
+    v-model="model"
     color="primary"
     fixed
     :rail="clipped"
@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['update:model-value'])
+const emit = defineEmits(['update:model-value']);
 const props = defineProps({
   blocks: {
     type: Array as PropType<
@@ -72,7 +72,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
- 
+
   notFixed: {
     type: Boolean,
     default: false,
@@ -86,8 +86,16 @@ const props = defineProps({
     default: false,
   },
 });
+const model = ref(props.show);
 
 const { blocks, show, clipped } = toRefs(props);
+
+watch(
+  () => show.value,
+  () => {
+    model.value = props.show;
+  },
+);
 </script>
 
 <style lang="scss">

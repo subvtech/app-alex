@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <AppSnackbar />
-
     <alex-custom-drawable
       :blocks="menus"
       :clipped="clipped"
@@ -34,14 +33,7 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="
-        isPermanent
-          ? () => {
-              if (!drawer) drawer = true;
-              clipped = !clipped;
-            }
-          : () => (drawer = !drawer)
-      "
+      :toggle-drawer="() => closeDrawable(!clipped)"
       :user="user"
       @click="closeDrawable"
       :menu-items="profileMenuItems"

@@ -32,9 +32,9 @@
       <p class="text-subtitle-2 text-gray-500">
         Esse é o modelo mais simples, é necessário passar
         <strong>not-fixed</strong> para que ele se atenha ao parent e
-        <strong>temporary</strong> para que ele não adicione um padding-left no componente principal e
-        <strong>disappear</strong> para que ele suma quando não aberto. apenas o
-        ícone principal funciona.
+        <strong>temporary</strong> para que ele não adicione um padding-left no
+        componente principal e <strong>disappear</strong> para que ele suma
+        quando não aberto. apenas o ícone principal funciona.
       </p>
     </div>
     <div
@@ -425,7 +425,7 @@ const examples = [
       </alex-custom-drawable>
     </div>
      `,
-`   <alex-custom-drawable
+  `   <alex-custom-drawable
       :blocks="menus"
       :clipped="clipped"
       :show="drawer"

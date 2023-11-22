@@ -33,14 +33,7 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="
-        isPermanent
-          ? () => {
-              if (!drawer) drawer = true;
-              clipped = !clipped;
-            }
-          : () => (drawer = !drawer)
-      "
+      :toggle-drawer="() => closeDrawable(!clipped)"
       :user="user"
       @click="closeDrawable"
       :menu-items="profileMenuItems"
@@ -84,11 +77,7 @@ const menus = [
         title: 'Banner',
         to: '/components/custom/banner',
       },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Breadcrumbs',
-        to: '/components/custom/breadcrumbs',
-      },
+
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Chip',
@@ -99,15 +88,38 @@ const menus = [
         title: 'Dialog',
         to: '/components/custom/Dialog',
       },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Horizontalbar',
-        to: '/components/custom/horizontalbar',
-      },
+
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Info',
         to: '/components/custom/info',
+      },
+    ],
+  },
+  {
+    title: 'Navigation',
+    items: [
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Breadcrumbs',
+        to: '/components/custom/breadcrumbs',
+      },
+
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'HorizontalBar',
+        to: '/components/custom/horizontalBar',
+      },
+
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Tabs',
+        to: '/components/custom/tabs',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Header',
+        to: '/components/custom/header',
       },
     ],
   },
