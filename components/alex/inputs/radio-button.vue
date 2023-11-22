@@ -7,7 +7,7 @@
       role="button-radio"
     >
       <v-radio
-        class="text-body-1 text-gray-800"
+        class="text-body-1 text-gray-800 radio"
         :label="button.label"
         :value="button.value"
         :hint="button.hint"
@@ -50,5 +50,9 @@ defineProps({
 .v-selection-control__wrapper,
 .v-selection-control__input {
   height: 24px !important;
+}
+
+.radio .v-label {
+  opacity: 1 !important;
 }
 </style>
