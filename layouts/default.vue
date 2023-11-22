@@ -56,22 +56,14 @@
 </template>
 
 <script setup lang="ts">
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
+
 const i18n = useI18n();
-const clipped = ref(false);
-const drawer = ref(true);
-const isPermanent = ref(false);
+
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
-const currentWidth = ref(0);
-
-onMounted(() => {
-  currentWidth.value = window.innerWidth;
-
-  window.addEventListener('resize', () => {
-    currentWidth.value = window.innerWidth;
-  });
-});
+const { clipped, drawer, isPermanent, closeDrawable } = useNavigationDrawer();
 
 onBeforeMount(() => {
   if (user.value) {
@@ -79,13 +71,6 @@ onBeforeMount(() => {
     userStore.fullname = user.value.fullname;
   }
 });
-
-const closeDrawable = () => {
-  if (isPermanent.value) {
-    if (!drawer.value) drawer.value = true;
-    clipped.value = true;
-  } else if (drawer.value) drawer.value = false;
-};
 
 const menus = [
   {
@@ -173,17 +158,6 @@ const profileMenuItems = [
     logout: true,
   },
 ];
-
-watch(
-  () => currentWidth.value,
-  () => {
-    if (currentWidth.value >= 959) {
-      isPermanent.value = true;
-    } else {
-      isPermanent.value = false;
-    }
-  },
-);
 </script>
 
 <style scoped lang="scss">

@@ -1,51 +1,52 @@
 <template>
-  <v-app v-if="user">
+  <v-app>
     <AppSnackbar />
-    <div
-      @click.stop="
-        (e: any) => {
-          drawer = !drawer;
-        }
-      "
+    <alex-custom-drawable
+      :blocks="menus"
+      :clipped="clipped"
+      :show="drawer"
+      dark
+      :permanent="isPermanent"
+      @update:model-value="closeDrawable"
     >
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        dark
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
-    </div>
+        </div>
+      </template>
+    </alex-custom-drawable>
+
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => (drawer = !drawer)"
-      :menu-items="profileMenuItems"
-      :reverse="false"
+      :toggle-drawer="
+        isPermanent
+          ? () => {
+              if (!drawer) drawer = true;
+              clipped = !clipped;
+            }
+          : () => (drawer = !drawer)
+      "
       :user="user"
+      @click="closeDrawable"
+      :menu-items="profileMenuItems"
     />
 
-    <v-main class="secondary bg-gray-blue pt-16">
+    <v-main class="secondary bg-gray-blue pt-16" @click="closeDrawable">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -54,16 +55,19 @@
 </template>
 
 <script setup lang="ts">
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
+
 const i18n = useI18n();
-const clipped = ref(false);
-const drawer = ref(true);
-const isPermanent = ref(false);
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
+const { clipped, drawer, isPermanent, closeDrawable } = useNavigationDrawer();
+
 onBeforeMount(() => {
-  userStore.profilePicture = user.value.avatar;
-  userStore.fullname = user.value.fullname;
+  if (user.value) {
+    userStore.profilePicture = user.value.avatar;
+    userStore.fullname = user.value.fullname;
+  }
 });
 
 const menus = [
@@ -112,7 +116,7 @@ const menus = [
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
+    to: `/user/${user.value ? user.value.username : ''}`,
     logout: false,
   },
   {
@@ -128,7 +132,6 @@ const profileMenuItems = [
 </script>
 
 <style scoped lang="scss">
-$--v-layout-left: 90px;
 html,
 body {
   overflow-y: auto;
