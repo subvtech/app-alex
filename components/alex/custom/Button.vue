@@ -1,0 +1,110 @@
+<template>
+  <v-btn
+    flat
+    rounded="lg"
+    :class="`${variant} ${selectedVariant.textColor}`"
+    :color="selectedVariant.bgColor"
+    :variant="selectedVariant.variant as unknown as undefined"
+    :size="size"
+    :ripple="false"
+    :icon="icon"
+  >
+    <template v-if="hasDefault" #default>
+      <slot />
+    </template>
+  </v-btn>
+</template>
+
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    variant?:
+      | 'primary'
+      | 'secondary'
+      | 'tertiary'
+      | 'text'
+      | 'error'
+      | 'success'
+      | 'warning'
+      | 'info';
+    size?: 'small' | 'default' | 'large';
+    icon?: string;
+  }>(),
+  { variant: 'primary', size: 'default', icon: undefined },
+);
+
+const variants = computed(() => ({
+  primary: { textColor: 'text-white', bgColor: 'secondary-0', variant: 'flat' },
+  secondary: {
+    textColor: 'text-gray-600',
+    bgColor: 'gray-blue',
+    variant: 'flat',
+  },
+  tertiary: {
+    textColor: 'text-gray-600',
+    bgColor: 'gray-100',
+    variant: 'flat',
+  },
+  text: { textColor: 'text-gray-600', bgColor: '', variant: 'text' },
+  error: { textColor: 'text-white', bgColor: 'error-0', variant: 'flat' },
+  success: { textColor: 'text-white', bgColor: 'success-0', variant: 'flat' },
+  warning: { textColor: 'text-white', bgColor: 'warning-0', variant: 'flat' },
+  info: { textColor: 'text-white', bgColor: 'info-0', variant: 'flat' },
+}));
+
+const selectedVariant = computed(() => variants.value[props.variant]);
+
+// Slots
+const slots = useSlots();
+const hasDefault = computed(() => !!slots.default);
+</script>
+
+<style scoped lang="scss">
+@use 'sass:map';
+$variants: (error, success, info, warning);
+@each $name in $variants {
+  .#{$name}:hover {
+    background-color: rgb(var(--v-theme-#{$name}-1)) !important;
+  }
+  .#{$name}:active {
+    background-color: rgb(var(--v-theme-#{$name}-2)) !important;
+  }
+}
+
+$otherVariants: (
+  primary: (
+    hover: 'secondary-1',
+    active: 'secondary-2',
+  ),
+  secondary: (
+    hover: 'gray-100',
+    active: 'gray-200',
+  ),
+  tertiary: (
+    hover: 'gray-200',
+    active: 'gray-300',
+  ),
+  text: (
+    hover: 'gray-100',
+    active: 'gray-200',
+  ),
+);
+
+@each $name, $value in $otherVariants {
+  @each $hover, $active in $value {
+    .#{$name}:hover {
+      background-color: rgb(var(--v-theme-#{$hover})) !important;
+    }
+    .#{$name}:active {
+      background-color: rgb(var(--v-theme-#{$active})) !important;
+    }
+  }
+}
+
+.primary:hover {
+  background-color: rgb(var(--v-theme-secondary-1)) !important;
+}
+.primary:active {
+  background-color: rgb(var(--v-theme-secondary-2)) !important;
+}
+</style>
