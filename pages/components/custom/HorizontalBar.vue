@@ -36,7 +36,7 @@
         icone de usuário vazio, e nenhum dos botões funcionam
       </p>
     </div>
-    <div class="w-100 d-flex">
+    <div class="first w-100 d-flex flex-row">
       <v-container class="p-0 m-0">
         <v-row align="center"><alex-custom-horizontal-bar not-fixed /></v-row
       ></v-container>
@@ -467,5 +467,11 @@ const copyToClipboard = async (index) => {
   right: 10px;
   top: 10px;
   color: #a0a8b1;
+}
+
+@media (max-width: 800px){
+  .first {
+    flex-wrap: wrap;
+  }
 }
 </style>
