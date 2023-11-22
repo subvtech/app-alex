@@ -32,12 +32,13 @@
       <p class="text-subtitle-2 text-gray-500">
         Esse é o modelo mais simples, é necessário passar
         <strong>not-fixed</strong> para que ele se atenha ao parent e
+        <strong>temporary</strong> para que ele não adicione um padding-left no componente principal e
         <strong>disappear</strong> para que ele suma quando não aberto. apenas o
         ícone principal funciona.
       </p>
     </div>
     <div
-      class="w-100 d-flex"
+      class="w-100 d-flex flex-wrap"
       @click.stop="
         (e: any) => {
           drawer1 = !drawer1;
@@ -47,6 +48,7 @@
       <alex-custom-drawable
         not-fixed
         disappear
+        temporary
         :blocks="menuItems"
         :show="drawer1"
       />
@@ -82,10 +84,12 @@
           drawer2 = !drawer2;
         }
       "
+      style="position: relative"
     >
       <alex-custom-drawable
         not-fixed
         disappear
+        temporary
         :blocks="menuItems"
         :show="drawer2"
       />
@@ -142,12 +146,14 @@
           drawer3 = !drawer3;
         }
       "
+      style="position: relative"
     >
       <alex-custom-drawable
         :blocks="menuItems"
         :clipped="true"
         :show="drawer3"
         not-fixed
+        temporary
         disappear
       >
         <template v-slot:header>
@@ -209,6 +215,7 @@
           :clipped="true"
           :show="drawer4"
           disappear
+          temporary
           not-fixed
         />
         <prism>{{ examples[4] }}</prism>
@@ -246,6 +253,7 @@
             :show="drawer5"
             disappear
             not-fixed
+            temporary
             :permanent="isPermanent"
           >
             <template v-slot:header>
@@ -364,10 +372,11 @@ const isPermanent = ref(false);
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
-  `<alex-custom-drawable not-fixed disappear :show="drawer" :blocks="menuItems" />`,
+  `<alex-custom-drawable not-fixed temporary disappear :show="drawer" :blocks="menuItems" />`,
   `<alex-custom-drawable
         not-fixed
         disappear
+        temporary
         :blocks="menuItems"
         :show="drawer1"
       />
@@ -410,74 +419,77 @@ const examples = [
         :clipped="clipped"
         :show="drawer"
         :permanent="isPermanent"
+        temporary
       >
        ...
       </alex-custom-drawable>
     </div>
      `,
-  ` 
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+`   <alex-custom-drawable
+      :blocks="menus"
+      :clipped="clipped"
+      :show="drawer"
+      temporary
+      :permanent="isPermanent"
+    >
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
+        </div>
+      </template>
+    </alex-custom-drawable>
    `,
   `<alex-custom-drawable
       :blocks="menuItems"
       :clipped="true"
       :show="drawer4"
       disappear
+      temporary
       not-fixed
     />`,
   `<alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        disappear
-        not-fixed
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      :blocks="menus"
+      :clipped="clipped"
+      :show="drawer"
+      disappear
+      not-fixed
+      temporary
+      :permanent="isPermanent"
+    >
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>`,
+        </div>
+      </template>
+    </alex-custom-drawable>`,
 ];
 
 const propsDocumentation = [
@@ -513,8 +525,7 @@ const propsDocumentation = [
     name: 'disappear',
     type: 'Boolean',
     default: 'false',
-    description:
-      'Define se o menu some enquanto fechado.',
+    description: 'Define se o menu some enquanto fechado.',
   },
 ];
 

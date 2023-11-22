@@ -107,8 +107,6 @@ const menus = [
       },
     ],
   },
-
- 
 ];
 
 const profileMenuItems = [
@@ -127,10 +125,10 @@ const profileMenuItems = [
     logout: true,
   },
 ];
-
 </script>
 
 <style scoped lang="scss">
+$--v-layout-left: 90px;
 html,
 body {
   overflow-y: auto;

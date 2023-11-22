@@ -7,6 +7,7 @@
     app
     data-testid="drawable"
     class="d-flex flex-column pb-2 px-2"
+    @update:model-value="$emit('update:model-value')"
     :class="[
       notFixed ? 'not-fixed' : '',
       disappear && !show ? 'disappear' : '',
@@ -58,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits(['update:model-value'])
 const props = defineProps({
   blocks: {
     type: Array as PropType<
@@ -70,6 +72,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+ 
   notFixed: {
     type: Boolean,
     default: false,
