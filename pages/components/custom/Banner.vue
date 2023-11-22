@@ -148,7 +148,7 @@
           :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
           :profilePictureSize="50"
           :darkerBackground="false"
-          :titleAbove="false"
+          :descriptionAbove="false"
           :distribution="'fullname-username-role'"
           :code="'ABC123'"
           :fullnameStyle="'font-weight-bold'"
@@ -217,7 +217,7 @@
           :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
           :profilePictureSize="500"
           :darkerBackground="false"
-          :titleAbove="false"
+          :descriptionAbove="false"
           :distribution="'fullname-username-role'"
           :code="'ABC123'"
           :fullnameStyle="'font-weight-bold'"
@@ -272,6 +272,111 @@
         </div>
       </div>
     </div>
+    <div class="w-100">
+      <p class="text-subtitle-2 text-gray-500 mb-14">
+        Aqui é um exemplo com de como é usado no
+        <strong>perfil</strong>
+      </p>
+
+      <alex-custom-banner
+        v-if="user"
+        :can-edit="true"
+        :cover-picture="user.cover"
+        :profile-picture-size="160"
+        :profile-picture="user.avatar"
+        :userId="user.id"
+        can-delete
+        show-menu
+        show-profile-picture
+        show-role
+        show-border
+        float-beneath
+        distribution="fullname-username-role"
+        :selectedOption="selectedOption2"
+        @select:option="selectOption2"
+        @display:settings="showSettings = !showSettings"
+        :is-professor="user.isProfessor"
+        :fullname="user.fullname"
+        fullnameStyle="color: #454D54;"
+        :username="user.username"
+        usernameStyle="color: #A0A8B1;"
+        roleStyle="color: #A0A8B1;"
+        :links="links"
+      />
+      <div class="w-100" style="position: relative">
+        <prism class="bg-grey-lighten-5">
+          {{ examples[5] }}
+        </prism>
+        <v-btn
+          class="copy-icon mt-1 ml-4"
+          variant="text"
+          color="gray-400"
+          @click="copyToClipboard(5)"
+        >
+          <v-icon
+            v-if="copiedIndex === 5"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </v-btn>
+      </div>
+    </div>
+
+    <div class="w-100">
+      <p class="text-subtitle-2 text-gray-500 mb-14">
+        Aqui é um exemplo com de como é usado no
+        <strong>courses</strong>
+      </p>
+
+      <alex-custom-banner
+        v-if="user"
+        :can-edit="false"
+        :cover-picture="user.cover"
+        :profile-picture-size="24"
+        :profile-picture="user.avatar"
+        :userId="user.id"
+        show-profile-picture
+        darker-background
+        show-shade
+        show-menu
+        settings-menu
+        distribution="fullname-username-role"
+        :selectedOption="selectedOption2"
+        @select:option="selectOption2"
+        @display:settings="showSettings = !showSettings"
+        :is-professor="user.isProfessor"
+        :fullname="user.fullname"
+        title="Turma"
+        code="dasdas"
+        description="Information Systems"
+        subtitle="tsf idsda"
+        startDate="12/06/2006"
+        endDate="12/06/2016"
+        :links="links"
+      />
+      <div class="w-100" style="position: relative">
+        <prism class="bg-grey-lighten-5">
+          {{ examples[6] }}
+        </prism>
+        <v-btn
+          class="copy-icon mt-1 ml-4"
+          variant="text"
+          color="gray-400"
+          @click="copyToClipboard(6)"
+        >
+          <v-icon
+            v-if="copiedIndex === 6"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </v-btn>
+      </div>
+    </div>
+
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
@@ -391,16 +496,40 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
-definePageMeta({
-  layout: 'components',
-  middleware: 'auth',
-});
+const { findOne } = useStrapi();
+
+const i18n = useI18n();
+
+const messageStore = useMessageStore();
+
+const { id } = useStrapiUser<User>().value;
 
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 
+const user = ref<any>();
 const selectedOption1 = ref(0);
 const selectedOption2 = ref(0);
+const selectOption1 = (index) => {
+  selectedOption1.value = index;
+  showSettings.value = false;
+};
+const selectOption2 = (index) => {
+  selectedOption2.value = index;
+  showSettings.value = false;
+};
+const links = ref([
+  i18n.t('pages.profile.general'),
+  i18n.t('pages.profile.courses'),
+  i18n.t('pages.profile.projects'),
+  i18n.t('pages.profile.assignments'),
+  i18n.t('pages.profile.events'),
+]);
+
+const profilePicture = ref<string | null>(null);
+const coverPicture = ref<string | null>(null);
+
+const showSettings = ref(false);
 
 const examples = [
   '<alex-custom-banner />',
@@ -418,7 +547,7 @@ const examples = [
       :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
       :profilePictureSize="50"
       :darkerBackground="false"
-      :titleAbove="false"
+      :descriptionAbove="false"
       :distribution="'fullname-username-role'"
       :code="'ABC123'"
       settings-icon="mdi-cog"
@@ -453,14 +582,14 @@ const examples = [
       @display:settings="() => {}"
     />`,
 
-  `  <alex-custom-banner
+  `<alex-custom-banner
         :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
         :imgFromStrapi="false"
         :showProfilePicture="true"
         :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
         :profilePictureSize="500"
         :darkerBackground="false"
-        :titleAbove="false"
+        :descriptionAbove="false"
         :distribution="'fullname-username-role'"
         :code="'ABC123'"
         :fullnameStyle="'font-weight-bold'"
@@ -493,6 +622,57 @@ const examples = [
         :canDelete="false"
         @select:option="() => {}"
         @display:settings="() => {}"
+      />`,
+  `<alex-custom-banner
+      v-if="user"
+      :can-edit="true"
+      :cover-picture="user.cover"
+      :profile-picture-size="160"
+      :profile-picture="user.avatar"
+      :userId="user.id"
+      can-delete
+      show-menu
+      show-profile-picture
+      show-role
+      show-border
+      float-beneath
+      distribution="fullname-username-role"
+      :selectedOption="selectedOption2"
+      @select:option="selectOption2"
+      @display:settings="showSettings = !showSettings"
+      :is-professor="user.isProfessor"
+      :fullname="user.fullname"
+      fullnameStyle="color: #454D54;"
+      :username="user.username"
+      usernameStyle="color: #A0A8B1;"
+      roleStyle="color: #A0A8B1;"
+      :links="links"
+    />`,
+  `<alex-custom-banner
+        v-if="user"
+        :can-edit="false"
+        :cover-picture="user.cover"
+        :profile-picture-size="24"
+        :profile-picture="user.avatar"
+        :userId="user.id"
+        show-profile-picture        
+        darker-background
+        show-shade
+        show-menu
+        settings-menu
+        distribution="fullname-username-role"
+        :selectedOption="selectedOption2"
+        @select:option="selectOption2"
+        @display:settings="showSettings = !showSettings"
+        :is-professor="user.isProfessor"
+        :fullname="user.fullname"
+        title="Turma"
+        code="dasdas"
+        description="Information Systems"
+        subtitle="tsf idsda"
+        startDate="12/06/2006"
+        endDate="12/06/2016"
+        :links="links"
       />`,
 ];
 
@@ -572,6 +752,33 @@ const copyToClipboard = async (index) => {
     copiedValue.value = examples[index];
   }
   copiedIndex.value = index;
+};
+
+onBeforeMount(async () => {
+  await updateUser(false);
+});
+
+const updateUser = async (show = true) => {
+  const populate = [
+    'cover',
+    'avatar',
+    'learningPlans',
+    'socials',
+    'trails',
+    'role',
+    'user_descriptions',
+    'user_wallet',
+  ];
+
+  user.value = await findOne<User>('users', id, {
+    populate: populate,
+  });
+
+  if (user.value.avatar) profilePicture.value = user.value.avatar.url;
+  if (user.value.cover) coverPicture.value = user.value.cover.url;
+  messageStore.message = 'done';
+  messageStore.color = 'green';
+  messageStore.show = show;
 };
 </script>
 
