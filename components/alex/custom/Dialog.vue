@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="640" v-model="isActive" data-testid="dialog">
+  <v-dialog width="640" v-model="model" data-testid="dialog">
     <template v-slot:activator>
       <v-btn
         v-if="!overwriteActivator"
@@ -18,10 +18,7 @@
         :class="extraPadding ? 'pa-10' : ''"
         role="default"
       >
-        <v-card-title
-          class="d-flex flex-row align-center px-6 py-0"
-          style="height: 76px; gap: 16px; border-bottom: 1px solid #ebedef"
-        >
+        <v-card-title class="d-flex flex-row align-center px-6 py-0 header">
           <span
             style="
               white-space: nowrap;
@@ -40,9 +37,12 @@
           >
         </v-card-title>
 
+        <v-card-text class="pa-6">
+          <slot name="content" />
+        </v-card-text>
+
         <v-card-actions
-          class="py-4"
-          style="gap: 8px; border-top: 1px solid #ebedef"
+          class="py-4 actions"
           :role="prependIcon ? 'prepend' : ''"
         >
           <v-spacer />
@@ -126,7 +126,14 @@ const props = defineProps({
   },
 });
 
-const { isActive } = toRefs(props);
+const model = ref(props.isActive);
+
+watch(
+  () => props.isActive,
+  (value) => {
+    model.value = value;
+  },
+);
 </script>
 
 <style scoped lang="scss">
@@ -160,5 +167,17 @@ const { isActive } = toRefs(props);
   line-height: 19px;
   letter-spacing: 0.02em;
   text-align: left;
+}
+
+.header {
+  height: 72px;
+  gap: 16px;
+  border-bottom: 1px solid #ebedef;
+}
+
+.actions {
+  height: 76px;
+  gap: 8px;
+  border-top: 1px solid #ebedef;
 }
 </style>

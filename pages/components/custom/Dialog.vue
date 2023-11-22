@@ -36,7 +36,7 @@
       </p>
     </div>
     <div class="w-100 flex-column d-flex">
-      <alex-custom-dialog title="exemplo" />
+      <alex-custom-dialog title="exemplo 1" />
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
         <v-btn
@@ -63,7 +63,7 @@
       <strong>toggleDialog</strong>.
     </p>
     <alex-custom-dialog
-      title="exemplo"
+      title="exemplo 2"
       :toggleDialog="() => (model1 = !model1)"
       :isActive="model1"
     />
@@ -91,7 +91,7 @@
 
     <div class="w-100">
       <alex-custom-dialog
-        title="exemplo-2"
+        title="exemplo 3"
         :toggleDialog="() => (model2 = !model2)"
         :isActive="model2"
         :btnVariant="'outlined'"
@@ -123,7 +123,7 @@
 
     <div class="w-100">
       <alex-custom-dialog
-        title="exemplo-2"
+        title="exemplo 4"
         :toggleDialog="() => (model3 = !model3)"
         :isActive="model3"
         :btnVariant="'outlined'"
@@ -157,7 +157,7 @@
 
     <div class="w-100">
       <alex-custom-dialog
-        title="exemplo-2"
+        title="exemplo 5"
         :toggleDialog="() => (model4 = !model4)"
         :isActive="model4"
         :btnVariant="'outlined'"
@@ -186,16 +186,19 @@
     </div>
 
     <p class="text-subtitle-2 text-gray-500">
-      Existe a propriedade <strong>extraPadding</strong> que torna o dialog um
-      pouco maior
+      Para adicionar conteúdo sem sobrescrever o header e o footer é necessário
+      usar o slot <strong>content</strong>
     </p>
     <alex-custom-dialog
-      title="exemplo-2"
+      title="exemplo 6"
       :toggleDialog="() => (model5 = !model5)"
       :isActive="model5"
       :btnVariant="'text'"
-      extra-padding
-    />
+    >
+      <template v-slot:content>
+        <span>This is a test</span>
+      </template>
+    </alex-custom-dialog>
 
     <div class="w-100">
       <div class="px-3" style="position: relative">
@@ -217,27 +220,65 @@
       </div>
     </div>
 
+    <p class="text-subtitle-2 text-gray-500">
+      Existe a propriedade <strong>extraPadding</strong> que torna o dialog um
+      pouco maior
+    </p>
+    <alex-custom-dialog
+      title="exemplo 7"
+      :toggleDialog="() => (model6 = !model6)"
+      :isActive="model6"
+      :btnVariant="'text'"
+      extra-padding
+    />
+
+    <div class="w-100">
+      <div class="px-3" style="position: relative">
+        <prism>{{ examples[6] }}</prism>
+        <v-btn
+          class="copy-icon"
+          variant="text"
+          color="gray-400"
+          @click="copyToClipboard(6)"
+        >
+          <v-icon
+            v-if="copiedIndex === 6"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </v-btn>
+      </div>
+    </div>
+
     <h2 class="text-h2 text-gray-800">Uso Completo</h2>
     <div class="px-4 py-2 w-100 d-flex">
       <div class="w-100 bg-gray-100">
         <alex-custom-dialog
-          title="exemplo-completo"
-          :toggleDialog="() => (model6 = !model6)"
-          :isActive="model6"
+          title="exemplo completo"
+          :toggleDialog="() => (model7 = !model7)"
+          :isActive="model7"
           :btnVariant="'text'"
           prepend-Icon
           extra-padding
-        />
+          ><template v-slot:content>
+            <div>
+              <v-icon>mdi-account</v-icon>
+              <span>final test</span>
+            </div>
+          </template>
+        </alex-custom-dialog>
         <div class="px-3" style="position: relative">
-          <prism>{{ examples[6] }}</prism>
+          <prism>{{ examples[7] }}</prism>
           <v-btn
             class="copy-icon"
             variant="text"
             color="gray-400"
-            @click="copyToClipboard(6)"
+            @click="copyToClipboard(7)"
           >
             <v-icon
-              v-if="copiedIndex === 6"
+              v-if="copiedIndex === 7"
               size="x-large"
               icon="mdi-clipboard-check-multiple-outline"
               color="green-lighten-1"
@@ -316,6 +357,7 @@ const model3 = ref(false);
 const model4 = ref(false);
 const model5 = ref(false);
 const model6 = ref(false);
+const model7 = ref(false);
 
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
@@ -357,19 +399,45 @@ const examples = [
         </template></alex-custom-dialog
       >`,
   `<alex-custom-dialog
+      title="exemplo 6"
+      :toggleDialog="() => (model5 = !model5)"
+      :isActive="model5"
+      :btnVariant="'text'"
+    >
+      <template v-slot:content>
+        <span>This is a test</span>
+      </template>
+    </alex-custom-dialog>`,
+  `<alex-custom-dialog
         title="exemplo-6"
         :toggleDialog="() => (model = !model)"
         :isActive="model"
         extra-padding
        />`,
+
   `<alex-custom-dialog
-          title="exemplo-completo"
+          title="exemplo-7"
           :toggleDialog="() => (model = !model)"
           :isActive="model"
           :btnVariant="'text'"
           prepend-Icon
           extra-padding
         />`,
+
+  `<alex-custom-dialog
+      title="exemplo-completo"
+      :toggleDialog="() => (model = !model)"
+      :isActive="model"
+      :btnVariant="'text'"
+      prepend-Icon
+      extra-padding
+    ><template v-slot:content>
+        <div>
+          <v-icon>mdi-account</v-icon>
+          <span>final test</span>
+        </div>
+      </template>
+    </alex-custom-dialog>`,
 ];
 
 const propsDocumentation = [
