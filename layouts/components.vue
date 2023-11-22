@@ -110,6 +110,12 @@ const menus = [
         title: 'HorizontalBar',
         to: '/components/custom/horizontalBar',
       },
+      
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Drawable',
+        to: '/components/custom/Drawable',
+      },
 
       {
         icon: 'mdi-view-dashboard-outline',

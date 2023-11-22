@@ -325,6 +325,25 @@
         </p>
       </div>
     </div>
+    <h2 class="text-h3 text-gray-800">Eventos disponíveis</h2>
+    <div class="d-flex flex-column w-100" style="gap: 8px">
+      <div
+        class="pa-6 d-flex flex-column rounded-lg align-baseline w-100"
+        v-for="(item, index) in eventsDocumentation"
+        :style="
+          index % 2 === 0
+            ? 'background-color: #EBEDEF'
+            : 'background-color: #D1F6FA'
+        "
+      >
+        <p class="text-subtitle-2 text-gray-500">{{ item.name }}</p>
+
+        <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
+          Descrição:
+          <span class="font-weight-regular">{{ item.description }}</span>
+        </p>
+      </div>
+    </div>
   </v-container>
 </template>
 
@@ -526,6 +545,13 @@ const propsDocumentation = [
     type: 'Boolean',
     default: 'false',
     description: 'Define se o menu some enquanto fechado.',
+  },
+];
+
+const eventsDocumentation = [
+  {
+    name: 'update:model-value',
+    description: 'Ativa quando o model de controle é atualizado',
   },
 ];
 
