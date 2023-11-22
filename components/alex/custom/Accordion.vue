@@ -51,6 +51,7 @@
             class="mx-4 delete-btn"
             variant="text"
             size="36px"
+            color="transparent"
             @click="deleteItem(index)"
           >
             <v-icon
@@ -194,6 +195,9 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
   transition: all 0.3s ease;
   &:hover {
     background-color: #ebedef !important;
+  }
+  &:active {
+    background-color: #d2d6da !important;
   }
 }
 </style>
