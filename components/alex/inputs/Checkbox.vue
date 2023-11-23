@@ -12,6 +12,7 @@
         width="18"
         data-testid="testing-checkbox"
         @update:model-value="handleChange"
+        @change="() => emit('change', modelValue)"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
@@ -54,7 +55,6 @@ defineProps({
 const emit = defineEmits(['update:modelValue', 'change']);
 
 const handleChange = (value) => {
-  console.log(`Checkbox value changed to: ${value}`);
   emit('update:modelValue', value);
 };
 </script>
