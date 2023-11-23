@@ -3,7 +3,7 @@
     <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
         :class="{ 'input-checkbox': indeterminate }"
-        :model-value="checked"
+        :model-value="modelValue"
         :indeterminate="indeterminate"
         :disabled="disabled"
         :readonly="readonly"
@@ -11,7 +11,7 @@
         color="#00b7cc"
         width="18"
         data-testid="testing-checkbox"
-        @change="handleChange"
+        @update:model-value="handleChange"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
@@ -34,7 +34,7 @@ defineProps({
     type: String,
     default: '',
   },
-  checked: {
+  modelValue: {
     type: Boolean,
     default: false,
   },
@@ -51,10 +51,11 @@ defineProps({
     default: false,
   },
 });
-const emit = defineEmits(['update:checked', 'change']);
+const emit = defineEmits(['update:modelValue', 'change']);
 
 const handleChange = (value) => {
-  emit('update:checked', value);
+  console.log(`Checkbox value changed to: ${value}`);
+  emit('update:modelValue', value);
 };
 </script>
 <style scoped>
