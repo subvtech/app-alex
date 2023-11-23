@@ -1,6 +1,7 @@
 <template>
   <div class="text-center">
     <v-menu
+      v-model="selectedItem"
       :open-on-click="options.openOnClick"
       :open-on-hover="options.openOnHover"
       :close-on-content-click="options.closeOnContentClick"
@@ -29,6 +30,7 @@
           ]"
           @mouseover="item.isHover = true"
           @mouseout="item.isHover = false"
+          @click="onSelect(item)"
         >
           <template v-if="item.type === 'text'">
             <v-list-item-title>{{ item.text }}</v-list-item-title>
@@ -40,7 +42,10 @@
           </template>
           <template v-else-if="item.type === 'checkbox'">
             <v-list-item-action>
-              <alex-inputs-checkbox disabled />
+              <alex-inputs-checkbox
+                class="dropCheckbox"
+                v-model="item.isChecked"
+              />
               <v-list-item-title>{{ item.text }}</v-list-item-title>
             </v-list-item-action>
           </template>
@@ -51,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import { on } from 'events';
 import { defineProps } from 'vue';
 
 type Item = {
@@ -69,12 +75,18 @@ type Options = {
   isDarkMode: boolean;
 };
 
+const selectedItem = ref({} as Item);
+
 const { items, options } = defineProps(['items', 'options']);
 
 const { openOnClick, openOnHover, closeOnContentClick, location, isDarkMode } =
   options as Options;
 
 const { id, text, icon, type } = items as Item;
+
+const onSelect = (item: Item) => {
+  selectedItem.value = item;
+};
 </script>
 
 <style scoped lang="scss">
@@ -129,5 +141,9 @@ div {
 .warning.hover.dark-theme {
   color: #e9494a;
   background-color: #042749;
+}
+
+div.container.dropCheckbox {
+  align-items: center !important;
 }
 </style>

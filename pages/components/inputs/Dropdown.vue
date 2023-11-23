@@ -142,8 +142,7 @@
         </Prism>
       </div>
     </div>
-    <div class="w-100">
-    </div>
+    <div class="w-100"></div>
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
@@ -284,7 +283,8 @@
       }}</Prism>
     </p>
     <p class="text-subtitle-2 text-gray-500">
-      Existe uma opção de estilo complementar ao utilizar <strong>class: 'warning'</strong>. por exemplo:<br />
+      Existe uma opção de estilo complementar ao utilizar
+      <strong>class: 'warning'</strong>. por exemplo:<br />
       <Prism inline class="bg-white">{{
         `
           {
@@ -387,6 +387,13 @@
         </v-window-item>
       </v-window>
     </div>
+    <div class="w-100">
+      <alex-inputs-dropdown
+        v-model="selectedItems"
+        :items="itemsDropCheckbox"
+        :options="optionsDropCheckbox"
+      />
+    </div>
   </v-container>
 </template>
 
@@ -429,6 +436,32 @@ const opcoes1 = ref({
   closeOnContentClick: true,
   location: 'end',
   isDarkMode: false,
+});
+
+const itemsDropCheckbox = ref([
+  {
+    id: 1,
+    type: 'checkbox',
+    text: 'Opção 1',
+  },
+  {
+    id: 2,
+    type: 'checkbox',
+    text: 'Opção 2',
+  },
+  {
+    id: 3,
+    type: 'checkbox',
+    text: 'Opção 3',
+  },
+]);
+
+const optionsDropCheckbox = ref({
+  openOnClick: true,
+  openOnHover: false,
+  closeOnContentClick: false,
+  location: 'start',
+  isDarkMode: true,
 });
 
 const propsExample = `
