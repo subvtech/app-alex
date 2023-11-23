@@ -2,8 +2,12 @@
   <div class="container" width="113" max-width="fit-content" height="47">
     <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
-        :class="indeterminate ? 'input-checkbox' : ''"
-        :model-value="modelValue"
+        :class="
+          indeterminate && modelValue === null
+            ? 'input-indeterminate-checkbox'
+            : ''
+        "
+        model-value="modelValue"
         :indeterminate="indeterminate"
         :disabled="disabled"
         :readonly="readonly"
@@ -25,8 +29,6 @@
   </div>
 </template>
 <script setup lang="ts">
-// let { indeterminate } = 
-//o let é para que o valor de indeterminate seja reativo, mas não está funcionando. Em busca de solução
 defineProps({
   label: {
     type: String,
@@ -35,10 +37,6 @@ defineProps({
   hint: {
     type: String,
     default: '',
-  },
-  modelValue: {
-    type: Boolean,
-    default: false,
   },
   indeterminate: {
     type: Boolean,
@@ -54,6 +52,8 @@ defineProps({
   },
 });
 
+const modelValue = ref(null);
+
 const emit = defineEmits([
   'update:modelValue',
   'change',
@@ -62,13 +62,9 @@ const emit = defineEmits([
 
 const handleChange = ($event) => {
   const value = $event.target.checked;
-  emit('update:modelValue', value);
 
-  // if (indeterminate) {
-  //   indeterminate = false;
-  //   emit('update:indeterminate', false);
-  // }
-  // aqui não estou conseguindo setar o valor de indeterminate para false, em busca de solução
+  console.log('modelValue', value, modelValue);
+  emit('update:modelValue', value);
 };
 </script>
 <style scoped>
@@ -118,9 +114,8 @@ div {
   margin-bottom: 1.2rem !important;
 }
 
-.input-checkbox {
-  color: rgba(0, 183, 204, 1) !important;
+.input-indeterminate-checkbox {
+  color: rgba(0, 183, 204, 1);
   border-color: #a0a8b1 !important;
-  position: relative !important;
 }
 </style>
