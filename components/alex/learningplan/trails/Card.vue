@@ -2,10 +2,13 @@
   <v-hover v-slot="{ isHovering, props }">
     <v-card
       v-bind="props"
-      :elevation="isHovering ? 4 : 0"
       :min-width="width.min"
       :max-width="width.max"
-      :class="isVertical ? 'vertical-grid' : 'horizontal-grid column-gap-4'"
+      :class="{
+        'vertical-grid': isVertical,
+        'horizontal-grid column-gap-4': !isVertical,
+        'hover-shadow': isHovering,
+      }"
       variant="outlined"
       color="gray-100"
       rounded="lg"
@@ -113,7 +116,7 @@
               <template v-slot:activator="{ props }">
                 <h5
                   v-bind="props"
-                  class="text-h5 text-gray-900 ellipsis lines-1 max-height-24"
+                  class="text-h5 text-gray-900 ellipsis lines-2 max-height-48"
                 >
                   {{ name }}
                 </h5>
@@ -171,17 +174,19 @@
               <v-icon size="20" color="gray-600"
                 >mdi-text-box-multiple-outline</v-icon
               >
-              <span>5</span>
+              <span>{{ documents?.length || 0 }}</span>
             </div>
           </template>
 
-          <v-list>
+          <v-list v-if="documents">
             <v-list-item
-              :title="$t('components.learningPlan.cardTrails.article')"
-              prepend-icon="mdi-text-box-multiple-outline"
-            />
-            <v-list-item
-              :title="$t('components.learningPlan.cardTrails.document')"
+              v-for="(item, key) in documents"
+              :key="key"
+              :title="
+                item.number +
+                ' ' +
+                $t(`components.learningPlan.cardTrails.${item.type}`)
+              "
               prepend-icon="mdi-text-box-multiple-outline"
             />
           </v-list>
@@ -198,10 +203,12 @@ interface LearningPlanCard {
   description: string;
   hide?: boolean;
   direction?: 'HORIZONTAL' | 'VERTICAL';
+  documents?: [{ type: string; number: number }];
 }
 const props = withDefaults(defineProps<LearningPlanCard>(), {
   direction: 'VERTICAL',
   hide: false,
+  documents: undefined,
 });
 const options = ref(false);
 const isVertical = computed(() => props.direction === 'VERTICAL');
@@ -305,7 +312,11 @@ const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
   background-color: rgb(var(--v-theme-gray-100));
 }
 
-.max-height-24 {
-  max-height: 24px;
+.max-height-48 {
+  max-height: 48px;
+}
+
+.hover-shadow {
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
 }
 </style>
