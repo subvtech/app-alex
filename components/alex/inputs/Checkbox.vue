@@ -62,8 +62,6 @@ const emit = defineEmits([
 
 const handleChange = ($event) => {
   const value = $event.target.checked;
-
-  console.log('modelValue', value, modelValue);
   emit('update:modelValue', value);
 };
 </script>
