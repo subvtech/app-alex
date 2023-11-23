@@ -1,0 +1,12 @@
+{
+    "options": "Opções",
+    "configurations": "Configurações",
+    "visibility": {
+        "show": "Mostrar",
+        "hide": "Ocultar"
+    },
+    "copy": "Copiar",
+    "hidden": "Oculto",
+    "article": "Artigo",
+    "document": "Documento"
+}

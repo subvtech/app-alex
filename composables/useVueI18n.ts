@@ -68,6 +68,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tagCombobox',
     'usersAutocomplete',
     'learningPlan/editor',
+    'learningPlan/cardTrails',
     'learningPlan/authors',
     'learningPlan/link',
     'learningPlan/list',

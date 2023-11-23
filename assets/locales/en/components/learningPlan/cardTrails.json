@@ -1,0 +1,12 @@
+{
+    "options": "Options",
+    "configurations": "Configurations",
+    "visibility": {
+        "show": "Show",
+        "hide": "Hide"
+    },
+    "copy": "Copy",
+    "hidden": "Hidden",
+    "article": "Article",
+    "document": "Document"
+}
