@@ -8,7 +8,6 @@
     :variant="selectedVariant.variant as unknown as undefined"
     :size="size"
     :ripple="false"
-    :icon="icon"
   >
     <template v-if="hasDefault" #default>
       <slot />
@@ -29,12 +28,11 @@ const props = withDefaults(
       | 'warning'
       | 'info';
     size?: 'small' | 'default' | 'large';
-    icon?: string;
   }>(),
   { variant: 'primary', size: 'default', icon: undefined },
 );
 
-const variants = computed(() => ({
+const variants = {
   primary: { textColor: 'text-white', bgColor: 'secondary-0', variant: 'flat' },
   secondary: {
     textColor: 'text-gray-600',
@@ -51,9 +49,9 @@ const variants = computed(() => ({
   success: { textColor: 'text-white', bgColor: 'success-0', variant: 'flat' },
   warning: { textColor: 'text-white', bgColor: 'warning-0', variant: 'flat' },
   info: { textColor: 'text-white', bgColor: 'info-0', variant: 'flat' },
-}));
+};
 
-const selectedVariant = computed(() => variants.value[props.variant]);
+const selectedVariant = computed(() => variants[props.variant]);
 
 // Slots
 const slots = useSlots();
