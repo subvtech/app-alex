@@ -2,12 +2,13 @@
   <v-hover v-slot="{ isHovering, props }">
     <v-card
       v-bind="props"
-      :elevation="isHovering ? 4 : 0"
       :min-width="width.min"
       :max-width="width.max"
-      :class="
-        isVertical ? 'vertical-grid' : 'horizontal-grid pa-2 column-gap-4'
-      "
+      :class="{
+        'vertical-grid': isVertical,
+        'horizontal-grid pa-2 column-gap-4': !isVertical,
+        'hover-shadow': isHovering,
+      }"
       variant="outlined"
       color="gray-100"
       rounded="lg"
@@ -301,5 +302,9 @@ const emits = defineEmits([
 
 .column-gap-4 {
   column-gap: 16px;
+}
+
+.hover-shadow {
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
 }
 </style>

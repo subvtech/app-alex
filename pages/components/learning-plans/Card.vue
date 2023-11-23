@@ -5,7 +5,7 @@
     <h1 class="text-h2 text-gray-800">Card de Cursos e Projetos</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
-      <strong class="bg-accent pa-1 rounded">alex-custom-card</strong>
+      <strong class="bg-accent pa-1 rounded">alex-learningplan-card</strong>
       é um componente que tem como principal objetivo representar e organizar
       informações de forma compacta e acessível.
     </p>
