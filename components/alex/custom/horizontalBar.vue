@@ -41,12 +41,11 @@
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
             <div
-              v-if="user"
+              v-if="user && showPicture"
               v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-
               <app-user-avatar
                 :profile-picture="user.avatar"
                 :placeholder="user.fullname"
@@ -65,12 +64,16 @@
               </v-icon>
             </div>
             <div
-              v-else
+              v-else-if="showPicture"
               v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <app-user-avatar :placeholder="''"  :size="pictureSize" class="mr-2" />
+              <app-user-avatar
+                :placeholder="''"
+                :size="pictureSize"
+                class="mr-2"
+              />
               <span class="fullname mr-1" style="cursor: pointer"> user </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
@@ -83,7 +86,13 @@
           <v-list-item
             v-for="(item, index) in menuItems"
             :key="`profile-menu-item-${index}`"
-            @click="onMenuClick(item.to ?? '/', item.logout)"
+            @click="
+              item.to
+                ? router.push({ path: item.to })
+                : item.action
+                ? item.action
+                : () => {}
+            "
           >
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
@@ -95,7 +104,6 @@
 <script setup lang="ts">
 import { User } from '../../../models/user.model';
 
-const { logout } = useStrapiAuth();
 const emit = defineEmits(['alert', 'chat']);
 
 const router = useRouter();
@@ -111,7 +119,7 @@ defineProps({
   },
 
   menuItems: {
-    type: Array as PropType<{ title: string; to?: string; logout: boolean }[]>,
+    type: Array as PropType<{ title: string; to?: string; action?: () => void }[]>,
     default: [],
   },
 
@@ -134,24 +142,16 @@ defineProps({
     default: false,
   },
 
+  showPicture: {
+    type: Boolean,
+    default: false,
+  },
+
   pictureSize: {
     type: Number,
-    default: 40
-  }
+    default: 40,
+  },
 });
-
-function onMenuClick(route = '', logout = false) {
-  if (logout) {
-    logoutUser();
-  } else {
-    router.push({ path: route });
-  }
-}
-
-function logoutUser() {
-  logout();
-  router.push('/login');
-}
 </script>
 
 <style scoped lang="scss">
