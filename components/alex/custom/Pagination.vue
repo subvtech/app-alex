@@ -56,4 +56,9 @@ defineProps({
 .v-pagination__item--is-active:active {
   background: #005c66;
 }
+
+.v-pagination__list > * > .v-btn {
+  width: 44px !important;
+  height: 44px !important;
+}
 </style>
