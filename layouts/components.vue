@@ -105,10 +105,13 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
+      },
     ],
   },
-
- 
 ];
 
 const profileMenuItems = [
@@ -127,7 +130,6 @@ const profileMenuItems = [
     logout: true,
   },
 ];
-
 </script>
 
 <style scoped lang="scss">

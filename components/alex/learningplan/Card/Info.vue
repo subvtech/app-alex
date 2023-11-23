@@ -5,13 +5,13 @@
       size="large"
       :icon="'mdi-account'"
       variant="outlined"
-      color="gray-400"
+      color="gray-600"
     />
     <v-avatar
       v-else
       :variant="hasImage ? 'flat' : 'outlined'"
       size="36"
-      color="gray-400"
+      color="gray-600"
       :image="image?.url"
       rounded="lg"
     >

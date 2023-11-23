@@ -122,7 +122,18 @@
         }"
       >
         <div class="d-flex flex-column pa-0 gap-2">
-          <h5 class="text-h5 text-gray-900 ellipsis lines-2">{{ name }}</h5>
+          <v-tooltip
+            :text="name"
+            :location="isVertical ? 'top center' : 'top left'"
+            max-width="360"
+            :disabled="isActiveTitleTooltip"
+          >
+            <template v-slot:activator="{ props }">
+              <h5 v-bind="props" class="text-h5 text-gray-900 ellipsis lines-2">
+                {{ name }}
+              </h5>
+            </template>
+          </v-tooltip>
           <v-card-subtitle
             class="text-body-3 text-gray-600 ellipsis lines-3"
             lines="three"
@@ -204,6 +215,10 @@ const width = computed(() =>
     ? { min: 300, max: 400 }
     : { min: 688, max: 959 },
 );
+const isActiveTitleTooltip = computed(() => {
+  if (isVertical.value) return props.name.length < 60;
+  else return props.name.length < 84;
+});
 const emits = defineEmits([
   'open',
   'favorite',
@@ -217,6 +232,7 @@ const emits = defineEmits([
 .grid {
   display: grid;
   align-content: stretch;
+  height: fit-content;
 }
 
 .vertical-grid {
