@@ -35,11 +35,11 @@
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
       :user="user"
-      @click="closeDrawable"
+      @click="onClickOutside"
       :menu-items="profileMenuItems"
     />
 
-    <v-main class="secondary bg-gray-blue pt-16" @click="closeDrawable">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -55,7 +55,8 @@ const i18n = useI18n();
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
-const { clipped, drawer, isPermanent, closeDrawable } = useNavigationDrawer();
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
 
 onBeforeMount(() => {
   if (user.value) {

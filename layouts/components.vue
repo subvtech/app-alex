@@ -4,10 +4,9 @@
     <alex-custom-drawable
       :blocks="menus"
       :clipped="clipped"
-      :show="drawer"
+      v-model="drawer"
       dark
       :permanent="isPermanent"
-      @update:model-value="closeDrawable"
     >
       <template v-slot:header>
         <div
@@ -35,11 +34,11 @@
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
       :user="user"
-      @click="closeDrawable"
+      @click="onClickOutside"
       :menu-items="profileMenuItems"
     />
 
-    <v-main class="secondary bg-gray-blue pt-16" @click="closeDrawable">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -54,7 +53,8 @@ const i18n = useI18n();
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
-const { clipped, drawer, isPermanent, closeDrawable } = useNavigationDrawer();
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
 
 onBeforeMount(() => {
   if (user.value) {
@@ -110,7 +110,7 @@ const menus = [
         title: 'HorizontalBar',
         to: '/components/custom/horizontalBar',
       },
-      
+
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Drawable',

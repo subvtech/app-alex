@@ -17,6 +17,7 @@ export default function useNavigationDrawer() {
       currentWidth.value = window.innerWidth;
     });
   });
+  const onClickOutside = computed(() => (drawer ? () => {} : closeDrawable));
 
   const closeDrawable = (clippedValue = true) => {
     if (isPermanent.value) {
@@ -46,5 +47,6 @@ export default function useNavigationDrawer() {
     drawer,
     isPermanent,
     closeDrawable,
+    onClickOutside
   };
 }
