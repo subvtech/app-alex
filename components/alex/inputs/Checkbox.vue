@@ -11,8 +11,7 @@
         color="#00b7cc"
         width="18"
         data-testid="testing-checkbox"
-        @update:model-value="handleChange"
-        @change="() => emit('change', modelValue)"
+        @change="handleChange"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
@@ -54,7 +53,8 @@ defineProps({
 });
 const emit = defineEmits(['update:modelValue', 'change']);
 
-const handleChange = (value) => {
+const handleChange = ($event) => {
+  const value = $event.target.checked;
   emit('update:modelValue', value);
 };
 </script>
@@ -91,6 +91,10 @@ div {
 }
 
 .gray-400 {
+  color: #a0a8b1 !important;
+}
+
+.gray-400.input-checkbox {
   color: #a0a8b1 !important;
 }
 
