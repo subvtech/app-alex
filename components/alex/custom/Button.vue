@@ -2,6 +2,7 @@
   <v-btn
     flat
     rounded="lg"
+    data-testid="alexButton"
     :class="`${variant} ${selectedVariant.textColor}`"
     :color="selectedVariant.bgColor"
     :variant="selectedVariant.variant as unknown as undefined"
