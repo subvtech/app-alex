@@ -98,22 +98,31 @@
         </Prism>
       </div>
     </div>
-    <div class="d-flex flex-wrap w-100">
-      <alex-inputs-checkbox label="Checkbox 1" hint="Hint" />
-      <alex-inputs-checkbox label="Checkbox 2" hint="Hint 2" />
-      <alex-inputs-checkbox indeterminate label="Checkbox 3" hint="Hint 3" />
-      <alex-inputs-checkbox disabled label="Checkbox 4" hint="Hint 4" />
-      <alex-inputs-checkbox disabled label="Checkbox 5" hint="Hint 5" />
-      <alex-inputs-checkbox readonly label="Checkbox 6" hint="Hint 6" />
-      <alex-inputs-checkbox readonly label="Checkbox 7" hint="Hint 7" />
-      <alex-inputs-checkbox
-        indeterminate
-        readonly
-        label="Checkbox 8"
-        hint="Hint 8"
-      />
-      <alex-inputs-checkbox label="Checkbox 9" readonly />
-      <alex-inputs-checkbox label="" readonly />
+    <div class="d-flex flex-wrap w-100 justify-center">
+      <div>
+        <alex-inputs-checkbox label="Checkbox 1" hint="False" />
+        <alex-inputs-checkbox modelValue label="Checkbox 2" hint="True" />
+        <alex-inputs-checkbox
+          indeterminate
+          label="Checkbox 3"
+          hint="Indeterminate"
+        />
+      </div>
+      <div>
+        <alex-inputs-checkbox disabled label="Checkbox 4" hint="Disabled" />
+        <alex-inputs-checkbox
+          disabled
+          indeterminate
+          label="Checkbox 5"
+          hint="Disabled and indeterminate"
+        />
+        <alex-inputs-checkbox
+          indeterminate
+          readonly
+          label="Checkbox 8"
+          hint="Readonly and indeterminate"
+        />
+      </div>
     </div>
     <div class="w-100">
       <div
@@ -381,55 +390,40 @@ const secondExampleTemplate = `
 const thirdExampleTemplate = `
   <template>
     <alex-inputs-checkbox 
-     
-      label="Checkbox 1" 
-      hint="Hint" 
+    label="Checkbox 1" 
+    hint="False" 
     />
-    <alex-inputs-checkbox
-      label="Checkbox 2"
-      hint="Hint 2" 
-    />
+
     <alex-inputs-checkbox 
+    modelValue 
+    label="Checkbox 2" 
+    hint="True" 
+    />
+    
+    <alex-inputs-checkbox
       indeterminate
       label="Checkbox 3"
-      hint="Hint 3"
+      hint="Indeterminate"
     />
-    <alex-inputs-checkbox
-     
+    
+    <alex-inputs-checkbox 
       disabled 
       label="Checkbox 4" 
-      hint="Hint 4" 
+      hint="Disabled" 
     />
-    <alex-inputs-checkbox 
-      disabled 
-      label="Checkbox 5" 
-      hint="Hint 5" 
+
+    <alex-inputs-checkbox
+      disabled
+      indeterminate
+      label="Checkbox 5"
+      hint="Disabled and indeterminate"
     />
-    <alex-inputs-checkbox 
-     
-      readonly 
-      label="Checkbox 6" 
-      hint="Hint 6" />
-    <alex-inputs-checkbox 
-      readonly 
-      label="Checkbox 7" 
-      hint="Hint 7" 
-    />
-    <alex-inputs-checkbox 
-      indeterminate 
-      readonly 
-      label="Checkbox 8" 
-      hint="Hint 8" 
-    />
-    <alex-inputs-checkbox 
-     
-      label="Checkbox 9" 
-      readonly 
-    />
-    <alex-inputs-checkbox 
-     
-      label="" 
-      readonly 
+
+    <alex-inputs-checkbox
+      indeterminate
+      readonly
+      label="Checkbox 8"
+      hint="Readonly and indeterminate"
     />
   </template>`;
 
