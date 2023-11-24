@@ -48,9 +48,9 @@
           <tbody>
             <tr>
               <td>modelValue</td>
-              <td>Boolean</td>
+              <td>Boolean | Null</td>
               <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
+                <v-icon icon="mdi-checkbox-marked" color="success" />
               </td>
             </tr>
             <tr>
@@ -100,26 +100,48 @@
     </div>
     <div class="d-flex flex-wrap w-100 justify-center">
       <div>
-        <alex-inputs-checkbox label="Checkbox 1" hint="False" />
-        <alex-inputs-checkbox modelValue label="Checkbox 2" hint="True" />
         <alex-inputs-checkbox
+          v-model:model-value="checkboxOne"
+          label="Checkbox 1"
+          hint="False"
+        />
+        <alex-inputs-checkbox
+          v-model:model-value="checkboxTwo"
+          label="Checkbox 2"
+          :hint="checkboxTwo ? 'true' : 'false'"
+        />
+        <alex-inputs-checkbox
+          v-model:model-value="checkboxThree"
           indeterminate
           label="Checkbox 3"
-          hint="Indeterminate"
+          :hint="
+            checkboxThree === null
+              ? 'null'
+              : checkboxThree === false
+              ? 'false'
+              : 'true'
+          "
         />
       </div>
       <div>
-        <alex-inputs-checkbox disabled label="Checkbox 4" hint="Disabled" />
         <alex-inputs-checkbox
+          :model-value="checkboxTrue"
+          disabled
+          label="Checkbox 4"
+          hint="Disabled"
+        />
+        <alex-inputs-checkbox
+          :model-value="checkboxFalse"
           disabled
           indeterminate
           label="Checkbox 5"
           hint="Disabled and indeterminate"
         />
         <alex-inputs-checkbox
+          :model-value="checkboxFalse"
           indeterminate
           readonly
-          label="Checkbox 8"
+          label="Checkbox 6"
           hint="Readonly and indeterminate"
         />
       </div>
@@ -190,8 +212,8 @@
     <p class="text-subtitle-2 text-gray-500">
       A propriedade <strong>modelValue</strong> é um booleano que, quando
       verdadeiro, deixa o checkbox marcado. Para que o checkbox esteja
-      inicialmente sem marcação, basta não informar a propriedade
-      <strong>modelValue = "true"</strong>, pois o default é false.
+      inicialmente sem marcação, basta informar
+      <strong>:modelValue = "false"</strong>.
     </p>
     <h2 class="text-h3 text-gray-800">Variante: No Label, No Hint</h2>
     <p class="text-subtitle-2 text-gray-500">
@@ -200,7 +222,7 @@
       <strong>label</strong> ou <strong>hint</strong>.
     </p>
     <div class="w-100">
-      <alex-inputs-checkbox />
+      <alex-inputs-checkbox v-model:model-value="checkboxExOne" />
     </div>
     <div class="w-100">
       <div
@@ -271,21 +293,34 @@
       estilo, já o readonly é um booleano que, quando verdadeiro, torna o
       checkbox somente leitura, mas sem desativar o seu estilo <br />
       <Prism inline class="bg-white pa-0"
-        >{{ ` <alex-inputs-checkbox disabled />` }}</Prism
+        >{{ `
+        <alex-inputs-checkbox
+          :model-value="checkboxFalse"
+          disabled
+          label="Disabled Checkbox"
+          hint="You can't change its value"
+        />` }}</Prism
       >
       <br />
       <Prism inline class="bg-white"
-        >{{ ` <alex-inputs-checkbox readonly />` }}</Prism
+        >{{ `<alex-inputs-checkbox
+          :model-value="checkboxTrue"
+          readonly
+          label="Readonly Checkbox"
+          hint="You can still see it's style"
+        />` }}</Prism
       >
     </p>
 
     <div class="w-100">
       <alex-inputs-checkbox
+        :model-value="checkboxFalse"
         disabled
         label="Disabled Checkbox"
         hint="You can't change its value"
       />
       <alex-inputs-checkbox
+        :model-value="checkboxTrue"
         readonly
         label="Readonly Checkbox"
         hint="You can still see it's style"
@@ -357,11 +392,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
+const checkboxOne = ref(false);
+const checkboxTwo = ref(true);
+const checkboxThree = ref(null);
+const checkboxExOne = ref(false);
+const checkboxFalse = ref(false);
+const checkboxTrue = ref(true);
+watch(
+  () => checkboxThree.value,
+  () => console.log(checkboxThree.value),
+);
 const copiedValue = ref('');
 const firstExampleActivePage = ref('1');
 const secondExampleActivePage = ref('1');
@@ -369,62 +413,66 @@ const thirdExampleActivePage = ref('1');
 
 const propsExample = `
     <alex-inputs-checkbox 
-   
-    label="Checkbox 1" 
-    hint="Hint" />
+    :model-value="checkboxExOne"
+    label="Checkbox" 
+    hint="Example 1" />
     `;
 
 const firstExampleTemplate = `
   <alex-inputs-checkbox 
-   
+    :model-value="checkboxOne"
     label="Checkbox 1" 
     hint="Hint" 
   /> `;
 
 const secondExampleTemplate = `
-  <alex-inputs-checkbox />
-  <alex-inputs-checkbox />
-  <alex-inputs-checkbox indeterminate />
+  <alex-inputs-checkbox :model-value="checkboxFalse" />
+  <alex-inputs-checkbox :model-value="checkboxTrue"/>
+  <alex-inputs-checkbox :model-value="checkboxThree" indeterminate />
   `;
 
 const thirdExampleTemplate = `
   <template>
     <alex-inputs-checkbox 
+    :model-value="checkboxFalse"
     label="Checkbox 1" 
     hint="False" 
     />
 
     <alex-inputs-checkbox 
-    modelValue 
+    :model-value="checkboxTrue"
     label="Checkbox 2" 
     hint="True" 
     />
     
     <alex-inputs-checkbox
+      :model-value="checkboxThree"
       indeterminate
       label="Checkbox 3"
       hint="Indeterminate"
     />
     
-    <alex-inputs-checkbox 
-      disabled 
-      label="Checkbox 4" 
-      hint="Disabled" 
-    />
-
     <alex-inputs-checkbox
-      disabled
-      indeterminate
-      label="Checkbox 5"
-      hint="Disabled and indeterminate"
-    />
-
-    <alex-inputs-checkbox
-      indeterminate
-      readonly
-      label="Checkbox 8"
-      hint="Readonly and indeterminate"
-    />
+          :model-value="checkboxTrue"
+          disabled
+          label="Checkbox 4"
+          hint="Disabled"
+        />
+        <alex-inputs-checkbox
+          :model-value="checkboxFalse"
+          disabled
+          indeterminate
+          label="Checkbox 5"
+          hint="Disabled and indeterminate"
+        />
+        <alex-inputs-checkbox
+          :model-value="checkboxFalse"
+          indeterminate
+          readonly
+          label="Checkbox 6"
+          hint="Readonly and indeterminate"
+        />
+      </div>
   </template>`;
 
 const exampleTabs = [
@@ -433,6 +481,15 @@ const exampleTabs = [
     value: '1',
   },
 ];
+
+const thirdExampleScript = `
+
+const checkboxOne = ref(false);
+const checkboxTwo = ref(true);
+const checkboxThree = ref(null);
+const checkboxFalse = ref(false);
+const checkboxTrue = ref(true);
+`;
 
 const copyToClipboard = async (message, item) => {
   await navigator.clipboard.writeText(message);
