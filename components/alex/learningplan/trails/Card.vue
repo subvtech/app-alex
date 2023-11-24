@@ -59,6 +59,7 @@
                     v-if="
                       direction !== 'HORIZONTAL' && (isHovering || isActive)
                     "
+                    size="small"
                     v-bind="{ ...propsMenu, ...props }"
                     icon="mdi-dots-vertical"
                     class="options"
@@ -126,7 +127,11 @@
             <div v-if="!isVertical">
               <v-menu :close-on-content-click="false">
                 <template #activator="{ props }">
-                  <v-btn-tertiary v-bind="props" icon="mdi-dots-vertical" />
+                  <v-btn-tertiary
+                    v-bind="props"
+                    icon="mdi-dots-vertical"
+                    size="small"
+                  />
                 </template>
                 <v-list>
                   <v-list-item
