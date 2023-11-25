@@ -71,7 +71,7 @@ type Options = {
   openOnClick: boolean;
   openOnHover: boolean;
   closeOnContentClick: boolean;
-  location: string;
+  location: 'top' | 'bottom' | 'end' | 'start' | 'center';
   isDarkMode: boolean;
 };
 

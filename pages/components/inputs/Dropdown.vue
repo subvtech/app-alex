@@ -283,6 +283,19 @@
       }}</Prism>
     </p>
     <p class="text-subtitle-2 text-gray-500">
+      A props <strong>location</strong> define a localização do dropdown,
+      podendo ser <strong>start</strong>, <strong>end</strong>,
+      <strong>top</strong> ou <strong>bottom</strong>.<br />
+      <Prism inline class="bg-white pa-0">{{
+        `
+        const options1 = ref({
+        ...
+        location: 'end',
+        ...
+        });`
+      }}</Prism>
+    </p>
+    <p class="text-subtitle-2 text-gray-500">
       Existe uma opção de estilo complementar ao utilizar
       <strong>class: 'warning'</strong>. por exemplo:<br />
       <Prism inline class="bg-white">{{
