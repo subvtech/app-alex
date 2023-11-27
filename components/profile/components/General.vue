@@ -116,4 +116,10 @@ const { info, canEdit, generalTags, technicalTags, institutions } =
 .details {
   gap: 24px;
 }
+@media (min-width: 801px) {
+  .details {
+    max-width: 450px;
+  }
+}
+
 </style>
