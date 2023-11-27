@@ -10,7 +10,11 @@
         :href="items[items.length - 2].href"
         data-testid="back_arrow"
       >
-        <v-icon class="header__arrow" data-testid="back_arrow" color="#6E7A87" style="cursor: pointer"
+        <v-icon
+          class="header__arrow"
+          data-testid="back_arrow"
+          color="#6E7A87"
+          style="cursor: pointer"
           >mdi-chevron-left</v-icon
         >
       </a>
@@ -30,7 +34,7 @@
       </div>
       <v-divider vertical class="divider ml-4 align-center" />
       <div class="header__breadcrumb">
-        <breadcrumbs :items="items" />
+        <alex-custom-breadcrumbs :items="items" />
       </div>
     </div>
     <div class="header__button d-flex">
@@ -42,7 +46,7 @@
         class="button"
         :text="text"
         :icon="btnIcon"
-        @click="dialog = true"
+        @click="() => toggleDialog"
         ><v-icon data-testid="btn-icon" width="20" height="20">
           {{ icon }}
         </v-icon>
@@ -52,16 +56,26 @@
   </div>
 </template>
 <script setup lang="ts">
-import Breadcrumbs from '~/components/Breadcrumbs.vue';
-
 defineProps({
   isTerciary: {
+    type: Boolean,
+    default: false,
+  },
+  dialog: {
+    type: Boolean,
+    default: false,
+  },
+  toggleDialog: {
     type: Boolean,
     default: false,
   },
   text: {
     type: String,
     default: 'Botão',
+  },
+  icon: {
+    type: String,
+    default: 'mdi-account',
   },
   btnIcon: {
     type: String,
@@ -78,12 +92,11 @@ defineProps({
 });
 
 const items = [
-  { text: 'Início', disabled: false, href: '/inicio' },
-  { text: 'Página', disabled: false, href: '/pagina' },
-  { text: 'Nome da Página', disabled: true },
+  { title: 'Início', disabled: false, href: '/inicio' },
+  { title: 'Página', disabled: false, href: '/pagina' },
 ];
 </script>
-<style scoped>
+<style scoped lang="scss">
 .button {
   font-size: 14px;
   font-weight: 700;

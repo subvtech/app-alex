@@ -24,16 +24,18 @@
               }
             "
           />
+          <p
+            v-if="item.position || (showPositions && item.position !== false)"
+            class="text-gray-300 ml-2 mr-1 font-weight-bold"
+          >
+            {{ index + 1 }}.
+          </p>
           <v-icon
             v-if="item.icon"
             class="ml-3 mr-2 icon-border"
             color="gray-500"
             :icon="item.icon"
           />
-          <p v-else class="text-gray-300 ml-2 mr-1 font-weight-bold">
-            {{ index + 1 }}.
-          </p>
-
           <span
             class="text-body-3 text-gray-600 text-overflow"
             data-testid="text"
@@ -80,9 +82,14 @@ const { data } = defineProps({
         icon?: string;
         contentData?: object;
         id?: number;
+        position?: boolean;
       }[]
     >,
     default: () => [],
+  },
+  showPositions: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -157,11 +164,14 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 }
 
 .v-expansion-panel-title {
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  height: 52px !important;
 }
 
 .v-expansion-panel-title--active {
   background-color: #f1f5f9 !important;
+  height: 60px !important;
+  min-height: 60px !important;
 }
 
 .v-expansion-panel-title:hover {

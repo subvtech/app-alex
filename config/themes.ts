@@ -1,6 +1,6 @@
 import { ThemeDefinition } from 'vuetify';
 
-const AlexThemeColors = {
+export const AlexThemeColors = {
   'primary--2': '#2E74B8',
   'primary--1': '#1B5B98',
   'primary-0': '#001529',

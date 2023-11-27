@@ -18,11 +18,11 @@
       <v-list class="pa-0" :key="`menu-${i}-list`">
         <v-list-subheader
           :key="`menu-${i}`"
-          class="accent-text"
+          class="accent-text pb-2"
           :class="
             clipped
-              ? 'pb-2 no-padding d-flex justify-center text-center align-center'
-              : 'pl-4 pr-2'
+              ? 'no-padding d-flex justify-center text-center align-center'
+              : 'pl-4 pr-2 '
           "
           density="compact"
           nav
