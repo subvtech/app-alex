@@ -182,7 +182,7 @@
           @select:option="() => {}"
           @display:settings="() => {}"
         />
-        <div class="w-100" style="position: relative;">
+        <div class="w-100" style="position: relative">
           <prism class="bg-grey-lighten-5">
             {{ examples[3] }}
           </prism>
@@ -251,7 +251,7 @@
           @select:option="() => {}"
           @display:settings="() => {}"
         />
-        <div class="w-100" style="position: relative;">
+        <div class="w-100" style="position: relative">
           <prism class="bg-grey-lighten-5">
             {{ examples[4] }}
           </prism>
@@ -392,14 +392,15 @@ import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
 definePageMeta({
+  layout: 'components',
   middleware: 'auth',
 });
 
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 
-const selectedOption1 = ref(0)
-const selectedOption2 = ref(0)
+const selectedOption1 = ref(0);
+const selectedOption2 = ref(0);
 
 const examples = [
   '<alex-custom-banner />',
