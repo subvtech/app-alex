@@ -26,19 +26,13 @@
             {{ $t('components.profile.about.placeholder') }}
           </span>
         </div>
-        <client-only>
-          <div
-            id="lockedEditor"
-            class="lockedEditor w-full p-6 sm:p-16"
-            :class="isEditing ? 'd-none' : ''"
-          />
-        </client-only>
       </div>
       <client-only>
         <div
           id="editorjs"
           class="editorjs w-full p-6 sm:p-16"
-          :class="isEditing ? '' : 'd-none'"
+          :class="isEditing ? '' : 'locked'"
+          :spellcheck="isEditing ? 'true' : 'false'"
         />
       </client-only>
     </template>
@@ -69,10 +63,11 @@ const props = defineProps({
 
 const { info, canEdit } = toRefs(props);
 const isEditing = ref(false);
-const cancel = () => {};
+const cancel = async () => {
+  await instance.value.render({ blocks: info.value });
+};
 const emit = defineEmits(['ready', 'update:user']);
 const instance = ref();
-const lockedEditor = ref();
 
 onMounted(() => {
   instance.value = new EditorJS({
@@ -97,29 +92,6 @@ onMounted(() => {
       new DragDrop(instance.value);
       /* eslint-disable-next-line */
       new Undo({ editor: instance.value });
-      emit('ready');
-    },
-  });
-  lockedEditor.value = new EditorJS({
-    tools: {
-      marker: {
-        class: Marker,
-        shortcut: 'CMD+SHIFT+M',
-      },
-    },
-    onChange: () => checkBlocksLimit(lockedEditor.value),
-    i18n,
-    holder: 'lockedEditor',
-    readOnly: true,
-    // logLevel: 'ERROR',
-    data: {
-      blocks: info.value,
-    },
-    onReady: () => {
-      /* eslint-disable-next-line */
-      new DragDrop(lockedEditor.value);
-      /* eslint-disable-next-line */
-      new Undo({ editor: lockedEditor.value });
       emit('ready');
     },
   });
@@ -160,7 +132,6 @@ const updateAbout = async () => {
   await Promise.all(promises);
   isEditing.value = false;
 
-  await lockedEditor.value.render(instanceData);
   emit('update:user');
 };
 
@@ -184,12 +155,24 @@ const toggleIsEditing = () => {
   max-width: 100% !important;
 }
 
+.locked {
+  pointer-events: none;
+  -webkit-user-select: text; /* Chrome, Safari, and Opera */
+  -moz-user-select: text; /* Firefox */
+  -ms-user-select: text; /* Internet Explorer/Edge */
+  user-select: text;
+
+
+  .ce-toolbar__actions.ce-toolbar__actions--opened {
+    display: none;
+  }
+}
+
 .cdx-block {
   max-width: 100% !important;
   overflow-wrap: break-word;
 }
 #Card {
-  #lockedEditor,
   #editorjs {
     .codex-editor__redactor {
       padding-bottom: 24px !important;

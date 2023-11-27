@@ -154,8 +154,6 @@ const updateUser = async (show = true) => {
     router.push({ path: '/' });
   }
 
-  console.log({user: user.value})
-
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
