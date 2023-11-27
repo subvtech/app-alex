@@ -6,6 +6,7 @@
       :value="tab.value"
       class="text-body-1 tab"
       :class="!tab.notification ? 'px-7' : ''"
+      rounded="0"
       @click="tab.notification = false"
       >{{ tab.label }}
       <v-icon
