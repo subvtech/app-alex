@@ -158,7 +158,7 @@ const updateAbout = async () => {
   }
 
   await Promise.all(promises);
-  isEditing.value = !isEditing.value;
+  isEditing.value = false;
 
   await lockedEditor.value.render(instanceData);
   emit('update:user');

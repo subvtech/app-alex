@@ -154,14 +154,15 @@ const updateUser = async (show = true) => {
     router.push({ path: '/' });
   }
 
+  console.log({user: user.value})
+
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
-  messageStore.message = 'done';
-  messageStore.color = 'green';
-  messageStore.show = show;
+
+  messageStore.setMessage('done', 'green', show);
 };
 
 const selectOption = (index) => {
