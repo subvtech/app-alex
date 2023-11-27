@@ -32,9 +32,11 @@
           {{ title }}
         </p>
       </div>
-      <v-divider vertical class="divider ml-4 align-center" />
+      <!-- <v-divider vertical class="divider ml-4 align-center" /> -->
       <div class="header__breadcrumb">
-        <alex-custom-breadcrumbs :items="items" />
+        <slot name="breadcrumbs" :items="items">
+          <alex-custom-breadcrumbs :items="items" />
+        </slot>
       </div>
     </div>
     <div class="header__button d-flex">
@@ -61,21 +63,9 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  dialog: {
-    type: Boolean,
-    default: false,
-  },
-  toggleDialog: {
-    type: Boolean,
-    default: false,
-  },
   text: {
     type: String,
     default: 'Botão',
-  },
-  icon: {
-    type: String,
-    default: 'mdi-account',
   },
   btnIcon: {
     type: String,
