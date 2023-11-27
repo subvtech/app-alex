@@ -356,6 +356,49 @@
         </v-btn>
       </div>
     </div>
+
+    <h2 class="text-h2 text-gray-800">Outros componentes: Header e Footer</h2>
+    <p class="text-subtitle-2 text-gray-500">
+      Componente superior contendo título e destaque do modal
+    </p>
+
+    <div class="w-100 flex-column d-flex gap-4">
+      <div
+        class="d-flex flex-column bg-gray-100 pa-4 rounded-lg"
+        style="gap: 8px"
+      >
+        <alex-custom-modal-header title="Header customizado" />
+        <alex-custom-modal-header
+          title="Header customizado"
+          highlight="#222"
+          @on-close="console.log('close')"
+        />
+        <alex-custom-modal-footer
+          :name-main-button="'Enviar'"
+          :name-second-button="'Voltar'"
+          @on-main-action="() => console.log('mainAction')"
+          @on-second-action="() => console.log('secondAction')"
+        />
+        <alex-custom-modal-footer no-main-button no-second-button />
+      </div>
+      <div class="a w-100" style="position: relative">
+        <prism> {{ examples[4] }}</prism>
+        <v-btn
+          class="copy-icon"
+          variant="text"
+          color="gray-400"
+          @click="copyToClipboard(4)"
+        >
+          <v-icon
+            v-if="copiedIndex === 4"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </v-btn>
+      </div>
+    </div>
   </v-container>
 </template>
 
@@ -429,6 +472,19 @@ const examples = [
             </template>
           </alex-custom-modal>
         </v-btn>`,
+  ` <alex-custom-modal-header title="Header customizado" />
+  <alex-custom-modal-header
+    title="Header customizado"
+    highlight="#222"
+    @on-close="console.log('close')"
+  />
+    <alex-custom-modal-footer
+    :name-main-button="'Enviar'"
+    :name-second-button="'Voltar'"
+    @on-main-action="() => console.log('mainAction')"
+    @on-second-action="() => console.log('secondAction')"
+  />
+  <alex-custom-modal-footer no-main-button no-second-button />`,
 ];
 
 const copyToClipboard = async (index) => {

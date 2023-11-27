@@ -2,8 +2,10 @@
   <v-dialog
     max-width="720"
     transition="dialog-center-transition"
+    class="custom-alex-modal"
     :model-value="modelValue"
     :activator="activator"
+    data-testid="alex-modal"
     @update:model-value="handleChange"
   >
     <template v-if="hasCustomActivator" #activator="{ isActive, props }">
@@ -22,7 +24,7 @@
       :highlight="highlight"
       @on-close="() => emits('update:modelValue', false)"
     />
-    <v-container class="bg-white pa-6 gap-6 max-height">
+    <v-container class="bg-white pa-6 gap-6 body-max-height">
       <v-row dense>
         <v-col dense>
           <slot />
@@ -76,8 +78,8 @@ const hasFooter = computed(() => !!slots.footer);
 </script>
 
 <style scoped>
-.max-height {
-  max-height: calc(100svh - 308px);
+.body-max-height {
+  max-height: calc(100% - 148px);
   overflow-y: auto;
 }
 </style>

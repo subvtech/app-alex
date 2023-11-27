@@ -1,6 +1,7 @@
 <template>
   <v-container
     class="bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100"
+    data-testid="alex-modal-footer"
   >
     <v-row dense justify="end">
       <v-col v-if="!noSecondButton" dense cols="auto">
@@ -36,10 +37,10 @@
 
 <script setup lang="ts">
 interface HeaderProps {
+  nameMainButton?: string;
+  nameSecondButton?: string;
   noMainButton?: boolean;
   noSecondButton?: boolean;
-  nameMainButton: string;
-  nameSecondButton: string;
 }
 withDefaults(defineProps<HeaderProps>(), {
   noMainButton: false,
@@ -58,6 +59,7 @@ const hasSecondSlot = computed(() => !!slots.secondButton);
   border-top: 1px solid rgb(var(--v-theme-gray-100)) !important;
 }
 .min-height-76 {
-  min-height: 72px;
+  min-height: fit-content;
+  height: 76px;
 }
 </style>

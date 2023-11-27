@@ -43,3 +43,7 @@ $btn-icon-density: (
     height: calc(var(--v-btn-height) + $size);
   }
 }
+
+.v-dialog.custom-alex-modal > .v-overlay__content {
+  max-height: calc(100svh - 160px);
+}
