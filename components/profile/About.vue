@@ -79,7 +79,6 @@ onMounted(() => {
     },
     onChange: () => checkBlocksLimit(instance.value),
     i18n,
-    autofocus: true,
     placeholder: 'Clique para iniciar...',
     holder: 'editorjs',
     //readOnly: true,
