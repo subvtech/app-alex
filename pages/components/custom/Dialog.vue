@@ -37,7 +37,6 @@
       <div class="d-flex" style="gap: 8px">
         <alex-custom-dialog
           v-model="dialog"
-          activator="parent"
           title="Título dialog"
           name-main-button="Criar"
           name-second-button="Cancelar"
@@ -45,7 +44,7 @@
           @on-second-action="() => console.log('second')"
         >
           <template #activator="{ props }">
-            <v-btn v-bind="props">Abrir dialog</v-btn>
+            <alex-custom-button v-bind="props">Abrir dialog</alex-custom-button>
           </template>
           tesLorem ipsum dolor sit amet, semper quis, sapien id natoque elit.
           Nostra urna at, magna at neque sed sed ante imperdiet, dolor mauris
@@ -127,10 +126,9 @@
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
-        <v-btn
+        <alex-custom-button
           class="copy-icon"
           variant="text"
-          color="gray-400"
           @click="copyToClipboard(0)"
         >
           <v-icon
@@ -140,7 +138,7 @@
             color="green-lighten-1"
           />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
+        </alex-custom-button>
       </div>
     </div>
 
@@ -242,7 +240,7 @@
 
     <div class="w-100 flex-column d-flex gap-4">
       <div class="d-flex" style="gap: 8px">
-        <v-btn>
+        <alex-custom-button>
           Abrir dialog highlight
           <alex-custom-dialog
             v-model="dialogHighlight"
@@ -253,14 +251,13 @@
             @on-second-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
-        </v-btn>
+        </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[1] }}</prism>
-        <v-btn
+        <alex-custom-button
           class="copy-icon"
           variant="text"
-          color="gray-400"
           @click="copyToClipboard(1)"
         >
           <v-icon
@@ -270,7 +267,7 @@
             color="green-lighten-1"
           />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
+        </alex-custom-button>
       </div>
     </div>
 
@@ -282,7 +279,7 @@
 
     <div class="w-100 flex-column d-flex gap-4">
       <div class="d-flex" style="gap: 8px">
-        <v-btn>
+        <alex-custom-button>
           Abrir dialog
           <alex-custom-dialog
             v-model="dialogInsideUse"
@@ -292,14 +289,13 @@
             @on-second-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
-        </v-btn>
+        </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[2] }}</prism>
-        <v-btn
+        <alex-custom-button
           class="copy-icon"
           variant="text"
-          color="gray-400"
           @click="copyToClipboard(2)"
         >
           <v-icon
@@ -309,7 +305,7 @@
             color="green-lighten-1"
           />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
+        </alex-custom-button>
       </div>
     </div>
 
@@ -321,7 +317,7 @@
 
     <div class="w-100 flex-column d-flex gap-4">
       <div class="d-flex gap-2">
-        <v-btn>
+        <alex-custom-button>
           Abrir dialog Customizado
           <alex-custom-dialog
             v-model="dialogCustomization"
@@ -336,14 +332,13 @@
               ><alex-custom-dialog-footer no-main-button no-second-button />
             </template>
           </alex-custom-dialog>
-        </v-btn>
+        </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[3] }}</prism>
-        <v-btn
+        <alex-custom-button
           class="copy-icon"
           variant="text"
-          color="gray-400"
           @click="copyToClipboard(3)"
         >
           <v-icon
@@ -353,7 +348,7 @@
             color="green-lighten-1"
           />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
+        </alex-custom-button>
       </div>
     </div>
 
@@ -383,10 +378,9 @@
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[4] }}</prism>
-        <v-btn
+        <alex-custom-button
           class="copy-icon"
           variant="text"
-          color="gray-400"
           @click="copyToClipboard(4)"
         >
           <v-icon
@@ -396,7 +390,7 @@
             color="green-lighten-1"
           />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
+        </alex-custom-button>
       </div>
     </div>
   </v-container>
@@ -421,7 +415,6 @@ const copiedIndex = ref(-1);
 const examples = [
   `  <alex-custom-dialog
           v-model="dialog"
-          activator="parent"
           title="Criar Algo"
           name-main-button="Criar"
           name-second-button="Cancelar"
@@ -429,11 +422,11 @@ const examples = [
           @on-second-action="() => console.log('second')"
         >
           <template #activator="{ props }">
-            <v-btn v-bind="props">activator</v-btn>
+            <alex-custom-button v-bind="props">activator</alex-custom-button>
           </template>
           teste
         </alex-custom-dialog>`,
-  `  <v-btn>
+  `  <alex-custom-button>
           Abrir dialog Highlight
           <alex-custom-dialog
             v-model="dialogHighlight"
@@ -444,8 +437,8 @@ const examples = [
             @on-second-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
-        </v-btn>`,
-  `  <v-btn>
+        </alex-custom-button>`,
+  `  <alex-custom-button>
           Abrir dialog
           <alex-custom-dialog
             v-model="dialogInsideUse"
@@ -455,8 +448,8 @@ const examples = [
             @on-second-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
-        </v-btn>`,
-  ` <v-btn>
+        </alex-custom-button>`,
+  ` <alex-custom-button>
           Abrir dialog Customizado
           <alex-custom-dialog
             v-model="dialogCustomization"
@@ -471,7 +464,7 @@ const examples = [
               ><alex-custom-dialog-footer no-main-button no-second-button />
             </template>
           </alex-custom-dialog>
-        </v-btn>`,
+        </alex-custom-button>`,
   ` <alex-custom-dialog-header title="Header customizado" />
   <alex-custom-dialog-header
     title="Header customizado"

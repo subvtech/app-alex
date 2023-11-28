@@ -11,11 +11,10 @@
         </h4>
       </v-col>
       <v-col cols="auto"
-        ><v-btn
+        ><alex-custom-button
           icon="mdi-close"
           variant="text"
           size="large"
-          color="gray-600"
           @click="() => emits('onClose')"
       /></v-col>
     </v-row>

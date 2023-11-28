@@ -10,10 +10,10 @@
           name="secondButton"
           :on-second-action="() => emits('onSecondAction')"
         />
-        <v-btn
+        <alex-custom-button
           v-else
           size="large"
-          color="gray-blue"
+          variant="secondary"
           :text="nameSecondButton"
           @click="() => emits('onSecondAction')"
         />
@@ -24,9 +24,10 @@
           name="mainButton"
           :on-main-action="() => emits('onMainAction')"
         />
-        <v-btn
+        <alex-custom-button
           v-else
           size="large"
+          variant="primary"
           :text="nameMainButton"
           @click="() => emits('onMainAction')"
         />
