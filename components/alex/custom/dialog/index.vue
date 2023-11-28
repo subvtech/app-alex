@@ -2,10 +2,10 @@
   <v-dialog
     max-width="720"
     transition="dialog-center-transition"
-    class="custom-alex-modal"
+    class="custom-alex-dialog"
     :model-value="modelValue"
     :activator="activator"
-    data-testid="alex-modal"
+    data-testid="alex-dialog"
     @update:model-value="handleChange"
   >
     <template v-if="hasCustomActivator" #activator="{ isActive, props }">
@@ -18,7 +18,7 @@
       :highlight="highlight"
       :on-close="() => emits('update:modelValue', false)"
     />
-    <alex-custom-modal-header
+    <alex-custom-dialog-header
       v-else
       :title="title"
       :highlight="highlight"
@@ -37,7 +37,7 @@
       :on-main-action="() => emits('onMainAction')"
       :on-second-action="() => emits('onSecondAction')"
     />
-    <alex-custom-modal-footer
+    <alex-custom-dialog-footer
       v-else
       :name-main-button="nameMainButton"
       :name-second-button="nameSecondButton"
@@ -68,7 +68,7 @@ const emits = defineEmits([
   'onMainAction',
   'onSecondAction',
 ]);
-const handleChange = (value) => {
+const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
 };
 const slots = useSlots();

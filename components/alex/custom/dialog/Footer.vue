@@ -23,7 +23,7 @@
           v-if="hasMainSlot"
           name="mainButton"
           :on-main-action="() => emits('onMainAction')"
-        ></slot>
+        />
         <v-btn
           v-else
           size="large"
