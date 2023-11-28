@@ -7,7 +7,6 @@ import { alexIcons } from 'assets/icons';
 import Carousel from './Carousel.vue';
 
 const vuetify = createVuetify({
-  aliases,
   components,
   directives,
   defaults,
