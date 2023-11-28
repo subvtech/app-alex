@@ -44,6 +44,13 @@ $btn-icon-density: (
   }
 }
 
+
 .v-dialog.custom-alex-dialog > .v-overlay__content {
-  max-height: calc(100svh - 160px);
+  max-height: calc(100vh - 160px);
+};
+
+@supports(max-height: calc(100svh - 160px)) {
+  .v-dialog.custom-alex-dialog > .v-overlay__content {
+    max-height: calc(100svh - 160px);
+  };
 }

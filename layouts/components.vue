@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="user">
     <AppSnackbar />
     <div
       @click.stop="
@@ -61,6 +61,11 @@ const isPermanent = ref(false);
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
+onBeforeMount(() => {
+  userStore.profilePicture = user.value.avatar;
+  userStore.fullname = user.value.fullname;
+});
+
 const menus = [
   {
     title: 'Components',
@@ -100,6 +105,11 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Modal',
+        to: '/components/custom/modal',
+      },
     ],
   },
 ];
@@ -107,7 +117,7 @@ const menus = [
 const profileMenuItems = [
   {
     title: i18n.t('layouts.default.profile'),
-    to: `/user/`,
+    to: `/user/${user.value.username}`,
     logout: false,
   },
   {
