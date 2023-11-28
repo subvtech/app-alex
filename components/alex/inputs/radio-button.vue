@@ -7,7 +7,12 @@
       role="button-radio"
     >
       <v-radio
-        class="text-body-1 text-gray-800 radio"
+        class="text-body-1 radio"
+        :class="
+          button.disabled && button.disabled === true
+            ? 'text-gray-400'
+            : 'text-gray-800 '
+        "
         :label="button.label"
         :value="button.value"
         :hint="button.hint"
@@ -18,7 +23,7 @@
       <p
         :class="
           button.disabled && button.disabled === true
-            ? 'text-gray-400 '
+            ? 'text-gray-400'
             : 'text-gray-600 '
         "
         class="ml-10 mt-1 text-body-3"
@@ -47,12 +52,8 @@ defineProps({
 </script>
 
 <style>
-.v-selection-control__wrapper,
-.v-selection-control__input {
-  height: 24px !important;
-}
-
-.radio .v-label {
+.radio .v-label,
+.v-selection-control--disabled {
   opacity: 1 !important;
 }
 </style>
