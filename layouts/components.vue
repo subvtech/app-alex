@@ -105,11 +105,6 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Modal',
-        to: '/components/custom/modal',
-      },
     ],
   },
 ];
