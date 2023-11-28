@@ -75,6 +75,7 @@
     "plyr": "^3.7.8",
     "prismjs": "^1.29.0",
     "sass": "^1.64.2",
+    "shepherd.js": "^11.2.0",
     "strapi-sdk-js": "^2.2.0",
     "v-viewer": "^1.6.4",
     "vee-validate": "^4.11.1",
