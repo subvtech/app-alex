@@ -1,18 +1,13 @@
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
 export default function useNavigationDrawer() {
   const clipped = ref(false);
   const drawer = ref(false);
-  const isPermanent = ref(false);
   const currentWidth = ref(0);
 
   onMounted(() => {
     currentWidth.value = window.innerWidth;
-    if (currentWidth.value >= 959) {
-      isPermanent.value = true;
-    } else {
-      isPermanent.value = false;
-    }
+
     window.addEventListener('resize', () => {
       currentWidth.value = window.innerWidth;
     });
@@ -31,22 +26,13 @@ export default function useNavigationDrawer() {
     }
   };
 
-  watch(
-    () => currentWidth.value,
-    () => {
-      if (currentWidth.value >= 959) {
-        isPermanent.value = true;
-      } else {
-        isPermanent.value = false;
-      }
-    },
-  );
+  const isPermanent = computed(() => currentWidth.value >= 959);
 
   return {
     clipped,
     drawer,
     isPermanent,
     closeDrawable,
-    onClickOutside
+    onClickOutside,
   };
 }
