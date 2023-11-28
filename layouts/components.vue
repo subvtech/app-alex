@@ -7,6 +7,7 @@
       v-model="drawer"
       dark
       :permanent="isPermanent"
+      @update:model-value="closeDrawable"
     >
       <template v-slot:header>
         <div

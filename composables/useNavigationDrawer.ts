@@ -1,9 +1,9 @@
 import { ref, onMounted } from 'vue';
 
-export default function useNavigationDrawer() {
+export default function useNavigationDrawer(defaultWidth = 0) {
   const clipped = ref(false);
   const drawer = ref(false);
-  const currentWidth = ref(0);
+  const currentWidth = ref(defaultWidth);
 
   onMounted(() => {
     currentWidth.value = window.innerWidth;
@@ -12,7 +12,9 @@ export default function useNavigationDrawer() {
       currentWidth.value = window.innerWidth;
     });
   });
-  const onClickOutside = computed(() => (drawer ? () => {} : closeDrawable));
+  const onClickOutside = computed(() =>
+    drawer.value && !isPermanent.value ? closeDrawable : () => {},
+  );
 
   const closeDrawable = (clippedValue = true) => {
     if (isPermanent.value) {
