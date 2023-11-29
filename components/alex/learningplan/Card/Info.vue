@@ -1,9 +1,9 @@
 <template>
-  <div class="d-flex gap-2 align-center justify-start width">
+  <div class="d-flex gap-2 align-center justify-center width">
     <alex-custom-chip
       v-if="!image"
       size="large"
-      :icon="'mdi-account'"
+      :icon="icon"
       variant="outlined"
       color="gray-600"
     />
@@ -36,12 +36,10 @@ const props = withDefaults(
   }>(),
   { icon: 'mdi-account', image: undefined },
 );
-
 const letters = computed(() => {
-  const names = props.image?.name.split(' ');
-  if (!names) return 'NM';
-  if (names.length >= 2) return names[0][0] + names[1][0];
-  return names[0][0];
+  if (props.image) {
+    return getLetters(props.image.name);
+  }
 });
 
 const hasImage = computed(() => !!props.image?.url);

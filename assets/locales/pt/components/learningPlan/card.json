@@ -12,5 +12,10 @@
     "facilitator": "Facilitador",
     "hidden": "Oculto",
     "options": "Opções",
-    "favorite": "Favoritar"
+    "favorite": "Favoritar",
+    "status": {
+        "start": "Iniciar",
+        "running": "Em progresso",
+        "finished": "Finalizado"
+    }
 }

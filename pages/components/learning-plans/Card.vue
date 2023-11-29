@@ -20,6 +20,7 @@
       <div class="d-flex" style="gap: 8px">
         <alex-learningplan-card
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          type="course"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -30,6 +31,23 @@
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
           favorited
+          @favorite="() => console.log('favoritei')"
+          @open="() => console.log('abri')"
+        />
+        <alex-learningplan-card
+          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
+          :facilitator="{
+            name: 'Carlos Andrade',
+            imageURL: 'https://thispersondoesnotexist.com/',
+          }"
+          :trails-number="40"
+          :image="{
+            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+          }"
+          favorited
+          @favorite="() => console.log('favoritei')"
+          @open="() => console.log('abri')"
         />
       </div>
       <div class="px-3 w-100" style="position: relative">
@@ -99,12 +117,27 @@
               </td>
             </tr>
             <tr>
+              <td>participants</td>
+              <td>person[]</td>
+              <td class="text-center">
+                <v-icon icon="mdi-checkbox-marked" color="success" />
+              </td>
+            </tr>
+            <tr>
               <td>type</td>
-              <td>'project' | 'course'</td>
+              <td>'project' | 'course' | 'project_in_courses'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
+            <tr>
+              <td>status</td>
+              <td>'start' | 'running' | 'finished'</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+
             <tr>
               <td>direction</td>
               <td>'HORIZONTAL' | 'VERTICAL'</td>

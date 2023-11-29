@@ -1,7 +1,7 @@
 <template>
-  <v-hover v-slot="{ isHovering, props }">
+  <v-hover v-slot="{ props: hoverProps }" v-model="isHovering">
     <v-card
-      v-bind="props"
+      v-bind="hoverProps"
       :min-width="width.min"
       :max-width="width.max"
       :class="{
@@ -13,6 +13,7 @@
       color="gray-100"
       rounded="lg"
       class="grid bg-white"
+      data-testid="alex-learningplan-card"
       @click="() => emits('open')"
     >
       <div :class="{ rounded: !isVertical }" class="header">
@@ -58,11 +59,12 @@
                 location="bottom center"
               >
                 <template #activator="{ props }">
-                  <v-btn-secondary
+                  <alex-custom-button
                     v-if="isHovering"
                     v-bind="{ ...propsMenu, ...props }"
                     icon="mdi-cards-heart"
                     class="favorite"
+                    variant="secondary"
                     :class="{ 'text-error-0': favorited }"
                     @click="() => emits('favorite')"
                   />
@@ -81,10 +83,11 @@
                 location="bottom center"
               >
                 <template #activator="{ props }">
-                  <v-btn-secondary
+                  <alex-custom-button
                     v-if="
                       direction !== 'HORIZONTAL' && (isHovering || isActive)
                     "
+                    variant="secondary"
                     v-bind="{ ...propsMenu, ...props }"
                     icon="mdi-dots-vertical"
                     class="options"
@@ -122,6 +125,14 @@
           'pa-4': isVertical,
         }"
       >
+        <alex-custom-chip
+          v-if="type === 'project'"
+          :text="$t(`components.learningPlan.card.status.${status}`)"
+          size="small"
+          :status="statusConfig.variant"
+          variant="flat"
+          :prepend-icon="statusConfig.icon"
+        />
         <div class="d-flex flex-column pa-0 gap-2">
           <v-tooltip
             :text="name"
@@ -130,7 +141,11 @@
             :disabled="isActiveTitleTooltip"
           >
             <template v-slot:activator="{ props }">
-              <h5 v-bind="props" class="text-h5 text-gray-900 ellipsis lines-2">
+              <h5
+                v-bind="props"
+                ref="nameRef"
+                class="text-h5 text-gray-900 ellipsis lines-2"
+              >
                 {{ name }}
               </h5>
             </template>
@@ -152,7 +167,8 @@
             :subtitle="facilitator.name"
           />
           <alex-learningplan-card-info
-            icon="mdi-trails"
+            v-if="type !== 'project_in_courses'"
+            icon="alex:trail"
             :title="$t('components.learningPlan.card.trails')"
             :subtitle="trailsNumber"
           />
@@ -162,7 +178,11 @@
       <div v-if="!isVertical" class="h-full">
         <v-menu :close-on-content-click="false">
           <template #activator="{ props }">
-            <v-btn-tertiary v-bind="props" icon="mdi-dots-vertical" />
+            <alex-custom-button
+              v-bind="props"
+              variant="text"
+              icon="mdi-dots-vertical"
+            />
           </template>
           <v-list>
             <v-list-item
@@ -190,25 +210,51 @@
 </template>
 
 <script setup lang="ts">
-interface LearningPlanCard {
+interface person {
+  name: string;
+  image?: {
+    url: string;
+    alt?: string;
+  };
+}
+
+interface LearningPlanCardBase {
+  type?: 'project' | 'course' | 'project_in_courses';
   image: { url: string; alt?: string };
   name: string;
   description: string;
   facilitator: { name: string; imageURL?: string };
   trailsNumber: number;
-  type?: 'project' | 'course' | (string & {});
   hide?: boolean;
   hideFavorited?: boolean;
   favorited?: boolean;
   direction?: 'HORIZONTAL' | 'VERTICAL';
 }
-const props = withDefaults(defineProps<LearningPlanCard>(), {
+
+interface LearningPlanCardProject extends LearningPlanCardBase {
+  status?: 'start' | 'running' | 'finished';
+  trailsNumber: number;
+}
+interface LearningPlanCardProjectInCourses
+  extends Omit<LearningPlanCardProject, 'trailsNumber'> {
+  participants?: person[];
+}
+
+interface LearningPlanCardProps
+  extends LearningPlanCardProjectInCourses,
+    LearningPlanCardBase {}
+
+const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   hideFavorited: false,
   favorited: false,
   direction: 'VERTICAL',
   hide: false,
   type: 'project',
+  status: 'start',
+  participants: undefined,
 });
+const nameRef = ref(null);
+const isHovering = ref(false);
 const options = ref(false);
 const isVertical = computed(() => props.direction === 'VERTICAL');
 const width = computed(() =>
@@ -216,6 +262,27 @@ const width = computed(() =>
     ? { min: 300, max: 400 }
     : { min: 688, max: 959 },
 );
+const statusConfig = computed<{ icon: string; variant: any }>(() => {
+  switch (props.status) {
+    // eslint-disable-next-line default-case-last
+    default:
+    case 'start':
+      return {
+        icon: 'mdi-clock',
+        variant: 'blue',
+      };
+    case 'running':
+      return {
+        icon: 'mdi-clock',
+        variant: 'warning',
+      };
+    case 'finished':
+      return {
+        icon: 'mdi-check',
+        variant: 'success',
+      };
+  }
+});
 const isActiveTitleTooltip = computed(() => {
   if (isVertical.value) return props.name.length < 60;
   else return props.name.length < 84;
@@ -242,7 +309,7 @@ const emits = defineEmits([
 }
 
 .horizontal-grid {
-  grid-template-columns: minmax(200px, 300px) minmax(400px, 1fr) auto;
+  grid-template-columns: minmax(220px, 300px) minmax(370px, 1fr) auto;
   grid-template-rows: 1fr;
 }
 
