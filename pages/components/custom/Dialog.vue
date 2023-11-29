@@ -29,7 +29,7 @@
     <p class="text-subtitle-2 text-gray-500">
       Tem como propriedades o <strong>v-model</strong> que é obrigatório e o
       <strong>activator</strong>, <strong>title</strong>,
-      <strong>nameMainButton</strong>, <strong>nameSecondButton</strong>, que
+      <strong>mainButtonText</strong>, <strong>secondaryButtonText</strong>, que
       são opcionais.
     </p>
 
@@ -41,7 +41,7 @@
           name-main-button="Criar"
           name-second-button="Cancelar"
           @on-main-action="() => console.log('main')"
-          @on-second-action="() => console.log('second')"
+          @on-secondary-action="() => console.log('second')"
         >
           <template #activator="{ props }">
             <alex-custom-button v-bind="props">Abrir dialog</alex-custom-button>
@@ -176,21 +176,21 @@
               </td>
             </tr>
             <tr>
-              <td>highlight</td>
+              <td>highlightedTitle</td>
               <td>string</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
             <tr>
-              <td>nameMainButton</td>
+              <td>mainButtonText</td>
               <td>string</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
             <tr>
-              <td>nameSecondButton</td>
+              <td>secondaryButtonText</td>
               <td>string</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
@@ -221,7 +221,9 @@
               </td>
             </tr>
             <tr>
-              <td><strong class="text-success-0">@on-second-action</strong></td>
+              <td>
+                <strong class="text-success-0">@on-secondary-action</strong>
+              </td>
               <td>Ação ao clicar no botão secundário</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
@@ -241,14 +243,14 @@
     <div class="w-100 flex-column d-flex gap-4">
       <div class="d-flex" style="gap: 8px">
         <alex-custom-button>
-          Abrir dialog highlight
+          Abrir dialog highlightedTitle
           <alex-custom-dialog
-            v-model="dialogHighlight"
+            v-model="dialoghighlightedTitle"
             activator="parent"
             title="dialog uso dentro do botão"
-            highlight="#132"
+            highlighted-title="#132"
             @on-main-action="() => console.log('main')"
-            @on-second-action="() => console.log('second')"
+            @on-secondary-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
         </alex-custom-button>
@@ -286,7 +288,7 @@
             activator="parent"
             title="dialog uso dentro do botão"
             @on-main-action="() => console.log('main')"
-            @on-second-action="() => console.log('second')"
+            @on-secondary-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
         </alex-custom-button>
@@ -323,13 +325,13 @@
             v-model="dialogCustomization"
             activator="parent"
             @on-main-action="() => console.log('main')"
-            @on-second-action="() => console.log('second')"
+            @on-secondary-action="() => console.log('second')"
             ><template #header>
               <alex-custom-dialog-header title="Header customizado"
             /></template>
             teste
             <template #footer
-              ><alex-custom-dialog-footer no-main-button no-second-button />
+              ><alex-custom-dialog-footer no-main-button on-secondary-action />
             </template>
           </alex-custom-dialog>
         </alex-custom-button>
@@ -365,16 +367,16 @@
         <alex-custom-dialog-header title="Header customizado" />
         <alex-custom-dialog-header
           title="Header customizado"
-          highlight="#222"
+          highlighted-title="#222"
           @on-close="console.log('close')"
         />
         <alex-custom-dialog-footer
           :name-main-button="'Enviar'"
           :name-second-button="'Voltar'"
           @on-main-action="() => console.log('mainAction')"
-          @on-second-action="() => console.log('secondAction')"
+          @on-secondary-action="() => console.log('secondAction')"
         />
-        <alex-custom-dialog-footer no-main-button no-second-button />
+        <alex-custom-dialog-footer no-main-button on-secondary-action />
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[4] }}</prism>
@@ -409,7 +411,7 @@ definePageMeta({
 const dialog = ref(false);
 const dialogInsideUse = ref(false);
 const dialogCustomization = ref(false);
-const dialogHighlight = ref(false);
+const dialoghighlightedTitle = ref(false);
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
@@ -419,7 +421,7 @@ const examples = [
           name-main-button="Criar"
           name-second-button="Cancelar"
           @on-main-action="() => console.log('main')"
-          @on-second-action="() => console.log('second')"
+          @on-secondary-action="() => console.log('second')"
         >
           <template #activator="{ props }">
             <alex-custom-button v-bind="props">activator</alex-custom-button>
@@ -427,14 +429,14 @@ const examples = [
           teste
         </alex-custom-dialog>`,
   `  <alex-custom-button>
-          Abrir dialog Highlight
+          Abrir dialog highlightedTitle
           <alex-custom-dialog
-            v-model="dialogHighlight"
+            v-model="dialoghighlightedTitle"
             activator="parent"
             title="dialog uso dentro do botão"
-            highlight="#132"
+            highlighted-title="#132"
             @on-main-action="() => console.log('main')"
-            @on-second-action="() => console.log('second')"
+            @on-secondary-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
         </alex-custom-button>`,
@@ -445,7 +447,7 @@ const examples = [
             activator="parent"
             title=""
             @on-main-action="() => console.log('main')"
-            @on-second-action="() => console.log('second')"
+            @on-secondary-action="() => console.log('second')"
             >teste
           </alex-custom-dialog>
         </alex-custom-button>`,
@@ -455,29 +457,29 @@ const examples = [
             v-model="dialogCustomization"
             activator="parent"
             @on-main-action="() => console.log('main')"
-            @on-second-action="() => console.log('second')"
+            @on-secondary-action="() => console.log('second')"
             ><template #header>
               <alex-custom-dialog-header title="Header customizado"
             /></template>
             teste
             <template #footer
-              ><alex-custom-dialog-footer no-main-button no-second-button />
+              ><alex-custom-dialog-footer no-main-button on-secondary-action />
             </template>
           </alex-custom-dialog>
         </alex-custom-button>`,
   ` <alex-custom-dialog-header title="Header customizado" />
   <alex-custom-dialog-header
     title="Header customizado"
-    highlight="#222"
+    highlighted-title="#222"
     @on-close="console.log('close')"
   />
     <alex-custom-dialog-footer
     :name-main-button="'Enviar'"
     :name-second-button="'Voltar'"
     @on-main-action="() => console.log('mainAction')"
-    @on-second-action="() => console.log('secondAction')"
+    @on-secondary-action="() => console.log('secondAction')"
   />
-  <alex-custom-dialog-footer no-main-button no-second-button />`,
+  <alex-custom-dialog-footer no-main-button on-secondary-action />`,
 ];
 
 const copyToClipboard = async (index) => {

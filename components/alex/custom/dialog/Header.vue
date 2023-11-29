@@ -6,8 +6,8 @@
     <v-row dense>
       <v-col class="w-100 d-flex align-center justify-start gap-2">
         <h4 class="text-h4 text-gray-800">{{ title }}</h4>
-        <h4 v-if="highlight" class="text-h4 text-secondary-0">
-          {{ highlight }}
+        <h4 v-if="highlightedTitle" class="text-h4 text-secondary-0">
+          {{ highlightedTitle }}
         </h4>
       </v-col>
       <v-col cols="auto"
@@ -24,11 +24,11 @@
 <script setup lang="ts">
 interface HeaderProps {
   title?: string;
-  highlight?: string;
+  highlightedTitle?: string;
 }
 withDefaults(defineProps<HeaderProps>(), {
   title: 'Title',
-  highlight: undefined,
+  highlightedTitle: undefined,
 });
 const emits = defineEmits(['onClose']);
 </script>

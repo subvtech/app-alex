@@ -4,18 +4,18 @@
     data-testid="alex-modal-footer"
   >
     <v-row dense justify="end">
-      <v-col v-if="!noSecondButton" dense cols="auto">
+      <v-col v-if="!noSecondaryButton" dense cols="auto">
         <slot
           v-if="hasSecondSlot"
           name="secondButton"
-          :on-second-action="() => emits('onSecondAction')"
+          :on-second-action="() => emits('onSecondaryAction')"
         />
         <alex-custom-button
           v-else
           size="large"
           variant="secondary"
-          :text="nameSecondButton"
-          @click="() => emits('onSecondAction')"
+          :text="secondaryButtonText"
+          @click="() => emits('onSecondaryAction')"
         />
       </v-col>
       <v-col v-if="!noMainButton" dense cols="auto">
@@ -28,7 +28,7 @@
           v-else
           size="large"
           variant="primary"
-          :text="nameMainButton"
+          :text="mainButtonText"
           @click="() => emits('onMainAction')"
         />
       </v-col>
@@ -38,18 +38,18 @@
 
 <script setup lang="ts">
 interface HeaderProps {
-  nameMainButton?: string;
-  nameSecondButton?: string;
+  mainButtonText?: string;
+  secondaryButtonText?: string;
   noMainButton?: boolean;
-  noSecondButton?: boolean;
+  noSecondaryButton?: boolean;
 }
 withDefaults(defineProps<HeaderProps>(), {
+  mainButtonText: 'Salvar',
+  secondaryButtonText: 'Cancelar',
   noMainButton: false,
-  noSecondButton: false,
-  nameMainButton: 'Salvar',
-  nameSecondButton: 'Cancelar',
+  noSecondaryButton: false,
 });
-const emits = defineEmits(['onMainAction', 'onSecondAction']);
+const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
 const hasMainSlot = computed(() => !!slots.mainButton);
 const hasSecondSlot = computed(() => !!slots.secondButton);

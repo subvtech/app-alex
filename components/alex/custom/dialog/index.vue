@@ -15,13 +15,13 @@
       v-if="hasHeader"
       name="header"
       :title="title"
-      :highlight="highlight"
+      :highlighted-title="highlightedTitle"
       :on-close="() => emits('update:modelValue', false)"
     />
     <alex-custom-dialog-header
       v-else
       :title="title"
-      :highlight="highlight"
+      :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
     />
     <v-container class="bg-white pa-6 gap-6 body-max-height">
@@ -35,14 +35,14 @@
       v-if="hasFooter"
       name="footer"
       :on-main-action="() => emits('onMainAction')"
-      :on-second-action="() => emits('onSecondAction')"
+      :on-secondary-action="() => emits('onSecondaryAction')"
     />
     <alex-custom-dialog-footer
       v-else
-      :name-main-button="nameMainButton"
-      :name-second-button="nameSecondButton"
+      :main-button-text="mainButtonText"
+      :secondary-button-text="secondaryButtonText"
       @on-main-action="() => emits('onMainAction')"
-      @on-second-action="() => emits('onSecondAction')"
+      @on-secondary-action="() => emits('onSecondaryAction')"
     />
   </v-dialog>
 </template>
@@ -52,21 +52,21 @@ interface HeaderProps {
   modelValue: boolean;
   activator?: 'parent';
   title?: string;
-  highlight?: string;
-  nameMainButton?: string;
-  nameSecondButton?: string;
+  highlightedTitle?: string;
+  mainButtonText?: string;
+  secondaryButtonText?: string;
 }
 withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
   title: undefined,
-  highlight: undefined,
-  nameMainButton: undefined,
-  nameSecondButton: undefined,
+  highlightedTitle: undefined,
+  mainButtonText: undefined,
+  secondaryButtonText: undefined,
 });
 const emits = defineEmits([
   'update:modelValue',
   'onMainAction',
-  'onSecondAction',
+  'onSecondaryAction',
 ]);
 const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
