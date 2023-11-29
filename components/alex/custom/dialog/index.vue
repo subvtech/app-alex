@@ -24,7 +24,10 @@
       :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
     />
-    <v-container class="bg-white pa-6 gap-6 body-max-height">
+    <v-container
+      class="bg-white pa-6 gap-6 body-max-height"
+      :class="{ 'rounded-b-lg': noFooter }"
+    >
       <v-row dense>
         <v-col dense>
           <slot />
@@ -38,7 +41,7 @@
       :on-secondary-action="() => emits('onSecondaryAction')"
     />
     <alex-custom-dialog-footer
-      v-else
+      v-else-if="!hasFooter && !noFooter"
       :main-button-text="mainButtonText"
       :secondary-button-text="secondaryButtonText"
       @on-main-action="() => emits('onMainAction')"
@@ -55,6 +58,7 @@ interface HeaderProps {
   highlightedTitle?: string;
   mainButtonText?: string;
   secondaryButtonText?: string;
+  noFooter?: boolean;
 }
 withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
@@ -62,6 +66,7 @@ withDefaults(defineProps<HeaderProps>(), {
   highlightedTitle: undefined,
   mainButtonText: undefined,
   secondaryButtonText: undefined,
+  noFooter: false,
 });
 const emits = defineEmits([
   'update:modelValue',

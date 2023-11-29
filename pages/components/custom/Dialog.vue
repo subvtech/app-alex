@@ -196,6 +196,13 @@
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
+            <tr>
+              <td>noFooter</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
           </tbody>
         </v-table>
       </div>
@@ -234,6 +241,46 @@
       </div>
     </div>
 
+    <h2 class="text-h2 text-gray-800">Variante sem Footer</h2>
+    <p class="text-subtitle-2 text-gray-500">
+      Modo dentro de outros componentes possibilitando uma simplicidade maior na
+      hora de usar.
+    </p>
+
+    <div class="w-100 flex-column d-flex gap-4">
+      <div class="d-flex" style="gap: 8px">
+        <alex-custom-button>
+          Abrir dialog noFooter
+          <alex-custom-dialog
+            v-model="dialogNoFooter"
+            activator="parent"
+            title="dialog uso dentro do botão"
+            highlighted-title="#132"
+            no-footer
+            @on-main-action="() => console.log('main')"
+            @on-secondary-action="() => console.log('second')"
+            >teste
+          </alex-custom-dialog>
+        </alex-custom-button>
+      </div>
+      <div class="a w-100" style="position: relative">
+        <prism> {{ examples[1] }}</prism>
+        <alex-custom-button
+          class="copy-icon"
+          variant="text"
+          @click="copyToClipboard(1)"
+        >
+          <v-icon
+            v-if="copiedIndex === 1"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </alex-custom-button>
+      </div>
+    </div>
+
     <h2 class="text-h2 text-gray-800">Variante com destaque</h2>
     <p class="text-subtitle-2 text-gray-500">
       Modo dentro de outros componentes possibilitando uma simplicidade maior na
@@ -256,14 +303,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[1] }}</prism>
+        <prism> {{ examples[2] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(1)"
+          @click="copyToClipboard(2)"
         >
           <v-icon
-            v-if="copiedIndex === 1"
+            v-if="copiedIndex === 2"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -294,14 +341,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[2] }}</prism>
+        <prism> {{ examples[3] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(2)"
+          @click="copyToClipboard(3)"
         >
           <v-icon
-            v-if="copiedIndex === 2"
+            v-if="copiedIndex === 3"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -337,14 +384,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[3] }}</prism>
+        <prism> {{ examples[4] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(3)"
+          @click="copyToClipboard(4)"
         >
           <v-icon
-            v-if="copiedIndex === 3"
+            v-if="copiedIndex === 4"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -379,14 +426,14 @@
         <alex-custom-dialog-footer no-main-button on-secondary-action />
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[4] }}</prism>
+        <prism> {{ examples[5] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(4)"
+          @click="copyToClipboard(5)"
         >
           <v-icon
-            v-if="copiedIndex === 4"
+            v-if="copiedIndex === 5"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -412,6 +459,7 @@ const dialog = ref(false);
 const dialogInsideUse = ref(false);
 const dialogCustomization = ref(false);
 const dialoghighlightedTitle = ref(false);
+const dialogNoFooter = ref(false);
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
@@ -428,6 +476,19 @@ const examples = [
           </template>
           teste
         </alex-custom-dialog>`,
+  `<alex-custom-button>
+          Abrir dialog noFooter
+          <alex-custom-dialog
+            v-model="dialogNoFooter"
+            activator="parent"
+            title="dialog uso dentro do botão"
+            highlighted-title="#132"
+            no-footer
+            @on-main-action="() => console.log('main')"
+            @on-secondary-action="() => console.log('second')"
+            >teste
+          </alex-custom-dialog>
+        </alex-custom-button>`,
   `  <alex-custom-button>
           Abrir dialog highlightedTitle
           <alex-custom-dialog
