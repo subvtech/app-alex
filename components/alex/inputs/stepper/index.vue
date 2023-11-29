@@ -4,7 +4,7 @@
       <alex-inputs-stepper-indicator
         v-for="({ title, subtitle, icon, completed }, index) in stepsList"
         :key="index"
-        :stepNumber="index + 1"
+        :step-number="index + 1"
         :active="index == activeStep - 1"
         :checked="activeStep - 1 > index"
         :title="title"
@@ -12,48 +12,44 @@
         :icon="icon"
         :completed="completed"
         :disabled="false"
-        @onSelect="() => onSelectStep(index + 1)"
+        @on-select="() => onSelectStep(index + 1)"
       />
     </div>
-    <template v-for="(_, index) in stepsList" :key="index">
-      <slot
-        v-if="index == activeStep - 1"
-        :name="`step${index + 1}`"
-        :errors="errors"
-        :values="values"
-      />
-    </template>
+    <div :class="stepClasses">
+      <template v-for="(_, index) in stepsList" :key="index">
+        <slot
+          v-if="index == activeStep - 1"
+          :name="`step${index + 1}`"
+          :errors="errors"
+          :values="values"
+        />
+      </template>
+    </div>
     <div v-if="!showControls" class="w-100 d-flex">
-      <v-btn
+      <alex-custom-button
         v-if="activeStep > 1"
-        :disabled="submitLoading"
-        type="button"
-        rounded="lg"
-        color="secondary"
-        variant="outlined"
-        size="large"
-        @click="onPrevStep"
+        variant="secondary"
         text="Voltar"
+        size="large"
+        :disabled="submitLoading"
+        @click="onPrevStep"
       />
 
-      <v-btn
-        type="submit"
+      <alex-custom-button
+        class="ml-auto"
+        size="large"
         :disabled="!isValid"
         :loading="submitLoading"
-        class="ml-auto"
-        rounded="lg"
-        color="accent"
-        size="large"
         :text="activeStep == numberSteps ? 'Criar' : 'Avançar'"
       />
     </div>
     <slot
       name="controls"
-      :onPrevStep="onPrevStep"
-      :isValid="isValid"
-      :isLastStep="activeStep == numberSteps"
-      :isFirstStep="activeStep == 1"
-      :submitLoading="submitLoading"
+      :on-prev-step="onPrevStep"
+      :is-valid="isValid"
+      :is-last-step="activeStep == numberSteps"
+      :is-first-step="activeStep == 1"
+      :submit-loading="submitLoading"
     />
   </v-form>
 </template>
@@ -76,13 +72,18 @@ type StepType<T extends string[], U> = Record<ElementType<T>, U>;
 const props = withDefaults(
   defineProps<{
     noHeader?: boolean;
-    stepsConfig?: StepType<typeof stepsCounter.value, Partial<StepsConfig>>;
+    stepsConfig?: Record<string, Partial<StepsConfig>>;
     submitLoading?: boolean;
+    stepClasses: string;
   }>(),
-  { submitLoading: false, noHeader: false },
+  {
+    submitLoading: false,
+    noHeader: false,
+    stepClasses: undefined,
+    stepsConfig: undefined,
+  },
 );
 const emit = defineEmits(['onSuccess']);
-
 // Slots
 const slots = useSlots();
 const showControls = computed(() => !!slots.controls);
@@ -119,7 +120,7 @@ const validationSchema = computed(() => {
 });
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: validationSchema,
+  validationSchema,
   keepValuesOnUnmount: true,
 });
 
@@ -166,7 +167,6 @@ const onSelectStep = (step: number) => {
   }
 
   activeStep.value = step;
- 
 };
 </script>
 
