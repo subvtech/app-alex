@@ -6,8 +6,8 @@
     <v-row dense justify="end">
       <v-col v-if="!noSecondaryButton" dense cols="auto">
         <slot
-          v-if="hasSecondSlot"
-          name="secondButton"
+          v-if="hasSecondarySlot"
+          name="secondaryButton"
           :on-second-action="() => emits('onSecondaryAction')"
         />
         <alex-custom-button
@@ -52,7 +52,7 @@ withDefaults(defineProps<HeaderProps>(), {
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
 const hasMainSlot = computed(() => !!slots.mainButton);
-const hasSecondSlot = computed(() => !!slots.secondButton);
+const hasSecondarySlot = computed(() => !!slots.secondarySlot);
 </script>
 
 <style scoped>
