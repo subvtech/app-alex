@@ -48,6 +48,7 @@ import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import { i18n } from '~/assets/editor-i18n';
 const { create, update, delete: _delete } = useStrapi();
+const { t } = useI18n();
 
 const props = defineProps({
   info: {
@@ -79,7 +80,7 @@ onMounted(() => {
     },
     onChange: () => checkBlocksLimit(instance.value),
     i18n,
-    placeholder: 'Clique para iniciar...',
+    placeholder: t('components.profile.about.placeholder'),
     holder: 'editorjs',
     //readOnly: true,
     // logLevel: 'ERROR',
@@ -160,7 +161,6 @@ const toggleIsEditing = () => {
   -moz-user-select: text; /* Firefox */
   -ms-user-select: text; /* Internet Explorer/Edge */
   user-select: text;
-
 
   .ce-toolbar__actions.ce-toolbar__actions--opened {
     display: none;
