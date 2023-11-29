@@ -8,9 +8,12 @@
         :size="size"
         :image="avatar.image?.url"
         class="alex-avatar-group-border alex-avatar-group-margin"
+        color="gray-100"
       >
         <template v-if="!avatar.image" #default>
-          {{ getLetters(avatar.name) }}
+          <p class="text-gray-600">
+            {{ getLetters(avatar.name) }}
+          </p>
         </template>
       </v-avatar>
     </template>
@@ -21,7 +24,7 @@
       class="alex-avatar-group-border alex-avatar-group-margin"
       :size="size"
     >
-      <span class="text-body-5">+{{ avatarsNumber }}</span>
+      <span class="text-body-3 text-gray-600">+{{ avatarsNumber }}</span>
     </v-avatar>
   </div>
 </template>
