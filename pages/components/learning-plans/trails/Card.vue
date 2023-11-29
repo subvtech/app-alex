@@ -5,7 +5,9 @@
     <h1 class="text-h2 text-gray-800">Card de Trilhas</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
-      <strong class="bg-accent pa-1 rounded">alex-learningplan-card</strong>
+      <strong class="bg-accent pa-1 rounded"
+        >alex-learningplan-trails-card</strong
+      >
       é um componente que tem como principal objetivo representar e organizar
       informações de forma compacta e acessível no contexto de trilhas.
     </p>
@@ -21,7 +23,7 @@
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
         />
       </div>
@@ -174,7 +176,7 @@
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           hide
         />
@@ -210,7 +212,7 @@
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           direction="HORIZONTAL"
         />
@@ -218,7 +220,7 @@
           name="sistemas operacionais"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           hide
           direction="HORIZONTAL"
@@ -280,7 +282,7 @@
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           direction="HORIZONTAL"
           :documents="[{ type: 'article', number: 4 }]"
@@ -324,14 +326,14 @@ const examples = [
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
         />`,
   ` <alex-learningplan-trails-card
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           hide
         />`,
@@ -339,7 +341,7 @@ const examples = [
           name="sistemas operacionais"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           hide
           direction="HORIZONTAL"
@@ -349,7 +351,7 @@ const examples = [
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           direction="HORIZONTAL"
           :documents="[{ type: 'article', number: 4 }]"

@@ -34,7 +34,6 @@
               v-if="hide"
               v-bind="props"
               class="hidden-icon"
-              size="large"
               status="dark"
               icon="mdi-eye-off-outline"
               variant="elevated"
@@ -55,14 +54,15 @@
                 location="bottom center"
               >
                 <template #activator="{ props }">
-                  <v-btn-secondary
+                  <alex-custom-button
                     v-if="
                       direction !== 'HORIZONTAL' && (isHovering || isActive)
                     "
-                    size="small"
                     v-bind="{ ...propsMenu, ...props }"
-                    icon="mdi-dots-vertical"
                     class="options"
+                    size="small"
+                    variant="secondary"
+                    icon="mdi-dots-vertical"
                   />
                 </template>
               </v-tooltip>
@@ -101,80 +101,85 @@
       <div
         class="d-flex flex-column gap-4"
         :class="{
-          'grayscale-2': hide,
           'py-2': !isVertical,
-          'pa-4': isVertical,
+          'pa-4 pb-6': isVertical,
         }"
       >
-        <div class="d-flex flex-column pa-0 gap-2">
-          <div class="d-flex gap-2 align-center">
-            <v-tooltip
-              :text="name"
-              :location="isVertical ? 'top center' : 'top left'"
-              max-width="360"
-              :disabled="isActiveTitleTooltip"
-            >
-              <template v-slot:activator="{ props }">
-                <h5
-                  v-bind="props"
-                  class="text-h5 text-gray-900 ellipsis lines-2 max-height-48"
-                >
-                  {{ name }}
-                </h5>
-              </template>
-            </v-tooltip>
-
-            <div v-if="!isVertical">
-              <v-menu :close-on-content-click="false">
-                <template #activator="{ props }">
-                  <v-btn-tertiary
-                    v-bind="props"
-                    icon="mdi-dots-vertical"
-                    size="small"
-                  />
-                </template>
-                <v-list>
-                  <v-list-item
-                    v-if="hide"
-                    :title="
-                      $t('components.learningPlan.cardTrails.visibility.show')
-                    "
-                    prepend-icon="mdi-eye-outline"
-                    @click="() => emits('show')"
-                  />
-                  <v-list-item
-                    v-else
-                    :title="
-                      $t('components.learningPlan.cardTrails.visibility.hide')
-                    "
-                    prepend-icon="mdi-eye-off-outline"
-                    @click="() => emits('hide')"
-                  />
-                  <v-list-item
-                    :title="$t('components.learningPlan.cardTrails.copy')"
-                    prepend-icon="mdi-content-copy"
-                    @click="() => emits('copy')"
-                  />
-                  <v-list-item
-                    :title="
-                      $t('components.learningPlan.cardTrails.configurations')
-                    "
-                    prepend-icon="mdi-cog-outline"
-                    @click="() => emits('configurations')"
-                  />
-                </v-list>
-              </v-menu>
-            </div>
-          </div>
-          <v-card-subtitle
-            class="text-body-3 text-gray-600 ellipsis lines-3"
-            lines="three"
-            >{{ description }}</v-card-subtitle
+        <div class="d-flex gap-2 align-center">
+          <v-tooltip
+            :text="name"
+            :location="isVertical ? 'top center' : 'top left'"
+            max-width="360"
+            :disabled="isActiveTitleTooltip"
           >
+            <template v-slot:activator="{ props }">
+              <h5
+                v-bind="props"
+                class="text-body-2 text-gray-900 ellipsis lines-2 max-height-48"
+                :class="{ 'grayscale-2': hide }"
+              >
+                {{ name }}
+              </h5>
+            </template>
+          </v-tooltip>
+
+          <div v-if="!isVertical">
+            <v-menu :close-on-content-click="false">
+              <template #activator="{ props }">
+                <alex-custom-button
+                  v-bind="props"
+                  icon="mdi-dots-vertical"
+                  size="small"
+                  variant="text"
+                />
+              </template>
+              <v-list>
+                <v-list-item
+                  v-if="hide"
+                  :title="
+                    $t('components.learningPlan.cardTrails.visibility.show')
+                  "
+                  prepend-icon="mdi-eye-outline"
+                  @click="() => emits('show')"
+                />
+                <v-list-item
+                  v-else
+                  :title="
+                    $t('components.learningPlan.cardTrails.visibility.hide')
+                  "
+                  prepend-icon="mdi-eye-off-outline"
+                  @click="() => emits('hide')"
+                />
+                <v-list-item
+                  :title="$t('components.learningPlan.cardTrails.copy')"
+                  prepend-icon="mdi-content-copy"
+                  @click="() => emits('copy')"
+                />
+                <v-list-item
+                  :title="
+                    $t('components.learningPlan.cardTrails.configurations')
+                  "
+                  prepend-icon="mdi-cog-outline"
+                  @click="() => emits('configurations')"
+                />
+              </v-list>
+            </v-menu>
+          </div>
         </div>
 
-        <v-menu open-on-hover location="top left">
-          <template v-slot:activator="{ props }">
+        <div
+          class="text-body-5 text-gray-600 ellipsis lines-3"
+          lines="three"
+          :class="{ 'grayscale-2': hide }"
+        >
+          {{ description }}
+        </div>
+        <v-tooltip
+          :text="organizeDocuments as unknown as string"
+          :disabled="!hasDocuments"
+          location="bottom center"
+        >
+          <template #activator="{ props }">
             <div class="documents" v-bind="props">
               <v-icon size="20" color="gray-600"
                 >mdi-text-box-multiple-outline</v-icon
@@ -182,20 +187,7 @@
               <span>{{ documents?.length || 0 }}</span>
             </div>
           </template>
-
-          <v-list v-if="documents">
-            <v-list-item
-              v-for="(item, key) in documents"
-              :key="key"
-              :title="
-                item.number +
-                ' ' +
-                $t(`components.learningPlan.cardTrails.${item.type}`)
-              "
-              prepend-icon="mdi-text-box-multiple-outline"
-            />
-          </v-list>
-        </v-menu>
+        </v-tooltip>
       </div>
     </v-card>
   </v-hover>
@@ -210,6 +202,7 @@ interface LearningPlanCard {
   direction?: 'HORIZONTAL' | 'VERTICAL';
   documents?: [{ type: string; number: number }];
 }
+const { t } = useI18n();
 const props = withDefaults(defineProps<LearningPlanCard>(), {
   direction: 'VERTICAL',
   hide: false,
@@ -225,6 +218,24 @@ const width = computed(() =>
 const isActiveTitleTooltip = computed(() => {
   if (isVertical.value) return props.name.length < 30;
   else return props.name.length < 60;
+});
+
+const organizeDocuments = computed(() => {
+  let string = '';
+  props.documents?.map(
+    (item) =>
+      (string += `${item.number} ${t(
+        `components.learningPlan.cardTrails.${item.type}`,
+      )};`),
+  );
+  return string;
+});
+
+const hasDocuments = computed(() => {
+  if (props.documents) {
+    return !!props.documents.length;
+  }
+  return false;
 });
 const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
 </script>
@@ -311,10 +322,6 @@ const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
   gap: 8px;
   border-radius: 8px;
   width: fit-content;
-}
-
-.documents:hover {
-  background-color: rgb(var(--v-theme-gray-100));
 }
 
 .max-height-48 {
