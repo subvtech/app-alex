@@ -7,7 +7,7 @@
     @toggle:isEditing="toggleIsEditing"
     :cancel="cancel"
     :save="updateAbout"
-    :full-width="true"
+    full-width
   >
     <template v-slot:content class="pa-6">
       <div>
@@ -150,7 +150,6 @@ const toggleIsEditing = () => {
 </script>
 
 <style global lang="scss">
-#lockedEditor,
 #editorjs {
   max-width: 100% !important;
 }
