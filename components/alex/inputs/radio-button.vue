@@ -8,11 +8,7 @@
     >
       <v-radio
         class="text-body-1 radio"
-        :class="
-          button.disabled && button.disabled === true
-            ? 'text-gray-400'
-            : 'text-gray-800 '
-        "
+        :class="button.disabled ? 'text-gray-400' : 'text-gray-800 '"
         :label="button.label"
         :value="button.value"
         :hint="button.hint"
@@ -21,11 +17,7 @@
       >
       </v-radio>
       <p
-        :class="
-          button.disabled && button.disabled === true
-            ? 'text-gray-400'
-            : 'text-gray-600 '
-        "
+        :class="button.disabled ? 'text-gray-400' : 'text-gray-600 '"
         class="ml-10 mt-1 text-body-3"
       >
         {{ button.hint }}
