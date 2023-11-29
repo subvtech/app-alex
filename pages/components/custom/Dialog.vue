@@ -203,6 +203,13 @@
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
+            <tr>
+              <td>bodyClasses</td>
+              <td>string</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
           </tbody>
         </v-table>
       </div>
@@ -241,7 +248,9 @@
       </div>
     </div>
 
-    <h2 class="text-h2 text-gray-800">Variante sem Footer</h2>
+    <h2 class="text-h2 text-gray-800">
+      Variante sem Footer e customização do body
+    </h2>
     <p class="text-subtitle-2 text-gray-500">
       Modo dentro de outros componentes possibilitando uma simplicidade maior na
       hora de usar.
@@ -257,6 +266,7 @@
             title="dialog uso dentro do botão"
             highlighted-title="#132"
             no-footer
+            body-classes="pa-1 bg-white"
             @on-main-action="() => console.log('main')"
             @on-secondary-action="() => console.log('second')"
             >teste
@@ -476,7 +486,7 @@ const examples = [
           </template>
           teste
         </alex-custom-dialog>`,
-  `<alex-custom-button>
+  ` <alex-custom-button>
           Abrir dialog noFooter
           <alex-custom-dialog
             v-model="dialogNoFooter"
@@ -484,6 +494,7 @@ const examples = [
             title="dialog uso dentro do botão"
             highlighted-title="#132"
             no-footer
+            body-classes="pa-1 bg-white"
             @on-main-action="() => console.log('main')"
             @on-secondary-action="() => console.log('second')"
             >teste

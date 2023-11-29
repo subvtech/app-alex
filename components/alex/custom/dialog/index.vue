@@ -24,10 +24,7 @@
       :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
     />
-    <v-container
-      class="bg-white pa-6 gap-6 body-max-height"
-      :class="{ 'rounded-b-lg': noFooter }"
-    >
+    <v-container class="body-max-height" :class="bodyStyles">
       <v-row dense>
         <v-col dense>
           <slot />
@@ -55,18 +52,20 @@ interface HeaderProps {
   modelValue: boolean;
   activator?: 'parent';
   title?: string;
+  bodyClasses?: string;
   highlightedTitle?: string;
   mainButtonText?: string;
   secondaryButtonText?: string;
   noFooter?: boolean;
 }
-withDefaults(defineProps<HeaderProps>(), {
+const props = withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
   title: undefined,
   highlightedTitle: undefined,
   mainButtonText: undefined,
   secondaryButtonText: undefined,
   noFooter: false,
+  bodyClasses: undefined,
 });
 const emits = defineEmits([
   'update:modelValue',
@@ -80,6 +79,14 @@ const slots = useSlots();
 const hasCustomActivator = computed(() => !!slots.activator);
 const hasHeader = computed(() => !!slots.header);
 const hasFooter = computed(() => !!slots.footer);
+const bodyStyles = computed(() =>
+  props.bodyClasses
+    ? props.bodyClasses
+    : {
+        'bg-white pa-6 gap-6': !props.bodyClasses,
+        'rounded-b-lg': props.noFooter,
+      },
+);
 </script>
 
 <style scoped>
