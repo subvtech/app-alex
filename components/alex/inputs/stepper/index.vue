@@ -38,6 +38,7 @@
       <alex-custom-button
         class="ml-auto"
         size="large"
+        type="submit"
         :disabled="!isValid"
         :loading="submitLoading"
         :text="activeStep == numberSteps ? 'Criar' : 'Avançar'"
