@@ -71,7 +71,27 @@
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
-          favorited
+          hide-favorited-button
+          :participants="[
+            {
+              name: 'Edvaldo',
+              image: {
+                url: 'https://thispersondoesnotexist.com/',
+              },
+            },
+            {
+              name: 'Edvaldo',
+              image: {
+                url: 'https://thispersondoesnotexist.com/',
+              },
+            },
+            {
+              name: 'Pedro',
+            },
+            {
+              name: 'Marcos Santos',
+            },
+          ]"
           @favorite="() => console.log('favoritei')"
           @open="() => console.log('abri')"
         />

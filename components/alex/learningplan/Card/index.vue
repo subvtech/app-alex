@@ -1,5 +1,10 @@
 <template>
   <v-card
+    class="grid bg-white"
+    variant="outlined"
+    color="gray-100"
+    rounded="lg"
+    data-testid="alex-learningplan-card"
     :min-width="width.min"
     :max-width="width.max"
     :class="{
@@ -7,11 +12,6 @@
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
     }"
-    variant="outlined"
-    color="gray-100"
-    rounded="lg"
-    class="grid bg-white"
-    data-testid="alex-learningplan-card"
     @click="() => emits('open')"
     @mouseover="isHovering = true"
     @mouseleave="isHovering = false"
@@ -157,7 +157,10 @@
         >
       </div>
 
-      <div class="d-flex gap-6 flex-wrap py-2">
+      <div
+        class="d-flex gap-6 flex-wrap py-2"
+        :class="{ 'justify-space-between': participants?.length }"
+      >
         <alex-learningplan-card-info
           :avatar="{
             url: facilitator.imageURL,
@@ -171,6 +174,12 @@
           icon="alex:trail"
           :title="$t('components.learningPlan.card.trails')"
           :subtitle="trailsCount"
+        />
+
+        <alex-custom-avatar-group
+          v-else-if="participants && type === 'course_project'"
+          :avatar-items="participants"
+          :size="36"
         />
       </div>
     </div>
@@ -209,7 +218,7 @@
 </template>
 
 <script setup lang="ts">
-interface person {
+interface participant {
   name: string;
   image?: {
     url: string;
@@ -217,7 +226,7 @@ interface person {
   };
 }
 
-interface LearningPlanCardBase {
+interface LearningPlanCardProps {
   type?: 'project' | 'course' | 'course_project';
   image: { url: string; alt?: string };
   name: string;
@@ -228,20 +237,9 @@ interface LearningPlanCardBase {
   hideFavoritedButton?: boolean;
   favorited?: boolean;
   direction?: 'HORIZONTAL' | 'VERTICAL';
-}
-
-interface LearningPlanCardProject extends LearningPlanCardBase {
   status?: 'start' | 'in_progress' | 'done';
-  trailsCount: number;
+  participants?: participant[];
 }
-interface LearningPlanCardProjectInCourses
-  extends Omit<LearningPlanCardProject, 'trailsCount'> {
-  participants?: person[];
-}
-
-interface LearningPlanCardProps
-  extends LearningPlanCardProjectInCourses,
-    LearningPlanCardBase {}
 
 const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   hideFavoritedButton: false,
@@ -252,6 +250,7 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   status: 'start',
   participants: undefined,
 });
+
 const isHovering = ref(false);
 const options = ref(false);
 const isVertical = computed(() => props.direction === 'VERTICAL');
