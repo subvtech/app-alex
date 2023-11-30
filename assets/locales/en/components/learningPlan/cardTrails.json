@@ -8,5 +8,7 @@
     "copy": "Copy",
     "hidden": "Hidden",
     "article": "Article",
-    "document": "Document"
+    "articles": "Articles",
+    "document": "Document",
+    "documents": "Documents"
 }

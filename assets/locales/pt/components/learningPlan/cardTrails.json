@@ -8,5 +8,7 @@
     "copy": "Copiar",
     "hidden": "Oculto",
     "article": "Artigo",
-    "document": "Documento"
+    "articles": "Artigos",
+    "document": "Documento",
+    "documents": "Documentos"
 }

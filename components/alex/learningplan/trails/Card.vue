@@ -168,7 +168,7 @@
         {{ description }}
       </div>
       <v-tooltip
-        :text="organizeDocuments as unknown as string"
+        :text="listDocuments"
         :disabled="!hasDocuments"
         location="bottom center"
       >
@@ -213,7 +213,7 @@ const isActiveTitleTooltip = computed(() => {
   else return props.name.length < 60;
 });
 
-const organizeDocuments = computed(() => {
+const listDocuments = computed(() => {
   let string = '';
   props.documents?.map(
     (item) =>
