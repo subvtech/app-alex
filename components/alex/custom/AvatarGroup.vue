@@ -4,7 +4,7 @@
     :class="{ 'flex-row-reverse': order === 'FIRST_ON_TOP' }"
     data-testid="alex-avatar-group"
   >
-    <template v-for="(avatar, index) in showpeople" :key="index">
+    <template v-for="(avatar, index) in avatarsToShow" :key="index">
       <v-avatar
         :size="size"
         :image="avatar.image?.url"
@@ -20,18 +20,18 @@
     </template>
 
     <v-avatar
-      v-if="avatarsNumber && avatarsNumber > 0"
+      v-if="exceedingAvatarCount && exceedingAvatarCount > 0"
       color="gray-100"
       class="alex-avatar-group-border alex-avatar-group-margin"
       :size="size"
     >
-      <span class="text-body-3 text-gray-600">+{{ avatarsNumber }}</span>
+      <span class="text-body-3 text-gray-600">+{{ exceedingAvatarCount }}</span>
     </v-avatar>
   </div>
 </template>
 
 <script setup lang="ts">
-interface person {
+interface avatar {
   name: string;
   image?: {
     url: string;
@@ -39,7 +39,7 @@ interface person {
   };
 }
 interface AvatarGroupProps {
-  people: person[];
+  avatarItems: avatar[];
   max?: number;
   size?: number;
   order?: 'FIRST_ON_TOP' | 'LAST_ON_TOP';
@@ -50,16 +50,14 @@ const props = withDefaults(defineProps<AvatarGroupProps>(), {
   order: 'LAST_ON_TOP',
 });
 
-const avatarsNumber = computed(() => {
-  const length = (props.people || []).length;
+const exceedingAvatarCount = computed(() => {
+  const length = (props.avatarItems || []).length;
   const exceedNumber = length - props.max;
   return exceedNumber;
 });
 
-const showpeople = computed(() => {
-  if (props.people) {
-    return (props.people || []).slice(0, props.max);
-  }
+const avatarsToShow = computed(() => {
+  return (props.avatarItems || []).slice(0, props.max);
 });
 </script>
 
