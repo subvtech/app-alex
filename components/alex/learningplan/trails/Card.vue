@@ -1,71 +1,132 @@
 <template>
-  <v-hover v-slot="{ isHovering, props }">
-    <v-card
-      v-bind="props"
-      :min-width="width.min"
-      :max-width="width.max"
-      :class="{
-        'vertical-grid': isVertical,
-        'horizontal-grid column-gap-4': !isVertical,
-        'hover-shadow': isHovering,
-      }"
-      variant="outlined"
-      color="gray-100"
-      rounded="lg"
-      class="grid bg-white"
-      @click="() => emits('open')"
-    >
-      <div class="header">
-        <v-img
-          :src="image.url"
-          :alt="image.alt"
-          :class="{ grayscale: hide }"
-          cover
-          height="100%"
-          aspect-ratio="2.5"
-        />
+  <v-card
+    data-testid="alex-learningplan-trails-card"
+    :min-width="width.min"
+    :max-width="width.max"
+    :class="{
+      'vertical-grid': isVertical,
+      'horizontal-grid column-gap-4': !isVertical,
+      'hover-shadow': isHovering,
+    }"
+    variant="outlined"
+    color="gray-100"
+    rounded="lg"
+    class="grid bg-white"
+    @click="() => emits('open')"
+    @mouseover="isHovering = true"
+    @mouseleave="isHovering = false"
+  >
+    <div class="header">
+      <v-img
+        :src="image.url"
+        :alt="image.alt"
+        :class="{ grayscale: hide }"
+        cover
+        height="100%"
+        aspect-ratio="2.5"
+      />
 
+      <v-tooltip
+        :text="$t('components.learningPlan.cardTrails.hidden')"
+        location="bottom center"
+      >
+        <template v-slot:activator="{ props }">
+          <alex-custom-chip
+            v-if="hide"
+            v-bind="props"
+            class="hidden-icon"
+            status="dark"
+            icon="mdi-eye-off-outline"
+            variant="elevated"
+          >
+          </alex-custom-chip>
+        </template>
+      </v-tooltip>
+
+      <div :class="{ hover: isHovering }">
+        <v-menu
+          v-model="options"
+          :close-on-content-click="false"
+          :class="{ hidden: !isHovering && !options }"
+        >
+          <template #activator="{ props: propsMenu, isActive }">
+            <v-tooltip
+              :text="$t('components.learningPlan.cardTrails.options')"
+              location="bottom center"
+            >
+              <template #activator="{ props }">
+                <alex-custom-button
+                  v-if="direction !== 'HORIZONTAL' && (isHovering || isActive)"
+                  v-bind="{ ...propsMenu, ...props }"
+                  class="options"
+                  size="small"
+                  variant="secondary"
+                  icon="mdi-dots-vertical"
+                />
+              </template>
+            </v-tooltip>
+          </template>
+          <v-list>
+            <v-list-item
+              v-if="hide"
+              :title="$t('components.learningPlan.cardTrails.visibility.show')"
+              prepend-icon="mdi-eye-outline"
+              @click="() => emits('show')"
+            />
+            <v-list-item
+              v-else
+              :title="$t('components.learningPlan.cardTrails.visibility.hide')"
+              prepend-icon="mdi-eye-off-outline"
+              @click="() => emits('hide')"
+            />
+            <v-list-item
+              :title="$t('components.learningPlan.cardTrails.copy')"
+              prepend-icon="mdi-content-copy"
+              @click="() => emits('copy')"
+            />
+            <v-list-item
+              :title="$t('components.learningPlan.cardTrails.configurations')"
+              prepend-icon="mdi-cog-outline"
+              @click="() => emits('configurations')"
+            />
+          </v-list>
+        </v-menu>
+      </div>
+    </div>
+    <div
+      class="d-flex flex-column gap-4"
+      :class="{
+        'py-2': !isVertical,
+        'pa-4 pb-6': isVertical,
+      }"
+    >
+      <div class="d-flex gap-2 align-center">
         <v-tooltip
-          :text="$t('components.learningPlan.cardTrails.hidden')"
-          location="bottom center"
+          :text="name"
+          :location="isVertical ? 'top center' : 'top left'"
+          max-width="360"
+          :disabled="isActiveTitleTooltip"
         >
           <template v-slot:activator="{ props }">
-            <alex-custom-chip
-              v-if="hide"
+            <h5
               v-bind="props"
-              class="hidden-icon"
-              status="dark"
-              icon="mdi-eye-off-outline"
-              variant="elevated"
+              class="text-body-2 text-gray-900 ellipsis lines-2 max-height-48"
+              :class="{ 'grayscale-2': hide }"
             >
-            </alex-custom-chip>
+              {{ name }}
+            </h5>
           </template>
         </v-tooltip>
 
-        <div :class="{ hover: isHovering }">
-          <v-menu
-            v-model="options"
-            :close-on-content-click="false"
-            :class="{ hidden: !isHovering && !options }"
-          >
-            <template #activator="{ props: propsMenu, isActive }">
-              <v-tooltip
-                :text="$t('components.learningPlan.cardTrails.options')"
-                location="bottom center"
-              >
-                <template #activator="{ props }">
-                  <alex-custom-button
-                    v-if="
-                      direction !== 'HORIZONTAL' && (isHovering || isActive)
-                    "
-                    v-bind="{ ...propsMenu, ...props }"
-                    class="options"
-                    size="small"
-                    variant="secondary"
-                    icon="mdi-dots-vertical"
-                  />
-                </template>
-              </v-tooltip>
+        <div v-if="!isVertical">
+          <v-menu :close-on-content-click="false">
+            <template #activator="{ props }">
+              <alex-custom-button
+                v-bind="props"
+                icon="mdi-dots-vertical"
+                size="small"
+                variant="text"
+              />
             </template>
             <v-list>
               <v-list-item
@@ -98,99 +159,30 @@
           </v-menu>
         </div>
       </div>
+
       <div
-        class="d-flex flex-column gap-4"
-        :class="{
-          'py-2': !isVertical,
-          'pa-4 pb-6': isVertical,
-        }"
+        class="text-body-5 text-gray-600 ellipsis lines-3"
+        lines="three"
+        :class="{ 'grayscale-2': hide }"
       >
-        <div class="d-flex gap-2 align-center">
-          <v-tooltip
-            :text="name"
-            :location="isVertical ? 'top center' : 'top left'"
-            max-width="360"
-            :disabled="isActiveTitleTooltip"
-          >
-            <template v-slot:activator="{ props }">
-              <h5
-                v-bind="props"
-                class="text-body-2 text-gray-900 ellipsis lines-2 max-height-48"
-                :class="{ 'grayscale-2': hide }"
-              >
-                {{ name }}
-              </h5>
-            </template>
-          </v-tooltip>
-
-          <div v-if="!isVertical">
-            <v-menu :close-on-content-click="false">
-              <template #activator="{ props }">
-                <alex-custom-button
-                  v-bind="props"
-                  icon="mdi-dots-vertical"
-                  size="small"
-                  variant="text"
-                />
-              </template>
-              <v-list>
-                <v-list-item
-                  v-if="hide"
-                  :title="
-                    $t('components.learningPlan.cardTrails.visibility.show')
-                  "
-                  prepend-icon="mdi-eye-outline"
-                  @click="() => emits('show')"
-                />
-                <v-list-item
-                  v-else
-                  :title="
-                    $t('components.learningPlan.cardTrails.visibility.hide')
-                  "
-                  prepend-icon="mdi-eye-off-outline"
-                  @click="() => emits('hide')"
-                />
-                <v-list-item
-                  :title="$t('components.learningPlan.cardTrails.copy')"
-                  prepend-icon="mdi-content-copy"
-                  @click="() => emits('copy')"
-                />
-                <v-list-item
-                  :title="
-                    $t('components.learningPlan.cardTrails.configurations')
-                  "
-                  prepend-icon="mdi-cog-outline"
-                  @click="() => emits('configurations')"
-                />
-              </v-list>
-            </v-menu>
-          </div>
-        </div>
-
-        <div
-          class="text-body-5 text-gray-600 ellipsis lines-3"
-          lines="three"
-          :class="{ 'grayscale-2': hide }"
-        >
-          {{ description }}
-        </div>
-        <v-tooltip
-          :text="organizeDocuments as unknown as string"
-          :disabled="!hasDocuments"
-          location="bottom center"
-        >
-          <template #activator="{ props }">
-            <div class="documents" v-bind="props">
-              <v-icon size="20" color="gray-600"
-                >mdi-text-box-multiple-outline</v-icon
-              >
-              <span>{{ documents?.length || 0 }}</span>
-            </div>
-          </template>
-        </v-tooltip>
+        {{ description }}
       </div>
-    </v-card>
-  </v-hover>
+      <v-tooltip
+        :text="organizeDocuments as unknown as string"
+        :disabled="!hasDocuments"
+        location="bottom center"
+      >
+        <template #activator="{ props }">
+          <div class="documents" v-bind="props">
+            <v-icon size="20" color="gray-600"
+              >mdi-text-box-multiple-outline</v-icon
+            >
+            <span>{{ documents?.length || 0 }}</span>
+          </div>
+        </template>
+      </v-tooltip>
+    </div>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -208,6 +200,7 @@ const props = withDefaults(defineProps<LearningPlanCard>(), {
   hide: false,
   documents: undefined,
 });
+const isHovering = ref(false);
 const options = ref(false);
 const isVertical = computed(() => props.direction === 'VERTICAL');
 const width = computed(() =>
