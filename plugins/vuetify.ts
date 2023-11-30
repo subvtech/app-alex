@@ -5,7 +5,6 @@ import * as directives from 'vuetify/directives';
 import { alexIcons } from 'assets/icons';
 
 export const vuetify = createVuetify({
-  aliases,
   components,
   directives,
   defaults,
