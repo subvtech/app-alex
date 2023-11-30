@@ -43,7 +43,10 @@
         </template>
       </v-tooltip>
 
-      <div :class="{ hover: isHovering }">
+      <div
+        class="alex-learningplan-trails-card-hover"
+        :class="{ hover: isHovering }"
+      >
         <v-menu
           v-model="options"
           :close-on-content-click="false"
@@ -94,7 +97,7 @@
       </div>
     </div>
     <div
-      class="d-flex flex-column gap-4"
+      class="d-flex flex-column gap-3"
       :class="{
         'py-2': !isVertical,
         'pa-4 pb-6': isVertical,
