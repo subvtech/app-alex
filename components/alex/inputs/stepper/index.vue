@@ -1,6 +1,10 @@
 <template>
   <v-form @submit="onSubmit">
-    <div v-if="!noHeader" class="d-flex gap-4 py-3 px-1">
+    <div
+      v-if="!noHeader"
+      class="d-flex gap-4 py-3 px-1"
+      :class="stepperIndicatorClass"
+    >
       <alex-inputs-stepper-indicator
         v-for="({ title, subtitle, icon, completed }, index) in stepsList"
         :key="index"
@@ -15,7 +19,7 @@
         @on-select="() => onSelectStep(index + 1)"
       />
     </div>
-    <div :class="stepClasses">
+    <div :class="stepClass">
       <template v-for="(_, index) in stepsList" :key="index">
         <slot
           v-if="index == activeStep - 1"
@@ -75,12 +79,14 @@ const props = withDefaults(
     noHeader?: boolean;
     stepsConfig?: Record<string, Partial<StepsConfig>>;
     submitLoading?: boolean;
-    stepClasses: string;
+    stepClass?: string;
+    stepperIndicatorClass?: string;
   }>(),
   {
     submitLoading: false,
     noHeader: false,
-    stepClasses: undefined,
+    stepClass: undefined,
+    stepperIndicatorClass: undefined,
     stepsConfig: undefined,
   },
 );
@@ -91,7 +97,11 @@ const showControls = computed(() => !!slots.controls);
 
 // Steps Logic
 const stepsCounter = computed(() =>
-  literalArray(...Object.entries(slots).map((slot) => slot[0])),
+  literalArray(
+    ...Object.entries(slots)
+      .map((slot) => slot[0])
+      .filter((slot) => slot.includes('step')),
+  ),
 );
 
 const activeStep = ref(1);
