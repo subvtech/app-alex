@@ -106,7 +106,7 @@
             </tr>
             <tr>
               <td>items.type</td>
-              <td>String</td>
+              <td>text | text-icon</td>
               <td class="text-center">
                 <v-icon icon="mdi-checkbox-marked" color="success" />
               </td>
@@ -127,7 +127,7 @@
             </tr>
             <tr>
               <td>items.class</td>
-              <td>String</td>
+              <td>warning | disabled</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -205,7 +205,12 @@
         </v-window-item>
       </v-window>
     </div>
-    <div class="w-100"></div>
+    <div class="w-100">
+      <alex-inputs-dropdown
+        :options="dadosComponente"
+        :items="itemsComponente"
+      />
+    </div>
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
@@ -268,18 +273,24 @@
         </v-window-item>
       </v-window>
     </div>
+    <div class="w-100">
+      <alex-inputs-dropdown
+        :options="dadosComponente"
+        :items="itemsComponente2"
+      />
+    </div>
     <h2 class="text-h3 text-gray-800">Uso de Props</h2>
     <p class="text-subtitle-2 text-gray-500">
       O conteúdo de cada item é inserido através das props options e items:<br />
       <Prism inline class="bg-white pa-0">{{
         `
-        const options1 = ref({
-        openOnClick: true,
-        openOnHover: true,
-        closeOnContentClick: true,
-        location: 'end',
-        isDarkMode: false,
-        &#x7d);`
+          const options1 = ref({
+            openOnClick: true,
+            openOnHover: true,
+            closeOnContentClick: true,
+            location: 'end',
+            isDarkMode: false,
+          &#x7d);`
       }}</Prism>
     </p>
     <p class="text-subtitle-2 text-gray-500">
@@ -289,11 +300,11 @@
       <strong>center</strong>.<br />
       <Prism inline class="bg-white pa-0">{{
         `
-        const options1 = ref({
-        ...
-        location: 'end',
-        ...
-        });`
+          const options1 = ref({
+            ...
+            location: 'end',
+            ...
+          });`
       }}</Prism>
     </p>
     <p class="text-subtitle-2 text-gray-500">
@@ -302,20 +313,17 @@
       <Prism inline class="bg-white">{{
         `
           {
-        id: 4,
-        type: 'icon',
-        icon: 'mdi-delete',
-        text: 'Excluir',
-        class: 'warning',
-    },
+            id: 4,
+            type: 'icon',
+            icon: 'mdi-delete',
+            text: 'Excluir',
+            class: 'warning',
+          },
         `
       }}</Prism>
       <br />
     </p>
 
-    <div class="w-100">
-      <alex-inputs-dropdown :options="dadosComponente" :items="itemsComponente" />
-    </div>
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
@@ -382,6 +390,7 @@
       <alex-inputs-dropdown
         :options="dadosComponente"
         :items="itemsComponente2"
+        isDarkMode
       />
     </div>
   </v-container>
@@ -453,137 +462,147 @@ const itemsComponente2 = ref([
 ]);
 
 const propsExample = `
-<Dropdown 
-  :options="dropdownOptions"
-  :items="dropdownOptions.items" 
+  <alex-inputs-dropdown 
+    :options="dropdownOptions"
+    :items="dropdownOptions.items" 
+  />
   
-/>
-  
-const dropdownItems = ref([
-  {
-    id: 1,
-    ...
-  },
-  {
-    id: 2,
-    ...
-  },
-  {
-    id: 3,
-    ...
-  },
-])
+  const dropdownItems = ref([
+    {
+      id: 1,
+      ...
+    },
+    {
+      id: 2,
+      ...
+    },
+    {
+      id: 3,
+      ...
+    },
+  ])
 
-const dropdownOptions = ref({
-  ...
-})
-  `;
+  const dropdownOptions = ref({
+    ...
+  })
+    `;
 
-const firstExampleTemplate = `<Dropdown :items="items1" :options="options1" />
+const firstExampleTemplate = `
+  <alex-inputs-dropdown 
+    :items="itemsComponente" 
+    :options="dadosComponente" 
+  />
 `;
 
 const firstExampleScript = `
-    import { ref } from 'vue';
-    const items1 = ref([
-    {
+    const dadosComponente = ref({
+      openOnClick: true,
+      openOnHover: false,
+      closeOnContentClick: true,
+      location: 'end',
+      isDarkMode: false,
+  });
+
+    const itemsComponente = ref([
+      {
         id: 1,
-        type: 'icon',
+        type: 'text-icon',
+        link: '/',
         icon: 'mdi-home',
         text: 'Início',
-    },
-    {
+      },
+      {
         id: 2,
-        type: 'icon',
+        type: 'text-icon',
+        link: '/profile',
         icon: 'mdi-account-circle',
         text: 'Perfil',
-    },
-    {
+      },
+      {
         id: 3,
-        type: 'icon',
+        type: 'text-icon',
         icon: 'mdi-account',
+        link: '/settings',
         text: 'Configurações',
-    },
+      },
     ]);
-
-    const options1 = ref({
-    openOnClick: true,
-    openOnHover: true,
-    closeOnContentClick: true,
-    location: 'end',
-    isDarkMode: false,
-    });
 `;
 
 const secondExampleTemplate = `
-<Dropdown :items="items2" :options="options1" />`;
+    <alex-inputs-dropdown 
+      :items="itemsComponente2" 
+      :options="dadosComponente" 
+    />`;
 
 const secondExampleScript = `
-    const items2 = ref([
-    {
-        id: 1,
-        type: 'icon',
-        icon: 'mdi-lock',
-        text: 'Bloquear',
-    },
-    {
-        id: 2,
-        type: 'icon',
-        icon: 'mdi-pencil',
-        text: 'Editar',
-    },
-    {
-        id: 3,
-        type: 'icon',
-        icon: 'mdi-check-decagram-outline',
-        text: 'Verificar',
-    },
-    {
-        id: 4,
-        type: 'icon',
-        icon: 'mdi-delete',
-        text: 'Excluir',
-        class: 'warning',
-    },
-    ]);
+      const dadosComponente = ref({
+        openOnClick: true,
+        openOnHover: false,
+        closeOnContentClick: true,
+        location: 'end',
+        isDarkMode: false,
+      });
 
-    const options1 = ref({
-    openOnClick: true,
-    openOnHover: true,
-    closeOnContentClick: true,
-    location: 'end',
-    isDarkMode: false,
-    });
-  `;
+      const itemsComponente2 = ref([
+        {
+          id: 1,
+          type: 'text',
+          text: 'Homepage',
+        },
+        {
+          id: 2,
+          type: 'text-icon',
+          icon: 'mdi-account-circle',
+          text: 'Perfil',
+          link: '/profile',
+        },
+        {
+          id: 3,
+          type: 'text-icon',
+          icon: 'mdi-trash-can',
+          text: 'Excluir conta',
+          class: 'warning',
+        },
+      ]);
+      `;
 
 const thirdExampleTemplate = `
-<Dropdown :items="items3" :options="options2" />`;
+    <alex-inputs-dropdown 
+      :items="itemsComponente2" 
+      :options="dadosComponente"
+      isDarkMode 
+    />`;
 
 const thirdExampleScript = `
-    const items3 = ref([
-    {
-        id: 1,
-        type: 'checkbox',
-        text: 'Opção 1',
-    },
-    {
-        id: 2,
-        type: 'checkbox',
-        text: 'Opção 2',
-    },
-    {
-        id: 3,
-        type: 'checkbox',
-        text: 'Opção 3',
-    },
-    ]);
+    const dadosComponente = ref({
+      openOnClick: true,
+      openOnHover: false,
+      closeOnContentClick: true,
+      location: 'end',
+      isDarkMode: false,
+    });
 
-    const options2 = ref({
-    openOnClick: true,
-    openOnHover: false,
-    closeOnContentClick: true,
-    location: 'start',
-    isDarkMode: true,
-    });`;
+    const itemsComponente2 = ref([
+      {
+        id: 1,
+        type: 'text',
+        text: 'Homepage',
+      },
+      {
+        id: 2,
+        type: 'text-icon',
+        icon: 'mdi-account-circle',
+        text: 'Perfil',
+        link: '/profile',
+      },
+      {
+        id: 3,
+        type: 'text-icon',
+        icon: 'mdi-trash-can',
+        text: 'Excluir conta',
+        class: 'warning',
+      },
+    ]);`;
 
 const exampleTabs = [
   {
