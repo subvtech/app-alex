@@ -1,9 +1,11 @@
 import { h } from 'vue';
 import type { IconSet, IconProps } from 'vuetify';
 import trail from './Trail.vue';
+import DragIndicator from './DragIndicator.vue';
 
 const alexAliases = {
   trail,
+  DragIndicator,
 };
 
 const alexIcons: IconSet = {
