@@ -20,7 +20,7 @@
             height="40"
             width="120"
             alt="Alex"
-            src="../static/images/alex.svg"
+            src="/images/alex.svg"
             class="mt-8 mb-12 mb-sm-16"
           />
         </div>
@@ -53,7 +53,7 @@ const handlePasswordChanged = () => {
 
 <style scoped lang="scss">
 #reset-container {
-  background-image: url('../static/images/login-bg.svg');
+  background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }
