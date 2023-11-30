@@ -1,7 +1,6 @@
 <template>
   <div class="text-center">
     <v-menu
-      v-model="selectedItem"
       :open-on-click="options.openOnClick"
       :open-on-hover="options.openOnHover"
       :close-on-content-click="options.closeOnContentClick"
@@ -10,11 +9,7 @@
       data-testid="testing-dropdown"
     >
       <template v-slot:activator="{ props }">
-        <v-btn
-          class="dropdown-activator"
-          icon="mdi-dots-vertical"
-          v-bind="props"
-        ></v-btn>
+        <v-btn class="dropdown-activator" icon="mdi-dots-vertical" v-bind="props"></v-btn>
       </template>
 
       <v-list data-testid="dropdown-content" class="pa-0">
@@ -30,24 +25,23 @@
           ]"
           @mouseover="item.isHover = true"
           @mouseout="item.isHover = false"
-          @click="onSelect(item)"
+          @click="onClick(item)"
         >
           <template v-if="item.type === 'text'">
-            <v-list-item-title>{{ item.text }}</v-list-item-title>
-          </template>
-          <template v-else-if="item.type === 'icon'">
             <v-list-item-title>
-              <v-icon>{{ item.icon }}</v-icon> {{ item.text }}
+              <a v-if="item.link" v-bind:href="item.link">{{ item.text }}</a>
+              <span v-else>{{ item.text }}</span>
             </v-list-item-title>
           </template>
-          <template v-else-if="item.type === 'checkbox'">
-            <v-list-item-action>
-              <alex-inputs-checkbox
-                class="dropCheckbox"
-                v-model="item.isChecked"
-              />
-              <v-list-item-title>{{ item.text }}</v-list-item-title>
-            </v-list-item-action>
+          <template v-else-if="item.type === 'text-icon'">
+            <v-list-item-title>
+              <a v-if="item.link" v-bind:href="item.link">
+                <v-icon>{{ item.icon }}</v-icon> {{ item.text }}
+              </a>
+              <span v-else>
+                <v-icon>{{ item.icon }}</v-icon> {{ item.text }}
+              </span>
+            </v-list-item-title>
           </template>
         </v-list-item>
       </v-list>
@@ -56,36 +50,37 @@
 </template>
 
 <script setup lang="ts">
-import { on } from 'events';
-import { defineProps } from 'vue';
-
-type Item = {
+interface Item {
   id: number;
-  type: string;
+  type: 'text' | 'text-icon';
+  link?: string;
   icon?: string;
   text: string;
-  class?: string;
-};
+  class?: 'warning' | 'disabled' | undefined;
+}
 
-type Options = {
-  openOnClick: boolean;
-  openOnHover: boolean;
-  closeOnContentClick: boolean;
-  location: 'top' | 'bottom' | 'end' | 'start' | 'center';
-  isDarkMode: boolean;
-};
+interface Options {
+  openOnClick?: boolean;
+  openOnHover?: boolean;
+  closeOnContentClick?: boolean;
+  location?: 'top' | 'bottom' | 'end' | 'start' | 'center';
+  isDarkMode?: boolean;
+  items: Item[];
+}
 
-const selectedItem = ref({} as Item);
+const options = withDefaults(defineProps<Options>(), {
+  openOnClick: true,
+  openOnHover: false,
+  closeOnContentClick: true,
+  location: 'bottom',
+  isDarkMode: false,
+  items: () => [],
+});
 
-const { items, options } = defineProps(['items', 'options']);
+const emit = defineEmits(['click']);
 
-const { openOnClick, openOnHover, closeOnContentClick, location, isDarkMode } =
-  options as Options;
-
-const { id, text, icon, type } = items as Item;
-
-const onSelect = (item: Item) => {
-  selectedItem.value = item;
+const onClick = (item) => {
+  emit('click', item);
 };
 </script>
 
@@ -102,48 +97,62 @@ div {
   border-radius: 8px !important;
   min-width: 200px !important;
   cursor: pointer !important;
+  text-decoration: none !important;
 }
 
 .dropdown-activator {
   background-color: white !important;
-  box-shadow: none;
+  border-radius: 2px !important;
   color: #4f4f4f !important;
 }
 .default {
-  color: #6e7a87;
+  color: #6e7a87 !important;
+  text-decoration: none !important;
 }
 
 .default.light-theme {
-  background-color: white;
+  background-color: white !important;
+  text-decoration: none !important;
 }
 
 .hover {
-  color: #30363b;
-  background-color: #ebedef;
+  color: #30363b !important;
+  background-color: #ebedef !important;
+  text-decoration: none !important;
 }
 
 .dark-theme {
-  background-color: #001a33;
+  background-color: #001a33 !important;
+  text-decoration: none !important;
 }
 
 .hover.dark-theme {
-  color: #fff;
-  background-color: #042749;
+  color: #fff !important;
+  background-color: #042749 !important;
+  text-decoration: none !important;
 }
 .warning {
-  color: #e9494a;
+  color: #e9494a !important;
+  text-decoration: none !important;
 }
 
 .warning.dark-theme {
-  color: #e9494a;
-  background-color: #001a33;
+  color: #e9494a !important;
+  background-color: #001a33 !important;
+  text-decoration: none !important;
 }
 .warning.hover.dark-theme {
-  color: #e9494a;
-  background-color: #042749;
+  color: #e9494a !important;
+  background-color: #042749 !important;
+  text-decoration: none !important;
 }
 
 div.container.dropCheckbox {
   align-items: center !important;
+}
+
+a {
+  color: inherit !important;
+  text-decoration: none !important;
 }
 </style>

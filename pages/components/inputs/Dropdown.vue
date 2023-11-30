@@ -285,7 +285,8 @@
     <p class="text-subtitle-2 text-gray-500">
       A props <strong>location</strong> define a localização do dropdown,
       podendo ser <strong>start</strong>, <strong>end</strong>,
-      <strong>top</strong>, <strong>bottom</strong> ou <strong>center</strong>.<br />
+      <strong>top</strong>, <strong>bottom</strong> ou
+      <strong>center</strong>.<br />
       <Prism inline class="bg-white pa-0">{{
         `
         const options1 = ref({
@@ -313,30 +314,7 @@
     </p>
 
     <div class="w-100">
-      <Dropdown :items="itens1" :options="opcoes1" />
-    </div>
-    <div class="w-100">
-      <AlexCustomAccordion v-model:data="listSlots">
-        <template #content="{ index, text, image }">
-          <v-text-field
-            v-model="listSlots[index].title"
-            label="Titulo"
-            placeholder="Insira um Titulo"
-          />
-          <v-text-field
-            v-model="listSlots[index].keyWord"
-            label="KeyWord"
-            placeholder="Insira uma keyWord"
-          />
-          <v-text-field
-            v-model="listSlots[index].icon"
-            label="Ícone"
-            placeholder="Insira um Ícone"
-          />
-          <p v-if="text">{{ text }}</p>
-          <img v-if="image" class="w-25 rounded-lg" :src="image" />
-        </template>
-      </AlexCustomAccordion>
+      <alex-inputs-dropdown :options="dadosComponente" :items="itemsComponente" />
     </div>
     <div class="w-100">
       <div
@@ -402,9 +380,8 @@
     </div>
     <div class="w-100">
       <alex-inputs-dropdown
-        v-model="selectedItems"
-        :items="itemsDropCheckbox"
-        :options="optionsDropCheckbox"
+        :options="dadosComponente"
+        :items="itemsComponente2"
       />
     </div>
   </v-container>
@@ -415,35 +392,13 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-import Dropdown from '@/components/alex/inputs/Dropdown.vue';
 
 const copiedValue = ref('');
 const firstExampleActivePage = ref('1');
 const secondExampleActivePage = ref('1');
 const thirdExampleActivePage = ref('1');
 
-const itens1 = ref([
-  {
-    id: 1,
-    type: 'icon',
-    icon: 'mdi-home',
-    text: 'Início',
-  },
-  {
-    id: 2,
-    type: 'icon',
-    icon: 'mdi-account-circle',
-    text: 'Perfil',
-  },
-  {
-    id: 3,
-    type: 'icon',
-    icon: 'mdi-account',
-    text: 'Configurações',
-    class: 'warning',
-  },
-]);
-const opcoes1 = ref({
+const dadosComponente = ref({
   openOnClick: true,
   openOnHover: false,
   closeOnContentClick: true,
@@ -451,36 +406,57 @@ const opcoes1 = ref({
   isDarkMode: false,
 });
 
-const itemsDropCheckbox = ref([
+const itemsComponente = ref([
   {
     id: 1,
-    type: 'checkbox',
-    text: 'Opção 1',
+    type: 'text-icon',
+    link: '/',
+    icon: 'mdi-home',
+    text: 'Início',
   },
   {
     id: 2,
-    type: 'checkbox',
-    text: 'Opção 2',
+    type: 'text-icon',
+    link: '/profile',
+    icon: 'mdi-account-circle',
+    text: 'Perfil',
   },
   {
     id: 3,
-    type: 'checkbox',
-    text: 'Opção 3',
+    type: 'text-icon',
+    icon: 'mdi-account',
+    link: '/settings',
+    text: 'Configurações',
   },
 ]);
 
-const optionsDropCheckbox = ref({
-  openOnClick: true,
-  openOnHover: false,
-  closeOnContentClick: false,
-  location: 'start',
-  isDarkMode: true,
-});
+const itemsComponente2 = ref([
+  {
+    id: 1,
+    type: 'text',
+    text: 'Homepage',
+  },
+  {
+    id: 2,
+    type: 'text-icon',
+    icon: 'mdi-account-circle',
+    text: 'Perfil',
+    link: '/profile',
+  },
+  {
+    id: 3,
+    type: 'text-icon',
+    icon: 'mdi-trash-can',
+    text: 'Excluir conta',
+    class: 'warning',
+  },
+]);
 
 const propsExample = `
 <Dropdown 
-  :items="dropdownItems" 
-  :options="dropdownOptions" 
+  :options="dropdownOptions"
+  :items="dropdownOptions.items" 
+  
 />
   
 const dropdownItems = ref([
