@@ -6,7 +6,7 @@
         sm="6"
         class="justify-center align-center d-none d-md-flex pa-0"
       >
-        <img class="w-50" src="../static/images/imagem_forgot.png" />
+        <img class="w-50" src="/images/imagem_forgot.png" />
       </v-col>
       <v-col
         id="forgot-container"
@@ -20,7 +20,7 @@
             height="40"
             width="120"
             alt="Alex"
-            src="../static/images/alex.svg"
+            src="/images/alex.svg"
             class="mt-8 mb-12 mb-sm-16"
           />
         </div>
@@ -56,7 +56,7 @@ const handleSentEmail = (email) => {
 
 <style scoped lang="scss">
 #forgot-container {
-  background-image: url('../static/images/login-bg.svg');
+  background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }

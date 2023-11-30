@@ -211,7 +211,7 @@ const submit = handleSubmit(async () => {
     }
 
     &-acesso {
-      background-image: url('../../static/images/login-bg.svg');
+      background-image: url('/images/login-bg.svg');
       background-repeat: initial;
       background-size: cover;
       right: 0;

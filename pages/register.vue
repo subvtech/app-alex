@@ -24,7 +24,7 @@
             height="40"
             width="120"
             alt="Alex"
-            src="../static/images/alex.svg"
+            src="/images/alex.svg"
             class="mt-8 mb-7"
           />
         </div>
@@ -33,7 +33,6 @@
           v-if="registeredUser"
           :title="$t('pages.register.success.title')"
           :subtitle="$t('pages.register.success.subtitle')"
-          
         />
 
         <RegisterFields v-else @success:message="onRegisteredUser" />
@@ -55,7 +54,7 @@ const onRegisteredUser = () => {
 
 <style scoped lang="scss">
 .content-field {
-  background-image: url('../static/images/login-bg.svg');
+  background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: cover;
   height: 100%;
