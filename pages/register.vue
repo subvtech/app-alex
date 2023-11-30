@@ -8,7 +8,7 @@
         xl="8"
         class="justify-center align-center d-none d-md-flex pa-0"
       >
-        <img class="signUp" src="../static/images/signUp.svg" />
+        <img class="signUp" src="/images/signUp.svg" />
       </v-col>
 
       <v-col

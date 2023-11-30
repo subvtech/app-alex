@@ -1,5 +1,10 @@
 <template>
-  <profile-card :title="$t('components.profile.general.title')">
+  <profile-card
+    :title="$t('components.profile.general.title')"
+    :isEditing="false"
+    :showIcon="false"
+    @toggle:isEditing="isEditing = !isEditing"
+  >
     <template v-slot:content>
       <div class="boxes d-flex justify-center w-100 pb-6">
         <div
@@ -12,7 +17,7 @@
             },
             {
               icon: 'mdi-newspaper-variant-multiple-outline',
-              number: 20,
+              number: projects.length,
               label: $t('components.profile.general.projects'),
             },
             {
@@ -25,23 +30,23 @@
           <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
           <div class="d-flex">
             <h6>{{ box.number }}</h6>
-            <span>{{ box.label }}</span>
+            <p>{{ box.label }}</p>
           </div>
         </div>
       </div>
     </template>
 
     <template v-slot:footer>
-      <div class="d-flex flex-column contacts py-6">
+      <div class="d-flex flex-column contacts pt-6">
         <div class="d-flex align-center contact">
-          <v-icon color="#5D6872">mdi-email-outline</v-icon>
+          <v-icon color="#6E7A87">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
             <p>{{ $t('components.profile.general.email') }}</p>
             <span>{{ email }}</span>
           </div>
         </div>
         <div v-if="telephone" class="d-flex align-center contact">
-          <v-icon color="#5D6872">mdi-phone-outline</v-icon>
+          <v-icon color="#6E7A87">mdi-phone-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
             <p>{{ $t('components.profile.general.telephone') }}</p>
             <span>{{ mask.masked(telephone) }}</span>
@@ -55,10 +60,8 @@
 <script setup lang="ts">
 import { Mask } from 'maska';
 
-const { updateImage } = useUploadedImage();
-
 const props = defineProps({
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
@@ -68,9 +71,12 @@ const props = defineProps({
   },
   telephone: {
     type: String,
-    required: true,
   },
   learningPlans: {
+    type: Array,
+    default: () => [],
+  },
+  projects: {
     type: Array,
     default: () => [],
   },
@@ -88,6 +94,9 @@ const { email, telephone, socials } = toRefs(props);
 
 const newIcon = ref<string | null>(null);
 const mask = new Mask({ mask: '(##) #####-####' });
+const isEditing = ref(false);
+
+const cancel = () => {};
 </script>
 
 <style scoped lang="scss">
@@ -100,7 +109,6 @@ const mask = new Mask({ mask: '(##) #####-####' });
     .box {
       flex-direction: column;
       min-width: 90px;
-      max-width: 123px;
       min-height: 90px;
       width: 33%;
       gap: 16px;
@@ -116,15 +124,16 @@ const mask = new Mask({ mask: '(##) #####-####' });
 
         h6 {
           font-size: 24px;
-          color: #001529;
+          color: #0d4173;
         }
 
-        span {
-          font-size: 16px;
-          font-weight: 400;
+        p {
+          color: #a0a8b1 !important;
+          font-size: 16px !important;
+          font-style: normal;
+          font-weight: 400 !important;
           line-height: 135%; /* 21.6px */
-          letter-spacing: 0.32px;
-          color: #a0a8b1;
+          letter-spacing: 0.64px;
         }
       }
     }
@@ -139,16 +148,21 @@ const mask = new Mask({ mask: '(##) #####-####' });
 
       .field {
         p {
-          color: #6e7a87;
+          color: #a0a8b1;
+
           font-size: 14px;
           font-weight: 400;
+          line-height: 135%; /* 18.9px */
+          letter-spacing: 0.56px;
         }
 
         span {
           color: #6e7a87;
+
           font-size: 16px;
           font-weight: 400;
-          line-height: 22px;
+          line-height: 135%; /* 21.6px */
+          letter-spacing: 0.64px;
           text-decoration: none;
         }
       }
@@ -166,15 +180,17 @@ const mask = new Mask({ mask: '(##) #####-####' });
       .box {
         flex-direction: row;
         width: 100%;
-        padding-inline: 0px;
+        max-width: none;
+        padding-inline: 16px;
         padding-block: 0px;
-        justify-content: center;
         align-items: center;
         :last-child {
-          flex-direction: column-reverse;
+          flex-direction: row;
+          align-items: center;
+          gap: 8px;
 
           p {
-            color: #abb2b9;
+            color: #0d4173;
             font-size: 14px;
             font-weight: 400;
           }

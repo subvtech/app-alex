@@ -4,27 +4,26 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import { alexIcons } from 'assets/icons';
 
-export default defineNuxtPlugin((nuxtApp) => {
-  const vuetify = createVuetify({
-    aliases,
-    components,
-    directives,
-    defaults,
-    theme: {
-      defaultTheme: MAIN_THEME,
-      themes: {
-        mainTheme,
-        mainDarkTheme,
-      },
+export const vuetify = createVuetify({
+  components,
+  directives,
+  defaults,
+  theme: {
+    defaultTheme: MAIN_THEME,
+    themes: {
+      mainTheme,
+      mainDarkTheme,
     },
-    icons: {
-      defaultSet: 'mdi',
-      sets: {
-        mdi,
-        alex: alexIcons,
-      },
+  },
+  icons: {
+    defaultSet: 'mdi',
+    sets: {
+      mdi,
+      alex: alexIcons,
     },
-  });
+  },
+});
 
+export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(vuetify);
 });

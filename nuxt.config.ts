@@ -6,14 +6,18 @@ export default defineNuxtConfig({
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
     '@mdi/font/css/materialdesignicons.min.css',
-    'assets/css/settings.scss',
   ],
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/strapi', 'nuxt-vitest'],
+  modules: ['@pinia/nuxt', '@nuxt/image', '@nuxtjs/strapi', 'nuxt-vitest'],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
+  },
+  image: {
+    strapi: {
+      baseURL: process.env.STRAPI_URL || 'http://localhost:1337',
+    },
   },
 
   strapi: {
@@ -22,7 +26,6 @@ export default defineNuxtConfig({
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
-
   imports: {
     dirs: ['stores', 'models', 'config'],
     presets: [
