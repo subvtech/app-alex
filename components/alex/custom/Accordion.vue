@@ -11,20 +11,23 @@
         @dragenter="(e) => e.preventDefault()"
       >
         <v-expansion-panel-title class="expand-panel">
-          <v-icon
+          <div
+            class="drag-icon"
             data-testid="dragItem"
-            size="16px"
-            class="drag-icon pa-2"
-            icon="mdi-drag"
-            color="gray-300"
             draggable="true"
             @dragstart="
               (e) => {
-                const dragGhost = e.target.closest('.expand-panel');
-                startDrag(item, e, dragGhost);
+                startDrag(item, e, '.expand-panel');
               }
             "
-          />
+          >
+            <v-icon
+              style="min-width: 16px !important; height: 16px; width: 16px"
+              src="@assets/svg/DragIndicator.svg"
+              icon="alex:DragIndicator"
+              color="gray-300"
+            />
+          </div>
           <p
             v-if="item.position || (showPositions && item.position !== false)"
             class="text-gray-300 ml-2 mr-1 font-weight-bold"
@@ -33,7 +36,7 @@
           </p>
           <v-icon
             v-if="item.icon"
-            class="ml-3 mr-2 icon-border"
+            class="mr-2 icon-border"
             color="gray-500"
             :icon="item.icon"
           />
@@ -151,8 +154,10 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 }
 
 .drag-icon {
+  width: 16px !important;
+  height: 16px !important;
   position: absolute;
-  left: 12px;
+  left: 4px;
   cursor: grab;
   transition: 0.3s ease;
   &:hover {
