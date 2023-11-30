@@ -64,14 +64,20 @@ onBeforeMount(() => {
   }
 });
 
+
 const menus = [
   {
-    title: 'Components',
+    title: 'Custom',
     items: [
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-account-circle',
         title: 'AppUserAvatar',
-        to: '/components/custom/appuseravatar',
+        to: '/components/custom/Appuseravatar',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Accordion',
+        to: '/components/custom/Accordion',
       },
       {
         icon: 'mdi-view-dashboard-outline',
@@ -81,6 +87,11 @@ const menus = [
 
       {
         icon: 'mdi-view-dashboard-outline',
+        title: 'Button',
+        to: '/components/custom/Button',
+      },
+      {
+        icon: 'mdi-chip',
         title: 'Chip',
         to: '/components/custom/chip',
       },
@@ -91,7 +102,7 @@ const menus = [
       },
 
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-information-variant',
         title: 'Info',
         to: '/components/custom/info',
       },
@@ -101,32 +112,39 @@ const menus = [
     title: 'Navigation',
     items: [
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-baguette',
         title: 'Breadcrumbs',
         to: '/components/custom/breadcrumbs',
       },
-
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'HorizontalBar',
-        to: '/components/custom/horizontalBar',
+        title: 'Horizontalbar',
+        to: '/components/custom/horizontalbar',
       },
-
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Drawable',
-        to: '/components/custom/Drawable',
+        icon: 'mdi-book-open-page-variant',
+        title: 'pagination',
+        to: '/components/custom/pagination',
       },
-
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'Tabs',
+        title: 'tabs',
         to: '/components/custom/tabs',
       },
+    ],
+  },
+  {
+    title: 'Input',
+    items: [
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Header',
-        to: '/components/custom/header',
+        icon: 'mdi-radio',
+        title: 'Radio-button',
+        to: '/components/inputs/radio-button',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Text-field',
+        to: '/components/inputs/text-field',
       },
     ],
   },

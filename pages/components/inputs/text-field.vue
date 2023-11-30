@@ -199,6 +199,12 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const copiedValue = ref('');
 const activeExampleTabs = ref(['1']);
 const playgroundOptions = ref([false, false, false, true]);
