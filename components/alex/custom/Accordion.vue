@@ -17,11 +17,7 @@
             draggable="true"
             @dragstart="
               (e) => {
-                if (e.target !== null) {
-                  const targetElement = e.target as Element;
-                  const dragGhost = targetElement.closest('.expand-panel');
-                  startDrag(item, e, dragGhost);
-                }
+                startDrag(item, e, '.expand-panel');
               }
             "
           >
@@ -30,7 +26,6 @@
               src="@assets/svg/DragIndicator.svg"
               icon="alex:DragIndicator"
               color="gray-300"
-              class="drag-icon"
             />
           </div>
           <p
