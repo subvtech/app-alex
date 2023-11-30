@@ -1,11 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { renderSuspended, mockNuxtImport } from 'nuxt-vitest/utils';
+import { renderSuspended } from 'nuxt-vitest/utils';
+import { createI18n } from 'vue-i18n';
 import { screen } from '@testing-library/vue';
 import Card from '../../components/alex/learningplan/trails/Card.vue';
+import ptRules from '@/assets/locales/pt/rules.json';
+import ptLogin from '@/assets/locales/pt/pages/login.json';
+import enRules from '@/assets/locales/en/rules.json';
+import enLogin from '@/assets/locales/en/pages/login.json';
 
 describe('Card of trails', () => {
+  const i18n = createI18n({
+    messages: {
+      pt: { ptRules, ptLogin },
+      en: { enRules, enLogin },
+    },
+    locale: 'pt',
+    legacy: false,
+    missingWarn: false,
+    globalInjection: true,
+  });
+
   it('Card should be defined', async () => {
-    mockNuxtImport('useI18n', () => 'msg');
     const { unmount } = await renderSuspended(Card, {
       props: {
         name: 'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
@@ -14,6 +29,9 @@ describe('Card of trails', () => {
         image: {
           url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
         },
+      },
+      global: {
+        plugins: [i18n],
       },
     });
     const cardComponent = screen.queryByTestId('alex-learningplan-trails-card');
