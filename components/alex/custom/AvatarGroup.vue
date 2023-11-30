@@ -2,8 +2,9 @@
   <div
     class="d-flex align-center"
     :class="{ 'flex-row-reverse': order === 'FIRST_ON_TOP' }"
+    data-testid="alex-avatar-group"
   >
-    <template v-for="(avatar, index) in showPeaple" :key="index">
+    <template v-for="(avatar, index) in showpeople" :key="index">
       <v-avatar
         :size="size"
         :image="avatar.image?.url"
@@ -38,7 +39,7 @@ interface person {
   };
 }
 interface AvatarGroupProps {
-  peaple: person[];
+  people: person[];
   max?: number;
   size?: number;
   order?: 'FIRST_ON_TOP' | 'LAST_ON_TOP';
@@ -50,12 +51,17 @@ const props = withDefaults(defineProps<AvatarGroupProps>(), {
 });
 
 const avatarsNumber = computed(() => {
-  const length = props.peaple.length;
+  const length = props.people.length;
   const exceedNumber = length - props.max;
   return exceedNumber;
 });
 
-const showPeaple = computed(() => props.peaple.slice(0, props.max));
+const showpeople = computed(() => {
+  if (props.people) {
+    return props.people.slice(0, props.max);
+  }
+  return props.people;
+});
 </script>
 
 <style scoped>

@@ -27,7 +27,7 @@
     <p class="text-subtitle-2 text-gray-500">
       o componente tem basicamente quatro propriedades principais que são
       <strong>order</strong>, <strong>size</strong>, <strong>max</strong> e
-      <strong>peaple</strong>.
+      <strong>people</strong>.
     </p>
     <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
       <div class="w-100">
@@ -42,7 +42,7 @@
           </thead>
           <tbody>
             <tr>
-              <td>peaple</td>
+              <td>people</td>
               <td>person[]</td>
               <td class="text-center">
                 <v-icon icon="mdi-checkbox-marked" color="success" />
@@ -104,7 +104,7 @@
     <div class="d-flex w-100 gap-4 pa-4 rounded-lg flex-column align-center">
       <alex-custom-avatar-group
         :size="36"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -142,7 +142,7 @@
       />
       <alex-custom-avatar-group
         :size="36"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -194,7 +194,7 @@
       <alex-custom-avatar-group
         :size="36"
         order="FIRST_ON_TOP"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -232,7 +232,7 @@
       />
       <alex-custom-avatar-group
         :size="36"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -299,7 +299,7 @@ import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 const firstExampleTemplate = ref(` <alex-custom-avatar-group
         :size="36"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -337,7 +337,7 @@ const firstExampleTemplate = ref(` <alex-custom-avatar-group
       />
       <alex-custom-avatar-group
         :size="36"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -358,7 +358,7 @@ const firstExampleTemplate = ref(` <alex-custom-avatar-group
 const secondExampleTemplate = ref(` <alex-custom-avatar-group
         :size="36"
         order="FIRST_ON_TOP"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
@@ -396,7 +396,7 @@ const secondExampleTemplate = ref(` <alex-custom-avatar-group
       />
       <alex-custom-avatar-group
         :size="36"
-        :peaple="[
+        :people="[
           {
             name: 'Jorge Lima',
             image: {
