@@ -14,5 +14,40 @@
   "userList": "User list",
   "accessControl": "Access control",
   "settings": "Settings",
-  "isLoading": "Loading..."
+  "isLoading": "Loading...",
+  "step1": {
+    "title": "Welcome to Project ALEX, be ready to learn and teach!",
+    "text": "We start with a tour of our Lateral Menu, it centralizes information and shortcuts to system features",
+    "nextButton": "Next"
+  },
+  "step2": {
+    "title": "User Area",
+    "text": "This is your area, you can access your plans and classes and your favorites list",
+    "backButton": "Back",
+    "nextButton": "Next"
+  },
+  "step3": {
+    "title": "Navigating the system",
+    "text": "Here you can access the courses and projects created by the entire community",
+    "backButton": "Back",
+    "nextButton": "Next"
+  },
+  "step4": {
+    "title": "Professor Area",
+    "text": "Here Professors manage their classes and projects",
+    "backButton": "Back",
+    "completeButton": "Next"
+  },
+  "step5": {
+    "title": "Profile and Settings",
+    "text": "Here you can see your user profiles and your account settings",
+    "backButton": "Back",
+    "nextButton": "Next"
+  },
+  "step6": {
+    "title": "End of the tour",
+    "text": "Now you are ready to use Project ALEX, enjoy!",
+    "backButton": "Back",
+    "completeButton": "Complete"
+  }
 }

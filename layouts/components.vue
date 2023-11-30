@@ -61,6 +61,8 @@ const isPermanent = ref(false);
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
+const { profileMenuItems } = useMainHorizontalBar();
+
 onBeforeMount(() => {
   userStore.profilePicture = user.value.avatar;
   userStore.fullname = user.value.fullname;
@@ -106,23 +108,6 @@ const menus = [
         to: '/components/custom/info',
       },
     ],
-  },
-];
-
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
   },
 ];
 </script>
