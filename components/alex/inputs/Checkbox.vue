@@ -2,16 +2,17 @@
   <div class="container" width="113" max-width="fit-content" height="47">
     <div class="checkbox-container mr-1 pa-0 mt-0">
       <v-checkbox
-        :class="{ 'input-checkbox': indeterminate }"
-        :model-value="checked"
+        v-model:model-value="value"
+        :class="{
+          'text-secondary-0': hasCustomIndeterminateColor,
+        }"
         :indeterminate="indeterminate"
         :disabled="disabled"
         :readonly="readonly"
         hide-details="auto"
-        color="#00b7cc"
+        color="secondary-0"
         width="18"
         data-testid="testing-checkbox"
-        @change="handleChange"
       />
     </div>
     <div class="text-container" :class="{ 'no-hint': !hint }" width="auto">
@@ -25,37 +26,37 @@
   </div>
 </template>
 <script setup lang="ts">
-defineProps({
-  label: {
-    type: String,
-    default: '',
+interface CheckboxProps {
+  modelValue: boolean | null;
+  label?: string;
+  hint?: string;
+  indeterminate?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+}
+
+const props = withDefaults(defineProps<CheckboxProps>(), {
+  label: undefined,
+  hint: undefined,
+  indeterminate: false,
+  disabled: false,
+  readonly: false,
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const value = computed({
+  get() {
+    return props.modelValue;
   },
-  hint: {
-    type: String,
-    default: '',
-  },
-  checked: {
-    type: Boolean,
-    default: false,
-  },
-  indeterminate: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  readonly: {
-    type: Boolean,
-    default: false,
+  set(value) {
+    emit('update:modelValue', value);
   },
 });
-const emit = defineEmits(['update:checked', 'change']);
 
-const handleChange = (value) => {
-  emit('update:checked', value);
-};
+const hasCustomIndeterminateColor = computed(
+  () => props.indeterminate && value.value === null,
+);
 </script>
 <style scoped>
 div {
@@ -104,9 +105,13 @@ div {
   margin-bottom: 1.2rem !important;
 }
 
-.input-checkbox {
-  color: #00b7cc !important;
+/*
+.input-indeterminate-checkbox {
+  color: rgba(0, 183, 204, 1);
   border-color: #a0a8b1 !important;
-  position: relative !important;
+}
+*/
+.v-selection-control__wrapper {
+  color: #6e7a87 !important;
 }
 </style>

@@ -41,7 +41,11 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => (drawer = !drawer)"
+      :toggle-drawer="
+        () => {
+          drawer = !drawer;
+        }
+      "
       :menu-items="profileMenuItems"
       :data-tour="profileMenuItems[0].dataTour"
       :class="{
@@ -49,6 +53,7 @@
       }"
       :reverse="false"
       :user="user"
+      show-picture
     />
 
     <v-main class="secondary bg-gray-blue pt-16">
@@ -67,6 +72,8 @@ const drawer = ref(true);
 const isPermanent = ref(false);
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
+
+const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
   userStore.profilePicture = user.value.avatar;
