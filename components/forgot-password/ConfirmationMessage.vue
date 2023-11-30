@@ -1,6 +1,7 @@
 <template>
   <v-container
-    class="w-100 fill-height d-flex align-content-center justify-center"
+    class="w-100 fill-height d-flex justify-center"
+    style="align-content: start;"
   >
     <v-card
       variant="outlined"
@@ -10,12 +11,12 @@
       <v-card-title class="text-white">{{ title }}</v-card-title>
       <v-card-text class="text-body-1 text-grey-lighten-1"
         >{{ text }}
-        <strong class="text-white font-weight-bold"> {{ email }} </strong>
+        <strong class="text-white font-weight-bold"> {{ email }} </strong>.
         {{ text2 }}
       </v-card-text>
     </v-card>
     <NuxtLink to="/login" class="text-accent text-decoration-none mt-6">
-      <v-icon icon="mdi-arrow-left" class="mr-1" />{{ $t('pages.forgot.goBack') }}
+      <v-icon icon="mdi-arrow-left" class="mr-1" />{{ $t('pages.forgot.success.return') }}
     </NuxtLink>
   </v-container>
 </template>

@@ -10,6 +10,7 @@
   "remember": "Lembrar dados",
   "password": "Senha",
   "divider": "OU",
+  "blocked": "Você está banido.",
   "metamask": {
     "btn": "Acessar com a Metamask",
     "notFound": "Metamask not detected",
