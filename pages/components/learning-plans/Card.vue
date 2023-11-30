@@ -13,11 +13,16 @@
     <p class="text-subtitle-2 text-gray-500">
       Tem como propriedades obrigatórias o <strong>image</strong>,
       <strong>name</strong>, <strong>description</strong>,
-      <strong>facilitator</strong>, <strong>trailsNumber</strong>.
+      <strong>facilitator</strong>, <strong>trailsCount</strong>.
+    </p>
+    <p class="text-subtitle-2 text-gray-500">
+      Existem 3 variantes do deste card que são <strong>courses</strong>,
+      <strong>project</strong>, <strong>project_in_courses</strong>
     </p>
 
     <div class="w-100 flex-column d-flex">
-      <div class="d-flex" style="gap: 8px">
+      <div class="d-flex flex-column" style="gap: 8px">
+        <h2 class="text-h4 text-gray-800">Variant: <strong>courses</strong></h2>
         <alex-learningplan-card
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           type="course"
@@ -26,7 +31,7 @@
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
           }"
-          :trails-number="40"
+          :trails-count="40"
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
@@ -34,6 +39,7 @@
           @favorite="() => console.log('favoritei')"
           @open="() => console.log('abri')"
         />
+        <h2 class="text-h4 text-gray-800">Variant: <strong>project</strong></h2>
         <alex-learningplan-card
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
@@ -41,7 +47,25 @@
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
           }"
-          :trails-number="40"
+          :trails-count="40"
+          :image="{
+            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
+          }"
+          favorited
+          @favorite="() => console.log('favoritei')"
+          @open="() => console.log('abri')"
+        />
+        <h2 class="text-h4 text-gray-800">
+          Variant: <strong>project_in_courses</strong>
+        </h2>
+        <alex-learningplan-card
+          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
+          :facilitator="{
+            name: 'Carlos Andrade',
+            imageURL: 'https://thispersondoesnotexist.com/',
+          }"
+          :trails-count="40"
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
@@ -110,7 +134,7 @@
               </td>
             </tr>
             <tr>
-              <td>trailsNumber</td>
+              <td>trailsCount</td>
               <td>number</td>
               <td class="text-center">
                 <v-icon icon="mdi-checkbox-marked" color="success" />
@@ -223,6 +247,7 @@
         </v-table>
       </div>
     </div>
+
     <h2 class="text-h2 text-gray-800">Variante: Oculto</h2>
     <p class="text-subtitle-2 text-gray-500">
       Modo de visualização do card sinalizando que o card não está visível para
@@ -238,7 +263,7 @@
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
           }"
-          :trails-number="40"
+          :trails-count="40"
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
@@ -279,7 +304,7 @@
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
           }"
-          :trails-number="40"
+          :trails-count="40"
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
@@ -292,7 +317,7 @@
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
           }"
-          :trails-number="40"
+          :trails-count="40"
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
