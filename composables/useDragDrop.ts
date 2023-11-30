@@ -10,7 +10,8 @@ export function useDragDrop() {
     e.dataTransfer.setData('text/plain', item);
     dragging.value = true;
     dragFrom.value = item;
-    if (dragGhost) e.dataTransfer.setDragImage(dragGhost, 10, 10);
+    if (dragGhost)
+      e.dataTransfer.setDragImage(e.target.closest(dragGhost), 10, 10);
   };
 
   const finishDrag = (item, pos, list) => {

@@ -268,25 +268,6 @@ const menus = [
   },
 ];
 
-const profileMenuItems = [
-  {
-    dataTour: 'step-profile',
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    dataTour: 'step-logout',
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
-
 const miniVariant = ref(false);
 </script>
 
