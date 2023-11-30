@@ -30,10 +30,10 @@
         :text="$t('components.learningPlan.cardTrails.hidden')"
         location="bottom center"
       >
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props: propsTooltip }">
           <alex-custom-chip
             v-if="hide"
-            v-bind="props"
+            v-bind="propsTooltip"
             class="hidden-icon"
             status="dark"
             icon="mdi-eye-off-outline"
@@ -54,10 +54,10 @@
               :text="$t('components.learningPlan.cardTrails.options')"
               location="bottom center"
             >
-              <template #activator="{ props }">
+              <template #activator="{ props: propsTooltip }">
                 <alex-custom-button
                   v-if="direction !== 'HORIZONTAL' && (isHovering || isActive)"
-                  v-bind="{ ...propsMenu, ...props }"
+                  v-bind="{ ...propsMenu, ...propsTooltip }"
                   class="options"
                   size="small"
                   variant="secondary"
@@ -107,9 +107,9 @@
           max-width="360"
           :disabled="isActiveTitleTooltip"
         >
-          <template v-slot:activator="{ props }">
+          <template #activator="{ props: propsTooltip }">
             <h5
-              v-bind="props"
+              v-bind="propsTooltip"
               class="text-body-2 text-gray-900 ellipsis lines-2 max-height-48"
               :class="{ 'grayscale-2': hide }"
             >
@@ -120,9 +120,9 @@
 
         <div v-if="!isVertical">
           <v-menu :close-on-content-click="false">
-            <template #activator="{ props }">
+            <template #activator="{ props: propsMenu }">
               <alex-custom-button
-                v-bind="props"
+                v-bind="propsMenu"
                 icon="mdi-dots-vertical"
                 size="small"
                 variant="text"
@@ -172,8 +172,8 @@
         :disabled="!hasDocuments"
         location="bottom center"
       >
-        <template #activator="{ props }">
-          <div class="documents" v-bind="props">
+        <template #activator="{ props: propsTooltip }">
+          <div class="documents" v-bind="propsTooltip">
             <v-icon size="20" color="gray-600"
               >mdi-text-box-multiple-outline</v-icon
             >
