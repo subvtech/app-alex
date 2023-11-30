@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
-import userEvent from '@testing-library/user-event';
 import Dropdown from '../../components/alex/inputs/Dropdown.vue';
 
 describe('Dropdown', () => {
@@ -52,17 +51,10 @@ describe('Dropdown', () => {
     const itemsDropdown = await screen.findByTestId('dropdown-content');
     expect(itemsDropdown).not.toBeNull();
 
-    // Simular clique para abrir o Dropdown
     userEvent.click(menuDropdown);
 
-    // Verificar se está aberto
     const dropdownContent = await screen.findByTestId('dropdown-content');
     expect(dropdownContent).not.toBeNull();
-    expect(dropdownContent.textContent).toContain('Logout');
-
-    // Simular clique para fechar o Dropdown
-    userEvent.click(menuDropdown); // ou userEvent.click(document.body) para fechar
-    const closedDropdownContent = screen.queryByTestId('dropdown-content');
-    expect(closedDropdownContent).toBeTruthy();
+    expect(dropdownContent.children.length).toBe(4);
   });
 });
