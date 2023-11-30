@@ -61,6 +61,8 @@ const isPermanent = ref(false);
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
+const { profileMenuItems } = useMainHorizontalBar();
+
 onBeforeMount(() => {
   userStore.profilePicture = user.value.avatar;
   userStore.fullname = user.value.fullname;
