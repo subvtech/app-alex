@@ -434,7 +434,7 @@ const itemsComponente = ref([
     id: 3,
     type: 'text-icon',
     icon: 'mdi-account',
-    link: '/settings',
+    link: '/user/settings',
     text: 'Configurações',
   },
 ]);
