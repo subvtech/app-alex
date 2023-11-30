@@ -107,8 +107,6 @@ const menus = [
       },
     ],
   },
-
- 
 ];
 
 const profileMenuItems = [
@@ -127,7 +125,6 @@ const profileMenuItems = [
     logout: true,
   },
 ];
-
 </script>
 
 <style scoped lang="scss">

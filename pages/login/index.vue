@@ -1,5 +1,5 @@
 <template>
-  <v-row id="login-page">
+  <v-row id="login-page" data-testid="login">
     <v-col>
       <v-card class="card card-imagem">
         <div align="center">
