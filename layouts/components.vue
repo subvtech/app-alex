@@ -111,22 +111,6 @@ const menus = [
   },
 ];
 
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
 </script>
 
 <style scoped lang="scss">
