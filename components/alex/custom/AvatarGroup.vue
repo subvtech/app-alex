@@ -51,16 +51,15 @@ const props = withDefaults(defineProps<AvatarGroupProps>(), {
 });
 
 const avatarsNumber = computed(() => {
-  const length = props.people.length;
+  const length = (props.people || []).length;
   const exceedNumber = length - props.max;
   return exceedNumber;
 });
 
 const showpeople = computed(() => {
   if (props.people) {
-    return props.people.slice(0, props.max);
+    return (props.people || []).slice(0, props.max);
   }
-  return props.people;
 });
 </script>
 

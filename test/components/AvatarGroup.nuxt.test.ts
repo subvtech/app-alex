@@ -133,15 +133,12 @@ describe('AvatarGroup component', () => {
     expect(avatar.children.length).equals(4);
     unmount();
   });
-  // it('should throw error when noone people was passed in props', async () => {
-  //   const { unmount } = await renderSuspended(AvatarGroup, {
-  //     props: {},
-  //   });
-  //   const avatar = await screen.findByTestId('alex-avatar-group');
-  //   // expect(avatar).toThrowError(
-  //   //   new TypeError("Cannot read properties of undefined (reading 'length')"),
-  //   // );
-  //   expect(avatar).Throw();
-  //   unmount();
-  // });
+  it('should throw no error when no people was passed in props', async () => {
+    const { unmount } = await renderSuspended(AvatarGroup, {
+      props: {},
+    });
+    const avatar = await screen.findByTestId('alex-avatar-group');
+    expect(avatar);
+    unmount();
+  });
 });
