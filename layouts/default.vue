@@ -2,9 +2,9 @@
   <v-app>
     <AppSnackbar />
     <alex-custom-drawable
+      v-model="drawer"
       :blocks="menus"
       :clipped="clipped"
-      :show="drawer"
       dark
       :permanent="isPermanent"
       @update:model-value="closeDrawable"

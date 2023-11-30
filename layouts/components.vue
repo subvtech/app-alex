@@ -2,12 +2,11 @@
   <v-app>
     <AppSnackbar />
     <alex-custom-drawable
+      v-model="drawer"
       :blocks="menus"
       :clipped="clipped"
-      v-model="drawer"
       dark
       :permanent="isPermanent"
-      @update:model-value="closeDrawable"
     >
       <template v-slot:header>
         <div
@@ -41,6 +40,7 @@
 
     <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
+     
         <slot />
       </v-container>
     </v-main>
@@ -63,7 +63,6 @@ onBeforeMount(() => {
     userStore.fullname = user.value.fullname;
   }
 });
-
 
 const menus = [
   {
@@ -120,6 +119,11 @@ const menus = [
         icon: 'mdi-view-dashboard-outline',
         title: 'Horizontalbar',
         to: '/components/custom/horizontalbar',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Drawable',
+        to: '/components/custom/drawable',
       },
       {
         icon: 'mdi-book-open-page-variant',

@@ -21,10 +21,11 @@ export default function useNavigationDrawer(defaultWidth = 0) {
       if (!drawer.value) drawer.value = true;
       clipped.value = clippedValue;
     } else if (drawer.value) {
-      if (clipped.value) clipped.value = false;
+      clipped.value = false;
       drawer.value = false;
     } else {
       drawer.value = true;
+      clipped.value = false;
     }
   };
 
