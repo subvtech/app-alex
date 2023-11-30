@@ -16,15 +16,7 @@
         placeholder
         role="default-cover"
       />
-      <div
-        class="w-100 h-100"
-        style="top: 0; left: 0; opacity: 0.1; height: auto; position: absolute"
-        :style="
-          showShade
-            ? 'background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.24) 53.12%, rgba(0, 0, 0, 0.3) 61.46%, rgba(0, 0, 0, 0.6) 93.75%);'
-            : ''
-        "
-      ></div>
+      <div class="w-100 h-25" :class="showShade ? 'shade' : ''" />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
           v-if="cover && imgFromStrapi"
@@ -87,6 +79,7 @@
       :fullname="fullname"
       :username="username"
       :title="title"
+      :subtitle="subtitle"
       :code="code"
       :code-style="codeStyle"
       :settingsIcon="settingsIcon"
@@ -94,12 +87,14 @@
       :username-style="usernameStyle"
       :role-style="roleStyle"
       :title-style="titleStyle"
+      :subtitle-style="subtitleStyle"
       :avatar-block-style="avatarBlockStyle"
-      :title-above="titleAbove"
+      :description-above="descriptionAbove"
+      :description="description"
       :float-beneath="floatBeneath"
       :show-role="showRole"
       :show-border="showBorder"
-      :show-settings="!settingsMenu"
+      :show-settings="!settingsMenu && showSettings"
       :distribution="distribution"
       :darker-background="darkerBackground"
       :profile-picture-size="profilePictureSize"
@@ -133,14 +128,14 @@
       </div>
 
       <v-spacer />
-      <div v-if="settingsMenu" data-testid="settings-menu">
-        <v-icon
-          v-if="canEdit"
-          @click="emit('display:settings')"
-          class="mr-4 mr-md-3 mr-sm-3 mr-xs-2"
-          color="#6E7A87"
-          >{{ settingsIcon }}</v-icon
-        >
+      <div
+        v-if="settingsMenu && showSettings"
+        class="d-flex align-center mr-4 mr-md-3 mr-sm-3 mr-xs-2"
+        data-testid="settings-menu"
+      >
+        <v-icon @click="emit('display:settings')" class="" color="#6E7A87">{{
+          settingsIcon
+        }}</v-icon>
       </div>
     </div>
   </div>
@@ -153,6 +148,11 @@ const client = useStrapiClient();
 const props = defineProps({
   coverPicture: {
     type: Object as PropType<{ url: string; id: number } | null>,
+  },
+
+  showSettings: {
+    type: Boolean,
+    default: false
   },
 
   imgFromStrapi: {
@@ -176,10 +176,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-
-  titleAbove: {
+  descriptionAbove: {
     type: Boolean,
     default: false,
+  },
+
+  description: {
+    type: String,
   },
 
   distribution: {
@@ -224,6 +227,10 @@ const props = defineProps({
     type: String,
   },
 
+  subtitleStyle: {
+    type: String,
+  },
+
   avatarBlockStyle: {
     type: String,
   },
@@ -263,6 +270,10 @@ const props = defineProps({
   },
 
   title: {
+    type: String,
+  },
+
+  subtitle: {
     type: String,
   },
 
@@ -388,12 +399,29 @@ async function removeCoverPicture() {
       aspect-ratio: 1 / 1;
     }
 
+    .w-100.h-25 {
+      bottom: 0;
+      left: 0;
+      opacity: 1;
+      height: auto;
+      position: absolute;
+    }
+
+    .shade {
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.4) 78.65%
+      );
+    }
+
     .edit-cover {
       gap: 16px;
       position: absolute;
       bottom: 24px;
       right: 20px;
       z-index: 10;
+
       .btn.label {
         width: 153px;
 
@@ -436,6 +464,12 @@ async function removeCoverPicture() {
     height: 46px;
     padding-inline: 24px;
     transition: all ease-in-out 1s;
+    overflow-x: auto;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+      display: none;
+    }
     div {
       height: 100%;
       display: flex;
@@ -505,6 +539,7 @@ async function removeCoverPicture() {
         .btn.label.small {
           display: block !important;
           width: 33px !important;
+          height: 33px !important;
         }
         .btn.label {
           display: none !important;
@@ -521,12 +556,6 @@ async function removeCoverPicture() {
 @media (max-width: 608px) {
   .user-block {
     .menu {
-      overflow-x: auto;
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-      &::-webkit-scrollbar {
-        display: none;
-      }
       div {
         span {
           font-size: 14px;

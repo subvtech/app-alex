@@ -8,8 +8,11 @@
     data-testid="alex-dialog"
     @update:model-value="handleChange"
   >
-    <template v-if="hasCustomActivator" #activator="{ isActive, props }">
-      <slot name="activator" :is-active="isActive" :props="props" />
+    <template
+      v-if="hasCustomActivator"
+      #activator="{ isActive, props: activatorProps }"
+    >
+      <slot name="activator" :is-active="isActive" :props="activatorProps" />
     </template>
     <slot
       v-if="hasHeader"

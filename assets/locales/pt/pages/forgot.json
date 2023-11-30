@@ -1,7 +1,8 @@
 {
-    "success": {
-        "title": "Recuperação Enviada!",
-        "subtitle": "Enviamos instruções para | Acesse o e-mail e siga as instruções fornecidas.",
-        "return": "Voltar para o login"
-    }
+  "success": {
+    "title": "Recuperação Enviada!",
+    "subtitle1": "Enviamos instruções para ",
+    "subtitle2": "Acesse o e-mail e siga as instruções fornecidas.",
+    "return": "Voltar para o login"
+  }
 }

@@ -10,7 +10,7 @@ export const useMessageStore = defineStore('message', {
   state: (): Message => ({
     message: '',
     color: '',
-    show: true,
+    show: false,
   }),
   actions: {
     setMessage(message: string, color?: string, show?: boolean) {
