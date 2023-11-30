@@ -28,12 +28,12 @@
       <alex-inputs-stepper-field
         :label="$t('components.forgot.sendResetPassword.confirmPassword')"
         name="confirmPassword"
-        :append-inner-icon="passwordVisible2 ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="passwordVisible2 ? 'text' : 'password'"
+        :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="confirmationVisible ? 'text' : 'password'"
         color="white"
         class="my-3 text-secondary"
         theme="dark"
-        @click:append-inner="passwordVisible2 = !passwordVisible2"
+        @click:append-inner="confirmationVisible = !confirmationVisible"
       />
       <v-btn
         :color="!isValid ? 'grey-darken-1' : 'accent'"
@@ -68,7 +68,7 @@ const { schema4 } = useFormRules();
 const form = ref(null);
 const loading = ref(false);
 const passwordVisible = ref(false);
-const passwordVisible2 = ref(false);
+const confirmationVisible = ref(false);
 
 const route = useRoute();
 onBeforeMount(() => {

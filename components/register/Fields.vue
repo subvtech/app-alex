@@ -114,13 +114,13 @@
 
           <alex-inputs-stepper-field
             :label="$t('pages.register.confirmPassword')"
-            :append-inner-icon="passwordVisible2 ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="passwordVisible2 ? 'text' : 'password'"
+            :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="confirmationVisible ? 'text' : 'password'"
             name="confirmPassword"
             color="white"
             class="my-3 text-secondary"
             theme="dark"
-            @click:append-inner="passwordVisible2 = !passwordVisible2"
+            @click:append-inner="confirmationVisible = !confirmationVisible"
           />
         </template>
       </alex-inputs-stepper>
@@ -168,7 +168,7 @@ const registering = ref(false);
 const institutions = ref([]);
 const search = ref('');
 const passwordVisible = ref(false);
-const passwordVisible2 = ref(false);
+const confirmationVisible = ref(false);
 const submit = async (values: {
   fullname: string;
   username: string;
