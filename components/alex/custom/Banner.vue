@@ -94,7 +94,7 @@
       :float-beneath="floatBeneath"
       :show-role="showRole"
       :show-border="showBorder"
-      :show-settings="!settingsMenu"
+      :show-settings="!settingsMenu && showSettings"
       :distribution="distribution"
       :darker-background="darkerBackground"
       :profile-picture-size="profilePictureSize"
@@ -129,7 +129,7 @@
 
       <v-spacer />
       <div
-        v-if="settingsMenu"
+        v-if="settingsMenu && showSettings"
         class="d-flex align-center mr-4 mr-md-3 mr-sm-3 mr-xs-2"
         data-testid="settings-menu"
       >
@@ -148,6 +148,11 @@ const client = useStrapiClient();
 const props = defineProps({
   coverPicture: {
     type: Object as PropType<{ url: string; id: number } | null>,
+  },
+
+  showSettings: {
+    type: Boolean,
+    default: false
   },
 
   imgFromStrapi: {

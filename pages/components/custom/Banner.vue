@@ -288,6 +288,7 @@
         can-delete
         show-menu
         show-profile-picture
+        show-settings
         show-role
         show-border
         float-beneath
@@ -632,6 +633,7 @@ const examples = [
       :userId="user.id"
       can-delete
       show-menu
+      show-settings
       show-profile-picture
       show-role
       show-border
@@ -697,11 +699,18 @@ const propsDocumentation = [
       'Um boolean que indica se a um shading deve ser exibido na parte debaixo da imagem.',
   },
   {
+    name: 'showSettings',
+    type: 'Boolean',
+    default: 'false',
+    description:
+      'Um boolean que indica se o botão de settings deve ser exibido',
+  },
+  {
     name: 'settingsMenu',
     type: 'Boolean',
     default: 'false',
     description:
-      'Um boolean que indica se o botão de settings deve ser exibido no menu ou na imagem-capa.',
+      'Um boolean que indica se o posicionamento do botão de settings, se true ele é exibido no menu ou se false é exibido na imagem-capa, depende de showSettings.',
   },
 
   {
