@@ -1,3 +1,7 @@
+// Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
+export type ElementType<T extends ReadonlyArray<unknown>> =
+  T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+
 const extensions = literalArray('.jpeg', '.jpg', '.png', '.webp');
 
 export async function createFileFromUrl(
@@ -16,19 +20,15 @@ export async function createFileFromUrl(
 }
 
 export function withTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
-  const timeout = new Promise<T>((_, reject) => {
+  const timeout = new Promise<T>((_resolve, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id);
-      reject(`Timed out in ${ms}ms.`);
+      reject(new Error(`Timed out in ${ms}ms.`));
     }, ms);
   });
 
   return Promise.race([promise, timeout]);
 }
-
-// Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
-export type ElementType<T extends ReadonlyArray<unknown>> =
-  T extends ReadonlyArray<infer ElementType> ? ElementType : never;
 
 // Iinstead return of string[], gonna return a type of each element of array ex:
 // ['goiaba' | 'maconha'] =>  type = ('goiaba' | 'maconha')[]
