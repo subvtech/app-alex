@@ -173,7 +173,6 @@ const submit = handleSubmit(async () => {
 
     router.push('/');
   } catch (error) {
-    console.log(error);
     logging.value = false;
     messageStore.message = i18n.t('pages.login.loginError');
     messageStore.color = 'red';
@@ -187,6 +186,7 @@ const submit = handleSubmit(async () => {
   overflow-y: auto;
   .card {
     border-radius: 0 !important;
+
     height: 100%;
     position: absolute;
     top: 0;
@@ -211,7 +211,9 @@ const submit = handleSubmit(async () => {
     }
 
     &-acesso {
-      background: #001529 !important;
+      background-image: url('../../static/images/login-bg.svg');
+      background-repeat: initial;
+      background-size: cover;
       right: 0;
       overflow: auto;
       width: 600px;
