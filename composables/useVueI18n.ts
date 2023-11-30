@@ -58,6 +58,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'planId',
     'reset',
     'profile',
+    'courses',
     'trailId',
     'forgot',
   ]);
