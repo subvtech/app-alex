@@ -411,9 +411,9 @@
       </div>
     </div>
 
-    <h2 class="text-h2 text-gray-800">Outros componentes: Header e Footer</h2>
+    <h2 class="text-h2 text-gray-800">Header</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Componente superior contendo título e destaque do dialog
+      Componente superior contendo título e destaque do dialog,
     </p>
 
     <div class="w-100 flex-column d-flex gap-4">
@@ -427,13 +427,6 @@
           highlighted-title="#222"
           @on-close="console.log('close')"
         />
-        <alex-custom-dialog-footer
-          :name-main-button="'Enviar'"
-          :name-second-button="'Voltar'"
-          @on-main-action="() => console.log('mainAction')"
-          @on-secondary-action="() => console.log('secondAction')"
-        />
-        <alex-custom-dialog-footer no-main-button on-secondary-action />
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[5] }}</prism>
@@ -450,6 +443,43 @@
           />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
         </alex-custom-button>
+      </div>
+      <h2 class="text-h2 text-gray-800">Customização: Footer</h2>
+      <p class="text-subtitle-2 text-gray-500">
+        é possível substituir através de slots os botões padrões do footer,
+        remover botões atráves de propriedades, ou até mudar apenas o texto e
+        ação de cada botão.
+      </p>
+      <div
+        class="d-flex flex-column bg-gray-100 pa-4 rounded-lg"
+        style="gap: 8px"
+      >
+        <alex-custom-dialog-footer
+          :name-main-button="'Enviar'"
+          :name-second-button="'Voltar'"
+          @on-main-action="() => console.log('mainAction')"
+          @on-secondary-action="() => console.log('secondAction')"
+        />
+
+        <alex-custom-dialog-footer no-main-button no-secondary-button />
+
+        <alex-custom-dialog-footer>
+          <template #mainSlotButton>
+            <alex-custom-button
+              text="Avançar"
+              size="large"
+              append-icon="mdi-chevron-right"
+            />
+          </template>
+          <template #secondarySlotButton>
+            <alex-custom-button
+              text="Voltar"
+              variant="secondary"
+              size="large"
+              prepend-icon="mdi-chevron-left"
+            />
+          </template>
+        </alex-custom-dialog-footer>
       </div>
     </div>
   </v-container>

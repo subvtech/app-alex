@@ -15,7 +15,7 @@
         dark
         :permanent="isPermanent"
       >
-        <template v-slot:header>
+        <template #header>
           <div
             class="my-4 w-100 d-flex"
             :class="clipped ? '' : 'justify-center'"
@@ -54,7 +54,6 @@
 </template>
 
 <script setup lang="ts">
-const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
 const isPermanent = ref(false);
