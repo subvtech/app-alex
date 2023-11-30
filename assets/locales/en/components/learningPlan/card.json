@@ -1,5 +1,6 @@
 {
     "type": {
+        "course_project": "Project",
         "project": "Project",
         "course": "Course"
     },

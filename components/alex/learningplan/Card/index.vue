@@ -127,7 +127,7 @@
       }"
     >
       <alex-custom-chip
-        v-if="type === 'project'"
+        v-if="type !== 'course'"
         :text="$t(`components.learningPlan.card.status.${status}`)"
         size="small"
         :status="statusConfig.variant"
@@ -144,7 +144,6 @@
           <template #activator="{ props: nameTooltipProps }">
             <h5
               v-bind="nameTooltipProps"
-              ref="nameRef"
               class="text-h5 text-gray-900 ellipsis lines-2"
             >
               {{ name }}
@@ -160,15 +159,15 @@
 
       <div class="d-flex gap-6 flex-wrap py-2">
         <alex-learningplan-card-info
-          :image="{
+          :avatar="{
+            url: facilitator.imageURL,
             name: facilitator.name,
-            url: facilitator?.imageURL,
           }"
           :title="$t('components.learningPlan.card.facilitator')"
           :subtitle="facilitator.name"
         />
         <alex-learningplan-card-info
-          v-if="type !== 'project_in_courses'"
+          v-if="type !== 'course_project'"
           icon="alex:trail"
           :title="$t('components.learningPlan.card.trails')"
           :subtitle="trailsCount"
@@ -190,18 +189,18 @@
             v-if="hide"
             :title="$t('components.learningPlan.card.visibility.show')"
             prepend-icon="mdi-eye-outline"
-            @click="() => console.log('mostrar')"
+            @click="() => emits('show')"
           />
           <v-list-item
             v-else
             :title="$t('components.learningPlan.card.visibility.hide')"
             prepend-icon="mdi-eye-off-outline"
-            @click="() => console.log('Ocultar')"
+            @click="() => emits('hide')"
           />
           <v-list-item
             :title="$t('components.learningPlan.card.configurations')"
             prepend-icon="mdi-cog-outline"
-            @click="() => console.log('Configurações')"
+            @click="() => emits('configurations')"
           />
         </v-list>
       </v-menu>
@@ -219,7 +218,7 @@ interface person {
 }
 
 interface LearningPlanCardBase {
-  type?: 'project' | 'course' | 'project_in_courses';
+  type?: 'project' | 'course' | 'course_project';
   image: { url: string; alt?: string };
   name: string;
   description: string;
@@ -232,7 +231,7 @@ interface LearningPlanCardBase {
 }
 
 interface LearningPlanCardProject extends LearningPlanCardBase {
-  status?: 'start' | 'running' | 'finished';
+  status?: 'start' | 'in_progress' | 'done';
   trailsCount: number;
 }
 interface LearningPlanCardProjectInCourses
@@ -249,11 +248,10 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   favorited: false,
   direction: 'VERTICAL',
   hide: false,
-  type: 'project',
+  type: 'course',
   status: 'start',
   participants: undefined,
 });
-const nameRef = ref(null);
 const isHovering = ref(false);
 const options = ref(false);
 const isVertical = computed(() => props.direction === 'VERTICAL');
@@ -271,12 +269,12 @@ const statusConfig = computed<{ icon: string; variant: any }>(() => {
         icon: 'mdi-clock',
         variant: 'blue',
       };
-    case 'running':
+    case 'in_progress':
       return {
         icon: 'mdi-clock',
         variant: 'warning',
       };
-    case 'finished':
+    case 'done':
       return {
         icon: 'mdi-check',
         variant: 'success',

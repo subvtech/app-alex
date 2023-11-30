@@ -42,7 +42,7 @@ export const formRules = {
     (val && val.length >= 5) || 'Mínimo de 5 caracteres',
 };
 
-export const getLetters = (image: string) => {
+export const getInitials = (image: string) => {
   const names = image.split(' ');
   if (names.length >= 2) return names[0][0] + names[1][0];
   return names[0][0];

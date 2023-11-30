@@ -1,7 +1,8 @@
 {
     "type": {
-        "project": "Projeto",
-        "course": "Curso"
+        "course": "Curso",
+        "course_project": "Project",
+        "project": "Projeto"
     }, 
     "configurations": "Configurações",
     "visibility": {

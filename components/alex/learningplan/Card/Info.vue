@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex gap-2 align-center justify-center width">
     <alex-custom-chip
-      v-if="!image"
+      v-if="!avatar"
       size="large"
       :icon="icon"
       variant="outlined"
@@ -10,13 +10,14 @@
     <v-avatar
       v-else
       :variant="hasImage ? 'flat' : 'outlined'"
+      :image="avatar.url"
+      :alt="avatar?.alt"
       size="36"
       color="gray-600"
-      :image="image?.url"
       rounded="lg"
     >
       <template v-if="!hasImage" #default>
-        {{ letters }}
+        {{ initials }}
       </template>
     </v-avatar>
     <div class="d-flex flex-column">
@@ -29,20 +30,23 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    icon?: string;
-    image?: { url?: string; name: string };
     title: string;
     subtitle: string | number;
+    icon?: string;
+    avatar?: {
+      name: string;
+      url?: string;
+      alt?: string;
+    };
   }>(),
-  { icon: 'mdi-account', image: undefined },
+  { icon: 'mdi-account', avatar: undefined },
 );
-const letters = computed(() => {
-  if (props.image) {
-    return getLetters(props.image.name);
-  }
+const initials = computed(() => {
+  if (!props.avatar) return 'MN';
+  return getInitials(props.avatar?.name);
 });
 
-const hasImage = computed(() => !!props.image?.url);
+const hasImage = computed(() => !!props.avatar?.url);
 </script>
 
 <style scoped>

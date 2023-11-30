@@ -17,7 +17,7 @@
     </p>
     <p class="text-subtitle-2 text-gray-500">
       Existem 3 variantes do deste card que são <strong>courses</strong>,
-      <strong>project</strong>, <strong>project_in_courses</strong>
+      <strong>project</strong>, <strong>course_project</strong>
     </p>
 
     <div class="w-100 flex-column d-flex">
@@ -41,6 +41,7 @@
         />
         <h2 class="text-h4 text-gray-800">Variant: <strong>project</strong></h2>
         <alex-learningplan-card
+          type="project"
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
@@ -56,9 +57,10 @@
           @open="() => console.log('abri')"
         />
         <h2 class="text-h4 text-gray-800">
-          Variant: <strong>project_in_courses</strong>
+          Variant: <strong>course_project</strong>
         </h2>
         <alex-learningplan-card
+          type="course_project"
           name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
@@ -149,14 +151,14 @@
             </tr>
             <tr>
               <td>type</td>
-              <td>'project' | 'course' | 'project_in_courses'</td>
+              <td>'project' | 'course' | 'course_project'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
             <tr>
               <td>status</td>
-              <td>'start' | 'running' | 'finished'</td>
+              <td>'start' | 'in_progress' | 'done'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>

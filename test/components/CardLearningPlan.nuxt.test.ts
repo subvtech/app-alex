@@ -50,7 +50,7 @@ describe('Card of Project and Courses', () => {
     unmount();
   });
 
-  it('Card should be render chip of status when props type is project_in_courses or project', async () => {
+  it('Card should be render chip of status when props type is course_project', async () => {
     const { unmount } = await renderSuspended(Card, {
       props: {
         name: 'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
@@ -64,6 +64,7 @@ describe('Card of Project and Courses', () => {
         image: {
           url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
         },
+        type: 'course_project',
       },
     });
     const cardComponent = screen.queryByTestId('alex-learningplan-card');
