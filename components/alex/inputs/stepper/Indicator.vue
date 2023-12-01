@@ -1,5 +1,5 @@
 <template>
-  <v-hover #default="{ isHovering, props }">
+  <v-hover v-slot="{ isHovering, props }">
     <div
       v-bind="props"
       class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer active"
@@ -49,8 +49,8 @@ defineProps({
     type: String,
     required: true,
   },
-  subtitle: { type: String },
-  icon: { type: String },
+  subtitle: { type: String, default: undefined },
+  icon: { type: String, default: undefined },
   stepNumber: { type: Number, required: true },
   checked: { type: Boolean, default: false },
   active: { type: Boolean, default: false },
@@ -64,7 +64,7 @@ const states = {
     subtitle: 'text-gray-400',
     bgNumber: 'bg-gray-blue',
     number: 'text-gray-400 number',
-    container: 'border-1-gray-blue elevation-4',
+    container: 'border-1-gray-blue custom-shadow',
   },
   active: {
     title: 'text-gray-600',
@@ -94,10 +94,10 @@ const useClasses = (
   hovering?: boolean,
   click?: boolean,
 ) => {
-  if (click) return states['click'];
-  else if (hovering && !active && !disabled) return states['hovering'];
-  else if (active) return states['active'];
-  else return states['default'];
+  if (click) return states.click;
+  else if (hovering && !active && !disabled) return states.hovering;
+  else if (active) return states.active;
+  else return states.default;
 };
 </script>
 
@@ -119,6 +119,10 @@ const useClasses = (
   cursor: pointer;
 }
 .active:active .number {
-  color: rgb(var(--v-theme-secondary-0)) !important
+  color: rgb(var(--v-theme-secondary-0)) !important;
+}
+
+.custom-shadow {
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
 }
 </style>
