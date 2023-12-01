@@ -48,11 +48,13 @@
 </template>
 
 <script setup lang="ts">
+import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 import useNavigationDrawer from '~/composables/useNavigationDrawer';
 
-const i18n = useI18n();
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
+
+const { profileMenuItems } = useMainHorizontalBar();
 
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
@@ -154,22 +156,6 @@ const menus = [
   },
 ];
 
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value ? user.value.username : ''}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
 </script>
 
 <style scoped lang="scss">

@@ -14,5 +14,40 @@
   "userList": "Lista de usuários",
   "accessControl": "Controle de acesso",
   "settings": "Configurações",
-  "isLoading": "Carregando..."
+  "isLoading": "Carregando...",
+  "step1": {
+    "title": "Bem vindo ao Alex, esteja pronto para aprender e ensinar!",
+    "text": "Começamos com um tour do nosso Menu Lateral, ele centraliza informações e atalhos para as principais funcionalidades do Alex.",
+    "nextButton": "Avançar"
+  },
+  "step2": {
+    "title": "Área do Usuário",
+    "text": "Aqui é a sua área, você encontra seus planos, cursos e seus favoritos.",
+    "backButton": "Voltar",
+    "nextButton": "Avançar"
+  },
+  "step3": {
+    "title": "Navegando no Alex",
+    "text": "Aqui você encontra todos os cursos e projetos criados por toda a comunidade.",
+    "backButton": "Voltar",
+    "nextButton": "Avançar"
+  },
+  "step4": {
+    "title": "Área do Professor",
+    "text": "Aqui os professores gerenciam turmas e cursos.",
+    "backButton": "Voltar",
+    "nextButton": "Avançar"
+  },
+  "step5": {
+    "title": "Perfil e Configurações",
+    "text": "Aqui você encontra o seu perfil de usuário e as configurações da sua conta no Alex.",
+    "backButton": "Voltar",
+    "nextButton": "Avançar"
+  },
+  "step6": {
+    "title": "Fim do Tour",
+    "text": "Agora você já está pronto para usar o Projeto ALEX, aproveite!",
+    "backButton": "Voltar",
+    "completeButton": "Fim"
+  }
 }

@@ -72,7 +72,8 @@
           title="John Doe"
           :items="[
             { disabled: false, title: 'text', href: '/' },
-            { disabled: false, title: 'fext2', href: '/dsd' },
+            { disabled: false, title: 'text2', href: '/dsd' },
+            { disabled: true, title: 'text3', href: '/dsd2' },
           ]"
         />
       </div>
