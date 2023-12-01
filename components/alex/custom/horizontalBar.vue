@@ -15,6 +15,7 @@
       <v-app-bar-nav-icon @click.stop="toggleDrawer" class="text-gray-900" />
 
       <v-spacer />
+      
       <div :class="[reverse ? 'ml-4' : 'mr-4']">
         <v-btn icon color="#6E7A87" @click="emit('chat')">
           <NuxtImg
@@ -52,12 +53,14 @@
                 :size="pictureSize"
                 track-current-user
                 show-border
+               
                 avatar-style="border: 1px solid #A0A8B1;"
                 class="mr-2"
               />
+             
               <span class="placeholder mr-1" style="cursor: pointer">
                 {{ computedPlaceholder }}
-              </span>
+              </span>>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
                 mdi-chevron-down
@@ -70,7 +73,7 @@
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
               <app-user-avatar
-                :placeholder="''"
+                :placeholder="computedPlaceholder"
                 :size="pictureSize"
                 class="mr-2"
               />

@@ -43,3 +43,14 @@ $btn-icon-density: (
     height: calc(var(--v-btn-height) + $size);
   }
 }
+
+
+.v-dialog.custom-alex-dialog > .v-overlay__content {
+  max-height: calc(100vh - 160px);
+};
+
+@supports(max-height: calc(100svh - 160px)) {
+  .v-dialog.custom-alex-dialog > .v-overlay__content {
+    max-height: calc(100svh - 160px);
+  };
+}

@@ -33,22 +33,26 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => (drawer = !drawer)"
+      :toggle-drawer="
+        () => {
+          drawer = !drawer;
+        }
+      "
       :menu-items="profileMenuItems"
+      :placeholder="user.fullname"
       :avatar="user.avatar"
-      :placeholder="user.placeholder"
+      show-picture
     />
 
     <v-main class="secondary bg-gray-blue pt-16">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
-        <slot />
+        <span>{{ user }}</span> <slot />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script setup lang="ts">
-const i18n = useI18n();
 const clipped = ref(false);
 const drawer = ref(true);
 const isPermanent = ref(false);

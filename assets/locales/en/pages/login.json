@@ -10,6 +10,7 @@
   "remember": "Remember me",
   "password": "Password",
   "divider": "or",
+  "blocked": "You're blacklisted.",
   "metamask": {
     "btn": "Login with Metamask",
     "notFound": "Metamask wallet wasn't detected",

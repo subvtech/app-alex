@@ -1,6 +1,6 @@
 <template>
   <div
-    class="breadcrumb-block d-flex align-baseline"
+    class="breadcrumb-block d-flex align-center"
     style="gap: 8px"
     :style="
       backgroundColor
@@ -13,6 +13,7 @@
       <a
         v-if="arrowBack && items.length > 1"
         :href="items[items.length - 2].href"
+        class="mr-5"
         role="goback"
       >
         <v-icon color="#6E7A87" style="cursor: pointer"
@@ -29,7 +30,7 @@
       <v-divider
         vertical
         :thickness="thickness"
-        class="pl-2"
+        class="pl-4"
         style="margin-block: auto; height: 24px"
         :style="barStyle ?? ''"
       />
@@ -43,16 +44,24 @@
       <template v-slot:title="{ item }">
         <v-breadcrumbs-item
           :href="item.href"
+          class="text-decoration-none"
           :disabled="item.disabled"
-          :style="[item.disabled ? '' : 'cursor: pointer', itemStyle ?? '']"
+          :style="[itemStyle ?? '']"
           :role="item.disabled ? 'breadcrumb-item-disabled' : 'breadcrumb-item'"
         >
           {{ item.title }}
         </v-breadcrumbs-item>
       </template>
-      <template v-slot:divider>
-        <slot v-if="overwriteDivider" name="divider" />
-        <span v-else :style="itemStyle ?? ''">{{ divider }}</span>
+      <template v-slot:divider="{ index }">
+        <div class="mx-1">
+          <slot v-if="overwriteDivider" name="divider" />
+          <span
+            v-else
+            :class="index !== 0 ? 'disabled' : ''"
+            :style="itemStyle ?? ''"
+            >{{ divider }}</span
+          >
+        </div>
       </template>
     </v-breadcrumbs>
   </div>
@@ -110,9 +119,12 @@ defineProps({
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.28px;
+
+    cursor: pointer;
+    pointer-events: none;
   }
 
-  .v-breadcrumbs-item .v-breadcrumbs-item--disabled {
+  .v-breadcrumbs-item.v-breadcrumbs-item--disabled {
     color: #abb2b9 !important;
     opacity: unset !important;
     /* Body/P3 */
@@ -120,6 +132,11 @@ defineProps({
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.28px;
+  }
+
+  .v-breadcrumbs-divider .disabled {
+    stroke-width: 1px;
+    color: #abb2b9;
   }
 }
 @media (max-width: 400px) {
