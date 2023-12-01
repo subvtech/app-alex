@@ -24,7 +24,7 @@
       <div class="d-flex flex-column" style="gap: 8px">
         <h2 class="text-h4 text-gray-800">Variant: <strong>courses</strong></h2>
         <alex-learningplan-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           type="course"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
@@ -42,7 +42,7 @@
         <h2 class="text-h4 text-gray-800">Variant: <strong>project</strong></h2>
         <alex-learningplan-card
           type="project"
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -61,7 +61,7 @@
         </h2>
         <alex-learningplan-card
           type="course_project"
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -72,7 +72,7 @@
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
           hide-favorited-button
-          :participants="[
+          :members="[
             {
               name: 'Edvaldo',
               image: {
@@ -163,7 +163,7 @@
               </td>
             </tr>
             <tr>
-              <td>participants</td>
+              <td>members</td>
               <td>person[]</td>
               <td class="text-center">
                 <v-icon icon="mdi-checkbox-marked" color="success" />
@@ -279,7 +279,7 @@
     <div class="w-100 flex-column d-flex">
       <div class="d-flex" style="gap: 8px">
         <alex-learningplan-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -320,7 +320,7 @@
     <div class="w-100 flex-column d-flex">
       <div class="d-flex flex-column" style="gap: 8px">
         <alex-learningplan-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -333,7 +333,7 @@
           direction="HORIZONTAL"
         />
         <alex-learningplan-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -382,7 +382,7 @@ const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
   `<alex-learningplan-card
-        name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+        title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
         description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
         :facilitator="{
           name: 'Carlos Andrade',
@@ -394,7 +394,7 @@ const examples = [
         }"
       />`,
   ` <alex-learningplan-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
@@ -407,7 +407,7 @@ const examples = [
           hide
         />`,
   `<alex-learningplan-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',

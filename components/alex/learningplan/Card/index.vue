@@ -52,7 +52,7 @@
       </v-tooltip>
 
       <div
-        class="alex-learningplan-card-hover-area"
+        data-testid="alex-learningplan-card-hover-area"
         :class="{ hover: isHovering }"
       >
         <v-menu v-if="!hideFavoritedButton">
@@ -88,6 +88,7 @@
               <template #activator="{ props: optionsTooltipProps }">
                 <alex-custom-button
                   v-if="direction !== 'HORIZONTAL' && (isHovering || isActive)"
+                  data-testid="alex-learningplan-card-hover-options"
                   variant="secondary"
                   v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                   icon="mdi-dots-vertical"
@@ -119,7 +120,8 @@
       </div>
     </div>
     <div
-      class="alex-learningplan-card-content-area d-flex flex-column gap-4"
+      class="d-flex flex-column gap-4"
+      data-testid="alex-learningplan-card-content-area"
       :class="{
         'grayscale-2': hide,
         'py-2': !isVertical,
@@ -128,15 +130,16 @@
     >
       <alex-custom-chip
         v-if="type !== 'course'"
-        :text="$t(`components.learningPlan.card.status.${status}`)"
+        data-testid="alex-learningplan-card-status-chip"
         size="small"
-        :status="statusConfig.variant"
         variant="flat"
+        :status="statusConfig.variant"
+        :text="$t(`components.learningPlan.card.status.${status}`)"
         :prepend-icon="statusConfig.icon"
       />
       <div class="d-flex flex-column pa-0 gap-2">
         <v-tooltip
-          :text="name"
+          :text="title"
           :location="isVertical ? 'top center' : 'top left'"
           max-width="360"
           :disabled="isActiveTitleTooltip"
@@ -146,7 +149,7 @@
               v-bind="nameTooltipProps"
               class="text-h5 text-gray-900 ellipsis lines-2"
             >
-              {{ name }}
+              {{ title }}
             </h5>
           </template>
         </v-tooltip>
@@ -159,7 +162,7 @@
 
       <div
         class="d-flex gap-6 flex-wrap py-2"
-        :class="{ 'justify-space-between': participants?.length }"
+        :class="{ 'justify-space-between': members?.length }"
       >
         <alex-learningplan-card-info
           :avatar="{
@@ -177,8 +180,8 @@
         />
 
         <alex-custom-avatar-group
-          v-else-if="participants && type === 'course_project'"
-          :avatar-items="participants"
+          v-else-if="members && type === 'course_project'"
+          :avatar-items="members"
           :size="36"
         />
       </div>
@@ -218,7 +221,7 @@
 </template>
 
 <script setup lang="ts">
-interface participant {
+interface member {
   name: string;
   image?: {
     url: string;
@@ -229,7 +232,7 @@ interface participant {
 interface LearningPlanCardProps {
   type?: 'project' | 'course' | 'course_project';
   image: { url: string; alt?: string };
-  name: string;
+  title: string;
   description: string;
   facilitator: { name: string; imageURL?: string };
   trailsCount: number;
@@ -238,7 +241,7 @@ interface LearningPlanCardProps {
   favorited?: boolean;
   direction?: 'HORIZONTAL' | 'VERTICAL';
   status?: 'start' | 'in_progress' | 'done';
-  participants?: participant[];
+  members?: member[];
 }
 
 const props = withDefaults(defineProps<LearningPlanCardProps>(), {
@@ -248,7 +251,7 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   hide: false,
   type: 'course',
   status: 'start',
-  participants: undefined,
+  members: undefined,
 });
 
 const isHovering = ref(false);
@@ -281,8 +284,8 @@ const statusConfig = computed<{ icon: string; variant: any }>(() => {
   }
 });
 const isActiveTitleTooltip = computed(() => {
-  if (isVertical.value) return props.name.length < 60;
-  else return props.name.length < 84;
+  if (isVertical.value) return props.title.length < 60;
+  else return props.title.length < 84;
 });
 const emits = defineEmits([
   'open',
