@@ -19,17 +19,14 @@
         @on-select="() => onSelectStep(index + 1)"
       />
     </div>
-    <div :class="stepClass">
-      <template v-for="(_, index) in stepsList" :key="index">
-        <slot
-          v-if="index == activeStep - 1"
-          :name="`step${index + 1}`"
-          :errors="errors"
-          :values="values"
-        />
-      </template>
-    </div>
-    <div v-if="!showControls" class="w-100 d-flex">
+    <template v-for="(_, index) in stepsList" :key="index">
+      <v-slide-x-transition hide-on-leave>
+        <div v-if="index == activeStep - 1" :class="stepClass">
+          <slot :name="`step${index + 1}`" :errors="errors" :values="values" />
+        </div>
+      </v-slide-x-transition>
+    </template>
+    <div v-if="!showControls && !noControls" class="w-100 d-flex">
       <alex-custom-button
         v-if="activeStep > 1"
         variant="secondary"
@@ -49,6 +46,7 @@
       />
     </div>
     <slot
+      v-if="!noControls"
       name="controls"
       :on-prev-step="onPrevStep"
       :is-valid="isValid"
@@ -77,6 +75,7 @@ type StepType<T extends string[], U> = Record<ElementType<T>, U>;
 const props = withDefaults(
   defineProps<{
     noHeader?: boolean;
+    noControls: boolean;
     stepsConfig?: Record<string, Partial<StepsConfig>>;
     submitLoading?: boolean;
     stepClass?: string;
@@ -85,6 +84,7 @@ const props = withDefaults(
   {
     submitLoading: false,
     noHeader: false,
+    noControls: false,
     stepClass: undefined,
     stepperIndicatorClass: undefined,
     stepsConfig: undefined,
