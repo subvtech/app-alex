@@ -94,7 +94,13 @@ defineProps({
 .v-field--error > .v-field__outline {
   color: #e9494a !important;
 }
+
 .v-input__details {
   padding-inline-start: 0 !important;
+}
+
+.v-input__details > .v-messages > .v-messages__message {
+  font-size: 14px !important;
+  color: #6e7a87 !important;
 }
 </style>
