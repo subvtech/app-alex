@@ -45,8 +45,8 @@
         }
       "
       :menu-items="profileMenuItems"
-      :reverse="false"
-      :user="user"
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
       show-picture
     />
 

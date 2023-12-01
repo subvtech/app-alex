@@ -87,7 +87,8 @@
               },
             ]"
             not-fixed
-            :user="user"
+            :avatar="user.avatar"
+            :placeholder="user.fullname"
           /> </v-row
       ></v-container>
       <prism>{{ examples[1] }}</prism>
@@ -125,7 +126,8 @@
               :menu-items="menuItems"
               show-picture
               not-fixed
-              :user="user"
+              :placeholder="user.fullname"
+              :avatar="user.avatar"
             /> </v-row
         ></v-container>
         <prism>{{ examples[2] }}</prism>
@@ -164,7 +166,8 @@
               reverse
               show-picture
               not-fixed
-              :user="user"
+              :placeholder="user.fullname"
+              :avatar="user.avatar"
             /> </v-row
         ></v-container>
         <prism>{{ examples[3] }}</prism>
@@ -230,8 +233,8 @@
                 :toggle-drawer="() => (drawer = !drawer)"
                 reverse
                 not-fixed
-                show-picture
-                :user="user"
+                show-picture :placeholder="user.fullname"
+              :avatar="user.avatar"
                 :is-chat-active="isChatActive"
                 :is-bell-active="isBellActive"
                 @alert="isBellActive = !isBellActive"
@@ -350,7 +353,7 @@ const menuItems: { title: string; to?: string; action?: () => void }[] = [
   {
     title: 'logout',
     action: () => {
-      console.log('here');
+      console.log('logout');
     },
   },
 ];
@@ -372,14 +375,16 @@ const examples = [
         { title: 'logout', action: () => {console.log('logout')} },
       ]"
       not-fixed
-      :user="user"
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
     />`,
   `<alex-custom-horizontalBar
       :toggle-drawer="() => (drawer = !drawer)"
       :menu-items="profileMenuItems"
       show-picture
-      not-fixed
-      :user="user"
+      not-fixed 
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
     />
      `,
   `<alex-custom-horizontalBar
@@ -388,7 +393,8 @@ const examples = [
       reverse
       show-picture
       not-fixed
-      :user="user"
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
     />
      `,
   `<alex-custom-horizontalBar
@@ -407,7 +413,8 @@ const examples = [
       reverse
       not-fixed
       show-picture
-      :user="user"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
       :is-chat-active="isChatActive"
       :is-bell-active="isBellActive"
       @alert="isBellActive = !isBellActive"
@@ -428,11 +435,18 @@ const propsDocumentation = [
     description: 'O array de items a ser exibido no dropdown-menu.',
   },
   {
-    name: 'user',
-    type: 'User',
+    name: 'avatar',
+    type: '{ id: number, url: string }',
     default: 'undefined',
     description:
-      'As informações do usuário a serem exibidas, tal como fullname e avatar.',
+      'As informações do avatar a serem exibidas, contém uma url e um id. Funciona apenas com imagens hosteadas no strapi',
+  },
+  {
+    name: 'placeholder',
+    type: 'String',
+    default: 'undefined',
+    description:
+      'Placeholder que é exibido, ele assume o papel do fullname do usuário.',
   },
   {
     name: 'isBellActive',
@@ -468,7 +482,7 @@ const propsDocumentation = [
     type: 'Boolean',
     default: 'false',
     description:
-      'Define se a photo de profile é exibido ou não, independente se o user é passado.',
+      'Define se a photo de profile é exibido ou não, independente se o avatar é passado.',
   },
   {
     name: 'reverse',

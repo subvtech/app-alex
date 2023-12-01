@@ -41,22 +41,22 @@
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
             <div
-              v-if="user && showPicture"
+              v-if="avatar && showPicture"
               v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
               <app-user-avatar
-                :profile-picture="user.avatar"
-                :placeholder="user.fullname"
+                :profile-picture="avatar"
+                :placeholder="computedPlaceholder"
                 :size="pictureSize"
                 track-current-user
                 show-border
                 avatar-style="border: 1px solid #A0A8B1;"
                 class="mr-2"
               />
-              <span class="fullname mr-1" style="cursor: pointer">
-                {{ user.fullname }}
+              <span class="placeholder mr-1" style="cursor: pointer">
+                {{ computedPlaceholder }}
               </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
@@ -74,7 +74,9 @@
                 :size="pictureSize"
                 class="mr-2"
               />
-              <span class="fullname mr-1" style="cursor: pointer"> user </span>
+              <span class="placeholder mr-1" style="cursor: pointer">
+                {{ computedPlaceholder }}
+              </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
                 mdi-chevron-down
@@ -102,17 +104,17 @@
   </v-app-bar>
 </template>
 <script setup lang="ts">
-import { User } from '../../../models/user.model';
-
 const emit = defineEmits(['alert', 'chat']);
-
+const placeholderFallback = 'user';
 const router = useRouter();
 
 const props = defineProps({
-  user: {
-    type: Object as PropType<User>,
+  avatar: {
+    type: Object as PropType<{ id: number; url: string }>,
   },
-
+  placeholder: {
+    type: String, //expects the user's placeholder
+  },
   notFixed: {
     type: Boolean,
     default: false,
@@ -155,7 +157,9 @@ const props = defineProps({
   },
 });
 
-console.log({ items: props.menuItems });
+const computedPlaceholder = computed(() =>
+  props ? props.placeholder ?? placeholderFallback : placeholderFallback,
+);
 </script>
 
 <style scoped lang="scss">
@@ -207,7 +211,7 @@ body {
         min-width: 72px;
         display: flex;
         align-items: center;
-        .fullname {
+        .placeholder {
           color: #6e7a87;
 
           font-size: 16px;
@@ -221,7 +225,7 @@ body {
     @media (max-width: 550px) {
       .v-toolbar__content {
         .user-block {
-          .fullname {
+          .placeholder {
             display: none;
           }
         }
