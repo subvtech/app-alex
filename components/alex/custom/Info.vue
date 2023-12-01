@@ -3,112 +3,154 @@
     class="info-block d-flex w-100"
     :class="[
       floatBeneath
-        ? 'float-beneath w-100 pl-6 pl-sm-8 pr-xl-10 pr-md-8 pr-sm-6 pr-xs-4  '
-        : 'float-cover  h-100 pb-4 px-6 mt-4 mt-sm-6',
+        ? 'float-beneath pl-6 pl-sm-8 pr-xl-10 pr-md-8 pr-sm-6 pr-xs-4  '
+        : 'float-cover flex-column h-100 pb-4 px-6 mt-4 mt-sm-6',
       darkerBackground && floatBeneath ? 'darker-bg rounded-t-0' : '',
-      isMaxWidthReached ? 'breakpoint' : '',
+      title && descriptionAbove ? 'hasTitle' : '',
     ]"
     data-testid="info"
   >
-    <span
-      v-if="!titleAbove && title"
-      class="title font-weight-bold text-h2 mb-4 mb-sm-6"
-      :class="[
-        !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
-        startDateOrEndDate ? 'wrap' : '',
-      ]"
-      :style="[titleStyle ?? 'color: white;']"
-      >{{ title }}</span
-    >
     <div
-      class="card d-flex flex-row justify-space-between w-100"
+      class="card d-flex flex-row justify-space-between w-100 h-100"
       :class="[
         canEdit && userId ? 'hover' : '',
         startDateOrEndDate ? 'wrap' : '',
       ]"
-      style="position: relative; background-color: transparent"
     >
-      <div
-        class="d-flex flex-row align-center"
-        :class="[
-          biggerImage ? 'resize' : '',
-          !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
-        ]"
-        style="align-self: flex-start"
-        :style="
-          floatBeneath && profilePictureSize
-            ? `max-height: ${profilePictureSize / 3}px`
-            : ''
-        "
-      >
-        <app-user-avatar
-          v-if="showProfilePicture"
-          :show-border="showBorder"
-          :profile-picture="profilePicture"
-          :can-edit="userId ? canEdit : false"
-          :can-delete="canDelete"
-          :size="profilePictureSize"
-          :avatar-style="avatarStyle"
-          :user-id="userId ?? -1"
-          :placeholder="fullname ?? ''"
-          :style="[
-            floatBeneath ? `transform: translateY(-${translateY}px);` : '',
-          ]"
-          :class="startDate || endDate ? 'absolute' : ''"
-        />
-        <div class="info" :class="[distribution, wrap ? 'flex-wrap' : '']">
-          <span
-            v-if="titleAbove && title"
-            class="title mt-0 font-weight-bold text-h2 ml-2"
-            :style="titleStyle ?? 'color: white;'"
-            role="above"
-            >{{ title }}</span
+      <div class="d-flex flex-column justify-space-between" style="gap: 8px">
+        <div class="d-flex flex-column" style="gap: 8px">
+          <div
+            v-if="title || subtitle"
+            class="title-block d-flex flex-column"
+            :class="[
+              !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
+            ]"
           >
-
-          <div class="d-flex" :class="wrap ? 'flex-wrap' : ''">
             <span
-              v-if="fullname"
-              class="font-weight-normal ml-2 text-h5 text-sm-h4 text-md-h3"
-              style="letter-spacing: 0.8"
-              :style="fullnameStyle ?? 'color: white;'"
+              v-if="title"
+              class="title font-weight-bold"
+              :class="[startDateOrEndDate ? 'wrap' : '']"
+              :style="[titleStyle ?? 'color: white;']"
+              >{{ title }}</span
             >
-              {{ fullname }}
-            </span>
             <span
-              v-if="username"
-              class="username ml-2 text-h6 text-sm-h5 text-md-h4"
-              :style="usernameStyle ?? 'color: white;'"
-              >@{{ username }}
-            </span>
+              v-if="subtitle"
+              class="subtitle font-weight-bold"
+              :class="[startDateOrEndDate ? 'wrap' : '']"
+              :style="[subtitleStyle ?? 'color: white;']"
+              >{{ subtitle }}</span
+            >
           </div>
 
-          <span
-            v-if="showRole"
-            class="role ml-2 text-h6 text-sm-h5 text-md-h4"
-            :style="roleStyle ?? 'color: white;'"
-            role="role"
+          <div
+            class="d-flex flex-row align-center"
+            :class="[
+              biggerImage ? 'resize' : '',
+              !floatBeneath ? (darkerBackground ? 'darker-bg' : '') : '',
+            ]"
+            style="align-self: flex-start"
           >
-            {{
-              isProfessor
-                ? $t('pages.profile.teacher')
-                : $t('pages.profile.student')
-            }}
-          </span>
+            <app-user-avatar
+              v-if="showProfilePicture"
+              :show-border="showBorder"
+              :profile-picture="profilePicture"
+              :can-edit="userId ? canEdit : false"
+              :can-delete="canDelete"
+              :size="profilePictureSize"
+              :avatar-style="avatarStyle"
+              :user-id="userId ?? -1"
+              :placeholder="fullname ?? ''"
+              :style="
+                floatBeneath && profilePictureSize && profilePictureSize < 160
+                  ? `top: -${profilePictureSize / 3}px`
+                  : ''
+              "
+              :class="startDate || endDate ? 'absolute' : ''"
+            />
+            <div
+              class="info"
+              :class="[
+                distribution,
+                wrap ? 'flex-wrap' : '',
+                showProfilePicture ? 'absolute' : '',
+              ]"
+              :style="
+                floatBeneath &&
+                profilePictureSize &&
+                profilePictureSize < 160 &&
+                showProfilePictureAndProfilePicture
+                  ? `margin-left: ${profilePictureSize}px`
+                  : ''
+              "
+            >
+              <div v-if="descriptionAbove" class="description-block">
+                <span
+                  v-if="description"
+                  class="title amt-0 font-weight-bold text-h2"
+                  :class="[floatBeneath ? 'ml-2' : '']"
+                  :style="titleStyle ?? 'color: white;'"
+                  role="above"
+                  >{{ description }}</span
+                >
+              </div>
+
+              <div class="d-flex" :class="wrap ? 'flex-wrap' : ''">
+                <span
+                  v-if="fullname"
+                  class="fullname font-weight-normal ml-2"
+                  :style="fullnameStyle ?? 'color: white;'"
+                >
+                  {{ fullname }}
+                </span>
+                <span
+                  v-if="username"
+                  class="username ml-2 text-h6 text-sm-h5 text-md-h4"
+                  :style="usernameStyle ?? 'color: white;'"
+                  >@{{ username }}
+                </span>
+              </div>
+
+              <span
+                v-if="showRole"
+                class="role ml-2 text-h6 text-sm-h5 text-md-h4"
+                :style="roleStyle ?? 'color: white;'"
+                role="role"
+              >
+                {{
+                  isProfessor
+                    ? $t('pages.profile.teacher')
+                    : $t('pages.profile.student')
+                }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div v-if="!descriptionAbove" class="description-block">
+          <span
+            v-if="description"
+            class="title mt-0 font-weight-bold text-h2"
+            :class="[floatBeneath ? 'ml-2' : '']"
+            :style="titleStyle ?? 'color: white;'"
+            role="above"
+            >{{ description }}</span
+          >
         </div>
       </div>
-      <div class="extra d-flex">
+      <div class="extra d-flex" :class="[showSettings ? 'no-settings' : '']">
         <div class="block d-flex flex-column">
           <div
             v-if="startDateOrEndDate"
-            class="date d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
-            style="gap: 8px"
-            :style="[
+            class="date d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-sm-6"
+            :class="[
               !floatBeneath
                 ? darkerBackground
-                  ? 'background-color: rgba(0, 0, 0, 0.5); color: white'
-                  : 'background-color: white; color: #232b32'
+                  ? 'darker-bg'
+                  : 'white-bg'
+                : darkerBackground
+                ? 'darker-bg'
                 : '',
             ]"
+            style="gap: 8px"
           >
             <div
               v-if="startDate"
@@ -149,14 +191,14 @@
 
           <div
             v-if="code"
-            class="d-flex align-center py-1 py-sm-2 px-2 px-sm-4 mt-2 rounded-lg ml-4 ml-sm-6"
+            class="code d-flex align-center py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
             :class="[
               !floatBeneath
                 ? darkerBackground
                   ? 'darker-bg'
                   : 'white-bg'
                 : '',
-              !titleAbove && title ? 'wrap' : '',
+              title ? 'absolute' : '',
             ]"
             style="gap: 8px; cursor: pointer; align-self: flex-end"
             :style="codeStyle ?? ''"
@@ -170,7 +212,10 @@
         <div
           v-if="canEdit && showSettings"
           class="settings mx-1 py-1 px-1 mx-xs-2"
-          :class="darkerBackground ? 'darker-bg' : ''"
+          :class="[
+            darkerBackground ? 'darker-bg' : '',
+            showProfilePictureAndProfilePicture ? 'absolute' : '',
+          ]"
           style="height: min-content; color: #6e7a87"
           role="settings"
         >
@@ -228,11 +273,10 @@ const props = defineProps({
     default: 'mdi-cog-outline',
   },
 
-  titleAbove: {
+  descriptionAbove: {
     type: Boolean,
     default: false,
   },
-
   darkerBackground: {
     type: Boolean,
     default: false,
@@ -264,6 +308,9 @@ const props = defineProps({
     type: String,
   },
 
+  description: {
+    type: String,
+  },
   codeStyle: {
     type: String,
   },
@@ -290,11 +337,18 @@ const props = defineProps({
     type: String,
   },
 
+  subtitleStyle: {
+    type: String,
+  },
+
   roleStyle: {
     type: String,
   },
 
   title: {
+    type: String,
+  },
+  subtitle: {
     type: String,
   },
   startDate: {
@@ -320,21 +374,10 @@ const biggerImage = computed(() => {
   return props.resize && props.profilePictureSize > 100;
 });
 
-const translateY = computed(() => {
-  let profilePictureSize, ratio;
-  if (props.profilePictureSize >= 160) {
-    profilePictureSize = 160;
-  } else {
-    profilePictureSize = props.profilePictureSize;
-  }
-
-  ratio = (100 * profilePictureSize) / (60 + profilePictureSize);
-
-  return (profilePictureSize * ratio) / profilePictureSize;
-});
-
 const currentWidth = ref(window.innerWidth);
-
+const showProfilePictureAndProfilePicture = computed(() => {
+  return props.showProfilePicture && props.profilePicture;
+});
 // Update the currentWidth when the window is resized
 window.addEventListener('resize', () => {
   currentWidth.value = window.innerWidth;
@@ -346,24 +389,6 @@ const startDateAndEndDate = computed(() => {
 
 const startDateOrEndDate = computed(() => {
   return props.startDate || props.endDate;
-});
-
-const isMaxWidthReached = computed(() => {
-  const { profilePictureSize } = props;
-
-  let temp = 500;
-  if (profilePictureSize < 10) {
-    temp = profilePictureSize * 40 + 250;
-  } else if (profilePictureSize < 20) {
-    temp = profilePictureSize * 20 + 250;
-  } else if (profilePictureSize < 50) {
-    temp = profilePictureSize * 13 + 300;
-  } else if (profilePictureSize < 100) {
-    temp = profilePictureSize * 5 + 200;
-  } else if (profilePictureSize < 160) {
-    temp = profilePictureSize * 3 + 250;
-  }
-  return currentWidth.value < temp;
 });
 
 async function copyToClipboard(text) {
@@ -387,65 +412,24 @@ async function copyToClipboard(text) {
   color: #232b32;
 }
 
-.breakpoint {
-  &.float-beneath {
-    .resize {
-      display: flex;
-      align-items: center;
-
-      .avatar-block {
-        align-items: center;
-      }
-    }
-  }
-
-  &.float-cover {
-    .resize {
-      .avatar-block {
-        .avatar {
-          .img {
-            width: 80px !important;
-            height: 80px !important;
-          }
-        }
-      }
-    }
-    .card {
-      .extra {
-        .d-flex.flex-column {
-          .date {
-            flex-direction: column;
-            .d-flex {
-              margin-right: 0px !important;
-              align-items: center !important;
-              justify-content: center !important;
-            }
-            .horizontal {
-              display: flex !important;
-            }
-            .vertical {
-              display: none !important;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 .float-beneath {
   flex-direction: column-reverse !important;
   gap: 8px;
 
-  .title {
-    margin-top: -60px;
-    &.wrap {
-      margin-top: -25px;
+  &.hasTitle {
+    flex-direction: column !important;
+    margin-block: 0px !important;
+    .title {
+      margin-left: 180px;
     }
-  }
-  .d-flex {
-    .d-flex.flex-row {
-      width: 100%;
+    .card {
+      .d-flex.flex-row {
+        margin-top: 10px;
+        .avatar-block.absolute {
+          position: absolute;
+          top: -135px;
+        }
+      }
     }
   }
 
@@ -453,13 +437,26 @@ async function copyToClipboard(text) {
     flex-direction: column;
     align-self: start !important;
     padding-block: 16px;
+    position: relative;
 
     .d-flex.flex-row {
       align-items: flex-start !important;
-
-      .avatar-block.absolute {
+      width: 100%;
+      .avatar-block {
         position: absolute;
-        top: -50px;
+
+        top: -88px;
+      }
+
+      .info.absolute {
+        margin-left: 156px;
+      }
+    }
+
+    .extra {
+      .code.absolute {
+        position: absolute;
+        bottom: 0px;
       }
     }
   }
@@ -467,22 +464,31 @@ async function copyToClipboard(text) {
 .float-cover {
   position: absolute;
   top: 0px;
+  max-height: 300px;
   width: 100%;
   display: flex;
   flex-direction: row;
   transition: all ease-in-out 1s;
   gap: 8px;
   .darker-bg {
-    padding-inline: 8px;
-    padding-block: 16px;
+    padding-inline: 16px;
+    padding-block: 8px;
   }
 
-  .title {
+  .description-block {
     position: absolute;
-    bottom: 62px;
+    bottom: 24px;
   }
+  .title-block {
+    .title.absolute {
+      position: absolute;
+      bottom: 62px;
+    }
+  }
+
   .card {
-    .d-flex.flex-row {
+    .d-flex.flex-column.justify-space-between {
+      padding-bottom: 24px;
       .info {
         padding-left: 0px !important;
       }
@@ -495,6 +501,10 @@ async function copyToClipboard(text) {
       flex-wrap: wrap-reverse;
       align-self: flex-start;
       gap: 4px;
+
+      .block {
+        gap: 8px;
+      }
 
       .settings {
         align-self: flex-end;
@@ -512,6 +522,8 @@ async function copyToClipboard(text) {
   transition: all ease-in-out 1s;
 
   .card {
+    position: relative;
+    background-color: transparent;
     .single-row {
       justify-content: center;
       align-items: center;
@@ -591,10 +603,11 @@ async function copyToClipboard(text) {
       .d-flex {
         .fullname {
           color: #0d4173;
-          font-size: 24px;
+          font-size: 16px;
           font-style: normal;
           font-weight: bold;
           line-height: 28px;
+          width: max-content;
         }
 
         .username {
@@ -612,9 +625,138 @@ async function copyToClipboard(text) {
       }
     }
   }
+
+  .title-block {
+    width: max-content;
+    .title {
+      font-size: 16px;
+    }
+    .subtitle {
+      font-size: 24px;
+    }
+  }
 }
+
+@media (max-height: 740px) {
+  .float-beneath {
+    .card {
+      .d-flex.flex-column {
+        .d-flex.flex-column {
+          .info.absolute {
+            margin-left: 124px;
+          }
+          .title-block {
+            margin-left: 124px;
+          }
+        }
+      }
+      .d-flex.flex-row.resize {
+        .avatar-block {
+          top: -60px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .float-beneath {
+      .card {
+        .d-flex.flex-column {
+          .info.absolute {
+            margin-left: 96px;
+          }
+          .info {
+            margin-left: 0px;
+          }
+          .title-block {
+            margin-left: 0px;
+          }
+          .avatar-block.absolute {
+            top: -105px;
+          }
+        }
+
+        &.wrap {
+          .extra {
+            justify-content: flex-end;
+
+            .d-flex.mt-2.align-center.wrap {
+              bottom: -10px;
+            }
+          }
+        }
+
+        .extra {
+          &.no-settings {
+            .date {
+              top: -300px !important;
+            }
+
+            .settings.absolute {
+              position: absolute;
+              top: -40px;
+            }
+
+            .code {
+              position: absolute;
+              bottom: 30px !important;
+            }
+          }
+          .code {
+            span {
+              display: none;
+            }
+          }
+        }
+
+        .d-flex.flex-row.resize {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      &.hasTitle {
+        .card {
+          .d-flex.flex-row {
+            .avatar-block.absolute {
+              top: -160px;
+            }
+          }
+        }
+      }
+    }
+
+    .float-cover {
+      padding-inline: 8px !important;
+      .card {
+        gap: 4px;
+
+        .extra {
+          .block {
+            .date {
+              padding-inline: 4px !important;
+            }
+            .code {
+              span {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .title {
+      font-size: 1rem !important;
+    }
+  }
+}
+
 @media (max-width: 900px) {
   .card {
+    .extra {
+      margin-top: 0px;
+    }
     .username-role-fullname.flex-wrap {
       align-items: baseline;
       justify-content: flex-start;
@@ -654,7 +796,7 @@ async function copyToClipboard(text) {
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 700px) {
   .float-beneath {
     .card.wrap {
       flex-wrap: wrap;
@@ -666,14 +808,38 @@ async function copyToClipboard(text) {
         width: 100%;
         align-items: center;
         justify-content: center;
-      }
 
-      .extra {
-        justify-content: flex-end;
         .date {
           position: absolute;
           top: -300px;
           right: 0px;
+          &.darker-bg {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            right: 5px;
+          }
+
+          &.white-bg {
+            background-color: white;
+            color: #232b32;
+          }
+        }
+
+        &.no-settings {
+          .date {
+            top: -290px !important;
+          }
+
+          .settings.absolute {
+            position: absolute;
+            top: 10px;
+          }
+
+          .code {
+            position: absolute;
+            bottom: 20px !important;
+            right: 0px !important;
+          }
         }
 
         .d-flex.mt-2.align-center.wrap {
@@ -687,10 +853,35 @@ async function copyToClipboard(text) {
         }
       }
 
-      .settings {
+      .settings.absolute {
         position: absolute;
-        right: 4px;
+        right: 0px;
         top: 12px;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .float-cover {
+    .card {
+      .extra {
+        .block {
+          .date {
+            flex-direction: column;
+            .d-flex {
+              margin-right: 0px !important;
+              align-items: center !important;
+              justify-content: center !important;
+            }
+            .horizontal {
+              display: flex !important;
+            }
+            .vertical {
+              display: none !important;
+            }
+          }
+        }
       }
     }
   }
@@ -699,9 +890,21 @@ async function copyToClipboard(text) {
 @media (max-width: 480px) {
   .float-beneath {
     .card {
-      .d-flex.flex-row {
-        .avatar-block.absolute {
-          top: -30px !important;
+      .d-flex.flex-column {
+        .d-flex.flex-column {
+          .info.absolute {
+            margin-left: 99px;
+          }
+          .info {
+            margin-left: 0px;
+          }
+          .title-block {
+            margin-left: 99px !important;
+          }
+        }
+
+        .avatar-block {
+          top: -55px !important;
         }
       }
 
@@ -715,20 +918,80 @@ async function copyToClipboard(text) {
         }
       }
 
-      .resize {
+      .extra {
+        &.no-settings {
+          .date {
+            top: -300px !important;
+          }
+
+          .settings.absolute {
+            position: absolute;
+            top: -40px;
+          }
+
+          .code {
+            position: absolute;
+            bottom: 30px !important;
+          }
+        }
+        .code {
+          span {
+            display: none;
+          }
+        }
+      }
+
+      .d-flex.flex-row.resize {
         display: flex;
         align-items: center;
+      }
+    }
+
+    &.hasTitle {
+      .card {
+        .d-flex.flex-row {
+          .avatar-block.absolute {
+            top: -160px;
+          }
+        }
       }
     }
   }
 
   .float-cover {
     padding-inline: 8px !important;
+
     .card {
       gap: 4px;
+      flex-wrap: wrap;
 
-      .date {
-        padding-inline: 4px !important;
+      .extra {
+        justify-content: flex-start;
+        margin-top: -50px;
+        .block {
+          flex-direction: row !important;
+
+          .date {
+            flex-direction: row;
+            .d-flex {
+              margin-right: 0px !important;
+              align-items: center !important;
+              justify-content: center !important;
+            }
+            .horizontal {
+              display: none !important;
+            }
+            .vertical {
+              display: flex !important;
+            }
+          }
+
+          .code {
+            span {
+              display: none;
+            }
+          }
+        }
       }
     }
   }
@@ -747,20 +1010,6 @@ async function copyToClipboard(text) {
     .card {
       .d-flex.flex-row {
         max-height: unset !important;
-
-        .info {
-          margin-left: 0px !important;
-        }
-
-        .avatar-block.absolute {
-          top: -20px !important;
-        }
-
-        .avatar-block {
-          align-items: center;
-          position: absolute;
-          top: -15px;
-        }
       }
       &.wrap {
         .extra {
@@ -782,18 +1031,22 @@ async function copyToClipboard(text) {
 @media (max-width: 404px) {
   .float-beneath {
     .card {
-      .d-flex.flex-row {
-        .info {
-          margin-left: 0px;
+      .d-flex.flex-column {
+        .d-flex.flex-column {
+          .info {
+            margin-left: 0px !important;
+          }
+          .title-block {
+            margin-left: 0px !important;
+          }
+
+          .description-block {
+            margin-left: 0px !important;
+          }
         }
 
-        .avatar-block.absolute {
-          top: 0px !important;
-        }
-      }
-      .resize {
         .avatar-block {
-          top: 10px;
+          top: -85px !important;
         }
       }
     }
@@ -801,19 +1054,39 @@ async function copyToClipboard(text) {
 
   .float-cover {
     .card {
-      flex-wrap: wrap;
-      align-self: flex-start;
       .d-flex.flex-row.align-center {
         padding-left: 16px;
       }
+      .d-flex.flex-column.justify-space-between {
+        padding-bottom: 0px;
+      }
+
       .extra {
         width: 100%;
-        align-items: flex-end;
+
         flex-direction: row;
-        justify-content: space-between;
         flex-wrap: wrap-reverse;
 
         gap: 4px;
+      }
+    }
+  }
+}
+
+@media (max-width: 365px) {
+  .float-cover {
+    .card {
+      .description-block {
+        bottom: 12px;
+      }
+      .extra {
+        .block {
+          .code {
+            position: absolute;
+            right: 0px;
+            bottom: 12px;
+          }
+        }
       }
     }
   }
@@ -835,9 +1108,11 @@ async function copyToClipboard(text) {
   }
 
   .float-beneath {
-    .resize {
-      .avatar-block {
-        top: 0px !important;
+    .card {
+      .d-flex.flex-row.resize {
+        .avatar-block {
+          top: -80px !important;
+        }
       }
     }
   }
