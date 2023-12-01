@@ -90,7 +90,7 @@
               item.to
                 ? router.push({ path: item.to })
                 : item.action
-                ? item.action
+                ? item.action()
                 : () => {}
             "
           >
@@ -108,7 +108,7 @@ const emit = defineEmits(['alert', 'chat']);
 
 const router = useRouter();
 
-defineProps({
+const props = defineProps({
   user: {
     type: Object as PropType<User>,
   },
@@ -119,7 +119,9 @@ defineProps({
   },
 
   menuItems: {
-    type: Array as PropType<{ title: string; to?: string; action?: () => void }[]>,
+    type: Array as PropType<
+      { title: string; to?: string; action?: () => void }[]
+    >,
     default: [],
   },
 
@@ -152,6 +154,8 @@ defineProps({
     default: 40,
   },
 });
+
+console.log({ items: props.menuItems });
 </script>
 
 <style scoped lang="scss">
