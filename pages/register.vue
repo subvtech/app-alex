@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0 height-100" fluid>
+  <v-container id="register" class="pa-0 height-100 overflow-hidden" fluid>
     <v-row class="fill-height w-100 ma-0">
       <v-col
         sm="0"
@@ -10,6 +10,7 @@
       >
         <img class="signUp" src="/images/signUp.svg" />
       </v-col>
+
       <v-col
         cols="12"
         sm="12"
@@ -18,15 +19,23 @@
         xl="4"
         class="bg-primary pa-0 content-field"
       >
-        <div class="ellipse ellipse-top" />
+        <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end">
+          <img
+            height="40"
+            width="120"
+            alt="Alex"
+            src="/images/alex.svg"
+            class="mt-8 mb-7"
+          />
+        </div>
+
         <SuccessMessage
           v-if="registeredUser"
           :title="$t('pages.register.success.title')"
           :subtitle="$t('pages.register.success.subtitle')"
         />
 
-        <RegisterFields v-else @successMessage="onRegisteredUser"/>
-        <div class="ellipse ellipse-bottom" />
+        <RegisterFields v-else @success:message="onRegisteredUser" />
       </v-col>
     </v-row>
   </v-container>
@@ -35,19 +44,21 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
-  middleware: 'control-access'
+  middleware: 'control-access',
 });
 const registeredUser = ref(false);
 const onRegisteredUser = () => {
-  registeredUser.value = true
-}
+  registeredUser.value = true;
+};
 </script>
 
 <style scoped lang="scss">
 .content-field {
-  background-image: url('../assets/svg/Bubbles.svg');
-  background-size: 100% 100%;
+  background-image: url('/images/login-bg.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
   height: 100%;
+
   overflow-y: scroll;
   display: grid;
 }
@@ -57,40 +68,21 @@ const onRegisteredUser = () => {
 }
 
 .content-field {
-  overflow-y: auto !important
+  overflow-y: auto !important;
 }
 
 .content-field::-webkit-scrollbar {
   width: 12px;
 }
 
-
 .content-field::-webkit-scrollbar-thumb {
-  background-color: #00B8CC;
+  background-color: #00b8cc;
   border-radius: 999px;
-  border: 3px solid rgb(var(--v-theme-primary)) !important;;
-  
+  border: 3px solid rgb(var(--v-theme-primary)) !important;
 }
 
-.content-field::-webkit-scrollbar-track { 
+.content-field::-webkit-scrollbar-track {
   background-color: rgb(var(--v-theme-primary)) !important;
-}
-
-.ellipse {
-  width: 100%;
-  aspect-ratio: 4.4 / 1.3;
-  &-top {
-    background-image: url('../assets/svg/EllipseLogo.svg');
-    background-size: 130%;
-    background-position: 50% 100%;
-  }
-  &-bottom {
-    aspect-ratio: 4 / 0.9;
-    background-image: url('../assets/svg/Ellipse.svg');
-    background-size: 130%;
-    background-position: top;
-    align-self: flex-end;
-  }
 }
 
 .signUp {
@@ -99,8 +91,19 @@ const onRegisteredUser = () => {
 
 @media screen and (max-width: 500px) {
   .content-field::-webkit-scrollbar {
-  width: 8px;
-}
+    width: 8px;
+  }
 }
 
+@media (max-height: 768px) {
+  .content-field {
+    div.mt-12 {
+      margin-top: 20px !important;
+    }
+
+    div img.mt-8 {
+      margin-bottom: 8px !important;
+    }
+  }
+}
 </style>

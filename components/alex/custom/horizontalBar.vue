@@ -5,6 +5,7 @@
     class="px-4"
     :class="[notFixed ? 'not-fixed' : '']"
     data-testid="horizontal-bar"
+    style="min-width: max-content"
   >
     <div
       class="d-flex w-100 align-center"
@@ -14,32 +15,33 @@
       <v-app-bar-nav-icon @click.stop="toggleDrawer" class="text-gray-900" />
 
       <v-spacer />
-      <v-btn icon color="#6E7A87" @click="emit('chat')">
-        <NuxtImg
-          :src="
-            isChatActive ? '/svg/chat-read-active.svg' : '/svg/chat-read.svg'
-          "
-          width="24"
-          height="24"
-          role="chat-active"
-        />
-      </v-btn>
-      <v-btn icon color="grey" @click="emit('alert')" class="mr-2">
-        <NuxtImg
-          v-if="isBellActive"
-          src="/svg/bell.svg"
-          width="24"
-          height="24"
-          role="bell-active"
-        />
-        <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
-      </v-btn>
-
+      <div :class="[reverse ? 'ml-4' : 'mr-4']">
+        <v-btn icon color="#6E7A87" @click="emit('chat')">
+          <NuxtImg
+            :src="
+              isChatActive ? '/svg/chat-read-active.svg' : '/svg/chat-read.svg'
+            "
+            width="24"
+            height="24"
+            role="chat-active"
+          />
+        </v-btn>
+        <v-btn icon color="grey" @click="emit('alert')" class="">
+          <NuxtImg
+            v-if="isBellActive"
+            src="/svg/bell.svg"
+            width="24"
+            height="24"
+            role="bell-active"
+          />
+          <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
+        </v-btn>
+      </div>
       <v-menu offset-y nudge-bottom="10">
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
             <div
-              v-if="user"
+              v-if="user && showPicture"
               v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
@@ -47,6 +49,7 @@
               <app-user-avatar
                 :profile-picture="user.avatar"
                 :placeholder="user.fullname"
+                :size="pictureSize"
                 track-current-user
                 show-border
                 avatar-style="border: 1px solid #A0A8B1;"
@@ -61,12 +64,16 @@
               </v-icon>
             </div>
             <div
-              v-else
+              v-else-if="showPicture"
               v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
-              <app-user-avatar :placeholder="''" class="mr-2" />
+              <app-user-avatar
+                :placeholder="''"
+                :size="pictureSize"
+                class="mr-2"
+              />
               <span class="fullname mr-1" style="cursor: pointer"> user </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
@@ -79,7 +86,13 @@
           <v-list-item
             v-for="(item, index) in menuItems"
             :key="`profile-menu-item-${index}`"
-            @click="onMenuClick(item.to ?? '/', item.logout)"
+            @click="
+              item.to
+                ? router.push({ path: item.to })
+                : item.action
+                ? item.action
+                : () => {}
+            "
           >
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
@@ -91,12 +104,11 @@
 <script setup lang="ts">
 import { User } from '../../../models/user.model';
 
-const { logout } = useStrapiAuth();
 const emit = defineEmits(['alert', 'chat']);
 
 const router = useRouter();
 
-const props = defineProps({
+defineProps({
   user: {
     type: Object as PropType<User>,
   },
@@ -107,7 +119,7 @@ const props = defineProps({
   },
 
   menuItems: {
-    type: Array as PropType<{ title: string; to?: string; logout: boolean }[]>,
+    type: Array as PropType<{ title: string; to?: string; action?: () => void }[]>,
     default: [],
   },
 
@@ -129,20 +141,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
+  showPicture: {
+    type: Boolean,
+    default: false,
+  },
+
+  pictureSize: {
+    type: Number,
+    default: 40,
+  },
 });
-
-function onMenuClick(route = '', logout = false) {
-  if (logout) {
-    logoutUser();
-  } else {
-    router.push({ path: route });
-  }
-}
-
-function logoutUser() {
-  logout();
-  router.push('/login');
-}
 </script>
 
 <style scoped lang="scss">
@@ -217,6 +226,12 @@ body {
   }
 }
 
+.d-flex.w-100.align-center {
+  .v-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
 .not-fixed {
   position: static !important;
   top: unset !important;
