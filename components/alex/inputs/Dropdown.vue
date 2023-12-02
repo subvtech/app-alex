@@ -21,10 +21,11 @@
     >
       <v-list-item
         v-for="(
-          { text, type, icon, link, warning, onClick: onClickItem }, index
+          { text, icon, link, warning, onClick: onClickItem }, index
         ) in items"
         :key="index"
         class="d-flex pa-2 px-4 text-decoration"
+        data-testid="testint-dropdown-item"
         :min-width="200"
         :class="{
           'v-menu-dark': isDarkMode,
@@ -36,7 +37,12 @@
         @click="onClick(link, onClickItem)"
       >
         <div class="d-flex gap-4 text-body-4 align-center justify-center">
-          <v-icon v-if="type === 'text-icon' || icon" :icon="icon" :size="24" />
+          <v-icon
+            v-if="icon"
+            data-testid="testint-dropdown-item-icon"
+            :icon="icon"
+            :size="24"
+          />
           <span>{{ text }} </span>
         </div>
       </v-list-item>
@@ -46,15 +52,13 @@
 
 <script setup lang="ts">
 export interface Item {
-  type: 'text' | 'text-icon';
   text: string;
-  link?: string;
   icon?: string;
+  link?: string;
   warning?: boolean;
   selected?: boolean;
   onClick?: () => unknown;
 }
-
 interface DropdownProps {
   items: Item[];
   isDarkMode?: boolean;

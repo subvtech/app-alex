@@ -294,10 +294,10 @@
         </thead>
         <tbody>
           <tr>
-            <td>type</td>
-            <td>'text' | 'text-icon'</td>
+            <td>text</td>
+            <td>string</td>
             <td class="text-center">
-              <v-icon icon="mdi-checkbox-marked" color="success" />
+              <v-icon icon="mdi-close-box" color="error" />
             </td>
           </tr>
           <tr>
@@ -422,19 +422,16 @@ const thirdExampleActivePage = ref('1');
 
 const itemsComponentePropsExample = ref<Item[]>([
   {
-    type: 'text-icon',
     link: '/',
     icon: 'mdi-home',
     text: 'Início',
   },
   {
-    type: 'text-icon',
     link: '/profile',
     icon: 'mdi-account-circle',
     text: 'Perfil',
   },
   {
-    type: 'text-icon',
     icon: 'mdi-account',
     link: '/user/settings',
     text: 'Configurações',
@@ -442,19 +439,16 @@ const itemsComponentePropsExample = ref<Item[]>([
 ]);
 const itemsComponenteDarkWarning = ref<Item[]>([
   {
-    type: 'text-icon',
     link: '/',
     icon: 'mdi-home',
     text: 'Início',
   },
   {
-    type: 'text-icon',
     link: '/profile',
     icon: 'mdi-account-circle',
     text: 'Perfil',
   },
   {
-    type: 'text-icon',
     icon: 'mdi-trash-can-outline',
     text: 'Excluir conta',
     warning: true,
@@ -463,16 +457,13 @@ const itemsComponenteDarkWarning = ref<Item[]>([
 
 const itemsComponenteNoIcon = ref<Item[]>([
   {
-    type: 'text',
     text: 'Verificar',
   },
   {
-    type: 'text',
     text: 'Editar',
     link: '/profile',
   },
   {
-    type: 'text',
     text: 'Excluir conta',
   },
 ]);
@@ -480,18 +471,18 @@ const itemsComponenteNoIcon = ref<Item[]>([
 const propsExampleScript = `
 const itemsComponente2 = ref<Item[]>([
   {
-    type: 'text-icon',
+    
     text: 'Verificar',
     icon: 'mdi-check-decagram-outline',
   },
   {
-    type: 'text-icon',
+    
     icon: 'mdi-pencil-outline',
     text: 'Editar',
     link: '/profile',
   },
   {
-    type: 'text-icon',
+    
     icon: 'mdi-trash-can-outline',
     text: 'Excluir conta',
   },
@@ -505,19 +496,19 @@ const firstExampleTemplate = `
 const firstExampleScript = `
     const itemsComponente = ref<Item[]>([
       {
-        type: 'text-icon',
+        
         link: '/',
         icon: 'mdi-home',
         text: 'Início',
       },
       {
-        type: 'text-icon',
+        
         link: '/profile',
         icon: 'mdi-account-circle',
         text: 'Perfil',
       },
       {
-        type: 'text-icon',
+        
         icon: 'mdi-account',
         link: '/user/settings',
         text: 'Configurações',
@@ -529,16 +520,16 @@ const firstExampleScript = `
 const noIconExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteNoIcon" />`;
 const noIconExampleScript = `const itemsComponenteNoIcon = ref<Item[]>([
   {
-    type: 'text',
+   
     text: 'Verificar',
   },
   {
-    type: 'text',
+   
     text: 'Editar',
     link: '/profile',
   },
   {
-    type: 'text',
+   
     text: 'Excluir conta',
     warning: true,
   },
@@ -555,19 +546,19 @@ const thirdExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteDarkW
 
 const thirdExampleDarkWarning = `const itemsComponenteDarkWarning = ref<Item[]>([
   {
-    type: 'text-icon',
+    
     link: '/',
     icon: 'mdi-home',
     text: 'Início',
   },
   {
-    type: 'text-icon',
+    
     link: '/profile',
     icon: 'mdi-account-circle',
     text: 'Perfil',
   },
   {
-    type: 'text-icon',
+    
     icon: 'mdi-trash-can-outline',
     text: 'Excluir conta',
     warning: true,
