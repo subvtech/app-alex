@@ -111,6 +111,11 @@ const menus = [
         title: 'Card projetos e cursos',
         to: '/components/learning-plans/card',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/inputs/dropdown',
+      },
     ],
   },
 ];
