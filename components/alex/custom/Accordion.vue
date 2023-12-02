@@ -11,19 +11,23 @@
         @dragenter="(e) => e.preventDefault()"
       >
         <v-expansion-panel-title class="expand-panel">
-          <v-icon
-            data-testid="dragItem"
+          <div
             class="drag-icon"
-            icon="mdi-drag"
-            color="gray-300"
+            data-testid="dragItem"
             draggable="true"
             @dragstart="
               (e) => {
-                const dragGhost = e.target.closest('.expand-panel');
-                startDrag(item, e, dragGhost);
+                startDrag(item, e, '.expand-panel');
               }
             "
-          />
+          >
+            <v-icon
+              style="min-width: 16px !important; height: 16px; width: 16px"
+              src="@assets/svg/DragIndicator.svg"
+              icon="alex:DragIndicator"
+              color="gray-300"
+            />
+          </div>
           <p
             v-if="item.position || (showPositions && item.position !== false)"
             class="text-gray-300 ml-2 mr-1 font-weight-bold"
@@ -32,7 +36,7 @@
           </p>
           <v-icon
             v-if="item.icon"
-            class="ml-3 mr-2 icon-border"
+            class="mr-2 icon-border"
             color="gray-500"
             :icon="item.icon"
           />
@@ -46,7 +50,13 @@
             {{ item.title }}
           </span>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="deleteItem(index)">
+          <v-btn
+            class="mx-4 delete-btn"
+            variant="text"
+            size="36px"
+            color="transparent"
+            @click="deleteItem(index)"
+          >
             <v-icon
               size="24px"
               icon="mdi-trash-can-outline"
@@ -144,6 +154,10 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 }
 
 .drag-icon {
+  width: 16px !important;
+  height: 16px !important;
+  position: absolute;
+  left: 4px;
   cursor: grab;
   transition: 0.3s ease;
   &:hover {
@@ -174,11 +188,21 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
   min-height: 60px !important;
 }
 
-.v-expansion-panel-title:hover {
+.v-expansion-panel-title:hover:not(:has(.delete-btn:hover)) {
   background-color: #ebedef !important;
 }
 
 .v-expansion-panel-title__overlay {
   display: none;
+}
+
+.delete-btn {
+  transition: all 0.3s ease;
+  &:hover {
+    background-color: #ebedef !important;
+  }
+  &:active {
+    background-color: #d2d6da !important;
+  }
 }
 </style>
