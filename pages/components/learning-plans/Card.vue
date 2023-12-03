@@ -302,59 +302,6 @@
         </v-btn>
       </div>
     </div>
-
-    <h2 class="text-h2 text-gray-800">Variante: Horizontal</h2>
-    <p class="text-subtitle-2 text-gray-500">
-      Modo horizontal do card facilitando a visualização em telas menores como o
-      tablet
-    </p>
-
-    <div class="w-100 flex-column d-flex">
-      <div class="d-flex flex-column" style="gap: 8px">
-        <alex-learningplan-card
-          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
-          description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
-          :facilitator="{
-            name: 'Carlos Andrade',
-            imageURL: 'https://thispersondoesnotexist.com/',
-          }"
-          :trails-count="40"
-          :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
-          }"
-        />
-        <alex-learningplan-card
-          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
-          description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
-          :facilitator="{
-            name: 'Carlos Andrade',
-            imageURL: 'https://thispersondoesnotexist.com/',
-          }"
-          :trails-count="40"
-          :image="{
-            url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
-          }"
-          hide
-        />
-      </div>
-      <div class="px-3 w-100" style="position: relative">
-        <prism> {{ examples[2] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(2)"
-        >
-          <v-icon
-            v-if="copiedIndex === 2"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
   </v-container>
 </template>
 
