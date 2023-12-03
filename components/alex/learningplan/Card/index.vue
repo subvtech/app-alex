@@ -76,6 +76,7 @@
           </template>
         </v-menu>
         <alex-inputs-dropdown
+          v-if="direction !== 'HORIZONTAL'"
           v-model="showOptions"
           :close-on-content-click="false"
           :class="{ hidden: !isHovering && !showOptions }"
@@ -88,7 +89,7 @@
             >
               <template #activator="{ props: optionsTooltipProps }">
                 <alex-custom-button
-                  v-if="direction !== 'HORIZONTAL' && (isHovering || isActive)"
+                  v-if="isHovering || isActive"
                   data-testid="alex-learningplan-card-hover-options"
                   variant="secondary"
                   v-bind="{ ...propsMenu, ...optionsTooltipProps }"
@@ -171,8 +172,9 @@
 
     <div v-if="!isVertical" class="h-full">
       <alex-inputs-dropdown
+        v-model="showOptions"
         :close-on-content-click="false"
-        :class="{ hidden: !isHovering && !options }"
+        :class="{ hidden: !isHovering && !showOptions }"
         :items="options"
       >
         <template #activator="{ props: propsMenu }">
@@ -185,7 +187,6 @@
                 variant="text"
                 v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                 icon="mdi-dots-vertical"
-                class="options"
               />
             </template>
           </v-tooltip>
