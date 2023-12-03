@@ -175,12 +175,20 @@
         :class="{ hidden: !isHovering && !options }"
         :items="options"
       >
-        <template #activator="{ props: optionsProps }">
-          <alex-custom-button
-            v-bind="optionsProps"
-            variant="text"
-            icon="mdi-dots-vertical"
-          />
+        <template #activator="{ props: propsMenu }">
+          <v-tooltip
+            :text="$t('components.learningPlan.card.options')"
+            location="bottom center"
+          >
+            <template #activator="{ props: optionsTooltipProps }">
+              <alex-custom-button
+                variant="text"
+                v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                icon="mdi-dots-vertical"
+                class="options"
+              />
+            </template>
+          </v-tooltip>
         </template>
       </alex-inputs-dropdown>
     </div>
