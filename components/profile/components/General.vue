@@ -48,7 +48,7 @@
         :userId="userId"
         :can-edit="canEdit"
         :userTags="generalTags"
-        :is-general="true"
+        is-general
         @update:user="emit('update:user')"
       ></profile-competences>
     </div>
@@ -108,11 +108,18 @@ const props = defineProps({
   canEdit: { type: Boolean, required: true },
 });
 
-const { info, canEdit, institutions } = toRefs(props);
+const { info, canEdit, generalTags, technicalTags, institutions } =
+  toRefs(props);
 </script>
 
 <style scoped lang="scss">
 .details {
   gap: 24px;
 }
+@media (min-width: 801px) {
+  .details {
+    max-width: 450px;
+  }
+}
+
 </style>

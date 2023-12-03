@@ -5,6 +5,7 @@
       status ?? '',
       isActive ? '' : 'disabled',
       icon ? 'icon pa-2' : '',
+      clickable ? 'clickable' : '',
     ]"
     :variant="
       status
@@ -23,10 +24,7 @@
         chip = false;
       }
     "
-    :style="[
-      clickable ? 'cursor: pointer' : color ? '' : 'border: none',
-      icon ? 'gap: 0px !important' : '',
-    ]"
+    :style="[color ? '' : 'border: none']"
     close-icon="mdi-close"
     style="width: min-content"
     data-testid="chip"
@@ -46,13 +44,6 @@
       >
     </div>
     <div class="w-100 overflow-hidden" v-else>
-      <v-icon
-        v-if="!(prependIcon || icon)"
-        class="mr-1"
-        :size="['x-small', 'small'].includes(size) ? 'medium' : '20'"
-        >mdi-circle-medium</v-icon
-      >
-
       <span>{{ text }}</span>
     </div></v-chip
   >
@@ -82,9 +73,7 @@ const props = defineProps({
   },
 
   size: {
-    type: String as PropType<
-      'x-small' | 'small' | 'medium' | 'large' 
-    >,
+    type: String as PropType<'x-small' | 'small' | 'medium' | 'large'>,
     default: 'medium',
   },
   status: {
@@ -119,6 +108,9 @@ const chip = ref(false);
 </script>
 
 <style scoped lang="scss">
+.clickable {
+  cursor: pointer;
+}
 .v-chip__content {
   width: 100%;
   display: flex;
@@ -168,8 +160,10 @@ const chip = ref(false);
     border: 1px solid #b9bfc6 !important;
     background-color: #ebedef !important;
   }
-  &:hover {
-    color: #005c66;
+  &.clickable {
+    &:hover {
+      color: #005c66;
+    }
   }
 
   &:active {
@@ -191,9 +185,11 @@ const chip = ref(false);
     border: 1px solid #b9bfc6 !important;
     background-color: #ebedef !important;
   }
-  &:hover {
-    color: #005c66;
-    background-color: #ebedef;
+  &.clickable {
+    &:hover {
+      color: #005c66;
+      background-color: #ebedef;
+    }
   }
 
   &:active {
@@ -203,6 +199,9 @@ const chip = ref(false);
       background-color: #6e7a87;
     }
   }
+}
+.icon {
+  gap: 0px !important;
 }
 .large {
   display: inline-flex;

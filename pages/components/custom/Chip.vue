@@ -188,15 +188,15 @@
         <alex-custom-chip icon="mdi-account-outline" :status="'secondary'" />
         <alex-custom-chip icon="mdi-book" :status="'primary'" />
         <alex-custom-chip icon="mdi-pencil" :status="'grey'" />
-        <alex-custom-chip icon="mdi-box" :status="'success'" />
+        <alex-custom-chip icon="mdi-circle" :status="'success'" />
         <alex-custom-chip icon="mdi-close" :color="'#005C66'" />
         <alex-custom-chip icon="mdi-book" :color="'#156A3B'" />
         <alex-custom-chip icon="mdi-map" :color="'#B61617'" />
         <alex-custom-chip icon="mdi-book-outline" :color="'#6E7A87'" />
         <alex-custom-chip icon="mdi-book" :color="'#CC6400'" />
         <alex-custom-chip icon="mdi-pencil" :color="'#FFFFFF'" />
-        <alex-custom-chip icon="mdi-box" clickable :status="'primary'" />
-        <alex-custom-chip icon="mdi-close" clickable :status="'grey'" />
+        <alex-custom-chip icon="mdi-box" :status="'primary'" />
+        <alex-custom-chip icon="mdi-close" :status="'grey'" />
       </div>
       <div class="px-3" style="position: relative">
         <prism>{{ examples[5] }}</prism>
