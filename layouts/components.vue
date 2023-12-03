@@ -106,10 +106,14 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/inputs/dropdown',
+      },
     ],
   },
 ];
-
 </script>
 
 <style scoped lang="scss">
