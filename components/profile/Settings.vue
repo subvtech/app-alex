@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="$t('components.profile.settings.title')"
     :full-width="true"
     :showIcon="false"
@@ -50,7 +50,7 @@
     </template>
 
     <template v-slot:footer> </template>
-  </profile-card>
+  </alex-custom-card>
   <div class="d-flex flex-column">
     <profile-security :email="email" :id="id" /> <profile-wallets :id="id" />
   </div>

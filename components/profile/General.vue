@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="$t('components.profile.general.title')"
     :isEditing="false"
     :showIcon="false"
@@ -54,7 +54,7 @@
         </div>
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="$t('components.profile.socials.title')"
     :cancel="cancel"
     :save="onSave"
@@ -75,7 +75,7 @@
         />
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

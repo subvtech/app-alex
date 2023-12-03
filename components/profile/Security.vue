@@ -1,5 +1,5 @@
 <template>
-  <profile-card :title="$t('components.profile.security.title')" :showIcon="false" :full-width="true">
+  <alex-custom-card :title="$t('components.profile.security.title')" :showIcon="false" :full-width="true">
     <template v-slot:content>
       <div class="fields d-flex flex-wrap">
         <v-form class="field d-flex w-100 align-center justify-space-between">
@@ -55,7 +55,7 @@
         </div>
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

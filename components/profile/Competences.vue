@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="title"
     :isEditing="isEditing && canEdit"
     @toggle:isEditing="isEditing = !isEditing"
@@ -53,7 +53,7 @@
         </div>
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

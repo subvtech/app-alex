@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     class="mb-6"
     :title="$t('components.profile.about.title')"
     :isEditing="isEditing && canEdit"
@@ -36,7 +36,7 @@
         />
       </client-only>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">
