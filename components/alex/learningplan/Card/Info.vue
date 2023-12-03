@@ -5,7 +5,7 @@
       size="large"
       :icon="icon"
       variant="outlined"
-      color="gray-600"
+      color="#6E7A87"
     />
     <v-avatar
       v-else

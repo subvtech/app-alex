@@ -1,9 +1,23 @@
 import { describe, it, expect } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
+import { createI18n } from 'vue-i18n';
 import { fireEvent, screen } from '@testing-library/vue';
-import Card from '../../components/alex/learningplan/Card/index.vue';
+import Card from '@/components/alex/learningplan/Card/index.vue';
+import ptRules from '@/assets/locales/pt/components/learningPlan/card.json';
+import enRules from '@/assets/locales/en/components/learningPlan/card.json';
 
 describe('Card of Project and Courses', () => {
+  const i18n = createI18n({
+    messages: {
+      pt: { ptRules },
+      en: { enRules },
+    },
+    locale: 'pt',
+    legacy: false,
+    missingWarn: false,
+    globalInjection: true,
+  });
+
   const props = {
     title:
       'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
@@ -19,9 +33,14 @@ describe('Card of Project and Courses', () => {
     },
   };
 
+  const global = {
+    plugins: [i18n],
+  };
+
   it('Card should be defined', async () => {
     const { unmount } = await renderSuspended(Card, {
       props,
+      global,
     });
     const cardComponent = screen.queryByTestId('alex-learningplan-card');
     expect(cardComponent).not.toBeNull();
@@ -31,6 +50,7 @@ describe('Card of Project and Courses', () => {
   it('Card should be show buttons when hover', async () => {
     const { unmount } = await renderSuspended(Card, {
       props,
+      global,
     });
     const hoverComponent = screen.getByTestId(
       'alex-learningplan-card-hover-area',
@@ -47,6 +67,7 @@ describe('Card of Project and Courses', () => {
         ...props,
         type: 'course_project',
       },
+      global,
     });
     const cardComponent = screen.queryByTestId(
       'alex-learningplan-card-status-chip',
@@ -61,6 +82,7 @@ describe('Card of Project and Courses', () => {
         ...props,
         type: 'project',
       },
+      global,
     });
     const cardComponent = screen.queryByTestId(
       'alex-learningplan-card-status-chip',
@@ -73,8 +95,10 @@ describe('Card of Project and Courses', () => {
     const { unmount } = await renderSuspended(Card, {
       props: {
         ...props,
+
         type: 'course',
       },
+      global,
     });
     const cardComponent = screen.queryByTestId(
       'alex-learningplan-card-status-chip',

@@ -183,14 +183,6 @@
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
-
-            <tr>
-              <td>direction</td>
-              <td>'HORIZONTAL' | 'VERTICAL'</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
             <tr>
               <td>hide</td>
               <td>boolean</td>
@@ -330,7 +322,6 @@
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
-          direction="HORIZONTAL"
         />
         <alex-learningplan-card
           title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
@@ -344,7 +335,6 @@
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
           hide
-          direction="HORIZONTAL"
         />
       </div>
       <div class="px-3 w-100" style="position: relative">
@@ -417,7 +407,6 @@ const examples = [
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
-          direction="HORIZONTAL"
         />`,
 ];
 

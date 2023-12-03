@@ -75,10 +75,11 @@
             </v-tooltip>
           </template>
         </v-menu>
-        <v-menu
-          v-model="options"
+        <alex-inputs-dropdown
+          v-model="showOptions"
           :close-on-content-click="false"
-          :class="{ hidden: !isHovering && !options }"
+          :class="{ hidden: !isHovering && !showOptions }"
+          :items="options"
         >
           <template #activator="{ props: propsMenu, isActive }">
             <v-tooltip
@@ -97,26 +98,7 @@
               </template>
             </v-tooltip>
           </template>
-          <v-list>
-            <v-list-item
-              v-if="hide"
-              :title="$t('components.learningPlan.card.visibility.show')"
-              prepend-icon="mdi-eye-outline"
-              @click="() => emits('show')"
-            />
-            <v-list-item
-              v-else
-              :title="$t('components.learningPlan.card.visibility.hide')"
-              prepend-icon="mdi-eye-off-outline"
-              @click="() => emits('hide')"
-            />
-            <v-list-item
-              :title="$t('components.learningPlan.card.configurations')"
-              prepend-icon="mdi-cog-outline"
-              @click="() => emits('configurations')"
-            />
-          </v-list>
-        </v-menu>
+        </alex-inputs-dropdown>
       </div>
     </div>
     <div
@@ -188,7 +170,11 @@
     </div>
 
     <div v-if="!isVertical" class="h-full">
-      <v-menu :close-on-content-click="false">
+      <alex-inputs-dropdown
+        :close-on-content-click="false"
+        :class="{ hidden: !isHovering && !options }"
+        :items="options"
+      >
         <template #activator="{ props: optionsProps }">
           <alex-custom-button
             v-bind="optionsProps"
@@ -196,31 +182,13 @@
             icon="mdi-dots-vertical"
           />
         </template>
-        <v-list>
-          <v-list-item
-            v-if="hide"
-            :title="$t('components.learningPlan.card.visibility.show')"
-            prepend-icon="mdi-eye-outline"
-            @click="() => emits('show')"
-          />
-          <v-list-item
-            v-else
-            :title="$t('components.learningPlan.card.visibility.hide')"
-            prepend-icon="mdi-eye-off-outline"
-            @click="() => emits('hide')"
-          />
-          <v-list-item
-            :title="$t('components.learningPlan.card.configurations')"
-            prepend-icon="mdi-cog-outline"
-            @click="() => emits('configurations')"
-          />
-        </v-list>
-      </v-menu>
+      </alex-inputs-dropdown>
     </div>
   </v-card>
 </template>
 
 <script setup lang="ts">
+import { Item } from '../../inputs/Dropdown.vue';
 interface member {
   name: string;
   image?: {
@@ -239,31 +207,49 @@ interface LearningPlanCardProps {
   hide?: boolean;
   hideFavoritedButton?: boolean;
   favorited?: boolean;
-  direction?: 'HORIZONTAL' | 'VERTICAL';
   status?: 'start' | 'in_progress' | 'done';
   members?: member[];
 }
 
-const props = withDefaults(defineProps<LearningPlanCardProps>(), {
-  hideFavoritedButton: false,
-  favorited: false,
-  direction: 'VERTICAL',
-  hide: false,
-  type: 'course',
-  status: 'start',
-  members: undefined,
-});
-
+const { status, title, hide } = withDefaults(
+  defineProps<LearningPlanCardProps>(),
+  {
+    hideFavoritedButton: false,
+    favorited: false,
+    hide: false,
+    type: 'course',
+    status: 'start',
+    members: undefined,
+  },
+);
+const { t } = useI18n();
+const direction = useDirection();
 const isHovering = ref(false);
-const options = ref(false);
-const isVertical = computed(() => props.direction === 'VERTICAL');
+const showOptions = ref(false);
+const isVertical = computed(() => direction.value === 'VERTICAL');
+const options: Item[] = [
+  hide
+    ? {
+        text: t('components.learningPlan.card.visibility.show'),
+        icon: 'mdi-eye-outline',
+        onClick: () => emits('show'),
+      }
+    : {
+        text: t('components.learningPlan.card.visibility.hide'),
+        icon: 'mdi-eye-off-outline',
+        onClick: () => emits('hide'),
+      },
+  {
+    text: t('components.learningPlan.card.configurations'),
+    icon: 'mdi-cog-outline',
+    onClick: () => emits('configurations'),
+  },
+];
 const width = computed(() =>
-  props.direction === 'VERTICAL'
-    ? { min: 300, max: 400 }
-    : { min: 688, max: 959 },
+  isVertical.value ? { min: 300, max: 400 } : { min: 688, max: 959 },
 );
 const statusConfig = computed<{ icon: string; variant: any }>(() => {
-  switch (props.status) {
+  switch (status) {
     // eslint-disable-next-line default-case-last
     default:
     case 'start':
@@ -284,8 +270,8 @@ const statusConfig = computed<{ icon: string; variant: any }>(() => {
   }
 });
 const isActiveTitleTooltip = computed(() => {
-  if (isVertical.value) return props.title.length < 60;
-  else return props.title.length < 84;
+  if (isVertical.value) return title.length < 60;
+  else return title.length < 84;
 });
 const emits = defineEmits([
   'open',
@@ -353,10 +339,6 @@ const emits = defineEmits([
   height: 100%;
   background-color: #0005;
   transition: background 300ms ease-in-out;
-}
-
-.hidden {
-  visibility: hidden;
 }
 
 .grayscale {
