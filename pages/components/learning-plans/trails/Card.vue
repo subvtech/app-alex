@@ -94,13 +94,6 @@
               </td>
             </tr>
             <tr>
-              <td>direction</td>
-              <td>'HORIZONTAL' | 'VERTICAL'</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
               <td>hide</td>
               <td>boolean</td>
               <td class="text-center">
@@ -200,51 +193,6 @@
       </div>
     </div>
 
-    <h2 class="text-h2 text-gray-800">Variante: Horizontal</h2>
-    <p class="text-subtitle-2 text-gray-500">
-      Modo horizontal do card facilitando a visualização em telas menores como o
-      tablet
-    </p>
-
-    <div class="w-100 flex-column d-flex gap-4">
-      <div class="d-flex flex-column" style="gap: 8px">
-        <alex-learningplan-trails-card
-          name="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
-          description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
-          :image="{
-            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
-          }"
-          direction="HORIZONTAL"
-        />
-        <alex-learningplan-trails-card
-          name="sistemas operacionais"
-          description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
-          :image="{
-            url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
-          }"
-          hide
-          direction="HORIZONTAL"
-        />
-      </div>
-      <div class="a w-100" style="position: relative">
-        <prism> {{ examples[2] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(2)"
-        >
-          <v-icon
-            v-if="copiedIndex === 2"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
-
     <h2 class="text-h2 text-gray-800">Variante: Documentos</h2>
     <p class="text-subtitle-2 text-gray-500">
       Poderá ser passado um array de documentos que representaram uma síntese
@@ -284,8 +232,10 @@
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
-          direction="HORIZONTAL"
-          :documents="[{ type: 'article', number: 4 }]"
+          :documents="[
+            { type: 'articles', number: 4 },
+            { type: 'documents', number: 5 },
+          ]"
         />
       </div>
       <div class="a w-100" style="position: relative">
@@ -344,7 +294,6 @@ const examples = [
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
           hide
-          direction="HORIZONTAL"
         />
         `,
   `<alex-learningplan-trails-card
@@ -353,7 +302,6 @@ const examples = [
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
-          direction="HORIZONTAL"
           :documents="[{ type: 'article', number: 4 }]"
         />`,
 ];

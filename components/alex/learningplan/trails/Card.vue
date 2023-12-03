@@ -1,6 +1,6 @@
 <template>
   <v-card
-    data-testid="alex-learningplan-trails-card"
+    data-testid="trails-card"
     :min-width="width.min"
     :max-width="width.max"
     :class="{
@@ -43,57 +43,33 @@
         </template>
       </v-tooltip>
 
-      <div
-        class="alex-learningplan-trails-card-hover"
-        :class="{ hover: isHovering }"
-      >
-        <v-menu
-          v-model="options"
+      <div data-testid="trails-card-hover-area" :class="{ hover: isHovering }">
+        <alex-inputs-dropdown
+          v-if="direction !== 'HORIZONTAL'"
+          v-model="showOptions"
           :close-on-content-click="false"
-          :class="{ hidden: !isHovering && !options }"
+          :class="{ hidden: !isHovering && !showOptions }"
+          :items="options"
         >
           <template #activator="{ props: propsMenu, isActive }">
             <v-tooltip
               :text="$t('components.learningPlan.cardTrails.options')"
               location="bottom center"
             >
-              <template #activator="{ props: propsTooltip }">
+              <template #activator="{ props: optionsTooltipProps }">
                 <alex-custom-button
-                  v-if="direction !== 'HORIZONTAL' && (isHovering || isActive)"
-                  v-bind="{ ...propsMenu, ...propsTooltip }"
+                  v-if="isHovering || isActive"
+                  data-testid="alex-learningplan-card-hover-options"
+                  variant="secondary"
+                  v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                  icon="mdi-dots-vertical"
                   class="options"
                   size="small"
-                  variant="secondary"
-                  icon="mdi-dots-vertical"
                 />
               </template>
             </v-tooltip>
           </template>
-          <v-list>
-            <v-list-item
-              v-if="hide"
-              :title="$t('components.learningPlan.cardTrails.visibility.show')"
-              prepend-icon="mdi-eye-outline"
-              @click="() => emits('show')"
-            />
-            <v-list-item
-              v-else
-              :title="$t('components.learningPlan.cardTrails.visibility.hide')"
-              prepend-icon="mdi-eye-off-outline"
-              @click="() => emits('hide')"
-            />
-            <v-list-item
-              :title="$t('components.learningPlan.cardTrails.copy')"
-              prepend-icon="mdi-content-copy"
-              @click="() => emits('copy')"
-            />
-            <v-list-item
-              :title="$t('components.learningPlan.cardTrails.configurations')"
-              prepend-icon="mdi-cog-outline"
-              @click="() => emits('configurations')"
-            />
-          </v-list>
-        </v-menu>
+        </alex-inputs-dropdown>
       </div>
     </div>
     <div
@@ -107,8 +83,8 @@
         <v-tooltip
           :text="name"
           :location="isVertical ? 'top center' : 'top left'"
-          max-width="360"
           :disabled="isActiveTitleTooltip"
+          max-width="360"
         >
           <template #activator="{ props: propsTooltip }">
             <h5
@@ -122,44 +98,28 @@
         </v-tooltip>
 
         <div v-if="!isVertical">
-          <v-menu :close-on-content-click="false">
+          <alex-inputs-dropdown
+            v-model="showOptions"
+            :close-on-content-click="false"
+            :class="{ hidden: !isHovering && !showOptions }"
+            :items="options"
+          >
             <template #activator="{ props: propsMenu }">
-              <alex-custom-button
-                v-bind="propsMenu"
-                icon="mdi-dots-vertical"
-                size="small"
-                variant="text"
-              />
+              <v-tooltip
+                :text="$t('components.learningPlan.cardTrails.options')"
+                location="bottom center"
+              >
+                <template #activator="{ props: optionsTooltipProps }">
+                  <alex-custom-button
+                    variant="text"
+                    v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                    icon="mdi-dots-vertical"
+                    size="small"
+                  />
+                </template>
+              </v-tooltip>
             </template>
-            <v-list>
-              <v-list-item
-                v-if="hide"
-                :title="
-                  $t('components.learningPlan.cardTrails.visibility.show')
-                "
-                prepend-icon="mdi-eye-outline"
-                @click="() => emits('show')"
-              />
-              <v-list-item
-                v-else
-                :title="
-                  $t('components.learningPlan.cardTrails.visibility.hide')
-                "
-                prepend-icon="mdi-eye-off-outline"
-                @click="() => emits('hide')"
-              />
-              <v-list-item
-                :title="$t('components.learningPlan.cardTrails.copy')"
-                prepend-icon="mdi-content-copy"
-                @click="() => emits('copy')"
-              />
-              <v-list-item
-                :title="$t('components.learningPlan.cardTrails.configurations')"
-                prepend-icon="mdi-cog-outline"
-                @click="() => emits('configurations')"
-              />
-            </v-list>
-          </v-menu>
+          </alex-inputs-dropdown>
         </div>
       </div>
 
@@ -174,13 +134,20 @@
         :text="listDocuments"
         :disabled="!hasDocuments"
         location="bottom center"
+        data-testid="trails-documents-tooltip"
       >
         <template #activator="{ props: propsTooltip }">
-          <div class="documents" v-bind="propsTooltip">
+          <div
+            class="documents"
+            v-bind="propsTooltip"
+            data-testid="trails-documents-icon"
+          >
             <v-icon size="20" color="gray-600"
               >mdi-text-box-multiple-outline</v-icon
             >
-            <span>{{ documents?.length || 0 }}</span>
+            <span data-testid="trails-documents-icon-counter-type">{{
+              documents?.length || 0
+            }}</span>
           </div>
         </template>
       </v-tooltip>
@@ -189,50 +156,77 @@
 </template>
 
 <script setup lang="ts">
+import { Item } from '../../inputs/Dropdown.vue';
 interface LearningPlanCard {
   image: { url: string; alt?: string };
   name: string;
   description: string;
   hide?: boolean;
-  direction?: 'HORIZONTAL' | 'VERTICAL';
-  documents?: [{ type: string; number: number }];
+  documents?: { type: string; number: number }[];
 }
 const { t } = useI18n();
-const props = withDefaults(defineProps<LearningPlanCard>(), {
-  direction: 'VERTICAL',
-  hide: false,
-  documents: undefined,
-});
+const { documents, name, hide } = withDefaults(
+  defineProps<LearningPlanCard>(),
+  {
+    direction: 'VERTICAL',
+    hide: false,
+    documents: undefined,
+  },
+);
 const isHovering = ref(false);
-const options = ref(false);
-const isVertical = computed(() => props.direction === 'VERTICAL');
+const direction = useDirection();
+const showOptions = ref(false);
+const isVertical = computed(() => direction.value === 'VERTICAL');
 const width = computed(() =>
-  props.direction === 'VERTICAL'
-    ? { min: 240, max: 260 }
-    : { min: 300, max: 350 },
+  isVertical.value ? { min: 240, max: 260 } : { min: 300, max: 350 },
 );
 const isActiveTitleTooltip = computed(() => {
-  if (isVertical.value) return props.name.length < 30;
-  else return props.name.length < 60;
+  if (isVertical.value) return name.length < 30;
+  else return name.length < 60;
 });
 
 const listDocuments = computed(() => {
-  let string = '';
-  props.documents?.map(
+  let stringDocuments = '';
+  documents?.map(
     (item) =>
-      (string += `${item.number} ${t(
+      (stringDocuments += `${item.number} ${t(
         `components.learningPlan.cardTrails.${item.type}`,
-      )};`),
+      )}; `),
   );
-  return string;
+  return stringDocuments;
 });
 
 const hasDocuments = computed(() => {
-  if (props.documents) {
-    return !!props.documents.length;
+  if (documents) {
+    return !!documents.length;
   }
   return false;
 });
+
+const options: Item[] = [
+  hide
+    ? {
+        text: t('components.learningPlan.cardTrails.visibility.show'),
+        icon: 'mdi-eye-outline',
+        onClick: () => emits('show'),
+      }
+    : {
+        text: t('components.learningPlan.cardTrails.visibility.hide'),
+        icon: 'mdi-eye-off-outline',
+        onClick: () => emits('hide'),
+      },
+  {
+    text: t('components.learningPlan.cardTrails.copy'),
+    icon: 'mdi-content-copy',
+    onClick: () => emits('copy'),
+  },
+  {
+    text: t('components.learningPlan.cardTrails.configurations'),
+    icon: 'mdi-cog-outline',
+    onClick: () => emits('configurations'),
+  },
+];
+
 const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
 </script>
 
