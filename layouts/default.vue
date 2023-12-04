@@ -13,7 +13,7 @@
         :clipped="clipped"
         :show="drawer"
         :data-tour="menus[0].dataTour"
-        :class="{ 'active-step': menus[0].dataTour !== '' && isTourActive }"
+        :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
         dark
         :permanent="isPermanent"
       >
@@ -47,12 +47,8 @@
         }
       "
       :menu-items="profileMenuItems"
-      :data-tour="profileMenuItems[0].dataTour"
-      :class="{
-        'active-step': profileMenuItems[0].dataTour !== '' && isTourActive,
-      }"
-      :reverse="false"
-      :user="user"
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
       show-picture
     />
 
@@ -193,7 +189,7 @@ const steps = [
   },
 ];
 
-const { tour, isTourActive } = useOnBoarding(steps);
+const { activeTour } = useOnBoarding(steps);
 
 const menus = [
   {
