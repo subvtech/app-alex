@@ -2,7 +2,7 @@
   "success": {
     "title": "Recovery sent!",
     "subtitle1": "We have sent instructions to ",
-    "subtitle2": "Access the email and follow the instructions provided.",
+    "subtitle2": "If your email is already registered, you will receive an email to set your new password.",
     "return": "Back to Login"
   }
 }
