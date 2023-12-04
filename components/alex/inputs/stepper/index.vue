@@ -19,17 +19,18 @@
         @on-select="() => onSelectStep(index + 1)"
       />
     </div>
-    <div :class="stepClass">
-      <template v-for="(_, index) in stepsList" :key="index">
-        <slot
+    <template v-for="(_, index) in stepsList" :key="index">
+      <v-slide-x-transition hide-on-leave>
+        <div
           v-if="index == activeStep - 1"
-          :name="`step${index + 1}`"
-          :errors="errors"
-          :values="values"
-        />
-      </template>
-    </div>
-    <div v-if="!showControls" class="w-100 d-flex">
+          class="alex-scrollbar-white"
+          :class="stepClass"
+        >
+          <slot :name="`step${index + 1}`" :errors="errors" :values="values" />
+        </div>
+      </v-slide-x-transition>
+    </template>
+    <div v-if="!showControls && !noControls" class="w-100 d-flex">
       <alex-custom-button
         v-if="activeStep > 1"
         variant="secondary"
@@ -49,6 +50,7 @@
       />
     </div>
     <slot
+      v-if="!noControls"
       name="controls"
       :on-prev-step="onPrevStep"
       :is-valid="isValid"
@@ -63,7 +65,7 @@
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 
-interface StepsConfig {
+export interface StepsConfig {
   title: string;
   subtitle: string;
   icon?: string;
@@ -71,12 +73,13 @@ interface StepsConfig {
   completed?: boolean;
 }
 
-type StepType<T extends string[], U> = Record<ElementType<T>, U>;
+export type StepType<T extends string[], U> = Record<ElementType<T>, U>;
 
 // Props/events
 const props = withDefaults(
   defineProps<{
     noHeader?: boolean;
+    noControls?: boolean;
     stepsConfig?: Record<string, Partial<StepsConfig>>;
     submitLoading?: boolean;
     stepClass?: string;
@@ -85,6 +88,7 @@ const props = withDefaults(
   {
     submitLoading: false,
     noHeader: false,
+    noControls: false,
     stepClass: undefined,
     stepperIndicatorClass: undefined,
     stepsConfig: undefined,
@@ -96,19 +100,18 @@ const slots = useSlots();
 const showControls = computed(() => !!slots.controls);
 
 // Steps Logic
-const stepsCounter = computed(() =>
+const slotsList = computed(() =>
   literalArray(
     ...Object.entries(slots)
       .map((slot) => slot[0])
       .filter((slot) => slot.includes('step')),
   ),
 );
-
 const activeStep = ref(1);
-const numberSteps = computed(() => stepsCounter.value.length);
+const numberSteps = computed(() => slotsList.value.length);
 const stepsList = computed(() => {
-  const steps = {} as StepType<typeof stepsCounter.value, StepsConfig>;
-  stepsCounter.value.map(
+  const steps = {} as StepType<typeof slotsList.value, StepsConfig>;
+  slotsList.value.map(
     (step) =>
       (steps[step] = {
         title: 'Title',
