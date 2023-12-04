@@ -21,7 +21,11 @@
     </div>
     <template v-for="(_, index) in stepsList" :key="index">
       <v-slide-x-transition hide-on-leave>
-        <div v-if="index == activeStep - 1" :class="stepClass">
+        <div
+          v-if="index == activeStep - 1"
+          class="alex-scrollbar"
+          :class="stepClass"
+        >
           <slot :name="`step${index + 1}`" :errors="errors" :values="values" />
         </div>
       </v-slide-x-transition>
@@ -61,7 +65,7 @@
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 
-interface StepsConfig {
+export interface StepsConfig {
   title: string;
   subtitle: string;
   icon?: string;
@@ -69,13 +73,13 @@ interface StepsConfig {
   completed?: boolean;
 }
 
-type StepType<T extends string[], U> = Record<ElementType<T>, U>;
+export type StepType<T extends string[], U> = Record<ElementType<T>, U>;
 
 // Props/events
 const props = withDefaults(
   defineProps<{
     noHeader?: boolean;
-    noControls: boolean;
+    noControls?: boolean;
     stepsConfig?: Record<string, Partial<StepsConfig>>;
     submitLoading?: boolean;
     stepClass?: string;
@@ -96,19 +100,18 @@ const slots = useSlots();
 const showControls = computed(() => !!slots.controls);
 
 // Steps Logic
-const stepsCounter = computed(() =>
+const slotsList = computed(() =>
   literalArray(
     ...Object.entries(slots)
       .map((slot) => slot[0])
       .filter((slot) => slot.includes('step')),
   ),
 );
-
 const activeStep = ref(1);
-const numberSteps = computed(() => stepsCounter.value.length);
+const numberSteps = computed(() => slotsList.value.length);
 const stepsList = computed(() => {
-  const steps = {} as StepType<typeof stepsCounter.value, StepsConfig>;
-  stepsCounter.value.map(
+  const steps = {} as StepType<typeof slotsList.value, StepsConfig>;
+  slotsList.value.map(
     (step) =>
       (steps[step] = {
         title: 'Title',
