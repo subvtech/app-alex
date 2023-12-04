@@ -23,6 +23,7 @@
     />
     <alex-custom-dialog-header
       v-else
+      data-testid="alex-dialog-header"
       :title="title"
       :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
@@ -99,6 +100,7 @@
     />
     <alex-custom-dialog-footer
       v-else-if="!hasFooter && !noFooter && !stepper"
+      data-testid="alex-dialog-footer"
       :main-button-text="mainButtonText"
       :secondary-button-text="secondaryButtonText"
       @on-main-action="() => emits('onMainAction')"
