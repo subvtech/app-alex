@@ -1,53 +1,52 @@
 <template>
   <v-app v-if="user">
     <AppSnackbar />
-    <div
-      @click.stop="
-        (e: any) => {
-          drawer = !drawer;
-        }
-      "
+
+    <alex-custom-drawable
+      :blocks="menus"
+      :clipped="clipped"
+      :show="drawer"
+      dark
+      :permanent="isPermanent"
     >
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        dark
-        :permanent="isPermanent"
-      >
-        <template #header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
-    </div>
+        </div>
+      </template>
+    </alex-custom-drawable>
+
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => (drawer = !drawer)"
+      :toggle-drawer="
+        () => {
+          drawer = !drawer;
+        }
+      "
       :menu-items="profileMenuItems"
-      :reverse="false"
-      :user="user"
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
+      show-picture
     />
 
     <v-main class="secondary bg-gray-blue pt-16">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
-        <slot />
+        <span>{{ user }}</span> <slot />
       </v-container>
     </v-main>
   </v-app>
@@ -109,7 +108,6 @@ const menus = [
     ],
   },
 ];
-
 </script>
 
 <style scoped lang="scss">
