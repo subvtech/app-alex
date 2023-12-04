@@ -1,7 +1,7 @@
 <template>
   <v-container
     class="bg-white h-72 rounded-t-lg px-6 border-bottom-gray-100"
-    data-testid="alex-modal-header"
+    data-testid="alex-dialog-header"
   >
     <v-row dense>
       <v-col class="w-100 d-flex align-center justify-start gap-2">
