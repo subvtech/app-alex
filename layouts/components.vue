@@ -109,6 +109,7 @@ const menus = [
     ],
   },
 ];
+
 </script>
 
 <style scoped lang="scss">
