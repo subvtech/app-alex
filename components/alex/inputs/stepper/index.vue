@@ -23,7 +23,7 @@
       <v-slide-x-transition hide-on-leave>
         <div
           v-if="index == activeStep - 1"
-          class="alex-scrollbar"
+          class="alex-scrollbar-white"
           :class="stepClass"
         >
           <slot :name="`step${index + 1}`" :errors="errors" :values="values" />
