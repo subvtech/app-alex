@@ -13,7 +13,7 @@
         :clipped="clipped"
         :show="drawer"
         :data-tour="menus[0].dataTour"
-        :class="{ 'active-step': menus[0].dataTour !== '' && isTourActive }"
+        :class="tour.isActive() ? 'active-step' : ''"
         dark
         :permanent="isPermanent"
       >
@@ -47,11 +47,7 @@
         }
       "
       :menu-items="profileMenuItems"
-      :data-tour="profileMenuItems[0].dataTour"
-      :class="{
-        'active-step': profileMenuItems[0].dataTour !== '' && isTourActive,
-      }"
-      :reverse="false"
+      :class="tour.isActive() ? 'active-step' : ''"
       :user="user"
       show-picture
     />
@@ -193,7 +189,7 @@ const steps = [
   },
 ];
 
-const { tour, isTourActive } = useOnBoarding(steps);
+const { tour } = useOnBoarding(steps);
 
 const menus = [
   {
@@ -272,7 +268,6 @@ const miniVariant = ref(false);
 </script>
 
 <style lang="scss">
-
 .shepherd-step {
   z-index: 100000 !important;
   background-color: #fff !important;
