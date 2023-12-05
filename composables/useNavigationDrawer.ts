@@ -31,6 +31,10 @@ export default function useNavigationDrawer(defaultWidth = 0) {
 
   const isPermanent = computed(() => currentWidth.value >= 959);
 
+  watch(isPermanent, () => {
+    if (isPermanent.value) if (!drawer.value) drawer.value = true;
+  });
+
   return {
     clipped,
     drawer,
