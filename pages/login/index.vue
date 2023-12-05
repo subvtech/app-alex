@@ -12,18 +12,10 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card class="card card-acesso px-10">
-        <div align="center">
-          <img
-            alt="Alex"
-            src="/images/alex.svg"
-            class="card-acesso-alex-logo"
-          />
-        </div>
-
+      <v-card class="card card-acesso px-10 d-flex justify-center align-center">
         <div class="form d-flex flex-column">
           <div class="d-flex flex-column">
-            <v-card-title class="text-white text-center text-bold">
+            <v-card-title class="text-white text-center text-bold mt-16">
               {{ $t('pages.login.welcome') }}
             </v-card-title>
             <v-card-subtitle
@@ -34,21 +26,19 @@
             </v-card-subtitle>
           </div>
           <v-form ref="form" @submit.prevent="submit">
-            <alex-inputs-stepper-field
+            <alex-inputs-text-field
               :label="$t('pages.login.email')"
               name="email"
               color="white"
-              class="my-1 text-secondary"
               theme="dark"
             />
 
-            <alex-inputs-stepper-field
+            <alex-inputs-text-field
               :label="$t('pages.login.password')"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
               color="white"
-              class="my-1 text-secondary"
               theme="dark"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
@@ -71,13 +61,7 @@
               </nuxt-link>
             </div>
 
-            <v-btn
-              block
-              :disabled="!isValid"
-              class="card-btn"
-              type="submit"
-              :loading="logging"
-            >
+            <v-btn block class="card-btn" type="submit" :loading="logging">
               {{ $t('pages.login.submit') }}
             </v-btn>
           </v-form>
@@ -212,16 +196,12 @@ const submit = handleSubmit(async () => {
 
     &-acesso {
       background-image: url('/images/login-bg.svg');
-      background-repeat: initial;
+      background-repeat: no-repeat;
       background-size: cover;
+      background-position: center;
+      width: 600px;
       right: 0;
       overflow: auto;
-      width: 600px;
-
-      &-alex-logo {
-        width: 100px;
-        margin-block: 60px;
-      }
     }
 
     .blue-label {
