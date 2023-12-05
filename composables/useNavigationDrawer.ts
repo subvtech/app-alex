@@ -2,7 +2,7 @@ import { ref, onMounted } from 'vue';
 
 export default function useNavigationDrawer(defaultWidth = 0) {
   const clipped = ref(false);
-  const drawer = ref(false);
+  const drawer = ref(true);
   const currentWidth = ref(defaultWidth);
 
   onMounted(() => {
@@ -30,6 +30,10 @@ export default function useNavigationDrawer(defaultWidth = 0) {
   };
 
   const isPermanent = computed(() => currentWidth.value >= 959);
+
+  watch(isPermanent, () => {
+    if (isPermanent.value) if (!drawer.value) drawer.value = true;
+  });
 
   return {
     clipped,
