@@ -1,8 +1,8 @@
 {
   "success": {
     "title": "Recuperação Enviada!",
-    "subtitle1": "Enviamos instruções para ",
-    "subtitle2": "Caso este email esteja cadastrado, você receberá um email de definição de nova senha",
+    "subtitle1": "Caso o email",
+    "subtitle2": "esteja cadastrado em nossa plataforma, enviaremos instruções para recuperar a senha.",
     "return": "Voltar para o login"
   }
 }

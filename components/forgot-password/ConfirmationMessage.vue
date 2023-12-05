@@ -1,7 +1,6 @@
 <template>
   <v-container
-    class="w-100 fill-height d-flex justify-center"
-    style="align-content: start;"
+    class="w-100 fill-height d-flex justify-center align-content-center"
   >
     <v-card
       variant="outlined"
@@ -16,7 +15,9 @@
       </v-card-text>
     </v-card>
     <NuxtLink to="/login" class="text-accent text-decoration-none mt-6">
-      <v-icon icon="mdi-arrow-left" class="mr-1" />{{ $t('pages.forgot.success.return') }}
+      <v-icon icon="mdi-arrow-left" class="mr-1" />{{
+        $t('pages.forgot.success.return')
+      }}
     </NuxtLink>
   </v-container>
 </template>

@@ -1,6 +1,8 @@
 <template>
-  <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
-    <div class="mb-10">
+  <v-container
+    class="pa-0 d-flex flex-column h-75 mid-container justify-center"
+  >
+    <div>
       <p class="text-white text-h4 text-center font-weight-bold mb-4">
         {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
       </p>
@@ -9,18 +11,18 @@
       </p>
     </div>
     <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
-      <alex-inputs-stepper-field
+      <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.email')"
         name="email"
         color="white"
-        class="my-3 text-secondary"
+        class="text-secondary"
         theme="dark"
       />
       <span v-if="submitError" class="text-error w-100">{{
         $t('components.forgot.sendResetPassword.emailError')
       }}</span>
 
-      <v-btn
+      <alex-custom-button
         :color="!isValid ? 'grey-darken-1' : 'accent'"
         class="text-none text-white rounded-lg pa-5"
         block
@@ -28,7 +30,9 @@
         size="large"
         :disabled="!isValid"
         :loading="loading"
-        >{{ $t('components.forgot.sendResetPassword.recoverPassword') }}</v-btn
+        >{{
+          $t('components.forgot.sendResetPassword.recoverPassword')
+        }}</alex-custom-button
       >
     </v-form>
     <ForgotPasswordDividerRow />

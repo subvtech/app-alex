@@ -67,6 +67,7 @@
             class="my-3 text-secondary"
             :label="$t('pages.register.userType')"
             variant="outlined"
+            hide-selected
             :items="[
               {
                 title: $t('pages.register.typeProfessor'),
