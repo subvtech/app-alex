@@ -1,15 +1,16 @@
 <template>
   <v-navigation-drawer
-    v-model="show"
+    v-model="modelValue"
     color="primary"
     fixed
     :rail="clipped"
     app
     data-testid="drawable"
     class="d-flex flex-column pb-2 px-2"
+    @update:model-value="$emit('update:model-value')"
     :class="[
       notFixed ? 'not-fixed' : '',
-      disappear && !show ? 'disappear' : '',
+      disappear && !modelValue ? 'disappear' : '',
     ]"
   >
     <slot name="header" />
@@ -58,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits(['update:model-value']);
 const props = defineProps({
   blocks: {
     type: Array as PropType<
@@ -66,10 +68,11 @@ const props = defineProps({
     default: [],
   },
 
-  show: {
+  modelValue: {
     type: Boolean,
-    default: false,
+    required: true,
   },
+
   notFixed: {
     type: Boolean,
     default: false,
@@ -84,7 +87,7 @@ const props = defineProps({
   },
 });
 
-const { blocks, show, clipped } = toRefs(props);
+const { blocks, modelValue, clipped } = toRefs(props);
 </script>
 
 <style lang="scss">
