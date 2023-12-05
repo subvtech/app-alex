@@ -1,22 +1,8 @@
 <template>
-  <v-autocomplete
-    :name="name"
-    v-model="value"
-    :search="search"
-    @input="$emit('update:search', $event.target.value)"
-    :loading="fetching"
-    :items="institutions"
-    item-text="text"
-    item-value="id"
-    item-title="name"
-    :color="color"
-    class="my-3"
-    variant="outlined"
-    hide-no-data
-    required
-    :label="$t('pages.register.institution')"
-    :error-messages="errorMessage"
-  />
+  <v-autocomplete :name="name" v-model="value" :search="search" @input="$emit('update:search', $event.target.value)"
+    :loading="fetching" :items="institutions" item-text="text" item-value="id" item-title="socialName" :color="color"
+    class="my-3" variant="outlined" hide-no-data required :label="$t('pages.register.institution')"
+    :error-messages="errorMessage" />
 </template>
 
 <script setup lang="ts">
@@ -74,8 +60,11 @@ const fetchInstitutions = async (institution: string) => {
   fetching.value = true;
   try {
     const res = await find(
-      `institutions?populate=cover&nome_contains=${institution}&tipo=matriz&_limit=10`,
-    );
+      `institutions?tipo=matriz&_limit=10`, {
+        fields: ['id', 'acronym', 'socialName'],
+      filters: { $or: [{ socialName: { $contains: institution } }, { acronym: { $contains: institution } }] }
+    }
+    ); // olha aqui: https://docs.strapi.io/dev-docs/api/entity-service/filter#contains
 
     const resultArr = (res.data.length > 0 ? res.data : [])
       //.filter((r: any) => !props.filterIds.includes(r.id))
@@ -83,11 +72,11 @@ const fetchInstitutions = async (institution: string) => {
         return {
           id: r.id,
           acronym: r.attributes.acronym,
-          name: r.attributes.name,
-          type: r.attributes.type,
-          cover: r.attributes.cover.data.attributes,
-          cnpj: r.attributes.cnpj,
-          sector: r.attributes.sector,
+          socialName: r.attributes?.socialName,
+          // type: r.attributes.type?.attributes,
+          // cover: r.attributes.cover?.data?.attributes,
+          // cnpj: r.attributes.cnpj,
+          // sector: r.attributes?.sector?.attributes,
         };
       });
     emit('update:institutions', resultArr);
