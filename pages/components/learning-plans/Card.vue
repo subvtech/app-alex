@@ -52,7 +52,6 @@
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"
-          favorited
           @favorite="() => console.log('favoritei')"
           @open="() => console.log('abri')"
         />
@@ -67,7 +66,7 @@
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
           }"
-          :trails-count="40"
+          :trails-count="99"
           :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
           }"

@@ -61,26 +61,22 @@
         data-testid="alex-learningplan-card-hover-area"
         :class="{ hover: isHovering }"
       >
-        <v-menu v-if="!hideFavoritedButton">
-          <template #activator="{ props: propsMenu }">
-            <v-tooltip
-              :text="$t('components.learningPlan.card.favorite')"
-              location="bottom center"
-            >
-              <template #activator="{ props: favoritedTooltipProps }">
-                <alex-custom-button
-                  v-if="isHovering"
-                  v-bind="{ ...propsMenu, ...favoritedTooltipProps }"
-                  icon="mdi-cards-heart"
-                  class="favorite"
-                  variant="secondary"
-                  :class="{ 'text-error-0': favorited }"
-                  @click="() => emits('favorite')"
-                />
-              </template>
-            </v-tooltip>
+        <v-tooltip
+          :text="$t('components.learningPlan.card.favorite')"
+          location="bottom center"
+        >
+          <template #activator="{ props: favoritedTooltipProps }">
+            <alex-custom-button
+              v-if="isHovering && !hideFavoritedButton"
+              v-bind="favoritedTooltipProps"
+              icon="mdi-cards-heart"
+              class="favorite"
+              variant="secondary"
+              :class="{ 'text-error-0': favorited }"
+              @click.stop="() => emits('favorite')"
+            />
           </template>
-        </v-menu>
+        </v-tooltip>
         <alex-inputs-dropdown
           v-if="direction !== 'HORIZONTAL'"
           v-model="showOptions"
