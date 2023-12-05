@@ -27,7 +27,13 @@
       />
 
       <alex-custom-chip
-        :text="$t(`components.learningPlan.card.type.${type}`)"
+        :text="
+          $t(
+            `components.learningPlan.card.type.${
+              type === 'course_project' ? 'project' : type
+            }`,
+          )
+        "
         size="small"
         status="dark"
         class="type"
