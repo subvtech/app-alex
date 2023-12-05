@@ -1,39 +1,10 @@
 <template>
-  <div class="d-flex" style="gap: 24px">
-    <alex-custom-card title="Sobre o curso" :save="onSave">
+  <div class="d-flex gap" :class="fullWidth ? 'w-100' : ''">
+    <alex-custom-card title="Sobre o curso" :save="onSave" full-width>
       <template #content>
         <span :contenteditable="canEdit">{{ text }}</span>
       </template>
     </alex-custom-card>
-    <div>
-      <alex-custom-card title="Details">
-        <template #content>
-          <app-general-boxes
-            :boxes="[
-              {
-                icon: 'mdi-bookmark-box-multiple-outline',
-                number: 0,
-                label: $t('components.profile.general.courses'),
-              },
-              {
-                icon: 'mdi-newspaper-variant-multiple-outline',
-                number: 1,
-                label: $t('components.profile.general.projects'),
-              },
-              {
-                icon: 'mdi-check-decagram',
-                number: 62,
-                label: $t('components.profile.general.assignments'),
-              },
-            ]"
-          />
-        </template>
-        <template #footer>
-          <span> </span>
-        </template>
-      </alex-custom-card>
-      <profile-competences label="dasda" />
-    </div>
   </div>
 </template>
 
@@ -52,6 +23,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  fullWidth: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { text } = toRefs(props);
@@ -60,3 +35,8 @@ const onSave = async () => {
   await update('learningplans', props.id, { description: text });
 };
 </script>
+<style scoped lang="scss">
+.gap {
+  gap: 24px;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="boxes d-flex justify-center w-100 pb-6">
+  <div class="boxes d-flex justify-center w-100 pb-6" :class="hideDivider ? '' : 'border-bottom'">
     <div class="box d-flex" v-for="(box, index) in boxes" :key="index">
       <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
       <div class="d-flex">
@@ -15,12 +15,18 @@ const props = defineProps({
     type: Array as PropType<{ icon: string; number: number; label: string }[]>,
     default: [],
   },
+  hideDivider: {
+    type: Boolean,
+    default: false
+  }
 });
 </script>
 <style scoped lang="scss">
 .boxes {
   gap: 16px;
-  border-bottom: 1px solid #eaeef1;
+  &.border-bottom {
+    border-bottom: 1px solid #eaeef1;
+  }
   .box {
     flex-direction: column;
     min-width: 90px;

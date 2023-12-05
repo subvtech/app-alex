@@ -24,7 +24,65 @@
       endDate="12/06/2016"
       :links="links"
     />
-    <app-about :can-edit="false" :id="course.id" :text="course.description" />
+    <div class="d-flex w-100 gap">
+      <div class="d-flex w-100">
+        <app-about
+          :can-edit="false"
+          :id="course.id"
+          :text="course.description"
+          full-width
+        />
+      </div>
+      <div class="d-flex flex-column gap">
+        <alex-custom-card title="Details">
+          <template #content>
+            <app-general-boxes
+              :boxes="[
+                {
+                  icon: 'mdi-bookmark-box-multiple-outline',
+                  number: 0,
+                  label: $t('components.profile.general.courses'),
+                },
+                {
+                  icon: 'mdi-newspaper-variant-multiple-outline',
+                  number: 1,
+                  label: $t('components.profile.general.projects'),
+                },
+                {
+                  icon: 'mdi-check-decagram',
+                  number: 62,
+                  label: $t('components.profile.general.assignments'),
+                },
+              ]"
+              hide-divider
+            />
+          </template>
+          <template #footer>
+            <alex-custom-card class="" title="Encontros síncronos" href="dsads" hide-dividers sizing-class="ma-0" is-nested :show-icon="false">
+              <template #content>
+                <course-meeting date="25/06/1998" frequency="Everyday" startHour="14:00" end-hour="18:00" />
+                <course-meeting date="25/06/1998" frequency="Everyday" startHour="08:00" end-hour="11:00" />
+              </template>
+            </alex-custom-card>
+            <alex-custom-card class="" :show-icon="false" title="Convite do Curso" href="dsads" hide-dividers sizing-class="ma-0" is-nested>
+              <template #content>
+                <course-meeting date="25/06/1998" frequency="Everyday" startHour="14:00" end-hour="18:00" />
+                <course-meeting date="25/06/1998" frequency="Everyday" startHour="08:00" end-hour="11:00" />
+              </template>
+            </alex-custom-card>
+          </template>
+        </alex-custom-card>
+        <profile-competences
+          title="dsads"
+          label="dasda"
+          emptyMessage="it's empty"
+          placeholder="placeholder"
+          :userId="id"
+          :userTags="[]"
+          :can-edit="false"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -86,3 +144,8 @@ const updateCourse = async (show = true) => {
     });
 };
 </script>
+<style scoped lang="scss">
+.gap {
+  gap: 24px;
+}
+</style>

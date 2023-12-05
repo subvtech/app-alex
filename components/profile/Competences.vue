@@ -95,7 +95,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  canEdit: { type: Boolean, required: true },
+  canEdit: { type: Boolean, default: false },
 });
 
 const { canEdit, userId, isGeneral } = toRefs(props);
