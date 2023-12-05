@@ -40,7 +40,6 @@
 
     <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
-     
         <slot />
       </v-container>
     </v-main>
@@ -155,7 +154,6 @@ const menus = [
     ],
   },
 ];
-
 </script>
 
 <style scoped lang="scss">
