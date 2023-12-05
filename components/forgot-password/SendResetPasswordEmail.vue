@@ -3,16 +3,19 @@
     class="pa-0 d-flex flex-column h-75 mid-container justify-center"
   >
     <div>
-      <p class="text-white text-h4 text-center font-weight-bold mb-4">
+      <p class="text-white text-h3 text-center font-weight-bold mb-4">
         {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
       </p>
-      <p class="text-white text-h6 font-weight-regular text-center my-2">
+      <p
+        class="text-white text-subtitle-2 font-weight-regular text-center my-2"
+      >
         {{ $t('components.forgot.sendResetPassword.enterEmail') }}
       </p>
     </div>
     <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
       <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.email')"
+        :placeholder="$t('components.forgot.sendResetPassword.emailHolder')"
         name="email"
         color="white"
         class="text-secondary"
@@ -35,8 +38,7 @@
         }}</alex-custom-button
       >
     </v-form>
-    <ForgotPasswordDividerRow />
-    <p class="text-center text-body-1">
+    <p class="text-center text-body-1 font-weight-bold">
       {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-decoration-none text-accent">{{
         $t('components.forgot.sendResetPassword.login')

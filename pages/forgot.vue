@@ -50,6 +50,6 @@ const handleSentEmail = (email) => {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  max-width: 629px;
+  width: 629px;
 }
 </style>

@@ -27,7 +27,8 @@
           </div>
           <v-form ref="form" @submit.prevent="submit">
             <alex-inputs-text-field
-              :label="$t('pages.login.email')"
+              :label="$t('pages.login.user')"
+              :placeholder="$t('pages.login.userHolder')"
               name="email"
               color="white"
               theme="dark"
@@ -35,6 +36,7 @@
 
             <alex-inputs-text-field
               :label="$t('pages.login.password')"
+              :placeholder="$t('pages.login.passwordHolder')"
               :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
@@ -61,9 +63,15 @@
               </nuxt-link>
             </div>
 
-            <v-btn block class="card-btn" type="submit" :loading="logging">
+            <alex-custom-button
+              block
+              size="large"
+              type="submit"
+              class="text-none text-green text-body-1"
+              :loading="logging"
+            >
               {{ $t('pages.login.submit') }}
-            </v-btn>
+            </alex-custom-button>
           </v-form>
           <v-card-text class="smaller-text text-white text-center">
             {{ $t('pages.login.noAccount') }}
@@ -199,7 +207,7 @@ const submit = handleSubmit(async () => {
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
-      width: 600px;
+      max-width: 629px;
       right: 0;
       overflow: auto;
     }
