@@ -151,6 +151,11 @@ const menus = [
         title: 'Text-field',
         to: '/components/inputs/text-field',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/inputs/dropdown',
+      },
     ],
   },
 ];
