@@ -131,8 +131,8 @@
         {{ description }}
       </div>
       <v-tooltip
-        :text="listDocuments"
-        :disabled="!hasDocuments"
+        :text="listBlocks"
+        :disabled="!hasBlocks"
         location="bottom center"
         data-testid="trails-documents-tooltip"
       >
@@ -146,7 +146,7 @@
               >mdi-text-box-multiple-outline</v-icon
             >
             <span data-testid="trails-documents-icon-counter-type">{{
-              documents?.length || 0
+              blocks?.length || 0
             }}</span>
           </div>
         </template>
@@ -157,22 +157,25 @@
 
 <script setup lang="ts">
 import { Item } from '../../inputs/Dropdown.vue';
+interface Block {
+  type: string;
+}
+interface CountedBlock extends Block {
+  quantity: number;
+}
 interface LearningPlanCard {
   image: { url: string; alt?: string };
   name: string;
   description: string;
   hide?: boolean;
-  documents?: { type: string; number: number }[];
+  blocks?: Block[];
 }
 const { t } = useI18n();
-const { documents, name, hide } = withDefaults(
-  defineProps<LearningPlanCard>(),
-  {
-    direction: 'VERTICAL',
-    hide: false,
-    documents: undefined,
-  },
-);
+const { blocks, name, hide } = withDefaults(defineProps<LearningPlanCard>(), {
+  direction: 'VERTICAL',
+  hide: false,
+  blocks: undefined,
+});
 const isHovering = ref(false);
 const direction = useDirection();
 const showOptions = ref(false);
@@ -185,20 +188,33 @@ const isActiveTitleTooltip = computed(() => {
   else return name.length < 60;
 });
 
-const listDocuments = computed(() => {
-  let stringDocuments = '';
-  documents?.map(
+const countBlocks = () => {
+  const blocksArray: CountedBlock[] = [];
+  const blockTypes = new Set((blocks || []).map((block) => block.type));
+  blockTypes.forEach((type) => {
+    const quantity = (blocks || []).filter(
+      (block) => block.type === type,
+    ).length;
+    const block = { type, quantity };
+    blocksArray.push(block);
+  });
+  return blocksArray;
+};
+
+const listBlocks = computed(() => {
+  let stringBlocks = '';
+  countBlocks()?.map(
     (item) =>
-      (stringDocuments += `${item.number} ${t(
+      (stringBlocks += `${item.quantity} ${t(
         `components.learningPlan.cardTrails.${item.type}`,
       )}; `),
   );
-  return stringDocuments;
+  return stringBlocks;
 });
 
-const hasDocuments = computed(() => {
-  if (documents) {
-    return !!documents.length;
+const hasBlocks = computed(() => {
+  if (blocks) {
+    return !!blocks.length;
   }
   return false;
 });

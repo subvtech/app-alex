@@ -10,5 +10,7 @@
     "article": "Article",
     "articles": "Articles",
     "document": "Document",
-    "documents": "Documents"
+    "documents": "Documents",
+    "video": "Video",
+    "videos": "Videos"
 }

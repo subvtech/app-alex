@@ -80,8 +80,8 @@
               </td>
             </tr>
             <tr>
-              <td>documents</td>
-              <td>{ type: string; number?: string }</td>
+              <td>blocks</td>
+              <td>{ type: string }</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -193,10 +193,10 @@
       </div>
     </div>
 
-    <h2 class="text-h2 text-gray-800">Variante: Documentos</h2>
+    <h2 class="text-h2 text-gray-800">Variante: Blocos</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Poderá ser passado um array de documentos que representaram uma síntese
-      dos tipos de conteúdo da trilha. Apenas dando um hover no ícone com número
+      Poderá ser passado um array de blocos que representaram uma síntese dos
+      tipos de conteúdo da trilha. Apenas dando um hover no ícone com número
       abaixo da descrição.
     </p>
     <v-table variant="outline" class="w-full">
@@ -215,13 +215,6 @@
             <v-icon icon="mdi-checkbox-marked" color="success" />
           </td>
         </tr>
-        <tr>
-          <td>number</td>
-          <td>number</td>
-          <td class="text-center">
-            <v-icon icon="mdi-checkbox-marked" color="success" />
-          </td>
-        </tr>
       </tbody>
     </v-table>
     <div class="w-100 flex-column d-flex gap-4">
@@ -232,9 +225,11 @@
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
-          :documents="[
-            { type: 'articles', number: 4 },
-            { type: 'documents', number: 5 },
+          :blocks="[
+            { type: 'video' },
+            { type: 'article' },
+            { type: 'article' },
+            { type: 'video' },
           ]"
         />
       </div>
@@ -302,7 +297,7 @@ const examples = [
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
           }"
-          :documents="[{ type: 'article', number: 4 }]"
+          :blocks="[{ type: 'article'}]"
         />`,
 ];
 
