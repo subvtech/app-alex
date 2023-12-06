@@ -66,6 +66,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'appLearningPlanCard',
     'articleViewer',
     'imagePreview',
+    'appGeneralBoxes',
     'tagCombobox',
     'usersAutocomplete',
     'learningPlan/editor',

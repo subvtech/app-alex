@@ -1,24 +1,43 @@
 <template>
-  <div class="boxes d-flex justify-center w-100 pb-6" :class="hideDivider ? '' : 'border-bottom'">
+  <div
+    class="boxes d-flex justify-center w-100 pb-6"
+    :class="hideDivider ? '' : 'border-bottom'"
+  >
     <div class="box d-flex" v-for="(box, index) in boxes" :key="index">
       <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
       <div class="d-flex">
         <h6>{{ box.number }}</h6>
-        <p>{{ box.label }}</p>
+        <p>
+          {{
+            $t(
+              `components.appGeneralBoxes.${box.label}.${
+                box.number === 1 ? 'singular' : 'plural'
+              }`,
+            )
+          }}
+        </p>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+const i18n = useI18n();
+console.log(i18n);
 const props = defineProps({
   boxes: {
-    type: Array as PropType<{ icon: string; number: number; label: string }[]>,
+    type: Array as PropType<
+      {
+        icon: string;
+        number: number;
+        label: 'courses' | 'students' | 'projects' | 'assignments';
+      }[]
+    >,
     default: [],
   },
   hideDivider: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 </script>
 <style scoped lang="scss">

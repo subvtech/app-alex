@@ -9,17 +9,17 @@
           {
             icon: 'mdi-bookmark-box-multiple-outline',
             number: learningPlans.length,
-            label: $t('components.profile.general.courses'),
+            label: 'courses',
           },
           {
             icon: 'mdi-newspaper-variant-multiple-outline',
             number: projects.length,
-            label: $t('components.profile.general.projects'),
+            label: 'projects',
           },
           {
             icon: 'mdi-check-decagram',
             number: 62,
-            label: $t('components.profile.general.assignments'),
+            label: 'assignments',
           },
         ]"
       />

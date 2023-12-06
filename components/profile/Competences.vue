@@ -6,6 +6,8 @@
     :showIcon="canEdit"
     :cancel="onCancel"
     :save="onSave"
+    show-tooltip
+    :tooltip="title"
     full-width
   >
     <template v-slot:content>
@@ -98,7 +100,7 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false },
 });
 
-const { canEdit, userId, isGeneral } = toRefs(props);
+const { canEdit, userId } = toRefs(props);
 const isEditing = ref(false);
 const selectedTag = ref<Tag | null>(null);
 const allTags = ref<Tag[]>([]);
@@ -188,7 +190,7 @@ const onSave = async () => {
           create('tags', {
             ...item,
             verified_by: userId.value,
-            isGeneral: isGeneral.value,
+            isGeneral: props.isGeneral,
           }),
         );
       });
@@ -239,7 +241,7 @@ const updateTags = (tag, isCreating = false) => {
 };
 
 const filterTags = () => {
-  if (isGeneral.value) {
+  if (props.isGeneral) {
     filteredTags.value = allTags.value.filter(
       (item) => !userTagsIds.value.includes(item.id) && item.isGeneral,
     );

@@ -1,7 +1,7 @@
 <template>
   <div
     id="Card"
-    class="d-flex flex-column"
+    class="d-flex flex-column rounded-lg"
     :class="[fullWidth ? 'w-100' : '', isNested ? '' : 'float']"
   >
     <div
@@ -11,10 +11,19 @@
       <div class="foretitle d-flex py-6">
         <span>{{ title }}</span>
         <a v-if="href" :href="href" class="mr-5" role="goback">
-          <v-icon color="#6E7A87" class="pointer"
-            >mdi-chevron-right</v-icon
-          >
+          <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
         </a>
+        <div v-if="showTooltip" class="tooltip d-flex">
+          <img
+            class="pl-1"
+            src="/svg/tooltip.svg"
+            width="24"
+            height="24"
+          />
+          <div v-if="tooltip" class="px-4">
+            <span>{{ tooltip }}</span>
+          </div>
+        </div>
       </div>
 
       <div v-if="isEditing" class="buttons d-flex justify-end">
@@ -97,6 +106,13 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showTooltip: {
+    type: Boolean,
+    default: false,
+  },
+  tooltip: {
+    type: String,
+  },
   isNested: {
     type: Boolean,
     default: false,
@@ -139,8 +155,7 @@ type SizingClass =
   .pointer {
     cursor: pointer;
   }
-  .float {
-    border-radius: 8px;
+  &.float {
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
   }
   .border-bottom {
@@ -155,6 +170,35 @@ type SizingClass =
       font-size: 20px;
       font-weight: 700;
       line-height: 24px;
+    }
+
+    div.tooltip {
+      position: relative;
+      img:hover + div {
+        display: block !important;
+      }
+      div {
+        position: absolute;
+        display: none;
+        top: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 300px;
+        padding: 6.5px 16px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 4px;
+        background: var(--cinza-cinza-800, #454d54);
+        box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.15);
+
+        span {
+          color: var(--principais-branco, #fff);
+
+          font-size: 14px;
+          font-weight: 400;
+          letter-spacing: 0.28px;
+        }
+      }
     }
   }
 

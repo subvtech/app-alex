@@ -1,10 +1,6 @@
 <template>
   <div class="d-flex gap" :class="fullWidth ? 'w-100' : ''">
-    <alex-custom-card title="Sobre o curso" :save="onSave" full-width>
-      <template #content>
-        <span :contenteditable="canEdit">{{ text }}</span>
-      </template>
-    </alex-custom-card>
+    <span :contenteditable="canEdit">{{ text }}</span>
   </div>
 </template>
 
