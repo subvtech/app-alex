@@ -19,7 +19,7 @@
       name="header"
       :title="title"
       :highlighted-title="highlightedTitle"
-      :on-close="() => emits('update:modelValue', false)"
+      :emit-close="() => emits('update:modelValue', false)"
     />
     <alex-custom-dialog-header
       v-else
@@ -55,8 +55,8 @@
               <slot
                 v-if="hasFooter"
                 name="footer"
-                :on-main-action="() => emits('onMainAction')"
-                :on-secondary-action="() => emits('onSecondaryAction')"
+                :emit-main-action="() => emits('onMainAction')"
+                :emit-secondary-action="() => emits('onSecondaryAction')"
                 :is-valid="isValid"
                 :submit-loading="submitLoading"
               />
@@ -68,7 +68,11 @@
                   <alex-custom-button
                     type="submit"
                     size="large"
-                    :text="isLastStep ? 'Criar' : 'Avançar'"
+                    :text="
+                      isLastStep
+                        ? $t('components.dialog.create')
+                        : $t('components.dialog.next')
+                    "
                     :append-icon="!isLastStep ? 'mdi-chevron-right' : undefined"
                     :prepend-icon="isLastStep ? 'mdi-plus' : undefined"
                     :loading="submitLoading"
@@ -76,7 +80,7 @@
                 </template>
                 <template #secondarySlotButton>
                   <alex-custom-button
-                    text="Voltar"
+                    :text="$t('components.dialog.back')"
                     variant="secondary"
                     size="large"
                     prepend-icon="mdi-chevron-left"
@@ -95,8 +99,8 @@
     <slot
       v-if="hasFooter && !stepper"
       name="footer"
-      :on-main-action="() => emits('onMainAction')"
-      :on-secondary-action="() => emits('onSecondaryAction')"
+      :emit-main-action="() => emits('onMainAction')"
+      :emit-secondary-action="() => emits('onSecondaryAction')"
     />
     <alex-custom-dialog-footer
       v-else-if="!hasFooter && !noFooter && !stepper"
@@ -110,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { StepsConfig } from '../../inputs/stepper/index.vue';
+import { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
 
 interface HeaderProps {
   modelValue: boolean;
