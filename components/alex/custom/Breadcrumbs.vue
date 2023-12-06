@@ -10,16 +10,16 @@
     data-testid="breadcrumbs"
   >
     <div class="d-flex align-center">
-      <a
+      <nuxt-link
         v-if="arrowBack && items.length > 1"
-        :href="items[items.length - 2].href"
+        :to="items[items.length - 2].href"
         class="mr-5"
         role="goback"
       >
         <v-icon color="#6E7A87" style="cursor: pointer"
           >mdi-chevron-left</v-icon
         >
-      </a>
+      </nuxt-link>
 
       <span
         class="title text-h4 text-sm-h3"
@@ -73,7 +73,7 @@ defineProps({
     type: Array as PropType<
       { title: string; disabled: boolean; href: string }[]
     >,
-    default: [],
+    default: () => [],
   },
   arrowBack: {
     type: Boolean,
@@ -85,6 +85,7 @@ defineProps({
   },
   breadcrumbsVClasses: {
     type: String,
+    default: '',
   },
   divider: {
     type: String,
@@ -94,11 +95,26 @@ defineProps({
     type: Number,
     default: 2,
   },
-  title: { type: String },
-  titleStyle: { type: String },
-  barStyle: { type: String },
-  itemStyle: { type: String },
-  backgroundColor: { type: String },
+  title: {
+    type: String,
+    default: '',
+  },
+  titleStyle: {
+    type: String,
+    default: '',
+  },
+  barStyle: {
+    type: String,
+    default: '',
+  },
+  itemStyle: {
+    type: String,
+    default: '',
+  },
+  backgroundColor: {
+    type: String,
+    default: '',
+  },
 });
 </script>
 

@@ -5,41 +5,11 @@
     data-testid="header"
   >
     <div class="d-flex grow align-center">
-      <a
-        v-if="!noBackArrow"
-        :href="items[items.length - 2].href"
-        data-testid="back_arrow"
-      >
-        <v-icon
-          class="header__arrow"
-          data-testid="back_arrow"
-          color="#6E7A87"
-          style="cursor: pointer"
-          >mdi-chevron-left</v-icon
-        >
-      </a>
-      <div>
-        <p
-          class="header__title"
-          style="
-            font-size: 24px;
-            font-weight: 700;
-            line-height: 28px;
-            color: #5d6872;
-          "
-          :title="title"
-        >
-          {{ title }}
-        </p>
-      </div>
-      <!-- <v-divider vertical class="divider ml-4 align-center" /> -->
       <div class="header__breadcrumb">
-        <slot name="breadcrumbs" :items="items">
-          <alex-custom-breadcrumbs :items="items" />
-        </slot>
+        <alex-custom-breadcrumbs :title="title" :items="items" arrow-back />
       </div>
     </div>
-    <div class="header__button d-flex">
+    <!-- <div class="header__button d-flex">
       <v-btn
         data-testid="btn"
         :class="isTerciary ? 'terciary' : ''"
@@ -48,13 +18,10 @@
         class="button"
         :text="text"
         :icon="btnIcon"
-        @click="() => toggleDialog"
-        ><v-icon data-testid="btn-icon" width="20" height="20">
-          {{ icon }}
-        </v-icon>
+      >
         <p class="ml-2">{{ text }}</p>
       </v-btn>
-    </div>
+    </div> -->
   </div>
 </template>
 <script setup lang="ts">
