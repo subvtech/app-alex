@@ -1,6 +1,7 @@
 <template>
   <v-container
     class="pa-0 d-flex flex-column h-75 mid-container justify-center"
+    style="max-width: 400px"
   >
     <div>
       <p class="text-white text-h3 text-center font-weight-bold mb-4">
@@ -18,7 +19,7 @@
         :placeholder="$t('components.forgot.sendResetPassword.emailHolder')"
         name="email"
         color="white"
-        class="text-secondary"
+        class="mb-1"
         theme="dark"
       />
       <span v-if="submitError" class="text-error w-100">{{
@@ -26,7 +27,6 @@
       }}</span>
 
       <alex-custom-button
-        :color="!isValid ? 'grey-darken-1' : 'accent'"
         class="text-none text-white rounded-lg pa-5"
         block
         type="submit"

@@ -27,27 +27,30 @@
             {{ $t('pages.register.subtitle1') }}
           </v-card-subtitle>
 
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
             :label="$t('pages.register.fullName')"
+            :placeholder="$t('pages.register.fullNameHolder')"
             name="fullname"
             color="white"
-            class="my-3 text-secondary"
+            class="mb-1"
             theme="dark"
           />
 
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
             :label="$t('pages.register.email')"
+            :placeholder="$t('pages.register.emailHolder')"
             name="email"
             color="white"
-            class="my-3 text-secondary"
+            class="mb-1"
             theme="dark"
           />
 
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
+            :placeholder="$t('pages.register.cpfHolder')"
             label="CPF"
             name="cpf"
             color="white"
-            class="my-3 text-secondary"
+            class="mb-1"
             theme="dark"
             v-maska:[cpfMask]
           />
@@ -92,34 +95,37 @@
             {{ $t('pages.register.subtitle2') }}
           </v-card-subtitle>
 
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
             :label="$t('pages.register.username')"
+            :placeholder="$t('pages.register.usernameHolder')"
             name="username"
             color="white"
-            class="my-3 text-secondary"
+            class="my-3"
             theme="dark"
             :hint="`${usernameUrl}${values.username || ''}`"
             persistent-hint
           />
 
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
             :label="$t('pages.register.password')"
+            :placeholder="$t('pages.register.passwordHolder')"
             :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordVisible ? 'text' : 'password'"
             name="password"
             color="white"
-            class="my-3 text-secondary"
+            class="my-3"
             theme="dark"
             @click:append-inner="passwordVisible = !passwordVisible"
           />
 
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
             :label="$t('pages.register.confirmPassword')"
+            :placeholder="$t('pages.register.confirmPasswordHolder')"
             :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
             :type="confirmationVisible ? 'text' : 'password'"
             name="confirmPassword"
             color="white"
-            class="my-3 text-secondary"
+            class="my-3"
             theme="dark"
             @click:append-inner="confirmationVisible = !confirmationVisible"
           />

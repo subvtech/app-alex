@@ -18,5 +18,5 @@
     "notFound": "Metamask not detected",
     "tokenExpired": "Token expirado, tente novamente"
   },
-  "loginError": "Email ou Senha inválido(s)"
+  "loginError": "Nome de usuário ou senha incorretos!"
 }

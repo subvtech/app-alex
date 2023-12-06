@@ -1,7 +1,10 @@
 <template>
-  <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
+  <v-container
+    class="pa-0 d-flex flex-column h-75 mid-container justify-center"
+    style="max-width: 400px"
+  >
     <div class="mb-10">
-      <p class="text-white text-h4 text-center font-weight-bold mb-4">
+      <p class="text-white text-h3 text-center font-weight-bold mb-4">
         {{ $t('components.forgot.sendResetPassword.newPassword') }}
       </p>
       <p class="text-white text-h6 font-weight-regular text-center my-2">
@@ -14,29 +17,32 @@
       class="mb-10"
       @submit.prevent="changePassword"
     >
-      <alex-inputs-stepper-field
+      <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.password')"
+        :placeholder="$t('components.forgot.sendResetPassword.passwordHolder')"
         name="password"
         :type="passwordVisible ? 'text' : 'password'"
         color="white"
-        class="my-3 text-secondary"
+        class="mb-1"
         theme="dark"
         :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
         @click:append-inner="passwordVisible = !passwordVisible"
       />
 
-      <alex-inputs-stepper-field
+      <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.confirmPassword')"
+        :placeholder="
+          $t('components.forgot.sendResetPassword.confirmPasswordHolder')
+        "
         name="confirmPassword"
         :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
         :type="confirmationVisible ? 'text' : 'password'"
         color="white"
-        class="my-3 text-secondary"
+        class="mb-1"
         theme="dark"
         @click:append-inner="confirmationVisible = !confirmationVisible"
       />
-      <v-btn
-        :color="!isValid ? 'grey-darken-1' : 'accent'"
+      <alex-custom-button
         class="text-none text-white rounded-lg pa-5"
         block
         type="submit"
@@ -44,10 +50,11 @@
         :disabled="!isValid"
         :loading="loading"
       >
-        {{ $t('components.forgot.sendResetPassword.changePassword') }}</v-btn
+        {{
+          $t('components.forgot.sendResetPassword.changePassword')
+        }}</alex-custom-button
       >
     </v-form>
-    <ForgotPasswordDividerRow />
     <p class="text-center text-body-1 mt-5">
       {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-accent text-decoration-none">
@@ -96,7 +103,7 @@ const changePassword = handleSubmit(async () => {
       password: values.password,
       passwordConfirmation: values.confirmPassword,
     });
-    
+
     emit('confirmation-message');
   } catch (error) {
     messageStore.message = error as string;

@@ -21,6 +21,7 @@
         />
         <ForgotPasswordConfirmationMessage
           v-else
+          :title="$t('pages.forgot.success.title')"
           :text="$t('pages.forgot.success.subtitle1')"
           :email="userEmail"
           :text2="$t('pages.forgot.success.subtitle2')"
@@ -50,6 +51,6 @@ const handleSentEmail = (email) => {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  width: 629px;
+  max-width: 629px;
 }
 </style>

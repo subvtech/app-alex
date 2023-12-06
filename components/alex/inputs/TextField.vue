@@ -15,6 +15,8 @@
       >
     </div>
     <v-text-field
+      v-model="value"
+      :error-messages="errorMessage"
       :class="theme"
       color="primary--2"
       rounded="lg"
@@ -27,7 +29,9 @@
 </template>
 
 <script setup>
-const { theme, disabled } = defineProps({
+import { useField } from 'vee-validate';
+
+const props = defineProps({
   label: {
     type: String,
     default: '',
@@ -48,14 +52,22 @@ const { theme, disabled } = defineProps({
     type: String,
     default: 'light',
   },
+  name: { type: String, required: true },
+  value: {
+    type: String || Number || Boolean || undefined,
+    default: undefined,
+  },
 });
 
+const { value, errorMessage } = useField(() => props.name, undefined, {
+  initialValue: props.value,
+});
 const textColor = computed(() => {
-  if (theme === 'light') {
-    return disabled ? 'gray-300' : 'gray-800';
+  if (props.theme === 'light') {
+    return props.disabled ? 'gray-300' : 'gray-800';
   }
-  if (theme === 'dark') {
-    return disabled ? 'gray-300' : 'white';
+  if (props.theme === 'dark') {
+    return props.disabled ? 'gray-300' : 'white';
   }
 });
 </script>
@@ -100,21 +112,17 @@ const textColor = computed(() => {
     color: #454d54 !important;
   }
 
-  .v-field--error > .v-field__outline {
-    color: #e9494a !important;
-  }
-
   .v-input__details {
     padding-inline-start: 0 !important;
   }
 
   .v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
-    color: #6e7a87 !important;
+    color: #6e7a87;
   }
 
   .light .v-field__outline {
-    color: var(--gray-300) !important;
+    color: var(--gray-300);
   }
 
   .light .v-field--dirty > .v-field__field > .v-field__input {
@@ -126,7 +134,7 @@ const textColor = computed(() => {
   }
 
   .dark .v-field__outline {
-    color: var(--gray-400) !important;
+    color: var(--gray-400);
   }
 
   .dark .v-field--dirty > .v-field__field > .v-field__input {
@@ -135,6 +143,11 @@ const textColor = computed(() => {
 
   .dark .v-field > div > i {
     color: var(--gray-400) !important;
+  }
+
+  .v-field--error > .v-field__outline,
+  .v-input--error .v-messages__message {
+    color: #e9494a !important;
   }
 }
 </style>

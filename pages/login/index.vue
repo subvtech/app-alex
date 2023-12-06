@@ -12,8 +12,8 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card class="card card-acesso px-10 d-flex justify-center align-center">
-        <div class="form d-flex flex-column">
+      <v-card class="card card-acesso d-flex justify-center align-center">
+        <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
             <v-card-title class="text-white text-center text-bold mt-16">
               {{ $t('pages.login.welcome') }}
@@ -32,32 +32,46 @@
               name="email"
               color="white"
               theme="dark"
+              data-vv-validate-on="change|custom"
             />
 
             <alex-inputs-text-field
               :label="$t('pages.login.password')"
               :placeholder="$t('pages.login.passwordHolder')"
-              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :append-inner-icon="!passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
               color="white"
               theme="dark"
+              :hide-details="errorMessage"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
-
+            <div class="mt-2">
+              <p v-show="errorMessage" class="text-body-1 text-error">
+                {{ $t('pages.login.loginError') }}
+              </p>
+            </div>
             <div
-              class="d-flex justify-between align-center mb-3"
-              style="height: 24px"
+              class="d-flex justify-space-between align-center mb-2"
+              style="max-height: 30px"
             >
               <v-checkbox
                 v-model="checkbox"
                 class="text-white smaller-text"
                 color="accent"
-                :label="$t('pages.login.remember')"
-              ></v-checkbox>
+                base-color="white"
+                hide-details
+                style="margin-left: -8px"
+              >
+                <template #label>
+                  <span class="text-white text-body-2 text-high-emphasis">{{
+                    $t('pages.login.remember')
+                  }}</span>
+                </template>
+              </v-checkbox>
               <nuxt-link
                 to="/forgot"
-                class="blue-label smaller-text text-decoration-none pb-5"
+                class="blue-label smaller-text text-decoration-none"
               >
                 {{ $t('pages.login.forgot') }}
               </nuxt-link>
@@ -68,6 +82,7 @@
               size="large"
               type="submit"
               class="text-none text-green text-body-1"
+              :disabled="!isValid"
               :loading="logging"
             >
               {{ $t('pages.login.submit') }}
@@ -114,6 +129,8 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { ref } from 'vue';
+const errorMessage = ref(false);
 const i18n = useI18n();
 definePageMeta({
   layout: 'auth',
@@ -166,9 +183,10 @@ const submit = handleSubmit(async () => {
     router.push('/');
   } catch (error) {
     logging.value = false;
-    messageStore.message = i18n.t('pages.login.loginError');
-    messageStore.color = 'red';
-    messageStore.show = true;
+    errorMessage.value = true;
+    setTimeout(() => {
+      errorMessage.value = false;
+    }, 5000);
   }
 });
 </script>
@@ -188,7 +206,6 @@ const submit = handleSubmit(async () => {
 
       .v-card-subtitle {
         font-size: 1.25rem;
-        padding-inline: 64px;
       }
     }
 
@@ -207,7 +224,7 @@ const submit = handleSubmit(async () => {
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
-      max-width: 629px;
+      width: 629px;
       right: 0;
       overflow: auto;
     }

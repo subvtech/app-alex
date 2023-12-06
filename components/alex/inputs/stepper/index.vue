@@ -24,7 +24,7 @@
       />
     </template>
     <div v-if="!showControls" class="w-100 d-flex">
-      <v-btn
+      <alex-custom-button
         v-if="activeStep > 1"
         :disabled="submitLoading"
         type="button"
@@ -36,7 +36,7 @@
         text="Voltar"
       />
 
-      <v-btn
+      <alex-custom-button
         type="submit"
         :disabled="!isValid"
         :loading="submitLoading"
