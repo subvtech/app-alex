@@ -424,6 +424,12 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const customColor = ref('accent');
 const copiedValue = ref('');
 const firstExampleActivePage = ref('1');

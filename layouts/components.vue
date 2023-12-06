@@ -1,11 +1,10 @@
 <template>
-  <v-app v-if="user">
+  <v-app>
     <AppSnackbar />
-
     <alex-custom-drawable
+      v-model="drawer"
       :blocks="menus"
       :clipped="clipped"
-      :show="drawer"
       dark
       :permanent="isPermanent"
     >
@@ -33,60 +32,66 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="
-        () => {
-          drawer = !drawer;
-        }
-      "
+      :toggle-drawer="() => closeDrawable(!clipped)"
+      :user="user"
+      @click="onClickOutside"
       :menu-items="profileMenuItems"
-      :placeholder="user.fullname"
-      :avatar="user.avatar"
-      show-picture
     />
 
-    <v-main class="secondary bg-gray-blue pt-16">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
-        <span>{{ user }}</span> <slot />
+        <slot />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script setup lang="ts">
-const clipped = ref(false);
-const drawer = ref(true);
-const isPermanent = ref(false);
+import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
+
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
 const { profileMenuItems } = useMainHorizontalBar();
 
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
+
 onBeforeMount(() => {
-  userStore.profilePicture = user.value.avatar;
-  userStore.fullname = user.value.fullname;
+  if (user.value) {
+    userStore.profilePicture = user.value.avatar;
+    userStore.fullname = user.value.fullname;
+  }
 });
 
 const menus = [
   {
-    title: 'Components',
+    title: 'Custom',
     items: [
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-account-circle',
         title: 'AppUserAvatar',
-        to: '/components/custom/appuseravatar',
+        to: '/components/custom/Appuseravatar',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Accordion',
+        to: '/components/custom/Accordion',
       },
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Banner',
         to: '/components/custom/banner',
       },
+
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'Breadcrumbs',
-        to: '/components/custom/breadcrumbs',
+        title: 'Button',
+        to: '/components/custom/Button',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-chip',
         title: 'Chip',
         to: '/components/custom/chip',
       },
@@ -95,6 +100,22 @@ const menus = [
         title: 'Dialog',
         to: '/components/custom/Dialog',
       },
+
+      {
+        icon: 'mdi-information-variant',
+        title: 'Info',
+        to: '/components/custom/info',
+      },
+    ],
+  },
+  {
+    title: 'Navigation',
+    items: [
+      {
+        icon: 'mdi-baguette',
+        title: 'Breadcrumbs',
+        to: '/components/custom/breadcrumbs',
+      },
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Horizontalbar',
@@ -102,8 +123,33 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'Info',
-        to: '/components/custom/info',
+        title: 'Drawable',
+        to: '/components/custom/drawable',
+      },
+      {
+        icon: 'mdi-book-open-page-variant',
+        title: 'pagination',
+        to: '/components/custom/pagination',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'tabs',
+        to: '/components/custom/tabs',
+      },
+    ],
+  },
+  {
+    title: 'Input',
+    items: [
+      {
+        icon: 'mdi-radio',
+        title: 'Radio-button',
+        to: '/components/inputs/radio-button',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Text-field',
+        to: '/components/inputs/text-field',
       },
     ],
   },
