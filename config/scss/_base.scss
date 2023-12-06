@@ -44,6 +44,24 @@ $btn-icon-density: (
   }
 }
 
+//
+@for $i from 1 through 10 {
+  .lines-#{$i} {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $i;
+    line-clamp: $i;
+  }
+}
+
+.ellipsis {
+  display: -webkit-box;
+  padding: 0;
+  white-space: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-wrap: break-word;
+  line-height: inherit;
+}
 
 .v-dialog.custom-alex-dialog > .v-overlay__content {
   max-height: calc(100vh - 160px);
