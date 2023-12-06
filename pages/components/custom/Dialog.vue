@@ -2,7 +2,7 @@
   <v-container
     class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
   >
-    <h1 class="text-h2 text-gray-800">dialog</h1>
+    <h1 class="text-h1 text-gray-800">Dialog</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
       <strong class="bg-accent pa-1 rounded">alex-custom-dialog</strong>
@@ -25,7 +25,7 @@
         >
       </div>
     </div>
-    <h2 class="text-h2 text-gray-800">Uso Básico</h2>
+    <h3 class="text-h3 text-gray-800">Uso Básico</h3>
     <p class="text-subtitle-2 text-gray-500">
       Tem como propriedades o <strong>v-model</strong> que é obrigatório e o
       <strong>activator</strong>, <strong>title</strong>,
@@ -44,12 +44,20 @@
           @on-secondary-action="() => console.log('second')"
         >
           <template #activator="{ props }">
-            <alex-custom-button v-bind="props">Abrir dialog</alex-custom-button>
+            <alex-custom-button v-bind="props">Abrir Dialog</alex-custom-button>
           </template>
           tesLorem ipsum dolor sit amet, semper quis, sapien id natoque elit.
           Nostra urna at, magna at neque sed sed ante imperdiet, dolor mauris
           cursus velit, velit non, sem nec. Volutpat sem ridiculus placerat leo,
           augue in, duis erat proin condimentum in a eget, sed fermentum sed
+          vestibulum varius ac, vestibulum volutpat orci ut elit eget tortor.
+          Ultrices nascetur nulla gravida ante arcu. Pharetra rhoncus morbi
+          ipsum, nunc tempor debitis, ipsum pellentesque, vitae id quam utgue
+          in, duis erat proin condimentum in a eget, sed fermentum sed
+          vestibulum varius ac, vestibulum volutpat orci ut elit eget tortor.
+          Ultrices nascetur nulla gravida ante arcu. Pharetra rhoncus morbi
+          ipsum, nunc tempor debitis, ipsum pellentesque, vitae id quam utgue
+          in, duis erat proin condimentum in a eget, sed fermentum sed
           vestibulum varius ac, vestibulum volutpat orci ut elit eget tortor.
           Ultrices nascetur nulla gravida ante arcu. Pharetra rhoncus morbi
           ipsum, nunc tempor debitis, ipsum pellentesque, vitae id quam ut
@@ -72,56 +80,23 @@
           risus, quam ac egestas. Et vitae, nulla gravida erat scelerisque
           nullam nunc pellentesque, a dictumst cras augue, purus imperdiet non.
           Varius montes cursus varius vel tortor, nec leo a qui, magni cras,
-          velit vel consectetuer lobortis vel. Nibh erat et wisi felis leo
-          porttitor, sapien nibh sapien pede mi, sed eget porttitor, repellendus
-          arcu ac quis. Luctus vulputate aut est sem magna, placerat accumsan
-          nunc vestibulum ipsum ac auctor, maecenas lorem in ut nec mauris
-          tortor, doloribus varius sem tortor vestibulum mollis, eleifend tortor
-          felis tempus lacus eu eu. Eleifend vel eu, nullam maecenas mauris nec
-          nunc euismod, tortor porta ridiculus potenti, massa tristique nam
-          magna, et wisi placerat et erat ante. Eget pede erat in facilisis,
-          fermentum venenatis sodales. Ac tortor sociis et non animi tristique,
-          rhoncus malesuada, ut arcu volutpat scelerisque sollicitudin, elit
-          curabitur dui pede purus dolor, integer aenean risus taciti nulla
-          eleifend accumsan. At pulvinar diam parturient, interdum mi velit
-          aliquet et a. Arcu at ac placerat eget justo semper, purus sociis
-          curabitur mi ipsum consequat ut, mollis vestibulum, est ante ornare
-          lacus sem. Neque magna mauris, commodo quisque, praesent semper
-          suscipit lobortis nam. Justo malesuada cursus ac nunc litora nunc.
-          Tellus ac, in lobortis nunc, montes lectus purus fermentum.teibus
-          varius sem tortor vestibulum mollis, eleifend tortor felis tempus
-          lacus eu eu. Eleifend vel eu, nullam maecenas mauris nec nunc euismod,
-          tortor porta ridiculus potenti, massa tristique nam magna, et wisi
-          placerat et erat ante. Eget pede erat in facilisis, fermentum
-          venenatis sodales. Ac tortor sociis et non animi tristique, rhoncus
-          malesuada, ut arcu volutpat scelerisque sollicitudin, elit curabitur
-          dui pede purus dolor, integer aenean risus taciti nulla eleifend
-          accumsan. At pulvinar diam parturient, interdum mi velit aliquet et a.
-          Arcu at ac placerat eget justo semper, purus sociis curabitur mi ipsum
-          consequat ut, mollis vestibulum, est ante ornare lacus sem. Neque
-          magna mauris, commodo quisque, praesent semper suscipit lobortis nam.
-          Justo malesuada cursus ac nunc litora nunc. Tellus ac, in lobortis
-          nunc, montes lectus purus fermentum.teesuada, ut arcu volutpat
-          scelerisque sollicitudin, elit curabitur dui pede purus dolor, integer
-          aenean risus taciti nulla eleifend accumsan. At pulvinar diam
-          parturient, interdum mi velit aliquet et a. Arcu at ac placerat eget
-          justo semper, purus sociis curabitur mi ipsum consequat ut, mollis
-          vestibulum, est ante ornare lacus sem. Neque magna mauris, commodo
-          quisque, praesent semper suscipit lobortis nam. Justo malesuada cursus
-          ac nunc litora nunc. Tellus ac, in lobortis nunc, montes lectus purus
-          fermentum.teibus varius sem tortor vestibulum mollis, eleifend tortor
-          felis tempus lacus eu eu. Eleifend vel eu, nullam maecenas mauris nec
-          nunc euismod, tortor porta ridiculus potenti, massa tristique nam
-          magna, et wisi placerat et erat ante. Eget pede erat in facilisis,
-          fermentum venenatis sodales. Ac tortor sociis et non animi tristique,
-          rhoncus malesuada, ut arcu volutpat scelerisque sollicitudin, elit
-          curabitur dui pede purus dolor, integer aenean risus taciti nulla
-          eleifend accumsan. At pulvinar diam parturient, interdum mi velit
-          aliquet et a. Arcu at ac placerat eget justo semper, purus sociis
-          curabitur mi ipsum consequat ut, mollis vestibulum, est ante ornare
-          lacus sem. Neque magna mauris, commodo quisque, praesent semper
-          suscipit lobortis nam. Justo malesuada cursus ac nunc litora nunc.
-          Tellus ac, in lobortis nunc, montes lectus purus fermentum.te
+          nulla. Sit lacus pharetra tempus magna neque pellentesque, nulla vel
+          erat. Justo ex quisque nulla accusamus venenatis, sed quis. Nibh
+          phasellus gravida metus in, fusce aenean ut erat commodo eros. Ut
+          turpis, dui integer, nonummy pede placeat nec in sit leo. Faucibus
+          porttitor illo taciti odio, amet viverra scelerisque quis quis et
+          tortor, curabitur morbi a. Enim tempor at, rutrum elit condimentum,
+          amet rutrum vitae tempor torquent nunc. Praesent vestibulum integer
+          maxime felis. Neque aenean quia vitae nostra, tempus elit enim id dui,
+          at egestas pulvinar. Integer libero vestibulum, quis blandit
+          scelerisque mattis fermentum nulla, tortor donec vestibulum dolor amet
+          eget, elit nullam. Aliquam leo phasellus aliquam curabitur metus a,
+          nulla justo mattis duis interdum vel, mollis vitae et id, vestibulum
+          erat ridiculus sit pulvinar justo sed. Vehicula convallis, et nulla
+          wisi, amet vestibulum risus, quam ac egestas. Et vitae, nulla gravida
+          erat scelerisque nullam nunc pellentesque, a dictumst cras augue,
+          purus imperdiet non. Varius montes cursus varius vel tortor, nec leo a
+          qui, magni cras,
         </alex-custom-dialog>
       </div>
       <div class="a w-100" style="position: relative">
@@ -210,6 +185,20 @@
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
+            <tr>
+              <td>stepper</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>stepsConfig</td>
+              <td>StepsConfig</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
           </tbody>
         </v-table>
       </div>
@@ -248,6 +237,68 @@
       </div>
     </div>
 
+    <h3 class="text-h3 text-gray-800">Variante com Stepper</h3>
+    <p class="text-subtitle-2 text-gray-500">
+      Existe uma integração do modal com o
+      <nuxt-link to="/components/inputs/stepper" class="bg-accent pa-1 rounded"
+        >alex-inputs-stepper</nuxt-link
+      >.
+    </p>
+    <p class="text-subtitle-2 text-gray-500">
+      Tem como propriedades extras <strong>steps-config</strong> além de ser
+      possível utilizar os slots da mesma forma que o componente
+      <nuxt-link to="/components/inputs/stepper" class="bg-accent pa-1 rounded"
+        >alex-inputs-stepper</nuxt-link
+      >.
+    </p>
+
+    <div class="w-100 flex-column d-flex gap-4">
+      <div class="d-flex" style="gap: 8px">
+        <alex-custom-dialog
+          v-model="dialogStepper"
+          title="Dialog With Stepper"
+          name-main-button="Criar"
+          name-second-button="Cancelar"
+          stepper
+          :steps-config="{
+            step1: {
+              title: 'TitlePrimeiro',
+              subtitle: 'subtitle1',
+            },
+            step2: {
+              title: 'TitleSegundo',
+              subtitle: 'subtitle2',
+            },
+          }"
+          @on-main-action="() => console.log('maina')"
+        >
+          <template #activator="{ props }">
+            <alex-custom-button v-bind="props"
+              >Abrir Dialog Stepper</alex-custom-button
+            >
+          </template>
+          <template #step1> 1 </template>
+          <template #step2> 2 </template>
+        </alex-custom-dialog>
+      </div>
+      <div class="a w-100" style="position: relative">
+        <prism> {{ examples[1] }}</prism>
+        <alex-custom-button
+          class="copy-icon"
+          variant="text"
+          @click="copyToClipboard(1)"
+        >
+          <v-icon
+            v-if="copiedIndex === 1"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </alex-custom-button>
+      </div>
+    </div>
+
     <h2 class="text-h2 text-gray-800">
       Variante sem Footer e customização do body
     </h2>
@@ -266,7 +317,6 @@
             title="dialog uso dentro do botão"
             highlighted-title="#132"
             no-footer
-            body-classes="pa-1 bg-white"
             @on-main-action="() => console.log('main')"
             @on-secondary-action="() => console.log('second')"
             >teste
@@ -274,14 +324,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[1] }}</prism>
+        <prism> {{ examples[2] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(1)"
+          @click="copyToClipboard(2)"
         >
           <v-icon
-            v-if="copiedIndex === 1"
+            v-if="copiedIndex === 2"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -313,14 +363,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[2] }}</prism>
+        <prism> {{ examples[3] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(2)"
+          @click="copyToClipboard(3)"
         >
           <v-icon
-            v-if="copiedIndex === 2"
+            v-if="copiedIndex === 3"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -351,14 +401,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[3] }}</prism>
+        <prism> {{ examples[4] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(3)"
+          @click="copyToClipboard(4)"
         >
           <v-icon
-            v-if="copiedIndex === 3"
+            v-if="copiedIndex === 4"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -394,14 +444,14 @@
         </alex-custom-button>
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[4] }}</prism>
+        <prism> {{ examples[5] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(4)"
+          @click="copyToClipboard(5)"
         >
           <v-icon
-            v-if="copiedIndex === 4"
+            v-if="copiedIndex === 5"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -429,14 +479,14 @@
         />
       </div>
       <div class="a w-100" style="position: relative">
-        <prism> {{ examples[5] }}</prism>
+        <prism> {{ examples[6] }}</prism>
         <alex-custom-button
           class="copy-icon"
           variant="text"
-          @click="copyToClipboard(5)"
+          @click="copyToClipboard(6)"
         >
           <v-icon
-            v-if="copiedIndex === 5"
+            v-if="copiedIndex === 6"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -481,6 +531,22 @@
           </template>
         </alex-custom-dialog-footer>
       </div>
+      <div class="a w-100" style="position: relative">
+        <prism> {{ examples[7] }}</prism>
+        <alex-custom-button
+          class="copy-icon"
+          variant="text"
+          @click="copyToClipboard(7)"
+        >
+          <v-icon
+            v-if="copiedIndex === 7"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </alex-custom-button>
+      </div>
     </div>
   </v-container>
 </template>
@@ -496,6 +562,7 @@ definePageMeta({
 });
 
 const dialog = ref(false);
+const dialogStepper = ref(false);
 const dialogInsideUse = ref(false);
 const dialogCustomization = ref(false);
 const dialoghighlightedTitle = ref(false);
@@ -505,16 +572,42 @@ const copiedIndex = ref(-1);
 const examples = [
   `  <alex-custom-dialog
           v-model="dialog"
-          title="Criar Algo"
+          title="Título dialog"
           name-main-button="Criar"
           name-second-button="Cancelar"
           @on-main-action="() => console.log('main')"
           @on-secondary-action="() => console.log('second')"
         >
           <template #activator="{ props }">
-            <alex-custom-button v-bind="props">activator</alex-custom-button>
+            <alex-custom-button v-bind="props">Abrir Dialog</alex-custom-button>
           </template>
-          teste
+          body,
+        </alex-custom-dialog>`,
+  `<alex-custom-dialog
+          v-model="dialogStepper"
+          title="Dialog With Stepper"
+          name-main-button="Criar"
+          name-second-button="Cancelar"
+          stepper
+          :steps-config="{
+            step1: {
+              title: 'TitlePrimeiro',
+              subtitle: 'subtitle1',
+            },
+            step2: {
+              title: 'TitleSegundo',
+              subtitle: 'subtitle2',
+            },
+          }"
+          @on-main-action="() => console.log('maina')"
+        >
+          <template #activator="{ props }">
+            <alex-custom-button v-bind="props"
+              >Abrir Dialog Stepper</alex-custom-button
+            >
+          </template>
+          <template #step1> 1 </template>
+          <template #step2> 2 </template>
         </alex-custom-dialog>`,
   ` <alex-custom-button>
           Abrir dialog noFooter
@@ -524,7 +617,6 @@ const examples = [
             title="dialog uso dentro do botão"
             highlighted-title="#132"
             no-footer
-            body-classes="pa-1 bg-white"
             @on-main-action="() => console.log('main')"
             @on-secondary-action="() => console.log('second')"
             >teste
@@ -575,13 +667,33 @@ const examples = [
     highlighted-title="#222"
     @on-close="console.log('close')"
   />
-    <alex-custom-dialog-footer
-    :name-main-button="'Enviar'"
-    :name-second-button="'Voltar'"
-    @on-main-action="() => console.log('mainAction')"
-    @on-secondary-action="() => console.log('secondAction')"
-  />
-  <alex-custom-dialog-footer no-main-button on-secondary-action />`,
+`,
+  ` <alex-custom-dialog-footer
+          :name-main-button="'Enviar'"
+          :name-second-button="'Voltar'"
+          @on-main-action="() => console.log('mainAction')"
+          @on-secondary-action="() => console.log('secondAction')"
+        />
+
+        <alex-custom-dialog-footer no-main-button no-secondary-button />
+
+        <alex-custom-dialog-footer>
+          <template #mainSlotButton>
+            <alex-custom-button
+              text="Avançar"
+              size="large"
+              append-icon="mdi-chevron-right"
+            />
+          </template>
+          <template #secondarySlotButton>
+            <alex-custom-button
+              text="Voltar"
+              variant="secondary"
+              size="large"
+              prepend-icon="mdi-chevron-left"
+            />
+          </template>
+        </alex-custom-dialog-footer>`,
 ];
 
 const copyToClipboard = async (index) => {

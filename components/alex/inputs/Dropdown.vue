@@ -75,7 +75,7 @@ const hasActivatorSlot = computed(() => !!slots.activator);
 const onClick = (link?: string, onClick?: () => unknown) => {
   if (link) {
     push(link);
-  } else if (!link && onClick) {
+  } else if (onClick) {
     onClick();
   }
 };

@@ -8,7 +8,11 @@ export const useMainHorizontalBar = () => {
     router.push('/login');
   };
 
-  const profileMenuItems = [
+  const profileMenuItems: {
+    title: string;
+    to?: string;
+    action?: () => void;
+  }[] = [
     {
       title: i18n.t('layouts.default.profile'),
       to: `/user/${user.value ? user.value.username : ''}`,
