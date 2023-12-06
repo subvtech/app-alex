@@ -13,23 +13,33 @@
         />
       </div>
     </div>
-    <!-- <div class="header__button d-flex">
-      <v-btn
-        data-testid="btn"
-        :class="isTerciary ? 'terciary' : ''"
-        height="44"
-        width="103"
-        class="button"
-        :text="text"
-        :icon="btnIcon"
+    <div class="header__button d-flex">
+      <alex-custom-button
+        v-if="hasSecondaryButton"
+        variant="tertiary"
+        :prepend-icon="secondaryButtonIcon"
+        class="mr-2"
+        @click="() => emits('secondary-action')"
       >
-        <p class="ml-2">{{ text }}</p>
-      </v-btn>
-    </div> -->
+        {{ secondaryButtonText }}
+      </alex-custom-button>
+      <alex-custom-button
+        v-if="hasMainButton"
+        variant="primary"
+        :prepend-icon="mainButtonIcon"
+        @click="() => emits('main-action')"
+      >
+        {{ mainButtonText }}
+      </alex-custom-button>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 defineProps({
+  title: {
+    type: String,
+    default: 'Page Title',
+  },
   hasMainButton: {
     type: Boolean,
     default: false,
@@ -38,7 +48,22 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  // mainButton
+  mainButtonText: {
+    type: String,
+    default: 'Main Button',
+  },
+  mainButtonIcon: {
+    type: String,
+    default: null,
+  },
+  secondaryButtonIcon: {
+    type: String,
+    default: null,
+  },
+  secondaryButtonText: {
+    type: String,
+    default: 'Secondary Button',
+  },
   noBackArrow: {
     type: Boolean,
     default: false,
@@ -50,6 +75,8 @@ defineProps({
     default: () => [],
   },
 });
+
+const emits = defineEmits(['main-action', 'secondary-action']);
 </script>
 <style scoped lang="scss">
 .button {

@@ -95,7 +95,16 @@
       basta adicionar a propriedade <strong>noBackArrow</strong> ao componente.
     </p>
     <div class="w-100">
-      <alex-custom-header noBackArrow />
+      <alex-custom-header
+        no-back-arrow
+        has-main-button
+        has-secondary-button
+        main-button-icon="mdi-plus"
+        :items="[
+          { title: 'Início', disabled: false, href: '/inicio' },
+          { title: 'Página', disabled: false, href: '/pagina' },
+        ]"
+      />
     </div>
     <p class="text-subtitle-2 text-gray-500">
       <Prism inline class="bg-white pa-0"
