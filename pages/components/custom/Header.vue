@@ -107,7 +107,8 @@
     </h2>
     <p class="text-subtitle-2 text-gray-500">
       O componente aceita várias propriedades que permitem personalizar o
-      cabeçalho de acordo com as necessidades da sua aplicação. Seguem exemplos abaixo:<br />
+      cabeçalho de acordo com as necessidades da sua aplicação. Seguem exemplos
+      abaixo:<br />
     </p>
 
     <div class="w-100">
@@ -203,6 +204,11 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
 
 const copiedValue = ref('');
 const thirdExampleActivePage = ref('1');

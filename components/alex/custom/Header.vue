@@ -6,7 +6,11 @@
   >
     <div class="d-flex grow align-center">
       <div class="header__breadcrumb">
-        <alex-custom-breadcrumbs :title="title" :items="items" arrow-back />
+        <alex-custom-breadcrumbs
+          :title="title"
+          :items="items"
+          :arrow-back="!noBackArrow"
+        />
       </div>
     </div>
     <!-- <div class="header__button d-flex">
@@ -26,32 +30,26 @@
 </template>
 <script setup lang="ts">
 defineProps({
-  isTerciary: {
+  hasMainButton: {
     type: Boolean,
     default: false,
   },
-  text: {
-    type: String,
-    default: 'Botão',
+  hasSecondaryButton: {
+    type: Boolean,
+    default: false,
   },
-  btnIcon: {
-    type: String,
-    default: 'mdi-plus',
-  },
-  title: {
-    type: String,
-    default: 'Título da página',
-  },
+  // mainButton
   noBackArrow: {
     type: Boolean,
     default: false,
   },
+  items: {
+    type: Array as PropType<
+      { title: string; disabled: boolean; href: string }[]
+    >,
+    default: () => [],
+  },
 });
-
-const items = [
-  { title: 'Início', disabled: false, href: '/inicio' },
-  { title: 'Página', disabled: false, href: '/pagina' },
-];
 </script>
 <style scoped lang="scss">
 .button {

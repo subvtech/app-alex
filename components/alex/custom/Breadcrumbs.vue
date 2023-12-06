@@ -13,7 +13,7 @@
       <nuxt-link
         v-if="arrowBack && items.length > 1"
         :to="items[items.length - 2].href"
-        class="mr-5"
+        class="mr-5 arrow-back"
         role="goback"
       >
         <v-icon color="#6E7A87" style="cursor: pointer"
@@ -120,6 +120,9 @@ defineProps({
 
 <style scoped lang="scss">
 .breadcrumb-block {
+  .arrow-back {
+    text-decoration: none;
+  }
   .title {
     color: #5d6872;
     font-weight: 700;
