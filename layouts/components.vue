@@ -63,8 +63,8 @@ const userStore = useUserStore();
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  userStore.profilePicture = user.value.avatar;
-  userStore.fullname = user.value.fullname;
+  userStore.profilePicture = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
 });
 
 const menus = [
