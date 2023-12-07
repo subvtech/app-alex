@@ -88,7 +88,7 @@
     "vue-prism-component": "^2.0.0",
     "vuedraggable": "^4.1.0",
     "vueperslides": "^3.5.1",
-    "vuetify": "^3.3.11",
+    "vuetify": "^3.4.5",
     "yup": "^1.2.0"
   }
 }

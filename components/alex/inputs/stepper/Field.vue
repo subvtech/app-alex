@@ -8,16 +8,9 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-import {
-  VAutocomplete,
-  VSelect,
-  VTextarea,
-} from 'vuetify/lib/components/index.mjs';
-import TextField from '@/components/alex/inputs/TextField.vue';
+import { VAutocomplete, VSelect } from 'vuetify/lib/components/index.mjs';
 const components = {
-  TextField,
   VAutocomplete,
-  VTextarea,
   VSelect,
 };
 type ComponentsKeys = keyof typeof components;
@@ -30,7 +23,7 @@ interface FieldProps {
 
 const props = withDefaults(defineProps<FieldProps>(), {
   value: undefined,
-  fieldType: 'TextField',
+  fieldType: 'VAutocomplete',
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {

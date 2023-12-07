@@ -1,5 +1,5 @@
 <template>
-  <div id="custom-textfield">
+  <div id="alex-textarea">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -14,54 +14,47 @@
         >mdi-information-outline</v-icon
       >
     </div>
-    <v-text-field
+    <v-textarea
+      v-bind="$attrs"
       v-model="value"
-      :error-messages="errorMessage"
-      :class="theme"
       color="primary--2"
       rounded="lg"
-      role="textfield"
+      variant="outlined"
+      no-resize
+      role="textarea"
       clear-icon="mdi-close"
+      hide-details
+      :class="theme"
+      :error-messages="errorMessage"
       :disabled="disabled"
-      v-bind="$attrs"
-    />
+    ></v-textarea>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
 
-const props = defineProps({
-  label: {
-    type: String,
-    default: '',
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
-  info: {
-    type: String,
-    default: '',
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  theme: {
-    type: String,
-    default: 'light',
-  },
-  name: { type: String, required: true },
-  value: {
-    type: String || Number || Boolean || undefined,
-    default: undefined,
-  },
+interface TextAreaProps {
+  name: string;
+  label?: string;
+  required?: boolean;
+  info?: string;
+  disabled?: boolean;
+  theme?: 'light' | 'dark';
+  value?: string | number | boolean;
+}
+const props = withDefaults(defineProps<TextAreaProps>(), {
+  disabled: false,
+  theme: 'light',
+  info: undefined,
+  label: undefined,
+  value: undefined,
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {
   initialValue: props.value,
 });
+
 const textColor = computed(() => {
   if (props.theme === 'light') {
     return props.disabled ? 'gray-300' : 'gray-800';
@@ -72,26 +65,29 @@ const textColor = computed(() => {
 });
 </script>
 
-<style>
-#custom-textfield {
+<style lang="scss">
+#alex-textarea {
   .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
     --v-medium-emphasis-opacity: 1 !important;
     --v-disabled-opacity: 1 !important;
+    --v-border-color: rgb(var(--v-theme-gray-400));
   }
 
   .v-field__input {
     overflow: hidden;
-    color: rgb(var(--v-theme-gray-300)) !important;
+    color: rgb(var(--v-theme-gray-300));
+    border-color: rgb(var(--v-theme-gray-400));
     text-overflow: ellipsis !important;
     font-family: Sen !important;
     font-size: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
     font-style: normal !important;
-    font-weight: 400 !important;
     line-height: 135% !important;
     letter-spacing: 0.32px !important;
-    border-width: 5px;
+    border-width: 5px !important;
   }
 
   .v-field--disabled > div > i,
@@ -111,7 +107,7 @@ const textColor = computed(() => {
 
   .v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
-    color: rgb(var(--v-theme-gray-600)) !important;
+    color: rgb(var(--v-theme-gray-600));
   }
 
   .light .v-field__outline {
@@ -127,11 +123,11 @@ const textColor = computed(() => {
   }
 
   .dark .v-field__outline {
-    color: rgb(var(--v-theme-gray-400));
+    color: var(--gray-400);
   }
 
   .dark .v-field--dirty > .v-field__field > .v-field__input {
-    color: rgb(var(--v-theme-white)) !important;
+    color: #fff !important;
   }
 
   .dark .v-field > div > i {

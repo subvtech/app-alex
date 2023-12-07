@@ -29,14 +29,14 @@
       @on-close="() => emits('update:modelValue', false)"
     />
     <v-container
-      class="pa-1 gap-1 body-height alex-scrollbar-white"
+      class="pa-1 gap-4 body-height alex-scrollbar-white"
       :class="{ 'body-height-stepper': stepper }"
     >
       <v-row dense>
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">
           <alex-inputs-stepper
             :steps-config="stepsConfig"
-            step-class="max-height-stepper pa-6 gap-4"
+            step-class="d-flex flex-column max-height-stepper pa-6 gap-4"
             stepper-indicator-class="px-6 pt-6 pb-1"
             @on-success="emits('onMainAction')"
           >

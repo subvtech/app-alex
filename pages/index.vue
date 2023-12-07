@@ -1,30 +1,81 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12">
-      <app-editor :data="data"></app-editor>
+      <alex-custom-dialog
+        v-model="dialogStepper"
+        title="Criar novo Curso"
+        name-main-button="Criar"
+        name-second-button="Cancelar"
+        stepper
+        :steps-config="{
+          step1: { title: 'Informações', subtitle: 'Básicas' },
+          step2: { title: 'Mídia', subtitle: 'Descritiva' },
+          step3: { title: 'Membros', subtitle: 'Participantes' },
+          step4: { title: 'Encontros', subtitle: 'Síncronos' },
+        }"
+        step-class="d-flex gap-6"
+        stepper-indicator-class="d-flex"
+        @on-main-action="() => console.log('maina')"
+      >
+        <template #activator="{ props }">
+          <alex-custom-button v-bind="props"
+            >Abrir Dialog Stepper</alex-custom-button
+          >
+        </template>
+        <template #step1
+          ><alex-inputs-text-field
+            density="compact"
+            name="name"
+            label="Como vai se chamar seu Curso?"
+            hide-details
+            placeholder="Digite o nome do Curso"
+            required
+          />
+          <alex-inputs-text-area
+            density="compact"
+            name="description"
+            label="Do que se trata seu curso?"
+            placeholder="Digite uma descrição do Curso"
+            hide-details
+            theme="light"
+            required
+          />
+          <alex-inputs-text-field
+            density="compact"
+            name="classe"
+            label="Digite o nome da turma"
+            placeholder="Digite o nome da turma"
+            hide-details
+            required
+          />
+          <div class="w-100 d-flex gap-4">
+            <alex-inputs-date
+              v-model="startDate"
+              name="startdate"
+              label="Quando iniciará o curso?"
+              required
+            />
+            <alex-inputs-date
+              v-model="endDate"
+              name="endDate"
+              required
+              label="Quando terminará o curso?"
+            />
+          </div>
+        </template>
+        <template #step2>b</template>
+        <template #step3>c</template>
+        <template #step4>d</template>
+      </alex-custom-dialog>
     </v-col>
   </v-row>
 </template>
 <script setup lang="ts">
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from '@/models/structure.model';
-
-const data: Strapi4ResponseData<Structure> = {
-  id: 1,
-  meta: {},
-  attributes: {
-    version: 'v1',
-    id: 1,
-    time: 1,
-    updatedAt: '2023-01-01',
-    blocks: {
-      meta: {},
-      data: [],
-    },
-  },
-};
-
+const dialogStepper = ref(false);
+const startDate = ref();
+const endDate = ref();
 definePageMeta({
   middleware: 'auth',
+  layout: 'components',
 });
 </script>
