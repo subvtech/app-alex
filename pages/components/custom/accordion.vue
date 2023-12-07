@@ -383,6 +383,11 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const copiedValue = ref('');
 const firstExampleActivePage = ref('1');
 const secondExampleActivePage = ref('1');

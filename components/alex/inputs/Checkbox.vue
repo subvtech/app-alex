@@ -1,7 +1,8 @@
 <template>
   <div class="container" width="113" max-width="fit-content" height="47">
-    <div class="checkbox-container mr-1 pa-0 mt-0">
+    <div class="checkbox-container mr-0 pa-0 mt-0">
       <v-checkbox
+        class="input-checkbox"
         v-model:model-value="value"
         :class="{
           'text-secondary-0': hasCustomIndeterminateColor,
@@ -71,6 +72,7 @@ div {
   width: fit-content;
   height: 47px;
   border: none;
+  gap: 0px !important;
 }
 
 .text-container {
@@ -88,6 +90,11 @@ div {
   color: #454d54;
   display: flex;
   align-items: flex-start;
+  padding-bottom: 4px;
+}
+
+.input-checkbox {
+  margin-bottom: 3px !important;
 }
 
 .gray-400 {

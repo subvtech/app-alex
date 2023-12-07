@@ -45,5 +45,6 @@ export function useOnBoarding(steps) {
 
   return {
     tour,
+    activeTour: Shepherd.activeTour
   };
 }
