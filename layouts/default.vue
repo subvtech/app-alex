@@ -63,10 +63,8 @@ const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  if (user.value) {
-    userStore.profilePicture = user.value.avatar;
-    userStore.fullname = user.value.fullname;
-  }
+  userStore.profilePicture = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
 });
 
 const steps = [
