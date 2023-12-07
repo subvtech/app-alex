@@ -26,6 +26,6 @@
   "blockedError": "Usuário bloqueado!",
   "success": {
     "title": "Conta criada com sucesso!",
-    "subtitle": "Um link de ativação foi enviado para o e-mail cadastrado, acesse e realize a ativação da sua conta."
+    "subtitle": "Para acessar sua conta é necessário ativar sua conta através do link de ativação que foi enviado para o e-mail cadastrado."
     }
 }

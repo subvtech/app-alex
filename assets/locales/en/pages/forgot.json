@@ -1,8 +1,7 @@
 {
   "success": {
-    "title": "Recovery sent!",
-    "subtitle1": "We have sent instructions to ",
-    "subtitle2": "if your email is already registered, you will receive an email to set your new password.",
+    "title": "Account activated successfully!",
+    "subtitle1": "You can now access your account with the registered email and password.",
     "return": "Back to Login"
   }
 }

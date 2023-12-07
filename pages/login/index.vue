@@ -48,7 +48,7 @@
             />
             <div class="mt-2">
               <p v-show="errorMessage" class="text-body-1 text-error">
-                {{ $t('pages.login.loginError') }}
+                {{ $t(`pages.login.${errorType}`) }}
               </p>
             </div>
             <div
@@ -131,6 +131,7 @@
 import { useForm } from 'vee-validate';
 import { ref } from 'vue';
 const errorMessage = ref(false);
+const errorType = ref('');
 const i18n = useI18n();
 definePageMeta({
   layout: 'auth',
@@ -181,9 +182,22 @@ const submit = handleSubmit(async () => {
     });
 
     router.push('/');
-  } catch (error) {
+  } catch (err: any) {
     logging.value = false;
     errorMessage.value = true;
+    if (err.error && err.error.name === 'ValidationError')
+      errorType.value = 'loginError';
+    else if (
+      err.error &&
+      err.error.message === 'Your account email is not confirmed'
+    )
+      errorType.value = 'confirmEmail';
+    else if (
+      err.error &&
+      err.error.message === 'Your account has been blocked by an administrator'
+    )
+      errorType.value = 'blockedUser';
+    else errorType.value = 'genericError';
     setTimeout(() => {
       errorMessage.value = false;
     }, 5000);

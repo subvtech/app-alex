@@ -18,5 +18,8 @@
     "notFound": "Metamask wallet wasn't detected",
     "tokenExpired": "Token expired, try again"
   },
-  "loginError": "Invalid email or invalid password, maybe both"
+  "loginError": "Invalid email or invalid password, maybe both",
+  "confirmEmail": "Please validate your email before proceeding.",
+  "blockedUser": "User blocked, please contact support",
+  "genericError": "Something went wrong, please try again later"
 }

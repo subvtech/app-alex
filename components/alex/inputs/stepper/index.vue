@@ -30,10 +30,10 @@
         type="button"
         rounded="lg"
         color="secondary"
-        variant="outlined"
+        variant="secondary"
         size="large"
-        @click="onPrevStep"
         text="Voltar"
+        @click="onPrevStep"
       />
 
       <alex-custom-button
