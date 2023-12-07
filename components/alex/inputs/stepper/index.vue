@@ -124,11 +124,20 @@ const { handleSubmit, errors, values, controlledValues } = useForm({
 });
 
 // Functions
-const onSubmit = handleSubmit((values) => {
+const { find } = useStrapi();
+const onSubmit = handleSubmit(async (values) => {
   if (activeStep.value - 1 !== numberSteps.value - 1) {
     if (!props.noHeader) {
       stepsList.value[activeStep.value - 1].completed = true;
     }
+    // try {
+    //   let emailsCadastrados = await find('users', {fields: ['email'], filters: {$eq: [{email: values}]}});
+    //   console.log(emailsCadastrados);
+      
+    // } catch (error) {
+    //   console.log(error);
+      
+    // }
     activeStep.value++;
     return;
   }
