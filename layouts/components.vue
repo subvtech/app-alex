@@ -59,10 +59,8 @@ const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
 
 onBeforeMount(() => {
-  if (user.value) {
-    userStore.profilePicture = user.value.avatar;
-    userStore.fullname = user.value.fullname;
-  }
+  userStore.profilePicture = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
 });
 
 const menus = [
