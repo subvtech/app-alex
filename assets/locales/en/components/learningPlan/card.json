@@ -1,0 +1,22 @@
+{
+    "type": {
+        "course_project": "Project",
+        "project": "Project",
+        "course": "Course"
+    },
+    "configurations": "Configurations",
+    "visibility": {
+        "show": "Show",
+        "hide": "hide"
+    },
+    "trails": "Trails",
+    "facilitator": "Facilitator",
+    "hidden": "Hidden",
+    "options": "Options",
+    "favorite": "Favorite",
+    "status": {
+        "start": "Start",
+        "running": "Running",
+        "finished": "Finished"
+    }
+}
