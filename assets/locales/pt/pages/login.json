@@ -21,5 +21,6 @@
   "loginError": "Nome de usuário ou senha incorretos!",
   "confirmEmail": "Por favor, valide seu e-mail antes de continuar.",
   "blockedUser": "Usuário bloqueado, entre em contato com o suporte.",
-  "genericError": "Ocorreu um erro, tente novamente mais tarde."
+  "genericError": "Ocorreu um erro, tente novamente mais tarde.",
+  "searchError": "Instituição não encontrada"
 }

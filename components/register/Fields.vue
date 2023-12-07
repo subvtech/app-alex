@@ -15,9 +15,9 @@
           step3: { scheme: registerStep3 },
         }"
         :submit-loading="registering"
-        @onSuccess="submit"
         align="left"
         no-header
+        @on-success="submit"
       >
         <template #step1>
           <v-card-subtitle
@@ -46,13 +46,13 @@
           />
 
           <alex-inputs-text-field
+            v-maska:[cpfMask]
             :placeholder="$t('pages.register.cpfHolder')"
             label="CPF"
             name="cpf"
             color="white"
             class="mb-1"
             theme="dark"
-            v-maska:[cpfMask]
           />
         </template>
         <template #step2="{ values }">
@@ -245,6 +245,7 @@ const submit = async (values: {
   font-weight: 700;
   height: min-content !important;
   flex: none;
+
   &-link {
     text-decoration: none;
     color: #00d3ec !important;
@@ -264,9 +265,11 @@ const submit = async (values: {
   .my-10 {
     margin-block: 20px !important;
   }
+
   .haveAccount {
     padding-top: 0px !important;
   }
+
   .content {
     padding-top: 16px !important;
   }
@@ -277,6 +280,7 @@ const submit = async (values: {
     padding: 32px 32px 32px 32px;
   }
 }
+
 @media screen and (min-width: 1100px) {
   .content {
     padding: 32px 64px 32px 64px;
