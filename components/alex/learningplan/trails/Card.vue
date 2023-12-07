@@ -158,10 +158,7 @@
 <script setup lang="ts">
 import { Item } from '../../inputs/Dropdown.vue';
 interface Block {
-  type: string;
-}
-interface CountedBlock extends Block {
-  quantity: number;
+  type: 'carousel' | 'video' | (string & {});
 }
 interface LearningPlanCard {
   image: { url: string; alt?: string };
@@ -188,27 +185,26 @@ const isActiveTitleTooltip = computed(() => {
   else return name.length < 60;
 });
 
-const countBlocks = () => {
-  const blocksArray: CountedBlock[] = [];
-  const blockTypes = new Set((blocks || []).map((block) => block.type));
-  blockTypes.forEach((type) => {
-    const quantity = (blocks || []).filter(
-      (block) => block.type === type,
-    ).length;
-    const block = { type, quantity };
-    blocksArray.push(block);
-  });
-  return blocksArray;
-};
+const blocksInfo = computed(() => {
+  return blocks?.reduce((info, block) => {
+    if (Object.hasOwn(info, block.type)) {
+      info[block.type] += 1;
+    } else {
+      info[block.type] = 1;
+    }
+    return info;
+  }, {});
+});
 
 const listBlocks = computed(() => {
   let stringBlocks = '';
-  countBlocks()?.map(
-    (item) =>
-      (stringBlocks += `${item.quantity} ${t(
-        `components.learningPlan.cardTrails.${item.type}`,
-      )}; `),
-  );
+  if (blocksInfo.value) {
+    for (const [key, value] of Object.entries(blocksInfo.value)) {
+      stringBlocks += `${value} ${t(
+        `components.learningPlan.cardTrails.${key}`,
+      )}; `;
+    }
+  }
   return stringBlocks;
 });
 
