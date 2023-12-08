@@ -1,58 +1,46 @@
 <template>
-  <v-app v-if="user">
+  <v-app>
     <AppSnackbar />
-    <div
-      @click.stop="
-        (e: any) => {
-          drawer = !drawer;
-        }
-      "
+    <alex-custom-drawable
+      v-model="drawer"
+      :blocks="menus"
+      :clipped="clipped"
+      dark
+      :permanent="isPermanent"
+      :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
     >
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        :data-tour="menus[0].dataTour"
-        :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
-        dark
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
-    </div>
+        </div>
+      </template>
+    </alex-custom-drawable>
+
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="
-        () => {
-          drawer = !drawer;
-        }
-      "
+      :toggle-drawer="() => closeDrawable(!clipped)"
+      :user="user"
+      @click="onClickOutside"
       :menu-items="profileMenuItems"
-      :placeholder="user.fullname"
-      :avatar="user.avatar"
       show-picture
     />
 
-    <v-main class="secondary bg-gray-blue pt-16">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -61,19 +49,24 @@
 </template>
 
 <script setup lang="ts">
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
 import { useOnBoarding } from '@/composables/useOnBoarding';
+import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 const i18n = useI18n();
-const clipped = ref(false);
-const drawer = ref(true);
-const isPermanent = ref(false);
+
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
+
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
 
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  userStore.profilePicture = user.value.avatar;
-  userStore.fullname = user.value.fullname;
+  if (user.value) {
+    userStore.profilePicture = user.value.avatar;
+    userStore.fullname = user.value.fullname;
+  }
 });
 
 const steps = [
@@ -189,7 +182,7 @@ const steps = [
   },
 ];
 
-const { activeTour } = useOnBoarding(steps);
+const { tour, activeTour } = useOnBoarding(steps);
 
 const menus = [
   {
@@ -268,7 +261,6 @@ const miniVariant = ref(false);
 </script>
 
 <style lang="scss">
-
 .shepherd-step {
   z-index: 100000 !important;
   background-color: #fff !important;

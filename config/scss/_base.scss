@@ -44,6 +44,24 @@ $btn-icon-density: (
   }
 }
 
+//
+@for $i from 1 through 10 {
+  .lines-#{$i} {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $i;
+    line-clamp: $i;
+  }
+}
+
+.ellipsis {
+  display: -webkit-box;
+  padding: 0;
+  white-space: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-wrap: break-word;
+  line-height: inherit;
+}
 
 .v-dialog.custom-alex-dialog > .v-overlay__content {
   max-height: calc(100vh - 160px);
@@ -53,4 +71,28 @@ $btn-icon-density: (
   .v-dialog.custom-alex-dialog > .v-overlay__content {
     max-height: calc(100svh - 160px);
   };
+}
+
+$colors-scrollBar: (white, 'gray-blue', 'gray-100');
+
+@each $color in $colors-scrollBar {
+  .alex-scrollbar-#{$color}::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .alex-scrollbar-#{$color}::-webkit-scrollbar-thumb {
+    background-color: #abb2b9;
+    border-radius: 999px;
+  }
+  
+  .alex-scrollbar-#{$color}::-webkit-scrollbar-track {
+    background-color: rgb(var(--v-theme-#{$color})) !important;
+  }
+  
+}
+
+// Dialog Stepper
+.max-height-stepper {
+  max-height: calc(100svh - 392px);
+  overflow-y: auto;
 }
