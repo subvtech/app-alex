@@ -9814,10 +9814,10 @@ vueperslides@^3.5.1:
   resolved "https://registry.yarnpkg.com/vueperslides/-/vueperslides-3.5.1.tgz#b1a04ffbf3e1ceb48f32cd69b55a7d83def1a8e9"
   integrity sha512-g/Lauv1svlSaERzLNeys0oeLmpDFiXkIa+lxg+lJma6m6wXqJKzKKVIi8Kvc95XPnl42n7PYYJyr0+FMV6WZGw==
 
-vuetify@^3.3.11:
-  version "3.3.15"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.3.15.tgz#54d3aa076082c62e0b3ef103636b85270a9aef39"
-  integrity sha512-n7GYBO31k8vA9UfvRwLNyBlkq1WoN3IJ9wNnIBFeV4axleSjFAzzR4WUw7rgj6Ba3q6N2hxXoyxJM21tseQTfQ==
+vuetify@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.4.4.tgz#0819d03cbd554b27be25427773cbf2ebf9976e53"
+  integrity sha512-qnQy3iPOLMcyKUAb5Oi2hw+2qjc9NQK/M2i95ZUvjpHEF5mTBvGwCJ2xXV4Yn9eaGhuUtWBqgR/3Op42S3d41g==
 
 wait-on@^7.0.1:
   version "7.0.1"
