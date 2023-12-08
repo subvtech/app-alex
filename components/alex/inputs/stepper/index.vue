@@ -1,10 +1,14 @@
 <template>
   <v-form @submit="onSubmit">
-    <div v-if="!noHeader" class="d-flex gap-4 py-3 px-1">
+    <div
+      v-if="!noHeader"
+      class="d-flex gap-4 py-3 px-1"
+      :class="stepperIndicatorClass"
+    >
       <alex-inputs-stepper-indicator
         v-for="({ title, subtitle, icon, completed }, index) in stepsList"
         :key="index"
-        :stepNumber="index + 1"
+        :step-number="index + 1"
         :active="index == activeStep - 1"
         :checked="activeStep - 1 > index"
         :title="title"
@@ -12,48 +16,47 @@
         :icon="icon"
         :completed="completed"
         :disabled="false"
-        @onSelect="() => onSelectStep(index + 1)"
+        @on-select="() => onSelectStep(index + 1)"
       />
     </div>
     <template v-for="(_, index) in stepsList" :key="index">
-      <slot
-        v-if="index == activeStep - 1"
-        :name="`step${index + 1}`"
-        :errors="errors"
-        :values="values"
-      />
+      <v-slide-x-transition hide-on-leave>
+        <div
+          v-if="index == activeStep - 1"
+          class="alex-scrollbar-white"
+          :class="stepClass"
+        >
+          <slot :name="`step${index + 1}`" :errors="errors" :values="values" />
+        </div>
+      </v-slide-x-transition>
     </template>
-    <div v-if="!showControls" class="w-100 d-flex">
+    <div v-if="!showControls && !noControls" class="w-100 d-flex">
       <alex-custom-button
         v-if="activeStep > 1"
-        :disabled="submitLoading"
-        type="button"
-        rounded="lg"
-        color="secondary"
         variant="secondary"
-        size="large"
         text="Voltar"
+        size="large"
+        :disabled="submitLoading"
         @click="onPrevStep"
       />
 
       <alex-custom-button
+        class="ml-auto"
+        size="large"
         type="submit"
         :disabled="!isValid"
         :loading="submitLoading"
-        class="ml-auto"
-        rounded="lg"
-        color="accent"
-        size="large"
         :text="activeStep == numberSteps ? 'Criar' : 'Avançar'"
       />
     </div>
     <slot
+      v-if="!noControls"
       name="controls"
-      :onPrevStep="onPrevStep"
-      :isValid="isValid"
-      :isLastStep="activeStep == numberSteps"
-      :isFirstStep="activeStep == 1"
-      :submitLoading="submitLoading"
+      :on-prev-step="onPrevStep"
+      :is-valid="isValid"
+      :is-last-step="activeStep == numberSteps"
+      :is-first-step="activeStep == 1"
+      :submit-loading="submitLoading"
     />
   </v-form>
 </template>
@@ -62,41 +65,64 @@
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 
-interface StepsConfig {
+interface Validate {
+  name: string;
+  callback: (value: string) => Promise<
+    | {
+        status: boolean;
+        message: string;
+      }
+    | undefined
+  >;
+}
+export interface StepsConfig {
   title: string;
   subtitle: string;
   icon?: string;
   scheme?: yup.Schema;
   completed?: boolean;
+  validate?: Validate[];
 }
 
-type StepType<T extends string[], U> = Record<ElementType<T>, U>;
+export type StepType<T extends string[], U> = Record<ElementType<T>, U>;
 
 // Props/events
 const props = withDefaults(
   defineProps<{
     noHeader?: boolean;
-    stepsConfig?: StepType<typeof stepsCounter.value, Partial<StepsConfig>>;
+    noControls?: boolean;
+    stepsConfig?: Record<string, Partial<StepsConfig>>;
     submitLoading?: boolean;
+    stepClass?: string;
+    stepperIndicatorClass?: string;
   }>(),
-  { submitLoading: false, noHeader: false },
+  {
+    submitLoading: false,
+    noHeader: false,
+    noControls: false,
+    stepClass: undefined,
+    stepperIndicatorClass: undefined,
+    stepsConfig: undefined,
+  },
 );
 const emit = defineEmits(['onSuccess']);
-
 // Slots
 const slots = useSlots();
 const showControls = computed(() => !!slots.controls);
 
 // Steps Logic
-const stepsCounter = computed(() =>
-  literalArray(...Object.entries(slots).map((slot) => slot[0])),
+const slotsList = computed(() =>
+  literalArray(
+    ...Object.entries(slots)
+      .map((slot) => slot[0])
+      .filter((slot) => slot.includes('step')),
+  ),
 );
-
 const activeStep = ref(1);
-const numberSteps = computed(() => stepsCounter.value.length);
+const numberSteps = computed(() => slotsList.value.length);
 const stepsList = computed(() => {
-  const steps = {} as StepType<typeof stepsCounter.value, StepsConfig>;
-  stepsCounter.value.map(
+  const steps = {} as StepType<typeof slotsList.value, StepsConfig>;
+  slotsList.value.map(
     (step) =>
       (steps[step] = {
         title: 'Title',
@@ -118,32 +144,56 @@ const validationSchema = computed(() => {
   return configStep && configStep.scheme ? configStep.scheme : emptyObject;
 });
 
-const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: validationSchema,
-  keepValuesOnUnmount: true,
-});
+const { handleSubmit, errors, values, controlledValues, setFieldError } =
+  useForm({
+    validationSchema,
+    keepValuesOnUnmount: true,
+  });
 
-// Functions
-const { find } = useStrapi();
-const onSubmit = handleSubmit(async (values) => {
+const onAllValidated = () => {
   if (activeStep.value - 1 !== numberSteps.value - 1) {
     if (!props.noHeader) {
       stepsList.value[activeStep.value - 1].completed = true;
     }
-    // try {
-    //   let emailsCadastrados = await find('users', {fields: ['email'], filters: {$eq: [{email: values}]}});
-    //   console.log(emailsCadastrados);
-      
-    // } catch (error) {
-    //   console.log(error);
-      
-    // }
     activeStep.value++;
     return;
   }
   emit('onSuccess', values);
-});
+};
 
+const validateField = async (
+  values: Record<string, string>,
+  validate: Validate,
+) => {
+  const value = values[validate.name];
+  if (value) {
+    try {
+      const res = await validate.callback(value);
+      if (res && !res.status) {
+        setFieldError(validate.name, res.message);
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const onSubmit = handleSubmit(async (values) => {
+  const configStep = stepsList.value[activeStep.value - 1];
+  let validated = false;
+  if (configStep.validate) {
+    const validationPromises = configStep.validate.map(async (validate) => {
+      return await validateField(values, validate);
+    });
+    const validationResults = await Promise.all(validationPromises);
+    validated = !validationResults.includes(false);
+  }
+  if (validated) {
+    onAllValidated();
+  }
+});
 const isValid = computed(() => {
   if ((validationSchema.value as yup.AnyObject).fields.empty) return true;
   else if (
@@ -175,7 +225,6 @@ const onSelectStep = (step: number) => {
   }
 
   activeStep.value = step;
- 
 };
 </script>
 

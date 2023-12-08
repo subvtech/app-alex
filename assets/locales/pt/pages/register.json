@@ -27,5 +27,6 @@
   "success": {
     "title": "Conta criada com sucesso!",
     "subtitle": "Para acessar sua conta é necessário ativar sua conta através do link de ativação que foi enviado para o e-mail cadastrado."
-    }
+  },
+  "alreadyTaken": "já está cadastrado!"
 }

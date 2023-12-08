@@ -10,7 +10,19 @@
       </v-card-title>
       <alex-inputs-stepper
         :steps-config="{
-          step1: { scheme: registerStep1 },
+          step1: {
+            scheme: registerStep1,
+            validate: [
+              {
+                name: 'email',
+                callback: (value) => verifyField('email', value),
+              },
+              {
+                name: 'cpf',
+                callback: (value) => verifyField('cpf', value),
+              },
+            ],
+          },
           step2: { scheme: registerStep2 },
           step3: { scheme: registerStep3 },
         }"
@@ -169,6 +181,22 @@ const cpfMask = reactive({
   mask: '###.###.###-##',
   eager: true,
 });
+
+const { findOne } = useStrapi();
+
+const verifyField = async (field: string, inputValue: string) => {
+  const registeredFields = await findOne('users', {
+    fields: [field],
+    filters: { [field]: inputValue },
+  });
+  // findOne retorna o tipo Promise<Strapi4ResponseSingle<F> que tem como atributos data e meta, entretanto no retorno dessa função está vindo um array de objetos apenas. Por isso que temos que tipar dessa forma para que não haja erros
+  if ((registeredFields as unknown as []).length) {
+    return {
+      status: false,
+      message: `${field} ${i18n.t('pages.register.alreadyTaken')}`,
+    };
+  }
+};
 
 const usernameUrl = computed(() => window.location.host + '/profile/');
 const registering = ref(false);
