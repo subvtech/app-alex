@@ -38,11 +38,14 @@
       </p>
     </div>
     <alex-inputs-text-field
-      placeholder="Nome de Usuário"
+      placeholder="Alex"
       class="w-100"
       prepend-inner-icon="mdi-account"
       clearable
       hint="Nome de usuário deve conter no mínimo X caracteres"
+      required
+      info="Insira seu nome de usuário"
+      label="Nome de Usuário"
     />
     <div class="w-100">
       <div
@@ -123,6 +126,9 @@ ${exampleScript[0]}
           :prepend-inner-icon="playgroundValues[1]"
           :append-inner-icon="playgroundValues[2]"
           :density="playgroundDensities"
+          :label="playgroundValues[3]"
+          :required="playgroundOptions[4]"
+          info="Mensagem de informação"
         />
       </v-col>
       <v-col class="playground-controls pa-3 d-flex flex-column">
@@ -130,7 +136,7 @@ ${exampleScript[0]}
           v-model="playgroundValues[0]"
           hide-details
           placeholder="Nome de usuário"
-          label="Placeholder"
+          label="Alex"
           clearable
         />
         <alex-inputs-text-field
@@ -147,7 +153,14 @@ ${exampleScript[0]}
           label="Append Icon"
           clearable
         />
-        <div class="d-flex align-self-start">
+        <alex-inputs-text-field
+          v-model="playgroundValues[3]"
+          hide-details
+          placeholder="User Name"
+          label="Label"
+          clearable
+        />
+        <div class="d-flex flex-wrap">
           <v-checkbox
             v-model="playgroundOptions[0]"
             :hide-details="true"
@@ -171,6 +184,12 @@ ${exampleScript[0]}
             :hide-details="true"
             label="persistent-hint"
             color="accent"
+          />
+          <v-checkbox
+            v-model="playgroundOptions[4]"
+            :hide-details="true"
+            label="required"
+            color="info"
           />
         </div>
         <v-select
@@ -199,19 +218,28 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const copiedValue = ref('');
 const activeExampleTabs = ref(['1']);
-const playgroundOptions = ref([false, false, false, true]);
-const playgroundValues = ref(['', '', '']);
+const playgroundOptions = ref([0, 0, 0, 0, 0]);
+const playgroundValues = ref(['', '', '', 'User Name']);
 const playgroundDensities = ref('default');
 
 const exampleTemplates = [
-  `    <alex-inputs-text-field
-      v-model="inputText"
-      placeholder="Nome de Usuário"
+  `   <alex-inputs-text-field
+      placeholder="Alex"
+      class="w-100"
       prepend-inner-icon="mdi-account"
-      clearable
       hint="Nome de usuário deve conter no mínimo X caracteres"
+      info="Insira seu nome de usuário"
+      label="Nome de Usuário"
+      required
+      clearable 
     />`,
 ];
 
@@ -229,8 +257,12 @@ const exampleTabs = [
 ];
 
 const copyToClipboard = async (message, item) => {
-  await navigator.clipboard.writeText(message);
-  copiedValue.value = item;
+  try {
+    await navigator.clipboard.writeText(message);
+    copiedValue.value = item;
+  } catch (err) {
+    copiedValue.value = item;
+  }
 };
 </script>
 

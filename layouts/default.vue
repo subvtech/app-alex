@@ -1,51 +1,46 @@
 <template>
-  <v-app v-if="user">
+  <v-app>
     <AppSnackbar />
-    <div
-      @click.stop="
-        (e: any) => {
-          drawer = !drawer;
-        }
-      "
+    <alex-custom-drawable
+      v-model="drawer"
+      :blocks="menus"
+      :clipped="clipped"
+      dark
+      :permanent="isPermanent"
+      :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
     >
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        dark
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
-    </div>
+        </div>
+      </template>
+    </alex-custom-drawable>
+
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => (drawer = !drawer)"
-      :menu-items="profileMenuItems"
-      :reverse="false"
+      :toggle-drawer="() => closeDrawable(!clipped)"
       :user="user"
+      @click="onClickOutside"
+      :menu-items="profileMenuItems"
+      show-picture
     />
 
-    <v-main class="secondary bg-gray-blue pt-16">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -54,21 +49,145 @@
 </template>
 
 <script setup lang="ts">
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
+import { useOnBoarding } from '@/composables/useOnBoarding';
+import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 const i18n = useI18n();
-const clipped = ref(false);
-const drawer = ref(true);
-const isPermanent = ref(false);
+
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
+
+const { profileMenuItems } = useMainHorizontalBar();
+
 onBeforeMount(() => {
-  userStore.profilePicture = user.value.avatar;
-  userStore.fullname = user.value.fullname;
+  if (user.value) {
+    userStore.profilePicture = user.value.avatar;
+    userStore.fullname = user.value.fullname;
+  }
 });
+
+const steps = [
+  {
+    id: 'step1',
+    title: i18n.t('layouts.default.step1.title'),
+    text: i18n.t('layouts.default.step1.text'),
+    attachTo: {
+      element: '[data-tour="step-user-area"]',
+      on: 'right',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step1.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step2',
+    title: i18n.t('layouts.default.step2.title'),
+    text: i18n.t('layouts.default.step2.text'),
+    attachTo: {
+      element: '[data-tour="step-user-area"]',
+      on: 'right',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step2.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step2.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step3',
+    title: i18n.t('layouts.default.step3.title'),
+    text: i18n.t('layouts.default.step3.text'),
+    attachTo: {
+      element: '[data-tour="step-navigation"]',
+      on: 'right',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step3.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step3.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step4',
+    title: i18n.t('layouts.default.step4.title'),
+    text: i18n.t('layouts.default.step4.text'),
+    attachTo: {
+      element: '[data-tour="step-professor"]',
+      on: 'bottom',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step4.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step4.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step5',
+    title: i18n.t('layouts.default.step5.title'),
+    text: i18n.t('layouts.default.step5.text'),
+    attachTo: {
+      element: '[data-tour="step-profile"]',
+      on: 'bottom',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step5.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step5.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step6',
+    title: i18n.t('layouts.default.step6.title'),
+    text: i18n.t('layouts.default.step6.text'),
+    attachTo: {
+      element: '',
+      on: 'center',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step6.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step6.completeButton'),
+        action: 'complete',
+      },
+    ],
+  },
+];
+
+const { tour, activeTour } = useOnBoarding(steps);
 
 const menus = [
   {
     title: i18n.t('layouts.default.userArea'),
+    dataTour: 'step-user-area',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
@@ -98,6 +217,7 @@ const menus = [
     items: [
       {
         icon: 'mdi-book-outline',
+        dataTour: 'step-navigation',
         title: i18n.t('layouts.default.courses'),
         to: '/learning-plans',
       },
@@ -111,6 +231,7 @@ const menus = [
 
   {
     title: i18n.t('layouts.default.professorTitle'),
+    dataTour: 'step-professor',
     items: [
       {
         icon: 'mdi-account-multiple-outline',
@@ -136,27 +257,87 @@ const menus = [
   },
 ];
 
-const profileMenuItems = [
-  {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
-  },
-];
-
 const miniVariant = ref(false);
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+.shepherd-step {
+  z-index: 100000 !important;
+  background-color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.15);
+  padding: 16px !important;
+  max-width: 300px !important;
+}
+
+.active-step {
+  z-index: 200000 !important;
+  background: none;
+  border-radius: 0.1rem;
+  border: 2px dotted #00b7cc;
+  padding: 0.5rem;
+}
+
+.shepherd-step .shepherd-arrow {
+  background-color: #fff;
+}
+
+.shepherd-step .shepherd-title {
+  font-size: 1rem;
+  line-height: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.shepherd-step .shepherd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shepherd-cancel-icon {
+  font-size: 25px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.shepherd-step .shepherd-text {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.shepherd-step .shepherd-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.shepherd-step .shepherd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shepherd-cancel-icon {
+  font-size: 25px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.shepherd-step button {
+  background-color: #00b7cc;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
 html,
 body {
   overflow-y: auto;

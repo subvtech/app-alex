@@ -8,6 +8,9 @@ export const vuetify = createVuetify({
   components,
   directives,
   defaults,
+  display:{
+    mobileBreakpoint: 'md'
+  },
   theme: {
     defaultTheme: MAIN_THEME,
     themes: {

@@ -18,6 +18,7 @@
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
+    "@testing-library/user-event": "^14.5.1",
     "@testing-library/vue": "^7.0.0",
     "@types/node": "^18.17.1",
     "@typescript-eslint/parser": "^6.2.1",
@@ -75,6 +76,7 @@
     "plyr": "^3.7.8",
     "prismjs": "^1.29.0",
     "sass": "^1.64.2",
+    "shepherd.js": "^11.2.0",
     "strapi-sdk-js": "^2.2.0",
     "v-viewer": "^1.6.4",
     "vee-validate": "^4.11.1",

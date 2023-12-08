@@ -1,7 +1,8 @@
 {
-    "success": {
-        "title": "Recovery sent!",
-        "subtitle": "We have sent instructions to | Access the email and follow the instructions provided.",
-        "return": "Back to Login"
-    }
+  "success": {
+    "title": "Recovery sent!",
+    "subtitle1": "We have sent instructions to ",
+    "subtitle2": "Access the email and follow the instructions provided.",
+    "return": "Back to Login"
+  }
 }
