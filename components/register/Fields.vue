@@ -78,7 +78,7 @@
           <alex-inputs-stepper-field
             name="yourRole"
             color="white"
-            type-field="select"
+            field-type="VSelect"
             class="my-3 text-secondary"
             :label="$t('pages.register.userType')"
             variant="outlined"

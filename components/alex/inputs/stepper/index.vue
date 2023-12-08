@@ -190,7 +190,7 @@ const onSubmit = handleSubmit(async (values) => {
     const validationResults = await Promise.all(validationPromises);
     validated = !validationResults.includes(false);
   }
-  if (validated) {
+  if (validated || !configStep.validate) {
     onAllValidated();
   }
 });

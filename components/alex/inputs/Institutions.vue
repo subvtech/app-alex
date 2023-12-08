@@ -33,7 +33,7 @@ type InstitutionsType = {
 type InstitutionProps = {
   search: string;
   institutions: InstitutionsType[];
-  filterIds: number[];
+  filterIds?: number[];
   name?: string;
   color?: string;
 };
