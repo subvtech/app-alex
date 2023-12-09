@@ -1,5 +1,5 @@
 <template>
-  <div id="custom-textfield">
+  <div id="custom-textfield" :class="class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -20,7 +20,6 @@
       :class="theme"
       color="primary--2"
       rounded="lg"
-      role="textfield"
       clear-icon="mdi-close"
       :disabled="disabled"
       v-bind="$attrs"
@@ -30,6 +29,9 @@
 
 <script setup>
 import { useField } from 'vee-validate';
+defineOptions({
+  inheritAttrs: false,
+});
 
 const props = defineProps({
   label: {
@@ -52,11 +54,12 @@ const props = defineProps({
     type: String,
     default: 'light',
   },
-  name: { type: String, required: true },
+  name: { type: String, default: '' },
   value: {
     type: String || Number || Boolean || undefined,
     default: undefined,
   },
+  class: { type: String, default: '' },
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {

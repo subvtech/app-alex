@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
+// import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen, within, render, fireEvent } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
 
@@ -12,6 +12,7 @@ describe('TextField component', () => {
       hint: 'Enter your email',
       label: 'Email Input',
       persistentHint: true,
+      role: 'textfield',
       modelValue: '',
       'onUpdate:modelValue': (e) => {
         modelValue = e;
