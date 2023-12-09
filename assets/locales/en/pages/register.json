@@ -27,5 +27,6 @@
   "success": {
     "title": "Account successfully created!",
     "subtitle": "An activation link has been sent to your registered e-mail address. Go there and activate your account."
-  }
+  },
+  "alreadyTaken": "is already taken"
 }

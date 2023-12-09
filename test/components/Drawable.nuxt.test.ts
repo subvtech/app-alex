@@ -109,4 +109,39 @@ describe('Drawable', async () => {
 
     unmount();
   });
+
+  it('shall have the not-fixed class', async () => {
+    const drawableComponennt = await renderSuspended(Drawable, {
+      attrs: {
+        blocks: menus,
+        clipped: true,
+        show: true,
+        notFixed: true,
+        permanent: true,
+      },
+    });
+    const drawableMenu = await drawableComponennt.getByTestId('drawable');
+    expect(drawableMenu).not.toBeNull();
+
+    expect(drawableMenu.className.split(' ')).toContain('not-fixed');
+
+    drawableComponennt.unmount();
+  });
+
+  it('shall have the disappear class', async () => {
+    const drawableComponennt = await renderSuspended(Drawable, {
+      attrs: {
+        blocks: menus,
+        clipped: true,
+        show: false,
+        disappear: true,
+      },
+    });
+    const drawableMenu = await drawableComponennt.getByTestId('drawable');
+    expect(drawableMenu).not.toBeNull();
+
+    expect(drawableMenu.className.split(' ')).toContain('disappear');
+
+    drawableComponennt.unmount();
+  });
 });

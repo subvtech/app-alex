@@ -13,7 +13,7 @@
       >
         <template v-if="!avatar.image" #default>
           <p class="text-gray-600">
-            {{ getLetters(avatar.name) }}
+            {{ getInitials(avatar.name) }}
           </p>
         </template>
       </v-avatar>

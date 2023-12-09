@@ -22,22 +22,14 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://v2.vuetifyjs.com/en/components/menus/#usage"
+          href="https://vuetifyjs.com/en/components/menus/#usage"
           target="_blank"
           >vuetifyjs.com</a
         >
       </div>
     </div>
-    <h2 class="text-h3 text-gray-800">Uso do Componente</h2>
-    <p class="text-subtitle-2 text-gray-500">
-      Para utilizar o componente, basta importá-lo e adicioná-lo ao template.
-      <br />
-      <Prism inline class="bg-white pa-0">{{
-        `import Dropdown from '@/components/alex/inputs/Dropdown.vue';`
-      }}</Prism>
-    </p>
     <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
-      <div>
+      <div class="w-100">
         <p class="text-h5 text-center">Props do componente</p>
         <v-table variant="outline">
           <thead>
@@ -49,112 +41,44 @@
           </thead>
           <tbody>
             <tr>
-              <td>options</td>
-              <td>Object</td>
-              <td class="text-center">
-                <v-icon icon="mdi-checkbox-marked" color="success" />
-              </td>
-            </tr>
-            <tr>
-              <td>options.openOnClick</td>
-              <td>Boolean</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>options.openOnHover</td>
-              <td>Boolean</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>options.closeOnContentClick</td>
-              <td>Boolean</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>options.location</td>
-              <td>String</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>options.isDarkMode</td>
-              <td>Boolean</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
               <td>items</td>
-              <td>Array</td>
+              <td>Item[]</td>
               <td class="text-center">
                 <v-icon icon="mdi-checkbox-marked" color="success" />
               </td>
             </tr>
             <tr>
-              <td>items.id</td>
-              <td>Number</td>
-              <td class="text-center">
-                <v-icon icon="mdi-checkbox-marked" color="success" />
-              </td>
-            </tr>
-            <tr>
-              <td>items.type</td>
-              <td>text | text-icon</td>
-              <td class="text-center">
-                <v-icon icon="mdi-checkbox-marked" color="success" />
-              </td>
-            </tr>
-            <tr>
-              <td>items.icon</td>
-              <td>String</td>
+              <td>isDarkMode</td>
+              <td>Boolean</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
-            </tr>
-            <tr>
-              <td>items.text</td>
-              <td>String</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>items.class</td>
-              <td>warning | disabled</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+            </tr></tbody
+        ></v-table>
       </div>
       <div>
         <p class="text-h5 text-center">Exemplo</p>
         <Prism class="bg-white" language="javascript">
-          {{ propsExample }}
+          {{ propsExampleScript }}
         </Prism>
       </div>
     </div>
-    <div class="w-100"></div>
+
+    <div class="w-100">
+      <alex-inputs-dropdown :items="itemsComponentePropsExample" />
+    </div>
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
       >
         <alex-custom-tabs
-          v-model="firstExampleActivePage"
+          v-model="propsExampleActivePage"
           :tabs="exampleTabs"
           color="black"
         ></alex-custom-tabs>
         <v-icon icon=" mdi-code-tags" color="gray-600" />
       </div>
-      <v-window v-model="firstExampleActivePage" class="w-100">
+      <v-window v-model="propsExampleActivePage" class="w-100">
         <v-window-item value="1">
           <div class="bg-grey-lighten-5 pa-3" style="position: relative">
             <prism class="bg-grey-lighten-5">
@@ -205,11 +129,91 @@
         </v-window-item>
       </v-window>
     </div>
+
+    <h2 class="text-h3 text-gray-800">Uso sem ícone</h2>
+    <p class="text-subtitle-2 text-gray-500">
+      É possível usar os menus sem ícones, basta apenas não passar a propriedade
+      ícone na lista de items.
+    </p>
+
     <div class="w-100">
-      <alex-inputs-dropdown
-        :options="dadosComponente"
-        :items="itemsComponente"
-      />
+      <alex-inputs-dropdown :items="itemsComponenteNoIcon" />
+    </div>
+    <div class="w-100">
+      <div
+        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
+      >
+        <alex-custom-tabs
+          v-model="noIconExampleActivePage"
+          :tabs="exampleTabs"
+          color="black"
+        ></alex-custom-tabs>
+        <v-icon icon=" mdi-code-tags" color="gray-600" />
+      </div>
+      <v-window v-model="noIconExampleActivePage" class="w-100">
+        <v-window-item value="1">
+          <div class="bg-grey-lighten-5 pa-3" style="position: relative">
+            <prism class="bg-grey-lighten-5">
+              {{ noIconExampleTemplate }}
+            </prism>
+            <v-btn
+              class="copy-icon"
+              variant="text"
+              color="gray-400"
+              @click="copyToClipboard(noIconExampleTemplate, 'firstTemplate')"
+            >
+              <v-icon
+                v-if="copiedValue == 'firstTemplate'"
+                size="x-large"
+                icon="mdi-clipboard-check-multiple-outline"
+                color="green-lighten-1"
+              />
+              <v-icon v-else size="x-large" icon="mdi-content-copy" />
+            </v-btn>
+          </div>
+        </v-window-item>
+        <v-window-item value="2">
+          <div class="bg-grey-lighten-5 pa-3" style="position: relative">
+            <prism class="bg-grey-lighten-5">
+              {{
+                ` 
+    &lt;script setup&gt;
+    ${noIconExampleScript}
+    &lt;/script&gt;
+                `
+              }}
+            </prism>
+            <v-btn
+              class="copy-icon"
+              variant="text"
+              color="gray-400"
+              @click="copyToClipboard(noIconExampleScript, 'firstScript')"
+            >
+              <v-icon
+                v-if="copiedValue == 'firstScript'"
+                size="x-large"
+                icon="mdi-clipboard-check-multiple-outline"
+                color="green-lighten-1"
+              />
+              <v-icon v-else size="x-large" icon="mdi-content-copy" />
+            </v-btn>
+          </div>
+        </v-window-item>
+      </v-window>
+    </div>
+
+    <h2 class="text-h3 text-gray-800">Customização do botão: Slot activator</h2>
+    <p class="text-subtitle-2 text-gray-500">
+      É possível alterar o componente de ativação do menu, através do slot
+      activator, que poderá ser passado qualquer componente. Deverá ser passado
+      a propriedade props vinda do slot para funcionar corretamente
+    </p>
+    <div class="w-100">
+      <alex-inputs-dropdown :items="itemsComponentePropsExample">
+        <template #activator="{ props }">
+          <alex-custom-button v-bind="props"> Abrir Menu </alex-custom-button>
+        </template>
+      </alex-inputs-dropdown>
     </div>
     <div class="w-100">
       <div
@@ -226,13 +230,13 @@
         <v-window-item value="1">
           <div class="bg-grey-lighten-5 pa-3" style="position: relative">
             <prism class="bg-grey-lighten-5">
-              {{ secondExampleTemplate }}
+              {{ slotExampleTemplate }}
             </prism>
             <v-btn
               class="copy-icon"
               variant="text"
               color="gray-400"
-              @click="copyToClipboard(secondExampleTemplate, 'secondTemplate')"
+              @click="copyToClipboard(slotExampleTemplate, 'secondTemplate')"
             >
               <v-icon
                 v-if="copiedValue == 'secondTemplate'"
@@ -250,7 +254,7 @@
               {{
                 ` 
     &lt;script setup&gt;
-    ${secondExampleScript}
+    ${propsExampleScript}
     &lt;/script&gt;
                 `
               }}
@@ -259,7 +263,7 @@
               class="copy-icon"
               variant="text"
               color="gray-400"
-              @click="copyToClipboard(secondExampleScript, 'secondScript')"
+              @click="copyToClipboard(propsExampleScript, 'secondScript')"
             >
               <v-icon
                 v-if="copiedValue == 'secondScript'"
@@ -273,57 +277,71 @@
         </v-window-item>
       </v-window>
     </div>
-    <div class="w-100">
-      <alex-inputs-dropdown
-        :options="dadosComponente"
-        :items="itemsComponente2"
-      />
-    </div>
     <h2 class="text-h3 text-gray-800">Uso de Props</h2>
     <p class="text-subtitle-2 text-gray-500">
-      O conteúdo de cada item é inserido através das props options e items:<br />
-      <Prism inline class="bg-white pa-0">{{
-        `
-          const options1 = ref({
-            openOnClick: true,
-            openOnHover: true,
-            closeOnContentClick: true,
-            location: 'end',
-            isDarkMode: false,
-          &#x7d);`
-      }}</Prism>
-    </p>
-    <p class="text-subtitle-2 text-gray-500">
-      A props <strong>location</strong> define a localização do dropdown,
-      podendo ser <strong>start</strong>, <strong>end</strong>,
-      <strong>top</strong>, <strong>bottom</strong> ou
-      <strong>center</strong>.<br />
-      <Prism inline class="bg-white pa-0">{{
-        `
-          const options1 = ref({
-            ...
-            location: 'end',
-            ...
-          });`
-      }}</Prism>
-    </p>
-    <p class="text-subtitle-2 text-gray-500">
-      Existe uma opção de estilo complementar ao utilizar
-      <strong>class: 'warning'</strong>. por exemplo:<br />
-      <Prism inline class="bg-white">{{
-        `
-          {
-            id: 4,
-            type: 'icon',
-            icon: 'mdi-delete',
-            text: 'Excluir',
-            class: 'warning',
-          },
-        `
-      }}</Prism>
-      <br />
+      O conteúdo de cada item é inserido através das props items:<br />
     </p>
 
+    <div class="w-100">
+      <h5 class="text-h5 text-center">Item</h5>
+      <v-table variant="outline">
+        <thead>
+          <tr>
+            <th>Propriedade</th>
+            <th>Tipo</th>
+            <th>Obrigatório</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>text</td>
+            <td>string</td>
+            <td class="text-center">
+              <v-icon icon="mdi-close-box" color="error" />
+            </td>
+          </tr>
+          <tr>
+            <td>link</td>
+            <td>string</td>
+            <td class="text-center">
+              <v-icon icon="mdi-close-box" color="error" />
+            </td>
+          </tr>
+          <tr>
+            <td>icon</td>
+            <td>string</td>
+            <td class="text-center">
+              <v-icon icon="mdi-close-box" color="error" />
+            </td>
+          </tr>
+          <tr>
+            <td>warning</td>
+            <td>boolean</td>
+            <td class="text-center">
+              <v-icon icon="mdi-close-box" color="error" />
+            </td>
+          </tr>
+          <tr>
+            <td>onClick</td>
+            <td>() => unknown</td>
+            <td class="text-center">
+              <v-icon icon="mdi-close-box" color="error" />
+            </td>
+          </tr></tbody
+      ></v-table>
+    </div>
+    <div class="d-flex w-100 gap-2 flex-column">
+      <p class="text-subtitle-2 text-gray-500">
+        Existe uma opção de estilo complementar:
+        <strong>Warning</strong>.
+      </p>
+      <alex-inputs-dropdown :items="itemsComponenteDarkWarning" />
+      <p class="text-subtitle-2 text-gray-500">
+        Além do DarkMode
+        <strong>Dark</strong>.
+      </p>
+      <alex-inputs-dropdown :items="itemsComponenteDarkWarning" is-dark-mode />
+    </div>
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
@@ -363,7 +381,7 @@
               {{
                 ` 
     &lt;script setup&gt;
-    ${thirdExampleScript}
+    ${thirdExampleDarkWarning}
     &lt;/script&gt;
                 `
               }}
@@ -372,7 +390,7 @@
               class="copy-icon"
               variant="text"
               color="gray-400"
-              @click="copyToClipboard(thirdExampleScript, 'thirdScript')"
+              @click="copyToClipboard(thirdExampleDarkWarning, 'thirdScript')"
             >
               <v-icon
                 v-if="copiedValue == 'thirdScript'"
@@ -386,223 +404,166 @@
         </v-window-item>
       </v-window>
     </div>
-    <div class="w-100">
-      <alex-inputs-dropdown
-        :options="dadosComponente"
-        :items="itemsComponente2"
-        isDarkMode
-      />
-    </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+import { Item } from '~/components/alex/inputs/Dropdown.vue';
+definePageMeta({ layout: 'components' });
 
 const copiedValue = ref('');
-const firstExampleActivePage = ref('1');
+const propsExampleActivePage = ref('1');
+const noIconExampleActivePage = ref('1');
 const secondExampleActivePage = ref('1');
 const thirdExampleActivePage = ref('1');
 
-const dadosComponente = ref({
-  openOnClick: true,
-  openOnHover: false,
-  closeOnContentClick: true,
-  location: 'end',
-  isDarkMode: false,
-});
-
-const itemsComponente = ref([
+const itemsComponentePropsExample = ref<Item[]>([
   {
-    id: 1,
-    type: 'text-icon',
     link: '/',
     icon: 'mdi-home',
     text: 'Início',
   },
   {
-    id: 2,
-    type: 'text-icon',
     link: '/profile',
     icon: 'mdi-account-circle',
     text: 'Perfil',
   },
   {
-    id: 3,
-    type: 'text-icon',
     icon: 'mdi-account',
     link: '/user/settings',
     text: 'Configurações',
   },
 ]);
-
-const itemsComponente2 = ref([
+const itemsComponenteDarkWarning = ref<Item[]>([
   {
-    id: 1,
-    type: 'text',
-    text: 'Homepage',
+    link: '/',
+    icon: 'mdi-home',
+    text: 'Início',
   },
   {
-    id: 2,
-    type: 'text-icon',
+    link: '/profile',
     icon: 'mdi-account-circle',
     text: 'Perfil',
-    link: '/profile',
   },
   {
-    id: 3,
-    type: 'text-icon',
-    icon: 'mdi-trash-can',
+    icon: 'mdi-trash-can-outline',
     text: 'Excluir conta',
-    class: 'warning',
+    warning: true,
   },
 ]);
 
-const propsExample = `
-  <alex-inputs-dropdown 
-    :options="dropdownOptions"
-    :items="dropdownOptions.items" 
-  />
-  
-  const dropdownItems = ref([
-    {
-      id: 1,
-      ...
-    },
-    {
-      id: 2,
-      ...
-    },
-    {
-      id: 3,
-      ...
-    },
-  ])
+const itemsComponenteNoIcon = ref<Item[]>([
+  {
+    text: 'Verificar',
+  },
+  {
+    text: 'Editar',
+    link: '/profile',
+  },
+  {
+    text: 'Excluir conta',
+  },
+]);
 
-  const dropdownOptions = ref({
-    ...
-  })
+const propsExampleScript = `
+const itemsComponente2 = ref<Item[]>([
+  {
+    
+    text: 'Verificar',
+    icon: 'mdi-check-decagram-outline',
+  },
+  {
+    
+    icon: 'mdi-pencil-outline',
+    text: 'Editar',
+    link: '/profile',
+  },
+  {
+    
+    icon: 'mdi-trash-can-outline',
+    text: 'Excluir conta',
+  },
+]);
     `;
 
 const firstExampleTemplate = `
-  <alex-inputs-dropdown 
-    :items="itemsComponente" 
-    :options="dadosComponente" 
-  />
+<alex-inputs-dropdown :items="itemsComponente" />
 `;
 
 const firstExampleScript = `
-    const dadosComponente = ref({
-      openOnClick: true,
-      openOnHover: false,
-      closeOnContentClick: true,
-      location: 'end',
-      isDarkMode: false,
-  });
-
-    const itemsComponente = ref([
+    const itemsComponente = ref<Item[]>([
       {
-        id: 1,
-        type: 'text-icon',
+        
         link: '/',
         icon: 'mdi-home',
         text: 'Início',
       },
       {
-        id: 2,
-        type: 'text-icon',
+        
         link: '/profile',
         icon: 'mdi-account-circle',
         text: 'Perfil',
       },
       {
-        id: 3,
-        type: 'text-icon',
+        
         icon: 'mdi-account',
-        link: '/settings',
+        link: '/user/settings',
         text: 'Configurações',
       },
     ]);
+
 `;
 
-const secondExampleTemplate = `
-    <alex-inputs-dropdown 
-      :items="itemsComponente2" 
-      :options="dadosComponente" 
-    />`;
+const noIconExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteNoIcon" />`;
+const noIconExampleScript = `const itemsComponenteNoIcon = ref<Item[]>([
+  {
+   
+    text: 'Verificar',
+  },
+  {
+   
+    text: 'Editar',
+    link: '/profile',
+  },
+  {
+   
+    text: 'Excluir conta',
+    warning: true,
+  },
+]);`;
 
-const secondExampleScript = `
-      const dadosComponente = ref({
-        openOnClick: true,
-        openOnHover: false,
-        closeOnContentClick: true,
-        location: 'end',
-        isDarkMode: false,
-      });
+const slotExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteExample2">
+        <template #activator="{ props }">
+          <alex-custom-button v-bind="props"> Abrir Menu </alex-custom-button>
+        </template>
+      </alex-inputs-dropdown>`;
 
-      const itemsComponente2 = ref([
-        {
-          id: 1,
-          type: 'text',
-          text: 'Homepage',
-        },
-        {
-          id: 2,
-          type: 'text-icon',
-          icon: 'mdi-account-circle',
-          text: 'Perfil',
-          link: '/profile',
-        },
-        {
-          id: 3,
-          type: 'text-icon',
-          icon: 'mdi-trash-can',
-          text: 'Excluir conta',
-          class: 'warning',
-        },
-      ]);
-      `;
+const thirdExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteDarkWarning" />
+      <alex-inputs-dropdown :items="itemsComponenteDarkWarning" is-dark-mode />`;
 
-const thirdExampleTemplate = `
-    <alex-inputs-dropdown 
-      :items="itemsComponente2" 
-      :options="dadosComponente"
-      isDarkMode 
-    />`;
-
-const thirdExampleScript = `
-    const dadosComponente = ref({
-      openOnClick: true,
-      openOnHover: false,
-      closeOnContentClick: true,
-      location: 'end',
-      isDarkMode: false,
-    });
-
-    const itemsComponente2 = ref([
-      {
-        id: 1,
-        type: 'text',
-        text: 'Homepage',
-      },
-      {
-        id: 2,
-        type: 'text-icon',
-        icon: 'mdi-account-circle',
-        text: 'Perfil',
-        link: '/profile',
-      },
-      {
-        id: 3,
-        type: 'text-icon',
-        icon: 'mdi-trash-can',
-        text: 'Excluir conta',
-        class: 'warning',
-      },
-    ]);`;
+const thirdExampleDarkWarning = `const itemsComponenteDarkWarning = ref<Item[]>([
+  {
+    
+    link: '/',
+    icon: 'mdi-home',
+    text: 'Início',
+  },
+  {
+    
+    link: '/profile',
+    icon: 'mdi-account-circle',
+    text: 'Perfil',
+  },
+  {
+    
+    icon: 'mdi-trash-can-outline',
+    text: 'Excluir conta',
+    warning: true,
+  },
+]);`;
 
 const exampleTabs = [
   {

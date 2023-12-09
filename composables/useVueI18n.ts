@@ -20,7 +20,7 @@ export const setupI18n = (locale: SUPPORT_LOCALES_TYPE = 'pt') => {
 };
 
 export function setI18nLanguage(locale) {
-  let mode = i18n.mode;
+  const mode = i18n.mode;
   if (mode === 'legacy') {
     i18n.global.locale = locale;
   } else {
@@ -67,8 +67,10 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'articleViewer',
     'imagePreview',
     'tagCombobox',
+    'dialog',
     'usersAutocomplete',
     'learningPlan/editor',
+    'learningPlan/card',
     'learningPlan/authors',
     'learningPlan/link',
     'learningPlan/list',

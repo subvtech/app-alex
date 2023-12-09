@@ -1,7 +1,7 @@
 <template>
   <v-container
     class="bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100"
-    data-testid="alex-modal-footer"
+    data-testid="alex-dialog-footer"
   >
     <v-row dense justify="end">
       <v-col v-if="!noSecondaryButton" dense cols="auto">

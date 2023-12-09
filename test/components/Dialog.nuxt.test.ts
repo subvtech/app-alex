@@ -8,7 +8,7 @@ import Footer from '../../components/alex/custom/dialog/Footer.vue';
 describe('Dialog', () => {
   it('Dialog should be defined', async () => {
     const { unmount } = await renderSuspended(Dialog, {
-      attrs: {},
+      props: {},
     });
     const bar = screen.queryByTestId('alex-dialog');
     expect(bar).not.toBeNull();
@@ -32,7 +32,7 @@ describe('Dialog', () => {
 describe('Header Dialog', () => {
   it('Header should be defined', async () => {
     const { unmount } = await renderSuspended(Header, {
-      attrs: {},
+      props: {},
     });
     const header = screen.queryByTestId('alex-dialog-header');
     expect(header).not.toBeNull();
@@ -42,7 +42,7 @@ describe('Header Dialog', () => {
   it('Title must be rendered', async () => {
     const title = 'Criar um projeto';
     const { unmount } = await renderSuspended(Header, {
-      attrs: {
+      props: {
         title,
       },
     });
@@ -54,14 +54,14 @@ describe('Header Dialog', () => {
 
   it('Highlight must be rendered', async () => {
     const title = 'Criar curso com';
-    const highlight = '#222';
+    const highlightedTitle = '#222';
     const { unmount } = await renderSuspended(Header, {
-      attrs: {
+      props: {
         title,
-        highlight,
+        highlightedTitle,
       },
     });
-    const highlightComponent = screen.getByText(highlight);
+    const highlightComponent = screen.getByText(highlightedTitle);
     expect(highlightComponent).not.toBeNull();
 
     unmount();
@@ -71,7 +71,7 @@ describe('Header Dialog', () => {
 describe('Footer Dialog', () => {
   it('Footer should be defined', async () => {
     const { unmount } = await renderSuspended(Footer, {
-      attrs: {},
+      props: {},
     });
     const bar = screen.queryByTestId('alex-dialog-footer');
     expect(bar).not.toBeNull();
