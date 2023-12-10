@@ -136,7 +136,7 @@ ${exampleScript[0]}
           v-model="playgroundValues[0]"
           hide-details
           placeholder="Nome de usuário"
-          label="Alex"
+          label="Placeholder"
           clearable
         />
         <alex-inputs-text-field
@@ -292,9 +292,5 @@ const copyToClipboard = async (message, item) => {
 .playground-controls {
   border-left: 1px solid #a0a8b7;
   gap: 16px;
-}
-
-.playground-select > * .v-select__selection {
-  margin-left: 35px !important;
 }
 </style>

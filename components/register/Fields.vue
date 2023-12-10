@@ -96,6 +96,7 @@
             v-model:search="search"
             name="institution"
             theme="dark"
+            autocomplete="off"
           />
         </template>
         <template #step3="{ values }">
