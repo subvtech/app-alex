@@ -75,14 +75,12 @@
             {{ $t('pages.register.type') }}
           </v-card-subtitle>
 
-          <alex-inputs-stepper-field
+          <alex-inputs-select
             name="yourRole"
-            color="white"
-            field-type="VSelect"
+            theme="dark"
             class="my-3 text-secondary"
-            :label="$t('pages.register.userType')"
-            variant="outlined"
             hide-selected
+            :label="$t('pages.register.userType')"
             :items="[
               {
                 title: $t('pages.register.typeProfessor'),
@@ -97,6 +95,7 @@
             v-model:institutions="institutions"
             v-model:search="search"
             name="institution"
+            theme="dark"
           />
         </template>
         <template #step3="{ values }">

@@ -1,5 +1,5 @@
 <template>
-  <v-autocomplete
+  <alex-inputs-autocomplete
     v-model="value"
     :label="$t('pages.register.institution')"
     :name="name"
@@ -14,10 +14,10 @@
     item-value="id"
     class="my-3"
     variant="outlined"
-    required
     no-data-text="Instituição não encontrada"
     autofocus
     spellcheck="false"
+    v-bind="$attrs"
     @input="$emit('update:search', $event.target.value)"
   />
 </template>
