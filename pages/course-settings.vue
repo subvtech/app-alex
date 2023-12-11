@@ -183,12 +183,10 @@
           </p>
         </div>
         <div class="content-body">
-          <div class="d-flex flex-row px-6">
-            <div class="sideBySide">
-              <alex-inputs-radio-button
-                :class="radioButtons"
-                :buttons="buttons"
-              />
+          <div class="container-radio">
+            <div class="radioButtons">
+              <alex-inputs-radio-button :buttons="firstButton" v-model="activeButton" />
+              <alex-inputs-radio-button :buttons="secondButton" v-model="activeButton" />
             </div>
           </div>
         </div>
@@ -240,18 +238,23 @@
 </template>
 <script setup lang="ts">
 const activeLink = ref(false);
-const buttons = ref([
+const firstButton = ref([
   {
     label: 'Mostrar (Público)',
     hint: 'Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca',
     value: '1',
   },
+]);
+
+const secondButton = ref([
   {
     label: 'Ocultar (Privado)',
     hint: 'Torna o curso privado, garantindo que somente os integrantes possam ver o curso.',
     value: '2',
   },
 ]);
+
+const activeButton = ref('1');
 </script>
 <style scoped lang="scss">
 .container {
@@ -400,14 +403,6 @@ p {
   text-transform: none;
 }
 
-.sideBySide {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  align-self: stretch;
-}
-
 .text-invite {
   color: var(--cinza-cinza-800, #454d54);
 }
@@ -416,5 +411,14 @@ p {
   align-items: flex-start;
   gap: 8px;
   flex: 1 0 0;
+}
+
+.container-radio {
+  display: flex;
+  padding: 24px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 24px;
+  align-self: stretch;
 }
 </style>
