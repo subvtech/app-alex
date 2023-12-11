@@ -28,5 +28,8 @@
     "title": "Account successfully created!",
     "subtitle": "An activation link has been sent to your registered e-mail address. Go there and activate your account."
   },
-  "alreadyTaken": "is already taken"
+  "alreadyTaken": "is already taken",
+  "blockedUser": "User blocked, please contact support",
+  "genericError": "Something went wrong, please try again later",
+  "emailMustBeValid": "Email must be Valid, please check it!"
 }

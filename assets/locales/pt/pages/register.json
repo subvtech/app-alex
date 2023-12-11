@@ -28,5 +28,8 @@
     "title": "Conta criada com sucesso!",
     "subtitle": "Para acessar sua conta é necessário ativar sua conta através do link de ativação que foi enviado para o e-mail cadastrado."
   },
-  "alreadyTaken": "já está cadastrado!"
+  "alreadyTaken": "já está cadastrado!",
+  "blockedUser": "Usuário bloqueado, entre em contato com o suporte.",
+  "genericError": "Ocorreu um erro, tente novamente mais tarde.",
+  "emailMustBeValid": "Seu email deve ser válido, por favor cheque-o"
 }

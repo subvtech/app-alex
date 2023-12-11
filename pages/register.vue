@@ -1,30 +1,20 @@
 <template>
-  <v-container id="register" class="pa-0 height-100 overflow-hidden" fluid>
-    <v-row class="fill-height w-100 ma-0">
-      <v-col
-        sm="6"
-        md="8"
-        class="justify-center align-center d-none d-md-flex pa-0"
-      >
-        <img class="signUp" src="/images/signUp.svg" />
-      </v-col>
+  <v-container id="register" class="pa-0 container-grid overflow-hidden" fluid>
+    <div class="image justify-center align-center d-none d-md-flex pa-0">
+      <img class="signUp" src="/images/signUp.svg" />
+    </div>
 
-      <v-col cols="12" sm="12" md="4" class="bg-primary-0 pa-0 content-field">
-        <div
-          class="mt-12 mt-sm-16"
-          align="center"
-          style="align-self: flex-end"
-        ></div>
+    <div class="bg-primary-0 pa-0 content-field">
+      <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end" />
 
-        <SuccessMessage
-          v-if="registeredUser"
-          :title="$t('pages.register.success.title')"
-          :subtitle="$t('pages.register.success.subtitle')"
-        />
+      <SuccessMessage
+        v-if="registeredUser"
+        :title="$t('pages.register.success.title')"
+        :subtitle="$t('pages.register.success.subtitle')"
+      />
 
-        <RegisterFields v-else @success:message="onRegisteredUser" />
-      </v-col>
-    </v-row>
+      <RegisterFields v-else @success:message="onRegisteredUser" />
+    </div>
   </v-container>
 </template>
 
@@ -45,15 +35,15 @@ const onRegisteredUser = () => {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  max-width: 629px;
   overflow-y: scroll;
   display: grid;
 }
 
-.height-100 {
-  height: 100vh !important;
+.container-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(auto, 629px);
+  height: 100%;
 }
-
 .content-field {
   overflow-y: auto !important;
 }
@@ -73,24 +63,15 @@ const onRegisteredUser = () => {
 }
 
 .signUp {
-  width: clamp(550px, 65%, 50vw);
+  width: clamp(500px, 65%, 1000px);
 }
 
-@media screen and (max-width: 500px) {
-  .content-field::-webkit-scrollbar {
-    width: 8px;
+@media screen and (max-width: 959px) {
+  .container-grid {
+    grid-template-columns: 1fr;
   }
-}
-
-@media (max-height: 768px) {
-  .content-field {
-    div.mt-12 {
-      margin-top: 20px !important;
-    }
-
-    div img.mt-8 {
-      margin-bottom: 8px !important;
-    }
+  .signUp {
+    display: none;
   }
 }
 </style>

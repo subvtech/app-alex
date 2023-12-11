@@ -32,7 +32,7 @@ const props = withDefaults(
       | 'info';
     size?: 'small' | 'default' | 'large';
     disabled?: boolean;
-    theme: 'light' | 'dark';
+    theme?: 'light' | 'dark';
   }>(),
   {
     variant: 'primary',
@@ -73,32 +73,15 @@ const slots = useSlots();
 const hasDefault = computed(() => !!slots.default);
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @use 'sass:map';
 $variants: (error, success, info, warning);
-@each $name in $variants {
-  .#{$name}:hover {
-    background-color: rgb(var(--v-theme-#{$name}-1)) !important;
-  }
-  .#{$name}:active {
-    background-color: rgb(var(--v-theme-#{$name}-2)) !important;
-  }
-}
-
 $otherVariants:
   'primary' 'secondary-1' 'secondary-2',
   'secondary' 'gray-100' 'gray-200',
   'tertiary' 'gray-200' 'gray-300',
   'text' 'gray-blue' 'gray-100';
 
-@each $name, $hover, $active in $otherVariants {
-  .#{$name}:hover {
-    background-color: rgb(var(--v-theme-#{$hover})) !important;
-  }
-  .#{$name}:active {
-    background-color: rgb(var(--v-theme-#{$active})) !important;
-  }
-}
 .alex-button {
   &.v-btn {
     padding: 0 12px !important;
@@ -110,6 +93,23 @@ $otherVariants:
   &.disabled {
     pointer-events: none;
     opacity: 1;
+  }
+  @each $name in $variants {
+    &.#{$name}:hover {
+      background-color: rgb(var(--v-theme-#{$name}-1)) !important;
+    }
+    &.#{$name}:active {
+      background-color: rgb(var(--v-theme-#{$name}-2)) !important;
+    }
+  }
+
+  @each $name, $hover, $active in $otherVariants {
+    &.#{$name}:hover {
+      background-color: rgb(var(--v-theme-#{$hover})) !important;
+    }
+    &.#{$name}:active {
+      background-color: rgb(var(--v-theme-#{$active})) !important;
+    }
   }
 }
 </style>

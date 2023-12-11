@@ -30,13 +30,15 @@
         </div>
       </v-slide-x-transition>
     </template>
-    <div v-if="!showControls && !noControls" class="w-100 d-flex">
+    <div
+      v-if="!showControls && !noControls"
+      class="w-100 d-flex justify-center align-end"
+    >
       <alex-custom-button
         v-if="activeStep > 1"
         variant="secondary"
         text="Voltar"
         size="large"
-        :disabled="submitLoading"
         @click="onPrevStep"
       />
 
@@ -45,7 +47,7 @@
         size="large"
         type="submit"
         :disabled="!isValid"
-        :loading="submitLoading"
+        :loading="loading"
         :text="activeStep == numberSteps ? 'Criar' : 'Avançar'"
       />
     </div>
@@ -56,7 +58,7 @@
       :is-valid="isValid"
       :is-last-step="activeStep == numberSteps"
       :is-first-step="activeStep == 1"
-      :submit-loading="submitLoading"
+      :loading="loading"
     />
   </v-form>
 </template>
@@ -92,12 +94,12 @@ const props = withDefaults(
     noHeader?: boolean;
     noControls?: boolean;
     stepsConfig?: Record<string, Partial<StepsConfig>>;
-    submitLoading?: boolean;
+    loading?: boolean;
     stepClass?: string;
     stepperIndicatorClass?: string;
   }>(),
   {
-    submitLoading: false,
+    loading: false,
     noHeader: false,
     noControls: false,
     stepClass: undefined,
@@ -105,7 +107,7 @@ const props = withDefaults(
     stepsConfig: undefined,
   },
 );
-const emit = defineEmits(['onSuccess']);
+const emit = defineEmits(['onSuccess', 'updateLoading']);
 // Slots
 const slots = useSlots();
 const showControls = computed(() => !!slots.controls);
@@ -185,10 +187,12 @@ const onSubmit = handleSubmit(async (values) => {
   let validated = false;
   if (configStep.validate) {
     const validationPromises = configStep.validate.map(async (validate) => {
+      emit('updateLoading', true);
       return await validateField(values, validate);
     });
     const validationResults = await Promise.all(validationPromises);
     validated = !validationResults.includes(false);
+    emit('updateLoading', false);
   }
   if (validated || !configStep.validate) {
     onAllValidated();
@@ -227,9 +231,3 @@ const onSelectStep = (step: number) => {
   activeStep.value = step;
 };
 </script>
-
-<style scoped>
-button[type='submit']:disabled {
-  background-color: gray !important;
-}
-</style>

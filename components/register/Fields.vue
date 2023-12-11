@@ -26,11 +26,37 @@
           step2: { scheme: registerStep2 },
           step3: { scheme: registerStep3 },
         }"
-        :submit-loading="registering"
         align="left"
         no-header
+        :loading="registering"
+        @update-loading="(value: boolean) => (registering = value)"
         @on-success="submit"
       >
+        <template
+          #controls="{ isFirstStep, onPrevStep, isValid, loading, isLastStep }"
+        >
+          <div class="w-100 d-flex justify-end align-end gap-4">
+            <alex-custom-button
+              v-if="!isFirstStep"
+              variant="secondary"
+              text="Voltar"
+              theme="dark"
+              size="large"
+              prepend-icon="mdi-chevron-left"
+              @click="onPrevStep"
+            />
+
+            <alex-custom-button
+              size="large"
+              type="submit"
+              theme="dark"
+              append-icon="mdi-chevron-right"
+              :disabled="!isValid"
+              :loading="loading"
+              :text="isLastStep ? 'Criar conta' : 'Avançar'"
+            />
+          </div>
+        </template>
         <template #step1>
           <v-card-subtitle
             class="text-white text-body-1 text-sm-subtitle-2 mb-8 break-spaces"
@@ -131,16 +157,22 @@
           />
 
           <alex-inputs-text-field
-            :label="$t('pages.register.confirmPassword')"
-            :placeholder="$t('pages.register.confirmPasswordHolder')"
-            :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="confirmationVisible ? 'text' : 'password'"
             name="confirmPassword"
             color="white"
             class="my-3"
             theme="dark"
+            :label="$t('pages.register.confirmPassword')"
+            :placeholder="$t('pages.register.confirmPasswordHolder')"
+            :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="confirmationVisible ? 'text' : 'password'"
+            :hide-details="hasError"
             @click:append-inner="confirmationVisible = !confirmationVisible"
           />
+          <div class="my-2">
+            <p v-show="hasError" class="text-body-1 text-error">
+              {{ $t(`pages.register.${errorMessage}`) }}
+            </p>
+          </div>
         </template>
       </alex-inputs-stepper>
 
@@ -173,7 +205,6 @@ const emit = defineEmits(['success:message']);
 const {
   registerSchemas: { registerStep1, registerStep2, registerStep3 },
 } = useFormRules();
-const { setMessage } = useMessageStore();
 const { register } = useStrapiAuth();
 const { value: wallet } = useRouteStore<{ address: string }>();
 const i18n = useI18n();
@@ -201,6 +232,8 @@ const verifyField = async (field: string, inputValue: string) => {
 const usernameUrl = computed(() => window.location.host + '/profile/');
 const registering = ref(false);
 const institutions = ref([]);
+const hasError = ref(false);
+const errorMessage = ref('');
 const search = ref('');
 const passwordVisible = ref(false);
 const confirmationVisible = ref(false);
@@ -246,14 +279,30 @@ const submit = async (values: {
   try {
     const { user } = await register(userData);
     if (user.value && user.value.blocked) {
-      setMessage(i18n.t('pages.login.blocked'), 'red', true);
+      errorMessage.value = 'blockedUser';
     } else {
       emit('success:message');
     }
   } catch (err: any) {
-    setMessage(err.error.message, 'red', true);
+    hasError.value = true;
+    if (err.error) {
+      switch (err.error.name) {
+        case 'ValidationError':
+          errorMessage.value = 'emailMustBeValid';
+          break;
+        case 'Your account has been blocked by an administrator':
+          errorMessage.value = 'blockedUser';
+          break;
+        default:
+          errorMessage.value = 'genericError';
+          break;
+      }
+    }
   } finally {
     registering.value = false;
+    setTimeout(() => {
+      hasError.value = false;
+    }, 3000);
   }
 };
 </script>
@@ -282,7 +331,7 @@ const submit = async (values: {
 }
 
 .max-w-100 {
-  max-width: 450px;
+  max-width: 400px;
 }
 
 @media (max-height: 700px) {

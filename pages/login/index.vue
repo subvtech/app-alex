@@ -43,12 +43,12 @@
               name="password"
               color="white"
               theme="dark"
-              :hide-details="errorMessage"
+              :hide-details="hasError"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
             <div class="mt-2">
-              <p v-show="errorMessage" class="text-body-1 text-error">
-                {{ $t(`pages.login.${errorType}`) }}
+              <p v-show="hasError" class="text-body-1 text-error">
+                {{ $t(`pages.login.${errorMessage}`) }}
               </p>
             </div>
             <div
@@ -82,6 +82,7 @@
               size="large"
               type="submit"
               class="text-none text-green text-body-1"
+              theme="dark"
               :disabled="!isValid"
               :loading="logging"
             >
@@ -129,20 +130,17 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { ref } from 'vue';
-const errorMessage = ref(false);
-const errorType = ref('');
-const i18n = useI18n();
+import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
+const hasError = ref(false);
+const errorMessage = ref('');
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
 });
-const { login, setToken, setUser } = useStrapiAuth();
-const { create, find } = useStrapi();
+const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
-const messageStore = useMessageStore();
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -182,24 +180,29 @@ const submit = handleSubmit(async () => {
     });
 
     router.push('/');
-  } catch (err: any) {
+  } catch (err: unknown) {
+    hasError.value = true;
+    const error = err as Strapi4Error;
+    if (error.error) {
+      switch (error.error.name) {
+        case 'ValidationError':
+          errorMessage.value = 'loginError';
+          break;
+        case 'Your account email is not confirmed':
+          errorMessage.value = 'confirmEmail';
+          break;
+        case 'Your account has been blocked by an administrator':
+          errorMessage.value = 'blockedUser';
+          break;
+        default:
+          errorMessage.value = 'genericError';
+          break;
+      }
+    }
+  } finally {
     logging.value = false;
-    errorMessage.value = true;
-    if (err.error && err.error.name === 'ValidationError')
-      errorType.value = 'loginError';
-    else if (
-      err.error &&
-      err.error.message === 'Your account email is not confirmed'
-    )
-      errorType.value = 'confirmEmail';
-    else if (
-      err.error &&
-      err.error.message === 'Your account has been blocked by an administrator'
-    )
-      errorType.value = 'blockedUser';
-    else errorType.value = 'genericError';
     setTimeout(() => {
-      errorMessage.value = false;
+      hasError.value = false;
     }, 5000);
   }
 });
