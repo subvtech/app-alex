@@ -1,0 +1,34 @@
+{
+    "config": {
+        "title": "Settings",
+        "coverTitle": "Course Cover",
+        "addCover": "Add Videos or Photos",
+        "formats": "Supported Formats: .jpeg, .png, .wav, .mp4, .jpg;",
+        "uploadButton": "Upload",
+        "generalTitle": "General Information",
+        "courseName": "Course Name",
+        "beginDate": "Start Date",
+        "endDate": "End Date",
+        "courseAcronym": "Course Acronym",
+        "cancelButton": "Cancel",
+        "saveButton": "Save Changes",
+        "syncMeetingsTitle": "Synchronous Meetings",
+        "noSyncMeetings": "It seems there are no synchronous meetings.",
+        "createSyncMeetingButton": "Create Meeting",
+        "inviteSettingsTitle": "Invitation Settings",
+        "linkInvitation": "Link Invitation",
+        "inviteLink": "Invitation Link",
+        "linkDuration": "Link Duration",
+        "mailInvite": "Email Invitation",
+        "inviteMessage": "Invitation Message",
+        "courseVisibilityTitle": "Course Visibility",
+        "showCourseTitle": "Show Course",
+        "showCourseHint": "Makes the course public, allowing any user to find it through search.",
+        "hideCourseTitle": "Hide Course",
+        "hideCourseHint": "Makes the course private, ensuring only members can see the course.",
+        "eraseCourseTitle": "Delete Course",
+        "eraseCourseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
+        "eraseButton": "Delete Course"
+    }
+    
+}

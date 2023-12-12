@@ -2,7 +2,7 @@
   <div class="container d-flex flex-column">
     <div class="config config-title">
       <p>
-        <span class="header-h4">Configurações</span>
+        <span class="header-h4"> {{ t('config.title') }}</span>
       </p>
     </div>
     <div class="config">
@@ -13,7 +13,15 @@
           </p>
         </div>
         <div class="content-body">
-          <div class="empty-state mb-4">
+          <div
+            v-if="selectedFile"
+            class="filePreview"
+            :style="{
+              backgroundImage: 'url(' + preview + ')',
+              backgroundSize: 'cover',
+            }"
+          ></div>
+          <div v-else class="empty-state mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="57"
@@ -42,6 +50,14 @@
               text="Fazer upload"
               prepend-icon="mdi-cloud-upload-outline"
               variant="secondary"
+              @click="$refs.fileInput.click()"
+            />
+            <input
+              ref="fileInput"
+              type="file"
+              accept=".jpeg, .png, .wav, .mp4, .jpg"
+              style="display: none"
+              @change="handleFileUpload($event)"
             />
           </span>
         </div>
@@ -59,21 +75,21 @@
             class="w-100"
             required
           />
-          <div class="d-flex flex-row">
-            <div class="sideBySide">
-              <alex-inputs-text-field
+          <div class="container-date">
+            <div class="datePickers">
+              <alex-inputs-date
                 label="Início"
+                :model-value="startValue"
                 name=""
                 required
-                type="date"
+                class="w-100"
               />
-            </div>
-            <div class="sideBySide">
-              <alex-inputs-text-field
+              <alex-inputs-date
                 label="Término"
                 name=""
+                :model-value="endValue"
                 required
-                type="date"
+                class="w-100"
               />
             </div>
           </div>
@@ -132,7 +148,11 @@
         </div>
         <div class="content-body">
           <p class="header-h5 text-invite">Convite por link</p>
-          <v-switch v-model:model-value="activeLink" label="Link de convite" />
+          <v-switch
+            v-model:model-value="activeLink"
+            label="Link de convite"
+            color="accent"
+          />
           <div v-if="activeLink" class="d-flex flex-row">
             <div class="w-1/2">
               <alex-inputs-text-field
@@ -141,14 +161,23 @@
                 class="w-100"
                 name=""
                 required
+                :items="[
+                  '5 minutos',
+                  '15 minutos',
+                  '30 minutos',
+                  '1 hora',
+                  '2 horas',
+                  '8 horas',
+                  '24 horas',
+                ]"
               />
             </div>
             <div class="w-1/2">
               <alex-inputs-text-field
                 class="w-100"
-                label="EITA"
+                label=""
                 hint="Tempo de duração"
-                name=""
+                name="Tempo de duração"
               />
             </div>
           </div>
@@ -185,8 +214,14 @@
         <div class="content-body">
           <div class="container-radio">
             <div class="radioButtons">
-              <alex-inputs-radio-button :buttons="firstButton" v-model="activeButton" />
-              <alex-inputs-radio-button :buttons="secondButton" v-model="activeButton" />
+              <alex-inputs-radio-button
+                v-model="activeButton"
+                :buttons="firstButton"
+              />
+              <alex-inputs-radio-button
+                v-model="activeButton"
+                :buttons="secondButton"
+              />
             </div>
           </div>
         </div>
@@ -237,6 +272,24 @@
   </div>
 </template>
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+const selectedFile = ref(null);
+const preview = ref(null);
+
+const handleFileUpload = (event) => {
+  selectedFile.value = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    preview.value = e.target.result;
+  };
+  reader.readAsDataURL(selectedFile.value);
+};
+
+const startValue = ref(new Date());
+const endValue = ref(new Date());
 const activeLink = ref(false);
 const firstButton = ref([
   {
@@ -324,6 +377,17 @@ const activeButton = ref('1');
   background: var(--cinza-cinza-azulado, #f1f5f9);
 }
 
+.filePreview {
+  display: flex;
+  height: 250px;
+  padding: 5.072px;
+  align-items: center;
+  gap: 5.072px;
+  align-self: stretch;
+  border-radius: 8px;
+  border: 1px solid var(--cinza-cinza-100, #ebedef);
+}
+
 .action-content {
   display: flex;
   flex-direction: column;
@@ -378,7 +442,6 @@ p {
   gap: 16px;
   align-self: stretch;
   border-top: 1px solid var(--cinza-cinza-100, #ebedef);
-  background: #fff;
 }
 
 .no-encounters {
@@ -420,5 +483,20 @@ p {
   align-items: flex-end;
   gap: 24px;
   align-self: stretch;
+}
+
+.container-date {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  align-self: stretch;
+}
+
+.datePickers {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 0 0;
 }
 </style>

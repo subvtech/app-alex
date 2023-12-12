@@ -1,0 +1,33 @@
+{
+    "config": {
+        "title": "Configurações",
+        "coverTitle": "Capa do curso",
+        "addCover": "Adicione Vídeos ou Fotos",
+        "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
+        "uploadButton": "Fazer upload",
+        "generalTitle": "Informações gerais",
+        "courseName": "Nome do curso",
+        "beginDate": "Início",
+        "endDate": "Término",
+        "courseAcronym": "Sigla do curso",
+        "cancelButton": "Cancelar",
+        "saveButton": "Salvar alterações",
+        "syncMeetingsTitle": "Encontros síncronos",
+        "noSyncMeetings": "Parece que não há nenhum encontro síncrono.",
+        "createSyncMeetingButton": "Criar encontro",
+        "inviteSettingsTitle": "Configurações de convite",
+        "linkInvitation": "Convite por link",
+        "inviteLink": "Link de convite",
+        "linkDuration": "Duração do link",
+        "mailInvite": "Convite por e-mail",
+        "inviteMessage": "Mensagem do convite",
+        "courseVisibilityTitle": "Visibilidade do curso",
+        "showCourseTitle": "Mostrar curso",
+        "showCourseHint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca.",
+        "hideCourseTitle": "Ocultar curso",
+        "hideCourseHint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso.",
+        "eraseCourseTitle": "Excluir curso",
+        "eraseCourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
+        "eraseButton": "Excluir curso"
+    }
+}
