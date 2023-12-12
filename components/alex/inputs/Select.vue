@@ -27,7 +27,7 @@
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"
-    ></v-select>
+    />
   </div>
 </template>
 

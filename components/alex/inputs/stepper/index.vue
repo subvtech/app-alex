@@ -75,6 +75,7 @@ interface Validate {
         message: string;
       }
     | undefined
+    | any
   >;
 }
 export interface StepsConfig {
@@ -121,7 +122,9 @@ const slotsList = computed(() =>
   ),
 );
 const activeStep = ref(1);
+const activeStepIndex = computed(() => activeStep.value - 1);
 const numberSteps = computed(() => slotsList.value.length);
+const lastStepIndex = computed(() => numberSteps.value - 1);
 const stepsList = computed(() => {
   const steps = {} as StepType<typeof slotsList.value, StepsConfig>;
   slotsList.value.map(
@@ -141,7 +144,7 @@ const stepsList = computed(() => {
 });
 // Steps Logic Get Schema
 const validationSchema = computed(() => {
-  const configStep = stepsList.value[activeStep.value - 1];
+  const configStep = stepsList.value[activeStepIndex.value];
   const emptyObject = yup.object({ empty: yup.string().optional().nullable() });
   return configStep && configStep.scheme ? configStep.scheme : emptyObject;
 });
@@ -153,9 +156,9 @@ const { handleSubmit, errors, values, controlledValues, setFieldError } =
   });
 
 const onAllValidated = () => {
-  if (activeStep.value - 1 !== numberSteps.value - 1) {
+  if (activeStepIndex.value !== lastStepIndex.value) {
     if (!props.noHeader) {
-      stepsList.value[activeStep.value - 1].completed = true;
+      stepsList.value[activeStepIndex.value].completed = true;
     }
     activeStep.value++;
     return;
@@ -183,7 +186,7 @@ const validateField = async (
 };
 
 const onSubmit = handleSubmit(async (values) => {
-  const configStep = stepsList.value[activeStep.value - 1];
+  const configStep = stepsList.value[activeStepIndex.value];
   let validated = false;
   if (configStep.validate) {
     const validationPromises = configStep.validate.map(async (validate) => {
@@ -214,7 +217,7 @@ const onPrevStep = () => {
   if (activeStep.value > 1) {
     activeStep.value--;
     if (!props.noHeader) {
-      stepsList.value[activeStep.value - 1].completed = false;
+      stepsList.value[activeStepIndex.value].completed = false;
     }
   }
 };
@@ -225,7 +228,7 @@ const onSelectStep = (step: number) => {
   }
 
   if (step > activeStep.value) {
-    stepsList.value[activeStep.value - 1].completed = true;
+    stepsList.value[activeStepIndex.value].completed = true;
   }
 
   activeStep.value = step;

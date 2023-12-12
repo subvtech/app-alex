@@ -161,6 +161,11 @@ const menus = [
         title: 'Dropdown',
         to: '/components/inputs/dropdown',
       },
+      {
+        icon: 'mdi-shoe-print',
+        title: 'Stepper',
+        to: '/components/inputs/stepper',
+      },
     ],
   },
 ];
