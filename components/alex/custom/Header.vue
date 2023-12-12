@@ -3,8 +3,9 @@
     class="header d-flex align-center w-full"
     style="height: 44px; justify-content: space-between"
     data-testid="header"
+    role="header-parent"
   >
-    <div class="d-flex grow align-center">
+    <div class="d-flex grow align-center" role="breadcrumb">
       <div class="header__breadcrumb">
         <alex-custom-breadcrumbs
           :title="title"
