@@ -1,5 +1,5 @@
 <template>
-  <v-form @submit="onSubmit">
+  <v-form role="stepper" @submit="onSubmit">
     <div
       v-if="!noHeader"
       class="d-flex gap-4 py-3 px-1"
