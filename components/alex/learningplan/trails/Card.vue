@@ -174,7 +174,7 @@ const { blocks, name, hide } = withDefaults(defineProps<LearningPlanCard>(), {
   blocks: undefined,
 });
 const isHovering = ref(false);
-const direction = useDirection();
+const direction = useDirection('mobile');
 const showOptions = ref(false);
 const isVertical = computed(() => direction.value === 'VERTICAL');
 const width = computed(() =>
@@ -266,20 +266,16 @@ const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
   overflow: hidden;
 }
 
-.type,
 .favorite,
 .hidden-icon,
 .options,
 .hover {
   position: absolute;
 }
-.type {
-  top: 16px;
-  left: 16px;
-}
+
 .hidden-icon {
-  top: 16px;
-  left: 16px;
+  bottom: 16px;
+  right: 16px;
   z-index: 1;
 }
 
