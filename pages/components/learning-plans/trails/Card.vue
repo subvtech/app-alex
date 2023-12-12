@@ -16,6 +16,11 @@
       Tem como propriedades obrigatórias o <strong>image</strong>,
       <strong>name</strong>, <strong>description</strong>,
     </p>
+    <p class="text-subtitle-2 text-gray-500">
+      Há duas formas de visualizações do <strong>Card de Trilhas</strong>. Se a
+      tela for menor que 600px o card ficará na vertical ( redimensione a tela
+      para poder visualizar), caso seja maior ela permanece na horizontal
+    </p>
 
     <div class="w-100 flex-column d-flex gap-4">
       <div class="d-flex" style="gap: 8px">
