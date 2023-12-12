@@ -33,9 +33,11 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :user="user"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
       @click="onClickOutside"
       :menu-items="profileMenuItems"
+      show-picture
     />
 
     <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
