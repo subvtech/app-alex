@@ -34,7 +34,8 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :user="user"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
       @click="onClickOutside"
       :menu-items="profileMenuItems"
       show-picture
@@ -56,7 +57,6 @@ const i18n = useI18n();
 
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
-
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
 
