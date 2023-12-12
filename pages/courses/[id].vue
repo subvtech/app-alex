@@ -24,55 +24,34 @@
       endDate="12/06/2016"
       :links="links"
     />
-    <div class="d-flex w-100 gap-6">
-      <div class="d-flex w-100">
-        <alex-custom-card title="Sobre o curso">
-          <template #content>
-            <div class="d-flex flex-column">
-              dasdsad
-              <app-about
-                :can-edit="false"
-                :id="course.id"
-                :text="course.description"
-                full-width
-              />
-              <alex-custom-card
-                title="Objetivos de aprendizagem"
-                is-nested
-                hide-dividers
-              >
-                <template #content class="gap-6">
-                  <div class="d-flex flex-column gap-2">
-                    <courses-goal
-                      v-for="(item, index) in [
-                        {
-                          title: 'Melhorar',
-                          description:
-                            'Au commencement était la Parole, et la Parole était avec Dieu, et la Parole était Dieu.',
-                        },
-                        {
-                          title: 'Melhorar',
-                          description: 'Elle était au commencement avec Dieu.',
-                        },
-                        {
-                          title: 'Melhorar',
-                          description: `Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.`,
-                        },
-                      ]"
-                      :key="index + item.title"
-                      :index="index"
-                      :title="item.title"
-                      :description="item.description"
-                    />
-                  </div>
-                </template>
-              </alex-custom-card>
-              <alex-custom-card title="Details" is-nested hide-dividers>
-              </alex-custom-card>
-            </div>
-          </template>
-        </alex-custom-card>
-      </div>
+    <div class="course-page d-flex w-100 gap-6">
+      <alex-custom-card title="" no-header full-width sizingClass="px-12">
+        <template #content>
+          <div class="d-flex flex-column w-100">
+            <app-about
+              title="Sobre o curso"
+              :text="course.description"
+              :user-id="course.id"
+              :can-edit="true"
+              @update="updateAbout"
+              empty-text-message="it's empty"
+              sizing-class="pa-0"
+              is-nested
+              hide-dividers
+              full-width
+            />
+            <courses-goals
+              :can-edit="false"
+              title="Objetivos de aprendizagem"
+              :data="data"
+              tooltip="Defina o que os estudantes devem alcançar no final deste cursos. Utilize verbos da taxonomia de bloom e busque definir os resultados esperados de aprendizagem (learning outcomes)"
+              sizing-class="pa-0"
+              is-nested
+            />
+          </div>
+        </template>
+      </alex-custom-card>
+
       <div class="d-flex flex-column gap-6">
         <alex-custom-card title="Details">
           <template #content>
@@ -122,34 +101,16 @@
                 />
               </template>
             </alex-custom-card>
-            <alex-custom-card
-              class=""
-              :show-icon="false"
-              title="Convite do Curso"
-              href="dsads"
-              hide-dividers
-              sizing-class="ma-0"
-              is-nested
-            >
-              <template #content>
-                <course-meeting
-                  date="25/06/1998"
-                  frequency="Everyday"
-                  startHour="14:00"
-                  end-hour="18:00"
-                />
-                <course-meeting
-                  date="25/06/1998"
-                  frequency="Everyday"
-                  startHour="08:00"
-                  end-hour="11:00"
-                />
-              </template>
-            </alex-custom-card>
+            <courses-invites
+              :enable-invites="course.invite_enabled"
+              :duration="course.invitation_duration"
+              :course-id="course.id"
+              :data="invitationLink"
+            />
           </template>
         </alex-custom-card>
-        <profile-competences
-          title="Competências gerais"
+        <competences
+          title="Competências Gerais"
           label="dasda"
           emptyMessage="it's empty"
           placeholder="placeholder"
@@ -157,7 +118,7 @@
           :userTags="generalTags"
           :can-edit="false"
         />
-        <profile-competences
+        <competences
           title="Competências Técnicas"
           label="dasda"
           emptyMessage="it's empty"
@@ -172,16 +133,17 @@
 </template>
 
 <script setup lang="ts">
-import Carousel from '../../editor-js/plugins/carousel/CarouselBlock';
 import { useI18n } from 'vue-i18n';
 
-const { find, findOne } = useStrapi();
+const { find, findOne, update } = useStrapi();
 
 const i18n = useI18n();
 const user = ref<any>();
 const course = ref<any>();
 const generalTags = ref();
 const technicalTags = ref();
+const invitationLink = ref();
+const componentKey = ref(0);
 
 const { id, fullname, avatar } = useStrapiUser<User>().value;
 
@@ -190,7 +152,21 @@ const router = useRouter();
 const selectedOption = ref(0);
 
 const canEdit = computed(() => id.value === course.value);
-
+const data = [
+  {
+    keyWord: 'Melhorar',
+    title:
+      'Au commencement était la Parole, et la Paroe était avec Dieu, et la Parole était Dieu.',
+  },
+  {
+    keyWord: 'Melhorar',
+    title: 'Elle était au commencement avec Dieu.',
+  },
+  {
+    keyWord: 'Melhorar',
+    title: `Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.`,
+  },
+];
 const selectOption = (index) => {
   selectedOption.value = index;
 };
@@ -200,7 +176,6 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const populate = ['cover_image', 'media', 'tags'];
 const links = ref([
   i18n.t('pages.courses.general'),
   i18n.t('pages.courses.trails'),
@@ -210,6 +185,8 @@ const links = ref([
   i18n.t('pages.courses.events'),
   i18n.t('pages.courses.communication'),
 ]);
+
+const populate = ['cover_image', 'media', 'invitation_links', 'tags'];
 
 onBeforeMount(async () => {
   await updateCourse(false);
@@ -225,6 +202,26 @@ const updateCourse = async (show = true) => {
         ...(result.data.attributes as Object),
       };
       console.log({ course: course.value });
+      let temp;
+      if (course.value.invitation_links) {
+        course.value.invitation_links.data.forEach((link) => {
+          const expirationDate = new Date(link.attributes.expires_at);
+
+          if (
+            link.attributes.role === 'student' &&
+            expirationDate.getTime() > new Date().getTime()
+          ) {
+            const differenceBetweenLinks = temp
+              ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
+              : 1;
+
+            if (!temp || differenceBetweenLinks > 0) {
+              temp = link;
+            }
+          }
+        });
+      }
+      if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
       generalTags.value = course.value.tags.data.reduce((acc, item) => {
         // If the item is general, create a new object and add it to the accumulator
 
@@ -249,11 +246,22 @@ const updateCourse = async (show = true) => {
       setMessage('Course not found:', 'red', show);
     });
 };
+
+const updateAbout = async (text) => {
+  await update('/courses', course.value.id, {
+    info: text,
+  });
+};
 </script>
 <style scoped lang="scss">
-.gap-2 {
-  gap: 8px;
+
+@media(max-width: 750px){
+  .course-page{
+    flex-direction: column;
 }
+
+}
+
 .gap-6 {
   gap: 24px;
 }

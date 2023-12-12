@@ -76,7 +76,7 @@ onBeforeMount(() => {
   userStore.fullname = user.value.fullname;
 });
 
-const steps = [
+const [] = [
   {
     id: 'step1',
     title: i18n.t('layouts.default.step1.title'),
@@ -189,7 +189,7 @@ const steps = [
   },
 ];
 
-const { tour } = useOnBoarding(steps);
+const { tour } = useOnBoarding([]);
 
 const menus = [
   {

@@ -1,28 +1,32 @@
 <template>
-  <div id="goal" class="d-flex pa-4 gap">
+  <div id="goal" class="d-flex pa-4 w-100 gap">
     <span>{{ index }}.</span>
     <div class="d-flex flex-column">
       <span class="title">
-        {{ title }}
+        {{ keyWord }}
       </span>
       <span>
-        {{ description }}
+        {{ title }}
       </span>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 const props = defineProps({
   title: {
     type: String,
     required: true,
   },
-  description: {
+  text: {
     type: String,
-    required: true,
   },
   index: {
     type: Number,
+    required: true,
+  },
+  keyWord: {
+    type: String,
     required: true,
   },
 });

@@ -11,8 +11,8 @@
     full-width
   >
     <template v-slot:content>
-      <div class="footer d-flex flex-column">
-        <div v-if="isEditing" class="d-flex flex-column" style="gap: 8px">
+      <div class="gap-3 d-flex flex-column">
+        <div v-if="isEditing" class="d-flex flex-column gap-2">
           <span>{{ label }}</span>
           <v-autocomplete
             :placeholder="placeholder"
@@ -23,20 +23,18 @@
             hide-no-data
             @update:model-value="populateSelectedTags"
             @input="handleInput"
-            @keydown.enter.stop="populateSelectedTags"
+            @keydown.enter.stop="populateSelectedTags(selectedTag)"
             v-model="selectedTag"
+            :menu-props="{ maxHeight: 200 }"
             return-object
           >
           </v-autocomplete>
         </div>
 
-        <div class="competences d-flex flex-column align-start">
-          <div :key="rerender" class="d-flex flex-wrap justify-center">
+        <div class="d-flex flex-column align-start gap-2">
+          <div :key="rerender" class="d-flex flex-wrap justify-center gap-2">
             <alex-custom-chip
-              v-if="
-                selectedTags.length !== 0 &&
-                selectedTags.some((item) => !item.isDeleted)
-              "
+              v-if="selectedTags.length !== 0"
               v-for="(tag, index) in selectedTags"
               :key="index"
               :text="tag.text"
@@ -44,6 +42,7 @@
               color="#000"
               :closable="isEditing"
               @click:close="isEditing ? removeItem(tag) : () => {}"
+              :uncloseable="isEditing"
             />
             <alex-custom-chip
               v-else
@@ -61,14 +60,15 @@
 <script setup lang="ts">
 const { create, find, update, delete: _delete } = useStrapi();
 
+const { t } = useI18n();
 const client = useStrapiClient();
 const emit = defineEmits(['update:user']);
+const { setMessage } = useMessageStore();
 type Tag = {
   text: string;
   id: number;
   verified_by: any;
   isGeneral: boolean;
-  isDeleted?: boolean;
 };
 
 const props = defineProps({
@@ -100,36 +100,54 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false },
 });
 
-const { canEdit, userId } = toRefs(props);
+const { canEdit } = toRefs(props);
 const isEditing = ref(false);
 const selectedTag = ref<Tag | null>(null);
-const allTags = ref<Tag[]>([]);
 const filteredTags = ref<Tag[]>([]);
+const forbiddenTags = ref<Tag[]>([]);
+const allTags = ref<any>([]);
+
 const userTagsIds = ref<number[]>([]);
 const selectedTags = ref<Tag[]>([]);
 const rerender = ref(0);
 
-onBeforeMount(async () => {
-  const data = await find('tags', { populate: 'verified_by' });
+function filterTags(
+  data: any[],
+  isGeneral: boolean,
+  ids: number[] = [],
+): Tag[] {
+  return data
+    .filter((item) => (item.attributes as Tag).isGeneral === isGeneral)
+    .filter((item) => !ids.includes(item.id))
+    .map((item, index) => {
+      return { ...item.attributes, id: item.id };
+    }) as Tag[];
+}
 
+onBeforeMount(async () => {
+  allTags.value = await find('tags', {
+    populate: 'verified_by',
+  });
   userTagsIds.value = props.userTags.map((item) => item.id);
-  //selectedTags.value = [...props.userTags];
+
   selectedTags.value = props.userTags.map((item) => {
-    return { ...item, isDeleted: false };
+    return { ...item };
   });
 
-  allTags.value = data.data.map((item) => {
-    return { ...item.attributes!, id: item.id };
-  }) as Tag[];
-
-  filterTags();
+  forbiddenTags.value = filterTags(allTags.value.data, !props.isGeneral);
+  filteredTags.value = filterTags(
+    allTags.value.data,
+    props.isGeneral,
+    userTagsIds.value,
+  );
 });
 const createArray = ref<Tag[]>([]);
 const updateArray = ref<Tag[]>([]);
 const deleteArray = ref<Tag[]>([]);
 
 const populateSelectedTags = (newValue) => {
-  newValue.isDeleted = false;
+  if (!newValue) return;
+
   if (!selectedTag.value && newValue.id) {
     updateTags(newValue);
   } else if (
@@ -143,13 +161,10 @@ const populateSelectedTags = (newValue) => {
 };
 
 const removeItem = (tag) => {
-  if (props.userTags.find((item) => item.text === tag.text)) {
-    if (tag.id) deleteArray.value.push(tag);
-    selectedTags.value[
-      selectedTags.value.findIndex((item) => item.text === tag.text)
-    ].isDeleted = true;
-  }
-
+  selectedTags.value = selectedTags.value.filter(
+    (item) => item.text !== tag.text,
+  );
+  if (tag.id) deleteArray.value.push(tag);
   createArray.value = createArray.value.filter(
     (item) => item.text !== tag.text,
   );
@@ -169,10 +184,13 @@ const handleInput = (e) => {
 
 const onCancel = async () => {
   selectedTags.value = props.userTags.map((item) => {
-    return { ...item, isDeleted: false };
+    return { ...item };
   });
-
-  filterTags();
+  filteredTags.value = filterTags(
+    allTags.value.data,
+    props.isGeneral,
+    userTagsIds.value,
+  );
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
@@ -181,7 +199,10 @@ const onCancel = async () => {
 
 const onSave = async () => {
   const promises: Promise<any>[] = [];
-  const ids = allTags.value.map((item) => item.id);
+
+  const ids = forbiddenTags.value
+    .map((item) => item.id)
+    .concat(userTagsIds.value);
   if (createArray.value.length !== 0)
     createArray.value
       .filter((item) => !ids.includes(item.id))
@@ -189,67 +210,88 @@ const onSave = async () => {
         promises.push(
           create('tags', {
             ...item,
-            verified_by: userId.value,
+            verified_by: props.userId,
             isGeneral: props.isGeneral,
           }),
         );
       });
   if (updateArray.value.length !== 0)
     updateArray.value
-      .filter((item) => !userTagsIds.value.includes(item.id))
+      .filter((item) => !ids.includes(item.id))
       .forEach((item) => {
         promises.push(
           update(`tags/${item.id}`, {
-            verified_by: item.verified_by.data
-              ? [item.verified_by.data, userId.value]
-              : [userId.value],
+            verified_by: {
+              connect: [props.userId],
+            },
           }),
         );
       });
-  if (deleteArray.value.length !== 0)
+  if (deleteArray.value.length !== 0) {
     deleteArray.value.forEach((element) => {
       selectedTags.value = selectedTags.value.filter(
         (item) => item.text !== element.text,
       );
-      userTagsIds.value = userTagsIds.value.filter((id) => id !== element.id);
-      promises.push(
-        client(`/users/${props.userId}`, {
-          method: 'PUT',
-          body: {
-            data: {
-              tags: userTagsIds,
-            },
-          },
-        }),
-      );
     });
-  await Promise.all(promises);
+    promises.push(
+      client(`/users/${props.userId}`, {
+        method: 'PUT',
+        body: {
+          tags: {
+            disconnect: deleteArray.value.map((item) => item.id),
+          },
+        },
+      }),
+    );
+  }
+
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
-  emit('update:user');
+  userTagsIds.value = selectedTags.value.map((item) => item.id);
+
+  if (promises.length > 0) {
+    await Promise.all(promises);
+    emit('update:user');
+  }
+  rerender.value -= 1;
 };
 
 const updateTags = (tag, isCreating = false) => {
-  if (tag.isDeleted) return;
-  selectedTags.value.push(tag);
+  if (
+    isCreating &&
+    forbiddenTags.value.find((item) => item.text === tag.text)
+  ) {
+    setMessage(
+      t('components.competences.duplicatedText'),
+      'warning',
+      true,
+    );
+    return;
+  }
   filteredTags.value = filteredTags.value.filter(
     (item) => item.text !== tag.text,
   );
+  deleteArray.value = deleteArray.value.filter(
+    (item) => item.text !== tag.text,
+  );
+  const indexFound = selectedTags.value
+    .map((item) => item.text)
+    .indexOf(tag.text);
+
+  if (indexFound !== -1) {
+    setMessage(
+      t('components.competences.alreadyAdded'),
+      'warning',
+      true,
+    );
+
+    return;
+  }
+  selectedTags.value.push(tag);
   if (isCreating) createArray.value.push(tag);
   else updateArray.value.push(tag);
-};
-
-const filterTags = () => {
-  if (props.isGeneral) {
-    filteredTags.value = allTags.value.filter(
-      (item) => !userTagsIds.value.includes(item.id) && item.isGeneral,
-    );
-  } else {
-    filteredTags.value = allTags.value.filter(
-      (item) => !userTagsIds.value.includes(item.id) && !item.isGeneral,
-    );
-  }
+  selectedTag.value = null;
 };
 
 watch(
@@ -262,15 +304,11 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.footer {
+.gap-2 {
+  gap: 8px;
+}
+
+.gap-3 {
   gap: 12px;
-
-  .competences {
-    gap: 8px;
-
-    div {
-      gap: 8px;
-    }
-  }
 }
 </style>
