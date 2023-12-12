@@ -1,7 +1,7 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.general.title')"
-    @toggle:isEditing="isEditing = !isEditing"
+    :show-icon="false"
   >
     <template v-slot:content>
       <app-general-boxes

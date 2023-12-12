@@ -6,14 +6,14 @@
     :showIcon="canEdit"
     :cancel="onCancel"
     :save="onSave"
+    align-content="align-start"
     show-tooltip
     :tooltip="title"
     full-width
   >
     <template v-slot:content>
-      <div class="gap-3 d-flex flex-column">
+      <div class="gap-3 d-flex flex-column w-100">
         <div v-if="isEditing" class="d-flex flex-column gap-2">
-          <span>{{ label }}</span>
           <v-autocomplete
             :placeholder="placeholder"
             :items="filteredTags"
@@ -62,7 +62,7 @@ const { create, find, update, delete: _delete } = useStrapi();
 
 const { t } = useI18n();
 const client = useStrapiClient();
-const emit = defineEmits(['update:user']);
+const emit = defineEmits(['update']);
 const { setMessage } = useMessageStore();
 type Tag = {
   text: string;
@@ -77,10 +77,6 @@ const props = defineProps({
     default: () => [],
   },
   title: {
-    type: String,
-    required: true,
-  },
-  label: {
     type: String,
     required: true,
   },
@@ -178,8 +174,7 @@ const removeItem = (tag) => {
 };
 
 const handleInput = (e) => {
-  if (e.target.value.length > 1)
-    selectedTag.value = { text: e.target.value } as Tag;
+  if (e.target.value.length > 1) populateSelectedTags({ text: e.target.value });
 };
 
 const onCancel = async () => {
@@ -252,7 +247,7 @@ const onSave = async () => {
 
   if (promises.length > 0) {
     await Promise.all(promises);
-    emit('update:user');
+    emit('update');
   }
   rerender.value -= 1;
 };
@@ -262,11 +257,7 @@ const updateTags = (tag, isCreating = false) => {
     isCreating &&
     forbiddenTags.value.find((item) => item.text === tag.text)
   ) {
-    setMessage(
-      t('components.competences.duplicatedText'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.competences.duplicatedText'), 'warning', true);
     return;
   }
   filteredTags.value = filteredTags.value.filter(
@@ -280,11 +271,7 @@ const updateTags = (tag, isCreating = false) => {
     .indexOf(tag.text);
 
   if (indexFound !== -1) {
-    setMessage(
-      t('components.competences.alreadyAdded'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.competences.alreadyAdded'), 'warning', true);
 
     return;
   }

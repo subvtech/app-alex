@@ -1,6 +1,6 @@
 <template>
   <alex-custom-card
-    class=""
+    class="w-100"
     :show-icon="false"
     title="Convite do Curso"
     href="dsads"
@@ -52,7 +52,7 @@ const props = defineProps({
     default: false,
   },
   data: {
-    type: Object as PropType<any>,
+    type: Object as PropType<any | null>,
     required: true,
   },
   duration: {

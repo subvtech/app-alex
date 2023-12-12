@@ -13,7 +13,7 @@
       ]"
     >
       <div class="foretitle d-flex py-6">
-        <span>{{ title }}</span>
+        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{ title }}</span>
         <a v-if="href" :href="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
         </a>
@@ -63,8 +63,8 @@
     </div>
 
     <div
-      class="d-flex flex-column"
-      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6')]"
+      class="d-flex flex-column w-100"
+      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent ?? 'align-start']"
     >
       <slot name="content" />
       <slot name="footer" />
@@ -104,6 +104,9 @@ const props = defineProps({
   },
   sizingClass: {
     type: String as PropType<SizingClass>,
+  },
+  alignContent: {
+    type: String as PropType<'align-center' | 'align-start' | 'align-end'>,
   },
   href: {
     type: String,
@@ -175,6 +178,9 @@ type SizingClass =
     align-items: center;
     align-self: stretch;
 
+    .min-width {
+      width: min-content;
+    }
     span {
       color: #5d6872;
       font-size: 20px;

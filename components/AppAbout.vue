@@ -10,7 +10,7 @@
     full-width
   >
     <template v-slot:content class="pa-6">
-      <div class="d-flex flex-column gap-6" :class="fullWidth ? 'w-100' : ''">
+      <div class="d-flex flex-column gap-6 w-100" :class="fullWidth ? 'w-100' : ''">
         <alex-custom-empty-placeholder
           v-if="isTextEmpty && !isEditingAndCanEdit"
           :empty-text-message="

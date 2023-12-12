@@ -25,14 +25,14 @@
       :links="links"
     />
     <div class="course-page d-flex w-100 gap-6">
-      <alex-custom-card title="" no-header full-width sizingClass="px-12">
+      <alex-custom-card title="" no-header full-width sizing-class="px-12" :align-content="'align-center'">
         <template #content>
-          <div class="d-flex flex-column w-100">
+          <div class="d-flex flex-column align-center">
             <app-about
               title="Sobre o curso"
               :text="course.description"
               :user-id="course.id"
-              :can-edit="true"
+              :can-edit="canEdit"
               @update="updateAbout"
               empty-text-message="it's empty"
               sizing-class="pa-0"
@@ -45,15 +45,29 @@
               title="Objetivos de aprendizagem"
               :data="data"
               tooltip="Defina o que os estudantes devem alcançar no final deste cursos. Utilize verbos da taxonomia de bloom e busque definir os resultados esperados de aprendizagem (learning outcomes)"
-              sizing-class="pa-0"
+              sizing-class="pa-0 w-100"
+              class="w-100"
               is-nested
+            />
+            <courses-editor
+              :info="
+                course.course_descriptions.data.map((item) => {
+                  return { id: item.id, ...item.attributes };
+                })
+              "
+              :courseId="course.id"
+              :title="$t('components.courses.editor.title')"
+              :can-edit="canEdit"
+              is-nested
+              hide-dividers
+              @update="updateCourse"
             />
           </div>
         </template>
       </alex-custom-card>
 
       <div class="d-flex flex-column gap-6">
-        <alex-custom-card title="Details">
+        <alex-custom-card title="Details" :show-icon="false">
           <template #content>
             <app-general-boxes
               :boxes="[
@@ -73,17 +87,18 @@
                   label: 'assignments',
                 },
               ]"
-              hide-divider
+               hide-dividers
             />
           </template>
           <template #footer>
             <alex-custom-card
-              class=""
+              class="w-100"
               title="Encontros síncronos"
               href="dsads"
               hide-dividers
               sizing-class="ma-0"
               is-nested
+              align-content="align-center"
               :show-icon="false"
             >
               <template #content>
@@ -116,7 +131,8 @@
           placeholder="placeholder"
           :userId="id"
           :userTags="generalTags"
-          :can-edit="false"
+          :can-edit="canEdit"
+          @update="updateCourse"
         />
         <competences
           title="Competências Técnicas"
@@ -125,7 +141,8 @@
           placeholder="placeholder"
           :userId="id"
           :userTags="technicalTags"
-          :can-edit="false"
+          :can-edit="canEdit"
+          @update="updateCourse"
         />
       </div>
     </div>
@@ -151,7 +168,7 @@ const route = useRoute();
 const router = useRouter();
 const selectedOption = ref(0);
 
-const canEdit = computed(() => id.value === course.value);
+const canEdit = computed(() => id.value === course.value.owner);
 const data = [
   {
     keyWord: 'Melhorar',
@@ -186,7 +203,13 @@ const links = ref([
   i18n.t('pages.courses.communication'),
 ]);
 
-const populate = ['cover_image', 'media', 'invitation_links', 'tags'];
+const populate = [
+  'cover_image',
+  'media',
+  'invitation_links',
+  'course_descriptions',
+  'tags',
+];
 
 onBeforeMount(async () => {
   await updateCourse(false);
@@ -254,12 +277,14 @@ const updateAbout = async (text) => {
 };
 </script>
 <style scoped lang="scss">
-
-@media(max-width: 750px){
-  .course-page{
+@media (max-width: 750px) {
+  .course-page {
     flex-direction: column;
+  }
 }
 
+.max-width {
+  max-width: 850px;
 }
 
 .gap-6 {
