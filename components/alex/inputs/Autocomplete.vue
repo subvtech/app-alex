@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-autocomplete">
+  <div class="alex-autocomplete" role="autocomplete">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -27,7 +27,7 @@
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"
-    ></v-autocomplete>
+    />
   </div>
 </template>
 
@@ -35,24 +35,24 @@
 import { useField } from 'vee-validate';
 
 interface TextAreaProps {
+  modelValue?: string | number | boolean;
   name: string;
   label?: string;
   required?: boolean;
   info?: string;
   disabled?: boolean;
   theme?: 'light' | 'dark';
-  value?: string | number | boolean;
 }
 const props = withDefaults(defineProps<TextAreaProps>(), {
+  modelValue: undefined,
   disabled: false,
   theme: 'light',
   info: undefined,
   label: undefined,
-  value: undefined,
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.value,
+  syncVModel: true,
 });
 
 const textColor = computed(() => {

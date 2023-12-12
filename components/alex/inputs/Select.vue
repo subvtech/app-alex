@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-select">
+  <div class="alex-select" role="select">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -35,24 +35,24 @@
 import { useField } from 'vee-validate';
 
 interface SelectProps {
+  modelValue?: string | number | boolean;
   name: string;
   label?: string;
   required?: boolean;
   info?: string;
   disabled?: boolean;
   theme?: 'light' | 'dark';
-  value?: string | number | boolean;
 }
 const props = withDefaults(defineProps<SelectProps>(), {
   disabled: false,
   theme: 'light',
   info: undefined,
   label: undefined,
-  value: undefined,
+  modelValue: undefined,
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.value,
+  syncVModel: true,
 });
 
 const textColor = computed(() => {
@@ -66,17 +66,13 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
-.alex-textarea {
+.alex-select {
   &.v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
     --v-medium-emphasis-opacity: 1 !important;
     --v-disabled-opacity: 1 !important;
     --v-border-color: rgb(var(--v-theme-gray-400));
-  }
-
-  &div[role='autocomplete'][aria-expanded='true'] > .v-select__selection {
-    padding-inline: 16px;
   }
 
   &.v-field__input {
