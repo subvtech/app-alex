@@ -42,6 +42,15 @@ describe('Header component', () => {
     const breadcrumbElement = titleElement.parentElement?.nextSibling;
 
     expect(breadcrumbElement?.textContent).toEqual(breadcrumbTitle);
+
+    items.forEach(async (i) => {
+      const item = await within(header).findAllByRole('link', {
+        name: i.title,
+      });
+
+      expect(item[0].getAttribute('href')).toEqual(i.href);
+      expect(item[0].textContent).toEqual(i.title);
+    });
   });
 
   it('should render the arrow back if the prop noArrowBack is false', async () => {
@@ -65,11 +74,13 @@ describe('Header component', () => {
       },
     });
 
-    const header = await screen.findByRole('breadcrumb');
+    const header = await screen.findByRole('navigation', {
+      name: 'Page Breadcrumb',
+    });
 
     expect(header).toBeDefined();
 
-    const arrowBack = within(header).findByRole('goback');
+    const arrowBack = within(header).findByRole('link', { name: 'Go Back' });
 
     expect(arrowBack).toBeDefined();
   });
@@ -86,14 +97,18 @@ describe('Header component', () => {
       },
     });
 
-    const header = await screen.findByRole('breadcrumb');
+    const header = await screen.findByRole('navigation', {
+      name: 'Page Breadcrumb',
+    });
 
     expect(header).toBeDefined();
 
-    await expect(() => within(header).findByRole('goback')).rejects.toThrow();
+    await expect(() =>
+      within(header).findByRole('link', { name: 'Go Back' }),
+    ).rejects.toThrow();
   });
   it('should render the buttons when passing props', async () => {
-    const comp = await renderSuspended(HeaderComponent, {
+    await renderSuspended(HeaderComponent, {
       props: {
         title: 'Test',
         items: [
@@ -127,6 +142,35 @@ describe('Header component', () => {
 
     expect(secondaryButton.textContent).toEqual('Secondary Btn Text');
     expect(mainButton.textContent).toEqual('Main Btn Text');
+  });
+
+  it('should not render any buttons when props are false', async () => {
+    await renderSuspended(HeaderComponent, {
+      props: {
+        title: 'Test',
+        items: [
+          {
+            title: 'breadcrumb 1',
+            href: '/breadcrumb1',
+          },
+          {
+            title: 'breadcrumb 2',
+            href: '/breadcrumb2',
+          },
+        ],
+        noArrowBack: false,
+        hasMainButton: false,
+        hasSecondaryButton: false,
+      },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+
+    const header = await screen.findByRole('heading', { name: 'Test' });
+    const buttons = await within(header).queryAllByRole('button');
+
+    expect(buttons).toHaveLength(0);
   });
 
   it('should emit main action', async () => {

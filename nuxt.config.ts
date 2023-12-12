@@ -1,4 +1,3 @@
-console.log(process.env.COMPONENTS_PAGE);
 export default defineNuxtConfig({
   pages: true,
   ssr: false,

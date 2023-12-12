@@ -6,7 +6,11 @@
     role="heading"
     :aria-label="title"
   >
-    <div class="d-flex grow align-center" role="breadcrumb">
+    <div
+      class="d-flex grow align-center"
+      role="navigation"
+      aria-label="Page Breadcrumb"
+    >
       <div class="header__breadcrumb">
         <alex-custom-breadcrumbs
           :title="title"
