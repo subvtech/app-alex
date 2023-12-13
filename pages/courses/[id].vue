@@ -1,0 +1,307 @@
+<template>
+  <div v-if="course">
+    <alex-custom-banner
+      :can-edit="canEdit"
+      :cover-picture="{ id: course.id, ...course.cover_image.data.attributes }"
+      :profile-picture-size="24"
+      :profile-picture="avatar"
+      :userId="id"
+      show-profile-picture
+      darker-background
+      show-shade
+      show-menu
+      settings-menu
+      distribution="fullname-username-role"
+      :selectedOption="selectedOption"
+      @select:option="selectOption"
+      is-professor
+      :fullname="fullname"
+      title="Turma"
+      code="dasdas"
+      description="Information Systems"
+      subtitle="tsf idsda"
+      startDate="12/06/2006"
+      endDate="12/06/2016"
+      :links="links"
+    />
+    <div class="course-page d-flex w-100 gap-6">
+      <alex-custom-card
+        title=""
+        no-header
+        full-width
+        sizing-class="px-12"
+        :align-content="'align-center'"
+      >
+        <template #content>
+          <div class="d-flex flex-column align-center gap-12">
+            <app-about
+              title="Sobre o curso"
+              :text="course.description"
+              :user-id="course.id"
+              :can-edit="canEdit"
+              @update="updateAbout"
+              empty-text-message="it's empty"
+              sizing-class="pa-0"
+              is-nested
+              hide-dividers
+              full-width
+            />
+            <courses-goals
+              :can-edit="false"
+              :data="
+                course.goals.data.map((item) => {
+                  return { id: item.id, ...item.attributes };
+                })
+              "
+              tooltip="Defina o que os estudantes devem alcançar no final deste cursos. Utilize verbos da taxonomia de bloom e busque definir os resultados esperados de aprendizagem (learning outcomes)"
+              sizing-class="pa-0 w-100"
+              class="w-100"
+              is-nested
+            />
+            <courses-editor
+              :info="
+                course.course_descriptions.data.map((item) => {
+                  return { id: item.id, ...item.attributes };
+                })
+              "
+              :courseId="course.id"
+              :title="$t('components.courses.editor.title')"
+              :can-edit="canEdit"
+              is-nested
+              hide-dividers
+              @update="updateCourse"
+            />
+          </div>
+        </template>
+      </alex-custom-card>
+
+      <div class="d-flex flex-column gap-6">
+        <alex-custom-card title="Details" :show-icon="false">
+          <template #content>
+            <app-general-boxes
+              :boxes="[
+                {
+                  icon: 'mdi-bookmark-box-multiple-outline',
+                  number: 0,
+                  label: 'students',
+                },
+                {
+                  icon: 'mdi-newspaper-variant-multiple-outline',
+                  number: course.projects ? course.projects.data.length : 0,
+                  label: 'projects',
+                },
+                {
+                  icon: 'mdi-check-decagram',
+                  number: 62,
+                  label: 'assignments',
+                },
+              ]"
+              hide-dividers
+            />
+          </template>
+          <template #footer>
+            <alex-custom-card
+              class="w-100"
+              title="Encontros síncronos"
+              href="dsads"
+              hide-dividers
+              sizing-class="ma-0"
+              is-nested
+              align-content="align-center"
+              :show-icon="false"
+            >
+              <template #content>
+                <course-meeting
+                  date="25/06/1998"
+                  frequency="Everyday"
+                  startHour="14:00"
+                  end-hour="18:00"
+                />
+                <course-meeting
+                  date="25/06/1998"
+                  frequency="Everyday"
+                  startHour="08:00"
+                  end-hour="11:00"
+                />
+              </template>
+            </alex-custom-card>
+            <courses-invites
+              :enable-invites="course.invite_enabled"
+              :duration="course.invitation_duration"
+              :course-id="course.id"
+              :data="invitationLink"
+            />
+          </template>
+        </alex-custom-card>
+        <competences
+          title="Competências Gerais"
+          label="dasda"
+          emptyMessage="it's empty"
+          placeholder="placeholder"
+          :userId="id"
+          :userTags="generalTags"
+          :can-edit="canEdit"
+          @update="updateCourse"
+        />
+        <competences
+          title="Competências Técnicas"
+          label="dasda"
+          emptyMessage="it's empty"
+          placeholder="placeholder"
+          :userId="id"
+          :userTags="technicalTags"
+          :can-edit="canEdit"
+          @update="updateCourse"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { find, findOne, update } = useStrapi();
+
+const i18n = useI18n();
+const user = ref<any>();
+const course = ref<any>();
+const generalTags = ref();
+const technicalTags = ref();
+const invitationLink = ref();
+const componentKey = ref(0);
+
+const { id, fullname, avatar } = useStrapiUser<User>().value;
+
+const route = useRoute();
+const router = useRouter();
+const selectedOption = ref(0);
+
+const canEdit = computed(() => id.value === course.value.owner);
+const data = [
+  {
+    keyWord: 'Melhorar',
+    title:
+      'Au commencement était la Parole, et la Paroe était avec Dieu, et la Parole était Dieu.',
+  },
+  {
+    keyWord: 'Melhorar',
+    title: 'Elle était au commencement avec Dieu.',
+  },
+  {
+    keyWord: 'Melhorar',
+    title: `Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle.`,
+  },
+];
+const selectOption = (index) => {
+  selectedOption.value = index;
+};
+const { setMessage } = useMessageStore();
+
+definePageMeta({
+  middleware: 'auth',
+});
+
+const links = ref([
+  i18n.t('pages.courses.general'),
+  i18n.t('pages.courses.trails'),
+  i18n.t('pages.courses.assignments'),
+  i18n.t('pages.courses.class'),
+  i18n.t('pages.courses.projects'),
+  i18n.t('pages.courses.events'),
+  i18n.t('pages.courses.communication'),
+]);
+
+const populate = [
+  'cover_image',
+  'media',
+  'invitation_links',
+  'course_descriptions',
+  'goals',
+  'tags',
+];
+
+onBeforeMount(async () => {
+  await updateCourse(false);
+});
+
+const updateCourse = async (show = true) => {
+  let { id } = route.params;
+
+  findOne('learningplans', id as string, { populate })
+    .then((result) => {
+      course.value = {
+        id: result.data.id,
+        ...(result.data.attributes as Object),
+      };
+      console.log({ course: course.value });
+      let temp;
+      if (course.value.invitation_links) {
+        course.value.invitation_links.data.forEach((link) => {
+          const expirationDate = new Date(link.attributes.expires_at);
+
+          if (
+            link.attributes.role === 'student' &&
+            expirationDate.getTime() > new Date().getTime()
+          ) {
+            const differenceBetweenLinks = temp
+              ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
+              : 1;
+
+            if (!temp || differenceBetweenLinks > 0) {
+              temp = link;
+            }
+          }
+        });
+      }
+      if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
+      generalTags.value = course.value.tags.data.reduce((acc, item) => {
+        // If the item is general, create a new object and add it to the accumulator
+
+        if (item.attributes.isGeneral) {
+          acc.push({ id: item, ...item.attributes });
+        }
+        // Return the accumulator for the next iteration
+        return acc;
+      }, []);
+      technicalTags.value = course.value.tags.data.reduce((acc, item) => {
+        // If the item is general, create a new object and add it to the accumulator
+        if (!item.attributes.isGeneral) {
+          acc.push({ id: item, ...item.attributes });
+        }
+        // Return the accumulator for the next iteration
+        return acc;
+      }, []);
+
+      setMessage('done', 'green', show);
+    })
+    .catch((err) => {
+      setMessage('Course not found:', 'red', show);
+    });
+};
+
+const updateAbout = async (text) => {
+  await update('/courses', course.value.id, {
+    info: text,
+  });
+};
+</script>
+<style scoped lang="scss">
+@media (max-width: 750px) {
+  .course-page {
+    flex-direction: column;
+  }
+}
+
+.max-width {
+  max-width: 850px;
+}
+
+.gap-6 {
+  gap: 24px;
+}
+
+.gap-12 {
+  gap: 48px;
+}
+</style>

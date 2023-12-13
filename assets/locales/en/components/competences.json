@@ -3,12 +3,16 @@
     "title": "Technical competences",
     "label": "What's the new Technical competence?",
     "placeholder": "Type in a technical competence",
-    "empty": "No competences..."
+    "empty": "No competences...",
+    "updated": "Technical competences successfuly updated."
   },
   "general": {
     "title": "General competences",
     "label": "What's the new General Competence?",
     "placeholder": "Type in a general competence",
-    "empty": "No competences..."
-  }
+    "empty": "No competences...",
+    "updated": "General competences successfuly updated."
+  },
+  "duplicatedText": "There's already a tag with this description, please pick another name.",
+  "alreadyAdded": "Tag already added"
 }

@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="$t('components.profile.institutional.title')"
     :full-width="true"
     :isEditing="isEditing && canEdit"
@@ -60,7 +60,7 @@
         </span>
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

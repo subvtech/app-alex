@@ -1,0 +1,14 @@
+{
+  "title": "Learning Goals",
+  "verb": {
+    "title": "Keyword",
+    "placeholder": "Pick a Keyword"
+  },
+
+  "description": {
+    "title": "Goal description",
+    "placeholder": "Describe your goal"
+  },
+  "add": "Add Goal",
+  "empty": "It' seems that up until now no Learning Goals have been added"
+}

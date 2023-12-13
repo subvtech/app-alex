@@ -15,8 +15,12 @@
     "invalid": "CPF inválido."
   },
 
-  "about": {
-    "required": "Sobre é necessário",
+  "keyword": {
+    "required": "Esse campo é obrigatório"
+  },
+
+  "description": {
+    "required": "Esse campo é obrigatório",
     "min": "Mínimo de 12 caracteres",
     "max": "Máximo de 4000 caracteres"
   },
