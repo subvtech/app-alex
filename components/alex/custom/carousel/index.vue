@@ -228,11 +228,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  uploadBaseUrl: {
-    type: String,
-    default: '',
-  },
 });
+
+const uploadBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
 
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
@@ -329,7 +327,7 @@ const addSlideByFile = async (slide, index) => {
     });
   }
   try {
-    const res = onSelectFile(files);
+    const res = await onSelectFile(files);
     index === -1
       ? slides.value.push(newSlide(slide, res))
       : slides.value.splice(index, 1, newSlide(slide, res));
@@ -423,7 +421,7 @@ const onSelectFile = (slides) => {
       formData.append('files', imageFile, imageFile.name);
     }
   });
-  strapiClient<Upload>('/upload', {
+  return strapiClient<Upload>('/upload', {
     method: 'POST',
     body: formData,
   })
