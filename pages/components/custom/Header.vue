@@ -30,40 +30,79 @@
               <th>Tipo</th>
               <th>Obrigatório</th>
               <th>Padrão</th>
+              <th>Descrição</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>isTerciary</td>
-              <td>Boolean</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-              <td>false</td>
-            </tr>
-            <tr>
-              <td>text</td>
-              <td>String</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-              <td>'Botão'</td>
-            </tr>
-            <tr>
-              <td>btnIcon</td>
-              <td>String</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-              <td>'mdi-plus'</td>
-            </tr>
             <tr>
               <td>title</td>
               <td>String</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
-              <td>'Título da página'</td>
+              <td>'Page Title'</td>
+              <td>Titulo do Header</td>
+            </tr>
+
+            <tr>
+              <td>has-main-button</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>false</td>
+              <td>
+                Define se o botão primario ira aparecer(Caso haja o secundario
+                este aparecera no final)
+              </td>
+            </tr>
+            <tr>
+              <td>main-button-text</td>
+              <td>String</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>'Main Button'</td>
+              <td>Texto do botão primario</td>
+            </tr>
+            <tr>
+              <td>main-button-icon</td>
+              <td>String</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>null</td>
+              <td>Icone do botão primario</td>
+            </tr>
+            <tr>
+              <td>has-secondary-button</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>false</td>
+              <td>
+                Define se o botão secundario ira aparecerCaso haja o primario
+                este aparecera no inicio)
+              </td>
+            </tr>
+            <tr>
+              <td>secondary-button-text</td>
+              <td>String</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>'Secondary Button'</td>
+              <td>Texto do botão secundario</td>
+            </tr>
+            <tr>
+              <td>secondary-button-icon</td>
+              <td>String</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>null</td>
+              <td>Icone do botão secundario</td>
             </tr>
             <tr>
               <td>noBackArrow</td>
@@ -72,6 +111,19 @@
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
               <td>false</td>
+              <td>Define se o icone de voltar sera escondido</td>
+            </tr>
+            <tr>
+              <td>items</td>
+              <td>Array &lt;{title, href}></td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>[]</td>
+              <td>
+                Itens do Breadcrumb. E possivel definir o titulo e a rota que
+                ira acessar
+              </td>
             </tr>
           </tbody>
         </v-table>
@@ -84,7 +136,14 @@
       </div>
     </div>
     <div class="w-100">
-      <alex-custom-header />
+      <alex-custom-header
+        :items="[
+          { title: 'Início', disabled: false, href: '/inicio' },
+          { title: 'Página', disabled: false, href: '/pagina' },
+        ]"
+        has-main-button
+        has-secondary-button
+      />
     </div>
     <p class="text-subtitle-2 text-gray-500">
       <Prism inline class="bg-white pa-0">{{ `<alex-custom-header />` }}</Prism>
@@ -95,7 +154,16 @@
       basta adicionar a propriedade <strong>noBackArrow</strong> ao componente.
     </p>
     <div class="w-100">
-      <alex-custom-header noBackArrow />
+      <alex-custom-header
+        no-back-arrow
+        has-main-button
+        has-secondary-button
+        main-button-icon="mdi-plus"
+        :items="[
+          { title: 'Início', disabled: false, href: '/inicio' },
+          { title: 'Página', disabled: false, href: '/pagina' },
+        ]"
+      />
     </div>
     <p class="text-subtitle-2 text-gray-500">
       <Prism inline class="bg-white pa-0"
@@ -107,7 +175,8 @@
     </h2>
     <p class="text-subtitle-2 text-gray-500">
       O componente aceita várias propriedades que permitem personalizar o
-      cabeçalho de acordo com as necessidades da sua aplicação. Seguem exemplos abaixo:<br />
+      cabeçalho de acordo com as necessidades da sua aplicação. Seguem exemplos
+      abaixo:<br />
     </p>
 
     <div class="w-100">
@@ -203,6 +272,11 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
 
 const copiedValue = ref('');
 const thirdExampleActivePage = ref('1');

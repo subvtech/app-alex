@@ -81,6 +81,11 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
+        title: 'Avatar Group',
+        to: '/components/custom/AvatarGroup',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
         title: 'Banner',
         to: '/components/custom/banner',
       },
@@ -118,6 +123,11 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
+        title: 'Header',
+        to: '/components/custom/Header',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
         title: 'Horizontalbar',
         to: '/components/custom/horizontalbar',
       },
@@ -136,6 +146,11 @@ const menus = [
         title: 'tabs',
         to: '/components/custom/tabs',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
+      },
     ],
   },
   {
@@ -152,13 +167,13 @@ const menus = [
         to: '/components/inputs/text-field',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Card projetos e cursos',
-        to: '/components/learning-plans/card',
+        icon: 'mdi-card-text-outline',
+        title: 'Checkbox',
+        to: '/components/inputs/checkbox',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Dropdown',
+        icon: 'mdi-card-text-outline',
+        title: 'Drodown',
         to: '/components/inputs/dropdown',
       },
     ],
