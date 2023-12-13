@@ -472,6 +472,7 @@ import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
 definePageMeta({
+  layout: 'components',
   middleware: 'auth',
 });
 

@@ -297,6 +297,12 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const firstExampleTemplate = ref(` <alex-custom-avatar-group
         :size="36"
         :avatar-items="[
