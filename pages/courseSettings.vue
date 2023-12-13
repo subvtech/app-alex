@@ -268,6 +268,45 @@
           </span>
         </div>
       </div>
+      <alex-custom-dialog
+        ref="exclusionDialog"
+        model-value="true"
+        title="Excluir curso"
+        :close-on-click-outside="false"
+      >
+        <div class="criticalAttention">
+          <div class="exclusionBody">
+            <p>
+              <span class="header-h4">Realmente deseja excluir o curso?</span>
+              <span class="body-p1"
+                >Ao excluir um curso todo o conteúdo criado dentro dele também
+                será excluído.</span
+              >
+            </p>
+            <alex-inputs-text-field
+              label="Digite a palavra: `<strong>excluir</strong>`"
+              name=""
+              class="w-100"
+              required
+              placeholder="Digite a frase"
+            />
+          </div>
+          <div class="exclusionFooter">
+            <alex-custom-button
+              class="button"
+              text="Cancelar"
+              variant="secondary"
+              @click="dialog = false"
+            />
+            <alex-custom-button
+              class="button"
+              text="Excluir curso"
+              variant="error"
+              @click="dialog = false"
+            />
+          </div>
+        </div>
+      </alex-custom-dialog>
     </div>
   </div>
 </template>
@@ -498,5 +537,33 @@ p {
   align-items: flex-start;
   gap: 8px;
   flex: 1 0 0;
+}
+
+.criticalAttention {
+  display: flex;
+  width: 520px;
+  max-width: 520px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.exclusionBody {
+  display: flex;
+  padding: var(--40px, 40px) 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.exclusionFooter {
+  display: flex;
+  padding: 16px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  align-self: stretch;
+  border-top: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 </style>
