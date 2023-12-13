@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="$t('components.profile.events.title')"
     :full-width="true"
   >
@@ -29,7 +29,7 @@
         </div>
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

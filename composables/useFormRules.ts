@@ -91,12 +91,16 @@ export const useFormRules = (formData?: FormDataType) => {
       ),
   };
 
-  const aboutRules = {
-    info: yup
+  const keywordRules = {
+    keyword: yup.string().required(i18n.t('rules.keyword.required')).trim(),
+  };
+  const descriptionRules = {
+    description: yup
       .string()
-      .min(12, i18n.t('rules.about.min'))
-      .max(4000, i18n.t('rules.about.max'))
-      .required(i18n.t('rules.about.required'))
+      .required(i18n.t('rules.description.required'))
+      .min(12, i18n.t('rules.description.min'))
+      .max(4000, i18n.t('rules.description.max'))
+      
       .trim(),
   };
 
@@ -177,6 +181,8 @@ export const useFormRules = (formData?: FormDataType) => {
     emailRules: yup.object(emailRules),
     passwordRules,
     fullnameRules,
+    descriptionRules,
+    keywordRules,
     cpfRules,
     profileSchema,
     socialsSchema,

@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     class="mt-6"
     :title="$t('components.projects.title')"
     :full-width="true"
@@ -87,7 +87,7 @@
         </div>
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts"></script>
