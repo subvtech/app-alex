@@ -25,9 +25,15 @@
       :links="links"
     />
     <div class="course-page d-flex w-100 gap-6">
-      <alex-custom-card title="" no-header full-width sizing-class="px-12" :align-content="'align-center'">
+      <alex-custom-card
+        title=""
+        no-header
+        full-width
+        sizing-class="px-12"
+        :align-content="'align-center'"
+      >
         <template #content>
-          <div class="d-flex flex-column align-center">
+          <div class="d-flex flex-column align-center gap-12">
             <app-about
               title="Sobre o curso"
               :text="course.description"
@@ -42,8 +48,11 @@
             />
             <courses-goals
               :can-edit="false"
-              title="Objetivos de aprendizagem"
-              :data="data"
+              :data="
+                course.goals.data.map((item) => {
+                  return { id: item.id, ...item.attributes };
+                })
+              "
               tooltip="Defina o que os estudantes devem alcançar no final deste cursos. Utilize verbos da taxonomia de bloom e busque definir os resultados esperados de aprendizagem (learning outcomes)"
               sizing-class="pa-0 w-100"
               class="w-100"
@@ -78,7 +87,7 @@
                 },
                 {
                   icon: 'mdi-newspaper-variant-multiple-outline',
-                  number: 1,
+                  number: course.projects ? course.projects.data.length : 0,
                   label: 'projects',
                 },
                 {
@@ -87,7 +96,7 @@
                   label: 'assignments',
                 },
               ]"
-               hide-dividers
+              hide-dividers
             />
           </template>
           <template #footer>
@@ -208,6 +217,7 @@ const populate = [
   'media',
   'invitation_links',
   'course_descriptions',
+  'goals',
   'tags',
 ];
 
@@ -289,5 +299,9 @@ const updateAbout = async (text) => {
 
 .gap-6 {
   gap: 24px;
+}
+
+.gap-12 {
+  gap: 48px;
 }
 </style>

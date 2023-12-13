@@ -2,42 +2,49 @@
   <alex-custom-card
     class="w-100"
     :show-icon="false"
-    title="Convite do Curso"
+    :title="$t('components.courses.invites.title')"
     href="dsads"
     hide-dividers
     sizing-class="ma-0"
     is-nested
   >
-    <template #content v-if="enableInvites">
-      <div
-        class="invite gap-6 justify-space-between"
-        :class="theresTimeAndUrl ? '' : 'disabled'"
-      >
-        <a v-if="theresTimeAndUrl" class="" :href="url!">
-          {{ url }}
-        </a>
-        <span v-else>Convite Expirado</span>
+    <template #content>
+      <div v-if="enableInvites" class="d-flex flex-column w-100">
+        <div
+          class="invite gap-6 justify-space-between"
+          :class="theresTimeAndUrl ? '' : 'disabled'"
+        >
+          <a v-if="theresTimeAndUrl" class="" :href="url!">
+            {{ url }}
+          </a>
+          <span v-else>{{ $t('components.courses.invites.expired') }}</span>
 
-        <div class="d-flex align-center gap-1">
-          <img
-            class="pointer"
-            src="/svg/refresh.svg"
-            @click="generateNewInvite"
-            width="20"
-            height="20"
-          />
-          <v-icon
-            v-if="theresTimeAndUrl"
-            class="pointer"
-            color="#00B7CC"
-            size="small"
-            >mdi-content-copy</v-icon
-          >
+          <div class="d-flex align-center gap-1">
+            <img
+              class="pointer"
+              src="/svg/refresh.svg"
+              @click="generateNewInvite"
+              width="20"
+              height="20"
+            />
+            <v-icon
+              v-if="theresTimeAndUrl"
+              class="pointer"
+              color="#00B7CC"
+              size="small"
+              >mdi-content-copy</v-icon
+            >
+          </div>
+        </div>
+        <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
+          <span>{{ $t('components.courses.invites.countdown') }}</span>
+          <p>{{ msToHHMMSS(remainingTime) }}</p>
         </div>
       </div>
-      <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
-        <span>Tempo Restante: </span>
-        <p>{{ msToHHMMSS(remainingTime) }}</p>
+      <div v-else class="d-flex justify-center w-100">
+        <span class="desactivated">{{
+          $t('components.courses.invites.desactivated')
+        }}</span>
       </div>
     </template>
   </alex-custom-card>
@@ -151,6 +158,18 @@ watch(remainingTime, () => {
   cursor: pointer;
 }
 
+.desactivated {
+  color: var(--cinza-cinza-500, #8291a1);
+  text-align: center;
+
+  /* Body/P1 */
+  font-family: Sen;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 135%; /* 21.6px */
+  letter-spacing: 0.32px;
+}
 .invite {
   display: flex;
   height: 52px;

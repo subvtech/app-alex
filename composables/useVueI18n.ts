@@ -72,6 +72,8 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tagCombobox',
     'usersAutocomplete',
     'courses/editor',
+    'courses/goals',
+    'courses/invites',
     'learningPlan/editor',
     'learningPlan/authors',
     'learningPlan/link',
