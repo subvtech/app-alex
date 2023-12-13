@@ -3,6 +3,8 @@
     class="d-flex pa-2 px-4 text-decoration"
     :min-width="200"
     :class="{
+      'v-list-item-light-selected': !isDarkMode && selected,
+      'v-list-item-dark-selected': isDarkMode && selected,
       'v-list-item-dark': isDarkMode,
       'v-list-item-dark-warning': isDarkMode && warning,
       'v-list-item-light': !isDarkMode,
@@ -11,6 +13,7 @@
     :ripple="false"
     @click="onClick(link, emit('click'))"
   >
+    <template #title></template>
     <div class="d-flex gap-4 text-body-4 align-center justify-center">
       <v-icon
         v-if="icon"
@@ -18,7 +21,7 @@
         :icon="icon"
         :size="24"
       />
-      <span>{{ text }} </span>
+      <span> {{ text }} </span>
     </div>
   </v-list-item>
 </template>
@@ -75,7 +78,7 @@ $variants: (
       default: 'gray-200',
       hover: 'gray-200',
       active: 'gray-200',
-      selected: 'gray-200',
+      selected: 'secondary-0',
       warning: 'error-0',
     ),
   ),
@@ -90,7 +93,7 @@ $variants: (
       default: 'gray-600',
       hover: 'gray-900',
       active: 'gray-900',
-      selected: 'gray-600',
+      selected: 'secondary-0',
       warning: 'error-0',
     ),
   ),
@@ -127,6 +130,17 @@ $variants: (
     }
     .v-list-item-#{$mode}-warning:hover {
       color: rgb(var(--v-theme-#{map-deep-get($status, 'warning')})) !important;
+    }
+
+    .v-list-item--active.v-list-item-#{$mode}-selected {
+      @if $component == 'background' {
+        background-color: rgb(
+          var(--v-theme-#{map-deep-get($status, 'selected')})
+        ) !important;
+      }
+      color: rgb(
+        var(--v-theme-#{map-deep-get($status, 'selected')})
+      ) !important;
     }
   }
 }

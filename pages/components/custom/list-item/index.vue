@@ -70,28 +70,48 @@
     </div>
 
     <div class="w-100">
-      <alex-custom-list-item
-        text="Home"
-        icon="mdi-home"
-        @click="() => console.log('click item')"
-      />
-      <alex-custom-list-item
-        text="Home"
-        icon="mdi-home"
-        theme="dark"
-        @click="() => console.log('click item dark')"
-      />
-      <alex-custom-list-item
-        text="text"
-        warning
-        @click="() => console.log('click item dark')"
-      />
-      <alex-custom-list-item
-        text="text"
-        theme="dark"
-        warning
-        @click="() => console.log('click item dark')"
-      />
+      <div class="py-2 text-gray-600">
+        <p class="text-h5">Variação: Default</p>
+        <alex-custom-list-item
+          text="Home"
+          icon="mdi-home"
+          @click="() => console.log('click item')"
+        />
+        <alex-custom-list-item
+          text="Home"
+          icon="mdi-home"
+          theme="dark"
+          @click="() => console.log('click item dark')"
+        />
+      </div>
+      <div class="py-2 text-gray-600">
+        <p class="text-h5">Variação: Warning</p>
+        <alex-custom-list-item
+          text="text"
+          warning
+          @click="() => console.log('click item dark')"
+        />
+        <alex-custom-list-item
+          text="text"
+          theme="dark"
+          warning
+          @click="() => console.log('click item dark')"
+        />
+      </div>
+      <div class="py-2 text-gray-600">
+        <p class="text-h5">Variação: Selected</p>
+        <alex-custom-list-item
+          text="text"
+          selected
+          @click="() => console.log('click item dark')"
+        />
+        <alex-custom-list-item
+          text="text"
+          theme="dark"
+          selected
+          @click="() => console.log('click item dark')"
+        />
+      </div>
     </div>
     <div class="w-100">
       <div
@@ -163,6 +183,17 @@ const firstExampleTemplate = `
         warning
         @click="() => console.log('click item dark')"
       />
+      <alex-custom-list-item
+          text="text"
+          selected
+          @click="() => console.log('click item dark')"
+        />
+        <alex-custom-list-item
+          text="text"
+          theme="dark"
+          selected
+          @click="() => console.log('click item dark')"
+        />
 `;
 
 const exampleTabs = [

@@ -2,7 +2,7 @@
   <v-form role="stepper" @submit="onSubmit">
     <div
       v-if="!noHeader"
-      class="d-flex gap-4 py-3 px-1"
+      class="d-flex gap-4 py-3 px-1 align-center justify-center"
       :class="stepperIndicatorClass"
     >
       <alex-inputs-stepper-indicator

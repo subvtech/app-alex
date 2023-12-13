@@ -23,11 +23,25 @@
       no-resize
       role="select"
       clear-icon="mdi-close"
-      hide-details
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"
-    />
+    >
+      <!-- Bind all slots  -->
+      <template v-for="(_, slot) in $slots" #[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
+      <!-- Default item slot -->
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item
+          :key="index"
+          :text="item.title"
+          v-bind="propsItem"
+          :theme="theme"
+          :selected="value === item.title"
+        />
+      </template>
+    </v-select>
   </div>
 </template>
 
@@ -35,7 +49,7 @@
 import { useField } from 'vee-validate';
 
 interface SelectProps {
-  modelValue?: string | number | boolean;
+  modelValue?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
@@ -50,7 +64,6 @@ const props = withDefaults(defineProps<SelectProps>(), {
   label: undefined,
   modelValue: undefined,
 });
-
 const { value, errorMessage } = useField(() => props.name, undefined, {
   syncVModel: true,
 });

@@ -8,6 +8,7 @@
       selectedVariant.textColor
     }`"
     :color="selectedVariant.bgColor"
+    :style="color && { color: `rgb(var(--v-theme-${color})) !important` }"
     :variant="variant === 'text' ? 'text' : 'flat'"
     :size="size"
     :ripple="false"
@@ -33,6 +34,7 @@ const props = withDefaults(
     size?: 'small' | 'default' | 'large';
     disabled?: boolean;
     theme?: 'light' | 'dark';
+    color?: AlexColors;
   }>(),
   {
     variant: 'primary',
@@ -40,6 +42,7 @@ const props = withDefaults(
     icon: undefined,
     disabled: false,
     theme: 'light',
+    color: undefined,
   },
 );
 

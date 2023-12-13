@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-autocomplete" role="autocomplete">
+  <div class="alex-autocomplete" role="select">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -15,27 +15,41 @@
       >
     </div>
     <v-autocomplete
-      v-bind="$attrs"
       v-model="value"
+      v-model:search="searchModelValue"
+      :error-messages="errorMessage"
+      :class="theme"
+      :disabled="disabled"
       color="primary--2"
       rounded="lg"
       variant="outlined"
-      no-resize
-      role="textarea"
       clear-icon="mdi-close"
-      hide-details
-      :class="theme"
-      :error-messages="errorMessage"
-      :disabled="disabled"
-    />
+      v-bind="$attrs"
+    >
+      <!-- Bind all slots  -->
+      <template v-for="(_, slot) in $slots" #[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
+      <!-- Default item slot -->
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item
+          :key="index"
+          :text="item.title"
+          v-bind="propsItem"
+          :theme="theme"
+          :selected="value === item.title"
+        />
+      </template>
+    </v-autocomplete>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
 
-interface TextAreaProps {
-  modelValue?: string | number | boolean;
+interface AutoCompleteProps {
+  modelValue?: string | number | boolean | unknown[] | any;
+  search?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
@@ -43,8 +57,18 @@ interface TextAreaProps {
   disabled?: boolean;
   theme?: 'light' | 'dark';
 }
-const props = withDefaults(defineProps<TextAreaProps>(), {
+const emit = defineEmits(['update:search']);
+const searchModelValue = computed({
+  get() {
+    return props.search;
+  },
+  set(value) {
+    emit('update:search', value);
+  },
+});
+const props = withDefaults(defineProps<AutoCompleteProps>(), {
   modelValue: undefined,
+  search: undefined,
   disabled: false,
   theme: 'light',
   info: undefined,
@@ -66,7 +90,7 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
-.alex-autcomplete {
+.alex-autocomplete {
   &.v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;

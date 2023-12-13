@@ -49,7 +49,7 @@ export const AlexThemeColors = {
   'tag-red-light': '#FF8484',
   'tag-blue-light': '#9EBBDA',
 };
-
+export type AlexColors = keyof typeof AlexThemeColors;
 // String that represents the name of the theme I am using
 export const MAIN_THEME = 'mainTheme';
 // Light mode theme
