@@ -15,20 +15,20 @@
       <v-app-bar-nav-icon @click.stop="toggleDrawer" class="text-gray-900" />
 
       <v-spacer />
-      
+
       <div :class="[reverse ? 'ml-4' : 'mr-4']">
         <v-btn icon color="#6E7A87" @click="emit('chat')">
-          <NuxtImg
+          <img
             :src="
               isChatActive ? '/svg/chat-read-active.svg' : '/svg/chat-read.svg'
             "
             width="24"
             height="24"
             role="chat-active"
-          />
+          >
         </v-btn>
         <v-btn icon color="grey" @click="emit('alert')" class="">
-          <NuxtImg
+          <img
             v-if="isBellActive"
             src="/svg/bell.svg"
             width="24"
@@ -53,14 +53,13 @@
                 :size="pictureSize"
                 track-current-user
                 show-border
-               
                 avatar-style="border: 1px solid #A0A8B1;"
                 class="mr-2"
               />
-             
+
               <span class="placeholder mr-1" style="cursor: pointer">
                 {{ computedPlaceholder }}
-              </span>>
+              </span>
 
               <v-icon color="#6E7A87" style="cursor: pointer">
                 mdi-chevron-down
