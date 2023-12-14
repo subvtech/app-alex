@@ -16,13 +16,13 @@
     </div>
     <v-text-field
       v-model="value"
-      :error-messages="errorMessage"
-      :class="theme"
-      :disabled="disabled"
       color="primary--2"
       rounded="lg"
       role="textfield"
       clear-icon="mdi-close"
+      :error-messages="errorMessage"
+      :class="theme"
+      :disabled="disabled"
       v-bind="$attrs"
     />
   </div>

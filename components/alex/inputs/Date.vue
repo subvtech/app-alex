@@ -15,18 +15,18 @@
       >
     </div>
     <v-text-field
-      v-bind="$attrs"
       v-model="inputValue"
-      :error-messages="errorMessage"
-      :disabled="disabled"
-      :required="required"
-      :class="{ 'no-value': !inputValue, theme }"
       color="primary--2"
       rounded="lg"
       clear-icon="mdi-close"
       class="w-100"
       type="date"
       append-inner-icon="mdi-calendar"
+      :error-messages="errorMessage"
+      :disabled="disabled"
+      :required="required"
+      :class="{ 'no-value': !inputValue, theme }"
+      v-bind="$attrs"
     >
       <v-menu
         :close-on-content-click="false"

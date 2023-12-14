@@ -26,7 +26,7 @@
       :error-messages="errorMessage"
       :disabled="disabled"
       v-bind="$attrs"
-    ></v-textarea>
+    />
   </div>
 </template>
 
