@@ -15,7 +15,6 @@
       >
     </div>
     <v-select
-      v-bind="$attrs"
       v-model="value"
       color="primary--2"
       rounded="lg"
@@ -26,6 +25,7 @@
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"
+      v-bind="$attrs"
     >
       <!-- Bind all slots  -->
       <template v-for="(_, slot) in $slots" #[slot]="scope">

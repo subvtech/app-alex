@@ -21,7 +21,7 @@
         :icon="icon"
         :size="24"
       />
-      <span> {{ text }} </span>
+      <span class="v-list-item-text"> {{ text }} </span>
     </div>
   </v-list-item>
 </template>
@@ -138,6 +138,8 @@ $variants: (
           var(--v-theme-#{map-deep-get($status, 'selected')})
         ) !important;
       }
+    }
+    .v-list-item--active.v-list-item-#{$mode}-selected .v-list-item-text {
       color: rgb(
         var(--v-theme-#{map-deep-get($status, 'selected')})
       ) !important;
