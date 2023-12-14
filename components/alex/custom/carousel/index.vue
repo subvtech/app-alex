@@ -12,20 +12,16 @@
       style="z-index: 0; max-width: 850px"
     >
       <vueper-slide
-        :class="editMode && slides.length < 1 ? '' : 'd-none'"
+        :class="!readOnly && slides.length < 1 ? '' : 'd-none'"
         class="rounded"
         @click="openAddSlidesDialog(-1)"
       >
         <template #content>
           <v-container
-            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-blue-grey-lighten-4"
+            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue"
             elevation="0"
           >
-            <v-icon
-              color="blue-grey-lighten-1"
-              size="100px"
-              icon="mdi-image-area"
-            />
+            <v-icon color="accent" size="100px" icon="mdi-image-area" />
           </v-container>
         </template>
       </vueper-slide>
@@ -41,7 +37,7 @@
         "
       >
         <template #content>
-          <div v-if="editMode" class="ma-2 config-icon">
+          <div v-if="!readOnly" class="ma-2 config-icon">
             <v-btn
               color="grey"
               variant="text"
@@ -103,32 +99,34 @@
       :class="slides.length == 0 ? 'justify-center' : 'justify-space-around'"
     >
       <div
-        v-if="editMode"
-        class="d-flex align-center justify-center rounded bg-gray-200 mr-2 mr-sm-10 addSlide"
+        v-if="!readOnly"
+        class="d-flex align-center justify-center rounded bg-gray-blue mr-2 mr-sm-4 addSlide"
         elevation="0"
         @click="openAddSlidesDialog(-1)"
       >
-        <v-icon color="blue-grey-darken-1" size="36px" icon="mdi-image-plus" />
+        <v-icon color="accent" size="36px" icon="mdi-image-plus-outline" />
       </div>
       <vueper-slides
         ref="vueperslides2"
-        class="no-shadow rounded thumbnails-container slides-track-container"
+        class="no-shadow thumbnails-container slides-track-container"
         :class="slides.length == 0 ? 'w-0' : 'w-100'"
-        :visible-slides="4.5 - Number(editMode)"
+        :visible-slides="
+          slides.length < 5 ? slides.length : 4.5 - Number(!readOnly)
+        "
         :slide-multiple="false"
         :gap="1"
         :slide-ratio="2 / 4"
         :dragging-distance="50"
-        :arrowsOutside="false"
+        :arrows-outside="false"
         :infinite="false"
         :bullets="false"
         :autoplay="false"
         disable-arrows-on-edges
         :breakpoints="{
-          900: { visibleSlides: editMode ? 2.5 : 3.5 },
+          900: { visibleSlides: !readOnly ? 2.5 : 3.5 },
           600: {
             fixedHeight: '80px',
-            visibleSlides: editMode ? 2.5 : 3.5,
+            visibleSlides: !readOnly ? 2.5 : 3.5,
           },
         }"
         fixedHeight="120px"
@@ -142,18 +140,20 @@
         "
       >
         <template #arrow-left>
-          <v-icon
-            color="black"
+          <alex-custom-button
+            color="white"
             icon="mdi-chevron-left"
-            class="bg-white rounded"
-          />
+            class="bg-white rounded-lg"
+            variant="text"
+          ></alex-custom-button>
         </template>
         <template #arrow-right>
-          <v-icon
-            color="black"
+          <alex-custom-button
+            color="white"
             icon="mdi-chevron-right"
-            class="bg-white rounded"
-          />
+            class="bg-white rounded-lg"
+            variant="text"
+          ></alex-custom-button>
         </template>
         <vueper-slide
           v-for="(slide, i) in slides"
@@ -171,7 +171,7 @@
           "
         >
           <template #content>
-            <div v-if="editMode" class="ma-2">
+            <div v-if="!readOnly" class="ma-2">
               <v-btn
                 size="small"
                 variant="text"
@@ -193,7 +193,9 @@
               />
             </div>
             <div v-if="slide.video" class="rounded">
-              <div class="pa-1 bg-grey video-play-icon rounded-xl">
+              <div
+                class="pa-1 video-play-icon rounded-xl d-flex align-center justify-center"
+              >
                 <v-icon color="white" icon="mdi-play"></v-icon>
               </div>
             </div>
@@ -207,10 +209,9 @@
     @upload-files="(f, index) => addSlide(f, index)"
     @change-slides="(f, added, deleted) => editSlides(f, added, deleted)"
   />
-  <!-- </div> -->
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
 import { ref } from 'vue';
@@ -227,6 +228,12 @@ const props = defineProps({
   readOnly: {
     type: Boolean,
     default: false,
+  },
+});
+
+const emit = defineEmits({
+  slidesChanged(slides) {
+    return slides;
   },
 });
 
@@ -266,34 +273,37 @@ const captureVideoFrame = (file) => {
 function newSlide(file, res) {
   if (file.type.includes('image')) {
     return {
-      title: file.name,
+      title: file.title,
       image: res.url.url,
       type: 'FileImage',
+      icon: file.icon,
     };
   } else {
     return {
-      title: file.name,
+      title: file.title,
       video: res.url.url,
       image: res.thumbnail.thumbnail,
       type: 'FileVideo',
+      icon: file.icon,
     };
   }
 }
-// eslint-disable-next-line vue/no-setup-props-destructure
-const editMode = ref(!props.readOnly);
-const dialog = ref(null);
+
+// const editMode = ref(!props.readOnly);
+const dialog = ref();
 const activeSlide = ref(0);
-const vueperslides2 = ref(null);
+const vueperslides2 = ref();
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
-// eslint-disable-next-line vue/no-setup-props-destructure
+
 const slides = ref([...props.slides]);
 const deleteSlide = (item) => {
   if (item.type.includes('File')) {
     onDeletedSlide(item);
   }
   slides.value.splice(slides.value.indexOf(item), 1);
+  emit('slidesChanged', slides.value);
 };
 
 const addSlide = async (slide, index) => {
@@ -326,14 +336,14 @@ const addSlideByFile = async (slide, index) => {
       });
     });
   }
-  try {
-    const res = await onSelectFile(files);
-    index === -1
-      ? slides.value.push(newSlide(slide, res))
-      : slides.value.splice(index, 1, newSlide(slide, res));
-  } catch (error) {
-    messageStore.message = error;
+  const res = await onSelectFile(files);
+  if (res.success !== 1) {
+    return;
   }
+  index === -1
+    ? slides.value.push(newSlide(slide, res))
+    : slides.value.splice(index, 1, newSlide(slide, res));
+  emit('slidesChanged', slides.value);
 };
 
 const addSlideByUrl = (slide, index) => {
@@ -349,20 +359,23 @@ const addSlideByUrl = (slide, index) => {
         ? `https://img.youtube.com/vi/${slide.url.split('v=')[1]}/0.jpg`
         : `https://vumbnail.com/${slide.url.split('vimeo.com/')[1]}.jpg`,
       type: slide.url.includes('www.youtube') ? 'youtube' : 'vimeo',
+      icon: slide.icon,
     };
   } else {
     newSlide = {
       title: slide.title,
       image: slide.url,
       type: 'UrlImage',
+      icon: slide.icon,
     };
   }
   index === -1
     ? slides.value.push(newSlide)
     : slides.value.splice(index, 1, newSlide);
+  emit('slidesChanged', slides.value);
 };
 
-const editSlides = (f, deleted, added) => {
+const editSlides = (f) => {
   deleted.forEach((slide) => {
     deleteSlide(slide);
   });
@@ -378,17 +391,17 @@ const editSlides = (f, deleted, added) => {
 };
 
 const onDeletedSlide = async (file) => {
-  (await strapiClient)<Upload>('/upload/files', {
+  await strapiClient('/upload/files', {
     method: 'GET',
   }).then((res) => {
     const files = res;
     const fileImage = files.find((f) => f.url === file.image);
-    strapiClient<Upload>(`/upload/files/${fileImage.id}`, {
+    strapiClient(`/upload/files/${fileImage.id}`, {
       method: 'DELETE',
     });
     if (file.video) {
       const fileVideo = files.find((f) => f.url === file.video);
-      strapiClient<Upload>(`/upload/files/${fileVideo.id}`, {
+      strapiClient(`/upload/files/${fileVideo.id}`, {
         method: 'DELETE',
       });
     }
@@ -399,7 +412,7 @@ const onSelectFile = (slides) => {
   const formData = new FormData();
   slides.forEach((slide) => {
     if (slide.url instanceof File) {
-      formData.append('files', slide.url, slide.name);
+      formData.append('files', slide.url, slide.title);
     } else if (typeof slide.url === 'string' && slide.url.startsWith('data:')) {
       const base64Data = slide.url.split(',')[1];
       const binaryString = window.atob(base64Data);
@@ -415,13 +428,13 @@ const onSelectFile = (slides) => {
       }
 
       const blob = new Blob([byteArray], { type: mimeType });
-      const imageFile = new File([blob], slide.name, {
+      const imageFile = new File([blob], slide.title, {
         type: mimeType,
       });
       formData.append('files', imageFile, imageFile.name);
     }
   });
-  return strapiClient<Upload>('/upload', {
+  return strapiClient('/upload', {
     method: 'POST',
     body: formData,
   })
@@ -441,6 +454,11 @@ const onSelectFile = (slides) => {
 };
 </script>
 
+<style>
+.vueperslides__arrow {
+  opacity: 1 !important;
+}
+</style>
 <style scoped>
 .inputFile {
   position: absolute;
@@ -472,8 +490,9 @@ const onSelectFile = (slides) => {
   top: 75%;
   left: 80%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  color: #ffffffaf;
+  background: rgba(255, 255, 255, 0.25);
+  width: 36px;
+  height: 36px;
 }
 
 .config-icon {

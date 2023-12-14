@@ -69,27 +69,29 @@
         </div>
         <div v-else-if="addMediaType == 'url'" class="w-100">
           <div class="d-flex w-100">
-            <v-text-field
+            <alex-inputs-text-field
               v-model="urlInput"
               placeholder="Insira o link"
               variant="outlined"
               :error-messages="errors"
               :rules="urlRules"
               density="compact"
+              class="w-100"
             >
-            </v-text-field>
+            </alex-inputs-text-field>
 
-            <v-btn
+            <alex-custom-button
               icon="mdi-plus"
-              type="submit"
               class="ml-2"
+              size="42px"
               color="accent"
               :loading="isLoading"
               @click="addUrl(urlInput)"
-            ></v-btn>
+            ></alex-custom-button>
           </div>
           <div class="rounded d-flex justify-center align-center w-100">
             <div
+              style="position: relative"
               class="d-flex flex-column align-center justify-center preview-area w-100"
               :class="urlInput && pastedLink ? '' : 'preview-area-border'"
             >
@@ -118,6 +120,7 @@
                     indeterminate
                     color="accent"
                     class="loading"
+                    theme="light"
                   ></v-progress-circular>
                   <img
                     v-if="pastedLink == 'image'"
@@ -160,87 +163,6 @@
       </transition>
       <div v-if="slides.length > 0 && editSlideMode !== 'edit'" class="w-100">
         <p class="text-primary text-h6 font-weight-bold mt-5 mb-2">Playlist</p>
-        <!-- <v-expansion-panels class="mt-2 bg-green pa-2">
-          <transition-group name="list">
-            <v-expansion-panel
-              v-for="(slide, i) in slides"
-              :key="slide"
-              :class="
-                over.pos == i && dragging && dragFrom != slide ? 'over' : ''
-              "
-              @dragover="(e) => onDragOver(slide, i, e)"
-              @dragend="(e) => finishDrag(slide, i, e)"
-              @dragenter="(e) => e.preventDefault()"
-            >
-              <v-expansion-panel-title class="expand-panel">
-                <v-icon
-                  class="drag-icon"
-                  icon="mdi-drag"
-                  color="gray-300"
-                  draggable="true"
-                  @dragstart="(e) => startDrag(slide, e)"
-                />
-                <v-icon class="ml-3 mr-2 icon-border" color="gray-500">
-                  {{
-                    typeof slide.url === 'string'
-                      ? slide.url.startsWith('https://www.youtube.com') ||
-                        slide.url.startsWith('https://vimeo.com/') ||
-                        slide.url.startsWith('https://youtu.be')
-                        ? 'mdi-youtube'
-                        : 'mdi-image'
-                      : slide.type.includes('video')
-                      ? 'mdi-youtube'
-                      : 'mdi-image'
-                  }}</v-icon
-                >
-                <span class="text-body-3 text-gray-600 text-overflow">
-                  {{
-                    typeof slide.url === 'string'
-                      ? slide.name
-                      : slide.name.replace(/\.[^/.]+$/, '')
-                  }}
-                </span>
-                <v-spacer></v-spacer>
-                <v-btn variant="text" @click="removeSlide(i)">
-                  <v-icon
-                    size="24px"
-                    icon="mdi-trash-can-outline"
-                    color="tag-red-light"
-                  />
-                </v-btn>
-              </v-expansion-panel-title>
-              <v-expansion-panel-text
-                class="bg-white rounded"
-                @dragover="(e) => e.preventDefault()"
-              >
-                <p class="text-body-1 mb-1">Titulo da Mídia</p>
-
-                <v-text-field
-                  :model-value="
-                    typeof slide.url === 'string'
-                      ? slide.name
-                      : slide.name.replace(/\.[^/.]+$/, '')
-                  "
-                  placeholder="Insira o título"
-                  variant="outlined"
-                  @change="
-                    (e) =>
-                      slides.forEach((s) => {
-                        if (s == slide)
-                          slide.name =
-                            typeof slide.url === 'string'
-                              ? e.target.value
-                              : e.target.value +
-                                '.' +
-                                slide.url.name.split('.').pop();
-                      })
-                  "
-                >
-                </v-text-field>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </transition-group>
-        </v-expansion-panels> -->
         <alex-custom-accordion v-model:data="slides">
           <template #content="{ index }">
             <alex-inputs-text-field
@@ -257,7 +179,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 const messageStore = useMessageStore();
 
 const urlInput = ref('');
@@ -380,32 +302,19 @@ const addUrl = (url) => {
   isLoading.value = true;
   let videoTitle = url;
   let type = 'UrlImage';
+  let icon = 'mdi-image';
   if (pastedLink.value !== 'image') {
     videoTitle = pastedLink.value.split(' | ')[1];
     type = 'UrlVideo';
+    icon = 'mdi-youtube';
   }
-  addedSlides.value.push({ url, title: videoTitle, type });
-  slides.value.push({ url, title: videoTitle, type });
+  addedSlides.value.push({ url, title: videoTitle, type, icon });
+  slides.value.push({ url, title: videoTitle, type, icon });
   if (editSlideMode.value === 'edit') upload();
   urlInput.value = '';
   isLoading.value = false;
   pastedLink.value = false;
 };
-
-// const setIcon = computed((index) => {
-//   if (typeof slide[index] === 'string') {
-//     if (
-//       slide[index].startsWith('https://www.youtube.com') ||
-//       slide[index].startsWith('https://vimeo.com/') ||
-//       slide[index].startsWith('https://youtu.be')
-//     ) {
-//       return 'mdi-youtube';
-//     }
-//     return 'mdi-image';
-//   }
-//   if (slide[index].type.includes('video')) return 'mdi-youtube';
-//   else return 'mdi-image';
-// });
 </script>
 
 <style scoped>
