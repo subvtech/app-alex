@@ -19,12 +19,12 @@
       v-model="inputValue"
       :error-messages="errorMessage"
       :disabled="disabled"
+      :required="required"
       :class="{ 'no-value': !inputValue, theme }"
       color="primary--2"
       rounded="lg"
       clear-icon="mdi-close"
       class="w-100"
-      density="compact"
       type="date"
       append-inner-icon="mdi-calendar"
     >
@@ -42,6 +42,9 @@
           color="secondary-0"
           rounded="lg"
           location="bottom start"
+          :title="$t('components.date.selectDate')"
+          :header="$t('components.date.enterDate')"
+          :landscape="true"
         />
       </v-menu>
     </v-text-field>
@@ -188,12 +191,6 @@ const textColor = computed(() => {
 
   &.dark .v-field__append-inner .v-icon {
     color: rgb(var(--v-theme-gray-400)) !important;
-  }
-
-  &.light .v-field__append-inner,
-  &.dark .v-field__append-inner {
-    max-height: 40px !important;
-    padding-top: 2px;
   }
 
   .v-field--error > .v-field__outline,

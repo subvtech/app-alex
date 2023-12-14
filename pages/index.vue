@@ -56,9 +56,11 @@
               label="Quando iniciará o curso?"
               required
               class="w-100"
+              density="compact"
             />
             <alex-inputs-date
               v-model="endDate"
+              density="compact"
               name="endDate"
               required
               label="Quando terminará o curso?"
