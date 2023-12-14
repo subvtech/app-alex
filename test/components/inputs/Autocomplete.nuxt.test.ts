@@ -3,18 +3,10 @@ import { render, fireEvent, screen } from '@testing-library/vue';
 import { vuetify } from '@/plugins/vuetify';
 import Autocomplete from '@/components/alex/inputs/Autocomplete.vue';
 
-const items = [
-  'Joanderson',
-  'Robert',
-  'Zignago',
-  'Eliezir',
-  'Cris',
-  'Angelo',
-  'Berta',
-  'Breno',
-  'Luiz',
-];
-let rerenderBind;
+const items = ['Joanderson', 'Robert', 'Zignago'];
+
+let rerenderBind: (props: object) => Promise<void>;
+let modelValue: string;
 describe('Autocomplete component', () => {
   beforeEach(() => {
     const { rerender } = render(Autocomplete, {
@@ -25,6 +17,12 @@ describe('Autocomplete component', () => {
         label: 'Quem Participara?',
         persistentHint: true,
         items,
+        modelValue: '',
+        'onUpdate:modelValue': (e) => {
+          modelValue = e;
+          rerender({ modelValue: e });
+        },
+        menuProps: { modelValue: true },
       },
       global: {
         plugins: [vuetify],
@@ -48,6 +46,26 @@ describe('Autocomplete component', () => {
   it("Should show the hint 'Digite algo' ", async () => {
     const hint = await screen.findByText('Digite algo');
     expect(hint).not.toBeNull();
+  });
+
+  it('Should render items', async () => {
+    const autocomplete = await screen.findByRole('select');
+    await fireEvent.focus(autocomplete);
+    screen.debug(autocomplete);
+    const itemOne = await screen.findByText('Joanderson');
+    const itemTwo = await screen.findByText('Robert');
+    const itemThree = await screen.findByText('Zignago');
+    expect(itemOne).not.toBeNull();
+    expect(itemTwo).not.toBeNull();
+    expect(itemThree).not.toBeNull();
+  });
+
+  it('Should select item when click', async () => {
+    const autocomplete = await screen.findByRole('select');
+    await fireEvent.focus(autocomplete);
+    const itemOne = await screen.findByText('Joanderson');
+    await fireEvent.click(itemOne);
+    expect(modelValue).toBe('Joanderson');
   });
 
   it('Should show the error message instead of the hint message', async () => {
