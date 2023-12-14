@@ -53,12 +53,28 @@
 
   "name": {
     "required": "Nome is required",
-    "min": "At least 3 characters long",
-    "max": "At most 20 characters long"
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
   },
   "url": {
     "required": "Url is required",
     "min": "At least 3 characters long",
     "max": "At most 64 characters long"
+  },
+  "startDate": {
+    "required": "Start date is required"
+  },
+  "endDate": {
+    "required": "End date is required"
+  },
+  "class": {
+    "required": "Class is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "description": {
+    "required": "Description is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
   }
 }

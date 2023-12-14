@@ -1,5 +1,5 @@
 <template>
-  <div id="custom-textfield">
+  <div class="alex-text-field">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -18,11 +18,11 @@
       v-model="value"
       :error-messages="errorMessage"
       :class="theme"
+      :disabled="disabled"
       color="primary--2"
       rounded="lg"
       role="textfield"
       clear-icon="mdi-close"
-      :disabled="disabled"
       v-bind="$attrs"
     />
   </div>
@@ -53,14 +53,15 @@ const props = defineProps({
     default: 'light',
   },
   name: { type: String, required: true },
-  value: {
+  modalValue: {
     type: String || Number || Boolean || undefined,
     default: undefined,
   },
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.value,
+  initialValue: props.modalValue,
+  syncVModel: true,
 });
 const textColor = computed(() => {
   if (props.theme === 'light') {
@@ -72,8 +73,8 @@ const textColor = computed(() => {
 });
 </script>
 
-<style>
-#custom-textfield {
+<style lang="scss">
+.alex-text-field {
   .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
@@ -111,7 +112,7 @@ const textColor = computed(() => {
 
   .v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
-    color: rgb(var(--v-theme-gray-600)) !important;
+    color: rgb(var(--v-theme-gray-600));
   }
 
   .light .v-field__outline {

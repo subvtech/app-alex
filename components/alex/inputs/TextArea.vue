@@ -1,5 +1,5 @@
 <template>
-  <div id="alex-textarea">
+  <div class="alex-textarea">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -15,7 +15,6 @@
       >
     </div>
     <v-textarea
-      v-bind="$attrs"
       v-model="value"
       color="primary--2"
       rounded="lg"
@@ -23,10 +22,10 @@
       no-resize
       role="textarea"
       clear-icon="mdi-close"
-      hide-details
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"
+      v-bind="$attrs"
     ></v-textarea>
   </div>
 </template>
@@ -66,7 +65,7 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
-#alex-textarea {
+.alex-textarea {
   .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
