@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-autocomplete" role="select">
+  <div class="alex-autocomplete">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -24,6 +24,7 @@
       rounded="lg"
       variant="outlined"
       clear-icon="mdi-close"
+      role="select"
       v-bind="$attrs"
     >
       <!-- Bind all slots  -->

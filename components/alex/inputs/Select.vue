@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-select" role="select">
+  <div class="alex-select">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
