@@ -5,5 +5,6 @@ export default defineVitestConfig({
   // @ts-ignore
   test: {
     environment: 'nuxt',
+    globals: true,
   },
 });

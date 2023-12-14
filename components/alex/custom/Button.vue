@@ -5,7 +5,7 @@
     data-testid="alexButton"
     :class="`${variant} ${selectedVariant.textColor}`"
     :color="selectedVariant.bgColor"
-    :variant="selectedVariant.variant as unknown as undefined"
+    :variant="buttonVariant"
     :size="size"
     :ripple="false"
   >
@@ -18,7 +18,7 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    variant?:
+    variant:
       | 'primary'
       | 'secondary'
       | 'tertiary'
@@ -51,6 +51,9 @@ const variants = {
   info: { textColor: 'text-white', bgColor: 'info-0', variant: 'flat' },
 };
 
+const buttonVariant = computed<NonNullable<any>>(
+  () => selectedVariant.value.variant,
+);
 const selectedVariant = computed(() => variants[props.variant]);
 
 // Slots

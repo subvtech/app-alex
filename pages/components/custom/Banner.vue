@@ -497,6 +497,11 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const { findOne } = useStrapi();
 
 const i18n = useI18n();
@@ -779,9 +784,7 @@ const updateUser = async (show = true) => {
     'user_wallet',
   ];
 
-  user.value = await findOne<User>('users', id, {
-    populate: populate,
-  });
+  user.value = await findOne<User>('users', id, { populate });
 
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
