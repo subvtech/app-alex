@@ -254,59 +254,73 @@
           </p>
         </div>
         <div class="footer-content">
-          <span class="action-content-two">
+          <span class="action-content">
             <alex-custom-button
               class="button"
-              text="Cancelar"
-              variant="secondary"
-            />
-            <alex-custom-button
-              class="button"
+              prepend-icon="mdi-trash-can-outline"
               text="Excluir curso"
               variant="error"
-            />
+              @click="openDialog = true"
+            >
+              Excluir curso
+              <alex-custom-dialog
+                :model-value="openDialog"
+                title=""
+                body-classes="criticalAttention"
+                class="exclusionDialog"
+              >
+                <template #header>
+                  <alex-custom-dialog-header title="" class="noShow"
+                /></template>
+                <div class="criticalAttention">
+                  <div class="exclusionBody">
+                    <span class="exclusionIMG">
+                      <img
+                        src="@/assets/svg/exclusionImage.svg"
+                        alt="attention image"
+                      />
+                    </span>
+                    <p>
+                      <span class="header-h4"
+                        >Realmente deseja excluir o curso?</span
+                      >
+                      <br />
+                      <span class="body-p1"
+                        >Ao excluir um curso todo o conteúdo criado dentro dele
+                        também será excluído.</span
+                      >
+                    </p>
+                    <alex-inputs-text-field
+                      label="Digite a palavra:"
+                      name=""
+                      class="w-100"
+                      required
+                      placeholder="Digite a frase"
+                    />
+                  </div>
+                  <div class="exclusionFooter">
+                    <alex-custom-button
+                      class="button"
+                      text="Cancelar"
+                      variant="secondary"
+                      @click="openDialog = false"
+                    />
+                    <alex-custom-button
+                      class="button"
+                      text="Excluir"
+                      variant="error"
+                      @click="openDialog = false"
+                    />
+                  </div>
+                </div>
+                <template #footer>
+                  <alex-custom-dialog-footer class="noShow"
+                /></template>
+              </alex-custom-dialog>
+            </alex-custom-button>
           </span>
         </div>
       </div>
-      <alex-custom-dialog
-        ref="exclusionDialog"
-        model-value="true"
-        title="Excluir curso"
-        :close-on-click-outside="false"
-      >
-        <div class="criticalAttention">
-          <div class="exclusionBody">
-            <p>
-              <span class="header-h4">Realmente deseja excluir o curso?</span>
-              <span class="body-p1"
-                >Ao excluir um curso todo o conteúdo criado dentro dele também
-                será excluído.</span
-              >
-            </p>
-            <alex-inputs-text-field
-              label="Digite a palavra: `<strong>excluir</strong>`"
-              name=""
-              class="w-100"
-              required
-              placeholder="Digite a frase"
-            />
-          </div>
-          <div class="exclusionFooter">
-            <alex-custom-button
-              class="button"
-              text="Cancelar"
-              variant="secondary"
-              @click="dialog = false"
-            />
-            <alex-custom-button
-              class="button"
-              text="Excluir curso"
-              variant="error"
-              @click="dialog = false"
-            />
-          </div>
-        </div>
-      </alex-custom-dialog>
     </div>
   </div>
 </template>
@@ -314,6 +328,8 @@
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
+
+const openDialog = ref(false);
 
 const selectedFile = ref(null);
 const preview = ref(null);
@@ -545,8 +561,13 @@ p {
   max-width: 520px;
   flex-direction: column;
   align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
 }
 
+.noShow {
+  display: none;
+}
 .exclusionBody {
   display: flex;
   padding: var(--40px, 40px) 24px;
