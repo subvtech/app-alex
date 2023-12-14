@@ -157,6 +157,16 @@ const menus = [
         to: '/components/inputs/text-field',
       },
       {
+        icon: 'mdi-card-text-outline',
+        title: 'Autocomplete',
+        to: '/components/inputs/autocomplete',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Select',
+        to: '/components/inputs/select',
+      },
+      {
         icon: 'mdi-view-dashboard-outline',
         title: 'Card projetos e cursos',
         to: '/components/learning-plans/card',
