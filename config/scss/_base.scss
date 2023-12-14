@@ -73,7 +73,7 @@ $btn-icon-density: (
   };
 }
 
-$colors-scrollBar: (white, 'gray-blue', 'gray-100');
+$colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 
 @each $color in $colors-scrollBar {
   .alex-scrollbar-#{$color}::-webkit-scrollbar {
