@@ -1,5 +1,5 @@
 <template>
-  <div id="custom-textfield" :class="class">
+  <div class="alex-text-field" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -27,44 +27,36 @@
   </div>
 </template>
 
-<script setup>
-import { useField } from 'vee-validate';
+<script setup lang="ts">
+import { useField, YupSchema } from 'vee-validate';
 defineOptions({
   inheritAttrs: false,
 });
 
-const props = defineProps({
-  label: {
-    type: String,
-    default: '',
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
-  info: {
-    type: String,
-    default: '',
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  theme: {
-    type: String,
-    default: 'light',
-  },
-  name: { type: String, default: '' },
-  value: {
-    type: String || Number || Boolean || undefined,
-    default: undefined,
-  },
-  class: { type: String, default: '' },
+interface TextFieldProps {
+  modelValue?: string | number | boolean | unknown[] | any;
+  name: string;
+  label?: string;
+  required?: boolean;
+  info?: string;
+  disabled?: boolean;
+  theme?: 'light' | 'dark';
+  schema?: YupSchema;
+}
+
+const props = withDefaults(defineProps<TextFieldProps>(), {
+  disabled: false,
+  theme: 'light',
+  info: undefined,
+  label: undefined,
+  modelValue: undefined,
+  schema: undefined,
 });
 
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.value,
+const { value, errorMessage } = useField(() => props.name, props.schema, {
+  syncVModel: true,
 });
+
 const textColor = computed(() => {
   if (props.theme === 'light') {
     return props.disabled ? 'gray-300' : 'gray-800';
@@ -75,15 +67,8 @@ const textColor = computed(() => {
 });
 </script>
 
-<style>
-:root {
-  --gray-300: #b9bfc6;
-  --gray-400: #a0a8b1;
-  --gray-600: #6e7a87;
-  --gray-800: #454d54;
-}
-
-#custom-textfield {
+<style lang="scss">
+.alex-text-field {
   .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
@@ -93,7 +78,7 @@ const textColor = computed(() => {
 
   .v-field__input {
     overflow: hidden;
-    color: #b9bfc6 !important;
+    color: rgb(var(--v-theme-gray-300)) !important;
     text-overflow: ellipsis !important;
     font-family: Sen !important;
     font-size: 16px !important;
@@ -107,12 +92,12 @@ const textColor = computed(() => {
   .v-field--disabled > div > i,
   .v-field--disabled > .v-field__field > .v-field__input,
   .v-input--disabled > .v-input__details {
-    color: #b9bfc6 !important;
+    color: rgb(var(--v-theme-gray-300)) !important;
   }
 
   .v-field:hover:not(.v-field--active):not(.v-field--error)
     > .v-field__outline {
-    color: #454d54 !important;
+    color: rgb(var(--v-theme-gray-800)) !important;
   }
 
   .v-input__details {
@@ -121,36 +106,36 @@ const textColor = computed(() => {
 
   .v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
-    color: #6e7a87;
+    color: rgb(var(--v-theme-gray-600));
   }
 
   .light .v-field__outline {
-    color: var(--gray-300);
+    color: rgb(var(--v-theme-gray-300));
   }
 
   .light .v-field--dirty > .v-field__field > .v-field__input {
-    color: var(--gray-800) !important;
+    color: rgb(var(--v-theme-gray-800)) !important;
   }
 
   .light .v-field > div > i {
-    color: var(--gray-600) !important;
+    color: rgb(var(--v-theme-gray-600)) !important;
   }
 
   .dark .v-field__outline {
-    color: var(--gray-400);
+    color: rgb(var(--v-theme-gray-400));
   }
 
   .dark .v-field--dirty > .v-field__field > .v-field__input {
-    color: #fff !important;
+    color: rgb(var(--v-theme-white)) !important;
   }
 
   .dark .v-field > div > i {
-    color: var(--gray-400) !important;
+    color: rgb(var(--v-theme-gray-400)) !important;
   }
 
   .v-field--error > .v-field__outline,
   .v-input--error .v-messages__message {
-    color: #e9494a !important;
+    color: rgb(var(--v-theme-error-0)) !important;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-select">
+  <div class="alex-select" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -26,6 +26,7 @@
       :error-messages="errorMessage"
       :disabled="disabled"
       v-bind="$attrs"
+      @blur="handleBlur"
     >
       <!-- Bind all slots  -->
       <template v-for="(_, slot) in $slots" #[slot]="scope">
@@ -46,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { useField } from 'vee-validate';
+import { YupSchema, useField } from 'vee-validate';
 
 interface SelectProps {
   modelValue?: string | number | boolean | unknown[] | any;
@@ -56,6 +57,7 @@ interface SelectProps {
   info?: string;
   disabled?: boolean;
   theme?: 'light' | 'dark';
+  schema?: YupSchema;
 }
 const props = withDefaults(defineProps<SelectProps>(), {
   disabled: false,
@@ -63,10 +65,15 @@ const props = withDefaults(defineProps<SelectProps>(), {
   info: undefined,
   label: undefined,
   modelValue: undefined,
+  schema: undefined,
 });
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  syncVModel: true,
-});
+const { value, errorMessage, handleBlur } = useField(
+  () => props.name,
+  props.schema,
+  {
+    syncVModel: true,
+  },
+);
 
 const textColor = computed(() => {
   if (props.theme === 'light') {

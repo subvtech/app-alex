@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-autocomplete">
+  <div class="alex-autocomplete" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { useField } from 'vee-validate';
+import { YupSchema, useField } from 'vee-validate';
 
 interface AutoCompleteProps {
   modelValue?: string | number | boolean | unknown[] | any;
@@ -57,8 +57,9 @@ interface AutoCompleteProps {
   info?: string;
   disabled?: boolean;
   theme?: 'light' | 'dark';
+  schema?: YupSchema;
 }
-const emit = defineEmits(['update:search']);
+const emit = defineEmits(['update:search', 'update:modelValue']);
 const searchModelValue = computed({
   get() {
     return props.search;
@@ -74,9 +75,10 @@ const props = withDefaults(defineProps<AutoCompleteProps>(), {
   theme: 'light',
   info: undefined,
   label: undefined,
+  schema: undefined,
 });
 
-const { value, errorMessage } = useField(() => props.name, undefined, {
+const { value, errorMessage } = useField(() => props.name, props.schema, {
   syncVModel: true,
 });
 

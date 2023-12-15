@@ -34,13 +34,37 @@
           href="https://vuetifyjs.com/en/api/v-autocomplete/"
           target="_blank"
           >v-autocomplete</a
-        >, as mudanças que fizemos foram apenas estéticas.
+        >, também poderá ser passado um schema para validação individual.
       </p>
+    </div>
+    <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
+      <div class="w-100">
+        <p class="text-h5 text-center">Props do componente</p>
+        <v-table variant="outline">
+          <thead>
+            <tr>
+              <th>Propriedade</th>
+              <th>Tipo</th>
+              <th>Obrigatório</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>schema</td>
+              <td>YupSchema</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
     </div>
     <alex-inputs-autocomplete
       v-model="selectedItem"
       v-model:search="search"
       name="convite"
+      :schema="schema"
       :items="[
         'Joanderson',
         'Robert',
@@ -52,14 +76,14 @@
         'Breno',
         'Luiz',
       ]"
-      placeholder="Buscar Integrante"
+      placeholder="Selecione o usuário"
       class="w-100"
       required
       hint="Nome do integrante deve conter no mínimo X caracteres"
       persistent-hint
       clearable
       info="Insira o nome do integrante"
-      label="Quem participará?"
+      label="Buscar usuário"
     />
 
     <div class="w-100">
@@ -152,6 +176,7 @@ ${exampleScript[0]}
       <v-col class="playground-controls pa-3 d-flex flex-column">
         <alex-inputs-text-field
           v-model="playgroundValues[0]"
+          name="placeholder"
           hide-details
           placeholder="Nome de usuário"
           label="Placeholder"
@@ -159,6 +184,7 @@ ${exampleScript[0]}
         />
         <alex-inputs-text-field
           v-model="playgroundValues[1]"
+          name="preprend"
           hide-details
           placeholder="mdi-account"
           label="Prepend Icon"
@@ -166,6 +192,7 @@ ${exampleScript[0]}
         />
         <alex-inputs-text-field
           v-model="playgroundValues[2]"
+          name="append"
           hide-details
           placeholder="mdi-close"
           label="Append Icon"
@@ -173,6 +200,7 @@ ${exampleScript[0]}
         />
         <alex-inputs-text-field
           v-model="playgroundValues[3]"
+          name="label"
           hide-details
           placeholder="User Name"
           label="Label"
@@ -233,6 +261,7 @@ ${exampleScript[0]}
 </template>
 
 <script setup lang="ts">
+import * as yup from 'yup';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
@@ -243,6 +272,7 @@ definePageMeta({
 });
 
 const selectedItem = ref();
+const schema = yup.string().nonNullable().required('this field is required');
 const search = ref('');
 const copiedValue = ref('');
 const activeExampleTabs = ref(['1']);
