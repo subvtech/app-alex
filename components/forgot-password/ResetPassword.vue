@@ -43,7 +43,7 @@
         @click:append-inner="confirmationVisible = !confirmationVisible"
       />
       <alex-custom-button
-        class="text-none text-white rounded-lg pa-5"
+        theme="dark"
         block
         type="submit"
         size="large"

@@ -27,8 +27,8 @@
       }}</span>
 
       <alex-custom-button
-        class="text-none text-white rounded-lg pa-5"
         block
+        theme="dark"
         type="submit"
         size="large"
         :disabled="!isValid"

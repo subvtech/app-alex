@@ -150,6 +150,11 @@ const menus = [
         to: '/components/inputs/radio-button',
       },
       {
+        icon: 'mdi-radio',
+        title: 'Radio-button',
+        to: '/components/inputs/checkbox',
+      },
+      {
         icon: 'mdi-card-text-outline',
         title: 'Text-field',
         to: '/components/inputs/text-field',
