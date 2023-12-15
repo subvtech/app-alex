@@ -13,16 +13,13 @@
       ]"
     >
       <div class="foretitle d-flex py-6">
-        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{ title }}</span>
+        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{
+          title
+        }}</span>
         <a v-if="href" :href="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
         </a>
-        <div v-if="showTooltip" class="tooltip d-flex">
-          <img class="pl-1" src="/svg/tooltip.svg" width="24" height="24" />
-          <div v-if="tooltip" class="px-4">
-            <span>{{ tooltip }}</span>
-          </div>
-        </div>
+        <alex-custom-tooltip v-if="showTooltip" show-icon :text="tooltip" />
       </div>
 
       <div v-if="isEditing" class="buttons d-flex justify-end">
@@ -58,13 +55,20 @@
         class="pointer"
         @click="emit('toggle:isEditing')"
       >
-        <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
+        <alex-custom-tooltip :text="$t('components.card.edit')">
+          <template #content>
+            <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
+          </template>
+        </alex-custom-tooltip>
       </div>
     </div>
 
     <div
       class="d-flex flex-column w-100"
-      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent ?? 'align-start']"
+      :class="[
+        sizingClass ?? (noHeader ? 'px-6' : 'pa-6'),
+        alignContent ?? 'align-start',
+      ]"
     >
       <slot name="content" />
       <slot name="footer" />
@@ -186,35 +190,6 @@ type SizingClass =
       font-size: 20px;
       font-weight: 700;
       line-height: 24px;
-    }
-
-    div.tooltip {
-      position: relative;
-      img:hover + div {
-        display: block !important;
-      }
-      div {
-        position: absolute;
-        display: none;
-        top: 120%;
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 300px;
-        padding: 6.5px 16px;
-        justify-content: center;
-        align-items: center;
-        border-radius: 4px;
-        background: var(--cinza-cinza-800, #454d54);
-        box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.15);
-
-        span {
-          color: var(--principais-branco, #fff);
-
-          font-size: 14px;
-          font-weight: 400;
-          letter-spacing: 0.28px;
-        }
-      }
     }
   }
 

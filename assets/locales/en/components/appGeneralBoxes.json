@@ -7,6 +7,10 @@
     "singular": "Student",
     "plural": "Students"
   },
+  "trails": {
+    "singular": "Trail",
+    "plural": "Trails"
+  },
   "projects": {
     "singular": "Project",
     "plural": "Projects"

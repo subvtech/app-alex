@@ -44,6 +44,16 @@ import Marker from '@editorjs/marker';
 import DragDrop from 'editorjs-drag-drop';
 
 import Undo from 'editorjs-undo';
+import Delimiter from '@editorjs/delimiter';
+import InlineCode from '@editorjs/inline-code';
+import Link from '@editorjs/link';
+import List from '@editorjs/nested-list';
+import Quote from '@editorjs/quote';
+import Hyperlink from 'editorjs-hyperlink';
+import AlignmentBlockTune from 'editorjs-text-alignment-blocktune';
+import Paragraph from '@editorjs/paragraph';
+import Embed from '@editorjs/embed';
+import header from '../../editor-js/plugins/header/HeaderBlock';
 import { i18n } from '~/assets/editor-i18n';
 const { create, update, delete: _delete } = useStrapi();
 const { t } = useI18n();
@@ -73,14 +83,79 @@ const emit = defineEmits(['ready', 'update']);
 const instance = ref();
 
 const initialiseEditor = () => {
-  console.log({ info: info.value });
   instance.value = new EditorJS({
     tools: {
       marker: {
         class: Marker,
         shortcut: 'CMD+SHIFT+M',
       },
+
+      delimiter: Delimiter,
+      embed: Embed,
+      header: {
+        class: header,
+        shortcut: 'CMD+SHIFT+H',
+        tunes: ['alignmentBlockTune'],
+        config: {
+          allowAnchor: true,
+          anchorLength: 100,
+        },
+      },
+
+      inlineCode: {
+        class: InlineCode,
+        shortcut: 'CMD+SHIFT+C',
+      },
+      link: {
+        class: Link,
+        config: {
+          endpoint: '/api/fetch-url',
+        },
+      },
+      list: {
+        class: List,
+        inlineToolbar: true,
+      },
+
+      quote: {
+        class: Quote,
+        inlineToolbar: true,
+        shortcut: 'CMD+SHIFT+O',
+        config: {
+          quotePlaceholder: 'Insira uma citação',
+          captionPlaceholder: 'Autor da citação',
+        },
+      },
+
+      alignmentBlockTune: {
+        class: AlignmentBlockTune,
+        config: {
+          default: 'left',
+          blocks: {
+            header: 'center',
+            list: 'left',
+          },
+        },
+      },
+      hyperlink: {
+        class: Hyperlink,
+        config: {
+          shortcut: 'CMD+L',
+          target: '_blank',
+          rel: 'nofollow',
+          availableTargets: ['_blank', '_self'],
+          availableRels: ['author', 'noreferrer'],
+          validate: false,
+        },
+      },
+
+      paragraph: {
+        class: Paragraph,
+        inlineToolbar: true,
+        tunes: ['alignmentBlockTune'],
+      },
     },
+
     onChange: () => checkBlocksLimit(instance.value),
     i18n,
     placeholder: isEditing

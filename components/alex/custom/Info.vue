@@ -190,7 +190,7 @@
           </div>
 
           <div
-            v-if="code"
+            v-if="copyObject"
             class="code d-flex align-center py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
             :class="[
               !floatBeneath
@@ -202,10 +202,10 @@
             ]"
             style="gap: 8px; cursor: pointer; align-self: flex-end"
             :style="codeStyle ?? ''"
-            @click="copyToClipboard(code)"
+            @click="copyToClipboard(copyObject.copyText)"
           >
             <v-icon style="flex-grow: 0" size="20">mdi-content-copy</v-icon>
-            <span style="flex-grow: 0">{{ code }}</span>
+            <span style="flex-grow: 0">{{ copyObject.label }}</span>
           </div>
         </div>
 
@@ -358,8 +358,8 @@ const props = defineProps({
     type: String,
   },
 
-  code: {
-    type: String,
+  copyObject: {
+    type: Object as PropType<{ label: string; copyText: string }>,
   },
   username: {
     type: String,
@@ -369,7 +369,7 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false },
   canDelete: { type: Boolean, default: false },
 });
-
+const { copyToClipboard } = useCopyText()
 const biggerImage = computed(() => {
   return props.resize && props.profilePictureSize > 100;
 });
@@ -391,13 +391,7 @@ const startDateOrEndDate = computed(() => {
   return props.startDate || props.endDate;
 });
 
-async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (err) {
-    console.error('Failed to copy text: ', err);
-  }
-}
+
 </script>
 
 <style scoped lang="scss">

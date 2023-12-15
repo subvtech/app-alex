@@ -16,7 +16,9 @@
   },
 
   "keyword": {
-    "required": "Esse campo é obrigatório"
+    "required": "Esse campo é obrigatório",
+    "noSpaces": "Não pode haver espaços",
+    "onlyLetters": "Apenas letras do alfabeto são permitidas"
   },
 
   "description": {
@@ -63,5 +65,9 @@
     "required": "Url é necessário",
     "min": "Mínimo de 4 caracteres",
     "max": "Máximo de 64 caracteres"
+  },
+  "copy": {
+    "success": "Texto copiado.",
+    "error": "Não foi possível copiar o texto."
   }
 }

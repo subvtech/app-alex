@@ -91,16 +91,22 @@ export const useFormRules = (formData?: FormDataType) => {
       ),
   };
 
-  const keywordRules = {
-    keyword: yup.string().required(i18n.t('rules.keyword.required')).trim(),
-  };
+  const keywordRules = yup
+    .object({
+      text: yup
+        .string()
+        .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+        .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+        .required(i18n.t('rules.keyword.required')),
+    })
+    .required(i18n.t('rules.keyword.required'));
+
   const descriptionRules = {
     description: yup
       .string()
       .required(i18n.t('rules.description.required'))
       .min(12, i18n.t('rules.description.min'))
       .max(4000, i18n.t('rules.description.max'))
-      
       .trim(),
   };
 

@@ -8,27 +8,21 @@
     :save="onSave"
     align-content="align-start"
     show-tooltip
-    :tooltip="title"
+    :tooltip="
+      isGeneral
+        ? $t('components.competences.general.tooltip')
+        : $t('components.competences.technical.tooltip')
+    "
     full-width
   >
     <template v-slot:content>
       <div class="gap-3 d-flex flex-column w-100">
         <div v-if="isEditing" class="d-flex flex-column gap-2">
-          <v-autocomplete
+          <app-autocomplete
             :placeholder="placeholder"
-            :items="filteredTags"
-            item-title="text"
-            variant="outlined"
-            hide-details
-            hide-no-data
-            @update:model-value="populateSelectedTags"
-            @input="handleInput"
-            @keydown.enter.stop="populateSelectedTags(selectedTag)"
-            v-model="selectedTag"
-            :menu-props="{ maxHeight: 200 }"
-            return-object
-          >
-          </v-autocomplete>
+            :filteredItems="filteredTags"
+            :update-items="updateTags"
+          />
         </div>
 
         <div class="d-flex flex-column align-start gap-2">
@@ -141,21 +135,6 @@ const createArray = ref<Tag[]>([]);
 const updateArray = ref<Tag[]>([]);
 const deleteArray = ref<Tag[]>([]);
 
-const populateSelectedTags = (newValue) => {
-  if (!newValue) return;
-
-  if (!selectedTag.value && newValue.id) {
-    updateTags(newValue);
-  } else if (
-    selectedTag.value &&
-    selectedTag.value.text &&
-    selectedTag.value.text.length > 2
-  ) {
-    updateTags(selectedTag.value, true);
-  }
-  selectedTag.value = null;
-};
-
 const removeItem = (tag) => {
   selectedTags.value = selectedTags.value.filter(
     (item) => item.text !== tag.text,
@@ -171,10 +150,6 @@ const removeItem = (tag) => {
 
   filteredTags.value.push(tag);
   selectedTag.value = null;
-};
-
-const handleInput = (e) => {
-  if (e.target.value.length > 1) populateSelectedTags({ text: e.target.value });
 };
 
 const onCancel = async () => {

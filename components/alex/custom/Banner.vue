@@ -27,12 +27,11 @@
           variant="outlined"
           role="delete-cover"
         >
-          <NuxtImg
+          <img
             src="/svg/trash-dark.svg"
             style="color: #6e7a87"
             width="24"
             height="24"
-            placeholder
           />
         </v-btn>
 
@@ -80,7 +79,7 @@
       :username="username"
       :title="title"
       :subtitle="subtitle"
-      :code="code"
+      :copy-object="copyObject"
       :code-style="codeStyle"
       :settingsIcon="settingsIcon"
       :fullname-style="fullnameStyle"
@@ -152,7 +151,7 @@ const props = defineProps({
 
   showSettings: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   imgFromStrapi: {
@@ -201,8 +200,8 @@ const props = defineProps({
     default: 'mdi-cog-outline',
   },
 
-  code: {
-    type: String,
+  copyObject: {
+    type: Object as PropType<{ label: string; copyText: string }>,
   },
   fullnameStyle: {
     type: String,

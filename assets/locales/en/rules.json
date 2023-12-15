@@ -16,7 +16,9 @@
   },
 
   "keyword": {
-    "required": "This field is required"
+    "required": "This field is required",
+    "noSpaces": "There shall be no spaces",
+    "onlyLetters": "There shall only alphabetic letters"
   },
 
   "description": {
@@ -64,5 +66,9 @@
     "required": "Url is required",
     "min": "At least 3 characters long",
     "max": "At most 64 characters long"
+  },
+  "copy": {
+    "success": "Text copied to clipboard",
+    "error": "Couldn't copy to clipboard"
   }
 }

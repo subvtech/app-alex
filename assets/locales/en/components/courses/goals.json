@@ -10,5 +10,7 @@
     "placeholder": "Describe your goal"
   },
   "add": "Add Goal",
-  "empty": "It' seems that up until now no Learning Goals have been added"
+  "empty": "It seems that up until now no Learning Goals have been added",
+  "tooltip": "Establish what the students must accomplish by the end of these courses. Use the keywords from the bloom taxonomy and seek set the expected learning outcomes",
+  "update": "Learning Goals succesfully updated."
 }
