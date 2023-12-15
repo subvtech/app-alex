@@ -2,7 +2,12 @@
   <div class="wrapper pa-6">
     <div class="d-flex justify-space-between flex-column flex-sm-row mb-2">
       <alex-custom-breadcrumbs title="Meus Cursos" :items="breadcrumbs" />
-      <v-btn prepend-icon="mdi-plus">Novo Curso</v-btn>
+      <alex-custom-button
+        prepend-icon="mdi-plus"
+        size="large"
+        class="text-body-4"
+        >Novo Curso</alex-custom-button
+      >
     </div>
     <div
       class="d-flex align-center justify-center bg-white flex-column fill-height rounded-lg pa-6"
@@ -22,37 +27,56 @@
         <div class="d-flex justify-space-between">
           <alex-inputs-text-field
             v-model="search"
-            label="Buscar"
+            placeholder="Buscar"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
-            class="input"
+            hide-details
+            style="width: 320px"
+            density="compact"
           >
             ></alex-inputs-text-field
           >
           <div>
-            <v-btn
-              size="44px"
-              class="bg-gray-blue mx-2"
-              @click="changeViewMode"
+            <v-tooltip
+              text="Alterar Visualização"
+              location="bottom"
+              content-class="bg-gray-800"
             >
-              <v-icon
-                size="24px"
-                :icon="
-                  coursesView == 'grid'
-                    ? 'mdi-format-list-bulleted'
-                    : 'mdi-view-grid-outline'
-                "
-                color="gray-600"
-              />
-            </v-btn>
-            <v-btn size="44px" class="bg-gray-blue">
-              <v-icon size="24px" icon="mdi-filter-variant" color="gray-600" />
-            </v-btn>
+              <template #activator="{ props }">
+                <alex-custom-button
+                  v-bind="props"
+                  :icon="
+                    coursesView == 'grid'
+                      ? 'mdi-format-list-bulleted'
+                      : 'mdi-view-grid-outline'
+                  "
+                  size="large"
+                  variant="secondary"
+                  @click="changeViewMode"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              text="Filtrar"
+              location="bottom"
+              content-class="bg-gray-800"
+            >
+              <template #activator="{ props }">
+                <alex-custom-button
+                  v-bind="props"
+                  class="mx-2"
+                  icon="mdi-filter-variant"
+                  size="large"
+                  variant="secondary"
+                  @click="console.log('filter')"
+                />
+              </template>
+            </v-tooltip>
           </div>
         </div>
         <div
           v-if="coursesView == 'grid'"
-          class="d-flex w-100 py-6"
+          class="d-flex flex-wrap w-100 py-6"
           style="gap: 24px"
         >
           <v-card
@@ -67,7 +91,7 @@
             />
             <v-card-item>
               <v-card-title class="text-h5 text-gray-900 card-title">{{
-                course
+                course.title
               }}</v-card-title>
               <v-card-text class="text-gray-600 text-body-3 card-text pa-0">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -113,7 +137,36 @@
                   {{ item.Trilhas }}
                 </td>
                 <td>
-                  <alex-custom-button variant="text" icon="mdi-dots-vertical" />
+                  <v-tooltip
+                    text="Opções"
+                    location="bottom"
+                    content-class="bg-gray-800"
+                  >
+                    <template #activator="{ props }">
+                      <div v-bind="props">
+                        <alex-inputs-dropdown
+                          :items="[
+                            {
+                              icon: 'mdi-eye-outline',
+                              text: 'Mostrar',
+                            },
+                            {
+                              icon: 'mdi-cog-outline',
+                              text: 'Configurações',
+                            },
+                          ]"
+                        >
+                          <template #activator="{ props }">
+                            <alex-custom-button
+                              v-bind="props"
+                              variant="text"
+                              icon="mdi-dots-vertical"
+                            />
+                          </template>
+                        </alex-inputs-dropdown>
+                      </div>
+                    </template>
+                  </v-tooltip>
                 </td>
               </tr>
             </template>
@@ -217,55 +270,52 @@ const headers = [
 
 courses.value = [
   {
-    title: 'Gerenciamento de projetos de redes de computadores',
+    title: 'Introdução à Segurança da Informação',
     img: 'https://picsum.photos/400/300',
     Descrição:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    Facilitador: 'Alexandre',
-    Trilhas: '5',
+      'Explore os fundamentos da segurança da informação e práticas de proteção de dados.',
+    Facilitador: 'Carolina',
+    Trilhas: '4',
   },
   {
-    title: 'Gerenciamento de projetos de redes de computadores',
+    title: 'Desenvolvimento Web Avançado',
     img: 'https://picsum.photos/800/600',
     Descrição:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    Facilitador: 'Alexandre',
-    Trilhas: '5',
+      'Aprofunde-se no desenvolvimento web, abordando tecnologias modernas e práticas avançadas.',
+    Facilitador: 'Gabriel',
+    Trilhas: '8',
   },
   {
-    title: 'Gerenciamento de projetos de redes de computadores',
+    title: 'Machine Learning Aplicado',
     img: 'https://picsum.photos/200/150',
     Descrição:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    Facilitador: 'Alexandre',
-    Trilhas: '5',
+      'Conheça aplicações práticas de machine learning e como implementá-las em projetos do mundo real.',
+    Facilitador: 'Isabela',
+    Trilhas: '6',
   },
   {
-    title: 'Gerenciamento de projetos de redes de computadores',
+    title: 'Inteligência Artificial para Iniciantes',
     img: 'https://picsum.photos/100/75',
-
     Descrição:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    Facilitador: 'Alexandre',
-    Trilhas: '5',
+      'Um curso introdutório para entender os conceitos básicos de inteligência artificial.',
+    Facilitador: 'Ricardo',
+    Trilhas: '3',
   },
   {
-    title: 'Gerenciamento de projetos de redes de computadores',
+    title: 'Gestão Ágil de Projetos',
     img: 'https://picsum.photos/400/300',
-
     Descrição:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    Facilitador: 'Alexandre',
+      'Aprenda metodologias ágeis para gerenciar eficientemente projetos de software.',
+    Facilitador: 'Daniela',
     Trilhas: '5',
   },
   {
-    title: 'Gerenciamento de projetos de redes de computadores',
+    title: 'Cibersegurança Avançada',
     img: 'https://picsum.photos/48/36',
-
     Descrição:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    Facilitador: 'Alexandre Alexandre Alexandre',
-    Trilhas: '511111111',
+      'Explore técnicas avançadas de cibersegurança para proteger sistemas contra ameaças sofisticadas.',
+    Facilitador: 'Alexandre',
+    Trilhas: '8',
   },
 ];
 
@@ -313,10 +363,6 @@ const changeViewMode = () => {
 
 .wrapper {
   height: calc(100vh - 150px);
-}
-.input {
-  height: 44px;
-  max-width: 300px;
 }
 .course-card {
   min-width: 300px;
