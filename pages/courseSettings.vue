@@ -83,6 +83,7 @@
                 name=""
                 required
                 class="w-100"
+                close-on-select
               />
               <alex-inputs-date
                 label="Término"
@@ -140,26 +141,50 @@
           </span>
         </div>
       </div>
-      <div class="content-area">
+      <div class="d-flex content-area">
         <div class="card-title">
           <p>
             <span class="header-h4">Configurações de convite</span>
           </p>
         </div>
-        <div class="content-body">
+        <div class="d-flex content-body">
           <p class="header-h5 text-invite">Convite por link</p>
           <v-switch
             v-model:model-value="activeLink"
             label="Link de convite"
             color="accent"
           />
-          <div v-if="activeLink" class="d-flex flex-row">
-            <div class="w-1/2">
-              <alex-inputs-text-field
-                type="select"
-                label="Duração do convite"
-                class="w-100"
+          <div v-if="activeLink" class="inviteLinks d-flex flex-row">
+            <div class="w-1/4">
+              <label for="select-1" class="body-p1 py-2"
+                >Duração do convite</label
+              >
+              <v-tooltip
+                location="bottom"
+                attach="#linkTooltip"
+                content-class="inviteTooltip"
+                max-width="300px"
+                text="Alterar a duração do convite não vai mudar o tempo restante
+                  do endereço atual. Para aplicar a nova duração é necessário
+                  gerar um novo convite."
+              >
+                <template v-slot:activator="{ props }">
+                  <v-icon
+                    v-bind="props"
+                    id="linkTooltip"
+                    class="ml-2"
+                    color="#6E7A87"
+                    size="20"
+                    >mdi-information-outline</v-icon
+                  >
+                </template>
+              </v-tooltip>
+              <v-select
+                id="select-1"
+                class="py-2"
                 name=""
+                variant="solo-filled"
+                density="comfortable"
                 required
                 :items="[
                   '5 minutos',
@@ -170,14 +195,18 @@
                   '8 horas',
                   '24 horas',
                 ]"
-              />
+              >
+              </v-select>
             </div>
-            <div class="w-1/2">
-              <alex-inputs-text-field
-                class="w-100"
-                label=""
-                hint="Tempo de duração"
-                name="Tempo de duração"
+            <div class="w-3/4">
+              <span class="body-p1 py-2"> Endereço do convite </span>
+              <courses-invites
+                :enable-invites="course.invite_enabled"
+                :invitation-link="invitationLink"
+                href=""
+                no-header
+                class="mt-2 w-full"
+                height="56px"
               />
             </div>
           </div>
@@ -330,6 +359,11 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 const openDialog = ref(false);
+
+const course = ref({
+  invite_enabled: true,
+});
+const invitationLink = ref();
 
 const selectedFile = ref(null);
 const preview = ref(null);
@@ -511,11 +545,12 @@ p {
 }
 
 .body-p1 {
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
+  font-size: 16px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
   line-height: 135%;
   letter-spacing: 0.32px;
+  color: var(--cinza-cinza-800, #454d54) !important;
 }
 .button {
   text-transform: none;
@@ -586,5 +621,22 @@ p {
   gap: 16px;
   align-self: stretch;
   border-top: 1px solid var(--cinza-cinza-100, #ebedef);
+}
+
+.inviteLinks {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: flex-start;
+  gap: 24px;
+  align-content: center;
+  justify-content: flex-start;
+}
+
+.inviteTooltip {
+  text-align: center !important;
+  padding: 6.5px 16px;
+  justify-content: center;
+  align-items: center;
 }
 </style>
