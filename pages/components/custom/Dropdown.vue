@@ -414,6 +414,11 @@ import Prism from 'vue-prism-component';
 import { AlexDropdownItem } from '@/components/alex/custom/Dropdown.vue';
 definePageMeta({ layout: 'components' });
 
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const copiedValue = ref('');
 const propsExampleActivePage = ref('1');
 const noIconExampleActivePage = ref('1');

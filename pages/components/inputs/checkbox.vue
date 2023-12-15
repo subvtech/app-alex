@@ -396,6 +396,11 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const checkboxOne = ref(false);
 const checkboxTwo = ref(true);
 const checkboxThree = ref(null);
