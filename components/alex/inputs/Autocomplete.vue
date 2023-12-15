@@ -17,14 +17,15 @@
     <v-autocomplete
       v-model="value"
       v-model:search="searchModelValue"
-      :error-messages="errorMessage"
-      :class="theme"
-      :disabled="disabled"
+      hide-details="auto"
       color="primary--2"
       rounded="lg"
       variant="outlined"
       clear-icon="mdi-close"
       role="select"
+      :error-messages="errorMessage"
+      :class="theme"
+      :disabled="disabled"
       v-bind="$attrs"
     >
       <!-- Bind all slots  -->
