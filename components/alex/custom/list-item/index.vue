@@ -1,77 +1,50 @@
 <template>
-  <v-menu :dark="isDarkMode" data-testid="testing-dropdown">
-    <template #activator="{ props: propsActivator, isActive }">
-      <alex-custom-button
-        v-if="!hasActivatorSlot"
-        v-bind="propsActivator"
-        icon="mdi-dots-vertical"
+  <v-list-item
+    class="d-flex pa-2 px-4 text-decoration"
+    :min-width="200"
+    :class="{
+      'v-list-item-light-selected': !isDarkMode && selected,
+      'v-list-item-dark-selected': isDarkMode && selected,
+      'v-list-item-dark': isDarkMode,
+      'v-list-item-dark-warning': isDarkMode && warning,
+      'v-list-item-light': !isDarkMode,
+      'v-list-item-light-warning': !isDarkMode && warning,
+    }"
+    :ripple="false"
+    @click="onClick(link, emit('click'))"
+  >
+    <template #title></template>
+    <div class="d-flex gap-4 text-body-4 align-center justify-center">
+      <v-icon
+        v-if="icon"
+        data-testid="testint-dropdown-item-icon"
+        :icon="icon"
+        :size="24"
       />
-      <slot
-        v-else
-        name="activator"
-        :props="propsActivator"
-        :is-active="isActive"
-      />
-    </template>
-
-    <v-list
-      data-testid="dropdown-content"
-      class="pa-0 py-2 rounded-lg my-2"
-      :class="{ 'bg-primary-2': isDarkMode, 'bg-white': !isDarkMode }"
-    >
-      <v-list-item
-        v-for="(
-          { text, icon, link, warning, onClick: onClickItem }, index
-        ) in items"
-        :key="index"
-        class="d-flex pa-2 px-4 text-decoration"
-        data-testid="testint-dropdown-item"
-        :min-width="200"
-        :class="{
-          'v-menu-dark': isDarkMode,
-          'v-menu-dark-warning': isDarkMode && warning,
-          'v-menu-light': !isDarkMode,
-          'v-menu-light-warning': !isDarkMode && warning,
-        }"
-        :ripple="false"
-        @click="onClick(link, onClickItem)"
-      >
-        <div class="d-flex gap-4 text-body-4 align-center justify-center">
-          <v-icon
-            v-if="icon"
-            data-testid="testint-dropdown-item-icon"
-            :icon="icon"
-            :size="24"
-          />
-          <span>{{ text }} </span>
-        </div>
-      </v-list-item>
-    </v-list>
-  </v-menu>
+      <span class="v-list-item-text"> {{ text }} </span>
+    </div>
+  </v-list-item>
 </template>
 
 <script setup lang="ts">
-export interface Item {
+export interface AlexListItem {
   text: string;
   icon?: string;
-  link?: string;
   warning?: boolean;
   selected?: boolean;
-  onClick?: () => unknown;
+  link?: string;
+  theme?: 'light' | 'dark';
 }
-interface DropdownProps {
-  items: Item[];
-  isDarkMode?: boolean;
-}
-
-withDefaults(defineProps<DropdownProps>(), {
-  isDarkMode: false,
-  warning: false,
+const props = withDefaults(defineProps<AlexListItem>(), {
+  icon: undefined,
+  link: undefined,
+  checkbox: false,
+  selected: false,
+  theme: 'light',
 });
-
+const emit = defineEmits(['click']);
 const { push } = useRouter();
-const slots = useSlots();
-const hasActivatorSlot = computed(() => !!slots.activator);
+const isDarkMode = computed(() => props.theme === 'dark');
 const onClick = (link?: string, onClick?: () => unknown) => {
   if (link) {
     push(link);
@@ -105,7 +78,7 @@ $variants: (
       default: 'gray-200',
       hover: 'gray-200',
       active: 'gray-200',
-      selected: 'gray-200',
+      selected: 'secondary-0',
       warning: 'error-0',
     ),
   ),
@@ -120,7 +93,7 @@ $variants: (
       default: 'gray-600',
       hover: 'gray-900',
       active: 'gray-900',
-      selected: 'gray-600',
+      selected: 'secondary-0',
       warning: 'error-0',
     ),
   ),
@@ -128,7 +101,7 @@ $variants: (
 
 @each $mode, $value in $variants {
   @each $component, $status in $value {
-    .v-menu-#{$mode} {
+    .v-list-item-#{$mode} {
       @if $component == 'background' {
         background-color: rgb(
           var(--v-theme-#{map-deep-get($status, 'default')})
@@ -136,7 +109,7 @@ $variants: (
       }
       color: rgb(var(--v-theme-#{map-deep-get($status, 'default')})) !important;
     }
-    .v-menu-#{$mode}:hover {
+    .v-list-item-#{$mode}:hover {
       @if $component == 'background' {
         background-color: rgb(
           var(--v-theme-#{map-deep-get($status, 'hover')})
@@ -144,7 +117,7 @@ $variants: (
       }
       color: rgb(var(--v-theme-#{map-deep-get($status, 'hover')})) !important;
     }
-    .v-menu-#{$mode}:active {
+    .v-list-item-#{$mode}:active {
       @if $component == 'background' {
         background-color: rgb(
           var(--v-theme-#{map-deep-get($status, 'active')})
@@ -152,11 +125,24 @@ $variants: (
       }
       color: rgb(var(--v-theme-#{map-deep-get($status, 'active')})) !important;
     }
-    .v-menu-#{$mode}-warning {
+    .v-list-item-#{$mode}-warning {
       color: rgb(var(--v-theme-#{map-deep-get($status, 'warning')})) !important;
     }
-    .v-menu-#{$mode}-warning:hover {
+    .v-list-item-#{$mode}-warning:hover {
       color: rgb(var(--v-theme-#{map-deep-get($status, 'warning')})) !important;
+    }
+
+    .v-list-item--active.v-list-item-#{$mode}-selected {
+      @if $component == 'background' {
+        background-color: rgb(
+          var(--v-theme-#{map-deep-get($status, 'selected')})
+        ) !important;
+      }
+    }
+    .v-list-item--active.v-list-item-#{$mode}-selected .v-list-item-text {
+      color: rgb(
+        var(--v-theme-#{map-deep-get($status, 'selected')})
+      ) !important;
     }
   }
 }

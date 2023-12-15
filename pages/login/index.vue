@@ -12,18 +12,10 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card class="card card-acesso px-10">
-        <div align="center">
-          <img
-            alt="Alex"
-            src="/images/alex.svg"
-            class="card-acesso-alex-logo"
-          />
-        </div>
-
-        <div class="form d-flex flex-column">
+      <v-card class="card card-acesso d-flex justify-center align-center">
+        <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
-            <v-card-title class="text-white text-center text-bold">
+            <v-card-title class="text-white text-center text-bold mt-16">
               {{ $t('pages.login.welcome') }}
             </v-card-title>
             <v-card-subtitle
@@ -34,52 +26,68 @@
             </v-card-subtitle>
           </div>
           <v-form ref="form" @submit.prevent="submit">
-            <alex-inputs-stepper-field
-              :label="$t('pages.login.email')"
+            <alex-inputs-text-field
+              :label="$t('pages.login.user')"
+              :placeholder="$t('pages.login.userHolder')"
               name="email"
               color="white"
-              class="my-1 text-secondary"
               theme="dark"
+              data-vv-validate-on="change|custom"
             />
 
-            <alex-inputs-stepper-field
+            <alex-inputs-text-field
               :label="$t('pages.login.password')"
-              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :placeholder="$t('pages.login.passwordHolder')"
+              :append-inner-icon="!passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
               color="white"
-              class="my-1 text-secondary"
               theme="dark"
+              :hide-details="hasError"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
-
+            <div class="mt-2">
+              <p v-show="hasError" class="text-body-1 text-error">
+                {{ $t(`pages.login.${errorMessage}`) }}
+              </p>
+            </div>
             <div
-              class="d-flex justify-between align-center mb-3"
-              style="height: 24px"
+              class="d-flex justify-space-between align-center mb-2"
+              style="max-height: 30px"
             >
               <v-checkbox
                 v-model="checkbox"
                 class="text-white smaller-text"
                 color="accent"
-                :label="$t('pages.login.remember')"
-              ></v-checkbox>
+                base-color="white"
+                hide-details
+                style="margin-left: -8px"
+              >
+                <template #label>
+                  <span class="text-white text-body-2 text-high-emphasis">{{
+                    $t('pages.login.remember')
+                  }}</span>
+                </template>
+              </v-checkbox>
               <nuxt-link
                 to="/forgot"
-                class="blue-label smaller-text text-decoration-none pb-5"
+                class="blue-label smaller-text text-decoration-none"
               >
                 {{ $t('pages.login.forgot') }}
               </nuxt-link>
             </div>
 
-            <v-btn
+            <alex-custom-button
               block
-              :disabled="!isValid"
-              class="card-btn"
+              size="large"
               type="submit"
+              class="text-none text-green text-body-1"
+              theme="dark"
+              :disabled="!isValid"
               :loading="logging"
             >
               {{ $t('pages.login.submit') }}
-            </v-btn>
+            </alex-custom-button>
           </v-form>
           <v-card-text class="smaller-text text-white text-center">
             {{ $t('pages.login.noAccount') }}
@@ -122,17 +130,17 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-const i18n = useI18n();
+import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
+const hasError = ref(false);
+const errorMessage = ref('');
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
 });
-const { login, setToken, setUser } = useStrapiAuth();
-const { create, find } = useStrapi();
+const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
-const messageStore = useMessageStore();
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
@@ -172,11 +180,30 @@ const submit = handleSubmit(async () => {
     });
 
     router.push('/');
-  } catch (error) {
+  } catch (err: unknown) {
+    hasError.value = true;
+    const error = err as Strapi4Error;
+    if (error.error) {
+      switch (error.error.name) {
+        case 'ValidationError':
+          errorMessage.value = 'loginError';
+          break;
+        case 'Your account email is not confirmed':
+          errorMessage.value = 'confirmEmail';
+          break;
+        case 'Your account has been blocked by an administrator':
+          errorMessage.value = 'blockedUser';
+          break;
+        default:
+          errorMessage.value = 'genericError';
+          break;
+      }
+    }
+  } finally {
     logging.value = false;
-    messageStore.message = i18n.t('pages.login.loginError');
-    messageStore.color = 'red';
-    messageStore.show = true;
+    setTimeout(() => {
+      hasError.value = false;
+    }, 5000);
   }
 });
 </script>
@@ -196,7 +223,6 @@ const submit = handleSubmit(async () => {
 
       .v-card-subtitle {
         font-size: 1.25rem;
-        padding-inline: 64px;
       }
     }
 
@@ -212,16 +238,12 @@ const submit = handleSubmit(async () => {
 
     &-acesso {
       background-image: url('/images/login-bg.svg');
-      background-repeat: initial;
+      background-repeat: no-repeat;
       background-size: cover;
+      background-position: center;
+      width: 629px;
       right: 0;
       overflow: auto;
-      width: 600px;
-
-      &-alex-logo {
-        width: 100px;
-        margin-block: 60px;
-      }
     }
 
     .blue-label {

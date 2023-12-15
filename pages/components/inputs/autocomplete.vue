@@ -2,12 +2,12 @@
   <v-container
     class="page rounded-lg bg-white pa-8 d-flex flex-column align-start pb-15"
   >
-    <h1 class="text-h2 text-gray-800">Text Field</h1>
+    <h1 class="text-h2 text-gray-800">Autocomplete</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
-      <strong class="bg-accent pa-1 rounded">alex-inputs-text-field</strong>
+      <strong class="bg-accent pa-1 rounded">alex-inputs-autocomplete</strong>
       é um componente que utiliza a estrutura do Vuetify para criar um campo de
-      texto.
+      texto com opções.
     </p>
     <div class="d-flex align-center container rounded-lg pa-4">
       <img class="align-self-stretch" src="@/assets/svg/vuetify.svg" />
@@ -18,7 +18,7 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/text-fields/"
+          href="https://vuetifyjs.com/en/components/autocompletes/#usage"
           target="_blank"
           >vuetifyjs.com</a
         >
@@ -31,9 +31,9 @@
         e o name.<br />todas as suas propriedades são herdadas do
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/api/v-text-field/"
+          href="https://vuetifyjs.com/en/api/v-autocomplete/"
           target="_blank"
-          >v-text-field</a
+          >v-autocomplete</a
         >, também poderá ser passado um schema para validação individual.
       </p>
     </div>
@@ -60,19 +60,32 @@
         </v-table>
       </div>
     </div>
-    <alex-inputs-text-field
-      v-model="inputText"
-      name="name"
-      placeholder="Alex"
-      class="w-100"
-      prepend-inner-icon="mdi-account"
-      clearable
-      hint="Nome de usuário deve conter no mínimo X caracteres"
-      required
-      info="Insira seu nome de usuário"
-      label="Nome de Usuário"
+    <alex-inputs-autocomplete
+      v-model="selectedItem"
+      v-model:search="search"
+      name="convite"
       :schema="schema"
+      :items="[
+        'Joanderson',
+        'Robert',
+        'Zignago',
+        'Eliezir',
+        'Cris',
+        'Angelo',
+        'Berta',
+        'Breno',
+        'Luiz',
+      ]"
+      placeholder="Selecione o usuário"
+      class="w-100"
+      required
+      hint="Nome do integrante deve conter no mínimo X caracteres"
+      persistent-hint
+      clearable
+      info="Insira o nome do integrante"
+      label="Buscar usuário"
     />
+
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
@@ -142,11 +155,13 @@ ${exampleScript[0]}
     </p>
     <v-row class="w-100 d-flex align-center">
       <v-col cols="12" md="7">
-        <alex-inputs-text-field
-          name="editable"
+        <alex-inputs-autocomplete
+          name="example"
           :clearable="playgroundOptions[0]"
           :disabled="playgroundOptions[2]"
-          :error-messages="playgroundOptions[1] ? ['Mensagem de erro'] : []"
+          :error-messages="
+            playgroundOptions[1] ? 'Mensagem de erro' : undefined
+          "
           :persistent-hint="playgroundOptions[3]"
           hint="Mensagem de ajuda"
           :placeholder="playgroundValues[0]"
@@ -169,7 +184,7 @@ ${exampleScript[0]}
         />
         <alex-inputs-text-field
           v-model="playgroundValues[1]"
-          name="prepend"
+          name="preprend"
           hide-details
           placeholder="mdi-account"
           label="Prepend Icon"
@@ -247,7 +262,6 @@ ${exampleScript[0]}
 
 <script setup lang="ts">
 import * as yup from 'yup';
-import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
@@ -257,34 +271,41 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const inputText = ref('');
-const schema = yup.string().required('Este campo é obrigatório');
+const selectedItem = ref();
+const schema = yup.string().nonNullable().required('this field is required');
+const search = ref('');
 const copiedValue = ref('');
 const activeExampleTabs = ref(['1']);
 const playgroundOptions = ref([false, false, false, false, false]);
 const playgroundValues = ref(['', '', '', 'User Name']);
 const playgroundDensities = ref('default');
-
 const exampleTemplates = [
-  ` <alex-inputs-text-field
-      v-model="inputText"
-      name="name"
-      placeholder="Alex"
+  `    <alex-inputs-autocomplete
+      name="convite"
+      placeholder="Buscar Integrante"
+      :items="[
+        'Joanderson',
+        'Robert',
+        'Zignago',
+        'Eliezir',
+        'Cris',
+        'Angelo',
+        'Berta',
+        'Breno',
+        'Luiz',
+      ]"
       class="w-100"
-      prepend-inner-icon="mdi-account"
-      clearable
-      hint="Nome de usuário deve conter no mínimo X caracteres"
+      hint="Nome do integrante deve conter no mínimo X caracteres"
       required
-      info="Insira seu nome de usuário"
-      label="Nome de Usuário"
-      :schema="schema"
-    />`,
+      persistent-hint
+      clearable
+      info="Insira o nome do integrante"
+      label="Quem participará?"
+    />
+`,
 ];
 
-const exampleScript = [
-  `const inputText = ref('');
-const schema = yup.string().required('Este campo é obrigatório');`,
-];
+const exampleScript = [`const inputText = ref('');`];
 
 const exampleTabs = [
   {

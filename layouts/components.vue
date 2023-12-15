@@ -104,6 +104,11 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/custom/dropdown',
+      },
     ],
   },
   {
@@ -150,14 +155,24 @@ const menus = [
         to: '/components/inputs/text-field',
       },
       {
+        icon: 'mdi-card-text-outline',
+        title: 'Autocomplete',
+        to: '/components/inputs/autocomplete',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Select',
+        to: '/components/inputs/select',
+      },
+      {
         icon: 'mdi-view-dashboard-outline',
         title: 'Card projetos e cursos',
         to: '/components/learning-plans/card',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Dropdown',
-        to: '/components/inputs/dropdown',
+        icon: 'mdi-shoe-print',
+        title: 'Stepper',
+        to: '/components/inputs/stepper',
       },
     ],
   },

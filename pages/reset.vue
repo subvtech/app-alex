@@ -13,17 +13,8 @@
         cols="12"
         md="4"
         sm="12"
-        class="bg-primary px-16"
+        class="bg-primary-0 px-16 d-flex justify-center align-center"
       >
-        <div class="mt-12 mt-sm-16" align="center">
-          <img
-            height="40"
-            width="120"
-            alt="Alex"
-            src="/images/alex.svg"
-            class="mt-8 mb-12 mb-sm-16"
-          />
-        </div>
         <ForgotPasswordResetPassword
           v-if="!passwordChanged"
           @confirmation-message="handlePasswordChanged"
@@ -56,17 +47,7 @@ const handlePasswordChanged = () => {
   background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: cover;
-}
-
-@media (max-height: 700px) {
-  #reset-container {
-    div {
-      margin-top: 0px !important;
-    }
-
-    div img.mt-8 {
-      margin-bottom: 24px !important;
-    }
-  }
+  background-position: center;
+  max-width: 629px;
 }
 </style>

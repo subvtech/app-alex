@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-text-field" :class="$attrs.class">
+  <div class="alex-autocomplete" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -14,28 +14,44 @@
         >mdi-information-outline</v-icon
       >
     </div>
-    <v-text-field
+    <v-autocomplete
       v-model="value"
+      v-model:search="searchModelValue"
+      hide-details="auto"
       color="primary--2"
       rounded="lg"
+      variant="outlined"
       clear-icon="mdi-close"
-      hide-details="auto"
+      role="select"
       :error-messages="errorMessage"
       :class="theme"
       :disabled="disabled"
       v-bind="$attrs"
-    ></v-text-field>
+    >
+      <!-- Bind all slots  -->
+      <template v-for="(_, slot) in $slots" #[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
+      <!-- Default item slot -->
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item
+          :key="index"
+          :text="item.title"
+          v-bind="propsItem"
+          :theme="theme"
+          :selected="value === item.title"
+        />
+      </template>
+    </v-autocomplete>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useField, YupSchema } from 'vee-validate';
-defineOptions({
-  inheritAttrs: false,
-});
+import { YupSchema, useField } from 'vee-validate';
 
-interface TextFieldProps {
+interface AutoCompleteProps {
   modelValue?: string | number | boolean | unknown[] | any;
+  search?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
@@ -44,13 +60,22 @@ interface TextFieldProps {
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
-
-const props = withDefaults(defineProps<TextFieldProps>(), {
+const emit = defineEmits(['update:search', 'update:modelValue']);
+const searchModelValue = computed({
+  get() {
+    return props.search;
+  },
+  set(value) {
+    emit('update:search', value);
+  },
+});
+const props = withDefaults(defineProps<AutoCompleteProps>(), {
+  modelValue: undefined,
+  search: undefined,
   disabled: false,
   theme: 'light',
   info: undefined,
   label: undefined,
-  modelValue: undefined,
   schema: undefined,
 });
 
@@ -69,72 +94,75 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
-.alex-text-field {
-  .v-theme--mainTheme {
+.alex-autocomplete {
+  &.v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
     --v-medium-emphasis-opacity: 1 !important;
     --v-disabled-opacity: 1 !important;
+    --v-border-color: rgb(var(--v-theme-gray-400));
   }
 
-  .v-field__input {
+  &.v-field__input {
     overflow: hidden;
-    color: rgb(var(--v-theme-gray-300)) !important;
+    color: rgb(var(--v-theme-gray-300));
+    border-color: rgb(var(--v-theme-gray-400));
     text-overflow: ellipsis !important;
     font-family: Sen !important;
     font-size: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
     font-style: normal !important;
-    font-weight: 400 !important;
     line-height: 135% !important;
     letter-spacing: 0.32px !important;
-    border-width: 5px;
+    border-width: 5px !important;
   }
 
-  .v-field--disabled > div > i,
-  .v-field--disabled > .v-field__field > .v-field__input,
-  .v-input--disabled > .v-input__details {
+  &.v-field--disabled > div > i,
+  &.v-field--disabled > .v-field__field > .v-field__input,
+  &.v-input--disabled > .v-input__details {
     color: rgb(var(--v-theme-gray-300)) !important;
   }
 
-  .v-field:hover:not(.v-field--active):not(.v-field--error)
+  &.v-field:hover:not(.v-field--active):not(.v-field--error)
     > .v-field__outline {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
-  .v-input__details {
+  &.v-input__details {
     padding-inline-start: 0 !important;
   }
 
-  .v-input__details > .v-messages > .v-messages__message {
+  &.v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
     color: rgb(var(--v-theme-gray-600));
   }
 
-  .light .v-field__outline {
+  &.light .v-field__outline {
     color: rgb(var(--v-theme-gray-300));
   }
 
-  .light .v-field--dirty > .v-field__field > .v-field__input {
+  &.light .v-field--dirty > .v-field__field > .v-field__input {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
-  .light .v-field > div > i {
+  &.light .v-field > div > i {
     color: rgb(var(--v-theme-gray-600)) !important;
   }
 
-  .dark .v-field__outline {
-    color: rgb(var(--v-theme-gray-400));
+  &.dark .v-field__outline {
+    color: var(--gray-400);
   }
 
-  .dark .v-field--dirty > .v-field__field > .v-field__input {
-    color: rgb(var(--v-theme-white)) !important;
+  &.dark .v-field--dirty > .v-field__field > .v-field__input {
+    color: #fff !important;
   }
 
-  .dark .v-field > div > i {
+  &.dark .v-field > div > i {
     color: rgb(var(--v-theme-gray-400)) !important;
   }
 
-  .v-field--error > .v-field__outline,
+  &.v-field--error > .v-field__outline,
   .v-input--error .v-messages__message {
     color: rgb(var(--v-theme-error-0)) !important;
   }

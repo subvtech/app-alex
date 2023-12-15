@@ -66,7 +66,11 @@ export const useFormRules = (formData?: FormDataType) => {
       .string()
       .required(i18n.t('rules.username.required'))
       .min(6, i18n.t('rules.username.min'))
-      .max(64, i18n.t('rules.username.max')),
+      .max(64, i18n.t('rules.username.max'))
+      .matches(
+        /^[a-zA-Z0-9_-]*[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+[a-zA-Z0-9_-]*$/,
+        i18n.t('rules.username.onlyLetters'),
+      ),
   };
 
   const fullnameRules = {
