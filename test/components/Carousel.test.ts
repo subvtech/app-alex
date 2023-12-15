@@ -170,6 +170,13 @@ describe('Accordion component', () => {
     const nextButton = await within(Carousel).findByRole('button', {
       name: 'Next',
     });
+    const defaultActiveSlide = await within(Carousel).findByRole('img', {
+      name: 'Slide 1',
+    });
+
+    expect(defaultActiveSlide.getAttribute('class')).toContain(
+      'vueperslide-active',
+    );
     await fireEvent.click(nextButton);
     const activeSlide = await within(Carousel).findByRole('img', {
       name: 'Slide 2',
