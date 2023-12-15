@@ -25,7 +25,11 @@
               {{ $t('pages.login.access') }}
             </v-card-subtitle>
           </div>
-          <v-form ref="form" @submit.prevent="submit">
+          <v-form
+            ref="form"
+            class="d-flex flex-column gap-4"
+            @submit.prevent="submit"
+          >
             <alex-inputs-text-field
               :label="$t('pages.login.user')"
               :placeholder="$t('pages.login.userHolder')"
@@ -81,7 +85,6 @@
               block
               size="large"
               type="submit"
-              class="text-none text-green text-body-1"
               theme="dark"
               :disabled="!isValid"
               :loading="logging"
@@ -116,8 +119,8 @@
           <v-btn
             block
             class="card-btn metamask d-flex"
-            @click="metalogin"
             :loading="logging2"
+            @click="metalogin"
           >
             <img src="/images/metamask.png" alt="" />
             <span>{{ $t('pages.login.metamask.btn') }}</span>

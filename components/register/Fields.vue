@@ -28,6 +28,7 @@
         }"
         align="left"
         no-header
+        step-class="d-flex flex-column gap-4"
         :loading="registering"
         @update-loading="(value: boolean) => (registering = value)"
         @on-success="submit"
@@ -35,7 +36,7 @@
         <template
           #controls="{ isFirstStep, onPrevStep, isValid, loading, isLastStep }"
         >
-          <div class="w-100 d-flex justify-end align-end gap-4">
+          <div class="w-100 d-flex justify-end align-end gap-4 mt-4">
             <alex-custom-button
               v-if="!isFirstStep"
               variant="secondary"
@@ -70,7 +71,6 @@
             :placeholder="$t('pages.register.fullNameHolder')"
             name="fullname"
             color="white"
-            class="mb-1"
             theme="dark"
           />
 
@@ -79,7 +79,6 @@
             :placeholder="$t('pages.register.emailHolder')"
             name="email"
             color="white"
-            class="mb-1"
             theme="dark"
           />
 
@@ -89,7 +88,6 @@
             label="CPF"
             name="cpf"
             color="white"
-            class="mb-1"
             theme="dark"
           />
         </template>
@@ -104,8 +102,7 @@
           <alex-inputs-select
             name="yourRole"
             theme="dark"
-            class="my-3 text-secondary"
-            hide-selected
+            class="text-secondary"
             :label="$t('pages.register.userType')"
             :items="[
               {
@@ -122,7 +119,6 @@
             v-model:search="search"
             name="institution"
             theme="dark"
-            autocomplete="off"
           />
         </template>
         <template #step3="{ values }">
@@ -138,7 +134,6 @@
             :placeholder="$t('pages.register.usernameHolder')"
             name="username"
             color="white"
-            class="my-3"
             theme="dark"
             :hint="`${usernameUrl}${values.username || ''}`"
             persistent-hint
@@ -151,7 +146,6 @@
             :type="passwordVisible ? 'text' : 'password'"
             name="password"
             color="white"
-            class="my-3"
             theme="dark"
             @click:append-inner="passwordVisible = !passwordVisible"
           />
@@ -159,7 +153,6 @@
           <alex-inputs-text-field
             name="confirmPassword"
             color="white"
-            class="my-3"
             theme="dark"
             :label="$t('pages.register.confirmPassword')"
             :placeholder="$t('pages.register.confirmPasswordHolder')"
