@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-text-field">
+  <div class="alex-text-field" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -18,51 +18,46 @@
       v-model="value"
       color="primary--2"
       rounded="lg"
-      role="textfield"
+      hide-details="auto"
       clear-icon="mdi-close"
       :error-messages="errorMessage"
       :class="theme"
       :disabled="disabled"
       v-bind="$attrs"
-    />
+    ></v-text-field>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useField } from 'vee-validate';
-
-const props = defineProps({
-  label: {
-    type: String,
-    default: '',
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
-  info: {
-    type: String,
-    default: '',
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  theme: {
-    type: String,
-    default: 'light',
-  },
-  name: { type: String, required: true },
-  modalValue: {
-    type: String || Number || Boolean || undefined,
-    default: undefined,
-  },
+import { useField, YupSchema } from 'vee-validate';
+defineOptions({
+  inheritAttrs: false,
 });
 
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.modalValue,
+interface TextFieldProps {
+  modelValue?: string | number | boolean | unknown[] | any;
+  name: string;
+  label?: string;
+  required?: boolean;
+  info?: string;
+  disabled?: boolean;
+  theme?: 'light' | 'dark';
+  schema?: YupSchema;
+}
+
+const props = withDefaults(defineProps<TextFieldProps>(), {
+  disabled: false,
+  theme: 'light',
+  info: undefined,
+  label: undefined,
+  modelValue: undefined,
+  schema: undefined,
+});
+
+const { value, errorMessage } = useField(() => props.name, props.schema, {
   syncVModel: true,
 });
+
 const textColor = computed(() => {
   if (props.theme === 'light') {
     return props.disabled ? 'gray-300' : 'gray-800';

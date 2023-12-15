@@ -36,7 +36,10 @@
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">
           <alex-inputs-stepper
             :steps-config="stepsConfig"
-            step-class="d-flex flex-column max-height-stepper pa-6 gap-4"
+            :step-class="[
+              'd-flex flex-column max-height-stepper pa-6',
+              stepClass,
+            ]"
             stepper-indicator-class="px-6 pt-6 pb-1"
             @on-success="emits('onMainAction')"
           >
@@ -49,7 +52,7 @@
                 isLastStep,
                 isValid,
                 onPrevStep,
-                submitLoading,
+                loading,
               }"
             >
               <slot
@@ -58,7 +61,7 @@
                 :emit-main-action="() => emits('onMainAction')"
                 :emit-secondary-action="() => emits('onSecondaryAction')"
                 :is-valid="isValid"
-                :submit-loading="submitLoading"
+                :submit-loading="loading"
               />
               <alex-custom-dialog-footer
                 v-else-if="!hasFooter && !noFooter"
@@ -75,7 +78,7 @@
                     "
                     :append-icon="!isLastStep ? 'mdi-chevron-right' : undefined"
                     :prepend-icon="isLastStep ? 'mdi-plus' : undefined"
-                    :loading="submitLoading"
+                    :loading="loading"
                   />
                 </template>
                 <template #secondarySlotButton>
@@ -126,6 +129,7 @@ interface HeaderProps {
   secondaryButtonText?: string;
   noFooter?: boolean;
   stepper?: boolean;
+  stepClass?: unknown[] | string;
   stepsConfig?: Record<string, Partial<StepsConfig>>;
 }
 const props = withDefaults(defineProps<HeaderProps>(), {
@@ -138,6 +142,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   bodyClasses: undefined,
   stepper: false,
   stepsConfig: undefined,
+  stepClass: undefined,
 });
 const emits = defineEmits([
   'update:modelValue',

@@ -21,6 +21,7 @@
       variant="outlined"
       no-resize
       role="textarea"
+      hide-details="auto"
       clear-icon="mdi-close"
       :class="theme"
       :error-messages="errorMessage"
@@ -75,7 +76,6 @@ const textColor = computed(() => {
   }
 
   .v-field__input {
-    overflow: hidden;
     color: rgb(var(--v-theme-gray-300));
     border-color: rgb(var(--v-theme-gray-400));
     text-overflow: ellipsis !important;
@@ -84,6 +84,7 @@ const textColor = computed(() => {
     padding-top: 16px !important;
     padding-bottom: 16px !important;
     font-style: normal !important;
+    height: 102px;
     line-height: 135% !important;
     letter-spacing: 0.32px !important;
     border-width: 5px !important;
@@ -136,6 +137,19 @@ const textColor = computed(() => {
   .v-field--error > .v-field__outline,
   .v-input--error .v-messages__message {
     color: rgb(var(--v-theme-error-0)) !important;
+  }
+
+  textarea::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  textarea::-webkit-scrollbar-thumb {
+    background-color: #abb2b9;
+    border-radius: 999px;
+  }
+
+  textarea::-webkit-scrollbar-track {
+    background-color: rgb(var(--v-theme-white)) !important;
   }
 }
 </style>

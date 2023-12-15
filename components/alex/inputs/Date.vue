@@ -22,6 +22,7 @@
       class="w-100"
       type="date"
       append-inner-icon="mdi-calendar"
+      hide-details="auto"
       :error-messages="errorMessage"
       :disabled="disabled"
       :required="required"
