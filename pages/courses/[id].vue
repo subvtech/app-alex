@@ -2,7 +2,14 @@
   <div v-if="course">
     <alex-custom-banner
       :can-edit="canEdit"
-      :cover-picture="{ id: course.id, ...course.cover_image.data.attributes }"
+      :cover-picture="
+        course.cover_image.data
+          ? {
+              id: course.cover_image.data.id,
+              ...course.cover_image.data.attributes,
+            }
+          : null
+      "
       :profile-picture-size="24"
       :profile-picture="avatar"
       :userId="id"
@@ -34,9 +41,9 @@
     <div class="course-page d-flex w-100 gap-6">
       <alex-custom-card
         title=""
+        class="left-block"
         no-header
         full-width
-        sizing-class="px-12"
         :align-content="'align-center'"
       >
         <template #content>
@@ -95,7 +102,7 @@
         </template>
       </alex-custom-card>
 
-      <div class="d-flex flex-column gap-6">
+      <div class="d-flex flex-column w-100 gap-6">
         <alex-custom-card
           :title="$t('pages.courses.details')"
           :show-icon="false"
@@ -309,9 +316,14 @@ watch(invitationLink, () => {
 });
 </script>
 <style scoped lang="scss">
-@media (max-width: 750px) {
+
+@media (max-width: 850px) {
   .course-page {
     flex-direction: column;
+
+    .left-block {
+      padding-inline: 24px !important;
+    }
   }
 }
 

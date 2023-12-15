@@ -11,6 +11,8 @@
         hideDividers ? '' : 'border-bottom',
         sizingClass ?? (noHeader ? 'px-6' : isNested ? '' : 'px-6'),
       ]"
+
+   
     >
       <div class="foretitle d-flex py-6">
         <span :class="isEditing && showTooltip ? 'min-width' : ''">{{
@@ -19,35 +21,41 @@
         <a v-if="href" :href="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
         </a>
-        <alex-custom-tooltip v-if="showTooltip" show-icon :text="tooltip" />
+        <alex-custom-tooltip
+          v-if="showTooltip"
+          show-icon
+          :text="tooltip"
+          :extra-classes="tooltipExtraClass"
+        ></alex-custom-tooltip>
       </div>
 
-      <div v-if="isEditing" class="buttons d-flex justify-end">
-        <v-btn
+      <div
+        v-if="isEditing"
+        class="buttons d-flex flex-wrap justify-end"
+        :class="smallButtons ? 'small-buttons' : ''"
+      >
+        <alex-custom-button
           class="btn"
-          color="accent"
           @click="cancelledAction"
-          variant="outlined"
+          variant="secondary"
         >
-          {{ $t('components.profile.settings.cancel') }}</v-btn
+          {{ $t('components.profile.settings.cancel') }}</alex-custom-button
         >
-        <v-btn class="btn" color="accent" @click="savedAction" type="submit">
-          {{ $t('components.profile.settings.save') }}
-        </v-btn>
+        <alex-custom-button class="btn" @click="savedAction" variant="primary">
+          {{ $t('components.profile.settings.save') }}</alex-custom-button
+        >
 
-        <v-btn
-          class="hide rounded-circle"
-          color="accent"
-          @click="cancelledAction"
-          variant="outlined"
+        <alex-custom-button
+          class="small"
           icon="mdi-cancel"
+          variant="secondary"
+          @click="cancelledAction"
         />
-        <v-btn
-          class="hide rounded-circle"
+        <alex-custom-button
+          class="small"
           icon="mdi-check"
-          color="accent"
-          @click="save"
-          type="submit"
+          variant="primary"
+          @click="savedAction"
         />
       </div>
       <div
@@ -109,6 +117,9 @@ const props = defineProps({
   sizingClass: {
     type: String as PropType<SizingClass>,
   },
+  tooltipExtraClass: {
+    type: String,
+  },
   alignContent: {
     type: String as PropType<'align-center' | 'align-start' | 'align-end'>,
   },
@@ -120,6 +131,10 @@ const props = defineProps({
     default: true,
   },
   showTooltip: {
+    type: Boolean,
+    default: false,
+  },
+  smallButtons: {
     type: Boolean,
     default: false,
   },
@@ -195,34 +210,30 @@ type SizingClass =
 
   .buttons {
     gap: 8px;
-  }
-  .btn {
-    text-transform: none !important;
-    height: 36px;
-    padding-inline: 12px;
-  }
-  .hide {
-    display: none;
+    .small {
+      display: none;
+    }
+    .btn {
+      display: flex;
+      text-transform: none !important;
+      height: 36px;
+      padding-inline: 12px;
+    }
+    &.small-buttons {
+     
+      .small {
+        display: flex;
+      }
+
+      .btn {
+        display: none;
+      }
+    }
   }
 }
 @media (max-width: 800px) {
   #Card {
     width: 100%;
-  }
-}
-
-@media (max-width: 400px) {
-  #Card {
-    .buttons {
-      .btn {
-        display: none;
-      }
-      .hide {
-        display: flex;
-        height: 36px !important;
-        width: 36px !important;
-      }
-    }
   }
 }
 </style>

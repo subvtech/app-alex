@@ -9,11 +9,10 @@
         placeholder
         role="custom-cover"
       />
-      <NuxtImg
+      <img
         v-else
         class="cover"
-        src="https://picsum.photos/2200/500"
-        placeholder
+        src="/images/alex-banner.svg"
         role="default-cover"
       />
       <div class="w-100 h-25" :class="showShade ? 'shade' : ''" />

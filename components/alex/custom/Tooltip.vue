@@ -8,7 +8,7 @@
       width="24"
       height="24"
     />
-    <div v-if="text" class="px-4">
+    <div v-if="text" class="px-4" :class="extraClasses ?? ''">
       <span>{{ text }}</span>
     </div>
   </div>
@@ -23,6 +23,9 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  extraClasses: {
+    type: String,
+  }
 });
 </script>
 

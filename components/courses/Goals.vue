@@ -7,8 +7,10 @@
     :is-editing="isEditing"
     @toggle:is-editing="isEditing = !isEditing"
     :save="onSave"
+    :tooltip-extra-class="isEditing ? 'mt-3' : ''"
     :cancel="onCancel"
     :tooltip="tooltip"
+    :small-buttons="withinBreakpoint"
   >
     <template #content>
       <alex-custom-empty-placeholder
@@ -90,7 +92,7 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['update']);
-
+const { currentWidth } = useNavigationDrawer();
 type Keyword = { text: string; id?: number };
 
 const updateArray = ref<
@@ -107,6 +109,12 @@ const isEditing = toRef(props.canEdit);
 const rerender = ref(0);
 const filteredVerbs = ref<{ text: string; id: number }[]>([]);
 const dataCopy = toRef([...props.data]);
+
+const withinBreakpoint = computed(
+  () =>
+    (currentWidth.value > 850 && currentWidth.value < 1000) ||
+    currentWidth.value < 450,
+);
 
 onBeforeMount(async () => {
   filteredVerbs.value = (
