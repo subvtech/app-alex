@@ -1,136 +1,168 @@
 <template>
-  <v-autocomplete
-    v-model="selectedUsers"
-    v-model:search-input="search"
-    :items="users"
-    :loading="loadingUsers"
-    :label="$t('components.usersAutocomplete.label')"
-    prepend-inner-icon="mdi-plus-circle"
-    append-icon="mdi-magnify"
-    outlined
-    dense
-    chips
-    multiple
-    hide-no-data
-    hide-selected
-    cache-items
-    item-value="id"
-    :item-text="(item) => `${item.fullname} ${item.email}`"
-    :reverse="false"
-    small-chips
-    @input="onInput"
-  >
-    <template #chip="data">
-      <v-chip v-bind="data.props" close small @click:close="remove(data.item)">
-        <v-avatar left>
-          <v-img
-            v-if="data.item.raw.attributes.avatar"
-            :src="data.item.raw.attributes.avatar.url"
-          ></v-img>
-          <v-img v-else src="/images/not-found.png"></v-img>
-        </v-avatar>
-        {{ getReducedName(data.item.raw.attributes.fullname) }}
-      </v-chip>
-    </template>
-    <template #item="data">
-      <v-list-item-avatar>
-        <img
-          v-if="data.item.raw.attributes.avatar"
-          :src="data.item.raw.attributes.avatar.url"
+  <div class="alex-autocomplete" role="select">
+    <div v-if="label" class="d-flex mb-2 text-blue">
+      <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
+      <p class="text-body-1" :class="`text-${textColor}`">
+        {{ label }}
+      </p>
+      <v-icon
+        v-if="info"
+        class="ml-1 align-self-center"
+        size="20"
+        :title="info"
+        :color="textColor"
+        >mdi-information-outline</v-icon
+      >
+    </div>
+    <v-autocomplete
+      v-bind="$attrs"
+      v-model="value"
+      color="primary--2"
+      rounded="lg"
+      variant="outlined"
+      role="select"
+      clear-icon="mdi-close"
+      hide-details
+      no-data-text="Nenhum item encontrado!"
+      :class="theme"
+      :error-messages="errorMessage"
+      :disabled="disabled"
+    >
+      <!-- Bind all slots  -->
+      <template v-for="(_, slot) in $slots" #[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
+      <!-- Default item slot -->
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item
+          :key="index"
+          :text="item.title"
+          v-bind="propsItem"
+          :theme="theme"
+          :selected="value === item.title"
         />
-        <img v-else src="/images/not-found.png" />
-      </v-list-item-avatar>
-      <v-list-item-content>
-        <v-list-item-title>
-          {{ data.item.raw.attributes.fullname }}
-        </v-list-item-title>
-        <v-list-item-subtitle>
-          {{ data.item.raw.attributes.email }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </template>
-  </v-autocomplete>
+      </template>
+      <template #chip />
+    </v-autocomplete>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { stringify } from 'qs';
-import { User } from '../../../models/user.model';
+import { useField } from 'vee-validate';
 
-const user = useStrapiUser();
-const { find } = useStrapi();
+interface AutoCompleteProps {
+  modelValue?: string | number | boolean | unknown[] | any;
+  name: string;
+  label?: string;
+  required?: boolean;
+  info?: string;
+  disabled?: boolean;
+  theme?: 'light' | 'dark';
+}
 
-const props = defineProps({
-  value: {
-    type: Array<number>,
-    required: true,
-  },
+const props = withDefaults(defineProps<AutoCompleteProps>(), {
+  modelValue: undefined,
+  disabled: false,
+  theme: 'light',
+  info: undefined,
+  label: undefined,
 });
-const { value } = toRefs(props);
 
-const emit = defineEmits(['input']);
+const { value, errorMessage } = useField(() => props.name, undefined, {
+  syncVModel: true,
+});
 
-const users = ref<Strapi4ResponseData<User>[]>([]);
-const selectedUsers: globalThis.Ref<number[]> = ref([]);
-const loadingUsers = ref(false);
-const search = ref('');
-
-watch(
-  () => search,
-  async () => await searchUsers(search.value),
-);
-watch(
-  () => value,
-  async () => await loadUsers(),
-);
-
-onMounted(async () => await loadUsers());
-
-const loadUsers = async () => {
-  if (value.value && value.value.length) {
-    selectedUsers.value = value.value;
-    await searchUsers('', value.value);
+const textColor = computed(() => {
+  if (props.theme === 'light') {
+    return props.disabled ? 'gray-300' : 'gray-800';
   }
-};
-
-const searchUsers = async (search = '', ids: number[] = []) => {
-  if ((!search || search.length < 3) && !ids.length) return;
-  loadingUsers.value = true;
-
-  const queryIds = { _where: { id: ids } };
-
-  const querySearch = {
-    _where: {
-      id_ne: user.value!.id,
-      _or: [{ email_contains: search }, { fullname_contains: search }],
-    },
-  };
-
-  const query = stringify(ids.length ? queryIds : querySearch);
-
-  users.value = (await find<User>(`/users?${query}&_limit=20`)).data;
-
-  loadingUsers.value = false;
-};
-const remove = (item) => {
-  selectedUsers.value = selectedUsers.value.filter((u) => u !== item.id);
-};
-
-const getReducedName = (fullname = '') => {
-  if (!fullname) return '';
-  const names = fullname.split(' ');
-
-  if (names.length === 1) {
-    return fullname;
+  if (props.theme === 'dark') {
+    return props.disabled ? 'gray-300' : 'white';
   }
-
-  return `${names[0]} ${names[names.length - 1]}`;
-};
-
-const onInput = () => {
-  search.value = '';
-  emit('input', selectedUsers.value);
-};
+});
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss">
+.alex-autocomplete {
+  &.v-theme--mainTheme {
+    --v-border-opacity: 1 !important;
+    --v-high-emphasis-opacity: 1 !important;
+    --v-medium-emphasis-opacity: 1 !important;
+    --v-disabled-opacity: 1 !important;
+    --v-border-color: rgb(var(--v-theme-gray-400));
+  }
+
+  &.v-field__input {
+    overflow: hidden;
+    color: rgb(var(--v-theme-gray-300));
+    border-color: rgb(var(--v-theme-gray-400));
+    text-overflow: ellipsis !important;
+    font-family: Sen !important;
+    font-size: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    font-style: normal !important;
+    line-height: 135% !important;
+    letter-spacing: 0.32px !important;
+    border-width: 5px !important;
+  }
+
+  &.v-field--disabled > div > i,
+  &.v-field--disabled > .v-field__field > .v-field__input,
+  &.v-input--disabled > .v-input__details {
+    color: rgb(var(--v-theme-gray-300)) !important;
+  }
+
+  &.v-field:hover:not(.v-field--active):not(.v-field--error)
+    > .v-field__outline {
+    color: rgb(var(--v-theme-gray-800)) !important;
+  }
+
+  &.v-input__details {
+    padding-inline-start: 0 !important;
+  }
+
+  &.v-input__details > .v-messages > .v-messages__message {
+    font-size: 14px !important;
+    color: rgb(var(--v-theme-gray-600));
+  }
+
+  &.light .v-field__outline {
+    color: rgb(var(--v-theme-gray-300));
+  }
+
+  &.light .v-field--dirty > .v-field__field > .v-field__input {
+    color: rgb(var(--v-theme-gray-800)) !important;
+  }
+
+  &.light .v-field > div > i {
+    color: rgb(var(--v-theme-gray-600)) !important;
+  }
+
+  &.dark .v-field__outline {
+    color: var(--gray-400);
+  }
+
+  &.dark .v-field--dirty > .v-field__field > .v-field__input {
+    color: #fff !important;
+  }
+
+  &.dark .v-field > div > i {
+    color: rgb(var(--v-theme-gray-400)) !important;
+  }
+
+  &.v-field--error > .v-field__outline,
+  .v-input--error .v-messages__message {
+    color: rgb(var(--v-theme-error-0)) !important;
+  }
+  & .v-autocomplete__selection {
+    display: none;
+  }
+  .v-autocomplete.v-field--dirty.v-autocomplete__selection {
+    margin-inline-end: 0 !important;
+  }
+  .v-list-item--active {
+    background-color: rgb(var(--v-theme-gray-blue)) !important;
+  }
+}
+</style>

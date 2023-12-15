@@ -153,8 +153,8 @@ export const useFormRules = (formData?: FormDataType) => {
   const socialsSchema = yup.object({
     name: yup
       .string()
-      .min(3, i18n.t('rules.name.min'))
-      .max(20, i18n.t('rules.name.max'))
+      .min(3, i18n.t('rules.name.min', { min: 3 }))
+      .max(20, i18n.t('rules.name.max', { min: 20 }))
       .required()
       .trim(),
 
@@ -174,6 +174,28 @@ export const useFormRules = (formData?: FormDataType) => {
       .required()
       .trim(),
   });
+  const createCourseRules = yup.object({
+    name: yup
+      .string()
+      .required(i18n.t('rules.name.required'))
+      .min(4, ({ min }) => i18n.t('rules.name.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.name.max', { max }))
+      .trim(),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+    class: yup
+      .string()
+      .required(i18n.t('rules.class.required'))
+      .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
+      .trim(),
+    startDate: yup.date().required(i18n.t('rules.startDate.required')),
+    endDate: yup.date().required(i18n.t('rules.endDate.required')),
+  });
 
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
@@ -188,8 +210,8 @@ export const useFormRules = (formData?: FormDataType) => {
     socialsSchema,
     nameRules: yup
       .string()
-      .min(3, i18n.t('rules.name.min'))
-      .max(20, i18n.t('rules.name.max'))
+      .min(3, ({ min }) => i18n.t('rules.name.min', { min }))
+      .max(20, ({ max }) => i18n.t('rules.name.max', { max }))
       .matches(/^((?!instagram\b)(?!linkedin\b)(?!youtube\b).)*/)
       .required(i18n.t('rules.name.required'))
       .trim(),
@@ -200,5 +222,6 @@ export const useFormRules = (formData?: FormDataType) => {
       .required()
       .trim(),
     loginSchema,
+    createCourseRules,
   };
 };

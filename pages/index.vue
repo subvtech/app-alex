@@ -8,7 +8,11 @@
         name-second-button="Cancelar"
         stepper
         :steps-config="{
-          step1: { title: 'Informações', subtitle: 'Básicas' },
+          step1: {
+            title: 'Informações',
+            subtitle: 'Básicas',
+            scheme: createCourseRules,
+          },
           step2: { title: 'Mídia', subtitle: 'Descritiva' },
           step3: { title: 'Membros', subtitle: 'Participantes' },
           step4: { title: 'Encontros', subtitle: 'Síncronos' },
@@ -27,7 +31,6 @@
             density="compact"
             name="name"
             label="Como vai se chamar seu Curso?"
-            hide-details
             placeholder="Digite o nome do Curso"
             required
           />
@@ -36,30 +39,32 @@
             name="description"
             label="Do que se trata seu curso?"
             placeholder="Digite uma descrição do Curso"
-            hide-details
             theme="light"
             required
           />
           <alex-inputs-text-field
             density="compact"
-            name="classe"
+            name="class"
             label="Digite o nome da turma"
             placeholder="Digite o nome da turma"
-            hide-details
             required
           />
           <div class="w-100 d-flex gap-4">
             <alex-inputs-date
               v-model="startDate"
-              name="startdate"
+              name="startDate"
               label="Quando iniciará o curso?"
               required
+              class="w-100"
+              density="compact"
             />
             <alex-inputs-date
               v-model="endDate"
+              density="compact"
               name="endDate"
               required
               label="Quando terminará o curso?"
+              class="w-100"
             />
           </div>
         </template>
@@ -72,8 +77,9 @@
 </template>
 <script setup lang="ts">
 const dialogStepper = ref(false);
-const startDate = ref();
-const endDate = ref();
+const startDate = ref<Date>();
+const endDate = ref<Date>();
+const { createCourseRules } = useFormRules();
 definePageMeta({
   middleware: 'auth',
   layout: 'components',

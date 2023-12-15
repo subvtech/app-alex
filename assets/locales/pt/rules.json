@@ -56,12 +56,33 @@
   },
   "name": {
     "required": "Nome é necessário",
-    "min": "Mínimo de 3 caracteres",
-    "max": "Máximo de 20 caracteres"
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres"
   },
   "url": {
     "required": "Url é necessário",
     "min": "Mínimo de 4 caracteres",
     "max": "Máximo de 64 caracteres"
+  },
+  "startDate": {
+    "required": "Data de início é obrigatório"
+  },
+  "endDate": {
+    "required": "Data de término é obrigatório"
+  },
+  "class": {
+    "required": "Turma é obrigatório",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres"
+  },
+  "description": {
+    "required": "Descrição é obrigatório",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres"
+  },
+  "title": {
+    "required": "Título é obrigatório",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres"
   }
 }

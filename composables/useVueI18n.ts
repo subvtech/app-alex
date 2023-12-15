@@ -71,6 +71,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'competences',
     'tagCombobox',
     'dialog',
+    'date',
     'usersAutocomplete',
     'courses/editor',
     'courses/goals',

@@ -152,6 +152,16 @@ const menus = [
         to: '/components/inputs/text-field',
       },
       {
+        icon: 'mdi-card-text-outline',
+        title: 'Textarea',
+        to: '/components/inputs/text-area',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Date Field',
+        to: '/components/inputs/date',
+      },
+      {
         icon: 'mdi-view-dashboard-outline',
         title: 'Card projetos e cursos',
         to: '/components/learning-plans/card',
