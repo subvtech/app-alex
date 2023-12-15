@@ -8,7 +8,7 @@ describe('AvatarGroup component', () => {
     const { unmount } = await renderSuspended(AvatarGroup, {
       props: {
         size: 36,
-        people: [
+        avatarItems: [
           {
             name: 'Jorge Lima',
             image: {
@@ -45,8 +45,7 @@ describe('AvatarGroup component', () => {
     const { unmount } = await renderSuspended(AvatarGroup, {
       props: {
         size: 36,
-        order: 'LAST_ON_TOP',
-        people: [
+        avatarItems: [
           {
             name: 'Jorge Lima',
             image: {
@@ -66,16 +65,16 @@ describe('AvatarGroup component', () => {
       },
     });
     const avatar = await screen.findByTestId('alex-avatar-group');
-    screen.debug(avatar);
     expect(avatar.getAttribute('class')).not.toContain('flex-row-reverse');
     unmount();
   });
+
   it('should render the to way direction when props order is equals "FIRST_ON_TOP"', async () => {
     const { unmount } = await renderSuspended(AvatarGroup, {
       props: {
         size: 36,
         order: 'FIRST_ON_TOP',
-        people: [
+        avatarItems: [
           {
             name: 'Jorge Lima',
             image: {
@@ -98,12 +97,12 @@ describe('AvatarGroup component', () => {
     expect(avatar.getAttribute('class')).toContain('flex-row-reverse');
     unmount();
   });
+
   it('should render the right number of childs', async () => {
     const { unmount } = await renderSuspended(AvatarGroup, {
       props: {
         size: 36,
-        order: 'FIRST_ON_TOP',
-        people: [
+        avatarItems: [
           {
             name: 'Jorge Lima',
             image: {
@@ -126,14 +125,15 @@ describe('AvatarGroup component', () => {
             name: 'Jorge Lima',
           },
         ],
-        max: 3,
+        max: 4,
       },
     });
-    const avatar = await screen.findByTestId('alex-avatar-group');
-    expect(avatar.children.length).equals(4);
+    const avatar = await screen.findAllByTestId('alex-avatar');
+    expect(avatar.length).equals(4);
     unmount();
   });
-  it('should throw no error when no people was passed in props', async () => {
+
+  it('should throw no error when no avatars was passed in props', async () => {
     const { unmount } = await renderSuspended(AvatarGroup, {
       props: {},
     });
