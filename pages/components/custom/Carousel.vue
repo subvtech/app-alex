@@ -263,7 +263,7 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-
+definePageMeta({ layout: 'components' });
 const slidesFirstExample = ref([
   {
     title: 'Slide 1',
