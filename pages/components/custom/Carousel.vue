@@ -34,12 +34,11 @@
     <h2 class="text-h3 text-gray-800">Uso do Componente</h2>
     <p class="text-subtitle-2 text-gray-500">
       O componente pode ser utilizado como apenas um carrossel de imagens fixas
-      ou como um carousel customizável, onde o usuário pode adicionar, remover e
-      editar os slides, para o primeiro caso basta passar um array
+      ou como um carousel totalmente editável, onde o usuário pode adicionar,
+      remover e editar os slides, para o primeiro caso basta passar um array
       <strong>slides</strong> com as imagens em conjunto com a propriedade
-      <strong>readonly</strong>
-      como valor <strong class="text-red">false</strong>, para o segundo caso
-      deve-se utilizar um array vazio e atualizar o banco através do evento
+      <strong>readonly</strong>, para o segundo caso deve-se utilizar um array
+      vazio e atualizar o banco através do evento
       <strong>@slides-changed="(slide)"</strong>
     </p>
     <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
@@ -96,7 +95,12 @@
                   text="Image | Youtube | Vimeo | FileImage | FileVideo"
                 >
                   <template #activator="{ props }">
-                    <span v-bind="props">String</span>
+                    <span v-bind="props">
+                      String
+                      <v-icon size="small" color="gray-=500"
+                        >mdi-information-outline</v-icon
+                      >
+                    </span>
                   </template>
                 </v-tooltip>
               </td>
@@ -115,7 +119,7 @@
       </div>
     </div>
     <div class="w-100">
-      <alex-custom-carousel read-only :slides="slidesFirstExample" />
+      <alex-custom-carousel :slides="slidesFirstExample" read-only />
     </div>
     <div class="w-100">
       <div
@@ -187,10 +191,7 @@
       alguma alteração nos slides
     </p>
     <div class="w-100">
-      <alex-custom-carousel
-        :slides="slidesSecondExample"
-        @slides-changed="(slide) => console.log(slide)"
-      />
+      <alex-custom-carousel :slides="slidesSecondExample" />
     </div>
     <div class="w-100">
       <div
@@ -231,7 +232,7 @@
               {{
                 ` 
   &lt;script setup&gt;
-  ${exampleScripts[1]}
+  ${exampleScripts[2]}
   &lt;/script&gt;
               `
               }}
@@ -240,7 +241,7 @@
               class="copy-icon"
               variant="text"
               color="gray-400"
-              @click="copyToClipboard(exampleScripts[1], 'firstScript')"
+              @click="copyToClipboard(exampleScripts[2], 'firstScript')"
             >
               <v-icon
                 v-if="copiedValue == 'firstScript'"
@@ -262,11 +263,12 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
 const slidesFirstExample = ref([
   {
     title: 'Slide 1',
     type: 'youtube',
-    image: 'https://img.youtube.com/vi/AUci5aV2y0w/0.jpg',
+    image: 'https://img.youtube.com/vi/AUci5aV2y0w/maxresdefault.jpg',
     video: 'https://www.youtube.com/watch?v=AUci5aV2y0w',
   },
   {
@@ -302,7 +304,7 @@ const slidesFirstExample = ref([
   {
     title: 'Slide 8',
     type: 'image',
-    image: 'https://picsum.photos/200/121',
+    image: 'https://picsum.photos/2000/2000',
   },
   {
     title: 'Slide 9',
@@ -360,6 +362,15 @@ const slides = ref([
   },
 ])
 `,
+  `
+  import { ref } from 'vue';
+  const slides = ref([]);
+  const handleSlidesChange = (slide) => {
+    //salve o array de slides no banco
+  };
+  `,
+  `
+`,
 ];
 
 const exampleTemplates = [
@@ -368,7 +379,7 @@ const exampleTemplates = [
       <alex-custom-carousel read-only :slides="slides" />
   `,
   `
-      <alex-custom-carousel :slides="slides" @slides-changed="(slide => handleSlidesChange(slide))" />
+      <alex-custom-carousel :slides="slides" @slides-changed="(slide) => handleSlidesChange(slide)" />
   `,
 ];
 

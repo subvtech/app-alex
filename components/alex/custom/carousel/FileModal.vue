@@ -1,14 +1,17 @@
 <template>
   <alex-custom-dialog
     v-model="dialog"
-    title="Carregar Mídia"
-    name-main-button="Adicionar"
-    name-second-button="Cancelar"
+    :title="$t('components.carousel.dialogTitle')"
+    :secondary-button-text="$t('components.carousel.dialogSecondaryButton')"
+    :main-button-text="$t('components.carousel.dialogMainButton')"
+    :no-footer="editSlideMode == 'edit'"
     @on-main-action="() => upload()"
-    @on-secondary-action="() => console.log('second')"
+    @on-secondary-action="() => (dialog = false)"
   >
     <v-container class="px-3">
-      <p class="text-gray-800 text-body-1">Como deseja adicionar a mídia?</p>
+      <p class="text-gray-800 text-body-1">
+        {{ $t('components.carousel.mediaType') }}
+      </p>
       <alex-inputs-radio-button
         v-model="addMediaType"
         style="margin-left: -10px"
@@ -54,16 +57,16 @@
               v-if="!fileDrop"
               class="text-h5 font-weight-bold text-gray-600 text-center"
             >
-              Arraste e solte um arquivo ou
+              {{ $t('components.carousel.fileDropText') }}
               <strong class="text-accent text-decoration-underline">
-                clique para buscar
+                {{ $t('components.carousel.fileDropHighlightedText') }}
               </strong>
             </p>
             <p
               v-else
               class="text-h5 font-weight-bold text-secondary-0 text-center"
             >
-              Solte o Arquivo para adicioná-lo
+              {{ $t('components.carousel.fileDropActionText') }}
             </p>
           </div>
         </div>
@@ -71,7 +74,7 @@
           <div class="d-flex w-100">
             <alex-inputs-text-field
               v-model="urlInput"
-              placeholder="Insira o link"
+              :placeholder="$t('components.carousel.linkPlaceholder')"
               variant="outlined"
               :error-messages="errors"
               :rules="urlRules"
@@ -107,9 +110,10 @@
                   />
 
                   <p
+                    style="max-width: 60%"
                     class="text-h5 font-weight-bold text-gray-600 text-center mt-1"
                   >
-                    Sua imagem <br />aparecerá Aqui!
+                    {{ $t('components.carousel.linkPreviewText') }}
                   </p>
                 </div>
                 <div
@@ -355,6 +359,7 @@ const addUrl = (url) => {
 
 .loading {
   position: absolute;
+  z-index: -1;
 }
 
 .url-preview-enter-active,

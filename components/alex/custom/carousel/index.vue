@@ -38,19 +38,16 @@
       >
         <template #content>
           <div v-if="!readOnly" class="ma-2 config-icon">
-            <v-btn
-              color="grey"
-              variant="text"
+            <alex-custom-button
+              color="gray-700"
+              class="text-green"
+              icon="mdi-cog"
+              style="
+                background-color: rgba(0, 0, 0, 0.25) !important;
+                z-index: 0 !important;
+              "
               @click="openAddSlidesDialog(-1, slides)"
-            >
-              <v-icon
-                size="large"
-                icon="mdi-cog"
-                class="rounded-lg pa-4"
-                style="background-color: #ffffff94; z-index: 0"
-                color="gray-700"
-              />
-            </v-btn>
+            />
           </div>
           <video-player
             v-if="slide.type.includes('File') && slide.video"
@@ -108,6 +105,7 @@
       </div>
       <vueper-slides
         ref="vueperslides2"
+        role="slider"
         class="no-shadow thumbnails-container slides-track-container"
         :class="slides.length == 0 ? 'w-0' : 'w-100'"
         :visible-slides="
@@ -141,15 +139,15 @@
       >
         <template #arrow-left>
           <alex-custom-button
-            color="white"
+            color="gray-600"
             icon="mdi-chevron-left"
-            class="bg-white rounded-lg"
+            class="bg-white rounded-lg ml-2"
             variant="text"
           ></alex-custom-button>
         </template>
         <template #arrow-right>
           <alex-custom-button
-            color="white"
+            color="gray-600"
             icon="mdi-chevron-right"
             class="bg-white rounded-lg"
             variant="text"
@@ -158,7 +156,10 @@
         <vueper-slide
           v-for="(slide, i) in slides"
           :key="i"
+          role="img"
+          :aria-label="slide.title"
           class="slide-track-item"
+          style="max-width: 200px"
           :image="
             slide.type.includes('File')
               ? uploadBaseUrl + slide.image
@@ -171,26 +172,35 @@
           "
         >
           <template #content>
-            <div v-if="!readOnly" class="ma-2">
-              <v-btn
-                size="small"
-                variant="text"
-                color="green"
+            <div v-if="!readOnly" class="ma-2 d-flex align-center justify-end">
+              <alex-custom-button
+                aria-label="edit"
+                elevation="0"
+                color="blue"
+                icon="mdi-pencil-outline"
+                class="bg-gray-blue rounded-lg mr-1"
+                size="28px"
+                variant="secondary"
                 @click="openAddSlidesDialog(i)"
               >
-                <v-icon
-                  icon="mdi-pencil-outline"
-                  class="bg-green-lighten-5 rounded-lg pa-3"
-                  color="green-lighten-1"
-                />
-              </v-btn>
-              <V-icon
-                size="x-small"
-                icon="mdi-trash-can-outline"
-                class="pa-3 bg-red-lighten-5 rounded-lg"
+                <v-icon size="small" icon="mdi-pencil-outline" color="accent" />
+              </alex-custom-button>
+              <alex-custom-button
+                aria-label="delete"
+                elevation="0"
                 color="red"
+                icon="mdi-trash-can-outline"
+                size="28px"
+                variant="secondary"
+                class="bg-gray-blue rounded-lg"
                 @click="deleteSlide(slide)"
-              />
+              >
+                <v-icon
+                  size="small"
+                  color="red"
+                  icon="mdi-trash-can-outline"
+                ></v-icon>
+              </alex-custom-button>
             </div>
             <div v-if="slide.video" class="rounded">
               <div
@@ -231,11 +241,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits({
-  slidesChanged(slides) {
-    return slides;
-  },
-});
+const emit = defineEmits(['slidesChanged']);
 
 const uploadBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
 
@@ -303,7 +309,7 @@ const deleteSlide = (item) => {
     onDeletedSlide(item);
   }
   slides.value.splice(slides.value.indexOf(item), 1);
-  emit('slidesChanged', slides.value);
+  emit('slidesChanged', slides.value, 'teste');
 };
 
 const addSlide = async (slide, index) => {
@@ -375,19 +381,24 @@ const addSlideByUrl = (slide, index) => {
   emit('slidesChanged', slides.value);
 };
 
-const editSlides = (f) => {
-  deleted.forEach((slide) => {
+const editSlides = async (f, deleted, added) => {
+  await deleted.forEach((slide) => {
     deleteSlide(slide);
   });
   slides.value = [...f];
-  added.forEach((slide) => {
-    const index = f.indexOf(slide);
+  await added.forEach((slide) => {
+    const index = slides.value.findIndex(
+      (s) => s.title === slide.title && s.url === slide.url,
+    );
     if (typeof slide.url === 'string') {
       addSlideByUrl(slide, index);
     } else {
       addSlideByFile(slide, index);
     }
   });
+  if (added.length === 0) {
+    emit('slidesChanged', slides.value);
+  }
 };
 
 const onDeletedSlide = async (file) => {
