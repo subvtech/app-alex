@@ -1,12 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
-import { screen, fireEvent } from '@testing-library/vue';
+import { screen, fireEvent, render, within } from '@testing-library/vue';
 import { vuetify } from '../../../plugins/vuetify';
 import StepperComponent from '@/components/alex/inputs/stepper/index.vue';
 
 describe('Stepper component', () => {
-  beforeEach(async () => {
-    await renderSuspended(StepperComponent, {
+  beforeEach(() => {
+    render(StepperComponent, {
       global: {
         plugins: [vuetify],
       },
@@ -36,22 +35,24 @@ describe('Stepper component', () => {
   });
 
   it('should have render slot 2 when click on next button', async () => {
-    const nextButton = await screen.findByText('Avançar');
+    const stepper = await screen.findByRole('stepper');
+    const nextButton = await within(stepper).findByText('Avançar');
     await fireEvent.click(nextButton);
-    const step2 = await screen.findByText('step2');
-    const previousButton = await screen.findByText('Voltar');
+    const step2 = await within(stepper).findByText('step2');
+    const previousButton = await within(stepper).findByText('Voltar');
     expect(step2.innerText).toBe('step2');
     expect(step2.innerText).not.toBe('step1');
     expect(previousButton).not.toBeNull();
   });
 
   it('should have go back to slot 1 when click on previous button', async () => {
-    const nextButton = await screen.findByText('Avançar');
+    const stepper = await screen.findByRole('stepper');
+    const nextButton = await within(stepper).findByText('Avançar');
     await fireEvent.click(nextButton);
-    const previousButton = await screen.findByText('Voltar');
+    const previousButton = await within(stepper).findByText('Voltar');
     expect(previousButton).not.toBeNull();
     await fireEvent.click(previousButton);
-    const step1 = await screen.findByText('step1');
+    const step1 = await within(stepper).findByText('step1');
     expect(step1.innerText).toBe('step1');
     expect(step1.innerText).not.toBe('step2');
   });
