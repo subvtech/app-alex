@@ -18,6 +18,7 @@
       show-shade
       show-menu
       settings-menu
+      show-settings
       distribution="fullname-username-role"
       :selectedOption="selectedOption"
       @select:option="selectOption"
@@ -130,31 +131,7 @@
             />
           </template>
           <template #footer>
-            <alex-custom-card
-              class="w-100"
-              :title="$t('components.meeting.title')"
-              href="dsads"
-              hide-dividers
-              sizing-class="ma-0"
-              is-nested
-              align-content="align-center"
-              :show-icon="false"
-            >
-              <template #content>
-                <course-meeting
-                  date="25/06/1998"
-                  frequency="Everyday"
-                  startHour="14:00"
-                  end-hour="18:00"
-                />
-                <course-meeting
-                  date="25/06/1998"
-                  frequency="Everyday"
-                  startHour="08:00"
-                  end-hour="11:00"
-                />
-              </template>
-            </alex-custom-card>
+            <courses-meetings :data="meetings" />
             <courses-invites
               :enable-invites="course.invite_enabled"
               :duration="course.invitation_duration"
@@ -203,6 +180,7 @@ const { generateUrl } = useInvitationLink();
 const i18n = useI18n();
 const user = ref<any>();
 const course = ref<any>();
+const meetings = ref<any>();
 const generalTags = ref();
 const technicalTags = ref();
 const invitationLink = ref();
@@ -243,6 +221,7 @@ const populate = [
   'course_descriptions',
   'goals.verb',
   'tags',
+  'schedules',
 ];
 
 onBeforeMount(async () => {
@@ -296,12 +275,31 @@ const updateCourse = async (show = true, message?) => {
         // Return the accumulator for the next iteration
         return acc;
       }, []);
+      updateMeetings(course.value.schedules).then();
 
       setMessage(message ?? 'done', 'green', show);
     })
     .catch((err) => {
       setMessage(i18n.t('pages.courses.notfound'), 'red', show);
     });
+};
+
+const updateMeetings = async (schedules) => {
+  meetings.value = (
+    await find('meetings', {
+      filters: {
+        schedule: {
+          id: {
+            $in: schedules.data.map((item) => item.id),
+          },
+        },
+        isExpired: false,
+      },
+      populate: 'schedule',
+      sort: 'date:asc',
+    })
+  ).data;
+
 };
 
 const updateAbout = async (text) => {
@@ -316,7 +314,6 @@ watch(invitationLink, () => {
 });
 </script>
 <style scoped lang="scss">
-
 @media (max-width: 850px) {
   .course-page {
     flex-direction: column;

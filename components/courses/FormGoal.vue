@@ -5,6 +5,10 @@
 
       <app-autocomplete
         v-model="keywordField.value.value"
+        :class="[
+          keywordField.errorMessage.value ? 'error' : '',
+          descriptionErrorOrKeywordError ? '' : 'success',
+        ]"
         :placeholder="$t('components.courses.goals.verb.placeholder')"
         :filtered-items="myVerbs"
         :update-items="updateItems"
@@ -13,13 +17,17 @@
         name="keyword"
         clerable
       />
-      <span>{{ keywordField.errorMessage.value }}</span>
+      <span class="error">{{ keywordField.errorMessage.value }}</span>
     </div>
 
     <alex-inputs-text-field
       v-model="descriptionField.value.value"
       :placeholder="$t('components.courses.goals.description.placeholder')"
       class="w-100"
+      :class="[
+        descriptionField.errorMessage.value ? 'error' : '',
+        descriptionErrorOrKeywordError ? '' : 'success',
+      ]"
       :label="$t('components.courses.goals.description.title')"
       clearable
       :error-messages="descriptionField.errorMessage.value"
@@ -81,7 +89,9 @@ onMounted(() => {
 });
 
 const updateItems = (newValue) => {};
-
+const descriptionErrorOrKeywordError = computed(
+  () => keywordField.errorMessage.value || descriptionField.errorMessage.value,
+);
 watch(
   [
     keywordField.value,
@@ -90,10 +100,7 @@ watch(
     descriptionField.errorMessage,
   ],
   () => {
-    if (
-      keywordField.errorMessage.value ||
-      descriptionField.errorMessage.value
-    ) {
+    if (descriptionErrorOrKeywordError) {
     } else {
       emit('success', {
         id: props.id,
@@ -106,4 +113,9 @@ watch(
 );
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.error {
+  border-color: red;
+  color: red;
+}
+</style>

@@ -117,6 +117,9 @@ function filterTags(
 onBeforeMount(async () => {
   allTags.value = await find('tags', {
     populate: 'verified_by',
+    filters: {
+      isPublic: true,
+    },
   });
   userTagsIds.value = props.userTags.map((item) => item.id);
 
@@ -182,6 +185,7 @@ const onSave = async () => {
             ...item,
             verified_by: props.userId,
             isGeneral: props.isGeneral,
+            isPublic: false,
           }),
         );
       });

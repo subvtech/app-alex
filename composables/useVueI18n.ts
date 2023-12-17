@@ -77,6 +77,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'courses/editor',
     'courses/goals',
     'courses/invites',
+    'courses/meeting',
     'learningPlan/editor',
     'learningPlan/cardTrails',
     'learningPlan/card',

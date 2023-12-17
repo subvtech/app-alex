@@ -1,0 +1,36 @@
+{
+  "every": {
+    "sunday": "Every Sunday",
+    "monday": "Every Monday",
+    "tuesday": "Every Tuesday",
+    "wednesday": "Every Wednesday",
+    "thursday": "Every Thursday",
+    "friday": "Every Friday",
+    "saturday": "Every Saturday",
+    "everyday": "Every Sunday",
+    "weekly": "Weekly: Every {day}",
+    "biweekly": "Biweekly: Every {day}",
+    "monthly": "Monthly: Every {day}"
+  },
+  "starting": "Starting",
+  "single": {
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "everyday": "Sunday"
+  },
+  "of": "of",
+  "to": "to",
+  "at": "at",
+  "interval": "Every {days} days",
+  "weekly": "Weekly: {day}",
+  "biweekly": "Biweekly: {day}",
+  "monthly": "Monthly: {day}",
+  "empty": "It seems that there are no meetings available",
+  "edit": "Edit",
+  "delete": "Delete"
+}
