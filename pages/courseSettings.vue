@@ -2,7 +2,7 @@
   <div class="container d-flex flex-column">
     <div class="config config-title">
       <p>
-        <span class="header-h4"> {{ t('config.title') }}</span>
+        <span class="header-h4"> {{ $t('config.title') }}</span>
       </p>
     </div>
     <div class="config">
@@ -148,76 +148,97 @@
           </p>
         </div>
         <div class="d-flex content-body">
-          <p class="header-h5 text-invite">Convite por link</p>
-          <v-switch
-            v-model:model-value="activeLink"
-            label="Link de convite"
-            color="accent"
-          />
-          <div v-if="activeLink" class="inviteLinks d-flex flex-row">
-            <div class="w-1/4">
-              <label for="select-1" class="body-p1 py-2"
-                >Duração do convite</label
-              >
-              <v-tooltip
-                location="bottom"
-                attach="#linkTooltip"
-                content-class="inviteTooltip"
-                max-width="300px"
-                text="Alterar a duração do convite não vai mudar o tempo restante
+          <div class="container-invite border-bottom">
+            <span class="header-h5 text-invite">Convite por link</span>
+            <v-switch
+              v-model:model-value="activeLink"
+              label="Link de convite"
+              color="accent"
+            />
+
+            <div v-if="activeLink" class="inviteLinks d-flex flex-row">
+              <div class="w-1/4">
+                <label for="select-1" class="body-p1 py-2"
+                  >Duração do convite</label
+                >
+                <v-tooltip
+                  location="bottom"
+                  attach="#linkTooltip"
+                  content-class="inviteTooltip"
+                  max-width="300px"
+                  text="Alterar a duração do convite não vai mudar o tempo restante
                   do endereço atual. Para aplicar a nova duração é necessário
                   gerar um novo convite."
-              >
-                <template v-slot:activator="{ props }">
-                  <v-icon
-                    v-bind="props"
-                    id="linkTooltip"
-                    class="ml-2"
-                    color="#6E7A87"
-                    size="20"
-                    >mdi-information-outline</v-icon
-                  >
-                </template>
-              </v-tooltip>
-              <v-select
-                id="select-1"
-                class="py-2"
-                name=""
-                variant="solo-filled"
-                density="comfortable"
-                required
-                :items="[
-                  '5 minutos',
-                  '15 minutos',
-                  '30 minutos',
-                  '1 hora',
-                  '2 horas',
-                  '8 horas',
-                  '24 horas',
-                ]"
-              >
-              </v-select>
-            </div>
-            <div class="w-3/4">
-              <span class="body-p1 py-2"> Endereço do convite </span>
-              <courses-invites
-                :enable-invites="course.invite_enabled"
-                :invitation-link="invitationLink"
-                href=""
-                no-header
-                class="mt-2 w-full"
-                height="56px"
-              />
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-icon
+                      v-bind="props"
+                      id="linkTooltip"
+                      class="ml-2"
+                      color="#6E7A87"
+                      size="20"
+                      >mdi-information-outline</v-icon
+                    >
+                  </template>
+                </v-tooltip>
+                <v-select
+                  id="select-1"
+                  class="py-2"
+                  name=""
+                  variant="outlined"
+                  density="comfortable"
+                  required
+                  :items="[
+                    '5 minutos',
+                    '15 minutos',
+                    '30 minutos',
+                    '1 hora',
+                    '2 horas',
+                    '8 horas',
+                    '24 horas',
+                  ]"
+                >
+                </v-select>
+              </div>
+              <div class="w-3/4">
+                <span class="body-p1 py-2"> Endereço do convite </span>
+                <courses-invites
+                  :enable-invites="course.invite_enabled"
+                  :invitation-link="invitationLink"
+                  href=""
+                  no-header
+                  class="mt-2 w-full"
+                />
+              </div>
             </div>
           </div>
-          <v-divider class="divider py-4" />
-          <p class="header-h5 text-invite">Convite por e-mail</p>
-          <alex-inputs-text-field
-            name="Mensagem do convite"
-            label="Mensagem do convite"
-            class="w-100"
-            required
-          />
+          <div class="container-invite">
+            <span class="header-h5 text-invite">Convite por e-mail</span>
+            <alex-inputs-text-field
+              name="Mensagem do convite"
+              label="Mensagem do convite"
+              hint="Mensagem que será enviada por e-mail para o convidado."
+              persistent-hint
+              append-inner-icon="mdi-cached"
+              class="w-100"
+              required
+            />
+          </div>
+          <v-tooltip
+            location="bottom"
+            attach="append-inner-icon"
+            content-class="inviteTooltip"
+            max-width="300px"
+            text="Restaurar mensagem padrão"
+          ><template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                class="ml-2"
+                color="#6E7A87"
+                size="20"
+                >mdi-cached</v-icon
+              >
+            </template></v-tooltip>
         </div>
         <div class="footer-content">
           <span class="action-content-two">
@@ -623,6 +644,17 @@ p {
   border-top: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
+.container-invite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
+}
 .inviteLinks {
   display: flex;
   flex-wrap: wrap;
