@@ -25,6 +25,8 @@
       :userId="user.id"
       can-delete
       show-menu
+      settings-menu
+      show-settings
       show-profile-picture
       show-role
       show-border

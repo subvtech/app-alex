@@ -26,7 +26,7 @@
           show-icon
           :text="tooltip"
           :extra-classes="tooltipExtraClass"
-        ></alex-custom-tooltip>
+        />
       </div>
 
       <div

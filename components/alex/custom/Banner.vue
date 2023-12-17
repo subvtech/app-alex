@@ -1,5 +1,9 @@
 <template>
-  <div class="user-block my-6" style="position: relative" data-testid="banner">
+  <div
+    class="user-block my-6 w-100"
+    style="position: relative"
+    data-testid="banner"
+  >
     <div class="cover-block w-100">
       <NuxtImg
         v-if="cover"
@@ -109,10 +113,11 @@
       v-if="showMenu"
       class="menu d-flex"
       data-testid="menu"
-      style="z-index: 1"
+      style="z-index: 1;"
     >
       <div
         v-for="(link, index) in links"
+        class="cursor-pointer"
         :class="selectedOption === index ? 'selected' : ''"
         @click="emit('select:option', index)"
       >
@@ -126,14 +131,25 @@
       </div>
 
       <v-spacer />
+
       <div
         v-if="settingsMenu && showSettings"
         class="d-flex align-center mr-4 mr-md-3 mr-sm-3 mr-xs-2"
         data-testid="settings-menu"
       >
-        <v-icon @click="emit('display:settings')" class="" color="#6E7A87">{{
-          settingsIcon
-        }}</v-icon>
+        <alex-custom-tooltip
+          :text="$t('components.card.settings')"
+          class="d-flex align-center cursor-pointer"
+        >
+          <template #content>
+            <v-icon
+              @click="emit('display:settings')"
+              class=""
+              color="#6E7A87"
+              >{{ settingsIcon }}</v-icon
+            >
+          </template>
+        </alex-custom-tooltip>
       </div>
     </div>
   </div>
@@ -336,6 +352,9 @@ async function removeCoverPicture() {
 </script>
 
 <style scoped lang="scss">
+.cursor-pointer {
+  cursor: pointer;
+}
 .coverPlaceholder {
   .avatar {
     display: flex;
@@ -463,6 +482,7 @@ async function removeCoverPicture() {
     padding-inline: 24px;
     transition: all ease-in-out 1s;
     overflow-x: auto;
+    overflow-y: hidden;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
     &::-webkit-scrollbar {
@@ -471,7 +491,6 @@ async function removeCoverPicture() {
     div {
       height: 100%;
       display: flex;
-      cursor: pointer;
       border-bottom: 2px solid transparent;
       &:hover {
         color: #279ee3;

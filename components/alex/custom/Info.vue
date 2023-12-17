@@ -208,19 +208,23 @@
             <span style="flex-grow: 0">{{ copyObject.label }}</span>
           </div>
         </div>
-
-        <div
-          v-if="canEdit && showSettings"
-          class="settings mx-1 py-1 px-1 mx-xs-2"
-          :class="[
-            darkerBackground ? 'darker-bg' : '',
-            showProfilePictureAndProfilePicture ? 'absolute' : '',
-          ]"
-          style="height: min-content; color: #6e7a87"
-          role="settings"
-        >
-          <v-icon @click="emit('display:settings')">{{ settingsIcon }}</v-icon>
-        </div>
+        <alex-custom-tooltip v-if="canEdit && showSettings" :text="$t('components.card.settings')">
+          <template #content>
+            <div
+              class="settings mx-1 py-1 px-1 mx-xs-2"
+              :class="[
+                darkerBackground ? 'darker-bg' : '',
+                showProfilePictureAndProfilePicture ? 'absolute' : '',
+              ]"
+              style="height: min-content; color: #6e7a87"
+              role="settings"
+            >
+              <v-icon @click="emit('display:settings')">{{
+                settingsIcon
+              }}</v-icon>
+            </div>
+          </template>
+        </alex-custom-tooltip>
       </div>
     </div>
   </div>
@@ -369,7 +373,7 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false },
   canDelete: { type: Boolean, default: false },
 });
-const { copyToClipboard } = useCopyText()
+const { copyToClipboard } = useCopyText();
 const biggerImage = computed(() => {
   return props.resize && props.profilePictureSize > 100;
 });
@@ -390,8 +394,6 @@ const startDateAndEndDate = computed(() => {
 const startDateOrEndDate = computed(() => {
   return props.startDate || props.endDate;
 });
-
-
 </script>
 
 <style scoped lang="scss">

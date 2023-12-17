@@ -3,12 +3,12 @@
     <slot name="content" />
     <img
       v-if="showIcon"
-      class="pl-1"
+      class="pl-1 z-index-999"
       src="/svg/tooltip.svg"
       width="24"
       height="24"
     />
-    <div v-if="text" class="px-4" :class="extraClasses ?? ''">
+    <div class="px-4 z-index-999" :class="extraClasses ?? ''">
       <span>{{ text }}</span>
     </div>
   </div>
@@ -17,7 +17,6 @@
 defineProps({
   text: {
     type: String,
-    requrired: true,
   },
   showIcon: {
     type: Boolean,
@@ -25,26 +24,30 @@ defineProps({
   },
   extraClasses: {
     type: String,
-  }
+  },
 });
 </script>
 
 <style scoped lang="scss">
-.tooltip {
-  position: relative;
+.z-index-999 {
   z-index: 999;
+}
+.tooltip {
+  position: relative !important;
 
   &:hover {
-    div {
+    .px-4 {
       display: block !important;
     }
   }
-  img:hover + div {
+
+  img:hover + .px-4 {
     display: block !important;
   }
-  div {
+  .px-4 {
     position: absolute;
-    display: none;
+    display: none;  
+    z-index: 999;
     top: 120%;
     left: 50%;
     transform: translateX(-50%);

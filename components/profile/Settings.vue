@@ -5,7 +5,7 @@
     :showIcon="false"
   >
     <template v-slot:content>
-      <div class="settings">
+      <div class="settings w-100">
         <v-form
           ref="form"
           color="black"
@@ -18,17 +18,19 @@
             name="fullname"
             class=""
           />
-          <div class="block d-flex flex-wrap">
+          <div class="block d-flex">
             <alex-inputs-stepper-field
               :label="$t('components.profile.settings.phone')"
               :value="telephone"
               name="phone"
+              class="w-100"
               v-maska:[phoneMask]
             />
             <alex-inputs-stepper-field
               :label="$t('components.profile.settings.cpf')"
               :value="cpf"
               name="cpf"
+              class="w-100"
               v-maska:[cpfMask]
             />
           </div>
