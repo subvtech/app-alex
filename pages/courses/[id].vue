@@ -63,7 +63,7 @@
             />
 
             <courses-goals
-              :can-edit="false"
+              :can-edit="canEdit"
               :course-id="course.id"
               :data="
                 course.goals.data.map((item) => {
@@ -87,6 +87,10 @@
               is-nested
             />
             <courses-editor
+              v-if="
+                (course.course_descriptions.data.length === 0 && canEdit) ||
+                course.course_descriptions.data.length !== 0
+              "
               :info="
                 course.course_descriptions.data.map((item) => {
                   return { id: item.id, ...item.attributes };
@@ -131,8 +135,9 @@
             />
           </template>
           <template #footer>
-            <courses-meetings :data="meetings" />
+            <courses-meetings :data="meetings" :is-facilitator="canEdit" />
             <courses-invites
+              v-if="canEdit"
               :enable-invites="course.invite_enabled"
               :duration="course.invitation_duration"
               :course-id="course.id"
@@ -146,6 +151,9 @@
           </template>
         </alex-custom-card>
         <competences
+          v-if="
+            (generalTags.length === 0 && canEdit) || generalTags.length !== 0
+          "
           :title="$t('components.competences.general.title')"
           :label="$t('components.competences.general.label')"
           :emptyMessage="$t('components.competences.general.empty')"
@@ -156,6 +164,10 @@
           @update="(data) => updateCourse(true, data.message)"
         />
         <competences
+          v-if="
+            (technicalTags.length === 0 && canEdit) ||
+            technicalTags.length !== 0
+          "
           :title="$t('components.competences.technical.title')"
           :label="$t('components.competences.technical.label')"
           :emptyMessage="$t('components.competences.technical.empty')"
@@ -178,7 +190,6 @@ const { find, findOne, update } = useStrapi();
 const { generateUrl } = useInvitationLink();
 
 const i18n = useI18n();
-const user = ref<any>();
 const course = ref<any>();
 const meetings = ref<any>();
 const generalTags = ref();
@@ -193,11 +204,11 @@ const route = useRoute();
 const router = useRouter();
 const selectedOption = ref(0);
 
-const canEdit = computed(() => id.value === course.value.owner);
-
 const selectOption = (index) => {
   selectedOption.value = index;
 };
+
+const canEdit = computed(() => course.value.owner.id === id.value);
 const { setMessage } = useMessageStore();
 
 definePageMeta({
@@ -221,6 +232,7 @@ const populate = [
   'course_descriptions',
   'goals.verb',
   'tags',
+  'owner',
   'schedules',
 ];
 
@@ -259,20 +271,17 @@ const updateCourse = async (show = true, message?) => {
       }
       if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
       generalTags.value = course.value.tags.data.reduce((acc, item) => {
-        // If the item is general, create a new object and add it to the accumulator
-
         if (item.attributes.isGeneral) {
           acc.push({ id: item, ...item.attributes });
         }
-        // Return the accumulator for the next iteration
+
         return acc;
       }, []);
       technicalTags.value = course.value.tags.data.reduce((acc, item) => {
-        // If the item is general, create a new object and add it to the accumulator
         if (!item.attributes.isGeneral) {
           acc.push({ id: item, ...item.attributes });
         }
-        // Return the accumulator for the next iteration
+
         return acc;
       }, []);
       updateMeetings(course.value.schedules).then();
@@ -299,7 +308,6 @@ const updateMeetings = async (schedules) => {
       sort: 'date:asc',
     })
   ).data;
-
 };
 
 const updateAbout = async (text) => {

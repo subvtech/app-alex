@@ -4,13 +4,15 @@
     is-nested
     hide-dividers
     show-tooltip
-    :is-editing="isEditing"
+    
+    :is-editing="isEditingAndCanEdit"
     @toggle:is-editing="isEditing = !isEditing"
     :save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
     :cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
+    :show-icon="canEdit"
   >
     <template #content>
       <alex-custom-empty-placeholder
@@ -115,6 +117,8 @@ const withinBreakpoint = computed(
     (currentWidth.value > 850 && currentWidth.value < 1000) ||
     currentWidth.value < 450,
 );
+
+const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value)
 
 onBeforeMount(async () => {
   filteredVerbs.value = (

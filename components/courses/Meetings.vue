@@ -12,7 +12,11 @@
     <template #content>
       <div v-if="data.length === 0" class="d-flex justify-center w-100">
         <span class="desactivated">{{
-          $t('components.courses.meeting.empty')
+          $t(
+            `components.courses.meeting.empty.${
+              isFacilitator ? 'facilitator' : 'student'
+            }`,
+          )
         }}</span>
       </div>
       <course-meeting
@@ -35,6 +39,10 @@ defineProps({
       { id: number; attributes: { schedule: any; date: string } }[]
     >,
     default: [],
+  },
+  isFacilitator: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

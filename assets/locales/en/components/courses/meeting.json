@@ -23,6 +23,7 @@
     "saturday": "Saturday",
     "everyday": "Sunday"
   },
+  "today": "Today",
   "of": "of",
   "to": "to",
   "at": "at",
@@ -30,7 +31,10 @@
   "weekly": "Weekly: {day}",
   "biweekly": "Biweekly: {day}",
   "monthly": "Monthly: {day}",
-  "empty": "It seems that there are no meetings available",
+  "empty": {
+    "facilitator": "It seems that there are no meetings available",
+    "student": "It seems that you don't have any meetings scheduled"
+  },
   "edit": "Edit",
   "delete": "Delete"
 }
