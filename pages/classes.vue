@@ -1,6 +1,6 @@
 <template>
-  <div class="wrapper pa-6">
-    <div class="d-flex justify-space-between flex-column flex-sm-row mb-2">
+  <div class="wrapper d-flex flex-column">
+    <header class="d-flex justify-space-between flex-column flex-sm-row mb-2">
       <alex-custom-breadcrumbs title="Meus Cursos" :items="breadcrumbs" />
       <alex-custom-button
         prepend-icon="mdi-plus"
@@ -8,9 +8,10 @@
         class="text-body-4"
         >Novo Curso</alex-custom-button
       >
-    </div>
+    </header>
     <div
-      class="d-flex align-center justify-center bg-white flex-column fill-height rounded-lg pa-6"
+      style="flex: 1"
+      class="d-flex align-center justify-center bg-white flex-column rounded-lg fill-height pa-6"
     >
       <div
         v-if="courses.length == 0"
@@ -23,15 +24,16 @@
         />
         <p class="text-h3 text-gray-600">Nenhum curso encontrado!</p>
       </div>
-      <div v-else class="d-flex fill-height w-100 bg-white flex-column">
-        <div class="d-flex justify-space-between">
+      <div v-else class="d-flex w-100 flex-column">
+        <div class="d-flex justify-space-between flex-wrap w-100">
           <alex-inputs-text-field
             v-model="search"
             placeholder="Buscar"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             hide-details
-            style="width: 320px"
+            class="w-50"
+            style="min-width: 160px"
             density="compact"
           >
             ></alex-inputs-text-field
@@ -74,33 +76,34 @@
             </v-tooltip>
           </div>
         </div>
-        <div
-          v-if="coursesView == 'grid'"
-          class="d-flex flex-wrap w-100 py-6"
-          style="gap: 24px"
-        >
-          <v-card
-            v-for="course in courses"
-            :key="course"
-            class="course-card rounded"
-            max-width="400"
+        <!-- <div class="d-flex flex-column h-100 justify-space-between"> -->
+        <div v-if="coursesView == 'grid'" class="d-flex flex-wrap w-100 py-6">
+          <v-data-iterator
+            v-model:search="search"
+            v-model:page="page"
+            :items="courses"
+            :items-per-page="12"
+            class="w-100 d-flex flex-wrap"
+            style="gap: 16px"
           >
-            <img
-              src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-              class="card-image"
-            />
-            <v-card-item>
-              <v-card-title class="text-h5 text-gray-900 card-title">{{
-                course.title
-              }}</v-card-title>
-              <v-card-text class="text-gray-600 text-body-3 card-text pa-0">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Quisquam voluptatum, voluptate, quibusdam, quia voluptas quod
-                quos voluptatem quas quibusdam, quia voluptas quod quos
-                voluptatem quas
-              </v-card-text>
-            </v-card-item>
-          </v-card>
+            <template #default="{ items }">
+              <alex-learningplan-card
+                v-for="course in items"
+                :key="course"
+                class="flex-stretch"
+                :title="course.raw.title"
+                :description="course.raw.description"
+                :image="{
+                  url: course.raw.img,
+                }"
+                :facilitator="{
+                  name: course.raw.facilitatorName,
+                  imageURL: course.raw.facilitatorImage,
+                }"
+                :trails="course.raw.trails"
+              />
+            </template>
+          </v-data-iterator>
         </div>
         <div v-if="coursesView == 'table'">
           <v-data-table
@@ -108,9 +111,10 @@
             ref="tableRef"
             v-model:search="search"
             v-model:page="page"
+            :items-per-page="12"
             :items="courses"
             :headers="headers"
-            class="py-6"
+            class="py-4"
           >
             <template #item="{ item }">
               <tr class="table-row text-body-3 text-gray">
@@ -128,67 +132,67 @@
                   </div>
                 </td>
                 <td class="text-overflow" style="max-width: 596px">
-                  {{ item.Descrição }}
+                  {{ item.description }}
                 </td>
                 <td class="text-overflow" style="max-width: 150px">
-                  {{ item.Facilitador }}
+                  {{ item.facilitatorName }}
                 </td>
                 <td class="text-overflow" style="max-width: 90px">
-                  {{ item.Trilhas }}
+                  {{ item.trails }}
                 </td>
                 <td>
-                  <v-tooltip
-                    text="Opções"
-                    location="bottom"
-                    content-class="bg-gray-800"
+                  <alex-inputs-dropdown
+                    :items="[
+                      {
+                        icon: 'mdi-eye-outline',
+                        text: 'Mostrar',
+                      },
+                      {
+                        icon: 'mdi-cog-outline',
+                        text: 'Configurações',
+                      },
+                    ]"
                   >
-                    <template #activator="{ props }">
-                      <div v-bind="props">
-                        <alex-inputs-dropdown
-                          :items="[
-                            {
-                              icon: 'mdi-eye-outline',
-                              text: 'Mostrar',
-                            },
-                            {
-                              icon: 'mdi-cog-outline',
-                              text: 'Configurações',
-                            },
-                          ]"
-                        >
-                          <template #activator="{ props }">
-                            <alex-custom-button
-                              v-bind="props"
-                              variant="text"
-                              icon="mdi-dots-vertical"
-                            />
-                          </template>
-                        </alex-inputs-dropdown>
-                      </div>
+                    <template #activator="{ props: propsMenu }">
+                      <v-tooltip
+                        text="Opções"
+                        location="bottom"
+                        content-class="bg-gray-800"
+                      >
+                        <template #activator="{ props: optionsTooltipProps }">
+                          <alex-custom-button
+                            v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                            variant="text"
+                            icon="mdi-dots-vertical"
+                          />
+                        </template>
+                      </v-tooltip>
                     </template>
-                  </v-tooltip>
+                  </alex-inputs-dropdown>
                 </td>
               </tr>
             </template>
             <template #bottom> </template>
           </v-data-table>
         </div>
-        <div
-          class="d-flex w-100 justify-space-between align-center px-6 bg-white"
-          style="border-top: 1px #ebedef solid"
-        >
-          <p class="text-body-3 text-gray-600">
-            Mostrando do {{ showingData.from }} ao {{ showingData.to }} de um
-            total de {{ showingData.total }} cursos
-          </p>
-          <alex-custom-pagination
-            v-if="pageCount > 1"
-            v-model="page"
-            :length="pageCount"
-            :total-visible="5"
-          />
-        </div>
       </div>
+      <!-- </div> -->
+    </div>
+    <div
+      v-if="courses.length > 0"
+      class="d-flex w-100 justify-space-between align-center pa-6 flex-column flex-sm-row ga-3 bg-white"
+      style="border-top: 1px #ebedef solid"
+    >
+      <p class="text-body-3 text-gray-600">
+        Mostrando do {{ showingData.from }} ao {{ showingData.to }} de um total
+        de {{ showingData.total }} cursos
+      </p>
+      <alex-custom-pagination
+        v-if="pageCount > 1"
+        v-model="page"
+        :length="pageCount"
+        :total-visible="5"
+      />
     </div>
   </div>
 </template>
@@ -209,14 +213,11 @@ const showingData = ref({
 
 const setShowingData = () => {
   showingData.value = {
-    from:
-      page.value * tableRef.value.itemsPerPage -
-      tableRef.value.itemsPerPage +
-      1,
+    from: page.value * 12 - 12 + 1,
     to:
-      page.value * tableRef.value.itemsPerPage > courses.value.length
+      page.value * 12 > courses.value.length
         ? courses.value.length
-        : page.value * tableRef.value.itemsPerPage,
+        : page.value * 12,
     total: courses.value.length,
   };
 };
@@ -232,17 +233,13 @@ const breadcrumbs = [
   },
 ];
 onMounted(() => {
-  pageCount.value = Math.ceil(
-    courses.value.length / tableRef.value.itemsPerPage,
-  );
+  pageCount.value = Math.ceil(courses.value.length / 12);
   setShowingData();
 });
 
 watch([page, courses], () => {
   if (!tableRef.value) return;
-  pageCount.value = Math.ceil(
-    courses.value.length / tableRef.value.itemsPerPage,
-  );
+  pageCount.value = Math.ceil(courses.value.length / 12);
   setShowingData();
 });
 
@@ -270,60 +267,85 @@ const headers = [
 
 courses.value = [
   {
-    title: 'Introdução à Segurança da Informação',
-    img: 'https://picsum.photos/400/300',
-    Descrição:
-      'Explore os fundamentos da segurança da informação e práticas de proteção de dados.',
-    Facilitador: 'Carolina',
-    Trilhas: '4',
+    title:
+      'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
+    description:
+      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
+    facilitatorName: 'Alexandre',
+    facilitatorImage: 'https://picsum.photos/200/300',
+    trails: 3,
+    img: 'https://picsum.photos/400/600',
   },
   {
-    title: 'Desenvolvimento Web Avançado',
-    img: 'https://picsum.photos/800/600',
-    Descrição:
-      'Aprofunde-se no desenvolvimento web, abordando tecnologias modernas e práticas avançadas.',
-    Facilitador: 'Gabriel',
-    Trilhas: '8',
+    title: 'Introdução à programação em Python',
+    description:
+      'Olá pessoal! Este é um curso introdutório sobre programação em Python. Espero que aproveitem!',
+    facilitatorName: 'Isabella',
+    facilitatorImage: 'https://picsum.photos/201/301',
+    trails: 5,
+    img: 'https://picsum.photos/401/601',
   },
   {
-    title: 'Machine Learning Aplicado',
-    img: 'https://picsum.photos/200/150',
-    Descrição:
-      'Conheça aplicações práticas de machine learning e como implementá-las em projetos do mundo real.',
-    Facilitador: 'Isabela',
-    Trilhas: '6',
+    title: 'Desenvolvimento web com React.js',
+    description:
+      'Bem-vindos ao curso de desenvolvimento web com React.js! Vamos explorar juntos as maravilhas do React.',
+    facilitatorName: 'Carlos',
+    facilitatorImage: 'https://picsum.photos/202/302',
+    trails: 4,
+    img: 'https://picsum.photos/402/602',
   },
   {
-    title: 'Inteligência Artificial para Iniciantes',
-    img: 'https://picsum.photos/100/75',
-    Descrição:
-      'Um curso introdutório para entender os conceitos básicos de inteligência artificial.',
-    Facilitador: 'Ricardo',
-    Trilhas: '3',
+    title: 'Aprendendo machine learning com scikit-learn',
+    description:
+      'Oi pessoal! Vamos mergulhar no mundo do machine learning com o scikit-learn. Animados?',
+    facilitatorName: 'Camila',
+    facilitatorImage: 'https://picsum.photos/203/303',
+    trails: 6,
+    img: 'https://picsum.photos/403/603',
   },
   {
-    title: 'Gestão Ágil de Projetos',
-    img: 'https://picsum.photos/400/300',
-    Descrição:
-      'Aprenda metodologias ágeis para gerenciar eficientemente projetos de software.',
-    Facilitador: 'Daniela',
-    Trilhas: '5',
+    title: 'Segurança da informação e ethical hacking',
+    description:
+      'Este curso aborda tópicos essenciais sobre segurança da informação e ethical hacking. Fiquem atentos!',
+    facilitatorName: 'Diego',
+    facilitatorImage: 'https://picsum.photos/204/304',
+    trails: 5,
+    img: 'https://picsum.photos/404/604',
   },
   {
-    title: 'Cibersegurança Avançada',
-    img: 'https://picsum.photos/48/36',
-    Descrição:
-      'Explore técnicas avançadas de cibersegurança para proteger sistemas contra ameaças sofisticadas.',
-    Facilitador: 'Alexandre',
-    Trilhas: '8',
+    title: 'Desenvolvimento mobile com Flutter',
+    description:
+      'Vamos construir aplicativos incríveis com Flutter! Este curso é para quem quer mergulhar no desenvolvimento mobile.',
+    facilitatorName: 'Eduarda',
+    facilitatorImage: 'https://picsum.photos/205/305',
+    trails: 4,
+    img: 'https://picsum.photos/405/605',
+  },
+  {
+    title: 'Gestão de projetos ágeis com Scrum',
+    description:
+      'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
+    facilitatorName: 'Fernando',
+    facilitatorImage: 'https://picsum.photos/206/306',
+    trails: 3,
+    img: 'https://picsum.photos/406/606',
+  },
+  {
+    title: 'Inteligência artificial e redes neurais',
+    description:
+      'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
+    facilitatorName: 'Gabriela',
+    facilitatorImage: 'https://picsum.photos/207/307',
+    trails: 6,
+    img: 'https://picsum.photos/407/607',
   },
 ];
 
 courses.value = [
-  ...courses.value,
-  ...courses.value,
-  ...courses.value,
-  ...courses.value,
+  // ...courses.value,
+  // ...courses.value,
+  // ...courses.value,
+  // ...courses.value,
 ];
 
 const changeViewMode = () => {
@@ -362,31 +384,11 @@ const changeViewMode = () => {
 }
 
 .wrapper {
-  height: calc(100vh - 150px);
-}
-.course-card {
-  min-width: 300px;
-  max-width: 400px;
+  min-height: calc(100vh - 130px);
 }
 
-.card-image {
-  height: 250px;
-  flex-shrink: 0;
-  align-self: stretch;
-  width: 100%;
-}
-
-.card-title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  align-self: stretch;
-}
-.card-text {
-  display: -webkit-box;
-  max-height: 60px;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  align-self: stretch;
+.flex-stretch {
+  flex: 1 !important;
+  flex-basis: fit-content;
 }
 </style>
