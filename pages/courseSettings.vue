@@ -230,15 +230,12 @@
             content-class="inviteTooltip"
             max-width="300px"
             text="Restaurar mensagem padrão"
-          ><template v-slot:activator="{ props }">
-              <v-icon
-                v-bind="props"
-                class="ml-2"
-                color="#6E7A87"
-                size="20"
+            ><template v-slot:activator="{ props }">
+              <v-icon v-bind="props" class="ml-2" color="#6E7A87" size="20"
                 >mdi-cached</v-icon
               >
-            </template></v-tooltip>
+            </template></v-tooltip
+          >
         </div>
         <div class="footer-content">
           <span class="action-content-two">
@@ -317,7 +314,7 @@
                 :model-value="openDialog"
                 title=""
                 body-classes="criticalAttention"
-                class="exclusionDialog"
+                class="exclusionBody"
               >
                 <template #header>
                   <alex-custom-dialog-header title="" class="noShow"
