@@ -9,7 +9,6 @@
     :item-title="getItemTitle"
     :color="color"
     :error-messages="errorMessage"
-    :hide-selected="true"
     show
     item-value="id"
     class="my-3"
@@ -49,7 +48,7 @@ const emit = defineEmits([
   'update:search',
 ]);
 
-const { value, errorMessage } = useField(
+const { value, errorMessage, setErrors } = useField(
   () => props.name || 'institution',
   undefined,
 );
@@ -57,7 +56,6 @@ const { value, errorMessage } = useField(
 const isTyping = ref(false);
 const fetching = ref(false);
 const { find } = useStrapi();
-const { setMessage } = useMessageStore();
 const i18n = useI18n();
 
 const fetchInstitutions = async (institution: string) => {
@@ -73,18 +71,18 @@ const fetchInstitutions = async (institution: string) => {
       },
       pagination: { start: 0, limit: 10 }, // limite de instituições
     });
-    const dataInstitutions = (result.data.length > 0 ? result.data : []).map(
-      (r: any) => {
+    if (result.data.length > 0) {
+      const dataInstitutions = result.data.map((institution: any) => {
         return {
-          id: r.id,
-          acronym: r.attributes?.acronym,
-          socialName: r.attributes?.socialName,
+          id: institution.id,
+          acronym: institution.attributes?.acronym,
+          socialName: institution.attributes?.socialName,
         };
-      },
-    );
-    emit('update:institutions', dataInstitutions);
+      });
+      emit('update:institutions', dataInstitutions);
+    }
   } catch (error) {
-    setMessage(i18n.t('pages.login.searchError'), 'red', true);
+    setErrors(i18n.t('pages.login.searchError'));
   } finally {
     fetching.value = false;
   }
@@ -97,7 +95,7 @@ watchEffect((onInvalidate) => {
     const getData = setTimeout(async () => {
       isTyping.value = false;
       await fetchInstitutions(props.search);
-    }, 500);
+    }, 700);
 
     onInvalidate(() => {
       clearInterval(getData);
@@ -109,5 +107,3 @@ const getItemTitle = (item: InstitutionsType) => {
   return `${item.acronym} - ${item.socialName}`;
 };
 </script>
-
-<style scoped></style>

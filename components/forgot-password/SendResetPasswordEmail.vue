@@ -1,19 +1,22 @@
 <template>
   <v-container
-    class="pa-0 d-flex flex-column h-75 mid-container justify-center"
-    style="max-width: 400px"
+    class="content d-flex flex-column align-content-start justify-start max-400"
   >
     <div>
       <p class="text-white text-h3 text-center font-weight-bold mb-4">
         {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
       </p>
-      <p
-        class="text-white text-subtitle-2 font-weight-regular text-center my-2"
-      >
+
+      <p class="text-white text-h6 mb-8" align="center">
         {{ $t('components.forgot.sendResetPassword.enterEmail') }}
       </p>
     </div>
-    <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
+    <v-form
+      ref="form"
+      class="d-flex flex-column gap-4 mb-10"
+      color="white"
+      @submit.prevent="submit"
+    >
       <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.email')"
         :placeholder="$t('components.forgot.sendResetPassword.emailHolder')"
@@ -30,6 +33,8 @@
         block
         theme="dark"
         type="submit"
+        theme="dark"
+        block
         size="large"
         :disabled="!isValid"
         :loading="loading"
@@ -82,3 +87,9 @@ const submit = handleSubmit(async () => {
   }
 });
 </script>
+
+<style lang="scss">
+.max-400 {
+  max-width: 400px;
+}
+</style>
