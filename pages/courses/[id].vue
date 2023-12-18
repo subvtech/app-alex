@@ -1,7 +1,6 @@
 <template>
   <div v-if="course">
     <alex-custom-banner
-      :can-edit="canEdit"
       :cover-picture="
         course.cover_image.data
           ? {

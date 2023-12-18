@@ -44,6 +44,7 @@
                   class="pointer"
                   color="#00B7CC"
                   size="small"
+                  @click="copyToClipboard(url)"
                   >mdi-content-copy</v-icon
                 >
               </template>
@@ -66,6 +67,7 @@
 
 <script setup lang="ts">
 const { create, delete: _delete } = useStrapi();
+const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link']);
 const props = defineProps({
   enableInvites: {
