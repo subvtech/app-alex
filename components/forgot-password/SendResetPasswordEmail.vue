@@ -33,8 +33,6 @@
         block
         theme="dark"
         type="submit"
-        theme="dark"
-        block
         size="large"
         :disabled="!isValid"
         :loading="loading"
