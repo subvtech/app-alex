@@ -19,7 +19,7 @@
         src="/images/alex-banner.svg"
         role="default-cover"
       />
-      <div class="w-100 h-25" :class="showShade ? 'shade' : ''" />
+      <div class="w-100 h-25" :class="showShade ? 'shade' : ''" role="shade" />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
           v-if="cover && imgFromStrapi"
@@ -113,7 +113,7 @@
       v-if="showMenu"
       class="menu d-flex"
       data-testid="menu"
-      style="z-index: 1;"
+      style="z-index: 1"
     >
       <div
         v-for="(link, index) in links"

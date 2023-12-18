@@ -131,7 +131,7 @@
             class="title mt-0 font-weight-bold text-h2"
             :class="[floatBeneath ? 'ml-2' : '']"
             :style="titleStyle ?? 'color: white;'"
-            role="above"
+            role="below"
             >{{ description }}</span
           >
         </div>
@@ -208,7 +208,10 @@
             <span style="flex-grow: 0">{{ copyObject.label }}</span>
           </div>
         </div>
-        <alex-custom-tooltip v-if="canEdit && showSettings" :text="$t('components.card.settings')">
+        <alex-custom-tooltip
+          v-if="canEdit && showSettings"
+          :text="$t('components.card.settings')"
+        >
           <template #content>
             <div
               class="settings mx-1 py-1 px-1 mx-xs-2"

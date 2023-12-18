@@ -218,15 +218,18 @@ const selectedOption3 = ref(0);
 const selectedOption4 = ref(0);
 
 const selectOption1 = (index) => {
+  console.log({ index });
   selectedOption1.value = index;
   showSettings.value = false;
 };
 const selectOption2 = (index) => {
+  console.log({ index });
   selectedOption2.value = index;
   showSettings2.value = false;
 };
 
 const selectOption3 = (index) => {
+  console.log({ index });
   selectedOption3.value = index;
   showSettings3.value = false;
 };
@@ -267,7 +270,6 @@ const updateUser = async (show = true) => {
   user.value = await findOne<User>('users', id, {
     populate: populate,
   });
-  console.log({ user: user.value });
   if (!user.value.avatar) user.value.avatar = profilePicture;
   if (!user.value.cover) {
     user.value.cover = coverPicture;
