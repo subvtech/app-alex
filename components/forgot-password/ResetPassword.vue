@@ -1,7 +1,6 @@
 <template>
   <v-container
-    class="pa-0 d-flex flex-column h-75 mid-container justify-center"
-    style="max-width: 400px"
+    class="content d-flex flex-column align-content-start justify-start max-400"
   >
     <div class="mb-10">
       <p class="text-white text-h3 text-center font-weight-bold mb-4">
@@ -14,7 +13,7 @@
     <v-form
       ref="form"
       color="white"
-      class="mb-10"
+      class="d-flex flex-column gap-4 mb-10"
       @submit.prevent="changePassword"
     >
       <alex-inputs-text-field
@@ -43,7 +42,7 @@
         @click:append-inner="confirmationVisible = !confirmationVisible"
       />
       <alex-custom-button
-        class="text-none text-white rounded-lg pa-5"
+        theme="dark"
         block
         type="submit"
         size="large"
@@ -126,5 +125,8 @@ const changePassword = handleSubmit(async () => {
       margin-bottom: 10px !important;
     }
   }
+}
+.max-400 {
+  max-width: 400px;
 }
 </style>
