@@ -132,14 +132,28 @@ $variants: (
       color: rgb(var(--v-theme-#{map-deep-get($status, 'warning')})) !important;
     }
 
-    .v-list-item--active.v-list-item-#{$mode}-selected {
+    .v-list-item-#{$mode}-selected,
+    .v-list-item--active.v-list-item-#{$mode} {
       @if $component == 'background' {
         background-color: rgb(
           var(--v-theme-#{map-deep-get($status, 'selected')})
         ) !important;
       }
     }
-    .v-list-item--active.v-list-item-#{$mode}-selected .v-list-item-text {
+    .v-list-item-#{$mode}-selected,
+    .v-list-item--active.v-list-item-#{$mode} .v-list-item-text {
+      color: rgb(
+        var(--v-theme-#{map-deep-get($status, 'selected')})
+      ) !important;
+    }
+
+    .v-list-item-#{$mode}-selected:hover,
+    .v-list-item--active.v-list-item-#{$mode}:hover {
+      @if $component == 'background' {
+        background-color: rgb(
+          var(--v-theme-#{map-deep-get($status, 'selected')})
+        ) !important;
+      }
       color: rgb(
         var(--v-theme-#{map-deep-get($status, 'selected')})
       ) !important;

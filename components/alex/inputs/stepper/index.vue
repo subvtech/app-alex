@@ -38,6 +38,7 @@
         v-if="activeStep > 1"
         variant="secondary"
         text="Voltar"
+        title="previous-step-button"
         size="large"
         @click="onPrevStep"
       />
@@ -45,6 +46,7 @@
       <alex-custom-button
         class="ml-auto"
         size="large"
+        title="next-step-button"
         type="submit"
         :disabled="!isValid"
         :loading="loading"

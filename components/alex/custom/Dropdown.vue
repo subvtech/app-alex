@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlexListItem } from '@/components/alex/custom/listItem/index.vue';
+import { AlexListItem } from '@/components/alex/custom/list-item/index.vue';
 
 export interface AlexDropdownItem extends Omit<AlexListItem, 'theme'> {
   onClick?: () => unknown;

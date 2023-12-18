@@ -16,7 +16,6 @@
     </div>
     <v-autocomplete
       v-model="value"
-      v-model:search="searchModelValue"
       hide-details="auto"
       color="primary--2"
       rounded="lg"
@@ -26,6 +25,9 @@
       :error-messages="errorMessage"
       :class="theme"
       :disabled="disabled"
+      :menu-props="{
+        class: theme,
+      }"
       v-bind="$attrs"
     >
       <!-- Bind all slots  -->
@@ -60,15 +62,7 @@ interface AutoCompleteProps {
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
-const emit = defineEmits(['update:search', 'update:modelValue']);
-const searchModelValue = computed({
-  get() {
-    return props.search;
-  },
-  set(value) {
-    emit('update:search', value);
-  },
-});
+defineEmits(['update:modelValue']);
 const props = withDefaults(defineProps<AutoCompleteProps>(), {
   modelValue: undefined,
   search: undefined,

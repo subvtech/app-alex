@@ -26,6 +26,9 @@
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"
+      :menu-props="{
+        class: theme,
+      }"
       v-bind="$attrs"
       @blur="handleBlur"
     >
@@ -40,7 +43,6 @@
           :text="item.title"
           v-bind="propsItem"
           :theme="theme"
-          :selected="value === item.title"
         />
       </template>
     </v-select>
@@ -159,5 +161,12 @@ const textColor = computed(() => {
   &.v-input--error .v-messages__message {
     color: rgb(var(--v-theme-error-0)) !important;
   }
+}
+.dark .v-list {
+  background-color: rgb(var(--v-theme-primary-2)) !important;
+  color: rgb(var(--v-theme-white)) !important;
+}
+.light .v-list {
+  background-color: rgb(var(--v-theme-white)) !important;
 }
 </style>
