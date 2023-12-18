@@ -1,0 +1,16 @@
+{
+    "options": "Opções",
+    "configurations": "Configurações",
+    "visibility": {
+        "show": "Mostrar",
+        "hide": "Ocultar"
+    },
+    "copy": "Copiar",
+    "hidden": "Oculto",
+    "article": "Artigo",
+    "articles": "Artigos",
+    "document": "Documento",
+    "documents": "Documentos",
+    "video": "Vídeo",
+    "videos": "Vídeos"
+}

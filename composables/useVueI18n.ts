@@ -70,6 +70,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'dialog',
     'usersAutocomplete',
     'learningPlan/editor',
+    'learningPlan/cardTrails',
     'learningPlan/card',
     'learningPlan/authors',
     'learningPlan/link',

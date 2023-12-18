@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
-import { renderSuspended, mockNuxtImport } from 'nuxt-vitest/utils';
+import { describe, it, expect } from 'vitest';
+import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
 import Breadcrumbs from '../../components/alex/custom/Breadcrumbs.vue';
 
-describe('Breadcrumbs', async () => {
+describe('Breadcrumbs', () => {
   it('Breadcrumbs should be defined', async () => {
     const breadcrumbsComponent = await renderSuspended(Breadcrumbs, {
       attrs: {
@@ -38,7 +38,7 @@ describe('Breadcrumbs', async () => {
         plugins: [vuetify],
       },
     });
-    const arrow = await screen.queryByRole('goback');
+    const arrow = await screen.queryByRole('link', { name: 'Go Back' });
     expect(arrow).toBeNull();
 
     unmount();
@@ -53,7 +53,9 @@ describe('Breadcrumbs', async () => {
         plugins: [vuetify],
       },
     });
-    const arrow = await breadcrumbsComponent.queryByRole('goback');
+    const arrow = await breadcrumbsComponent.queryByRole('link', {
+      name: 'Go Back',
+    });
     expect(arrow).toBeNull();
 
     breadcrumbsComponent.unmount();

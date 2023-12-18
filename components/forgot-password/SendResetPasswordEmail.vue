@@ -30,6 +30,8 @@
       }}</span>
 
       <alex-custom-button
+        block
+        theme="dark"
         type="submit"
         theme="dark"
         block

@@ -4,16 +4,17 @@
     :class="{ 'flex-row-reverse': order === 'FIRST_ON_TOP' }"
     data-testid="alex-avatar-group"
   >
-    <template v-for="(avatar, index) in avatarsToShow" :key="index">
+    <template v-for="({ name, image }, index) in avatarsToShow" :key="index">
       <v-avatar
+        data-testid="alex-avatar"
         :size="size"
-        :image="avatar.image?.url"
+        :image="image?.url"
         class="alex-avatar-group-border alex-avatar-group-margin"
         color="gray-100"
       >
-        <template v-if="!avatar.image" #default>
+        <template v-if="!image" #default>
           <p class="text-gray-600">
-            {{ getInitials(avatar.name) }}
+            {{ getInitials(name) }}
           </p>
         </template>
       </v-avatar>

@@ -33,9 +33,11 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :user="user"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
       @click="onClickOutside"
       :menu-items="profileMenuItems"
+      show-picture
     />
 
     <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
@@ -59,10 +61,8 @@ const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
 
 onBeforeMount(() => {
-  if (user.value) {
-    userStore.profilePicture = user.value.avatar;
-    userStore.fullname = user.value.fullname;
-  }
+  userStore.profilePicture = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
 });
 
 const menus = [
@@ -78,6 +78,11 @@ const menus = [
         icon: 'mdi-view-dashboard-outline',
         title: 'Accordion',
         to: '/components/custom/Accordion',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Avatar Group',
+        to: '/components/custom/AvatarGroup',
       },
       {
         icon: 'mdi-view-dashboard-outline',
@@ -123,6 +128,11 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
+        title: 'Header',
+        to: '/components/custom/Header',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
         title: 'Horizontalbar',
         to: '/components/custom/horizontalbar',
       },
@@ -141,6 +151,11 @@ const menus = [
         title: 'tabs',
         to: '/components/custom/tabs',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
+      },
     ],
   },
   {
@@ -150,6 +165,11 @@ const menus = [
         icon: 'mdi-radio',
         title: 'Radio-button',
         to: '/components/inputs/radio-button',
+      },
+      {
+        icon: 'mdi-radio',
+        title: 'Radio-button',
+        to: '/components/inputs/checkbox',
       },
       {
         icon: 'mdi-card-text-outline',
