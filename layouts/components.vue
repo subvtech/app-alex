@@ -106,6 +106,11 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/custom/dropdown',
+      },
     ],
   },
   {
@@ -153,13 +158,13 @@ const menus = [
       },
       {
         icon: 'mdi-card-text-outline',
-        title: 'Textarea',
-        to: '/components/inputs/text-area',
+        title: 'Autocomplete',
+        to: '/components/inputs/autocomplete',
       },
       {
         icon: 'mdi-card-text-outline',
-        title: 'Date Field',
-        to: '/components/inputs/date',
+        title: 'Select',
+        to: '/components/inputs/select',
       },
       {
         icon: 'mdi-view-dashboard-outline',
@@ -167,9 +172,9 @@ const menus = [
         to: '/components/learning-plans/card',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Dropdown',
-        to: '/components/inputs/dropdown',
+        icon: 'mdi-shoe-print',
+        title: 'Stepper',
+        to: '/components/inputs/stepper',
       },
     ],
   },

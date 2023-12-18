@@ -1,21 +1,23 @@
 <template>
-  <v-autocomplete
-    :name="name"
+  <alex-inputs-autocomplete
     v-model="value"
+    :label="$t('pages.register.institution')"
+    :name="name"
     :search="search"
-    @input="$emit('update:search', $event.target.value)"
     :loading="fetching"
     :items="institutions"
-    item-text="text"
-    item-value="id"
-    item-title="name"
+    :item-title="getItemTitle"
     :color="color"
+    :error-messages="errorMessage"
+    show
+    item-value="id"
     class="my-3"
     variant="outlined"
-    hide-no-data
-    required
-    :label="$t('pages.register.institution')"
-    :error-messages="errorMessage"
+    no-data-text="Instituição não encontrada"
+    autofocus
+    spellcheck="false"
+    v-bind="$attrs"
+    @input="$emit('update:search', $event.target.value)"
   />
 </template>
 
@@ -23,36 +25,23 @@
 import { useField } from 'vee-validate';
 
 type InstitutionsType = {
-  name: string;
+  socialName: string;
   acronym: string;
-  sector: string;
-  id: number;
-  cover: any;
 };
 
-const props = defineProps({
-  search: {
-    type: String,
-    required: true,
-  },
-  institutions: {
-    type: Array as PropType<InstitutionsType[]>,
-    required: true,
-  },
-
-  filterIds: {
-    type: Array as PropType<Number[]>,
-    default: [],
-  },
-  name: {
-    type: String,
-    required: false,
-  },
-  color: {
-    type: String,
-    default: 'white',
-  },
+type InstitutionProps = {
+  search: string;
+  institutions: InstitutionsType[];
+  filterIds?: number[];
+  name?: string;
+  color?: string;
+};
+const props = withDefaults(defineProps<InstitutionProps>(), {
+  name: 'institution',
+  color: 'white',
+  filterIds: () => [],
 });
+
 const emit = defineEmits([
   'update:institutions',
   'update:value',
@@ -73,24 +62,26 @@ const i18n = useI18n();
 const fetchInstitutions = async (institution: string) => {
   fetching.value = true;
   try {
-    const res = await find(
-      `institutions?populate=cover&nome_contains=${institution}&tipo=matriz&_limit=10`,
-    );
-
-    const resultArr = (res.data.length > 0 ? res.data : [])
-      //.filter((r: any) => !props.filterIds.includes(r.id))
-      .map((r: any) => {
+    const result = await find(`institutions`, {
+      fields: ['id', 'acronym', 'socialName'], // campos a serem buscados
+      filters: {
+        $or: [
+          { acronym: { $containsi: institution } },
+          { socialName: { $containsi: institution } },
+        ],
+      },
+      pagination: { start: 0, limit: 10 }, // limite de instituições
+    });
+    if (result.data.length > 0) {
+      const dataInstitutions = result.data.map((institution: any) => {
         return {
-          id: r.id,
-          acronym: r.attributes.acronym,
-          name: r.attributes.name,
-          type: r.attributes.type,
-          cover: r.attributes.cover.data.attributes,
-          cnpj: r.attributes.cnpj,
-          sector: r.attributes.sector,
+          id: institution.id,
+          acronym: institution.attributes?.acronym,
+          socialName: institution.attributes?.socialName,
         };
       });
-    emit('update:institutions', resultArr);
+      emit('update:institutions', dataInstitutions);
+    }
   } catch (error) {
     setMessage(i18n.t('pages.login.searchError'), 'red', true);
   } finally {
@@ -98,14 +89,14 @@ const fetchInstitutions = async (institution: string) => {
   }
 };
 
-watchEffect(async (onInvalidate) => {
+watchEffect((onInvalidate) => {
   if (props.search.length > 0) {
     isTyping.value = true;
 
     const getData = setTimeout(async () => {
       isTyping.value = false;
       await fetchInstitutions(props.search);
-    }, 500);
+    }, 700);
 
     onInvalidate(() => {
       clearInterval(getData);
@@ -113,9 +104,7 @@ watchEffect(async (onInvalidate) => {
   }
 });
 
-watchEffect(() => {
-  emit('update:value', (value.value as number) - 1);
-});
+const getItemTitle = (item: InstitutionsType) => {
+  return `${item.acronym} - ${item.socialName}`;
+};
 </script>
-
-<style scoped></style>

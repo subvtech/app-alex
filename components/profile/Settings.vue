@@ -12,20 +12,20 @@
           class="d-flex flex-column"
           @submit.prevent="updateValues"
         >
-          <alex-inputs-stepper-field
+          <alex-inputs-text-field
             :label="$t('components.profile.settings.fullname')"
             :value="fullname"
             name="fullname"
             class=""
           />
           <div class="block d-flex flex-wrap">
-            <alex-inputs-stepper-field
+            <alex-inputs-text-field
               :label="$t('components.profile.settings.phone')"
               :value="telephone"
               name="phone"
               v-maska:[phoneMask]
             />
-            <alex-inputs-stepper-field
+            <alex-inputs-text-field
               :label="$t('components.profile.settings.cpf')"
               :value="cpf"
               name="cpf"

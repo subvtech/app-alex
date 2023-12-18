@@ -1,38 +1,44 @@
 <template>
-  <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
-    <div class="mb-10">
-      <p class="text-white text-h4 text-center font-weight-bold mb-4">
+  <v-container
+    class="pa-0 d-flex flex-column h-75 mid-container justify-center"
+    style="max-width: 400px"
+  >
+    <div>
+      <p class="text-white text-h3 text-center font-weight-bold mb-4">
         {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
       </p>
-      <p class="text-white text-h6 font-weight-regular text-center my-2">
+      <p
+        class="text-white text-subtitle-2 font-weight-regular text-center my-2"
+      >
         {{ $t('components.forgot.sendResetPassword.enterEmail') }}
       </p>
     </div>
     <v-form ref="form" color="white" class="mb-10" @submit.prevent="submit">
-      <alex-inputs-stepper-field
+      <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.email')"
+        :placeholder="$t('components.forgot.sendResetPassword.emailHolder')"
         name="email"
         color="white"
-        class="my-3 text-secondary"
+        class="mb-1"
         theme="dark"
       />
       <span v-if="submitError" class="text-error w-100">{{
         $t('components.forgot.sendResetPassword.emailError')
       }}</span>
 
-      <v-btn
-        :color="!isValid ? 'grey-darken-1' : 'accent'"
+      <alex-custom-button
         class="text-none text-white rounded-lg pa-5"
         block
         type="submit"
         size="large"
         :disabled="!isValid"
         :loading="loading"
-        >{{ $t('components.forgot.sendResetPassword.recoverPassword') }}</v-btn
+        >{{
+          $t('components.forgot.sendResetPassword.recoverPassword')
+        }}</alex-custom-button
       >
     </v-form>
-    <ForgotPasswordDividerRow />
-    <p class="text-center text-body-1">
+    <p class="text-center text-body-1 font-weight-bold">
       {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-decoration-none text-accent">{{
         $t('components.forgot.sendResetPassword.login')

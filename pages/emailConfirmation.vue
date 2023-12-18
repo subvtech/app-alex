@@ -9,22 +9,15 @@
         <img class="w-50" src="/images/imagem_forgot.png" />
       </v-col>
       <v-col
-        id="forgot-container"
+        id="container"
         cols="12"
         md="4"
         sm="12"
         class="bg-primary-0 px-16 d-flex justify-center align-center"
       >
-        <ForgotPasswordSendResetPasswordEmail
-          v-if="!emailSent"
-          @confirmation-message="handleSentEmail"
-        />
         <ForgotPasswordConfirmationMessage
-          v-else
-          :title="$t('pages.forgot.success.title')"
-          :text="$t('pages.forgot.success.subtitle1')"
-          :email="userEmail"
-          :text2="$t('pages.forgot.success.subtitle2')"
+          :title="$t('pages.emailConfirmation.success.title')"
+          :text="$t('pages.emailConfirmation.success.subtitle1')"
         />
       </v-col>
     </v-row>
@@ -32,21 +25,14 @@
 </template>
 
 <script setup lang="ts">
-const emailSent = ref(false);
-const userEmail = ref('');
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
 });
-
-const handleSentEmail = (email) => {
-  userEmail.value = email;
-  emailSent.value = true;
-};
 </script>
 
 <style scoped lang="scss">
-#forgot-container {
+#container {
   background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: cover;

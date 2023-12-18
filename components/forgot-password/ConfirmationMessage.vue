@@ -1,22 +1,23 @@
 <template>
   <v-container
-    class="w-100 fill-height d-flex justify-center"
-    style="align-content: start;"
+    class="w-100 fill-height d-flex justify-center align-content-center"
   >
     <v-card
       variant="outlined"
       class="w-100 pa-4 rounded-lg"
       color="green-lighten-1"
     >
-      <v-card-title class="text-white">{{ title }}</v-card-title>
-      <v-card-text class="text-body-1 text-grey-lighten-1"
+      <v-card-title class="text-white text-h3">{{ title }}</v-card-title>
+      <v-card-text class="text-body-1 text-gray-200"
         >{{ text }}
-        <strong class="text-white font-weight-bold"> {{ email }} </strong>.
+        <strong class="text-white font-weight-bold"> {{ email }} </strong>
         {{ text2 }}
       </v-card-text>
     </v-card>
     <NuxtLink to="/login" class="text-accent text-decoration-none mt-6">
-      <v-icon icon="mdi-arrow-left" class="mr-1" />{{ $t('pages.forgot.success.return') }}
+      <v-icon icon="mdi-arrow-left" class="mr-1" />{{
+        $t('pages.forgot.success.return')
+      }}
     </NuxtLink>
   </v-container>
 </template>

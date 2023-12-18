@@ -40,7 +40,8 @@
   "username": {
     "required": "Username is required",
     "min": "At least 6 characters long",
-    "max": "At most 64 characters long"
+    "max": "At most 64 characters long",
+    "onlyLetters": "It must have only letters and numbers"
   },
   "password": {
     "required": "Password is required",
