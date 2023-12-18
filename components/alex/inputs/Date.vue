@@ -30,7 +30,6 @@
       v-bind="$attrs"
     >
       <v-menu
-        :close-on-content-click="false"
         class="alex-picker"
         transition="scale-transition"
         offset-y
