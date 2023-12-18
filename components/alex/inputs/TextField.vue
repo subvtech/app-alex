@@ -18,13 +18,14 @@
       v-model="value"
       color="primary--2"
       rounded="lg"
+      hide-details="auto"
       clear-icon="mdi-close"
       hide-details="auto"
       :error-messages="errorMessage"
       :class="theme"
       :disabled="disabled"
       v-bind="$attrs"
-    />
+    ></v-text-field>
   </div>
 </template>
 

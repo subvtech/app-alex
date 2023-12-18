@@ -22,6 +22,7 @@
       class="w-100"
       type="date"
       append-inner-icon="mdi-calendar"
+      hide-details="auto"
       :error-messages="errorMessage"
       :disabled="disabled"
       :required="required"
@@ -29,7 +30,6 @@
       v-bind="$attrs"
     >
       <v-menu
-        :close-on-content-click="false"
         class="alex-picker"
         transition="scale-transition"
         offset-y
