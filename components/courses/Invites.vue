@@ -9,31 +9,46 @@
     is-nested
   >
     <template #content>
-      <div v-if="enableInvites" class="d-flex flex-column w-100">
+      <div v-if="enableInvites" class="d-flex flex-column w-100 max-width">
         <div
           class="invite gap-6 justify-space-between"
           :class="theresTimeAndUrl ? '' : 'disabled'"
         >
-          <a v-if="theresTimeAndUrl" class="" :href="url!">
-            {{ url }}
-          </a>
+          <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
+            <template #content>
+              <a :href="url!">
+                {{ url }}
+              </a>
+            </template>
+          </alex-custom-tooltip>
           <span v-else>{{ $t('components.courses.invites.expired') }}</span>
 
           <div class="d-flex align-center gap-1">
-            <img
-              class="pointer"
-              src="/svg/refresh.svg"
-              @click="generateNewInvite"
-              width="20"
-              height="20"
-            />
-            <v-icon
-              v-if="theresTimeAndUrl"
-              class="pointer"
-              color="#00B7CC"
-              size="small"
-              >mdi-content-copy</v-icon
+            <alex-custom-tooltip
+              :text="$t('components.courses.invites.refresh')"
             >
+              <template #content>
+                <img
+                  class="pointer"
+                  src="/svg/refresh.svg"
+                  @click="generateNewInvite"
+                  width="20"
+                  height="20"
+                />
+              </template>
+            </alex-custom-tooltip>
+            <alex-custom-tooltip :text="$t('components.courses.invites.copy')">
+              <template #content>
+                <v-icon
+                  v-if="theresTimeAndUrl"
+                  class="pointer"
+                  color="#00B7CC"
+                  size="small"
+                  @click="copyToClipboard(url)"
+                  >mdi-content-copy</v-icon
+                >
+              </template>
+            </alex-custom-tooltip>
           </div>
         </div>
         <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
@@ -52,7 +67,8 @@
 
 <script setup lang="ts">
 const { create, delete: _delete } = useStrapi();
-
+const { copyToClipboard } = useCopyText();
+const emit = defineEmits(['update:link']);
 const props = defineProps({
   enableInvites: {
     type: Boolean,
@@ -72,18 +88,12 @@ const props = defineProps({
   },
 });
 
+const { generateUrl } = useInvitationLink();
+
 const inviteId = ref(null);
 const url = toRef<string | null>(null);
 const remainingTime = toRef<number>(-5);
-const fullPath = removeAfterLastSlash(window.location.href);
-function removeAfterLastSlash(url) {
-  let lastSlashIndex = url.lastIndexOf('/');
-  if (lastSlashIndex !== -1) {
-    return url.substring(0, lastSlashIndex);
-  } else {
-    return url;
-  }
-}
+
 function generateRandomBytes(size) {
   if (size < 1 || size > 36) size = 8;
   return window.crypto.randomUUID().substring(0, size);
@@ -113,10 +123,10 @@ const generateNewInvite = async () => {
     hash: generateRandomBytes(8),
     learningplan: props.courseId,
   });
-  console.log({ result });
-  inviteId.value = result.id;
-  url.value = fullPath + '/join/' + result.hash;
 
+  inviteId.value = result.id;
+  url.value = generateUrl(result.hash);
+  emit('update:link', { url: url.value });
   remainingTime.value =
     new Date(result.expires_at).getTime() - new Date().getTime();
 };
@@ -126,7 +136,7 @@ const theresTime = computed(() => remainingTime.value > 0);
 
 onBeforeMount(() => {
   if (!props.data) return;
-  if (props.data.hash) url.value = fullPath + '/join/' + props.data.hash;
+  if (props.data.hash) url.value = generateUrl(props.data.hash);
   if (props.data.id) inviteId.value = props.data.id;
   if (props.data.expires_at) {
     remainingTime.value =
@@ -154,6 +164,10 @@ watch(remainingTime, () => {
 .gap-6 {
   gap: 24px;
 }
+
+.max-width {
+  max-width: 500px;
+}
 .pointer {
   cursor: pointer;
 }
@@ -170,6 +184,7 @@ watch(remainingTime, () => {
   line-height: 135%; /* 21.6px */
   letter-spacing: 0.32px;
 }
+
 .invite {
   display: flex;
   height: 52px;
@@ -201,6 +216,7 @@ watch(remainingTime, () => {
   }
   a {
     overflow: hidden;
+    white-space: nowrap;
     color: var(--principais-secundria-secundria-0, #00b7cc);
     text-overflow: ellipsis;
     font-family: Montserrat;

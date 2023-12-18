@@ -77,10 +77,10 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Accordion',
-        to: '/components/custom/Accordion',
+        to: '/components/custom/accordion',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-image-area',
         title: 'Banner',
         to: '/components/custom/banner',
       },
@@ -88,7 +88,12 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Button',
-        to: '/components/custom/Button',
+        to: '/components/custom/button',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Card',
+        to: '/components/custom/card',
       },
       {
         icon: 'mdi-chip',
@@ -98,7 +103,12 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Dialog',
-        to: '/components/custom/Dialog',
+        to: '/components/custom/dialog',
+      },
+      {
+        icon: 'mdi-image-filter-center-focus-weak',
+        title: 'EmptyPlaceholder',
+        to: '/components/custom/emptyplaceholder',
       },
 
       {
@@ -110,6 +120,11 @@ const menus = [
         icon: 'mdi-view-dashboard-outline',
         title: 'Dropdown',
         to: '/components/custom/dropdown',
+      },
+      {
+        icon: 'mdi-tooltip',
+        title: 'Tooltip',
+        to: '/components/custom/tooltip',
       },
     ],
   },
@@ -133,12 +148,12 @@ const menus = [
       },
       {
         icon: 'mdi-book-open-page-variant',
-        title: 'pagination',
+        title: 'Pagination',
         to: '/components/custom/pagination',
       },
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'tabs',
+        title: 'Tabs',
         to: '/components/custom/tabs',
       },
     ],

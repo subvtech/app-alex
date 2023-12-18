@@ -11,46 +11,51 @@
         hideDividers ? '' : 'border-bottom',
         sizingClass ?? (noHeader ? 'px-6' : isNested ? '' : 'px-6'),
       ]"
+
+   
     >
       <div class="foretitle d-flex py-6">
-        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{ title }}</span>
+        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{
+          title
+        }}</span>
         <a v-if="href" :href="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
         </a>
-        <div v-if="showTooltip" class="tooltip d-flex">
-          <img class="pl-1" src="/svg/tooltip.svg" width="24" height="24" />
-          <div v-if="tooltip" class="px-4">
-            <span>{{ tooltip }}</span>
-          </div>
-        </div>
+        <alex-custom-tooltip
+          v-if="showTooltip"
+          show-icon
+          :text="tooltip"
+          :extra-classes="tooltipExtraClass"
+        />
       </div>
 
-      <div v-if="isEditing" class="buttons d-flex justify-end">
-        <v-btn
+      <div
+        v-if="isEditing"
+        class="buttons d-flex flex-wrap justify-end"
+        :class="smallButtons ? 'small-buttons' : ''"
+      >
+        <alex-custom-button
           class="btn"
-          color="accent"
           @click="cancelledAction"
-          variant="outlined"
+          variant="secondary"
         >
-          {{ $t('components.profile.settings.cancel') }}</v-btn
+          {{ $t('components.profile.settings.cancel') }}</alex-custom-button
         >
-        <v-btn class="btn" color="accent" @click="savedAction" type="submit">
-          {{ $t('components.profile.settings.save') }}
-        </v-btn>
+        <alex-custom-button class="btn" @click="savedAction" variant="primary">
+          {{ $t('components.profile.settings.save') }}</alex-custom-button
+        >
 
-        <v-btn
-          class="hide rounded-circle"
-          color="accent"
-          @click="cancelledAction"
-          variant="outlined"
+        <alex-custom-button
+          class="small"
           icon="mdi-cancel"
+          variant="secondary"
+          @click="cancelledAction"
         />
-        <v-btn
-          class="hide rounded-circle"
+        <alex-custom-button
+          class="small"
           icon="mdi-check"
-          color="accent"
-          @click="save"
-          type="submit"
+          variant="primary"
+          @click="savedAction"
         />
       </div>
       <div
@@ -58,13 +63,20 @@
         class="pointer"
         @click="emit('toggle:isEditing')"
       >
-        <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
+        <alex-custom-tooltip :text="$t('components.card.edit')">
+          <template #content>
+            <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
+          </template>
+        </alex-custom-tooltip>
       </div>
     </div>
 
     <div
       class="d-flex flex-column w-100"
-      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent ?? 'align-start']"
+      :class="[
+        sizingClass ?? (noHeader ? 'px-6' : 'pa-6'),
+        alignContent ?? 'align-start',
+      ]"
     >
       <slot name="content" />
       <slot name="footer" />
@@ -105,6 +117,9 @@ const props = defineProps({
   sizingClass: {
     type: String as PropType<SizingClass>,
   },
+  tooltipExtraClass: {
+    type: String,
+  },
   alignContent: {
     type: String as PropType<'align-center' | 'align-start' | 'align-end'>,
   },
@@ -116,6 +131,10 @@ const props = defineProps({
     default: true,
   },
   showTooltip: {
+    type: Boolean,
+    default: false,
+  },
+  smallButtons: {
     type: Boolean,
     default: false,
   },
@@ -187,67 +206,34 @@ type SizingClass =
       font-weight: 700;
       line-height: 24px;
     }
-
-    div.tooltip {
-      position: relative;
-      img:hover + div {
-        display: block !important;
-      }
-      div {
-        position: absolute;
-        display: none;
-        top: 120%;
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 300px;
-        padding: 6.5px 16px;
-        justify-content: center;
-        align-items: center;
-        border-radius: 4px;
-        background: var(--cinza-cinza-800, #454d54);
-        box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.15);
-
-        span {
-          color: var(--principais-branco, #fff);
-
-          font-size: 14px;
-          font-weight: 400;
-          letter-spacing: 0.28px;
-        }
-      }
-    }
   }
 
   .buttons {
     gap: 8px;
-  }
-  .btn {
-    text-transform: none !important;
-    height: 36px;
-    padding-inline: 12px;
-  }
-  .hide {
-    display: none;
+    .small {
+      display: none;
+    }
+    .btn {
+      display: flex;
+      text-transform: none !important;
+      height: 36px;
+      padding-inline: 12px;
+    }
+    &.small-buttons {
+     
+      .small {
+        display: flex;
+      }
+
+      .btn {
+        display: none;
+      }
+    }
   }
 }
 @media (max-width: 800px) {
   #Card {
     width: 100%;
-  }
-}
-
-@media (max-width: 400px) {
-  #Card {
-    .buttons {
-      .btn {
-        display: none;
-      }
-      .hide {
-        display: flex;
-        height: 36px !important;
-        width: 36px !important;
-      }
-    }
   }
 }
 </style>

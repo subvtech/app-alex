@@ -1,6 +1,10 @@
 <template>
   <div class="d-flex flex-column justify-center align-center gap-6">
-    <img class="img-size" :src="emptyTextImage" />
+    <img
+      class="img-size"
+      :class="hideImage ? 'd-none' : ''"
+      :src="emptyTextImage"
+    />
 
     <span class="info text-center text-color">
       {{ emptyTextMessage }}
@@ -17,6 +21,10 @@ const props = defineProps({
   emptyTextMessage: {
     type: String,
     default: '',
+  },
+  hideImage: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

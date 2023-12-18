@@ -4,14 +4,16 @@
     "label": "What's the new Technical competence?",
     "placeholder": "Type in a technical competence",
     "empty": "No competences...",
-    "updated": "Technical competences successfuly updated."
+    "updated": "Technical competences successfuly updated.",
+    "tooltip": "Technical competences are specific skills required to work in a determined field, examples:  JavaScript, Calculation and English (Hard skills)."
   },
   "general": {
     "title": "General competences",
     "label": "What's the new General Competence?",
     "placeholder": "Type in a general competence",
     "empty": "No competences...",
-    "updated": "General competences successfuly updated."
+    "updated": "General competences successfuly updated.",
+    "tooltip": "General competences are essencial skills that are useful in different fields, examples: Comunication, problem solving and teamwork (Soft skills)."
   },
   "duplicatedText": "There's already a tag with this description, please pick another name.",
   "alreadyAdded": "Tag already added"

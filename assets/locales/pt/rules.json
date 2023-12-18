@@ -16,7 +16,9 @@
   },
 
   "keyword": {
-    "required": "Esse campo é obrigatório"
+    "required": "Esse campo é obrigatório",
+    "noSpaces": "Não pode haver espaços",
+    "onlyLetters": "Apenas letras do alfabeto são permitidas"
   },
 
   "description": {
@@ -65,25 +67,8 @@
     "min": "Mínimo de 4 caracteres",
     "max": "Máximo de 64 caracteres"
   },
-  "startDate": {
-    "required": "Data de início é obrigatório"
-  },
-  "endDate": {
-    "required": "Data de término é obrigatório"
-  },
-  "class": {
-    "required": "Turma é obrigatório",
-    "min": "Mínimo de {min} caracteres",
-    "max": "Máximo de {max} caracteres"
-  },
-  "description": {
-    "required": "Descrição é obrigatório",
-    "min": "Mínimo de {min} caracteres",
-    "max": "Máximo de {max} caracteres"
-  },
-  "title": {
-    "required": "Título é obrigatório",
-    "min": "Mínimo de {min} caracteres",
-    "max": "Máximo de {max} caracteres"
+  "copy": {
+    "success": "Texto copiado.",
+    "error": "Não foi possível copiar o texto."
   }
 }

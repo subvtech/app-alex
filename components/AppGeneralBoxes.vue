@@ -4,7 +4,10 @@
     :class="hideDivider ? '' : 'border-bottom'"
   >
     <div class="box d-flex" v-for="(box, index) in boxes" :key="index">
-      <v-icon color="#00B8CC">{{ box.icon }}</v-icon>
+      <v-icon v-if="box.icon.startsWith('mdi')" color="#00B8CC">{{
+        box.icon
+      }}</v-icon>
+      <img v-else :src="`/svg/${box.icon}`" width="24" height="24" />
       <div class="d-flex">
         <h6>{{ box.number }}</h6>
         <p>
@@ -22,14 +25,14 @@
 </template>
 <script setup lang="ts">
 const i18n = useI18n();
-console.log(i18n);
+
 const props = defineProps({
   boxes: {
     type: Array as PropType<
       {
         icon: string;
         number: number;
-        label: 'courses' | 'students' | 'projects' | 'assignments';
+        label: 'courses' | 'students' | 'trails' | 'projects' | 'assignments';
       }[]
     >,
     default: [],

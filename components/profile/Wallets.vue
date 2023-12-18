@@ -6,7 +6,7 @@
     :showIcon="false"
   >
     <template v-slot:content>
-      <div class="item d-flex justify-space-between">
+      <div class="item d-flex w-100 justify-space-between">
         <div class="label d-flex align-center">
           <div v-if="wallet" class="tooltip-box">
             <span class="tooltiptext">{{ wallet.address }}</span>
