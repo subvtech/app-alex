@@ -9,12 +9,10 @@
         >Novo Curso</alex-custom-button
       >
     </header>
-    <div
-      style="flex: 1"
-      class="d-flex align-center justify-center bg-white flex-column rounded-lg fill-height pa-6"
-    >
+    <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
       <div
         v-if="courses.length == 0"
+        style="flex: 1"
         class="d-flex align-center justify-center flex-column"
       >
         <img
@@ -24,8 +22,8 @@
         />
         <p class="text-h3 text-gray-600">Nenhum curso encontrado!</p>
       </div>
-      <div v-else class="d-flex w-100 flex-column">
-        <div class="d-flex justify-space-between flex-wrap w-100">
+      <div v-else class="d-flex w-100 flex-column h-100" style="flex: 1">
+        <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
           <alex-inputs-text-field
             v-model="search"
             placeholder="Buscar"
@@ -76,17 +74,18 @@
             </v-tooltip>
           </div>
         </div>
-        <!-- <div class="d-flex flex-column h-100 justify-space-between"> -->
-        <div v-if="coursesView == 'grid'" class="d-flex flex-wrap w-100 py-6">
-          <v-data-iterator
-            v-model:search="search"
-            v-model:page="page"
-            :items="courses"
-            :items-per-page="12"
-            class="w-100 d-flex flex-wrap"
-            style="gap: 16px"
-          >
-            <template #default="{ items }">
+        <v-data-iterator
+          v-model:search="search"
+          v-model:page="page"
+          :items="courses"
+          :items-per-page="12"
+          :headers="headers"
+          :filter-keys="['title', 'description', 'facilitatorName', 'trails']"
+          class="d-flex flex-wrap align-content-space-between"
+          style="flex: 1"
+        >
+          <template #default="{ items }">
+            <div v-if="coursesView === 'grid'" class="d-flex flex-wrap ga-4">
               <alex-learningplan-card
                 v-for="course in items"
                 :key="course"
@@ -102,126 +101,121 @@
                 }"
                 :trails="course.raw.trails"
               />
-            </template>
-          </v-data-iterator>
-        </div>
-        <div v-if="coursesView == 'table'">
-          <v-data-table
-            id="courses-table"
-            ref="tableRef"
-            v-model:search="search"
-            v-model:page="page"
-            :items-per-page="12"
-            :items="courses"
-            :headers="headers"
-            class="py-4"
-          >
-            <template #item="{ item }">
-              <tr class="table-row text-body-3 text-gray">
-                <td style="max-width: 596px">
-                  <div class="d-flex align-center">
-                    <img
-                      :src="item.img"
-                      width="48"
-                      height="36"
-                      class="rounded mr-4"
-                    />
-                    <p class="text-gray-900 text-body-4 text-overflow">
-                      {{ item.title }}
-                    </p>
-                  </div>
-                </td>
-                <td class="text-overflow" style="max-width: 596px">
-                  {{ item.description }}
-                </td>
-                <td class="text-overflow" style="max-width: 150px">
-                  {{ item.facilitatorName }}
-                </td>
-                <td class="text-overflow" style="max-width: 90px">
-                  {{ item.trails }}
-                </td>
-                <td>
-                  <alex-inputs-dropdown
-                    :items="[
-                      {
-                        icon: 'mdi-eye-outline',
-                        text: 'Mostrar',
-                      },
-                      {
-                        icon: 'mdi-cog-outline',
-                        text: 'Configurações',
-                      },
-                    ]"
-                  >
-                    <template #activator="{ props: propsMenu }">
-                      <v-tooltip
-                        text="Opções"
-                        location="bottom"
-                        content-class="bg-gray-800"
-                      >
-                        <template #activator="{ props: optionsTooltipProps }">
-                          <alex-custom-button
-                            v-bind="{ ...propsMenu, ...optionsTooltipProps }"
-                            variant="text"
-                            icon="mdi-dots-vertical"
-                          />
-                        </template>
-                      </v-tooltip>
-                    </template>
-                  </alex-inputs-dropdown>
-                </td>
-              </tr>
-            </template>
-            <template #bottom> </template>
-          </v-data-table>
-        </div>
+            </div>
+            <v-data-table
+              v-else
+              id="courses-table"
+              ref="tableRef"
+              :items-per-page="12"
+              :items="passData(items)"
+              :headers="headers"
+            >
+              <template #item="{ item }">
+                <tr class="table-row text-body-3 text-gray">
+                  <td style="max-width: 596px">
+                    <div class="d-flex align-center">
+                      <img
+                        :src="item.img"
+                        width="48"
+                        height="36"
+                        style="min-width: 48px; min-height: 36px"
+                        class="rounded mr-4"
+                      />
+                      <p class="text-gray-900 text-body-4 text-overflow">
+                        {{ item.title }}
+                      </p>
+                    </div>
+                  </td>
+                  <td class="text-overflow" style="max-width: 596px">
+                    {{ item.description }}
+                  </td>
+                  <td class="text-overflow" style="max-width: 150px">
+                    {{ item.facilitatorName }}
+                  </td>
+                  <td class="text-overflow" style="max-width: 90px">
+                    {{ item.trails }}
+                  </td>
+                  <td>
+                    <alex-inputs-dropdown
+                      :items="[
+                        {
+                          icon: 'mdi-eye-outline',
+                          text: 'Mostrar',
+                        },
+                        {
+                          icon: 'mdi-cog-outline',
+                          text: 'Configurações',
+                        },
+                      ]"
+                    >
+                      <template #activator="{ props: propsMenu }">
+                        <v-tooltip
+                          text="Opções"
+                          location="bottom"
+                          content-class="bg-gray-800"
+                        >
+                          <template #activator="{ props: optionsTooltipProps }">
+                            <alex-custom-button
+                              v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                              variant="text"
+                              icon="mdi-dots-vertical"
+                            />
+                          </template>
+                        </v-tooltip>
+                      </template>
+                    </alex-inputs-dropdown>
+                  </td>
+                </tr>
+              </template>
+              <template #bottom />
+            </v-data-table>
+          </template>
+          <template #footer="{ pageCount, groupedItems }">
+            <div
+              class="d-flex w-100 justify-space-between align-center pa-6 flex-column flex-sm-row ga-3 footer mt-6"
+            >
+              <p class="text-body-3 text-gray-600">
+                {{ showingData(groupedItems) }}
+              </p>
+              <alex-custom-pagination
+                v-if="pageCount > 1"
+                v-model="page"
+                :model-value="page"
+                :length="pageCount"
+                :total-visible="5"
+              />
+            </div>
+          </template>
+        </v-data-iterator>
       </div>
-      <!-- </div> -->
-    </div>
-    <div
-      v-if="courses.length > 0"
-      class="d-flex w-100 justify-space-between align-center pa-6 flex-column flex-sm-row ga-3 bg-white"
-      style="border-top: 1px #ebedef solid"
-    >
-      <p class="text-body-3 text-gray-600">
-        Mostrando do {{ showingData.from }} ao {{ showingData.to }} de um total
-        de {{ showingData.total }} cursos
-      </p>
-      <alex-custom-pagination
-        v-if="pageCount > 1"
-        v-model="page"
-        :length="pageCount"
-        :total-visible="5"
-      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-const coursesView = ref('table');
+import { ref } from 'vue';
+const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
-const pageCount = ref(0);
 const courses = ref([]);
-const showingData = ref({
-  from: 0,
-  to: 0,
-  total: 0,
-});
 
-const setShowingData = () => {
-  showingData.value = {
-    from: page.value * 12 - 12 + 1,
-    to:
-      page.value * 12 > courses.value.length
-        ? courses.value.length
-        : page.value * 12,
-    total: courses.value.length,
-  };
+const passData = (items) => {
+  return items.map((item) => item.raw);
 };
 
+const showingData = (groupedItems) => {
+  const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
+
+  const from = (page.value - 1) * itemsPerPage + 1;
+  const to =
+    page.value * itemsPerPage > courses.value.length
+      ? courses.value.length
+      : page.value * itemsPerPage;
+  const total = courses.value.length;
+  const message = `Mostrando do ${from} ao ${to} de um total de ${total} cursos`;
+  return message;
+};
 const breadcrumbs = [
   {
     title: 'Home',
@@ -232,16 +226,6 @@ const breadcrumbs = [
     href: '/course',
   },
 ];
-onMounted(() => {
-  pageCount.value = Math.ceil(courses.value.length / 12);
-  setShowingData();
-});
-
-watch([page, courses], () => {
-  if (!tableRef.value) return;
-  pageCount.value = Math.ceil(courses.value.length / 12);
-  setShowingData();
-});
 
 const headers = [
   {
@@ -250,15 +234,15 @@ const headers = [
   },
   {
     title: 'Descrição',
-    key: 'Descrição',
+    key: 'description',
   },
   {
     title: 'Facilitador',
-    key: 'Facilitador',
+    key: 'facilitatorName',
   },
   {
     title: 'Trilhas',
-    key: 'Trilhas',
+    key: 'trails',
   },
   {
     title: '',
@@ -342,8 +326,8 @@ courses.value = [
 ];
 
 courses.value = [
-  // ...courses.value,
-  // ...courses.value,
+  ...courses.value,
+  ...courses.value,
   // ...courses.value,
   // ...courses.value,
 ];
@@ -390,5 +374,10 @@ const changeViewMode = () => {
 .flex-stretch {
   flex: 1 !important;
   flex-basis: fit-content;
+}
+
+.footer {
+  border-top: 1px #ebedef solid;
+  max-height: 95px;
 }
 </style>
