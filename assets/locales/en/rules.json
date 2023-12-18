@@ -15,8 +15,14 @@
     "invalid": "Invalid CPF"
   },
 
-  "about": {
-    "required": "About is required",
+  "keyword": {
+    "required": "This field is required",
+    "noSpaces": "There shall be no spaces",
+    "onlyLetters": "There shall only alphabetic letters"
+  },
+
+  "description": {
+    "required": "This field is required",
     "min": "At least 12 characters long",
     "max": "At most 4000 characters long"
   },
@@ -60,5 +66,9 @@
     "required": "Url is required",
     "min": "At least 3 characters long",
     "max": "At most 64 characters long"
+  },
+  "copy": {
+    "success": "Text copied to clipboard",
+    "error": "Couldn't copy to clipboard"
   }
 }

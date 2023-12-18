@@ -25,6 +25,8 @@
       :userId="user.id"
       can-delete
       show-menu
+      settings-menu
+      show-settings
       show-profile-picture
       show-role
       show-border
@@ -64,10 +66,10 @@
         :institutions="user.institutions"
         :technicalTags="technicalTags"
         :generalTags="generalTags"
-        :info="user.user_descriptions"
+        :info="user.info"
         :user-id="user.id"
         :can-edit="canEdit"
-        @update:user="updateUser"
+        @update:user="(data) => updateUser(true, data ? data.message : data)"
       />
     </div>
   </div>
@@ -122,7 +124,7 @@ onBeforeMount(async () => {
   await updateUser(false);
 });
 
-const updateUser = async (show = true) => {
+const updateUser = async (show = true, message?) => {
   const populate = [
     'institutions.cover',
     'cover',
@@ -160,7 +162,7 @@ const updateUser = async (show = true) => {
   if (user.value.avatar) profilePicture.value = user.value.avatar.url;
   if (user.value.cover) coverPicture.value = user.value.cover.url;
 
-  messageStore.setMessage('done', 'green', show);
+  messageStore.setMessage(message ?? 'done', 'green', show);
 };
 
 const selectOption = (index) => {

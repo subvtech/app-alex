@@ -1,0 +1,16 @@
+{
+  "general": "Visão Geral",
+  "trails": "Trilhas",
+  "assignments": "Tarefas",
+  "class": "Turma",
+  "projects": "Projetos",
+  "events": "Eventos",
+  "communication": "Comunicação",
+  "details": "Detalhes",
+  "invite": "Convite do curso",
+  "about": {
+    "title": "Sobre o curso",
+    "empty": "Parece que esse curso não tem uma descrição..."
+  },
+  "notfound": "Curso não encontrado"
+}

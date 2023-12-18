@@ -41,5 +41,6 @@ export default function useNavigationDrawer(defaultWidth = 0) {
     isPermanent,
     closeDrawable,
     onClickOutside,
+    currentWidth
   };
 }

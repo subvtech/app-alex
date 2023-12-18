@@ -1,5 +1,5 @@
 <template>
-  <profile-card
+  <alex-custom-card
     :title="$t('components.profile.socials.title')"
     :cancel="cancel"
     :save="onSave"
@@ -8,22 +8,22 @@
     :full-width="true"
     @toggle:isEditing="isEditing = !isEditing"
   >
-    <template class="d-flex w-100" v-slot:content>
+    <template class="d-flex" v-slot:content>
       <div
         v-if="sortedSocials.length === 0"
-        class="empty d-flex flex-column justify-center align-center"
+        class="empty d-flex flex-column justify-center align-center w-100"
         style="gap: 16px"
       >
         <NuxtImg src="/svg/EmptySocials.svg" placeholder />
         <span>{{ $t('components.profile.socials.empty') }}</span>
       </div>
-      <div v-else>
+      <div class="w-100" v-else>
         <div
           class="rounded-lg"
           style="box-sizing: border-box; border: 1px solid #d2d6da"
         >
           <v-expansion-panels
-            class=""
+            class="w-100"
             variant="accordion"
             theme="flat"
             :key="componentKey"
@@ -75,7 +75,7 @@
         />
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

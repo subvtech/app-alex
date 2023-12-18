@@ -1,0 +1,16 @@
+{
+  "general": "General",
+  "trails": "Trails",
+  "assignments": "Assignments",
+  "class": "Class Members",
+  "projects": "Projects",
+  "events": "Events",
+  "communication": "Communication",
+  "invite": "Course invite",
+  "details": "Details",
+  "about": {
+    "title": "About the course",
+    "empty": "It seems that this course doesn't have a description..."
+  },
+  "notfound": "Course not found"
+}
