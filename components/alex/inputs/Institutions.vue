@@ -48,7 +48,7 @@ const emit = defineEmits([
   'update:search',
 ]);
 
-const { value, errorMessage } = useField(
+const { value, errorMessage, setErrors } = useField(
   () => props.name || 'institution',
   undefined,
 );
@@ -56,7 +56,6 @@ const { value, errorMessage } = useField(
 const isTyping = ref(false);
 const fetching = ref(false);
 const { find } = useStrapi();
-const { setMessage } = useMessageStore();
 const i18n = useI18n();
 
 const fetchInstitutions = async (institution: string) => {
@@ -83,7 +82,7 @@ const fetchInstitutions = async (institution: string) => {
       emit('update:institutions', dataInstitutions);
     }
   } catch (error) {
-    setMessage(i18n.t('pages.login.searchError'), 'red', true);
+    setErrors(i18n.t('pages.login.searchError'));
   } finally {
     fetching.value = false;
   }
