@@ -314,7 +314,9 @@
                 :model-value="openDialog"
                 title=""
                 body-classes="criticalAttention"
-                class="exclusionBody"
+                width="520px"
+                :scrollable="false"
+                max-height="500px"
               >
                 <template #header>
                   <alex-custom-dialog-header title="" class="noShow"
@@ -337,9 +339,14 @@
                         também será excluído.</span
                       >
                     </p>
+                    <div class="label d-flex flex-start w-100">
+                      <label for="exclusionLabel" class="body-p1" required
+                        >Digite a palavra: <strong>{{ exclusionWord }}</strong>
+                      </label>
+                    </div>
                     <alex-inputs-text-field
-                      label="Digite a palavra:"
                       name=""
+                      id="exclusionLabel"
                       class="w-100"
                       required
                       placeholder="Digite a frase"
@@ -373,8 +380,11 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { ref } from 'vue';
 
 const { t } = useI18n();
+
+const exclusionWord = ref(`Excluir`);
 
 const openDialog = ref(false);
 
@@ -610,12 +620,11 @@ p {
 
 .criticalAttention {
   display: flex;
-  width: 520px;
-  max-width: 520px;
   flex-direction: column;
   align-items: center;
   background-color: #fff;
   border-radius: 8px;
+  justify-content: center;
 }
 
 .noShow {
