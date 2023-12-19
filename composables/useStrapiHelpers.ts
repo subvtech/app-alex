@@ -1,12 +1,12 @@
 export function useStrapiHelpers() {
   const { t } = useI18n();
   const ERRORS = {
-    'Invalid Identifier or Password': t('erros.invalidIdentifierPassword'),
+    'Invalid identifier or password': t('errors.invalidIdentifierPassword'),
     'Your account has been blocked by an administrator': t(
-      'erros.blockedByAdministrator',
+      'errors.blockedByAdministrator',
     ),
-    'Your account email is not confirmed': t('erros.emailIsNotConfirmed'),
-    default: t('erros.default'),
+    'Your account email is not confirmed': t('errors.emailIsNotConfirmed'),
+    default: t('errors.default'),
   };
   const mapStrapiErrors = (message: string) => {
     return ERRORS[message] || ERRORS.default;

@@ -52,7 +52,8 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
 
   // If the language hasn't been loaded yet
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-  const errors = (await import(`../assets/locales/${lang}/erros.json`)).default;
+  const errors = (await import(`../assets/locales/${lang}/errors.json`))
+    .default;
   const pages = await useImportLanguages('pages', lang, [
     'login',
     'register',
