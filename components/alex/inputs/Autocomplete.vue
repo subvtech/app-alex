@@ -16,7 +16,6 @@
     </div>
     <v-autocomplete
       v-model="value"
-      hide-details="auto"
       color="primary--2"
       rounded="lg"
       variant="outlined"

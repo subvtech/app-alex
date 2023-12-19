@@ -19,7 +19,7 @@
       color="primary--2"
       rounded="lg"
       clear-icon="mdi-close"
-      hide-details="auto"
+      variant="outlined"
       :error-messages="errorMessage"
       :class="theme"
       :disabled="disabled"

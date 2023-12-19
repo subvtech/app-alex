@@ -28,7 +28,7 @@
         }"
         align="left"
         no-header
-        step-class="d-flex flex-column gap-4"
+        step-class="d-flex flex-column gap-1"
         :loading="registering"
         @update-loading="(value: boolean) => (registering = value)"
         @on-success="submit"

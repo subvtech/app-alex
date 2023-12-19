@@ -13,7 +13,7 @@
     <v-form
       ref="form"
       color="white"
-      class="d-flex flex-column gap-4 mb-10"
+      class="d-flex flex-column gap-1 mb-10"
       @submit.prevent="changePassword"
     >
       <alex-inputs-text-field
@@ -54,7 +54,7 @@
         }}</alex-custom-button
       >
     </v-form>
-    <p class="text-center text-body-1 mt-5">
+    <p class="text-center text-body-1 font-weight-bold mt-5">
       {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-accent text-decoration-none">
         {{ $t('components.forgot.sendResetPassword.login') }}
@@ -77,9 +77,9 @@ const passwordVisible = ref(false);
 const confirmationVisible = ref(false);
 
 const route = useRoute();
-onBeforeMount(() => {
-  if (!route.query.code) navigateTo('/login');
-});
+// onBeforeMount(() => {
+//   if (!route.query.code) navigateTo('/login');
+// });
 
 const emit = defineEmits(['confirmation-message']);
 

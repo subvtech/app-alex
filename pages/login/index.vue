@@ -27,7 +27,7 @@
           </div>
           <v-form
             ref="form"
-            class="d-flex flex-column gap-4"
+            class="d-flex flex-column gap-1"
             @submit.prevent="submit"
           >
             <alex-inputs-text-field
@@ -36,7 +36,6 @@
               name="email"
               color="white"
               theme="dark"
-              data-vv-validate-on="change|custom"
             />
 
             <alex-inputs-text-field

@@ -13,7 +13,7 @@
     </div>
     <v-form
       ref="form"
-      class="d-flex flex-column gap-4 mb-10"
+      class="d-flex flex-column mb-10"
       color="white"
       @submit.prevent="submit"
     >

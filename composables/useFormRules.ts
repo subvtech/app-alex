@@ -42,7 +42,11 @@ export const useFormRules = (formData?: FormDataType) => {
     email: yup
       .string()
       .required(i18n.t('rules.email.required'))
-      .email(i18n.t('rules.email.invalid')),
+      .trim()
+      .matches(
+        /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
+        i18n.t('rules.email.invalid'),
+      ),
   };
 
   const passwordRules = {
@@ -70,7 +74,8 @@ export const useFormRules = (formData?: FormDataType) => {
       .matches(
         /^[a-zA-Z0-9_-]*[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+[a-zA-Z0-9_-]*$/,
         i18n.t('rules.username.onlyLetters'),
-      ),
+      )
+      .trim(),
   };
 
   const fullnameRules = {
@@ -82,7 +87,8 @@ export const useFormRules = (formData?: FormDataType) => {
       .matches(
         /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
         i18n.t('rules.fullName.onlyLetters'),
-      ),
+      )
+      .trim(),
   };
 
   const cpfRules = {
