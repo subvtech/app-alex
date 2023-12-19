@@ -15,11 +15,13 @@
       <v-card class="card card-acesso d-flex justify-center align-center">
         <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
-            <v-card-title class="text-white text-center text-bold mt-16">
+            <v-card-title
+              class="text-white text-h3 text-center text-bold mt-16"
+            >
               {{ $t('pages.login.welcome') }}
             </v-card-title>
             <v-card-subtitle
-              class="text-white text-center"
+              class="text-subtitle-2 text-white text-center"
               style="white-space: normal"
             >
               {{ $t('pages.login.access') }}
@@ -91,13 +93,12 @@
               {{ $t('pages.login.submit') }}
             </alex-custom-button>
           </v-form>
-          <v-card-text class="smaller-text text-white text-center">
+          <v-card-text
+            class="text-white text-center font-weight-bold text-body-2"
+          >
             {{ $t('pages.login.noAccount') }}
 
-            <nuxt-link
-              to="/register"
-              class="blue-label smaller-text text-decoration-none"
-            >
+            <nuxt-link to="/register" class="blue-label text-decoration-none">
               {{ $t('pages.login.register') }}
             </nuxt-link>
           </v-card-text>

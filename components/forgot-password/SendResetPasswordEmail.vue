@@ -3,14 +3,17 @@
     class="content d-flex flex-column align-content-start justify-start max-400"
   >
     <div>
-      <p class="text-white text-h3 text-center font-weight-bold mb-4">
+      <v-card-title class="text-white text-h3 text-center text-bold">
         {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
-      </p>
-
-      <p class="text-white text-h6 mb-8" align="center">
+      </v-card-title>
+      <v-card-subtitle
+        class="text-subtitle-2 text-white text-center mb-8"
+        style="white-space: normal"
+      >
         {{ $t('components.forgot.sendResetPassword.enterEmail') }}
-      </p>
+      </v-card-subtitle>
     </div>
+
     <v-form
       ref="form"
       class="d-flex flex-column mb-10"

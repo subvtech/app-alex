@@ -183,7 +183,7 @@
         ></v-divider>
       </div>
 
-      <v-card-text class="text-white font-bold haveAccount">
+      <v-card-text class="text-white font-bold haveAccount text-body-2">
         {{ $t('pages.register.hasAccount') }}
         <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
           {{ $t('pages.register.login') }}
@@ -319,7 +319,6 @@ const submit = async (values: {
   &-link {
     text-decoration: none;
     color: #00d3ec !important;
-    font-size: 16px;
   }
 }
 
