@@ -24,7 +24,15 @@
             ],
           },
           step2: { scheme: registerStep2 },
-          step3: { scheme: registerStep3 },
+          step3: {
+            scheme: registerStep3,
+            validate: [
+              {
+                name: 'username',
+                callback: (value) => verifyField('username', value),
+              },
+            ],
+          },
         }"
         align="left"
         no-header
@@ -217,7 +225,9 @@ const verifyField = async (field: string, inputValue: string) => {
   if ((registeredFields as unknown as []).length) {
     return {
       status: false,
-      message: `${field} ${i18n.t('pages.register.alreadyTaken')}`,
+      message: `${i18n.t(`pages.register.${field}`)} ${i18n.t(
+        'pages.register.alreadyTaken',
+      )}`,
     };
   }
 };
