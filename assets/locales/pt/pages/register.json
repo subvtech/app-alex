@@ -12,6 +12,7 @@
   "fullName": "Nome completo",
   "fullNameHolder": "Digite seu nome completo",
   "email": "E-mail",
+  "cpf": "CPF",
   "emailHolder": "Digite seu e-mail",
   "cpfHolder": "Digite seu CPF",
   "password": "Senha",

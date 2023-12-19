@@ -209,31 +209,31 @@ ${exampleScript[0]}
         <div class="d-flex flex-wrap">
           <v-checkbox
             v-model="playgroundOptions[0]"
-            :hide-details="true"
+            hide-details
             label="clearable"
             color="primary"
           />
           <v-checkbox
             v-model="playgroundOptions[1]"
-            :hide-details="true"
+            hide-details
             label="error"
             color="error"
           />
           <v-checkbox
             v-model="playgroundOptions[2]"
-            :hide-details="true"
+            hide-details
             label="disabled"
             color="gray-400"
           />
           <v-checkbox
             v-model="playgroundOptions[3]"
-            :hide-details="true"
+            hide-details
             label="persistent-hint"
             color="accent"
           />
           <v-checkbox
             v-model="playgroundOptions[4]"
-            :hide-details="true"
+            hide-details
             label="required"
             color="info"
           />

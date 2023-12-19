@@ -4,7 +4,7 @@
       <img class="left-image" src="/images/imagem_forgot.png" />
     </div>
     <div class="bg-primary-0 pa-0 content-field">
-      <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end" />
+      <div class="mt-0 mt-sm-0" align="center" style="align-self: flex-end" />
 
       <ForgotPasswordSendResetPasswordEmail
         v-if="!emailSent"
