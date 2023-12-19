@@ -22,7 +22,7 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    variant:
+    variant?:
       | 'primary'
       | 'secondary'
       | 'tertiary'

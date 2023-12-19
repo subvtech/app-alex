@@ -22,7 +22,6 @@
       no-resize
       role="select"
       clear-icon="mdi-close"
-      hide-details="auto"
       :class="theme"
       :error-messages="errorMessage"
       :disabled="disabled"

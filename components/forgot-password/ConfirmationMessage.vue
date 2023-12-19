@@ -32,3 +32,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.max-400 {
+  max-width: 400px;
+}
+</style>

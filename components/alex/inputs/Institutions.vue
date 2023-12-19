@@ -13,7 +13,7 @@
     item-value="id"
     class="my-3"
     variant="outlined"
-    no-data-text="Instituição não encontrada"
+    :no-data-text="noDataText"
     autofocus
     spellcheck="false"
     v-bind="$attrs"
@@ -53,13 +53,16 @@ const { value, errorMessage, setErrors } = useField(
   undefined,
 );
 
+const { t } = useI18n();
 const isTyping = ref(false);
 const fetching = ref(false);
+const noDataText = ref(t('components.institutions.searchForIntitutions'));
 const { find } = useStrapi();
 const i18n = useI18n();
 
 const fetchInstitutions = async (institution: string) => {
   fetching.value = true;
+  noDataText.value = t('components.institutions.noInstitutionsFound');
   try {
     const result = await find(`institutions`, {
       fields: ['id', 'acronym', 'socialName'], // campos a serem buscados

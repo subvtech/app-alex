@@ -15,11 +15,13 @@
       <v-card class="card card-acesso d-flex justify-center align-center">
         <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
-            <v-card-title class="text-white text-center text-bold mt-16">
+            <v-card-title
+              class="text-white text-h3 text-center text-bold mt-16"
+            >
               {{ $t('pages.login.welcome') }}
             </v-card-title>
             <v-card-subtitle
-              class="text-white text-center"
+              class="text-subtitle-2 text-white text-center"
               style="white-space: normal"
             >
               {{ $t('pages.login.access') }}
@@ -27,7 +29,7 @@
           </div>
           <v-form
             ref="form"
-            class="d-flex flex-column gap-4"
+            class="d-flex flex-column gap-1"
             @submit.prevent="submit"
           >
             <alex-inputs-text-field
@@ -36,7 +38,6 @@
               name="email"
               color="white"
               theme="dark"
-              data-vv-validate-on="change|custom"
             />
 
             <alex-inputs-text-field
@@ -52,7 +53,7 @@
             />
             <div class="mt-2">
               <p v-show="hasError" class="text-body-1 text-error">
-                {{ $t(`pages.login.${errorMessage}`) }}
+                {{ errorMessage }}
               </p>
             </div>
             <div
@@ -92,13 +93,12 @@
               {{ $t('pages.login.submit') }}
             </alex-custom-button>
           </v-form>
-          <v-card-text class="smaller-text text-white text-center">
+          <v-card-text
+            class="text-white text-center font-weight-bold text-body-2"
+          >
             {{ $t('pages.login.noAccount') }}
 
-            <nuxt-link
-              to="/register"
-              class="blue-label smaller-text text-decoration-none"
-            >
+            <nuxt-link to="/register" class="blue-label text-decoration-none">
               {{ $t('pages.login.register') }}
             </nuxt-link>
           </v-card-text>
@@ -144,7 +144,7 @@ const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
-
+const { mapStrapiErrors } = useStrapiHelpers();
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
   keepValuesOnUnmount: true,
@@ -155,22 +155,11 @@ const isValid = computed(
     !Object.values(controlledValues.value).includes(undefined) &&
     !Object.values(errors.value).length,
 );
-/*
-const loadMessages = async () => {
-  if (!i18n.availableLocales.includes(i18n.locale.value)) {
-    await loadLocaleMessages(i18n, i18n.locale.value);
-  }
-
-  // set i18n language
-  setI18nLanguage(i18n, i18n.locale.value);
-};
-*/
 
 const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-
 const { metalogin } = useMetamask(logging2);
 
 const submit = handleSubmit(async () => {
@@ -186,21 +175,9 @@ const submit = handleSubmit(async () => {
   } catch (err: unknown) {
     hasError.value = true;
     const error = err as Strapi4Error;
-    if (error.error) {
-      switch (error.error.name) {
-        case 'ValidationError':
-          errorMessage.value = 'loginError';
-          break;
-        case 'Your account email is not confirmed':
-          errorMessage.value = 'confirmEmail';
-          break;
-        case 'Your account has been blocked by an administrator':
-          errorMessage.value = 'blockedUser';
-          break;
-        default:
-          errorMessage.value = 'genericError';
-          break;
-      }
+    const catchErrorMessage = error?.error?.message;
+    if (catchErrorMessage) {
+      errorMessage.value = mapStrapiErrors(catchErrorMessage);
     }
   } finally {
     logging.value = false;

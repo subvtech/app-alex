@@ -1,0 +1,6 @@
+{
+    "invalidIdentifierPassword":  "Invalid identifier or password",
+    "blockedByAdministrator": "User blocked, please contact support",
+    "emailIsNotConfirmed": "Please validate your email before proceeding.",
+    "default": "Something went wrong, please try again later"
+}
