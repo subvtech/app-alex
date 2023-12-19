@@ -2,7 +2,7 @@
   <div class="container d-flex flex-column">
     <div class="config config-title">
       <p>
-        <span class="header-h4"> {{ $t('config.title') }}</span>
+        <span class="header-h4"> {{ t('config.title') }}</span>
       </p>
     </div>
     <div class="config">
@@ -70,16 +70,17 @@
         </div>
         <div class="content-body">
           <alex-inputs-text-field
+            v-model="course.name"
             label="Nome do curso"
             name=""
             class="w-100"
             required
-          />
+          ></alex-inputs-text-field>
           <div class="container-date">
             <div class="datePickers">
               <alex-inputs-date
                 label="Início"
-                :model-value="startValue"
+                :model-value="course.start_date"
                 name=""
                 required
                 class="w-100"
@@ -88,7 +89,7 @@
               <alex-inputs-date
                 label="Término"
                 name=""
-                :model-value="endValue"
+                :model-value="course.end_date"
                 required
                 class="w-100"
               />
@@ -96,6 +97,7 @@
           </div>
 
           <alex-inputs-text-field
+            v-model="course.acronym"
             label="Sigla da turma"
             name=""
             class="w-100"
@@ -388,9 +390,6 @@ const exclusionWord = ref(`Excluir`);
 
 const openDialog = ref(false);
 
-const course = ref({
-  invite_enabled: true,
-});
 const invitationLink = ref();
 
 const selectedFile = ref(null);
@@ -405,8 +404,40 @@ const handleFileUpload = (event) => {
   reader.readAsDataURL(selectedFile.value);
 };
 
-const startValue = ref(new Date());
-const endValue = ref(new Date());
+const course = ref({
+  id: '',
+  invite_enabled: false,
+  name: '',
+  start_date: '',
+  end_date: '',
+  acronym: '',
+});
+
+const getCourseInfo = async () => {
+  try {
+    const response = await fetch('http://localhost:1337/api/learningplans');
+    if (!response.ok) {
+      throw new Error('Erro ao obter dados da API');
+    }
+    const data = await response.json();
+    console.log(data);
+
+    if (data && data.data && data.data.length > 0) {
+      const courseData = data.data[0];
+      course.value.id = courseData.id;
+      course.value.invite_enabled = courseData.attributes.invitation_enabled;
+      course.value.name = courseData.attributes.title;
+      course.value.start_date = courseData.attributes.start_date;
+      course.value.end_date = courseData.attributes.end_date;
+      course.value.acronym = courseData.attributes.slug;
+    }
+  } catch (error) {
+    console.error('Erro na requisição:', error.message);
+  }
+};
+
+getCourseInfo();
+
 const activeLink = ref(false);
 const firstButton = ref([
   {
