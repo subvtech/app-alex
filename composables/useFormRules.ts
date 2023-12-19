@@ -1,22 +1,11 @@
 import * as yup from 'yup';
 
-type FormDataType = {
-  fullname: string;
-  username: string;
-  email: string;
-  cpf: string;
-  password1: string;
-  password2: string;
-  yourRole: string;
-  institution: string;
-};
-
-export function isValidCpf(val) {
+export function isValidCpf(val: string) {
   val = val.replace(/\D/g, '');
   if (val === '00000000000') return false;
 
-  let sum;
-  let left;
+  let sum: number;
+  let left: number;
   sum = 0;
 
   for (let i = 1; i <= 9; i++)
@@ -36,29 +25,30 @@ export function isValidCpf(val) {
   return true;
 }
 
-export const useFormRules = (formData?: FormDataType) => {
+export const useFormRules = () => {
   const i18n = useI18n();
+  const emailRegex =
+    /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/g;
   const emailRules = {
     email: yup
       .string()
       .required(i18n.t('rules.email.required'))
       .trim()
-      .matches(
-        /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
-        i18n.t('rules.email.invalid'),
-      ),
+      .matches(emailRegex, i18n.t('rules.email.invalid')),
   };
 
   const passwordRules = {
     password: yup.string().required(i18n.t('rules.password.required')),
-    //.matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
-    //.matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
-    //.matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
-    /*.matches(
+    /*
+    .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
+    .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
+    .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
+    .matches(
         /(?=.*[^a-zA-Z0-9])/,
         i18n.t('rules.password.character'),
-      )*/
-    //.min(8, i18n.t('rules.password.min'))
+      )
+    .min(8, i18n.t('rules.password.min'))
+    */
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))

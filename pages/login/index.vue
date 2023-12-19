@@ -53,7 +53,7 @@
             />
             <div class="mt-2">
               <p v-show="hasError" class="text-body-1 text-error">
-                {{ $t(`pages.login.${errorMessage}`) }}
+                {{ errorMessage }}
               </p>
             </div>
             <div
@@ -144,7 +144,7 @@ const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
-
+const { mapStrapiErrors } = useStrapiHelpers();
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
   keepValuesOnUnmount: true,
@@ -155,22 +155,11 @@ const isValid = computed(
     !Object.values(controlledValues.value).includes(undefined) &&
     !Object.values(errors.value).length,
 );
-/*
-const loadMessages = async () => {
-  if (!i18n.availableLocales.includes(i18n.locale.value)) {
-    await loadLocaleMessages(i18n, i18n.locale.value);
-  }
-
-  // set i18n language
-  setI18nLanguage(i18n, i18n.locale.value);
-};
-*/
 
 const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-
 const { metalogin } = useMetamask(logging2);
 
 const submit = handleSubmit(async () => {
@@ -186,18 +175,9 @@ const submit = handleSubmit(async () => {
   } catch (err: unknown) {
     hasError.value = true;
     const error = err as Strapi4Error;
-    const cactchErrorMessage = error?.error?.message;
-    const cactchErrorName = error?.error?.name;
-    if (cactchErrorName === 'ValidationError') {
-      errorMessage.value = 'loginError';
-    } else if (cactchErrorMessage === 'Your account email is not confirmed') {
-      errorMessage.value = 'confirmEmail';
-    } else if (
-      cactchErrorMessage === 'Your account has been blocked by an administrator'
-    ) {
-      errorMessage.value = 'blockedUser';
-    } else {
-      errorMessage.value = 'genericError';
+    const catchErrorMessage = error?.error?.message;
+    if (catchErrorMessage) {
+      errorMessage.value = mapStrapiErrors(catchErrorMessage);
     }
   } finally {
     logging.value = false;

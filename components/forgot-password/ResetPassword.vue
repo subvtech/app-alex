@@ -3,12 +3,14 @@
     class="content d-flex flex-column align-content-start justify-start max-400"
   >
     <div class="mb-10">
-      <p class="text-white text-h3 text-center font-weight-bold mb-4">
+      <v-card-title class="text-white text-h3 text-center text-bold">
         {{ $t('components.forgot.sendResetPassword.newPassword') }}
-      </p>
-      <p class="text-white text-h6 font-weight-regular text-center my-2">
+      </v-card-title>
+      <v-card-subtitle
+        class="text-subtitle-2 text-white text-center white-space-normal"
+      >
         {{ $t('components.forgot.sendResetPassword.enterPassword') }}
-      </p>
+      </v-card-subtitle>
     </div>
     <v-form
       ref="form"
@@ -77,9 +79,10 @@ const passwordVisible = ref(false);
 const confirmationVisible = ref(false);
 
 const route = useRoute();
-// onBeforeMount(() => {
-//   if (!route.query.code) navigateTo('/login');
-// });
+
+onBeforeMount(() => {
+  if (!route.query.code) navigateTo('/login');
+});
 
 const emit = defineEmits(['confirmation-message']);
 
@@ -128,5 +131,9 @@ const changePassword = handleSubmit(async () => {
 }
 .max-400 {
   max-width: 400px;
+}
+
+.white-space-normal {
+  white-space: normal;
 }
 </style>

@@ -7,8 +7,7 @@
         {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
       </v-card-title>
       <v-card-subtitle
-        class="text-subtitle-2 text-white text-center mb-8"
-        style="white-space: normal"
+        class="text-subtitle-2 text-white text-center mb-8 white-space-normal"
       >
         {{ $t('components.forgot.sendResetPassword.enterEmail') }}
       </v-card-subtitle>
@@ -92,5 +91,8 @@ const submit = handleSubmit(async () => {
 <style lang="scss">
 .max-400 {
   max-width: 400px;
+}
+.white-space-normal {
+  white-space: normal;
 }
 </style>

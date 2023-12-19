@@ -53,15 +53,16 @@ const { value, errorMessage, setErrors } = useField(
   undefined,
 );
 
+const { t } = useI18n();
 const isTyping = ref(false);
 const fetching = ref(false);
-const noDataText = ref('Pesquise por alguma Instituição');
+const noDataText = ref(t('components.institutions.searchForIntitutions'));
 const { find } = useStrapi();
 const i18n = useI18n();
 
 const fetchInstitutions = async (institution: string) => {
   fetching.value = true;
-  noDataText.value = 'Nenhuma Instituição encontrada';
+  noDataText.value = t('components.institutions.noInstitutionsFound');
   try {
     const result = await find(`institutions`, {
       fields: ['id', 'acronym', 'socialName'], // campos a serem buscados

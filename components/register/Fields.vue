@@ -171,7 +171,7 @@
           />
           <div class="my-2">
             <p v-show="hasError" class="text-body-1 text-error">
-              {{ $t(`pages.register.${errorMessage}`) }}
+              {{ errorMessage }}
             </p>
           </div>
         </template>
@@ -242,6 +242,7 @@ const errorMessage = ref('');
 const search = ref('');
 const passwordVisible = ref(false);
 const confirmationVisible = ref(false);
+const { mapStrapiErrors } = useStrapiHelpers();
 const submit = async (values: {
   fullname: string;
   username: string;
@@ -291,15 +292,9 @@ const submit = async (values: {
   } catch (err: unknown) {
     hasError.value = true;
     const error = err as Strapi4Error;
-    const cactchErrorMessage = error?.error?.message;
-    if (cactchErrorMessage === 'Your account email is not confirmed') {
-      errorMessage.value = 'confirmEmail';
-    } else if (
-      cactchErrorMessage === 'Your account has been blocked by an administrator'
-    ) {
-      errorMessage.value = 'blockedUser';
-    } else {
-      errorMessage.value = 'genericError';
+    const catchErrorMessage = error?.error?.message;
+    if (catchErrorMessage) {
+      errorMessage.value = mapStrapiErrors(catchErrorMessage);
     }
   } finally {
     registering.value = false;
