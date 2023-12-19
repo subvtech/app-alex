@@ -167,8 +167,8 @@ const menus = [
         to: '/components/inputs/radio-button',
       },
       {
-        icon: 'mdi-radio',
-        title: 'Radio-button',
+        icon: 'mdi-checkbox-marked',
+        title: 'Checkbox',
         to: '/components/inputs/checkbox',
       },
       {
