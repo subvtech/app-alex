@@ -20,7 +20,6 @@
       rounded="lg"
       hide-details="auto"
       clear-icon="mdi-close"
-      hide-details="auto"
       :error-messages="errorMessage"
       :class="theme"
       :disabled="disabled"
