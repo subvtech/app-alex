@@ -202,6 +202,8 @@
 </template>
 
 <script setup lang="ts">
+import { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types';
+
 const emit = defineEmits(['success:message']);
 const {
   registerSchemas: { registerStep1, registerStep2, registerStep3 },
@@ -286,20 +288,18 @@ const submit = async (values: {
     } else {
       emit('success:message');
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     hasError.value = true;
-    if (err.error) {
-      switch (err.error.name) {
-        case 'ValidationError':
-          errorMessage.value = 'emailMustBeValid';
-          break;
-        case 'Your account has been blocked by an administrator':
-          errorMessage.value = 'blockedUser';
-          break;
-        default:
-          errorMessage.value = 'genericError';
-          break;
-      }
+    const error = err as Strapi4Error;
+    const cactchErrorMessage = error?.error?.message;
+    if (cactchErrorMessage === 'Your account email is not confirmed') {
+      errorMessage.value = 'confirmEmail';
+    } else if (
+      cactchErrorMessage === 'Your account has been blocked by an administrator'
+    ) {
+      errorMessage.value = 'blockedUser';
+    } else {
+      errorMessage.value = 'genericError';
     }
   } finally {
     registering.value = false;

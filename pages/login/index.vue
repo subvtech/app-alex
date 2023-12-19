@@ -186,21 +186,18 @@ const submit = handleSubmit(async () => {
   } catch (err: unknown) {
     hasError.value = true;
     const error = err as Strapi4Error;
-    if (error.error) {
-      switch (error.error.name) {
-        case 'ValidationError':
-          errorMessage.value = 'loginError';
-          break;
-        case 'Your account email is not confirmed':
-          errorMessage.value = 'confirmEmail';
-          break;
-        case 'Your account has been blocked by an administrator':
-          errorMessage.value = 'blockedUser';
-          break;
-        default:
-          errorMessage.value = 'genericError';
-          break;
-      }
+    const cactchErrorMessage = error?.error?.message;
+    const cactchErrorName = error?.error?.name;
+    if (cactchErrorName === 'ValidationError') {
+      errorMessage.value = 'loginError';
+    } else if (cactchErrorMessage === 'Your account email is not confirmed') {
+      errorMessage.value = 'confirmEmail';
+    } else if (
+      cactchErrorMessage === 'Your account has been blocked by an administrator'
+    ) {
+      errorMessage.value = 'blockedUser';
+    } else {
+      errorMessage.value = 'genericError';
     }
   } finally {
     logging.value = false;
