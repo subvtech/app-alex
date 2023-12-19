@@ -62,10 +62,12 @@
     "max": "At most 64 characters long"
   },
   "startDate": {
-    "required": "Start date is required"
+    "required": "Start date is required",
+    "min": "Min accepted date: {min}"
   },
   "endDate": {
-    "required": "End date is required"
+    "required": "End date is required",
+    "min": "Min accepted date: {min}"
   },
   "class": {
     "required": "Class is required",

@@ -189,8 +189,18 @@ export const useFormRules = (formData?: FormDataType) => {
       .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
       .trim(),
-    startDate: yup.date().required(i18n.t('rules.startDate.required')),
-    endDate: yup.date().required(i18n.t('rules.endDate.required')),
+    startDate: yup
+      .date()
+      .required(i18n.t('rules.startDate.required'))
+      .min(new Date().toISOString(), ({ min }) =>
+        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
+      ),
+    endDate: yup
+      .date()
+      .required(i18n.t('rules.endDate.required'))
+      .min(new Date().toISOString(), ({ min }) =>
+        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
+      ),
   });
 
   return {

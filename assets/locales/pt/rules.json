@@ -61,10 +61,12 @@
     "max": "Máximo de 64 caracteres"
   },
   "startDate": {
-    "required": "Data de início é obrigatório"
+    "required": "Data de início é obrigatório",
+    "min": "Data mínima aceita: {min}"
   },
   "endDate": {
-    "required": "Data de término é obrigatório"
+    "required": "Data de término é obrigatório",
+    "min": "Data mínima aceita: {min}"
   },
   "class": {
     "required": "Turma é obrigatório",
