@@ -105,7 +105,7 @@ export const useFormRules = (formData?: FormDataType) => {
     description: yup
       .string()
       .required(i18n.t('rules.description.required'))
-      .min(12, i18n.t('rules.description.min'))
+      .min(6, i18n.t('rules.description.min'))
       .max(4000, i18n.t('rules.description.max'))
       .trim(),
   };

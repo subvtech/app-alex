@@ -4,7 +4,7 @@
     is-nested
     hide-dividers
     show-tooltip
-    
+    :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
     @toggle:is-editing="isEditing = !isEditing"
     :save="onSave"
@@ -22,10 +22,11 @@
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4">
         <alex-custom-accordion
-          :data="dataCopy"
+          v-model:data="dataCopy"
           :key="rerender"
           show-positions
           :overwrite-item="!isEditing"
+          v-model="selectedPanel"
           class="max-width"
         >
           <template v-if="isEditing" #content="temp">
@@ -35,6 +36,10 @@
               :id="temp.id"
               :description="temp.description"
               :filtered-items="filteredVerbs"
+              @error:description="onErrorDescription"
+              @error:keyword="onErrorKeyword"
+              @success:description="onSuccessDescription"
+              @success:keyword="onSuccessKeyword"
               @success="onSuccess"
             /> </template
         ></alex-custom-accordion>
@@ -61,6 +66,22 @@
 <script setup lang="ts">
 const { create, find, update, delete: _delete } = useStrapi();
 const { t } = useI18n();
+
+type AccordionProps = {
+  id?: number;
+  title: string;
+  keyWord: string;
+  keyWordId: number;
+  errorTitle: boolean;
+  errorKeyWord: boolean;
+  contentData: {
+    description: string;
+    verb: { text: string } | null;
+    index?: number;
+    id: number;
+  };
+};
+
 const props = defineProps({
   canEdit: {
     type: Boolean,
@@ -74,22 +95,13 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  userId: {
+    type: Number,
+    required: true,
+  },
 
   data: {
-    type: Array as PropType<
-      {
-        id?: number;
-        title: string;
-        keyWord: string;
-        keyWordId: number;
-        contentData: {
-          description: string;
-          verb: { text: string } | null;
-          index?: number;
-          id: number;
-        };
-      }[]
-    >,
+    type: Array as PropType<AccordionProps[]>,
     default: [],
   },
 });
@@ -97,6 +109,7 @@ const emit = defineEmits(['update']);
 const { currentWidth } = useNavigationDrawer();
 type Keyword = { text: string; id?: number };
 
+const disableSave = ref(true);
 const updateArray = ref<
   { id: number; index: number; keyWord: Keyword; description: string }[]
 >([]);
@@ -106,23 +119,51 @@ const createArray = ref<
 const deleteArray = ref<{ id: number; text: string }[]>([]);
 
 const { canEdit, data } = toRefs(props);
-const isEditing = toRef(props.canEdit);
+const isEditing = ref(false);
 
+const selectedPanel = ref(0);
 const rerender = ref(0);
 const filteredVerbs = ref<{ text: string; id: number }[]>([]);
-const dataCopy = toRef([...props.data]);
+const dataCopy = toRef<AccordionProps[]>([...props.data]);
 
-const withinBreakpoint = computed(
-  () =>
-    (currentWidth.value > 850 && currentWidth.value < 1000) ||
-    currentWidth.value < 450,
-);
+const withinBreakpoint = computed(() => currentWidth.value < 450);
 
-const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value)
+const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
+
+const toggleDisableSave = (index) => {
+  const errorFound = dataCopy.value.find(
+    (item) => item.errorTitle || item.errorKeyWord,
+  );
+
+  if (errorFound) disableSave.value = true;
+  else disableSave.value = false;
+};
+
+const onErrorDescription = (index) => {
+  dataCopy.value[index].errorTitle = true;
+  disableSave.value = true;
+  toggleDisableSave(index);
+};
+
+const onErrorKeyword = (index) => {
+  dataCopy.value[index].errorKeyWord = true;
+  toggleDisableSave(index);
+};
+
+const onSuccessDescription = (index) => {
+  dataCopy.value[index].errorTitle = false;
+  disableSave.value = true;
+  toggleDisableSave(index);
+};
+
+const onSuccessKeyword = (index) => {
+  dataCopy.value[index].errorKeyWord = false;
+  toggleDisableSave(index);
+};
 
 onBeforeMount(async () => {
   filteredVerbs.value = (
-    (await find('verbs', { filters: { isPublic: true } }))
+    (await find('learning-goal-verbs', { filters: { user: props.userId } }))
       .data as unknown as any[]
   ).map((item) => {
     return { id: item.id, ...item.attributes };
@@ -135,6 +176,8 @@ const addGoal = () => {
     title: t('components.courses.goals.description.placeholder'),
     keyWordId: -1,
     id: -1,
+    errorTitle: true,
+    errorKeyWord: true,
     contentData: {
       verb: null,
       description: '',
@@ -142,6 +185,7 @@ const addGoal = () => {
       id: -1,
     },
   });
+  selectedPanel.value = dataCopy.value.length - 1;
 };
 const onSuccess = (goal) => {
   if (goal.id >= 0) {
@@ -172,14 +216,14 @@ const onSave = async () => {
   const promises: Promise<any>[] = [];
   const getConnectArray = async (connectId, keyWord) => {
     if (typeof connectId === 'number') return [connectId];
-    const doesVerbExist = await find('verbs', {
+    const doesVerbExist = await find('learning-goal-verbs', {
       filters: { text: keyWord.text },
     });
 
     if (doesVerbExist.data.length > 0) return [doesVerbExist.data[0].id];
-    const createdVerb = await create('verbs', {
+    const createdVerb = await create('learning-goal-verbs', {
       ...keyWord,
-      isPublic: false,
+      user: props.userId,
     });
     return [createdVerb.data.id];
   };
@@ -187,7 +231,7 @@ const onSave = async () => {
   const createPromises = createArray.value.map(async (item, index) => {
     const connectArray = await getConnectArray(item.keyWord.id, item.keyWord);
 
-    return create('goals', {
+    return create('learning-goals', {
       description: item.description,
       learningplan: props.courseId,
       verb: {
@@ -204,7 +248,7 @@ const onSave = async () => {
   const updatePromises = updateArray.value.map(async (item) => {
     const connectArray = await getConnectArray(item.keyWord.id, item.keyWord);
 
-    return update(`goals/${item.id}`, {
+    return update(`learning-goals/${item.id}`, {
       description: item.description,
       verb: {
         connect: connectArray,
@@ -236,7 +280,7 @@ watch(canEdit, () => {
   isEditing.value = props.canEdit;
 });
 watch(data, () => {
-  dataCopy.value = props.data;
+  dataCopy.value = [...props.data];
 });
 </script>
 <style scoped lang="scss">

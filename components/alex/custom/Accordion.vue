@@ -44,10 +44,10 @@
             class="text-body-3 text-gray-600 text-overflow"
             data-testid="text"
           >
-            <strong class="text-accent">
+            <strong :class="item.errorKeyWord ? 'error' : 'text-accent'">
               {{ item.keyWord }}
             </strong>
-            {{ item.title }}
+            <span :class="item.errorTitle ? 'error' : ''">{{' ' + item.title }}</span>
           </span>
           <v-spacer></v-spacer>
           <v-btn
@@ -128,6 +128,9 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 </script>
 
 <style>
+.error {
+  color: red !important; 
+}
 .text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;

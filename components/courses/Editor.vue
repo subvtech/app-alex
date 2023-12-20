@@ -60,7 +60,9 @@ const { t } = useI18n();
 
 const props = defineProps({
   info: {
-    type: Array as PropType<OutputBlockData<string, any>[]>,
+    type: Array as PropType<
+      { data: any; id: number; type: string; order: number }[]
+    >,
     default: [],
   },
   courseId: {
@@ -122,8 +124,8 @@ const initialiseEditor = () => {
         inlineToolbar: true,
         shortcut: 'CMD+SHIFT+O',
         config: {
-          quotePlaceholder: 'Insira uma citação',
-          captionPlaceholder: 'Autor da citação',
+          quotePlaceholder: t('components.courses.editor.quote.placeholder'),
+          captionPlaceholder: t('components.courses.editor.quote.caption'),
         },
       },
 
@@ -165,7 +167,7 @@ const initialiseEditor = () => {
     //readOnly: true,
     // logLevel: 'ERROR',
     data: {
-      blocks: info.value,
+      blocks: info.value as any,
     },
     onReady: () => {
       /* eslint-disable-next-line */
@@ -193,7 +195,7 @@ const updateAbout = async () => {
     info.value.forEach((item, index) => {
       if (instanceData.blocks[index])
         promises.push(
-          update(`course-descriptions/${item.id}`, {
+          update(`blocks/${item.id}`, {
             data: instanceData.blocks[index].data,
             type: instanceData.blocks[index].type,
             learningplan: props.courseId,
@@ -204,7 +206,7 @@ const updateAbout = async () => {
   }
   instanceData.blocks.slice(info.value.length).forEach((item, index) => {
     promises.push(
-      create('course-descriptions', {
+      create('blocks', {
         data: item.data,
         type: item.type,
         learningplan: props.courseId,
@@ -214,7 +216,7 @@ const updateAbout = async () => {
   });
   if (info.value.length > instanceData.blocks.length) {
     info.value.slice(instanceData.blocks.length).forEach((item) => {
-      promises.push(_delete(`course-descriptions/${item.id}`));
+      promises.push(_delete(`blocks/${item.id}`));
     });
   }
 
@@ -250,10 +252,17 @@ watch(isEmptyAndIsNotEditing, () => {
   max-width: 100% !important;
 }
 
-@media (min-width: 750px) {
+@media (min-width: 550px) {
   .ce-toolbar__actions.ce-toolbar__actions--opened {
     left: 0 !important;
     margin-left: -54px;
+  }
+}
+@media (max-width: 550px) {
+  .ce-toolbar__actions.ce-toolbar__actions--opened {
+    right: 0 !important;
+    bottom: 0 !important;
+    margin-right: -54px;
   }
 }
 

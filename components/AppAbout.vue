@@ -6,11 +6,14 @@
     :showIcon="canEdit"
     @toggle:isEditing="toggleIsEditing"
     :cancel="onCancel"
-    :save="() => emit('update')"
+    :save="() => emit('update', myText)"
     full-width
   >
     <template v-slot:content class="pa-6">
-      <div class="d-flex flex-column gap-6 w-100" :class="fullWidth ? 'w-100' : ''">
+      <div
+        class="d-flex flex-column gap-6 w-100"
+        :class="fullWidth ? 'w-100' : ''"
+      >
         <alex-custom-empty-placeholder
           v-if="isTextEmpty && !isEditingAndCanEdit"
           :empty-text-message="
@@ -19,11 +22,11 @@
         />
         <span
           v-else
-          ref="myText"
           class="info"
           :contenteditable="isEditingAndCanEdit"
           :data-placeholder="$t('components.appAbout.placeholder')"
-          >{{ text }}</span
+          @input="updateText"
+          >{{ myText }}</span
         >
       </div>
     </template>
@@ -33,7 +36,6 @@
 <script setup lang="ts">
 const { t } = useI18n();
 
-const client = useStrapiClient();
 const emit = defineEmits(['update']);
 
 const props = defineProps({
@@ -68,19 +70,30 @@ const props = defineProps({
   },
 });
 
-const { text, canEdit } = toRefs(props);
-const myText = ref();
+const { canEdit, text } = toRefs(props);
+const myText = ref(props.text);
 
 const isEditing = ref(false);
 
 const isEditingAndCanEdit = computed(() => isEditing.value && canEdit.value);
-const isTextEmpty = computed(() => props.text === null || props.text === '');
+const isTextEmpty = computed(
+  () => myText.value === null || myText.value === '',
+);
+
+const updateText = (event: Event) => {
+  const target = event.target as HTMLSpanElement;
+  myText.value = target.innerText;
+};
 
 const onCancel = async () => {};
 
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
+
+watch(text, () => {
+  myText.value = props.text;
+});
 </script>
 
 <style scoped lang="scss">

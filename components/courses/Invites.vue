@@ -9,7 +9,7 @@
     is-nested
   >
     <template #content>
-      <div v-if="enableInvites" class="d-flex flex-column w-100 max-width">
+      <div v-if="enableInvites" class="d-flex flex-column w-100">
         <div
           class="invite gap-6 justify-space-between"
           :class="theresTimeAndUrl ? '' : 'disabled'"
@@ -165,9 +165,6 @@ watch(remainingTime, () => {
   gap: 24px;
 }
 
-.max-width {
-  max-width: 500px;
-}
 .pointer {
   cursor: pointer;
 }

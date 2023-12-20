@@ -23,7 +23,7 @@
 
   "description": {
     "required": "This field is required",
-    "min": "At least 12 characters long",
+    "min": "At least 6 characters long",
     "max": "At most 4000 characters long"
   },
 

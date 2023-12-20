@@ -11,8 +11,6 @@
         hideDividers ? '' : 'border-bottom',
         sizingClass ?? (noHeader ? 'px-6' : isNested ? '' : 'px-6'),
       ]"
-
-   
     >
       <div class="foretitle d-flex py-6">
         <span :class="isEditing && showTooltip ? 'min-width' : ''">{{
@@ -28,7 +26,6 @@
           :extra-classes="tooltipExtraClass"
         />
       </div>
-
       <div
         v-if="isEditing"
         class="buttons d-flex flex-wrap justify-end"
@@ -41,13 +38,18 @@
         >
           {{ $t('components.profile.settings.cancel') }}</alex-custom-button
         >
-        <alex-custom-button class="btn" @click="savedAction" variant="primary">
+        <alex-custom-button
+          class="btn"
+          @click="savedAction"
+          :disabled="disableSave"
+          variant="primary"
+        >
           {{ $t('components.profile.settings.save') }}</alex-custom-button
         >
 
         <alex-custom-button
           class="small"
-          icon="mdi-cancel"
+          icon="mdi-close"
           variant="secondary"
           @click="cancelledAction"
         />
@@ -55,6 +57,7 @@
           class="small"
           icon="mdi-check"
           variant="primary"
+          :disabled="disableSave"
           @click="savedAction"
         />
       </div>
@@ -145,6 +148,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disableSave: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { title, cancel, isEditing, save } = toRefs(props);
@@ -220,7 +227,6 @@ type SizingClass =
       padding-inline: 12px;
     }
     &.small-buttons {
-     
       .small {
         display: flex;
       }
