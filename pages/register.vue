@@ -1,106 +1,77 @@
 <template>
-  <v-container class="pa-0 height-100" fluid>
-    <v-row class="fill-height w-100 ma-0">
-      <v-col
-        sm="0"
-        md="7"
-        lg="7"
-        xl="8"
-        class="justify-center align-center d-none d-md-flex pa-0"
-      >
-        <img class="signUp" src="/images/signUp.svg" />
-      </v-col>
-      <v-col
-        cols="12"
-        sm="12"
-        md="5"
-        lg="5"
-        xl="4"
-        class="bg-primary pa-0 content-field"
-      >
-        <div class="ellipse ellipse-top" />
-        <SuccessMessage
-          v-if="registeredUser"
-          :title="$t('pages.register.success.title')"
-          :subtitle="$t('pages.register.success.subtitle')"
-        />
+  <v-container id="register" class="pa-0 container-grid overflow-hidden" fluid>
+    <div class="image justify-center align-center d-none d-md-flex pa-0">
+      <img class="signUp" src="/images/signUp.svg" />
+    </div>
 
-        <RegisterFields v-else @successMessage="onRegisteredUser"/>
-        <div class="ellipse ellipse-bottom" />
-      </v-col>
-    </v-row>
+    <div class="bg-primary-0 pa-0 content-field">
+      <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end" />
+
+      <SuccessMessage
+        v-if="registeredUser"
+        :title="$t('pages.register.success.title')"
+        :subtitle="$t('pages.register.success.subtitle')"
+      />
+
+      <RegisterFields v-else @success:message="onRegisteredUser" />
+    </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
-  middleware: 'control-access'
+  middleware: 'control-access',
 });
 const registeredUser = ref(false);
 const onRegisteredUser = () => {
-  registeredUser.value = true
-}
+  registeredUser.value = true;
+};
 </script>
 
 <style scoped lang="scss">
 .content-field {
-  background-image: url('../assets/svg/Bubbles.svg');
-  background-size: 100% 100%;
-  height: 100%;
+  background-image: url('/images/login-bg.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   overflow-y: scroll;
   display: grid;
 }
 
-.height-100 {
-  height: 100vh !important;
+.container-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(auto, 629px);
+  height: 100%;
 }
-
 .content-field {
-  overflow-y: auto !important
+  overflow-y: auto !important;
 }
 
 .content-field::-webkit-scrollbar {
   width: 12px;
 }
 
-
 .content-field::-webkit-scrollbar-thumb {
-  background-color: #00B8CC;
+  background-color: #00b8cc;
   border-radius: 999px;
-  border: 3px solid rgb(var(--v-theme-primary)) !important;;
-  
+  border: 3px solid rgb(var(--v-theme-primary)) !important;
 }
 
-.content-field::-webkit-scrollbar-track { 
+.content-field::-webkit-scrollbar-track {
   background-color: rgb(var(--v-theme-primary)) !important;
 }
 
-.ellipse {
-  width: 100%;
-  aspect-ratio: 4.4 / 1.3;
-  &-top {
-    background-image: url('../assets/svg/EllipseLogo.svg');
-    background-size: 130%;
-    background-position: 50% 100%;
-  }
-  &-bottom {
-    aspect-ratio: 4 / 0.9;
-    background-image: url('../assets/svg/Ellipse.svg');
-    background-size: 130%;
-    background-position: top;
-    align-self: flex-end;
-  }
-}
-
 .signUp {
-  width: clamp(550px, 65%, 50vw);
+  width: clamp(500px, 65%, 1000px);
 }
 
-@media screen and (max-width: 500px) {
-  .content-field::-webkit-scrollbar {
-  width: 8px;
+@media screen and (max-width: 959px) {
+  .container-grid {
+    grid-template-columns: 1fr;
+  }
+  .signUp {
+    display: none;
+  }
 }
-}
-
 </style>

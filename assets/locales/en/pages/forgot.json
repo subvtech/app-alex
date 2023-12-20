@@ -1,7 +1,7 @@
 {
-    "success": {
-        "title": "Recovery sent!",
-        "subtitle": "We have sent instructions to | Access the email and follow the instructions provided.",
-        "return": "Back to Login"
-    }
+  "success": {
+    "title": "Account activated successfully!",
+    "subtitle1": "You can now access your account with the registered email and password.",
+    "return": "Back to Login"
+  }
 }

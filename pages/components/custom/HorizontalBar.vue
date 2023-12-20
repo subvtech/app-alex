@@ -32,11 +32,11 @@
     <div class="pa-4">
       <p class="text-subtitle-2 text-gray-500">
         Esse é o modelo mais simples, passado nenhuma propriedade, é necessário
-        passar a prop <strong>not-fixed</strong>ele exibe o esqueleto com um
-        icone de usuário vazio, e nenhum dos botões funcionam
+        passar a prop <strong>not-fixed</strong>ele exibe o esqueleto com dois
+        botões, e nenhum deles funcionam
       </p>
     </div>
-    <div class="w-100 d-flex">
+    <div class="first w-100 d-flex flex-row">
       <v-container class="p-0 m-0">
         <v-row align="center"><alex-custom-horizontal-bar not-fixed /></v-row
       ></v-container>
@@ -74,18 +74,21 @@
               {
                 title: 'profile',
                 to: '/',
-                logout: false,
               },
               {
                 title: 'settings',
                 to: '/user/settings',
-                logout: false,
               },
-              { title: 'logout', logout: true },
+              {
+                title: 'logout',
+                action: () => {
+                  console.log('logout');
+                },
+              },
             ]"
             not-fixed
-            :reverse="false"
-            :user="user"
+            :avatar="user.avatar"
+            :placeholder="user.fullname"
           /> </v-row
       ></v-container>
       <prism>{{ examples[1] }}</prism>
@@ -106,6 +109,46 @@
     </div>
 
     <p class="text-subtitle-2 text-gray-500">
+      Para exibir o ícone de avatar é necessário usar
+      <strong>show-picture</strong>.
+    </p>
+
+    <div class="w-100">
+      <div class="px-3" style="position: relative">
+        <v-container>
+          <v-row align="center"
+            ><alex-custom-horizontalBar
+              :toggle-drawer="
+                () => {
+                  drawer = !drawer;
+                }
+              "
+              :menu-items="menuItems"
+              show-picture
+              not-fixed
+              :placeholder="user.fullname"
+              :avatar="user.avatar"
+            /> </v-row
+        ></v-container>
+        <prism>{{ examples[2] }}</prism>
+        <v-btn
+          class="copy-icon"
+          variant="text"
+          color="gray-400"
+          @click="copyToClipboard(2)"
+        >
+          <v-icon
+            v-if="copiedIndex === 2"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
+          <v-icon v-else size="x-large" icon="mdi-content-copy" />
+        </v-btn>
+      </div>
+    </div>
+
+    <p class="text-subtitle-2 text-gray-500">
       É possível inverter a disposição do menu com <strong>reverse</strong>.
     </p>
 
@@ -121,19 +164,21 @@
               "
               :menu-items="menuItems"
               reverse
+              show-picture
               not-fixed
-              :user="user"
+              :placeholder="user.fullname"
+              :avatar="user.avatar"
             /> </v-row
         ></v-container>
-        <prism>{{ examples[2] }}</prism>
+        <prism>{{ examples[3] }}</prism>
         <v-btn
           class="copy-icon"
           variant="text"
           color="gray-400"
-          @click="copyToClipboard(2)"
+          @click="copyToClipboard(3)"
         >
           <v-icon
-            v-if="copiedIndex === 2"
+            v-if="copiedIndex === 3"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -160,15 +205,15 @@
               :menu-items="menuItems"
             /> </v-row
         ></v-container>
-        <prism>{{ examples[3] }}</prism>
+        <prism>{{ examples[4] }}</prism>
         <v-btn
           class="copy-icon"
           variant="text"
           color="gray-400"
-          @click="copyToClipboard(3)"
+          @click="copyToClipboard(4)"
         >
           <v-icon
-            v-if="copiedIndex === 3"
+            v-if="copiedIndex === 4"
             size="x-large"
             icon="mdi-clipboard-check-multiple-outline"
             color="green-lighten-1"
@@ -188,27 +233,28 @@
                 :toggle-drawer="() => (drawer = !drawer)"
                 reverse
                 not-fixed
-                :user="user"
+                show-picture :placeholder="user.fullname"
+              :avatar="user.avatar"
                 :is-chat-active="isChatActive"
                 :is-bell-active="isBellActive"
                 @alert="isBellActive = !isBellActive"
                 @chat="isChatActive = !isChatActive"
                 :menu-items="[
-                  { title: 'title1', to: '/', logout: false },
-                  { title: 'title2', to: '/', logout: false },
-                  { title: 'title3', to: '/', logout: false },
+                  { title: 'title1', to: '/' },
+                  { title: 'title2', to: '/' },
+                  { title: 'title3', to: '/' },
                 ]"
               /> </v-row
           ></v-container>
-          <prism>{{ examples[4] }}</prism>
+          <prism>{{ examples[5] }}</prism>
           <v-btn
             class="copy-icon"
             variant="text"
             color="gray-400"
-            @click="copyToClipboard(4)"
+            @click="copyToClipboard(5)"
           >
             <v-icon
-              v-if="copiedIndex === 4"
+              v-if="copiedIndex === 5"
               size="x-large"
               icon="mdi-clipboard-check-multiple-outline"
               color="green-lighten-1"
@@ -295,46 +341,60 @@ const drawer = ref(false);
 const isChatActive = ref(false);
 const isBellActive = ref(false);
 
-const menuItems = [
+const menuItems: { title: string; to?: string; action?: () => void }[] = [
   {
     title: 'profile',
     to: '/',
-    logout: false,
   },
   {
     title: 'settings',
     to: '/user/settings',
-    logout: false,
   },
-  { title: 'logout', logout: true },
+  {
+    title: 'logout',
+    action: () => {
+      console.log('logout');
+    },
+  },
 ];
 const examples = [
   `<alex-custom-horizontal-bar not-fixed/>`,
   `<alex-custom-horizontal-bar
-            :toggle-drawer="() => {}"
-            :menu-items="[
-              {
-                title: 'profile',
-                to: '/',
-                logout: false,
-              },
-              {
-                title: 'settings',
-                to: '/user/settings',
-                logout: false,
-              },
-              { title: 'logout', logout: true },
-            ]"
-            not-fixed
-            :reverse="false"
-            :user="user"
-          />`,
+      :toggle-drawer="() => {}"
+      :menu-items="[
+        {
+          title: 'profile',
+          to: '/',
+          
+        },
+        {
+          title: 'settings',
+          to: '/user/settings',
+          
+        },
+        { title: 'logout', action: () => {console.log('logout')} },
+      ]"
+      not-fixed
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
+    />`,
+  `<alex-custom-horizontalBar
+      :toggle-drawer="() => (drawer = !drawer)"
+      :menu-items="profileMenuItems"
+      show-picture
+      not-fixed 
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
+    />
+     `,
   `<alex-custom-horizontalBar
       :toggle-drawer="() => (drawer = !drawer)"
       :menu-items="profileMenuItems"
       reverse
+      show-picture
       not-fixed
-      :user="user"
+      :placeholder="user.fullname"
+      :avatar="user.avatar"
     />
      `,
   `<alex-custom-horizontalBar
@@ -343,24 +403,26 @@ const examples = [
       is-bell-active
       not-fixed
       :menu-items="[
-        { title: 'title1', to: '/', logout: false },
-        { title: 'title2', to: '/', logout: false },
-        { title: 'title3', to: '/', logout: false },
+        { title: 'title1', to: '/' },
+        { title: 'title2', to: '/' },
+        { title: 'title3', to: '/' },
       ]"
     /> `,
   `<alex-custom-horizontalBar
       :toggle-drawer="() => (drawer = !drawer)"
       reverse
       not-fixed
-      :user="user"
+      show-picture
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
       :is-chat-active="isChatActive"
       :is-bell-active="isBellActive"
       @alert="isBellActive = !isBellActive"
       @chat="isChatActive = !isChatActive"
       :menu-items="[
-        { title: 'title1', to: '/', logout: false },
-        { title: 'title2', to: '/', logout: false },
-        { title: 'title3', to: '/', logout: false },
+        { title: 'title1', to: '/' },
+        { title: 'title2', to: '/' },
+        { title: 'title3', to: '/' },
       ]"
     />`,
 ];
@@ -368,16 +430,23 @@ const examples = [
 const propsDocumentation = [
   {
     name: 'menu-items',
-    type: '{ title: string; to: string; logout: boolean }[]',
+    type: '{ title: string; to?: string; action?: () => {} }[]',
     default: '[]',
     description: 'O array de items a ser exibido no dropdown-menu.',
   },
   {
-    name: 'user',
-    type: 'User',
+    name: 'avatar',
+    type: '{ id: number, url: string }',
     default: 'undefined',
     description:
-      'As informações do usuário a serem exibidas, tal como fullname e avatar.',
+      'As informações do avatar a serem exibidas, contém uma url e um id. Funciona apenas com imagens hosteadas no strapi',
+  },
+  {
+    name: 'placeholder',
+    type: 'String',
+    default: 'undefined',
+    description:
+      'Placeholder que é exibido, ele assume o papel do fullname do usuário.',
   },
   {
     name: 'isBellActive',
@@ -406,6 +475,14 @@ const propsDocumentation = [
     default: 'false',
     description:
       'Define se o icon horizontal-bar é exibido fixo no topo da tela ou se é restrito ao parent',
+  },
+
+  {
+    name: 'showPicture',
+    type: 'Boolean',
+    default: 'false',
+    description:
+      'Define se a photo de profile é exibido ou não, independente se o avatar é passado.',
   },
   {
     name: 'reverse',
@@ -467,5 +544,11 @@ const copyToClipboard = async (index) => {
   right: 10px;
   top: 10px;
   color: #a0a8b1;
+}
+
+@media (max-width: 800px) {
+  .first {
+    flex-wrap: wrap;
+  }
 }
 </style>

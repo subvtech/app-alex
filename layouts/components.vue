@@ -1,51 +1,46 @@
 <template>
-  <v-app v-if="user">
+  <v-app>
     <AppSnackbar />
-    <div
-      @click.stop="
-        (e: any) => {
-          drawer = !drawer;
-        }
-      "
+    <alex-custom-drawable
+      v-model="drawer"
+      :blocks="menus"
+      :clipped="clipped"
+      dark
+      :permanent="isPermanent"
     >
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        dark
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
-    </div>
+        </div>
+      </template>
+    </alex-custom-drawable>
+
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => (drawer = !drawer)"
+      :toggle-drawer="() => closeDrawable(!clipped)"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
+      @click="onClickOutside"
       :menu-items="profileMenuItems"
-      :reverse="false"
-      :user="user"
+      show-picture
     />
 
-    <v-main class="secondary bg-gray-blue pt-16">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -54,39 +49,54 @@
 </template>
 
 <script setup lang="ts">
-const i18n = useI18n();
-const clipped = ref(false);
-const drawer = ref(true);
-const isPermanent = ref(false);
+import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
+
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
+const { profileMenuItems } = useMainHorizontalBar();
+
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
+
 onBeforeMount(() => {
-  userStore.profilePicture = user.value.avatar;
-  userStore.fullname = user.value.fullname;
+  userStore.profilePicture = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
 });
 
 const menus = [
   {
-    title: 'Components',
+    title: 'Custom',
     items: [
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-account-circle',
         title: 'AppUserAvatar',
-        to: '/components/custom/appuseravatar',
+        to: '/components/custom/Appuseravatar',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Accordion',
+        to: '/components/custom/Accordion',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Avatar Group',
+        to: '/components/custom/AvatarGroup',
       },
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Banner',
         to: '/components/custom/banner',
       },
+
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'Breadcrumbs',
-        to: '/components/custom/breadcrumbs',
+        title: 'Button',
+        to: '/components/custom/Button',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-chip',
         title: 'Chip',
         to: '/components/custom/chip',
       },
@@ -95,6 +105,32 @@ const menus = [
         title: 'Dialog',
         to: '/components/custom/Dialog',
       },
+
+      {
+        icon: 'mdi-information-variant',
+        title: 'Info',
+        to: '/components/custom/info',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/custom/dropdown',
+      },
+    ],
+  },
+  {
+    title: 'Navigation',
+    items: [
+      {
+        icon: 'mdi-baguette',
+        title: 'Breadcrumbs',
+        to: '/components/custom/breadcrumbs',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Header',
+        to: '/components/custom/Header',
+      },
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Horizontalbar',
@@ -102,27 +138,65 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'Info',
-        to: '/components/custom/info',
+        title: 'Drawable',
+        to: '/components/custom/drawable',
+      },
+      {
+        icon: 'mdi-book-open-page-variant',
+        title: 'pagination',
+        to: '/components/custom/pagination',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'tabs',
+        to: '/components/custom/tabs',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
       },
     ],
   },
-];
-
-const profileMenuItems = [
   {
-    title: i18n.t('layouts.default.profile'),
-    to: `/user/${user.value.username}`,
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.settings'),
-    to: '/user/settings',
-    logout: false,
-  },
-  {
-    title: i18n.t('layouts.default.logout'),
-    logout: true,
+    title: 'Input',
+    items: [
+      {
+        icon: 'mdi-radio',
+        title: 'Radio-button',
+        to: '/components/inputs/radio-button',
+      },
+      {
+        icon: 'mdi-checkbox-marked',
+        title: 'Checkbox',
+        to: '/components/inputs/checkbox',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Text-field',
+        to: '/components/inputs/text-field',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Autocomplete',
+        to: '/components/inputs/autocomplete',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Select',
+        to: '/components/inputs/select',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
+      },
+      {
+        icon: 'mdi-shoe-print',
+        title: 'Stepper',
+        to: '/components/inputs/stepper',
+      },
+    ],
   },
 ];
 </script>

@@ -43,3 +43,81 @@ $btn-icon-density: (
     height: calc(var(--v-btn-height) + $size);
   }
 }
+
+//
+@for $i from 1 through 10 {
+  .lines-#{$i} {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $i;
+    line-clamp: $i;
+  }
+}
+
+.ellipsis {
+  display: -webkit-box;
+  padding: 0;
+  white-space: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-wrap: break-word;
+  line-height: inherit;
+}
+
+.v-dialog.custom-alex-dialog > .v-overlay__content {
+  max-height: calc(100vh - 160px);
+};
+
+@supports(max-height: calc(100svh - 160px)) {
+  .v-dialog.custom-alex-dialog > .v-overlay__content {
+    max-height: calc(100svh - 160px);
+  };
+}
+
+$colors-scrollBar: ('white', 'gray-blue', 'gray-100');
+
+@each $color in $colors-scrollBar {
+  .alex-scrollbar-#{$color}::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .alex-scrollbar-#{$color}::-webkit-scrollbar-thumb {
+    background-color: #abb2b9;
+    border-radius: 999px;
+  }
+  
+  .alex-scrollbar-#{$color}::-webkit-scrollbar-track {
+    background-color: rgb(var(--v-theme-#{$color})) !important;
+  }
+  
+}
+
+// Dialog Stepper
+.max-height-stepper {
+  max-height: calc(100svh - 392px);
+  overflow-y: auto;
+}
+
+/* Autocomplete inputs */
+.v-input.dark input:-webkit-autofill,
+.v-input.dark input:-webkit-autofill:hover, 
+.v-input.dark input:-webkit-autofill:focus,
+.v-input.dark textarea:-webkit-autofill,
+.v-input.dark textarea:-webkit-autofill:hover,
+.v-input.dark textarea:-webkit-autofill:focus,
+.v-input.dark select:-webkit-autofill,
+.v-input.dark select:-webkit-autofill:hover,
+.v-input.dark select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 3000px rgb(var(--v-theme-primary-0)) inset !important; 
+  -webkit-text-fill-color: white !important;
+}
+.v-input input:-webkit-autofill,
+.v-input input:-webkit-autofill:hover, 
+.v-input input:-webkit-autofill:focus,
+.v-input textarea:-webkit-autofill,
+.v-input textarea:-webkit-autofill:hover,
+.v-input textarea:-webkit-autofill:focus,
+.v-input select:-webkit-autofill,
+.v-input select:-webkit-autofill:hover,
+.v-input select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 3000px #fff inset !important; 
+}

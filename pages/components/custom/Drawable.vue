@@ -32,41 +32,35 @@
       <p class="text-subtitle-2 text-gray-500">
         Esse é o modelo mais simples, é necessário passar
         <strong>not-fixed</strong> para que ele se atenha ao parent e
-        <strong>disappear</strong> para que ele suma quando não aberto. apenas o
-        ícone principal funciona.
+        <strong>temporary</strong> para que ele não adicione um padding-left no
+        componente principal e <strong>disappear</strong> para que ele suma
+        quando não aberto. apenas o ícone principal funciona.
       </p>
     </div>
-    <div
-      class="w-100 d-flex"
-      @click.stop="
-        (e: any) => {
-          drawer1 = !drawer1;
-        }
-      "
-    >
-      <alex-custom-drawable
-        not-fixed
-        disappear
-        :blocks="menuItems"
-        :show="drawer1"
-      />
-      <div class="px-3 w-100" style="position: relative">
-        <prism> {{ examples[0] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(0)"
-        >
-          <v-icon
-            v-if="copiedIndex === 0"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
+
+    <alex-custom-drawable
+      not-fixed
+      disappear
+      temporary
+      :blocks="menuItems"
+      v-model="drawer1"
+    />
+    <div class="px-3 w-100" style="position: relative">
+      <prism> {{ examples[0] }}</prism>
+      <v-btn
+        class="copy-icon"
+        variant="text"
+        color="gray-400"
+        @click="copyToClipboard(0)"
+      >
+        <v-icon
+          v-if="copiedIndex === 0"
+          size="x-large"
+          icon="mdi-clipboard-check-multiple-outline"
+          color="green-lighten-1"
+        />
+        <v-icon v-else size="x-large" icon="mdi-content-copy" />
+      </v-btn>
     </div>
 
     <h2 class="text-h3 text-gray-800">Adicionando propriedades básicas</h2>
@@ -82,12 +76,14 @@
           drawer2 = !drawer2;
         }
       "
+      style="position: relative"
     >
       <alex-custom-drawable
         not-fixed
         disappear
+        temporary
         :blocks="menuItems"
-        :show="drawer2"
+        :modelValue="drawer2"
       />
       <prism>{{ examples[1] }}</prism>
       <v-btn
@@ -142,12 +138,14 @@
           drawer3 = !drawer3;
         }
       "
+      style="position: relative"
     >
       <alex-custom-drawable
         :blocks="menuItems"
         :clipped="true"
-        :show="drawer3"
+        :modelValue="drawer3"
         not-fixed
+        temporary
         disappear
       >
         <template v-slot:header>
@@ -207,8 +205,9 @@
         <alex-custom-drawable
           :blocks="menuItems"
           :clipped="true"
-          :show="drawer4"
+          :modelValue="drawer4"
           disappear
+          temporary
           not-fixed
         />
         <prism>{{ examples[4] }}</prism>
@@ -243,9 +242,10 @@
           <alex-custom-drawable
             :blocks="menuItems"
             :clipped="clipped"
-            :show="drawer5"
+            :modelValue="drawer5"
             disappear
             not-fixed
+            temporary
             :permanent="isPermanent"
           >
             <template v-slot:header>
@@ -317,6 +317,25 @@
         </p>
       </div>
     </div>
+    <h2 class="text-h3 text-gray-800">Eventos disponíveis</h2>
+    <div class="d-flex flex-column w-100" style="gap: 8px">
+      <div
+        class="pa-6 d-flex flex-column rounded-lg align-baseline w-100"
+        v-for="(item, index) in eventsDocumentation"
+        :style="
+          index % 2 === 0
+            ? 'background-color: #EBEDEF'
+            : 'background-color: #D1F6FA'
+        "
+      >
+        <p class="text-subtitle-2 text-gray-500">{{ item.name }}</p>
+
+        <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
+          Descrição:
+          <span class="font-weight-regular">{{ item.description }}</span>
+        </p>
+      </div>
+    </div>
   </v-container>
 </template>
 
@@ -364,12 +383,13 @@ const isPermanent = ref(false);
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
-  `<alex-custom-drawable not-fixed disappear :show="drawer" :blocks="menuItems" />`,
+  `<alex-custom-drawable not-fixed temporary disappear :modelValue="drawer" :blocks="menuItems" />`,
   `<alex-custom-drawable
         not-fixed
         disappear
+        temporary
         :blocks="menuItems"
-        :show="drawer1"
+        :modelValue="drawer1"
       />
     const menus = [
   {
@@ -408,76 +428,79 @@ const examples = [
       <alex-custom-drawable
         :blocks="menus"
         :clipped="clipped"
-        :show="drawer"
+        :modelValue="drawer"
         :permanent="isPermanent"
+        temporary
       >
        ...
       </alex-custom-drawable>
     </div>
      `,
-  ` 
-      <alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+  `   <alex-custom-drawable
+      :blocks="menus"
+      :clipped="clipped"
+      :modelValue="drawer"
+      temporary
+      :permanent="isPermanent"
+    >
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>
+        </div>
+      </template>
+    </alex-custom-drawable>
    `,
   `<alex-custom-drawable
       :blocks="menuItems"
       :clipped="true"
-      :show="drawer4"
+      :modelValue="drawer4"
       disappear
+      temporary
       not-fixed
     />`,
   `<alex-custom-drawable
-        :blocks="menus"
-        :clipped="clipped"
-        :show="drawer"
-        disappear
-        not-fixed
-        :permanent="isPermanent"
-      >
-        <template v-slot:header>
-          <div
-            class="my-4 w-100 d-flex"
-            :class="clipped ? '' : 'justify-center'"
-            style="max-height: 28px"
-          >
-            <div>
-              <NuxtLink to="/">
-                <img
-                  v-if="clipped"
-                  src="/images/alex-mini.svg"
-                  height="28"
-                  width="43"
-                />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
-              </NuxtLink>
-            </div>
+      :blocks="menus"
+      :clipped="clipped"
+      :modelValue="drawer"
+      disappear
+      not-fixed
+      temporary
+      :permanent="isPermanent"
+    >
+      <template v-slot:header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
+        >
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
+              />
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
           </div>
-        </template>
-      </alex-custom-drawable>`,
+        </div>
+      </template>
+    </alex-custom-drawable>`,
 ];
 
 const propsDocumentation = [
@@ -489,7 +512,7 @@ const propsDocumentation = [
   },
 
   {
-    name: 'show',
+    name: 'modelValue',
     type: 'Boolean',
     default: 'false',
     description: 'Define se o menu é exibido',
@@ -513,8 +536,14 @@ const propsDocumentation = [
     name: 'disappear',
     type: 'Boolean',
     default: 'false',
-    description:
-      'Define se o menu some enquanto fechado.',
+    description: 'Define se o menu some enquanto fechado.',
+  },
+];
+
+const eventsDocumentation = [
+  {
+    name: 'update:model-value',
+    description: 'Ativa quando o model de controle é atualizado',
   },
 ];
 

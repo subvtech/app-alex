@@ -90,13 +90,10 @@ const props = defineProps({
   },
 });
 
-const { email, telephone, socials } = toRefs(props);
+const { email, telephone } = toRefs(props);
 
-const newIcon = ref<string | null>(null);
 const mask = new Mask({ mask: '(##) #####-####' });
 const isEditing = ref(false);
-
-const cancel = () => {};
 </script>
 
 <style scoped lang="scss">
@@ -206,4 +203,5 @@ const cancel = () => {};
     }
   }
 }
+
 </style>
