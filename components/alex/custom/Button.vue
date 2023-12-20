@@ -1,11 +1,15 @@
 <template>
   <v-btn
-    flat
+    v-bind="$attrs"
     rounded="lg"
     data-testid="alexButton"
-    :class="`${variant} ${selectedVariant.textColor}`"
+    class="alex-button"
+    :class="`${disabled ? 'disabled' : variant} text-${
+      selectedVariant.textColor
+    }`"
     :color="selectedVariant.bgColor"
-    :variant="selectedVariant.variant as unknown as undefined"
+    :style="color && { color: `rgb(var(--v-theme-${color})) !important` }"
+    :variant="variant === 'text' ? 'text' : 'flat'"
     :size="size"
     :ripple="false"
   >
@@ -28,67 +32,87 @@ const props = withDefaults(
       | 'warning'
       | 'info';
     size?: 'small' | 'default' | 'large';
+    disabled?: boolean;
+    theme?: 'light' | 'dark';
+    color?: AlexColors;
   }>(),
-  { variant: 'primary', size: 'default', icon: undefined },
+  {
+    variant: 'primary',
+    size: 'default',
+    icon: undefined,
+    disabled: false,
+    theme: 'light',
+    color: undefined,
+  },
 );
 
 const variants = {
-  primary: { textColor: 'text-white', bgColor: 'secondary-0', variant: 'flat' },
+  primary: { textColor: 'white', bgColor: 'secondary-0' },
   secondary: {
-    textColor: 'text-gray-600',
+    textColor: 'gray-600',
     bgColor: 'gray-blue',
-    variant: 'flat',
   },
   tertiary: {
-    textColor: 'text-gray-600',
+    textColor: 'gray-600',
     bgColor: 'gray-100',
-    variant: 'flat',
   },
-  text: { textColor: 'text-gray-600', bgColor: '', variant: 'text' },
-  error: { textColor: 'text-white', bgColor: 'error-0', variant: 'flat' },
-  success: { textColor: 'text-white', bgColor: 'success-0', variant: 'flat' },
-  warning: { textColor: 'text-white', bgColor: 'warning-0', variant: 'flat' },
-  info: { textColor: 'text-white', bgColor: 'info-0', variant: 'flat' },
+  text: { textColor: 'gray-600', bgColor: '' },
+  error: { textColor: 'white', bgColor: 'error-0' },
+  success: { textColor: 'white', bgColor: 'success-0' },
+  warning: { textColor: 'white', bgColor: 'warning-0' },
+  info: { textColor: 'white', bgColor: 'info-0' },
+  disabled: { textColor: 'gray-300', bgColor: 'gray-100' },
+  disabledDark: { textColor: 'gray-600', bgColor: 'gray-800' },
 };
 
-const selectedVariant = computed(() => variants[props.variant]);
-
+const disabledVariant = computed(() =>
+  props.theme === 'dark' ? variants.disabledDark : variants.disabled,
+);
+const selectedVariant = computed(() =>
+  props.disabled ? disabledVariant.value : variants[props.variant],
+);
 // Slots
 const slots = useSlots();
 const hasDefault = computed(() => !!slots.default);
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @use 'sass:map';
 $variants: (error, success, info, warning);
-@each $name in $variants {
-  .#{$name}:hover {
-    background-color: rgb(var(--v-theme-#{$name}-1)) !important;
-  }
-  .#{$name}:active {
-    background-color: rgb(var(--v-theme-#{$name}-2)) !important;
-  }
-}
-
 $otherVariants:
   'primary' 'secondary-1' 'secondary-2',
   'secondary' 'gray-100' 'gray-200',
   'tertiary' 'gray-200' 'gray-300',
   'text' 'gray-blue' 'gray-100';
 
-@each $name, $hover, $active in $otherVariants {
-  .#{$name}:hover {
-    background-color: rgb(var(--v-theme-#{$hover})) !important;
+.alex-button {
+  &.v-btn {
+    padding: 0 12px !important;
+    text-transform: none !important;
   }
-  .#{$name}:active {
-    background-color: rgb(var(--v-theme-#{$active})) !important;
+  &.v-btn--size-large {
+    padding: 0 16px !important;
   }
-}
+  &.disabled {
+    pointer-events: none;
+    opacity: 1;
+  }
+  @each $name in $variants {
+    &.#{$name}:hover {
+      background-color: rgb(var(--v-theme-#{$name}-1)) !important;
+    }
+    &.#{$name}:active {
+      background-color: rgb(var(--v-theme-#{$name}-2)) !important;
+    }
+  }
 
-.primary:hover {
-  background-color: rgb(var(--v-theme-secondary-1)) !important;
-}
-.primary:active {
-  background-color: rgb(var(--v-theme-secondary-2)) !important;
+  @each $name, $hover, $active in $otherVariants {
+    &.#{$name}:hover {
+      background-color: rgb(var(--v-theme-#{$hover})) !important;
+    }
+    &.#{$name}:active {
+      background-color: rgb(var(--v-theme-#{$active})) !important;
+    }
+  }
 }
 </style>

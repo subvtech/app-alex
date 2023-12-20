@@ -3,88 +3,86 @@
     class="header d-flex align-center w-full"
     style="height: 44px; justify-content: space-between"
     data-testid="header"
+    role="heading"
+    :aria-label="title"
   >
-    <div class="d-flex grow align-center">
-      <a
-        v-if="!noBackArrow"
-        :href="items[items.length - 2].href"
-        data-testid="back_arrow"
-      >
-        <v-icon
-          class="header__arrow"
-          data-testid="back_arrow"
-          color="#6E7A87"
-          style="cursor: pointer"
-          >mdi-chevron-left</v-icon
-        >
-      </a>
-      <div>
-        <p
-          class="header__title"
-          style="
-            font-size: 24px;
-            font-weight: 700;
-            line-height: 28px;
-            color: #5d6872;
-          "
-          :title="title"
-        >
-          {{ title }}
-        </p>
-      </div>
-      <!-- <v-divider vertical class="divider ml-4 align-center" /> -->
+    <div
+      class="d-flex grow align-center"
+      role="navigation"
+      aria-label="Page Breadcrumb"
+    >
       <div class="header__breadcrumb">
-        <slot name="breadcrumbs" :items="items">
-          <alex-custom-breadcrumbs :items="items" />
-        </slot>
+        <alex-custom-breadcrumbs
+          :title="title"
+          :items="items"
+          :arrow-back="!noBackArrow"
+        />
       </div>
     </div>
     <div class="header__button d-flex">
-      <v-btn
-        data-testid="btn"
-        :class="isTerciary ? 'terciary' : ''"
-        height="44"
-        width="103"
-        class="button"
-        :text="text"
-        :icon="btnIcon"
-        @click="() => toggleDialog"
-        ><v-icon data-testid="btn-icon" width="20" height="20">
-          {{ icon }}
-        </v-icon>
-        <p class="ml-2">{{ text }}</p>
-      </v-btn>
+      <alex-custom-button
+        v-if="hasSecondaryButton"
+        variant="tertiary"
+        :prepend-icon="secondaryButtonIcon"
+        class="mr-2"
+        @click="() => emits('secondary-action')"
+      >
+        {{ secondaryButtonText }}
+      </alex-custom-button>
+      <alex-custom-button
+        v-if="hasMainButton"
+        variant="primary"
+        :prepend-icon="mainButtonIcon"
+        @click="() => emits('main-action')"
+      >
+        {{ mainButtonText }}
+      </alex-custom-button>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 defineProps({
-  isTerciary: {
+  title: {
+    type: String,
+    default: 'Page Title',
+  },
+  hasMainButton: {
     type: Boolean,
     default: false,
   },
-  text: {
-    type: String,
-    default: 'Botão',
+  hasSecondaryButton: {
+    type: Boolean,
+    default: false,
   },
-  btnIcon: {
+  mainButtonText: {
     type: String,
-    default: 'mdi-plus',
+    default: 'Main Button',
   },
-  title: {
+  mainButtonIcon: {
     type: String,
-    default: 'Título da página',
+    default: null,
+  },
+  secondaryButtonIcon: {
+    type: String,
+    default: null,
+  },
+  secondaryButtonText: {
+    type: String,
+    default: 'Secondary Button',
   },
   noBackArrow: {
     type: Boolean,
     default: false,
   },
+  items: {
+    type: Array as PropType<
+      { title: string; disabled: boolean; href: string }[]
+    >,
+    default: () => [],
+  },
 });
 
-const items = [
-  { title: 'Início', disabled: false, href: '/inicio' },
-  { title: 'Página', disabled: false, href: '/pagina' },
-];
+const emits = defineEmits(['main-action', 'secondary-action']);
 </script>
 <style scoped lang="scss">
 .button {
