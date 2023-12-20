@@ -1,12 +1,16 @@
 <template>
   <div class="wrapper d-flex flex-column">
     <header class="d-flex justify-space-between flex-column flex-sm-row mb-2">
-      <alex-custom-breadcrumbs title="Meus Cursos" :items="breadcrumbs" />
+      <alex-custom-breadcrumbs
+        :title="$t('pages.classes.breadcrumbs.myCourses')"
+        :items="breadcrumbs"
+      />
       <alex-custom-button
+        v-if="professorMode"
         prepend-icon="mdi-plus"
         size="large"
         class="text-body-4"
-        >Novo Curso</alex-custom-button
+        >{{ $t('pages.classes.newCourse') }}</alex-custom-button
       >
     </header>
     <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
@@ -20,13 +24,15 @@
           src="@/assets/svg/EmptyProjects.svg"
           alt="Empty Projects"
         />
-        <p class="text-h3 text-gray-600">Nenhum curso encontrado!</p>
+        <p class="text-h3 text-gray-600">
+          {{ $t('pages.classes.emptyStateText') }}
+        </p>
       </div>
       <div v-else class="d-flex w-100 flex-column h-100" style="flex: 1">
         <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
           <alex-inputs-text-field
             v-model="search"
-            placeholder="Buscar"
+            :placeholder="$t('pages.classes.searchPlaceholder')"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             hide-details
@@ -38,7 +44,7 @@
           >
           <div>
             <v-tooltip
-              text="Alterar Visualização"
+              :text="$t('pages.classes.viewModeTooltip')"
               location="bottom"
               content-class="bg-gray-800"
             >
@@ -57,7 +63,7 @@
               </template>
             </v-tooltip>
             <v-tooltip
-              text="Filtrar"
+              :text="$t('pages.classes.filterTooltip')"
               location="bottom"
               content-class="bg-gray-800"
             >
@@ -79,16 +85,27 @@
           v-model:page="page"
           :items="courses"
           :items-per-page="12"
-          :headers="headers"
-          :filter-keys="['title', 'description', 'facilitatorName', 'trails']"
+          :filter-keys="[
+            'title',
+            'description',
+            'facilitatorName',
+            'trails',
+            'institution',
+            'generalCompetencies',
+            'technicalCompetencies',
+            'startDate',
+            'endDate',
+          ]"
           class="d-flex flex-wrap align-content-space-between"
           style="flex: 1"
         >
           <template #default="{ items }">
             <div v-if="coursesView === 'grid'" class="d-flex flex-wrap ga-4">
               <alex-learningplan-card
-                v-for="course in items"
-                :key="course"
+                v-for="(course, index) in items"
+                v-show="!course.raw.hidden || professorMode"
+                :key="course.raw.title + index"
+                type="course"
                 class="flex-stretch"
                 :title="course.raw.title"
                 :description="course.raw.description"
@@ -99,7 +116,13 @@
                   name: course.raw.facilitatorName,
                   imageURL: course.raw.facilitatorImage,
                 }"
-                :trails="course.raw.trails"
+                style="flex: 1"
+                :trails-count="course.raw.trails"
+                :hide="course.raw.hidden"
+                :favorited="course.raw.favorited"
+                @favorite="changeItemFavorited(index)"
+                @toggle-visibility="changeItemVisibility(index)"
+                @configurations="console.log('configurations')"
               />
             </div>
             <v-data-table
@@ -107,46 +130,42 @@
               id="courses-table"
               ref="tableRef"
               :items-per-page="12"
-              :items="passData(items)"
+              :items="setTableData(items)"
               :headers="headers"
             >
-              <template #item="{ item }">
-                <tr class="table-row text-body-3 text-gray">
+              <template #item="{ item, index }">
+                <tr
+                  v-show="!(item as any).hidden || professorMode"
+                  class="table-row text-body-3 text-gray"
+                  :class="{ hidden: (item as any).hidden }"
+                >
                   <td style="max-width: 596px">
                     <div class="d-flex align-center">
                       <img
-                        :src="item.img"
+                        :src="(item as any).img"
                         width="48"
                         height="36"
                         style="min-width: 48px; min-height: 36px"
                         class="rounded mr-4"
                       />
                       <p class="text-gray-900 text-body-4 text-overflow">
-                        {{ item.title }}
+                        {{ (item as any).title }}
                       </p>
                     </div>
                   </td>
                   <td class="text-overflow" style="max-width: 596px">
-                    {{ item.description }}
+                    {{ (item as any).description }}
                   </td>
                   <td class="text-overflow" style="max-width: 150px">
-                    {{ item.facilitatorName }}
+                    {{ (item as any).facilitatorName }}
                   </td>
                   <td class="text-overflow" style="max-width: 90px">
-                    {{ item.trails }}
+                    {{ (item as any).trails }}
                   </td>
                   <td>
                     <alex-inputs-dropdown
-                      :items="[
-                        {
-                          icon: 'mdi-eye-outline',
-                          text: 'Mostrar',
-                        },
-                        {
-                          icon: 'mdi-cog-outline',
-                          text: 'Configurações',
-                        },
-                      ]"
+                      v-if="professorMode"
+                      :items="dropdownItems((item as any).hidden, index)"
                     >
                       <template #activator="{ props: propsMenu }">
                         <v-tooltip
@@ -180,7 +199,6 @@
               <alex-custom-pagination
                 v-if="pageCount > 1"
                 v-model="page"
-                :model-value="page"
                 :length="pageCount"
                 :total-visible="5"
               />
@@ -192,15 +210,46 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
-const courses = ref([]);
+const professorMode = ref(false);
+const { t } = useI18n();
 
-const passData = (items) => {
+onBeforeMount(() => {
+  const { isProfessor } = useStrapiUser<User>().value;
+  professorMode.value = !isProfessor;
+  if (professorMode.value) {
+    headers.push({
+      title: '',
+      key: '',
+      sortable: false,
+    });
+  }
+});
+
+interface RawItem {
+  title: string;
+  description: string;
+  facilitatorName: string;
+  facilitatorImage: string;
+  trails: number;
+  img: string;
+  institution: string;
+  generalCompetencies: string[];
+  technicalCompetencies: string[];
+  startDate: string;
+  endDate: string;
+  hidden: boolean;
+  favorited: boolean;
+}
+
+interface Item {
+  raw: RawItem;
+}
+const setTableData = (items: readonly Item[]): RawItem[] => {
   return items.map((item) => item.raw);
 };
 
@@ -213,43 +262,73 @@ const showingData = (groupedItems) => {
       ? courses.value.length
       : page.value * itemsPerPage;
   const total = courses.value.length;
-  const message = `Mostrando do ${from} ao ${to} de um total de ${total} cursos`;
+  const message = t('pages.classes.showingData', {
+    from,
+    to,
+    total,
+  });
   return message;
 };
 const breadcrumbs = [
   {
-    title: 'Home',
+    title: t('pages.classes.breadcrumbs.home'),
     href: '/',
+    disabled: false,
   },
   {
-    title: 'Meus Cursos',
+    title: t('pages.classes.breadcrumbs.myCourses'),
     href: '/course',
+    disabled: false,
   },
 ];
 
-const headers = [
+const dropdownItems = (hidden, index) => {
+  return [
+    hidden
+      ? {
+          icon: 'mdi-eye-outline',
+          text: t('components.learningPlan.card.visibility.show'),
+          onClick: () => changeItemVisibility(index),
+        }
+      : {
+          icon: 'mdi-eye-off-outline',
+          text: t('components.learningPlan.card.visibility.hide'),
+          onClick: () => changeItemVisibility(index),
+        },
+    {
+      icon: 'mdi-cog-outline',
+      text: t('components.learningPlan.card.configurations'),
+      link: `/course/settings/${index}`,
+    },
+  ];
+};
+
+interface DataTableHeader {
+  title: string;
+  key: string;
+  sortable?: boolean;
+}
+
+const headers: DataTableHeader[] = [
   {
-    title: 'Curso',
+    title: t('pages.classes.tableHeaders.course'),
     key: 'title',
   },
   {
-    title: 'Descrição',
+    title: t('pages.classes.tableHeaders.description'),
     key: 'description',
   },
   {
-    title: 'Facilitador',
+    title: t('pages.classes.tableHeaders.facilitator'),
     key: 'facilitatorName',
   },
   {
-    title: 'Trilhas',
+    title: t('pages.classes.tableHeaders.trails'),
     key: 'trails',
-  },
-  {
-    title: '',
   },
 ];
 
-courses.value = [
+const courses = ref([
   {
     title:
       'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
@@ -259,6 +338,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/200/300',
     trails: 3,
     img: 'https://picsum.photos/400/600',
+    institution: 'IFAL',
+    generalCompetencies: ['Teamwork', 'Communication', 'Problem Solving'],
+    technicalCompetencies: ['Networking', 'Project Management'],
+    startDate: '2023-01-10',
+    endDate: '2023-03-15',
+    hidden: true,
+    favorited: true,
   },
   {
     title: 'Introdução à programação em Python',
@@ -268,6 +354,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/201/301',
     trails: 5,
     img: 'https://picsum.photos/401/601',
+    institution: 'UFAL',
+    generalCompetencies: ['Problem Solving', 'Logic', 'Communication'],
+    technicalCompetencies: ['Python Programming'],
+    startDate: '2023-02-01',
+    endDate: '2023-04-15',
+    hidden: false,
+    favorited: false,
   },
   {
     title: 'Desenvolvimento web com React.js',
@@ -277,6 +370,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/202/302',
     trails: 4,
     img: 'https://picsum.photos/402/602',
+    institution: 'UNCISAL',
+    generalCompetencies: ['Web Development', 'React.js'],
+    technicalCompetencies: ['Frontend Development'],
+    startDate: '2023-03-05',
+    endDate: '2023-05-20',
+    hidden: false,
+    favorited: false,
   },
   {
     title: 'Aprendendo machine learning com scikit-learn',
@@ -286,6 +386,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/203/303',
     trails: 6,
     img: 'https://picsum.photos/403/603',
+    institution: 'LAPP',
+    generalCompetencies: ['Machine Learning', 'Data Analysis'],
+    technicalCompetencies: ['Scikit-learn'],
+    startDate: '2023-04-15',
+    endDate: '2023-07-01',
+    hidden: false,
+    favorited: false,
   },
   {
     title: 'Segurança da informação e ethical hacking',
@@ -295,6 +402,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/204/304',
     trails: 5,
     img: 'https://picsum.photos/404/604',
+    institution: 'IFAL',
+    generalCompetencies: ['Cybersecurity', 'Ethical Hacking'],
+    technicalCompetencies: ['Information Security'],
+    startDate: '2023-06-01',
+    endDate: '2023-08-15',
+    hidden: false,
+    favorited: false,
   },
   {
     title: 'Desenvolvimento mobile com Flutter',
@@ -304,6 +418,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/205/305',
     trails: 4,
     img: 'https://picsum.photos/405/605',
+    institution: 'LAPP',
+    generalCompetencies: ['Mobile Development', 'Flutter'],
+    technicalCompetencies: ['Mobile App Development'],
+    startDate: '2023-07-10',
+    endDate: '2023-10-01',
+    hidden: false,
+    favorited: false,
   },
   {
     title: 'Gestão de projetos ágeis com Scrum',
@@ -313,6 +434,13 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/206/306',
     trails: 3,
     img: 'https://picsum.photos/406/606',
+    institution: 'UNCISAL',
+    generalCompetencies: ['Agile Project Management', 'Scrum'],
+    technicalCompetencies: ['Project Management'],
+    startDate: '2023-08-15',
+    endDate: '2023-11-01',
+    hidden: false,
+    favorited: false,
   },
   {
     title: 'Inteligência artificial e redes neurais',
@@ -322,8 +450,15 @@ courses.value = [
     facilitatorImage: 'https://picsum.photos/207/307',
     trails: 6,
     img: 'https://picsum.photos/407/607',
+    institution: 'LAPP',
+    generalCompetencies: ['Artificial Intelligence', 'Neural Networks'],
+    technicalCompetencies: ['AI Fundamentals'],
+    startDate: '2023-09-01',
+    endDate: '2023-12-15',
+    hidden: false,
+    favorited: false,
   },
-];
+]);
 
 courses.value = [
   ...courses.value,
@@ -334,6 +469,14 @@ courses.value = [
 
 const changeViewMode = () => {
   coursesView.value = coursesView.value === 'grid' ? 'table' : 'grid';
+};
+
+const changeItemVisibility = (index: number) => {
+  courses.value[index].hidden = !courses.value[index].hidden;
+};
+
+const changeItemFavorited = (index: number) => {
+  courses.value[index].favorited = !courses.value[index].favorited;
 };
 </script>
 
@@ -379,5 +522,9 @@ const changeViewMode = () => {
 .footer {
   border-top: 1px #ebedef solid;
   max-height: 95px;
+}
+
+.hidden {
+  opacity: 0.5;
 }
 </style>

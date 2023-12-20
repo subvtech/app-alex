@@ -1,0 +1,19 @@
+{
+    "newCourse": "New Course",
+    "emptyStateText": "No courses found!",
+    "searchPlaceholder": "Search...",
+    "viewModeTooltip": "Change View Mode",
+    "filterTooltip": "Filter",
+    "tableHeaders": {
+      "course": "Course",
+      "description": "Description",
+      "facilitator": "Facilitator",
+      "trails": "Trails"
+    },
+    "breadcrumbs": {
+      "myCourses": "My Courses",
+      "home": "Home"
+    },
+    "showingData": "Showing %{from} to %{to} of a total of %{total} courses"
+  }
+  
