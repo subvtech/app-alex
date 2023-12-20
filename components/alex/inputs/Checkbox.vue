@@ -2,15 +2,14 @@
   <div class="container" width="113" max-width="fit-content" height="47">
     <div class="checkbox-container mr-0 pa-0 mt-0">
       <v-checkbox
-        class="input-checkbox"
         v-model:model-value="value"
+        class="input-checkbox"
         :class="{
           'text-secondary-0': hasCustomIndeterminateColor,
         }"
         :indeterminate="indeterminate"
         :disabled="disabled"
         :readonly="readonly"
-        hide-details="auto"
         color="secondary-0"
         width="18"
         data-testid="testing-checkbox"

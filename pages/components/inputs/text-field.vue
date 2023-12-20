@@ -27,17 +27,42 @@
     <h2 class="text-h3 text-gray-800">Uso do Componente</h2>
     <div>
       <p class="text-subtitle-2 text-gray-500">
-        O componente não requer nenhuma propriedade especifica, apenas o
-        v-model.<br />todas as suas propriedades são herdadas do
+        O componente não requer nenhuma propriedade especifica, apenas o v-model
+        e o name.<br />todas as suas propriedades são herdadas do
         <a
           class="text-decoration-underline text-blue"
           href="https://vuetifyjs.com/en/api/v-text-field/"
           target="_blank"
           >v-text-field</a
-        >, as mudanças que fizemos foram apenas estéticas.
+        >, também poderá ser passado um schema para validação individual.
       </p>
     </div>
+    <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
+      <div class="w-100">
+        <p class="text-h5 text-center">Props do componente</p>
+        <v-table variant="outline">
+          <thead>
+            <tr>
+              <th>Propriedade</th>
+              <th>Tipo</th>
+              <th>Obrigatório</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>schema</td>
+              <td>YupSchema</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
+    </div>
     <alex-inputs-text-field
+      v-model="inputText"
+      name="name"
       placeholder="Alex"
       class="w-100"
       prepend-inner-icon="mdi-account"
@@ -46,6 +71,7 @@
       required
       info="Insira seu nome de usuário"
       label="Nome de Usuário"
+      :schema="schema"
     />
     <div class="w-100">
       <div
@@ -117,6 +143,7 @@ ${exampleScript[0]}
     <v-row class="w-100 d-flex align-center">
       <v-col cols="12" md="7">
         <alex-inputs-text-field
+          name="editable"
           :clearable="playgroundOptions[0]"
           :disabled="playgroundOptions[2]"
           :error-messages="playgroundOptions[1] ? ['Mensagem de erro'] : []"
@@ -134,13 +161,15 @@ ${exampleScript[0]}
       <v-col class="playground-controls pa-3 d-flex flex-column">
         <alex-inputs-text-field
           v-model="playgroundValues[0]"
+          name="placeholder"
           hide-details
           placeholder="Nome de usuário"
-          label="Alex"
+          label="Placeholder"
           clearable
         />
         <alex-inputs-text-field
           v-model="playgroundValues[1]"
+          name="prepend"
           hide-details
           placeholder="mdi-account"
           label="Prepend Icon"
@@ -148,6 +177,7 @@ ${exampleScript[0]}
         />
         <alex-inputs-text-field
           v-model="playgroundValues[2]"
+          name="append"
           hide-details
           placeholder="mdi-close"
           label="Append Icon"
@@ -155,6 +185,7 @@ ${exampleScript[0]}
         />
         <alex-inputs-text-field
           v-model="playgroundValues[3]"
+          name="label"
           hide-details
           placeholder="User Name"
           label="Label"
@@ -163,37 +194,38 @@ ${exampleScript[0]}
         <div class="d-flex flex-wrap">
           <v-checkbox
             v-model="playgroundOptions[0]"
-            :hide-details="true"
+            hide-details
             label="clearable"
             color="primary"
           />
           <v-checkbox
             v-model="playgroundOptions[1]"
-            :hide-details="true"
+            hide-details
             label="error"
             color="error"
           />
           <v-checkbox
             v-model="playgroundOptions[2]"
-            :hide-details="true"
+            hide-details
             label="disabled"
             color="gray-400"
           />
           <v-checkbox
             v-model="playgroundOptions[3]"
-            :hide-details="true"
+            hide-details
             label="persistent-hint"
             color="accent"
           />
           <v-checkbox
             v-model="playgroundOptions[4]"
-            :hide-details="true"
+            hide-details
             label="required"
             color="info"
           />
         </div>
-        <v-select
+        <alex-inputs-select
           v-model="playgroundDensities"
+          name="density"
           class="playground-select"
           :items="['default', 'comfortable', 'compact']"
           label="Density"
@@ -214,6 +246,7 @@ ${exampleScript[0]}
 </template>
 
 <script setup lang="ts">
+import * as yup from 'yup';
 import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
@@ -224,26 +257,34 @@ definePageMeta({
   middleware: 'auth',
 });
 
+const inputText = ref('');
+const schema = yup.string().required('Este campo é obrigatório');
 const copiedValue = ref('');
 const activeExampleTabs = ref(['1']);
-const playgroundOptions = ref([0, 0, 0, 0, 0]);
+const playgroundOptions = ref([false, false, false, false, false]);
 const playgroundValues = ref(['', '', '', 'User Name']);
 const playgroundDensities = ref('default');
 
 const exampleTemplates = [
-  `   <alex-inputs-text-field
+  ` <alex-inputs-text-field
+      v-model="inputText"
+      name="name"
       placeholder="Alex"
       class="w-100"
       prepend-inner-icon="mdi-account"
+      clearable
       hint="Nome de usuário deve conter no mínimo X caracteres"
+      required
       info="Insira seu nome de usuário"
       label="Nome de Usuário"
-      required
-      clearable 
+      :schema="schema"
     />`,
 ];
 
-const exampleScript = [`const inputText = ref('');`];
+const exampleScript = [
+  `const inputText = ref('');
+const schema = yup.string().required('Este campo é obrigatório');`,
+];
 
 const exampleTabs = [
   {
@@ -292,9 +333,5 @@ const copyToClipboard = async (message, item) => {
 .playground-controls {
   border-left: 1px solid #a0a8b7;
   gap: 16px;
-}
-
-.playground-select > * .v-select__selection {
-  margin-left: 35px !important;
 }
 </style>

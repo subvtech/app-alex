@@ -5,7 +5,7 @@
     <h1 class="text-h2 text-gray-800">Dropdown</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
-      <strong class="bg-accent pa-1 rounded">alex-inputs-dropdown</strong>
+      <strong class="bg-accent pa-1 rounded">alex-custom-dropdown</strong>
       é útil ao lidar com informações em espaços reduzidos, permitindo que
       usuário visualize as informações apenas quando desejar, evitando poluição
       visual. O componente é composto por um ativador, que pode ser um botão ou
@@ -42,14 +42,14 @@
           <tbody>
             <tr>
               <td>items</td>
-              <td>Item[]</td>
+              <td>AlexDropdownItem[]</td>
               <td class="text-center">
                 <v-icon icon="mdi-checkbox-marked" color="success" />
               </td>
             </tr>
             <tr>
-              <td>isDarkMode</td>
-              <td>Boolean</td>
+              <td>theme</td>
+              <td>'light' | 'dark'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -65,7 +65,7 @@
     </div>
 
     <div class="w-100">
-      <alex-inputs-dropdown :items="itemsComponentePropsExample" />
+      <alex-custom-dropdown :items="itemsComponentePropsExample" />
     </div>
     <div class="w-100">
       <div
@@ -137,7 +137,7 @@
     </p>
 
     <div class="w-100">
-      <alex-inputs-dropdown :items="itemsComponenteNoIcon" />
+      <alex-custom-dropdown :items="itemsComponenteNoIcon" />
     </div>
     <div class="w-100">
       <div
@@ -209,11 +209,11 @@
       a propriedade props vinda do slot para funcionar corretamente
     </p>
     <div class="w-100">
-      <alex-inputs-dropdown :items="itemsComponentePropsExample">
+      <alex-custom-dropdown :items="itemsComponentePropsExample">
         <template #activator="{ props }">
           <alex-custom-button v-bind="props"> Abrir Menu </alex-custom-button>
         </template>
-      </alex-inputs-dropdown>
+      </alex-custom-dropdown>
     </div>
     <div class="w-100">
       <div
@@ -277,7 +277,7 @@
         </v-window-item>
       </v-window>
     </div>
-    <h2 class="text-h3 text-gray-800">Uso de Props</h2>
+    <h2 class="text-h3 text-gray-800">Props dos Itens</h2>
     <p class="text-subtitle-2 text-gray-500">
       O conteúdo de cada item é inserido através das props items:<br />
     </p>
@@ -335,12 +335,12 @@
         Existe uma opção de estilo complementar:
         <strong>Warning</strong>.
       </p>
-      <alex-inputs-dropdown :items="itemsComponenteDarkWarning" />
+      <alex-custom-dropdown :items="itemsComponenteDarkWarning" />
       <p class="text-subtitle-2 text-gray-500">
         Além do DarkMode
         <strong>Dark</strong>.
       </p>
-      <alex-inputs-dropdown :items="itemsComponenteDarkWarning" is-dark-mode />
+      <alex-custom-dropdown :items="itemsComponenteDarkWarning" theme="dark" />
     </div>
     <div class="w-100">
       <div
@@ -411,8 +411,13 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
-import { Item } from '~/components/alex/inputs/Dropdown.vue';
+import { AlexDropdownItem } from '@/components/alex/custom/Dropdown.vue';
 definePageMeta({ layout: 'components' });
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
 
 const copiedValue = ref('');
 const propsExampleActivePage = ref('1');
@@ -420,7 +425,7 @@ const noIconExampleActivePage = ref('1');
 const secondExampleActivePage = ref('1');
 const thirdExampleActivePage = ref('1');
 
-const itemsComponentePropsExample = ref<Item[]>([
+const itemsComponentePropsExample = ref<AlexDropdownItem[]>([
   {
     link: '/',
     icon: 'mdi-home',
@@ -437,7 +442,7 @@ const itemsComponentePropsExample = ref<Item[]>([
     text: 'Configurações',
   },
 ]);
-const itemsComponenteDarkWarning = ref<Item[]>([
+const itemsComponenteDarkWarning = ref<AlexDropdownItem[]>([
   {
     link: '/',
     icon: 'mdi-home',
@@ -455,7 +460,7 @@ const itemsComponenteDarkWarning = ref<Item[]>([
   },
 ]);
 
-const itemsComponenteNoIcon = ref<Item[]>([
+const itemsComponenteNoIcon = ref<AlexDropdownItem[]>([
   {
     text: 'Verificar',
   },
@@ -468,33 +473,30 @@ const itemsComponenteNoIcon = ref<Item[]>([
   },
 ]);
 
-const propsExampleScript = `
-const itemsComponente2 = ref<Item[]>([
+const propsExampleScript = `const itemsComponentePropsExample = ref<AlexDropdownItem[]>([
   {
-    
-    text: 'Verificar',
-    icon: 'mdi-check-decagram-outline',
+    link: '/',
+    icon: 'mdi-home',
+    text: 'Início',
   },
   {
-    
-    icon: 'mdi-pencil-outline',
-    text: 'Editar',
     link: '/profile',
+    icon: 'mdi-account-circle',
+    text: 'Perfil',
   },
   {
-    
-    icon: 'mdi-trash-can-outline',
-    text: 'Excluir conta',
+    icon: 'mdi-account',
+    link: '/user/settings',
+    text: 'Configurações',
   },
-]);
-    `;
+]);`;
 
 const firstExampleTemplate = `
-<alex-inputs-dropdown :items="itemsComponente" />
+<alex-custom-dropdown :items="itemsComponente" />
 `;
 
 const firstExampleScript = `
-    const itemsComponente = ref<Item[]>([
+    const itemsComponente = ref<AlexDropdownItem[]>([
       {
         
         link: '/',
@@ -517,8 +519,8 @@ const firstExampleScript = `
 
 `;
 
-const noIconExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteNoIcon" />`;
-const noIconExampleScript = `const itemsComponenteNoIcon = ref<Item[]>([
+const noIconExampleTemplate = `<alex-custom-dropdown :items="itemsComponenteNoIcon" />`;
+const noIconExampleScript = `const itemsComponenteNoIcon = ref<AlexDropdownItem[]>([
   {
    
     text: 'Verificar',
@@ -535,16 +537,16 @@ const noIconExampleScript = `const itemsComponenteNoIcon = ref<Item[]>([
   },
 ]);`;
 
-const slotExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteExample2">
+const slotExampleTemplate = `<alex-custom-dropdown :items="itemsComponenteExample2">
         <template #activator="{ props }">
           <alex-custom-button v-bind="props"> Abrir Menu </alex-custom-button>
         </template>
-      </alex-inputs-dropdown>`;
+      </alex-custom-dropdown>`;
 
-const thirdExampleTemplate = `<alex-inputs-dropdown :items="itemsComponenteDarkWarning" />
-      <alex-inputs-dropdown :items="itemsComponenteDarkWarning" is-dark-mode />`;
+const thirdExampleTemplate = `<alex-custom-dropdown :items="itemsComponenteDarkWarning" />
+      <alex-custom-dropdown :items="itemsComponenteDarkWarning" theme='dark' />`;
 
-const thirdExampleDarkWarning = `const itemsComponenteDarkWarning = ref<Item[]>([
+const thirdExampleDarkWarning = `const itemsComponenteDarkWarning = ref<AlexDropdownItem[]>([
   {
     
     link: '/',

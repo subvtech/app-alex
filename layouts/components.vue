@@ -81,6 +81,11 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
+        title: 'Avatar Group',
+        to: '/components/custom/AvatarGroup',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
         title: 'Banner',
         to: '/components/custom/banner',
       },
@@ -106,6 +111,11 @@ const menus = [
         title: 'Info',
         to: '/components/custom/info',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Dropdown',
+        to: '/components/custom/dropdown',
+      },
     ],
   },
   {
@@ -115,6 +125,11 @@ const menus = [
         icon: 'mdi-baguette',
         title: 'Breadcrumbs',
         to: '/components/custom/breadcrumbs',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Header',
+        to: '/components/custom/Header',
       },
       {
         icon: 'mdi-view-dashboard-outline',
@@ -136,6 +151,11 @@ const menus = [
         title: 'tabs',
         to: '/components/custom/tabs',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
+      },
     ],
   },
   {
@@ -147,9 +167,24 @@ const menus = [
         to: '/components/inputs/radio-button',
       },
       {
+        icon: 'mdi-checkbox-marked',
+        title: 'Checkbox',
+        to: '/components/inputs/checkbox',
+      },
+      {
         icon: 'mdi-card-text-outline',
         title: 'Text-field',
         to: '/components/inputs/text-field',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Autocomplete',
+        to: '/components/inputs/autocomplete',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Select',
+        to: '/components/inputs/select',
       },
       {
         icon: 'mdi-view-dashboard-outline',
@@ -157,9 +192,9 @@ const menus = [
         to: '/components/learning-plans/card',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Dropdown',
-        to: '/components/inputs/dropdown',
+        icon: 'mdi-shoe-print',
+        title: 'Stepper',
+        to: '/components/inputs/stepper',
       },
     ],
   },
