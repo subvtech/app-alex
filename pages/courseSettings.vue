@@ -2,14 +2,18 @@
   <div class="container d-flex flex-column">
     <div class="config config-title">
       <p>
-        <span class="header-h4"> {{ t('config.title') }}</span>
+        <span class="header-h4">{{
+          t('pages.courseSettings.config.title')
+        }}</span>
       </p>
     </div>
     <div class="config">
       <div class="content-area">
         <div class="card-title">
           <p>
-            <span class="header-h4">Capa do curso</span>
+            <span class="header-h4">{{
+              t('pages.courseSettings.config.coverTitle')
+            }}</span>
           </p>
         </div>
         <div class="content-body">
@@ -35,23 +39,25 @@
               />
             </svg>
             <p class="text-center">
-              <span class="header-h5 text--secondary"
-                >Adicione Vídeos ou Fotos</span
-              >
+              <span class="header-h5 text--secondary">{{
+                t('pages.courseSettings.config.addCover')
+              }}</span>
               <br />
-              <span class="subtitle text--secondary"
-                >Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;</span
-              >
+              <span class="subtitle text--secondary">{{
+                t('pages.courseSettings.config.formats')
+              }}</span>
             </p>
           </div>
           <span class="action-content">
             <alex-custom-button
               class="button"
-              text="Fazer upload"
               prepend-icon="mdi-cloud-upload-outline"
               variant="secondary"
               @click="$refs.fileInput.click()"
-            />
+              >{{
+                t('pages.courseSettings.config.uploadButton')
+              }}</alex-custom-button
+            >
             <input
               ref="fileInput"
               type="file"
@@ -65,13 +71,16 @@
       <div class="content-area">
         <div class="card-title">
           <p>
-            <span class="header-h4">Informações gerais</span>
+            <span class="header-h4">{{
+              t('pages.courseSettings.config.generalTitle')
+            }}</span>
           </p>
         </div>
         <div class="content-body">
           <alex-inputs-text-field
+            id="courseName"
             v-model="course.name"
-            label="Nome do curso"
+            :label="$t('pages.courseSettings.config.courseName')"
             name=""
             class="w-100"
             required
@@ -79,26 +88,29 @@
           <div class="container-date">
             <div class="datePickers">
               <alex-inputs-date
-                label="Início"
+                id="startDate"
                 :model-value="course.start_date"
+                :label="t('pages.courseSettings.config.startDate')"
                 name=""
                 required
                 class="w-100"
                 close-on-select
               />
+
               <alex-inputs-date
-                label="Término"
+                id="endDate"
                 name=""
+                :label="t('pages.courseSettings.config.endDate')"
                 :model-value="course.end_date"
                 required
                 class="w-100"
               />
             </div>
           </div>
-
           <alex-inputs-text-field
+            id="acronym"
             v-model="course.acronym"
-            label="Sigla da turma"
+            :label="$t('pages.courseSettings.config.courseAcronym')"
             name=""
             class="w-100"
             required
@@ -106,104 +118,78 @@
         </div>
         <div class="footer-content">
           <span class="action-content-two">
-            <alex-custom-button
-              class="button"
-              text="Cancelar"
-              variant="secondary"
-            />
-            <alex-custom-button
-              class="button"
-              text="Salvar alterações"
-              variant="primary"
-            />
+            <alex-custom-button class="button" variant="secondary">{{
+              t('pages.courseSettings.config.cancelButton')
+            }}</alex-custom-button>
+            <alex-custom-button class="button" variant="primary">{{
+              t('pages.courseSettings.config.saveButton')
+            }}</alex-custom-button>
           </span>
         </div>
       </div>
       <div class="content-area">
         <div class="card-title">
           <p>
-            <span class="header-h4">Encontros síncronos</span>
+            <span class="header-h4">{{
+              t('pages.courseSettings.config.syncMeetingsTitle')
+            }}</span>
           </p>
         </div>
         <div class="content-body">
           <div class="no-encounters mb-4">
             <p>
-              <span class="body-p1"
-                >Parece que não há nenhum encontro síncrono</span
-              >
+              <span class="body-p1">{{
+                t('pages.courseSettings.config.noSyncMeetings')
+              }}</span>
             </p>
           </div>
           <span class="action-content">
             <alex-custom-button
               class="button"
-              text="Criar encontro"
               prepend-icon="mdi-plus"
               variant="primary"
-            />
+              >{{
+                t('pages.courseSettings.config.createSyncMeetingButton')
+              }}</alex-custom-button
+            >
           </span>
         </div>
       </div>
       <div class="d-flex content-area">
         <div class="card-title">
           <p>
-            <span class="header-h4">Configurações de convite</span>
+            <span class="header-h4">{{
+              t('pages.courseSettings.config.inviteSettingsTitle')
+            }}</span>
           </p>
         </div>
         <div class="d-flex content-body">
           <div class="container-invite border-bottom">
-            <span class="header-h5 text-invite">Convite por link</span>
+            <span class="header-h5 text-invite">{{
+              t('pages.courseSettings.config.linkInvitation')
+            }}</span>
             <v-switch
               v-model:model-value="activeLink"
-              label="Link de convite"
+              :label="$t('pages.courseSettings.config.inviteLink')"
               color="accent"
             />
 
             <div v-if="activeLink" class="inviteLinks d-flex flex-row">
-              <div class="w-1/4">
-                <label for="select-1" class="body-p1 py-2"
-                  >Duração do convite</label
-                >
-                <v-tooltip
-                  location="bottom"
-                  attach="#linkTooltip"
-                  content-class="inviteTooltip"
-                  max-width="300px"
-                  text="Alterar a duração do convite não vai mudar o tempo restante
-                  do endereço atual. Para aplicar a nova duração é necessário
-                  gerar um novo convite."
-                >
-                  <template v-slot:activator="{ props }">
-                    <v-icon
-                      v-bind="props"
-                      id="linkTooltip"
-                      class="ml-2"
-                      color="#6E7A87"
-                      size="20"
-                      >mdi-information-outline</v-icon
-                    >
-                  </template>
-                </v-tooltip>
-                <v-select
-                  id="select-1"
-                  class="py-2"
-                  name=""
-                  variant="outlined"
+              <div class="">
+                <alex-inputs-select
+                  v-model="selectedTime"
+                  name="duration"
+                  :label="$t('pages.courseSettings.config.linkDuration')"
                   density="comfortable"
                   required
-                  :items="[
-                    '5 minutos',
-                    '15 minutos',
-                    '30 minutos',
-                    '1 hora',
-                    '2 horas',
-                    '8 horas',
-                    '24 horas',
-                  ]"
-                >
-                </v-select>
+                  :items="timeOptions"
+                  :info="$t('pages.courseSettings.config.inviteTooltip')"
+                />
               </div>
               <div class="w-3/4">
-                <span class="body-p1 py-2"> Endereço do convite </span>
+                <span class="body-p1 py-2">
+                  {{ t('pages.courseSettings.config.linkAddress') }}
+                </span>
                 <courses-invites
                   :enable-invites="course.invite_enabled"
                   :invitation-link="invitationLink"
@@ -215,40 +201,37 @@
             </div>
           </div>
           <div class="container-invite">
-            <span class="header-h5 text-invite">Convite por e-mail</span>
+            <span class="header-h5 text-invite">{{
+              t('pages.courseSettings.config.mailInvite')
+            }}</span>
             <alex-inputs-text-field
-              name="Mensagem do convite"
-              label="Mensagem do convite"
-              hint="Mensagem que será enviada por e-mail para o convidado."
+              v-model="course.message"
+              name="Mensagem"
+              :label="$t('pages.courseSettings.config.inviteMessage')"
+              :hint="$t('pages.courseSettings.config.inviteHint')"
               persistent-hint
-              append-inner-icon="mdi-cached"
               class="w-100"
               required
-            />
+              density="comfortable"
+              append-inner-icon="mdi-cached"
+            >
+            </alex-inputs-text-field>
           </div>
-          <v-tooltip
-            location="bottom"
-            attach="append-inner-icon"
-            content-class="inviteTooltip"
-            max-width="300px"
+          <alex-custom-tooltip
             text="Restaurar mensagem padrão"
-            ><template v-slot:activator="{ props }">
-              <v-icon v-bind="props" class="ml-2" color="#6E7A87" size="20"
-                >mdi-cached</v-icon
-              >
-            </template></v-tooltip
-          >
+            attach="append-inner-icon"
+          ></alex-custom-tooltip>
         </div>
         <div class="footer-content">
           <span class="action-content-two">
             <alex-custom-button
               class="button"
-              text="Cancelar"
+              :text="$t('pages.courseSettings.config.cancelButton')"
               variant="secondary"
             />
             <alex-custom-button
               class="button"
-              text="Salvar alterações"
+              :text="$t('pages.courseSettings.config.saveButton')"
               variant="primary"
             />
           </span>
@@ -257,7 +240,9 @@
       <div class="content-area">
         <div class="card-title">
           <p>
-            <span class="header-h4">Visibilidade do curso</span>
+            <span class="header-h4">
+              {{ t('pages.courseSettings.config.courseVisibilityTitle') }}</span
+            >
           </p>
         </div>
         <div class="content-body">
@@ -266,6 +251,7 @@
               <alex-inputs-radio-button
                 v-model="activeButton"
                 :buttons="firstButton"
+                :text="t('pages.courseSettings.config.showButton')"
               />
               <alex-inputs-radio-button
                 v-model="activeButton"
@@ -278,12 +264,12 @@
           <span class="action-content-two">
             <alex-custom-button
               class="button"
-              text="Cancelar"
+              :text="$t('pages.courseSettings.config.cancelButton')"
               variant="secondary"
             />
             <alex-custom-button
               class="button"
-              text="Salvar alterações"
+              :text="$t('pages.courseSettings.config.saveButton')"
               variant="primary"
             />
           </span>
@@ -292,14 +278,14 @@
       <div class="content-area">
         <div class="card-title">
           <p>
-            <span class="header-h4">Excluir curso</span>
+            <span class="header-h4">{{
+              t('pages.courseSettings.config.deleteCourseTitle')
+            }}</span>
           </p>
         </div>
         <div class="content-body">
           <p>
-            Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos,
-            serão perdidos. Você não terá mais acesso a nenhum conteúdo deste
-            curso. sendo assim tenha certeza antes de continuar.
+            {{ t('pages.courseSettings.config.deleteCourseDescription') }}
           </p>
         </div>
         <div class="footer-content">
@@ -311,7 +297,7 @@
               variant="error"
               @click="openDialog = true"
             >
-              Excluir curso
+              {{ t('pages.courseSettings.config.deleteButton') }}
               <alex-custom-dialog
                 :model-value="openDialog"
                 title=""
@@ -332,18 +318,20 @@
                       />
                     </span>
                     <p>
-                      <span class="header-h4"
-                        >Realmente deseja excluir o curso?</span
-                      >
+                      <span class="header-h4">{{
+                        t('pages.courseSettings.config.deleteConfirmation')
+                      }}</span>
                       <br />
-                      <span class="body-p1"
-                        >Ao excluir um curso todo o conteúdo criado dentro dele
-                        também será excluído.</span
-                      >
+                      <span class="body-p1">{{
+                        t('pages.courseSettings.config.deleteDescription')
+                      }}</span>
                     </p>
                     <div class="label d-flex flex-start w-100">
-                      <label for="exclusionLabel" class="body-p1" required
-                        >Digite a palavra: <strong>{{ exclusionWord }}</strong>
+                      <label for="exclusionLabel" class="body-p1">
+                        {{ t('pages.courseSettings.config.deleteLabel') }}
+                        <strong>{{
+                          t('pages.courseSettings.config.deleteWord')
+                        }}</strong>
                       </label>
                     </div>
                     <alex-inputs-text-field
@@ -351,19 +339,21 @@
                       id="exclusionLabel"
                       class="w-100"
                       required
-                      placeholder="Digite a frase"
+                      :placeholder="
+                        $t('pages.courseSettings.config.deletePlaceholder')
+                      "
                     />
                   </div>
                   <div class="exclusionFooter">
                     <alex-custom-button
                       class="button"
-                      text="Cancelar"
+                      :text="$t('pages.courseSettings.config.cancelButton')"
                       variant="secondary"
                       @click="openDialog = false"
                     />
                     <alex-custom-button
                       class="button"
-                      text="Excluir"
+                      :text="$t('pages.courseSettings.config.deleteWord')"
                       variant="error"
                       @click="openDialog = false"
                     />
@@ -386,7 +376,17 @@ import { ref } from 'vue';
 
 const { t } = useI18n();
 
-const exclusionWord = ref(`Excluir`);
+const selectedTime = ref('');
+
+const timeOptions = ref([
+  t('pages.courseSettings.config.fiveMinutes'),
+  t('pages.courseSettings.config.fifteenMinutes'),
+  t('pages.courseSettings.config.thirtyMinutes'),
+  t('pages.courseSettings.config.oneHour'),
+  t('pages.courseSettings.config.twoHours'),
+  t('pages.courseSettings.config.eightHours'),
+  t('pages.courseSettings.config.twentyFourHours'),
+]);
 
 const openDialog = ref(false);
 
@@ -411,6 +411,7 @@ const course = ref({
   start_date: '',
   end_date: '',
   acronym: '',
+  message: 'Mensagem padrão?',
 });
 
 const getCourseInfo = async () => {
@@ -430,6 +431,7 @@ const getCourseInfo = async () => {
       course.value.start_date = courseData.attributes.start_date;
       course.value.end_date = courseData.attributes.end_date;
       course.value.acronym = courseData.attributes.slug;
+      course.value.message = courseData.attributes.invitation_message;
     }
   } catch (error) {
     console.error('Erro na requisição:', error.message);
@@ -441,16 +443,16 @@ getCourseInfo();
 const activeLink = ref(false);
 const firstButton = ref([
   {
-    label: 'Mostrar (Público)',
-    hint: 'Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca',
+    label: t('pages.courseSettings.config.showCourseTitle'),
+    hint: t('pages.courseSettings.config.showCourseHint'),
     value: '1',
   },
 ]);
 
 const secondButton = ref([
   {
-    label: 'Ocultar (Privado)',
-    hint: 'Torna o curso privado, garantindo que somente os integrantes possam ver o curso.',
+    label: t('pages.courseSettings.config.hideCourseTitle'),
+    hint: t('pages.courseSettings.config.hideCourseHint'),
     value: '2',
   },
 ]);
@@ -696,7 +698,7 @@ p {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  align-items: flex-start;
+  align-items: baseline;
   gap: 24px;
   align-content: center;
   justify-content: flex-start;
