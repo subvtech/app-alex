@@ -68,7 +68,7 @@
             />
           </div>
         </template>
-        <template #step2>b</template>
+        <template #step2> <alex-custom-carousel :slides="slides" /></template>
         <template #step3>c</template>
         <template #step4>d</template>
       </alex-custom-dialog>
@@ -79,6 +79,8 @@
 const dialogStepper = ref(false);
 const startDate = ref<Date>();
 const endDate = ref<Date>();
+const slides = ref([]);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { createCourseRules } = useFormRules();
 definePageMeta({
   middleware: 'auth',
