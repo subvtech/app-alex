@@ -71,6 +71,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'carousel',
     'usersAutocomplete',
     'learningPlan/editor',
+    'learningPlan/cardTrails',
     'learningPlan/card',
     'learningPlan/authors',
     'learningPlan/link',
