@@ -1,51 +1,102 @@
 <template>
-  <alex-inputs-autocomplete
-    v-model="value"
-    v-model:search="search"
-    :item-title="getItemTitle"
-    :items="items"
-    :name="name"
-    v-bind="$attrs"
-  >
-    <template #item="{ props: propsItem, item, index }">
+  <div>
+    <alex-inputs-autocomplete
+      v-model="value"
+      v-model:search="search"
+      item-value="id"
+      item-title="email"
+      variant="outlined"
+      :items="items"
+      :custom-filter="filterByFullnameAndEmail"
+      :name="name"
+      v-bind="$attrs"
+      @update:model-value="(value) => updateModelValue(value)"
+    >
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item-user
+          v-bind="propsItem"
+          :key="index"
+          :user="{
+            email: item.raw.email,
+            name: item.raw.fullname,
+          }"
+          no-delete
+          @click="
+            () => {
+              search = '';
+              setState({ value: null });
+            }
+          "
+        />
+      </template>
+    </alex-inputs-autocomplete>
+    <div v-if="selectedItems.length">
       <alex-custom-list-item-user
-        v-bind="propsItem"
-        :key="index"
+        v-for="item in selectedItems"
+        :key="item.id"
         :user="{
-          email: item.raw.email,
-          name: item.raw.fullname,
-          image: item.raw.image,
+          email: item.email,
+          name: item.fullname,
         }"
-        :status="item.raw.status"
         no-delete
+        no-select
+        @delete="() => removeSelf(item.id)"
+        @reload="() => emit('refresh:invite')"
       />
-    </template>
-  </alex-inputs-autocomplete>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { useField } from 'vee-validate';
+type User = { id: string; email: string; fullname: string };
+
 interface AutoCompleteUsersProps {
   name: string;
-  modelValue?: string;
+  selectedItems: User[];
 }
 
-const props = withDefaults(defineProps<AutoCompleteUsersProps>(), {
-  modelValue: undefined,
-});
+const props = defineProps<AutoCompleteUsersProps>();
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits([
+  'update:selectedItems',
+  'refresh:invite',
+  'remove:invite',
+]);
 
-const value = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
 const { find } = useStrapi();
 const search = ref('');
-const items = ref([]);
+const { value, setState } = useField<User | null>(() => props.name, undefined);
+const items = ref<User[]>([]);
+const selectedItems = computed({
+  get() {
+    return props.selectedItems;
+  },
+  set(value) {
+    emit('update:selectedItems', value);
+  },
+});
+
+const removeSelf = (id: string) => {
+  selectedItems.value = selectedItems.value.filter((item) => item.id !== id);
+  emit('remove:invite');
+};
+
+const updateModelValue = (user?: User | null) => {
+  const selectedItem = items.value.find((item) => item.id === user?.id);
+  const alreadyInList = selectedItems.value.find(
+    (item) => item.id === user?.id,
+  );
+  if (selectedItem && !alreadyInList) {
+    emit('update:selectedItems', [...selectedItems.value, selectedItem]);
+    items.value = [
+      ...items.value.filter((item) => item.id !== selectedItem.id),
+    ];
+    setState({ value: null });
+    search.value = '';
+  }
+};
+
 useOnStopTyping(search, async () => {
   const registeredFields = await find('users', {
     fields: ['email', 'fullname'],
@@ -56,12 +107,24 @@ useOnStopTyping(search, async () => {
       ],
     },
   });
-  // findOne retorna o tipo Promise<Strapi4ResponseSingle<F> que tem como atributos data e meta, entretanto no retorno dessa função está vindo um array de objetos apenas. Por isso que temos que tipar dessa forma para que não haja erros
+
   if ((registeredFields as unknown as []).length > 0) {
-    items.value = registeredFields as unknown as [];
+    items.value = (registeredFields as unknown as User[]).filter(
+      (itemRequest) =>
+        !selectedItems.value.find((item) => item.id === itemRequest?.id),
+    );
   }
 });
-const getItemTitle = (item: { fullname: string; email: string }) => {
-  return `${item.fullname} - ${item.email}`;
+
+const filterByFullnameAndEmail = (
+  _value: string,
+  query: string,
+  item?: any,
+) => {
+  const fullname = item.raw.fullname.toLowerCase();
+  const email = item.raw.email.toLowerCase();
+  const searchText = query.toLowerCase();
+
+  return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
 };
 </script>

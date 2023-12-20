@@ -1,9 +1,10 @@
 export const useOnStopTyping = (
   search: Ref<string>,
   callback: () => Promise<unknown> | unknown,
+  emptyCall: boolean = false,
 ) => {
   const isTyping = ref(false);
-  watchEffect((onInvalidate) => {
+  watchEffect(async (onInvalidate) => {
     if (search.value.length > 0) {
       isTyping.value = true;
 
@@ -15,6 +16,8 @@ export const useOnStopTyping = (
       onInvalidate(() => {
         clearInterval(getData);
       });
+    } else if (emptyCall) {
+      await callback();
     }
   });
 };

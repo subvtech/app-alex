@@ -1,6 +1,5 @@
 <template>
   <v-list-item
-    v-bind="$attrs"
     class="alex-list-item-user"
     :class="{
       'no-select': noSelect,
@@ -8,6 +7,7 @@
     }"
     :ripple="false"
     :disabled="status === 'participating'"
+    v-bind="$attrs"
   >
     <template #prepend>
       <v-avatar
@@ -35,7 +35,7 @@
           v-if="status === 'pending'"
           icon="mdi-cached"
           variant="text"
-          @click="$emit('reload')"
+          @click="$emit('refresh')"
         />
 
         <alex-custom-button
@@ -69,7 +69,7 @@ interface AlexListItemUser {
   status?: 'readyToSend' | 'pending' | 'participating';
 }
 
-defineEmits(['delete', 'reload']);
+defineEmits(['delete', 'refresh']);
 const props = withDefaults(defineProps<AlexListItemUser>(), {
   participating: false,
   noSelect: false,
@@ -79,7 +79,6 @@ const props = withDefaults(defineProps<AlexListItemUser>(), {
 });
 
 const initials = computed(() => {
-  if (!props.user.image) return 'MN';
   return getInitials(props.user?.name || props.user.email);
 });
 </script>

@@ -71,10 +71,12 @@
         <template #step2> <alex-custom-carousel :slides="slides" /></template>
         <template #step3>
           <alex-inputs-users-autocomplete
+            v-model:selected-items="selectedUsers"
             name="users"
             class="w-100"
             label="Quem participará?"
             placeholder="Buscar Integrante"
+            density="comfortable"
             return-object
           />
         </template>
@@ -88,7 +90,7 @@ const dialogStepper = ref(false);
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const slides = ref([]);
-
+const selectedUsers = ref([]);
 const { createCourseRules } = useFormRules();
 definePageMeta({
   middleware: 'auth',
