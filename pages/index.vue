@@ -69,7 +69,15 @@
           </div>
         </template>
         <template #step2> <alex-custom-carousel :slides="slides" /></template>
-        <template #step3>c</template>
+        <template #step3>
+          <alex-inputs-users-autocomplete
+            name="users"
+            class="w-100"
+            label="Quem participará?"
+            placeholder="Buscar Integrante"
+            return-object
+          />
+        </template>
         <template #step4>d</template>
       </alex-custom-dialog>
     </v-col>
@@ -80,7 +88,7 @@ const dialogStepper = ref(false);
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const slides = ref([]);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const { createCourseRules } = useFormRules();
 definePageMeta({
   middleware: 'auth',

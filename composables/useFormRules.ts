@@ -38,6 +38,8 @@ export function isValidCpf(val) {
 
 export const useFormRules = (formData?: FormDataType) => {
   const i18n = useI18n();
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
   const emailRules = {
     email: yup
       .string()
@@ -192,13 +194,13 @@ export const useFormRules = (formData?: FormDataType) => {
     startDate: yup
       .date()
       .required(i18n.t('rules.startDate.required'))
-      .min(new Date().toISOString(), ({ min }) =>
+      .min(currentDate.toISOString(), ({ min }) =>
         i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
       ),
     endDate: yup
       .date()
       .required(i18n.t('rules.endDate.required'))
-      .min(new Date().toISOString(), ({ min }) =>
+      .min(currentDate.toISOString(), ({ min }) =>
         i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
       ),
   });
