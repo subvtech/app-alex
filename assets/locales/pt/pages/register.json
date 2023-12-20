@@ -10,9 +10,16 @@
   "subtitle2": "Insira seus dados de acesso",
   "username": "Nome de Usuário",
   "fullName": "Nome completo",
+  "fullNameHolder": "Digite seu nome completo",
   "email": "E-mail",
+  "cpf": "CPF",
+  "emailHolder": "Digite seu e-mail",
+  "cpfHolder": "Digite seu CPF",
   "password": "Senha",
+  "passwordHolder": "Digite sua senha",
   "confirmPassword": "Confirmar Senha",
+  "confirmPasswordHolder": "Confirme sua senha",
+  "usernameHolder": "Digite seu nome de usuário",
   "divider": "OU",
   "hasAccount": "Se já possui conta,",
   "login": "Acesse aqui",
@@ -20,6 +27,10 @@
   "blockedError": "Usuário bloqueado!",
   "success": {
     "title": "Conta criada com sucesso!",
-    "subtitle": "Um link de ativação foi enviado para o e-mail cadastrado, acesse e realize a ativação da sua conta."
-    }
+    "subtitle": "Para acessar sua conta é necessário ativar sua conta através do link de ativação que foi enviado para o e-mail cadastrado."
+  },
+  "alreadyTaken": "já está cadastrado!",
+  "blockedUser": "Usuário bloqueado, entre em contato com o suporte.",
+  "genericError": "Ocorreu um erro, tente novamente mais tarde.",
+  "emailMustBeValid": "Seu email deve ser válido, por favor cheque-o"
 }

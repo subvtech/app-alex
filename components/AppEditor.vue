@@ -291,7 +291,7 @@ onMounted(() => {
     },
     i18n,
     minHeight: 400,
-    autofocus: true,
+    // autofocus: true,
     data: planData.value,
     holder: 'editorjs',
     // logLevel: 'ERROR',
