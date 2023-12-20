@@ -10,9 +10,16 @@
   "subtitle2": "Insert your access data",
   "username": "Username",
   "email": "Email",
+  "cpf": "CPF",
+  "emailHolder": "Insert your email",
   "fullName": "Fullname",
+  "fullNameHolder": "Insert your fullname",
+  "cpfHolder": "Insert your CPF",
   "password": "Password",
+  "passwordHolder": "Insert your password",
   "confirmPassword": "Confirm Password",
+  "confirmPasswordHolder": "Confirm your password",
+  "usernameHolder": "Enter your username",
   "divider": "or",
   "hasAccount": "If you already have an account,",
   "login": "Access here",
@@ -21,5 +28,9 @@
   "success": {
     "title": "Account successfully created!",
     "subtitle": "An activation link has been sent to your registered e-mail address. Go there and activate your account."
-  }
+  },
+  "alreadyTaken": "is already taken",
+  "blockedUser": "User blocked, please contact support",
+  "genericError": "Something went wrong, please try again later",
+  "emailMustBeValid": "Email must be Valid, please check it!"
 }

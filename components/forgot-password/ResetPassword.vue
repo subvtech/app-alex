@@ -1,53 +1,62 @@
 <template>
-  <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
+  <v-container
+    class="content d-flex flex-column align-content-start justify-start max-400"
+  >
     <div class="mb-10">
-      <p class="text-white text-h4 text-center font-weight-bold mb-4">
+      <v-card-title class="text-white text-h3 text-center text-bold">
         {{ $t('components.forgot.sendResetPassword.newPassword') }}
-      </p>
-      <p class="text-white text-h6 font-weight-regular text-center my-2">
+      </v-card-title>
+      <v-card-subtitle
+        class="text-subtitle-2 text-white text-center white-space-normal"
+      >
         {{ $t('components.forgot.sendResetPassword.enterPassword') }}
-      </p>
+      </v-card-subtitle>
     </div>
     <v-form
       ref="form"
       color="white"
-      class="mb-10"
+      class="d-flex flex-column gap-1 mb-10"
       @submit.prevent="changePassword"
     >
-      <alex-inputs-stepper-field
+      <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.password')"
+        :placeholder="$t('components.forgot.sendResetPassword.passwordHolder')"
         name="password"
         :type="passwordVisible ? 'text' : 'password'"
         color="white"
-        class="my-3 text-secondary"
+        class="mb-1"
         theme="dark"
+        :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
         @click:append-inner="passwordVisible = !passwordVisible"
       />
 
-      <alex-inputs-stepper-field
+      <alex-inputs-text-field
         :label="$t('components.forgot.sendResetPassword.confirmPassword')"
-        name="password"
-        :append-inner-icon="passwordVisible2 ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="passwordVisible2 ? 'text' : 'password'"
+        :placeholder="
+          $t('components.forgot.sendResetPassword.confirmPasswordHolder')
+        "
+        name="confirmPassword"
+        :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="confirmationVisible ? 'text' : 'password'"
         color="white"
-        class="my-3 text-secondary"
+        class="mb-1"
         theme="dark"
-        @click:append-inner="passwordVisible2 = !passwordVisible2"
+        @click:append-inner="confirmationVisible = !confirmationVisible"
       />
-      <v-btn
-        :color="!isValid ? 'grey-darken-1' : 'accent'"
-        class="text-none text-white rounded-lg pa-5"
+      <alex-custom-button
+        theme="dark"
         block
         type="submit"
         size="large"
         :disabled="!isValid"
         :loading="loading"
       >
-        {{ $t('components.forgot.sendResetPassword.changePassword') }}</v-btn
+        {{
+          $t('components.forgot.sendResetPassword.changePassword')
+        }}</alex-custom-button
       >
     </v-form>
-    <ForgotPasswordDividerRow />
-    <p class="text-center text-body-1">
+    <p class="text-center text-body-1 font-weight-bold mt-5">
       {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-accent text-decoration-none">
         {{ $t('components.forgot.sendResetPassword.login') }}
@@ -67,9 +76,13 @@ const { schema4 } = useFormRules();
 const form = ref(null);
 const loading = ref(false);
 const passwordVisible = ref(false);
-const passwordVisible2 = ref(false);
+const confirmationVisible = ref(false);
 
 const route = useRoute();
+
+onBeforeMount(() => {
+  if (!route.query.code) navigateTo('/login');
+});
 
 const emit = defineEmits(['confirmation-message']);
 
@@ -92,13 +105,35 @@ const changePassword = handleSubmit(async () => {
       password: values.password,
       passwordConfirmation: values.confirmPassword,
     });
+
     emit('confirmation-message');
   } catch (error) {
     messageStore.message = error as string;
     messageStore.color = 'red';
     messageStore.show = true;
+    navigateTo('/login');
   } finally {
     loading.value = false;
   }
 });
 </script>
+
+<style scoped lang="scss">
+@media (max-height: 700px) {
+  .v-container {
+    .mt-5 {
+      margin-top: 10px !important;
+    }
+    .mb-10 {
+      margin-bottom: 10px !important;
+    }
+  }
+}
+.max-400 {
+  max-width: 400px;
+}
+
+.white-space-normal {
+  white-space: normal;
+}
+</style>

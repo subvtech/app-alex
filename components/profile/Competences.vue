@@ -6,7 +6,7 @@
     :showIcon="canEdit"
     :cancel="onCancel"
     :save="onSave"
-    :full-width="true"
+    full-width
   >
     <template v-slot:content>
       <div class="footer d-flex flex-column">
@@ -29,23 +29,26 @@
         </div>
 
         <div class="competences d-flex flex-column align-start">
-          <div class="d-flex flex-wrap justify-center">
-            <profile-components-tag
-              v-if="selectedTags.length !== 0"
+          <div :key="rerender" class="d-flex flex-wrap justify-center">
+            <alex-custom-chip
+              v-if="
+                selectedTags.length !== 0 &&
+                selectedTags.some((item) => !item.isDeleted)
+              "
               v-for="(tag, index) in selectedTags"
-              :isEditing="isEditing"
               :key="index"
               :text="tag.text"
-              :removeItem="removeItem(tag)"
+              variant="outlined"
+              color="#000"
+              :closable="isEditing"
+              @click:close="isEditing ? removeItem(tag) : () => {}"
             />
-
-            <div v-else class="item d-flex justify-center align-center">
-              <profile-components-tag
-                :isEditing="false"
-                :text="emptyMessage"
-                :removeItem="() => {}"
-              />
-            </div>
+            <alex-custom-chip
+              v-else
+              variant="outlined"
+              color="#000"
+              :text="emptyMessage"
+            />
           </div>
         </div>
       </div>
@@ -57,7 +60,14 @@
 const { create, find, update, delete: _delete } = useStrapi();
 
 const client = useStrapiClient();
-type Tag = { text: string; id: number; verified_by: any; isGeneral: boolean };
+const emit = defineEmits(['update:user']);
+type Tag = {
+  text: string;
+  id: number;
+  verified_by: any;
+  isGeneral: boolean;
+  isDeleted?: boolean;
+};
 
 const props = defineProps({
   userTags: {
@@ -88,49 +98,36 @@ const props = defineProps({
   canEdit: { type: Boolean, required: true },
 });
 
-const { userTags, canEdit, userId, isGeneral } = toRefs(props);
+const { canEdit, userId, isGeneral } = toRefs(props);
 const isEditing = ref(false);
-
-const selectedTags = ref<{ text: string }[]>([...props.userTags]);
 const selectedTag = ref<Tag | null>(null);
 const allTags = ref<Tag[]>([]);
 const filteredTags = ref<Tag[]>([]);
-
 const userTagsIds = ref<number[]>([]);
+const selectedTags = ref<Tag[]>([]);
+const rerender = ref(0);
 
-onMounted(async () => {
-  const temp = await find('tags', { populate: 'verified_by' });
+onBeforeMount(async () => {
+  const data = await find('tags', { populate: 'verified_by' });
 
-  userTagsIds.value = userTags.value.map((item) => item.id);
-  allTags.value = temp.data.map((item) => {
+  userTagsIds.value = props.userTags.map((item) => item.id);
+  //selectedTags.value = [...props.userTags];
+  selectedTags.value = props.userTags.map((item) => {
+    return { ...item, isDeleted: false };
+  });
+
+  allTags.value = data.data.map((item) => {
     return { ...item.attributes!, id: item.id };
   }) as Tag[];
 
-  if (isGeneral.value) {
-    filteredTags.value = allTags.value.filter(
-      (item) => !userTagsIds.value.includes(item.id) && item.isGeneral,
-    );
-  } else {
-    filteredTags.value = allTags.value.filter(
-      (item) => !userTagsIds.value.includes(item.id) && !item.isGeneral,
-    );
-  }
+  filterTags();
 });
 const createArray = ref<Tag[]>([]);
 const updateArray = ref<Tag[]>([]);
 const deleteArray = ref<Tag[]>([]);
 
 const populateSelectedTags = (newValue) => {
-  const updateTags = (tag, isCreating = false) => {
-    if (selectedTags.value.find((item) => item.text === tag.text)) return;
-    selectedTags.value.push(tag);
-    filteredTags.value = filteredTags.value.filter(
-      (item) => item.text !== tag.text,
-    );
-    if (isCreating) createArray.value.push(tag);
-    else updateArray.value.push(tag);
-  };
-
+  newValue.isDeleted = false;
   if (!selectedTag.value && newValue.id) {
     updateTags(newValue);
   } else if (
@@ -144,12 +141,12 @@ const populateSelectedTags = (newValue) => {
 };
 
 const removeItem = (tag) => {
-  if (userTags.value.find((item) => item.id === tag.id)) {
-    deleteArray.value.push(tag);
+  if (props.userTags.find((item) => item.text === tag.text)) {
+    if (tag.id) deleteArray.value.push(tag);
+    selectedTags.value[
+      selectedTags.value.findIndex((item) => item.text === tag.text)
+    ].isDeleted = true;
   }
-  selectedTags.value = selectedTags.value.filter(
-    (item) => item.text !== tag.text,
-  );
 
   createArray.value = createArray.value.filter(
     (item) => item.text !== tag.text,
@@ -169,56 +166,95 @@ const handleInput = (e) => {
 };
 
 const onCancel = async () => {
-  selectedTags.value = userTags.value;
+  selectedTags.value = props.userTags.map((item) => {
+    return { ...item, isDeleted: false };
+  });
+
+  filterTags();
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
+  rerender.value += 1;
 };
 
 const onSave = async () => {
   const promises: Promise<any>[] = [];
   const ids = allTags.value.map((item) => item.id);
-  createArray.value
-    .filter((item) => !ids.includes(item.id))
-    .forEach((item) => {
+  if (createArray.value.length !== 0)
+    createArray.value
+      .filter((item) => !ids.includes(item.id))
+      .forEach((item) => {
+        promises.push(
+          create('tags', {
+            ...item,
+            verified_by: userId.value,
+            isGeneral: isGeneral.value,
+          }),
+        );
+      });
+  if (updateArray.value.length !== 0)
+    updateArray.value
+      .filter((item) => !userTagsIds.value.includes(item.id))
+      .forEach((item) => {
+        promises.push(
+          update(`tags/${item.id}`, {
+            verified_by: item.verified_by.data
+              ? [item.verified_by.data, userId.value]
+              : [userId.value],
+          }),
+        );
+      });
+  if (deleteArray.value.length !== 0)
+    deleteArray.value.forEach((element) => {
+      selectedTags.value = selectedTags.value.filter(
+        (item) => item.text !== element.text,
+      );
+      userTagsIds.value = userTagsIds.value.filter((id) => id !== element.id);
       promises.push(
-        create('tags', {
-          ...item,
-          verified_by: userId.value,
-          isGeneral: isGeneral.value,
+        client(`/users/${props.userId}`, {
+          method: 'PUT',
+          body: {
+            data: {
+              tags: userTagsIds,
+            },
+          },
         }),
       );
     });
-  updateArray.value
-    .filter((item) => !userTagsIds.value.includes(item.id))
-    .forEach((item) => {
-      promises.push(
-        update(`tags/${item.id}`, {
-          verified_by: item.verified_by.data
-            ? item.verified_by.data.push(userId.value)
-            : [userId.value],
-        }),
-      );
-    });
-  deleteArray.value.forEach((element) => {
-    promises.push(
-      client(`/users/${props.userId}`, {
-        method: 'PUT',
-        body: {
-          tags: userTags.value.filter((item) => item.id !== element.id),
-        },
-      }),
-    );
-  });
   await Promise.all(promises);
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
+  emit('update:user');
+};
+
+const updateTags = (tag, isCreating = false) => {
+  if (tag.isDeleted) return;
+  selectedTags.value.push(tag);
+  filteredTags.value = filteredTags.value.filter(
+    (item) => item.text !== tag.text,
+  );
+  if (isCreating) createArray.value.push(tag);
+  else updateArray.value.push(tag);
+};
+
+const filterTags = () => {
+  if (isGeneral.value) {
+    filteredTags.value = allTags.value.filter(
+      (item) => !userTagsIds.value.includes(item.id) && item.isGeneral,
+    );
+  } else {
+    filteredTags.value = allTags.value.filter(
+      (item) => !userTagsIds.value.includes(item.id) && !item.isGeneral,
+    );
+  }
 };
 
 watch(
-  () => selectedTags,
-  () => (selectedTag.value = null),
+  () => selectedTags.value,
+  () => {
+    selectedTag.value = null;
+  },
   { deep: true },
 );
 </script>

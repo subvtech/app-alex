@@ -59,8 +59,8 @@
               </td>
             </tr>
             <tr>
-              <td>icon</td>
-              <td>string</td>
+              <td>theme</td>
+              <td>'light' | 'dark'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -69,7 +69,7 @@
         </v-table>
       </div>
     </div>
-    <div class="d-flex gap-4">
+    <div class="d-flex gap-4 flex-wrap">
       <alex-custom-button>Primary</alex-custom-button>
       <alex-custom-button variant="secondary">Secondary</alex-custom-button>
       <alex-custom-button variant="tertiary">Tertiary</alex-custom-button>
@@ -78,6 +78,10 @@
       <alex-custom-button variant="success">Success</alex-custom-button>
       <alex-custom-button variant="info">Info</alex-custom-button>
       <alex-custom-button variant="warning">Warning</alex-custom-button>
+      <alex-custom-button disabled>Disabled</alex-custom-button>
+      <alex-custom-button variant="secondary" disabled theme="dark"
+        >Disabled Dark</alex-custom-button
+      >
     </div>
     <div class="w-100">
       <div class="bg-grey-lighten-5 pa-3" style="position: relative">
@@ -111,6 +115,13 @@
       <alex-custom-button variant="success" icon="mdi-plus" />
       <alex-custom-button variant="info" icon="mdi-plus" />
       <alex-custom-button variant="warning" icon="mdi-plus" />
+      <alex-custom-button variant="warning" icon="mdi-plus" disabled />
+      <alex-custom-button
+        variant="warning"
+        icon="mdi-plus"
+        disabled
+        theme="dark"
+      />
     </div>
     <div class="w-100">
       <div class="bg-grey-lighten-5 pa-3" style="position: relative">
@@ -170,7 +181,7 @@
       Variante: ícone na esquerda e/ou na direita
     </h2>
     <div class="d-flex flex-column gap-2">
-      <div class="d-flex gap-4">
+      <div class="d-flex gap-4 flex-wrap">
         <alex-custom-button prepend-icon="mdi-plus">Primary</alex-custom-button>
         <alex-custom-button variant="secondary" prepend-icon="mdi-plus"
           >Secondary</alex-custom-button
@@ -193,8 +204,18 @@
         <alex-custom-button variant="warning" prepend-icon="mdi-plus"
           >Warning</alex-custom-button
         >
+        <alex-custom-button variant="info" prepend-icon="mdi-plus" disabled
+          >Disabled</alex-custom-button
+        >
+        <alex-custom-button
+          variant="warning"
+          prepend-icon="mdi-plus"
+          disabled
+          theme="dark"
+          >DisabledDark</alex-custom-button
+        >
       </div>
-      <div class="d-flex gap-4">
+      <div class="d-flex gap-4 flex-wrap">
         <alex-custom-button append-icon="mdi-plus">Primary</alex-custom-button>
         <alex-custom-button variant="secondary" append-icon="mdi-plus"
           >Secondary</alex-custom-button
@@ -216,6 +237,16 @@
         >
         <alex-custom-button variant="warning" append-icon="mdi-plus"
           >Warning</alex-custom-button
+        >
+        <alex-custom-button variant="info" append-icon="mdi-plus" disabled
+          >Disabled</alex-custom-button
+        >
+        <alex-custom-button
+          variant="warning"
+          append-icon="mdi-plus"
+          disabled
+          theme="dark"
+          >DisabledDark</alex-custom-button
         >
       </div>
       <div class="d-flex gap-4 flex-wrap">
@@ -264,6 +295,21 @@
           prepend-icon="mdi-plus"
           >Warning</alex-custom-button
         >
+        <alex-custom-button
+          variant="info"
+          append-icon="mdi-plus"
+          prepend-icon="mdi-plus"
+          disabled
+          >Disabled</alex-custom-button
+        >
+        <alex-custom-button
+          variant="warning"
+          append-icon="mdi-plus"
+          prepend-icon="mdi-plus"
+          disabled
+          theme="dark"
+          >DisabledDark</alex-custom-button
+        >
       </div>
     </div>
 
@@ -296,6 +342,12 @@ import { ref } from 'vue';
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const copiedValue = ref('');
 
 const firstExampleTemplate = ref(`
@@ -307,6 +359,10 @@ const firstExampleTemplate = ref(`
       <alex-custom-button variant="success">Success</alex-custom-button>
       <alex-custom-button variant="info">Info</alex-custom-button>
       <alex-custom-button variant="warning">Warning</alex-custom-button>
+      <alex-custom-button disabled>Disabled</alex-custom-button>
+      <alex-custom-button variant="secondary" disabled theme="dark"
+        >Disabled Dark</alex-custom-button
+      >
 `);
 
 const secondExampleTemplate = ref(`
@@ -318,6 +374,13 @@ const secondExampleTemplate = ref(`
       <alex-custom-button variant="success" icon="mdi-plus" />
       <alex-custom-button variant="info" icon="mdi-plus" />
       <alex-custom-button variant="warning" icon="mdi-plus" />
+      <alex-custom-button variant="warning" icon="mdi-plus" disabled />
+      <alex-custom-button
+        variant="warning"
+        icon="mdi-plus"
+        disabled
+        theme="dark"
+      />
 `);
 const thirtyExampleTemplate = ref(`
 <alex-custom-button size="small" text="Primary" />
@@ -328,50 +391,37 @@ const thirtyExampleTemplate = ref(`
       <alex-custom-button icon="mdi-plus" size="large" />
 `);
 const forthExampleTemplate = ref(`
-<alex-custom-button append-icon="mdi-plus" prepend-icon="mdi-plus"
-          >Primary</alex-custom-button
-        >
-        <alex-custom-button
-          variant="secondary"
-          append-icon="mdi-plus"
-          prepend-icon="mdi-plus"
+<alex-custom-button prepend-icon="mdi-plus">Primary</alex-custom-button>
+        <alex-custom-button variant="secondary" prepend-icon="mdi-plus"
           >Secondary</alex-custom-button
         >
-        <alex-custom-button
-          variant="tertiary"
-          append-icon="mdi-plus"
-          prepend-icon="mdi-plus"
+        <alex-custom-button variant="tertiary" prepend-icon="mdi-plus"
           >Tertiary</alex-custom-button
         >
-        <alex-custom-button
-          variant="text"
-          append-icon="mdi-plus"
-          prepend-icon="mdi-plus"
+        <alex-custom-button variant="text" prepend-icon="mdi-plus"
           >Text</alex-custom-button
         >
-        <alex-custom-button
-          variant="error"
-          append-icon="mdi-plus"
-          prepend-icon="mdi-plus"
+        <alex-custom-button variant="error" prepend-icon="mdi-plus"
           >Error</alex-custom-button
         >
-        <alex-custom-button
-          variant="success"
-          append-icon="mdi-plus"
-          prepend-icon="mdi-plus"
+        <alex-custom-button variant="success" prepend-icon="mdi-plus"
           >Success</alex-custom-button
         >
-        <alex-custom-button
-          variant="info"
-          append-icon="mdi-plus"
-          prepend-icon="mdi-plus"
+        <alex-custom-button variant="info" prepend-icon="mdi-plus"
           >Info</alex-custom-button
+        >
+        <alex-custom-button variant="warning" prepend-icon="mdi-plus"
+          >Warning</alex-custom-button
+        >
+        <alex-custom-button variant="info" prepend-icon="mdi-plus" disabled
+          >Disabled</alex-custom-button
         >
         <alex-custom-button
           variant="warning"
-          append-icon="mdi-plus"
           prepend-icon="mdi-plus"
-          >Warning</alex-custom-button
+          disabled
+          theme="dark"
+          >DisabledDark</alex-custom-button
         >
 `);
 

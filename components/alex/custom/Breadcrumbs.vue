@@ -1,6 +1,6 @@
 <template>
   <div
-    class="breadcrumb-block d-flex align-baseline"
+    class="breadcrumb-block d-flex align-center"
     style="gap: 8px"
     :style="
       backgroundColor
@@ -10,15 +10,16 @@
     data-testid="breadcrumbs"
   >
     <div class="d-flex align-center">
-      <a
+      <nuxt-link
         v-if="arrowBack && items.length > 1"
-        :href="items[items.length - 2].href"
-        role="goback"
+        :to="items[items.length - 2].href"
+        class="mr-5 arrow-back"
+        aria-label="Go Back"
       >
         <v-icon color="#6E7A87" style="cursor: pointer"
           >mdi-chevron-left</v-icon
         >
-      </a>
+      </nuxt-link>
 
       <span
         class="title text-h4 text-sm-h3"
@@ -29,7 +30,7 @@
       <v-divider
         vertical
         :thickness="thickness"
-        class="pl-2"
+        class="pl-4"
         style="margin-block: auto; height: 24px"
         :style="barStyle ?? ''"
       />
@@ -43,16 +44,24 @@
       <template v-slot:title="{ item }">
         <v-breadcrumbs-item
           :href="item.href"
+          class="text-decoration-none"
           :disabled="item.disabled"
-          :style="[item.disabled ? '' : 'cursor: pointer', itemStyle ?? '']"
+          :style="[itemStyle ?? '']"
           :role="item.disabled ? 'breadcrumb-item-disabled' : 'breadcrumb-item'"
         >
           {{ item.title }}
         </v-breadcrumbs-item>
       </template>
-      <template v-slot:divider>
-        <slot v-if="overwriteDivider" name="divider" />
-        <span v-else :style="itemStyle ?? ''">{{ divider }}</span>
+      <template v-slot:divider="{ index }">
+        <div class="mx-1">
+          <slot v-if="overwriteDivider" name="divider" />
+          <span
+            v-else
+            :class="index !== 0 ? 'disabled' : ''"
+            :style="itemStyle ?? ''"
+            >{{ divider }}</span
+          >
+        </div>
       </template>
     </v-breadcrumbs>
   </div>
@@ -64,7 +73,7 @@ defineProps({
     type: Array as PropType<
       { title: string; disabled: boolean; href: string }[]
     >,
-    default: [],
+    default: () => [],
   },
   arrowBack: {
     type: Boolean,
@@ -76,6 +85,7 @@ defineProps({
   },
   breadcrumbsVClasses: {
     type: String,
+    default: '',
   },
   divider: {
     type: String,
@@ -85,16 +95,34 @@ defineProps({
     type: Number,
     default: 2,
   },
-  title: { type: String },
-  titleStyle: { type: String },
-  barStyle: { type: String },
-  itemStyle: { type: String },
-  backgroundColor: { type: String },
+  title: {
+    type: String,
+    default: '',
+  },
+  titleStyle: {
+    type: String,
+    default: '',
+  },
+  barStyle: {
+    type: String,
+    default: '',
+  },
+  itemStyle: {
+    type: String,
+    default: '',
+  },
+  backgroundColor: {
+    type: String,
+    default: '',
+  },
 });
 </script>
 
 <style scoped lang="scss">
 .breadcrumb-block {
+  .arrow-back {
+    text-decoration: none;
+  }
   .title {
     color: #5d6872;
     font-weight: 700;
@@ -110,9 +138,12 @@ defineProps({
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.28px;
+
+    cursor: pointer;
+    pointer-events: none;
   }
 
-  .v-breadcrumbs-item .v-breadcrumbs-item--disabled {
+  .v-breadcrumbs-item.v-breadcrumbs-item--disabled {
     color: #abb2b9 !important;
     opacity: unset !important;
     /* Body/P3 */
@@ -120,6 +151,11 @@ defineProps({
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.28px;
+  }
+
+  .v-breadcrumbs-divider .disabled {
+    stroke-width: 1px;
+    color: #abb2b9;
   }
 }
 @media (max-width: 400px) {

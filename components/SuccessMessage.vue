@@ -1,13 +1,13 @@
 <template>
   <v-container
-    class="w-100 fill-height d-flex align-content-center justify-center padding flex-column"
+    class="w-100 fill-height d-flex align-content-center padding flex-column"
   >
     <v-card
       variant="outlined"
       class="w-100 pa-4 rounded-lg card"
       color="green-lighten-1"
     >
-      <v-card-title class="title text-white ">{{ title }}</v-card-title>
+      <v-card-title class="title text-white">{{ title }}</v-card-title>
       <v-card-text class="text-body-1 text-grey-lighten-1">
         <template v-if="email">
           {{ peaces[0] }}
@@ -15,7 +15,7 @@
           {{ peaces[1] }}
         </template>
         <template v-else>
-        {{ subtitle }}
+          {{ subtitle }}
         </template>
       </v-card-text>
     </v-card>
@@ -38,7 +38,6 @@ const peaces = computed(() => props.subtitle.split('|'));
 </script>
 
 <style scoped lang="scss">
-
 .padding {
   padding: 32px 40px 32px 40px;
 }
@@ -50,7 +49,7 @@ const peaces = computed(() => props.subtitle.split('|'));
 }
 
 .card {
-  max-width: 600px ;
+  max-width: 600px;
 }
 
 @media screen and (min-width: 1100px) {

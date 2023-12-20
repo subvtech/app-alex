@@ -273,7 +273,6 @@
         username="username"
       />
 
-
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
       >
@@ -297,7 +296,8 @@
       </div>
     </div>
     <h2 class="text-h2 text-gray-800">Uso Completo</h2>
-    <div class="px-4 py-2 w-100 d-flex">
+    <div class="px-4 py-2 w-100 d-flex flex-column">
+      <p class="text-subtitle-2 text-gray-500 mb-6">Sem float-beneath</p>
       <div class="w-100">
         <alex-custom-banner
           :coverPicture="{ url: '/images/default-cover.png', id: 1 }"
@@ -305,8 +305,8 @@
           :showProfilePicture="true"
           :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
           :profilePictureSize="50"
-          :darkerBackground="false"
-          :titleAbove="false"
+          :darkerBackground="true"
+          :descriptionAbove="false"
           :distribution="'username-fullname-role'"
           :code="'ABC123'"
           :fullnameStyle="'font-weight-bold'"
@@ -327,8 +327,53 @@
           :title="'Software Engineer'"
           :userId="123"
           :fullname="'John Doe'"
-        
           :username="'johndoe'"
+          :selectedOption="0"
+          :links="['Link 1', 'Link 2', 'Link 3']"
+          :isProfessor="false"
+          :canEdit="true"
+          :canDelete="false"
+          @select:option="() => {}"
+          @display:settings="() => {}"
+        />
+        <prism class="bg-grey-lighten-5">
+          {{ examples[7] }}
+        </prism>
+      </div>
+    </div>
+    <div class="px-4 py-2 w-100 d-flex flex-column">
+      <p class="text-subtitle-2 text-gray-500 mb-6">Com float-beneath</p>
+      <div class="w-100">
+        <alex-custom-banner
+          :coverPicture="{ url: '/images/default-cover.png', id: 1 }"
+          :imgFromStrapi="false"
+          :showProfilePicture="true"
+          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
+          :profilePictureSize="50"
+          :darkerBackground="true"
+          :descriptionAbove="false"
+          :distribution="'username-fullname-role'"
+          :code="'ABC123'"
+          :fullnameStyle="'font-weight-bold'"
+          :codeStyle="'color: red;'"
+          :roleStyle="'font-style: italic;'"
+          :usernameStyle="'color: blue;'"
+          :startDateStyle="'font-size: 12px;'"
+          :endDateStyle="'font-size: 12px;'"
+          :titleStyle="'font-size: 16px;'"
+          :avatarBlockStyle="'border: 1px solid #ccc;'"
+          :showBorder="false"
+          :floatBeneath="true"
+          :settingsMenu="false"
+          :dateToTheLeft="false"
+          :showShade="false"
+          show-role
+          :updateProfilePicture="false"
+          :title="'Software Engineer'"
+          :userId="123"
+          :fullname="'John Doe'"
+          :username="'johndoe'"
+          startDate="25/06/2545"
           :selectedOption="0"
           :links="['Link 1', 'Link 2', 'Link 3']"
           :isProfessor="false"
@@ -431,7 +476,6 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const customColor = ref('accent');
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
@@ -503,8 +547,8 @@ const examples = [
         :showProfilePicture="true"
         :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
         :profilePictureSize="50"
-        :darkerBackground="false"
-        :titleAbove="false"
+        :darkerBackground="true"
+        :descriptionAbove="false"
         :dateToTheLeft="true"
         :distribution="'username-fullname-role'"
         :code="'ABC123'"
@@ -602,7 +646,7 @@ const propsDocumentation = [
     description: 'Exibir a função do usuário.',
   },
   {
-    name: 'titleAbove',
+    name: 'descriptionAbove',
     type: 'Boolean',
     default: 'false',
     description: 'Exibir o título acima do conteúdo.',
@@ -691,6 +735,12 @@ const propsDocumentation = [
     type: 'String',
     default: "''",
     description: 'Título do bloco de informações do usuário.',
+  },
+  {
+    name: 'description',
+    type: 'String',
+    default: "''",
+    description: 'Um título alternativo ao informações do usuário.',
   },
   {
     name: 'startDate',
