@@ -3,6 +3,7 @@
     v-model="value"
     v-model:search="search"
     :item-title="getItemTitle"
+    :items="items"
     :name="name"
     v-bind="$attrs"
   >
@@ -12,7 +13,7 @@
         :key="index"
         :user="{
           email: item.raw.email,
-          name: item.raw.name,
+          name: item.raw.fullname,
           image: item.raw.image,
         }"
         :status="item.raw.status"
@@ -42,11 +43,25 @@ const value = computed({
     emit('update:modelValue', value);
   },
 });
-
+const { find } = useStrapi();
 const search = ref('');
-
-useOnStopTyping(search, async () => await console.log(search.value));
-const getItemTitle = (item: { name: string; email: string }) => {
-  return `${item.name} - ${item.email}`;
+const items = ref([]);
+useOnStopTyping(search, async () => {
+  const registeredFields = await find('users', {
+    fields: ['email', 'fullname'],
+    filters: {
+      $or: [
+        { email: { $containsi: search.value } },
+        { fullname: { $containsi: search.value } },
+      ],
+    },
+  });
+  // findOne retorna o tipo Promise<Strapi4ResponseSingle<F> que tem como atributos data e meta, entretanto no retorno dessa função está vindo um array de objetos apenas. Por isso que temos que tipar dessa forma para que não haja erros
+  if ((registeredFields as unknown as []).length > 0) {
+    items.value = registeredFields as unknown as [];
+  }
+});
+const getItemTitle = (item: { fullname: string; email: string }) => {
+  return `${item.fullname} - ${item.email}`;
 };
 </script>

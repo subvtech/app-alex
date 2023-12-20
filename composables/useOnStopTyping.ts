@@ -1,6 +1,6 @@
 export const useOnStopTyping = (
   search: Ref<string>,
-  callback: () => Promise<unknown>,
+  callback: () => Promise<unknown> | unknown,
 ) => {
   const isTyping = ref(false);
   watchEffect((onInvalidate) => {

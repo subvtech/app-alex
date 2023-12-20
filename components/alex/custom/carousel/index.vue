@@ -64,7 +64,7 @@
                 },
               ],
             }"
-            data-setup="{}"
+            :data-setup="{}"
           ></video-player>
           <video-player
             v-else-if="
@@ -92,6 +92,7 @@
       </vueper-slide>
     </vueper-slides>
     <div
+      v-if="slides.length > 0"
       class="d-flex thumbnails-container slides-track-container w-100"
       :class="slides.length == 0 ? 'justify-center' : 'justify-space-around'"
     >
