@@ -17,7 +17,7 @@
           step3: { title: 'Membros', subtitle: 'Participantes' },
           step4: { title: 'Encontros', subtitle: 'Síncronos' },
         }"
-        step-class="d-flex gap-4"
+        step-class="d-flex gap-1"
         stepper-indicator-class="d-flex"
         @on-main-action="() => console.log('maina')"
       >

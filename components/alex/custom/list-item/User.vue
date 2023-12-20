@@ -35,14 +35,14 @@
           v-if="status === 'pending'"
           icon="mdi-cached"
           variant="text"
-          @on-click="$emit('reload')"
+          @click="$emit('reload')"
         />
 
         <alex-custom-button
           icon="mdi-trash-can-outline"
           variant="text"
           color="error-0"
-          @on-click="$emit('delete')"
+          @click="$emit('delete')"
         />
       </template>
     </template>

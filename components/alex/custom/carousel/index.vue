@@ -127,7 +127,7 @@
             visibleSlides: !readOnly ? 2.5 : 3.5,
           },
         }"
-        fixedHeight="120px"
+        fixed-height="120px"
         style="z-index: 0; max-width: 850px; max-height: 120px"
         @slide="
           $refs.vueperslides1 &&
