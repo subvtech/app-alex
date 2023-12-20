@@ -78,11 +78,11 @@
           </template>
         </v-tooltip>
         <alex-inputs-dropdown
-          v-if="direction !== 'HORIZONTAL'"
+          v-if="direction !== 'HORIZONTAL' && options"
           v-model="showOptions"
           :close-on-content-click="false"
           :class="{ hidden: !isHovering && !showOptions }"
-          :items="options(hide)"
+          :items="dropdownItems(hide)"
         >
           <template #activator="{ props: propsMenu, isActive }">
             <v-tooltip
@@ -172,12 +172,12 @@
       </div>
     </div>
 
-    <div v-if="!isVertical" class="h-full">
+    <div v-if="!isVertical && options" class="h-full">
       <alex-inputs-dropdown
         v-model="showOptions"
         :close-on-content-click="false"
         :class="{ hidden: !isHovering && !showOptions }"
-        :items="options"
+        :items="dropdownItems(hide)"
       >
         <template #activator="{ props: propsMenu }">
           <v-tooltip
@@ -199,7 +199,6 @@
 </template>
 
 <script setup lang="ts">
-// import { Item } from '../../inputs/Dropdown.vue';
 interface member {
   name: string;
   image?: {
@@ -220,6 +219,7 @@ interface LearningPlanCardProps {
   favorited?: boolean;
   status?: 'start' | 'in_progress' | 'done';
   members?: member[];
+  options?: boolean;
 }
 
 const props = withDefaults(defineProps<LearningPlanCardProps>(), {
@@ -229,6 +229,7 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   type: 'course',
   status: 'start',
   members: undefined,
+  options: true,
 });
 
 const { t } = useI18n();
@@ -236,7 +237,7 @@ const direction = useDirection();
 const isHovering = ref(false);
 const showOptions = ref(false);
 const isVertical = computed(() => direction.value === 'VERTICAL');
-const options = (hidden: boolean) => {
+const dropdownItems = (hidden: boolean) => {
   return [
     {
       text: hidden

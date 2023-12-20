@@ -107,6 +107,7 @@
                 :key="course.raw.title + index"
                 type="course"
                 class="flex-stretch"
+                :options="professorMode"
                 :title="course.raw.title"
                 :description="course.raw.description"
                 :image="{
@@ -220,7 +221,8 @@ const { t } = useI18n();
 
 onBeforeMount(() => {
   const { isProfessor } = useStrapiUser<User>().value;
-  professorMode.value = !isProfessor;
+  console.log(useStrapiUser<User>().value);
+  professorMode.value = isProfessor;
   if (professorMode.value) {
     headers.push({
       title: '',
@@ -231,7 +233,6 @@ onBeforeMount(() => {
 });
 
 interface RawItem {
-  title: string;
   description: string;
   facilitatorName: string;
   facilitatorImage: string;
