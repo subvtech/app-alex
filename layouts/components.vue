@@ -96,6 +96,11 @@ const menus = [
         to: '/components/custom/card',
       },
       {
+        icon: 'mdi-view-carousel',
+        title: 'Carousel',
+        to: '/components/custom/carousel',
+      },
+      {
         icon: 'mdi-chip',
         title: 'Chip',
         to: '/components/custom/chip',

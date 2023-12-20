@@ -131,6 +131,9 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 .error {
   color: red !important; 
 }
+.v-theme--mainTheme {
+  --v-border-opacity: unset !important;
+}
 .text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;

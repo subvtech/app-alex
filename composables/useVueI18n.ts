@@ -73,6 +73,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'dialog',
     'card',
     'meeting',
+    'carousel',
     'usersAutocomplete',
     'courses/about',
     'courses/editor',
