@@ -17,7 +17,7 @@
       show-shade
       show-menu
       settings-menu
-      show-settings
+      :show-settings="canEdit"
       distribution="fullname-username-role"
       :selectedOption="selectedOption"
       @select:option="selectOption"
@@ -155,7 +155,7 @@
             />
           </template>
           <template #footer>
-            <courses-meetings :data="meetings" :is-facilitator="canEdit" />
+            <courses-meetings :can-edit="canEdit" :data="meetings" :is-facilitator="canEdit" />
             <courses-invites
               v-if="canEdit"
               :enable-invites="course.invite_enabled"
@@ -352,6 +352,7 @@ watch(invitationLink, () => {
   .left-block {
     min-width: 66% !important;
     padding-inline: 24px !important;
+    padding-block: 24px;
   }
 }
 

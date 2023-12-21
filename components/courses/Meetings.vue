@@ -2,7 +2,7 @@
   <alex-custom-card
     class="w-100"
     :title="$t('components.meeting.title')"
-    href="dsads"
+    :href="canEdit ? '/settings' : ''"
     hide-dividers
     sizing-class="ma-0"
     is-nested
@@ -40,6 +40,7 @@ defineProps({
     >,
     default: [],
   },
+  canEdit: { type: Boolean, default: false },
   isFacilitator: {
     type: Boolean,
     default: false,
