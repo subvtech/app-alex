@@ -1,40 +1,50 @@
 {
-  "every": {
-    "sunday": "Todo Domingo",
-    "monday": "Toda Segunda-feira",
-    "tuesday": "Toda Terça-feira",
-    "wednesday": "Toda Quarta-feira",
-    "thursday": "Toda Quinta-feira",
-    "friday": "Toda Sexta-feira",
-    "saturday": "Todo Sábado",
-    "everyday": "Todo dia",
-    "weekly": "Semanal: Toda {day}",
-    "biweekly": "Quizenal: Toda {day}",
-    "monthly": "Mensal: Toda {day}"
-  },
-  "starting": "Iniciando em",
-  "single": {
-    "sunday": "Domingo",
-    "monday": "Segunda-feira",
-    "tuesday": "Terça-feira",
-    "wednesday": "Quarta-feira",
-    "thursday": "Quinta-feira",
-    "friday": "Sexta-feira",
-    "saturday": "Sábado",
-    "everyday": "dia"
-  },
-  "today": "Hoje",
-  "of": "de",
-  "to": "a",
-  "at": "às",
-  "interval": "A cada {days} dias",
-  "weekly": "Semanal: {day}",
-  "biweekly": "Quizenal: {day}",
-  "monthly": "Mensal: {day}",
-  "empty": {
-    "facilitator": "Parece que não há encontros disponíveis",
-    "student": "Parece que você não tem encontro síncrono"
-  },
-  "edit": "Editar",
-  "delete": "Excluir"
-}
+    "every": {
+      "sunday": "Todo Domingo",
+      "monday": "Toda Segunda-feira",
+      "tuesday": "Toda Terça-feira",
+      "wednesday": "Toda Quarta-feira",
+      "thursday": "Toda Quinta-feira",
+      "friday": "Toda Sexta-feira",
+      "saturday": "Todo Sábado",
+      "everyday": "Todo dia",
+      "weekly": "Semanal: Toda {day}",
+      "biweekly": "Quizenal: Toda {day}",
+      "monthly": "Mensal: Toda {day}"
+    },
+    "starting": "Iniciando em",
+    "single": {
+      "sunday": "Domingo",
+      "monday": "Segunda-feira",
+      "tuesday": "Terça-feira",
+      "wednesday": "Quarta-feira",
+      "thursday": "Quinta-feira",
+      "friday": "Sexta-feira",
+      "saturday": "Sábado",
+      "everyday": "dia"
+    },
+    "today": "Hoje",
+    "of": "de",
+    "to": "a",
+    "at": "às",
+    "interval": "A cada {days} dias",
+    "weekly": "Semanal: {day}",
+    "biweekly": "Quizenal: {day}",
+    "monthly": "Mensal: {day}",
+    "empty": {
+      "facilitator": "Parece que não há encontros disponíveis",
+      "student": "Parece que você não tem encontro síncrono"
+    },
+    "edit": "Editar",
+    "delete": "Excluir",
+    "course": {
+      "title": "Deixe salvos seus encontros síncronos",
+      "subtitle": "Adicione uma data e uma frequência para cada encontro",
+      "addMeeting": "Adicionar encontros síncronos",
+      "editMeeting": "Editar encontros síncronos",
+      "meetingFrequency": "Frequencia do encontro",
+      "meetingDate": "Data do encontro",
+      "startTime": "Hora de início",
+      "endTime": "Hora de término"
+    }
+  }

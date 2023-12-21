@@ -52,6 +52,8 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
 
   // If the language hasn't been loaded yet
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
+  const errors = (await import(`../assets/locales/${lang}/errors.json`))
+    .default;
   const pages = await useImportLanguages('pages', lang, [
     'login',
     'register',
@@ -74,12 +76,10 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tagCombobox',
     'dialog',
     'date',
-    'card',
-    'meeting',
+    'carousel',
+    'institutions',
     'usersAutocomplete',
-    'courses/editor',
-    'courses/goals',
-    'courses/invites',
+    'meeting',
     'courses/meeting',
     'learningPlan/editor',
     'learningPlan/cardTrails',
@@ -107,6 +107,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   ]);
   i18n.global.setLocaleMessage(lang, {
     pages,
+    errors,
     rules,
     components,
     layouts,

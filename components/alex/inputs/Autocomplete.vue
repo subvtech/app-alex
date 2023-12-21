@@ -16,7 +16,6 @@
     </div>
     <v-autocomplete
       v-model="value"
-      hide-details="auto"
       color="primary--2"
       rounded="lg"
       variant="outlined"
@@ -53,7 +52,6 @@ import { YupSchema, useField } from 'vee-validate';
 
 interface AutoCompleteProps {
   modelValue?: string | number | boolean | unknown[] | any;
-  search?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
@@ -62,7 +60,6 @@ interface AutoCompleteProps {
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
-defineEmits(['update:modelValue']);
 const props = withDefaults(defineProps<AutoCompleteProps>(), {
   modelValue: undefined,
   search: undefined,

@@ -69,49 +69,43 @@
       </div>
     </div>
 
-    <div class="w-100">
+    <div class="w-100 d-flex flex-column gap-4">
+      <p class="text-h5 text-center">Items fora do select</p>
       <alex-custom-list-item-user
-        v-model="selected"
+        no-select
+        status="readyToSend"
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+      />
+      <alex-custom-list-item-user
         no-select
         status="participating"
         :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
       />
-    </div>
-    <alex-inputs-autocomplete
-      v-model="peapleSelected"
-      :items="pearson"
-      :item-title="getItemTitle"
-      name="aaa"
-      class="w-100"
-      label="Quem participará?"
-      placeholder="Buscar Integrante"
-      item-color="#000"
-      return-object
-    >
-      <template #item="{ props, item, index }">
-        <alex-custom-list-item-user
-          v-bind="props"
-          :key="index"
-          :user="{
-            email: item.raw.email,
-            name: item.raw.name,
-            image: item.raw.image,
-          }"
-          :status="item.raw.status"
-          no-delete
-        />
-      </template>
-    </alex-inputs-autocomplete>
-    <!-- <alex-inputs-autocomplete
+
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+        status="pending"
+        no-select
+      />
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com' }"
+        status="pending"
+        no-select
+      />
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com' }"
+        no-select
+      />
+
+      <p class="text-h5 text-center">Items dentro do select</p>
+      <alex-inputs-autocomplete
         v-model="peapleSelected"
         :items="pearson"
         :item-title="getItemTitle"
         name="aaa"
         class="w-100"
         label="Quem participará?"
-        multiple
         placeholder="Buscar Integrante"
-        item-color="#000"
         return-object
       >
         <template #item="{ props, item, index }">
@@ -127,15 +121,9 @@
             no-delete
           />
         </template>
-      </alex-inputs-autocomplete> -->
-    <!-- <div class="w-100">
-        <alex-custom-list-item-user
-          v-for="user in peapleSelected"
-          :key="user.email"
-          :user="user"
-          no-select
-        />
-      </div> -->
+      </alex-inputs-autocomplete>
+    </div>
+
     <div class="w-100">
       <div
         class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
@@ -205,30 +193,32 @@ const pearson = ref([
 const propsExampleActivePage = ref('1');
 const peapleSelected = ref<{ email: string; name: string }[]>([]);
 const firstExampleTemplate = `
-  <alex-custom-list-item
-          text="Home"
-          icon="mdi-home"
-          @click="() => console.log('click item')"
-        />
-        <alex-custom-list-item
-          text="Home"
-          icon="mdi-home"
-          theme="dark"
-          @click="() => console.log('click item dark')"
-        />
-        <alex-custom-list-item
-          text="text"
-          warning
-          @click="() => console.log('click item dark')"
-        />
-        <alex-custom-list-item
-          text="text"
-          theme="dark"
-          warning
-          @click="() => console.log('click item dark')"
-        />
+<alex-custom-list-item-user
+        no-select
+        status="readyToSend"
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+      />
+      <alex-custom-list-item-user
+        no-select
+        status="participating"
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+      />
+
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+        status="pending"
+        no-select
+      />
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com' }"
+        status="pending"
+        no-select
+      />
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com' }"
+        no-select
+      />
   `;
-const selected = ref(false);
 
 const exampleTabs = [
   {

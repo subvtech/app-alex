@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="w-100 fill-height d-flex justify-center align-content-center"
+    class="w-100 d-flex flex-column justify-start align-center max-400"
   >
     <v-card
       variant="outlined"
@@ -32,3 +32,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.max-400 {
+  max-width: 400px;
+}
+</style>

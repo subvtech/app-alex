@@ -21,7 +21,6 @@
       variant="outlined"
       no-resize
       role="textarea"
-      hide-details="auto"
       clear-icon="mdi-close"
       :class="theme"
       :error-messages="errorMessage"

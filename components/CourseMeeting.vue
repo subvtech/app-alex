@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="d-flex w-100 py-3 px-4 justify-space-between align-center"
-
-  >
+  <div class="d-flex w-100 py-3 px-4 justify-space-between align-center">
     <div class="d-flex flex-column">
       <span class="date">
         {{ formattedDate }}
@@ -12,25 +9,38 @@
       </span>
     </div>
 
-    <div class="d-flex justify-space-between align-end gap-2" :class="isEditing ? 'flex-row' : 'flex-column-reverse'">
+    <div
+      class="d-flex justify-space-between align-end gap-2"
+      :class="isEditing ? 'flex-row' : 'flex-column-reverse'"
+    >
       <span class="duration">
         {{ duration }}
       </span>
-      <alex-inputs-dropdown v-if="isEditing" :items="dropdownProps">
-        <template #activator="{ props }">
-          <v-icon v-bind="props" class="cursor-pointer"
+      <alex-custom-dropdown v-if="isEditing" :items="dropdownProps">
+        <template #activator="{ props: activeProps }">
+          <v-icon v-bind="activeProps" class="cursor-pointer"
             >mdi-dots-vertical</v-icon
           >
         </template>
-      </alex-inputs-dropdown>
-      <img v-else class="cursor-pointer" src="/svg/calendar.svg" @click="emit('click:calendar')" width="24" height="24">
+      </alex-custom-dropdown>
+      <img
+        v-else
+        class="cursor-pointer"
+        src="/svg/calendar.svg"
+        width="24"
+        height="24"
+        @click="emit('click:calendar')"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
+// eslint-disable-next-line import/no-duplicates
 import { pt } from 'date-fns/locale';
+import { AlexDropdownItem } from './alex/custom/Dropdown.vue';
 const { t } = useI18n();
 const emit = defineEmits(['click:activator', 'click:calendar']);
 
@@ -68,23 +78,15 @@ const props = defineProps({
     default: false,
   },
   dropdownProps: {
-    type: Array as PropType<
-      {
-        icon: string;
-        text: string;
-        warning?: boolean;
-        link: string;
-        action: () => void;
-      }[]
-    >,
-    default: [
+    type: Array as PropType<AlexDropdownItem[]>,
+    default: () => [
       {
         icon: 'mdi-pencil',
         text: 'Editar', // t('components.courses.meeting.edit'),
       },
       {
         icon: 'mdi-trash-can',
-        text: 'Excluir', //t('components.courses.meeting.delete'),
+        text: 'Excluir', // t('components.courses.meeting.delete'),
         warning: true,
       },
     ],

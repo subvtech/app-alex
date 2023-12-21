@@ -195,6 +195,11 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
 const { findOne } = useStrapi();
 
 const i18n = useI18n();
@@ -681,6 +686,31 @@ const copyToClipboard = async (index) => {
     copiedValue.value = examples[index];
   }
   copiedIndex.value = index;
+};
+
+onBeforeMount(async () => {
+  await updateUser(false);
+});
+
+const updateUser = async (show = true) => {
+  const populate = [
+    'cover',
+    'avatar',
+    'learningPlans',
+    'socials',
+    'trails',
+    'role',
+    'user_descriptions',
+    'user_wallet',
+  ];
+
+  user.value = await findOne<User>('users', id, { populate });
+
+  if (user.value.avatar) profilePicture.value = user.value.avatar.url;
+  if (user.value.cover) coverPicture.value = user.value.cover.url;
+  messageStore.message = 'done';
+  messageStore.color = 'green';
+  messageStore.show = show;
 };
 </script>
 

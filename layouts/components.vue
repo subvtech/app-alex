@@ -80,7 +80,12 @@ const menus = [
         to: '/components/custom/accordion',
       },
       {
-        icon: 'mdi-image-area',
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Avatar Group',
+        to: '/components/custom/AvatarGroup',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
         title: 'Banner',
         to: '/components/custom/banner',
       },
@@ -88,12 +93,12 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Button',
-        to: '/components/custom/button',
+        to: '/components/custom/Button',
       },
       {
-        icon: 'mdi-card-text-outline',
-        title: 'Card',
-        to: '/components/custom/card',
+        icon: 'mdi-view-carousel',
+        title: 'Carousel',
+        to: '/components/custom/carousel',
       },
       {
         icon: 'mdi-chip',
@@ -138,6 +143,11 @@ const menus = [
       },
       {
         icon: 'mdi-view-dashboard-outline',
+        title: 'Header',
+        to: '/components/custom/Header',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
         title: 'Horizontalbar',
         to: '/components/custom/horizontalbar',
       },
@@ -156,6 +166,11 @@ const menus = [
         title: 'Tabs',
         to: '/components/custom/tabs',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card projetos e cursos',
+        to: '/components/learning-plans/card',
+      },
     ],
   },
   {
@@ -167,9 +182,24 @@ const menus = [
         to: '/components/inputs/radio-button',
       },
       {
+        icon: 'mdi-checkbox-marked',
+        title: 'Checkbox',
+        to: '/components/inputs/checkbox',
+      },
+      {
         icon: 'mdi-card-text-outline',
         title: 'Text-field',
         to: '/components/inputs/text-field',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Textarea',
+        to: '/components/inputs/text-area',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Date Field',
+        to: '/components/inputs/date',
       },
       {
         icon: 'mdi-card-text-outline',

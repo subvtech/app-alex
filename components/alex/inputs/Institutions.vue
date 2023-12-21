@@ -13,7 +13,7 @@
     item-value="id"
     class="my-3"
     variant="outlined"
-    no-data-text="Instituição não encontrada"
+    :no-data-text="noDataText"
     autofocus
     spellcheck="false"
     v-bind="$attrs"
@@ -48,19 +48,21 @@ const emit = defineEmits([
   'update:search',
 ]);
 
-const { value, errorMessage } = useField(
+const { value, errorMessage, setErrors } = useField(
   () => props.name || 'institution',
   undefined,
 );
 
+const { t } = useI18n();
 const isTyping = ref(false);
 const fetching = ref(false);
+const noDataText = ref(t('components.institutions.searchForIntitutions'));
 const { find } = useStrapi();
-const { setMessage } = useMessageStore();
 const i18n = useI18n();
 
 const fetchInstitutions = async (institution: string) => {
   fetching.value = true;
+  noDataText.value = t('components.institutions.noInstitutionsFound');
   try {
     const result = await find(`institutions`, {
       fields: ['id', 'acronym', 'socialName'], // campos a serem buscados
@@ -83,7 +85,7 @@ const fetchInstitutions = async (institution: string) => {
       emit('update:institutions', dataInstitutions);
     }
   } catch (error) {
-    setMessage(i18n.t('pages.login.searchError'), 'red', true);
+    setErrors(i18n.t('pages.login.searchError'));
   } finally {
     fetching.value = false;
   }

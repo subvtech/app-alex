@@ -1,168 +1,146 @@
 <template>
-  <div class="alex-autocomplete" role="select">
-    <div v-if="label" class="d-flex mb-2 text-blue">
-      <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
-      <p class="text-body-1" :class="`text-${textColor}`">
-        {{ label }}
-      </p>
-      <v-icon
-        v-if="info"
-        class="ml-1 align-self-center"
-        size="20"
-        :title="info"
-        :color="textColor"
-        >mdi-information-outline</v-icon
-      >
-    </div>
-    <v-autocomplete
-      v-bind="$attrs"
+  <div>
+    <alex-inputs-autocomplete
       v-model="value"
-      color="primary--2"
-      rounded="lg"
+      v-model:search="search"
+      item-value="id"
+      item-title="email"
       variant="outlined"
-      role="select"
-      clear-icon="mdi-close"
-      hide-details
-      no-data-text="Nenhum item encontrado!"
-      :class="theme"
-      :error-messages="errorMessage"
-      :disabled="disabled"
+      :items="items"
+      :custom-filter="filterByFullnameAndEmail"
+      :name="name"
+      v-bind="$attrs"
+      :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
+      @update:model-value="(value) => updateModelValue(value)"
     >
-      <!-- Bind all slots  -->
-      <template v-for="(_, slot) in $slots" #[slot]="scope">
-        <slot :name="slot" v-bind="scope" />
-      </template>
-      <!-- Default item slot -->
       <template #item="{ props: propsItem, item, index }">
-        <alex-custom-list-item
-          :key="index"
-          :text="item.title"
+        <alex-custom-list-item-user
           v-bind="propsItem"
-          :theme="theme"
-          :selected="value === item.title"
+          :key="index"
+          :user="{
+            email: item.raw.email,
+            name: item.raw.fullname,
+          }"
+          no-delete
+          @click="
+            () => {
+              search = '';
+              setState({ value: null });
+            }
+          "
         />
       </template>
-      <template #chip />
-    </v-autocomplete>
+    </alex-inputs-autocomplete>
+    <div v-if="selectedItems.length">
+      <alex-custom-list-item-user
+        v-for="item in selectedItems"
+        :key="item.id"
+        :user="{
+          email: item.email,
+          name: item.fullname,
+        }"
+        no-delete
+        no-select
+        @delete="() => removeSelf(item.id)"
+        @reload="() => emit('refresh:invite')"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
+type User = { id?: string; email: string; fullname?: string };
 
-interface AutoCompleteProps {
-  modelValue?: string | number | boolean | unknown[] | any;
+interface AutoCompleteUsersProps {
   name: string;
-  label?: string;
-  required?: boolean;
-  info?: string;
-  disabled?: boolean;
-  theme?: 'light' | 'dark';
+  selectedItems: User[];
 }
 
-const props = withDefaults(defineProps<AutoCompleteProps>(), {
-  modelValue: undefined,
-  disabled: false,
-  theme: 'light',
-  info: undefined,
-  label: undefined,
+const props = defineProps<AutoCompleteUsersProps>();
+
+const emit = defineEmits([
+  'update:selectedItems',
+  'refresh:invite',
+  'remove:invite',
+]);
+const { find } = useStrapi();
+const { emailRegex } = useFormRules();
+const { value, setState } = useField<User | null>(() => props.name, undefined);
+const search = ref('');
+const items = ref<User[]>([]);
+const selectedItems = computed({
+  get() {
+    return props.selectedItems;
+  },
+  set(value) {
+    emit('update:selectedItems', value);
+  },
 });
 
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  syncVModel: true,
-});
+const removeSelf = (id?: string) => {
+  selectedItems.value = selectedItems.value.filter((item) => item.id !== id);
+  emit('remove:invite');
+};
 
-const textColor = computed(() => {
-  if (props.theme === 'light') {
-    return props.disabled ? 'gray-300' : 'gray-800';
+const updateModelValue = (user?: User | null) => {
+  const selectedItem = items.value.find((item) => item.id === user?.id);
+  const alreadyInList = selectedItems.value.find(
+    (item) => item.id === user?.id,
+  );
+  if (selectedItem && !alreadyInList) {
+    emit('update:selectedItems', [...selectedItems.value, selectedItem]);
+    items.value = [
+      ...items.value.filter((item) => item.id !== selectedItem.id),
+    ];
+    setState({ value: null });
+    search.value = '';
   }
-  if (props.theme === 'dark') {
-    return props.disabled ? 'gray-300' : 'white';
+};
+
+useOnStopTyping(search, async () => {
+  const registeredFields = (await find('users', {
+    fields: ['email', 'fullname'],
+    filters: {
+      $or: [
+        { email: { $containsi: search.value } },
+        { fullname: { $containsi: search.value } },
+      ],
+    },
+  })) as unknown as User[];
+  if (registeredFields.length) {
+    items.value = registeredFields.filter(
+      (itemRequest) =>
+        !selectedItems.value.find((item) => item.id === itemRequest?.id),
+    );
+  }
+});
+
+const filterByFullnameAndEmail = (
+  _value: string,
+  query: string,
+  item?: any,
+) => {
+  const fullname = item.raw.fullname?.toLowerCase() || '';
+  const email = item.raw.email?.toLowerCase();
+  const searchText = query.toLowerCase();
+
+  return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
+};
+
+watch(search, () => {
+  const isValidEmail = emailRegex.test(search.value);
+  const hasEmail = items.value.filter(
+    (item) => !item.fullname && item.email,
+  ).length;
+  if (!isValidEmail) {
+    items.value.filter((item) => item.email === search.value && !item.fullname);
+    return;
+  }
+  if (!hasEmail) {
+    items.value = [{ email: search.value }, ...items.value];
+  } else {
+    items.value.splice(0, 1, { email: search.value });
   }
 });
 </script>
-
-<style lang="scss">
-.alex-autocomplete {
-  &.v-theme--mainTheme {
-    --v-border-opacity: 1 !important;
-    --v-high-emphasis-opacity: 1 !important;
-    --v-medium-emphasis-opacity: 1 !important;
-    --v-disabled-opacity: 1 !important;
-    --v-border-color: rgb(var(--v-theme-gray-400));
-  }
-
-  &.v-field__input {
-    overflow: hidden;
-    color: rgb(var(--v-theme-gray-300));
-    border-color: rgb(var(--v-theme-gray-400));
-    text-overflow: ellipsis !important;
-    font-family: Sen !important;
-    font-size: 16px !important;
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
-    font-style: normal !important;
-    line-height: 135% !important;
-    letter-spacing: 0.32px !important;
-    border-width: 5px !important;
-  }
-
-  &.v-field--disabled > div > i,
-  &.v-field--disabled > .v-field__field > .v-field__input,
-  &.v-input--disabled > .v-input__details {
-    color: rgb(var(--v-theme-gray-300)) !important;
-  }
-
-  &.v-field:hover:not(.v-field--active):not(.v-field--error)
-    > .v-field__outline {
-    color: rgb(var(--v-theme-gray-800)) !important;
-  }
-
-  &.v-input__details {
-    padding-inline-start: 0 !important;
-  }
-
-  &.v-input__details > .v-messages > .v-messages__message {
-    font-size: 14px !important;
-    color: rgb(var(--v-theme-gray-600));
-  }
-
-  &.light .v-field__outline {
-    color: rgb(var(--v-theme-gray-300));
-  }
-
-  &.light .v-field--dirty > .v-field__field > .v-field__input {
-    color: rgb(var(--v-theme-gray-800)) !important;
-  }
-
-  &.light .v-field > div > i {
-    color: rgb(var(--v-theme-gray-600)) !important;
-  }
-
-  &.dark .v-field__outline {
-    color: var(--gray-400);
-  }
-
-  &.dark .v-field--dirty > .v-field__field > .v-field__input {
-    color: #fff !important;
-  }
-
-  &.dark .v-field > div > i {
-    color: rgb(var(--v-theme-gray-400)) !important;
-  }
-
-  &.v-field--error > .v-field__outline,
-  .v-input--error .v-messages__message {
-    color: rgb(var(--v-theme-error-0)) !important;
-  }
-  & .v-autocomplete__selection {
-    display: none;
-  }
-  .v-autocomplete.v-field--dirty.v-autocomplete__selection {
-    margin-inline-end: 0 !important;
-  }
-  .v-list-item--active {
-    background-color: rgb(var(--v-theme-gray-blue)) !important;
-  }
-}
-</style>

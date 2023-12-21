@@ -24,11 +24,19 @@
             ],
           },
           step2: { scheme: registerStep2 },
-          step3: { scheme: registerStep3 },
+          step3: {
+            scheme: registerStep3,
+            validate: [
+              {
+                name: 'username',
+                callback: (value) => verifyField('username', value),
+              },
+            ],
+          },
         }"
         align="left"
         no-header
-        step-class="d-flex flex-column gap-4"
+        step-class="d-flex flex-column gap-1"
         :loading="registering"
         @update-loading="(value: boolean) => (registering = value)"
         @on-success="submit"
@@ -163,7 +171,7 @@
           />
           <div class="my-2">
             <p v-show="hasError" class="text-body-1 text-error">
-              {{ $t(`pages.register.${errorMessage}`) }}
+              {{ errorMessage }}
             </p>
           </div>
         </template>
@@ -183,7 +191,7 @@
         ></v-divider>
       </div>
 
-      <v-card-text class="text-white font-bold haveAccount">
+      <v-card-text class="text-white font-bold haveAccount text-body-2">
         {{ $t('pages.register.hasAccount') }}
         <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
           {{ $t('pages.register.login') }}
@@ -194,6 +202,8 @@
 </template>
 
 <script setup lang="ts">
+import { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types';
+
 const emit = defineEmits(['success:message']);
 const {
   registerSchemas: { registerStep1, registerStep2, registerStep3 },
@@ -217,7 +227,9 @@ const verifyField = async (field: string, inputValue: string) => {
   if ((registeredFields as unknown as []).length) {
     return {
       status: false,
-      message: `${field} ${i18n.t('pages.register.alreadyTaken')}`,
+      message: `${i18n.t(`pages.register.${field}`)} ${i18n.t(
+        'pages.register.alreadyTaken',
+      )}`,
     };
   }
 };
@@ -230,6 +242,7 @@ const errorMessage = ref('');
 const search = ref('');
 const passwordVisible = ref(false);
 const confirmationVisible = ref(false);
+const { mapStrapiErrors } = useStrapiHelpers();
 const submit = async (values: {
   fullname: string;
   username: string;
@@ -276,20 +289,12 @@ const submit = async (values: {
     } else {
       emit('success:message');
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     hasError.value = true;
-    if (err.error) {
-      switch (err.error.name) {
-        case 'ValidationError':
-          errorMessage.value = 'emailMustBeValid';
-          break;
-        case 'Your account has been blocked by an administrator':
-          errorMessage.value = 'blockedUser';
-          break;
-        default:
-          errorMessage.value = 'genericError';
-          break;
-      }
+    const error = err as Strapi4Error;
+    const catchErrorMessage = error?.error?.message;
+    if (catchErrorMessage) {
+      errorMessage.value = mapStrapiErrors(catchErrorMessage);
     }
   } finally {
     registering.value = false;
@@ -319,7 +324,6 @@ const submit = async (values: {
   &-link {
     text-decoration: none;
     color: #00d3ec !important;
-    font-size: 16px;
   }
 }
 

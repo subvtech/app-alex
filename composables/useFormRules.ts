@@ -1,22 +1,11 @@
 import * as yup from 'yup';
 
-type FormDataType = {
-  fullname: string;
-  username: string;
-  email: string;
-  cpf: string;
-  password1: string;
-  password2: string;
-  yourRole: string;
-  institution: string;
-};
-
-export function isValidCpf(val) {
+export function isValidCpf(val: string) {
   val = val.replace(/\D/g, '');
   if (val === '00000000000') return false;
 
-  let sum;
-  let left;
+  let sum: number;
+  let left: number;
   sum = 0;
 
   for (let i = 1; i <= 9; i++)
@@ -36,25 +25,32 @@ export function isValidCpf(val) {
   return true;
 }
 
-export const useFormRules = (formData?: FormDataType) => {
+export const useFormRules = () => {
   const i18n = useI18n();
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+  const emailRegex =
+    /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/g;
   const emailRules = {
     email: yup
       .string()
       .required(i18n.t('rules.email.required'))
-      .email(i18n.t('rules.email.invalid')),
+      .trim()
+      .matches(emailRegex, i18n.t('rules.email.invalid')),
   };
 
   const passwordRules = {
     password: yup.string().required(i18n.t('rules.password.required')),
-    //.matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
-    //.matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
-    //.matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
-    /*.matches(
+    /*
+    .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
+    .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
+    .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
+    .matches(
         /(?=.*[^a-zA-Z0-9])/,
         i18n.t('rules.password.character'),
-      )*/
-    //.min(8, i18n.t('rules.password.min'))
+      )
+    .min(8, i18n.t('rules.password.min'))
+    */
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))
@@ -70,7 +66,8 @@ export const useFormRules = (formData?: FormDataType) => {
       .matches(
         /^[a-zA-Z0-9_-]*[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+[a-zA-Z0-9_-]*$/,
         i18n.t('rules.username.onlyLetters'),
-      ),
+      )
+      .trim(),
   };
 
   const fullnameRules = {
@@ -82,7 +79,8 @@ export const useFormRules = (formData?: FormDataType) => {
       .matches(
         /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
         i18n.t('rules.fullName.onlyLetters'),
-      ),
+      )
+      .trim(),
   };
 
   const cpfRules = {
@@ -203,8 +201,16 @@ export const useFormRules = (formData?: FormDataType) => {
       .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
       .trim(),
-    startDate: yup.date().required(i18n.t('rules.startDate.required')),
-    endDate: yup.date().required(i18n.t('rules.endDate.required')),
+    startDate: yup
+      .date()
+      .required(i18n.t('rules.startDate.required'))
+      .min(currentDate.toISOString(), ({ min }) =>
+        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
+      ),
+    endDate: yup
+      .date()
+      .required(i18n.t('rules.endDate.required'))
+      .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate')),
   });
 
   return {
@@ -233,5 +239,6 @@ export const useFormRules = (formData?: FormDataType) => {
       .trim(),
     loginSchema,
     createCourseRules,
+    emailRegex,
   };
 };
