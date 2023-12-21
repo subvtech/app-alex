@@ -226,10 +226,12 @@
                 class="button"
                 prepend-icon="mdi-plus"
                 variant="primary"
+                @click="createSchedule = true"
                 >{{
                   t('pages.courseSettings.config.createSyncMeetingButton')
                 }}</alex-custom-button
               >
+              <alex-learningplan-modal-schedule v-model="createSchedule" />
             </span>
           </div>
         </div>
@@ -464,6 +466,8 @@ import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 
 const dialogMeetingExclusion = ref(false);
+const createSchedule = ref(false);
+
 // const schedules = ref([
 //   {
 //     id: '1',
@@ -520,13 +524,15 @@ const getCourseInfo = async () => {
       course.value.slug = courseData.attributes.slug;
       course.value.invitation_message =
         courseData.attributes.invitation_message;
+      course.value.owner = courseData.attributes.owner.data.attributes;
       schedules.value = courseData.attributes.schedules.data;
 
       console.log(courseData);
+      console.log(course.value.owner);
       console.log(schedules.value);
     }
 
-    // await updateCourse(false);
+    await updateCourse(false);
   } catch (error) {
     console.error('Erro na requisição:', error.message);
   }
@@ -554,21 +560,21 @@ const updateCourse = async (show = true, message?) => {
       }
     });
   }
-  // if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
-  // generalTags.value = course.value.tags.data.reduce((acc, item) => {
-  //   if (item.attributes.isGeneral) {
-  //     acc.push({ id: item, ...item.attributes });
-  //   }
+  if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
+  generalTags.value = course.value.tags.data.reduce((acc, item) => {
+    if (item.attributes.isGeneral) {
+      acc.push({ id: item, ...item.attributes });
+    }
 
-  //   return acc;
-  // }, []);
-  // technicalTags.value = course.value.tags.data.reduce((acc, item) => {
-  //   if (!item.attributes.isGeneral) {
-  //     acc.push({ id: item, ...item.attributes });
-  //   }
+    return acc;
+  }, []);
+  technicalTags.value = course.value.tags.data.reduce((acc, item) => {
+    if (!item.attributes.isGeneral) {
+      acc.push({ id: item, ...item.attributes });
+    }
 
-  //   return acc;
-  // }, []);
+    return acc;
+  }, []);
   updateMeetings(course.value.schedules).then();
 
   setMessage(message ?? 'done', 'green', show);
