@@ -67,7 +67,8 @@
   },
   "endDate": {
     "required": "Data de término é obrigatório",
-    "min": "Data mínima aceita: {min}"
+    "min": "Data mínima aceita: {min}",
+    "beforeStartDate": "Não pode ser menor que data de início"
   },
   "class": {
     "required": "Turma é obrigatório",

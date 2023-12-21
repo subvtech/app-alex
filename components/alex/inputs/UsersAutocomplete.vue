@@ -10,6 +10,7 @@
       :custom-filter="filterByFullnameAndEmail"
       :name="name"
       v-bind="$attrs"
+      :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
       @update:model-value="(value) => updateModelValue(value)"
     >
       <template #item="{ props: propsItem, item, index }">
@@ -49,7 +50,7 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = { id: string; email: string; fullname: string };
+type User = { id?: string; email: string; fullname?: string };
 
 interface AutoCompleteUsersProps {
   name: string;
@@ -63,10 +64,10 @@ const emit = defineEmits([
   'refresh:invite',
   'remove:invite',
 ]);
-
 const { find } = useStrapi();
-const search = ref('');
+const { emailRegex } = useFormRules();
 const { value, setState } = useField<User | null>(() => props.name, undefined);
+const search = ref('');
 const items = ref<User[]>([]);
 const selectedItems = computed({
   get() {
@@ -77,7 +78,7 @@ const selectedItems = computed({
   },
 });
 
-const removeSelf = (id: string) => {
+const removeSelf = (id?: string) => {
   selectedItems.value = selectedItems.value.filter((item) => item.id !== id);
   emit('remove:invite');
 };
@@ -98,7 +99,7 @@ const updateModelValue = (user?: User | null) => {
 };
 
 useOnStopTyping(search, async () => {
-  const registeredFields = await find('users', {
+  const registeredFields = (await find('users', {
     fields: ['email', 'fullname'],
     filters: {
       $or: [
@@ -106,10 +107,9 @@ useOnStopTyping(search, async () => {
         { fullname: { $containsi: search.value } },
       ],
     },
-  });
-
-  if ((registeredFields as unknown as []).length > 0) {
-    items.value = (registeredFields as unknown as User[]).filter(
+  })) as unknown as User[];
+  if (registeredFields.length) {
+    items.value = registeredFields.filter(
       (itemRequest) =>
         !selectedItems.value.find((item) => item.id === itemRequest?.id),
     );
@@ -121,10 +121,26 @@ const filterByFullnameAndEmail = (
   query: string,
   item?: any,
 ) => {
-  const fullname = item.raw.fullname.toLowerCase();
-  const email = item.raw.email.toLowerCase();
+  const fullname = item.raw.fullname?.toLowerCase() || '';
+  const email = item.raw.email?.toLowerCase();
   const searchText = query.toLowerCase();
 
   return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
 };
+
+watch(search, () => {
+  const isValidEmail = emailRegex.test(search.value);
+  const hasEmail = items.value.filter(
+    (item) => !item.fullname && item.email,
+  ).length;
+  if (!isValidEmail) {
+    items.value.filter((item) => item.email === search.value && !item.fullname);
+    return;
+  }
+  if (!hasEmail) {
+    items.value = [{ email: search.value }, ...items.value];
+  } else {
+    items.value.splice(0, 1, { email: search.value });
+  }
+});
 </script>

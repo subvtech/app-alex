@@ -200,9 +200,7 @@ export const useFormRules = () => {
     endDate: yup
       .date()
       .required(i18n.t('rules.endDate.required'))
-      .min(currentDate.toISOString(), ({ min }) =>
-        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
-      ),
+      .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate')),
   });
 
   return {
@@ -229,5 +227,6 @@ export const useFormRules = () => {
       .trim(),
     loginSchema,
     createCourseRules,
+    emailRegex,
   };
 };

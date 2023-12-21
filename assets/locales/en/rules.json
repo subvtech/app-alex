@@ -68,7 +68,8 @@
   },
   "endDate": {
     "required": "End date is required",
-    "min": "Min accepted date: {min}"
+    "min": "Min accepted date: {min}",
+    "beforeStartDate": "End date can't be before start date"
   },
   "class": {
     "required": "Class is required",
