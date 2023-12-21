@@ -79,7 +79,7 @@
         <div class="content-body">
           <alex-inputs-text-field
             id="courseName"
-            v-model="course.name"
+            v-model="course.title"
             :label="$t('pages.courseSettings.config.courseName')"
             name=""
             class="w-100"
@@ -109,7 +109,7 @@
           </div>
           <alex-inputs-text-field
             id="acronym"
-            v-model="course.acronym"
+            v-model="course.slug"
             :label="$t('pages.courseSettings.config.courseAcronym')"
             name=""
             class="w-100"
@@ -136,6 +136,63 @@
           </p>
         </div>
         <div class="content-body">
+          <div class="meetings">
+            <alex-custom-button
+              class="button"
+              :text="$t('pages.courseSettings.config.deleteWord')"
+              variant="error"
+              @click="dialogMeetingExclusion = true"
+            >
+              <alex-custom-dialog
+                :model-value="dialogMeetingExclusion"
+                title=""
+                body-classes="criticalAttention"
+                width="520px"
+                :scrollable="false"
+                max-height="500px"
+              >
+                <template #header>
+                  <alex-custom-dialog-header title="" class="noShow"
+                /></template>
+                <div class="criticalAttention">
+                  <div class="exclusionBody">
+                    <span class="exclusionIMG">
+                      <img
+                        src="@/assets/svg/exclusionImage.svg"
+                        alt="attention image"
+                      />
+                    </span>
+                    <p>
+                      <span class="header-h4">{{
+                        t('pages.courseSettings.config.deleteMeetingConfirmation')
+                      }}</span>
+                      <br />
+                      <span class="body-p1">{{
+                        t('pages.courseSettings.config.deleteMeetingDescription')
+                      }}</span>
+                    </p>
+                  </div>
+                  <div class="exclusionFooter">
+                    <alex-custom-button
+                      class="button"
+                      :text="$t('pages.courseSettings.config.cancelButton')"
+                      variant="secondary"
+                      @click="dialogMeetingExclusion = false"
+                    />
+                    <alex-custom-button
+                      class="button"
+                      :text="$t('pages.courseSettings.config.deleteWord')"
+                      variant="error"
+                      @click="dialogMeetingExclusion = false"
+                    />
+                  </div>
+                </div>
+                <template #footer>
+                  <alex-custom-dialog-footer class="noShow"
+                /></template>
+              </alex-custom-dialog>
+            </alex-custom-button>
+          </div>
           <div class="no-encounters mb-4">
             <p>
               <span class="body-p1">{{
@@ -169,12 +226,15 @@
               t('pages.courseSettings.config.linkInvitation')
             }}</span>
             <v-switch
-              v-model:model-value="activeLink"
+              v-model:model-value="course.invite_enabled"
               :label="$t('pages.courseSettings.config.inviteLink')"
               color="accent"
             />
 
-            <div v-if="activeLink" class="inviteLinks d-flex flex-row">
+            <div
+              v-if="course.invite_enabled"
+              class="inviteLinks d-flex flex-row"
+            >
               <div class="">
                 <alex-inputs-select
                   v-model="selectedTime"
@@ -191,11 +251,19 @@
                   {{ t('pages.courseSettings.config.linkAddress') }}
                 </span>
                 <courses-invites
-                  :enable-invites="course.invite_enabled"
-                  :invitation-link="invitationLink"
+                  v-if="canEdit"
                   href=""
                   no-header
                   class="mt-2 w-full"
+                  :enable-invites="course.invite_enabled"
+                  :duration="course.invitation_duration"
+                  :course-id="course.id"
+                  :data="invitationLink"
+                  @update:link="
+                    (data) => {
+                      plainLink = data.url;
+                    }
+                  "
                 />
               </div>
             </div>
@@ -293,7 +361,6 @@
             <alex-custom-button
               class="button"
               prepend-icon="mdi-trash-can-outline"
-              text="Excluir curso"
               variant="error"
               @click="openDialog = true"
             >
@@ -335,8 +402,8 @@
                       </label>
                     </div>
                     <alex-inputs-text-field
-                      name=""
                       id="exclusionLabel"
+                      name="placeholder"
                       class="w-100"
                       required
                       :placeholder="
@@ -374,9 +441,113 @@
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 
+const dialogMeetingExclusion = ref(false);
 const { t } = useI18n();
-
+const { find, findOne, update, create, delete: _delete } = useStrapi();
+const { generateUrl } = useInvitationLink();
+const route = useRoute();
+const course = ref<any>({});
+const canEdit = ref(true);
+// const canEdit = computed(() => course.value.owner.id === id.value);
+const { setMessage } = useMessageStore();
+const meetings = ref<any>();
+const generalTags = ref();
+const technicalTags = ref();
+const invitationLink = ref();
+const plainLink = ref<string | null>(null);
 const selectedTime = ref('');
+const emit = defineEmits([]);
+
+const getCourseInfo = async () => {
+  try {
+    const response = await fetch('http://localhost:1337/api/learningplans');
+    if (!response.ok) {
+      throw new Error('Erro ao obter dados da API');
+    }
+    const data = await response.json();
+
+    if (data && data.data && data.data.length > 0) {
+      const courseData = data.data[0];
+      course.value.id = courseData.id;
+      course.value.invite_enabled = courseData.attributes.invite_enabled;
+      course.value.title = courseData.attributes.title;
+      course.value.start_date = courseData.attributes.start_date;
+      course.value.end_date = courseData.attributes.end_date;
+      course.value.slug = courseData.attributes.slug;
+      course.value.invitation_message =
+        courseData.attributes.invitation_message;
+      course.value.schedule = courseData.attributes.schedule;
+    }
+
+    // await updateCourse(false);
+  } catch (error) {
+    console.error('Erro na requisição:', error.message);
+  }
+};
+
+const updateCourse = async (show = true, message?) => {
+  let { id } = route.params;
+
+  let temp;
+  if (course.value.invitation_links) {
+    course.value.invitation_links.data.forEach((link) => {
+      const expirationDate = new Date(link.attributes.expires_at);
+
+      if (
+        link.attributes.role === 'student' &&
+        expirationDate.getTime() > new Date().getTime()
+      ) {
+        const differenceBetweenLinks = temp
+          ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
+          : 1;
+
+        if (!temp || differenceBetweenLinks > 0) {
+          temp = link;
+        }
+      }
+    });
+  }
+  // if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
+  // generalTags.value = course.value.tags.data.reduce((acc, item) => {
+  //   if (item.attributes.isGeneral) {
+  //     acc.push({ id: item, ...item.attributes });
+  //   }
+
+  //   return acc;
+  // }, []);
+  // technicalTags.value = course.value.tags.data.reduce((acc, item) => {
+  //   if (!item.attributes.isGeneral) {
+  //     acc.push({ id: item, ...item.attributes });
+  //   }
+
+  //   return acc;
+  // }, []);
+  updateMeetings(course.value.schedules).then();
+
+  setMessage(message ?? 'done', 'green', show);
+};
+
+const updateMeetings = async (schedules) => {
+  meetings.value = (
+    await find('meetings', {
+      filters: {
+        schedule: {
+          id: {
+            $in: schedules.data.map((item) => item.id),
+          },
+        },
+        isExpired: false,
+      },
+      populate: 'schedule',
+      sort: 'date:asc',
+    })
+  ).data;
+};
+
+watch(invitationLink, () => {
+  if (invitationLink.value.data)
+    plainLink.value = generateUrl(invitationLink.value.data.hash);
+});
 
 const timeOptions = ref([
   t('pages.courseSettings.config.fiveMinutes'),
@@ -389,9 +560,6 @@ const timeOptions = ref([
 ]);
 
 const openDialog = ref(false);
-
-const invitationLink = ref();
-
 const selectedFile = ref(null);
 const preview = ref(null);
 
@@ -404,43 +572,6 @@ const handleFileUpload = (event) => {
   reader.readAsDataURL(selectedFile.value);
 };
 
-const course = ref({
-  id: '',
-  invite_enabled: false,
-  name: '',
-  start_date: '',
-  end_date: '',
-  acronym: '',
-  message: 'Mensagem padrão?',
-});
-
-const getCourseInfo = async () => {
-  try {
-    const response = await fetch('http://localhost:1337/api/learningplans');
-    if (!response.ok) {
-      throw new Error('Erro ao obter dados da API');
-    }
-    const data = await response.json();
-    console.log(data);
-
-    if (data && data.data && data.data.length > 0) {
-      const courseData = data.data[0];
-      course.value.id = courseData.id;
-      course.value.invite_enabled = courseData.attributes.invitation_enabled;
-      course.value.name = courseData.attributes.title;
-      course.value.start_date = courseData.attributes.start_date;
-      course.value.end_date = courseData.attributes.end_date;
-      course.value.acronym = courseData.attributes.slug;
-      course.value.message = courseData.attributes.invitation_message;
-    }
-  } catch (error) {
-    console.error('Erro na requisição:', error.message);
-  }
-};
-
-getCourseInfo();
-
-const activeLink = ref(false);
 const firstButton = ref([
   {
     label: t('pages.courseSettings.config.showCourseTitle'),
@@ -458,6 +589,10 @@ const secondButton = ref([
 ]);
 
 const activeButton = ref('1');
+
+onBeforeMount(async () => {
+  await getCourseInfo();
+});
 </script>
 <style scoped lang="scss">
 .container {
@@ -665,6 +800,7 @@ p {
 }
 .exclusionBody {
   display: flex;
+  min-height: 300px;
   padding: var(--40px, 40px) 24px;
   flex-direction: column;
   justify-content: center;
@@ -675,6 +811,7 @@ p {
 
 .exclusionFooter {
   display: flex;
+  min-height: 76px;
   padding: 16px 24px;
   justify-content: center;
   align-items: center;

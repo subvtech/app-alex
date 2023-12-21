@@ -36,6 +36,8 @@
         "showCourseHint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca.",
         "hideCourseTitle": "Ocultar curso (Privado)",
         "hideCourseHint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso.",
+        "deleteMeetingConfirmation": "Realmente deseja excluir o encontro?",
+        "deleteMeetingDescription": "Ao confirmar você irá excluir o encontro síncrono cadastrado.",
         "deleteCourseTitle": "Excluir curso",
         "deleteCourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
         "deleteButton": "Excluir curso",
