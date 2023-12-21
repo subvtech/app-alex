@@ -9,7 +9,7 @@
         "courseName": "Course Name",
         "startDate": "Start Date",
         "endDate": "End Date",
-        "courseAcronym": "Course Acronym",
+        "courseAcronym": "Course Slug",
         "cancelButton": "Cancel",
         "saveButton": "Save Changes",
         "syncMeetingsTitle": "Synchronous Meetings",

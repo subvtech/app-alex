@@ -136,13 +136,31 @@
           </p>
         </div>
         <div class="content-body">
-          <div class="meetings">
-            <alex-custom-button
-              class="button"
-              :text="$t('pages.courseSettings.config.deleteWord')"
-              variant="error"
-              @click="dialogMeetingExclusion = true"
-            >
+          <div class="meetings d-flex flex-column w-100">
+            <div v-if="schedules.length > 0">
+              <course-meeting
+                v-for="schedule in schedules"
+                :key="schedule.id"
+                frequency="sunday"
+                class="test"
+                :date="schedule.date"
+                :start-hour="schedule.startHour"
+                :end-hour="schedule.endHour"
+                :variant="'editing'"
+                :dropdown-props="[
+                  {
+                    onClick: () => console.log('editar'),
+                    text: 'Editar',
+                    icon: 'mdi-pencil',
+                  },
+                  {
+                    onClick: () => (dialogMeetingExclusion = true),
+                    text: 'Apagar',
+                    icon: 'mdi-trash-can-outline',
+                    warning: true,
+                  },
+                ]"
+              />
               <alex-custom-dialog
                 :model-value="dialogMeetingExclusion"
                 title=""
@@ -164,11 +182,15 @@
                     </span>
                     <p>
                       <span class="header-h4">{{
-                        t('pages.courseSettings.config.deleteMeetingConfirmation')
+                        t(
+                          'pages.courseSettings.config.deleteMeetingConfirmation',
+                        )
                       }}</span>
                       <br />
                       <span class="body-p1">{{
-                        t('pages.courseSettings.config.deleteMeetingDescription')
+                        t(
+                          'pages.courseSettings.config.deleteMeetingDescription',
+                        )
                       }}</span>
                     </p>
                   </div>
@@ -183,33 +205,33 @@
                       class="button"
                       :text="$t('pages.courseSettings.config.deleteWord')"
                       variant="error"
-                      @click="dialogMeetingExclusion = false"
+                      @click="removeSelf(schedule.id)"
                     />
                   </div>
                 </div>
                 <template #footer>
                   <alex-custom-dialog-footer class="noShow"
-                /></template>
-              </alex-custom-dialog>
-            </alex-custom-button>
+                /></template> </alex-custom-dialog
+              >,
+            </div>
+            <div v-else class="no-encounters mb-4">
+              <p>
+                <span class="body-p1">{{
+                  t('pages.courseSettings.config.noSyncMeetings')
+                }}</span>
+              </p>
+            </div>
+            <span class="action-content">
+              <alex-custom-button
+                class="button"
+                prepend-icon="mdi-plus"
+                variant="primary"
+                >{{
+                  t('pages.courseSettings.config.createSyncMeetingButton')
+                }}</alex-custom-button
+              >
+            </span>
           </div>
-          <div class="no-encounters mb-4">
-            <p>
-              <span class="body-p1">{{
-                t('pages.courseSettings.config.noSyncMeetings')
-              }}</span>
-            </p>
-          </div>
-          <span class="action-content">
-            <alex-custom-button
-              class="button"
-              prepend-icon="mdi-plus"
-              variant="primary"
-              >{{
-                t('pages.courseSettings.config.createSyncMeetingButton')
-              }}</alex-custom-button
-            >
-          </span>
         </div>
       </div>
       <div class="d-flex content-area">
@@ -442,6 +464,25 @@ import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 
 const dialogMeetingExclusion = ref(false);
+const schedules = ref([
+  {
+    id: '1',
+    date: new Date().toISOString(),
+    startHour: new Date().toISOString(),
+    endHour: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    date: new Date().toISOString(),
+    startHour: new Date().toISOString(),
+    endHour: new Date().toISOString(),
+  },
+]);
+const { createCourseRules } = useFormRules();
+
+const removeSelf = (id: string) => {
+  schedules.value = schedules.value.filter((item) => item.id !== id);
+};
 const { t } = useI18n();
 const { find, findOne, update, create, delete: _delete } = useStrapi();
 const { generateUrl } = useInvitationLink();
@@ -846,5 +887,21 @@ p {
   padding: 6.5px 16px;
   justify-content: center;
   align-items: center;
+}
+
+.meetings {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+.test {
+  display: flex !important;
+  justify-content: space-between !important;
+  border-radius: 8px;
+  border: 1px solid var(--Cinza-Cinza-azulado, #f1f5f9);
+  padding: 12px 16px;
+  align-self: stretch;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 </style>

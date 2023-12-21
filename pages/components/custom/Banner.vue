@@ -260,27 +260,27 @@ const showSettings = ref(false);
 const showSettings2 = ref(false);
 const showSettings3 = ref(false);
 const showSettings4 = ref(false);
-const updateUser = async (show = true) => {
-  const populate = [
-    'cover',
-    'avatar',
-    'learningPlans',
-    'socials',
-    'trails',
-    'role',
-    'user_descriptions',
-    'user_wallet',
-  ];
+// const updateUser = async (show = true) => {
+//   const populate = [
+//     'cover',
+//     'avatar',
+//     'learningPlans',
+//     'socials',
+//     'trails',
+//     'role',
+//     'user_descriptions',
+//     'user_wallet',
+//   ];
 
-  user.value = await findOne<User>('users', id, {
-    populate: populate,
-  });
-  if (!user.value.avatar) user.value.avatar = profilePicture;
-  if (!user.value.cover) {
-    user.value.cover = coverPicture;
-  }
-  setMessage('done', 'green', show);
-};
+//   user.value = await findOne<User>('users', id, {
+//     populate: populate,
+//   });
+//   if (!user.value.avatar) user.value.avatar = profilePicture;
+//   if (!user.value.cover) {
+//     user.value.cover = coverPicture;
+//   }
+//   setMessage('done', 'green', show);
+// };
 
 await updateUser(false);
 
