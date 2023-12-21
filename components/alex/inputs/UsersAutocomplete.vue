@@ -31,7 +31,8 @@
         />
       </template>
     </alex-inputs-autocomplete>
-    <div v-if="selectedItems.length">
+
+    <v-slide-y-transition group>
       <alex-custom-list-item-user
         v-for="item in selectedItems"
         :key="item.id"
@@ -44,7 +45,7 @@
         @delete="() => removeSelf(item.id)"
         @reload="() => emit('refresh:invite')"
       />
-    </div>
+    </v-slide-y-transition>
   </div>
 </template>
 
