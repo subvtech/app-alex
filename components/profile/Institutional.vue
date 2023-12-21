@@ -1,12 +1,12 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.institutional.title')"
-    :full-width="true"
     :isEditing="isEditing && canEdit"
     :showIcon="canEdit"
     @toggle:isEditing="isEditing = !isEditing"
     :cancel="onCancel"
     :save="onSave"
+    full-width
   >
     <template v-slot:content>
       <alex-inputs-institutions
@@ -47,13 +47,13 @@
       </div>
       <div
         v-else
-        class="d-flex flex-column justify-center align-center pa-6"
+        class="d-flex flex-column w-100 justify-center align-center pa-6"
         style="gap: 16px"
       >
-        <NuxtImg
+        <img
           src="/svg/EmptyInstitutional.svg"
-          placeholder
-          style="height: 160px; width: 160px"
+          width="160"
+          height="160"
         />
         <span class="info text-center" style="color: rgb(175, 175, 175)">
           {{ $t('components.profile.institutional.emptyInstitutional') }}

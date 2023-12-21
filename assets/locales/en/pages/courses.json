@@ -10,7 +10,13 @@
   "details": "Details",
   "about": {
     "title": "About the course",
-    "empty": "It seems that this course doesn't have a description..."
+    "empty": "It seems that this course doesn't have a description...",
+    "placeholder": "Type something in...",
+    "updated": "About section was successfully updated."
+  },
+  "media": {
+    "updated": "Available media successfully updated",
+    "empty": "It seems that this course has no media."
   },
   "notfound": "Course not found"
 }

@@ -84,8 +84,6 @@ const { find, findOne } = useStrapi();
 const route = useRoute();
 const router = useRouter();
 const messageStore = useMessageStore();
-const profilePicture = ref<string | null>(null);
-const coverPicture = ref<string | null>(null);
 const canEdit = ref(false);
 const showSettings = ref(false);
 
@@ -159,9 +157,7 @@ const updateUser = async (show = true, message?) => {
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
-  if (user.value.avatar) profilePicture.value = user.value.avatar.url;
-  if (user.value.cover) coverPicture.value = user.value.cover.url;
-
+  
   messageStore.setMessage(message ?? 'done', 'green', show);
 };
 

@@ -40,7 +40,13 @@
 import { PropType } from 'nuxt/dist/app/compat/capi';
 import { useField } from 'vee-validate';
 import AppAutocomplete from '../AppAutocomplete.vue';
-const emit = defineEmits(['success']);
+const emit = defineEmits([
+  'error:keyword',
+  'error:description',
+  'success:keyword',
+  'success:description',
+  'success',
+]);
 const { keywordRules, descriptionRules } = useFormRules();
 
 const props = defineProps({
@@ -92,6 +98,18 @@ const updateItems = (newValue) => {};
 const descriptionErrorOrKeywordError = computed(
   () => keywordField.errorMessage.value || descriptionField.errorMessage.value,
 );
+
+watch(descriptionField.errorMessage, () => {
+  if (descriptionField.errorMessage.value)
+    emit('error:description', props.index);
+  else emit('success:description', props.index);
+});
+
+watch(keywordField.errorMessage, () => {
+  if (keywordField.errorMessage.value) emit('error:keyword', props.index);
+  else emit('success:keyword', props.index);
+});
+
 watch(
   [
     keywordField.value,
@@ -100,15 +118,13 @@ watch(
     descriptionField.errorMessage,
   ],
   () => {
-    if (descriptionErrorOrKeywordError) {
-    } else {
+    if (!descriptionErrorOrKeywordError.value)
       emit('success', {
         id: props.id,
         index: props.index,
         keyWord: keywordField.value.value,
         description: descriptionField.value.value,
       });
-    }
   },
 );
 </script>

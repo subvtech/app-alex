@@ -1,16 +1,19 @@
 <template>
   <v-snackbar
-    v-if="data"
+    v-if="currentShow"
     class="snackbar"
-    v-model="data.show"
+    v-model="currentShow"
+    @update:model-value="updateModelValue"
     :color="currentColor"
-    top
     :timeout="timeout"
+    location="bottom right"
     data-testid="snackbar"
   >
-    <v-row justify="space-between" align="center" class="py-4 pl-4 pr-8">
+    <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8">
       <v-row justify="start" align="center">
-        <v-icon v-if="color === 'green' || color === '#26BF6B'">mdi-check-circle-outline</v-icon>
+        <v-icon v-if="currentColor === 'green' || color === '#26BF6B'"
+          >mdi-check-circle-outline</v-icon
+        >
         <v-icon v-else>mdi-close-circle-outline</v-icon>
         <span class="text-white font-weight-bold">{{ currentMessage }}</span>
       </v-row>
@@ -18,28 +21,13 @@
         >mdi-close</v-icon
       >
     </v-row>
-    <div class="lowbar w-100" />
-  </v-snackbar>
-  <v-snackbar
-    v-else
-    class="snackbar"
-    v-model="show"
-    :color="currentColor"
-    top
-    :timeout="timeout"
-    data-testid="snackbar"
-  >
-    <v-row justify="space-between" align="center" class="py-4 pl-4 pr-8">
-      <v-row justify="start" align="center">
-        <v-icon v-if="color === 'green' || color === '#26BF6B'">mdi-check-circle-outline</v-icon>
-        <v-icon v-else>mdi-close-circle-outline</v-icon>
-        <span class="text-white font-weight-bold">{{ currentMessage }}</span>
-      </v-row>
-      <v-icon class="close" size="x-small" @click="onClose" role="close-btn"
-        >mdi-close</v-icon
-      >
-    </v-row>
-    <div class="lowbar w-100" />
+    <div class="w-100 bg-white lowbar">
+      <div
+        class="bar h-100"
+        :class="startTimer ? 'w-100' : ''"
+        :style="`transition: width ${timeout}ms linear`"
+      />
+    </div>
   </v-snackbar>
 </template>
 
@@ -54,7 +42,20 @@ const props = defineProps({
   },
 });
 
-const timeout = 5000;
+const { data } = toRefs(props);
+
+const timeout = ref(5000);
+const startTimer = ref(false);
+
+const updateModelValue = (newValue) => {
+  if (data?.value) data.value.show = newValue;
+  show.value = newValue;
+  startTimer.value = true;
+};
+
+const currentShow = computed(() =>
+  data?.value?.show ? data.value.show : show.value,
+);
 
 const currentColor = computed(() =>
   data?.value?.color ? data.value.color : color.value ? color.value : '#26bf6b',
@@ -68,27 +69,38 @@ const currentMessage = computed(() =>
     : 'done',
 );
 
-const { data } = toRefs(props);
-
 const onClose = () => {
-  if (data) if (data.value) data.value.show = false;
+  if (data?.value) data.value.show = false;
   show.value = false;
+  startTimer.value = false;
 };
+
+watch(currentShow, () => {
+  setTimeout(() => {
+    startTimer.value = !startTimer.value;
+  }, 10);
+  
+});
 </script>
 <style scoped lang="scss">
 .lowbar {
-  position: absolute;
+  border-end-end-radius: 8px;
+  margin-top: 45px;
   bottom: 0px;
   left: 0px;
-  background-color: white;
-  border-end-end-radius: 8px;
   height: 4px;
+  background-color: white;
+  position: absolute;
+}
+
+.bar {
+  background-color: blue;
+  width: 0%;
 }
 .snackbar {
   display: inline-flex;
   min-width: 300px;
-  max-width: 600px;
-  flex-direction: column;
+  flex-direction: column-reverse;
   justify-content: center;
   align-items: flex-start;
   border-radius: 8px;
@@ -112,8 +124,7 @@ span {
 .close {
   position: absolute;
   top: 16px;
-  right: 16px;
-
+  right: 8px; 
   color: white;
 }
 </style>

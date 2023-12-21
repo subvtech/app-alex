@@ -2,7 +2,7 @@
   <alex-custom-card
     class="w-100"
     :title="$t('components.meeting.title')"
-    href="dsads"
+    :href="canEdit ? '/settings' : ''"
     hide-dividers
     sizing-class="ma-0"
     is-nested
@@ -24,8 +24,8 @@
         v-for="item in data"
         :date="item.attributes.date"
         :frequency="item.attributes.schedule.data.attributes.frequency"
-        :start-hour="item.attributes.schedule.data.attributes.startHour"
-        :end-hour="item.attributes.schedule.data.attributes.endHour"
+        :start-hour="item.attributes.schedule.data.attributes.startDate"
+        :end-hour="item.attributes.schedule.data.attributes.endDate"
         :interval="item.attributes.schedule.data.attributes.interval"
       />
     </template>
@@ -40,6 +40,7 @@ defineProps({
     >,
     default: [],
   },
+  canEdit: { type: Boolean, default: false },
   isFacilitator: {
     type: Boolean,
     default: false,

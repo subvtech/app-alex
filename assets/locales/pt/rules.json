@@ -23,7 +23,7 @@
 
   "description": {
     "required": "Esse campo é obrigatório",
-    "min": "Mínimo de 12 caracteres",
+    "min": "Mínimo de 6 caracteres",
     "max": "Máximo de 4000 caracteres"
   },
 

@@ -10,19 +10,19 @@
           : null
       "
       :profile-picture-size="24"
-      :profile-picture="avatar"
+      :profile-picture="owner.attributes.user.data.attributes.avatar.data"
       :userId="id"
       show-profile-picture
       darker-background
       show-shade
       show-menu
       settings-menu
-      show-settings
+      :show-settings="canEdit"
       distribution="fullname-username-role"
       :selectedOption="selectedOption"
       @select:option="selectOption"
       is-professor
-      :fullname="fullname"
+      :fullname="owner.attributes.user.data.attributes.fullname"
       :title="$t('pages.courses.class')"
       :copy-object="
         plainLink
@@ -48,8 +48,22 @@
       >
         <template #content>
           <div class="d-flex flex-column align-center gap-12">
+            <app-media
+              :title="$t('pages.courses.media.title')"
+              :images="
+                course.media.data.map((item) => {
+                  return { id: item.id, ...item.attributes };
+                })
+              "
+              :course-id="course.id"
+              :can-edit="canEdit"
+              :empty-text-message="$t('pages.courses.media.empty')"
+              sizing-class="pa-0"
+              is-nested
+              hide-dividers
+              full-width
+            />
             <app-about
-              :title="$t('pages.courses.about.title')"
               :text="course.description"
               :user-id="course.id"
               :can-edit="canEdit"
@@ -64,8 +78,9 @@
             <courses-goals
               :can-edit="canEdit"
               :course-id="course.id"
+              :user-id="owner.id"
               :data="
-                course.goals.data.map((item) => {
+                course.learning_goals.data.map((item) => {
                   return {
                     id: item.id,
                     title: item.attributes.description,
@@ -85,14 +100,20 @@
               @update="(data) => updateCourse(true, data.message)"
               is-nested
             />
+
             <courses-editor
               v-if="
-                (course.course_descriptions.data.length === 0 && canEdit) ||
-                course.course_descriptions.data.length !== 0
+                (course.blocks.data.length === 0 && canEdit) ||
+                course.blocks.data.length !== 0
               "
               :info="
-                course.course_descriptions.data.map((item) => {
-                  return { id: item.id, ...item.attributes };
+                course.blocks.data.map((item) => {
+                  return {
+                    id: item.id,
+                    data: item.attributes.data,
+                    type: item.attributes.type,
+                    order: item.attributes.order,
+                  };
                 })
               "
               :courseId="course.id"
@@ -106,7 +127,7 @@
         </template>
       </alex-custom-card>
 
-      <div class="d-flex flex-column w-100 gap-6">
+      <div class="d-flex flex-column w-100 gap-6 max-width">
         <alex-custom-card
           :title="$t('pages.courses.details')"
           :show-icon="false"
@@ -134,7 +155,11 @@
             />
           </template>
           <template #footer>
-            <courses-meetings :data="meetings" :is-facilitator="canEdit" />
+            <courses-meetings
+              :can-edit="canEdit"
+              :data="meetings"
+              :is-facilitator="canEdit"
+            />
             <courses-invites
               v-if="canEdit"
               :enable-invites="course.invite_enabled"
@@ -197,17 +222,17 @@ const invitationLink = ref();
 const plainLink = ref<string | null>(null);
 const componentKey = ref(0);
 
-const { id, fullname, avatar } = useStrapiUser<User>().value;
+const { id } = useStrapiUser<User>().value;
 
 const route = useRoute();
 const router = useRouter();
 const selectedOption = ref(0);
-
+const owner = ref<any>();
 const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const canEdit = computed(() => course.value.owner.id === id.value);
+const canEdit = computed(() => owner.value?.id === id.value);
 const { setMessage } = useMessageStore();
 
 definePageMeta({
@@ -228,10 +253,10 @@ const populate = [
   'cover_image',
   'media',
   'invitation_links',
-  'course_descriptions',
-  'goals.verb',
+  'blocks',
+  'learning_goals.verb',
+  'members.user.avatar',
   'tags',
-  'owner',
   'schedules',
 ];
 
@@ -268,6 +293,7 @@ const updateCourse = async (show = true, message?) => {
           }
         });
       }
+
       if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
       generalTags.value = course.value.tags.data.reduce((acc, item) => {
         if (item.attributes.isGeneral) {
@@ -283,6 +309,11 @@ const updateCourse = async (show = true, message?) => {
 
         return acc;
       }, []);
+
+      owner.value = course.value.members.data.filter(
+        (member) => member.attributes.role === 'facilitator',
+      )[0];
+
       updateMeetings(course.value.schedules).then();
 
       setMessage(message ?? 'done', 'green', show);
@@ -294,7 +325,7 @@ const updateCourse = async (show = true, message?) => {
 
 const updateMeetings = async (schedules) => {
   meetings.value = (
-    await find('meetings', {
+    await find('learning-plan-meetings', {
       filters: {
         schedule: {
           id: {
@@ -306,13 +337,17 @@ const updateMeetings = async (schedules) => {
       populate: 'schedule',
       sort: 'date:asc',
     })
-  ).data;
+  ).data.splice(0, 2);
 };
 
 const updateAbout = async (text) => {
-  await update('/courses', course.value.id, {
-    info: text,
+  await update('/learningplans', course.value.id, {
+    description: text,
   });
+  await updateCourse(
+    true,
+    i18n.t('components.courses.about.description.updated'),
+  );
 };
 
 watch(invitationLink, () => {
@@ -321,6 +356,49 @@ watch(invitationLink, () => {
 });
 </script>
 <style scoped lang="scss">
+.course-page {
+  .left-block {
+    min-width: 66% !important;
+    padding-inline: 24px !important;
+    padding-block: 24px;
+  }
+}
+
+@media (max-width: 1420px) {
+  .course-page {
+    .left-block {
+      min-width: 50% !important;
+    }
+  }
+}
+
+@media (max-width: 1075px) {
+  .course-page {
+    flex-wrap: wrap;
+    &.gap-6 {
+      gap: 12px !important;
+    }
+    .left-block {
+      min-width: 33% !important;
+      padding-inline: 8px !important;
+    }
+    .max-width {
+      max-width: unset;
+    }
+  }
+}
+
+@media (max-width: 961px) {
+  .course-page {
+    .left-block {
+      min-width: 50% !important;
+      padding-inline: 24px !important;
+    }
+    .max-width {
+      max-width: 450px;
+    }
+  }
+}
 @media (max-width: 850px) {
   .course-page {
     flex-direction: column;
@@ -328,11 +406,14 @@ watch(invitationLink, () => {
     .left-block {
       padding-inline: 24px !important;
     }
+    .max-width {
+      max-width: unset;
+    }
   }
 }
 
 .max-width {
-  max-width: 850px;
+  max-width: 500px;
 }
 
 .gap-6 {
