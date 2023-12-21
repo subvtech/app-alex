@@ -70,6 +70,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'imagePreview',
     'tagCombobox',
     'dialog',
+    'carousel',
     'institutions',
     'usersAutocomplete',
     'learningPlan/editor',
