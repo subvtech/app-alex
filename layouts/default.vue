@@ -34,7 +34,8 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :user="user"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
       @click="onClickOutside"
       :menu-items="profileMenuItems"
       show-picture
@@ -53,20 +54,18 @@ import useNavigationDrawer from '~/composables/useNavigationDrawer';
 import { useOnBoarding } from '@/composables/useOnBoarding';
 import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 const i18n = useI18n();
+const config = useRuntimeConfig();
 
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
-
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
 
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  if (user.value) {
-    userStore.profilePicture = user.value.avatar;
-    userStore.fullname = user.value.fullname;
-  }
+  userStore.profilePicture = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
 });
 
 const steps = [
@@ -184,7 +183,7 @@ const steps = [
 
 const { tour, activeTour } = useOnBoarding(steps);
 
-const menus = [
+const defaultMenus = [
   {
     title: i18n.t('layouts.default.userArea'),
     dataTour: 'step-user-area',
@@ -256,6 +255,25 @@ const menus = [
     ],
   },
 ];
+
+const componentsMenu = [
+  {
+    title: 'Componentes',
+    items: [
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Documentacao',
+        to: '/components',
+      },
+    ],
+  },
+];
+
+const menus = computed(() => {
+  return config.public.showComponentsPage
+    ? defaultMenus.concat(componentsMenu)
+    : defaultMenus;
+});
 
 const miniVariant = ref(false);
 </script>

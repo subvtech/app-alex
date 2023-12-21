@@ -73,7 +73,7 @@ $btn-icon-density: (
   };
 }
 
-$colors-scrollBar: (white, 'gray-blue', 'gray-100');
+$colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 
 @each $color in $colors-scrollBar {
   .alex-scrollbar-#{$color}::-webkit-scrollbar {
@@ -95,4 +95,29 @@ $colors-scrollBar: (white, 'gray-blue', 'gray-100');
 .max-height-stepper {
   max-height: calc(100svh - 392px);
   overflow-y: auto;
+}
+
+/* Autocomplete inputs */
+.v-input.dark input:-webkit-autofill,
+.v-input.dark input:-webkit-autofill:hover, 
+.v-input.dark input:-webkit-autofill:focus,
+.v-input.dark textarea:-webkit-autofill,
+.v-input.dark textarea:-webkit-autofill:hover,
+.v-input.dark textarea:-webkit-autofill:focus,
+.v-input.dark select:-webkit-autofill,
+.v-input.dark select:-webkit-autofill:hover,
+.v-input.dark select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 3000px rgb(var(--v-theme-primary-0)) inset !important; 
+  -webkit-text-fill-color: white !important;
+}
+.v-input input:-webkit-autofill,
+.v-input input:-webkit-autofill:hover, 
+.v-input input:-webkit-autofill:focus,
+.v-input textarea:-webkit-autofill,
+.v-input textarea:-webkit-autofill:hover,
+.v-input textarea:-webkit-autofill:focus,
+.v-input select:-webkit-autofill,
+.v-input select:-webkit-autofill:hover,
+.v-input select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 3000px #fff inset !important; 
 }
