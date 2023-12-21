@@ -50,7 +50,11 @@
           <div class="d-flex flex-column align-center gap-12">
             <app-media
               :title="$t('pages.courses.media.title')"
-              :media="course.media"
+              :images="
+                course.media.data.map((item) => {
+                  return { id: item.id, ...item.attributes };
+                })
+              "
               :course-id="course.id"
               :can-edit="canEdit"
               :empty-text-message="$t('pages.courses.media.empty')"
@@ -224,7 +228,7 @@ const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const canEdit = computed(() => course.value.owner.data.id === id.value || true);
+const canEdit = computed(() => course.value.owner.data.id === id.value);
 const { setMessage } = useMessageStore();
 
 definePageMeta({

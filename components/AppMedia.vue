@@ -88,7 +88,6 @@ const onCancel = async () => {
 };
 
 const onSlidesChanged = async (data) => {
-  console.log({ data });
   myImages.value = data;
 };
 const toggleIsEditing = () => {
@@ -98,9 +97,16 @@ const toggleIsEditing = () => {
 const onSave = async () => {
   const createPromises = myImages.value
     .filter(
-      (item) => props.images.findIndex((item2) => item2.id === item.id) !== -1,
+      (item) =>
+        props.images.findIndex(
+          (item2) =>
+            item2.title === item.title &&
+            item2.video === item.video &&
+            item2.title === item.title &&
+            item.image === item.image,
+        ) === -1,
     )
-    .map((item) => create('medias', { ...item }));
+    .map((item) => create('medias', { ...item, learningplan: props.courseId }));
 
   const deletePromises = props.images
     .filter(
@@ -113,6 +119,7 @@ const onSave = async () => {
   promises.push(...createPromises, ...deletePromises);
 
   await Promise.all(promises);
+
 };
 
 watch(images, () => {
