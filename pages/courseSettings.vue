@@ -137,15 +137,16 @@
         </div>
         <div class="content-body">
           <div class="meetings d-flex flex-column w-100">
-            <div v-if="schedules.length > 0">
+            <div v-if="canEdit">
               <course-meeting
-                v-for="schedule in schedules"
-                :key="schedule.id"
-                frequency="sunday"
+                v-for="(schedule, index) in schedules"
+                :id="schedule.attributes.id"
+                :key="index"
+                :frequency="schedule.attributes.frequency"
                 class="test"
-                :date="schedule.date"
-                :start-hour="schedule.startHour"
-                :end-hour="schedule.endHour"
+                :date="new Date().toISOString()"
+                :start-hour="new Date().toISOString()"
+                :end-hour="new Date().toISOString()"
                 :variant="'editing'"
                 :dropdown-props="[
                   {
@@ -210,9 +211,8 @@
                   </div>
                 </div>
                 <template #footer>
-                  <alex-custom-dialog-footer class="noShow"
-                /></template> </alex-custom-dialog
-              >,
+                  <alex-custom-dialog-footer class="noShow" /></template
+              ></alex-custom-dialog>
             </div>
             <div v-else class="no-encounters mb-4">
               <p>
@@ -464,20 +464,20 @@ import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 
 const dialogMeetingExclusion = ref(false);
-const schedules = ref([
-  {
-    id: '1',
-    date: new Date().toISOString(),
-    startHour: new Date().toISOString(),
-    endHour: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    date: new Date().toISOString(),
-    startHour: new Date().toISOString(),
-    endHour: new Date().toISOString(),
-  },
-]);
+// const schedules = ref([
+//   {
+//     id: '1',
+//     date: new Date().toISOString(),
+//     startHour: new Date().toISOString(),
+//     endHour: new Date().toISOString(),
+//   },
+//   {
+//     id: '2',
+//     date: new Date().toISOString(),
+//     startHour: new Date().toISOString(),
+//     endHour: new Date().toISOString(),
+//   },
+// ]);
 const { createCourseRules } = useFormRules();
 
 const removeSelf = (id: string) => {
@@ -492,6 +492,7 @@ const canEdit = ref(true);
 // const canEdit = computed(() => course.value.owner.id === id.value);
 const { setMessage } = useMessageStore();
 const meetings = ref<any>();
+const schedules = ref([]);
 const generalTags = ref();
 const technicalTags = ref();
 const invitationLink = ref();
@@ -501,7 +502,9 @@ const emit = defineEmits([]);
 
 const getCourseInfo = async () => {
   try {
-    const response = await fetch('http://localhost:1337/api/learningplans');
+    const response = await fetch(
+      'http://localhost:1337/api/learningplans?populate=*',
+    );
     if (!response.ok) {
       throw new Error('Erro ao obter dados da API');
     }
@@ -517,7 +520,10 @@ const getCourseInfo = async () => {
       course.value.slug = courseData.attributes.slug;
       course.value.invitation_message =
         courseData.attributes.invitation_message;
-      course.value.schedule = courseData.attributes.schedule;
+      schedules.value = courseData.attributes.schedules.data;
+
+      console.log(courseData);
+      console.log(schedules.value);
     }
 
     // await updateCourse(false);
