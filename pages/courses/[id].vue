@@ -10,7 +10,7 @@
           : null
       "
       :profile-picture-size="24"
-      :profile-picture="course.owner.data.attributes.avatar.data"
+      :profile-picture="owner.attributes.user.data.attributes.avatar.data"
       :userId="id"
       show-profile-picture
       darker-background
@@ -22,7 +22,7 @@
       :selectedOption="selectedOption"
       @select:option="selectOption"
       is-professor
-      :fullname="course.owner.data.attributes.fullname"
+      :fullname="owner.attributes.user.data.attributes.fullname"
       :title="$t('pages.courses.class')"
       :copy-object="
         plainLink
@@ -78,7 +78,7 @@
             <courses-goals
               :can-edit="canEdit"
               :course-id="course.id"
-              :user-id="course.owner.data.id"
+              :user-id="owner.id"
               :data="
                 course.learning_goals.data.map((item) => {
                   return {
@@ -155,7 +155,11 @@
             />
           </template>
           <template #footer>
-            <courses-meetings :can-edit="canEdit" :data="meetings" :is-facilitator="canEdit" />
+            <courses-meetings
+              :can-edit="canEdit"
+              :data="meetings"
+              :is-facilitator="canEdit"
+            />
             <courses-invites
               v-if="canEdit"
               :enable-invites="course.invite_enabled"
@@ -223,12 +227,12 @@ const { id } = useStrapiUser<User>().value;
 const route = useRoute();
 const router = useRouter();
 const selectedOption = ref(0);
-
+const owner = ref<any>();
 const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const canEdit = computed(() => course.value.owner.data.id === id.value);
+const canEdit = computed(() => owner.value?.id === id.value);
 const { setMessage } = useMessageStore();
 
 definePageMeta({
@@ -251,8 +255,8 @@ const populate = [
   'invitation_links',
   'blocks',
   'learning_goals.verb',
+  'members.user.avatar',
   'tags',
-  'owner.avatar',
   'schedules',
 ];
 
@@ -289,7 +293,7 @@ const updateCourse = async (show = true, message?) => {
           }
         });
       }
-      console.log({ course: course.value });
+
       if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
       generalTags.value = course.value.tags.data.reduce((acc, item) => {
         if (item.attributes.isGeneral) {
@@ -305,6 +309,10 @@ const updateCourse = async (show = true, message?) => {
 
         return acc;
       }, []);
+
+      owner.value = course.value.members.data.filter(
+        (member) => member.attributes.role === 'facilitator',
+      )[0];
 
       updateMeetings(course.value.schedules).then();
 
