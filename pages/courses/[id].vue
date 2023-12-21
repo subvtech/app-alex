@@ -48,8 +48,18 @@
       >
         <template #content>
           <div class="d-flex flex-column align-center gap-12">
+            <app-media
+              :title="$t('pages.courses.media.title')"
+              :media="course.media"
+              :course-id="course.id"
+              :can-edit="canEdit"
+              :empty-text-message="$t('pages.courses.media.empty')"
+              sizing-class="pa-0"
+              is-nested
+              hide-dividers
+              full-width
+            />
             <app-about
-              :title="$t('pages.courses.about.title')"
               :text="course.description"
               :user-id="course.id"
               :can-edit="canEdit"
@@ -214,7 +224,7 @@ const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const canEdit = computed(() => course.value.owner.data.id === id.value);
+const canEdit = computed(() => course.value.owner.data.id === id.value || true);
 const { setMessage } = useMessageStore();
 
 definePageMeta({
@@ -275,7 +285,7 @@ const updateCourse = async (show = true, message?) => {
           }
         });
       }
-      console.log({course: course.value})
+      console.log({ course: course.value });
       if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
       generalTags.value = course.value.tags.data.reduce((acc, item) => {
         if (item.attributes.isGeneral) {
@@ -322,7 +332,10 @@ const updateAbout = async (text) => {
   await update('/learningplans', course.value.id, {
     description: text,
   });
-  await updateCourse(true, i18n.t('components.courses.about.description.updated'));
+  await updateCourse(
+    true,
+    i18n.t('components.courses.about.description.updated'),
+  );
 };
 
 watch(invitationLink, () => {
@@ -338,21 +351,17 @@ watch(invitationLink, () => {
   }
 }
 
-
-@media (max-width: 961px) {
+@media (max-width: 1420px) {
   .course-page {
     .left-block {
-      min-width: 66% !important;
-      padding-inline: 24px !important;
-    }
-    .max-width {
-      max-width: 450px;
+      min-width: 50% !important;
     }
   }
 }
 
 @media (max-width: 1075px) {
   .course-page {
+    flex-wrap: wrap;
     &.gap-6 {
       gap: 12px !important;
     }
@@ -361,11 +370,22 @@ watch(invitationLink, () => {
       padding-inline: 8px !important;
     }
     .max-width {
-      max-width: 325px;
+      max-width: unset;
     }
   }
 }
 
+@media (max-width: 961px) {
+  .course-page {
+    .left-block {
+      min-width: 50% !important;
+      padding-inline: 24px !important;
+    }
+    .max-width {
+      max-width: 450px;
+    }
+  }
+}
 @media (max-width: 850px) {
   .course-page {
     flex-direction: column;
@@ -375,14 +395,6 @@ watch(invitationLink, () => {
     }
     .max-width {
       max-width: unset;
-    }
-  }
-}
-
-@media (max-width: 1420px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
     }
   }
 }

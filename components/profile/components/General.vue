@@ -21,7 +21,7 @@
       :text="info"
       :userId="userId"
       :can-edit="canEdit"
-      :empty-text-message="$t('components.profile.about.placeholder')"
+      :about-text-message="$t('components.profile.about.placeholder')"
       @update="updateAbout"
     />
     <div

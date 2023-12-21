@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="d-flex w-100 py-3 px-4 justify-space-between align-center"
-
-  >
+  <div class="d-flex w-100 py-3 px-4 justify-space-between align-center">
     <div class="d-flex flex-column">
       <span class="date">
         {{ formattedDate }}
@@ -12,7 +9,10 @@
       </span>
     </div>
 
-    <div class="d-flex justify-space-between align-end gap-2" :class="isEditing ? 'flex-row' : 'flex-column-reverse'">
+    <div
+      class="d-flex justify-space-between align-end gap-2"
+      :class="isEditing ? 'flex-row' : 'flex-column-reverse'"
+    >
       <span class="duration">
         {{ duration }}
       </span>
@@ -23,7 +23,14 @@
           >
         </template>
       </alex-inputs-dropdown>
-      <img v-else class="cursor-pointer" src="/svg/calendar.svg" @click="emit('click:calendar')" width="24" height="24">
+      <img
+        v-else
+        class="cursor-pointer"
+        src="/svg/calendar.svg"
+        @click="emit('click:calendar')"
+        width="24"
+        height="24"
+      />
     </div>
   </div>
 </template>
@@ -31,12 +38,22 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
+import { Item } from './alex/inputs/Dropdown.vue';
 const { t } = useI18n();
 const emit = defineEmits(['click:activator', 'click:calendar']);
 
 const props = defineProps({
   frequency: {
-    type: String,
+    type: String as PropType<
+      | 'sunday'
+      | 'monday'
+      | 'tuesday'
+      | 'wednesday'
+      | 'thursday'
+      | 'friday'
+      | 'saturday'
+      | 'interval'
+    >,
     required: true,
   },
   interval: {
@@ -68,15 +85,7 @@ const props = defineProps({
     default: false,
   },
   dropdownProps: {
-    type: Array as PropType<
-      {
-        icon: string;
-        text: string;
-        warning?: boolean;
-        link: string;
-        action: () => void;
-      }[]
-    >,
+    type: Array as PropType<Item[]>,
     default: [
       {
         icon: 'mdi-pencil',

@@ -24,8 +24,8 @@
         v-for="item in data"
         :date="item.attributes.date"
         :frequency="item.attributes.schedule.data.attributes.frequency"
-        :start-hour="item.attributes.schedule.data.attributes.startHour"
-        :end-hour="item.attributes.schedule.data.attributes.endHour"
+        :start-hour="item.attributes.schedule.data.attributes.startDate"
+        :end-hour="item.attributes.schedule.data.attributes.endDate"
         :interval="item.attributes.schedule.data.attributes.interval"
       />
     </template>

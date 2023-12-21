@@ -130,7 +130,7 @@ const withinBreakpoint = computed(() => currentWidth.value < 450);
 
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
 
-const toggleDisableSave = (index) => {
+const toggleDisableSave = () => {
   const errorFound = dataCopy.value.find(
     (item) => item.errorTitle || item.errorKeyWord,
   );
@@ -142,23 +142,23 @@ const toggleDisableSave = (index) => {
 const onErrorDescription = (index) => {
   dataCopy.value[index].errorTitle = true;
   disableSave.value = true;
-  toggleDisableSave(index);
+  toggleDisableSave();
 };
 
 const onErrorKeyword = (index) => {
   dataCopy.value[index].errorKeyWord = true;
-  toggleDisableSave(index);
+  toggleDisableSave();
 };
 
 const onSuccessDescription = (index) => {
   dataCopy.value[index].errorTitle = false;
   disableSave.value = true;
-  toggleDisableSave(index);
+  toggleDisableSave();
 };
 
 const onSuccessKeyword = (index) => {
   dataCopy.value[index].errorKeyWord = false;
-  toggleDisableSave(index);
+  toggleDisableSave();
 };
 
 onBeforeMount(async () => {
@@ -247,7 +247,6 @@ const onSave = async () => {
 
   const updatePromises = updateArray.value.map(async (item) => {
     const connectArray = await getConnectArray(item.keyWord.id, item.keyWord);
-
     return update(`learning-goals/${item.id}`, {
       description: item.description,
       verb: {
@@ -266,8 +265,20 @@ const onSave = async () => {
 
   await Promise.all(promises);
 
+  let previousId: number | null = null;
   await update('learningplans', props.courseId, {
-    goals: dataCopy.value.map((item) => item.id),
+    learning_goals: {
+      connect: dataCopy.value.map((item, index) => {
+        if (index === 0) {
+          previousId = item.id!;
+          return { id: item.id, position: { start: true } };
+        }
+
+        let afterId = previousId;
+        previousId = item.id!;
+        return { id: item.id, position: { after: afterId } };
+      }),
+    },
   });
   emit('update', { message: t('components.courses.goals.update') });
   rerender.value -= 1;
@@ -282,6 +293,13 @@ watch(canEdit, () => {
 watch(data, () => {
   dataCopy.value = [...props.data];
 });
+watch(
+  dataCopy,
+  () => {
+    toggleDisableSave();
+  },
+  { deep: true },
+);
 </script>
 <style scoped lang="scss">
 .max-width {

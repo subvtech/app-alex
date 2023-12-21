@@ -11,20 +11,16 @@
     full-width
   >
     <template v-slot:content>
-      <div>
-        <div
-          v-if="isEmptyAndIsNotEditing"
-          class="d-flex flex-column justify-center align-center"
-          style="gap: 16px"
-        >
-          <alex-custom-empty-placeholder
-            empty-text-image="/svg/EmptyAbout.svg"
-            :empty-text-message="
-              $t('components.courses.editor.emptyPlaceholder')
-            "
-          />
-        </div>
+      <div
+        v-if="isEmptyAndIsNotEditing"
+        class="d-flex flex-column w-100 justify-center align-center gap-4"
+      >
+        <alex-custom-empty-placeholder
+          empty-text-image="/svg/EmptyAbout.svg"
+          :empty-text-message="$t('components.courses.editor.emptyPlaceholder')"
+        />
       </div>
+
       <client-only>
         <div
           id="editorjs"
@@ -248,6 +244,9 @@ watch(isEmptyAndIsNotEditing, () => {
 </script>
 
 <style global lang="scss">
+.gap-4 {
+  gap: 16px;
+}
 #editorjs {
   max-width: 100% !important;
 }

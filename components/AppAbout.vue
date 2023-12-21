@@ -10,21 +10,22 @@
     full-width
   >
     <template v-slot:content class="pa-6">
-      <div
-        class="d-flex flex-column gap-6 w-100"
-        :class="fullWidth ? 'w-100' : ''"
-      >
+      <div class="d-flex flex-column w-100">
         <alex-custom-empty-placeholder
           v-if="isTextEmpty && !isEditingAndCanEdit"
+          :empty-text-image="emptyTextImage ?? undefined"
           :empty-text-message="
-            emptyTextMessage ?? $t('components.appAbout.empty')
+            emptyTextMessage ??
+            $t('pages.courses.about.empty')
           "
         />
         <span
           v-else
           class="info"
           :contenteditable="isEditingAndCanEdit"
-          :data-placeholder="$t('components.appAbout.placeholder')"
+          :data-placeholder="
+            textPlaceholder ?? $t('pages.courses.about.placeholder')
+          "
           @input="updateText"
           >{{ myText }}</span
         >
@@ -41,7 +42,7 @@ const emit = defineEmits(['update']);
 const props = defineProps({
   title: {
     type: String,
-    required: true,
+    default: ''
   },
   text: {
     type: String,
@@ -57,6 +58,7 @@ const props = defineProps({
   emptyTextMessage: {
     type: String,
   },
+  textPlaceholder: { type: String },
   emptyTextImage: {
     type: String,
   },
@@ -67,6 +69,10 @@ const props = defineProps({
   images: {
     type: Array as PropType<any[]>,
     default: [],
+  },
+  showMedia: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -97,6 +103,9 @@ watch(text, () => {
 </script>
 
 <style scoped lang="scss">
+.gap-8 {
+  gap: 32px;
+}
 .text-color {
   color: rgb(175, 175, 175);
 }

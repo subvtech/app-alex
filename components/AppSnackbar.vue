@@ -124,8 +124,7 @@ span {
 .close {
   position: absolute;
   top: 16px;
-  right: 16px;
-
+  right: 8px; 
   color: white;
 }
 </style>

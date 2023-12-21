@@ -13,5 +13,11 @@
   "settings": "Settings",
   "cover": "Update cover",
   "startDate": "Start date",
-  "endDate": "End date"
+  "endDate": "End date",
+  "about": {
+    "title": "About",
+    "empty": "It seems there's no description...",
+    "placeholder": "Type something in...",
+    "updated": "About section was successfully updated."
+  }
 }
