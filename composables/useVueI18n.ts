@@ -74,6 +74,8 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'carousel',
     'institutions',
     'usersAutocomplete',
+    'meeting',
+    'courses/meeting',
     'learningPlan/editor',
     'learningPlan/cardTrails',
     'learningPlan/card',

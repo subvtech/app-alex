@@ -49,14 +49,14 @@ const props = withDefaults(
 const variants = {
   primary: { textColor: 'white', bgColor: 'secondary-0' },
   secondary: {
-    textColor: 'gray-600',
+    textColor: 'gray-800',
     bgColor: 'gray-blue',
   },
   tertiary: {
-    textColor: 'gray-600',
+    textColor: 'gray-800',
     bgColor: 'gray-100',
   },
-  text: { textColor: 'gray-600', bgColor: '' },
+  text: { textColor: 'gray-800', bgColor: '' },
   error: { textColor: 'white', bgColor: 'error-0' },
   success: { textColor: 'white', bgColor: 'success-0' },
   warning: { textColor: 'white', bgColor: 'warning-0' },
