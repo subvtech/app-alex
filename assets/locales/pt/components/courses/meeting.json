@@ -36,6 +36,8 @@
       "student": "Parece que você não tem encontro síncrono"
     },
     "edit": "Editar",
+    "add": "Adicionar",
+    "cancel": "Cancelar",
     "delete": "Excluir",
     "course": {
       "title": "Deixe salvos seus encontros síncronos",
