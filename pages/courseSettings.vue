@@ -95,6 +95,7 @@
                 required
                 class="w-100"
                 close-on-select
+                @input="updateStartDate"
               />
 
               <alex-inputs-date
@@ -104,6 +105,7 @@
                 :model-value="course.end_date"
                 required
                 class="w-100"
+                @input="updateEndDate"
               />
             </div>
           </div>
@@ -121,9 +123,14 @@
             <alex-custom-button class="button" variant="secondary">{{
               t('pages.courseSettings.config.cancelButton')
             }}</alex-custom-button>
-            <alex-custom-button class="button" variant="primary">{{
-              t('pages.courseSettings.config.saveButton')
-            }}</alex-custom-button>
+            <alex-custom-button
+              class="button"
+              variant="primary"
+              @click="saveGeneralChanges"
+              >{{
+                t('pages.courseSettings.config.saveButton')
+              }}</alex-custom-button
+            >
           </span>
         </div>
       </div>
@@ -231,8 +238,11 @@
                   t('pages.courseSettings.config.createSyncMeetingButton')
                 }}</alex-custom-button
               >
-              <alex-learningplan-modal-schedule v-model="createSchedule" />
             </span>
+            <alex-learningplan-modal-schedule
+              v-model="createSchedule"
+              :data="newData"
+            />
           </div>
         </div>
       </div>
@@ -270,6 +280,8 @@
                   :info="$t('pages.courseSettings.config.inviteTooltip')"
                 />
               </div>
+              {{ selectedTime }}
+              {{ course.duration }}
               <div class="w-3/4">
                 <span class="body-p1 py-2">
                   {{ t('pages.courseSettings.config.linkAddress') }}
@@ -280,7 +292,7 @@
                   no-header
                   class="mt-2 w-full"
                   :enable-invites="course.invite_enabled"
-                  :duration="course.invitation_duration"
+                  :duration="course.duration"
                   :course-id="course.id"
                   :data="invitationLink"
                   @update:link="
@@ -464,24 +476,11 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
+import { format } from 'date-fns';
 
 const dialogMeetingExclusion = ref(false);
 const createSchedule = ref(false);
 
-// const schedules = ref([
-//   {
-//     id: '1',
-//     date: new Date().toISOString(),
-//     startHour: new Date().toISOString(),
-//     endHour: new Date().toISOString(),
-//   },
-//   {
-//     id: '2',
-//     date: new Date().toISOString(),
-//     startHour: new Date().toISOString(),
-//     endHour: new Date().toISOString(),
-//   },
-// ]);
 const { createCourseRules } = useFormRules();
 
 const removeSelf = (id: string) => {
@@ -493,16 +492,28 @@ const { generateUrl } = useInvitationLink();
 const route = useRoute();
 const course = ref<any>({});
 const canEdit = ref(true);
-// const canEdit = computed(() => course.value.owner.id === id.value);
+const owner = ref<any>();
 const { setMessage } = useMessageStore();
-const meetings = ref<any>();
 const schedules = ref([]);
-const generalTags = ref();
-const technicalTags = ref();
 const invitationLink = ref();
 const plainLink = ref<string | null>(null);
-const selectedTime = ref('');
-const emit = defineEmits([]);
+const newData = ref<any>({});
+
+const emit = defineEmits(['update:modelValue']);
+const selectedTime = computed({
+  get() {
+    return course.value.duration;
+  },
+  set(value) {
+    const time = value.split(' ');
+    if (time[1] === 'minutos') {
+      course.value.duration = time[0] * 60;
+    } else if (time[1] === 'hora' || time[1] === 'horas') {
+      course.value.duration = time[0] * 60 * 60;
+    }
+    emit('update:modelValue', value);
+  },
+});
 
 const getCourseInfo = async () => {
   try {
@@ -524,83 +535,57 @@ const getCourseInfo = async () => {
       course.value.slug = courseData.attributes.slug;
       course.value.invitation_message =
         courseData.attributes.invitation_message;
-      course.value.owner = courseData.attributes.owner.data.attributes;
       schedules.value = courseData.attributes.schedules.data;
-
-      console.log(courseData);
-      console.log(course.value.owner);
-      console.log(schedules.value);
+      invitationLink.value = generateUrl(courseData.id);
     }
-
-    await updateCourse(false);
   } catch (error) {
     console.error('Erro na requisição:', error.message);
   }
 };
 
-const updateCourse = async (show = true, message?) => {
-  let { id } = route.params;
-
-  let temp;
-  if (course.value.invitation_links) {
-    course.value.invitation_links.data.forEach((link) => {
-      const expirationDate = new Date(link.attributes.expires_at);
-
-      if (
-        link.attributes.role === 'student' &&
-        expirationDate.getTime() > new Date().getTime()
-      ) {
-        const differenceBetweenLinks = temp
-          ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
-          : 1;
-
-        if (!temp || differenceBetweenLinks > 0) {
-          temp = link;
-        }
-      }
-    });
-  }
-  if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
-  generalTags.value = course.value.tags.data.reduce((acc, item) => {
-    if (item.attributes.isGeneral) {
-      acc.push({ id: item, ...item.attributes });
-    }
-
-    return acc;
-  }, []);
-  technicalTags.value = course.value.tags.data.reduce((acc, item) => {
-    if (!item.attributes.isGeneral) {
-      acc.push({ id: item, ...item.attributes });
-    }
-
-    return acc;
-  }, []);
-  updateMeetings(course.value.schedules).then();
-
-  setMessage(message ?? 'done', 'green', show);
-};
-
-const updateMeetings = async (schedules) => {
-  meetings.value = (
-    await find('meetings', {
-      filters: {
-        schedule: {
-          id: {
-            $in: schedules.data.map((item) => item.id),
-          },
+const saveGeneralChanges = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:1337/api/learningplans/${course.value.id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        isExpired: false,
+        body: JSON.stringify({
+          title: course.value.title,
+          start_date: course.value.start_date,
+          end_date: course.value.end_date,
+          slug: course.value.slug,
+        }),
       },
-      populate: 'schedule',
-      sort: 'date:asc',
-    })
-  ).data;
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Erro ao enviar dados para a API: ${response.statusText}`,
+      );
+    }
+
+    const responseData = await response.json();
+    console.log('Resposta da API:', responseData);
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+const updateStartDate = () => {
+  course.value.start_date = formatDate(course.value.start_date);
 };
 
-watch(invitationLink, () => {
-  if (invitationLink.value.data)
-    plainLink.value = generateUrl(invitationLink.value.data.hash);
-});
+const updateEndDate = () => {
+  course.value.end_date = formatDate(course.value.end_date);
+};
+
+const formatDate = (dateString) => {
+  const date = dateString ? parseISO(dateString) : null;
+  const formatString = t('locale') === 'en' ? 'MM/dd/yyyy' : 'dd/MM/yyyy';
+  return date ? format(date, formatString) : null;
+};
 
 const timeOptions = ref([
   t('pages.courseSettings.config.fiveMinutes'),
