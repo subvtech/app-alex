@@ -247,17 +247,20 @@ function newSlide(file, res) {
   if (file.type.includes('image')) {
     return {
       title: file.title,
-      image: res.url.url,
+      image: res.url,
       type: 'FileImage',
       icon: file.icon,
+      imgId: res.imgId,
     };
   } else {
     return {
       title: file.title,
-      video: res.url.url,
-      image: res.thumbnail.thumbnail,
+      video: res.url,
+      image: res.thumbnail,
       type: 'FileVideo',
       icon: file.icon,
+      imgId: res.imgId,
+      videoId: res.videoId,
     };
   }
 }
@@ -282,11 +285,11 @@ const addSlide = async (slide, index) => {
   if (index !== -1) {
     onDeletedSlide(slides.value[index]);
   }
-  for (const s of slidesArray) {
-    if (typeof s.url === 'string') {
-      addSlideByUrl(s, index);
+  for (const slide of slidesArray) {
+    if (typeof slide.url === 'string') {
+      addSlideByUrl(slide, index);
     } else {
-      await addSlideByFile(s, index);
+      await addSlideByFile(slide, index);
     }
   }
   if (slidesChanged) {
@@ -376,27 +379,14 @@ const editSlides = async (files, deleted, added) => {
 };
 
 const onDeletedSlide = async (file) => {
-  const fileImage = await strapiClient(`/upload/files?url=${file.image}`, {
-    method: 'GET',
-  }).then((res) => res[0]);
-
-  if (fileImage) {
-    await strapiClient(`/upload/files/${fileImage.id}`, {
+  if (file.videoId)
+    await strapiClient(`/upload/files/${file.videoId}`, {
       method: 'DELETE',
     });
-  }
-
-  if (file.video) {
-    const fileVideo = await strapiClient(`/upload/files?url=${file.video}`, {
-      method: 'GET',
-    }).then((res) => res[0]);
-
-    if (fileVideo) {
-      await strapiClient(`/upload/files/${fileVideo.id}`, {
-        method: 'DELETE',
-      });
-    }
-  }
+  if (file.imgId)
+    strapiClient(`/upload/files/${file.imgId}`, {
+      method: 'DELETE',
+    });
 };
 
 const onSelectFile = async (slides) => {
@@ -431,13 +421,27 @@ const onSelectFile = async (slides) => {
   });
   if (slides.length > 1) {
     const url = res[0].url;
+    const videoId = res[0].id;
     const thumbnail = res[1].url;
-    return { success: 1, url: { url }, thumbnail: { thumbnail } };
+    const imgId = res[1].id;
+    return { success: 1, url, thumbnail, videoId, imgId };
   } else {
-    const url = res[0].url;
-    return { success: 1, url: { url } };
+    const { url, id } = res[0];
+    return { success: 1, url, imgId: id };
   }
 };
+
+const clearSlides = () => {
+  const deletedSlides = [...slides.value];
+  deletedSlides.forEach(async (slide) => {
+    if (slide.type.includes('File')) await onDeletedSlide(slide);
+  });
+  slides.value = [];
+  emit('update:modelValue', slides.value);
+};
+defineExpose({
+  clearSlides,
+});
 </script>
 
 <style>
