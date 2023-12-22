@@ -74,10 +74,10 @@
           <div class="d-flex w-100">
             <alex-inputs-text-field
               v-model="urlInput"
+              name="url"
               :placeholder="$t('components.carousel.linkPlaceholder')"
-              variant="outlined"
-              :error-messages="errors"
               :rules="urlRules"
+              variant="outlined"
               density="compact"
               class="w-100"
             >
@@ -87,7 +87,6 @@
               icon="mdi-plus"
               class="ml-2"
               size="42px"
-              color="accent"
               :loading="isLoading"
               @click="addUrl(urlInput)"
             ></alex-custom-button>
@@ -173,6 +172,7 @@
               v-model="slides[index].title"
               placeholder="Insira o título"
               label="Titulo da Mídia"
+              name="title"
             >
             </alex-inputs-text-field>
           </template>
