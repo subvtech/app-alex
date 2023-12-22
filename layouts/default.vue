@@ -196,7 +196,7 @@ const defaultMenus = [
       {
         icon: 'mdi-book-cog-outline',
         title: i18n.t('layouts.default.myClasses'),
-        to: '/courses/me',
+        to: '/classes',
       },
       {
         icon: 'mdi-clipboard-multiple-outline',
