@@ -30,20 +30,15 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="
-          slide.type.includes('File')
-            ? uploadBaseUrl + slide.image
-            : slide.image
-        "
+        :image="slide.image"
       >
         <template #content>
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
-              color="gray-700"
-              class="text-green"
+              color="gray-500"
               icon="mdi-cog"
               style="
-                background-color: rgba(0, 0, 0, 0.25) !important;
+                background-color: rgba(255, 255, 255, 0.25) !important;
                 z-index: 0 !important;
               "
               @click="openAddSlidesDialog(-1, slides)"
@@ -54,16 +49,7 @@
             class="w-100 fill-height video-js"
             controls
             :is-active="activeSlide == i"
-            :options="{
-              playbackRates: [0.5, 1, 1.5, 2],
-              poster: uploadBaseUrl + slide.image,
-              sources: [
-                {
-                  src: uploadBaseUrl + slide.video,
-                  type: 'video/mp4',
-                },
-              ],
-            }"
+            :options="videoPlayerOptions(slide)"
             :data-setup="{}"
           ></video-player>
           <video-player
@@ -72,19 +58,11 @@
             "
             class="w-100 fill-height video-js"
             controls
-            :options="{
-              playbackRates: [0.5, 1, 1.5, 2],
-            }"
+            :options="videoPlayerOptions(slide)"
             :is-active="activeSlide == i"
             :data-setup="
               JSON.stringify({
                 techOrder: [slide.type],
-                sources: [
-                  {
-                    src: slide.video,
-                    type: `video/${slide.type}`,
-                  },
-                ],
               })
             "
           ></video-player>
@@ -121,22 +99,10 @@
         :bullets="false"
         :autoplay="false"
         disable-arrows-on-edges
-        :breakpoints="{
-          900: { visibleSlides: !readOnly ? 2.5 : 3.5 },
-          600: {
-            fixedHeight: '80px',
-            visibleSlides: !readOnly ? 2.5 : 3.5,
-          },
-        }"
+        :breakpoints="carouselBreakPoints"
         fixed-height="120px"
         style="z-index: 0; max-width: 850px; max-height: 120px"
-        @slide="
-          $refs.vueperslides1 &&
-            $refs.vueperslides1.goToSlide($event.currentSlide.index, {
-              emit: false,
-            }),
-            (activeSlide = $event.currentSlide.index)
-        "
+        @slide="onCarouselSlide($event)"
       >
         <template #arrow-left>
           <alex-custom-button
@@ -161,16 +127,9 @@
           :aria-label="slide.title"
           class="slide-track-item"
           style="max-width: 200px"
-          :image="
-            slide.type.includes('File')
-              ? uploadBaseUrl + slide.image
-              : slide.image
-          "
+          :image="slide.image"
           :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-          @click="
-            $refs.vueperslides2 &&
-              $refs.vueperslides2.goToSlide(slides.indexOf(slide))
-          "
+          @click="onSlideClick(slide)"
         >
           <template #content>
             <div v-if="!readOnly" class="ma-2 d-flex align-center justify-end">
@@ -217,22 +176,27 @@
   </div>
   <FileModal
     ref="dialog"
-    @upload-files="(f, index) => addSlide(f, index)"
-    @change-slides="(f, added, deleted) => editSlides(f, added, deleted)"
+    @upload-files="addSlide"
+    @change-slides="editSlides"
   />
 </template>
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
-import { ref } from 'vue';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
-import { useMessageStore } from '~/stores/message';
-const messageStore = useMessageStore();
+import {
+  useCaptureVideoThumbnail,
+  useGetYoutubeThumbnail,
+  useGetVimeoThumbnail,
+} from '@/composables/useCaptureVideoThumbnail';
+const vueperslides1 = ref();
+const vueperslides2 = ref();
+
 const strapiClient = useStrapiClient();
 const props = defineProps({
-  slides: {
+  modelValue: {
     type: Array,
     default: () => [],
   },
@@ -242,100 +206,105 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['slidesChanged']);
+const emit = defineEmits(['update:modelValue']);
 
-const uploadBaseUrl = computed(() => useStrapiUrl().replace('/api', ''));
+const slides = ref([...props.modelValue]);
 
-const captureVideoFrame = (file) => {
-  return new Promise((resolve, reject) => {
-    const videoEl = document.createElement('video');
-    videoEl.muted = true;
-    videoEl.autoplay = false;
-    videoEl.preload = 'metadata';
-    videoEl.src = URL.createObjectURL(file);
+const videoPlayerOptions = (slide) => {
+  let type = slide.type;
+  if (slide.type.includes('File')) type = 'mp4';
+  return {
+    playbackRates: [0.5, 1, 1.5, 2],
+    poster: slide.image,
+    sources: [
+      {
+        src: slide.video,
+        type: `video/${type}`,
+      },
+    ],
+  };
+};
 
-    videoEl.addEventListener('loadedmetadata', () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoEl.videoWidth;
-      canvas.height = videoEl.videoHeight;
-      const ctx = canvas.getContext('2d');
-      const seekTime = Math.min(3, videoEl.duration);
-      videoEl.currentTime = seekTime;
+const carouselBreakPoints = computed(() => {
+  return {
+    900: { visibleSlides: !props.readOnly ? 2.5 : 3.5 },
+    600: {
+      fixedHeight: '80px',
+      visibleSlides: !props.readOnly ? 2.5 : 3.5,
+    },
+  };
+});
 
-      videoEl.addEventListener('seeked', () => {
-        ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
-        const thumbnailDataUrl = canvas.toDataURL('image/jpeg');
-        videoEl.remove();
-        canvas.remove();
-        resolve(thumbnailDataUrl);
-      });
+const onSlideClick = (slide) => {
+  vueperslides2.value.goToSlide(slides.value.indexOf(slide));
+};
 
-      videoEl.addEventListener('error', (e) => {
-        reject(e);
-      });
-    });
-  });
+const onCarouselSlide = (event) => {
+  vueperslides1.value.goToSlide(event.currentSlide.index, { emit: false });
+  activeSlide.value = event.currentSlide.index;
 };
 
 function newSlide(file, res) {
   if (file.type.includes('image')) {
     return {
       title: file.title,
-      image: res.url.url,
+      image: res.url,
       type: 'FileImage',
       icon: file.icon,
+      imgId: res.imgId,
     };
   } else {
     return {
       title: file.title,
-      video: res.url.url,
-      image: res.thumbnail.thumbnail,
+      video: res.url,
+      image: res.thumbnail,
       type: 'FileVideo',
       icon: file.icon,
+      imgId: res.imgId,
+      videoId: res.videoId,
     };
   }
 }
 
-// const editMode = ref(!props.readOnly);
 const dialog = ref();
 const activeSlide = ref(0);
-const vueperslides2 = ref();
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
 
-const slides = ref([...props.slides]);
 const deleteSlide = (item) => {
   if (item.type.includes('File')) {
     onDeletedSlide(item);
   }
   slides.value.splice(slides.value.indexOf(item), 1);
-  emit('slidesChanged', slides.value, 'teste');
+  emit('update:modelValue', slides.value);
 };
 
 const addSlide = async (slide, index) => {
+  const slidesChanged = index !== -1;
   const slidesArray = [...slide];
   if (index !== -1) {
     onDeletedSlide(slides.value[index]);
   }
-  for (const s of slidesArray) {
-    if (typeof s.url === 'string') {
-      addSlideByUrl(s, index);
+  for (const slide of slidesArray) {
+    if (typeof slide.url === 'string') {
+      addSlideByUrl(slide, index);
     } else {
-      await addSlideByFile(s, index);
+      await addSlideByFile(slide, index);
     }
   }
-  if (index === -1) {
-    vueperslides2.value.goToSlide(slides.value.length - 1);
-  } else {
+  if (slidesChanged) {
     vueperslides2.value.goToSlide(index);
+  } else {
+    vueperslides2.value.goToSlide(slides.value.length - 1);
   }
 };
 
 const addSlideByFile = async (slide, index) => {
+  const slidesChanged = index !== -1;
   const files = [slide];
   if (slide.url.type.includes('video')) {
-    await captureVideoFrame(slide.url).then((res) => {
+    await useCaptureVideoThumbnail(slide.url).then((res) => {
       files.push({
         url: res,
         title: `${slide.title.replace(/\.[^/.]+$/, '')}-thumbnail.jpg`,
@@ -347,25 +316,33 @@ const addSlideByFile = async (slide, index) => {
   if (res.success !== 1) {
     return;
   }
-  index === -1
-    ? slides.value.push(newSlide(slide, res))
-    : slides.value.splice(index, 1, newSlide(slide, res));
-  emit('slidesChanged', slides.value);
+  slidesChanged
+    ? slides.value.splice(index, 1, newSlide(slide, res))
+    : slides.value.push(newSlide(slide, res));
+  emit('update:modelValue', slides.value);
 };
 
 const addSlideByUrl = (slide, index) => {
+  const slidesChanged = index !== -1;
+
   let newSlide = {};
   if (
     slide.url.startsWith('https://www.youtube.com') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
+    let image, type;
+    if (slide.url.includes('www.youtube')) {
+      type = 'youtube';
+      image = useGetYoutubeThumbnail(slide.url);
+    } else {
+      type = 'vimeo';
+      image = useGetVimeoThumbnail(slide.url);
+    }
     newSlide = {
       title: slide.title,
       video: slide.url,
-      image: slide.url.includes('www.youtube')
-        ? `https://img.youtube.com/vi/${slide.url.split('v=')[1]}/0.jpg`
-        : `https://vumbnail.com/${slide.url.split('vimeo.com/')[1]}.jpg`,
-      type: slide.url.includes('www.youtube') ? 'youtube' : 'vimeo',
+      image,
+      type,
       icon: slide.icon,
     };
   } else {
@@ -376,17 +353,17 @@ const addSlideByUrl = (slide, index) => {
       icon: slide.icon,
     };
   }
-  index === -1
-    ? slides.value.push(newSlide)
-    : slides.value.splice(index, 1, newSlide);
-  emit('slidesChanged', slides.value);
+  slidesChanged
+    ? slides.value.splice(index, 1, newSlide)
+    : slides.value.push(newSlide);
+  emit('update:modelValue', slides.value);
 };
 
-const editSlides = async (f, deleted, added) => {
+const editSlides = async (files, deleted, added) => {
   await deleted.forEach((slide) => {
     deleteSlide(slide);
   });
-  slides.value = [...f];
+  slides.value = [...files];
   await added.forEach((slide) => {
     const index = slides.value.findIndex(
       (s) => s.title === slide.title && s.url === slide.url,
@@ -398,29 +375,22 @@ const editSlides = async (f, deleted, added) => {
     }
   });
   if (added.length === 0) {
-    emit('slidesChanged', slides.value);
+    emit('update:modelValue', slides.value);
   }
 };
 
 const onDeletedSlide = async (file) => {
-  await strapiClient('/upload/files', {
-    method: 'GET',
-  }).then((res) => {
-    const files = res;
-    const fileImage = files.find((f) => f.url === file.image);
-    strapiClient(`/upload/files/${fileImage.id}`, {
+  if (file.videoId)
+    await strapiClient(`/upload/files/${file.videoId}`, {
       method: 'DELETE',
     });
-    if (file.video) {
-      const fileVideo = files.find((f) => f.url === file.video);
-      strapiClient(`/upload/files/${fileVideo.id}`, {
-        method: 'DELETE',
-      });
-    }
-  });
+  if (file.imgId)
+    strapiClient(`/upload/files/${file.imgId}`, {
+      method: 'DELETE',
+    });
 };
 
-const onSelectFile = (slides) => {
+const onSelectFile = async (slides) => {
   const formData = new FormData();
   slides.forEach((slide) => {
     if (slide.url instanceof File) {
@@ -446,24 +416,33 @@ const onSelectFile = (slides) => {
       formData.append('files', imageFile, imageFile.name);
     }
   });
-  return strapiClient('/upload', {
+  const res = await strapiClient('/upload', {
     method: 'POST',
     body: formData,
-  })
-    .then((res) => {
-      if (slides.length > 1) {
-        const url = res[0].url;
-        const thumbnail = res[1].url;
-        return { success: 1, url: { url }, thumbnail: { thumbnail } };
-      } else {
-        const url = res[0].url;
-        return { success: 1, url: { url } };
-      }
-    })
-    .catch((err) => {
-      messageStore.message = err;
-    });
+  });
+  if (slides.length > 1) {
+    const url = res[0].url;
+    const videoId = res[0].id;
+    const thumbnail = res[1].url;
+    const imgId = res[1].id;
+    return { success: 1, url, thumbnail, videoId, imgId };
+  } else {
+    const { url, id } = res[0];
+    return { success: 1, url, imgId: id };
+  }
 };
+
+const clearSlides = () => {
+  const deletedSlides = [...slides.value];
+  deletedSlides.forEach(async (slide) => {
+    if (slide.type.includes('File')) await onDeletedSlide(slide);
+  });
+  slides.value = [];
+  emit('update:modelValue', slides.value);
+};
+defineExpose({
+  clearSlides,
+});
 </script>
 
 <style>
