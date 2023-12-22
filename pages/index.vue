@@ -86,7 +86,7 @@
             <alex-custom-button append-icon="mdi-plus" variant="secondary"
               ><alex-learningplan-modal-schedule
                 v-model="createScheduleModal"
-                @submit="(values) => console.log(values)"
+                @submit="(values) => addSchedule(values)"
               />Novo Encontro</alex-custom-button
             >
           </div>
@@ -111,7 +111,6 @@
             <template v-for="schedule in schedules" :key="schedule.id">
               <course-meeting
                 frequency="sunday"
-                class="test"
                 :date="schedule.meetingDate.toISOString()"
                 :start-hour="new Date().toISOString()"
                 :end-hour="new Date().toISOString()"
@@ -134,7 +133,7 @@
               <alex-learningplan-modal-schedule
                 v-model="editScheduleModal"
                 :data="schedule"
-                @submit="(values) => console.log(values)"
+                @submit="(values) => editMeeting(schedule.id, values)"
               />
             </template>
           </div>
@@ -144,6 +143,8 @@
   </v-row>
 </template>
 <script setup lang="ts">
+import { Meeting } from '~/components/alex/learningplan/modal/Schedule.vue';
+
 const dialogStepper = ref(false);
 const createScheduleModal = ref(false);
 const editScheduleModal = ref(false);
@@ -151,26 +152,23 @@ const startDate = ref<Date>(new Date());
 const endDate = ref<Date>(new Date());
 const slides = ref([]);
 const selectedUsers = ref([]);
-const schedules = ref([
-  {
-    id: '1',
-    frequency: 7,
-    meetingDate: new Date(),
-    startHour: '18:00',
-    endHour: '12:00',
-  },
-  {
-    id: '2',
-    frequency: 7,
-    meetingDate: new Date(),
-    startHour: '18:00',
-    endHour: '12:00',
-  },
-]);
+const schedules = ref<Meeting[]>([]);
 const { createCourseRules } = useFormRules();
 
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
+};
+
+const editMeeting = (id: string, values: Meeting) => {
+  schedules.value = schedules.value.map((meeting) => {
+    if (meeting.id === id) {
+      return { ...meeting, ...values };
+    }
+    return meeting;
+  });
+};
+const addSchedule = (values: Meeting) => {
+  schedules.value = [...schedules.value, values];
 };
 definePageMeta({
   middleware: 'auth',

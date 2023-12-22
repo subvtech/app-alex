@@ -29,12 +29,14 @@
       v-bind="$attrs"
     >
       <v-menu
+        v-model="menu"
         class="alex-picker"
         transition="scale-transition"
         offset-y
         min-width="auto"
         location="top start"
         activator="parent"
+        :close-on-content-click="false"
       >
         <v-date-picker
           v-model="value"
@@ -77,6 +79,7 @@ const { value, errorMessage } = useField(() => props.name, undefined, {
   syncVModel: true,
 });
 
+const menu = ref(false);
 const inputValue = computed({
   get() {
     return formatDate(value.value);
@@ -99,6 +102,8 @@ const textColor = computed(() => {
     return props.disabled ? 'gray-300' : 'white';
   }
 });
+
+watch(inputValue, () => (menu.value = false));
 </script>
 
 <style lang="scss">

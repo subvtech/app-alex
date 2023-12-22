@@ -54,10 +54,10 @@
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
-            :text="$t(`components.courses.meeting.${data ? 'edit' : 'add'}`)"
+            :text="$t(`components.courses.meeting.${data ? 'save' : 'add'}`)"
             size="large"
             type="submit"
-            prepend-icon="mdi-plus"
+            :prepend-icon="data ? 'mdi-check' : 'mdi-plus'"
           />
         </template>
         <template #secondarySlotButton>
@@ -76,15 +76,18 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+
+export interface Meeting {
+  id: string;
+  frequency: number;
+  meetingDate: Date;
+  startHour: string;
+  endHour: string;
+}
+
 interface ScheduleProps {
   modelValue: boolean;
-  data?: {
-    id: string;
-    frequency: number;
-    meetingDate: Date;
-    startHour: string;
-    endHour: string;
-  };
+  data?: Meeting;
 }
 
 const props = withDefaults(defineProps<ScheduleProps>(), {
@@ -98,6 +101,8 @@ const { handleSubmit } = useForm({ validationSchema: scheduleRules });
 
 const submit = handleSubmit((values) => {
   emit('submit', values);
+  emit('update:modelValue', false);
+  emit('update:data', undefined);
 });
 
 const value = computed({
