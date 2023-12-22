@@ -129,7 +129,6 @@
                   },
                 ]"
               />
-
               <alex-learningplan-modal-schedule
                 v-model="editScheduleModal"
                 :data="schedule"
@@ -168,7 +167,7 @@ const editMeeting = (id: string, values: Meeting) => {
   });
 };
 const addSchedule = (values: Meeting) => {
-  schedules.value = [...schedules.value, values];
+  schedules.value.push({ ...values, id: crypto.randomUUID() });
 };
 definePageMeta({
   middleware: 'auth',

@@ -87,7 +87,7 @@ export interface Meeting {
 
 interface ScheduleProps {
   modelValue: boolean;
-  data?: Meeting;
+  data?: Meeting | null;
 }
 
 const props = withDefaults(defineProps<ScheduleProps>(), {
@@ -101,8 +101,8 @@ const { handleSubmit } = useForm({ validationSchema: scheduleRules });
 
 const submit = handleSubmit((values) => {
   emit('submit', values);
+
   emit('update:modelValue', false);
-  emit('update:data', undefined);
 });
 
 const value = computed({
@@ -137,4 +137,10 @@ const meetingDate = ref<Date | undefined>(data.value?.meetingDate || undefined);
 const frequency = ref<number | null>(data.value?.frequency || 0);
 const startHour = ref(data.value?.startHour || '');
 const endHour = ref(data.value?.endHour || '');
+
+watch(value, () => {
+  if (!value.value) {
+    emit('update:data', null);
+  }
+});
 </script>
