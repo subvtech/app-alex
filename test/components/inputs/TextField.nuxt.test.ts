@@ -1,26 +1,31 @@
-import { describe, it, expect } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { screen, within, render, fireEvent } from '@testing-library/vue';
-import { vuetify } from '../../plugins/vuetify';
+import { vuetify } from '@/plugins/vuetify';
+import TextFieldComponent from '@/components/alex/inputs/TextField.vue';
 
-import TextFieldComponent from '../../components/Alex/inputs/TextField.vue';
 let modelValue = 'Test Value';
+let rerenderBind: (props: object) => Promise<void>;
 describe('TextField component', () => {
-  const { rerender } = render(TextFieldComponent, {
-    props: {
-      placeholder: 'johndoe@gmail.com',
-      hint: 'Enter your email',
-      label: 'Email Input',
-      persistentHint: true,
-      modelValue: '',
-      'onUpdate:modelValue': (e) => {
-        modelValue = e;
-        rerender({ modelValue: e });
+  beforeEach(() => {
+    const { rerender } = render(TextFieldComponent, {
+      props: {
+        placeholder: 'johndoe@gmail.com',
+        hint: 'Enter your email',
+        label: 'Email Input',
+        persistentHint: true,
+        name: 'test',
+        role: 'textfield',
+        modelValue: '',
+        'onUpdate:modelValue': (e) => {
+          modelValue = e;
+          rerender({ modelValue: e });
+        },
       },
-    },
-    global: {
-      plugins: [vuetify],
-    },
+      global: {
+        plugins: [vuetify],
+      },
+    });
+    rerenderBind = rerender;
   });
   it('should render the TextField component', async () => {
     const textfield = await screen.findByRole('textfield');
@@ -46,9 +51,9 @@ describe('TextField component', () => {
   });
 
   it('Should show the error message instead of the hint message', async () => {
-    await rerender({ 'error-messages': 'This field is required' });
+    await rerenderBind({ 'error-messages': 'This field is required' });
     const error = await screen.findByText('This field is required');
-    const hint = await screen.queryByText('Enter your email');
+    const hint = screen.queryByText('Enter your email');
     expect(error).not.toBeNull();
     expect(hint).toBeNull();
   });

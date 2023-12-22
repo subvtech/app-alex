@@ -12,82 +12,93 @@
       </v-card>
     </v-col>
     <v-col>
-      <v-card class="card card-acesso px-10">
-        <div align="center">
-          <img
-            alt="Alex"
-            src="/images/alex.svg"
-            class="card-acesso-alex-logo"
-          />
-        </div>
-
-        <div class="form d-flex flex-column">
+      <v-card class="card card-acesso d-flex justify-center align-center">
+        <div class="form d-flex flex-column" style="max-width: 400px">
           <div class="d-flex flex-column">
-            <v-card-title class="text-white text-center text-bold">
+            <v-card-title
+              class="text-white text-h3 text-center text-bold mt-16"
+            >
               {{ $t('pages.login.welcome') }}
             </v-card-title>
             <v-card-subtitle
-              class="text-white text-center"
+              class="text-subtitle-2 text-white text-center"
               style="white-space: normal"
             >
               {{ $t('pages.login.access') }}
             </v-card-subtitle>
           </div>
-          <v-form ref="form" @submit.prevent="submit">
-            <alex-inputs-stepper-field
-              :label="$t('pages.login.email')"
+          <v-form
+            ref="form"
+            class="d-flex flex-column gap-1"
+            @submit.prevent="submit"
+          >
+            <alex-inputs-text-field
+              :label="$t('pages.login.user')"
+              :placeholder="$t('pages.login.userHolder')"
               name="email"
               color="white"
-              class="my-1 text-secondary"
               theme="dark"
             />
 
-            <alex-inputs-stepper-field
+            <alex-inputs-text-field
               :label="$t('pages.login.password')"
-              :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :placeholder="$t('pages.login.passwordHolder')"
+              :append-inner-icon="!passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
               :type="passwordVisible ? 'text' : 'password'"
               name="password"
               color="white"
-              class="my-1 text-secondary"
               theme="dark"
+              :hide-details="hasError"
               @click:append-inner="passwordVisible = !passwordVisible"
             />
-
+            <div class="mt-2">
+              <p v-show="hasError" class="text-body-1 text-error">
+                {{ errorMessage }}
+              </p>
+            </div>
             <div
-              class="d-flex justify-between align-center mb-3"
-              style="height: 24px"
+              class="d-flex justify-space-between align-center mb-2"
+              style="max-height: 30px"
             >
               <v-checkbox
                 v-model="checkbox"
                 class="text-white smaller-text"
                 color="accent"
-                :label="$t('pages.login.remember')"
-              ></v-checkbox>
+                base-color="white"
+                hide-details
+                style="margin-left: -8px"
+              >
+                <template #label>
+                  <span class="text-white text-body-2 text-high-emphasis">{{
+                    $t('pages.login.remember')
+                  }}</span>
+                </template>
+              </v-checkbox>
               <nuxt-link
                 to="/forgot"
-                class="blue-label smaller-text text-decoration-none pb-5"
+                class="blue-label smaller-text text-decoration-none"
               >
                 {{ $t('pages.login.forgot') }}
               </nuxt-link>
             </div>
 
-            <v-btn
+            <alex-custom-button
               block
-              :disabled="!isValid"
-              class="card-btn"
+              size="large"
               type="submit"
+              theme="dark"
+              :disabled="!isValid"
               :loading="logging"
             >
               {{ $t('pages.login.submit') }}
-            </v-btn>
+            </alex-custom-button>
           </v-form>
-          <v-card-text class="smaller-text text-white text-center">
+          <v-card-text
+            class="text-white text-center font-weight-bold text-body-2"
+          >
             {{ $t('pages.login.noAccount') }}
 
-            <nuxt-link
-              to="/register"
-              class="blue-label smaller-text text-decoration-none"
-            >
+            <nuxt-link to="/register" class="blue-label text-decoration-none">
               {{ $t('pages.login.register') }}
             </nuxt-link>
           </v-card-text>
@@ -108,8 +119,8 @@
           <v-btn
             block
             class="card-btn metamask d-flex"
-            @click="metalogin"
             :loading="logging2"
+            @click="metalogin"
           >
             <img src="/images/metamask.png" alt="" />
             <span>{{ $t('pages.login.metamask.btn') }}</span>
@@ -122,18 +133,18 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-const i18n = useI18n();
+import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
+const hasError = ref(false);
+const errorMessage = ref('');
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
 });
-const { login, setToken, setUser } = useStrapiAuth();
-const { create, find } = useStrapi();
+const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
-const messageStore = useMessageStore();
-
+const { mapStrapiErrors } = useStrapiHelpers();
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
   keepValuesOnUnmount: true,
@@ -144,22 +155,11 @@ const isValid = computed(
     !Object.values(controlledValues.value).includes(undefined) &&
     !Object.values(errors.value).length,
 );
-/*
-const loadMessages = async () => {
-  if (!i18n.availableLocales.includes(i18n.locale.value)) {
-    await loadLocaleMessages(i18n, i18n.locale.value);
-  }
-
-  // set i18n language
-  setI18nLanguage(i18n, i18n.locale.value);
-};
-*/
 
 const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-
 const { metalogin } = useMetamask(logging2);
 
 const submit = handleSubmit(async () => {
@@ -172,11 +172,18 @@ const submit = handleSubmit(async () => {
     });
 
     router.push('/');
-  } catch (error) {
+  } catch (err: unknown) {
+    hasError.value = true;
+    const error = err as Strapi4Error;
+    const catchErrorMessage = error?.error?.message;
+    if (catchErrorMessage) {
+      errorMessage.value = mapStrapiErrors(catchErrorMessage);
+    }
+  } finally {
     logging.value = false;
-    messageStore.message = i18n.t('pages.login.loginError');
-    messageStore.color = 'red';
-    messageStore.show = true;
+    setTimeout(() => {
+      hasError.value = false;
+    }, 5000);
   }
 });
 </script>
@@ -196,7 +203,6 @@ const submit = handleSubmit(async () => {
 
       .v-card-subtitle {
         font-size: 1.25rem;
-        padding-inline: 64px;
       }
     }
 
@@ -212,16 +218,12 @@ const submit = handleSubmit(async () => {
 
     &-acesso {
       background-image: url('/images/login-bg.svg');
-      background-repeat: initial;
+      background-repeat: no-repeat;
       background-size: cover;
+      background-position: center;
+      width: 629px;
       right: 0;
       overflow: auto;
-      width: 600px;
-
-      &-alex-logo {
-        width: 100px;
-        margin-block: 60px;
-      }
     }
 
     .blue-label {

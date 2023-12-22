@@ -1,9 +1,9 @@
 <template>
   <v-form
-    @submit.prevent="updateValues"
     ref="form"
     class="d-flex flex-row align-center justify-space-between w-100"
     style="gap: 16px"
+    @submit.prevent="updateValues"
   >
     <div class="contact-item d-flex flex-col align-center w-100">
       <div class="img-upload pa-1">
@@ -33,11 +33,11 @@
         </label>
         <input
           v-if="isEditing || isAdding"
-          @input="(e) => uploadNewIcon(e)"
-          style="display: none"
           :id="`new-icon-${social.id}`"
+          style="display: none"
           type="file"
           accept="image/png, image/jpeg, image/svg"
+          @input="(e) => uploadNewIcon(e)"
         />
       </div>
 
@@ -46,19 +46,17 @@
         class="d-flex flex-column w-100 mb-16"
         style="gap: 24px"
       >
-        <alex-inputs-stepper-field
+        <alex-inputs-text-field
           :label="label1 ? label1 : social.name"
-          name="name"
           :value="social.name"
+          name="name"
           color="black"
-          variant="outlined"
         />
-        <alex-inputs-stepper-field
+        <alex-inputs-text-field
           :label="label2 ? label2 : social.url"
-          name="url"
           :value="social.url"
+          name="url"
           color="black"
-          variant="outlined"
         />
       </div>
 
