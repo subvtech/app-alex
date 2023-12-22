@@ -195,7 +195,7 @@ const vueperslides2 = ref();
 
 const strapiClient = useStrapiClient();
 const props = defineProps({
-  slides: {
+  modelValue: {
     type: Array,
     default: () => [],
   },
@@ -205,7 +205,9 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['slidesChanged']);
+const emit = defineEmits(['update:modelValue']);
+
+const slides = ref([...props.modelValue]);
 
 const videoPlayerOptions = (slide) => {
   let type = slide.type;
@@ -266,13 +268,12 @@ const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
 
-const slides = ref([...props.slides]);
 const deleteSlide = (item) => {
   if (item.type.includes('File')) {
     onDeletedSlide(item);
   }
   slides.value.splice(slides.value.indexOf(item), 1);
-  emit('slidesChanged', slides.value);
+  emit('update:modelValue', slides.value);
 };
 
 const addSlide = async (slide, index) => {
@@ -314,7 +315,7 @@ const addSlideByFile = async (slide, index) => {
   slidesChanged
     ? slides.value.splice(index, 1, newSlide(slide, res))
     : slides.value.push(newSlide(slide, res));
-  emit('slidesChanged', slides.value);
+  emit('update:modelValue', slides.value);
 };
 
 const addSlideByUrl = (slide, index) => {
@@ -351,7 +352,7 @@ const addSlideByUrl = (slide, index) => {
   slidesChanged
     ? slides.value.splice(index, 1, newSlide)
     : slides.value.push(newSlide);
-  emit('slidesChanged', slides.value);
+  emit('update:modelValue', slides.value);
 };
 
 const editSlides = async (files, deleted, added) => {
@@ -370,7 +371,7 @@ const editSlides = async (files, deleted, added) => {
     }
   });
   if (added.length === 0) {
-    emit('slidesChanged', slides.value);
+    emit('update:modelValue', slides.value);
   }
 };
 

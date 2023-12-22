@@ -38,8 +38,8 @@
       remover e editar os slides, para o primeiro caso basta passar um array
       <strong>slides</strong> com as imagens em conjunto com a propriedade
       <strong>readonly</strong>, para o segundo caso deve-se utilizar um array
-      vazio e atualizar o banco através do evento
-      <strong>@slides-changed="(slide)"</strong>
+      vazio como v-model e atualizar o banco de dados conforme o v-model é
+      atualizado
     </p>
     <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
       <div>
@@ -119,7 +119,7 @@
       </div>
     </div>
     <div class="w-100">
-      <alex-custom-carousel :slides="slidesFirstExample" read-only />
+      <alex-custom-carousel v-model="slidesFirstExample" read-only />
     </div>
     <div class="w-100">
       <div
@@ -186,12 +186,11 @@
     <h2 class="text-h3 text-gray-800">Variante: Carousel Customizavel</h2>
     <p class="text-subtitle-2 text-gray-500">
       Caso deseje, utilizar do carousel customizável, vamos ter que salvar o
-      array de slides no banco e ir atualizando o mesmo através do evento
-      <strong>@slides-changed="(slide)"</strong> que é emitido sempre que ocorre
-      alguma alteração nos slides
+      array de slides no banco e ir atualizando o mesmo sempre que o v-model for
+      atualizado alguma alteração nos slides
     </p>
     <div class="w-100">
-      <alex-custom-carousel :slides="slidesSecondExample" />
+      <alex-custom-carousel v-model="slidesSecondExample" />
     </div>
     <div class="w-100">
       <div
@@ -365,9 +364,6 @@ const slides = ref([
   `
   import { ref } from 'vue';
   const slides = ref([]);
-  const handleSlidesChange = (slide) => {
-    //salve o array de slides no banco
-  };
   `,
   `
 `,
@@ -376,10 +372,10 @@ const slides = ref([
 const exampleTemplates = [
   '',
   `
-      <alex-custom-carousel read-only :slides="slides" />
+      <alex-custom-carousel read-only v-model="slides" />
   `,
   `
-      <alex-custom-carousel :slides="slides" @slides-changed="(slide) => handleSlidesChange(slide)" />
+      <alex-custom-carousel v-model="slides" />
   `,
 ];
 
