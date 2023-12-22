@@ -77,7 +77,7 @@
             />
           </template>
         </v-tooltip>
-        <alex-inputs-dropdown
+        <alex-custom-dropdown
           v-if="direction !== 'HORIZONTAL' && options"
           v-model="showOptions"
           :close-on-content-click="false"
@@ -101,7 +101,7 @@
               </template>
             </v-tooltip>
           </template>
-        </alex-inputs-dropdown>
+        </alex-custom-dropdown>
       </div>
     </div>
     <div

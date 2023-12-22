@@ -32,6 +32,7 @@
         <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
           <alex-inputs-text-field
             v-model="search"
+            name="search"
             :placeholder="$t('pages.classes.searchPlaceholder')"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
@@ -106,8 +107,8 @@
                 :key="course.raw.title + index"
                 type="course"
                 class="flex-stretch"
-                :options="professorMode"
                 :title="course.raw.title"
+                :options="professorMode"
                 :description="course.raw.description"
                 :image="{
                   url: course.raw.img,
@@ -121,7 +122,8 @@
                 :favorited="course.raw.favorited"
                 @favorite="changeItemFavorited(index)"
                 @toggle-visibility="changeItemVisibility(index, course.raw.id)"
-                @configurations="console.log('configurations')"
+                @configurations="navigate(course.raw.id, 'configurations')"
+                @open="navigate(course.raw.id, 'page')"
               />
             </div>
             <v-data-table
@@ -162,7 +164,7 @@
                     {{ (item as any).trails }}
                   </td>
                   <td>
-                    <alex-inputs-dropdown
+                    <alex-custom-dropdown
                       v-if="professorMode"
                       :items="
                         dropdownItems(
@@ -180,6 +182,7 @@
                         >
                           <template #activator="{ props: optionsTooltipProps }">
                             <alex-custom-button
+                              name="options"
                               v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                               variant="text"
                               icon="mdi-dots-vertical"
@@ -187,7 +190,7 @@
                           </template>
                         </v-tooltip>
                       </template>
-                    </alex-inputs-dropdown>
+                    </alex-custom-dropdown>
                   </td>
                 </tr>
               </template>
@@ -219,6 +222,7 @@
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetLearningPlans } from '~/assets/queries';
 import { LearningPlan } from '@/models/learningPlan.model';
+const rounter = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
@@ -361,7 +365,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/settings/${index}`,
+      link: `/course/${id}/configurations`,
     },
   ];
 };
@@ -405,6 +409,14 @@ const changeItemVisibility = (index: number, id) => {
 
 const changeItemFavorited = (index: number) => {
   courses.value[index].favorited = !courses.value[index].favorited;
+};
+
+const navigate = (id: number, page) => {
+  if (page === 'configurations') {
+    rounter.push(`/course/${id}/configurations`);
+  } else {
+    rounter.push(`/course/${id}`);
+  }
 };
 </script>
 
