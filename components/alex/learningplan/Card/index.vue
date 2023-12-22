@@ -8,7 +8,7 @@
     :min-width="width.min"
     :max-width="width.max"
     :class="{
-      'vertical-grid': isVertical,
+      'vertical-grid card': isVertical,
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
     }"
@@ -77,12 +77,12 @@
             />
           </template>
         </v-tooltip>
-        <alex-inputs-dropdown
-          v-if="direction !== 'HORIZONTAL'"
+        <alex-custom-dropdown
+          v-if="direction !== 'HORIZONTAL' && options"
           v-model="showOptions"
           :close-on-content-click="false"
           :class="{ hidden: !isHovering && !showOptions }"
-          :items="options"
+          :items="dropdownItems(hide)"
         >
           <template #activator="{ props: propsMenu, isActive }">
             <v-tooltip
@@ -101,11 +101,11 @@
               </template>
             </v-tooltip>
           </template>
-        </alex-inputs-dropdown>
+        </alex-custom-dropdown>
       </div>
     </div>
     <div
-      class="d-flex flex-column gap-4"
+      class="d-flex flex-column gap-4 justify-space-between"
       data-testid="alex-learningplan-card-content-area"
       :class="{
         'grayscale-2': hide,
@@ -172,12 +172,12 @@
       </div>
     </div>
 
-    <div v-if="!isVertical" class="h-full">
+    <div v-if="!isVertical && options" class="h-full">
       <alex-inputs-dropdown
         v-model="showOptions"
         :close-on-content-click="false"
         :class="{ hidden: !isHovering && !showOptions }"
-        :items="options"
+        :items="dropdownItems(hide)"
       >
         <template #activator="{ props: propsMenu }">
           <v-tooltip
@@ -199,7 +199,6 @@
 </template>
 
 <script setup lang="ts">
-import { Item } from '../../inputs/Dropdown.vue';
 interface member {
   name: string;
   image?: {
@@ -220,47 +219,47 @@ interface LearningPlanCardProps {
   favorited?: boolean;
   status?: 'start' | 'in_progress' | 'done';
   members?: member[];
+  options?: boolean;
 }
 
-const { status, title, hide } = withDefaults(
-  defineProps<LearningPlanCardProps>(),
-  {
-    hideFavoritedButton: false,
-    favorited: false,
-    hide: false,
-    type: 'course',
-    status: 'start',
-    members: undefined,
-  },
-);
+const props = withDefaults(defineProps<LearningPlanCardProps>(), {
+  hideFavoritedButton: false,
+  favorited: false,
+  hide: false,
+  type: 'course',
+  status: 'start',
+  members: undefined,
+  options: true,
+});
+
 const { t } = useI18n();
 const direction = useDirection();
 const isHovering = ref(false);
 const showOptions = ref(false);
 const isVertical = computed(() => direction.value === 'VERTICAL');
-const options: Item[] = [
-  hide
-    ? {
-        text: t('components.learningPlan.card.visibility.show'),
-        icon: 'mdi-eye-outline',
-        onClick: () => emits('show'),
-      }
-    : {
-        text: t('components.learningPlan.card.visibility.hide'),
-        icon: 'mdi-eye-off-outline',
-        onClick: () => emits('hide'),
+const dropdownItems = (hidden: boolean) => {
+  return [
+    {
+      text: hidden
+        ? t('components.learningPlan.card.visibility.show')
+        : t('components.learningPlan.card.visibility.hide'),
+      icon: hidden ? 'mdi-eye-outline' : 'mdi-eye-off-outline',
+      onClick: () => {
+        emits('toggleVisibility');
       },
-  {
-    text: t('components.learningPlan.card.configurations'),
-    icon: 'mdi-cog-outline',
-    onClick: () => emits('configurations'),
-  },
-];
+    },
+    {
+      text: t('components.learningPlan.card.configurations'),
+      icon: 'mdi-cog-outline',
+      onClick: () => emits('configurations'),
+    },
+  ];
+};
 const width = computed(() =>
   isVertical.value ? { min: 300, max: 400 } : { min: 688, max: 959 },
 );
 const statusConfig = computed<{ icon: string; variant: any }>(() => {
-  switch (status) {
+  switch (props.status) {
     // eslint-disable-next-line default-case-last
     default:
     case 'start':
@@ -281,19 +280,22 @@ const statusConfig = computed<{ icon: string; variant: any }>(() => {
   }
 });
 const isActiveTitleTooltip = computed(() => {
-  if (isVertical.value) return title.length < 60;
-  else return title.length < 84;
+  if (isVertical.value) return props.title.length < 60;
+  else return props.title.length < 84;
 });
 const emits = defineEmits([
   'open',
   'favorite',
   'configurations',
-  'show',
-  'hide',
+  'toggleVisibility',
 ]);
 </script>
 
 <style scoped lang="scss">
+.card {
+  height: 470px !important;
+}
+
 .grid {
   display: grid;
   align-content: stretch;
