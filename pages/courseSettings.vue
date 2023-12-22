@@ -233,16 +233,12 @@
                 class="button"
                 prepend-icon="mdi-plus"
                 variant="primary"
-                @click="createSchedule = true"
-                >{{
-                  t('pages.courseSettings.config.createSyncMeetingButton')
-                }}</alex-custom-button
-              >
+                >{{ t('pages.courseSettings.config.createSyncMeetingButton')
+                }}<alex-learningplan-modal-schedule
+                  v-model="createSchedule"
+                  @submit="(values) => createNewSchedule(values)"
+              /></alex-custom-button>
             </span>
-            <alex-learningplan-modal-schedule
-              v-model="createSchedule"
-              :data="newData"
-            />
           </div>
         </div>
       </div>
@@ -477,9 +473,9 @@
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { format } from 'date-fns';
+import { on } from 'events';
 
 const dialogMeetingExclusion = ref(false);
-const createSchedule = ref(false);
 
 const { createCourseRules } = useFormRules();
 
@@ -540,6 +536,55 @@ const getCourseInfo = async () => {
     }
   } catch (error) {
     console.error('Erro na requisição:', error.message);
+  }
+};
+const createSchedule = ref({
+  frequency: '',
+  meetingDate: '',
+  startHour: '',
+  endHour: '',
+  LearningPlan: {
+    data: {
+      id: course.id,
+      attributes: {
+        title: course.title,
+      },
+    },
+  },
+});
+const createNewSchedule = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:1337/api/learningplans/${course.id}?populate=schedules`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          createSchedule(values) {
+            return {
+              frequency: values.frequency,
+              meetingDate: values.meetingDate,
+              startHour: values.startHour,
+              endHour: values.endHour,
+              LearningPlan: values.LearningPlan,
+            };
+          },
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Erro ao enviar dados para a API: ${response.statusText}`,
+      );
+    }
+
+    const responseData = await response.json();
+    console.log('Resposta da API:', responseData);
+  } catch (error) {
+    console.error(error.message);
   }
 };
 
@@ -608,6 +653,56 @@ const handleFileUpload = (event) => {
     preview.value = e.target.result;
   };
   reader.readAsDataURL(selectedFile.value);
+  onSelectFile(selectedFile.value);
+};
+
+const onSelectFile = async (selectedFile) => {
+  try {
+    const formData = new FormData();
+
+    if (selectedFile.url instanceof File) {
+      formData.append('files', selectedFile.url);
+    } else if (
+      typeof selectedFile.url === 'string' &&
+      selectedFile.url.startsWith('data:')
+    ) {
+      const base64Data = selectedFile.url.split(',')[1];
+      const binaryString = window.atob(base64Data);
+      const byteArray = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        byteArray[i] = binaryString.charCodeAt(i);
+      }
+
+      let mimeType = 'image/png';
+      if (selectedFile.url.startsWith('data:image/jpeg')) {
+        mimeType = 'image/jpeg';
+      }
+
+      const blob = new Blob([byteArray], { type: mimeType });
+      const imageFile = new File([blob], 'image', { type: mimeType });
+      formData.append('files', imageFile);
+    }
+
+    const response = await fetch(
+      `http://localhost:1337/api/learningplans/${course.id}?populate=cover_image`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Erro ao enviar a imagem: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    const imageUrl = responseData[0].url;
+
+    console.log('Imagem enviada com sucesso:', imageUrl);
+  } catch (error) {
+    console.error('Erro ao enviar a imagem:', error);
+  }
 };
 
 const firstButton = ref([
