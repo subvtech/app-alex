@@ -213,6 +213,19 @@ export const useFormRules = () => {
       .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate')),
   });
 
+  const scheduleRules = yup.object({
+    meetingDate: yup
+      .date()
+      .required(i18n.t('rules.meeting.date.required'))
+      .min(currentDate.toISOString(), ({ min }) =>
+        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
+      ),
+    startHour: yup
+      .string()
+      .required(i18n.t('rules.meeting.startHour.required')),
+    endHour: yup.string().required(i18n.t('rules.meeting.endHour.required')),
+  });
+
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -240,5 +253,6 @@ export const useFormRules = () => {
     loginSchema,
     createCourseRules,
     emailRegex,
+    scheduleRules,
   };
 };

@@ -84,8 +84,10 @@
           <div class="d-flex align-center justify-space-between">
             <p>Momentos Síncronos</p>
             <alex-custom-button append-icon="mdi-plus" variant="secondary"
-              ><alex-learningplan-modal-schedule v-model="scheduleModal" />Novo
-              Encontro</alex-custom-button
+              ><alex-learningplan-modal-schedule
+                v-model="createScheduleModal"
+                @submit="(values) => console.log(values)"
+              />Novo Encontro</alex-custom-button
             >
           </div>
           <div v-if="!schedules.length">
@@ -106,29 +108,35 @@
             </div>
           </div>
           <div v-else>
-            <course-meeting
-              v-for="schedule in schedules"
-              :key="schedule.id"
-              frequency="sunday"
-              class="test"
-              :date="schedule.date"
-              :start-hour="schedule.startHour"
-              :end-hour="schedule.endHour"
-              :variant="'editing'"
-              :dropdown-props="[
-                {
-                  onClick: () => console.log('editar'),
-                  text: 'Editar',
-                  icon: 'mdi-pencil',
-                },
-                {
-                  onClick: () => removeSelf(schedule.id),
-                  text: 'Apagar',
-                  icon: 'mdi-trash-can-outline',
-                  warning: true,
-                },
-              ]"
-            />
+            <template v-for="schedule in schedules" :key="schedule.id">
+              <course-meeting
+                frequency="sunday"
+                class="test"
+                :date="schedule.meetingDate.toISOString()"
+                :start-hour="new Date().toISOString()"
+                :end-hour="new Date().toISOString()"
+                :variant="'editing'"
+                :dropdown-props="[
+                  {
+                    onClick: () => (editScheduleModal = true),
+                    text: 'Editar',
+                    icon: 'mdi-pencil',
+                  },
+                  {
+                    onClick: () => removeSelf(schedule.id),
+                    text: 'Apagar',
+                    icon: 'mdi-trash-can-outline',
+                    warning: true,
+                  },
+                ]"
+              />
+
+              <alex-learningplan-modal-schedule
+                v-model="editScheduleModal"
+                :data="schedule"
+                @submit="(values) => console.log(values)"
+              />
+            </template>
           </div>
         </template>
       </alex-custom-dialog>
@@ -137,7 +145,8 @@
 </template>
 <script setup lang="ts">
 const dialogStepper = ref(false);
-const scheduleModal = ref(false);
+const createScheduleModal = ref(false);
+const editScheduleModal = ref(false);
 const startDate = ref<Date>(new Date());
 const endDate = ref<Date>(new Date());
 const slides = ref([]);
@@ -145,15 +154,17 @@ const selectedUsers = ref([]);
 const schedules = ref([
   {
     id: '1',
-    date: new Date().toISOString(),
-    startHour: new Date().toISOString(),
-    endHour: new Date().toISOString(),
+    frequency: 7,
+    meetingDate: new Date(),
+    startHour: '18:00',
+    endHour: '12:00',
   },
   {
     id: '2',
-    date: new Date().toISOString(),
-    startHour: new Date().toISOString(),
-    endHour: new Date().toISOString(),
+    frequency: 7,
+    meetingDate: new Date(),
+    startHour: '18:00',
+    endHour: '12:00',
   },
 ]);
 const { createCourseRules } = useFormRules();

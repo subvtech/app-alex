@@ -9,78 +9,82 @@
         }`,
       )
     "
+    body-classes="pa-0 bg-white rounded-b-lg"
+    no-footer
   >
-    <alex-inputs-select
-      v-model="frequency"
-      :items="items"
-      name="frequency"
-      :label="$t('components.courses.meeting.course.meetingFrequency')"
-      density="comfortable"
-      required
-    />
-    <alex-inputs-date
-      v-model="meetingDate"
-      name="meetingDate"
-      :label="$t('components.courses.meeting.course.meetingDate')"
-      required
-      class="w-100"
-      density="comfortable"
-    />
-    <div class="d-flex gap-4">
-      <alex-inputs-text-field
-        v-model="hour"
-        type="time"
-        name="hour"
-        :label="$t('components.courses.meeting.course.startTime')"
-        required
-        class="w-100"
-        density="comfortable"
-      />
-      <alex-inputs-text-field
-        v-model="minutes"
-        type="time"
-        name="minutes"
-        :label="$t('components.courses.meeting.course.endTime')"
-        required
-        class="w-100"
-        density="comfortable"
-      />
-    </div>
-    <template #footer>
+    <v-form @submit="submit">
+      <div class="pa-6">
+        <alex-inputs-select
+          v-model="frequency"
+          :items="items"
+          name="frequency"
+          :label="$t('components.courses.meeting.course.meetingFrequency')"
+          density="comfortable"
+          required
+        />
+        <alex-inputs-date
+          v-model="meetingDate"
+          name="meetingDate"
+          :label="$t('components.courses.meeting.course.meetingDate')"
+          required
+          class="w-100"
+          density="comfortable"
+        />
+        <div class="d-flex gap-4">
+          <alex-inputs-text-field
+            v-model="startHour"
+            type="time"
+            name="startHour"
+            :label="$t('components.courses.meeting.course.startTime')"
+            required
+            class="w-100"
+            density="comfortable"
+          />
+          <alex-inputs-text-field
+            v-model="endHour"
+            type="time"
+            name="endHour"
+            :label="$t('components.courses.meeting.course.endTime')"
+            required
+            class="w-100"
+            density="comfortable"
+          />
+        </div>
+      </div>
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
-            text="Adicionar"
+            :text="$t(`components.courses.meeting.${data ? 'edit' : 'add'}`)"
             size="large"
+            type="submit"
             prepend-icon="mdi-plus"
           />
         </template>
         <template #secondarySlotButton>
           <alex-custom-button
-            text="Cancelar"
+            :text="$t('components.courses.meeting.cancel')"
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
+            @click="$emit('update:modelValue', false)"
           />
         </template>
       </alex-custom-dialog-footer>
-    </template>
+    </v-form>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
+import { useForm } from 'vee-validate';
 interface ScheduleProps {
   modelValue: boolean;
   data?: {
+    id: string;
     frequency: number;
     meetingDate: Date;
-    hour: string;
-    minutes: string;
+    startHour: string;
+    endHour: string;
   };
-}
-interface frequencyItem {
-  title: string;
-  value: number;
 }
 
 const props = withDefaults(defineProps<ScheduleProps>(), {
@@ -88,7 +92,14 @@ const props = withDefaults(defineProps<ScheduleProps>(), {
   data: undefined,
 });
 
-const emit = defineEmits(['update:modelValue', 'submit']);
+const emit = defineEmits(['update:modelValue', 'update:data', 'submit']);
+const { scheduleRules } = useFormRules();
+const { handleSubmit } = useForm({ validationSchema: scheduleRules });
+
+const submit = handleSubmit((values) => {
+  emit('submit', values);
+});
+
 const value = computed({
   get() {
     return props.modelValue;
@@ -97,15 +108,28 @@ const value = computed({
     emit('update:modelValue', value);
   },
 });
-const items: frequencyItem[] = [
+
+const data = computed({
+  get() {
+    return props.data;
+  },
+  set(value) {
+    emit('update:data', value);
+  },
+});
+
+const items: {
+  title: string;
+  value: number;
+}[] = [
   { title: 'Não se repete', value: 0 },
   { title: 'Diário', value: 1 },
   { title: 'Semanal', value: 7 },
   { title: 'Quinzenal', value: 14 },
   { title: 'Mensal', value: 30 },
 ];
-const meetingDate = ref<Date | undefined>(props.data?.meetingDate);
-const frequency = ref<number | null>(props.data?.frequency || 0);
-const hour = ref(props.data?.hour || '');
-const minutes = ref(props.data?.minutes || '');
+const meetingDate = ref<Date | undefined>(data.value?.meetingDate || undefined);
+const frequency = ref<number | null>(data.value?.frequency || 0);
+const startHour = ref(data.value?.startHour || '');
+const endHour = ref(data.value?.endHour || '');
 </script>

@@ -90,5 +90,16 @@
     "required": "Título é obrigatório",
     "min": "Mínimo de {min} caracteres",
     "max": "Máximo de {max} caracteres"
+  },
+  "meeting": {
+    "date": {
+      "required": "Data de encontro é obrigatória"
+    },
+    "startHour": {
+      "required": "Hora de início é obrigatório"
+    },
+    "endHour": {
+      "required": "Hora de término é obrigatório"
+    }
   }
 }

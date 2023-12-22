@@ -87,8 +87,15 @@
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
-  "copy": {
-    "success": "Text copied to clipboard",
-    "error": "Couldn't copy to clipboard"
+  "meeting": {
+    "date": {
+      "required": "Meeting date is required"
+    },
+    "startHour": {
+      "required": "Start time is required"
+    },
+    "endHour": {
+      "required": "End time is required"
+    }
   }
 }

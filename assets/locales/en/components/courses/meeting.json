@@ -36,6 +36,8 @@
       "student": "It seems that you don't have any meetings scheduled"
     },
     "edit": "Edit",
+    "add": "Add",
+    "cancel": "Cancel",
     "delete": "Delete",
     "course": {
       "title": "Save your synchronous meetings!",
