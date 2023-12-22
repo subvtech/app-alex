@@ -331,3 +331,73 @@ export const tagsByids = `
     }
   }
 `;
+
+export const GetLearningPlans = `
+query ($userId: ID!) {
+  learningplans(filters: { members: { user: { id: { eq: $userId } } } }) {
+    data {
+      id
+      attributes {
+        title
+        description
+        start_date
+        end_date
+        hidden
+      	learning_structure{
+          data{
+            attributes{
+              trails{
+                data{
+                  id
+                }
+              }
+            }
+          }
+        }
+        tags{
+          data{
+            attributes{
+              text
+              isGeneral
+            }
+          }
+        }
+        cover_image {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        members(filters: {role: {eq: "facilitator"}}) {
+          data {
+           attributes{ 
+            user{
+              data{
+                attributes{
+                  fullname
+                  institutions{
+                    data{
+                      attributes{
+                        name
+                      }
+                    }
+                  }
+                  avatar{
+                    data{
+                      attributes{
+                        url
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          }
+        }
+      }
+    }
+  }
+}
+`;
