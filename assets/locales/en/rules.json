@@ -80,5 +80,16 @@
     "required": "Description is required",
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
+  },
+  "meeting": {
+    "date": {
+      "required": "Meeting date is required"
+    },
+    "startHour": {
+      "required": "Start time is required"
+    },
+    "endHour": {
+      "required": "End time is required"
+    }
   }
 }

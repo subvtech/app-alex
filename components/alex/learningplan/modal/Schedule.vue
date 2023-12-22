@@ -9,54 +9,55 @@
         }`,
       )
     "
+    body-classes="pa-0 bg-white rounded-b-lg"
+    no-footer
   >
-    <alex-inputs-select
-      v-model="frequency"
-      :items="items"
-      name="frequency"
-      :label="$t('components.courses.meeting.course.meetingFrequency')"
-      density="comfortable"
-      required
-    />
-    <alex-inputs-date
-      v-model="meetingDate"
-      name="meetingDate"
-      :label="$t('components.courses.meeting.course.meetingDate')"
-      required
-      class="w-100"
-      density="comfortable"
-    />
-    <div class="d-flex gap-4">
-      <alex-inputs-text-field
-        v-model="startHour"
-        type="time"
-        name="startHour"
-        :label="$t('components.courses.meeting.course.startTime')"
-        required
-        class="w-100"
-        density="comfortable"
-      />
-      <alex-inputs-text-field
-        v-model="endHour"
-        type="time"
-        name="endHour"
-        :label="$t('components.courses.meeting.course.endTime')"
-        required
-        class="w-100"
-        density="comfortable"
-      />
-    </div>
-    <template #footer>
+    <v-form @submit="submit">
+      <div class="pa-6">
+        <alex-inputs-select
+          v-model="frequency"
+          :items="items"
+          name="frequency"
+          :label="$t('components.courses.meeting.course.meetingFrequency')"
+          density="comfortable"
+          required
+        />
+        <alex-inputs-date
+          v-model="meetingDate"
+          name="meetingDate"
+          :label="$t('components.courses.meeting.course.meetingDate')"
+          required
+          class="w-100"
+          density="comfortable"
+        />
+        <div class="d-flex gap-4">
+          <alex-inputs-text-field
+            v-model="startHour"
+            type="time"
+            name="startHour"
+            :label="$t('components.courses.meeting.course.startTime')"
+            required
+            class="w-100"
+            density="comfortable"
+          />
+          <alex-inputs-text-field
+            v-model="endHour"
+            type="time"
+            name="endHour"
+            :label="$t('components.courses.meeting.course.endTime')"
+            required
+            class="w-100"
+            density="comfortable"
+          />
+        </div>
+      </div>
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
             :text="$t(`components.courses.meeting.${data ? 'edit' : 'add'}`)"
             size="large"
+            type="submit"
             prepend-icon="mdi-plus"
-            @click="
-              () =>
-                $emit('submit', { frequency, meetingDate, startHour, endHour })
-            "
           />
         </template>
         <template #secondarySlotButton>
@@ -69,11 +70,12 @@
           />
         </template>
       </alex-custom-dialog-footer>
-    </template>
+    </v-form>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
+import { useForm } from 'vee-validate';
 interface ScheduleProps {
   modelValue: boolean;
   data?: {
@@ -91,6 +93,12 @@ const props = withDefaults(defineProps<ScheduleProps>(), {
 });
 
 const emit = defineEmits(['update:modelValue', 'update:data', 'submit']);
+const { scheduleRules } = useFormRules();
+const { handleSubmit } = useForm({ validationSchema: scheduleRules });
+
+const submit = handleSubmit((values) => {
+  emit('submit', values);
+});
 
 const value = computed({
   get() {
