@@ -137,8 +137,9 @@
               <template #item="{ item, index }">
                 <tr
                   v-show="!(item as any).hidden || professorMode"
-                  class="table-row text-body-3 text-gray"
+                  class="table-row text-body-3 text-gray course-row"
                   :class="{ hidden: (item as any).hidden }"
+                  @click="navigate((item as any).id, 'page')"
                 >
                   <td style="max-width: 596px">
                     <div class="d-flex align-center">
@@ -163,9 +164,8 @@
                   <td class="text-overflow" style="max-width: 90px">
                     {{ (item as any).trails }}
                   </td>
-                  <td>
+                  <td v-if="professorMode">
                     <alex-custom-dropdown
-                      v-if="professorMode"
                       :items="
                         dropdownItems(
                           (item as any).hidden,
@@ -438,6 +438,10 @@ const navigate = (id: number, page) => {
   font-weight: 700;
   line-height: 135%;
   letter-spacing: 0.32px;
+}
+
+.course-row {
+  cursor: pointer;
 }
 
 .text-overflow {
