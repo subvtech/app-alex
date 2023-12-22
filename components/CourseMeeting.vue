@@ -1,6 +1,5 @@
 <template>
   <div class="d-flex w-100 py-3 px-4 justify-space-between align-center">
-  <div class="d-flex w-100 py-3 px-4 justify-space-between align-center">
     <div class="d-flex flex-column">
       <span class="date">
         {{ formattedDate }}
