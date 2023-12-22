@@ -86,7 +86,11 @@
             <alex-custom-button append-icon="mdi-plus" variant="secondary"
               ><alex-learningplan-modal-schedule
                 v-model="createScheduleModal"
-                @submit="(values) => addSchedule(values)"
+                v-model:data="editData"
+                @submit="
+                  (values) =>
+                    !editData ? addMeeting(values) : editMeeting(values)
+                "
               />Novo Encontro</alex-custom-button
             >
           </div>
@@ -108,33 +112,32 @@
             </div>
           </div>
           <div v-else>
-            <template v-for="schedule in schedules" :key="schedule.id">
-              <course-meeting
-                frequency="sunday"
-                :date="schedule.meetingDate.toISOString()"
-                :start-hour="new Date().toISOString()"
-                :end-hour="new Date().toISOString()"
-                :variant="'editing'"
-                :dropdown-props="[
-                  {
-                    onClick: () => (editScheduleModal = true),
-                    text: 'Editar',
-                    icon: 'mdi-pencil',
+            <course-meeting
+              v-for="schedule in schedules"
+              :key="schedule.id"
+              :frequency="frequency[schedule.frequency]"
+              :interval="schedule.frequency"
+              :date="schedule.meetingDate"
+              :start-hour="schedule.startHour"
+              :end-hour="schedule.endHour"
+              :variant="'editing'"
+              :dropdown-props="[
+                {
+                  onClick: () => {
+                    editData = schedule;
+                    createScheduleModal = true;
                   },
-                  {
-                    onClick: () => removeSelf(schedule.id),
-                    text: 'Apagar',
-                    icon: 'mdi-trash-can-outline',
-                    warning: true,
-                  },
-                ]"
-              />
-              <alex-learningplan-modal-schedule
-                v-model="editScheduleModal"
-                :data="schedule"
-                @submit="(values) => editMeeting(schedule.id, values)"
-              />
-            </template>
+                  text: 'Editar',
+                  icon: 'mdi-pencil',
+                },
+                {
+                  onClick: () => removeSelf(schedule.id),
+                  text: 'Apagar',
+                  icon: 'mdi-trash-can-outline',
+                  warning: true,
+                },
+              ]"
+            />
           </div>
         </template>
       </alex-custom-dialog>
@@ -144,31 +147,43 @@
 <script setup lang="ts">
 import { Meeting } from '~/components/alex/learningplan/modal/Schedule.vue';
 
+const { createCourseRules } = useFormRules();
 const dialogStepper = ref(false);
 const createScheduleModal = ref(false);
-const editScheduleModal = ref(false);
 const startDate = ref<Date>(new Date());
 const endDate = ref<Date>(new Date());
 const slides = ref([]);
 const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
-const { createCourseRules } = useFormRules();
+const editData = ref<Meeting | null>(null);
 
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
 
-const editMeeting = (id: string, values: Meeting) => {
-  schedules.value = schedules.value.map((meeting) => {
-    if (meeting.id === id) {
+const editMeeting = (values: Meeting) => {
+  const updatedSchedules = schedules.value.map((meeting) => {
+    if (meeting.id === values.id) {
       return { ...meeting, ...values };
     }
     return meeting;
   });
+  schedules.value = updatedSchedules;
 };
-const addSchedule = (values: Meeting) => {
+const addMeeting = (values: Meeting) => {
   schedules.value.push({ ...values, id: crypto.randomUUID() });
 };
+
+const frequency = {
+  7: 'weekly',
+  1: 'everyday',
+  0: 'interval',
+  30: 'monthly',
+  14: 'biweekly',
+};
+
+watch(schedules, (value) => console.log(value), { deep: true });
+
 definePageMeta({
   middleware: 'auth',
   layout: 'components',
