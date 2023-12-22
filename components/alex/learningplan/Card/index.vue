@@ -8,7 +8,7 @@
     :min-width="width.min"
     :max-width="width.max"
     :class="{
-      'vertical-grid': isVertical,
+      'vertical-grid card': isVertical,
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
     }"
@@ -105,7 +105,7 @@
       </div>
     </div>
     <div
-      class="d-flex flex-column gap-4"
+      class="d-flex flex-column gap-4 justify-space-between"
       data-testid="alex-learningplan-card-content-area"
       :class="{
         'grayscale-2': hide,
@@ -292,6 +292,10 @@ const emits = defineEmits([
 </script>
 
 <style scoped lang="scss">
+.card {
+  height: 470px !important;
+}
+
 .grid {
   display: grid;
   align-content: stretch;

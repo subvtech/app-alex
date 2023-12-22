@@ -91,10 +91,9 @@
             'facilitatorName',
             'trails',
             'institution',
-            'generalCompetencies',
-            'technicalCompetencies',
-            'startDate',
-            'endDate',
+            'start_date',
+            'end_date',
+            'tags',
           ]"
           class="d-flex flex-wrap align-content-space-between"
           style="flex: 1"
@@ -117,12 +116,11 @@
                   name: course.raw.facilitatorName,
                   imageURL: course.raw.facilitatorImage,
                 }"
-                style="flex: 1"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
                 :favorited="course.raw.favorited"
                 @favorite="changeItemFavorited(index)"
-                @toggle-visibility="changeItemVisibility(index)"
+                @toggle-visibility="changeItemVisibility(index, course.raw.id)"
                 @configurations="console.log('configurations')"
               />
             </div>
@@ -166,7 +164,13 @@
                   <td>
                     <alex-inputs-dropdown
                       v-if="professorMode"
-                      :items="dropdownItems((item as any).hidden, index)"
+                      :items="
+                        dropdownItems(
+                          (item as any).hidden,
+                          index,
+                          items[index].raw.id,
+                        )
+                      "
                     >
                       <template #activator="{ props: propsMenu }">
                         <v-tooltip
@@ -212,16 +216,38 @@
 </template>
 
 <script setup lang="ts">
+import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import { GetLearningPlans } from '~/assets/queries';
+import { LearningPlan } from '@/models/learningPlan.model';
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
 const professorMode = ref(false);
 const { t } = useI18n();
+const graphql = useStrapiGraphQL();
+const { update } = useStrapi();
 
-onBeforeMount(() => {
-  const { isProfessor } = useStrapiUser<User>().value;
-  console.log(useStrapiUser<User>().value);
+interface courseItem {
+  id: number;
+  description: string;
+  facilitatorName?: string;
+  facilitatorImage?: string;
+  trails?: number;
+  img?: string;
+  institution?: string;
+  tags?: string[];
+  start_date: string;
+  end_date?: string;
+  hidden: boolean;
+  favorited: boolean;
+  title: string;
+}
+
+const courses = ref<courseItem[]>([]);
+
+onBeforeMount(async () => {
+  const { isProfessor, id } = useStrapiUser<User>().value;
   professorMode.value = isProfessor;
   if (professorMode.value) {
     headers.push({
@@ -230,27 +256,63 @@ onBeforeMount(() => {
       sortable: false,
     });
   }
+  const { data } = await useAsyncData('learningPlans', () => {
+    const params = { userId: id };
+    return graphql<{
+      data: {
+        learningplans: Strapi4ResponseMany<LearningPlan>;
+      };
+    }>(GetLearningPlans, params);
+  });
+  courses.value =
+    data.value?.data.learningplans.data.map((plan): courseItem => {
+      const { attributes } = plan;
+      const id = plan.id;
+      const {
+        title,
+        description,
+        start_date,
+        end_date,
+        cover_image,
+        hidden,
+        members,
+        tags,
+        learning_structure,
+      } = attributes;
+      const facilitatorName =
+        members.data[0]?.attributes?.user.data.attributes.fullname;
+      const facilitatorImage =
+        members.data[0]?.attributes?.user.data.attributes.avatar?.data
+          ?.attributes?.url;
+      const institution =
+        members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
+          ?.attributes?.name;
+      const img = cover_image?.data?.attributes?.url;
+      const trails =
+        learning_structure?.data?.attributes?.trails.data.length || 0;
+
+      return {
+        id,
+        title,
+        description,
+        start_date,
+        end_date,
+        img,
+        hidden,
+        facilitatorName,
+        facilitatorImage,
+        institution,
+        tags: tags.data.map((tag) => tag.attributes.text),
+        trails,
+        favorited: false,
+      };
+    }) || [];
 });
 
-interface RawItem {
-  description: string;
-  facilitatorName: string;
-  facilitatorImage: string;
-  trails: number;
-  img: string;
-  institution: string;
-  generalCompetencies: string[];
-  technicalCompetencies: string[];
-  startDate: string;
-  endDate: string;
-  hidden: boolean;
-  favorited: boolean;
-}
-
 interface Item {
-  raw: RawItem;
+  raw: courseItem;
 }
-const setTableData = (items: readonly Item[]): RawItem[] => {
+const setTableData = (items: readonly Item[]): courseItem[] => {
   return items.map((item) => item.raw);
 };
 
@@ -283,18 +345,18 @@ const breadcrumbs = [
   },
 ];
 
-const dropdownItems = (hidden, index) => {
+const dropdownItems = (hidden, index, id) => {
   return [
     hidden
       ? {
           icon: 'mdi-eye-outline',
           text: t('components.learningPlan.card.visibility.show'),
-          onClick: () => changeItemVisibility(index),
+          onClick: () => changeItemVisibility(index, id),
         }
       : {
           icon: 'mdi-eye-off-outline',
           text: t('components.learningPlan.card.visibility.hide'),
-          onClick: () => changeItemVisibility(index),
+          onClick: () => changeItemVisibility(index, id),
         },
     {
       icon: 'mdi-cog-outline',
@@ -329,151 +391,16 @@ const headers: DataTableHeader[] = [
   },
 ];
 
-const courses = ref([
-  {
-    title:
-      'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
-    description:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    facilitatorName: 'Alexandre',
-    facilitatorImage: 'https://picsum.photos/200/300',
-    trails: 3,
-    img: 'https://picsum.photos/400/600',
-    institution: 'IFAL',
-    generalCompetencies: ['Teamwork', 'Communication', 'Problem Solving'],
-    technicalCompetencies: ['Networking', 'Project Management'],
-    startDate: '2023-01-10',
-    endDate: '2023-03-15',
-    hidden: true,
-    favorited: true,
-  },
-  {
-    title: 'Introdução à programação em Python',
-    description:
-      'Olá pessoal! Este é um curso introdutório sobre programação em Python. Espero que aproveitem!',
-    facilitatorName: 'Isabella',
-    facilitatorImage: 'https://picsum.photos/201/301',
-    trails: 5,
-    img: 'https://picsum.photos/401/601',
-    institution: 'UFAL',
-    generalCompetencies: ['Problem Solving', 'Logic', 'Communication'],
-    technicalCompetencies: ['Python Programming'],
-    startDate: '2023-02-01',
-    endDate: '2023-04-15',
-    hidden: false,
-    favorited: false,
-  },
-  {
-    title: 'Desenvolvimento web com React.js',
-    description:
-      'Bem-vindos ao curso de desenvolvimento web com React.js! Vamos explorar juntos as maravilhas do React.',
-    facilitatorName: 'Carlos',
-    facilitatorImage: 'https://picsum.photos/202/302',
-    trails: 4,
-    img: 'https://picsum.photos/402/602',
-    institution: 'UNCISAL',
-    generalCompetencies: ['Web Development', 'React.js'],
-    technicalCompetencies: ['Frontend Development'],
-    startDate: '2023-03-05',
-    endDate: '2023-05-20',
-    hidden: false,
-    favorited: false,
-  },
-  {
-    title: 'Aprendendo machine learning com scikit-learn',
-    description:
-      'Oi pessoal! Vamos mergulhar no mundo do machine learning com o scikit-learn. Animados?',
-    facilitatorName: 'Camila',
-    facilitatorImage: 'https://picsum.photos/203/303',
-    trails: 6,
-    img: 'https://picsum.photos/403/603',
-    institution: 'LAPP',
-    generalCompetencies: ['Machine Learning', 'Data Analysis'],
-    technicalCompetencies: ['Scikit-learn'],
-    startDate: '2023-04-15',
-    endDate: '2023-07-01',
-    hidden: false,
-    favorited: false,
-  },
-  {
-    title: 'Segurança da informação e ethical hacking',
-    description:
-      'Este curso aborda tópicos essenciais sobre segurança da informação e ethical hacking. Fiquem atentos!',
-    facilitatorName: 'Diego',
-    facilitatorImage: 'https://picsum.photos/204/304',
-    trails: 5,
-    img: 'https://picsum.photos/404/604',
-    institution: 'IFAL',
-    generalCompetencies: ['Cybersecurity', 'Ethical Hacking'],
-    technicalCompetencies: ['Information Security'],
-    startDate: '2023-06-01',
-    endDate: '2023-08-15',
-    hidden: false,
-    favorited: false,
-  },
-  {
-    title: 'Desenvolvimento mobile com Flutter',
-    description:
-      'Vamos construir aplicativos incríveis com Flutter! Este curso é para quem quer mergulhar no desenvolvimento mobile.',
-    facilitatorName: 'Eduarda',
-    facilitatorImage: 'https://picsum.photos/205/305',
-    trails: 4,
-    img: 'https://picsum.photos/405/605',
-    institution: 'LAPP',
-    generalCompetencies: ['Mobile Development', 'Flutter'],
-    technicalCompetencies: ['Mobile App Development'],
-    startDate: '2023-07-10',
-    endDate: '2023-10-01',
-    hidden: false,
-    favorited: false,
-  },
-  {
-    title: 'Gestão de projetos ágeis com Scrum',
-    description:
-      'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
-    facilitatorName: 'Fernando',
-    facilitatorImage: 'https://picsum.photos/206/306',
-    trails: 3,
-    img: 'https://picsum.photos/406/606',
-    institution: 'UNCISAL',
-    generalCompetencies: ['Agile Project Management', 'Scrum'],
-    technicalCompetencies: ['Project Management'],
-    startDate: '2023-08-15',
-    endDate: '2023-11-01',
-    hidden: false,
-    favorited: false,
-  },
-  {
-    title: 'Inteligência artificial e redes neurais',
-    description:
-      'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
-    facilitatorName: 'Gabriela',
-    facilitatorImage: 'https://picsum.photos/207/307',
-    trails: 6,
-    img: 'https://picsum.photos/407/607',
-    institution: 'LAPP',
-    generalCompetencies: ['Artificial Intelligence', 'Neural Networks'],
-    technicalCompetencies: ['AI Fundamentals'],
-    startDate: '2023-09-01',
-    endDate: '2023-12-15',
-    hidden: false,
-    favorited: false,
-  },
-]);
-
-courses.value = [
-  ...courses.value,
-  ...courses.value,
-  // ...courses.value,
-  // ...courses.value,
-];
-
 const changeViewMode = () => {
   coursesView.value = coursesView.value === 'grid' ? 'table' : 'grid';
 };
 
-const changeItemVisibility = (index: number) => {
-  courses.value[index].hidden = !courses.value[index].hidden;
+const changeItemVisibility = (index: number, id) => {
+  update('learningPlans', id, {
+    hidden: !courses.value[index].hidden,
+  }).then(() => {
+    courses.value[index].hidden = !courses.value[index].hidden;
+  });
 };
 
 const changeItemFavorited = (index: number) => {
