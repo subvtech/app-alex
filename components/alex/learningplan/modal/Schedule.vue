@@ -12,10 +12,9 @@
     body-classes="pa-0 bg-white rounded-b-lg"
     no-footer
   >
-    <v-form @submit="submit">
+    <v-form @submit="submit" @reset="handleReset">
       <div class="pa-6">
         <alex-inputs-select
-          v-model="frequency"
           :items="items"
           name="frequency"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
@@ -23,7 +22,6 @@
           required
         />
         <alex-inputs-date
-          v-model="meetingDate"
           name="meetingDate"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
@@ -32,7 +30,6 @@
         />
         <div class="d-flex gap-4">
           <alex-inputs-text-field
-            v-model="startHour"
             type="time"
             name="startHour"
             :label="$t('components.courses.meeting.course.startTime')"
@@ -41,7 +38,6 @@
             density="comfortable"
           />
           <alex-inputs-text-field
-            v-model="endHour"
             type="time"
             name="endHour"
             :label="$t('components.courses.meeting.course.endTime')"
@@ -54,10 +50,10 @@
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
-            :text="$t(`components.courses.meeting.${data ? 'edit' : 'add'}`)"
+            :text="$t(`components.courses.meeting.${data ? 'save' : 'add'}`)"
             size="large"
             type="submit"
-            prepend-icon="mdi-plus"
+            :prepend-icon="data ? 'mdi-check' : 'mdi-plus'"
           />
         </template>
         <template #secondarySlotButton>
@@ -76,15 +72,18 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+
+export interface Meeting {
+  id: string;
+  frequency: 0 | 1 | 14 | 7 | 30;
+  meetingDate: Date;
+  startHour: string;
+  endHour: string;
+}
+
 interface ScheduleProps {
   modelValue: boolean;
-  data?: {
-    id: string;
-    frequency: number;
-    meetingDate: Date;
-    startHour: string;
-    endHour: string;
-  };
+  data?: Meeting | null;
 }
 
 const props = withDefaults(defineProps<ScheduleProps>(), {
@@ -94,11 +93,6 @@ const props = withDefaults(defineProps<ScheduleProps>(), {
 
 const emit = defineEmits(['update:modelValue', 'update:data', 'submit']);
 const { scheduleRules } = useFormRules();
-const { handleSubmit } = useForm({ validationSchema: scheduleRules });
-
-const submit = handleSubmit((values) => {
-  emit('submit', values);
-});
 
 const value = computed({
   get() {
@@ -118,6 +112,22 @@ const data = computed({
   },
 });
 
+const { handleSubmit, handleReset, setFieldValue } = useForm({
+  validationSchema: scheduleRules,
+  initialValues: {
+    frequency: data.value?.frequency || 0,
+    meetingDate: data.value?.meetingDate,
+    startHour: data.value?.startHour || '',
+    endHour: data.value?.endHour || '',
+  },
+});
+
+const submit = handleSubmit((values) => {
+  emit('submit', { ...values, id: props.data?.id });
+  emit('update:modelValue', false);
+  handleReset();
+});
+
 const items: {
   title: string;
   value: number;
@@ -128,8 +138,19 @@ const items: {
   { title: 'Quinzenal', value: 14 },
   { title: 'Mensal', value: 30 },
 ];
-const meetingDate = ref<Date | undefined>(data.value?.meetingDate || undefined);
-const frequency = ref<number | null>(data.value?.frequency || 0);
-const startHour = ref(data.value?.startHour || '');
-const endHour = ref(data.value?.endHour || '');
+
+watch(value, () => {
+  if (!value.value) {
+    emit('update:data', null);
+  }
+});
+
+watch(data, () => {
+  if (data.value) {
+    setFieldValue('frequency', data.value.frequency);
+    setFieldValue('startHour', data.value.startHour);
+    setFieldValue('endHour', data.value.endHour);
+    setFieldValue('meetingDate', data.value.meetingDate);
+  }
+});
 </script>
