@@ -62,6 +62,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile',
     'trailId',
     'forgot',
+    'classes',
     'emailConfirmation',
   ]);
   const components = await useImportLanguages('components', lang, [
@@ -70,6 +71,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'imagePreview',
     'tagCombobox',
     'dialog',
+    'carousel',
     'institutions',
     'usersAutocomplete',
     'learningPlan/editor',

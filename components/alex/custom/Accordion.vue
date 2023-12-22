@@ -128,6 +128,9 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 </script>
 
 <style>
+.v-theme--mainTheme {
+  --v-border-opacity: unset !important;
+}
 .text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;
