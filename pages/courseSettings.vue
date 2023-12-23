@@ -137,7 +137,7 @@
           </span>
         </div>
       </div>
-      <div class="content-area">
+      <div class="content-area meetings">
         <div class="card-title">
           <p>
             <span class="header-h4">{{
@@ -152,9 +152,10 @@
                 v-for="(schedule, index) in schedules"
                 :id="schedule.id"
                 :key="index"
-                :frequency="schedule.frequency"
+                :frequency="frequency[schedule.frequency]"
+                :interval="schedule.frequency"
                 class="test"
-                :date="new Date()"
+                :date="schedule.meetingDate"
                 :start-hour="startHour"
                 :end-hour="endHour"
                 :variant="'editing'"
@@ -247,7 +248,7 @@
           </div>
         </div>
       </div>
-      <div class="d-flex content-area">
+      <div class="d-flex content-area invites">
         <div class="card-title">
           <p>
             <span class="header-h4">{{
@@ -286,7 +287,6 @@
                 />
               </div>
               {{ selectedTime }}
-              {{ course.duration }}
               <div class="w-3/4">
                 <span class="body-p1 py-2">
                   {{ t('pages.courseSettings.config.linkAddress') }}
@@ -297,7 +297,7 @@
                   no-header
                   class="mt-2 w-full"
                   :enable-invites="course.invite_enabled"
-                  :duration="3600"
+                  :duration="selectedTime"
                   :course-id="course.id"
                   :data="invitationLink"
                   @update:link="
@@ -346,7 +346,7 @@
           </span>
         </div>
       </div>
-      <div class="content-area">
+      <div class="content-area course-visibility">
         <div class="card-title">
           <p>
             <span class="header-h4">
@@ -384,7 +384,7 @@
           </span>
         </div>
       </div>
-      <div class="content-area">
+      <div class="content-area delete">
         <div class="card-title">
           <p>
             <span class="header-h4">{{
@@ -460,7 +460,7 @@
                       @click="openDialog = false"
                     />
                     <alex-custom-button
-                      class="button"
+                      class="button error"
                       :text="$t('pages.courseSettings.config.deleteWord')"
                       variant="error"
                       @click="openDialog = false"
@@ -483,40 +483,82 @@ import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
 
-const dialogMeetingExclusion = ref(false);
-
 const { t } = useI18n();
-const { update } = useStrapi();
+const { find, update } = useStrapi();
 const { generateUrl } = useInvitationLink();
-const course = ref<any>({});
-const canEdit = ref(true);
-// const schedules = ref([]);
 const invitationLink = ref();
 const plainLink = ref<string | null>(null);
 const inviteEnabled = ref();
-
+const course = ref<any>({});
 const emit = defineEmits(['update:modelValue']);
-const selectedTime = computed({
-  get() {
-    return course.value.duration;
-  },
-  set(value) {
-    const time = value.split(' ');
-    if (time[1] === 'minutos') {
-      course.value.duration = time[0] * 60;
-    } else if (time[1] === 'hora' || time[1] === 'horas') {
-      course.value.duration = time[0] * 60 * 60;
+const canEdit = ref(true);
+// upload file
+const selectedFile = ref(null);
+const preview = ref(null);
+const handleFileUpload = (event) => {
+  selectedFile.value = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    preview.value = e.target.result;
+  };
+  reader.readAsDataURL(selectedFile.value);
+  onSelectFile(selectedFile.value);
+};
+const onSelectFile = async (selectedFile) => {
+  try {
+    const formData = new FormData();
+
+    if (selectedFile.url instanceof File) {
+      formData.append('files', selectedFile.url);
+    } else if (
+      typeof selectedFile.url === 'string' &&
+      selectedFile.url.startsWith('data:')
+    ) {
+      const base64Data = selectedFile.url.split(',')[1];
+      const binaryString = window.atob(base64Data);
+      const byteArray = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        byteArray[i] = binaryString.charCodeAt(i);
+      }
+
+      let mimeType = 'image/png';
+      if (selectedFile.url.startsWith('data:image/jpeg')) {
+        mimeType = 'image/jpeg';
+      }
+
+      const blob = new Blob([byteArray], { type: mimeType });
+      const imageFile = new File([blob], 'image', { type: mimeType });
+      formData.append('files', imageFile);
     }
-    emit('update:modelValue', value);
-  },
-});
 
-const { find } = useStrapi4();
+    const response = await fetch(`http://localhost:1337/api/learningplans`, {
+      method: 'POST',
+      body: formData,
+    });
 
+    if (!response.ok) {
+      throw new Error(`Erro ao enviar a imagem: ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    const imageUrl = responseData[0].url;
+
+    update(`learningplans/${course.value.id}`, {
+      cover_image: imageUrl,
+    });
+
+    console.log('Imagem enviada com sucesso:', imageUrl);
+  } catch (error) {
+    console.error('Erro ao enviar a imagem:', error);
+  }
+};
+
+// general info
 const getCourseInfo = async () => {
   try {
     const result = await find<any>(`learningplans`, {
-      filters: { id: { $containsi: 42 } },
+      filters: { id: { $containsi: 1 } },
     });
     const id = result.data[0].id;
     const data = result.data[0].attributes;
@@ -530,6 +572,7 @@ const getCourseInfo = async () => {
         end_date: data.end_date,
         slug: data.slug,
         invitation_message: data.invitation_message,
+        invitation_duration: data.invitation_duration,
       };
       schedules.value = data.schedules.data;
       invitationLink.value = generateUrl(id);
@@ -539,6 +582,56 @@ const getCourseInfo = async () => {
     console.error('Erro na requisição:', error?.message);
   }
 };
+
+const startDate = ref();
+const endDate = ref();
+
+// invites
+const selectedTime = computed({
+  get() {
+    return course.value.invitation_duration;
+  },
+  set(value) {
+    const time = value.split(' ');
+    if (time[1] === 'minutos') {
+      course.value.invitation_duration = time[0] * 60;
+    } else if (time[1] === 'hora' || time[1] === 'horas') {
+      course.value.invitation_duration = time[0] * 60 * 60;
+    }
+    emit('update:modelValue', value);
+  },
+});
+
+const timeOptions = ref([
+  t('pages.courseSettings.config.fiveMinutes'),
+  t('pages.courseSettings.config.fifteenMinutes'),
+  t('pages.courseSettings.config.thirtyMinutes'),
+  t('pages.courseSettings.config.oneHour'),
+  t('pages.courseSettings.config.twoHours'),
+  t('pages.courseSettings.config.eightHours'),
+  t('pages.courseSettings.config.twentyFourHours'),
+]);
+
+// sync meetings
+
+const createScheduleModal = ref(false);
+const schedules = ref<Meeting[]>([]);
+const removeSelf = (id: string) => {
+  schedules.value = schedules.value.filter((item) => item.id !== id);
+};
+
+const addMeeting = (values: Meeting) => {
+  schedules.value.push({ ...values, id: crypto.randomUUID() });
+};
+
+const frequency = {
+  7: 'weekly',
+  1: 'everyday',
+  0: 'interval',
+  30: 'monthly',
+  14: 'biweekly',
+};
+
 // const createNewSchedule = async () => {
 //   try {
 //     const response = await fetch(
@@ -574,12 +667,7 @@ const getCourseInfo = async () => {
 //     console.error(error.message);
 //   }
 // };
-const createScheduleModal = ref(false);
-const schedules = ref<Meeting[]>([]);
 
-const removeSelf = (id: string) => {
-  schedules.value = schedules.value.filter((item) => item.id !== id);
-};
 
 // const editMeeting = (values: Meeting) => {
 //   const updatedSchedules = schedules.value.map((meeting) => {
@@ -590,92 +678,8 @@ const removeSelf = (id: string) => {
 //   });
 //   schedules.value = updatedSchedules;
 // };
-const addMeeting = (values: Meeting) => {
-  schedules.value.push({ ...values, id: crypto.randomUUID() });
-};
-const startDate = ref();
-const endDate = ref();
-const frequency = {
-  7: 'weekly',
-  1: 'everyday',
-  0: 'interval',
-  30: 'monthly',
-  14: 'biweekly',
-};
 
-const timeOptions = ref([
-  t('pages.courseSettings.config.fiveMinutes'),
-  t('pages.courseSettings.config.fifteenMinutes'),
-  t('pages.courseSettings.config.thirtyMinutes'),
-  t('pages.courseSettings.config.oneHour'),
-  t('pages.courseSettings.config.twoHours'),
-  t('pages.courseSettings.config.eightHours'),
-  t('pages.courseSettings.config.twentyFourHours'),
-]);
-
-const openDialog = ref(false);
-const selectedFile = ref(null);
-const preview = ref(null);
-
-const handleFileUpload = (event) => {
-  selectedFile.value = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    preview.value = e.target.result;
-  };
-  reader.readAsDataURL(selectedFile.value);
-  onSelectFile(selectedFile.value);
-};
-
-const onSelectFile = async (selectedFile) => {
-  try {
-    const formData = new FormData();
-
-    if (selectedFile.url instanceof File) {
-      formData.append('files', selectedFile.url);
-    } else if (
-      typeof selectedFile.url === 'string' &&
-      selectedFile.url.startsWith('data:')
-    ) {
-      const base64Data = selectedFile.url.split(',')[1];
-      const binaryString = window.atob(base64Data);
-      const byteArray = new Uint8Array(binaryString.length);
-
-      for (let i = 0; i < binaryString.length; i++) {
-        byteArray[i] = binaryString.charCodeAt(i);
-      }
-
-      let mimeType = 'image/png';
-      if (selectedFile.url.startsWith('data:image/jpeg')) {
-        mimeType = 'image/jpeg';
-      }
-
-      const blob = new Blob([byteArray], { type: mimeType });
-      const imageFile = new File([blob], 'image', { type: mimeType });
-      formData.append('files', imageFile);
-    }
-
-    const response = await fetch(`http://localhost:1337/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro ao enviar a imagem: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    const imageUrl = responseData[0].url;
-
-    update(`learningplans/${course.value.id}`, {
-      cover_image: imageUrl,
-    });
-
-    console.log('Imagem enviada com sucesso:', imageUrl);
-  } catch (error) {
-    console.error('Erro ao enviar a imagem:', error);
-  }
-};
+//course visibility
 
 const firstButton = ref([
   {
@@ -694,6 +698,11 @@ const secondButton = ref([
 ]);
 
 const activeButton = ref('1');
+
+// delete course
+
+const dialogMeetingExclusion = ref(false);
+const openDialog = ref(false);
 
 onBeforeMount(async () => {
   await getCourseInfo();
@@ -923,6 +932,10 @@ p {
   gap: 16px;
   align-self: stretch;
   border-top: 1px solid var(--cinza-cinza-100, #ebedef);
+}
+
+.button.error {
+  color: #fff !important;
 }
 
 .container-invite {
