@@ -10,7 +10,7 @@
     full-width
   >
     <template v-slot:content class="pa-6">
-      <div class="d-flex flex-column w-100 align-center gap-8">
+      <div class="d-flex flex-column w-100 align-self-center gap-8">
         <alex-custom-empty-placeholder
           v-if="myImages.length === 0 && !isEditingAndCanEdit"
           :empty-text-image="'/svg/emptyMedia.svg'"

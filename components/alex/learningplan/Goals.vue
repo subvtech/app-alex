@@ -14,13 +14,14 @@
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
   >
-    <template #content>
+    <template #content class="d-flex w-100">
       <alex-custom-empty-placeholder
         v-if="dataCopy.length === 0"
+        class="align-self-center"
         :empty-text-message="$t('components.courses.goals.empty')"
         empty-text-image="/svg/EmptyGoals.svg"
       />
-      <div v-if="isEditing" class="d-flex flex-column w-100 gap-4">
+      <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion
           v-model:data="dataCopy"
           :key="rerender"
@@ -29,12 +30,12 @@
           v-model="selectedPanel"
           class="max-width"
         >
-          <template v-if="isEditing" #content="temp">
-            <courses-form-goal
-              :keyword="temp.verb"
-              :index="temp.index"
-              :id="temp.id"
-              :description="temp.description"
+          <template v-if="isEditing" #content="contentProps">
+            <alex-learningplan-form-goal
+              :keyword="contentProps.verb"
+              :index="contentProps.index"
+              :id="contentProps.id"
+              :description="contentProps.description"
               :filtered-items="filteredVerbs"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
@@ -53,7 +54,7 @@
         >
       </div>
       <div v-else class="d-flex flex-column gap-2 w-100">
-        <courses-goal
+        <alex-learningplan-goal
           v-for="(item, index) in data"
           :index="index"
           :key-word="item.contentData.verb ? item.contentData.verb.text : ''"
@@ -187,20 +188,22 @@ const addGoal = () => {
   });
   selectedPanel.value = dataCopy.value.length - 1;
 };
-const onSuccess = (goal) => {
-  if (goal.id >= 0) {
-    const index = updateArray.value.findIndex((item) => item.id == goal.id);
-    if (index !== -1) updateArray.value[index] = goal;
+const onSuccess = (validGoal) => {
+  if (validGoal.id >= 0) {
+    const index = updateArray.value.findIndex(
+      (item) => item.id == validGoal.id,
+    );
+    if (index !== -1) updateArray.value[index] = validGoal;
     else {
-      updateArray.value.push(goal);
+      updateArray.value.push(validGoal);
     }
   } else {
     const index = createArray.value.findIndex(
-      (item) => item.index == goal.index,
+      (item) => item.index == validGoal.index,
     );
-    if (index !== -1) createArray.value[index] = goal;
+    if (index !== -1) createArray.value[index] = validGoal;
     else {
-      createArray.value.push(goal);
+      createArray.value.push(validGoal);
     }
   }
 };
@@ -212,41 +215,39 @@ const onCancel = () => {
   deleteArray.value = [];
 };
 
+const getVerbConnectArray = async (keyWord) => {
+  if (typeof keyWord.id === 'number') return [keyWord.id];
+  const doesVerbExist = await find('learning-goal-verbs', {
+    filters: { text: keyWord.text, user: props.userId },
+  });
+
+  if (doesVerbExist.data.length > 0) return [doesVerbExist.data[0].id];
+  const createdVerb = await create('learning-goal-verbs', {
+    ...keyWord,
+    user: props.userId,
+  });
+  return [createdVerb.data.id];
+};
+
 const onSave = async () => {
-  const promises: Promise<any>[] = [];
-  const getConnectArray = async (connectId, keyWord) => {
-    if (typeof connectId === 'number') return [connectId];
-    const doesVerbExist = await find('learning-goal-verbs', {
-      filters: { text: keyWord.text },
-    });
-
-    if (doesVerbExist.data.length > 0) return [doesVerbExist.data[0].id];
-    const createdVerb = await create('learning-goal-verbs', {
-      ...keyWord,
-      user: props.userId,
-    });
-    return [createdVerb.data.id];
-  };
-
   const createPromises = createArray.value.map(async (item, index) => {
-    const connectArray = await getConnectArray(item.keyWord.id, item.keyWord);
+    const connectArray = await getVerbConnectArray(item.keyWord);
 
-    return create('learning-goals', {
+    const result = await create('learning-goals', {
       description: item.description,
       learningplan: props.courseId,
       verb: {
         connect: connectArray,
       },
-    }).then((result) => {
-      const currentIndex = dataCopy.value.findIndex(
-        (obj) => obj.contentData.index === item.index,
-      );
-      dataCopy.value[currentIndex].id = result.data.id;
     });
+    const currentIndex = dataCopy.value.findIndex(
+      (obj) => obj.contentData.index === item.index,
+    );
+    dataCopy.value[currentIndex].id = result.data.id;
   });
 
   const updatePromises = updateArray.value.map(async (item) => {
-    const connectArray = await getConnectArray(item.keyWord.id, item.keyWord);
+    const connectArray = await getVerbConnectArray(item.keyWord);
     return update(`learning-goals/${item.id}`, {
       description: item.description,
       verb: {
@@ -261,14 +262,12 @@ const onSave = async () => {
       return _delete('goals', item.id);
     });
 
-  promises.push(...createPromises, ...updatePromises, ...deletePromises);
-
-  await Promise.all(promises);
+  await Promise.all([...createPromises, ...updatePromises, ...deletePromises]);
 
   let previousId: number | null = null;
   await update('learningplans', props.courseId, {
     learning_goals: {
-      connect: dataCopy.value.map((item, index) => {
+      set: dataCopy.value.map((item, index) => {
         if (index === 0) {
           previousId = item.id!;
           return { id: item.id, position: { start: true } };

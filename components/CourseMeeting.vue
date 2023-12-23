@@ -8,7 +8,6 @@
         {{ frequencyText }}
       </span>
     </div>
-
     <div
       class="d-flex justify-space-between align-end gap-2"
       :class="isEditing ? 'flex-row' : 'flex-column-reverse'"
@@ -16,48 +15,43 @@
       <span class="duration">
         {{ duration }}
       </span>
-      <alex-inputs-dropdown v-if="isEditing" :items="dropdownProps">
-        <template #activator="{ props }">
-          <v-icon v-bind="props" class="cursor-pointer"
+      <alex-custom-dropdown v-if="isEditing" :items="dropdownProps">
+        <template #activator="{ props: activeProps }">
+          <v-icon v-bind="activeProps" class="cursor-pointer"
             >mdi-dots-vertical</v-icon
           >
         </template>
-      </alex-inputs-dropdown>
+      </alex-custom-dropdown>
       <img
         v-else
         class="cursor-pointer"
         src="/svg/calendar.svg"
-        @click="emit('click:calendar')"
         width="24"
         height="24"
+        @click="emit('click:calendar')"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
+// eslint-disable-next-line import/no-duplicates
 import { pt } from 'date-fns/locale';
-import { Item } from './alex/inputs/Dropdown.vue';
+import { PropType } from 'nuxt/dist/app/compat/capi';
+import { AlexDropdownItem } from './alex/inputs/Dropdown.vue';
+import { useDatetime } from '~/composables/useDate';
 const { t } = useI18n();
 const emit = defineEmits(['click:activator', 'click:calendar']);
 
 const props = defineProps({
   frequency: {
-    type: String as PropType<
-      | 'sunday'
-      | 'monday'
-      | 'tuesday'
-      | 'wednesday'
-      | 'thursday'
-      | 'friday'
-      | 'saturday'
-      | 'interval'
-    >,
+    type: String,
     required: true,
   },
   interval: {
-    type: Number,
+    type: Number as PropType<0 | 1 | 7 | 14 | 30>,
     default: 7,
   },
   variant: {
@@ -65,7 +59,7 @@ const props = defineProps({
     default: 'list',
   },
   date: {
-    type: String,
+    type: Date,
     required: true,
   },
   startHour: {
@@ -85,22 +79,24 @@ const props = defineProps({
     default: false,
   },
   dropdownProps: {
-    type: Array as PropType<Item[]>,
-    default: [
+    type: Array as PropType<AlexDropdownItem[]>,
+    default: () => [
       {
         icon: 'mdi-pencil',
         text: 'Editar', // t('components.courses.meeting.edit'),
       },
       {
         icon: 'mdi-trash-can',
-        text: 'Excluir', //t('components.courses.meeting.delete'),
+        text: 'Excluir', // t('components.courses.meeting.delete'),
         warning: true,
       },
     ],
   },
 });
 
-const date = new Date(props.date);
+const { dateToHour } = useDatetime();
+const date = computed(() => new Date(props.date));
+const phrase = computed(() => format(date.value, 'EEEE').toLowerCase());
 const formattedDate = computed(() => {
   let formatText = ` d '${t('components.courses.meeting.of')}' MMMM '${t(
     'components.courses.meeting.of',
@@ -113,8 +109,8 @@ const formattedDate = computed(() => {
 
   const temp = isEditing.value
     ? t('components.courses.meeting.starting') +
-      format(date, formatText, { locale: pt })
-    : format(date, formatText2, {
+      format(date.value, formatText, { locale: pt })
+    : format(date.value, formatText2, {
         locale: pt,
       });
   return temp.charAt(0).toUpperCase() + temp.slice(1);
@@ -127,16 +123,19 @@ const frequencyText = computed(() =>
     ? t(`components.courses.meeting.every.${props.frequency}`)
     : props.interval === 30
     ? t('components.courses.meeting.monthly', {
-        day: t(`components.courses.meeting.single.${format(date, 'EEEE')}`),
+        day: t(`components.courses.meeting.single.${phrase.value}`),
       })
     : props.interval === 14
     ? t('components.courses.meeting.biweekly', {
-        day: t(`components.courses.meeting.single.${format(date, 'EEEE')}`),
+        day: t(`components.courses.meeting.single.${phrase.value}`),
       })
+    : props.interval === 0
+    ? t(`components.courses.meeting.single.${phrase.value}`)
     : t('components.courses.meeting.interval', { days: props.interval }),
 );
-const startTime = computed(() => format(new Date(props.startHour), 'HH:mm'));
-const endTime = computed(() => format(new Date(props.endHour), 'HH:mm'));
+
+const startTime = computed(() => dateToHour(props.startHour, date.value));
+const endTime = computed(() => dateToHour(props.endHour, date.value));
 
 const duration = computed(
   () =>

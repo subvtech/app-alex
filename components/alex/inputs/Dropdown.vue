@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-export interface Item {
+export interface AlexDropdownItem {
   text: string;
   icon?: string;
   link?: string;
@@ -60,7 +60,7 @@ export interface Item {
   onClick?: () => unknown;
 }
 interface DropdownProps {
-  items: Item[];
+  items: AlexDropdownItem[];
   isDarkMode?: boolean;
 }
 
