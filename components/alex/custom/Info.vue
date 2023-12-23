@@ -131,7 +131,7 @@
             class="title mt-0 font-weight-bold text-h2"
             :class="[floatBeneath ? 'ml-2' : '']"
             :style="titleStyle ?? 'color: white;'"
-            role="above"
+            role="below"
             >{{ description }}</span
           >
         </div>
@@ -190,7 +190,7 @@
           </div>
 
           <div
-            v-if="code"
+            v-if="copyObject"
             class="code d-flex align-center py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
             :class="[
               !floatBeneath
@@ -202,25 +202,32 @@
             ]"
             style="gap: 8px; cursor: pointer; align-self: flex-end"
             :style="codeStyle ?? ''"
-            @click="copyToClipboard(code)"
+            @click="copyToClipboard(copyObject.copyText)"
           >
-            <v-icon style="flex-grow: 0" size="20">mdi-content-copy</v-icon>
-            <span style="flex-grow: 0">{{ code }}</span>
+            <v-icon class="flex-grow-0" size="20">mdi-content-copy</v-icon>
+            <span class="flex-grow-0">{{ copyObject.label }}</span>
           </div>
         </div>
-
-        <div
+        <alex-custom-tooltip
           v-if="canEdit && showSettings"
-          class="settings mx-1 py-1 px-1 mx-xs-2"
-          :class="[
-            darkerBackground ? 'darker-bg' : '',
-            showProfilePictureAndProfilePicture ? 'absolute' : '',
-          ]"
-          style="height: min-content; color: #6e7a87"
-          role="settings"
+          :text="$t('components.card.settings')"
         >
-          <v-icon @click="emit('display:settings')">{{ settingsIcon }}</v-icon>
-        </div>
+          <template #content>
+            <div
+              class="settings mx-1 py-1 px-1 mx-xs-2"
+              :class="[
+                darkerBackground ? 'darker-bg' : '',
+                showProfilePictureAndProfilePicture ? 'absolute' : '',
+              ]"
+              style="height: min-content; color: #6e7a87"
+              role="settings"
+            >
+              <v-icon @click="emit('display:settings')">{{
+                settingsIcon
+              }}</v-icon>
+            </div>
+          </template>
+        </alex-custom-tooltip>
       </div>
     </div>
   </div>
@@ -358,8 +365,8 @@ const props = defineProps({
     type: String,
   },
 
-  code: {
-    type: String,
+  copyObject: {
+    type: Object as PropType<{ label: string; copyText: string }>,
   },
   username: {
     type: String,
@@ -369,7 +376,7 @@ const props = defineProps({
   canEdit: { type: Boolean, default: false },
   canDelete: { type: Boolean, default: false },
 });
-
+const { copyToClipboard } = useCopyText();
 const biggerImage = computed(() => {
   return props.resize && props.profilePictureSize > 100;
 });
@@ -390,17 +397,12 @@ const startDateAndEndDate = computed(() => {
 const startDateOrEndDate = computed(() => {
   return props.startDate || props.endDate;
 });
-
-async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (err) {
-    console.error('Failed to copy text: ', err);
-  }
-}
 </script>
 
 <style scoped lang="scss">
+.flex-grow-0 {
+  flex-grow: 0;
+}
 .darker-bg {
   border-radius: 8px;
   background-color: rgba(0, 0, 0, 0.5);
