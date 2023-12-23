@@ -61,7 +61,7 @@
         />
       </div>
     </template>
-    <template #step2> <alex-custom-carousel :v-model="slides" /></template>
+    <template #step2> <alex-custom-carousel v-model="slides" /></template>
     <template #step3>
       <alex-inputs-users-autocomplete
         v-model:selected-items="selectedUsers"
