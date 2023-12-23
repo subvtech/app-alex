@@ -88,18 +88,16 @@
           <div class="container-date">
             <div class="datePickers">
               <alex-inputs-date
-                id="startDate"
-                v-model="startDate"
+                v-model="course.start_date"
+                name="startDate"
                 :label="t('pages.courseSettings.config.startDate')"
-                name=""
                 required
                 class="w-100"
               />
 
               <alex-inputs-date
-                id="endDate"
-                v-model="endDate"
-                name=""
+                v-model="course.end_date"
+                name="endDate"
                 :label="t('pages.courseSettings.config.endDate')"
                 required
                 class="w-100"
@@ -491,7 +489,6 @@ const { t } = useI18n();
 const { update } = useStrapi();
 const { generateUrl } = useInvitationLink();
 const course = ref<any>({});
-console.log(course);
 const canEdit = ref(true);
 // const schedules = ref([]);
 const invitationLink = ref();
@@ -514,33 +511,32 @@ const selectedTime = computed({
   },
 });
 
+const { find } = useStrapi4();
+
 const getCourseInfo = async () => {
   try {
-    const response = await fetch(
-      'http://localhost:1337/api/learningplans?populate=*',
-    );
-    if (!response.ok) {
-      throw new Error('Erro ao obter dados da API');
+    const result = await find<any>(`learningplans`, {
+      filters: { id: { $containsi: 42 } },
+    });
+    const id = result.data[0].id;
+    const data = result.data[0].attributes;
+    if (data) {
+      course.value = {
+        ...course.value,
+        id,
+        invite_enabled: data.invite_enabled,
+        title: data.title,
+        start_date: data.start_date,
+        end_date: data.end_date,
+        slug: data.slug,
+        invitation_message: data.invitation_message,
+      };
+      schedules.value = data.schedules.data;
+      invitationLink.value = generateUrl(id);
     }
-    const data = await response.json();
-
-    if (data && data.data && data.data.length > 0) {
-      const courseData = data.data[0];
-      course.value.id = courseData.id;
-      course.value.invite_enabled = courseData.attributes.invite_enabled;
-      course.value.title = courseData.attributes.title;
-      course.value.start_date = courseData.attributes.start_date;
-      course.value.end_date = courseData.attributes.end_date;
-      course.value.slug = courseData.attributes.slug;
-      course.value.invitation_message =
-        courseData.attributes.invitation_message;
-      schedules.value = courseData.attributes.schedules.data;
-      invitationLink.value = generateUrl(courseData.id);
-    }
-
     console.log('Resposta da API:', data.data[0]);
   } catch (error) {
-    console.error('Erro na requisição:', error.message);
+    console.error('Erro na requisição:', error?.message);
   }
 };
 // const createNewSchedule = async () => {
@@ -597,8 +593,8 @@ const removeSelf = (id: string) => {
 const addMeeting = (values: Meeting) => {
   schedules.value.push({ ...values, id: crypto.randomUUID() });
 };
-const startDate = ref()
-const endDate = ref()
+const startDate = ref();
+const endDate = ref();
 const frequency = {
   7: 'weekly',
   1: 'everyday',
@@ -701,12 +697,6 @@ const activeButton = ref('1');
 
 onBeforeMount(async () => {
   await getCourseInfo();
-});
-
-watch(course, (value) => {
-  console.log(course);
-  startDate.value = value.start_date;
-  endDate.value = value.end_date;
 });
 </script>
 <style scoped lang="scss">
