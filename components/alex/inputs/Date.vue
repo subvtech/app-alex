@@ -78,10 +78,10 @@ const emit = defineEmits(['update:modelValue']);
 const dateValue = computed({
   get() {
     let date: Date | string | undefined = props.modelValue;
-    if (typeof props.modelValue === 'string') {
-      date = new Date(props.modelValue.replace(/-/g, '/'));
-    } else if (props.modelValue) {
-      date = new Date(props.modelValue);
+    if (typeof date === 'string') {
+      date = new Date(date.replace(/-/g, '/'));
+    } else if (date) {
+      date = new Date(date);
       date.setHours(0, 0, 0, 0);
     }
     return date;
@@ -92,7 +92,7 @@ const dateValue = computed({
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: dateValue,
+  initialValue: dateValue.value,
   syncVModel: true,
 });
 
