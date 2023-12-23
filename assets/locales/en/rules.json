@@ -57,6 +57,11 @@
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
+  "title": {
+    "required": "Title is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
   "url": {
     "required": "Url is required",
     "min": "At least 3 characters long",

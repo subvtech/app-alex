@@ -17,17 +17,33 @@
     }"
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
-    @on-main-action="() => console.log('maina')"
+    @on-main-action="
+      () =>
+        create('learningplans', {
+          title: title.replace(/\s+/g, ' ').trim(),
+          description,
+          start_date: startDate,
+          end_date: endDate,
+          type: 'course',
+          slug: title.replace(/\s+/g, '_').trim().toLocaleLowerCase(),
+          invitation_enabled: true,
+          invitation_duration: 3600,
+          members: selectedUsers,
+          class_name: learningClass,
+        })
+    "
   >
     <template #step1
       ><alex-inputs-text-field
+        v-model="title"
         density="comfortable"
-        name="name"
+        name="title"
         label="Como vai se chamar seu Curso?"
         placeholder="Digite o nome do Curso"
         required
       />
       <alex-inputs-text-area
+        v-model="description"
         density="comfortable"
         name="description"
         label="Do que se trata seu curso?"
@@ -36,6 +52,7 @@
         required
       />
       <alex-inputs-text-field
+        v-model="learningClass"
         density="comfortable"
         name="class"
         label="Digite o nome da turma"
@@ -137,11 +154,13 @@
 
 <script setup lang="ts">
 import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
+
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
 
 const emit = defineEmits(['update:modelValue']);
+const { create } = useStrapi4();
 const value = computed({
   get() {
     return props.modelValue;
@@ -155,6 +174,9 @@ const createScheduleModal = ref(false);
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const slides = ref([]);
+const title = ref('');
+const description = ref('');
+const learningClass = ref('');
 const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
 const editData = ref<Meeting | null>(null);

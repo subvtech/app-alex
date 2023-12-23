@@ -173,11 +173,11 @@ export const useFormRules = () => {
       .trim(),
   });
   const createCourseRules = yup.object({
-    name: yup
+    title: yup
       .string()
-      .required(i18n.t('rules.name.required'))
-      .min(4, ({ min }) => i18n.t('rules.name.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.name.max', { max }))
+      .required(i18n.t('rules.title.required'))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .trim(),
     description: yup
       .string()
