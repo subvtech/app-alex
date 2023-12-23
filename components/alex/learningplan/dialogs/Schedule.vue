@@ -75,7 +75,7 @@ import { useForm } from 'vee-validate';
 
 export interface Meeting {
   id: string;
-  frequency: 0 | 1 | 14 | 7 | 30;
+  frequency: 0 | 1 | 7 | 14 | 30;
   meetingDate: Date;
   startHour: string;
   endHour: string;
@@ -145,12 +145,12 @@ watch(value, () => {
   }
 });
 
-watch(data, () => {
-  if (data.value) {
-    setFieldValue('frequency', data.value.frequency);
-    setFieldValue('startHour', data.value.startHour);
-    setFieldValue('endHour', data.value.endHour);
-    setFieldValue('meetingDate', data.value.meetingDate);
+watch(data, (value) => {
+  if (value) {
+    setFieldValue('frequency', value.frequency);
+    setFieldValue('startHour', value.startHour);
+    setFieldValue('endHour', value.endHour);
+    setFieldValue('meetingDate', value.meetingDate);
   }
 });
 </script>
