@@ -89,23 +89,20 @@
             <div class="datePickers">
               <alex-inputs-date
                 id="startDate"
-                :model-value="course.start_date"
+                v-model="startDate"
                 :label="t('pages.courseSettings.config.startDate')"
                 name=""
                 required
                 class="w-100"
-                close-on-select
-                @input="updateStartDate"
               />
 
               <alex-inputs-date
                 id="endDate"
+                v-model="endDate"
                 name=""
                 :label="t('pages.courseSettings.config.endDate')"
-                :model-value="course.end_date"
                 required
                 class="w-100"
-                @input="updateEndDate"
               />
             </div>
           </div>
@@ -126,7 +123,15 @@
             <alex-custom-button
               class="button"
               variant="primary"
-              @click="saveGeneralChanges"
+              @click="
+                () =>
+                  update(`learningplans/${course.id}`, {
+                    title: course.title,
+                    start_date: course.start_date,
+                    end_date: course.end_date,
+                    slug: course.slug,
+                  })
+              "
               >{{
                 t('pages.courseSettings.config.saveButton')
               }}</alex-custom-button
@@ -147,13 +152,13 @@
             <div v-if="canEdit">
               <course-meeting
                 v-for="(schedule, index) in schedules"
-                :id="schedule.attributes.id"
+                :id="schedule.id"
                 :key="index"
-                :frequency="schedule.attributes.frequency"
+                :frequency="schedule.frequency"
                 class="test"
-                :date="new Date().toISOString()"
-                :start-hour="new Date().toISOString()"
-                :end-hour="new Date().toISOString()"
+                :date="new Date()"
+                :start-hour="startHour"
+                :end-hour="endHour"
                 :variant="'editing'"
                 :dropdown-props="[
                   {
@@ -233,11 +238,13 @@
                 class="button"
                 prepend-icon="mdi-plus"
                 variant="primary"
-                >{{ t('pages.courseSettings.config.createSyncMeetingButton')
-                }}<alex-learningplan-modal-schedule
-                  v-model="createSchedule"
-                  @submit="(values) => createNewSchedule(values)"
-              /></alex-custom-button>
+                >{{ t('pages.courseSettings.config.createSyncMeetingButton') }}
+
+                <alex-learningplan-dialogs-schedule
+                  v-model="createScheduleModal"
+                  @submit="(values) => addMeeting(values)"
+                />
+              </alex-custom-button>
             </span>
           </div>
         </div>
@@ -255,16 +262,20 @@
             <span class="header-h5 text-invite">{{
               t('pages.courseSettings.config.linkInvitation')
             }}</span>
+
             <v-switch
-              v-model:model-value="course.invite_enabled"
+              v-model="inviteEnabled"
+              :defaults-target="course.invite_enabled"
               :label="$t('pages.courseSettings.config.inviteLink')"
               color="accent"
+              @change="
+                update(`learningplans/${course.id}`, {
+                  invite_enabled: inviteEnabled,
+                })
+              "
             />
-
-            <div
-              v-if="course.invite_enabled"
-              class="inviteLinks d-flex flex-row"
-            >
+            <p>{{ inviteEnabled }}</p>
+            <div v-if="inviteEnabled" class="inviteLinks d-flex flex-row">
               <div class="">
                 <alex-inputs-select
                   v-model="selectedTime"
@@ -288,7 +299,7 @@
                   no-header
                   class="mt-2 w-full"
                   :enable-invites="course.invite_enabled"
-                  :duration="course.duration"
+                  :duration="3600"
                   :course-id="course.id"
                   :data="invitationLink"
                   @update:link="
@@ -472,28 +483,20 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
-import { format } from 'date-fns';
-import { on } from 'events';
+import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
 
 const dialogMeetingExclusion = ref(false);
 
-const { createCourseRules } = useFormRules();
-
-const removeSelf = (id: string) => {
-  schedules.value = schedules.value.filter((item) => item.id !== id);
-};
 const { t } = useI18n();
-const { find, findOne, update, create, delete: _delete } = useStrapi();
+const { update } = useStrapi();
 const { generateUrl } = useInvitationLink();
-const route = useRoute();
 const course = ref<any>({});
+console.log(course);
 const canEdit = ref(true);
-const owner = ref<any>();
-const { setMessage } = useMessageStore();
-const schedules = ref([]);
+// const schedules = ref([]);
 const invitationLink = ref();
 const plainLink = ref<string | null>(null);
-const newData = ref<any>({});
+const inviteEnabled = ref();
 
 const emit = defineEmits(['update:modelValue']);
 const selectedTime = computed({
@@ -534,102 +537,74 @@ const getCourseInfo = async () => {
       schedules.value = courseData.attributes.schedules.data;
       invitationLink.value = generateUrl(courseData.id);
     }
+
+    console.log('Resposta da API:', data.data[0]);
   } catch (error) {
     console.error('Erro na requisição:', error.message);
   }
 };
-const createSchedule = ref({
-  frequency: '',
-  meetingDate: '',
-  startHour: '',
-  endHour: '',
-  LearningPlan: {
-    data: {
-      id: course.id,
-      attributes: {
-        title: course.title,
-      },
-    },
-  },
-});
-const createNewSchedule = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:1337/api/learningplans/${course.id}?populate=schedules`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          createSchedule(values) {
-            return {
-              frequency: values.frequency,
-              meetingDate: values.meetingDate,
-              startHour: values.startHour,
-              endHour: values.endHour,
-              LearningPlan: values.LearningPlan,
-            };
-          },
-        }),
-      },
-    );
+// const createNewSchedule = async () => {
+//   try {
+//     const response = await fetch(
+//       `http://localhost:1337/api/learningplans/${course.id}?populate=schedules`,
+//       {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           createSchedule(values) {
+//             return {
+//               frequency: values.frequency,
+//               meetingDate: values.meetingDate,
+//               startHour: values.startHour,
+//               endHour: values.endHour,
+//               LearningPlan: values.LearningPlan,
+//             };
+//           },
+//         }),
+//       },
+//     );
 
-    if (!response.ok) {
-      throw new Error(
-        `Erro ao enviar dados para a API: ${response.statusText}`,
-      );
-    }
+//     if (!response.ok) {
+//       throw new Error(
+//         `Erro ao enviar dados para a API: ${response.statusText}`,
+//       );
+//     }
 
-    const responseData = await response.json();
-    console.log('Resposta da API:', responseData);
-  } catch (error) {
-    console.error(error.message);
-  }
+//     const responseData = await response.json();
+//     console.log('Resposta da API:', responseData);
+//   } catch (error) {
+//     console.error(error.message);
+//   }
+// };
+const createScheduleModal = ref(false);
+const schedules = ref<Meeting[]>([]);
+
+const removeSelf = (id: string) => {
+  schedules.value = schedules.value.filter((item) => item.id !== id);
 };
 
-const saveGeneralChanges = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:1337/api/learningplans/${course.value.id}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: course.value.title,
-          start_date: course.value.start_date,
-          end_date: course.value.end_date,
-          slug: course.value.slug,
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Erro ao enviar dados para a API: ${response.statusText}`,
-      );
-    }
-
-    const responseData = await response.json();
-    console.log('Resposta da API:', responseData);
-  } catch (error) {
-    console.error(error.message);
-  }
+// const editMeeting = (values: Meeting) => {
+//   const updatedSchedules = schedules.value.map((meeting) => {
+//     if (meeting.id === values.id) {
+//       return { ...meeting, ...values };
+//     }
+//     return meeting;
+//   });
+//   schedules.value = updatedSchedules;
+// };
+const addMeeting = (values: Meeting) => {
+  schedules.value.push({ ...values, id: crypto.randomUUID() });
 };
-const updateStartDate = () => {
-  course.value.start_date = formatDate(course.value.start_date);
-};
-
-const updateEndDate = () => {
-  course.value.end_date = formatDate(course.value.end_date);
-};
-
-const formatDate = (dateString) => {
-  const date = dateString ? parseISO(dateString) : null;
-  const formatString = t('locale') === 'en' ? 'MM/dd/yyyy' : 'dd/MM/yyyy';
-  return date ? format(date, formatString) : null;
+const startDate = ref()
+const endDate = ref()
+const frequency = {
+  7: 'weekly',
+  1: 'everyday',
+  0: 'interval',
+  30: 'monthly',
+  14: 'biweekly',
 };
 
 const timeOptions = ref([
@@ -684,13 +659,10 @@ const onSelectFile = async (selectedFile) => {
       formData.append('files', imageFile);
     }
 
-    const response = await fetch(
-      `http://localhost:1337/api/learningplans/${course.id}?populate=cover_image`,
-      {
-        method: 'POST',
-        body: formData,
-      },
-    );
+    const response = await fetch(`http://localhost:1337/upload`, {
+      method: 'POST',
+      body: formData,
+    });
 
     if (!response.ok) {
       throw new Error(`Erro ao enviar a imagem: ${response.statusText}`);
@@ -698,6 +670,10 @@ const onSelectFile = async (selectedFile) => {
 
     const responseData = await response.json();
     const imageUrl = responseData[0].url;
+
+    update(`learningplans/${course.value.id}`, {
+      cover_image: imageUrl,
+    });
 
     console.log('Imagem enviada com sucesso:', imageUrl);
   } catch (error) {
@@ -725,6 +701,12 @@ const activeButton = ref('1');
 
 onBeforeMount(async () => {
   await getCourseInfo();
+});
+
+watch(course, (value) => {
+  console.log(course);
+  startDate.value = value.start_date;
+  endDate.value = value.end_date;
 });
 </script>
 <style scoped lang="scss">
