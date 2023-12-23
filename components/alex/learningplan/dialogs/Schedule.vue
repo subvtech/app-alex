@@ -22,6 +22,7 @@
           required
         />
         <alex-inputs-date
+          v-model="meetingDate"
           name="meetingDate"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
@@ -122,6 +123,7 @@ const { handleSubmit, handleReset, setFieldValue } = useForm({
   },
 });
 
+const meetingDate = ref(data.value?.meetingDate);
 const submit = handleSubmit((values) => {
   emit('submit', { ...values, id: props.data?.id });
   emit('update:modelValue', false);
@@ -142,6 +144,7 @@ const items: {
 watch(value, () => {
   if (!value.value) {
     emit('update:data', null);
+    meetingDate.value = undefined;
   }
 });
 
@@ -151,6 +154,7 @@ watch(data, (value) => {
     setFieldValue('startHour', value.startHour);
     setFieldValue('endHour', value.endHour);
     setFieldValue('meetingDate', value.meetingDate);
+    meetingDate.value = value.meetingDate;
   }
 });
 </script>

@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = { id?: string; email: string; fullname?: string };
+type User = { id?: string; email: string; fullname?: string; local?: boolean };
 
 interface AutoCompleteUsersProps {
   name: string;
@@ -85,9 +85,9 @@ const removeSelf = (id?: string) => {
 };
 
 const updateModelValue = (user?: User | null) => {
-  const selectedItem = items.value.find((item) => item.id === user?.id);
+  const selectedItem = items.value.find((item) => item.email === user?.email);
   const alreadyInList = selectedItems.value.find(
-    (item) => item.id === user?.id,
+    (item) => item.email === user?.email,
   );
   if (selectedItem && !alreadyInList) {
     emit('update:selectedItems', [...selectedItems.value, selectedItem]);
@@ -129,19 +129,24 @@ const filterByFullnameAndEmail = (
   return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
 };
 
-watch(search, () => {
-  const isValidEmail = emailRegex.test(search.value);
-  const hasEmail = items.value.filter(
-    (item) => !item.fullname && item.email,
-  ).length;
-  if (!isValidEmail) {
-    items.value.filter((item) => item.email === search.value && !item.fullname);
-    return;
-  }
-  if (!hasEmail) {
-    items.value = [{ email: search.value }, ...items.value];
-  } else {
-    items.value.splice(0, 1, { email: search.value });
-  }
-});
+watch(
+  search,
+  () => {
+    const isValidEmail = emailRegex.test(search.value);
+    const local = items.value.filter((item) => item?.local);
+
+    if (search.value.length && isValidEmail) {
+      if (!local.length) {
+        items.value = [{ email: search.value, local: true }, ...items.value];
+      }
+      items.value = items.value.map((item) => {
+        if (item.local) {
+          return { ...item, email: search.value, local: true };
+        }
+        return item;
+      });
+    }
+  },
+  { deep: true },
+);
 </script>

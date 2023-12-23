@@ -30,6 +30,7 @@
           invitation_duration: 3600,
           members: selectedUsers,
           class_name: learningClass,
+          media: slides,
         })
     "
   >
