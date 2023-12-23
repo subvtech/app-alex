@@ -56,7 +56,7 @@
 import { useField } from 'vee-validate';
 interface DatePickerProps {
   name: string;
-  modelValue?: Date;
+  modelValue?: Date | string;
   label?: string;
   required?: boolean;
   disabled?: boolean;
@@ -74,8 +74,25 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
 });
 
 const emit = defineEmits(['update:modelValue']);
+
+const dateValue = computed({
+  get() {
+    let date: Date | string | undefined = props.modelValue;
+    if (typeof props.modelValue === 'string') {
+      date = new Date(props.modelValue.replace(/-/g, '/'));
+    } else if (props.modelValue) {
+      date = new Date(props.modelValue);
+      date.setHours(0, 0, 0, 0);
+    }
+    return date;
+  },
+  set(value) {
+    emit('update:modelValue', value);
+  },
+});
+
 const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.modelValue,
+  initialValue: dateValue,
   syncVModel: true,
 });
 
@@ -91,7 +108,9 @@ const inputValue = computed({
 
 const formatDate = (date?: Date | string) => {
   if (!date) return undefined;
-  return new Date(date).toISOString().substring(0, 10);
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate.toISOString().substring(0, 10);
 };
 
 const textColor = computed(() => {

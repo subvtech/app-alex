@@ -61,7 +61,7 @@
         />
       </div>
     </template>
-    <template #step2> <alex-custom-carousel :v-model="slides" /></template>
+    <template #step2> <alex-custom-carousel v-model="slides" /></template>
     <template #step3>
       <alex-inputs-users-autocomplete
         v-model:selected-items="selectedUsers"
@@ -152,8 +152,8 @@ const value = computed({
 });
 const { createCourseRules } = useFormRules();
 const createScheduleModal = ref(false);
-const startDate = ref<Date>(new Date());
-const endDate = ref<Date>(new Date());
+const startDate = ref<Date>();
+const endDate = ref<Date>();
 const slides = ref([]);
 const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
