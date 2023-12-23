@@ -16,7 +16,7 @@
       <div class="pa-6">
         <alex-inputs-select
           :items="items"
-          name="frequency"
+          name="interval"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
           density="comfortable"
           required
@@ -73,10 +73,22 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+export type Frequency =
+  | 'sunday'
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'everyday'
+  | 'none'
+  | 'interval';
 
 export interface Meeting {
   id: string;
-  frequency: 0 | 1 | 7 | 14 | 30;
+  frequency: Frequency;
+  interval: 0 | 1 | 7 | 14 | 30;
   meetingDate: Date;
   startHour: string;
   endHour: string;
@@ -116,7 +128,7 @@ const data = computed({
 const { handleSubmit, handleReset, setFieldValue } = useForm({
   validationSchema: scheduleRules,
   initialValues: {
-    frequency: data.value?.frequency || 0,
+    interval: data.value?.interval || 0,
     meetingDate: data.value?.meetingDate,
     startHour: data.value?.startHour || '',
     endHour: data.value?.endHour || '',
@@ -150,7 +162,7 @@ watch(value, () => {
 
 watch(data, (value) => {
   if (value) {
-    setFieldValue('frequency', value.frequency);
+    setFieldValue('interval', value.interval);
     setFieldValue('startHour', value.startHour);
     setFieldValue('endHour', value.endHour);
     setFieldValue('meetingDate', value.meetingDate);

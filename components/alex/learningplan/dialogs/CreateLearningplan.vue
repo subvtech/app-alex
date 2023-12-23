@@ -7,8 +7,8 @@
     stepper
     :steps-config="{
       step1: {
-        title: 'Informações',
-        subtitle: 'Básicas',
+        title: $t('components.learningPlan.dialogs.infos'),
+        subtitle: $t('components.learningPlan.dialogs.basics'),
         scheme: createCourseRules,
       },
       step2: { title: 'Mídia', subtitle: 'Descritiva' },
@@ -17,8 +17,10 @@
     }"
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
+    :loading="loading"
     @on-main-action="
-      () =>
+      () => {
+        loading = true;
         create('learningplans', {
           title: title.replace(/\s+/g, ' ').trim(),
           description,
@@ -31,7 +33,11 @@
           members: selectedUsers,
           class_name: learningClass,
           media: slides,
+          schedules: schedules,
         })
+          .then(() => $emit('update:modelValue', false))
+          .finally(() => (loading = false));
+      }
     "
   >
     <template #step1
@@ -39,16 +45,20 @@
         v-model="title"
         density="comfortable"
         name="title"
-        label="Como vai se chamar seu Curso?"
-        placeholder="Digite o nome do Curso"
+        :label="$t('components.learningPlan.dialogs.titleCourseLabel')"
+        :placeholder="
+          $t('components.learningPlan.dialogs.titleCoursePlaceholder')
+        "
         required
       />
       <alex-inputs-text-area
         v-model="description"
         density="comfortable"
         name="description"
-        label="Do que se trata seu curso?"
-        placeholder="Digite uma descrição do Curso"
+        :label="$t('components.learningPlan.dialogs.aboutCourseLabel')"
+        :placeholder="
+          $t('components.learningPlan.dialogs.aboutCoursePlaceholder')
+        "
         theme="light"
         required
       />
@@ -56,15 +66,15 @@
         v-model="learningClass"
         density="comfortable"
         name="class"
-        label="Digite o nome da turma"
-        placeholder="Digite o nome da turma"
+        :label="$t('components.learningPlan.dialogs.classLabel')"
+        :placeholder="$t('components.learningPlan.dialogs.classPlaceholder')"
         required
       />
       <div class="w-100 d-flex gap-4">
         <alex-inputs-date
           v-model="startDate"
           name="startDate"
-          label="Quando iniciará o curso?"
+          :label="$t('components.learningPlan.dialogs.startDateLabel')"
           required
           class="w-100"
           density="comfortable"
@@ -74,7 +84,7 @@
           density="comfortable"
           name="endDate"
           required
-          label="Quando terminará o curso?"
+          :label="$t('components.learningPlan.dialogs.endDateLabel')"
           class="w-100"
         />
       </div>
@@ -125,8 +135,8 @@
         <course-meeting
           v-for="schedule in schedules"
           :key="schedule.id"
-          :frequency="frequency[schedule.frequency]"
-          :interval="schedule.frequency"
+          :frequency="frequency[schedule.interval]"
+          :interval="schedule.interval"
           :date="schedule.meetingDate"
           :start-hour="schedule.startHour"
           :end-hour="schedule.endHour"
@@ -172,6 +182,7 @@ const value = computed({
 });
 const { createCourseRules } = useFormRules();
 const createScheduleModal = ref(false);
+const loading = ref(false);
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const slides = ref([]);
@@ -181,7 +192,6 @@ const learningClass = ref('');
 const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
 const editData = ref<Meeting | null>(null);
-
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
@@ -196,7 +206,11 @@ const editMeeting = (values: Meeting) => {
   schedules.value = updatedSchedules;
 };
 const addMeeting = (values: Meeting) => {
-  schedules.value.push({ ...values, id: crypto.randomUUID() });
+  schedules.value.push({
+    ...values,
+    id: crypto.randomUUID(),
+    frequency: 'interval',
+  });
 };
 
 const frequency = {
@@ -206,6 +220,8 @@ const frequency = {
   30: 'monthly',
   14: 'biweekly',
 };
+
+watch(schedules, (values) => console.log(values));
 </script>
 
 <style scoped></style>

@@ -1,0 +1,12 @@
+{
+  "infos": "Informações",
+  "basics": "Básicas",
+  "titleCourseLabel": "Como vai se chamar seu Curso?",
+  "titleCoursePlaceholder": "Digite o nome do Curso",
+  "aboutCourseLabel": "Do que se trata seu curso?",
+  "aboutCoursePlaceholder": "Digite uma descrição do Curso",
+  "classLabel": "Como vai se chamar a turma?",
+  "classPlaceholder": "Digite o nome da turma",
+  "startDateLabel": "Quando iniciará o curso?",
+  "endDateLabel": "Quando terminará o curso?"
+}
