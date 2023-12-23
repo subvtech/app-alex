@@ -147,21 +147,31 @@
         </div>
         <div class="content-body">
           <div class="meetings d-flex flex-column w-100">
-            <div v-if="canEdit">
+            <div>
               <course-meeting
-                v-for="(schedule, index) in schedules"
-                :id="schedule.id"
-                :key="index"
-                :frequency="frequency[schedule.frequency]"
-                :interval="schedule.frequency"
-                class="test"
-                :date="schedule.meetingDate"
-                :start-hour="startHour"
-                :end-hour="endHour"
+                v-for="item in meetings"
+                :key="item.id"
+                :date="new Date(item.attributes.date)"
+                :frequency="item.attributes.schedule.data.attributes.frequency"
+                :start-hour="
+                  format(
+                    new Date(
+                      item.attributes.schedule.data.attributes.startDate,
+                    ),
+                    'HH:mm',
+                  )
+                "
+                :end-hour="
+                  format(
+                    new Date(item.attributes.schedule.data.attributes.endDate),
+                    'HH:mm',
+                  )
+                "
+                :interval="item.attributes.schedule.data.attributes.interval"
                 :variant="'editing'"
                 :dropdown-props="[
                   {
-                    onClick: () => console.log('editar'),
+                    onClick: () => editMeeting(item),
                     text: 'Editar',
                     icon: 'mdi-pencil',
                   },
@@ -173,6 +183,7 @@
                   },
                 ]"
               />
+
               <alex-custom-dialog
                 :model-value="dialogMeetingExclusion"
                 title=""
@@ -217,7 +228,7 @@
                       class="button"
                       :text="$t('pages.courseSettings.config.deleteWord')"
                       variant="error"
-                      @click="removeSelf(schedule.id)"
+                      @click="removeSelf('')"
                     />
                   </div>
                 </div>
@@ -225,7 +236,7 @@
                   <alex-custom-dialog-footer class="noShow" /></template
               ></alex-custom-dialog>
             </div>
-            <div v-else class="no-encounters mb-4">
+            <div class="no-encounters mb-4">
               <p>
                 <span class="body-p1">{{
                   t('pages.courseSettings.config.noSyncMeetings')
@@ -482,6 +493,7 @@
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
+import { format } from 'date-fns';
 
 const { t } = useI18n();
 const { find, update } = useStrapi();
@@ -559,7 +571,9 @@ const getCourseInfo = async () => {
   try {
     const result = await find<any>(`learningplans`, {
       filters: { id: { $containsi: 1 } },
+      populate: 'schedules',
     });
+    console.log({ result });
     const id = result.data[0].id;
     const data = result.data[0].attributes;
     if (data) {
@@ -574,12 +588,11 @@ const getCourseInfo = async () => {
         invitation_message: data.invitation_message,
         invitation_duration: data.invitation_duration,
       };
-      schedules.value = data.schedules.data;
       invitationLink.value = generateUrl(id);
+      await updateMeetings(data.schedules.data);
     }
-    console.log('Resposta da API:', data.data[0]);
   } catch (error) {
-    console.error('Erro na requisição:', error?.message);
+    console.error('Erro na requisição:', error);
   }
 };
 
@@ -594,9 +607,9 @@ const selectedTime = computed({
   set(value) {
     const time = value.split(' ');
     if (time[1] === 'minutos') {
-      course.value.invitation_duration = time[0] * 60;
+      course.value.invitation_duration = time[0] * 60 * 1000;
     } else if (time[1] === 'hora' || time[1] === 'horas') {
-      course.value.invitation_duration = time[0] * 60 * 60;
+      course.value.invitation_duration = time[0] * 60 * 60 * 1000;
     }
     emit('update:modelValue', value);
   },
@@ -615,71 +628,44 @@ const timeOptions = ref([
 // sync meetings
 
 const createScheduleModal = ref(false);
-const schedules = ref<Meeting[]>([]);
+const meetings = ref<any>();
+
+const updateMeetings = async (schedules) => {
+  meetings.value = (
+    await find('learning-plan-meetings', {
+      filters: {
+        schedule: {
+          id: {
+            $in: schedules.map((item) => item.id),
+          },
+        },
+        isExpired: false,
+      },
+      populate: 'schedule',
+      sort: 'date:asc',
+    })
+  ).data.splice(0, 2);
+};
+
 const removeSelf = (id: string) => {
-  schedules.value = schedules.value.filter((item) => item.id !== id);
+  meetings.value = meetings.value.filter((item) => item.id !== id);
 };
 
 const addMeeting = (values: Meeting) => {
-  schedules.value.push({ ...values, id: crypto.randomUUID() });
+  meetings.value.push({ ...values, id: crypto.randomUUID() });
 };
 
-const frequency = {
-  7: 'weekly',
-  1: 'everyday',
-  0: 'interval',
-  30: 'monthly',
-  14: 'biweekly',
+const editMeeting = (values: Meeting) => {
+  const updatedSchedules = meetings.value.map((meeting) => {
+    if (meeting.id === values.id) {
+      return { ...meeting, ...values };
+    }
+    return meeting;
+  });
+  meetings.value = updatedSchedules;
 };
 
-// const createNewSchedule = async () => {
-//   try {
-//     const response = await fetch(
-//       `http://localhost:1337/api/learningplans/${course.id}?populate=schedules`,
-//       {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           createSchedule(values) {
-//             return {
-//               frequency: values.frequency,
-//               meetingDate: values.meetingDate,
-//               startHour: values.startHour,
-//               endHour: values.endHour,
-//               LearningPlan: values.LearningPlan,
-//             };
-//           },
-//         }),
-//       },
-//     );
-
-//     if (!response.ok) {
-//       throw new Error(
-//         `Erro ao enviar dados para a API: ${response.statusText}`,
-//       );
-//     }
-
-//     const responseData = await response.json();
-//     console.log('Resposta da API:', responseData);
-//   } catch (error) {
-//     console.error(error.message);
-//   }
-// };
-
-
-// const editMeeting = (values: Meeting) => {
-//   const updatedSchedules = schedules.value.map((meeting) => {
-//     if (meeting.id === values.id) {
-//       return { ...meeting, ...values };
-//     }
-//     return meeting;
-//   });
-//   schedules.value = updatedSchedules;
-// };
-
-//course visibility
+// course visibility
 
 const firstButton = ref([
   {
