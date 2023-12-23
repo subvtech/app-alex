@@ -39,7 +39,7 @@
         :close-on-content-click="false"
       >
         <v-date-picker
-          v-model="value"
+          v-model="dateValue"
           color="secondary-0"
           rounded="lg"
           location="bottom start"
@@ -75,25 +75,29 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
 
 const emit = defineEmits(['update:modelValue']);
 
+const { value, errorMessage } = useField(() => props.name, undefined, {
+  initialValue: props.modelValue,
+  syncVModel: true,
+});
+
+const convertToDate = (dateValue: Date | string | undefined) => {
+  let date: Date | string | undefined = dateValue;
+  if (typeof date === 'string') {
+    date = new Date(date.replace(/-/g, '/'));
+  } else if (date) {
+    date = new Date(date);
+    date.setHours(0, 0, 0, 0);
+  }
+  return date;
+};
+
 const dateValue = computed({
   get() {
-    let date: Date | string | undefined = props.modelValue;
-    if (typeof date === 'string') {
-      date = new Date(date.replace(/-/g, '/'));
-    } else if (date) {
-      date = new Date(date);
-      date.setHours(0, 0, 0, 0);
-    }
-    return date;
+    return convertToDate(value.value);
   },
   set(value) {
     emit('update:modelValue', value);
   },
-});
-
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: dateValue.value,
-  syncVModel: true,
 });
 
 const menu = ref(false);
@@ -107,9 +111,8 @@ const inputValue = computed({
 });
 
 const formatDate = (date?: Date | string) => {
-  if (!date) return undefined;
-  const newDate = new Date(date);
-  newDate.setHours(0, 0, 0, 0);
+  const newDate = convertToDate(date);
+  if (!newDate) return undefined;
   return newDate.toISOString().substring(0, 10);
 };
 
