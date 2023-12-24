@@ -9,37 +9,7 @@
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
     :loading="loading"
-    @on-main-action="
-      () => {
-        loading = true;
-        create('learningplans', {
-          title: title.trim().replace(/\s+/g, ' '),
-          description,
-          start_date: startDate,
-          end_date: endDate,
-          type: 'course',
-          slug: title.trim().replace(/\s+/g, '_').toLocaleLowerCase(),
-          invitation_enabled: true,
-          invitation_duration: 3600,
-          members: selectedUsers,
-          class_name: learningClass,
-          media: slides,
-          schedules: schedules,
-        })
-          .then(() => {
-            $emit('update:modelValue', false);
-            schedules = [];
-            slides = [];
-            selectedUsers = [];
-            title = '';
-            description = '';
-            learningClass = '';
-            startDate = undefined;
-            endDate = undefined;
-          })
-          .finally(() => (loading = false));
-      }
-    "
+    @on-main-action="createCourse"
   >
     <template #step1
       ><alex-inputs-text-field
@@ -186,6 +156,7 @@ const value = computed({
   },
 });
 const { t } = useI18n();
+const { setMessage } = useMessageStore();
 const { createCourseRules } = useFormRules();
 const stepsConfig = {
   step1: {
@@ -218,6 +189,14 @@ const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
 const editData = ref<Meeting | null>(null);
 const carousel = ref<{ clearSlides: () => unknown } | null>(null);
+const frequency = {
+  7: 'weekly',
+  1: 'everyday',
+  0: 'interval',
+  30: 'monthly',
+  14: 'biweekly',
+};
+
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
@@ -239,12 +218,42 @@ const addMeeting = (values: Meeting) => {
   });
 };
 
-const frequency = {
-  7: 'weekly',
-  1: 'everyday',
-  0: 'interval',
-  30: 'monthly',
-  14: 'biweekly',
+const createCourse = async () => {
+  try {
+    loading.value = true;
+    await create('learningplans', {
+      title: title.value.trim().replace(/\s+/g, ' '),
+      description: description.value,
+      start_date: startDate.value,
+      end_date: endDate.value,
+      type: 'course',
+      slug: title.value.trim().replace(/\s+/g, '_').toLocaleLowerCase(),
+      invitation_enabled: true,
+      invitation_duration: 3600,
+      members: selectedUsers.value,
+      class_name: learningClass.value,
+      media: slides.value,
+      schedules: schedules.value,
+    });
+    emit('update:modelValue', false);
+    schedules.value = [];
+    slides.value = [];
+    selectedUsers.value = [];
+    title.value = '';
+    description.value = '';
+    learningClass.value = '';
+    startDate.value = undefined;
+    endDate.value = undefined;
+  } catch (error: unknown) {
+    const message = (error as { error: { message: string } })?.error?.message;
+    if (message) {
+      setMessage(message, 'red', true);
+    } else {
+      setMessage('Não foi possível criar o curso', 'red', true);
+    }
+  } finally {
+    loading.value = false;
+  }
 };
 
 watch(
