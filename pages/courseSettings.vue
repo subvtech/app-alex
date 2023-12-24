@@ -171,7 +171,7 @@
                 :variant="'editing'"
                 :dropdown-props="[
                   {
-                    onClick: () => editMeeting(item),
+                    onClick: () => (editData = true),
                     text: 'Editar',
                     icon: 'mdi-pencil',
                   },
@@ -253,6 +253,7 @@
                 <alex-learningplan-dialogs-schedule
                   v-model="createScheduleModal"
                   v-model:data="editData"
+                  :data="item"
                   @submit="
                     (values) =>
                       !editData ? addMeeting(values) : editMeeting(values)
@@ -511,6 +512,8 @@ import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
 
+const canEdit = ref(true);
+
 const { t } = useI18n();
 const { find, update } = useStrapi();
 const { generateUrl } = useInvitationLink();
@@ -518,10 +521,9 @@ const invitationLink = ref();
 const plainLink = ref<string | null>(null);
 const course = ref<any>({});
 const emit = defineEmits(['update:modelValue']);
-const canEdit = ref(true);
 const editData = ref<Meeting | null>(null);
 
-// upload file
+// upload file - erro 403
 const selectedFile = ref(null);
 const preview = ref(null);
 const handleFileUpload = (event) => {
@@ -561,7 +563,7 @@ const onSelectFile = async (selectedFile) => {
       formData.append('files', imageFile);
     }
 
-    const response = await fetch(`http://localhost:1337/api/learningplans`, {
+    const response = await fetch(`http://localhost:1337/api/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -576,8 +578,6 @@ const onSelectFile = async (selectedFile) => {
     update(`learningplans/${course.value.id}`, {
       cover_image: imageUrl,
     });
-
-    console.log('Imagem enviada com sucesso:', imageUrl);
   } catch (error) {
     console.error('Erro ao enviar a imagem:', error);
   }
@@ -590,7 +590,6 @@ const getCourseInfo = async () => {
       filters: { id: { $containsi: 1 } },
       populate: 'schedules',
     });
-    console.log({ result });
     const id = result.data[0].id;
     const data = result.data[0].attributes;
     if (data) {
@@ -646,7 +645,7 @@ const timeOptions = ref([
   { title: t('pages.courseSettings.config.twentyFourHours'), value: 86400000 },
 ]);
 
-// sync meetings
+// sync meetings - modal de edição não quer abrir, na criação data não seleciona...
 
 const createScheduleModal = ref(false);
 const meetings = ref<any>();
