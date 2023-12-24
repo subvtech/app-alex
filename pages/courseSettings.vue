@@ -326,23 +326,31 @@
             <span class="header-h5 text-invite">{{
               t('pages.courseSettings.config.mailInvite')
             }}</span>
-            <alex-inputs-text-field
-              v-model="course.message"
-              name="Mensagem"
+            <alex-inputs-text-area
+              v-model="invitationMessage"
+              name="message"
               :label="$t('pages.courseSettings.config.inviteMessage')"
               :hint="$t('pages.courseSettings.config.inviteHint')"
               persistent-hint
               class="w-100"
-              required
               density="comfortable"
-              append-inner-icon="mdi-cached"
             >
-            </alex-inputs-text-field>
+              <template #append-inner>
+                <alex-custom-tooltip
+                  text="Restaurar mensagem padrão"
+                  attach="append-inner-icon"
+                >
+                  <template #content>
+                    <v-icon
+                      class="mdi mdi-cached"
+                      color="primary"
+                      @click="restoreDefaultMessage"
+                    />
+                  </template>
+                </alex-custom-tooltip>
+              </template>
+            </alex-inputs-text-area>
           </div>
-          <alex-custom-tooltip
-            text="Restaurar mensagem padrão"
-            attach="append-inner-icon"
-          ></alex-custom-tooltip>
         </div>
         <div class="footer-content">
           <span class="action-content-two">
@@ -355,6 +363,7 @@
               class="button"
               :text="$t('pages.courseSettings.config.saveButton')"
               variant="primary"
+              @click="setNewInvitationMessage(invitationMessage)"
             />
           </span>
         </div>
@@ -388,11 +397,17 @@
               class="button"
               :text="$t('pages.courseSettings.config.cancelButton')"
               variant="secondary"
+              @click="console.log('Cancelar')"
             />
             <alex-custom-button
               class="button"
               :text="$t('pages.courseSettings.config.saveButton')"
               variant="primary"
+              @click="
+                update(`learningplans/${course.id}`, {
+                  hidden: activeButton,
+                })
+              "
             />
           </span>
         </div>
@@ -495,7 +510,6 @@
 import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
-
 
 const { t } = useI18n();
 const { find, update } = useStrapi();
@@ -603,6 +617,18 @@ const startDate = ref();
 const endDate = ref();
 
 // invites
+let invitationMessage = ref(
+  `Olá, {{ Usuário }}, tudo bem? Você foi convidado para participar do curso de {{ course.title }} por {{ Integrante }}. Para acessar o curso, basta clicar no link abaixo: {{ invitationLink }}`,
+);
+
+const setNewInvitationMessage = (message) => {
+  invitationMessage.value = message;
+};
+
+const restoreDefaultMessage = () => {
+  invitationMessage.value = `Olá, {{ Usuário }}, tudo bem? Você foi convidado para participar do curso de {{ course.title }} por {{ Integrante }}. Para acessar o curso, basta clicar no link abaixo: {{ invitationLink }}`;
+};
+
 const inviteEnabled = computed({
   get: () => course.value.invite_enabled,
   set: (value) => {
@@ -666,7 +692,7 @@ const firstButton = ref([
   {
     label: t('pages.courseSettings.config.showCourseTitle'),
     hint: t('pages.courseSettings.config.showCourseHint'),
-    value: '1',
+    value: 'false',
   },
 ]);
 
@@ -674,11 +700,28 @@ const secondButton = ref([
   {
     label: t('pages.courseSettings.config.hideCourseTitle'),
     hint: t('pages.courseSettings.config.hideCourseHint'),
-    value: '2',
+    value: 'true',
   },
 ]);
 
-const activeButton = ref('1');
+const activeButton = computed({
+  get() {
+    if (course.value.hidden) {
+      return 'true';
+    } else {
+      return 'false';
+    }
+  },
+  set(value) {
+    if (value === 'true') {
+      course.value.hidden = true;
+      emit('update:modelValue', true);
+    } else {
+      course.value.hidden = false;
+      emit('update:modelValue', false);
+    }
+  },
+});
 
 // delete course
 
