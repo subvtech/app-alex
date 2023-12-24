@@ -3,7 +3,7 @@
     <alex-custom-header
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
-      :has-main-button="!professorMode"
+      :has-main-button="professorMode"
       :main-button-text="$t('pages.classes.newCourse')"
       main-button-icon="mdi-plus"
       no-back-arrow
