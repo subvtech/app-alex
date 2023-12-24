@@ -89,7 +89,9 @@
         />
       </div>
     </template>
-    <template #step2> <alex-custom-carousel v-model="slides" /></template>
+    <template #step2>
+      <alex-custom-carousel ref="carousel" v-model="slides"
+    /></template>
     <template #step3>
       <alex-inputs-users-autocomplete
         v-model:selected-items="selectedUsers"
@@ -192,6 +194,7 @@ const learningClass = ref('');
 const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
 const editData = ref<Meeting | null>(null);
+const carousel = ref<{ clearSlides: () => unknown } | null>(null);
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
@@ -221,7 +224,10 @@ const frequency = {
   14: 'biweekly',
 };
 
-watch(schedules, (values) => console.log(values));
+watch(
+  () => props.modelValue,
+  () => carousel?.value?.clearSlides(),
+);
 </script>
 
 <style scoped></style>
