@@ -325,6 +325,7 @@ const updateMeetings = async (schedules) => {
   ).data.splice(0, 2);
 };
 
+
 const updateAbout = async (text) => {
   await update('/learningplans', course.value.id, {
     description: text,
