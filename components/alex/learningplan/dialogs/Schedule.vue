@@ -139,7 +139,6 @@ const meetingDate = ref(data.value?.meetingDate);
 const submit = handleSubmit((values) => {
   emit('submit', { ...values, id: props.data?.id });
   emit('update:modelValue', false);
-  handleReset();
 });
 
 const items: {
@@ -157,6 +156,8 @@ watch(value, () => {
   if (!value.value) {
     emit('update:data', null);
     meetingDate.value = undefined;
+    handleReset();
+    setFieldValue('interval', 0);
   }
 });
 
