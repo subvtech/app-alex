@@ -1,20 +1,11 @@
 <template>
   <alex-custom-dialog
     v-model="value"
-    title="Criar novo Curso"
-    name-main-button="Criar"
-    name-second-button="Cancelar"
+    :title="$t('components.learningPlan.dialogs.createNewCourse')"
+    :name-main-button="$t('components.learningPlan.dialogs.create')"
+    :name-second-button="$t('components.learningPlan.dialogs.cancel')"
     stepper
-    :steps-config="{
-      step1: {
-        title: $t('components.learningPlan.dialogs.infos'),
-        subtitle: $t('components.learningPlan.dialogs.basics'),
-        scheme: createCourseRules,
-      },
-      step2: { title: 'Mídia', subtitle: 'Descritiva' },
-      step3: { title: 'Membros', subtitle: 'Participantes' },
-      step4: { title: 'Encontros', subtitle: 'Síncronos' },
-    }"
+    :steps-config="stepsConfig"
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
     :loading="loading"
@@ -22,12 +13,12 @@
       () => {
         loading = true;
         create('learningplans', {
-          title: title.replace(/\s+/g, ' ').trim(),
+          title: title.trim().replace(/\s+/g, ' '),
           description,
           start_date: startDate,
           end_date: endDate,
           type: 'course',
-          slug: title.replace(/\s+/g, '_').trim().toLocaleLowerCase(),
+          slug: title.trim().replace(/\s+/g, '_').toLocaleLowerCase(),
           invitation_enabled: true,
           invitation_duration: 3600,
           members: selectedUsers,
@@ -35,7 +26,17 @@
           media: slides,
           schedules: schedules,
         })
-          .then(() => $emit('update:modelValue', false))
+          .then(() => {
+            $emit('update:modelValue', false);
+            schedules = [];
+            slides = [];
+            selectedUsers = [];
+            title = '';
+            description = '';
+            learningClass = '';
+            startDate = undefined;
+            endDate = undefined;
+          })
           .finally(() => (loading = false));
       }
     "
@@ -97,15 +98,15 @@
         v-model:selected-items="selectedUsers"
         name="users"
         class="w-100"
-        label="Quem participará?"
-        placeholder="Buscar Integrante"
+        :label="$t('components.learningPlan.dialogs.whoParticipate')"
+        :placeholder="$t('components.learningPlan.dialogs.searchMember')"
         density="comfortable"
         return-object
       />
     </template>
     <template #step4>
       <div class="d-flex align-center justify-space-between">
-        <p>Momentos Síncronos</p>
+        <p>{{ $t('components.learningPlan.dialogs.newMeeting') }}</p>
         <alex-custom-button append-icon="mdi-plus" variant="secondary"
           ><alex-learningplan-dialogs-schedule
             v-model="createScheduleModal"
@@ -113,7 +114,9 @@
             @submit="
               (values) => (!editData ? addMeeting(values) : editMeeting(values))
             "
-          />Novo Encontro</alex-custom-button
+          />{{
+            $t('components.learningPlan.dialogs.syncMeetings')
+          }}</alex-custom-button
         >
       </div>
       <div v-if="!schedules.length">
@@ -182,7 +185,27 @@ const value = computed({
     emit('update:modelValue', value);
   },
 });
+const { t } = useI18n();
 const { createCourseRules } = useFormRules();
+const stepsConfig = {
+  step1: {
+    title: t('components.learningPlan.dialogs.infos'),
+    subtitle: t('components.learningPlan.dialogs.basics'),
+    scheme: createCourseRules,
+  },
+  step2: {
+    title: t('components.learningPlan.dialogs.media'),
+    subtitle: t('components.learningPlan.dialogs.descriptive'),
+  },
+  step3: {
+    title: t('components.learningPlan.dialogs.members'),
+    subtitle: t('components.learningPlan.dialogs.participants'),
+  },
+  step4: {
+    title: t('components.learningPlan.dialogs.meetings'),
+    subtitle: t('components.learningPlan.dialogs.synchronous'),
+  },
+};
 const createScheduleModal = ref(false);
 const loading = ref(false);
 const startDate = ref<Date>();
