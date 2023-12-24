@@ -21,7 +21,7 @@
               </a>
             </template>
           </alex-custom-tooltip>
-          <span v-else>{{ $t('components.courses.invites.expired') }}</span>
+          <span v-else>{{ $t("components.courses.invites.expired") }}</span>
 
           <div class="d-flex align-center gap-1">
             <alex-custom-tooltip
@@ -31,7 +31,7 @@
                 <img
                   class="pointer"
                   src="/svg/refresh.svg"
-                  @click="generateNewInvite"
+                  @click="updateLink"
                   width="20"
                   height="20"
                 />
@@ -52,13 +52,13 @@
           </div>
         </div>
         <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
-          <span>{{ $t('components.courses.invites.countdown') }}</span>
+          <span>{{ $t("components.courses.invites.countdown") }}</span>
           <p>{{ msToHHMMSS(remainingTime) }}</p>
         </div>
       </div>
       <div v-else class="d-flex justify-center w-100">
         <span class="desactivated">{{
-          $t('components.courses.invites.desactivated')
+          $t("components.courses.invites.desactivated")
         }}</span>
       </div>
     </template>
@@ -66,9 +66,8 @@
 </template>
 
 <script setup lang="ts">
-const { create, delete: _delete } = useStrapi();
 const { copyToClipboard } = useCopyText();
-const emit = defineEmits(['update:link', 'link:expired']);
+const emit = defineEmits(["update:link", "link:expired"]);
 const props = defineProps({
   enableInvites: {
     type: Boolean,
@@ -88,42 +87,24 @@ const props = defineProps({
   },
 });
 
-const { generateUrl } = useInvitationLink();
+const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =
+  useInvitationLink();
 
 const inviteId = ref(null);
 const url = toRef<string | null>(null);
 const remainingTime = toRef<number>(-5);
 
-function msToHHMMSS(ms) {
-  let totalSeconds = Math.floor(ms / 1000);
-  let hours: string | number = Math.floor(totalSeconds / 3600);
-  let minutes: string | number = Math.floor((totalSeconds - hours * 3600) / 60);
-  let seconds: string | number = totalSeconds - hours * 3600 - minutes * 60;
-
-  // Pad the hours, minutes, and seconds with leading zeros, if required
-  hours = hours < 10 ? '0' + hours : hours;
-  minutes = minutes < 10 ? '0' + minutes : minutes;
-  seconds = seconds < 10 ? '0' + seconds : seconds;
-
-  return hours + ':' + minutes + ':' + seconds;
-}
-
-const generateNewInvite = async () => {
-  try {
-    if (inviteId.value) await _delete('invitation-links', inviteId.value);
-  } catch {}
-
-  const result: any = await create('invitation-links', {
-    duration: props.duration,
-    learningplan: props.courseId,
-  });
-
-  inviteId.value = result.data.id;
-
+const updateLink = async () => {
+  const result = await generateNewInvite(
+    inviteId.value,
+    props.duration,
+    props.courseId
+  );
+  
   url.value = generateUrl(result.data.attributes.hash);
-  emit('update:link', { url: url.value });
-  remainingTime.value =
-    new Date(result.data.attributes.expires_at).getTime() - new Date().getTime();
+  console.log({ updateLink: url.value });
+  emit("update:link", { url: url.value });
+  remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
 };
 
 const theresTimeAndUrl = computed(() => theresTime.value && url.value);
@@ -134,8 +115,7 @@ onBeforeMount(() => {
   if (props.data.hash) url.value = generateUrl(props.data.hash);
   if (props.data.id) inviteId.value = props.data.id;
   if (props.data.expires_at) {
-    remainingTime.value =
-      new Date(props.data.expires_at).getTime() - new Date().getTime();
+    remainingTime.value = calcRemainingTime(props.data.expires_at);
   }
 });
 
@@ -148,9 +128,9 @@ watch(remainingTime, () => {
 });
 
 watch(theresTimeAndUrl, () => {
-  if(theresTimeAndUrl.value) return;
-  emit('link:expired') 
-})
+  if (theresTimeAndUrl.value) return;
+  emit("link:expired");
+});
 </script>
 
 <style scoped lang="scss">

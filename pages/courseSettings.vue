@@ -147,7 +147,7 @@
         </div>
         <div class="content-body">
           <div class="meetings d-flex flex-column w-100">
-            <div>
+            <div v-if="meetings">
               <course-meeting
                 v-for="item in meetings"
                 :key="item.id"
@@ -236,7 +236,7 @@
                   <alex-custom-dialog-footer class="noShow" /></template
               ></alex-custom-dialog>
             </div>
-            <div class="no-encounters mb-4">
+            <div v-else class="no-encounters mb-4">
               <p>
                 <span class="body-p1">{{
                   t('pages.courseSettings.config.noSyncMeetings')
@@ -252,7 +252,11 @@
 
                 <alex-learningplan-dialogs-schedule
                   v-model="createScheduleModal"
-                  @submit="(values) => addMeeting(values)"
+                  v-model:data="editData"
+                  @submit="
+                    (values) =>
+                      !editData ? addMeeting(values) : editMeeting(values)
+                  "
                 />
               </alex-custom-button>
             </span>
@@ -284,7 +288,6 @@
                 })
               "
             />
-            <p>{{ inviteEnabled }}</p>
             <div v-if="inviteEnabled" class="inviteLinks d-flex flex-row">
               <div class="">
                 <alex-inputs-select
@@ -297,12 +300,11 @@
                   :info="$t('pages.courseSettings.config.inviteTooltip')"
                 />
               </div>
-              {{ selectedTime }}
               <div class="w-3/4">
                 <span class="body-p1 py-2">
                   {{ t('pages.courseSettings.config.linkAddress') }}
                 </span>
-                <courses-invites
+                <alex-learningplan-invites
                   v-if="canEdit"
                   href=""
                   no-header
@@ -491,19 +493,20 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
-import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
 import { format } from 'date-fns';
+import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
+
 
 const { t } = useI18n();
 const { find, update } = useStrapi();
 const { generateUrl } = useInvitationLink();
 const invitationLink = ref();
 const plainLink = ref<string | null>(null);
-const inviteEnabled = ref();
 const course = ref<any>({});
 const emit = defineEmits(['update:modelValue']);
 const canEdit = ref(true);
+const editData = ref<Meeting | null>(null);
+
 // upload file
 const selectedFile = ref(null);
 const preview = ref(null);
@@ -600,29 +603,21 @@ const startDate = ref();
 const endDate = ref();
 
 // invites
-const selectedTime = computed({
-  get() {
-    return course.value.invitation_duration;
-  },
-  set(value) {
-    const time = value.split(' ');
-    if (time[1] === 'minutos') {
-      course.value.invitation_duration = time[0] * 60 * 1000;
-    } else if (time[1] === 'hora' || time[1] === 'horas') {
-      course.value.invitation_duration = time[0] * 60 * 60 * 1000;
-    }
-    emit('update:modelValue', value);
+const inviteEnabled = computed({
+  get: () => course.value.invite_enabled,
+  set: (value) => {
+    course.value.invite_enabled = value;
   },
 });
-
+const selectedTime = ref();
 const timeOptions = ref([
-  t('pages.courseSettings.config.fiveMinutes'),
-  t('pages.courseSettings.config.fifteenMinutes'),
-  t('pages.courseSettings.config.thirtyMinutes'),
-  t('pages.courseSettings.config.oneHour'),
-  t('pages.courseSettings.config.twoHours'),
-  t('pages.courseSettings.config.eightHours'),
-  t('pages.courseSettings.config.twentyFourHours'),
+  { title: t('pages.courseSettings.config.fiveMinutes'), value: 300000 },
+  { title: t('pages.courseSettings.config.fifteenMinutes'), value: 900000 },
+  { title: t('pages.courseSettings.config.thirtyMinutes'), value: 1800000 },
+  { title: t('pages.courseSettings.config.oneHour'), value: 3600000 },
+  { title: t('pages.courseSettings.config.twoHours'), value: 7200000 },
+  { title: t('pages.courseSettings.config.eightHours'), value: 28800000 },
+  { title: t('pages.courseSettings.config.twentyFourHours'), value: 86400000 },
 ]);
 
 // sync meetings
