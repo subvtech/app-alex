@@ -10,7 +10,7 @@
           : null
       "
       :profile-picture-size="24"
-      :profile-picture="owner.attributes.user.data.attributes.avatar.data"
+      :profile-picture="owner.attributes.avatar.data"
       :userId="id"
       show-profile-picture
       darker-background
@@ -22,7 +22,7 @@
       :selectedOption="selectedOption"
       @select:option="selectOption"
       is-professor
-      :fullname="owner.attributes.user.data.attributes.fullname"
+      :fullname="owner.attributes.fullname"
       :title="$t('pages.courses.class')"
       :copy-object="
         plainLink
@@ -51,7 +51,7 @@
             <app-media
               :title="$t('pages.courses.media.title')"
               :images="
-                course.media.data.map((item) => {
+                (course.media ? course.media.data : []).map((item) => {
                   return { id: item.id, ...item.attributes };
                 })
               "
@@ -61,7 +61,6 @@
               sizing-class="pa-0"
               is-nested
               hide-dividers
-              full-width
             />
             <app-about
               :text="course.description"
@@ -75,7 +74,7 @@
               full-width
             />
 
-            <courses-goals
+            <alex-learningplan-goals
               :can-edit="canEdit"
               :course-id="course.id"
               :user-id="owner.id"
@@ -101,21 +100,9 @@
               is-nested
             />
 
-            <courses-editor
-              v-if="
-                (course.blocks.data.length === 0 && canEdit) ||
-                course.blocks.data.length !== 0
-              "
-              :info="
-                course.blocks.data.map((item) => {
-                  return {
-                    id: item.id,
-                    data: item.attributes.data,
-                    type: item.attributes.type,
-                    order: item.attributes.order,
-                  };
-                })
-              "
+            <alex-learningplan-details-editor
+              v-if="showDetails"
+              :info="course.details?.data"
               :courseId="course.id"
               :title="$t('components.courses.editor.title')"
               :can-edit="canEdit"
@@ -155,12 +142,12 @@
             />
           </template>
           <template #footer>
-            <courses-meetings
+            <alex-learningplan-meetings
               :can-edit="canEdit"
               :data="meetings"
               :is-facilitator="canEdit"
             />
-            <courses-invites
+            <alex-learningplan-invites
               v-if="canEdit"
               :enable-invites="course.invite_enabled"
               :duration="course.invitation_duration"
@@ -171,6 +158,7 @@
                   plainLink = data.url;
                 }
               "
+              @link:expired="plainLink = null"
             />
           </template>
         </alex-custom-card>
@@ -232,7 +220,7 @@ const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const canEdit = computed(() => owner.value?.id === id.value);
+const canEdit = computed(() => owner.value?.id == id);
 const { setMessage } = useMessageStore();
 
 definePageMeta({
@@ -253,7 +241,6 @@ const populate = [
   'cover_image',
   'media',
   'invitation_links',
-  'blocks',
   'learning_goals.verb',
   'members.user.avatar',
   'tags',
@@ -267,60 +254,58 @@ onBeforeMount(async () => {
 const updateCourse = async (show = true, message?) => {
   let { id } = route.params;
 
-  findOne('learningplans', id as string, { populate })
-    .then((result) => {
-      course.value = {
-        id: result.data.id,
-        ...(result.data.attributes as Object),
-      };
+  const result = await findOne('learningplans', id as string, { populate });
+  if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
+  course.value = {
+    id: result.data.id,
+    ...(result.data.attributes as Object),
+  };
 
-      let temp;
-      if (course.value.invitation_links) {
-        course.value.invitation_links.data.forEach((link) => {
-          const expirationDate = new Date(link.attributes.expires_at);
+  let temp;
+  if (course.value.invitation_links) {
+    course.value.invitation_links.data.forEach((link) => {
+      if (link.attributes.is_expired) return;
+      const expirationDate = new Date(link.attributes.expires_at);
 
-          if (
-            link.attributes.role === 'student' &&
-            expirationDate.getTime() > new Date().getTime()
-          ) {
-            const differenceBetweenLinks = temp
-              ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
-              : 1;
+      if (
+        link.attributes.role === 'student' &&
+        link.attributes.emails_to_send === null &&
+        expirationDate.getTime() > new Date().getTime()
+      ) {
+        const differenceBetweenLinks = temp
+          ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
+          : 1;
 
-            if (!temp || differenceBetweenLinks > 0) {
-              temp = link;
-            }
-          }
-        });
+        if (!temp || differenceBetweenLinks > 0) {
+          temp = link;
+        }
       }
-
-      if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
-      generalTags.value = course.value.tags.data.reduce((acc, item) => {
-        if (item.attributes.isGeneral) {
-          acc.push({ id: item, ...item.attributes });
-        }
-
-        return acc;
-      }, []);
-      technicalTags.value = course.value.tags.data.reduce((acc, item) => {
-        if (!item.attributes.isGeneral) {
-          acc.push({ id: item, ...item.attributes });
-        }
-
-        return acc;
-      }, []);
-
-      owner.value = course.value.members.data.filter(
-        (member) => member.attributes.role === 'facilitator',
-      )[0];
-
-      updateMeetings(course.value.schedules).then();
-
-      setMessage(message ?? 'done', 'green', show);
-    })
-    .catch((err) => {
-      setMessage(i18n.t('pages.courses.notfound'), 'red', show);
     });
+  }
+
+  if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
+  generalTags.value = course.value.tags.data.reduce((acc, item) => {
+    if (item.attributes.isGeneral) {
+      acc.push({ id: item, ...item.attributes });
+    }
+
+    return acc;
+  }, []);
+  technicalTags.value = course.value.tags.data.reduce((acc, item) => {
+    if (!item.attributes.isGeneral) {
+      acc.push({ id: item, ...item.attributes });
+    }
+
+    return acc;
+  }, []);
+
+  owner.value = course.value.members.data.filter(
+    (member) => member.attributes.role === 'facilitator',
+  )[0].attributes.user.data;
+
+  await updateMeetings(course.value.schedules);
+
+  setMessage(message ?? 'done', 'green', show);
 };
 
 const updateMeetings = async (schedules) => {
@@ -350,6 +335,12 @@ const updateAbout = async (text) => {
   );
 };
 
+const showDetails = computed(() => {
+  if (canEdit.value) return canEdit.value;
+
+  return course.value.details?.data?.length !== 0;
+});
+
 watch(invitationLink, () => {
   if (invitationLink.value.data)
     plainLink.value = generateUrl(invitationLink.value.data.hash);
@@ -360,7 +351,10 @@ watch(invitationLink, () => {
   .left-block {
     min-width: 66% !important;
     padding-inline: 24px !important;
-    padding-block: 24px;
+    padding-bottom: 24px;
+    .flex-column.align-center.gap-12 {
+      width: 50%;
+    }
   }
 }
 
@@ -368,6 +362,9 @@ watch(invitationLink, () => {
   .course-page {
     .left-block {
       min-width: 50% !important;
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
     }
   }
 }
@@ -381,6 +378,10 @@ watch(invitationLink, () => {
     .left-block {
       min-width: 33% !important;
       padding-inline: 8px !important;
+
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
     }
     .max-width {
       max-width: unset;
@@ -393,9 +394,13 @@ watch(invitationLink, () => {
     .left-block {
       min-width: 50% !important;
       padding-inline: 24px !important;
+
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
     }
     .max-width {
-      max-width: 450px;
+      max-width: unset;
     }
   }
 }
@@ -405,6 +410,10 @@ watch(invitationLink, () => {
 
     .left-block {
       padding-inline: 24px !important;
+
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
     }
     .max-width {
       max-width: unset;

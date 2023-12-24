@@ -68,7 +68,7 @@
 <script setup lang="ts">
 const { create, delete: _delete } = useStrapi();
 const { copyToClipboard } = useCopyText();
-const emit = defineEmits(['update:link']);
+const emit = defineEmits(['update:link', 'link:expired']);
 const props = defineProps({
   enableInvites: {
     type: Boolean,
@@ -94,11 +94,6 @@ const inviteId = ref(null);
 const url = toRef<string | null>(null);
 const remainingTime = toRef<number>(-5);
 
-function generateRandomBytes(size) {
-  if (size < 1 || size > 36) size = 8;
-  return window.crypto.randomUUID().substring(0, size);
-}
-
 function msToHHMMSS(ms) {
   let totalSeconds = Math.floor(ms / 1000);
   let hours: string | number = Math.floor(totalSeconds / 3600);
@@ -120,15 +115,15 @@ const generateNewInvite = async () => {
 
   const result: any = await create('invitation-links', {
     duration: props.duration,
-    hash: generateRandomBytes(8),
     learningplan: props.courseId,
   });
 
-  inviteId.value = result.id;
-  url.value = generateUrl(result.hash);
+  inviteId.value = result.data.id;
+
+  url.value = generateUrl(result.data.attributes.hash);
   emit('update:link', { url: url.value });
   remainingTime.value =
-    new Date(result.expires_at).getTime() - new Date().getTime();
+    new Date(result.data.attributes.expires_at).getTime() - new Date().getTime();
 };
 
 const theresTimeAndUrl = computed(() => theresTime.value && url.value);
@@ -151,6 +146,11 @@ watch(remainingTime, () => {
     }, 1000);
   }
 });
+
+watch(theresTimeAndUrl, () => {
+  if(theresTimeAndUrl.value) return;
+  emit('link:expired') 
+})
 </script>
 
 <style scoped lang="scss">

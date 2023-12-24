@@ -40,22 +40,14 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { pt } from 'date-fns/locale';
 import { PropType } from 'nuxt/dist/app/compat/capi';
-import { AlexDropdownItem } from './alex/custom/Dropdown.vue';
+import { AlexDropdownItem } from './alex/inputs/Dropdown.vue';
+import { useDatetime } from '~/composables/useDate';
 const { t } = useI18n();
 const emit = defineEmits(['click:activator', 'click:calendar']);
 
 const props = defineProps({
   frequency: {
-    type: String as PropType<
-      | 'sunday'
-      | 'monday'
-      | 'tuesday'
-      | 'wednesday'
-      | 'thursday'
-      | 'friday'
-      | 'saturday'
-      | 'interval'
-    >,
+    type: String,
     required: true,
   },
   interval: {

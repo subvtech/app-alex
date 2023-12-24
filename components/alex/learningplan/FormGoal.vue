@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { PropType } from 'nuxt/dist/app/compat/capi';
 import { useField } from 'vee-validate';
-import AppAutocomplete from '../AppAutocomplete.vue';
+import AppAutocomplete from '../../AppAutocomplete.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',

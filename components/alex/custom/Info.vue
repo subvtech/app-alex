@@ -204,8 +204,8 @@
             :style="codeStyle ?? ''"
             @click="copyToClipboard(copyObject.copyText)"
           >
-            <v-icon style="flex-grow: 0" size="20">mdi-content-copy</v-icon>
-            <span style="flex-grow: 0">{{ copyObject.label }}</span>
+            <v-icon class="flex-grow-0" size="20">mdi-content-copy</v-icon>
+            <span class="flex-grow-0">{{ copyObject.label }}</span>
           </div>
         </div>
         <alex-custom-tooltip
@@ -400,6 +400,9 @@ const startDateOrEndDate = computed(() => {
 </script>
 
 <style scoped lang="scss">
+.flex-grow-0 {
+  flex-grow: 0;
+}
 .darker-bg {
   border-radius: 8px;
   background-color: rgba(0, 0, 0, 0.5);

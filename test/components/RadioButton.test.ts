@@ -3,7 +3,7 @@ import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen, within, fireEvent } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
 
-import RadioButtonComponent from '../../components/Alex/inputs/RadioButton.vue';
+import RadioButtonComponent from '../../components/alex/inputs/RadioButton.vue';
 let model = 'Test Value';
 
 describe('Pagination component', () => {

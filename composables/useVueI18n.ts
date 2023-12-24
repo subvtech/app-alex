@@ -63,6 +63,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'courses',
     'trailId',
     'forgot',
+    'classes',
     'emailConfirmation',
     'courseSettings',
   ]);

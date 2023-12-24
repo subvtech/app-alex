@@ -22,10 +22,20 @@
       <course-meeting
         v-else
         v-for="item in data"
-        :date="item.attributes.date"
+        :date="new Date(item.attributes.date)"
         :frequency="item.attributes.schedule.data.attributes.frequency"
-        :start-hour="item.attributes.schedule.data.attributes.startDate"
-        :end-hour="item.attributes.schedule.data.attributes.endDate"
+        :start-hour="
+          format(
+            new Date(item.attributes.schedule.data.attributes.startDate),
+            'HH:mm',
+          )
+        "
+        :end-hour="
+          format(
+            new Date(item.attributes.schedule.data.attributes.endDate),
+            'HH:mm',
+          )
+        "
         :interval="item.attributes.schedule.data.attributes.interval"
       />
     </template>
@@ -33,6 +43,8 @@
 </template>
 
 <script setup lang="ts">
+import { format } from 'date-fns';
+
 defineProps({
   data: {
     type: Array as PropType<

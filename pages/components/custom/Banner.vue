@@ -687,31 +687,6 @@ const copyToClipboard = async (index) => {
   }
   copiedIndex.value = index;
 };
-
-onBeforeMount(async () => {
-  await updateUser(false);
-});
-
-const updateUser = async (show = true) => {
-  const populate = [
-    'cover',
-    'avatar',
-    'learningPlans',
-    'socials',
-    'trails',
-    'role',
-    'user_descriptions',
-    'user_wallet',
-  ];
-
-  user.value = await findOne<User>('users', id, { populate });
-
-  if (user.value.avatar) profilePicture.value = user.value.avatar.url;
-  if (user.value.cover) coverPicture.value = user.value.cover.url;
-  messageStore.message = 'done';
-  messageStore.color = 'green';
-  messageStore.show = show;
-};
 </script>
 
 <style>

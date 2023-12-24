@@ -49,7 +49,7 @@ import Hyperlink from 'editorjs-hyperlink';
 import AlignmentBlockTune from 'editorjs-text-alignment-blocktune';
 import Paragraph from '@editorjs/paragraph';
 import Embed from '@editorjs/embed';
-import header from '../../editor-js/plugins/header/HeaderBlock';
+import header from '../../../editor-js/plugins/header/HeaderBlock';
 import { i18n } from '~/assets/editor-i18n';
 const { create, update, delete: _delete } = useStrapi();
 const { t } = useI18n();
@@ -186,37 +186,17 @@ const isEmptyAndIsNotEditing = computed(
 const updateAbout = async () => {
   const instanceData = await instance.value.save();
 
-  const promises: Promise<any>[] = [];
-  if (info.value.length > 0) {
-    info.value.forEach((item, index) => {
-      if (instanceData.blocks[index])
-        promises.push(
-          update(`blocks/${item.id}`, {
-            data: instanceData.blocks[index].data,
-            type: instanceData.blocks[index].type,
-            learningplan: props.courseId,
-            order: index,
-          }),
-        );
-    });
-  }
-  instanceData.blocks.slice(info.value.length).forEach((item, index) => {
-    promises.push(
-      create('blocks', {
-        data: item.data,
-        type: item.type,
-        learningplan: props.courseId,
-        order: info.value.length + index,
-      }),
-    );
+  const newData = instanceData.blocks.map((item, index) => {
+    return {
+      data: item.data,
+      type: item.type,
+      order: index,
+    };
   });
-  if (info.value.length > instanceData.blocks.length) {
-    info.value.slice(instanceData.blocks.length).forEach((item) => {
-      promises.push(_delete(`blocks/${item.id}`));
-    });
-  }
-
-  await Promise.all(promises);
+  
+  await update(`learningplans/${props.courseId}`, {
+    details: { data: newData },
+  });
   isEditing.value = false;
 
   emit('update');

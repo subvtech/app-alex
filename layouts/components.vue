@@ -85,7 +85,7 @@ const menus = [
         to: '/components/custom/AvatarGroup',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-image-area',
         title: 'Banner',
         to: '/components/custom/banner',
       },

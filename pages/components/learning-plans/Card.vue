@@ -203,6 +203,13 @@
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
+            <tr>
+              <td>Options</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
           </tbody>
         </v-table>
       </div>
@@ -243,15 +250,8 @@
               </td>
             </tr>
             <tr>
-              <td><strong class="text-success-0">@show</strong></td>
-              <td>Ação ao clicar em mostrar</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td><strong class="text-success-0">@hide</strong></td>
-              <td>Ação ao clicar em ocultar</td>
+              <td><strong class="text-success-0">@toggleVisibility</strong></td>
+              <td>Ação ao clicar em ocultar/mostrar</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
