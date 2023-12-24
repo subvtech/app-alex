@@ -19,14 +19,23 @@
         style="flex: 1"
         class="d-flex align-center justify-center flex-column"
       >
-        <img
-          class="emptyProjects-img"
-          src="@/assets/svg/EmptyProjects.svg"
-          alt="Empty Projects"
-        />
-        <p class="text-h3 text-gray-600">
-          {{ $t('pages.classes.emptyStateText') }}
-        </p>
+        <v-progress-circular
+          v-if="isLoading"
+          color="accent"
+          indeterminate
+          :size="100"
+          :width="6"
+        ></v-progress-circular>
+        <div v-else>
+          <img
+            class="emptyProjects-img"
+            src="@/assets/svg/EmptyProjects.svg"
+            alt="Empty Projects"
+          />
+          <p class="text-h3 text-gray-600">
+            {{ $t('pages.classes.emptyStateText') }}
+          </p>
+        </div>
       </div>
       <div v-else class="d-flex w-100 flex-column h-100" style="flex: 1">
         <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
@@ -38,7 +47,7 @@
             variant="outlined"
             hide-details
             class="w-50"
-            style="min-width: 160px"
+            style="min-width: 160px; max-width: 320px"
             density="compact"
           >
             ></alex-inputs-text-field
@@ -96,11 +105,14 @@
             'end_date',
             'tags',
           ]"
-          class="d-flex flex-wrap align-content-space-between"
-          style="flex: 1"
+          class="d-flex flex-wrap"
+          style="flex: 1; position: relative"
         >
           <template #default="{ items }">
-            <div v-if="coursesView === 'grid'" class="d-flex flex-wrap ga-4">
+            <div
+              v-if="coursesView === 'grid'"
+              class="d-flex ga-6 grid-container flex-wrap w-100"
+            >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
@@ -199,7 +211,7 @@
           </template>
           <template #footer="{ pageCount, groupedItems }">
             <div
-              class="d-flex w-100 justify-space-between align-center pa-6 flex-column flex-sm-row ga-3 footer mt-6"
+              class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
             >
               <p class="text-body-3 text-gray-600">
                 {{ showingData(groupedItems) }}
@@ -222,18 +234,19 @@
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetLearningPlans } from '~/assets/queries';
 import { LearningPlan } from '@/models/learningPlan.model';
-const rounter = useRouter();
+const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
 const professorMode = ref(false);
+const isLoading = ref(false);
 const { t } = useI18n();
 const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
 
 interface courseItem {
-  id: number;
+  id?: number;
   description: string;
   facilitatorName?: string;
   facilitatorImage?: string;
@@ -241,7 +254,7 @@ interface courseItem {
   img?: string;
   institution?: string;
   tags?: string[];
-  start_date: string;
+  start_date?: string;
   end_date?: string;
   hidden: boolean;
   favorited: boolean;
@@ -260,58 +273,173 @@ onBeforeMount(async () => {
       sortable: false,
     });
   }
-  const { data } = await useAsyncData('learningPlans', () => {
-    const params = { userId: id };
-    return graphql<{
-      data: {
-        learningplans: Strapi4ResponseMany<LearningPlan>;
-      };
-    }>(GetLearningPlans, params);
-  });
-  courses.value =
-    data.value?.data.learningplans.data.map((plan): courseItem => {
-      const { attributes } = plan;
-      const id = plan.id;
-      const {
-        title,
-        description,
-        start_date,
-        end_date,
-        cover_image,
-        hidden,
-        members,
-        tags,
-        learning_structure,
-      } = attributes;
-      const facilitatorName =
-        members.data[0]?.attributes?.user.data.attributes.fullname;
-      const facilitatorImage =
-        members.data[0]?.attributes?.user.data.attributes.avatar?.data
-          ?.attributes?.url;
-      const institution =
-        members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
-          ?.attributes?.name;
-      const img = cover_image?.data?.attributes?.url;
-      const trails =
-        learning_structure?.data?.attributes?.trails.data.length || 0;
+  // isLoading.value = true;
+  // const { data } = await useAsyncData('learningPlans', () => {
+  //   const params = { userId: id };
+  //   return graphql<{
+  //     data: {
+  //       learningplans: Strapi4ResponseMany<LearningPlan>;
+  //     };
+  //   }>(GetLearningPlans, params);
+  // });
+  // courses.value =
+  //   data.value?.data.learningplans.data.map((plan): courseItem => {
+  //     const { attributes } = plan;
+  //     const id = plan.id;
+  //     const {
+  //       title,
+  //       description,
+  //       start_date,
+  //       end_date,
+  //       cover_image,
+  //       hidden,
+  //       members,
+  //       tags,
+  //       learning_structure,
+  //     } = attributes;
+  //     const facilitatorName =
+  //       members.data[0]?.attributes?.user.data.attributes.fullname;
+  //     const facilitatorImage =
+  //       members.data[0]?.attributes?.user.data.attributes.avatar?.data
+  //         ?.attributes?.url;
+  //     const institution =
+  //       members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
+  //         ?.attributes?.name;
+  //     const img = cover_image?.data?.attributes?.url;
+  //     const trails =
+  //       learning_structure?.data?.attributes?.trails.data.length || 0;
 
-      return {
-        id,
-        title,
-        description,
-        start_date,
-        end_date,
-        img,
-        hidden,
-        facilitatorName,
-        facilitatorImage,
-        institution,
-        tags: tags.data.map((tag) => tag.attributes.text),
-        trails,
-        favorited: false,
-      };
-    }) || [];
+  //     return {
+  //       id,
+  //       title,
+  //       description,
+  //       start_date,
+  //       end_date,
+  //       img,
+  //       hidden,
+  //       facilitatorName,
+  //       facilitatorImage,
+  //       institution,
+  //       tags: tags.data.map((tag) => tag.attributes.text),
+  //       trails,
+  //       favorited: false,
+  //     };
+  //   }) || [];
+  // isLoading.value = false;
 });
+
+courses.value = [
+  {
+    title:
+      'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
+    description:
+      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
+    facilitatorName: 'Alexandre',
+    facilitatorImage: 'https://picsum.photos/200/300',
+    trails: 3,
+    img: 'https://picsum.photos/400/600',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Introdução à programação em Python',
+    description: 'Olá pessoal!',
+    facilitatorName: 'Isabella',
+    facilitatorImage: 'https://picsum.photos/201/301',
+    trails: 5,
+    img: 'https://picsum.photos/401/601',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Desenvolvimento web com React.js',
+    description:
+      'Bem-vindos ao curso de desenvolvimento web com React.js! Vamos explorar juntos as maravilhas do React.',
+    facilitatorName: 'Carlos',
+    facilitatorImage: 'https://picsum.photos/202/302',
+    trails: 4,
+    img: 'https://picsum.photos/402/602',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Aprendendo machine learning com scikit-learn',
+    description:
+      'Oi pessoal! Vamos mergulhar no mundo do machine learning com o scikit-learn. Animados?',
+    facilitatorName: 'Camila',
+    facilitatorImage: 'https://picsum.photos/203/303',
+    trails: 6,
+    img: 'https://picsum.photos/403/603',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Segurança da informação e ethical hacking',
+    description:
+      'Este curso aborda tópicos essenciais sobre segurança da informação e ethical hacking. Fiquem atentos!',
+    facilitatorName: 'Diego',
+    facilitatorImage: 'https://picsum.photos/204/304',
+    trails: 5,
+    img: 'https://picsum.photos/404/604',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Desenvolvimento mobile com Flutter',
+    description:
+      'Vamos construir aplicativos incríveis com Flutter! Este curso é para quem quer mergulhar no desenvolvimento mobile.',
+    facilitatorName: 'Eduarda',
+    facilitatorImage: 'https://picsum.photos/205/305',
+    trails: 4,
+    img: 'https://picsum.photos/405/605',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Gestão de projetos ágeis com Scrum',
+    description:
+      'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
+    facilitatorName: 'Fernando',
+    facilitatorImage: 'https://picsum.photos/206/306',
+    trails: 3,
+    img: 'https://picsum.photos/406/606',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Inteligência artificial e redes neurais',
+    description:
+      'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
+    facilitatorName: 'Gabriela',
+    facilitatorImage: 'https://picsum.photos/207/307',
+    trails: 6,
+    img: 'https://picsum.photos/407/607',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Gestão de projetos ágeis com Scrum',
+    description:
+      'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
+    facilitatorName: 'Fernando',
+    facilitatorImage: 'https://picsum.photos/206/306',
+    trails: 3,
+    img: 'https://picsum.photos/406/606',
+    favorited: false,
+    hidden: false,
+  },
+  {
+    title: 'Inteligência artificial e redes neurais',
+    description:
+      'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
+    facilitatorName: 'Gabriela',
+    facilitatorImage: 'https://picsum.photos/207/307',
+    trails: 6,
+    img: 'https://picsum.photos/407/607',
+    favorited: false,
+    hidden: false,
+  },
+];
 
 interface Item {
   raw: courseItem;
@@ -334,6 +462,9 @@ const showingData = (groupedItems) => {
     to,
     total,
   });
+  if (to === 0) {
+    return t('pages.classes.noData');
+  }
   return message;
 };
 const breadcrumbs = [
@@ -344,7 +475,6 @@ const breadcrumbs = [
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/course',
     disabled: false,
   },
 ];
@@ -413,9 +543,9 @@ const changeItemFavorited = (index: number) => {
 
 const navigate = (id: number, page) => {
   if (page === 'configurations') {
-    rounter.push(`/course/${id}/configurations`);
+    router.push(`/course/${id}/configurations`);
   } else {
-    rounter.push(`/course/${id}`);
+    router.push(`/course/${id}`);
   }
 };
 </script>
@@ -459,16 +589,28 @@ const navigate = (id: number, page) => {
 }
 
 .flex-stretch {
-  flex: 1 !important;
-  flex-basis: fit-content;
+  flex: 1;
+}
+
+.flex-container {
+  flex: 1;
+  flex-grow: 0.5;
 }
 
 .footer {
   border-top: 1px #ebedef solid;
   max-height: 95px;
+  align-self: flex-end !important;
 }
 
 .hidden {
   opacity: 0.5;
+}
+
+@media (min-width: 1420px) {
+  .flex-stretch {
+    max-width: min(calc(25% - 24px), 375px) !important;
+    /* max-width: calc(25% - 24px); */
+  }
 }
 </style>
