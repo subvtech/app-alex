@@ -26,7 +26,13 @@
       :error-messages="errorMessage"
       :disabled="disabled"
       v-bind="$attrs"
-    />
+    >
+      <template #append-inner>
+        <div class="v-input__append-inner">
+          <slot name="append-inner"></slot>
+        </div>
+      </template>
+    </v-textarea>
   </div>
 </template>
 
