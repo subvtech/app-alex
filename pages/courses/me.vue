@@ -1,18 +1,17 @@
 <template>
-  <div class="wrapper d-flex flex-column">
-    <header class="d-flex justify-space-between flex-column flex-sm-row mb-2">
-      <alex-custom-breadcrumbs
-        :title="$t('pages.classes.breadcrumbs.myCourses')"
-        :items="breadcrumbs"
-      />
-      <alex-custom-button
-        v-if="professorMode"
-        prepend-icon="mdi-plus"
-        size="large"
-        class="text-body-4"
-        >{{ $t('pages.classes.newCourse') }}</alex-custom-button
-      >
-    </header>
+  <div class="wrapper d-flex flex-column gap-6">
+    <alex-custom-header
+      :title="$t('pages.classes.breadcrumbs.myCourses')"
+      :items="breadcrumbs"
+      :has-main-button="!professorMode"
+      :main-button-text="$t('pages.classes.newCourse')"
+      main-button-icon="mdi-plus"
+      no-back-arrow
+      @main-action="() => (createCourseDialog = true)"
+    />
+    <alex-learningplan-dialogs-create-learningplan
+      v-model="createCourseDialog"
+    />
     <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
       <div
         v-if="courses.length == 0"
@@ -231,7 +230,7 @@ const professorMode = ref(false);
 const { t } = useI18n();
 const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
-
+const createCourseDialog = ref(false);
 interface courseItem {
   id: number;
   description: string;

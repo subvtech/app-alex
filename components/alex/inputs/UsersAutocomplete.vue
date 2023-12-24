@@ -66,6 +66,7 @@ const emit = defineEmits([
   'remove:invite',
 ]);
 const { find } = useStrapi();
+const user = useStrapiUser().value;
 const { emailRegex } = useFormRules();
 const { value, setState } = useField<User | null>(() => props.name, undefined);
 const search = ref('');
@@ -112,7 +113,8 @@ useOnStopTyping(search, async () => {
   if (registeredFields.length) {
     items.value = registeredFields.filter(
       (itemRequest) =>
-        !selectedItems.value.find((item) => item.id === itemRequest?.id),
+        !selectedItems.value.find((item) => item.id === itemRequest?.id) &&
+        itemRequest.email !== user?.email,
     );
   }
 });
