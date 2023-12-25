@@ -3,5 +3,6 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.quickSuggestions": {
     "strings": true
-  }
+  },
+  "zenMode.hideLineNumbers": false
 }

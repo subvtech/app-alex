@@ -15,9 +15,15 @@
     "invalid": "CPF inválido."
   },
 
-  "about": {
-    "required": "Sobre é necessário",
-    "min": "Mínimo de 12 caracteres",
+  "keyword": {
+    "required": "Esse campo é obrigatório",
+    "noSpaces": "Não pode haver espaços",
+    "onlyLetters": "Apenas letras do alfabeto são permitidas"
+  },
+
+  "description": {
+    "required": "Esse campo é obrigatório",
+    "min": "Mínimo de 6 caracteres",
     "max": "Máximo de 4000 caracteres"
   },
 
@@ -94,6 +100,10 @@
     },
     "endHour": {
       "required": "Hora de término é obrigatório"
+    },
+    "copy": {
+      "success": "Texto copiado.",
+      "error": "Não foi possível copiar o texto."
     }
   }
 }

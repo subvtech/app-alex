@@ -93,12 +93,22 @@ export const useFormRules = () => {
       ),
   };
 
-  const aboutRules = {
-    info: yup
+  const keywordRules = yup
+    .object({
+      text: yup
+        .string()
+        .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+        .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+        .required(i18n.t('rules.keyword.required')),
+    })
+    .required(i18n.t('rules.keyword.required'));
+
+  const descriptionRules = {
+    description: yup
       .string()
-      .min(12, i18n.t('rules.about.min'))
-      .max(4000, i18n.t('rules.about.max'))
-      .required(i18n.t('rules.about.required'))
+      .required(i18n.t('rules.description.required'))
+      .min(6, i18n.t('rules.description.min'))
+      .max(4000, i18n.t('rules.description.max'))
       .trim(),
   };
 
@@ -222,6 +232,8 @@ export const useFormRules = () => {
     emailRules: yup.object(emailRules),
     passwordRules,
     fullnameRules,
+    descriptionRules,
+    keywordRules,
     cpfRules,
     profileSchema,
     socialsSchema,
