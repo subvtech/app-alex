@@ -44,54 +44,46 @@ import { AlexDropdownItem } from './alex/inputs/Dropdown.vue';
 import { useDatetime } from '~/composables/useDate';
 const { t } = useI18n();
 const emit = defineEmits(['click:activator', 'click:calendar']);
+export type MeetingVariantType = 'editing' | 'list';
 
-const props = defineProps({
-  frequency: {
-    type: String,
-    required: true,
-  },
-  interval: {
-    type: Number as PropType<0 | 1 | 7 | 14 | 30>,
-    default: 7,
-  },
-  variant: {
-    type: String as PropType<'editing' | 'list'>,
-    default: 'list',
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-  startHour: {
-    type: String,
-    required: true,
-  },
-  endHour: {
-    type: String,
-    required: true,
-  },
-  showOptions: {
-    type: Boolean,
-    default: false,
-  },
-  shortText: {
-    type: Boolean,
-    default: false,
-  },
-  dropdownProps: {
-    type: Array as PropType<AlexDropdownItem[]>,
-    default: () => [
-      {
-        icon: 'mdi-pencil',
-        text: 'Editar', // t('components.courses.meeting.edit'),
-      },
-      {
-        icon: 'mdi-trash-can',
-        text: 'Excluir', // t('components.courses.meeting.delete'),
-        warning: true,
-      },
-    ],
-  },
+export interface MeetingProps {
+  frequency:
+    | 'everyday'
+    | 'sunday'
+    | 'monday'
+    | 'tuesday'
+    | 'wednesday'
+    | 'thursday'
+    | 'friday'
+    | 'saturday'
+    | 'none';
+  interval: 0 | 1 | 7 | 14 | 30;
+  variant: MeetingVariantType;
+  date: Date;
+  startHour: string;
+  endHour: string;
+  shortText: boolean;
+  showOptions: boolean;
+  dropdownProps: AlexDropdownItem[];
+}
+
+const props = withDefaults(defineProps<MeetingProps>(), {
+  interval: 7,
+  frequency: 'none',
+  variant: 'list',
+  dropdownProps: () => [
+    {
+      icon: 'mdi-pencil',
+      text: 'Editar', // t('components.courses.meeting.edit'),
+    },
+    {
+      icon: 'mdi-trash-can',
+      text: 'Excluir', // t('components.courses.meeting.delete'),
+      warning: true,
+    },
+  ],
+  shortText: false,
+  showOptions: false,
 });
 
 const { dateToHour } = useDatetime();
@@ -119,7 +111,7 @@ const formattedDate = computed(() => {
 const isEditing = computed(() => props.variant === 'editing');
 
 const frequencyText = computed(() =>
-  props.frequency !== 'interval'
+  props.frequency !== 'none'
     ? t(`components.courses.meeting.every.${props.frequency}`)
     : props.interval === 30
     ? t('components.courses.meeting.monthly', {

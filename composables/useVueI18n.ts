@@ -65,7 +65,6 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'forgot',
     'classes',
     'emailConfirmation',
-    'courseSettings',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
@@ -75,15 +74,16 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'competences',
     'tagCombobox',
     'dialog',
-    'date',
-    'carousel',
-    'institutions',
     'card',
     'meeting',
     'carousel',
+    'institutions',
     'usersAutocomplete',
-    'meeting',
+    'courses/editor',
+    'courses/goals',
+    'courses/invites',
     'courses/meeting',
+    'courses/settings',
     'learningPlan/editor',
     'learningPlan/cardTrails',
     'learningPlan/card',
@@ -118,3 +118,4 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);
 }
+
