@@ -11,6 +11,7 @@
     />
     <alex-learningplan-dialogs-create-learningplan
       v-model="createCourseDialog"
+      @submit="async () => await getCourses()"
     />
     <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
       <div
@@ -248,8 +249,7 @@ interface courseItem {
 }
 
 const courses = ref<courseItem[]>([]);
-
-onBeforeMount(async () => {
+const getCourses = async () => {
   const { isProfessor, id } = useStrapiUser<User>().value;
   professorMode.value = isProfessor;
   if (professorMode.value) {
@@ -310,7 +310,9 @@ onBeforeMount(async () => {
         favorited: false,
       };
     }) || [];
-});
+};
+// eslint-disable camelcase
+onBeforeMount(async () => await getCourses());
 
 interface Item {
   raw: courseItem;

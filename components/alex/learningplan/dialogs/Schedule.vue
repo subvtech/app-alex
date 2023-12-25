@@ -82,8 +82,7 @@ export type Frequency =
   | 'friday'
   | 'saturday'
   | 'everyday'
-  | 'none'
-  | 'interval';
+  | 'none';
 
 export interface Meeting {
   id: string;

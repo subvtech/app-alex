@@ -145,7 +145,7 @@ const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'submit']);
 const { create } = useStrapi4();
 const value = computed({
   get() {
@@ -214,7 +214,7 @@ const addMeeting = (values: Meeting) => {
   schedules.value.push({
     ...values,
     id: crypto.randomUUID(),
-    frequency: 'interval',
+    frequency: 'none',
   });
 };
 
@@ -235,6 +235,7 @@ const createCourse = async () => {
       media: slides.value,
       schedules: schedules.value,
     });
+    emit('submit');
     emit('update:modelValue', false);
     schedules.value = [];
     slides.value = [];
