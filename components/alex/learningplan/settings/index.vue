@@ -21,134 +21,15 @@
         :learning-plan-id="learningPlan.id"
         @update="(data) => emit('update', data)"
       />
+      <alex-learningplan-meetings
+        can-edit
+        is-facilitator
+        :learning-plan-id="learningPlan.id"
+        :data="schedules"
+        :end-date="new Date(learningPlan.end_date)"
+        variant="editing"
+      />
 
-      <alex-learningplan-meetings can-edit is-facilitator :data="meetings" />
-      <div class="content-area meetings">
-        <div class="card-title">
-          <p>
-            <span class="header-h4">{{
-              t('pages.courseSettings.config.syncMeetingsTitle')
-            }}</span>
-          </p>
-        </div>
-        <div class="content-body">
-          <div class="meetings d-flex flex-column w-100">
-            <div v-if="meetings">
-              <course-meeting
-                v-for="item in meetings"
-                :key="item.id"
-                :date="new Date(item.attributes.date)"
-                :frequency="item.attributes.schedule.data.attributes.frequency"
-                :start-hour="
-                  format(
-                    new Date(
-                      item.attributes.schedule.data.attributes.startDate,
-                    ),
-                    'HH:mm',
-                  )
-                "
-                :end-hour="
-                  format(
-                    new Date(item.attributes.schedule.data.attributes.endDate),
-                    'HH:mm',
-                  )
-                "
-                :interval="item.attributes.schedule.data.attributes.interval"
-                :variant="'editing'"
-                :dropdown-props="[
-                  {
-                    onClick: () => editMeeting(item),
-                    text: 'Editar',
-                    icon: 'mdi-pencil',
-                  },
-                  {
-                    onClick: () => (dialogMeetingExclusion = true),
-                    text: 'Apagar',
-                    icon: 'mdi-trash-can-outline',
-                    warning: true,
-                  },
-                ]"
-              />
-
-              <alex-custom-dialog
-                :model-value="dialogMeetingExclusion"
-                title=""
-                body-classes="criticalAttention"
-                width="520px"
-                :scrollable="false"
-                max-height="500px"
-              >
-                <template #header>
-                  <alex-custom-dialog-header title="" class="noShow"
-                /></template>
-                <div class="criticalAttention">
-                  <div class="exclusionBody">
-                    <span class="exclusionIMG">
-                      <img
-                        src="@/assets/svg/exclusionImage.svg"
-                        alt="attention image"
-                      />
-                    </span>
-                    <p>
-                      <span class="header-h4">{{
-                        t(
-                          'pages.courseSettings.config.deleteMeetingConfirmation',
-                        )
-                      }}</span>
-                      <br />
-                      <span class="body-p1">{{
-                        t(
-                          'pages.courseSettings.config.deleteMeetingDescription',
-                        )
-                      }}</span>
-                    </p>
-                  </div>
-                  <div class="exclusionFooter">
-                    <alex-custom-button
-                      class="button"
-                      :text="$t('pages.courseSettings.config.cancelButton')"
-                      variant="secondary"
-                      @click="dialogMeetingExclusion = false"
-                    />
-                    <alex-custom-button
-                      class="button"
-                      :text="$t('pages.courseSettings.config.deleteWord')"
-                      variant="error"
-                      @click="removeSelf('')"
-                    />
-                  </div>
-                </div>
-                <template #footer>
-                  <alex-custom-dialog-footer class="noShow" /></template
-              ></alex-custom-dialog>
-            </div>
-            <div v-else class="no-encounters mb-4">
-              <p>
-                <span class="body-p1">{{
-                  t('pages.courseSettings.config.noSyncMeetings')
-                }}</span>
-              </p>
-            </div>
-            <span class="action-content">
-              <alex-custom-button
-                class="button"
-                prepend-icon="mdi-plus"
-                variant="primary"
-                >{{ t('pages.courseSettings.config.createSyncMeetingButton') }}
-
-                <alex-learningplan-dialogs-schedule
-                  v-model="createScheduleModal"
-                  v-model:data="editData"
-                  @submit="
-                    (values) =>
-                      !editData ? addMeeting(values) : editMeeting(values)
-                  "
-                />
-              </alex-custom-button>
-            </span>
-          </div>
-        </div>
-      </div>
       <div class="d-flex content-area invites">
         <div class="card-title">
           <p>
@@ -379,12 +260,11 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { format } from 'date-fns';
+
 import { useField } from 'vee-validate';
 
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
-import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
 
 const { t } = useI18n();
@@ -394,6 +274,10 @@ const { generateUrl } = useInvitationLink();
 const props = defineProps({
   learningPlan: {
     type: Object as PropType<LearningPlanType>,
+    required: true,
+  },
+  schedules: {
+    type: Array as PropType<any[]>,
     required: true,
   },
 });
@@ -412,94 +296,6 @@ const plainLink = ref<string | null>(null);
 const course = ref<any>({});
 const emit = defineEmits(['update']);
 const canEdit = ref(true);
-const editData = ref<Meeting | null>(null);
-
-// upload file
-const selectedFile = ref(null);
-const preview = ref(null);
-
-const onSelectFile = async (selectedFile) => {
-  try {
-    const formData = new FormData();
-
-    if (selectedFile.url instanceof File) {
-      formData.append('files', selectedFile.url);
-    } else if (
-      typeof selectedFile.url === 'string' &&
-      selectedFile.url.startsWith('data:')
-    ) {
-      const base64Data = selectedFile.url.split(',')[1];
-      const binaryString = window.atob(base64Data);
-      const byteArray = new Uint8Array(binaryString.length);
-
-      for (let i = 0; i < binaryString.length; i++) {
-        byteArray[i] = binaryString.charCodeAt(i);
-      }
-
-      let mimeType = 'image/png';
-      if (selectedFile.url.startsWith('data:image/jpeg')) {
-        mimeType = 'image/jpeg';
-      }
-
-      const blob = new Blob([byteArray], { type: mimeType });
-      const imageFile = new File([blob], 'image', { type: mimeType });
-      formData.append('files', imageFile);
-    }
-
-    const response = await fetch(`http://localhost:1337/api/learningplans`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro ao enviar a imagem: ${response.statusText}`);
-    }
-
-    const responseData = await response.json();
-    const imageUrl = responseData[0].url;
-
-    update(`learningplans/${course.value.id}`, {
-      cover_image: imageUrl,
-    });
-
-    console.log('Imagem enviada com sucesso:', imageUrl);
-  } catch (error) {
-    console.error('Erro ao enviar a imagem:', error);
-  }
-};
-
-// general info
-const getCourseInfo = async () => {
-  try {
-    const result = await find<any>(`learningplans`, {
-      filters: { id: { $containsi: 1 } },
-      populate: 'schedules',
-    });
-    console.log({ result });
-    const id = result.data[0].id;
-    const data = result.data[0].attributes;
-    if (data) {
-      course.value = {
-        ...course.value,
-        id,
-        invite_enabled: data.invite_enabled,
-        title: data.title,
-        start_date: data.start_date,
-        end_date: data.end_date,
-        slug: data.slug,
-        invitation_message: data.invitation_message,
-        invitation_duration: data.invitation_duration,
-      };
-      invitationLink.value = generateUrl(id);
-      await updateMeetings(data.schedules.data);
-    }
-  } catch (error) {
-    console.error('Erro na requisição:', error);
-  }
-};
-
-const startDate = ref();
-const endDate = ref();
 
 // invites
 const inviteEnabled = computed({
@@ -520,44 +316,6 @@ const timeOptions = ref([
 ]);
 
 // sync meetings
-
-const createScheduleModal = ref(false);
-const meetings = ref<any>();
-
-const updateMeetings = async (schedules) => {
-  meetings.value = (
-    await find('learning-plan-meetings', {
-      filters: {
-        schedule: {
-          id: {
-            $in: schedules.map((item) => item.id),
-          },
-        },
-        isExpired: false,
-      },
-      populate: 'schedule',
-      sort: 'date:asc',
-    })
-  ).data.splice(0, 2);
-};
-
-const removeSelf = (id: string) => {
-  meetings.value = meetings.value.filter((item) => item.id !== id);
-};
-
-const addMeeting = (values: Meeting) => {
-  meetings.value.push({ ...values, id: crypto.randomUUID() });
-};
-
-const editMeeting = (values: Meeting) => {
-  const updatedSchedules = meetings.value.map((meeting) => {
-    if (meeting.id === values.id) {
-      return { ...meeting, ...values };
-    }
-    return meeting;
-  });
-  meetings.value = updatedSchedules;
-};
 
 // course visibility
 
@@ -583,10 +341,6 @@ const activeButton = ref('1');
 
 const dialogMeetingExclusion = ref(false);
 const openDialog = ref(false);
-
-onBeforeMount(async () => {
-  await getCourseInfo();
-});
 </script>
 <style scoped lang="scss">
 .container {

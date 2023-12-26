@@ -26,16 +26,7 @@
   "showCourseHint": "Makes the course public, allowing any user to find it through search.",
   "hideCourseTitle": "Hide Course (Private)",
   "hideCourseHint": "Makes the course private, ensuring only members can see the course.",
-  "deleteMeetingConfirmation": "Do you really wish to delete the meeting?",
-  "deleteMeetingDescription": "Upon confirmation, you will delete the registered synchronous meeting.",
-  "deleteCourseTitle": "Delete Course",
-  "deleteCourseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
-  "deleteButton": "Delete Course",
-  "deleteConfirmation": "Do you really wish to delete the course?",
-  "deleteDescription": "By deleting a course you will lose all the content associated with it.",
-  "deleteLabel": "Enter the word:",
-  "deletePlaceholder": "Enter the word to confirm",
-  "deleteWord": "Delete",
+
   "update": "Course successfully updated",
   "cover": {
     "title": "Course Cover",
@@ -54,5 +45,33 @@
     "cancel": "Cancel",
     "save": "Save Changes",
     "update": "General information successfully updated"
+  },
+  "meetings": {
+    "title": "Edit synchronous meeting",
+    "frequency": "Meeting frequency",
+    "date": "Meeting date",
+    "dateTip": "The date the meetings start",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "add": "Create meeting",
+    "delete": {
+      "confirmation": "Do you really wish to delete the meeting?",
+      "description": "Upon confirmation, you will delete the registered synchronous meeting.",
+      "button": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+
+  "delete": {
+    "deleteCourseTitle": "Delete Course",
+    "deleteCourseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
+    "deleteButton": "Delete Course",
+    "deleteConfirmation": "Do you really wish to delete the course?",
+    "deleteDescription": "By deleting a course you will lose all the content associated with it.",
+    "deleteLabel": "Enter the word:",
+    "deletePlaceholder": "Enter the word to confirm",
+    "deleteWord": "Delete"
   }
 }

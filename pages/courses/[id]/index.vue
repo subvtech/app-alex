@@ -46,7 +46,24 @@
       :owner="owner"
       :invitationLink="invitationLink"
       :canEdit="canEdit"
-      :meetings="meetings"
+      :schedules="
+        meetings.map((item) => {
+          return {
+            id: item.id,
+            startHour: format(new Date(item.attributes.startDate), 'HH:mm'),
+            endHour: format(new Date(item.attributes.endDate), 'HH:mm'),
+            interval: item.attributes.interval,
+            date:
+              item.attributes.meetings.data.length !== 0
+                ? new Date(
+                    getEarliestMeeting(
+                      item.attributes.meetings.data,
+                    ).attributes.date,
+                  )
+                : new Date(),
+          };
+        })
+      "
       @update="(data) => updateCourse(true, data)"
     />
   </div>
@@ -54,6 +71,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { format } from 'date-fns';
 
 import General from '@/components/alex/learningplan/General.vue';
 import Settings from '@/components/alex/learningplan/settings/index.vue';
@@ -84,7 +102,7 @@ const { generateUrl } = useInvitationLink();
 
 const i18n = useI18n();
 const course = ref<any>();
-const meetings = ref<any>();
+const meetings = ref<any>([]);
 const invitationLink = ref();
 const plainLink = ref<string | null>(null);
 
@@ -148,6 +166,20 @@ const links = ref([
   i18n.t('pages.courses.communication'),
 ]);
 
+const getEarliestMeeting = (meetings) => {
+  if (meetings.length === 0) return null;
+  const result = meetings.sort((a, b) => {
+    if (a.date < b.date) {
+      return -1;
+    }
+    if (a.date > b.date) {
+      return 1;
+    }
+    return 0;
+  });
+  return result[0];
+};
+
 const populate = [
   'cover_image',
   'media',
@@ -200,7 +232,6 @@ const updateCourse = async (show = true, message?) => {
     (member) => member.attributes.role === 'facilitator',
   )[0].attributes.user.data;
 
-  console.log(course);
   await updateMeetings(course.value.schedules);
 
   setMessage(message ?? 'done', 'green', show);
@@ -208,19 +239,16 @@ const updateCourse = async (show = true, message?) => {
 
 const updateMeetings = async (schedules) => {
   meetings.value = (
-    await find('learning-plan-meetings', {
+    await find('learning-plan-meeting-schedules', {
       filters: {
-        schedule: {
-          id: {
-            $in: schedules.data.map((item) => item.id),
-          },
+        learningplan: {
+          id: course.value.id,
         },
-        isExpired: false,
       },
-      populate: 'schedule',
+      populate: 'meetings',
       sort: 'date:asc',
     })
-  ).data.splice(0, 2);
+  ).data;
 };
 
 watch(invitationLink, () => {
