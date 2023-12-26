@@ -18,7 +18,7 @@
   >
     <div :class="{ rounded: !isVertical }" class="header">
       <v-img
-        :src="image.url"
+        :src="image.url || '/images/cover_image_course.svg'"
         :alt="image.alt"
         :class="{ grayscale: hide }"
         cover

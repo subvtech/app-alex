@@ -263,4 +263,8 @@ watch(
 );
 </script>
 
-<style scoped></style>
+<style scoped>
+.max-w-200 {
+  max-width: 200px;
+}
+</style>
