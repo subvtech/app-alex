@@ -11,7 +11,7 @@
     />
     <alex-learningplan-dialogs-create-learningplan
       v-model="createCourseDialog"
-      @submit="async () => await getCourses()"
+      @submit="getCourses()"
     />
     <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
       <div

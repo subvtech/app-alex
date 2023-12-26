@@ -65,13 +65,11 @@
     /></template>
     <template #step3>
       <alex-inputs-users-autocomplete
-        v-model:selected-items="selectedUsers"
+        v-model="selectedUsers"
         name="users"
         class="w-100"
         :label="$t('components.learningPlan.dialogs.whoParticipate')"
         :placeholder="$t('components.learningPlan.dialogs.searchMember')"
-        density="comfortable"
-        return-object
       />
     </template>
     <template #step4>
