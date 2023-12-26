@@ -159,9 +159,15 @@ const emit = defineEmits(['select:option', 'display:settings']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
 
+export type BannerImageType = {
+  url: string;
+  id: number;
+  [x: string | number | symbol]: unknown;
+};
+
 const props = defineProps({
   coverPicture: {
-    type: Object as PropType<{ url: string; id: number } | null>,
+    type: Object as PropType<BannerImageType | null>,
   },
 
   showSettings: {
@@ -180,7 +186,7 @@ const props = defineProps({
   },
 
   profilePicture: {
-    type: Object as PropType<{ url: string; id: number } | null>,
+    type: Object as PropType<BannerImageType | null>,
   },
   profilePictureSize: {
     type: Number,
@@ -322,9 +328,10 @@ const props = defineProps({
   canDelete: { type: Boolean, default: false },
 });
 
-const { selectedOption, fullname, username, canEdit, userId } = toRefs(props);
+const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
+  toRefs(props);
 
-const cover = ref<{ id: number; url: string } | null | undefined>(
+const cover = ref<BannerImageType | null | undefined>(
   props.coverPicture,
 );
 
@@ -349,6 +356,11 @@ async function removeCoverPicture() {
   await removeImage(cover.value.id);
   cover.value = null;
 }
+
+watch(coverPicture!, () => {
+  if (coverPicture) cover.value = coverPicture.value;
+  else cover.value = undefined;
+});
 </script>
 
 <style scoped lang="scss">

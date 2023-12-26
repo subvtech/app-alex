@@ -46,6 +46,7 @@
           :title="$t('components.date.selectDate')"
           :header="$t('components.date.enterDate')"
           :landscape="true"
+          :allowed-dates="allowedDates"
         />
       </v-menu>
     </v-text-field>
@@ -62,6 +63,7 @@ interface DatePickerProps {
   disabled?: boolean;
   info?: string;
   theme?: 'light' | 'dark';
+  allowedDates: Function;
 }
 
 const props = withDefaults(defineProps<DatePickerProps>(), {
@@ -71,6 +73,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   disabled: false,
   info: undefined,
   theme: 'light',
+  allowedDates: () => true,
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -80,14 +83,6 @@ const { value, errorMessage } = useField(() => props.name, undefined, {
   syncVModel: true,
 });
 
-const dateValue = computed({
-  get() {
-    return convertToDate(value.value);
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
 const convertToDate = (dateValue: Date | string | undefined) => {
   let date: Date | string | undefined = dateValue;
   if (typeof date === 'string') {
@@ -98,6 +93,16 @@ const convertToDate = (dateValue: Date | string | undefined) => {
   }
   return date;
 };
+
+const dateValue = computed({
+  get() {
+    return convertToDate(value.value);
+  },
+  set(value) {
+    emit('update:modelValue', value);
+  },
+});
+
 const menu = ref(false);
 const inputValue = computed({
   get() {

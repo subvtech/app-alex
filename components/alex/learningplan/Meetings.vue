@@ -2,10 +2,7 @@
   <alex-custom-card
     class="w-100"
     :title="$t('components.meeting.title')"
-    :href="canEdit ? '/settings' : ''"
-    hide-dividers
     sizing-class="ma-0"
-    is-nested
     align-content="align-center"
     :show-icon="false"
   >
@@ -37,15 +34,30 @@
           )
         "
         :interval="item.attributes.schedule.data.attributes.interval"
+        :variant="variant"
       />
+    </template>
+    <template v-if="variant === 'editing'" #footer>
+      <alex-custom-button
+        variant="primary"
+        prepend-icon="mdi-check"
+        @click=""
+        >{{
+          $t('components.courses.settings.general.save')
+        }}</alex-custom-button
+      >
     </template>
   </alex-custom-card>
 </template>
 
 <script setup lang="ts">
 import { format } from 'date-fns';
+import {
+  MeetingVariantType,
+  MeetingProps,
+} from '@/components/CourseMeeting.vue';
 
-defineProps({
+const props = defineProps({
   data: {
     type: Array as PropType<
       { id: number; attributes: { schedule: any; date: string } }[]
@@ -53,11 +65,21 @@ defineProps({
     default: [],
   },
   canEdit: { type: Boolean, default: false },
+  variant: {
+    type: String as PropType<MeetingVariantType>,
+    default: 'list',
+  },
   isFacilitator: {
     type: Boolean,
     default: false,
   },
 });
+
+const { data } = toRefs(props);
+
+const addMeeting = () => {
+  data.value.push();
+};
 </script>
 
 <style scoped lang="scss">
