@@ -16,41 +16,50 @@
     />
   </div>
   <div class="d-flex flex-column w-100">
-    <profile-about
-      :info="info"
+    <app-about
+      :title="$t('components.profile.about.title')"
+      :text="info"
       :userId="userId"
       :can-edit="canEdit"
-      @update:user="emit('update:user')"
+      :about-text-message="$t('components.profile.about.placeholder')"
+      @update="updateAbout"
     />
     <div
-      class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences"
-      style="gap: 24px"
+      class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences gap-6"
     >
-      <profile-competences
+      <competences
         v-if="technicalTags.length !== 0 || canEdit"
-        :title="$t('components.profile.competences.technical.title')"
-        :label="$t('components.profile.competences.technical.label')"
-        :placeholder="
-          $t('components.profile.competences.technical.placeholder')
-        "
-        :emptyMessage="$t('components.profile.competences.technical.empty')"
+        :title="$t('components.competences.technical.title')"
+        :label="$t('components.competences.technical.label')"
+        :placeholder="$t('components.competences.technical.placeholder')"
+        :emptyMessage="$t('components.competences.technical.empty')"
         :userId="userId"
         :can-edit="canEdit"
         :userTags="technicalTags"
-        @update:user="emit('update:user')"
-      ></profile-competences>
-      <profile-competences
+        :forbidden-tags="generalTags"
+        @update:user="
+          emit('update:user', {
+            message: $t('components.competences.technical.updated'),
+          })
+        "
+      />
+      <competences
         v-if="generalTags.length !== 0 || canEdit"
-        :title="$t('components.profile.competences.general.title')"
-        :label="$t('components.profile.competences.general.label')"
-        :placeholder="$t('components.profile.competences.general.placeholder')"
-        :emptyMessage="$t('components.profile.competences.general.empty')"
+        :title="$t('components.competences.general.title')"
+        :label="$t('components.competences.general.label')"
+        :placeholder="$t('components.competences.general.placeholder')"
+        :emptyMessage="$t('components.competences.general.empty')"
         :userId="userId"
         :can-edit="canEdit"
         :userTags="generalTags"
+        :forbidden-tags="technicalTags"
         is-general
-        @update:user="emit('update:user')"
-      ></profile-competences>
+        @update:user="
+          emit('update:user', {
+            message: $t('components.competences.technical.updated'),
+          })
+        "
+      />
     </div>
     <profile-institutional
       v-if="institutions.length !== 0 || canEdit"
@@ -63,8 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { OutputBlockData } from '@editorjs/editorjs';
-
+const client = useStrapiClient()
 const emit = defineEmits(['update:user']);
 const props = defineProps({
   email: {
@@ -98,7 +106,7 @@ const props = defineProps({
     default: () => [],
   },
   info: {
-    type: Array as PropType<OutputBlockData<string, any>[]>,
+    type: String,
     required: true,
   },
   userId: {
@@ -110,9 +118,23 @@ const props = defineProps({
 
 const { info, canEdit, generalTags, technicalTags, institutions } =
   toRefs(props);
+
+
+const updateAbout = async (text) => {
+  await client(`/users/${props.userId}`, {
+    method: 'PUT',
+    body: {
+      info: text,
+    },
+  });
+  emit('update:user')
+}
 </script>
 
 <style scoped lang="scss">
+.gap-6 {
+  gap: 24px;
+}
 .details {
   gap: 24px;
 }
@@ -121,5 +143,4 @@ const { info, canEdit, generalTags, technicalTags, institutions } =
     max-width: 450px;
   }
 }
-
 </style>

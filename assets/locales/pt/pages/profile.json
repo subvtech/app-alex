@@ -13,5 +13,11 @@
   "settings": "Configurações",
   "cover": "Alterar capa",
   "startDate": "Início",
+  "about": {
+    "title": "Sobre",
+    "empty": "Parece que não há uma descrição...",
+    "placeholder": "Digite uma descrição...",
+    "updated": "Sobre atualizado com sucesso."
+  },
   "endDate": "Término"
 }

@@ -1,0 +1,22 @@
+{
+  "courses": {
+    "singular": "Course",
+    "plural": "Courses"
+  },
+  "students": {
+    "singular": "Student",
+    "plural": "Students"
+  },
+  "trails": {
+    "singular": "Trail",
+    "plural": "Trails"
+  },
+  "projects": {
+    "singular": "Project",
+    "plural": "Projects"
+  },
+  "assignments": {
+    "singular": "Assignment",
+    "plural": "Assignments"
+  }
+}

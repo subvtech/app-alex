@@ -2,15 +2,30 @@ import { describe, it, expect } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
 import { screen } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
+import { createI18n } from 'vue-i18n';
 import Banner from '../../components/alex/custom/Banner.vue';
-
+import ptRules from '@/assets/locales/pt/rules.json';
+import ptLogin from '@/assets/locales/pt/pages/login.json';
+import enRules from '@/assets/locales/en/rules.json';
+import enLogin from '@/assets/locales/en/pages/login.json';
 describe('Banner', async () => {
+  const i18n = createI18n({
+    messages: {
+      pt: { ptRules, ptLogin },
+      en: { enRules, enLogin },
+    },
+    locale: 'pt',
+    legacy: false,
+    missingWarn: false,
+    globalInjection: true,
+  });
+
   const title = 'title',
     fullname = 'Jojo Per',
     username = 'dasdas',
     startDate = '05/10/2025',
     endDate = '05/10/2025',
-    code = 'dsds',
+    copyObject = { label: 'Code', copyText: 'dasdasda' },
     isProfessor = false;
 
   describe('info component related', async () => {
@@ -24,7 +39,7 @@ describe('Banner', async () => {
           endDate,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const endDateComponent = await screen.queryByText(endDate);
@@ -33,7 +48,7 @@ describe('Banner', async () => {
     });
 
     it('startDate should be displayed correctly', async () => {
-      const bannerComponent= await renderSuspended(Banner, {
+      const bannerComponent = await renderSuspended(Banner, {
         attrs: {
           userId: 2,
           canEdit: true,
@@ -42,7 +57,7 @@ describe('Banner', async () => {
           startDate,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const startDateComponent = await bannerComponent.queryByText(startDate);
@@ -55,13 +70,13 @@ describe('Banner', async () => {
         attrs: {
           userId: 2,
           title,
-          code,
+          copyObject,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
-      const codeComponent = await screen.queryByText(code);
+      const codeComponent = await screen.queryByText(copyObject.label);
       expect(codeComponent).not.toBeNull();
 
       unmount();
@@ -74,7 +89,7 @@ describe('Banner', async () => {
           canEdit: true,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const roleComponent = await screen.queryByRole('role');
@@ -89,7 +104,7 @@ describe('Banner', async () => {
           canEdit: true,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const avatar = await screen.queryByRole('avatar');
@@ -97,7 +112,7 @@ describe('Banner', async () => {
       unmount();
     });
 
-    it('Banner shoul be defined', async () => {
+    it('Banner should be defined', async () => {
       const { unmount } = await renderSuspended(Banner, {
         attrs: {
           userId: 2,
@@ -110,11 +125,11 @@ describe('Banner', async () => {
           username,
           startDate,
           canEdit: true,
-          code,
+          copyObject,
           isProfessor,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const component = await screen.queryByTestId('banner');
@@ -130,7 +145,7 @@ describe('Banner', async () => {
           fullname,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const fullnameComponent = await screen.queryByText(fullname);
@@ -146,7 +161,7 @@ describe('Banner', async () => {
           username,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const usernameComponent = await screen.queryByText('@' + username);
@@ -162,7 +177,7 @@ describe('Banner', async () => {
           startDate,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const startDateComponent = await screen.queryByText(startDate);
@@ -178,7 +193,7 @@ describe('Banner', async () => {
           fullname,
         },
         global: {
-          plugins: [vuetify],
+          plugins: [vuetify, i18n],
         },
       });
       const roleComponent = await screen.queryByRole('role');
@@ -196,12 +211,32 @@ describe('Banner', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const settingsComponent = await screen.queryByTestId('menu');
     expect(settingsComponent).not.toBeNull();
     unmount();
+  });
+
+  it('shade styling should be displayed', async () => {
+    const bannerComponent = await renderSuspended(Banner, {
+      attrs: {
+        userId: 2,
+        canEdit: true,
+        isProfessor: false,
+        showShade: true,
+        showRole: true,
+        startDate,
+      },
+      global: {
+        plugins: [vuetify, i18n],
+      },
+    });
+    const shadeComponent = await bannerComponent.findByRole('shade');
+
+    expect(shadeComponent.className.split(' ')).toContain('shade');
+    bannerComponent.unmount();
   });
 
   it('settings should be displayed next to the menu', async () => {
@@ -210,11 +245,12 @@ describe('Banner', async () => {
         userId: 2,
         title,
         settingsMenu: true,
+        showSettings: true,
         showMenu: true,
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const settingsComponent = await screen.queryByRole('settings');
@@ -231,10 +267,11 @@ describe('Banner', async () => {
         userId: 2,
         title,
         settingsMenu: false,
+        showSettings: true,
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const settingsComponent = await screen.queryByRole('settings');
@@ -245,39 +282,21 @@ describe('Banner', async () => {
     unmount();
   });
 
-  it('settings should be displayed on the cover', async () => {
-    const { unmount } = await renderSuspended(Banner, {
-      attrs: {
-        userId: 2,
-        title,
-        settingsMenu: false,
-        canEdit: true,
-      },
-      global: {
-        plugins: [vuetify],
-      },
-    });
-    const settingsComponent = await screen.queryByRole('settings');
-    expect(settingsComponent).not.toBeNull();
-
-    const menuSettings = await screen.queryByTestId('settings-menu');
-    expect(menuSettings).toBeNull();
-    unmount();
-  });
   it('Cover image should be displayed when it exists', async () => {
     const { unmount } = await renderSuspended(Banner, {
       attrs: {
         userId: 2,
         title: 'Sample Title',
         fullname: 'Sample Fullname',
+        imgFromStrapi: false,
         coverPicture: {
           id: 1,
-          url: '../../public/icon.png',
+          url: '../../public/images/default-cover.png',
         },
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
 
@@ -297,7 +316,7 @@ describe('Banner', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
 
@@ -307,6 +326,7 @@ describe('Banner', async () => {
     expect(customCoverImage).toBeNull();
     unmount();
   });
+
   it('Edit button should be displayed when the user can edit', async () => {
     const { unmount } = await renderSuspended(Banner, {
       attrs: {
@@ -317,7 +337,7 @@ describe('Banner', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const editButton = await screen.queryByTestId('edit-cover');
@@ -338,7 +358,7 @@ describe('Banner', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const editButton = await screen.queryByTestId('edit-cover');
@@ -348,6 +368,7 @@ describe('Banner', async () => {
     expect(removeButton).not.toBeNull();
     unmount();
   });
+
   it('Edit button shall not be displayed when the user cannot edit', async () => {
     const { unmount } = await renderSuspended(Banner, {
       attrs: {
@@ -361,7 +382,7 @@ describe('Banner', async () => {
         canEdit: false,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const editButton = await screen.queryByTestId('edit-cover');
