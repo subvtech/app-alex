@@ -28,8 +28,6 @@ input[type='password']::-webkit-credentials-auto-fill-button {
   pointer-events: none;
 }
 
-
-
 // Reset extra px of icon button
 $btn-icon-density: (
   'compact': -12px,
@@ -65,12 +63,12 @@ $btn-icon-density: (
 
 .v-dialog.custom-alex-dialog > .v-overlay__content {
   max-height: calc(100vh - 160px);
-};
+}
 
-@supports(max-height: calc(100svh - 160px)) {
+@supports (max-height: calc(100svh - 160px)) {
   .v-dialog.custom-alex-dialog > .v-overlay__content {
     max-height: calc(100svh - 160px);
-  };
+  }
 }
 
 $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
@@ -79,27 +77,26 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
   .alex-scrollbar-#{$color}::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   .alex-scrollbar-#{$color}::-webkit-scrollbar-thumb {
     background-color: #abb2b9;
     border-radius: 999px;
   }
-  
+
   .alex-scrollbar-#{$color}::-webkit-scrollbar-track {
     background-color: rgb(var(--v-theme-#{$color})) !important;
   }
-  
 }
 
 // Dialog Stepper
 .max-height-stepper {
-  max-height: calc(100svh - 392px);
+  max-height: calc(100svh - 400px);
   overflow-y: auto;
 }
 
 /* Autocomplete inputs */
 .v-input.dark input:-webkit-autofill,
-.v-input.dark input:-webkit-autofill:hover, 
+.v-input.dark input:-webkit-autofill:hover,
 .v-input.dark input:-webkit-autofill:focus,
 .v-input.dark textarea:-webkit-autofill,
 .v-input.dark textarea:-webkit-autofill:hover,
@@ -107,11 +104,11 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 .v-input.dark select:-webkit-autofill,
 .v-input.dark select:-webkit-autofill:hover,
 .v-input.dark select:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 3000px rgb(var(--v-theme-primary-0)) inset !important; 
+  -webkit-box-shadow: 0 0 0px 3000px rgb(var(--v-theme-primary-0)) inset !important;
   -webkit-text-fill-color: white !important;
 }
 .v-input input:-webkit-autofill,
-.v-input input:-webkit-autofill:hover, 
+.v-input input:-webkit-autofill:hover,
 .v-input input:-webkit-autofill:focus,
 .v-input textarea:-webkit-autofill,
 .v-input textarea:-webkit-autofill:hover,
@@ -119,5 +116,5 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 .v-input select:-webkit-autofill,
 .v-input select:-webkit-autofill:hover,
 .v-input select:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 3000px #fff inset !important; 
+  -webkit-box-shadow: 0 0 0px 3000px #fff inset !important;
 }

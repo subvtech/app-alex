@@ -1,136 +1,160 @@
 <template>
-  <v-autocomplete
-    v-model="selectedUsers"
-    v-model:search-input="search"
-    :items="users"
-    :loading="loadingUsers"
-    :label="$t('components.usersAutocomplete.label')"
-    prepend-inner-icon="mdi-plus-circle"
-    append-icon="mdi-magnify"
-    outlined
-    dense
-    chips
-    multiple
-    hide-no-data
-    hide-selected
-    cache-items
-    item-value="id"
-    :item-text="(item) => `${item.fullname} ${item.email}`"
-    :reverse="false"
-    small-chips
-    @input="onInput"
-  >
-    <template #chip="data">
-      <v-chip v-bind="data.props" close small @click:close="remove(data.item)">
-        <v-avatar left>
-          <v-img
-            v-if="data.item.raw.attributes.avatar"
-            :src="data.item.raw.attributes.avatar.url"
-          ></v-img>
-          <v-img v-else src="/images/not-found.png"></v-img>
-        </v-avatar>
-        {{ getReducedName(data.item.raw.attributes.fullname) }}
-      </v-chip>
-    </template>
-    <template #item="data">
-      <v-list-item-avatar>
-        <img
-          v-if="data.item.raw.attributes.avatar"
-          :src="data.item.raw.attributes.avatar.url"
+  <div>
+    <alex-inputs-autocomplete
+      v-model="selectedUser"
+      v-model:search="search"
+      item-title="email"
+      variant="outlined"
+      density="comfortable"
+      return-object
+      :items="filteredItems"
+      :custom-filter="filterByFullnameAndEmail"
+      :name="name"
+      v-bind="$attrs"
+      :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
+    >
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item-user
+          v-bind="propsItem"
+          :key="index"
+          :user="{
+            email: item.raw.email,
+            name: item.raw.fullname,
+          }"
+          no-delete
         />
-        <img v-else src="/images/not-found.png" />
-      </v-list-item-avatar>
-      <v-list-item-content>
-        <v-list-item-title>
-          {{ data.item.raw.attributes.fullname }}
-        </v-list-item-title>
-        <v-list-item-subtitle>
-          {{ data.item.raw.attributes.email }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </template>
-  </v-autocomplete>
+      </template>
+    </alex-inputs-autocomplete>
+
+    <v-slide-y-transition group>
+      <alex-custom-list-item-user
+        v-for="item in selectedUsers"
+        :key="`user-${item.id}`"
+        :user="{
+          email: item.email,
+          name: item.fullname,
+        }"
+        no-delete
+        no-select
+        @delete="() => removeSelf(item.email)"
+        @reload="() => emit('refresh:invite')"
+      />
+    </v-slide-y-transition>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { stringify } from 'qs';
-import { User } from '../../../models/user.model';
+import { useField } from 'vee-validate';
+type User = { id?: string; email: string; fullname?: string; local?: boolean };
 
-const user = useStrapiUser();
+interface AutoCompleteUsersProps {
+  name: string;
+  modelValue: User[];
+}
+
+const props = defineProps<AutoCompleteUsersProps>();
+
+const emit = defineEmits([
+  'update:modelValue',
+  'refresh:invite',
+  'remove:invite',
+]);
 const { find } = useStrapi();
+const { emailRegex } = useFormRules();
+const user = useStrapiUser().value;
+const { value: selectedUser, setState } = useField<User | null>(
+  () => props.name,
+  undefined,
+  {
+    initialValue: null,
+  },
+);
+const search = ref('');
+const items = ref<User[]>([]);
 
-const props = defineProps({
-  value: {
-    type: Array<number>,
-    required: true,
+const selectedUsers = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit('update:modelValue', value);
   },
 });
-const { value } = toRefs(props);
 
-const emit = defineEmits(['input']);
-
-const users = ref<Strapi4ResponseData<User>[]>([]);
-const selectedUsers: globalThis.Ref<number[]> = ref([]);
-const loadingUsers = ref(false);
-const search = ref('');
-
-watch(
-  () => search,
-  async () => await searchUsers(search.value),
-);
-watch(
-  () => value,
-  async () => await loadUsers(),
-);
-
-onMounted(async () => await loadUsers());
-
-const loadUsers = async () => {
-  if (value.value && value.value.length) {
-    selectedUsers.value = value.value;
-    await searchUsers('', value.value);
-  }
-};
-
-const searchUsers = async (search = '', ids: number[] = []) => {
-  if ((!search || search.length < 3) && !ids.length) return;
-  loadingUsers.value = true;
-
-  const queryIds = { _where: { id: ids } };
-
-  const querySearch = {
-    _where: {
-      id_ne: user.value!.id,
-      _or: [{ email_contains: search }, { fullname_contains: search }],
-    },
-  };
-
-  const query = stringify(ids.length ? queryIds : querySearch);
-
-  users.value = (await find<User>(`/users?${query}&_limit=20`)).data;
-
-  loadingUsers.value = false;
-};
-const remove = (item) => {
-  selectedUsers.value = selectedUsers.value.filter((u) => u !== item.id);
-};
-
-const getReducedName = (fullname = '') => {
-  if (!fullname) return '';
-  const names = fullname.split(' ');
-
-  if (names.length === 1) {
-    return fullname;
-  }
-
-  return `${names[0]} ${names[names.length - 1]}`;
-};
-
-const onInput = () => {
+const cleanInput = () => {
   search.value = '';
-  emit('input', selectedUsers.value);
+  setState({ value: null });
 };
-</script>
 
-<style scoped lang="scss"></style>
+const removeSelf = (email?: string) => {
+  selectedUsers.value = selectedUsers.value.filter(
+    (item) => item.email !== email,
+  );
+  emit('remove:invite');
+};
+
+const filteredItems = computed(() => {
+  const idSelectedUsers = selectedUsers.value.map((user) => user.email);
+  return items.value.filter((item) => !idSelectedUsers.includes(item.email));
+});
+
+const updateModelValue = () => {
+  if (selectedUser.value) {
+    selectedUsers.value.push(selectedUser.value);
+    cleanInput();
+  }
+};
+
+useOnStopTyping(search, async () => {
+  const registeredFields = (await find('users', {
+    fields: ['email', 'fullname'],
+    filters: {
+      $or: [
+        { email: { $containsi: search.value } },
+        { fullname: { $containsi: search.value } },
+      ],
+    },
+  })) as unknown as User[];
+  if (registeredFields.length) {
+    items.value = registeredFields.filter(
+      (itemRequest) =>
+        !selectedUsers.value.find((item) => item.id === itemRequest?.id) &&
+        itemRequest.email !== user?.email,
+    );
+  }
+});
+
+const filterByFullnameAndEmail = (
+  _value: string,
+  query: string,
+  item?: any,
+) => {
+  const fullname = item.raw.fullname?.toLowerCase() || '';
+  const email = item.raw.email?.toLowerCase();
+  const searchText = query.toLowerCase();
+
+  return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
+};
+
+watch(
+  search,
+  () => {
+    const isValidEmail = emailRegex.test(search.value);
+    const local = items.value.filter((item) => item?.local);
+    if (search.value.length && isValidEmail) {
+      if (!local.length) {
+        items.value = [{ email: search.value, local: true }, ...items.value];
+      }
+      items.value = items.value.map((item) => {
+        if (item.local) {
+          return { ...item, email: search.value, local: true };
+        }
+        return item;
+      });
+    }
+  },
+  { deep: true },
+);
+
+watch(selectedUser, updateModelValue);
+</script>

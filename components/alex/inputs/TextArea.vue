@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-autocomplete" :class="$attrs.class">
+  <div class="alex-textarea">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -14,43 +14,26 @@
         >mdi-information-outline</v-icon
       >
     </div>
-    <v-autocomplete
+    <v-textarea
       v-model="value"
       color="primary--2"
       rounded="lg"
       variant="outlined"
+      no-resize
+      role="textarea"
       clear-icon="mdi-close"
-      role="select"
-      :error-messages="errorMessage"
       :class="theme"
+      :error-messages="errorMessage"
       :disabled="disabled"
-      :menu-props="{
-        class: theme,
-      }"
       v-bind="$attrs"
-    >
-      <!-- Bind all slots  -->
-      <template v-for="(_, slot) in $slots" #[slot]="scope">
-        <slot :name="slot" v-bind="scope" />
-      </template>
-      <!-- Default item slot -->
-      <template #item="{ props: propsItem, item, index }">
-        <alex-custom-list-item
-          :key="index"
-          :text="item.title"
-          v-bind="propsItem"
-          :theme="theme"
-          :selected="value === item.title"
-        />
-      </template>
-    </v-autocomplete>
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { YupSchema, useField } from 'vee-validate';
+import { useField } from 'vee-validate';
 
-interface AutoCompleteProps {
+interface TextAreaProps {
   modelValue?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
@@ -58,20 +41,17 @@ interface AutoCompleteProps {
   info?: string;
   disabled?: boolean;
   theme?: 'light' | 'dark';
-  schema?: YupSchema;
 }
-
-const props = withDefaults(defineProps<AutoCompleteProps>(), {
-  modelValue: undefined,
-  search: undefined,
+const props = withDefaults(defineProps<TextAreaProps>(), {
   disabled: false,
   theme: 'light',
   info: undefined,
   label: undefined,
-  schema: undefined,
+  value: undefined,
+  modelValue: undefined,
 });
 
-const { value, errorMessage } = useField(() => props.name, props.schema, {
+const { value, errorMessage } = useField(() => props.name, undefined, {
   syncVModel: true,
 });
 
@@ -86,8 +66,8 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
-.alex-autocomplete {
-  &.v-theme--mainTheme {
+.alex-textarea {
+  .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
     --v-medium-emphasis-opacity: 1 !important;
@@ -95,8 +75,7 @@ const textColor = computed(() => {
     --v-border-color: rgb(var(--v-theme-gray-400));
   }
 
-  &.v-field__input {
-    overflow: hidden;
+  .v-field__input {
     color: rgb(var(--v-theme-gray-300));
     border-color: rgb(var(--v-theme-gray-400));
     text-overflow: ellipsis !important;
@@ -105,58 +84,72 @@ const textColor = computed(() => {
     padding-top: 16px !important;
     padding-bottom: 16px !important;
     font-style: normal !important;
+    height: 102px;
     line-height: 135% !important;
     letter-spacing: 0.32px !important;
     border-width: 5px !important;
   }
 
-  &.v-field--disabled > div > i,
-  &.v-field--disabled > .v-field__field > .v-field__input,
-  &.v-input--disabled > .v-input__details {
+  .v-field--disabled > div > i,
+  .v-field--disabled > .v-field__field > .v-field__input,
+  .v-input--disabled > .v-input__details {
     color: rgb(var(--v-theme-gray-300)) !important;
   }
 
-  &.v-field:hover:not(.v-field--active):not(.v-field--error)
+  .v-field:hover:not(.v-field--active):not(.v-field--error)
     > .v-field__outline {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
-  &.v-input__details {
+  .v-input__details {
     padding-inline-start: 0 !important;
   }
 
-  &.v-input__details > .v-messages > .v-messages__message {
+  .v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
     color: rgb(var(--v-theme-gray-600));
   }
 
-  &.light .v-field__outline {
+  .light .v-field__outline {
     color: rgb(var(--v-theme-gray-300));
   }
 
-  &.light .v-field--dirty > .v-field__field > .v-field__input {
+  .light .v-field--dirty > .v-field__field > .v-field__input {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
-  &.light .v-field > div > i {
+  .light .v-field > div > i {
     color: rgb(var(--v-theme-gray-600)) !important;
   }
 
-  &.dark .v-field__outline {
+  .dark .v-field__outline {
     color: var(--gray-400);
   }
 
-  &.dark .v-field--dirty > .v-field__field > .v-field__input {
+  .dark .v-field--dirty > .v-field__field > .v-field__input {
     color: #fff !important;
   }
 
-  &.dark .v-field > div > i {
+  .dark .v-field > div > i {
     color: rgb(var(--v-theme-gray-400)) !important;
   }
 
-  &.v-field--error > .v-field__outline,
+  .v-field--error > .v-field__outline,
   .v-input--error .v-messages__message {
     color: rgb(var(--v-theme-error-0)) !important;
+  }
+
+  textarea::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  textarea::-webkit-scrollbar-thumb {
+    background-color: #abb2b9;
+    border-radius: 999px;
+  }
+
+  textarea::-webkit-scrollbar-track {
+    background-color: rgb(var(--v-theme-white)) !important;
   }
 }
 </style>

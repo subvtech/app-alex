@@ -98,7 +98,7 @@ const props = withDefaults(
     noControls?: boolean;
     stepsConfig?: Record<string, Partial<StepsConfig>>;
     loading?: boolean;
-    stepClass?: string;
+    stepClass?: string | unknown[];
     stepperIndicatorClass?: string;
   }>(),
   {
