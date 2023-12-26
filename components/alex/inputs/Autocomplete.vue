@@ -61,8 +61,6 @@ interface AutoCompleteProps {
   schema?: YupSchema;
 }
 
-defineEmits(['update:modelValue']);
-
 const props = withDefaults(defineProps<AutoCompleteProps>(), {
   modelValue: undefined,
   search: undefined,

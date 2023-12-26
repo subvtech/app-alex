@@ -12,7 +12,6 @@
       :name="name"
       v-bind="$attrs"
       :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
-      @update:model-value="updateModelValue"
     >
       <template #item="{ props: propsItem, item, index }">
         <alex-custom-list-item-user
@@ -35,7 +34,6 @@
           email: item.email,
           name: item.fullname,
         }"
-        @click="cleanInput"
         no-delete
         no-select
         @delete="() => removeSelf(item.id)"
@@ -46,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { useField } from 'vee-validate';
 type User = { id?: string; email: string; fullname?: string; local?: boolean };
 
 interface AutoCompleteUsersProps {
@@ -63,9 +62,16 @@ const emit = defineEmits([
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
 const user = useStrapiUser().value;
-const selectedUser = ref<User | null>(null);
+const { value: selectedUser, setState } = useField<User | null>(
+  () => props.name,
+  undefined,
+  {
+    initialValue: null,
+  },
+);
 const search = ref('');
 const items = ref<User[]>([]);
+
 const selectedUsers = computed({
   get() {
     return props.modelValue;
@@ -77,7 +83,7 @@ const selectedUsers = computed({
 
 const cleanInput = () => {
   search.value = '';
-  selectedUser.value = null;
+  setState({ value: null });
 };
 
 const removeSelf = (id?: string) => {
@@ -86,13 +92,12 @@ const removeSelf = (id?: string) => {
 };
 
 const filteredItems = computed(() => {
-  const idSelectedUsers = selectedUsers.value.map((user) => user?.id);
-  return items.value.filter((item) => !idSelectedUsers.includes(item.id));
+  const idSelectedUsers = selectedUsers.value.map((user) => user.email);
+  return items.value.filter((item) => !idSelectedUsers.includes(item.email));
 });
 
 const updateModelValue = () => {
   if (selectedUser.value) {
-    // console.log('user: ', selectedUser.value);
     selectedUsers.value.push(selectedUser.value);
     cleanInput();
   }
@@ -134,7 +139,6 @@ watch(
   () => {
     const isValidEmail = emailRegex.test(search.value);
     const local = items.value.filter((item) => item?.local);
-
     if (search.value.length && isValidEmail) {
       if (!local.length) {
         items.value = [{ email: search.value, local: true }, ...items.value];
@@ -150,8 +154,5 @@ watch(
   { deep: true },
 );
 
-watch(
-  () => selectedUser.value,
-  () => console.log(selectedUser.value),
-);
+watch(selectedUser, updateModelValue);
 </script>
