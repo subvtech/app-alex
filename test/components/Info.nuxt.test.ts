@@ -1,19 +1,36 @@
 import { describe, it, expect } from 'vitest';
 import { renderSuspended } from 'nuxt-vitest/utils';
-import { screen } from '@testing-library/vue';
+import { screen, fireEvent } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
+import { createI18n } from 'vue-i18n';
 import Info from '../../components/alex/custom/Info.vue';
+import ptRules from '@/assets/locales/pt/rules.json';
+import ptLogin from '@/assets/locales/pt/pages/login.json';
+import enRules from '@/assets/locales/en/rules.json';
+import enLogin from '@/assets/locales/en/pages/login.json';
 
 describe('Info', async () => {
+  const i18n = createI18n({
+    messages: {
+      pt: { ptRules, ptLogin },
+      en: { enRules, enLogin },
+    },
+    locale: 'pt',
+    legacy: false,
+    missingWarn: false,
+    globalInjection: true,
+  });
+
   const title = 'title',
     fullname = 'Jojo Per',
     username = 'dasdas',
+    description = 'description',
     startDate = '05/10/2025',
-    code = 'dsds',
+    copyObject = { label: 'Code', copyText: 'dasdasda' },
     isProfessor = false,
     showSettings = true;
 
-  it('Info shoul be defined', async () => {
+  it('Info should be defined', async () => {
     const { unmount } = await renderSuspended(Info, {
       attrs: {
         userId: 2,
@@ -26,12 +43,12 @@ describe('Info', async () => {
         username,
         startDate,
         canEdit: true,
-        code,
+        copyObject,
         showSettings,
         isProfessor,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const info = await screen.queryByTestId('info');
@@ -47,7 +64,7 @@ describe('Info', async () => {
         fullname,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const fullnameComponent = await screen.queryByText(fullname);
@@ -63,7 +80,7 @@ describe('Info', async () => {
         fullname,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const titleComponent = await infoComponent.queryByText(title);
@@ -71,23 +88,24 @@ describe('Info', async () => {
     infoComponent.unmount();
   });
 
-  it('there should be a title above the user information', async () => {
+  it('there should be a description above the user information', async () => {
     const infoComponent = await renderSuspended(Info, {
       attrs: {
         userId: 2,
         title,
-        titleAbove: true,
+        descriptionAbove: true,
+        description,
         fullname,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
-    const titleComponent = await infoComponent.queryByRole('above');
-    expect(titleComponent).not.toBeNull();
+    const descriptionComponent = await infoComponent.queryByRole('above');
+    expect(descriptionComponent).not.toBeNull();
+    expect(descriptionComponent?.textContent).toBe(description);
     infoComponent.unmount();
   });
-
 
   it('there should not be a title above the user information', async () => {
     const infoComponent = await renderSuspended(Info, {
@@ -97,7 +115,7 @@ describe('Info', async () => {
         fullname,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const titleComponent = await infoComponent.queryByRole('above');
@@ -113,7 +131,7 @@ describe('Info', async () => {
         username,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const usernameComponent = await screen.queryByText('@' + username);
@@ -129,7 +147,7 @@ describe('Info', async () => {
         startDate,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const startDateComponent = await screen.queryByText(startDate);
@@ -145,7 +163,7 @@ describe('Info', async () => {
         fullname,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const roleComponent = await screen.queryByRole('role');
@@ -162,11 +180,34 @@ describe('Info', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const settingsComponent = await screen.queryByRole('settings');
     expect(settingsComponent).not.toBeNull();
+
+    unmount();
+  });
+
+  it('settings should emit an event when clicked', async () => {
+    const { unmount, emitted } = await renderSuspended(Info, {
+      attrs: {
+        userId: 2,
+        title,
+        showSettings,
+        canEdit: true,
+      },
+      global: {
+        plugins: [vuetify, i18n],
+      },
+    });
+    const settingsComponent = await screen.queryByRole('settings');
+    expect(settingsComponent).not.toBeNull();
+    await fireEvent.click(settingsComponent!);
+
+    const settingsEvent = await emitted('display:settings');
+    expect(settingsEvent).not.toBeNull();
+
     unmount();
   });
 
@@ -175,13 +216,13 @@ describe('Info', async () => {
       attrs: {
         userId: 2,
         title,
-        code,
+        copyObject,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
-    const codeComponent = await screen.queryByText(code);
+    const codeComponent = await screen.queryByText(copyObject.label);
     expect(codeComponent).not.toBeNull();
 
     unmount();
@@ -201,7 +242,7 @@ describe('Info', async () => {
         endDate,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const endDateComponent = await screen.queryByText(endDate);
@@ -216,7 +257,7 @@ describe('Info', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const roleComponent = await screen.queryByRole('role');
@@ -231,7 +272,7 @@ describe('Info', async () => {
         canEdit: true,
       },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
     const avatar = await screen.queryByRole('avatar');

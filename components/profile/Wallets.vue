@@ -1,12 +1,12 @@
 <template>
-  <profile-card
+  <alex-custom-card
     class="mt-6"
     :title="$t('components.profile.wallets.title')"
     :full-width="false"
     :showIcon="false"
   >
     <template v-slot:content>
-      <div class="item d-flex justify-space-between">
+      <div class="item d-flex w-100 justify-space-between">
         <div class="label d-flex align-center">
           <div v-if="wallet" class="tooltip-box">
             <span class="tooltiptext">{{ wallet.address }}</span>
@@ -48,7 +48,7 @@
         >
       </div>
     </template>
-  </profile-card>
+  </alex-custom-card>
 </template>
 
 <script setup lang="ts">

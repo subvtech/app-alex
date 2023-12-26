@@ -1,0 +1,16 @@
+{
+  "title": "Objetivos de aprendizagem",
+  "verb": {
+    "title": "Verbo",
+    "placeholder": "Escolha um verbo"
+  },
+
+  "description": {
+    "title": "Descrição do objetivo",
+    "placeholder": "Descreva o objetivo"
+  },
+  "add": "Adicionar Objetivo",
+  "empty": "Parece que não tem nenhum Objetivo de Aprendizagem definido até o momento",
+  "tooltip": "Defina o que os estudantes devem alcançar no final deste cursos. Utilize verbos da taxonomia de bloom e busque definir os resultados esperados de aprendizagem (learning outcomes)",
+  "update": "Objetivo de Aprendizagem atualizados com sucesso"
+}
