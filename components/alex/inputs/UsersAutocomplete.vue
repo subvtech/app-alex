@@ -36,7 +36,7 @@
         }"
         no-delete
         no-select
-        @delete="() => removeSelf(item.id)"
+        @delete="() => removeSelf(item.email)"
         @reload="() => emit('refresh:invite')"
       />
     </v-slide-y-transition>
@@ -86,8 +86,10 @@ const cleanInput = () => {
   setState({ value: null });
 };
 
-const removeSelf = (id?: string) => {
-  selectedUsers.value = selectedUsers.value.filter((item) => item.id !== id);
+const removeSelf = (email?: string) => {
+  selectedUsers.value = selectedUsers.value.filter(
+    (item) => item.email !== email,
+  );
   emit('remove:invite');
 };
 
