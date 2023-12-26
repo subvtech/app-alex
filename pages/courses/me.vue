@@ -273,173 +273,60 @@ onBeforeMount(async () => {
       sortable: false,
     });
   }
-  // isLoading.value = true;
-  // const { data } = await useAsyncData('learningPlans', () => {
-  //   const params = { userId: id };
-  //   return graphql<{
-  //     data: {
-  //       learningplans: Strapi4ResponseMany<LearningPlan>;
-  //     };
-  //   }>(GetLearningPlans, params);
-  // });
-  // courses.value =
-  //   data.value?.data.learningplans.data.map((plan): courseItem => {
-  //     const { attributes } = plan;
-  //     const id = plan.id;
-  //     const {
-  //       title,
-  //       description,
-  //       start_date,
-  //       end_date,
-  //       cover_image,
-  //       hidden,
-  //       members,
-  //       tags,
-  //       learning_structure,
-  //     } = attributes;
-  //     const facilitatorName =
-  //       members.data[0]?.attributes?.user.data.attributes.fullname;
-  //     const facilitatorImage =
-  //       members.data[0]?.attributes?.user.data.attributes.avatar?.data
-  //         ?.attributes?.url;
-  //     const institution =
-  //       members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
-  //         ?.attributes?.name;
-  //     const img = cover_image?.data?.attributes?.url;
-  //     const trails =
-  //       learning_structure?.data?.attributes?.trails.data.length || 0;
+  isLoading.value = true;
+  const { data } = await useAsyncData('learningPlans', () => {
+    const params = { userId: id };
+    return graphql<{
+      data: {
+        learningplans: Strapi4ResponseMany<LearningPlan>;
+      };
+    }>(GetLearningPlans, params);
+  });
+  courses.value =
+    data.value?.data.learningplans.data.map((plan): courseItem => {
+      const { attributes } = plan;
+      const id = plan.id;
+      const {
+        title,
+        description,
+        start_date,
+        end_date,
+        cover_image,
+        hidden,
+        members,
+        tags,
+        learning_structure,
+      } = attributes;
+      const facilitatorName =
+        members.data[0]?.attributes?.user.data.attributes.fullname;
+      const facilitatorImage =
+        members.data[0]?.attributes?.user.data.attributes.avatar?.data
+          ?.attributes?.url;
+      const institution =
+        members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
+          ?.attributes?.name;
+      const img = cover_image?.data?.attributes?.url;
+      const trails =
+        learning_structure?.data?.attributes?.trails.data.length || 0;
 
-  //     return {
-  //       id,
-  //       title,
-  //       description,
-  //       start_date,
-  //       end_date,
-  //       img,
-  //       hidden,
-  //       facilitatorName,
-  //       facilitatorImage,
-  //       institution,
-  //       tags: tags.data.map((tag) => tag.attributes.text),
-  //       trails,
-  //       favorited: false,
-  //     };
-  //   }) || [];
-  // isLoading.value = false;
+      return {
+        id,
+        title,
+        description,
+        start_date,
+        end_date,
+        img,
+        hidden,
+        facilitatorName,
+        facilitatorImage,
+        institution,
+        tags: tags.data.map((tag) => tag.attributes.text),
+        trails,
+        favorited: false,
+      };
+    }) || [];
+  isLoading.value = false;
 });
-
-courses.value = [
-  {
-    title:
-      'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
-    description:
-      'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-    facilitatorName: 'Alexandre',
-    facilitatorImage: 'https://picsum.photos/200/300',
-    trails: 3,
-    img: 'https://picsum.photos/400/600',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Introdução à programação em Python',
-    description: 'Olá pessoal!',
-    facilitatorName: 'Isabella',
-    facilitatorImage: 'https://picsum.photos/201/301',
-    trails: 5,
-    img: 'https://picsum.photos/401/601',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Desenvolvimento web com React.js',
-    description:
-      'Bem-vindos ao curso de desenvolvimento web com React.js! Vamos explorar juntos as maravilhas do React.',
-    facilitatorName: 'Carlos',
-    facilitatorImage: 'https://picsum.photos/202/302',
-    trails: 4,
-    img: 'https://picsum.photos/402/602',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Aprendendo machine learning com scikit-learn',
-    description:
-      'Oi pessoal! Vamos mergulhar no mundo do machine learning com o scikit-learn. Animados?',
-    facilitatorName: 'Camila',
-    facilitatorImage: 'https://picsum.photos/203/303',
-    trails: 6,
-    img: 'https://picsum.photos/403/603',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Segurança da informação e ethical hacking',
-    description:
-      'Este curso aborda tópicos essenciais sobre segurança da informação e ethical hacking. Fiquem atentos!',
-    facilitatorName: 'Diego',
-    facilitatorImage: 'https://picsum.photos/204/304',
-    trails: 5,
-    img: 'https://picsum.photos/404/604',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Desenvolvimento mobile com Flutter',
-    description:
-      'Vamos construir aplicativos incríveis com Flutter! Este curso é para quem quer mergulhar no desenvolvimento mobile.',
-    facilitatorName: 'Eduarda',
-    facilitatorImage: 'https://picsum.photos/205/305',
-    trails: 4,
-    img: 'https://picsum.photos/405/605',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Gestão de projetos ágeis com Scrum',
-    description:
-      'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
-    facilitatorName: 'Fernando',
-    facilitatorImage: 'https://picsum.photos/206/306',
-    trails: 3,
-    img: 'https://picsum.photos/406/606',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Inteligência artificial e redes neurais',
-    description:
-      'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
-    facilitatorName: 'Gabriela',
-    facilitatorImage: 'https://picsum.photos/207/307',
-    trails: 6,
-    img: 'https://picsum.photos/407/607',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Gestão de projetos ágeis com Scrum',
-    description:
-      'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
-    facilitatorName: 'Fernando',
-    facilitatorImage: 'https://picsum.photos/206/306',
-    trails: 3,
-    img: 'https://picsum.photos/406/606',
-    favorited: false,
-    hidden: false,
-  },
-  {
-    title: 'Inteligência artificial e redes neurais',
-    description:
-      'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
-    facilitatorName: 'Gabriela',
-    facilitatorImage: 'https://picsum.photos/207/307',
-    trails: 6,
-    img: 'https://picsum.photos/407/607',
-    favorited: false,
-    hidden: false,
-  },
-];
 
 interface Item {
   raw: courseItem;
@@ -588,13 +475,13 @@ const navigate = (id: number, page) => {
   min-height: calc(100vh - 130px);
 }
 
-.flex-stretch {
-  flex: 1;
+.grid-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
 }
 
-.flex-container {
-  flex: 1;
-  flex-grow: 0.5;
+.flex-stretch {
+  box-sizing: border-box !important;
 }
 
 .footer {
@@ -607,10 +494,13 @@ const navigate = (id: number, page) => {
   opacity: 0.5;
 }
 
-@media (min-width: 1420px) {
+@media (max-width: 1280px) {
+  .grid-container {
+    display: flex !important;
+  }
   .flex-stretch {
-    max-width: min(calc(25% - 24px), 375px) !important;
-    /* max-width: calc(25% - 24px); */
+    flex: 1;
+    box-sizing: border-box !important;
   }
 }
 </style>
