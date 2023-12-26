@@ -293,7 +293,7 @@ const emits = defineEmits([
 
 <style scoped lang="scss">
 .card {
-  height: 470px !important;
+  min-height: 460px !important;
 }
 
 .grid {

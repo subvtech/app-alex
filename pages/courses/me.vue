@@ -40,9 +40,7 @@
             class="w-50"
             style="min-width: 160px"
             density="compact"
-          >
-            ></alex-inputs-text-field
-          >
+          />
           <div>
             <v-tooltip
               :text="$t('pages.classes.viewModeTooltip')"
@@ -96,17 +94,19 @@
             'end_date',
             'tags',
           ]"
-          class="d-flex flex-wrap align-content-space-between"
-          style="flex: 1"
+          class="d-flex flex-wrap align-content-space-between flex-1"
         >
           <template #default="{ items }">
-            <div v-if="coursesView === 'grid'" class="d-flex flex-wrap ga-4">
+            <div
+              v-if="coursesView === 'grid'"
+              class="d-flex flex-wrap ga-4 flex-1"
+            >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="flex-stretch"
+                class="w-100"
                 :title="course.raw.title"
                 :options="professorMode"
                 :description="course.raw.description"
@@ -144,7 +144,9 @@
                   <td style="max-width: 596px">
                     <div class="d-flex align-center">
                       <img
-                        :src="(item as any).img"
+                        :src="
+                          (item as any).img || '/images/cover_image_course.svg'
+                        "
                         width="48"
                         height="36"
                         style="min-width: 48px; min-height: 36px"
@@ -274,13 +276,13 @@ const getCourses = async () => {
       const {
         title,
         description,
-        start_date,
-        end_date,
-        cover_image,
+        start_date: startDate,
+        end_date: endDate,
+        cover_image: coverImage,
         hidden,
         members,
         tags,
-        learning_structure,
+        learning_structure: learningStructure,
       } = attributes;
       const facilitatorName =
         members.data[0]?.attributes?.user.data.attributes.fullname;
@@ -290,16 +292,16 @@ const getCourses = async () => {
       const institution =
         members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
           ?.attributes?.name;
-      const img = cover_image?.data?.attributes?.url;
+      const img = coverImage?.data?.attributes?.url;
       const trails =
-        learning_structure?.data?.attributes?.trails.data.length || 0;
+        learningStructure?.data?.attributes?.trails.data.length || 0;
 
       return {
         id,
         title,
         description,
-        start_date,
-        end_date,
+        start_date: startDate,
+        end_date: endDate,
         img,
         hidden,
         facilitatorName,
@@ -345,7 +347,7 @@ const breadcrumbs = [
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/course',
+    href: '/courses',
     disabled: false,
   },
 ];
@@ -366,7 +368,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/${id}/configurations`,
+      link: `/courses/${id}/configurations`,
     },
   ];
 };
@@ -412,16 +414,20 @@ const changeItemFavorited = (index: number) => {
   courses.value[index].favorited = !courses.value[index].favorited;
 };
 
-const navigate = (id: number, page) => {
+const navigate = (id: number, page: string) => {
   if (page === 'configurations') {
-    rounter.push(`/course/${id}/configurations`);
+    rounter.push(`/courses/${id}/configurations`);
   } else {
-    rounter.push(`/course/${id}`);
+    rounter.push(`/courses/${id}`);
   }
 };
 </script>
 
 <style>
+.flex-1 {
+  flex: 1;
+}
+
 #courses-table thead > tr > th {
   height: 40px;
 }
