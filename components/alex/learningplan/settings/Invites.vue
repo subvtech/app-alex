@@ -1,5 +1,8 @@
 <template>
-  <alex-custom-card :title="$t('components.courses.settings.invite.title')">
+  <alex-custom-card
+    :title="$t('components.courses.settings.invite.title')"
+    :show-icon="false"
+  >
     <template #content>
       <div class="d-flex flex-column w-100">
         <div class="d-flex flex-column border-bottom">
@@ -13,7 +16,10 @@
             color="accent"
             @change="toggleInviteEnabled"
           />
-          <div v-if="myInviteEnabled" class="d-flex flex-row align-center w-100 gap-4">
+          <div
+            v-if="myInviteEnabled"
+            class="d-flex flex-row align-center w-100 gap-4"
+          >
             <alex-inputs-select
               v-model="selectedTime"
               name="duration"
@@ -123,7 +129,6 @@ const myMessage = toRef(props.message);
 const myInviteEnabled = toRef(props.inviteEnabled);
 
 const toggleInviteEnabled = async () => {
-
   await update(`learningplans/${props.learningPlanId}`, {
     invite_enabled: !myInviteEnabled.value,
   });
@@ -157,5 +162,15 @@ const timeOptions = ref([
 const plainLink = ref();
 </script>
 <style scoped lang="scss">
+.title {
+  color: var(--Cinza-Cinza-800, #454d54);
 
+  /* Header/H5 */
+  font-family: Sen;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.36px;
+}
 </style>

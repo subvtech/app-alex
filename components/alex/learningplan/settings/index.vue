@@ -1,13 +1,6 @@
 <template>
-  <div class="container d-flex flex-column">
-    <div class="config config-title">
-      <p>
-        <span class="header-h4">{{
-          t('pages.courseSettings.config.title')
-        }}</span>
-      </p>
-    </div>
-    <div class="config">
+  <alex-custom-card :title="$t('components.courses.settings.title')" :show-icon="false">
+    <template #content>
       <alex-learningplan-settings-banner
         :cover="coverImage"
         :learning-plan-id="learningPlan.id"
@@ -176,8 +169,8 @@
           </span>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </alex-custom-card>
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
