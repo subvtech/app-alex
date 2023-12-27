@@ -193,13 +193,13 @@ const updateAbout = async () => {
       order: index,
     };
   });
-  
+
   await update(`learningplans/${props.courseId}`, {
     details: { data: newData },
   });
   isEditing.value = false;
 
-  emit('update');
+  emit('update', t('components.courses.editor.update'));
 };
 
 const checkBlocksLimit = async (editor) => {
