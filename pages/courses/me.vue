@@ -282,6 +282,9 @@ const getCourses = async () => {
       };
     }>(GetLearningPlans, params);
   });
+  if (!data.value?.data.learningplans.data) {
+    return;
+  }
   courses.value =
     data.value?.data.learningplans.data.map((plan): courseItem => {
       const { attributes } = plan;
