@@ -24,8 +24,21 @@
               prepend-inner-icon="mdi-magnify"
             />
           </v-col>
-          <alex-custom-button :prepend-icon="actionIcon">
+          <alex-custom-button :prepend-icon="actionIcon" size="large">
             {{ actionText }}
+            <alex-custom-dialog
+              v-model="openDialog"
+              :title="dialogTitle"
+              activator="parent"
+            >
+              <slot name="dialog-content"></slot>
+              <template #footer>
+                <alex-custom-dialog-footer
+                  no-secondary-button
+                  @on-main-action="emit('action')"
+                />
+              </template>
+            </alex-custom-dialog>
           </alex-custom-button>
         </v-row>
         <v-row justify="center"> </v-row>
@@ -86,7 +99,7 @@
 import { usePagination } from '~/composables/usePagination';
 
 const page = ref(1);
-const emit = defineEmits(['update:search']);
+const emit = defineEmits(['update:search', 'action']);
 const props = defineProps({
   loading: {
     type: Boolean,
@@ -144,6 +157,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  dialogTitle: {
+    type: String,
+    default: '',
+  },
 });
 
 const modelSearch = computed({
@@ -158,4 +175,6 @@ const modelSearch = computed({
 const cardItems = computed(() => props.items);
 
 const pagination = usePagination(modelSearch, page, cardItems);
+
+const openDialog = ref(false);
 </script>

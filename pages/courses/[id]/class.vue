@@ -13,6 +13,8 @@
       search-placeholder="Encontrar participante"
       action-text="Convites"
       action-icon="mdi-email-outline"
+      dialog-title="Convites do Curso"
+      @action="onClickSendInvites"
     >
       <template #item="{ item }">
         <!-- <AlexLearningplanClassMemberCard
@@ -21,6 +23,19 @@
           :avatar-image="item.avatar?.url"
         /> -->
         {{ item }}
+      </template>
+      <template #dialog-content>
+        <alex-custom-list-item-user
+          v-for="(member, i) in learningPlanStore.pendingMembers"
+          :key="`pending-member-${i}`"
+          :user="{
+            name: member.user?.fullname,
+            email: member.email,
+            image: member.user?.avatar,
+          }"
+          no-select
+          status="pending"
+        />
       </template>
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
@@ -37,9 +52,9 @@
       action-text="Criar grupos"
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
+      @action="onCreateGroup"
     >
-      assd
-      {{ searchGroups }}
+      <template #dialog-content> sfldsf </template>
     </alex-learningplan-class-section-card>
   </div>
 </template>
@@ -51,5 +66,13 @@ const searchMembers = ref('');
 const searchGroups = ref('');
 
 const learningPlanStore = useLearningPlanStore();
+
+function onClickSendInvites() {
+  console.log('onClickSendInvites');
+}
+
+function onCreateGroup() {
+  console.log('onCreateGroup');
+}
 </script>
 <style scoped lang="scss"></style>

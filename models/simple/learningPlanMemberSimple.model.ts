@@ -1,10 +1,10 @@
-enum Roles {
+export enum MemberRoles {
   STUDENT = 'student',
   PARTNER = 'partner',
   FACILITATOR = 'facilitator',
 }
 
-enum Status {
+export enum MemberStatus {
   PENDING_INVITATION = 'pending_invitation',
   JOINED = 'joined',
 }
@@ -14,9 +14,9 @@ export interface LearningPlanMemberSimple {
   learningplan: LearningPlanSimple;
   user: UserSimple;
   email: string;
-  role: Roles;
+  role: MemberRoles;
   joined_at: Date;
-  status: Status;
+  status: MemberStatus;
   learning_structure: any[];
   partner_trails: any[];
   trail_contribuitions: any[];
