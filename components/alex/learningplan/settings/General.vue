@@ -4,7 +4,27 @@
     :show-icon="false"
   >
     <template #content>
-      <div class="d-flex flex-column w-100">
+      <div v-if="isTrail" class="d-flex flex-column w-100">
+        <alex-inputs-text-field
+          :v-model="trailsTitle"
+          :label="trails.labelTitle"
+          name="title"
+          class="w-100"
+          density="comfortable"
+          :error-messages="errors.title"
+          required
+        ></alex-inputs-text-field>
+        <alex-inputs-text-area
+          :v-model="trailsDescription"
+          :label="trails.labelDescription"
+          name="description"
+          class="w-100"
+          density="comfortable"
+          :error-messages="errors.description"
+          required
+        ></alex-inputs-text-area>
+      </div>
+      <div v-else class="d-flex flex-column w-100">
         <alex-inputs-text-field
           v-model="myTitle"
           :label="$t('components.courses.settings.general.courseTitle')"
@@ -98,6 +118,21 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  isTrail: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  trailsTitle: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  trailsDescription: {
+    type: String,
+    required: false,
+    default: '',
+  },
 });
 
 const i18n = useI18n();
@@ -109,6 +144,17 @@ const myStartDate = toRef(startDate.value);
 const myEndDate = toRef(endDate.value);
 const myTitle = toRef(title.value);
 const mySlug = toRef(slug.value);
+
+const isTrail = toRef(props, 'isTrail');
+const trails = ref({
+  title: '',
+  description: '',
+  labelTitle: 'Nome da trilha',
+  labelDescription: 'Descrição da trilha',
+});
+
+const trailsTitle = toRef(props, 'trailsTitle');
+const trailsDescription = toRef(props, 'trailsDescription');
 
 const { handleSubmit, errors, values, controlledValues, setFieldError } =
   useForm({
@@ -122,9 +168,16 @@ const onSave = handleSubmit(async (e) => {
       filters: { slug: controlledValues.value.slug },
     });
 
-    if(isSlugAvailable.data.length !== 0) {
-      setFieldError('slug', i18n.t('components.courses.settings.general.slug.unique'));
-      setMessage(i18n.t('components.courses.settings.general.slug.unique'), 'red', true);
+    if (isSlugAvailable.data.length !== 0) {
+      setFieldError(
+        'slug',
+        i18n.t('components.courses.settings.general.slug.unique'),
+      );
+      setMessage(
+        i18n.t('components.courses.settings.general.slug.unique'),
+        'red',
+        true,
+      );
       return;
     }
   }

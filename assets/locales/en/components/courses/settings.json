@@ -21,7 +21,7 @@
   "twoHours": "2 hours",
   "eightHours": "8 hours",
   "twentyFourHours": "24 hours",
-  "courseVisibilityTitle": "Course Visibility",
+  "visibilityTitle": "Course Visibility",
   "showCourseTitle": "Show Course (Public)",
   "showCourseHint": "Makes the course public, allowing any user to find it through search.",
   "hideCourseTitle": "Hide Course (Private)",
