@@ -118,10 +118,6 @@ const { handleSubmit, handleReset, setFieldValue } = useForm({
 });
 
 const meetingDate = ref(data.value?.date);
-const submit = handleSubmit((values) => {
-  emit('submit', { ...values, id: props.data?.id });
-  emit('update:modelValue', false);
-});
 
 const disablePastDates = (date) => {
   const today = new Date();
@@ -164,4 +160,4 @@ watch(data, (value) => {
   }
 });
 </script>
-<style scoped  lang="scss"></style>
+<style scoped lang="scss"></style>

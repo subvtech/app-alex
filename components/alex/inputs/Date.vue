@@ -63,7 +63,7 @@ interface DatePickerProps {
   disabled?: boolean;
   info?: string;
   theme?: 'light' | 'dark';
-  allowedDates: Function;
+  allowedDates?: (value?: any) => boolean;
 }
 
 const props = withDefaults(defineProps<DatePickerProps>(), {

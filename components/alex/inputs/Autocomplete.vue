@@ -60,6 +60,7 @@ interface AutoCompleteProps {
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
+
 const props = withDefaults(defineProps<AutoCompleteProps>(), {
   modelValue: undefined,
   search: undefined,

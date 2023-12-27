@@ -1,18 +1,18 @@
 <template>
-  <div class="wrapper d-flex flex-column">
-    <header class="d-flex justify-space-between flex-column flex-sm-row mb-2">
-      <alex-custom-breadcrumbs
-        :title="$t('pages.classes.breadcrumbs.myCourses')"
-        :items="breadcrumbs"
-      />
-      <alex-custom-button
-        v-if="professorMode"
-        prepend-icon="mdi-plus"
-        size="large"
-        class="text-body-4"
-        >{{ $t('pages.classes.newCourse') }}</alex-custom-button
-      >
-    </header>
+  <div class="wrapper d-flex flex-column gap-6">
+    <alex-custom-header
+      :title="$t('pages.classes.breadcrumbs.myCourses')"
+      :items="breadcrumbs"
+      :has-main-button="professorMode"
+      :main-button-text="$t('pages.classes.newCourse')"
+      main-button-icon="mdi-plus"
+      no-back-arrow
+      @main-action="() => (createCourseDialog = true)"
+    />
+    <alex-learningplan-dialogs-create-learningplan
+      v-model="createCourseDialog"
+      @submit="getCourses()"
+    />
     <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
       <div
         v-if="courses.length == 0"
@@ -40,9 +40,7 @@
             class="w-50"
             style="min-width: 160px"
             density="compact"
-          >
-            ></alex-inputs-text-field
-          >
+          />
           <div>
             <v-tooltip
               :text="$t('pages.classes.viewModeTooltip')"
@@ -96,17 +94,19 @@
             'end_date',
             'tags',
           ]"
-          class="d-flex flex-wrap align-content-space-between"
-          style="flex: 1"
+          class="d-flex flex-wrap align-content-space-between flex-1"
         >
           <template #default="{ items }">
-            <div v-if="coursesView === 'grid'" class="d-flex flex-wrap ga-4">
+            <div
+              v-if="coursesView === 'grid'"
+              class="d-flex flex-wrap ga-4 flex-1"
+            >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="flex-stretch"
+                class="w-100"
                 :title="course.raw.title"
                 :options="professorMode"
                 :description="course.raw.description"
@@ -144,7 +144,9 @@
                   <td style="max-width: 596px">
                     <div class="d-flex align-center">
                       <img
-                        :src="(item as any).img"
+                        :src="
+                          (item as any).img || '/images/cover_image_course.svg'
+                        "
                         width="48"
                         height="36"
                         style="min-width: 48px; min-height: 36px"
@@ -231,7 +233,7 @@ const professorMode = ref(false);
 const { t } = useI18n();
 const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
-
+const createCourseDialog = ref(false);
 interface courseItem {
   id: number;
   description: string;
@@ -249,8 +251,7 @@ interface courseItem {
 }
 
 const courses = ref<courseItem[]>([]);
-
-onBeforeMount(async () => {
+const getCourses = async () => {
   const { isProfessor, id } = useStrapiUser<User>().value;
   professorMode.value = isProfessor;
   if (professorMode.value) {
@@ -275,13 +276,13 @@ onBeforeMount(async () => {
       const {
         title,
         description,
-        start_date,
-        end_date,
-        cover_image,
+        start_date: startDate,
+        end_date: endDate,
+        cover_image: coverImage,
         hidden,
         members,
         tags,
-        learning_structure,
+        learning_structure: learningStructure,
       } = attributes;
       const facilitatorName =
         members.data[0]?.attributes?.user.data.attributes.fullname;
@@ -291,16 +292,16 @@ onBeforeMount(async () => {
       const institution =
         members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
           ?.attributes?.name;
-      const img = cover_image?.data?.attributes?.url;
+      const img = coverImage?.data?.attributes?.url;
       const trails =
-        learning_structure?.data?.attributes?.trails.data.length || 0;
+        learningStructure?.data?.attributes?.trails.data.length || 0;
 
       return {
         id,
         title,
         description,
-        start_date,
-        end_date,
+        start_date: startDate,
+        end_date: endDate,
         img,
         hidden,
         facilitatorName,
@@ -311,7 +312,9 @@ onBeforeMount(async () => {
         favorited: false,
       };
     }) || [];
-});
+};
+// eslint-disable camelcase
+onBeforeMount(async () => await getCourses());
 
 interface Item {
   raw: courseItem;
@@ -344,7 +347,7 @@ const breadcrumbs = [
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/course',
+    href: '/courses',
     disabled: false,
   },
 ];
@@ -365,7 +368,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/${id}/configurations`,
+      link: `/courses/${id}/configurations`,
     },
   ];
 };
@@ -411,16 +414,20 @@ const changeItemFavorited = (index: number) => {
   courses.value[index].favorited = !courses.value[index].favorited;
 };
 
-const navigate = (id: number, page) => {
+const navigate = (id: number, page: string) => {
   if (page === 'configurations') {
-    rounter.push(`/course/${id}/configurations`);
+    rounter.push(`/courses/${id}/configurations`);
   } else {
-    rounter.push(`/course/${id}`);
+    rounter.push(`/courses/${id}`);
   }
 };
 </script>
 
 <style>
+.flex-1 {
+  flex: 1;
+}
+
 #courses-table thead > tr > th {
   height: 40px;
 }

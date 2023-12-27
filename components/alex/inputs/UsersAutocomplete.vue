@@ -1,17 +1,17 @@
 <template>
   <div>
     <alex-inputs-autocomplete
-      v-model="value"
+      v-model="selectedUser"
       v-model:search="search"
-      item-value="id"
       item-title="email"
       variant="outlined"
-      :items="items"
+      density="comfortable"
+      return-object
+      :items="filteredItems"
       :custom-filter="filterByFullnameAndEmail"
       :name="name"
       v-bind="$attrs"
       :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
-      @update:model-value="(value) => updateModelValue(value)"
     >
       <template #item="{ props: propsItem, item, index }">
         <alex-custom-list-item-user
@@ -22,27 +22,21 @@
             name: item.raw.fullname,
           }"
           no-delete
-          @click="
-            () => {
-              search = '';
-              setState({ value: null });
-            }
-          "
         />
       </template>
     </alex-inputs-autocomplete>
 
     <v-slide-y-transition group>
       <alex-custom-list-item-user
-        v-for="item in selectedItems"
-        :key="item.id"
+        v-for="item in selectedUsers"
+        :key="`user-${item.id}`"
         :user="{
           email: item.email,
           name: item.fullname,
         }"
         no-delete
         no-select
-        @delete="() => removeSelf(item.id)"
+        @delete="() => removeSelf(item.email)"
         @reload="() => emit('refresh:invite')"
       />
     </v-slide-y-transition>
@@ -51,51 +45,63 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = { id?: string; email: string; fullname?: string };
+type User = { id?: string; email: string; fullname?: string; local?: boolean };
 
 interface AutoCompleteUsersProps {
   name: string;
-  selectedItems: User[];
+  modelValue: User[];
 }
 
 const props = defineProps<AutoCompleteUsersProps>();
 
 const emit = defineEmits([
-  'update:selectedItems',
+  'update:modelValue',
   'refresh:invite',
   'remove:invite',
 ]);
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
-const { value, setState } = useField<User | null>(() => props.name, undefined);
+const user = useStrapiUser().value;
+const { value: selectedUser, setState } = useField<User | null>(
+  () => props.name,
+  undefined,
+  {
+    initialValue: null,
+  },
+);
 const search = ref('');
 const items = ref<User[]>([]);
-const selectedItems = computed({
+
+const selectedUsers = computed({
   get() {
-    return props.selectedItems;
+    return props.modelValue;
   },
   set(value) {
-    emit('update:selectedItems', value);
+    emit('update:modelValue', value);
   },
 });
 
-const removeSelf = (id?: string) => {
-  selectedItems.value = selectedItems.value.filter((item) => item.id !== id);
+const cleanInput = () => {
+  search.value = '';
+  setState({ value: null });
+};
+
+const removeSelf = (email?: string) => {
+  selectedUsers.value = selectedUsers.value.filter(
+    (item) => item.email !== email,
+  );
   emit('remove:invite');
 };
 
-const updateModelValue = (user?: User | null) => {
-  const selectedItem = items.value.find((item) => item.id === user?.id);
-  const alreadyInList = selectedItems.value.find(
-    (item) => item.id === user?.id,
-  );
-  if (selectedItem && !alreadyInList) {
-    emit('update:selectedItems', [...selectedItems.value, selectedItem]);
-    items.value = [
-      ...items.value.filter((item) => item.id !== selectedItem.id),
-    ];
-    setState({ value: null });
-    search.value = '';
+const filteredItems = computed(() => {
+  const idSelectedUsers = selectedUsers.value.map((user) => user.email);
+  return items.value.filter((item) => !idSelectedUsers.includes(item.email));
+});
+
+const updateModelValue = () => {
+  if (selectedUser.value) {
+    selectedUsers.value.push(selectedUser.value);
+    cleanInput();
   }
 };
 
@@ -112,7 +118,8 @@ useOnStopTyping(search, async () => {
   if (registeredFields.length) {
     items.value = registeredFields.filter(
       (itemRequest) =>
-        !selectedItems.value.find((item) => item.id === itemRequest?.id),
+        !selectedUsers.value.find((item) => item.id === itemRequest?.id) &&
+        itemRequest.email !== user?.email,
     );
   }
 });
@@ -129,19 +136,25 @@ const filterByFullnameAndEmail = (
   return fullname.includes(searchText) > -1 || email.includes(searchText) > -1;
 };
 
-watch(search, () => {
-  const isValidEmail = emailRegex.test(search.value);
-  const hasEmail = items.value.filter(
-    (item) => !item.fullname && item.email,
-  ).length;
-  if (!isValidEmail) {
-    items.value.filter((item) => item.email === search.value && !item.fullname);
-    return;
-  }
-  if (!hasEmail) {
-    items.value = [{ email: search.value }, ...items.value];
-  } else {
-    items.value.splice(0, 1, { email: search.value });
-  }
-});
+watch(
+  search,
+  () => {
+    const isValidEmail = emailRegex.test(search.value);
+    const local = items.value.filter((item) => item?.local);
+    if (search.value.length && isValidEmail) {
+      if (!local.length) {
+        items.value = [{ email: search.value, local: true }, ...items.value];
+      }
+      items.value = items.value.map((item) => {
+        if (item.local) {
+          return { ...item, email: search.value, local: true };
+        }
+        return item;
+      });
+    }
+  },
+  { deep: true },
+);
+
+watch(selectedUser, updateModelValue);
 </script>

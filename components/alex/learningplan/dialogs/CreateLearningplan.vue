@@ -1,52 +1,51 @@
 <template>
   <alex-custom-dialog
     v-model="value"
-    title="Criar novo Curso"
-    name-main-button="Criar"
-    name-second-button="Cancelar"
+    :title="$t('components.learningPlan.dialogs.createNewCourse')"
+    :name-main-button="$t('components.learningPlan.dialogs.create')"
+    :name-second-button="$t('components.learningPlan.dialogs.cancel')"
     stepper
-    :steps-config="{
-      step1: {
-        title: 'Informações',
-        subtitle: 'Básicas',
-        scheme: createCourseRules,
-      },
-      step2: { title: 'Mídia', subtitle: 'Descritiva' },
-      step3: { title: 'Membros', subtitle: 'Participantes' },
-      step4: { title: 'Encontros', subtitle: 'Síncronos' },
-    }"
+    :steps-config="stepsConfig"
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
-    @on-main-action="() => console.log('maina')"
+    :loading="loading"
+    @on-main-action="createCourse"
   >
     <template #step1
       ><alex-inputs-text-field
+        v-model="title"
         density="comfortable"
-        name="name"
-        label="Como vai se chamar seu Curso?"
-        placeholder="Digite o nome do Curso"
+        name="title"
+        :label="$t('components.learningPlan.dialogs.titleCourseLabel')"
+        :placeholder="
+          $t('components.learningPlan.dialogs.titleCoursePlaceholder')
+        "
         required
       />
       <alex-inputs-text-area
+        v-model="description"
         density="comfortable"
         name="description"
-        label="Do que se trata seu curso?"
-        placeholder="Digite uma descrição do Curso"
+        :label="$t('components.learningPlan.dialogs.aboutCourseLabel')"
+        :placeholder="
+          $t('components.learningPlan.dialogs.aboutCoursePlaceholder')
+        "
         theme="light"
         required
       />
       <alex-inputs-text-field
+        v-model="learningClass"
         density="comfortable"
         name="class"
-        label="Digite o nome da turma"
-        placeholder="Digite o nome da turma"
+        :label="$t('components.learningPlan.dialogs.classLabel')"
+        :placeholder="$t('components.learningPlan.dialogs.classPlaceholder')"
         required
       />
       <div class="w-100 d-flex gap-4">
         <alex-inputs-date
           v-model="startDate"
           name="startDate"
-          label="Quando iniciará o curso?"
+          :label="$t('components.learningPlan.dialogs.startDateLabel')"
           required
           class="w-100"
           density="comfortable"
@@ -56,26 +55,26 @@
           density="comfortable"
           name="endDate"
           required
-          label="Quando terminará o curso?"
+          :label="$t('components.learningPlan.dialogs.endDateLabel')"
           class="w-100"
         />
       </div>
     </template>
-    <template #step2> <alex-custom-carousel v-model="slides" /></template>
+    <template #step2>
+      <alex-custom-carousel ref="carousel" v-model="slides"
+    /></template>
     <template #step3>
       <alex-inputs-users-autocomplete
-        v-model:selected-items="selectedUsers"
+        v-model="selectedUsers"
         name="users"
         class="w-100"
-        label="Quem participará?"
-        placeholder="Buscar Integrante"
-        density="comfortable"
-        return-object
+        :label="$t('components.learningPlan.dialogs.whoParticipate')"
+        :placeholder="$t('components.learningPlan.dialogs.searchMember')"
       />
     </template>
     <template #step4>
       <div class="d-flex align-center justify-space-between">
-        <p>Momentos Síncronos</p>
+        <p>{{ $t('components.learningPlan.dialogs.newMeeting') }}</p>
         <alex-custom-button append-icon="mdi-plus" variant="secondary"
           ><alex-learningplan-dialogs-schedule
             v-model="createScheduleModal"
@@ -83,7 +82,9 @@
             @submit="
               (values) => (!editData ? addMeeting(values) : editMeeting(values))
             "
-          />Novo Encontro</alex-custom-button
+          />{{
+            $t('components.learningPlan.dialogs.syncMeetings')
+          }}</alex-custom-button
         >
       </div>
       <div v-if="!schedules.length">
@@ -107,8 +108,8 @@
         <course-meeting
           v-for="schedule in schedules"
           :key="schedule.id"
-          :frequency="frequency[schedule.frequency]"
-          :interval="schedule.frequency"
+          :frequency="frequency[schedule.interval]"
+          :interval="schedule.interval"
           :date="schedule.meetingDate"
           :start-hour="schedule.startHour"
           :end-hour="schedule.endHour"
@@ -137,11 +138,13 @@
 
 <script setup lang="ts">
 import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
+
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'submit']);
+const { create } = useStrapi4();
 const value = computed({
   get() {
     return props.modelValue;
@@ -150,14 +153,47 @@ const value = computed({
     emit('update:modelValue', value);
   },
 });
+const { t } = useI18n();
+const { setMessage } = useMessageStore();
 const { createCourseRules } = useFormRules();
+const stepsConfig = {
+  step1: {
+    title: t('components.learningPlan.dialogs.infos'),
+    subtitle: t('components.learningPlan.dialogs.basics'),
+    scheme: createCourseRules,
+  },
+  step2: {
+    title: t('components.learningPlan.dialogs.media'),
+    subtitle: t('components.learningPlan.dialogs.descriptive'),
+  },
+  step3: {
+    title: t('components.learningPlan.dialogs.members'),
+    subtitle: t('components.learningPlan.dialogs.participants'),
+  },
+  step4: {
+    title: t('components.learningPlan.dialogs.meetings'),
+    subtitle: t('components.learningPlan.dialogs.synchronous'),
+  },
+};
 const createScheduleModal = ref(false);
+const loading = ref(false);
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const slides = ref([]);
+const title = ref('');
+const description = ref('');
+const learningClass = ref('');
 const selectedUsers = ref([]);
 const schedules = ref<Meeting[]>([]);
 const editData = ref<Meeting | null>(null);
+const carousel = ref<{ clearSlides: () => unknown } | null>(null);
+const frequency = {
+  7: 'weekly',
+  1: 'everyday',
+  0: 'interval',
+  30: 'monthly',
+  14: 'biweekly',
+};
 
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
@@ -173,16 +209,60 @@ const editMeeting = (values: Meeting) => {
   schedules.value = updatedSchedules;
 };
 const addMeeting = (values: Meeting) => {
-  schedules.value.push({ ...values, id: crypto.randomUUID() });
+  schedules.value.push({
+    ...values,
+    id: crypto.randomUUID(),
+    frequency: 'none',
+  });
 };
 
-const frequency = {
-  7: 'weekly',
-  1: 'everyday',
-  0: 'interval',
-  30: 'monthly',
-  14: 'biweekly',
+const createCourse = async () => {
+  try {
+    loading.value = true;
+    await create('learningplans', {
+      title: title.value.trim().replace(/\s+/g, ' '),
+      description: description.value,
+      start_date: startDate.value,
+      end_date: endDate.value,
+      type: 'course',
+      slug: title.value.trim().replace(/\s+/g, '_').toLocaleLowerCase(),
+      invitation_enabled: true,
+      invitation_duration: 3600,
+      members: selectedUsers.value,
+      class_name: learningClass.value,
+      media: slides.value,
+      schedules: schedules.value,
+    });
+    emit('submit');
+    emit('update:modelValue', false);
+    schedules.value = [];
+    slides.value = [];
+    selectedUsers.value = [];
+    title.value = '';
+    description.value = '';
+    learningClass.value = '';
+    startDate.value = undefined;
+    endDate.value = undefined;
+  } catch (error: unknown) {
+    const message = (error as { error: { message: string } })?.error?.message;
+    if (message) {
+      setMessage(message, 'red', true);
+    } else {
+      setMessage('Não foi possível criar o curso', 'red', true);
+    }
+  } finally {
+    loading.value = false;
+  }
 };
+
+watch(
+  () => props.modelValue,
+  () => carousel?.value?.clearSlides(),
+);
 </script>
 
-<style scoped></style>
+<style scoped>
+.max-w-200 {
+  max-width: 200px;
+}
+</style>
