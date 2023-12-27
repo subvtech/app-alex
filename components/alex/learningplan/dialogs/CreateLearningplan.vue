@@ -49,6 +49,7 @@
           required
           class="w-100"
           density="comfortable"
+          :allowed-dates="disablePastDates"
         />
         <alex-inputs-date
           v-model="endDate"
@@ -57,6 +58,7 @@
           required
           :label="$t('components.learningPlan.dialogs.endDateLabel')"
           class="w-100"
+          :allowed-dates="disablePastDates"
         />
       </div>
     </template>
@@ -104,13 +106,12 @@
           </div>
         </div>
       </div>
-      <div v-else>
+      <div v-else class="mt-4">
         <course-meeting
           v-for="schedule in schedules"
           :key="schedule.id"
-          :frequency="frequency[schedule.interval]"
           :interval="schedule.interval"
-          :date="schedule.meetingDate"
+          :date="schedule.date"
           :start-hour="schedule.startHour"
           :end-hour="schedule.endHour"
           :variant="'editing'"
@@ -124,7 +125,7 @@
               icon: 'mdi-pencil',
             },
             {
-              onClick: () => removeSelf(schedule.id),
+              onClick: () => schedule.id && removeSelf(schedule.id),
               text: 'Apagar',
               icon: 'mdi-trash-can-outline',
               warning: true,
@@ -137,8 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { Meeting } from '@/components/alex/learningplan/dialogs/Schedule.vue';
-
+import { MeetingPropsType } from '@/components/CourseMeeting.vue';
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
@@ -184,22 +184,22 @@ const title = ref('');
 const description = ref('');
 const learningClass = ref('');
 const selectedUsers = ref([]);
-const schedules = ref<Meeting[]>([]);
-const editData = ref<Meeting | null>(null);
+const schedules = ref<MeetingPropsType[]>([]);
+const editData = ref<MeetingPropsType | null>(null);
 const carousel = ref<{ clearSlides: () => unknown } | null>(null);
-const frequency = {
-  7: 'weekly',
-  1: 'everyday',
-  0: 'interval',
-  30: 'monthly',
-  14: 'biweekly',
+
+const disablePastDates = (date: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const parsedDate = new Date(date);
+  return parsedDate >= today;
 };
 
 const removeSelf = (id: string) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
 
-const editMeeting = (values: Meeting) => {
+const editMeeting = (values: MeetingPropsType) => {
   const updatedSchedules = schedules.value.map((meeting) => {
     if (meeting.id === values.id) {
       return { ...meeting, ...values };
@@ -208,11 +208,10 @@ const editMeeting = (values: Meeting) => {
   });
   schedules.value = updatedSchedules;
 };
-const addMeeting = (values: Meeting) => {
+const addMeeting = (values: MeetingPropsType) => {
   schedules.value.push({
     ...values,
     id: crypto.randomUUID(),
-    frequency: 'none',
   });
 };
 

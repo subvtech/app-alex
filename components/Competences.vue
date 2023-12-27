@@ -58,16 +58,16 @@ const { t } = useI18n();
 const client = useStrapiClient();
 const emit = defineEmits(['update']);
 const { setMessage } = useMessageStore();
-type Tag = {
+export type CompetenceTag = {
   text: string;
-  id: number;
+  id?: number;
   verified_by: any;
   isGeneral: boolean;
 };
 
 const props = defineProps({
   userTags: {
-    type: Array as PropType<Tag[]>,
+    type: Array as PropType<CompetenceTag[]>,
     default: () => [],
   },
   title: {
@@ -92,26 +92,26 @@ const props = defineProps({
 
 const { canEdit } = toRefs(props);
 const isEditing = ref(false);
-const selectedTag = ref<Tag | null>(null);
-const filteredTags = ref<Tag[]>([]);
-const forbiddenTags = ref<Tag[]>([]);
+const selectedTag = ref<CompetenceTag | null>(null);
+const filteredTags = ref<CompetenceTag[]>([]);
+const forbiddenTags = ref<CompetenceTag[]>([]);
 const allTags = ref<any>([]);
 
 const userTagsIds = ref<number[]>([]);
-const selectedTags = ref<Tag[]>([]);
+const selectedTags = ref<CompetenceTag[]>([]);
 const rerender = ref(0);
 
 function filterTags(
   data: any[],
   isGeneral: boolean,
   ids: number[] = [],
-): Tag[] {
+): CompetenceTag[] {
   return data
-    .filter((item) => (item.attributes as Tag).isGeneral === isGeneral)
+    .filter((item) => (item.attributes as CompetenceTag).isGeneral === isGeneral)
     .filter((item) => !ids.includes(item.id))
     .map((item, index) => {
       return { ...item.attributes, id: item.id };
-    }) as Tag[];
+    }) as CompetenceTag[];
 }
 
 onBeforeMount(async () => {
@@ -121,7 +121,7 @@ onBeforeMount(async () => {
       isPublic: true,
     },
   });
-  userTagsIds.value = props.userTags.map((item) => item.id);
+  userTagsIds.value = props.userTags.map((item) => item.id!);
 
   selectedTags.value = props.userTags.map((item) => {
     return { ...item };
@@ -134,9 +134,9 @@ onBeforeMount(async () => {
     userTagsIds.value,
   );
 });
-const createArray = ref<Tag[]>([]);
-const updateArray = ref<Tag[]>([]);
-const deleteArray = ref<Tag[]>([]);
+const createArray = ref<CompetenceTag[]>([]);
+const updateArray = ref<CompetenceTag[]>([]);
+const deleteArray = ref<CompetenceTag[]>([]);
 
 const removeItem = (tag) => {
   selectedTags.value = selectedTags.value.filter(
@@ -222,7 +222,7 @@ const onSave = async () => {
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
-  userTagsIds.value = selectedTags.value.map((item) => item.id);
+  userTagsIds.value = selectedTags.value.map((item) => item.id!);
 
   if (promises.length > 0) {
     await Promise.all(promises);

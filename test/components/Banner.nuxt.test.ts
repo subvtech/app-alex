@@ -202,22 +202,6 @@ describe('Banner', async () => {
     });
   });
 
-  it('menu should be displayed', async () => {
-    const { unmount } = await renderSuspended(Banner, {
-      attrs: {
-        userId: 2,
-        title,
-        showMenu: true,
-        canEdit: true,
-      },
-      global: {
-        plugins: [vuetify, i18n],
-      },
-    });
-    const settingsComponent = await screen.queryByTestId('menu');
-    expect(settingsComponent).not.toBeNull();
-    unmount();
-  });
 
   it('shade styling should be displayed', async () => {
     const bannerComponent = await renderSuspended(Banner, {

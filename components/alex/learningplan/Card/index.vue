@@ -256,7 +256,7 @@ const dropdownItems = (hidden: boolean) => {
   ];
 };
 const width = computed(() =>
-  isVertical.value ? { min: 300, max: 400 } : { min: 688, max: 959 },
+  isVertical.value ? { min: 300, max: 375 } : { min: 688, max: 959 },
 );
 const statusConfig = computed<{ icon: string; variant: any }>(() => {
   switch (props.status) {
