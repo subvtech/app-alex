@@ -13,7 +13,10 @@
       search-placeholder="Encontrar participante"
       action-text="Convites"
       action-icon="mdi-email-outline"
+      dialog-title="Convites do Curso"
+      @action="onClickSendInvites"
     >
+      <template #dialog-content> sfldsf </template>
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
       v-model="searchGroups"
@@ -29,9 +32,9 @@
       action-text="Criar grupos"
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
+      @action="onCreateGroup"
     >
-      assd
-      {{ searchGroups }}
+      <template #dialog-content> sfldsf </template>
     </alex-learningplan-class-section-card>
   </div>
 </template>
@@ -45,6 +48,14 @@ const searchMembers = ref('');
 const searchGroups = ref('');
 
 const learningPlanStore = useLearningPlanStore();
+
+function onClickSendInvites() {
+  console.log('onClickSendInvites');
+}
+
+function onCreateGroup() {
+  console.log('onCreateGroup');
+}
 </script>
 <style scoped lang="scss">
 // .participantes-card {
