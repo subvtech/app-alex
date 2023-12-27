@@ -1,6 +1,7 @@
 <template>
-  <div class="wrapper d-flex flex-column gap-6">
+  <div class="wrapper d-flex flex-column">
     <alex-custom-header
+      class="mb-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"
@@ -19,14 +20,23 @@
         style="flex: 1"
         class="d-flex align-center justify-center flex-column"
       >
-        <img
-          class="emptyProjects-img"
-          src="@/assets/svg/EmptyProjects.svg"
-          alt="Empty Projects"
-        />
-        <p class="text-h3 text-gray-600">
-          {{ $t('pages.classes.emptyStateText') }}
-        </p>
+        <v-progress-circular
+          v-if="isLoading"
+          color="accent"
+          indeterminate
+          :size="100"
+          :width="6"
+        ></v-progress-circular>
+        <div v-else>
+          <img
+            class="emptyProjects-img"
+            src="@/assets/svg/EmptyProjects.svg"
+            alt="Empty Projects"
+          />
+          <p class="text-h3 text-gray-600">
+            {{ $t('pages.classes.emptyStateText') }}
+          </p>
+        </div>
       </div>
       <div v-else class="d-flex w-100 flex-column h-100" style="flex: 1">
         <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
@@ -38,7 +48,7 @@
             variant="outlined"
             hide-details
             class="w-50"
-            style="min-width: 160px"
+            style="min-width: 160px; max-width: 320px"
             density="compact"
           />
           <div>
@@ -94,12 +104,13 @@
             'end_date',
             'tags',
           ]"
-          class="d-flex flex-wrap align-content-space-between flex-1"
+          class="d-flex flex-wrap"
+          style="flex: 1; position: relative"
         >
           <template #default="{ items }">
             <div
               v-if="coursesView === 'grid'"
-              class="d-flex flex-wrap ga-4 flex-1"
+              class="d-flex ga-6 grid-container flex-wrap w-100"
             >
               <alex-learningplan-card
                 v-for="(course, index) in items"
@@ -122,7 +133,7 @@
                 :favorited="course.raw.favorited"
                 @favorite="changeItemFavorited(index)"
                 @toggle-visibility="changeItemVisibility(index, course.raw.id)"
-                @configurations="navigate(course.raw.id, 'configurations')"
+                @configurations="navigate(course.raw.id, 'settings')"
                 @open="navigate(course.raw.id, 'page')"
               />
             </div>
@@ -201,7 +212,7 @@
           </template>
           <template #footer="{ pageCount, groupedItems }">
             <div
-              class="d-flex w-100 justify-space-between align-center pa-6 flex-column flex-sm-row ga-3 footer mt-6"
+              class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
             >
               <p class="text-body-3 text-gray-600">
                 {{ showingData(groupedItems) }}
@@ -224,18 +235,19 @@
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetLearningPlans } from '~/assets/queries';
 import { LearningPlan } from '@/models/learningPlan.model';
-const rounter = useRouter();
+const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
 const professorMode = ref(false);
+const isLoading = ref(false);
 const { t } = useI18n();
 const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
 const createCourseDialog = ref(false);
 interface courseItem {
-  id: number;
+  id?: number;
   description: string;
   facilitatorName?: string;
   facilitatorImage?: string;
@@ -243,7 +255,7 @@ interface courseItem {
   img?: string;
   institution?: string;
   tags?: string[];
-  start_date: string;
+  start_date?: string;
   end_date?: string;
   hidden: boolean;
   favorited: boolean;
@@ -261,6 +273,7 @@ const getCourses = async () => {
       sortable: false,
     });
   }
+  isLoading.value = true;
   const { data } = await useAsyncData('learningPlans', () => {
     const params = { userId: id };
     return graphql<{
@@ -312,6 +325,7 @@ const getCourses = async () => {
         favorited: false,
       };
     }) || [];
+  isLoading.value = false;
 };
 // eslint-disable camelcase
 onBeforeMount(async () => await getCourses());
@@ -337,6 +351,9 @@ const showingData = (groupedItems) => {
     to,
     total,
   });
+  if (to === 0) {
+    return t('pages.classes.noData');
+  }
   return message;
 };
 const breadcrumbs = [
@@ -347,7 +364,7 @@ const breadcrumbs = [
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/courses',
+    href: '/courses/me',
     disabled: false,
   },
 ];
@@ -368,7 +385,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/courses/${id}/configurations`,
+      link: `/course/${id}/settings`,
     },
   ];
 };
@@ -403,31 +420,30 @@ const changeViewMode = () => {
 };
 
 const changeItemVisibility = (index: number, id) => {
-  update('learningPlans', id, {
-    hidden: !courses.value[index].hidden,
-  }).then(() => {
+  courses.value[index].hidden = !courses.value[index].hidden;
+  try {
+    update('learningPlans', id, {
+      hidden: !courses.value[index].hidden,
+    });
+  } catch (error) {
     courses.value[index].hidden = !courses.value[index].hidden;
-  });
+  }
 };
 
 const changeItemFavorited = (index: number) => {
   courses.value[index].favorited = !courses.value[index].favorited;
 };
 
-const navigate = (id: number, page: string) => {
-  if (page === 'configurations') {
-    rounter.push(`/courses/${id}/configurations`);
+const navigate = (id: number, page) => {
+  if (page === 'settings') {
+    router.push(`/course/${id}/settings`);
   } else {
-    rounter.push(`/courses/${id}`);
+    router.push(`/course/${id}`);
   }
 };
 </script>
 
 <style>
-.flex-1 {
-  flex: 1;
-}
-
 #courses-table thead > tr > th {
   height: 40px;
 }
@@ -465,17 +481,32 @@ const navigate = (id: number, page: string) => {
   min-height: calc(100vh - 130px);
 }
 
+.grid-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+}
+
 .flex-stretch {
-  flex: 1 !important;
-  flex-basis: fit-content;
+  box-sizing: border-box !important;
 }
 
 .footer {
   border-top: 1px #ebedef solid;
   max-height: 95px;
+  align-self: flex-end !important;
 }
 
 .hidden {
   opacity: 0.5;
+}
+
+@media (max-width: 1280px) {
+  .grid-container {
+    display: flex !important;
+  }
+  .flex-stretch {
+    flex: 1;
+    box-sizing: border-box !important;
+  }
 }
 </style>
