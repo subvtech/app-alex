@@ -23,7 +23,8 @@
         />
         <alex-inputs-date
           v-model="meetingDate"
-          name="meetingDate"
+          name="date"
+          :allowed-dates="disablePastDates"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
           class="w-100"
@@ -73,29 +74,11 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-export type Frequency =
-  | 'sunday'
-  | 'monday'
-  | 'tuesday'
-  | 'wednesday'
-  | 'thursday'
-  | 'friday'
-  | 'saturday'
-  | 'everyday'
-  | 'none';
-
-export interface Meeting {
-  id: string;
-  frequency: Frequency;
-  interval: 0 | 1 | 7 | 14 | 30;
-  meetingDate: Date;
-  startHour: string;
-  endHour: string;
-}
+import { MeetingPropsType } from '@/components/CourseMeeting.vue';
 
 interface ScheduleProps {
   modelValue: boolean;
-  data?: Meeting | null;
+  data?: MeetingPropsType | null;
 }
 
 const props = withDefaults(defineProps<ScheduleProps>(), {
@@ -128,17 +111,29 @@ const { handleSubmit, handleReset, setFieldValue } = useForm({
   validationSchema: scheduleRules,
   initialValues: {
     interval: data.value?.interval || 0,
-    meetingDate: data.value?.meetingDate,
+    date: data.value?.date,
     startHour: data.value?.startHour || '',
     endHour: data.value?.endHour || '',
   },
 });
 
-const meetingDate = ref(data.value?.meetingDate);
+const meetingDate = ref(data.value?.date);
 const submit = handleSubmit((values) => {
   emit('submit', { ...values, id: props.data?.id });
+  console.log('submit');
   emit('update:modelValue', false);
 });
+
+const disablePastDates = (date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Vuetify uses strings in the format 'YYYY-MM-DD' for dates, so convert the date argument to a Date object
+  const parsedDate = new Date(date);
+
+  // If the parsed date is earlier than today, return false to disable it
+  return parsedDate >= today;
+};
 
 const items: {
   title: string;
@@ -165,8 +160,8 @@ watch(data, (value) => {
     setFieldValue('interval', value.interval);
     setFieldValue('startHour', value.startHour);
     setFieldValue('endHour', value.endHour);
-    setFieldValue('meetingDate', value.meetingDate);
-    meetingDate.value = value.meetingDate;
+    setFieldValue('date', value.date);
+    meetingDate.value = value.date;
   }
 });
 </script>

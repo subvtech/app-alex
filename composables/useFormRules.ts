@@ -214,7 +214,7 @@ export const useFormRules = () => {
   });
 
   const scheduleRules = yup.object({
-    meetingDate: yup
+    date: yup
       .date()
       .required(i18n.t('rules.meeting.date.required'))
       .min(currentDate.toISOString(), ({ min }) =>
