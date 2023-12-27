@@ -333,8 +333,20 @@ export const tagsByids = `
 `;
 
 export const GetLearningPlans = `
-query ($userId: ID!) {
-  learningplans(filters: { members: { user: { id: { eq: $userId } } } }) {
+query($userId: ID!) {
+  learningplans(
+   	sort: "id:desc"
+    pagination: {limit: -1}
+    filters: {
+      or: [{ hidden: { eq: false } }, { members: { role: { ne: "student" } } }]
+      and: [
+        { members: { user: { id: { eq: $userId } } } }
+        { members: { status: { eq: "joined" } } }
+        { type: { eq: "course"}}
+        { archived_at: { eq: null}}
+      ]
+    }
+  ) {
     data {
       id
       attributes {
@@ -343,20 +355,22 @@ query ($userId: ID!) {
         start_date
         end_date
         hidden
-      	learning_structure{
-          data{
-            attributes{
-              trails{
-                data{
-                  id
+        learning_structure {
+          data {
+            attributes {
+              trails {
+                data {
+                  attributes {
+                    createdAt
+                  }
                 }
               }
             }
           }
         }
-        tags{
-          data{
-            attributes{
+        tags {
+          data {
+            attributes {
               text
               isGeneral
             }
@@ -369,24 +383,25 @@ query ($userId: ID!) {
             }
           }
         }
-        members(filters: {role: {eq: "facilitator"}}) {
+        members(filters: { role: { eq: "facilitator" } }) {
           data {
-           attributes{ 
-            user{
-              data{
-                attributes{
-                  fullname
-                  institutions{
-                    data{
-                      attributes{
-                        name
+            attributes {
+              user {
+                data {
+                  attributes {
+                    fullname
+                    institutions {
+                      data {
+                        attributes {
+                          name
+                        }
                       }
                     }
-                  }
-                  avatar{
-                    data{
-                      attributes{
-                        url
+                    avatar {
+                      data {
+                        attributes {
+                          url
+                        }
                       }
                     }
                   }
@@ -394,10 +409,10 @@ query ($userId: ID!) {
               }
             }
           }
-          }
         }
       }
     }
   }
 }
+
 `;

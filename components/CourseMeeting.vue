@@ -1,5 +1,8 @@
 <template>
-  <div class="d-flex w-100 py-3 px-4 justify-space-between align-center">
+  <div
+    class="d-flex w-100 py-3 px-4 justify-space-between align-center"
+    :class="variant === 'editing' ? 'bordered' : ''"
+  >
     <div class="d-flex flex-column">
       <span class="date">
         {{ formattedDate }}
@@ -38,65 +41,46 @@
 // eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
-import { pt } from 'date-fns/locale';
-import { PropType } from 'nuxt/dist/app/compat/capi';
+import { pt, enUS } from 'date-fns/locale';
 import { AlexDropdownItem } from './alex/inputs/Dropdown.vue';
-import { useDatetime } from '~/composables/useDate';
+
 const { t } = useI18n();
 const emit = defineEmits(['click:activator', 'click:calendar']);
+export type MeetingVariantType = 'editing' | 'list';
 
-const props = defineProps({
-  frequency: {
-    type: String,
-    required: true,
-  },
-  interval: {
-    type: Number as PropType<0 | 1 | 7 | 14 | 30>,
-    default: 7,
-  },
-  variant: {
-    type: String as PropType<'editing' | 'list'>,
-    default: 'list',
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-  startHour: {
-    type: String,
-    required: true,
-  },
-  endHour: {
-    type: String,
-    required: true,
-  },
-  showOptions: {
-    type: Boolean,
-    default: false,
-  },
-  shortText: {
-    type: Boolean,
-    default: false,
-  },
-  dropdownProps: {
-    type: Array as PropType<AlexDropdownItem[]>,
-    default: () => [
-      {
-        icon: 'mdi-pencil',
-        text: 'Editar', // t('components.courses.meeting.edit'),
-      },
-      {
-        icon: 'mdi-trash-can',
-        text: 'Excluir', // t('components.courses.meeting.delete'),
-        warning: true,
-      },
-    ],
-  },
+export interface MeetingPropsType {
+  interval: 0 | 1 | 7 | 14 | 30;
+  variant?: MeetingVariantType;
+  date: Date;
+  startHour: string;
+  endHour: string;
+  shortText?: boolean;
+  showOptions?: boolean;
+  id?: string;
+  dropdownProps?: AlexDropdownItem[];
+}
+
+const props = withDefaults(defineProps<MeetingPropsType>(), {
+  interval: 7,
+  variant: 'list',
+  id: undefined,
+  dropdownProps: () => [
+    {
+      icon: 'mdi-pencil',
+      text: 'Editar', // t('components.courses.meeting.edit'),
+    },
+    {
+      icon: 'mdi-trash-can',
+      text: 'Excluir', // t('components.courses.meeting.delete'),
+      warning: true,
+    },
+  ],
+  shortText: false,
+  showOptions: false,
 });
 
-const { dateToHour } = useDatetime();
 const date = computed(() => new Date(props.date));
-const phrase = computed(() => format(date.value, 'EEEE').toLowerCase());
+
 const formattedDate = computed(() => {
   let formatText = ` d '${t('components.courses.meeting.of')}' MMMM '${t(
     'components.courses.meeting.of',
@@ -107,42 +91,51 @@ const formattedDate = computed(() => {
     formatText2 = `EEEE, d/MM`;
   }
 
-  const temp = isEditing.value
-    ? t('components.courses.meeting.starting') +
-      format(date.value, formatText, { locale: pt })
-    : format(date.value, formatText2, {
-        locale: pt,
-      });
+  const temp =
+    date.value >= new Date()
+      ? t('components.courses.meeting.starting') +
+        format(date.value, formatText, { locale: pt })
+      : format(date.value, formatText2, {
+          locale: pt,
+        });
   return temp.charAt(0).toUpperCase() + temp.slice(1);
 });
 
 const isEditing = computed(() => props.variant === 'editing');
 
-const frequencyText = computed(() =>
-  props.frequency !== 'interval'
-    ? t(`components.courses.meeting.every.${props.frequency}`)
-    : props.interval === 30
-    ? t('components.courses.meeting.monthly', {
-        day: t(`components.courses.meeting.single.${phrase.value}`),
-      })
-    : props.interval === 14
-    ? t('components.courses.meeting.biweekly', {
-        day: t(`components.courses.meeting.single.${phrase.value}`),
-      })
-    : props.interval === 0
-    ? t(`components.courses.meeting.single.${phrase.value}`)
-    : t('components.courses.meeting.interval', { days: props.interval }),
-);
-
-const startTime = computed(() => dateToHour(props.startHour, date.value));
-const endTime = computed(() => dateToHour(props.endHour, date.value));
+const frequencyText = computed(() => {
+  const dayOfTheWeek = format(date.value, 'iiii', {
+    locale: enUS,
+  }).toLowerCase();
+  switch (props.interval) {
+    case 0: // once
+      return t(`components.courses.meeting.single.${dayOfTheWeek}`);
+    case 1:
+      return t(`components.courses.meeting.every.${dayOfTheWeek}`);
+    case 14:
+      return t('components.courses.meeting.biweekly', {
+        day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
+      });
+    case 30:
+      return t('components.courses.meeting.monthly', {
+        day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
+      });
+    default:
+      return t('components.courses.meeting.interval', { days: props.interval });
+  }
+});
 
 const duration = computed(
   () =>
-    `${startTime.value} ${t('components.courses.meeting.at')} ${endTime.value}`,
+    `${props.startHour} ${t('components.courses.meeting.at')} ${props.endHour}`,
 );
 </script>
 <style scoped lang="scss">
+.bordered {
+  border-radius: 8px;
+  border: 1px solid var(--Cinza-Cinza-100, #ebedef);
+}
+
 .duration {
   color: var(--Cinza-Cinza-800, #454d54);
   width: max-content;

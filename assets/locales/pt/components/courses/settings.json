@@ -1,0 +1,77 @@
+{
+  "title": "Configurações",
+  "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
+  "syncMeetingsTitle": "Encontros síncronos",
+  "noSyncMeetings": "Parece que não há nenhum encontro síncrono.",
+
+  "fiveMinutes": "5 minutos",
+  "fifteenMinutes": "15 minutos",
+  "thirtyMinutes": "30 minutos",
+  "oneHour": "1 hora",
+  "twoHours": "2 horas",
+  "eightHours": "8 horas",
+  "twentyFourHours": "24 horas",
+  "courseVisibilityTitle": "Visibilidade do curso",
+  "showCourseTitle": "Mostrar curso (Público)",
+  "showCourseHint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca.",
+  "hideCourseTitle": "Ocultar curso (Privado)",
+  "hideCourseHint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso.",
+
+  "update": "Curso atualizado com sucesso",
+  "cover": {
+    "title": "Capa do curso",
+    "update": "A Imagem de capa do curso foi atualizada com sucesso",
+    "addCover": "Fazer upload"
+  },
+  "general": {
+    "title": "Informações Gerais",
+    "courseTitle": "Nome do curso",
+    "startDate": "Início",
+    "endDate": "Término",
+    "slug": {
+      "label": "Nome ou sigla do curso",
+      "unique": "Nome/Sigla selecionada não disponível"
+    },
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "update": "Informações Gerais atualizadas com sucesso"
+  },
+  "meetings": {
+    "title": "Editar encontro síncrono",
+    "frequency": "Frequência do encontro",
+    "date": "Data do encontro",
+    "dateTip": "A data que o encontro começa",
+    "startDate": "Data de início",
+    "endDate": "Data de término",
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "add": "Criar encontro",
+    "delete": {
+      "confirmation": "Realmente deseja excluir o encontro?",
+      "description": "Ao confirmar você irá excluir o encontro síncrono cadastrado.",
+      "button": "Excluir",
+      "cancel": "Cancelar"
+    }
+  },
+  "delete": {
+    "CourseTitle": "Excluir curso",
+    "CourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
+    "Button": "Excluir curso",
+    "Confirmation": "Realmente deseja excluir o curso?",
+    "Description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
+    "Label": "Digite a palavra:",
+    "Placeholder": "Digite a palavra",
+    "Word": "Excluir"
+  },
+  "invite": {
+    "title": "Configurações de convite",
+    "label": "Convite por link",
+    "link": "Link de convite",
+    "linkDuration": "Duração do Convite",
+    "linkAddress": "Endereço do convite",
+    "email": "Convite por e-mail",
+    "message": "Mensagem do convite",
+    "hint": "Mensagem que será enviada por e-mail para o convidado.",
+    "tooltip": "Alterar a duração do convite não vai mudar o tempo restante do endereço atual. Para aplicar a nova duração é necessário gerar um novo convite."
+  }
+}

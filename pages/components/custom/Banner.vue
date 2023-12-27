@@ -195,11 +195,6 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
-definePageMeta({
-  layout: 'components',
-  middleware: 'auth',
-});
-
 const { findOne } = useStrapi();
 
 const i18n = useI18n();

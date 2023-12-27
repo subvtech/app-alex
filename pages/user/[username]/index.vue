@@ -44,20 +44,7 @@
       :links="links"
     />
 
-    <div
-      v-if="showSettings && canEdit"
-      class="content-block d-flex justify-center flex-row"
-    >
-      <profile-settings
-        :email="user.email"
-        :cpf="user.cpf"
-        :telephone="user.phone"
-        :fullname="user.fullname"
-        :id="user.id"
-      />
-    </div>
-
-    <div v-else class="content-block d-flex justify-center flex-row w-100">
+    <div class="content-block d-flex justify-center flex-row w-100">
       <component
         :is="selectedComponent"
         :email="user.email"
@@ -76,8 +63,9 @@
 </template>
 
 <script setup lang="ts">
-import { User } from '../../models/user.model';
 import { useI18n } from 'vue-i18n';
+import { TabType } from '@/components/alex/custom/Tabs.vue';
+import { User } from '@/models/user.model';
 const i18n = useI18n();
 const { find, findOne } = useStrapi();
 
@@ -90,13 +78,6 @@ const showSettings = ref(false);
 const generalTags = ref();
 const technicalTags = ref();
 const selectedOption = ref(0);
-const links = ref([
-  i18n.t('pages.profile.general'),
-  i18n.t('pages.profile.courses'),
-  i18n.t('pages.profile.projects'),
-  i18n.t('pages.profile.assignments'),
-  i18n.t('pages.profile.events'),
-]);
 
 const user = ref<any>();
 definePageMeta({
@@ -121,6 +102,23 @@ const selectedComponent = computed(() => {
 onBeforeMount(async () => {
   await updateUser(false);
 });
+const links = computed<TabType[]>(() => [
+  {
+    label: i18n.t('pages.profile.general'),
+    value: '0',
+    to: `/user/${user.value.username}`,
+  },
+  { label: i18n.t('pages.profile.courses'), value: '1' },
+  { label: i18n.t('pages.profile.projects'), value: '2' },
+  { label: i18n.t('pages.profile.assignments'), value: '3' },
+  { label: i18n.t('pages.profile.events'), value: '4' },
+  {
+    label: '',
+    icon: 'mdi-cog-outline',
+    value: '5',
+    to: `/user/${user.value.username}/settings`,
+  },
+]);
 
 const updateUser = async (show = true, message?) => {
   const populate = [
@@ -157,7 +155,6 @@ const updateUser = async (show = true, message?) => {
   generalTags.value = user.value.tags.filter((item) => item.isGeneral);
   technicalTags.value = user.value.tags.filter((item) => !item.isGeneral);
 
-  
   messageStore.setMessage(message ?? 'done', 'green', show);
 };
 

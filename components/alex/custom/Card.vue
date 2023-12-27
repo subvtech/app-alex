@@ -82,6 +82,15 @@
       ]"
     >
       <slot name="content" />
+    </div>
+    <v-divider v-if="showFooterDivider" class="w-100" :thickness="1" />
+    <div
+      class="d-flex flex-column w-100"
+      :class="[
+        sizingClass ?? (noHeader ? 'px-6' : 'px-6 pb-6'),
+        alignContent ?? 'align-start',
+      ]"
+    >
       <slot name="footer" />
     </div>
   </div>
@@ -114,6 +123,10 @@ const props = defineProps({
     default: false,
   },
   noHeader: {
+    type: Boolean,
+    default: false,
+  },
+  showFooterDivider: {
     type: Boolean,
     default: false,
   },
@@ -166,7 +179,6 @@ const cancelledAction = async () => {
   emit('toggle:isEditing');
   cancel.value();
 };
-
 </script>
 
 <style scoped lang="scss">
