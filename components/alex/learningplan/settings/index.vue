@@ -4,7 +4,8 @@
     :show-icon="false"
   >
     <template #content>
-      <alex-learningplan-settings-banner
+      <div class="d-flex flex-column w-100 gap-6 justify-center">
+        <alex-learningplan-settings-banner
         :cover="coverImage"
         :learning-plan-id="learningPlan.id"
         @update="(data) => emit('update', data)"
@@ -33,54 +34,9 @@
         :invitation-duration="learningPlan.invitation_duration"
         :message="'sdasds'"
       />
-
-      <div class="d-flex content-area invites">
-        <div class="card-title">
-          <p>
-            <span class="header-h4">{{
-              t('pages.courseSettings.config.inviteSettingsTitle')
-            }}</span>
-          </p>
-        </div>
       </div>
-      <div class="content-area course-visibility">
-        <div class="card-title">
-          <p>
-            <span class="header-h4">
-              {{ t('pages.courseSettings.config.courseVisibilityTitle') }}</span
-            >
-          </p>
-        </div>
-        <div class="content-body">
-          <div class="container-radio">
-            <div class="radioButtons">
-              <alex-inputs-radio-button
-                v-model="activeButton"
-                :buttons="firstButton"
-                :text="t('pages.courseSettings.config.showButton')"
-              />
-              <alex-inputs-radio-button
-                v-model="activeButton"
-                :buttons="secondButton"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="footer-content">
-          <span class="action-content-two">
-            <alex-custom-button
-              class="button"
-              :text="$t('pages.courseSettings.config.cancelButton')"
-              variant="secondary"
-            />
-            <alex-custom-button
-              class="button"
-              :text="$t('pages.courseSettings.config.saveButton')"
-              variant="primary"
-            />
-          </span>
-        </div>
-      </div>
+    
+      <alex-learningplan-settings-visibility/>
       <div class="content-area delete">
         <div class="card-title">
           <p>

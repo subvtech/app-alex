@@ -11,7 +11,7 @@
     <template #content>
       <div v-if="enableInvites" class="d-flex flex-column w-100">
         <div
-          class="invite gap-6 justify-space-between"
+          class="invite gap-6 justify-space-between "
           :class="[
             theresTimeAndUrl ? '' : 'disabled',
             smaller ? 'smaller' : '',
@@ -179,7 +179,7 @@ watch(theresTimeAndUrl, () => {
   letter-spacing: 0.32px;
 }
 .smaller {
-  height: 44px !important;
+  height: 48px !important;
 }
 .invite {
   display: flex;

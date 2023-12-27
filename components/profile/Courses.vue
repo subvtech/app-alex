@@ -2,7 +2,7 @@
   <alex-custom-card
     class="mt-6"
     :title="$t('components.profile.courses.title')"
-    :full-width="true"
+    full-width
   >
     <template v-slot:content>
       <div class="d-flex mb-6">

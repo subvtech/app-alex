@@ -6,5 +6,7 @@
   "cancel": "Cancel",
   "saveProfile": "Save Profile",
   "save": "Save",
-  "cpf": "CPF"
+  "phonePlaceholder": "Type in your number",
+  "cpf": "CPF",
+  "update": "Personal Information updated"
 }

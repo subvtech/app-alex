@@ -1,8 +1,8 @@
 import { ref, onMounted } from 'vue';
 
-export default function useNavigationDrawer(defaultWidth = 0) {
+export default function useNavigationDrawer(defaultWidth = 0, defaultDrawerValue = true) {
   const clipped = ref(false);
-  const drawer = ref(true);
+  const drawer = ref(defaultDrawerValue);
   const currentWidth = ref(defaultWidth);
 
   onMounted(() => {

@@ -5,12 +5,6 @@
   "syncMeetingsTitle": "Synchronous Meetings",
   "noSyncMeetings": "It seems there are no synchronous meetings.",
 
-  "showCourseTitle": "Show Course (Public)",
-  "showCourseHint": "Makes the course public, allowing any user to find it through search.",
-  "hideCourseTitle": "Hide Course (Private)",
-  "hideCourseHint": "Makes the course private, ensuring only members can see the course.",
-  "courseVisibilityTitle": "Course Visibility",
-
   "update": "Course successfully updated",
   "cover": {
     "title": "Course Cover",
@@ -74,6 +68,19 @@
     "oneHour": "1 hour",
     "twoHours": "2 hours",
     "eightHours": "8 hours",
-    "twentyFourHours": "24 hours"
+    "twentyFourHours": "24 hours",
+    "save": "Save Changes",
+    "cancel": "Cancel"
+  },
+  "visibility": {
+    "title": "Course Visibility",
+    "showCourse": {
+      "title": "Show Course (Public)",
+      "hint": "Makes the course public, allowing any user to find it through search."
+    },
+    "hideCourse": {
+      "title": "Hide Course (Private)",
+      "hint": "Makes the course private, ensuring only members can see the course."
+    }
   }
 }
