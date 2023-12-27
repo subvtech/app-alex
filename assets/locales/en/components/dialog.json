@@ -4,5 +4,7 @@
     "back": "Back",
     "title": "Title",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "cantCreateCourse": "The course could not be created",
+    "successCreateCourse": "Course successfully created"
 }
