@@ -2,32 +2,37 @@ import {
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from './structure.model';
-import { Tag } from './tag.model';
-import { User } from './user.model';
-import { Upload } from './upload.model';
 
-// FIX ME: CORRECT KEYS BUT SOME VALUES ARE INCORRECT.
+export const LearningPlanType = {
+  COURSE: 'course',
+  PROJECT: 'project',
+  COURSE_PROJECT: 'course_project',
+} as const;
+
+export type ValueOf<T> = T[keyof T];
 export interface LearningPlan {
   id: number;
-  type: 'course' | 'project' | 'course_project ';
   title: string;
   description: string;
   start_date: string;
   end_date: string;
-  author: Strapi4ResponseSingle<User>;
+  media: Strapi4ResponseMany<Media>;
+  type: ValueOf<typeof LearningPlanType>;
   cover_image: Strapi4ResponseSingle<Upload>;
+  slug: string;
+  class_name: string;
+  archive_at: string;
+  projects: Strapi4ResponseMany<LearningPlan>;
+  courses: Strapi4ResponseMany<LearningPlan>;
   members: Strapi4ResponseMany<User>;
-  hidden: boolean;
-  learning_goals: Strapi4ResponseMany<any>;
-  groups: Strapi4ResponseMany<any>;
-  projects: Strapi4ResponseMany<any>;
-  course: Strapi4ResponseMany<any>;
-  tasks: Strapi4ResponseMany<any>;
-  media: Strapi4ResponseMany<any>;
-  schedules: Strapi4ResponseMany<any>;
-  invitation_links: Strapi4ResponseSingle<any>;
-  invite_enable: boolean;
-  learning_structure?: Strapi4ResponseMany<Structure>;
+  learning_structure: Strapi4ResponseSingle<learningPlanStructure>;
+  groups: Strapi4ResponseMany<learningPlanGroup>;
+  tasks: Strapi4ResponseMany<Task>;
   tags: Strapi4ResponseMany<Tag>;
+  invite_enable: boolean;
+  invitation_links: Strapi4ResponseSingle<InvitationLink>;
+  learning_goals: Strapi4ResponseMany<LearningPlanGoal>;
+  schedules: Strapi4ResponseMany<LearningPlanSchedule>;
+  hidden: boolean;
+  details: any;
 }
