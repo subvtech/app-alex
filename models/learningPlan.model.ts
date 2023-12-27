@@ -3,14 +3,13 @@ import {
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
 
-const LearningPlanType = {
+export const LearningPlanType = {
   COURSE: 'course',
   PROJECT: 'project',
   COURSE_PROJECT: 'course_project',
 } as const;
 
-type ValueOf<T> = T[keyof T];
-
+export type ValueOf<T> = T[keyof T];
 export interface LearningPlan {
   id: number;
   title: string;
@@ -31,9 +30,9 @@ export interface LearningPlan {
   tasks: Strapi4ResponseMany<Task>;
   tags: Strapi4ResponseMany<Tag>;
   invite_enable: boolean;
-  invitation_links: Strapi4ResponseSingle<any>; // Missing correct type: InvitationLink
-  learning_goals: Strapi4ResponseMany<any>; // Missing correct type: LearninGoal
-  schedules: Strapi4ResponseMany<any>; // Missing correct type: LearninplanMeetingSchedule
+  invitation_links: Strapi4ResponseSingle<InvitationLink>;
+  learning_goals: Strapi4ResponseMany<LearningPlanGoal>;
+  schedules: Strapi4ResponseMany<LearningPlanSchedule>;
   hidden: boolean;
   details: any;
 }
