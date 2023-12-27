@@ -198,6 +198,16 @@ const menus = [
       },
       {
         icon: 'mdi-card-text-outline',
+        title: 'Textarea',
+        to: '/components/inputs/text-area',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Date Field',
+        to: '/components/inputs/date',
+      },
+      {
+        icon: 'mdi-card-text-outline',
         title: 'Autocomplete',
         to: '/components/inputs/autocomplete',
       },
