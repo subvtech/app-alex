@@ -12,11 +12,10 @@
     <template v-slot:content class="pa-6">
       <div class="d-flex flex-column w-100">
         <alex-custom-empty-placeholder
-          v-if="isTextEmpty && !isEditingAndCanEdit"
+          v-if="isTextEmpty && !isEditingAndCanEdit && !isOptional"
           :empty-text-image="emptyTextImage ?? undefined"
           :empty-text-message="
-            emptyTextMessage ??
-            $t('pages.courses.about.empty')
+            emptyTextMessage ?? $t('pages.courses.about.empty')
           "
         />
         <span
@@ -42,7 +41,7 @@ const emit = defineEmits(['update']);
 const props = defineProps({
   title: {
     type: String,
-    default: ''
+    default: '',
   },
   text: {
     type: String,
@@ -74,6 +73,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isOptional: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { canEdit, text } = toRefs(props);
@@ -83,7 +86,8 @@ const isEditing = ref(false);
 
 const isEditingAndCanEdit = computed(() => isEditing.value && canEdit.value);
 const isTextEmpty = computed(
-  () => myText.value === null || myText.value === '',
+  () =>
+    myText.value === null || myText.value === undefined || myText.value === '',
 );
 
 const updateText = (event: Event) => {

@@ -6,7 +6,7 @@
     <template #content>
       <div class="d-flex flex-column w-100">
         <div class="d-flex flex-column border-bottom">
-          <span class="header-h5">{{
+          <span class="header-h5 title">{{
             $t('components.courses.settings.invite.label')
           }}</span>
 
@@ -23,23 +23,26 @@
             <alex-inputs-select
               v-model="selectedTime"
               name="duration"
-              class="min-width"
               :label="$t('components.courses.settings.invite.linkDuration')"
               density="comfortable"
+              class="duration"
+              value="first"
               required
               :items="timeOptions"
               :info="$t('components.courses.settings.invite.tooltip')"
             />
-
-            <div class="w-100">
-              <span class="py-2">
+            <div
+              class="d-flex flex-column w-100 align-self-center"
+              :class="invitationLink ? '' : 'mt-3'"
+            >
+              <span class="description">
                 {{ t('components.courses.settings.invite.linkAddress') }}
               </span>
               <alex-learningplan-invites
                 href=""
                 no-header
                 smaller
-                class="mt-2 w-full"
+                class="py-2 w-full"
                 :enable-invites="myInviteEnabled"
                 :duration="selectedTime"
                 :course-id="learningPlanId"
@@ -49,28 +52,28 @@
                     plainLink = data.url;
                   }
                 "
+                @link:expired="invitationLink = null"
               />
             </div>
           </div>
         </div>
-        <v-divider :thickness="1" class="border-opacity-100 w-100" />
+        <v-divider :thickness="1" class="bg-white w-100 my-6" />
 
-        <div class="">
-          <span class="header-h5 text-invite">{{
+        <div class="d-flex flex-column gap-6">
+          <span class="header-h5 title">{{
             t('components.courses.settings.invite.email')
           }}</span>
-          <alex-inputs-text-field
+          <alex-inputs-text-area
             v-model="myMessage"
             name="message"
+            class="max-width w-100"
             :label="$t('components.courses.settings.invite.message')"
             :hint="$t('components.courses.settings.invite.hint')"
             persistent-hint
-            class="w-100"
             required
             density="comfortable"
             append-inner-icon="mdi-cached"
-          >
-          </alex-inputs-text-field>
+          />
         </div>
         <alex-custom-tooltip
           text="Restaurar mensagem padrão"
@@ -78,19 +81,17 @@
         ></alex-custom-tooltip>
       </div>
 
-      <div class="footer-content">
-        <span class="action-content-two">
-          <alex-custom-button
-            class="button"
-            :text="$t('pages.courseSettings.config.cancelButton')"
-            variant="secondary"
-          />
-          <alex-custom-button
-            class="button"
-            :text="$t('pages.courseSettings.config.saveButton')"
-            variant="primary"
-          />
-        </span>
+      <div class="d-flex w-100 pt-6 justify-end gap-4">
+        <alex-custom-button
+          class="button"
+          :text="$t('components.courses.settings.invite.cancel')"
+          variant="secondary"
+        />
+        <alex-custom-button
+          class="button"
+          :text="$t('components.courses.settings.invite.save')"
+          variant="primary"
+        />
       </div>
     </template>
   </alex-custom-card>
@@ -129,14 +130,11 @@ const myMessage = toRef(props.message);
 const myInviteEnabled = toRef(props.inviteEnabled);
 
 const toggleInviteEnabled = async () => {
-  await update(`learningplans/${props.learningPlanId}`, {
-    invite_enabled: !myInviteEnabled.value,
-  });
+  console.log({ myInviteEnabled: myInviteEnabled.value });
 
   myInviteEnabled.value = !myInviteEnabled.value;
 };
 
-const selectedTime = ref();
 const timeOptions = ref([
   { title: t('components.courses.settings.invite.fiveMinutes'), value: 300000 },
   {
@@ -158,10 +156,27 @@ const timeOptions = ref([
     value: 86400000,
   },
 ]);
+const selectedTime = ref(timeOptions.value[0].value);
 
 const plainLink = ref();
 </script>
 <style scoped lang="scss">
+.duration {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+.description {
+  color: var(--Cinza-Cinza-800, #454d54);
+
+  /* Body/P1 */
+  font-family: Sen;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 135%; /* 21.6px */
+  letter-spacing: 0.32px;
+}
 .title {
   color: var(--Cinza-Cinza-800, #454d54);
 

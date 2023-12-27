@@ -81,4 +81,36 @@ const props = defineProps({
     }
   }
 }
+@media (max-width: 450px) {
+  .boxes {
+    flex-direction: column;
+    align-items: center;
+    .box {
+      flex-direction: row;
+      width: 100%;
+      max-width: none;
+      padding-inline: 16px;
+      padding-block: 0px;
+      align-items: center;
+      :last-child {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+
+        p {
+          color: #0d4173;
+          font-size: 14px;
+          font-weight: 400;
+        }
+
+        span {
+          color: #5d6872;
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 22px;
+        }
+      }
+    }
+  }
+}
 </style>

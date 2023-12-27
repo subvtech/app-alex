@@ -22,7 +22,8 @@
       no-resize
       role="select"
       clear-icon="mdi-close"
-      :class="theme"
+      class="height-44"
+      :class="[theme, smaller ? 'height-44' : '']"
       :error-messages="errorMessage"
       :disabled="disabled"
       :menu-props="{
@@ -57,6 +58,7 @@ interface SelectProps {
   label?: string;
   required?: boolean;
   info?: string;
+  smaller?: boolean;
   disabled?: boolean;
   theme?: 'light' | 'dark';
   schema?: YupSchema;
@@ -64,6 +66,7 @@ interface SelectProps {
 const props = withDefaults(defineProps<SelectProps>(), {
   disabled: false,
   theme: 'light',
+  smaller: false,
   info: undefined,
   label: undefined,
   modelValue: undefined,
@@ -88,6 +91,12 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
+.height-44 {
+  height: 44px !important;
+  min-height: unset !important;
+  max-height: 44px;
+  width: auto;
+}
 .alex-select {
   &.v-theme--mainTheme {
     --v-border-opacity: 1 !important;

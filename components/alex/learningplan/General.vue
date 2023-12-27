@@ -141,7 +141,7 @@
         :userId="owner.id"
         :userTags="generalTags"
         :can-edit="canEdit"
-        @update="(data) => updateCourse(true, data.message)"
+        @update="(data) => updateCourse(true, data)"
       />
       <competences
         v-if="
@@ -154,7 +154,7 @@
         :userId="owner.id"
         :userTags="technicalTags"
         :can-edit="canEdit"
-        @update="(data) => updateCourse(true, data.message)"
+        @update="(data) => updateCourse(true, data)"
       />
     </div>
   </div>

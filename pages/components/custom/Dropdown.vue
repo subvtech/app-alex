@@ -438,7 +438,7 @@ const itemsComponentePropsExample = ref<AlexDropdownItem[]>([
   },
   {
     icon: 'mdi-account',
-    link: '/user/settings',
+    link: '/users/settings',
     text: 'Configurações',
   },
 ]);
@@ -486,7 +486,7 @@ const propsExampleScript = `const itemsComponentePropsExample = ref<AlexDropdown
   },
   {
     icon: 'mdi-account',
-    link: '/user/settings',
+    link: '/users/settings',
     text: 'Configurações',
   },
 ]);`;
@@ -512,7 +512,7 @@ const firstExampleScript = `
       {
         
         icon: 'mdi-account',
-        link: '/user/settings',
+        link: '/users/settings',
         text: 'Configurações',
       },
     ]);
