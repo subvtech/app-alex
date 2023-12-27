@@ -134,7 +134,7 @@
                 :favorited="course.raw.favorited"
                 @favorite="changeItemFavorited(index)"
                 @toggle-visibility="changeItemVisibility(index, course.raw.id)"
-                @configurations="navigate(course.raw.id, 'configurations')"
+                @configurations="navigate(course.raw.id, 'settings')"
                 @open="navigate(course.raw.id, 'page')"
               />
             </div>
@@ -382,7 +382,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/${id}/configurations`,
+      link: `/course/${id}/settings`,
     },
   ];
 };
@@ -417,11 +417,14 @@ const changeViewMode = () => {
 };
 
 const changeItemVisibility = (index: number, id) => {
-  update('learningPlans', id, {
-    hidden: !courses.value[index].hidden,
-  }).then(() => {
+  courses.value[index].hidden = !courses.value[index].hidden;
+  try {
+    update('learningPlans', id, {
+      hidden: !courses.value[index].hidden,
+    });
+  } catch (error) {
     courses.value[index].hidden = !courses.value[index].hidden;
-  });
+  }
 };
 
 const changeItemFavorited = (index: number) => {
@@ -429,8 +432,8 @@ const changeItemFavorited = (index: number) => {
 };
 
 const navigate = (id: number, page) => {
-  if (page === 'configurations') {
-    router.push(`/course/${id}/configurations`);
+  if (page === 'settings') {
+    router.push(`/course/${id}/settings`);
   } else {
     router.push(`/course/${id}`);
   }
