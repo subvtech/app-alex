@@ -16,7 +16,19 @@
       dialog-title="Convites do Curso"
       @action="onClickSendInvites"
     >
-      <template #dialog-content> sfldsf </template>
+      <template #dialog-content>
+        <alex-custom-list-item-user
+          v-for="(member, i) in learningPlanStore.pendingMembers"
+          :key="`pending-member-${i}`"
+          :user="{
+            name: member.user?.fullname,
+            email: member.email,
+            image: member.user?.avatar,
+          }"
+          no-select
+          status="pending"
+        />
+      </template>
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
       v-model="searchGroups"

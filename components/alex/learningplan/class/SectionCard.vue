@@ -23,7 +23,7 @@
               prepend-inner-icon="mdi-magnify"
             />
           </v-col>
-          <alex-custom-button :prepend-icon="actionIcon">
+          <alex-custom-button :prepend-icon="actionIcon" size="large">
             {{ actionText }}
             <alex-custom-dialog
               v-model="openDialog"
