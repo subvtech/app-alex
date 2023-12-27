@@ -108,11 +108,14 @@
         <template #footer>
           <alex-learningplan-meetings
             :can-edit="canEdit"
-            :data="meetings"
+            :data="schedules"
+            :end-date="new Date()"
             :is-facilitator="canEdit"
             :href="canEdit ? '/settings' : ''"
             is-nested
+            :learning-plan-id="0"
             hide-dividers
+            sizing-class="ma-0"
           />
           <alex-learningplan-invites
             v-if="canEdit"
@@ -178,7 +181,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  meetings: {
+  schedules: {
     type: Array as PropType<any[]>,
     default: [],
   },

@@ -24,16 +24,7 @@
   "showCourseHint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca.",
   "hideCourseTitle": "Ocultar curso (Privado)",
   "hideCourseHint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso.",
-  "deleteMeetingConfirmation": "Realmente deseja excluir o encontro?",
-  "deleteMeetingDescription": "Ao confirmar você irá excluir o encontro síncrono cadastrado.",
-  "deleteCourseTitle": "Excluir curso",
-  "deleteCourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
-  "deleteButton": "Excluir curso",
-  "deleteConfirmation": "Realmente deseja excluir o curso?",
-  "deleteDescription": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
-  "deleteLabel": "Digite a palavra:",
-  "deletePlaceholder": "Digite a palavra",
-  "deleteWord": "Excluir",
+
   "update": "Curso atualizado com sucesso",
   "cover": {
     "title": "Capa do curso",
@@ -52,5 +43,32 @@
     "cancel": "Cancelar",
     "save": "Salvar alterações",
     "update": "Informações Gerais atualizadas com sucesso"
+  },
+  "meetings": {
+    "title": "Editar encontro síncrono",
+    "frequency": "Frequência do encontro",
+    "date": "Data do encontro",
+    "dateTip": "A data que o encontro começa",
+    "startDate": "Data de início",
+    "endDate": "Data de término",
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "add": "Criar encontro",
+    "delete": {
+      "confirmation": "Realmente deseja excluir o encontro?",
+      "description": "Ao confirmar você irá excluir o encontro síncrono cadastrado.",
+      "button": "Excluir",
+      "cancel": "Cancelar"
+    }
+  },
+  "delete": {
+    "CourseTitle": "Excluir curso",
+    "CourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
+    "Button": "Excluir curso",
+    "Confirmation": "Realmente deseja excluir o curso?",
+    "Description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
+    "Label": "Digite a palavra:",
+    "Placeholder": "Digite a palavra",
+    "Word": "Excluir"
   }
 }

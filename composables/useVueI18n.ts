@@ -75,6 +75,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tagCombobox',
     'dialog',
     'card',
+    'date',
     'meeting',
     'carousel',
     'institutions',
@@ -118,4 +119,3 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   loadedLanguages.push(lang);
   return setI18nLanguage(lang);
 }
-
