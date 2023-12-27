@@ -81,6 +81,8 @@
           ><alex-learningplan-dialogs-schedule
             v-model="createScheduleModal"
             v-model:data="editData"
+            :end-date="endDate"
+            :start-date="startDate"
             @submit="
               (values) => (!editData ? addMeeting(values) : editMeeting(values))
             "
@@ -106,7 +108,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="mt-4">
+      <div v-else class="d-flex flex-column mt-4 gap-2">
         <course-meeting
           v-for="schedule in schedules"
           :key="schedule.id"
@@ -215,6 +217,18 @@ const addMeeting = (values: MeetingPropsType) => {
   });
 };
 
+const cleanFields = () => {
+  schedules.value = [];
+  slides.value = [];
+  selectedUsers.value = [];
+  title.value = '';
+  description.value = '';
+  learningClass.value = '';
+  startDate.value = undefined;
+  endDate.value = undefined;
+  carousel?.value?.clearSlides();
+};
+
 const createCourse = async () => {
   try {
     loading.value = true;
@@ -256,7 +270,11 @@ const createCourse = async () => {
 
 watch(
   () => props.modelValue,
-  () => carousel?.value?.clearSlides(),
+  () => {
+    if (!props.modelValue) {
+      cleanFields();
+    }
+  },
 );
 </script>
 
