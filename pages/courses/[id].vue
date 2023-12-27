@@ -4,7 +4,7 @@
       v-if="learningPlanStore.learningPlan"
       :cover-picture="learningPlanStore.learningPlan.cover_image"
       :profile-picture-size="24"
-      :profile-picture="learningPlanStore.owner?.user.avatar"
+      :profile-picture="learningPlanStore.owner?.user?.avatar"
       :user-id="user.value?.id"
       show-profile-picture
       darker-background

@@ -1,4 +1,3 @@
-import itemVue from '../../tutorial/stepper/item.vue';
 <template>
   <alex-custom-card
     class="participantes-card mb-6"
@@ -19,6 +18,7 @@ import itemVue from '../../tutorial/stepper/item.vue';
           <v-col cols="4">
             <alex-inputs-text-field
               v-model="modelSearch"
+              name="search"
               density="comfortable"
               :placeholder="searchPlaceholder"
               prepend-inner-icon="mdi-magnify"
@@ -83,6 +83,8 @@ import itemVue from '../../tutorial/stepper/item.vue';
   </alex-custom-card>
 </template>
 <script setup lang="ts">
+import { usePagination } from '~/composables/usePagination';
+
 const page = ref(1);
 const emit = defineEmits(['update:search']);
 const props = defineProps({

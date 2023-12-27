@@ -14,6 +14,14 @@
       action-text="Convites"
       action-icon="mdi-email-outline"
     >
+      <template #item="{ item }">
+        <!-- <AlexLearningplanClassMemberCard
+          :name="item.fullname"
+          :email="item.email"
+          :avatar-image="item.avatar?.url"
+        /> -->
+        {{ item }}
+      </template>
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
       v-model="searchGroups"
@@ -36,19 +44,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-
+// import { useI18n } from 'vue-i18n';
 // const { find, findOne, update } = useStrapi();
-const route = useRoute();
-
+// const route = useRoute();
 const searchMembers = ref('');
 const searchGroups = ref('');
 
 const learningPlanStore = useLearningPlanStore();
 </script>
-<style scoped lang="scss">
-// .participantes-card {
-//   height: 588px;
-//   max-height: 588px;
-// }
-</style>
+<style scoped lang="scss"></style>

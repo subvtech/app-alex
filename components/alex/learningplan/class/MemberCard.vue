@@ -63,11 +63,14 @@
 interface LearningMemberProps {
   name: string;
   email: string;
-  coverImage: string;
+  coverImage?: string;
   avatarImage?: string;
 }
 const emit = defineEmits(['open', 'sendMessage', 'delete']);
-withDefaults(defineProps<LearningMemberProps>(), { avatarImage: undefined });
+withDefaults(defineProps<LearningMemberProps>(), {
+  avatarImage: undefined,
+  coverImage: undefined,
+});
 // const { t } = useI18n();
 const showOptions = ref(false);
 const items = [

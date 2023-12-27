@@ -14,16 +14,29 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
 
   const { generateUrl } = useInvitationLink();
 
-  const populate = [
-    'cover_image',
-    'media',
-    'invitation_links',
-    'learning_goals.verb',
-    'members.user.avatar',
-    'groups.group_members.student_member.user',
-    'tags',
-    'schedules',
-  ];
+  const populate = {
+    cover_image: true,
+    media: true,
+    invitation_links: true,
+    learning_goals: {
+      verb: true,
+    },
+    groups: {
+      group_members: {
+        student_member: {
+          user: true,
+        },
+      },
+    },
+    tags: true,
+    schedules: true,
+    members: {
+      user: {
+        avatar: true,
+        cover: true,
+      },
+    },
+  };
 
   async function loadLearningPlan(id: number, showMessageIfNotFound = true) {
     try {
