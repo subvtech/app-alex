@@ -93,12 +93,7 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Button',
-        to: '/components/custom/button',
-      },
-      {
-        icon: 'mdi-card-text-outline',
-        title: 'Card',
-        to: '/components/custom/card',
+        to: '/components/custom/Button',
       },
       {
         icon: 'mdi-view-carousel',
