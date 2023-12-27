@@ -21,7 +21,7 @@
     @click:close="
       () => {
         emit('click:close');
-        chip = false;
+        chip = uncloseable;
       }
     "
     :style="[color ? '' : 'border: none']"
@@ -29,6 +29,16 @@
     style="width: min-content"
     data-testid="chip"
   >
+    <template #close v-if="uncloseable">
+      <v-icon
+        icon="mdi-close"
+        @click.stop="
+          () => {
+            emit('click:close');
+          }
+        "
+      />
+    </template>
     <v-icon
       v-if="prependIcon"
       class="mr-1"
@@ -70,6 +80,10 @@ const props = defineProps({
   },
   icon: {
     type: String,
+  },
+  uncloseable: {
+    type: Boolean,
+    default: false,
   },
 
   size: {

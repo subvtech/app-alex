@@ -1,0 +1,23 @@
+{
+  "general": "Visão Geral",
+  "trails": "Trilhas",
+  "assignments": "Tarefas",
+  "class": "Turma",
+  "projects": "Projetos",
+  "events": "Eventos",
+  "communication": "Comunicação",
+  "details": "Detalhes",
+  "invite": "Convite do curso",
+  "about": {
+    "title": "Sobre o curso",
+    "empty": "Parece que esse curso não tem uma descrição...",
+    "placeholder": "Digite uma descrição...",
+    "updated": "Sobre atualizado com sucesso."
+  },
+  "media": {
+    "title": "Sobre o curso",
+    "empty": "Parece que esse curso não tem mídia...",
+    "updated": "Mídia foi atualizada com sucesso."
+  },
+  "notfound": "Curso não encontrado"
+}

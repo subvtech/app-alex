@@ -1,0 +1,11 @@
+{
+    "dialogTitle": "Carregar Mídia",
+    "dialogMainButton": "Adicionar",
+    "dialogSecondaryButton": "Cancelar",
+    "mediaType": "Como deseja adicionar a mídia?",
+    "fileDropText": "Arraste e solte um arquivo ou ",
+    "fileDropHighlightedText": "clique para buscar",
+    "fileDropActionText": "Solte o Arquivo para adicioná-lo",
+    "linkPlaceholder": "Cole o link aqui...",
+    "linkPreviewText": "Sua imagem aparecerá aqui"
+}

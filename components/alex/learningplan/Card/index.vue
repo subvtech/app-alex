@@ -18,7 +18,7 @@
   >
     <div :class="{ rounded: !isVertical }" class="header">
       <v-img
-        :src="image.url"
+        :src="image.url || '/images/cover_image_course.svg'"
         :alt="image.alt"
         :class="{ grayscale: hide }"
         cover
@@ -293,7 +293,7 @@ const emits = defineEmits([
 
 <style scoped lang="scss">
 .card {
-  height: 470px !important;
+  min-height: 460px !important;
 }
 
 .grid {

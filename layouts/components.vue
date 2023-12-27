@@ -77,7 +77,7 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Accordion',
-        to: '/components/custom/Accordion',
+        to: '/components/custom/accordion',
       },
       {
         icon: 'mdi-view-dashboard-outline',
@@ -85,7 +85,7 @@ const menus = [
         to: '/components/custom/AvatarGroup',
       },
       {
-        icon: 'mdi-view-dashboard-outline',
+        icon: 'mdi-image-area',
         title: 'Banner',
         to: '/components/custom/banner',
       },
@@ -93,7 +93,17 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Button',
-        to: '/components/custom/Button',
+        to: '/components/custom/button',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Card',
+        to: '/components/custom/card',
+      },
+      {
+        icon: 'mdi-view-carousel',
+        title: 'Carousel',
+        to: '/components/custom/carousel',
       },
       {
         icon: 'mdi-chip',
@@ -103,7 +113,12 @@ const menus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Dialog',
-        to: '/components/custom/Dialog',
+        to: '/components/custom/dialog',
+      },
+      {
+        icon: 'mdi-image-filter-center-focus-weak',
+        title: 'EmptyPlaceholder',
+        to: '/components/custom/emptyplaceholder',
       },
 
       {
@@ -115,6 +130,11 @@ const menus = [
         icon: 'mdi-view-dashboard-outline',
         title: 'Dropdown',
         to: '/components/custom/dropdown',
+      },
+      {
+        icon: 'mdi-tooltip',
+        title: 'Tooltip',
+        to: '/components/custom/tooltip',
       },
     ],
   },
@@ -143,12 +163,12 @@ const menus = [
       },
       {
         icon: 'mdi-book-open-page-variant',
-        title: 'pagination',
+        title: 'Pagination',
         to: '/components/custom/pagination',
       },
       {
         icon: 'mdi-view-dashboard-outline',
-        title: 'tabs',
+        title: 'Tabs',
         to: '/components/custom/tabs',
       },
       {
@@ -175,6 +195,16 @@ const menus = [
         icon: 'mdi-card-text-outline',
         title: 'Text-field',
         to: '/components/inputs/text-field',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Textarea',
+        to: '/components/inputs/text-area',
+      },
+      {
+        icon: 'mdi-card-text-outline',
+        title: 'Date Field',
+        to: '/components/inputs/date',
       },
       {
         icon: 'mdi-card-text-outline',

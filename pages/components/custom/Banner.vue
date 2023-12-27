@@ -37,93 +37,35 @@
       <strong>alex-custom-banner</strong> juntamente com os comportamentos mais
       comuns.
     </p>
-    <div class="pa-4">
-      <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, passado nenhuma propriedade ele meramente
-        exibe uma imagem aleatória da internet.
-      </p>
-    </div>
-    <div class="w-100" style="margin-top: -40px">
-      <div
-        class="d-flex align-center justify-space-between w-100 px-3 rounded-t"
-      >
-        <alex-custom-banner />
-      </div>
-      <div class="px-3" style="position: relative">
-        <prism class=""> {{ examples[0] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(0)"
-        >
-          <v-icon
-            v-if="copiedIndex === 0"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
 
-    <h2 class="text-h3 text-gray-800">Alterando a imagem do Banner</h2>
-    <p class="text-subtitle-2 text-gray-500">
-      Por padrão, o componente usa uma imagem aleatória, mas você pode alterar
-      essa image, passando uma prop <strong>coverPicture</strong> com a url
-      desejada. Por padrão se espera que a imagem veja do strapi, mas você pode
-      mudar esse comportamento passando a prop
-      <strong>imgFromStrapi</strong> para falso
-    </p>
-    <div class="d-flex w-100 flex-column flex-sm-row">
-      <div class="w-100 w-sm-25">
-        <alex-custom-banner
-          :cover-picture="{ id: 0, url: 'https://picsum.photos/2100/500' }"
-          :img-from-strapi="false"
-        />
-      </div>
-      <div class="mt-4 mb-8 w-100" style="position: relative">
-        <prism class="h-100 overflow-auto"> {{ examples[1] }}</prism>
-        <v-btn
-          class="copy-icon mt-1 ml-4"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(1)"
-        >
-          <v-icon
-            v-if="copiedIndex === 1"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        Por padrão <strong>img-from-strapi</strong> é falso, entao basta passar
-        <strong>cover-picture</strong> que ele pega do strapi
-      </p>
-      <alex-custom-banner
-        :cover-picture="{ id: 0, url: 'https://picsum.photos/2300/500' }"
-        :img-from-strapi="false"
-      />
+    <div v-if="user" v-for="(item, index) in documentation">
+      <p class="text-subtitle-2 text-gray-500" v-html="item.text" />
 
-      <div
-        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
-      >
-        <div class="mt-4 mb-8 w-100" style="position: relative">
-          <prism class="overflow-auto"> {{ examples[2] }}</prism>
+      <div class="d-flex flex-column w-100">
+        <div
+          class="d-flex align-center rounded-lg my-2 justify-center bg-gray-100 w-100 px-3 rounded-t"
+        >
+          <alex-custom-banner
+            :key="index"
+            v-bind="item.props as any"
+            @select:option="item.props.selectOption"
+            @display:settings="
+              item.props.displaySettings
+                ? item.props.displaySettings()
+                : () => {}
+            "
+          />
+        </div>
+        <div class="px-3" style="position: relative">
+          <prism>{{ examples[index] }}</prism>
           <v-btn
-            class="copy-icon mt-1 ml-4"
+            class="copy-icon"
             variant="text"
             color="gray-400"
-            @click="copyToClipboard(2)"
+            @click="copyToClipboard(index)"
           >
             <v-icon
-              v-if="copiedIndex === 2"
+              v-if="copiedIndex === index"
               size="x-large"
               icon="mdi-clipboard-check-multiple-outline"
               color="green-lighten-1"
@@ -131,250 +73,6 @@
             <v-icon v-else size="x-large" icon="mdi-content-copy" />
           </v-btn>
         </div>
-      </div>
-    </div>
-    <h2 class="text-h2 text-gray-800">Uso Completo</h2>
-    <div class="px-4 py-2 w-100 d-flex">
-      <div class="w-100">
-        <p class="text-subtitle-2 text-gray-500 mb-14">
-          O componente <strong>alex-custom-info</strong> altera bastante a
-          maneira que o banner é exibido. Aqui é um exemplo com
-          <strong>float-beneath</strong> definido como falso
-        </p>
-        <alex-custom-banner
-          :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
-          :imgFromStrapi="false"
-          :showProfilePicture="true"
-          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
-          :profilePictureSize="50"
-          :darkerBackground="false"
-          :descriptionAbove="false"
-          :distribution="'fullname-username-role'"
-          :code="'ABC123'"
-          :fullnameStyle="'font-weight-bold'"
-          :codeStyle="'color: red;'"
-          :roleStyle="'font-style: italic;'"
-          :usernameStyle="'color: blue;'"
-          :startDateStyle="'font-size: 12px;'"
-          :endDateStyle="'font-size: 12px;'"
-          :titleStyle="'font-size: 16px;'"
-          :avatarStyle="'border: 1px solid #ccc;'"
-          :showBorder="false"
-          :floatBeneath="false"
-          :settingsMenu="false"
-          :dateToTheLeft="false"
-          :showShade="false"
-          :showRole="false"
-          :updateProfilePicture="false"
-          :title="'Software Engineer'"
-          :showMenu="true"
-          settings-icon="mdi-cog"
-          :userId="123"
-          :fullname="'John Doe'"
-          :startDate="'2022-01-01'"
-          :endDate="'2023-01-01'"
-          :username="'johndoe'"
-          :selectedOption="selectedOption1"
-          :links="['Link 1', 'Link 2', 'Link 3']"
-          :isProfessor="false"
-          :canEdit="true"
-          :canDelete="false"
-          @select:option="() => {}"
-          @display:settings="() => {}"
-        />
-        <div class="w-100" style="position: relative">
-          <prism class="bg-grey-lighten-5">
-            {{ examples[3] }}
-          </prism>
-          <v-btn
-            class="copy-icon mt-1 ml-4"
-            variant="text"
-            color="gray-400"
-            @click="copyToClipboard(3)"
-          >
-            <v-icon
-              v-if="copiedIndex === 3"
-              size="x-large"
-              icon="mdi-clipboard-check-multiple-outline"
-              color="green-lighten-1"
-            />
-            <v-icon v-else size="x-large" icon="mdi-content-copy" />
-          </v-btn>
-        </div>
-      </div>
-    </div>
-    <div class="px-4 py-2 w-100 d-flex">
-      <div class="w-100">
-        <p class="text-subtitle-2 text-gray-500 mb-14">
-          O componente <strong>alex-custom-info</strong> altera bastante a
-          maneira que o banner é exibido. Aqui é um exemplo com
-          <strong>float-beneath</strong> definido como verdadeiro
-        </p>
-        <alex-custom-banner
-          :coverPicture="{ url: 'https://picsum.photos/2000/600', id: 1 }"
-          :imgFromStrapi="false"
-          :showProfilePicture="true"
-          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
-          :profilePictureSize="500"
-          :darkerBackground="false"
-          :descriptionAbove="false"
-          :distribution="'fullname-username-role'"
-          :code="'ABC123'"
-          :fullnameStyle="'font-weight-bold'"
-          :codeStyle="'color: red;'"
-          :roleStyle="'font-style: italic;'"
-          :usernameStyle="'color: blue;'"
-          :startDateStyle="'font-size: 12px;'"
-          :endDateStyle="'font-size: 12px;'"
-          :titleStyle="'font-size: 16px;'"
-          :avatarStyle="'border: 1px solid #ccc;'"
-          :showBorder="false"
-          float-beneath
-          :settingsMenu="false"
-          :dateToTheLeft="false"
-          :showShade="false"
-          :updateProfilePicture="false"
-          :title="'Software Engineer'"
-          :showMenu="true"
-          settings-icon="mdi-cog"
-          :userId="123"
-          :fullname="'John Doe'"
-          :startDate="'2022-01-01'"
-          :endDate="'2023-01-01'"
-          :username="'johndoe'"
-          :selectedOption="selectedOption2"
-          show-role
-          :links="['Link 1', 'Link 2', 'Link 3', 'Link 4']"
-          :isProfessor="false"
-          :canEdit="true"
-          :canDelete="false"
-          @select:option="() => {}"
-          @display:settings="() => {}"
-        />
-        <div class="w-100" style="position: relative">
-          <prism class="bg-grey-lighten-5">
-            {{ examples[4] }}
-          </prism>
-          <v-btn
-            class="copy-icon mt-1 ml-4"
-            variant="text"
-            color="gray-400"
-            @click="copyToClipboard(4)"
-          >
-            <v-icon
-              v-if="copiedIndex === 4"
-              size="x-large"
-              icon="mdi-clipboard-check-multiple-outline"
-              color="green-lighten-1"
-            />
-            <v-icon v-else size="x-large" icon="mdi-content-copy" />
-          </v-btn>
-        </div>
-      </div>
-    </div>
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        Aqui é um exemplo com de como é usado no
-        <strong>perfil</strong>
-      </p>
-
-      <alex-custom-banner
-        v-if="user"
-        :can-edit="true"
-        :cover-picture="user.cover"
-        :profile-picture-size="160"
-        :profile-picture="user.avatar"
-        :userId="user.id"
-        can-delete
-        show-menu
-        show-profile-picture
-        show-settings
-        show-role
-        show-border
-        float-beneath
-        distribution="fullname-username-role"
-        :selectedOption="selectedOption2"
-        @select:option="selectOption2"
-        @display:settings="showSettings = !showSettings"
-        :is-professor="user.isProfessor"
-        :fullname="user.fullname"
-        fullnameStyle="color: #454D54;"
-        :username="user.username"
-        usernameStyle="color: #A0A8B1;"
-        roleStyle="color: #A0A8B1;"
-        :links="links"
-      />
-      <div class="w-100" style="position: relative">
-        <prism class="bg-grey-lighten-5">
-          {{ examples[5] }}
-        </prism>
-        <v-btn
-          class="copy-icon mt-1 ml-4"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(5)"
-        >
-          <v-icon
-            v-if="copiedIndex === 5"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
-
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        Aqui é um exemplo com de como é usado no
-        <strong>courses</strong>
-      </p>
-
-      <alex-custom-banner
-        v-if="user"
-        :can-edit="false"
-        :cover-picture="user.cover"
-        :profile-picture-size="24"
-        :profile-picture="user.avatar"
-        :userId="user.id"
-        show-profile-picture
-        darker-background
-        show-shade
-        show-menu
-        settings-menu
-        distribution="fullname-username-role"
-        :selectedOption="selectedOption2"
-        @select:option="selectOption2"
-        @display:settings="showSettings = !showSettings"
-        :is-professor="user.isProfessor"
-        :fullname="user.fullname"
-        title="Turma"
-        code="dasdas"
-        description="Information Systems"
-        subtitle="tsf idsda"
-        startDate="12/06/2006"
-        endDate="12/06/2016"
-        :links="links"
-      />
-      <div class="w-100" style="position: relative">
-        <prism class="bg-grey-lighten-5">
-          {{ examples[6] }}
-        </prism>
-        <v-btn
-          class="copy-icon mt-1 ml-4"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(6)"
-        >
-          <v-icon
-            v-if="copiedIndex === 6"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
       </div>
     </div>
 
@@ -506,24 +204,47 @@ const { findOne } = useStrapi();
 
 const i18n = useI18n();
 
-const messageStore = useMessageStore();
+const { setMessage } = useMessageStore();
 
 const { id } = useStrapiUser<User>().value;
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
 
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 
-const user = ref<any>();
+const user = ref<any>(null);
 const selectedOption1 = ref(0);
 const selectedOption2 = ref(0);
+const selectedOption3 = ref(0);
+const selectedOption4 = ref(0);
+
 const selectOption1 = (index) => {
+  console.log({ index });
   selectedOption1.value = index;
   showSettings.value = false;
 };
 const selectOption2 = (index) => {
+  console.log({ index });
   selectedOption2.value = index;
-  showSettings.value = false;
+  showSettings2.value = false;
 };
+
+const selectOption3 = (index) => {
+  console.log({ index });
+  selectedOption3.value = index;
+  showSettings3.value = false;
+};
+
+const selectOption4 = (index) => {
+  console.log({ index });
+  selectedOption4.value = index;
+  showSettings4.value = false;
+};
+
 const links = ref([
   i18n.t('pages.profile.general'),
   i18n.t('pages.profile.courses'),
@@ -532,10 +253,209 @@ const links = ref([
   i18n.t('pages.profile.events'),
 ]);
 
-const profilePicture = ref<string | null>(null);
-const coverPicture = ref<string | null>(null);
+const profilePicture = { url: 'https://picsum.photos/1200/600', id: 1 };
+const coverPicture = { url: 'https://picsum.photos/2000/600', id: 1 };
 
 const showSettings = ref(false);
+const showSettings2 = ref(false);
+const showSettings3 = ref(false);
+const showSettings4 = ref(false);
+const updateUser = async (show = true) => {
+  const populate = [
+    'cover',
+    'avatar',
+    'learningPlans',
+    'socials',
+    'trails',
+    'role',
+    'user_descriptions',
+    'user_wallet',
+  ];
+
+  user.value = await findOne<User>('users', id, {
+    populate: populate,
+  });
+  if (!user.value.avatar) user.value.avatar = profilePicture;
+  if (!user.value.cover) {
+    user.value.cover = coverPicture;
+  }
+  setMessage('done', 'green', show);
+};
+
+await updateUser(false);
+
+const documentation = ref([
+  {
+    text: 'Esse é o modelo mais simples, passado nenhuma propriedade ele meramente exibe uma imagem aleatória da internet.',
+    props: {},
+  },
+  {
+    text: 'Por padrão, o componente usa uma imagem aleatória, mas você pode alterar essa imagem, passando uma prop <strong>coverPicture</strong> com a url desejada. Por padrão se espera que a imagem veja do strapi, mas você pode mudar esse comportamento passando a prop <strong>imgFromStrapi</strong> para falso',
+    props: {
+      coverPicture,
+      imgFromStrapi: false,
+      selectOption: () => {},
+      displaySettings: () => {},
+    },
+  },
+  {
+    text: 'Por padrão <strong>img-from-strapi</strong> é falso, entao basta passar <strong>cover-picture</strong> que ele pega do strapi',
+    props: {
+      coverPicture, //na documentação está o exemplo correto
+      imgFromStrapi: false,
+      selectOption: () => {},
+      displaySettings: () => {},
+    },
+  },
+  {
+    text: 'USO COMPLETO: O componente <strong>alex-custom-info</strong> altera bastante a maneira que o banner é exibido. Aqui é um exemplo com <strong>float-beneath</strong> definido como falso',
+    props: {
+      coverPicture,
+      imgFromStrapi: false,
+      showProfilePicture: true,
+      profilePicture: { url: 'https://picsum.photos/600/500', id: 2 },
+      profilePictureSize: 50,
+      darkerBackground: false,
+      descriptionAbove: false,
+      distribution: 'fullname-username-role',
+      copyObject: { label: 'Code', copyText: 'dasdasda' },
+      fullnameStyle: 'font-weight-bold',
+      codeStyle: 'color: red;',
+      roleStyle: 'font-style: italic;',
+      usernameStyle: 'color: blue;',
+      startDateStyle: 'font-size: 12px;',
+      endDateStyle: 'font-size: 12px;',
+      titleStyle: 'font-size: 16px;',
+      avatarStyle: 'border: 1px solid #ccc;',
+      showBorder: false,
+      floatBeneath: false,
+      settingsMenu: false,
+      dateToTheLeft: false,
+      showShade: false,
+      showRole: false,
+      updateProfilePicture: false,
+      title: 'Software Engineer',
+      showMenu: true,
+      settingsIcon: 'mdi-cog',
+      userId: '123',
+      fullname: 'John Doe',
+      startDate: '2022-01-01',
+      endDate: '2023-01-01',
+      username: 'johndoe',
+      selectedOption: selectedOption1.value,
+      links: ['Link 1', 'Link 2', 'Link 3'],
+      isProfessor: false,
+      canEdit: true,
+      canDelete: false,
+      selectOption: selectOption1,
+      displaySettings: () => (showSettings.value = !showSettings.value),
+    },
+  },
+  {
+    text: 'O componente <strong>alex-custom-info</strong> altera bastante a maneira que o banner é exibido. Aqui é um exemplo com <strong>float-beneath</strong> definido como verdadeiro',
+    props: {
+      coverPicture,
+      imgFromStrapi: false,
+      showProfilePicture: true,
+      profilePicture: { url: 'https://picsum.photos/600/500', id: 2 },
+      profilePictureSize: 500,
+      darkerBackground: false,
+      descriptionAbove: false,
+      distribution: 'fullname-username-role',
+      copyObject: { label: 'Code', copyText: 'dasdasda' },
+      fullnameStyle: 'font-weight-bold',
+      codeStyle: 'color: blue;',
+      roleStyle: 'font-style: italic;',
+      usernameStyle: 'color: blue;',
+      startDateStyle: 'font-size: 12px;',
+      endDateStyle: 'font-size: 12px;',
+      titleStyle: 'font-size: 16px;',
+      avatarStyle: 'border: 1px solid #ccc;',
+      showBorder: false,
+      floatBeneath: true,
+      settingsMenu: false,
+      dateToTheLeft: false,
+      showShade: false,
+      updateProfilePicture: false,
+      title: 'Software Engineer',
+      showMenu: true,
+      settingsIcon: 'mdi-cog',
+      userId: '123',
+      fullname: 'John Doe',
+      startDate: '2022-01-01',
+      endDate: '2023-01-01',
+      username: 'johndoe',
+      selectedOption: selectedOption2.value,
+      showRole: true,
+      links: ['Link 1', 'Link 2', 'Link 3', 'Link 4'],
+      isProfessor: false,
+      canEdit: true,
+      canDelete: false,
+      selectOption: selectOption2,
+      displaySettings: () => {
+        showSettings2.value = !showSettings2.value;
+      },
+    },
+  },
+  {
+    text: 'Aqui é um exemplo com de como é usado no <strong>perfil</strong>',
+    props: {
+      canEdit: true,
+      coverPicture: user.value.cover,
+      imgFromStrapi: user.value.cover ? false : true,
+      profilePictureSize: 160,
+      profilePicture: user.value.avatar,
+      userId: id,
+      canDelete: true,
+      showMenu: true,
+      showProfilePicture: true,
+      showSettings: true,
+      showRole: true,
+      showBorder: true,
+      floatBeneath: true,
+      distribution: 'fullname-username-role',
+      selectedOption: selectedOption3.value,
+      selectOption: selectOption3,
+      displaySettings: () => (showSettings3.value = !showSettings3.value),
+      isProfessor: user.value.isProfessor,
+      fullname: user.value.fullname ?? 'John Smith',
+      fullnameStyle: 'color: #454D54;',
+      username: user.value.username,
+      usernameStyle: 'color: #A0A8B1;',
+      roleStyle: 'color: #A0A8B1;',
+      links: links.value,
+    },
+  },
+  {
+    text: 'Aqui é um exemplo com de como é usado no <strong>courses</strong>',
+    props: {
+      canEdit: false,
+      coverPicture: user.value.cover,
+      imgFromStrapi: user.value.cover ? false : true,
+      profilePictureSize: 24,
+      profilePicture: user.value.avatar,
+      userId: id,
+      showProfilePicture: true,
+      darkerBackground: true,
+      showShade: true,
+      showMenu: true,
+      settingsMenu: true,
+      distribution: 'fullname-username-role',
+      selectedOption: selectedOption4.value,
+      selectOption: selectOption4,
+      displaySettings: () => (showSettings4.value = !showSettings4.value),
+      isProfessor: user.value.isProfessor,
+      fullname: user.value.fullname ?? 'John Smith',
+      title: 'Turma',
+      copyObject: { label: 'Code', copyText: 'dasdasda' },
+      description: 'Information Systems',
+      subtitle: 'tsf idsda',
+      startDate: '12/06/2006',
+      endDate: '12/06/2016',
+      links: links.value,
+    },
+  },
+]);
 
 const examples = [
   '<alex-custom-banner />',
@@ -555,7 +475,7 @@ const examples = [
       :darkerBackground="false"
       :descriptionAbove="false"
       :distribution="'fullname-username-role'"
-      :code="'ABC123'"
+      :copyObject="{ label: 'Code', copyText: 'dasdasda' }",
       settings-icon="mdi-cog"
       :fullnameStyle="'font-weight-bold'"
       :codeStyle="'color: red;'"
@@ -597,7 +517,7 @@ const examples = [
         :darkerBackground="false"
         :descriptionAbove="false"
         :distribution="'fullname-username-role'"
-        :code="'ABC123'"
+        :copyObject="{ label: 'Code', copyText: 'dasdasda' }",
         :fullnameStyle="'font-weight-bold'"
         :codeStyle="'color: red;'"
         :roleStyle="'font-style: italic;'"
@@ -662,7 +582,7 @@ const examples = [
         :profile-picture-size="24"
         :profile-picture="user.avatar"
         :userId="user.id"
-        show-profile-picture        
+        show-profile-picture
         darker-background
         show-shade
         show-menu
@@ -674,7 +594,7 @@ const examples = [
         :is-professor="user.isProfessor"
         :fullname="user.fullname"
         title="Turma"
-        code="dasdas"
+        :copyObject="{ label: 'Code', copyText: 'dasdasda' }",
         description="Information Systems"
         subtitle="tsf idsda"
         startDate="12/06/2006"
@@ -766,31 +686,6 @@ const copyToClipboard = async (index) => {
     copiedValue.value = examples[index];
   }
   copiedIndex.value = index;
-};
-
-onBeforeMount(async () => {
-  await updateUser(false);
-});
-
-const updateUser = async (show = true) => {
-  const populate = [
-    'cover',
-    'avatar',
-    'learningPlans',
-    'socials',
-    'trails',
-    'role',
-    'user_descriptions',
-    'user_wallet',
-  ];
-
-  user.value = await findOne<User>('users', id, { populate });
-
-  if (user.value.avatar) profilePicture.value = user.value.avatar.url;
-  if (user.value.cover) coverPicture.value = user.value.cover.url;
-  messageStore.message = 'done';
-  messageStore.color = 'green';
-  messageStore.show = show;
 };
 </script>
 

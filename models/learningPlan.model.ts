@@ -2,31 +2,32 @@ import {
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
-import { ClassesLearningPlan } from './classesLearningPlan.model';
 import { Structure } from './structure.model';
 import { Tag } from './tag.model';
 import { User } from './user.model';
-import { Version } from './version.model';
 import { Upload } from './upload.model';
-import { Class } from './class.model';
 
+// FIX ME: CORRECT KEYS BUT SOME VALUES ARE INCORRECT.
 export interface LearningPlan {
   id: number;
+  type: 'course' | 'project' | 'course_project ';
   title: string;
-  author: Strapi4ResponseSingle<User>;
-  users: User[];
-  image: Strapi4ResponseSingle<Upload>;
-  isVisible: boolean;
-  learningplan?: Strapi4ResponseSingle<LearningPlan>;
-  trails: Strapi4ResponseMany<LearningPlan>;
-  structures?: Strapi4ResponseMany<Structure>;
-  structure?: Strapi4ResponseMany<Structure>;
-  versions: Strapi4ResponseMany<Version>;
-  classes_learning_plans: ClassesLearningPlan;
-  coauthors: Strapi4ResponseMany<User>;
-  approved_grade: Number;
   description: string;
+  start_date: string;
+  end_date: string;
+  author: Strapi4ResponseSingle<User>;
+  cover_image: Strapi4ResponseSingle<Upload>;
+  members: Strapi4ResponseMany<User>;
+  hidden: boolean;
+  learning_goals: Strapi4ResponseMany<any>;
+  groups: Strapi4ResponseMany<any>;
+  projects: Strapi4ResponseMany<any>;
+  course: Strapi4ResponseMany<any>;
+  tasks: Strapi4ResponseMany<any>;
+  media: Strapi4ResponseMany<any>;
+  schedules: Strapi4ResponseMany<any>;
+  invitation_links: Strapi4ResponseSingle<any>;
+  invite_enable: boolean;
+  learning_structure?: Strapi4ResponseMany<Structure>;
   tags: Strapi4ResponseMany<Tag>;
-  userClasses?: Strapi4ResponseMany<Class>;
-  isTrail?: boolean;
 }

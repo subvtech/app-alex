@@ -15,9 +15,15 @@
     "invalid": "Invalid CPF"
   },
 
-  "about": {
-    "required": "About is required",
-    "min": "At least 12 characters long",
+  "keyword": {
+    "required": "This field is required",
+    "noSpaces": "There shall be no spaces",
+    "onlyLetters": "There shall only alphabetic letters"
+  },
+
+  "description": {
+    "required": "This field is required",
+    "min": "At least 6 characters long",
     "max": "At most 4000 characters long"
   },
 
@@ -54,12 +60,51 @@
 
   "name": {
     "required": "Nome is required",
-    "min": "At least 3 characters long",
-    "max": "At most 20 characters long"
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "title": {
+    "required": "Title is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
   },
   "url": {
     "required": "Url is required",
     "min": "At least 3 characters long",
     "max": "At most 64 characters long"
+  },
+  "startDate": {
+    "required": "Start date is required",
+    "min": "Min accepted date: {min}"
+  },
+  "endDate": {
+    "required": "End date is required",
+    "min": "Min accepted date: {min}",
+    "beforeStartDate": "End date can't be before start date"
+  },
+  "class": {
+    "required": "Class is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "description": {
+    "required": "Description is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "meeting": {
+    "date": {
+      "required": "Meeting date is required"
+    },
+    "startHour": {
+      "required": "Start time is required"
+    },
+    "endHour": {
+      "required": "End time is required"
+    },
+    "copy": {
+      "success": "Text copied to clipboard",
+      "error": "Couldn't copy to clipboard"
+    }
   }
 }

@@ -35,181 +35,42 @@
       <strong>alex-custom-info</strong> juntamente com os comportamentos mais
       comuns.
     </p>
-    <div class="pa-4">
-      <p class="text-subtitle-2 text-gray-500">
-        Esse é o modelo mais simples, passado nenhuma propriedade ele não exibe
-        nada.
-      </p>
-    </div>
-    <div class="w-100" style="margin-top: -40px">
-      <div
-        class="d-flex align-center justify-space-between bg-gray-300 w-100 px-3 rounded-t"
-        style="height: 300px; position: relative"
-      >
-        <alex-custom-info />
-      </div>
-      <div class="px-3" style="position: relative">
-        <prism> {{ examples[0] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(0)"
-        >
-          <v-icon
-            v-if="copiedIndex === 0"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
-
-    <h2 class="text-h3 text-gray-800">Adicionando propriedades básicas</h2>
-    <p class="text-subtitle-2 text-gray-500">
-      Vamos adicionar título, username e role. Perceba que é necessário apenas
-      passar <strong>show-role</strong> para exibir a role, por padrão a role é
-      de Aluno, para alterar se usa o <strong>isProfessor</strong>
-    </p>
-
-    <div class="w-100">
-      <div
-        class="d-flex align-center justify-space-between bg-gray-300 w-100 px-3 rounded-t"
-        style="height: 300px; position: relative"
-      >
-        <alex-custom-info
-          title="test title"
-          username="username"
-          is-professor
-          show-role
-        />
-      </div>
-      <div class="px-3" style="position: relative">
-        <prism>{{ examples[1] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(1)"
-        >
-          <v-icon
-            v-if="copiedIndex === 1"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
-    <p class="text-subtitle-2 text-gray-500">
+    <p class="mt-2 text-subtitle-2 text-gray-500">
       Nos próximos exemplos vamos utilizar
       <strong>alex-custom-banner</strong> para ilustrar, dado que
       <strong>alex-custom-banner</strong> é apenas uma extensão do
       <strong>alex-custom-info</strong>
     </p>
-    <div class="w-100" style="margin-top: -40px">
-      <alex-custom-banner
-        title="test title"
-        username="username"
-        is-professor
-        show-role
-      />
-      <div class="px-3" style="position: relative">
-        <prism> {{ examples[2] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(1)"
+    <h2 class="text-h3 text-gray-800">Adicionando propriedades básicas</h2>
+
+    <div v-if="user" v-for="(item, index) in documentation" class="d-flex flex-column w-100">
+      <h2 v-if="item.title" class="text-h2 text-gray-800">{{ item.title }}</h2>
+
+      <div class="d-flex flex-column w-100 overflow-hidden">
+        <p class="text-subtitle-2 text-gray-500" v-html="item.text" />
+        <div
+          class="d-flex align-center rounded-lg my-2 justify-center bg-gray-100 w-100 px-3 rounded-t"
         >
-          <v-icon
-            v-if="copiedIndex === 1"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
+          <alex-custom-banner
+            key="index"
+            v-bind="item.props as any"
+            @display:settings="
+              item.props.displaySettings
+                ? item.props.displaySettings()
+                : () => {}
+            "
           />
-          <v-icon v-else size="x-large" icon="mdi-content-copy" />
-        </v-btn>
-      </div>
-    </div>
-
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        Há duas variações principais <strong>float-beneath</strong> e
-        <strong>float-cover</strong>, por padrão <strong>float-cover</strong> é
-        selecionado. Para alterar basta setar
-        <strong>float-beneath</strong> como true.
-        <strong>Float Beneath</strong>
-      </p>
-      <alex-custom-banner
-        :cover-picture="{ id: 0, url: '/images/default-cover.png' }"
-        :img-from-strapi="false"
-        float-beneath
-        show-role
-        role-style="color: #000"
-        title="Title test"
-        fullname="John Doe"
-        username="username"
-        username-style="color: #000"
-        fullname-style="color: #000;"
-        title-style="color: #000;"
-      />
-
-      <div
-        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
-      >
-        <div class="mt-4 mb-8 w-100" style="position: relative">
-          <prism class="overflow-auto"> {{ examples[3] }}</prism>
-          <v-btn
-            class="copy-icon mt-1 ml-4"
-            variant="text"
-            color="gray-400"
-            @click="copyToClipboard(3)"
-          >
-            <v-icon
-              v-if="copiedIndex === 3"
-              size="x-large"
-              icon="mdi-clipboard-check-multiple-outline"
-              color="green-lighten-1"
-            />
-            <v-icon v-else size="x-large" icon="mdi-content-copy" />
-          </v-btn>
         </div>
-      </div>
-    </div>
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        <strong>Float Cover</strong>
-      </p>
-      <alex-custom-banner
-        :cover-picture="{ id: 0, url: '/images/default-cover.png' }"
-        :img-from-strapi="false"
-        show-role
-        role-style="color: #000"
-        title="Title test"
-        fullname="John Doe"
-        username="username"
-        username-style="color: #000"
-        fullname-style="color: #000;"
-        title-style="color: #000;"
-      />
-
-      <div
-        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
-      >
-        <div class="mt-4 mb-8 w-100" style="position: relative">
-          <prism class="overflow-auto"> {{ examples[5] }}</prism>
+        <div class="px-3" style="position: relative">
+          <prism>{{ examples[index] }}</prism>
           <v-btn
-            class="copy-icon mt-1 ml-4"
+            class="copy-icon"
             variant="text"
             color="gray-400"
-            @click="copyToClipboard(5)"
+            @click="copyToClipboard(index)"
           >
             <v-icon
-              v-if="copiedIndex === 5"
+              v-if="copiedIndex === index"
               size="x-large"
               icon="mdi-clipboard-check-multiple-outline"
               color="green-lighten-1"
@@ -220,173 +81,6 @@
       </div>
     </div>
 
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        Outra variação importante é o <strong>darkerBackground</strong>
-      </p>
-      <alex-custom-banner
-        :cover-picture="{ id: 0, url: '/images/default-cover.png' }"
-        :img-from-strapi="false"
-        show-role
-        darker-background
-        endDate="25/12/2022"
-        title="Title test"
-        fullname="John Doe"
-        username="username"
-      />
-
-      <div
-        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
-      >
-        <div class="mt-4 mb-8 w-100" style="position: relative">
-          <prism class="overflow-auto"> {{ examples[5] }}</prism>
-          <v-btn
-            class="copy-icon mt-1 ml-4"
-            variant="text"
-            color="gray-400"
-            @click="copyToClipboard(4)"
-          >
-            <v-icon
-              v-if="copiedIndex === 4"
-              size="x-large"
-              icon="mdi-clipboard-check-multiple-outline"
-              color="green-lighten-1"
-            />
-            <v-icon v-else size="x-large" icon="mdi-content-copy" />
-          </v-btn>
-        </div>
-      </div>
-    </div>
-    <div class="w-100">
-      <p class="text-subtitle-2 text-gray-500 mb-14">
-        <strong>darkerBackground</strong> com <strong>float-beneath</strong>
-      </p>
-      <alex-custom-banner
-        :cover-picture="{ id: 0, url: '/images/default-cover.png' }"
-        :img-from-strapi="false"
-        show-role
-        float-beneath
-        darker-background
-        endDate="25/12/2022"
-        title="Title test"
-        fullname="John Doe"
-        username="username"
-      />
-
-      <div
-        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
-      >
-        <div class="mt-4 mb-8 w-100" style="position: relative">
-          <prism class="overflow-auto"> {{ examples[6] }}</prism>
-          <v-btn
-            class="copy-icon mt-1 ml-4"
-            variant="text"
-            color="gray-400"
-            @click="copyToClipboard(6)"
-          >
-            <v-icon
-              v-if="copiedIndex === 6"
-              size="x-large"
-              icon="mdi-clipboard-check-multiple-outline"
-              color="green-lighten-1"
-            />
-            <v-icon v-else size="x-large" icon="mdi-content-copy" />
-          </v-btn>
-        </div>
-      </div>
-    </div>
-    <h2 class="text-h2 text-gray-800">Uso Completo</h2>
-    <div class="px-4 py-2 w-100 d-flex flex-column">
-      <p class="text-subtitle-2 text-gray-500 mb-6">Sem float-beneath</p>
-      <div class="w-100">
-        <alex-custom-banner
-          :coverPicture="{ url: '/images/default-cover.png', id: 1 }"
-          :imgFromStrapi="false"
-          :showProfilePicture="true"
-          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
-          :profilePictureSize="50"
-          :darkerBackground="true"
-          :descriptionAbove="false"
-          :distribution="'username-fullname-role'"
-          :code="'ABC123'"
-          :fullnameStyle="'font-weight-bold'"
-          :codeStyle="'color: red;'"
-          :roleStyle="'font-style: italic;'"
-          :usernameStyle="'color: blue;'"
-          :startDateStyle="'font-size: 12px;'"
-          :endDateStyle="'font-size: 12px;'"
-          :titleStyle="'font-size: 16px;'"
-          :avatarBlockStyle="'border: 1px solid #ccc;'"
-          :showBorder="false"
-          :floatBeneath="false"
-          :settingsMenu="false"
-          :dateToTheLeft="false"
-          :showShade="false"
-          show-role
-          :updateProfilePicture="false"
-          :title="'Software Engineer'"
-          :userId="123"
-          :fullname="'John Doe'"
-          :username="'johndoe'"
-          :selectedOption="0"
-          :links="['Link 1', 'Link 2', 'Link 3']"
-          :isProfessor="false"
-          :canEdit="true"
-          :canDelete="false"
-          @select:option="() => {}"
-          @display:settings="() => {}"
-        />
-        <prism class="bg-grey-lighten-5">
-          {{ examples[7] }}
-        </prism>
-      </div>
-    </div>
-    <div class="px-4 py-2 w-100 d-flex flex-column">
-      <p class="text-subtitle-2 text-gray-500 mb-6">Com float-beneath</p>
-      <div class="w-100">
-        <alex-custom-banner
-          :coverPicture="{ url: '/images/default-cover.png', id: 1 }"
-          :imgFromStrapi="false"
-          :showProfilePicture="true"
-          :profilePicture="{ url: 'https://picsum.photos/600/500', id: 2 }"
-          :profilePictureSize="50"
-          :darkerBackground="true"
-          :descriptionAbove="false"
-          :distribution="'username-fullname-role'"
-          :code="'ABC123'"
-          :fullnameStyle="'font-weight-bold'"
-          :codeStyle="'color: red;'"
-          :roleStyle="'font-style: italic;'"
-          :usernameStyle="'color: blue;'"
-          :startDateStyle="'font-size: 12px;'"
-          :endDateStyle="'font-size: 12px;'"
-          :titleStyle="'font-size: 16px;'"
-          :avatarBlockStyle="'border: 1px solid #ccc;'"
-          :showBorder="false"
-          :floatBeneath="true"
-          :settingsMenu="false"
-          :dateToTheLeft="false"
-          :showShade="false"
-          show-role
-          :updateProfilePicture="false"
-          :title="'Software Engineer'"
-          :userId="123"
-          :fullname="'John Doe'"
-          :username="'johndoe'"
-          startDate="25/06/2545"
-          :selectedOption="0"
-          :links="['Link 1', 'Link 2', 'Link 3']"
-          :isProfessor="false"
-          :canEdit="true"
-          :canDelete="false"
-          @select:option="() => {}"
-          @display:settings="() => {}"
-        />
-        <prism class="bg-grey-lighten-5">
-          {{ examples[7] }}
-        </prism>
-      </div>
-    </div>
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
@@ -410,7 +104,10 @@
             item.type
           }}</span>
         </p>
-        <p class="text-body-1 text-gray-800 ml-2 font-weight-bold">
+        <p
+          v-if="item.default"
+          class="text-body-1 text-gray-800 ml-2 font-weight-bold"
+        >
           Default:
           <span class="text-purple-darken-2 font-weight-regular">{{
             item.default
@@ -471,20 +168,216 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
+const { findOne } = useStrapi();
+
+const i18n = useI18n();
+
+const { setMessage } = useMessageStore();
+
+const { id } = useStrapiUser<User>().value;
+
 definePageMeta({
   layout: 'components',
   middleware: 'auth',
 });
 
+const user = ref<any>(null);
+
+const profilePicture = { url: 'https://picsum.photos/1200/600', id: 1 };
+const coverPicture = { url: 'https://picsum.photos/2000/600', id: 1 };
+
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
+
+const updateUser = async (show = true) => {
+  const populate = [
+    'cover',
+    'avatar',
+    'learningPlans',
+    'socials',
+    'trails',
+    'role',
+    'user_descriptions',
+    'user_wallet',
+  ];
+
+  user.value = await findOne<User>('users', id, {
+    populate: populate,
+  });
+  console.log({ user: user.value });
+  if (!user.value.avatar) user.value.avatar = profilePicture;
+  if (!user.value.cover) {
+    user.value.cover = coverPicture;
+  }
+  setMessage('done', 'green', show);
+};
+
+await updateUser(false);
+
+const documentation = ref([
+  {
+    text: 'Esse é o modelo mais simples, passado nenhuma propriedade ele não exibe nada.',
+    props: {
+      displaySettings: () => {},
+    },
+  },
+  {
+    text: 'Vamos adicionar título, username e role. Perceba que é necessário apenas passar <strong>show-role</strong> para exibir a role, por padrão a role é de Aluno, para alterar se usa o <strong>isProfessor</strong>',
+    props: {
+      displaySettings: () => {},
+      title: 'test title',
+      username: 'username',
+      isProfessor: true,
+      showRole: true,
+    },
+  },
+  {
+    text: 'Há duas variações principais <strong>float-beneath</strong> e <strong>float-cover</strong>, por padrão <strong>float-cover</strong> é selecionado. Para alterar basta setar <strong>float-beneath</strong> como true. <strong>Float Beneath</strong>',
+    props: {
+      displaySettings: () => {},
+      coverPicture: { id: 0, url: '/images/default-cover.png' },
+      imgFromStrapi: false,
+      floatBeneath: true,
+      showRole: true,
+      roleStyle: 'color: #000',
+      title: 'Title test',
+      fullname: 'John Doe',
+      username: 'username',
+      usernameStyle: 'color: #000',
+      fullnameStyle: 'color: #000;',
+      titleStyle: 'color: #000;',
+    },
+  },
+  {
+    text: '<strong>Float Cover</strong>',
+    props: {
+      displaySettings: () => {},
+      coverPicture,
+      showRole: true,
+      roleStyle: 'color: #000',
+      title: 'Title test',
+      fullname: 'John Doe',
+      username: 'username',
+      usernameStyle: 'color: #000',
+      fullnameStyle: 'color: #000;',
+      titleStyle: 'color: #000;',
+    },
+  },
+  {
+    text: 'Outra variação importante é o <strong>darkerBackground</strong>',
+    props: {
+      displaySettings: () => {},
+      coverPicture: { id: 0, url: '/images/default-cover.png' },
+      imgFromStrapi: false,
+      showRole: true,
+      darkerBackground: true,
+      endDate: '25/12/2022',
+      title: 'Title test',
+      fullname: 'John Doe',
+      username: 'username',
+    },
+  },
+  {
+    text: '<strong>darkerBackground</strong> com <strong>float-beneath</strong>',
+    props: {
+      displaySettings: () => {},
+      coverPicture: { id: 0, url: '/images/default-cover.png' },
+      imgFromStrapi: false,
+      showRole: true,
+      darkerBackground: true,
+      floatBeneath: true,
+      endDate: '25/12/2022',
+      title: 'Title test',
+      fullname: 'John Doe',
+      username: 'username',
+    },
+  },
+  {
+    title: 'Uso Completo',
+    text: 'Sem float-beneath',
+    props: {
+      displaySettings: () => {},
+      coverPicture,
+      showProfilePicture: true,
+      profilePicture,
+      profilePictureSize: 50,
+      darkerBackground: true,
+      descriptionAbove: false,
+      distribution: 'username-fullname-role',
+      copyObject: { label: 'Code', copyText: 'dasdasda' },
+      fullnameStyle: 'font-weight-bold',
+      codeStyle: 'color: red;',
+      roleStyle: 'font-style: italic;',
+      usernameStyle: 'color: blue;',
+      startDateStyle: 'font-size: 12px;',
+      endDateStyle: 'font-size: 12px;',
+      titleStyle: 'font-size: 16px;',
+      avatarBlockStyle: 'border: 1px solid #ccc;',
+      showBorder: false,
+      floatBeneath: false,
+      settingsMenu: false,
+      dateToTheLeft: false,
+      showShade: false,
+      showRole: true,
+      updateProfilePicture: false,
+      title: 'Software Engineer',
+      userId: 123,
+      fullname: 'John Doe',
+      username: 'johndoe',
+      selectedOption: 0,
+      links: ['Link 1', 'Link 2', 'Link 3'],
+      isProfessor: false,
+      canEdit: true,
+      canDelete: false,
+      selectOption: () => {},
+    },
+  },
+  {
+    text: 'Com float-beneath',
+    props: {
+      coverPicture,
+      profilePicture,
+      showProfilePicture: true,
+      profilePictureSize: 50,
+      darkerBackground: true,
+      descriptionAbove: false,
+      distribution: 'username-fullname-role',
+      copyObject: { label: 'copyme', copyText: 'dasdasda' },
+      fullnameStyle: 'font-weight-bold',
+      codeStyle: 'color: red;',
+      roleStyle: 'font-style: italic;',
+      usernameStyle: 'color: blue;',
+      startDateStyle: 'font-size: 12px;',
+      endDateStyle: 'font-size: 12px;',
+      titleStyle: 'font-size: 16px;',
+      avatarBlockStyle: 'border: 1px solid #ccc;',
+      showBorder: false,
+      floatBeneath: true,
+      settingsMenu: false,
+      dateToTheLeft: false,
+      showShade: false,
+      showRole: true,
+      updateProfilePicture: false,
+      title: 'Software Engineer',
+      userId: 123,
+      fullname: 'John Doe',
+      username: 'johndoe',
+      startDate: '25/06/2544',
+      selectedOption: 0,
+      links: ['Link 1', 'Link 2', 'Link 3'],
+      isProfessor: false,
+      canEdit: true,
+      canDelete: false,
+    },
+  },
+]);
+
 const examples = [
-  `<div class="d-flex align-center justify-space-between bg-gray-300 w-100 px-3 rounded-t" style="height: 300px; position: relative">
+  `<div class="d-flex align-center
+   justify-space-between bg-gray-300
+   w-100 px-3 rounded-t"
+   style="height: 300px; position: relative">
       <alex-custom-info/>
-</div>`,
-  `<div class="d-flex align-center justify-space-between bg-gray-300 w-100 px-3 rounded-t" style="height: 300px; position: relative"
-      >
-    <alex-custom-info  title="test title" username="username" is-professor show-role/>
 </div>`,
   `<alex-custom-banner
     title="test title"
@@ -678,92 +571,78 @@ const propsDocumentation = [
   {
     name: 'fullname',
     type: 'String',
-    default: "''",
     description: 'Nome completo do usuário.',
   },
   {
     name: 'codeStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade code.',
   },
   {
     name: 'startDateStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade startDate.',
   },
   {
     name: 'endDateStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade endDate.',
   },
   {
     name: 'fullnameStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade fullname.',
   },
   {
     name: 'avatarBlockStyle',
     type: 'String',
-    default: "''",
     description:
       'Css extra para a propriedade o bloco do app-user-avatar, útil para corrigir o posicionamento.',
   },
   {
     name: 'usernameStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade username',
   },
   {
     name: 'titleStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade title.',
   },
   {
     name: 'roleStyle',
     type: 'String',
-    default: "''",
     description: 'Css extra para a propriedade role.',
   },
   {
     name: 'title',
     type: 'String',
-    default: "''",
     description: 'Título do bloco de informações do usuário.',
   },
   {
     name: 'description',
     type: 'String',
-    default: "''",
     description: 'Um título alternativo ao informações do usuário.',
   },
   {
     name: 'startDate',
     type: 'String',
-    default: "''",
     description: 'Data de início do usuário.',
   },
   {
     name: 'endDate',
     type: 'String',
-    default: "''",
     description: 'Data de término do usuário.',
   },
   {
-    name: 'code',
-    type: 'String',
-    default: "''",
-    description: 'Código do usuário.',
+    name: 'copyObject',
+    type: '{ label: string; copyText: text }',
+
+    description: 'Um objeto a ser copiado.',
   },
   {
     name: 'username',
     type: 'String',
-    default: "''",
     description: 'Nome de usuário do usuário.',
   },
   {

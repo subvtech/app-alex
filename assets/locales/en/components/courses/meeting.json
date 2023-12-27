@@ -1,0 +1,53 @@
+{
+  "every": {
+    "sunday": "Every Sunday",
+    "monday": "Every Monday",
+    "tuesday": "Every Tuesday",
+    "wednesday": "Every Wednesday",
+    "thursday": "Every Thursday",
+    "friday": "Every Friday",
+    "saturday": "Every Saturday",
+    "everyday": "Every Sunday",
+    "weekly": "Weekly: Every {day}",
+    "biweekly": "Biweekly: Every {day}",
+    "monthly": "Monthly: Every {day}"
+  },
+  "starting": "Starting",
+  "single": {
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "everyday": "Sunday"
+  },
+  "today": "Today",
+  "of": "of",
+  "to": "to",
+  "at": "at",
+  "interval": "Every {days} days",
+  "weekly": "Weekly: {day}",
+  "biweekly": "Biweekly: {day}",
+  "monthly": "Monthly: {day}",
+  "empty": {
+    "facilitator": "It seems that there are no meetings available",
+    "student": "It seems that you don't have any meetings scheduled"
+  },
+  "edit": "Edit",
+  "add": "Add",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "course": {
+    "title": "Save your synchronous meetings!",
+    "subtitle": "Add a date and frequency for each meeting",
+    "addMeeting": "Add synchronous meeting",
+    "editMeeting": "Edit synchronous meeting",
+    "meetingFrequency": "Meeting frequency",
+    "meetingDate": "Meeting Date",
+    "startTime": "Start time",
+    "endTime": "End time"
+  }
+}
