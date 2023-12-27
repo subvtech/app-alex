@@ -1,18 +1,32 @@
-import { Block } from 'typescript';
-import { Class } from './class.model';
-import { ClassesLearningPlan } from './classesLearningPlan.model';
-import { LearningPlan } from './learningPlan.model';
-import { Version } from './version.model';
+import {
+  Strapi4ResponseSingle,
+  Strapi4ResponseMany,
+} from '@nuxtjs/strapi/dist/runtime/types';
+
+export enum TaskStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  IN_PROGRESS = 'in_progress',
+  EVALUATION = 'evaluation',
+  DONE = 'done',
+}
+
+export enum TaskAssign {
+  ALL = 'all',
+  SPECIFC = 'specific',
+}
 
 export interface Task {
   id: number;
+  learningplan: Strapi4ResponseSingle<LearningPlan>;
+  trail: Strapi4ResponseSingle<Trail>;
+  deliverable_description: any;
   title: string;
   description: string;
-  weight: number;
-  begin_at: Date;
-  deadline_at: Date;
-  classes_learning_plan: ClassesLearningPlan;
-  status: string;
+  status: TaskStatus;
   blocks: Block[];
-  learningplan: LearningPlan;
+  start_at: Date;
+  deadline_at: Date;
+  tags: string;
+  task_members: Strapi4ResponseMany<TaskMember>;
 }
