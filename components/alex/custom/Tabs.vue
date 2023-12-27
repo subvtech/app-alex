@@ -4,11 +4,14 @@
       v-for="tab in tabs"
       :key="tab.value"
       :value="tab.value"
+      :to="tab.to"
       class="text-body-1 tab"
       :class="!tab.notification ? 'px-7' : ''"
       rounded="0"
       @click="tab.notification = false"
-      >{{ tab.label }}
+    >
+      <v-icon v-if="tab.icon">{{ tab.icon }}</v-icon>
+      <span v-else>{{ tab.label }}</span>
       <v-icon
         v-if="tab.notification"
         class="ml-1 mt-1"
@@ -20,11 +23,17 @@
 </template>
 
 <script setup lang="ts">
+export type TabType = {
+  label: string;
+  to?: string;
+  value: string;
+  notification?: boolean;
+  icon?: string;
+};
+
 const { vertical } = defineProps({
   tabs: {
-    type: Array as PropType<
-      { label: string; value: string; notification?: boolean }[]
-    >,
+    type: Array as PropType<TabType[]>,
     default: () => [{}],
   },
   color: {

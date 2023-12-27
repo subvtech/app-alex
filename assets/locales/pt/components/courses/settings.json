@@ -3,15 +3,7 @@
   "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
   "syncMeetingsTitle": "Encontros síncronos",
   "noSyncMeetings": "Parece que não há nenhum encontro síncrono.",
-  "inviteSettingsTitle": "Configurações de convite",
-  "linkInvitation": "Convite por link",
-  "inviteLink": "Link de convite",
-  "linkDuration": "Duração do Convite",
-  "linkAddress": "Endereço do convite",
-  "mailInvite": "Convite por e-mail",
-  "inviteMessage": "Mensagem do convite",
-  "inviteHint": "Mensagem que será enviada por e-mail para o convidado.",
-  "inviteTooltip": "Alterar a duração do convite não vai mudar o tempo restante do endereço atual. Para aplicar a nova duração é necessário gerar um novo convite.",
+
   "fiveMinutes": "5 minutos",
   "fifteenMinutes": "15 minutos",
   "thirtyMinutes": "30 minutos",
@@ -70,5 +62,16 @@
     "Label": "Digite a palavra:",
     "Placeholder": "Digite a palavra",
     "Word": "Excluir"
+  },
+  "invite": {
+    "title": "Configurações de convite",
+    "label": "Convite por link",
+    "link": "Link de convite",
+    "linkDuration": "Duração do Convite",
+    "linkAddress": "Endereço do convite",
+    "email": "Convite por e-mail",
+    "message": "Mensagem do convite",
+    "hint": "Mensagem que será enviada por e-mail para o convidado.",
+    "tooltip": "Alterar a duração do convite não vai mudar o tempo restante do endereço atual. Para aplicar a nova duração é necessário gerar um novo convite."
   }
 }

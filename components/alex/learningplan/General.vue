@@ -162,6 +162,7 @@
 <script setup lang="ts">
 import { CompetenceTag } from '@/components/Competences.vue';
 import { useI18n } from 'vue-i18n';
+import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
 const { update } = useStrapi();
 
@@ -174,8 +175,8 @@ const props = defineProps({
   },
 
   invitationLink: {
-    type: String,
-    required: true,
+    type: Object as PropType<InvitationLinkType | null>,
+    default: null,
   },
   canEdit: {
     type: Boolean,

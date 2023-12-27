@@ -30,6 +30,14 @@
         variant="editing"
       />
 
+      <alex-learningplan-settings-invites
+        :learning-plan-id="learningPlan.id"
+        :invite-enabled="learningPlan.invite_enabled"
+        :invitation-link="invitationLink"
+        :invitation-duration="learningPlan.invitation_duration"
+        :message="'sdasds'"
+      />
+
       <div class="d-flex content-area invites">
         <div class="card-title">
           <p>
@@ -37,93 +45,6 @@
               t('pages.courseSettings.config.inviteSettingsTitle')
             }}</span>
           </p>
-        </div>
-        <div class="d-flex content-body">
-          <div class="container-invite border-bottom">
-            <span class="header-h5 text-invite">{{
-              t('pages.courseSettings.config.linkInvitation')
-            }}</span>
-
-            <v-switch
-              v-model="inviteEnabled"
-              :defaults-target="course.invite_enabled"
-              :label="$t('pages.courseSettings.config.inviteLink')"
-              color="accent"
-              @change="
-                update(`learningplans/${course.id}`, {
-                  invite_enabled: inviteEnabled,
-                })
-              "
-            />
-            <div v-if="inviteEnabled" class="inviteLinks d-flex flex-row">
-              <div class="">
-                <alex-inputs-select
-                  v-model="selectedTime"
-                  name="duration"
-                  :label="$t('pages.courseSettings.config.linkDuration')"
-                  density="comfortable"
-                  required
-                  :items="timeOptions"
-                  :info="$t('pages.courseSettings.config.inviteTooltip')"
-                />
-              </div>
-              <div class="w-3/4">
-                <span class="body-p1 py-2">
-                  {{ t('pages.courseSettings.config.linkAddress') }}
-                </span>
-                <alex-learningplan-invites
-                  v-if="canEdit"
-                  href=""
-                  no-header
-                  class="mt-2 w-full"
-                  :enable-invites="course.invite_enabled"
-                  :duration="selectedTime"
-                  :course-id="course.id"
-                  :data="invitationLink"
-                  @update:link="
-                    (data) => {
-                      plainLink = data.url;
-                    }
-                  "
-                />
-              </div>
-            </div>
-          </div>
-          <div class="container-invite">
-            <span class="header-h5 text-invite">{{
-              t('pages.courseSettings.config.mailInvite')
-            }}</span>
-            <alex-inputs-text-field
-              v-model="course.message"
-              name="Mensagem"
-              :label="$t('pages.courseSettings.config.inviteMessage')"
-              :hint="$t('pages.courseSettings.config.inviteHint')"
-              persistent-hint
-              class="w-100"
-              required
-              density="comfortable"
-              append-inner-icon="mdi-cached"
-            >
-            </alex-inputs-text-field>
-          </div>
-          <alex-custom-tooltip
-            text="Restaurar mensagem padrão"
-            attach="append-inner-icon"
-          ></alex-custom-tooltip>
-        </div>
-        <div class="footer-content">
-          <span class="action-content-two">
-            <alex-custom-button
-              class="button"
-              :text="$t('pages.courseSettings.config.cancelButton')"
-              variant="secondary"
-            />
-            <alex-custom-button
-              class="button"
-              :text="$t('pages.courseSettings.config.saveButton')"
-              variant="primary"
-            />
-          </span>
         </div>
       </div>
       <div class="content-area course-visibility">
@@ -266,10 +187,10 @@ import { useField } from 'vee-validate';
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
+import { InvitationLinkType } from '../Invites.vue';
 
 const { t } = useI18n();
 const { find, update } = useStrapi();
-const { generateUrl } = useInvitationLink();
 
 const props = defineProps({
   learningPlan: {
@@ -279,6 +200,10 @@ const props = defineProps({
   schedules: {
     type: Array as PropType<any[]>,
     required: true,
+  },
+  invitationLink: {
+    type: Object as PropType<InvitationLinkType | null>,
+    default: null,
   },
 });
 
@@ -291,8 +216,6 @@ const coverImage = ref<BannerImageType | undefined>(
     : undefined,
 );
 
-const invitationLink = ref();
-const plainLink = ref<string | null>(null);
 const course = ref<any>({});
 const emit = defineEmits(['update']);
 const canEdit = ref(true);
@@ -304,16 +227,6 @@ const inviteEnabled = computed({
     course.value.invite_enabled = value;
   },
 });
-const selectedTime = ref();
-const timeOptions = ref([
-  { title: t('pages.courseSettings.config.fiveMinutes'), value: 300000 },
-  { title: t('pages.courseSettings.config.fifteenMinutes'), value: 900000 },
-  { title: t('pages.courseSettings.config.thirtyMinutes'), value: 1800000 },
-  { title: t('pages.courseSettings.config.oneHour'), value: 3600000 },
-  { title: t('pages.courseSettings.config.twoHours'), value: 7200000 },
-  { title: t('pages.courseSettings.config.eightHours'), value: 28800000 },
-  { title: t('pages.courseSettings.config.twentyFourHours'), value: 86400000 },
-]);
 
 // sync meetings
 

@@ -39,7 +39,7 @@
       :endDate="(course.end_date as string).split('-').reverse().join('/')"
       :links="links"
     />
-    <alex-learningplan-general
+    <alex-learningplan-settings
       :learningPlan="course"
       :learning-plan-id="course.id"
       :owner="owner"
@@ -63,7 +63,7 @@
           };
         })
       "
-      :updateCourse="(data) => updateCourse(true, data)"
+      @update="(data) => updateCourse(true, data)"
     />
   </div>
 </template>
@@ -72,13 +72,11 @@
 import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 
-import General from '@/components/alex/learningplan/General.vue';
-import Settings from '@/components/alex/learningplan/settings/index.vue';
 import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { TabType } from '~/components/alex/custom/Tabs.vue';
+import { TabType } from '@/components/alex/custom/Tabs.vue';
 
 export type LearningPlanType = {
   id: number;
@@ -112,7 +110,6 @@ const plainLink = ref<string | null>(null);
 const { id } = useStrapiUser<User>().value;
 
 const route = useRoute();
-const router = useRouter();
 const selectedOption = ref(0);
 const owner = ref<any>();
 
@@ -127,11 +124,11 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const links = computed(() => [
+const links = computed<TabType[]>(() => [
   {
     label: i18n.t('pages.courses.general'),
     value: '0',
-    to: course.value ? `/courses/${course.value.id}` : route.path,
+    to: `/courses/${course.value.id}`,
   },
   { label: i18n.t('pages.courses.trails'), value: '1' },
   { label: i18n.t('pages.courses.class'), value: '2' },
@@ -142,7 +139,7 @@ const links = computed(() => [
     label: '',
     value: '6',
     icon: 'mdi-cog-outline',
-    to: course.value ? `/courses/${course.value.id}/settings` : '',
+    to: course.value ? `/courses/${course.value.id}/settings` : '/' + route.path,
   },
 ]);
 
@@ -236,90 +233,3 @@ watch(invitationLink, () => {
     plainLink.value = generateUrl(invitationLink.value.hash);
 });
 </script>
-<style scoped lang="scss">
-.course-page {
-  .left-block {
-    min-width: 66% !important;
-    padding-inline: 24px !important;
-    padding-bottom: 24px;
-    .flex-column.align-center.gap-12 {
-      width: 50%;
-    }
-  }
-}
-
-@media (max-width: 1420px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-  }
-}
-
-@media (max-width: 1075px) {
-  .course-page {
-    flex-wrap: wrap;
-    &.gap-6 {
-      gap: 12px !important;
-    }
-    .left-block {
-      min-width: 33% !important;
-      padding-inline: 8px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
-  }
-}
-
-@media (max-width: 961px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
-  }
-}
-@media (max-width: 850px) {
-  .course-page {
-    flex-direction: column;
-
-    .left-block {
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
-  }
-}
-
-.max-width {
-  max-width: 500px;
-}
-
-.gap-6 {
-  gap: 24px;
-}
-
-.gap-12 {
-  gap: 48px;
-}
-</style>
