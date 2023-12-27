@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="grid bg-white"
+    class="grid"
     variant="outlined"
     color="gray-100"
     rounded="lg"
@@ -9,7 +9,7 @@
     :max-width="width.max"
     :class="{
       'vertical-grid card': isVertical,
-      'horizontal-grid pa-2 column-gap-4': !isVertical,
+      'horizontal-grid pa-2 column-gap-4 trail-card bg-green': !isVertical,
       'hover-shadow': isHovering,
     }"
     @click="() => emits('open')"
@@ -296,6 +296,10 @@ const emits = defineEmits([
   min-height: 460px !important;
 }
 
+.trail-card {
+  min-height: 200px !important;
+}
+
 .grid {
   display: grid;
   align-content: stretch;
@@ -367,6 +371,6 @@ const emits = defineEmits([
 }
 
 .hover-shadow {
-  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 10px 0px rgba(247, 4, 4, 0.1);
 }
 </style>

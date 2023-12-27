@@ -5,7 +5,7 @@
     :max-width="width.max"
     :class="{
       'vertical-grid': isVertical,
-      'horizontal-grid column-gap-4': !isVertical,
+      'horizontal-grid column-gap-4 card': !isVertical,
       'hover-shadow': isHovering,
     }"
     variant="outlined"
@@ -79,7 +79,7 @@
         'pa-4 pb-6': isVertical,
       }"
     >
-      <div class="d-flex gap-2 align-center">
+      <div class="d-flex gap-2 align-center justify-space-between">
         <v-tooltip
           :text="name"
           :location="isVertical ? 'top center' : 'top left'"
@@ -97,7 +97,7 @@
           </template>
         </v-tooltip>
 
-        <div v-if="!isVertical">
+        <div v-if="!isVertical" class="align-self-start">
           <alex-inputs-dropdown
             v-model="showOptions"
             :close-on-content-click="false"
@@ -130,27 +130,29 @@
       >
         {{ description }}
       </div>
-      <v-tooltip
-        :text="listBlocks"
-        :disabled="!hasBlocks"
-        location="bottom center"
-        data-testid="trails-documents-tooltip"
-      >
-        <template #activator="{ props: propsTooltip }">
-          <div
-            class="documents"
-            v-bind="propsTooltip"
-            data-testid="trails-documents-icon"
-          >
-            <v-icon size="20" color="gray-600"
-              >mdi-text-box-multiple-outline</v-icon
+      <div class="mt-auto">
+        <v-tooltip
+          :text="listBlocks"
+          :disabled="!hasBlocks"
+          location="bottom center"
+          data-testid="trails-documents-tooltip"
+        >
+          <template #activator="{ props: propsTooltip }">
+            <div
+              class="documents"
+              v-bind="propsTooltip"
+              data-testid="trails-documents-icon"
             >
-            <span data-testid="trails-documents-icon-counter-type">{{
-              blocks?.length || 0
-            }}</span>
-          </div>
-        </template>
-      </v-tooltip>
+              <v-icon size="20" color="gray-600"
+                >mdi-text-box-multiple-outline</v-icon
+              >
+              <span data-testid="trails-documents-icon-counter-type">{{
+                blocks?.length || 0
+              }}</span>
+            </div>
+          </template>
+        </v-tooltip>
+      </div>
     </div>
   </v-card>
 </template>
@@ -243,6 +245,9 @@ const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
 </script>
 
 <style scoped lang="scss">
+.card {
+  min-height: 175px;
+}
 .grid {
   display: grid;
   align-content: stretch;

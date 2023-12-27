@@ -401,3 +401,36 @@ query ($userId: ID!) {
   }
 }
 `;
+
+export const GetTrails = `
+query($learningPlanId: ID!) {
+  learningplan(id: $learningPlanId) {
+    data {
+      attributes {
+        learning_structure {
+          data {
+            attributes {
+              trails {
+                data {
+                  attributes {
+                    cover_image {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                    title
+                    description
+                    visible
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;

@@ -38,7 +38,7 @@
       :endDate="(course.end_date as string).split('-').reverse().join('/')"
       :links="links"
     />
-    <div class="course-page d-flex w-100 gap-6">
+    <div v-if="selectedOption === 0" class="course-page d-flex w-100 gap-6">
       <alex-custom-card
         title=""
         class="left-block"
@@ -191,11 +191,15 @@
         />
       </div>
     </div>
+    <div v-else-if="selectedOption === 1">
+      <trails></trails>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import trails from './trails.vue';
 
 const { find, findOne, update } = useStrapi();
 
