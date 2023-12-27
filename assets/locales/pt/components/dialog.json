@@ -2,5 +2,7 @@
     "create": "Criar",
     "next": "Avançar",
     "back": "Voltar",
-    "title": "Título"
+    "title": "Título",
+    "cantCreateCourse": "Não foi possível criar o curso",
+    "successCreateCourse": "Curso criado com sucesso"
 }

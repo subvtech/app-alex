@@ -4,11 +4,11 @@
     :title="$t('components.learningPlan.dialogs.createNewCourse')"
     :name-main-button="$t('components.learningPlan.dialogs.create')"
     :name-second-button="$t('components.learningPlan.dialogs.cancel')"
-    stepper
     :steps-config="stepsConfig"
+    :loading="loading"
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
-    :loading="loading"
+    stepper
     @on-main-action="createCourse"
   >
     <template #step1
@@ -248,20 +248,14 @@ const createCourse = async () => {
     });
     emit('submit');
     emit('update:modelValue', false);
-    schedules.value = [];
-    slides.value = [];
-    selectedUsers.value = [];
-    title.value = '';
-    description.value = '';
-    learningClass.value = '';
-    startDate.value = undefined;
-    endDate.value = undefined;
+    cleanFields();
+    setMessage(t('components.dialog.successCreateCourse'), 'green', true);
   } catch (error: unknown) {
     const message = (error as { error: { message: string } })?.error?.message;
     if (message) {
       setMessage(message, 'red', true);
     } else {
-      setMessage('Não foi possível criar o curso', 'red', true);
+      setMessage(t('components.dialog.cantCreateCourse'), 'red', true);
     }
   } finally {
     loading.value = false;
@@ -276,6 +270,12 @@ watch(
     }
   },
 );
+
+watch(endDate, (value) => {
+  if (value) {
+    value.setUTCHours(23, 59, 59, 999);
+  }
+});
 </script>
 
 <style scoped>
