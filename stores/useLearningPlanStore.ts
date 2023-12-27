@@ -10,6 +10,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { setMessage } = useMessageStore();
   const i18n = useI18n();
   const learningPlan = ref<LearningPlanSimple>();
+  const loading = ref(true);
 
   const { generateUrl } = useInvitationLink();
 
@@ -19,20 +20,24 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     'invitation_links',
     'learning_goals.verb',
     'members.user.avatar',
+    'groups.group_members.student_member.user',
     'tags',
     'schedules',
   ];
 
   async function loadLearningPlan(id: number, showMessageIfNotFound = true) {
     try {
+      loading.value = true;
       const result = await findOne<LearningPlanSimple>('learningplans', id, {
         populate,
       });
 
       learningPlan.value = result.data;
 
+      loading.value = false;
       return result;
     } catch (e: any) {
+      loading.value = false;
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
         setMessage(i18n.t('pages.courses.notfound'), 'red', true);
       }
@@ -95,5 +100,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     endDateFormated,
     invitationLink,
     activeInvitationLinkUrl,
+    loading,
   };
 });
