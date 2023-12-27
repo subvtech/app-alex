@@ -12,7 +12,10 @@
       <div v-if="enableInvites" class="d-flex flex-column w-100">
         <div
           class="invite gap-6 justify-space-between"
-          :class="theresTimeAndUrl ? '' : 'disabled'"
+          :class="[
+            theresTimeAndUrl ? '' : 'disabled',
+            smaller ? 'smaller' : '',
+          ]"
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
             <template #content>
@@ -31,7 +34,7 @@
                 <img
                   class="pointer"
                   src="/svg/refresh.svg"
-                  @click="generateNewInvite"
+                  @click="updateLink"
                   width="20"
                   height="20"
                 />
@@ -66,16 +69,25 @@
 </template>
 
 <script setup lang="ts">
-const { create, delete: _delete } = useStrapi();
+export type InvitationLinkType = {
+  id: number;
+  role: 'student' | 'facilitator';
+  hash: string;
+  emails_to_send: string | null;
+  expires_at: Date;
+  is_expired: boolean;
+};
+
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
+
 const props = defineProps({
   enableInvites: {
     type: Boolean,
     default: false,
   },
   data: {
-    type: Object as PropType<any | null>,
+    type: Object as PropType<InvitationLinkType | null>,
     required: true,
   },
   duration: {
@@ -86,44 +98,30 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  smaller: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const { generateUrl } = useInvitationLink();
+const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =
+  useInvitationLink();
 
-const inviteId = ref(null);
+const inviteId = ref<number | null>(null);
 const url = toRef<string | null>(null);
 const remainingTime = toRef<number>(-5);
 
-function msToHHMMSS(ms) {
-  let totalSeconds = Math.floor(ms / 1000);
-  let hours: string | number = Math.floor(totalSeconds / 3600);
-  let minutes: string | number = Math.floor((totalSeconds - hours * 3600) / 60);
-  let seconds: string | number = totalSeconds - hours * 3600 - minutes * 60;
-
-  // Pad the hours, minutes, and seconds with leading zeros, if required
-  hours = hours < 10 ? '0' + hours : hours;
-  minutes = minutes < 10 ? '0' + minutes : minutes;
-  seconds = seconds < 10 ? '0' + seconds : seconds;
-
-  return hours + ':' + minutes + ':' + seconds;
-}
-
-const generateNewInvite = async () => {
-  try {
-    if (inviteId.value) await _delete('invitation-links', inviteId.value);
-  } catch {}
-
-  const result: any = await create('invitation-links', {
-    duration: props.duration,
-    learningplan: props.courseId,
-  });
-
-  inviteId.value = result.data.id;
+const updateLink = async () => {
+  const result = await generateNewInvite(
+    inviteId.value,
+    props.duration,
+    props.courseId,
+  );
 
   url.value = generateUrl(result.data.attributes.hash);
+  console.log({ updateLink: url.value });
   emit('update:link', { url: url.value });
-  remainingTime.value =
-    new Date(result.data.attributes.expires_at).getTime() - new Date().getTime();
+  remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
 };
 
 const theresTimeAndUrl = computed(() => theresTime.value && url.value);
@@ -134,8 +132,7 @@ onBeforeMount(() => {
   if (props.data.hash) url.value = generateUrl(props.data.hash);
   if (props.data.id) inviteId.value = props.data.id;
   if (props.data.expires_at) {
-    remainingTime.value =
-      new Date(props.data.expires_at).getTime() - new Date().getTime();
+    remainingTime.value = calcRemainingTime(props.data.expires_at);
   }
 });
 
@@ -148,9 +145,9 @@ watch(remainingTime, () => {
 });
 
 watch(theresTimeAndUrl, () => {
-  if(theresTimeAndUrl.value) return;
-  emit('link:expired') 
-})
+  if (theresTimeAndUrl.value) return;
+  emit('link:expired');
+});
 </script>
 
 <style scoped lang="scss">
@@ -181,7 +178,9 @@ watch(theresTimeAndUrl, () => {
   line-height: 135%; /* 21.6px */
   letter-spacing: 0.32px;
 }
-
+.smaller {
+  height: 44px !important;
+}
 .invite {
   display: flex;
   height: 52px;

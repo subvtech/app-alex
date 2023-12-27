@@ -46,6 +46,7 @@
           :title="$t('components.date.selectDate')"
           :header="$t('components.date.enterDate')"
           :landscape="true"
+          :allowed-dates="allowedDates"
         />
       </v-menu>
     </v-text-field>
@@ -62,6 +63,7 @@ interface DatePickerProps {
   disabled?: boolean;
   info?: string;
   theme?: 'light' | 'dark';
+  allowedDates?: (value?: any) => boolean;
 }
 
 const props = withDefaults(defineProps<DatePickerProps>(), {
@@ -71,6 +73,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   disabled: false,
   info: undefined,
   theme: 'light',
+  allowedDates: () => true,
 });
 
 const emit = defineEmits(['update:modelValue']);

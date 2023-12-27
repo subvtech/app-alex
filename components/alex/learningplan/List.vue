@@ -159,6 +159,8 @@ const submit = async () => {
   if (isTrail) {
     data.learningplan = props.parentLearningPlan.id;
   }
+  data.slug = 'text';
+  data.start_date = new Date();
 
   formData.append('data', JSON.stringify(data));
 

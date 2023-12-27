@@ -26,7 +26,7 @@
     </template>
 
     <template v-slot:footer>
-      <div class="d-flex flex-column contacts pt-6">
+      <div class="d-flex flex-column contacts">
         <div class="d-flex align-center contact">
           <v-icon color="#6E7A87">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
