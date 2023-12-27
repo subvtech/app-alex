@@ -103,12 +103,28 @@ export const useFormRules = () => {
     })
     .required(i18n.t('rules.keyword.required'));
 
+  const startDateCreationRules = yup
+    .date()
+    .required(i18n.t('rules.startDate.required'))
+    .min(currentDate.toISOString(), ({ min }) =>
+      i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
+    );
+
+  const startDateUpdateRules = yup
+    .date()
+    .required(i18n.t('rules.startDate.required'));
+
+  const endDateRules = yup
+    .date()
+    .required(i18n.t('rules.endDate.required'))
+    .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'));
+
   const descriptionRules = {
     description: yup
       .string()
       .required(i18n.t('rules.description.required'))
-      .min(6, i18n.t('rules.description.min'))
-      .max(4000, i18n.t('rules.description.max'))
+      .min(6, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(4000, ({ max }) => i18n.t('rules.description.max', { max }))
       .trim(),
   };
 
@@ -121,6 +137,23 @@ export const useFormRules = () => {
       )
       .required(i18n.t('rules.phone.required')),
   };
+
+  const generalCourseSchema = yup.object({
+    startDate: startDateUpdateRules,
+    endDate: endDateRules,
+    title: yup
+      .string()
+      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .required(i18n.t('rules.title.required'))
+      .trim(),
+    slug: yup
+      .string()
+      .min(3, ({ min }) => i18n.t('rules.slug.min', { min }))
+      .max(20, ({ max }) => i18n.t('rules.slug.max', { max }))
+      .required(i18n.t('rules.slug.required'))
+      .trim(),
+  });
 
   const registerStep1 = yup.object({
     ...fullnameRules,
@@ -201,16 +234,8 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
       .trim(),
-    startDate: yup
-      .date()
-      .required(i18n.t('rules.startDate.required'))
-      .min(currentDate.toISOString(), ({ min }) =>
-        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
-      ),
-    endDate: yup
-      .date()
-      .required(i18n.t('rules.endDate.required'))
-      .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate')),
+    startDate: startDateCreationRules,
+    endDate: endDateRules,
   });
 
   const scheduleRules = yup.object({
@@ -244,12 +269,19 @@ export const useFormRules = () => {
       .matches(/^((?!instagram\b)(?!linkedin\b)(?!youtube\b).)*/)
       .required(i18n.t('rules.name.required'))
       .trim(),
+    titleRules: yup
+      .string()
+      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .required(i18n.t('rules.title.required'))
+      .trim(),
     urlRules: yup
       .string()
       .min(4, i18n.t('rules.url.min'))
       .max(64, i18n.t('rules.url.max'))
       .required()
       .trim(),
+    generalCourseSchema,
     loginSchema,
     createCourseRules,
     emailRegex,

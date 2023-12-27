@@ -21,12 +21,6 @@
     "onlyLetters": "There shall only alphabetic letters"
   },
 
-  "description": {
-    "required": "This field is required",
-    "min": "At least 6 characters long",
-    "max": "At most 4000 characters long"
-  },
-
   "phone": {
     "required": "Phone is required",
     "length": "Must be 11 characters long",
@@ -57,9 +51,18 @@
     "required": "Confirm Password is required",
     "matchError": "The passwords do no match"
   },
-
+  "title": {
+    "required": "Name is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "slug": {
+    "required": "Acronym/Name is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
   "name": {
-    "required": "Nome is required",
+    "required": "Name is required",
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
@@ -87,6 +90,7 @@
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
+
   "description": {
     "required": "Description is required",
     "min": "At least {min} characters long",

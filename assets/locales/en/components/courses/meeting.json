@@ -41,6 +41,7 @@
   "save": "Save",
   "delete": "Delete",
   "course": {
+    "addButton": "Create Meeting",
     "title": "Save your synchronous meetings!",
     "subtitle": "Add a date and frequency for each meeting",
     "addMeeting": "Add synchronous meeting",

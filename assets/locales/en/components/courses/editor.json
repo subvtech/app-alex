@@ -4,5 +4,6 @@
   "quote": {
     "placeholder": "Type the quote",
     "caption": "Quote's author"
-  }
+  },
+  "update": "Details successfully updated."
 }
