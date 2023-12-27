@@ -1,6 +1,6 @@
 import { Strapi4RequestParams } from '@nuxtjs/strapi/dist/runtime/types';
 
-function formatResult(result: any) {
+function formatResult<T>(result: any): T {
   const resultFormatted = { id: result.id, ...result.attributes };
 
   Object.keys(resultFormatted).forEach((attribute) => {
@@ -34,19 +34,19 @@ export const useStrapiUtils = () => {
     contentType: string,
     id: number,
     params?: Strapi4RequestParams,
-  ): Promise<T> {
+  ): Promise<{ meta: any; data: T }> {
     const result = await strapi.findOne<T>(contentType, id, params);
 
-    return formatResult(result.data);
+    return { ...result, data: formatResult<T>(result.data) };
   }
 
   async function find<T>(
     contentType: string,
     params?: Strapi4RequestParams,
-  ): Promise<T[]> {
+  ): Promise<{ meta: any; data: T[] }> {
     const result = await strapi.find<T>(contentType, params);
 
-    return result.data.map(formatResult);
+    return { meta: result.meta, data: result.data.map(formatResult<T>) };
   }
 
   return { findOne, find, formatResult };
