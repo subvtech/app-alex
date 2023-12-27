@@ -1,44 +1,5 @@
 <template>
   <div v-if="course">
-    <alex-custom-banner
-      :cover-picture="
-        course.cover_image.data
-          ? {
-              id: course.cover_image.data.id,
-              ...course.cover_image.data.attributes,
-            }
-          : null
-      "
-      :profile-picture-size="24"
-      :profile-picture="owner.attributes.avatar.data"
-      :userId="id"
-      show-profile-picture
-      darker-background
-      show-shade
-      show-menu
-      settings-menu
-      :show-settings="canEdit"
-      distribution="fullname-username-role"
-      :selectedOption="selectedOption"
-      @select:option="selectOption"
-      @display:settings="selectOption(8)"
-      is-professor
-      :fullname="owner.attributes.fullname"
-      :title="$t('pages.courses.class')"
-      :copy-object="
-        plainLink
-          ? {
-              label: $t('pages.courses.invite'),
-              copyText: plainLink,
-            }
-          : undefined
-      "
-      :description="course.title"
-      :subtitle="course.class_name"
-      :startDate="(course.start_date as string).split('-').reverse().join('/')"
-      :endDate="(course.end_date as string).split('-').reverse().join('/')"
-      :links="links"
-    />
     <alex-learningplan-settings
       :learningPlan="course"
       :learning-plan-id="course.id"
@@ -139,7 +100,9 @@ const links = computed<TabType[]>(() => [
     label: '',
     value: '6',
     icon: 'mdi-cog-outline',
-    to: course.value ? `/courses/${course.value.id}/settings` : '/' + route.path,
+    to: course.value
+      ? `/courses/${course.value.id}/settings`
+      : '/' + route.path,
   },
 ]);
 

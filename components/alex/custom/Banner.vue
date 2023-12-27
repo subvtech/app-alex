@@ -297,7 +297,7 @@ const props = defineProps({
 const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
   toRefs(props);
 
-const bannerSelectedOption = toRef(props.selectedOption)
+const bannerSelectedOption = toRef(props.selectedOption);
 
 const cover = ref<BannerImageType | null | undefined>(props.coverPicture);
 
@@ -329,8 +329,8 @@ watch(coverPicture!, () => {
 });
 
 watch(selectedOption, () => {
-  bannerSelectedOption.value = selectedOption.value
-})
+  bannerSelectedOption.value = selectedOption.value;
+});
 </script>
 
 <style scoped lang="scss">

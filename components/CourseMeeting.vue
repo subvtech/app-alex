@@ -108,9 +108,9 @@ const frequencyText = computed(() => {
     locale: enUS,
   }).toLowerCase();
   switch (props.interval) {
-    case 0: //once
+    case 0: // once
       return t(`components.courses.meeting.single.${dayOfTheWeek}`);
-    case 1: 
+    case 1:
       return t(`components.courses.meeting.every.${dayOfTheWeek}`);
     case 14:
       return t('components.courses.meeting.biweekly', {

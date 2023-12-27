@@ -1,5 +1,8 @@
 <template>
-  <alex-custom-card :title="$t('components.courses.settings.title')" :show-icon="false">
+  <alex-custom-card
+    :title="$t('components.courses.settings.title')"
+    :show-icon="false"
+  >
     <template #content>
       <div class="d-flex flex-column w-100 gap-6 justify-center">
         <alex-learningplan-settings-banner
