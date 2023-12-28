@@ -1,7 +1,7 @@
 {
-    "title": "Configurações",
-    "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
-    "update": "Trilha atualizada com sucesso",
+  "title": "Configurações",
+  "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
+  "update": "Trilha atualizada com sucesso",
 
   "cover": {
     "title": "Capa da trilha",
@@ -22,8 +22,8 @@
     "hidetrailTitle": "Ocultar trilha (Privado)",
     "hidetrailHint": "Torna a trilha privada, garantindo que somente os integrantes possam vê-la.",
     "delete": {
-        "deleteCourseTitle": "Excluir trilha",
-        "deleteCourseDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
+        "deleteTrailTitle": "Excluir trilha",
+        "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
         "deleteButton": "Excluir trilha",
         "deleteConfirmation": "Realmente deseja excluir a trilha?",
         "deleteDescription": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",

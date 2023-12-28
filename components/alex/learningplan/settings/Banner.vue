@@ -2,12 +2,13 @@
   <alex-custom-card
     :title="$t('components.courses.settings.cover.title')"
     :show-icon="false"
-    show-footer-divider
+    class="content-area"
   >
     <template #content>
       <alex-custom-banner
         :cover-picture="uploadCover"
         :img-from-strapi="theresCover"
+        class="banner"
       />
     </template>
     <template #footer>
@@ -93,3 +94,15 @@ watch(cover!, () => {
   uploadCover.value = props.cover;
 });
 </script>
+<style scoped lang="scss">
+.content-area {
+  border: 1px solid var(--cinza-cinza-200, #d2d6da) !important;
+  box-shadow: none !important;
+}
+
+.banner {
+  border-radius: 8px;
+  border: 1px solid var(--Cinza-Cinza-100, #ebedef);
+  box-shadow: none !important;
+}
+</style>

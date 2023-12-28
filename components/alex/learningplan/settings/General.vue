@@ -2,9 +2,10 @@
   <alex-custom-card
     :title="$t('components.courses.settings.general.title')"
     :show-icon="false"
+    class="content-area"
   >
     <template #content>
-      <div v-if="isTrail" class="d-flex flex-column w-100">
+      <div v-if="isTrail" class="d-flex flex-column w-100 content-body">
         <alex-inputs-text-field
           :v-model="trailsTitle"
           :label="trails.labelTitle"
@@ -236,3 +237,10 @@ watch(slug, () => {
   mySlug.value = slug.value;
 });
 </script>
+<style scoped lang="scss">
+.content-area {
+  margin-top: 24px;
+  border: 1px solid var(--cinza-cinza-200, #d2d6da) !important;
+  box-shadow: none !important;
+}
+</style>
