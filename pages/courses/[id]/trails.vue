@@ -11,7 +11,7 @@
         v-show="trails.length > 0"
         v-model="search"
         name="search"
-        placeholder="Encontrar Trilha"
+        :placeholder="$t('pages.trails.newTrail')"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
@@ -24,7 +24,8 @@
         prepend-icon="mdi-plus"
         size="large"
         @click="createTrailDialog = true"
-        >Nova Trilha</alex-custom-button
+      >
+        {{ $t('pages.trails.newTrail') }}</alex-custom-button
       >
     </div>
     <div
@@ -191,13 +192,13 @@ const showingData = (groupedItems) => {
       ? trails.value.length
       : page.value * itemsPerPage;
   const total = trails.value.length;
-  const message = t('pages.classes.showingData', {
+  const message = t('pages.trails.showingData', {
     from,
     to,
     total,
   });
   if (to === 0) {
-    return t('pages.classes.noData');
+    return t('pages.trails.noData');
   }
   return message;
 };

@@ -1,0 +1,8 @@
+{
+    "newTrail": "Nova Trilha",
+    "emptyStateText": "Parece que não há trilhas criadas!",
+    "searchPlaceholder": "Buscar...",
+    "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} trilhas",
+    "noData": "Nenhuma trilha encontrada!"
+  }
+  
