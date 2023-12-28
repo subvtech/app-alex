@@ -105,10 +105,10 @@
     },
     "endHour": {
       "required": "End time is required"
-    },
-    "copy": {
-      "success": "Text copied to clipboard",
-      "error": "Couldn't copy to clipboard"
     }
+  },
+  "copy": {
+    "success": "Text copied to clipboard",
+    "error": "Couldn't copy to clipboard"
   }
 }
