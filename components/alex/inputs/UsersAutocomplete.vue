@@ -65,7 +65,7 @@ const emit = defineEmits([
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
 const user = useStrapiUser().value;
-const { value: selectedUser, setState } = useField<User | null>(
+const { value: selectedUser, resetField } = useField<User | null>(
   () => props.name,
   undefined,
   {
@@ -86,7 +86,8 @@ const selectedUsers = computed({
 
 const cleanInput = () => {
   search.value = '';
-  setState({ value: null });
+
+  resetField();
 };
 
 const removeSelf = (email?: string) => {
@@ -107,8 +108,8 @@ const updateModelValue = () => {
     !selectedUsers.value.find((v) => v.email === selectedUser.value?.email)
   ) {
     selectedUsers.value.push(selectedUser.value);
-    cleanInput();
   }
+  cleanInput();
 };
 
 useOnStopTyping(search, async () => {
