@@ -2,6 +2,7 @@
   <div>
     <alex-learningplan-class-section-card
       v-model:search="searchMembers"
+      v-model:dialog-model="addMemberDialog"
       title="Participantes da turma"
       :loading="learningPlanStore.loading"
       :show-empty-state="!learningPlanStore?.activeMembers?.length"
@@ -63,6 +64,7 @@
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
       v-model="searchGroups"
+      v-model:dialog-model="createGroupDialog"
       title="Grupos de participantes"
       :loading="learningPlanStore.loading"
       :items="learningPlanStore.learningPlan?.groups"
@@ -84,15 +86,16 @@
       <template #item="{ item }">
         <alex-learningplan-class-group-card
           :title="item?.title"
-          :members="getGroupMembersInfo(item.group_members) as any"
-          @delete="() => onDeleteParticipant(item.id)"
+          :members="getGroupMembersInfo(item.group_members)"
+          @delete="() => onDeleteGroup(item.id)"
         />
       </template>
       <template #dialog-content>
         <v-form>
           <alex-inputs-text-field
+            v-model="groupTitle"
             :schema="createGroupRules.groupName"
-            label="Qual o nome do Grupo?*"
+            label="Qual o nome do Grupo?"
             name="group_name"
             density="comfortable"
             placeholder="Digite o nome do grupo"
@@ -152,7 +155,7 @@
             </template>
           </alex-inputs-autocomplete>
           <alex-custom-list-item-user
-            v-for="(member, i) in groupMembers"
+            v-for="(member, i) in selectedGroupMembers"
             :key="`group-member-${i}`"
             :user="{
               email: member?.user?.email || '',
@@ -160,7 +163,15 @@
               image: member?.user?.avatar?.url || '',
             }"
             remove-selection
-          />
+            @delete="() => removeSelectedGroupMember(member.id)"
+          >
+            <template
+              v-if="member.id === selectedInChargeGroupMember?.id"
+              #chip
+            >
+              <alex-custom-chip status="dark" size="small" text="Responsável" />
+            </template>
+          </alex-custom-list-item-user>
         </v-form>
       </template>
     </alex-learningplan-class-section-card>
@@ -172,6 +183,8 @@ const { setMessage } = useMessageStore();
 const { createGroupRules } = useFormRules();
 const strapi = useStrapi();
 const formAddGroup = useForm();
+const addMemberDialog = ref(false);
+const createGroupDialog = ref(false);
 const searchMembers = ref('');
 const searchGroups = ref('');
 const usersToInvite = ref([]);
@@ -186,40 +199,36 @@ const groupTitle = ref('');
 
 const headerStore = usePageHeaderStore();
 
-headerStore.title = 'Meus Cursos';
-headerStore.items = [
-  {
-    title: 'Home',
-    to: '/',
-  },
-  {
-    title: 'Meus Curos',
-    to: '/courses/me',
-  },
-  {
-    title: learningPlanStore.learningPlan
-      ? learningPlanStore.learningPlan.title
-      : 'Curso',
-    to: `/courses/${learningPlanId.value}`,
-  },
-  {
-    title: 'Turma',
-  },
-];
-
-headerStore.showHeader = true;
-
 const resendingInviteMember = ref(false);
 const resendingInviteMemberId = ref(0);
-
-const selectedInChargeGroupMember = ref<LearningPlanMemberSimple>();
+const selectedInChargeGroupMember = ref<LearningPlanMemberSimple | null>(null);
 const selectedGroupMembers = ref<LearningPlanMemberSimple[]>([]);
-
-watch(selectedInChargeGroupMember, () => {
-  selectedGroupMembers.value = selectedGroupMembers.value.filter(
-    (m) => m.id !== selectedInChargeGroupMember.value?.id,
-  );
+const ignoreUserIds = computed(() => {
+  return learningPlanStore.learningPlan?.members?.map((m) => m.user?.id) || [];
 });
+
+const ignoreUserEmails = computed(() => {
+  return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
+});
+
+const membersToCreateGroup = computed<LearningPlanMemberSimple[]>(() => {
+  return learningPlanStore.activeMembers || [];
+});
+
+function removeSelectedGroupMember(id: number) {
+  if (selectedInChargeGroupMember?.value?.id === id) {
+    formAddGroup.setFieldError(
+      'members',
+      'Você não pode retirar o responsável dos integrantes',
+    );
+    setTimeout(() => {
+      formAddGroup.setFieldError('members', undefined);
+    }, 2000);
+  }
+  selectedGroupMembers.value = selectedGroupMembers.value.filter(
+    (member) => member.id !== id,
+  );
+}
 
 async function onClickSendInvites() {
   if (!usersToInvite.value.length) {
@@ -250,14 +259,13 @@ async function onClickSendInvites() {
 
 async function onCreateGroup() {
   const { valid } = await formAddGroup.validate();
-  console.log(selectedGroupMembers);
   if (!valid) {
     return;
   }
   try {
     creatingGroup.value = true;
 
-    const members = groupMembers.value.map(
+    const members = selectedGroupMembers.value.map(
       (member: LearningPlanMemberSimple) => {
         const role =
           member.id === selectedInChargeGroupMember.value?.id
@@ -276,29 +284,29 @@ async function onCreateGroup() {
     await strapi.create('learnin-plan-groups', data);
     setMessage('Grupo criado com sucesso!', 'green', true);
     learningPlanStore.loadLearningPlan(learningPlanId.value);
+    selectedGroupMembers.value = [];
+    selectedInChargeGroupMember.value = null;
     formAddGroup.resetForm();
+    createGroupDialog.value = false;
   } catch (_) {
     setMessage('Erro ao criar grupo!', 'red', true);
   } finally {
     creatingGroup.value = false;
   }
 }
-
-const ignoreUserIds = computed(() => {
-  return learningPlanStore.learningPlan?.members?.map((m) => m.user?.id) || [];
-});
-
-const ignoreUserEmails = computed(() => {
-  return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
-});
-
-const membersToCreateGroup = computed<LearningPlanMemberSimple[]>(() => {
-  return (
-    learningPlanStore.activeMembers?.filter(
-      (member) => member.id !== selectedInChargeGroupMember.value?.id,
-    ) || []
-  );
-});
+async function onDeleteGroup(id: number) {
+  const { valid } = await formAddGroup.validate();
+  if (!valid) {
+    return;
+  }
+  try {
+    await strapi.delete('learnin-plan-groups', id);
+    setMessage('Grupo excluido com sucesso!', 'green', true);
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
+  } catch (_) {
+    setMessage('Erro ao excluir grupo!', 'red', true);
+  }
+}
 
 function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
   return groupMembers.map((groupMember) => {
@@ -309,12 +317,6 @@ function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
     };
   });
 }
-
-const groupMembers = computed<LearningPlanMemberSimple[]>(() => {
-  return selectedInChargeGroupMember.value
-    ? [selectedInChargeGroupMember.value, ...selectedGroupMembers.value]
-    : selectedGroupMembers.value;
-});
 
 async function onResendInvite(member: LearningPlanMemberSimple) {
   try {
@@ -360,5 +362,44 @@ function searchGroupMembers(_itemTitle, queryText, item) {
     item.raw.user.email.toLowerCase().includes(queryText)
   );
 }
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+  headerStore.title = 'Meus Cursos';
+  headerStore.items = [
+    {
+      title: 'Home',
+      to: '/',
+    },
+    {
+      title: 'Meus Curos',
+      to: '/courses/me',
+    },
+    {
+      title: learningPlanStore.learningPlan
+        ? learningPlanStore.learningPlan.title
+        : 'Curso',
+      to: `/courses/${learningPlanId.value}`,
+    },
+    {
+      title: 'Turma',
+    },
+  ];
+});
+
+watch(
+  () => [selectedGroupMembers.value, selectedInChargeGroupMember.value],
+  () => {
+    const alreadyHasLeader = selectedGroupMembers.value.filter(
+      (member) => member.id === selectedInChargeGroupMember?.value?.id,
+    );
+    if (selectedInChargeGroupMember.value && !alreadyHasLeader.length) {
+      selectedGroupMembers.value = [
+        selectedInChargeGroupMember.value,
+        ...selectedGroupMembers.value,
+      ];
+    }
+  },
+);
 </script>
 <style scoped lang="scss"></style>

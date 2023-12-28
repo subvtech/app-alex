@@ -33,7 +33,7 @@
           >
             {{ actionText }}
             <alex-custom-dialog
-              v-model="openDialog"
+              v-model="dialogModelValue"
               :title="dialogTitle"
               activator="parent"
             >
@@ -111,7 +111,7 @@
 import { usePagination } from '~/composables/usePagination';
 const { t } = useI18n();
 const page = ref(1);
-const emit = defineEmits(['update:search', 'action']);
+const emit = defineEmits(['update:search', 'action', 'update:dialogModel']);
 const props = defineProps({
   loading: {
     type: Boolean,
@@ -185,6 +185,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  dialogModel: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const modelSearch = computed({
@@ -196,6 +200,15 @@ const modelSearch = computed({
   },
 });
 
+const dialogModelValue = computed({
+  get() {
+    return props.dialogModel;
+  },
+  set(value) {
+    emit('update:dialogModel', value);
+  },
+});
+
 const cardItems = computed(() => props.items);
 
 const pagination = usePagination(
@@ -204,8 +217,6 @@ const pagination = usePagination(
   cardItems,
   t('pages.classes.participant'),
 );
-
-const openDialog = ref(false);
 </script>
 
 <style lang="scss" scoped>
