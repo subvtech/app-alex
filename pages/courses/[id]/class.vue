@@ -76,6 +76,7 @@
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
       dialog-action-text="Criar Grupo"
+      dialog-title="Criar Grupo"
       @action="onCreateGroup"
     >
       <template #item="{ item }">
@@ -86,80 +87,88 @@
         />
       </template>
       <template #dialog-content>
-        <alex-inputs-text-field
-          label="Qual o nome do Grupo?*"
-          name="group_name"
-          density="comfortable"
-          placeholder="Digite o nome do grupo"
-        />
-        <alex-inputs-autocomplete
-          v-model="selectedInChargeGroupMember"
-          label="Quem será responsável pelo grupo?"
-          placeholder="Selecione o responsável pelo grupo"
-          name="in_charge"
-          variant="outlined"
-          density="comfortable"
-          item-title="user.fullname"
-          :custom-filter="searchGroupMembers"
-          :items="learningPlanStore.activeMembers"
-          return-object
-        >
-          <template #item="{ props: propsItem, item, index }">
-            <alex-custom-list-item-user
-              v-bind="propsItem"
-              :key="index"
-              :user="{
-                email: item.raw.user.email,
-                name: item.raw.user.fullname,
-              }"
-              no-delete
-            />
-          </template>
-        </alex-inputs-autocomplete>
-        <alex-inputs-autocomplete
-          v-model="selectedGroupMembers"
-          label="Quem será responsável pelo grupo?"
-          placeholder="Selecione os participantes para o grupo"
-          name="in_charge"
-          variant="outlined"
-          density="comfortable"
-          :items="membersToCreateGroup"
-          :custom-filter="searchGroupMembers"
-          return-object
-          multiple
-        >
-          <template #selection>
-            <span></span>
-          </template>
-          <template #item="{ props: propsItem, item, index }">
-            <alex-custom-list-item-user
-              v-bind="propsItem"
-              :key="index"
-              :user="{
-                email: item.raw.user.email,
-                name: item.raw.user.fullname,
-                image: item.raw.user?.avatar?.url,
-              }"
-            />
-          </template>
-        </alex-inputs-autocomplete>
-        <alex-custom-list-item-user
-          v-for="(member, i) in groupMembers"
-          :key="`group-member-${i}`"
-          :user="{
-            email: member?.user?.email || '',
-            name: member?.user?.fullname || '',
-            image: member?.user?.avatar?.url,
-          }"
-          remove-selection
-        />
+        <v-form>
+          <alex-inputs-text-field
+            :schema="createGroupRules.groupName"
+            label="Qual o nome do Grupo?*"
+            name="group_name"
+            density="comfortable"
+            placeholder="Digite o nome do grupo"
+          />
+          <alex-inputs-autocomplete
+            v-model="selectedInChargeGroupMember"
+            :schema="createGroupRules.leader"
+            label="Quem será responsável pelo grupo?"
+            placeholder="Selecione o responsável pelo grupo"
+            name="leader"
+            variant="outlined"
+            density="comfortable"
+            item-title="user.fullname"
+            :custom-filter="searchGroupMembers"
+            :items="learningPlanStore.activeMembers"
+            return-object
+          >
+            <template #item="{ props: propsItem, item, index }">
+              <alex-custom-list-item-user
+                v-bind="propsItem"
+                :key="index"
+                :user="{
+                  email: item.raw.user.email,
+                  name: item.raw.user.fullname,
+                }"
+                no-delete
+              />
+            </template>
+          </alex-inputs-autocomplete>
+          <alex-inputs-autocomplete
+            v-model="selectedGroupMembers"
+            label="Quem serão os participantes do grupo?"
+            :schema="createGroupRules.members"
+            placeholder="Selecione os participantes para o grupo"
+            name="members"
+            variant="outlined"
+            density="comfortable"
+            :items="membersToCreateGroup"
+            :custom-filter="searchGroupMembers"
+            return-object
+            multiple
+          >
+            <template #selection>
+              <span></span>
+            </template>
+            <template #item="{ props: propsItem, item, index }">
+              <alex-custom-list-item-user
+                v-bind="propsItem"
+                :key="index"
+                :user="{
+                  email: item.raw.user.email,
+                  name: item.raw.user.fullname,
+                  image: item.raw.user?.avatar?.url,
+                }"
+              />
+            </template>
+          </alex-inputs-autocomplete>
+          <alex-custom-list-item-user
+            v-for="(member, i) in groupMembers"
+            :key="`group-member-${i}`"
+            :user="{
+              email: member?.user?.email || '',
+              name: member?.user?.fullname || '',
+              image: member?.user?.avatar?.url,
+            }"
+            remove-selection
+          />
+        </v-form>
       </template>
     </alex-learningplan-class-section-card>
   </div>
 </template>
 <script setup lang="ts">
-const strapi = useStrapi();
+import { useForm } from 'vee-validate';
 const { setMessage } = useMessageStore();
+const { createGroupRules } = useFormRules();
+const strapi = useStrapi();
+const formAddGroup = useForm();
 const searchMembers = ref('');
 const searchGroups = ref('');
 const usersToInvite = ref([]);
@@ -209,8 +218,11 @@ async function onClickSendInvites() {
   }
 }
 
-function onCreateGroup() {
-  console.log('onCreateGroup');
+async function onCreateGroup() {
+  const { valid } = await formAddGroup.validate();
+  if (valid) {
+    console.log('onCreateGroup');
+  }
 }
 
 const ignoreUserIds = computed(() => {

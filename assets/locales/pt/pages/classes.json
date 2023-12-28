@@ -23,5 +23,8 @@
   "removeParticipant": "Remover participante",
   "removeGroup": "Excluir grupo",
   "editGroup": "Editar grupo",
-  "sendMessage": "Enviar mensagem"
+  "sendMessage": "Enviar mensagem",
+  "responsibleIsRequired":"Responsável é obrigatório",
+  "participantsIsRequired":"É necessário ter integrantes",
+  "groupNameIsRequired":"Nome do grupo é obrigatório"
 }
