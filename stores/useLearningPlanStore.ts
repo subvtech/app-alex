@@ -25,7 +25,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     media: true,
     invitation_links: true,
     learning_goals: {
-      verb: true,
+      populate: ['verb'],
     },
     groups: {
       populate: ['group_members.student_member.user.avatar'],

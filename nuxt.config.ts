@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
