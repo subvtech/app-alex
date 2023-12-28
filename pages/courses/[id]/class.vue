@@ -159,6 +159,7 @@
 </template>
 <script setup lang="ts">
 const strapi = useStrapi();
+
 const { setMessage } = useMessageStore();
 const searchMembers = ref('');
 const searchGroups = ref('');
@@ -169,6 +170,38 @@ const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const sendingInvites = ref(false);
 const removingMember = ref(false);
 const removingMemberId = ref(0);
+
+const headerStore = usePageHeaderStore();
+
+// watch(headerStore, () => {
+//   if (headerStore.mainActionEmitted) {
+//     console.log('teste');
+//     headerStore.mainActionEmitted = false;
+//   }
+// });
+
+headerStore.title = 'Meus Cursos';
+headerStore.items = [
+  {
+    title: 'Home',
+    to: '/',
+  },
+  {
+    title: 'Meus Curos',
+    to: '/courses/me',
+  },
+  {
+    title: learningPlanStore.learningPlan
+      ? learningPlanStore.learningPlan.title
+      : 'Curso',
+    to: `/courses/${learningPlanId.value}`,
+  },
+  {
+    title: 'Turma',
+  },
+];
+headerStore.hasMainButton = true;
+headerStore.showHeader = true;
 
 const resendingInviteMember = ref(false);
 const resendingInviteMemberId = ref(0);

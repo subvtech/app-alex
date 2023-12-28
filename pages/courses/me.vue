@@ -235,6 +235,11 @@
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetLearningPlans } from '~/assets/queries';
 import { LearningPlan } from '@/models/learningPlan.model';
+
+definePageMeta({
+  middleware: 'auth',
+});
+
 const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');

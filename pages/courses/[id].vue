@@ -40,6 +40,11 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+
+definePageMeta({
+  middleware: 'auth',
+});
+
 const i18n = useI18n();
 
 const user = useStrapiUser<User>();
