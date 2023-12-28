@@ -13,15 +13,17 @@
           width="6"
         />
       </v-row>
-      <v-container v-else fluid>
-        <v-row justify="space-between">
+      <v-container v-else fluid class="pa-1 ga-2">
+        <v-row justify="space-between" align="center" dense class="mb-6">
           <v-col cols="4">
             <alex-inputs-text-field
               v-model="modelSearch"
               name="search"
               density="comfortable"
               :placeholder="searchPlaceholder"
+              hide-details
               prepend-inner-icon="mdi-magnify"
+              class="max-width-320"
             />
           </v-col>
           <alex-custom-button :prepend-icon="actionIcon" size="large">
@@ -41,17 +43,18 @@
             </alex-custom-dialog>
           </alex-custom-button>
         </v-row>
-        <v-row justify="center"> </v-row>
-        <div v-if="showEmptyState" class="d-flex flex-column align-center ga-6">
-          <v-img
-            :src="emptyStateImage"
-            :height="imageHeight"
-            :width="imageWidth"
-          />
-          <h3 class="text-h3 text-gray-400">
-            {{ emptyStateMessage }}
-          </h3>
-        </div>
+        <v-row v-if="showEmptyState" dense align="center" justify="center">
+          <div class="d-flex flex-column align-center ga-6">
+            <v-img
+              :src="emptyStateImage"
+              :height="imageHeight"
+              :width="imageWidth"
+            />
+            <h3 class="text-h3 text-gray-400">
+              {{ emptyStateMessage }}
+            </h3>
+          </div>
+        </v-row>
         <v-row
           v-else
           :class="{
@@ -59,6 +62,7 @@
             'pa-6': coloredBackground,
             rounded: coloredBackground,
           }"
+          dense
         >
           <v-data-iterator
             v-model:search="modelSearch"
@@ -67,12 +71,13 @@
             :items-per-page="itemsPerPage"
             :filter-keys="filterKeys"
             class="d-flex flex-wrap"
-            style="flex: 1; position: relative"
           >
             <template #default="{ items: iterateItems }">
-              <template v-for="(item, i) in iterateItems" :key="`item-${i}`">
-                <slot name="item" :item="item.raw"></slot>
-              </template>
+              <div class="d-flex flex-wrap gap-6 w-100 px-1">
+                <template v-for="(item, i) in iterateItems" :key="`item-${i}`">
+                  <slot name="item" :item="item.raw" />
+                </template>
+              </div>
             </template>
             <template #footer="{ pageCount, groupedItems }">
               <div
@@ -97,7 +102,7 @@
 </template>
 <script setup lang="ts">
 import { usePagination } from '~/composables/usePagination';
-
+const { t } = useI18n();
 const page = ref(1);
 const emit = defineEmits(['update:search', 'action']);
 const props = defineProps({
@@ -174,7 +179,18 @@ const modelSearch = computed({
 
 const cardItems = computed(() => props.items);
 
-const pagination = usePagination(modelSearch, page, cardItems);
+const pagination = usePagination(
+  modelSearch,
+  page,
+  cardItems,
+  t('pages.classes.participant'),
+);
 
 const openDialog = ref(false);
 </script>
+
+<style lang="scss" scoped>
+.max-width-320 {
+  max-width: 320px;
+}
+</style>

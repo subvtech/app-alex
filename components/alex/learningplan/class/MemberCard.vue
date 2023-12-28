@@ -1,10 +1,12 @@
 <template>
   <v-card
-    class="container-grid pt-8 pb-6 px-4"
+    class="container-grid pt-8 pb-6 px-4 w-100"
     :min-width="250"
     :max-width="300"
     elevation="0"
     rounded="lg"
+    variant="outlined"
+    color="gray-100"
   >
     <v-img class="banner" :src="coverImage" cover>
       <alex-custom-dropdown
@@ -105,5 +107,6 @@ const items = [
   left: 0;
   width: 100%;
   height: 80px;
+  background-color: rgb(var(--v-theme-gray-blue));
 }
 </style>

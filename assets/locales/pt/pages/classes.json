@@ -15,5 +15,6 @@
     "home": "Home"
   },
   "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
-  "noData": "Nenhum curso encontrado!"
+  "noData": "Nenhum {object} encontrado!",
+  "participant": "participante"
 }
