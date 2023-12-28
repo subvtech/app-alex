@@ -19,7 +19,7 @@
           />
           <div
             v-if="myInviteEnabled"
-            class="d-flex flex-row flex-wrap align-center w-100 gap-4"
+            class="d-flex flex-row align-center w-100 gap-4"
           >
             <alex-inputs-select
               v-model="selectedTime"
@@ -32,17 +32,14 @@
               :items="timeOptions"
               :info="$t('components.courses.settings.invite.tooltip')"
             />
-            <div
-              class="d-flex flex-column align-self-center"
-              :class="invitationLink ? '' : 'mt-3'"
-            >
+            <div class="d-flex flex-column w-100 mt-3 align-self-center">
               <span class="description">
                 {{ t('components.courses.settings.invite.linkAddress') }}
               </span>
               <alex-learningplan-invites
                 href=""
                 no-header
-                smaller
+                dark
                 class="py-2"
                 :enable-invites="myInviteEnabled"
                 :duration="selectedTime"
@@ -54,6 +51,7 @@
                   }
                 "
                 @link:expired="invitationLink = null"
+                full-width
               />
             </div>
           </div>

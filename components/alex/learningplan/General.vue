@@ -8,7 +8,7 @@
       :align-content="'align-center'"
     >
       <template #content>
-        <div class="d-flex flex-column align-center gap-12">
+        <div class="d-flex flex-column align-center w-100 gap-12 px-6 w-212">
           <app-media
             :title="$t('pages.courses.media.title')"
             :images="
@@ -60,7 +60,7 @@
             :tooltip="$t('components.courses.goals.tooltip')"
             sizing-class="pa-0 w-100"
             class="w-100"
-            @update="(data) => updateCourse(true, data.message)"
+            @update="(data) => emit('update', data)"
             is-nested
           />
 
@@ -72,7 +72,7 @@
             :can-edit="canEdit"
             is-nested
             hide-dividers
-            @update="(data) => updateCourse(true, data.message)"
+            @update="(data) => emit('update', data)"
           />
         </div>
       </template>
@@ -112,7 +112,7 @@
             :data="schedules"
             :end-date="new Date()"
             :is-facilitator="canEdit"
-            :href="canEdit ? '/settings' : ''"
+            :href="canEdit ? `${learningPlan.id}/settings` : ''"
             is-nested
             :learning-plan-id="0"
             hide-dividers
@@ -130,6 +130,7 @@
               }
             "
             @link:expired="plainLink = null"
+            full-width
           />
         </template>
       </alex-custom-card>
@@ -142,7 +143,7 @@
         :userId="owner.id"
         :userTags="generalTags"
         :can-edit="canEdit"
-        @update="(data) => updateCourse(true, data)"
+        @update="(data) => emit('update', data)"
       />
       <competences
         v-if="
@@ -155,7 +156,7 @@
         :userId="owner.id"
         :userTags="technicalTags"
         :can-edit="canEdit"
-        @update="(data) => updateCourse(true, data)"
+        @update="(data) => emit('update', true, data)"
       />
     </div>
   </div>
@@ -168,7 +169,7 @@ import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
 const { update } = useStrapi();
 
 const i18n = useI18n();
-
+const emit = defineEmits(['update']);
 const props = defineProps({
   learningPlan: {
     type: Object as PropType<LearningPlanType>,
@@ -189,10 +190,6 @@ const props = defineProps({
   },
   owner: {
     type: Object as PropType<{ id: number }>,
-    required: true,
-  },
-  updateCourse: {
-    type: Function,
     required: true,
   },
 });
@@ -226,10 +223,7 @@ const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
   });
-  await props.updateCourse(
-    true,
-    i18n.t('components.courses.about.description.updated'),
-  );
+  emit('update', i18n.t('components.courses.about.description.updated'));
 };
 
 const showDetails = computed(() => {
@@ -239,4 +233,94 @@ const showDetails = computed(() => {
 });
 </script>
 
-<style scope lang="scss"></style>
+<style scope lang="scss">
+.w-212 {
+  max-width: 850px;
+}
+
+.course-page {
+  .left-block {
+    min-width: 66% !important;
+    padding-inline: 24px !important;
+    padding-bottom: 24px;
+    .flex-column.align-center.gap-12 {
+      width: 50%;
+    }
+  }
+}
+
+@media (max-width: 1420px) {
+  .course-page {
+    .left-block {
+      min-width: 50% !important;
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 1075px) {
+  .course-page {
+    flex-wrap: wrap;
+    &.gap-6 {
+      gap: 12px !important;
+    }
+    .left-block {
+      min-width: 33% !important;
+      padding-inline: 8px !important;
+
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
+    }
+    .max-width {
+      max-width: unset;
+    }
+  }
+}
+
+@media (max-width: 961px) {
+  .course-page {
+    .left-block {
+      min-width: 50% !important;
+      padding-inline: 24px !important;
+
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
+    }
+    .max-width {
+      max-width: unset;
+    }
+  }
+}
+@media (max-width: 850px) {
+  .course-page {
+    flex-direction: column;
+
+    .left-block {
+      padding-inline: 24px !important;
+
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
+    }
+    .max-width {
+      max-width: unset;
+    }
+  }
+}
+
+.max-width {
+  max-width: 500px;
+}
+
+.gap-6 {
+  gap: 24px;
+}
+
+.gap-12 {
+  gap: 48px;
+}
+</style>

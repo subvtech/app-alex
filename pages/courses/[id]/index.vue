@@ -1,9 +1,9 @@
 <template>
   <div v-if="course">
     <alex-learningplan-general
-      :learningPlan="course"
-      :learning-plan-id="course.id"
-      :owner="owner"
+      :learningPlan="learningPlanStore.learningPlan as any"
+      :learning-plan-id="learningPlanStore.learningPlan?.id"
+      :owner="learningPlanStore.owner"
       :invitationLink="invitationLink"
       :canEdit="canEdit"
       :schedules="
@@ -24,7 +24,7 @@
           };
         })
       "
-      :updateCourse="(data) => updateCourse(true, data)"
+      @update="(data) => updateCourse(true, data)"
     />
   </div>
 </template>
@@ -33,14 +33,11 @@
 import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 
-import General from '@/components/alex/learningplan/General.vue';
-import Settings from '@/components/alex/learningplan/settings/index.vue';
 import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { TabType } from '~/components/alex/custom/Tabs.vue';
-
+import { InvitationLink } from '@/models/InvitationLink.model';
 export type LearningPlanType = {
   id: number;
   description: string;
@@ -78,43 +75,15 @@ const router = useRouter();
 const selectedOption = ref(0);
 const owner = ref<any>();
 
-const selectOption = (index) => {
-  selectedOption.value = index;
-};
+const learningPlanStore = useLearningPlanStore();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
-const canEdit = computed(() => owner.value?.id == id);
+const canEdit = computed(() => learningPlanStore.owner?.id === id);
 const { setMessage } = useMessageStore();
 
 definePageMeta({
   middleware: 'auth',
 });
-
-const links = computed(() => [
-  {
-    label: i18n.t('pages.courses.general'),
-    value: '0',
-    to: course.value ? `/courses/${course.value.id}` : route.path,
-  },
-  {
-    label: i18n.t('pages.courses.trails'),
-    value: '1',
-    to: course.value ? `/courses/${course.value.id}/trails` : 'aaaaaaaaa',
-  },
-  {
-    label: i18n.t('pages.courses.class'),
-    value: '2',
-    to: `/courses/${course.value?.id}/class`,
-  },
-  { label: i18n.t('pages.courses.projects'), value: '3' },
-  { label: i18n.t('pages.courses.events'), value: '4' },
-  { label: i18n.t('pages.courses.communication'), value: '5' },
-  {
-    label: '',
-    value: '6',
-    icon: 'mdi-cog-outline',
-    to: course.value ? `/courses/${course.value.id}/settings` : '',
-  },
-]);
 
 const getEarliestMeeting = (meetings) => {
   if (meetings.length === 0) return null;
@@ -145,8 +114,10 @@ onBeforeMount(async () => {
 });
 
 const updateCourse = async (show = true, message?) => {
+  await useAsyncData('user', () =>
+    learningPlanStore.loadLearningPlan(learningPlanId.value),
+  );
   let { id } = route.params;
-
   const result = await findOne('learningplans', id as string, { populate });
   if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
   course.value = {
@@ -154,29 +125,30 @@ const updateCourse = async (show = true, message?) => {
     ...(result.data.attributes as Object),
   };
 
-  let temp;
+  let sortedLinks: { id: number; attributes: InvitationLink }[] = [];
   if (course.value.invitation_links) {
-    course.value.invitation_links.data.forEach((link) => {
-      if (link.attributes.is_expired) return;
-      const expirationDate = new Date(link.attributes.expires_at);
-
-      if (
-        link.attributes.role === 'student' &&
-        link.attributes.emails_to_send === null &&
-        expirationDate.getTime() > new Date().getTime()
-      ) {
-        const differenceBetweenLinks = temp
-          ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
-          : 1;
-
-        if (!temp || differenceBetweenLinks > 0) {
-          temp = link;
-        }
-      }
-    });
+    const filterLinks = ({
+      attributes: { role, emails_to_send, expires_at, is_expired },
+    }) => {
+      return (
+        role === 'student' &&
+        emails_to_send === null &&
+        !is_expired &&
+        new Date(expires_at).getTime() > new Date().getTime()
+      );
+    };
+    sortedLinks = course.value.invitation_links.data.sort(
+      (a, b) =>
+        new Date(a.attributes.createdAt).getTime() -
+        new Date(b.attributes.createdAt).getTime(),
+    );
   }
-
-  if (temp) invitationLink.value = { id: temp.id, ...temp.attributes };
+  const sortedLinkLength = sortedLinks.length - 1;
+  if (sortedLinkLength >= 0)
+    invitationLink.value = {
+      id: sortedLinks[sortedLinkLength].id,
+      ...sortedLinks[sortedLinkLength].attributes,
+    } as any;
 
   owner.value = course.value.members.data.filter(
     (member) => member.attributes.role === 'facilitator',
@@ -206,90 +178,4 @@ watch(invitationLink, () => {
     plainLink.value = generateUrl(invitationLink.value.hash);
 });
 </script>
-<style scoped lang="scss">
-.course-page {
-  .left-block {
-    min-width: 66% !important;
-    padding-inline: 24px !important;
-    padding-bottom: 24px;
-    .flex-column.align-center.gap-12 {
-      width: 50%;
-    }
-  }
-}
-
-@media (max-width: 1420px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-  }
-}
-
-@media (max-width: 1075px) {
-  .course-page {
-    flex-wrap: wrap;
-    &.gap-6 {
-      gap: 12px !important;
-    }
-    .left-block {
-      min-width: 33% !important;
-      padding-inline: 8px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
-  }
-}
-
-@media (max-width: 961px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
-  }
-}
-@media (max-width: 850px) {
-  .course-page {
-    flex-direction: column;
-
-    .left-block {
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
-  }
-}
-
-.max-width {
-  max-width: 500px;
-}
-
-.gap-6 {
-  gap: 24px;
-}
-
-.gap-12 {
-  gap: 48px;
-}
-</style>
+<style scoped lang="scss"></style>

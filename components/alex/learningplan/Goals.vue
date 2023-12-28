@@ -37,6 +37,8 @@
               :id="contentProps.id"
               :description="contentProps.description"
               :filtered-items="filteredVerbs"
+              @update:description="onUpdateDescription"
+              @update:keyword="onUpdateKeyword"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
               @success:description="onSuccessDescription"
@@ -162,6 +164,13 @@ const onSuccessKeyword = (index) => {
   toggleDisableSave();
 };
 
+const onUpdateDescription = (data) => {
+  dataCopy.value[data.index].title = data.value;
+};
+const onUpdateKeyword = (data) => {
+  console.log(data);
+  dataCopy.value[data.index].keyWord = data.value.text;
+};
 onBeforeMount(async () => {
   filteredVerbs.value = (
     (await find('learning-goal-verbs', { filters: { user: props.userId } }))
@@ -259,7 +268,7 @@ const onSave = async () => {
   const deletePromises = props.data
     .filter((x) => dataCopy.value.findIndex((y) => y.id === x.id) === -1)
     .map(async (item) => {
-      return _delete('goals', item.id);
+      return _delete('learning-goals', item.id);
     });
 
   await Promise.all([...createPromises, ...updatePromises, ...deletePromises]);
@@ -279,7 +288,7 @@ const onSave = async () => {
       }),
     },
   });
-  emit('update', { message: t('components.courses.goals.update') });
+  emit('update', t('components.courses.goals.update'));
   rerender.value -= 1;
   updateArray.value = [];
   createArray.value = [];

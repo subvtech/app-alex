@@ -106,7 +106,7 @@ const links = computed<TabType[]>(() => [
   {
     label: i18n.t('pages.profile.assignments'),
     value: '3',
-    to: `/users/${username.value}/assignments`,
+    to: `/users/${username.value}/tasks`,
   },
   {
     label: i18n.t('pages.profile.events'),

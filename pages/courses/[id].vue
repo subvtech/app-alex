@@ -35,7 +35,7 @@
       @select:option="selectOption"
       @display:settings="selectOption(8)"
     />
-    <NuxtPage />
+    <NuxtPage @update="fetchData()" />
   </div>
 </template>
 <script setup lang="ts">
@@ -51,15 +51,17 @@ const user = useStrapiUser<User>();
 
 // const { find, findOne, update } = useStrapi();
 const route = useRoute();
-
 const learningPlanStore = useLearningPlanStore();
+const { learningPlan } = toRefs(learningPlanStore);
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);
 
-await useAsyncData('user', () =>
-  learningPlanStore.loadLearningPlan(learningPlanId.value),
-);
+const fetchData = async () => {
+  await useAsyncData('user', () =>
+    learningPlanStore.loadLearningPlan(learningPlanId.value),
+  );
+};
 
 const selectOption = (index) => {
   selectedOption.value = index;
@@ -79,13 +81,21 @@ const links = computed(() => [
     to: `/courses/${learningPlanStore.learningPlan?.id}/trails`,
   },
   {
-    label: i18n.t('pages.courses.class'),
+    label: i18n.t('pages.courses.assignments'),
     value: '2',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/tasks`,
+  },
+  {
+    label: i18n.t('pages.courses.class'),
+    value: '3',
     to: `/courses/${learningPlanStore.learningPlan?.id}/class`,
   },
-  { label: i18n.t('pages.courses.projects'), value: '3' },
-  { label: i18n.t('pages.courses.events'), value: '4' },
-  { label: i18n.t('pages.courses.communication'), value: '5' },
+  {
+    label: i18n.t('pages.courses.projects'),
+    value: '4',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/projects`,
+  },
+
   {
     label: '',
     value: '6',

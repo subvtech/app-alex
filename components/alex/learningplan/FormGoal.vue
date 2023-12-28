@@ -11,8 +11,15 @@
         ]"
         :placeholder="$t('components.courses.goals.verb.placeholder')"
         :filtered-items="myVerbs"
-        :update-items="updateItems"
+        :update-items="updateVerbs"
         @input="handleInput"
+        @update:model-value="
+          (text) =>
+            emit('update:keyword', {
+              value: { text },
+              index,
+            })
+        "
         :error-messages="keywordField.errorMessage.value"
         name="keyword"
         clerable
@@ -30,6 +37,12 @@
       ]"
       :label="$t('components.courses.goals.description.title')"
       clearable
+      @input="
+        emit('update:description', {
+          value: descriptionField.value.value,
+          index: index,
+        })
+      "
       :error-messages="descriptionField.errorMessage.value"
       name="description"
     />
@@ -43,9 +56,12 @@ import AppAutocomplete from '../../AppAutocomplete.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',
+
   'success:keyword',
   'success:description',
   'success',
+  'update:description',
+  'update:keyword',
 ]);
 const { keywordRules, descriptionRules } = useFormRules();
 
@@ -76,6 +92,17 @@ const myVerbs = ref(
   filteredItems.value.filter((item) => item.text !== props.keyword),
 );
 
+const updateVerbs = (verb, isCreating = false) => {
+  filteredItems.value = filteredItems.value.filter(
+    (item) => item.text !== verb.text,
+  );
+
+  emit('update:keyword', {
+    value: { text: verb.text },
+    index: props.index,
+  });
+};
+
 const keywordField = useField('keyword', keywordRules, {
   initialValue: keyword.value,
 });
@@ -94,7 +121,6 @@ onMounted(() => {
   keywordField.validate();
 });
 
-const updateItems = (newValue) => {};
 const descriptionErrorOrKeywordError = computed(
   () => keywordField.errorMessage.value || descriptionField.errorMessage.value,
 );

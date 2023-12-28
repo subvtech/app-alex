@@ -29,7 +29,7 @@
           class="button"
           :text="$t('components.courses.settings.visibility.save')"
           variant="primary"
-          @click="onSave"
+          @click="$emit('update', { hidden: activeButton === '2' })"
         />
       </div>
     </template>
@@ -37,9 +37,7 @@
 </template>
 <script setup lang="ts">
 const { t } = useI18n();
-const { update } = useStrapi();
-const { setMessage } = useMessageStore();
-
+const emit = defineEmits(['update']);
 const props = defineProps({
   isHidden: {
     type: Boolean,
@@ -67,11 +65,6 @@ const activeButton = ref(props.isHidden ? '2' : '1');
 
 const onCancel = () => {
   activeButton.value = props.isHidden ? '2' : '1';
-};
-
-const onSave = async () => {
-  await update('learningplan', { hidden: activeButton.value === '1' });
-  setMessage(t('components.courses.settings.visibility.update'), 'green', true);
 };
 </script>
 <style scoped lang="scss">

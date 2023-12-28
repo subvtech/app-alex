@@ -80,7 +80,7 @@ export type ScheduleResponseType = {
 };
 
 export interface MeetingsPropsType {
-  variant: MeetingVariantType;
+  variant?: MeetingVariantType;
   data: MeetingPropsType[];
   endDate: Date;
   canEdit: boolean;

@@ -34,7 +34,6 @@ defineProps({
 }
 .tooltip {
   position: relative !important;
-
   &:hover {
     .px-4 {
       display: block !important;

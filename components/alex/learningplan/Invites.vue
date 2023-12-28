@@ -2,31 +2,20 @@
   <alex-custom-card
     :show-icon="false"
     :title="$t('components.courses.invites.title')"
-    href="dsads"
+    :href="`${courseId}/settings`"
     hide-dividers
     sizing-class="ma-0"
     is-nested
   >
     <template #content>
-      <div v-if="enableInvites" class="d-flex flex-column w-100">
+      <div v-if="enableInvites" class="d-flex flex-column w-100 relative">
         <div
           class="invite gap-6 justify-space-between"
-          :class="[
-            theresTimeAndUrl ? '' : 'disabled',
-            smaller ? 'smaller' : '',
-          ]"
+          :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
             <template #content>
-              <a
-                class="w-100"
-                :href="url!"
-                style="
-                  text-overflow: ellipsis;
-                  max-width: 100%;
-                  overflow: hidden;
-                "
-              >
+              <a class="w-100 url" :href="url!">
                 {{ url }}
               </a>
             </template>
@@ -40,7 +29,7 @@
               <template #content>
                 <img
                   class="pointer"
-                  src="/svg/refresh.svg"
+                  :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
                   @click="updateLink"
                   width="20"
                   height="20"
@@ -52,7 +41,7 @@
                 <v-icon
                   v-if="theresTimeAndUrl"
                   class="pointer"
-                  color="#00B7CC"
+                  :color="dark ? '#6E7A87' : '#00B7CC'"
                   size="small"
                   @click="copyToClipboard(url)"
                   >mdi-content-copy</v-icon
@@ -61,7 +50,11 @@
             </alex-custom-tooltip>
           </div>
         </div>
-        <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
+        <div
+          v-if="theresTime"
+          class="timer d-flex pt-2 justify-end gap-1"
+          :class="dark ? 'dark' : ''"
+        >
           <span>{{ $t('components.courses.invites.countdown') }}</span>
           <p>{{ msToHHMMSS(remainingTime) }}</p>
         </div>
@@ -105,7 +98,7 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  smaller: {
+  dark: {
     type: Boolean,
     default: false,
   },
@@ -168,6 +161,15 @@ watch(theresTimeAndUrl, () => {
 </script>
 
 <style scoped lang="scss">
+.relative {
+  position: relative;
+}
+
+.url {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 .gap-1 {
   gap: 4px;
 }
@@ -195,9 +197,7 @@ watch(theresTimeAndUrl, () => {
   line-height: 135%; /* 21.6px */
   letter-spacing: 0.32px;
 }
-.smaller {
-  height: 48px !important;
-}
+
 .invite {
   display: flex;
   height: 52px;
@@ -210,7 +210,21 @@ watch(theresTimeAndUrl, () => {
   border-radius: 8px;
   border: 1px solid var(--principais-secundria-secundria-1, #47d9eb);
   background: var(--principais-secundria-secundria-2, #d1f6fa);
-
+  &.dark {
+    height: 48px !important;
+    border: 1px solid var(--Cinza-Cinza-400, #a0a8b1);
+    background: var(--Cinza-Cinza-100, #ebedef);
+    span {
+      overflow: hidden;
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-overflow: ellipsis;
+    }
+    a {
+      overflow: hidden;
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-overflow: ellipsis;
+    }
+  }
   &.disabled {
     border-radius: 8px;
     border: 1px solid var(--cinza-cinza-200, #d2d6da);
@@ -241,6 +255,9 @@ watch(theresTimeAndUrl, () => {
   }
 }
 .timer {
+  position: absolute;
+  bottom: -28px;
+  right: 0px;
   span {
     color: var(--cinza-cinza-800, #454d54);
 
@@ -261,6 +278,11 @@ watch(theresTimeAndUrl, () => {
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.32px;
+  }
+  &.dark {
+    p {
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+    }
   }
 }
 </style>
