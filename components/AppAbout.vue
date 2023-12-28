@@ -20,7 +20,7 @@
         />
         <span
           v-else
-          class="info"
+          class="about-description"
           :contenteditable="isEditingAndCanEdit"
           :data-placeholder="
             textPlaceholder ?? $t('pages.courses.about.placeholder')
@@ -118,7 +118,7 @@ span[contenteditable='true']:empty::before {
   color: #aaa;
 }
 
-.info {
+.about-description {
   text-align: justify;
   text-justify: inter-word;
   align-self: stretch;
@@ -126,6 +126,7 @@ span[contenteditable='true']:empty::before {
   font-size: 16px;
   font-weight: 400;
   line-height: 22px;
+  overflow-wrap: break-word;
 
   &:focus {
     outline: none;

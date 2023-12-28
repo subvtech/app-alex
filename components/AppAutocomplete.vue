@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits(['update:model-value']);
 const props = defineProps({
   placeholder: {
     type: String,
@@ -38,11 +39,12 @@ const handleInput = (e) => {
   if (e.target.value.length > 1)
     selectedTag.value = { text: e.target.value } as Tag;
 
+  emit('update:model-value', e.target.value);
 };
 
 const populateSelectedTags = (newValue) => {
   if (!newValue) return;
-
+ 
   if (!selectedTag.value && newValue.id) {
     props.updateItems(newValue);
   } else if (
@@ -52,6 +54,7 @@ const populateSelectedTags = (newValue) => {
   ) {
     props.updateItems(selectedTag.value, true);
   }
+
   selectedTag.value = null;
 };
 </script>

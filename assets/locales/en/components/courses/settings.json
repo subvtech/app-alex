@@ -51,7 +51,8 @@
     "label": "Enter the word:",
     "placeholder": "Enter the word to confirm",
     "word": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "match": "It doesn't match with the Delete"
   },
   "invite": {
     "title": "Invitation Settings",

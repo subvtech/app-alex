@@ -50,18 +50,16 @@ export const useUpdateStrapi = () => {
         populate: ['learningplan.tasks'],
       })
     ).data;
-    console.log({ learningPlanMembers });
     const learningPlans = learningPlanMembers.length;
 
     const tasks = learningPlanMembers.reduce((count, item) => {
       return (item.attributes as any).learningplan.data.attributes.tasks.data
         .length;
     }, 0);
-    console.log(tasks);
+
     user.tasks = tasks;
     user.learningPlans = learningPlans;
     user.canEdit = canEdit;
-    console.log(user);
     Object.assign(userStore, user);
 
     messageStore.setMessage(message ?? 'done', 'green', show);

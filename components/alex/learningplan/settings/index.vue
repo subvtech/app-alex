@@ -2,14 +2,18 @@
   <alex-custom-card
     :title="$t('components.courses.settings.title')"
     :show-icon="false"
+    :align-content="'align-center'"
+
   >
     <template #content>
-      <div class="d-flex flex-column w-100 gap-6 justify-center">
+      <div class="d-flex flex-column  w-100 gap-6 justify-center w-201">
         <alex-learningplan-settings-banner
           :cover="coverImage"
           :learning-plan-id="learningPlan.id"
-          @update="(data) => emit('update', data)"
+          @update="uploadCoverImage"
+          @delete="removeCoverImage"
           outline
+          full-width
         />
         <alex-learningplan-settings-general
           :title="learningPlan.title"
@@ -19,6 +23,7 @@
           :learning-plan-id="learningPlan.id"
           @update="(data) => emit('update', data)"
           outline
+          full-width
         />
         <alex-learningplan-meetings
           can-edit
@@ -40,6 +45,7 @@
         />
         <alex-learningplan-settings-visibility
           :isHidden="learningPlan.hidden"
+          @update="updateVisibility"
           outline
         />
         <alex-learningplan-settings-delete outline />
@@ -50,7 +56,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 
-import { useField } from 'vee-validate';
 
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
@@ -59,6 +64,8 @@ import { InvitationLinkType } from '../Invites.vue';
 
 const { t } = useI18n();
 const { find, update } = useStrapi();
+const { setMessage } = useMessageStore();
+const { uploadImage, removeImage } = useUploadedImage();
 
 const props = defineProps({
   learningPlan: {
@@ -85,8 +92,34 @@ const coverImage = ref<BannerImageType | undefined>(
 );
 
 const emit = defineEmits(['update']);
+
+const updateVisibility = async (data) => {
+  await update('learningplans', props.learningPlan.id, { ...data });
+  setMessage(t('components.courses.settings.visibility.update'), 'green', true);
+};
+
+async function uploadCoverImage(event: any) {
+  const newImage = await uploadImage(event);
+  coverImage.value = { url: newImage[0].url, id: newImage[0].id };
+
+  await update('learningplans', props.learningPlan.id, {
+    cover_image: coverImage.value.id,
+  });
+  emit('update', t('components.courses.settings.cover.update'));
+}
+
+async function removeCoverImage() {
+  if(!coverImage.value) return;
+  await removeImage(coverImage.value.id);
+  coverImage.value = undefined;
+  emit('update', t('components.courses.settings.cover.update'));
+}
 </script>
 <style scoped lang="scss">
+.w-201{
+  max-width: 804px;
+}
+
 .container {
   display: flex;
 }
@@ -165,21 +198,7 @@ p {
   font-family: Sen;
 }
 
-.header-h4 {
-  color: var(--cinza-cinza-800, #454d54);
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.2px;
-}
-.header-h5 {
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.36px;
-}
+
 .body-p3 {
   font-size: 14px;
   font-style: normal;
@@ -209,14 +228,7 @@ p {
   border: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
-.body-p1 {
-  font-size: 16px !important;
-  font-style: normal !important;
-  font-weight: 400 !important;
-  line-height: 135%;
-  letter-spacing: 0.32px;
-  color: var(--cinza-cinza-800, #454d54) !important;
-}
+
 .button {
   text-transform: none;
 }
