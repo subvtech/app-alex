@@ -111,13 +111,17 @@ const frequencyText = computed(() => {
     case 0: // once
       return t(`components.courses.meeting.single.${dayOfTheWeek}`);
     case 1:
-      return t(`components.courses.meeting.every.${dayOfTheWeek}`);
+      return t(`components.courses.meeting.everyday`);
     case 14:
       return t('components.courses.meeting.biweekly', {
         day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
       });
     case 30:
       return t('components.courses.meeting.monthly', {
+        day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
+      });
+    case 7:
+      return t('components.courses.meeting.weekly', {
         day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
       });
     default:
