@@ -16,5 +16,11 @@
   },
   "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
   "noData": "Nenhum {object} encontrado!",
-  "participant": "participante"
+  "participant": "participante",
+  "participants": "participantes",
+  "noOneResponsible": "Nenhum responsável",
+  "removeParticipant": "Remover participante",
+  "removeGroup": "Excluir grupo",
+  "editGroup": "Editar grupo",
+  "sendMessage": "Enviar mensagem"
 }

@@ -26,6 +26,7 @@
                 v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                 icon="mdi-dots-vertical"
                 class="options"
+                size="small"
               />
             </template>
           </v-tooltip>
@@ -49,16 +50,13 @@
       <div class="text-center">
         <p class="text-body-2 text-gray-800">{{ name }}</p>
         <p class="text-body-3 text-gray-600">{{ email }}</p>
-        <p v-if="role" class="text-body-3 text-gray-600">
-          {{ mapRoles[role] }}
-        </p>
       </div>
       <alex-custom-button
         prepend-icon="mdi-message-text-outline"
         variant="tertiary"
         @click="$emit('sendMessage')"
       >
-        Enviar mensagem
+        {{ $t('pages.classes.sendMessage') }}
       </alex-custom-button>
     </div>
   </v-card>
@@ -76,22 +74,18 @@ const emit = defineEmits(['open', 'sendMessage', 'delete']);
 withDefaults(defineProps<LearningMemberProps>(), {
   avatarImage: undefined,
   coverImage: undefined,
+  role: 'student',
 });
-// const { t } = useI18n();
+const { t } = useI18n();
 const showOptions = ref(false);
 const items = [
   {
-    text: 'Remover participante',
+    text: t('pages.classes.removeParticipant'),
     icon: 'mdi-trash-can-outline',
     onClick: () => emit('delete'),
     warning: true,
   },
 ];
-
-const mapRoles = {
-  student: 'Aluno',
-  partner: 'Parceiro',
-};
 </script>
 
 <style lang="scss" scoped>
