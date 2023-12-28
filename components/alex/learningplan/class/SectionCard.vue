@@ -26,7 +26,11 @@
               class="max-width-320"
             />
           </v-col>
-          <alex-custom-button :prepend-icon="actionIcon" size="large">
+          <alex-custom-button
+            v-if="showAction"
+            :prepend-icon="actionIcon"
+            size="large"
+          >
             {{ actionText }}
             <alex-custom-dialog
               v-model="openDialog"
@@ -37,13 +41,16 @@
               <template #footer>
                 <alex-custom-dialog-footer
                   no-secondary-button
+                  :main-button-text="dialogActionText"
+                  :main-button-loading="dialogActionLoading"
+                  :main-button-disabled="dialogActionDisabled"
                   @on-main-action="emit('action')"
                 />
               </template>
             </alex-custom-dialog>
           </alex-custom-button>
         </v-row>
-        <v-row v-if="showEmptyState" dense align="center" justify="center">
+        <v-row v-if="!items.length" dense align="center" justify="center">
           <div class="d-flex flex-column align-center ga-6">
             <v-img
               :src="emptyStateImage"
@@ -110,6 +117,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showAction: {
+    type: Boolean,
+    default: true,
+  },
   items: {
     type: Array,
     default: () => [],
@@ -121,10 +132,6 @@ const props = defineProps({
   itemsPerPage: {
     type: Number,
     default: 12,
-  },
-  showEmptyState: {
-    type: Boolean,
-    default: false,
   },
   emptyStateImage: {
     type: String,
@@ -157,6 +164,18 @@ const props = defineProps({
   actionIcon: {
     type: String,
     default: '',
+  },
+  dialogActionText: {
+    type: String,
+    default: '',
+  },
+  dialogActionLoading: {
+    type: Boolean,
+    default: false,
+  },
+  dialogActionDisabled: {
+    type: Boolean,
+    default: false,
   },
   coloredBackground: {
     type: Boolean,

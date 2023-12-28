@@ -35,6 +35,7 @@
           v-if="status === 'pending'"
           icon="mdi-cached"
           variant="text"
+          :loading="loadingRefresh"
           @click="$emit('refresh')"
         />
 
@@ -42,6 +43,7 @@
           icon="mdi-trash-can-outline"
           variant="text"
           color="error-0"
+          :loading="loadingDelete"
           @click="$emit('delete')"
         />
       </template>
@@ -66,6 +68,8 @@ interface AlexListItemUser {
     image?: string;
   };
   noSelect?: boolean;
+  loadingDelete?: boolean;
+  loadingRefresh?: boolean;
   status?: 'readyToSend' | 'pending' | 'participating';
 }
 
@@ -76,6 +80,8 @@ const props = withDefaults(defineProps<AlexListItemUser>(), {
   noDelete: false,
   status: 'readyToSend',
   noReload: false,
+  loadingDelete: false,
+  loadingRefresh: false,
 });
 
 const initials = computed(() => {

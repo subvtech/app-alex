@@ -15,6 +15,10 @@
       action-icon="mdi-email-outline"
       dialog-title="Convites do Curso"
       :filter-keys="['user.fullname', 'email']"
+      :show-action="learningPlanStore.userIsFacilitator"
+      dialog-action-text="Enviar convites"
+      :dialog-action-loading="sendingInvites"
+      :dialog-action-disabled="!usersToInvite.length"
       @action="onClickSendInvites"
     >
       <template #item="{ item }">
@@ -23,28 +27,38 @@
           :email="item.email"
           :avatar-image="item?.user?.avatar?.url"
           :cover-image="item?.user?.cover"
+          :role="item?.role"
           @delete="() => onDeleteParticipant(item.id)"
         />
       </template>
       <template #dialog-content>
         <alex-inputs-users-autocomplete
-          v-model="readySendUsers"
-          name="readySendUsers"
+          v-model="usersToInvite"
+          name="usersToInvite"
           class="w-100"
+          :ignore-user-ids="ignoreUserIds"
+          :ignore-emails="ignoreUserEmails"
           :label="$t('components.learningPlan.dialogs.whoParticipate')"
           :placeholder="$t('components.learningPlan.dialogs.searchMember')"
         />
-        <!-- <alex-custom-list-item-user
+        <p>Convites pendentes</p>
+        <alex-custom-list-item-user
           v-for="(member, i) in learningPlanStore.pendingMembers"
           :key="`pending-member-${i}`"
           :user="{
             name: member.user?.fullname,
             email: member.email,
-            image: member.user?.avatar,
+            image: member.user?.avatar?.url,
           }"
           no-select
           status="pending"
-        /> -->
+          :loading-delete="removingMember && removingMemberId === member.id"
+          :loading-refresh="
+            resendingInviteMember && resendingInviteMemberId === member.id
+          "
+          @delete="onDeleteParticipant(member.id)"
+          @refresh="onResendInvite(member)"
+        />
       </template>
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
@@ -72,30 +86,92 @@ const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const searchMembers = ref('');
 const searchGroups = ref('');
-const readySendUsers = ref([]);
+const usersToInvite = ref([]);
 const learningPlanStore = useLearningPlanStore();
+const route = useRoute();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const sendingInvites = ref(false);
+const removingMember = ref(false);
+const removingMemberId = ref(0);
 
-function onClickSendInvites() {
-  console.log('onClickSendInvites');
+const resendingInviteMember = ref(false);
+const resendingInviteMemberId = ref(0);
+
+async function onClickSendInvites() {
+  if (!usersToInvite.value.length) {
+    return;
+  }
+
+  try {
+    sendingInvites.value = true;
+
+    await strapi.update<LearningPlanSimple>(
+      'learningplans',
+      learningPlanId.value,
+      {
+        members: usersToInvite.value,
+      },
+    );
+
+    usersToInvite.value = [];
+
+    await learningPlanStore.loadLearningPlan(learningPlanId.value);
+  } catch (error) {
+    console.log(error);
+    setMessage('Erro ao enviar convites!', 'red', true);
+  } finally {
+    sendingInvites.value = false;
+  }
 }
 
 function onCreateGroup() {
   console.log('onCreateGroup');
 }
-// Está listando, apagando e atualizando após apagar, falta criar e arrumar o bug do input. Além do i18
-async function onDeleteParticipant(id: number) {
-  const response = await strapi.delete('learning-plan-members', id);
-  if (learningPlanStore.learningPlan?.members && response.data.id) {
-    learningPlanStore.learningPlan.members =
-      learningPlanStore.learningPlan.members.filter(
-        (member) => member.id !== id,
-      );
-    // falta i18
-    setMessage('Usuário removido com sucesso!', 'green', true);
-    return;
+
+const ignoreUserIds = computed(() => {
+  return learningPlanStore.learningPlan?.members?.map((m) => m.user?.id) || [];
+});
+
+const ignoreUserEmails = computed(() => {
+  return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
+});
+
+async function onResendInvite(member: LearningPlanMemberSimple) {
+  try {
+    resendingInviteMemberId.value = member.id;
+    resendingInviteMember.value = true;
+
+    const data = {
+      learningplan: learningPlanId.value,
+      duration: 259200,
+      emails_to_send: member.email,
+      role: member.role,
+    };
+
+    await strapi.create('invitation-links', data);
+    setMessage('Convite reenviado com sucesso!', 'green', true);
+  } catch (error) {
+    setMessage('Não foi possivel reenviar o convite!', 'red', true);
+  } finally {
+    resendingInviteMember.value = false;
   }
-  // falta i18
-  setMessage('Erro ao remover usuário!', 'red', true);
+}
+
+async function onDeleteParticipant(id: number) {
+  try {
+    removingMember.value = true;
+    removingMemberId.value = id;
+
+    const response = await strapi.delete('learning-plan-members', id);
+    if (response.data.id) {
+      await learningPlanStore.loadLearningPlan(learningPlanId.value);
+      setMessage('Participante removido com sucesso!', 'green', true);
+    }
+  } catch (error) {
+    setMessage('Erro ao remover participante!', 'red', true);
+  } finally {
+    removingMember.value = false;
+  }
 }
 </script>
 <style scoped lang="scss"></style>

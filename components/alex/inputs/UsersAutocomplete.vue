@@ -44,12 +44,15 @@
 </template>
 
 <script setup lang="ts">
+import { verify } from 'crypto';
 import { useField } from 'vee-validate';
 type User = { id?: string; email: string; fullname?: string; local?: boolean };
 
 interface AutoCompleteUsersProps {
   name: string;
   modelValue: User[];
+  ignoreUserIds?: number[];
+  ignoreEmails?: string[];
 }
 
 const props = defineProps<AutoCompleteUsersProps>();
@@ -99,7 +102,10 @@ const filteredItems = computed(() => {
 });
 
 const updateModelValue = () => {
-  if (selectedUser.value) {
+  if (
+    selectedUser.value &&
+    !selectedUsers.value.find((v) => v.email === selectedUser.value?.email)
+  ) {
     selectedUsers.value.push(selectedUser.value);
     cleanInput();
   }
@@ -113,6 +119,7 @@ useOnStopTyping(search, async () => {
         { email: { $containsi: search.value } },
         { fullname: { $containsi: search.value } },
       ],
+      id: { $notIn: props.ignoreUserIds || [] },
     },
   })) as unknown as User[];
   if (registeredFields.length) {
@@ -141,7 +148,11 @@ watch(
   () => {
     const isValidEmail = emailRegex.test(search.value);
     const local = items.value.filter((item) => item?.local);
-    if (search.value.length && isValidEmail) {
+    if (
+      search.value.length &&
+      isValidEmail &&
+      !(props.ignoreEmails || []).includes(search.value)
+    ) {
       if (!local.length) {
         items.value = [{ email: search.value, local: true }, ...items.value];
       }

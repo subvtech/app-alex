@@ -7,9 +7,11 @@ import {
   MemberStatus,
   MemberRoles,
 } from '@/models/simple/learningPlanMemberSimple.model';
-import { InvitationLink } from '@/models/simple/InvitationLinkSimple.model';
+import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
+
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
+  const user = useStrapiUser<User>();
 
   const { setMessage } = useMessageStore();
   const i18n = useI18n();
@@ -58,10 +60,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     }
   }
 
-  const owner = computed<LearningPlanMemberSimple>(() => {
+  const facilitator = computed<LearningPlanMemberSimple | undefined>(() => {
     return learningPlan.value?.members.find(
-      (m: LearningPlanMemberSimple) => m.role === 'facilitator',
+      (m: LearningPlanMemberSimple) => m.role === MemberRoles.FACILITATOR,
     );
+  });
+
+  const userIsFacilitator = computed(() => {
+    return facilitator.value?.user?.id === user.value.id;
   });
 
   const startDateFormated = computed(() => {
@@ -76,25 +82,27 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     let activeLink;
 
     if (learningPlan.value?.invitation_links) {
-      learningPlan.value.invitation_links?.forEach((link: InvitationLink) => {
-        if (link.is_expired) return;
-        const expirationDate = new Date(link.expires_at);
+      learningPlan.value.invitation_links?.forEach(
+        (link: InvitationLinkSimple) => {
+          if (link.is_expired) return;
+          const expirationDate = new Date(link.expires_at);
 
-        if (
-          link.role === 'student' &&
-          link.emails_to_send === null &&
-          expirationDate.getTime() > new Date().getTime()
-        ) {
-          const differenceBetweenLinks = activeLink
-            ? expirationDate.getTime() -
-              new Date(activeLink.expires_at).getTime()
-            : 1;
+          if (
+            link.role === 'student' &&
+            link.emails_to_send === null &&
+            expirationDate.getTime() > new Date().getTime()
+          ) {
+            const differenceBetweenLinks = activeLink
+              ? expirationDate.getTime() -
+                new Date(activeLink.expires_at).getTime()
+              : 1;
 
-          if (!activeLink || differenceBetweenLinks > 0) {
-            activeLink = link;
+            if (!activeLink || differenceBetweenLinks > 0) {
+              activeLink = link;
+            }
           }
-        }
-      });
+        },
+      );
     }
 
     return activeLink;
@@ -123,7 +131,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   return {
     learningPlan,
     loadLearningPlan,
-    owner,
+    facilitator,
     startDateFormated,
     endDateFormated,
     invitationLink,
@@ -131,5 +139,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     loading,
     pendingMembers,
     activeMembers,
+    userIsFacilitator,
   };
 });

@@ -49,6 +49,9 @@
       <div class="text-center">
         <p class="text-body-2 text-gray-800">{{ name }}</p>
         <p class="text-body-3 text-gray-600">{{ email }}</p>
+        <p v-if="role" class="text-body-3 text-gray-600">
+          {{ mapRoles[role] }}
+        </p>
       </div>
       <alex-custom-button
         prepend-icon="mdi-message-text-outline"
@@ -67,6 +70,7 @@ interface LearningMemberProps {
   email: string;
   coverImage?: string;
   avatarImage?: string;
+  role?: string;
 }
 const emit = defineEmits(['open', 'sendMessage', 'delete']);
 withDefaults(defineProps<LearningMemberProps>(), {
@@ -83,6 +87,11 @@ const items = [
     warning: true,
   },
 ];
+
+const mapRoles = {
+  student: 'Aluno',
+  partner: 'Parceiro',
+};
 </script>
 
 <style lang="scss" scoped>

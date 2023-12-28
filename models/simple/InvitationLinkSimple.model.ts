@@ -3,7 +3,7 @@ const InvitationLinkRole = {
   PARTNER: 'partner',
 } as const;
 
-export interface InvitationLink {
+export interface InvitationLinkSimple {
   role: ValueOf<typeof InvitationLinkRole>;
   emails_to_send: string;
   hash: string;

@@ -29,6 +29,8 @@
           size="large"
           variant="primary"
           :text="mainButtonText"
+          :loading="mainButtonLoading"
+          :disabled="mainButtonDisabled"
           @click="() => emits('onMainAction')"
         />
       </v-col>
@@ -42,12 +44,16 @@ interface HeaderProps {
   secondaryButtonText?: string;
   noMainButton?: boolean;
   noSecondaryButton?: boolean;
+  mainButtonLoading?: boolean;
+  mainButtonDisabled?: boolean;
 }
 withDefaults(defineProps<HeaderProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
   noMainButton: false,
   noSecondaryButton: false,
+  mainButtonLoading: false,
+  mainButtonDisabled: false,
 });
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
