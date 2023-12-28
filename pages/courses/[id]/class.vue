@@ -75,9 +75,76 @@
       action-text="Criar grupos"
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
+      dialog-action-text="Criar Grupo"
       @action="onCreateGroup"
     >
-      <template #dialog-content> content </template>
+      <template #dialog-content>
+        <alex-inputs-text-field
+          label="Qual o nome do Grupo?*"
+          name="group_name"
+          density="comfortable"
+        />
+        <alex-inputs-autocomplete
+          v-model="selectedInChargeGroupMember"
+          label="Quem será responsável pelo grupo?"
+          name="in_charge"
+          variant="outlined"
+          density="comfortable"
+          item-title="user.fullname"
+          :custom-filter="searchGroupMembers"
+          :items="learningPlanStore.activeMembers"
+          return-object
+        >
+          <template #item="{ props: propsItem, item, index }">
+            <alex-custom-list-item-user
+              v-bind="propsItem"
+              :key="index"
+              :user="{
+                email: item.raw.user.email,
+                name: item.raw.user.fullname,
+              }"
+              no-delete
+            />
+          </template>
+        </alex-inputs-autocomplete>
+        <alex-inputs-autocomplete
+          v-model="selectedGroupMembers"
+          label="Quem será responsável pelo grupo?"
+          name="in_charge"
+          variant="outlined"
+          density="comfortable"
+          :items="membersToCreateGroup"
+          :custom-filter="searchGroupMembers"
+          return-object
+          multiple
+        >
+          <template #selection>
+            <span></span>
+          </template>
+          <template #item="{ props: propsItem, item, index }">
+            <alex-custom-list-item-user
+              v-bind="propsItem"
+              :key="index"
+              :user="{
+                email: item.raw.user.email,
+                name: item.raw.user.fullname,
+                image: item.raw.user?.avatar?.url,
+              }"
+              no-delete
+            />
+          </template>
+        </alex-inputs-autocomplete>
+        <alex-custom-list-item-user
+          v-for="(member, i) in groupMembers"
+          :key="`group-member-${i}`"
+          :user="{
+            email: member?.user?.email || '',
+            name: member?.user?.fullname || '',
+            image: member?.user?.avatar?.url,
+          }"
+          no-delete
+        />
+      </template>
     </alex-learningplan-class-section-card>
   </div>
 </template>
@@ -96,6 +163,15 @@ const removingMemberId = ref(0);
 
 const resendingInviteMember = ref(false);
 const resendingInviteMemberId = ref(0);
+
+const selectedInChargeGroupMember = ref<LearningPlanMemberSimple>();
+const selectedGroupMembers = ref<LearningPlanMemberSimple[]>([]);
+
+watch(selectedInChargeGroupMember, () => {
+  selectedGroupMembers.value = selectedGroupMembers.value.filter(
+    (m) => m.id !== selectedInChargeGroupMember.value?.id,
+  );
+});
 
 async function onClickSendInvites() {
   if (!usersToInvite.value.length) {
@@ -136,6 +212,20 @@ const ignoreUserEmails = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
 });
 
+const membersToCreateGroup = computed<LearningPlanMemberSimple[]>(() => {
+  return (
+    learningPlanStore.activeMembers?.filter(
+      (member) => member.id !== selectedInChargeGroupMember.value?.id,
+    ) || []
+  );
+});
+
+const groupMembers = computed<LearningPlanMemberSimple[]>(() => {
+  return selectedInChargeGroupMember.value
+    ? [selectedInChargeGroupMember.value, ...selectedGroupMembers.value]
+    : selectedGroupMembers.value;
+});
+
 async function onResendInvite(member: LearningPlanMemberSimple) {
   try {
     resendingInviteMemberId.value = member.id;
@@ -172,6 +262,13 @@ async function onDeleteParticipant(id: number) {
   } finally {
     removingMember.value = false;
   }
+}
+
+function searchGroupMembers(_itemTitle, queryText, item) {
+  return (
+    item.raw.user.fullname.toLowerCase().includes(queryText) ||
+    item.raw.user.email.toLowerCase().includes(queryText)
+  );
 }
 </script>
 <style scoped lang="scss"></style>
