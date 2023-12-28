@@ -260,7 +260,7 @@ export const useFormRules = () => {
       .trim(),
     leader: yup.mixed().required(i18n.t('pages.classes.responsibleIsRequired')),
     members: yup
-      .mixed()
+      .array()
       .required(i18n.t('pages.classes.participantsIsRequired')),
   };
 

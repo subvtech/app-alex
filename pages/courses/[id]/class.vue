@@ -77,6 +77,8 @@
       colored-background
       dialog-action-text="Criar Grupo"
       dialog-title="Criar Grupo"
+      :dialog-action-loading="creatingGroup"
+      :dialog-action-disabled="!formAddGroup.meta.value.valid"
       @action="onCreateGroup"
     >
       <template #item="{ item }">
@@ -128,6 +130,7 @@
             name="members"
             variant="outlined"
             density="comfortable"
+            item-title="user.fullname"
             :items="membersToCreateGroup"
             :custom-filter="searchGroupMembers"
             return-object
@@ -154,7 +157,7 @@
             :user="{
               email: member?.user?.email || '',
               name: member?.user?.fullname || '',
-              image: member?.user?.avatar?.url,
+              image: member?.user?.avatar?.url || '',
             }"
             remove-selection
           />
@@ -176,8 +179,35 @@ const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const sendingInvites = ref(false);
+const creatingGroup = ref(false);
 const removingMember = ref(false);
 const removingMemberId = ref(0);
+const groupTitle = ref('');
+
+const headerStore = usePageHeaderStore();
+
+headerStore.title = 'Meus Cursos';
+headerStore.items = [
+  {
+    title: 'Home',
+    to: '/',
+  },
+  {
+    title: 'Meus Curos',
+    to: '/courses/me',
+  },
+  {
+    title: learningPlanStore.learningPlan
+      ? learningPlanStore.learningPlan.title
+      : 'Curso',
+    to: `/courses/${learningPlanId.value}`,
+  },
+  {
+    title: 'Turma',
+  },
+];
+headerStore.hasMainButton = true;
+headerStore.showHeader = true;
 
 const resendingInviteMember = ref(false);
 const resendingInviteMemberId = ref(0);
@@ -209,9 +239,9 @@ async function onClickSendInvites() {
 
     usersToInvite.value = [];
 
+    setMessage('Convites enviados com sucesso!', 'green', true);
     await learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (error) {
-    console.log(error);
     setMessage('Erro ao enviar convites!', 'red', true);
   } finally {
     sendingInvites.value = false;
@@ -220,8 +250,37 @@ async function onClickSendInvites() {
 
 async function onCreateGroup() {
   const { valid } = await formAddGroup.validate();
-  if (valid) {
-    console.log('onCreateGroup');
+  console.log(selectedGroupMembers);
+  if (!valid) {
+    return;
+  }
+  try {
+    creatingGroup.value = true;
+
+    const members = groupMembers.value.map(
+      (member: LearningPlanMemberSimple) => {
+        const role =
+          member.id === selectedInChargeGroupMember.value?.id
+            ? 'in_charge'
+            : 'standard';
+        return { role, member_id: member.id };
+      },
+    );
+
+    const data = {
+      title: groupTitle.value,
+      learningplan: learningPlanId.value,
+      group_members: members,
+    };
+
+    await strapi.create('learning-plan-groupss', data);
+    setMessage('Grupo criado com sucesso!', 'green', true);
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
+    formAddGroup.resetForm();
+  } catch (_) {
+    setMessage('Erro ao criar grupo!', 'red', true);
+  } finally {
+    creatingGroup.value = false;
   }
 }
 

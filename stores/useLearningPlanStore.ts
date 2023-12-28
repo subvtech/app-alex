@@ -28,11 +28,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       verb: true,
     },
     groups: {
-      group_members: {
-        student_member: {
-          user: true,
-        },
-      },
+      populate: ['group_members.student_member.user.avatar'],
     },
     tags: true,
     schedules: true,
