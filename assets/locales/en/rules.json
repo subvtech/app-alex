@@ -51,11 +51,6 @@
     "required": "Confirm Password is required",
     "matchError": "The passwords do no match"
   },
-  "title": {
-    "required": "Name is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
-  },
   "slug": {
     "required": "Acronym/Name is required",
     "min": "At least {min} characters long",
@@ -83,6 +78,7 @@
   "endDate": {
     "required": "End date is required",
     "min": "Min accepted date: {min}",
+    "max": "Max accepted date: {max}",
     "beforeStartDate": "End date can't be before start date"
   },
   "class": {
@@ -104,7 +100,8 @@
       "required": "Start time is required"
     },
     "endHour": {
-      "required": "End time is required"
+      "required": "End time is required",
+      "beforeStartHour": "End hour must be after start Hour"
     },
     "copy": {
       "success": "Text copied to clipboard",
