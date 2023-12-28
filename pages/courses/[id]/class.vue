@@ -82,7 +82,7 @@
       <template #item="{ item }">
         <alex-learningplan-class-group-card
           :title="item?.title"
-          :members="[]"
+          :members="getGroupMembersInfo(item.group_members) as any"
           @delete="() => onDeleteParticipant(item.id)"
         />
       </template>
@@ -198,7 +198,7 @@ headerStore.items = [
     title: 'Turma',
   },
 ];
-headerStore.hasMainButton = true;
+
 headerStore.showHeader = true;
 
 const resendingInviteMember = ref(false);
@@ -260,7 +260,7 @@ async function onCreateGroup() {
       group_members: members,
     };
 
-    await strapi.create('learning-plan-groupss', data);
+    await strapi.create('learnin-plan-groups', data);
     setMessage('Grupo criado com sucesso!', 'green', true);
     learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
@@ -285,6 +285,16 @@ const membersToCreateGroup = computed<LearningPlanMemberSimple[]>(() => {
     ) || []
   );
 });
+
+function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
+  return groupMembers.map((groupMember) => {
+    return {
+      name: groupMember.student_member.user.fullname,
+      image: groupMember.student_member.user.avatar,
+      role: groupMember.role,
+    };
+  });
+}
 
 const groupMembers = computed<LearningPlanMemberSimple[]>(() => {
   return selectedInChargeGroupMember.value

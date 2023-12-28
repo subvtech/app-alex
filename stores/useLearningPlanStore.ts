@@ -25,14 +25,10 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     media: true,
     invitation_links: true,
     learning_goals: {
-      verb: true,
+      populate: ['verb'],
     },
     groups: {
-      group_members: {
-        student_member: {
-          user: true,
-        },
-      },
+      populate: ['group_members.student_member.user.avatar'],
     },
     tags: true,
     schedules: true,
