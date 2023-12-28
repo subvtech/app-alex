@@ -1,32 +1,42 @@
 <template>
   <div class="wrapper d-flex flex-column">
-    <header class="d-flex justify-space-between flex-column flex-sm-row mb-2">
-      <alex-custom-breadcrumbs
-        :title="$t('pages.classes.breadcrumbs.myCourses')"
-        :items="breadcrumbs"
-      />
-      <alex-custom-button
-        v-if="professorMode"
-        prepend-icon="mdi-plus"
-        size="large"
-        class="text-body-4"
-        >{{ $t('pages.classes.newCourse') }}</alex-custom-button
-      >
-    </header>
+    <alex-custom-header
+      class="mb-6"
+      :title="$t('pages.classes.breadcrumbs.myCourses')"
+      :items="breadcrumbs"
+      :has-main-button="professorMode"
+      :main-button-text="$t('pages.classes.newCourse')"
+      main-button-icon="mdi-plus"
+      no-back-arrow
+      @main-action="() => (createCourseDialog = true)"
+    />
+    <alex-learningplan-dialogs-create-learningplan
+      v-model="createCourseDialog"
+      @submit="getCourses()"
+    />
     <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
       <div
         v-if="courses.length == 0"
         style="flex: 1"
         class="d-flex align-center justify-center flex-column"
       >
-        <img
-          class="emptyProjects-img"
-          src="@/assets/svg/EmptyProjects.svg"
-          alt="Empty Projects"
-        />
-        <p class="text-h3 text-gray-600">
-          {{ $t('pages.classes.emptyStateText') }}
-        </p>
+        <v-progress-circular
+          v-if="isLoading"
+          color="accent"
+          indeterminate
+          :size="100"
+          :width="6"
+        ></v-progress-circular>
+        <div v-else>
+          <img
+            class="emptyProjects-img"
+            src="@/assets/svg/EmptyProjects.svg"
+            alt="Empty Projects"
+          />
+          <p class="text-h3 text-gray-600">
+            {{ $t('pages.classes.emptyStateText') }}
+          </p>
+        </div>
       </div>
       <div v-else class="d-flex w-100 flex-column h-100" style="flex: 1">
         <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
@@ -38,11 +48,9 @@
             variant="outlined"
             hide-details
             class="w-50"
-            style="min-width: 160px"
+            style="min-width: 160px; max-width: 320px"
             density="compact"
-          >
-            ></alex-inputs-text-field
-          >
+          />
           <div>
             <v-tooltip
               :text="$t('pages.classes.viewModeTooltip')"
@@ -96,17 +104,20 @@
             'end_date',
             'tags',
           ]"
-          class="d-flex flex-wrap align-content-space-between"
-          style="flex: 1"
+          class="d-flex flex-wrap"
+          style="flex: 1; position: relative"
         >
           <template #default="{ items }">
-            <div v-if="coursesView === 'grid'" class="d-flex flex-wrap ga-4">
+            <div
+              v-if="coursesView === 'grid'"
+              class="d-flex ga-6 grid-container flex-wrap w-100"
+            >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="flex-stretch"
+                class="w-100"
                 :title="course.raw.title"
                 :options="professorMode"
                 :description="course.raw.description"
@@ -122,7 +133,7 @@
                 :favorited="course.raw.favorited"
                 @favorite="changeItemFavorited(index)"
                 @toggle-visibility="changeItemVisibility(index, course.raw.id)"
-                @configurations="navigate(course.raw.id, 'configurations')"
+                @configurations="navigate(course.raw.id, 'settings')"
                 @open="navigate(course.raw.id, 'page')"
               />
             </div>
@@ -144,7 +155,9 @@
                   <td style="max-width: 596px">
                     <div class="d-flex align-center">
                       <img
-                        :src="(item as any).img"
+                        :src="
+                          (item as any).img || '/images/cover_image_course.svg'
+                        "
                         width="48"
                         height="36"
                         style="min-width: 48px; min-height: 36px"
@@ -199,7 +212,7 @@
           </template>
           <template #footer="{ pageCount, groupedItems }">
             <div
-              class="d-flex w-100 justify-space-between align-center pa-6 flex-column flex-sm-row ga-3 footer mt-6"
+              class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
             >
               <p class="text-body-3 text-gray-600">
                 {{ showingData(groupedItems) }}
@@ -222,18 +235,19 @@
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetLearningPlans } from '~/assets/queries';
 import { LearningPlan } from '@/models/learningPlan.model';
-const rounter = useRouter();
+const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
 const professorMode = ref(false);
+const isLoading = ref(false);
 const { t } = useI18n();
 const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
-
+const createCourseDialog = ref(false);
 interface courseItem {
-  id: number;
+  id?: number;
   description: string;
   facilitatorName?: string;
   facilitatorImage?: string;
@@ -241,7 +255,7 @@ interface courseItem {
   img?: string;
   institution?: string;
   tags?: string[];
-  start_date: string;
+  start_date?: string;
   end_date?: string;
   hidden: boolean;
   favorited: boolean;
@@ -249,8 +263,7 @@ interface courseItem {
 }
 
 const courses = ref<courseItem[]>([]);
-
-onBeforeMount(async () => {
+const getCourses = async () => {
   const { isProfessor, id } = useStrapiUser<User>().value;
   professorMode.value = isProfessor;
   if (professorMode.value) {
@@ -260,6 +273,7 @@ onBeforeMount(async () => {
       sortable: false,
     });
   }
+  isLoading.value = true;
   const { data } = await useAsyncData('learningPlans', () => {
     const params = { userId: id };
     return graphql<{
@@ -268,6 +282,9 @@ onBeforeMount(async () => {
       };
     }>(GetLearningPlans, params);
   });
+  if (!data.value?.data.learningplans.data) {
+    return;
+  }
   courses.value =
     data.value?.data.learningplans.data.map((plan): courseItem => {
       const { attributes } = plan;
@@ -275,13 +292,13 @@ onBeforeMount(async () => {
       const {
         title,
         description,
-        start_date,
-        end_date,
-        cover_image,
+        start_date: startDate,
+        end_date: endDate,
+        cover_image: coverImage,
         hidden,
         members,
         tags,
-        learning_structure,
+        learning_structure: learningStructure,
       } = attributes;
       const facilitatorName =
         members.data[0]?.attributes?.user.data.attributes.fullname;
@@ -291,16 +308,16 @@ onBeforeMount(async () => {
       const institution =
         members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
           ?.attributes?.name;
-      const img = cover_image?.data?.attributes?.url;
+      const img = coverImage?.data?.attributes?.url;
       const trails =
-        learning_structure?.data?.attributes?.trails.data.length || 0;
+        learningStructure?.data?.attributes?.trails.data.length || 0;
 
       return {
         id,
         title,
         description,
-        start_date,
-        end_date,
+        start_date: startDate,
+        end_date: endDate,
         img,
         hidden,
         facilitatorName,
@@ -311,7 +328,10 @@ onBeforeMount(async () => {
         favorited: false,
       };
     }) || [];
-});
+  isLoading.value = false;
+};
+// eslint-disable camelcase
+onBeforeMount(async () => await getCourses());
 
 interface Item {
   raw: courseItem;
@@ -334,6 +354,9 @@ const showingData = (groupedItems) => {
     to,
     total,
   });
+  if (to === 0) {
+    return t('pages.classes.noData');
+  }
   return message;
 };
 const breadcrumbs = [
@@ -344,7 +367,7 @@ const breadcrumbs = [
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/course',
+    href: '/courses/me',
     disabled: false,
   },
 ];
@@ -365,7 +388,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/${id}/configurations`,
+      link: `/course/${id}/settings`,
     },
   ];
 };
@@ -400,11 +423,14 @@ const changeViewMode = () => {
 };
 
 const changeItemVisibility = (index: number, id) => {
-  update('learningPlans', id, {
-    hidden: !courses.value[index].hidden,
-  }).then(() => {
+  courses.value[index].hidden = !courses.value[index].hidden;
+  try {
+    update('learningPlans', id, {
+      hidden: !courses.value[index].hidden,
+    });
+  } catch (error) {
     courses.value[index].hidden = !courses.value[index].hidden;
-  });
+  }
 };
 
 const changeItemFavorited = (index: number) => {
@@ -412,10 +438,10 @@ const changeItemFavorited = (index: number) => {
 };
 
 const navigate = (id: number, page) => {
-  if (page === 'configurations') {
-    rounter.push(`/course/${id}/configurations`);
+  if (page === 'settings') {
+    router.push(`/course/${id}/settings`);
   } else {
-    rounter.push(`/course/${id}`);
+    router.push(`/course/${id}`);
   }
 };
 </script>
@@ -458,17 +484,32 @@ const navigate = (id: number, page) => {
   min-height: calc(100vh - 130px);
 }
 
+.grid-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+}
+
 .flex-stretch {
-  flex: 1 !important;
-  flex-basis: fit-content;
+  box-sizing: border-box !important;
 }
 
 .footer {
   border-top: 1px #ebedef solid;
   max-height: 95px;
+  align-self: flex-end !important;
 }
 
 .hidden {
   opacity: 0.5;
+}
+
+@media (max-width: 1280px) {
+  .grid-container {
+    display: flex !important;
+  }
+  .flex-stretch {
+    flex: 1;
+    box-sizing: border-box !important;
+  }
 }
 </style>

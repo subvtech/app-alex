@@ -67,7 +67,6 @@
 </template>
 
 <script setup lang="ts">
-
 import {
   MeetingVariantType,
   MeetingPropsType,
@@ -146,7 +145,7 @@ const addMeeting = async (values: MeetingPropsType) => {
     name: 'name',
     learningplan: props.learningPlanId,
     startDate: meetingStartDate,
-    endDate: meetingEndDate, 
+    endDate: meetingEndDate,
   });
 
   myData.value.push({ ...values, id: result.data.id.toString() });
@@ -172,7 +171,7 @@ const updateMeeting = async (values) => {
         ...values,
         startDate: meetingStartDate,
         endDate: meetingEndDate,
-        learningplan: props.learningPlanId
+        learningplan: props.learningPlanId,
       };
     }
     return meeting;
@@ -206,6 +205,18 @@ watch(data, () => {
 </script>
 
 <style scoped lang="scss">
+.title {
+  color: var(--Cinza-Cinza-800, #454d54);
+
+  /* Header/H5 */
+  font-family: Sen;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.36px;
+}
+
 .bordered {
   border-radius: 8px;
   border: 1px solid var(--Cinza-Cinza-100, #ebedef);

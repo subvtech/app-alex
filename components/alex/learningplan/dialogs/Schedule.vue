@@ -164,3 +164,4 @@ watch(data, (value) => {
   }
 });
 </script>
+<style scoped lang="scss"></style>

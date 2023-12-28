@@ -109,52 +109,18 @@
       @display:settings="emit('display:settings')"
     />
 
-    <div
-      v-if="showMenu"
-      class="menu d-flex"
-      data-testid="menu"
-      style="z-index: 1"
-    >
-      <div
-        v-for="(link, index) in links"
-        class="cursor-pointer"
-        :class="selectedOption === index ? 'selected' : ''"
-        @click="emit('select:option', index)"
-      >
-        <span
-          class="font-weight-regular"
-          :key="index"
-          style="letter-spacing: 0.32px !important"
-        >
-          {{ link }}
-        </span>
-      </div>
-
-      <v-spacer />
-
-      <div
-        v-if="settingsMenu && showSettings"
-        class="d-flex align-center mr-4 mr-md-3 mr-sm-3 mr-xs-2"
-        data-testid="settings-menu"
-      >
-        <alex-custom-tooltip
-          :text="$t('components.card.settings')"
-          class="d-flex align-center cursor-pointer"
-        >
-          <template #content>
-            <v-icon
-              @click="emit('display:settings')"
-              class=""
-              color="#6E7A87"
-              >{{ settingsIcon }}</v-icon
-            >
-          </template>
-        </alex-custom-tooltip>
-      </div>
+    <div class="d-flex">
+      <alex-custom-tabs
+        v-if="showMenu"
+        v-model="bannerSelectedOption"
+        :tabs="links"
+        @update:modelValue="emit('select:option', bannerSelectedOption)"
+      />
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { TabType } from '@/components/alex/custom/Tabs.vue';
 const emit = defineEmits(['select:option', 'display:settings']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
@@ -320,7 +286,7 @@ const props = defineProps({
   },
 
   links: {
-    type: Array as PropType<string[]>,
+    type: Array as PropType<TabType[]>,
     default: [],
   },
   isProfessor: { type: Boolean, default: false },
@@ -331,9 +297,9 @@ const props = defineProps({
 const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
   toRefs(props);
 
-const cover = ref<BannerImageType | null | undefined>(
-  props.coverPicture,
-);
+const bannerSelectedOption = toRef(props.selectedOption);
+
+const cover = ref<BannerImageType | null | undefined>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {
   if (cover.value && props.imgFromStrapi) {
@@ -360,6 +326,10 @@ async function removeCoverPicture() {
 watch(coverPicture!, () => {
   if (coverPicture) cover.value = coverPicture.value;
   else cover.value = undefined;
+});
+
+watch(selectedOption, () => {
+  bannerSelectedOption.value = selectedOption.value;
 });
 </script>
 

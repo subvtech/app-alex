@@ -26,6 +26,7 @@
   "showCourseHint": "Makes the course public, allowing any user to find it through search.",
   "hideCourseTitle": "Hide Course (Private)",
   "hideCourseHint": "Makes the course private, ensuring only members can see the course.",
+  "courseVisibilityTitle": "Course Visibility",
 
   "update": "Course successfully updated",
   "cover": {
@@ -73,5 +74,23 @@
     "deleteLabel": "Enter the word:",
     "deletePlaceholder": "Enter the word to confirm",
     "deleteWord": "Delete"
+  },
+  "invite": {
+    "title": "Invitation Settings",
+    "label": "Link Invitation",
+    "link": "Invitation Link",
+    "linkDuration": "Link Duration",
+    "linkAddress": "Link Address",
+    "email": "Email Invitation",
+    "message": "Invitation Message",
+    "hint": "Message to be sent by email to the invited users.",
+    "tooltip": "Changes in the invite duration will not impact the remaining time for links that are already in use. To apply a new duration, a new invite link must be generated.",
+    "fiveMinutes": "5 minutes",
+    "fifteenMinutes": "15 minutes",
+    "thirtyMinutes": "30 minutes",
+    "oneHour": "1 hour",
+    "twoHours": "2 hours",
+    "eightHours": "8 hours",
+    "twentyFourHours": "24 hours"
   }
 }

@@ -12,7 +12,10 @@
       <div v-if="enableInvites" class="d-flex flex-column w-100">
         <div
           class="invite gap-6 justify-space-between"
-          :class="theresTimeAndUrl ? '' : 'disabled'"
+          :class="[
+            theresTimeAndUrl ? '' : 'disabled',
+            smaller ? 'smaller' : '',
+          ]"
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
             <template #content>
@@ -21,7 +24,7 @@
               </a>
             </template>
           </alex-custom-tooltip>
-          <span v-else>{{ $t("components.courses.invites.expired") }}</span>
+          <span v-else>{{ $t('components.courses.invites.expired') }}</span>
 
           <div class="d-flex align-center gap-1">
             <alex-custom-tooltip
@@ -52,13 +55,13 @@
           </div>
         </div>
         <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
-          <span>{{ $t("components.courses.invites.countdown") }}</span>
+          <span>{{ $t('components.courses.invites.countdown') }}</span>
           <p>{{ msToHHMMSS(remainingTime) }}</p>
         </div>
       </div>
       <div v-else class="d-flex justify-center w-100">
         <span class="desactivated">{{
-          $t("components.courses.invites.desactivated")
+          $t('components.courses.invites.desactivated')
         }}</span>
       </div>
     </template>
@@ -66,15 +69,25 @@
 </template>
 
 <script setup lang="ts">
+export type InvitationLinkType = {
+  id: number;
+  role: 'student' | 'facilitator';
+  hash: string;
+  emails_to_send: string | null;
+  expires_at: Date;
+  is_expired: boolean;
+};
+
 const { copyToClipboard } = useCopyText();
-const emit = defineEmits(["update:link", "link:expired"]);
+const emit = defineEmits(['update:link', 'link:expired']);
+
 const props = defineProps({
   enableInvites: {
     type: Boolean,
     default: false,
   },
   data: {
-    type: Object as PropType<any | null>,
+    type: Object as PropType<InvitationLinkType | null>,
     required: true,
   },
   duration: {
@@ -85,12 +98,16 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  smaller: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =
   useInvitationLink();
 
-const inviteId = ref(null);
+const inviteId = ref<number | null>(null);
 const url = toRef<string | null>(null);
 const remainingTime = toRef<number>(-5);
 
@@ -98,12 +115,12 @@ const updateLink = async () => {
   const result = await generateNewInvite(
     inviteId.value,
     props.duration,
-    props.courseId
+    props.courseId,
   );
-  
+
   url.value = generateUrl(result.data.attributes.hash);
   console.log({ updateLink: url.value });
-  emit("update:link", { url: url.value });
+  emit('update:link', { url: url.value });
   remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
 };
 
@@ -129,7 +146,7 @@ watch(remainingTime, () => {
 
 watch(theresTimeAndUrl, () => {
   if (theresTimeAndUrl.value) return;
-  emit("link:expired");
+  emit('link:expired');
 });
 </script>
 
@@ -161,7 +178,9 @@ watch(theresTimeAndUrl, () => {
   line-height: 135%; /* 21.6px */
   letter-spacing: 0.32px;
 }
-
+.smaller {
+  height: 44px !important;
+}
 .invite {
   display: flex;
   height: 52px;

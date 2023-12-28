@@ -28,6 +28,7 @@
     <div class="d-flex w-100 justify-space-evenly flex-column flex-sm-row">
       <div class="w-100">
         <p class="text-h5 text-center">Props do componente</p>
+
         <v-table variant="outline">
           <thead>
             <tr>
@@ -38,29 +39,22 @@
           </thead>
           <tbody>
             <tr>
-              <td>text</td>
-              <td>string</td>
+              <td>user</td>
+              <td>{ email: string; name?: string; image?: string; }</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
             <tr>
-              <td>link</td>
-              <td>string</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>icon</td>
-              <td>string</td>
-              <td class="text-center">
-                <v-icon icon="mdi-close-box" color="error" />
-              </td>
-            </tr>
-            <tr>
-              <td>warning</td>
+              <td>noSelect</td>
               <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>status</td>
+              <td>'readyToSend' | 'pending' | 'participating'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>

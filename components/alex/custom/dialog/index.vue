@@ -41,6 +41,7 @@
               stepClass,
             ]"
             stepper-indicator-class="px-6 pt-6 pb-1"
+            :loading="loading"
             @on-success="emits('onMainAction')"
           >
             <template v-for="slot in slotsList" #[slot]>
@@ -52,7 +53,7 @@
                 isLastStep,
                 isValid,
                 onPrevStep,
-                loading,
+                loading: controlsLoading,
               }"
             >
               <slot
@@ -78,7 +79,7 @@
                     "
                     :append-icon="!isLastStep ? 'mdi-chevron-right' : undefined"
                     :prepend-icon="isLastStep ? 'mdi-plus' : undefined"
-                    :loading="loading"
+                    :loading="controlsLoading"
                   />
                 </template>
                 <template #secondarySlotButton>
@@ -131,6 +132,7 @@ interface HeaderProps {
   stepper?: boolean;
   stepClass?: unknown[] | string;
   stepsConfig?: Record<string, Partial<StepsConfig>>;
+  loading?: boolean;
 }
 const props = withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
@@ -143,9 +145,11 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   stepper: false,
   stepsConfig: undefined,
   stepClass: undefined,
+  loading: undefined,
 });
 const emits = defineEmits([
   'update:modelValue',
+  'update:loading',
   'onMainAction',
   'onSecondaryAction',
 ]);

@@ -8,6 +8,7 @@
       dark
       :permanent="isPermanent"
       :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
+      data-tour="step-user-area"
     >
       <template v-slot:header>
         <div

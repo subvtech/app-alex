@@ -18,7 +18,7 @@
   >
     <div :class="{ rounded: !isVertical }" class="header">
       <v-img
-        :src="image.url"
+        :src="image.url || '/images/cover_image_course.svg'"
         :alt="image.alt"
         :class="{ grayscale: hide }"
         cover
@@ -256,7 +256,7 @@ const dropdownItems = (hidden: boolean) => {
   ];
 };
 const width = computed(() =>
-  isVertical.value ? { min: 300, max: 400 } : { min: 688, max: 959 },
+  isVertical.value ? { min: 300, max: 375 } : { min: 688, max: 959 },
 );
 const statusConfig = computed<{ icon: string; variant: any }>(() => {
   switch (props.status) {
@@ -293,7 +293,7 @@ const emits = defineEmits([
 
 <style scoped lang="scss">
 .card {
-  height: 470px !important;
+  min-height: 460px !important;
 }
 
 .grid {

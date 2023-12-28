@@ -40,13 +40,13 @@
 import { useField } from 'vee-validate';
 
 interface TextAreaProps {
+  modelValue?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
   info?: string;
   disabled?: boolean;
   theme?: 'light' | 'dark';
-  value?: string | number | boolean;
 }
 const props = withDefaults(defineProps<TextAreaProps>(), {
   disabled: false,
@@ -54,10 +54,11 @@ const props = withDefaults(defineProps<TextAreaProps>(), {
   info: undefined,
   label: undefined,
   value: undefined,
+  modelValue: undefined,
 });
 
 const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.value,
+  syncVModel: true,
 });
 
 const textColor = computed(() => {

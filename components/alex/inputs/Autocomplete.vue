@@ -51,7 +51,6 @@
 import { YupSchema, useField } from 'vee-validate';
 
 interface AutoCompleteProps {
-  modelValue?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
@@ -60,8 +59,8 @@ interface AutoCompleteProps {
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
+
 const props = withDefaults(defineProps<AutoCompleteProps>(), {
-  modelValue: undefined,
   search: undefined,
   disabled: false,
   theme: 'light',

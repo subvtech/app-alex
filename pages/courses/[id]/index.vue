@@ -1,46 +1,6 @@
 <template>
   <div v-if="course">
-    <alex-custom-banner
-      :cover-picture="
-        course.cover_image.data
-          ? {
-              id: course.cover_image.data.id,
-              ...course.cover_image.data.attributes,
-            }
-          : null
-      "
-      :profile-picture-size="24"
-      :profile-picture="owner.attributes.avatar.data"
-      :userId="id"
-      show-profile-picture
-      darker-background
-      show-shade
-      show-menu
-      settings-menu
-      :show-settings="canEdit"
-      distribution="fullname-username-role"
-      :selectedOption="selectedOption"
-      @select:option="selectOption"
-      @display:settings="selectOption(8)"
-      is-professor
-      :fullname="owner.attributes.fullname"
-      :title="$t('pages.courses.class')"
-      :copy-object="
-        plainLink
-          ? {
-              label: $t('pages.courses.invite'),
-              copyText: plainLink,
-            }
-          : undefined
-      "
-      :description="course.title"
-      :subtitle="course.class_name"
-      :startDate="(course.start_date as string).split('-').reverse().join('/')"
-      :endDate="(course.end_date as string).split('-').reverse().join('/')"
-      :links="links"
-    />
-    <component
-      :is="selectedComponent"
+    <alex-learningplan-general
       :learningPlan="course"
       :learning-plan-id="course.id"
       :owner="owner"
@@ -64,7 +24,7 @@
           };
         })
       "
-      @update="(data) => updateCourse(true, data)"
+      :updateCourse="(data) => updateCourse(true, data)"
     />
   </div>
 </template>
@@ -78,11 +38,15 @@ import Settings from '@/components/alex/learningplan/settings/index.vue';
 import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
+import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
+import { TabType } from '~/components/alex/custom/Tabs.vue';
+
 export type LearningPlanType = {
   id: number;
   description: string;
   slug: string;
   learning_goals: any;
+  message: string;
   title: string;
   invite_enabled: boolean;
   invitation_duration: number;
@@ -103,7 +67,7 @@ const { generateUrl } = useInvitationLink();
 const i18n = useI18n();
 const course = ref<any>();
 const meetings = ref<any>([]);
-const invitationLink = ref();
+const invitationLink = ref<InvitationLinkType | null>(null);
 const plainLink = ref<string | null>(null);
 
 const { id } = useStrapiUser<User>().value;
@@ -113,41 +77,9 @@ const router = useRouter();
 const selectedOption = ref(0);
 const owner = ref<any>();
 
-const checkPath = () => {
-  switch (route.hash.toLowerCase()) {
-    case '#general':
-      selectedOption.value = 0;
-    case '#settings':
-      selectedOption.value = 8;
-      break;
-    default:
-      router.push(route.path + '#general');
-  }
-};
-onBeforeMount(() => {
-  checkPath();
-});
-
 const selectOption = (index) => {
-  checkPath();
   selectedOption.value = index;
 };
-
-const selectedComponent = computed(() => {
-  const currentPath = route.path;
-
-  switch (selectedOption.value) {
-    case 0:
-      router.push(currentPath + '#general');
-      return General;
-    case 8:
-      router.push(currentPath + '#settings');
-      return Settings;
-    default:
-      router.push(currentPath + '#general');
-      return General;
-  }
-});
 
 const canEdit = computed(() => owner.value?.id == id);
 const { setMessage } = useMessageStore();
@@ -156,14 +88,27 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const links = ref([
-  i18n.t('pages.courses.general'),
-  i18n.t('pages.courses.trails'),
-  i18n.t('pages.courses.assignments'),
-  i18n.t('pages.courses.class'),
-  i18n.t('pages.courses.projects'),
-  i18n.t('pages.courses.events'),
-  i18n.t('pages.courses.communication'),
+const links = computed(() => [
+  {
+    label: i18n.t('pages.courses.general'),
+    value: '0',
+    to: course.value ? `/courses/${course.value.id}` : route.path,
+  },
+  { label: i18n.t('pages.courses.trails'), value: '1' },
+  {
+    label: i18n.t('pages.courses.class'),
+    value: '2',
+    to: `/courses/${course.value?.id}/class`,
+  },
+  { label: i18n.t('pages.courses.projects'), value: '3' },
+  { label: i18n.t('pages.courses.events'), value: '4' },
+  { label: i18n.t('pages.courses.communication'), value: '5' },
+  {
+    label: '',
+    value: '6',
+    icon: 'mdi-cog-outline',
+    to: course.value ? `/courses/${course.value.id}/settings` : '',
+  },
 ]);
 
 const getEarliestMeeting = (meetings) => {
@@ -252,8 +197,8 @@ const updateMeetings = async (schedules) => {
 };
 
 watch(invitationLink, () => {
-  if (invitationLink.value.data)
-    plainLink.value = generateUrl(invitationLink.value.data.hash);
+  if (invitationLink.value)
+    plainLink.value = generateUrl(invitationLink.value.hash);
 });
 </script>
 <style scoped lang="scss">
