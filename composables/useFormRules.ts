@@ -28,6 +28,7 @@ export function isValidCpf(val: string) {
 export const useFormRules = () => {
   const i18n = useI18n();
   const currentDate = new Date();
+  const { isSameOrBeforeHour } = useDatetime();
   currentDate.setHours(0, 0, 0, 0);
   const emailRegex =
     /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/gi;
@@ -132,6 +133,7 @@ export const useFormRules = () => {
     phone: yup
       .string()
       .matches(
+        // eslint-disable-next-line no-useless-escape
         /^\((?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\) (?:9[0-9])[0-9]{3}\-[0-9]{4}$/,
         i18n.t('rules.phone.invalid'),
       )
@@ -207,14 +209,14 @@ export const useFormRules = () => {
       .trim(),
   });
 
-  const urlSchema = yup.object({
-    url: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .required()
-      .trim(),
-  });
+  // const urlSchema = yup.object({
+  //   url: yup
+  //     .string()
+  //     .min(4, i18n.t('rules.url.min'))
+  //     .max(64, i18n.t('rules.url.max'))
+  //     .required()
+  //     .trim(),
+  // });
   const createCourseRules = yup.object({
     title: yup
       .string()
@@ -238,18 +240,38 @@ export const useFormRules = () => {
     endDate: endDateRules,
   });
 
-  const scheduleRules = yup.object({
-    date: yup
-      .date()
-      .required(i18n.t('rules.meeting.date.required'))
-      .min(currentDate.toISOString(), ({ min }) =>
-        i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
-      ),
-    startHour: yup
-      .string()
-      .required(i18n.t('rules.meeting.startHour.required')),
-    endHour: yup.string().required(i18n.t('rules.meeting.endHour.required')),
-  });
+  const scheduleRules = (startDate?: Date, endDate?: Date) =>
+    yup.object({
+      date: yup
+        .date()
+        .required(i18n.t('rules.meeting.date.required'))
+        .min(
+          startDate ? startDate.toISOString() : currentDate.toISOString(),
+          ({ min }) =>
+            i18n.t('rules.startDate.min', {
+              min: min.toString().split('T')[0],
+            }),
+        )
+        .max(endDate ? endDate.toISOString() : undefined, ({ max }) =>
+          i18n.t('rules.endDate.max', {
+            max: max.toString().split('T')[0],
+          }),
+        ),
+      startHour: yup
+        .string()
+        .required(i18n.t('rules.meeting.startHour.required')),
+      endHour: yup
+        .string()
+        .required(i18n.t('rules.meeting.endHour.required'))
+        .test(
+          'endHourTest',
+          i18n.t('rules.meeting.endHour.beforeStartHour'),
+          (value, ctx) => {
+            const { startHour } = ctx.parent;
+            return isSameOrBeforeHour(value, startHour) === 1;
+          },
+        ),
+    });
 
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
