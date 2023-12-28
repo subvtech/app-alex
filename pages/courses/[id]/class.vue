@@ -76,6 +76,7 @@
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
       dialog-action-text="Criar Grupo"
+      :dialog-action-loading="creatingGroup"
       @action="onCreateGroup"
     >
       <template #item="{ item }">
@@ -87,6 +88,7 @@
       </template>
       <template #dialog-content>
         <alex-inputs-text-field
+          v-model="groupTitle"
           label="Qual o nome do Grupo?*"
           name="group_name"
           density="comfortable"
@@ -113,6 +115,7 @@
                 name: item.raw.user.fullname,
               }"
               no-delete
+              no-checkbox
             />
           </template>
         </alex-inputs-autocomplete>
@@ -168,17 +171,12 @@ const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const sendingInvites = ref(false);
+const creatingGroup = ref(false);
 const removingMember = ref(false);
 const removingMemberId = ref(0);
+const groupTitle = ref('');
 
 const headerStore = usePageHeaderStore();
-
-// watch(headerStore, () => {
-//   if (headerStore.mainActionEmitted) {
-//     console.log('teste');
-//     headerStore.mainActionEmitted = false;
-//   }
-// });
 
 headerStore.title = 'Meus Cursos';
 headerStore.items = [
@@ -233,17 +231,43 @@ async function onClickSendInvites() {
 
     usersToInvite.value = [];
 
+    setMessage('Convites enviados com sucesso!', 'green', true);
     await learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (error) {
-    console.log(error);
     setMessage('Erro ao enviar convites!', 'red', true);
   } finally {
     sendingInvites.value = false;
   }
 }
 
-function onCreateGroup() {
-  console.log('onCreateGroup');
+async function onCreateGroup() {
+  try {
+    creatingGroup.value = true;
+
+    const members = groupMembers.value.map(
+      (member: LearningPlanMemberSimple) => {
+        const role =
+          member.id === selectedInChargeGroupMember.value?.id
+            ? 'in_charge'
+            : 'standard';
+        return { role, member_id: member.id };
+      },
+    );
+
+    const data = {
+      title: groupTitle.value,
+      learningplan: learningPlanId.value,
+      group_members: members,
+    };
+
+    await strapi.create('learning-plan-groupss', data);
+    setMessage('Grupo criado com sucesso!', 'green', true);
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
+  } catch (_) {
+    setMessage('Erro ao criar grupo!', 'red', true);
+  } finally {
+    creatingGroup.value = false;
+  }
 }
 
 const ignoreUserIds = computed(() => {
