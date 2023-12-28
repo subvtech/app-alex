@@ -46,15 +46,57 @@
               </td>
             </tr>
             <tr>
-              <td>noSelect</td>
+              <td>removeSelection</td>
               <td>boolean</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
             </tr>
             <tr>
-              <td>status</td>
-              <td>'readyToSend' | 'pending' | 'participating'</td>
+              <td>loadingDelete</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>loadingSecondButton</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>noDelete</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>noChip</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>selected</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>noCheckbox</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>noSecondButton</td>
+              <td>boolean</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -66,30 +108,61 @@
     <div class="w-100 d-flex flex-column gap-4">
       <p class="text-h5 text-center">Items fora do select</p>
       <alex-custom-list-item-user
-        no-select
-        status="readyToSend"
         :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
       />
       <alex-custom-list-item-user
-        no-select
-        status="participating"
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+      />
+      <alex-custom-list-item-user
+        no-checkbox
+        :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
+        selected
+      />
+      <alex-custom-list-item-user
+        remove-selection
         :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
       />
 
       <alex-custom-list-item-user
         :user="{ email: 'zignago@gmail.com', name: 'João Victor Zignago' }"
-        status="pending"
-        no-select
+        remove-selection
+      />
+      <alex-custom-list-item-user
+        :user="{ email: 'noName@gmail.com' }"
+        :no-second-button="false"
+        remove-selection
       />
       <alex-custom-list-item-user
         :user="{ email: 'zignago@gmail.com' }"
-        status="pending"
-        no-select
+        remove-selection
+      />
+      <alex-custom-list-item-user
+        :user="{ email: 'loadingSecondButton@gmail.com' }"
+        remove-selection
+        :no-second-button="false"
+        loading-second-button
       />
       <alex-custom-list-item-user
         :user="{ email: 'zignago@gmail.com' }"
-        no-select
-      />
+        remove-selection
+      >
+        <template #chip>
+          <alex-custom-chip status="dark" size="small" text="Responsável" />
+        </template>
+      </alex-custom-list-item-user>
+      <alex-custom-list-item-user
+        :user="{ email: 'zignago@gmail.com' }"
+        remove-selection
+      >
+        <template #secondButton="{ loading, click }">
+          <alex-custom-button
+            icon="mdi-message-outline"
+            variant="secondary"
+            :loading="loading"
+            @click="click"
+          />
+        </template>
+      </alex-custom-list-item-user>
 
       <p class="text-h5 text-center">Items dentro do select</p>
       <alex-inputs-autocomplete

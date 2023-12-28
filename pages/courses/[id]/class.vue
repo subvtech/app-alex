@@ -50,10 +50,10 @@
             email: member.email,
             image: member.user?.avatar?.url,
           }"
-          no-select
+          remove-selection
           status="pending"
           :loading-delete="removingMember && removingMemberId === member.id"
-          :loading-refresh="
+          :loading-second-button="
             resendingInviteMember && resendingInviteMemberId === member.id
           "
           @delete="onDeleteParticipant(member.id)"
@@ -78,15 +78,24 @@
       dialog-action-text="Criar Grupo"
       @action="onCreateGroup"
     >
+      <template #item="{ item }">
+        <alex-learningplan-class-group-card
+          :title="item?.title"
+          :members="[]"
+          @delete="() => onDeleteParticipant(item.id)"
+        />
+      </template>
       <template #dialog-content>
         <alex-inputs-text-field
           label="Qual o nome do Grupo?*"
           name="group_name"
           density="comfortable"
+          placeholder="Digite o nome do grupo"
         />
         <alex-inputs-autocomplete
           v-model="selectedInChargeGroupMember"
           label="Quem será responsável pelo grupo?"
+          placeholder="Selecione o responsável pelo grupo"
           name="in_charge"
           variant="outlined"
           density="comfortable"
@@ -110,6 +119,7 @@
         <alex-inputs-autocomplete
           v-model="selectedGroupMembers"
           label="Quem será responsável pelo grupo?"
+          placeholder="Selecione os participantes para o grupo"
           name="in_charge"
           variant="outlined"
           density="comfortable"
@@ -130,7 +140,6 @@
                 name: item.raw.user.fullname,
                 image: item.raw.user?.avatar?.url,
               }"
-              no-delete
             />
           </template>
         </alex-inputs-autocomplete>
@@ -142,7 +151,7 @@
             name: member?.user?.fullname || '',
             image: member?.user?.avatar?.url,
           }"
-          no-delete
+          remove-selection
         />
       </template>
     </alex-learningplan-class-section-card>
