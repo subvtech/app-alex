@@ -33,6 +33,7 @@
             :empty-text-message="$t('pages.courses.about.empty')"
             sizing-class="pa-0"
             is-nested
+            is-optional
             hide-dividers
             full-width
           />

@@ -6,127 +6,43 @@
     <template #content>
       <div class="d-flex flex-column w-100 gap-6 justify-center">
         <alex-learningplan-settings-banner
-        :cover="coverImage"
-        :learning-plan-id="learningPlan.id"
-        @update="(data) => emit('update', data)"
-      />
-      <alex-learningplan-settings-general
-        :title="learningPlan.title"
-        :startDate="learningPlan.start_date"
-        :endDate="learningPlan.end_date"
-        :slug="learningPlan.slug"
-        :learning-plan-id="learningPlan.id"
-        @update="(data) => emit('update', data)"
-      />
-      <alex-learningplan-meetings
-        can-edit
-        is-facilitator
-        :learning-plan-id="learningPlan.id"
-        :data="schedules"
-        :end-date="new Date(learningPlan.end_date)"
-        variant="editing"
-      />
+          :cover="coverImage"
+          :learning-plan-id="learningPlan.id"
+          @update="(data) => emit('update', data)"
+          outline
+        />
+        <alex-learningplan-settings-general
+          :title="learningPlan.title"
+          :startDate="learningPlan.start_date"
+          :endDate="learningPlan.end_date"
+          :slug="learningPlan.slug"
+          :learning-plan-id="learningPlan.id"
+          @update="(data) => emit('update', data)"
+          outline
+        />
+        <alex-learningplan-meetings
+          can-edit
+          is-facilitator
+          :learning-plan-id="learningPlan.id"
+          :data="schedules"
+          :end-date="new Date(learningPlan.end_date)"
+          variant="editing"
+          outline
+        />
 
-      <alex-learningplan-settings-invites
-        :learning-plan-id="learningPlan.id"
-        :invite-enabled="learningPlan.invite_enabled"
-        :invitation-link="invitationLink"
-        :invitation-duration="learningPlan.invitation_duration"
-        :message="'sdasds'"
-      />
-      </div>
-    
-      <alex-learningplan-settings-visibility/>
-      <div class="content-area delete">
-        <div class="card-title">
-          <p>
-            <span class="header-h4">{{
-              t('pages.courseSettings.config.deleteCourseTitle')
-            }}</span>
-          </p>
-        </div>
-        <div class="content-body">
-          <p>
-            {{ t('pages.courseSettings.config.deleteCourseDescription') }}
-          </p>
-        </div>
-        <div class="footer-content">
-          <span class="action-content">
-            <alex-custom-button
-              class="button"
-              prepend-icon="mdi-trash-can-outline"
-              variant="error"
-              @click="openDialog = true"
-            >
-              {{ t('pages.courseSettings.config.deleteButton') }}
-              <alex-custom-dialog
-                :model-value="openDialog"
-                title=""
-                body-classes="criticalAttention"
-                width="520px"
-                :scrollable="false"
-                max-height="500px"
-              >
-                <template #header>
-                  <alex-custom-dialog-header title="" class="noShow"
-                /></template>
-                <div class="criticalAttention">
-                  <div class="exclusionBody">
-                    <span class="exclusionIMG">
-                      <img
-                        src="@/assets/svg/exclusionImage.svg"
-                        alt="attention image"
-                      />
-                    </span>
-                    <p>
-                      <span class="header-h4">{{
-                        t('pages.courseSettings.config.deleteConfirmation')
-                      }}</span>
-                      <br />
-                      <span class="body-p1">{{
-                        t('pages.courseSettings.config.deleteDescription')
-                      }}</span>
-                    </p>
-                    <div class="label d-flex flex-start w-100">
-                      <label for="exclusionLabel" class="body-p1">
-                        {{ t('pages.courseSettings.config.deleteLabel') }}
-                        <strong>{{
-                          t('pages.courseSettings.config.deleteWord')
-                        }}</strong>
-                      </label>
-                    </div>
-                    <alex-inputs-text-field
-                      id="exclusionLabel"
-                      name="placeholder"
-                      class="w-100"
-                      required
-                      :placeholder="
-                        $t('pages.courseSettings.config.deletePlaceholder')
-                      "
-                    />
-                  </div>
-                  <div class="exclusionFooter">
-                    <alex-custom-button
-                      class="button"
-                      :text="$t('pages.courseSettings.config.cancelButton')"
-                      variant="secondary"
-                      @click="openDialog = false"
-                    />
-                    <alex-custom-button
-                      class="button error"
-                      :text="$t('pages.courseSettings.config.deleteWord')"
-                      variant="error"
-                      @click="openDialog = false"
-                    />
-                  </div>
-                </div>
-                <template #footer>
-                  <alex-custom-dialog-footer class="noShow"
-                /></template>
-              </alex-custom-dialog>
-            </alex-custom-button>
-          </span>
-        </div>
+        <alex-learningplan-settings-invites
+          :learning-plan-id="learningPlan.id"
+          :invite-enabled="learningPlan.invite_enabled"
+          :invitation-link="invitationLink"
+          :invitation-duration="learningPlan.invitation_duration"
+          :message="'sdasds'"
+          outline
+        />
+        <alex-learningplan-settings-visibility
+          :isHidden="learningPlan.hidden"
+          outline
+        />
+        <alex-learningplan-settings-delete outline />
       </div>
     </template>
   </alex-custom-card>
@@ -168,44 +84,7 @@ const coverImage = ref<BannerImageType | undefined>(
     : undefined,
 );
 
-const course = ref<any>({});
 const emit = defineEmits(['update']);
-const canEdit = ref(true);
-
-// invites
-const inviteEnabled = computed({
-  get: () => course.value.invite_enabled,
-  set: (value) => {
-    course.value.invite_enabled = value;
-  },
-});
-
-// sync meetings
-
-// course visibility
-
-const firstButton = ref([
-  {
-    label: t('pages.courseSettings.config.showCourseTitle'),
-    hint: t('pages.courseSettings.config.showCourseHint'),
-    value: '1',
-  },
-]);
-
-const secondButton = ref([
-  {
-    label: t('pages.courseSettings.config.hideCourseTitle'),
-    hint: t('pages.courseSettings.config.hideCourseHint'),
-    value: '2',
-  },
-]);
-
-const activeButton = ref('1');
-
-// delete course
-
-const dialogMeetingExclusion = ref(false);
-const openDialog = ref(false);
 </script>
 <style scoped lang="scss">
 .container {
@@ -261,29 +140,6 @@ const openDialog = ref(false);
   gap: 8px;
   align-self: stretch;
   border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
-}
-.empty-state {
-  display: flex;
-  height: 250px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  align-self: stretch;
-  border-radius: 8px;
-  border: 1px solid var(--cinza-cinza-100, #ebedef);
-  background: var(--cinza-cinza-azulado, #f1f5f9);
-}
-
-.filePreview {
-  display: flex;
-  height: 250px;
-  padding: 5.072px;
-  align-items: center;
-  gap: 5.072px;
-  align-self: stretch;
-  border-radius: 8px;
-  border: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
 .action-content {
@@ -399,38 +255,8 @@ p {
   flex: 1 0 0;
 }
 
-.criticalAttention {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 8px;
-  justify-content: center;
-}
-
 .noShow {
   display: none;
-}
-.exclusionBody {
-  display: flex;
-  min-height: 300px;
-  padding: var(--40px, 40px) 24px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  align-self: stretch;
-}
-
-.exclusionFooter {
-  display: flex;
-  min-height: 76px;
-  padding: 16px 24px;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  align-self: stretch;
-  border-top: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
 .button.error {

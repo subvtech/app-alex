@@ -52,6 +52,7 @@ export type LearningPlanType = {
   invitation_duration: number;
   start_date: string;
   end_date: string;
+  hidden: boolean;
   cover_image: { data: { id: number; attributes: BannerImageType } | null };
   trails: any;
   tags: { data: { id: number; attributes: CompetenceTag }[] };

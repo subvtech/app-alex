@@ -41,14 +41,15 @@
     }
   },
   "delete": {
-    "CourseTitle": "Excluir curso",
-    "CourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
-    "Button": "Excluir curso",
-    "Confirmation": "Realmente deseja excluir o curso?",
-    "Description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
-    "Label": "Digite a palavra:",
-    "Placeholder": "Digite a palavra",
-    "Word": "Excluir"
+    "courseTitle": "Excluir curso",
+    "courseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
+    "button": "Excluir curso",
+    "confirmation": "Realmente deseja excluir o curso?",
+    "description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
+    "label": "Digite a palavra:",
+    "placeholder": "Digite a palavra",
+    "word": "Excluir",
+    "cancel": "Cancelar"
   },
   "invite": {
     "title": "Configurações de convite",
@@ -79,6 +80,9 @@
     "hideCourse": {
       "title": "Ocultar curso (Privado)",
       "hint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso."
-    }
+    },
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "update": "Visibilidade do curso alterada"
   }
 }

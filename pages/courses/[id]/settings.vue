@@ -148,17 +148,19 @@ const updateCourse = async (show = true, message?) => {
   if (course.value.invitation_links) {
     course.value.invitation_links.data.forEach((link) => {
       if (link.attributes.is_expired) return;
+      const creationDate = new Date(link.attributes.createdAt);
       const expirationDate = new Date(link.attributes.expires_at);
-
+      
       if (
         link.attributes.role === 'student' &&
         link.attributes.emails_to_send === null &&
         expirationDate.getTime() > new Date().getTime()
       ) {
         const differenceBetweenLinks = temp
-          ? expirationDate.getTime() - new Date(temp.expires_at).getTime()
+          ? creationDate.getTime() -
+            new Date(temp.attributes.createdAt).getTime()
           : 1;
-
+        console.log({ link: link.id, diff: differenceBetweenLinks });
         if (!temp || differenceBetweenLinks > 0) {
           temp = link;
         }

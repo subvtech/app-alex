@@ -43,14 +43,15 @@
   },
 
   "delete": {
-    "deleteCourseTitle": "Delete Course",
-    "deleteCourseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
-    "deleteButton": "Delete Course",
+    "courseTitle": "Delete Course",
+    "courseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
+    "button": "Delete Course",
     "deleteConfirmation": "Do you really wish to delete the course?",
-    "deleteDescription": "By deleting a course you will lose all the content associated with it.",
-    "deleteLabel": "Enter the word:",
-    "deletePlaceholder": "Enter the word to confirm",
-    "deleteWord": "Delete"
+    "description": "By deleting a course you will lose all the content associated with it.",
+    "label": "Enter the word:",
+    "placeholder": "Enter the word to confirm",
+    "word": "Delete",
+    "cancel": "Cancel"
   },
   "invite": {
     "title": "Invitation Settings",
@@ -81,6 +82,9 @@
     "hideCourse": {
       "title": "Hide Course (Private)",
       "hint": "Makes the course private, ensuring only members can see the course."
-    }
+    },
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "update": "Course visibility updated"
   }
 }

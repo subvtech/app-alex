@@ -1,6 +1,5 @@
 <template>
   <alex-custom-card
-    class="w-100"
     :show-icon="false"
     :title="$t('components.courses.invites.title')"
     href="dsads"
@@ -11,7 +10,7 @@
     <template #content>
       <div v-if="enableInvites" class="d-flex flex-column w-100">
         <div
-          class="invite gap-6 justify-space-between "
+          class="invite gap-6 justify-space-between"
           :class="[
             theresTimeAndUrl ? '' : 'disabled',
             smaller ? 'smaller' : '',
@@ -19,7 +18,15 @@
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
             <template #content>
-              <a :href="url!">
+              <a
+                class="w-100"
+                :href="url!"
+                style="
+                  text-overflow: ellipsis;
+                  max-width: 100%;
+                  overflow: hidden;
+                "
+              >
                 {{ url }}
               </a>
             </template>
@@ -117,16 +124,21 @@ const updateLink = async () => {
     props.duration,
     props.courseId,
   );
+  stopTimeout();
 
   url.value = generateUrl(result.data.attributes.hash);
-  console.log({ updateLink: url.value });
+
   emit('update:link', { url: url.value });
   remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
 };
 
 const theresTimeAndUrl = computed(() => theresTime.value && url.value);
 const theresTime = computed(() => remainingTime.value > 0);
-
+const timeoutId = ref<NodeJS.Timeout | null>(null);
+const stopTimeout = () => {
+  if (timeoutId.value) clearTimeout(timeoutId.value);
+  else timeoutId.value = null;
+};
 onBeforeMount(() => {
   if (!props.data) return;
   if (props.data.hash) url.value = generateUrl(props.data.hash);
@@ -135,10 +147,13 @@ onBeforeMount(() => {
     remainingTime.value = calcRemainingTime(props.data.expires_at);
   }
 });
+onUnmounted(() => {
+  stopTimeout();
+});
 
 watch(remainingTime, () => {
   if (theresTime.value) {
-    setTimeout(() => {
+    timeoutId.value = setTimeout(() => {
       remainingTime.value = remainingTime.value - 1000;
     }, 1000);
   }
@@ -146,6 +161,8 @@ watch(remainingTime, () => {
 
 watch(theresTimeAndUrl, () => {
   if (theresTimeAndUrl.value) return;
+  if (timeoutId.value) stopTimeout();
+
   emit('link:expired');
 });
 </script>
