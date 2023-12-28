@@ -1,7 +1,9 @@
 <template>
   <div>
     <alex-custom-banner
-      v-if="learningPlanStore.learningPlan"
+      v-if="
+        learningPlanStore.learningPlan && !route.meta?.hideLearningPlanBanner
+      "
       :cover-picture="learningPlanStore.learningPlan.cover_image"
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
