@@ -338,10 +338,9 @@ query($userId: ID!) {
    	sort: "id:desc"
     pagination: {limit: -1}
     filters: {
-      or: [{ hidden: { eq: false } }, { members: { role: { ne: "student" } } }]
+      or: [{ hidden: { eq: false } }, { members: { user: { id: { eq: $userId } }, role: { eq: "facilitator" }  } }]
       and: [
-        { members: { user: { id: { eq: $userId } } } }
-        { members: { status: { eq: "joined" } } }
+        { members: { user: { id: { eq: $userId } }, status: { eq: "joined" } } }
         { type: { eq: "course"}}
         { archived_at: { eq: null}}
       ]
@@ -414,7 +413,6 @@ query($userId: ID!) {
     }
   }
 }
-
 `;
 
 export const GetTrails = `
@@ -424,9 +422,13 @@ query($learningPlanId: ID!) {
       attributes {
         learning_structure {
           data {
+            id
             attributes {
-              trails {
+              trails: trails(sort: "id:desc"
+              pagination: {limit: -1})  	
+               {
                 data {
+                  id
                   attributes {
                     cover_image {
                       data {
@@ -437,7 +439,20 @@ query($learningPlanId: ID!) {
                     }
                     title
                     description
-                    visible
+                    hidden
+                    structures {
+                      data {
+                        attributes {
+                          blocks {
+                            data {
+                              attributes {
+                                type
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -448,4 +463,5 @@ query($learningPlanId: ID!) {
     }
   }
 }
+
 `;

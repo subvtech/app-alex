@@ -30,10 +30,10 @@
         <div v-else>
           <img
             class="emptyProjects-img"
-            src="@/assets/svg/EmptyProjects.svg"
+            src="/images/emptyCourses.svg"
             alt="Empty Projects"
           />
-          <p class="text-h3 text-gray-600">
+          <p class="text-h3 text-gray-600 text-center">
             {{ $t('pages.classes.emptyStateText') }}
           </p>
         </div>
@@ -154,14 +154,15 @@
                 >
                   <td style="max-width: 596px">
                     <div class="d-flex align-center">
-                      <img
+                      <v-img
                         :src="
                           (item as any).img || '/images/cover_image_course.svg'
                         "
                         width="48"
                         height="36"
-                        style="min-width: 48px; min-height: 36px"
+                        style="max-width: 48px; max-height: 36px"
                         class="rounded mr-4"
+                        cover
                       />
                       <p class="text-gray-900 text-body-4 text-overflow">
                         {{ (item as any).title }}
@@ -388,7 +389,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/${id}/settings`,
+      link: `/courses/${id}/settings`,
     },
   ];
 };
@@ -426,7 +427,7 @@ const changeItemVisibility = (index: number, id) => {
   courses.value[index].hidden = !courses.value[index].hidden;
   try {
     update('learningPlans', id, {
-      hidden: !courses.value[index].hidden,
+      hidden: courses.value[index].hidden,
     });
   } catch (error) {
     courses.value[index].hidden = !courses.value[index].hidden;
@@ -439,9 +440,9 @@ const changeItemFavorited = (index: number) => {
 
 const navigate = (id: number, page) => {
   if (page === 'settings') {
-    router.push(`/course/${id}/settings`);
+    router.push(`/courses/${id}/settings`);
   } else {
-    router.push(`/course/${id}`);
+    router.push(`/courses/${id}`);
   }
 };
 </script>

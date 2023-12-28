@@ -42,7 +42,7 @@
       <div v-else class="d-flex align-center justify-center flex-column">
         <img
           class="emptyProjects-img"
-          src="@/assets/svg/EmptyTrails.svg"
+          src="/images/emptyTrails.svg"
           alt="Empty Projects"
         />
         <p class="text-h3 text-gray-400 mt-4">
@@ -57,32 +57,27 @@
         v-model:page="page"
         :items="trails"
         :items-per-page="12"
-        :filter-keys="[
-          'title',
-          'description',
-          'facilitatorName',
-          'trails',
-          'institution',
-          'start_date',
-          'end_date',
-          'tags',
-        ]"
+        :filter-keys="['name', 'description', 'blocks']"
         class="d-flex flex-wrap"
         style="flex: 1; position: relative"
       >
         <template #default="{ items }">
           <div class="d-flex ga-6 flex-wrap w-100 card-container">
             <alex-learningplan-trails-card
-              v-for="(trail, index) in items"
-              :key="trail.raw.name + index"
-              :hide="trail.raw.visible"
-              :name="trail.raw.name"
-              :description="trail.raw.description"
+              v-for="(item, index) in items"
+              :key="item.raw.name + index"
+              :hide="item.raw.hidden"
+              :name="item.raw.name"
+              :description="item.raw.description"
               :image="{
-                url: trail.raw.image.url,
+                url: item.raw.image.url,
               }"
-              :blocks="[{ type: 'article' }]"
+              :blocks="item.raw.blocks !== undefined ? item.raw.blocks : []"
               class="flex-stretch"
+              @toggle-visibility="changeItemVisibility(index, item.raw.id)"
+              @configurations="navigate(item.raw.id, 'settings')"
+              @open="navigate(item.raw.id, 'trails')"
+              @copy="console.log(item.raw.id)"
             />
           </div>
         </template>
@@ -106,14 +101,16 @@
     <CreateDialog
       v-if="professorMode"
       v-model="createTrailDialog"
+      :learning-structure="learningStructure"
+      @course-created="handleCreatedCourse"
     ></CreateDialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetTrails } from '~/assets/queries';
-import { LearningPlan } from '@/models/learningPlan.model';
 import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
 const router = useRouter();
 const route = useRoute();
@@ -125,11 +122,13 @@ const { t } = useI18n();
 const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
 const createTrailDialog = ref(false);
+const learningStructure = ref(null);
 
 interface trail {
+  id?: number;
   name: string;
   description: string;
-  visible: boolean;
+  hidden: boolean;
   image: {
     url: string;
   };
@@ -142,87 +141,6 @@ interface trail {
 
 const trails = ref<trail[]>([]);
 
-// trails.value = [
-// {
-//   name: 'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
-//   description:
-//     'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
-//   image: {
-//     url: 'https://picsum.photos/401/601',
-//   },
-//   blocks: [{ type: 'article' }],
-// },
-// {
-//   name: 'Introdução à programação em Python',
-//   description:
-//     'Olá pessoal! Este é um curso introdutório sobre programação em Python. Espero que aproveitem!',
-//   image: {
-//     url: 'https://picsum.photos/402/602',
-//   },
-//   blocks: [{ type: 'video' }],
-// },
-// {
-//   name: 'Desenvolvimento web com React.js',
-//   description:
-//     'Bem-vindos ao curso de desenvolvimento web com React.js! Vamos explorar juntos as maravilhas do React.',
-//   image: {
-//     url: 'https://picsum.photos/403/603',
-//   },
-//   blocks: [{ type: 'quiz' }],
-// },
-// {
-//   name: 'Aprendendo machine learning com scikit-learn',
-//   description:
-//     'Oi pessoal! Vamos mergulhar no mundo do machine learning com o scikit-learn. Animados?',
-//   image: {
-//     url: 'https://picsum.photos/404/604',
-//   },
-//   blocks: [{ type: 'assignment' }],
-// },
-// {
-//   name: 'Segurança da informação e ethical hacking',
-//   description:
-//     'Este curso aborda tópicos essenciais sobre segurança da informação e ethical hacking. Fiquem atentos!',
-//   image: {
-//     url: 'https://picsum.photos/405/605',
-//   },
-//   blocks: [{ type: 'article' }, { type: 'video' }],
-// },
-// {
-//   name: 'Desenvolvimento mobile com Flutter',
-//   description:
-//     'Vamos construir aplicativos incríveis com Flutter! Este curso é para quem quer mergulhar no desenvolvimento mobile.',
-//   image: {
-//     url: 'https://picsum.photos/406/606',
-//   },
-//   blocks: [{ type: 'quiz' }, { type: 'assignment' }],
-// },
-// {
-//   name: 'Gestão de projetos ágeis com Scrum',
-//   description:
-//     'Sejam bem-vindos ao curso de Gestão de Projetos Ágeis com Scrum. Preparem-se para uma jornada de aprendizado!',
-//   image: {
-//     url: 'https://picsum.photos/407/607',
-//   },
-//   blocks: [{ type: 'video' }],
-// },
-// {
-//   name: 'Inteligência artificial e redes neurais',
-//   description:
-//     'Este curso explora os fundamentos da inteligência artificial e as maravilhas das redes neurais. Animados para aprender?',
-//   image: {
-//     url: 'https://picsum.photos/408/608',
-//   },
-//   blocks: [{ type: 'article' }, { type: 'quiz' }],
-// },
-// ];
-
-// trails.value = [
-//   ...trails.value,
-//   ...trails.value,
-//   ...trails.value,
-//   ...trails.value,
-// ];
 const { isProfessor } = useStrapiUser<User>().value;
 const { id } = route.params;
 const getCourses = async () => {
@@ -236,24 +154,33 @@ const getCourses = async () => {
       };
     }>(GetTrails, params);
   });
-  data.value?.data.learningplan.data.attributes.learning_structure.data.attributes.trails.data.forEach(
+  learningStructure.value =
+    data.value?.data.learningplan.data.attributes.learning_structure.data.id;
+  trails.value = [];
+  data.value?.data.learningplan.data.attributes.learning_structure.data?.attributes.trails.data.forEach(
     (trail) => {
       trails.value.push({
         name: trail.attributes.title,
         description: trail.attributes.description,
-        visible: !trail.attributes.visible,
+        hidden: trail.attributes.hidden,
         image: {
-          url: trail.attributes.cover_image.data.attributes.url,
+          url: trail.attributes.cover_image.data?.attributes.url,
         },
-        blocks: [{ type: 'article' }],
+        blocks: trail.attributes.structures.data[0]?.attributes.blocks.data.map(
+          (block) => {
+            return {
+              type: block.attributes.type,
+            };
+          },
+        ),
+        id: trail.id,
       });
     },
   );
-  console.log(data.value);
   isLoading.value = false;
 };
 // eslint-disable camelcase
-onBeforeMount(async () => await getCourses());
+onMounted(async () => await getCourses());
 
 const showingData = (groupedItems) => {
   const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
@@ -278,29 +205,25 @@ const showingData = (groupedItems) => {
 const changeItemVisibility = (index: number, id) => {
   trails.value[index].hidden = !trails.value[index].hidden;
   try {
-    update('learningPlans', id, {
-      hidden: !trails.value[index].hidden,
+    update('trails', id, {
+      hidden: trails.value[index].hidden,
     });
   } catch (error) {
     trails.value[index].hidden = !trails.value[index].hidden;
   }
 };
 
-// const changeItemFavorited = (index: number) => {
-//   trails.value[index].favorited = !trails.value[index].favorited;
-// };
+const navigate = (trailId: number, page) => {
+  if (page === 'settings') {
+    router.push(`/courses/${id}/trails/${trailId}/settings/`);
+  } else {
+    router.push(`/courses/${id}/trails/${trailId}/`);
+  }
+};
 
-// const navigate = (id: number, page) => {
-//   if (page === 'settings') {
-//     router.push(`/course/${id}/settings`);
-//   } else {
-//     router.push(`/course/${id}`);
-//   }
-// };
-
-const createTrail = () => {
+const handleCreatedCourse = () => {
+  getCourses();
   createTrailDialog.value = false;
-  console.log('criar trilha');
 };
 </script>
 
