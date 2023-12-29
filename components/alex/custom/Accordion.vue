@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels variant="accordion" role="list">
+  <v-expansion-panels variant="accordion" role="list" class="alex-accordion">
     <transition-group name="list">
       <v-expansion-panel
         v-for="(item, index) in list"
@@ -47,7 +47,9 @@
             <strong :class="item.errorKeyWord ? 'error' : 'text-accent'">
               {{ item.keyWord }}
             </strong>
-            <span :class="item.errorTitle ? 'error' : ''">{{' ' + item.title }}</span>
+            <span :class="item.errorTitle ? 'error' : ''">{{
+              ' ' + item.title
+            }}</span>
           </span>
           <v-spacer></v-spacer>
           <v-btn
@@ -128,8 +130,8 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 </script>
 
 <style>
-.error {
-  color: red !important; 
+.alex-accordion .error {
+  color: red !important;
 }
 .v-theme--mainTheme {
   --v-border-opacity: unset !important;

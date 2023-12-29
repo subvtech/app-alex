@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
@@ -31,7 +31,7 @@ export default defineNuxtConfig({
     },
   },
   imports: {
-    dirs: ['stores', 'models', 'config'],
+    dirs: ['stores', 'models', 'config', 'models/simple'],
     presets: [
       {
         from: 'vue-i18n',

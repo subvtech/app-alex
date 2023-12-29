@@ -2,46 +2,61 @@
   <v-list-item
     class="alex-list-item-user"
     :class="{
-      'no-select': noSelect,
-      participating: status === 'participating',
+      'no-select': removeSelection,
     }"
     :ripple="false"
-    :disabled="status === 'participating'"
+    :disabled="selected"
     v-bind="$attrs"
   >
-    <template #prepend>
-      <v-avatar
-        :size="40"
-        :image="user?.image"
-        class="alex-avatar-group-border alex-avatar-group-margin"
-        color="gray-100"
-      >
-        <template v-if="!user?.image" #default>
-          <p class="text-gray-300 text-body-2">
-            {{ initials }}
-          </p>
-        </template>
-      </v-avatar></template
+    <template #prepend="{ isSelected }">
+      <div class="d-flex gap-4">
+        <alex-inputs-checkbox
+          v-if="!noCheckbox && !removeSelection"
+          :model-value="isSelected"
+          :disabled="selected"
+          class="checkbox"
+        />
+        <v-avatar
+          :size="40"
+          :image="user?.image"
+          class="alex-avatar-group-border alex-avatar-group-margin"
+          color="gray-100"
+        >
+          <template v-if="!user?.image" #default>
+            <p class="text-gray-300 text-body-2">
+              {{ initials }}
+            </p>
+          </template>
+        </v-avatar>
+      </div></template
     >
     <template #append
       ><alex-custom-chip
-        v-if="status === 'participating'"
-        text="Participando"
+        v-if="!noChip && !hasChip && selected"
+        :text="$t('pages.classes.participating')"
         status="success"
         size="small"
       />
-      <template v-if="noSelect && status !== 'participating'">
+      <slot name="chip" />
+      <template v-if="removeSelection">
         <alex-custom-button
-          v-if="status === 'pending'"
+          v-if="!noSecondButton && !hasSecondButton"
           icon="mdi-cached"
           variant="text"
-          @click="$emit('refresh')"
+          :loading="loadingSecondButton"
+          @click="$emit('secondButtonAction')"
         />
-
+        <slot
+          name="secondButton"
+          :click="() => $emit('secondButtonAction')"
+          :loading="loadingSecondButton"
+        />
         <alex-custom-button
+          v-if="!noDelete"
           icon="mdi-trash-can-outline"
           variant="text"
           color="error-0"
+          :loading="loadingDelete"
           @click="$emit('delete')"
         />
       </template>
@@ -65,22 +80,36 @@ interface AlexListItemUser {
     name?: string;
     image?: string;
   };
-  noSelect?: boolean;
-  status?: 'readyToSend' | 'pending' | 'participating';
+  loadingDelete?: boolean;
+  loadingSecondButton?: boolean;
+  removeSelection?: boolean;
+  noDelete?: boolean;
+  noChip?: boolean;
+  selected?: boolean;
+  noCheckbox?: boolean;
+  noSecondButton?: boolean;
 }
 
-defineEmits(['delete', 'refresh']);
+defineEmits(['delete', 'secondButtonAction']);
 const props = withDefaults(defineProps<AlexListItemUser>(), {
   participating: false,
   noSelect: false,
   noDelete: false,
-  status: 'readyToSend',
+  noCheckbox: false,
+  noSecondButton: true,
+  noChip: false,
+  selected: false,
   noReload: false,
+  loadingDelete: false,
+  loadingSecondButton: false,
 });
 
 const initials = computed(() => {
   return getInitials(props.user?.name || props.user.email);
 });
+const slots = useSlots();
+const hasChip = computed(() => !!slots.chip);
+const hasSecondButton = computed(() => !!slots.secondButton);
 </script>
 
 <style lang="scss">

@@ -1,11 +1,9 @@
-import { Structure } from './structure.model';
-
+import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 export interface Block {
   id: number;
   type: string;
   data: any;
-  order: any;
+  order: number;
   tunes: any;
-  downloaded: boolean;
-  structure: Structure;
+  structure: Strapi4ResponseMany<Structure>;
 }
