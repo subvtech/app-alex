@@ -52,7 +52,8 @@
     "placeholder": "Enter the word to confirm",
     "word": "Delete",
     "cancel": "Cancel",
-    "match": "It doesn't match with the Delete"
+    "match": "It doesn't match with the Delete",
+    "update": "The Course was deleted"
   },
   "invite": {
     "title": "Invitation Settings",

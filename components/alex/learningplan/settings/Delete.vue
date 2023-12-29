@@ -6,7 +6,7 @@
     :show-icon="false"
   >
     <template #content>
-      <p>
+      <p class="text">
         {{ $t(`components.${namespace}.settings.delete.courseDescription`) }}
       </p>
     </template>
@@ -28,3 +28,17 @@ defineProps({
   },
 });
 </script>
+
+<style scoped lang="scss">
+.text {
+  color: var(--Cinza-Cinza-700, #5A636D);
+text-align: justify;
+
+/* Body/P3 */
+font-family: Sen;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 135%; /* 18.9px */
+letter-spacing: 0.28px;
+}</style>

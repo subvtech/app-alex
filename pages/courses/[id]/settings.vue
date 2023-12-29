@@ -5,7 +5,7 @@
       :learning-plan-id="course.id"
       :owner="owner"
       :invitationLink="invitationLink"
-      :canEdit="canEdit"
+      :canEdit="learningPlanStore.userIsFacilitator"
       :schedules="
         meetings.map((item) => {
           return {
@@ -69,17 +69,12 @@ const invitationLink = ref<InvitationLinkType | null>(null);
 const plainLink = ref<string | null>(null);
 const emit = defineEmits(['update'])
 
-const { id } = useStrapiUser<User>().value;
+
+const learningPlanStore = useLearningPlanStore();
 
 const route = useRoute();
-const selectedOption = ref(0);
 const owner = ref<any>();
 
-const selectOption = (index) => {
-  selectedOption.value = index;
-};
-
-const canEdit = computed(() => owner.value?.id == id);
 const { setMessage } = useMessageStore();
 
 definePageMeta({

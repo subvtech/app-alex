@@ -175,7 +175,6 @@ const updateMeeting = async (values) => {
     startDate: meetingStartDate,
     endDate: meetingEndDate,
   });
-  console.log({ result });
   editData.value = null;
 };
 

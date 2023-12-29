@@ -3,10 +3,9 @@
     :title="$t('components.courses.settings.title')"
     :show-icon="false"
     :align-content="'align-center'"
-
   >
     <template #content>
-      <div class="d-flex flex-column  w-100 gap-6 justify-center w-201">
+      <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
         <alex-learningplan-settings-banner
           :cover="coverImage"
           :learning-plan-id="learningPlan.id"
@@ -49,14 +48,13 @@
           @update="updateVisibility"
           outline
         />
-        <alex-learningplan-settings-delete outline />
+        <alex-learningplan-settings-delete outline @update="removeCourse" />
       </div>
     </template>
   </alex-custom-card>
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-
 
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
@@ -110,14 +108,21 @@ async function uploadCoverImage(event: any) {
 }
 
 async function removeCoverImage() {
-  if(!coverImage.value) return;
+  if (!coverImage.value) return;
   await removeImage(coverImage.value.id);
   coverImage.value = undefined;
   emit('update', t('components.courses.settings.cover.update'));
 }
+
+async function removeCourse() {
+  await update('learningplans', props.learningPlan.id, {
+    archived_at: new Date(),
+  });
+  setMessage(t('components.courses.settings.delete.update'), 'green', true);
+}
 </script>
 <style scoped lang="scss">
-.w-201{
+.w-201 {
   max-width: 804px;
 }
 
@@ -199,7 +204,6 @@ p {
   font-family: Sen;
 }
 
-
 .body-p3 {
   font-size: 14px;
   font-style: normal;
@@ -228,7 +232,6 @@ p {
   border-radius: 8px;
   border: 1px solid var(--cinza-cinza-100, #ebedef);
 }
-
 
 .button {
   text-transform: none;

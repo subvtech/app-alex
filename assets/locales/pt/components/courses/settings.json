@@ -50,7 +50,8 @@
     "placeholder": "Digite a palavra",
     "word": "Excluir",
     "cancel": "Cancelar",
-    "match": "Não corresponde a Excluir"
+    "match": "Não corresponde a Excluir",
+    "update": "Curso deletado"
   },
   "invite": {
     "title": "Configurações de convite",
