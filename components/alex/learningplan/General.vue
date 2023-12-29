@@ -103,7 +103,7 @@
           />
         </template>
         <template #footer>
-          <div class="pb-12 w-100 fix-margin">
+          <div class="w-100 fix-margin" :class="!plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'">
             <alex-learningplan-meetings
             :can-edit="learningPlanStore.userIsFacilitator"
             :data="schedules"
@@ -247,25 +247,36 @@ const showDetails = computed(() => {
 
 .course-page {
   .left-block {
-    min-width: 66% !important;
+    min-width: 60% !important;
     padding-inline: 24px !important;
     padding-bottom: 24px;
     .flex-column.align-center.gap-12 {
-      width: 50%;
     }
   }
 }
 
-@media (max-width: 1420px) {
+@media (max-width: 1530px) {
   .course-page {
     .left-block {
-      min-width: 50% !important;
+      min-width: 45% !important;
       .flex-column.align-center.gap-12 {
         width: 100%;
       }
     }
   }
 }
+
+@media (max-width: 1250px) {
+  .course-page {
+    .left-block {
+      min-width: 37% !important;
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
+    }
+  }
+}
+
 
 @media (max-width: 1075px) {
   .course-page {
