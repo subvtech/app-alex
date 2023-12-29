@@ -1,18 +1,20 @@
 <template>
   <div>
     <alex-custom-banner
-      v-if="learningPlan"
+      v-if="
+        learningPlan && !route.meta?.hideLearningPlanBanner
+      "
       :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user.avatar"
-      :user-id="user.value?.id"
+      :user-id="user.id"
       show-profile-picture
       darker-background
       show-shade
       show-menu
       settings-menu
       :title="$t('pages.courses.class')"
-      :show-settings="canEdit"
+      :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
       is-professor
       :fullname="learningPlanStore.facilitator?.user?.fullname"
@@ -20,7 +22,7 @@
       :subtitle="learningPlanStore.learningPlan?.class_name"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
-      :links="links"
+      :links="canEdit ? links : links.splice(-1)"
       :selected-option="selectedOption"
       :copy-object="
         learningPlanStore.activeInvitationLinkUrl
@@ -38,6 +40,11 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+
+definePageMeta({
+  middleware: 'auth',
+});
+
 const i18n = useI18n();
 
 const user = useStrapiUser<User>();
@@ -55,8 +62,7 @@ const fetchData = async () => {
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
 };
-//const canEdit = computed(() => learningPlanStore.owner?.id === user.value.id);
-const canEdit = true;
+const canEdit = computed(() => learningPlanStore.facilitator?.id === user.value.id);
 
 
 const selectOption = (index) => {
@@ -92,13 +98,5 @@ const links = computed(() => [
     to: `/courses/${learningPlanStore.learningPlan?.id}/projects`,
   },
 
-  {
-    label: '',
-    value: '6',
-    icon: 'mdi-cog-outline',
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/settings`
-      : '',
-  },
 ]);
 </script>

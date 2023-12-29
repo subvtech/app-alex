@@ -8,7 +8,7 @@
       dark
       :permanent="isPermanent"
     >
-      <template v-slot:header>
+      <template #header>
         <div
           class="my-4 w-100 d-flex"
           :class="clipped ? '' : 'justify-center'"
@@ -35,9 +35,9 @@
       :toggle-drawer="() => closeDrawable(!clipped)"
       :avatar="user.avatar"
       :placeholder="user.fullname"
-      @click="onClickOutside"
       :menu-items="profileMenuItems"
       show-picture
+      @click="onClickOutside"
     />
 
     <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
@@ -131,6 +131,16 @@ const menus = [
         title: 'Tooltip',
         to: '/components/custom/tooltip',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'List item',
+        to: '/components/custom/list-item',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'List item user',
+        to: '/components/custom/list-item/user',
+      },
     ],
   },
   {
@@ -165,11 +175,6 @@ const menus = [
         icon: 'mdi-view-dashboard-outline',
         title: 'Tabs',
         to: '/components/custom/tabs',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Card projetos e cursos',
-        to: '/components/learning-plans/card',
       },
     ],
   },
@@ -215,6 +220,11 @@ const menus = [
         icon: 'mdi-view-dashboard-outline',
         title: 'Card projetos e cursos',
         to: '/components/learning-plans/card',
+      },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Card Trilhas',
+        to: '/components/learning-plans/trails/card',
       },
       {
         icon: 'mdi-shoe-print',

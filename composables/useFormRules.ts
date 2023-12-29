@@ -252,6 +252,19 @@ export const useFormRules = () => {
     endHour: yup.string().required(i18n.t('rules.meeting.endHour.required')),
   });
 
+  const createGroupRules = {
+    groupName: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .required(i18n.t('pages.classes.groupNameIsRequired'))
+      .trim(),
+    leader: yup.mixed().required(i18n.t('pages.classes.responsibleIsRequired')),
+    members: yup
+      .array()
+      .required(i18n.t('pages.classes.participantsIsRequired')),
+  };
+
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -284,6 +297,7 @@ export const useFormRules = () => {
       .trim(),
     generalCourseSchema,
     loginSchema,
+    createGroupRules,
     createCourseRules,
     emailRegex,
     scheduleRules,

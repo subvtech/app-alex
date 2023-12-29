@@ -1,4 +1,3 @@
-import itemVue from '../../tutorial/stepper/item.vue';
 <template>
   <alex-custom-card
     class="participantes-card mb-6"
@@ -14,31 +13,55 @@ import itemVue from '../../tutorial/stepper/item.vue';
           width="6"
         />
       </v-row>
-      <v-container v-else fluid>
-        <v-row justify="space-between">
+      <v-container v-else fluid class="pa-1 ga-2">
+        <v-row justify="space-between" align="center" dense class="mb-6">
           <v-col cols="4">
             <alex-inputs-text-field
               v-model="modelSearch"
+              :name="`search-${$attrs.title}`"
               density="comfortable"
               :placeholder="searchPlaceholder"
+              hide-details
               prepend-inner-icon="mdi-magnify"
+              class="max-width-320"
             />
           </v-col>
-          <alex-custom-button :prepend-icon="actionIcon">
+          <alex-custom-button
+            v-if="showAction"
+            :prepend-icon="actionIcon"
+            size="large"
+          >
             {{ actionText }}
+            <alex-custom-dialog
+              v-model="dialogModelValue"
+              :title="dialogTitle"
+              activator="parent"
+            >
+              <slot name="dialog-content"></slot>
+              <template #footer>
+                <alex-custom-dialog-footer
+                  no-secondary-button
+                  :main-button-text="dialogActionText"
+                  :main-button-loading="dialogActionLoading"
+                  :main-button-disabled="dialogActionDisabled"
+                  @on-main-action="emit('action')"
+                />
+              </template>
+            </alex-custom-dialog>
           </alex-custom-button>
         </v-row>
-        <v-row justify="center"> </v-row>
-        <div v-if="showEmptyState" class="d-flex flex-column align-center ga-6">
-          <v-img
-            :src="emptyStateImage"
-            :height="imageHeight"
-            :width="imageWidth"
-          />
-          <h3 class="text-h3 text-gray-400">
-            {{ emptyStateMessage }}
-          </h3>
-        </div>
+        <v-row v-if="!items.length" dense align="center" justify="center">
+          <div class="d-flex flex-column align-center ga-6">
+            <v-img
+              :src="emptyStateImage"
+              :height="imageHeight"
+              :width="imageWidth"
+            />
+            <h3 class="text-h3 text-gray-400">
+              {{ emptyStateMessage }}
+            </h3>
+          </div>
+        </v-row>
         <v-row
           v-else
           :class="{
@@ -46,6 +69,7 @@ import itemVue from '../../tutorial/stepper/item.vue';
             'pa-6': coloredBackground,
             rounded: coloredBackground,
           }"
+          dense
         >
           <v-data-iterator
             v-model:search="modelSearch"
@@ -53,13 +77,14 @@ import itemVue from '../../tutorial/stepper/item.vue';
             :items="items"
             :items-per-page="itemsPerPage"
             :filter-keys="filterKeys"
-            class="d-flex flex-wrap"
-            style="flex: 1; position: relative"
+            class="d-flex flex-wrap w-100"
           >
             <template #default="{ items: iterateItems }">
-              <template v-for="(item, i) in iterateItems" :key="`item-${i}`">
-                <slot name="item" :item="item.raw"></slot>
-              </template>
+              <div class="d-flex flex-wrap gap-6 w-100 px-1">
+                <template v-for="(item, i) in iterateItems" :key="`item-${i}`">
+                  <slot name="item" :item="item.raw" />
+                </template>
+              </div>
             </template>
             <template #footer="{ pageCount, groupedItems }">
               <div
@@ -83,12 +108,18 @@ import itemVue from '../../tutorial/stepper/item.vue';
   </alex-custom-card>
 </template>
 <script setup lang="ts">
+import { usePagination } from '~/composables/usePagination';
+const { t } = useI18n();
 const page = ref(1);
-const emit = defineEmits(['update:search']);
+const emit = defineEmits(['update:search', 'action', 'update:dialogModel']);
 const props = defineProps({
   loading: {
     type: Boolean,
     default: false,
+  },
+  showAction: {
+    type: Boolean,
+    default: true,
   },
   items: {
     type: Array,
@@ -101,10 +132,6 @@ const props = defineProps({
   itemsPerPage: {
     type: Number,
     default: 12,
-  },
-  showEmptyState: {
-    type: Boolean,
-    default: false,
   },
   emptyStateImage: {
     type: String,
@@ -138,9 +165,33 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  dialogActionText: {
+    type: String,
+    default: '',
+  },
+  dialogActionLoading: {
+    type: Boolean,
+    default: false,
+  },
+  dialogActionDisabled: {
+    type: Boolean,
+    default: false,
+  },
   coloredBackground: {
     type: Boolean,
     default: false,
+  },
+  dialogTitle: {
+    type: String,
+    default: '',
+  },
+  dialogModel: {
+    type: Boolean,
+    default: false,
+  },
+  emptyStateObjectName: {
+    type: String,
+    default: 'pages.classes.participant',
   },
 });
 
@@ -153,7 +204,27 @@ const modelSearch = computed({
   },
 });
 
+const dialogModelValue = computed({
+  get() {
+    return props.dialogModel;
+  },
+  set(value) {
+    emit('update:dialogModel', value);
+  },
+});
+
 const cardItems = computed(() => props.items);
 
-const pagination = usePagination(modelSearch, page, cardItems);
+const pagination = usePagination(
+  modelSearch,
+  page,
+  cardItems,
+  t(props.emptyStateObjectName),
+);
 </script>
+
+<style lang="scss" scoped>
+.max-width-320 {
+  max-width: 320px;
+}
+</style>

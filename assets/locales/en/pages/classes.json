@@ -15,5 +15,17 @@
     "home": "Home"
   },
   "showingData": "Showing %{from} to %{to} of a total of %{total} courses",
-  "noData": "No courses found!"
+  "noData": "No {object} found!",
+  "participant": "Participant",
+  "participating": "Participating",
+  "participants": "Participants",
+  "noOneResponsible": "No one responsible",
+  "removeParticipant": "Remove participant",
+  "removeGroup": "Delete group",
+  "editGroup": "Edit group",
+  "sendMessage": "Send message",
+  "responsibleIsRequired":"Responsible is required",
+  "participantsIsRequired":"Must be have participants",
+  "groupNameIsRequired":"Group name is required",
+  "group": "Group"
 }

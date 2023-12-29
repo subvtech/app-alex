@@ -22,6 +22,7 @@
             name: item.raw.fullname,
           }"
           no-delete
+          no-checkbox
         />
       </template>
     </alex-inputs-autocomplete>
@@ -34,8 +35,7 @@
           email: item.email,
           name: item.fullname,
         }"
-        no-delete
-        no-select
+        remove-selection
         @delete="() => removeSelf(item.email)"
         @reload="() => emit('refresh:invite')"
       />
@@ -50,6 +50,8 @@ type User = { id?: string; email: string; fullname?: string; local?: boolean };
 interface AutoCompleteUsersProps {
   name: string;
   modelValue: User[];
+  ignoreUserIds?: number[];
+  ignoreEmails?: string[];
 }
 
 const props = defineProps<AutoCompleteUsersProps>();
@@ -62,7 +64,7 @@ const emit = defineEmits([
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
 const user = useStrapiUser().value;
-const { value: selectedUser, setState } = useField<User | null>(
+const { value: selectedUser, resetField } = useField<User | null>(
   () => props.name,
   undefined,
   {
@@ -83,7 +85,8 @@ const selectedUsers = computed({
 
 const cleanInput = () => {
   search.value = '';
-  setState({ value: null });
+
+  resetField();
 };
 
 const removeSelf = (email?: string) => {
@@ -99,10 +102,13 @@ const filteredItems = computed(() => {
 });
 
 const updateModelValue = () => {
-  if (selectedUser.value) {
+  if (
+    selectedUser.value &&
+    !selectedUsers.value.find((v) => v.email === selectedUser.value?.email)
+  ) {
     selectedUsers.value.push(selectedUser.value);
-    cleanInput();
   }
+  cleanInput();
 };
 
 useOnStopTyping(search, async () => {
@@ -113,6 +119,7 @@ useOnStopTyping(search, async () => {
         { email: { $containsi: search.value } },
         { fullname: { $containsi: search.value } },
       ],
+      id: { $notIn: props.ignoreUserIds || [] },
     },
   })) as unknown as User[];
   if (registeredFields.length) {
@@ -141,7 +148,11 @@ watch(
   () => {
     const isValidEmail = emailRegex.test(search.value);
     const local = items.value.filter((item) => item?.local);
-    if (search.value.length && isValidEmail) {
+    if (
+      search.value.length &&
+      isValidEmail &&
+      !(props.ignoreEmails || []).includes(search.value)
+    ) {
       if (!local.length) {
         items.value = [{ email: search.value, local: true }, ...items.value];
       }

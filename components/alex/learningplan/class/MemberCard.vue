@@ -1,13 +1,16 @@
 <template>
   <v-card
-    class="container-grid pt-8 pb-6 px-4"
+    class="container-grid pt-8 pb-6 px-4 w-100"
     :min-width="250"
     :max-width="300"
     elevation="0"
     rounded="lg"
+    variant="outlined"
+    color="gray-100"
   >
     <v-img class="banner" :src="coverImage" cover>
       <alex-custom-dropdown
+        v-if="!noOptions"
         v-model="showOptions"
         :close-on-content-click="false"
         :items="items"
@@ -24,6 +27,7 @@
                 v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                 icon="mdi-dots-vertical"
                 class="options"
+                size="small"
               />
             </template>
           </v-tooltip>
@@ -53,7 +57,7 @@
         variant="tertiary"
         @click="$emit('sendMessage')"
       >
-        Enviar mensagem
+        {{ $t('pages.classes.sendMessage') }}
       </alex-custom-button>
     </div>
   </v-card>
@@ -63,16 +67,23 @@
 interface LearningMemberProps {
   name: string;
   email: string;
-  coverImage: string;
+  coverImage?: string;
   avatarImage?: string;
+  role?: string;
+  noOptions: boolean;
 }
 const emit = defineEmits(['open', 'sendMessage', 'delete']);
-withDefaults(defineProps<LearningMemberProps>(), { avatarImage: undefined });
-// const { t } = useI18n();
+withDefaults(defineProps<LearningMemberProps>(), {
+  avatarImage: undefined,
+  coverImage: undefined,
+  noOptions: false,
+  role: 'student',
+});
+const { t } = useI18n();
 const showOptions = ref(false);
 const items = [
   {
-    text: 'Remover participante',
+    text: t('pages.classes.removeParticipant'),
     icon: 'mdi-trash-can-outline',
     onClick: () => emit('delete'),
     warning: true,
@@ -102,5 +113,6 @@ const items = [
   left: 0;
   width: 100%;
   height: 80px;
+  background-color: rgb(var(--v-theme-gray-blue));
 }
 </style>
