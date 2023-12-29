@@ -416,30 +416,43 @@ query($userId: ID!) {
 `;
 
 export const GetTrails = `
-query($trailId: ID!) {
-  trail(id:$trailId ){
-    data{
-      attributes{
-        cover_image{
-          data{
-            attributes{
-              url
-            }
-          }
-        }
-        title
-        description
-      	structures{
-          data{
-            attributes{
-              time
-              version
-              blocks{
-                data{
-                  attributes{
-                    data
-                    type
-    
+query($learningPlanId: ID!) {
+  learningplan(id: $learningPlanId) {
+    data {
+      attributes {
+        learning_structure {
+          data {
+            id
+            attributes {
+              trails: trails(sort: "id:desc"
+              pagination: {limit: -1})  	
+               {
+                data {
+                  id
+                  attributes {
+                    cover_image {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                    title
+                    description
+                    hidden
+                    structures {
+                      data {
+                        attributes {
+                          blocks {
+                            data {
+                              attributes {
+                                type
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
