@@ -27,6 +27,7 @@
   "of": "of",
   "to": "to",
   "at": "at",
+  "everyday": "Everyday",
   "interval": "Every {days} days",
   "everyday": "Daily",
   "weekly": "Weekly: {day}",
