@@ -250,8 +250,7 @@ const showDetails = computed(() => {
     min-width: 60% !important;
     padding-inline: 24px !important;
     padding-bottom: 24px;
-    .flex-column.align-center.gap-12 {
-    }
+
   }
 }
 
