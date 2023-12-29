@@ -197,7 +197,7 @@ const steps = [
   },
 ];
 
-const { tour, activeTour } = useOnBoarding(steps);
+// const { tour, activeTour } = useOnBoarding(steps);
 
 const defaultMenus = [
   {

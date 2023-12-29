@@ -2,7 +2,7 @@
   <div>
     <alex-custom-banner
       v-if="
-        learningPlan && !route.meta?.hideLearningPlanBanner
+        learningPlanStore.learningPlan && !route.meta?.hideLearningPlanBanner
       "
       :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
@@ -22,10 +22,11 @@
       :subtitle="learningPlanStore.learningPlan?.class_name"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
-      :links="learningPlanStore.userIsFacilitator ? links : links.slice(0, -1)"
+      :links="isJoinRoutePath ? [] : links"
       :selected-option="selectedOption"
       :copy-object="
-        learningPlanStore.activeInvitationLinkUrl
+        learningPlanStore.activeInvitationLinkUrl &&
+        learningPlanStore.userIsFacilitator
           ? {
               label: $t('pages.courses.invite'),
               copyText: learningPlanStore.activeInvitationLinkUrl,
@@ -42,65 +43,111 @@
 import { useI18n } from 'vue-i18n';
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth'],
 });
 
 const i18n = useI18n();
 
 const user = useStrapiUser<User>();
 
-// const { find, findOne, update } = useStrapi();
 const route = useRoute();
 const learningPlanStore = useLearningPlanStore();
-const { learningPlan } = toRefs(learningPlanStore);
+
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);
+
+const isJoinRoutePath = computed(() => {
+  return route.name === 'courses-id-join-hash';
+});
 
 const fetchData = async () => {
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
+
+  if (!learningPlanStore.learningPlan) {
+    navigateTo('/');
+  }
+
+  if (
+    !learningPlanStore.userIsFacilitator &&
+    !learningPlanStore.userIsActiveMember &&
+    !learningPlanStore.userIsPendingMember
+  ) {
+    navigateTo('/courses/me');
+  }
+
+  if (learningPlanStore.userIsPendingMember && !isJoinRoutePath.value) {
+    const invite = learningPlanStore.learningPlan?.invitation_links.find(
+      (i) => {
+        return i.emails_to_send?.includes(user.value.email);
+      },
+    );
+
+    if (invite) {
+      navigateTo(`/courses/${learningPlanId.value}/join/${invite.hash}`);
+    }
+  }
 };
+
+await fetchData();
 
 const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const links = computed(() => [
-  {
-    label: i18n.t('pages.courses.general'),
-    value: '0',
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}`
-      : route.path,
-  },
-  {
-    label: i18n.t('pages.courses.trails'),
-    value: '1',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/trails`,
-  },
-  {
-    label: i18n.t('pages.courses.assignments'),
-    value: '2',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/tasks`,
-  },
-  {
-    label: i18n.t('pages.courses.class'),
-    value: '3',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/class`,
-  },
-  {
-    label: i18n.t('pages.courses.projects'),
-    value: '4',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/projects`,
-  },
-  {
-    label: '',
-    icon: 'mdi-cog-outline',
-    value: '5',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
-  },
+const links = computed(() => {
+  const generalLinks = [
+    {
+      label: i18n.t('pages.courses.general'),
+      value: '0',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.trails'),
+      value: '1',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/trails`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.assignments'),
+      value: '2',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/tasks`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.class'),
+      value: '3',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/class`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.projects'),
+      value: '4',
 
-]);
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/projects`
+        : '',
+    },
+  ];
+
+  const settingsLink = [
+    {
+      label: '',
+      icon: 'mdi-cog-outline',
+      value: '5',
+      to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
+    },
+  ];
+
+  return learningPlanStore.userIsFacilitator
+    ? [...generalLinks, ...settingsLink]
+    : generalLinks;
+});
 </script>

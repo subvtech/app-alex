@@ -259,6 +259,7 @@
       title="Realmente deseja excluir esse grupo?"
       subtitle="Ao desfazer esse grupo todos os conteúdos e alunos vinculados à perderão esse vínculo."
       submit-button-text="Excluir"
+      @cancel="confirmDeleteGroup = false"
       @submit="() => onDeleteGroup(removingGroupId)"
     />
     <alex-learningplan-dialogs-alert
@@ -269,6 +270,7 @@
       subtitle="Ao remover o participante ele ficará impossibilitado de acessar os conteúdos desse curso."
       submit-button-text="Excluir"
       @submit="() => onDeleteParticipant(removingMemberId)"
+      @cancel="confirmDeleteMember = false"
     />
   </div>
 </template>
@@ -416,6 +418,8 @@ async function onDeleteGroup(id: number) {
     learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
     setMessage('Erro ao excluir grupo!', 'red', true);
+  } finally {
+    confirmDeleteGroup.value = false;
   }
 }
 
@@ -464,6 +468,7 @@ async function onDeleteParticipant(id: number) {
     setMessage('Erro ao remover participante!', 'red', true);
   } finally {
     removingMember.value = false;
+    confirmDeleteMember.value = false;
   }
 }
 

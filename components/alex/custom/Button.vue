@@ -35,6 +35,7 @@ const props = withDefaults(
     disabled?: boolean;
     theme?: 'light' | 'dark';
     color?: AlexColors;
+    loading?: boolean;
   }>(),
   {
     variant: 'primary',

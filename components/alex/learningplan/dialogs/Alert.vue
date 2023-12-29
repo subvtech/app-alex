@@ -45,10 +45,10 @@
             size="large"
             :text="submitButtonText"
             :variant="variant"
+            :loading="loading"
             @click="
               () => {
                 $emit('submit');
-                $emit('update:modelValue', false);
               }
             "
         /></template>
@@ -57,7 +57,11 @@
             size="large"
             :text="$t('components.courses.settings.meetings.delete.cancel')"
             variant="secondary"
-            @click="$emit('update:modelValue', false)"
+            @click="
+              () => {
+                $emit('cancel');
+              }
+            "
         /></template>
       </alex-custom-dialog-footer>
     </template>
@@ -65,7 +69,7 @@
 </template>
 <script setup lang="ts">
 import * as yup from 'yup';
-const emit = defineEmits(['update:modelValue', 'submit']);
+const emit = defineEmits(['update:modelValue', 'submit', 'cancel']);
 interface AlertDialogProps {
   modelValue: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
@@ -77,6 +81,7 @@ interface AlertDialogProps {
   inputLabelConfirmation?: string;
   inputPlaceholderConfirmation?: string;
   noInputConfirmation?: boolean;
+  loading?: boolean;
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
   noInputConfirmation: true,
@@ -85,6 +90,7 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
   inputWordConfirmation: undefined,
   inputLabelConfirmation: undefined,
   inputPlaceholderConfirmation: undefined,
+  loading: false,
 });
 const value = computed({
   get() {
