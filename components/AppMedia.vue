@@ -21,7 +21,7 @@
         <alex-custom-carousel
           v-else
           :read-only="!isEditingAndCanEdit"
-          :slides="myImages"
+          v-model="myImages"
           @slidesChanged="onSlidesChanged"
         />
       </div>
@@ -115,15 +115,12 @@ const onSave = async () => {
     )
     .map((item) => _delete('medias', item.id));
 
-  const promises: Promise<any>[] = [];
-  promises.push(...createPromises, ...deletePromises);
-
-  await Promise.all(promises);
+  const result = await Promise.all([...createPromises, ...deletePromises]);
 
 };
 
 watch(images, () => {
-  myImages.value = props.images;
+  myImages.value = images.value;
 });
 </script>
 

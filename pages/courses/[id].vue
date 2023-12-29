@@ -2,12 +2,12 @@
   <div>
     <alex-custom-banner
       v-if="
-        learningPlanStore.learningPlan && !route.meta?.hideLearningPlanBanner
+        learningPlan && !route.meta?.hideLearningPlanBanner
       "
-      :cover-picture="learningPlanStore.learningPlan.cover_image"
+      :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
-      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
-      :user-id="user.value?.id"
+      :profile-picture="learningPlanStore.facilitator?.user.avatar"
+      :user-id="user.id"
       show-profile-picture
       darker-background
       show-shade
@@ -18,11 +18,11 @@
       distribution="fullname-username-role"
       is-professor
       :fullname="learningPlanStore.facilitator?.user?.fullname"
-      :description="learningPlanStore.learningPlan.title"
-      :subtitle="learningPlanStore.learningPlan.class_name"
+      :description="learningPlanStore.learningPlan?.title"
+      :subtitle="learningPlanStore.learningPlan?.class_name"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
-      :links="links"
+      :links="learningPlanStore.userIsFacilitator ? links : links.slice(0, -1)"
       :selected-option="selectedOption"
       :copy-object="
         learningPlanStore.activeInvitationLinkUrl
@@ -35,7 +35,7 @@
       @select:option="selectOption"
       @display:settings="selectOption(8)"
     />
-    <NuxtPage />
+    <NuxtPage @update="fetchData()" />
   </div>
 </template>
 <script setup lang="ts">
@@ -51,15 +51,17 @@ const user = useStrapiUser<User>();
 
 // const { find, findOne, update } = useStrapi();
 const route = useRoute();
-
 const learningPlanStore = useLearningPlanStore();
+const { learningPlan } = toRefs(learningPlanStore);
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);
 
-await useAsyncData('user', () =>
-  learningPlanStore.loadLearningPlan(learningPlanId.value),
-);
+const fetchData = async () => {
+  await useAsyncData('user', () =>
+    learningPlanStore.loadLearningPlan(learningPlanId.value),
+  );
+};
 
 const selectOption = (index) => {
   selectedOption.value = index;
@@ -73,22 +75,32 @@ const links = computed(() => [
       ? `/courses/${learningPlanStore.learningPlan?.id}`
       : route.path,
   },
-  { label: i18n.t('pages.courses.trails'), value: '1' },
+  {
+    label: i18n.t('pages.courses.trails'),
+    value: '1',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/trails`,
+  },
+  {
+    label: i18n.t('pages.courses.assignments'),
+    value: '2',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/tasks`,
+  },
   {
     label: i18n.t('pages.courses.class'),
-    value: '2',
+    value: '3',
     to: `/courses/${learningPlanStore.learningPlan?.id}/class`,
   },
-  { label: i18n.t('pages.courses.projects'), value: '3' },
-  { label: i18n.t('pages.courses.events'), value: '4' },
-  { label: i18n.t('pages.courses.communication'), value: '5' },
+  {
+    label: i18n.t('pages.courses.projects'),
+    value: '4',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/projects`,
+  },
   {
     label: '',
-    value: '6',
     icon: 'mdi-cog-outline',
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/settings`
-      : '',
+    value: '5',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
   },
+
 ]);
 </script>

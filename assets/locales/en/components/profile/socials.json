@@ -4,5 +4,6 @@
   "editSocialUrl": "What's the url of the website?",
   "addSocial": "Which website do you want to add?",
   "empty": "No social media added",
-  "otherSocial": "Other social"
+  "otherSocial": "Other social",
+  "update": "Social Media updated"
 }

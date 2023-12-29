@@ -13,4 +13,5 @@ export interface InvitationLink {
   expires_at: Date;
   learningplan: Strapi4ResponseSingle<LearningPlan>;
   is_expired: boolean;
+  createdAt?: Date;
 }

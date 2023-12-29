@@ -8,7 +8,7 @@
       width="24"
       height="24"
     />
-    <div class="px-4 z-index-999" :class="extraClasses ?? ''">
+    <div v-if="text" class="px-4 z-index-999" :class="extraClasses ?? ''">
       <span>{{ text }}</span>
     </div>
   </div>
@@ -34,7 +34,6 @@ defineProps({
 }
 .tooltip {
   position: relative !important;
-
   &:hover {
     .px-4 {
       display: block !important;

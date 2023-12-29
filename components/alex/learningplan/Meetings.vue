@@ -80,7 +80,7 @@ export type ScheduleResponseType = {
 };
 
 export interface MeetingsPropsType {
-  variant: MeetingVariantType;
+  variant?: MeetingVariantType;
   data: MeetingPropsType[];
   endDate: Date;
   canEdit: boolean;
@@ -125,21 +125,14 @@ const setDateTime = (
 
 const addMeeting = async (values: MeetingPropsType) => {
   createScheduleModal.value = false;
-  console.log({ values });
+
   const [meetingStartDate, meetingEndDate] = setDateTime(
     values.endHour,
     values.startHour,
     values.date,
     values.interval,
   );
-  console.log({
-    create: {
-      ...values,
-      name: 'name',
-      startDate: meetingStartDate,
-      endDate: meetingEndDate,
-    },
-  });
+ 
   const result = await create('learning-plan-meeting-schedules', {
     ...values,
     name: 'name',
@@ -182,7 +175,6 @@ const updateMeeting = async (values) => {
     startDate: meetingStartDate,
     endDate: meetingEndDate,
   });
-  console.log({ result });
   editData.value = null;
 };
 
