@@ -126,7 +126,7 @@
       <div
         class="text-body-5 text-gray-600 ellipsis lines-3"
         lines="three"
-        :class="{ 'grayscale-2': hide }"
+        :class="{ 'grayscale-2': hide, 'max-width-80': !isVertical }"
       >
         {{ description }}
       </div>

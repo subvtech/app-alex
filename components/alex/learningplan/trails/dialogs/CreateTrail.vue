@@ -1,6 +1,6 @@
 <template>
   <alex-custom-dialog
-    title="Criar nova Trilha de Aprendizagem"
+    :title="$t('pages.trails.newTrailText')"
     no-footer
     body-classes="bg-white px-6 pt-3 rounded-b-lg"
   >
@@ -53,24 +53,26 @@
         </alex-custom-button>
       </div>
       <div v-else class="d-flex flex-column align-center ga-2">
-        <p class="text-h5 text-secondary-0">Capa da Trilha</p>
+        <p class="text-h5 text-secondary-0">
+          {{ $t('pages.trails.newTrailCoverText') }}
+        </p>
         <alex-custom-button prepend-icon="mdi-pencil" @click="openFileInput">
-          Editar
+          {{ $t('pages.trails.newTrailCoverAction') }}
         </alex-custom-button>
       </div>
     </div>
     <v-form @submit.prevent="createTrail">
       <alex-inputs-text-field
         class="mt-2 mb-1"
-        label="Do que se trata sua Trilha de Aprendizagem?"
-        placeholder="Digite o título da sua trilha"
+        :label="$t('pages.trails.newTrailTitleLabel')"
+        :placeholder="$t('pages.trails.newTrailTitlePlaceholder')"
         required
         density="comfortable"
         name="title"
       />
       <alex-inputs-text-area
-        label="Conte-nos mais sobre a trilha"
-        placeholder="Descreva a sua trilha"
+        :label="$t('pages.trails.newTrailDescriptionLabel')"
+        :placeholder="$t('pages.trails.newTrailDescriptionPlaceholder')"
         required
         density="comfortable"
         name="description"
@@ -85,7 +87,7 @@
         <template #mainSlotButton>
           <alex-custom-button
             :loading="isLoading"
-            text="Criar Trilha"
+            :text="$t('pages.trails.newTrailAction')"
             size="large"
             type="submit"
             prepend-icon="mdi-plus"
@@ -93,7 +95,7 @@
         </template>
         <template #secondarySlotButton>
           <alex-custom-button
-            text="Cancelar"
+            :text="$t('pages.trails.newTrailCancel')"
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
