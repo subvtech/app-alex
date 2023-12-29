@@ -393,7 +393,7 @@ const dropdownItems = (hidden, index, id) => {
     {
       icon: 'mdi-cog-outline',
       text: t('components.learningPlan.card.configurations'),
-      link: `/course/${id}/settings`,
+      link: `/courses/${id}/settings`,
     },
   ];
 };
@@ -444,9 +444,9 @@ const changeItemFavorited = (index: number) => {
 
 const navigate = (id: number, page) => {
   if (page === 'settings') {
-    router.push(`/course/${id}/settings`);
+    router.push(`/courses/${id}/settings`);
   } else {
-    router.push(`/course/${id}`);
+    router.push(`/courses/${id}`);
   }
 };
 </script>

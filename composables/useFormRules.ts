@@ -274,7 +274,7 @@ export const useFormRules = () => {
     });
 
   const createGroupRules = {
-    groupName: yup
+    groupTitle: yup
       .string()
       .min(4, i18n.t('rules.url.min'))
       .max(64, i18n.t('rules.url.max'))
@@ -283,7 +283,8 @@ export const useFormRules = () => {
     leader: yup.mixed().required(i18n.t('pages.classes.responsibleIsRequired')),
     members: yup
       .array()
-      .required(i18n.t('pages.classes.participantsIsRequired')),
+      .required(i18n.t('pages.classes.participantsIsRequired'))
+      .min(2, i18n.t('pages.classes.participantsIsRequired')),
   };
 
   return {

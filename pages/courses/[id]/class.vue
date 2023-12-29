@@ -2,7 +2,7 @@
   <div>
     <alex-learningplan-class-section-card
       v-model:search="searchMembers"
-      v-model:dialog-model="addMemberDialog"
+      v-model:dialog-model="dialogAddMember"
       title="Participantes da turma"
       :loading="learningPlanStore.loading"
       :show-empty-state="!learningPlanStore?.activeMembers?.length"
@@ -30,12 +30,7 @@
           :cover-image="item?.user?.cover"
           :role="item?.role"
           :no-options="!learningPlanStore.userIsFacilitator"
-          @delete="
-            () => {
-              removingMemberId = item.id;
-              confirmDeleteMember = true;
-            }
-          "
+          @delete="() => deleteParticipant(item.id)"
         />
       </template>
       <template #dialog-content>
@@ -76,7 +71,7 @@
     </alex-learningplan-class-section-card>
     <alex-learningplan-class-section-card
       v-model:search="searchGroups"
-      v-model:dialog-model="createGroupDialog"
+      v-model:dialog-model="dialogGroup"
       title="Grupos de participantes"
       :loading="learningPlanStore.loading"
       :items="learningPlanStore.learningPlan?.groups"
@@ -89,45 +84,35 @@
       action-text="Criar grupos"
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
-      dialog-action-text="Criar Grupo"
-      dialog-title="Criar Grupo"
+      :dialog-action-text="dialogGroupActionText"
+      :dialog-title="dialogGroupTitle"
       :filter-keys="['title']"
       :show-action="learningPlanStore.userIsFacilitator"
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="!formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
-      @action="onCreateGroup"
+      @action="!editing ? onCreateGroup() : onUpdateGroup(editingGroupId)"
     >
+      <!-- onUpdateGroup(item.id)  -->
       <template #item="{ item }">
         <alex-learningplan-class-group-card
           :title="item?.title"
           :members="getGroupMembersInfo(item.group_members)"
           :no-options="!learningPlanStore.userIsFacilitator"
-          @delete="
-            () => {
-              removingGroupId = item.id;
-              confirmDeleteGroup = true;
-            }
+          @delete="() => deleteGroupCard(item.id)"
+          @edit="
+            () => setUpdatedValues(item.id, item.title, item.group_members)
           "
-          @open="
-            () => {
-              showGroupDialog = true;
-              showValuesGroup = {
-                title: item.title,
-                members: item.group_members,
-              };
-              console.log(item.group_members);
-            }
-          "
+          @open="() => openGroupCard(item)"
         />
       </template>
       <template #dialog-content>
         <v-form>
           <alex-inputs-text-field
             v-model="groupTitle"
-            :schema="createGroupRules.groupName"
+            :schema="createGroupRules.groupTitle"
             label="Qual o nome do Grupo?"
-            name="group_name"
+            name="groupTitle"
             density="comfortable"
             placeholder="Digite o nome do grupo"
           />
@@ -206,54 +191,12 @@
         </v-form>
       </template>
     </alex-learningplan-class-section-card>
-    <alex-custom-dialog
-      v-model="showGroupDialog"
-      title="Grupo de participantes"
-      no-footer
-      body-classes="d-flex flex-column gap-6 bg-white pa-6 rounded-b-lg"
-    >
-      <div class="d-flex flex-column align-center justify-center">
-        <p class="text-gray-600 text-subtitle-2">
-          {{ learningPlanStore?.learningPlan?.title }}
-        </p>
-        <h2 class="text-h2 text-gray-800">{{ showValuesGroup?.title }}</h2>
-      </div>
-      <template
-        v-for="(section, indexSection) in sectionsShowGroup"
-        :key="`group-section-${indexSection}`"
-      >
-        <h5 class="text-h5 text-gray-800">{{ section.title }}</h5>
-        <alex-custom-list-item-user
-          v-for="(member, i) in filterMembersByRole(
-            section.filter,
-            showValuesGroup?.members,
-          )"
-          :key="`group-member-${i}`"
-          :user="{
-            email: member?.student_member?.email || 'a',
-            name: member?.student_member?.user?.fullname || '',
-            image: member?.student_member?.user.avatar?.url || '',
-          }"
-          remove-selection
-          no-delete
-          ><template #secondButton="{ loading, click }">
-            <alex-custom-button
-              icon="mdi-message-text-outline"
-              variant="secondary"
-              :loading="loading"
-              @click="click"
-            /> </template
-        ></alex-custom-list-item-user>
-        <v-divider
-          v-if="indexSection == 0"
-          color="secondary"
-          :thickness="1"
-          class="border-opacity-100"
-        />
-      </template>
-    </alex-custom-dialog>
+    <alex-learningplan-class-participants-details-dialog
+      v-model="dialogShowGroup"
+      :show-values-group="showValuesGroup"
+    />
     <alex-learningplan-dialogs-alert
-      v-model="confirmDeleteGroup"
+      v-model="dialogConfirmDeleteGroup"
       variant="error"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       title="Realmente deseja excluir esse grupo?"
@@ -278,22 +221,21 @@ const { setMessage } = useMessageStore();
 const { createGroupRules } = useFormRules();
 const strapi = useStrapi();
 const formAddGroup = useForm();
+const editing = ref(false);
+const editingGroupId = ref(0);
 // Dialog
-const addMemberDialog = ref(false);
-const createGroupDialog = ref(false);
-const showGroupDialog = ref(false);
-const confirmDeleteGroup = ref(false);
+const dialogAddMember = ref(false);
+const dialogGroup = ref(false);
+const dialogShowGroup = ref(false);
+const dialogConfirmDeleteGroup = ref(false);
+const dialogGroupTitle = ref('Criar Curso');
+const dialogGroupActionText = ref('Criar Curso');
+//
 const showValuesGroup = ref<{
   title: string;
   members: LearningPlanGroupMemberSimple[];
 }>();
-const sectionsShowGroup: {
-  title: string;
-  filter: keyof typeof learningPlanGroupMemberRolesSimple;
-}[] = [
-  { title: 'Responsável', filter: 'IN_CHARGE' },
-  { title: 'Participantes', filter: 'STANDARD' },
-];
+
 // Filters
 const searchMembers = ref('');
 const searchGroups = ref('');
@@ -313,7 +255,6 @@ const removingGroupId = ref(0);
 //
 const groupTitle = ref('');
 const headerStore = usePageHeaderStore();
-
 const resendingInviteMember = ref(false);
 const resendingInviteMemberId = ref(0);
 const selectedInChargeGroupMember = ref<LearningPlanMemberSimple | null>(null);
@@ -321,7 +262,6 @@ const selectedGroupMembers = ref<LearningPlanMemberSimple[]>([]);
 const ignoreUserIds = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.user?.id) || [];
 });
-
 const ignoreUserEmails = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
 });
@@ -340,7 +280,6 @@ function removeSelectedGroupMember(id: number) {
     (member) => member.id !== id,
   );
 }
-
 async function onClickSendInvites() {
   if (!usersToInvite.value.length) {
     return;
@@ -367,7 +306,6 @@ async function onClickSendInvites() {
     sendingInvites.value = false;
   }
 }
-
 async function onCreateGroup() {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -398,7 +336,7 @@ async function onCreateGroup() {
     selectedGroupMembers.value = [];
     selectedInChargeGroupMember.value = null;
     formAddGroup.resetForm();
-    createGroupDialog.value = false;
+    dialogGroup.value = false;
   } catch (_) {
     setMessage('Erro ao criar grupo!', 'red', true);
   } finally {
@@ -418,7 +356,57 @@ async function onDeleteGroup(id: number) {
     setMessage('Erro ao excluir grupo!', 'red', true);
   }
 }
+async function onUpdateGroup(id: number) {
+  const { valid } = await formAddGroup.validate();
+  if (!valid) {
+    return;
+  }
+  try {
+    const members = selectedGroupMembers.value?.map(
+      (member: LearningPlanMemberSimple) => {
+        return member.user.id;
+      },
+    );
+    const data = {
+      title: groupTitle.value,
+      learningplan: learningPlanId.value,
+      group_members: members,
+    };
 
+    await strapi.update('learnin-plan-groups', id, data);
+    setMessage('Grupo atualizado com sucesso!', 'green', true);
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
+  } catch (_) {
+    setMessage('Erro ao atualizar o grupo!', 'red', true);
+  }
+}
+function setUpdatedValues(
+  id: number,
+  title: string,
+  groupMembers: LearningPlanGroupMemberSimple[],
+) {
+  dialogGroupTitle.value = 'Editar Grupo ';
+  dialogGroupActionText.value = 'Atualizar Grupo';
+  dialogGroup.value = true;
+  editingGroupId.value = id;
+  editing.value = true;
+  groupTitle.value = title;
+  const selectedMembersList =
+    (learningPlanStore?.activeMembers?.filter((activeMember) =>
+      groupMembers
+        .map((member) => member.student_member.id)
+        .includes(activeMember.id),
+    ) as LearningPlanMemberSimple[]) || [];
+  formAddGroup.setFieldValue('members', selectedMembersList);
+  selectedGroupMembers.value = selectedMembersList;
+  const leader = filterMembersByRole('IN_CHARGE', groupMembers);
+  const leaderId = leader ? leader[0]?.student_member?.id : undefined;
+  const selectedLeader =
+    selectedMembersList.filter((member) => member.id === leaderId)[0] ||
+    undefined;
+  selectedInChargeGroupMember.value = selectedLeader;
+  formAddGroup.setFieldValue('leader', selectedLeader);
+}
 function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
   return groupMembers?.map((groupMember) => {
     return {
@@ -428,7 +416,6 @@ function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
     };
   });
 }
-
 async function onResendInvite(member: LearningPlanMemberSimple) {
   try {
     resendingInviteMemberId.value = member.id;
@@ -449,7 +436,6 @@ async function onResendInvite(member: LearningPlanMemberSimple) {
     resendingInviteMember.value = false;
   }
 }
-
 async function onDeleteParticipant(id: number) {
   try {
     removingMember.value = true;
@@ -466,14 +452,16 @@ async function onDeleteParticipant(id: number) {
     removingMember.value = false;
   }
 }
-
+function deleteParticipant(id: number) {
+  removingMemberId.value = id;
+  confirmDeleteMember.value = true;
+}
 function searchGroupMembers(_itemTitle: string, queryText: string, item: any) {
   return (
     item.raw.user.fullname.toLowerCase().includes(queryText) ||
     item.raw.user.email.toLowerCase().includes(queryText)
   );
 }
-
 function filterMembersByRole(
   role: keyof typeof learningPlanGroupMemberRolesSimple,
   members?: LearningPlanGroupMemberSimple[],
@@ -481,6 +469,17 @@ function filterMembersByRole(
   return members?.filter(
     (member) => member.role === learningPlanGroupMemberRolesSimple[role],
   );
+}
+function openGroupCard(item: any) {
+  dialogShowGroup.value = true;
+  showValuesGroup.value = {
+    title: item.title,
+    members: item.group_members,
+  };
+}
+function deleteGroupCard(id: number) {
+  removingGroupId.value = id;
+  dialogConfirmDeleteGroup.value = true;
 }
 
 onBeforeMount(() => {
@@ -521,4 +520,17 @@ watch(
     }
   },
 );
+
+watch(dialogGroup, (value) => {
+  if (!value) {
+    groupTitle.value = '';
+    selectedGroupMembers.value = [];
+    selectedInChargeGroupMember.value = null;
+    formAddGroup.resetForm();
+    editing.value = false;
+    dialogGroupTitle.value = 'Criar Grupo ';
+    dialogGroupActionText.value = 'Criar Grupo';
+    editing.value = false;
+  }
+});
 </script>
