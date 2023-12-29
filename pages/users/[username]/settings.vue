@@ -35,7 +35,7 @@ const {
 
 const strapiUser = useStrapiUser<User>().value;
 
-if (!canEdit.value) router.push({ path: '/' });
+//if (!canEdit.value) router.push({ path: '/' });
 </script>
 
 <style scoped lang="scss"></style>

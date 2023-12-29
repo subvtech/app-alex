@@ -22,7 +22,7 @@
       :subtitle="learningPlanStore.learningPlan?.class_name"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
-      :links="canEdit ? links : links.splice(-1)"
+      :links="learningPlanStore.userIsFacilitator ? links : links.slice(0, -1)"
       :selected-option="selectedOption"
       :copy-object="
         learningPlanStore.activeInvitationLinkUrl
@@ -62,8 +62,6 @@ const fetchData = async () => {
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
 };
-const canEdit = computed(() => learningPlanStore.facilitator?.id === user.value.id);
-
 
 const selectOption = (index) => {
   selectedOption.value = index;
@@ -96,6 +94,12 @@ const links = computed(() => [
     label: i18n.t('pages.courses.projects'),
     value: '4',
     to: `/courses/${learningPlanStore.learningPlan?.id}/projects`,
+  },
+  {
+    label: '',
+    icon: 'mdi-cog-outline',
+    value: '5',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
   },
 
 ]);

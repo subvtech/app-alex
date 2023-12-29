@@ -28,7 +28,7 @@
   "to": "to",
   "at": "at",
   "interval": "Every {days} days",
-  "everyday": "Every day",
+  "everyday": "Daily",
   "weekly": "Weekly: {day}",
   "biweekly": "Biweekly: {day}",
   "monthly": "Monthly: {day}",

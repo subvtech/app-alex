@@ -17,7 +17,7 @@
               })
             "
             :course-id="learningPlan.id"
-            :can-edit="canEdit"
+            :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
             sizing-class="pa-0"
             is-nested
@@ -26,7 +26,7 @@
           <app-about
             :text="learningPlan.description"
             :user-id="learningPlan.id"
-            :can-edit="canEdit"
+            :can-edit="learningPlanStore.userIsFacilitator"
             @update="updateAbout"
             :empty-text-message="$t('pages.courses.about.empty')"
             sizing-class="pa-0"
@@ -65,7 +65,7 @@
             :info="learningPlan.details?.lines"
             :courseId="learningPlan.id"
             :title="$t('components.courses.editor.title')"
-            :can-edit="canEdit"
+            :can-edit="learningPlanStore.userIsFacilitator"
             is-nested
             hide-dividers
             @update="(data) => emit('update', data)"
@@ -75,7 +75,7 @@
     </alex-custom-card>
 
     <div class="d-flex flex-column w-100 gap-6 max-width">
-      <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false" sizing-class="px-6 pb-12">
+      <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false">
         <template #content>
           <app-general-boxes
             :boxes="[
@@ -103,12 +103,13 @@
           />
         </template>
         <template #footer>
-          <alex-learningplan-meetings
-            :can-edit="canEdit"
+          <div class="pb-12 w-100 fix-margin">
+            <alex-learningplan-meetings
+            :can-edit="learningPlanStore.userIsFacilitator"
             :data="schedules"
             :end-date="new Date()"
-            :is-facilitator="canEdit"
-            :href="canEdit ? `${learningPlan.id}/settings` : ''"
+            :is-facilitator="learningPlanStore.userIsFacilitator"
+            :href="learningPlanStore.userIsFacilitator ? `${learningPlan.id}/settings` : ''"
             is-nested
             :learning-plan-id="0"
             hide-dividers
@@ -128,22 +129,24 @@
             @link:expired="plainLink = null"
             full-width
           />
+          
+        </div>
         </template>
       </alex-custom-card>
       <competences
-        v-if="(generalTags.length === 0 && canEdit) || generalTags.length !== 0"
+        v-if="(generalTags.length === 0 && learningPlanStore.userIsFacilitator) || generalTags.length !== 0"
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
         :userId="owner.id"
         :userTags="generalTags"
-        :can-edit="canEdit"
+        :can-edit="learningPlanStore.userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
       <competences
         v-if="
-          (technicalTags.length === 0 && canEdit) || technicalTags.length !== 0
+          (technicalTags.length === 0 && learningPlanStore.userIsFacilitator) || technicalTags.length !== 0
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
@@ -151,7 +154,7 @@
         :placeholder="$t('components.competences.technical.placeholder')"
         :userId="owner.id"
         :userTags="technicalTags"
-        :can-edit="canEdit"
+        :can-edit="learningPlanStore.userIsFacilitator"
         @update="(data) => emit('update', true, data)"
       />
     </div>
@@ -163,6 +166,8 @@ import { useI18n } from 'vue-i18n';
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
 const { update } = useStrapi();
+
+const learningPlanStore = useLearningPlanStore();
 
 const i18n = useI18n();
 const emit = defineEmits(['update']);
@@ -235,6 +240,9 @@ const showDetails = computed(() => {
 <style scope lang="scss">
 .w-212 {
   max-width: 850px;
+}
+.fix-margin {
+  margin-top: -24px;
 }
 
 .course-page {
