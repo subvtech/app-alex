@@ -11,7 +11,9 @@
   >
     <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8 relative">
       <v-row justify="start" align="center">
-        <v-icon :color="countdown ? currentColor : 'white'">{{ iconName }}</v-icon>
+        <v-icon :color="countdown ? currentColor : 'white'">{{
+          iconName
+        }}</v-icon>
         <span class="text-white font-weight-bold">{{ currentMessage }}</span>
       </v-row>
       <v-icon class="close" size="x-small" @click="onClose" role="close-btn"

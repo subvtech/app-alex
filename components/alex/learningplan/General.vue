@@ -103,38 +103,49 @@
           />
         </template>
         <template #footer>
-          <div class="w-100 fix-margin" :class="!plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'">
-            <alex-learningplan-meetings
-            :can-edit="learningPlanStore.userIsFacilitator"
-            :data="schedules"
-            :end-date="new Date()"
-            :is-facilitator="learningPlanStore.userIsFacilitator"
-            :href="learningPlanStore.userIsFacilitator ? `${learningPlan.id}/settings` : ''"
-            is-nested
-            :learning-plan-id="0"
-            hide-dividers
-            sizing-class="ma-0"
-          />
-          <alex-learningplan-invites
-            v-if="canEdit"
-            :enable-invites="learningPlan.invite_enabled"
-            :duration="learningPlan.invitation_duration"
-            :course-id="learningPlan.id"
-            :data="invitationLink"
-            @update:link="
-              (data) => {
-                plainLink = data.url;
-              }
+          <div
+            class="w-100 fix-margin"
+            :class="
+              !plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'
             "
-            @link:expired="plainLink = null"
-            full-width
-          />
-          
-        </div>
+          >
+            <alex-learningplan-meetings
+              :can-edit="learningPlanStore.userIsFacilitator"
+              :data="schedules"
+              :end-date="new Date()"
+              :is-facilitator="learningPlanStore.userIsFacilitator"
+              :href="
+                learningPlanStore.userIsFacilitator
+                  ? `${learningPlan.id}/settings`
+                  : ''
+              "
+              is-nested
+              :learning-plan-id="0"
+              hide-dividers
+              sizing-class="ma-0"
+            />
+            <alex-learningplan-invites
+              v-if="canEdit"
+              :enable-invites="learningPlan.invite_enabled"
+              :duration="learningPlan.invitation_duration"
+              :course-id="learningPlan.id"
+              :data="invitationLink"
+              @update:link="
+                (data) => {
+                  plainLink = data.url;
+                }
+              "
+              @link:expired="plainLink = null"
+              full-width
+            />
+          </div>
         </template>
       </alex-custom-card>
       <competences
-        v-if="(generalTags.length === 0 && learningPlanStore.userIsFacilitator) || generalTags.length !== 0"
+        v-if="
+          (generalTags.length === 0 && learningPlanStore.userIsFacilitator) ||
+          generalTags.length !== 0
+        "
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
@@ -146,7 +157,8 @@
       />
       <competences
         v-if="
-          (technicalTags.length === 0 && learningPlanStore.userIsFacilitator) || technicalTags.length !== 0
+          (technicalTags.length === 0 && learningPlanStore.userIsFacilitator) ||
+          technicalTags.length !== 0
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
@@ -274,7 +286,6 @@ const showDetails = computed(() => {
     }
   }
 }
-
 
 @media (max-width: 1125px) {
   .course-page {

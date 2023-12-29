@@ -74,7 +74,6 @@ const owner = ref<any>();
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
-
 const { setMessage } = useMessageStore();
 const emit = defineEmits(['update']);
 definePageMeta({
@@ -172,7 +171,10 @@ const updateMeetings = async (schedules) => {
 
 watch(invitationLink, () => {
   if (invitationLink.value)
-    plainLink.value = generateUrl(invitationLink.value.hash);
+    plainLink.value = generateUrl(
+      invitationLink.value.hash,
+      learningPlanId.value,
+    );
 });
 </script>
 <style scoped lang="scss"></style>

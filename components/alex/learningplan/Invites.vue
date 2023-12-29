@@ -119,7 +119,7 @@ const updateLink = async () => {
   );
   stopTimeout();
 
-  url.value = generateUrl(result.data.attributes.hash);
+  url.value = generateUrl(result.data.attributes.hash, courseId);
 
   emit('update:link', { url: url.value });
   remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
@@ -316,8 +316,8 @@ watch(theresTimeAndUrl, () => {
   }
 }
 
-@media(max-width: 550px){
-  .invite{
+@media (max-width: 550px) {
+  .invite {
     min-width: unset;
   }
   .url {
@@ -325,13 +325,13 @@ watch(theresTimeAndUrl, () => {
   }
 }
 
-@media(max-width: 480px){
+@media (max-width: 480px) {
   .url {
     width: 200px;
   }
 }
 
-@media(max-width: 380px){
+@media (max-width: 380px) {
   .url {
     width: 150px;
   }
