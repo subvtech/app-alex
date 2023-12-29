@@ -32,7 +32,7 @@ const {
 
 const generalTags = ref();
 const technicalTags = ref();
-const { updateUser } = useUpdateStrapi();
+const { updateUser } = useUpdateUser();
 
 const strapiUser = useStrapiUser<User>().value;
 

@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { User } from '@/models/user.model';
-const { updateUser } = useUpdateStrapi();
+const { updateUser } = useUpdateUser();
 
 definePageMeta({
   middleware: 'auth',

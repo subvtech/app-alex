@@ -45,7 +45,7 @@
 import { useI18n } from 'vue-i18n';
 import { TabType } from '~/components/alex/custom/Tabs.vue';
 const i18n = useI18n();
-const { updateUser } = useUpdateStrapi();
+const { updateUser } = useUpdateUser();
 
 definePageMeta({
   middleware: 'auth',
