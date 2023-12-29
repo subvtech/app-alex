@@ -414,5 +414,42 @@ query($userId: ID!) {
     }
   }
 }
-
 `;
+
+export const getTrail = `
+query($trailId: ID!) {
+  trail(id:$trailId ){
+    data{
+      attributes{
+        cover_image{
+          data{
+            attributes{
+              url
+            }
+          }
+        }
+        title
+        description
+      	structures{
+          data{
+            id
+            attributes{
+              time
+              version
+              blocks(
+                pagination: {limit: -1}
+              ){
+                data{
+                  attributes{
+                    data
+                    type
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } 
+}`;
