@@ -7,8 +7,10 @@
     color="gray-100"
     :max-width="320"
     :min-width="200"
+    @click="$emit('open')"
   >
     <alex-custom-dropdown
+      v-if="!noOptions"
       v-model="showOptions"
       :close-on-content-click="false"
       :items="items"
@@ -66,11 +68,14 @@ interface LearningMemberGroupProps {
     };
     role: 'in_charge' | 'standard';
   }[];
+  noOptions?: boolean;
 }
 
 const showOptions = ref(false);
-const emit = defineEmits(['edit', 'delete']);
-const props = defineProps<LearningMemberGroupProps>();
+const emit = defineEmits(['edit', 'delete', 'open']);
+const props = withDefaults(defineProps<LearningMemberGroupProps>(), {
+  noOptions: false,
+});
 
 const leader = computed(() =>
   props.members.filter((user) => user.role === 'in_charge'),

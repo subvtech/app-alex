@@ -26,5 +26,6 @@
   "sendMessage": "Enviar mensagem",
   "responsibleIsRequired":"Responsável é obrigatório",
   "participantsIsRequired":"É necessário ter integrantes",
-  "groupNameIsRequired":"Nome do grupo é obrigatório"
+  "groupNameIsRequired":"Nome do grupo é obrigatório",
+  "group": "Grupo"
 }

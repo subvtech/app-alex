@@ -1,3 +1,5 @@
+import { UserRoles } from '../user.model';
+
 export interface UserSimple {
   id: number;
   username: string;
@@ -13,5 +15,5 @@ export interface UserSimple {
   isProfessor: boolean;
   tags: any[];
   avatar: Upload;
-  role: any;
+  role: UserRoles;
 }

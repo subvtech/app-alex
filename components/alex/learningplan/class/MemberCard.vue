@@ -10,6 +10,7 @@
   >
     <v-img class="banner" :src="coverImage" cover>
       <alex-custom-dropdown
+        v-if="!noOptions"
         v-model="showOptions"
         :close-on-content-click="false"
         :items="items"
@@ -69,11 +70,13 @@ interface LearningMemberProps {
   coverImage?: string;
   avatarImage?: string;
   role?: string;
+  noOptions: boolean;
 }
 const emit = defineEmits(['open', 'sendMessage', 'delete']);
 withDefaults(defineProps<LearningMemberProps>(), {
   avatarImage: undefined,
   coverImage: undefined,
+  noOptions: false,
   role: 'student',
 });
 const { t } = useI18n();

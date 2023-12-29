@@ -18,7 +18,7 @@
           <v-col cols="4">
             <alex-inputs-text-field
               v-model="modelSearch"
-              name="search"
+              :name="`search-${$attrs.title}`"
               density="comfortable"
               :placeholder="searchPlaceholder"
               hide-details
@@ -77,7 +77,7 @@
             :items="items"
             :items-per-page="itemsPerPage"
             :filter-keys="filterKeys"
-            class="d-flex flex-wrap"
+            class="d-flex flex-wrap w-100"
           >
             <template #default="{ items: iterateItems }">
               <div class="d-flex flex-wrap gap-6 w-100 px-1">
@@ -189,6 +189,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  emptyStateObjectName: {
+    type: String,
+    default: 'pages.classes.participant',
+  },
 });
 
 const modelSearch = computed({
@@ -215,7 +219,7 @@ const pagination = usePagination(
   modelSearch,
   page,
   cardItems,
-  t('pages.classes.participant'),
+  t(props.emptyStateObjectName),
 );
 </script>
 

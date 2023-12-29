@@ -3,7 +3,7 @@
     class="bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100"
     data-testid="alex-dialog-footer"
   >
-    <v-row dense justify="end">
+    <v-row dense :justify="justify">
       <v-col v-if="!noSecondaryButton" dense cols="auto">
         <slot
           v-if="hasSecondarySlotButton"
@@ -46,6 +46,14 @@ interface HeaderProps {
   noSecondaryButton?: boolean;
   mainButtonLoading?: boolean;
   mainButtonDisabled?: boolean;
+  justify?:
+    | 'start'
+    | 'end'
+    | 'center'
+    | 'space-around'
+    | 'space-between'
+    | 'space-evenly'
+    | 'stretch';
 }
 withDefaults(defineProps<HeaderProps>(), {
   mainButtonText: 'Salvar',
@@ -54,6 +62,7 @@ withDefaults(defineProps<HeaderProps>(), {
   noSecondaryButton: false,
   mainButtonLoading: false,
   mainButtonDisabled: false,
+  justify: 'end',
 });
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
