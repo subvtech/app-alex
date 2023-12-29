@@ -24,6 +24,7 @@
         :text="info"
         :userId="userId"
         :can-edit="canEdit"
+        is-optional
         :about-text-message="$t('components.profile.about.placeholder')"
         :empty-text-message="$t('components.profile.about.placeholder')"
         @update="updateAbout"

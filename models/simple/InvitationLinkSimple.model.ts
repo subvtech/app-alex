@@ -10,4 +10,6 @@ export interface InvitationLinkSimple {
   expires_at: Date;
   learningplan: LearningPlanSimple;
   is_expired: boolean;
+  createdAt?: Date;
 }
+
