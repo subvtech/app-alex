@@ -73,7 +73,11 @@ const links = computed(() => [
       ? `/courses/${learningPlanStore.learningPlan?.id}`
       : route.path,
   },
-  { label: i18n.t('pages.courses.trails'), value: '1' },
+  {
+    label: i18n.t('pages.courses.trails'),
+    value: '1',
+    to: `/courses/${learningPlanStore.learningPlan?.id}/trails`,
+  },
   {
     label: i18n.t('pages.courses.class'),
     value: '2',

@@ -273,6 +273,21 @@ export const useFormRules = () => {
         ),
     });
 
+  const createTrailsRules = yup.object({
+    title: yup
+      .string()
+      .required(i18n.t('rules.title.required'))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
+      .trim(),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+  });
+
   const createGroupRules = {
     groupTitle: yup
       .string()
@@ -322,6 +337,7 @@ export const useFormRules = () => {
     createCourseRules,
     emailRegex,
     scheduleRules,
+    createTrailsRules,
     createGroupRules,
   };
 };
