@@ -1,4 +1,4 @@
-export const useUpdateUser = () => {
+export const useUpdateUserStore = () => {
   const { find, findOne } = useStrapi();
   const route = useRoute();
   const router = useRouter();
