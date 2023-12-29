@@ -75,19 +75,23 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const invitationLink = computed(() => {
-    let activeLink;
+    if (learningPlan.value?.invitation_links?.length) {
+      const sortedLinks = learningPlan.value.invitation_links
+        .filter((invite: InvitationLinkSimple) => {
+          return (
+            !invite.emails_to_send &&
+            invite.role === 'student' &&
+            !invite.is_expired &&
+            new Date(invite.expires_at).getTime() > new Date().getTime()
+          );
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+        );
 
-    if (learningPlan.value?.invitation_links) {
-      const sortedLinks = learningPlan.value.invitation_links.sort(
-        (a, b) =>
-          new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime(),
-      );
-
-      const sortedLinkLength = sortedLinks.length - 1;
-      if (sortedLinkLength >= 0) activeLink = sortedLinks[sortedLinkLength];
+      return sortedLinks[0];
     }
-
-    return activeLink;
   });
 
   const activeInvitationLinkUrl = computed(() => {
