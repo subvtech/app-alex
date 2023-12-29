@@ -33,11 +33,16 @@
             />
           </div>
           <div class="buttons d-flex justify-end">
-            <alex-custom-button variant="secondary" @click="onCancel">
+            <alex-custom-button
+              variant="secondary"
+              size="large"
+              @click="onCancel"
+            >
               {{ $t('components.profile.settings.cancel') }}</alex-custom-button
             >
             <alex-custom-button
               variant="primary"
+              size="large"
               type="submit"
               :disabled="theresError"
               @click="onSave"
