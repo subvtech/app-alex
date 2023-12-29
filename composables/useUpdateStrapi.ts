@@ -21,8 +21,7 @@ export const useUpdateStrapi = () => {
     ];
     let user;
     const canEdit = username === route.params.username;
-    console.log(route.params);
-    console.log(username, route.params.username);
+
 
     if (canEdit) {
       user = await findOne<User>('users', id, {

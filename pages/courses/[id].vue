@@ -55,7 +55,6 @@ const fetchData = async () => {
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
 };
-console.log({ learningPlanStore });
 //const canEdit = computed(() => learningPlanStore.owner?.id === user.value.id);
 const canEdit = true;
 

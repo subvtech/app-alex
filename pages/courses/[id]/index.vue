@@ -75,7 +75,7 @@ const owner = ref<any>();
 
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-console.log({ learningPlanStore });
+
 //const canEdit = computed(() => learningPlanStore.owner?.id === id);
 const canEdit = true;
 const { setMessage } = useMessageStore();

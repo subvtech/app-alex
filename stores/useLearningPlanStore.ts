@@ -48,7 +48,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         populate,
       });
 
-      console.log({ result: result.data });
       learningPlan.value = result.data;
 
       loading.value = false;
