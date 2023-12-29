@@ -250,8 +250,6 @@ const showDetails = computed(() => {
     min-width: 60% !important;
     padding-inline: 24px !important;
     padding-bottom: 24px;
-    .flex-column.align-center.gap-12 {
-    }
   }
 }
 
@@ -278,7 +276,7 @@ const showDetails = computed(() => {
 }
 
 
-@media (max-width: 1075px) {
+@media (max-width: 1125px) {
   .course-page {
     flex-wrap: wrap;
     &.gap-6 {
