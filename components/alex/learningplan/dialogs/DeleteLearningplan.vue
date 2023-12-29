@@ -90,7 +90,6 @@ const props = defineProps({
 const openDialog = ref(false);
 
 const closeDialog = () => {
-  console.log({ openDialog: openDialog.value });
   openDialog.value = false;
 };
 let regex = new RegExp(

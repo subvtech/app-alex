@@ -88,7 +88,6 @@ const onCancel = async () => {
 };
 
 const onSlidesChanged = async (data) => {
-  console.log(data)
   myImages.value = data;
 };
 const toggleIsEditing = () => {
@@ -117,7 +116,7 @@ const onSave = async () => {
     .map((item) => _delete('medias', item.id));
 
   const result = await Promise.all([...createPromises, ...deletePromises]);
-  console.log({ result });
+
 };
 
 watch(images, () => {
