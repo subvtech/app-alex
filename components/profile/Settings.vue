@@ -13,7 +13,7 @@
             name="fullname"
             class=""
           />
-          <div class="block d-flex">
+          <div class="block gap-6 d-flex">
             <alex-inputs-text-field
               v-maska:[phoneMask]
               :placeholder="$t('components.profile.settings.phonePlaceholder')"
@@ -153,6 +153,9 @@ watch(cpf, () => {
 </script>
 
 <style scoped lang="scss">
+.gap-6{
+  gap: 24px;
+}
 .settings {
   form {
     gap: 24px;
@@ -160,9 +163,7 @@ watch(cpf, () => {
       text-transform: none !important;
     }
   }
-  .block {
-    gap: 24px;
-  }
+
 
   .buttons {
     gap: 8px;
