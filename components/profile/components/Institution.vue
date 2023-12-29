@@ -4,7 +4,7 @@
       isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item'
     "
   >
-    <div class="d-flex" style="gap: 12px">
+    <div class="d-flex gap-3">
       <NuxtImg provider="strapi" :src="url" placeholder />
       <div class="d-flex flex-column justify-center">
         <span>{{ acronym + ' - ' + name }}</span>
@@ -76,10 +76,14 @@ const removeInstitution = async () => {
 </script>
 
 <style scoped lang="scss">
+.gap-3 {
+  gap: 12px;
+}
 .item {
   position: relative;
   color: #5d6872;
   line-height: 22px;
+  max-width: 533px;
 
   border-radius: 8px;
   border: 1px solid #eaeef1;
@@ -98,14 +102,7 @@ const removeInstitution = async () => {
     border-radius: 8px;
     border: 1px solid #eaeef1;
   }
-  &:hover {
-    .options {
-      .handle {
-        cursor: move;
-        display: block;
-      }
-    }
-  }
+
   .options {
     position: relative;
 
@@ -113,7 +110,7 @@ const removeInstitution = async () => {
       width: 24px;
       height: 24px;
       border-width: 0px;
-      display: none;
+      cursor: move;
     }
     .remove {
       cursor: pointer;

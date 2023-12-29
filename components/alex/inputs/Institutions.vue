@@ -24,12 +24,14 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate';
 
-type InstitutionsType = {
-  socialName: string;
+export type InstitutionsType = {
+  name: string;
   acronym: string;
+  id: number;
+  cover: any;
 };
 
-type InstitutionProps = {
+export type InstitutionProps = {
   search: string;
   institutions: InstitutionsType[];
   filterIds?: number[];
@@ -65,23 +67,26 @@ const fetchInstitutions = async (institution: string) => {
   noDataText.value = t('components.institutions.noInstitutionsFound');
   try {
     const result = await find(`institutions`, {
-      fields: ['id', 'acronym', 'socialName'], // campos a serem buscados
       filters: {
         $or: [
           { acronym: { $containsi: institution } },
-          { socialName: { $containsi: institution } },
+          { name: { $containsi: institution } },
         ],
       },
-      pagination: { start: 0, limit: 10 }, // limite de instituições
+      populate: ['cover'],
+      pagination: { start: 0, limit: 10 }, // limit per page
     });
     if (result.data.length > 0) {
-      const dataInstitutions = result.data.map((institution: any) => {
-        return {
-          id: institution.id,
-          acronym: institution.attributes?.acronym,
-          socialName: institution.attributes?.socialName,
-        };
-      });
+      const dataInstitutions: InstitutionsType[] = result.data.map(
+        (institution: any) => {
+          return {
+            id: institution.id,
+            acronym: institution.attributes?.acronym,
+            name: institution.attributes?.name,
+            cover: institution.attributes?.cover.data.attributes,
+          };
+        },
+      );
       emit('update:institutions', dataInstitutions);
     }
   } catch (error) {
@@ -107,6 +112,6 @@ watchEffect((onInvalidate) => {
 });
 
 const getItemTitle = (item: InstitutionsType) => {
-  return `${item.acronym} - ${item.socialName}`;
+  return `${item.acronym} - ${item.name}`;
 };
 </script>
