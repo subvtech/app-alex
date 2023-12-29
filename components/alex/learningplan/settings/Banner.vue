@@ -1,6 +1,6 @@
 <template>
   <alex-custom-card
-    :title="$t('components.courses.settings.cover.title')"
+    :title="$t(`components.${namespace}.settings.cover.title`)"
     :show-icon="false"
     show-footer-divider
   >
@@ -24,11 +24,11 @@
           v-if="theresCover"
           icon="mdi-trash-can-outline"
           variant="error"
-          @click="removeCoverPicture"
+          @click="deleteCover"
         />
         <input
           class="d-none"
-          @input="uploadCoverPicture"
+          @input="(e) => emit('update', e)"
           accept="image/png, image/jpeg"
           ref="fileInput"
           type="file"
@@ -41,11 +41,9 @@
 import { useI18n } from 'vue-i18n';
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
-const { find, update } = useStrapi();
-const { uploadImage, removeImage } = useUploadedImage();
 const i18n = useI18n();
 
-const emit = defineEmits(['update']);
+const emit = defineEmits(['update', 'delete']);
 
 const props = defineProps({
   cover: {
@@ -59,6 +57,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  namespace: {
+    type: String as PropType<'courses' | 'trails'>,
+    default: 'courses',
+  },
 });
 
 const { cover } = toRefs(props);
@@ -70,24 +72,12 @@ const emptyState = {
   url: '/images/emptyBanner.svg',
 };
 
-async function uploadCoverPicture(event: any) {
-  const temp = await uploadImage(event);
-  uploadCover.value = { url: temp[0].url, id: temp[0].id };
-
-  await update(`/learningplans/${props.learningPlanId}`, {
-    cover_image: uploadCover.value.id,
-  });
-  emit('update', i18n.t('components.courses.settings.cover.update'));
-}
-
-async function removeCoverPicture() {
-  if (!theresCover.value) return;
-  await removeImage(uploadCover.value.id);
-  uploadCover.value = emptyState;
-  emit('update', i18n.t('components.courses.settings.cover.update'));
-}
-
 const theresCover = computed(() => uploadCover.value.id !== emptyState.id);
+
+const deleteCover = () => {
+  if (!theresCover.value) return;
+  emit('delete');
+};
 
 watch(cover!, () => {
   uploadCover.value = props.cover;

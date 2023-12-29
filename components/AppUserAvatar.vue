@@ -59,7 +59,7 @@
           : 'xx-small',
       ]"
     >
-      <NuxtImg src="/svg/trash.svg" placeholder />
+      <img src="/svg/trash.svg" width="20" height="20" />
     </div>
   </div>
 </template>
@@ -103,7 +103,7 @@ const props = defineProps({
 const { profilePicture, placeholder } = toRefs(props);
 
 const avatar = ref<{ url: string; id: number } | null | undefined>(
-  props.trackCurrentUser ? userStore.profilePicture : profilePicture?.value,
+  props.trackCurrentUser ? userStore.avatar : profilePicture?.value,
 );
 const fullname = ref<string | null | undefined>(placeholder.value);
 const { uploadProfilePicture, removeProfilePicture } = useProfilePicture(
@@ -146,10 +146,10 @@ const xlarge = computed(() => {
 });
 
 watch(
-  () => userStore.profilePicture,
+  () => userStore.avatar,
   () => {
     if (props.trackCurrentUser) {
-      avatar!.value = userStore.profilePicture;
+      avatar!.value = userStore.avatar;
       fullname.value = userStore.fullname;
     }
   },

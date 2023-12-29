@@ -107,5 +107,9 @@
       "success": "Texto copiado.",
       "error": "Não foi possível copiar o texto."
     }
+  },
+  "copy": {
+    "success": "Texto copiado.",
+    "error": "Não foi possível copiar o texto."
   }
 }

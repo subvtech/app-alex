@@ -28,6 +28,7 @@
         >{{ title }}</span
       >
       <v-divider
+        v-if="items.length !== 0"
         vertical
         :thickness="thickness"
         class="pl-4"

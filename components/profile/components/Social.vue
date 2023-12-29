@@ -20,19 +20,18 @@
 
           <div class="d-flex justify-space-between align-center w-100">
             <div class="d-flex align-center">
-              <NuxtImg
+              <img
                 v-if="canEdit"
                 class="handle"
                 src="/svg/menu.svg"
-                placeholder
+               
               />
               <div
                 class="d-flex justify-center align-center rounded-lg"
                 style="padding: 6px; border: 1px solid #d2d6da"
               >
-                <NuxtImg
+                <img
                   :src="isSupported ? `/svg/${name}.svg` : '/svg/website.svg'"
-                  placeholder
                   style="width: 24px; height: 24px"
                 />
               </div>

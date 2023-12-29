@@ -25,14 +25,13 @@
           v-model="selectedSocial"
         >
           <template #selection="{ item }">
-            <NuxtImg
+            <img
               class="mr-4"
               :src="
                 ['Youtube', 'Linkedin', 'Instagram'].includes(item.raw)
                   ? `/svg/${item.raw}.svg`
                   : '/svg/website.svg'
               "
-              placeholder
               style="width: 24px; height: 24px"
             />
             <p4 style="color: #6e7a87">{{ item.raw }}</p4>
@@ -52,14 +51,13 @@
               "
               v-slot:prepend=""
             >
-              <NuxtImg
+              <img
                 class="mr-4"
                 :src="
                   ['Youtube', 'Linkedin', 'Instagram'].includes(item.raw)
                     ? `/svg/${item.raw}.svg`
                     : '/svg/website.svg'
                 "
-                placeholder
                 style="width: 24px; height: 24px"
               />
             </v-list-item> </template

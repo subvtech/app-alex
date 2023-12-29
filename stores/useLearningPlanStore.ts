@@ -78,27 +78,13 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     let activeLink;
 
     if (learningPlan.value?.invitation_links) {
-      learningPlan.value.invitation_links?.forEach(
-        (link: InvitationLinkSimple) => {
-          if (link.is_expired) return;
-          const expirationDate = new Date(link.expires_at);
-
-          if (
-            link.role === 'student' &&
-            link.emails_to_send === null &&
-            expirationDate.getTime() > new Date().getTime()
-          ) {
-            const differenceBetweenLinks = activeLink
-              ? expirationDate.getTime() -
-                new Date(activeLink.expires_at).getTime()
-              : 1;
-
-            if (!activeLink || differenceBetweenLinks > 0) {
-              activeLink = link;
-            }
-          }
-        },
+      const sortedLinks = learningPlan.value.invitation_links.sort(
+        (a, b) =>
+          new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime(),
       );
+
+      const sortedLinkLength = sortedLinks.length - 1;
+      if (sortedLinkLength >= 0) activeLink = sortedLinks[sortedLinkLength];
     }
 
     return activeLink;
