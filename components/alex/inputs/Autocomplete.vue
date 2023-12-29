@@ -51,7 +51,6 @@
 import { YupSchema, useField } from 'vee-validate';
 
 interface AutoCompleteProps {
-  modelValue?: string | number | boolean | unknown[] | any;
   name: string;
   label?: string;
   required?: boolean;
@@ -62,7 +61,6 @@ interface AutoCompleteProps {
 }
 
 const props = withDefaults(defineProps<AutoCompleteProps>(), {
-  modelValue: undefined,
   search: undefined,
   disabled: false,
   theme: 'light',
@@ -87,18 +85,19 @@ const textColor = computed(() => {
 
 <style lang="scss">
 .alex-autocomplete {
-  &.v-theme--mainTheme {
+  .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;
     --v-medium-emphasis-opacity: 1 !important;
     --v-disabled-opacity: 1 !important;
     --v-border-color: rgb(var(--v-theme-gray-400));
   }
-
-  &.v-field__input {
-    overflow: hidden;
+  .v-field__input {
     color: rgb(var(--v-theme-gray-300));
     border-color: rgb(var(--v-theme-gray-400));
+  }
+  &.v-field__input {
+    overflow: hidden;
     text-overflow: ellipsis !important;
     font-family: Sen !important;
     font-size: 16px !important;
@@ -110,51 +109,51 @@ const textColor = computed(() => {
     border-width: 5px !important;
   }
 
-  &.v-field--disabled > div > i,
-  &.v-field--disabled > .v-field__field > .v-field__input,
-  &.v-input--disabled > .v-input__details {
+  .v-field--disabled > div > i,
+  .v-field--disabled > .v-field__field > .v-field__input,
+  .v-input--disabled > .v-input__details {
     color: rgb(var(--v-theme-gray-300)) !important;
   }
 
-  &.v-field:hover:not(.v-field--active):not(.v-field--error)
+  .v-field:hover:not(.v-field--active):not(.v-field--error)
     > .v-field__outline {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
-  &.v-input__details {
+  .v-input__details {
     padding-inline-start: 0 !important;
   }
 
-  &.v-input__details > .v-messages > .v-messages__message {
+  .v-input__details > .v-messages > .v-messages__message {
     font-size: 14px !important;
     color: rgb(var(--v-theme-gray-600));
   }
 
-  &.light .v-field__outline {
+  .light .v-field__outline {
     color: rgb(var(--v-theme-gray-300));
   }
 
-  &.light .v-field--dirty > .v-field__field > .v-field__input {
+  .light .v-field--dirty > .v-field__field > .v-field__input {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
-  &.light .v-field > div > i {
+  .light .v-field > div > i {
     color: rgb(var(--v-theme-gray-600)) !important;
   }
 
-  &.dark .v-field__outline {
+  .dark .v-field__outline {
     color: var(--gray-400);
   }
 
-  &.dark .v-field--dirty > .v-field__field > .v-field__input {
+  .dark .v-field--dirty > .v-field__field > .v-field__input {
     color: #fff !important;
   }
 
-  &.dark .v-field > div > i {
+  .dark .v-field > div > i {
     color: rgb(var(--v-theme-gray-400)) !important;
   }
 
-  &.v-field--error > .v-field__outline,
+  .v-field--error > .v-field__outline,
   .v-input--error .v-messages__message {
     color: rgb(var(--v-theme-error-0)) !important;
   }

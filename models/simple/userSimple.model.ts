@@ -1,10 +1,6 @@
-import { Tag } from './tag.model';
+import { UserRoles } from '../user.model';
 
-export enum UserRoles {
-  PROFESSOR = 'professor',
-  AUTHENTICATED = 'Authenticated',
-}
-export interface User {
+export interface UserSimple {
   id: number;
   username: string;
   email: string;
@@ -17,7 +13,7 @@ export interface User {
   blocked: boolean;
   confirmed: boolean;
   isProfessor: boolean;
-  tags: Tag[];
-  avatar: any;
+  tags: any[];
+  avatar: Upload;
   role: UserRoles;
 }

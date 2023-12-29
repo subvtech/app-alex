@@ -273,6 +273,20 @@ export const useFormRules = () => {
         ),
     });
 
+  const createGroupRules = {
+    groupTitle: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .required(i18n.t('pages.classes.groupNameIsRequired'))
+      .trim(),
+    leader: yup.mixed().required(i18n.t('pages.classes.responsibleIsRequired')),
+    members: yup
+      .array()
+      .required(i18n.t('pages.classes.participantsIsRequired'))
+      .min(2, i18n.t('pages.classes.participantsIsRequired')),
+  };
+
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -308,5 +322,6 @@ export const useFormRules = () => {
     createCourseRules,
     emailRegex,
     scheduleRules,
+    createGroupRules,
   };
 };
