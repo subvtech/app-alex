@@ -4,11 +4,11 @@
     :title="$t('components.learningPlan.dialogs.createNewCourse')"
     :name-main-button="$t('components.learningPlan.dialogs.create')"
     :name-second-button="$t('components.learningPlan.dialogs.cancel')"
-    stepper
     :steps-config="stepsConfig"
+    :loading="loading"
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
-    :loading="loading"
+    stepper
     @on-main-action="createCourse"
   >
     <template #step1
@@ -81,6 +81,8 @@
           ><alex-learningplan-dialogs-schedule
             v-model="createScheduleModal"
             v-model:data="editData"
+            :end-date="endDate"
+            :start-date="startDate"
             @submit="
               (values) => (!editData ? addMeeting(values) : editMeeting(values))
             "
@@ -106,7 +108,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="mt-4">
+      <div v-else class="d-flex flex-column mt-4 gap-2">
         <course-meeting
           v-for="schedule in schedules"
           :key="schedule.id"
@@ -215,6 +217,18 @@ const addMeeting = (values: MeetingPropsType) => {
   });
 };
 
+const cleanFields = () => {
+  schedules.value = [];
+  slides.value = [];
+  selectedUsers.value = [];
+  title.value = '';
+  description.value = '';
+  learningClass.value = '';
+  startDate.value = undefined;
+  endDate.value = undefined;
+  carousel?.value?.clearSlides();
+};
+
 const createCourse = async () => {
   try {
     loading.value = true;
@@ -234,20 +248,14 @@ const createCourse = async () => {
     });
     emit('submit');
     emit('update:modelValue', false);
-    schedules.value = [];
-    slides.value = [];
-    selectedUsers.value = [];
-    title.value = '';
-    description.value = '';
-    learningClass.value = '';
-    startDate.value = undefined;
-    endDate.value = undefined;
+    cleanFields();
+    setMessage(t('components.dialog.successCreateCourse'), 'green', true);
   } catch (error: unknown) {
     const message = (error as { error: { message: string } })?.error?.message;
     if (message) {
       setMessage(message, 'red', true);
     } else {
-      setMessage('Não foi possível criar o curso', 'red', true);
+      setMessage(t('components.dialog.cantCreateCourse'), 'red', true);
     }
   } finally {
     loading.value = false;
@@ -256,8 +264,18 @@ const createCourse = async () => {
 
 watch(
   () => props.modelValue,
-  () => carousel?.value?.clearSlides(),
+  () => {
+    if (!props.modelValue) {
+      cleanFields();
+    }
+  },
 );
+
+watch(endDate, (value) => {
+  if (value) {
+    value.setUTCHours(23, 59, 59, 999);
+  }
+});
 </script>
 
 <style scoped>
