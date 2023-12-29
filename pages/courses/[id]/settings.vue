@@ -67,8 +67,7 @@ const course = ref<any>();
 const meetings = ref<any>([]);
 const invitationLink = ref<InvitationLinkType | null>(null);
 const plainLink = ref<string | null>(null);
-const emit = defineEmits(['update'])
-
+const emit = defineEmits(['update']);
 
 const learningPlanStore = useLearningPlanStore();
 
@@ -122,7 +121,7 @@ const validLink = ({
 
 const updateCourse = async (show = true, message?) => {
   let { id } = route.params;
-  emit('update')
+  emit('update');
   const result = await findOne('learningplans', id as string, { populate });
   if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
   course.value = {
@@ -152,7 +151,7 @@ const updateCourse = async (show = true, message?) => {
   )[0].attributes.user.data;
 
   await updateMeetings(course.value.schedules);
-  
+
   setMessage(message ?? 'done', 'green', show);
 };
 
@@ -172,6 +171,9 @@ const updateMeetings = async (schedules) => {
 
 watch(invitationLink, () => {
   if (invitationLink.value)
-    plainLink.value = generateUrl(invitationLink.value.hash);
+    plainLink.value = generateUrl(
+      invitationLink.value.hash,
+      learningPlanStore.learningPlan?.id,
+    );
 });
 </script>

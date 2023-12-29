@@ -1,74 +1,106 @@
 <template>
-  <div>teste</div>
+  <div>
+    <v-row
+      v-if="learningPlanStore.loading || !learningPlanStore.learningPlan"
+      justify="center"
+    >
+      <v-progress-circular indeterminate color="accent" size="100" width="6" />
+    </v-row>
+    <alex-learningplan-dialogs-alert
+      v-model="openConfirmation"
+      variant="primary"
+      persistent
+      title="Deseja participar desse curso?"
+      :subtitle="`Voce foi convidado para participar do curso de ${learningPlanStore.learningPlan?.title} da turma ${learningPlanStore.learningPlan?.class_name}`"
+      submit-button-text="Participar"
+      :loading="loading"
+      @submit="onConfirm"
+      @cancel="onCancel"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-const { create, find } = useStrapi();
-type User = {
-  id?: string;
-  username: string;
-  fullname?: string;
-  local?: boolean;
-};
-
 const route = useRoute();
-const router = useRouter();
+
+// route.params?.id
+const learningPlanStore = useLearningPlanStore();
+const { setMessage } = useMessageStore();
+const openConfirmation = ref(false);
+const strapi = useStrapi();
+const loading = ref(false);
+const user = useStrapiUser();
 
 const invite = ref();
-const timeoutId = ref<NodeJS.Timeout | null>(null);
-const redirect = ref('/');
-const { id } = useStrapiUser<User>().value;
 
-// onBeforeMount(async () => {
-//   const result = (
-//     await find('invitation-links', {
-//       filters: {
-//         hash: route.params.hash,
-//         is_expired: false,
-//       },
-//       populate: ['learningplan'],
-//     })
-//   ).data;
+onMounted(() => {
+  const hash = route.params.hash?.toString();
+  invite.value = learningPlanStore.activeInviteLinks?.find(
+    (i) => i.hash === hash,
+  );
 
-//   if (result.length !== 0) {
-//     theresInvite(result[0]);
-//   } else {
-//     startTimer();
-//   }
-// });
+  if (
+    learningPlanStore.userIsActiveMember ||
+    learningPlanStore.userIsFacilitator
+  ) {
+    setMessage('Voce ja faz parte do curso!', 'blue', true);
+    navigateTo(`/courses/${learningPlanStore.learningPlan?.id}`);
+  }
 
-// const theresInvite = async (data) => {
-//   if (data.attributes.emails_to_send) {
-//     return;
-//   }
-//   invite.value = { id: data.id, ...data.attributes };
-//   const learningPlanId = invite.value.learningplan.data.id;
+  if (!invite.value) {
+    setMessage('Convite não encontrado!', 'red', true);
+    navigateTo('/');
+  }
 
-//   const isMemberAlready = (
-//     await find('learning-plan-members', {
-//       filters: { user: id, learningplan: learningPlanId },
-//     })
-//   ).data;
+  openConfirmation.value = true;
+});
 
-//   redirect.value = `/courses/${learningPlanId}`;
+function onCancel() {
+  openConfirmation.value = false;
+  navigateTo('/');
+}
 
-//   if (isMemberAlready.length !== 0) {
-//     return;
-//   }
+async function onConfirm() {
+  try {
+    loading.value = true;
 
-//   await create('learning-plan-members', {
-//     learningPlan: learningPlanId,
-//     user: id,
-//     role: invite.value.role,
-//   });
-// };
+    if (learningPlanStore.userIsPendingMember) {
+      const id = learningPlanStore.pendingMembers.find(
+        (m) => m.user?.id === user.value?.id || m.email === user.value?.email,
+      )?.id;
 
-// const isExpired = computed(() => (!invite.value ? 'expired' : 'joined'));
+      const data = {
+        user: user.value?.id,
+        status: 'joined',
+        joined_at: new Date(),
+      };
 
-// onUnmounted(() => {
-//   if (timeoutId.value) clearTimeout(timeoutId.value);
-//   else timeoutId.value = null;
-// });
+      await strapi.update('learning-plan-members', id || 0, data);
+    } else {
+      const data = {
+        user: user.value?.id,
+        status: 'joined',
+        joined_at: new Date(),
+        learningplan: learningPlanStore.learningPlan?.id,
+      };
+
+      await strapi.create('learning-plan-members', data);
+    }
+
+    setMessage('Participação registrada com sucesso!', 'green', true);
+    navigateTo(`/courses/${learningPlanStore.learningPlan?.id}`);
+    loading.value = false;
+    openConfirmation.value = false;
+  } catch (_) {
+    setMessage(
+      'Não foi possivel finalizar a operação. Tente Novamente!',
+      'red',
+      true,
+    );
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <style scoped lang="scss">
