@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { User } from '@/models/user.model';
-const { updateUser } = useUpdateUser();
+const { updateUser } = useUpdateUserStore();
 
 definePageMeta({
   middleware: 'auth',
