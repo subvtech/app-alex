@@ -172,7 +172,7 @@
               v-model="slides[index].title"
               placeholder="Insira o título"
               label="Titulo da Mídia"
-              name="title"
+              :name="`title+${index}`"
             >
             </alex-inputs-text-field>
           </template>
@@ -185,7 +185,6 @@
 <script setup>
 import { ref } from 'vue';
 const messageStore = useMessageStore();
-
 const urlInput = ref('');
 const slides = ref([]);
 const dialog = ref(false);
