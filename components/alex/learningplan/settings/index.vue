@@ -40,7 +40,8 @@
           :invite-enabled="learningPlan.invite_enabled"
           :invitation-link="invitationLink"
           :invitation-duration="learningPlan.invitation_duration"
-          :message="'sdasds'"
+          :message="learningPlan.message"
+          @update="(data) => emit('update', data)"
           outline
         />
         <alex-learningplan-settings-visibility

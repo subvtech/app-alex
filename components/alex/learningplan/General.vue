@@ -12,11 +12,9 @@
           <app-media
             :title="$t('pages.courses.media.title')"
             :images="
-              (learningPlan.media ? learningPlan.media.data : []).map(
-                (item) => {
-                  return { id: item.id, ...item.attributes };
-                },
-              )
+              (learningPlan.media ? learningPlan.media : []).map((item) => {
+                return { ...item };
+              })
             "
             :course-id="learningPlan.id"
             :can-edit="canEdit"
@@ -33,26 +31,24 @@
             :empty-text-message="$t('pages.courses.about.empty')"
             sizing-class="pa-0"
             is-nested
-            is-optional
             hide-dividers
             full-width
           />
-
           <alex-learningplan-goals
             :can-edit="canEdit"
             :course-id="learningPlan.id"
             :user-id="owner.id"
             :data="
-              learningPlan.learning_goals.data.map((item) => {
+              learningPlan.learning_goals.map((item) => {
                 return {
                   id: item.id,
-                  title: item.attributes.description,
-                  keyWord: item.attributes.verb.data.attributes.text,
-                  keyWordId: item.attributes.verb.data.id,
+                  title: item.description,
+                  keyWord: item.verb.text,
+                  keyWordId: item.verb.id,
                   contentData: {
                     id: item.id,
-                    description: item.attributes.description,
-                    verb: { text: item.attributes.verb.data.attributes.text },
+                    description: item.description,
+                    verb: { text: item.verb.text },
                   },
                 };
               })
@@ -66,7 +62,7 @@
 
           <alex-learningplan-details-editor
             v-if="showDetails"
-            :info="learningPlan.details?.data"
+            :info="learningPlan.details?.lines"
             :courseId="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="canEdit"
@@ -79,27 +75,27 @@
     </alex-custom-card>
 
     <div class="d-flex flex-column w-100 gap-6 max-width">
-      <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false">
+      <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false" sizing-class="px-6 pb-12">
         <template #content>
           <app-general-boxes
             :boxes="[
               {
                 icon: 'mdi-account-outline',
-                number: learningPlan.members
+                number: learningPlan.members?.data
                   ? learningPlan.members.data.length
                   : 0,
                 label: 'students',
               },
               {
                 icon: 'trails.svg',
-                number: learningPlan.trails
+                number: learningPlan.trails?.data
                   ? learningPlan.trails.data.length
                   : 0,
                 label: 'trails',
               },
               {
                 icon: 'mdi-newspaper-variant-multiple-outline',
-                number: 62,
+                number: 0,
                 label: 'assignments',
               },
             ]"
@@ -189,7 +185,7 @@ const props = defineProps({
     default: [],
   },
   owner: {
-    type: Object as PropType<{ id: number }>,
+    type: Object as PropType<LearningPlanMemberSimple>,
     required: true,
   },
 });
@@ -198,32 +194,35 @@ const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
 
-generalTags.value = props.learningPlan.tags.data.reduce(
-  (acc: CompetenceTag[], item) => {
-    if (item.attributes.isGeneral) {
-      acc.push({ id: item.id, ...item.attributes });
-    }
+if (props.learningPlan.tags.data) {
+  generalTags.value = props.learningPlan.tags.data.reduce(
+    (acc: CompetenceTag[], item) => {
+      if (item.attributes.isGeneral) {
+        acc.push({ id: item.id, ...item.attributes });
+      }
 
-    return acc;
-  },
-  [],
-);
-technicalTags.value = props.learningPlan.tags.data.reduce(
-  (acc: CompetenceTag[], item) => {
-    if (!item.attributes.isGeneral) {
-      acc.push({ id: item.id, ...item.attributes });
-    }
+      return acc;
+    },
+    [],
+  );
 
-    return acc;
-  },
-  [],
-);
+  technicalTags.value = props.learningPlan.tags.data.reduce(
+    (acc: CompetenceTag[], item) => {
+      if (!item.attributes.isGeneral) {
+        acc.push({ id: item.id, ...item.attributes });
+      }
+
+      return acc;
+    },
+    [],
+  );
+}
 
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
   });
-  emit('update', i18n.t('components.courses.about.description.updated'));
+  emit('update', i18n.t('pages.courses.about.updated'));
 };
 
 const showDetails = computed(() => {

@@ -168,7 +168,6 @@ const onUpdateDescription = (data) => {
   dataCopy.value[data.index].title = data.value;
 };
 const onUpdateKeyword = (data) => {
-  console.log(data);
   dataCopy.value[data.index].keyWord = data.value.text;
 };
 onBeforeMount(async () => {

@@ -13,13 +13,7 @@
         :filtered-items="myVerbs"
         :update-items="updateVerbs"
         @input="handleInput"
-        @update:model-value="
-          (text) =>
-            emit('update:keyword', {
-              value: { text },
-              index,
-            })
-        "
+        @update:model-value="updateVerbs"
         :error-messages="keywordField.errorMessage.value"
         name="keyword"
         clerable
@@ -56,7 +50,6 @@ import AppAutocomplete from '../../AppAutocomplete.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',
-
   'success:keyword',
   'success:description',
   'success',
@@ -93,9 +86,7 @@ const myVerbs = ref(
 );
 
 const updateVerbs = (verb, isCreating = false) => {
-  filteredItems.value = filteredItems.value.filter(
-    (item) => item.text !== verb.text,
-  );
+  keywordField.value.value = { text: verb.text } as Tag;
 
   emit('update:keyword', {
     value: { text: verb.text },
@@ -112,8 +103,14 @@ const descriptionField = useField('description', descriptionRules.description, {
 });
 
 const handleInput = (e) => {
-  if (e.target.value.length > 1)
-    keywordField.value.value = { text: e.target.value } as Tag;
+  keywordField.value.value = { text: e.target.value } as Tag;
+
+  emit('update:keyword', {
+    value: { text: e.target.value },
+    index: props.index,
+  });
+
+  keywordField.validate();
 };
 
 onMounted(() => {

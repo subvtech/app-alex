@@ -8,21 +8,21 @@
     is-nested
   >
     <template #content>
-      <div v-if="enableInvites" class="d-flex flex-column w-100 relative">
+      <div v-if="enableInvites" class="relative">
         <div
-          class="invite gap-6 justify-space-between"
+          class="invite justify-space-between"
           :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
             <template #content>
-              <a class="w-100 url" :href="url!">
+              <a class="url" :href="url!">
                 {{ url }}
               </a>
             </template>
           </alex-custom-tooltip>
           <span v-else>{{ $t('components.courses.invites.expired') }}</span>
 
-          <div class="d-flex align-center gap-1">
+          <div class="d-flex align-center gap-2">
             <alex-custom-tooltip
               :text="$t('components.courses.invites.refresh')"
             >
@@ -163,11 +163,17 @@ watch(theresTimeAndUrl, () => {
 <style scoped lang="scss">
 .relative {
   position: relative;
+  display: block;
+  width: 100%;
+  min-width: 200px;
 }
 
 .url {
-  text-overflow: ellipsis;
+  display: block;
   overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gap-1 {
@@ -201,6 +207,7 @@ watch(theresTimeAndUrl, () => {
 .invite {
   display: flex;
   height: 52px;
+  min-width: 300px;
 
   padding: 0px 16px;
   align-items: center;
@@ -212,6 +219,7 @@ watch(theresTimeAndUrl, () => {
   background: var(--principais-secundria-secundria-2, #d1f6fa);
   &.dark {
     height: 48px !important;
+    flex-grow: 1;
     border: 1px solid var(--Cinza-Cinza-400, #a0a8b1);
     background: var(--Cinza-Cinza-100, #ebedef);
     span {
@@ -280,9 +288,52 @@ watch(theresTimeAndUrl, () => {
     letter-spacing: 0.32px;
   }
   &.dark {
+    bottom: -26px;
+    span {
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-align: right;
+
+      /* Body/P3 */
+      font-family: Sen;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 135%; /* 18.9px */
+      letter-spacing: 0.28px;
+    }
     p {
       color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-align: right;
+
+      /* Body/P3 */
+      font-family: Sen;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 135%; /* 18.9px */
+      letter-spacing: 0.28px;
     }
+  }
+}
+
+@media(max-width: 550px){
+  .invite{
+    min-width: unset;
+  }
+  .url {
+    width: 250px;
+  }
+}
+
+@media(max-width: 480px){
+  .url {
+    width: 200px;
+  }
+}
+
+@media(max-width: 380px){
+  .url {
+    width: 150px;
   }
 }
 </style>

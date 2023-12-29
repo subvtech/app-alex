@@ -28,6 +28,7 @@
   "to": "a",
   "at": "às",
   "interval": "A cada {days} dias",
+  "everyday": "Todo dia",
   "weekly": "Semanal: {day}",
   "biweekly": "Quizenal: {day}",
   "monthly": "Mensal: {day}",

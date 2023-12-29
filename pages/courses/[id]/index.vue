@@ -3,7 +3,7 @@
     <alex-learningplan-general
       :learningPlan="learningPlanStore.learningPlan as any"
       :learning-plan-id="learningPlanStore.learningPlan?.id"
-      :owner="learningPlanStore.owner"
+      :owner="learningPlanStore.facilitator!"
       :invitationLink="invitationLink"
       :canEdit="canEdit"
       :schedules="
@@ -71,16 +71,15 @@ const plainLink = ref<string | null>(null);
 const { id } = useStrapiUser<User>().value;
 
 const route = useRoute();
-const router = useRouter();
-const selectedOption = ref(0);
 const owner = ref<any>();
 
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
-const canEdit = computed(() => learningPlanStore.owner?.id === id);
+console.log({ learningPlanStore });
+//const canEdit = computed(() => learningPlanStore.owner?.id === id);
+const canEdit = true;
 const { setMessage } = useMessageStore();
-
+const emit = defineEmits(['update']);
 definePageMeta({
   middleware: 'auth',
 });
@@ -114,6 +113,7 @@ onBeforeMount(async () => {
 });
 
 const updateCourse = async (show = true, message?) => {
+  emit('update');
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );

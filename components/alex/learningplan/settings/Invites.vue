@@ -6,7 +6,7 @@
   >
     <template #content>
       <div class="d-flex flex-column w-100">
-        <div class="d-flex flex-column border-bottom">
+        <div class="d-flex flex-column border-bottom mb-5">
           <span class="header-h5 title">{{
             $t('components.courses.settings.invite.label')
           }}</span>
@@ -15,11 +15,10 @@
             v-model="myInviteEnabled"
             :label="$t('components.courses.settings.invite.link')"
             color="accent"
-            @change="toggleInviteEnabled"
           />
           <div
             v-if="myInviteEnabled"
-            class="d-flex flex-row align-center w-100 gap-4"
+            class="d-flex flex-row align-center justify-space-between w-100 flex-wrap gap-4"
           >
             <alex-inputs-select
               v-model="selectedTime"
@@ -32,7 +31,7 @@
               :items="timeOptions"
               :info="$t('components.courses.settings.invite.tooltip')"
             />
-            <div class="d-flex flex-column w-100 mt-3 align-self-center">
+            <div class="d-flex flex-column mt-3 align-self-center">
               <span class="description">
                 {{ t('components.courses.settings.invite.linkAddress') }}
               </span>
@@ -51,7 +50,6 @@
                   }
                 "
                 @link:expired="invitationLink = null"
-                full-width
               />
             </div>
           </div>
@@ -65,19 +63,19 @@
           <alex-inputs-text-area
             v-model="myMessage"
             name="message"
-            class="max-width w-100"
+            class="w-100"
             :label="$t('components.courses.settings.invite.message')"
             :hint="$t('components.courses.settings.invite.hint')"
             persistent-hint
             required
             density="comfortable"
             append-inner-icon="mdi-cached"
+            :append-inner-icon-hint="
+              $t('components.courses.settings.invite.restore')
+            "
+            @click:append-inner="myMessage = defaultMessage"
           />
         </div>
-        <alex-custom-tooltip
-          text="Restaurar mensagem padrão"
-          attach="append-inner-icon"
-        ></alex-custom-tooltip>
       </div>
     </template>
     <template #footer>
@@ -86,11 +84,13 @@
           class="button"
           :text="$t('components.courses.settings.invite.cancel')"
           variant="secondary"
+          @click="onCancel"
         />
         <alex-custom-button
           class="button"
           :text="$t('components.courses.settings.invite.save')"
           variant="primary"
+          @click="onSave"
         />
       </div>
     </template>
@@ -103,6 +103,7 @@ const { update } = useStrapi();
 
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 
+const emit = defineEmits(['update'])
 const props = defineProps({
   learningPlanId: {
     type: Number,
@@ -131,10 +132,8 @@ const { inviteEnabled, invitationLink, message } = toRefs(props);
 const myMessage = ref(message.value);
 const myInviteEnabled = ref(inviteEnabled.value);
 const myInvitationLink = ref(invitationLink.value);
-
-const toggleInviteEnabled = async () => {
-  console.log({ myInviteEnabled: myInviteEnabled.value });
-};
+const defaultMessage =
+  'Olá, {{ Usuário }}, Você foi convidado para o curso de {{ Curso }} por {{ Integrante }}.';
 
 const timeOptions = ref([
   { title: t('components.courses.settings.invite.fiveMinutes'), value: 300 },
@@ -161,6 +160,19 @@ const selectedTime = ref(timeOptions.value[0].value);
 
 const plainLink = ref();
 
+const onSave = async () => {
+  await update('learningplans', props.learningPlanId, {
+    invite_enabled: myInviteEnabled.value,
+    message: myMessage.value,
+  });
+  emit('update', t('components.courses.settings.invite.update'))
+};
+
+const onCancel = () => {
+  myInviteEnabled.value = props.inviteEnabled;
+  myMessage.value = props.message
+}
+
 watch(invitationLink, () => {
   myInvitationLink.value = invitationLink.value;
 });
@@ -178,6 +190,7 @@ watch(inviteEnabled, () => {
   display: flex;
   flex-direction: column;
   min-width: max-content;
+  max-width: 260px;
 }
 .description {
   color: var(--Cinza-Cinza-800, #454d54);

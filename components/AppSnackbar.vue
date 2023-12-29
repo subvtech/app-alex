@@ -45,6 +45,7 @@ const props = defineProps({
 const { data } = toRefs(props);
 
 const timeout = ref(5000);
+const timeoutId = ref<NodeJS.Timeout | null>(null);
 const startTimer = ref(false);
 
 const updateModelValue = (newValue) => {
@@ -68,6 +69,14 @@ const currentMessage = computed(() =>
     ? message.value
     : 'done',
 );
+const stopTimeout = () => {
+  if (timeoutId.value) clearTimeout(timeoutId.value);
+  else timeoutId.value = null;
+};
+
+onUnmounted(() => {
+  stopTimeout()
+})
 
 const onClose = () => {
   if (data?.value) data.value.show = false;
@@ -76,10 +85,9 @@ const onClose = () => {
 };
 
 watch(currentShow, () => {
-  setTimeout(() => {
+  timeoutId.value = setTimeout(() => {
     startTimer.value = !startTimer.value;
   }, 10);
-  
 });
 </script>
 <style scoped lang="scss">
@@ -124,7 +132,7 @@ span {
 .close {
   position: absolute;
   top: 16px;
-  right: 8px; 
+  right: 8px;
   color: white;
 }
 </style>

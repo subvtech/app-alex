@@ -327,8 +327,8 @@ const updateAbout = async () => {
     };
   });
 
-  await update(`learningplans/${props.courseId}`, {
-    details: { data: newData },
+  await update(`learningplans`, props.courseId, {
+    details: { lines: newData },
   });
   isEditing.value = false;
   emit('update', t('components.courses.editor.update'));

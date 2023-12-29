@@ -60,6 +60,7 @@
     "link": "Invitation Link",
     "linkDuration": "Link Duration",
     "linkAddress": "Link Address",
+    "restore": "Restore Message",
     "email": "Email Invitation",
     "message": "Invitation Message",
     "hint": "Message to be sent by email to the invited users.",
@@ -72,7 +73,8 @@
     "eightHours": "8 hours",
     "twentyFourHours": "24 hours",
     "save": "Save Changes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "update": "Invitation settings updated"
   },
   "visibility": {
     "title": "Course Visibility",

@@ -58,6 +58,7 @@
     "link": "Link de convite",
     "linkDuration": "Duração do Convite",
     "linkAddress": "Endereço do convite",
+    "restore": "Restaurar Messagem",
     "email": "Convite por e-mail",
     "message": "Mensagem do convite",
     "hint": "Mensagem que será enviada por e-mail para o convidado.",
@@ -70,7 +71,8 @@
     "oneHour": "1 hora",
     "twoHours": "2 horas",
     "eightHours": "8 horas",
-    "twentyFourHours": "24 horas"
+    "twentyFourHours": "24 horas",
+    "update": "Configurações do convite atualizadas."
   },
   "visibility": {
     "title": "Visibilidade do curso",
