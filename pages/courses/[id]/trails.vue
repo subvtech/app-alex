@@ -155,10 +155,11 @@ const getCourses = async () => {
       };
     }>(GetTrails, params);
   });
+  console.log(data);
   learningStructure.value =
-    data.value?.data.learningplan.data.attributes.learning_structure.data.id;
+    data.value?.data.learningplan.data.attributes.learning_structures?.data.id;
   trails.value = [];
-  data.value?.data.learningplan.data.attributes.learning_structure.data?.attributes.trails.data.forEach(
+  data.value?.data.learningplan.data.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
     (trail) => {
       trails.value.push({
         name: trail.attributes.title,
