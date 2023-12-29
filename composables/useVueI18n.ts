@@ -65,6 +65,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'forgot',
     'classes',
     'emailConfirmation',
+    'trails',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
