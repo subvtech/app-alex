@@ -153,7 +153,7 @@ watch(cpf, () => {
 </script>
 
 <style scoped lang="scss">
-.gap-6 {
+.gap-6{
   gap: 24px;
 }
 .settings {
@@ -162,6 +162,9 @@ watch(cpf, () => {
     .btn {
       text-transform: none !important;
     }
+  }
+  .block {
+    gap: 24px;
   }
 
   .buttons {
