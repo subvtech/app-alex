@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { verify } from 'crypto';
 import { useField } from 'vee-validate';
 type User = { id?: string; email: string; fullname?: string; local?: boolean };
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { parse } from '@postlight/parser';
+import Parser  from '@postlight/parser';
 
 const app = express();
 
@@ -11,4 +11,4 @@ app.post('/api/parse-url', function (req, res) {
     .catch((error) => res.status(500).json({ error }));
 });
 
-module.exports = app;
+// module.exports = app;

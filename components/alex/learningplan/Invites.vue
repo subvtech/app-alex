@@ -119,7 +119,7 @@ const updateLink = async () => {
   );
   stopTimeout();
 
-  url.value = generateUrl(result.data.attributes.hash, courseId);
+  url.value = generateUrl(result.data.attributes.hash, props.courseId);
 
   emit('update:link', { url: url.value });
   remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
@@ -203,7 +203,9 @@ watch(theresTimeAndUrl, () => {
   line-height: 135%; /* 21.6px */
   letter-spacing: 0.32px;
 }
-
+.smaller {
+  height: 44px !important;
+}
 .invite {
   display: flex;
   height: 52px;
