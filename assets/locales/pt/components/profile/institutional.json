@@ -3,5 +3,6 @@
   "remove": "remover",
   "add": "Adicionar",
   "save": "Salvar",
-  "emptyInstitutional": "Você não possui instituições cadastradas"
+  "emptyInstitutional": "Você não possui instituições cadastradas",
+  "update": "Dados Institucionais atualizados."
 }

@@ -11,8 +11,9 @@
         ]"
         :placeholder="$t('components.courses.goals.verb.placeholder')"
         :filtered-items="myVerbs"
-        :update-items="updateItems"
+        :update-items="updateVerbs"
         @input="handleInput"
+        @update:model-value="updateVerbs"
         :error-messages="keywordField.errorMessage.value"
         name="keyword"
         clerable
@@ -30,6 +31,12 @@
       ]"
       :label="$t('components.courses.goals.description.title')"
       clearable
+      @input="
+        emit('update:description', {
+          value: descriptionField.value.value,
+          index: index,
+        })
+      "
       :error-messages="descriptionField.errorMessage.value"
       name="description"
     />
@@ -46,6 +53,8 @@ const emit = defineEmits([
   'success:keyword',
   'success:description',
   'success',
+  'update:description',
+  'update:keyword',
 ]);
 const { keywordRules, descriptionRules } = useFormRules();
 
@@ -76,6 +85,15 @@ const myVerbs = ref(
   filteredItems.value.filter((item) => item.text !== props.keyword),
 );
 
+const updateVerbs = (verb, isCreating = false) => {
+  keywordField.value.value = { text: verb.text } as Tag;
+
+  emit('update:keyword', {
+    value: { text: verb.text },
+    index: props.index,
+  });
+};
+
 const keywordField = useField('keyword', keywordRules, {
   initialValue: keyword.value,
 });
@@ -85,8 +103,14 @@ const descriptionField = useField('description', descriptionRules.description, {
 });
 
 const handleInput = (e) => {
-  if (e.target.value.length > 1)
-    keywordField.value.value = { text: e.target.value } as Tag;
+  keywordField.value.value = { text: e.target.value } as Tag;
+
+  emit('update:keyword', {
+    value: { text: e.target.value },
+    index: props.index,
+  });
+
+  keywordField.validate();
 };
 
 onMounted(() => {
@@ -94,7 +118,6 @@ onMounted(() => {
   keywordField.validate();
 });
 
-const updateItems = (newValue) => {};
 const descriptionErrorOrKeywordError = computed(
   () => keywordField.errorMessage.value || descriptionField.errorMessage.value,
 );

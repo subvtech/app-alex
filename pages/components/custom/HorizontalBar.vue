@@ -77,7 +77,7 @@
               },
               {
                 title: 'settings',
-                to: '/user/settings',
+                to: '/users/settings',
               },
               {
                 title: 'logout',
@@ -348,7 +348,7 @@ const menuItems: { title: string; to?: string; action?: () => void }[] = [
   },
   {
     title: 'settings',
-    to: '/user/settings',
+    to: '/users/settings',
   },
   {
     title: 'logout',
@@ -369,7 +369,7 @@ const examples = [
         },
         {
           title: 'settings',
-          to: '/user/settings',
+          to: '/users/settings',
           
         },
         { title: 'logout', action: () => {console.log('logout')} },

@@ -4,10 +4,10 @@
       v-if="
         learningPlanStore.learningPlan && !route.meta?.hideLearningPlanBanner
       "
-      :cover-picture="learningPlanStore.learningPlan.cover_image"
+      :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
-      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
-      :user-id="user.value?.id"
+      :profile-picture="learningPlanStore.facilitator?.user.avatar"
+      :user-id="user.id"
       show-profile-picture
       darker-background
       show-shade
@@ -18,14 +18,15 @@
       distribution="fullname-username-role"
       is-professor
       :fullname="learningPlanStore.facilitator?.user?.fullname"
-      :description="learningPlanStore.learningPlan.title"
-      :subtitle="learningPlanStore.learningPlan.class_name"
+      :description="learningPlanStore.learningPlan?.title"
+      :subtitle="learningPlanStore.learningPlan?.class_name"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
-      :links="links"
+      :links="isJoinRoutePath ? [] : links"
       :selected-option="selectedOption"
       :copy-object="
-        learningPlanStore.activeInvitationLinkUrl
+        learningPlanStore.activeInvitationLinkUrl &&
+        learningPlanStore.userIsFacilitator
           ? {
               label: $t('pages.courses.invite'),
               copyText: learningPlanStore.activeInvitationLinkUrl,
@@ -35,64 +36,118 @@
       @select:option="selectOption"
       @display:settings="selectOption(8)"
     />
-    <NuxtPage />
+    <NuxtPage @update="fetchData()" />
   </div>
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 
 definePageMeta({
-  middleware: 'auth',
+  middleware: ['auth'],
 });
 
 const i18n = useI18n();
 
 const user = useStrapiUser<User>();
 
-// const { find, findOne, update } = useStrapi();
 const route = useRoute();
-
 const learningPlanStore = useLearningPlanStore();
+
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);
 
-await useAsyncData('user', () =>
-  learningPlanStore.loadLearningPlan(learningPlanId.value),
-);
+const isJoinRoutePath = computed(() => {
+  return route.name === 'courses-id-join-hash';
+});
+
+const fetchData = async () => {
+  await useAsyncData('user', () =>
+    learningPlanStore.loadLearningPlan(learningPlanId.value),
+  );
+
+  if (!learningPlanStore.learningPlan) {
+    navigateTo('/');
+  }
+
+  if (
+    !learningPlanStore.userIsFacilitator &&
+    !learningPlanStore.userIsActiveMember &&
+    !learningPlanStore.userIsPendingMember
+  ) {
+    navigateTo('/courses/me');
+  }
+
+  if (learningPlanStore.userIsPendingMember && !isJoinRoutePath.value) {
+    const invite = learningPlanStore.learningPlan?.invitation_links.find(
+      (i) => {
+        return i.emails_to_send?.includes(user.value.email);
+      },
+    );
+
+    if (invite) {
+      navigateTo(`/courses/${learningPlanId.value}/join/${invite.hash}`);
+    }
+  }
+};
+
+await fetchData();
 
 const selectOption = (index) => {
   selectedOption.value = index;
 };
 
-const links = computed(() => [
-  {
-    label: i18n.t('pages.courses.general'),
-    value: '0',
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}`
-      : route.path,
-  },
-  {
-    label: i18n.t('pages.courses.trails'),
-    value: '1',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/trails`,
-  },
-  {
-    label: i18n.t('pages.courses.class'),
-    value: '2',
-    to: `/courses/${learningPlanStore.learningPlan?.id}/class`,
-  },
-  { label: i18n.t('pages.courses.projects'), value: '3' },
-  { label: i18n.t('pages.courses.events'), value: '4' },
-  { label: i18n.t('pages.courses.communication'), value: '5' },
-  {
-    label: '',
-    value: '6',
-    icon: 'mdi-cog-outline',
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/settings`
-      : '',
-  },
-]);
+const links = computed(() => {
+  const generalLinks = [
+    {
+      label: i18n.t('pages.courses.general'),
+      value: '0',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.trails'),
+      value: '1',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/trails`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.assignments'),
+      value: '2',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/tasks`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.class'),
+      value: '3',
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/class`
+        : '',
+    },
+    {
+      label: i18n.t('pages.courses.projects'),
+      value: '4',
+
+      to: learningPlanStore.learningPlan
+        ? `/courses/${learningPlanStore.learningPlan?.id}/projects`
+        : '',
+    },
+  ];
+
+  const settingsLink = [
+    {
+      label: '',
+      icon: 'mdi-cog-outline',
+      value: '5',
+      to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
+    },
+  ];
+
+  return learningPlanStore.userIsFacilitator
+    ? [...generalLinks, ...settingsLink]
+    : generalLinks;
+});
 </script>

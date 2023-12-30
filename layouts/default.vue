@@ -80,7 +80,7 @@ const headerStore = usePageHeaderStore();
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  userStore.profilePicture = user.value?.avatar;
+  userStore.avatar = user.value?.avatar;
   userStore.fullname = user.value?.fullname;
 });
 
@@ -197,7 +197,7 @@ const steps = [
   },
 ];
 
-const { tour, activeTour } = useOnBoarding(steps);
+// const { tour, activeTour } = useOnBoarding(steps);
 
 const defaultMenus = [
   {

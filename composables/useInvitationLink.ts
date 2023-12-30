@@ -10,7 +10,8 @@ export const useInvitationLink = () => {
   }
   const fullPath = removeAfterLastSlash(window.location.href);
 
-  const generateUrl = (hash) => fullPath + '/join/' + hash;
+  const generateUrl = (hash, learningPlanId = 0) =>
+    `${fullPath}/${learningPlanId}/join/${hash}`;
 
   function msToHHMMSS(ms) {
     const totalSeconds = Math.floor(ms / 1000);

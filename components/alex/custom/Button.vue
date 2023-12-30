@@ -1,6 +1,5 @@
 <template>
   <v-btn
-    v-bind="$attrs"
     rounded="lg"
     data-testid="alexButton"
     class="alex-button"
@@ -12,6 +11,7 @@
     :variant="variant === 'text' ? 'text' : 'flat'"
     :size="size"
     :ripple="false"
+    v-bind="$attrs"
   >
     <template v-if="hasDefault" #default>
       <slot />

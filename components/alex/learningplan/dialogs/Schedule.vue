@@ -27,7 +27,7 @@
           :allowed-dates="(date) => disablePastDates(date)"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
-          class="w-100"
+          class="w-100 mt-4"
           density="comfortable"
         />
         <div class="d-flex gap-4">

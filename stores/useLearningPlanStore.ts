@@ -74,53 +74,67 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     return learningPlan.value?.end_date?.split('-').reverse().join('/');
   });
 
-  const invitationLink = computed(() => {
-    let activeLink;
-
-    if (learningPlan.value?.invitation_links) {
-      learningPlan.value.invitation_links?.forEach(
-        (link: InvitationLinkSimple) => {
-          if (link.is_expired) return;
-          const expirationDate = new Date(link.expires_at);
-
-          if (
-            link.role === 'student' &&
-            link.emails_to_send === null &&
-            expirationDate.getTime() > new Date().getTime()
-          ) {
-            const differenceBetweenLinks = activeLink
-              ? expirationDate.getTime() -
-                new Date(activeLink.expires_at).getTime()
-              : 1;
-
-            if (!activeLink || differenceBetweenLinks > 0) {
-              activeLink = link;
-            }
-          }
+  const activeInviteLinks = computed(() => {
+    return (
+      learningPlan.value?.invitation_links?.filter(
+        (invite: InvitationLinkSimple) => {
+          return (
+            !invite.is_expired &&
+            (invite.emails_to_send ||
+              new Date(invite.expires_at).getTime() > new Date().getTime())
+          );
         },
-      );
-    }
+      ) || []
+    );
+  });
 
-    return activeLink;
+  const invitationLink = computed(() => {
+    if (activeInviteLinks.value.length) {
+      const sortedLinks = activeInviteLinks.value
+        .filter((invite: InvitationLinkSimple) => {
+          return !invite.emails_to_send && invite.role === 'student';
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+        );
+
+      return sortedLinks[0];
+    }
   });
 
   const activeInvitationLinkUrl = computed(() => {
     if (invitationLink.value) {
-      return generateUrl(invitationLink.value.hash);
+      return generateUrl(invitationLink.value.hash, learningPlan.value?.id);
     }
   });
 
   const activeMembers = computed(() => {
-    return learningPlan.value?.members.filter(
-      (m: LearningPlanMemberSimple) =>
-        m.status === MemberStatus.JOINED && m.role !== MemberRoles.FACILITATOR,
+    return (
+      learningPlan.value?.members.filter(
+        (m: LearningPlanMemberSimple) =>
+          m.status === MemberStatus.JOINED &&
+          m.role !== MemberRoles.FACILITATOR,
+      ) || []
     );
   });
 
   const pendingMembers = computed(() => {
-    return learningPlan.value?.members.filter(
-      (m: LearningPlanMemberSimple) =>
-        m.status === MemberStatus.PENDING_INVITATION,
+    return (
+      learningPlan.value?.members.filter(
+        (m: LearningPlanMemberSimple) =>
+          m.status === MemberStatus.PENDING_INVITATION,
+      ) || []
+    );
+  });
+
+  const userIsActiveMember = computed(() => {
+    return activeMembers.value.some((m) => m.user.id === user.value.id);
+  });
+
+  const userIsPendingMember = computed(() => {
+    return pendingMembers.value.some(
+      (m) => m.user?.id === user.value.id || m.email === user.value.email,
     );
   });
 
@@ -136,5 +150,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     pendingMembers,
     activeMembers,
     userIsFacilitator,
+    userIsActiveMember,
+    userIsPendingMember,
+    activeInviteLinks,
   };
 });
