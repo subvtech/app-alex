@@ -4,38 +4,39 @@
       :trails-title="trailsTitle"
       :trails-description="trailsDescription"
       :trails-cover="coverImage"
+      :page="0"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
-      <div class="d-flex justify-end px-6 pt-6">
+      <div id="Início" class="d-flex justify-end px-6 pt-6">
         <alex-custom-button
-          v-if="readOnly"
+          v-if="readOnly && professorMode"
           variant="primary"
           size="large"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
           >Editar</alex-custom-button
         >
-        <div v-else>
+        <div v-else-if="professorMode">
           <alex-custom-button
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
             class="mr-2"
-            @click="console.log('cancelar')"
+            @click="resetData"
             >Cancelar</alex-custom-button
           >
           <alex-custom-button
             variant="primary"
+            :loading="saveLoading"
             size="large"
             prepend-icon="mdi-check"
-            @click="toggleReadOnly"
+            @click="saveData"
             >Salvar</alex-custom-button
           >
         </div>
       </div>
-
       <div
-        v-if="emptyState && readOnly"
+        v-if="editorData.blocks.length === 0 && readOnly"
         class="d-flex fill-height align-center justify-center container-min-height"
       >
         <v-progress-circular
@@ -53,13 +54,16 @@
         </div>
       </div>
       <div v-else class="container-min-height d-flex justify-center ma-6">
-        <div class="" style="min-width: 785px">
-          <p v-if="readOnly" class="text-gray-500 text-body-3 mb-4">
+        <div style="width: 785px">
+          <p
+            v-show="readOnly && editorData.time"
+            class="text-gray-500 text-body-3 mb-4"
+          >
             Ultima atualização: {{ timeStampToDate(editorData.time) }}
           </p>
           <AppEditor ref="editor" :data="editorData" />
         </div>
-        <div v-if="readOnly" class="sections-container">
+        <div v-if="readOnly" class="sections-container d-lg-block d-none">
           <p class="text-gray-800 text-h6 mb-4">Seções</p>
           <div>
             <v-tooltip
@@ -96,55 +100,90 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getTrail } from '~/assets/queries';
 import { Trail } from '@/models/trail.model';
 const { create, update } = useStrapi();
 const graphql = useStrapiGraphQL();
-const router = useRouter();
 const route = useRoute();
-const emptyState = ref(false);
-const isLoading = ref(false);
-const readOnly = ref(false);
-const editor = ref();
-
-const trailsTitle = ref('');
-const trailsDescription = ref('');
-const coverImage = ref('');
-const editorData = ref({});
+const { setMessage } = useMessageStore();
 
 definePageMeta({
   hideLearningPlanBanner: true,
 });
 
+const professorMode = ref(false);
+const isLoading = ref(false);
+const saveLoading = ref(false);
+const readOnly = ref(true);
+const editor = ref();
+
+const trailsTitle = ref('');
+const trailsDescription = ref('');
+const coverImage = ref('');
+const editorData = ref({
+  id: '',
+  time: 0,
+  version: '',
+  blocks: [],
+});
+const backUpEditorData = ref({});
+
 const { id } = route.params;
+
+const { isProfessor } = useStrapiUser<User>().value;
+professorMode.value = isProfessor;
 
 const getTrailData = async () => {
   isLoading.value = true;
-  const { data } = await useAsyncData('trails', () => {
-    return graphql<{}>(getTrail, { trailId: id });
-  });
-  const trail = data.value.data.trail?.data.attributes;
-  trailsTitle.value = trail.title;
-  trailsDescription.value = trail.description;
-  coverImage.value = trail.cover_image.data.attributes.url;
+  try {
+    const { data } = await useAsyncData('trails', () => {
+      return graphql<{}>(getTrail, { trailId: id });
+    });
+    const trail = data.value.data.trail?.data.attributes;
+    trailsTitle.value = trail.title;
+    trailsDescription.value = trail.description;
+    coverImage.value = trail.cover_image.data.attributes.url;
 
-  editorData.value = {
-    id: trail.structures.data[0].id,
-    time: trail.structures.data[0].attributes.time,
-    version: trail.structures.data[0].attributes.version,
-    blocks: trail.structures.data[0].attributes.blocks,
-  };
-  isLoading.value = false;
+    const structureData = trail.structures.data[0];
+    if (structureData) {
+      editorData.value = {
+        id: structureData.id,
+        time: structureData.attributes.time,
+        version: structureData.attributes.version,
+        blocks: structureData.attributes.blocks.data?.map((block: any) => {
+          return {
+            type: block.attributes.type,
+            data: block.attributes.data,
+            tunes: block.attributes.tunes,
+          };
+        }),
+      };
+    }
+  } catch (e) {
+    setMessage(
+      'Ocorreu um erro ao buscar os dados da trilha, tente novamente',
+      'error',
+      true,
+    );
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-getTrailData();
+onMounted(async () => {
+  await getTrailData();
+  if (editorData.value.blocks.length > 0) {
+    loadEditor();
+    setSections();
+  }
+});
 
 const sections = ref([
   {
     title: 'Início',
     type: 1,
-    active: false,
+    active: true,
   },
 ]);
 
@@ -158,30 +197,35 @@ const isAvaliableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = async () => {
-  if (!readOnly.value) {
-    const newSections = [
-      {
-        title: 'Início',
-        type: 1,
-        active: true,
-      },
-    ];
-    const data = await editor.value.getData();
-    data.blocks.forEach((block: any) => {
-      if (block.type === 'header') {
-        newSections.push({
-          title: block.data.text,
-          type: block.data.level,
-          active: false,
-        });
-      }
-    });
-    sections.value = newSections;
+const toggleReadOnly = () => {
+  if (readOnly.value) {
+    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
+  } else {
+    setSections();
   }
-
-  editor.value.toggleReadOnly();
   readOnly.value = !readOnly.value;
+  if (editor.value) editor.value.toggleReadOnly();
+};
+
+const setSections = () => {
+  const newSections = [
+    {
+      title: 'Início',
+      type: 1,
+      active: true,
+    },
+  ];
+
+  editorData.value.blocks.forEach((block: any) => {
+    if (block.type === 'header') {
+      newSections.push({
+        title: block.data.text,
+        type: block.data.level,
+        active: false,
+      });
+    }
+  });
+  sections.value = newSections;
 };
 
 const navigateToSection = (title: string) => {
@@ -190,45 +234,69 @@ const navigateToSection = (title: string) => {
     item.active = false;
   });
   sections.value[index].active = true;
-  editor.value.navigateToId(title);
+  if (title === 'Início') {
+    const element = document.getElementById(title);
+    if (element) {
+      element.scrollIntoView();
+    }
+  } else editor.value.navigateToId(title);
 };
 
-// const load = async () => {
-//   emptyState.value = false;
+const loadEditor = () => {
+  if (!editor.value) return;
+  editor.value.loadEditor({
+    id: editorData.value.id,
+    time: editorData.value.time,
+    version: editorData.value.version,
+    blocks: editorData.value.blocks,
+  });
+};
 
-//   editor.value.loadEditor({
-//     id: editorData.value.id,
-//     time: editorData.value.time,
-//     version: editorData.value.version,
-//     blocks: editorData.value.blocks,
-//   });
-// };
+const saveData = async () => {
+  saveLoading.value = true;
+  try {
+    const data = await editor.value.getData();
+    const blockIds = [];
+    for (const block of data.blocks) {
+      const res = await create('blocks', {
+        type: block.type,
+        data: block.data,
+        tunes: block.tunes,
+      });
+      blockIds.push(res.data.id);
+    }
+    if (editorData.value.id) {
+      await update('structures', editorData.value.id, {
+        time: Date.now(),
+        version: data.version,
+        blocks: blockIds,
+      });
+    } else {
+      await create('structures', {
+        time: Date.now(),
+        version: data.version,
+        blocks: blockIds,
+        trail: id,
+      });
+    }
+    editorData.value = data;
+    toggleReadOnly();
+  } catch (e) {
+    setMessage(
+      'Ocorreu um erro ao salvar os dados da trilha, tente novamente',
+      'error',
+      true,
+    );
+  } finally {
+    saveLoading.value = false;
+  }
+};
 
-// const saveData = async () => {
-//   const data = await editor.value.getData();
-//   let blockIds = [];
-//   for (let block of data.blocks) {
-//     const res = await create('blocks', {
-//       type: block.type,
-//       data: block.data,
-//       tunes: block.tunes,
-//     });
-//     blockIds.push(res.data.id);
-//   }
-//   if (editorData.value.id) {
-//     await update('structures', editorData.value.id, {
-//       time: Date.now(),
-//       version: data.version,
-//       blocks: blockIds,
-//     });
-//   } else {
-//     await create('structures', {
-//       time: Date.now(),
-//       version: data.version,
-//       blocks: blockIds,
-//     });
-//   }
-// };
+const resetData = () => {
+  editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
+  readOnly.value = true;
+  loadEditor();
+};
 
 const timeStampToDate = (timeStamp: number) => {
   const date = new Date(timeStamp);
@@ -268,9 +336,9 @@ const timeStampToDate = (timeStamp: number) => {
 .section-text {
   width: 240px;
   vertical-align: middle;
+  cursor: pointer;
 }
 .section-text-default:hover {
-  cursor: pointer;
   background-color: #ebedef;
   color: #30363b !important;
 }

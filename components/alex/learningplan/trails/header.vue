@@ -2,45 +2,49 @@
   <div>
     <alex-custom-breadcrumbs
       :arrow-back="true"
-      title="Configurações"
+      title="Trilha de aprendizagem "
       :items="[
-        { title: 'Início', disabled: false, href: '/' },
-        { title: 'Visão Geral', disabled: false, href: '/overview' },
-        { title: 'Configurações', disabled: false, href: '/settings' },
+        { title: 'Home', disabled: false, href: '/' },
+        { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
+        // { title: courseTitle, disabled: false, href: `/courses/${courseId}` },
+        { title: 'Trilhas', disabled: false, href: '/courses/me' },
+        {
+          title: trailsTitle,
+          disabled: true,
+          href: `/courses/${courseId}/trails/${trailId}`,
+        },
       ]"
     />
-    <div
-      style="
-        background-color: #fff;
-        border-radius: 8px 8px 8px 8px !important;
-        margin: 24px 0;
-      "
-    >
+    <div class="bg-white rounded my-6">
       <v-container fluid class="header">
         <v-row class="header-row">
-          <v-col cols="2" width="200px">
+          <v-col
+            cols="12"
+            md="6"
+            lg="3"
+            class="d-flex align-center justify-center"
+          >
             <img
               :src="trailsCover || '/images/cover_image_course.svg'"
               alt="Imagem da trilha"
               class="trailImg"
             />
           </v-col>
-          <v-col cols="9">
-            <v-row>
-              <v-col class="header-text">
-                <span class="header-h3">{{ trailsTitle }}</span>
-                <span class="body-p1" style="width: 100%">{{
-                  trailsDescription
-                }}</span>
-                <alex-custom-chip
-                  text="Jornada Individual"
-                  prepend-icon="mdi-check"
-                  :size="'x-small'"
-                  :status="'dark'"
-                  >{{ t('pages.trails.settings.chip') }}</alex-custom-chip
-                >
-              </v-col>
-            </v-row>
+          <v-col cols="12" md="6" lg="9">
+            <div class="header-text">
+              <span class="header-h3">{{ trailsTitle }}</span>
+              <span class="body-p1" style="width: 100%">{{
+                trailsDescription
+              }}</span>
+              <alex-custom-chip
+                v-if="page === 3"
+                text="Jornada Individual"
+                prepend-icon="mdi-check"
+                :size="'x-small'"
+                :status="'dark'"
+                >{{ t('pages.trails.settings.chip') }}</alex-custom-chip
+              >
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -49,7 +53,9 @@
   </div>
 </template>
 <script setup lang="ts">
-defineProps({
+import { watch } from 'vue';
+const router = useRouter();
+const props = defineProps({
   trailsTitle: {
     type: String,
     required: true,
@@ -62,13 +68,41 @@ defineProps({
     type: String,
     required: true,
   },
+  // trailId: {
+  //   type: Number,
+  //   required: true,
+  // },
+  // courseTitle: {
+  //   type: String,
+  //   required: true,
+  // },
+  // courseId: {
+  //   type: String,
+  //   required: true,
+  // },
+  page: {
+    type: Number,
+    required: true,
+  },
 });
 
-const activePage = ref('1');
+const activePage = ref(props.page);
+
+watch(activePage, () => {
+  if (activePage.value == 0) {
+    let currentPath = router.currentRoute.value.fullPath;
+    if (currentPath.endsWith('/settings')) {
+      currentPath = currentPath.replace('/settings', '');
+    }
+    router.push(currentPath);
+  } else if (activePage.value == 2) {
+    router.push(`${router.currentRoute.value.fullPath}/settings`);
+  }
+});
 const tabs = [
-  { label: 'Visão Geral', value: '1' },
-  { label: 'Tarefas', value: '2' },
-  { icon: 'mdi-cog-outline', label: '', value: '4' },
+  { label: 'Visão Geral', value: '0' },
+  { label: 'Tarefas', value: '1' },
+  { icon: 'mdi-cog-outline', label: '', value: '2' },
 ];
 </script>
 <style scoped lang="scss">
@@ -108,7 +142,6 @@ const tabs = [
 }
 
 .trailImg {
-  display: flex;
   width: 200px !important;
   height: 150px !important;
   justify-content: flex-end !important;
@@ -118,7 +151,6 @@ const tabs = [
 
 .header-text {
   display: flex;
-  padding: 12px 24px;
   gap: 8px;
   flex-direction: column;
   align-items: flex-start;

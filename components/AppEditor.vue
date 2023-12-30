@@ -61,7 +61,7 @@ const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 const token = useStrapiToken();
-const editable = ref(false);
+const readOnly = ref(true);
 const anchors = ref([]);
 
 const props = defineProps({
@@ -323,14 +323,16 @@ const getData = async () => {
   return data;
 };
 const loadEditor = (data) => {
-  instance.value.isReady.then(() => {
-    instance.value.render(data);
+  instance.value.isReady.then(async () => {
+    await instance.value.render(data);
+    instance.value.readOnly.toggle();
   });
 };
 
 const toggleReadOnly = () => {
-  instance.value.readOnly.toggle();
-  return editable.value;
+  instance.value.isReady.then(() => {
+    instance.value.readOnly.toggle();
+  });
 };
 
 const navigateToId = (id) => {
