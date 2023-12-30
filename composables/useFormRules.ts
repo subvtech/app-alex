@@ -263,12 +263,8 @@ export const useFormRules = () => {
             i18n.t('rules.startDate.min', {
               min: min.toString().split('T')[0],
             }),
-        )
-        .max(endDate ? endDate.toISOString() : undefined, ({ max }) =>
-          i18n.t('rules.endDate.max', {
-            max: max.toString().split('T')[0],
-          }),
         ),
+     
       startHour: yup
         .string()
         .required(i18n.t('rules.meeting.startHour.required')),
