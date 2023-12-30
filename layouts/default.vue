@@ -255,7 +255,7 @@ const defaultMenus = [
       },
       {
         icon: 'mdi-account-multiple-outline',
-        title: i18n.t('layouts.default.userList'),
+        title: i18n.t('layouts.default.institutionList'),
         to: '/classes',
       },
       {

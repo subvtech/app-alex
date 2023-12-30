@@ -13,7 +13,7 @@
     <template v-slot:content class="pa-6">
       <div class="d-flex flex-column w-100">
         <alex-custom-empty-placeholder
-          v-if="isTextEmpty && notOptionalAndNotEditing"
+          v-if="isTextEmpty && !isOptional && !isEditing"
           :empty-text-image="emptyTextImage ?? undefined"
           :empty-text-message="
             emptyTextMessage ?? $t('pages.courses.about.empty')
