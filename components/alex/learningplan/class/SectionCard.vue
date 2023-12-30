@@ -1,5 +1,6 @@
 <template>
   <alex-custom-card
+    title=""
     class="participantes-card mb-6"
     align-content="align-center"
     :show-icon="false"

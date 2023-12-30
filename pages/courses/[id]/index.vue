@@ -24,7 +24,7 @@
           };
         })
       "
-      @update="(data) => updateCourse(true, data)"
+      :updateCourse="(data) => updateCourse(true, data)"
     />
   </div>
 </template>
@@ -35,6 +35,9 @@ import { format } from 'date-fns';
 
 import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
+
+import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
+import { TabType } from '~/components/alex/custom/Tabs.vue';
 
 export type LearningPlanType = {
   id: number;
