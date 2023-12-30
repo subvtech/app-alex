@@ -158,6 +158,17 @@ export const useFormRules = () => {
       .trim(),
   });
 
+  const generalTrailSchema = yup.object({
+   
+    title: yup
+      .string()
+      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .required(i18n.t('rules.title.required'))
+      .trim(),
+    ...descriptionRules
+  });
+
   const registerStep1 = yup.object({
     ...fullnameRules,
     ...emailRules,
@@ -336,6 +347,7 @@ export const useFormRules = () => {
     generalCourseSchema,
     loginSchema,
     createCourseRules,
+    generalTrailSchema,
     emailRegex,
     scheduleRules,
     createTrailsRules,
