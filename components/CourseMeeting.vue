@@ -92,7 +92,7 @@ const formattedDate = computed(() => {
   }
 
   const temp =
-    date.value >= new Date()
+    date.value >= new Date() && isEditing.value
       ? t('components.courses.meeting.starting') +
         format(date.value, formatText, { locale: pt })
       : format(date.value, formatText2, {
@@ -110,14 +110,23 @@ const frequencyText = computed(() => {
   switch (props.interval) {
     case 0: // once
       return t(`components.courses.meeting.single.${dayOfTheWeek}`);
+
     case 1:
+      return t(`components.courses.meeting.everyday`);
+
+    case 7:
       return t(`components.courses.meeting.every.${dayOfTheWeek}`);
+
     case 14:
       return t('components.courses.meeting.biweekly', {
         day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
       });
     case 30:
       return t('components.courses.meeting.monthly', {
+        day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
+      });
+    case 7:
+      return t('components.courses.meeting.weekly', {
         day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
       });
     default:

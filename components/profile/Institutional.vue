@@ -15,6 +15,7 @@
         v-model:search="search"
         @update:value="updateSelectedOption"
         color="black"
+        class="w-100"
         name="institution"
       />
       <div v-if="sortedInstitutions.length > 0" class="d-flex flex-wrap items">
@@ -189,7 +190,7 @@ const onSave = async () => {
       },
     },
   });
-  emit('update:user');
+  emit('update:user',);
   deleteArray.value = [];
 };
 

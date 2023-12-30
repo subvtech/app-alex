@@ -12,7 +12,7 @@
       </div>
     </div>
     <div v-if="canEdit" class="d-flex align-center mr-3 options">
-      <NuxtImg class="handle" src="/svg/menu.svg" placeholder />
+      <img class="handle" src="/svg/menu.svg" />
 
       <v-icon
         class="remove"

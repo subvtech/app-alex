@@ -10,7 +10,7 @@
       :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
       data-tour="step-user-area"
     >
-      <template v-slot:header>
+      <template #header>
         <div
           class="my-4 w-100 d-flex"
           :class="clipped ? '' : 'justify-center'"
@@ -37,13 +37,19 @@
       :toggle-drawer="() => closeDrawable(!clipped)"
       :avatar="user.avatar"
       :placeholder="user.fullname"
-      @click="onClickOutside"
       :menu-items="profileMenuItems"
       show-picture
+      @click="onClickOutside"
     />
 
     <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
       <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
+        <alex-custom-header
+          v-if="headerStore.showHeader"
+          v-bind="headerStore.headerOptions"
+          @main-action="headerStore.onMainAction"
+          @secondary-action="headerStore.onSecondaryAction"
+        />
         <slot />
       </v-container>
     </v-main>
@@ -56,16 +62,25 @@ import { useOnBoarding } from '@/composables/useOnBoarding';
 import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 const i18n = useI18n();
 const config = useRuntimeConfig();
+const router = useRouter();
+
+router.beforeEach(() => {
+  headerStore.showHeader = false;
+  headerStore.onMainAction = null;
+  headerStore.onSecondaryAction = null;
+});
 
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
 
+const headerStore = usePageHeaderStore();
+
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  userStore.profilePicture = user.value?.avatar;
+  userStore.avatar = user.value?.avatar;
   userStore.fullname = user.value?.fullname;
 });
 
@@ -182,7 +197,7 @@ const steps = [
   },
 ];
 
-const { tour, activeTour } = useOnBoarding(steps);
+// const { tour, activeTour } = useOnBoarding(steps);
 
 const defaultMenus = [
   {

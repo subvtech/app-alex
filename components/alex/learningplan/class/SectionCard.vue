@@ -1,5 +1,6 @@
 <template>
   <alex-custom-card
+    title=""
     class="participantes-card mb-6"
     align-content="align-center"
     :show-icon="false"
@@ -18,7 +19,7 @@
           <v-col cols="4">
             <alex-inputs-text-field
               v-model="modelSearch"
-              name="search"
+              :name="`search-${$attrs.title}`"
               density="comfortable"
               :placeholder="searchPlaceholder"
               hide-details
@@ -33,7 +34,7 @@
           >
             {{ actionText }}
             <alex-custom-dialog
-              v-model="openDialog"
+              v-model="dialogModelValue"
               :title="dialogTitle"
               activator="parent"
             >
@@ -77,7 +78,7 @@
             :items="items"
             :items-per-page="itemsPerPage"
             :filter-keys="filterKeys"
-            class="d-flex flex-wrap"
+            class="d-flex flex-wrap w-100"
           >
             <template #default="{ items: iterateItems }">
               <div class="d-flex flex-wrap gap-6 w-100 px-1">
@@ -111,7 +112,7 @@
 import { usePagination } from '~/composables/usePagination';
 const { t } = useI18n();
 const page = ref(1);
-const emit = defineEmits(['update:search', 'action']);
+const emit = defineEmits(['update:search', 'action', 'update:dialogModel']);
 const props = defineProps({
   loading: {
     type: Boolean,
@@ -185,6 +186,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  dialogModel: {
+    type: Boolean,
+    default: false,
+  },
+  emptyStateObjectName: {
+    type: String,
+    default: 'pages.classes.participant',
+  },
 });
 
 const modelSearch = computed({
@@ -196,16 +205,23 @@ const modelSearch = computed({
   },
 });
 
+const dialogModelValue = computed({
+  get() {
+    return props.dialogModel;
+  },
+  set(value) {
+    emit('update:dialogModel', value);
+  },
+});
+
 const cardItems = computed(() => props.items);
 
 const pagination = usePagination(
   modelSearch,
   page,
   cardItems,
-  t('pages.classes.participant'),
+  t(props.emptyStateObjectName),
 );
-
-const openDialog = ref(false);
 </script>
 
 <style lang="scss" scoped>

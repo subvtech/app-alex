@@ -42,7 +42,7 @@
                 prepend-icon="mdi-check"
                 :size="'x-small'"
                 :status="'dark'"
-                >{{ t('pages.trails.settings.chip') }}</alex-custom-chip
+                >{{ $t('pages.trails.settings.chip') }}</alex-custom-chip
               >
             </div>
           </v-col>
@@ -68,18 +68,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  // trailId: {
-  //   type: Number,
-  //   required: true,
-  // },
-  // courseTitle: {
-  //   type: String,
-  //   required: true,
-  // },
-  // courseId: {
-  //   type: String,
-  //   required: true,
-  // },
+  trailId: {
+    type: Number,
+    required: true,
+  },
+  courseTitle: {
+    type: String,
+    required: true,
+  },
+  courseId: {
+    type: String,
+    required: true,
+  },
   page: {
     type: Number,
     required: true,

@@ -69,6 +69,7 @@
   "endDate": {
     "required": "Data de término é obrigatório",
     "min": "Data mínima aceita: {min}",
+    "max": "Data máxima aceita: {max}",
     "beforeStartDate": "Não pode ser menor que data de início"
   },
   "class": {
@@ -82,7 +83,7 @@
     "max": "Máximo de {max} caracteres"
   },
   "title": {
-    "required": "Nome é obrigatório",
+    "required": "Título é obrigatório",
     "min": "Mínimo de {min} caracteres",
     "max": "Máximo de {max} caracteres"
   },
@@ -99,11 +100,16 @@
       "required": "Hora de início é obrigatório"
     },
     "endHour": {
-      "required": "Hora de término é obrigatório"
+      "required": "Hora de término é obrigatório",
+      "beforeStartHour": "Hora de término deve ser maior que início"
     },
     "copy": {
       "success": "Texto copiado.",
       "error": "Não foi possível copiar o texto."
     }
+  },
+  "copy": {
+    "success": "Texto copiado.",
+    "error": "Não foi possível copiar o texto."
   }
 }

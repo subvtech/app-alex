@@ -6,22 +6,22 @@
     :showIcon="canEdit"
     @toggle:isEditing="toggleIsEditing"
     :cancel="onCancel"
-    :save="() => emit('update', myText)"
+    :save="() => emit('update', isOptional ? myText : value)"
+    :disable-save="errorMessage !== undefined"
     full-width
   >
     <template v-slot:content class="pa-6">
       <div class="d-flex flex-column w-100">
         <alex-custom-empty-placeholder
-          v-if="isTextEmpty && !isEditingAndCanEdit"
+          v-if="isTextEmpty && notOptionalAndNotEditing"
           :empty-text-image="emptyTextImage ?? undefined"
           :empty-text-message="
-            emptyTextMessage ??
-            $t('pages.courses.about.empty')
+            emptyTextMessage ?? $t('pages.courses.about.empty')
           "
         />
         <span
-          v-else
-          class="info"
+          v-else-if="usingMyText"
+          class="about-description"
           :contenteditable="isEditingAndCanEdit"
           :data-placeholder="
             textPlaceholder ?? $t('pages.courses.about.placeholder')
@@ -29,12 +29,24 @@
           @input="updateText"
           >{{ myText }}</span
         >
+        <alex-inputs-text-area
+          v-else
+          v-model="value"
+          density="comfortable"
+          name="description"
+          :label="$t('pages.courses.about.placeholder')"
+          :placeholder="$t('pages.courses.about.placeholder')"
+          theme="light"
+          :error-messages="errorMessage"
+          required
+        />
       </div>
     </template>
   </alex-custom-card>
 </template>
 
 <script setup lang="ts">
+import { useField } from 'vee-validate';
 const { t } = useI18n();
 
 const emit = defineEmits(['update']);
@@ -42,7 +54,7 @@ const emit = defineEmits(['update']);
 const props = defineProps({
   title: {
     type: String,
-    default: ''
+    default: '',
   },
   text: {
     type: String,
@@ -74,16 +86,31 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isOptional: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { canEdit, text } = toRefs(props);
+
+const { descriptionRules } = useFormRules();
+
 const myText = ref(props.text);
 
 const isEditing = ref(false);
 
 const isEditingAndCanEdit = computed(() => isEditing.value && canEdit.value);
 const isTextEmpty = computed(
-  () => myText.value === null || myText.value === '',
+  () =>
+    myText.value === null || myText.value === undefined || myText.value === '',
+);
+
+const notOptionalAndNotEditing = computed(
+  () => !isEditingAndCanEdit.value && !props.isOptional,
+);
+const usingMyText = computed(
+  () => props.isOptional || notOptionalAndNotEditing.value,
 );
 
 const updateText = (event: Event) => {
@@ -96,6 +123,14 @@ const onCancel = async () => {};
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
+
+const { value, errorMessage } = useField(
+  'description',
+  descriptionRules.description,
+  {
+    initialValue: myText.value,
+  },
+);
 
 watch(text, () => {
   myText.value = props.text;
@@ -114,7 +149,7 @@ span[contenteditable='true']:empty::before {
   color: #aaa;
 }
 
-.info {
+.about-description {
   text-align: justify;
   text-justify: inter-word;
   align-self: stretch;
@@ -122,6 +157,7 @@ span[contenteditable='true']:empty::before {
   font-size: 16px;
   font-weight: 400;
   line-height: 22px;
+  overflow-wrap: break-word;
 
   &:focus {
     outline: none;

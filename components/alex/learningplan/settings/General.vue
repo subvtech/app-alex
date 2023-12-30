@@ -2,7 +2,7 @@
   <alex-custom-card
     :title="$t('components.courses.settings.general.title')"
     :show-icon="false"
-    class="content-area"
+    show-footer-divider
   >
     <template #content>
       <div v-if="isTrail" class="d-flex flex-column w-100 content-body">
@@ -66,7 +66,7 @@
       </div>
     </template>
     <template #footer>
-      <div class="d-flex w-100 justify-end gap-4">
+      <div class="d-flex w-100 justify-end gap-4 pt-6">
         <alex-custom-button
           variant="secondary"
           prepend-icon="mdi-close"

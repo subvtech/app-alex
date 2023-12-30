@@ -1,5 +1,11 @@
 <template>
   <div class="w-100 d-flex flex-column justify-center align-center">
+    <v-progress-linear
+      v-if="uploading"
+      indeterminate
+      class="mb-1"
+      color="accent"
+    />
     <vueper-slides
       ref="vueperslides1"
       class="no-shadow mb-4 rounded d-block w-100"
@@ -193,7 +199,7 @@ import {
 } from '@/composables/useCaptureVideoThumbnail';
 const vueperslides1 = ref();
 const vueperslides2 = ref();
-
+const uploading = ref(false);
 const strapiClient = useStrapiClient();
 const props = defineProps({
   modelValue: {
@@ -416,10 +422,12 @@ const onSelectFile = async (slides) => {
       formData.append('files', imageFile, imageFile.name);
     }
   });
+  uploading.value = true;
   const res = await strapiClient('/upload', {
     method: 'POST',
     body: formData,
   });
+  uploading.value = false;
   if (slides.length > 1) {
     const url = res[0].url;
     const videoId = res[0].id;

@@ -6,54 +6,57 @@
   >
     <template v-slot:content>
       <div class="settings w-100">
-        <v-form
-          ref="form"
-          color="black"
-          class="d-flex flex-column"
-          @submit.prevent="updateValues"
-        >
+        <div color="black" class="d-flex flex-column">
           <alex-inputs-text-field
             :label="$t('components.profile.settings.fullname')"
-            :value="fullname"
+            :modelValue="computedFullname"
             name="fullname"
             class=""
           />
           <div class="block d-flex">
-            <alex-inputs-stepper-field
-              :label="$t('components.profile.settings.phone')"
-              :value="telephone"
-              name="phone"
-              class="w-100"
-              v-maska:[phoneMask]
-            />
             <alex-inputs-text-field
-              :label="$t('components.profile.settings.cpf')"
-              :value="cpf"
+              v-maska:[phoneMask]
+              :placeholder="$t('components.profile.settings.phonePlaceholder')"
+              :label="$t('components.profile.settings.phone')"
+              name="phone"
+              :modelValue="computedTelephone"
+              class="w-100"
+            />
+
+            <alex-inputs-text-field
+              v-maska:[cpfMask]
+              :placeholder="$t('pages.register.cpfHolder')"
+              label="CPF"
+              :model-value="computedCpf"
               name="cpf"
               class="w-100"
-              v-maska:[cpfMask]
             />
           </div>
           <div class="buttons d-flex justify-end">
-            <v-btn
-              class="btn"
-              color="accent"
-              @click="cancel"
-              variant="outlined"
+            <alex-custom-button
+              variant="secondary"
+              size="large"
+              @click="onCancel"
             >
-              {{ $t('components.profile.settings.cancel') }}</v-btn
+              {{ $t('components.profile.settings.cancel') }}</alex-custom-button
             >
-            <v-btn class="btn" color="accent" type="submit">
+            <alex-custom-button
+              variant="primary"
+              size="large"
+              type="submit"
+              :disabled="theresError"
+              @click="onSave"
+            >
               {{ $t('components.profile.settings.save') }}
-            </v-btn>
+            </alex-custom-button>
           </div>
-        </v-form>
+        </div>
       </div>
     </template>
 
     <template v-slot:footer> </template>
   </alex-custom-card>
-  <div class="d-flex flex-column">
+  <div class="d-flex flex-column mt-6">
     <profile-security :email="email" :id="id" /> <profile-wallets :id="id" />
   </div>
 </template>
@@ -92,6 +95,10 @@ const props = defineProps({
 
 const { fullname, email, telephone, cpf } = toRefs(props);
 
+const computedFullname = ref(fullname.value);
+const computedCpf = ref(cpf.value);
+const computedTelephone = ref(telephone.value);
+
 const cpfMask = reactive({
   mask: '###.###.###-##',
   eager: true,
@@ -107,30 +114,41 @@ const { handleSubmit, errors, values, controlledValues } = useForm({
   keepValuesOnUnmount: true,
 });
 
-const cancel = () => {
-  telephone.value = props.telephone;
-  fullname.value = props.fullname;
-  cpf.value = props.cpf;
+const onCancel = () => {
+  computedTelephone.value = props.telephone;
+  computedFullname.value = props.fullname;
+  computedCpf.value = props.cpf;
 };
 
-const updateValues = handleSubmit(async () => {
-  loading.value = true;
+const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
+const onSave = handleSubmit(async () => {
+  loading.value = true;
   try {
     await client(`/users/${props.id}`, {
       method: 'PUT',
       body: { ...values, phone: values.phone.replace(/[^0-9]/g, '') },
     });
 
-    emit('update:user', {});
+    emit('update:user');
   } catch (error) {
     console.log(error);
-    messageStore.message = error as string;
-    messageStore.color = 'red';
-    messageStore.show = true;
+    messageStore.setMessage(error as string, 'red', true);
   } finally {
     loading.value = false;
   }
+});
+
+watch(fullname, () => {
+  computedFullname.value = props.fullname;
+});
+
+watch(telephone, () => {
+  computedTelephone.value = props.telephone;
+});
+
+watch(cpf, () => {
+  computedCpf.value = props.cpf;
 });
 </script>
 

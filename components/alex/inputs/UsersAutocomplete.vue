@@ -22,6 +22,7 @@
             name: item.raw.fullname,
           }"
           no-delete
+          no-checkbox
         />
       </template>
     </alex-inputs-autocomplete>
@@ -34,8 +35,7 @@
           email: item.email,
           name: item.fullname,
         }"
-        no-delete
-        no-select
+        remove-selection
         @delete="() => removeSelf(item.email)"
         @reload="() => emit('refresh:invite')"
       />

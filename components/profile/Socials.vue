@@ -5,19 +5,18 @@
     :save="onSave"
     :showIcon="canEdit"
     :isEditing="isEditing && canEdit"
-    :full-width="true"
+    full-width
     @toggle:isEditing="isEditing = !isEditing"
   >
     <template class="d-flex" v-slot:content>
-      <div
+     <div class="d-flex flex-column w-100 justify-center">
+      <alex-custom-empty-placeholder
         v-if="sortedSocials.length === 0"
-        class="empty d-flex flex-column justify-center align-center w-100"
-        style="gap: 16px"
-      >
-        <NuxtImg src="/svg/EmptySocials.svg" placeholder />
-        <span>{{ $t('components.profile.socials.empty') }}</span>
-      </div>
-      <div class="w-100" v-else>
+        empty-text-image="/svg/EmptySocials.svg"
+        :empty-text-message="$t('components.profile.socials.empty')"
+      />
+
+      <div v-else class="w-100">
         <div
           class="rounded-lg"
           style="box-sizing: border-box; border: 1px solid #d2d6da"
@@ -74,12 +73,14 @@
           :socials="updatedMissingSocials"
         />
       </div>
+     </div>
     </template>
   </alex-custom-card>
 </template>
 
 <script setup lang="ts">
 import draggable from 'vuedraggable';
+import { SocialItemType } from '~/models/social.model';
 const i18n = useI18n();
 
 const isEditing = ref(false);
@@ -91,15 +92,10 @@ const componentKey = ref(0);
 const emit = defineEmits(['update:user']);
 const { create, update, delete: _delete } = useStrapi();
 
+
 const props = defineProps({
   socials: {
-    type: Array as PropType<
-      {
-        id: number;
-        url: string;
-        name: string;
-      }[]
-    >,
+    type: Array as PropType<SocialItemType[]>,
     required: true,
   },
   canEdit: {
