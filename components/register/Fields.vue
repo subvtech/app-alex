@@ -110,7 +110,7 @@
           <alex-inputs-select
             name="yourRole"
             theme="dark"
-            class="text-secondary"
+            class="text-secondary mb-4"
             :label="$t('pages.register.userType')"
             :items="[
               {
@@ -127,6 +127,7 @@
             v-model:search="search"
             name="institution"
             theme="dark"
+            class=""
           />
         </template>
         <template #step3="{ values }">

@@ -11,18 +11,26 @@
             <span>{{ $t('components.profile.security.email') }}</span>
             <p :contenteditable="editEmail">{{ email }}</p>
           </div>
-          <alex-custom-button
-            class="ml-2"
-            variant="secondary"
-            size="large"
-            type="submit"
-            @click="updateEmail"
-            :text="
-              editEmail
-                ? $t('components.profile.security.saveEmail')
-                : $t('components.profile.security.editEmail')
-            "
-          />
+          <alex-custom-tooltip
+            :text="$t('components.profile.security.message')"
+          >
+            <template #content>
+              <alex-custom-button
+                id="email-button"
+                class="ml-2"
+                variant="secondary"
+                size="large"
+                type="submit"
+                disabled
+                :text="
+                  editEmail
+                    ? $t('components.profile.security.saveEmail')
+                    : $t('components.profile.security.editEmail')
+                "
+                @click="updateEmail"
+              />
+            </template>
+          </alex-custom-tooltip>
           <div class="options">
             <v-icon
               @click="editEmail = !editEmail"
@@ -38,18 +46,24 @@
             <span>{{ $t('components.profile.security.password') }}</span>
             <input type="password" disabled value="dasdasdasda" />
           </div>
-
-          <alex-custom-button
-            class="ml-2"
-            variant="secondary"
-            size="large"
-            @click="updatePassword"
-            :text="
-              editPassword
-                ? $t('components.profile.security.savePassword')
-                : $t('components.profile.security.editPassword')
-            "
-          />
+          <alex-custom-tooltip
+            :text="$t('components.profile.security.message')"
+          >
+            <template #content>
+              <alex-custom-button
+                class="ml-2"
+                variant="secondary"
+                size="large"
+                disabled
+                @click="updatePassword"
+                :text="
+                  editPassword
+                    ? $t('components.profile.security.savePassword')
+                    : $t('components.profile.security.editPassword')
+                "
+              />
+            </template>
+          </alex-custom-tooltip>
           <div class="options">
             <v-icon
               @click="editPassword = !editPassword"
