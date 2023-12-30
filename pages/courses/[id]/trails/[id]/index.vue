@@ -5,7 +5,6 @@
       :trails-description="trailsDescription"
       :trails-cover="coverImage"
       :page="0"
-      :course-id="(learningPlan!.id as String)"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" class="d-flex justify-end px-6 pt-6">
@@ -102,7 +101,7 @@
 <script setup lang="ts">
 import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 import { ref, onMounted } from 'vue';
-import { GetTrails } from '~/assets/queries';
+import { GetTrail } from '~/assets/queries';
 import { Trail } from '@/models/trail.model';
 const { create, update } = useStrapi();
 const graphql = useStrapiGraphQL();
@@ -113,7 +112,7 @@ definePageMeta({
   hideLearningPlanBanner: true,
 });
 
-const { learningPlan } = useLearningPlanStore()
+const { learningPlan } = useLearningPlanStore();
 
 const professorMode = ref(false);
 const isLoading = ref(false);
@@ -132,7 +131,9 @@ const editorData = ref({
 });
 const backUpEditorData = ref({});
 
-const { id } = route.params;
+const id = route.params.id;
+
+
 
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
@@ -141,13 +142,12 @@ const getTrailData = async () => {
   isLoading.value = true;
   try {
     const { data } = await useAsyncData('trails', () => {
-      return graphql<{}>(GetTrails, { trailId: id });
+      return graphql<{}>(GetTrail, { trailId: id });
     });
     const trail = data.value.data.trail?.data.attributes;
     trailsTitle.value = trail.title;
     trailsDescription.value = trail.description;
     coverImage.value = trail.cover_image.data.attributes.url;
-
     const structureData = trail.structures.data[0];
     if (structureData) {
       editorData.value = {

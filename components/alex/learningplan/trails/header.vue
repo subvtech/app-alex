@@ -69,7 +69,7 @@ const props = defineProps({
     required: true,
   },
   trailId: {
-    type: Number,
+    type: String,
     required: true,
   },
   courseTitle: {
@@ -96,7 +96,7 @@ watch(activePage, () => {
     }
     router.push(currentPath);
   } else if (activePage.value == 2) {
-    router.push(`${router.currentRoute.value.fullPath}/settings`);
+    router.push(`${router.currentRoute.value.fullPath}settings`);
   }
 });
 const tabs = [
