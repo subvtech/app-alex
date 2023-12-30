@@ -30,6 +30,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     groups: {
       populate: ['group_members.student_member.user.avatar'],
     },
+    learning_structures: {
+      populate: ['trails'],
+    },
     tags: true,
     schedules: true,
     members: {
@@ -45,7 +48,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       });
 
       learningPlan.value = result.data;
-
       loading.value = false;
       return result;
     } catch (e: any) {
@@ -86,6 +88,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         },
       ) || []
     );
+  });
+
+  const standardTrails = computed(() => {
+    let counter = 0;
+    learningPlan.value?.learning_structures.filter(structure => structure.type === 'standard').forEach(item => {
+      counter += item.trails.length
+    } )
+    return counter;
   });
 
   const invitationLink = computed(() => {
@@ -153,5 +163,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsActiveMember,
     userIsPendingMember,
     activeInviteLinks,
+    standardTrails
   };
 });
