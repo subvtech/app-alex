@@ -4,7 +4,7 @@
       :learningPlan="learningPlanStore.learningPlan as any"
       :learning-plan-id="learningPlanStore.learningPlan?.id"
       :owner="learningPlanStore.facilitator!"
-      :invitationLink="invitationLink"
+      :invitationLink="learningPlanStore.invitationLink"
       :canEdit="learningPlanStore.userIsFacilitator"
       :schedules="
         meetings.map((item) => {
@@ -36,8 +36,6 @@ import { format } from 'date-fns';
 import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
-import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { InvitationLink } from '@/models/InvitationLink.model';
 export type LearningPlanType = {
   id: number;
   description: string;
@@ -60,20 +58,16 @@ export type LearningPlanType = {
 
 const { find, findOne, update } = useStrapi();
 
-const { generateUrl } = useInvitationLink();
-
 const i18n = useI18n();
 const course = ref<any>();
 const meetings = ref<any>([]);
-const invitationLink = ref<InvitationLinkType | null>(null);
-const plainLink = ref<string | null>(null);
+const plainLink = ref<string | undefined>();
 
 const route = useRoute();
 const owner = ref<any>();
 
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
 
 const { setMessage } = useMessageStore();
 const emit = defineEmits(['update']);
@@ -122,31 +116,6 @@ const updateCourse = async (show = true, message?) => {
     ...(result.data.attributes as Object),
   };
 
-  let sortedLinks: { id: number; attributes: InvitationLink }[] = [];
-  if (course.value.invitation_links) {
-    const filterLinks = ({
-      attributes: { role, emails_to_send, expires_at, is_expired },
-    }) => {
-      return (
-        role === 'student' &&
-        emails_to_send === null &&
-        !is_expired &&
-        new Date(expires_at).getTime() > new Date().getTime()
-      );
-    };
-    sortedLinks = course.value.invitation_links.data.sort(
-      (a, b) =>
-        new Date(a.attributes.createdAt).getTime() -
-        new Date(b.attributes.createdAt).getTime(),
-    );
-  }
-  const sortedLinkLength = sortedLinks.length - 1;
-  if (sortedLinkLength >= 0)
-    invitationLink.value = {
-      id: sortedLinks[sortedLinkLength].id,
-      ...sortedLinks[sortedLinkLength].attributes,
-    } as any;
-
   owner.value = course.value.members.data.filter(
     (member) => member.attributes.role === 'facilitator',
   )[0].attributes.user.data;
@@ -170,9 +139,9 @@ const updateMeetings = async (schedules) => {
   ).data;
 };
 
-watch(invitationLink, () => {
-  if (invitationLink.value)
-    plainLink.value = generateUrl(invitationLink.value.hash);
+watch(learningPlanStore.invitationLink, () => {
+  if (learningPlanStore.invitationLink.value)
+    plainLink.value = learningPlanStore.activeInvitationLinkUrl;
 });
 </script>
 <style scoped lang="scss"></style>

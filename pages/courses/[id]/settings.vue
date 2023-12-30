@@ -4,7 +4,7 @@
       :learningPlan="course"
       :learning-plan-id="course.id"
       :owner="owner"
-      :invitationLink="invitationLink"
+      :invitationLink="learningPlanStore.invitationLink"
       :canEdit="learningPlanStore.userIsFacilitator"
       :schedules="
         meetings.map((item) => {
@@ -65,10 +65,8 @@ const { generateUrl } = useInvitationLink();
 const i18n = useI18n();
 const course = ref<any>();
 const meetings = ref<any>([]);
-const invitationLink = ref<InvitationLinkType | null>(null);
-const plainLink = ref<string | null>(null);
-const emit = defineEmits(['update'])
-
+const plainLink = ref<string | undefined>();
+const emit = defineEmits(['update']);
 
 const learningPlanStore = useLearningPlanStore();
 
@@ -122,7 +120,7 @@ const validLink = ({
 
 const updateCourse = async (show = true, message?) => {
   let { id } = route.params;
-  emit('update')
+  emit('update');
   const result = await findOne('learningplans', id as string, { populate });
   if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
   course.value = {
@@ -130,29 +128,12 @@ const updateCourse = async (show = true, message?) => {
     ...(result.data.attributes as Object),
   };
 
-  let sortedLinks: { id: number; attributes: InvitationLink }[] = [];
-  if (course.value.invitation_links) {
-    sortedLinks = course.value.invitation_links.data.sort(
-      (a, b) =>
-        new Date(a.attributes.createdAt).getTime() -
-        new Date(b.attributes.createdAt).getTime(),
-    );
-  }
-
-  const sortedLinkLength = sortedLinks.length - 1;
-  if (sortedLinkLength >= 0)
-    if (validLink(sortedLinks[sortedLinkLength]))
-      invitationLink.value = {
-        id: sortedLinks[sortedLinkLength].id,
-        ...sortedLinks[sortedLinkLength].attributes,
-      } as any;
-
   owner.value = course.value.members.data.filter(
     (member) => member.attributes.role === 'facilitator',
   )[0].attributes.user.data;
 
   await updateMeetings(course.value.schedules);
-  
+
   setMessage(message ?? 'done', 'green', show);
 };
 
@@ -170,8 +151,8 @@ const updateMeetings = async (schedules) => {
   ).data;
 };
 
-watch(invitationLink, () => {
-  if (invitationLink.value)
-    plainLink.value = generateUrl(invitationLink.value.hash);
+watch(learningPlanStore.invitationLink, () => {
+  if (learningPlanStore.invitationLink.value)
+    plainLink.value = learningPlanStore.activeInvitationLinkUrl;
 });
 </script>
