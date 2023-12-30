@@ -17,7 +17,7 @@
       ]"
     >
       <div class="foretitle d-flex py-6">
-        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{
+        <span :class="isEditing && showTooltip ? '' : ''">{{
           title
         }}</span>
         <a v-if="href" :href="href" class="mr-5" role="goback">
