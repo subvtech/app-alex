@@ -163,7 +163,9 @@ watch(cpf, () => {
       text-transform: none !important;
     }
   }
-
+  .block {
+    gap: 24px;
+  }
 
   .buttons {
     gap: 8px;
