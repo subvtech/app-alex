@@ -24,7 +24,7 @@
           };
         })
       "
-      :updateCourse="(data) => updateCourse(true, data)"
+      @update="(data) => updateCourse(true, data)"
     />
   </div>
 </template>

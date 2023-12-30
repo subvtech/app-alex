@@ -71,6 +71,7 @@ const fetchInstitutions = async (institution: string) => {
         $or: [
           { acronym: { $containsi: institution } },
           { name: { $containsi: institution } },
+          { socialName: { $containsi: institution } },
         ],
       },
       populate: ['cover'],
@@ -83,6 +84,7 @@ const fetchInstitutions = async (institution: string) => {
             id: institution.id,
             acronym: institution.attributes?.acronym,
             name: institution.attributes?.name,
+            socialName: institution.attributes?.socialName,
             cover: institution.attributes?.cover.data.attributes,
           };
         },
