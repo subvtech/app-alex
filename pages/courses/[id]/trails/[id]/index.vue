@@ -5,7 +5,9 @@
       :trails-description="trailsDescription"
       :trails-cover="coverImage"
       :page="0"
-      :course-id="(learningPlan!.id as String)"
+      :trail-id="trailId"
+      :course-id="learningPlanId as string"
+      :course-title="learningPlan!.title"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" class="d-flex justify-end px-6 pt-6">
@@ -97,6 +99,7 @@
       </div>
     </div>
   </div>
+  <NuxtPage />
 </template>
 
 <script setup lang="ts">
@@ -113,7 +116,8 @@ definePageMeta({
   hideLearningPlanBanner: true,
 });
 
-const { learningPlan } = useLearningPlanStore()
+const { trail } = useTrailStore();
+const { learningPlan } = useLearningPlanStore();
 
 const professorMode = ref(false);
 const isLoading = ref(false);
@@ -143,7 +147,7 @@ const getTrailData = async () => {
     const { data } = await useAsyncData('trails', () => {
       return graphql<{}>(GetTrails, { trailId: id });
     });
-    const trail = data.value.data.trail?.data.attributes;
+    const trail = data.value?.data.trail?.data.attributes;
     trailsTitle.value = trail.title;
     trailsDescription.value = trail.description;
     coverImage.value = trail.cover_image.data.attributes.url;
@@ -173,6 +177,21 @@ const getTrailData = async () => {
     isLoading.value = false;
   }
 };
+
+const isJoinRoutePath = computed(() => {
+  return route.name === 'courses-id-join-hash';
+});
+
+const trailId = computed(() => {
+  if (trail?.id) return trail.id;
+  return route.params.id;
+});
+
+const learningPlanId = computed(() => {
+  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
+
+  return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
+});
 
 onMounted(async () => {
   await getTrailData();
@@ -259,7 +278,7 @@ const saveData = async () => {
   saveLoading.value = true;
   try {
     const data = await editor.value.getData();
-    const blockIds = [];
+    const blockIds: number[] = [];
     for (const block of data.blocks) {
       const res = await create('blocks', {
         type: block.type,

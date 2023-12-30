@@ -37,7 +37,7 @@
           <alex-learningplan-goals
             :can-edit="canEdit"
             :course-id="learningPlan.id"
-            :user-id="owner.id"
+            :user-id="id"
             :data="
               learningPlan.learning_goals.map((item) => {
                 return {
@@ -210,6 +210,7 @@ const props = defineProps({
 const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
+const { id } = useStrapiUser<User>().value;
 
 if (props.learningPlan.tags.data) {
   generalTags.value = props.learningPlan.tags.data.reduce(

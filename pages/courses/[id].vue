@@ -53,13 +53,19 @@ const user = useStrapiUser<User>();
 const route = useRoute();
 const learningPlanStore = useLearningPlanStore();
 
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
-const selectedOption = ref(0);
-
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
+
+const learningPlanId = computed(() => {
+  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
+
+  return learningPlanStore.learningPlan
+    ? learningPlanStore.learningPlan.id
+    : parseInt(route.params?.id.toString());
+});
+
+const selectedOption = ref(0);
 
 const fetchData = async () => {
   await useAsyncData('user', () =>
