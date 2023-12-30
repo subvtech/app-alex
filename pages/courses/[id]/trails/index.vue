@@ -100,9 +100,9 @@
       </v-data-iterator>
     </div>
     <CreateDialog
-      v-if="professorMode"
+      v-if="professorMode && learningStructure"
       v-model="createTrailDialog"
-      :learning-structure="learningStructure"
+      :learning-structure="parseInt(learningStructure)"
       @course-created="handleCreatedCourse"
     ></CreateDialog>
   </div>
@@ -113,15 +113,19 @@ import { ref, onMounted } from 'vue';
 import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 import { GetTrails } from '~/assets/queries';
 import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
+
+const emit = defineEmits(['update']);
 const router = useRouter();
 const route = useRoute();
+const { t } = useI18n();
+const graphql = useStrapiGraphQL();
+const { update } = useStrapi();
+
 const search = ref('');
 const page = ref(1);
 const professorMode = ref(false);
 const isLoading = ref(false);
-const { t } = useI18n();
-const graphql = useStrapiGraphQL();
-const { update } = useStrapi();
+
 const createTrailDialog = ref(false);
 const learningStructure = ref(null);
 
@@ -141,25 +145,27 @@ interface trail {
 }
 
 const trails = ref<trail[]>([]);
+const { learningPlan } = useLearningPlanStore();
 
 const { isProfessor } = useStrapiUser<User>().value;
-const { id } = route.params;
 const getCourses = async () => {
   professorMode.value = isProfessor;
+  emit('update');
   isLoading.value = true;
-  const { data } = await useAsyncData('learningPlans', () => {
-    const params = { learningPlanId: id };
+  const { data } = await useAsyncData('learningPlan', () => {
+    const params = { learningPlanId: learningPlan!.id };
     return graphql<{
       data: {
         learningplans: Strapi4ResponseMany<LearningPlan>;
       };
     }>(GetTrails, params);
   });
-  console.log(data);
+  
   learningStructure.value =
-    data.value?.data.learningplan.data.attributes.learning_structures?.data[0].id;
+    data.value?.data.learningplan.data?.attributes.learning_structures?.data[0]
+      .id;
   trails.value = [];
-  data.value?.data.learningplan.data.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
+  data.value?.data.learningplan.data?.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
     (trail) => {
       trails.value.push({
         name: trail.attributes.title,
@@ -215,11 +221,23 @@ const changeItemVisibility = (index: number, id) => {
   }
 };
 
+const isJoinRoutePath = computed(() => {
+  return route.name === 'courses-id-join-hash';
+});
+
+const learningPlanId = computed(() => {
+  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
+
+  return learningPlan
+    ? learningPlan.id
+    : parseInt(route.params?.id.toString());
+});
+
 const navigate = (trailId: number, page) => {
   if (page === 'settings') {
-    router.push(`/courses/${id}/trails/${trailId}/settings/`);
+    router.push(`/courses/${learningPlanId.value}/trails/${trailId}/settings/`);
   } else {
-    router.push(`/courses/${id}/trails/${trailId}/`);
+    router.push(`/courses/${learningPlanId.value}/trails/${trailId}/`);
   }
 };
 

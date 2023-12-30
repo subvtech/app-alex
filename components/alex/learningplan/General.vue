@@ -37,7 +37,7 @@
           <alex-learningplan-goals
             :can-edit="canEdit"
             :course-id="learningPlan.id"
-            :user-id="owner.id"
+            :user-id="id"
             :data="
               learningPlan.learning_goals.map((item) => {
                 return {
@@ -150,7 +150,7 @@
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :userId="owner.id"
+        :userId="learningPlan.id"
         :userTags="generalTags"
         :can-edit="learningPlanStore.userIsFacilitator"
         @update="(data) => emit('update', data)"
@@ -164,7 +164,7 @@
         :label="$t('components.competences.technical.label')"
         :emptyMessage="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="owner.id"
+        :userId="learningPlan.id"
         :userTags="technicalTags"
         :can-edit="learningPlanStore.userIsFacilitator"
         @update="(data) => emit('update', true, data)"
@@ -210,6 +210,7 @@ const props = defineProps({
 const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
+const { id } = useStrapiUser<User>().value;
 
 if (props.learningPlan.tags.data) {
   generalTags.value = props.learningPlan.tags.data.reduce(
