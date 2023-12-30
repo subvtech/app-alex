@@ -130,20 +130,12 @@ const submit = handleSubmit((values) => {
   emit('update:modelValue', false);
 });
 
-const disablePastDates = (date: Date | string) => {
-  if (!props.endDate || !props.startDate) {
-    return true;
-  }
-  const endDate = props.endDate ? new Date(props.endDate) : new Date();
-  endDate.setHours(23, 59, 59, 59);
-  const startDate = props.startDate ? new Date(props.startDate) : new Date();
-  endDate.setHours(0, 0, 0, 0);
 
-  // Vuetify uses strings in the format 'YYYY-MM-DD' for dates, so convert the date argument to a Date object
+const disablePastDates = (date: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const parsedDate = new Date(date);
-  parsedDate.setHours(0, 0, 0, 0);
-  // If the parsed date is earlier than today, return false to disable it
-  return startDate <= parsedDate && parsedDate <= endDate;
+  return parsedDate >= today;
 };
 
 const items: {
