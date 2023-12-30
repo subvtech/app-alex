@@ -232,7 +232,7 @@ const cleanFields = () => {
 const createCourse = async () => {
   try {
     loading.value = true;
-    await create('learningplans', {
+    const courseData = await create('learningplans', {
       title: title.value.trim().replace(/\s+/g, ' '),
       description: description.value,
       start_date: startDate.value,
@@ -243,9 +243,11 @@ const createCourse = async () => {
       invitation_duration: 3600,
       members: selectedUsers.value,
       class_name: learningClass.value,
-      media: slides.value,
       schedules: schedules.value,
     });
+    slides.value.map((item) =>
+      create('medias', { ...item, learningplan: courseData.data.id }),
+    );
     emit('submit');
     emit('update:modelValue', false);
     cleanFields();
