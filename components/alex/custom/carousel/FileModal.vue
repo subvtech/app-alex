@@ -3,7 +3,11 @@
     v-model="dialog"
     :title="$t('components.carousel.dialogTitle')"
     :secondary-button-text="$t('components.carousel.dialogSecondaryButton')"
-    :main-button-text="$t('components.carousel.dialogMainButton')"
+    :main-button-text="
+      editSlideMode === 'config'
+        ? $t('components.carousel.dialogMainButtonConfig')
+        : $t('components.carousel.dialogMainButton')
+    "
     :no-footer="editSlideMode == 'edit'"
     @on-main-action="() => upload()"
     @on-secondary-action="() => (dialog = false)"

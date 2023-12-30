@@ -211,6 +211,22 @@ const emit = defineEmits(['update:modelValue']);
 
 const slides = ref([...props.modelValue]);
 
+onMounted(() => {
+  if (slides.value.length > 0) {
+    slides.value.forEach((slide) => {
+      if (
+        slide.type === 'FileVideo' ||
+        slide.type === 'youtube' ||
+        slide.type === 'vimeo'
+      ) {
+        slide.icon = 'mdi-youtube';
+      } else {
+        slide.icon = 'mdi-image';
+      }
+    });
+  }
+});
+
 const videoPlayerOptions = (slide) => {
   let type = slide.type;
   let url = slide.video;

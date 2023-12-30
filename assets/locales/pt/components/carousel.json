@@ -1,6 +1,7 @@
 {
     "dialogTitle": "Carregar Mídia",
     "dialogMainButton": "Adicionar",
+    "dialogMainButtonConfig": "Salvar", 
     "dialogSecondaryButton": "Cancelar",
     "mediaType": "Como deseja adicionar a mídia?",
     "fileDropText": "Arraste e solte um arquivo ou ",
