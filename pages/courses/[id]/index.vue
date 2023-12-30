@@ -1,11 +1,11 @@
 <template>
   <div v-if="course">
     <alex-learningplan-general
-      :learningPlan="learningPlanStore.learningPlan as any"
+      :learning-plan="learningPlanStore.learningPlan as any"
       :learning-plan-id="learningPlanStore.learningPlan?.id"
       :owner="learningPlanStore.facilitator!"
-      :invitationLink="learningPlanStore.invitationLink"
-      :canEdit="learningPlanStore.userIsFacilitator"
+      :invitation-link="learningPlanStore.invitationLink as any"
+      :can-edit="learningPlanStore.userIsFacilitator"
       :schedules="
         meetings.map((item) => {
           return {
@@ -56,7 +56,7 @@ export type LearningPlanType = {
   media: any;
 };
 
-const { find, findOne, update } = useStrapi();
+const { find, findOne } = useStrapi();
 
 const i18n = useI18n();
 const course = ref<any>();
@@ -107,7 +107,7 @@ const updateCourse = async (show = true, message?) => {
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
-  let { id } = route.params;
+  const { id } = route.params;
   const result = await findOne('learningplans', id as string, { populate });
   if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
   course.value = {
@@ -119,12 +119,12 @@ const updateCourse = async (show = true, message?) => {
     (member) => member.attributes.role === 'facilitator',
   )[0].attributes.user.data;
 
-  await updateMeetings(course.value.schedules);
+  await updateMeetings();
 
   setMessage(message ?? 'done', 'green', show);
 };
 
-const updateMeetings = async (schedules) => {
+const updateMeetings = async () => {
   meetings.value = (
     await find('learning-plan-meeting-schedules', {
       filters: {
@@ -138,4 +138,3 @@ const updateMeetings = async (schedules) => {
   ).data;
 };
 </script>
-<style scoped lang="scss"></style>

@@ -1,7 +1,7 @@
 <template>
   <alex-custom-dialog
     v-model="value"
-    title="Grupo de participantes"
+    :title="$t('pages.classes.membersGroup')"
     no-footer
     body-classes="d-flex flex-column gap-6 bg-white pa-6 rounded-b-lg"
   >
@@ -55,6 +55,7 @@ interface ParticipantsDetailsDialogProps {
     members: LearningPlanGroupMemberSimple[];
   };
 }
+const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
 const props = withDefaults(defineProps<ParticipantsDetailsDialogProps>(), {
   showValuesGroup: undefined,
@@ -72,8 +73,8 @@ const sectionsShowGroup: {
   title: string;
   filter: keyof typeof learningPlanGroupMemberRolesSimple;
 }[] = [
-  { title: 'Responsável', filter: 'IN_CHARGE' },
-  { title: 'Participantes', filter: 'STANDARD' },
+  { title: t('pages.classes.responsible'), filter: 'IN_CHARGE' },
+  { title: t('pages.classes.members'), filter: 'STANDARD' },
 ];
 
 function filterMembersByRole(
