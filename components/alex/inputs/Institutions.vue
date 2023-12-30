@@ -82,10 +82,7 @@ const fetchInstitutions = async (institution: string) => {
         (institution: any) => {
           return {
             id: institution.id,
-            acronym: institution.attributes?.acronym,
-            name: institution.attributes?.name,
-            socialName: institution.attributes?.socialName,
-            cover: institution.attributes?.cover.data.attributes,
+            ...institution.attributes
           };
         },
       );
