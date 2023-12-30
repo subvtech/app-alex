@@ -134,7 +134,7 @@ const stopTimeout = () => {
 };
 onBeforeMount(() => {
   if (!props.data) return;
-  if (props.data.hash) url.value = generateUrl(props.data.hash);
+  if (props.data.hash) url.value = generateUrl(props.data.hash, props.courseId);
   if (props.data.id) inviteId.value = props.data.id;
   if (props.data.expires_at) {
     remainingTime.value = calcRemainingTime(props.data.expires_at);

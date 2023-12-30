@@ -362,7 +362,7 @@ watch(isEmptyAndIsNotEditing, () => {
 #editorjs {
   max-width: 100% !important;
 }
-
+/*
 @media (min-width: 550px) {
   .ce-toolbar__actions.ce-toolbar__actions--opened {
     left: 0 !important;
@@ -376,7 +376,7 @@ watch(isEmptyAndIsNotEditing, () => {
     margin-right: -54px;
   }
 }
-
+*/
 .locked {
   pointer-events: none;
   -webkit-user-select: text; /* Chrome, Safari, and Opera */
@@ -394,6 +394,7 @@ watch(isEmptyAndIsNotEditing, () => {
   overflow-wrap: break-word;
 }
 #Card {
+  /*
   #editorjs {
     .codex-editor__redactor {
       padding-bottom: 24px !important;
@@ -402,7 +403,7 @@ watch(isEmptyAndIsNotEditing, () => {
       margin: 0px;
     }
   }
-
+*/
   .info {
     text-align: justify;
     text-justify: inter-word;
