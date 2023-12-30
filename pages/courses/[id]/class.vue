@@ -202,7 +202,7 @@
       title="Realmente deseja excluir esse grupo?"
       subtitle="Ao desfazer esse grupo todos os conteúdos e alunos vinculados à perderão esse vínculo."
       submit-button-text="Excluir"
-      @cancel="confirmDeleteGroup = false"
+      @cancel="dialogConfirmDeleteGroup = false"
       @submit="() => onDeleteGroup(removingGroupId)"
     />
     <alex-learningplan-dialogs-alert
@@ -357,7 +357,7 @@ async function onDeleteGroup(id: number) {
   } catch (_) {
     setMessage('Erro ao excluir grupo!', 'red', true);
   } finally {
-    confirmDeleteGroup.value = false;
+    dialogConfirmDeleteGroup.value = false;
   }
 }
 async function onUpdateGroup(id: number) {
