@@ -157,7 +157,7 @@ const getCourses = async () => {
   });
   console.log(data);
   learningStructure.value =
-    data.value?.data.learningplan.data.attributes.learning_structures?.data.id;
+    data.value?.data.learningplan.data.attributes.learning_structures?.data[0].id;
   trails.value = [];
   data.value?.data.learningplan.data.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
     (trail) => {
