@@ -52,6 +52,7 @@ const user = useStrapiUser<User>();
 
 const route = useRoute();
 const learningPlanStore = useLearningPlanStore();
+
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);

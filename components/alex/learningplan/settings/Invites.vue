@@ -164,6 +164,7 @@ const onSave = async () => {
   await update('learningplans', props.learningPlanId, {
     invite_enabled: myInviteEnabled.value,
     message: myMessage.value,
+    invitation_duration: selectedTime.value
   });
   emit('update', t('components.courses.settings.invite.update'))
 };

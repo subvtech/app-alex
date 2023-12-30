@@ -54,10 +54,6 @@ const props = defineProps({
       url: '/images/emptyBanner.svg',
     },
   },
-  learningPlanId: {
-    type: Number,
-    required: true,
-  },
   namespace: {
     type: String as PropType<'courses' | 'trails'>,
     default: 'courses',
