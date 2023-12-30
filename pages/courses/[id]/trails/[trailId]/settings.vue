@@ -1,5 +1,6 @@
 <template>
   <alex-custom-card
+    v-if="trail"
     :title="$t('components.courses.settings.title')"
     :show-icon="false"
     :align-content="'align-center'"
@@ -35,7 +36,6 @@
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
 const { t } = useI18n();
@@ -46,18 +46,15 @@ const { uploadImage, removeImage } = useUploadedImage();
 const route = useRoute();
 const router = useRouter();
 
-const props = defineProps({
-  trail: {
-    type: Object as PropType<any>,
-    required: true,
-  },
-});
+const { trail, loadTrailData } = useTrailStore();
+const trailId = ref(route.params.trailId[0] ?? route.params.traildId);
+loadTrailData(trailId.value);
 
 const coverImage = ref<BannerImageType | undefined>(
-  props.trail.cover_image.data
+  trail.cover_image.data
     ? {
-        id: props.trail.cover_image.data.id,
-        url: props.trail.cover_image.data.attributes.url,
+        id: trail.cover_image.data.id,
+        url: trail.cover_image.data.attributes.url,
       }
     : undefined,
 );
@@ -65,7 +62,7 @@ const coverImage = ref<BannerImageType | undefined>(
 const emit = defineEmits(['update']);
 
 const updateVisibility = async (data) => {
-  await update('learningplans', props.trail.id, { ...data });
+  await update('learningplans', trailId.value, { ...data });
   setMessage(t('components.courses.settings.visibility.update'), 'green', true);
 };
 
@@ -73,7 +70,7 @@ async function uploadCoverImage(event: any) {
   const newImage = await uploadImage(event);
   coverImage.value = { url: newImage[0].url, id: newImage[0].id };
 
-  await update('trails', props.trail.id, {
+  await update('trails', trailId.value, {
     cover_image: coverImage.value.id,
   });
   emit('update', t('components.trails.settings.cover.update'));
@@ -87,7 +84,7 @@ async function removeCoverImage() {
 }
 
 async function removeTrail() {
-  await _delete('trails', props.trail.id);
+  await _delete('trails', trailId.value);
 
   router.push(route.path);
   setMessage(t('components.trails.settings.delete.update'), 'green', true);
