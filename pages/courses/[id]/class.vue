@@ -3,21 +3,21 @@
     <alex-learningplan-class-section-card
       v-model:search="searchMembers"
       v-model:dialog-model="dialogAddMember"
-      title="Participantes da turma"
+      :title="$t('pages.classes.classMembers')"
       :loading="learningPlanStore.loading"
       :show-empty-state="!learningPlanStore?.activeMembers?.length"
       :items="learningPlanStore.activeMembers || []"
       empty-state-image="/svg/no-team-members.svg"
       image-height="250px"
       image-width="335px"
-      empty-state-message="Parece que ainda não há participantes nessa turma!"
-      search-placeholder="Encontrar participante"
-      action-text="Convites"
+      :empty-state-message="$t('pages.classes.emptyStateMemberClass')"
+      :search-placeholder="$t('pages.classes.findMember')"
+      :action-text="$t('pages.classes.invites')"
       action-icon="mdi-email-outline"
-      dialog-title="Convites do Curso"
+      :dialog-title="$t('pages.classes.courseInvites')"
       :filter-keys="['user.fullname', 'email']"
       :show-action="learningPlanStore.userIsFacilitator"
-      dialog-action-text="Enviar convites"
+      :dialog-action-text="$t('pages.classes.sendInvites')"
       :dialog-action-loading="sendingInvites"
       :dialog-action-disabled="!usersToInvite.length"
       @action="onClickSendInvites"
@@ -72,16 +72,16 @@
     <alex-learningplan-class-section-card
       v-model:search="searchGroups"
       v-model:dialog-model="dialogGroup"
-      title="Grupos de participantes"
+      :title="$t('pages.classes.membersGroup')"
       :loading="learningPlanStore.loading"
       :items="learningPlanStore.learningPlan?.groups"
       :show-empty-state="!learningPlanStore.learningPlan?.groups?.length"
       empty-state-image="/svg/no-group-members.svg"
       image-height="200px"
       image-width="250px"
-      empty-state-message="Parece que ainda não há grupos criados!"
-      search-placeholder="Encontrar grupo"
-      action-text="Criar grupos"
+      :empty-state-message="$t('pages.classes.emptyGroupsMessage')"
+      :search-placeholder="$t('pages.classes.findGroup')"
+      :action-text="$t('pages.classes.createGroup')"
       action-icon="mdi-account-multiple-plus-outline"
       colored-background
       :dialog-action-text="dialogGroupActionText"
@@ -93,7 +93,6 @@
       empty-state-object-name="pages.classes.participant"
       @action="!editing ? onCreateGroup() : onUpdateGroup(editingGroupId)"
     >
-      <!-- onUpdateGroup(item.id)  -->
       <template #item="{ item }">
         <alex-learningplan-class-group-card
           :title="item?.title"
@@ -111,16 +110,16 @@
           <alex-inputs-text-field
             v-model="groupTitle"
             :schema="createGroupRules.groupTitle"
-            label="Qual o nome do Grupo?"
+            :label="$t('pages.classes.whatGroupName')"
+            :placeholder="$t('pages.classes.textGroupName')"
             name="groupTitle"
             density="comfortable"
-            placeholder="Digite o nome do grupo"
           />
           <alex-inputs-autocomplete
             v-model="selectedInChargeGroupMember"
             :schema="createGroupRules.leader"
-            label="Quem será responsável pelo grupo?"
-            placeholder="Selecione o responsável pelo grupo"
+            :label="$t('pages.classes.whoAreGroupResponsible')"
+            :placeholder="$t('pages.classes.selectGroupResponsible')"
             name="leader"
             variant="outlined"
             density="comfortable"
@@ -143,9 +142,9 @@
           </alex-inputs-autocomplete>
           <alex-inputs-autocomplete
             v-model="selectedGroupMembers"
-            label="Quem serão os participantes do grupo?"
+            :label="$t('pages.classes.whoAreGroupMembers')"
             :schema="createGroupRules.members"
-            placeholder="Selecione os participantes para o grupo"
+            :placeholder="$t('pages.classes.selectGroupMembers')"
             name="members"
             variant="outlined"
             density="comfortable"
@@ -185,7 +184,11 @@
               v-if="member.id === selectedInChargeGroupMember?.id"
               #chip
             >
-              <alex-custom-chip status="dark" size="small" text="Responsável" />
+              <alex-custom-chip
+                status="dark"
+                size="small"
+                :text="$t('pages.classes.responsible')"
+              />
             </template>
           </alex-custom-list-item-user>
         </v-form>
@@ -199,9 +202,9 @@
       v-model="dialogConfirmDeleteGroup"
       variant="error"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-      title="Realmente deseja excluir esse grupo?"
-      subtitle="Ao desfazer esse grupo todos os conteúdos e alunos vinculados à perderão esse vínculo."
-      submit-button-text="Excluir"
+      :title="$t('pages.classes.wantDeleteGroup')"
+      :subtitle="$t('pages.classes.deleteGroupSubtitle')"
+      :submit-button-text="$t('pages.classes.delete')"
       @cancel="dialogConfirmDeleteGroup = false"
       @submit="() => onDeleteGroup(removingGroupId)"
     />
@@ -209,9 +212,9 @@
       v-model="confirmDeleteMember"
       variant="error"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-      title="Realmente deseja remover esse participante da turma?"
-      subtitle="Ao remover o participante ele ficará impossibilitado de acessar os conteúdos desse curso."
-      submit-button-text="Excluir"
+      :title="$t('pages.classes.wantDeleteMember')"
+      :subtitle="$t('pages.classes.deleteMemberSubtitle')"
+      :submit-button-text="$t('pages.classes.delete')"
       @submit="() => onDeleteParticipant(removingMemberId)"
       @cancel="confirmDeleteMember = false"
     />
@@ -219,6 +222,7 @@
 </template>
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { createGroupRules } = useFormRules();
 const strapi = useStrapi();
@@ -230,8 +234,8 @@ const dialogAddMember = ref(false);
 const dialogGroup = ref(false);
 const dialogShowGroup = ref(false);
 const dialogConfirmDeleteGroup = ref(false);
-const dialogGroupTitle = ref('Criar Curso');
-const dialogGroupActionText = ref('Criar Curso');
+const dialogGroupTitle = ref(t('pages.classes.createGroup'));
+const dialogGroupActionText = ref(t('pages.classes.createGroup'));
 //
 const showValuesGroup = ref<{
   title: string;
@@ -272,7 +276,7 @@ function removeSelectedGroupMember(id: number) {
   if (selectedInChargeGroupMember?.value?.id === id) {
     formAddGroup.setFieldError(
       'members',
-      'Você não pode retirar o responsável dos integrantes',
+      t('pages.classes.cantRemoveResponsible'),
     );
     setTimeout(() => {
       formAddGroup.setFieldError('members', undefined);
