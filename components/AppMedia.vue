@@ -102,8 +102,8 @@ const onSave = async () => {
           (item2) =>
             item2.title === item.title &&
             item2.video === item.video &&
-            item2.title === item.title &&
-            item.image === item.image,
+            item2.type === item.type &&
+            item2.image === item.image,
         ) === -1,
     )
     .map((item) => create('medias', { ...item, learningplan: props.courseId }));
