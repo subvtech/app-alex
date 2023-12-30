@@ -354,7 +354,7 @@ query($userId: ID!) {
         start_date
         end_date
         hidden
-        learning_structure {
+        learning_structures(filters: { type: { eq: "standard" } }) {
           data {
             attributes {
               trails {
@@ -420,13 +420,11 @@ query($learningPlanId: ID!) {
   learningplan(id: $learningPlanId) {
     data {
       attributes {
-        learning_structure {
+        learning_structures(filters: { type: { eq: "standard" } }) {
           data {
             id
             attributes {
-              trails: trails(sort: "id:desc"
-              pagination: {limit: -1})  	
-               {
+              trails(sort: "id:desc", pagination: { limit: -1 }) {
                 data {
                   id
                   attributes {
@@ -463,4 +461,5 @@ query($learningPlanId: ID!) {
     }
   }
 }
+
 `;

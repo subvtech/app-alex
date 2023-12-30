@@ -25,19 +25,18 @@ const props = defineProps({
     },
   },
   dataSetup: {
-    type: Object,
-    default() {
-      return {};
-    },
+    type: String,
+    default: '{}',
   },
-  isActive: {
+  active: {
     type: Boolean,
     default: false,
   },
 });
 const videoPlayer = ref(null);
 onMounted(() => {
-  videoPlayer.value = videojs(videoPlayer.value, props.options);
+  const options = JSON.parse(props.options);
+  videoPlayer.value = videojs(videoPlayer.value, options);
 });
 </script>
 
