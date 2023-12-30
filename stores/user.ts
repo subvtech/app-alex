@@ -37,6 +37,12 @@ export const useUserStore = defineStore('user', {
     tasks: 0,
     cover: undefined,
     isProfessor: false,
-    canEdit: false
+    canEdit: false,
   }),
+  actions: {
+    getUserLearningPlans: async (id) => {
+      const { find } = useStrapiUtils();
+      return (await find('learning-plan-member', { filters: { user: id } })).data.length;
+    },
+  },
 });

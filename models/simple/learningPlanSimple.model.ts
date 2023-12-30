@@ -23,7 +23,7 @@ export interface LearningPlanSimple {
   projects: any[];
   courses: any[];
   members: LearningPlanMemberSimple[];
-  learning_structure: any;
+  learning_structures: any;
   groups: any[];
   tasks: any[];
   tags: any[];
