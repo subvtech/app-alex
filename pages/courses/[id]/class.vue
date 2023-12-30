@@ -370,15 +370,27 @@ async function onUpdateGroup(id: number) {
     return;
   }
   try {
-    const members = selectedGroupMembers.value?.map(
-      (member: LearningPlanMemberSimple) => {
-        return member.user.id;
-      },
-    );
+    const group =
+      learningPlanStore.learningPlan?.groups.filter(
+        (group) => group.id === id,
+      ) || [];
+    const groupMembers = group[0]?.group_members
+      ?.filter((groupMember) => {
+        return selectedGroupMembers.value
+          .map((member) => member.id)
+          .includes(groupMember.student_member.id);
+      })
+      .map((member) => {
+        const role =
+          member.student_member.id === selectedInChargeGroupMember.value?.id
+            ? 'in_charge'
+            : 'standard';
+        return { id: member.id, role };
+      });
     const data = {
       title: groupTitle.value,
       learningplan: learningPlanId.value,
-      group_members: members,
+      group_members: groupMembers,
     };
 
     await strapi.update('learnin-plan-groups', id, data);
