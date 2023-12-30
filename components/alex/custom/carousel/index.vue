@@ -56,7 +56,6 @@
             controls
             :is-active="activeSlide == i"
             :options="videoPlayerOptions(slide)"
-            :data-setup="{}"
           ></video-player>
           <video-player
             v-else-if="
@@ -66,11 +65,7 @@
             controls
             :options="videoPlayerOptions(slide)"
             :is-active="activeSlide == i"
-            :data-setup="
-              JSON.stringify({
-                techOrder: [slide.type],
-              })
-            "
+            :data-setup="JSON.stringify({ techOrder: [slide.type] })"
           ></video-player>
         </template>
       </vueper-slide>
@@ -218,17 +213,22 @@ const slides = ref([...props.modelValue]);
 
 const videoPlayerOptions = (slide) => {
   let type = slide.type;
-  if (slide.type.includes('File')) type = 'mp4';
-  return {
+  let url = slide.video;
+  if (slide.type.includes('File')) {
+    type = 'mp4';
+    url = `https://${slide.video}`;
+  }
+  const data = {
     playbackRates: [0.5, 1, 1.5, 2],
     poster: slide.image,
     sources: [
       {
-        src: slide.video,
+        src: url,
         type: `video/${type}`,
       },
     ],
   };
+  return JSON.stringify(data);
 };
 
 const carouselBreakPoints = computed(() => {
@@ -242,7 +242,9 @@ const carouselBreakPoints = computed(() => {
 });
 
 const onSlideClick = (slide) => {
-  vueperslides2.value.goToSlide(slides.value.indexOf(slide));
+  const index = slides.value.indexOf(slide);
+  if (index === -1) return;
+  vueperslides2.value.goToSlide(index);
 };
 
 const onCarouselSlide = (event) => {

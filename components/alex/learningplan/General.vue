@@ -103,38 +103,49 @@
           />
         </template>
         <template #footer>
-          <div class="pb-12 w-100 fix-margin">
-            <alex-learningplan-meetings
-            :can-edit="learningPlanStore.userIsFacilitator"
-            :data="schedules"
-            :end-date="new Date()"
-            :is-facilitator="learningPlanStore.userIsFacilitator"
-            :href="learningPlanStore.userIsFacilitator ? `${learningPlan.id}/settings` : ''"
-            is-nested
-            :learning-plan-id="0"
-            hide-dividers
-            sizing-class="ma-0"
-          />
-          <alex-learningplan-invites
-            v-if="canEdit"
-            :enable-invites="learningPlan.invite_enabled"
-            :duration="learningPlan.invitation_duration"
-            :course-id="learningPlan.id"
-            :data="invitationLink"
-            @update:link="
-              (data) => {
-                plainLink = data.url;
-              }
+          <div
+            class="w-100 fix-margin"
+            :class="
+              !plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'
             "
-            @link:expired="plainLink = null"
-            full-width
-          />
-          
-        </div>
+          >
+            <alex-learningplan-meetings
+              :can-edit="learningPlanStore.userIsFacilitator"
+              :data="schedules"
+              :end-date="new Date()"
+              :is-facilitator="learningPlanStore.userIsFacilitator"
+              :href="
+                learningPlanStore.userIsFacilitator
+                  ? `${learningPlan.id}/settings`
+                  : ''
+              "
+              is-nested
+              :learning-plan-id="0"
+              hide-dividers
+              sizing-class="ma-0"
+            />
+            <alex-learningplan-invites
+              v-if="canEdit"
+              :enable-invites="learningPlan.invite_enabled"
+              :duration="learningPlan.invitation_duration"
+              :course-id="learningPlan.id"
+              :data="invitationLink"
+              @update:link="
+                (data) => {
+                  plainLink = data.url;
+                }
+              "
+              @link:expired="plainLink = null"
+              full-width
+            />
+          </div>
         </template>
       </alex-custom-card>
       <competences
-        v-if="(generalTags.length === 0 && learningPlanStore.userIsFacilitator) || generalTags.length !== 0"
+        v-if="
+          (generalTags.length === 0 && learningPlanStore.userIsFacilitator) ||
+          generalTags.length !== 0
+        "
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
@@ -146,7 +157,8 @@
       />
       <competences
         v-if="
-          (technicalTags.length === 0 && learningPlanStore.userIsFacilitator) || technicalTags.length !== 0
+          (technicalTags.length === 0 && learningPlanStore.userIsFacilitator) ||
+          technicalTags.length !== 0
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
@@ -247,19 +259,16 @@ const showDetails = computed(() => {
 
 .course-page {
   .left-block {
-    min-width: 66% !important;
+    min-width: 60% !important;
     padding-inline: 24px !important;
     padding-bottom: 24px;
-    .flex-column.align-center.gap-12 {
-      width: 50%;
-    }
   }
 }
 
-@media (max-width: 1420px) {
+@media (max-width: 1530px) {
   .course-page {
     .left-block {
-      min-width: 50% !important;
+      min-width: 45% !important;
       .flex-column.align-center.gap-12 {
         width: 100%;
       }
@@ -267,7 +276,18 @@ const showDetails = computed(() => {
   }
 }
 
-@media (max-width: 1075px) {
+@media (max-width: 1250px) {
+  .course-page {
+    .left-block {
+      min-width: 37% !important;
+      .flex-column.align-center.gap-12 {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 1125px) {
   .course-page {
     flex-wrap: wrap;
     &.gap-6 {

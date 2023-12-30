@@ -4,7 +4,7 @@
       :learningPlan="course"
       :learning-plan-id="course.id"
       :owner="owner"
-      :invitationLink="invitationLink"
+      :invitationLink="learningPlanStore.invitationLink"
       :canEdit="learningPlanStore.userIsFacilitator"
       :schedules="
         meetings.map((item) => {
@@ -36,9 +36,6 @@ import { format } from 'date-fns';
 import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
-import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { TabType } from '@/components/alex/custom/Tabs.vue';
-
 export type LearningPlanType = {
   id: number;
   description: string;
@@ -60,13 +57,10 @@ export type LearningPlanType = {
 
 const { find, findOne, update } = useStrapi();
 
-const { generateUrl } = useInvitationLink();
-
 const i18n = useI18n();
 const course = ref<any>();
 const meetings = ref<any>([]);
-const invitationLink = ref<InvitationLinkType | null>(null);
-const plainLink = ref<string | null>(null);
+
 const emit = defineEmits(['update']);
 
 const learningPlanStore = useLearningPlanStore();
@@ -129,23 +123,6 @@ const updateCourse = async (show = true, message?) => {
     ...(result.data.attributes as Object),
   };
 
-  let sortedLinks: { id: number; attributes: InvitationLink }[] = [];
-  if (course.value.invitation_links) {
-    sortedLinks = course.value.invitation_links.data.sort(
-      (a, b) =>
-        new Date(a.attributes.createdAt).getTime() -
-        new Date(b.attributes.createdAt).getTime(),
-    );
-  }
-
-  const sortedLinkLength = sortedLinks.length - 1;
-  if (sortedLinkLength >= 0)
-    if (validLink(sortedLinks[sortedLinkLength]))
-      invitationLink.value = {
-        id: sortedLinks[sortedLinkLength].id,
-        ...sortedLinks[sortedLinkLength].attributes,
-      } as any;
-
   owner.value = course.value.members.data.filter(
     (member) => member.attributes.role === 'facilitator',
   )[0].attributes.user.data;
@@ -168,12 +145,4 @@ const updateMeetings = async (schedules) => {
     })
   ).data;
 };
-
-watch(invitationLink, () => {
-  if (invitationLink.value)
-    plainLink.value = generateUrl(
-      invitationLink.value.hash,
-      learningPlanStore.learningPlan?.id,
-    );
-});
 </script>

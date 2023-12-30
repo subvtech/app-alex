@@ -9,23 +9,22 @@
     location="bottom right"
     data-testid="snackbar"
   >
-    <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8">
+    <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8 relative">
       <v-row justify="start" align="center">
-        <v-icon v-if="currentColor === 'green' || color === '#26BF6B'"
-          >mdi-check-circle-outline</v-icon
-        >
-        <v-icon v-else>mdi-close-circle-outline</v-icon>
+        <v-icon :color="countdown ? currentColor : 'white'">{{
+          iconName
+        }}</v-icon>
         <span class="text-white font-weight-bold">{{ currentMessage }}</span>
       </v-row>
       <v-icon class="close" size="x-small" @click="onClose" role="close-btn"
         >mdi-close</v-icon
       >
     </v-row>
-    <div class="w-100 bg-white lowbar">
+    <div v-if="countdown" class="w-100 bg-white lowbar">
       <div
         class="bar h-100"
         :class="startTimer ? 'w-100' : ''"
-        :style="`transition: width ${timeout}ms linear`"
+        :style="`transition: width ${timeout}ms linear; background-color: ${currentColor}`"
       />
     </div>
   </v-snackbar>
@@ -40,9 +39,34 @@ const props = defineProps({
   data: {
     type: Object as PropType<{ show: boolean; color: string; message: string }>,
   },
+  countdown: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { data } = toRefs(props);
+
+const iconName = computed(() => {
+  let name = '';
+  switch (currentColor.value) {
+    case 'red':
+      name = 'mdi-close-circle';
+      break;
+    case 'green':
+      name = 'mdi-check-circle';
+      break;
+    case 'warning':
+      name = 'mdi-alert-circle';
+      break;
+    case 'blue':
+      name = 'mdi-information';
+    case 'gray':
+      name = 'mdi-view-dashboard';
+  }
+  if (props.countdown) name += '-outline';
+  return name;
+});
 
 const timeout = ref(5000);
 const timeoutId = ref<NodeJS.Timeout | null>(null);
@@ -59,7 +83,7 @@ const currentShow = computed(() =>
 );
 
 const currentColor = computed(() =>
-  data?.value?.color ? data.value.color : color.value ? color.value : '#26bf6b',
+  data?.value?.color ? data.value.color : color.value ? color.value : 'green',
 );
 
 const currentMessage = computed(() =>
@@ -75,13 +99,14 @@ const stopTimeout = () => {
 };
 
 onUnmounted(() => {
-  stopTimeout()
-})
+  stopTimeout();
+});
 
 const onClose = () => {
   if (data?.value) data.value.show = false;
   show.value = false;
   startTimer.value = false;
+  stopTimeout();
 };
 
 watch(currentShow, () => {
@@ -101,8 +126,11 @@ watch(currentShow, () => {
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
 .bar {
-  background-color: blue;
   width: 0%;
 }
 .snackbar {
@@ -131,7 +159,7 @@ span {
 
 .close {
   position: absolute;
-  top: 16px;
+  top: 4px;
   right: 8px;
   color: white;
 }
