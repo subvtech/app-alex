@@ -1,6 +1,7 @@
 {
     "dialogTitle": "Load Media",
     "dialogMainButton": "Add",
+    "dialogMainButtonConfig": "Save", 
     "dialogSecondaryButton": "Cancel",
     "mediaType": "How do you want to add the media?",
     "fileDropText": "Drag and drop a file or ",
