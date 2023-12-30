@@ -1,0 +1,16 @@
+{
+  "newTrail": "Nova Trilha",
+  "emptyStateText": "Parece que não há trilhas criadas!",
+  "searchPlaceholder": "Buscar...",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} trilhas",
+  "noData": "Nenhuma trilha encontrada!",
+  "newTrailText": "Criar nova Trilha de Aprendizagem",
+  "newTrailDescriptionLabel": "Conte-nos mais sobre a trilha",
+  "newTrailDescriptionPlaceholder": "Descreva a a sua trilha",
+  "newTrailTitleLabel": "Do que se trata sua Trilha de Aprendizagem?",
+  "newTrailTitlePlaceholder": "Digite o título da sua trilha",
+  "newTrailAction": "Criar Trilha",
+  "newTrailCancel": "Cancelar123",
+  "newTrailCoverText": "Capa da Trilha",
+  "newTrailCoverAction": "Editar"
+}

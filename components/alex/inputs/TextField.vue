@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-text-field" :class="$attrs.class">
+  <div class="alex-text-field" :class="class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -43,6 +43,7 @@ interface TextFieldProps {
   disabled?: boolean;
   theme?: 'light' | 'dark';
   schema?: YupSchema;
+  class?: string;
 }
 
 const props = withDefaults(defineProps<TextFieldProps>(), {
@@ -52,6 +53,7 @@ const props = withDefaults(defineProps<TextFieldProps>(), {
   label: undefined,
   modelValue: undefined,
   schema: undefined,
+  class: undefined,
 });
 
 const { value, errorMessage } = useField(() => props.name, props.schema, {
