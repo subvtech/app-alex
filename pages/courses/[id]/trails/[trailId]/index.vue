@@ -5,6 +5,9 @@
       :trails-description="trailsDescription"
       :trails-cover="coverImage"
       :page="0"
+      :trail-id="trailId"
+      :course-id="id"
+      :course-title="learningPlan.title || ''"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" class="d-flex justify-end px-6 pt-6">
@@ -114,6 +117,8 @@ definePageMeta({
 
 const { learningPlan } = useLearningPlanStore();
 
+console.log(learningPlan);
+
 const professorMode = ref(false);
 const isLoading = ref(false);
 const saveLoading = ref(false);
@@ -131,9 +136,7 @@ const editorData = ref({
 });
 const backUpEditorData = ref({});
 
-const id = route.params.id;
-
-
+const { trailId, id } = route.params;
 
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
@@ -142,12 +145,13 @@ const getTrailData = async () => {
   isLoading.value = true;
   try {
     const { data } = await useAsyncData('trails', () => {
-      return graphql<{}>(GetTrail, { trailId: id });
+      return graphql<{}>(GetTrail, { trailId });
     });
+    console.log(data);
     const trail = data.value.data.trail?.data.attributes;
     trailsTitle.value = trail.title;
     trailsDescription.value = trail.description;
-    coverImage.value = trail.cover_image.data.attributes.url;
+    coverImage.value = trail.cover_image.data?.attributes.url;
     const structureData = trail.structures.data[0];
     if (structureData) {
       editorData.value = {
@@ -279,7 +283,7 @@ const saveData = async () => {
         time: Date.now(),
         version: data.version,
         blocks: blockIds,
-        trail: id,
+        trail: trailId,
       });
     }
     editorData.value = data;
