@@ -17,7 +17,7 @@
               })
             "
             :course-id="learningPlan.id"
-            :can-edit="learningPlanStore.userIsFacilitator"
+            :can-edit="userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
             sizing-class="pa-0"
             is-nested
@@ -26,7 +26,7 @@
           <app-about
             :text="learningPlan.description"
             :user-id="learningPlan.id"
-            :can-edit="learningPlanStore.userIsFacilitator"
+            :can-edit="userIsFacilitator"
             @update="updateAbout"
             :empty-text-message="$t('pages.courses.about.empty')"
             sizing-class="pa-0"
@@ -65,7 +65,7 @@
             :info="learningPlan.details?.lines"
             :courseId="learningPlan.id"
             :title="$t('components.courses.editor.title')"
-            :can-edit="learningPlanStore.userIsFacilitator"
+            :can-edit="userIsFacilitator"
             is-nested
             hide-dividers
             @update="(data) => emit('update', data)"

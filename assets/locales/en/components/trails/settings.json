@@ -1,0 +1,94 @@
+{
+    "title": "Settings",
+    "formats": "Supported Formats: .jpeg, .png, .wav, .mp4, .jpg;",
+  
+    "syncMeetingsTitle": "Synchronous Meetings",
+    "noSyncMeetings": "It seems there are no synchronous meetings.",
+  
+    "update": "Trails successfully updated",
+    "cover": {
+      "title": "Trails Cover",
+      "update": "Trails cover image successfully updated",
+      "upload": "Upload"
+    },
+    "general": {
+      "title": "General Information",
+      "courseTitle": "Course name",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "slug": {
+        "label": "Course name or acronym",
+        "unique": "Selected Name/Acronym not available"
+      },
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "update": "General information successfully updated"
+    },
+    "meetings": {
+      "title": "Edit synchronous meeting",
+      "frequency": "Meeting frequency",
+      "date": "Meeting date",
+      "dateTip": "The date the meetings start",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "add": "Create meeting",
+      "delete": {
+        "confirmation": "Do you really wish to delete the meeting?",
+        "description": "Upon confirmation, you will delete the registered synchronous meeting.",
+        "button": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+  
+    "delete": {
+      "courseTitle": "Delete Course",
+      "courseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
+      "button": "Delete Course",
+      "deleteConfirmation": "Do you really wish to delete the course?",
+      "description": "By deleting a course you will lose all the content associated with it.",
+      "label": "Enter the word:",
+      "placeholder": "Enter the word to confirm",
+      "word": "Delete",
+      "cancel": "Cancel",
+      "match": "It doesn't match with the Delete",
+      "update": "The Course was deleted"
+    },
+    "invite": {
+      "title": "Invitation Settings",
+      "label": "Link Invitation",
+      "link": "Invitation Link",
+      "linkDuration": "Link Duration",
+      "linkAddress": "Link Address",
+      "restore": "Restore Message",
+      "email": "Email Invitation",
+      "message": "Invitation Message",
+      "hint": "Message to be sent by email to the invited users.",
+      "tooltip": "Changes in the invite duration will not impact the remaining time for links that are already in use. To apply a new duration, a new invite link must be generated.",
+      "fiveMinutes": "5 minutes",
+      "fifteenMinutes": "15 minutes",
+      "thirtyMinutes": "30 minutes",
+      "oneHour": "1 hour",
+      "twoHours": "2 hours",
+      "eightHours": "8 hours",
+      "twentyFourHours": "24 hours",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "update": "Invitation settings updated"
+    },
+    "visibility": {
+      "title": "Course Visibility",
+      "showCourse": {
+        "title": "Show Course (Public)",
+        "hint": "Makes the course public, allowing any user to find it through search."
+      },
+      "hideCourse": {
+        "title": "Hide Course (Private)",
+        "hint": "Makes the course private, ensuring only members can see the course."
+      },
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "update": "Course visibility updated"
+    }
+  }

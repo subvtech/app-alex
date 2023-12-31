@@ -93,7 +93,7 @@ const breadCrumbs = [
   },
 ];
 
-if (props.page === 3) {
+if (props.page === 2) {
   breadCrumbs.push({
     title: 'Configurações',
     disabled: false,
@@ -107,7 +107,6 @@ watch(activePage, () => {
     if (currentPath.endsWith('settings')) {
       currentPath = currentPath.replace('settings', '');
     }
-    console.log({ currentPath });
     router.push(currentPath);
   } else if (activePage.value == 2) {
     router.push(`${router.currentRoute.value.fullPath}settings`);

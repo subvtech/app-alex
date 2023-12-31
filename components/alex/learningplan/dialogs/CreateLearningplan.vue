@@ -9,6 +9,7 @@
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
     stepper
+    persistent
     @on-main-action="createCourse"
   >
     <template #step1

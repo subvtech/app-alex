@@ -160,7 +160,6 @@ const getCourses = async () => {
       };
     }>(GetTrails, params);
   });
-  
   learningStructure.value =
     data.value?.data.learningplan.data?.attributes.learning_structures?.data[0]
       .id;
@@ -228,9 +227,7 @@ const isJoinRoutePath = computed(() => {
 const learningPlanId = computed(() => {
   if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
 
-  return learningPlan
-    ? learningPlan.id
-    : parseInt(route.params?.id.toString());
+  return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
 });
 
 const navigate = (trailId: number, page) => {
