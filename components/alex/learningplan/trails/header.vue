@@ -93,7 +93,7 @@ const breadCrumbs = [
   },
 ];
 
-if (props.page === 3) {
+if (props.page === 2) {
   breadCrumbs.push({
     title: 'Configurações',
     disabled: false,

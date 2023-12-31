@@ -1,38 +1,48 @@
 <template>
-  <alex-custom-card
-    v-if="trail"
-    :title="$t('components.courses.settings.title')"
-    :show-icon="false"
-    :align-content="'align-center'"
-  >
-    <template #content>
-      <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
-        <alex-learningplan-settings-banner
-          :cover="coverImage"
-          @update="uploadCoverImage"
-          @delete="removeCoverImage"
-          outline
-          namespace="trails"
-          full-width
-        />
-        <alex-learningplan-settings-trails-general
-          :title="trail.title"
-          :description="trail.description"
-          :trail-id="trail.id"
-          @update="(data) => emit('update', data)"
-          outline
-          full-width
-        />
+  <div v-if="trail">
+    <alex-learningplan-trails-header
+      :trails-title="trail.title"
+      :trails-description="trail.description"
+      :trails-cover="coverImage?.url ?? ''"
+      :page="2"
+      :trail-id="trailId"
+      :course-id="learningPlan!.id as any"
+      :course-title="learningPlan!.title"
+    />
+    <alex-custom-card
+      :title="$t('components.courses.settings.title')"
+      :show-icon="false"
+      :align-content="'align-center'"
+    >
+      <template #content>
+        <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
+          <alex-learningplan-settings-banner
+            :cover="coverImage"
+            @update="uploadCoverImage"
+            @delete="removeCoverImage"
+            outline
+            namespace="trails"
+            full-width
+          />
+          <alex-learningplan-settings-trails-general
+            :title="trail.title"
+            :description="trail.description"
+            :trail-id="trailId as any"
+            @update="(data) => emit('update', data)"
+            outline
+            full-width
+          />
 
-        <alex-learningplan-settings-visibility
-          :isHidden="trail.hidden"
-          @update="updateVisibility"
-          outline
-        />
-        <alex-learningplan-settings-delete outline @update="removeTrail" />
-      </div>
-    </template>
-  </alex-custom-card>
+          <alex-learningplan-settings-visibility
+            :isHidden="trail.hidden"
+            @update="updateVisibility"
+            outline
+          />
+          <alex-learningplan-settings-delete outline @update="removeTrail" />
+        </div>
+      </template>
+    </alex-custom-card>
+  </div>
 </template>
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
@@ -43,15 +53,19 @@ const { find, update, delete: _delete } = useStrapi();
 const { setMessage } = useMessageStore();
 const { uploadImage, removeImage } = useUploadedImage();
 
+definePageMeta({
+  hideLearningPlanBanner: true,
+});
+
 const route = useRoute();
 const router = useRouter();
 
+const { learningPlan } = useLearningPlanStore();
 const { trail, loadTrailData } = useTrailStore();
 const trailId = ref(route.params.trailId[0] ?? route.params.traildId);
-loadTrailData(trailId.value);
 
 const coverImage = ref<BannerImageType | undefined>(
-  trail.cover_image.data
+  trail?.cover_image?.data
     ? {
         id: trail.cover_image.data.id,
         url: trail.cover_image.data.attributes.url,
@@ -89,6 +103,10 @@ async function removeTrail() {
   router.push(route.path);
   setMessage(t('components.trails.settings.delete.update'), 'green', true);
 }
+
+onBeforeMount(async () => {
+  await loadTrailData(trailId.value);
+});
 </script>
 <style scoped lang="scss">
 .w-201 {
