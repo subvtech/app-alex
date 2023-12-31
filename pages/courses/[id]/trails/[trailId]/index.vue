@@ -1,13 +1,13 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column" style="flex: 1">
     <alex-learningplan-trails-header
-      :trails-title="trailsTitle"
       :trails-description="trailsDescription"
       :trails-cover="coverImage"
       :page="0"
       :trail-id="trailId"
-      :course-id="(learningPlanId as string)"
+      :course-id="id"
       :course-title="learningPlan!.title"
+      :trails-title="trailsTitle"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" class="d-flex justify-end px-6 pt-6">
@@ -99,7 +99,6 @@
       </div>
     </div>
   </div>
-  <NuxtPage />
 </template>
 
 <script setup lang="ts">
@@ -177,15 +176,6 @@ const getTrailData = async () => {
   }
 };
 
-const isJoinRoutePath = computed(() => {
-  return route.name === 'courses-id-join-hash';
-});
-
-const learningPlanId = computed(() => {
-  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
-
-  return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
-});
 
 onMounted(async () => {
   await getTrailData();

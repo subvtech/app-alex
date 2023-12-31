@@ -354,14 +354,12 @@ query($userId: ID!) {
         start_date
         end_date
         hidden
-        learning_structures(filters: { type: { eq: "standard" } }) {
+        learning_structures{
           data {
             attributes {
               trails {
                 data {
-                  attributes {
-                    createdAt
-                  }
+                  id
                 }
               }
             }

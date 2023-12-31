@@ -3,7 +3,20 @@
     <alex-custom-breadcrumbs
       :arrow-back="true"
       title="Trilha de aprendizagem "
-      :items="breadCrumbs"
+      :items="[
+        { title: 'Home', disabled: false, href: '/' },
+        { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
+        {
+          title: props.courseTitle,
+          disabled: false,
+          href: `/courses/${props.courseId}`,
+        },
+        {
+          title: props.trailsTitle,
+          disabled: false,
+          href: `/courses/${props.courseId}/trails/${props.trailId}`,
+        },
+      ]"
     />
     <div class="bg-white rounded my-6">
       <v-container fluid class="header">
@@ -78,37 +91,15 @@ const props = defineProps({
 
 const activePage = ref(props.page);
 
-const breadCrumbs = [
-  { title: 'Home', disabled: false, href: '/' },
-  { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
-  {
-    title: props.courseTitle,
-    disabled: false,
-    href: `/courses/${props.courseId}`,
-  },
-  {
-    title: props.trailsTitle,
-    disabled: false,
-    href: `/courses/${props.courseId}/trails/${props.trailId}`,
-  },
-];
-
-if (props.page === 2) {
-  breadCrumbs.push({
-    title: 'Configurações',
-    disabled: false,
-    href: `/courses/${props.courseId}/trails/${props.trailId}/settings`,
-  });
-}
-
 watch(activePage, () => {
   if (activePage.value == 0) {
     let currentPath = router.currentRoute.value.fullPath;
     if (currentPath.endsWith('settings')) {
       currentPath = currentPath.replace('settings', '');
+      router.push(currentPath);
     }
-    router.push(currentPath);
   } else if (activePage.value == 2) {
+    if (router.currentRoute.value.fullPath.endsWith('settings')) return;
     router.push(`${router.currentRoute.value.fullPath}settings`);
   }
 });

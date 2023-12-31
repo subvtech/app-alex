@@ -304,7 +304,7 @@ const getCourses = async () => {
         hidden,
         members,
         tags,
-        learning_structure: learningStructure,
+        learning_structure: learningStructures,
       } = attributes;
       const facilitatorName =
         members.data[0]?.attributes?.user.data.attributes.fullname;
@@ -316,7 +316,8 @@ const getCourses = async () => {
           ?.attributes?.name;
       const img = coverImage?.data?.attributes?.url;
       const trails =
-        learningStructure?.data?.attributes?.trails.data.length || 0;
+        attributes.learning_structures.data[0].attributes.trails.data.length ||
+        0;
 
       return {
         id,
