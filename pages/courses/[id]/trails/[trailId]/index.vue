@@ -102,7 +102,6 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 import { ref, onMounted } from 'vue';
 import { GetTrail } from '~/assets/queries';
 import { Trail } from '@/models/trail.model';

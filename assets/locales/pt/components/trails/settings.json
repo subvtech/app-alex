@@ -41,17 +41,17 @@
       }
     },
     "delete": {
-      "courseTitle": "Excluir curso",
-      "courseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
-      "button": "Excluir curso",
-      "confirmation": "Realmente deseja excluir o curso?",
-      "description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
+      "courseTitle": "Excluir trilha",
+      "courseDescription": "Após a exclusão do trilha, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
+      "button": "Excluir trilha",
+      "confirmation": "Realmente deseja excluir o trilha?",
+      "description": "Ao excluir um trilha todo o conteúdo criado dentro dela também será excluído.",
       "label": "Digite a palavra:",
       "placeholder": "Digite a palavra",
       "word": "Excluir",
       "cancel": "Cancelar",
       "match": "Não corresponde a Excluir",
-      "update": "Curso deletado"
+      "update": "Trilha deletado"
     },
     "invite": {
       "title": "Configurações de convite",
@@ -76,17 +76,17 @@
       "update": "Configurações do convite atualizadas."
     },
     "visibility": {
-      "title": "Visibilidade do curso",
+      "title": "Visibilidade do trilha",
       "showCourse": {
         "title": "Mostrar trilha (Público)",
         "hint": "Torna o trilha público, permitindo que qualquer usuário possa encontra-lo através da busca."
       },
       "hideCourse": {
         "title": "Ocultar trilha (Privado)",
-        "hint": "Torna o trilha privado, garantindo que somente os integrantes possam ver o curso."
+        "hint": "Torna o trilha privado, garantindo que somente os integrantes possam ver a trilha."
       },
       "cancel": "Cancelar",
       "save": "Salvar alterações",
-      "update": "Visibilidade do curso alterada"
+      "update": "Visibilidade do trilha alterada"
     }
   }

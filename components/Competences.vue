@@ -83,6 +83,9 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  learningPlanId: {
+    type: Number,
+  },
   isGeneral: {
     type: Boolean,
     default: false,
@@ -188,6 +191,11 @@ const onSave = async () => {
             verified_by: props.userId,
             isGeneral: props.isGeneral,
             isPublic: false,
+            learningplans: props.learningPlanId
+              ? {
+                  connect: [props.learningPlanId],
+                }
+              : undefined,
           }),
         );
       });
@@ -219,6 +227,15 @@ const onSave = async () => {
         },
       }),
     );
+    if (props.learningPlanId) {
+      promises.push(
+        update(`learningplans/${props.learningPlanId}`, {
+          tags: {
+            disconnect: deleteArray.value.map((item) => item.id),
+          },
+        }),
+      );
+    }
   }
 
   deleteArray.value = [];
@@ -231,7 +248,9 @@ const onSave = async () => {
     emit(
       'update',
       t(
-        `components.competences.${props.isGeneral ? 'general' : 'technical'}.updated`,
+        `components.competences.${
+          props.isGeneral ? 'general' : 'technical'
+        }.updated`,
       ),
     );
   }

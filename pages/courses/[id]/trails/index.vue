@@ -166,22 +166,24 @@ const getCourses = async () => {
   trails.value = [];
   data.value?.data.learningplan.data?.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
     (trail) => {
-      trails.value.push({
-        name: trail.attributes.title,
-        description: trail.attributes.description,
-        hidden: trail.attributes.hidden,
-        image: {
-          url: trail.attributes.cover_image.data?.attributes.url,
-        },
-        blocks: trail.attributes.structures.data[0]?.attributes.blocks.data.map(
-          (block) => {
-            return {
-              type: block.attributes.type,
-            };
+      if (trail.attributes)
+        trails.value.push({
+          name: trail.attributes.title,
+          description: trail.attributes.description,
+          hidden: trail.attributes.hidden,
+          image: {
+            url: trail.attributes.cover_image.data?.attributes.url,
           },
-        ),
-        id: trail.id,
-      });
+          blocks:
+            trail.attributes.structures.data[0]?.attributes.blocks.data.map(
+              (block) => {
+                return {
+                  type: block.attributes.type,
+                };
+              },
+            ),
+          id: trail.id,
+        });
     },
   );
   isLoading.value = false;
