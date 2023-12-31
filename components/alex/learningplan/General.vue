@@ -37,7 +37,7 @@
           <alex-learningplan-goals
             :can-edit="canEdit"
             :course-id="learningPlan.id"
-            :user-id="owner.id"
+            :user-id="id"
             :data="
               learningPlan.learning_goals.map((item) => {
                 return {
@@ -81,16 +81,12 @@
             :boxes="[
               {
                 icon: 'mdi-account-outline',
-                number: learningPlan.members?.data
-                  ? learningPlan.members.data.length
-                  : 0,
+                number: activeMembers.length,
                 label: 'students',
               },
               {
                 icon: 'trails.svg',
-                number: learningPlan.trails?.data
-                  ? learningPlan.trails.data.length
-                  : 0,
+                number: standardTrails,
                 label: 'trails',
               },
               {
@@ -110,15 +106,11 @@
             "
           >
             <alex-learningplan-meetings
-              :can-edit="learningPlanStore.userIsFacilitator"
+              :can-edit="userIsFacilitator"
               :data="schedules"
               :end-date="new Date()"
-              :is-facilitator="learningPlanStore.userIsFacilitator"
-              :href="
-                learningPlanStore.userIsFacilitator
-                  ? `${learningPlan.id}/settings`
-                  : ''
-              "
+              :is-facilitator="userIsFacilitator"
+              :href="userIsFacilitator ? `${learningPlan.id}/settings` : ''"
               is-nested
               :learning-plan-id="0"
               hide-dividers
@@ -143,30 +135,30 @@
       </alex-custom-card>
       <competences
         v-if="
-          (generalTags.length === 0 && learningPlanStore.userIsFacilitator) ||
+          (generalTags.length === 0 && userIsFacilitator) ||
           generalTags.length !== 0
         "
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :userId="owner.id"
+        :userId="learningPlan.id"
         :userTags="generalTags"
-        :can-edit="learningPlanStore.userIsFacilitator"
+        :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
       <competences
         v-if="
-          (technicalTags.length === 0 && learningPlanStore.userIsFacilitator) ||
+          (technicalTags.length === 0 && userIsFacilitator) ||
           technicalTags.length !== 0
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
         :emptyMessage="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="owner.id"
+        :userId="learningPlan.id"
         :userTags="technicalTags"
-        :can-edit="learningPlanStore.userIsFacilitator"
+        :can-edit="userIsFacilitator"
         @update="(data) => emit('update', true, data)"
       />
     </div>
@@ -179,7 +171,8 @@ import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
 const { update } = useStrapi();
 
-const learningPlanStore = useLearningPlanStore();
+const { standardTrails, userIsFacilitator, activeMembers } =
+  useLearningPlanStore();
 
 const i18n = useI18n();
 const emit = defineEmits(['update']);
@@ -210,6 +203,7 @@ const props = defineProps({
 const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
+const { id } = useStrapiUser<User>().value;
 
 if (props.learningPlan.tags.data) {
   generalTags.value = props.learningPlan.tags.data.reduce(

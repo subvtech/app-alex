@@ -6,8 +6,8 @@
       :trails-cover="coverImage"
       :page="0"
       :trail-id="trailId"
-      :course-id="id"
-      :course-title="learningPlan.title || ''"
+      :course-id="(learningPlanId as string)"
+      :course-title="learningPlan!.title"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" class="d-flex justify-end px-6 pt-6">
@@ -99,6 +99,7 @@
       </div>
     </div>
   </div>
+  <NuxtPage />
 </template>
 
 <script setup lang="ts">
@@ -115,9 +116,8 @@ definePageMeta({
   hideLearningPlanBanner: true,
 });
 
+const { trail } = useTrailStore();
 const { learningPlan } = useLearningPlanStore();
-
-console.log(learningPlan);
 
 const professorMode = ref(false);
 const isLoading = ref(false);
@@ -147,8 +147,7 @@ const getTrailData = async () => {
     const { data } = await useAsyncData('trails', () => {
       return graphql<{}>(GetTrail, { trailId });
     });
-    console.log(data);
-    const trail = data.value.data.trail?.data.attributes;
+    const trail = data.value?.data.trail?.data.attributes;
     trailsTitle.value = trail.title;
     trailsDescription.value = trail.description;
     coverImage.value = trail.cover_image.data?.attributes.url;
@@ -177,6 +176,21 @@ const getTrailData = async () => {
     isLoading.value = false;
   }
 };
+
+const isJoinRoutePath = computed(() => {
+  return route.name === 'courses-id-join-hash';
+});
+
+const trailId = computed(() => {
+  if (trail?.id) return trail.id;
+  return route.params.id;
+});
+
+const learningPlanId = computed(() => {
+  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
+
+  return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
+});
 
 onMounted(async () => {
   await getTrailData();
@@ -263,7 +277,7 @@ const saveData = async () => {
   saveLoading.value = true;
   try {
     const data = await editor.value.getData();
-    const blockIds = [];
+    const blockIds: number[] = [];
     for (const block of data.blocks) {
       const res = await create('blocks', {
         type: block.type,

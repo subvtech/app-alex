@@ -107,7 +107,7 @@ onBeforeMount(async () => {
 
 const updateCourse = async (show = true, message?) => {
   emit('update');
-  await useAsyncData('user', () =>
+  await useAsyncData('learningPlans', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
   const { id } = route.params;
