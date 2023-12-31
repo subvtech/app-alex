@@ -12,6 +12,9 @@ export const useTrailStore = defineStore('trail', () => {
   const { findOne } = useStrapiUtils();
   const trail = ref();
 
+  const { setMessage } = useMessageStore();
+  const i18n = useI18n();
+
   const populate = [
     'structures',
     'partners',
@@ -21,9 +24,23 @@ export const useTrailStore = defineStore('trail', () => {
     'learning_structure',
   ];
 
-  const loadTrailData = async (id) => {
-    trail.value = (await findOne('trails', id, { populate })).data;
-  };
+  const loading = ref(false);
+
+  async function loadTrailData(id: number, showMessageIfNotFound = true) {
+    try {
+      loading.value = true;
+      const result = (await findOne('trails', id, { populate })).data;
+
+      trail.value = result;
+      loading.value = false;
+      return result;
+    } catch (e: any) {
+      loading.value = false;
+      if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
+        setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+      }
+    }
+  }
 
   return { loadTrailData, trail };
 });

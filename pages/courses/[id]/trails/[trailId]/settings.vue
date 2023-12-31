@@ -3,10 +3,10 @@
     <alex-learningplan-trails-header
       :trails-title="trail.title"
       :trails-description="trail.description"
-      :trails-cover="coverImage?.url ?? ''"
+      :trails-cover="coverImage?.url ?? undefined"
       :page="2"
       :trail-id="trailId"
-      :course-id="learningPlan!.id as any"
+      :course-id="learningPlanId as string"
       :course-title="learningPlan!.title"
     />
     <alex-custom-card
@@ -35,15 +35,21 @@
 
           <alex-learningplan-settings-visibility
             :isHidden="trail.hidden"
+            variant="trails"
             @update="updateVisibility"
             outline
           />
-          <alex-learningplan-settings-delete outline @update="removeTrail" />
+          <alex-learningplan-settings-delete
+            namespace="trails"
+            outline
+            @update="removeTrail"
+          />
         </div>
       </template>
     </alex-custom-card>
   </div>
 </template>
+
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
@@ -53,6 +59,8 @@ const { find, update, delete: _delete } = useStrapi();
 const { setMessage } = useMessageStore();
 const { uploadImage, removeImage } = useUploadedImage();
 
+const emit = defineEmits(['update']);
+
 definePageMeta({
   hideLearningPlanBanner: true,
 });
@@ -61,7 +69,8 @@ const route = useRoute();
 const router = useRouter();
 
 const { learningPlan } = useLearningPlanStore();
-const { trail, loadTrailData } = useTrailStore();
+const { trail: _trail, loadTrailData } = useTrailStore();
+const trail = ref(_trail);
 const trailId = ref(route.params.trailId[0] ?? route.params.traildId);
 
 const coverImage = ref<BannerImageType | undefined>(
@@ -72,8 +81,6 @@ const coverImage = ref<BannerImageType | undefined>(
       }
     : undefined,
 );
-
-const emit = defineEmits(['update']);
 
 const updateVisibility = async (data) => {
   await update('learningplans', trailId.value, { ...data });
@@ -105,7 +112,7 @@ async function removeTrail() {
 }
 
 onBeforeMount(async () => {
-  await loadTrailData(trailId.value);
+  trail.value = await loadTrailData(parseInt(trailId.value));
 });
 </script>
 <style scoped lang="scss">

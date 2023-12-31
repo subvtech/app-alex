@@ -142,7 +142,8 @@
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :userId="learningPlan.id"
+        :user-id="id"
+        :learning-plan-id="learningPlan.id"
         :userTags="generalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
@@ -156,10 +157,11 @@
         :label="$t('components.competences.technical.label')"
         :emptyMessage="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="learningPlan.id"
+        :userId="id"
+        :learning-plan-id="learningPlan.id"
         :userTags="technicalTags"
         :can-edit="userIsFacilitator"
-        @update="(data) => emit('update', true, data)"
+        @update="(data) => emit('update', data)"
       />
     </div>
   </div>
