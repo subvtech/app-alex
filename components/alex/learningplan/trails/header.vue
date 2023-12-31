@@ -94,10 +94,9 @@ watch(activePage, () => {
     if (currentPath.endsWith('/settings')) {
       currentPath = currentPath.replace('/settings', '');
     }
-    console.log({ currentPath });
     router.push(currentPath);
   } else if (activePage.value == 2) {
-    router.push(`${router.currentRoute.value.fullPath}/settings`);
+    router.push(`${router.currentRoute.value.fullPath}settings`);
   }
 });
 const tabs = [

@@ -22,6 +22,7 @@ export const useTrailStore = defineStore('trail', () => {
   ];
 
   const loadTrailData = async (id) => {
+    console.log(id);
     trail.value = (await findOne('trails', id, { populate })).data;
   };
 
