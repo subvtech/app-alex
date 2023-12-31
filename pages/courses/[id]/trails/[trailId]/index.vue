@@ -6,7 +6,7 @@
       :trails-cover="coverImage"
       :page="0"
       :trail-id="trailId"
-      :course-id="learningPlanId as string"
+      :course-id="(learningPlanId as string)"
       :course-title="learningPlan!.title"
     />
     <div class="bg-white rounded w-100" style="flex: 1">
@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import { Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 import { ref, onMounted } from 'vue';
-import { GetTrails } from '~/assets/queries';
+import { GetTrail } from '~/assets/queries';
 import { Trail } from '@/models/trail.model';
 const { create, update } = useStrapi();
 const graphql = useStrapiGraphQL();
@@ -136,7 +136,7 @@ const editorData = ref({
 });
 const backUpEditorData = ref({});
 
-const { id } = route.params;
+const { trailId, id } = route.params;
 
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
@@ -145,13 +145,12 @@ const getTrailData = async () => {
   isLoading.value = true;
   try {
     const { data } = await useAsyncData('trails', () => {
-      return graphql<{}>(GetTrails, { trailId: id });
+      return graphql<{}>(GetTrail, { trailId });
     });
     const trail = data.value?.data.trail?.data.attributes;
     trailsTitle.value = trail.title;
     trailsDescription.value = trail.description;
-    coverImage.value = trail.cover_image.data.attributes.url;
-
+    coverImage.value = trail.cover_image.data?.attributes.url;
     const structureData = trail.structures.data[0];
     if (structureData) {
       editorData.value = {
@@ -180,11 +179,6 @@ const getTrailData = async () => {
 
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
-});
-
-const trailId = computed(() => {
-  if (trail?.id) return trail.id;
-  return route.params.id;
 });
 
 const learningPlanId = computed(() => {
@@ -298,7 +292,7 @@ const saveData = async () => {
         time: Date.now(),
         version: data.version,
         blocks: blockIds,
-        trail: id,
+        trail: trailId,
       });
     }
     editorData.value = data;

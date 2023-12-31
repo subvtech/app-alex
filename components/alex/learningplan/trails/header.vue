@@ -3,17 +3,7 @@
     <alex-custom-breadcrumbs
       :arrow-back="true"
       title="Trilha de aprendizagem "
-      :items="[
-        { title: 'Home', disabled: false, href: '/' },
-        { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
-        // { title: courseTitle, disabled: false, href: `/courses/${courseId}` },
-        { title: 'Trilhas', disabled: false, href: '/courses/me' },
-        {
-          title: trailsTitle,
-          disabled: true,
-          href: `/courses/${courseId}/trails/${trailId}`,
-        },
-      ]"
+      :items="breadCrumbs"
     />
     <div class="bg-white rounded my-6">
       <v-container fluid class="header">
@@ -69,7 +59,7 @@ const props = defineProps({
     required: true,
   },
   trailId: {
-    type: Number,
+    type: String,
     required: true,
   },
   courseTitle: {
@@ -88,11 +78,34 @@ const props = defineProps({
 
 const activePage = ref(props.page);
 
+const breadCrumbs = [
+  { title: 'Home', disabled: false, href: '/' },
+  { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
+  {
+    title: props.courseTitle,
+    disabled: false,
+    href: `/courses/${props.courseId}`,
+  },
+  {
+    title: props.trailsTitle,
+    disabled: false,
+    href: `/courses/${props.courseId}/trails/${props.trailId}`,
+  },
+];
+
+if (props.page === 3) {
+  breadCrumbs.push({
+    title: 'Configurações',
+    disabled: false,
+    href: `/courses/${props.courseId}/trails/${props.trailId}/settings`,
+  });
+}
+
 watch(activePage, () => {
   if (activePage.value == 0) {
     let currentPath = router.currentRoute.value.fullPath;
-    if (currentPath.endsWith('/settings')) {
-      currentPath = currentPath.replace('/settings', '');
+    if (currentPath.endsWith('settings')) {
+      currentPath = currentPath.replace('settings', '');
     }
     router.push(currentPath);
   } else if (activePage.value == 2) {
