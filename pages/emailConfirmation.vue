@@ -1,9 +1,9 @@
 <template>
   <div class="container fill-height">
     <div class="row fill-height d-flex">
-      <div class="img col xxl-6 fill-height d-flex justify-center align-center">
+      <div class="img col fill-height d-flex justify-center align-center">
         <img
-          style="width: 100%"
+          class="w-50 pa-6"
           src="https://alexproject.nyc3.digitaloceanspaces.com/strapi-test/30363f52492aae3f8cf7f931688e7199.png"
         />
       </div>
@@ -37,6 +37,9 @@ body {
   padding: 0;
 }
 
+.img {
+  width: 65%;
+}
 .fill-height {
   height: 100vh !important;
 }
@@ -47,15 +50,12 @@ body {
   background-size: contain;
   background-position: center;
   max-width: 100%;
+  width: 40%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.img {
-  width: 65%;
 }
 
 .row.fill-height {
