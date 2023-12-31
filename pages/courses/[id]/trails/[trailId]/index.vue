@@ -181,11 +181,6 @@ const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
 
-const trailId = computed(() => {
-  if (trail?.id) return trail.id;
-  return route.params.id;
-});
-
 const learningPlanId = computed(() => {
   if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
 
