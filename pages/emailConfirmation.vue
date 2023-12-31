@@ -1,7 +1,10 @@
 <template>
   <div class="container fill-height">
     <div class="row fill-height d-flex">
-      <div class="img col fill-height d-flex justify-center align-center">
+      <div
+        id="img"
+        class="img col fill-height d-flex justify-center align-center"
+      >
         <img
           class="w-50 pa-6"
           src="https://alexproject.nyc3.digitaloceanspaces.com/strapi-test/30363f52492aae3f8cf7f931688e7199.png"
@@ -71,20 +74,23 @@ body {
   max-width: 100%;
 }
 
-@media screen and (max-width: 768px) {
-  .img.col.xxl-6.fill-height.d-flex.justify-center.align-center {
-    display: none !important;
+@media screen and (max-width: 1024px) {
+  #img {
+    width: 70% !important;
+  }
+
+  #message {
+    width: 55% !important;
   }
 }
 
-@media screen and (max-width: 480px) {
-  .v-card-title {
-    overflow: visible !important;
-    overflow-wrap: break-word !important;
-    text-overflow: inherit !important;
-    white-space: pre-wrap !important;
-    word-break: break-word;
-    word-wrap: break-word !important;
+@media screen and (max-width: 768px) {
+  #img {
+    display: none !important;
+  }
+
+  #message {
+    width: 100% !important;
   }
 }
 </style>
