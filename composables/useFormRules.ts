@@ -98,6 +98,7 @@ export const useFormRules = () => {
     .object({
       text: yup
         .string()
+        .min(2, i18n.t('rules.keyword.required'))
         .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
         .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
         .required(i18n.t('rules.keyword.required')),
@@ -273,6 +274,35 @@ export const useFormRules = () => {
         ),
     });
 
+  const createTrailsRules = yup.object({
+    title: yup
+      .string()
+      .required(i18n.t('rules.title.required'))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
+      .trim(),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+  });
+
+  const createGroupRules = {
+    groupTitle: yup
+      .string()
+      .min(4, i18n.t('rules.url.min'))
+      .max(64, i18n.t('rules.url.max'))
+      .required(i18n.t('pages.classes.groupNameIsRequired'))
+      .trim(),
+    leader: yup.mixed().required(i18n.t('pages.classes.responsibleIsRequired')),
+    members: yup
+      .array()
+      .required(i18n.t('pages.classes.participantsIsRequired'))
+      .min(2, i18n.t('pages.classes.participantsIsRequired')),
+  };
+
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -308,5 +338,7 @@ export const useFormRules = () => {
     createCourseRules,
     emailRegex,
     scheduleRules,
+    createTrailsRules,
+    createGroupRules,
   };
 };

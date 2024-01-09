@@ -2,7 +2,11 @@
   <div
     id="Card"
     class="d-flex flex-column rounded-lg"
-    :class="[fullWidth ? 'w-100' : '', isNested ? '' : 'float']"
+    :class="[
+      fullWidth ? 'w-100' : '',
+      isNested ? '' : 'float',
+      outline ? 'outline' : '',
+    ]"
   >
     <div
       v-if="!noHeader"
@@ -126,6 +130,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  outline: {
+    type: Boolean,
+    default: false,
+  },
   showFooterDivider: {
     type: Boolean,
     default: false,
@@ -191,6 +199,11 @@ const cancelledAction = async () => {
   }
   &.float {
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
+
+    .outline{
+      box-shadow: none !important;
+      border: 1px solid var(--Cinza-Cinza-100, #EBEDEF);
+    }
   }
   .border-bottom {
     border-bottom: 1px solid #eaeef1;

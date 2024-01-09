@@ -4,5 +4,6 @@
   "editSocialUrl": "Qual o endereço do site?",
   "addSocial": "Qual rede deseja adicionar?",
   "empty": "Nenhuma rede social adicionada",
-  "otherSocial": "Outra rede"
+  "otherSocial": "Outra rede",
+  "update": "Rede Social atualizada"
 }

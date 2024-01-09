@@ -6,6 +6,7 @@
       :value="tab.value"
       :to="tab.to"
       class="text-body-1 tab"
+      exact
       :class="!tab.notification ? 'px-7' : ''"
       rounded="0"
       @click="tab.notification = false"

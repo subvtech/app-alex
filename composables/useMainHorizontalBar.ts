@@ -15,11 +15,11 @@ export const useMainHorizontalBar = () => {
   }[] = [
     {
       title: i18n.t('layouts.default.profile'),
-      to: `/user/${user.value ? user.value.username : ''}`,
+      to: `/users/${user.value ? user.value.username : ''}`,
     },
     {
       title: i18n.t('layouts.default.settings'),
-      to: '/user/settings',
+      to: `/users/${user.value ? user.value.username + '/' : ''}settings`,
     },
     {
       title: i18n.t('layouts.default.logout'),

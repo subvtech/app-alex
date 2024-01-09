@@ -4,6 +4,8 @@
     "phone": "Telefone",
     "about": "Sobre",
     "cancel": "Cancelar",
+    "phonePlaceholder": "Digite seu telefone",
     "save": "Salvar",
-    "cpf": "CPF"
+    "cpf": "CPF",
+    "update": "Informações pessoais atualizadas."
 }

@@ -107,7 +107,9 @@ function filterTags(
   ids: number[] = [],
 ): CompetenceTag[] {
   return data
-    .filter((item) => (item.attributes as CompetenceTag).isGeneral === isGeneral)
+    .filter(
+      (item) => (item.attributes as CompetenceTag).isGeneral === isGeneral,
+    )
     .filter((item) => !ids.includes(item.id))
     .map((item, index) => {
       return { ...item.attributes, id: item.id };
@@ -226,7 +228,12 @@ const onSave = async () => {
 
   if (promises.length > 0) {
     await Promise.all(promises);
-    emit('update');
+    emit(
+      'update',
+      t(
+        `components.competences.${props.isGeneral ? 'general' : 'technical'}.updated`,
+      ),
+    );
   }
   rerender.value -= 1;
 };

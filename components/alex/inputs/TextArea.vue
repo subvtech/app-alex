@@ -26,7 +26,16 @@
       :error-messages="errorMessage"
       :disabled="disabled"
       v-bind="$attrs"
-    />
+      @click:append-inner="$emit('click:append-inner')"
+    >
+      <template #append-inner>
+        <alex-custom-tooltip v-if="appendInnerIcon" :text="appendInnerIconHint">
+          <template #content>
+            <v-icon class="pointer" color="#6E7A87" @click="$emit('click:append-inner')">{{ appendInnerIcon }}</v-icon>
+          </template>
+        </alex-custom-tooltip>
+      </template>
+    </v-textarea>
   </div>
 </template>
 
@@ -40,6 +49,8 @@ interface TextAreaProps {
   required?: boolean;
   info?: string;
   disabled?: boolean;
+  appendInnerIcon?: string;
+  appendInnerIconHint?: string;
   theme?: 'light' | 'dark';
 }
 const props = withDefaults(defineProps<TextAreaProps>(), {
@@ -48,6 +59,8 @@ const props = withDefaults(defineProps<TextAreaProps>(), {
   info: undefined,
   label: undefined,
   value: undefined,
+  appendInnerIcon: undefined,
+  appendInnerIconHint: undefined,
   modelValue: undefined,
 });
 
