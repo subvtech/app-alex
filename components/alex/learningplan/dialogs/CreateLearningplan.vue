@@ -9,6 +9,7 @@
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
     stepper
+    persistent
     @on-main-action="createCourse"
   >
     <template #step1
@@ -179,8 +180,8 @@ const stepsConfig = {
 };
 const createScheduleModal = ref(false);
 const loading = ref(false);
-const startDate = ref<Date>();
-const endDate = ref<Date>();
+const startDate = ref<string>();
+const endDate = ref<string>();
 const slides = ref([]);
 const title = ref('');
 const description = ref('');
@@ -232,7 +233,7 @@ const cleanFields = () => {
 const createCourse = async () => {
   try {
     loading.value = true;
-    await create('learningplans', {
+    const courseData = await create('learningplans', {
       title: title.value.trim().replace(/\s+/g, ' '),
       description: description.value,
       start_date: startDate.value,
@@ -243,9 +244,11 @@ const createCourse = async () => {
       invitation_duration: 3600,
       members: selectedUsers.value,
       class_name: learningClass.value,
-      media: slides.value,
       schedules: schedules.value,
     });
+    slides.value.map((item) =>
+      create('medias', { ...item, learningplan: courseData.data.id }),
+    );
     emit('submit');
     emit('update:modelValue', false);
     cleanFields();
@@ -270,12 +273,6 @@ watch(
     }
   },
 );
-
-watch(endDate, (value) => {
-  if (value) {
-    value.setUTCHours(23, 59, 59, 999);
-  }
-});
 </script>
 
 <style scoped>

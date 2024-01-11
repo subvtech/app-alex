@@ -73,13 +73,15 @@
   },
   "startDate": {
     "required": "Start date is required",
-    "min": "Min accepted date: {min}"
+    "min": "Min accepted date: {min}",
+    "typeError": "Date must be valid"
   },
   "endDate": {
     "required": "End date is required",
     "min": "Min accepted date: {min}",
     "max": "Max accepted date: {max}",
-    "beforeStartDate": "End date can't be before start date"
+    "beforeStartDate": "End date can't be before start date",
+    "typeError": "Date must be valid"
   },
   "class": {
     "required": "Class is required",
@@ -107,5 +109,9 @@
       "success": "Text copied to clipboard",
       "error": "Couldn't copy to clipboard"
     }
+  },
+  "copy": {
+    "success": "Text copied to clipboard",
+    "error": "Couldn't copy to clipboard"
   }
 }
