@@ -7,7 +7,7 @@ export const useProfilePicture = (profile, userId) => {
     if (!profile.value) return;
     await removeImage(profile.value.id);
     profile.value = null;
-    userStore.profilePicture = null;
+    userStore.avatar = undefined;
   }
 
   async function uploadProfilePicture(event: any) {
@@ -26,7 +26,7 @@ export const useProfilePicture = (profile, userId) => {
       });
     }
 
-    userStore.profilePicture = profile.value;
+    userStore.avatar = profile.value;
   }
   return { uploadProfilePicture, removeProfilePicture };
 };

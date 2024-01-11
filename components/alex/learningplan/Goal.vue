@@ -1,6 +1,6 @@
 <template>
   <div id="goal" class="d-flex pa-4 w-100 gap">
-    <span>{{ index }}.</span>
+    <span>{{ index + 1   }}.</span>
     <div class="d-flex flex-column">
       <span class="title">
         {{ keyWord }}

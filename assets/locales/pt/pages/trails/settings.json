@@ -1,0 +1,34 @@
+{
+  "title": "Configurações",
+  "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
+  "update": "Trilha atualizada com sucesso",
+
+  "cover": {
+    "title": "Capa da trilha",
+    "update": "A Imagem de capa da trilha foi atualizada com sucesso",
+    "upload": "Fazer upload"
+  },
+  "general": {
+    "title": "Informações Gerais",
+    "TrailTitle": "Nome da trilha",
+    "description": "Descrição da trilha",
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "update": "Informações gerais atualizadas com sucesso"
+  },
+    "visibilityTitle": "Visibilidade da trilha",
+    "showtrailTitle": "Mostrar trilha (Público)",
+    "showtrailHint": "Torna a trilha pública, permitindo que qualquer usuário possa encontra-la através da busca.",
+    "hidetrailTitle": "Ocultar trilha (Privado)",
+    "hidetrailHint": "Torna a trilha privada, garantindo que somente os integrantes possam vê-la.",
+    "delete": {
+        "deleteTrailTitle": "Excluir trilha",
+        "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
+        "deleteButton": "Excluir trilha",
+        "deleteConfirmation": "Realmente deseja excluir a trilha?",
+        "deleteDescription": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",
+        "deleteLabel": "Digite a palavra:",
+        "deletePlaceholder": "Digite a frase",
+        "deleteWord": "Excluir"
+      }
+}

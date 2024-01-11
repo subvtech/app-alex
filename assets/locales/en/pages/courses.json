@@ -18,5 +18,17 @@
     "updated": "Available media successfully updated",
     "empty": "It seems that this course has no media."
   },
+  "hash": {
+    "joined": {
+      "title": "Joining the course...",
+      "description": "You're being redirected to the selected course page, if it's taking too long be sure to click directly into the link below",
+      "redirect": "Go to the Course page"
+    },
+    "expired": {
+      "title": "Invite Expired",
+      "description": "This invite expired ages ago, go back and be sure to present a proper invite next time...",
+      "redirect": "Go back home"
+    }
+  },
   "notfound": "Course not found"
 }

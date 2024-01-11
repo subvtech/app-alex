@@ -1,13 +1,13 @@
 <template>
   <v-container
-    class="w-100 d-flex flex-column justify-start align-center max-400"
+    class="w-100 d-flex flex-column justify-start align-center fill-height"
   >
     <v-card
       variant="outlined"
       class="w-100 pa-4 rounded-lg"
       color="green-lighten-1"
     >
-      <v-card-title class="text-white text-h3">{{ title }}</v-card-title>
+      <v-card-title class="title text-white text-h3">{{ title }}</v-card-title>
       <v-card-text class="text-body-1 text-gray-200"
         >{{ text }}
         <strong class="text-white font-weight-bold"> {{ email }} </strong>
@@ -36,5 +36,14 @@ export default {
 <style scoped>
 .max-400 {
   max-width: 400px;
+}
+
+.title {
+  overflow: visible !important;
+  overflow-wrap: break-word !important;
+  text-overflow: inherit !important;
+  white-space: pre-wrap !important;
+  word-break: break-word;
+  word-wrap: break-word !important;
 }
 </style>

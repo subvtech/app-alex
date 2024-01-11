@@ -295,7 +295,6 @@ const emits = defineEmits([
 .card {
   min-height: 460px !important;
 }
-
 .grid {
   display: grid;
   align-content: stretch;

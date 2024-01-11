@@ -5,7 +5,7 @@
     :max-width="width.max"
     :class="{
       'vertical-grid': isVertical,
-      'horizontal-grid column-gap-4': !isVertical,
+      'horizontal-grid column-gap-4 card': !isVertical,
       'hover-shadow': isHovering,
     }"
     variant="outlined"
@@ -18,7 +18,7 @@
   >
     <div class="header">
       <v-img
-        :src="image.url"
+        :src="image.url || '/images/cover_image_course.svg'"
         :alt="image.alt"
         :class="{ grayscale: hide }"
         cover
@@ -49,7 +49,7 @@
           v-model="showOptions"
           :close-on-content-click="false"
           :class="{ hidden: !isHovering && !showOptions }"
-          :items="options"
+          :items="dropdownItems(hide)"
         >
           <template #activator="{ props: propsMenu, isActive }">
             <v-tooltip
@@ -79,7 +79,7 @@
         'pa-4 pb-6': isVertical,
       }"
     >
-      <div class="d-flex gap-2 align-center">
+      <div class="d-flex gap-2 align-center justify-space-between">
         <v-tooltip
           :text="name"
           :location="isVertical ? 'top center' : 'top left'"
@@ -90,19 +90,19 @@
             <h5
               v-bind="propsTooltip"
               class="text-body-2 text-gray-900 ellipsis lines-2 max-height-48"
-              :class="{ 'grayscale-2': hide }"
+              :class="{ 'grayscale-2': hide, 'max-width-80': !isVertical }"
             >
               {{ name }}
             </h5>
           </template>
         </v-tooltip>
 
-        <div v-if="!isVertical">
+        <div v-if="!isVertical" class="align-self-start">
           <alex-inputs-dropdown
             v-model="showOptions"
             :close-on-content-click="false"
             :class="{ hidden: !isHovering && !showOptions }"
-            :items="options"
+            :items="dropdownItems(hide)"
           >
             <template #activator="{ props: propsMenu }">
               <v-tooltip
@@ -126,37 +126,38 @@
       <div
         class="text-body-5 text-gray-600 ellipsis lines-3"
         lines="three"
-        :class="{ 'grayscale-2': hide }"
+        :class="{ 'grayscale-2': hide, 'max-width-80': !isVertical }"
       >
         {{ description }}
       </div>
-      <v-tooltip
-        :text="listBlocks"
-        :disabled="!hasBlocks"
-        location="bottom center"
-        data-testid="trails-documents-tooltip"
-      >
-        <template #activator="{ props: propsTooltip }">
-          <div
-            class="documents"
-            v-bind="propsTooltip"
-            data-testid="trails-documents-icon"
-          >
-            <v-icon size="20" color="gray-600"
-              >mdi-text-box-multiple-outline</v-icon
+      <div class="mt-auto">
+        <v-tooltip
+          :text="listBlocks"
+          :disabled="!hasBlocks"
+          location="bottom center"
+          data-testid="trails-documents-tooltip"
+        >
+          <template #activator="{ props: propsTooltip }">
+            <div
+              class="documents"
+              v-bind="propsTooltip"
+              data-testid="trails-documents-icon"
             >
-            <span data-testid="trails-documents-icon-counter-type">{{
-              blocks?.length || 0
-            }}</span>
-          </div>
-        </template>
-      </v-tooltip>
+              <v-icon size="20" color="gray-600"
+                >mdi-text-box-multiple-outline</v-icon
+              >
+              <span data-testid="trails-documents-icon-counter-type">{{
+                blocks?.length || 0
+              }}</span>
+            </div>
+          </template>
+        </v-tooltip>
+      </div>
     </div>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { Item } from '../../inputs/Dropdown.vue';
 interface Block {
   type: 'carousel' | 'video' | (string & {});
 }
@@ -168,7 +169,7 @@ interface LearningPlanCard {
   blocks?: Block[];
 }
 const { t } = useI18n();
-const { blocks, name, hide } = withDefaults(defineProps<LearningPlanCard>(), {
+const props = withDefaults(defineProps<LearningPlanCard>(), {
   direction: 'VERTICAL',
   hide: false,
   blocks: undefined,
@@ -181,12 +182,12 @@ const width = computed(() =>
   isVertical.value ? { min: 240, max: 260 } : { min: 300, max: 350 },
 );
 const isActiveTitleTooltip = computed(() => {
-  if (isVertical.value) return name.length < 30;
-  else return name.length < 60;
+  if (isVertical.value) return props.name.length < 30;
+  else return props.name.length < 30;
 });
 
 const blocksInfo = computed(() => {
-  return blocks?.reduce((info, block) => {
+  return props.blocks?.reduce((info, block) => {
     if (Object.hasOwn(info, block.type)) {
       info[block.type] += 1;
     } else {
@@ -209,40 +210,48 @@ const listBlocks = computed(() => {
 });
 
 const hasBlocks = computed(() => {
-  if (blocks) {
-    return !!blocks.length;
+  if (props.blocks) {
+    return !!props.blocks.length;
   }
   return false;
 });
 
-const options: Item[] = [
-  hide
-    ? {
-        text: t('components.learningPlan.cardTrails.visibility.show'),
-        icon: 'mdi-eye-outline',
-        onClick: () => emits('show'),
-      }
-    : {
-        text: t('components.learningPlan.cardTrails.visibility.hide'),
-        icon: 'mdi-eye-off-outline',
-        onClick: () => emits('hide'),
+const dropdownItems = (hidden: boolean) => {
+  return [
+    {
+      text: hidden
+        ? t('components.learningPlan.cardTrails.visibility.show')
+        : t('components.learningPlan.cardTrails.visibility.hide'),
+      icon: hidden ? 'mdi-eye-outline' : 'mdi-eye-off-outline',
+      onClick: () => {
+        emits('toggleVisibility');
       },
-  {
-    text: t('components.learningPlan.cardTrails.copy'),
-    icon: 'mdi-content-copy',
-    onClick: () => emits('copy'),
-  },
-  {
-    text: t('components.learningPlan.cardTrails.configurations'),
-    icon: 'mdi-cog-outline',
-    onClick: () => emits('configurations'),
-  },
-];
+    },
+    {
+      text: t('components.learningPlan.cardTrails.configurations'),
+      icon: 'mdi-cog-outline',
+      onClick: () => emits('configurations'),
+    },
+    {
+      text: t('components.learningPlan.cardTrails.copy'),
+      icon: 'mdi-content-copy',
+      onClick: () => emits('copy'),
+    },
+  ];
+};
 
-const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
+const emits = defineEmits([
+  'open',
+  'configurations',
+  'toggleVisibility',
+  'copy',
+]);
 </script>
 
 <style scoped lang="scss">
+.card {
+  min-height: 175px;
+}
 .grid {
   display: grid;
   align-content: stretch;
@@ -324,6 +333,10 @@ const emits = defineEmits(['open', 'configurations', 'show', 'hide', 'copy']);
 
 .max-height-48 {
   max-height: 48px;
+}
+
+.max-width-80 {
+  max-width: 125px;
 }
 
 .hover-shadow {

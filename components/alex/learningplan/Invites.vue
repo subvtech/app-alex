@@ -1,39 +1,35 @@
 <template>
   <alex-custom-card
-    class="w-100"
     :show-icon="false"
     :title="$t('components.courses.invites.title')"
-    href="dsads"
+    :href="`${courseId}/settings`"
     hide-dividers
     sizing-class="ma-0"
     is-nested
   >
     <template #content>
-      <div v-if="enableInvites" class="d-flex flex-column w-100">
+      <div v-if="enableInvites" class="relative">
         <div
-          class="invite gap-6 justify-space-between"
-          :class="[
-            theresTimeAndUrl ? '' : 'disabled',
-            smaller ? 'smaller' : '',
-          ]"
+          class="invite justify-space-between"
+          :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
             <template #content>
-              <a :href="url!">
+              <a class="url" :href="url!">
                 {{ url }}
               </a>
             </template>
           </alex-custom-tooltip>
           <span v-else>{{ $t('components.courses.invites.expired') }}</span>
 
-          <div class="d-flex align-center gap-1">
+          <div class="d-flex align-center gap-2">
             <alex-custom-tooltip
               :text="$t('components.courses.invites.refresh')"
             >
               <template #content>
                 <img
                   class="pointer"
-                  src="/svg/refresh.svg"
+                  :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
                   @click="updateLink"
                   width="20"
                   height="20"
@@ -45,7 +41,7 @@
                 <v-icon
                   v-if="theresTimeAndUrl"
                   class="pointer"
-                  color="#00B7CC"
+                  :color="dark ? '#6E7A87' : '#00B7CC'"
                   size="small"
                   @click="copyToClipboard(url)"
                   >mdi-content-copy</v-icon
@@ -54,7 +50,11 @@
             </alex-custom-tooltip>
           </div>
         </div>
-        <div v-if="theresTime" class="timer d-flex pt-2 justify-end gap-1">
+        <div
+          v-if="theresTime"
+          class="timer d-flex pt-2 justify-end gap-1"
+          :class="dark ? 'dark' : ''"
+        >
           <span>{{ $t('components.courses.invites.countdown') }}</span>
           <p>{{ msToHHMMSS(remainingTime) }}</p>
         </div>
@@ -98,7 +98,7 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  smaller: {
+  dark: {
     type: Boolean,
     default: false,
   },
@@ -117,28 +117,36 @@ const updateLink = async () => {
     props.duration,
     props.courseId,
   );
+  stopTimeout();
 
-  url.value = generateUrl(result.data.attributes.hash);
-  console.log({ updateLink: url.value });
+  url.value = generateUrl(result.data.attributes.hash, props.courseId);
+
   emit('update:link', { url: url.value });
   remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
 };
 
 const theresTimeAndUrl = computed(() => theresTime.value && url.value);
 const theresTime = computed(() => remainingTime.value > 0);
-
+const timeoutId = ref<NodeJS.Timeout | null>(null);
+const stopTimeout = () => {
+  if (timeoutId.value) clearTimeout(timeoutId.value);
+  else timeoutId.value = null;
+};
 onBeforeMount(() => {
   if (!props.data) return;
-  if (props.data.hash) url.value = generateUrl(props.data.hash);
+  if (props.data.hash) url.value = generateUrl(props.data.hash, props.courseId);
   if (props.data.id) inviteId.value = props.data.id;
   if (props.data.expires_at) {
     remainingTime.value = calcRemainingTime(props.data.expires_at);
   }
 });
+onUnmounted(() => {
+  stopTimeout();
+});
 
 watch(remainingTime, () => {
   if (theresTime.value) {
-    setTimeout(() => {
+    timeoutId.value = setTimeout(() => {
       remainingTime.value = remainingTime.value - 1000;
     }, 1000);
   }
@@ -146,11 +154,27 @@ watch(remainingTime, () => {
 
 watch(theresTimeAndUrl, () => {
   if (theresTimeAndUrl.value) return;
+  if (timeoutId.value) stopTimeout();
+
   emit('link:expired');
 });
 </script>
 
 <style scoped lang="scss">
+.relative {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 200px;
+}
+
+.url {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .gap-1 {
   gap: 4px;
 }
@@ -184,6 +208,7 @@ watch(theresTimeAndUrl, () => {
 .invite {
   display: flex;
   height: 52px;
+  min-width: 300px;
 
   padding: 0px 16px;
   align-items: center;
@@ -193,7 +218,22 @@ watch(theresTimeAndUrl, () => {
   border-radius: 8px;
   border: 1px solid var(--principais-secundria-secundria-1, #47d9eb);
   background: var(--principais-secundria-secundria-2, #d1f6fa);
-
+  &.dark {
+    height: 48px !important;
+    flex-grow: 1;
+    border: 1px solid var(--Cinza-Cinza-400, #a0a8b1);
+    background: var(--Cinza-Cinza-100, #ebedef);
+    span {
+      overflow: hidden;
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-overflow: ellipsis;
+    }
+    a {
+      overflow: hidden;
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-overflow: ellipsis;
+    }
+  }
   &.disabled {
     border-radius: 8px;
     border: 1px solid var(--cinza-cinza-200, #d2d6da);
@@ -224,6 +264,9 @@ watch(theresTimeAndUrl, () => {
   }
 }
 .timer {
+  position: absolute;
+  bottom: -28px;
+  right: 0px;
   span {
     color: var(--cinza-cinza-800, #454d54);
 
@@ -244,6 +287,54 @@ watch(theresTimeAndUrl, () => {
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.32px;
+  }
+  &.dark {
+    bottom: -26px;
+    span {
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-align: right;
+
+      /* Body/P3 */
+      font-family: Sen;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 135%; /* 18.9px */
+      letter-spacing: 0.28px;
+    }
+    p {
+      color: var(--Cinza-Cinza-600, #6e7a87) !important;
+      text-align: right;
+
+      /* Body/P3 */
+      font-family: Sen;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 135%; /* 18.9px */
+      letter-spacing: 0.28px;
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .invite {
+    min-width: unset;
+  }
+  .url {
+    width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .url {
+    width: 200px;
+  }
+}
+
+@media (max-width: 380px) {
+  .url {
+    width: 150px;
   }
 }
 </style>

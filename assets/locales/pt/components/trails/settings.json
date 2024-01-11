@@ -1,0 +1,92 @@
+{
+    "title": "Configurações",
+    "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
+    "syncMeetingsTitle": "Encontros síncronos",
+    "noSyncMeetings": "Parece que não há nenhum encontro síncrono.",
+  
+    "update": "Trilha atualizado com sucesso",
+    "cover": {
+      "title": "Capa da trilha",
+      "update": "A Imagem de capa do trilha foi atualizada com sucesso",
+      "addCover": "Fazer upload"
+    },
+    "general": {
+      "title": "Informações Gerais",
+      "courseTitle": "Nome do trilha",
+      "startDate": "Início",
+      "endDate": "Término",
+      "slug": {
+        "label": "Nome ou sigla do trilha",
+        "unique": "Nome/Sigla selecionada não disponível"
+      },
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "update": "Informações Gerais atualizadas com sucesso"
+    },
+    "meetings": {
+      "title": "Editar encontro síncrono",
+      "frequency": "Frequência do encontro",
+      "date": "Data do encontro",
+      "dateTip": "A data que o encontro começa",
+      "startDate": "Data de início",
+      "endDate": "Data de término",
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "add": "Criar encontro",
+      "delete": {
+        "confirmation": "Realmente deseja excluir o encontro?",
+        "description": "Ao confirmar você irá excluir o encontro síncrono cadastrado.",
+        "button": "Excluir",
+        "cancel": "Cancelar"
+      }
+    },
+    "delete": {
+      "courseTitle": "Excluir trilha",
+      "courseDescription": "Após a exclusão do trilha, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
+      "button": "Excluir trilha",
+      "confirmation": "Realmente deseja excluir o trilha?",
+      "description": "Ao excluir um trilha todo o conteúdo criado dentro dela também será excluído.",
+      "label": "Digite a palavra:",
+      "placeholder": "Digite a palavra",
+      "word": "Excluir",
+      "cancel": "Cancelar",
+      "match": "Não corresponde a Excluir",
+      "update": "Trilha deletado"
+    },
+    "invite": {
+      "title": "Configurações de convite",
+      "label": "Convite por link",
+      "link": "Link de convite",
+      "linkDuration": "Duração do Convite",
+      "linkAddress": "Endereço do convite",
+      "restore": "Restaurar Messagem",
+      "email": "Convite por e-mail",
+      "message": "Mensagem do convite",
+      "hint": "Mensagem que será enviada por e-mail para o convidado.",
+      "tooltip": "Alterar a duração do convite não vai mudar o tempo restante do endereço atual. Para aplicar a nova duração é necessário gerar um novo convite.",
+      "save": "Salvar alterações",
+      "cancel": "Cancelar",
+      "fiveMinutes": "5 minutos",
+      "fifteenMinutes": "15 minutos",
+      "thirtyMinutes": "30 minutos",
+      "oneHour": "1 hora",
+      "twoHours": "2 horas",
+      "eightHours": "8 horas",
+      "twentyFourHours": "24 horas",
+      "update": "Configurações do convite atualizadas."
+    },
+    "visibility": {
+      "title": "Visibilidade do trilha",
+      "showCourse": {
+        "title": "Mostrar trilha (Público)",
+        "hint": "Torna o trilha público, permitindo que qualquer usuário possa encontra-lo através da busca."
+      },
+      "hideCourse": {
+        "title": "Ocultar trilha (Privado)",
+        "hint": "Torna o trilha privado, garantindo que somente os integrantes possam ver a trilha."
+      },
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "update": "Visibilidade do trilha alterada"
+    }
+  }

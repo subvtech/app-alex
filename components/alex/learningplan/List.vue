@@ -159,7 +159,7 @@ const submit = async () => {
   if (isTrail) {
     data.learningplan = props.parentLearningPlan.id;
   }
-  data.slug = 'text';
+  data.slug = title.trim().replace(/\s+/g, '_').toLocaleLowerCase();
   data.start_date = new Date();
 
   formData.append('data', JSON.stringify(data));

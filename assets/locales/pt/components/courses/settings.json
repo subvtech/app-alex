@@ -4,19 +4,6 @@
   "syncMeetingsTitle": "Encontros síncronos",
   "noSyncMeetings": "Parece que não há nenhum encontro síncrono.",
 
-  "fiveMinutes": "5 minutos",
-  "fifteenMinutes": "15 minutos",
-  "thirtyMinutes": "30 minutos",
-  "oneHour": "1 hora",
-  "twoHours": "2 horas",
-  "eightHours": "8 horas",
-  "twentyFourHours": "24 horas",
-  "courseVisibilityTitle": "Visibilidade do curso",
-  "showCourseTitle": "Mostrar curso (Público)",
-  "showCourseHint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca.",
-  "hideCourseTitle": "Ocultar curso (Privado)",
-  "hideCourseHint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso.",
-
   "update": "Curso atualizado com sucesso",
   "cover": {
     "title": "Capa do curso",
@@ -54,14 +41,17 @@
     }
   },
   "delete": {
-    "CourseTitle": "Excluir curso",
-    "CourseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
-    "Button": "Excluir curso",
-    "Confirmation": "Realmente deseja excluir o curso?",
-    "Description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
-    "Label": "Digite a palavra:",
-    "Placeholder": "Digite a palavra",
-    "Word": "Excluir"
+    "courseTitle": "Excluir curso",
+    "courseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
+    "button": "Excluir curso",
+    "confirmation": "Realmente deseja excluir o curso?",
+    "description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
+    "label": "Digite a palavra:",
+    "placeholder": "Digite a palavra",
+    "word": "Excluir",
+    "cancel": "Cancelar",
+    "match": "Não corresponde a Excluir",
+    "update": "Curso deletado"
   },
   "invite": {
     "title": "Configurações de convite",
@@ -69,9 +59,34 @@
     "link": "Link de convite",
     "linkDuration": "Duração do Convite",
     "linkAddress": "Endereço do convite",
+    "restore": "Restaurar Messagem",
     "email": "Convite por e-mail",
     "message": "Mensagem do convite",
     "hint": "Mensagem que será enviada por e-mail para o convidado.",
-    "tooltip": "Alterar a duração do convite não vai mudar o tempo restante do endereço atual. Para aplicar a nova duração é necessário gerar um novo convite."
+    "tooltip": "Alterar a duração do convite não vai mudar o tempo restante do endereço atual. Para aplicar a nova duração é necessário gerar um novo convite.",
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "fiveMinutes": "5 minutos",
+    "fifteenMinutes": "15 minutos",
+    "thirtyMinutes": "30 minutos",
+    "oneHour": "1 hora",
+    "twoHours": "2 horas",
+    "eightHours": "8 horas",
+    "twentyFourHours": "24 horas",
+    "update": "Configurações do convite atualizadas."
+  },
+  "visibility": {
+    "title": "Visibilidade do curso",
+    "showCourse": {
+      "title": "Mostrar curso (Público)",
+      "hint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca."
+    },
+    "hideCourse": {
+      "title": "Ocultar curso (Privado)",
+      "hint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso."
+    },
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "update": "Visibilidade do curso alterada"
   }
 }

@@ -1,13 +1,48 @@
 import { defineStore } from 'pinia';
+import { SocialItemType } from '@/models/social.model';
 
-type User = {
-  profilePicture: { url: string; id: number } | null;
-  fullname: string | null;
+export type UserStoreType = {
+  avatar: { url: string; id: number } | undefined;
+  cover: any | undefined;
+  username: string | undefined;
+  fullname: string | undefined;
+  tags: any[];
+  socials: SocialItemType[];
+  institutions: any[];
+  learningplans: number;
+  email: string | undefined;
+  phone: string | undefined;
+  info: string | undefined;
+  cpf: string | undefined;
+  tasks: number;
+  isProfessor: false;
+  id: number | undefined;
+  canEdit: boolean;
 };
 
 export const useUserStore = defineStore('user', {
-  state: (): User => ({
-    profilePicture: null,
-    fullname: null,
+  state: (): UserStoreType => ({
+    avatar: undefined,
+    fullname: undefined,
+    username: undefined,
+    id: undefined,
+    cpf: undefined,
+    info: undefined,
+    email: undefined,
+    phone: undefined,
+    institutions: [],
+    socials: [],
+    tags: [],
+    learningplans: 0,
+    tasks: 0,
+    cover: undefined,
+    isProfessor: false,
+    canEdit: false,
   }),
+  actions: {
+    getUserLearningPlans: async (id) => {
+      const { find } = useStrapiUtils();
+      return (await find('learning-plan-member', { filters: { user: id } })).data.length;
+    },
+  },
 });

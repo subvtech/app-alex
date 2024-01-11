@@ -338,10 +338,9 @@ query($userId: ID!) {
    	sort: "id:desc"
     pagination: {limit: -1}
     filters: {
-      or: [{ hidden: { eq: false } }, { members: { role: { ne: "student" } } }]
+      or: [{ hidden: { eq: false } }, { members: { user: { id: { eq: $userId } }, role: { eq: "facilitator" }  } }]
       and: [
-        { members: { user: { id: { eq: $userId } } } }
-        { members: { status: { eq: "joined" } } }
+        { members: { user: { id: { eq: $userId } }, status: { eq: "joined" } } }
         { type: { eq: "course"}}
         { archived_at: { eq: null}}
       ]
@@ -355,14 +354,12 @@ query($userId: ID!) {
         start_date
         end_date
         hidden
-        learning_structure {
+        learning_structures{
           data {
             attributes {
               trails {
                 data {
-                  attributes {
-                    createdAt
-                  }
+                  id
                 }
               }
             }
@@ -414,5 +411,91 @@ query($userId: ID!) {
     }
   }
 }
+`;
 
+export const GetTrails = `
+query($learningPlanId: ID!) {
+  learningplan(id: $learningPlanId) {
+    data {
+      attributes {
+        learning_structures(filters: { type: { eq: "standard" } }) {
+          data {
+            id
+            attributes {
+              trails(sort: "id:desc", pagination: { limit: -1 }) {
+                data {
+                  id
+                  attributes {
+                    cover_image {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                    title
+                    description
+                    hidden
+                    structures {
+                      data {
+                        attributes {
+                          blocks {
+                            data {
+                              attributes {
+                                type
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export const GetTrail = `
+query($trailId: ID!) {
+  trail(id:$trailId ){
+    data{
+      attributes{
+        cover_image{
+          data{
+            attributes{
+              url
+            }
+          }
+        }
+        title
+        description
+      	structures{
+          data{
+            id
+            attributes{
+              time
+              version
+              blocks(
+                pagination: {limit: -1}
+              ){
+                data{
+                  attributes{
+                    data
+                    type
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } 
+}
 `;

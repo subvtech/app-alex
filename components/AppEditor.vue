@@ -1,19 +1,24 @@
 <template>
-  <v-container id="start" class="d-flex justify-space-between">
+  <!-- <v-container id="start" class="d-flex justify-space-between">
     <v-btn @click="saveEditor()">Save</v-btn>
     <a href="#teste123">Teste</a>
     <v-btn @click="loadEditor">Load</v-btn>
-  </v-container>
+  </v-container> -->
   <client-only>
-    <v-row>
+    <!-- <v-row>
       <v-col :cols="!editable ? 9 : 12">
-        <div id="editorjs" class="editorjs w-full p-6 sm:p-16" />
+       
       </v-col>
 
       <v-col v-if="!editable" cols="3">
         <Anchors :anchors="anchors"></Anchors>
       </v-col>
-    </v-row>
+    </v-row> -->
+    <div
+      id="editorjs"
+      class="editorjs w-full p-6 sm:p-16"
+      style="max-width: 785px"
+    />
   </client-only>
 </template>
 
@@ -56,26 +61,33 @@ const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 const token = useStrapiToken();
-const editable = ref(false);
+const readOnly = ref(true);
 const anchors = ref([]);
 
 const props = defineProps({
   data: {
-    type: Object as PropType<Strapi4ResponseData<Structure>>,
+    type: Object,
     default: () => {},
   },
 });
 
-const planData = computed(() => {
-  const structure: any = { ...props.data.attributes, id: props.data.id };
-  structure.blocks = props.data.attributes.blocks.data.map((b) => {
-    if (!b.attributes.tunes) {
-      delete b.attributes.tunes;
-    }
-    return { ...b.attributes, id: b.id };
-  });
-  return structure;
-});
+// const planData = computed(() => {
+//   console.log(props.data);
+//   const data = props.data.blocls.data.map((b) => {
+//     if (!b.attributes.tunes) {
+//       delete b.attributes.tunes;
+//     }
+//     return { ...b.attributes, id: b.id };
+//   });
+//   const structure: any = { ...props.data, id: props.data.id };
+//   structure.blocks = props.data.attributes.blocks.data.map((b) => {
+//     if (!b.attributes.tunes) {
+//       delete b.attributes.tunes;
+//     }
+//     return { ...b.attributes, id: b.id };
+//   });
+//   return structure;
+// });
 
 const uploadBaseUrl = computed(() => {
   const runtimeConfig = useRuntimeConfig();
@@ -84,7 +96,6 @@ const uploadBaseUrl = computed(() => {
 
 onMounted(() => {
   instance.value = new EditorJS({
-    readOnly: editable.value,
     tools: {
       delimiter: Delmiter,
       embed: Embed,
@@ -111,7 +122,7 @@ onMounted(() => {
                 body: formData,
               })
                 .then((res) => {
-                  const url = uploadBaseUrl.value + res[0].url;
+                  const url = res[0].url;
                   return { success: 1, file: { url } };
                 })
                 .catch((err) => {
@@ -292,7 +303,7 @@ onMounted(() => {
     i18n,
     minHeight: 400,
     // autofocus: true,
-    data: planData.value,
+    data: {},
     holder: 'editorjs',
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
@@ -306,13 +317,37 @@ onMounted(() => {
     onChange: () => emit('change'),
   });
 });
-const saveEditor = () => {
-  instance.value.save().then((outputData) => {
-    console.log(outputData);
+
+const getData = async () => {
+  const data = await instance.value.save();
+  return data;
+};
+const loadEditor = (data) => {
+  instance.value.isReady.then(async () => {
+    await instance.value.render(data);
+    instance.value.readOnly.toggle();
   });
 };
 
-const loadEditor = () => {};
+const toggleReadOnly = () => {
+  instance.value.isReady.then(() => {
+    instance.value.readOnly.toggle();
+  });
+};
+
+const navigateToId = (id) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView();
+  }
+};
+defineExpose({
+  getData,
+  loadEditor,
+  toggleReadOnly,
+  navigateToId,
+  anchors,
+});
 </script>
 
 <style scoped>

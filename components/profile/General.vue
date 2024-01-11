@@ -8,17 +8,17 @@
         :boxes="[
           {
             icon: 'mdi-bookmark-box-multiple-outline',
-            number: learningPlans.length,
+            number: learningPlansLength,
             label: 'courses',
           },
           {
             icon: 'mdi-newspaper-variant-multiple-outline',
-            number: projects.length,
+            number: projects,
             label: 'projects',
           },
           {
             icon: 'mdi-check-decagram',
-            number: 62,
+            number: assignments,
             label: 'assignments',
           },
         ]"
@@ -27,7 +27,7 @@
 
     <template v-slot:footer>
       <div class="d-flex flex-column contacts">
-        <div class="d-flex align-center contact">
+        <div v-if="email" class="d-flex align-center contact">
           <v-icon color="#6E7A87">mdi-email-outline</v-icon>
           <div class="d-flex flex-column justify-center align-start field">
             <p>{{ $t('components.profile.general.email') }}</p>
@@ -56,18 +56,21 @@ const props = defineProps({
   },
   email: {
     type: String,
-    required: true,
   },
   telephone: {
     type: String,
   },
   learningPlans: {
-    type: Array,
-    default: () => [],
+    type: Number,
+    default: 0,
   },
   projects: {
-    type: Array,
-    default: () => [],
+    type: Number,
+    default: 0,
+  },
+  assignments: {
+    type: Number,
+    default: 0,
   },
   socials: {
     type: Array as PropType<any[]>,
@@ -81,12 +84,12 @@ const props = defineProps({
 
 const { email, telephone } = toRefs(props);
 
+const { getUserLearningPlans } = useUserStore();
+const learningPlansLength = await getUserLearningPlans(props.userId);
 const mask = new Mask({ mask: '(##) #####-####' });
 const isEditing = ref(false);
 
-onBeforeMount(() => {
-  
-})
+onBeforeMount(() => {});
 </script>
 
 <style scoped lang="scss">
@@ -125,40 +128,6 @@ onBeforeMount(() => {
   }
   @media (max-width: 950px) {
     min-width: 380px;
-  }
-
-  @media (max-width: 450px) {
-    min-width: 0px;
-    .boxes {
-      flex-direction: column;
-      align-items: center;
-      .box {
-        flex-direction: row;
-        width: 100%;
-        max-width: none;
-        padding-inline: 16px;
-        padding-block: 0px;
-        align-items: center;
-        :last-child {
-          flex-direction: row;
-          align-items: center;
-          gap: 8px;
-
-          p {
-            color: #0d4173;
-            font-size: 14px;
-            font-weight: 400;
-          }
-
-          span {
-            color: #5d6872;
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 22px;
-          }
-        }
-      }
-    }
   }
 }
 </style>

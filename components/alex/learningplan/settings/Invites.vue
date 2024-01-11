@@ -2,11 +2,12 @@
   <alex-custom-card
     :title="$t('components.courses.settings.invite.title')"
     :show-icon="false"
+    show-footer-divider
   >
     <template #content>
       <div class="d-flex flex-column w-100">
-        <div class="d-flex flex-column border-bottom">
-          <span class="header-h5">{{
+        <div class="d-flex flex-column border-bottom mb-5">
+          <span class="header-h5 title">{{
             $t('components.courses.settings.invite.label')
           }}</span>
 
@@ -14,32 +15,31 @@
             v-model="myInviteEnabled"
             :label="$t('components.courses.settings.invite.link')"
             color="accent"
-            @change="toggleInviteEnabled"
           />
           <div
             v-if="myInviteEnabled"
-            class="d-flex flex-row align-center w-100 gap-4"
+            class="d-flex flex-row align-center justify-space-between w-100 flex-wrap gap-4"
           >
             <alex-inputs-select
               v-model="selectedTime"
               name="duration"
-              class="min-width"
               :label="$t('components.courses.settings.invite.linkDuration')"
               density="comfortable"
+              class="duration"
+              value="first"
               required
               :items="timeOptions"
               :info="$t('components.courses.settings.invite.tooltip')"
             />
-
-            <div class="w-100">
-              <span class="py-2">
+            <div class="d-flex flex-column mt-3 align-self-center">
+              <span class="description">
                 {{ t('components.courses.settings.invite.linkAddress') }}
               </span>
               <alex-learningplan-invites
                 href=""
                 no-header
-                smaller
-                class="mt-2 w-full"
+                dark
+                class="py-2"
                 :enable-invites="myInviteEnabled"
                 :duration="selectedTime"
                 :course-id="learningPlanId"
@@ -49,48 +49,49 @@
                     plainLink = data.url;
                   }
                 "
+                @link:expired="invitationLink = null"
               />
             </div>
           </div>
         </div>
-        <v-divider :thickness="1" class="border-opacity-100 w-100" />
+        <v-divider :thickness="1" class="bg-white w-100 my-6" />
 
-        <div class="">
-          <span class="header-h5 text-invite">{{
+        <div class="d-flex flex-column gap-6">
+          <span class="header-h5 title">{{
             t('components.courses.settings.invite.email')
           }}</span>
-          <alex-inputs-text-field
+          <alex-inputs-text-area
             v-model="myMessage"
             name="message"
+            class="w-100"
             :label="$t('components.courses.settings.invite.message')"
             :hint="$t('components.courses.settings.invite.hint')"
             persistent-hint
-            class="w-100"
             required
             density="comfortable"
             append-inner-icon="mdi-cached"
-          >
-          </alex-inputs-text-field>
+            :append-inner-icon-hint="
+              $t('components.courses.settings.invite.restore')
+            "
+            @click:append-inner="myMessage = defaultMessage"
+          />
         </div>
-        <alex-custom-tooltip
-          text="Restaurar mensagem padrão"
-          attach="append-inner-icon"
-        ></alex-custom-tooltip>
       </div>
-
-      <div class="footer-content">
-        <span class="action-content-two">
-          <alex-custom-button
-            class="button"
-            :text="$t('pages.courseSettings.config.cancelButton')"
-            variant="secondary"
-          />
-          <alex-custom-button
-            class="button"
-            :text="$t('pages.courseSettings.config.saveButton')"
-            variant="primary"
-          />
-        </span>
+    </template>
+    <template #footer>
+      <div class="d-flex w-100 pt-6 justify-end gap-4">
+        <alex-custom-button
+          class="button"
+          :text="$t('components.courses.settings.invite.cancel')"
+          variant="secondary"
+          @click="onCancel"
+        />
+        <alex-custom-button
+          class="button"
+          :text="$t('components.courses.settings.invite.save')"
+          variant="primary"
+          @click="onSave"
+        />
       </div>
     </template>
   </alex-custom-card>
@@ -102,6 +103,7 @@ const { update } = useStrapi();
 
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 
+const emit = defineEmits(['update'])
 const props = defineProps({
   learningPlanId: {
     type: Number,
@@ -125,43 +127,83 @@ const props = defineProps({
   },
 });
 
-const myMessage = toRef(props.message);
-const myInviteEnabled = toRef(props.inviteEnabled);
+const { inviteEnabled, invitationLink, message } = toRefs(props);
 
-const toggleInviteEnabled = async () => {
-  await update(`learningplans/${props.learningPlanId}`, {
-    invite_enabled: !myInviteEnabled.value,
-  });
+const myMessage = ref(message.value);
+const myInviteEnabled = ref(inviteEnabled.value);
+const myInvitationLink = ref(invitationLink.value);
+const defaultMessage =
+  'Olá, {{ Usuário }}, Você foi convidado para o curso de {{ Curso }} por {{ Integrante }}.';
 
-  myInviteEnabled.value = !myInviteEnabled.value;
-};
-
-const selectedTime = ref();
 const timeOptions = ref([
-  { title: t('components.courses.settings.invite.fiveMinutes'), value: 300000 },
+  { title: t('components.courses.settings.invite.fiveMinutes'), value: 300 },
   {
     title: t('components.courses.settings.invite.fifteenMinutes'),
-    value: 900000,
+    value: 900,
   },
   {
     title: t('components.courses.settings.invite.thirtyMinutes'),
-    value: 1800000,
+    value: 1800,
   },
-  { title: t('components.courses.settings.invite.oneHour'), value: 3600000 },
-  { title: t('components.courses.settings.invite.twoHours'), value: 7200000 },
+  { title: t('components.courses.settings.invite.oneHour'), value: 3600 },
+  { title: t('components.courses.settings.invite.twoHours'), value: 7200 },
   {
     title: t('components.courses.settings.invite.eightHours'),
-    value: 28800000,
+    value: 28800,
   },
   {
     title: t('components.courses.settings.invite.twentyFourHours'),
-    value: 86400000,
+    value: 86400,
   },
 ]);
+const selectedTime = ref(timeOptions.value[0].value);
 
 const plainLink = ref();
+
+const onSave = async () => {
+  await update('learningplans', props.learningPlanId, {
+    invite_enabled: myInviteEnabled.value,
+    message: myMessage.value,
+    invitation_duration: selectedTime.value
+  });
+  emit('update', t('components.courses.settings.invite.update'))
+};
+
+const onCancel = () => {
+  myInviteEnabled.value = props.inviteEnabled;
+  myMessage.value = props.message
+}
+
+watch(invitationLink, () => {
+  myInvitationLink.value = invitationLink.value;
+});
+
+watch(message, () => {
+  myMessage.value = message.value;
+});
+
+watch(inviteEnabled, () => {
+  myInviteEnabled.value = inviteEnabled.value;
+});
 </script>
 <style scoped lang="scss">
+.duration {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+  max-width: 260px;
+}
+.description {
+  color: var(--Cinza-Cinza-800, #454d54);
+
+  /* Body/P1 */
+  font-family: Sen;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 135%; /* 21.6px */
+  letter-spacing: 0.32px;
+}
 .title {
   color: var(--Cinza-Cinza-800, #454d54);
 

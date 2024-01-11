@@ -171,7 +171,7 @@ export const useFormRules = () => {
       .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
-    ...descriptionRules,
+    ...descriptionRules
   });
 
   const registerStep1 = yup.object({

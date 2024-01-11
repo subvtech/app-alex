@@ -1,25 +1,36 @@
 <template>
-  <alex-custom-card :title="$t('components.profile.security.title')" :showIcon="false" :full-width="true">
+  <alex-custom-card
+    :title="$t('components.profile.security.title')"
+    :showIcon="false"
+    :full-width="true"
+  >
     <template v-slot:content>
-      <div class="fields d-flex flex-wrap">
-        <v-form class="field d-flex w-100 align-center justify-space-between">
+      <div class="fields d-flex flex-wrap w-100">
+        <div class="field d-flex w-100 align-center justify-space-between">
           <div class="d-flex">
             <span>{{ $t('components.profile.security.email') }}</span>
             <p :contenteditable="editEmail">{{ email }}</p>
           </div>
-          <v-btn
-            class="btn ml-2"
-            variant="outlined"
-            size="large"
-            type="submit"
-            color="#5D6872"
-            @click="updateEmail"
-            :text="
-              editEmail
-                ? $t('components.profile.security.saveEmail')
-                : $t('components.profile.security.editEmail')
-            "
-          />
+          <alex-custom-tooltip
+            :text="$t('components.profile.security.message')"
+          >
+            <template #content>
+              <alex-custom-button
+                id="email-button"
+                class="ml-2"
+                variant="secondary"
+                size="large"
+                type="submit"
+                disabled
+                :text="
+                  editEmail
+                    ? $t('components.profile.security.saveEmail')
+                    : $t('components.profile.security.editEmail')
+                "
+                @click="updateEmail"
+              />
+            </template>
+          </alex-custom-tooltip>
           <div class="options">
             <v-icon
               @click="editEmail = !editEmail"
@@ -28,22 +39,31 @@
               >mdi-dots-vertical</v-icon
             >
           </div>
-        </v-form>
+        </div>
 
         <div class="field d-flex w-100 align-center justify-space-between">
           <div class="d-flex">
             <span>{{ $t('components.profile.security.password') }}</span>
             <input type="password" disabled value="dasdasdasda" />
           </div>
-
-          <v-btn
-            class="btn ml-2"
-            variant="outlined"
-            size="large"
-            color="#5D6872"
-            @click="editPassword = !editPassword"
-            :text="$t('components.profile.security.editPassword')"
-          />
+          <alex-custom-tooltip
+            :text="$t('components.profile.security.message')"
+          >
+            <template #content>
+              <alex-custom-button
+                class="ml-2"
+                variant="secondary"
+                size="large"
+                disabled
+                @click="updatePassword"
+                :text="
+                  editPassword
+                    ? $t('components.profile.security.savePassword')
+                    : $t('components.profile.security.editPassword')
+                "
+              />
+            </template>
+          </alex-custom-tooltip>
           <div class="options">
             <v-icon
               @click="editPassword = !editPassword"
@@ -62,6 +82,7 @@
 import { useForm } from 'vee-validate';
 
 const emit = defineEmits(['update:user']);
+const { setMessage } = useMessageStore();
 const { emailRules } = useFormRules();
 const editEmail = ref(false);
 const editPassword = ref(false);
@@ -81,30 +102,19 @@ const props = defineProps({
 
 const { email } = toRefs(props);
 
-const { handleSubmit, errors: emailErrors } = useForm({
-  validationSchema: emailRules,
-  keepValuesOnUnmount: true,
-});
+const cancel = () => {};
 
-const cancel = () => {
-
-}
-
-const updateEmail = handleSubmit(async () => {
+const updateEmail = async () => {
   editEmail.value = !editEmail.value;
-  if (!editEmail.value) return;
-  const url = useStrapiUrl() + '/users/' + props.id;
-  const options = {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    Authentication: `Bearer ${useStrapiToken()}`,
-    body: JSON.stringify({ email }),
-  };
-
-  await fetch(url, options);
+  setMessage('Not yet implemented', 'warning', true);
 
   emit('update:user', {});
-});
+};
+
+const updatePassword = () => {
+  editPassword.value = !editPassword.value;
+  setMessage('Not yet implemented', 'warning', true);
+};
 </script>
 
 <style scoped lang="scss">

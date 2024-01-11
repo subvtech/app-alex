@@ -83,6 +83,9 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  learningPlanId: {
+    type: Number,
+  },
   isGeneral: {
     type: Boolean,
     default: false,
@@ -107,7 +110,9 @@ function filterTags(
   ids: number[] = [],
 ): CompetenceTag[] {
   return data
-    .filter((item) => (item.attributes as CompetenceTag).isGeneral === isGeneral)
+    .filter(
+      (item) => (item.attributes as CompetenceTag).isGeneral === isGeneral,
+    )
     .filter((item) => !ids.includes(item.id))
     .map((item, index) => {
       return { ...item.attributes, id: item.id };
@@ -186,6 +191,11 @@ const onSave = async () => {
             verified_by: props.userId,
             isGeneral: props.isGeneral,
             isPublic: false,
+            learningplans: props.learningPlanId
+              ? {
+                  connect: [props.learningPlanId],
+                }
+              : undefined,
           }),
         );
       });
@@ -217,6 +227,15 @@ const onSave = async () => {
         },
       }),
     );
+    if (props.learningPlanId) {
+      promises.push(
+        update(`learningplans/${props.learningPlanId}`, {
+          tags: {
+            disconnect: deleteArray.value.map((item) => item.id),
+          },
+        }),
+      );
+    }
   }
 
   deleteArray.value = [];
@@ -226,7 +245,14 @@ const onSave = async () => {
 
   if (promises.length > 0) {
     await Promise.all(promises);
-    emit('update');
+    emit(
+      'update',
+      t(
+        `components.competences.${
+          props.isGeneral ? 'general' : 'technical'
+        }.updated`,
+      ),
+    );
   }
   rerender.value -= 1;
 };

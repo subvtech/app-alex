@@ -204,7 +204,7 @@ const updateUser = async (show = true) => {
   user.value = await findOne<User>('users', id, {
     populate: populate,
   });
-  console.log({ user: user.value });
+  
   if (!user.value.avatar) user.value.avatar = profilePicture;
   if (!user.value.cover) {
     user.value.cover = coverPicture;

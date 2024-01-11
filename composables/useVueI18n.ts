@@ -65,6 +65,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'forgot',
     'classes',
     'emailConfirmation',
+    'trails',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
@@ -105,6 +106,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile/settings',
     'profile/socials',
     'profile/wallets',
+    'trails/settings'
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

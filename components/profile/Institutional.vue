@@ -1,38 +1,43 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.institutional.title')"
-    :isEditing="isEditing && canEdit"
+    :isEditing="canEditAndIsEditing"
     :showIcon="canEdit"
     @toggle:isEditing="isEditing = !isEditing"
     :cancel="onCancel"
     :save="onSave"
+    align-content="align-center"
     full-width
   >
-    <template v-slot:content>
+    <template #content>
       <alex-inputs-institutions
-        v-if="isEditing && canEdit"
+        v-if="canEditAndIsEditing"
         v-model:institutions="searchInstitutions"
         v-model:search="search"
-        @update:value="updateSelectedOption"
+        @update:model-value="updateSelectedOption"
         color="black"
+        class="w-100"
         name="institution"
       />
-      <div v-if="sortedInstitutions.length > 0" class="d-flex flex-wrap items">
+      <div
+        v-if="sortedInstitutions.length > 0"
+        class="d-flex flex-wrap items w-100"
+      >
         <draggable
-          class="d-flex flex-column contacts w-100"
+          class="d-flex flex-row flex-wrap contacts gap-6 w-100 justify-center w-100"
           :list="sortedInstitutions"
           item-key="name"
-          :disabled="!(isEditing && canEdit)"
+          :disabled="!canEditAndIsEditing"
           :key="componentKey"
           ghost-class="ghost"
           handle=".handle"
         >
           <template
-            class="d-flex pa-4 align-center justify-space-between w-100 item"
+            class="d-flex align-center justify-space-between item w-100"
             #item="{ element, index }"
           >
             <profile-components-institution
-              :canEdit="isEditing && canEdit"
+              :canEdit="canEditAndIsEditing"
               :index="index"
               :acronym="element.acronym"
               :sector="element.sector"
@@ -45,39 +50,25 @@
           </template>
         </draggable>
       </div>
-      <div
+      <alex-custom-empty-placeholder
         v-else
-        class="d-flex flex-column w-100 justify-center align-center pa-6"
-        style="gap: 16px"
-      >
-        <img
-          src="/svg/EmptyInstitutional.svg"
-          width="160"
-          height="160"
-        />
-        <span class="info text-center" style="color: rgb(175, 175, 175)">
-          {{ $t('components.profile.institutional.emptyInstitutional') }}
-        </span>
-      </div>
+        empty-text-image="/svg/EmptyInstitutional.svg"
+        :empty-text-message="
+          $t('components.profile.institutional.emptyInstitutional')
+        "
+      />
     </template>
   </alex-custom-card>
 </template>
 
 <script setup lang="ts">
 import draggable from 'vuedraggable';
+import { InstitutionsType } from '../alex/inputs/Institutions.vue';
 
-type Institution = {
-  name: string;
-  acronym: string;
-  sector: string;
-  id: number;
-  index: number;
-  cover: any;
-};
-
-const searchInstitutions = ref<Institution[]>([]);
+const searchInstitutions = ref<InstitutionsType[]>([]);
 const search = ref('');
 const isEditing = ref(false);
+const i18n = useI18n();
 const componentKey = ref(0);
 
 const client = useStrapiClient();
@@ -85,7 +76,7 @@ const emit = defineEmits(['update:user']);
 
 const props = defineProps({
   institutions: {
-    type: Array as PropType<Institution[]>,
+    type: Array as PropType<InstitutionsType[]>,
     required: true,
   },
   userId: {
@@ -99,6 +90,10 @@ const props = defineProps({
 });
 const { userId, canEdit } = toRefs(props);
 
+const findInstitution = (selectedId) => {
+  return sortedInstitutions.value.find((item) => item.id === selectedId);
+};
+
 const updateSelectedOption = (selectedId) => {
   if (
     searchInstitutions.value.length === 0 ||
@@ -106,47 +101,39 @@ const updateSelectedOption = (selectedId) => {
     selectedId < 0
   )
     return;
-  if (
-    !sortedInstitutions.value.find(
-      (item) => item.id === searchInstitutions.value[selectedId].id,
-    )
-  ) {
-    sortedInstitutions.value.push(searchInstitutions.value[selectedId]);
 
-    if (
-      !institutionsIds.value.includes(searchInstitutions.value[selectedId].id)
-    )
-      institutionsIds.value.push(searchInstitutions.value[selectedId].id);
+  const selectedInstitution = searchInstitutions.value.find(
+    (item) => (item.id = selectedId),
+  );
+  if (!selectedInstitution) return;
+  if (!findInstitution(selectedId)) {
+    sortedInstitutions.value.push(selectedInstitution);
 
-    if (
-      deleteArray.value.find(
-        (id) => id === searchInstitutions.value[selectedId].id,
-      )
-    ) {
-      deleteArray.value = deleteArray.value.filter(
-        (id) => id !== searchInstitutions.value[selectedId].id,
-      );
+    if (!institutionsIds.value.includes(selectedId))
+      institutionsIds.value.push(selectedId);
+
+    if (deleteArray.value.find((id) => id === selectedId)) {
+      deleteArray.value = deleteArray.value.filter((id) => id !== selectedId);
     }
-  } else if (
-    deleteArray.value.find(
-      (id) => id === searchInstitutions.value[selectedId].id,
-    )
-  ) {
-    deleteArray.value = deleteArray.value.filter(
-      (id) => id !== searchInstitutions.value[selectedId].id,
-    );
+  } else if (deleteArray.value.find((id) => id === selectedId)) {
+    deleteArray.value = deleteArray.value.filter((id) => id !== selectedId);
   }
 
   search.value = '';
 };
 
-const sortedInstitutions = ref<Institution[]>([...props.institutions]);
+const canEditAndIsEditing = computed(() => canEdit.value && isEditing.value);
+
+const sortedInstitutions = ref<InstitutionsType[]>([...props.institutions]);
 const institutionsIds = ref<number[]>(
   props.institutions.map((item) => item.id),
 );
 const deleteArray = ref<number[]>([]);
 
 const updateDeleteArray = (id: number) => {
+  sortedInstitutions.value = sortedInstitutions.value.filter(
+    (item) => item.id !== id,
+  );
   deleteArray.value.push(id);
   institutionsIds.value = institutionsIds.value.filter((item) => item !== id);
 };

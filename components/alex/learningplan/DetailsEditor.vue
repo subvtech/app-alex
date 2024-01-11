@@ -37,8 +37,12 @@
 import EditorJS, { OutputBlockData } from '@editorjs/editorjs';
 import Marker from '@editorjs/marker';
 
+import Image from '@editorjs/image';
+import ImageUrl from '@editorjs/simple-image';
 import DragDrop from 'editorjs-drag-drop';
-
+import Alert from 'editorjs-alert';
+import Warning from '@editorjs/warning';
+import Attaches from '@editorjs/attaches';
 import Undo from 'editorjs-undo';
 import Delimiter from '@editorjs/delimiter';
 import InlineCode from '@editorjs/inline-code';
@@ -49,10 +53,15 @@ import Hyperlink from 'editorjs-hyperlink';
 import AlignmentBlockTune from 'editorjs-text-alignment-blocktune';
 import Paragraph from '@editorjs/paragraph';
 import Embed from '@editorjs/embed';
-import header from '../../../editor-js/plugins/header/HeaderBlock';
+import Carousel from '@/editor-js/plugins/carousel/CarouselBlock';
+import header from '@/editor-js/plugins/header/HeaderBlock';
 import { i18n } from '~/assets/editor-i18n';
 const { create, update, delete: _delete } = useStrapi();
 const { t } = useI18n();
+const messageStore = useMessageStore();
+const strapiClient = useStrapiClient();
+const token = useStrapiToken();
+
 
 const props = defineProps({
   info: {
@@ -73,12 +82,14 @@ const props = defineProps({
 });
 
 const { info, canEdit } = toRefs(props);
+
 const isEditing = ref(false);
 const cancel = async () => {
   await instance.value.render({ blocks: info.value });
 };
 const emit = defineEmits(['ready', 'update']);
 const instance = ref();
+
 
 const initialiseEditor = () => {
   instance.value = new EditorJS({
@@ -125,6 +136,32 @@ const initialiseEditor = () => {
         },
       },
 
+      image: {
+        class: Image,
+        config: {
+          uploader: {
+            uploadByFile: (file) => {
+              const formData = new FormData();
+
+              formData.append('files', file, file.name);
+
+              return strapiClient<Upload>('/upload', {
+                method: 'POST',
+                body: formData,
+              })
+                .then((res) => {
+                  const url = res[0].url;
+                  return { success: 1, file: { url } };
+                })
+                .catch((err) => {
+                  messageStore.message = err;
+                });
+            },
+          },
+        },
+      },
+      imageUrl: ImageUrl,
+
       alignmentBlockTune: {
         class: AlignmentBlockTune,
         config: {
@@ -147,10 +184,106 @@ const initialiseEditor = () => {
         },
       },
 
+      alert: {
+        class: Alert,
+        inlineToolbar: true,
+        shortcut: 'CMD+SHIFT+A',
+        config: {
+          defaultType: 'info',
+          messagePlaceholder: 'Enter something',
+        },
+      },
       paragraph: {
         class: Paragraph,
         inlineToolbar: true,
         tunes: ['alignmentBlockTune'],
+      },
+      warning: {
+        class: Warning,
+        inlineToolbar: true,
+        shortcut: 'CMD+SHIFT+W',
+        config: {
+          titlePlaceholder: 'Título',
+          messagePlaceholder: 'Mensagem',
+        },
+      },
+      attaches: {
+        class: Attaches,
+        config: {
+          endpoint: `/api/upload-file?token=${token}`,
+          buttonText: 'Selecionar arquivo',
+          errorMessage: 'Erro no upload do arquivo',
+        },
+      },
+      carousel: {
+        class: Carousel,
+        config: {
+          handleFileSelected: (files) => {
+            const formData = new FormData();
+            files.forEach((file) => {
+              if (file instanceof File) {
+                formData.append('files', file, file.name);
+              } else if (typeof file === 'string' && file.startsWith('data:')) {
+                const base64Data = file.split(',')[1];
+                const binaryString = window.atob(base64Data);
+                const byteArray = new Uint8Array(binaryString.length);
+
+                for (let i = 0; i < binaryString.length; i++) {
+                  byteArray[i] = binaryString.charCodeAt(i);
+                }
+
+                let mimeType = 'image/png';
+                if (file.startsWith('data:image/jpeg')) {
+                  mimeType = 'image/jpeg';
+                }
+
+                const blob = new Blob([byteArray], { type: mimeType });
+                const fileName =
+                  files[0].name.slice(0, files[0].name.lastIndexOf('.')) +
+                  '.jpeg';
+                const imageFile = new File([blob], fileName, {
+                  type: mimeType,
+                });
+                formData.append('files', imageFile, imageFile.name);
+              }
+            });
+
+            return strapiClient<Upload>('/upload', {
+              method: 'POST',
+              body: formData,
+            })
+              .then((res) => {
+                if (files.length > 1) {
+                  const url = res[0].url;
+                  const thumbnail = res[1].url;
+                  return { success: 1, url: { url }, thumbnail: { thumbnail } };
+                } else {
+                  const url = res[0].url;
+                  return { success: 1, url: { url } };
+                }
+              })
+              .catch((err) => {
+                messageStore.message = err;
+              });
+          },
+          handleDeletedFiles: async (file) => {
+            await strapiClient<Upload>('/upload/files', {
+              method: 'GET',
+            }).then((res) => {
+              const files = res;
+              const fileImage = files.find((f) => f.url === file.image);
+              strapiClient<Upload>(`/upload/files/${fileImage.id}`, {
+                method: 'DELETE',
+              });
+              if (file.video) {
+                const fileVideo = files.find((f) => f.url === file.video);
+                strapiClient<Upload>(`/upload/files/${fileVideo.id}`, {
+                  method: 'DELETE',
+                });
+              }
+            });
+          },
+        },
       },
     },
 
@@ -194,11 +327,10 @@ const updateAbout = async () => {
     };
   });
 
-  await update(`learningplans/${props.courseId}`, {
-    details: { data: newData },
+  await update(`learningplans`, props.courseId, {
+    details: { lines: newData },
   });
   isEditing.value = false;
-
   emit('update', t('components.courses.editor.update'));
 };
 
@@ -230,7 +362,7 @@ watch(isEmptyAndIsNotEditing, () => {
 #editorjs {
   max-width: 100% !important;
 }
-
+/*
 @media (min-width: 550px) {
   .ce-toolbar__actions.ce-toolbar__actions--opened {
     left: 0 !important;
@@ -244,7 +376,7 @@ watch(isEmptyAndIsNotEditing, () => {
     margin-right: -54px;
   }
 }
-
+*/
 .locked {
   pointer-events: none;
   -webkit-user-select: text; /* Chrome, Safari, and Opera */
@@ -262,6 +394,7 @@ watch(isEmptyAndIsNotEditing, () => {
   overflow-wrap: break-word;
 }
 #Card {
+  /*
   #editorjs {
     .codex-editor__redactor {
       padding-bottom: 24px !important;
@@ -270,7 +403,7 @@ watch(isEmptyAndIsNotEditing, () => {
       margin: 0px;
     }
   }
-
+*/
   .info {
     text-align: justify;
     text-justify: inter-word;

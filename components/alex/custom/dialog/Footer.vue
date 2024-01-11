@@ -3,7 +3,7 @@
     class="bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100"
     data-testid="alex-dialog-footer"
   >
-    <v-row dense justify="end">
+    <v-row dense :justify="justify">
       <v-col v-if="!noSecondaryButton" dense cols="auto">
         <slot
           v-if="hasSecondarySlotButton"
@@ -29,6 +29,8 @@
           size="large"
           variant="primary"
           :text="mainButtonText"
+          :loading="mainButtonLoading"
+          :disabled="mainButtonDisabled"
           @click="() => emits('onMainAction')"
         />
       </v-col>
@@ -42,12 +44,25 @@ interface HeaderProps {
   secondaryButtonText?: string;
   noMainButton?: boolean;
   noSecondaryButton?: boolean;
+  mainButtonLoading?: boolean;
+  mainButtonDisabled?: boolean;
+  justify?:
+    | 'start'
+    | 'end'
+    | 'center'
+    | 'space-around'
+    | 'space-between'
+    | 'space-evenly'
+    | 'stretch';
 }
 withDefaults(defineProps<HeaderProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
   noMainButton: false,
   noSecondaryButton: false,
+  mainButtonLoading: false,
+  mainButtonDisabled: false,
+  justify: 'end',
 });
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
