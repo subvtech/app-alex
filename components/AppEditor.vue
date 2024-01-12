@@ -1,24 +1,6 @@
 <template>
-  <!-- <v-container id="start" class="d-flex justify-space-between">
-    <v-btn @click="saveEditor()">Save</v-btn>
-    <a href="#teste123">Teste</a>
-    <v-btn @click="loadEditor">Load</v-btn>
-  </v-container> -->
   <client-only>
-    <!-- <v-row>
-      <v-col :cols="!editable ? 9 : 12">
-       
-      </v-col>
-
-      <v-col v-if="!editable" cols="3">
-        <Anchors :anchors="anchors"></Anchors>
-      </v-col>
-    </v-row> -->
-    <div
-      id="editorjs"
-      class="editorjs w-full p-6 sm:p-16"
-      style="max-width: 785px"
-    />
+    <div id="editorjs" class="editorjs p-6 sm:p-16"></div>
   </client-only>
 </template>
 
@@ -96,6 +78,7 @@ const uploadBaseUrl = computed(() => {
 
 onMounted(() => {
   instance.value = new EditorJS({
+    autofocus: true,
     tools: {
       delimiter: Delmiter,
       embed: Embed,
@@ -338,7 +321,7 @@ const toggleReadOnly = () => {
 const navigateToId = (id) => {
   const element = document.getElementById(id);
   if (element) {
-    element.scrollIntoView();
+    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 };
 defineExpose({

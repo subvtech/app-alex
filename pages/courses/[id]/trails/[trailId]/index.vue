@@ -56,8 +56,11 @@
           </p>
         </div>
       </div>
-      <div v-else class="container-min-height d-flex justify-center ma-6">
-        <div style="width: 785px">
+      <div
+        v-else
+        class="container-min-height d-flex justify-center ma-6 align-start"
+      >
+        <div style="width: 850px">
           <p
             v-show="readOnly && editorData.time"
             class="text-gray-500 text-body-3 mb-4"
@@ -175,7 +178,6 @@ const getTrailData = async () => {
   }
 };
 
-
 onMounted(async () => {
   await getTrailData();
   if (editorData.value.blocks.length > 0) {
@@ -242,7 +244,11 @@ const navigateToSection = (title: string) => {
   if (title === 'Início') {
     const element = document.getElementById(title);
     if (element) {
-      element.scrollIntoView();
+      element.scrollIntoView({
+        block: 'end',
+        inline: 'nearest',
+        behavior: 'smooth',
+      });
     }
   } else editor.value.navigateToId(title);
 };
@@ -318,7 +324,6 @@ const timeStampToDate = (timeStamp: number) => {
 }
 .container-min-height {
   min-height: 436px;
-  position: relative;
 }
 
 .empty-state-text {
@@ -327,10 +332,11 @@ const timeStampToDate = (timeStamp: number) => {
 
 .sections-container {
   max-width: 240px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 100;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 65px;
+  z-index: 1;
+  margin-left: auto;
 }
 
 .text-overflow {

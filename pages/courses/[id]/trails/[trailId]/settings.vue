@@ -71,7 +71,7 @@ const router = useRouter();
 const { learningPlan } = useLearningPlanStore();
 const { trail: _trail, loadTrailData } = useTrailStore();
 const trail = ref(_trail);
-const trailId = ref(route.params.trailId[0] ?? route.params.traildId);
+const { trailId, id } = route.params;
 
 const coverImage = ref<BannerImageType | undefined>(
   trail?.cover_image?.data
