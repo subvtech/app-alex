@@ -17,7 +17,7 @@
           size="large"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
-          >Editar</alex-custom-button
+          >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
         <div v-else-if="professorMode">
           <alex-custom-button
@@ -26,7 +26,7 @@
             prepend-icon="mdi-close"
             class="mr-2"
             @click="resetData"
-            >Cancelar</alex-custom-button
+            >{{ $t('pages.trailId.overview.cancelBtn') }}</alex-custom-button
           >
           <alex-custom-button
             variant="primary"
@@ -34,7 +34,7 @@
             size="large"
             prepend-icon="mdi-check"
             @click="saveData"
-            >Salvar</alex-custom-button
+            >{{ $t('pages.trailId.overview.saveBtn') }}</alex-custom-button
           >
         </div>
       </div>
@@ -52,7 +52,7 @@
         <div v-else>
           <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">
-            Parece que não há nenhum conteúdo aqui
+            {{ $t('pages.trailId.overview.emptyState') }}
           </p>
         </div>
       </div>
@@ -65,7 +65,8 @@
             v-show="readOnly && editorData.time"
             class="text-gray-500 text-body-3 mb-4"
           >
-            Ultima atualização: {{ timeStampToDate(editorData.time) }}
+            {{ $t('pages.trailId.overview.lastUpdated') }}
+            {{ timeStampToDate(editorData.time) }}
           </p>
           <AppEditor ref="editor" :data="editorData" />
         </div>
@@ -142,6 +143,7 @@ const { trailId, id } = route.params;
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
 
+const { t } = useI18n();
 const getTrailData = async () => {
   isLoading.value = true;
   try {
@@ -168,11 +170,7 @@ const getTrailData = async () => {
       };
     }
   } catch (e) {
-    setMessage(
-      'Ocorreu um erro ao buscar os dados da trilha, tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('pages.trailId.overview.searchError'), 'error', true);
   } finally {
     isLoading.value = false;
   }
@@ -188,7 +186,7 @@ onMounted(async () => {
 
 const sections = ref([
   {
-    title: 'Início',
+    title: t('pages.trailId.overview.sectionTitle'),
     type: 1,
     active: true,
   },
@@ -217,7 +215,7 @@ const toggleReadOnly = () => {
 const setSections = () => {
   const newSections = [
     {
-      title: 'Início',
+      title: t('pages.trailId.overview.sectionTitle'),
       type: 1,
       active: true,
     },
@@ -293,11 +291,7 @@ const saveData = async () => {
     editorData.value = data;
     toggleReadOnly();
   } catch (e) {
-    setMessage(
-      'Ocorreu um erro ao salvar os dados da trilha, tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('pages.trailId.overview.saveError'), 'error', true);
   } finally {
     saveLoading.value = false;
   }

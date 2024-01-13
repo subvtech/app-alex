@@ -2,10 +2,18 @@
   <div>
     <alex-custom-breadcrumbs
       :arrow-back="true"
-      title="Trilha de aprendizagem "
+      :title="$t('components.trails.header.breadcrumbs.title')"
       :items="[
-        { title: 'Home', disabled: false, href: '/' },
-        { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
+        {
+          title: $t('components.trails.header.breadcrumbs.0.title'),
+          disabled: false,
+          href: '/',
+        },
+        {
+          title: $t('components.trails.header.breadcrumbs.1.title'),
+          disabled: false,
+          href: '/courses/me',
+        },
         {
           title: props.courseTitle,
           disabled: false,
@@ -29,7 +37,7 @@
           >
             <img
               :src="trailsCover || '/images/cover_image_course.svg'"
-              alt="Imagem da trilha"
+              :alt="$t('components.trails.header.imgAlt')"
               class="trailImg"
             />
           </v-col>
@@ -41,7 +49,7 @@
               }}</span>
               <alex-custom-chip
                 v-if="page === 3"
-                text="Jornada Individual"
+                :text="$t('components.trails.header.chip')"
                 prepend-icon="mdi-check"
                 :size="'x-small'"
                 :status="'dark'"
@@ -103,9 +111,16 @@ watch(activePage, () => {
     router.push(`${router.currentRoute.value.fullPath}settings`);
   }
 });
+
+const { t } = useI18n();
+const tab = {
+  firstTitle: t('components.trails.header.firstTab'),
+  secondTitle: t('components.trails.header.secondTab'),
+};
+
 const tabs = [
-  { label: 'Visão Geral', value: '0' },
-  { label: 'Tarefas', value: '1' },
+  { label: tab.firstTitle, value: '0' },
+  { label: tab.secondTitle, value: '1' },
   { icon: 'mdi-cog-outline', label: '', value: '2' },
 ];
 </script>
