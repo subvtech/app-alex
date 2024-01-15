@@ -180,8 +180,8 @@ const stepsConfig = {
 };
 const createScheduleModal = ref(false);
 const loading = ref(false);
-const startDate = ref<Date>();
-const endDate = ref<Date>();
+const startDate = ref<string>();
+const endDate = ref<string>();
 const slides = ref([]);
 const title = ref('');
 const description = ref('');
@@ -273,12 +273,6 @@ watch(
     }
   },
 );
-
-watch(endDate, (value) => {
-  if (value) {
-    value.setUTCHours(23, 59, 59, 999);
-  }
-});
 </script>
 
 <style scoped>
