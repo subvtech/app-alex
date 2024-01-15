@@ -1,13 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { userEvent } from '@testing-library/user-event';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { vuetify } from '@/plugins/vuetify';
 import Select from '@/components/alex/inputs/Select.vue';
-
 const items = ['Joanderson', 'Robert', 'Zignago'];
 let rerenderBind: (props: object) => Promise<void>;
 let modelValue: string;
 describe('Select component', () => {
   beforeEach(() => {
+    const mockWindow = window;
+    mockWindow.devicePixelRatio = 1;
     const { rerender } = render(Select, {
       props: {
         name: 'integrante',
@@ -15,16 +17,19 @@ describe('Select component', () => {
         hint: 'Digite algo',
         label: 'Quem Participara?',
         persistentHint: true,
+        clearable: true,
         items,
         modelValue: '',
         'onUpdate:modelValue': (e) => {
           modelValue = e;
           rerender({ modelValue: e });
         },
-        menuProps: { modelValue: true },
       },
       global: {
         plugins: [vuetify],
+        mocks: {
+          window: mockWindow,
+        },
       },
     });
     rerenderBind = rerender;
@@ -49,8 +54,7 @@ describe('Select component', () => {
 
   it('Should render items', async () => {
     const autocomplete = await screen.findByRole('select');
-    await fireEvent.focus(autocomplete);
-    screen.debug(autocomplete);
+    userEvent.click(autocomplete);
     const itemOne = await screen.findByText('Joanderson');
     const itemTwo = await screen.findByText('Robert');
     const itemThree = await screen.findByText('Zignago');
@@ -61,7 +65,7 @@ describe('Select component', () => {
 
   it('Should select item when click', async () => {
     const autocomplete = await screen.findByRole('select');
-    await fireEvent.focus(autocomplete);
+    userEvent.click(autocomplete);
     const itemOne = await screen.findByText('Joanderson');
     await fireEvent.click(itemOne);
     expect(modelValue).toBe('Joanderson');

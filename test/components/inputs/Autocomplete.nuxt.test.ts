@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { userEvent } from '@testing-library/user-event';
 import { render, fireEvent, screen } from '@testing-library/vue';
 import { vuetify } from '@/plugins/vuetify';
 import Autocomplete from '@/components/alex/inputs/Autocomplete.vue';
-
 const items = ['Joanderson', 'Robert', 'Zignago'];
-
 let rerenderBind: (props: object) => Promise<void>;
-let modelValue: string;
+let modelValue: string | null | undefined;
 describe('Autocomplete component', () => {
   beforeEach(() => {
+    const mockWindow = window;
+    mockWindow.devicePixelRatio = 1;
     const { rerender } = render(Autocomplete, {
       props: {
         name: 'integrante',
@@ -22,10 +23,12 @@ describe('Autocomplete component', () => {
           modelValue = e;
           rerender({ modelValue: e });
         },
-        menuProps: { modelValue: true },
       },
       global: {
         plugins: [vuetify],
+        mocks: {
+          window: mockWindow,
+        },
       },
     });
     rerenderBind = rerender;
@@ -37,9 +40,7 @@ describe('Autocomplete component', () => {
   });
 
   it("Should show 'Integrante' as a placeholder", async () => {
-    const autocomplete = await screen.findByRole('select');
-    await fireEvent.focus(autocomplete);
-    const placeHolder = screen.findByPlaceholderText('Integrante');
+    const placeHolder = await screen.findByPlaceholderText('Integrante');
     expect(placeHolder).not.toBeNull();
   });
 
@@ -50,8 +51,7 @@ describe('Autocomplete component', () => {
 
   it('Should render items', async () => {
     const autocomplete = await screen.findByRole('select');
-    await fireEvent.focus(autocomplete);
-    screen.debug(autocomplete);
+    userEvent.click(autocomplete);
     const itemOne = await screen.findByText('Joanderson');
     const itemTwo = await screen.findByText('Robert');
     const itemThree = await screen.findByText('Zignago');
@@ -62,7 +62,7 @@ describe('Autocomplete component', () => {
 
   it('Should select item when click', async () => {
     const autocomplete = await screen.findByRole('select');
-    await fireEvent.focus(autocomplete);
+    userEvent.click(autocomplete);
     const itemOne = await screen.findByText('Joanderson');
     await fireEvent.click(itemOne);
     expect(modelValue).toBe('Joanderson');
