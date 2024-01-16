@@ -14,7 +14,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const user = useStrapiUser<User>();
 
   const { setMessage } = useMessageStore();
-  const i18n = useI18n();
+
   const learningPlan = ref<LearningPlanSimple>();
   const loading = ref(true);
 
@@ -53,7 +53,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     } catch (e: any) {
       loading.value = false;
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+        // i18n.t('pages.courses.notfound');
+        setMessage('Curso não encontrado.', 'red', true);
       }
     }
   }
@@ -91,11 +92,16 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const standardTrails = computed(() => {
-    let counter = 0;
-    learningPlan.value?.learning_structures.filter(structure => structure.type === 'standard').forEach(item => {
-      counter += item.trails.length
-    } )
-    return counter;
+    return (
+      learningPlan.value?.learning_structures.filter(
+        (structure) =>
+          structure.type === LearningPlanScructureSimpleType.STANDARD,
+      )[0].trails ?? []
+    );
+  });
+
+  const standardTrailsCount = computed(() => {
+    return standardTrails.value.length;
   });
 
   const invitationLink = computed(() => {
@@ -163,6 +169,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsActiveMember,
     userIsPendingMember,
     activeInviteLinks,
-    standardTrails
+    standardTrailsCount,
+    standardTrails,
   };
 });

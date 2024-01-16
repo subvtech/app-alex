@@ -36,14 +36,12 @@
       @select:option="selectOption"
       @display:settings="selectOption(8)"
     />
-    <NuxtPage @update="fetchData()" />
+    <NuxtPage @update="fetchData" />
   </div>
 </template>
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-
 definePageMeta({
-  middleware: ['auth'],
+  middleware: ['auth', 'load-learningplan'],
 });
 
 const i18n = useI18n();
@@ -51,19 +49,14 @@ const i18n = useI18n();
 const user = useStrapiUser<User>();
 
 const route = useRoute();
+
 const learningPlanStore = useLearningPlanStore();
 
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
 
-const learningPlanId = computed(() => {
-  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
-
-  return learningPlanStore.learningPlan
-    ? learningPlanStore.learningPlan.id
-    : parseInt(route.params?.id.toString());
-});
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);
 
@@ -71,33 +64,7 @@ const fetchData = async () => {
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
-
-  if (!learningPlanStore.learningPlan) {
-    navigateTo('/');
-  }
-
-  if (
-    !learningPlanStore.userIsFacilitator &&
-    !learningPlanStore.userIsActiveMember &&
-    !learningPlanStore.userIsPendingMember
-  ) {
-    navigateTo('/courses/me');
-  }
-
-  if (learningPlanStore.userIsPendingMember && !isJoinRoutePath.value) {
-    const invite = learningPlanStore.learningPlan?.invitation_links.find(
-      (i) => {
-        return i.emails_to_send?.includes(user.value.email);
-      },
-    );
-
-    if (invite) {
-      navigateTo(`/courses/${learningPlanId.value}/join/${invite.hash}`);
-    }
-  }
 };
-
-await fetchData();
 
 const selectOption = (index) => {
   selectedOption.value = index;
