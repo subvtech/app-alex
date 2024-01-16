@@ -1,18 +1,21 @@
 export default defineNuxtRouteMiddleware(async (to, _from) => {
   const user = useStrapiUser<any>();
-  // const loader = useLoadingIndicator();
+  const loader = useLoadingIndicator();
 
   const isJoinRoutePath = to.name === 'courses-id-join-hash';
 
   const learningPlanStore = useLearningPlanStore();
   const learningPlanId = parseInt(to.params.id.toString());
 
+  loader.start();
+
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId),
   );
 
   if (!learningPlanStore.learningPlan) {
-    navigateTo('/');
+    loader.finish();
+    return navigateTo('/');
   }
 
   if (
@@ -20,7 +23,8 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
     !learningPlanStore.userIsActiveMember &&
     !learningPlanStore.userIsPendingMember
   ) {
-    navigateTo('/courses/me');
+    loader.finish();
+    return navigateTo('/courses/me');
   }
 
   if (learningPlanStore.userIsPendingMember && !isJoinRoutePath) {
@@ -31,7 +35,8 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
     );
 
     if (invite) {
-      navigateTo(`/courses/${learningPlanId}/join/${invite.hash}`);
+      loader.finish();
+      return navigateTo(`/courses/${learningPlanId}/join/${invite.hash}`);
     }
   }
 });
