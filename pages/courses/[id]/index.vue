@@ -43,9 +43,8 @@ const route = useRoute();
 const owner = ref<LearningPlanMemberSimple>();
 
 const learningPlanStore = useLearningPlanStore();
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const { setMessage } = useMessageStore();
-const emit = defineEmits(['update']);
+defineEmits(['update']);
 definePageMeta({
   middleware: 'auth',
 });
@@ -78,11 +77,7 @@ onBeforeMount(async () => {
   await updateCourse(false);
 });
 
-const updateCourse = async (show = true, message?: string) => {
-  emit('update');
-  await useAsyncData('learningPlans', () =>
-    learningPlanStore.loadLearningPlan(learningPlanId.value),
-  );
+const updateCourse = async (show = true, message?) => {
   const { id } = route.params;
   const result = await findOne('learningplans', id as string, { populate });
   if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);

@@ -169,8 +169,13 @@
 <script setup lang="ts">
 import { CompetenceTag } from '@/components/Competences.vue';
 const { update } = useStrapi();
-const { standardTrails, userIsFacilitator, activeMembers } =
-  useLearningPlanStore();
+
+const learningPlanStore = useLearningPlanStore();
+
+const standardTrails = learningPlanStore.standardTrailsCount;
+const userIsFacilitator = learningPlanStore.userIsFacilitator;
+const activeMembers = learningPlanStore.activeMembers;
+
 const i18n = useI18n();
 const emit = defineEmits(['update']);
 type GeneralProps = {

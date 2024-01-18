@@ -1,5 +1,3 @@
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
-
 const LearningPlanType = {
   COURSE: 'course',
   PROJECT: 'project',
@@ -14,7 +12,7 @@ export interface LearningPlanSimple {
   description: string;
   start_date: string;
   end_date: string;
-  media: Strapi4ResponseMany<Media>;
+  media: MediaSimple[];
   type: ValueOf<typeof LearningPlanType>;
   cover_image: Upload;
   slug: string;
@@ -23,8 +21,8 @@ export interface LearningPlanSimple {
   projects: any[];
   courses: any[];
   members: LearningPlanMemberSimple[];
-  learning_structures: any;
-  groups: any[];
+  learning_structures: LearningPlanStructureSimple[];
+  groups: LearningPlanGroupSimple[];
   tasks: any[];
   tags: any[];
   invite_enable: boolean;
