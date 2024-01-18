@@ -83,15 +83,14 @@ const coverImage = ref<BannerImageType | undefined>(
 );
 
 const updateVisibility = async (data) => {
-  await update('learningplans', trailId.value, { ...data });
+  await update('learningplans', trailId, { ...data });
   setMessage(t('components.courses.settings.visibility.update'), 'green', true);
 };
 
 async function uploadCoverImage(event: any) {
   const newImage = await uploadImage(event);
   coverImage.value = { url: newImage[0].url, id: newImage[0].id };
-
-  await update('trails', trailId.value, {
+  await update('trails', trailId, {
     cover_image: coverImage.value.id,
   });
   emit('update', t('components.trails.settings.cover.update'));
@@ -105,14 +104,14 @@ async function removeCoverImage() {
 }
 
 async function removeTrail() {
-  await _delete('trails', trailId.value);
+  await _delete('trails', trailId);
 
   router.push(route.path);
   setMessage(t('components.trails.settings.delete.update'), 'green', true);
 }
 
 onBeforeMount(async () => {
-  trail.value = await loadTrailData(parseInt(trailId.value));
+  trail.value = await loadTrailData(parseInt(trailId));
 });
 </script>
 <style scoped lang="scss">

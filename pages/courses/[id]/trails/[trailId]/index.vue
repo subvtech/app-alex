@@ -60,7 +60,7 @@
         v-else
         class="container-min-height d-flex justify-center ma-6 align-start"
       >
-        <div style="width: 850px">
+        <div style="width: 750px">
           <p
             v-show="readOnly && editorData.time"
             class="text-gray-500 text-body-3 mb-4"
@@ -69,34 +69,41 @@
           </p>
           <AppEditor ref="editor" :data="editorData" />
         </div>
-        <div v-if="readOnly" class="sections-container d-lg-block d-none">
-          <p class="text-gray-800 text-h6 mb-4">Seções</p>
-          <div>
-            <v-tooltip
-              v-for="section in sections"
-              :key="section.title"
-              :text="section.title"
-              location="bottom center"
-              content-class="bg-gray-800 pa-6  text-body-3 text-overflow"
-              :disabled="!isAvaliableTooltip(section.title)"
-              max-width="300"
-            >
-              <template #activator="{ props: propsTooltip }">
-                <p
-                  v-bind="propsTooltip"
-                  class="section-text pr-4 text-body-3 align-center py-2 text-truncate"
-                  :class="[
-                    section.active
-                      ? 'text-accent bg-gray-blue'
-                      : 'text-gray-600 section-text-default',
-                    calculateMargin(section.type),
-                  ]"
-                  @click="navigateToSection(section.title)"
-                >
-                  {{ section.title }}
-                </p>
-              </template>
-            </v-tooltip>
+
+        <div
+          v-if="readOnly"
+          class="d-lg-block d-none sections-col h-100"
+          cols="2"
+        >
+          <div class="sections-container">
+            <p class="text-gray-800 text-h6 mb-4">Seções</p>
+            <div>
+              <v-tooltip
+                v-for="(section, index) in sections"
+                :key="section.title"
+                :text="section.title"
+                location="bottom center"
+                content-class="bg-gray-800 pa-6  text-body-3 text-overflow"
+                :disabled="!isAvaliableTooltip(section.title)"
+                max-width="300"
+              >
+                <template #activator="{ props: propsTooltip }">
+                  <p
+                    v-bind="propsTooltip"
+                    class="section-text pr-4 text-body-3 align-center py-2 text-truncate"
+                    :class="[
+                      activeSection == index
+                        ? 'text-accent bg-gray-blue'
+                        : 'text-gray-600 section-text-default',
+                      calculateMargin(section.type),
+                    ]"
+                    @click="navigateToSection(section.title)"
+                  >
+                    {{ section.title }}
+                  </p>
+                </template>
+              </v-tooltip>
+            </div>
           </div>
         </div>
       </div>
@@ -107,7 +114,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { GetTrail } from '~/assets/queries';
-import { Trail } from '@/models/trail.model';
+// import { Trail } from '@/models/trail.model';
 const { create, update } = useStrapi();
 const graphql = useStrapiGraphQL();
 const route = useRoute();
@@ -123,9 +130,8 @@ const { learningPlan } = useLearningPlanStore();
 const professorMode = ref(false);
 const isLoading = ref(false);
 const saveLoading = ref(false);
-const readOnly = ref(true);
+const readOnly = ref(false);
 const editor = ref();
-
 const trailsTitle = ref('');
 const trailsDescription = ref('');
 const coverImage = ref('');
@@ -135,10 +141,11 @@ const editorData = ref({
   version: '',
   blocks: [],
 });
+
+const isNavigating = ref(false);
+
 const backUpEditorData = ref({});
-
 const { trailId, id } = route.params;
-
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
 
@@ -181,8 +188,9 @@ const getTrailData = async () => {
 onMounted(async () => {
   await getTrailData();
   if (editorData.value.blocks.length > 0) {
-    loadEditor();
+    await loadEditor();
     setSections();
+    toggleReadOnly();
   }
 });
 
@@ -204,14 +212,18 @@ const isAvaliableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = () => {
-  if (readOnly.value) {
-    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
-  } else {
-    setSections();
-  }
+const toggleReadOnly = async () => {
   readOnly.value = !readOnly.value;
-  if (editor.value) editor.value.toggleReadOnly();
+  if (editor.value) await editor.value.toggleReadOnly();
+  if (!readOnly.value) {
+    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
+    observer.disconnect();
+  } else {
+    setTimeout(() => {
+      setSections();
+      setObserver();
+    }, 300);
+  }
 };
 
 const setSections = () => {
@@ -222,7 +234,6 @@ const setSections = () => {
       active: true,
     },
   ];
-
   editorData.value.blocks.forEach((block: any) => {
     if (block.type === 'header') {
       newSections.push({
@@ -231,16 +242,19 @@ const setSections = () => {
         active: false,
       });
     }
+    const element = document.querySelector(`[data-id="${block.id}"]`);
+    if (element) {
+      element.setAttribute('id', newSections.length - 1);
+    }
   });
   sections.value = newSections;
 };
 
-const navigateToSection = (title: string) => {
+const navigateToSection = async (title: string) => {
+  if (isNavigating.value) return;
+  isNavigating.value = true;
   const index = sections.value.findIndex((item) => item.title === title);
-  sections.value.forEach((item) => {
-    item.active = false;
-  });
-  sections.value[index].active = true;
+  activeSection.value = index;
   if (title === 'Início') {
     const element = document.getElementById(title);
     if (element) {
@@ -251,16 +265,20 @@ const navigateToSection = (title: string) => {
       });
     }
   } else editor.value.navigateToId(title);
+  setTimeout(() => {
+    isNavigating.value = false;
+  }, 1000);
 };
 
-const loadEditor = () => {
+const loadEditor = async () => {
   if (!editor.value) return;
-  editor.value.loadEditor({
+  const data = await editor.value.loadEditor({
     id: editorData.value.id,
     time: editorData.value.time,
     version: editorData.value.version,
     blocks: editorData.value.blocks,
   });
+  editorData.value = data;
 };
 
 const saveData = async () => {
@@ -303,10 +321,10 @@ const saveData = async () => {
   }
 };
 
-const resetData = () => {
+const resetData = async () => {
   editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
-  readOnly.value = true;
-  loadEditor();
+  await loadEditor();
+  toggleReadOnly();
 };
 
 const timeStampToDate = (timeStamp: number) => {
@@ -316,6 +334,51 @@ const timeStampToDate = (timeStamp: number) => {
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 };
+
+const pageHeight = ref(0);
+const activeSection = ref(0);
+
+pageHeight.value = window.innerHeight;
+window.addEventListener('resize', () => {
+  setTimeout(() => {
+    pageHeight.value = window.innerHeight;
+  }, 300);
+});
+const observerMargin = Math.floor(pageHeight.value / 2);
+
+const observerConfig = {
+  rootMargin: `-${
+    pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin
+  }px 0px -${observerMargin}px 0px`,
+};
+
+const handleIntersection = (entries) => {
+  entries.forEach((entry) => {
+    if (
+      activeSection.value !== entry.target.id &&
+      entry.isIntersecting &&
+      !isNavigating.value
+    ) {
+      if (entry.target.id === 'Início') return (activeSection.value = 0);
+      activeSection.value = entry.target.id;
+    }
+  });
+};
+
+const observer = new IntersectionObserver(handleIntersection, observerConfig);
+
+const setObserver = () => {
+  editorData.value.blocks.forEach((section) => {
+    const element = document.querySelector(`[data-id="${section.id}"]`);
+    if (element) {
+      observer.observe(element);
+    }
+  });
+  const startSection = document.getElementById('Início');
+  if (startSection) {
+    observer.observe(startSection);
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -324,6 +387,7 @@ const timeStampToDate = (timeStamp: number) => {
 }
 .container-min-height {
   min-height: 436px;
+  position: relative;
 }
 
 .empty-state-text {
@@ -336,7 +400,11 @@ const timeStampToDate = (timeStamp: number) => {
   position: sticky;
   top: 65px;
   z-index: 1;
-  margin-left: auto;
+}
+
+.sections-col {
+  position: absolute;
+  right: 0;
 }
 
 .text-overflow {
@@ -348,6 +416,8 @@ const timeStampToDate = (timeStamp: number) => {
   width: 240px;
   vertical-align: middle;
   cursor: pointer;
+  border-left: 1px solid #d2d6da;
+  transition: all 0.3s ease-in;
 }
 .section-text-default:hover {
   background-color: #ebedef;
