@@ -1,10 +1,10 @@
 <template>
   <div v-if="course">
     <alex-learningplan-general
-      :learning-plan="learningPlanStore.learningPlan as any"
+      :learning-plan="learningPlanStore.learningPlan"
       :learning-plan-id="learningPlanStore.learningPlan?.id"
       :owner="learningPlanStore.facilitator!"
-      :invitation-link="learningPlanStore.invitationLink as any"
+      :invitation-link="learningPlanStore.invitationLink"
       :can-edit="learningPlanStore.userIsFacilitator"
       :schedules="
         meetings.map((item) => {
@@ -33,44 +33,17 @@
 import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 
-import { CompetenceTag } from '~/components/Competences.vue';
-import { BannerImageType } from '~/components/alex/custom/Banner.vue';
-
-import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { TabType } from '~/components/alex/custom/Tabs.vue';
-
-export type LearningPlanType = {
-  id: number;
-  description: string;
-  slug: string;
-  learning_goals: any;
-  message: string;
-  title: string;
-  invite_enabled: boolean;
-  invitation_duration: number;
-  start_date: string;
-  end_date: string;
-  hidden: boolean;
-  cover_image: { data: { id: number; attributes: BannerImageType } | null };
-  trails: any;
-  tags: { data: { id: number; attributes: CompetenceTag }[] };
-  details: any;
-  members: { data: any[] };
-  media: any;
-};
-
 const { find, findOne } = useStrapi();
 
 const i18n = useI18n();
-const course = ref<any>();
-const meetings = ref<any>([]);
+const course = ref<LearningPlanSimple>();
+const meetings = ref<LearningPlanMeetingSimple[]>([]);
 
 const route = useRoute();
-const owner = ref<any>();
+const owner = ref<LearningPlanMemberSimple>();
 
 const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
 const { setMessage } = useMessageStore();
 const emit = defineEmits(['update']);
 definePageMeta({
@@ -105,7 +78,7 @@ onBeforeMount(async () => {
   await updateCourse(false);
 });
 
-const updateCourse = async (show = true, message?) => {
+const updateCourse = async (show = true, message?: string) => {
   emit('update');
   await useAsyncData('learningPlans', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
@@ -122,17 +95,17 @@ const updateCourse = async (show = true, message?) => {
     (member) => member.attributes.role === 'facilitator',
   )[0].attributes.user.data;
 
-  await updateMeetings();
+  await updateMeetings(id as string);
 
   setMessage(message ?? 'done', 'green', show);
 };
 
-const updateMeetings = async () => {
+const updateMeetings = async (id: string) => {
   meetings.value = (
     await find('learning-plan-meeting-schedules', {
       filters: {
         learningplan: {
-          id: course.value.id,
+          id,
         },
       },
       populate: 'meetings',

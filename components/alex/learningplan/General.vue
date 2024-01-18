@@ -10,6 +10,9 @@
       <template #content>
         <div class="d-flex flex-column align-center w-100 gap-12 px-6 w-212">
           <app-media
+            sizing-class="pa-0"
+            is-nested
+            hide-dividers
             :title="$t('pages.courses.media.title')"
             :images="
               (learningPlan.media ? learningPlan.media : []).map((item) => {
@@ -19,22 +22,22 @@
             :course-id="learningPlan.id"
             :can-edit="userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
-            sizing-class="pa-0"
-            is-nested
-            hide-dividers
           />
           <app-about
-            :text="learningPlan.description"
-            :user-id="learningPlan.id"
-            :can-edit="userIsFacilitator"
-            @update="updateAbout"
-            :empty-text-message="$t('pages.courses.about.empty')"
             sizing-class="pa-0"
             is-nested
             hide-dividers
             full-width
+            :text="learningPlan.description"
+            :user-id="learningPlan.id"
+            :can-edit="userIsFacilitator"
+            :empty-text-message="$t('pages.courses.about.empty')"
+            @update="updateAbout"
           />
           <alex-learningplan-goals
+            sizing-class="pa-0 w-100"
+            class="w-100"
+            is-nested
             :can-edit="canEdit"
             :course-id="learningPlan.id"
             :user-id="id"
@@ -54,20 +57,17 @@
               })
             "
             :tooltip="$t('components.courses.goals.tooltip')"
-            sizing-class="pa-0 w-100"
-            class="w-100"
             @update="(data) => emit('update', data)"
-            is-nested
           />
 
           <alex-learningplan-details-editor
             v-if="showDetails"
-            :info="learningPlan.details?.lines"
-            :courseId="learningPlan.id"
-            :title="$t('components.courses.editor.title')"
-            :can-edit="userIsFacilitator"
             is-nested
             hide-dividers
+            :info="learningPlan.details?.lines"
+            :course-id="learningPlan.id"
+            :title="$t('components.courses.editor.title')"
+            :can-edit="userIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
@@ -106,18 +106,19 @@
             "
           >
             <alex-learningplan-meetings
+              is-nested
+              hide-dividers
+              sizing-class="ma-0"
               :can-edit="userIsFacilitator"
               :data="schedules"
               :end-date="new Date()"
               :is-facilitator="userIsFacilitator"
               :href="userIsFacilitator ? `${learningPlan.id}/settings` : ''"
-              is-nested
               :learning-plan-id="0"
-              hide-dividers
-              sizing-class="ma-0"
             />
             <alex-learningplan-invites
               v-if="canEdit"
+              full-width
               :enable-invites="learningPlan.invite_enabled"
               :duration="learningPlan.invitation_duration"
               :course-id="learningPlan.id"
@@ -128,7 +129,6 @@
                 }
               "
               @link:expired="plainLink = null"
-              full-width
             />
           </div>
         </template>
@@ -140,11 +140,11 @@
         "
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
-        :emptyMessage="$t('components.competences.general.empty')"
+        :empty-message="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
         :user-id="id"
         :learning-plan-id="learningPlan.id"
-        :userTags="generalTags"
+        :user-tags="generalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
@@ -155,11 +155,11 @@
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
-        :emptyMessage="$t('components.competences.technical.empty')"
+        :empty-message="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="id"
+        :user-id="id"
         :learning-plan-id="learningPlan.id"
-        :userTags="technicalTags"
+        :user-tags="technicalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
@@ -168,45 +168,26 @@
 </template>
 <script setup lang="ts">
 import { CompetenceTag } from '@/components/Competences.vue';
-import { useI18n } from 'vue-i18n';
-import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
 const { update } = useStrapi();
-
 const { standardTrails, userIsFacilitator, activeMembers } =
   useLearningPlanStore();
-
 const i18n = useI18n();
 const emit = defineEmits(['update']);
-const props = defineProps({
-  learningPlan: {
-    type: Object as PropType<LearningPlanType>,
-    required: true,
-  },
-
-  invitationLink: {
-    type: Object as PropType<InvitationLinkType | null>,
-    default: null,
-  },
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
-  schedules: {
-    type: Array as PropType<any[]>,
-    default: [],
-  },
-  owner: {
-    type: Object as PropType<LearningPlanMemberSimple>,
-    required: true,
-  },
+type GeneralProps = {
+  learningPlan: LearningPlanSimple;
+  owner: LearningPlanMemberSimple;
+  invitationLink?: InvitationLinkSimple | null;
+  canEdit?: boolean;
+  schedules?: LearningPlanScheduleSimple[];
+};
+const props = withDefaults(defineProps<GeneralProps>(), {
+  invitationLink: null,
+  schedules: () => [],
 });
-
 const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
 const { id } = useStrapiUser<User>().value;
-
 if (props.learningPlan.tags.data) {
   generalTags.value = props.learningPlan.tags.data.reduce(
     (acc: CompetenceTag[], item) => {

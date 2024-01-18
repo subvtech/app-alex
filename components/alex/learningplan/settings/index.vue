@@ -58,17 +58,14 @@ import { useI18n } from 'vue-i18n';
 
 import { BannerImageType } from '@/components/alex/custom/Banner.vue';
 
-import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
-import { InvitationLinkType } from '../Invites.vue';
-
 const { t } = useI18n();
-const { find, update } = useStrapi();
+const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 const { uploadImage, removeImage } = useUploadedImage();
 
 const props = defineProps({
   learningPlan: {
-    type: Object as PropType<LearningPlanType>,
+    type: Object as PropType<LearningPlanSimple>,
     required: true,
   },
   schedules: {
@@ -76,7 +73,7 @@ const props = defineProps({
     required: true,
   },
   invitationLink: {
-    type: Object as PropType<InvitationLinkType | null>,
+    type: Object as PropType<InvitationLinkSimple | null>,
     default: null,
   },
 });
