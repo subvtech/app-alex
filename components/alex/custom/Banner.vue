@@ -24,11 +24,11 @@
         <v-btn
           v-if="cover && imgFromStrapi"
           class="btn remove"
-          @click="removeCoverPicture"
           size="large"
           icon
           variant="outlined"
           role="delete-cover"
+          @click="removeCoverPicture"
         >
           <img
             src="/svg/trash-dark.svg"
@@ -41,10 +41,10 @@
         <label class="" for="coverInput" data-testid="edit-cover">
           <v-btn
             class="btn label"
-            @click="($refs.coverInput as any).click()"
             size="large"
             icon
             variant="outlined"
+            @click="($refs.coverInput as any).click()"
           >
             <v-icon class="icon" size="20" color="#6E7A87"
               >mdi-pencil-outline</v-icon
@@ -54,20 +54,20 @@
           >
           <v-btn
             class="btn label small"
-            @click="($refs.coverInput as any).click()"
             size="large"
             icon="mdi-pencil-outline"
             variant="outlined"
+            @click="($refs.coverInput as any).click()"
           />
         </label>
 
         <input
-          class="d-none"
-          @input="uploadCoverPicture"
-          accept="image/png, image/jpeg"
-          ref="coverInput"
           id="coverInput"
+          ref="coverInput"
+          class="d-none"
+          accept="image/png, image/jpeg"
           type="file"
+          @input="uploadCoverPicture"
         />
       </div>
     </div>
@@ -84,7 +84,7 @@
       :subtitle="subtitle"
       :copy-object="copyObject"
       :code-style="codeStyle"
-      :settingsIcon="settingsIcon"
+      :settings-icon="settingsIcon"
       :fullname-style="fullnameStyle"
       :username-style="usernameStyle"
       :role-style="roleStyle"
@@ -109,12 +109,12 @@
       @display:settings="emit('display:settings')"
     />
 
-    <div class="d-flex">
+    <div class="d-flex px-6">
       <alex-custom-tabs
         v-if="showMenu"
         v-model="bannerSelectedOption"
         :tabs="links"
-        @update:modelValue="emit('select:option', bannerSelectedOption)"
+        @update:model-value="emit('select:option', bannerSelectedOption)"
       />
     </div>
   </div>
@@ -287,7 +287,7 @@ const props = defineProps({
 
   links: {
     type: Array as PropType<TabType[]>,
-    default: [],
+    default: () => [],
   },
   isProfessor: { type: Boolean, default: false },
   canEdit: { type: Boolean, default: false },
@@ -379,7 +379,7 @@ watch(selectedOption, () => {
   background-color: white;
   border-top-left-radius: 8px;
   box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
-  border-top-right-radius: 8px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 0px;

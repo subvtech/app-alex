@@ -5,10 +5,10 @@
       :key="tab.value"
       :value="tab.value"
       :to="tab.to"
+      :class="!tab.notification ? 'px-4' : ''"
+      :ripple="false"
       class="text-body-1 tab"
       exact
-      :class="!tab.notification ? 'px-7' : ''"
-      rounded="0"
       @click="tab.notification = false"
     >
       <v-icon v-if="tab.icon">{{ tab.icon }}</v-icon>
@@ -53,5 +53,9 @@ const direction = vertical ? 'vertical' : 'horizontal';
 <style>
 .tab:not(.v-tab--selected):hover {
   background-color: #ebedef !important;
+}
+.v-tab__slider {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }
 </style>
