@@ -36,7 +36,7 @@
             class="d-flex align-center justify-space-between item w-100"
             #item="{ element, index }"
           >
-            <profile-components-institution
+            <alex-profile-components-institution
               :canEdit="canEditAndIsEditing"
               :index="index"
               :acronym="element.acronym"

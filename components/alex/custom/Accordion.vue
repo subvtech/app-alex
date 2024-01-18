@@ -34,12 +34,11 @@
           >
             {{ index + 1 }}.
           </p>
-          <v-icon
-            v-if="item.icon"
-            class="mr-2 icon-border"
-            color="gray-500"
-            :icon="item.icon"
-          />
+          <div v-if="item.icon" class="mr-2 icon-border">
+            <img v-if="item.icon.includes('.')" :src="item.icon" />
+            <v-icon v-else color="gray-500" :icon="item.icon" />
+          </div>
+
           <span
             class="text-body-3 text-gray-600 text-overflow"
             data-testid="text"
@@ -84,19 +83,22 @@
 import { ref } from 'vue';
 import { useDragDrop } from '@/composables/useDragDrop';
 
+export interface AccordionItemType {
+  title?: string;
+  keyWord?: string;
+  icon?: string;
+  contentData?: { [key: string]: any };
+  id?: number;
+  position?: boolean;
+}
+
+const emit = defineEmits(['deleted:item'])
+
+
 const id = ref(0);
 const { data } = defineProps({
   data: {
-    type: Array as PropType<
-      {
-        title?: string;
-        keyWord?: string;
-        icon?: string;
-        contentData?: object;
-        id?: number;
-        position?: boolean;
-      }[]
-    >,
+    type: Array as PropType<AccordionItemType[]>,
     default: () => [],
   },
   showPositions: {
@@ -122,6 +124,7 @@ onBeforeMount(() => {
 });
 
 const deleteItem = (pos) => {
+  emit('deleted:item', list.value[pos])
   list.value.splice(pos, 1);
 };
 

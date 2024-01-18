@@ -1,51 +1,37 @@
 <template>
   <alex-custom-card
-    class="mt-6"
+    class="max-w-250"
     :title="$t('components.profile.wallets.title')"
-    :full-width="false"
     :showIcon="false"
   >
     <template v-slot:content>
       <div class="item d-flex w-100 justify-space-between">
-        <div class="label d-flex align-center">
-          <div v-if="wallet" class="tooltip-box">
-            <span class="tooltiptext">{{ wallet.address }}</span>
+        <div class="d-flex align-center gap-4">
+          <div class="label d-flex align-center">
+            <img src="/images/metamask.png" alt="" />
+            <span>{{ $t('components.profile.wallets.metamask') }}</span>
           </div>
-          <img src="/images/metamask.png" alt="" />
-          <span>{{ $t('components.profile.wallets.metamask') }}</span>
+          <alex-documentation-copy-button
+            v-if="isWalletLinked"
+            :text="wallet.address"
+            :tooltip-text="wallet.address"
+          />
         </div>
-        <v-btn
-          class="btn ml-2"
-          variant="outlined"
-          size="large"
-          color="#5D6872"
-          @click="handleClick"
-          :text="
-            isWalletLinked
-              ? $t('components.profile.wallets.unlink')
-              : $t('components.profile.wallets.link')
-          "
-        />
 
-        <v-btn
-          class="btn small ml-2"
-          :class="isWalletLinked ? 'unlink' : ''"
-          variant="outlined"
+        <alex-custom-button
+          class="small ml-2"
           size="large"
-          color="#5D6872"
+          :variant="buttonVariant"
           @click="handleClick"
         >
-          <div v-if="wallet" class="tooltip-box">
-            <span class="tooltiptext">{{ wallet.address }}</span>
-          </div>
-          <img src="/images/metamask.png" alt="" /><span>
+          <img class="hide mr-1" src="/images/metamask.png" alt="" /><span>
             {{
               isWalletLinked
                 ? $t('components.profile.wallets.unlink')
                 : $t('components.profile.wallets.link')
             }}
-          </span></v-btn
-        >
+          </span>
+        </alex-custom-button>
       </div>
     </template>
   </alex-custom-card>
@@ -60,18 +46,14 @@ const { linkWallet } = useMetamask(loading);
 
 const emit = defineEmits(['update:user']);
 
-const messageStore = useMessageStore();
-
-type Wallet = {
-  address: string;
-  id: number;
-};
+const { setMessage } = useMessageStore();
 
 const props = defineProps({
   wallet: {
     type: Object as PropType<Wallet>,
+    required: true,
   },
-  id: {
+  userId: {
     type: Number,
     required: true,
   },
@@ -83,6 +65,9 @@ const isWalletLinked = ref(
   props.wallet ? (props.wallet.address ? true : false) : false,
 );
 
+const buttonVariant = computed(() =>
+  isWalletLinked.value ? 'error' : 'secondary',
+);
 const handleClick = async () => {
   try {
     if (isWalletLinked.value) {
@@ -90,14 +75,12 @@ const handleClick = async () => {
 
       isWalletLinked.value = false;
     } else {
-      const result = await linkWallet(props.id);
+      const result = await linkWallet(props.userId);
       wallet!.value = { id: result.wallet.id, address: result.wallet.address };
       isWalletLinked.value = true;
     }
   } catch (err) {
-    messageStore.message = err as string;
-    messageStore.show = true;
-    messageStore.color = 'red';
+    setMessage(err as string, 'red', true);
   }
 
   emit('update:user', {});
@@ -105,6 +88,9 @@ const handleClick = async () => {
 </script>
 
 <style scoped lang="scss">
+.max-w-250 {
+  max-width: 1000px;
+}
 .item {
   border-radius: 8px;
   .label {
@@ -152,20 +138,14 @@ const handleClick = async () => {
       line-height: 22px;
     }
   }
-
-  .btn {
-    background-color: #eaeef1;
-    border: none;
-    text-transform: none !important;
-  }
-
-  .small {
-    display: none;
-  }
+}
+.hide {
+  display: none;
 }
 @media (max-width: 420px) {
   .item {
-    flex-direction: column;
+    flex-direction: row-reverse;
+    justify-content: center !important;
     align-items: center;
 
     .label {
@@ -177,13 +157,12 @@ const handleClick = async () => {
         display: none;
       }
     }
-    .btn {
-      display: none;
-    }
 
     .small {
       display: block;
-      img {
+
+      .hide {
+        display: block;
         max-width: 32px;
         max-height: 32px;
       }

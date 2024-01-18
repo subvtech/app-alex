@@ -1,5 +1,5 @@
 <template>
-  <div
+  <div 
     class="boxes d-flex justify-center w-100 pb-6"
     :class="hideDivider ? '' : 'border-bottom'"
   >

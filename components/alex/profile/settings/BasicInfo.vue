@@ -1,12 +1,14 @@
 <template>
   <alex-custom-card
+    class="basic-info"
     :title="$t('components.profile.settings.title')"
-    :full-width="true"
     :showIcon="false"
+    align-content="align-center"
+    full-width
   >
     <template v-slot:content>
-      <div class="settings w-100">
-        <div color="black" class="d-flex flex-column">
+      <div class="d-flex w-100 max-w-200">
+        <div color="black" class="d-flex flex-column w-100">
           <alex-inputs-text-field
             :label="$t('components.profile.settings.fullname')"
             :modelValue="computedFullname"
@@ -24,15 +26,17 @@
             />
 
             <alex-inputs-text-field
-              v-maska:[cpfMask]
+              :model-value="cpf"
               :placeholder="$t('pages.register.cpfHolder')"
               label="CPF"
-              :model-value="computedCpf"
+              variant="solo"
+              flat
+              readonly
               name="cpf"
               class="w-100"
             />
           </div>
-          <div class="buttons d-flex justify-end">
+          <div class="buttons d-flex justify-end gap-4">
             <alex-custom-button
               variant="secondary"
               size="large"
@@ -53,131 +57,73 @@
         </div>
       </div>
     </template>
-
-    <template v-slot:footer> </template>
   </alex-custom-card>
-  <div class="d-flex flex-column mt-6">
-    <profile-security :email="email" :id="id" /> <profile-wallets :id="id" />
-  </div>
 </template>
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
-const { profileSchema } = useFormRules();
-const client = useStrapiClient();
-const messageStore = useMessageStore();
-const emit = defineEmits(['update:user']);
-const loading = ref(false);
-
+const emit = defineEmits(['update']);
 const props = defineProps({
-  fullname: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  telephone: {
-    type: String,
-    default: '',
-  },
   cpf: {
     type: String,
     required: true,
   },
-  id: {
-    type: Number,
+  fullname: {
+    type: String,
     required: true,
+  },
+  phone: {
+    type: String,
   },
 });
 
-const { fullname, email, telephone, cpf } = toRefs(props);
+const { phone, cpf, fullname } = toRefs(props);
 
-const computedFullname = ref(fullname.value);
-const computedCpf = ref(cpf.value);
-const computedTelephone = ref(telephone.value);
+const { find } = useStrapiUtils();
 
-const cpfMask = reactive({
-  mask: '###.###.###-##',
-  eager: true,
-});
-
+const { t } = useI18n();
+const { profileSchema } = useFormRules();
 const phoneMask = {
   mask: '(##) #####-####',
   eager: true,
 };
 
-const { handleSubmit, errors, values, controlledValues } = useForm({
+const computedFullname = ref(props.fullname);
+const computedTelephone = ref(props.phone);
+
+const { handleSubmit, errors, values, controlledValues, setErrors } = useForm({
   validationSchema: profileSchema,
   keepValuesOnUnmount: true,
 });
 
 const onCancel = () => {
-  computedTelephone.value = props.telephone;
+  computedTelephone.value = props.phone;
   computedFullname.value = props.fullname;
-  computedCpf.value = props.cpf;
 };
 
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
 const onSave = handleSubmit(async () => {
-  loading.value = true;
-  try {
-    await client(`/users/${props.id}`, {
-      method: 'PUT',
-      body: { ...values, phone: values.phone.replace(/[^0-9]/g, '') },
-    });
-
-    emit('update:user');
-  } catch (error) {
-    console.log(error);
-    messageStore.setMessage(error as string, 'red', true);
-  } finally {
-    loading.value = false;
+  const userPhone = values.phone.replace(/[^0-9]/g, '');
+  const isPhoneTaken = await find('users', { filters: { phone: userPhone } });
+  if (isPhoneTaken.data.length !== 0 && userPhone !== props.phone) {
+    setErrors({ phone: t('components.profile.settings.phoneDuplicated') });
+    return;
   }
+  emit('update', {
+    fullname: values.fullname,
+    phone: userPhone,
+  });
 });
 
-watch(fullname, () => {
-  computedFullname.value = props.fullname;
-});
-
-watch(telephone, () => {
-  computedTelephone.value = props.telephone;
-});
-
-watch(cpf, () => {
-  computedCpf.value = props.cpf;
+watch([fullname, phone], () => {
+  computedFullname.value = fullname.value;
+  if (phone?.value) computedTelephone.value = phone.value;
 });
 </script>
-
 <style scoped lang="scss">
-.gap-6{
-  gap: 24px;
-}
-.settings {
-  form {
-    gap: 24px;
-    .btn {
-      text-transform: none !important;
-    }
-  }
-  .block {
-    gap: 24px;
-  }
-
-  .buttons {
-    gap: 8px;
-  }
-  @media (max-width: 430px) {
-    .block {
-      flex-direction: column;
-    }
-
-    .buttons {
-      flex-direction: column-reverse;
-    }
-  }
+.max-w-200 {
+  max-width: 800px;
 }
 </style>

@@ -8,7 +8,7 @@
         :boxes="[
           {
             icon: 'mdi-bookmark-box-multiple-outline',
-            number: learningPlansLength,
+            number: learningPlans,
             label: 'courses',
           },
           {
@@ -84,10 +84,7 @@ const props = defineProps({
 
 const { email, telephone } = toRefs(props);
 
-const { getUserLearningPlans } = useUserStore();
-const learningPlansLength = await getUserLearningPlans(props.userId);
 const mask = new Mask({ mask: '(##) #####-####' });
-const isEditing = ref(false);
 
 onBeforeMount(() => {});
 </script>
