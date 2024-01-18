@@ -1,16 +1,16 @@
 <template>
   <alex-custom-card
     class="mb-6"
+    sizing-class="pa-0"
+    full-width
     :title="title"
-    :isEditing="isEditing && canEdit"
-    :showIcon="canEdit"
-    @toggle:isEditing="toggleIsEditing"
+    :is-editing="isEditing && canEdit"
+    :show-icon="canEdit"
     :cancel="cancel"
     :save="updateAbout"
-    sizingClass="pa-0"
-    full-width
+    @toggle:is-editing="toggleIsEditing"
   >
-    <template v-slot:content>
+    <template #content>
       <div
         v-if="isEmptyAndIsNotEditing"
         class="d-flex flex-column w-100 justify-center align-center gap-4"
@@ -34,9 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import EditorJS, { OutputBlockData } from '@editorjs/editorjs';
+import EditorJS, { ToolConstructable } from '@editorjs/editorjs';
 import Marker from '@editorjs/marker';
-
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
 import DragDrop from 'editorjs-drag-drop';
@@ -56,29 +55,21 @@ import Embed from '@editorjs/embed';
 import Carousel from '@/editor-js/plugins/carousel/CarouselBlock';
 import header from '@/editor-js/plugins/header/HeaderBlock';
 import { i18n } from '~/assets/editor-i18n';
-const { create, update, delete: _delete } = useStrapi();
+const { update } = useStrapi();
 const { t } = useI18n();
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const token = useStrapiToken();
 
+type DetailsEditorProps = {
+  info?: { data: any; id: number; type: string; order: number }[];
+  courseId: number;
+  title: string;
+  canEdit: boolean;
+};
 
-const props = defineProps({
-  info: {
-    type: Array as PropType<
-      { data: any; id: number; type: string; order: number }[]
-    >,
-    default: [],
-  },
-  courseId: {
-    type: Number,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  canEdit: { type: Boolean, required: true },
+const props = withDefaults(defineProps<DetailsEditorProps>(), {
+  info: () => [],
 });
 
 const { info, canEdit } = toRefs(props);
@@ -89,7 +80,6 @@ const cancel = async () => {
 };
 const emit = defineEmits(['ready', 'update']);
 const instance = ref();
-
 
 const initialiseEditor = () => {
   instance.value = new EditorJS({
@@ -216,7 +206,7 @@ const initialiseEditor = () => {
         },
       },
       carousel: {
-        class: Carousel,
+        class: Carousel as unknown as ToolConstructable,
         config: {
           handleFileSelected: (files) => {
             const formData = new FormData();
@@ -293,8 +283,6 @@ const initialiseEditor = () => {
       ? `${t('components.profile.about.placeholder')}`
       : '',
     holder: 'editorjs',
-    //readOnly: true,
-    // logLevel: 'ERROR',
     data: {
       blocks: info.value as any,
     },
@@ -356,27 +344,9 @@ watch(isEmptyAndIsNotEditing, () => {
 </script>
 
 <style global lang="scss">
-.gap-4 {
-  gap: 16px;
-}
 #editorjs {
-  max-width: 100% !important;
+  width: 100% !important;
 }
-/*
-@media (min-width: 550px) {
-  .ce-toolbar__actions.ce-toolbar__actions--opened {
-    left: 0 !important;
-    margin-left: -54px;
-  }
-}
-@media (max-width: 550px) {
-  .ce-toolbar__actions.ce-toolbar__actions--opened {
-    right: 0 !important;
-    bottom: 0 !important;
-    margin-right: -54px;
-  }
-}
-*/
 .locked {
   pointer-events: none;
   -webkit-user-select: text; /* Chrome, Safari, and Opera */
@@ -388,22 +358,44 @@ watch(isEmptyAndIsNotEditing, () => {
     display: none;
   }
 }
-
+@media (max-width: 851px) {
+  .codex-editor--narrow .ce-toolbox .ce-popover:not(.ce-popover--open-top) {
+    right: auto !important;
+    left: auto !important;
+  }
+  .codex-editor--narrow .ce-settings .ce-popover:not(.ce-popover--open-top) {
+    right: auto !important;
+    left: auto !important;
+  }
+  .codex-editor--narrow .ce-toolbar__actions {
+    right: 0;
+  }
+}
+@media (min-width: 852px) {
+  .codex-editor--narrow .ce-toolbox .ce-popover {
+    right: auto;
+    left: 0;
+  }
+}
 .cdx-block {
-  max-width: 100% !important;
+  width: 100% !important;
   overflow-wrap: break-word;
 }
 #Card {
-  /*
   #editorjs {
     .codex-editor__redactor {
       padding-bottom: 24px !important;
     }
     .ce-block__content {
       margin: 0px;
+      max-width: none;
+    }
+    .ce-toolbar__content {
+      margin: 0px;
+      max-width: max-content;
     }
   }
-*/
+
   .info {
     text-align: justify;
     text-justify: inter-word;
@@ -413,80 +405,8 @@ watch(isEmptyAndIsNotEditing, () => {
     font-weight: 400;
     line-height: 22px;
   }
-}
-
-@media (min-width: 800px) {
-  .ce-block__content {
-    max-width: 250px !important;
-  }
-}
-@media (min-width: 900px) {
-  .ce-block__content {
-    max-width: 350px !important;
-  }
-}
-
-@media (min-width: 1000px) {
-  .ce-block__content {
-    max-width: 390px !important;
-  }
-}
-
-@media (min-width: 1100px) {
-  .ce-block__content {
-    max-width: 500px !important;
-  }
-}
-@media (min-width: 1200px) {
-  .ce-block__content {
-    max-width: 600px !important;
-  }
-}
-@media (min-width: 1300px) {
-  .ce-block__content {
-    max-width: 450px !important;
-  }
-}
-
-@media (min-width: 1400px) {
-  .ce-block__content {
-    max-width: 500px !important;
-  }
-}
-
-@media (min-width: 1500px) {
-  .ce-block__content {
-    max-width: 550px !important;
-  }
-}
-
-@media (min-width: 1600px) {
-  .ce-block__content {
-    max-width: 600px !important;
-  }
-}
-
-@media (min-width: 1700px) {
-  .ce-block__content {
-    max-width: 650px !important;
-  }
-}
-
-@media (min-width: 1800px) {
-  .ce-block__content {
-    max-width: 700px !important;
-  }
-}
-
-@media (min-width: 1900px) {
-  .ce-block__content {
-    max-width: 750px !important;
-  }
-}
-
-@media (min-width: 2000px) {
-  .ce-block__content {
-    max-width: 800px !important;
+  .codex-editor__redactor {
+    margin-right: 0;
   }
 }
 </style>
