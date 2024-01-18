@@ -1,14 +1,14 @@
 <template>
-  <div class="course-page d-flex w-100 gap-6">
+  <div class="course-page w-100 gap-6">
     <alex-custom-card
       title=""
-      class="left-block"
+      class="left-block min-w-card flex-wrap w-100"
       no-header
       full-width
       :align-content="'align-center'"
     >
       <template #content>
-        <div class="d-flex flex-column align-center w-100 gap-12 px-6 w-212">
+        <div class="d-flex flex-column align-center w-100 gap-12 w-212">
           <app-media
             sizing-class="pa-0"
             is-nested
@@ -74,8 +74,14 @@
       </template>
     </alex-custom-card>
 
-    <div class="d-flex flex-column w-100 gap-6 max-width">
-      <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false">
+    <div
+      class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
+    >
+      <alex-custom-card
+        :title="$t('pages.courses.details')"
+        :show-icon="false"
+        class="w-100"
+      >
         <template #content>
           <app-general-boxes
             :boxes="[
@@ -138,6 +144,7 @@
           (generalTags.length === 0 && userIsFacilitator) ||
           generalTags.length !== 0
         "
+        is-general
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
         :empty-message="$t('components.competences.general.empty')"
@@ -168,6 +175,7 @@
 </template>
 <script setup lang="ts">
 import { CompetenceTag } from '@/components/Competences.vue';
+import { MeetingPropsType } from '~/components/CourseMeeting.vue';
 const { update } = useStrapi();
 
 const learningPlanStore = useLearningPlanStore();
@@ -183,7 +191,7 @@ type GeneralProps = {
   owner: LearningPlanMemberSimple;
   invitationLink?: InvitationLinkSimple | null;
   canEdit?: boolean;
-  schedules?: LearningPlanScheduleSimple[];
+  schedules?: MeetingPropsType[];
 };
 const props = withDefaults(defineProps<GeneralProps>(), {
   invitationLink: null,
@@ -193,25 +201,25 @@ const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
 const { id } = useStrapiUser<User>().value;
-if (props.learningPlan.tags.data) {
-  generalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
-      if (item.attributes.isGeneral) {
-        acc.push({ id: item.id, ...item.attributes });
+if (props.learningPlan.tags) {
+  generalTags.value = props.learningPlan.tags.reduce(
+    (tags: CompetenceTag[], item) => {
+      if (item.isGeneral) {
+        tags.push({ ...item });
       }
 
-      return acc;
+      return tags;
     },
     [],
   );
 
-  technicalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
-      if (!item.attributes.isGeneral) {
-        acc.push({ id: item.id, ...item.attributes });
+  technicalTags.value = props.learningPlan.tags.reduce(
+    (tags: CompetenceTag[], item) => {
+      if (!item.isGeneral) {
+        tags.push({ ...item });
       }
 
-      return acc;
+      return tags;
     },
     [],
   );
@@ -235,101 +243,36 @@ const showDetails = computed(() => {
 .w-212 {
   max-width: 850px;
 }
+.min-w-card {
+  min-width: 400px;
+}
 .fix-margin {
   margin-top: -24px;
 }
-
+.max-width-card-right {
+  max-width: 500px;
+}
 .course-page {
+  // display: grid;
+  // grid-template-columns: minmax(400px, 1fr) minmax(400px, 500px);
+  // grid-auto-columns: 401px;
+  // grid-auto-flow: column;
+  display: flex;
+  flex-direction: row;
   .left-block {
-    min-width: 60% !important;
-    padding-inline: 24px !important;
     padding-bottom: 24px;
   }
 }
 
-@media (max-width: 1530px) {
-  .course-page {
-    .left-block {
-      min-width: 45% !important;
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-  }
-}
-
-@media (max-width: 1250px) {
-  .course-page {
-    .left-block {
-      min-width: 37% !important;
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-  }
-}
-
-@media (max-width: 1125px) {
+@media screen and (max-width: 1130px) {
   .course-page {
     flex-wrap: wrap;
-    &.gap-6 {
-      gap: 12px !important;
-    }
-    .left-block {
-      min-width: 33% !important;
-      padding-inline: 8px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
   }
-}
-
-@media (max-width: 961px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
+  .min-w-card {
+    min-width: 300px;
   }
-}
-@media (max-width: 850px) {
-  .course-page {
-    flex-direction: column;
-
-    .left-block {
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
+  .max-width-card-right {
+    max-width: unset;
   }
-}
-
-.max-width {
-  max-width: 500px;
-}
-
-.gap-6 {
-  gap: 24px;
-}
-
-.gap-12 {
-  gap: 48px;
 }
 </style>

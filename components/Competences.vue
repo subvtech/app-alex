@@ -1,9 +1,9 @@
 <template>
   <alex-custom-card
+    full-width
     :title="title"
-    :isEditing="isEditing && canEdit"
-    @toggle:isEditing="isEditing = !isEditing"
-    :showIcon="canEdit"
+    :is-editing="isEditing && canEdit"
+    :show-icon="canEdit"
     :cancel="onCancel"
     :save="onSave"
     align-content="align-start"
@@ -13,31 +13,33 @@
         ? $t('components.competences.general.tooltip')
         : $t('components.competences.technical.tooltip')
     "
-    full-width
+    @toggle:is-editing="isEditing = !isEditing"
   >
-    <template v-slot:content>
+    <template #content>
       <div class="gap-3 d-flex flex-column w-100">
         <div v-if="isEditing" class="d-flex flex-column gap-2">
           <app-autocomplete
             :placeholder="placeholder"
-            :filteredItems="filteredTags"
+            :filtered-items="filteredTags"
             :update-items="updateTags"
           />
         </div>
 
         <div class="d-flex flex-column align-start gap-2">
-          <div :key="rerender" class="d-flex flex-wrap justify-center gap-2">
-            <alex-custom-chip
-              v-if="selectedTags.length !== 0"
-              v-for="(tag, index) in selectedTags"
-              :key="index"
-              :text="tag.text"
-              variant="outlined"
-              color="#000"
-              :closable="isEditing"
-              @click:close="isEditing ? removeItem(tag) : () => {}"
-              :uncloseable="isEditing"
-            />
+          <div :key="rerender" class="d-flex flex-wrap justify-start gap-2">
+            <template v-if="selectedTags.length !== 0">
+              <alex-custom-chip
+                v-for="(tag, index) in selectedTags"
+                :key="index"
+                :text="tag.text"
+                :closable="isEditing"
+                :uncloseable="isEditing"
+                variant="outlined"
+                color="#000"
+                @click:close="isEditing ? removeItem(tag) : () => {}"
+              />
+            </template>
+
             <alex-custom-chip
               v-else
               variant="outlined"
@@ -52,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-const { create, find, update, delete: _delete } = useStrapi();
+const { create, find, update } = useStrapi();
 
 const { t } = useI18n();
 const client = useStrapiClient();
@@ -85,6 +87,7 @@ const props = defineProps({
   },
   learningPlanId: {
     type: Number,
+    required: true,
   },
   isGeneral: {
     type: Boolean,
@@ -114,7 +117,7 @@ function filterTags(
       (item) => (item.attributes as CompetenceTag).isGeneral === isGeneral,
     )
     .filter((item) => !ids.includes(item.id))
-    .map((item, index) => {
+    .map((item) => {
       return { ...item.attributes, id: item.id };
     }) as CompetenceTag[];
 }
@@ -160,7 +163,7 @@ const removeItem = (tag) => {
   selectedTag.value = null;
 };
 
-const onCancel = async () => {
+const onCancel = () => {
   selectedTags.value = props.userTags.map((item) => {
     return { ...item };
   });

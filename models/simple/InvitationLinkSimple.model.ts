@@ -4,6 +4,7 @@ const InvitationLinkRole = {
 } as const;
 
 export interface InvitationLinkSimple {
+  id: number;
   role: ValueOf<typeof InvitationLinkRole>;
   emails_to_send: string;
   hash: string;
@@ -12,4 +13,3 @@ export interface InvitationLinkSimple {
   is_expired: boolean;
   createdAt?: Date;
 }
-

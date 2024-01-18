@@ -18,17 +18,19 @@ export interface LearningPlanSimple {
   slug: string;
   class_name: string;
   archive_at: string;
+  message: string | null;
   projects: any[];
   courses: any[];
   members: LearningPlanMemberSimple[];
   learning_structures: LearningPlanStructureSimple[];
   groups: LearningPlanGroupSimple[];
   tasks: any[];
-  tags: any[];
-  invite_enable: boolean;
-  invitation_links: InvitationLink[];
+  tags: TagSimple[];
+  invite_enabled: boolean;
+  invitation_duration: number;
+  invitation_links: InvitationLinkSimple[];
   learning_goals: any;
-  schedules: any[];
+  schedules: LearningPlanScheduleSimple[];
   hidden: boolean;
-  details: any;
+  details: any | null;
 }
