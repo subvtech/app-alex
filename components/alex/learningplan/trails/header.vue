@@ -1,11 +1,20 @@
 <template>
   <div>
     <alex-custom-breadcrumbs
+      class="breadcrumbs"
       :arrow-back="true"
-      title="Trilha de aprendizagem "
+      :title="$t('components.trails.header.breadcrumbs.title')"
       :items="[
-        { title: 'Home', disabled: false, href: '/' },
-        { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
+        {
+          title: $t('components.trails.header.breadcrumbs.0.title'),
+          disabled: false,
+          href: '/',
+        },
+        {
+          title: $t('components.trails.header.breadcrumbs.1.title'),
+          disabled: false,
+          href: '/courses/me',
+        },
         {
           title: props.courseTitle,
           disabled: false,
@@ -19,21 +28,16 @@
       ]"
     />
     <div class="bg-white rounded my-6">
-      <v-container fluid class="header">
-        <v-row class="header-row">
-          <v-col
-            cols="12"
-            md="6"
-            lg="3"
-            class="d-flex align-center justify-center"
-          >
+      <div fluid class="header">
+        <div class="header-row">
+          <div class="d-flex header-img">
             <img
               :src="trailsCover || '/images/cover_image_course.svg'"
-              alt="Imagem da trilha"
+              :alt="$t('components.trails.header.imgAlt')"
               class="trailImg"
             />
-          </v-col>
-          <v-col cols="12" md="6" lg="9">
+          </div>
+          <div class="h-text">
             <div class="header-text">
               <span class="header-h3">{{ trailsTitle }}</span>
               <span class="body-p1" style="width: 100%">{{
@@ -41,16 +45,16 @@
               }}</span>
               <alex-custom-chip
                 v-if="page === 3"
-                text="Jornada Individual"
+                :text="$t('components.trails.header.chip')"
                 prepend-icon="mdi-check"
                 :size="'x-small'"
                 :status="'dark'"
                 >{{ $t('pages.trails.settings.chip') }}</alex-custom-chip
               >
             </div>
-          </v-col>
-        </v-row>
-      </v-container>
+          </div>
+        </div>
+      </div>
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="customTabs" />
     </div>
   </div>
@@ -103,9 +107,16 @@ watch(activePage, () => {
     router.push(`${router.currentRoute.value.fullPath}settings`);
   }
 });
+
+const { t } = useI18n();
+const tab = {
+  firstTitle: t('components.trails.header.firstTab'),
+  secondTitle: t('components.trails.header.secondTab'),
+};
+
 const tabs = [
-  { label: 'Visão Geral', value: '0' },
-  { label: 'Tarefas', value: '1' },
+  { label: tab.firstTitle, value: '0' },
+  { label: tab.secondTitle, value: '1' },
   { icon: 'mdi-cog-outline', label: '', value: '2' },
 ];
 </script>
@@ -113,7 +124,7 @@ const tabs = [
 .header {
   display: flex;
   padding: 24px;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: flex-start;
   align-content: flex-start;
   align-self: stretch;
@@ -145,23 +156,71 @@ const tabs = [
   color: var(--Cinza-Cinza-600, #6e7a87);
 }
 
+.header-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 24px !important;
+  width: 100%;
+  flex-shrink: calc(100% / 3);
+}
+
 .trailImg {
   width: 200px !important;
   height: 150px !important;
   justify-content: flex-end !important;
   align-items: flex-start !important;
   border-radius: 12px !important;
+  object-fit: cover !important;
 }
 
+.header-img {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  align-self: stretch;
+  max-width: 25%;
+}
 .header-text {
   display: flex;
   gap: 8px;
   flex-direction: column;
-  align-items: flex-start;
-  align-self: stretch;
+  max-width: 100%;
+  max-height: fit-content;
+  word-break: break-all;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  text-align: justify;
+  flex-shrink: 1;
 }
 
 .customTabs {
   border-top: 1px solid var(--cinza-cinza-100, #ebedef);
+}
+@media screen and (max-width: 768px) {
+  .breadcrumbs {
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-width: 100%;
+    align-items: flex-start !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden;
+  }
+}
+@media screen and (max-width: 900px) {
+  .header-row {
+    flex-direction: column;
+  }
+  .trailImg {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .header-img {
+    max-width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  .header-text {
+    max-width: 100%;
+  }
 }
 </style>

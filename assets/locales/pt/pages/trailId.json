@@ -1,3 +1,13 @@
 {
-  "fail": "Falhou { learningPlan }"
+  "fail": "Falhou { learningPlan }",
+  "overview": {
+    "emptyState": "Parece que não há nenhum conteúdo aqui",
+    "lastUpdated": "Última atualização: ",
+    "editBtn": "Editar",
+    "cancelBtn": "Cancelar",
+    "saveBtn": "Salvar",
+    "searchError": "Ocorreu um erro ao buscar os dados da trilha, tente novamente.",
+    "saveError": "Ocorreu um erro ao salvar os dados da trilha, tente novamente.",
+    "sectionTitle": "Início"
+  }
 }
