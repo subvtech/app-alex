@@ -1,7 +1,7 @@
 <template>
   <div v-if="user" class="content-block d-flex w-100 gap-6">
     <div class="details d-flex flex-column w-100 gap-6">
-      <alex-profile-info
+      <alex-profile-overview
         :user-id="user.id"
         :socials="user.socials"
         :telephone="user.phone"

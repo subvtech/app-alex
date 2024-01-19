@@ -4,43 +4,23 @@
     :show-icon="false"
   >
     <template v-slot:content>
-      <app-general-boxes
-        :boxes="[
-          {
-            icon: 'mdi-bookmark-box-multiple-outline',
-            number: learningPlans,
-            label: 'courses',
-          },
-          {
-            icon: 'mdi-newspaper-variant-multiple-outline',
-            number: projects,
-            label: 'projects',
-          },
-          {
-            icon: 'mdi-check-decagram',
-            number: assignments,
-            label: 'assignments',
-          },
-        ]"
-      />
+      <app-general-boxes :boxes="overviewBoxes" />
     </template>
 
     <template v-slot:footer>
-      <div class="d-flex flex-column contacts">
-        <div v-if="email" class="d-flex align-center contact">
-          <v-icon color="#6E7A87">mdi-email-outline</v-icon>
-          <div class="d-flex flex-column justify-center align-start field">
-            <p>{{ $t('components.profile.general.email') }}</p>
-            <span>{{ email }}</span>
-          </div>
-        </div>
-        <div v-if="telephone" class="d-flex align-center contact">
-          <v-icon color="#6E7A87">mdi-phone-outline</v-icon>
-          <div class="d-flex flex-column justify-center align-start field">
-            <p>{{ $t('components.profile.general.telephone') }}</p>
-            <span>{{ mask.masked(telephone) }}</span>
-          </div>
-        </div>
+      <div class="d-flex flex-column contacts gap-4">
+        <alex-profile-components-contact
+          v-if="email"
+          :label="$t('components.profile.general.email')"
+          icon="mdi-email-outline"
+          :value="email"
+        />
+        <alex-profile-components-contact
+          v-if="telephone"
+          :label="$t('components.profile.general.telephone')"
+          icon="mdi-phone-outline"
+          :value="mask.masked(telephone)"
+        />
       </div>
     </template>
   </alex-custom-card>
@@ -48,6 +28,7 @@
 
 <script setup lang="ts">
 import { Mask } from 'maska';
+import { BoxItemType } from './components/BoxInfo.vue';
 
 const props = defineProps({
   userId: {
@@ -85,44 +66,28 @@ const props = defineProps({
 const { email, telephone } = toRefs(props);
 
 const mask = new Mask({ mask: '(##) #####-####' });
-
-onBeforeMount(() => {});
+const overviewBoxes = ref<BoxItemType[]>([
+  {
+    icon: 'mdi-bookmark-box-multiple-outline',
+    number: props.learningPlans,
+    label: 'courses',
+  },
+  {
+    icon: 'mdi-newspaper-variant-multiple-outline',
+    number: props.projects,
+    label: 'projects',
+  },
+  {
+    icon: 'mdi-check-decagram',
+    number: props.assignments,
+    label: 'assignments',
+  },
+]);
 </script>
 
 <style scoped lang="scss">
 #Card {
   min-width: 450px;
-
-  .contacts {
-    gap: 16px;
-    //border-bottom: 1px solid #eaeef1;
-    flex-direction: column;
-
-    .contact {
-      gap: 16px;
-
-      .field {
-        p {
-          color: #a0a8b1;
-
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 135%; /* 18.9px */
-          letter-spacing: 0.56px;
-        }
-
-        span {
-          color: #6e7a87;
-
-          font-size: 16px;
-          font-weight: 400;
-          line-height: 135%; /* 21.6px */
-          letter-spacing: 0.64px;
-          text-decoration: none;
-        }
-      }
-    }
-  }
   @media (max-width: 950px) {
     min-width: 380px;
   }
