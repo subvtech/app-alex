@@ -12,7 +12,6 @@
       darker-background
       show-shade
       show-menu
-      settings-menu
       :title="$t('pages.courses.class')"
       :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"

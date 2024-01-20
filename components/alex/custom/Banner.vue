@@ -119,7 +119,7 @@
         />
       </div>
       <alex-custom-button
-        v-if="showMenu"
+        v-if="showMenu && showSettings"
         variant="text"
         :icon="settingsIcon"
         :color="isSettingsRoute ? 'secondary-0' : undefined"
