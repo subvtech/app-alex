@@ -29,7 +29,7 @@
             hide-dividers
             full-width
             :text="learningPlan.description"
-            :user-id="learningPlan.id"
+            :user-id="userId"
             :can-edit="userIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
@@ -40,7 +40,7 @@
             is-nested
             :can-edit="canEdit"
             :course-id="learningPlan.id"
-            :user-id="id"
+            :user-id="userId"
             :data="
               learningPlan.learning_goals.map((item) => {
                 return {
@@ -120,7 +120,7 @@
               :end-date="new Date()"
               :is-facilitator="userIsFacilitator"
               :href="userIsFacilitator ? `${learningPlan.id}/settings` : ''"
-              :learning-plan-id="0"
+              :learning-plan-id="learningPlan.id"
             />
             <alex-learningplan-invites
               v-if="canEdit"
@@ -149,7 +149,7 @@
         :label="$t('components.competences.general.label')"
         :empty-message="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :user-id="id"
+        :user-id="userId"
         :learning-plan-id="learningPlan.id"
         :user-tags="generalTags"
         :can-edit="userIsFacilitator"
@@ -164,7 +164,7 @@
         :label="$t('components.competences.technical.label')"
         :empty-message="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :user-id="id"
+        :user-id="userId"
         :learning-plan-id="learningPlan.id"
         :user-tags="technicalTags"
         :can-edit="userIsFacilitator"
@@ -179,7 +179,6 @@ import { MeetingPropsType } from '~/components/CourseMeeting.vue';
 const { update } = useStrapi();
 
 const learningPlanStore = useLearningPlanStore();
-
 const standardTrails = learningPlanStore.standardTrailsCount;
 const userIsFacilitator = learningPlanStore.userIsFacilitator;
 const activeMembers = learningPlanStore.activeMembers;
@@ -200,7 +199,7 @@ const props = withDefaults(defineProps<GeneralProps>(), {
 const generalTags = ref<CompetenceTag[]>([]);
 const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
-const { id } = useStrapiUser<User>().value;
+const { id: userId } = useStrapiUser<User>().value;
 if (props.learningPlan.tags) {
   generalTags.value = props.learningPlan.tags.reduce(
     (tags: CompetenceTag[], item) => {
@@ -253,10 +252,6 @@ const showDetails = computed(() => {
   max-width: 500px;
 }
 .course-page {
-  // display: grid;
-  // grid-template-columns: minmax(400px, 1fr) minmax(400px, 500px);
-  // grid-auto-columns: 401px;
-  // grid-auto-flow: column;
   display: flex;
   flex-direction: row;
   .left-block {

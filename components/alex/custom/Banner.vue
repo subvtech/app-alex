@@ -8,10 +8,10 @@
       <NuxtImg
         v-if="cover"
         class="cover"
-        :provider="imgFromStrapi ? 'strapi' : undefined"
-        :src="cover.url"
         placeholder
         role="custom-cover"
+        :provider="imgFromStrapi ? 'strapi' : undefined"
+        :src="cover.url"
       />
       <img
         v-else
@@ -109,12 +109,26 @@
       @display:settings="emit('display:settings')"
     />
 
-    <div class="d-flex px-6">
-      <alex-custom-tabs
+    <div class="d-flex justify-space-between align-center px-6">
+      <div class="d-flex">
+        <alex-custom-tabs
+          v-if="showMenu"
+          v-model="bannerSelectedOption"
+          :tabs="links"
+          @update:model-value="emit('select:option', bannerSelectedOption)"
+        />
+      </div>
+      <alex-custom-button
         v-if="showMenu"
-        v-model="bannerSelectedOption"
-        :tabs="links"
-        @update:model-value="emit('select:option', bannerSelectedOption)"
+        variant="text"
+        :icon="settingsIcon"
+        :color="isSettingsRoute ? 'secondary-0' : undefined"
+        @click="
+          () => {
+            emit('select:option', null);
+            navigateTo(settings?.to);
+          }
+        "
       />
     </div>
   </div>
@@ -124,174 +138,105 @@ import { TabType } from '@/components/alex/custom/Tabs.vue';
 const emit = defineEmits(['select:option', 'display:settings']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
-
-export type BannerImageType = {
-  url: string;
-  id: number;
-  [x: string | number | symbol]: unknown;
+const route = useRoute();
+const isSettingsRoute = computed(() =>
+  route.name && /(courses)-(id)-(settings)/.test(route.name.toString())
+    ? 'secondary-0'
+    : undefined,
+);
+type BannerProps = {
+  coverPicture?: Upload | null;
+  showSetting?: boolean;
+  imgFromStrapi?: boolean;
+  showProfilePicture?: boolean;
+  profilePicture?: Upload | null;
+  profilePictureSize?: number;
+  darkerBackground?: boolean;
+  descriptionAbove?: boolean;
+  description?: string;
+  distribution?:
+    | 'single-row'
+    | 'single-column'
+    | 'fullname-username-role'
+    | 'fullname-role-username'
+    | 'username-fullname-role'
+    | 'username-role-fullname';
+  settingsIcon?: string;
+  selectedOption?: number;
+  isProfessor?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  userId?: number;
+  fullname?: string;
+  startDate?: string;
+  endDate?: string;
+  username?: string;
+  copyObject?: { label: string; copyText: string };
+  fullnameStyle?: string;
+  codeStyle?: string;
+  roleStyle?: string;
+  usernameStyle?: string;
+  startDateStyle?: string;
+  endDateStyle?: string;
+  titleStyle?: string;
+  subtitleStyle?: string;
+  avatarBlockStyle?: string;
+  showBorder?: boolean;
+  floatBeneath?: boolean;
+  settingsMenu?: boolean;
+  dateToTheLeft?: boolean;
+  showShade?: boolean;
+  showRole?: boolean;
+  updateProfilePicture?: boolean;
+  title?: string;
+  subtitle?: string;
+  showMenu?: boolean;
+  showSettings?: boolean;
+  links?: TabType[];
+  settings?: TabType;
 };
-
-const props = defineProps({
-  coverPicture: {
-    type: Object as PropType<BannerImageType | null>,
-  },
-
-  showSettings: {
-    type: Boolean,
-    default: false,
-  },
-
-  imgFromStrapi: {
-    type: Boolean,
-    default: true,
-  },
-
-  showProfilePicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  profilePicture: {
-    type: Object as PropType<BannerImageType | null>,
-  },
-  profilePictureSize: {
-    type: Number,
-    default: 50,
-  },
-  darkerBackground: {
-    type: Boolean,
-    default: false,
-  },
-  descriptionAbove: {
-    type: Boolean,
-    default: false,
-  },
-
-  description: {
-    type: String,
-  },
-
-  distribution: {
-    type: String as PropType<
-      | 'single-row'
-      | 'single-column'
-      | 'fullname-username-role'
-      | 'fullname-role-username'
-      | 'username-fullname-role'
-      | 'username-role-fullname'
-    >,
-    default: 'fullname-username-role',
-  },
-  settingsIcon: {
-    type: String,
-    default: 'mdi-cog-outline',
-  },
-
-  copyObject: {
-    type: Object as PropType<{ label: string; copyText: string }>,
-  },
-  fullnameStyle: {
-    type: String,
-  },
-  codeStyle: {
-    type: String,
-  },
-  roleStyle: {
-    type: String,
-  },
-  usernameStyle: {
-    type: String,
-  },
-  startDateStyle: {
-    type: String,
-  },
-  endDateStyle: {
-    type: String,
-  },
-
-  titleStyle: {
-    type: String,
-  },
-
-  subtitleStyle: {
-    type: String,
-  },
-
-  avatarBlockStyle: {
-    type: String,
-  },
-
-  showBorder: {
-    type: Boolean,
-    default: false,
-  },
-
-  floatBeneath: {
-    type: Boolean,
-    default: false,
-  },
-  settingsMenu: {
-    type: Boolean,
-    default: false,
-  },
-
-  dateToTheLeft: {
-    type: Boolean,
-    default: false,
-  },
-
-  showShade: {
-    type: Boolean,
-    default: false,
-  },
-
-  showRole: {
-    type: Boolean,
-    default: false,
-  },
-
-  updateProfilePicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  title: {
-    type: String,
-  },
-
-  subtitle: {
-    type: String,
-  },
-
-  showMenu: { type: Boolean, default: false },
-
-  userId: {
-    type: Number,
-  },
-  fullname: {
-    type: String,
-  },
-  startDate: {
-    type: String,
-  },
-  endDate: {
-    type: String,
-  },
-  username: {
-    type: String,
-  },
-  selectedOption: {
-    type: Number,
-    default: 0,
-  },
-
-  links: {
-    type: Array as PropType<TabType[]>,
-    default: () => [],
-  },
-  isProfessor: { type: Boolean, default: false },
-  canEdit: { type: Boolean, default: false },
-  canDelete: { type: Boolean, default: false },
+const props = withDefaults(defineProps<BannerProps>(), {
+  coverPicture: null,
+  showSetting: false,
+  imgFromStrapi: false,
+  showProfilePicture: false,
+  profilePicture: null,
+  profilePictureSize: 50,
+  darkerBackground: false,
+  descriptionAbove: false,
+  description: undefined,
+  selectedOption: 0,
+  links: () => [],
+  isProfessor: false,
+  canEdit: false,
+  canDelete: false,
+  userId: undefined,
+  fullname: undefined,
+  startDate: undefined,
+  endDate: undefined,
+  username: undefined,
+  copyObject: undefined,
+  floatBeneath: false,
+  settingsMenu: false,
+  dateToTheLeft: false,
+  showShade: false,
+  showRole: false,
+  fullnameStyle: undefined,
+  codeStyle: undefined,
+  roleStyle: undefined,
+  usernameStyle: undefined,
+  startDateStyle: undefined,
+  endDateStyle: undefined,
+  titleStyle: undefined,
+  subtitleStyle: undefined,
+  avatarBlockStyle: undefined,
+  settingsIcon: 'mdi-cog-outline',
+  distribution: 'fullname-username-role',
+  title: undefined,
+  subtitle: undefined,
+  showMenu: false,
+  showSettings: false,
+  settings: undefined,
 });
 
 const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
@@ -299,7 +244,7 @@ const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
 
 const bannerSelectedOption = toRef(props.selectedOption);
 
-const cover = ref<BannerImageType | null | undefined>(props.coverPicture);
+const cover = ref<Partial<Upload> | null | undefined>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {
   if (cover.value && props.imgFromStrapi) {

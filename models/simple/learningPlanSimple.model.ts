@@ -14,11 +14,13 @@ export interface LearningPlanSimple {
   end_date: string;
   media: MediaSimple[];
   type: ValueOf<typeof LearningPlanType>;
-  cover_image: Upload;
+  archive_at: string | null;
+  details: any | null;
+  updatedAt: string | null;
+  message: string | null;
+  cover_image: Upload | null;
   slug: string;
   class_name: string;
-  archive_at: string;
-  message: string | null;
   projects: any[];
   courses: any[];
   members: LearningPlanMemberSimple[];
@@ -32,5 +34,4 @@ export interface LearningPlanSimple {
   learning_goals: any;
   schedules: LearningPlanScheduleSimple[];
   hidden: boolean;
-  details: any | null;
 }

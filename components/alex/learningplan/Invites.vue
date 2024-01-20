@@ -75,27 +75,18 @@
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
 
-const props = defineProps({
-  enableInvites: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Object as PropType<InvitationLinkSimple | null>,
-    required: true,
-  },
-  duration: {
-    type: Number,
-    required: true,
-  },
-  courseId: {
-    type: Number,
-    required: true,
-  },
-  dark: {
-    type: Boolean,
-    default: false,
-  },
+type InviteProps = {
+  duration: number;
+  courseId: number;
+  data?: InvitationLinkSimple | null;
+  enableInvites?: boolean;
+  dark?: boolean;
+};
+
+const props = withDefaults(defineProps<InviteProps>(), {
+  dark: false,
+  enableInvites: false,
+  data: null,
 });
 
 const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =

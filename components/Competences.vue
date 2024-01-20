@@ -63,7 +63,7 @@ const { setMessage } = useMessageStore();
 export type CompetenceTag = {
   text: string;
   id?: number;
-  verified_by: any;
+  verified_by?: string;
   isGeneral: boolean;
 };
 

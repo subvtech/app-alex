@@ -1,9 +1,9 @@
 <template>
-  <div v-if="course">
+  <div v-if="learningPlanStore.learningPlan && learningPlanStore.facilitator">
     <alex-learningplan-general
-      :learning-plan="learningPlanStore.learningPlan!"
+      :learning-plan="learningPlanStore.learningPlan"
       :learning-plan-id="learningPlanStore.learningPlan?.id"
-      :owner="learningPlanStore.facilitator!"
+      :owner="learningPlanStore.facilitator"
       :invitation-link="learningPlanStore.invitationLink"
       :can-edit="learningPlanStore.userIsFacilitator"
       :schedules="
@@ -33,10 +33,8 @@ definePageMeta({
 });
 const { find } = useStrapiUtils();
 const i18n = useI18n();
-const course = ref<LearningPlanSimple>();
 const meetings = ref<LearningPlanScheduleSimple[]>([]);
 const route = useRoute();
-const owner = ref();
 const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
 
@@ -63,13 +61,7 @@ const updateCourse = async (show = true, message?) => {
   const learninPlanResult = await learningPlanStore.loadLearningPlan(id, true);
   if (!learninPlanResult)
     setMessage(i18n.t('pages.courses.notfound'), 'red', show);
-  course.value = learninPlanResult?.data;
-  owner.value = course.value?.members.filter(
-    (member) => member.role === 'facilitator',
-  )[0].user;
-
   await updateMeetings(id);
-
   setMessage(message ?? 'done', 'green', show);
 };
 

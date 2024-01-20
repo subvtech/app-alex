@@ -6,10 +6,11 @@ const InvitationLinkRole = {
 export interface InvitationLinkSimple {
   id: number;
   role: ValueOf<typeof InvitationLinkRole>;
-  emails_to_send: string;
+  emails_to_send: string | null;
   hash: string;
   expires_at: Date;
   learningplan: LearningPlanSimple;
   is_expired: boolean;
-  createdAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }

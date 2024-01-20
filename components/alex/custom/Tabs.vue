@@ -27,7 +27,7 @@
 export type TabType = {
   label: string;
   to?: string;
-  value: string;
+  value: string | number;
   notification?: boolean;
   icon?: string;
 };
