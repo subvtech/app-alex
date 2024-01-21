@@ -109,6 +109,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile/socials',
     'profile/wallets',
     'trails/settings/cover',
+    'trails/settings/delete',
     'trails/settings/general',
     'trails/settings/visibility',
     'trails/header',

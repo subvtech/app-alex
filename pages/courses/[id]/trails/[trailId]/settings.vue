@@ -1,7 +1,7 @@
 <template>
   <div>
     <alex-custom-card
-      :title="$t('components.courses.settings.title')"
+      :title="$t('components.trails.settings.title')"
       :show-icon="false"
       :align-content="'align-center'"
     >
@@ -11,21 +11,9 @@
             namespace="trails"
             full-width
           />
-          <alex-learningplan-trails-settings-general
-            :my-title="trailStore.trail.title"
-            :my-description="trailStore.trail.description"
-            :trail-id="parseInt(trailId.toString())"
-            outline
-            full-width
-            @update="(data) => emit('update', data)"
-          />
-
+          <alex-learningplan-trails-settings-general />
           <alex-learningplan-trails-settings-visibility />
-          <alex-learningplan-settings-delete
-            namespace="trails"
-            outline
-            @update="removeTrail"
-          />
+          <alex-learningplan-trails-settings-delete />
         </div>
       </template>
     </alex-custom-card>
@@ -33,11 +21,6 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n();
-const { update, delete: _delete } = useStrapi();
-const { setMessage } = useMessageStore();
-
-const emit = defineEmits(['update']);
 
 definePageMeta({
   middleware: ['load-trail'],
@@ -45,22 +28,8 @@ definePageMeta({
 });
 
 const route = useRoute();
-const router = useRouter();
-
 const { courseId, trailId } = route.params;
 const trailStore = useTrailStore();
-
-const updateVisibility = async (data) => {
-  await update('trails', parseInt(trailId.toString()), { ...data });
-  setMessage(t('components.courses.settings.visibility.update'), 'green', true);
-};
-
-async function removeTrail() {
-  await _delete('trails', parseInt(trailId.toString()));
-
-  router.push(route.path);
-  setMessage(t('components.trails.settings.delete.update'), 'green', true);
-}
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(parseInt(trailId.toString()));

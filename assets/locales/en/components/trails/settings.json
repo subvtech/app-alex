@@ -22,6 +22,7 @@
   "showtrailHint": "Makes the trail public, allowing any course member to see it.",
   "hidetrailTitle": "Hide trail (Private)",
   "hidetrailHint": "Makes the trail private, ensuring only its creator can see the trail.",
+  "visibilityUpdate": "Trail visibility successfully updated",
   "delete": {
       "deleteCourseTitle": "Delete trail",
       "deleteCourseDescription": "After deleting the trail, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this trail. So please be sure before proceeding.",
@@ -30,6 +31,7 @@
       "deleteDescription": "By deleting a trail you will lose all the content associated with it.",
       "deleteLabel": "Enter the word:",
       "deletePlaceholder": "Enter the word to confirm",
-      "deleteWord": "Delete"
+      "deleteWord": "Delete",
+      "update": "Trail successfully deleted"
     }
 }

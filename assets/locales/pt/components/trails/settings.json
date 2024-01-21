@@ -6,7 +6,7 @@
   "cover": {
     "add": "Adicione Vídeos ou Fotos",
     "title": "Capa da trilha",
-    "update": "A Imagem de capa da trilha foi atualizada com sucesso",
+    "update": "A imagem de capa da trilha foi atualizada com sucesso",
     "addCover": "Fazer upload"
   },
   "general": {
@@ -22,6 +22,7 @@
     "showtrailHint": "Torna a trilha pública, permitindo que qualquer participante do curso possa vê-la.",
     "hidetrailTitle": "Ocultar trilha (Privado)",
     "hidetrailHint": "Torna a trilha privada, garantindo que somente seu criador tenha acesso a ela.",
+    "visibilityUpdate": "Visibilidade da trilha atualizada com sucesso",
     "delete": {
         "deleteTrailTitle": "Excluir trilha",
         "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
@@ -30,6 +31,7 @@
         "deleteDescription": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",
         "deleteLabel": "Digite a palavra:",
         "deletePlaceholder": "Digite a frase",
-        "deleteWord": "Excluir"
+        "deleteWord": "Excluir",
+        "update": "Trilha excluída com sucesso"
       }
 }
