@@ -90,6 +90,8 @@ const emptyState = {
 
 const route = useRoute();
 const { update } = useStrapi();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
 const strapiClient = useStrapiClient();
 const { courseId, trailId } = route.params;
 const trailStore = useTrailStore();
@@ -144,6 +146,8 @@ const handleSubmit = async () => {
     await update(`trails/${trailId}`, {
       cover_image: imageData[0].id,
     });
+    setMessage(t('components.trails.settings.cover.update'), 'green', true);
+    getTrailData();
   } catch (error) {
     theresError.value = true;
     console.error('Erro na requisição:', error);

@@ -57,7 +57,7 @@ const updateVisibility = async () => {
   await update('trails', parseInt(trailId.toString()), {
     hidden: activeButton.value,
   });
-  setMessage(t('components.trails.settings.visibility.update'), 'green', true);
+  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
 };
 
 const onCancel = () => {
