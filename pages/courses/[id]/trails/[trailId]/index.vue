@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column" style="flex: 1">
-    <alex-learningplan-trails-header
+    <!-- <alex-learningplan-trails-header
       :trails-description="trailsDescription"
       :trails-cover="coverImage"
       :page="0"
@@ -8,7 +8,7 @@
       :course-id="id"
       :course-title="learningPlan!.title"
       :trails-title="trailsTitle"
-    />
+    /> -->
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" class="d-flex justify-end px-6 pt-6">
         <alex-custom-button

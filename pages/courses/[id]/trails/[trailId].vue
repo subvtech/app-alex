@@ -2,7 +2,11 @@
   <div>
     <alex-learningplan-trails-header
       :trails-description="trailStore.trail.description"
-      :trails-cover="trailStore.trail.cover_image_url"
+      :trails-cover="
+        trailStore.trail.cover_image
+          ? trailStore.trail.cover_image.url
+          : '/images/cover_image_course.svg'
+      "
       :trail-id="trailId"
       :course-id="id"
       :course-title="learningPlanStore.learningPlan?.title"
