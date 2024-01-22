@@ -21,7 +21,7 @@
       />
       <div
         v-if="sortedInstitutions.length > 0"
-        class="d-flex flex-wrap items w-100"
+        class="d-flex flex-wrap gap-6 w-100"
       >
         <draggable
           class="d-flex flex-row flex-wrap contacts gap-6 w-100 justify-center w-100"
@@ -187,36 +187,4 @@ const onCancel = () => {
 };
 </script>
 
-<style scoped lang="scss">
-.btn {
-  position: absolute;
-  top: 20px;
-  right: 10px;
-  text-transform: none !important;
-  font-weight: bold;
-  font-size: 14px;
-  border-radius: 8px;
-}
-.small {
-  display: none;
-  position: absolute;
-  width: auto;
-  height: auto;
-  top: 20px;
-  right: 10px;
-  padding: 4px;
-}
-.items {
-  gap: 24px;
-}
-
-@media (max-width: 400px) {
-  .btn {
-    display: none;
-  }
-
-  .small {
-    display: block;
-  }
-}
-</style>
+<style scoped lang="scss"></style>

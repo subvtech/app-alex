@@ -17,7 +17,7 @@ export const useUserStore = defineStore('user', () => {
   const client = useStrapiClient();
   const graphql = useStrapiGraphQL();
   const { findOne, find } = useStrapiUtils();
-  const { id } = useStrapiUser<User>().value;
+  const strapiUser = useStrapiUser<User>();
   const { setMessage } = useMessageStore();
   const i18n = useI18n();
 
@@ -65,6 +65,28 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function loadUserTags(message) {
+    if (!loadedUser.value) return;
+    try {
+      loading.value = true;
+      const result = await find<Tag>('tags', {
+        filters: {
+          verified_by: loadedUser.value.id,
+        },
+      });
+      loadedUser.value = { ...loadedUser.value, tags: result.data };
+      loading.value = false;
+      if (message)
+        setMessage(message, 'green', true);
+      return;
+    } catch (e: any) {
+      loading.value = false;
+      if (e?.error?.name === 'NotFoundError' && message) {
+        setMessage(i18n.t('components.competences.notFound'), 'red', true);
+      }
+    }
+  }
+
   async function loadUserSocials(showMessage = true) {
     if (!loadedUser.value) return;
     try {
@@ -97,7 +119,7 @@ export const useUserStore = defineStore('user', () => {
         },
         populate,
       });
-      console.log({ result, id });
+      console.log({ result, id: strapiUser.value?.id });
 
       loadedUser.value = result.data[0];
       loading.value = false;
@@ -113,7 +135,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const isCurrentUser = computed(() => {
-    return loadedUser.value?.id === id;
+    return loadedUser.value?.id === strapiUser.value?.id;
   });
 
   const activeTasks = computed(async () => {
@@ -143,5 +165,6 @@ export const useUserStore = defineStore('user', () => {
     loadUser,
     setWallet,
     loadUserSocials,
+    loadUserTags
   };
 });

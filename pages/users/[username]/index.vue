@@ -15,7 +15,7 @@
         @update="async () => await updateSocials()"
       />
     </div>
-    <div class="d-flex flex-column w-100 gap-6" style="max-width: 100%">
+    <div class="d-flex flex-column w-100 gap-6">
       <app-about
         :title="$t('components.profile.about.title')"
         :text="user.info"
@@ -37,34 +37,31 @@
       <div
         class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences gap-6"
       >
-        {{ technicalTags }}
         <alex-profile-competences
           v-if="technicalTags.length !== 0 || canEdit"
           :title="$t('components.competences.technical.title')"
           :label="$t('components.competences.technical.label')"
           :placeholder="$t('components.competences.technical.placeholder')"
           :emptyMessage="$t('components.competences.technical.empty')"
-          :userId="user.id"
+          :relation-id="user.id"
           :can-edit="canEdit"
           :selected-tags="technicalTags"
-          :fetch-tags="fetchGeneralTags"
           @update="
-            emit('update', $t('components.competences.technical.updated'))
+            updateCompetences($t('components.competences.technical.updated'))
           "
         />
         <alex-profile-competences
-          v-if="generalTags.length !== 0 && false && canEdit"
+          v-if="generalTags.length !== 0 || canEdit"
           :title="$t('components.competences.general.title')"
           :label="$t('components.competences.general.label')"
           :placeholder="$t('components.competences.general.placeholder')"
           :emptyMessage="$t('components.competences.general.empty')"
-          :userId="user.id"
+          :relation-id="user.id"
           :can-edit="canEdit"
-          :userTags="generalTags"
-          :forbidden-tags="technicalTags"
+          :selected-tags="generalTags"
           is-general
           @update="
-            emit('update', $t('components.competences.technical.updated'))
+            updateCompetences($t('components.competences.general.updated'))
           "
         />
       </div>
@@ -94,6 +91,10 @@ const props = defineProps({
     type: Function,
     default: () => {},
   },
+  updateCompetences: {
+    type: Function,
+    default: () => {},
+  },
 });
 const { user } = toRefs(props);
 const emit = defineEmits(['update']);
@@ -106,16 +107,66 @@ const strapiUser = useStrapiUser<User>().value;
 
 generalTags.value = props.user.tags.filter((item) => item.isGeneral) ?? [];
 technicalTags.value = props.user.tags.filter((item) => !item.isGeneral) ?? [];
-
-const fetchGeneralTags = async (search: string) => {
-  generalTags.value = (
-    await find('tags', {
-      filters: {
-        text: search,
-        isGeneral: true,
-      },
-    })
-  ).data;
-};
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+#profile {
+  flex-direction: column;
+  font-family: 'Sen';
+  height: 100%;
+
+  .header {
+    justify-content: flex-start;
+    align-items: center;
+    align-self: stretch;
+    height: 44px;
+
+    .title {
+      color: #5d6872;
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 28px;
+      padding-right: 16px;
+    }
+
+    .pages {
+      padding-left: 16px;
+      gap: 12px;
+      align-items: center;
+      border-left: 1px solid #e1e4e7;
+      .go-back {
+        color: #abb2b9;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: normal;
+      }
+
+      .current-page {
+        color: #5d6872;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: normal;
+      }
+    }
+  }
+
+  .content-block {
+    gap: 24px;
+    flex-direction: row;
+  }
+
+  @media (max-width: 1410px) {
+    .competences {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .content-block {
+      flex-wrap: wrap;
+    }
+    .details {
+      max-width: none;
+    }
+  }
+}
+</style>

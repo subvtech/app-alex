@@ -142,8 +142,8 @@
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :user-id="id"
-        :learning-plan-id="learningPlan.id"
+        :relation-id="learningPlan.id"
+        learningplan
         :userTags="generalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
@@ -157,8 +157,8 @@
         :label="$t('components.competences.technical.label')"
         :emptyMessage="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="id"
-        :learning-plan-id="learningPlan.id"
+        :relationId="learningPlan.id"
+        learningplan
         :userTags="technicalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
@@ -167,7 +167,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { CompetenceTag } from '@/components/alex/profile/Competences.vue';
 import { useI18n } from 'vue-i18n';
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
@@ -202,14 +201,14 @@ const props = defineProps({
   },
 });
 
-const generalTags = ref<CompetenceTag[]>([]);
-const technicalTags = ref<CompetenceTag[]>([]);
+const generalTags = ref<Tag[]>([]);
+const technicalTags = ref<Tag[]>([]);
 const plainLink = ref<string | null>(null);
 const { id } = useStrapiUser<User>().value;
 
 if (props.learningPlan.tags.data) {
   generalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
+    (acc: Tag[], item) => {
       if (item.attributes.isGeneral) {
         acc.push({ id: item.id, ...item.attributes });
       }
@@ -220,7 +219,7 @@ if (props.learningPlan.tags.data) {
   );
 
   technicalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
+    (acc: Tag[], item) => {
       if (!item.attributes.isGeneral) {
         acc.push({ id: item.id, ...item.attributes });
       }

@@ -88,7 +88,7 @@ const overviewBoxes = ref<BoxItemType[]>([
 <style scoped lang="scss">
 #Card {
   min-width: 450px;
-  @media (max-width: 950px) {
+  @media (max-width: 1200px) {
     min-width: 380px;
   }
 }

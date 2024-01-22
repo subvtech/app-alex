@@ -22,16 +22,20 @@
             name="competences"
             :search="search"
             :placeholder="placeholder"
-            :filteredItems="filteredTags"
+            :items="filteredTags"
             :update-items="updateTags"
+            return-object
+            @update:model-value="addExistingTag"
+            @input="handleInput"
+            @keydown.enter.stop="createNewTag"
           />
         </div>
 
         <div class="d-flex flex-column align-start gap-2">
           <div :key="rerender" class="d-flex flex-wrap justify-center gap-2">
             <alex-custom-chip
-              v-if="selectedTags.length !== 0"
-              v-for="(tag, index) in selectedTags"
+              v-if="updatedSelectedTags.length !== 0"
+              v-for="(tag, index) in updatedSelectedTags"
               :key="index"
               :text="tag.text"
               variant="outlined"
@@ -54,22 +58,20 @@
 </template>
 
 <script setup lang="ts">
-const { create, find, update, delete: _delete } = useStrapi();
+const { create, update, delete: _delete } = useStrapi();
+const { find } = useStrapiUtils();
 
 const { t } = useI18n();
 const client = useStrapiClient();
 const emit = defineEmits(['update', 'fetch']);
 const { setMessage } = useMessageStore();
-export type CompetenceTag = {
-  text: string;
-  id?: number;
-  verified_by: any;
-  isGeneral: boolean;
-};
+
+const { timeSpan, timeoutId, stopTimeout } = useTimeout(500);
+const { id } = useStrapiUser<User>().value;
 
 const props = defineProps({
-  userTags: {
-    type: Array as PropType<CompetenceTag[]>,
+  selectedTags: {
+    type: Array as PropType<Tag[]>,
     default: () => [],
   },
   title: {
@@ -81,12 +83,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  userId: {
+  relationId: {
     type: Number,
     required: true,
   },
-  learningPlanId: {
-    type: Number,
+  learningplan: {
+    type: Boolean,
+    default: false,
   },
   isGeneral: {
     type: Boolean,
@@ -98,57 +101,58 @@ const props = defineProps({
 const { canEdit } = toRefs(props);
 const isEditing = ref(false);
 
-const search = ref('');
-const selectedTag = ref<CompetenceTag | null>(null);
-const filteredTags = ref<CompetenceTag[]>([]);
-const forbiddenTags = ref<CompetenceTag[]>([]);
-const allTags = ref<any>([]);
+const search = ref<string | null>(null);
+const filteredTags = ref<Tag[]>([]);
 
-const userTagsIds = ref<number[]>([]);
-const selectedTags = ref<CompetenceTag[]>([]);
+const updatedSelectedTags = ref<Tag[]>([...props.selectedTags]);
 const rerender = ref(0);
 
-function filterTags(
-  data: any[],
-  isGeneral: boolean,
-  ids: number[] = [],
-): CompetenceTag[] {
-  return data
-    .filter(
-      (item) => (item.attributes as CompetenceTag).isGeneral === isGeneral,
-    )
-    .filter((item) => !ids.includes(item.id))
+const handleInput = (input: any) => {
+  if (input.data) search.value = input.target.value;
+
+  stopTimeout();
+
+  timeoutId.value = setTimeout(() => {
+    fetchTags();
+  }, timeSpan);
+};
+
+function filterTags(data: any[]): void {
+  filteredTags.value = data
+    .filter((item) => !userTagsIds.value.includes(item.id))
     .map((item, index) => {
-      return { ...item.attributes, id: item.id };
-    }) as CompetenceTag[];
+      return { ...item, title: item.text, id: item.id };
+    }) as Tag[];
 }
 
-onBeforeMount(async () => {
-  allTags.value = await find('tags', {
-    populate: 'verified_by',
-    filters: {
-      isPublic: true,
-    },
-  });
-  userTagsIds.value = props.userTags.map((item) => item.id!);
+const createArray = ref<Tag[]>([]);
+const updateArray = ref<Tag[]>([]);
+const deleteArray = ref<Tag[]>([]);
 
-  selectedTags.value = props.userTags.map((item) => {
-    return { ...item };
-  });
+const fetchTags = async () => {
+  const result = (
+    await find('tags', {
+      filters: {
+        $or: [
+          {
+            verified_by: { id: { $in: [id] } },
+          },
+          {
+            isPublic: true,
+          },
+        ],
+        text: { $containsi: search.value },
+        isGeneral: props.isGeneral,
+      },
+      populate: 'verified_by',
+    })
+  ).data;
 
-  forbiddenTags.value = filterTags(allTags.value.data, !props.isGeneral);
-  filteredTags.value = filterTags(
-    allTags.value.data,
-    props.isGeneral,
-    userTagsIds.value,
-  );
-});
-const createArray = ref<CompetenceTag[]>([]);
-const updateArray = ref<CompetenceTag[]>([]);
-const deleteArray = ref<CompetenceTag[]>([]);
+  filterTags(result);
+};
 
 const removeItem = (tag) => {
-  selectedTags.value = selectedTags.value.filter(
+  updatedSelectedTags.value = updatedSelectedTags.value.filter(
     (item) => item.text !== tag.text,
   );
   if (tag.id) deleteArray.value.push(tag);
@@ -159,112 +163,116 @@ const removeItem = (tag) => {
   updateArray.value = updateArray.value.filter(
     (item) => item.text !== tag.text,
   );
-
-  filteredTags.value.push(tag);
-  selectedTag.value = null;
+  filteredTags.value.push({ ...tag, title: tag.text });
 };
 
 const onCancel = async () => {
-  selectedTags.value = props.userTags.map((item) => {
-    return { ...item };
-  });
-  filteredTags.value = filterTags(
-    allTags.value.data,
-    props.isGeneral,
-    userTagsIds.value,
-  );
+  updatedSelectedTags.value = [...props.selectedTags];
+  filterTags([...props.selectedTags]);
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
   rerender.value += 1;
 };
 
+const userTagsIds = computed(() =>
+  updatedSelectedTags.value.map((item) => item.id!),
+);
+
 const onSave = async () => {
   const promises: Promise<any>[] = [];
 
-  const ids = forbiddenTags.value
-    .map((item) => item.id)
-    .concat(userTagsIds.value);
   if (createArray.value.length !== 0)
     createArray.value
-      .filter((item) => !ids.includes(item.id))
+      .filter((item) => !item.id)
       .forEach((item) => {
+        const commonProps = {
+          ...item,
+          isGeneral: props.isGeneral,
+          isPublic: false,
+        };
         promises.push(
-          create('tags', {
-            ...item,
-            verified_by: props.userId,
-            isGeneral: props.isGeneral,
-            isPublic: false,
-            learningplans: props.learningPlanId
+          create(
+            'tags',
+            props.learningplan
               ? {
-                  connect: [props.learningPlanId],
+                  ...commonProps,
+                  learningplans: {
+                    connect: [props.relationId],
+                  },
                 }
-              : undefined,
-          }),
+              : {
+                  ...commonProps,
+                  verified_by: {
+                    connect: [props.relationId],
+                  },
+                },
+          ),
         );
       });
   if (updateArray.value.length !== 0)
     updateArray.value
-      .filter((item) => !ids.includes(item.id))
+      .filter((item) => item.id)
       .forEach((item) => {
-        promises.push(
-          update(`tags/${item.id}`, {
-            verified_by: {
-              connect: [props.userId],
-            },
-          }),
-        );
+        const temp = props.learningplan
+          ? {
+              learningplans: { connect: [props.relationId] },
+            }
+          : {
+              verified_by: {
+                connect: [props.relationId],
+              },
+            };
+        promises.push(update('tags', item.id, temp as any));
       });
   if (deleteArray.value.length !== 0) {
     deleteArray.value.forEach((element) => {
-      selectedTags.value = selectedTags.value.filter(
+      updatedSelectedTags.value = updatedSelectedTags.value.filter(
         (item) => item.text !== element.text,
       );
     });
+
     promises.push(
-      client(`/users/${props.userId}`, {
-        method: 'PUT',
-        body: {
-          tags: {
-            disconnect: deleteArray.value.map((item) => item.id),
+      client(
+        `${props.learningplan ? 'learningplans' : 'users'}/${props.relationId}`,
+        {
+          method: 'PUT',
+          body: {
+            tags: {
+              disconnect: deleteArray.value.map((item) => item.id),
+            },
           },
         },
-      }),
+      ),
     );
-    if (props.learningPlanId) {
-      promises.push(
-        update(`learningplans/${props.learningPlanId}`, {
-          tags: {
-            disconnect: deleteArray.value.map((item) => item.id),
-          },
-        }),
-      );
-    }
   }
 
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
-  userTagsIds.value = selectedTags.value.map((item) => item.id!);
 
   if (promises.length > 0) {
     await Promise.all(promises);
-    emit(
-      'update',
-      t(
-        `components.competences.${
-          props.isGeneral ? 'general' : 'technical'
-        }.updated`,
-      ),
-    );
+    emit('update');
   }
   rerender.value -= 1;
+};
+
+const addExistingTag = (data) => {
+  if (!data) return;
+
+  updateTags(data);
+};
+
+const createNewTag = (data) => {
+  if (!search.value || search.value === '') return;
+  updateTags({ text: search.value }, true);
 };
 
 const updateTags = (tag, isCreating = false) => {
   if (
     isCreating &&
-    forbiddenTags.value.find((item) => item.text === tag.text)
+    updatedSelectedTags.value.find((item) => item.text === tag.text)
   ) {
     setMessage(t('components.competences.duplicatedText'), 'warning', true);
     return;
@@ -275,7 +283,7 @@ const updateTags = (tag, isCreating = false) => {
   deleteArray.value = deleteArray.value.filter(
     (item) => item.text !== tag.text,
   );
-  const indexFound = selectedTags.value
+  const indexFound = updatedSelectedTags.value
     .map((item) => item.text)
     .indexOf(tag.text);
 
@@ -284,23 +292,18 @@ const updateTags = (tag, isCreating = false) => {
 
     return;
   }
-  selectedTags.value.push(tag);
+  updatedSelectedTags.value.push(tag);
   if (isCreating) createArray.value.push(tag);
   else updateArray.value.push(tag);
-  selectedTag.value = null;
 };
 
 watch(
-  () => selectedTags.value,
+  () => updatedSelectedTags.value,
   () => {
-    selectedTag.value = null;
+    search.value = null;
   },
   { deep: true },
 );
-
-watch(search, () => {
-  emit('fetch');
-});
 </script>
 
 <style scoped lang="scss">

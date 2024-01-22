@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user" id="profile" class="w-100 d-flex overflow-x-hidden">
+  <div v-if="user" id="profile" class="w-100 d-flex flex-column h-100 overflow-x-hidden">
     <alex-custom-breadcrumbs
       v-if="isCurrentUser"
       :title="$t('pages.profile.title')"
@@ -42,6 +42,7 @@
       :user="user"
       :can-edit="isCurrentUser"
       :update-socials="userStore.loadUserSocials"
+      :update-competences="userStore.loadUserTags"
       @update="
         async (data, populateArray, message) =>
           await userStore.updateUser(data, populateArray, message)
@@ -129,64 +130,5 @@ const links = computed<TabType[]>(() => {
 </script>
 
 <style scoped lang="scss">
-#profile {
-  flex-direction: column;
-  font-family: 'Sen';
-  height: 100%;
 
-  .header {
-    justify-content: flex-start;
-    align-items: center;
-    align-self: stretch;
-    height: 44px;
-
-    .title {
-      color: #5d6872;
-      font-size: 24px;
-      font-weight: bold;
-      line-height: 28px;
-      padding-right: 16px;
-    }
-
-    .pages {
-      padding-left: 16px;
-      gap: 12px;
-      align-items: center;
-      border-left: 1px solid #e1e4e7;
-      .go-back {
-        color: #abb2b9;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: normal;
-      }
-
-      .current-page {
-        color: #5d6872;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: normal;
-      }
-    }
-  }
-
-  .content-block {
-    gap: 24px;
-    flex-direction: row;
-  }
-
-  @media (max-width: 1410px) {
-    .competences {
-      flex-direction: column;
-    }
-  }
-
-  @media (max-width: 800px) {
-    .content-block {
-      flex-wrap: wrap;
-    }
-    .details {
-      max-width: none;
-    }
-  }
-}
 </style>
