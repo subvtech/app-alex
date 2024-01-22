@@ -47,3 +47,14 @@ export const getInitials = (name: string) => {
   if (names.length >= 2) return names[0][0] + names[1][0];
   return names[0][0];
 };
+
+export const sortByDate = (array: { date: string | Date }[]) =>
+  array.sort((a, b) => {
+    if (a.date < b.date) {
+      return -1;
+    }
+    if (a.date > b.date) {
+      return 1;
+    }
+    return 0;
+  });

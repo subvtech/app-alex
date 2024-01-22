@@ -34,7 +34,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['trails'],
     },
     tags: true,
-    schedules: true,
+    schedules: {
+      populate: ['meetings'],
+    },
     members: {
       populate: ['user.avatar', 'user.cover'],
     },
@@ -154,6 +156,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
+  const schedules = computed(() => {
+    if (learningPlan.value?.schedules.length === 0) return undefined;
+    return learningPlan.value?.schedules.map((schedule) => {
+      const earliestMeeting = sortByDate(schedule.meetings);
+      return { ...schedule, meetings: earliestMeeting };
+    });
+  });
+
   return {
     learningPlan,
     loadLearningPlan,
@@ -171,5 +181,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     activeInviteLinks,
     standardTrailsCount,
     standardTrails,
+    schedules,
   };
 });
