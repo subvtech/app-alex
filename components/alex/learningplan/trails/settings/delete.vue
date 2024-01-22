@@ -3,13 +3,13 @@
     <div class="card-title">
       <p>
         <span class="header-h4">{{
-          t('components.trails.delete.deleteTrailTitle')
+          t('components.trails.settings.delete.deleteTrailTitle')
         }}</span>
       </p>
     </div>
     <div class="content-body">
       <p>
-        {{ t('components.trails.delete.deleteTrailDescription') }}
+        {{ t('components.trails.settings.delete.deleteTrailDescription') }}
       </p>
     </div>
     <div class="footer-content">
@@ -20,7 +20,7 @@
           variant="error"
           @click="openDialog = true"
         >
-          {{ t('components.trails.delete.deleteButton') }}
+          {{ t('components.trails.settings.delete.deleteButton') }}
           <alex-custom-dialog
             :model-value="openDialog"
             title=""
@@ -42,18 +42,18 @@
                 </span>
                 <p>
                   <span class="header-h4">{{
-                    t('components.trails.delete.deleteConfirmation')
+                    t('components.trails.settings.delete.deleteConfirmation')
                   }}</span>
                   <br />
                   <span class="body-p1">{{
-                    t('components.trails.delete.deleteDescription')
+                    t('components.trails.settings.delete.deleteDescription')
                   }}</span>
                 </p>
                 <div class="label d-flex flex-start w-100">
                   <label for="exclusionLabel" class="body-p1">
-                    {{ t('components.trails.delete.deleteLabel') }}
+                    {{ t('components.trails.settings.delete.deleteLabel') }}
                     <strong>{{
-                      t('components.trails.delete.deleteWord')
+                      t('components.trails.settings.delete.deleteWord')
                     }}</strong>
                   </label>
                 </div>
@@ -63,22 +63,22 @@
                   class="w-100"
                   required
                   :placeholder="
-                    $t('components.trails.delete.deletePlaceholder')
+                    $t('components.trails.settings.delete.deletePlaceholder')
                   "
                 />
               </div>
               <div class="exclusionFooter">
                 <alex-custom-button
                   class="button"
-                  :text="$t('pages.trails.general.cancel')"
+                  :text="$t('components.trails.settings.general.cancel')"
                   variant="secondary"
                   @click="openDialog = false"
                 />
                 <alex-custom-button
                   class="button error"
-                  :text="$t('pages.trails.delete.deleteWord')"
+                  :text="$t('components.trails.settings.delete.deleteWord')"
                   variant="error"
-                  @click="openDialog = false"
+                  @click="removeTrail()"
                 />
               </div>
             </div>
@@ -93,7 +93,19 @@
 </template>
 <script setup lang="ts">
 const openDialog = ref(false);
+const { delete: _delete } = useStrapi();
+const { setMessage } = useMessageStore();
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
+const { courseId, trailId } = route.params;
+
+async function removeTrail() {
+  await _delete('trails', parseInt(trailId.toString()));
+
+  router.push(`/courses/me`);
+  setMessage(t('components.trails.settings.delete.update'), 'green', true);
+}
 </script>
 <style lang="scss" scoped>
 .content-area {
@@ -204,9 +216,5 @@ p {
 }
 .border-bottom {
   border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
-}
-
-.button {
-  color: var(--principais-branco, #fff) !important;
 }
 </style>

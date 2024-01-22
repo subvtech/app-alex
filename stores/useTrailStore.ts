@@ -13,7 +13,7 @@ export const useTrailStore = defineStore('trail', () => {
   const trail = ref();
 
   const { setMessage } = useMessageStore();
-  const i18n = useI18n();
+  // const i18n = useI18n();
 
   const populate = [
     'structures',
@@ -37,7 +37,7 @@ export const useTrailStore = defineStore('trail', () => {
     } catch (e: any) {
       loading.value = false;
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+        setMessage('Trilha não encontrada', 'red', true);
       }
     }
   }
