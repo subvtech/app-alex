@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div id="editorjs" class="editorjs p-6 sm:p-16"></div>
+    <div id="editorjs" class="editorjs w-100" style="max-width: 700px"></div>
   </client-only>
 </template>
 
@@ -305,16 +305,18 @@ const getData = async () => {
   const data = await instance.value.save();
   return data;
 };
-const loadEditor = (data) => {
-  instance.value.isReady.then(async () => {
-    await instance.value.render(data);
-    instance.value.readOnly.toggle();
-  });
+const loadEditor = async (data) => {
+  await instance.value.isReady;
+  await instance.value.render(data);
+  const editorData = await instance.value.save();
+  // toggleReadOnly();
+  return editorData;
 };
 
 const toggleReadOnly = () => {
   instance.value.isReady.then(() => {
     instance.value.readOnly.toggle();
+    console.log(instance.value.readOnly);
   });
 };
 
@@ -324,16 +326,19 @@ const navigateToId = (id) => {
     element.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 };
+
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
   navigateToId,
-  anchors,
 });
 </script>
 
 <style scoped>
+.section {
+  background-color: aqua !important;
+}
 .editorjs >>> .ce-header {
   padding: 0 0 1em;
 }
@@ -354,6 +359,6 @@ defineExpose({
 .editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
   /* max-width: 64rem; */
-  max-width: 95%;
+  max-width: 100%;
 }
 </style>
