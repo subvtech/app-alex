@@ -1,34 +1,37 @@
 <template>
   <alex-custom-card
-    class="mb-6"
     :title="title"
     :isEditing="isEditingAndCanEdit"
     :showIcon="canEdit"
     @toggle:isEditing="toggleIsEditing"
     :cancel="onCancel"
-    :save="() => emit('update', isOptional ? myText : value)"
+    :save="() => emit('update', usingMyText ? myText : value)"
     :disable-save="errorMessage !== undefined"
-    full-width
+    :align-content="displayEmptyPlaceholder ? 'align-center' : 'align-start'"
   >
-    <template v-slot:content class="pa-6">
-      <div class="d-flex flex-column w-100">
+    <template v-slot:content>
+      <div class="d-flex flex-column flex-wrap w-100">
         <alex-custom-empty-placeholder
-          v-if="isTextEmpty && !isOptional && !isEditing"
+          v-if="displayEmptyPlaceholder"
           :empty-text-image="emptyTextImage ?? undefined"
           :empty-text-message="
             emptyTextMessage ?? $t('pages.courses.about.empty')
           "
         />
-        <span
+        <alex-inputs-text-area
           v-else-if="usingMyText"
-          class="about-description"
-          :contenteditable="isEditingAndCanEdit"
-          :data-placeholder="
+          class="w-100"
+          :model-value="myText"
+          variant="solo"
+          name="info"
+          flat
+          :readonly="!isEditingAndCanEdit"
+          :placeholder="
             textPlaceholder ?? $t('pages.courses.about.placeholder')
           "
+          type="text-area"
           @input="updateText"
-          >{{ myText }}</span
-        >
+        />
         <alex-inputs-text-area
           v-else
           v-model="value"
@@ -113,9 +116,13 @@ const usingMyText = computed(
   () => props.isOptional || notOptionalAndNotEditing.value,
 );
 
+const displayEmptyPlaceholder = computed(
+  () => isTextEmpty.value && props.isOptional && !isEditing.value,
+);
+
 const updateText = (event: Event) => {
-  const target = event.target as HTMLSpanElement;
-  myText.value = target.innerText;
+  const target = event.target as HTMLInputElement;
+  myText.value = target.value;
 };
 
 const onCancel = async () => {};
@@ -148,6 +155,9 @@ span[contenteditable='true']:empty::before {
   content: attr(data-placeholder);
   color: #aaa;
 }
+.about-container {
+  max-width: 100%;
+}
 
 .about-description {
   text-align: justify;
@@ -157,7 +167,10 @@ span[contenteditable='true']:empty::before {
   font-size: 16px;
   font-weight: 400;
   line-height: 22px;
+
+  word-wrap: break-word;
   overflow-wrap: break-word;
+  max-width: fit-content;
 
   &:focus {
     outline: none;

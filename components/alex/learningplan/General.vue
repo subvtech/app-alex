@@ -133,7 +133,7 @@
           </div>
         </template>
       </alex-custom-card>
-      <competences
+      <alex-profile-competences
         v-if="
           (generalTags.length === 0 && userIsFacilitator) ||
           generalTags.length !== 0
@@ -148,7 +148,7 @@
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
-      <competences
+      <alex-profile-competences
         v-if="
           (technicalTags.length === 0 && userIsFacilitator) ||
           technicalTags.length !== 0
@@ -167,7 +167,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { CompetenceTag } from '@/components/Competences.vue';
+import { CompetenceTag } from '@/components/alex/profile/Competences.vue';
 import { useI18n } from 'vue-i18n';
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
 import { LearningPlanType } from '~/pages/courses/[id]/index.vue';

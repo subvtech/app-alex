@@ -18,7 +18,9 @@
     <template v-slot:content>
       <div class="gap-3 d-flex flex-column w-100">
         <div v-if="isEditing" class="d-flex flex-column gap-2">
-          <app-autocomplete
+          <alex-inputs-autocomplete
+            name="competences"
+            :search="search"
             :placeholder="placeholder"
             :filteredItems="filteredTags"
             :update-items="updateTags"
@@ -56,7 +58,7 @@ const { create, find, update, delete: _delete } = useStrapi();
 
 const { t } = useI18n();
 const client = useStrapiClient();
-const emit = defineEmits(['update']);
+const emit = defineEmits(['update', 'fetch']);
 const { setMessage } = useMessageStore();
 export type CompetenceTag = {
   text: string;
@@ -95,6 +97,8 @@ const props = defineProps({
 
 const { canEdit } = toRefs(props);
 const isEditing = ref(false);
+
+const search = ref('');
 const selectedTag = ref<CompetenceTag | null>(null);
 const filteredTags = ref<CompetenceTag[]>([]);
 const forbiddenTags = ref<CompetenceTag[]>([]);
@@ -293,6 +297,10 @@ watch(
   },
   { deep: true },
 );
+
+watch(search, () => {
+  emit('fetch');
+});
 </script>
 
 <style scoped lang="scss">

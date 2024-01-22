@@ -41,16 +41,10 @@
     <NuxtPage
       :user="user"
       :can-edit="isCurrentUser"
+      :update-socials="userStore.loadUserSocials"
       @update="
-        async (data, message) => await userStore.updateUser(data, message)
-      "
-      @load="
-        async (data) =>
-          await userStore.loadUserGraphql(
-            route.params.username as string,
-            data.query,
-            data.message,
-          )
+        async (data, populateArray, message) =>
+          await userStore.updateUser(data, populateArray, message)
       "
     />
   </div>

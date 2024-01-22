@@ -12,33 +12,33 @@
         :can-edit="canEdit"
         :socials="user.socials"
         :user-id="user.id"
-        @update="
-          emit('load', {
-            message: $t('components.profile.socials.update'),
-            query: userSocials,
-          })
-        "
+        @update="async () => await updateSocials()"
       />
     </div>
-    <div class="d-flex flex-column w-100 gap-6">
+    <div class="d-flex flex-column w-100 gap-6" style="max-width: 100%">
       <app-about
         :title="$t('components.profile.about.title')"
         :text="user.info"
         :userId="user.id"
         :can-edit="canEdit"
+        is-optional
         :about-text-message="$t('components.profile.about.placeholder')"
         :empty-text-message="$t('components.profile.about.placeholder')"
         @update="
-          emit('update', {
-            message: $t('components.profile.about.update'),
-            query: userInfo,
-          })
+          (data) =>
+            emit(
+              'update',
+              { info: data },
+              [],
+              $t('components.profile.about.updated'),
+            )
         "
       />
       <div
         class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences gap-6"
       >
-        <competences
+        {{ technicalTags }}
+        <alex-profile-competences
           v-if="technicalTags.length !== 0 || canEdit"
           :title="$t('components.competences.technical.title')"
           :label="$t('components.competences.technical.label')"
@@ -46,14 +46,14 @@
           :emptyMessage="$t('components.competences.technical.empty')"
           :userId="user.id"
           :can-edit="canEdit"
-          :userTags="technicalTags"
-          :forbidden-tags="generalTags"
+          :selected-tags="technicalTags"
+          :fetch-tags="fetchGeneralTags"
           @update="
             emit('update', $t('components.competences.technical.updated'))
           "
         />
-        <competences
-          v-if="generalTags.length !== 0 || canEdit"
+        <alex-profile-competences
+          v-if="generalTags.length !== 0 && false && canEdit"
           :title="$t('components.competences.general.title')"
           :label="$t('components.competences.general.label')"
           :placeholder="$t('components.competences.general.placeholder')"
@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { userInfo, userSocials } from '@/assets/queries';
+const { find } = useStrapiUtils();
 const props = defineProps({
   user: {
     type: Object as PropType<User>,
@@ -90,9 +90,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  updateSocials: {
+    type: Function,
+    default: () => {},
+  },
 });
 const { user } = toRefs(props);
-const emit = defineEmits(['update', 'load']);
+const emit = defineEmits(['update']);
 const { setMessage } = useMessageStore();
 
 const generalTags = ref();
@@ -102,5 +106,16 @@ const strapiUser = useStrapiUser<User>().value;
 
 generalTags.value = props.user.tags.filter((item) => item.isGeneral) ?? [];
 technicalTags.value = props.user.tags.filter((item) => !item.isGeneral) ?? [];
+
+const fetchGeneralTags = async (search: string) => {
+  generalTags.value = (
+    await find('tags', {
+      filters: {
+        text: search,
+        isGeneral: true,
+      },
+    })
+  ).data;
+};
 </script>
 <style scoped lang="scss"></style>

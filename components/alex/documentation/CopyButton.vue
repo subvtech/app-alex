@@ -2,11 +2,11 @@
   <alex-custom-button variant="text" color="gray-400" @click="handleClick">
     <v-icon
       v-if="isCopied"
-      size="x-large"
+      :size="iconSize"
       :icon="copiedIcon"
       color="green-lighten-1"
     />
-    <v-icon v-else size="x-large" :icon="copyIcon" />
+    <v-icon v-else :size="iconSize" :icon="copyIcon" />
     <v-tooltip
       v-if="tooltipText"
       :text="tooltipText"
@@ -31,6 +31,12 @@ const props = defineProps({
   copiedIcon: {
     type: String,
     default: 'mdi-clipboard-check-multiple-outline',
+  },
+  iconSize: {
+    type: String as PropType<
+      'x-small' | 'small' | 'medium' | 'large' | 'x-large'
+    >,
+    default: 'large',
   },
 });
 const { copyToClipboard } = useCopyText();

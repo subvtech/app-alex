@@ -1,6 +1,16 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+type PopulateFields =
+  | 'avatar'
+  | 'cover'
+  | 'socials'
+  | 'tags'
+  | 'institutions'
+  | 'user_wallet';
+
+export type UniquePopulateFieldsArray = Array<PopulateFields>;
+
 export const useUserStore = defineStore('user', () => {
   const { update } = useStrapi();
 
@@ -23,7 +33,13 @@ export const useUserStore = defineStore('user', () => {
     user_wallet: true,
   };
 
-  async function updateUser(data, message, showMessage = true) {
+  async function updateUser(
+    data,
+    populateArray: UniquePopulateFieldsArray = [],
+    message,
+    showMessage = true,
+  ) {
+    console.log({ data, populateArray });
     if (!loadedUser.value) return;
     try {
       const result: User = await client(`/users/${loadedUser.value.id}`, {
@@ -31,10 +47,13 @@ export const useUserStore = defineStore('user', () => {
         body: {
           ...data,
         },
+        params: {
+          _populate: populateArray,
+        },
       });
 
       if (showMessage) setMessage(message, 'green', true);
-      console.log( { ...loadedUser.value, ...result })
+      console.log({ ...loadedUser.value, ...result });
       loadedUser.value = { ...loadedUser.value, ...result };
     } catch (e: any) {
       await loadUser(loadedUser.value?.username, '', false);
@@ -46,40 +65,25 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  async function loadUserGraphql(
-    username: string,
-    query: string,
-    message = '',
-    showMessage = true,
-  ) {
-    if (loadedUser.value?.username !== username) return;
+  async function loadUserSocials(showMessage = true) {
+    if (!loadedUser.value) return;
     try {
       loading.value = true;
-
-      console.log(loadedUser.value?.username, username);
-      const result = await graphql<any>(query, {
-        userId: loadedUser.value?.id,
+      const result = await find<SocialItemType>('socials', {
+        filters: {
+          users_permissions_user: loadedUser.value.id,
+        },
       });
-      console.log({ result });
-      loadedUser.value = {
-        ...loadedUser.value,
-        socials: result.data.socials.data.map((item) => ({
-          id: item.id,
-          ...item.attributes,
-        })),
-      };
+      loadedUser.value = { ...loadedUser.value, socials: result.data };
       loading.value = false;
-      if (showMessage) setMessage(message, 'green', true);
-      return loadedUser.value;
+      if (showMessage)
+        setMessage(i18n.t('components.profile.socials.update'), 'green', true);
+      return;
     } catch (e: any) {
       loading.value = false;
-      console.log({ error: e });
-
-      await loadUser(loadedUser.value?.username, '', false);
-      if (!showMessage) return;
-      if (e?.error?.name === 'NotFoundError') {
+      if (e?.error?.name === 'NotFoundError' && showMessage) {
         setMessage(i18n.t('pages.login.notfound'), 'red', true);
-      } else setMessage(e, 'red', true);
+      }
     }
   }
 
@@ -137,7 +141,7 @@ export const useUserStore = defineStore('user', () => {
     updateUser,
     user: loadedUser,
     loadUser,
-    loadUserGraphql,
     setWallet,
+    loadUserSocials,
   };
 });

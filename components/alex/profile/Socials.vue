@@ -124,7 +124,7 @@ const updateArray = ref<{ socialId: number; url: string; name: string }[]>([]);
 const updateDeleteArray = ({ contentData }: AccordionItemType) => {
   if (contentData) {
     sortedSocials.value = sortedSocials.value.filter((item) => {
-      return item.id !== contentData.id;
+      return item.contentData?.id !== contentData.id;
     });
     deleteArray.value.push(contentData.id);
   }
@@ -176,19 +176,20 @@ const updateUrl = ({ url, index, socialId }) => {
   }
 };
 
-const resetArrays = () => {
+const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
-  sortedSocials.value = socials.value.map(({ id, name, url }) => ({
-    title: name,
-    icon: supported.includes(name.toLocaleLowerCase())
-      ? `/svg/${name}.svg`
-      : '/svg/website.svg',
-    contentData: {
-      url: url,
-      id: id,
-    },
-  })) as AccordionItemType[];
+  if (updateSocials)
+    sortedSocials.value = socials.value.map(({ id, name, url }) => ({
+      title: name,
+      icon: supported.includes(name.toLocaleLowerCase())
+        ? `/svg/${name}.svg`
+        : '/svg/website.svg',
+      contentData: {
+        url: url,
+        id: id,
+      },
+    })) as AccordionItemType[];
   isChanged.value = false;
 };
 
@@ -267,15 +268,13 @@ const onSave = async () => {
       promises.push(_delete(`/socials/${item}`));
     });
   }
-  console.log({ connectArray });
   if (connectArray.length !== 0)
     promises.push(
       client(`/users/${userId.value}`, {
         method: 'PUT',
         body: {
           socials: {
-            connect: connectArray,
-            disconnect: deleteArray.value,
+            set: connectArray,
           },
         },
       }),
@@ -287,13 +286,12 @@ const onSave = async () => {
   }
   await Promise.all(promises);
 
-  resetArrays();
+  resetArrays(false);
   emit('update');
 };
 
 const cancel = () => {
   componentKey.value = componentKey.value + 1;
-
   isChanged.value = false;
   resetArrays();
 };
