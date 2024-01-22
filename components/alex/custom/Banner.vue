@@ -332,11 +332,11 @@ watch(selectedOption, () => {
 
   .cover-block {
     position: relative;
-    max-height: 300px;
+    max-height: 360px;
     .cover {
       width: 100%;
       height: auto;
-      max-height: 300px;
+      max-height: 360px;
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       object-fit: cover;
@@ -474,7 +474,7 @@ watch(selectedOption, () => {
         width: 100%;
         height: auto;
         max-width: 100%;
-        max-height: 300px;
+        max-height: 360px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
       }
@@ -513,7 +513,7 @@ watch(selectedOption, () => {
   .user-block {
     .cover-block {
       img {
-        height: 300px !important;
+        height: 360px !important;
         max-height: unset !important;
       }
     }

@@ -1,5 +1,12 @@
 <template>
   <div>
+    <alex-custom-header
+      class="mb-6"
+      :title="$t('pages.classes.breadcrumbs.myCourses')"
+      :items="breadcrumbs"
+      :main-button-text="$t('pages.classes.newCourse')"
+      main-button-icon="mdi-plus"
+    />
     <alex-custom-banner
       v-if="
         learningPlanStore.learningPlan && !route.meta?.hideLearningPlanBanner
@@ -52,13 +59,9 @@ definePageMeta({
 });
 
 const i18n = useI18n();
-
 const user = useStrapiUser<User>();
-
 const route = useRoute();
-
 const learningPlanStore = useLearningPlanStore();
-
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
@@ -112,6 +115,24 @@ const generalLinks: TabType[] = [
     to: learningPlanStore.learningPlan
       ? `/courses/${learningPlanStore.learningPlan?.id}/projects`
       : '',
+  },
+];
+
+const breadcrumbs = [
+  {
+    title: i18n.t('pages.classes.breadcrumbs.home'),
+    href: '/',
+    disabled: true,
+  },
+  {
+    title: i18n.t('pages.classes.breadcrumbs.myCourses'),
+    href: '/courses/me',
+    disabled: false,
+  },
+  {
+    title: learningPlanStore.learningPlan?.title || '',
+    href: `/courses/${learningPlanId.value}`,
+    disabled: false,
   },
 ];
 </script>
