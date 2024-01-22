@@ -44,7 +44,6 @@
                 trailsDescription
               }}</span>
               <alex-custom-chip
-                v-if="page === 3"
                 :text="$t('components.trails.header.chip')"
                 prepend-icon="mdi-check"
                 :size="'x-small'"
@@ -85,10 +84,6 @@ const props = defineProps({
   },
   courseId: {
     type: String,
-    required: true,
-  },
-  page: {
-    type: Number,
     required: true,
   },
 });

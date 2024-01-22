@@ -1,49 +1,19 @@
 <template>
-  <div v-if="trail">
-    <alex-learningplan-trails-header
-      :trails-title="trail.title"
-      :trails-description="trail.description"
-      :trails-cover="coverImage?.url ?? undefined"
-      :page="2"
-      :trail-id="trailId"
-      :course-id="learningPlanId as string"
-      :course-title="learningPlan!.title"
-    />
+  <div>
     <alex-custom-card
-      :title="$t('components.courses.settings.title')"
+      :title="$t('components.trails.settings.title')"
       :show-icon="false"
       :align-content="'align-center'"
     >
       <template #content>
         <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
-          <alex-learningplan-settings-banner
-            :cover="coverImage"
-            @update="uploadCoverImage"
-            @delete="removeCoverImage"
-            outline
+          <alex-learningplan-trails-settings-cover
             namespace="trails"
             full-width
           />
-          <alex-learningplan-settings-trails-general
-            :title="trail.title"
-            :description="trail.description"
-            :trail-id="trailId as any"
-            @update="(data) => emit('update', data)"
-            outline
-            full-width
-          />
-
-          <alex-learningplan-settings-visibility
-            :isHidden="trail.hidden"
-            variant="trails"
-            @update="updateVisibility"
-            outline
-          />
-          <alex-learningplan-settings-delete
-            namespace="trails"
-            outline
-            @update="removeTrail"
-          />
+          <alex-learningplan-trails-settings-general />
+          <alex-learningplan-trails-settings-visibility />
+          <alex-learningplan-trails-settings-delete />
         </div>
       </template>
     </alex-custom-card>
@@ -51,67 +21,22 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-import { BannerImageType } from '@/components/alex/custom/Banner.vue';
-
-const { t } = useI18n();
-const { find, update, delete: _delete } = useStrapi();
-const { setMessage } = useMessageStore();
-const { uploadImage, removeImage } = useUploadedImage();
-
-const emit = defineEmits(['update']);
 
 definePageMeta({
+  middleware: ['load-trail'],
   hideLearningPlanBanner: true,
 });
 
 const route = useRoute();
-const router = useRouter();
+const { courseId, trailId } = route.params;
+const trailStore = useTrailStore();
 
-const { learningPlan } = useLearningPlanStore();
-const { trail: _trail, loadTrailData } = useTrailStore();
-const trail = ref(_trail);
-const { trailId, id } = route.params;
-
-const coverImage = ref<BannerImageType | undefined>(
-  trail?.cover_image?.data
-    ? {
-        id: trail.cover_image.data.id,
-        url: trail.cover_image.data.attributes.url,
-      }
-    : undefined,
-);
-
-const updateVisibility = async (data) => {
-  await update('learningplans', trailId, { ...data });
-  setMessage(t('components.courses.settings.visibility.update'), 'green', true);
+const getTrailData = async () => {
+  await trailStore.loadTrailData(parseInt(trailId.toString()));
 };
 
-async function uploadCoverImage(event: any) {
-  const newImage = await uploadImage(event);
-  coverImage.value = { url: newImage[0].url, id: newImage[0].id };
-  await update('trails', trailId, {
-    cover_image: coverImage.value.id,
-  });
-  emit('update', t('components.trails.settings.cover.update'));
-}
-
-async function removeCoverImage() {
-  if (!coverImage.value) return;
-  await removeImage(coverImage.value.id);
-  coverImage.value = undefined;
-  emit('update', t('components.trails.settings.cover.update'));
-}
-
-async function removeTrail() {
-  await _delete('trails', trailId);
-
-  router.push(route.path);
-  setMessage(t('components.trails.settings.delete.update'), 'green', true);
-}
-
-onBeforeMount(async () => {
-  trail.value = await loadTrailData(parseInt(trailId));
+onMounted(() => {
+  getTrailData();
 });
 </script>
 <style scoped lang="scss">

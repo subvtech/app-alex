@@ -3,7 +3,7 @@
     <div class="card-title">
       <p>
         <span class="header-h4">
-          {{ t('pages.courseSettings.config.courseVisibilityTitle') }}</span
+          {{ t('components.trails.settings.visibilityTitle') }}</span
         >
       </p>
     </div>
@@ -25,13 +25,15 @@
       <span class="action-content-two">
         <alex-custom-button
           class="button"
-          :text="t('components.courses.settings.general.cancel')"
+          :text="t('components.trails.settings.general.cancel')"
           variant="secondary"
+          @click="onCancel"
         />
         <alex-custom-button
           class="button"
-          :text="t('components.courses.settings.general.save')"
+          :text="t('components.trails.settings.general.save')"
           variant="primary"
+          @click="updateVisibility()"
         />
       </span>
     </div>
@@ -39,34 +41,51 @@
 </template>
 <script setup lang="ts">
 const { t } = useI18n();
+const { update } = useStrapi();
+const { setMessage } = useMessageStore();
+const route = useRoute();
+const { courseId, trailId } = route.params;
+const trailStore = useTrailStore();
 
-const isTrail = ref();
+definePageMeta({
+  middleware: ['load-trail'],
+});
+
+const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
+
+const updateVisibility = async () => {
+  await update('trails', parseInt(trailId.toString()), {
+    hidden: activeButton.value,
+  });
+  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
+};
 
 const onCancel = () => {
-  console.log('cancel');
+  activeButton.value = trailStore.trail.hidden ? 'true' : 'false';
 };
-
-const onSave = () => {
-  console.log('save');
-};
-
 const firstButton = ref([
   {
-    label: t('pages.trails.settings.showtrailTitle'),
-    hint: t('pages.trails.settings.showtrailHint'),
-    value: '1',
+    label: t('components.trails.settings.showtrailTitle'),
+    hint: t('components.trails.settings.showtrailHint'),
+    value: 'false',
   },
 ]);
 
 const secondButton = ref([
   {
-    label: t('pages.trails.settings.hideTrailTitle'),
-    hint: t('pages.trails.settings.hideTrailHint'),
-    value: '2',
+    label: t('components.trails.settings.hidetrailTitle'),
+    hint: t('components.trails.settings.hidetrailHint'),
+    value: 'true',
   },
 ]);
 
-const activeButton = ref('1');
+const getTrailData = async () => {
+  await trailStore.loadTrailData(parseInt(trailId.toString()));
+};
+
+onMounted(() => {
+  getTrailData();
+});
 </script>
 <style lang="scss" scoped>
 .content-area {
@@ -100,6 +119,14 @@ const activeButton = ref('1');
   border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
+.header-h4 {
+  color: var(--cinza-cinza-800, #454d54);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.2px;
+}
 .footer-content {
   display: flex;
   padding: 0px 24px;
