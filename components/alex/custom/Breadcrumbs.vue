@@ -12,7 +12,7 @@
     <div class="d-flex align-center">
       <nuxt-link
         v-if="arrowBack && items.length > 1"
-        :to="items[items.length - 2].href"
+        :to="items[items.length - 2].to"
         class="mr-5 arrow-back"
         aria-label="Go Back"
       >
@@ -46,8 +46,8 @@
           class="text-body-3 text-gray-700"
           :disabled="item.disabled"
           :style="[itemStyle ?? '']"
+          :to="item.to"
           :role="item.disabled ? 'breadcrumb-item-disabled' : 'breadcrumb-item'"
-          @click.prevent="navigateTo(item.href)"
         >
           {{ item.title }}
         </v-breadcrumbs-item>
@@ -68,7 +68,7 @@
 defineProps({
   items: {
     type: Array as PropType<
-      { title: string; disabled: boolean; href: string }[]
+      { title: string; disabled?: boolean; to?: string }[]
     >,
     default: () => [],
   },

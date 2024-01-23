@@ -1,5 +1,3 @@
-import { LearningPlanSimple } from './learningPlanSimple.model';
-
 export interface TagSimple {
   id: number;
   text: string;

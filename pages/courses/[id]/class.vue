@@ -510,6 +510,7 @@ onBeforeMount(() => {
     {
       title: 'Home',
       to: '/',
+      disabled: true,
     },
     {
       title: 'Meus Curos',
@@ -520,9 +521,6 @@ onBeforeMount(() => {
         ? learningPlanStore.learningPlan.title
         : 'Curso',
       to: `/courses/${learningPlanId.value}`,
-    },
-    {
-      title: 'Turma',
     },
   ];
 });

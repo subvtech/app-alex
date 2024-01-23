@@ -56,7 +56,7 @@ export interface MeetingPropsType {
   endHour: string;
   shortText?: boolean;
   showOptions?: boolean;
-  id?: string;
+  id?: number;
   dropdownProps?: AlexDropdownItem[];
 }
 

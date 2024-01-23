@@ -156,14 +156,17 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
-  const schedules = computed(() => {
-    if (learningPlan.value?.schedules.length === 0) return undefined;
-    return learningPlan.value?.schedules.map((schedule) => {
-      const earliestMeeting = sortByDate(schedule.meetings);
-      return { ...schedule, meetings: earliestMeeting };
-    });
+  const schedules = computed<LearningPlanScheduleSimple[]>(() => {
+    return (
+      learningPlan.value?.schedules.map((schedule) => {
+        const earliestMeeting: LearningPlanMeetingSimple[] = sortByDate(
+          schedule.meetings,
+        );
+        earliestMeeting[0].earliest = true;
+        return { ...schedule, meetings: earliestMeeting };
+      }) || []
+    );
   });
-
   return {
     learningPlan,
     loadLearningPlan,

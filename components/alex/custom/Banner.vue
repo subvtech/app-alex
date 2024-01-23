@@ -123,12 +123,7 @@
         variant="text"
         :icon="settingsIcon"
         :color="isSettingsRoute ? 'secondary-0' : undefined"
-        @click="
-          () => {
-            emit('select:option', null);
-            navigateTo(settings?.to);
-          }
-        "
+        @click="() => onSelectSettings(settings?.to)"
       />
     </div>
   </div>
@@ -140,7 +135,7 @@ const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
 const route = useRoute();
 const isSettingsRoute = computed(() =>
-  route.name && /(courses)-(id)-(settings)/.test(route.name.toString())
+  route.name?.toString().includes('courses-id-settings')
     ? 'secondary-0'
     : undefined,
 );
@@ -243,7 +238,10 @@ const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
   toRefs(props);
 
 const bannerSelectedOption = toRef(props.selectedOption);
-
+const onSelectSettings = (to?: string) => {
+  emit('select:option', null);
+  navigateTo(to);
+};
 const cover = ref<Partial<Upload> | null | undefined>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {

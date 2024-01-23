@@ -18,7 +18,7 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/breadcrumbs/"
+          to="https://vuetifyjs.com/en/components/breadcrumbs/"
           target="_blank"
           >vuetifyjs.com</a
         >
@@ -71,9 +71,9 @@
         <alex-custom-breadcrumbs
           title="John Doe"
           :items="[
-            { disabled: false, title: 'text', href: '/' },
-            { disabled: false, title: 'text2', href: '/dsd' },
-            { disabled: true, title: 'text3', href: '/dsd2' },
+            { disabled: false, title: 'text', to: '/' },
+            { disabled: false, title: 'text2', to: '/dsd' },
+            { disabled: true, title: 'text3', to: '/dsd2' },
           ]"
         />
       </div>
@@ -108,8 +108,8 @@
           title="John Doe"
           background-color="#abb2b9"
           :items="[
-            { disabled: false, title: 'text', href: '/' },
-            { disabled: false, title: 'fext2', href: '/dsd' },
+            { disabled: false, title: 'text', to: '/' },
+            { disabled: false, title: 'fext2', to: '/dsd' },
           ]"
         />
       </div>
@@ -146,8 +146,8 @@
           titleStyle="color: #000"
           :thickness="5"
           :items="[
-            { disabled: false, title: 'text1', href: '/' },
-            { disabled: true, title: 'text', href: '/dsd' },
+            { disabled: false, title: 'text1', to: '/' },
+            { disabled: true, title: 'text', to: '/dsd' },
           ]"
         />
       </div>
@@ -185,8 +185,8 @@
           divider="@"
           :thickness="3"
           :items="[
-            { disabled: false, title: 'text1', href: '/' },
-            { disabled: true, title: 'text', href: '/dsd' },
+            { disabled: false, title: 'text1', to: '/' },
+            { disabled: true, title: 'text', to: '/dsd' },
           ]"
         />
       </div>
@@ -226,10 +226,10 @@
           overwrite-divider
           :thickness="3"
           :items="[
-            { disabled: false, title: 'text1', href: '/' },
-            { disabled: true, title: 'text', href: '/dsd' },
-            { disabled: false, title: 'text4', href: '/' },
-            { disabled: true, title: 'text3', href: '/dsd' },
+            { disabled: false, title: 'text1', to: '/' },
+            { disabled: true, title: 'text', to: '/dsd' },
+            { disabled: false, title: 'text4', to: '/' },
+            { disabled: true, title: 'text3', to: '/dsd' },
           ]"
         >
           <template v-slot:divider>
@@ -269,9 +269,9 @@
           breadcrumbs-v-classes="pt-2 flex-wrap"
           item-style="font-size: 18px; !important"
           :items="[
-            { disabled: true, title: 'text', href: '/' },
-            { disabled: false, title: 'fext2', href: '/dsd' },
-            { disabled: true, title: 'text', href: '/' },
+            { disabled: true, title: 'text', to: '/' },
+            { disabled: false, title: 'fext2', to: '/dsd' },
+            { disabled: true, title: 'text', to: '/' },
           ]"
         />
         <div class="px-3" style="position: relative">
@@ -296,8 +296,9 @@
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in propsDocumentation"
+        :key="index"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -344,15 +345,15 @@ const examples = [
   `<alex-custom-breadcrumbs
     title="John Doe"
     :items="[
-          { disabled: false, title: 'text', href: '/' },
-          { disabled: false, title: 'fext2', href: '/dsd' },
+          { disabled: false, title: 'text', to: '/' },
+          { disabled: false, title: 'fext2', to: '/dsd' },
         ]",
     />`,
   `<alex-custom-breadcrumbs
     :arrow-back="false"
     :items="[
-      { disabled: false, title: 'text', href: '/' },
-      { disabled: false, title: 'text2', href: '/' },
+      { disabled: false, title: 'text', to: '/' },
+      { disabled: false, title: 'text2', to: '/' },
     ]"
     />
      `,
@@ -360,8 +361,8 @@ const examples = [
       title="John Doe"
       background-color="#abb2b9"
       :items="[
-        { disabled: false, title: 'text', href: '/' },
-        { disabled: false, title: 'fext2', href: '/dsd' },
+        { disabled: false, title: 'text', to: '/' },
+        { disabled: false, title: 'fext2', to: '/dsd' },
       ]"
     /> `,
   ` <alex-custom-breadcrumbs
@@ -369,8 +370,8 @@ const examples = [
       background-color="#abb2b9"
       :thickness="5"
       :items="[
-        { disabled: false, title: 'text1', href: '/' },
-        { disabled: true, title: 'text', href: '/dsd' },
+        { disabled: false, title: 'text1', to: '/' },
+        { disabled: true, title: 'text', to: '/dsd' },
       ]"
     />`,
   `<alex-custom-breadcrumbs
@@ -379,8 +380,8 @@ const examples = [
       divider="@"
       :thickness="3"
       :items="[
-        { disabled: false, title: 'text1', href: '/' },
-        { disabled: true, title: 'text', href: '/dsd' },
+        { disabled: false, title: 'text1', to: '/' },
+        { disabled: true, title: 'text', to: '/dsd' },
       ]"
     />`,
   `<alex-custom-breadcrumbs
@@ -390,10 +391,10 @@ const examples = [
       overwrite-divider
       :thickness="3"
       :items="[
-        { disabled: false, title: 'text1', href: '/' },
-        { disabled: true, title: 'text', href: '/dsd' },
-        { disabled: false, title: 'text4', href: '/' },
-        { disabled: true, title: 'text3', href: '/dsd' },
+        { disabled: false, title: 'text1', to: '/' },
+        { disabled: true, title: 'text', to: '/dsd' },
+        { disabled: false, title: 'text4', to: '/' },
+        { disabled: true, title: 'text3', to: '/dsd' },
       ]"
     >
       <template v-slot:divider>
@@ -410,9 +411,9 @@ const examples = [
       :divider="'-'"
       item-style="font-size: 18px; !important"
       :items="[
-        { disabled: true, title: 'text', href: '/' },
-        { disabled: false, title: 'fext2', href: '/dsd' },
-        { disabled: true, title: 'text', href: '/' },
+        { disabled: true, title: 'text', to: '/' },
+        { disabled: false, title: 'fext2', to: '/dsd' },
+        { disabled: true, title: 'text', to: '/' },
       ]"
     />`,
 ];
@@ -420,7 +421,7 @@ const examples = [
 const propsDocumentation = [
   {
     name: 'items',
-    type: '{ title: string; disabled: boolean; href: string }[]',
+    type: '{ title: string; disabled: boolean; to: string }[]',
     default: '[]',
     description: 'O array de items a ser exibido.',
   },

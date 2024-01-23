@@ -5,18 +5,8 @@
     :owner="learningPlanStore.facilitator!"
     :invitation-link="learningPlanStore.invitationLink"
     :can-edit="learningPlanStore.userIsFacilitator"
-    :schedules="
-      learningPlanStore.schedules?.map((item) => {
-        return {
-          id: String(item.id),
-          startHour: format(new Date(item.startDate), 'HH:mm'),
-          endHour: format(new Date(item.endDate), 'HH:mm'),
-          interval: item.interval as 0 | 1 | 7 | 14 | 30,
-          date: new Date(item.meetings[0].date),
-        };
-      })
-    "
-    @update="(data) => updateCourse(true, data)"
+    :schedules="schedules"
+    @update="(message) => updateCourse(true, message)"
   />
 </template>
 
@@ -32,8 +22,43 @@ const i18n = useI18n();
 const route = useRoute();
 const id = Number(route.params.id);
 
+const schedules = computed(
+  () =>
+    learningPlanStore.schedules?.map((item) => {
+      const earliestMeeting = item.meetings.find((meeting) => meeting.earliest);
+      return {
+        id: item.id,
+        startHour: format(new Date(item.startDate), 'HH:mm'),
+        endHour: format(new Date(item.endDate), 'HH:mm'),
+        interval: item.interval,
+        date: earliestMeeting?.date
+          ? new Date(earliestMeeting.date)
+          : new Date(),
+      };
+    }),
+);
+const headerStore = usePageHeaderStore();
 onBeforeMount(async () => {
   await updateCourse(false);
+  headerStore.showHeader = true;
+  headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
+  headerStore.items = [
+    {
+      title: i18n.t('pages.classes.breadcrumbs.home'),
+      to: '/',
+      disabled: true,
+    },
+    {
+      title: i18n.t('pages.classes.breadcrumbs.myCourses'),
+      to: '/courses/me',
+      disabled: false,
+    },
+    {
+      title: learningPlanStore.learningPlan?.title || '',
+      to: `/courses/${learningPlanStore.learningPlan?.id}`,
+      disabled: false,
+    },
+  ];
 });
 
 const updateCourse = async (show = true, message?: string) => {

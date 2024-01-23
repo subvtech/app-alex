@@ -1,4 +1,5 @@
 // Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
+import { compareDesc } from 'date-fns';
 export type ElementType<T extends ReadonlyArray<unknown>> =
   T extends ReadonlyArray<infer ElementType> ? ElementType : never;
 
@@ -48,13 +49,5 @@ export const getInitials = (name: string) => {
   return names[0][0];
 };
 
-export const sortByDate = (array: { date: string | Date }[]) =>
-  array.sort((a, b) => {
-    if (a.date < b.date) {
-      return -1;
-    }
-    if (a.date > b.date) {
-      return 1;
-    }
-    return 0;
-  });
+export const sortByDate = <T extends { date: string | Date }>(array: T[]) =>
+  array.sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
