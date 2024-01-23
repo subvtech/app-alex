@@ -290,11 +290,14 @@ onMounted(() => {
     holder: 'editorjs',
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
-    onReady: () => {
-      /* eslint-disable-next-line */
-      new DragDrop(instance.value);
-      /* eslint-disable-next-line */
-      new Undo({ editor: instance.value });
+    onReady: async () => {
+      const data = await instance.value.save();
+      if (data.blocks.length > 0) {
+        /* eslint-disable-next-line */
+        new DragDrop(instance.value);
+        /* eslint-disable-next-line */
+        new Undo({ editor: instance.value });
+      }
       emit('ready');
     },
     onChange: () => emit('change'),
@@ -309,14 +312,12 @@ const loadEditor = async (data) => {
   await instance.value.isReady;
   await instance.value.render(data);
   const editorData = await instance.value.save();
-  // toggleReadOnly();
   return editorData;
 };
 
 const toggleReadOnly = () => {
   instance.value.isReady.then(() => {
     instance.value.readOnly.toggle();
-    console.log(instance.value.readOnly);
   });
 };
 

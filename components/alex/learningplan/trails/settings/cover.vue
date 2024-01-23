@@ -14,6 +14,7 @@
         :style="{
           backgroundImage: 'url(' + trailStore.trail.cover_image.url + ')',
           backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }"
       >
         <alex-custom-button

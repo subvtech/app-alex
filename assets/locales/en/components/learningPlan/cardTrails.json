@@ -2,8 +2,8 @@
     "options": "Options",
     "configurations": "Configurations",
     "visibility": {
-        "show": "Show",
-        "hide": "Hide"
+      "show": "Show",
+      "hide": "Hide"
     },
     "copy": "Copy",
     "hidden": "Hidden",
@@ -12,5 +12,14 @@
     "document": "Document",
     "documents": "Documents",
     "video": "Video",
-    "videos": "Videos"
-}
+    "videos": "Videos",
+    "header": "Header",
+    "headers": "Headers",
+    "image": "Image",
+    "images": "Images",
+    "paragraph": "Paragraph",
+    "paragraphs": "Paragraphs",
+    "link": "Link",
+    "links": "Links"
+  }
+  

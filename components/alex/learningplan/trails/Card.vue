@@ -202,7 +202,7 @@ const listBlocks = computed(() => {
   if (blocksInfo.value) {
     for (const [key, value] of Object.entries(blocksInfo.value)) {
       stringBlocks += `${value} ${t(
-        `components.learningPlan.cardTrails.${key}`,
+        `components.learningPlan.cardTrails.${key + (value > 1 ? 's' : '')}`,
       )}; `;
     }
   }

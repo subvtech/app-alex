@@ -10,7 +10,7 @@
       :trails-title="trailsTitle"
     /> -->
     <div class="bg-white rounded w-100" style="flex: 1">
-      <div id="Início" class="d-flex justify-end px-6 pt-6">
+      <div id="Início" section="0" class="d-flex justify-end px-6 pt-6">
         <alex-custom-button
           v-if="readOnly && professorMode"
           variant="primary"
@@ -143,8 +143,6 @@ const editorData = ref({
   blocks: [],
 });
 
-const isNavigating = ref(false);
-
 const backUpEditorData = ref({});
 const { trailId, id } = route.params;
 const { isProfessor } = useStrapiUser<User>().value;
@@ -188,8 +186,8 @@ onMounted(async () => {
   if (editorData.value.blocks.length > 0) {
     await loadEditor();
     setSections();
-    toggleReadOnly();
   }
+  toggleReadOnly();
 });
 
 const sections = ref([
@@ -242,17 +240,13 @@ const setSections = () => {
     }
     const element = document.querySelector(`[data-id="${block.id}"]`);
     if (element) {
-      element.setAttribute('id', newSections.length - 1);
+      element.setAttribute('section', String(newSections.length - 1));
     }
   });
   sections.value = newSections;
 };
 
-const navigateToSection = async (title: string) => {
-  if (isNavigating.value) return;
-  isNavigating.value = true;
-  const index = sections.value.findIndex((item) => item.title === title);
-  activeSection.value = index;
+const navigateToSection = (title: string) => {
   if (title === 'Início') {
     const element = document.getElementById(title);
     if (element) {
@@ -263,9 +257,6 @@ const navigateToSection = async (title: string) => {
       });
     }
   } else editor.value.navigateToId(title);
-  setTimeout(() => {
-    isNavigating.value = false;
-  }, 1000);
 };
 
 const loadEditor = async () => {
@@ -348,13 +339,10 @@ const observerConfig = {
 
 const handleIntersection = (entries) => {
   entries.forEach((entry) => {
-    if (
-      activeSection.value !== entry.target.id &&
-      entry.isIntersecting &&
-      !isNavigating.value
-    ) {
+    const entrySection = parseInt(entry.target.getAttribute('section'));
+    if (activeSection.value !== entrySection && entry.isIntersecting) {
       if (entry.target.id === 'Início') return (activeSection.value = 0);
-      activeSection.value = entry.target.id;
+      activeSection.value = entrySection;
     }
   });
 };
@@ -392,7 +380,7 @@ const setObserver = () => {
   max-width: 240px;
   position: -webkit-sticky;
   position: sticky;
-  top: 65px;
+  top: 88px;
   z-index: 1;
 }
 
@@ -411,10 +399,16 @@ const setObserver = () => {
   vertical-align: middle;
   cursor: pointer;
   border-left: 1px solid #d2d6da;
-  transition: all 0.3s ease-in;
+  transition: all 0.2s ease-in;
 }
-.section-text-default:hover {
-  background-color: #ebedef;
-  color: #30363b !important;
+.section-text-default {
+  &:hover {
+    background-color: #ebedef;
+    color: #30363b !important;
+  }
+  &:active {
+    background-color: #d2d6da;
+    color: #30363b !important;
+  }
 }
 </style>

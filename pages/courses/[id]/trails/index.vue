@@ -47,8 +47,7 @@
           alt="Empty Projects"
         />
         <p class="text-h3 text-gray-400 mt-4">
-          <!-- {{ $t('pages.classes.emptyStateText') }} -->
-          Parece que não há trilhas criadas
+          {{ $t('pages.trails.emptyStateText') }}
         </p>
       </div>
     </div>
@@ -66,14 +65,14 @@
           <div class="d-flex ga-6 flex-wrap w-100 card-container">
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
-              :key="item.raw.name + index"
+              :key="item.raw.title + index"
               :hide="item.raw.hidden"
-              :name="item.raw.name"
+              :name="item.raw.title"
               :description="item.raw.description"
               :image="{
-                url: item.raw.image.url,
+                url: item.raw?.cover_image?.url,
               }"
-              :blocks="item.raw.blocks !== undefined ? item.raw.blocks : []"
+              :blocks="item.raw.blocks"
               class="flex-stretch"
               @toggle-visibility="changeItemVisibility(index, item.raw.id)"
               @configurations="navigate(item.raw.id, 'settings')"
@@ -118,7 +117,6 @@ const emit = defineEmits(['update']);
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const graphql = useStrapiGraphQL();
 const { update } = useStrapi();
 
 const search = ref('');
@@ -131,10 +129,10 @@ const learningStructure = ref(null);
 
 interface trail {
   id?: number;
-  name: string;
+  title: string;
   description: string;
   hidden: boolean;
-  image: {
+  cover_image: {
     url: string;
   };
   blocks: [
@@ -145,47 +143,23 @@ interface trail {
 }
 
 const trails = ref<trail[]>([]);
-const { learningPlan } = useLearningPlanStore();
+const learningPlanStore = useLearningPlanStore();
+const trailsData = learningPlanStore.learningPlan?.learning_structures.filter(
+  (structure) => structure.type === 'standard',
+);
+
+// console.log(trailsData[0].trails);
 
 const { isProfessor } = useStrapiUser<User>().value;
-const getCourses = async () => {
+const getCourses = () => {
   professorMode.value = isProfessor;
   emit('update');
   isLoading.value = true;
-  const { data } = await useAsyncData('learningPlan', () => {
-    const params = { learningPlanId: learningPlan!.id };
-    return graphql<{
-      data: {
-        learningplans: Strapi4ResponseMany<LearningPlan>;
-      };
-    }>(GetTrails, params);
+  trailsData[0].trails.forEach((trail) => {
+    trail.blocks = trail.structures[trail.structures.length - 1]?.blocks ?? [];
+    trails.value.push(trail);
+    console.log(trail);
   });
-  learningStructure.value =
-    data.value?.data.learningplan.data?.attributes.learning_structures?.data[0]
-      .id;
-  trails.value = [];
-  data.value?.data.learningplan.data?.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
-    (trail) => {
-      if (trail.attributes)
-        trails.value.push({
-          name: trail.attributes.title,
-          description: trail.attributes.description,
-          hidden: trail.attributes.hidden,
-          image: {
-            url: trail.attributes.cover_image.data?.attributes.url,
-          },
-          blocks:
-            trail.attributes.structures.data[0]?.attributes.blocks.data.map(
-              (block) => {
-                return {
-                  type: block.attributes.type,
-                };
-              },
-            ),
-          id: trail.id,
-        });
-    },
-  );
   isLoading.value = false;
 };
 // eslint-disable camelcase
@@ -222,21 +196,23 @@ const changeItemVisibility = (index: number, id) => {
   }
 };
 
-const isJoinRoutePath = computed(() => {
-  return route.name === 'courses-id-join-hash';
-});
+// const isJoinRoutePath = computed(() => {
+//   return route.name === 'courses-id-join-hash';
+// });
 
-const learningPlanId = computed(() => {
-  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
+// const learningPlanId = computed(() => {
+//   if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
 
-  return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
-});
+//   return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
+// });
+
+const { id, trailID } = route.params;
 
 const navigate = (trailId: number, page) => {
   if (page === 'settings') {
-    router.push(`/courses/${learningPlanId.value}/trails/${trailId}/settings/`);
+    router.push(`/courses/${id}/trails/${trailId}/settings/`);
   } else {
-    router.push(`/courses/${learningPlanId.value}/trails/${trailId}/`);
+    router.push(`/courses/${id}/trails/${trailId}/`);
   }
 };
 

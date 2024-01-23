@@ -206,8 +206,10 @@ const tabs = [
     flex-direction: column;
   }
   .trailImg {
-    width: 100% !important;
+    width: 85% !important;
     height: auto !important;
+    max-height: 400px !important;
+    max-width: fit-content !important;
   }
   .header-img {
     max-width: 100%;

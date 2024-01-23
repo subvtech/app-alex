@@ -1,3 +1,4 @@
+import { Structure } from './../models/structure.model';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
@@ -31,8 +32,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['group_members.student_member.user.avatar'],
     },
     learning_structures: {
-      populate: ['trails'],
+      populate: ['trails', 'trails.cover_image', 'trails.structures.blocks'],
     },
+
     tags: true,
     schedules: true,
     members: {
@@ -92,9 +94,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
 
   const standardTrails = computed(() => {
     let counter = 0;
-    learningPlan.value?.learning_structures.filter(structure => structure.type === 'standard').forEach(item => {
-      counter += item.trails.length
-    } )
+    learningPlan.value?.learning_structures
+      .filter((structure) => structure.type === 'standard')
+      .forEach((item) => {
+        counter += item.trails.length;
+      });
     return counter;
   });
 
@@ -163,6 +167,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsActiveMember,
     userIsPendingMember,
     activeInviteLinks,
-    standardTrails
+    standardTrails,
   };
 });
