@@ -56,7 +56,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { watch } from 'vue';
+import { TabType } from '@/components/alex/custom/Tabs.vue';
 const router = useRouter();
 const props = defineProps({
   trailsTitle: {
@@ -103,7 +103,7 @@ watch(activePage, () => {
     router.push(`${router.currentRoute.value.fullPath}settings`);
   }
 });
-const tabs = [
+const tabs: TabType[] = [
   { label: 'Visão Geral', value: '0' },
   { label: 'Tarefas', value: '1' },
   { icon: 'mdi-cog-outline', label: '', value: '2' },

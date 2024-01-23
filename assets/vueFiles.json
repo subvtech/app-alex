@@ -1,0 +1,203 @@
+[
+  {
+    "namespaces": [
+      "custom",
+      "accordion"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "AppUserAvatar"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "AvatarGroup"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Banner"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Breadcrumbs"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Button"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Carousel"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Chip"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Dialog"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Drawable"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Dropdown"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "EmptyPlaceholder"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Header"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "HorizontalBar"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Info"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "list-item",
+      "index"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "list-item",
+      "User"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Pagination"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Tabs"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Tooltip"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "autocomplete"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "checkbox"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "date"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "radio-button"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "select"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "stepper"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "text-area"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "text-field"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "trails",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "institution"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "wallet"
+    ]
+  }
+]

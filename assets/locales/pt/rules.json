@@ -105,6 +105,7 @@
       "beforeStartHour": "Hora de término deve ser maior que início"
     },
     "copy": {
+      "hint": "Copiar Texto",
       "success": "Texto copiado.",
       "error": "Não foi possível copiar o texto."
     }

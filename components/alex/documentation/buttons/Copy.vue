@@ -1,19 +1,10 @@
 <template>
-  <alex-custom-button variant="text" color="gray-400" @click="handleClick">
-    <v-icon
-      v-if="isCopied"
-      :size="iconSize"
-      :icon="copiedIcon"
-      color="green-lighten-1"
-    />
-    <v-icon v-else :size="iconSize" :icon="copyIcon" />
-    <v-tooltip
-      v-if="tooltipText"
-      :text="tooltipText"
-      location="top"
-      activator="parent"
-    />
-  </alex-custom-button>
+  <alex-documentation-buttons-tooltip
+    :tooltip-text="tooltipText ?? $t('rules.meeting.copy.hint')"
+    :icon="isCopied ? copiedIcon : copyIcon"
+    :variant="isCopied ? 'success' : 'text'"
+    @click:button="handleClick"
+  />
 </template>
 <script setup lang="ts">
 const props = defineProps({
@@ -31,12 +22,6 @@ const props = defineProps({
   copiedIcon: {
     type: String,
     default: 'mdi-clipboard-check-multiple-outline',
-  },
-  iconSize: {
-    type: String as PropType<
-      'x-small' | 'small' | 'medium' | 'large' | 'x-large'
-    >,
-    default: 'large',
   },
 });
 const { copyToClipboard } = useCopyText();
@@ -67,4 +52,8 @@ function handleKeyDown(event) {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.rounded {
+  border-radius: 99%;
+}
+</style>

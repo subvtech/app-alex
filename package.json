@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "node assets/listDocumentation.js && nuxt build",
     "dev": "nuxt dev",
     "test": "vitest --watch",
     "test:coverage": "vitest --coverage",

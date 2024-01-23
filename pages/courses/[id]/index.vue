@@ -33,7 +33,6 @@
 import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 
-import { CompetenceTag } from '~/components/Competences.vue';
 import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
@@ -53,7 +52,7 @@ export type LearningPlanType = {
   hidden: boolean;
   cover_image: { data: { id: number; attributes: BannerImageType } | null };
   trails: any;
-  tags: { data: { id: number; attributes: CompetenceTag }[] };
+  tags: { data: { id: number; attributes: Tag }[] };
   details: any;
   members: { data: any[] };
   media: any;

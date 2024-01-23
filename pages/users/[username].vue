@@ -60,6 +60,7 @@ import { useI18n } from 'vue-i18n';
 import { TabType } from '~/components/alex/custom/Tabs.vue';
 const i18n = useI18n();
 const route = useRoute();
+const router = useRouter();
 
 const { id } = useStrapiUser<User>().value;
 definePageMeta({
@@ -70,6 +71,8 @@ const userStore = useUserStore();
 const { user, isCurrentUser } = toRefs(userStore);
 
 await userStore.loadUser(route.params.username as string, '', false);
+if (!user.value) router.push('/');
+
 const showSettings = ref(true);
 
 const selectedOption = ref(0);

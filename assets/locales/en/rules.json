@@ -105,6 +105,7 @@
       "beforeStartHour": "End hour must be after start Hour"
     },
     "copy": {
+      "hint": "Copy Text",
       "success": "Text copied to clipboard",
       "error": "Couldn't copy to clipboard"
     }
