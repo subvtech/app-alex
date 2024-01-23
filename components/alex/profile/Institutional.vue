@@ -41,7 +41,7 @@
               :index="index"
               :acronym="element.acronym"
               :sector="element.sector"
-              :url="element.cover.url"
+              :url="element.cover?.url"
               :institutionId="element.id"
               :name="element.name"
               :isDeleted="deleteArray.includes(element.id)"
@@ -63,16 +63,14 @@
 
 <script setup lang="ts">
 import draggable from 'vuedraggable';
-import { InstitutionsType } from '../alex/inputs/Institutions.vue';
 
 const searchInstitutions = ref<InstitutionsType[]>([]);
 const search = ref('');
 const isEditing = ref(false);
-const i18n = useI18n();
 const componentKey = ref(0);
 
 const client = useStrapiClient();
-const emit = defineEmits(['update:user']);
+const emit = defineEmits(['update']);
 
 const props = defineProps({
   institutions: {
@@ -88,7 +86,7 @@ const props = defineProps({
     default: false,
   },
 });
-const { userId, canEdit } = toRefs(props);
+const { canEdit } = toRefs(props);
 
 const findInstitution = (selectedId) => {
   return sortedInstitutions.value.find((item) => item.id === selectedId);
@@ -103,7 +101,7 @@ const updateSelectedOption = (selectedId) => {
     return;
 
   const selectedInstitution = searchInstitutions.value.find(
-    (item) => (item.id = selectedId),
+    (item) => item.id == selectedId,
   );
   if (!selectedInstitution) return;
   if (!findInstitution(selectedId)) {
@@ -158,8 +156,6 @@ const onSave = async () => {
       }
     });
     if (!deleteArray.value.includes(sortedInstitutions.value[0].id)) {
-      if (sortedInstitutions.value.length <= deleteArray.value.length)
-        sortedInstitutions.value = [];
       connectArray.push({
         id: sortedInstitutions.value[0].id,
         position: { start: true },
@@ -167,7 +163,7 @@ const onSave = async () => {
     }
   }
 
-  await client(`/users/${userId.value}`, {
+  await client(`/users/${props.userId}`, {
     method: 'PUT',
     body: {
       institutions: {
@@ -176,7 +172,8 @@ const onSave = async () => {
       },
     },
   });
-  emit('update:user');
+
+  emit('update');
   deleteArray.value = [];
 };
 
@@ -184,6 +181,7 @@ const onCancel = () => {
   componentKey.value = componentKey.value + 1;
   deleteArray.value = [];
   sortedInstitutions.value = [...props.institutions];
+  searchInstitutions.value = [];
 };
 </script>
 

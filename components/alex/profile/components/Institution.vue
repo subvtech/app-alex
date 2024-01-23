@@ -5,7 +5,7 @@
     "
   >
     <div class="d-flex gap-3">
-      <NuxtImg provider="strapi" :src="url" placeholder />
+      <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
       <div class="d-flex flex-column justify-center">
         <span>{{ acronym + ' - ' + name }}</span>
         <p>{{ sector }}</p>
@@ -32,7 +32,6 @@ const emit = defineEmits(['delete:institution']);
 const props = defineProps({
   url: {
     type: String,
-    required: true,
   },
   name: {
     type: String,

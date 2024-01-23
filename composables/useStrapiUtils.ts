@@ -48,7 +48,7 @@ export const useStrapiUtils = () => {
     const formattedResult = result.data
       ? result.data.map(formatResult<T>)
       : (result as unknown as T[]);
-      
+
     return {
       meta: result.meta,
       data: formattedResult,

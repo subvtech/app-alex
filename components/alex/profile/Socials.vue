@@ -31,6 +31,7 @@
                   :name="title"
                   :url="url"
                   :index="index"
+                  :social-id="sortedSocials[index]?.contentData?.id"
                   @error="disableSave = true"
                   @no:error="disableSave = false"
                   @update:url="updateUrl"
@@ -111,21 +112,25 @@ const addSocial = async ({ name, url, selectedSocial }) => {
       title: includesTitle ? undefined : title,
       url,
     },
+    id: sortedSocials.value.length + 1,
   };
 
   sortedSocials.value.push(addedSocial);
 
   isAdding.value = false;
   isChanged.value = true;
+  componentKey.value += 1;
 };
 const deleteArray = ref<number[]>([]);
 const updateArray = ref<{ socialId: number; url: string; name: string }[]>([]);
 
 const updateDeleteArray = ({ contentData }: AccordionItemType) => {
   if (contentData) {
-    sortedSocials.value = sortedSocials.value.filter((item) => {
-      return item.contentData?.id !== contentData.id;
-    });
+    sortedSocials.value = sortedSocials.value
+      .filter((item) => {
+        return item.contentData?.id !== contentData.id;
+      })
+      .map((item, index) => ({ ...item, id: index + 1 }));
     deleteArray.value.push(contentData.id);
   }
   isChanged.value = true;
@@ -163,8 +168,6 @@ const updateUrl = ({ url, index, socialId }) => {
     ...sortedSocials.value[validIndex],
     contentData: { url },
   };
-  console.log({ updateArray: updateArray.value });
-
   if (updateArray.value.find((item) => item.socialId === socialId))
     updateArray.value[validIndex].url = url;
   else {
@@ -181,7 +184,7 @@ const resetArrays = (updateSocials = true) => {
   updateArray.value = [];
   if (updateSocials)
     sortedSocials.value = socials.value.map(({ id, name, url }) => ({
-      title: name,
+      title: name.toUpperCase(),
       icon: supported.includes(name.toLocaleLowerCase())
         ? `/svg/${name}.svg`
         : '/svg/website.svg',
@@ -274,7 +277,8 @@ const onSave = async () => {
         method: 'PUT',
         body: {
           socials: {
-            set: connectArray,
+            connect: connectArray,
+            deleteArray: deleteArray.value,
           },
         },
       }),

@@ -35,7 +35,7 @@
         "
       />
       <div
-        class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row mb-6 competences gap-6"
+        class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row competences gap-6"
       >
         <alex-profile-competences
           v-if="technicalTags.length !== 0 || canEdit"
@@ -66,18 +66,17 @@
         />
       </div>
       <alex-profile-institutional
-        v-if="user.institutions.length !== 0 || canEdit"
-        :institutions="user.institutions"
+        v-if="institutions.length !== 0 || canEdit"
+        :institutions="institutions"
         :userId="user.id"
         :can-edit="canEdit"
-        @update="emit('update')"
+        @update="async () => await updateInstitutions()"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const { find } = useStrapiUtils();
 const props = defineProps({
   user: {
     type: Object as PropType<User>,
@@ -95,18 +94,22 @@ const props = defineProps({
     type: Function,
     default: () => {},
   },
+  updateInstitutions: {
+    type: Function,
+    default: () => {},
+  },
 });
 const { user } = toRefs(props);
 const emit = defineEmits(['update']);
-const { setMessage } = useMessageStore();
 
-const generalTags = ref();
-const technicalTags = ref();
+const generalTags = computed(
+  () => user.value.tags.filter((item) => item.isGeneral) ?? [],
+);
+const technicalTags = computed(
+  () => user.value.tags.filter((item) => !item.isGeneral) ?? [],
+);
 
-const strapiUser = useStrapiUser<User>().value;
-
-generalTags.value = props.user.tags.filter((item) => item.isGeneral) ?? [];
-technicalTags.value = props.user.tags.filter((item) => !item.isGeneral) ?? [];
+const institutions = computed(() => user.value.institutions ?? []);
 </script>
 <style scoped lang="scss">
 #profile {

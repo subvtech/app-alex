@@ -159,14 +159,13 @@ export const useFormRules = () => {
   });
 
   const generalTrailSchema = yup.object({
-   
     title: yup
       .string()
       .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
       .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
-    ...descriptionRules
+    ...descriptionRules,
   });
 
   const registerStep1 = yup.object({
@@ -204,7 +203,16 @@ export const useFormRules = () => {
     ...phoneRules,
     ...cpfRules,
   });
+  const urlRegex =
+  /^(?=.{4,2048}$)((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]{1,63}(\.[a-zA-Z]{1,63}){1,5}(\/)?.([\w\?[a-zA-Z-_%\/@?]+)*([^\/\w\?[a-zA-Z0-9_-]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/;
+  const urlRules = yup
+    .string()
+    .matches(urlRegex, i18n.t('rules.url.valid'))
+    .min(4, i18n.t('rules.url.min'))
+    .max(64, i18n.t('rules.url.max'))
 
+    .required(i18n.t('rules.url.required'))
+    .trim();
   const socialsSchema = yup.object({
     name: yup
       .string()
@@ -213,22 +221,9 @@ export const useFormRules = () => {
       .required()
       .trim(),
 
-    url: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .required()
-      .trim(),
+    url: urlRules,
   });
 
-  // const urlSchema = yup.object({
-  //   url: yup
-  //     .string()
-  //     .min(4, i18n.t('rules.url.min'))
-  //     .max(64, i18n.t('rules.url.max'))
-  //     .required()
-  //     .trim(),
-  // });
   const createCourseRules = yup.object({
     title: yup
       .string()
@@ -264,7 +259,7 @@ export const useFormRules = () => {
               min: min.toString().split('T')[0],
             }),
         ),
-     
+
       startHour: yup
         .string()
         .required(i18n.t('rules.meeting.startHour.required')),
@@ -334,12 +329,7 @@ export const useFormRules = () => {
       .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
-    urlRules: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .required()
-      .trim(),
+    urlRules: urlRules,
     generalCourseSchema,
     loginSchema,
     createCourseRules,

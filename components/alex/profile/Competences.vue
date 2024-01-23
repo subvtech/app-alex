@@ -25,6 +25,7 @@
             :items="filteredTags"
             :update-items="updateTags"
             return-object
+            hide-no-data
             @update:model-value="addExistingTag"
             @input="handleInput"
             @keydown.enter.stop="createNewTag"

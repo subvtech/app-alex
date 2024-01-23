@@ -58,6 +58,7 @@
     "max": "Máximo de {max} caracteres"
   },
   "url": {
+    "valid": "Deve ser uma url válida",
     "required": "Url é necessário",
     "min": "Mínimo de 4 caracteres",
     "max": "Máximo de 64 caracteres"

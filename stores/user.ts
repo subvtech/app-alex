@@ -6,7 +6,7 @@ type PopulateFields =
   | 'cover'
   | 'socials'
   | 'tags'
-  | 'institutions'
+  | 'institutions.cover'
   | 'user_wallet';
 
 export type UniquePopulateFieldsArray = Array<PopulateFields>;
@@ -24,14 +24,14 @@ export const useUserStore = defineStore('user', () => {
   const loadedUser = ref<User>();
   const loading = ref(true);
 
-  const populate = {
-    avatar: true,
-    cover: true,
-    socials: true,
-    tags: true,
-    institutions: true,
-    user_wallet: true,
-  };
+  const populate: UniquePopulateFieldsArray = [
+    'avatar',
+    'cover',
+    'institutions.cover',
+    'socials',
+    'tags',
+    'user_wallet',
+  ];
 
   async function updateUser(
     data,
@@ -39,7 +39,6 @@ export const useUserStore = defineStore('user', () => {
     message,
     showMessage = true,
   ) {
-    console.log({ data, populateArray });
     if (!loadedUser.value) return;
     try {
       const result: User = await client(`/users/${loadedUser.value.id}`, {
@@ -53,7 +52,6 @@ export const useUserStore = defineStore('user', () => {
       });
 
       if (showMessage) setMessage(message, 'green', true);
-      console.log({ ...loadedUser.value, ...result });
       loadedUser.value = { ...loadedUser.value, ...result };
     } catch (e: any) {
       await loadUser(loadedUser.value?.username, '', false);
@@ -76,8 +74,7 @@ export const useUserStore = defineStore('user', () => {
       });
       loadedUser.value = { ...loadedUser.value, tags: result.data };
       loading.value = false;
-      if (message)
-        setMessage(message, 'green', true);
+      if (message) setMessage(message, 'green', true);
       return;
     } catch (e: any) {
       loading.value = false;
@@ -109,6 +106,37 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function loadUserInstitutions(showMessage = true) {
+    if (!loadedUser.value) return;
+    try {
+      loading.value = true;
+      const result = await find<InstitutionsType>('institutions', {
+        filters: {
+          users: { id: { $in: [loadedUser.value.id] } },
+        },
+        populate: ['cover'],
+      });
+      loadedUser.value = { ...loadedUser.value, institutions: result.data };
+      loading.value = false;
+      if (showMessage)
+        setMessage(
+          i18n.t('components.profile.institutional.update'),
+          'green',
+          true,
+        );
+      return;
+    } catch (e: any) {
+      loading.value = false;
+      if (e?.error?.name === 'NotFoundError' && showMessage) {
+        setMessage(
+          i18n.t('components.profile.institutional.emptyInstitutional'),
+          'red',
+          true,
+        );
+      }
+    }
+  }
+
   async function loadUser(username: string, message = '', showMessage = true) {
     if (loadedUser.value?.username === username) return;
     try {
@@ -119,7 +147,6 @@ export const useUserStore = defineStore('user', () => {
         },
         populate,
       });
-      console.log({ result, id: strapiUser.value?.id });
 
       loadedUser.value = result.data[0];
       loading.value = false;
@@ -165,6 +192,7 @@ export const useUserStore = defineStore('user', () => {
     loadUser,
     setWallet,
     loadUserSocials,
-    loadUserTags
+    loadUserTags,
+    loadUserInstitutions,
   };
 });

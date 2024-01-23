@@ -2,13 +2,14 @@
   <alex-custom-card
     :title="$t('components.profile.general.title')"
     :show-icon="false"
+    align-content="align-center"
   >
     <template v-slot:content>
-      <app-general-boxes :boxes="overviewBoxes" />
+      <app-general-boxes  class="max-w-125" :boxes="overviewBoxes" />
     </template>
 
     <template v-slot:footer>
-      <div class="d-flex flex-column contacts gap-4">
+      <div class="d-flex flex-column contacts gap-4 max-w-125 w-100 align-start  ">
         <alex-profile-components-contact
           v-if="email"
           :label="$t('components.profile.general.email')"
@@ -91,5 +92,8 @@ const overviewBoxes = ref<BoxItemType[]>([
   @media (max-width: 1200px) {
     min-width: 380px;
   }
+}
+.max-w-125 {
+  max-width: 500px;
 }
 </style>

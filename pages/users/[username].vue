@@ -1,5 +1,9 @@
 <template>
-  <div v-if="user" id="profile" class="w-100 d-flex flex-column h-100 overflow-x-hidden">
+  <div
+    v-if="user"
+    id="profile"
+    class="w-100 d-flex flex-column h-100 overflow-x-hidden"
+  >
     <alex-custom-breadcrumbs
       v-if="isCurrentUser"
       :title="$t('pages.profile.title')"
@@ -37,12 +41,12 @@
       roleStyle="color: #A0A8B1;"
       :links="isCurrentUser ? links : links.slice(0, -1)"
     />
-
     <NuxtPage
       :user="user"
       :can-edit="isCurrentUser"
       :update-socials="userStore.loadUserSocials"
       :update-competences="userStore.loadUserTags"
+      :update-institutions="userStore.loadUserInstitutions"
       @update="
         async (data, populateArray, message) =>
           await userStore.updateUser(data, populateArray, message)
@@ -129,6 +133,4 @@ const links = computed<TabType[]>(() => {
 });
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

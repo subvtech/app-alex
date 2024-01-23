@@ -60,9 +60,7 @@ const nameField = useField('editname', nameRules, {
 });
 
 const updateUrl = () => {
-  
   if (!urlField.errorMessage.value)
-  console.log(urlField.value.value)
     emit('update:url', {
       index: props.index,
       socialId: props.socialId,
