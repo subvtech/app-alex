@@ -4,6 +4,8 @@ export const MediaSimpleTypes = {
   YOUTUBE: 'youtube',
   VIMEO: 'vimeo',
   FILEIMAGE: 'FileImage',
+  FILEVIDEO: 'FileVideo',
+  URLIMAGE: 'UrlImage',
 } as const;
 
 export interface MediaSimple {

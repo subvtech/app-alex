@@ -53,7 +53,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     } catch (e: any) {
       loading.value = false;
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        // i18n.t('pages.courses.notfound');
         setMessage('Curso não encontrado.', 'red', true);
       }
     }
