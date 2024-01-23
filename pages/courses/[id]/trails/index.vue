@@ -72,7 +72,7 @@
               :image="{
                 url: item.raw?.cover_image?.url,
               }"
-              :blocks="item.raw.blocks"
+              :blocks="item.raw.blocks ?? []"
               class="flex-stretch"
               @toggle-visibility="changeItemVisibility(index, item.raw.id)"
               @configurations="navigate(item.raw.id, 'settings')"
@@ -109,15 +109,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
-import { GetTrails } from '~/assets/queries';
 import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
 
 const emit = defineEmits(['update']);
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const { update } = useStrapi();
+const { update, findOne } = useStrapi();
+// const strapiClient = useStrapiClient();
 
 const search = ref('');
 const page = ref(1);
@@ -127,7 +126,11 @@ const isLoading = ref(false);
 const createTrailDialog = ref(false);
 const learningStructure = ref(null);
 
-interface trail {
+interface Block {
+  type: string;
+}
+
+interface Trail {
   id?: number;
   title: string;
   description: string;
@@ -135,35 +138,34 @@ interface trail {
   cover_image: {
     url: string;
   };
-  blocks: [
-    {
-      type: string;
-    },
-  ];
+  blocks: Block[] | [];
 }
 
-const trails = ref<trail[]>([]);
+const trails = ref<Trail[]>([]);
 const learningPlanStore = useLearningPlanStore();
 const trailsData = learningPlanStore.learningPlan?.learning_structures.filter(
   (structure) => structure.type === 'standard',
 );
-
-// console.log(trailsData[0].trails);
+learningStructure.value = trailsData[0]?.id;
 
 const { isProfessor } = useStrapiUser<User>().value;
-const getCourses = () => {
+const getTrails = () => {
   professorMode.value = isProfessor;
   emit('update');
   isLoading.value = true;
-  trailsData[0].trails.forEach((trail) => {
+  for (
+    let itemIndex = trailsData[0].trails.length - 1;
+    itemIndex >= 0;
+    itemIndex--
+  ) {
+    const trail = trailsData[0].trails[itemIndex];
     trail.blocks = trail.structures[trail.structures.length - 1]?.blocks ?? [];
     trails.value.push(trail);
-    console.log(trail);
-  });
+  }
   isLoading.value = false;
 };
 // eslint-disable camelcase
-onMounted(async () => await getCourses());
+onMounted(async () => await getTrails());
 
 const showingData = (groupedItems) => {
   const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
@@ -206,7 +208,7 @@ const changeItemVisibility = (index: number, id) => {
 //   return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
 // });
 
-const { id, trailID } = route.params;
+const { id } = route.params;
 
 const navigate = (trailId: number, page) => {
   if (page === 'settings') {
@@ -216,8 +218,19 @@ const navigate = (trailId: number, page) => {
   }
 };
 
-const handleCreatedCourse = () => {
-  getCourses();
+const handleCreatedCourse = async (id) => {
+  const newTrail = await findOne('trails', id, {
+    populate: ['cover_image'],
+  });
+  const trail: Trail = newTrail.data.attributes as Trail;
+  trails.value.unshift({
+    id,
+    title: trail.title,
+    description: trail.description,
+    hidden: trail.hidden,
+    cover_image: trail.cover_image.data.attributes,
+    blocks: trail.blocks || [],
+  });
   createTrailDialog.value = false;
 };
 </script>

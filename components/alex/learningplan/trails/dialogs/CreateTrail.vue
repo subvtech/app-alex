@@ -183,9 +183,9 @@ const createTrail = handleSubmit(async (values) => {
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
-    await create('trails', data);
+    const trailData = await create('trails', data);
     setMessage('Trilha Criada com sucesso!', 'success', true);
-    emit('courseCreated');
+    emit('courseCreated', trailData.data.id);
   } catch (error) {
     setMessage(
       'Ocorreu um erro ao criar a trilha, tente novamente',
