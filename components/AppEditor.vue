@@ -310,7 +310,11 @@ const getData = async () => {
 };
 const loadEditor = async (data) => {
   await instance.value.isReady;
-  await instance.value.render(data);
+  try {
+    await instance.value.render(data);
+  } catch (error) {
+    console.log(error);
+  }
   const editorData = await instance.value.save();
   return editorData;
 };

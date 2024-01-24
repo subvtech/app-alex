@@ -4,8 +4,11 @@ import { SocialItemType } from '@/models/social.model';
 export type TrailStoreType = {
   avatar: { url: string; id: number } | undefined;
   cover_image: any | undefined;
-  title: any;
-  editorData: any;
+  title: string;
+  editorData: Array<any>;
+  id: number | undefined;
+  time: number | undefined;
+  version: string | undefined;
 };
 
 export const useTrailStore = defineStore('trail', () => {
@@ -16,7 +19,7 @@ export const useTrailStore = defineStore('trail', () => {
   // const i18n = useI18n();
 
   const populate = [
-    'structures',
+    'structures.blocks',
     'partners',
     'tasks',
     'contributions',

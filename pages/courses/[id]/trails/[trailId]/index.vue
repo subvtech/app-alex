@@ -1,14 +1,5 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column" style="flex: 1">
-    <!-- <alex-learningplan-trails-header
-      :trails-description="trailsDescription"
-      :trails-cover="coverImage"
-      :page="0"
-      :trail-id="trailId"
-      :course-id="id"
-      :course-title="learningPlan!.title"
-      :trails-title="trailsTitle"
-    /> -->
     <div class="bg-white rounded w-100" style="flex: 1">
       <div id="Início" section="0" class="d-flex justify-end px-6 pt-6">
         <alex-custom-button
@@ -114,28 +105,24 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { GetTrail } from '~/assets/queries';
-// import { Trail } from '@/models/trail.model';
+import { Trail } from '@/models/trail.model';
 const { create, update } = useStrapi();
-const graphql = useStrapiGraphQL();
 const route = useRoute();
 const { setMessage } = useMessageStore();
+const { trailId } = route.params;
 
 definePageMeta({
   hideLearningPlanBanner: true,
 });
 
-const { trail } = useTrailStore();
-const { learningPlan } = useLearningPlanStore();
+const trailStore = useTrailStore();
+const trailData = await trailStore.loadTrailData(parseInt(trailId.toString()));
 
 const professorMode = ref(false);
 const isLoading = ref(false);
 const saveLoading = ref(false);
 const readOnly = ref(false);
 const editor = ref();
-const trailsTitle = ref('');
-const trailsDescription = ref('');
-const coverImage = ref('');
 const editorData = ref({
   id: '',
   time: 0,
@@ -144,41 +131,31 @@ const editorData = ref({
 });
 
 const backUpEditorData = ref({});
-const { trailId, id } = route.params;
+
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
 
 const { t } = useI18n();
 const getTrailData = async () => {
   isLoading.value = true;
-  try {
-    const { data } = await useAsyncData('trails', () => {
-      return graphql<{}>(GetTrail, { trailId });
-    });
-    const trail = data.value?.data.trail?.data.attributes;
-    trailsTitle.value = trail.title;
-    trailsDescription.value = trail.description;
-    coverImage.value = trail.cover_image.data?.attributes.url;
-    const structureData = trail.structures.data[0];
+  if (trailData) {
+    const structureData = trailData.structures[trailData.structures.length - 1];
     if (structureData) {
       editorData.value = {
-        id: structureData.id,
-        time: structureData.attributes.time,
-        version: structureData.attributes.version,
-        blocks: structureData.attributes.blocks.data?.map((block: any) => {
+        id: structureData.id.toString(),
+        time: parseInt(structureData.time),
+        version: structureData.version,
+        blocks: structureData.blocks.map((block: any) => {
           return {
-            type: block.attributes.type,
-            data: block.attributes.data,
-            tunes: block.attributes.tunes,
+            type: block.type,
+            data: block.data,
+            tunes: block.tunes ? block.tunes : {},
           };
         }),
       };
     }
-  } catch (e) {
-    setMessage(t('pages.trailId.overview.searchError'), 'error', true);
-  } finally {
-    isLoading.value = false;
   }
+  isLoading.value = false;
 };
 
 onMounted(async () => {

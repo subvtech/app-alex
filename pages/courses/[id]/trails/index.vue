@@ -11,7 +11,7 @@
         v-show="trails.length > 0"
         v-model="search"
         name="search"
-        :placeholder="$t('pages.trails.newTrail')"
+        :placeholder="$t('pages.trails.searchPlaceholder')"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
