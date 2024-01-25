@@ -7,14 +7,9 @@
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
-      show-profile-picture
-      darker-background
-      show-shade
-      show-menu
       :title="$t('pages.courses.class')"
       :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
-      is-professor
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
       :subtitle="learningPlanStore.learningPlan?.class_name"
@@ -35,10 +30,14 @@
         label: '',
         icon: 'mdi-cog-outline',
         value: 5,
-        to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
+        to: `/courses/${learningPlanId}/settings`,
       }"
+      show-profile-picture
+      darker-background
+      show-shade
+      show-menu
+      is-professor
       @select:option="selectOption"
-      @display:settings="selectOption(8)"
     />
     <NuxtPage @update="fetchData" />
   </div>
@@ -51,13 +50,18 @@ definePageMeta({
 });
 
 const i18n = useI18n();
+
 const user = useStrapiUser<User>();
+
 const route = useRoute();
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+
 const learningPlanStore = useLearningPlanStore();
+
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
+
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const selectedOption = ref(0);
 
@@ -96,52 +100,40 @@ const pageRoute = computed(() => route.name);
 onMounted(async () => {
   await fetchData();
 });
-
 watch(pageRoute, async () => {
   if (pageRoute.value?.toString().includes('courses-id')) {
     await fetchData();
   }
 });
 
-const selectOption = (index: number) => {
+const selectOption = (index) => {
   selectedOption.value = index;
 };
-
 const generalLinks: TabType[] = [
   {
     label: i18n.t('pages.courses.general'),
     value: 0,
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}`
-      : '',
+    to: learningPlanId.value ? `/courses/${learningPlanId.value}` : '',
   },
   {
     label: i18n.t('pages.courses.trails'),
     value: 1,
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/trails`
-      : '',
+    to: learningPlanId.value ? `/courses/${learningPlanId.value}/trails` : '',
   },
   {
     label: i18n.t('pages.courses.assignments'),
     value: 2,
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/tasks`
-      : '',
+    to: learningPlanId.value ? `/courses/${learningPlanId.value}/tasks` : '',
   },
   {
     label: i18n.t('pages.courses.class'),
     value: 3,
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/class`
-      : '',
+    to: learningPlanId.value ? `/courses/${learningPlanId.value}/class` : '',
   },
   {
     label: i18n.t('pages.courses.projects'),
     value: 4,
-    to: learningPlanStore.learningPlan
-      ? `/courses/${learningPlanStore.learningPlan?.id}/projects`
-      : '',
+    to: learningPlanId.value ? `/courses/${learningPlanId.value}/projects` : '',
   },
 ];
 </script>
