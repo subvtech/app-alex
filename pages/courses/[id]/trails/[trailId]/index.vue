@@ -162,7 +162,6 @@ onMounted(async () => {
   await getTrailData();
   if (editorData.value.blocks.length > 0) {
     await loadEditor();
-    setSections();
   }
   toggleReadOnly();
 });
@@ -238,21 +237,29 @@ const navigateToSection = (title: string) => {
 
 const loadEditor = async () => {
   if (!editor.value) return;
-  const data = await editor.value.loadEditor({
+  const res = await editor.value.loadEditor({
     id: editorData.value.id,
     time: editorData.value.time,
     version: editorData.value.version,
     blocks: editorData.value.blocks,
   });
-  editorData.value = data;
+  if (res.success) {
+    editorData.value = res.data;
+  } else if (!res.success) {
+    setMessage(t('pages.trailId.overview.loadError'), 'error', true);
+  }
 };
 
 const saveData = async () => {
   saveLoading.value = true;
   try {
-    const data = await editor.value.getData();
+    const res = await editor.value.getData();
+    if (!res.success) {
+      setMessage(t('pages.trailId.overview.saveError'), 'error', true);
+      return;
+    }
     const blockIds: number[] = [];
-    for (const block of data.blocks) {
+    for (const block of res.data.blocks) {
       const res = await create('blocks', {
         type: block.type,
         data: block.data,
@@ -263,18 +270,18 @@ const saveData = async () => {
     if (editorData.value.id) {
       await update('structures', editorData.value.id, {
         time: Date.now(),
-        version: data.version,
+        version: res.data.version,
         blocks: blockIds,
       });
     } else {
       await create('structures', {
         time: Date.now(),
-        version: data.version,
+        version: res.data.version,
         blocks: blockIds,
         trail: trailId,
       });
     }
-    editorData.value = data;
+    editorData.value = res.data;
     toggleReadOnly();
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'error', true);

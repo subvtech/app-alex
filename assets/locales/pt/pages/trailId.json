@@ -6,8 +6,9 @@
     "editBtn": "Editar",
     "cancelBtn": "Cancelar",
     "saveBtn": "Salvar",
+    "sectionTitle": "Início",
     "searchError": "Ocorreu um erro ao buscar os dados da trilha, tente novamente.",
     "saveError": "Ocorreu um erro ao salvar os dados da trilha, tente novamente.",
-    "sectionTitle": "Início"
+    "loadError": "Ocorreu um erro ao carregar os dados da trilha, tente novamente."
   }
 }

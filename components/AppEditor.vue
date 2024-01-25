@@ -305,18 +305,22 @@ onMounted(() => {
 });
 
 const getData = async () => {
-  const data = await instance.value.save();
-  return data;
+  try {
+    const data = await instance.value.save();
+    return { success: 1, data };
+  } catch (error) {
+    return { success: 0 };
+  }
 };
 const loadEditor = async (data) => {
   await instance.value.isReady;
   try {
     await instance.value.render(data);
+    const editorData = await instance.value.save();
+    return { success: 1, data: editorData };
   } catch (error) {
-    console.log(error);
+    return { success: 0 };
   }
-  const editorData = await instance.value.save();
-  return editorData;
 };
 
 const toggleReadOnly = () => {
