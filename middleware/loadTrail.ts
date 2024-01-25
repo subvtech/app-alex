@@ -3,7 +3,6 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
 
   const trailStore = useTrailStore();
   const trailId = parseInt(to.params.trailId.toString());
-  console.log('trailId', trailId);
   // loader.start();
 
   await useAsyncData('user', () => trailStore.loadTrailData(trailId));

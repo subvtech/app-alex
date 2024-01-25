@@ -29,5 +29,19 @@ const learningPlanStore = useLearningPlanStore();
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(parseInt(trailId.toString()));
+
+  if (!trailStore.trail) {
+    navigateTo(`/courses/${id}`);
+  }
+  if (
+    !(
+      trailStore.trail.learning_structure.learningplan.id ===
+      parseInt(id.toString())
+    )
+  ) {
+    navigateTo(`/courses/${id}/trails`);
+  }
 };
+
+await getTrailData();
 </script>

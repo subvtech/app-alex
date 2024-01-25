@@ -1,3 +1,5 @@
+import { LearningPlan } from './../models/learningPlan.model';
+import { learningPlanGroupMember } from './../models/learningPlanGroupMember.model';
 import { defineStore } from 'pinia';
 import { SocialItemType } from '@/models/social.model';
 
@@ -24,7 +26,7 @@ export const useTrailStore = defineStore('trail', () => {
     'tasks',
     'contributions',
     'cover_image',
-    'learning_structure',
+    'learning_structure.learningplan',
   ];
 
   const loading = ref(false);

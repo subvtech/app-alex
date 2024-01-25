@@ -136,7 +136,7 @@ const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
 
 const { t } = useI18n();
-const getTrailData = async () => {
+const getTrailData = () => {
   isLoading.value = true;
   if (trailData) {
     const structureData = trailData.structures[trailData.structures.length - 1];
@@ -159,7 +159,7 @@ const getTrailData = async () => {
 };
 
 onMounted(async () => {
-  await getTrailData();
+  getTrailData();
   if (editorData.value.blocks.length > 0) {
     await loadEditor();
   }
@@ -267,20 +267,12 @@ const saveData = async () => {
       });
       blockIds.push(res.data.id);
     }
-    if (editorData.value.id) {
-      await update('structures', editorData.value.id, {
-        time: Date.now(),
-        version: res.data.version,
-        blocks: blockIds,
-      });
-    } else {
-      await create('structures', {
-        time: Date.now(),
-        version: res.data.version,
-        blocks: blockIds,
-        trail: trailId,
-      });
-    }
+    await create('structures', {
+      time: Date.now(),
+      version: res.data.version,
+      blocks: blockIds,
+      trail: trailId,
+    });
     editorData.value = res.data;
     toggleReadOnly();
   } catch (e) {

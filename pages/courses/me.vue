@@ -232,6 +232,8 @@
 </template>
 
 <script setup lang="ts">
+// import { LearningPlan } from '~/models/learningPlan.model';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 definePageMeta({
   middleware: 'auth',
 });
@@ -247,22 +249,24 @@ const { t } = useI18n();
 
 const { update, find } = useStrapi();
 const createCourseDialog = ref(false);
-interface courseItem {
+interface LearningPlan {
   id?: number;
   description: string;
   facilitatorName?: string;
   facilitatorImage?: string;
   trails?: number;
-  img?: string;
+  cover_image?: string;
   institution?: string;
   tags?: string[];
   start_date?: string;
   end_date?: string;
   hidden: boolean;
   title: string;
+  members?: any;
+  learning_structures?: any;
 }
 
-const courses = ref<courseItem[]>([]);
+const courses = ref<LearningPlan[]>([]);
 const { isProfessor, id } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
 const queryConfig = {
@@ -309,12 +313,12 @@ const getCourses = async () => {
   isLoading.value = true;
   const getCourses = await find('learningplans', queryConfig);
   courses.value = [];
-  getCourses.data.forEach((element) => {
-    const elementData = element.attributes;
+  getCourses.data.forEach((element: Strapi4ResponseData<unknown>) => {
+    const elementData = element.attributes as LearningPlan;
 
     const facilitator =
       elementData.members.data[0].attributes.user.data.attributes;
-    const tags = element.attributes.tags.data.map((tag) => tag.attributes.text);
+    const tags = elementData.tags?.data.map((tag) => tag.attributes.text);
     const trails =
       elementData.learning_structures.data[0].attributes.trails.data.length ||
       0;
@@ -325,7 +329,7 @@ const getCourses = async () => {
       description: elementData.description,
       start_date: elementData.start_date,
       end_date: elementData.end_date,
-      img: elementData.cover_image?.data?.attributes?.url,
+      cover_image: elementData.cover_image?.data?.attributes?.url,
       hidden: elementData.hidden,
       facilitatorName: facilitator.fullname,
       facilitatorImage: facilitator.avatar?.data?.attributes?.url,
@@ -341,9 +345,9 @@ const getCourses = async () => {
 onBeforeMount(async () => await getCourses());
 
 interface Item {
-  raw: courseItem;
+  raw: LearningPlan;
 }
-const setTableData = (items: readonly Item[]): courseItem[] => {
+const setTableData = (items: readonly Item[]): LearningPlan[] => {
   return items.map((item) => item.raw);
 };
 
