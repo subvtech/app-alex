@@ -1,0 +1,9 @@
+{
+  "title": "Detalhes",
+  "emptyPlaceholder": "Parece que não tem nenhum detalhe a mais sobre seu curso",
+  "quote": {
+    "placeholder": "Insira uma citação",
+    "caption": "Autor da citação"
+  },
+  "update": "Detalhes atualizados com sucesso."
+}

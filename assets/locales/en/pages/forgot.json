@@ -1,0 +1,7 @@
+{
+  "success": {
+    "title": "Account activated successfully!",
+    "subtitle1": "You can now access your account with the registered email and password.",
+    "return": "Back to Login"
+  }
+}

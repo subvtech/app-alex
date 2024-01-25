@@ -1,206 +1,422 @@
 <template>
   <v-app>
-    <!-- <AppSnackbar></AppSnackbar> -->
-    <v-navigation-drawer
+    <AppSnackbar />
+    <alex-custom-drawable
       v-model="drawer"
-      :mini-variant="miniVariant"
+      :blocks="menus"
       :clipped="clipped"
-      color="primary"
-      fixed
-      app
       dark
-      class="pa-4"
+      :permanent="isPermanent"
+      :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
+      data-tour="step-user-area"
     >
-      <v-row justify="center" class="my-10">
-        <div>
-          <NuxtLink to="/">
-            <v-img src="/images/alex.svg" height="32" width="96" />
-          </NuxtLink>
-        </div>
-      </v-row>
-      <div v-for="(menu, i) in menus" :key="`menu-${i}`">
-        <v-subheader
-          :key="`menu-${i}`"
-          class="accent--text"
-          style="font-size: 12px; line-height: 15px"
+      <template #header>
+        <div
+          class="my-4 w-100 d-flex"
+          :class="clipped ? '' : 'justify-center'"
+          style="max-height: 28px"
         >
-          {{ menu.title }}
-        </v-subheader>
-        <v-list :key="`menu-${i}-list`">
-          <v-list-item
-            v-for="(item, j) in menu.items"
-            :key="`menu-${i}-item-${j}`"
-            :to="item.to"
-            router
-            exact
-          >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title
-                class="font-weight-medium"
-                :text="item.title"
+          <div>
+            <NuxtLink to="/">
+              <img
+                v-if="clipped"
+                src="/images/alex-mini.svg"
+                height="28"
+                width="43"
               />
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </div>
-    </v-navigation-drawer>
-    <v-app-bar :clipped-left="clipped" fixed app color="white">
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <div
-        v-if="!drawer"
-        class="primary pl-2 pt-1 rounded-pill"
-        style="height: 42px; width: 115px"
-      >
-        <NuxtLink to="/">
-          <v-img src="/images/alex.svg" height="32" width="96" />
-        </NuxtLink>
-      </div>
-      <v-spacer />
-      <v-btn icon color="grey">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <v-btn icon color="grey">
-        <v-icon>mdi-chat-processing-outline</v-icon>
-      </v-btn>
-      <v-btn icon color="grey" class="mr-2">
-        <v-icon>mdi-bell-outline</v-icon>
-      </v-btn>
+              <img v-else src="/images/alex.svg" height="28" width="84" />
+            </NuxtLink>
+          </div>
+        </div>
+      </template>
+    </alex-custom-drawable>
 
-      <v-menu offset-y nudge-bottom="10">
-        <template #activator="{ props }">
-          <v-hover v-slot="{ isHovering }">
-            <div
-              v-bind="props"
-              style="cursor: pointer"
-              :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
-            >
-              <!-- <app-user-avatar :user="user" class="mr-2" /> -->
-              <span>
-                {{ user?.fullname }}
-              </span>
+    <alex-custom-horizontal-bar
+      :drawer="drawer"
+      fixed
+      :toggle-drawer="() => closeDrawable(!clipped)"
+      :avatar="user.avatar"
+      :placeholder="user.fullname"
+      :menu-items="profileMenuItems"
+      show-picture
+      @click="onClickOutside"
+    />
 
-              <v-icon> mdi-chevron-down </v-icon>
-            </div>
-          </v-hover>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="(item, index) in profileMenuItems"
-            :key="`profile-menu-item-${index}`"
-            @click="onMenuClick(item.to, item.logout)"
-          >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
-    <v-main class="secondary">
-      <v-container style="width: 100%; max-width: 100%" class="pa-10">
+    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
+      <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
+        <alex-custom-header
+          v-if="headerStore.showHeader"
+          v-bind="headerStore.headerOptions"
+          @main-action="headerStore.onMainAction"
+          @secondary-action="headerStore.onSecondaryAction"
+        />
         <slot />
       </v-container>
     </v-main>
-    <!-- <v-footer :absolute="!fixed" app>
-        <span>&copy; {{ new Date().getFullYear() }}</span>
-      </v-footer> -->
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { User } from 'models/user.model';
-
-const clipped = ref(false);
-const drawer = ref(true);
-// const fixed = ref(false);
-
-const { logout } = useStrapiAuth();
+import useNavigationDrawer from '~/composables/useNavigationDrawer';
+import { useOnBoarding } from '@/composables/useOnBoarding';
+import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
+const i18n = useI18n();
+const config = useRuntimeConfig();
 const router = useRouter();
+
+router.beforeEach(() => {
+  headerStore.showHeader = false;
+  headerStore.onMainAction = null;
+  headerStore.onSecondaryAction = null;
+});
+
 const user = useStrapiUser<User>();
+const userStore = useUserStore();
+const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
+  useNavigationDrawer();
 
-const profileMenuItems = ref([
-  {
-    title: 'Perfil',
-    to: '/user/profile',
-  },
-  {
-    title: 'Configurações',
-    to: '/user/settings',
-  },
-  {
-    title: 'Sair',
-    logout: true,
-  },
-]);
+const headerStore = usePageHeaderStore();
 
-const menus = ref([
+const { profileMenuItems } = useMainHorizontalBar();
+
+onBeforeMount(() => {
+  userStore.avatar = user.value?.avatar;
+  userStore.fullname = user.value?.fullname;
+});
+
+const steps = [
   {
-    title: 'DASHBOARDS',
+    id: 'step1',
+    title: i18n.t('layouts.default.step1.title'),
+    text: i18n.t('layouts.default.step1.text'),
+    attachTo: {
+      element: '[data-tour="step-user-area"]',
+      on: 'right',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step1.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step2',
+    title: i18n.t('layouts.default.step2.title'),
+    text: i18n.t('layouts.default.step2.text'),
+    attachTo: {
+      element: '[data-tour="step-user-area"]',
+      on: 'right',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step2.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step2.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step3',
+    title: i18n.t('layouts.default.step3.title'),
+    text: i18n.t('layouts.default.step3.text'),
+    attachTo: {
+      element: '[data-tour="step-navigation"]',
+      on: 'right',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step3.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step3.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step4',
+    title: i18n.t('layouts.default.step4.title'),
+    text: i18n.t('layouts.default.step4.text'),
+    attachTo: {
+      element: '[data-tour="step-professor"]',
+      on: 'bottom',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step4.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step4.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step5',
+    title: i18n.t('layouts.default.step5.title'),
+    text: i18n.t('layouts.default.step5.text'),
+    attachTo: {
+      element: '[data-tour="step-profile"]',
+      on: 'bottom',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step5.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step5.nextButton'),
+        action: 'next',
+      },
+    ],
+  },
+  {
+    id: 'step6',
+    title: i18n.t('layouts.default.step6.title'),
+    text: i18n.t('layouts.default.step6.text'),
+    attachTo: {
+      element: '',
+      on: 'center',
+    },
+    buttons: [
+      {
+        text: i18n.t('layouts.default.step6.backButton'),
+        action: 'back',
+      },
+      {
+        text: i18n.t('layouts.default.step6.completeButton'),
+        action: 'complete',
+      },
+    ],
+  },
+];
+
+// const { tour, activeTour } = useOnBoarding(steps);
+
+const defaultMenus = [
+  {
+    title: i18n.t('layouts.default.userArea'),
+    dataTour: 'step-user-area',
     items: [
       {
-        icon: 'mdi-star-outline',
-        title: 'Dashboard',
+        icon: 'mdi-view-dashboard-outline',
+        title: i18n.t('layouts.default.dashboard'),
         to: '/dashboard',
       },
-    ],
-  },
-  {
-    title: 'PLANOS DE APRENDIZAGEM',
-    items: [
       {
-        icon: 'mdi-star-outline',
-        title: 'Todos os planos',
-        to: '/learning-plans',
+        icon: 'mdi-book-cog-outline',
+        title: i18n.t('layouts.default.myClasses'),
+        to: '/courses/me',
       },
       {
-        icon: 'mdi-star-outline',
-        title: 'Meus planos',
-        to: '/learning-plans/user',
-      },
-    ],
-  },
-  {
-    title: 'TURMAS',
-    items: [
-      {
-        icon: 'mdi-star-outline',
-        title: 'Minhas turmas',
-        to: '/classes',
+        icon: 'mdi-clipboard-multiple-outline',
+        title: i18n.t('layouts.default.myProjects'),
+        to: '/classes/active-links',
       },
       {
-        icon: 'mdi-star-outline',
-        title: 'Links ativos',
+        icon: 'mdi-heart-outline',
+        title: i18n.t('layouts.default.favourites'),
         to: '/classes/active-links',
       },
     ],
   },
-]);
+
+  {
+    title: i18n.t('layouts.default.BrowseOnAlex'),
+    items: [
+      {
+        icon: 'mdi-book-outline',
+        dataTour: 'step-navigation',
+        title: i18n.t('layouts.default.courses'),
+        to: '/learning-plans',
+      },
+      {
+        icon: 'mdi-clipboard-text-outline',
+        title: i18n.t('layouts.default.projects'),
+        to: '/learning-plans/user',
+      },
+    ],
+  },
+
+  {
+    title: i18n.t('layouts.default.professorTitle'),
+    dataTour: 'step-professor',
+    items: [
+      {
+        icon: 'mdi-account-multiple-outline',
+        title: i18n.t('layouts.default.userList'),
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-account-multiple-outline',
+        title: i18n.t('layouts.default.institutionList'),
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-lock-outline',
+        title: i18n.t('layouts.default.accessControl'),
+        to: '/classes',
+      },
+      {
+        icon: 'mdi-cog-outline',
+        title: i18n.t('layouts.default.settings'),
+        to: '/projects',
+      },
+    ],
+  },
+];
+
+const componentsMenu = [
+  {
+    title: 'Componentes',
+    items: [
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Documentacao',
+        to: '/components',
+      },
+    ],
+  },
+];
+
+const menus = computed(() => {
+  return config.public.showComponentsPage
+    ? defaultMenus.concat(componentsMenu)
+    : defaultMenus;
+});
 
 const miniVariant = ref(false);
-
-// const title = ref('Alex');
-
-function onMenuClick(route = '', logout = false) {
-  if (logout) {
-    logoutUser();
-  } else {
-    router.push({ path: route });
-  }
-}
-
-function logoutUser() {
-  logout();
-  router.push('/login');
-}
 </script>
+
 <style lang="scss">
+.shepherd-step {
+  z-index: 100000 !important;
+  background-color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.15);
+  padding: 16px !important;
+  max-width: 300px !important;
+}
+
+.active-step {
+  z-index: 200000 !important;
+  background: none;
+  border-radius: 0.1rem;
+  border: 2px dotted #00b7cc;
+  padding: 0.5rem;
+}
+
+.shepherd-step .shepherd-arrow {
+  background-color: #fff;
+}
+
+.shepherd-step .shepherd-title {
+  font-size: 1rem;
+  line-height: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.shepherd-step .shepherd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shepherd-cancel-icon {
+  font-size: 25px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.shepherd-step .shepherd-text {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.shepherd-step .shepherd-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.shepherd-step .shepherd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.shepherd-cancel-icon {
+  font-size: 25px;
+  height: 25px;
+  width: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.shepherd-step button {
+  background-color: #00b7cc;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
 html,
 body {
-  font-family: 'Montserrat' !important;
+  overflow-y: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   .v-application {
-    font-family: 'Montserrat' !important;
+    .item-name {
+      color: #d2d6da;
+
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 135%; /* 18.9px */
+      letter-spacing: 0.56px;
+    }
+
+    .smaller {
+      display: flex;
+    }
+    .larger {
+      display: none;
+    }
+
+    @media (min-width: 959px) {
+      .smaller {
+        display: none;
+      }
+      .larger {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .v-toolbar__content {
+        .user-block {
+          .fullname {
+            display: none;
+          }
+        }
+      }
+    }
   }
 }
 </style>

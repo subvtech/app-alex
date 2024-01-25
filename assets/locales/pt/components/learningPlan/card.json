@@ -1,0 +1,22 @@
+{
+    "type": {
+        "course": "Curso",
+        "course_project": "Project",
+        "project": "Projeto"
+    }, 
+    "configurations": "Configurações",
+    "visibility": {
+        "show": "Mostrar",
+        "hide": "Ocultar"
+    },
+    "trails": "Trilhas",
+    "facilitator": "Facilitador",
+    "hidden": "Oculto",
+    "options": "Opções",
+    "favorite": "Favoritar",
+    "status": {
+        "start": "Iniciar",
+        "running": "Em progresso",
+        "finished": "Finalizado"
+    }
+}

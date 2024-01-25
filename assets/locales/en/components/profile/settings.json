@@ -1,0 +1,12 @@
+{
+  "title": "Personal Information",
+  "fullname": "Fullname",
+  "phone": "Phone",
+  "about": "About",
+  "cancel": "Cancel",
+  "saveProfile": "Save Profile",
+  "save": "Save",
+  "phonePlaceholder": "Type in your number",
+  "cpf": "CPF",
+  "update": "Personal Information updated"
+}

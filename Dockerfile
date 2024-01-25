@@ -1,10 +1,13 @@
-FROM node:16.20-alpine3.17
+FROM node:18.19-alpine3.19
 
 RUN apk update && \
   apk upgrade --no-cache && \
   apk add --no-cache \
   git \
   bash
+
+ARG strapi_url
+ARG components_page
 
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
@@ -17,14 +20,16 @@ RUN yarn --ignore-scripts
 
 ADD --chown=alex:alex . .
 
+ENV STRAPI_URL=$strapi_url
+ENV COMPONENTS_PAGE=$components_page
+
 RUN yarn build
 
 ENV NODE_ENV=production
 
 EXPOSE 3000
 
-CMD yarn start -H 0.0.0.0
-
+CMD node .output/server/index.mjs
 
 
 

@@ -5,7 +5,7 @@
     v-model:search-input="search"
     :items="tags"
     :loading="loadingTags"
-    label="Adicionar Tags"
+    :label="$t('components.tagCombobox.label')"
     prepend-inner-icon="mdi-plus-circle"
     append-icon="mdi-magnify"
     outlined
@@ -40,7 +40,7 @@
             v-if="data.item.raw.attributes.verified"
             color="green"
             small
-            title="Tag Verificada Alex"
+            :title="$t('components.tagCombobox.verified')"
             >mdi-check-decagram</v-icon
           >
         </template>
@@ -63,7 +63,7 @@
           <v-icon
             v-if="data.item.raw.attributes.verified"
             color="green"
-            title="Tag Verificada Alex"
+            :title="$t('components.tagCombobox.verified')"
             >mdi-check-decagram</v-icon
           >
         </v-list-item-title>
@@ -73,8 +73,10 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>
-            Nenhuma tag encontrada para "<strong>{{ search }}</strong
-            >". Aperte <kbd>enter</kbd> para criar uma tag nova
+            {{ $t('components.tagCombobox.noTag') }}<strong>{{ search }}</strong
+            > {{ $t('components.tagCombobox.press') }}
+            <kbd>enter</kbd>
+            {{ $t('components.tagCombobox.newTag') }}
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -88,7 +90,7 @@ import {
   Strapi4ResponseMany,
 } from '@nuxtjs/strapi/dist/runtime/types';
 import { PropType } from 'nuxt/dist/app/compat/capi';
-import { Tag } from 'models/tag.model';
+import { Tag } from '~/models/tag.model';
 import * as queries from '~/assets/queries';
 const { create } = useStrapi();
 const graphql = useStrapiGraphQL();
@@ -139,7 +141,6 @@ const searchTags = async (search = '', ids: number[] = []) => {
   if ((!search || search.length < 3) && !ids.length) return;
   loadingTags.value = true;
 
-  // const
   const props = {
     query: ids.length ? queries.tagsByids : queries.tags,
     variables: ids.length ? { ids } : { search },

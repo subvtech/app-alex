@@ -1,0 +1,17 @@
+
+{
+    "newTrail": "New Trail",
+    "emptyStateText": "Looks like there are no trails created!",
+    "searchPlaceholder": "Search...",
+    "showingData": "Showing %{from} to %{to} out of a total of %{total} trails",
+    "noData": "No trails found!",
+    "newTrailText": "Create a new Learning Trail",
+    "newTrailDescriptionLabel": "Tell us more about the trail",
+    "newTrailDescriptionPlaceholder": "Describe your trail",
+    "newTrailTitleLabel": "What is your Learning Trail about?",
+    "newTrailTitlePlaceholder": "Enter the title of your trail",
+    "newTrailAction": "Create Trail",
+    "newTrailCancel": "Cancel",
+    "newTrailCoverText": "Trail Cover",
+    "newTrailCoverAction": "Edit"
+    }

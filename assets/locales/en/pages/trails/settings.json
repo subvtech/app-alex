@@ -1,0 +1,34 @@
+{
+    "title": "Settings",
+    "formats": "Supported Formats: .jpeg, .png, .wav, .mp4, .jpg;",
+    "update": "Trail successfully updated",
+
+  "cover": {
+    "title": "Trail Cover",
+    "update": "Trail cover image successfully updated",
+    "upload": "Upload"
+  },
+  "general": {
+    "title": "General Information",
+    "TrailTitle": "Trail name",
+    "description": "Trail description",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "update": "General information successfully updated"
+  },
+    "visibilityTitle": "Trail visibility",
+    "showtrailTitle": "Show trail (Public)",
+    "showtrailHint": "Makes the trail public, allowing any user to find it through search.",
+    "hidetrailTitle": "Hide trail (Private)",
+    "hidetrailHint": "Makes the trail private, ensuring only members can see the trail.",
+    "delete": {
+        "deleteCourseTitle": "Delete trail",
+        "deleteCourseDescription": "After deleting the trail, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this trail. So please be sure before proceeding.",
+        "deleteButton": "Delete trail",
+        "deleteConfirmation": "Do you really wish to delete the trail?",
+        "deleteDescription": "By deleting a trail you will lose all the content associated with it.",
+        "deleteLabel": "Enter the word:",
+        "deletePlaceholder": "Enter the word to confirm",
+        "deleteWord": "Delete"
+      }
+}

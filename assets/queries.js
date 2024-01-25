@@ -331,3 +331,171 @@ export const tagsByids = `
     }
   }
 `;
+
+export const GetLearningPlans = `
+query($userId: ID!) {
+  learningplans(
+   	sort: "id:desc"
+    pagination: {limit: -1}
+    filters: {
+      or: [{ hidden: { eq: false } }, { members: { user: { id: { eq: $userId } }, role: { eq: "facilitator" }  } }]
+      and: [
+        { members: { user: { id: { eq: $userId } }, status: { eq: "joined" } } }
+        { type: { eq: "course"}}
+        { archived_at: { eq: null}}
+      ]
+    }
+  ) {
+    data {
+      id
+      attributes {
+        title
+        description
+        start_date
+        end_date
+        hidden
+        learning_structures{
+          data {
+            attributes {
+              trails {
+                data {
+                  id
+                }
+              }
+            }
+          }
+        }
+        tags {
+          data {
+            attributes {
+              text
+              isGeneral
+            }
+          }
+        }
+        cover_image {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        members(filters: { role: { eq: "facilitator" } }) {
+          data {
+            attributes {
+              user {
+                data {
+                  attributes {
+                    fullname
+                    institutions {
+                      data {
+                        attributes {
+                          name
+                        }
+                      }
+                    }
+                    avatar {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export const GetTrails = `
+query($learningPlanId: ID!) {
+  learningplan(id: $learningPlanId) {
+    data {
+      attributes {
+        learning_structures(filters: { type: { eq: "standard" } }) {
+          data {
+            id
+            attributes {
+              trails(sort: "id:desc", pagination: { limit: -1 }) {
+                data {
+                  id
+                  attributes {
+                    cover_image {
+                      data {
+                        attributes {
+                          url
+                        }
+                      }
+                    }
+                    title
+                    description
+                    hidden
+                    structures {
+                      data {
+                        attributes {
+                          blocks {
+                            data {
+                              attributes {
+                                type
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export const GetTrail = `
+query($trailId: ID!) {
+  trail(id:$trailId ){
+    data{
+      attributes{
+        cover_image{
+          data{
+            attributes{
+              url
+            }
+          }
+        }
+        title
+        description
+      	structures{
+          data{
+            id
+            attributes{
+              time
+              version
+              blocks(
+                pagination: {limit: -1}
+              ){
+                data{
+                  attributes{
+                    data
+                    type
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } 
+}
+`;

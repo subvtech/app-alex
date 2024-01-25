@@ -1,0 +1,8 @@
+{
+  "success": {
+    "title": "Recuperação Enviada!",
+    "subtitle1": "Caso o email",
+    "subtitle2": "esteja cadastrado em nossa plataforma, enviaremos instruções para recuperar a senha.",
+    "return": "Voltar para o login"
+  }
+}

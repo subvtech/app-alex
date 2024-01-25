@@ -1,0 +1,117 @@
+{
+  "fullName": {
+    "required": "Full name is required",
+    "min": "At least 6 characters long",
+    "max": "At most 64 characters long",
+    "onlyLetters": "It must have only letters"
+  },
+  "email": {
+    "required": "Email is required",
+    "invalid": "Invalid email"
+  },
+  "cpf": {
+    "required": "CPF is required",
+    "length": "Must be 11 characters long",
+    "invalid": "Invalid CPF"
+  },
+
+  "keyword": {
+    "required": "This field is required",
+    "noSpaces": "There shall be no spaces",
+    "onlyLetters": "There shall only alphabetic letters"
+  },
+
+  "phone": {
+    "required": "Phone is required",
+    "length": "Must be 11 characters long",
+    "invalid": "Invalid phone number"
+  },
+
+  "yourRole": {
+    "required": "User type is required"
+  },
+  "institution": {
+    "required": "Institution type is required"
+  },
+  "username": {
+    "required": "Username is required",
+    "min": "At least 6 characters long",
+    "max": "At most 64 characters long",
+    "onlyLetters": "It must have only letters and numbers"
+  },
+  "password": {
+    "required": "Password is required",
+    "upperCase": "It must have at least 1 upper case letter",
+    "lowerCase": "It must have at least 1 lower case letter",
+    "number": "It must have at least 1 number",
+    "character": "It must have at least 1 special character",
+    "min": "At least 8 characters long"
+  },
+  "confirmPassword": {
+    "required": "Confirm Password is required",
+    "matchError": "The passwords do no match"
+  },
+  "slug": {
+    "required": "Acronym/Name is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "name": {
+    "required": "Name is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "title": {
+    "required": "Title is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "url": {
+    "required": "Url is required",
+    "min": "At least 3 characters long",
+    "max": "At most 64 characters long"
+  },
+  "startDate": {
+    "required": "Start date is required",
+    "min": "Min accepted date: {min}",
+    "typeError": "Date must be valid"
+  },
+  "endDate": {
+    "required": "End date is required",
+    "min": "Min accepted date: {min}",
+    "max": "Max accepted date: {max}",
+    "beforeStartDate": "End date can't be before start date",
+    "typeError": "Date must be valid"
+  },
+  "class": {
+    "required": "Class is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+
+  "description": {
+    "required": "Description is required",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
+  },
+  "meeting": {
+    "date": {
+      "required": "Meeting date is required"
+    },
+    "startHour": {
+      "required": "Start time is required"
+    },
+    "endHour": {
+      "required": "End time is required",
+      "beforeStartHour": "End hour must be after start Hour"
+    },
+    "copy": {
+      "success": "Text copied to clipboard",
+      "error": "Couldn't copy to clipboard"
+    }
+  },
+  "copy": {
+    "success": "Text copied to clipboard",
+    "error": "Couldn't copy to clipboard"
+  }
+}

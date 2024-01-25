@@ -4,10 +4,9 @@ import {
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
 import * as queries from '~/assets/queries';
-import { getFullnameInitials } from '@/helpers/utils';
 import { User } from '@/models/user.model';
-import { LearningPlan } from 'models/learningPlan.model';
-import { Class } from 'models/class.model';
+import { LearningPlan } from '../models/learningPlan.model';
+import { Class } from '../models/class.model';
 
 export const useGetData = () => {
   const user = useStrapiUser<User>();
@@ -20,10 +19,6 @@ export const useGetData = () => {
   const isTrailRoute = computed(() => {
     const { trailId } = route.params;
     return !!trailId;
-  });
-
-  const userInitials = computed(() => {
-    return getFullnameInitials(user?.value?.fullname ?? '');
   });
 
   function handleBack() {
@@ -112,6 +107,5 @@ export const useGetData = () => {
     loadPlan,
     handleBack,
     isTrailRoute,
-    userInitials,
   };
 };
