@@ -25,7 +25,7 @@
         <div
           id="editorjs"
           class="editorjs w-full p-6 sm:p-16"
-          :class="[isEditing ? '' : 'locked']"
+          :class="[isEditing ? 'editing-editor' : 'locked']"
           :spellcheck="isEditing ? 'true' : 'false'"
         />
       </client-only>
@@ -358,55 +358,44 @@ watch(isEmptyAndIsNotEditing, () => {
     display: none;
   }
 }
-@media (max-width: 851px) {
-  .codex-editor--narrow .ce-toolbox .ce-popover:not(.ce-popover--open-top) {
-    right: auto !important;
-    left: auto !important;
-  }
-  .codex-editor--narrow .ce-settings .ce-popover:not(.ce-popover--open-top) {
-    right: auto !important;
-    left: auto !important;
-  }
-  .codex-editor--narrow .ce-toolbar__actions {
-    right: 0;
-  }
-}
-@media (min-width: 852px) {
-  .codex-editor--narrow .ce-toolbox .ce-popover {
-    right: auto;
-    left: 0;
-  }
-}
-.cdx-block {
-  width: 100% !important;
-  overflow-wrap: break-word;
-}
-#Card {
-  #editorjs {
-    .codex-editor__redactor {
-      padding-bottom: 24px !important;
+@media (min-width: 651px) {
+  #editorjs:not(.locked) {
+    .codex-editor--narrow .ce-block {
+      margin-right: 0;
+      padding-right: 0;
     }
     .ce-block__content {
-      margin: 0px;
-      max-width: none;
+      margin: 0;
+      margin-left: 40px;
     }
-    .ce-toolbar__content {
-      margin: 0px;
-      max-width: max-content;
-    }
-  }
 
-  .info {
-    text-align: justify;
-    text-justify: inter-word;
-    align-self: stretch;
-    color: #5d6872;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 22px;
+    .ce-toolbar__actions {
+      right: auto;
+      left: -20px;
+    }
+    .codex-editor--narrow .ce-toolbox .ce-popover,
+    .codex-editor--narrow .ce-settings .ce-popover {
+      right: auto;
+      left: 0;
+    }
   }
-  .codex-editor__redactor {
-    margin-right: 0;
+}
+#editorjs:not(.locked) {
+  .ce-toolbar__content {
+    margin: 0;
   }
+}
+.ce-block__content {
+  margin: 0;
+  max-width: none;
+}
+.info {
+  text-align: justify;
+  text-justify: inter-word;
+  align-self: stretch;
+  color: #5d6872;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
 }
 </style>
