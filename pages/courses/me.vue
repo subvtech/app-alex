@@ -233,9 +233,9 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import type { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types/v4';
 import { GetLearningPlans } from '~/assets/queries';
-import { LearningPlan } from '@/models/learningPlan.model';
+import type { LearningPlan } from '@/models/learningPlan.model';
 
 definePageMeta({
   middleware: 'auth',
@@ -446,9 +446,9 @@ const changeItemFavorited = (index: number) => {
 
 const navigate = (id: number, page) => {
   if (page === 'settings') {
-    router.push(`/courses/${id}/settings`);
+    navigateTo(`/courses/${id}/settings`);
   } else {
-    router.push(`/courses/${id}`);
+    navigateTo(`/courses/${id}`);
   }
 };
 </script>

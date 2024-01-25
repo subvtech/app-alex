@@ -5,30 +5,32 @@
     data-testid="banner"
   >
     <div class="cover-block w-100">
-      <NuxtImg
-        v-if="cover"
-        class="cover"
-        :provider="imgFromStrapi ? 'strapi' : undefined"
-        :src="cover.url"
-        placeholder
-        role="custom-cover"
-      />
-      <img
-        v-else
-        class="cover"
-        src="/images/alex-banner.svg"
-        role="default-cover"
-      />
+      <v-skeleton-loader width="100%" type="image" :loading="loading">
+        <NuxtImg
+          v-if="cover"
+          class="cover"
+          :provider="imgFromStrapi ? 'strapi' : undefined"
+          :src="cover.url"
+          placeholder
+          role="custom-cover"
+        />
+        <img
+          v-else
+          class="cover"
+          src="/images/alex-banner.svg"
+          role="default-cover"
+        />
+      </v-skeleton-loader>
       <div class="w-100 h-25" :class="showShade ? 'shade' : ''" role="shade" />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
           v-if="cover && imgFromStrapi"
           class="btn remove"
-          @click="removeCoverPicture"
           size="large"
           icon
           variant="outlined"
           role="delete-cover"
+          @click="removeCoverPicture"
         >
           <img
             src="/svg/trash-dark.svg"
@@ -41,10 +43,10 @@
         <label class="" for="coverInput" data-testid="edit-cover">
           <v-btn
             class="btn label"
-            @click="($refs.coverInput as any).click()"
             size="large"
             icon
             variant="outlined"
+            @click="($refs.coverInput as any).click()"
           >
             <v-icon class="icon" size="20" color="#6E7A87"
               >mdi-pencil-outline</v-icon
@@ -54,20 +56,20 @@
           >
           <v-btn
             class="btn label small"
-            @click="($refs.coverInput as any).click()"
             size="large"
             icon="mdi-pencil-outline"
             variant="outlined"
+            @click="($refs.coverInput as any).click()"
           />
         </label>
 
         <input
-          class="d-none"
-          @input="uploadCoverPicture"
-          accept="image/png, image/jpeg"
-          ref="coverInput"
           id="coverInput"
+          ref="coverInput"
+          class="d-none"
+          accept="image/png, image/jpeg"
           type="file"
+          @input="uploadCoverPicture"
         />
       </div>
     </div>
@@ -84,7 +86,7 @@
       :subtitle="subtitle"
       :copy-object="copyObject"
       :code-style="codeStyle"
-      :settingsIcon="settingsIcon"
+      :settings-icon="settingsIcon"
       :fullname-style="fullnameStyle"
       :username-style="usernameStyle"
       :role-style="roleStyle"
@@ -114,7 +116,8 @@
         v-if="showMenu"
         v-model="bannerSelectedOption"
         :tabs="links"
-        @update:modelValue="emit('select:option', bannerSelectedOption)"
+        :loading="loading"
+        @update:model-value="emit('select:option', bannerSelectedOption)"
       />
     </div>
   </div>
@@ -133,7 +136,8 @@ export type BannerImageType = {
 
 const props = defineProps({
   coverPicture: {
-    type: Object as PropType<BannerImageType | null>,
+    type: Object as PropType<Upload | null>,
+    default: null,
   },
 
   showSettings: {
@@ -152,7 +156,8 @@ const props = defineProps({
   },
 
   profilePicture: {
-    type: Object as PropType<BannerImageType | null>,
+    type: Object as PropType<Upload | null>,
+    default: null,
   },
   profilePictureSize: {
     type: Number,
@@ -169,6 +174,7 @@ const props = defineProps({
 
   description: {
     type: String,
+    default: null,
   },
 
   distribution: {
@@ -189,36 +195,50 @@ const props = defineProps({
 
   copyObject: {
     type: Object as PropType<{ label: string; copyText: string }>,
+    default: null,
   },
   fullnameStyle: {
     type: String,
+    default: null,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
   codeStyle: {
     type: String,
+    default: null,
   },
   roleStyle: {
     type: String,
+    default: null,
   },
   usernameStyle: {
     type: String,
+    default: null,
   },
   startDateStyle: {
     type: String,
+    default: null,
   },
   endDateStyle: {
     type: String,
+    default: null,
   },
 
   titleStyle: {
     type: String,
+    default: null,
   },
 
   subtitleStyle: {
     type: String,
+    default: null,
   },
 
   avatarBlockStyle: {
     type: String,
+    default: null,
   },
 
   showBorder: {
@@ -257,28 +277,35 @@ const props = defineProps({
 
   title: {
     type: String,
+    default: null,
   },
 
   subtitle: {
     type: String,
+    default: null,
   },
 
   showMenu: { type: Boolean, default: false },
 
   userId: {
     type: Number,
+    default: null,
   },
   fullname: {
     type: String,
+    default: null,
   },
   startDate: {
     type: String,
+    default: null,
   },
   endDate: {
     type: String,
+    default: null,
   },
   username: {
     type: String,
+    default: null,
   },
   selectedOption: {
     type: Number,
@@ -287,7 +314,7 @@ const props = defineProps({
 
   links: {
     type: Array as PropType<TabType[]>,
-    default: [],
+    default: () => [],
   },
   isProfessor: { type: Boolean, default: false },
   canEdit: { type: Boolean, default: false },
@@ -299,7 +326,7 @@ const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
 
 const bannerSelectedOption = toRef(props.selectedOption);
 
-const cover = ref<BannerImageType | null | undefined>(props.coverPicture);
+const cover = ref<Upload | null | undefined>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {
   if (cover.value && props.imgFromStrapi) {
