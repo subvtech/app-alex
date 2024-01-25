@@ -1,4 +1,4 @@
-FROM node:16.20-alpine3.17
+FROM node:18.19-alpine3.19
 
 RUN apk update && \
   apk upgrade --no-cache && \
