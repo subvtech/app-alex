@@ -100,12 +100,11 @@ const props = defineProps({
   },
 });
 
-const { profilePicture, placeholder } = toRefs(props);
-
-const avatar = ref<{ url: string; id: number } | null | undefined>(
-  props.trackCurrentUser ? userStore.avatar : profilePicture?.value,
+const avatar = computed<{ url: string; id: number } | null | undefined>(() =>
+  props.trackCurrentUser ? userStore.avatar : props.profilePicture,
 );
-const fullname = ref<string | null | undefined>(placeholder.value);
+
+const fullname = computed<string | null | undefined>(() => props.placeholder);
 const { uploadProfilePicture, removeProfilePicture } = useProfilePicture(
   avatar,
   props.userId,
