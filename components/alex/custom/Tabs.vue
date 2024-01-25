@@ -1,10 +1,16 @@
 <template>
-  <v-tabs class="text-gray-800" :color="color" :direction="direction">
+  <v-tabs
+    class="text-gray-800"
+    :color="color"
+    :direction="direction"
+    :loading="loading"
+  >
     <v-tab
       v-for="tab in tabs"
       :key="tab.value"
       :value="tab.value"
       :to="tab.to"
+      :disabled="tab.disabled"
       class="text-body-1 tab"
       exact
       :class="!tab.notification ? 'px-7' : ''"
@@ -30,6 +36,7 @@ export type TabType = {
   value: string;
   notification?: boolean;
   icon?: string;
+  disabled?: boolean;
 };
 
 const { vertical } = defineProps({
@@ -42,6 +49,10 @@ const { vertical } = defineProps({
     default: 'accent',
   },
   vertical: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
     type: Boolean,
     default: false,
   },

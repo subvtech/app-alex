@@ -1,3 +1,5 @@
+import { InvitationLinkSimple } from './InvitationLinkSimple.model';
+
 const LearningPlanType = {
   COURSE: 'course',
   PROJECT: 'project',
@@ -26,7 +28,7 @@ export interface LearningPlanSimple {
   tasks: any[];
   tags: any[];
   invite_enable: boolean;
-  invitation_links: InvitationLink[];
+  invitation_links: InvitationLinkSimple[];
   learning_goals: any;
   schedules: any[];
   hidden: boolean;

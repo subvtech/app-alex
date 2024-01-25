@@ -1,5 +1,5 @@
 <template>
-  <div v-if="course">
+  <div v-if="learningPlanStore.learningPlan && course">
     <alex-learningplan-general
       :learning-plan="learningPlanStore.learningPlan as any"
       :learning-plan-id="learningPlanStore.learningPlan?.id"

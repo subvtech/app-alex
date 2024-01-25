@@ -12,6 +12,7 @@ import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
   const user = useStrapiUser<User>();
+  const i18n = useI18n();
 
   const { setMessage } = useMessageStore();
 
@@ -53,7 +54,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     } catch (e: any) {
       loading.value = false;
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        setMessage('Curso não encontrado.', 'red', true);
+        setMessage(i18n.t('pages.courses.notfound'), 'red', true);
       }
     }
   }
