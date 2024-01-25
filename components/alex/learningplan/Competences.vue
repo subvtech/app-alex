@@ -76,8 +76,10 @@ const props = withDefaults(defineProps<CompetencesProps>(), {
   canEdit: false,
   isGeneral: false,
 });
-const strapi = useStrapi();
 const { create } = useStrapiUtils();
+const { setMessage } = useMessageStore();
+const i18n = useI18n();
+const strapi = useStrapi();
 const isEditing = ref(false);
 const initialTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 const temporaryTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
@@ -155,6 +157,17 @@ const onSave = async () => {
   deleteTags();
   await createTags(temporaryTags.value);
   updatePublicTags(initialTags.value);
+  setMessage(
+    i18n.t(
+      `components.learningPlan.page.${
+        props.isGeneral
+          ? 'generalCompetencesUpdated'
+          : 'technicalCompetencesUpdated'
+      }`,
+    ),
+    'green',
+    true,
+  );
 };
 const onRemove = (text?: string) => {
   temporaryTags.value = temporaryTags.value.filter(
