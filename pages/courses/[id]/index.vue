@@ -38,8 +38,7 @@ const schedules = computed(
     }),
 );
 const headerStore = usePageHeaderStore();
-onBeforeMount(async () => {
-  await updateCourse(false);
+onBeforeMount(() => {
   headerStore.showHeader = true;
   headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
   headerStore.items = [

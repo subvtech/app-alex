@@ -167,6 +167,13 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       }) || []
     );
   });
+
+  const tags = computed(
+    () =>
+      learningPlan.value?.tags.map((tag) => {
+        return { ...tag, learningplanId: learningPlan.value?.id };
+      }),
+  );
   return {
     learningPlan,
     loadLearningPlan,
@@ -185,5 +192,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     standardTrailsCount,
     standardTrails,
     schedules,
+    tags,
   };
 });

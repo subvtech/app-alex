@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, _from) => {
-  const user = useStrapiUser<any>();
+  const user = useStrapiUser<UserSimple>();
   const loader = useLoadingIndicator();
 
   const isJoinRoutePath = to.name === 'courses-id-join-hash';

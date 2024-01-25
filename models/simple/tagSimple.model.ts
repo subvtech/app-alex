@@ -3,7 +3,7 @@ export interface TagSimple {
   text: string;
   verified: boolean;
   verified_date: Date;
-  verified_by?: string;
+  verified_by?: number;
   isPublic: boolean;
   isGeneral: boolean;
   learningplans: LearningPlanSimple;

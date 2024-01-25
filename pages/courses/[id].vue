@@ -41,7 +41,7 @@
       @select:option="selectOption"
       @display:settings="selectOption(8)"
     />
-    <NuxtPage @update="fetchData" />
+    <NuxtPage />
   </div>
 </template>
 <script setup lang="ts">
@@ -59,15 +59,7 @@ const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
 
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
 const selectedOption = ref(0);
-
-const fetchData = async () => {
-  await useAsyncData('user', () =>
-    learningPlanStore.loadLearningPlan(learningPlanId.value),
-  );
-};
 
 const selectOption = (index) => {
   selectedOption.value = index;

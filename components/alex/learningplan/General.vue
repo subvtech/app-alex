@@ -29,7 +29,7 @@
             hide-dividers
             full-width
             :text="learningPlan.description"
-            :user-id="userId"
+            :user-id="user.id"
             :can-edit="userIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
@@ -40,7 +40,7 @@
             is-nested
             :can-edit="canEdit"
             :course-id="learningPlan.id"
-            :user-id="userId"
+            :user-id="user.id"
             :data="
               learningPlan.learning_goals.map((item) => {
                 return {
@@ -139,52 +139,40 @@
           </div>
         </template>
       </alex-custom-card>
-      <competences
+      <alex-learningplan-competences
         v-if="
-          (generalTags.length === 0 && userIsFacilitator) ||
-          generalTags.length !== 0
+          (generalTags?.length === 0 && userIsFacilitator) ||
+          generalTags?.length !== 0
         "
         is-general
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
         :empty-message="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :user-id="userId"
+        :user-id="user.id"
         :learning-plan-id="learningPlan.id"
-        :user-tags="generalTags"
+        :tags="generalTags"
         :can-edit="userIsFacilitator"
-        @update="(data) => emit('update', data)"
       />
-      <competences
+      <alex-learningplan-competences
         v-if="
-          (technicalTags.length === 0 && userIsFacilitator) ||
-          technicalTags.length !== 0
+          (technicalTags?.length === 0 && userIsFacilitator) ||
+          technicalTags?.length !== 0
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
         :empty-message="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :user-id="userId"
+        :user-id="user.id"
         :learning-plan-id="learningPlan.id"
-        :user-tags="technicalTags"
+        :tags="technicalTags"
         :can-edit="userIsFacilitator"
-        @update="(data) => emit('update', data)"
       />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { CompetenceTag } from '@/components/Competences.vue';
 import { MeetingPropsType } from '~/components/CourseMeeting.vue';
-const { update } = useStrapi();
-
-const learningPlanStore = useLearningPlanStore();
-const standardTrails = learningPlanStore.standardTrailsCount;
-const userIsFacilitator = learningPlanStore.userIsFacilitator;
-const activeMembers = learningPlanStore.activeMembers;
-
-const i18n = useI18n();
-const emit = defineEmits(['update']);
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;
@@ -196,34 +184,21 @@ const props = withDefaults(defineProps<GeneralProps>(), {
   invitationLink: null,
   schedules: () => [],
 });
-const generalTags = ref<CompetenceTag[]>([]);
-const technicalTags = ref<CompetenceTag[]>([]);
+const { update } = useStrapi();
+const learningPlanStore = useLearningPlanStore();
+const standardTrails = learningPlanStore.standardTrailsCount;
+const userIsFacilitator = learningPlanStore.userIsFacilitator;
+const activeMembers = learningPlanStore.activeMembers;
+const i18n = useI18n();
+const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
-const { id: userId } = useStrapiUser<User>().value;
-if (props.learningPlan.tags) {
-  generalTags.value = props.learningPlan.tags.reduce(
-    (tags: CompetenceTag[], item) => {
-      if (item.isGeneral) {
-        tags.push({ ...item });
-      }
-
-      return tags;
-    },
-    [],
-  );
-
-  technicalTags.value = props.learningPlan.tags.reduce(
-    (tags: CompetenceTag[], item) => {
-      if (!item.isGeneral) {
-        tags.push({ ...item });
-      }
-
-      return tags;
-    },
-    [],
-  );
-}
-
+const user = useStrapiUser<User>();
+const generalTags = computed(
+  () => learningPlanStore.tags?.filter((tag) => tag.isGeneral),
+);
+const technicalTags = computed(
+  () => learningPlanStore.tags?.filter((tag) => !tag.isGeneral),
+);
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
