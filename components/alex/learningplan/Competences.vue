@@ -61,12 +61,8 @@
 </template>
 
 <script setup lang="ts">
-export type CompetenceTag = Pick<
-  TagSimple,
-  'id' | 'isGeneral' | 'text' | 'verified_by' | 'isPublic'
-> & { learningplanId: number };
 type CompetencesProps = {
-  tags: CompetenceTag[];
+  tags: Omit<TagSimple, 'learningplans'>[];
   title: string;
   emptyMessage: string;
   placeholder: string;
@@ -83,21 +79,21 @@ const props = withDefaults(defineProps<CompetencesProps>(), {
 const strapi = useStrapi();
 const { create } = useStrapiUtils();
 const isEditing = ref(false);
-const selectedTags = ref<CompetenceTag[]>(props.tags);
-const temporaryTags = ref<CompetenceTag[]>(props.tags);
+const initialTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
+const temporaryTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 
-const updateLocalTag = (
-  localTags: CompetenceTag[],
-  serverTag: Partial<TagSimple>,
-) => {
-  localTags.map((localTag) => {
-    if (localTag.text === serverTag.text) {
-      return serverTag;
+const updateLocalTag = (serverTag: Omit<TagSimple, 'learningplans'>) => {
+  const size = temporaryTags.value.length;
+  for (let index = 0; index < size; index++) {
+    const value = temporaryTags.value[index];
+    // Performace melhor que o map pois quando ele acha o valor ele para de iterar
+    if (value.text === serverTag.text) {
+      temporaryTags.value[index] = serverTag;
+      break;
     }
-    return localTag;
-  });
+  }
 };
-const createTags = async (tags: CompetenceTag[]) => {
+const createTags = async (tags: Omit<TagSimple, 'learningplans'>[]) => {
   const promises = tags
     .filter((tag) => !tag.id)
     .map(({ text }) =>
@@ -115,38 +111,50 @@ const createTags = async (tags: CompetenceTag[]) => {
       }),
     );
 
-  const createTags = await Promise.allSettled(promises);
+  const createTags = await Promise.all(promises);
   createTags.forEach((tag) => {
-    if (tag.status === 'fulfilled') {
-      updateLocalTag(selectedTags.value, tag.value.data);
-    }
+    updateLocalTag(tag.data);
   });
+  initialTags.value = temporaryTags.value;
 };
-const deleteTags = async () => {
-  const deletedTags = selectedTags.value.filter(
+const deleteTags = () => {
+  const deletedTags = initialTags.value.filter(
     (selectedTag) =>
       !temporaryTags.value.find((tag) => tag.text === selectedTag.text),
   );
+  if (deletedTags.length === 0) return;
   const deletedPromises = deletedTags
     .filter((tag) => tag.id)
     .map((tag) => {
+      if (tag.isPublic) {
+        return strapi.update(`tags/${tag.id}`, {
+          learningplans: {
+            disconnect: [props.learningPlanId],
+          },
+        });
+      }
       return strapi.delete('tags', tag.id);
     });
-  await Promise.allSettled(deletedPromises);
+  Promise.all(deletedPromises);
 };
-
-const updateTags = (tags: CompetenceTag[]) => {
-  const serverTags = tags.filter((tag) => !tag.learningplanId);
-  console.log(serverTags);
+const updatePublicTags = (tags: Omit<TagSimple, 'learningplans'>[]) => {
+  const serverTags = tags.filter((tag) => tag.isPublic);
+  const updatedTagsPromises = serverTags.map((tag) =>
+    strapi.update(`tags/${tag.id}`, {
+      learningplans: {
+        connect: [props.learningPlanId],
+      },
+    }),
+  );
+  Promise.all(updatedTagsPromises);
 };
 const onCancel = () => {
-  temporaryTags.value = selectedTags.value;
+  temporaryTags.value = initialTags.value;
 };
-const onSave = () => {
+const onSave = async () => {
   deleteTags();
-  selectedTags.value = temporaryTags.value;
-  updateTags(selectedTags.value);
-  createTags(selectedTags.value);
+  await createTags(temporaryTags.value);
+  updatePublicTags(initialTags.value);
 };
 const onRemove = (text?: string) => {
   temporaryTags.value = temporaryTags.value.filter(

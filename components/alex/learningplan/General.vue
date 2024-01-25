@@ -194,10 +194,10 @@ const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
 const user = useStrapiUser<User>();
 const generalTags = computed(
-  () => learningPlanStore.tags?.filter((tag) => tag.isGeneral),
+  () => learningPlanStore.learningPlan?.tags?.filter((tag) => tag.isGeneral),
 );
 const technicalTags = computed(
-  () => learningPlanStore.tags?.filter((tag) => !tag.isGeneral),
+  () => learningPlanStore.learningPlan?.tags?.filter((tag) => !tag.isGeneral),
 );
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
