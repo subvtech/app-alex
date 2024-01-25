@@ -1,8 +1,7 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
@@ -11,9 +10,19 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/strapi'],
+  modules: ['@pinia/nuxt', '@nuxt/image', '@nuxtjs/strapi', 'nuxt-vitest'],
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
+  },
+  image: {
+    strapi: {
+      baseURL: process.env.STRAPI_URL || 'http://localhost:1337',
+    },
+  },
+  runtimeConfig: {
+    public: {
+      showComponentsPage: process.env.COMPONENTS_PAGE === 'on',
+    },
   },
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
@@ -22,6 +31,12 @@ export default defineNuxtConfig({
     },
   },
   imports: {
-    dirs: ['stores', 'models'],
+    dirs: ['stores', 'models', 'config', 'models/simple'],
+    presets: [
+      {
+        from: 'vue-i18n',
+        imports: ['useI18n'],
+      },
+    ],
   },
 });

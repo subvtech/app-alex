@@ -1,0 +1,173 @@
+<template>
+  <div class="alex-select" :class="$attrs.class">
+    <div v-if="label" class="d-flex mb-2 text-blue">
+      <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
+      <p class="text-body-1" :class="`text-${textColor}`">
+        {{ label }}
+      </p>
+      <alex-custom-tooltip v-if="info" show-icon :text="info"/>
+    </div>
+    <v-select
+      v-model="value"
+      color="primary--2"
+      rounded="lg"
+      variant="outlined"
+      no-resize
+      role="select"
+      clear-icon="mdi-close"
+      class="height-44"
+      :class="[theme, smaller ? 'height-44' : '']"
+      :error-messages="errorMessage"
+      :disabled="disabled"
+      :menu-props="{
+        class: theme,
+      }"
+      v-bind="$attrs"
+      @blur="handleBlur"
+    >
+      <!-- Bind all slots  -->
+      <template v-for="(_, slot) in $slots" #[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
+      <!-- Default item slot -->
+      <template #item="{ props: propsItem, item, index }">
+        <alex-custom-list-item
+          :key="index"
+          :text="item.title"
+          v-bind="propsItem"
+          :theme="theme"
+        />
+      </template>
+    </v-select>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { YupSchema, useField } from 'vee-validate';
+
+interface SelectProps {
+  modelValue?: string | number | boolean | unknown[] | any;
+  name: string;
+  label?: string;
+  required?: boolean;
+  info?: string;
+  smaller?: boolean;
+  disabled?: boolean;
+  theme?: 'light' | 'dark';
+  schema?: YupSchema;
+}
+const props = withDefaults(defineProps<SelectProps>(), {
+  disabled: false,
+  theme: 'light',
+  smaller: false,
+  info: undefined,
+  label: undefined,
+  modelValue: undefined,
+  schema: undefined,
+});
+const { value, errorMessage, handleBlur } = useField(
+  () => props.name,
+  props.schema,
+  {
+    syncVModel: true,
+  },
+);
+
+const textColor = computed(() => {
+  if (props.theme === 'light') {
+    return props.disabled ? 'gray-300' : 'gray-800';
+  }
+  if (props.theme === 'dark') {
+    return props.disabled ? 'gray-300' : 'white';
+  }
+});
+</script>
+
+<style lang="scss">
+.height-44 {
+  height: 44px !important;
+  min-height: unset !important;
+  max-height: 44px;
+  width: auto;
+}
+.alex-select {
+  &.v-theme--mainTheme {
+    --v-border-opacity: 1 !important;
+    --v-high-emphasis-opacity: 1 !important;
+    --v-medium-emphasis-opacity: 1 !important;
+    --v-disabled-opacity: 1 !important;
+    --v-border-color: rgb(var(--v-theme-gray-400));
+  }
+
+  &.v-field__input {
+    overflow: hidden;
+    color: rgb(var(--v-theme-gray-300));
+    border-color: rgb(var(--v-theme-gray-400));
+    text-overflow: ellipsis !important;
+    font-family: Sen !important;
+    font-size: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    font-style: normal !important;
+    line-height: 135% !important;
+    letter-spacing: 0.32px !important;
+    border-width: 5px !important;
+  }
+
+  .v-field--disabled > div > i,
+  .v-field--disabled > .v-field__field > .v-field__input,
+  .v-input--disabled > .v-input__details {
+    color: rgb(var(--v-theme-gray-300)) !important;
+  }
+
+  .v-field:hover:not(.v-field--active):not(.v-field--error)
+    > .v-field__outline {
+    color: rgb(var(--v-theme-gray-800)) !important;
+  }
+
+  .v-input__details {
+    padding-inline-start: 0 !important;
+  }
+
+  .v-input__details > .v-messages > .v-messages__message {
+    font-size: 14px !important;
+    color: rgb(var(--v-theme-gray-600));
+  }
+
+  .light .v-field__outline {
+    color: rgb(var(--v-theme-gray-300));
+  }
+
+  .light .v-field--dirty > .v-field__field > .v-field__input {
+    color: rgb(var(--v-theme-gray-800)) !important;
+  }
+
+  .light .v-field > div > i {
+    color: rgb(var(--v-theme-gray-600)) !important;
+  }
+
+  .dark .v-field__outline {
+    color: var(--gray-400);
+  }
+
+  .dark .v-field--dirty > .v-field__field > .v-field__input {
+    color: #fff !important;
+  }
+
+  .dark .v-field > div > i {
+    color: rgb(var(--v-theme-gray-400)) !important;
+  }
+
+  .v-field--error > .v-field__outline,
+  .v-input--error .v-messages__message {
+    color: rgb(var(--v-theme-error-0)) !important;
+  }
+}
+.dark .v-list {
+  background-color: rgb(var(--v-theme-primary-2)) !important;
+  color: rgb(var(--v-theme-white)) !important;
+}
+.light .v-list {
+  background-color: rgb(var(--v-theme-white)) !important;
+}
+</style>

@@ -1,5 +1,9 @@
 import { Tag } from './tag.model';
 
+export enum UserRoles {
+  PROFESSOR = 'professor',
+  AUTHENTICATED = 'Authenticated',
+}
 export interface User {
   id: number;
   username: string;
@@ -15,5 +19,5 @@ export interface User {
   isProfessor: boolean;
   tags: Tag[];
   avatar: any;
-  role: any;
+  role: UserRoles;
 }

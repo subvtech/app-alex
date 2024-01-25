@@ -1,0 +1,10 @@
+{
+  "title": "Securities",
+  "email": "Email",
+  "password": "Password",
+  "editEmail": "Change Email",
+  "editPassword": "Change Password",
+  "saveEmail": "Save Email",
+  "savePassword": "Save Password",
+  "message": "Not yet implemented"
+}

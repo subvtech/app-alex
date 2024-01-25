@@ -1,0 +1,26 @@
+{
+  "alt": "Bem-vindo ao Alex",
+  "welcome": "Olá! Acesse a sua conta",
+  "access": "Entre com seus dados cadastrados e continue seus estudos",
+  "forgot": "Esqueci a senha",
+  "submit": "Entrar",
+  "user": "E-mail",
+  "userHolder": "Digite seu E-mail",
+  "noAccount": "Ainda não possui conta?",
+  "register": "Crie sua conta aqui!",
+  "remember": "Relembrar",
+  "password": "Senha",
+  "passwordHolder": "Digite sua senha",
+  "divider": "OU",
+  "blocked": "Você está banido.",
+  "metamask": {
+    "btn": "Acessar com a Metamask",
+    "notFound": "Metamask not detected",
+    "tokenExpired": "Token expirado, tente novamente"
+  },
+  "loginError": "Email ou senha incorretos!",
+  "confirmEmail": "Por favor, valide seu e-mail antes de continuar.",
+  "blockedUser": "Usuário bloqueado, entre em contato com o suporte.",
+  "genericError": "Ocorreu um erro, tente novamente mais tarde.",
+  "searchError": "Instituição não encontrada"
+}

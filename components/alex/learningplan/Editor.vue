@@ -3,7 +3,7 @@
     <v-col cols="12">
       <v-row justify="end" class="mb-2">
         <v-btn color="white" class="mr-1" @click="emit('back')">
-          Cancelar
+          {{ $t('components.learningPlan.editor.cancel') }}
         </v-btn>
         <v-btn
           color="accent"
@@ -20,13 +20,15 @@
           :loading="saving"
           @click="openModal = true"
         >
-          Criar Versão
+          {{ $t('components.learningPlan.editor.createVersion') }}
         </v-btn>
       </v-row>
     </v-col>
     <v-col cols="11" class="pa-0 mb-8">
       <v-card class="pa-5">
-        <v-card-title class="pa-0 mb-6">Informações do plano</v-card-title>
+        <v-card-title class="pa-0 mb-6">
+          {{ $t('components.learningPlan.editor.formTitle') }}</v-card-title
+        >
         <v-form v-model="updateFormValid">
           <v-row>
             <v-col cols="3">
@@ -41,7 +43,7 @@
                   <v-text-field
                     v-model="updateForm.title"
                     :rules="updateRules.title"
-                    label="Nome do Plano"
+                    :label="$t('components.learningPlan.editor.planTitle')"
                     dense
                     outlined
                   />
@@ -51,7 +53,7 @@
                     v-model="updateForm.description"
                     :rules="updateRules.description"
                     rows="4"
-                    label="Descrição do Plano"
+                    :label="$t('components.learningPlan.editor.planDescription')"
                     dense
                     no-resize
                     auto-grow
@@ -85,7 +87,7 @@
                 <v-text-field
                   v-model="tag"
                   :rules="tagRules"
-                  label="Versão"
+                  :label="$t('components.learningPlan.editor.version')"
                   outlined
                 />
               </v-col>
@@ -100,7 +102,7 @@
                     :loading="saving"
                     type="submit"
                   >
-                    Criar
+                    {{ $t('components.learningPlan.editor.submit') }}
                   </v-btn>
                 </v-row>
               </v-col>
@@ -114,11 +116,11 @@
 
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-
-import { Tag } from 'models/tag.model';
-import { formRules, createFileFromUrl } from '@/helpers/utils';
-import { LearningPlan } from 'models/learningPlan.model';
+import { Tag } from '~/models/tag.model';
+import { LearningPlan } from '~/models/learningPlan.model';
 const { requiredRule, min5CharactersRule } = formRules;
+
+const i18n = useI18n();
 
 const emit = defineEmits(['back', 'updated']);
 
@@ -203,7 +205,7 @@ const loadUpdateForm = async () => {
 const save = async (tag = '') => {
   if (!updateForm.value) return;
   const route = useRoute();
-  const { planId, trailId } = route.params;
+  const { planId, trailId } = route.params as {planId: string, trailId: string};
   const { instance } = editor.value;
 
   saving.value = true;
@@ -243,14 +245,17 @@ const save = async (tag = '') => {
 
     await update('learningplans', trailId || planId, formData as any);
 
-    messageStore.message = 'Dados salvos com sucesso!';
+    messageStore.message = i18n.t('components.learningPlan.editor.successMsg');
+    messageStore.color = 'green';
     emit('updated');
   } catch (err) {
     messageStore.message = err as string;
+    messageStore.color = 'red';
   } finally {
     openModal.value = false;
     saving.value = false;
     visible.value = false;
+    messageStore.show = true;
   }
 };
 

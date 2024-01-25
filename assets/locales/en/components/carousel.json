@@ -1,0 +1,12 @@
+{
+    "dialogTitle": "Load Media",
+    "dialogMainButton": "Add",
+    "dialogMainButtonConfig": "Save", 
+    "dialogSecondaryButton": "Cancel",
+    "mediaType": "How do you want to add the media?",
+    "fileDropText": "Drag and drop a file or ",
+    "fileDropHighlightedText": "click to browse",
+    "fileDropActionText": "Drop the file to add it",
+    "linkPlaceholder": "Paste the link here...",
+    "linkPreviewText": "Your image will appear here"
+}

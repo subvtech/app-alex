@@ -1,80 +1,98 @@
 <template>
-  <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
-    <div class="mb-10">
-      <p class="text-white text-h4 text-center font-weight-bold mb-4">
-        Esqueceu a senha?
-      </p>
-      <p class="text-white text-h6 font-weight-regular text-center my-2">
-        Digite seu e-mail e enviaremos instruções
-      </p>
+  <v-container
+    class="content d-flex flex-column align-content-start justify-start max-400"
+  >
+    <div>
+      <v-card-title class="text-white text-h3 text-center text-bold">
+        {{ $t('components.forgot.sendResetPassword.forgotPassword') }}
+      </v-card-title>
+      <v-card-subtitle
+        class="text-subtitle-2 text-white text-center mb-8 white-space-normal"
+      >
+        {{ $t('components.forgot.sendResetPassword.enterEmail') }}
+      </v-card-subtitle>
     </div>
+
     <v-form
       ref="form"
-      v-model="validForm"
+      class="d-flex flex-column mb-10"
       color="white"
-      class="mb-10"
-      :update:modelValue="!validForm ? (errorMessage = false) : null"
-      @submit.prevent="sendEmail"
+      @submit.prevent="submit"
     >
-      <v-text-field
-        v-model="email"
-        label="Email"
-        class="mb-6"
-        variant="outlined"
-        density="comfortable"
-        :rules="emailRules"
-      >
-        <template #details>
-          <span v-if="errorMessage" class="text-error w-100"
-            >Ocorreu um erro ao enviar o e-mail, tente novamente mais
-            tarde.</span
-          >
-        </template>
-      </v-text-field>
-      <v-btn
-        :color="!validForm ? 'grey-darken-1' : 'accent'"
-        class="text-none text-white rounded-lg pa-5"
+      <alex-inputs-text-field
+        :label="$t('components.forgot.sendResetPassword.email')"
+        :placeholder="$t('components.forgot.sendResetPassword.emailHolder')"
+        name="email"
+        color="white"
+        class="mb-1"
+        theme="dark"
+      />
+      <span v-if="submitError" class="text-error w-100">{{
+        $t('components.forgot.sendResetPassword.emailError')
+      }}</span>
+
+      <alex-custom-button
         block
+        theme="dark"
         type="submit"
         size="large"
-        :disabled="!validForm"
+        :disabled="!isValid"
         :loading="loading"
-        >RECUPERAR SENHA</v-btn
+        >{{
+          $t('components.forgot.sendResetPassword.recoverPassword')
+        }}</alex-custom-button
       >
     </v-form>
-    <ForgotPasswordDividerRow />
-    <p class="text-center text-body-1">
-      Lembrou da senha?
-      <NuxtLink to="/login" class="text-decoration-none text-accent"
-        >acesse aqui!</NuxtLink
-      >
+    <p class="text-center text-body-1 font-weight-bold">
+      {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
+      <NuxtLink to="/login" class="text-decoration-none text-accent">{{
+        $t('components.forgot.sendResetPassword.login')
+      }}</NuxtLink>
     </p>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useForm } from 'vee-validate';
 const { emailRules } = useFormRules();
-const validForm = ref(false);
-const email = ref('');
 const form = ref(null);
+const submitError = ref(false);
 const loading = ref(false);
-const errorMessage = ref(false);
 const messageStore = useMessageStore();
 const { forgotPassword } = useStrapiAuth();
 const emit = defineEmits(['confirmation-message']);
 
-const sendEmail = async () => {
+const { handleSubmit, errors, values, controlledValues } = useForm({
+  validationSchema: emailRules,
+  keepValuesOnUnmount: true,
+});
+
+const isValid = computed(
+  () =>
+    !Object.values(controlledValues.value).includes(undefined) &&
+    !Object.values(errors.value).length,
+);
+const submit = handleSubmit(async () => {
   loading.value = true;
-  errorMessage.value = false;
   try {
-    await forgotPassword({ email: email.value });
-    emit('confirmation-message', email.value);
-    loading.value = false;
+    await forgotPassword({ email: values.email });
+    emit('confirmation-message', values.email);
   } catch (error) {
+    submitError.value = true;
     messageStore.message = error as string;
-    errorMessage.value = true;
+    messageStore.color = 'red';
+    messageStore.show = true;
+  } finally {
     loading.value = false;
   }
-};
+});
 </script>
+
+<style lang="scss">
+.max-400 {
+  max-width: 400px;
+}
+.white-space-normal {
+  white-space: normal;
+}
+</style>

@@ -1,0 +1,23 @@
+{
+  "title": "Meu Perfil",
+  "home": "Home",
+  "edit": "Editar",
+  "teacher": "Professor",
+  "student": "Aluno",
+  "general": "Visão Geral",
+  "courses": "Cursos",
+  "projects": "Projetos",
+  "assignments": "Tarefas",
+  "learningPlans": "Planos de Aprendizado",
+  "events": "Eventos",
+  "settings": "Configurações",
+  "cover": "Alterar capa",
+  "startDate": "Início",
+  "about": {
+    "title": "Sobre",
+    "empty": "Parece que não há uma descrição...",
+    "placeholder": "Digite uma descrição...",
+    "updated": "Sobre atualizado com sucesso."
+  },
+  "endDate": "Término"
+}

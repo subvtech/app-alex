@@ -1,0 +1,9 @@
+{
+  "title": "Details",
+  "emptyPlaceholder": "It looks like there are no details about your course.",
+  "quote": {
+    "placeholder": "Type the quote",
+    "caption": "Quote's author"
+  },
+  "update": "Details successfully updated."
+}

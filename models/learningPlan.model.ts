@@ -2,31 +2,37 @@ import {
   Strapi4ResponseMany,
   Strapi4ResponseSingle,
 } from '@nuxtjs/strapi/dist/runtime/types';
-import { ClassesLearningPlan } from './classesLearningPlan.model';
-import { Structure } from './structure.model';
-import { Tag } from './tag.model';
-import { User } from './user.model';
-import { Version } from './version.model';
-import { Upload } from './upload.model';
-import { Class } from './class.model';
 
+export const LearningPlanType = {
+  COURSE: 'course',
+  PROJECT: 'project',
+  COURSE_PROJECT: 'course_project',
+} as const;
+
+export type ValueOf<T> = T[keyof T];
 export interface LearningPlan {
   id: number;
   title: string;
-  author: Strapi4ResponseSingle<User>;
-  users: User[];
-  image: Strapi4ResponseSingle<Upload>;
-  isVisible: boolean;
-  learningplan?: Strapi4ResponseSingle<LearningPlan>;
-  trails: Strapi4ResponseMany<LearningPlan>;
-  structures?: Strapi4ResponseMany<Structure>;
-  structure?: Strapi4ResponseMany<Structure>;
-  versions: Strapi4ResponseMany<Version>;
-  classes_learning_plans: ClassesLearningPlan;
-  coauthors: Strapi4ResponseMany<User>;
-  approved_grade: Number;
   description: string;
+  start_date: string;
+  end_date: string;
+  media: Strapi4ResponseMany<Media>;
+  type: ValueOf<typeof LearningPlanType>;
+  cover_image: Strapi4ResponseSingle<Upload>;
+  slug: string;
+  class_name: string;
+  archive_at: string;
+  projects: Strapi4ResponseMany<LearningPlan>;
+  courses: Strapi4ResponseMany<LearningPlan>;
+  members: Strapi4ResponseMany<User>;
+  learning_structure: Strapi4ResponseSingle<learningPlanStructure>;
+  groups: Strapi4ResponseMany<learningPlanGroup>;
+  tasks: Strapi4ResponseMany<Task>;
   tags: Strapi4ResponseMany<Tag>;
-  userClasses?: Strapi4ResponseMany<Class>;
-  isTrail?: boolean;
+  invite_enable: boolean;
+  invitation_links: Strapi4ResponseSingle<InvitationLink>;
+  learning_goals: Strapi4ResponseMany<LearningPlanGoal>;
+  schedules: Strapi4ResponseMany<LearningPlanSchedule>;
+  hidden: boolean;
+  details: any;
 }

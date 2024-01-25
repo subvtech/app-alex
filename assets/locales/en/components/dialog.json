@@ -1,0 +1,10 @@
+{
+    "create": "Create",
+    "next": "Next",
+    "back": "Back",
+    "title": "Title",
+    "save": "Save",
+    "cancel": "Cancel",
+    "cantCreateCourse": "The course could not be created",
+    "successCreateCourse": "Course successfully created"
+}

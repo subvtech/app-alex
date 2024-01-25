@@ -1,21 +1,23 @@
 <template>
   <v-container
-    class="w-100 fill-height d-flex align-content-center justify-center"
+    class="w-100 d-flex flex-column justify-start align-center fill-height"
   >
     <v-card
       variant="outlined"
       class="w-100 pa-4 rounded-lg"
       color="green-lighten-1"
     >
-      <v-card-title class="text-white">{{ title }}</v-card-title>
-      <v-card-text class="text-body-1 text-grey-lighten-1"
+      <v-card-title class="title text-white text-h3">{{ title }}</v-card-title>
+      <v-card-text class="text-body-1 text-gray-200"
         >{{ text }}
         <strong class="text-white font-weight-bold"> {{ email }} </strong>
         {{ text2 }}
       </v-card-text>
     </v-card>
     <NuxtLink to="/login" class="text-accent text-decoration-none mt-6">
-      <v-icon icon="mdi-arrow-left" class="mr-1" />Voltar para o login
+      <v-icon icon="mdi-arrow-left" class="mr-1" />{{
+        $t('pages.forgot.success.return')
+      }}
     </NuxtLink>
   </v-container>
 </template>
@@ -30,3 +32,18 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.max-400 {
+  max-width: 400px;
+}
+
+.title {
+  overflow: visible !important;
+  overflow-wrap: break-word !important;
+  text-overflow: inherit !important;
+  white-space: pre-wrap !important;
+  word-break: break-word;
+  word-wrap: break-word !important;
+}
+</style>

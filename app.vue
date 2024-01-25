@@ -1,11 +1,12 @@
 <template>
   <div>
     <NuxtLayout>
+      <NuxtLoadingIndicator />
       <NuxtPage />
     </NuxtLayout>
   </div>
 </template>
 
-<script setup>
-import './assets/css/base.scss';
-</script>
+<style lang="scss">
+@use 'config/scss/index.scss';
+</style>

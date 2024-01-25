@@ -1,0 +1,35 @@
+{
+  "general": "Visão Geral",
+  "trails": "Trilhas",
+  "assignments": "Tarefas",
+  "class": "Turma",
+  "projects": "Projetos",
+  "events": "Eventos",
+  "communication": "Comunicação",
+  "details": "Detalhes",
+  "invite": "Convite do curso",
+  "about": {
+    "title": "Sobre o curso",
+    "empty": "Parece que esse curso não tem uma descrição...",
+    "placeholder": "Digite uma descrição...",
+    "updated": "Sobre atualizado com sucesso."
+  },
+  "media": {
+    "title": "Sobre o curso",
+    "empty": "Parece que esse curso não tem mídia...",
+    "updated": "Mídia foi atualizada com sucesso."
+  },
+  "hash": {
+    "joined": {
+      "title": "Utilizando o convite...",
+      "description": "Você está sendo redirecionado para a página do curso selecionado, se estiver demorando muito clique no link abaixo",
+      "redirect": "Ir para o curso selecionado"
+    },
+    "expired": {
+      "title": "Convite Expirado",
+      "description": "Esse convite expirou anos atrás, volte e certifique-se de apresentar um convite válido na próxima vez...",
+      "redirect": "Voltar para home"
+    }
+  },
+  "notfound": "Curso não encontrado"
+}

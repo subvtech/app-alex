@@ -1,122 +1,139 @@
 <template>
-  <v-container class="pa-0 d-flex flex-column h-75 mid-container mt-220">
+  <v-container
+    class="content d-flex flex-column align-content-start justify-start max-400"
+  >
     <div class="mb-10">
-      <p class="text-white text-h4 text-center font-weight-bold mb-4">
-        Cadastre sua nova senha
-      </p>
-      <p class="text-white text-h6 font-weight-regular text-center my-2">
-        Digite sua nova senha e a confirmação
-      </p>
+      <v-card-title class="text-white text-h3 text-center text-bold">
+        {{ $t('components.forgot.sendResetPassword.newPassword') }}
+      </v-card-title>
+      <v-card-subtitle
+        class="text-subtitle-2 text-white text-center white-space-normal"
+      >
+        {{ $t('components.forgot.sendResetPassword.enterPassword') }}
+      </v-card-subtitle>
     </div>
     <v-form
       ref="form"
-      v-model="validForm"
       color="white"
-      class="mb-10"
-      :update:modelValue="!validForm ? (errorMessage = false) : null"
+      class="d-flex flex-column gap-1 mb-10"
       @submit.prevent="changePassword"
     >
-      <v-text-field
-        v-model="password"
-        label="Senha"
-        class="mb-2"
-        rounded="lg"
-        variant="outlined"
-        density="comfortable"
-        :rules="rules.password"
-        type="password"
-      >
-      </v-text-field>
-      <v-text-field
-        v-model="passwordConfirmation"
-        label="Confirmação"
-        class="mb-6"
-        rounded="lg"
-        variant="outlined"
-        density="comfortable"
-        :rules="rules.passwordConfirmation"
-        type="password"
-      >
-        <template #details>
-          <span v-if="errorMessage" class="text-error w-100"
-            >Ocorreu um erro ao alterar a senha, tente novamente mais tarde.
-            tarde.</span
-          >
-        </template>
-      </v-text-field>
-      <v-btn
-        :color="!validForm ? 'grey-darken-1' : 'accent'"
-        class="text-none text-white rounded-lg pa-5"
+      <alex-inputs-text-field
+        :label="$t('components.forgot.sendResetPassword.password')"
+        :placeholder="$t('components.forgot.sendResetPassword.passwordHolder')"
+        name="password"
+        :type="passwordVisible ? 'text' : 'password'"
+        color="white"
+        class="mb-1"
+        theme="dark"
+        :append-inner-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+        @click:append-inner="passwordVisible = !passwordVisible"
+      />
+
+      <alex-inputs-text-field
+        :label="$t('components.forgot.sendResetPassword.confirmPassword')"
+        :placeholder="
+          $t('components.forgot.sendResetPassword.confirmPasswordHolder')
+        "
+        name="confirmPassword"
+        :append-inner-icon="confirmationVisible ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="confirmationVisible ? 'text' : 'password'"
+        color="white"
+        class="mb-1"
+        theme="dark"
+        @click:append-inner="confirmationVisible = !confirmationVisible"
+      />
+      <alex-custom-button
+        theme="dark"
         block
         type="submit"
         size="large"
-        :disabled="!validForm"
+        :disabled="!isValid"
         :loading="loading"
       >
-        ALTERAR SENHA</v-btn
+        {{
+          $t('components.forgot.sendResetPassword.changePassword')
+        }}</alex-custom-button
       >
     </v-form>
-    <ForgotPasswordDividerRow />
-    <p class="text-center text-body-1">
-      Lembrou da senha?
+    <p class="text-center text-body-1 font-weight-bold mt-5">
+      {{ $t('components.forgot.sendResetPassword.recalledPassword') }}
       <NuxtLink to="/login" class="text-accent text-decoration-none">
-        acesse aqui!
+        {{ $t('components.forgot.sendResetPassword.login') }}
       </NuxtLink>
     </p>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { passwordRules } from '@/helpers/utils';
-const {
-  charactersRule,
-  min8CharactersRule,
-  passwordConfirmationRule,
-  requiredRule,
-  requiredConfirmationRule,
-} = passwordRules;
-const messageStore = useMessageStore();
+import { useForm } from 'vee-validate';
 const { resetPassword } = useStrapiAuth();
-const password = ref('');
-const passwordConfirmation = ref('');
-const validForm = ref(false);
+const messageStore = useMessageStore();
+
+const { schema4 } = useFormRules();
+
 const form = ref(null);
 const loading = ref(false);
-const errorMessage = ref(false);
+const passwordVisible = ref(false);
+const confirmationVisible = ref(false);
+
 const route = useRoute();
+
+onBeforeMount(() => {
+  if (!route.query.code) navigateTo('/login');
+});
 
 const emit = defineEmits(['confirmation-message']);
 
-const rules = ref({
-  password: [
-    requiredRule,
-    min8CharactersRule,
-    charactersRule,
-    (val) => passwordConfirmationRule(val, passwordConfirmation.value) || true,
-  ],
-  passwordConfirmation: [
-    requiredConfirmationRule,
-    (val) => passwordConfirmationRule(password.value, val) || true,
-  ],
+const { handleSubmit, errors, values, controlledValues } = useForm({
+  validationSchema: schema4,
+  keepValuesOnUnmount: true,
 });
 
-const changePassword = async () => {
+const isValid = computed(
+  () =>
+    !Object.values(controlledValues.value).includes(undefined) &&
+    !Object.values(errors.value).length,
+);
+
+const changePassword = handleSubmit(async () => {
   loading.value = true;
-  errorMessage.value = false;
   try {
     await resetPassword({
       code: route.query.code as string,
-      password: password.value,
-      passwordConfirmation: passwordConfirmation.value,
+      password: values.password,
+      passwordConfirmation: values.confirmPassword,
     });
+
     emit('confirmation-message');
-    loading.value = false;
   } catch (error) {
     messageStore.message = error as string;
-    errorMessage.value = true;
+    messageStore.color = 'red';
+    messageStore.show = true;
+    navigateTo('/login');
+  } finally {
     loading.value = false;
   }
-};
+});
 </script>
+
+<style scoped lang="scss">
+@media (max-height: 700px) {
+  .v-container {
+    .mt-5 {
+      margin-top: 10px !important;
+    }
+    .mb-10 {
+      margin-bottom: 10px !important;
+    }
+  }
+}
+.max-400 {
+  max-width: 400px;
+}
+
+.white-space-normal {
+  white-space: normal;
+}
+</style>

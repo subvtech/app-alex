@@ -1,0 +1,11 @@
+{
+    "title": "Informações Pessoais",
+    "fullname": "Nome Completo",
+    "phone": "Telefone",
+    "about": "Sobre",
+    "cancel": "Cancelar",
+    "phonePlaceholder": "Digite seu telefone",
+    "save": "Salvar",
+    "cpf": "CPF",
+    "update": "Informações pessoais atualizadas."
+}

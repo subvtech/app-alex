@@ -1,17 +1,8 @@
-import {
-  Strapi4ResponseMany,
-  Strapi4ResponseSingle,
-} from '@nuxtjs/strapi/dist/runtime/types';
-import { Block } from './block.model';
-import { LearningPlan } from './learningPlan.model';
-import { Version } from './version.model';
-
+import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
 export interface Structure {
   id: number;
-  version: string;
-  learningplan?: Strapi4ResponseSingle<LearningPlan>;
   time: Number;
+  version: string;
   blocks: Strapi4ResponseMany<Block>;
-  versioning: Version;
-  updatedAt: string;
+  trails: Strapi4ResponseMany<Trail>;
 }

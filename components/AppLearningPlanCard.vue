@@ -25,14 +25,19 @@
         <div class="description">{{ getDescriptionHtml }}</div>
 
         <div class="mt-2">
-          {{ (learningPlan.attributes.trails.data || []).length }} trilhas
-          existentes
+          {{
+            $t('components.appLearningPlanCard.existingTrails', {
+              data: (learningPlan.attributes.trails.data || []).length,
+            })
+          }}
         </div>
       </v-card-subtitle>
       <v-divider></v-divider>
       <v-card-actions>
         <v-row justify="end" align="center" class="pa-2">
-          <v-btn color="accent" nuxt :to="viewPlanUrl"> Visualizar </v-btn>
+          <v-btn color="accent" nuxt :to="viewPlanUrl">
+            {{ $t('components.appLearningPlanCard.show') }}
+          </v-btn>
         </v-row>
       </v-card-actions>
     </v-card>
@@ -41,10 +46,7 @@
 <script setup lang="ts">
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { LearningPlan } from 'models/learningPlan.model';
-
-// const strapiUrl = useStrapiUrl();
-// const strapiBaseUrl = computed(() => strapiUrl.replace('/api', ''));
-
+const i18n = useI18n();
 const props = defineProps({
   learningPlan: {
     type: Object as () => Strapi4ResponseData<LearningPlan>,
@@ -65,7 +67,7 @@ const getImageUrl = computed(() => {
 const getImageName = computed(() => {
   return props.learningPlan.attributes.image.data
     ? props.learningPlan.attributes.image.data.attributes.name
-    : 'Sem Imagem';
+    : i18n.t('components.appLearningPlanCard.show');
 });
 
 const getDescriptionHtml = computed(() => {
