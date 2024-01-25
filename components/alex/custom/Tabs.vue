@@ -1,5 +1,10 @@
 <template>
-  <v-tabs class="text-gray-800" :color="color" :direction="direction">
+  <v-tabs
+    class="text-gray-800"
+    :color="color"
+    :direction="direction"
+    :loading="loading"
+  >
     <v-tab
       v-for="tab in tabs"
       :key="tab.value"
@@ -7,6 +12,7 @@
       :to="tab.to"
       :class="!tab.notification ? 'px-4' : ''"
       :ripple="false"
+      :disabled="tab.disabled"
       class="text-body-1 tab"
       exact
       @click="tab.notification = false"
@@ -30,9 +36,10 @@ export type TabType = {
   value: string | number;
   notification?: boolean;
   icon?: string;
+  disabled?: boolean;
 };
 
-const { vertical } = defineProps({
+const props = defineProps({
   tabs: {
     type: Array as PropType<TabType[]>,
     default: () => [{}],
@@ -45,9 +52,13 @@ const { vertical } = defineProps({
     type: Boolean,
     default: false,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const direction = vertical ? 'vertical' : 'horizontal';
+const direction = computed(() => (props.vertical ? 'vertical' : 'horizontal'));
 </script>
 
 <style>

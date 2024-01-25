@@ -5,20 +5,27 @@
     data-testid="banner"
   >
     <div class="cover-block w-100">
-      <NuxtImg
-        v-if="cover"
-        class="cover"
-        placeholder
-        role="custom-cover"
-        :provider="imgFromStrapi ? 'strapi' : undefined"
-        :src="cover.url"
-      />
-      <img
-        v-else
-        class="cover"
-        src="/images/alex-banner.svg"
-        role="default-cover"
-      />
+      <v-skeleton-loader
+        width="100%"
+        type="image"
+        :loading="loading"
+        height="360"
+      >
+        <NuxtImg
+          v-if="cover"
+          class="cover"
+          :provider="imgFromStrapi ? 'strapi' : undefined"
+          :src="cover.url"
+          placeholder
+          role="custom-cover"
+        />
+        <img
+          v-else
+          class="cover"
+          src="/images/alex-banner.svg"
+          role="default-cover"
+        />
+      </v-skeleton-loader>
       <div class="w-100 h-25" :class="showShade ? 'shade' : ''" role="shade" />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
@@ -108,7 +115,6 @@
       :is-professor="isProfessor"
       @display:settings="emit('display:settings')"
     />
-
     <div class="d-flex justify-space-between align-center px-6">
       <div class="d-flex">
         <alex-custom-tabs
@@ -189,6 +195,7 @@ type BannerProps = {
   showSettings?: boolean;
   links?: TabType[];
   settings?: TabType;
+  loading?: boolean;
 };
 const props = withDefaults(defineProps<BannerProps>(), {
   coverPicture: null,
@@ -232,6 +239,7 @@ const props = withDefaults(defineProps<BannerProps>(), {
   showMenu: false,
   showSettings: false,
   settings: undefined,
+  loading: false,
 });
 
 const { selectedOption, coverPicture, fullname, username, canEdit, userId } =

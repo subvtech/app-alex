@@ -101,8 +101,14 @@ const value = computed({
   },
 });
 const rules = computed(() => {
-  const startDate = props.startDate ? new Date(props.startDate) : new Date();
-  const endDate = props.endDate ? new Date(props.endDate) : new Date();
+  const startDate = props.startDate
+    ? new Date(props.startDate.toString().replace(/-/g, '/'))
+    : new Date();
+  const endDate = props.endDate
+    ? new Date(props.endDate.toString().replace(/-/g, '/'))
+    : new Date();
+  endDate.setUTCHours(23, 59, 59, 59);
+  startDate.setHours(0, 0, 0, 0);
   return scheduleRules(startDate, endDate);
 });
 const data = computed({
@@ -129,7 +135,6 @@ const submit = handleSubmit((values) => {
   emit('submit', { ...values, id: props.data?.id });
   emit('update:modelValue', false);
 });
-
 
 const disablePastDates = (date: Date) => {
   const today = new Date();

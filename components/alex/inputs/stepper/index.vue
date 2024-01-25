@@ -151,11 +151,17 @@ const validationSchema = computed(() => {
   return configStep && configStep.scheme ? configStep.scheme : emptyObject;
 });
 
-const { handleSubmit, errors, values, controlledValues, setFieldError } =
-  useForm({
-    validationSchema,
-    keepValuesOnUnmount: true,
-  });
+const {
+  handleSubmit,
+  errors,
+  values,
+  controlledValues,
+  setFieldError,
+  validate,
+} = useForm({
+  validationSchema,
+  keepValuesOnUnmount: true,
+});
 
 const onAllValidated = () => {
   if (activeStepIndex.value !== lastStepIndex.value) {
@@ -224,15 +230,13 @@ const onPrevStep = () => {
   }
 };
 
-const onSelectStep = (step: number) => {
-  if (step > activeStep.value && !isValid.value) {
-    return;
-  }
+const onSelectStep = async (step: number) => {
+  const valid = await validate();
+  if (!valid.valid) return;
 
   if (step > activeStep.value) {
     stepsList.value[activeStepIndex.value].completed = true;
   }
-
   activeStep.value = step;
 };
 </script>

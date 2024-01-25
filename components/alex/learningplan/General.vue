@@ -150,7 +150,7 @@
         :empty-message="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
         :user-id="user.id"
-        :learning-plan-id="learningPlan.id"
+        :learning-plan-id="learningPlan?.id"
         :tags="generalTags"
         :can-edit="userIsFacilitator"
       />
@@ -164,7 +164,7 @@
         :empty-message="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
         :user-id="user.id"
-        :learning-plan-id="learningPlan.id"
+        :learning-plan-id="learningPlan?.id"
         :tags="technicalTags"
         :can-edit="userIsFacilitator"
       />

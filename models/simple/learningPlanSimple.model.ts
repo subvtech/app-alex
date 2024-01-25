@@ -1,3 +1,5 @@
+import { InvitationLinkSimple } from './InvitationLinkSimple.model';
+
 const LearningPlanType = {
   COURSE: 'course',
   PROJECT: 'project',

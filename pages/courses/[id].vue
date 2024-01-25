@@ -1,12 +1,11 @@
 <template>
   <div>
     <alex-custom-banner
-      v-if="
-        learningPlanStore.learningPlan && !route.meta?.hideLearningPlanBanner
-      "
+      v-if="!route.meta?.hideLearningPlanBanner"
+      :loading="learningPlanStore.loading"
       :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
-      :profile-picture="learningPlanStore.facilitator?.user.avatar"
+      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
       show-profile-picture
       darker-background
@@ -41,19 +40,20 @@
       @select:option="selectOption"
       @display:settings="selectOption(8)"
     />
-    <NuxtPage />
+    <NuxtPage @update="fetchData" />
   </div>
 </template>
 <script setup lang="ts">
 import { TabType } from '~/components/alex/custom/Tabs.vue';
 
 definePageMeta({
-  middleware: ['auth', 'load-learningplan'],
+  middleware: ['auth'],
 });
 
 const i18n = useI18n();
 const user = useStrapiUser<User>();
 const route = useRoute();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const learningPlanStore = useLearningPlanStore();
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
@@ -61,7 +61,49 @@ const isJoinRoutePath = computed(() => {
 
 const selectedOption = ref(0);
 
-const selectOption = (index) => {
+const fetchData = async () => {
+  await useAsyncData('user', () =>
+    learningPlanStore.loadLearningPlan(learningPlanId.value),
+  );
+
+  if (!learningPlanStore.learningPlan) {
+    return navigateTo('/');
+  }
+
+  if (
+    !learningPlanStore.userIsFacilitator &&
+    !learningPlanStore.userIsActiveMember &&
+    !learningPlanStore.userIsPendingMember
+  ) {
+    return navigateTo('/courses/me');
+  }
+
+  if (learningPlanStore.userIsPendingMember && !isJoinRoutePath.value) {
+    const invite = learningPlanStore.learningPlan?.invitation_links.find(
+      (i) => {
+        return i.emails_to_send?.includes(user?.value?.email);
+      },
+    );
+
+    if (invite) {
+      return navigateTo(`/courses/${learningPlanId}/join/${invite.hash}`);
+    }
+  }
+};
+
+const pageRoute = computed(() => route.name);
+
+onMounted(async () => {
+  await fetchData();
+});
+
+watch(pageRoute, async () => {
+  if (pageRoute.value?.toString().includes('courses-id')) {
+    await fetchData();
+  }
+});
+
+const selectOption = (index: number) => {
   selectedOption.value = index;
 };
 

@@ -1,7 +1,7 @@
 <template>
   <alex-learningplan-general
+    v-if="!learningPlanStore.loading"
     :learning-plan="learningPlanStore.learningPlan!"
-    :learning-plan-id="learningPlanStore.learningPlan?.id"
     :owner="learningPlanStore.facilitator!"
     :invitation-link="learningPlanStore.invitationLink"
     :can-edit="learningPlanStore.userIsFacilitator"
