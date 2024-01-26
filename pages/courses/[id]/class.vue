@@ -513,7 +513,7 @@ onBeforeMount(() => {
       disabled: true,
     },
     {
-      title: 'Meus Curos',
+      title: 'Meus Cursos',
       to: '/courses/me',
     },
     {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <section>
     <alex-custom-banner
       v-if="!route.meta?.hideLearningPlanBanner"
       :loading="learningPlanStore.loading"
@@ -40,7 +40,7 @@
       @select:option="selectOption"
     />
     <NuxtPage @update="fetchData" />
-  </div>
+  </section>
 </template>
 <script setup lang="ts">
 import { TabType } from '~/components/alex/custom/Tabs.vue';
@@ -63,8 +63,7 @@ const isJoinRoutePath = computed(() => {
 
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
-const selectedOption = ref(0);
-
+const selectedOption = ref(null);
 const fetchData = async () => {
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
@@ -97,7 +96,7 @@ const fetchData = async () => {
 
 const pageRoute = computed(() => route.name);
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await fetchData();
 });
 watch(pageRoute, async () => {

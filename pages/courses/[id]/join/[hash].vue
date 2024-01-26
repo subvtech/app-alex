@@ -31,14 +31,8 @@ const strapi = useStrapi();
 const loading = ref(false);
 const user = useStrapiUser();
 
-const invite = ref();
-
-onMounted(() => {
+onBeforeMount(() => {
   const hash = route.params.hash?.toString();
-  invite.value = learningPlanStore.activeInviteLinks?.find(
-    (i) => i.hash === hash,
-  );
-
   if (
     learningPlanStore.userIsActiveMember ||
     learningPlanStore.userIsFacilitator
@@ -47,7 +41,7 @@ onMounted(() => {
     navigateTo(`/courses/${learningPlanStore.learningPlan?.id}`);
   }
 
-  if (!invite.value) {
+  if (learningPlanStore.invitationLink?.hash !== hash) {
     setMessage('Convite não encontrado!', 'red', true);
     navigateTo('/');
   }
@@ -66,22 +60,25 @@ async function onConfirm() {
 
     if (learningPlanStore.userIsPendingMember) {
       const id = learningPlanStore.pendingMembers.find(
-        (m) => m.user?.id === user.value?.id || m.email === user.value?.email,
+        (member) =>
+          member.user?.id === user.value?.id ||
+          member.email === user.value?.email,
       )?.id;
 
-      const data = {
-        user: user.value?.id,
-        status: 'joined',
-        joined_at: new Date(),
-      };
-
-      await strapi.update('learning-plan-members', id || 0, data);
+      if (id && user.value) {
+        await strapi.update('learning-plan-members', id, {
+          user: user.value.id,
+          status: 'joined',
+          joined_at: new Date(),
+        });
+      }
     } else {
       const data = {
         user: user.value?.id,
         status: 'joined',
         joined_at: new Date(),
         learningplan: learningPlanStore.learningPlan?.id,
+        role: 'student',
       };
 
       await strapi.create('learning-plan-members', data);

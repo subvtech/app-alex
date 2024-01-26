@@ -11,16 +11,12 @@ import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
+  const { setMessage } = useMessageStore();
+  const { generateUrl } = useInvitationLink();
   const user = useStrapiUser<User>();
   const i18n = useI18n();
-
-  const { setMessage } = useMessageStore();
-
   const learningPlan = ref<LearningPlanSimple>();
   const loading = ref(true);
-
-  const { generateUrl } = useInvitationLink();
-
   const populate = {
     cover_image: true,
     media: true,
@@ -167,7 +163,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       }) || []
     );
   });
-
   return {
     learningPlan,
     loadLearningPlan,
