@@ -1,14 +1,13 @@
 <template>
-  <v-container
+  <div
     class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
   >
-    <h1 class="text-h2 text-gray-800">AvatarGroup</h1>
-    <p class="text-subtitle-2 text-gray-500">
-      O componente
-      <strong class="bg-accent pa-1 rounded">alex-custom-pagination</strong>
-      é usado para separar agrupar outro componente chamado Avatar
-    </p>
-    <div class="d-flex align-center pa-4 container rounded-lg">
+    <h1 class="text-h2 text-gray-800">{{ title }}</h1>
+    <p class="text-subtitle-2 text-gray-500">{{ description }}</p>
+    <div
+      v-if="vuetifyLink"
+      class="d-flex align-center pa-4 container rounded-lg"
+    >
       <img class="align-self-stretch" src="@/assets/svg/vuetify.svg" />
       <div>
         <p class="text-body-1 text-primary align-self-stretch">
@@ -17,13 +16,27 @@
         </p>
         <a
           class="text-decoration-underline text-blue"
-          href="https://vuetifyjs.com/en/components/avatars/"
+          :href="vuetifyLink"
           target="_blank"
           >vuetifyjs.com</a
         >
       </div>
     </div>
-  </v-container>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  vuetifyLink: {
+    type: String,
+  },
+});
+</script>

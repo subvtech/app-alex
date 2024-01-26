@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node assets/listDocumentation.js && nuxt build",
+    "build": "yarn list:documentation && nuxt build",
     "dev": "nuxt dev",
     "test": "vitest --watch",
     "test:coverage": "vitest --coverage",
+    "list:documentation": "node assets/listDocumentation.js",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",

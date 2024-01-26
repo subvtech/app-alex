@@ -1,0 +1,124 @@
+<template>
+  <v-container
+    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
+  >
+    <alex-documentation-header :title="title" :description="description" />
+    <alex-documentation-accordions-prop-list :data="listProps" />
+    <alex-documentation-example
+      v-for="item in examples"
+      :snippets="item.snippets"
+      :title="item.title"
+      :description="item.description"
+      :has-example="item.hasExample"
+    >
+      <template v-slot:component>
+        <alex-profile-cards-institutions
+          :user-id="InstitutionsProps.userId"
+          :institutions="InstitutionsProps.institutions"
+          :can-edit="InstitutionsProps.canEdit"
+        /> </template
+    ></alex-documentation-example>
+
+    <alex-documentation-playground :data="listProps">
+      <template #component="componentProps">
+        {{ componentProps }}
+      </template></alex-documentation-playground
+    >
+  </v-container>
+</template>
+
+<script setup lang="ts">
+import {
+  ExampleComponentType,
+} from '~/components/alex/documentation/Example.vue';
+import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import { InstitutionsComponentType } from '~/components/alex/profile/cards/Institutions.vue';
+
+definePageMeta({
+  layout: 'components',
+  middleware: 'auth',
+});
+
+const title = 'Card da Wallet';
+const description = 'É usado para exibir informações da carteira do usuário';
+
+const InstitutionsProps: InstitutionsComponentType = {
+  canEdit: true,
+  userId: 1,
+  institutions: [
+    {
+      url: 'https://picsum.photos/400/600',
+      name: 'name',
+      acronym: 'acronym',
+      sector: 'sector',
+      backgroundColor: 'bg-white',
+      canEdit: true,
+      isDeleted: false,
+      institutionId: 1,
+    },
+  ],
+};
+
+const listProps: PlaygroundItemType[] = [
+  {
+    name: 'userId',
+    type: 'number',
+    required: true,
+    description: 'The user ID associated with the institutions.',
+    initialValue: InstitutionsProps.userId,
+  },
+  {
+    name: 'canEdit',
+    type: 'boolean',
+    required: false,
+    default: 'false',
+    description: 'Whether the current user can edit the component or not.',
+    initialValue: InstitutionsProps.canEdit,
+  },
+  {
+    name: 'institutions',
+    type: 'InstitutionsType[]',
+    required: true,
+    description: 'A list with the institutions associated with the User',
+    initialValue: InstitutionsProps.institutions,
+  },
+];
+
+const examples = ref<ExampleComponentType[]>([
+  {
+    snippets: [
+      {
+        template: `<alex-profile-cards-institutions
+          :user-id="InstitutionsProps.userId"
+          :institutions="InstitutionsProps.institutions"
+          :can-edit="InstitutionsProps.canEdit"
+        />`,
+        label: 'Template',
+      },
+      {
+        template: `const InstitutionsProps: InstitutionsComponentType = {
+  canEdit: true,
+  userId: 1,
+  institutions: [
+    {
+      url: 'https://picsum.photos/400/600',
+      name: 'name',
+      acronym: 'acronym',
+      sector: 'sector',
+      backgroundColor: 'bg-white',
+      canEdit: true,
+      isDeleted: false,
+      institutionId: 1,
+    },
+  ],
+};
+`,
+        label: 'Script',
+      },
+    ],
+    hasExample: true,
+    title: 'Basic Usage',
+    description: '',
+  },
+]);
+</script>

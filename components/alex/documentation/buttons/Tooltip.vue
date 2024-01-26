@@ -7,7 +7,8 @@
         @click="emit('click:button')"
         :icon="icon"
         :size="iconSize"
-        v-bind="props"
+        v-bind="tooltipText ? props : undefined"
+        :disabled="disabled"
       />
     </template>
   </v-tooltip>
@@ -41,6 +42,11 @@ const props = defineProps({
     default: 'mdi-content-copy',
   },
   rounded: {
+    type: Boolean,
+    default: false,
+  },
+
+  disabled: {
     type: Boolean,
     default: false,
   },

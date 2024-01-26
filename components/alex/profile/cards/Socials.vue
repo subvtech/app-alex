@@ -39,7 +39,7 @@
                 />
               </template>
             </alex-custom-accordion>
-            <alex-profile-components-social-item
+            <alex-profile-social-item
               v-else
               :socials="sortedSocials"
             />
@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { SocialItemType } from '~/models/social.model';
-import { AccordionItemType } from '../custom/Accordion.vue';
+import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
 const i18n = useI18n();
 
 const isEditing = ref(false);

@@ -3,7 +3,7 @@
       class="boxes d-flex justify-center w-100 pb-6 gap-4"
       :class="hideDivider ? '' : 'border-bottom'"
     >
-      <alex-profile-components-box-info
+      <alex-profile-box-item
         v-for="(item, index) in boxes"
         :key="index"
         :icon="item.icon"

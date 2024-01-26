@@ -191,13 +191,21 @@
   {
     "namespaces": [
       "profile",
-      "institution"
+      "cards",
+      "Institutions"
     ]
   },
   {
     "namespaces": [
       "profile",
-      "wallet"
+      "cards",
+      "Wallet"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "InstitutionItem"
     ]
   }
 ]

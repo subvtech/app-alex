@@ -18,7 +18,7 @@
   </a>
 </template>
 <script setup lang="ts">
-import { AccordionItemType } from '../../custom/Accordion.vue';
+import { AccordionItemType } from '@/components/alex/custom/Accordion.vue';
 
 defineProps({
   socials: { type: Array as PropType<AccordionItemType[]>, default: [] },

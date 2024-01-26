@@ -1,13 +1,13 @@
 <template>
   <div v-if="user" class="content-block d-flex w-100 gap-6">
     <div class="details d-flex flex-column w-100 gap-6">
-      <alex-profile-overview
+      <alex-profile-cards-overview
         :user-id="user.id"
         :socials="user.socials"
         :telephone="user.phone"
         :email="user.email"
       />
-      <alex-profile-socials
+      <alex-profile-cards-socials
         v-if="user.socials.length !== 0 || canEdit"
         :can-edit="canEdit"
         :socials="user.socials"
@@ -37,7 +37,7 @@
       <div
         class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row competences gap-6"
       >
-        <alex-profile-competences
+        <alex-profile-cards-competences
           v-if="technicalTags.length !== 0 || canEdit"
           :title="$t('components.competences.technical.title')"
           :label="$t('components.competences.technical.label')"
@@ -50,7 +50,7 @@
             updateCompetences($t('components.competences.technical.updated'))
           "
         />
-        <alex-profile-competences
+        <alex-profile-cards-competences
           v-if="generalTags.length !== 0 || canEdit"
           :title="$t('components.competences.general.title')"
           :label="$t('components.competences.general.label')"
@@ -65,7 +65,7 @@
           "
         />
       </div>
-      <alex-profile-institutional
+      <alex-profile-cards-institutions
         v-if="institutions.length !== 0 || canEdit"
         :institutions="institutions"
         :userId="user.id"

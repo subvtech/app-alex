@@ -22,7 +22,7 @@
             "
           >
             <v-icon
-              style="min-width: 16px !important; height: 16px; width: 16px"
+              class="drag-icon-size"
               src="@assets/svg/DragIndicator.svg"
               icon="alex:DragIndicator"
               color="gray-300"
@@ -50,7 +50,7 @@
               ' ' + item.title
             }}</span>
           </span>
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <v-btn
             class="mx-4 delete-btn"
             variant="text"
@@ -58,11 +58,7 @@
             color="transparent"
             @click="deleteItem(index)"
           >
-            <v-icon
-              size="24px"
-              icon="mdi-trash-can-outline"
-              color="tag-red-light"
-            />
+            <v-icon size="24px" :icon="icon" :color="iconColor" />
           </v-btn>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="bg-white rounded">
@@ -92,8 +88,7 @@ export interface AccordionItemType {
   position?: boolean;
 }
 
-const emit = defineEmits(['deleted:item'])
-
+const emit = defineEmits(['deleted:item']);
 
 const id = ref(0);
 const { data } = defineProps({
@@ -104,6 +99,14 @@ const { data } = defineProps({
   showPositions: {
     type: Boolean,
     default: false,
+  },
+  icon: {
+    type: String,
+    default: 'mdi-trash-can-outline',
+  },
+  iconColor: {
+    type: String,
+    default: 'tag-red-light',
   },
 });
 
@@ -124,7 +127,7 @@ onBeforeMount(() => {
 });
 
 const deleteItem = (pos) => {
-  emit('deleted:item', list.value[pos])
+  emit('deleted:item', list.value[pos]);
   list.value.splice(pos, 1);
 };
 
@@ -162,6 +165,12 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 .list-leave-to {
   opacity: 0;
   transform: translateX(-40px);
+}
+
+.drag-icon-size {
+  min-width: 16px !important;
+  height: 16px;
+  width: 16px;
 }
 
 .drag-icon {

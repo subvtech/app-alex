@@ -26,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
 
 const emit = defineEmits(['update:user']);
 const { setMessage } = useMessageStore();

@@ -2,12 +2,11 @@
   <div id="tasks" class="d-flex flex-row">
     <div class="column">
       <draggable
-        class="d-flex flex-column pa-3 w-100 h-100"
+        class="d-flex flex-column pa-3 w-100 h-100 gap-2"
         :list="tasks"
         group="tasks"
         handle=".handle"
         @end="isChanged = true"
-        style="gap: 8px"
       >
         <template #item="{ element, index }">
           <alex-task
@@ -25,8 +24,7 @@
     </div>
     <div class="column">
       <draggable
-        class="d-flex flex-column pa-3 w-100 h-100"
-        style="gap: 8px"
+        class="d-flex flex-column pa-3 w-100 h-100 gap-2"
         :list="tasks2"
         group="tasks"
         handle=".handle"
@@ -88,6 +86,9 @@ const tasks2 = ref([
 </script>
 
 <style scoped lang="scss">
+.gap-2 {
+  gap: 8px;
+}
 #tasks {
   max-width: 100%;
   gap: 8px;

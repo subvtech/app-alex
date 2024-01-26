@@ -36,7 +36,7 @@
             class="d-flex align-center justify-space-between item w-100"
             #item="{ element, index }"
           >
-            <alex-profile-components-institution
+            <alex-profile-institution-item
               :canEdit="canEditAndIsEditing"
               :index="index"
               :acronym="element.acronym"
@@ -64,29 +64,25 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable';
 
-const searchInstitutions = ref<InstitutionsType[]>([]);
-const search = ref('');
-const isEditing = ref(false);
-const componentKey = ref(0);
+export interface InstitutionsComponentType {
+  institutions: InstitutionsType[];
+  userId: number;
+  canEdit: boolean;
+}
 
 const client = useStrapiClient();
 const emit = defineEmits(['update']);
 
-const props = defineProps({
-  institutions: {
-    type: Array as PropType<InstitutionsType[]>,
-    required: true,
-  },
-  userId: {
-    type: Number,
-    required: true,
-  },
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<InstitutionsComponentType>(), {
+  canEdit: false,
 });
+
 const { canEdit } = toRefs(props);
+
+const searchInstitutions = ref<InstitutionsType[]>([]);
+const search = ref('');
+const isEditing = ref(false);
+const componentKey = ref(0);
 
 const findInstitution = (selectedId) => {
   return sortedInstitutions.value.find((item) => item.id === selectedId);

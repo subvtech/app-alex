@@ -133,7 +133,7 @@
           </div>
         </template>
       </alex-custom-card>
-      <alex-profile-competences
+      <alex-profile-cards-competences
         v-if="
           (generalTags.length === 0 && userIsFacilitator) ||
           generalTags.length !== 0
@@ -148,7 +148,7 @@
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
-      <alex-profile-competences
+      <alex-profile-cards-competences
         v-if="
           (technicalTags.length === 0 && userIsFacilitator) ||
           technicalTags.length !== 0

@@ -10,13 +10,13 @@
 
     <template v-slot:footer>
       <div class="d-flex flex-column contacts gap-4 max-w-125 w-100 align-start  ">
-        <alex-profile-components-contact
+        <alex-profile-contact-item
           v-if="email"
           :label="$t('components.profile.general.email')"
           icon="mdi-email-outline"
           :value="email"
         />
-        <alex-profile-components-contact
+        <alex-profile-contact-item
           v-if="telephone"
           :label="$t('components.profile.general.telephone')"
           icon="mdi-phone-outline"
@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { Mask } from 'maska';
-import { BoxItemType } from './components/BoxInfo.vue';
+import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 
 const props = defineProps({
   userId: {

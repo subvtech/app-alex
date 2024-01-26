@@ -1,8 +1,9 @@
 <template>
   <div
-    :class="
-      isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item'
-    "
+    :class="[
+      isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item',
+      backgroundColor ?? 'bg-white',
+    ]"
   >
     <div class="d-flex gap-3">
       <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
@@ -29,43 +30,23 @@
 <script setup lang="ts">
 const emit = defineEmits(['delete:institution']);
 
-const props = defineProps({
-  url: {
-    type: String,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  acronym: {
-    type: String,
-    required: true,
-  },
-  sector: {
-    type: String,
-    required: true,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
+export interface InstitutionComponentType {
+  url?: string;
+  name: string;
+  acronym: string;
+  sector: string;
+  canEdit: boolean;
+  isDeleted: boolean;
+  backgroundColor?: string;
+  institutionId: number;
+}
 
-  canEdit: {
-    type: Boolean,
-    required: true,
-  },
-
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-  institutionId: {
-    type: Number,
-    required: true,
-  },
+const props = withDefaults(defineProps<InstitutionComponentType>(), {
+  isDeleted: false,
+  canEdit: false,
 });
 
-const { url, name, acronym, index, isDeleted, institutionId, sector, canEdit } =
+const { url, name, acronym, isDeleted, institutionId, sector, canEdit } =
   toRefs(props);
 
 const removeInstitution = async () => {

@@ -11,7 +11,7 @@
             <img src="/images/metamask.png" alt="" />
             <span>{{ $t('components.profile.wallets.metamask') }}</span>
           </div>
-          <alex-documentation-copy-button
+          <alex-documentation-buttons-copy
             v-if="isWalletLinked"
             :text="wallet.address"
             :tooltip-text="wallet.address"
@@ -44,20 +44,15 @@ const loading = ref(false);
 
 const { linkWallet } = useMetamask(loading);
 
-const emit = defineEmits(['update:user']);
+const emit = defineEmits(['update']);
 
 const { setMessage } = useMessageStore();
 
-const props = defineProps({
-  wallet: {
-    type: Object as PropType<Wallet>,
-    required: true,
-  },
-  userId: {
-    type: Number,
-    required: true,
-  },
-});
+export interface WalletComponentType {
+  wallet: Wallet;
+  userId: number;
+}
+const props = withDefaults(defineProps<WalletComponentType>(), {});
 
 const { wallet } = toRefs(props);
 
@@ -76,14 +71,14 @@ const handleClick = async () => {
       isWalletLinked.value = false;
     } else {
       const result = await linkWallet(props.userId);
-      wallet!.value = { id: result.wallet.id, address: result.wallet.address };
+      wallet.value = { id: result.wallet.id, address: result.wallet.address };
       isWalletLinked.value = true;
     }
   } catch (err) {
     setMessage(err as string, 'red', true);
   }
 
-  emit('update:user', {});
+  emit('update');
 };
 </script>
 
