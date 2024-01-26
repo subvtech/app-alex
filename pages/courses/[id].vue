@@ -2,7 +2,7 @@
   <section>
     <alex-custom-banner
       v-if="!route.meta?.hideLearningPlanBanner"
-      :loading="learningPlanStore.loading"
+      :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
       :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
@@ -63,12 +63,14 @@ const isJoinRoutePath = computed(() => {
 
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
-const selectedOption = ref(null);
+const selectedOption = ref<number | null>(null);
+const delay = (value: number) =>
+  new Promise((resolve) => setTimeout(resolve, value));
 const fetchData = async () => {
+  await delay(3000);
   await useAsyncData('user', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
-
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/');
   }
@@ -99,13 +101,17 @@ const pageRoute = computed(() => route.name);
 onBeforeMount(async () => {
   await fetchData();
 });
+onUnmounted(() => {
+  learningPlanStore.learningPlan = undefined;
+  learningPlanStore.loading = true;
+});
 watch(pageRoute, async () => {
   if (pageRoute.value?.toString().includes('courses-id')) {
     await fetchData();
   }
 });
 
-const selectOption = (index) => {
+const selectOption = (index: number | null) => {
   selectedOption.value = index;
 };
 const generalLinks: TabType[] = [
