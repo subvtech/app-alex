@@ -7,7 +7,7 @@ export const usePageHeaderStore = defineStore('page-header', () => {
   const mainButtonText = ref('');
   const mainButtonIcon = ref('');
   const hasSecondaryButton = ref(false);
-  const secondaryButtonText = ref(false);
+  const secondaryButtonText = ref('');
   const secondaryButtonIcon = ref('');
   const noBackArrow = ref(false);
   const items = ref<{ title: string; disabled?: boolean; to?: string }[]>([]);
