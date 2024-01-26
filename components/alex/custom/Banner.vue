@@ -1,13 +1,8 @@
 <template>
   <div class="banner user-block my-6 w-100" data-testid="banner">
     <div class="cover-block w-100">
-      <v-skeleton-loader
-        width="100%"
-        type="image"
-        class="banner-skeleton"
-        height="360px"
-        :loading="loading"
-      >
+      <alex-custom-skeleton v-if="loading" class="height-90" color="gray-200" />
+      <template v-else>
         <NuxtImg
           v-if="cover"
           class="cover"
@@ -22,7 +17,7 @@
           src="/images/alex-banner.svg"
           role="default-cover"
         />
-      </v-skeleton-loader>
+      </template>
       <div class="w-100 h-25" :class="showShade ? 'shade' : ''" role="shade" />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn

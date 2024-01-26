@@ -8,7 +8,14 @@
       :align-content="'align-center'"
     >
       <template #content>
-        <div class="d-flex flex-column align-center w-100 gap-12 w-212">
+        <div
+          v-if="loading"
+          class="d-flex flex-column align-start w-100 gap-4 w-212 py-6"
+        >
+          <alex-custom-skeleton class="w-25 height-6" color="gray-200" />
+          <alex-custom-skeleton class="w-100 height-68" color="gray-200" />
+        </div>
+        <div v-else class="d-flex flex-column align-center w-100 gap-12 w-212">
           <app-media
             sizing-class="pa-0"
             is-nested
@@ -77,7 +84,18 @@
     <div
       class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
     >
+      <alex-custom-card v-if="loading" title="" :show-icon="false">
+        <template #content>
+          <div class="d-flex bg-white rounded-lg align-center w-100 gap-4">
+            <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
+            <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
+            <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
+          </div>
+          <alex-custom-skeleton class="w-50 height-6 mt-4" color="gray-200" />
+        </template>
+      </alex-custom-card>
       <alex-custom-card
+        v-else
         :title="$t('pages.courses.details')"
         :show-icon="false"
         class="w-100"
@@ -139,10 +157,11 @@
           </div>
         </template>
       </alex-custom-card>
+      <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
           (generalTags?.length === 0 && userIsFacilitator) ||
-          generalTags?.length !== 0
+          (generalTags?.length !== 0 && !loading)
         "
         is-general
         :title="$t('components.competences.general.title')"
@@ -153,11 +172,13 @@
         :learning-plan-id="learningPlan?.id"
         :tags="generalTags"
         :can-edit="userIsFacilitator"
+        :loading="loading"
       />
+      <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
           (technicalTags?.length === 0 && userIsFacilitator) ||
-          technicalTags?.length !== 0
+          (technicalTags?.length !== 0 && !loading)
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
@@ -167,6 +188,7 @@
         :learning-plan-id="learningPlan?.id"
         :tags="technicalTags"
         :can-edit="userIsFacilitator"
+        :loading="loading"
       />
     </div>
   </div>
@@ -179,10 +201,12 @@ type GeneralProps = {
   invitationLink?: InvitationLinkSimple | null;
   canEdit?: boolean;
   schedules?: MeetingPropsType[];
+  loading?: boolean;
 };
 const props = withDefaults(defineProps<GeneralProps>(), {
   invitationLink: null,
   schedules: () => [],
+  loading: false,
 });
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();

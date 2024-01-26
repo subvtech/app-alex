@@ -1,6 +1,6 @@
 <template>
   <alex-learningplan-general
-    v-if="!learningPlanStore.loading"
+    :loading="learningPlanStore.loading"
     :learning-plan="learningPlanStore.learningPlan!"
     :owner="learningPlanStore.facilitator!"
     :invitation-link="learningPlanStore.invitationLink"
