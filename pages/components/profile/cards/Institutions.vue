@@ -3,7 +3,7 @@
     class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
   >
     <alex-documentation-header :title="title" :description="description" />
-    <alex-documentation-accordions-prop-list :data="listProps" />
+    <alex-documentation-accordions-props-list :data="listProps" />
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
@@ -13,24 +13,16 @@
     >
       <template v-slot:component>
         <alex-profile-cards-institutions
-          :user-id="InstitutionsProps.userId"
-          :institutions="InstitutionsProps.institutions"
-          :can-edit="InstitutionsProps.canEdit"
+          :user-id="institutionsProps.userId"
+          :institutions="institutionsProps.institutions"
+          :can-edit="institutionsProps.canEdit"
         /> </template
     ></alex-documentation-example>
-
-    <alex-documentation-playground :data="listProps">
-      <template #component="componentProps">
-        {{ componentProps }}
-      </template></alex-documentation-playground
-    >
   </v-container>
 </template>
 
 <script setup lang="ts">
-import {
-  ExampleComponentType,
-} from '~/components/alex/documentation/Example.vue';
+import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
 import { InstitutionsComponentType } from '~/components/alex/profile/cards/Institutions.vue';
 
@@ -39,10 +31,11 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const title = 'Card da Wallet';
-const description = 'É usado para exibir informações da carteira do usuário';
+const title = 'Card de Instituições';
+const description =
+  "The InstitutionsComponent is a Vue 3 component designed to manage and display a user's institutional affiliations. It provides functionality for adding, reordering, and deleting institutions in a user profile. The component supports drag-and-drop reordering of institutions and includes an editing mode for enhanced user interaction.";
 
-const InstitutionsProps: InstitutionsComponentType = {
+const institutionsProps: InstitutionsComponentType = {
   canEdit: true,
   userId: 1,
   institutions: [
@@ -65,7 +58,7 @@ const listProps: PlaygroundItemType[] = [
     type: 'number',
     required: true,
     description: 'The user ID associated with the institutions.',
-    initialValue: InstitutionsProps.userId,
+    initialValue: institutionsProps.userId,
   },
   {
     name: 'canEdit',
@@ -73,14 +66,14 @@ const listProps: PlaygroundItemType[] = [
     required: false,
     default: 'false',
     description: 'Whether the current user can edit the component or not.',
-    initialValue: InstitutionsProps.canEdit,
+    initialValue: institutionsProps.canEdit,
   },
   {
     name: 'institutions',
     type: 'InstitutionsType[]',
     required: true,
     description: 'A list with the institutions associated with the User',
-    initialValue: InstitutionsProps.institutions,
+    initialValue: institutionsProps.institutions,
   },
 ];
 
@@ -89,14 +82,14 @@ const examples = ref<ExampleComponentType[]>([
     snippets: [
       {
         template: `<alex-profile-cards-institutions
-          :user-id="InstitutionsProps.userId"
-          :institutions="InstitutionsProps.institutions"
-          :can-edit="InstitutionsProps.canEdit"
+          :user-id="institutionsProps.userId"
+          :institutions="institutionsProps.institutions"
+          :can-edit="institutionsProps.canEdit"
         />`,
         label: 'Template',
       },
       {
-        template: `const InstitutionsProps: InstitutionsComponentType = {
+        template: `const institutionsProps: InstitutionsComponentType = {
   canEdit: true,
   userId: 1,
   institutions: [

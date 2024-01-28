@@ -19,6 +19,7 @@
         class="w-100"
         name="institution"
       />
+     
       <div
         v-if="sortedInstitutions.length > 0"
         class="d-flex flex-wrap gap-6 w-100"
@@ -41,7 +42,7 @@
               :index="index"
               :acronym="element.acronym"
               :sector="element.sector"
-              :url="element.cover?.url"
+              :url="element.cover?.url ?? element.url"
               :institutionId="element.id"
               :name="element.name"
               :isDeleted="deleteArray.includes(element.id)"

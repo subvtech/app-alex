@@ -1,30 +1,17 @@
 <template>
   <v-container
-    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
+    class="page rounded-lg bg-white pa-6 gap-6 d-flex flex-column align-start pb-15"
   >
     <alex-documentation-header :title="title" :description="description" />
-    <alex-documentation-accordions-prop-list :data="listProps" />
+    <alex-documentation-accordions-props-list :data="listProps" show-positions/>
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
-      :has-example="item.hasExample"
     >
-      <template v-slot:component>
-        <alex-profile-institution-item
-          :url="institutionProps.url"
-          :acronym="institutionProps.acronym"
-          :sector="institutionProps.sector"
-          :name="institutionProps.name"
-          :can-edit="institutionProps.canEdit"
-          :is-deleted="institutionProps.isDeleted"
-          :institution-id="institutionProps.institutionId"
-        /> </template
-    ></alex-documentation-example>
-    <alex-documentation-playground
-      :data="listProps"
-    >
+    </alex-documentation-example>
+    <alex-documentation-playground :data="listProps">
       <template #component="{ props }">
         <alex-profile-institution-item
           :url="props.url"
@@ -75,28 +62,28 @@ const listProps: PlaygroundItemType[] = [
     type: 'string',
     required: false,
     description: "Image url, it's better served if it comes from strapi",
-    initialValue: institutionProps.url
+    initialValue: institutionProps.url,
   },
   {
     name: 'name',
     type: 'string',
     required: true,
     description: 'Institution name',
-    initialValue: institutionProps.name
+    initialValue: institutionProps.name,
   },
   {
     name: 'acronym',
     type: 'string',
     required: true,
     description: 'Institution acronym',
-    initialValue: institutionProps.acronym
+    initialValue: institutionProps.acronym,
   },
   {
     name: 'sector',
     type: 'string',
     required: true,
     description: 'Institution sector',
-    initialValue: institutionProps.sector
+    initialValue: institutionProps.sector,
   },
   {
     name: 'backgroundColor',
@@ -104,7 +91,7 @@ const listProps: PlaygroundItemType[] = [
     required: false,
     default: "'bg-white'",
     description: 'It changes the component default backgroundColor',
-    initialValue: institutionProps.backgroundColor
+    initialValue: institutionProps.backgroundColor,
   },
   {
     name: 'canEdit',
@@ -113,7 +100,7 @@ const listProps: PlaygroundItemType[] = [
     default: 'false',
     description:
       'It controls whether the user can edit/move the institution item',
-      initialValue: institutionProps.canEdit
+    initialValue: institutionProps.canEdit,
   },
   {
     name: 'isDeleted',
@@ -121,14 +108,14 @@ const listProps: PlaygroundItemType[] = [
     required: false,
     default: 'false',
     description: 'If its true it hides the component.',
-    initialValue: institutionProps.isDeleted
+    initialValue: institutionProps.isDeleted,
   },
   {
     name: 'institutionId',
     type: 'number',
     required: true,
     description: 'It returns the institutionId on the button event',
-    initialValue: institutionProps.institutionId
+    initialValue: institutionProps.institutionId,
   },
 ];
 const examples = ref<ExampleComponentType[]>([

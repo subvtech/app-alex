@@ -39,10 +39,7 @@
                 />
               </template>
             </alex-custom-accordion>
-            <alex-profile-social-item
-              v-else
-              :socials="sortedSocials"
-            />
+            <alex-profile-social-item v-else :socials="sortedSocials" />
           </div>
         </div>
         <div v-if="canEditAndIsEditing" class="d-flex justify-center mt-6">
@@ -59,6 +56,7 @@
 <script setup lang="ts">
 import { SocialItemType } from '~/models/social.model';
 import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
+import { SocialFormUpdateNamePayload, SocialFormUpdateUrlPayload } from '../forms/Social.vue';
 const i18n = useI18n();
 
 const isEditing = ref(false);
@@ -70,19 +68,14 @@ const componentKey = ref(0);
 const emit = defineEmits(['update']);
 const { create, update, delete: _delete } = useStrapi();
 
-const props = defineProps({
-  socials: {
-    type: Array as PropType<SocialItemType[]>,
-    required: true,
-  },
-  canEdit: {
-    type: Boolean,
-    required: false,
-  },
-  userId: {
-    type: Number,
-    required: true,
-  },
+export interface SocialsComponentType {
+  socials: SocialItemType[];
+  canEdit?: boolean;
+  userId: number;
+}
+
+const props = withDefaults(defineProps<SocialsComponentType>(), {
+  canEdit: false,
 });
 
 const { userId, socials, canEdit } = toRefs(props);
@@ -122,7 +115,7 @@ const addSocial = async ({ name, url, selectedSocial }) => {
   componentKey.value += 1;
 };
 const deleteArray = ref<number[]>([]);
-const updateArray = ref<{ socialId: number; url: string; name: string }[]>([]);
+const updateArray = ref<{ socialId?: number; url: string; name: string }[]>([]);
 
 const updateDeleteArray = ({ contentData }: AccordionItemType) => {
   if (contentData) {
@@ -136,7 +129,11 @@ const updateDeleteArray = ({ contentData }: AccordionItemType) => {
   isChanged.value = true;
 };
 
-const updateItemName = ({ name, index, socialId }) => {
+const updateItemName = ({
+  name,
+  index,
+  socialId,
+}: SocialFormUpdateNamePayload) => {
   const socialIdIndex = sortedSocials.value.findIndex(
     (item) => item.id === socialId,
   );
@@ -158,7 +155,7 @@ const updateItemName = ({ name, index, socialId }) => {
   }
 };
 
-const updateUrl = ({ url, index, socialId }) => {
+const updateUrl = ({ url, index, socialId }: SocialFormUpdateUrlPayload) => {
   const socialIdIndex = sortedSocials.value.findIndex(
     (item) => item.id === socialId,
   );

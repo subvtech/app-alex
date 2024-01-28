@@ -5,11 +5,13 @@
     align-content="align-center"
   >
     <template v-slot:content>
-      <app-general-boxes  class="max-w-125" :boxes="overviewBoxes" />
+      <alex-profile-detail-boxes class="max-w-125" :boxes="overviewBoxes" />
     </template>
 
     <template v-slot:footer>
-      <div class="d-flex flex-column contacts gap-4 max-w-125 w-100 align-start  ">
+      <div
+        class="d-flex flex-column contacts gap-4 max-w-125 w-100 align-start"
+      >
         <alex-profile-contact-item
           v-if="email"
           :label="$t('components.profile.general.email')"
@@ -31,37 +33,18 @@
 import { Mask } from 'maska';
 import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 
-const props = defineProps({
-  userId: {
-    type: Number,
-    required: true,
-  },
-  email: {
-    type: String,
-  },
-  telephone: {
-    type: String,
-  },
-  learningPlans: {
-    type: Number,
-    default: 0,
-  },
-  projects: {
-    type: Number,
-    default: 0,
-  },
-  assignments: {
-    type: Number,
-    default: 0,
-  },
-  socials: {
-    type: Array as PropType<any[]>,
-    required: true,
-  },
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
+export interface OverviewComponentType {
+  email?: string;
+  telephone?: string;
+  learningPlans?: number;
+  assignments?: number;
+  projects?: number;
+}
+
+const props = withDefaults(defineProps<OverviewComponentType>(), {
+  projects: 0,
+  assignments: 0,
+  learningPlans: 0,
 });
 
 const { email, telephone } = toRefs(props);

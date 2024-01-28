@@ -4,7 +4,7 @@
     class="row-pointer"
     variant="outline"
     :headers="headers"
-    :items="data"
+    :items="dataWithIndex"
     item-value="name"
     show-expand
     no-data-text="No data"
@@ -20,7 +20,7 @@
         >
       </v-toolbar>
     </template>
-    <template v-slot:item="{ item, index, toggleExpand, props, isExpanded }">
+    <template v-slot:item="{ item, toggleExpand, props, isExpanded }">
       <tr
         class="w-100 tr-hover"
         :class="[isExpanded(props.item) ? 'bg-gray-blue' : '']"
@@ -30,17 +30,17 @@
           }
         "
       >
-        <td>{{ index }}</td>
-        <td class="text-warning-1">{{ item.name }}</td>
-        <td>{{ item.type }}</td>
+        <td v-if="showPositions" class="text-warning-1">{{ item.index }}</td>
+        <td>{{ item.name }}</td>
+        <td class="text-success-1">{{ item.type }}</td>
 
-        <td class="w-110">
-          <v-icon v-if="item.required" style="cursor: pointer" color="success-1"
+        <td v-if="item.required !== undefined" class="w-110">
+          <v-icon v-if="item.required" class="pointer" color="success-1"
             >mdi-checkbox-marked</v-icon
           >
           <v-icon v-else color="error-1">mdi-close-box</v-icon>
         </td>
-        <td>{{ item.default ?? '' }}</td>
+        <td v-if="!listEmits">{{ item.default ?? '' }}</td>
         <td>
           <alex-documentation-buttons-tooltip
             :icon="
@@ -64,9 +64,10 @@
 <script setup lang="ts">
 export interface PropItemType {
   name: string;
-  required: boolean;
+  required?: boolean;
   description: string;
   default?: string;
+  index?: number;
   type: 'number' | 'string' | 'boolean' | 'array' | 'object' | string;
 }
 
@@ -74,11 +75,13 @@ export interface PropListType {
   title: string;
   data: PropItemType[];
   showPositions?: boolean;
+  listEmits?: boolean;
 }
 const props = withDefaults(defineProps<PropListType>(), {
   title: 'Component Props',
   data: () => [],
   showPositions: false,
+  listEmits: false,
 });
 
 const expanded = ref<string[]>([]);
@@ -86,16 +89,30 @@ const headers = computed(() => {
   const indexCol = props.showPositions
     ? [{ title: 'Index', key: 'index' }]
     : [];
+  const propCols = props.listEmits
+    ? []
+    : [
+        { title: 'Required', key: 'required' },
+        { title: 'Default', key: 'default' },
+      ];
+
   return [
     ...indexCol,
     { title: 'Name', key: 'name' },
     { title: 'Type', key: 'type' },
-    { title: 'Required', key: 'required' },
-    { title: 'Default', key: 'default' },
+    ...propCols,
   ];
 });
+const dataWithIndex = computed(() =>
+  props.showPositions
+    ? props.data.map((item, index) => ({ index: index + 1, ...item }))
+    : props.data,
+);
 </script>
 <style scoped lang="scss">
+.pointer {
+  cursor: pointer;
+}
 .tr-hover {
   cursor: pointer;
   &:hover {

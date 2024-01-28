@@ -15,15 +15,12 @@
 <script setup lang="ts">
 import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 
-defineProps({
-  boxes: {
-    type: Array as PropType<BoxItemType[]>,
-    default: [],
-  },
-  hideDivider: {
-    type: Boolean,
-    default: false,
-  },
+export interface DetailsComponentType {
+  boxes: BoxItemType[];
+  hideDivider?: boolean;
+}
+const props = withDefaults(defineProps<DetailsComponentType>(), {
+  hideDivider: false,
 });
 </script>
 <style scoped lang="scss">

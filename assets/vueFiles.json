@@ -192,6 +192,13 @@
     "namespaces": [
       "profile",
       "cards",
+      "Competences"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
       "Institutions"
     ]
   },
@@ -199,7 +206,41 @@
     "namespaces": [
       "profile",
       "cards",
+      "Overview"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
+      "Socials"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
       "Wallet"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "DetailBoxes"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "dialogs",
+      "AddSocial"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "forms",
+      "Social"
     ]
   },
   {

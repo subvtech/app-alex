@@ -51,32 +51,29 @@
 </template>
 
 <script setup lang="ts">
-import { useField, YupSchema } from 'vee-validate';
-const emit = defineEmits(['click']);
-const props = defineProps({
-  label: {
-    type: String,
-    required: true,
-  },
-  value: {
-    type: String,
-    required: true,
-  },
-  placeholder: {
-    type: String,
-  },
-  isPassword: {
-    type: Boolean,
-    default: false,
-  },
-  buttonText: {
-    type: String,
-    required: true,
-  },
+import { YupSchema } from 'vee-validate';
+
+export interface SecurityFormComponentType {
+  label: string;
+  value: string;
+  placeholder?: string;
+  isPassword?: boolean;
+
+  buttonText: string;
   schema: {
-    type: Object as PropType<YupSchema>,
-  },
+    type: YupSchema;
+  };
+}
+
+export interface SecurityFormEmits {
+  (e: 'click'): void;
+}
+
+const props = withDefaults(defineProps<SecurityFormComponentType>(), {
+  isPassword: false,
 });
+
+const emit = defineEmits<SecurityFormEmits>();
 
 const {} = toRefs(props);
 

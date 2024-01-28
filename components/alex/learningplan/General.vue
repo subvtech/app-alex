@@ -77,7 +77,7 @@
     <div class="d-flex flex-column w-100 gap-6 max-width">
       <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false">
         <template #content>
-          <app-general-boxes
+          <alex-profile-detail-boxes
             :boxes="[
               {
                 icon: 'mdi-account-outline',
@@ -144,7 +144,7 @@
         :placeholder="$t('components.competences.general.placeholder')"
         :relation-id="learningPlan.id"
         learningplan
-        :userTags="generalTags"
+        :selected-tags="generalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
@@ -159,7 +159,7 @@
         :placeholder="$t('components.competences.technical.placeholder')"
         :relationId="learningPlan.id"
         learningplan
-        :userTags="technicalTags"
+        :selected-tags="technicalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />

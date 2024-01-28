@@ -70,33 +70,20 @@ const { setMessage } = useMessageStore();
 const { timeSpan, timeoutId, stopTimeout } = useTimeout(500);
 const { id } = useStrapiUser<User>().value;
 
-const props = defineProps({
-  selectedTags: {
-    type: Array as PropType<Tag[]>,
-    default: () => [],
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  emptyMessage: { type: String, required: true },
-  placeholder: {
-    type: String,
-    required: true,
-  },
-  relationId: {
-    type: Number,
-    required: true,
-  },
-  learningplan: {
-    type: Boolean,
-    default: false,
-  },
-  isGeneral: {
-    type: Boolean,
-    default: false,
-  },
-  canEdit: { type: Boolean, default: false },
+export interface CompetencesComponentType {
+  selectedTags: Tag[];
+  title: string;
+  emptyMessage: string;
+  placeholder: string;
+  relationId: number;
+  learningplan?: boolean;
+  isGeneral?: boolean;
+  canEdit?: boolean;
+}
+const props = withDefaults(defineProps<CompetencesComponentType>(), {
+  canEdit: false,
+  learningplan: false,
+  isGeneral: false,
 });
 
 const { canEdit } = toRefs(props);

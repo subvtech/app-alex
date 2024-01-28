@@ -29,27 +29,38 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate';
 
-const emit = defineEmits(['error', 'no:error', 'update:url', 'update:name']);
-const { nameRules, urlRules } = useFormRules();
+export interface SocialFormComponentType {
+  url: string;
+  name?: string;
+  index: number;
+  socialId?: number;
+}
 
-const props = defineProps({
-  url: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-  socialId: {
-    type: Number,
-  },
-});
+export interface SocialFormUpdateUrlPayload {
+  index: number;
+  socialId?: number;
+  url: string;
+}
+
+export interface SocialFormUpdateNamePayload {
+  index: number;
+  socialId?: number;
+  name: string;
+}
+
+export interface SocialFormEmits {
+  (e: 'error'): void;
+  (e: 'no:error'): void;
+  (e: 'update:url', value: SocialFormUpdateUrlPayload): void;
+  (e: 'update:name', value: SocialFormUpdateNamePayload): void;
+}
+
+const props = withDefaults(defineProps<SocialFormComponentType>(), {});
 
 const { url, name } = toRefs(props);
+
+const emit = defineEmits<SocialFormEmits>();
+const { nameRules, urlRules } = useFormRules();
 
 const urlField = useField('editurl', urlRules, {
   initialValue: url.value,

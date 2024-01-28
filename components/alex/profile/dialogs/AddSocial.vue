@@ -49,9 +49,7 @@
           />
 
           <alex-inputs-text-field
-            v-if="
-              selectedSocial === $t('components.profile.socials.otherSocial')
-            "
+            v-if="nonSupportedSocialMedia"
             v-model="nameValue"
             class="w-100"
             :label="$t('components.profile.socials.editForm.name.label')"
@@ -70,19 +68,32 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
+
+export interface AddSocialComponentType {
+  socials: string[];
+}
+
+export interface SocialDialogSavePayload {
+  name: string;
+  url: string;
+  selectedSocial: string;
+}
+export interface AddSocialEmits {
+  (e: 'save:social', value: SocialDialogSavePayload): void;
+}
+
+const i18n = useI18n();
+const emit = defineEmits<AddSocialEmits>();
+
+const props = withDefaults(defineProps<AddSocialComponentType>(), {});
+
 const { nameRules, urlRules } = useFormRules();
 
-const emit = defineEmits(['save:social']);
-
-const props = defineProps({
-  socials: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
-});
-
-
-const formattedSocials = computed(() => props.socials.map(item => item.charAt(0).toUpperCase() + item.toLowerCase().slice(1)))
+const formattedSocials = computed(() =>
+  props.socials.map(
+    (item) => item.charAt(0).toUpperCase() + item.toLowerCase().slice(1),
+  ),
+);
 const selectedSocial = ref<string | null>(null);
 const dialog = ref(false);
 
@@ -103,7 +114,7 @@ const { value: urlValue, errorMessage: urlErrorMessage } = useField(
 );
 
 const onSave = () => {
-
+  if (!selectedSocial.value) return;
   emit('save:social', {
     name: nameValue.value,
     url: urlValue.value,
@@ -119,8 +130,19 @@ const supported = ['Youtube', 'Linkedin', 'Instagram'];
 const getIcon = (name) =>
   supported.includes(name) ? `/svg/${name}.svg` : '/svg/website.svg';
 
+const nonSupportedSocialMedia = computed(
+  () =>
+    selectedSocial.value === i18n.t('components.profile.socials.otherSocial'),
+);
+
 const mainButtonDisabled = computed(() => {
-  return !!nameErrorMessage?.value || !!urlErrorMessage?.value;
+  return (
+    !!nameErrorMessage?.value ||
+    !!urlErrorMessage?.value ||
+    !selectedSocial.value ||
+    nonSupportedSocialMedia.value ||
+    !urlValue.value
+  );
 });
 </script>
 

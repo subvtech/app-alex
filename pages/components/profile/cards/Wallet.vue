@@ -3,7 +3,7 @@
     class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
   >
     <alex-documentation-header :title="title" :description="description" />
-    <alex-documentation-accordions-prop-list :data="listProps" />
+    <alex-documentation-accordions-props-list :data="listProps" />
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
-import { PropItemType } from '~/components/alex/documentation/accordions/PropList.vue';
+import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
 import { WalletComponentType } from '~/components/alex/profile/settings/Wallet.vue';
 
 definePageMeta({
