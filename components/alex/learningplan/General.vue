@@ -77,7 +77,7 @@
     <div class="d-flex flex-column w-100 gap-6 max-width">
       <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false">
         <template #content>
-          <app-general-boxes
+          <alex-profile-detail-boxes
             :boxes="[
               {
                 icon: 'mdi-account-outline',
@@ -133,7 +133,7 @@
           </div>
         </template>
       </alex-custom-card>
-      <competences
+      <alex-profile-cards-competences
         v-if="
           (generalTags.length === 0 && userIsFacilitator) ||
           generalTags.length !== 0
@@ -142,13 +142,13 @@
         :label="$t('components.competences.general.label')"
         :emptyMessage="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :user-id="id"
-        :learning-plan-id="learningPlan.id"
-        :userTags="generalTags"
+        :relation-id="learningPlan.id"
+        learningplan
+        :selected-tags="generalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
-      <competences
+      <alex-profile-cards-competences
         v-if="
           (technicalTags.length === 0 && userIsFacilitator) ||
           technicalTags.length !== 0
@@ -157,9 +157,9 @@
         :label="$t('components.competences.technical.label')"
         :emptyMessage="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="id"
-        :learning-plan-id="learningPlan.id"
-        :userTags="technicalTags"
+        :relationId="learningPlan.id"
+        learningplan
+        :selected-tags="technicalTags"
         :can-edit="userIsFacilitator"
         @update="(data) => emit('update', data)"
       />
@@ -167,6 +167,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { CompetenceTag } from '@/components/Competences.vue';
 
 import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
@@ -205,14 +206,14 @@ const props = defineProps({
   },
 });
 
-const generalTags = ref<CompetenceTag[]>([]);
-const technicalTags = ref<CompetenceTag[]>([]);
+const generalTags = ref<Tag[]>([]);
+const technicalTags = ref<Tag[]>([]);
 const plainLink = ref<string | null>(null);
 const { id } = useStrapiUser<User>().value;
 
 if (props.learningPlan.tags.data) {
   generalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
+    (acc: Tag[], item) => {
       if (item.attributes.isGeneral) {
         acc.push({ id: item.id, ...item.attributes });
       }
@@ -223,7 +224,7 @@ if (props.learningPlan.tags.data) {
   );
 
   technicalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
+    (acc: Tag[], item) => {
       if (!item.attributes.isGeneral) {
         acc.push({ id: item.id, ...item.attributes });
       }

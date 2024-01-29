@@ -6,14 +6,18 @@ export interface UserSimple {
   email: string;
   fullname: string;
   password: string;
-  institute: string;
+  institutions: InstitutionsType[];
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;
+  phone: string;
+  info: string;
   blocked: boolean;
   confirmed: boolean;
   isProfessor: boolean;
   tags: any[];
+  socials: any[];
   avatar: Upload;
+  cover: Upload;
   role: UserRoles;
 }

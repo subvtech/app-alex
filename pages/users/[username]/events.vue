@@ -1,9 +1,6 @@
 <template>
-  <div id="events" class="w-100 d-flex overflow-x-hidden">
-    <alex-custom-card
-      :title="$t('components.profile.events.title')"
-      :full-width="true"
-    >
+  <div v-if="user" id="events" class="w-100 d-flex overflow-x-hidden">
+    <alex-custom-card :title="$t('components.profile.events.title')" full-width>
       <template v-slot:content>
         <div class="items d-flex flex-column">
           <div
@@ -11,12 +8,12 @@
             v-if="props.url"
             v-for="item in [
               {
-                username: username,
+                username: user.username,
                 action: $t('components.profile.events.add'),
                 time: '11:30 AM',
               },
               {
-                username: username,
+                username: user.username,
                 action: $t('components.profile.events.add'),
                 time: '11:30 AM',
               },
@@ -44,24 +41,7 @@ const props = defineProps({
   },
 });
 
-const userStore = useUserStore();
-
-const {
-  email,
-  phone,
-  id,
-  cpf,
-  username,
-  fullname,
-  avatar,
-  cover,
-  isProfessor,
-  socials,
-  institutions,
-  tags,
-  info,
-  canEdit,
-} = toRefs(userStore);
+const { user } = useUserStore();
 </script>
 
 <style scoped lang="scss">

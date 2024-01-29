@@ -1,48 +1,198 @@
 import { defineStore } from 'pinia';
-import { SocialItemType } from '@/models/social.model';
+import { ref } from 'vue';
 
-export type UserStoreType = {
-  avatar: { url: string; id: number } | undefined;
-  cover: any | undefined;
-  username: string | undefined;
-  fullname: string | undefined;
-  tags: any[];
-  socials: SocialItemType[];
-  institutions: any[];
-  learningplans: number;
-  email: string | undefined;
-  phone: string | undefined;
-  info: string | undefined;
-  cpf: string | undefined;
-  tasks: number;
-  isProfessor: false;
-  id: number | undefined;
-  canEdit: boolean;
-};
+type PopulateFields =
+  | 'avatar'
+  | 'cover'
+  | 'socials'
+  | 'tags'
+  | 'institutions.cover'
+  | 'user_wallet';
 
-export const useUserStore = defineStore('user', {
-  state: (): UserStoreType => ({
-    avatar: undefined,
-    fullname: undefined,
-    username: undefined,
-    id: undefined,
-    cpf: undefined,
-    info: undefined,
-    email: undefined,
-    phone: undefined,
-    institutions: [],
-    socials: [],
-    tags: [],
-    learningplans: 0,
-    tasks: 0,
-    cover: undefined,
-    isProfessor: false,
-    canEdit: false,
-  }),
-  actions: {
-    getUserLearningPlans: async (id) => {
-      const { find } = useStrapiUtils();
-      return (await find('learning-plan-member', { filters: { user: id } })).data.length;
-    },
-  },
+export type UniquePopulateFieldsArray = Array<PopulateFields>;
+
+export const useUserStore = defineStore('user', () => {
+  const { update } = useStrapi();
+
+  const client = useStrapiClient();
+  const graphql = useStrapiGraphQL();
+  const { findOne, find } = useStrapiUtils();
+  const strapiUser = useStrapiUser<User>();
+  const { setMessage } = useMessageStore();
+  const i18n = useI18n();
+
+  const loadedUser = ref<User>();
+  const loading = ref(true);
+
+  const populate: UniquePopulateFieldsArray = [
+    'avatar',
+    'cover',
+    'institutions.cover',
+    'socials',
+    'tags',
+    'user_wallet',
+  ];
+
+  async function updateUser(
+    data,
+    populateArray: UniquePopulateFieldsArray = [],
+    message,
+    showMessage = true,
+  ) {
+    if (!loadedUser.value) return;
+    try {
+      const result: User = await client(`/users/${loadedUser.value.id}`, {
+        method: 'PUT',
+        body: {
+          ...data,
+        },
+        params: {
+          _populate: populateArray,
+        },
+      });
+
+      if (showMessage) setMessage(message, 'green', true);
+      loadedUser.value = { ...loadedUser.value, ...result };
+    } catch (e: any) {
+      await loadUser(loadedUser.value?.username, '', false);
+      if (!showMessage) return;
+      if (e?.error?.name === 'NotFoundError') {
+        setMessage(i18n.t('pages.login.notfound'), 'red', true);
+      } else setMessage(e, 'red', true);
+      loading.value = false;
+    }
+  }
+
+  async function loadUserTags(message) {
+    if (!loadedUser.value) return;
+    try {
+      loading.value = true;
+      const result = await find<Tag>('tags', {
+        filters: {
+          verified_by: loadedUser.value.id,
+        },
+      });
+      loadedUser.value = { ...loadedUser.value, tags: result.data };
+      loading.value = false;
+      if (message) setMessage(message, 'green', true);
+      return;
+    } catch (e: any) {
+      loading.value = false;
+      if (e?.error?.name === 'NotFoundError' && message) {
+        setMessage(i18n.t('components.competences.notFound'), 'red', true);
+      }
+    }
+  }
+
+  async function loadUserSocials(showMessage = true) {
+    if (!loadedUser.value) return;
+    try {
+      loading.value = true;
+      const result = await find<SocialItemType>('socials', {
+        filters: {
+          users_permissions_user: loadedUser.value.id,
+        },
+      });
+      loadedUser.value = { ...loadedUser.value, socials: result.data };
+      loading.value = false;
+      if (showMessage)
+        setMessage(i18n.t('components.profile.socials.update'), 'green', true);
+      return;
+    } catch (e: any) {
+      loading.value = false;
+      if (e?.error?.name === 'NotFoundError' && showMessage) {
+        setMessage(i18n.t('pages.login.notfound'), 'red', true);
+      }
+    }
+  }
+
+  async function loadUserInstitutions(showMessage = true) {
+    if (!loadedUser.value) return;
+    try {
+      loading.value = true;
+      const result = await find<InstitutionsType>('institutions', {
+        filters: {
+          users: { id: { $in: [loadedUser.value.id] } },
+        },
+        populate: ['cover'],
+      });
+      loadedUser.value = { ...loadedUser.value, institutions: result.data };
+      loading.value = false;
+      if (showMessage)
+        setMessage(
+          i18n.t('components.profile.institutional.update'),
+          'green',
+          true,
+        );
+      return;
+    } catch (e: any) {
+      loading.value = false;
+      if (e?.error?.name === 'NotFoundError' && showMessage) {
+        setMessage(
+          i18n.t('components.profile.institutional.emptyInstitutional'),
+          'red',
+          true,
+        );
+      }
+    }
+  }
+
+  async function loadUser(username: string, message = '', showMessage = true) {
+    if (loadedUser.value?.username === username) return;
+    try {
+      loading.value = true;
+      const result = await find<User>('users', {
+        filters: {
+          username,
+        },
+        populate,
+      });
+
+      loadedUser.value = result.data[0];
+      loading.value = false;
+      if (showMessage) setMessage(message, 'green', true);
+      return loadedUser.value;
+    } catch (e: any) {
+      loading.value = false;
+      console.log({ error: e });
+      if (e?.error?.name === 'NotFoundError' && showMessage) {
+        setMessage(i18n.t('pages.login.notfound'), 'red', true);
+      }
+    }
+  }
+
+  const isCurrentUser = computed(() => {
+    return loadedUser.value?.id === strapiUser.value?.id;
+  });
+
+  const activeTasks = computed(async () => {
+    const result = await find('learning-plan-members', {
+      filters: {
+        user: loadedUser.value?.id,
+      },
+      populate: 'taskmembers',
+    });
+    return result?.data?.reduce((acc: number, taskMembers: unknown) => {
+      acc += (taskMembers as any[]).length;
+      return acc;
+    }, 0);
+  });
+
+  const setWallet = (data: Wallet) => {
+    if (loadedUser.value)
+      loadedUser.value = { ...loadedUser.value, user_wallet: data };
+  };
+
+  return {
+    activeTasks,
+    isCurrentUser,
+    loading,
+    updateUser,
+    user: loadedUser,
+    loadUser,
+    setWallet,
+    loadUserSocials,
+    loadUserTags,
+    loadUserInstitutions,
+  };
 });
