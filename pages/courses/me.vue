@@ -122,7 +122,7 @@
                 :options="professorMode"
                 :description="course.raw.description"
                 :image="{
-                  url: course.raw.img,
+                  url: course.raw.cover_image,
                 }"
                 :facilitator="{
                   name: course.raw.facilitatorName,
@@ -338,7 +338,6 @@ const getCourses = async () => {
       trails,
     });
   });
-  console.log(courses.value);
   isLoading.value = false;
 };
 

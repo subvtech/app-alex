@@ -30,7 +30,7 @@
         </div>
       </div>
       <div
-        v-if="editorData.blocks.length === 0 && readOnly"
+        v-if="!showEditor && readOnly"
         class="d-flex fill-height align-center justify-center container-min-height"
       >
         <v-progress-circular
@@ -48,10 +48,10 @@
         </div>
       </div>
       <div
-        v-else
-        class="container-min-height d-flex justify-center ma-6 align-start"
+        :class="showEditor ? 'd-flex' : 'd-none'"
+        class="container-min-height justify-center ma-6 align-start"
       >
-        <div style="width: 750px">
+        <div style="width: 700px">
           <p
             v-show="readOnly && editorData.time"
             class="text-gray-500 text-body-3 mb-4"
@@ -106,7 +106,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Trail } from '@/models/trail.model';
-const { create, update } = useStrapi();
+const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const { trailId } = route.params;
@@ -121,7 +121,7 @@ const trailData = await trailStore.loadTrailData(parseInt(trailId.toString()));
 const professorMode = ref(false);
 const isLoading = ref(false);
 const saveLoading = ref(false);
-const readOnly = ref(false);
+const readOnly = ref(true);
 const editor = ref();
 const editorData = ref({
   id: '',
@@ -131,6 +131,9 @@ const editorData = ref({
 });
 
 const backUpEditorData = ref({});
+const showEditor = computed(() => {
+  return !isLoading.value && editorData.value.blocks.length;
+});
 
 const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
@@ -160,10 +163,11 @@ const getTrailData = () => {
 
 onMounted(async () => {
   getTrailData();
-  if (editorData.value.blocks.length > 0) {
+  if (editorData.value.blocks.length) {
+    readOnly.value = false;
     await loadEditor();
+    toggleReadOnly();
   }
-  toggleReadOnly();
 });
 
 const sections = ref([
@@ -185,8 +189,8 @@ const isAvaliableTooltip = (title: string) => {
 };
 
 const toggleReadOnly = async () => {
-  readOnly.value = !readOnly.value;
   if (editor.value) await editor.value.toggleReadOnly();
+  readOnly.value = !readOnly.value;
   if (!readOnly.value) {
     backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
     observer.disconnect();
@@ -258,21 +262,14 @@ const saveData = async () => {
       setMessage(t('pages.trailId.overview.saveError'), 'error', true);
       return;
     }
-    const blockIds: number[] = [];
-    for (const block of res.data.blocks) {
-      const res = await create('blocks', {
-        type: block.type,
-        data: block.data,
-        tunes: block.tunes,
+    if (res.data.blocks.length) {
+      await create('structures', {
+        time: Date.now(),
+        version: res.data.version,
+        blocks: res.data.blocks,
+        trail: trailId,
       });
-      blockIds.push(res.data.id);
     }
-    await create('structures', {
-      time: Date.now(),
-      version: res.data.version,
-      blocks: blockIds,
-      trail: trailId,
-    });
     editorData.value = res.data;
     toggleReadOnly();
   } catch (e) {

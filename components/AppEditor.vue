@@ -1,13 +1,16 @@
 <template>
   <client-only>
-    <div id="editorjs" class="editorjs w-100" style="max-width: 700px"></div>
+    <div
+      id="editorjs"
+      class="editorjs w-100 pa-0"
+      style="max-width: 700px"
+    ></div>
   </client-only>
 </template>
 
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
-import Delmiter from '@editorjs/delimiter';
-// import Header from 'editorjs-header-with-anchor';
+import Delimiter from '@editorjs/delimiter';
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
 import InlineCode from '@editorjs/inline-code';
@@ -28,13 +31,11 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from '../models/structure.model';
+// import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+// import { Structure } from '../models/structure.model';
 import { Upload } from '../models/upload.model';
-import { dataLength } from 'ethers';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
-import Anchors from '../components/Anchors.vue';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 
@@ -43,33 +44,6 @@ const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 const token = useStrapiToken();
-const readOnly = ref(true);
-const anchors = ref([]);
-
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => {},
-  },
-});
-
-// const planData = computed(() => {
-//   console.log(props.data);
-//   const data = props.data.blocls.data.map((b) => {
-//     if (!b.attributes.tunes) {
-//       delete b.attributes.tunes;
-//     }
-//     return { ...b.attributes, id: b.id };
-//   });
-//   const structure: any = { ...props.data, id: props.data.id };
-//   structure.blocks = props.data.attributes.blocks.data.map((b) => {
-//     if (!b.attributes.tunes) {
-//       delete b.attributes.tunes;
-//     }
-//     return { ...b.attributes, id: b.id };
-//   });
-//   return structure;
-// });
 
 const uploadBaseUrl = computed(() => {
   const runtimeConfig = useRuntimeConfig();
@@ -80,7 +54,7 @@ onMounted(() => {
   instance.value = new EditorJS({
     autofocus: true,
     tools: {
-      delimiter: Delmiter,
+      delimiter: Delimiter,
       embed: Embed,
       header: {
         class: header,
