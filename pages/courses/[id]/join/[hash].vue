@@ -1,51 +1,47 @@
 <template>
-  <div>
-    <v-row
-      v-if="learningPlanStore.loading || !learningPlanStore.learningPlan"
-      justify="center"
-    >
-      <v-progress-circular indeterminate color="accent" size="100" width="6" />
-    </v-row>
-    <alex-learningplan-dialogs-alert
-      v-model="openConfirmation"
-      variant="primary"
-      persistent
-      title="Deseja participar desse curso?"
-      :subtitle="`Voce foi convidado para participar do curso de ${learningPlanStore.learningPlan?.title} da turma ${learningPlanStore.learningPlan?.class_name}`"
-      submit-button-text="Participar"
-      :loading="loading"
-      @submit="onConfirm"
-      @cancel="onCancel"
-    />
-  </div>
+  <alex-learningplan-dialogs-alert
+    v-if="!learningPlanStore.loading && learningPlanStore.invitationLink"
+    v-model="openConfirmation"
+    variant="primary"
+    persistent
+    title="Deseja participar desse curso?"
+    :subtitle="`Voce foi convidado para participar do curso de ${learningPlanStore.learningPlan?.title} da turma ${learningPlanStore.learningPlan?.class_name}`"
+    submit-button-text="Participar"
+    :loading="loading"
+    @submit="onConfirm"
+    @cancel="onCancel"
+  />
+  <v-row v-else justify="center">
+    <v-progress-circular indeterminate color="accent" size="100" width="6" />
+  </v-row>
 </template>
 
 <script setup lang="ts">
 const route = useRoute();
-
-// route.params?.id
 const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
 const openConfirmation = ref(false);
 const strapi = useStrapi();
 const loading = ref(false);
 const user = useStrapiUser();
+const hash = route.params.hash?.toString();
 
-onBeforeMount(() => {
-  const hash = route.params.hash?.toString();
+watch(learningPlanStore, () => {
+  const isCorrectInvitationHash =
+    learningPlanStore.invitationLink?.hash === hash;
+  const isLinkEnabled = learningPlanStore.learningPlan?.invite_enabled;
   if (
     learningPlanStore.userIsActiveMember ||
     learningPlanStore.userIsFacilitator
   ) {
-    setMessage('Voce ja faz parte do curso!', 'blue', true);
+    setMessage('Voce já faz parte do curso!', 'blue', true);
     navigateTo(`/courses/${learningPlanStore.learningPlan?.id}`);
   }
 
-  if (learningPlanStore.invitationLink?.hash !== hash) {
+  if (!isCorrectInvitationHash || !isLinkEnabled) {
     setMessage('Convite não encontrado!', 'red', true);
-    navigateTo('/');
+    navigateTo('/courses/me');
   }
-
   openConfirmation.value = true;
 });
 

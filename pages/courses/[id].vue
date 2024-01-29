@@ -69,7 +69,8 @@ const fetchData = async () => {
   if (
     !learningPlanStore.userIsFacilitator &&
     !learningPlanStore.userIsActiveMember &&
-    !learningPlanStore.userIsPendingMember
+    !learningPlanStore.userIsPendingMember &&
+    !isJoinRoutePath.value
   ) {
     return navigateTo('/courses/me');
   }
