@@ -445,9 +445,9 @@ const changeItemVisibility = (index: number, id) => {
 
 const navigate = (id: number, page) => {
   if (page === 'settings') {
-    router.push(`/courses/${id}/settings`);
+    navigateTo(`/courses/${id}/settings`);
   } else {
-    router.push(`/courses/${id}`);
+    navigateTo(`/courses/${id}`);
   }
 };
 </script>
