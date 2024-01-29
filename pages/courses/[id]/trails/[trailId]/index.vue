@@ -105,7 +105,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Trail } from '@/models/trail.model';
 const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
@@ -132,7 +131,9 @@ const editorData = ref({
 
 const backUpEditorData = ref({});
 const showEditor = computed(() => {
-  return !isLoading.value && editorData.value.blocks.length;
+  return (
+    !isLoading.value && (editorData.value.blocks.length || !readOnly.value)
+  );
 });
 
 const { isProfessor } = useStrapiUser<User>().value;
@@ -164,8 +165,8 @@ const getTrailData = () => {
 onMounted(async () => {
   getTrailData();
   if (editorData.value.blocks.length) {
-    readOnly.value = false;
     await loadEditor();
+    readOnly.value = false;
     toggleReadOnly();
   }
 });
@@ -189,8 +190,11 @@ const isAvaliableTooltip = (title: string) => {
 };
 
 const toggleReadOnly = async () => {
-  if (editor.value) await editor.value.toggleReadOnly();
   readOnly.value = !readOnly.value;
+  if (editor.value && editorData.value.blocks.length) {
+    await editor.value.toggleReadOnly();
+  }
+
   if (!readOnly.value) {
     backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
     observer.disconnect();
@@ -240,7 +244,7 @@ const navigateToSection = (title: string) => {
 };
 
 const loadEditor = async () => {
-  if (!editor.value) return;
+  if (!editor.value || !editorData.value) return;
   const res = await editor.value.loadEditor({
     id: editorData.value.id,
     time: editorData.value.time,
@@ -280,8 +284,13 @@ const saveData = async () => {
 };
 
 const resetData = async () => {
-  editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
-  await loadEditor();
+  if (!backUpEditorData.value.blocks.length) {
+    editor.value.clearEditor();
+  } else {
+    editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
+    await loadEditor();
+  }
+
   toggleReadOnly();
 };
 
@@ -296,20 +305,6 @@ const timeStampToDate = (timeStamp: number) => {
 const pageHeight = ref(0);
 const activeSection = ref(0);
 
-pageHeight.value = window.innerHeight;
-window.addEventListener('resize', () => {
-  setTimeout(() => {
-    pageHeight.value = window.innerHeight;
-  }, 300);
-});
-const observerMargin = Math.floor(pageHeight.value / 2);
-
-const observerConfig = {
-  rootMargin: `-${
-    pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin
-  }px 0px -${observerMargin}px 0px`,
-};
-
 const handleIntersection = (entries) => {
   entries.forEach((entry) => {
     const entrySection = parseInt(entry.target.getAttribute('section'));
@@ -320,20 +315,45 @@ const handleIntersection = (entries) => {
   });
 };
 
-const observer = new IntersectionObserver(handleIntersection, observerConfig);
+let observer;
 
 const setObserver = () => {
+  if (observer) {
+    observer.disconnect();
+  }
+
+  const observerMargin = Math.floor(pageHeight.value / 2);
+
+  const observerConfig = {
+    rootMargin: `-${
+      pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin
+    }px 0px -${observerMargin}px 0px`,
+  };
+
+  observer = new IntersectionObserver(handleIntersection, observerConfig);
+
   editorData.value.blocks.forEach((section) => {
     const element = document.querySelector(`[data-id="${section.id}"]`);
     if (element) {
       observer.observe(element);
     }
   });
+
   const startSection = document.getElementById('Início');
   if (startSection) {
     observer.observe(startSection);
   }
 };
+
+pageHeight.value = window.innerHeight;
+setObserver();
+
+window.addEventListener('resize', () => {
+  setTimeout(() => {
+    pageHeight.value = window.innerHeight;
+    setObserver();
+  }, 300);
+});
 </script>
 
 <style scoped lang="scss">

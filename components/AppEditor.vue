@@ -310,11 +310,18 @@ const navigateToId = (id) => {
   }
 };
 
+const clearEditor = () => {
+  instance.value.isReady.then(() => {
+    instance.value.clear();
+  });
+};
+
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
   navigateToId,
+  clearEditor,
 });
 </script>
 
