@@ -4,26 +4,22 @@
     :icon="isCopied ? copiedIcon : copyIcon"
     :variant="isCopied ? 'success' : 'text'"
     @click:button="handleClick"
+    rounded
   />
 </template>
 <script setup lang="ts">
-const props = defineProps({
-  text: {
-    type: String,
-    required: true,
-  },
-  tooltipText: {
-    type: String,
-  },
-  copyIcon: {
-    type: String,
-    default: 'mdi-content-copy',
-  },
-  copiedIcon: {
-    type: String,
-    default: 'mdi-clipboard-check-multiple-outline',
-  },
+export interface CopyButtonComponentType {
+  text: string;
+  tooltipText?: string;
+  copyIcon?: string;
+  copiedIcon?: string;
+}
+
+const props = withDefaults(defineProps<CopyButtonComponentType>(), {
+  copyIcon: 'mdi-content-copy',
+  copiedIcon: 'mdi-clipboard-check-multiple-outline',
 });
+
 const { copyToClipboard } = useCopyText();
 
 const isCopied = ref(false);
@@ -51,9 +47,3 @@ function handleKeyDown(event) {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.rounded {
-  border-radius: 99%;
-}
-</style>

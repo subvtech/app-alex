@@ -26,25 +26,23 @@
 </template>
 
 <script setup lang="ts">
+export interface SecurityEmits {
+  (e: 'update'): void;
+}
 
-const emit = defineEmits(['update:user']);
+export interface SecurityComponentType {
+  email: string;
+  id: number;
+}
+
+const emit = defineEmits<SecurityEmits>();
 const { setMessage } = useMessageStore();
 const { emailRules, passwordRules } = useFormRules();
 const editEmail = ref(false);
 const editPassword = ref(false);
 const password = ref('your-password');
 
-const props = defineProps({
-  email: {
-    type: String,
-    required: true,
-  },
-
-  id: {
-    type: Number,
-    required: true,
-  },
-});
+const props = withDefaults(defineProps<SecurityComponentType>(), {});
 
 const { email } = toRefs(props);
 
@@ -54,7 +52,7 @@ const updateEmail = async () => {
   editEmail.value = !editEmail.value;
   setMessage('Not yet implemented', 'warning', true);
 
-  emit('update:user', {});
+  emit('update');
 };
 
 const updatePassword = () => {
@@ -63,5 +61,4 @@ const updatePassword = () => {
 };
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

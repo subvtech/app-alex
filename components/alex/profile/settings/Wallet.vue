@@ -38,20 +38,25 @@
 </template>
 
 <script setup lang="ts">
+export interface WalletEmits {
+  (e: 'update'): void;
+}
+
+export interface WalletComponentType {
+  wallet: Wallet;
+  userId: number;
+}
+
 const { delete: _delete } = useStrapi();
 
 const loading = ref(false);
 
 const { linkWallet } = useMetamask(loading);
 
-const emit = defineEmits(['update']);
+const emit = defineEmits<WalletEmits>();
 
 const { setMessage } = useMessageStore();
 
-export interface WalletComponentType {
-  wallet: Wallet;
-  userId: number;
-}
 const props = withDefaults(defineProps<WalletComponentType>(), {});
 
 const { wallet } = toRefs(props);
@@ -74,11 +79,11 @@ const handleClick = async () => {
       wallet.value = { id: result.wallet.id, address: result.wallet.address };
       isWalletLinked.value = true;
     }
+
+    emit('update');
   } catch (err) {
     setMessage(err as string, 'red', true);
   }
-
-  emit('update');
 };
 </script>
 

@@ -14,47 +14,37 @@
   </v-tooltip>
 </template>
 <script setup lang="ts">
-const emit = defineEmits(['click:button']);
-const props = defineProps({
-  tooltipText: {
-    type: String,
-    default: '',
-  },
-  tooltipLocation: {
-    type: String as PropType<'start' | 'bottom' | 'end' | 'top'>,
-    default: 'top',
-  },
-  variant: {
-    type: String as PropType<
-      | 'primary'
-      | 'secondary'
-      | 'tertiary'
-      | 'text'
-      | 'error'
-      | 'success'
-      | 'warning'
-      | 'info'
-    >,
-    default: 'success',
-  },
-  icon: {
-    type: String,
-    default: 'mdi-content-copy',
-  },
-  rounded: {
-    type: Boolean,
-    default: false,
-  },
+export interface TooltipButtonEmits {
+  (e: 'click:button'): void;
+}
 
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
+export interface TooltipButtonComponentType {
+  tooltipLocation?: 'start' | 'bottom' | 'end' | 'top';
+  tooltipText?: string;
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'text'
+    | 'error'
+    | 'success'
+    | 'warning'
+    | 'info';
+  icon?: string;
+  iconSize?: 'default' | 'small' | 'large';
+  rounded?: boolean;
+  disabled?: boolean;
+}
+const emit = defineEmits<TooltipButtonEmits>();
 
-  iconSize: {
-    type: String as PropType<'default' | 'small' | 'large'>,
-    default: 'large',
-  },
+withDefaults(defineProps<TooltipButtonComponentType>(), {
+  tooltipText: '',
+  tooltipLocation: 'top',
+  variant: 'success',
+  icon: 'mdi-content-copy',
+  rounded: false,
+  disabled: false,
+  iconSize: 'large',
 });
 </script>
 

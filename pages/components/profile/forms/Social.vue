@@ -4,17 +4,15 @@
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" />
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits />
+
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
     />
-    <alex-documentation-accordions-props-list
-      :data="listEmits"
-      title="Component Emits"
-      list-emits
-    />
+   
     <alex-documentation-playground :data="listProps">
       <template #component="{ props }">
         <alex-profile-forms-social

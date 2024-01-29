@@ -27,24 +27,18 @@ import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
 
-export interface HighlightItemType {
+export interface HighlighterItemType {
   template: string;
 }
 
-const props = defineProps({
-  activePage: {
-    type: String,
-    required: true,
-  },
-  templates: {
-    type: Array as PropType<HighlightItemType[]>,
-    required: true,
-  },
+export interface HighlighterComponentType {
+  activePage: string;
+  templates: HighlighterItemType[];
+  hasExample?: boolean;
+}
 
-  hasExample: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<HighlighterComponentType>(), {
+  hasExample: false,
 });
 const { activePage } = toRefs(props);
 </script>

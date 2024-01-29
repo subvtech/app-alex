@@ -15,7 +15,7 @@
       <v-toolbar flat color="gray-blue">
         <v-toolbar-title>
           <p class="text-h5 text-center">
-            {{ title }}
+            {{ componentTitle }}
           </p></v-toolbar-title
         >
       </v-toolbar>
@@ -34,7 +34,7 @@
         <td>{{ item.name }}</td>
         <td class="text-success-1">{{ item.type }}</td>
 
-        <td v-if="item.required !== undefined" class="w-110">
+        <td v-if="item.required !== undefined && !listEmits" class="w-110">
           <v-icon v-if="item.required" class="pointer" color="success-1"
             >mdi-checkbox-marked</v-icon
           >
@@ -71,18 +71,25 @@ export interface PropItemType {
   type: 'number' | 'string' | 'boolean' | 'array' | 'object' | string;
 }
 
-export interface PropListType {
+export interface PropsListComponentType {
   title: string;
   data: PropItemType[];
   showPositions?: boolean;
   listEmits?: boolean;
 }
-const props = withDefaults(defineProps<PropListType>(), {
+const props = withDefaults(defineProps<PropsListComponentType>(), {
   title: 'Component Props',
-  data: () => [],
   showPositions: false,
   listEmits: false,
 });
+
+const { title, listEmits } = toRefs(props);
+
+const componentTitle = computed(() =>
+  listEmits.value && title.value.toLowerCase() === 'component props'
+    ? 'Component Events'
+    : title.value,
+);
 
 const expanded = ref<string[]>([]);
 const headers = computed(() => {

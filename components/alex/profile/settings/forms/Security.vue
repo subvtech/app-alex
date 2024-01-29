@@ -58,11 +58,9 @@ export interface SecurityFormComponentType {
   value: string;
   placeholder?: string;
   isPassword?: boolean;
-
   buttonText: string;
-  schema: {
-    type: YupSchema;
-  };
+  schema: YupSchema;
+
 }
 
 export interface SecurityFormEmits {

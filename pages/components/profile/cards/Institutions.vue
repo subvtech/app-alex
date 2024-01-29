@@ -4,6 +4,7 @@
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" />
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits/>
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
@@ -24,6 +25,7 @@
 <script setup lang="ts">
 import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
 import { InstitutionsComponentType } from '~/components/alex/profile/cards/Institutions.vue';
 
 definePageMeta({
@@ -74,6 +76,15 @@ const listProps: PlaygroundItemType[] = [
     required: true,
     description: 'A list with the institutions associated with the User',
     initialValue: institutionsProps.institutions,
+  },
+];
+
+const listEmits: PropItemType[] = [
+  {
+    name: 'update',
+    type: 'void',
+    description:
+      "It's triggered when the user saves the information by click on the mainButton",
   },
 ];
 

@@ -1,16 +1,15 @@
 <template>
   <a
-    v-for="item in socials"
     class="d-flex flex-row align-center justify-space-between pointer w-100 overflow-hidden text-decoration-none"
-    :href="absolutePath(item.contentData?.url)"
+    :href="absolutePath(contentData?.url)"
     target="_blank"
   >
     <div class="mr-4 icon-border">
-      <img :src="item.icon" />
+      <img :src="icon" />
     </div>
 
     <span class="text-body-3 text-gray-600 text-overflow" data-testid="text">
-      <span>{{ toUpperCase(' ' + item.title) }}</span>
+      <span>{{ toUpperCase(' ' + title) }}</span>
     </span>
     <v-spacer />
 
@@ -20,9 +19,9 @@
 <script setup lang="ts">
 import { AccordionItemType } from '@/components/alex/custom/Accordion.vue';
 
-defineProps({
-  socials: { type: Array as PropType<AccordionItemType[]>, default: [] },
-});
+export interface SocialItemComponentType extends AccordionItemType{};
+
+withDefaults(defineProps<SocialItemComponentType>(), {});
 
 const absolutePath = (url: string, https = true) => {
   if (!url) return;

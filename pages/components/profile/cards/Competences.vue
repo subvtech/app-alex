@@ -4,6 +4,8 @@
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" show-positions />
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits/>
+
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
@@ -31,6 +33,7 @@
 <script setup lang="ts">
 import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
 import { CompetencesComponentType } from '~/components/alex/profile/cards/Competences.vue';
 
 definePageMeta({
@@ -115,6 +118,15 @@ const listProps: PlaygroundItemType[] = [
     description:
       'A list with the tags associated with the user or learningplan',
     initialValue: competencesProps.selectedTags,
+  },
+];
+
+const listEmits: PropItemType[] = [
+  {
+    name: 'update',
+    type: 'void',
+    description:
+      "It's triggered when the user saves the information by click on the mainButton and changes are detected",
   },
 ];
 

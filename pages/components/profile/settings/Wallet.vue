@@ -4,6 +4,7 @@
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" />
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits/>
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
@@ -53,6 +54,16 @@ const listProps: PropItemType[] = [
       "The user's wallet information, containing id and address properties.",
   },
 ];
+
+const listEmits: PropItemType[] = [
+  {
+    name: 'update',
+    type: 'void',
+    description:
+      "It's triggered when the wallet is successfully linked or unlinked",
+  },
+];
+
 
 const examples = ref<ExampleComponentType[]>([
   {

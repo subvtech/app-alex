@@ -3,7 +3,11 @@
     class="page rounded-lg bg-white pa-6 gap-6 d-flex flex-column align-start pb-15"
   >
     <alex-documentation-header :title="title" :description="description" />
-    <alex-documentation-accordions-props-list :data="listProps" show-positions/>
+    <alex-documentation-accordions-props-list
+      :data="listProps"
+      show-positions
+    />
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
       v-for="item in examples"
       :snippets="item.snippets"
@@ -31,9 +35,9 @@
 <script setup lang="ts">
 import {
   ExampleComponentType,
-  ExampleItemType,
 } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
+import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
 import { InstitutionComponentType } from '~/components/alex/profile/InstitutionItem.vue';
 
 definePageMeta({
@@ -118,20 +122,42 @@ const listProps: PlaygroundItemType[] = [
     initialValue: institutionProps.institutionId,
   },
 ];
+
+const listEmits: PropItemType[] = [
+  {
+    name: 'delete:institution',
+    type: 'number',
+    description: "It's triggered when the removes an institution",
+  },
+];
+
 const examples = ref<ExampleComponentType[]>([
   {
     snippets: [
       {
-        template: `<alex-profile-settings-wallet
-          :user-id="walletProps.userId"
-          :wallet="walletProps.wallet"
+        template: `<alex-profile-institution-item
+          :url="props.url"
+          :acronym="props.acronym"
+          :sector="props.sector"
+          :name="props.name"
+          :can-edit="props.canEdit"
+          :is-deleted="props.isDeleted"
+          :institution-id="props.institutionId"
+          :background-color="props.backgroundColor"
         />`,
         label: 'Template',
       },
       {
-        template: `const walletProps: WalletComponentType = {
-  userId: 1,
-  wallet: { address: 'example', id: 2 },
+        template: `
+const institutionProps: InstitutionComponentType = {
+  url: 'https://picsum.photos/400/600',
+  name: 'name',
+  acronym: 'acronym',
+  sector: 'sector',
+  backgroundColor: 'bg-white',
+  canEdit: true,
+  isDeleted: false,
+  institutionId: 1,
 };`,
         label: 'Script',
       },

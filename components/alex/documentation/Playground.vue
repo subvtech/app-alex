@@ -1,5 +1,5 @@
 <template>
-  <h2 class="text-h3 text-gray-800">Component Playground</h2>
+  <h2 class="text-h3 text-gray-800">{{ title }}</h2>
   <p class="text-subtitle-2 text-gray-500">
     Aqui você pode testar algumas das propriedades do componente e ver como elas
     se comportam.
@@ -68,7 +68,7 @@ export interface PlaygroundComponentType {
   data: PlaygroundItemType[];
 }
 const props = withDefaults(defineProps<PlaygroundComponentType>(), {
-  title: 'Component Props',
+  title: 'Component Playground',
 });
 
 const { data } = toRefs(props);

@@ -22,7 +22,7 @@ export interface BoxItemType {
   icon: string;
   number: number;
 }
-const props = withDefaults(defineProps<BoxItemType>(), {
+withDefaults(defineProps<BoxItemType>(), {
   number: 0,
 });
 </script>

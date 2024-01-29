@@ -19,7 +19,7 @@ export interface DetailsComponentType {
   boxes: BoxItemType[];
   hideDivider?: boolean;
 }
-const props = withDefaults(defineProps<DetailsComponentType>(), {
+withDefaults(defineProps<DetailsComponentType>(), {
   hideDivider: false,
 });
 </script>

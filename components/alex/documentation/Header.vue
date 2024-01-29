@@ -26,17 +26,18 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  vuetifyLink: {
-    type: String,
-  },
-});
+export interface HeaderComponentType {
+  title: string;
+  description: string;
+  vuetifyLink?: string;
+}
+
+withDefaults(defineProps<HeaderComponentType>(), {});
 </script>
+<style scoped lang="scss">
+.container {
+  border: 1px solid #a0a8b1;
+  gap: 16px;
+  align-self: stretch;
+}
+</style>

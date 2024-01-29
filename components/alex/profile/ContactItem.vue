@@ -13,7 +13,7 @@ export interface ContactItemType {
   label: string;
   value: string;
 }
-const props = withDefaults(defineProps<ContactItemType>(), {});
+withDefaults(defineProps<ContactItemType>(), {});
 </script>
 <style scoped lang="scss">
 .field {

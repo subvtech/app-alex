@@ -39,7 +39,14 @@
                 />
               </template>
             </alex-custom-accordion>
-            <alex-profile-social-item v-else :socials="sortedSocials" />
+            <alex-profile-social-item
+              v-else
+              v-for="(social, index) in sortedSocials"
+              :key="index"
+              :icon="social.icon"
+              :content-data="social.contentData"
+              :title="social.title"
+            />
           </div>
         </div>
         <div v-if="canEditAndIsEditing" class="d-flex justify-center mt-6">
@@ -56,7 +63,10 @@
 <script setup lang="ts">
 import { SocialItemType } from '~/models/social.model';
 import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
-import { SocialFormUpdateNamePayload, SocialFormUpdateUrlPayload } from '../forms/Social.vue';
+import {
+  SocialFormUpdateNamePayload,
+  SocialFormUpdateUrlPayload,
+} from '../forms/Social.vue';
 const i18n = useI18n();
 
 const isEditing = ref(false);
@@ -64,8 +74,12 @@ const isAdding = ref(false);
 const isChanged = ref(false);
 const disableSave = ref(false);
 const componentKey = ref(0);
+export interface SocialsEmits {
+  (e: 'update'): void;
+}
 
-const emit = defineEmits(['update']);
+const emit = defineEmits<SocialsEmits>();
+
 const { create, update, delete: _delete } = useStrapi();
 
 export interface SocialsComponentType {

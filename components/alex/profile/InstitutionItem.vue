@@ -28,7 +28,11 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['delete:institution']);
+export interface InstitutionItemEmits {
+  (e: 'delete:institution', value: number): void;
+}
+
+const emit = defineEmits<InstitutionItemEmits>();
 
 export interface InstitutionComponentType {
   url?: string;

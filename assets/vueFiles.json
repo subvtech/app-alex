@@ -129,6 +129,52 @@
   },
   {
     "namespaces": [
+      "documentation",
+      "accordions",
+      "PropsList"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "buttons",
+      "Copy"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "buttons",
+      "Tooltip"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "Example"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "Header"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "Playground"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "prism",
+      "Highligther"
+    ]
+  },
+  {
+    "namespaces": [
       "inputs",
       "autocomplete"
     ]
@@ -191,6 +237,12 @@
   {
     "namespaces": [
       "profile",
+      "BoxItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
       "cards",
       "Competences"
     ]
@@ -219,8 +271,7 @@
   {
     "namespaces": [
       "profile",
-      "cards",
-      "Wallet"
+      "ContactItem"
     ]
   },
   {
@@ -247,6 +298,41 @@
     "namespaces": [
       "profile",
       "InstitutionItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "BasicInfo"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "forms",
+      "Security"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "Security"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "Wallet"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "SocialItem"
     ]
   }
 ]

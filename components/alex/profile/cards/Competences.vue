@@ -64,12 +64,10 @@ const { find } = useStrapiUtils();
 
 const { t } = useI18n();
 const client = useStrapiClient();
-const emit = defineEmits(['update', 'fetch']);
 const { setMessage } = useMessageStore();
 
 const { timeSpan, timeoutId, stopTimeout } = useTimeout(500);
 const { id } = useStrapiUser<User>().value;
-
 export interface CompetencesComponentType {
   selectedTags: Tag[];
   title: string;
@@ -80,6 +78,13 @@ export interface CompetencesComponentType {
   isGeneral?: boolean;
   canEdit?: boolean;
 }
+
+export interface CompetencesEmits {
+  (e: 'update'): void;
+}
+
+const emit = defineEmits<CompetencesEmits>();
+
 const props = withDefaults(defineProps<CompetencesComponentType>(), {
   canEdit: false,
   learningplan: false,

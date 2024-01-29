@@ -62,21 +62,19 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+export interface BasicInfoComponentType {
+  cpf: string;
+  fullname: string;
+  phone?: string;
+}
 
-const emit = defineEmits(['update']);
-const props = defineProps({
-  cpf: {
-    type: String,
-    required: true,
-  },
-  fullname: {
-    type: String,
-    required: true,
-  },
-  phone: {
-    type: String,
-  },
-});
+export interface BasicInfoEmits {
+  (e: 'update', value: { fullname: string; phone: string }): void;
+}
+
+const props = withDefaults(defineProps<BasicInfoComponentType>(), {});
+
+const emit = defineEmits<BasicInfoEmits>();
 
 const { phone, cpf, fullname } = toRefs(props);
 

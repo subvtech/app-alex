@@ -19,7 +19,7 @@
         class="w-100"
         name="institution"
       />
-     
+
       <div
         v-if="sortedInstitutions.length > 0"
         class="d-flex flex-wrap gap-6 w-100"
@@ -71,8 +71,13 @@ export interface InstitutionsComponentType {
   canEdit: boolean;
 }
 
+export interface InstitutionsEmits {
+  (e: 'update'): void;
+}
+
+const emit = defineEmits<InstitutionsEmits>();
+
 const client = useStrapiClient();
-const emit = defineEmits(['update']);
 
 const props = withDefaults(defineProps<InstitutionsComponentType>(), {
   canEdit: false,
