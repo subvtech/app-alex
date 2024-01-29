@@ -27,9 +27,10 @@ export function isValidCpf(val: string) {
 
 export const useFormRules = () => {
   const i18n = useI18n();
+  const locale = i18n.locale.value === 'pt' ? 'pt-BR' : 'en-US';
   const currentDate = new Date();
-  const { isSameOrBeforeHour } = useDatetime();
   currentDate.setHours(0, 0, 0, 0);
+  const { isSameOrBeforeHour } = useDatetime();
   const emailRegex =
     /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/gi;
   const emailRules = {
@@ -108,18 +109,23 @@ export const useFormRules = () => {
   const startDateCreationRules = yup
     .date()
     .required(i18n.t('rules.startDate.required'))
-    .min(currentDate.toISOString(), ({ min }) =>
-      i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
-    );
+    .min(currentDate, ({ min }) =>
+      i18n.t('rules.startDate.min', {
+        min: min.toLocaleString(locale).split(',')[0],
+      }),
+    )
+    .typeError(i18n.t('rules.startDate.typeError'));
 
   const startDateUpdateRules = yup
     .date()
-    .required(i18n.t('rules.startDate.required'));
+    .required(i18n.t('rules.startDate.required'))
+    .typeError(i18n.t('rules.startDate.typeError'));
 
   const endDateRules = yup
     .date()
     .required(i18n.t('rules.endDate.required'))
-    .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'));
+    .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'))
+    .typeError('A data precisa ser válida');
 
   const descriptionRules = {
     description: yup
@@ -252,12 +258,15 @@ export const useFormRules = () => {
       date: yup
         .date()
         .required(i18n.t('rules.meeting.date.required'))
-        .min(
-          startDate ? startDate.toISOString() : currentDate.toISOString(),
-          ({ min }) =>
-            i18n.t('rules.startDate.min', {
-              min: min.toString().split('T')[0],
-            }),
+        .min(startDate || currentDate, ({ min }) =>
+          i18n.t('rules.startDate.min', {
+            min: min.toLocaleString(i18n.locale.value).split(',')[0],
+          }),
+        )
+        .max(endDate || currentDate, ({ max }) =>
+          i18n.t('rules.endDate.max', {
+            max: max.toLocaleString(i18n.locale.value).split(',')[0],
+          }),
         ),
 
       startHour: yup

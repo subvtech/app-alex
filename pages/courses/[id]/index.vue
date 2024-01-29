@@ -1,5 +1,5 @@
 <template>
-  <div v-if="course">
+  <div v-if="learningPlanStore.learningPlan && course">
     <alex-learningplan-general
       :learning-plan="learningPlanStore.learningPlan as any"
       :learning-plan-id="learningPlanStore.learningPlan?.id"
@@ -105,10 +105,6 @@ onBeforeMount(async () => {
 });
 
 const updateCourse = async (show = true, message?) => {
-  emit('update');
-  await useAsyncData('learningPlans', () =>
-    learningPlanStore.loadLearningPlan(learningPlanId.value),
-  );
   const { id } = route.params;
   const result = await findOne('learningplans', id as string, { populate });
   if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
