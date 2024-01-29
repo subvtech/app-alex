@@ -10,6 +10,7 @@
     :name="name"
     v-bind="$attrs"
     :no-data-text="'Adiciona novas competências'"
+    @keydown.enter="updateModelValue"
   />
 </template>
 
@@ -66,12 +67,18 @@ useOnStopTyping(search, async () => {
     tags.data.filter(({ text }) =>
       selectedTags.value.find((selectedTag) => selectedTag.text !== text),
     );
-    items.value = tags.data.map(({ id, isGeneral, text, isPublic }) => ({
-      id,
-      isGeneral,
-      text,
-      isPublic,
-    }));
+    const local = items.value.filter((item) => item.local);
+    items.value = [
+      ...local,
+      ...tags.data
+        .map(({ id, isGeneral, text, isPublic }) => ({
+          id,
+          isGeneral,
+          text,
+          isPublic,
+        }))
+        .filter((item) => item.text !== local[0].text),
+    ];
   }
 });
 

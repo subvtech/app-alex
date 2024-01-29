@@ -15,12 +15,12 @@
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
             <template #content>
-              <a
+              <nuxt-link
                 class="ellipsis lines-1 w-100 text-decoration-none text-secondary-0"
-                :href="url!"
+                :to="url!"
               >
                 {{ url }}
-              </a>
+              </nuxt-link>
             </template>
           </alex-custom-tooltip>
           <span v-else>{{ $t('components.courses.invites.expired') }}</span>

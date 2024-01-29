@@ -27,7 +27,7 @@
               })
             "
             :course-id="learningPlan.id"
-            :can-edit="userIsFacilitator"
+            :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
           <app-about
@@ -37,7 +37,7 @@
             full-width
             :text="learningPlan.description"
             :user-id="user.id"
-            :can-edit="userIsFacilitator"
+            :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
           />
@@ -74,7 +74,7 @@
             :info="learningPlan.details?.lines"
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
-            :can-edit="userIsFacilitator"
+            :can-edit="learningPlanStore.userIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
@@ -105,12 +105,12 @@
             :boxes="[
               {
                 icon: 'mdi-account-outline',
-                number: activeMembers.length,
+                number: learningPlanStore.activeMembers.length,
                 label: 'students',
               },
               {
                 icon: 'trails.svg',
-                number: standardTrails,
+                number: learningPlanStore.standardTrails.length,
                 label: 'trails',
               },
               {
@@ -133,11 +133,15 @@
               is-nested
               hide-dividers
               sizing-class="ma-0"
-              :can-edit="userIsFacilitator"
+              :can-edit="learningPlanStore.userIsFacilitator"
               :data="schedules"
               :end-date="new Date()"
-              :is-facilitator="userIsFacilitator"
-              :href="userIsFacilitator ? `${learningPlan.id}/settings` : ''"
+              :is-facilitator="learningPlanStore.userIsFacilitator"
+              :to="
+                learningPlanStore.userIsFacilitator
+                  ? `${learningPlan.id}/settings`
+                  : ''
+              "
               :learning-plan-id="learningPlan.id"
             />
             <alex-learningplan-invites
@@ -160,7 +164,7 @@
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
-          (generalTags?.length === 0 && userIsFacilitator) ||
+          (generalTags?.length === 0 && learningPlanStore.userIsFacilitator) ||
           (generalTags?.length !== 0 && !loading)
         "
         is-general
@@ -171,13 +175,14 @@
         :user-id="user.id"
         :learning-plan-id="learningPlan?.id"
         :tags="generalTags"
-        :can-edit="userIsFacilitator"
+        :can-edit="learningPlanStore.userIsFacilitator"
         :loading="loading"
       />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
-          (technicalTags?.length === 0 && userIsFacilitator) ||
+          (technicalTags?.length === 0 &&
+            learningPlanStore.userIsFacilitator) ||
           (technicalTags?.length !== 0 && !loading)
         "
         :title="$t('components.competences.technical.title')"
@@ -187,7 +192,7 @@
         :user-id="user.id"
         :learning-plan-id="learningPlan?.id"
         :tags="technicalTags"
-        :can-edit="userIsFacilitator"
+        :can-edit="learningPlanStore.userIsFacilitator"
         :loading="loading"
       />
     </div>
@@ -210,9 +215,6 @@ const props = withDefaults(defineProps<GeneralProps>(), {
 });
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
-const standardTrails = learningPlanStore.standardTrailsCount;
-const userIsFacilitator = learningPlanStore.userIsFacilitator;
-const activeMembers = learningPlanStore.activeMembers;
 const i18n = useI18n();
 const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);

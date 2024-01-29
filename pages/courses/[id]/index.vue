@@ -21,7 +21,6 @@ const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
 const route = useRoute();
 const id = Number(route.params.id);
-
 const schedules = computed(
   () =>
     learningPlanStore.schedules?.map((item) => {

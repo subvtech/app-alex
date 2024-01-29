@@ -199,7 +199,7 @@ const props = withDefaults(defineProps<BannerProps>(), {
   darkerBackground: false,
   descriptionAbove: false,
   description: undefined,
-  selectedOption: 0,
+  selectedOption: null,
   links: () => [],
   isProfessor: false,
   canEdit: false,

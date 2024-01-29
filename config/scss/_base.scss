@@ -120,17 +120,11 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
   -webkit-box-shadow: 0 0 0px 3000px #fff inset !important;
 }
 
-// Dynamic class, ex: w-200px or w-200
-@mixin dynamic-size($size) {
+@for $size from 2 through 256 {
   .width-#{$size} {
     width: $size * 4px
   }
   .height-#{$size} {
     height: $size * 4px
   }
-}
-
-$dynami-sizes-list: 2;
-@for $size from 2 through 256 {
-  @include dynamic-size($size);
 }
