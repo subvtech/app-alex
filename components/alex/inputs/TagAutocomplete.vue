@@ -10,7 +10,7 @@
     :name="name"
     v-bind="$attrs"
     :no-data-text="'Adiciona novas competências'"
-    @keydown.enter="updateModelValue"
+    @keydown.enter="selectOnEnter"
   />
 </template>
 
@@ -65,32 +65,43 @@ useOnStopTyping(search, async () => {
   });
   if (tags.data.length) {
     tags.data.filter(({ text }) =>
-      selectedTags.value.find((selectedTag) => selectedTag.text !== text),
+      selectedTags.value.find(
+        (selectedTag) => selectedTag.text.toLowerCase() !== text.toLowerCase(),
+      ),
     );
-    const local = items.value.filter((item) => item.local);
+    const local = items.value.find((item) => item.local);
     items.value = [
-      ...local,
-      ...tags.data
-        .map(({ id, isGeneral, text, isPublic }) => ({
-          id,
-          isGeneral,
-          text,
-          isPublic,
-        }))
-        .filter((item) => item.text !== local[0].text),
+      ...tags.data.map(({ id, isGeneral, text, isPublic }) => ({
+        id,
+        isGeneral,
+        text,
+        isPublic,
+      })),
     ];
+    if (local && !items.value.some((tag) => tag.text === local.text)) {
+      items.value = [local, ...items.value];
+    }
   }
 });
 
 const updateModelValue = () => {
   if (
     selectedTag.value &&
-    !selectedTags.value.find((tag) => tag.text === selectedTag.value?.text)
+    !selectedTags.value.find(
+      (tag) => tag.text.toLowerCase() === selectedTag.value?.text.toLowerCase(),
+    )
   ) {
-    selectedTags.value.push(selectedTag.value);
+    selectedTags.value = [...selectedTags.value, selectedTag.value];
   }
   search.value = '';
   resetField();
+};
+
+const selectOnEnter = () => {
+  if (search.value.trim()) {
+    selectedTag.value = { text: search.value, local: true };
+    updateModelValue();
+  }
 };
 
 watch(
