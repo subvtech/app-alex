@@ -1,6 +1,6 @@
 <template>
   <div
-    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
+    class="rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
   >
     <h1 class="text-h2 text-gray-800">{{ title }}</h1>
     <p class="text-subtitle-2 text-gray-500">{{ description }}</p>
@@ -18,6 +18,7 @@
           class="text-decoration-underline text-blue"
           :href="vuetifyLink"
           target="_blank"
+          role="link"
           >vuetifyjs.com</a
         >
       </div>

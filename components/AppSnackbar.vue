@@ -5,7 +5,7 @@
     v-model="currentShow"
     @update:model-value="updateModelValue"
     :color="currentColor"
-    :timeout="timeout"
+    :timeout="timeSpan"
     location="bottom right"
     data-testid="snackbar"
   >
@@ -24,7 +24,7 @@
       <div
         class="bar h-100"
         :class="startTimer ? 'w-100' : ''"
-        :style="`transition: width ${timeout}ms linear; background-color: ${currentColor}`"
+        :style="`transition: width ${timeSpan}ms linear; background-color: ${currentColor}`"
       />
     </div>
   </v-snackbar>
@@ -34,6 +34,9 @@
 const messageStore = useMessageStore();
 
 const { show, message, color } = storeToRefs(messageStore);
+
+const { timeoutId, stopTimeout, timeSpan, startTimer, setStartTimer } =
+  useTimeout(5000);
 
 const props = defineProps({
   data: {
@@ -68,14 +71,10 @@ const iconName = computed(() => {
   return name;
 });
 
-const timeout = ref(5000);
-const timeoutId = ref<NodeJS.Timeout | null>(null);
-const startTimer = ref(false);
-
 const updateModelValue = (newValue) => {
   if (data?.value) data.value.show = newValue;
   show.value = newValue;
-  startTimer.value = true;
+  setStartTimer(true);
 };
 
 const currentShow = computed(() =>
@@ -93,10 +92,6 @@ const currentMessage = computed(() =>
     ? message.value
     : 'done',
 );
-const stopTimeout = () => {
-  if (timeoutId.value) clearTimeout(timeoutId.value);
-  else timeoutId.value = null;
-};
 
 onUnmounted(() => {
   stopTimeout();
@@ -105,13 +100,12 @@ onUnmounted(() => {
 const onClose = () => {
   if (data?.value) data.value.show = false;
   show.value = false;
-  startTimer.value = false;
   stopTimeout();
 };
 
 watch(currentShow, () => {
   timeoutId.value = setTimeout(() => {
-    startTimer.value = !startTimer.value;
+    setStartTimer(!startTimer.value);
   }, 10);
 });
 </script>
