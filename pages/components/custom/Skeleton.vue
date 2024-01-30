@@ -27,8 +27,8 @@
           </thead>
           <tbody>
             <tr>
-              <td>avatar-items</td>
-              <td>person[]</td>
+              <td>color</td>
+              <td>AlexColors</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
