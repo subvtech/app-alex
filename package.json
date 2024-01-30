@@ -30,7 +30,7 @@
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
     "happy-dom": "^13.0.6",
-    "nuxt": "^3.7.0",
+    "nuxt": "3.9.1",
     "playwright-core": "^1.40.1",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6",
