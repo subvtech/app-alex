@@ -20,8 +20,6 @@ type Tag = Partial<TagSimple> & {
   text: string;
   local?: true;
 };
-
-const emit = defineEmits(['update:modelValue']);
 interface AutoCompleteUsersProps {
   name: string;
   modelValue: Tag[];
@@ -41,14 +39,7 @@ const { value: selectedTag, resetField } = useField<Tag | null>(
     initialValue: null,
   },
 );
-const selectedTags = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
+const selectedTags = defineModel<Tag[]>({ required: true });
 const filteredItems = computed(() => {
   const selectedTagsText = selectedTags.value.map((user) => user.text);
   return items.value.filter((item) => !selectedTagsText.includes(item.text));
