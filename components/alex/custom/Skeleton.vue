@@ -5,7 +5,7 @@
 <script setup lang="ts">
 type SkeletonProps = {
   color?: AlexColors;
-  rounded?: 'sm' | 'rounded' | 'lg' | 'pill';
+  rounded?: 'sm' | 'rounded' | 'md' | 'lg' | 'pill';
 };
 const props = withDefaults(defineProps<SkeletonProps>(), {
   color: 'gray-100',
@@ -13,7 +13,9 @@ const props = withDefaults(defineProps<SkeletonProps>(), {
 });
 
 const styles = computed(() =>
-  props.rounded !== 'rounded' ? `rounded-${props.rounded}` : 'rounded',
+  props.rounded === 'rounded' || props.rounded === 'md'
+    ? 'rounded'
+    : `rounded-${props.rounded}`,
 );
 
 const color = computed(() => `bg-${props.color}`);
@@ -23,10 +25,6 @@ const color = computed(() => `bg-${props.color}`);
 .alex-skeleton {
   animation: 2s ease-in-out 0.5s infinite normal none running skeleton-animation;
 }
-.skeleton-circle {
-  aspect-ratio: 1;
-}
-
 @keyframes skeleton-animation {
   0% {
     opacity: 1;
