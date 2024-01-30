@@ -1,10 +1,6 @@
 <template>
   <client-only>
-    <div
-      id="editorjs"
-      class="editorjs w-100 pa-0"
-      style="max-width: 700px"
-    ></div>
+    <div id="editorjs" class="editorjs w-100 pa-0"></div>
   </client-only>
 </template>
 
@@ -52,7 +48,6 @@ const uploadBaseUrl = computed(() => {
 
 onMounted(() => {
   instance.value = new EditorJS({
-    autofocus: true,
     tools: {
       delimiter: Delimiter,
       embed: Embed,
@@ -316,19 +311,21 @@ const clearEditor = () => {
   });
 };
 
+const isReady = async () => {
+  return await instance.value.isReady;
+};
+
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
   navigateToId,
   clearEditor,
+  isReady,
 });
 </script>
 
 <style scoped>
-.section {
-  background-color: aqua !important;
-}
 .editorjs >>> .ce-header {
   padding: 0 0 1em;
 }
@@ -348,7 +345,11 @@ defineExpose({
 /* stylelint-disable */
 .editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
-  /* max-width: 64rem; */
+  max-width: 64rem;
   max-width: 100%;
+}
+
+.editorjs >>> .codex-editor--narrow {
+  background-color: aqua !important;
 }
 </style>

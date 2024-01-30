@@ -48,13 +48,14 @@
         </div>
       </div>
       <div
-        :class="showEditor ? 'd-flex' : 'd-none'"
-        class="container-min-height justify-center ma-6 align-start"
+        v-else
+        class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 700px">
+        <div style="width: 750px">
           <p
             v-show="readOnly && editorData.time"
-            class="text-gray-500 text-body-3 mb-4"
+            style="max-width: 700px"
+            class="text-gray-500 text-body-3 mb-4 mx-auto"
           >
             {{ $t('pages.trailId.overview.lastUpdated') }}
             {{ timeStampToDate(editorData.time) }}
@@ -165,9 +166,13 @@ const getTrailData = () => {
 onMounted(async () => {
   getTrailData();
   if (editorData.value.blocks.length) {
-    await loadEditor();
-    readOnly.value = false;
-    toggleReadOnly();
+    if (await checkEditorReady()) {
+      readOnly.value = false;
+      await loadEditor();
+      toggleReadOnly();
+    } else {
+      setMessage(t('pages.trailId.overview.loadError'), 'error', true);
+    }
   }
 });
 
@@ -292,6 +297,22 @@ const resetData = async () => {
   }
 
   toggleReadOnly();
+};
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const checkEditorReady = async () => {
+  let attempts = 0;
+  while (attempts < 10) {
+    try {
+      await editor.value.isReady;
+      return true;
+    } catch (error) {
+      await sleep(100);
+      attempts++;
+    }
+  }
+  return false;
 };
 
 const timeStampToDate = (timeStamp: number) => {

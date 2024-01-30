@@ -228,7 +228,7 @@ const handleCreatedCourse = async (id) => {
     title: trail.title,
     description: trail.description,
     hidden: trail.hidden,
-    cover_image: trail.cover_image.data.attributes,
+    cover_image: trail.cover_image.data?.attributes,
     blocks: trail.blocks || [],
   });
   createTrailDialog.value = false;
