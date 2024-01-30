@@ -12,5 +12,6 @@
   "newTrailAction": "Criar Trilha",
   "newTrailCancel": "Cancelar",
   "newTrailCoverText": "Capa da Trilha",
-  "newTrailCoverAction": "Editar"
+  "newTrailCoverAction": "Editar",
+  "notFound": "Trilha não encontrada"
 }

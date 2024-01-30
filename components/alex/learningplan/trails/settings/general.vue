@@ -9,7 +9,7 @@
     </div>
     <div class="d-flex flex-column w-100 content-body">
       <alex-inputs-text-field
-        v-model="trailStore.trail.title"
+        v-model="name"
         :label="$t('components.trails.settings.general.trailTitle')"
         name="title"
         class="w-100"
@@ -17,7 +17,7 @@
         required
       ></alex-inputs-text-field>
       <alex-inputs-text-area
-        v-model="trailStore.trail.description"
+        v-model="description"
         :label="$t('components.trails.settings.general.description')"
         name="description"
         class="w-100"
@@ -53,6 +53,10 @@ const route = useRoute();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
 
+const name = ref('');
+const description = ref('');
+
+
 const emit = defineEmits(['update']);
 
 const { generalTrailSchema } = useFormRules();
@@ -65,17 +69,24 @@ const { handleSubmit, errors, values, controlledValues, setFieldError } =
 
 const onSave = async () => {
   await update(`trails/${trailId}`, {
-    title: trailStore.trail.title,
-    description: trailStore.trail.description,
+    title: name.value,
+    description: description.value,
   });
+  emit('update');
   setMessage(t('components.trails.settings.general.update'), 'green', true);
 };
 
 const onCancel = () => {
-  refreshNuxtData();
+  name.value = trailStore.trail.title;
+  description.value = trailStore.trail.description;
 };
 
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
+
+onMounted(() => {
+  name.value = trailStore.trail.title;
+  description.value = trailStore.trail.description;
+});
 </script>
 <style scoped lang="scss">
 .header-h4 {

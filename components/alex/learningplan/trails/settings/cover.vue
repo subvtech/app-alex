@@ -93,6 +93,8 @@ const strapiClient = useStrapiClient();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
 
+const emit = defineEmits(['update']);
+
 const removeCoverImage = () => {
   try {
     update(`trails/${trailId}`, {
@@ -139,7 +141,7 @@ const handleSubmit = async () => {
       cover_image: imageData[0].id,
     });
     setMessage(t('components.trails.settings.cover.update'), 'green', true);
-    getTrailData();
+    emit('update');
   } catch (error) {
     theresError.value = true;
     setMessage(t('components.trails.settings.cover.error'), 'red', true);

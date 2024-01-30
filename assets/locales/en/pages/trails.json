@@ -13,5 +13,6 @@
     "newTrailAction": "Create Trail",
     "newTrailCancel": "Cancel",
     "newTrailCoverText": "Trail Cover",
-    "newTrailCoverAction": "Edit"
+    "newTrailCoverAction": "Edit",
+    "notFound": "Trail not found"
     }
