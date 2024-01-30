@@ -77,7 +77,7 @@ definePageMeta({
   middleware: ['load-trail'],
 });
 
-const props = defineProps({
+defineProps({
   namespace: {
     type: String as PropType<'courses' | 'trails'>,
     default: 'courses',
@@ -94,7 +94,7 @@ const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const strapiClient = useStrapiClient();
-const { courseId, trailId } = route.params;
+const { trailId } = route.params;
 const trailStore = useTrailStore();
 
 const getTrailData = async () => {
@@ -110,7 +110,7 @@ const removeCoverImage = () => {
     getTrailData();
   } catch (error) {
     theresError.value = true;
-    console.error('Erro na requisição:', error);
+    setMessage(t('components.trails.settings.cover.error'), 'red', true);
   }
 };
 
@@ -143,7 +143,6 @@ const handleSubmit = async () => {
         body: formData,
       });
     }
-    console.log(imageData);
     await update(`trails/${trailId}`, {
       cover_image: imageData[0].id,
     });
@@ -151,7 +150,7 @@ const handleSubmit = async () => {
     getTrailData();
   } catch (error) {
     theresError.value = true;
-    console.error('Erro na requisição:', error);
+    setMessage(t('components.trails.settings.cover.error'), 'red', true);
   }
 };
 

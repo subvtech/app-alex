@@ -7,7 +7,8 @@
   "add": "Add Videos or Photos",
   "title": "Trail Cover",
   "update": "Trail cover image successfully updated",
-  "addCover": "Upload"
+  "addCover": "Upload",
+  "error": "Error uploading trail cover image"
 },
 "general": {
   "title": "General Information",

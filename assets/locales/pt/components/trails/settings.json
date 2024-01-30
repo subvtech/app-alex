@@ -7,7 +7,8 @@
     "add": "Adicione Vídeos ou Fotos",
     "title": "Capa da trilha",
     "update": "A imagem de capa da trilha foi atualizada com sucesso",
-    "addCover": "Fazer upload"
+    "addCover": "Fazer upload",
+    "error": "Erro ao fazer upload da imagem de capa da trilha"
   },
   "general": {
     "title": "Informações Gerais",

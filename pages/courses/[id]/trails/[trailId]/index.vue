@@ -1,7 +1,12 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column" style="flex: 1">
     <div class="bg-white rounded w-100" style="flex: 1">
-      <div id="Início" section="0" class="d-flex justify-end px-6 pt-6">
+      <div
+        id="Início"
+        section="0"
+        class="d-flex justify-end px-6 pt-6"
+        :class="!readOnly ? 'sticky-buttons' : ''"
+      >
         <alex-custom-button
           v-if="readOnly && professorMode"
           variant="primary"
@@ -423,6 +428,15 @@ window.addEventListener('resize', () => {
   &:active {
     background-color: #d2d6da;
     color: #30363b !important;
+  }
+}
+
+@media screen and (min-width: 1380px) {
+  .sticky-buttons {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 88px;
+    z-index: 1;
   }
 }
 </style>
