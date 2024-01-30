@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: alex-app2-prod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: alex-app2-prod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alex-app2-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alex-app2-prod
+  template:
+    metadata:
+      labels:
+        app: alex-app2-prod
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: node
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: alex-app2-prod
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: alex-app2-prod
+          imagePullPolicy: Always
+          image: projetoalex/alex-app:v2-prod%VERSION%
+          ports:
+            - containerPort: 3000
+          env:
+            - name: STRAPI_URL
+              value: https://api-v4.projetoalex.cc
