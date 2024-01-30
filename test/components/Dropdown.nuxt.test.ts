@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { renderSuspended } from '@nuxt/test-utils/runtime';
 import { screen } from '@testing-library/vue';
 import { userEvent } from '@testing-library/user-event';
 import Dropdown from '../../components/alex/inputs/Dropdown.vue';
