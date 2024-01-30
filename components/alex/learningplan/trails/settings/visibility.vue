@@ -44,12 +44,8 @@ const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 const route = useRoute();
-const { courseId, trailId } = route.params;
+const { trailId } = route.params;
 const trailStore = useTrailStore();
-
-definePageMeta({
-  middleware: ['load-trail'],
-});
 
 const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
 
@@ -78,14 +74,6 @@ const secondButton = ref([
     value: 'true',
   },
 ]);
-
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-};
-
-onMounted(() => {
-  getTrailData();
-});
 </script>
 <style lang="scss" scoped>
 .content-area {

@@ -73,10 +73,6 @@
   </div>
 </template>
 <script setup lang="ts">
-definePageMeta({
-  middleware: ['load-trail'],
-});
-
 defineProps({
   namespace: {
     type: String as PropType<'courses' | 'trails'>,
@@ -96,10 +92,6 @@ const { t } = useI18n();
 const strapiClient = useStrapiClient();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
-
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-};
 
 const removeCoverImage = () => {
   try {
@@ -153,10 +145,6 @@ const handleSubmit = async () => {
     setMessage(t('components.trails.settings.cover.error'), 'red', true);
   }
 };
-
-onBeforeMount(() => {
-  getTrailData();
-});
 </script>
 <style scoped lang="scss">
 p {

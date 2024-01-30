@@ -21,22 +21,8 @@
 </template>
 
 <script setup lang="ts">
-
 definePageMeta({
-  middleware: ['load-trail'],
   hideLearningPlanBanner: true,
-});
-
-const route = useRoute();
-const { courseId, trailId } = route.params;
-const trailStore = useTrailStore();
-
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-};
-
-onMounted(() => {
-  getTrailData();
 });
 </script>
 <style scoped lang="scss">

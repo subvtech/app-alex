@@ -48,16 +48,10 @@ import { useForm } from 'vee-validate';
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-definePageMeta({
-  middleware: ['load-trail'],
-});
-const route = useRoute();
-const { courseId, trailId } = route.params;
-const trailStore = useTrailStore();
 
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-};
+const route = useRoute();
+const { trailId } = route.params;
+const trailStore = useTrailStore();
 
 const emit = defineEmits(['update']);
 
@@ -78,14 +72,10 @@ const onSave = async () => {
 };
 
 const onCancel = () => {
-  getTrailData();
+  refreshNuxtData();
 };
 
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
-
-onBeforeMount(() => {
-  getTrailData();
-});
 </script>
 <style scoped lang="scss">
 .header-h4 {
