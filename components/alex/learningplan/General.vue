@@ -164,8 +164,9 @@
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
-          (generalTags?.length === 0 && learningPlanStore.userIsFacilitator) ||
-          (generalTags?.length !== 0 && !loading)
+          (learningPlanStore.generalTags?.length === 0 &&
+            learningPlanStore.userIsFacilitator) ||
+          (learningPlanStore.generalTags?.length !== 0 && !loading)
         "
         is-general
         :title="$t('components.competences.general.title')"
@@ -174,16 +175,16 @@
         :placeholder="$t('components.competences.general.placeholder')"
         :user-id="user.id"
         :learning-plan-id="learningPlan?.id"
-        :tags="generalTags"
+        :tags="learningPlanStore.generalTags"
         :can-edit="learningPlanStore.userIsFacilitator"
         :loading="loading"
       />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
-          (technicalTags?.length === 0 &&
+          (learningPlanStore.technicalTags?.length === 0 &&
             learningPlanStore.userIsFacilitator) ||
-          (technicalTags?.length !== 0 && !loading)
+          (learningPlanStore.technicalTags?.length !== 0 && !loading)
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
@@ -191,7 +192,7 @@
         :placeholder="$t('components.competences.technical.placeholder')"
         :user-id="user.id"
         :learning-plan-id="learningPlan?.id"
-        :tags="technicalTags"
+        :tags="learningPlanStore.technicalTags"
         :can-edit="learningPlanStore.userIsFacilitator"
         :loading="loading"
       />
@@ -219,12 +220,6 @@ const i18n = useI18n();
 const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
 const user = useStrapiUser<User>();
-const generalTags = computed(
-  () => learningPlanStore.learningPlan?.tags?.filter((tag) => tag.isGeneral),
-);
-const technicalTags = computed(
-  () => learningPlanStore.learningPlan?.tags?.filter((tag) => !tag.isGeneral),
-);
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,

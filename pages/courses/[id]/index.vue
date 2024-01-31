@@ -37,27 +37,32 @@ const schedules = computed(
     }),
 );
 const headerStore = usePageHeaderStore();
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-  headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
-  headerStore.items = [
-    {
-      title: i18n.t('pages.classes.breadcrumbs.home'),
-      to: '/',
-      disabled: true,
-    },
-    {
-      title: i18n.t('pages.classes.breadcrumbs.myCourses'),
-      to: '/courses/me',
-      disabled: false,
-    },
-    {
-      title: learningPlanStore.learningPlan?.title || '',
-      to: `/courses/${learningPlanStore.learningPlan?.id}`,
-      disabled: false,
-    },
-  ];
-});
+watch(
+  () => learningPlanStore.loading,
+  () => {
+    if (!learningPlanStore.loading) {
+      headerStore.showHeader = true;
+      headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
+      headerStore.items = [
+        {
+          title: i18n.t('pages.classes.breadcrumbs.home'),
+          to: '/',
+          disabled: true,
+        },
+        {
+          title: i18n.t('pages.classes.breadcrumbs.myCourses'),
+          to: '/courses/me',
+          disabled: false,
+        },
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          to: `/courses/${learningPlanStore.learningPlan?.id}`,
+          disabled: false,
+        },
+      ];
+    }
+  },
+);
 
 const updateCourse = async (show = true, message?: string) => {
   const learninPlanResult = await learningPlanStore.loadLearningPlan(id, true);

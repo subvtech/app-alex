@@ -85,15 +85,8 @@ const initialTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 const temporaryTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 
 const updateLocalTag = (serverTag: Omit<TagSimple, 'learningplans'>) => {
-  const size = temporaryTags.value.length;
-  for (let index = 0; index < size; index++) {
-    const value = temporaryTags.value[index];
-    // Performace melhor que o map pois quando ele acha o valor ele para de iterar
-    if (value.text === serverTag.text) {
-      temporaryTags.value[index] = serverTag;
-      break;
-    }
-  }
+  const index = temporaryTags.value.findIndex((t) => t.text === serverTag.text);
+  temporaryTags.value[index] = serverTag;
 };
 const createTags = async (tags: Omit<TagSimple, 'learningplans'>[]) => {
   const promises = tags

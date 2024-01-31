@@ -88,29 +88,8 @@ const fetchData = async () => {
   }
 };
 const pageRoute = computed(() => route.name);
-const headerStore = usePageHeaderStore();
-
 onBeforeMount(async () => {
   await fetchData();
-  headerStore.showHeader = true;
-  headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
-  headerStore.items = [
-    {
-      title: i18n.t('pages.classes.breadcrumbs.home'),
-      to: '/',
-      disabled: true,
-    },
-    {
-      title: i18n.t('pages.classes.breadcrumbs.myCourses'),
-      to: '/courses/me',
-      disabled: false,
-    },
-    {
-      title: learningPlanStore.learningPlan?.title || '',
-      to: `/courses/${learningPlanStore.learningPlan?.id}`,
-      disabled: false,
-    },
-  ];
 });
 onUnmounted(() => {
   learningPlanStore.learningPlan = undefined;
