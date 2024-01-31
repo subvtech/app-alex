@@ -14,9 +14,12 @@
           <alex-learningplan-trails-settings-general
             :name="trailTitle"
             :description="trailDescription"
-            @update="handleUpdate"
+            @update="handleUpdateGeneral"
           />
-          <alex-learningplan-trails-settings-visibility />
+          <alex-learningplan-trails-settings-visibility
+            :active-button="visibilityButton"
+            @update="handleUpdateVisibility"
+          />
           <alex-learningplan-trails-settings-delete />
         </div>
       </template>
@@ -35,23 +38,34 @@ const { t } = useI18n();
 const route = useRoute();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
-
 const trailTitle = ref('');
 const trailDescription = ref('');
+const visibilityButton = ref('');
 
-const handleUpdate = (name, description) => {
+const handleUpdateGeneral = (name, description) => {
   trailTitle.value = name;
   trailDescription.value = description;
-
-  onSave();
+  updateGeneral();
 };
 
-const onSave = async () => {
+const updateGeneral = async () => {
   await update(`trails/${trailId}`, {
     title: trailTitle.value,
     description: trailDescription.value,
   });
   setMessage(t('components.trails.settings.general.update'), 'green', true);
+};
+
+const handleUpdateVisibility = (activeButton) => {
+  visibilityButton.value = activeButton;
+  updateVisibility();
+};
+
+const updateVisibility = async () => {
+  await update('trails', parseInt(trailId.toString()), {
+    hidden: visibilityButton.value,
+  });
+  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
 };
 </script>
 <style scoped lang="scss">

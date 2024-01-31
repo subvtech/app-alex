@@ -33,7 +33,7 @@
           class="button"
           :text="t('components.trails.settings.general.save')"
           variant="primary"
-          @click="updateVisibility()"
+          @click="handleUpdate"
         />
       </span>
     </div>
@@ -46,14 +46,12 @@ const { setMessage } = useMessageStore();
 const route = useRoute();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
+const emit = defineEmits(['update']);
 
 const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
 
-const updateVisibility = async () => {
-  await update('trails', parseInt(trailId.toString()), {
-    hidden: activeButton.value,
-  });
-  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
+const handleUpdate = () => {
+  emit('update', activeButton.value);
 };
 
 const onCancel = () => {
