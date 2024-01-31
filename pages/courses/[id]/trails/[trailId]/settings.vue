@@ -11,7 +11,11 @@
             namespace="trails"
             full-width
           />
-          <alex-learningplan-trails-settings-general />
+          <alex-learningplan-trails-settings-general
+            :name="trailTitle"
+            :description="trailDescription"
+            @update="handleUpdate"
+          />
           <alex-learningplan-trails-settings-visibility />
           <alex-learningplan-trails-settings-delete />
         </div>
@@ -24,6 +28,31 @@
 definePageMeta({
   hideLearningPlanBanner: true,
 });
+
+const { update } = useStrapi();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
+const route = useRoute();
+const { trailId } = route.params;
+const trailStore = useTrailStore();
+
+const trailTitle = ref('');
+const trailDescription = ref('');
+
+const handleUpdate = (name, description) => {
+  trailTitle.value = name;
+  trailDescription.value = description;
+
+  onSave();
+};
+
+const onSave = async () => {
+  await update(`trails/${trailId}`, {
+    title: trailTitle.value,
+    description: trailDescription.value,
+  });
+  setMessage(t('components.trails.settings.general.update'), 'green', true);
+};
 </script>
 <style scoped lang="scss">
 .w-201 {
