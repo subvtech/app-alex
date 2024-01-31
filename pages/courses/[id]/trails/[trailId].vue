@@ -17,7 +17,6 @@
 </template>
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['load-trail'],
   hideLearningPlanBanner: true,
 });
 
