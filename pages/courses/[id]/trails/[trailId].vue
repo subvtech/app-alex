@@ -1,6 +1,7 @@
 <template>
   <div>
     <alex-learningplan-trails-header
+      v-if="trailStore.trail"
       :trails-description="trailStore.trail.description"
       :trails-cover="
         trailStore.trail.cover_image
@@ -42,5 +43,15 @@ const getTrailData = async () => {
   }
 };
 
-await getTrailData();
+onMounted(async () => {
+  await getTrailData();
+});
+
+const pageRoute = computed(() => route.name);
+
+watch(pageRoute, async () => {
+  if (pageRoute.value?.toString().includes('courses-id-trails-trailId')) {
+    await getTrailData();
+  }
+});
 </script>
