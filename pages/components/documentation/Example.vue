@@ -6,12 +6,13 @@
     <alex-documentation-accordions-props-list :data="listProps" />
     <alex-documentation-example
       v-for="item in examples"
+      :key="item.title"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
       :has-example="item.hasExample"
     >
-      <template v-slot:component>
+      <template #component>
         <alex-profile-institution-item
           :url="institutionProps.url"
           :acronym="institutionProps.acronym"

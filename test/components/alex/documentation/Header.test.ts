@@ -1,71 +1,62 @@
-import { describe, it, expect } from 'vitest';
-import { screen, within, fireEvent } from '@testing-library/vue';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/vue';
 import { vuetify } from '@/plugins/vuetify';
 import HeaderComponent from '@/components/alex/documentation/Header.vue';
-import { transformAssetUrls } from 'vite-plugin-vuetify';
 
 // Test suite for HeaderComponent
 describe('HeaderComponent', () => {
   // Test case: Renders the component with title and description
-  const title = 'Test Title';
-  const description = 'Test Description';
-  const vuetifyLink = 'https://google.com/';
 
-  it('renders the component with title and description', async () => {
-    const component = await renderSuspended(HeaderComponent, {
-      props: { title, description },
+  const headerProps = {
+    title: 'Test Title',
+    description: 'Test Description',
+    vuetifyLink: 'https://google.com/',
+  };
+
+  let rerenderBind: (props: object) => Promise<void>;
+  beforeEach(() => {
+    const { rerender } = render(HeaderComponent, {
+      props: { ...headerProps },
       global: {
-        plugins: [vuetify],
+        plugins: [vuetify, i18n],
       },
     });
+    rerenderBind = rerender;
+  });
 
-    const titleComponent = await component.findByText(title);
+  it('renders the component with title and description', async () => {
+    await rerenderBind({ ...headerProps });
 
+    const titleComponent = await screen.findByText(headerProps.title);
     expect(titleComponent).not.toBeNull();
   });
   it('renders the component with description', async () => {
-    const description = 'Test Description';
+    await rerenderBind({ ...headerProps });
 
-    const component = await renderSuspended(HeaderComponent, {
-      props: { title, description },
-      global: {
-        plugins: [vuetify],
-      },
-    });
-
-    const descriptionComponent = await component.findByText(description);
+    const descriptionComponent = await screen.findByText(
+      headerProps.description,
+    );
 
     expect(descriptionComponent).not.toBeNull();
   });
 
   // Test case: Renders the Vuetify link when vuetifyLink prop is provided
   it('renders the Vuetify link when vuetifyLink prop is provided', async () => {
-    const component = await renderSuspended(HeaderComponent, {
-      props: { description, title, vuetifyLink },
-      global: {
-        plugins: [vuetify],
-      },
-    });
+    await rerenderBind({ ...headerProps });
 
-    const vuetifyLinkComponent = (await component.getByRole('link', {
+    const vuetifyLinkComponent = (await screen.getByRole('link', {
       name: /vuetifyjs.com/i,
     })) as HTMLAnchorElement;
 
     expect(vuetifyLinkComponent).not.toBeNull();
-    expect(vuetifyLinkComponent.href).toBe(vuetifyLink);
+    expect(vuetifyLinkComponent.href).toBe(headerProps.vuetifyLink);
   });
 
   // Test case: Does not render the Vuetify link when vuetifyLink prop is not provided
   it('does not render the Vuetify link when vuetifyLink prop is not provided', async () => {
-    const component = await renderSuspended(HeaderComponent, {
-      props: { description, title },
-      global: {
-        plugins: [vuetify],
-      },
-    });
+    await rerenderBind({ ...headerProps, vuetifyLink: undefined });
 
-    const vuetifyLinkComponent = (await component.queryByRole('link', {
+    const vuetifyLinkComponent = (await screen.queryByRole('link', {
       name: /vuetifyjs.com/i,
     })) as HTMLAnchorElement;
 

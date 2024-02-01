@@ -1,21 +1,21 @@
 <template>
   <alex-custom-card
     :title="title"
-    :isEditing="isEditing && canEdit"
-    @toggle:isEditing="isEditing = !isEditing"
-    :showIcon="canEdit"
-    :cancel="onCancel"
+    :is-diting="isEditing && canEdit"
     :save="onSave"
     align-content="align-start"
+    full-width
+    :show-icon="canEdit"
+    :cancel="onCancel"
     show-tooltip
     :tooltip="
       isGeneral
         ? $t('components.competences.general.tooltip')
         : $t('components.competences.technical.tooltip')
     "
-    full-width
+    @toggle:is-diting="isEditing = !isEditing"
   >
-    <template v-slot:content>
+    <template #content>
       <div class="gap-3 d-flex flex-column w-100">
         <div v-if="isEditing" class="d-flex flex-column gap-2">
           <alex-inputs-autocomplete
@@ -33,25 +33,28 @@
         </div>
 
         <div class="d-flex flex-column align-start gap-2">
-          <div :key="rerender" class="d-flex flex-wrap justify-center gap-2">
+          <div
+            v-if="updatedSelectedTags.length !== 0"
+            :key="rerender"
+            class="d-flex flex-wrap justify-center gap-2"
+          >
             <alex-custom-chip
-              v-if="updatedSelectedTags.length !== 0"
               v-for="(tag, index) in updatedSelectedTags"
               :key="index"
               :text="tag.text"
               variant="outlined"
               color="#000"
               :closable="isEditing"
-              @click:close="isEditing ? removeItem(tag) : () => {}"
               :uncloseable="isEditing"
-            />
-            <alex-custom-chip
-              v-else
-              variant="outlined"
-              color="#000"
-              :text="emptyMessage"
+              @click:close="isEditing ? removeItem(tag) : () => {}"
             />
           </div>
+          <alex-custom-chip
+            v-else
+            variant="outlined"
+            color="#000"
+            :text="emptyMessage"
+          />
         </div>
       </div>
     </template>
@@ -59,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-const { create, update, delete: _delete } = useStrapi();
+const { create, update } = useStrapi();
 const { find } = useStrapiUtils();
 
 const { t } = useI18n();
@@ -113,7 +116,7 @@ const handleInput = (input: any) => {
 function filterTags(data: any[]): void {
   filteredTags.value = data
     .filter((item) => !userTagsIds.value.includes(item.id))
-    .map((item, index) => {
+    .map((item) => {
       return { ...item, title: item.text, id: item.id };
     }) as Tag[];
 }
@@ -159,7 +162,7 @@ const removeItem = (tag) => {
   filteredTags.value.push({ ...tag, title: tag.text });
 };
 
-const onCancel = async () => {
+const onCancel = () => {
   updatedSelectedTags.value = [...props.selectedTags];
   filterTags([...props.selectedTags]);
   deleteArray.value = [];
@@ -257,7 +260,7 @@ const addExistingTag = (data) => {
   updateTags(data);
 };
 
-const createNewTag = (data) => {
+const createNewTag = () => {
   if (!search.value || search.value === '') return;
   updateTags({ text: search.value }, true);
 };

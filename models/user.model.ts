@@ -25,5 +25,5 @@ export interface User {
   avatar: any;
   cover: any;
   role: UserRoles;
-  user_wallet: Wallet;
+  user_wallet?: Wallet;
 }

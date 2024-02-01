@@ -2,7 +2,7 @@
   <div
     :class="[
       isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item',
-      backgroundColor ?? 'bg-white',
+      backgroundColor,
     ]"
   >
     <div class="d-flex gap-3">
@@ -17,9 +17,9 @@
 
       <v-icon
         class="remove"
-        @click="removeInstitution"
         color="red"
         size="small"
+        @click="removeInstitution"
       >
         mdi-trash-can-outline
       </v-icon>
@@ -48,12 +48,14 @@ export interface InstitutionComponentType {
 const props = withDefaults(defineProps<InstitutionComponentType>(), {
   isDeleted: false,
   canEdit: false,
+  backgroundColor: 'bg-white',
+  url: undefined,
 });
 
 const { url, name, acronym, isDeleted, institutionId, sector, canEdit } =
   toRefs(props);
 
-const removeInstitution = async () => {
+const removeInstitution = () => {
   isDeleted.value = true;
   emit('delete:institution', institutionId.value);
 };

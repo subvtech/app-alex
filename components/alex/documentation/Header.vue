@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
-  >
+  <div class="rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15">
     <h1 class="text-h2 text-gray-800">{{ title }}</h1>
     <p class="text-subtitle-2 text-gray-500">{{ description }}</p>
     <div
@@ -33,7 +31,7 @@ export interface HeaderComponentType {
   vuetifyLink?: string;
 }
 
-withDefaults(defineProps<HeaderComponentType>(), {});
+withDefaults(defineProps<HeaderComponentType>(), { vuetifyLink: undefined });
 </script>
 <style scoped lang="scss">
 .container {

@@ -4,11 +4,11 @@
       <alex-custom-button
         :class="rounded ? 'rounded' : ''"
         :variant="variant"
-        @click="emit('click:button')"
         :icon="icon"
         :size="iconSize"
         v-bind="tooltipText ? props : undefined"
         :disabled="disabled"
+        @click="emit('click:button')"
       />
     </template>
   </v-tooltip>

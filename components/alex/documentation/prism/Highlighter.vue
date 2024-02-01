@@ -1,5 +1,5 @@
 <template>
-  <v-window v-model="activePage" class="w-100">
+  <v-window v-model="activePage" class="w-100" role="code">
     <v-window-item
       v-for="(item, index) in templates"
       :value="index"
@@ -16,7 +16,7 @@
       class="d-flex w-100 justify-center bg-gray-300"
       :value="templates.length"
     >
-      <div class="w-75 gray-300">
+      <div class="w-75 gray-300" role="example">
         <slot name="example" />
       </div>
     </v-window-item>

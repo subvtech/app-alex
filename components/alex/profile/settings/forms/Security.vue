@@ -60,20 +60,18 @@ export interface SecurityFormComponentType {
   isPassword?: boolean;
   buttonText: string;
   schema: YupSchema;
-
 }
 
 export interface SecurityFormEmits {
   (e: 'click'): void;
 }
 
-const props = withDefaults(defineProps<SecurityFormComponentType>(), {
+withDefaults(defineProps<SecurityFormComponentType>(), {
   isPassword: false,
+  placeholder: undefined,
 });
 
 const emit = defineEmits<SecurityFormEmits>();
-
-const {} = toRefs(props);
 
 const isDisabled = ref(true);
 const isPasswordVisible = ref(false);

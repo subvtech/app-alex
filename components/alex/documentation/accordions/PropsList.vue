@@ -11,7 +11,7 @@
     fixed-header
     :height="300"
   >
-    <template v-slot:top>
+    <template #top>
       <v-toolbar flat color="gray-blue">
         <v-toolbar-title>
           <p class="text-h5 text-center">
@@ -20,13 +20,13 @@
         >
       </v-toolbar>
     </template>
-    <template v-slot:item="{ item, toggleExpand, props, isExpanded }">
+    <template #item="{ item, props: itemProps, isExpanded }">
       <tr
         class="w-100 tr-hover"
-        :class="[isExpanded(props.item) ? 'bg-gray-blue' : '']"
+        :class="[isExpanded(itemProps.item) ? 'bg-gray-blue' : '']"
         @click="
           () => {
-            expanded = isExpanded(props.item) ? [] : [item.name];
+            expanded = isExpanded(itemProps.item) ? [] : [item.name];
           }
         "
       >
@@ -44,7 +44,7 @@
         <td>
           <alex-documentation-buttons-tooltip
             :icon="
-              isExpanded(props.item) ? 'mdi-chevron-up' : 'mdi-chevron-down'
+              isExpanded(itemProps.item) ? 'mdi-chevron-up' : 'mdi-chevron-down'
             "
             variant="text"
             rounded
@@ -52,12 +52,12 @@
         </td>
       </tr>
     </template>
-    <template v-slot:expanded-row="{ columns, item }">
+    <template #expanded-row="{ columns, item }">
       <tr class="bg-gray-100 rounded">
         <td :colspan="columns.length">{{ item.description }}</td>
       </tr>
     </template>
-    <template v-slot:bottom />
+    <template #bottom />
   </v-data-table>
 </template>
 

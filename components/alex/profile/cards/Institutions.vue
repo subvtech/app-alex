@@ -1,23 +1,23 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.institutional.title')"
-    :isEditing="canEditAndIsEditing"
-    :showIcon="canEdit"
-    @toggle:isEditing="isEditing = !isEditing"
+    :is-editing="canEditAndIsEditing"
+    :show-icon="canEdit"
     :cancel="onCancel"
     :save="onSave"
     align-content="align-center"
     full-width
+    @toggle:is-editing="isEditing = !isEditing"
   >
     <template #content>
       <alex-inputs-institutions
         v-if="canEditAndIsEditing"
         v-model:institutions="searchInstitutions"
         v-model:search="search"
-        @update:model-value="updateSelectedOption"
         color="black"
         class="w-100"
         name="institution"
+        @update:model-value="updateSelectedOption"
       />
 
       <div
@@ -25,27 +25,24 @@
         class="d-flex flex-wrap gap-6 w-100"
       >
         <draggable
+          :key="componentKey"
           class="d-flex flex-row flex-wrap contacts gap-6 w-100 justify-center w-100"
           :list="sortedInstitutions"
           item-key="name"
           :disabled="!canEditAndIsEditing"
-          :key="componentKey"
           ghost-class="ghost"
           handle=".handle"
         >
-          <template
-            class="d-flex align-center justify-space-between item w-100"
-            #item="{ element, index }"
-          >
+          <template #item="{ element, index }">
             <alex-profile-institution-item
-              :canEdit="canEditAndIsEditing"
+              :can-edit="canEditAndIsEditing"
               :index="index"
               :acronym="element.acronym"
               :sector="element.sector"
               :url="element.cover?.url ?? element.url"
-              :institutionId="element.id"
+              :institution-id="element.id"
               :name="element.name"
-              :isDeleted="deleteArray.includes(element.id)"
+              :is-deleted="deleteArray.includes(element.id)"
               @delete:institution="updateDeleteArray"
             />
           </template>
@@ -103,7 +100,7 @@ const updateSelectedOption = (selectedId) => {
     return;
 
   const selectedInstitution = searchInstitutions.value.find(
-    (item) => item.id == selectedId,
+    (item) => item.id === selectedId,
   );
   if (!selectedInstitution) return;
   if (!findInstitution(selectedId)) {

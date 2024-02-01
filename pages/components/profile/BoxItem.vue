@@ -9,6 +9,7 @@
     />
     <alex-documentation-example
       v-for="item in examples"
+      :key="item.title"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
@@ -37,7 +38,8 @@ definePageMeta({
 });
 
 const title = 'Box Item';
-const description = "É usado pra exibir informações dentro de uma caixa. Um número, um texto e um ícone.s"
+const description =
+  'É usado pra exibir informações dentro de uma caixa. Um número, um texto e um ícone.s';
 const boxItemProps: BoxItemType = {
   icon: 'mdi-alert-cicle',
   label: 'assignments',

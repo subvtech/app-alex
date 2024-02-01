@@ -12,11 +12,8 @@ type PopulateFields =
 export type UniquePopulateFieldsArray = Array<PopulateFields>;
 
 export const useUserStore = defineStore('user', () => {
-  const { update } = useStrapi();
-
   const client = useStrapiClient();
-  const graphql = useStrapiGraphQL();
-  const { findOne, find } = useStrapiUtils();
+  const { find } = useStrapiUtils();
   const strapiUser = useStrapiUser<User>();
   const { setMessage } = useMessageStore();
   const i18n = useI18n();
@@ -75,7 +72,6 @@ export const useUserStore = defineStore('user', () => {
       loadedUser.value = { ...loadedUser.value, tags: result.data };
       loading.value = false;
       if (message) setMessage(message, 'green', true);
-      return;
     } catch (e: any) {
       loading.value = false;
       if (e?.error?.name === 'NotFoundError' && message) {
@@ -97,7 +93,6 @@ export const useUserStore = defineStore('user', () => {
       loading.value = false;
       if (showMessage)
         setMessage(i18n.t('components.profile.socials.update'), 'green', true);
-      return;
     } catch (e: any) {
       loading.value = false;
       if (e?.error?.name === 'NotFoundError' && showMessage) {
@@ -124,7 +119,6 @@ export const useUserStore = defineStore('user', () => {
           'green',
           true,
         );
-      return;
     } catch (e: any) {
       loading.value = false;
       if (e?.error?.name === 'NotFoundError' && showMessage) {
@@ -154,7 +148,6 @@ export const useUserStore = defineStore('user', () => {
       return loadedUser.value;
     } catch (e: any) {
       loading.value = false;
-      console.log({ error: e });
       if (e?.error?.name === 'NotFoundError' && showMessage) {
         setMessage(i18n.t('pages.login.notfound'), 'red', true);
       }
@@ -178,7 +171,7 @@ export const useUserStore = defineStore('user', () => {
     }, 0);
   });
 
-  const setWallet = (data: Wallet) => {
+  const setWallet = (data?: Wallet) => {
     if (loadedUser.value)
       loadedUser.value = { ...loadedUser.value, user_wallet: data };
   };

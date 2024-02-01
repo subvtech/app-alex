@@ -3,8 +3,8 @@
     :tooltip-text="tooltipText ?? $t('rules.meeting.copy.hint')"
     :icon="isCopied ? copiedIcon : copyIcon"
     :variant="isCopied ? 'success' : 'text'"
-    @click:button="handleClick"
     rounded
+    @click:button="handleClick"
   />
 </template>
 <script setup lang="ts">
@@ -18,6 +18,7 @@ export interface CopyButtonComponentType {
 const props = withDefaults(defineProps<CopyButtonComponentType>(), {
   copyIcon: 'mdi-content-copy',
   copiedIcon: 'mdi-clipboard-check-multiple-outline',
+  tooltipText: undefined,
 });
 
 const { copyToClipboard } = useCopyText();

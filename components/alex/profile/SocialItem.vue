@@ -8,7 +8,7 @@
       <img :src="icon" />
     </div>
 
-    <span class="text-body-3 text-gray-600 text-overflow" data-testid="text">
+    <span class="text-body-3 text-gray-600 text-overflow">
       <span>{{ toUpperCase(' ' + title) }}</span>
     </span>
     <v-spacer />
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { AccordionItemType } from '@/components/alex/custom/Accordion.vue';
 
-export interface SocialItemComponentType extends AccordionItemType{};
+export interface SocialItemComponentType extends AccordionItemType {}
 
 withDefaults(defineProps<SocialItemComponentType>(), {});
 

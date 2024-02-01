@@ -17,19 +17,20 @@
       />
       <div class="d-flex justify-end w-100 pa-2 gap-3" color="black">
         <alex-documentation-buttons-copy
+          v-if="snippets[parseInt(activePage)]"
           :disabled="isShowingComponent"
-          :text="snippets[parseInt(activePage)]?.template"
+          :text="snippets[parseInt(activePage)].template"
           rounded
         />
         <alex-documentation-buttons-tooltip
           v-if="hasExample"
           :tooltip-text="showCode ? 'script' : 'component'"
-          @click:button="toggleShowCode"
-          size="large"
-          variant="text"
-          :icon="showCode ? 'mdi-chevron-up' : 'mdi-code-tags'"
           :input-value="showCode"
+          :icon="showCode ? 'mdi-chevron-up' : 'mdi-code-tags'"
           rounded
+          variant="text"
+          size="large"
+          @click:button="toggleShowCode"
         />
       </div>
     </div>
@@ -38,7 +39,7 @@
       :templates="snippets"
       :has-example="hasExample"
     >
-      <template v-slot:example>
+      <template #example>
         <slot name="component" />
       </template>
     </alex-documentation-prism-highlighter>
@@ -59,6 +60,8 @@ export interface ExampleComponentType {
   hasExample: boolean;
 }
 const props = withDefaults(defineProps<ExampleComponentType>(), {
+  title: undefined,
+  description: undefined,
   hasExample: false,
 });
 

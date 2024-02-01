@@ -2,9 +2,9 @@
   <alex-custom-card
     class="max-w-250"
     :title="$t('components.profile.wallets.title')"
-    :showIcon="false"
+    :show-icon="false"
   >
-    <template v-slot:content>
+    <template #content>
       <div class="item d-flex w-100 justify-space-between">
         <div class="d-flex align-center gap-4">
           <div class="label d-flex align-center">
@@ -12,7 +12,7 @@
             <span>{{ $t('components.profile.wallets.metamask') }}</span>
           </div>
           <alex-documentation-buttons-copy
-            v-if="isWalletLinked"
+            v-if="wallet"
             :text="wallet.address"
             :tooltip-text="wallet.address"
           />
@@ -26,7 +26,7 @@
         >
           <img class="hide mr-1" src="/images/metamask.png" alt="" /><span>
             {{
-              isWalletLinked
+              wallet
                 ? $t('components.profile.wallets.unlink')
                 : $t('components.profile.wallets.link')
             }}
@@ -39,50 +39,28 @@
 
 <script setup lang="ts">
 export interface WalletEmits {
-  (e: 'update'): void;
+  (e: 'update:wallet', walletId: number): void;
+  (e: 'remove:wallet'): void;
 }
 
 export interface WalletComponentType {
-  wallet: Wallet;
-  userId: number;
+  wallet?: Wallet;
 }
-
-const { delete: _delete } = useStrapi();
-
-const loading = ref(false);
-
-const { linkWallet } = useMetamask(loading);
 
 const emit = defineEmits<WalletEmits>();
 
-const { setMessage } = useMessageStore();
-
-const props = withDefaults(defineProps<WalletComponentType>(), {});
+const props = withDefaults(defineProps<WalletComponentType>(), {
+  wallet: undefined,
+});
 
 const { wallet } = toRefs(props);
 
-const isWalletLinked = ref(
-  props.wallet ? (props.wallet.address ? true : false) : false,
-);
-
-const buttonVariant = computed(() =>
-  isWalletLinked.value ? 'error' : 'secondary',
-);
-const handleClick = async () => {
-  try {
-    if (isWalletLinked.value) {
-      await _delete('user-wallets', props.wallet?.id);
-
-      isWalletLinked.value = false;
-    } else {
-      const result = await linkWallet(props.userId);
-      wallet.value = { id: result.wallet.id, address: result.wallet.address };
-      isWalletLinked.value = true;
-    }
-
-    emit('update');
-  } catch (err) {
-    setMessage(err as string, 'red', true);
+const buttonVariant = computed(() => (wallet.value ? 'error' : 'secondary'));
+const handleClick = () => {
+  if (wallet.value) {
+    emit('update:wallet', wallet.value.id);
+  } else {
+    emit('remove:wallet'); // if it succeeds it updates the stored wallet
   }
 };
 </script>

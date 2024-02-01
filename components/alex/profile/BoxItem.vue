@@ -20,7 +20,7 @@
 export interface BoxItemType {
   label: 'courses' | 'students' | 'trails' | 'projects' | 'assignments';
   icon: string;
-  number: number;
+  number?: number;
 }
 withDefaults(defineProps<BoxItemType>(), {
   number: 0,

@@ -2,16 +2,16 @@
   <alex-custom-card
     class="basic-info"
     :title="$t('components.profile.settings.title')"
-    :showIcon="false"
+    :show-icon="false"
     align-content="align-center"
     full-width
   >
-    <template v-slot:content>
+    <template #content>
       <div class="d-flex w-100 max-w-200">
         <div color="black" class="d-flex flex-column w-100">
           <alex-inputs-text-field
             :label="$t('components.profile.settings.fullname')"
-            :modelValue="computedFullname"
+            :model-value="computedFullname"
             name="fullname"
             class=""
           />
@@ -21,7 +21,7 @@
               :placeholder="$t('components.profile.settings.phonePlaceholder')"
               :label="$t('components.profile.settings.phone')"
               name="phone"
-              :modelValue="computedTelephone"
+              :model-value="computedTelephone"
               class="w-100"
             />
 
@@ -72,7 +72,9 @@ export interface BasicInfoEmits {
   (e: 'update', value: { fullname: string; phone: string }): void;
 }
 
-const props = withDefaults(defineProps<BasicInfoComponentType>(), {});
+const props = withDefaults(defineProps<BasicInfoComponentType>(), {
+  phone: undefined,
+});
 
 const emit = defineEmits<BasicInfoEmits>();
 
@@ -90,7 +92,7 @@ const phoneMask = {
 const computedFullname = ref(props.fullname);
 const computedTelephone = ref(props.phone);
 
-const { handleSubmit, errors, values, controlledValues, setErrors } = useForm({
+const { handleSubmit, errors, values, setErrors } = useForm({
   validationSchema: profileSchema,
   keepValuesOnUnmount: true,
 });

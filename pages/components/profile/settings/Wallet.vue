@@ -4,19 +4,17 @@
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" />
-    <alex-documentation-accordions-props-list :data="listEmits" list-emits/>
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
       v-for="item in examples"
+      :key="item.title"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
       :has-example="item.hasExample"
     >
-      <template v-slot:component>
-        <alex-profile-settings-wallet
-          :user-id="walletProps.userId"
-          :wallet="walletProps.wallet"
-        /> </template
+      <template #component>
+        <alex-profile-settings-wallet :wallet="walletProps.wallet" /> </template
     ></alex-documentation-example>
   </v-container>
 </template>
@@ -35,17 +33,10 @@ const title = 'Card da Wallet';
 const description = 'É usado para exibir informações da carteira do usuário';
 
 const walletProps: WalletComponentType = {
-  userId: 1,
   wallet: { address: 'example', id: 2 },
 };
 
 const listProps: PropItemType[] = [
-  {
-    name: 'userId',
-    type: 'number',
-    required: true,
-    description: 'The user ID associated with the wallet.',
-  },
   {
     name: 'wallet',
     type: 'object',
@@ -57,29 +48,35 @@ const listProps: PropItemType[] = [
 
 const listEmits: PropItemType[] = [
   {
-    name: 'update',
-    type: 'void',
+    name: 'update:wallet',
+    type: '(walletId: number) => void',
     description:
-      "It's triggered when the wallet is successfully linked or unlinked",
+      "It's triggered in order to link a wallet, must use useMetamask",
+  },
+  {
+    name: 'remove:wallet',
+    type: '() => void',
+    description:
+      "It's triggered in order to unlink a wallet, must use useMetamask",
   },
 ];
-
 
 const examples = ref<ExampleComponentType[]>([
   {
     snippets: [
       {
         template: `<alex-profile-settings-wallet
-          :user-id="walletProps.userId"
-          :wallet="walletProps.wallet"
+          :wallet="walletProps.wallet"          
+          @update:wallet="linkWallet"
+          @remove:wallet="unlinkWallet(userId)"
         />`,
         label: 'Template',
       },
       {
         template: `const walletProps: WalletComponentType = {
-  userId: 1,
   wallet: { address: 'example', id: 2 },
-};`,
+};
+const userId = ref(2);`,
         label: 'Script',
       },
     ],

@@ -4,11 +4,11 @@
     :show-icon="false"
     align-content="align-center"
   >
-    <template v-slot:content>
+    <template #content>
       <alex-profile-detail-boxes class="max-w-125" :boxes="overviewBoxes" />
     </template>
 
-    <template v-slot:footer>
+    <template #footer>
       <div
         class="d-flex flex-column contacts gap-4 max-w-125 w-100 align-start"
       >
@@ -42,28 +42,31 @@ export interface OverviewComponentType {
 }
 
 const props = withDefaults(defineProps<OverviewComponentType>(), {
-  projects: 0,
-  assignments: 0,
-  learningPlans: 0,
+  projects: undefined,
+  assignments: undefined,
+  learningPlans: undefined,
+  email: undefined,
+  telephone: undefined,
 });
 
-const { email, telephone } = toRefs(props);
+const { email, telephone, learningPlans, projects, assignments } =
+  toRefs(props);
 
 const mask = new Mask({ mask: '(##) #####-####' });
-const overviewBoxes = ref<BoxItemType[]>([
+const overviewBoxes = computed<BoxItemType[]>(() => [
   {
     icon: 'mdi-bookmark-box-multiple-outline',
-    number: props.learningPlans,
+    number: learningPlans.value,
     label: 'courses',
   },
   {
     icon: 'mdi-newspaper-variant-multiple-outline',
-    number: props.projects,
+    number: projects.value,
     label: 'projects',
   },
   {
     icon: 'mdi-check-decagram',
-    number: props.assignments,
+    number: assignments.value,
     label: 'assignments',
   },
 ]);

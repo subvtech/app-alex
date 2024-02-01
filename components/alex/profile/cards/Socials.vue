@@ -4,12 +4,12 @@
     :cancel="cancel"
     :save="onSave"
     :disable-save="disableSave"
-    :showIcon="canEdit"
-    :isEditing="canEditAndIsEditing"
+    :show-icon="canEdit"
+    :is-editing="canEditAndIsEditing"
     full-width
-    @toggle:isEditing="isEditing = !isEditing"
+    @toggle:is-editing="isEditing = !isEditing"
   >
-    <template class="d-flex" v-slot:content>
+    <template #content>
       <div class="d-flex flex-column w-100 justify-center">
         <alex-custom-empty-placeholder
           v-if="sortedSocials.length === 0"
@@ -21,12 +21,12 @@
           <div class="d-flex flex-column rounded-lg gap-4">
             <alex-custom-accordion
               v-if="isEditing"
-              v-model:data="sortedSocials"
               :key="componentKey"
+              v-model:data="sortedSocials"
               show-positions
               @deleted:item="updateDeleteArray"
             >
-              <template class="px-0" #content="{ title, url, index }">
+              <template #content="{ title, url, index }">
                 <alex-profile-forms-social
                   :name="title"
                   :url="url"
@@ -40,8 +40,8 @@
               </template>
             </alex-custom-accordion>
             <alex-profile-social-item
-              v-else
               v-for="(social, index) in sortedSocials"
+              v-else
               :key="index"
               :icon="social.icon"
               :content-data="social.contentData"
@@ -51,8 +51,8 @@
         </div>
         <div v-if="canEditAndIsEditing" class="d-flex justify-center mt-6">
           <alex-profile-dialogs-add-social
-            @save:social="addSocial"
             :socials="updatedMissingSocials"
+            @save:social="addSocial"
           />
         </div>
       </div>
@@ -66,7 +66,7 @@ import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
 import {
   SocialFormUpdateNamePayload,
   SocialFormUpdateUrlPayload,
-} from '../forms/Social.vue';
+} from '@/components/alex/profile/forms/Social.vue';
 const i18n = useI18n();
 
 const isEditing = ref(false);
@@ -78,21 +78,21 @@ export interface SocialsEmits {
   (e: 'update'): void;
 }
 
-const emit = defineEmits<SocialsEmits>();
-
-const { create, update, delete: _delete } = useStrapi();
-
 export interface SocialsComponentType {
   socials: SocialItemType[];
   canEdit?: boolean;
   userId: number;
 }
 
+const emit = defineEmits<SocialsEmits>();
+
 const props = withDefaults(defineProps<SocialsComponentType>(), {
   canEdit: false,
 });
 
 const { userId, socials, canEdit } = toRefs(props);
+
+const { create, delete: _delete } = useStrapi();
 
 const supported = ['youtube', 'linkedin', 'instagram'];
 
@@ -106,7 +106,7 @@ onMounted(() => {
   resetArrays();
 });
 
-const addSocial = async ({ name, url, selectedSocial }) => {
+const addSocial = ({ name, url, selectedSocial }) => {
   const selectedSocialLowerCase = selectedSocial.toLowerCase();
   const title = name === '' ? selectedSocialLowerCase : name;
   const includesTitle = supported.includes(title);
@@ -190,20 +190,23 @@ const updateUrl = ({ url, index, socialId }: SocialFormUpdateUrlPayload) => {
   }
 };
 
+const fillSortedSocialsArray = () => {
+  sortedSocials.value = socials.value.map(({ id, name, url }) => ({
+    title: name.toUpperCase(),
+    icon: supported.includes(name.toLocaleLowerCase())
+      ? `/svg/${name}.svg`
+      : '/svg/website.svg',
+    contentData: {
+      url,
+      id,
+    },
+  })) as AccordionItemType[];
+};
+
 const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
-  if (updateSocials)
-    sortedSocials.value = socials.value.map(({ id, name, url }) => ({
-      title: name.toUpperCase(),
-      icon: supported.includes(name.toLocaleLowerCase())
-        ? `/svg/${name}.svg`
-        : '/svg/website.svg',
-      contentData: {
-        url: url,
-        id: id,
-      },
-    })) as AccordionItemType[];
+  if (updateSocials) fillSortedSocialsArray();
   isChanged.value = false;
 };
 
@@ -310,6 +313,14 @@ const cancel = () => {
   isChanged.value = false;
   resetArrays();
 };
+
+watch(
+  socials,
+  () => {
+    fillSortedSocialsArray();
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped lang="scss">

@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { StrapiUser } from 'strapi-sdk-js';
 
 declare global {
   interface Window {
@@ -8,7 +7,7 @@ declare global {
 }
 
 export const useMetamask = (loading) => {
-  const { create, find } = useStrapi();
+  const { create, find, delete: _delete } = useStrapi();
   const { setToken, setUser } = useStrapiAuth();
 
   const router = useRouter();
@@ -19,7 +18,7 @@ export const useMetamask = (loading) => {
   const { setMessage } = useMessageStore();
   const userStore = useUserStore();
 
-  const linkWallet = async (user_id?) => {
+  const linkWallet = async (userId?) => {
     try {
       loading.value = true;
       if (!window.ethereum) {
@@ -43,9 +42,9 @@ export const useMetamask = (loading) => {
         address: signer.address,
       };
 
-      if (user_id) {
+      if (userId) {
         endpoint = 'wallets/address';
-        requestData = { ...commonData, id: user_id };
+        requestData = { ...commonData, id: userId };
       } else {
         endpoint = 'wallets/auth';
         requestData = { ...commonData, returnToken: true };
@@ -54,8 +53,11 @@ export const useMetamask = (loading) => {
       try {
         const response: any = await create(endpoint, requestData);
         provider.destroy();
-        if (user_id)
-          userStore.setWallet({ id: response.wallet.id, address: signer.address });
+        if (userId)
+          userStore.setWallet({
+            id: response.wallet.id,
+            address: signer.address,
+          });
         return {
           jwt: response.jwt,
           user: response.user,
@@ -82,6 +84,15 @@ export const useMetamask = (loading) => {
     }
   };
 
+  const unlinkWallet = async (walletId: string | number) => {
+    try {
+      const result = await _delete('user-wallets', walletId);
+      if (result.data) userStore.setWallet();
+    } catch (err) {
+      setMessage(err as string, 'red', true);
+    }
+  };
+
   const metalogin = async () => {
     const { jwt, user, address } = await linkWallet();
 
@@ -96,5 +107,5 @@ export const useMetamask = (loading) => {
     }
   };
 
-  return { metalogin, linkWallet };
+  return { metalogin, linkWallet, unlinkWallet };
 };

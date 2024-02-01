@@ -2,16 +2,17 @@
   <alex-custom-card
     class="security"
     :title="$t('components.profile.security.title')"
-    :showIcon="false"
+    :show-icon="false"
     full-width
   >
-    <template v-slot:content>
+    <template #content>
       <div class="d-flex flex-wrap w-100 gap-6">
         <alex-profile-settings-forms-security
           :label="$t('components.profile.security.email')"
           :value="email"
           :button-text="$t('components.profile.security.editEmail')"
           :schema="emailRules"
+          @click="updateEmail"
         />
         <alex-profile-settings-forms-security
           :label="$t('components.profile.security.password')"
@@ -19,6 +20,7 @@
           :button-text="$t('components.profile.security.editPassword')"
           :schema="passwordRules.password"
           is-password
+          @click="updatePassword"
         />
       </div>
     </template>
@@ -46,9 +48,7 @@ const props = withDefaults(defineProps<SecurityComponentType>(), {});
 
 const { email } = toRefs(props);
 
-const cancel = () => {};
-
-const updateEmail = async () => {
+const updateEmail = () => {
   editEmail.value = !editEmail.value;
   setMessage('Not yet implemented', 'warning', true);
 

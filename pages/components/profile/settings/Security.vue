@@ -6,16 +6,17 @@
     <alex-documentation-accordions-props-list :data="listProps" />
     <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="item.title ?? index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
       has-example
     >
-      <template v-slot:component>
+      <template #component>
         <alex-profile-settings-security
-          :email="securityProps.email"
           :id="securityProps.id"
+          :email="securityProps.email"
         /> </template
     ></alex-documentation-example>
   </v-container>

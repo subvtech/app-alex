@@ -13,11 +13,11 @@
     <v-divider class="mx-6 divider-2" vertical />
     <v-col class="pa-3 d-flex flex-column gap-6">
       <div class="d-flex flex-wrap gap-3">
-        <div v-for="(item, index) in data">
+        <div v-for="(item, index) in data" :key="index">
           <alex-inputs-text-field
             v-if="item.type === 'string'"
-            class="w-min-50"
             v-model="playgroundValues[index]"
+            class="w-min-50"
             :name="item.name"
             hide-details
             :required="item.required"
@@ -26,11 +26,11 @@
             clearable
           />
         </div>
-        <div v-for="(item, index) in data">
+        <div v-for="(item, index) in data" :key="index">
           <alex-inputs-text-field
             v-if="item.type === 'number'"
-            class="w-max-40"
             v-model="playgroundValues[index]"
+            class="w-max-40"
             :name="item.name"
             type="number"
             hide-details
@@ -42,7 +42,7 @@
       </div>
 
       <div class="d-flex flex-wrap gap-3">
-        <div v-for="(item, index) in data">
+        <div v-for="(item, index) in data" :key="index">
           <v-checkbox
             v-if="item.type === 'boolean'"
             v-model="playgroundValues[index]"

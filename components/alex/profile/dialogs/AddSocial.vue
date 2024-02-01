@@ -26,8 +26,8 @@
             <p class="selected-item">{{ item.raw }}</p>
           </template>
 
-          <template #item="{ item, props }">
-            <v-list-item class="item-option" v-bind="props" v-slot:prepend="">
+          <template #item="{ item, props: itemProps }">
+            <v-list-item class="item-option" v-bind="itemProps">
               <img class="mr-4 icon-size" :src="getIcon(item.raw)" />
             </v-list-item> </template
         ></alex-inputs-select>
