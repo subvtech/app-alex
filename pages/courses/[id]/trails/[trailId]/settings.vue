@@ -11,8 +11,15 @@
             namespace="trails"
             full-width
           />
-          <alex-learningplan-trails-settings-general />
-          <alex-learningplan-trails-settings-visibility />
+          <alex-learningplan-trails-settings-general
+            :name="trailTitle"
+            :description="trailDescription"
+            @update="handleUpdateGeneral"
+          />
+          <alex-learningplan-trails-settings-visibility
+            :active-button="visibilityButton"
+            @update="handleUpdateVisibility"
+          />
           <alex-learningplan-trails-settings-delete />
         </div>
       </template>
@@ -21,22 +28,74 @@
 </template>
 
 <script setup lang="ts">
-
 definePageMeta({
-  middleware: ['load-trail'],
   hideLearningPlanBanner: true,
 });
 
+const { update } = useStrapi();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
 const route = useRoute();
-const { courseId, trailId } = route.params;
+const { trailId, id } = route.params;
 const trailStore = useTrailStore();
+const trailTitle = ref('');
+const trailDescription = ref('');
+const visibilityButton = ref('');
+const headerStore = usePageHeaderStore();
 
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
+const handleUpdateGeneral = (name, description) => {
+  trailTitle.value = name;
+  trailDescription.value = description;
+  updateGeneral();
 };
 
-onMounted(() => {
-  getTrailData();
+const updateGeneral = async () => {
+  await update(`trails/${trailId}`, {
+    title: trailTitle.value,
+    description: trailDescription.value,
+  });
+  setMessage(t('components.trails.settings.general.update'), 'green', true);
+};
+
+const handleUpdateVisibility = (activeButton) => {
+  visibilityButton.value = activeButton;
+  updateVisibility();
+};
+
+const updateVisibility = async () => {
+  await update('trails', parseInt(trailId.toString()), {
+    hidden: visibilityButton.value,
+  });
+  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
+};
+
+const learningPlanStore = useLearningPlanStore();
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+  headerStore.title = t('components.trails.header.breadcrumbs.title');
+  headerStore.items = [
+    {
+      title: t('components.trails.header.breadcrumbs.1.title'),
+      disabled: false,
+      href: '/courses/me',
+    },
+    {
+      title: learningPlanStore.learningPlan.title,
+      disabled: false,
+      href: `/courses/${id}`,
+    },
+    {
+      title: trailStore.trail.title,
+      disabled: false,
+      href: `/courses/${id}/trails/${trailId}`,
+    },
+    {
+      title: t('components.trails.settings.title'),
+      disabled: false,
+      href: `/courses/${id}/trails/${trailId}/settings`,
+    },
+  ];
 });
 </script>
 <style scoped lang="scss">

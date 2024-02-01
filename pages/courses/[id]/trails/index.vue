@@ -29,7 +29,7 @@
       >
     </div>
     <div
-      v-if="trails.length == 0"
+      v-if="!trails.length"
       style="flex: 1"
       class="d-flex align-center justify-center flex-column"
     >
@@ -101,22 +101,23 @@
     <CreateDialog
       v-if="professorMode && learningStructure"
       v-model="createTrailDialog"
-      :learning-structure="parseInt(learningStructure)"
-      @course-created="handleCreatedCourse"
+      :learning-structure="learningStructure"
+      @course-created="handleCreatedTrail"
     ></CreateDialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { TrailSimple } from '@/models/simple/trailSimple.model';
 import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
 
 const emit = defineEmits(['update']);
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const { update, findOne } = useStrapi();
-// const strapiClient = useStrapiClient();
+const { findOne } = useStrapiUtils();
+const { update } = useStrapi();
 
 const search = ref('');
 const page = ref(1);
@@ -124,44 +125,27 @@ const professorMode = ref(false);
 const isLoading = ref(false);
 
 const createTrailDialog = ref(false);
-const learningStructure = ref(null);
+const learningStructure = ref(0);
 
-interface Block {
-  type: string;
-}
-
-interface Trail {
-  id?: number;
-  title: string;
-  description: string;
-  hidden: boolean;
-  cover_image: {
-    url: string;
-  };
-  blocks: Block[] | [];
-}
-
-const trails = ref<Trail[]>([]);
+const trails = ref<TrailSimple[]>([]);
 const learningPlanStore = useLearningPlanStore();
-const trailsData = learningPlanStore.learningPlan?.learning_structures.filter(
+
+const trailsData = learningPlanStore.learningPlan?.learning_structures.find(
   (structure) => structure.type === 'standard',
 );
-learningStructure.value = trailsData[0]?.id;
 
 const { isProfessor } = useStrapiUser<User>().value;
 const getTrails = () => {
   professorMode.value = isProfessor;
   emit('update');
   isLoading.value = true;
-  for (
-    let itemIndex = trailsData[0].trails.length - 1;
-    itemIndex >= 0;
-    itemIndex--
-  ) {
-    const trail = trailsData[0].trails[itemIndex];
-    trail.blocks = trail.structures[trail.structures.length - 1]?.blocks ?? [];
-    trails.value.push(trail);
-  }
+  trails.value = (trailsData?.trails || []).map((trail) => {
+    const lastStructure = trail.structures[trail.structures.length - 1];
+    return {
+      ...trail,
+      blocks: lastStructure?.blocks ?? [],
+    };
+  });
   isLoading.value = false;
 };
 // eslint-disable camelcase
@@ -197,17 +181,6 @@ const changeItemVisibility = (index: number, id) => {
     trails.value[index].hidden = !trails.value[index].hidden;
   }
 };
-
-// const isJoinRoutePath = computed(() => {
-//   return route.name === 'courses-id-join-hash';
-// });
-
-// const learningPlanId = computed(() => {
-//   if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
-
-//   return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
-// });
-
 const { id } = route.params;
 
 const navigate = (trailId: number, page) => {
@@ -218,17 +191,17 @@ const navigate = (trailId: number, page) => {
   }
 };
 
-const handleCreatedCourse = async (id) => {
+const handleCreatedTrail = async (id) => {
   const newTrail = await findOne('trails', id, {
     populate: ['cover_image'],
   });
-  const trail: Trail = newTrail.data.attributes as Trail;
+  const trail: TrailSimple = newTrail.data as TrailSimple;
   trails.value.unshift({
     id,
     title: trail.title,
     description: trail.description,
     hidden: trail.hidden,
-    cover_image: trail.cover_image.data?.attributes,
+    cover_image: trail.cover_image,
     blocks: trail.blocks || [],
   });
   createTrailDialog.value = false;

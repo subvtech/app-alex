@@ -350,6 +350,6 @@ defineExpose({
 }
 
 .editorjs >>> .codex-editor--narrow {
-  background-color: aqua !important;
+  background-color: white !important;
 }
 </style>

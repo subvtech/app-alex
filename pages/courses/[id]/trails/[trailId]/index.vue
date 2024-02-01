@@ -1,6 +1,6 @@
 <template>
-  <div class="fill-height d-flex ga-3 flex-column" style="flex: 1">
-    <div class="bg-white rounded w-100" style="flex: 1">
+  <div class="fill-height d-flex ga-3 flex-column">
+    <div class="bg-white rounded w-100">
       <div
         id="Início"
         section="0"
@@ -263,7 +263,7 @@ const loadEditor = async () => {
   });
   if (res.success) {
     editorData.value = res.data;
-  } else if (!res.success) {
+  } else {
     setMessage(t('pages.trailId.overview.loadError'), 'error', true);
   }
 };
@@ -273,17 +273,15 @@ const saveData = async () => {
   try {
     const res = await editor.value.getData();
     if (!res.success) {
-      setMessage(t('pages.trailId.overview.saveError'), 'error', true);
+      setMessage(t('pages.trailId.overview.saveError'), 'success', true);
       return;
     }
-    if (res.data.blocks.length) {
-      await create('structures', {
-        time: Date.now(),
-        version: res.data.version,
-        blocks: res.data.blocks,
-        trail: trailId,
-      });
-    }
+    await create('structures', {
+      time: Date.now(),
+      version: res.data.version,
+      blocks: res.data.blocks,
+      trail: trailId,
+    });
     editorData.value = res.data;
     toggleReadOnly();
   } catch (e) {

@@ -8,18 +8,11 @@
     "copy": "Copy",
     "hidden": "Hidden",
     "article": "Article",
-    "articles": "Articles",
     "document": "Document",
-    "documents": "Documents",
     "video": "Video",
-    "videos": "Videos",
     "header": "Header",
-    "headers": "Headers",
     "image": "Image",
-    "images": "Images",
     "paragraph": "Paragraph",
-    "paragraphs": "Paragraphs",
-    "link": "Link",
-    "links": "Links"
+    "link": "Link"
   }
   

@@ -1,24 +1,11 @@
-import { LearningPlan } from './../models/learningPlan.model';
-import { learningPlanGroupMember } from './../models/learningPlanGroupMember.model';
 import { defineStore } from 'pinia';
-import { SocialItemType } from '@/models/social.model';
-
-export type TrailStoreType = {
-  avatar: { url: string; id: number } | undefined;
-  cover_image: any | undefined;
-  title: string;
-  editorData: Array<any>;
-  id: number | undefined;
-  time: number | undefined;
-  version: string | undefined;
-};
+import { TrailSimple } from '@/models/simple/trailSimple.model';
 
 export const useTrailStore = defineStore('trail', () => {
   const { findOne } = useStrapiUtils();
-  const trail = ref();
+  const trail = ref<TrailSimple>();
 
   const { setMessage } = useMessageStore();
-  // const i18n = useI18n();
 
   const populate = [
     'structures.blocks',
@@ -40,9 +27,9 @@ export const useTrailStore = defineStore('trail', () => {
       loading.value = false;
       return result;
     } catch (e: any) {
-      loading.value = false;
+      const i18n = useI18n();
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        setMessage('Trilha não encontrada', 'red', true);
+        setMessage(i18n.t('pages.trails.notFound'), 'red', true);
       }
     }
   }

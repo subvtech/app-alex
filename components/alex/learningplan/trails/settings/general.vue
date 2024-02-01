@@ -9,21 +9,21 @@
     </div>
     <div class="d-flex flex-column w-100 content-body">
       <alex-inputs-text-field
-        v-model="trailStore.trail.title"
+        v-model="name"
         :label="$t('components.trails.settings.general.trailTitle')"
         name="title"
         class="w-100"
         density="comfortable"
         required
-      ></alex-inputs-text-field>
+      />
       <alex-inputs-text-area
-        v-model="trailStore.trail.description"
+        v-model="description"
         :label="$t('components.trails.settings.general.description')"
         name="description"
         class="w-100"
         density="comfortable"
         required
-      ></alex-inputs-text-area>
+      />
     </div>
     <div class="footer-content">
       <span class="action-content-two">
@@ -35,9 +35,14 @@
             $t('components.trails.settings.general.cancel')
           }}</alex-custom-button
         >
-        <alex-custom-button class="button" variant="primary" @click="onSave">{{
-          $t('components.trails.settings.general.save')
-        }}</alex-custom-button>
+        <alex-custom-button
+          class="button"
+          variant="primary"
+          @click="handleUpdate()"
+          >{{
+            $t('components.trails.settings.general.save')
+          }}</alex-custom-button
+        >
       </span>
     </div>
   </div>
@@ -45,47 +50,39 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-const { update } = useStrapi();
-const { setMessage } = useMessageStore();
-const { t } = useI18n();
-definePageMeta({
-  middleware: ['load-trail'],
-});
-const route = useRoute();
-const { courseId, trailId } = route.params;
 const trailStore = useTrailStore();
-
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-};
 
 const emit = defineEmits(['update']);
 
 const { generalTrailSchema } = useFormRules();
 
-const { handleSubmit, errors, values, controlledValues, setFieldError } =
-  useForm({
-    validationSchema: generalTrailSchema,
-    keepValuesOnUnmount: true,
-  });
+const { errors } = useForm({
+  validationSchema: generalTrailSchema,
+  keepValuesOnUnmount: true,
+});
 
-const onSave = async () => {
-  await update(`trails/${trailId}`, {
-    title: trailStore.trail.title,
-    description: trailStore.trail.description,
-  });
-  setMessage(t('components.trails.settings.general.update'), 'green', true);
-};
+const name = ref('');
+const description = ref('');
 
 const onCancel = () => {
-  getTrailData();
+  name.value = trailStore.trail.title;
+  description.value = trailStore.trail.description;
 };
 
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
-onBeforeMount(() => {
-  getTrailData();
-});
+const handleUpdate = () => {
+  emit('update', name.value, description.value);
+};
+
+watch(
+  () => trailStore.trail,
+  (trail) => {
+    name.value = trail.title;
+    description.value = trail.description;
+  },
+  { immediate: true },
+);
 </script>
 <style scoped lang="scss">
 .header-h4 {

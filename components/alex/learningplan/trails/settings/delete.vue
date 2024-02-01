@@ -98,7 +98,7 @@ const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { courseId, trailId } = route.params;
+const { trailId } = route.params;
 
 async function removeTrail() {
   await _delete('trails', parseInt(trailId.toString()));

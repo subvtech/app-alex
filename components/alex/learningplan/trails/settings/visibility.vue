@@ -2,7 +2,7 @@
   <div class="content-area course-visibility">
     <div class="card-title">
       <p>
-        <span class="header-h4">
+        <span class="text-h4 text-gray-800">
           {{ t('components.trails.settings.visibilityTitle') }}</span
         >
       </p>
@@ -33,7 +33,7 @@
           class="button"
           :text="t('components.trails.settings.general.save')"
           variant="primary"
-          @click="updateVisibility()"
+          @click="handleUpdate"
         />
       </span>
     </div>
@@ -44,20 +44,14 @@ const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 const route = useRoute();
-const { courseId, trailId } = route.params;
+const { trailId } = route.params;
 const trailStore = useTrailStore();
-
-definePageMeta({
-  middleware: ['load-trail'],
-});
+const emit = defineEmits(['update']);
 
 const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
 
-const updateVisibility = async () => {
-  await update('trails', parseInt(trailId.toString()), {
-    hidden: activeButton.value,
-  });
-  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
+const handleUpdate = () => {
+  emit('update', activeButton.value);
 };
 
 const onCancel = () => {
@@ -78,14 +72,6 @@ const secondButton = ref([
     value: 'true',
   },
 ]);
-
-const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-};
-
-onMounted(() => {
-  getTrailData();
-});
 </script>
 <style lang="scss" scoped>
 .content-area {
@@ -119,14 +105,6 @@ onMounted(() => {
   border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
-.header-h4 {
-  color: var(--cinza-cinza-800, #454d54);
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.2px;
-}
 .footer-content {
   display: flex;
   padding: 0px 24px;

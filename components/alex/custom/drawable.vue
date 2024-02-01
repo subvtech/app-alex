@@ -104,8 +104,6 @@ const { blocks, modelValue, clipped } = toRefs(props);
 
 html,
 body {
-  // overflow-y: auto;
-  // -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   &::-webkit-scrollbar {
     display: none;
