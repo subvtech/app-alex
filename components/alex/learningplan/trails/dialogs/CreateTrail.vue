@@ -163,7 +163,6 @@ const { handleSubmit } = useForm({
     image: null,
   },
 });
-const { t } = useI18n();
 const createTrail = handleSubmit(async (values) => {
   isLoading.value = true;
   const { title, description } = values;
