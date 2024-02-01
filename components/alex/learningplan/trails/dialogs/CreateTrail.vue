@@ -163,7 +163,7 @@ const { handleSubmit } = useForm({
     image: null,
   },
 });
-
+const { t } = useI18n();
 const createTrail = handleSubmit(async (values) => {
   isLoading.value = true;
   const { title, description } = values;
@@ -185,10 +185,10 @@ const createTrail = handleSubmit(async (values) => {
       learning_structure: props.learningStructure,
     };
     const trailData = await create('trails', data);
-    setMessage(t('pages.trails.newTrailSuccessMessage'), 'success', true);
+    setMessage(t('pages.trails.success'), 'success', true);
     emit('courseCreated', trailData.data.id);
   } catch (error) {
-    setMessage(t('pages.trails.newTrailErrorMessage'), 'error', true);
+    setMessage(t('pages.trails.error'), 'error', true);
   } finally {
     fileInputRef.value = null;
     image.value = null;

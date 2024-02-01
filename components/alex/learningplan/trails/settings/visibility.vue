@@ -2,7 +2,7 @@
   <div class="content-area course-visibility">
     <div class="card-title">
       <p>
-        <span class="header-h4">
+        <span class="text-h4 text-gray-800">
           {{ t('components.trails.settings.visibilityTitle') }}</span
         >
       </p>
@@ -105,14 +105,6 @@ const secondButton = ref([
   border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 
-.header-h4 {
-  color: var(--cinza-cinza-800, #454d54);
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.2px;
-}
 .footer-content {
   display: flex;
   padding: 0px 24px;

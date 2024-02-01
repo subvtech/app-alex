@@ -21,8 +21,10 @@ definePageMeta({
   hideLearningPlanBanner: true,
 });
 
+const { t } = useI18n();
 const route = useRoute();
 const { trailId, id } = route.params;
+const headerStore = usePageHeaderStore();
 
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
@@ -42,9 +44,32 @@ const getTrailData = async () => {
     navigateTo(`/courses/${id}/trails`);
   }
 };
-
-onMounted(async () => {
+onBeforeMount(async () => {
   await getTrailData();
+  headerStore.showHeader = true;
+  headerStore.title = t('components.trails.header.breadcrumbs.title');
+  headerStore.items = [
+    {
+      title: t('components.trails.header.breadcrumbs.0.title'),
+      disabled: false,
+      href: '/',
+    },
+    {
+      title: t('components.trails.header.breadcrumbs.1.title'),
+      disabled: false,
+      href: '/courses/me',
+    },
+    {
+      title: learningPlanStore.learningPlan.title,
+      disabled: false,
+      href: `/courses/${id}`,
+    },
+    {
+      title: trailStore.trail.title,
+      disabled: false,
+      href: `/courses/${id}/trails/${trailId}`,
+    },
+  ];
 });
 
 const pageRoute = computed(() => route.name);
