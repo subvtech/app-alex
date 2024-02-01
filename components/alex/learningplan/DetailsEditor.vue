@@ -341,6 +341,9 @@ watch(isEmptyAndIsNotEditing, () => {
   if (isEmptyAndIsNotEditing && theresInstance) instance.value.destroy();
   else initialiseEditor();
 });
+watch(isEditing, () => {
+  instance.value.focus();
+});
 </script>
 
 <style global lang="scss">

@@ -100,7 +100,9 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 const { update } = useStrapi();
-const emit = defineEmits(['update']);
+const emit = defineEmits<{
+  (e: 'update', value: string): void;
+}>();
 const props = defineProps({
   learningPlanId: {
     type: Number,

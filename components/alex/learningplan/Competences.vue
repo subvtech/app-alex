@@ -86,7 +86,9 @@ const temporaryTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 
 const updateLocalTag = (serverTag: Omit<TagSimple, 'learningplans'>) => {
   const index = temporaryTags.value.findIndex((t) => t.text === serverTag.text);
-  temporaryTags.value[index] = serverTag;
+  if (index !== -1) {
+    temporaryTags.value[index] = serverTag;
+  }
 };
 const createTags = async (tags: Omit<TagSimple, 'learningplans'>[]) => {
   const promises = tags

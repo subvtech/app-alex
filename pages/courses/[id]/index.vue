@@ -37,11 +37,11 @@ const schedules = computed(
     }),
 );
 const headerStore = usePageHeaderStore();
+onBeforeMount(() => (headerStore.showHeader = true));
 watch(
   () => learningPlanStore.loading,
   () => {
     if (!learningPlanStore.loading) {
-      headerStore.showHeader = true;
       headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
       headerStore.items = [
         {

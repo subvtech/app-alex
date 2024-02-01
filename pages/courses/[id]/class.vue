@@ -502,28 +502,32 @@ function deleteGroupCard(id: number) {
   removingGroupId.value = id;
   dialogConfirmDeleteGroup.value = true;
 }
-
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-  headerStore.title = 'Meus Cursos';
-  headerStore.items = [
-    {
-      title: 'Home',
-      to: '/',
-      disabled: true,
-    },
-    {
-      title: 'Meus Cursos',
-      to: '/courses/me',
-    },
-    {
-      title: learningPlanStore.learningPlan
-        ? learningPlanStore.learningPlan.title
-        : 'Curso',
-      to: `/courses/${learningPlanId.value}`,
-    },
-  ];
-});
+onBeforeMount(() => (headerStore.showHeader = true));
+watch(
+  () => learningPlanStore.loading,
+  () => {
+    if (!learningPlanStore.loading) {
+      headerStore.title = t('pages.classes.breadcrumbs.myCourses');
+      headerStore.items = [
+        {
+          title: 'Home',
+          to: '/',
+          disabled: true,
+        },
+        {
+          title: 'Meus Cursos',
+          to: '/courses/me',
+        },
+        {
+          title: learningPlanStore.learningPlan
+            ? learningPlanStore.learningPlan.title
+            : 'Curso',
+          to: `/courses/${learningPlanId.value}`,
+        },
+      ];
+    }
+  },
+);
 
 watch(
   () => [selectedGroupMembers.value, selectedInChargeGroupMember.value],
