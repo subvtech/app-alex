@@ -29,7 +29,7 @@
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
     "happy-dom": "^10.11.2",
-    "nuxt": "^3.7.0",
+    "nuxt": "3.9.1",
     "nuxt-vitest": "^0.10.4",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6",
