@@ -374,9 +374,7 @@ const miniVariant = ref(false);
 
 html,
 body {
-  // overflow-y: auto;
-  // -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -388,7 +386,7 @@ body {
       font-size: 14px;
       font-style: normal;
       font-weight: 700;
-      line-height: 135%; /* 18.9px */
+      line-height: 135%;
       letter-spacing: 0.56px;
     }
 

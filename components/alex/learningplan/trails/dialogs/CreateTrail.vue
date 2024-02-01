@@ -121,8 +121,9 @@ const image = ref(null);
 const dialog = ref(false);
 
 const { setMessage } = useMessageStore();
+const { t } = useI18n();
 
-const emit = defineEmits(['courseCreated']);
+const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
 const props = defineProps({
   learningStructure: {
@@ -184,14 +185,10 @@ const createTrail = handleSubmit(async (values) => {
       learning_structure: props.learningStructure,
     };
     const trailData = await create('trails', data);
-    setMessage('Trilha Criada com sucesso!', 'success', true);
+    setMessage(t('pages.trails.newTrailSuccessMessage'), 'success', true);
     emit('courseCreated', trailData.data.id);
   } catch (error) {
-    setMessage(
-      'Ocorreu um erro ao criar a trilha, tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('pages.trails.newTrailErrorMessage'), 'error', true);
   } finally {
     fileInputRef.value = null;
     image.value = null;

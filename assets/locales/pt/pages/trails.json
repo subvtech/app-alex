@@ -13,5 +13,9 @@
   "newTrailCancel": "Cancelar",
   "newTrailCoverText": "Capa da Trilha",
   "newTrailCoverAction": "Editar",
+  "newTrailSuccessMessage": "Trilha criada com sucesso!",
+  "newTrailErrorMessage": "Ocorreu um erro ao criar a trilha, tente novamente",
   "notFound": "Trilha não encontrada"
+ 
+  
 }

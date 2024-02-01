@@ -8,17 +8,10 @@
   "copy": "Copiar",
   "hidden": "Oculto",
   "article": "Artigo",
-  "articles": "Artigos",
   "document": "Documento",
-  "documents": "Documentos",
   "video": "Vídeo",
-  "videos": "Vídeos",
   "header": "Cabeçalho",
-  "headers": "Cabeçalhos",
   "image": "Imagem",
-  "images": "Imagens",
   "paragraph": "Parágrafo",
-  "paragraphs": "Parágrafos",
-  "link": "Link",
-  "links": "Links"
+  "link": "Link"
 }
