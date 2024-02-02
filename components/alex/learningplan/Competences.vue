@@ -76,82 +76,28 @@ const props = withDefaults(defineProps<CompetencesProps>(), {
   canEdit: false,
   isGeneral: false,
 });
-const { create } = useStrapiUtils();
 const { setMessage } = useMessageStore();
 const i18n = useI18n();
-const strapi = useStrapi();
 const isEditing = ref(false);
 const initialTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 const temporaryTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
-
-const updateLocalTag = (serverTag: Omit<TagSimple, 'learningplans'>) => {
-  const index = temporaryTags.value.findIndex((t) => t.text === serverTag.text);
-  if (index !== -1) {
-    temporaryTags.value[index] = serverTag;
-  }
-};
-const createTags = async (tags: Omit<TagSimple, 'learningplans'>[]) => {
-  const promises = tags
-    .filter((tag) => !tag.id)
-    .map(({ text }) =>
-      create<Omit<TagSimple, 'learningplans'>>('tags', {
-        text,
-        verified: true,
-        isGeneral: props.isGeneral,
-        verified_by: props.userId,
-        isPublic: false,
-        ...(props.learningPlanId && {
-          learningplans: {
-            connect: [props.learningPlanId],
-          },
-        }),
-      }),
-    );
-
-  const createTags = await Promise.all(promises);
-  createTags.forEach((tag) => {
-    updateLocalTag(tag.data);
-  });
-  initialTags.value = temporaryTags.value;
-};
-const deleteTags = () => {
-  const deletedTags = initialTags.value.filter(
-    (selectedTag) =>
-      !temporaryTags.value.find((tag) => tag.text === selectedTag.text),
-  );
-  if (deletedTags.length === 0) return;
-  const deletedPromises = deletedTags
-    .filter((tag) => tag.id)
-    .map((tag) => {
-      if (tag.isPublic) {
-        return strapi.update(`tags/${tag.id}`, {
-          learningplans: {
-            disconnect: [props.learningPlanId],
-          },
-        });
-      }
-      return strapi.delete('tags', tag.id);
-    });
-  Promise.all(deletedPromises);
-};
-const updatePublicTags = (tags: Omit<TagSimple, 'learningplans'>[]) => {
-  const serverTags = tags.filter((tag) => tag.isPublic);
-  const updatedTagsPromises = serverTags.map((tag) =>
-    strapi.update(`tags/${tag.id}`, {
-      learningplans: {
-        connect: [props.learningPlanId],
-      },
-    }),
-  );
-  Promise.all(updatedTagsPromises);
-};
+const client = useStrapiClient();
 const onCancel = () => {
   temporaryTags.value = initialTags.value;
 };
 const onSave = async () => {
-  deleteTags();
-  await createTags(temporaryTags.value);
-  updatePublicTags(initialTags.value);
+  const updatedArray: Omit<TagSimple, 'learningplans'>[] = await client(
+    `/learningplans/${props.learningPlanId}/tags`,
+    {
+      method: 'PUT',
+      body: {
+        tags: temporaryTags.value,
+        isGeneral: props.isGeneral,
+      },
+    },
+  );
+  initialTags.value = updatedArray;
+  temporaryTags.value = updatedArray;
   setMessage(
     i18n.t(
       `components.learningPlan.page.${

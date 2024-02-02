@@ -106,6 +106,7 @@ watch(
             text: search.value,
             isGeneral: props.isGeneral,
             local: true,
+            isPublic: false,
           },
           ...items.value,
         ];
