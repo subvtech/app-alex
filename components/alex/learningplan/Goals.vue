@@ -170,14 +170,6 @@ const onUpdateDescription = (data) => {
 const onUpdateKeyword = (data) => {
   dataCopy.value[data.index].keyWord = data.value.text;
 };
-onBeforeMount(async () => {
-  filteredVerbs.value = (
-    (await find('learning-goal-verbs', { filters: { user: props.userId } }))
-      .data as unknown as any[]
-  ).map((item) => {
-    return { id: item.id, ...item.attributes };
-  });
-});
 
 const addGoal = () => {
   dataCopy.value.push({
