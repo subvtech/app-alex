@@ -114,7 +114,7 @@ import { ref, onMounted } from 'vue';
 const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
-const { trailId } = route.params;
+const { trailId, id } = route.params;
 const headerStore = usePageHeaderStore();
 const learningPlanStore = useLearningPlanStore();
 
