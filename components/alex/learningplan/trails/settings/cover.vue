@@ -9,7 +9,7 @@
     </div>
     <div class="cover-content-body">
       <div
-        v-if="trailStore.trail.cover_image"
+        v-if="trailStore.trail.cover_image != null"
         class="filePreview"
         :style="{
           backgroundImage: 'url(' + trailStore.trail.cover_image.url + ')',
@@ -40,7 +40,7 @@
           icon="mdi-trash-can-outline"
           variant="error"
           style="position: absolute; top: 16px; right: 16px"
-          @click="image = null && removeCoverImage()"
+          @click="removeCoverImage()"
         />
       </div>
       <div
@@ -92,19 +92,22 @@ const { t } = useI18n();
 const strapiClient = useStrapiClient();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
-
 const emit = defineEmits(['update']);
 
 const removeCoverImage = () => {
   try {
+    image.value = null;
     update(`trails/${trailId}`, {
       cover_image: null,
     });
-    trailStore.trail.value.cover_image.url = null;
-    getTrailData();
+    emit('update');
+    setMessage(
+      t('components.trails.settings.cover.removeSuccess'),
+      'green',
+      true,
+    );
   } catch (error) {
-    theresError.value = true;
-    setMessage(t('components.trails.settings.cover.error'), 'red', true);
+    setMessage(t('components.trails.settings.cover.removeError'), 'red', true);
   }
 };
 
@@ -128,22 +131,18 @@ const handleFileChange = () => {
 const handleSubmit = async () => {
   const uploadImage = fileInputRef.value.files[0];
   const formData = new FormData();
-  formData.append('files', uploadImage);
-  let imageData = null;
+  formData.append('files.cover_image', uploadImage);
+  formData.append('data', JSON.stringify({}));
   try {
     if (uploadImage) {
-      imageData = await strapiClient('/upload', {
-        method: 'POST',
+      await strapiClient(`trails/${trailId}`, {
+        method: 'PUT',
         body: formData,
       });
     }
-    await update(`trails/${trailId}`, {
-      cover_image: imageData[0].id,
-    });
     setMessage(t('components.trails.settings.cover.update'), 'green', true);
     emit('update');
   } catch (error) {
-    theresError.value = true;
     setMessage(t('components.trails.settings.cover.error'), 'red', true);
   }
 };

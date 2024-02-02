@@ -8,7 +8,9 @@
     "title": "Capa da trilha",
     "update": "A imagem de capa da trilha foi atualizada com sucesso",
     "addCover": "Fazer upload",
-    "error": "Erro ao fazer upload da imagem de capa da trilha"
+    "error": "Erro ao fazer upload da imagem de capa da trilha",
+    "removeError": "Erro ao remover a imagem de capa da trilha",
+    "removeSuccess": "Imagem de capa da trilha removida com sucesso"
   },
   "general": {
     "title": "Informações Gerais",
