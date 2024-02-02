@@ -2,7 +2,6 @@
   <div>
     <div class="bg-white rounded my-6">
       <div
-        fluid
         class="d-flex px-6 py-6 justify-start align-start align-self-stretch flex-wrap"
       >
         <div class="header-row">
@@ -16,7 +15,9 @@
           <div class="h-text">
             <div class="header-text">
               <span class="text-h3 text-gray-800">{{ trailsTitle }}</span>
-              <span class="body-p1 w-100"> {{ trailsDescription }}</span>
+              <span class="text-body-1 text-gray-600 w-100">
+                {{ trailsDescription }}</span
+              >
               <alex-custom-chip
                 :text="$t('components.trails.header.chip')"
                 prepend-icon="mdi-check"
@@ -49,26 +50,18 @@ const props = defineProps({
     required: true,
   },
   page: {
-    type: String,
-    default: '0',
+    type: Number as PropType<number>,
+    default: 0,
+  },
+  courseId: {
+    type: Number as PropType<number>,
+    required: true,
+  },
+  trailId: {
+    type: Number as PropType<number>,
+    required: true,
   },
 });
-
-const activePage = ref(props.page);
-
-watch(activePage, () => {
-  if (activePage.value == 0) {
-    let currentPath = router.currentRoute.value.fullPath;
-    if (currentPath.endsWith('settings')) {
-      currentPath = currentPath.replace('settings', '');
-      router.push(currentPath);
-    }
-  } else if (activePage.value == 2) {
-    if (router.currentRoute.value.fullPath.endsWith('settings')) return;
-    router.push(`${router.currentRoute.value.fullPath}settings`);
-  }
-});
-
 const { t } = useI18n();
 const tab = {
   firstTitle: t('components.trails.header.firstTab'),
@@ -80,22 +73,25 @@ const tabs = [
   { label: tab.secondTitle, value: '1' },
   { icon: 'mdi-cog-outline', label: '', value: '2' },
 ];
+const currentPath = router.currentRoute.value.fullPath;
+const activePage = ref(props.page);
+watch(activePage, () => {
+  if (activePage.value == 0) {
+    if (currentPath.endsWith('settings')) {
+      currentPath.replace('settings', '');
+      router.push(currentPath);
+    }
+    router.push(`/courses/${props.courseId}/trails/${props.trailId}`);
+  } else if (activePage.value == 2) {
+    if (currentPath.endsWith('settings')) return;
+    router.push(`${currentPath}settings`);
+  } else if (activePage.value == 1) {
+    if (currentPath.endsWith('tasks')) return;
+    router.push(`${currentPath}tasks`);
+  }
+});
 </script>
 <style scoped lang="scss">
-.body-p1 {
-  font-family: Sen;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 135%; /* 21.6px */
-  letter-spacing: 0.32px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  align-self: stretch;
-  color: var(--Cinza-Cinza-600, #6e7a87);
-}
-
 .header-row {
   display: flex;
   flex-wrap: nowrap;

@@ -11,7 +11,7 @@
       <div
         class="d-flex flex-column w-100 align-center bg-white py-10 px-6 rounded-t-lg gap-4"
       >
-        <span class="exclusionIMG">
+        <span>
           <img
             v-if="image"
             :src="image.src"
@@ -25,7 +25,7 @@
           <p class="text-body-1 text-gray-600">{{ subtitle }}</p>
         </div>
         <div class="d-flex flex-start w-100">
-          <label for="exclusionLabel" class="body-p1">
+          <label for="exclusionLabel" class="text-body-1 text-gray-600">
             {{ inputLabelConfirmation }}
             <strong> {{ inputWordConfirmation }}</strong>
           </label>

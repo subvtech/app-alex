@@ -2,7 +2,7 @@
   <div class="content-area">
     <div class="card-title">
       <p>
-        <span class="header-h4">{{
+        <span class="text-h4 text-gray-800">{{
           $t('components.trails.settings.general.title')
         }}</span>
       </p>
@@ -85,14 +85,6 @@ watch(
 );
 </script>
 <style scoped lang="scss">
-.header-h4 {
-  color: var(--cinza-cinza-800, #454d54);
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.2px;
-}
 
 .content-area {
   display: flex;

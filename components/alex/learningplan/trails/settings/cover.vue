@@ -2,7 +2,7 @@
   <div class="content-area">
     <div class="card-title">
       <p>
-        <span class="header-h4">{{
+        <span class="text-h4 text-gray-800">{{
           $t(`components.${namespace}.settings.cover.title`)
         }}</span>
       </p>
@@ -153,23 +153,6 @@ p {
   text-align: center;
   font-family: Sen;
 }
-.header-h4 {
-  color: var(--cinza-cinza-800, #454d54);
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.2px;
-}
-
-.header-h5 {
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.36px;
-}
-
 .container {
   display: flex;
 }
@@ -245,14 +228,6 @@ p {
   gap: 8px;
   align-self: stretch;
   border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
-}
-.body-p1 {
-  font-size: 16px !important;
-  font-style: normal !important;
-  font-weight: 400 !important;
-  line-height: 135%;
-  letter-spacing: 0.32px;
-  color: var(--cinza-cinza-800, #454d54) !important;
 }
 .footer-content {
   display: flex;

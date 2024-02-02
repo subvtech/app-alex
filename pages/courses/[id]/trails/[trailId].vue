@@ -12,6 +12,7 @@
       :course-id="id"
       :course-title="learningPlanStore.learningPlan?.title"
       :trails-title="trailStore.trail.title"
+      :page="activePage"
     />
     <NuxtPage @update="getTrailData()" />
   </div>
@@ -44,6 +45,15 @@ const getTrailData = async () => {
     navigateTo(`/courses/${id}/trails`);
   }
 };
+
+const activePage = computed(() => {
+  if (route.name?.toString().includes('tasks')) {
+    return 1;
+  } else if (route.name?.toString().includes('settings')) {
+    return 2;
+  }
+  return 0;
+});
 onBeforeMount(async () => {
   await getTrailData();
   headerStore.showHeader = true;
