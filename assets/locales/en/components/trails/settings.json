@@ -8,7 +8,9 @@
   "title": "Trail Cover",
   "update": "Trail cover image successfully updated",
   "addCover": "Upload",
-  "error": "Error uploading trail cover image"
+  "error": "Error uploading trail cover image",
+  "removeError": "Error removing trail cover image",
+  "removeSuccess": "Trail cover image successfully removed"
 },
 "general": {
   "title": "General Information",
