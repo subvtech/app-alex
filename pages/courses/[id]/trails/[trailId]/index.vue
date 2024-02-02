@@ -115,6 +115,8 @@ const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const { trailId } = route.params;
+const headerStore = usePageHeaderStore();
+const learningPlanStore = useLearningPlanStore();
 
 definePageMeta({
   hideLearningPlanBanner: true,
@@ -168,8 +170,34 @@ const getTrailData = () => {
   isLoading.value = false;
 };
 
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+  headerStore.title = t('components.trails.header.breadcrumbs.title');
+  headerStore.items = [
+    {
+      title: t('components.trails.header.breadcrumbs.0.title'),
+      disabled: false,
+      href: '/',
+    },
+    {
+      title: t('components.trails.header.breadcrumbs.1.title'),
+      disabled: false,
+      href: '/courses/me',
+    },
+    {
+      title: learningPlanStore.learningPlan.title,
+      disabled: false,
+      href: `/courses/${id}`,
+    },
+    {
+      title: trailStore.trail.title,
+      disabled: false,
+      href: `/courses/${id}/trails/${trailId}`,
+    }
+  ];
+});
+
 onMounted(async () => {
-  getTrailData();
   if (editorData.value.blocks.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
