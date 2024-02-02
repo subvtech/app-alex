@@ -122,7 +122,7 @@
                 :options="professorMode"
                 :description="course.raw.description"
                 :image="{
-                  url: course.raw.cover_image,
+                  url: course.raw.cover_image?.url,
                 }"
                 :facilitator="{
                   name: course.raw.facilitatorName,
@@ -232,13 +232,10 @@
 </template>
 
 <script setup lang="ts">
-// import { LearningPlan } from '~/models/learningPlan.model';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 definePageMeta({
   middleware: 'auth',
 });
 
-const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
@@ -247,19 +244,20 @@ const professorMode = ref(false);
 const isLoading = ref(false);
 const { t } = useI18n();
 
-const { update, find } = useStrapi();
+const { find } = useStrapiUtils();
+const { update } = useStrapi();
 const createCourseDialog = ref(false);
 interface LearningPlan {
   id?: number;
   description: string;
-  facilitatorName?: string;
-  facilitatorImage?: string;
-  trails?: number;
-  cover_image?: string;
-  institution?: string;
-  tags?: string[];
-  start_date?: string;
-  end_date?: string;
+  facilitatorName: string;
+  facilitatorImage: string;
+  trails: number;
+  cover_image: string;
+  institution: string;
+  tags: string[];
+  start_date: Date;
+  end_date: Date;
   hidden: boolean;
   title: string;
   members?: any;
@@ -293,7 +291,7 @@ const queryConfig = {
       populate: ['trails'],
     },
     members: {
-      populate: ['user.institutions'],
+      populate: ['user.institutions', 'user.avatar'],
       filters: {
         role: { $eq: 'facilitator' },
       },
@@ -311,29 +309,26 @@ const getCourses = async () => {
     });
   }
   isLoading.value = true;
-  const getCourses = await find('learningplans', queryConfig);
+  const getCourses = await find<LearningPlan>('learningplans', queryConfig);
   courses.value = [];
-  getCourses.data.forEach((element: Strapi4ResponseData<unknown>) => {
-    const elementData = element.attributes as LearningPlan;
-
-    const facilitator =
-      elementData.members.data[0].attributes.user.data.attributes;
-    const tags = elementData.tags?.data.map((tag) => tag.attributes.text);
+  getCourses.data.forEach((course) => {
+    const facilitator = course.members[0].user;
+    const tags = course.tags?.map((tag) => tag);
     const trails =
-      elementData.learning_structures.data[0].attributes.trails.data.length ||
-      0;
-
+      course.learning_structures?.find(
+        (structure) => structure.type === 'standard',
+      )?.trails?.length || 0;
     courses.value.push({
-      id: element.id,
-      title: elementData.title,
-      description: elementData.description,
-      start_date: elementData.start_date,
-      end_date: elementData.end_date,
-      cover_image: elementData.cover_image?.data?.attributes?.url,
-      hidden: elementData.hidden,
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      start_date: course.start_date,
+      end_date: course.end_date,
+      cover_image: course.cover_image,
+      hidden: course.hidden,
       facilitatorName: facilitator.fullname,
-      facilitatorImage: facilitator.avatar?.data?.attributes?.url,
-      institution: facilitator.institutions?.data[0]?.attributes?.name,
+      facilitatorImage: facilitator.avatar?.url,
+      institution: facilitator.institutions?.[0].name,
       tags,
       trails,
     });

@@ -4,6 +4,7 @@
     :title="$t('pages.trails.newTrailText')"
     no-footer
     body-classes="bg-white px-6 pt-3 rounded-b-lg"
+    @update:model-value="(event) => $emit('update:modelValue', event)"
   >
     <div
       class="bg-gray-blue d-flex flex-column justify-center align-center ga-2 image-container rounded"

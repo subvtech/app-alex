@@ -48,6 +48,7 @@ const uploadBaseUrl = computed(() => {
 
 onMounted(() => {
   instance.value = new EditorJS({
+    autofocus: true,
     tools: {
       delimiter: Delimiter,
       embed: Embed,

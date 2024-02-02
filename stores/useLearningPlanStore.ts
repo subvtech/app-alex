@@ -1,4 +1,3 @@
-import { Structure } from './../models/structure.model';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
