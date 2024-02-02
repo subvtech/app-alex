@@ -193,11 +193,12 @@ onBeforeMount(() => {
       title: trailStore.trail.title,
       disabled: false,
       href: `/courses/${id}/trails/${trailId}`,
-    }
+    },
   ];
 });
 
 onMounted(async () => {
+  getTrailData();
   if (editorData.value.blocks.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
