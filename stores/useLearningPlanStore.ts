@@ -32,7 +32,12 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['group_members.student_member.user.avatar'],
     },
     learning_structures: {
-      populate: ['trails', 'trails.cover_image', 'trails.structures.blocks'],
+      populate: {
+        trails: {
+          sort: 'id:desc',
+          populate: ['cover_image', 'structures.blocks'],
+        },
+      },
     },
 
     tags: true,

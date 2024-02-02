@@ -5,10 +5,10 @@
   >
     <div
       class="d-flex flex-wrap w-100 mb-6"
-      :class="trails.length == 0 ? 'justify-end' : 'justify-space-between'"
+      :class="!trails.length ? 'justify-end' : 'justify-space-between'"
     >
       <alex-inputs-text-field
-        v-show="trails.length > 0"
+        v-show="trails.length"
         v-model="search"
         name="search"
         :placeholder="$t('pages.trails.searchPlaceholder')"
@@ -20,7 +20,7 @@
         density="compact"
       />
       <alex-custom-button
-        v-if="professorMode"
+        v-if="learningPlanStore.userIsFacilitator ?? false"
         prepend-icon="mdi-plus"
         size="large"
         @click="createTrailDialog = true"
@@ -34,7 +34,7 @@
       class="d-flex align-center justify-center flex-column"
     >
       <v-progress-circular
-        v-if="isLoading"
+        v-if="learningPlanStore.loading ?? true"
         color="accent"
         indeterminate
         :size="100"
@@ -55,7 +55,7 @@
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
-        :items="trails"
+        :items="trails ?? []"
         :items-per-page="12"
         :filter-keys="['name', 'description', 'blocks']"
         class="d-flex flex-wrap"
@@ -99,7 +99,7 @@
       </v-data-iterator>
     </div>
     <CreateDialog
-      v-if="professorMode && learningStructure"
+      v-if="learningPlanStore.userIsFacilitator && learningStructure"
       v-model="createTrailDialog"
       :learning-structure="learningStructure"
       @course-created="handleCreatedTrail"
@@ -108,11 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { TrailSimple } from '@/models/simple/trailSimple.model';
 import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
 
-const emit = defineEmits(['update']);
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
@@ -121,35 +120,31 @@ const { update } = useStrapi();
 
 const search = ref('');
 const page = ref(1);
-const professorMode = ref(false);
-const isLoading = ref(false);
 
 const createTrailDialog = ref(false);
-const learningStructure = ref(0);
 
-const trails = ref<TrailSimple[]>([]);
 const learningPlanStore = useLearningPlanStore();
 
-const trailsData = learningPlanStore.learningPlan?.learning_structures.find(
-  (structure) => structure.type === 'standard',
-);
+const learningStructure = computed(() => {
+  return (
+    learningPlanStore.learningPlan?.learning_structures.find(
+      (structure) => structure.type === 'standard',
+    )?.id || 0
+  );
+});
 
-const { isProfessor } = useStrapiUser<User>().value;
-const getTrails = () => {
-  professorMode.value = isProfessor;
-  emit('update');
-  isLoading.value = true;
-  trails.value = (trailsData?.trails || []).map((trail) => {
-    const lastStructure = trail.structures[trail.structures.length - 1];
-    return {
-      ...trail,
-      blocks: lastStructure?.blocks ?? [],
-    };
-  });
-  isLoading.value = false;
-};
-// eslint-disable camelcase
-onMounted(async () => await getTrails());
+const trails = computed<TrailSimple[]>(() => {
+  return (
+    learningPlanStore.standardTrails?.map((trail) => {
+      const lastStructure =
+        trail.structures[trail.structures?.length - 1 || 0] || {};
+      return {
+        ...trail,
+        blocks: lastStructure.blocks || [],
+      };
+    }) || []
+  );
+});
 
 const showingData = (groupedItems) => {
   const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
@@ -193,16 +188,11 @@ const navigate = (trailId: number, page) => {
 
 const handleCreatedTrail = async (id) => {
   const newTrail = await findOne('trails', id, {
-    populate: ['cover_image'],
+    populate: ['cover_image', 'structures.blocks'],
   });
   const trail: TrailSimple = newTrail.data as TrailSimple;
-  trails.value.unshift({
-    id,
-    title: trail.title,
-    description: trail.description,
-    hidden: trail.hidden,
-    cover_image: trail.cover_image,
-    blocks: trail.blocks || [],
+  learningPlanStore.standardTrails.unshift({
+    ...trail,
   });
   createTrailDialog.value = false;
 };
