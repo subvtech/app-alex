@@ -28,6 +28,7 @@
     "visibilityUpdate": "Visibilidade da trilha atualizada com sucesso",
     "delete": {
         "deleteTrailTitle": "Excluir trilha",
+        "deleteImgAlt": "Imagem de atenção",
         "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
         "deleteButton": "Excluir trilha",
         "deleteConfirmation": "Realmente deseja excluir a trilha?",
@@ -35,6 +36,7 @@
         "deleteLabel": "Digite a palavra:",
         "deletePlaceholder": "Digite a frase",
         "deleteWord": "Excluir",
-        "update": "Trilha excluída com sucesso"
+        "update": "Trilha excluída com sucesso",
+        "matchError": "A palavra digitada não corresponde a palavra correta para excluir a trilha. Tente novamente."
       }
 }

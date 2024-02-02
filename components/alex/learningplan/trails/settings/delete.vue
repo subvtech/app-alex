@@ -2,7 +2,7 @@
   <div class="content-area delete">
     <div class="card-title">
       <p>
-        <span class="header-h4">{{
+        <span class="text-h4 text-gray-800">{{
           t('components.trails.settings.delete.deleteTrailTitle')
         }}</span>
       </p>
@@ -21,71 +21,34 @@
           @click="openDialog = true"
         >
           {{ t('components.trails.settings.delete.deleteButton') }}
-          <alex-custom-dialog
+          <alex-learningplan-dialogs-alert
             :model-value="openDialog"
-            title=""
-            body-classes="criticalAttention"
-            width="520px"
-            :scrollable="false"
-            max-height="500px"
-          >
-            <template #header>
-              <alex-custom-dialog-header title="" class="noShow"
-            /></template>
-            <div class="criticalAttention">
-              <div class="exclusionBody">
-                <span class="exclusionIMG">
-                  <img
-                    src="@/assets/svg/exclusionImage.svg"
-                    alt="attention image"
-                  />
-                </span>
-                <p>
-                  <span class="header-h4">{{
-                    t('components.trails.settings.delete.deleteConfirmation')
-                  }}</span>
-                  <br />
-                  <span class="body-p1">{{
-                    t('components.trails.settings.delete.deleteDescription')
-                  }}</span>
-                </p>
-                <div class="label d-flex flex-start w-100">
-                  <label for="exclusionLabel" class="body-p1">
-                    {{ t('components.trails.settings.delete.deleteLabel') }}
-                    <strong>{{
-                      t('components.trails.settings.delete.deleteWord')
-                    }}</strong>
-                  </label>
-                </div>
-                <alex-inputs-text-field
-                  id="exclusionLabel"
-                  name="placeholder"
-                  class="w-100"
-                  required
-                  :placeholder="
-                    $t('components.trails.settings.delete.deletePlaceholder')
-                  "
-                />
-              </div>
-              <div class="exclusionFooter">
-                <alex-custom-button
-                  class="button"
-                  :text="$t('components.trails.settings.general.cancel')"
-                  variant="secondary"
-                  @click="openDialog = false"
-                />
-                <alex-custom-button
-                  class="button error"
-                  :text="$t('components.trails.settings.delete.deleteWord')"
-                  variant="error"
-                  @click="removeTrail()"
-                />
-              </div>
-            </div>
-            <template #footer>
-              <alex-custom-dialog-footer class="noShow"
-            /></template>
-          </alex-custom-dialog>
+            :title="$t('components.trails.settings.delete.deleteConfirmation')"
+            :subtitle="
+              $t('components.trails.settings.delete.deleteDescription')
+            "
+            :image="imageProp"
+            :submit-button-text="
+              $t('components.trails.settings.delete.deleteWord')
+            "
+            :input-word-confirmation="
+              $t('components.trails.settings.delete.deleteWord')
+            "
+            :input-label-confirmation="
+              $t('components.trails.settings.delete.deleteLabel')
+            "
+            :input-placeholder-confirmation="
+              $t('components.trails.settings.delete.deletePlaceholder')
+            "
+            :no-input-confirmation="false"
+            variant="error"
+            :word-confirmation="wordConfirmation"
+            :error-message-text="
+              $t('components.trails.settings.delete.matchError')
+            "
+            @submit="removeTrail"
+            @cancel="openDialog = false"
+          />
         </alex-custom-button>
       </span>
     </div>
@@ -100,6 +63,14 @@ const route = useRoute();
 const router = useRouter();
 const { trailId } = route.params;
 
+const imageProp = {
+  src: 'https://i.ibb.co/PQpmJGH/exclusion-Image.png',
+  alt: t('components.trails.settings.delete.deleteImgAlt'),
+  width: 114,
+  height: 102,
+};
+
+const wordConfirmation = ref('');
 async function removeTrail() {
   await _delete('trails', parseInt(trailId.toString()));
 
@@ -145,23 +116,6 @@ p {
   font-family: Sen;
 }
 
-.body-p1 {
-  font-size: 16px !important;
-  font-style: normal !important;
-  font-weight: 400 !important;
-  line-height: 135%;
-  letter-spacing: 0.32px;
-  color: var(--cinza-cinza-800, #454d54) !important;
-}
-.header-h4 {
-  color: var(--cinza-cinza-800, #454d54);
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.2px;
-}
-
 .footer-content {
   display: flex;
   padding: 16px 24px;
@@ -178,43 +132,5 @@ p {
   align-items: flex-end;
   gap: 24px;
   align-self: stretch;
-}
-
-.criticalAttention {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 8px;
-  justify-content: center;
-}
-
-.exclusionBody {
-  display: flex;
-  min-height: 300px;
-  padding: var(--40px, 40px) 24px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  align-self: stretch;
-}
-
-.exclusionFooter {
-  display: flex;
-  min-height: 76px;
-  padding: 16px 24px;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  align-self: stretch;
-  border-top: 1px solid var(--cinza-cinza-100, #ebedef);
-}
-
-.noShow {
-  display: none;
-}
-.border-bottom {
-  border-bottom: 1px solid var(--cinza-cinza-100, #ebedef);
 }
 </style>

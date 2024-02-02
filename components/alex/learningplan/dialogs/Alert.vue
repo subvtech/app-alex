@@ -11,24 +11,32 @@
       <div
         class="d-flex flex-column w-100 align-center bg-white py-10 px-6 rounded-t-lg gap-4"
       >
-        <v-img
-          v-if="image"
-          :src="image.src"
-          :width="image.width"
-          :height="image.height"
-          :alt="image.alt"
-        />
-
+        <span class="exclusionIMG">
+          <img
+            v-if="image"
+            :src="image.src"
+            :alt="image.alt"
+            :width="image.width"
+            :height="image.height"
+          />
+        </span>
         <div class="d-flex flex-column gap-4 align-center text-center">
           <h4 class="text-h4 text-gray-800">{{ title }}</h4>
           <p class="text-body-1 text-gray-600">{{ subtitle }}</p>
         </div>
-
+        <div class="d-flex flex-start w-100">
+          <label for="exclusionLabel" class="body-p1">
+            {{ inputLabelConfirmation }}
+            <strong> {{ inputWordConfirmation }}</strong>
+          </label>
+        </div>
         <alex-inputs-text-field
           v-if="!noInputConfirmation"
+          v-model="inputValue"
+          class="w-100"
           name="confirmation"
-          :label="inputLabelConfirmation"
           :placeholder="inputPlaceholderConfirmation"
+          :error-messages="errorMessage"
           :scheme="
             yup
               .string()
@@ -46,6 +54,7 @@
             :text="submitButtonText"
             :variant="variant"
             :loading="loading"
+            :disabled="inputValue !== inputWordConfirmation"
             @click="
               () => {
                 $emit('submit');
@@ -69,19 +78,21 @@
 </template>
 <script setup lang="ts">
 import * as yup from 'yup';
+const { t } = useI18n();
 const emit = defineEmits(['update:modelValue', 'submit', 'cancel']);
 interface AlertDialogProps {
   modelValue: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
   title: string;
   subtitle: string;
-  image?: { src: string; width: number; height: number; alt?: string };
+  image?: { src: string; width?: number; height?: number; alt?: string };
   submitButtonText: string;
   inputWordConfirmation?: string;
   inputLabelConfirmation?: string;
   inputPlaceholderConfirmation?: string;
   noInputConfirmation?: boolean;
   loading?: boolean;
+  errorMessageText?: string;
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
   noInputConfirmation: true,
@@ -91,7 +102,20 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
   inputLabelConfirmation: undefined,
   inputPlaceholderConfirmation: undefined,
   loading: false,
+  errorMessageText: undefined,
 });
+const inputValue = ref('');
+
+const errorMessage = computed(() => {
+  if (
+    inputValue.value.length !== 0 &&
+    inputValue.value !== props.inputWordConfirmation
+  ) {
+    return props.errorMessageText;
+  }
+  return '';
+});
+
 const value = computed({
   get() {
     return props.modelValue;

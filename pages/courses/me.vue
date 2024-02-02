@@ -328,7 +328,7 @@ const getCourses = async () => {
       hidden: course.hidden,
       facilitatorName: facilitator.fullname,
       facilitatorImage: facilitator.avatar?.url,
-      institution: facilitator.institutions?.[0].name,
+      institution: facilitator.institutions?.[0]?.name,
       tags,
       trails,
     });

@@ -92,7 +92,7 @@ onBeforeMount(() => {
     },
     {
       title: t('components.trails.settings.title'),
-      disabled: false,
+      disabled: true,
       href: `/courses/${id}/trails/${trailId}/settings`,
     },
   ];
