@@ -108,27 +108,27 @@ const generalLinks: TabType[] = [
   {
     label: i18n.t('pages.courses.general'),
     value: 0,
-    to: learningPlanId.value ? `/courses/${learningPlanId.value}` : '',
+    to: `/courses/${learningPlanId.value}`,
   },
   {
     label: i18n.t('pages.courses.trails'),
     value: 1,
-    to: learningPlanId.value ? `/courses/${learningPlanId.value}/trails` : '',
+    to: `/courses/${learningPlanId.value}/trails`,
   },
   {
     label: i18n.t('pages.courses.assignments'),
     value: 2,
-    to: learningPlanId.value ? `/courses/${learningPlanId.value}/tasks` : '',
+    to: `/courses/${learningPlanId.value}/tasks`,
   },
   {
     label: i18n.t('pages.courses.class'),
     value: 3,
-    to: learningPlanId.value ? `/courses/${learningPlanId.value}/class` : '',
+    to: `/courses/${learningPlanId.value}/class`,
   },
   {
     label: i18n.t('pages.courses.projects'),
     value: 4,
-    to: learningPlanId.value ? `/courses/${learningPlanId.value}/projects` : '',
+    to: `/courses/${learningPlanId.value}/projects`,
   },
 ];
 </script>

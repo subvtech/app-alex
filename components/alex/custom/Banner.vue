@@ -112,6 +112,7 @@
         <alex-custom-tabs
           v-if="showMenu"
           v-model="bannerSelectedOption"
+          mandatory="false"
           :tabs="links"
           @update:model-value="emit('select:option', bannerSelectedOption)"
         />
