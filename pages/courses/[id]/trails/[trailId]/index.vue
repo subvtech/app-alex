@@ -262,7 +262,12 @@ const loadEditor = async () => {
     blocks: editorData.value.blocks,
   });
   if (res.success) {
-    editorData.value = res.data;
+    editorData.value = {
+      id: res.data.id,
+      version: res.data.version,
+      blocks: res.data.blocks,
+      time: editorData.value.time,
+    };
   } else {
     setMessage(t('pages.trailId.overview.loadError'), 'error', true);
   }
