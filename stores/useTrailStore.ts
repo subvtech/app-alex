@@ -22,8 +22,7 @@ export const useTrailStore = defineStore('trail', () => {
     try {
       loading.value = true;
       const result = (await findOne('trails', id, { populate })).data;
-
-      trail.value = result;
+      trail.value = result as TrailSimple;
       loading.value = false;
       return result;
     } catch (e: any) {
@@ -34,5 +33,5 @@ export const useTrailStore = defineStore('trail', () => {
     }
   }
 
-  return { loadTrailData, trail };
+  return { loadTrailData, trail, loading };
 });

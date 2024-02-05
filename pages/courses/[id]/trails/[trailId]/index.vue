@@ -15,7 +15,7 @@
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="professorMode">
+        <div v-else-if="professorMode && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
@@ -39,7 +39,7 @@
         class="d-flex fill-height align-center justify-center container-min-height"
       >
         <v-progress-circular
-          v-if="isLoading"
+          v-if="trailStore.loading || isLoading"
           color="accent"
           indeterminate
           :size="100"
@@ -63,7 +63,7 @@
             class="text-gray-500 text-body-3 mb-4 mx-auto"
           >
             {{ $t('pages.trailId.overview.lastUpdated') }}
-            {{ timeStampToDate(editorData.time) }}
+            {{ timeStampToDate }}
           </p>
           <AppEditor ref="editor" :data="editorData" />
         </div>
@@ -114,7 +114,10 @@ import { ref, onMounted } from 'vue';
 const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
-const { trailId, id } = route.params;
+
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
+
 const headerStore = usePageHeaderStore();
 const learningPlanStore = useLearningPlanStore();
 
@@ -123,24 +126,16 @@ definePageMeta({
 });
 
 const trailStore = useTrailStore();
-const trailData = await trailStore.loadTrailData(parseInt(trailId.toString()));
-
 const professorMode = ref(false);
-const isLoading = ref(false);
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
-const editorData = ref({
-  id: '',
-  time: 0,
-  version: '',
-  blocks: [],
-});
+const isLoading = ref(false);
 
-const backUpEditorData = ref({});
+const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
   return (
-    !isLoading.value && (editorData.value.blocks.length || !readOnly.value)
+    !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
 
@@ -148,27 +143,23 @@ const { isProfessor } = useStrapiUser<User>().value;
 professorMode.value = isProfessor;
 
 const { t } = useI18n();
-const getTrailData = () => {
-  isLoading.value = true;
-  if (trailData) {
-    const structureData = trailData.structures[trailData.structures.length - 1];
-    if (structureData) {
-      editorData.value = {
-        id: structureData.id.toString(),
-        time: parseInt(structureData.time),
-        version: structureData.version,
-        blocks: structureData.blocks.map((block: any) => {
-          return {
-            type: block.type,
-            data: block.data,
-            tunes: block.tunes ? block.tunes : {},
-          };
-        }),
-      };
-    }
-  }
-  isLoading.value = false;
-};
+const editorData = computed(() => {
+  const data =
+    trailStore.trail?.structures[trailStore.trail?.structures.length - 1];
+  return {
+    time: data && data.time ? parseInt(data.time.toString()) : 0,
+    version: data?.version || '',
+    blocks:
+      data?.blocks.map((block: any) => {
+        return {
+          type: block.type,
+          data: block.data,
+          tunes: block.tunes || {},
+          id: block.id || '',
+        };
+      }) || [],
+  };
+});
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
@@ -185,29 +176,33 @@ onBeforeMount(() => {
       href: '/courses/me',
     },
     {
-      title: learningPlanStore.learningPlan.title,
+      title: learningPlanStore.learningPlan?.title || '',
       disabled: false,
-      href: `/courses/${id}`,
+      href: `/courses/${learningPlanId.value}`,
     },
     {
-      title: trailStore.trail.title,
+      title: trailStore.trail?.title || '',
       disabled: false,
-      href: `/courses/${id}/trails/${trailId}`,
+      href: `/courses/${learningPlanId.value}/trails/${trailId}`,
     },
   ];
 });
 
 onMounted(async () => {
-  getTrailData();
+  isLoading.value = true;
+  while (trailStore.loading) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
   if (editorData.value.blocks.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
       await loadEditor();
       toggleReadOnly();
     } else {
-      setMessage(t('pages.trailId.overview.loadError'), 'error', true);
+      setMessage(t('pages.trailId.overview.loadError'), 'green', true);
     }
   }
+  isLoading.value = false;
 });
 
 const sections = ref([
@@ -285,18 +280,16 @@ const navigateToSection = (title: string) => {
 const loadEditor = async () => {
   if (!editor.value || !editorData.value) return;
   const res = await editor.value.loadEditor({
-    id: editorData.value.id,
-    time: editorData.value.time,
-    version: editorData.value.version,
     blocks: editorData.value.blocks,
   });
   if (res.success) {
-    editorData.value = {
-      id: res.data.id,
+    trailStore.trail?.structures.push({
+      time: editorData.value.time,
       version: res.data.version,
       blocks: res.data.blocks,
-      time: editorData.value.time,
-    };
+      id: res.data.id,
+      trail: trailId.value,
+    });
   } else {
     setMessage(t('pages.trailId.overview.loadError'), 'error', true);
   }
@@ -307,16 +300,21 @@ const saveData = async () => {
   try {
     const res = await editor.value.getData();
     if (!res.success) {
-      setMessage(t('pages.trailId.overview.saveError'), 'success', true);
+      setMessage(t('pages.trailId.overview.saveError'), 'error', true);
       return;
     }
     await create('structures', {
       time: Date.now(),
       version: res.data.version,
       blocks: res.data.blocks,
-      trail: trailId,
+      trail: trailId.value,
     });
-    editorData.value = res.data;
+    trailStore.trail?.structures.push({
+      time: Date.now(),
+      version: res.data.version,
+      blocks: res.data.blocks,
+      trail: trailId.value,
+    });
     toggleReadOnly();
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'error', true);
@@ -352,13 +350,13 @@ const checkEditorReady = async () => {
   return false;
 };
 
-const timeStampToDate = (timeStamp: number) => {
-  const date = new Date(timeStamp);
+const timeStampToDate = computed(() => {
+  const date = new Date(editorData.value.time);
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
-};
+});
 
 const pageHeight = ref(0);
 const activeSection = ref(0);

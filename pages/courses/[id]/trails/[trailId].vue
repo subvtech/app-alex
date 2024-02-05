@@ -9,7 +9,7 @@
           : '/images/cover_image_course.svg'
       "
       :trail-id="trailId"
-      :course-id="id"
+      :course-id="learningPlanId"
       :course-title="learningPlanStore.learningPlan?.title"
       :trails-title="trailStore.trail.title"
       :page="activePage"
@@ -21,28 +21,27 @@
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
 const { t } = useI18n();
 const route = useRoute();
-const { trailId, id } = route.params;
 const headerStore = usePageHeaderStore();
 
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 
 const getTrailData = async () => {
-  await trailStore.loadTrailData(parseInt(trailId.toString()));
-
+  await trailStore.loadTrailData(trailId.value);
   if (!trailStore.trail) {
-    navigateTo(`/courses/${id}`);
+    navigateTo(`/courses/${learningPlanId.value}`);
   }
   if (
     !(
-      trailStore.trail.learning_structure.learningplan.id ===
-      parseInt(id.toString())
+      trailStore.trail?.learning_structure.learningplan.id ===
+      learningPlanId.value
     )
   ) {
-    navigateTo(`/courses/${id}/trails`);
+    navigateTo(`/courses/${learningPlanId.value}/trails`);
   }
 };
 
@@ -70,14 +69,14 @@ onBeforeMount(async () => {
       href: '/courses/me',
     },
     {
-      title: learningPlanStore.learningPlan.title,
+      title: learningPlanStore.learningPlan?.title,
       disabled: false,
-      href: `/courses/${id}`,
+      href: `/courses/${learningPlanId.value}`,
     },
     {
-      title: trailStore.trail.title,
+      title: trailStore.trail?.title,
       disabled: false,
-      href: `/courses/${id}/trails/${trailId}`,
+      href: `/courses/${learningPlanId.value}/trails/${trailId}`,
     },
   ];
 });
