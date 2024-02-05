@@ -118,7 +118,7 @@ const onCancel = () => {
 };
 const onSave = () => {
   toggleIsEditing();
-  emit('update', usingMyText ? myText : value);
+  emit('update', usingMyText ? myText.value : value);
 };
 
 const { value, errorMessage } = useField(
