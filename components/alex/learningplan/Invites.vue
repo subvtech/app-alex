@@ -13,11 +13,14 @@
           class="invite justify-space-between"
           :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
         >
-          <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!">
+          <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
             <template #content>
-              <a class="url" :href="url!">
+              <nuxt-link
+                class="ellipsis lines-1 w-100 text-decoration-none text-secondary-0"
+                :to="url!"
+              >
                 {{ url }}
-              </a>
+              </nuxt-link>
             </template>
           </alex-custom-tooltip>
           <span v-else>{{ $t('components.courses.invites.expired') }}</span>
@@ -30,9 +33,9 @@
                 <img
                   class="pointer"
                   :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
-                  @click="updateLink"
                   width="20"
                   height="20"
+                  @click="updateLink"
                 />
               </template>
             </alex-custom-tooltip>
@@ -69,39 +72,21 @@
 </template>
 
 <script setup lang="ts">
-export type InvitationLinkType = {
-  id: number;
-  role: 'student' | 'facilitator';
-  hash: string;
-  emails_to_send: string | null;
-  expires_at: Date;
-  is_expired: boolean;
-};
-
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
 
-const props = defineProps({
-  enableInvites: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Object as PropType<InvitationLinkType | null>,
-    required: true,
-  },
-  duration: {
-    type: Number,
-    required: true,
-  },
-  courseId: {
-    type: Number,
-    required: true,
-  },
-  dark: {
-    type: Boolean,
-    default: false,
-  },
+type InviteProps = {
+  duration: number;
+  courseId: number;
+  data?: InvitationLinkSimple | null;
+  enableInvites?: boolean;
+  dark?: boolean;
+};
+
+const props = withDefaults(defineProps<InviteProps>(), {
+  dark: false,
+  enableInvites: false,
+  data: null,
 });
 
 const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =
@@ -169,21 +154,8 @@ watch(theresTimeAndUrl, () => {
 }
 
 .url {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.gap-1 {
-  gap: 4px;
-}
-
-.gap-2 {
-  gap: 8px;
-}
-.gap-6 {
-  gap: 24px;
+  flex: 1 1 100%;
+  min-width: 200px;
 }
 
 .pointer {
@@ -209,12 +181,11 @@ watch(theresTimeAndUrl, () => {
   display: flex;
   height: 52px;
   min-width: 300px;
-
+  width: 100%;
   padding: 0px 16px;
   align-items: center;
   gap: 24px;
   align-self: stretch;
-
   border-radius: 8px;
   border: 1px solid var(--principais-secundria-secundria-1, #47d9eb);
   background: var(--principais-secundria-secundria-2, #d1f6fa);
@@ -224,11 +195,6 @@ watch(theresTimeAndUrl, () => {
     border: 1px solid var(--Cinza-Cinza-400, #a0a8b1);
     background: var(--Cinza-Cinza-100, #ebedef);
     span {
-      overflow: hidden;
-      color: var(--Cinza-Cinza-600, #6e7a87) !important;
-      text-overflow: ellipsis;
-    }
-    a {
       overflow: hidden;
       color: var(--Cinza-Cinza-600, #6e7a87) !important;
       text-overflow: ellipsis;
@@ -243,24 +209,12 @@ watch(theresTimeAndUrl, () => {
       overflow: hidden;
       color: var(--cinza-cinza-400, #a0a8b1);
       text-overflow: ellipsis;
-      font-family: Montserrat;
+      font-family: Sen;
       font-size: 15px;
       font-style: normal;
       font-weight: 500;
       line-height: normal;
     }
-  }
-  a {
-    overflow: hidden;
-    white-space: nowrap;
-    color: var(--principais-secundria-secundria-0, #00b7cc);
-    text-overflow: ellipsis;
-    font-family: Montserrat;
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    text-decoration: none;
   }
 }
 .timer {
@@ -314,27 +268,6 @@ watch(theresTimeAndUrl, () => {
       line-height: 135%; /* 18.9px */
       letter-spacing: 0.28px;
     }
-  }
-}
-
-@media (max-width: 550px) {
-  .invite {
-    min-width: unset;
-  }
-  .url {
-    width: 250px;
-  }
-}
-
-@media (max-width: 480px) {
-  .url {
-    width: 200px;
-  }
-}
-
-@media (max-width: 380px) {
-  .url {
-    width: 150px;
   }
 }
 </style>
