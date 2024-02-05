@@ -29,7 +29,8 @@ export interface LearningPlan {
   groups: Strapi4ResponseMany<learningPlanGroup>;
   tasks: Strapi4ResponseMany<Task>;
   tags: Strapi4ResponseMany<Tag>;
-  invite_enable: boolean;
+  message: string;
+  invite_enabled: boolean;
   invitation_links: Strapi4ResponseSingle<InvitationLink>;
   learning_goals: Strapi4ResponseMany<LearningPlanGoal>;
   schedules: Strapi4ResponseMany<LearningPlanSchedule>;

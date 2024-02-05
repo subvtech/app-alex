@@ -106,7 +106,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile/settings',
     'profile/socials',
     'profile/wallets',
-    'trails/settings'
+    'trails/settings',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

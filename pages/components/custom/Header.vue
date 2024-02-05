@@ -115,7 +115,7 @@
             </tr>
             <tr>
               <td>items</td>
-              <td>Array &lt;{title, href}></td>
+              <td>Array &lt;{title, to}></td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -138,8 +138,8 @@
     <div class="w-100">
       <alex-custom-header
         :items="[
-          { title: 'Início', disabled: false, href: '/inicio' },
-          { title: 'Página', disabled: false, href: '/pagina' },
+          { title: 'Início', disabled: false, to: '/inicio' },
+          { title: 'Página', disabled: false, to: '/pagina' },
         ]"
         has-main-button
         has-secondary-button
@@ -160,8 +160,8 @@
         has-secondary-button
         main-button-icon="mdi-plus"
         :items="[
-          { title: 'Início', disabled: false, href: '/inicio' },
-          { title: 'Página', disabled: false, href: '/pagina' },
+          { title: 'Início', disabled: false, to: '/inicio' },
+          { title: 'Página', disabled: false, to: '/pagina' },
         ]"
       />
     </div>
@@ -183,8 +183,8 @@
       <alex-custom-header
         title="Exemplo header 01"
         :items="[
-          { title: 'Início', disabled: false, href: '/inicio' },
-          { title: 'Página', disabled: false, href: '/pagina' },
+          { title: 'Início', disabled: false, to: '/inicio' },
+          { title: 'Página', disabled: false, to: '/pagina' },
         ]"
         text="Botão"
         btnIcon="mdi-star"
@@ -194,8 +194,8 @@
       <alex-custom-header
         title="Exemplo header 02"
         :items="[
-          { title: 'Início', disabled: false, href: '/inicio' },
-          { title: 'Página', disabled: false, href: '/pagina' },
+          { title: 'Início', disabled: false, to: '/inicio' },
+          { title: 'Página', disabled: false, to: '/pagina' },
         ]"
         text="Botão"
         btnIcon="mdi-heart"
@@ -290,8 +290,8 @@ const thirdExampleTemplate = `
       <alex-custom-header
         title="Exemplo header 01"
         :items="[
-          { title: 'Início', disabled: false, href: '/inicio' },
-          { title: 'Página', disabled: false, href: '/pagina' },
+          { title: 'Início', disabled: false, to: '/inicio' },
+          { title: 'Página', disabled: false, to: '/pagina' },
         ]"
         text="Botão"
         btnIcon="mdi-star"
@@ -301,8 +301,8 @@ const thirdExampleTemplate = `
       <alex-custom-header
         title="Exemplo header 02"
         :items="[
-          { title: 'Início', disabled: false, href: '/inicio' },
-          { title: 'Página', disabled: false, href: '/pagina' },
+          { title: 'Início', disabled: false, to: '/inicio' },
+          { title: 'Página', disabled: false, to: '/pagina' },
         ]"
         text="Botão"
         btnIcon="mdi-heart"
