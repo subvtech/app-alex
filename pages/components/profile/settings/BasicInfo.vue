@@ -9,19 +9,21 @@
     />
     <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
     />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
       :has-example="item.hasExample"
     >
-      <template v-slot:component>
+      <template #component>
         <alex-profile-settings-basic-info
           :fullname="basicInfoProps.fullname"
           :cpf="basicInfoProps.cpf"

@@ -2,26 +2,26 @@
   <div class="pt-6 pb-2 w-100">
     <alex-inputs-text-field
       v-if="name"
+      v-model="nameField.value.value"
       :label="$t('components.profile.socials.editForm.name.label')"
       :placeholder="$t('components.profile.socials.editForm.name.placeholder')"
-      v-model="nameField.value.value"
       class="mb-2 w-100"
       name="editname"
-      @input="updateName"
       :error-messages="nameField.errorMessage.value"
-      color="black"
       variant="outlined"
+      color="black"
+      @input="updateName"
     />
     <alex-inputs-text-field
+      v-model="urlField.value.value"
       :label="$t('components.profile.socials.editForm.url.label')"
       :placeholder="$t('components.profile.socials.editForm.url.placeholder')"
-      v-model="urlField.value.value"
       class="w-100"
       name="editurl"
-      @input="updateUrl"
       :error-messages="urlField.errorMessage.value"
-      color="black"
       variant="outlined"
+      color="black"
+      @input="updateUrl"
     />
   </div>
 </template>
@@ -55,7 +55,10 @@ export interface SocialFormEmits {
   (e: 'update:name', value: SocialFormUpdateNamePayload): void;
 }
 
-const props = withDefaults(defineProps<SocialFormComponentType>(), {});
+const props = withDefaults(defineProps<SocialFormComponentType>(), {
+  socialId: undefined,
+  name: undefined,
+});
 
 const { url, name } = toRefs(props);
 
@@ -92,12 +95,6 @@ watchEffect(() => {
   if (nameField.errorMessage.value || urlField.errorMessage.value) {
     emit('error');
   } else {
-    const result = {
-      url: urlField.value.value,
-      index: props.index,
-      socialId: props.socialId ?? undefined,
-      name: name ? nameField.value.value : undefined,
-    };
     emit('no:error');
   }
 });

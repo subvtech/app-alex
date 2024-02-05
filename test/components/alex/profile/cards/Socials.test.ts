@@ -23,7 +23,7 @@ describe('SocialsComponent', () => {
             general: ptGeneralRules,
             socials: ptSocialsRules,
           },
-          ...ptCardRules,
+          card: ptCardRules,
         },
       },
       en: {
@@ -32,7 +32,7 @@ describe('SocialsComponent', () => {
             general: enGeneralRules,
             socials: enSocialsRules,
           },
-          ...enCardRules,
+          card: enCardRules,
         },
       },
     },
@@ -77,6 +77,14 @@ describe('SocialsComponent', () => {
     expect(titleComponent).not.toBeNull();
   });
 
+  it('renders the component with the different title', async () => {
+    await rerenderBind({ ...socialsProps, title: 'title2' });
+
+    const titleComponent = await screen.queryByText('title2');
+
+    expect(titleComponent).not.toBeNull();
+  });
+
   it('renders the component with the empty message', async () => {
     await rerenderBind({ ...socialsProps, socials: [] });
 
@@ -86,11 +94,16 @@ describe('SocialsComponent', () => {
   });
 
   it('renders the add button when can-edit is true', async () => {
-    const btnComponent = await screen.queryByText(ptGeneralRules.addSocial);
-    const addSocial = await screen.queryByText('add-social');
+    const editButton = await component.querySelector('.mdi-pencil-outline');
 
-    console.log({ addSocial });
+    expect(editButton).not.toBeNull();
+    // Simulate button click
+    await fireEvent.click(editButton!);
+
+    const btnComponent = await screen.queryByText(ptGeneralRules.addSocial);
+
     expect(btnComponent).not.toBeNull();
+    expect(btnComponent!.textContent).toBe(ptGeneralRules.addSocial);
   });
 
   it('does not render the add button when can-edit is false', async () => {
@@ -98,66 +111,24 @@ describe('SocialsComponent', () => {
       ...socialsProps,
       canEdit: false,
     });
+    const editButton = await component.querySelector('.mdi-pencil-outline');
+    expect(editButton).toBeNull();
+
     const btnComponent = await screen.queryByText(ptGeneralRules.addSocial);
     expect(btnComponent).toBeNull();
   });
-  /*
-  it("the button shows 'link' when there's no wallet", async () => {
-    await rerenderBind({
-      ...socialsProps,
-      wallet: undefined,
-    });
 
-    const btnComponent = await screen.queryByText(ptRules.link);
-    expect(btnComponent).not.toBeNull();
-  });
+  it('does not emit "update" when the save button is clicked and there are no changes', async () => {
+    const editButton = await component.querySelector('.mdi-pencil-outline');
 
-  it('emits "update:wallet" when wallet is defined and button is clicked', async () => {
-    await rerenderBind({
-      ...socialsProps,
-    });
+    expect(editButton).not.toBeNull();
+    await fireEvent.click(editButton!);
 
-    const btnComponent = await screen.queryByText(ptRules.unlink);
-    expect(btnComponent).not.toBeNull();
-
-    // Simulate button click
-    await fireEvent.click(btnComponent!);
-
-    // Check if "update:wallet" event has been emitted
-    expect(emittedBind()).toHaveProperty('update:wallet');
-    expect(emittedBind()['update:wallet'][0]).toEqual([socialsProps.wallet.id]); // Check the emitted value
-  });
-
-  it('emits "remove:wallet" when wallet is undefined and button is clicked', async () => {
-    await rerenderBind({ wallet: undefined });
-
-    // Simulate button click
-
-    const btnComponent = await screen.queryByText(ptRules.link);
+    const btnComponent = await screen.queryByText(ptCardRules.save);
     expect(btnComponent).not.toBeNull();
 
     await fireEvent.click(btnComponent!);
 
-    // Check if "remove:wallet" event has been emitted
-    expect(emittedBind()).toHaveProperty('remove:wallet');
-    expect(emittedBind()['remove:wallet'][0]).toEqual([]);
+    expect(emittedBind()).not.toHaveProperty('update');
   });
-
-  it('sets button variant to "error" when wallet is defined', async () => {
-    await rerenderBind({ ...socialsProps });
-
-    const alexBtnComponent = component.querySelector('.small');
-    expect(alexBtnComponent).not.toBeNull();
-
-    expect(alexBtnComponent?.classList.value.split(' ')).toContain('error');
-  });
-
-  it('sets button variant to "secondary" when wallet is undefined', async () => {
-    await rerenderBind({ wallet: undefined });
-
-    const alexBtnComponent = component.querySelector('.small');
-    expect(alexBtnComponent).not.toBeNull();
-    expect(alexBtnComponent?.classList.value.split(' ')).toContain('secondary');
-  });
-  */
 });

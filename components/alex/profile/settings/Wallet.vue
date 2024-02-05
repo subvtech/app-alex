@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 export interface WalletEmits {
-  (e: 'update:wallet', walletId: number): void;
-  (e: 'remove:wallet'): void;
+  (e: 'remove:wallet', walletId: number): void;
+  (e: 'update:wallet'): void;
 }
 
 export interface WalletComponentType {
@@ -58,9 +58,9 @@ const { wallet } = toRefs(props);
 const buttonVariant = computed(() => (wallet.value ? 'error' : 'secondary'));
 const handleClick = () => {
   if (wallet.value) {
-    emit('update:wallet', wallet.value.id);
+    emit('remove:wallet', wallet.value.id);
   } else {
-    emit('remove:wallet'); // if it succeeds it updates the stored wallet
+    emit('update:wallet'); // if it succeeds it updates the stored wallet
   }
 };
 </script>

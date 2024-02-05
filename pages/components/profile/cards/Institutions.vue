@@ -4,15 +4,16 @@
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" />
-    <alex-documentation-accordions-props-list :data="listEmits" list-emits/>
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
       :has-example="item.hasExample"
     >
-      <template v-slot:component>
+      <template #component>
         <alex-profile-cards-institutions
           :user-id="institutionsProps.userId"
           :institutions="institutionsProps.institutions"

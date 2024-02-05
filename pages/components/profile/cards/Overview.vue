@@ -8,13 +8,14 @@
       show-positions
     />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
     />
     <alex-documentation-playground :data="listProps">
-      <template v-slot:component="{ props }">
+      <template #component="{ props }">
         <alex-profile-cards-overview
           :assignments="props.assignments"
           :learning-plans="props.learning"

@@ -5,11 +5,11 @@
     :isEditing="isEditingAndCanEdit"
     :showIcon="canEdit"
     @toggle:isEditing="toggleIsEditing"
-    :cancel="onCancel"
-    :save="onSave"
+    @click:cancel="onCancel"
+    @click:save="onSave"
     full-width
   >
-    <template v-slot:content class="pa-6">
+    <template #content class="pa-6">
       <div class="d-flex flex-column w-100 align-self-center gap-8">
         <alex-custom-empty-placeholder
           v-if="myImages.length === 0 && !isEditingAndCanEdit"
@@ -85,9 +85,10 @@ const onCancel = async () => {
 
   await Promise.all([...deletePromises]);
   myImages.value = [...props.images];
+  toggleIsEditing();
 };
 
-const onSlidesChanged = async (data) => {
+const onSlidesChanged = (data) => {
   myImages.value = data;
 };
 const toggleIsEditing = () => {
@@ -115,8 +116,8 @@ const onSave = async () => {
     )
     .map((item) => _delete('medias', item.id));
 
-  const result = await Promise.all([...createPromises, ...deletePromises]);
-
+  await Promise.all([...createPromises, ...deletePromises]);
+  toggleIsEditing();
 };
 
 watch(images, () => {

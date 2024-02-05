@@ -1,23 +1,12 @@
 <template>
   <div v-if="user" id="events" class="w-100 d-flex overflow-x-hidden">
     <alex-custom-card :title="$t('components.profile.events.title')" full-width>
-      <template v-slot:content>
-        <div class="items d-flex flex-column">
+      <template #content>
+        <div v-if="props.url" class="items d-flex flex-column">
           <div
+            v-for="(item, index) in data"
+            :key="index"
             class="item d-flex flex-row align-center py-3 px-4"
-            v-if="props.url"
-            v-for="item in [
-              {
-                username: user.username,
-                action: $t('components.profile.events.add'),
-                time: '11:30 AM',
-              },
-              {
-                username: user.username,
-                action: $t('components.profile.events.add'),
-                time: '11:30 AM',
-              },
-            ]"
           >
             <img v-if="props.url" :src="props.url" :alt="item.username" />
             <div class="">
@@ -32,16 +21,36 @@
 </template>
 
 <script setup lang="ts">
+export interface EventsComponentType {
+  url?: string;
+}
+
 definePageMeta({
   middleware: 'auth',
 });
-const props = defineProps({
-  url: {
-    type: String,
-  },
+const props = withDefaults(defineProps<EventsComponentType>(), {
+  url: undefined,
 });
 
+const i18n = useI18n();
+
 const { user } = useUserStore();
+
+const data = computed(() => {
+  if (!user) return [];
+  return [
+    {
+      username: user.username,
+      action: i18n.t('components.profile.events.add'),
+      time: '11:30 AM',
+    },
+    {
+      username: user.username,
+      action: i18n.t('components.profile.events.add'),
+      time: '11:30 AM',
+    },
+  ];
+});
 </script>
 
 <style scoped lang="scss">

@@ -14,15 +14,14 @@
     </div>
     <div v-if="canEdit" class="d-flex align-center mr-3 options">
       <img class="handle" src="/svg/menu.svg" />
-
-      <v-icon
+      <alex-custom-button
+        variant="text"
         class="remove"
-        color="red"
+        color="error-0"
+        icon="mdi-trash-can-outline"
         size="small"
         @click="removeInstitution"
-      >
-        mdi-trash-can-outline
-      </v-icon>
+      />
     </div>
   </div>
 </template>
@@ -52,12 +51,11 @@ const props = withDefaults(defineProps<InstitutionComponentType>(), {
   url: undefined,
 });
 
-const { url, name, acronym, isDeleted, institutionId, sector, canEdit } =
-  toRefs(props);
+const { isDeleted } = toRefs(props);
 
 const removeInstitution = () => {
   isDeleted.value = true;
-  emit('delete:institution', institutionId.value);
+  emit('delete:institution', props.institutionId);
 };
 </script>
 

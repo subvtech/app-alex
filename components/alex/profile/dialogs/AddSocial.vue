@@ -1,69 +1,77 @@
 <template>
-  <alex-custom-button prepend-icon="mdi-plus" @click="dialog = true">
-    {{ $t('components.profile.general.addSocial') }}
-    <alex-custom-dialog
-      v-model="dialog"
-      :title="$t('components.profile.socials.title')"
-      :name-main-button="$t('components.profile.settings.onSave')"
-      :name-second-button="$t('components.profile.settings.cancel')"
-      :main-button-disabled="mainButtonDisabled"
-      @on-main-action="onSave"
-      @on-secondary-action="dialog = false"
-    >
-      <div class="d-flex flex-column pt-6 px-6 pb-1">
-        <alex-inputs-select
-          v-model="selectedSocial"
-          class="pb-6"
-          name="social"
-          :items="formattedSocials"
-          :placeholder="$t('components.profile.socials.addDialog.placeholder')"
-          persistent-hint
-          required
-          :label="$t('components.profile.socials.addDialog.label')"
-        >
-          <template #selection="{ item }">
-            <img class="mr-4 icon-size" :src="getIcon(item.raw)" />
-            <p class="selected-item">{{ item.raw }}</p>
-          </template>
+  <alex-custom-dialog
+    v-model="dialog"
+    :title="$t('components.profile.socials.title')"
+    :name-main-button="$t('components.profile.settings.onSave')"
+    :name-second-button="$t('components.profile.settings.cancel')"
+    :main-button-disabled="mainButtonDisabled"
+    @on-main-action="onSave"
+    @on-secondary-action="dialog = false"
+  >
+    <template #activator="{ props: propsActivator }">
+      <alex-custom-button
+        v-bind="propsActivator"
+        prepend-icon="mdi-plus"
+        @click="dialog = true"
+      >
+        {{ $t('components.profile.general.addSocial') }}
+      </alex-custom-button>
+    </template>
+    <div class="d-flex flex-column pt-6 px-6 pb-1">
+      <alex-inputs-select
+        v-model="selectedSocial"
+        class="pb-6"
+        name="social"
+        :items="formattedSocials"
+        :placeholder="$t('components.profile.socials.addDialog.placeholder')"
+        persistent-hint
+        required
+        :label="$t('components.profile.socials.addDialog.label')"
+      >
+        <template #selection="{ item }">
+          <img class="mr-4 icon-size" :src="getIcon(item.raw)" />
+          <p class="selected-item">{{ item.raw }}</p>
+        </template>
 
-          <template #item="{ item, props: itemProps }">
-            <v-list-item class="item-option" v-bind="itemProps">
+        <template #item="{ item, props: itemProps }">
+          <v-list-item class="item-option" v-bind="itemProps">
+            <template #prepend>
               <img class="mr-4 icon-size" :src="getIcon(item.raw)" />
-            </v-list-item> </template
-        ></alex-inputs-select>
-        <div
-          v-if="selectedSocial"
-          class="d-flex align-center w-100 gap-4"
-          style=""
-        >
-          <alex-inputs-text-field
-            v-model="urlValue"
-            class="w-100"
-            :label="$t('components.profile.socials.editForm.url.label')"
-            :placeholder="
-              $t('components.profile.socials.editForm.url.placeholder')
-            "
-            name="addurl"
-            required
-            :error-messages="urlErrorMessage"
-          />
+            </template>
+          </v-list-item> </template
+      ></alex-inputs-select>
+      <div
+        v-if="selectedSocial"
+        class="d-flex align-center w-100 gap-4"
+        style=""
+      >
+        <alex-inputs-text-field
+          v-model="urlValue"
+          class="w-100"
+          :label="$t('components.profile.socials.editForm.url.label')"
+          :placeholder="
+            $t('components.profile.socials.editForm.url.placeholder')
+          "
+          name="addurl"
+          required
+          :error-messages="urlErrorMessage"
+        />
 
-          <alex-inputs-text-field
-            v-if="nonSupportedSocialMedia"
-            v-model="nameValue"
-            class="w-100"
-            :label="$t('components.profile.socials.editForm.name.label')"
-            :placeholder="
-              $t('components.profile.socials.editForm.name.placeholder')
-            "
-            name="addname"
-            required
-            :error-messages="nameErrorMessage"
-          />
-        </div>
+        <alex-inputs-text-field
+          v-if="nonSupportedSocialMedia"
+          v-model="nameValue"
+          class="w-100"
+          :label="$t('components.profile.socials.editForm.name.label')"
+          :placeholder="
+            $t('components.profile.socials.editForm.name.placeholder')
+          "
+          name="addname"
+          required
+          :error-messages="nameErrorMessage"
+        />
       </div>
-    </alex-custom-dialog>
-  </alex-custom-button>
+    </div>
+  </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">

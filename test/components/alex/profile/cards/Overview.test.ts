@@ -58,8 +58,7 @@ describe('OverviewComponent', () => {
   });
 
   it('renders the component with the proper title', async () => {
-    const titleComponent = await screen.queryByText(ptGeneralRules.title);
-
+    const titleComponent = await screen.getByText(ptGeneralRules.title);
     expect(titleComponent).not.toBeNull();
   });
 

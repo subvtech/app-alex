@@ -9,7 +9,8 @@
     />
     <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
@@ -33,9 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ExampleComponentType,
-} from '~/components/alex/documentation/Example.vue';
+import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
 import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
 import { InstitutionComponentType } from '~/components/alex/profile/InstitutionItem.vue';

@@ -1,19 +1,19 @@
 <template>
   <alex-custom-card
     :title="title"
-    :is-diting="isEditing && canEdit"
-    :save="onSave"
+    :is-editing="isEditing && canEdit"
     align-content="align-start"
     full-width
     :show-icon="canEdit"
-    :cancel="onCancel"
     show-tooltip
     :tooltip="
       isGeneral
         ? $t('components.competences.general.tooltip')
         : $t('components.competences.technical.tooltip')
     "
-    @toggle:is-diting="isEditing = !isEditing"
+    @click:save="onSave"
+    @click:cancel="onCancel"
+    @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
       <div class="gap-3 d-flex flex-column w-100">
@@ -113,6 +113,10 @@ const handleInput = (input: any) => {
   }, timeSpan);
 };
 
+const toggleIsEditing = () => {
+  isEditing.value = !isEditing.value;
+};
+
 function filterTags(data: any[]): void {
   filteredTags.value = data
     .filter((item) => !userTagsIds.value.includes(item.id))
@@ -169,6 +173,7 @@ const onCancel = () => {
   updateArray.value = [];
   createArray.value = [];
   rerender.value += 1;
+  toggleIsEditing();
 };
 
 const userTagsIds = computed(() =>
@@ -246,7 +251,7 @@ const onSave = async () => {
   deleteArray.value = [];
   updateArray.value = [];
   createArray.value = [];
-
+  toggleIsEditing();
   if (promises.length > 0) {
     await Promise.all(promises);
     emit('update');

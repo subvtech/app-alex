@@ -3,11 +3,15 @@
     class="page rounded-lg bg-white pa-6 d-flex flex-column gap-6 align-start pb-15"
   >
     <alex-documentation-header :title="title" :description="description" />
-    <alex-documentation-accordions-props-list :data="listProps" show-positions />
-    <alex-documentation-accordions-props-list :data="listEmits" list-emits/>
+    <alex-documentation-accordions-props-list
+      :data="listProps"
+      show-positions
+    />
+    <alex-documentation-accordions-props-list :data="listEmits" list-emits />
 
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"

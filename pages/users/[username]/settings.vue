@@ -1,9 +1,9 @@
 <template>
   <div v-if="user" class="d-flex flex-column flex-md-row gap-6 w-100">
     <alex-profile-settings-basic-info
-      :cpf="user.cpf"
-      :phone="user.phone"
-      :fullname="user.fullname"
+      v-model:cpf="user.cpf"
+      v-model:phone="user.phone"
+      v-model:fullname="user.fullname"
       @update="
         (data) => emit('update', data, $t('components.profile.settings.update'))
       "
@@ -12,8 +12,8 @@
       <alex-profile-settings-security :id="id" :email="user.email" />
       <alex-profile-settings-wallet
         :wallet="user.user_wallet"
-        @update:wallet="linkWallet"
-        @remove:wallet="unlinkWallet(id)"
+        @update:wallet="linkWallet(id)"
+        @remove:wallet="(walletId) => unlinkWallet(walletId)"
       />
     </div>
   </div>

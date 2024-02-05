@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-center gap-4">
-    <v-icon color="#6E7A87">{{ icon }}</v-icon>
+    <v-icon v-if="icon.startsWith('mdi')" color="gray-600">{{ icon }}</v-icon>
     <div class="d-flex flex-column justify-center align-start field">
       <p>{{ label }}</p>
       <span>{{ value }}</span>

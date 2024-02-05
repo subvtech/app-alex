@@ -5,13 +5,14 @@
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list :data="listProps" />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
       has-example
     >
-      <template v-slot:component>
+      <template #component>
         <alex-profile-detail-boxes
           :boxes="detailsProps.boxes"
           :hide-divider="detailsProps.hideDivider"

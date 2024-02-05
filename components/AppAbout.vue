@@ -1,15 +1,15 @@
 <template>
   <alex-custom-card
     :title="title"
-    :isEditing="isEditingAndCanEdit"
-    :showIcon="canEdit"
-    @toggle:isEditing="toggleIsEditing"
-    :cancel="onCancel"
-    :save="() => emit('update', usingMyText ? myText : value)"
-    :disable-save="errorMessage !== undefined"
+    :is-editing="isEditingAndCanEdit"
+    :show-icon="canEdit"
     :align-content="displayEmptyPlaceholder ? 'align-center' : 'align-start'"
+    :disable-save="errorMessage !== undefined"
+    @toggle:is-editing="toggleIsEditing"
+    @click:cancel="onCancel"
+    @click:save="onSave"
   >
-    <template v-slot:content>
+    <template #content>
       <div class="d-flex flex-column flex-wrap w-100">
         <alex-custom-empty-placeholder
           v-if="displayEmptyPlaceholder"
@@ -50,49 +50,33 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-const { t } = useI18n();
+
+export interface AboutComponentType {
+  title?: string;
+
+  text: string;
+
+  userId: number;
+  canEdit?: boolean;
+  emptyTextMessage?: string;
+  textPlaceholder?: string;
+  emptyTextImage?: string;
+
+  fullWidth?: boolean;
+  images?: any[];
+  showMedia?: boolean;
+  isOptional?: boolean;
+}
 
 const emit = defineEmits(['update']);
 
-const props = defineProps({
-  title: {
-    type: String,
-    default: '',
-  },
-  text: {
-    type: String,
-    required: true,
-  },
-
-  userId: {
-    type: Number,
-    required: true,
-  },
-  canEdit: { type: Boolean, required: true },
-
-  emptyTextMessage: {
-    type: String,
-  },
-  textPlaceholder: { type: String },
-  emptyTextImage: {
-    type: String,
-  },
-  fullWidth: {
-    type: Boolean,
-    default: false,
-  },
-  images: {
-    type: Array as PropType<any[]>,
-    default: [],
-  },
-  showMedia: {
-    type: Boolean,
-    default: false,
-  },
-  isOptional: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<AboutComponentType>(), {
+  canEdit: false,
+  title: '',
+  images: () => [],
+  emptyTextMessage: undefined,
+  textPlaceholder: undefined,
+  emptyTextImage: undefined,
 });
 
 const { canEdit, text } = toRefs(props);
@@ -125,10 +109,16 @@ const updateText = (event: Event) => {
   myText.value = target.value;
 };
 
-const onCancel = async () => {};
-
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
+};
+const onCancel = () => {
+  myText.value = props.text;
+  toggleIsEditing();
+};
+const onSave = () => {
+  toggleIsEditing();
+  emit('update', usingMyText ? myText : value);
 };
 
 const { value, errorMessage } = useField(

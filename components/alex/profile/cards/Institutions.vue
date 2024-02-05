@@ -3,11 +3,11 @@
     :title="$t('components.profile.institutional.title')"
     :is-editing="canEditAndIsEditing"
     :show-icon="canEdit"
-    :cancel="onCancel"
-    :save="onSave"
     align-content="align-center"
     full-width
-    @toggle:is-editing="isEditing = !isEditing"
+    @click:cancel="onCancel"
+    @click:save="onSave"
+    @toggle:is-editing="toggleEditing"
   >
     <template #content>
       <alex-inputs-institutions
@@ -91,6 +91,10 @@ const findInstitution = (selectedId) => {
   return sortedInstitutions.value.find((item) => item.id === selectedId);
 };
 
+const toggleEditing = () => {
+  isEditing.value = !isEditing.value;
+};
+
 const updateSelectedOption = (selectedId) => {
   if (
     searchInstitutions.value.length === 0 ||
@@ -171,7 +175,7 @@ const onSave = async () => {
       },
     },
   });
-
+  toggleEditing();
   emit('update');
   deleteArray.value = [];
 };
@@ -181,6 +185,7 @@ const onCancel = () => {
   deleteArray.value = [];
   sortedInstitutions.value = [...props.institutions];
   searchInstitutions.value = [];
+  toggleEditing();
 };
 </script>
 

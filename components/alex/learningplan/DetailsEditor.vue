@@ -5,12 +5,12 @@
     :isEditing="isEditing && canEdit"
     :showIcon="canEdit"
     @toggle:isEditing="toggleIsEditing"
-    :cancel="cancel"
-    :save="updateAbout"
+    @click:cancel="onCancel"
+    @click:save="updateAbout"
     sizingClass="pa-0"
     full-width
   >
-    <template v-slot:content>
+    <template #content>
       <div
         v-if="isEmptyAndIsNotEditing"
         class="d-flex flex-column w-100 justify-center align-center gap-4"
@@ -62,7 +62,6 @@ const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const token = useStrapiToken();
 
-
 const props = defineProps({
   info: {
     type: Array as PropType<
@@ -84,12 +83,12 @@ const props = defineProps({
 const { info, canEdit } = toRefs(props);
 
 const isEditing = ref(false);
-const cancel = async () => {
+const onCancel = async () => {
+  toggleIsEditing();
   await instance.value.render({ blocks: info.value });
 };
 const emit = defineEmits(['ready', 'update']);
 const instance = ref();
-
 
 const initialiseEditor = () => {
   instance.value = new EditorJS({

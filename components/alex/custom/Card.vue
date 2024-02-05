@@ -1,7 +1,7 @@
 <template>
   <div
     id="Card"
-    class="d-flex flex-column rounded-lg"
+    class="d-flex flex-column rounded-lg bg-white"
     :class="[
       fullWidth ? 'w-100' : '',
       isNested ? '' : 'float',
@@ -13,13 +13,11 @@
       class="d-flex align-center justify-space-between"
       :class="[
         hideDividers ? '' : 'border-bottom',
-        sizingClass ?? (noHeader ? 'px-6' : isNested ? '' : 'px-6'),
+        sizingClass ?? (isNested ? '' : 'px-6'),
       ]"
     >
-      <div class="foretitle d-flex py-6">
-        <span :class="isEditing && showTooltip ? '' : ''">{{
-          title
-        }}</span>
+      <div class="foretitle d-flex text-gray-600 py-6">
+        <span>{{ title }}</span>
         <a v-if="href" :href="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
         </a>
@@ -37,63 +35,54 @@
       >
         <alex-custom-button
           class="btn"
-          @click="cancelledAction"
           variant="secondary"
+          @click="emit('click:cancel')"
         >
-          {{ $t('components.profile.settings.cancel') }}</alex-custom-button
+          {{ $t('components.card.cancel') }}</alex-custom-button
         >
         <alex-custom-button
           class="btn"
-          @click="savedAction"
           :disabled="disableSave"
           variant="primary"
+          @click="emit('click:save')"
         >
-          {{ $t('components.profile.settings.save') }}</alex-custom-button
+          {{ $t('components.card.save') }}</alex-custom-button
         >
 
         <alex-custom-button
           class="small"
           icon="mdi-close"
           variant="secondary"
-          @click="cancelledAction"
+          @click="emit('click:cancel')"
         />
         <alex-custom-button
           class="small"
           icon="mdi-check"
           variant="primary"
           :disabled="disableSave"
-          @click="savedAction"
+          @click="emit('click:save')"
         />
       </div>
-      <div
+      <alex-documentation-buttons-tooltip
         v-else-if="showIcon"
-        class="pointer"
-        @click="emit('toggle:isEditing')"
-      >
-        <alex-custom-tooltip :text="$t('components.card.edit')">
-          <template #content>
-            <v-icon color="#6E7A87">mdi-pencil-outline</v-icon>
-          </template>
-        </alex-custom-tooltip>
-      </div>
+        :tooltip-text="$t('components.card.edit')"
+        variant="text"
+        color="gray-600"
+        icon="mdi-pencil-outline"
+        @click:button="emit('toggle:isEditing')"
+      />
     </div>
 
     <div
       class="d-flex flex-column w-100"
-      :class="[
-        sizingClass ?? (noHeader ? 'px-6' : 'pa-6'),
-        alignContent ?? 'align-start',
-      ]"
+      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent]"
     >
       <slot name="content" />
     </div>
     <v-divider v-if="showFooterDivider" class="w-100" :thickness="1" />
     <div
       class="d-flex flex-column w-100"
-      :class="[
-        sizingClass ?? (noHeader ? 'px-6' : 'px-6 pb-6'),
-        alignContent ?? 'align-start',
-      ]"
+      :class="[sizingClass ?? (noHeader ? 'px-6' : 'px-6 pb-6'), alignContent]"
     >
       <slot name="footer" />
     </div>
@@ -101,97 +90,51 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  fullWidth: {
-    type: Boolean,
-    default: false,
-  },
-  cancel: {
-    type: Function,
-    default: () => {},
-  },
-  save: {
-    type: Function,
-    default: () => {},
-  },
-  isEditing: {
-    type: Boolean,
-    default: false,
-  },
-  hideDividers: {
-    type: Boolean,
-    default: false,
-  },
-  noHeader: {
-    type: Boolean,
-    default: false,
-  },
-  outline: {
-    type: Boolean,
-    default: false,
-  },
-  showFooterDivider: {
-    type: Boolean,
-    default: false,
-  },
-  sizingClass: {
-    type: String,
-  },
-  tooltipExtraClass: {
-    type: String,
-  },
-  alignContent: {
-    type: String as PropType<'align-center' | 'align-start' | 'align-end'>,
-  },
-  href: {
-    type: String,
-  },
-  showIcon: {
-    type: Boolean,
-    default: true,
-  },
-  showTooltip: {
-    type: Boolean,
-    default: false,
-  },
-  smallButtons: {
-    type: Boolean,
-    default: false,
-  },
-  tooltip: {
-    type: String,
-  },
-  isNested: {
-    type: Boolean,
-    default: false,
-  },
-  disableSave: {
-    type: Boolean,
-    default: false,
-  },
+export interface CardComponentType {
+  title: string;
+  fullWidth?: boolean;
+  isEditing?: boolean;
+  hideDividers?: boolean;
+  noHeader?: boolean;
+  outline?: boolean;
+  showFooterDivider?: boolean;
+  sizingClass?: string;
+  tooltipExtraClass?: string;
+  alignContent?: 'align-center' | 'align-start' | 'align-end';
+  href?: string;
+  showIcon?: boolean;
+  showTooltip?: boolean;
+  smallButtons?: boolean;
+  tooltip?: string;
+  isNested?: boolean;
+  disableSave?: boolean;
+}
+
+withDefaults(defineProps<CardComponentType>(), {
+  alignContent: 'align-start',
+  showIcon: true,
+  hideDividers: false,
+  fullWidth: false,
+  isNested: false,
+  disableSave: false,
+  smallButtons: false,
+  isEditing: false,
+  noHeader: false,
+  outline: false,
+  showTooltip: false,
+  showFooterDivider: false,
+
+  href: undefined,
+  tooltipExtraClass: undefined,
+  sizingClass: undefined,
+  tooltip: undefined,
 });
 
-const { title, cancel, isEditing, save } = toRefs(props);
-const emit = defineEmits(['toggle:isEditing']);
-
-const savedAction = async () => {
-  emit('toggle:isEditing');
-  save.value();
-};
-
-const cancelledAction = async () => {
-  emit('toggle:isEditing');
-  cancel.value();
-};
+const emit = defineEmits(['toggle:isEditing', 'click:save', 'click:cancel']);
 </script>
 
 <style scoped lang="scss">
 #Card {
-  background-color: white;
   font-family: Sen;
 
   .pointer {
@@ -200,9 +143,9 @@ const cancelledAction = async () => {
   &.float {
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
 
-    .outline{
+    .outline {
       box-shadow: none !important;
-      border: 1px solid var(--Cinza-Cinza-100, #EBEDEF);
+      border: 1px solid var(--Cinza-Cinza-100, #ebedef);
     }
   }
   .border-bottom {
@@ -216,7 +159,6 @@ const cancelledAction = async () => {
       width: min-content;
     }
     span {
-      color: #5d6872;
       font-size: 20px;
       font-weight: 700;
       line-height: 24px;

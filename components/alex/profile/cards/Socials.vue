@@ -1,13 +1,13 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.socials.title')"
-    :cancel="cancel"
-    :save="onSave"
     :disable-save="disableSave"
     :show-icon="canEdit"
     :is-editing="canEditAndIsEditing"
     full-width
-    @toggle:is-editing="isEditing = !isEditing"
+    @click:cancel="cancel"
+    @click:save="onSave"
+    @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
       <div class="d-flex flex-column w-100 justify-center">
@@ -24,6 +24,7 @@
               :key="componentKey"
               v-model:data="sortedSocials"
               show-positions
+              @dragged:item="isChanged = true"
               @deleted:item="updateDeleteArray"
             >
               <template #content="{ title, url, index }">
@@ -49,7 +50,11 @@
             />
           </div>
         </div>
-        <div v-if="canEditAndIsEditing" class="d-flex justify-center mt-6">
+        <div
+          v-if="canEditAndIsEditing"
+          class="d-flex justify-center mt-6"
+          data-testid="add-social"
+        >
           <alex-profile-dialogs-add-social
             :socials="updatedMissingSocials"
             @save:social="addSocial"
@@ -105,6 +110,10 @@ const canEditAndIsEditing = computed(() => isEditing.value && canEdit.value);
 onMounted(() => {
   resetArrays();
 });
+
+const toggleIsEditing = () => {
+  isEditing.value = !isEditing.value;
+};
 
 const addSocial = ({ name, url, selectedSocial }) => {
   const selectedSocialLowerCase = selectedSocial.toLowerCase();
@@ -247,7 +256,7 @@ const onSave = async () => {
     };
   }[] = [];
 
-  if (sortedSocials.value.length !== 0) {
+  if (sortedSocials.value.length !== 0 && isChanged.value) {
     sortedSocials.value.forEach((item, index) => {
       const position =
         index === 0
@@ -302,15 +311,16 @@ const onSave = async () => {
     resetArrays();
     return;
   }
+  toggleIsEditing();
   await Promise.all(promises);
-
   resetArrays(false);
   emit('update');
 };
 
 const cancel = () => {
   componentKey.value = componentKey.value + 1;
-  isChanged.value = false;
+
+  toggleIsEditing();
   resetArrays();
 };
 

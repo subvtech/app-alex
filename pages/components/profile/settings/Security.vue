@@ -7,7 +7,7 @@
     <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
       v-for="(item, index) in examples"
-      :key="item.title ?? index"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"

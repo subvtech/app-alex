@@ -5,6 +5,7 @@
         :class="rounded ? 'rounded' : ''"
         :variant="variant"
         :icon="icon"
+        :color="color"
         :size="iconSize"
         v-bind="tooltipText ? props : undefined"
         :disabled="disabled"
@@ -31,6 +32,7 @@ export interface TooltipButtonComponentType {
     | 'warning'
     | 'info';
   icon?: string;
+  color?: AlexColors;
   iconSize?: 'default' | 'small' | 'large';
   rounded?: boolean;
   disabled?: boolean;
@@ -42,6 +44,7 @@ withDefaults(defineProps<TooltipButtonComponentType>(), {
   tooltipLocation: 'top',
   variant: 'success',
   icon: 'mdi-content-copy',
+  color: undefined,
   rounded: false,
   disabled: false,
   iconSize: 'large',

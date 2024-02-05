@@ -7,7 +7,12 @@
         role="listItem"
         :class="over == index && dragging && dragFrom != item ? 'over' : ''"
         @dragover="(e) => onDragOver(index, e)"
-        @dragend="() => finishDrag(item, index, list)"
+        @dragend="
+          () => {
+            finishDrag(item, index, list);
+            emit('dragged:item', index);
+          }
+        "
         @dragenter="(e) => e.preventDefault()"
       >
         <v-expansion-panel-title class="expand-panel">
@@ -50,7 +55,7 @@
               ' ' + item.title
             }}</span>
           </span>
-          <v-spacer/>
+          <v-spacer />
           <v-btn
             class="mx-4 delete-btn"
             variant="text"
@@ -88,7 +93,7 @@ export interface AccordionItemType {
   position?: boolean;
 }
 
-const emit = defineEmits(['deleted:item']);
+const emit = defineEmits(['deleted:item', 'dragged:item']);
 
 const id = ref(0);
 const { data } = defineProps({

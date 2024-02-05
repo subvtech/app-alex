@@ -4,7 +4,7 @@
     :title="$t('components.projects.title')"
     full-width
   >
-    <template v-slot:content>
+    <template #content>
       <div class="d-flex mb-6">
         <div class="d-flex flex-wrap align-center py-2 px-3 search">
           <v-icon color="#5D6872">mdi-magnify</v-icon>
@@ -18,25 +18,9 @@
 
       <div class="d-flex flex-wrap items">
         <div
+          v-for="(item, index) in data"
+          :key="index"
           class="d-flex flex-column align-start item"
-          v-for="item in [
-            {
-              title: 'Gerenciamento de projetos de redes de computadores',
-              description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ultricies ligula quis tincidunt consectetur. Fusce sodales tortor nisi, et fermentum orci tincidunt vel. Sed molestie massa ipsum, sed fermentum libero iaculis malesuada. Duis tincidunt venenatis dictum. Pellentesque pulvinar arcu et turpis rhoncus lobortis. Ut congue purus at nisl tincidunt vulputate. Nullam vitae varius dui. Cras ultrices efficitur ante quis volutpat. In cursus, elit ac eleifend blandit, enim magna gravida tellus, ac malesuada augue libero et leo. Nulla vehicula nunc sed luctus vehicula. Ut posuere fermentum faucibus. Duis nibh elit, ornare ac est nec, tincidunt ultricies est. Fusce non interdum nulla, eleifend ornare orci. Curabitur felis sem, egestas ut tortor at, aliquet tincidunt odio. Praesent rutrum mi elit, at iaculis urna auctor eget. Pellentesque rhoncus metus felis, id pharetra magna tristique quis. Mauris in egestas nulla. Mauris justo sem, sodales id nunc vel, varius semper enim. Curabitur egestas nisi vel lacus facilisis, eu consequat eros luctus.Cras vehicula, dolor eget ullamcorper mollis, augue lectus feugiat nisl, et malesuada neque arcu eu arcu. Quisque vel felis quis orci blandit euismod. Nunc auctor nisl neque, et faucibus elit tempor eget. Vivamus consequat mollis molestie. Suspendisse facilisis, turpis nec sodales bibendum, turpis dolor feugiat arcu, vel gravida turpis ligula eget erat. Suspendisse sapien massa, dignissim aliquet ullamcorper id, accumsan ac lacus. Suspendisse a faucibus tortor. Curabitur tristique convallis varius. Cras a massa sollicitudin, commodo nulla vitae, ullamcorper erat.',
-              tags: ['Liderança', 'Liderança', 'Liderança', 'Liderança'],
-              trails: 4,
-              username: 'Carlos de Andrade',
-            },
-            {
-              title: 'Gerenciamento de projetos de redes de computadores',
-              description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ultricies ligula quis tincidunt consectetur. Fusce sodales tortor nisi, et fermentum orci tincidunt vel. Sed molestie massa ipsum, sed fermentum libero iaculis malesuada. Duis tincidunt venenatis dictum. Pellentesque pulvinar arcu et turpis rhoncus lobortis. Ut congue purus at nisl tincidunt vulputate. Nullam vitae varius dui. Cras ultrices efficitur ante quis volutpat. In cursus, elit ac eleifend blandit, enim magna gravida tellus, ac malesuada augue libero et leo. Nulla vehicula nunc sed luctus vehicula. Ut posuere fermentum faucibus. Duis nibh elit, ornare ac est nec, tincidunt ultricies est. Fusce non interdum nulla, eleifend ornare orci. Curabitur felis sem, egestas ut tortor at, aliquet tincidunt odio. Praesent rutrum mi elit, at iaculis urna auctor eget. Pellentesque rhoncus metus felis, id pharetra magna tristique quis. Mauris in egestas nulla. Mauris justo sem, sodales id nunc vel, varius semper enim. Curabitur egestas nisi vel lacus facilisis, eu consequat eros luctus.Cras vehicula, dolor eget ullamcorper mollis, augue lectus feugiat nisl, et malesuada neque arcu eu arcu. Quisque vel felis quis orci blandit euismod. Nunc auctor nisl neque, et faucibus elit tempor eget. Vivamus consequat mollis molestie. Suspendisse facilisis, turpis nec sodales bibendum, turpis dolor feugiat arcu, vel gravida turpis ligula eget erat. Suspendisse sapien massa, dignissim aliquet ullamcorper id, accumsan ac lacus. Suspendisse a faucibus tortor. Curabitur tristique convallis varius. Cras a massa sollicitudin, commodo nulla vitae, ullamcorper erat.',
-              tags: ['Liderança', 'Liderança', 'Liderança', 'Liderança'],
-              trails: 4,
-              username: 'Carlos de Andrade',
-            },
-          ]"
         >
           <img
             class="w-100"
@@ -46,8 +30,9 @@
           <div class="d-flex w-100 h-100 flex-column pa-4">
             <div class="tags d-flex flex-row flex-wrap justify-center">
               <span
+                v-for="(tag, index2) in item.tags"
+                :key="index2"
                 class="d-flex justify-center align-center px-4"
-                v-for="tag in item.tags"
                 >{{ tag }}</span
               >
             </div>
@@ -90,7 +75,26 @@
   </alex-custom-card>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const data = [
+  {
+    title: 'Gerenciamento de projetos de redes de computadores',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ultricies ligula quis tincidunt consectetur. Fusce sodales tortor nisi, et fermentum orci tincidunt vel. Sed molestie massa ipsum, sed fermentum libero iaculis malesuada. Duis tincidunt venenatis dictum. Pellentesque pulvinar arcu et turpis rhoncus lobortis. Ut congue purus at nisl tincidunt vulputate. Nullam vitae varius dui. Cras ultrices efficitur ante quis volutpat. In cursus, elit ac eleifend blandit, enim magna gravida tellus, ac malesuada augue libero et leo. Nulla vehicula nunc sed luctus vehicula. Ut posuere fermentum faucibus. Duis nibh elit, ornare ac est nec, tincidunt ultricies est. Fusce non interdum nulla, eleifend ornare orci. Curabitur felis sem, egestas ut tortor at, aliquet tincidunt odio. Praesent rutrum mi elit, at iaculis urna auctor eget. Pellentesque rhoncus metus felis, id pharetra magna tristique quis. Mauris in egestas nulla. Mauris justo sem, sodales id nunc vel, varius semper enim. Curabitur egestas nisi vel lacus facilisis, eu consequat eros luctus.Cras vehicula, dolor eget ullamcorper mollis, augue lectus feugiat nisl, et malesuada neque arcu eu arcu. Quisque vel felis quis orci blandit euismod. Nunc auctor nisl neque, et faucibus elit tempor eget. Vivamus consequat mollis molestie. Suspendisse facilisis, turpis nec sodales bibendum, turpis dolor feugiat arcu, vel gravida turpis ligula eget erat. Suspendisse sapien massa, dignissim aliquet ullamcorper id, accumsan ac lacus. Suspendisse a faucibus tortor. Curabitur tristique convallis varius. Cras a massa sollicitudin, commodo nulla vitae, ullamcorper erat.',
+    tags: ['Liderança', 'Liderança', 'Liderança', 'Liderança'],
+    trails: 4,
+    username: 'Carlos de Andrade',
+  },
+  {
+    title: 'Gerenciamento de projetos de redes de computadores',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ultricies ligula quis tincidunt consectetur. Fusce sodales tortor nisi, et fermentum orci tincidunt vel. Sed molestie massa ipsum, sed fermentum libero iaculis malesuada. Duis tincidunt venenatis dictum. Pellentesque pulvinar arcu et turpis rhoncus lobortis. Ut congue purus at nisl tincidunt vulputate. Nullam vitae varius dui. Cras ultrices efficitur ante quis volutpat. In cursus, elit ac eleifend blandit, enim magna gravida tellus, ac malesuada augue libero et leo. Nulla vehicula nunc sed luctus vehicula. Ut posuere fermentum faucibus. Duis nibh elit, ornare ac est nec, tincidunt ultricies est. Fusce non interdum nulla, eleifend ornare orci. Curabitur felis sem, egestas ut tortor at, aliquet tincidunt odio. Praesent rutrum mi elit, at iaculis urna auctor eget. Pellentesque rhoncus metus felis, id pharetra magna tristique quis. Mauris in egestas nulla. Mauris justo sem, sodales id nunc vel, varius semper enim. Curabitur egestas nisi vel lacus facilisis, eu consequat eros luctus.Cras vehicula, dolor eget ullamcorper mollis, augue lectus feugiat nisl, et malesuada neque arcu eu arcu. Quisque vel felis quis orci blandit euismod. Nunc auctor nisl neque, et faucibus elit tempor eget. Vivamus consequat mollis molestie. Suspendisse facilisis, turpis nec sodales bibendum, turpis dolor feugiat arcu, vel gravida turpis ligula eget erat. Suspendisse sapien massa, dignissim aliquet ullamcorper id, accumsan ac lacus. Suspendisse a faucibus tortor. Curabitur tristique convallis varius. Cras a massa sollicitudin, commodo nulla vitae, ullamcorper erat.',
+    tags: ['Liderança', 'Liderança', 'Liderança', 'Liderança'],
+    trails: 4,
+    username: 'Carlos de Andrade',
+  },
+];
+</script>
 
 <style scoped lang="scss">
 .search {

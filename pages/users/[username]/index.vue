@@ -19,7 +19,7 @@
       <app-about
         :title="$t('components.profile.about.title')"
         :text="user.info"
-        :userId="user.id"
+        :user-id="user.id"
         :can-edit="canEdit"
         is-optional
         :about-text-message="$t('components.profile.about.placeholder')"
@@ -42,7 +42,7 @@
           :title="$t('components.competences.technical.title')"
           :label="$t('components.competences.technical.label')"
           :placeholder="$t('components.competences.technical.placeholder')"
-          :emptyMessage="$t('components.competences.technical.empty')"
+          :empty-message="$t('components.competences.technical.empty')"
           :relation-id="user.id"
           :can-edit="canEdit"
           :selected-tags="technicalTags"
@@ -55,7 +55,7 @@
           :title="$t('components.competences.general.title')"
           :label="$t('components.competences.general.label')"
           :placeholder="$t('components.competences.general.placeholder')"
-          :emptyMessage="$t('components.competences.general.empty')"
+          :empty-message="$t('components.competences.general.empty')"
           :relation-id="user.id"
           :can-edit="canEdit"
           :selected-tags="generalTags"
@@ -68,7 +68,7 @@
       <alex-profile-cards-institutions
         v-if="institutions.length !== 0 || canEdit"
         :institutions="institutions"
-        :userId="user.id"
+        :user-id="user.id"
         :can-edit="canEdit"
         @update="async () => await updateInstitutions()"
       />

@@ -6,7 +6,8 @@
     <alex-documentation-accordions-props-list :data="listProps" />
     <alex-documentation-accordions-props-list :data="listEmits" list-emits />
     <alex-documentation-example
-      v-for="item in examples"
+      v-for="(item, index) in examples"
+      :key="index"
       :snippets="item.snippets"
       :title="item.title"
       :description="item.description"
@@ -28,11 +29,11 @@
 </template>
 
 <script setup lang="ts">
+import * as yup from 'yup';
 import { ExampleComponentType } from '~/components/alex/documentation/Example.vue';
 import { PlaygroundItemType } from '~/components/alex/documentation/Playground.vue';
 import { PropItemType } from '~/components/alex/documentation/accordions/PropsList.vue';
 import { SecurityFormComponentType } from '~/components/alex/profile/settings/forms/Security.vue';
-import * as yup from 'yup';
 
 definePageMeta({
   layout: 'components',

@@ -7,9 +7,9 @@
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
     @toggle:is-editing="isEditing = !isEditing"
-    :save="onSave"
+    @click:save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
-    :cancel="onCancel"
+    @click:cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
@@ -217,6 +217,7 @@ const onSuccess = (validGoal) => {
 };
 
 const onCancel = () => {
+  isEditing.value = !isEditing.value;
   dataCopy.value = [...props.data];
   updateArray.value = [];
   createArray.value = [];
@@ -287,6 +288,7 @@ const onSave = async () => {
       }),
     },
   });
+  isEditing.value = !isEditing.value;
   emit('update', t('components.courses.goals.update'));
   rerender.value -= 1;
   updateArray.value = [];
