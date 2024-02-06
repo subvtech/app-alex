@@ -11,6 +11,7 @@
         ? $t('components.competences.general.tooltip')
         : $t('components.competences.technical.tooltip')
     "
+    :controls-loading="isLoading"
     @click:save="onSave"
     @click:cancel="onCancel"
     @toggle:is-editing="toggleIsEditing"
@@ -77,7 +78,6 @@ export interface CompetencesComponentType {
   emptyMessage: string;
   placeholder: string;
   relationId: number;
-  learningplan?: boolean;
   isGeneral?: boolean;
   canEdit?: boolean;
 }
@@ -90,12 +90,12 @@ const emit = defineEmits<CompetencesEmits>();
 
 const props = withDefaults(defineProps<CompetencesComponentType>(), {
   canEdit: false,
-  learningplan: false,
   isGeneral: false,
 });
 
 const { canEdit } = toRefs(props);
 const isEditing = ref(false);
+const isLoading = ref(false);
 
 const search = ref<string | null>(null);
 const filteredTags = ref<Tag[]>([]);
@@ -182,7 +182,7 @@ const userTagsIds = computed(() =>
 
 const onSave = async () => {
   const promises: Promise<any>[] = [];
-
+  isLoading.value = true;
   if (createArray.value.length !== 0)
     createArray.value
       .filter((item) => !item.id)
@@ -193,37 +193,23 @@ const onSave = async () => {
           isPublic: false,
         };
         promises.push(
-          create(
-            'tags',
-            props.learningplan
-              ? {
-                  ...commonProps,
-                  learningplans: {
-                    connect: [props.relationId],
-                  },
-                }
-              : {
-                  ...commonProps,
-                  verified_by: {
-                    connect: [props.relationId],
-                  },
-                },
-          ),
+          create('tags', {
+            ...commonProps,
+            verified_by: {
+              connect: [props.relationId],
+            },
+          }),
         );
       });
   if (updateArray.value.length !== 0)
     updateArray.value
       .filter((item) => item.id)
       .forEach((item) => {
-        const temp = props.learningplan
-          ? {
-              learningplans: { connect: [props.relationId] },
-            }
-          : {
-              verified_by: {
-                connect: [props.relationId],
-              },
-            };
+        const temp = {
+          verified_by: {
+            connect: [props.relationId],
+          },
+        };
         promises.push(update('tags', item.id, temp as any));
       });
   if (deleteArray.value.length !== 0) {
@@ -234,17 +220,14 @@ const onSave = async () => {
     });
 
     promises.push(
-      client(
-        `${props.learningplan ? 'learningplans' : 'users'}/${props.relationId}`,
-        {
-          method: 'PUT',
-          body: {
-            tags: {
-              disconnect: deleteArray.value.map((item) => item.id),
-            },
+      client(`users/${props.relationId}`, {
+        method: 'PUT',
+        body: {
+          tags: {
+            disconnect: deleteArray.value.map((item) => item.id),
           },
         },
-      ),
+      }),
     );
   }
 
@@ -257,6 +240,7 @@ const onSave = async () => {
     emit('update');
   }
   rerender.value -= 1;
+  isLoading.value = false;
 };
 
 const addExistingTag = (data) => {
