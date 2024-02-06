@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "yarn list:documentation && nuxt build",
+    "build": "nuxt build",
     "dev": "nuxt dev",
     "test": "vitest --watch",
     "test:coverage": "vitest --coverage",
