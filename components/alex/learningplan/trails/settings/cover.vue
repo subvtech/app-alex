@@ -13,8 +13,6 @@
         class="filePreview"
         :style="{
           backgroundImage: 'url(' + trailStore.trail.cover_image.url + ')',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
         }"
       >
         <alex-custom-button
@@ -22,7 +20,7 @@
           elevation="0"
           icon="mdi-trash-can-outline"
           variant="error"
-          style="position: absolute; top: 16px; right: 16px"
+          class="position-absolute btn"
           @click="removeCoverImage()"
         />
       </div>
@@ -31,7 +29,6 @@
         class="filePreview"
         :style="{
           backgroundImage: 'url(' + image + ')',
-          backgroundSize: 'cover',
         }"
       >
         <alex-custom-button
@@ -39,7 +36,7 @@
           elevation="0"
           icon="mdi-trash-can-outline"
           variant="error"
-          style="position: absolute; top: 16px; right: 16px"
+          class="position-absolute btn"
           @click="removeCoverImage()"
         />
       </div>
@@ -48,7 +45,6 @@
         class="empty-state mb-4"
         :style="{
           backgroundImage: 'url(' + emptyState.url + ')',
-          backgroundPositionX: 'center',
         }"
       ></div>
       <span class="action-content">
@@ -65,7 +61,7 @@
           ref="fileInputRef"
           type="file"
           accept=".jpeg, .png, .wav, .mp4, .jpg"
-          style="display: none"
+          class="d-none"
           @change="handleFileChange()"
         />
       </span>
@@ -157,6 +153,11 @@ p {
   display: flex;
 }
 
+.btn {
+  top: 16px;
+  right: 16px;
+}
+
 .empty-state {
   display: flex;
   height: 250px;
@@ -168,6 +169,8 @@ p {
   border-radius: 8px;
   border: 1px solid var(--cinza-cinza-100, #ebedef);
   background: var(--cinza-cinza-azulado, #f1f5f9);
+  background-size: cover;
+  background-position: center;
 }
 
 .filePreview {
@@ -180,6 +183,8 @@ p {
   align-self: stretch;
   border-radius: 8px;
   border: 1px solid var(--cinza-cinza-100, #ebedef);
+  background-size: cover;
+  background-position: center;
 }
 
 .action-content {
