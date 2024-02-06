@@ -2,6 +2,7 @@ import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
 import { ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';
+import visibilityVue from '~/components/alex/learningplan/trails/settings/visibility.vue';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
@@ -66,6 +67,8 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'classes',
     'emailConfirmation',
     'trails',
+    'courses/trails',
+    'trails/tasks',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
@@ -107,6 +110,8 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile/socials',
     'profile/wallets',
     'trails/settings',
+    'trails/header',
+    'trails/tasks',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

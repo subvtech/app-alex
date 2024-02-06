@@ -5,13 +5,13 @@
   >
     <div
       class="d-flex flex-wrap w-100 mb-6"
-      :class="trails.length == 0 ? 'justify-end' : 'justify-space-between'"
+      :class="!trails.length ? 'justify-end' : 'justify-space-between'"
     >
       <alex-inputs-text-field
-        v-show="trails.length > 0"
+        v-show="trails.length"
         v-model="search"
         name="search"
-        :placeholder="$t('pages.trails.newTrail')"
+        :placeholder="$t('pages.trails.searchPlaceholder')"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
@@ -20,7 +20,7 @@
         density="compact"
       />
       <alex-custom-button
-        v-if="professorMode"
+        v-if="learningPlanStore.userIsFacilitator ?? false"
         prepend-icon="mdi-plus"
         size="large"
         @click="createTrailDialog = true"
@@ -29,12 +29,12 @@
       >
     </div>
     <div
-      v-if="trails.length == 0"
+      v-if="!trails.length"
       style="flex: 1"
       class="d-flex align-center justify-center flex-column"
     >
       <v-progress-circular
-        v-if="isLoading"
+        v-if="learningPlanStore.loading ?? true"
         color="accent"
         indeterminate
         :size="100"
@@ -47,8 +47,7 @@
           alt="Empty Projects"
         />
         <p class="text-h3 text-gray-400 mt-4">
-          <!-- {{ $t('pages.classes.emptyStateText') }} -->
-          Parece que não há trilhas criadas
+          {{ $t('pages.trails.emptyStateText') }}
         </p>
       </div>
     </div>
@@ -56,7 +55,7 @@
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
-        :items="trails"
+        :items="trails ?? []"
         :items-per-page="12"
         :filter-keys="['name', 'description', 'blocks']"
         class="d-flex flex-wrap"
@@ -66,14 +65,14 @@
           <div class="d-flex ga-6 flex-wrap w-100 card-container">
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
-              :key="item.raw.name + index"
+              :key="item.raw.title + index"
               :hide="item.raw.hidden"
-              :name="item.raw.name"
+              :name="item.raw.title"
               :description="item.raw.description"
               :image="{
-                url: item.raw.image.url,
+                url: item.raw?.cover_image?.url,
               }"
-              :blocks="item.raw.blocks !== undefined ? item.raw.blocks : []"
+              :blocks="item.raw.blocks ?? []"
               class="flex-stretch"
               @toggle-visibility="changeItemVisibility(index, item.raw.id)"
               @configurations="navigate(item.raw.id, 'settings')"
@@ -100,96 +99,52 @@
       </v-data-iterator>
     </div>
     <CreateDialog
-      v-if="professorMode && learningStructure"
+      v-if="learningPlanStore.userIsFacilitator && learningStructure"
       v-model="createTrailDialog"
-      :learning-structure="parseInt(learningStructure)"
-      @course-created="handleCreatedCourse"
+      :learning-structure="learningStructure"
+      @course-created="handleCreatedTrail"
     ></CreateDialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
-import { GetTrails } from '~/assets/queries';
+import { ref } from 'vue';
+import { TrailSimple } from '@/models/simple/trailSimple.model';
 import CreateDialog from '@/components/alex/learningplan/trails/dialogs/CreateTrail.vue';
 
-const emit = defineEmits(['update']);
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const graphql = useStrapiGraphQL();
+const { findOne } = useStrapiUtils();
 const { update } = useStrapi();
 
 const search = ref('');
 const page = ref(1);
-const professorMode = ref(false);
-const isLoading = ref(false);
 
 const createTrailDialog = ref(false);
-const learningStructure = ref(null);
 
-interface trail {
-  id?: number;
-  name: string;
-  description: string;
-  hidden: boolean;
-  image: {
-    url: string;
-  };
-  blocks: [
-    {
-      type: string;
-    },
-  ];
-}
+const learningPlanStore = useLearningPlanStore();
 
-const trails = ref<trail[]>([]);
-const { learningPlan } = useLearningPlanStore();
-
-const { isProfessor } = useStrapiUser<User>().value;
-const getCourses = async () => {
-  professorMode.value = isProfessor;
-  emit('update');
-  isLoading.value = true;
-  const { data } = await useAsyncData('learningPlan', () => {
-    const params = { learningPlanId: learningPlan!.id };
-    return graphql<{
-      data: {
-        learningplans: Strapi4ResponseMany<LearningPlan>;
-      };
-    }>(GetTrails, params);
-  });
-  learningStructure.value =
-    data.value?.data.learningplan.data?.attributes.learning_structures?.data[0]
-      .id;
-  trails.value = [];
-  data.value?.data.learningplan.data?.attributes.learning_structures?.data[0].attributes.trails.data.forEach(
-    (trail) => {
-      if (trail.attributes)
-        trails.value.push({
-          name: trail.attributes.title,
-          description: trail.attributes.description,
-          hidden: trail.attributes.hidden,
-          image: {
-            url: trail.attributes.cover_image.data?.attributes.url,
-          },
-          blocks:
-            trail.attributes.structures.data[0]?.attributes.blocks.data.map(
-              (block) => {
-                return {
-                  type: block.attributes.type,
-                };
-              },
-            ),
-          id: trail.id,
-        });
-    },
+const learningStructure = computed(() => {
+  return (
+    learningPlanStore.learningPlan?.learning_structures.find(
+      (structure) => structure.type === 'standard',
+    )?.id || 0
   );
-  isLoading.value = false;
-};
-// eslint-disable camelcase
-onMounted(async () => await getCourses());
+});
+
+const trails = computed<TrailSimple[]>(() => {
+  return (
+    learningPlanStore.standardTrails?.map((trail) => {
+      const lastStructure =
+        trail.structures[trail.structures?.length - 1 || 0] || {};
+      return {
+        ...trail,
+        blocks: lastStructure.blocks || [],
+      };
+    }) || []
+  );
+});
 
 const showingData = (groupedItems) => {
   const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
@@ -221,27 +176,24 @@ const changeItemVisibility = (index: number, id) => {
     trails.value[index].hidden = !trails.value[index].hidden;
   }
 };
-
-const isJoinRoutePath = computed(() => {
-  return route.name === 'courses-id-join-hash';
-});
-
-const learningPlanId = computed(() => {
-  if (isJoinRoutePath.value) return parseInt(route.fullPath.split('/')[2]);
-
-  return learningPlan ? learningPlan.id : parseInt(route.params?.id.toString());
-});
+const { id } = route.params;
 
 const navigate = (trailId: number, page) => {
   if (page === 'settings') {
-    router.push(`/courses/${learningPlanId.value}/trails/${trailId}/settings/`);
+    router.push(`/courses/${id}/trails/${trailId}/settings/`);
   } else {
-    router.push(`/courses/${learningPlanId.value}/trails/${trailId}/`);
+    router.push(`/courses/${id}/trails/${trailId}/`);
   }
 };
 
-const handleCreatedCourse = () => {
-  getCourses();
+const handleCreatedTrail = async (id) => {
+  const newTrail = await findOne('trails', id, {
+    populate: ['cover_image', 'structures.blocks'],
+  });
+  const trail: TrailSimple = newTrail.data as TrailSimple;
+  learningPlanStore.standardTrails.unshift({
+    ...trail,
+  });
   createTrailDialog.value = false;
 };
 </script>

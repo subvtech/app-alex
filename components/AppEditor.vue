@@ -1,31 +1,12 @@
 <template>
-  <!-- <v-container id="start" class="d-flex justify-space-between">
-    <v-btn @click="saveEditor()">Save</v-btn>
-    <a href="#teste123">Teste</a>
-    <v-btn @click="loadEditor">Load</v-btn>
-  </v-container> -->
   <client-only>
-    <!-- <v-row>
-      <v-col :cols="!editable ? 9 : 12">
-       
-      </v-col>
-
-      <v-col v-if="!editable" cols="3">
-        <Anchors :anchors="anchors"></Anchors>
-      </v-col>
-    </v-row> -->
-    <div
-      id="editorjs"
-      class="editorjs w-full p-6 sm:p-16"
-      style="max-width: 785px"
-    />
+    <div id="editorjs" class="editorjs w-100 pa-0"></div>
   </client-only>
 </template>
 
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
-import Delmiter from '@editorjs/delimiter';
-// import Header from 'editorjs-header-with-anchor';
+import Delimiter from '@editorjs/delimiter';
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
 import InlineCode from '@editorjs/inline-code';
@@ -46,13 +27,11 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-import { Structure } from '../models/structure.model';
+// import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+// import { Structure } from '../models/structure.model';
 import { Upload } from '../models/upload.model';
-import { dataLength } from 'ethers';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
-import Anchors from '../components/Anchors.vue';
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 
@@ -61,33 +40,6 @@ const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 const token = useStrapiToken();
-const readOnly = ref(true);
-const anchors = ref([]);
-
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => {},
-  },
-});
-
-// const planData = computed(() => {
-//   console.log(props.data);
-//   const data = props.data.blocls.data.map((b) => {
-//     if (!b.attributes.tunes) {
-//       delete b.attributes.tunes;
-//     }
-//     return { ...b.attributes, id: b.id };
-//   });
-//   const structure: any = { ...props.data, id: props.data.id };
-//   structure.blocks = props.data.attributes.blocks.data.map((b) => {
-//     if (!b.attributes.tunes) {
-//       delete b.attributes.tunes;
-//     }
-//     return { ...b.attributes, id: b.id };
-//   });
-//   return structure;
-// });
 
 const uploadBaseUrl = computed(() => {
   const runtimeConfig = useRuntimeConfig();
@@ -96,8 +48,9 @@ const uploadBaseUrl = computed(() => {
 
 onMounted(() => {
   instance.value = new EditorJS({
+    autofocus: true,
     tools: {
-      delimiter: Delmiter,
+      delimiter: Delimiter,
       embed: Embed,
       header: {
         class: header,
@@ -307,11 +260,14 @@ onMounted(() => {
     holder: 'editorjs',
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
-    onReady: () => {
-      /* eslint-disable-next-line */
-      new DragDrop(instance.value);
-      /* eslint-disable-next-line */
-      new Undo({ editor: instance.value });
+    onReady: async () => {
+      const data = await instance.value.save();
+      if (data.blocks.length > 0) {
+        /* eslint-disable-next-line */
+        new DragDrop(instance.value);
+        /* eslint-disable-next-line */
+        new Undo({ editor: instance.value });
+      }
       emit('ready');
     },
     onChange: () => emit('change'),
@@ -319,14 +275,22 @@ onMounted(() => {
 });
 
 const getData = async () => {
-  const data = await instance.value.save();
-  return data;
+  try {
+    const data = await instance.value.save();
+    return { success: 1, data };
+  } catch (error) {
+    return { success: 0 };
+  }
 };
-const loadEditor = (data) => {
-  instance.value.isReady.then(async () => {
+const loadEditor = async (data) => {
+  await instance.value.isReady;
+  try {
     await instance.value.render(data);
-    instance.value.readOnly.toggle();
-  });
+    const editorData = await instance.value.save();
+    return { success: 1, data: editorData };
+  } catch (error) {
+    return { success: 0 };
+  }
 };
 
 const toggleReadOnly = () => {
@@ -338,15 +302,27 @@ const toggleReadOnly = () => {
 const navigateToId = (id) => {
   const element = document.getElementById(id);
   if (element) {
-    element.scrollIntoView();
+    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 };
+
+const clearEditor = () => {
+  instance.value.isReady.then(() => {
+    instance.value.clear();
+  });
+};
+
+const isReady = async () => {
+  return await instance.value.isReady;
+};
+
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
   navigateToId,
-  anchors,
+  clearEditor,
+  isReady,
 });
 </script>
 
@@ -370,7 +346,11 @@ defineExpose({
 /* stylelint-disable */
 .editorjs >>> .ce-block__content,
 .editorjs >>> .ce-toolbar__content {
-  /* max-width: 64rem; */
-  max-width: 95%;
+  max-width: 64rem;
+  max-width: 100%;
+}
+
+.editorjs >>> .codex-editor--narrow {
+  background-color: white !important;
 }
 </style>
