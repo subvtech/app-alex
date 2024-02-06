@@ -20,26 +20,27 @@
       :cover-picture="user.cover"
       :profile-picture-size="160"
       :profile-picture="user.avatar"
-      :userId="user.id"
+      :user-id="user.id"
       can-delete
       show-menu
       settings-menu
       show-settings
+      :settings="settingsTab"
       show-profile-picture
       show-role
       show-border
       float-beneath
       distribution="fullname-username-role"
-      :selectedOption="selectedOption"
-      @select:option="selectOption"
-      @display:settings="showSettings = !showSettings"
+      :selected-option="selectedOption"
       :is-professor="user.isProfessor"
       :fullname="user.fullname"
-      fullnameStyle="color: #454D54;"
+      fullname-style="color: #454D54;"
       :username="user.username"
-      usernameStyle="color: #A0A8B1;"
-      roleStyle="color: #A0A8B1;"
+      username-style="color: #A0A8B1;"
+      role-style="color: #A0A8B1;"
       :links="isCurrentUser ? links : links.slice(0, -1)"
+      @select:option="selectOption"
+      @display:settings="showSettings = !showSettings"
     />
     <NuxtPage
       :user="user"
@@ -47,6 +48,7 @@
       :update-socials="userStore.loadUserSocials"
       :update-competences="userStore.loadUserTags"
       :update-institutions="userStore.loadUserInstitutions"
+      :loading="userStore.loading"
       @update="
         async (data, populateArray, message) =>
           await userStore.updateUser(data, populateArray, message)
@@ -62,7 +64,6 @@ const i18n = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const { id } = useStrapiUser<User>().value;
 definePageMeta({
   middleware: 'auth',
 });
@@ -126,14 +127,15 @@ const links = computed<TabType[]>(() => {
       value: '4',
       to: `/users/${username}/events`,
     },
-    {
-      label: '',
-      icon: 'mdi-cog-outline',
-      value: '5',
-      to: `/users/${username}/settings`,
-    },
   ];
 });
+
+const settingsTab = {
+  label: '',
+  icon: 'mdi-cog-outline',
+  value: '5',
+  to: `/users/${route.params.username}/settings`,
+};
 </script>
 
 <style scoped lang="scss"></style>

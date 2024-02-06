@@ -37,8 +37,9 @@
       <div
         class="d-flex flex-xs-column flex-sm-column flex-md-column flex-xl-row flex-xxl-row competences gap-6"
       >
+        <alex-learningplan-skeleton-competence v-if="loading" />
         <alex-profile-cards-competences
-          v-if="technicalTags.length !== 0 || canEdit"
+          v-else-if="technicalTags.length !== 0 || canEdit"
           :title="$t('components.competences.technical.title')"
           :label="$t('components.competences.technical.label')"
           :placeholder="$t('components.competences.technical.placeholder')"
@@ -50,8 +51,9 @@
             updateCompetences($t('components.competences.technical.updated'))
           "
         />
+        <alex-learningplan-skeleton-competence v-if="loading" />
         <alex-profile-cards-competences
-          v-if="generalTags.length !== 0 || canEdit"
+          v-else-if="generalTags.length !== 0 || canEdit"
           :title="$t('components.competences.general.title')"
           :label="$t('components.competences.general.label')"
           :placeholder="$t('components.competences.general.placeholder')"
@@ -97,6 +99,10 @@ const props = defineProps({
   updateInstitutions: {
     type: Function,
     default: () => {},
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 });
 const { user } = toRefs(props);

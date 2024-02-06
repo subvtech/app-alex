@@ -24,7 +24,6 @@
           :selected-tags="props.selectedTags"
           :title="props.title"
           :placeholder="props.placeholder"
-          :learningplan="props.learningplan"
           :is-general="props.isGeneral"
           :empty-message="props.emptyMessage"
           :can-edit="props.canEdit"
@@ -56,7 +55,6 @@ const competencesProps: CompetencesComponentType = {
   selectedTags: [],
   title: 'Title',
   isGeneral: true,
-  learningplan: true,
 };
 
 const listProps: PlaygroundItemType[] = [
@@ -82,15 +80,6 @@ const listProps: PlaygroundItemType[] = [
     default: 'false',
     description: 'Indicates what kind of tags are going to be handled',
     initialValue: competencesProps.isGeneral,
-  },
-  {
-    name: 'learningplan',
-    type: 'boolean',
-    required: false,
-    default: 'false',
-    description:
-      'Indicates if the tags are going to be attached to a learningplan or an user',
-    initialValue: competencesProps.learningplan,
   },
   {
     name: 'title',

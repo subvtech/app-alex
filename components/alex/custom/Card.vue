@@ -36,6 +36,7 @@
         <alex-custom-button
           class="btn"
           variant="secondary"
+          :disabled="controlsLoading"
           @click="emit('click:cancel')"
         >
           {{ $t('components.card.cancel') }}</alex-custom-button
@@ -44,6 +45,7 @@
           class="btn"
           :disabled="disableSave"
           variant="primary"
+          :loading="controlsLoading"
           @click="emit('click:save')"
         >
           {{ $t('components.card.save') }}</alex-custom-button
@@ -53,6 +55,7 @@
           class="small"
           icon="mdi-close"
           variant="secondary"
+          :disabled="controlsLoading"
           @click="emit('click:cancel')"
         />
         <alex-custom-button
@@ -60,6 +63,7 @@
           icon="mdi-check"
           variant="primary"
           :disabled="disableSave"
+          :loading="controlsLoading"
           @click="emit('click:save')"
         />
       </div>
@@ -98,6 +102,7 @@ export interface CardComponentType {
   noHeader?: boolean;
   outline?: boolean;
   showFooterDivider?: boolean;
+  controlsLoading?: boolean;
   sizingClass?: string;
   tooltipExtraClass?: string;
   alignContent?: 'align-center' | 'align-start' | 'align-end';
@@ -123,7 +128,7 @@ withDefaults(defineProps<CardComponentType>(), {
   outline: false,
   showTooltip: false,
   showFooterDivider: false,
-
+  controlsLoading: false,
   href: undefined,
   tooltipExtraClass: undefined,
   sizingClass: undefined,
