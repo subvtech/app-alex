@@ -4,17 +4,17 @@
       :arrow-back="true"
       title="Trilha de aprendizagem "
       :items="[
-        { title: 'Home', disabled: false, href: '/' },
-        { title: 'Meus Cursos', disabled: false, href: '/courses/me' },
+        { title: 'Home', disabled: false, to: '/' },
+        { title: 'Meus Cursos', disabled: false, to: '/courses/me' },
         {
           title: props.courseTitle,
           disabled: false,
-          href: `/courses/${props.courseId}`,
+          to: `/courses/${props.courseId}`,
         },
         {
           title: props.trailsTitle,
           disabled: false,
-          href: `/courses/${props.courseId}/trails/${props.trailId}`,
+          to: `/courses/${props.courseId}/trails/${props.trailId}`,
         },
       ]"
     />

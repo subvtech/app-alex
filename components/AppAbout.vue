@@ -37,6 +37,7 @@
           v-model="value"
           density="comfortable"
           name="description"
+          autofocus
           :label="$t('pages.courses.about.placeholder')"
           :placeholder="$t('pages.courses.about.placeholder')"
           theme="light"

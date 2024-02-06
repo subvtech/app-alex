@@ -16,11 +16,11 @@
         sizingClass ?? (isNested ? '' : 'px-6'),
       ]"
     >
-      <div class="foretitle d-flex text-gray-600 py-6">
+      <div class="foretitle d-flex py-6">
         <span>{{ title }}</span>
-        <a v-if="href" :href="href" class="mr-5" role="goback">
+        <nuxt-link v-if="href" :href="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
-        </a>
+        </nuxt-link>
         <alex-custom-tooltip
           v-if="showTooltip"
           show-icon

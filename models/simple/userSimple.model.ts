@@ -10,14 +10,13 @@ export interface UserSimple {
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;
-  phone: string;
-  info: string;
   blocked: boolean;
   confirmed: boolean;
   isProfessor: boolean;
   tags: any[];
   socials: any[];
-  avatar: Upload;
+  avatar: Upload | null;
   cover: Upload;
   role: UserRoles;
+  phone: string | null;
 }

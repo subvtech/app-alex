@@ -6,13 +6,27 @@
     :show-icon="false"
   >
     <template #content>
-      <v-row v-if="loading" justify="center">
-        <v-progress-circular
-          indeterminate
-          color="accent"
-          size="100"
-          width="6"
-        />
+      <v-row v-if="loading" class="w-100 gap-4">
+        <div
+          class="d-flex w-full align-center justify-space-between flex-wrap gap-6 w-100 px-1"
+        >
+          <alex-custom-skeleton
+            color="gray-100"
+            class="width-76 height-12 absolute"
+            rounded="rounded"
+          />
+          <alex-custom-skeleton
+            color="gray-100"
+            class="width-40 height-11 absolute"
+            rounded="rounded"
+          />
+        </div>
+        <div class="d-flex align-start flex-wrap gap-6 w-100 px-1">
+          <alex-learningplan-skeleton-class-member-card
+            v-for="(_item, index) in Array.from(Array(3).keys())"
+            :key="index"
+          />
+        </div>
       </v-row>
       <v-container v-else fluid class="pa-1 ga-2">
         <v-row justify="space-between" align="center" dense class="mb-6">

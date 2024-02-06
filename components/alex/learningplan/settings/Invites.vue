@@ -100,17 +100,16 @@
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 const { update } = useStrapi();
-
-import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-
-const emit = defineEmits(['update'])
+const emit = defineEmits<{
+  (e: 'update', value: string): void;
+}>();
 const props = defineProps({
   learningPlanId: {
     type: Number,
     required: true,
   },
   invitationLink: {
-    type: Object as PropType<InvitationLinkType | null>,
+    type: Object as PropType<InvitationLinkSimple | null>,
     default: null,
   },
   inviteEnabled: {
@@ -164,15 +163,15 @@ const onSave = async () => {
   await update('learningplans', props.learningPlanId, {
     invite_enabled: myInviteEnabled.value,
     message: myMessage.value,
-    invitation_duration: selectedTime.value
+    invitation_duration: selectedTime.value,
   });
-  emit('update', t('components.courses.settings.invite.update'))
+  emit('update', t('components.courses.settings.invite.update'));
 };
 
 const onCancel = () => {
   myInviteEnabled.value = props.inviteEnabled;
-  myMessage.value = props.message
-}
+  myMessage.value = props.message;
+};
 
 watch(invitationLink, () => {
   myInvitationLink.value = invitationLink.value;

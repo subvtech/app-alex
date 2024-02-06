@@ -369,12 +369,12 @@ const showingData = (groupedItems) => {
 const breadcrumbs = [
   {
     title: t('pages.classes.breadcrumbs.home'),
-    href: '/',
+    to: '/',
     disabled: false,
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/courses/me',
+    to: '/courses/me',
     disabled: false,
   },
 ];

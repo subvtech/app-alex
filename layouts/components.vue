@@ -73,15 +73,18 @@ const menus = computed(() => {
   const capitaliseString = (str: string) =>
     str.charAt(0).toUpperCase() + str.slice(1);
   // Map each group to the desired output format
-  const output = Object.entries(groups)
-    .map(([title, items]) => ({
-      title: capitaliseString(title),
-      items: (items as any[]).map((item) => ({
-        icon: 'mdi-view-dashboard-outline',
-        title: capitaliseString(item.namespaces[item.namespaces.length - 1] === 'index' ? item.namespaces[item.namespaces.length - 2] : item.namespaces[item.namespaces.length - 1]),
-        to: `/components/${item.namespaces.join('/').toLowerCase()}`,
-      })),
-    }))
+  const output = Object.entries(groups).map(([title, items]) => ({
+    title: capitaliseString(title),
+    items: (items as any[]).map((item) => ({
+      icon: 'mdi-view-dashboard-outline',
+      title: capitaliseString(
+        item.namespaces[item.namespaces.length - 1] === 'index'
+          ? item.namespaces[item.namespaces.length - 2]
+          : item.namespaces[item.namespaces.length - 1],
+      ),
+      to: `/components/${item.namespaces.join('/').toLowerCase()}`,
+    })),
+  }));
 
   return output;
 });

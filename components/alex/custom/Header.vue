@@ -76,7 +76,7 @@ defineProps({
   },
   items: {
     type: Array as PropType<
-      { title: string; disabled: boolean; href: string }[]
+      { title: string; disabled?: boolean; to?: string }[]
     >,
     default: () => [],
   },

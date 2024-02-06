@@ -54,6 +54,13 @@ export const useStrapiUtils = () => {
       data: formattedResult,
     };
   }
+  async function create<T>(
+    contentType: string,
+    data: Partial<T>,
+  ): Promise<{ meta: any; data: T }> {
+    const result = await strapi.create<T>(contentType, data);
+    return { meta: result.meta, data: formatResult<T>(result.data) };
+  }
 
-  return { findOne, find, formatResult };
+  return { findOne, find, formatResult, create };
 };

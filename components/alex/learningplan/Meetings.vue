@@ -20,8 +20,9 @@
         }}</span>
       </div>
       <course-meeting
+        v-for="(item, index) in myData"
         v-else
-        v-for="item in myData"
+        :key="index"
         :date="new Date(item.date)"
         :start-hour="item.startHour"
         :end-hour="item.endHour"
@@ -132,7 +133,7 @@ const addMeeting = async (values: MeetingPropsType) => {
     values.date,
     values.interval,
   );
- 
+
   const result = await create('learning-plan-meeting-schedules', {
     ...values,
     name: 'name',
