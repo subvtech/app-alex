@@ -5,7 +5,7 @@ import { readdirSync, writeFileSync, statSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-let vueFiles = [];
+const vueFiles = [];
 
 function listVueFiles(directoryPath) {
   const files = readdirSync(directoryPath);
