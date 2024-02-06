@@ -2,7 +2,6 @@ import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
 import { ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';
-import visibilityVue from '~/components/alex/learningplan/trails/settings/visibility.vue';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
