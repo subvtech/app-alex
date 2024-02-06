@@ -5,7 +5,13 @@
       v-model:phone="user.phone"
       v-model:fullname="user.fullname"
       @update="
-        (data) => emit('update', data, $t('components.profile.settings.update'))
+        (data) =>
+          emit(
+            'update',
+            { ...data },
+            [],
+            $t('components.profile.settings.update'),
+          )
       "
     />
     <div class="d-flex flex-column gap-6">

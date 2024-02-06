@@ -92,12 +92,13 @@ const phoneMask = {
 const computedFullname = ref(props.fullname);
 const computedTelephone = ref(props.phone);
 
-const { handleSubmit, errors, values, setErrors } = useForm({
+const { handleSubmit, errors, values, setErrors, setValues } = useForm({
   validationSchema: profileSchema,
   keepValuesOnUnmount: true,
 });
 
 const onCancel = () => {
+  setValues({ phone: props.phone, fullname: props.fullname });
   computedTelephone.value = props.phone;
   computedFullname.value = props.fullname;
 };
