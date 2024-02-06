@@ -1,13 +1,13 @@
 <template>
   <v-snackbar
     v-if="currentShow"
-    class="snackbar"
     v-model="currentShow"
-    @update:model-value="updateModelValue"
+    class="snackbar"
     :color="currentColor"
     :timeout="timeSpan"
     location="bottom right"
     data-testid="snackbar"
+    @update:model-value="updateModelValue"
   >
     <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8 relative">
       <v-row justify="start" align="center">
@@ -16,7 +16,7 @@
         }}</v-icon>
         <span class="text-white font-weight-bold">{{ currentMessage }}</span>
       </v-row>
-      <v-icon class="close" size="x-small" @click="onClose" role="close-btn"
+      <v-icon class="close" size="x-small" role="close-btn" @click="onClose"
         >mdi-close</v-icon
       >
     </v-row>
@@ -31,6 +31,14 @@
 </template>
 
 <script setup lang="ts">
+export interface AppSnackbarComponentType {
+  data?: {
+    show: boolean;
+    color: string;
+    message: string;
+  };
+  countdown?: boolean;
+}
 const messageStore = useMessageStore();
 
 const { show, message, color } = storeToRefs(messageStore);
@@ -38,14 +46,13 @@ const { show, message, color } = storeToRefs(messageStore);
 const { timeoutId, stopTimeout, timeSpan, startTimer, setStartTimer } =
   useTimeout(5000);
 
-const props = defineProps({
-  data: {
-    type: Object as PropType<{ show: boolean; color: string; message: string }>,
-  },
-  countdown: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<AppSnackbarComponentType>(), {
+  data: () => ({
+    show: false,
+    color: 'green',
+    message: 'done',
+  }),
+  countdown: false,
 });
 
 const { data } = toRefs(props);
@@ -64,8 +71,10 @@ const iconName = computed(() => {
       break;
     case 'blue':
       name = 'mdi-information';
+      break;
     case 'gray':
       name = 'mdi-view-dashboard';
+      break;
   }
   if (props.countdown) name += '-outline';
   return name;
