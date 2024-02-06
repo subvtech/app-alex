@@ -31,14 +31,6 @@
 </template>
 
 <script setup lang="ts">
-export interface AppSnackbarComponentType {
-  data?: {
-    show: boolean;
-    color: string;
-    message: string;
-  };
-  countdown?: boolean;
-}
 const messageStore = useMessageStore();
 
 const { show, message, color } = storeToRefs(messageStore);
@@ -46,13 +38,14 @@ const { show, message, color } = storeToRefs(messageStore);
 const { timeoutId, stopTimeout, timeSpan, startTimer, setStartTimer } =
   useTimeout(5000);
 
-const props = withDefaults(defineProps<AppSnackbarComponentType>(), {
-  data: () => ({
-    show: false,
-    color: 'green',
-    message: 'done',
-  }),
-  countdown: false,
+const props = defineProps({
+  data: {
+    type: Object as PropType<{ show: boolean; color: string; message: string }>,
+  },
+  countdown: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { data } = toRefs(props);
