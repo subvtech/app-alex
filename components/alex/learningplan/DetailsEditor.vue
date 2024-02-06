@@ -4,11 +4,11 @@
     sizing-class="pa-0"
     full-width
     :title="title"
-    :is-editing="isEditing && canEdit"
+    :is:editing="isEditing && canEdit"
     :show-icon="canEdit"
-    :cancel="cancel"
-    :save="updateAbout"
     @toggle:is-editing="toggleIsEditing"
+    @click:cancel="onCancel"
+    @click:save="updateAbout"
   >
     <template #content>
       <div
@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import EditorJS, { ToolConstructable } from '@editorjs/editorjs';
+import EditorJS, { type ToolConstructable } from '@editorjs/editorjs';
 import Marker from '@editorjs/marker';
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
@@ -75,7 +75,8 @@ const props = withDefaults(defineProps<DetailsEditorProps>(), {
 const { info, canEdit } = toRefs(props);
 
 const isEditing = ref(false);
-const cancel = async () => {
+const onCancel = async () => {
+  toggleIsEditing();
   await instance.value.render({ blocks: info.value });
 };
 const emit = defineEmits(['ready', 'update']);

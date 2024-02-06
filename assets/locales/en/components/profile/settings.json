@@ -8,5 +8,6 @@
   "save": "Save",
   "phonePlaceholder": "Type in your number",
   "cpf": "CPF",
-  "update": "Personal Information updated"
+  "update": "Personal Information updated",
+  "phoneDuplicated": "Phone number already taken."
 }

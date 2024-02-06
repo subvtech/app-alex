@@ -7,7 +7,12 @@
         role="listItem"
         :class="over == index && dragging && dragFrom != item ? 'over' : ''"
         @dragover="(e) => onDragOver(index, e)"
-        @dragend="() => finishDrag(item, index, list)"
+        @dragend="
+          () => {
+            finishDrag(item, index, list);
+            emit('dragged:item', index);
+          }
+        "
         @dragenter="(e) => e.preventDefault()"
       >
         <v-expansion-panel-title class="expand-panel">
@@ -22,7 +27,7 @@
             "
           >
             <v-icon
-              style="min-width: 16px !important; height: 16px; width: 16px"
+              class="drag-icon-size"
               src="@assets/svg/DragIndicator.svg"
               icon="alex:DragIndicator"
               color="gray-300"
@@ -34,12 +39,11 @@
           >
             {{ index + 1 }}.
           </p>
-          <v-icon
-            v-if="item.icon"
-            class="mr-2 icon-border"
-            color="gray-500"
-            :icon="item.icon"
-          />
+          <div v-if="item.icon" class="mr-2 icon-border">
+            <img v-if="item.icon.includes('.')" :src="item.icon" />
+            <v-icon v-else color="gray-500" :icon="item.icon" />
+          </div>
+
           <span
             class="text-body-3 text-gray-600 text-overflow"
             data-testid="text"
@@ -51,7 +55,7 @@
               ' ' + item.title
             }}</span>
           </span>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn
             class="mx-4 delete-btn"
             variant="text"
@@ -59,11 +63,7 @@
             color="transparent"
             @click="deleteItem(index)"
           >
-            <v-icon
-              size="24px"
-              icon="mdi-trash-can-outline"
-              color="tag-red-light"
-            />
+            <v-icon size="24px" :icon="icon" :color="iconColor" />
           </v-btn>
         </v-expansion-panel-title>
         <v-expansion-panel-text class="bg-white rounded">
@@ -84,24 +84,34 @@
 import { ref } from 'vue';
 import { useDragDrop } from '@/composables/useDragDrop';
 
+export interface AccordionItemType {
+  title?: string;
+  keyWord?: string;
+  icon?: string;
+  contentData?: { [key: string]: any };
+  id?: number;
+  position?: boolean;
+}
+
+const emit = defineEmits(['deleted:item', 'dragged:item']);
+
 const id = ref(0);
 const { data } = defineProps({
   data: {
-    type: Array as PropType<
-      {
-        title?: string;
-        keyWord?: string;
-        icon?: string;
-        contentData?: object;
-        id?: number;
-        position?: boolean;
-      }[]
-    >,
+    type: Array as PropType<AccordionItemType[]>,
     default: () => [],
   },
   showPositions: {
     type: Boolean,
     default: false,
+  },
+  icon: {
+    type: String,
+    default: 'mdi-trash-can-outline',
+  },
+  iconColor: {
+    type: String,
+    default: 'tag-red-light',
   },
 });
 
@@ -122,6 +132,7 @@ onBeforeMount(() => {
 });
 
 const deleteItem = (pos) => {
+  emit('deleted:item', list.value[pos]);
   list.value.splice(pos, 1);
 };
 
@@ -159,6 +170,12 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 .list-leave-to {
   opacity: 0;
   transform: translateX(-40px);
+}
+
+.drag-icon-size {
+  min-width: 16px !important;
+  height: 16px;
+  width: 16px;
 }
 
 .drag-icon {

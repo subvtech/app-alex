@@ -34,7 +34,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { watch } from 'vue';
+import { TabType } from '@/components/alex/custom/Tabs.vue';
 const router = useRouter();
 const props = defineProps({
   trailsTitle: {

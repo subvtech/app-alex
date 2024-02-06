@@ -1,4 +1,5 @@
 import { Tag } from './tag.model';
+import { InstitutionsType } from './institution.model';
 
 export enum UserRoles {
   PROFESSOR = 'professor',
@@ -10,14 +11,19 @@ export interface User {
   email: string;
   fullname: string;
   password: string;
-  institute: string;
+  institutions: InstitutionsType[];
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;
+  info: string;
+  phone: string;
   blocked: boolean;
   confirmed: boolean;
   isProfessor: boolean;
+  socials: any[];
   tags: Tag[];
   avatar: any;
+  cover: any;
   role: UserRoles;
+  user_wallet?: Wallet;
 }

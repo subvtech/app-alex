@@ -1,34 +1,37 @@
 <template>
   <alex-custom-card
-    class="mb-6"
     :title="title"
-    :isEditing="isEditingAndCanEdit"
-    :showIcon="canEdit"
-    @toggle:isEditing="toggleIsEditing"
-    :cancel="onCancel"
-    :save="() => emit('update', isOptional ? myText : value)"
+    :is-editing="isEditingAndCanEdit"
+    :show-icon="canEdit"
+    :align-content="displayEmptyPlaceholder ? 'align-center' : 'align-start'"
     :disable-save="errorMessage !== undefined"
-    full-width
+    @toggle:is-editing="toggleIsEditing"
+    @click:cancel="onCancel"
+    @click:save="onSave"
   >
-    <template v-slot:content class="pa-6">
-      <div class="d-flex flex-column w-100">
+    <template #content>
+      <div class="d-flex flex-column flex-wrap w-100">
         <alex-custom-empty-placeholder
-          v-if="isTextEmpty && !isOptional && !isEditing"
+          v-if="displayEmptyPlaceholder"
           :empty-text-image="emptyTextImage ?? undefined"
           :empty-text-message="
             emptyTextMessage ?? $t('pages.courses.about.empty')
           "
         />
-        <span
+        <alex-inputs-text-area
           v-else-if="usingMyText"
-          class="about-description"
-          :contenteditable="isEditingAndCanEdit"
-          :data-placeholder="
+          class="w-100"
+          :model-value="myText"
+          variant="solo"
+          name="info"
+          flat
+          :readonly="!isEditingAndCanEdit"
+          :placeholder="
             textPlaceholder ?? $t('pages.courses.about.placeholder')
           "
+          type="text-area"
           @input="updateText"
-          >{{ myText }}</span
-        >
+        />
         <alex-inputs-text-area
           v-else
           v-model="value"
@@ -48,49 +51,33 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-const { t } = useI18n();
+
+export interface AboutComponentType {
+  title?: string;
+
+  text: string;
+
+  userId: number;
+  canEdit?: boolean;
+  emptyTextMessage?: string;
+  textPlaceholder?: string;
+  emptyTextImage?: string;
+
+  fullWidth?: boolean;
+  images?: any[];
+  showMedia?: boolean;
+  isOptional?: boolean;
+}
 
 const emit = defineEmits(['update']);
 
-const props = defineProps({
-  title: {
-    type: String,
-    default: '',
-  },
-  text: {
-    type: String,
-    required: true,
-  },
-
-  userId: {
-    type: Number,
-    required: true,
-  },
-  canEdit: { type: Boolean, required: true },
-
-  emptyTextMessage: {
-    type: String,
-  },
-  textPlaceholder: { type: String },
-  emptyTextImage: {
-    type: String,
-  },
-  fullWidth: {
-    type: Boolean,
-    default: false,
-  },
-  images: {
-    type: Array as PropType<any[]>,
-    default: [],
-  },
-  showMedia: {
-    type: Boolean,
-    default: false,
-  },
-  isOptional: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<AboutComponentType>(), {
+  canEdit: false,
+  title: '',
+  images: () => [],
+  emptyTextMessage: undefined,
+  textPlaceholder: undefined,
+  emptyTextImage: undefined,
 });
 
 const { canEdit, text } = toRefs(props);
@@ -114,15 +101,25 @@ const usingMyText = computed(
   () => props.isOptional || notOptionalAndNotEditing.value,
 );
 
-const updateText = (event: Event) => {
-  const target = event.target as HTMLSpanElement;
-  myText.value = target.innerText;
-};
+const displayEmptyPlaceholder = computed(
+  () => isTextEmpty.value && props.isOptional && !isEditing.value,
+);
 
-const onCancel = async () => {};
+const updateText = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  myText.value = target.value;
+};
 
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
+};
+const onCancel = () => {
+  myText.value = props.text;
+  toggleIsEditing();
+};
+const onSave = () => {
+  toggleIsEditing();
+  emit('update', usingMyText ? myText.value : value);
 };
 
 const { value, errorMessage } = useField(
@@ -149,6 +146,9 @@ span[contenteditable='true']:empty::before {
   content: attr(data-placeholder);
   color: #aaa;
 }
+.about-container {
+  max-width: 100%;
+}
 
 .about-description {
   text-align: justify;
@@ -158,7 +158,10 @@ span[contenteditable='true']:empty::before {
   font-size: 16px;
   font-weight: 400;
   line-height: 22px;
+
+  word-wrap: break-word;
   overflow-wrap: break-word;
+  max-width: fit-content;
 
   &:focus {
     outline: none;

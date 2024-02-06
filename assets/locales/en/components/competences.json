@@ -16,5 +16,6 @@
     "tooltip": "General competences are essencial skills that are useful in different fields, examples: Comunication, problem solving and teamwork (Soft skills)."
   },
   "duplicatedText": "There's already a tag with this description, please pick another name.",
-  "alreadyAdded": "Tag already added"
+  "alreadyAdded": "Tag already added",
+  "notFound": "No competences found"
 }
