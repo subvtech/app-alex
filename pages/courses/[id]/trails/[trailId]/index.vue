@@ -168,22 +168,22 @@ onBeforeMount(() => {
     {
       title: t('components.trails.header.breadcrumbs.0.title'),
       disabled: false,
-      href: '/',
+      to: '/',
     },
     {
       title: t('components.trails.header.breadcrumbs.1.title'),
       disabled: false,
-      href: '/courses/me',
+      to: '/courses/me',
     },
     {
       title: learningPlanStore.learningPlan?.title || '',
       disabled: false,
-      href: `/courses/${learningPlanId.value}`,
+      to: `/courses/${learningPlanId.value}`,
     },
     {
       title: trailStore.trail?.title || '',
       disabled: false,
-      href: `/courses/${learningPlanId.value}/trails/${trailId}`,
+      to: `/courses/${learningPlanId.value}/trails/${trailId}`,
     },
   ];
 });
