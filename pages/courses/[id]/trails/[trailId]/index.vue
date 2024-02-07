@@ -82,7 +82,7 @@
                 :text="section.title"
                 location="bottom center"
                 content-class="bg-gray-800 pa-6  text-body-3 text-overflow"
-                :disabled="!isAvaliableTooltip(section.title)"
+                :disabled="!isAvailableTooltip(section.title)"
                 max-width="300"
               >
                 <template #activator="{ props: propsTooltip }">
@@ -161,7 +161,7 @@ const editorData = computed(() => {
   };
 });
 
-onBeforeMount(() => {
+onMounted(() => {
   headerStore.showHeader = true;
   headerStore.title = t('components.trails.header.breadcrumbs.title');
   headerStore.items = [
@@ -218,7 +218,7 @@ const calculateMargin = (index: number) => {
   return `pl-${(index - 1) * 4}`;
 };
 
-const isAvaliableTooltip = (title: string) => {
+const isAvailableTooltip = (title: string) => {
   if (title.length >= 29) return true;
   return false;
 };

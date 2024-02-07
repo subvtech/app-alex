@@ -374,10 +374,6 @@ const miniVariant = ref(false);
 
 html,
 body {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 
   .v-application {
     .item-name {

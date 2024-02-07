@@ -104,11 +104,6 @@ const { blocks, modelValue, clipped } = toRefs(props);
 
 html,
 body {
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
   .v-application {
     font-family: Sen !important;
 
