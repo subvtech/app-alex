@@ -4,6 +4,7 @@ import {
 } from '@nuxtjs/strapi/dist/runtime/types';
 
 export interface LearningPlanSchedule {
+  id: number;
   interval: number;
   startDate: Date;
   endDate: Date;

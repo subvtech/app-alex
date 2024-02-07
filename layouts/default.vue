@@ -7,7 +7,6 @@
       :clipped="clipped"
       dark
       :permanent="isPermanent"
-      :class="{ 'active-step': menus[0].dataTour !== '' && activeTour }"
       data-tour="step-user-area"
     >
       <template #header>
@@ -58,7 +57,6 @@
 
 <script setup lang="ts">
 import useNavigationDrawer from '~/composables/useNavigationDrawer';
-import { useOnBoarding } from '@/composables/useOnBoarding';
 import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 const i18n = useI18n();
 const config = useRuntimeConfig();
@@ -84,118 +82,118 @@ onBeforeMount(() => {
   userStore.fullname = user.value?.fullname;
 });
 
-const steps = [
-  {
-    id: 'step1',
-    title: i18n.t('layouts.default.step1.title'),
-    text: i18n.t('layouts.default.step1.text'),
-    attachTo: {
-      element: '[data-tour="step-user-area"]',
-      on: 'right',
-    },
-    buttons: [
-      {
-        text: i18n.t('layouts.default.step1.nextButton'),
-        action: 'next',
-      },
-    ],
-  },
-  {
-    id: 'step2',
-    title: i18n.t('layouts.default.step2.title'),
-    text: i18n.t('layouts.default.step2.text'),
-    attachTo: {
-      element: '[data-tour="step-user-area"]',
-      on: 'right',
-    },
-    buttons: [
-      {
-        text: i18n.t('layouts.default.step2.backButton'),
-        action: 'back',
-      },
-      {
-        text: i18n.t('layouts.default.step2.nextButton'),
-        action: 'next',
-      },
-    ],
-  },
-  {
-    id: 'step3',
-    title: i18n.t('layouts.default.step3.title'),
-    text: i18n.t('layouts.default.step3.text'),
-    attachTo: {
-      element: '[data-tour="step-navigation"]',
-      on: 'right',
-    },
-    buttons: [
-      {
-        text: i18n.t('layouts.default.step3.backButton'),
-        action: 'back',
-      },
-      {
-        text: i18n.t('layouts.default.step3.nextButton'),
-        action: 'next',
-      },
-    ],
-  },
-  {
-    id: 'step4',
-    title: i18n.t('layouts.default.step4.title'),
-    text: i18n.t('layouts.default.step4.text'),
-    attachTo: {
-      element: '[data-tour="step-professor"]',
-      on: 'bottom',
-    },
-    buttons: [
-      {
-        text: i18n.t('layouts.default.step4.backButton'),
-        action: 'back',
-      },
-      {
-        text: i18n.t('layouts.default.step4.nextButton'),
-        action: 'next',
-      },
-    ],
-  },
-  {
-    id: 'step5',
-    title: i18n.t('layouts.default.step5.title'),
-    text: i18n.t('layouts.default.step5.text'),
-    attachTo: {
-      element: '[data-tour="step-profile"]',
-      on: 'bottom',
-    },
-    buttons: [
-      {
-        text: i18n.t('layouts.default.step5.backButton'),
-        action: 'back',
-      },
-      {
-        text: i18n.t('layouts.default.step5.nextButton'),
-        action: 'next',
-      },
-    ],
-  },
-  {
-    id: 'step6',
-    title: i18n.t('layouts.default.step6.title'),
-    text: i18n.t('layouts.default.step6.text'),
-    attachTo: {
-      element: '',
-      on: 'center',
-    },
-    buttons: [
-      {
-        text: i18n.t('layouts.default.step6.backButton'),
-        action: 'back',
-      },
-      {
-        text: i18n.t('layouts.default.step6.completeButton'),
-        action: 'complete',
-      },
-    ],
-  },
-];
+// const steps = [
+//   {
+//     id: 'step1',
+//     title: i18n.t('layouts.default.step1.title'),
+//     text: i18n.t('layouts.default.step1.text'),
+//     attachTo: {
+//       element: '[data-tour="step-user-area"]',
+//       on: 'right',
+//     },
+//     buttons: [
+//       {
+//         text: i18n.t('layouts.default.step1.nextButton'),
+//         action: 'next',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'step2',
+//     title: i18n.t('layouts.default.step2.title'),
+//     text: i18n.t('layouts.default.step2.text'),
+//     attachTo: {
+//       element: '[data-tour="step-user-area"]',
+//       on: 'right',
+//     },
+//     buttons: [
+//       {
+//         text: i18n.t('layouts.default.step2.backButton'),
+//         action: 'back',
+//       },
+//       {
+//         text: i18n.t('layouts.default.step2.nextButton'),
+//         action: 'next',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'step3',
+//     title: i18n.t('layouts.default.step3.title'),
+//     text: i18n.t('layouts.default.step3.text'),
+//     attachTo: {
+//       element: '[data-tour="step-navigation"]',
+//       on: 'right',
+//     },
+//     buttons: [
+//       {
+//         text: i18n.t('layouts.default.step3.backButton'),
+//         action: 'back',
+//       },
+//       {
+//         text: i18n.t('layouts.default.step3.nextButton'),
+//         action: 'next',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'step4',
+//     title: i18n.t('layouts.default.step4.title'),
+//     text: i18n.t('layouts.default.step4.text'),
+//     attachTo: {
+//       element: '[data-tour="step-professor"]',
+//       on: 'bottom',
+//     },
+//     buttons: [
+//       {
+//         text: i18n.t('layouts.default.step4.backButton'),
+//         action: 'back',
+//       },
+//       {
+//         text: i18n.t('layouts.default.step4.nextButton'),
+//         action: 'next',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'step5',
+//     title: i18n.t('layouts.default.step5.title'),
+//     text: i18n.t('layouts.default.step5.text'),
+//     attachTo: {
+//       element: '[data-tour="step-profile"]',
+//       on: 'bottom',
+//     },
+//     buttons: [
+//       {
+//         text: i18n.t('layouts.default.step5.backButton'),
+//         action: 'back',
+//       },
+//       {
+//         text: i18n.t('layouts.default.step5.nextButton'),
+//         action: 'next',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'step6',
+//     title: i18n.t('layouts.default.step6.title'),
+//     text: i18n.t('layouts.default.step6.text'),
+//     attachTo: {
+//       element: '',
+//       on: 'center',
+//     },
+//     buttons: [
+//       {
+//         text: i18n.t('layouts.default.step6.backButton'),
+//         action: 'back',
+//       },
+//       {
+//         text: i18n.t('layouts.default.step6.completeButton'),
+//         action: 'complete',
+//       },
+//     ],
+//   },
+// ];
 
 // const { tour, activeTour } = useOnBoarding(steps);
 
@@ -291,7 +289,7 @@ const menus = computed(() => {
     : defaultMenus;
 });
 
-const miniVariant = ref(false);
+// const miniVariant = ref(false);
 </script>
 
 <style lang="scss">
