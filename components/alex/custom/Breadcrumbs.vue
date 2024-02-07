@@ -12,7 +12,7 @@
     <div class="d-flex align-center">
       <nuxt-link
         v-if="arrowBack && items.length > 1"
-        :to="items[items.length - 2].href"
+        :to="items[items.length - 2].to"
         class="mr-5 arrow-back"
         aria-label="Go Back"
       >
@@ -20,7 +20,6 @@
           >mdi-chevron-left</v-icon
         >
       </nuxt-link>
-
       <span
         class="title text-h4 text-sm-h3"
         :style="titleStyle ?? ''"
@@ -42,26 +41,23 @@
       :items="items"
       :divider="divider"
     >
-      <template v-slot:title="{ item }">
+      <template #title="{ item }">
         <v-breadcrumbs-item
-          :href="item.href"
-          class="text-decoration-none"
+          class="text-body-3 text-gray-700"
           :disabled="item.disabled"
           :style="[itemStyle ?? '']"
+          :to="item.to"
           :role="item.disabled ? 'breadcrumb-item-disabled' : 'breadcrumb-item'"
         >
           {{ item.title }}
         </v-breadcrumbs-item>
       </template>
-      <template v-slot:divider="{ index }">
+      <template #divider>
         <div class="mx-1">
           <slot v-if="overwriteDivider" name="divider" />
-          <span
-            v-else
-            :class="index !== 0 ? 'disabled' : ''"
-            :style="itemStyle ?? ''"
-            >{{ divider }}</span
-          >
+          <span v-else class="divider" :style="itemStyle ?? ''">{{
+            divider
+          }}</span>
         </div>
       </template>
     </v-breadcrumbs>
@@ -72,7 +68,7 @@
 defineProps({
   items: {
     type: Array as PropType<
-      { title: string; disabled: boolean; href: string }[]
+      { title: string; disabled?: boolean; to?: string }[]
     >,
     default: () => [],
   },
@@ -119,7 +115,7 @@ defineProps({
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .breadcrumb-block {
   .arrow-back {
     text-decoration: none;
@@ -129,31 +125,18 @@ defineProps({
     font-weight: 700;
     width: max-content;
   }
-
+  .v-breadcrumbs-divider .divider {
+    stroke-width: 1px;
+    color: #abb2b9;
+  }
   .v-breadcrumbs-item {
-    color: #5d6872;
-
-    /* Body/P3 */
-    font-family: Sen;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 0.28px;
-
     cursor: pointer;
-    pointer-events: none;
+    text-decoration: none !important;
   }
-
-  .v-breadcrumbs-item.v-breadcrumbs-item--disabled {
+  .v-breadcrumbs-item--disabled {
     color: #abb2b9 !important;
-    opacity: unset !important;
-    /* Body/P3 */
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 0.28px;
+    opacity: 1 !important;
   }
-
   .v-breadcrumbs-divider .disabled {
     stroke-width: 1px;
     color: #abb2b9;

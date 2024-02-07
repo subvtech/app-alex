@@ -10,11 +10,11 @@
       :key="tab.value"
       :value="tab.value"
       :to="tab.to"
+      :class="!tab.notification ? 'px-4' : ''"
+      :ripple="false"
       :disabled="tab.disabled"
       class="text-body-1 tab"
       exact
-      :class="!tab.notification ? 'px-7' : ''"
-      rounded="0"
       @click="tab.notification = false"
     >
       <v-icon v-if="tab.icon">{{ tab.icon }}</v-icon>
@@ -33,13 +33,13 @@
 export type TabType = {
   label: string;
   to?: string;
-  value: string;
+  value: string | number;
   notification?: boolean;
   icon?: string;
   disabled?: boolean;
 };
 
-const { vertical } = defineProps({
+const props = defineProps({
   tabs: {
     type: Array as PropType<TabType[]>,
     default: () => [{}],
@@ -58,11 +58,15 @@ const { vertical } = defineProps({
   },
 });
 
-const direction = vertical ? 'vertical' : 'horizontal';
+const direction = computed(() => (props.vertical ? 'vertical' : 'horizontal'));
 </script>
 
 <style>
 .tab:not(.v-tab--selected):hover {
   background-color: #ebedef !important;
+}
+.v-tab__slider {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }
 </style>

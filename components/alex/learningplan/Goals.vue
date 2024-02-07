@@ -6,15 +6,15 @@
     show-tooltip
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
-    @toggle:is-editing="isEditing = !isEditing"
     :save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
     :cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
+    @toggle:is-editing="isEditing = !isEditing"
   >
-    <template #content class="d-flex w-100">
+    <template #content>
       <alex-custom-empty-placeholder
         v-if="dataCopy.length === 0"
         class="align-self-center"
@@ -23,18 +23,17 @@
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion
-          v-model:data="dataCopy"
           :key="rerender"
+          v-model="selectedPanel"
+          v-model:data="dataCopy"
           show-positions
           :overwrite-item="!isEditing"
-          v-model="selectedPanel"
-          class="max-width"
         >
           <template v-if="isEditing" #content="contentProps">
             <alex-learningplan-form-goal
+              :id="contentProps.id"
               :keyword="contentProps.verb"
               :index="contentProps.index"
-              :id="contentProps.id"
               :description="contentProps.description"
               :filtered-items="filteredVerbs"
               @update:description="onUpdateDescription"
@@ -47,10 +46,10 @@
             /> </template
         ></alex-custom-accordion>
         <alex-custom-button
-          @click="addGoal"
           class="add-button"
           prepend-icon="mdi-plus"
           variant="text"
+          @click="addGoal"
         >
           {{ $t('components.courses.goals.add') }}</alex-custom-button
         >
@@ -58,6 +57,7 @@
       <div v-else class="d-flex flex-column gap-2 w-100">
         <alex-learningplan-goal
           v-for="(item, index) in data"
+          :key="index"
           :index="index"
           :key-word="item.contentData.verb ? item.contentData.verb.text : ''"
           :title="item.contentData.description"
@@ -105,7 +105,7 @@ const props = defineProps({
 
   data: {
     type: Array as PropType<AccordionProps[]>,
-    default: [],
+    default: () => [],
   },
 });
 const emit = defineEmits(['update']);
@@ -170,14 +170,6 @@ const onUpdateDescription = (data) => {
 const onUpdateKeyword = (data) => {
   dataCopy.value[data.index].keyWord = data.value.text;
 };
-onBeforeMount(async () => {
-  filteredVerbs.value = (
-    (await find('learning-goal-verbs', { filters: { user: props.userId } }))
-      .data as unknown as any[]
-  ).map((item) => {
-    return { id: item.id, ...item.attributes };
-  });
-});
 
 const addGoal = () => {
   dataCopy.value.push({
@@ -199,7 +191,7 @@ const addGoal = () => {
 const onSuccess = (validGoal) => {
   if (validGoal.id >= 0) {
     const index = updateArray.value.findIndex(
-      (item) => item.id == validGoal.id,
+      (item) => item.id === validGoal.id,
     );
     if (index !== -1) updateArray.value[index] = validGoal;
     else {
@@ -207,7 +199,7 @@ const onSuccess = (validGoal) => {
     }
   } else {
     const index = createArray.value.findIndex(
-      (item) => item.index == validGoal.index,
+      (item) => item.index === validGoal.index,
     );
     if (index !== -1) createArray.value[index] = validGoal;
     else {
@@ -238,7 +230,7 @@ const getVerbConnectArray = async (keyWord) => {
 };
 
 const onSave = async () => {
-  const createPromises = createArray.value.map(async (item, index) => {
+  const createPromises = createArray.value.map(async (item) => {
     const connectArray = await getVerbConnectArray(item.keyWord);
 
     const result = await create('learning-goals', {
@@ -266,7 +258,7 @@ const onSave = async () => {
 
   const deletePromises = props.data
     .filter((x) => dataCopy.value.findIndex((y) => y.id === x.id) === -1)
-    .map(async (item) => {
+    .map((item) => {
       return _delete('learning-goals', item.id);
     });
 
@@ -281,7 +273,7 @@ const onSave = async () => {
           return { id: item.id, position: { start: true } };
         }
 
-        let afterId = previousId;
+        const afterId = previousId;
         previousId = item.id!;
         return { id: item.id, position: { after: afterId } };
       }),
@@ -309,9 +301,6 @@ watch(
 );
 </script>
 <style scoped lang="scss">
-.max-width {
-  max-width: 404px;
-}
 .gap-2 {
   gap: 8px;
 }
