@@ -114,7 +114,7 @@
           v-for="schedule in schedules"
           :key="schedule.id"
           :interval="schedule.interval"
-          :date="schedule.date"
+          :date="new Date(schedule.date.toString().replaceAll('-', '/'))"
           :start-hour="schedule.startHour"
           :end-hour="schedule.endHour"
           :variant="'editing'"
@@ -198,7 +198,7 @@ const disablePastDates = (date: Date) => {
   return parsedDate >= today;
 };
 
-const removeSelf = (id: string) => {
+const removeSelf = (id: number) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
 
@@ -214,7 +214,7 @@ const editMeeting = (values: MeetingPropsType) => {
 const addMeeting = (values: MeetingPropsType) => {
   schedules.value.push({
     ...values,
-    id: crypto.randomUUID(),
+    id: Math.random() * 123,
   });
 };
 
