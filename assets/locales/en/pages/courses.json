@@ -15,6 +15,7 @@
     "updated": "About section was successfully updated."
   },
   "media": {
+    "title": "About the course",
     "updated": "Available media successfully updated",
     "empty": "It seems that this course has no media."
   },

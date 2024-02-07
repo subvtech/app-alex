@@ -11,16 +11,12 @@ import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
+  const { setMessage } = useMessageStore();
+  const { generateUrl } = useInvitationLink();
   const user = useStrapiUser<User>();
   const i18n = useI18n();
-
-  const { setMessage } = useMessageStore();
-
   const learningPlan = ref<LearningPlanSimple>();
   const loading = ref(true);
-
-  const { generateUrl } = useInvitationLink();
-
   const populate = {
     cover_image: true,
     media: true,
@@ -41,7 +37,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     },
 
     tags: true,
-    schedules: true,
+    schedules: {
+      populate: ['meetings'],
+    },
     members: {
       populate: ['user.avatar', 'user.cover'],
     },
@@ -160,6 +158,24 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
+  const schedules = computed<LearningPlanScheduleSimple[]>(() => {
+    return (
+      learningPlan.value?.schedules.map((schedule) => {
+        const earliestMeeting: LearningPlanMeetingSimple[] = sortByDate(
+          schedule.meetings,
+        );
+        earliestMeeting[0].earliest = true;
+        return { ...schedule, meetings: earliestMeeting };
+      }) || []
+    );
+  });
+
+  const generalTags = computed(
+    () => learningPlan.value?.tags?.filter((tag) => tag.isGeneral),
+  );
+  const technicalTags = computed(
+    () => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral),
+  );
   return {
     learningPlan,
     loadLearningPlan,
@@ -177,5 +193,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     activeInviteLinks,
     standardTrailsCount,
     standardTrails,
+    schedules,
+    generalTags,
+    technicalTags,
   };
 });

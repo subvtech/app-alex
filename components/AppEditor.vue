@@ -331,6 +331,10 @@ defineExpose({
   padding: 0 0 1em;
 }
 
+.editorjs >>> .ce-paragraph {
+  word-wrap: break-word;
+}
+
 .editorjs >>> .ce-block {
   margin-top: 16px;
 }

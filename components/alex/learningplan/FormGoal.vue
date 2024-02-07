@@ -12,11 +12,11 @@
         :placeholder="$t('components.courses.goals.verb.placeholder')"
         :filtered-items="myVerbs"
         :update-items="updateVerbs"
-        @input="handleInput"
-        @update:model-value="updateVerbs"
         :error-messages="keywordField.errorMessage.value"
         name="keyword"
         clerable
+        @input="handleInput"
+        @update:model-value="updateVerbs"
       />
       <span class="error">{{ keywordField.errorMessage.value }}</span>
     </div>
@@ -31,14 +31,14 @@
       ]"
       :label="$t('components.courses.goals.description.title')"
       clearable
+      :error-messages="descriptionField.errorMessage.value"
+      name="description"
       @input="
         emit('update:description', {
           value: descriptionField.value.value,
           index: index,
         })
       "
-      :error-messages="descriptionField.errorMessage.value"
-      name="description"
     />
   </div>
 </template>
@@ -46,7 +46,6 @@
 <script setup lang="ts">
 import { PropType } from 'nuxt/dist/app/compat/capi';
 import { useField } from 'vee-validate';
-import AppAutocomplete from '../../AppAutocomplete.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',

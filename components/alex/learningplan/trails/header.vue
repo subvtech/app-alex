@@ -18,13 +18,6 @@
               <span class="text-body-1 text-gray-600 w-100">
                 {{ trailsDescription }}</span
               >
-              <alex-custom-chip
-                :text="$t('components.trails.header.chip')"
-                prepend-icon="mdi-check"
-                :size="'x-small'"
-                :status="'dark'"
-                >{{ $t('pages.trails.settings.chip') }}</alex-custom-chip
-              >
             </div>
           </div>
         </div>
