@@ -98,11 +98,6 @@ const value = computed({
 
 html,
 body {
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
   .v-application {
     font-family: Sen !important;
 

@@ -166,14 +166,15 @@ const showingData = (groupedItems) => {
   return message;
 };
 
-const changeItemVisibility = (index: number, id) => {
-  trails.value[index].hidden = !trails.value[index].hidden;
+const changeItemVisibility = (index: number, id: number) => {
+  const status = !trails.value[index].hidden;
   try {
+    learningPlanStore.standardTrails[index].hidden = status;
     update('trails', id, {
-      hidden: trails.value[index].hidden,
+      hidden: status,
     });
   } catch (error) {
-    trails.value[index].hidden = !trails.value[index].hidden;
+    learningPlanStore.standardTrails[index].hidden = !status;
   }
 };
 const { id } = route.params;

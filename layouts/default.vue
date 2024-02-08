@@ -372,10 +372,6 @@ const menus = computed(() => {
 
 html,
 body {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
 
   .v-application {
     .item-name {

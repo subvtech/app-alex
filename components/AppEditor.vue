@@ -294,8 +294,27 @@ const loadEditor = async (data) => {
 };
 
 const toggleReadOnly = () => {
-  instance.value.isReady.then(() => {
-    instance.value.readOnly.toggle();
+  instance.value.isReady.then(async () => {
+    await instance.value.readOnly.toggle();
+    if (!instance.value.readOnly.isEnabled) {
+      const index = instance.value.blocks.getBlocksCount();
+      await instance.value.blocks.insert(
+        'paragraph',
+        { text: ' ' },
+        {},
+        index + 1,
+        true,
+      );
+
+      setTimeout(() => {
+        instance.value.focus(true);
+        const block = instance.value.blocks.getBlockByIndex(index);
+        const element = document.querySelector(`[data-id="${block.id}"]`);
+        if (element) {
+          element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+      }, 100);
+    }
   });
 };
 
@@ -329,10 +348,6 @@ defineExpose({
 <style scoped>
 .editorjs >>> .ce-header {
   padding: 0 0 1em;
-}
-
-.editorjs >>> .ce-paragraph {
-  word-wrap: break-word;
 }
 
 .editorjs >>> .ce-block {
