@@ -214,7 +214,7 @@ const editMeeting = (values: MeetingPropsType) => {
 const addMeeting = (values: MeetingPropsType) => {
   schedules.value.push({
     ...values,
-    id: Math.random() * 123,
+    id: Number.parseInt((Math.random() * 10000000000).toString()),
   });
 };
 
