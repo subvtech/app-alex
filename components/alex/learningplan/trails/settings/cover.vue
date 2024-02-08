@@ -110,18 +110,6 @@ const removeCoverImage = () => {
   }
 };
 
-const changeItemVisibility = (index: number, id: number) => {
-  const status = !trails.value[index].hidden;
-  try {
-    learningPlanStore.standardTrails[index].hidden = status;
-    update('trails', id, {
-      hidden: status,
-    });
-  } catch (error) {
-    learningPlanStore.standardTrails[index].hidden = !status;
-  }
-};
-
 const fileInputRef = ref(null);
 const image = ref(null);
 
