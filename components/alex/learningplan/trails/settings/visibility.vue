@@ -48,14 +48,14 @@ const { trailId } = route.params;
 const trailStore = useTrailStore();
 const emit = defineEmits(['update']);
 
-const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
+const activeButton = ref(trailStore.trail?.hidden ? 'true' : 'false');
 
 const handleUpdate = () => {
   emit('update', activeButton.value);
 };
 
 const onCancel = () => {
-  activeButton.value = trailStore.trail.hidden ? 'true' : 'false';
+  activeButton.value = trailStore.trail?.hidden ? 'true' : 'false';
 };
 const firstButton = ref([
   {

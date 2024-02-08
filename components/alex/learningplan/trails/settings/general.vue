@@ -65,11 +65,9 @@ const name = ref('');
 const description = ref('');
 
 const onCancel = () => {
-  name.value = trailStore.trail.title;
-  description.value = trailStore.trail.description;
+  name.value = trailStore.trail?.title || '';
+  description.value = trailStore.trail?.description || '';
 };
-
-const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
 const handleUpdate = () => {
   emit('update', name.value, description.value);
@@ -78,14 +76,13 @@ const handleUpdate = () => {
 watch(
   () => trailStore.trail,
   (trail) => {
-    name.value = trail.title;
-    description.value = trail.description;
+    name.value = trail?.title || '';
+    description.value = trail?.description || '';
   },
   { immediate: true },
 );
 </script>
 <style scoped lang="scss">
-
 .content-area {
   display: flex;
   max-width: 850px;
