@@ -76,7 +76,7 @@ onBeforeMount(() => {
   headerStore.title = t('components.trails.header.breadcrumbs.title');
   headerStore.items = [
     {
-      title: learningPlanStore.learningPlan.title,
+      title: learningPlanStore.learningPlan?.title || '',
       disabled: false,
       to: `/courses/${id}`,
     },
@@ -86,7 +86,7 @@ onBeforeMount(() => {
       to: `/courses/${id}/trails`,
     },
     {
-      title: trailStore.trail.title,
+      title: trailStore.trail?.title || '',
       disabled: false,
       to: `/courses/${id}/trails/${trailId}`,
     },

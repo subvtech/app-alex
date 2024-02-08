@@ -182,7 +182,7 @@ headerStore.showHeader = true;
 headerStore.title = t('components.trails.header.breadcrumbs.title');
 headerStore.items = [
   {
-    title: learningPlanStore.learningPlan.title,
+    title: learningPlanStore.learningPlan?.title || '',
     disabled: false,
     to: `/courses/${learningPlanId.value}`,
   },

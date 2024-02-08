@@ -9,10 +9,10 @@
     </div>
     <div class="cover-content-body">
       <div
-        v-if="trailStore.trail.cover_image != null"
+        v-if="trailStore.trail?.cover_image != null"
         class="filePreview"
         :style="{
-          backgroundImage: 'url(' + trailStore.trail.cover_image.url + ')',
+          backgroundImage: 'url(' + trailStore.trail?.cover_image.url + ')',
         }"
       >
         <alex-custom-button
@@ -69,7 +69,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { trail } from '~/assets/queries';
+// import { trail } from '~/assets/queries';
 
 defineProps({
   namespace: {
@@ -110,17 +110,6 @@ const removeCoverImage = () => {
   }
 };
 
-const changeItemVisibility = (index: number, id: number) => {
-  const status = !trails.value[index].hidden;
-  try {
-    learningPlanStore.standardTrails[index].hidden = status;
-    update('trails', id, {
-      hidden: status,
-    });
-  } catch (error) {
-    learningPlanStore.standardTrails[index].hidden = !status;
-  }
-};
 
 const fileInputRef = ref(null);
 const image = ref(null);
