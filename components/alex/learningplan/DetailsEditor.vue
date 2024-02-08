@@ -277,10 +277,8 @@ const initialiseEditor = () => {
         },
       },
     },
-
-    onChange: () => checkBlocksLimit(instance.value),
     i18n,
-    placeholder: isEditing
+    placeholder: isEditing.value
       ? `${t('components.profile.about.placeholder')}`
       : '',
     holder: 'editorjs',
@@ -321,15 +319,6 @@ const updateAbout = async () => {
   });
   isEditing.value = false;
   emit('update', t('components.courses.editor.update'));
-};
-
-const checkBlocksLimit = async (editor) => {
-  const data = await editor.save();
-  const maxBlocks = 5; // Set your maximum number of blocks
-  if (data.blocks.length > maxBlocks) {
-    // Remove the last block if the limit is exceeded
-    editor.blocks.delete(data.blocks.length - 1);
-  }
 };
 
 const toggleIsEditing = () => {

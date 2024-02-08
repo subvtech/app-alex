@@ -88,7 +88,7 @@
     </alex-custom-card>
 
     <div
-      class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
+      class="right-block d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
     >
       <alex-custom-card
         v-if="learningPlanStore.loading"
@@ -157,7 +157,7 @@
       </alex-custom-card>
       <alex-learningplan-skeleton-competence v-if="learningPlanStore.loading" />
       <alex-learningplan-competences
-        v-if="
+        v-else-if="
           ((learningPlanStore.generalTags?.length === 0 &&
             learningPlanStore.userIsFacilitator) ||
             (learningPlanStore.generalTags?.length !== 0 &&
@@ -177,7 +177,7 @@
       />
       <alex-learningplan-skeleton-competence v-if="learningPlanStore.loading" />
       <alex-learningplan-competences
-        v-if="
+        v-else-if="
           ((learningPlanStore.technicalTags?.length === 0 &&
             learningPlanStore.userIsFacilitator) ||
             (learningPlanStore.technicalTags?.length !== 0 &&
@@ -311,8 +311,13 @@ watch(
 
 @media screen and (max-width: 1130px) {
   .course-page {
-    flex-wrap: wrap;
+    flex-wrap: wrap-reverse;
   }
+
+  .right-block {
+    flex-direction: column !important;
+  }
+
   .min-w-card {
     min-width: 300px;
   }

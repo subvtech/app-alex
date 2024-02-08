@@ -16,10 +16,18 @@
         sizingClass ?? (isNested ? '' : 'px-6'),
       ]"
     >
-      <div class="foretitle d-flex py-6">
-        <span>{{ title }}</span>
-        <nuxt-link v-if="href" :href="href" class="mr-5" role="goback">
-          <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
+      <div class="foretitle text-gray-800 d-flex py-6">
+        <span v-if="!href">{{ title }}</span>
+        <nuxt-link
+          v-else
+          :href="href"
+          class="text-decoration-none foretitle"
+          role="goback"
+        >
+          <span class="text-gray-800">{{ title }}</span>
+          <v-icon color="gray-600" class="pointer mr-5 pb-1"
+            >mdi-chevron-right</v-icon
+          >
         </nuxt-link>
         <alex-custom-tooltip
           v-if="showTooltip"
@@ -83,8 +91,13 @@
     >
       <slot name="content" />
     </div>
-    <v-divider v-if="showFooterDivider" class="w-100" :thickness="1" />
+    <v-divider
+      v-if="showFooterDivider && !noFooter"
+      class="w-100"
+      :thickness="1"
+    />
     <div
+      v-if="!noFooter"
       class="d-flex flex-column w-100"
       :class="[sizingClass ?? (noHeader ? 'px-6' : 'px-6 pb-6'), alignContent]"
     >
@@ -100,6 +113,7 @@ export interface CardComponentType {
   isEditing?: boolean;
   hideDividers?: boolean;
   noHeader?: boolean;
+  noFooter?: boolean;
   outline?: boolean;
   showFooterDivider?: boolean;
   controlsLoading?: boolean;
@@ -119,6 +133,7 @@ withDefaults(defineProps<CardComponentType>(), {
   alignContent: 'align-start',
   showIcon: true,
   hideDividers: false,
+  noFooter: false,
   fullWidth: false,
   isNested: false,
   disableSave: false,

@@ -1,8 +1,8 @@
 <template>
   <alex-custom-card
-    class="max-w-250"
     :title="$t('components.profile.wallets.title')"
     :show-icon="false"
+    no-footer
   >
     <template #content>
       <div class="item d-flex w-100 justify-space-between">
@@ -70,9 +70,6 @@ const handleClick = () => {
 </script>
 
 <style scoped lang="scss">
-.max-w-250 {
-  max-width: 1000px;
-}
 .item {
   border-radius: 8px;
   .label {

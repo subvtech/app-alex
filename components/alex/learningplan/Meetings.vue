@@ -3,6 +3,7 @@
     class="w-100"
     :title="$t('components.meeting.title')"
     align-content="align-center"
+    :href="`${learningPlanId}/settings`"
     :show-icon="false"
   >
     <template #content>

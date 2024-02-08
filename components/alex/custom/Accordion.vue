@@ -70,7 +70,7 @@
           <slot
             name="content"
             v-bind="{
-              ...item.contentData,
+              ...(item.contentData as any),
               index,
             }"
           ></slot>
@@ -91,38 +91,44 @@ export interface AccordionItemType {
   contentData?: { [key: string]: any };
   id?: number;
   position?: boolean;
+  errorKeyWord?: boolean;
+  errorTitle?: boolean;
 }
 
-const emit = defineEmits(['deleted:item', 'dragged:item']);
+export interface AccordionComponentType {
+  data?: AccordionItemType[];
+  showPositions?: boolean;
+  icon?: string;
+  iconColor?: string;
+}
 
-const id = ref(0);
-const { data } = defineProps({
-  data: {
-    type: Array as PropType<AccordionItemType[]>,
-    default: () => [],
-  },
-  showPositions: {
-    type: Boolean,
-    default: false,
-  },
-  icon: {
-    type: String,
-    default: 'mdi-trash-can-outline',
-  },
-  iconColor: {
-    type: String,
-    default: 'tag-red-light',
-  },
+const props = withDefaults(defineProps<AccordionComponentType>(), {
+  data: () => [],
+  showPositions: false,
+  icon: 'mdi-trash-can-outline',
+  iconColor: 'tag-red-light',
 });
 
-const list = ref();
-list.value = data;
+const emit = defineEmits(['deleted:item', 'dragged:item', 'update:data']);
+const { data } = toRefs(props);
+const id = ref(0);
+
+const list = ref(props.data);
+
 watch(data, () => {
   list.value.map((item) => {
     if (!item.id) item.id = id.value += 1;
     return item;
   });
 });
+
+watch(
+  list,
+  () => {
+    emit('update:data', list.value);
+  },
+  { deep: true },
+);
 
 onBeforeMount(() => {
   list.value.map((item) => {

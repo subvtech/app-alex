@@ -4,6 +4,7 @@
     is-nested
     hide-dividers
     show-tooltip
+    no-footer
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"

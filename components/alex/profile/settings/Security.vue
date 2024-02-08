@@ -4,6 +4,7 @@
     :title="$t('components.profile.security.title')"
     :show-icon="false"
     full-width
+    no-footer
   >
     <template #content>
       <div class="d-flex flex-wrap w-100 gap-6">

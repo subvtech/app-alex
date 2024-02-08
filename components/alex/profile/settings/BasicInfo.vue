@@ -1,10 +1,11 @@
 <template>
   <alex-custom-card
-    class="basic-info"
+    class="max-h-96"
     :title="$t('components.profile.settings.title')"
     :show-icon="false"
     align-content="align-center"
     full-width
+    no-footer
   >
     <template #content>
       <div class="d-flex w-100 max-w-200">
@@ -29,9 +30,8 @@
               :model-value="cpf"
               :placeholder="$t('pages.register.cpfHolder')"
               label="CPF"
-              variant="solo"
-              flat
               readonly
+              disabled
               name="cpf"
               class="w-100"
             />
@@ -49,7 +49,7 @@
               size="large"
               type="submit"
               :loading="isLoading"
-              :disabled="theresError"
+              :disabled="disableSave"
               @click="onSave"
             >
               {{ $t('components.profile.settings.save') }}
@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { Mask } from 'maska';
 import { useForm } from 'vee-validate';
 export interface BasicInfoComponentType {
   cpf: string;
@@ -90,6 +91,8 @@ const phoneMask = {
   eager: true,
 };
 
+const mask = new Mask(phoneMask);
+
 const computedFullname = ref(props.fullname);
 const computedTelephone = ref(props.phone);
 
@@ -98,11 +101,19 @@ const { handleSubmit, errors, values, setErrors, setValues } = useForm({
   keepValuesOnUnmount: true,
 });
 
+const disableSave = computed(
+  () =>
+    (props.fullname === values.fullname &&
+      props.phone === mask.unmasked(values.phone ?? '')) ||
+    theresError.value,
+);
+
 const onCancel = () => {
   setValues({ phone: props.phone, fullname: props.fullname });
   computedTelephone.value = props.phone;
   computedFullname.value = props.fullname;
 };
+
 const isLoading = ref(false);
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
@@ -127,6 +138,10 @@ watch([fullname, phone], () => {
 });
 </script>
 <style scoped lang="scss">
+.max-h-96 {
+  max-height: 384px;
+}
+
 .max-w-200 {
   max-width: 800px;
 }

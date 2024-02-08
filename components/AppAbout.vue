@@ -4,7 +4,8 @@
     :is-editing="isEditingAndCanEdit"
     :show-icon="canEdit"
     :align-content="displayEmptyPlaceholder ? 'align-center' : 'align-start'"
-    :disable-save="errorMessage !== undefined"
+    :disable-save="disableSave"
+    no-footer
     @toggle:is-editing="toggleIsEditing"
     @click:cancel="onCancel"
     @click:save="onSave"
@@ -31,6 +32,8 @@
           name="info"
           :hide-details="isOptional"
           flat
+          auto-grow
+          density="comfortable"
           :readonly="!isEditingAndCanEdit"
           :placeholder="
             textPlaceholder ?? $t('pages.courses.about.placeholder')
@@ -43,6 +46,7 @@
           v-model="value"
           density="comfortable"
           name="description"
+          auto-grow
           autofocus
           :label="$t('pages.courses.about.placeholder')"
           :placeholder="$t('pages.courses.about.placeholder')"
@@ -108,6 +112,11 @@ const notOptionalAndNotEditing = computed(
 const usingMyText = computed(
   () => props.isOptional || notOptionalAndNotEditing.value,
 );
+
+const disableSave = computed(() => {
+  const comparisonValue = usingMyText.value ? myText.value : value.value;
+  return comparisonValue === props.text || errorMessage.value !== undefined;
+});
 
 const displayEmptyPlaceholder = computed(
   () => isTextEmpty.value && props.isOptional && !isEditing.value,

@@ -5,6 +5,7 @@
     :show-icon="canEdit"
     :is-editing="canEditAndIsEditing"
     full-width
+    no-footer
     @click:cancel="cancel"
     @click:save="onSave"
     @toggle:is-editing="toggleIsEditing"
@@ -24,7 +25,7 @@
               :key="componentKey"
               v-model:data="sortedSocials"
               show-positions
-              @dragged:item="isChanged = true"
+              @update:data="updateSortedArray"
               @deleted:item="updateDeleteArray"
             >
               <template #content="{ title, url, index }">
@@ -33,8 +34,8 @@
                   :url="url"
                   :index="index"
                   :social-id="sortedSocials[index]?.contentData?.id"
-                  @error="disableSave = true"
-                  @no:error="disableSave = false"
+                  @error="theresError = true"
+                  @no:error="theresError = false"
                   @update:url="updateUrl"
                   @update:name="updateItemName"
                 />
@@ -76,8 +77,8 @@ const i18n = useI18n();
 
 const isEditing = ref(false);
 const isAdding = ref(false);
-const isChanged = ref(false);
-const disableSave = ref(false);
+
+const theresError = ref(false);
 const componentKey = ref(0);
 export interface SocialsEmits {
   (e: 'update'): void;
@@ -98,6 +99,7 @@ const props = withDefaults(defineProps<SocialsComponentType>(), {
 const { userId, socials, canEdit } = toRefs(props);
 
 const { create, delete: _delete } = useStrapi();
+const { arraysAreEqual } = useArrays();
 
 const supported = ['youtube', 'linkedin', 'instagram'];
 
@@ -114,6 +116,24 @@ onMounted(() => {
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
+
+const disableSave = computed(() => {
+  return (
+    arraysAreEqual(
+      props.socials.map(({ id, name, url }) => ({
+        title: name.toUpperCase(),
+        icon: supported.includes(name.toLocaleLowerCase())
+          ? `/svg/${name}.svg`
+          : '/svg/website.svg',
+        contentData: {
+          url,
+          id,
+        },
+      })),
+      toRaw(sortedSocials.value),
+    ) || theresError.value
+  );
+});
 
 const addSocial = ({ name, url, selectedSocial }) => {
   const selectedSocialLowerCase = selectedSocial.toLowerCase();
@@ -134,7 +154,6 @@ const addSocial = ({ name, url, selectedSocial }) => {
   sortedSocials.value.push(addedSocial);
 
   isAdding.value = false;
-  isChanged.value = true;
   componentKey.value += 1;
 };
 const deleteArray = ref<number[]>([]);
@@ -142,14 +161,12 @@ const updateArray = ref<{ socialId?: number; url: string; name: string }[]>([]);
 
 const updateDeleteArray = ({ contentData }: AccordionItemType) => {
   if (contentData) {
-    sortedSocials.value = sortedSocials.value
-      .filter((item) => {
-        return item.contentData?.id !== contentData.id;
-      })
-      .map((item, index) => ({ ...item, id: index + 1 }));
     deleteArray.value.push(contentData.id);
   }
-  isChanged.value = true;
+};
+
+const updateSortedArray = (list: AccordionItemType[]) => {
+  sortedSocials.value = list.map((item) => ({ ...item, id: undefined }));
 };
 
 const updateItemName = ({
@@ -216,7 +233,6 @@ const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
   if (updateSocials) fillSortedSocialsArray();
-  isChanged.value = false;
 };
 
 const updatedMissingSocials = computed(() => {
@@ -256,7 +272,7 @@ const onSave = async () => {
     };
   }[] = [];
 
-  if (sortedSocials.value.length !== 0 && isChanged.value) {
+  if (sortedSocials.value.length !== 0) {
     sortedSocials.value.forEach((item, index) => {
       const position =
         index === 0

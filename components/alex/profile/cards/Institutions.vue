@@ -5,6 +5,8 @@
     :show-icon="canEdit"
     align-content="align-center"
     full-width
+    no-footer
+    :disable-save="disableSave"
     @click:cancel="onCancel"
     @click:save="onSave"
     @toggle:is-editing="toggleEditing"
@@ -88,6 +90,8 @@ const search = ref('');
 const isEditing = ref(false);
 const componentKey = ref(0);
 
+const { arraysAreEqual } = useArrays();
+
 const findInstitution = (selectedId) => {
   return sortedInstitutions.value.find((item) => item.id === selectedId);
 };
@@ -145,6 +149,10 @@ const updateDeleteArray = (id: number) => {
   deleteArray.value.push(id);
   institutionsIds.value = institutionsIds.value.filter((item) => item !== id);
 };
+
+const disableSave = computed(() =>
+  arraysAreEqual([...sortedInstitutions.value], [...props.institutions]),
+);
 
 const onSave = async () => {
   const connectArray: {

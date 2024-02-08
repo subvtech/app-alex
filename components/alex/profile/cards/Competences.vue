@@ -6,12 +6,14 @@
     full-width
     :show-icon="canEdit"
     show-tooltip
+    no-footer
     :tooltip="
       isGeneral
         ? $t('components.competences.general.tooltip')
         : $t('components.competences.technical.tooltip')
     "
     :controls-loading="isLoading"
+    :disable-save="disableSave"
     @click:save="onSave"
     @click:cancel="onCancel"
     @toggle:is-editing="toggleIsEditing"
@@ -26,6 +28,7 @@
             :items="filteredTags"
             :update-items="updateTags"
             return-object
+            hide-details
             hide-no-data
             @update:model-value="addExistingTag"
             @input="handleInput"
@@ -94,6 +97,9 @@ const props = withDefaults(defineProps<CompetencesComponentType>(), {
 });
 
 const { canEdit } = toRefs(props);
+
+const { arraysAreEqualIgnoreOrder } = useArrays();
+
 const isEditing = ref(false);
 const isLoading = ref(false);
 
@@ -102,6 +108,14 @@ const filteredTags = ref<Tag[]>([]);
 
 const updatedSelectedTags = ref<Tag[]>([...props.selectedTags]);
 const rerender = ref(0);
+
+const disableSave = computed(() =>
+  arraysAreEqualIgnoreOrder(
+    [...updatedSelectedTags.value],
+    [...props.selectedTags],
+    'text',
+  ),
+);
 
 const handleInput = (input: any) => {
   if (input.data) search.value = input.target.value;

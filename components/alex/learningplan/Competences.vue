@@ -6,6 +6,7 @@
     :show-icon="canEdit"
     align-content="align-start"
     show-tooltip
+    no-footer
     :tooltip="
       isGeneral
         ? $t('components.competences.general.tooltip')

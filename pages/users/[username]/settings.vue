@@ -19,6 +19,7 @@
       <alex-profile-settings-wallet
         :wallet="user.user_wallet"
         :is-loading="loading"
+        full-width
         @update:wallet="linkWallet(id)"
         @remove:wallet="(walletId) => unlinkWallet(walletId)"
       />
