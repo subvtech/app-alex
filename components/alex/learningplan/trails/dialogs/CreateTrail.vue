@@ -4,6 +4,7 @@
     :title="$t('pages.trails.newTrailText')"
     no-footer
     body-classes="bg-white px-6 pt-3 rounded-b-lg"
+    @update:model-value="(event) => $emit('update:modelValue', event)"
   >
     <div
       class="bg-gray-blue d-flex flex-column justify-center align-center ga-2 image-container rounded"
@@ -121,8 +122,9 @@ const image = ref(null);
 const dialog = ref(false);
 
 const { setMessage } = useMessageStore();
+const { t } = useI18n();
 
-const emit = defineEmits(['courseCreated']);
+const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
 const props = defineProps({
   learningStructure: {
@@ -162,7 +164,6 @@ const { handleSubmit } = useForm({
     image: null,
   },
 });
-
 const createTrail = handleSubmit(async (values) => {
   isLoading.value = true;
   const { title, description } = values;
@@ -183,15 +184,11 @@ const createTrail = handleSubmit(async (values) => {
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
-    await create('trails', data);
-    setMessage('Trilha Criada com sucesso!', 'success', true);
-    emit('courseCreated');
+    const trailData = await create('trails', data);
+    setMessage(t('pages.trails.success'), 'success', true);
+    emit('courseCreated', trailData.data.id);
   } catch (error) {
-    setMessage(
-      'Ocorreu um erro ao criar a trilha, tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('pages.trails.error'), 'error', true);
   } finally {
     fileInputRef.value = null;
     image.value = null;
