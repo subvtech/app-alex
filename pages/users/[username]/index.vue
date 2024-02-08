@@ -13,7 +13,9 @@
         :can-edit="canEdit"
         :socials="user.socials"
         :user-id="user.id"
-        @update="async () => await updateSocials()"
+        @update="
+          setMessage($t('components.profile.socials.update'), 'green', true)
+        "
       />
     </div>
     <div class="d-flex flex-column flex-grow-2 gap-6">
@@ -50,7 +52,11 @@
           :can-edit="canEdit"
           :selected-tags="technicalTags"
           @update="
-            updateCompetences($t('components.competences.technical.updated'))
+            setMessage(
+              $t('components.competences.technical.updated'),
+              'green',
+              true,
+            )
           "
         />
         <alex-learningplan-skeleton-competence v-if="loading" />
@@ -65,7 +71,11 @@
           :selected-tags="generalTags"
           is-general
           @update="
-            updateCompetences($t('components.competences.general.updated'))
+            setMessage(
+              $t('components.competences.general.updated'),
+              'green',
+              true,
+            )
           "
         />
       </div>
@@ -77,13 +87,20 @@
         :user-id="user.id"
         :can-edit="canEdit"
         :loading="loading"
-        @update="async () => await updateInstitutions()"
+        @update="
+          setMessage(
+            $t('components.profile.institutional.update'),
+            'green',
+            true,
+          )
+        "
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const { setMessage } = useMessageStore();
 const props = defineProps({
   user: {
     type: Object as PropType<User>,

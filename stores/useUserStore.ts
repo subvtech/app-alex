@@ -56,7 +56,6 @@ export const useUserStore = defineStore('user', () => {
       if (e?.error?.name === 'NotFoundError') {
         setMessage(i18n.t('pages.login.notfound'), 'red', true);
       } else setMessage(e, 'red', true);
-      loading.value = false;
     }
   }
 
