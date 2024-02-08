@@ -57,11 +57,16 @@ const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const headerStore = usePageHeaderStore();
 const selectedOption = ref<number | null>(null);
+const delay = (value: number) =>
+  new Promise((resolve) => setTimeout(resolve, value));
 const fetchData = async () => {
+  await delay(7000);
   await useAsyncData('learningPlanDetails', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
+  headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/');
   }
@@ -89,11 +94,13 @@ const fetchData = async () => {
 };
 const pageRoute = computed(() => route.name);
 onBeforeMount(async () => {
+  headerStore.isLoading = true;
   await fetchData();
 });
 onUnmounted(() => {
   learningPlanStore.learningPlan = undefined;
   learningPlanStore.loading = true;
+  headerStore.isLoading = false;
 });
 watch(pageRoute, async () => {
   if (pageRoute.value?.toString().includes('courses-id')) {
