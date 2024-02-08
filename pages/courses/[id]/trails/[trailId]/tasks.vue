@@ -8,7 +8,6 @@
   >
 </template>
 <script setup lang="ts">
-
 const headerStore = usePageHeaderStore();
 const { t } = useI18n();
 const { id, trailId } = useRoute().params;
@@ -19,14 +18,14 @@ onBeforeMount(() => {
   headerStore.title = t('components.trails.header.breadcrumbs.title');
   headerStore.items = [
     {
-      title: t('components.trails.header.breadcrumbs.1.title'),
-      disabled: false,
-      to: '/courses/me',
-    },
-    {
       title: learningPlanStore.learningPlan.title,
       disabled: false,
       to: `/courses/${id}`,
+    },
+    {
+      title: t('pages.courses.trails'),
+      disabled: false,
+      to: `/courses/${id}/trails`,
     },
     {
       title: trailStore.trail.title,
@@ -40,7 +39,6 @@ onBeforeMount(() => {
     },
   ];
 });
-
 </script>
 <style scoped lang="scss">
 .empty-state {
