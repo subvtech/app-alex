@@ -1,5 +1,21 @@
 <template>
-  <div>
+  <div
+    v-if="trailStore.loading"
+    class="d-flex flex-column gap-1 my-6 bg-white rounded"
+  >
+    <div class="d-flex gap-4 w-100 px-6 pt-6">
+      <alex-custom-skeleton
+        color="gray-300"
+        class="width-50 height-37"
+        rounded="md"
+      />
+      <alex-custom-skeleton color="gray-300" class="w-100 height-37" />
+    </div>
+    <div class="flex-row px-6 py-2">
+      <alex-custom-skeleton color="gray-300" class="w-100 height-12" />
+    </div>
+  </div>
+  <div v-else>
     <div class="bg-white rounded my-6">
       <div
         class="d-flex px-6 py-6 justify-start align-start align-self-stretch flex-wrap"
@@ -60,6 +76,8 @@ const tab = {
   firstTitle: t('components.trails.header.firstTab'),
   secondTitle: t('components.trails.header.secondTab'),
 };
+
+const trailStore = useTrailStore();
 
 const tabs = [
   { label: tab.firstTitle, value: '0' },

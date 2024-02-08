@@ -1,5 +1,18 @@
 <template>
+  <div
+    v-if="trailStore.loading || learningPlanStore.loading"
+    class="d-flex flex-column my-6 bg-white rounded"
+  >
+    <div class="d-flex w-100">
+      <alex-custom-skeleton
+        color="gray-300"
+        class="width-100 height-45"
+        rounded="md"
+      />
+    </div>
+  </div>
   <v-card
+    v-else
     data-testid="trails-card"
     :min-width="width.min"
     :max-width="width.max"
@@ -248,6 +261,9 @@ const emits = defineEmits([
   'toggleVisibility',
   'copy',
 ]);
+
+const trailStore = useTrailStore();
+const learningPlanStore = useLearningPlanStore();
 </script>
 
 <style scoped lang="scss">

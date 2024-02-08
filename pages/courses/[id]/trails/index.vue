@@ -33,14 +33,7 @@
       style="flex: 1"
       class="d-flex align-center justify-center flex-column"
     >
-      <v-progress-circular
-        v-if="learningPlanStore.loading ?? true"
-        color="accent"
-        indeterminate
-        :size="100"
-        :width="6"
-      ></v-progress-circular>
-      <div v-else class="d-flex align-center justify-center flex-column">
+      <div class="d-flex align-center justify-center flex-column">
         <img
           class="emptyProjects-img"
           src="/images/emptyTrails.svg"

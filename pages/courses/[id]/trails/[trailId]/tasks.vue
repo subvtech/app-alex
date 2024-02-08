@@ -1,6 +1,12 @@
 <template>
   <v-container fluid class="bg-white rounded">
-    <div class="empty-state">
+    <div v-if="trailStore.loading" class="pa-12">
+      <alex-custom-skeleton color="gray-300" class="w-100 height-96" />
+    </div>
+    <div
+      v-else
+      class="d-flex height-100 pa-6 align-center justify-center rounded text-gray-600"
+    >
       <span class="text-h4 text-gray-800">{{
         $t('components.trails.tasks.empty')
       }}</span>
@@ -40,16 +46,4 @@ onBeforeMount(() => {
   ];
 });
 </script>
-<style scoped lang="scss">
-.empty-state {
-  display: flex;
-  height: 250px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  align-self: stretch;
-  border-radius: 8px;
-  border: 1px solid var(--cinza-cinza-100, #ebedef);
-}
-</style>
+<style scoped lang="scss"></style>

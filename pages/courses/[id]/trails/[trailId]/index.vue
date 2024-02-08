@@ -38,13 +38,12 @@
         v-if="!showEditor && readOnly"
         class="d-flex fill-height align-center justify-center container-min-height"
       >
-        <v-progress-circular
+        <alex-custom-skeleton
           v-if="trailStore.loading || isLoading"
-          color="accent"
-          indeterminate
-          :size="100"
-          :width="6"
-        ></v-progress-circular>
+          color="gray-300"
+          type="list-item"
+          class="w-75 height-72"
+        ></alex-custom-skeleton>
         <div v-else>
           <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">

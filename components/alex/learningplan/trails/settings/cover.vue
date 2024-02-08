@@ -1,5 +1,8 @@
 <template>
-  <div class="content-area">
+  <div v-if="trailStore.loading" class="content-area">
+    <alex-custom-skeleton color="gray-300" class="w-100 height-72" />
+  </div>
+  <div v-else class="content-area">
     <div class="card-title">
       <p>
         <span class="text-h4 text-gray-800">{{
@@ -109,7 +112,6 @@ const removeCoverImage = () => {
     setMessage(t('components.trails.settings.cover.removeError'), 'red', true);
   }
 };
-
 
 const fileInputRef = ref(null);
 const image = ref(null);

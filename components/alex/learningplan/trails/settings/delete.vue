@@ -1,5 +1,8 @@
 <template>
-  <div class="content-area delete">
+  <div v-if="trailStore.loading" class="content-area">
+    <alex-custom-skeleton color="gray-300" class="w-100 height-64" />
+  </div>
+  <div v-else class="content-area delete">
     <div class="card-title">
       <p>
         <span class="text-h4 text-gray-800">{{
@@ -69,6 +72,8 @@ const imageProp = {
   width: 114,
   height: 102,
 };
+
+const trailStore = useTrailStore();
 
 const wordConfirmation = ref('');
 async function removeTrail() {
