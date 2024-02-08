@@ -69,6 +69,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { trail } from '~/assets/queries';
+
 defineProps({
   namespace: {
     type: String as PropType<'courses' | 'trails'>,
@@ -93,6 +95,7 @@ const emit = defineEmits(['update']);
 const removeCoverImage = () => {
   try {
     image.value = null;
+    trailStore.trail.cover_image = null;
     update(`trails/${trailId}`, {
       cover_image: null,
     });
@@ -104,6 +107,18 @@ const removeCoverImage = () => {
     );
   } catch (error) {
     setMessage(t('components.trails.settings.cover.removeError'), 'red', true);
+  }
+};
+
+const changeItemVisibility = (index: number, id: number) => {
+  const status = !trails.value[index].hidden;
+  try {
+    learningPlanStore.standardTrails[index].hidden = status;
+    update('trails', id, {
+      hidden: status,
+    });
+  } catch (error) {
+    learningPlanStore.standardTrails[index].hidden = !status;
   }
 };
 
