@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-export const useMetamask = (loading) => {
+export const useMetamask = () => {
   const { create, find, delete: _delete } = useStrapi();
   const { setToken, setUser } = useStrapiAuth();
 
@@ -17,6 +17,8 @@ export const useMetamask = (loading) => {
   }>();
   const { setMessage } = useMessageStore();
   const userStore = useUserStore();
+
+  const loading = ref(false);
 
   const linkWallet = async (userId?) => {
     try {
@@ -107,5 +109,5 @@ export const useMetamask = (loading) => {
     }
   };
 
-  return { metalogin, linkWallet, unlinkWallet };
+  return { metalogin, linkWallet, unlinkWallet, loading };
 };

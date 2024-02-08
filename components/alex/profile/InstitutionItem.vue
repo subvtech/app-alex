@@ -41,7 +41,7 @@ export interface InstitutionComponentType {
   canEdit: boolean;
   isDeleted: boolean;
   backgroundColor?: string;
-  institutionId: number;
+  id: number;
 }
 
 const props = withDefaults(defineProps<InstitutionComponentType>(), {
@@ -55,7 +55,7 @@ const { isDeleted } = toRefs(props);
 
 const removeInstitution = () => {
   isDeleted.value = true;
-  emit('delete:institution', props.institutionId);
+  emit('delete:institution', props.id);
 };
 </script>
 

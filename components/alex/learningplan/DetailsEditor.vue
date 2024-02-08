@@ -4,7 +4,7 @@
     sizing-class="pa-0"
     full-width
     :title="title"
-    :is:editing="isEditing && canEdit"
+    :is-editing="isEditing && canEdit"
     :show-icon="canEdit"
     @toggle:is-editing="toggleIsEditing"
     @click:cancel="onCancel"
@@ -342,8 +342,8 @@ watch(isEmptyAndIsNotEditing, () => {
   if (isEmptyAndIsNotEditing && theresInstance) instance.value.destroy();
   else initialiseEditor();
 });
-watch(isEditing, () => {
-  instance.value.focus();
+watch(isEditing, async () => {
+  await instance.value.focus();
 });
 </script>
 

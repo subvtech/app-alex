@@ -48,6 +48,7 @@
               variant="primary"
               size="large"
               type="submit"
+              :loading="isLoading"
               :disabled="theresError"
               @click="onSave"
             >
@@ -102,10 +103,11 @@ const onCancel = () => {
   computedTelephone.value = props.phone;
   computedFullname.value = props.fullname;
 };
-
+const isLoading = ref(false);
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
 const onSave = handleSubmit(async () => {
+  isLoading.value = true;
   const userPhone = values.phone.replace(/[^0-9]/g, '');
   const isPhoneTaken = await find('users', { filters: { phone: userPhone } });
   if (isPhoneTaken.data.length !== 0 && userPhone !== props.phone) {
@@ -116,6 +118,7 @@ const onSave = handleSubmit(async () => {
     fullname: values.fullname,
     phone: userPhone,
   });
+  isLoading.value = false;
 });
 
 watch([fullname, phone], () => {

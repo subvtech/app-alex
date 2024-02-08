@@ -10,7 +10,12 @@
     @click:save="onSave"
   >
     <template #content>
-      <div class="d-flex flex-column flex-wrap w-100">
+      <alex-custom-skeleton
+        v-if="loading"
+        class="w-100 height-30"
+        color="gray-200"
+      />
+      <div v-else class="d-flex flex-column flex-wrap w-100">
         <alex-custom-empty-placeholder
           v-if="displayEmptyPlaceholder"
           :empty-text-image="emptyTextImage ?? undefined"
@@ -24,6 +29,7 @@
           :model-value="myText"
           variant="solo"
           name="info"
+          :hide-details="isOptional"
           flat
           :readonly="!isEditingAndCanEdit"
           :placeholder="
@@ -41,6 +47,7 @@
           :label="$t('pages.courses.about.placeholder')"
           :placeholder="$t('pages.courses.about.placeholder')"
           theme="light"
+          :hide-details="isOptional"
           :error-messages="errorMessage"
           required
         />
@@ -59,11 +66,11 @@ export interface AboutComponentType {
 
   userId: number;
   canEdit?: boolean;
+  loading?: boolean;
   emptyTextMessage?: string;
   textPlaceholder?: string;
   emptyTextImage?: string;
 
-  fullWidth?: boolean;
   images?: any[];
   showMedia?: boolean;
   isOptional?: boolean;
@@ -73,6 +80,7 @@ const emit = defineEmits(['update']);
 
 const props = withDefaults(defineProps<AboutComponentType>(), {
   canEdit: false,
+  loading: false,
   title: '',
   images: () => [],
   emptyTextMessage: undefined,
@@ -115,11 +123,14 @@ const toggleIsEditing = () => {
 };
 const onCancel = () => {
   myText.value = props.text;
+  value.value = props.text;
   toggleIsEditing();
 };
 const onSave = () => {
+  if (usingMyText.value) value.value = myText.value;
+  else myText.value = value.value;
+  emit('update', myText.value);
   toggleIsEditing();
-  emit('update', usingMyText ? myText.value : value);
 };
 
 const { value, errorMessage } = useField(

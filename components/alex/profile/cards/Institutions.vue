@@ -35,12 +35,12 @@
         >
           <template #item="{ element, index }">
             <alex-profile-institution-item
+              :id="element.id"
               :can-edit="canEditAndIsEditing"
               :index="index"
               :acronym="element.acronym"
               :sector="element.sector"
               :url="element.cover?.url ?? element.url"
-              :institution-id="element.id"
               :name="element.name"
               :is-deleted="deleteArray.includes(element.id)"
               @delete:institution="updateDeleteArray"
@@ -61,9 +61,10 @@
 
 <script setup lang="ts">
 import draggable from 'vuedraggable';
+import { InstitutionComponentType } from '../InstitutionItem.vue';
 
 export interface InstitutionsComponentType {
-  institutions: InstitutionsType[];
+  institutions: InstitutionComponentType[];
   userId: number;
   canEdit: boolean;
 }
@@ -108,7 +109,11 @@ const updateSelectedOption = (selectedId) => {
   );
   if (!selectedInstitution) return;
   if (!findInstitution(selectedId)) {
-    sortedInstitutions.value.push(selectedInstitution);
+    sortedInstitutions.value.push({
+      ...selectedInstitution,
+      canEdit: props.canEdit,
+      isDeleted: false,
+    });
 
     if (!institutionsIds.value.includes(selectedId))
       institutionsIds.value.push(selectedId);
@@ -125,7 +130,9 @@ const updateSelectedOption = (selectedId) => {
 
 const canEditAndIsEditing = computed(() => canEdit.value && isEditing.value);
 
-const sortedInstitutions = ref<InstitutionsType[]>([...props.institutions]);
+const sortedInstitutions = ref<InstitutionComponentType[]>([
+  ...props.institutions,
+]);
 const institutionsIds = ref<number[]>(
   props.institutions.map((item) => item.id),
 );

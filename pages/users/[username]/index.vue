@@ -1,11 +1,12 @@
 <template>
   <div v-if="user" class="content-block d-flex w-100 gap-6">
-    <div class="details d-flex flex-column w-100 gap-6">
+    <div class="details d-flex flex-grow-1 flex-column gap-6">
       <alex-profile-cards-overview
         :user-id="user.id"
         :socials="user.socials"
         :telephone="user.phone"
         :email="user.email"
+        :loading="loading"
       />
       <alex-profile-cards-socials
         v-if="user.socials.length !== 0 || canEdit"
@@ -15,12 +16,13 @@
         @update="async () => await updateSocials()"
       />
     </div>
-    <div class="d-flex flex-column w-100 gap-6">
+    <div class="d-flex flex-column flex-grow-2 gap-6">
       <app-about
         :title="$t('components.profile.about.title')"
         :text="user.info"
         :user-id="user.id"
         :can-edit="canEdit"
+        :loading="loading"
         is-optional
         :about-text-message="$t('components.profile.about.placeholder')"
         :empty-text-message="$t('components.profile.about.placeholder')"
@@ -69,9 +71,12 @@
       </div>
       <alex-profile-cards-institutions
         v-if="institutions.length !== 0 || canEdit"
-        :institutions="institutions"
+        :institutions="
+          institutions.map((item) => ({ ...item, canEdit, isDeleted: false }))
+        "
         :user-id="user.id"
         :can-edit="canEdit"
+        :loading="loading"
         @update="async () => await updateInstitutions()"
       />
     </div>
@@ -118,6 +123,9 @@ const technicalTags = computed(
 const institutions = computed(() => user.value.institutions ?? []);
 </script>
 <style scoped lang="scss">
+.flex-grow-2 {
+  flex-grow: 2;
+}
 #profile {
   flex-direction: column;
   font-family: 'Sen';

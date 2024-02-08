@@ -22,6 +22,7 @@
           class="small ml-2"
           size="large"
           :variant="buttonVariant"
+          :loading="isLoading"
           @click="handleClick"
         >
           <img class="hide mr-1" src="/images/metamask.png" alt="" /><span>
@@ -45,17 +46,20 @@ export interface WalletEmits {
 
 export interface WalletComponentType {
   wallet?: Wallet;
+  isLoading?: boolean;
 }
 
 const emit = defineEmits<WalletEmits>();
 
 const props = withDefaults(defineProps<WalletComponentType>(), {
   wallet: undefined,
+  isLoading: false,
 });
 
 const { wallet } = toRefs(props);
 
 const buttonVariant = computed(() => (wallet.value ? 'error' : 'secondary'));
+
 const handleClick = () => {
   if (wallet.value) {
     emit('remove:wallet', wallet.value.id);

@@ -50,7 +50,7 @@ const institutionsProps: InstitutionsComponentType = {
       backgroundColor: 'bg-white',
       canEdit: true,
       isDeleted: false,
-      institutionId: 1,
+      id: 1,
     },
   ],
 };

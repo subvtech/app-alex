@@ -34,6 +34,7 @@ const description = 'É usado para exibir informações da carteira do usuário'
 
 const walletProps: WalletComponentType = {
   wallet: { address: 'example', id: 2 },
+  isLoading: false,
 };
 
 const listProps: PropItemType[] = [
@@ -43,6 +44,13 @@ const listProps: PropItemType[] = [
     required: true,
     description:
       "The user's wallet information, containing id and address properties.",
+  },
+  {
+    name: 'isLoading',
+    type: 'boolean',
+    required: false,
+    default: 'false',
+    description: "Controls whether it's waiting for a requisition to finish.",
   },
 ];
 

@@ -5,7 +5,11 @@
     align-content="align-center"
   >
     <template #content>
-      <alex-profile-detail-boxes class="max-w-125" :boxes="overviewBoxes" />
+      <alex-profile-detail-boxes
+        class="max-w-125"
+        :boxes="overviewBoxes"
+        :loading="loading"
+      />
     </template>
 
     <template #footer>
@@ -39,6 +43,7 @@ export interface OverviewComponentType {
   learningPlans?: number;
   assignments?: number;
   projects?: number;
+  loading?: boolean;
 }
 
 const props = withDefaults(defineProps<OverviewComponentType>(), {
@@ -47,6 +52,7 @@ const props = withDefaults(defineProps<OverviewComponentType>(), {
   learningPlans: undefined,
   email: undefined,
   telephone: undefined,
+  loading: false,
 });
 
 const { email, telephone, learningPlans, projects, assignments } =

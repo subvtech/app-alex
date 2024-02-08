@@ -9,6 +9,7 @@
       :icon="item.icon"
       :label="item.label"
       :number="item.number"
+      :loading="loading"
     />
   </div>
 </template>
@@ -18,9 +19,11 @@ import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 export interface DetailsComponentType {
   boxes: BoxItemType[];
   hideDivider?: boolean;
+  loading?: boolean;
 }
 withDefaults(defineProps<DetailsComponentType>(), {
   hideDivider: false,
+  loading: false,
 });
 </script>
 <style scoped lang="scss">

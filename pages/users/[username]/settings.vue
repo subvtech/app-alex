@@ -14,10 +14,11 @@
           )
       "
     />
-    <div class="d-flex flex-column gap-6">
+    <div class="d-flex flex-column gap-6 w-100">
       <alex-profile-settings-security :id="id" :email="user.email" />
       <alex-profile-settings-wallet
         :wallet="user.user_wallet"
+        :is-loading="loading"
         @update:wallet="linkWallet(id)"
         @remove:wallet="(walletId) => unlinkWallet(walletId)"
       />
@@ -27,9 +28,8 @@
 
 <script setup lang="ts">
 const emit = defineEmits(['update']);
-const loading = ref(false);
 
-const { linkWallet, unlinkWallet } = useMetamask(loading);
+const { linkWallet, unlinkWallet, loading } = useMetamask();
 
 definePageMeta({
   middleware: 'auth',

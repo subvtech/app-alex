@@ -1,5 +1,10 @@
 <template>
-  <div class="box-info d-flex">
+  <alex-custom-skeleton
+    v-if="loading"
+    class="w-100 height-33"
+    color="gray-200"
+  />
+  <div v-else class="box-info d-flex">
     <v-icon v-if="icon.startsWith('mdi')" color="#00B8CC">{{ icon }}</v-icon>
     <img v-else :src="`/svg/${icon}`" width="24" height="24" />
     <div class="d-flex">
@@ -20,10 +25,12 @@
 export interface BoxItemType {
   label: 'courses' | 'students' | 'trails' | 'projects' | 'assignments';
   icon: string;
+  loading?: boolean;
   number?: number;
 }
 withDefaults(defineProps<BoxItemType>(), {
   number: 0,
+  loading: false,
 });
 </script>
 <style scoped lang="scss">
