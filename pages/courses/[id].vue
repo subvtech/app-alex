@@ -59,10 +59,7 @@ const isJoinRoutePath = computed(() => {
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const headerStore = usePageHeaderStore();
 const selectedOption = ref<number | null>(null);
-const delay = (value: number) =>
-  new Promise((resolve) => setTimeout(resolve, value));
 const fetchData = async () => {
-  await delay(7000);
   await useAsyncData('learningPlanDetails', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
