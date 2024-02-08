@@ -2,8 +2,8 @@
   <div class="content-area course-visibility">
     <div class="card-title">
       <p>
-        <span class="header-h4">
-          {{ t('pages.courseSettings.config.courseVisibilityTitle') }}</span
+        <span class="text-h4 text-gray-800">
+          {{ t('components.trails.settings.visibilityTitle') }}</span
         >
       </p>
     </div>
@@ -25,13 +25,15 @@
       <span class="action-content-two">
         <alex-custom-button
           class="button"
-          :text="t('components.courses.settings.general.cancel')"
+          :text="t('components.trails.settings.general.cancel')"
           variant="secondary"
+          @click="onCancel"
         />
         <alex-custom-button
           class="button"
-          :text="t('components.courses.settings.general.save')"
+          :text="t('components.trails.settings.general.save')"
           variant="primary"
+          @click="handleUpdate"
         />
       </span>
     </div>
@@ -39,34 +41,37 @@
 </template>
 <script setup lang="ts">
 const { t } = useI18n();
+const { update } = useStrapi();
+const { setMessage } = useMessageStore();
+const route = useRoute();
+const { trailId } = route.params;
+const trailStore = useTrailStore();
+const emit = defineEmits(['update']);
 
-const isTrail = ref();
+const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
+
+const handleUpdate = () => {
+  emit('update', activeButton.value);
+};
 
 const onCancel = () => {
-  console.log('cancel');
+  activeButton.value = trailStore.trail.hidden ? 'true' : 'false';
 };
-
-const onSave = () => {
-  console.log('save');
-};
-
 const firstButton = ref([
   {
-    label: t('pages.trails.settings.showtrailTitle'),
-    hint: t('pages.trails.settings.showtrailHint'),
-    value: '1',
+    label: t('components.trails.settings.showtrailTitle'),
+    hint: t('components.trails.settings.showtrailHint'),
+    value: 'false',
   },
 ]);
 
 const secondButton = ref([
   {
-    label: t('pages.trails.settings.hideTrailTitle'),
-    hint: t('pages.trails.settings.hideTrailHint'),
-    value: '2',
+    label: t('components.trails.settings.hidetrailTitle'),
+    hint: t('components.trails.settings.hidetrailHint'),
+    value: 'true',
   },
 ]);
-
-const activeButton = ref('1');
 </script>
 <style lang="scss" scoped>
 .content-area {
