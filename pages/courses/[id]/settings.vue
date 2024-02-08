@@ -6,20 +6,7 @@
     :owner="owner"
     :invitation-link="learningPlanStore.invitationLink"
     :can-edit="learningPlanStore.userIsFacilitator"
-    :schedules="
-      learningPlanStore.schedules.map((item) => {
-        return {
-          id: item.id,
-          startHour: format(new Date(item.startDate), 'HH:mm'),
-          endHour: format(new Date(item.endDate), 'HH:mm'),
-          interval: item.interval,
-          date:
-            item.meetings.length !== 0
-              ? item.meetings.find((meeting) => meeting.earliest)?.date
-              : new Date(),
-        };
-      })
-    "
+    :schedules="schedules"
   />
   <div v-else />
 </template>
@@ -32,5 +19,19 @@ definePageMeta({
 const learningPlanStore = useLearningPlanStore();
 const owner = ref<any>();
 const route = useRoute();
+const schedules = computed(() =>
+  learningPlanStore.schedules.map((item) => {
+    return {
+      id: item.id,
+      startHour: format(new Date(item.startDate), 'HH:mm'),
+      endHour: format(new Date(item.endDate), 'HH:mm'),
+      interval: item.interval,
+      date:
+        item.meetings.length !== 0
+          ? item.meetings.find((meeting) => meeting.earliest)?.date
+          : new Date(),
+    };
+  }),
+);
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 </script>
