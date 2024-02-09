@@ -328,6 +328,7 @@ const emits = defineEmits([
 .type {
   top: 16px;
   left: 16px;
+  z-index: 1;
 }
 .hidden-icon {
   bottom: 16px;

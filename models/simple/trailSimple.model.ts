@@ -1,11 +1,13 @@
 export interface TrailSimple {
   id: number;
   title: string;
-  visible: boolean;
+  hidden: boolean;
   order: number;
+  description: string;
+  cover_image: Upload;
   learning_structure: LearningPlanStructureSimple;
   partners: LearningPlanMemberSimple[];
   contribuitions: any[];
-  structures: StructureSimple;
+  structures: StructureSimple[];
   tasks: any[];
 }

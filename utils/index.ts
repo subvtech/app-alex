@@ -50,4 +50,4 @@ export const getInitials = (name: string) => {
 };
 
 export const sortByDate = <T extends { date: string | Date }>(array: T[]) =>
-  array.sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
+  array.sort((a, b) => compareDesc(new Date(b.date), new Date(a.date)));
