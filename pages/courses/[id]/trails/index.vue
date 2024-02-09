@@ -208,35 +208,41 @@ const handleCreatedTrail = async (id) => {
   });
   createTrailDialog.value = false;
 };
-
 const headerStore = usePageHeaderStore();
-
-onMounted(() => {
+onBeforeMount(() => {
   headerStore.showHeader = true;
-  headerStore.title = t('components.trails.header.breadcrumbs.1.title');
-  headerStore.items = [
-    {
-      title: t('components.trails.header.breadcrumbs.0.title'),
-      disabled: false,
-      to: '/',
-    },
-    {
-      title: t('components.trails.header.breadcrumbs.1.title'),
-      disabled: false,
-      to: '/courses/me',
-    },
-    {
-      title: learningPlanStore.learningPlan?.title || '',
-      disabled: false,
-      to: `/courses/${id}`,
-    },
-    {
-      title: t('pages.courses.trails') || '',
-      disabled: true,
-      to: `/courses/${id}/trails/`,
-    },
-  ];
 });
+
+watch(
+  () => learningPlanStore.loading,
+  () => {
+    if (!learningPlanStore.loading) {
+      headerStore.title = t('components.trails.header.breadcrumbs.1.title');
+      headerStore.items = [
+        {
+          title: t('components.trails.header.breadcrumbs.0.title'),
+          disabled: false,
+          to: '/',
+        },
+        {
+          title: t('components.trails.header.breadcrumbs.1.title'),
+          disabled: false,
+          to: '/courses/me',
+        },
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${id}`,
+        },
+        {
+          title: t('pages.courses.trails') || '',
+          disabled: true,
+          to: `/courses/${id}/trails/`,
+        },
+      ];
+    }
+  },
+);
 </script>
 
 <style scoped>
