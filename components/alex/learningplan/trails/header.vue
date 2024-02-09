@@ -86,21 +86,22 @@ const tabs = [
   { label: tab.secondTitle, value: '1' },
   { icon: 'mdi-cog-outline', label: '', value: '2' },
 ];
-const currentPath = router.currentRoute.value.fullPath;
+
 const activePage = ref(props.page);
+const defaultURL = computed(() => {
+  return `/courses/${props.courseId}/trails/${props.trailId}`;
+});
 watch(activePage, () => {
-  if (activePage.value === '0') {
-    if (currentPath.endsWith('settings')) {
-      currentPath.replace('settings', '');
-      router.push(currentPath);
-    }
-    router.push(`/courses/${props.courseId}/trails/${props.trailId}`);
-  } else if (activePage.value === '2') {
-    if (currentPath.endsWith('settings')) return;
-    router.push(`${currentPath}settings`);
-  } else if (activePage.value === '1') {
-    if (currentPath.endsWith('tasks')) return;
-    router.push(`${currentPath}tasks`);
+  switch (activePage.value) {
+    case '0':
+      router.replace(`${defaultURL.value}`);
+      break;
+    case '2':
+      router.replace(`${defaultURL.value}/settings`);
+      break;
+    case '1':
+      router.replace(`${defaultURL.value}/tasks`);
+      break;
   }
 });
 </script>

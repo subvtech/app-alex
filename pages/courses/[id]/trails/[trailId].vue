@@ -23,7 +23,6 @@ definePageMeta({
 });
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-const { t } = useI18n();
 const route = useRoute();
 const headerStore = usePageHeaderStore();
 
@@ -32,6 +31,7 @@ const learningPlanStore = useLearningPlanStore();
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(trailId.value);
+  headerStore.isLoading = false;
   if (!trailStore.trail) {
     navigateTo(`/courses/${learningPlanId.value}`);
   }
@@ -54,7 +54,13 @@ const activePage = computed(() => {
   return '0';
 });
 onBeforeMount(async () => {
+  headerStore.isLoading = true;
   await getTrailData();
+});
+onUnmounted(() => {
+  trailStore.trail = undefined;
+  trailStore.loading = true;
+  headerStore.isLoading = false;
 });
 
 const pageRoute = computed(() => route.name);
