@@ -25,7 +25,7 @@
           role="goback"
         >
           <span class="text-gray-800">{{ title }}</span>
-          <v-icon color="gray-600" class="pointer mr-5 pb-1"
+          <v-icon color="gray-600" class="pointer mr-5 pb-2px"
             >mdi-chevron-right</v-icon
           >
         </nuxt-link>
@@ -154,12 +154,16 @@ const emit = defineEmits(['toggle:isEditing', 'click:save', 'click:cancel']);
 </script>
 
 <style scoped lang="scss">
+.pb-2px {
+  padding-bottom: 2px;
+}
 #Card {
   font-family: Sen;
 
   .pointer {
     cursor: pointer;
   }
+
   &.float {
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
 
