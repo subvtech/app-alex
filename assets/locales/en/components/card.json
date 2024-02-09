@@ -1,4 +1,6 @@
 {
-    "edit": "Edit",
-    "settings": "Settings"
+  "edit": "Edit",
+  "settings": "Settings",
+  "save": "Salvar",
+  "cancel": "Cancelar"
 }
