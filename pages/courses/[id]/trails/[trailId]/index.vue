@@ -8,7 +8,7 @@
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
-          v-if="readOnly && professorMode"
+          v-if="readOnly && professorMode && !trailStore.loading"
           variant="primary"
           size="large"
           prepend-icon="mdi-pencil-outline"
@@ -38,12 +38,50 @@
         v-if="!showEditor && readOnly"
         class="d-flex fill-height align-center justify-center container-min-height"
       >
-        <alex-custom-skeleton
+        <div
           v-if="trailStore.loading || isLoading"
-          color="gray-300"
-          type="list-item"
-          class="w-75 height-72"
-        ></alex-custom-skeleton>
+          style="max-width: 700px; min-height: 500px"
+          class="w-100"
+        >
+          <alex-custom-skeleton
+            color="gray-200"
+            type="list-item"
+            class="width-50 height-3 mb-4"
+            rounded="lg"
+          ></alex-custom-skeleton>
+          <div class="w-100 d-flex flex-column bg-gray-100 pa-8 rounded-lg">
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-10"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-3 mt-10"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-3 mt-3"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-75 height-3 mt-3"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-80 mt-10"
+              rounded="lg"
+            />
+          </div>
+        </div>
         <div v-else>
           <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">
