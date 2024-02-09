@@ -47,13 +47,13 @@ const getTrailData = async () => {
 
 const activePage = computed(() => {
   if (route.name?.toString().includes('tasks')) {
-    return 1;
+    return '1';
   } else if (route.name?.toString().includes('settings')) {
-    return 2;
+    return '2';
   }
-  return 0;
+  return '0';
 });
-onMounted(async () => {
+onBeforeMount(async () => {
   await getTrailData();
   headerStore.showHeader = true;
   headerStore.title = t('components.trails.header.breadcrumbs.title');
@@ -69,12 +69,12 @@ onMounted(async () => {
       to: '/courses/me',
     },
     {
-      title: learningPlanStore.learningPlan?.title,
+      title: learningPlanStore.learningPlan?.title || '',
       disabled: false,
       to: `/courses/${learningPlanId.value}`,
     },
     {
-      title: trailStore.trail?.title,
+      title: trailStore.trail?.title || '',
       disabled: false,
       to: `/courses/${learningPlanId.value}/trails/${trailId}`,
     },

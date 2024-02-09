@@ -4,8 +4,8 @@
     class="d-flex bg-white flex-column rounded-lg pa-6 wrapper"
   >
     <div
-      class="d-flex flex-wrap w-100 mb-6"
-      :class="!trails.length ? 'justify-end' : 'justify-space-between'"
+      class="d-flex flex-wrap w-100"
+      :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
     >
       <alex-inputs-text-field
         v-show="trails.length"
@@ -20,7 +20,7 @@
         density="compact"
       />
       <alex-custom-button
-        v-if="learningPlanStore.userIsFacilitator ?? false"
+        v-if="learningPlanStore.userIsFacilitator"
         prepend-icon="mdi-plus"
         size="large"
         @click="createTrailDialog = true"
@@ -31,9 +31,27 @@
     <div
       v-if="!trails.length"
       style="flex: 1"
-      class="d-flex align-center justify-center flex-column"
+      class="d-flex"
+      :class="
+        learningPlanStore.loading
+          ? ''
+          : 'align-center justify-center flex-column'
+      "
     >
-      <div class="d-flex align-center justify-center flex-column">
+      <div v-if="learningPlanStore.loading">
+        <alex-custom-skeleton
+          color="gray-200"
+          class="width-80 height-10 mb-6"
+          rounded="lg"
+        />
+        <div class="d-flex gap-5">
+          <alex-learningplan-skeleton-trail-card
+            v-for="index in 3"
+            :key="index"
+          ></alex-learningplan-skeleton-trail-card>
+        </div>
+      </div>
+      <div v-else class="d-flex align-center justify-center flex-column">
         <img
           class="emptyProjects-img"
           src="/images/emptyTrails.svg"

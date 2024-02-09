@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="trailStore.loading"
+    v-if="trailStore.loading && showSkeleton"
     class="d-flex flex-column gap-1 my-6 bg-white rounded"
   >
     <div class="d-flex gap-4 w-100 px-6 pt-6">
@@ -59,8 +59,8 @@ const props = defineProps({
     required: true,
   },
   page: {
-    type: Number as PropType<number>,
-    default: 0,
+    type: String as PropType<string>,
+    default: '0',
   },
   courseId: {
     type: Number as PropType<number>,
@@ -79,6 +79,8 @@ const tab = {
 
 const trailStore = useTrailStore();
 
+const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
+
 const tabs = [
   { label: tab.firstTitle, value: '0' },
   { label: tab.secondTitle, value: '1' },
@@ -87,16 +89,16 @@ const tabs = [
 const currentPath = router.currentRoute.value.fullPath;
 const activePage = ref(props.page);
 watch(activePage, () => {
-  if (activePage.value == 0) {
+  if (activePage.value === '0') {
     if (currentPath.endsWith('settings')) {
       currentPath.replace('settings', '');
       router.push(currentPath);
     }
     router.push(`/courses/${props.courseId}/trails/${props.trailId}`);
-  } else if (activePage.value == 2) {
+  } else if (activePage.value === '2') {
     if (currentPath.endsWith('settings')) return;
     router.push(`${currentPath}settings`);
-  } else if (activePage.value == 1) {
+  } else if (activePage.value === '1') {
     if (currentPath.endsWith('tasks')) return;
     router.push(`${currentPath}tasks`);
   }
