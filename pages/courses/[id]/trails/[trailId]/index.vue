@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column">
-    <div class="bg-white rounded w-100">
+    <div class="bg-white rounded w-100 container-min-height">
       <div
         id="Início"
         section="0"

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-min-height bg-white">
     <alex-custom-card
       :title="$t('components.trails.settings.title')"
       :show-icon="false"
@@ -306,5 +306,10 @@ p {
   align-self: stretch;
   flex-wrap: wrap;
   margin-bottom: 8px;
+}
+
+.container-min-height {
+  min-height: 436px;
+  position: relative;
 }
 </style>
