@@ -177,25 +177,35 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
-headerStore.showHeader = true;
-headerStore.title = t('components.trails.header.breadcrumbs.title');
-headerStore.items = [
-  {
-    title: learningPlanStore.learningPlan?.title || '',
-    disabled: false,
-    to: `/courses/${learningPlanId.value}`,
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+});
+
+watch(
+  () => [learningPlanStore.loading, trailStore.loading],
+  () => {
+    if (!learningPlanStore.loading && !trailStore.loading) {
+      headerStore.title = t('components.trails.header.breadcrumbs.title');
+      headerStore.items = [
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${learningPlanId.value}`,
+        },
+        {
+          title: t('pages.courses.trails'),
+          disabled: false,
+          to: `/courses/${learningPlanId.value}/trails`,
+        },
+        {
+          title: trailStore.trail?.title || '',
+          disabled: true,
+          to: `/courses/${learningPlanId.value}/trails/${trailId}`,
+        },
+      ];
+    }
   },
-  {
-    title: t('pages.courses.trails'),
-    disabled: false,
-    to: `/courses/${learningPlanId.value}/trails`,
-  },
-  {
-    title: trailStore.trail?.title || '',
-    disabled: true,
-    to: `/courses/${learningPlanId.value}/trails/${trailId}`,
-  },
-];
+);
 
 const sections = ref([
   {

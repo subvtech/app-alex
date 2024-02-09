@@ -73,30 +73,38 @@ const learningPlanStore = useLearningPlanStore();
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
-  headerStore.title = t('components.trails.header.breadcrumbs.title');
-  headerStore.items = [
-    {
-      title: learningPlanStore.learningPlan?.title || '',
-      disabled: false,
-      to: `/courses/${id}`,
-    },
-    {
-      title: t('pages.courses.trails'),
-      disabled: false,
-      to: `/courses/${id}/trails`,
-    },
-    {
-      title: trailStore.trail?.title || '',
-      disabled: false,
-      to: `/courses/${id}/trails/${trailId}`,
-    },
-    {
-      title: t('components.trails.settings.title'),
-      disabled: true,
-      to: `/courses/${id}/trails/${trailId}/settings`,
-    },
-  ];
 });
+
+watch(
+  () => [learningPlanStore.loading, trailStore.loading],
+  () => {
+    if (!learningPlanStore.loading && !trailStore.loading) {
+      headerStore.title = t('components.trails.header.breadcrumbs.title');
+      headerStore.items = [
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${id}`,
+        },
+        {
+          title: t('pages.courses.trails'),
+          disabled: false,
+          to: `/courses/${id}/trails`,
+        },
+        {
+          title: trailStore.trail?.title || '',
+          disabled: false,
+          to: `/courses/${id}/trails/${trailId}`,
+        },
+        {
+          title: t('components.trails.settings.title'),
+          disabled: true,
+          to: `/courses/${id}/trails/${trailId}/settings`,
+        },
+      ];
+    }
+  },
+);
 </script>
 <style scoped lang="scss">
 .w-201 {

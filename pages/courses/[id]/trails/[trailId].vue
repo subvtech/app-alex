@@ -55,30 +55,6 @@ const activePage = computed(() => {
 });
 onBeforeMount(async () => {
   await getTrailData();
-  headerStore.showHeader = true;
-  headerStore.title = t('components.trails.header.breadcrumbs.title');
-  headerStore.items = [
-    {
-      title: t('components.trails.header.breadcrumbs.0.title'),
-      disabled: false,
-      to: '/',
-    },
-    {
-      title: t('components.trails.header.breadcrumbs.1.title'),
-      disabled: false,
-      to: '/courses/me',
-    },
-    {
-      title: learningPlanStore.learningPlan?.title || '',
-      disabled: false,
-      to: `/courses/${learningPlanId.value}`,
-    },
-    {
-      title: trailStore.trail?.title || '',
-      disabled: false,
-      to: `/courses/${learningPlanId.value}/trails/${trailId}`,
-    },
-  ];
 });
 
 const pageRoute = computed(() => route.name);
