@@ -354,6 +354,10 @@ defineExpose({
   margin-top: 16px;
 }
 
+.editorjs >>> .ce-paragraph {
+  word-break: break-word;
+}
+
 .editorjs >>> .ce-block:first-of-type {
   margin-top: 0;
 }

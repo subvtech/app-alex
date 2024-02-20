@@ -1,5 +1,8 @@
 <template>
-  <div class="content-area">
+  <div v-if="trailStore.loading" class="content-area">
+    <alex-custom-skeleton color="gray-300" class="w-100 height-72" />
+  </div>
+  <div v-else class="content-area">
     <div class="card-title">
       <p>
         <span class="text-h4 text-gray-800">{{
@@ -9,10 +12,10 @@
     </div>
     <div class="cover-content-body">
       <div
-        v-if="trailStore.trail.cover_image != null"
+        v-if="trailStore.trail?.cover_image != null"
         class="filePreview"
         :style="{
-          backgroundImage: 'url(' + trailStore.trail.cover_image.url + ')',
+          backgroundImage: 'url(' + trailStore.trail?.cover_image.url + ')',
         }"
       >
         <alex-custom-button
@@ -69,6 +72,8 @@
   </div>
 </template>
 <script setup lang="ts">
+// import { trail } from '~/assets/queries';
+
 defineProps({
   namespace: {
     type: String as PropType<'courses' | 'trails'>,
@@ -93,6 +98,7 @@ const emit = defineEmits(['update']);
 const removeCoverImage = () => {
   try {
     image.value = null;
+    trailStore.trail.cover_image = null;
     update(`trails/${trailId}`, {
       cover_image: null,
     });

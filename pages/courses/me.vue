@@ -283,6 +283,7 @@ const queryConfig = {
         hidden: { $eq: false },
       },
     ],
+    archived_at: { $notNull: false },
   },
   populate: {
     cover_image: true,
@@ -310,6 +311,7 @@ const getCourses = async () => {
   }
   isLoading.value = true;
   const getCourses = await find<LearningPlan>('learningplans', queryConfig);
+  console.log(getCourses);
   courses.value = [];
   getCourses.data.forEach((course) => {
     const facilitator = course.members[0].user;
