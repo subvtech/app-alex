@@ -1,5 +1,21 @@
 <template>
-  <div>
+  <div
+    v-if="trailStore.loading && showSkeleton"
+    class="d-flex flex-column gap-1 my-6 bg-white rounded"
+  >
+    <div class="d-flex gap-4 w-100 px-6 pt-6">
+      <alex-custom-skeleton
+        color="gray-300"
+        class="width-50 height-37"
+        rounded="md"
+      />
+      <alex-custom-skeleton color="gray-300" class="w-100 height-37" />
+    </div>
+    <div class="flex-row px-6 py-2">
+      <alex-custom-skeleton color="gray-300" class="w-100 height-12" />
+    </div>
+  </div>
+  <div v-else>
     <div class="bg-white rounded my-6">
       <div
         class="d-flex px-6 py-6 justify-start align-start align-self-stretch flex-wrap"
@@ -43,8 +59,8 @@ const props = defineProps({
     required: true,
   },
   page: {
-    type: Number as PropType<number>,
-    default: 0,
+    type: String as PropType<string>,
+    default: '0',
   },
   courseId: {
     type: Number as PropType<number>,
@@ -61,26 +77,31 @@ const tab = {
   secondTitle: t('components.trails.header.secondTab'),
 };
 
+const trailStore = useTrailStore();
+
+const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
+
 const tabs = [
   { label: tab.firstTitle, value: '0' },
   { label: tab.secondTitle, value: '1' },
   { icon: 'mdi-cog-outline', label: '', value: '2' },
 ];
-const currentPath = router.currentRoute.value.fullPath;
+
 const activePage = ref(props.page);
+const defaultURL = computed(() => {
+  return `/courses/${props.courseId}/trails/${props.trailId}`;
+});
 watch(activePage, () => {
-  if (activePage.value == 0) {
-    if (currentPath.endsWith('settings')) {
-      currentPath.replace('settings', '');
-      router.push(currentPath);
-    }
-    router.push(`/courses/${props.courseId}/trails/${props.trailId}`);
-  } else if (activePage.value == 2) {
-    if (currentPath.endsWith('settings')) return;
-    router.push(`${currentPath}settings`);
-  } else if (activePage.value == 1) {
-    if (currentPath.endsWith('tasks')) return;
-    router.push(`${currentPath}tasks`);
+  switch (activePage.value) {
+    case '0':
+      router.replace(`${defaultURL.value}`);
+      break;
+    case '2':
+      router.replace(`${defaultURL.value}/settings`);
+      break;
+    case '1':
+      router.replace(`${defaultURL.value}/tasks`);
+      break;
   }
 });
 </script>

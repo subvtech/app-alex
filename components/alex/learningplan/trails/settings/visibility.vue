@@ -1,5 +1,8 @@
 <template>
-  <div class="content-area course-visibility">
+  <div v-if="trailStore.loading" class="content-area">
+    <alex-custom-skeleton color="gray-300" class="w-100 height-72" />
+  </div>
+  <div v-else class="content-area course-visibility">
     <div class="card-title">
       <p>
         <span class="text-h4 text-gray-800">
@@ -41,21 +44,17 @@
 </template>
 <script setup lang="ts">
 const { t } = useI18n();
-const { update } = useStrapi();
-const { setMessage } = useMessageStore();
-const route = useRoute();
-const { trailId } = route.params;
 const trailStore = useTrailStore();
 const emit = defineEmits(['update']);
 
-const activeButton = ref(trailStore.trail.hidden ? 'true' : 'false');
+const activeButton = ref(trailStore.trail?.hidden ? 'true' : 'false');
 
 const handleUpdate = () => {
   emit('update', activeButton.value);
 };
 
 const onCancel = () => {
-  activeButton.value = trailStore.trail.hidden ? 'true' : 'false';
+  activeButton.value = trailStore.trail?.hidden ? 'true' : 'false';
 };
 const firstButton = ref([
   {

@@ -23,7 +23,6 @@ definePageMeta({
 });
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-const { t } = useI18n();
 const route = useRoute();
 const headerStore = usePageHeaderStore();
 
@@ -32,6 +31,7 @@ const learningPlanStore = useLearningPlanStore();
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(trailId.value);
+  headerStore.isLoading = false;
   if (!trailStore.trail) {
     navigateTo(`/courses/${learningPlanId.value}`);
   }
@@ -47,38 +47,20 @@ const getTrailData = async () => {
 
 const activePage = computed(() => {
   if (route.name?.toString().includes('tasks')) {
-    return 1;
+    return '1';
   } else if (route.name?.toString().includes('settings')) {
-    return 2;
+    return '2';
   }
-  return 0;
+  return '0';
 });
-onMounted(async () => {
+onBeforeMount(async () => {
+  headerStore.isLoading = true;
   await getTrailData();
-  headerStore.showHeader = true;
-  headerStore.title = t('components.trails.header.breadcrumbs.title');
-  headerStore.items = [
-    {
-      title: t('components.trails.header.breadcrumbs.0.title'),
-      disabled: false,
-      to: '/',
-    },
-    {
-      title: t('components.trails.header.breadcrumbs.1.title'),
-      disabled: false,
-      to: '/courses/me',
-    },
-    {
-      title: learningPlanStore.learningPlan?.title,
-      disabled: false,
-      to: `/courses/${learningPlanId.value}`,
-    },
-    {
-      title: trailStore.trail?.title,
-      disabled: false,
-      to: `/courses/${learningPlanId.value}/trails/${trailId}`,
-    },
-  ];
+});
+onUnmounted(() => {
+  trailStore.trail = undefined;
+  trailStore.loading = true;
+  headerStore.isLoading = false;
 });
 
 const pageRoute = computed(() => route.name);

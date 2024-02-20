@@ -1,5 +1,8 @@
 <template>
-  <div class="content-area">
+  <div v-if="trailStore.loading" class="content-area">
+    <alex-custom-skeleton color="gray-300" class="w-100 height-96" />
+  </div>
+  <div v-else class="content-area">
     <div class="card-title">
       <p>
         <span class="text-h4 text-gray-800">{{
@@ -65,11 +68,9 @@ const name = ref('');
 const description = ref('');
 
 const onCancel = () => {
-  name.value = trailStore.trail.title;
-  description.value = trailStore.trail.description;
+  name.value = trailStore.trail?.title || '';
+  description.value = trailStore.trail?.description || '';
 };
-
-const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
 const handleUpdate = () => {
   emit('update', name.value, description.value);
@@ -78,14 +79,13 @@ const handleUpdate = () => {
 watch(
   () => trailStore.trail,
   (trail) => {
-    name.value = trail.title;
-    description.value = trail.description;
+    name.value = trail?.title || '';
+    description.value = trail?.description || '';
   },
   { immediate: true },
 );
 </script>
 <style scoped lang="scss">
-
 .content-area {
   display: flex;
   max-width: 850px;

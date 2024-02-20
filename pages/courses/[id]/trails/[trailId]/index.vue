@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column">
-    <div class="bg-white rounded w-100">
+    <div class="bg-white rounded w-100 container-min-height">
       <div
         id="Início"
         section="0"
@@ -8,7 +8,7 @@
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
-          v-if="readOnly && professorMode"
+          v-if="readOnly && professorMode && !trailStore.loading"
           variant="primary"
           size="large"
           prepend-icon="mdi-pencil-outline"
@@ -38,13 +38,50 @@
         v-if="!showEditor && readOnly"
         class="d-flex fill-height align-center justify-center container-min-height"
       >
-        <v-progress-circular
+        <div
           v-if="trailStore.loading || isLoading"
-          color="accent"
-          indeterminate
-          :size="100"
-          :width="6"
-        ></v-progress-circular>
+          style="max-width: 700px; min-height: 500px"
+          class="w-100"
+        >
+          <alex-custom-skeleton
+            color="gray-200"
+            type="list-item"
+            class="width-50 height-3 mb-4"
+            rounded="lg"
+          ></alex-custom-skeleton>
+          <div class="w-100 d-flex flex-column bg-gray-100 pa-8 rounded-lg">
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-10"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-3 mt-10"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-3 mt-3"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-75 height-3 mt-3"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-80 mt-10"
+              rounded="lg"
+            />
+          </div>
+        </div>
         <div v-else>
           <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">
@@ -161,33 +198,6 @@ const editorData = computed(() => {
   };
 });
 
-onMounted(() => {
-  headerStore.showHeader = true;
-  headerStore.title = t('components.trails.header.breadcrumbs.title');
-  headerStore.items = [
-    {
-      title: t('components.trails.header.breadcrumbs.0.title'),
-      disabled: false,
-      to: '/',
-    },
-    {
-      title: t('components.trails.header.breadcrumbs.1.title'),
-      disabled: false,
-      to: '/courses/me',
-    },
-    {
-      title: learningPlanStore.learningPlan?.title || '',
-      disabled: false,
-      to: `/courses/${learningPlanId.value}`,
-    },
-    {
-      title: trailStore.trail?.title || '',
-      disabled: false,
-      to: `/courses/${learningPlanId.value}/trails/${trailId}`,
-    },
-  ];
-});
-
 onMounted(async () => {
   isLoading.value = true;
   while (trailStore.loading) {
@@ -204,6 +214,36 @@ onMounted(async () => {
   }
   isLoading.value = false;
 });
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+});
+
+watch(
+  () => [learningPlanStore.loading, trailStore.loading],
+  () => {
+    if (!learningPlanStore.loading && !trailStore.loading) {
+      headerStore.title = t('components.trails.header.breadcrumbs.title');
+      headerStore.items = [
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${learningPlanId.value}`,
+        },
+        {
+          title: t('pages.courses.trails'),
+          disabled: false,
+          to: `/courses/${learningPlanId.value}/trails`,
+        },
+        {
+          title: trailStore.trail?.title || '',
+          disabled: true,
+          to: `/courses/${learningPlanId.value}/trails/${trailId}`,
+        },
+      ];
+    }
+  },
+);
 
 const sections = ref([
   {
