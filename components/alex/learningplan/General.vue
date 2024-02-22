@@ -2,7 +2,7 @@
   <div class="course-page w-100 gap-6">
     <alex-custom-card
       title=""
-      class="left-block min-w-card flex-wrap w-100"
+      class="left-block min-w-card flex-wrap w-100 pb-12"
       no-header
       full-width
       :align-content="'align-center'"
@@ -123,12 +123,7 @@
           />
         </template>
         <template #footer>
-          <div
-            class="w-100 fix-margin"
-            :class="
-              !plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'
-            "
-          >
+          <div class="w-100 fix-margin pb-6">
             <alex-learningplan-meetings
               is-nested
               hide-dividers

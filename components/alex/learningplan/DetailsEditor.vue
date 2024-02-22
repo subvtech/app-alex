@@ -303,7 +303,6 @@ onMounted(() => {
 const isEmptyAndIsNotEditing = computed(
   () => info.value.length === 0 && !isEditing.value,
 );
-
 const updateAbout = async () => {
   const instanceData = await instance.value.save();
 
@@ -341,9 +340,14 @@ watch(isEmptyAndIsNotEditing, () => {
   if (isEmptyAndIsNotEditing && theresInstance) instance.value.destroy();
   else initialiseEditor();
 });
-watch(isEditing, () => {
-  instance.value.focus();
-});
+watch(
+  () => [isEditing.value, instance.value],
+  () => {
+    if (instance.value.configuration) {
+      instance.value.focus();
+    }
+  },
+);
 </script>
 
 <style global lang="scss">
@@ -360,6 +364,9 @@ watch(isEditing, () => {
   .ce-toolbar__actions.ce-toolbar__actions--opened {
     display: none;
   }
+}
+#editorjs .codex-editor__redactor {
+  padding-bottom: 0 !important;
 }
 @media (min-width: 651px) {
   #editorjs:not(.locked) {

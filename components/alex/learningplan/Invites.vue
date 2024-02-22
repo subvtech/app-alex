@@ -201,19 +201,12 @@ watch(theresTimeAndUrl, () => {
     }
   }
   &.disabled {
-    border-radius: 8px;
     border: 1px solid var(--cinza-cinza-200, #d2d6da);
-    border-radius: 8px;
     background: var(--cinza-cinza-100, #ebedef);
     span {
       overflow: hidden;
       color: var(--cinza-cinza-400, #a0a8b1);
       text-overflow: ellipsis;
-      font-family: Sen;
-      font-size: 15px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: normal;
     }
   }
 }
