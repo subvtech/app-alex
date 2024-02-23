@@ -71,6 +71,13 @@ const secondButton = ref([
     value: 'true',
   },
 ]);
+
+watch(
+  () => trailStore.trail,
+  (newValue) => {
+    activeButton.value = newValue?.hidden ? 'true' : 'false';
+  },
+);
 </script>
 <style lang="scss" scoped>
 .content-area {
