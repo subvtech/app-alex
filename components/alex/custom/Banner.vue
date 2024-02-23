@@ -111,10 +111,10 @@
       <div class="d-flex">
         <alex-custom-tabs
           v-if="showMenu"
-          v-model="bannerSelectedOption"
-          mandatory="false"
+          v-model="selectedOption"
+          :mandatory="false"
           :tabs="links"
-          @update:model-value="emit('select:option', bannerSelectedOption)"
+          @update:model-value="emit('select:option', selectedOption)"
         />
       </div>
       <alex-custom-button
@@ -138,6 +138,11 @@ const isSettingsRoute = computed(() =>
     ? 'secondary-0'
     : undefined,
 );
+watch(isSettingsRoute, () => {
+  if (isSettingsRoute) {
+    selectedOption.value = null;
+  }
+});
 type BannerProps = {
   coverPicture?: Upload | null;
   showSetting?: boolean;
@@ -235,10 +240,8 @@ const props = withDefaults(defineProps<BannerProps>(), {
   loading: false,
 });
 
-const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
-  toRefs(props);
-
-const bannerSelectedOption = toRef(props.selectedOption);
+const { coverPicture, fullname, username, canEdit, userId } = toRefs(props);
+const selectedOption = toRef(props.selectedOption);
 const onSelectSettings = (to?: string) => {
   emit('select:option', null);
   navigateTo(to);
@@ -270,10 +273,6 @@ async function removeCoverPicture() {
 watch(coverPicture!, () => {
   if (coverPicture) cover.value = coverPicture.value;
   else cover.value = undefined;
-});
-
-watch(selectedOption, () => {
-  bannerSelectedOption.value = selectedOption.value;
 });
 </script>
 
