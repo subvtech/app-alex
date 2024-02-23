@@ -30,7 +30,7 @@
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
-          <app-about
+          <alex-learningplan-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
