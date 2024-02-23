@@ -27,7 +27,7 @@
             class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue"
             elevation="0"
           >
-            <v-icon color="accent" size="100px" icon="mdi-close" />
+            <v-icon color="accent" size="100px" icon="mdi-image-area" />
           </v-container>
         </template>
       </vueper-slide>
@@ -424,7 +424,6 @@ const editSlides = async (files, deleted, added) => {
   });
   slides.value = [...files];
   await added.forEach((slide) => {
-    console.log(slide);
     const index = slides.value.findIndex(
       (s) => s.title === slide.title && s.url === slide.url,
     );
