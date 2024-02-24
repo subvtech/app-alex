@@ -43,6 +43,10 @@ const trailDescription = ref('');
 const visibilityButton = ref('');
 const headerStore = usePageHeaderStore();
 
+const getTrailData = async () => {
+  await trailStore.loadTrailData(parseInt(trailId.toString()));
+};
+
 const handleUpdateGeneral = (name, description) => {
   trailTitle.value = name;
   trailDescription.value = description;
@@ -55,6 +59,7 @@ const updateGeneral = async () => {
     description: trailDescription.value,
   });
   setMessage(t('components.trails.settings.general.update'), 'green', true);
+  getTrailData();
 };
 
 const handleUpdateVisibility = (activeButton) => {

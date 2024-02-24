@@ -47,7 +47,9 @@ const { t } = useI18n();
 const trailStore = useTrailStore();
 const emit = defineEmits(['update']);
 
-const activeButton = ref(trailStore.trail?.hidden ? 'true' : 'false');
+const activeButton = computed(() =>
+  trailStore.trail?.hidden ? 'true' : 'false',
+);
 
 const handleUpdate = () => {
   emit('update', activeButton.value);
@@ -71,6 +73,13 @@ const secondButton = ref([
     value: 'true',
   },
 ]);
+
+watch(
+  () => trailStore.trail,
+  (newValue) => {
+    activeButton.value = newValue?.hidden ? 'true' : 'false';
+  },
+);
 </script>
 <style lang="scss" scoped>
 .content-area {
