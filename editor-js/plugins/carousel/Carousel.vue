@@ -52,6 +52,7 @@
           </div>
           <video-player
             v-if="slide.type.includes('File') && slide.video"
+            ref="videoJS"
             class="w-100 fill-height video-js"
             controls
             :is-active="activeSlide == i"
@@ -61,6 +62,7 @@
             v-else-if="
               slide.type.includes('youtube') || slide.type.includes('vimeo')
             "
+            ref="videoJSWeb"
             class="w-100 fill-height video-js"
             controls
             :options="videoPlayerOptions(slide)"
@@ -210,6 +212,8 @@ const props = defineProps({
 
 const vueperslides1 = ref();
 const vueperslides2 = ref();
+const videoJS = ref();
+const videoJSWeb = ref();
 const uploading = ref(false);
 
 const captureVideoFrame = (file) => {
@@ -288,6 +292,17 @@ const onSlideClick = (slide) => {
 };
 
 const onCarouselSlide = (event) => {
+  if (slides.value[activeSlide.value].video) {
+    if (slides.value[activeSlide.value].type.includes('File')) {
+      videoJS.value.forEach((video) => {
+        video.pause();
+      });
+    } else {
+      videoJSWeb.value.forEach((video) => {
+        video.pause();
+      });
+    }
+  }
   vueperslides1.value.goToSlide(event.currentSlide.index, { emit: false });
   activeSlide.value = event.currentSlide.index;
 };

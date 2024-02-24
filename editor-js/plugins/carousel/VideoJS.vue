@@ -38,6 +38,14 @@ onMounted(() => {
   const options = JSON.parse(props.options);
   videoPlayer.value = videojs(videoPlayer.value, options);
 });
+
+const pause = () => {
+  videoPlayer.value.pause();
+};
+
+defineExpose({
+  pause,
+});
 </script>
 
 <style>
