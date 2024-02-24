@@ -72,8 +72,6 @@
   </div>
 </template>
 <script setup lang="ts">
-// import { trail } from '~/assets/queries';
-
 defineProps({
   namespace: {
     type: String as PropType<'courses' | 'trails'>,
@@ -93,6 +91,10 @@ const { t } = useI18n();
 const strapiClient = useStrapiClient();
 const { trailId } = route.params;
 const trailStore = useTrailStore();
+const getTrailData = async () => {
+  await trailStore.loadTrailData(parseInt(trailId.toString()));
+};
+
 const emit = defineEmits(['update']);
 
 const removeCoverImage = () => {
@@ -103,6 +105,7 @@ const removeCoverImage = () => {
       cover_image: null,
     });
     emit('update');
+    getTrailData();
     setMessage(
       t('components.trails.settings.cover.removeSuccess'),
       'green',
@@ -142,6 +145,7 @@ const handleSubmit = async () => {
         body: formData,
       });
     }
+    getTrailData();
     setMessage(t('components.trails.settings.cover.update'), 'green', true);
     emit('update');
   } catch (error) {
