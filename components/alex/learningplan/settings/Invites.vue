@@ -155,7 +155,7 @@ const timeOptions = ref([
     value: 86400,
   },
 ]);
-const selectedTime = ref(timeOptions.value[0].value);
+const selectedTime = ref(timeOptions.value[3].value);
 
 const plainLink = ref();
 
