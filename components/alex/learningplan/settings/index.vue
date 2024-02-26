@@ -8,19 +8,19 @@
       <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
         <alex-learningplan-settings-banner namespace="courses" />
         <alex-learningplan-settings-general
-          :title="learningPlan.title"
-          :startDate="learningPlan.start_date"
-          :endDate="learningPlan.end_date"
-          :slug="learningPlan.slug"
-          :learning-plan-id="learningPlan.id"
-          @update="(data) => emit('update', data)"
+          :title="myTitle"
+          :start-date="myStartDate"
+          :end-date="myEndDate"
+          :slug="myIdentifier"
+          :learning-plan-id="parseInt(id.toString())"
           outline
           full-width
+          @update="handleGeneralUpdate()"
         />
         <alex-learningplan-meetings
           can-edit
           is-facilitator
-          :learning-plan-id="learningPlan.id"
+          :learning-plan-id="parseInt(id.toString())"
           :data="schedules"
           :end-date="new Date(learningPlan.end_date)"
           variant="editing"
@@ -28,7 +28,7 @@
         />
 
         <alex-learningplan-settings-invites
-          :learning-plan-id="learningPlan.id"
+          :learning-plan-id="parseInt(id.toString())"
           :invite-enabled="learningPlan.invite_enabled"
           :invitation-link="invitationLink"
           :invitation-duration="learningPlan.invitation_duration"
@@ -52,6 +52,29 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
+
+const route = useRoute();
+const { id } = route.params;
+const myTitle = ref('');
+const myStartDate = ref('');
+const myEndDate = ref('');
+const myIdentifier = ref('');
+
+const learningPlanStore = useLearningPlanStore();
+const fetchData = async () => {
+  await learningPlanStore.loadLearningPlan(parseInt(id.toString()));
+};
+
+const handleGeneralUpdate = async () => {
+  await update(`learningplans/${id}`, {
+    title: myTitle.value,
+    start_date: new Date(myStartDate.value).toISOString(),
+    end_date: new Date(myEndDate.value).toISOString(),
+    slug: myIdentifier.value,
+  });
+  setMessage(t('components.courses.settings.general.update'), 'green', true);
+  fetchData();
+};
 
 const props = defineProps({
   learningPlan: {
