@@ -6,14 +6,7 @@
   >
     <template #content>
       <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
-        <alex-learningplan-settings-banner
-          :cover="coverImage"
-          :learning-plan-id="learningPlan.id"
-          @update="uploadCoverImage"
-          @delete="removeCoverImage"
-          outline
-          full-width
-        />
+        <alex-learningplan-settings-banner namespace="courses" />
         <alex-learningplan-settings-general
           :title="learningPlan.title"
           :startDate="learningPlan.start_date"
@@ -56,12 +49,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 
-import { BannerImageType } from '@/components/alex/custom/Banner.vue';
-
 const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
-const { uploadImage, removeImage } = useUploadedImage();
 
 const props = defineProps({
   learningPlan: {
@@ -78,38 +68,12 @@ const props = defineProps({
   },
 });
 
-const coverImage = ref<BannerImageType | undefined>(
-  props.learningPlan.cover_image.data
-    ? {
-        id: props.learningPlan.cover_image.data.id,
-        url: props.learningPlan.cover_image.data.attributes.url,
-      }
-    : undefined,
-);
-
 const emit = defineEmits(['update']);
 
 const updateVisibility = async (data) => {
   await update('learningplans', props.learningPlan.id, { ...data });
   setMessage(t('components.courses.settings.visibility.update'), 'green', true);
 };
-
-async function uploadCoverImage(event: any) {
-  const newImage = await uploadImage(event);
-  coverImage.value = { url: newImage[0].url, id: newImage[0].id };
-
-  await update('learningplans', props.learningPlan.id, {
-    cover_image: coverImage.value.id,
-  });
-  emit('update', t('components.courses.settings.cover.update'));
-}
-
-async function removeCoverImage() {
-  if (!coverImage.value) return;
-  await removeImage(coverImage.value.id);
-  coverImage.value = undefined;
-  emit('update', t('components.courses.settings.cover.update'));
-}
 
 async function removeCourse() {
   await update('learningplans', props.learningPlan.id, {
