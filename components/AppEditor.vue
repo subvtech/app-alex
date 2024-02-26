@@ -181,7 +181,32 @@ onMounted(() => {
       attaches: {
         class: Attaches,
         config: {
-          endpoint: `/api/upload-file?token=${token}`,
+          uploader: {
+            uploadByFile: (file) => {
+              const formData = new FormData();
+
+              formData.append('files', file, file.name);
+
+              return strapiClient<Upload>('/upload', {
+                method: 'POST',
+                body: formData,
+              })
+                .then((res) => {
+                  const data = res[0];
+                  return {
+                    success: 1,
+                    file: {
+                      url: data.url,
+                      title: data.name,
+                      extension: data.ext.slice(1),
+                    },
+                  };
+                })
+                .catch((err) => {
+                  return { success: 0, file: { error: err } };
+                });
+            },
+          },
           buttonText: 'Selecionar arquivo',
           errorMessage: 'Erro no upload do arquivo',
         },
