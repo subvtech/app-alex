@@ -53,6 +53,7 @@ const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 
+const router = useRouter();
 const route = useRoute();
 const { id } = route.params;
 const myTitle = ref('');
@@ -103,6 +104,7 @@ async function removeCourse() {
     archived_at: new Date(),
   });
   setMessage(t('components.courses.settings.delete.update'), 'green', true);
+  router.push('/courses/me');
 }
 </script>
 <style scoped lang="scss">
