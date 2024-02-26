@@ -19,9 +19,10 @@
     "courseTitle": "Course name",
     "startDate": "Start date",
     "endDate": "End date",
-    "slug": {
-      "label": "Course name or acronym",
-      "unique": "Selected Name/Acronym not available"
+    "identifier": {
+      "label": "Course identifier",
+      "unique": "Identifier not available",
+      "tooltip": "The course identifier is a name that will differentiate your course from others and allow it to be accessed through an URL."
     },
     "cancel": "Cancel",
     "save": "Save Changes",
