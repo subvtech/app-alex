@@ -34,7 +34,6 @@ import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
 
 import { CompetenceTag } from '~/components/Competences.vue';
-import { BannerImageType } from '~/components/alex/custom/Banner.vue';
 
 export type LearningPlanType = {
   id: number;
@@ -47,7 +46,7 @@ export type LearningPlanType = {
   invitation_duration: number;
   start_date: string;
   end_date: string;
-  cover_image: { data: { id: number; attributes: BannerImageType } | null };
+  cover_image: Upload;
   trails: any;
   tags: { data: { id: number; attributes: CompetenceTag }[] };
   details: any;
@@ -55,9 +54,9 @@ export type LearningPlanType = {
   media: any;
 };
 
-const { find, findOne, update } = useStrapi();
+const { find, findOne } = useStrapi();
 
-const i18n = useI18n();
+const { t } = useI18n();
 const course = ref<any>();
 const meetings = ref<any>([]);
 
@@ -73,6 +72,44 @@ const { setMessage } = useMessageStore();
 definePageMeta({
   middleware: 'auth',
 });
+
+const headerStore = usePageHeaderStore();
+const { id } = route.params;
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+});
+
+watch(
+  () => [learningPlanStore.loading],
+  () => {
+    if (!learningPlanStore.loading) {
+      headerStore.title = t('components.courses.settings.breadcrumbTitle');
+      headerStore.items = [
+        {
+          title: t('components.courses.settings.home'),
+          disabled: false,
+          to: '/',
+        },
+        {
+          title: t('components.courses.settings.myCourses'),
+          disabled: false,
+          to: '/courses/me',
+        },
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${id}`,
+        },
+        {
+          title: t('components.courses.settings.title'),
+          disabled: true,
+          to: `/courses/${id}/settings`,
+        },
+      ];
+    }
+  },
+);
 
 const getEarliestMeeting = (meetings) => {
   if (meetings.length === 0) return null;
