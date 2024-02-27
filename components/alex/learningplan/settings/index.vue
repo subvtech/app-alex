@@ -9,44 +9,43 @@
         <alex-learningplan-settings-banner
           :cover="coverImage"
           :learning-plan-id="learningPlan.id"
-          @update="uploadCoverImage"
-          @delete="removeCoverImage"
           outline
           full-width
+          @update="uploadCoverImage"
+          @delete="removeCoverImage"
         />
         <alex-learningplan-settings-general
           :title="learningPlan.title"
-          :startDate="learningPlan.start_date"
-          :endDate="learningPlan.end_date"
+          :start-date="learningPlan.start_date"
+          :end-date="learningPlan.end_date"
           :slug="learningPlan.slug"
           :learning-plan-id="learningPlan.id"
-          @update="(data) => emit('update', data)"
           outline
           full-width
+          @update="(data) => emit('update', data)"
         />
         <alex-learningplan-meetings
           can-edit
           is-facilitator
           :learning-plan-id="learningPlan.id"
           :data="schedules"
-          :end-date="new Date(learningPlan.end_date)"
+          :end-date="new Date(learningPlan.end_date.replaceAll('-', '/'))"
           variant="editing"
           outline
         />
-
         <alex-learningplan-settings-invites
           :learning-plan-id="learningPlan.id"
           :invite-enabled="learningPlan.invite_enabled"
           :invitation-link="invitationLink"
           :invitation-duration="learningPlan.invitation_duration"
           :message="learningPlan.message"
-          @update="(data) => emit('update', data)"
           outline
+          @update="(data) => emit('update', data)"
         />
         <alex-learningplan-settings-visibility
-          :isHidden="learningPlan.hidden"
-          @update="updateVisibility"
+          :is-hidden="learningPlan.hidden"
           outline
+          @update="updateVisibility"
         />
         <alex-learningplan-settings-delete outline @update="removeCourse" />
       </div>
@@ -54,10 +53,6 @@
   </alex-custom-card>
 </template>
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-
-import { BannerImageType } from '@/components/alex/custom/Banner.vue';
-
 const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
@@ -79,10 +74,10 @@ const props = defineProps({
 });
 
 const coverImage = ref<BannerImageType | undefined>(
-  props.learningPlan.cover_image.data
+  props.learningPlan.cover_image
     ? {
-        id: props.learningPlan.cover_image.data.id,
-        url: props.learningPlan.cover_image.data.attributes.url,
+        id: props.learningPlan.cover_image.id,
+        url: props.learningPlan.cover_image.url,
       }
     : undefined,
 );
