@@ -181,6 +181,138 @@
   },
   {
     "namespaces": [
+      "generated",
+      "Accordion"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "AddSocial"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "AppAbout"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "AppUserAvatar"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "BasicInfo"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Competences"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Copy"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "DetailBoxes"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Example"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Header"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Highlighter"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "InstitutionItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Institutions"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Overview"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Playground"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "PropsList"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Security"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Social"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Socials"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Tooltip"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Wallet"
+    ]
+  },
+  {
+    "namespaces": [
       "inputs",
       "autocomplete"
     ]

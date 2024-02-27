@@ -66,8 +66,16 @@
   </div>
 </template>
 <script setup lang="ts">
+/*
+  This is a description
+*/
+export interface ProfilePictureItemType {
+  url: string;
+  id: number;
+}
+
 export interface AppUserAvatarComponentType {
-  userId?: number;
+  userId?: number; // user id
   placeholder?: string;
   avatarStyle?: string;
   showBorder?: boolean;
@@ -75,10 +83,7 @@ export interface AppUserAvatarComponentType {
   trackCurrentUser?: boolean;
   canDelete?: boolean;
   size?: number;
-  profilePicture?: {
-    url: string;
-    id: number;
-  } | null;
+  profilePicture?: ProfilePictureItemType | null;
 }
 const userStore = useUserStore();
 

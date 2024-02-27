@@ -15,7 +15,7 @@
       :description="item.description"
       :has-example="item.hasExample"
     >
-      <template v-slot:component>
+      <template #component>
         <alex-documentation-accordions-props-list
           :data="examplesPropList[index]"
           :list-emits="index == 1"
@@ -126,7 +126,7 @@ const propsListExampleEmits: PropItemType[] = [
   },
 ];
 
-const examplesPropList = [propsListExampleProps, propsListExampleEmits]
+const examplesPropList = [propsListExampleProps, propsListExampleEmits];
 
 const propslistProps: PropsListComponentType = {
   title: 'PropsListTitle Title',
@@ -302,7 +302,12 @@ const examples = ref<ExampleComponentType[]>([
         label: 'Template',
       },
       {
-        template: exampleConstString +'\n' + examplePropsString +'\n' + listPropsString,
+        template:
+          exampleConstString +
+          '\n' +
+          examplePropsString +
+          '\n' +
+          listPropsString,
         label: 'Script',
       },
     ],
@@ -320,7 +325,12 @@ const examples = ref<ExampleComponentType[]>([
         label: 'Template',
       },
       {
-        template: exampleConstString +'\n' +  listEmitsExampleString + '\n' +listPropsString,
+        template:
+          exampleConstString +
+          '\n' +
+          listEmitsExampleString +
+          '\n' +
+          listPropsString,
         label: 'Script',
       },
     ],

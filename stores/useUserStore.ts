@@ -19,6 +19,8 @@ export const useUserStore = defineStore('user', () => {
   const i18n = useI18n();
 
   const loadedUser = ref<User>();
+  const activeTasks = ref<number>();
+  const activeLearningPlans = ref<number>();
   const loading = ref(true);
 
   const populate: UniquePopulateFieldsArray = [
@@ -142,6 +144,27 @@ export const useUserStore = defineStore('user', () => {
       });
 
       loadedUser.value = result.data[0];
+      activeLearningPlans.value = (
+        await find<LearningPlanMemberSimple>('learning-plan-members', {
+          filters: {
+            user: { id: result.data[0].id },
+            status: 'joined',
+          },
+        })
+      ).data.length;
+
+      activeTasks.value = (
+        await find('learning-plan-members', {
+          filters: {
+            user: result.data[0].id,
+          },
+          populate: 'taskmembers',
+        })
+      ).data?.reduce((acc: number, taskMembers: unknown) => {
+        acc += (taskMembers as any[]).length;
+        return acc;
+      }, 0);
+
       loading.value = false;
       if (showMessage) setMessage(message, 'green', true);
       return loadedUser.value;
@@ -157,19 +180,6 @@ export const useUserStore = defineStore('user', () => {
     return loadedUser.value?.id === strapiUser.value?.id;
   });
 
-  const activeTasks = computed(async () => {
-    const result = await find('learning-plan-members', {
-      filters: {
-        user: loadedUser.value?.id,
-      },
-      populate: 'taskmembers',
-    });
-    return result?.data?.reduce((acc: number, taskMembers: unknown) => {
-      acc += (taskMembers as any[]).length;
-      return acc;
-    }, 0);
-  });
-
   const setWallet = (data?: Wallet) => {
     if (loadedUser.value)
       loadedUser.value = { ...loadedUser.value, user_wallet: data };
@@ -179,6 +189,7 @@ export const useUserStore = defineStore('user', () => {
     activeTasks,
     isCurrentUser,
     loading,
+    activeLearningPlans,
     updateUser,
     user: loadedUser,
     loadUser,

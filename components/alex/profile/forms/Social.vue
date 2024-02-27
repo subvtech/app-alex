@@ -1,27 +1,29 @@
 <template>
   <div class="pt-6 pb-2 w-100">
     <alex-inputs-text-field
-      v-if="name"
+      v-if="showName"
       v-model="nameField.value.value"
       :label="$t('components.profile.socials.editForm.name.label')"
       :placeholder="$t('components.profile.socials.editForm.name.placeholder')"
       class="mb-2 w-100"
-      name="editname"
+      name="name"
+      required
+      :schema="nameRules"
       :error-messages="nameField.errorMessage.value"
-      variant="outlined"
-      color="black"
-      @input="updateName"
+      @input="(e) => emit('update:name', e.target.value)"
     />
+
     <alex-inputs-text-field
       v-model="urlField.value.value"
       :label="$t('components.profile.socials.editForm.url.label')"
       :placeholder="$t('components.profile.socials.editForm.url.placeholder')"
       class="w-100"
-      name="editurl"
+      name="url"
+      required
+      :schema="urlRules"
+      :index="index"
       :error-messages="urlField.errorMessage.value"
-      variant="outlined"
-      color="black"
-      @input="updateUrl"
+      @input="(e) => emit('update:url', e.target.value)"
     />
   </div>
 </template>
@@ -30,66 +32,44 @@
 import { useField } from 'vee-validate';
 
 export interface SocialFormComponentType {
-  url: string;
-  name?: string;
-  index: number;
-  socialId?: number;
-}
-
-export interface SocialFormUpdateUrlPayload {
-  index: number;
-  socialId?: number;
-  url: string;
-}
-
-export interface SocialFormUpdateNamePayload {
-  index: number;
-  socialId?: number;
   name: string;
+  url: string;
+  index: number;
+  socialId?: number;
+  showName?: boolean;
+}
+
+export interface SocialFormUpdateValuePayload {
+  index: number;
+  socialId?: number;
+  value: string;
 }
 
 export interface SocialFormEmits {
   (e: 'error'): void;
   (e: 'no:error'): void;
-  (e: 'update:url', value: SocialFormUpdateUrlPayload): void;
-  (e: 'update:name', value: SocialFormUpdateNamePayload): void;
+  (e: 'update:name', value: SocialFormUpdateValuePayload): void;
+  (e: 'update:url', value: SocialFormUpdateValuePayload): void;
 }
 
 const props = withDefaults(defineProps<SocialFormComponentType>(), {
   socialId: undefined,
-  name: undefined,
+  showName: false,
 });
 
-const { url, name } = toRefs(props);
+const { name, url } = toRefs(props);
 
 const emit = defineEmits<SocialFormEmits>();
-const { nameRules, urlRules } = useFormRules();
 
-const urlField = useField('editurl', urlRules, {
-  initialValue: url.value,
+const { urlRules, nameRules } = useFormRules();
+
+const nameField = useField('nameEdit', nameRules, {
+  initialValue: props.name,
 });
 
-const nameField = useField('editname', nameRules, {
-  initialValue: name?.value ?? '',
+const urlField = useField('urlEdit', urlRules, {
+  initialValue: props.url,
 });
-
-const updateUrl = () => {
-  if (!urlField.errorMessage.value)
-    emit('update:url', {
-      index: props.index,
-      socialId: props.socialId,
-      url: urlField.value.value,
-    });
-};
-
-const updateName = () => {
-  if (!nameField.errorMessage.value)
-    emit('update:name', {
-      index: props.index,
-      socialId: props.socialId,
-      name: nameField.value.value,
-    });
-};
 
 watchEffect(() => {
   if (nameField.errorMessage.value || urlField.errorMessage.value) {
@@ -97,6 +77,14 @@ watchEffect(() => {
   } else {
     emit('no:error');
   }
+});
+
+watch(name, () => {
+  nameField.setValue(props.name);
+});
+
+watch(url, () => {
+  urlField.setValue(props.url);
 });
 </script>
 

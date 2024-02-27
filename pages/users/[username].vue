@@ -45,6 +45,8 @@
     <NuxtPage
       :user="user"
       :can-edit="isCurrentUser"
+      :active-learning-plans="userStore.activeLearningPlans"
+      :active-tasks="userStore.activeTasks"
       :update-socials="userStore.loadUserSocials"
       :update-competences="userStore.loadUserTags"
       :update-institutions="userStore.loadUserInstitutions"
@@ -70,7 +72,6 @@ definePageMeta({
 
 const userStore = useUserStore();
 const { user, isCurrentUser } = toRefs(userStore);
-
 await userStore.loadUser(route.params.username as string, '', false);
 if (!user.value) router.push('/');
 

@@ -36,7 +36,27 @@
         <template #item="{ item, props: itemProps }">
           <v-list-item class="item-option" v-bind="itemProps">
             <template #prepend>
-              <img class="mr-4 icon-size" :src="getIcon(item.raw)" />
+              <img
+                v-if="item.raw === 'Youtube'"
+                class="mr-4 icon-size"
+                src="@/assets/svg/Youtube.svg"
+              />
+              <img
+                v-else-if="item.raw === 'Linkedin'"
+                class="mr-4 icon-size"
+                src="@/assets/svg/Linkedin.svg"
+              />
+              <img
+                v-else-if="item.raw === 'Instagram'"
+                class="mr-4 icon-size"
+                src="@/assets/svg/Instagram.svg"
+              />
+
+              <img
+                v-else
+                class="mr-4 icon-size"
+                src="@/assets/svg/website.svg"
+              />
             </template>
           </v-list-item> </template
       ></alex-inputs-select>
@@ -46,7 +66,7 @@
         style=""
       >
         <alex-inputs-text-field
-          v-model="urlValue"
+          v-model="urlField.value.value"
           class="w-100"
           :label="$t('components.profile.socials.editForm.url.label')"
           :placeholder="
@@ -54,12 +74,12 @@
           "
           name="addurl"
           required
-          :error-messages="urlErrorMessage"
+          :error-messages="urlField.errorMessage.value"
         />
 
         <alex-inputs-text-field
           v-if="nonSupportedSocialMedia"
-          v-model="nameValue"
+          v-model="nameField.value.value"
           class="w-100"
           :label="$t('components.profile.socials.editForm.name.label')"
           :placeholder="
@@ -67,7 +87,7 @@
           "
           name="addname"
           required
-          :error-messages="nameErrorMessage"
+          :error-messages="nameField.errorMessage.value"
         />
       </div>
     </div>
@@ -105,32 +125,24 @@ const formattedSocials = computed(() =>
 const selectedSocial = ref<string | null>(null);
 const dialog = ref(false);
 
-const { value: nameValue, errorMessage: nameErrorMessage } = useField(
-  'addname',
-  nameRules,
-  {
-    initialValue: '',
-  },
-);
+const nameField = useField('addname', nameRules, {
+  initialValue: '',
+});
 
-const { value: urlValue, errorMessage: urlErrorMessage } = useField(
-  'addurl',
-  urlRules,
-  {
-    initialValue: '',
-  },
-);
+const urlField = useField('addurl', urlRules, {
+  initialValue: '',
+});
 
 const onSave = () => {
   if (!selectedSocial.value) return;
   emit('save:social', {
-    name: nameValue.value,
-    url: urlValue.value,
+    name: nameField.value.value,
+    url: urlField.value.value,
     selectedSocial: selectedSocial.value,
   });
   selectedSocial.value = null;
-  urlValue.value = '';
-  nameValue.value = '';
+  urlField.value.value = '';
+  nameField.value.value = '';
   dialog.value = false;
 };
 
@@ -145,11 +157,11 @@ const nonSupportedSocialMedia = computed(
 
 const mainButtonDisabled = computed(() => {
   return (
-    !!nameErrorMessage?.value ||
-    !!urlErrorMessage?.value ||
+    !!nameField.errorMessage?.value ||
+    !!urlField.errorMessage?.value ||
+    !urlField.value.value ||
     !selectedSocial.value ||
-    nonSupportedSocialMedia.value ||
-    !urlValue.value
+    (nonSupportedSocialMedia.value && !nameField.value.value)
   );
 });
 </script>

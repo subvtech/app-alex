@@ -114,8 +114,14 @@ const usingMyText = computed(
 );
 
 const disableSave = computed(() => {
-  const comparisonValue = usingMyText.value ? myText.value : value.value;
-  return comparisonValue === props.text || errorMessage.value !== undefined;
+  const comparisonValue = usingMyText.value
+    ? myText.value ?? ''
+    : value.value ?? '';
+
+  const comparisonOriginalValue = props.text || '';
+
+  const hasError = errorMessage.value !== undefined && !props.isOptional;
+  return comparisonValue === comparisonOriginalValue || hasError;
 });
 
 const displayEmptyPlaceholder = computed(

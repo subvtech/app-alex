@@ -58,7 +58,7 @@ export interface SecurityFormComponentType {
   value: string;
   placeholder?: string;
   isPassword?: boolean;
-  buttonText: string;
+  buttonText: string; // button text
   schema: YupSchema;
 }
 

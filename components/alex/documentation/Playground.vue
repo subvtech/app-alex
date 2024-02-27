@@ -57,6 +57,10 @@
 </template>
 
 <script setup lang="ts">
+/*
+  This component is meant to test other components;
+  This is a multiliner comment.
+*/
 import { PropItemType } from '@/components/alex/documentation/accordions/PropsList.vue';
 
 export interface PlaygroundItemType extends PropItemType {
@@ -64,11 +68,12 @@ export interface PlaygroundItemType extends PropItemType {
 }
 
 export interface PlaygroundComponentType {
-  title?: string;
-  data: PlaygroundItemType[];
+  title?: string; // playground title
+  data?: PlaygroundItemType[]; // component props
 }
 const props = withDefaults(defineProps<PlaygroundComponentType>(), {
   title: 'Component Playground',
+  data: () => [],
 });
 
 const { data } = toRefs(props);

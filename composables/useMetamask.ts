@@ -30,7 +30,7 @@ export const useMetamask = () => {
       }
       const provider = new ethers.BrowserProvider(window.ethereum);
 
-      const signer = await withTimeout(4000, provider.getSigner());
+      const signer = await withTimeout(8000, provider.getSigner());
 
       const data: any = await find('wallets/auth');
       const signedMessage = await signer.signMessage(data.token);
@@ -77,7 +77,7 @@ export const useMetamask = () => {
       }
     } catch (err: any) {
       setMessage(
-        err.info ? err.info.error.message : err.error.message,
+        err.info ? err.info.error?.message : err.error?.message,
         'red',
         true,
       );

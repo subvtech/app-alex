@@ -1,8 +1,8 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.socials.title')"
-    :disable-save="disableSave"
     :show-icon="canEdit"
+    :disable-save="disableSave"
     :is-editing="canEditAndIsEditing"
     full-width
     no-footer
@@ -28,16 +28,22 @@
               @update:data="updateSortedArray"
               @deleted:item="updateDeleteArray"
             >
-              <template #content="{ title, url, index }">
+              <template #content="{ id, index, title, url }">
                 <alex-profile-forms-social
-                  :name="title"
-                  :url="url"
+                  :name="sortedSocials[index].contentData!.title"
+                  :url="sortedSocials[index].contentData!.url"
+                  :social-id="id"
+                  :show-name="sortedSocials[index].icon === '/svg/website.svg'"
                   :index="index"
-                  :social-id="sortedSocials[index]?.contentData?.id"
-                  @error="theresError = true"
-                  @no:error="theresError = false"
-                  @update:url="updateUrl"
-                  @update:name="updateItemName"
+                  @update:name="
+                    (e) =>
+                      updateItemName({ id, index, value: e, oldName: title })
+                  "
+                  @update:url="
+                    (e) => updateItemUrl({ id, index, value: e, oldUrl: url })
+                  "
+                  @error="!errors.includes(id) ? errors.push(id) : {}"
+                  @no:error="errors = errors.filter((item) => item !== id)"
                 />
               </template>
             </alex-custom-accordion>
@@ -69,16 +75,11 @@
 <script setup lang="ts">
 import { SocialItemType } from '~/models/social.model';
 import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
-import {
-  SocialFormUpdateNamePayload,
-  SocialFormUpdateUrlPayload,
-} from '@/components/alex/profile/forms/Social.vue';
 const i18n = useI18n();
 
 const isEditing = ref(false);
 const isAdding = ref(false);
 
-const theresError = ref(false);
 const componentKey = ref(0);
 export interface SocialsEmits {
   (e: 'update'): void;
@@ -90,6 +91,12 @@ export interface SocialsComponentType {
   userId: number;
 }
 
+interface AccordionItemTitleRequiredType extends AccordionItemType {
+  title: string;
+}
+
+const errors = ref<number[]>([]);
+
 const emit = defineEmits<SocialsEmits>();
 
 const props = withDefaults(defineProps<SocialsComponentType>(), {
@@ -100,12 +107,26 @@ const { userId, socials, canEdit } = toRefs(props);
 
 const { create, delete: _delete } = useStrapi();
 const { arraysAreEqual } = useArrays();
-
 const supported = ['youtube', 'linkedin', 'instagram'];
 
 const client = useStrapiClient();
+const socialToAccordionItem = (social) => {
+  const { name, url, id } = social;
+  return {
+    title: name.toUpperCase(),
+    icon: supported.includes(name.toLocaleLowerCase())
+      ? `/svg/${name}.svg`
+      : '/svg/website.svg',
 
-const sortedSocials = ref<AccordionItemType[]>([]);
+    contentData: {
+      title: name,
+      url,
+      id,
+    },
+  };
+};
+
+const sortedSocials = ref<AccordionItemTitleRequiredType[]>([]);
 
 const canEditAndIsEditing = computed(() => isEditing.value && canEdit.value);
 
@@ -117,39 +138,20 @@ const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
 
+const isChanged = ref(false);
+
 const disableSave = computed(() => {
-  return (
-    arraysAreEqual(
-      props.socials.map(({ id, name, url }) => ({
-        title: name.toUpperCase(),
-        icon: supported.includes(name.toLocaleLowerCase())
-          ? `/svg/${name}.svg`
-          : '/svg/website.svg',
-        contentData: {
-          url,
-          id,
-        },
-      })),
-      toRaw(sortedSocials.value),
-    ) || theresError.value
-  );
+  return errors.value.length !== 0;
 });
 
 const addSocial = ({ name, url, selectedSocial }) => {
   const selectedSocialLowerCase = selectedSocial.toLowerCase();
   const title = name === '' ? selectedSocialLowerCase : name;
-  const includesTitle = supported.includes(title);
 
-  const icon = includesTitle ? `/svg/${title}.svg` : '/svg/website.svg';
-  const addedSocial = {
-    title: title.toUpperCase(),
-    icon,
-    contentData: {
-      title: includesTitle ? undefined : title,
-      url,
-    },
-    id: sortedSocials.value.length + 1,
-  };
+  const addedSocial = socialToAccordionItem({
+    name: title,
+    url,
+  });
 
   sortedSocials.value.push(addedSocial);
 
@@ -165,24 +167,23 @@ const updateDeleteArray = ({ contentData }: AccordionItemType) => {
   }
 };
 
-const updateSortedArray = (list: AccordionItemType[]) => {
+const updateSortedArray = (list: AccordionItemTitleRequiredType[]) => {
   sortedSocials.value = list.map((item) => ({ ...item, id: undefined }));
 };
 
-const updateItemName = ({
-  name,
-  index,
-  socialId,
-}: SocialFormUpdateNamePayload) => {
+const updateItemName = (props) => {
+  const { socialId, index, value: name, oldName } = props;
+  isChanged.value = oldName !== name;
   const socialIdIndex = sortedSocials.value.findIndex(
     (item) => item.id === socialId,
   );
-
   const validIndex = socialIdIndex === -1 ? index : socialIdIndex;
-  sortedSocials.value[validIndex] = {
-    ...sortedSocials.value[validIndex],
-    title: name,
-  };
+
+  sortedSocials.value[validIndex] = socialToAccordionItem({
+    name,
+    url: sortedSocials.value[validIndex].contentData!.url,
+    id: sortedSocials.value[validIndex].contentData?.id,
+  });
 
   if (updateArray.value.find((item) => item.socialId === socialId))
     updateArray.value[validIndex].name = name;
@@ -195,16 +196,20 @@ const updateItemName = ({
   }
 };
 
-const updateUrl = ({ url, index, socialId }: SocialFormUpdateUrlPayload) => {
+const updateItemUrl = (props) => {
+  const { socialId, index, value: url, oldUrl } = props;
+  isChanged.value = oldUrl !== url;
   const socialIdIndex = sortedSocials.value.findIndex(
     (item) => item.id === socialId,
   );
   const validIndex = socialIdIndex === -1 ? index : socialIdIndex;
 
-  sortedSocials.value[validIndex] = {
-    ...sortedSocials.value[validIndex],
-    contentData: { url },
-  };
+  sortedSocials.value[validIndex] = socialToAccordionItem({
+    name: sortedSocials.value[validIndex].contentData!.title,
+    url,
+    id: sortedSocials.value[validIndex].contentData?.id,
+  });
+
   if (updateArray.value.find((item) => item.socialId === socialId))
     updateArray.value[validIndex].url = url;
   else {
@@ -217,21 +222,15 @@ const updateUrl = ({ url, index, socialId }: SocialFormUpdateUrlPayload) => {
 };
 
 const fillSortedSocialsArray = () => {
-  sortedSocials.value = socials.value.map(({ id, name, url }) => ({
-    title: name.toUpperCase(),
-    icon: supported.includes(name.toLocaleLowerCase())
-      ? `/svg/${name}.svg`
-      : '/svg/website.svg',
-    contentData: {
-      url,
-      id,
-    },
-  })) as AccordionItemType[];
+  sortedSocials.value = socials.value.map(
+    socialToAccordionItem,
+  ) as AccordionItemTitleRequiredType[];
 };
 
 const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
+  isChanged.value = false;
   if (updateSocials) fillSortedSocialsArray();
 };
 
@@ -280,6 +279,7 @@ const onSave = async () => {
           : index === sortedSocials.value.length - 1
           ? { end: true }
           : { after: sortedSocials.value[index - 1].contentData?.id };
+
       if (item.contentData?.id) {
         if (!deleteArray.value.includes(item.contentData.id)) {
           connectArray.push({
@@ -334,19 +334,11 @@ const onSave = async () => {
 };
 
 const cancel = () => {
-  componentKey.value = componentKey.value + 1;
+  componentKey.value += 1;
 
   toggleIsEditing();
   resetArrays();
 };
-
-watch(
-  socials,
-  () => {
-    fillSortedSocialsArray();
-  },
-  { deep: true },
-);
 </script>
 
 <style scoped lang="scss">

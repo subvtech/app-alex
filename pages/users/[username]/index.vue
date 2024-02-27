@@ -6,6 +6,7 @@
         :socials="user.socials"
         :telephone="user.phone"
         :email="user.email"
+        :learning-plans="activeLearningPlans"
         :loading="loading"
       />
       <alex-profile-cards-socials
@@ -110,6 +111,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  activeLearningPlans: {
+    type: Number,
+    required: true,
+  },
+
+  activeTasks: {
+    type: Number,
+    required: true,
+  },
+
   updateSocials: {
     type: Function,
     default: () => {},
