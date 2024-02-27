@@ -1,0 +1,16 @@
+{
+    "breadcrumbs": {
+        "title": "Learning Trail",
+        "0": {
+            "title": "Home"
+        },
+        "1": {
+            "title": "My courses"
+        }
+    },
+    "imgAlt": "Trail image",
+    "chip": "Individual journey",
+    "firstTab": "Overview",
+    "secondTab": "Tasks"
+}
+

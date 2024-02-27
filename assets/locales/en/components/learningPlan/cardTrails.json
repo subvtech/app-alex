@@ -2,15 +2,17 @@
     "options": "Options",
     "configurations": "Configurations",
     "visibility": {
-        "show": "Show",
-        "hide": "Hide"
+      "show": "Show",
+      "hide": "Hide"
     },
     "copy": "Copy",
     "hidden": "Hidden",
     "article": "Article",
-    "articles": "Articles",
     "document": "Document",
-    "documents": "Documents",
     "video": "Video",
-    "videos": "Videos"
-}
+    "header": "Header",
+    "image": "Image",
+    "paragraph": "Paragraph",
+    "link": "Link"
+  }
+  

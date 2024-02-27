@@ -1,0 +1,13 @@
+{
+  "fail": "fail { learningPlan }",
+  "overview": {
+    "emptyState": "It seems there is no content here yet.",
+    "lastUpdated": "Last updated: ",
+    "editBtn": "Edit",
+    "cancelBtn": "Cancel",
+    "saveBtn": "Save",
+    "searchError": "There was an error searching for content, please try again.",
+    "saveError": "There was an error saving the content, please try again.",
+    "sectionTitle": "Start"
+  }
+}
