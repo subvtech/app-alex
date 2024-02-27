@@ -14,12 +14,10 @@ import Link from '@editorjs/link';
 import List from '@editorjs/nested-list';
 import Marker from '@editorjs/marker';
 import Quote from '@editorjs/quote';
-// import Table from 'editorjs-table';
-// import Table2 from '@editorjs/table';
+import Table from '@editorjs/table';
 import Hyperlink from 'editorjs-hyperlink';
 import AlignmentBlockTune from 'editorjs-text-alignment-blocktune';
-// import SocialPost from 'editorjs-social-post-plugin';
-// import Code from '@editorjs/code';
+import Code from '@editorjs/code';
 import Alert from 'editorjs-alert';
 import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
@@ -27,11 +25,13 @@ import Attaches from '@editorjs/attaches';
 import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
+import AIText from '@alkhipce/editorjs-aitext';
 // import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 // import { Structure } from '../models/structure.model';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
+
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 
@@ -86,6 +86,12 @@ onMounted(() => {
         },
       },
       imageUrl: ImageUrl,
+      aiText: {
+        class: AIText,
+        config: {
+          openaiKey: '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',
+        },
+      },
       inlineCode: {
         class: InlineCode,
         shortcut: 'CMD+SHIFT+C',
@@ -113,14 +119,14 @@ onMounted(() => {
           captionPlaceholder: 'Autor da citação',
         },
       },
-      /*    table: {
+      table: {
         class: Table,
-        // inlineToolbar: true,
+        inlineToolbar: true,
         config: {
           rows: 2,
           cols: 3,
         },
-      }, */
+      },
       alignmentBlockTune: {
         class: AlignmentBlockTune,
         config: {
@@ -142,13 +148,12 @@ onMounted(() => {
           validate: false,
         },
       },
-      // socialPost: SocialPost,
-      /*   code: {
+      code: {
         class: Code,
         config: {
           placeholder: 'Escreva o código aqui...',
         },
-      }, */
+      },
       // code: require('editorjs-codemirror'),
       alert: {
         class: Alert,
@@ -176,7 +181,32 @@ onMounted(() => {
       attaches: {
         class: Attaches,
         config: {
-          endpoint: `/api/upload-file?token=${token}`,
+          uploader: {
+            uploadByFile: (file) => {
+              const formData = new FormData();
+
+              formData.append('files', file, file.name);
+
+              return strapiClient<Upload>('/upload', {
+                method: 'POST',
+                body: formData,
+              })
+                .then((res) => {
+                  const data = res[0];
+                  return {
+                    success: 1,
+                    file: {
+                      url: data.url,
+                      title: data.name,
+                      extension: data.ext.slice(1),
+                    },
+                  };
+                })
+                .catch((err) => {
+                  return { success: 0, file: { error: err } };
+                });
+            },
+          },
           buttonText: 'Selecionar arquivo',
           errorMessage: 'Erro no upload do arquivo',
         },
