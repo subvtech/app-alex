@@ -28,8 +28,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['group_members.student_member.user.avatar'],
     },
     learning_structures: {
-      populate: ['trails'],
+      populate: {
+        trails: {
+          sort: 'id:desc',
+          populate: ['cover_image', 'structures.blocks'],
+        },
+      },
     },
+
     tags: true,
     schedules: {
       populate: ['meetings'],
