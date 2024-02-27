@@ -169,7 +169,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       }) || []
     );
   });
-
   const generalTags = computed(
     () => learningPlan.value?.tags?.filter((tag) => tag.isGeneral),
   );
