@@ -98,13 +98,6 @@ const value = computed({
 
 html,
 body {
-  overflow-y: auto;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
   .v-application {
     font-family: Sen !important;
 
