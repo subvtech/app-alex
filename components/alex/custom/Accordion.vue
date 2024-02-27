@@ -116,7 +116,7 @@ watch(data, () => {
 
 onBeforeMount(() => {
   list.value.map((item) => {
-    if (!item.id) item.id = id.value += 1;
+    item.id = id.value += 1;
     return item;
   });
 });

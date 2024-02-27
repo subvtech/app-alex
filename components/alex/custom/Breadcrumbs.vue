@@ -1,6 +1,6 @@
 <template>
   <div
-    class="breadcrumb-block d-flex align-center"
+    class="breadcrumb-block d-flex align-center flex-wrap"
     style="gap: 8px"
     :style="
       backgroundColor
@@ -30,14 +30,14 @@
         v-if="items.length !== 0"
         vertical
         :thickness="thickness"
-        class="pl-4"
+        class="pl-4 d-none d-md-block"
         style="margin-block: auto; height: 24px"
         :style="barStyle ?? ''"
       />
     </div>
     <v-breadcrumbs
-      class="w-100 pl-0"
-      :class="breadcrumbsVClasses ?? 'flex-wrap'"
+      class="pl-0"
+      :class="breadcrumbsVClasses"
       :items="items"
       :divider="divider"
     >
@@ -82,7 +82,7 @@ defineProps({
   },
   breadcrumbsVClasses: {
     type: String,
-    default: '',
+    default: 'flex-wrap',
   },
   divider: {
     type: String,
