@@ -46,6 +46,7 @@
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
+          :loading="headerStore.isLoading"
           @main-action="headerStore.onMainAction"
           @secondary-action="headerStore.onSecondaryAction"
         />
