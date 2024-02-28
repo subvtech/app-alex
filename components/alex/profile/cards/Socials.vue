@@ -22,16 +22,15 @@
           <div class="d-flex flex-column rounded-lg gap-4">
             <alex-custom-accordion
               v-if="isEditing"
-              :key="componentKey"
               v-model:data="sortedSocials"
               show-positions
-              @update:data="updateSortedArray"
               @deleted:item="updateDeleteArray"
             >
               <template #content="{ id, index, title, url }">
                 <alex-profile-forms-social
-                  :name="sortedSocials[index].contentData!.title"
-                  :url="sortedSocials[index].contentData!.url"
+                  :key="id"
+                  v-model:name="sortedSocials[index].contentData!.title"
+                  v-model:url="sortedSocials[index].contentData!.url"
                   :social-id="id"
                   :show-name="sortedSocials[index].icon === '/svg/website.svg'"
                   :index="index"
@@ -126,12 +125,17 @@ const socialToAccordionItem = (social) => {
   };
 };
 
-const sortedSocials = ref<AccordionItemTitleRequiredType[]>([]);
+const sortedSocials = ref<AccordionItemTitleRequiredType[]>(
+  socials.value.map(socialToAccordionItem) as AccordionItemTitleRequiredType[],
+);
+const backupSortedSocials = ref<AccordionItemTitleRequiredType[]>(
+  socials.value.map(socialToAccordionItem) as AccordionItemTitleRequiredType[],
+);
 
 const canEditAndIsEditing = computed(() => isEditing.value && canEdit.value);
 
 onMounted(() => {
-  resetArrays();
+  resetArrays(false);
 });
 
 const toggleIsEditing = () => {
@@ -141,7 +145,12 @@ const toggleIsEditing = () => {
 const isChanged = ref(false);
 
 const disableSave = computed(() => {
-  return errors.value.length !== 0;
+  return (
+    arraysAreEqual(
+      props.socials.map(socialToAccordionItem),
+      sortedSocials.value,
+    ) || errors.value.length !== 0
+  );
 });
 
 const addSocial = ({ name, url, selectedSocial }) => {
@@ -158,6 +167,7 @@ const addSocial = ({ name, url, selectedSocial }) => {
   isAdding.value = false;
   componentKey.value += 1;
 };
+
 const deleteArray = ref<number[]>([]);
 const updateArray = ref<{ socialId?: number; url: string; name: string }[]>([]);
 
@@ -173,7 +183,6 @@ const updateSortedArray = (list: AccordionItemTitleRequiredType[]) => {
 
 const updateItemName = (props) => {
   const { socialId, index, value: name, oldName } = props;
-  isChanged.value = oldName !== name;
   const socialIdIndex = sortedSocials.value.findIndex(
     (item) => item.id === socialId,
   );
@@ -225,12 +234,15 @@ const fillSortedSocialsArray = () => {
   sortedSocials.value = socials.value.map(
     socialToAccordionItem,
   ) as AccordionItemTitleRequiredType[];
+  backupSortedSocials.value = socials.value.map(
+    socialToAccordionItem,
+  ) as AccordionItemTitleRequiredType[];
 };
 
 const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
-  isChanged.value = false;
+
   if (updateSocials) fillSortedSocialsArray();
 };
 
