@@ -16,7 +16,8 @@
           <alex-custom-skeleton class="w-100 height-68" color="gray-200" />
         </div>
         <div v-else class="d-flex flex-column align-center w-100 gap-12 w-212">
-          <app-media
+          <alex-learningplan-media
+            :learningplan-id="learningPlan.id"
             sizing-class="pa-0"
             is-nested
             hide-dividers
