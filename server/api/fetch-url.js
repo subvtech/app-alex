@@ -2,7 +2,6 @@ import Parser from '@postlight/parser';
 
 export default defineEventHandler(async (event) => {
   const url = getQuery(event);
-  console.log('teste');
   const data = await Parser.parse(url.url);
   const domain =
     data.domain && typeof data.domain === 'string' ? data.domain : '';

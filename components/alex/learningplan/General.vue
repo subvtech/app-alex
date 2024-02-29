@@ -2,7 +2,7 @@
   <div class="course-page w-100 gap-6">
     <alex-custom-card
       title=""
-      class="left-block min-w-card flex-wrap w-100"
+      class="left-block min-w-card flex-wrap w-100 pb-12"
       no-header
       full-width
       :align-content="'align-center'"
@@ -16,7 +16,8 @@
           <alex-custom-skeleton class="w-100 height-68" color="gray-200" />
         </div>
         <div v-else class="d-flex flex-column align-center w-100 gap-12 w-212">
-          <app-media
+          <alex-learningplan-media
+            :learningplan-id="learningPlan.id"
             sizing-class="pa-0"
             is-nested
             hide-dividers
@@ -30,7 +31,7 @@
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
-          <app-about
+          <alex-learningplan-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
@@ -123,12 +124,7 @@
           />
         </template>
         <template #footer>
-          <div
-            class="w-100 fix-margin"
-            :class="
-              !plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'
-            "
-          >
+          <div class="w-100 fix-margin pb-6">
             <alex-learningplan-meetings
               is-nested
               hide-dividers
