@@ -41,8 +41,8 @@
       @click="onClickOutside"
     />
 
-    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
+    <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
+      <v-container class="pa-4 pa-sm-6 overflow-hidden">
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -289,11 +289,12 @@ const menus = computed(() => {
     ? defaultMenus.concat(componentsMenu)
     : defaultMenus;
 });
-
-// const miniVariant = ref(false);
 </script>
 
 <style lang="scss">
+.overflow-hidden {
+  overflow: hidden;
+}
 .shepherd-step {
   z-index: 100000 !important;
   background-color: #fff !important;
@@ -373,7 +374,6 @@ const menus = computed(() => {
 
 html,
 body {
-
   .v-application {
     .item-name {
       color: #d2d6da;
