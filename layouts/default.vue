@@ -42,7 +42,7 @@
     />
 
     <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container class="pa-4 pa-sm-6 overflow-hidden">
+      <v-container class="pa-4 pa-sm-6 overflow-hidden max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -293,7 +293,10 @@ const menus = computed(() => {
 
 <style lang="scss">
 .overflow-hidden {
-  overflow: hidden;
+  overflow-y: hidden;
+}
+.max-width-100 {
+  max-width: 100%;
 }
 .shepherd-step {
   z-index: 100000 !important;

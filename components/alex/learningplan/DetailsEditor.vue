@@ -47,18 +47,17 @@ type DetailsEditorProps = {
 const props = withDefaults(defineProps<DetailsEditorProps>(), {
   info: () => [],
 });
-
-const { info, canEdit } = toRefs(props);
-const isEditing = ref(false);
-const cancel = async () => {
-  await instance.value.render({ blocks: info.value });
-};
 const emit = defineEmits(['ready', 'update']);
+const { info, canEdit } = toRefs(props);
 const instance = ref();
 const editorDetails = ref();
+const isEditing = ref(false);
 const isEmptyAndIsNotEditing = computed(
   () => info.value.length === 0 && !isEditing.value,
 );
+const cancel = async () => {
+  await instance.value.render({ blocks: info.value });
+};
 const updateAbout = async () => {
   const editorData = await editorDetails.value?.getData();
   const newData = editorData.data.blocks.map((item, index) => {
@@ -77,10 +76,6 @@ const updateAbout = async () => {
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
-onMounted(async () => {
-  await editorDetails.value?.toggleReadOnly();
-  await instance.value.render({ blocks: info.value });
-});
 watch(
   () => [isEditing.value, instance.value],
   () => {
