@@ -122,7 +122,7 @@
                 :options="professorMode"
                 :description="course.raw.description"
                 :image="{
-                  url: course.raw.img,
+                  url: course.raw.cover_image?.url,
                 }"
                 :facilitator="{
                   name: course.raw.facilitatorName,
@@ -130,8 +130,7 @@
                 }"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
-                :favorited="course.raw.favorited"
-                @favorite="changeItemFavorited(index)"
+                :hide-favorited-button="true"
                 @toggle-visibility="changeItemVisibility(index, course.raw.id)"
                 @configurations="navigate(course.raw.id, 'settings')"
                 @open="navigate(course.raw.id, 'page')"
@@ -233,15 +232,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types/v4';
-import { GetLearningPlans } from '~/assets/queries';
-import type { LearningPlan } from '@/models/learningPlan.model';
-
 definePageMeta({
   middleware: 'auth',
 });
 
-const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
@@ -249,29 +243,65 @@ const tableRef = ref(null);
 const professorMode = ref(false);
 const isLoading = ref(false);
 const { t } = useI18n();
-const graphql = useStrapiGraphQL();
+
+const { find } = useStrapiUtils();
 const { update } = useStrapi();
 const createCourseDialog = ref(false);
-interface courseItem {
+interface LearningPlan {
   id?: number;
   description: string;
-  facilitatorName?: string;
-  facilitatorImage?: string;
-  trails?: number;
-  img?: string;
-  institution?: string;
-  tags?: string[];
-  start_date?: string;
-  end_date?: string;
+  facilitatorName: string;
+  facilitatorImage: string;
+  trails: number;
+  cover_image: string;
+  institution: string;
+  tags: string[];
+  start_date: Date;
+  end_date: Date;
   hidden: boolean;
-  favorited: boolean;
   title: string;
+  members?: any;
+  learning_structures?: any;
 }
 
-const courses = ref<courseItem[]>([]);
+const courses = ref<LearningPlan[]>([]);
+const { isProfessor, id } = useStrapiUser<User>().value;
+professorMode.value = isProfessor;
+const queryConfig = {
+  filters: {
+    members: {
+      $and: [{ user: { id: { $eq: id } } }, { status: { $eq: 'joined' } }],
+    },
+    $or: [
+      {
+        members: {
+          user: { id: { $eq: id } },
+          role: { $ne: 'student' },
+        },
+      },
+      {
+        hidden: { $eq: false },
+      },
+    ],
+    archived_at: { $notNull: false },
+  },
+  populate: {
+    cover_image: true,
+    tags: true,
+    learning_structures: {
+      populate: ['trails'],
+    },
+    members: {
+      populate: ['user.institutions', 'user.avatar'],
+      filters: {
+        role: { $eq: 'facilitator' },
+      },
+    },
+  },
+  sort: 'id:desc',
+};
+
 const getCourses = async () => {
-  const { isProfessor, id } = useStrapiUser<User>().value;
-  professorMode.value = isProfessor;
   if (professorMode.value) {
     headers.push({
       title: '',
@@ -280,70 +310,39 @@ const getCourses = async () => {
     });
   }
   isLoading.value = true;
-  const { data } = await useAsyncData('learningPlans', () => {
-    const params = { userId: id };
-    return graphql<{
-      data: {
-        learningplans: Strapi4ResponseMany<LearningPlan>;
-      };
-    }>(GetLearningPlans, params);
+  const getCourses = await find<LearningPlan>('learningplans', queryConfig);
+  courses.value = [];
+  getCourses.data.forEach((course) => {
+    const facilitator = course.members[0].user;
+    const tags = course.tags?.map((tag) => tag);
+    const trails =
+      course.learning_structures?.find(
+        (structure) => structure.type === 'standard',
+      )?.trails?.length || 0;
+    courses.value.push({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      start_date: course.start_date,
+      end_date: course.end_date,
+      cover_image: course.cover_image,
+      hidden: course.hidden,
+      facilitatorName: facilitator.fullname,
+      facilitatorImage: facilitator.avatar?.url,
+      institution: facilitator.institutions?.[0]?.name,
+      tags,
+      trails,
+    });
   });
-  if (!data.value?.data.learningplans.data) {
-    return;
-  }
-  courses.value =
-    data.value?.data.learningplans.data.map((plan): courseItem => {
-      const { attributes } = plan;
-      const id = plan.id;
-      const {
-        title,
-        description,
-        start_date: startDate,
-        end_date: endDate,
-        cover_image: coverImage,
-        hidden,
-        members,
-        tags,
-        learning_structure: learningStructures,
-      } = attributes;
-      const facilitatorName =
-        members.data[0]?.attributes?.user.data.attributes.fullname;
-      const facilitatorImage =
-        members.data[0]?.attributes?.user.data.attributes.avatar?.data
-          ?.attributes?.url;
-      const institution =
-        members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
-          ?.attributes?.name;
-      const img = coverImage?.data?.attributes?.url;
-      const trails =
-        attributes.learning_structures.data[0].attributes.trails.data.length ||
-        0;
-
-      return {
-        id,
-        title,
-        description,
-        start_date: startDate,
-        end_date: endDate,
-        img,
-        hidden,
-        facilitatorName,
-        facilitatorImage,
-        institution,
-        tags: tags.data.map((tag) => tag.attributes.text),
-        trails,
-        favorited: false,
-      };
-    }) || [];
   isLoading.value = false;
 };
-// eslint-disable camelcase
+
 onBeforeMount(async () => await getCourses());
 
 interface Item {
-  raw: courseItem;
+  raw: LearningPlan;
 }
-const setTableData = (items: readonly Item[]): courseItem[] => {
+const setTableData = (items: readonly Item[]): LearningPlan[] => {
   return items.map((item) => item.raw);
 };
 
@@ -438,10 +437,6 @@ const changeItemVisibility = (index: number, id) => {
   } catch (error) {
     courses.value[index].hidden = !courses.value[index].hidden;
   }
-};
-
-const changeItemFavorited = (index: number) => {
-  courses.value[index].favorited = !courses.value[index].favorited;
 };
 
 const navigate = (id: number, page) => {

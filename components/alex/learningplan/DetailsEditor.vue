@@ -6,9 +6,9 @@
     :title="title"
     :is-editing="isEditing && canEdit"
     :show-icon="canEdit"
-    @toggle:is-editing="toggleIsEditing"
-    @click:cancel="onCancel"
+    @click:cancel="cancel"
     @click:save="updateAbout"
+    @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
       <div
@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import EditorJS, { type ToolConstructable } from '@editorjs/editorjs';
+import EditorJS, { ToolConstructable } from '@editorjs/editorjs';
 import Marker from '@editorjs/marker';
 import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
@@ -75,8 +75,7 @@ const props = withDefaults(defineProps<DetailsEditorProps>(), {
 const { info, canEdit } = toRefs(props);
 
 const isEditing = ref(false);
-const onCancel = async () => {
-  toggleIsEditing();
+const cancel = async () => {
   await instance.value.render({ blocks: info.value });
 };
 const emit = defineEmits(['ready', 'update']);
@@ -277,8 +276,10 @@ const initialiseEditor = () => {
         },
       },
     },
+
+    onChange: () => checkBlocksLimit(instance.value),
     i18n,
-    placeholder: isEditing.value
+    placeholder: isEditing
       ? `${t('components.profile.about.placeholder')}`
       : '',
     holder: 'editorjs',
@@ -302,7 +303,6 @@ onMounted(() => {
 const isEmptyAndIsNotEditing = computed(
   () => info.value.length === 0 && !isEditing.value,
 );
-
 const updateAbout = async () => {
   const instanceData = await instance.value.save();
 
@@ -321,6 +321,15 @@ const updateAbout = async () => {
   emit('update', t('components.courses.editor.update'));
 };
 
+const checkBlocksLimit = async (editor) => {
+  const data = await editor.save();
+  const maxBlocks = 5; // Set your maximum number of blocks
+  if (data.blocks.length > maxBlocks) {
+    // Remove the last block if the limit is exceeded
+    editor.blocks.delete(data.blocks.length - 1);
+  }
+};
+
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
@@ -331,9 +340,14 @@ watch(isEmptyAndIsNotEditing, () => {
   if (isEmptyAndIsNotEditing && theresInstance) instance.value.destroy();
   else initialiseEditor();
 });
-watch(isEditing, async () => {
-  await instance.value.focus();
-});
+watch(
+  () => [isEditing.value, instance.value],
+  () => {
+    if (instance.value.configuration) {
+      instance.value.focus();
+    }
+  },
+);
 </script>
 
 <style global lang="scss">
@@ -350,6 +364,9 @@ watch(isEditing, async () => {
   .ce-toolbar__actions.ce-toolbar__actions--opened {
     display: none;
   }
+}
+#editorjs .codex-editor__redactor {
+  padding-bottom: 0 !important;
 }
 @media (min-width: 651px) {
   #editorjs:not(.locked) {
