@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 
 export function isValidCpf(val: string) {
+  if (!val) return false;
   val = val.replace(/\D/g, '');
   if (val === '00000000000') return false;
 
@@ -59,17 +60,17 @@ export const useFormRules = () => {
       trim?: boolean;
     },
   ) => {
-    const rule = yup.string();
+    let rule = yup.string();
 
-    if (required) rule.required(i18n.t(`rules.${key}.required`));
-    if (length) rule.length(length, i18n.t(`rules.${key}.length`));
+    if (required) rule = rule.required(i18n.t(`rules.${key}.required`));
+    if (length) rule = rule.length(length, i18n.t(`rules.${key}.length`));
     else {
-      if (min) rule.min(min, i18n.t(`rules.min`));
-      if (max) rule.max(max, i18n.t(`rules.max`));
+      if (min) rule = rule.min(min, i18n.t(`rules.min`));
+      if (max) rule = rule.max(max, i18n.t(`rules.max`));
     }
-    if (trim) rule.trim();
+    if (trim) rule = rule.trim();
     if (matches)
-      rule.matches(
+      rule = rule.matches(
         matches.regex,
         i18n.t(matches.errorMsg ? matches.errorMsg : `rules.${key}.invalid`),
       );
@@ -104,6 +105,7 @@ export const useFormRules = () => {
   const emailRules = {
     email: getStringRule('email', {
       required: true,
+      min: 2,
       matches: { regex: emailRegex },
       trim: true,
     }),
@@ -130,9 +132,9 @@ export const useFormRules = () => {
   };
 
   const fullnameRules = {
-    fullname: getMin4Max64StringRule('fullname').matches(
+    fullname: getMin4Max64StringRule('fullName').matches(
       /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
-      i18n.t('rules.fullname.onlyLetters'),
+      i18n.t('rules.fullName.onlyLetters'),
     ),
   };
 
