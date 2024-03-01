@@ -49,7 +49,7 @@ const getStringRule = (
   i18n: any,
   key: string,
   { required, length, min, max, matches, trim }: StringRuleProps,
-) => {
+): yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''> => {
   let rule = yup.string();
 
   if (required) rule = rule.required(i18n.t(`rules.${key}.required`));
