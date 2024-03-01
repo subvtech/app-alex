@@ -55,7 +55,7 @@ const emit = defineEmits([
   'update:description',
   'update:keyword',
 ]);
-const { keywordRules, descriptionRules } = useFormRules();
+const { keywordSchema, longDescriptionRules } = useFormRules();
 
 const props = defineProps({
   filteredItems: {
@@ -93,13 +93,17 @@ const updateVerbs = (verb, isCreating = false) => {
   });
 };
 
-const keywordField = useField('keyword', keywordRules, {
+const keywordField = useField('keyword', keywordSchema, {
   initialValue: keyword.value,
 });
 
-const descriptionField = useField('description', descriptionRules.description, {
-  initialValue: description.value,
-});
+const descriptionField = useField(
+  'description',
+  longDescriptionRules.description,
+  {
+    initialValue: description.value,
+  },
+);
 
 const handleInput = (e) => {
   keywordField.value.value = { text: e.target.value } as Tag;

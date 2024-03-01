@@ -91,10 +91,10 @@ const props = defineProps({
   },
 });
 const { canEdit } = toRefs(props);
-const { descriptionRules } = useFormRules();
+const { longDescriptionRules } = useFormRules();
 const { value, errorMessage, setValue } = useField(
   'description',
-  descriptionRules.description,
+  longDescriptionRules.description,
   {
     initialValue: props.text,
   },
