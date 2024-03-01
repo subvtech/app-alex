@@ -6,8 +6,8 @@
     :title="title"
     :is-editing="isEditing && canEdit"
     :show-icon="canEdit"
-    :cancel="cancel"
-    :save="updateAbout"
+    @click:cancel="cancel"
+    @click:save="updateAbout"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>

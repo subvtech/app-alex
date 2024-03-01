@@ -1,0 +1,476 @@
+[
+  {
+    "namespaces": [
+      "custom",
+      "accordion"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "AppUserAvatar"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "AvatarGroup"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Banner"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Breadcrumbs"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Button"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Carousel"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Chip"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Dialog"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Drawable"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Dropdown"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "EmptyPlaceholder"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Header"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "HorizontalBar"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Info"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "list-item",
+      "index"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "list-item",
+      "User"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Pagination"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Skeleton"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Tabs"
+    ]
+  },
+  {
+    "namespaces": [
+      "custom",
+      "Tooltip"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "accordions",
+      "PropsList"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "buttons",
+      "Copy"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "buttons",
+      "Tooltip"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "Example"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "Header"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "Playground"
+    ]
+  },
+  {
+    "namespaces": [
+      "documentation",
+      "prism",
+      "Highligther"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Accordion"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "AddSocial"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "AppAbout"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "AppUserAvatar"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "BasicInfo"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Competences"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Copy"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "DetailBoxes"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Example"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Header"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Highlighter"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "InstitutionItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Institutions"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Overview"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Playground"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "PropsList"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Security"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Social"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Socials"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Tooltip"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
+      "Wallet"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "autocomplete"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "checkbox"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "date"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "radio-button"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "select"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "stepper"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "text-area"
+    ]
+  },
+  {
+    "namespaces": [
+      "inputs",
+      "text-field"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "trails",
+      "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "BoxItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
+      "Competences"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
+      "Institutions"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
+      "Overview"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "cards",
+      "Socials"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "ContactItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "DetailBoxes"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "dialogs",
+      "AddSocial"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "forms",
+      "Social"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "InstitutionItem"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "BasicInfo"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "forms",
+      "Security"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "Security"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "settings",
+      "Wallet"
+    ]
+  },
+  {
+    "namespaces": [
+      "profile",
+      "SocialItem"
+    ]
+  }
+]
