@@ -7,5 +7,6 @@
     "phonePlaceholder": "Digite seu telefone",
     "save": "Salvar",
     "cpf": "CPF",
-    "update": "Informações pessoais atualizadas."
+    "update": "Informações pessoais atualizadas.",
+    "phoneDuplicated": "Telefone não disponível."
 }

@@ -18,5 +18,6 @@
 
   },
   "duplicatedText": "Já existe uma tag com essa descrição, por favor escolhar outro nome.",
-  "alreadyAdded": "Tag já adicionada."
+  "alreadyAdded": "Tag já adicionada.",
+  "notFound": "Nenhuma competência encontrada"
 }
