@@ -1,10 +1,10 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.security.title')"
-    :showIcon="false"
+    :show-icon="false"
     :full-width="true"
   >
-    <template v-slot:content>
+    <template #content>
       <div class="fields d-flex flex-wrap w-100">
         <div class="field d-flex w-100 align-center justify-space-between">
           <div class="d-flex">
@@ -33,9 +33,9 @@
           </alex-custom-tooltip>
           <div class="options">
             <v-icon
-              @click="editEmail = !editEmail"
               color="#6E7A87"
               style="cursor: pointer"
+              @click="editEmail = !editEmail"
               >mdi-dots-vertical</v-icon
             >
           </div>
@@ -55,20 +55,20 @@
                 variant="secondary"
                 size="large"
                 disabled
-                @click="updatePassword"
                 :text="
                   editPassword
                     ? $t('components.profile.security.savePassword')
                     : $t('components.profile.security.editPassword')
                 "
+                @click="updatePassword"
               />
             </template>
           </alex-custom-tooltip>
           <div class="options">
             <v-icon
-              @click="editPassword = !editPassword"
               color="#6E7A87"
               style="cursor: pointer"
+              @click="editPassword = !editPassword"
               >mdi-dots-vertical</v-icon
             >
           </div>
@@ -83,7 +83,6 @@ import { useForm } from 'vee-validate';
 
 const emit = defineEmits(['update:user']);
 const { setMessage } = useMessageStore();
-const { emailRules } = useFormRules();
 const editEmail = ref(false);
 const editPassword = ref(false);
 const password = ref();

@@ -90,7 +90,7 @@
       :show-action="learningPlanStore.userIsFacilitator"
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="!formAddGroup.meta.value.valid"
-      empty-state-object-name="pages.classes.participant"
+      empty-state-object-name="pages.classes.participant.singular"
       @action="!editing ? onCreateGroup() : onUpdateGroup(editingGroupId)"
     >
       <template #item="{ item }">

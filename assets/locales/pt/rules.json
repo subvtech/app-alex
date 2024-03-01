@@ -74,10 +74,13 @@
     "beforeStartDate": "Não pode ser menor que data de início",
     "typeError": "A data precisa ser válida"
   },
+  "min": "Mínimo de {min} caracteres",
+  "max": "Máximo de {max} caracteres",
+  "required": "{name} é obrigatório",
+  
   "class": {
-    "required": "Turma é obrigatório",
-    "min": "Mínimo de {min} caracteres",
-    "max": "Máximo de {max} caracteres"
+    "required": "Turma é obrigatório"
+  
   },
   "description": {
     "required": "Descrição é obrigatório",

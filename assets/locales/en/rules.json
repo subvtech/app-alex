@@ -83,10 +83,14 @@
     "beforeStartDate": "End date can't be before start date",
     "typeError": "Date must be valid"
   },
+
+  "min": "At least {min} characters long",
+  "max": "At most {max} characters long",
+  "required": "{name} is required",
+  
   "class": {
-    "required": "Class is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
+    "required": "Turma é obrigatório"
+  
   },
 
   "description": {

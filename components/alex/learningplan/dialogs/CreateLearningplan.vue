@@ -171,7 +171,7 @@ const stepsConfig = {
   },
   step3: {
     title: t('components.learningPlan.dialogs.members'),
-    subtitle: t('components.learningPlan.dialogs.participants'),
+    subtitle: t('components.learningPlan.dialogs.participant.plural'),
   },
   step4: {
     title: t('components.learningPlan.dialogs.meetings'),

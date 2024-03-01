@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-const { emailRules } = useFormRules();
+const { emailSchema } = useFormRules();
 const form = ref(null);
 const submitError = ref(false);
 const loading = ref(false);
@@ -63,7 +63,7 @@ const { forgotPassword } = useStrapiAuth();
 const emit = defineEmits(['confirmation-message']);
 
 const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: emailRules,
+  validationSchema: emailSchema,
   keepValuesOnUnmount: true,
 });
 

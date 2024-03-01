@@ -50,8 +50,8 @@
     <v-card-subtitle class="pa-0 text-body-1 text-gray-600 opacity-1">{{
       `${members.length} ${$t(
         members.length > 1
-          ? 'pages.classes.participants'
-          : 'pages.classes.participant',
+          ? 'pages.classes.participant.plural'
+          : 'pages.classes.participant.singular',
       )}`
     }}</v-card-subtitle>
   </v-card>
