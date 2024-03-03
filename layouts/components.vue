@@ -33,8 +33,8 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :avatar="userStore.user?.avatar"
-      :placeholder="userStore.user?.fullname"
+      :avatar="user?.avatar"
+      :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
       show-picture
       @click="onClickOutside"
@@ -57,7 +57,7 @@ const { profileMenuItems } = useMainHorizontalBar();
 
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
-const userStore = useUserStore();
+const user = useStrapiUser<User>();
 const menus = computed(() => {
   // Group input objects by the first element of the 'namespaces' array
   const groups = vuefiles.reduce((acc, obj) => {

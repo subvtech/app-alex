@@ -99,7 +99,9 @@ const props = withDefaults(defineProps<AppUserAvatarComponentType>(), {
 });
 
 const avatar = computed<{ url: string; id: number } | null | undefined>(() =>
-  props.trackCurrentUser ? userStore.user?.avatar : props.profilePicture,
+  props.trackCurrentUser && userStore.user
+    ? userStore.user?.avatar
+    : props.profilePicture,
 );
 
 const fullname = ref<string | null | undefined>(props.placeholder);
