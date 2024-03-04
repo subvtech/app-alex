@@ -374,7 +374,6 @@ const menus = computed(() => {
 
 html,
 body {
-
   .v-application {
     .item-name {
       color: #d2d6da;
