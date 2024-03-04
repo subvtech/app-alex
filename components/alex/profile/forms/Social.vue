@@ -2,19 +2,19 @@
   <div class="pt-6 pb-2 w-100">
     <alex-inputs-text-field
       v-if="showName"
-      v-model="nameField.value.value"
+      v-model="nameValue"
       :label="$t('components.profile.socials.editForm.name.label')"
       :placeholder="$t('components.profile.socials.editForm.name.placeholder')"
       class="mb-2 w-100"
       name="name"
       required
       :schema="nameRules"
-      :error-messages="nameField.errorMessage.value"
+      :error-messages="nameErrorMsg"
       @input="(e) => emit('update:name', e.target.value)"
     />
 
     <alex-inputs-text-field
-      v-model="urlField.value.value"
+      v-model="urlValue"
       :label="$t('components.profile.socials.editForm.url.label')"
       :placeholder="$t('components.profile.socials.editForm.url.placeholder')"
       class="w-100"
@@ -22,7 +22,7 @@
       required
       :schema="urlRules"
       :index="index"
-      :error-messages="urlField.errorMessage.value"
+      :error-messages="urlErrorMsg"
       @input="(e) => emit('update:url', e.target.value)"
     />
   </div>
@@ -39,17 +39,11 @@ export interface SocialFormComponentType {
   showName?: boolean;
 }
 
-export interface SocialFormUpdateValuePayload {
-  index: number;
-  socialId?: number;
-  value: string;
-}
-
 export interface SocialFormEmits {
   (e: 'error'): void;
   (e: 'no:error'): void;
-  (e: 'update:name', value: SocialFormUpdateValuePayload): void;
-  (e: 'update:url', value: SocialFormUpdateValuePayload): void;
+  (e: 'update:name', value: string): void;
+  (e: 'update:url', value: string): void;
 }
 
 const props = withDefaults(defineProps<SocialFormComponentType>(), {
@@ -57,34 +51,37 @@ const props = withDefaults(defineProps<SocialFormComponentType>(), {
   showName: false,
 });
 
-const { name, url } = toRefs(props);
-
 const emit = defineEmits<SocialFormEmits>();
 
 const { urlRules, nameRules } = useFormRules();
 
-const nameField = useField('nameEdit', nameRules, {
+const {
+  value: nameValue,
+  errorMessage: nameErrorMsg,
+  validate: nameValidate,
+} = useField('name', nameRules, {
   initialValue: props.name,
 });
 
-const urlField = useField('urlEdit', urlRules, {
+const {
+  value: urlValue,
+  errorMessage: urlErrorMsg,
+  validate: urlValidate,
+} = useField('url', urlRules, {
   initialValue: props.url,
 });
 
+onMounted(() => {
+  nameValidate();
+  urlValidate();
+});
+
 watchEffect(() => {
-  if (nameField.errorMessage.value || urlField.errorMessage.value) {
+  if (nameErrorMsg.value || urlErrorMsg.value) {
     emit('error');
   } else {
     emit('no:error');
   }
-});
-
-watch(name, () => {
-  nameField.setValue(props.name);
-});
-
-watch(url, () => {
-  urlField.setValue(props.url);
 });
 </script>
 
