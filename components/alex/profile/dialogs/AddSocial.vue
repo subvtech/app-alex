@@ -29,7 +29,23 @@
         :label="$t('components.profile.socials.addDialog.label')"
       >
         <template #selection="{ item }">
-          <img class="mr-4 icon-size" :src="getIcon(item.raw)" />
+          <img
+            v-if="item.raw === 'Youtube'"
+            class="mr-4 icon-size"
+            src="/svg/youtube.svg"
+          />
+          <img
+            v-else-if="item.raw === 'Linkedin'"
+            class="mr-4 icon-size"
+            src="/svg/linkedin.svg"
+          />
+          <img
+            v-else-if="item.raw === 'Instagram'"
+            class="mr-4 icon-size"
+            src="/svg/instagram.svg"
+          />
+
+          <img v-else class="mr-4 icon-size" src="/svg/website.svg" />
           <p class="selected-item">{{ item.raw }}</p>
         </template>
 
@@ -39,24 +55,20 @@
               <img
                 v-if="item.raw === 'Youtube'"
                 class="mr-4 icon-size"
-                src="@/assets/svg/Youtube.svg"
+                src="/svg/youtube.svg"
               />
               <img
                 v-else-if="item.raw === 'Linkedin'"
                 class="mr-4 icon-size"
-                src="@/assets/svg/Linkedin.svg"
+                src="/svg/linkedin.svg"
               />
               <img
                 v-else-if="item.raw === 'Instagram'"
                 class="mr-4 icon-size"
-                src="@/assets/svg/Instagram.svg"
+                src="/svg/instagram.svg"
               />
 
-              <img
-                v-else
-                class="mr-4 icon-size"
-                src="@/assets/svg/website.svg"
-              />
+              <img v-else class="mr-4 icon-size" src="/svg/website.svg" />
             </template>
           </v-list-item> </template
       ></alex-inputs-select>
@@ -145,10 +157,6 @@ const onSave = () => {
   nameField.value.value = '';
   dialog.value = false;
 };
-
-const supported = ['Youtube', 'Linkedin', 'Instagram'];
-const getIcon = (name) =>
-  supported.includes(name) ? `/svg/${name}.svg` : '/svg/website.svg';
 
 const nonSupportedSocialMedia = computed(
   () =>
