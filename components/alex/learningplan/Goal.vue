@@ -1,6 +1,6 @@
 <template>
-  <div id="goal" class="d-flex pa-4 w-100 gap">
-    <span>{{ index + 1   }}.</span>
+  <div class="goal d-flex pa-4 w-100 gap">
+    <span>{{ index + 1 }}.</span>
     <div class="d-flex flex-column">
       <span class="title">
         {{ keyWord }}
@@ -18,9 +18,6 @@ defineProps({
     type: String,
     required: true,
   },
-  text: {
-    type: String,
-  },
   index: {
     type: Number,
     required: true,
@@ -33,7 +30,7 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-#goal {
+.goal {
   border-radius: 8px;
   background: var(--cinza-cinza-azulado, #f1f5f9);
   .title {
