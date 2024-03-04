@@ -22,7 +22,6 @@ import Alert from 'editorjs-alert';
 import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
 import Attaches from '@editorjs/attaches';
-import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
 import AIText from '@alkhipce/editorjs-aitext';
@@ -32,20 +31,10 @@ import header from '../editor-js/plugins/header/HeaderBlock';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
-
-type AppEditorProps = {
-  data?: any;
-  autoFocus?: boolean;
-};
-
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
-const instance = defineModel<any>();
-const props = withDefaults(defineProps<AppEditorProps>(), {
-  data: undefined,
-  autoFocus: true,
-});
+const instance = ref();
 const uploadBaseUrl = computed(() => {
   const runtimeConfig = useRuntimeConfig();
   return runtimeConfig.public.strapi.url;
@@ -53,7 +42,7 @@ const uploadBaseUrl = computed(() => {
 
 onMounted(() => {
   instance.value = new EditorJS({
-    autofocus: props.autoFocus,
+    autofocus: true,
     tools: {
       delimiter: Delimiter,
       embed: Embed,
@@ -290,14 +279,14 @@ onMounted(() => {
     },
     i18n,
     minHeight: 400,
-    data: props.data,
+    data: { blocks: [] },
     holder: 'editorjs',
     placeholder: 'Clique para iniciar...',
     onReady: async () => {
       const data = await instance.value.save();
       if (data.blocks.length > 0) {
         /* eslint-disable-next-line */
-        new DragDrop(instance.value);
+        // new DragDrop(instance.value); // Fix ME
         /* eslint-disable-next-line */
         new Undo({ editor: instance.value });
       }
