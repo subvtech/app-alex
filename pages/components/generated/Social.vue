@@ -30,7 +30,7 @@ definePageMeta({
 });
 
 const myProps = [{name : `name`,required : true,description : `There's no description.`,type : `string`,},{name : `url`,required : true,description : `There's no description.`,type : `string`,},{name : `index`,required : true,description : `There's no description.`,type : `number`,},{name : `socialId`,required : false,description : `There's no description.`,type : `number`,},{name : `showName`,required : false,description : `There's no description.`,type : `boolean`,initialValue : 'false',default : `false`},];
-const myEmits = [{name : `error`,description : `There's no description`,type : `() => void`},{name : `no:error`,description : `There's no description`,type : `() => void`},{name : `update:name`,description : `There's no description`,type : `(value: SocialFormUpdateValuePayload) => void`},{name : `update:url`,description : `There's no description`,type : `(value: SocialFormUpdateValuePayload) => void`},];
+const myEmits = [{name : `error`,description : `There's no description`,type : `() => void`},{name : `no:error`,description : `There's no description`,type : `() => void`},{name : `update:name`,description : `There's no description`,type : `(value: string) => void`},{name : `update:url`,description : `There's no description`,type : `(value: string) => void`},];
 const emitsCount = true;
 const propsCount = true;
 

@@ -33,8 +33,8 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :avatar="userStore.user?.avatar"
-      :placeholder="userStore.user?.fullname"
+      :avatar="user?.avatar"
+      :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
       show-picture
       @click="onClickOutside"
@@ -57,7 +57,42 @@ const { profileMenuItems } = useMainHorizontalBar();
 
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
-const userStore = useUserStore();
+const user = useStrapiUser<User>();
+
+const icons = [
+  'mdi-account-circle',
+  'mdi-book',
+  'mdi-briefcase',
+  'mdi-image-area',
+  'mdi-view-dashboard-outline',
+  'mdi-view-carousel',
+  'mdi-chip',
+  'mdi-calendar-blank',
+  'mdi-image-filter-center-focus-weak',
+  'mdi-information-variant',
+  'mdi-cards-heart',
+  'mdi-tooltip',
+  'mdi-chart-tree',
+  'mdi-chart-line-stacked',
+  'mdi-chart-pie',
+  'mdi-chart-box',
+  'mdi-chart-box-outline',
+  'mdi-checkbook',
+  'mdi-checkerboard',
+  'mdi-clipboard-text-outline',
+  'mdi-clipboard-text',
+  'mdi-code-equal',
+  'mdi-credit-card',
+  'mdi-bitcoin',
+  'mdi-alert-box',
+  'mdi-baguette',
+];
+
+function getRandomIcon(): string {
+  const randomIndex = Math.floor(Math.random() * icons.length);
+  return icons[randomIndex];
+}
+
 const menus = computed(() => {
   // Group input objects by the first element of the 'namespaces' array
   const groups = vuefiles.reduce((acc, obj) => {
@@ -74,7 +109,7 @@ const menus = computed(() => {
   const output = Object.entries(groups).map(([title, items]) => ({
     title: capitaliseString(title),
     items: (items as any[]).map((item) => ({
-      icon: 'mdi-view-dashboard-outline',
+      icon: getRandomIcon(),
       title: capitaliseString(
         item.namespaces[item.namespaces.length - 1] === 'index'
           ? item.namespaces[item.namespaces.length - 2]
