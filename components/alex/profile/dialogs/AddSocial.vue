@@ -39,24 +39,20 @@
               <img
                 v-if="item.raw === 'Youtube'"
                 class="mr-4 icon-size"
-                src="@/assets/svg/Youtube.svg"
+                src="/svg/youtube.svg"
               />
               <img
                 v-else-if="item.raw === 'Linkedin'"
                 class="mr-4 icon-size"
-                src="@/assets/svg/Linkedin.svg"
+                src="/svg/linkedin.svg"
               />
               <img
                 v-else-if="item.raw === 'Instagram'"
                 class="mr-4 icon-size"
-                src="@/assets/svg/Instagram.svg"
+                src="/svg/instagram.svg"
               />
 
-              <img
-                v-else
-                class="mr-4 icon-size"
-                src="@/assets/svg/website.svg"
-              />
+              <img v-else class="mr-4 icon-size" src="/svg/website.svg" />
             </template>
           </v-list-item> </template
       ></alex-inputs-select>
