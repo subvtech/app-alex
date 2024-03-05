@@ -47,9 +47,7 @@ const { t } = useI18n();
 const trailStore = useTrailStore();
 const emit = defineEmits(['update']);
 
-const activeButton = computed(() =>
-  trailStore.trail?.hidden ? 'true' : 'false',
-);
+const activeButton = ref(trailStore.trail?.hidden ? 'true' : 'false');
 
 const handleUpdate = () => {
   emit('update', activeButton.value);
