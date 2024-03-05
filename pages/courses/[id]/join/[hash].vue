@@ -6,7 +6,7 @@
     v-model="openConfirmation"
     variant="primary"
     persistent
-    title="$t('components.courses.invite.title')"
+    :title="$t('components.learningPlan.join.active.title')"
     image-class="mb-6"
     :image="{
       src: '/svg/Invite.svg',
@@ -15,13 +15,14 @@
       height: 200,
     }"
     :loading="loading"
-    submit-button-text="Participar"
+    :submit-button-text="$t('components.learningPlan.join.active.action')"
     @submit="onConfirm"
     @cancel="onCancel"
   >
     <template #subtitle>
-      Voce foi convidado para participar do curso de
-      <strong>{{ learningPlanStore.learningPlan?.title }}</strong> na turma
+      {{ t('components.learningPlan.join.active.description') }}
+      <strong>{{ learningPlanStore.learningPlan?.title }}</strong>
+      {{ t('components.learningPlan.join.active.at') }}
       <strong>{{ learningPlanStore.learningPlan?.class_name }}</strong>
     </template>
   </alex-learningplan-dialogs-alert>
@@ -33,16 +34,15 @@
     variant="primary"
     persistent
     hide-cancel-button
-    title="Convite Expirado!"
+    :title="$t('components.learningPlan.join.expired.title')"
     :image="{
       src: '/svg/InviteExpired.svg',
       alt: 'Convite Expirado',
       width: 300,
       height: 200,
     }"
-    subtitle="Esse convite não é mais válido pois passou do tempo limite de
-          aceitação ou foi cancelado."
-    submit-button-text="Continuar"
+    :subtitle="$t('components.learningPlan.join.expired.description')"
+    :submit-button-text="$t('components.learningPlan.join.expired.action')"
     :loading="loading"
     @submit="onCancel"
   />
@@ -61,6 +61,7 @@ const loading = ref(false);
 const user = useStrapiUser();
 const hash = route.params.hash?.toString();
 const invitationHash = ref();
+const { t } = useI18n();
 
 watch(learningPlanStore, () => {
   invitationHash.value = learningPlanStore.learningPlan?.invitation_links.find(

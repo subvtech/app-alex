@@ -1,6 +1,0 @@
-{
-  "title": "Do you want to participate in this course?",
-  "description": "You have been invited to participate in the course ${title} in class ${class_name}",
-  "action": "Participate",
-  "cancel": "Cancel"
-}
