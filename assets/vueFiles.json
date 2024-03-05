@@ -236,6 +236,12 @@
   {
     "namespaces": [
       "generated",
+      "EditSocial"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
       "Example"
     ]
   },

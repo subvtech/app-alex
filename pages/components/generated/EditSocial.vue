@@ -2,7 +2,7 @@
   <v-container
     class="page rounded-lg bg-white pa-6 gap-6 d-flex flex-column align-start pb-15"
   >
-    <alex-documentation-header title="Social" description="undefined"  />
+    <alex-documentation-header title="EditSocial" description="undefined"  />
     <alex-documentation-accordions-props-list
       :data="myProps"
       :show-positions="propsCount"
@@ -16,7 +16,7 @@
    
     <alex-documentation-playground :data="myProps">
       <template #component="{ props }">
-        <alex-profile-forms-social :name="props.name" :url="props.url" :index="props.index" :socialId="props.socialId" :showName="props.showName" 
+        <alex-profile-forms-edit-social :name="props.name" :url="props.url" :index="props.index" :socialId="props.socialId" :showName="props.showName" 
         />
       </template>
     </alex-documentation-playground>
