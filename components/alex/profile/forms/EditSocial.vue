@@ -1,11 +1,11 @@
 <template>
-  <div class="pt-6 pb-2 w-100">
+  <div class="pt-6 pb-2 w-100 max-w-84 min-w-0">
     <alex-inputs-text-field
       v-if="showName"
       v-model="nameValue"
       :label="$t('components.profile.socials.editForm.name.label')"
       :placeholder="$t('components.profile.socials.editForm.name.placeholder')"
-      class="mb-2 w-100"
+      class="mb-2"
       name="name"
       required
       :schema="nameRules"
@@ -17,7 +17,7 @@
       v-model="urlValue"
       :label="$t('components.profile.socials.editForm.url.label')"
       :placeholder="$t('components.profile.socials.editForm.url.placeholder')"
-      class="w-100"
+      class=""
       name="url"
       required
       :schema="urlRules"
@@ -88,6 +88,10 @@ watchEffect(() => {
 <style global lang="scss">
 .border-down {
   border-bottom: 1px solid #d2d6da;
+}
+
+.min-w-0 {
+  min-width: 0;
 }
 
 .contact-item {

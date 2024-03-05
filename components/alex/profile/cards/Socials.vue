@@ -11,23 +11,25 @@
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
-      <div class="d-flex flex-column w-100 justify-center">
+      <div class="d-flex flex-column justify-center w-100">
         <alex-custom-empty-placeholder
           v-if="sortedSocials.length === 0"
           empty-text-image="/svg/EmptySocials.svg"
           :empty-text-message="$t('components.profile.socials.empty')"
         />
 
-        <div v-else class="w-100">
-          <div class="d-flex flex-column rounded-lg gap-4">
+        <div
+          v-else
+          class="d-flex flex-column align-center w-100 rounded-lg gap-4"
+        >
+          <div v-if="isEditing" class="d-flex align-center max-w-min-content">
             <alex-custom-accordion
-              v-if="isEditing"
               v-model:data="sortedSocials"
               show-positions
               @deleted:item="updateDeleteArray"
             >
               <template #content="{ index, id }">
-                <alex-profile-forms-social
+                <alex-profile-forms-edit-social
                   v-model:name="sortedSocials[index].contentData!.title"
                   v-model:url="sortedSocials[index].contentData!.url"
                   :social-id="id"
@@ -54,16 +56,17 @@
                 />
               </template>
             </alex-custom-accordion>
-            <alex-profile-social-item
-              v-for="(social, index) in sortedSocials"
-              v-else
-              :key="index"
-              :icon="social.icon"
-              :content-data="social.contentData"
-              :title="social.title"
-            />
           </div>
+          <alex-profile-social-item
+            v-for="(social, index) in sortedSocials"
+            v-else
+            :key="index"
+            :icon="social.icon"
+            :content-data="social.contentData"
+            :title="social.title"
+          />
         </div>
+
         <div
           v-if="canEditAndIsEditing"
           class="d-flex justify-center mt-6"
@@ -380,59 +383,31 @@ const cancel = () => {
 </script>
 
 <style scoped lang="scss">
-.ghost {
-  opacity: 0.5;
-  background: #c8ebfb;
-}
-
 #Card {
   //border-bottom: 1px solid #eaeef1;
   flex-direction: column;
+  box-sizing: border-box;
+}
 
-  .empty {
-    span {
-      color: #6e7a87;
-      text-align: center;
-      /* Body/P1 */
+.max-w-min-content {
+  max-width: min-content;
+  min-width: 100%;
+  max-width: 350px;
+}
 
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 135%;
-      /* 21.6px */
-      letter-spacing: 0.32px;
-    }
-  }
+.min-w-0 {
+  min-width: 0;
+}
 
-  .add-social {
-    position: fixed;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    top: 0px;
-    left: 0px;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
+@media (max-width: 450px) {
+  .max-w-min-content {
+    max-width: 300px;
   }
 }
 
-.btn {
-  text-transform: none;
-  color: #6e7a87 !important;
-  border-width: 0;
-  background-color: #f1f5f9;
-  font-weight: 700;
-  line-height: 135%;
-  /* 18.9px */
-  letter-spacing: 0.28px;
-}
-
-@media (max-width: 400px) {
-  #Card {
-    .btn {
-      width: 100%;
-    }
+@media (max-width: 350px) {
+  .max-w-min-content {
+    max-width: 250px;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div v-if="user" class="content-block d-flex w-100 gap-6">
-    <div class="details d-flex flex-grow-1 flex-column gap-6">
+  <div v-if="user" class="content-block d-flex gap-6">
+    <div class="details d-flex flex-column gap-6">
       <alex-profile-cards-overview
         :user-id="user.id"
         :socials="user.socials"
@@ -210,7 +210,8 @@ const institutions = computed(() => user.value.institutions ?? []);
       flex-wrap: wrap;
     }
     .details {
-      max-width: none;
+      max-width: 100%;
+      flex-grow: 1 !important;
     }
   }
 }
