@@ -33,8 +33,6 @@
               :index="index"
               :data="localData"
               :filtered-items="filteredVerbs"
-              @update:keyword="onUpdateKeyword"
-              @update:description="onUpdateDescription"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
               @success:description="onSuccessDescription"
@@ -153,7 +151,7 @@ const addGoal = () => {
   selectedPanel.value = localData.value.length - 1;
 };
 const onCancel = () => {
-  localData.value = toRaw(lastGoals.value.map((g) => Object.assign({}, g)));
+  localData.value = lastGoals.value;
 };
 const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {

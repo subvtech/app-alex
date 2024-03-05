@@ -25,6 +25,7 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { Goal } from './Goals.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',
@@ -38,12 +39,14 @@ type FormGoalProps = {
   data: Goal[];
   filteredItems: { text: string; id: number }[];
 };
-const props = withDefaults(defineProps<FormGoalProps>(), { id: undefined });
+const props = defineProps<FormGoalProps>();
 const { filteredItems } = toRefs(props);
-const preDefinedVerbs = ref(
-  filteredItems.value.filter((item) => item.text !== props.keyword),
-);
 const currentData = computed(() => props.data[props.index]);
+const preDefinedVerbs = ref(
+  filteredItems.value.filter(
+    (item) => item.text !== currentData.value.contentData.keyWord,
+  ),
+);
 const { validateField, errors, setFieldValue, useFieldModel } = useForm({
   validateOnMount: true,
   initialValues: {
@@ -59,11 +62,19 @@ const handleKeyWord = (value: string) => {
   validateField('keyword');
   setFieldValue('keyword', value);
   currentData.value.keyWord = value;
+  currentData.value.contentData = {
+    ...currentData.value.contentData,
+    keyWord: value,
+  };
 };
 const handleDescription = (value: string) => {
   validateField('description');
   setFieldValue('description', value);
-  currentData.value.description = value;
+  currentData.value.title = value;
+  currentData.value.contentData = {
+    ...currentData.value.contentData,
+    description: value,
+  };
 };
 watch(keyWord, (value) => {
   handleKeyWord(value);
