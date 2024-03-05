@@ -12,10 +12,7 @@
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
-    @toggle:is-editing="
-      isEditing = !isEditing;
-      isEditing && setLastGoals();
-    "
+    @toggle:is-editing="toggleEditing"
   >
     <template #content>
       <alex-custom-empty-placeholder
@@ -31,15 +28,10 @@
           show-positions
           :overwrite-item="!isEditing"
         >
-          <template
-            v-if="isEditing"
-            #content="{ id, keyWord, index, description }"
-          >
+          <template v-if="isEditing" #content="{ index }">
             <alex-learningplan-form-goal
-              :id="id"
-              :keyword="keyWord"
               :index="index"
-              :description="description"
+              :data="localData"
               :filtered-items="filteredVerbs"
               @update:keyword="onUpdateKeyword"
               @update:description="onUpdateDescription"
@@ -72,8 +64,7 @@
 </template>
 <script setup lang="ts">
 const client = useStrapiClient();
-type UpdateDataGoal = { value: string; index: number };
-type Goal = {
+export type Goal = {
   id?: number;
   title: string; // Description
   keyWord: string; // Verb
@@ -102,7 +93,6 @@ const emit = defineEmits(['update']);
 const { t } = useI18n();
 const { currentWidth } = useNavigationDrawer();
 const { setMessage } = useMessageStore();
-
 const localData = ref(props.data);
 const disableSave = ref(true);
 const isEditing = ref(false);
@@ -110,13 +100,17 @@ const selectedPanel = ref(0);
 const filteredVerbs = ref<{ text: string; id: number }[]>([]);
 const withinBreakpoint = computed(() => currentWidth.value < 450);
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
-
 const lastGoals = ref<Goal[]>([]);
 
-function setLastGoals() {
+const setLastGoals = () => {
   lastGoals.value = toRaw(localData.value.map((g) => Object.assign({}, g)));
-}
-
+};
+const toggleEditing = () => {
+  isEditing.value = !isEditing.value;
+  if (isEditing.value) {
+    setLastGoals();
+  }
+};
 const toggleSave = () => {
   const errorFound = localData.value.find(
     (item) => item.errorDescription || item.errorKeyWord,
@@ -142,15 +136,6 @@ const onSuccessKeyword = (index: number) => {
   localData.value[index].errorKeyWord = false;
   toggleSave();
 };
-const onUpdateDescription = (data: UpdateDataGoal) => {
-  localData.value[data.index].title = data.value;
-  localData.value[data.index].contentData.description = data.value;
-};
-const onUpdateKeyword = (data: UpdateDataGoal) => {
-  localData.value[data.index].keyWord = data.value;
-  localData.value[data.index].contentData.keyWord = data.value;
-};
-
 const addGoal = () => {
   const newGoal = {
     keyWord: t('components.courses.goals.verb.placeholder'),
@@ -174,7 +159,8 @@ const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {
     method: 'PUT',
     body: {
-      goals: localData.value.map((item) => ({
+      goals: localData.value.map((item, index) => ({
+        index,
         verb: {
           text: item.keyWord,
           id: item.contentData.keyWordId,

@@ -31,50 +31,39 @@ const emit = defineEmits([
   'success:keyword',
   'success:description',
   'success',
-  'update:description',
-  'update:keyword',
 ]);
 const { goalRules } = useFormRules();
 type FormGoalProps = {
-  id?: number;
   index: number;
+  data: Goal[];
   filteredItems: { text: string; id: number }[];
-  keyword: string;
-  description: string;
 };
 const props = withDefaults(defineProps<FormGoalProps>(), { id: undefined });
 const { filteredItems } = toRefs(props);
 const preDefinedVerbs = ref(
   filteredItems.value.filter((item) => item.text !== props.keyword),
 );
-const { values, validateField, errors, setFieldValue, useFieldModel } = useForm(
-  {
-    validateOnMount: true,
-    initialValues: {
-      keyword: props.keyword,
-      description: props.description,
-    },
-    validationSchema: goalRules,
+const currentData = computed(() => props.data[props.index]);
+const { validateField, errors, setFieldValue, useFieldModel } = useForm({
+  validateOnMount: true,
+  initialValues: {
+    keyword: currentData.value.contentData.keyWord,
+    description: currentData.value.contentData.description,
   },
-);
+  validationSchema: goalRules,
+});
 
 const keyWord = useFieldModel('keyword');
 const descriptionRef = useFieldModel('description');
 const handleKeyWord = (value: string) => {
   validateField('keyword');
   setFieldValue('keyword', value);
-  emit('update:keyword', {
-    value,
-    index: props.index,
-  });
+  currentData.value.keyWord = value;
 };
 const handleDescription = (value: string) => {
   validateField('description');
   setFieldValue('description', value);
-  emit('update:description', {
-    value,
-    index: props.index,
-  });
+  currentData.value.description = value;
 };
 watch(keyWord, (value) => {
   handleKeyWord(value);
@@ -86,14 +75,13 @@ watch(descriptionRef, (value) => {
 const descriptionErrorOrKeywordError = computed(
   () => errors.value.keyword || errors.value.description,
 );
-
-watch([errors], () => {
+watch(errors, () => {
   if (!errors.value.keyword && !errors.value.description) {
     emit('success', {
-      id: props.id,
+      id: currentData.value.id,
       index: props.index,
-      keyWord: values.keyword,
-      description: values.description,
+      keyWord: currentData.value.keyWord,
+      description: currentData.value.title,
     });
   }
 
