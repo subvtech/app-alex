@@ -67,6 +67,7 @@
               <alex-custom-dialog-footer
                 v-else-if="!hasFooter && !noFooter"
                 :no-secondary-button="isFirstStep"
+                :main-button-disabled="mainButtonDisabled"
               >
                 <template #mainSlotButton>
                   <alex-custom-button
@@ -111,6 +112,7 @@
       data-testid="alex-dialog-footer"
       :main-button-text="mainButtonText"
       :secondary-button-text="secondaryButtonText"
+      :main-button-disabled="mainButtonDisabled"
       @on-main-action="() => emits('onMainAction')"
       @on-secondary-action="() => emits('onSecondaryAction')"
     />
@@ -128,6 +130,7 @@ interface HeaderProps {
   highlightedTitle?: string;
   mainButtonText?: string;
   secondaryButtonText?: string;
+  mainButtonDisabled?: boolean;
   noFooter?: boolean;
   noHeader?: boolean;
   stepper?: boolean;
@@ -144,6 +147,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   secondaryButtonText: undefined,
   noFooter: false,
   noHeader: false,
+  mainButtonDisabled: false,
   bodyClasses: undefined,
   stepper: false,
   stepsConfig: undefined,
