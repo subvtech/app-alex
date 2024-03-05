@@ -12,7 +12,10 @@
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
-    @toggle:is-editing="isEditing = !isEditing"
+    @toggle:is-editing="
+      isEditing = !isEditing;
+      isEditing && setLastGoals();
+    "
   >
     <template #content>
       <alex-custom-empty-placeholder
@@ -99,13 +102,20 @@ const emit = defineEmits(['update']);
 const { t } = useI18n();
 const { currentWidth } = useNavigationDrawer();
 const { setMessage } = useMessageStore();
-const localData = ref([...props.data]);
+
+const localData = ref(props.data);
 const disableSave = ref(true);
 const isEditing = ref(false);
 const selectedPanel = ref(0);
 const filteredVerbs = ref<{ text: string; id: number }[]>([]);
 const withinBreakpoint = computed(() => currentWidth.value < 450);
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
+
+const lastGoals = ref<Goal[]>([]);
+
+function setLastGoals() {
+  lastGoals.value = toRaw(localData.value.map((g) => Object.assign({}, g)));
+}
 
 const toggleSave = () => {
   const errorFound = localData.value.find(
@@ -158,9 +168,7 @@ const addGoal = () => {
   selectedPanel.value = localData.value.length - 1;
 };
 const onCancel = () => {
-  console.log('propsdata', props.data);
-  console.log('local', localData.value);
-  localData.value = [...props.data];
+  localData.value = toRaw(lastGoals.value.map((g) => Object.assign({}, g)));
 };
 const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {
