@@ -58,7 +58,7 @@
             v-if="showDetails"
             is-nested
             hide-dividers
-            :blocks="learningPlan.details?.blocks"
+            :data="learningPlan.details"
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="learningPlanStore.userIsFacilitator"

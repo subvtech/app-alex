@@ -35,11 +35,6 @@ const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
-const uploadBaseUrl = computed(() => {
-  const runtimeConfig = useRuntimeConfig();
-  return runtimeConfig.public.strapi.url;
-});
-
 onMounted(() => {
   instance.value = new EditorJS({
     autofocus: true,
@@ -208,14 +203,16 @@ onMounted(() => {
       carousel: {
         class: Carousel,
         config: {
-          uploadBaseUrl: uploadBaseUrl.value,
-          handleFileSelected: (files) => {
+          handleFileSelected: async (slides) => {
             const formData = new FormData();
-            files.forEach((file) => {
-              if (file instanceof File) {
-                formData.append('files', file, file.name);
-              } else if (typeof file === 'string' && file.startsWith('data:')) {
-                const base64Data = file.split(',')[1];
+            slides.forEach((slide) => {
+              if (slide.url instanceof File) {
+                formData.append('files', slide.url, slide.title);
+              } else if (
+                typeof slide.url === 'string' &&
+                slide.url.startsWith('data:')
+              ) {
+                const base64Data = slide.url.split(',')[1];
                 const binaryString = window.atob(base64Data);
                 const byteArray = new Uint8Array(binaryString.length);
 
@@ -224,55 +221,41 @@ onMounted(() => {
                 }
 
                 let mimeType = 'image/png';
-                if (file.startsWith('data:image/jpeg')) {
+                if (slide.url.startsWith('data:image/jpeg')) {
                   mimeType = 'image/jpeg';
                 }
 
                 const blob = new Blob([byteArray], { type: mimeType });
-                const fileName =
-                  files[0].name.slice(0, files[0].name.lastIndexOf('.')) +
-                  '.jpeg';
-                const imageFile = new File([blob], fileName, {
+                const imageFile = new File([blob], slide.title, {
                   type: mimeType,
                 });
                 formData.append('files', imageFile, imageFile.name);
               }
             });
-
-            return strapiClient<Upload>('/upload', {
+            const res = await strapiClient('/upload', {
               method: 'POST',
               body: formData,
-            })
-              .then((res) => {
-                if (files.length > 1) {
-                  const url = res[0].url;
-                  const thumbnail = res[1].url;
-                  return { success: 1, url: { url }, thumbnail: { thumbnail } };
-                } else {
-                  const url = res[0].url;
-                  return { success: 1, url: { url } };
-                }
-              })
-              .catch((err) => {
-                messageStore.message = err;
-              });
+            });
+            if (slides.length > 1) {
+              const url = res[0].url;
+              const videoId = res[0].id;
+              const thumbnail = res[1].url;
+              const imgId = res[1].id;
+              return { success: 1, url, thumbnail, videoId, imgId };
+            } else {
+              const { url, id } = res[0];
+              return { success: 1, url, imgId: id };
+            }
           },
           handleDeletedFiles: async (file) => {
-            await strapiClient<Upload>('/upload/files', {
-              method: 'GET',
-            }).then((res) => {
-              const files = res;
-              const fileImage = files.find((f) => f.url === file.image);
-              strapiClient<Upload>(`/upload/files/${fileImage.id}`, {
+            if (file.videoId)
+              await strapiClient(`/upload/files/${file.videoId}`, {
                 method: 'DELETE',
               });
-              if (file.video) {
-                const fileVideo = files.find((f) => f.url === file.video);
-                strapiClient<Upload>(`/upload/files/${fileVideo.id}`, {
-                  method: 'DELETE',
-                });
-              }
-            });
+            if (file.imgId)
+              strapiClient(`/upload/files/${file.imgId}`, {
+                method: 'DELETE',
+              });
           },
         },
       },
@@ -281,12 +264,11 @@ onMounted(() => {
     minHeight: 400,
     data: { blocks: [] },
     holder: 'editorjs',
+    // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
     onReady: async () => {
       const data = await instance.value.save();
       if (data.blocks.length > 0) {
-        /* eslint-disable-next-line */
-        // new DragDrop(instance.value); // Fix ME
         /* eslint-disable-next-line */
         new Undo({ editor: instance.value });
       }
