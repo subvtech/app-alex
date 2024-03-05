@@ -94,18 +94,20 @@ export const useFormRules = () => {
         isValidCpf(cpf),
       ),
   };
-
-  const keywordRules = yup
-    .object({
-      text: yup
-        .string()
-        .min(2, i18n.t('rules.keyword.required'))
-        .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
-        .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
-        .required(i18n.t('rules.keyword.required')),
-    })
-    .required(i18n.t('rules.keyword.required'));
-
+  const goalRules = {
+    keyword: yup
+      .string()
+      .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
+      .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+      .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+      .required(i18n.t('rules.keyword.required')),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(6, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(4000, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+  };
   const startDateCreationRules = yup
     .date()
     .required(i18n.t('rules.startDate.required'))
@@ -321,10 +323,10 @@ export const useFormRules = () => {
     passwordRules,
     fullnameRules,
     descriptionRules,
-    keywordRules,
     cpfRules,
     profileSchema,
     socialsSchema,
+    goalRules,
     nameRules: yup
       .string()
       .min(3, ({ min }) => i18n.t('rules.name.min', { min }))

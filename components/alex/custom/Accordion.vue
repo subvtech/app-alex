@@ -1,5 +1,9 @@
 <template>
-  <v-expansion-panels variant="accordion" role="list" class="alex-accordion">
+  <v-expansion-panels
+    variant="accordion"
+    role="list"
+    class="alex-accordion elevation-0"
+  >
     <transition-group name="list">
       <v-expansion-panel
         v-for="(item, index) in list"
@@ -235,5 +239,17 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
   &:active {
     background-color: #d2d6da !important;
   }
+}
+
+.v-expansion-panel__shadow {
+  display: none !important;
+}
+.v-expansion-panels {
+  --color: rgb(var(--v-theme-gray-100)) !important;
+  border: 1px solid var(--color) !important;
+  border-radius: 8px;
+}
+.v-expansion-panel {
+  border-radius: 8px;
 }
 </style>

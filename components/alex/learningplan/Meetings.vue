@@ -161,7 +161,7 @@ const updateMeeting = async (values) => {
   );
 
   myData.value = myData.value.map((meeting) => {
-    if (meeting.id == values.id) {
+    if (meeting.id === values.id) {
       return {
         ...values,
         startDate: meetingStartDate,
@@ -172,7 +172,7 @@ const updateMeeting = async (values) => {
     return meeting;
   });
 
-  const result = await update('learning-plan-meeting-schedules', values.id, {
+  await update('learning-plan-meeting-schedules', values.id, {
     ...values,
     startDate: meetingStartDate,
     endDate: meetingEndDate,
