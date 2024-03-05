@@ -81,8 +81,7 @@ watch(learningPlanStore, () => {
     setMessage('Voce já faz parte do curso!', 'blue', true);
     navigateTo(`/courses/${learningPlanStore.learningPlan?.id}`);
   }
-
-  if (!invitationHash || !isLinkEnabled) {
+  if (!invitationHash.value || !isLinkEnabled) {
     setMessage('Convite não encontrado!', 'red', true);
     navigateTo('/courses/me');
   }
