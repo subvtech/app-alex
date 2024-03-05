@@ -34,7 +34,7 @@
           >
             <alex-learningplan-form-goal
               :id="id"
-              :keyword="keyWord || ''"
+              :keyword="keyWord"
               :index="index"
               :description="description"
               :filtered-items="filteredVerbs"
@@ -160,16 +160,18 @@ const addGoal = () => {
 const onCancel = () => {
   console.log('propsdata', props.data);
   console.log('local', localData.value);
-  // localData.value = [...props.data];
+  localData.value = [...props.data];
 };
 const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {
     method: 'PUT',
     body: {
       goals: localData.value.map((item) => ({
-        verb: item.keyWord,
+        verb: {
+          text: item.keyWord,
+          id: item.contentData.keyWordId,
+        },
         description: item.title,
-        keywordId: item.contentData.keyWordId,
         ...(!item.local && { id: item.contentData.id }),
       })),
     },
@@ -182,10 +184,6 @@ const onSave = async () => {
     },
   });
 };
-
-// watch(canEdit, () => {
-//   isEditing.value = props.canEdit;
-// });
 watch(
   localData,
   () => {
