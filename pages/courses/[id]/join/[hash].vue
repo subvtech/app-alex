@@ -1,15 +1,50 @@
 <template>
   <alex-learningplan-dialogs-alert
-    v-if="!learningPlanStore.loading && learningPlanStore.invitationLink"
+    v-if="
+      !learningPlanStore.loading && invitationHash && !invitationHash.is_expired
+    "
     v-model="openConfirmation"
     variant="primary"
     persistent
-    title="Deseja participar desse curso?"
-    :subtitle="`Voce foi convidado para participar do curso de ${learningPlanStore.learningPlan?.title} da turma ${learningPlanStore.learningPlan?.class_name}`"
-    submit-button-text="Participar"
+    :title="$t('components.learningPlan.join.active.title')"
+    image-class="mb-6"
+    :image="{
+      src: '/svg/Invite.svg',
+      alt: 'Convite',
+      width: 300,
+      height: 200,
+    }"
     :loading="loading"
+    :submit-button-text="$t('components.learningPlan.join.active.action')"
     @submit="onConfirm"
     @cancel="onCancel"
+  >
+    <template #subtitle>
+      {{ t('components.learningPlan.join.active.description') }}
+      <strong>{{ learningPlanStore.learningPlan?.title }}</strong>
+      {{ t('components.learningPlan.join.active.at') }}
+      <strong>{{ learningPlanStore.learningPlan?.class_name }}</strong>
+    </template>
+  </alex-learningplan-dialogs-alert>
+  <alex-learningplan-dialogs-alert
+    v-else-if="
+      !learningPlanStore.loading && invitationHash && invitationHash.is_expired
+    "
+    v-model="openConfirmation"
+    variant="primary"
+    persistent
+    hide-cancel-button
+    :title="$t('components.learningPlan.join.expired.title')"
+    :image="{
+      src: '/svg/InviteExpired.svg',
+      alt: 'Convite Expirado',
+      width: 300,
+      height: 200,
+    }"
+    :subtitle="$t('components.learningPlan.join.expired.description')"
+    :submit-button-text="$t('components.learningPlan.join.expired.action')"
+    :loading="loading"
+    @submit="onCancel"
   />
   <v-row v-else justify="center">
     <v-progress-circular indeterminate color="accent" size="100" width="6" />
@@ -25,10 +60,19 @@ const strapi = useStrapi();
 const loading = ref(false);
 const user = useStrapiUser();
 const hash = route.params.hash?.toString();
+const invitationHash = ref();
+const { t } = useI18n();
 
 watch(learningPlanStore, () => {
-  const isCorrectInvitationHash =
-    learningPlanStore.invitationLink?.hash === hash;
+  invitationHash.value = learningPlanStore.learningPlan?.invitation_links.find(
+    (link) => {
+      return (
+        link.hash === hash &&
+        (!link.emails_to_send ||
+          link.emails_to_send.includes(user.value?.email || ''))
+      );
+    },
+  );
   const isLinkEnabled = learningPlanStore.learningPlan?.invite_enabled;
   if (
     learningPlanStore.userIsActiveMember ||
@@ -37,8 +81,7 @@ watch(learningPlanStore, () => {
     setMessage('Voce já faz parte do curso!', 'blue', true);
     navigateTo(`/courses/${learningPlanStore.learningPlan?.id}`);
   }
-
-  if (!isCorrectInvitationHash || !isLinkEnabled) {
+  if (!invitationHash.value || !isLinkEnabled) {
     setMessage('Convite não encontrado!', 'red', true);
     navigateTo('/courses/me');
   }
@@ -151,5 +194,13 @@ async function onConfirm() {
     font-weight: 400;
     line-height: 24px; /* 150% */
   }
+}
+
+.modal-body {
+  width: 100%;
+  max-width: 350px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
