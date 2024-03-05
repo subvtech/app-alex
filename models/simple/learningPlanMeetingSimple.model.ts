@@ -1,5 +1,5 @@
 export interface LearningPlanMeetingSimple {
-  date: Date;
+  date: string;
   schedule: LearningPlanScheduleSimple;
   is_expired: boolean;
   earliest?: boolean; // Only Front
