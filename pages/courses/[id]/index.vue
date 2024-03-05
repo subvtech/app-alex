@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { format } from 'date-fns';
 defineEmits(['update']);
 definePageMeta({
   middleware: 'auth',
@@ -25,10 +24,12 @@ const schedules = computed(
   () =>
     learningPlanStore.schedules?.map((item) => {
       const earliestMeeting = item.meetings.find((meeting) => meeting.earliest);
+      const startHour = item.startDate.split('T')[1].slice(0, 5);
+      const endHour = item.endDate.split('T')[1].slice(0, 5);
       return {
         id: item.id,
-        startHour: format(new Date(item.startDate), 'HH:mm'),
-        endHour: format(new Date(item.endDate), 'HH:mm'),
+        startHour,
+        endHour,
         interval: item.interval,
         date: earliestMeeting?.date
           ? new Date(earliestMeeting.date)

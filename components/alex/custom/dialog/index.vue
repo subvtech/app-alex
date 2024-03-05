@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    max-width="720"
+    :max-width="maxWidth"
     transition="dialog-center-transition"
     data-testid="alex-dialog"
     class="custom-alex-dialog"
@@ -22,7 +22,7 @@
       :emit-close="() => emits('update:modelValue', false)"
     />
     <alex-custom-dialog-header
-      v-else
+      v-else-if="!noHeader && !noFooter"
       data-testid="alex-dialog-header"
       :title="title"
       :highlighted-title="highlightedTitle"
@@ -132,10 +132,12 @@ interface HeaderProps {
   secondaryButtonText?: string;
   mainButtonDisabled?: boolean;
   noFooter?: boolean;
+  noHeader?: boolean;
   stepper?: boolean;
   stepClass?: unknown[] | string;
   stepsConfig?: Record<string, Partial<StepsConfig>>;
   loading?: boolean;
+  maxWidth?: number;
 }
 const props = withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
@@ -144,12 +146,14 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   mainButtonText: undefined,
   secondaryButtonText: undefined,
   noFooter: false,
+  noHeader: false,
   mainButtonDisabled: false,
   bodyClasses: undefined,
   stepper: false,
   stepsConfig: undefined,
   stepClass: undefined,
   loading: undefined,
+  maxWidth: 720,
 });
 const emits = defineEmits([
   'update:modelValue',

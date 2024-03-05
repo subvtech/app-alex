@@ -234,7 +234,6 @@ const getVerbConnectArray = async (keyWord) => {
 const onSave = async () => {
   const createPromises = createArray.value.map(async (item) => {
     const connectArray = await getVerbConnectArray(item.keyWord);
-
     const result = await create('learning-goals', {
       description: item.description,
       learningplan: props.courseId,
@@ -261,7 +260,7 @@ const onSave = async () => {
   const deletePromises = props.data
     .filter((x) => dataCopy.value.findIndex((y) => y.id === x.id) === -1)
     .map((item) => {
-      return _delete('learning-goals', item.id);
+      return _delete('learning-goals', item.keyWordId);
     });
 
   await Promise.all([...createPromises, ...updatePromises, ...deletePromises]);

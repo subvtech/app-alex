@@ -5,6 +5,7 @@
     align-content="align-center"
     :href="`${learningPlanId}/settings`"
     :show-icon="false"
+    :href="`${learningPlanId}/settings`"
   >
     <template #content>
       <div

@@ -7,6 +7,7 @@
     :cancel="onCancel"
     :save="onSave"
     full-width
+    :disable-save="valueWasNotChanged"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
@@ -52,6 +53,9 @@ const client = useStrapiClient();
 const images = ref([...props.images]);
 const initialImages = ref([...props.images]);
 const isEditing = ref(false);
+const valueWasNotChanged = computed(
+  () => JSON.stringify(images.value) === JSON.stringify(initialImages.value),
+);
 const isEditingAndCanEdit = computed(() => isEditing.value && props.canEdit);
 const onCancel = async () => {
   const deletedMedia = images.value
