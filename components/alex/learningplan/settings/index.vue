@@ -6,7 +6,7 @@
   >
     <template #content>
       <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
-        <alex-learningplan-settings-banner
+        <alex-learningplan-settings-cover-image
           namespace="courses"
           @update="fetchData"
         />
