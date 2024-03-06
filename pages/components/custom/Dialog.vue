@@ -179,6 +179,13 @@
               </td>
             </tr>
             <tr>
+              <td>noHeader</td>
+              <td>boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
               <td>bodyClasses</td>
               <td>string</td>
               <td class="text-center">
@@ -195,6 +202,13 @@
             <tr>
               <td>stepsConfig</td>
               <td>StepsConfig</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>maxWidth</td>
+              <td>number</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
