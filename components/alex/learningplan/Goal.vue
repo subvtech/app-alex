@@ -1,11 +1,11 @@
 <template>
   <div class="goal d-flex pa-4 w-100 gap">
     <span>{{ index + 1 }}.</span>
-    <div class="d-flex flex-column">
-      <span class="title">
-        {{ keyWord }}
-      </span>
-      <span>
+    <div class="d-flex gap-1">
+      <span class="w-100 word-break">
+        <span class="title h-min">
+          {{ keyWord }}
+        </span>
         {{ title }}
       </span>
     </div>
@@ -31,6 +31,9 @@ defineProps({
 
 <style scoped lang="scss">
 .goal {
+  .word-break {
+    word-break: break-all;
+  }
   border-radius: 8px;
   background: var(--cinza-cinza-azulado, #f1f5f9);
   .title {
