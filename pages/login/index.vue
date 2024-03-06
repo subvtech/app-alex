@@ -136,10 +136,14 @@ import { useForm } from 'vee-validate';
 import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
 const hasError = ref(false);
 const errorMessage = ref('');
+const route = useRoute();
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
 });
+
+const redirect = route.query.redirect as string | undefined;
+
 const { login } = useStrapiAuth();
 const router = useRouter();
 
@@ -171,7 +175,11 @@ const submit = handleSubmit(async () => {
       password: values.password,
     });
 
-    router.push('/');
+    if (redirect) {
+      router.push(redirect);
+    } else {
+      router.push('/');
+    }
   } catch (err: unknown) {
     hasError.value = true;
     const error = err as Strapi4Error;
