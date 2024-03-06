@@ -58,7 +58,7 @@ const editorDetails = ref();
 const initialData = ref();
 const isEditing = ref(false);
 const isEmptyAndIsNotEditing = computed(
-  () => data.value?.blocks?.length === 0 && !isEditing.value,
+  () => !data.value?.blocks?.length && !isEditing.value,
 );
 const updateDetails = async () => {
   const editorData = await editorDetails.value?.getData();
