@@ -42,12 +42,12 @@ type DetailsBlock = {
 type DetailsEditorProps = {
   data: {
     blocks: DetailsBlock[];
-  };
+  } | null;
   courseId: number;
   title: string;
   canEdit: boolean;
 };
-const props = withDefaults(defineProps<DetailsEditorProps>(), {});
+const props = withDefaults(defineProps<DetailsEditorProps>(), { data: null });
 const emit = defineEmits(['ready', 'update']);
 const { setMessage } = useMessageStore();
 const { data, canEdit } = toRefs(props);
@@ -91,7 +91,7 @@ const checkEditorReady = async () => {
 };
 const toggleReadOnly = async () => {
   readOnly.value = !readOnly.value;
-  if (editorDetails.value && data.value.blocks?.length) {
+  if (editorDetails.value && data.value?.blocks?.length) {
     await editorDetails.value.toggleReadOnly();
   }
 
@@ -100,7 +100,7 @@ const toggleReadOnly = async () => {
   }
 };
 const resetData = async () => {
-  if (!data.value.blocks?.length) {
+  if (!data.value?.blocks?.length) {
     editorDetails.value.clearEditor();
   } else {
     const editorData = JSON.parse(JSON.stringify(initialData.value));
@@ -113,7 +113,7 @@ onMounted(async () => {
   while (learningplanStore.loading) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (data.value.blocks?.length) {
+  if (data.value?.blocks?.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
       const editorData = JSON.parse(JSON.stringify(data.value));
@@ -130,6 +130,9 @@ onMounted(async () => {
 <style global lang="scss">
 #editorjs {
   width: 100% !important;
+  .codex-editor__redactor {
+    padding-bottom: 0 !important;
+  }
 }
 .locked {
   pointer-events: none;
@@ -142,7 +145,8 @@ onMounted(async () => {
     display: none;
   }
 }
-#editorjs .codex-editor__redactor {
+
+#editorjs:not(.locked) {
   padding-bottom: 300px !important;
 }
 @media (min-width: 651px) {
