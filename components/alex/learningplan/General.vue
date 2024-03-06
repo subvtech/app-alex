@@ -2,7 +2,7 @@
   <div class="course-page w-100 gap-6">
     <alex-custom-card
       title=""
-      class="left-block min-w-card flex-wrap w-100"
+      class="left-block min-w-card flex-wrap w-100 pb-12"
       no-header
       full-width
       :align-content="'align-center'"
@@ -16,7 +16,8 @@
           <alex-custom-skeleton class="w-100 height-68" color="gray-200" />
         </div>
         <div v-else class="d-flex flex-column align-center w-100 gap-12 w-212">
-          <app-media
+          <alex-learningplan-media
+            :learningplan-id="learningPlan.id"
             sizing-class="pa-0"
             is-nested
             hide-dividers
@@ -30,7 +31,7 @@
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
-          <app-about
+          <alex-learningplan-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
@@ -48,21 +49,7 @@
             :can-edit="canEdit"
             :course-id="learningPlan.id"
             :user-id="user.id"
-            :data="
-              learningPlan.learning_goals.map((item) => {
-                return {
-                  id: item.id,
-                  title: item.description,
-                  keyWord: item.verb.text,
-                  keyWordId: item.verb.id,
-                  contentData: {
-                    id: item.id,
-                    description: item.description,
-                    verb: { text: item.verb.text },
-                  },
-                };
-              })
-            "
+            :data="learningGoals"
             :tooltip="$t('components.courses.goals.tooltip')"
             @update="(data) => emit('update', data)"
           />
@@ -71,7 +58,7 @@
             v-if="showDetails"
             is-nested
             hide-dividers
-            :info="learningPlan.details?.lines"
+            :data="learningPlan.details"
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="learningPlanStore.userIsFacilitator"
@@ -123,12 +110,7 @@
           />
         </template>
         <template #footer>
-          <div
-            class="w-100 fix-margin"
-            :class="
-              !plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'
-            "
-          >
+          <div class="w-100 fix-margin pb-6">
             <alex-learningplan-meetings
               is-nested
               hide-dividers
@@ -232,6 +214,23 @@ const showDetails = computed(() => {
 
   return props.learningPlan.details?.data?.length !== 0;
 });
+
+const learningGoals = computed(() =>
+  props.learningPlan.learning_goals.map((goal, index) => ({
+    id: goal.id,
+    title: goal.description,
+    keyWord: goal.verb.text,
+    errorKeyWord: false,
+    errorTitle: false,
+    contentData: {
+      id: goal.id,
+      index,
+      description: goal.description,
+      keyWord: goal.verb.text,
+      keyWordId: goal.verb.id,
+    },
+  })),
+);
 </script>
 
 <style scope lang="scss">

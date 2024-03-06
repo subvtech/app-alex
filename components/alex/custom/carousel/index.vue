@@ -207,10 +207,16 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'slidesChanged']);
 
-const slides = ref([...props.modelValue]);
-
+const slides = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit('update:modelValue', value);
+  },
+});
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {

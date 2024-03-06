@@ -51,7 +51,7 @@ export type MeetingVariantType = 'editing' | 'list';
 export interface MeetingPropsType {
   interval: 0 | 1 | 7 | 14 | 30;
   variant?: MeetingVariantType;
-  date: Date;
+  date: Date | string;
   startHour: string;
   endHour: string;
   shortText?: boolean;
@@ -80,7 +80,6 @@ const props = withDefaults(defineProps<MeetingPropsType>(), {
 });
 
 const date = computed(() => new Date(props.date));
-
 const formattedDate = computed(() => {
   let formatText = ` d '${t('components.courses.meeting.of')}' MMMM '${t(
     'components.courses.meeting.of',

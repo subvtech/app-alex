@@ -90,7 +90,12 @@ const updateModelValue = () => {
 
 const selectOnEnter = () => {
   if (search.value.trim()) {
-    selectedTag.value = { text: search.value, local: true };
+    selectedTag.value = {
+      text: search.value,
+      local: true,
+      isGeneral: props.isGeneral,
+      isPublic: false,
+    };
     updateModelValue();
   }
 };

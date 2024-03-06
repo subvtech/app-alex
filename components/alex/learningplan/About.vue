@@ -2,15 +2,15 @@
   <alex-custom-card
     class="mb-6"
     :title="title"
-    :isEditing="isEditingAndCanEdit"
-    :showIcon="canEdit"
-    @toggle:isEditing="toggleIsEditing"
+    :is-editing="isEditingAndCanEdit"
+    :showicon="canEdit"
     :cancel="onCancel"
-    :save="() => emit('update', isOptional ? myText : value)"
-    :disable-save="errorMessage !== undefined"
+    :save="() => emit('update', isOptional ? text : value)"
+    :disable-save="errorMessage !== undefined || textNotChanged"
     full-width
+    @toggle:is-editing="toggleIsEditing"
   >
-    <template v-slot:content class="pa-6">
+    <template #content>
       <div class="d-flex flex-column w-100">
         <alex-custom-empty-placeholder
           v-if="isTextEmpty && !isOptional && !isEditing"
@@ -27,7 +27,7 @@
             textPlaceholder ?? $t('pages.courses.about.placeholder')
           "
           @input="updateText"
-          >{{ myText }}</span
+          >{{ text }}</span
         >
         <alex-inputs-text-area
           v-else
@@ -35,9 +35,9 @@
           density="comfortable"
           name="description"
           autofocus
+          theme="light"
           :label="$t('pages.courses.about.placeholder')"
           :placeholder="$t('pages.courses.about.placeholder')"
-          theme="light"
           :error-messages="errorMessage"
           required
         />
@@ -48,10 +48,7 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-const { t } = useI18n();
-
 const emit = defineEmits(['update']);
-
 const props = defineProps({
   title: {
     type: String,
@@ -67,13 +64,14 @@ const props = defineProps({
     required: true,
   },
   canEdit: { type: Boolean, required: true },
-
   emptyTextMessage: {
     type: String,
+    required: true,
   },
-  textPlaceholder: { type: String },
+  textPlaceholder: { type: String, default: undefined },
   emptyTextImage: {
     type: String,
+    default: undefined,
   },
   fullWidth: {
     type: Boolean,
@@ -81,7 +79,7 @@ const props = defineProps({
   },
   images: {
     type: Array as PropType<any[]>,
-    default: [],
+    default: () => [],
   },
   showMedia: {
     type: Boolean,
@@ -92,50 +90,40 @@ const props = defineProps({
     default: false,
   },
 });
-
-const { canEdit, text } = toRefs(props);
-
+const { canEdit } = toRefs(props);
 const { descriptionRules } = useFormRules();
-
-const myText = ref(props.text);
+const { value, errorMessage, setValue } = useField(
+  'description',
+  descriptionRules.description,
+  {
+    initialValue: props.text,
+  },
+);
 
 const isEditing = ref(false);
 
 const isEditingAndCanEdit = computed(() => isEditing.value && canEdit.value);
-const isTextEmpty = computed(
-  () =>
-    myText.value === null || myText.value === undefined || myText.value === '',
-);
-
+const isTextEmpty = computed(() => !value.value);
 const notOptionalAndNotEditing = computed(
   () => !isEditingAndCanEdit.value && !props.isOptional,
 );
 const usingMyText = computed(
   () => props.isOptional || notOptionalAndNotEditing.value,
 );
+const textNotChanged = computed(() => props.text === value.value);
 
 const updateText = (event: Event) => {
   const target = event.target as HTMLSpanElement;
-  myText.value = target.innerText;
+  value.value = target.innerText;
 };
 
-const onCancel = async () => {};
+const onCancel = () => {
+  setValue(props.text);
+};
 
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
 };
-
-const { value, errorMessage } = useField(
-  'description',
-  descriptionRules.description,
-  {
-    initialValue: myText.value,
-  },
-);
-
-watch(text, () => {
-  myText.value = props.text;
-});
 </script>
 
 <style scoped lang="scss">

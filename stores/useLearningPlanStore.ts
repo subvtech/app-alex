@@ -164,12 +164,13 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         const earliestMeeting: LearningPlanMeetingSimple[] = sortByDate(
           schedule.meetings,
         );
-        earliestMeeting[0].earliest = true;
+        if (earliestMeeting[0]) {
+          earliestMeeting[0].earliest = true;
+        }
         return { ...schedule, meetings: earliestMeeting };
       }) || []
     );
   });
-
   const generalTags = computed(
     () => learningPlan.value?.tags?.filter((tag) => tag.isGeneral),
   );

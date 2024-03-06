@@ -18,7 +18,9 @@
   "keyword": {
     "required": "Esse campo é obrigatório",
     "noSpaces": "Não pode haver espaços",
-    "onlyLetters": "Apenas letras do alfabeto são permitidas"
+    "onlyLetters": "Apenas letras do alfabeto são permitidas",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres"
   },
 
   "phone": {
