@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 const { t } = useI18n();
-
 definePageMeta({
   middleware: 'auth',
 });
