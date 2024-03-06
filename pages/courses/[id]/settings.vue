@@ -1,160 +1,51 @@
 <template>
-  <div v-if="course">
-    <alex-learningplan-settings
-      :learning-plan="course"
-      :learning-plan-id="course.id"
-      :owner="owner"
-      :invitation-link="invitationLink"
-      :can-edit="userIsFacilitator"
-      :schedules="
-        meetings.map((item) => {
-          return {
-            id: item.id,
-            startHour: format(new Date(item.attributes.startDate), 'HH:mm'),
-            endHour: format(new Date(item.attributes.endDate), 'HH:mm'),
-            interval: item.attributes.interval,
-            date:
-              item.attributes.meetings.data.length !== 0
-                ? new Date(
-                    getEarliestMeeting(
-                      item.attributes.meetings.data,
-                    ).attributes.date,
-                  )
-                : new Date(),
-          };
-        })
-      "
-      @update="(data) => updateCourse(true, data)"
-    />
-  </div>
+  <alex-learningplan-settings
+    v-if="!learningPlanStore.loading && learningPlanStore.learningPlan"
+    :learning-plan="learningPlanStore.learningPlan"
+    :learning-plan-id="learningPlanId"
+    :owner="owner"
+    :invitation-link="learningPlanStore.invitationLink"
+    :can-edit="learningPlanStore.userIsFacilitator"
+    :schedules="schedules"
+  />
+  <div v-else />
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import { format } from 'date-fns';
-
-import { CompetenceTag } from '~/components/Competences.vue';
-
-export type LearningPlanType = {
-  id: number;
-  description: string;
-  slug: string;
-  learning_goals: any;
-  message: string;
-  title: string;
-  invite_enabled: boolean;
-  invitation_duration: number;
-  start_date: string;
-  end_date: string;
-  cover_image: Upload;
-  trails: any;
-  tags: { data: { id: number; attributes: CompetenceTag }[] };
-  details: any;
-  members: { data: any[] };
-  media: any;
-};
-
-const { find, findOne } = useStrapi();
-
-const { t } = useI18n();
-const course = ref<any>();
-const meetings = ref<any>([]);
-
-const invitationLink = ref<any>();
-const userIsFacilitator = ref<boolean>(false);
-const emit = defineEmits(['update']);
-
-const route = useRoute();
-const owner = ref<any>();
-
-const { setMessage } = useMessageStore();
-
 definePageMeta({
   middleware: 'auth',
 });
-
-const getEarliestMeeting = (meetings) => {
-  if (meetings.length === 0) return null;
-  const result = meetings.sort((a, b) => {
-    if (a.date < b.date) {
-      return -1;
-    }
-    if (a.date > b.date) {
-      return 1;
-    }
-    return 0;
-  });
-  return result[0];
-};
-
-const populate = [
-  'cover_image',
-  'media',
-  'invitation_links',
-  'learning_goals.verb',
-  'members.user.avatar',
-  'tags',
-  'schedules',
-];
-
-onBeforeMount(async () => {
-  await updateCourse(false);
-});
-
-const validLink = ({
-  attributes: { role, emails_to_send, expires_at, is_expired },
-}) => {
-  return (
-    role === 'student' &&
-    emails_to_send === null &&
-    !is_expired &&
-    new Date(expires_at).getTime() > new Date().getTime()
-  );
-};
-
-const updateCourse = async (show = true, message?) => {
-  let { id } = route.params;
-  emit('update');
-  const result = await findOne('learningplans', id as string, { populate });
-  if (!result) setMessage(i18n.t('pages.courses.notfound'), 'red', show);
-  course.value = {
-    id: result.data.id,
-    ...(result.data.attributes as Object),
-  };
-
-  owner.value = course.value.members.data.filter(
-    (member) => member.attributes.role === 'facilitator',
-  )[0].attributes.user.data;
-
-  await updateMeetings(course.value.schedules);
-
-  setMessage(message ?? 'done', 'green', show);
-};
-
-const updateMeetings = async (schedules) => {
-  meetings.value = (
-    await find('learning-plan-meeting-schedules', {
-      filters: {
-        learningplan: {
-          id: course.value.id,
-        },
-      },
-      populate: 'meetings',
-      sort: 'date:asc',
-    })
-  ).data;
-};
+const learningPlanStore = useLearningPlanStore();
+const owner = ref<any>();
+const route = useRoute();
+const schedules = computed(() =>
+  learningPlanStore.schedules.map((item) => {
+    return {
+      id: item.id,
+      startHour: format(new Date(item.startDate), 'HH:mm'),
+      endHour: format(new Date(item.endDate), 'HH:mm'),
+      interval: item.interval,
+      date:
+        item.meetings.length !== 0
+          ? item.meetings.find((meeting) => meeting.earliest)?.date
+          : new Date(),
+    };
+  }),
+);
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const headerStore = usePageHeaderStore();
+const { id } = route.params;
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
 });
 
 watch(
-  () => [!course.value],
+  () => [learningPlanStore.loading],
   () => {
-    if (course.value) {
+    if (!learningPlanStore.loading) {
       headerStore.title = t('components.courses.settings.breadcrumbTitle');
       headerStore.items = [
         {
@@ -168,14 +59,14 @@ watch(
           to: '/courses/me',
         },
         {
-          title: course.value.title || '',
+          title: learningPlanStore.learningPlan?.title || '',
           disabled: false,
-          to: `/courses/${course.value.id}`,
+          to: `/courses/${id}`,
         },
         {
           title: t('components.courses.settings.title'),
           disabled: true,
-          to: `/courses/${course.value.id}/settings`,
+          to: `/courses/${id}/settings`,
         },
       ];
     }
