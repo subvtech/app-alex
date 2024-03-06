@@ -6,7 +6,10 @@
   >
     <template #content>
       <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
-        <alex-learningplan-settings-banner namespace="courses" />
+        <alex-learningplan-settings-banner
+          namespace="courses"
+          @update="fetchData"
+        />
         <alex-learningplan-settings-general
           :title="myTitle"
           :start-date="myStartDate"
