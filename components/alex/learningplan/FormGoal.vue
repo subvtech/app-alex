@@ -1,154 +1,113 @@
 <template>
-  <div class="d-flex flex-column gap-4">
-    <div class="d-flex flex-column gap-1">
-      <span class="">{{ $t('components.courses.goals.verb.title') }}</span>
-
-      <app-autocomplete
-        v-model="keywordField.value.value"
-        :class="[
-          keywordField.errorMessage.value ? 'error' : '',
-          descriptionErrorOrKeywordError ? '' : 'success',
-        ]"
-        :placeholder="$t('components.courses.goals.verb.placeholder')"
-        :filtered-items="myVerbs"
-        :update-items="updateVerbs"
-        :error-messages="keywordField.errorMessage.value"
-        name="keyword"
-        clerable
-        @input="handleInput"
-        @update:model-value="updateVerbs"
-      />
-      <span class="error">{{ keywordField.errorMessage.value }}</span>
-    </div>
-
-    <alex-inputs-text-field
-      v-model="descriptionField.value.value"
-      :placeholder="$t('components.courses.goals.description.placeholder')"
-      class="w-100"
-      :class="[
-        descriptionField.errorMessage.value ? 'error' : '',
-        descriptionErrorOrKeywordError ? '' : 'success',
-      ]"
-      :label="$t('components.courses.goals.description.title')"
-      clearable
-      :error-messages="descriptionField.errorMessage.value"
-      name="description"
-      @input="
-        emit('update:description', {
-          value: descriptionField.value.value,
-          index: index,
-        })
-      "
+  <form class="d-flex flex-column gap-4">
+    <alex-inputs-combobox
+      v-model:search="keyWord"
+      name="keyword"
+      clerable
+      hide-details="auto"
+      :label="$t('components.courses.goals.verb.title')"
+      :placeholder="$t('components.courses.goals.verb.placeholder')"
+      :filtered-items="preDefinedVerbs"
     />
-  </div>
+    <alex-inputs-text-field
+      name="description"
+      class="w-100"
+      clearable
+      :placeholder="$t('components.courses.goals.description.placeholder')"
+      :label="$t('components.courses.goals.description.title')"
+      :class="[
+        errors.description && 'error',
+        !descriptionErrorOrKeywordError && 'success',
+      ]"
+    />
+  </form>
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'nuxt/dist/app/compat/capi';
-import { useField } from 'vee-validate';
+import { useForm } from 'vee-validate';
+import { Goal } from './Goals.vue';
 const emit = defineEmits([
   'error:keyword',
   'error:description',
   'success:keyword',
   'success:description',
   'success',
-  'update:description',
-  'update:keyword',
 ]);
-const { keywordRules, descriptionRules } = useFormRules();
-
-const props = defineProps({
-  filteredItems: {
-    type: Array as PropType<{ text: string; id: number }[]>,
-    default: [],
-  },
-  keyword: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  id: {
-    type: Number,
-    required: true,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-});
-const { description, keyword, filteredItems } = toRefs(props);
-const myVerbs = ref(
-  filteredItems.value.filter((item) => item.text !== props.keyword),
+const { goalRules } = useFormRules();
+type FormGoalProps = {
+  index: number;
+  data: Goal[];
+  filteredItems: { text: string; id: number }[];
+};
+const props = defineProps<FormGoalProps>();
+const { filteredItems } = toRefs(props);
+const currentData = computed(() => props.data[props.index]);
+const preDefinedVerbs = ref(
+  filteredItems.value.filter(
+    (item) => item.text !== currentData.value.contentData.keyWord,
+  ),
 );
-
-const updateVerbs = (verb, isCreating = false) => {
-  keywordField.value.value = { text: verb.text } as Tag;
-
-  emit('update:keyword', {
-    value: { text: verb.text },
-    index: props.index,
-  });
-};
-
-const keywordField = useField('keyword', keywordRules, {
-  initialValue: keyword.value,
+const { validateField, errors, setFieldValue, useFieldModel } = useForm({
+  validateOnMount: true,
+  initialValues: {
+    keyword: currentData.value.contentData.keyWord,
+    description: currentData.value.contentData.description,
+  },
+  validationSchema: goalRules,
 });
 
-const descriptionField = useField('description', descriptionRules.description, {
-  initialValue: description.value,
-});
-
-const handleInput = (e) => {
-  keywordField.value.value = { text: e.target.value } as Tag;
-
-  emit('update:keyword', {
-    value: { text: e.target.value },
-    index: props.index,
-  });
-
-  keywordField.validate();
+const keyWord = useFieldModel('keyword');
+const descriptionRef = useFieldModel('description');
+const handleKeyWord = (value: string) => {
+  validateField('keyword');
+  setFieldValue('keyword', value);
+  currentData.value.keyWord = value;
+  currentData.value.contentData = {
+    ...currentData.value.contentData,
+    keyWord: value,
+  };
 };
-
-onMounted(() => {
-  descriptionField.validate();
-  keywordField.validate();
+const handleDescription = (value: string) => {
+  validateField('description');
+  setFieldValue('description', value);
+  currentData.value.title = value;
+  currentData.value.contentData = {
+    ...currentData.value.contentData,
+    description: value,
+  };
+};
+watch(keyWord, (value) => {
+  handleKeyWord(value);
+});
+watch(descriptionRef, (value) => {
+  handleDescription(value);
 });
 
 const descriptionErrorOrKeywordError = computed(
-  () => keywordField.errorMessage.value || descriptionField.errorMessage.value,
+  () => errors.value.keyword || errors.value.description,
 );
+watch(errors, () => {
+  if (!errors.value.keyword && !errors.value.description) {
+    emit('success', {
+      id: currentData.value.id,
+      index: props.index,
+      keyWord: currentData.value.keyWord,
+      description: currentData.value.title,
+    });
+  }
 
-watch(descriptionField.errorMessage, () => {
-  if (descriptionField.errorMessage.value)
+  if (errors.value.keyword) {
+    emit('error:keyword', props.index);
+  } else {
+    emit('success:keyword', props.index);
+  }
+
+  if (errors.value.description) {
     emit('error:description', props.index);
-  else emit('success:description', props.index);
+  } else {
+    emit('success:description', props.index);
+  }
 });
-
-watch(keywordField.errorMessage, () => {
-  if (keywordField.errorMessage.value) emit('error:keyword', props.index);
-  else emit('success:keyword', props.index);
-});
-
-watch(
-  [
-    keywordField.value,
-    keywordField.errorMessage,
-    descriptionField.value,
-    descriptionField.errorMessage,
-  ],
-  () => {
-    if (!descriptionErrorOrKeywordError.value)
-      emit('success', {
-        id: props.id,
-        index: props.index,
-        keyWord: keywordField.value.value,
-        description: descriptionField.value.value,
-      });
-  },
-);
 </script>
 
 <style scoped lang="scss">

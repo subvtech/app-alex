@@ -103,27 +103,16 @@ const { update } = useStrapi();
 const emit = defineEmits<{
   (e: 'update', value: string): void;
 }>();
-const props = defineProps({
-  learningPlanId: {
-    type: Number,
-    required: true,
-  },
-  invitationLink: {
-    type: Object as PropType<InvitationLinkSimple | null>,
-    default: null,
-  },
-  inviteEnabled: {
-    type: Boolean,
-    default: false,
-  },
-  invitationDuration: {
-    type: Number,
-    required: true,
-  },
-  message: {
-    type: String,
-    required: true,
-  },
+type InviteProps = {
+  learningPlanId: number;
+  invitationDuration: number;
+  invitationLink?: InvitationLinkSimple | null;
+  inviteEnabled?: boolean;
+  message?: string | null;
+};
+const props = withDefaults(defineProps<InviteProps>(), {
+  invitationLink: null,
+  message: null,
 });
 
 const { inviteEnabled, invitationLink, message } = toRefs(props);

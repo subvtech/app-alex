@@ -22,24 +22,23 @@
           is-facilitator
           :learning-plan-id="parseInt(id.toString())"
           :data="schedules"
-          :end-date="new Date(learningPlan.end_date)"
+          :end-date="new Date(learningPlan.end_date.replaceAll('-', '/'))"
           variant="editing"
           outline
         />
-
         <alex-learningplan-settings-invites
           :learning-plan-id="parseInt(id.toString())"
           :invite-enabled="learningPlan.invite_enabled"
           :invitation-link="invitationLink"
           :invitation-duration="learningPlan.invitation_duration"
           :message="learningPlan.message"
-          @update="(data) => emit('update', data)"
           outline
+          @update="(data) => emit('update', data)"
         />
         <alex-learningplan-settings-visibility
-          :isHidden="learningPlan.hidden"
-          @update="updateVisibility"
+          :is-hidden="learningPlan.hidden"
           outline
+          @update="updateVisibility"
         />
         <alex-learningplan-settings-delete outline @update="removeCourse" />
       </div>
@@ -47,8 +46,6 @@
   </alex-custom-card>
 </template>
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-
 const { t } = useI18n();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();

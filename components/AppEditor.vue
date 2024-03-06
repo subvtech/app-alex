@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div id="editorjs" class="editorjs w-100 pa-0"></div>
+    <div id="editorjs" class="editorjs w-100 pa-0" v-bind="$attrs"></div>
   </client-only>
 </template>
 
@@ -22,30 +22,19 @@ import Alert from 'editorjs-alert';
 import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
 import Attaches from '@editorjs/attaches';
-import DragDrop from 'editorjs-drag-drop';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
 import AIText from '@alkhipce/editorjs-aitext';
-// import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
-// import { Structure } from '../models/structure.model';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
-
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
-const token = useStrapiToken();
-
-const uploadBaseUrl = computed(() => {
-  const runtimeConfig = useRuntimeConfig();
-  return runtimeConfig.public.strapi.url;
-});
-
 onMounted(() => {
   instance.value = new EditorJS({
     autofocus: true,
@@ -273,16 +262,13 @@ onMounted(() => {
     },
     i18n,
     minHeight: 400,
-    // autofocus: true,
-    data: {},
+    data: { blocks: [] },
     holder: 'editorjs',
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
     onReady: async () => {
       const data = await instance.value.save();
       if (data.blocks.length > 0) {
-        /* eslint-disable-next-line */
-        new DragDrop(instance.value);
         /* eslint-disable-next-line */
         new Undo({ editor: instance.value });
       }

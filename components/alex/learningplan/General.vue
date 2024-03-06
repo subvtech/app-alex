@@ -49,21 +49,7 @@
             :can-edit="canEdit"
             :course-id="learningPlan.id"
             :user-id="user.id"
-            :data="
-              learningPlan.learning_goals.map((item) => {
-                return {
-                  id: item.id,
-                  title: item.description,
-                  keyWord: item.verb.text,
-                  keyWordId: item.verb.id,
-                  contentData: {
-                    id: item.id,
-                    description: item.description,
-                    verb: { text: item.verb.text },
-                  },
-                };
-              })
-            "
+            :data="learningGoals"
             :tooltip="$t('components.courses.goals.tooltip')"
             @update="(data) => emit('update', data)"
           />
@@ -72,7 +58,7 @@
             v-if="showDetails"
             is-nested
             hide-dividers
-            :info="learningPlan.details?.lines"
+            :data="learningPlan.details"
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="learningPlanStore.userIsFacilitator"
@@ -228,6 +214,23 @@ const showDetails = computed(() => {
 
   return props.learningPlan.details?.data?.length !== 0;
 });
+
+const learningGoals = computed(() =>
+  props.learningPlan.learning_goals.map((goal, index) => ({
+    id: goal.id,
+    title: goal.description,
+    keyWord: goal.verb.text,
+    errorKeyWord: false,
+    errorTitle: false,
+    contentData: {
+      id: goal.id,
+      index,
+      description: goal.description,
+      keyWord: goal.verb.text,
+      keyWordId: goal.verb.id,
+    },
+  })),
+);
 </script>
 
 <style scope lang="scss">
