@@ -143,7 +143,7 @@ onMounted(async () => {
   }
 }
 #editorjs .codex-editor__redactor {
-  padding-bottom: 0 !important;
+  padding-bottom: 300px !important;
 }
 @media (min-width: 651px) {
   #editorjs:not(.locked) {
