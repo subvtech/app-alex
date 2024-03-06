@@ -92,10 +92,6 @@ const { update } = useStrapi();
 const { setMessage } = useMessageStore();
 const strapiClient = useStrapiClient();
 const { id } = route.params;
-const fetchData = async () => {
-  await learningPlanStore.loadLearningPlan(parseInt(id.toString()));
-};
-
 const emit = defineEmits(['update']);
 
 const removeCoverImage = () => {
@@ -106,7 +102,6 @@ const removeCoverImage = () => {
       cover_image: null,
     });
     emit('update');
-    fetchData();
     setMessage(
       t('components.trails.settings.cover.removeSuccess'),
       'green',
@@ -137,8 +132,6 @@ const handleFileChange = () => {
 const handleSubmit = async () => {
   const uploadImage = fileInputRef.value.files[0];
   const formData = new FormData();
-  console.log(uploadImage);
-  console.log(id);
   formData.append('files.cover_image', uploadImage);
   formData.append('data', JSON.stringify({}));
   try {
@@ -148,7 +141,6 @@ const handleSubmit = async () => {
         body: formData,
       });
     }
-    fetchData();
     setMessage(t('components.trails.settings.cover.update'), 'green', true);
     emit('update');
   } catch (error) {
