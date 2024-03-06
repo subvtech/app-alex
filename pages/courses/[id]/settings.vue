@@ -9,20 +9,12 @@
     :schedules="schedules"
   />
   <div v-else />
-  <alex-learningplan-settings
-    v-if="!learningPlanStore.loading && learningPlanStore.learningPlan"
-    :learning-plan="learningPlanStore.learningPlan"
-    :learning-plan-id="learningPlanId"
-    :owner="owner"
-    :invitation-link="learningPlanStore.invitationLink"
-    :can-edit="learningPlanStore.userIsFacilitator"
-    :schedules="schedules"
-  />
-  <div v-else />
 </template>
 
 <script setup lang="ts">
 import { format } from 'date-fns';
+const { t } = useI18n();
+
 definePageMeta({
   middleware: 'auth',
 });
