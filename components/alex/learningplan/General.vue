@@ -228,6 +228,7 @@ const learningGoals = computed(() =>
       description: goal.description,
       keyWord: goal.verb.text,
       keyWordId: goal.verb.id,
+      general: goal.verb.general,
     },
   })),
 );

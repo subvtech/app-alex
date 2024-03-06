@@ -32,7 +32,6 @@
             <alex-learningplan-form-goal
               :index="index"
               :data="localData"
-              :filtered-items="filteredVerbs"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
               @success:description="onSuccessDescription"
@@ -75,6 +74,7 @@ export type Goal = {
     index: number;
     keyWord: string; // Verb
     description: string; // Title
+    general: boolean;
   };
 };
 type GoalsProps = {
@@ -95,7 +95,6 @@ const localData = ref(props.data);
 const disableSave = ref(true);
 const isEditing = ref(false);
 const selectedPanel = ref(0);
-const filteredVerbs = ref<{ text: string; id: number }[]>([]);
 const withinBreakpoint = computed(() => currentWidth.value < 450);
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
 const lastGoals = ref<Goal[]>([]);
@@ -145,6 +144,7 @@ const addGoal = () => {
       description: '',
       keyWord: '',
       index: localData.value.length,
+      general: false,
     },
   };
   localData.value.push(newGoal);
@@ -162,6 +162,7 @@ const onSave = async () => {
         verb: {
           text: item.keyWord,
           id: item.contentData.keyWordId,
+          general: item.contentData.general,
         },
         description: item.title,
         ...(!item.local && { id: item.contentData.id }),

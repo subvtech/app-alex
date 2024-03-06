@@ -37,9 +37,11 @@ const { goalRules } = useFormRules();
 type FormGoalProps = {
   index: number;
   data: Goal[];
-  filteredItems: { text: string; id: number }[];
+  filteredItems?: LearningPlanGoalVerb[];
 };
-const props = defineProps<FormGoalProps>();
+const props = withDefaults(defineProps<FormGoalProps>(), {
+  filteredItems: () => [],
+});
 const { filteredItems } = toRefs(props);
 const currentData = computed(() => props.data[props.index]);
 const preDefinedVerbs = ref(
