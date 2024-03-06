@@ -1,11 +1,11 @@
 <template>
   <div v-if="course">
     <alex-learningplan-settings
-      :learningPlan="course"
+      :learning-plan="course"
       :learning-plan-id="course.id"
       :owner="owner"
-      :invitationLink="learningPlanStore.invitationLink"
-      :canEdit="learningPlanStore.userIsFacilitator"
+      :invitation-link="invitationLink"
+      :can-edit="userIsFacilitator"
       :schedules="
         meetings.map((item) => {
           return {
@@ -60,9 +60,9 @@ const { t } = useI18n();
 const course = ref<any>();
 const meetings = ref<any>([]);
 
+const invitationLink = ref<any>();
+const userIsFacilitator = ref<boolean>(false);
 const emit = defineEmits(['update']);
-
-const learningPlanStore = useLearningPlanStore();
 
 const route = useRoute();
 const owner = ref<any>();
@@ -72,44 +72,6 @@ const { setMessage } = useMessageStore();
 definePageMeta({
   middleware: 'auth',
 });
-
-const headerStore = usePageHeaderStore();
-const { id } = route.params;
-
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
-
-watch(
-  () => [learningPlanStore.loading],
-  () => {
-    if (!learningPlanStore.loading) {
-      headerStore.title = t('components.courses.settings.breadcrumbTitle');
-      headerStore.items = [
-        {
-          title: t('components.courses.settings.home'),
-          disabled: false,
-          to: '/',
-        },
-        {
-          title: t('components.courses.settings.myCourses'),
-          disabled: false,
-          to: '/courses/me',
-        },
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${id}`,
-        },
-        {
-          title: t('components.courses.settings.title'),
-          disabled: true,
-          to: `/courses/${id}/settings`,
-        },
-      ];
-    }
-  },
-);
 
 const getEarliestMeeting = (meetings) => {
   if (meetings.length === 0) return null;
@@ -182,4 +144,41 @@ const updateMeetings = async (schedules) => {
     })
   ).data;
 };
+
+const headerStore = usePageHeaderStore();
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+});
+
+watch(
+  () => [!course.value],
+  () => {
+    if (course.value) {
+      headerStore.title = t('components.courses.settings.breadcrumbTitle');
+      headerStore.items = [
+        {
+          title: t('components.courses.settings.home'),
+          disabled: false,
+          to: '/',
+        },
+        {
+          title: t('components.courses.settings.myCourses'),
+          disabled: false,
+          to: '/courses/me',
+        },
+        {
+          title: course.value.title || '',
+          disabled: false,
+          to: `/courses/${course.value.id}`,
+        },
+        {
+          title: t('components.courses.settings.title'),
+          disabled: true,
+          to: `/courses/${course.value.id}/settings`,
+        },
+      ];
+    }
+  },
+);
 </script>
