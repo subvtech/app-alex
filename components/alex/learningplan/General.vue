@@ -1,15 +1,26 @@
 <template>
-  <div class="course-page d-flex w-100 gap-6">
+  <div class="course-page w-100 gap-6">
     <alex-custom-card
       title=""
-      class="left-block"
+      class="left-block min-w-card flex-wrap w-100 pb-12"
       no-header
       full-width
       :align-content="'align-center'"
     >
       <template #content>
-        <div class="d-flex flex-column align-center w-100 gap-12 px-6 w-212">
-          <app-media
+        <div
+          v-if="loading"
+          class="d-flex flex-column align-start w-100 gap-4 w-212 py-6"
+        >
+          <alex-custom-skeleton class="w-25 height-6" color="gray-200" />
+          <alex-custom-skeleton class="w-100 height-68" color="gray-200" />
+        </div>
+        <div v-else class="d-flex flex-column align-center w-100 gap-12 w-212">
+          <alex-learningplan-media
+            :learningplan-id="learningPlan.id"
+            sizing-class="pa-0"
+            is-nested
+            hide-dividers
             :title="$t('pages.courses.media.title')"
             :images="
               (learningPlan.media ? learningPlan.media : []).map((item) => {
@@ -17,76 +28,76 @@
               })
             "
             :course-id="learningPlan.id"
-            :can-edit="userIsFacilitator"
+            :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
-            sizing-class="pa-0"
-            is-nested
-            hide-dividers
           />
-          <app-about
-            :text="learningPlan.description"
-            :user-id="learningPlan.id"
-            :can-edit="userIsFacilitator"
-            @update="updateAbout"
-            :empty-text-message="$t('pages.courses.about.empty')"
+          <alex-learningplan-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
             full-width
+            :text="learningPlan.description"
+            :user-id="user.id"
+            :can-edit="learningPlanStore.userIsFacilitator"
+            :empty-text-message="$t('pages.courses.about.empty')"
+            @update="updateAbout"
           />
           <alex-learningplan-goals
-            :can-edit="canEdit"
-            :course-id="learningPlan.id"
-            :user-id="id"
-            :data="
-              learningPlan.learning_goals.map((item) => {
-                return {
-                  id: item.id,
-                  title: item.description,
-                  keyWord: item.verb.text,
-                  keyWordId: item.verb.id,
-                  contentData: {
-                    id: item.id,
-                    description: item.description,
-                    verb: { text: item.verb.text },
-                  },
-                };
-              })
-            "
-            :tooltip="$t('components.courses.goals.tooltip')"
             sizing-class="pa-0 w-100"
             class="w-100"
-            @update="(data) => emit('update', data)"
             is-nested
+            :can-edit="canEdit"
+            :course-id="learningPlan.id"
+            :user-id="user.id"
+            :data="learningGoals"
+            :tooltip="$t('components.courses.goals.tooltip')"
+            @update="(data) => emit('update', data)"
           />
 
           <alex-learningplan-details-editor
             v-if="showDetails"
-            :info="learningPlan.details?.lines"
-            :courseId="learningPlan.id"
-            :title="$t('components.courses.editor.title')"
-            :can-edit="userIsFacilitator"
             is-nested
             hide-dividers
+            :data="learningPlan.details"
+            :course-id="learningPlan.id"
+            :title="$t('components.courses.editor.title')"
+            :can-edit="learningPlanStore.userIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
       </template>
     </alex-custom-card>
 
-    <div class="d-flex flex-column w-100 gap-6 max-width">
-      <alex-custom-card :title="$t('pages.courses.details')" :show-icon="false">
+    <div
+      class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
+    >
+      <alex-custom-card v-if="loading" title="" :show-icon="false">
+        <template #content>
+          <div class="d-flex bg-white rounded-lg align-center w-100 gap-4">
+            <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
+            <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
+            <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
+          </div>
+          <alex-custom-skeleton class="w-50 height-6 mt-4" color="gray-200" />
+        </template>
+      </alex-custom-card>
+      <alex-custom-card
+        v-else
+        :title="$t('pages.courses.details')"
+        :show-icon="false"
+        class="w-100"
+      >
         <template #content>
           <app-general-boxes
             :boxes="[
               {
                 icon: 'mdi-account-outline',
-                number: activeMembers.length,
+                number: learningPlanStore.activeMembers.length,
                 label: 'students',
               },
               {
                 icon: 'trails.svg',
-                number: standardTrails,
+                number: learningPlanStore.standardTrails.length,
                 label: 'trails',
               },
               {
@@ -99,25 +110,25 @@
           />
         </template>
         <template #footer>
-          <div
-            class="w-100 fix-margin"
-            :class="
-              !plainLink || !learningPlan.invite_enabled ? 'pb-6' : 'pb-12'
-            "
-          >
+          <div class="w-100 fix-margin pb-6">
             <alex-learningplan-meetings
-              :can-edit="userIsFacilitator"
-              :data="schedules"
-              :end-date="new Date()"
-              :is-facilitator="userIsFacilitator"
-              :href="userIsFacilitator ? `${learningPlan.id}/settings` : ''"
               is-nested
-              :learning-plan-id="0"
               hide-dividers
               sizing-class="ma-0"
+              :can-edit="learningPlanStore.userIsFacilitator"
+              :data="schedules"
+              :end-date="new Date()"
+              :is-facilitator="learningPlanStore.userIsFacilitator"
+              :to="
+                learningPlanStore.userIsFacilitator
+                  ? `${learningPlan.id}/settings`
+                  : ''
+              "
+              :learning-plan-id="learningPlan.id"
             />
             <alex-learningplan-invites
               v-if="canEdit"
+              full-width
               :enable-invites="learningPlan.invite_enabled"
               :duration="learningPlan.invitation_duration"
               :course-id="learningPlan.id"
@@ -128,112 +139,69 @@
                 }
               "
               @link:expired="plainLink = null"
-              full-width
             />
           </div>
         </template>
       </alex-custom-card>
-      <competences
+      <alex-learningplan-skeleton-competence v-if="loading" />
+      <alex-learningplan-competences
         v-if="
-          (generalTags.length === 0 && userIsFacilitator) ||
-          generalTags.length !== 0
+          (learningPlanStore.generalTags?.length === 0 &&
+            learningPlanStore.userIsFacilitator) ||
+          (learningPlanStore.generalTags?.length !== 0 && !loading)
         "
+        is-general
         :title="$t('components.competences.general.title')"
         :label="$t('components.competences.general.label')"
-        :emptyMessage="$t('components.competences.general.empty')"
+        :empty-message="$t('components.competences.general.empty')"
         :placeholder="$t('components.competences.general.placeholder')"
-        :user-id="id"
-        :learning-plan-id="learningPlan.id"
-        :userTags="generalTags"
-        :can-edit="userIsFacilitator"
-        @update="(data) => emit('update', data)"
+        :user-id="user.id"
+        :learning-plan-id="learningPlan?.id"
+        :tags="learningPlanStore.generalTags"
+        :can-edit="learningPlanStore.userIsFacilitator"
+        :loading="loading"
       />
-      <competences
+      <alex-learningplan-skeleton-competence v-if="loading" />
+      <alex-learningplan-competences
         v-if="
-          (technicalTags.length === 0 && userIsFacilitator) ||
-          technicalTags.length !== 0
+          (learningPlanStore.technicalTags?.length === 0 &&
+            learningPlanStore.userIsFacilitator) ||
+          (learningPlanStore.technicalTags?.length !== 0 && !loading)
         "
         :title="$t('components.competences.technical.title')"
         :label="$t('components.competences.technical.label')"
-        :emptyMessage="$t('components.competences.technical.empty')"
+        :empty-message="$t('components.competences.technical.empty')"
         :placeholder="$t('components.competences.technical.placeholder')"
-        :userId="id"
-        :learning-plan-id="learningPlan.id"
-        :userTags="technicalTags"
-        :can-edit="userIsFacilitator"
-        @update="(data) => emit('update', data)"
+        :user-id="user.id"
+        :learning-plan-id="learningPlan?.id"
+        :tags="learningPlanStore.technicalTags"
+        :can-edit="learningPlanStore.userIsFacilitator"
+        :loading="loading"
       />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { CompetenceTag } from '@/components/Competences.vue';
-
-import { InvitationLinkType } from '@/components/alex/learningplan/Invites.vue';
-import { LearningPlanType } from '~/pages/courses/[id]/index.vue';
+import { MeetingPropsType } from '~/components/CourseMeeting.vue';
+type GeneralProps = {
+  learningPlan: LearningPlanSimple;
+  owner: LearningPlanMemberSimple;
+  invitationLink?: InvitationLinkSimple | null;
+  canEdit?: boolean;
+  schedules?: MeetingPropsType[];
+  loading?: boolean;
+};
+const props = withDefaults(defineProps<GeneralProps>(), {
+  invitationLink: null,
+  schedules: () => [],
+  loading: false,
+});
 const { update } = useStrapi();
-
 const learningPlanStore = useLearningPlanStore();
-
-const standardTrails = learningPlanStore.standardTrailsCount;
-const userIsFacilitator = learningPlanStore.userIsFacilitator;
-const activeMembers = learningPlanStore.activeMembers;
-
 const i18n = useI18n();
 const emit = defineEmits(['update']);
-const props = defineProps({
-  learningPlan: {
-    type: Object as PropType<LearningPlanType>,
-    required: true,
-  },
-
-  invitationLink: {
-    type: Object as PropType<InvitationLinkType | null>,
-    default: null,
-  },
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
-  schedules: {
-    type: Array as PropType<any[]>,
-    default: [],
-  },
-  owner: {
-    type: Object as PropType<LearningPlanMemberSimple>,
-    required: true,
-  },
-});
-
-const generalTags = ref<CompetenceTag[]>([]);
-const technicalTags = ref<CompetenceTag[]>([]);
 const plainLink = ref<string | null>(null);
-const { id } = useStrapiUser<User>().value;
-
-if (props.learningPlan.tags.data) {
-  generalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
-      if (item.attributes.isGeneral) {
-        acc.push({ id: item.id, ...item.attributes });
-      }
-
-      return acc;
-    },
-    [],
-  );
-
-  technicalTags.value = props.learningPlan.tags.data.reduce(
-    (acc: CompetenceTag[], item) => {
-      if (!item.attributes.isGeneral) {
-        acc.push({ id: item.id, ...item.attributes });
-      }
-
-      return acc;
-    },
-    [],
-  );
-}
-
+const user = useStrapiUser<User>();
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
@@ -246,107 +214,58 @@ const showDetails = computed(() => {
 
   return props.learningPlan.details?.data?.length !== 0;
 });
+
+const learningGoals = computed(() =>
+  props.learningPlan.learning_goals.map((goal, index) => ({
+    id: goal.id,
+    title: goal.description,
+    keyWord: goal.verb.text,
+    errorKeyWord: false,
+    errorTitle: false,
+    contentData: {
+      id: goal.id,
+      index,
+      description: goal.description,
+      verb: {
+        id: goal.verb.id,
+        text: goal.verb.text,
+        general: goal.verb.general,
+      },
+    },
+  })),
+);
 </script>
 
 <style scope lang="scss">
 .w-212 {
   max-width: 850px;
 }
+.min-w-card {
+  min-width: 400px;
+}
 .fix-margin {
   margin-top: -24px;
 }
-
+.max-width-card-right {
+  max-width: 500px;
+}
 .course-page {
+  display: flex;
+  flex-direction: row;
   .left-block {
-    min-width: 60% !important;
-    padding-inline: 24px !important;
     padding-bottom: 24px;
   }
 }
 
-@media (max-width: 1530px) {
-  .course-page {
-    .left-block {
-      min-width: 45% !important;
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-  }
-}
-
-@media (max-width: 1250px) {
-  .course-page {
-    .left-block {
-      min-width: 37% !important;
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-  }
-}
-
-@media (max-width: 1125px) {
+@media screen and (max-width: 1130px) {
   .course-page {
     flex-wrap: wrap;
-    &.gap-6 {
-      gap: 12px !important;
-    }
-    .left-block {
-      min-width: 33% !important;
-      padding-inline: 8px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
   }
-}
-
-@media (max-width: 961px) {
-  .course-page {
-    .left-block {
-      min-width: 50% !important;
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
+  .min-w-card {
+    min-width: 300px;
   }
-}
-@media (max-width: 850px) {
-  .course-page {
-    flex-direction: column;
-
-    .left-block {
-      padding-inline: 24px !important;
-
-      .flex-column.align-center.gap-12 {
-        width: 100%;
-      }
-    }
-    .max-width {
-      max-width: unset;
-    }
+  .max-width-card-right {
+    max-width: unset;
   }
-}
-
-.max-width {
-  max-width: 500px;
-}
-
-.gap-6 {
-  gap: 24px;
-}
-
-.gap-12 {
-  gap: 48px;
 }
 </style>

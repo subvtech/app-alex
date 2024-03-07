@@ -1,3 +1,4 @@
+@use 'sass:list';
 label.theme--dark + input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -117,4 +118,13 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 .v-input select:-webkit-autofill:hover,
 .v-input select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 3000px #fff inset !important;
+}
+
+@for $size from 2 through 256 {
+  .width-#{$size} {
+    width: $size * 4px
+  }
+  .height-#{$size} {
+    height: $size * 4px
+  }
 }

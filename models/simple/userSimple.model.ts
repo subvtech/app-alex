@@ -14,6 +14,10 @@ export interface UserSimple {
   confirmed: boolean;
   isProfessor: boolean;
   tags: any[];
-  avatar: Upload;
+  avatar: Upload | null;
   role: UserRoles;
+  phone: string | null;
+  info: null;
+  cover: string | null;
+  institutions?: any[];
 }

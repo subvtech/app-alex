@@ -466,7 +466,7 @@ const startDateOrEndDate = computed(() => {
 .float-cover {
   position: absolute;
   top: 0px;
-  max-height: 300px;
+  max-height: 360px;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -691,7 +691,7 @@ const startDateOrEndDate = computed(() => {
         .extra {
           &.no-settings {
             .date {
-              top: -300px !important;
+              top: -360px !important;
             }
 
             .settings.absolute {
@@ -813,7 +813,7 @@ const startDateOrEndDate = computed(() => {
 
         .date {
           position: absolute;
-          top: -300px;
+          top: -360px;
           right: 0px;
           &.darker-bg {
             background-color: rgba(0, 0, 0, 0.5);
@@ -923,7 +923,7 @@ const startDateOrEndDate = computed(() => {
       .extra {
         &.no-settings {
           .date {
-            top: -300px !important;
+            top: -360px !important;
           }
 
           .settings.absolute {

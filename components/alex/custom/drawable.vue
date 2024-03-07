@@ -1,13 +1,12 @@
 <template>
   <v-navigation-drawer
-    v-model="modelValue"
+    v-model="value"
     color="primary"
     fixed
     :rail="clipped"
     app
     data-testid="drawable"
     class="d-flex flex-column pb-2 px-2"
-    @update:model-value="$emit('update:model-value')"
     :class="[
       notFixed ? 'not-fixed' : '',
       disappear && !modelValue ? 'disappear' : '',
@@ -16,7 +15,7 @@
     <slot name="header" />
 
     <div v-for="(block, i) in blocks" :key="`menu-${i}`">
-      <v-list class="pa-0" :key="`menu-${i}-list`">
+      <v-list :key="`menu-${i}-list`" class="pa-0">
         <v-list-subheader
           :key="`menu-${i}`"
           class="accent-text pb-2"
@@ -47,10 +46,9 @@
               <v-icon color="#d2d6da" role="icon">{{ item.icon }}</v-icon>
             </v-list-item-action>
 
-            <v-list-item-title
-              class="item-name font-weight-medium"
-              v-text="item.title"
-            />
+            <v-list-item-title class="item-name font-weight-medium">{{
+              item.title
+            }}</v-list-item-title>
           </div>
         </v-list-item>
       </v-list>
@@ -59,35 +57,31 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['update:model-value']);
-const props = defineProps({
+const emit = defineEmits(['update:modelValue']);
+type DrawableProps = {
   blocks: {
-    type: Array as PropType<
-      { title: string; items: { icon: string; title: string; to: string }[] }[]
-    >,
-    default: [],
-  },
-
-  modelValue: {
-    type: Boolean,
-    required: true,
-  },
-
-  notFixed: {
-    type: Boolean,
-    default: false,
-  },
-  disappear: {
-    type: Boolean,
-    default: false,
-  },
-  clipped: {
-    type: Boolean,
-    default: false,
-  },
+    title: string;
+    items: { icon: string; title: string; to: string }[];
+  }[];
+  modelValue: boolean;
+  notFixed?: boolean;
+  disappear?: boolean;
+  clipped?: boolean;
+};
+const props = withDefaults(defineProps<DrawableProps>(), {
+  notFixed: false,
+  clipped: false,
+  disappear: false,
 });
 
-const { blocks, modelValue, clipped } = toRefs(props);
+const value = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit('update:modelValue', value);
+  },
+});
 </script>
 
 <style lang="scss">
@@ -104,13 +98,6 @@ const { blocks, modelValue, clipped } = toRefs(props);
 
 html,
 body {
-  overflow-y: auto;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
   .v-application {
     font-family: Sen !important;
 

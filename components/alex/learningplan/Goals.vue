@@ -6,312 +6,198 @@
     show-tooltip
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
-    @toggle:is-editing="isEditing = !isEditing"
     :save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
     :cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
+    @toggle:is-editing="toggleEditing"
   >
-    <template #content class="d-flex w-100">
+    <template #content>
       <alex-custom-empty-placeholder
-        v-if="dataCopy.length === 0"
+        v-if="localData.length === 0"
         class="align-self-center"
         :empty-text-message="$t('components.courses.goals.empty')"
         empty-text-image="/svg/EmptyGoals.svg"
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion
-          v-model:data="dataCopy"
-          :key="rerender"
+          v-model="selectedPanel"
+          v-model:data="localData"
           show-positions
           :overwrite-item="!isEditing"
-          v-model="selectedPanel"
-          class="max-width"
         >
-          <template v-if="isEditing" #content="contentProps">
+          <template v-if="isEditing" #content="{ index }">
             <alex-learningplan-form-goal
-              :keyword="contentProps.verb"
-              :index="contentProps.index"
-              :id="contentProps.id"
-              :description="contentProps.description"
-              :filtered-items="filteredVerbs"
-              @update:description="onUpdateDescription"
-              @update:keyword="onUpdateKeyword"
+              :index="index"
+              :data="localData"
+              :filtered-items="generalVerbs || []"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
               @success:description="onSuccessDescription"
               @success:keyword="onSuccessKeyword"
-              @success="onSuccess"
             /> </template
         ></alex-custom-accordion>
         <alex-custom-button
-          @click="addGoal"
           class="add-button"
           prepend-icon="mdi-plus"
           variant="text"
+          @click="addGoal"
         >
           {{ $t('components.courses.goals.add') }}</alex-custom-button
         >
       </div>
       <div v-else class="d-flex flex-column gap-2 w-100">
         <alex-learningplan-goal
-          v-for="(item, index) in data"
+          v-for="(item, index) in localData"
+          :key="index"
           :index="index"
-          :key-word="item.contentData.verb ? item.contentData.verb.text : ''"
-          :title="item.contentData.description"
+          :key-word="item.keyWord"
+          :title="item.title"
         />
       </div>
     </template>
   </alex-custom-card>
 </template>
 <script setup lang="ts">
-const { create, find, update, delete: _delete } = useStrapi();
-const { t } = useI18n();
-
-type AccordionProps = {
+const client = useStrapiClient();
+export type Goal = {
   id?: number;
-  title: string;
-  keyWord: string;
-  keyWordId: number;
-  errorTitle: boolean;
+  title: string; // Description
+  keyWord: string; // Verb
+  local?: boolean;
   errorKeyWord: boolean;
+  errorDescription: boolean;
   contentData: {
-    description: string;
-    verb: { text: string } | null;
-    index?: number;
-    id: number;
+    id?: number;
+    index: number;
+    description: string; // Title
+    verb: { text: string; id?: number; general: boolean };
   };
 };
-
-const props = defineProps({
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
-  tooltip: {
-    type: String,
-    required: true,
-  },
-  courseId: {
-    type: Number,
-    required: true,
-  },
-  userId: {
-    type: Number,
-    required: true,
-  },
-
-  data: {
-    type: Array as PropType<AccordionProps[]>,
-    default: [],
-  },
+type GoalsProps = {
+  canEdit?: boolean;
+  tooltip: string;
+  courseId: number;
+  userId: number;
+  data: Goal[];
+};
+const props = withDefaults(defineProps<GoalsProps>(), {
+  canEdit: false,
 });
 const emit = defineEmits(['update']);
+const { t } = useI18n();
 const { currentWidth } = useNavigationDrawer();
-type Keyword = { text: string; id?: number };
-
+const { setMessage } = useMessageStore();
+const localData = ref(props.data);
 const disableSave = ref(true);
-const updateArray = ref<
-  { id: number; index: number; keyWord: Keyword; description: string }[]
->([]);
-const createArray = ref<
-  { id: number; index: number; keyWord: Keyword; description: string }[]
->([]);
-const deleteArray = ref<{ id: number; text: string }[]>([]);
-
-const { canEdit, data } = toRefs(props);
 const isEditing = ref(false);
-
 const selectedPanel = ref(0);
-const rerender = ref(0);
-const filteredVerbs = ref<{ text: string; id: number }[]>([]);
-const dataCopy = toRef<AccordionProps[]>([...props.data]);
-
 const withinBreakpoint = computed(() => currentWidth.value < 450);
-
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
-
-const toggleDisableSave = () => {
-  const errorFound = dataCopy.value.find(
-    (item) => item.errorTitle || item.errorKeyWord,
+const lastGoals = ref<Goal[]>([]);
+const { find } = useStrapiUtils();
+const { data: generalVerbs } = useAsyncData(
+  'general-verbs',
+  async () =>
+    await find<LearningPlanGoalVerb>('learning-goal-verbs', {
+      filters: {
+        general: true,
+      },
+    }),
+  { transform: (value) => value.data },
+);
+const setLastGoals = () => {
+  lastGoals.value = toRaw(localData.value.map((g) => Object.assign({}, g)));
+};
+const toggleEditing = () => {
+  isEditing.value = !isEditing.value;
+  if (isEditing.value) {
+    setLastGoals();
+  }
+};
+const toggleSave = () => {
+  const errorFound = localData.value.find(
+    (item) => item.errorDescription || item.errorKeyWord,
   );
-
   if (errorFound) disableSave.value = true;
   else disableSave.value = false;
 };
-
-const onErrorDescription = (index) => {
-  dataCopy.value[index].errorTitle = true;
+const onErrorDescription = (index: number) => {
+  localData.value[index].errorDescription = true;
   disableSave.value = true;
-  toggleDisableSave();
+  toggleSave();
 };
-
-const onErrorKeyword = (index) => {
-  dataCopy.value[index].errorKeyWord = true;
-  toggleDisableSave();
+const onErrorKeyword = (index: number) => {
+  localData.value[index].errorKeyWord = true;
+  toggleSave();
 };
-
-const onSuccessDescription = (index) => {
-  dataCopy.value[index].errorTitle = false;
+const onSuccessDescription = (index: number) => {
+  localData.value[index].errorDescription = false;
   disableSave.value = true;
-  toggleDisableSave();
+  toggleSave();
 };
-
-const onSuccessKeyword = (index) => {
-  dataCopy.value[index].errorKeyWord = false;
-  toggleDisableSave();
+const onSuccessKeyword = (index: number) => {
+  localData.value[index].errorKeyWord = false;
+  toggleSave();
 };
-
-const onUpdateDescription = (data) => {
-  dataCopy.value[data.index].title = data.value;
-};
-const onUpdateKeyword = (data) => {
-  dataCopy.value[data.index].keyWord = data.value.text;
-};
-onBeforeMount(async () => {
-  filteredVerbs.value = (
-    (await find('learning-goal-verbs', { filters: { user: props.userId } }))
-      .data as unknown as any[]
-  ).map((item) => {
-    return { id: item.id, ...item.attributes };
-  });
-});
-
 const addGoal = () => {
-  dataCopy.value.push({
+  const newGoal = {
     keyWord: t('components.courses.goals.verb.placeholder'),
     title: t('components.courses.goals.description.placeholder'),
-    keyWordId: -1,
-    id: -1,
-    errorTitle: true,
+    errorDescription: true,
     errorKeyWord: true,
+    local: true,
     contentData: {
-      verb: null,
+      index: localData.value.length,
       description: '',
-      index: dataCopy.value.length,
-      id: -1,
+      verb: {
+        text: '',
+        general: false,
+      },
     },
-  });
-  selectedPanel.value = dataCopy.value.length - 1;
+  };
+  localData.value.push(newGoal);
+  selectedPanel.value = localData.value.length - 1;
 };
-const onSuccess = (validGoal) => {
-  if (validGoal.id >= 0) {
-    const index = updateArray.value.findIndex(
-      (item) => item.id == validGoal.id,
-    );
-    if (index !== -1) updateArray.value[index] = validGoal;
-    else {
-      updateArray.value.push(validGoal);
-    }
-  } else {
-    const index = createArray.value.findIndex(
-      (item) => item.index == validGoal.index,
-    );
-    if (index !== -1) createArray.value[index] = validGoal;
-    else {
-      createArray.value.push(validGoal);
-    }
-  }
-};
-
 const onCancel = () => {
-  dataCopy.value = [...props.data];
-  updateArray.value = [];
-  createArray.value = [];
-  deleteArray.value = [];
+  localData.value = lastGoals.value;
 };
-
-const getVerbConnectArray = async (keyWord) => {
-  if (typeof keyWord.id === 'number') return [keyWord.id];
-  const doesVerbExist = await find('learning-goal-verbs', {
-    filters: { text: keyWord.text, user: props.userId },
-  });
-
-  if (doesVerbExist.data.length > 0) return [doesVerbExist.data[0].id];
-  const createdVerb = await create('learning-goal-verbs', {
-    ...keyWord,
-    user: props.userId,
-  });
-  return [createdVerb.data.id];
-};
-
 const onSave = async () => {
-  const createPromises = createArray.value.map(async (item, index) => {
-    const connectArray = await getVerbConnectArray(item.keyWord);
-
-    const result = await create('learning-goals', {
-      description: item.description,
-      learningplan: props.courseId,
-      verb: {
-        connect: connectArray,
-      },
-    });
-    const currentIndex = dataCopy.value.findIndex(
-      (obj) => obj.contentData.index === item.index,
-    );
-    dataCopy.value[currentIndex].id = result.data.id;
-  });
-
-  const updatePromises = updateArray.value.map(async (item) => {
-    const connectArray = await getVerbConnectArray(item.keyWord);
-    return update(`learning-goals/${item.id}`, {
-      description: item.description,
-      verb: {
-        connect: connectArray,
-      },
-    });
-  });
-
-  const deletePromises = props.data
-    .filter((x) => dataCopy.value.findIndex((y) => y.id === x.id) === -1)
-    .map(async (item) => {
-      return _delete('learning-goals', item.id);
-    });
-
-  await Promise.all([...createPromises, ...updatePromises, ...deletePromises]);
-
-  let previousId: number | null = null;
-  await update('learningplans', props.courseId, {
-    learning_goals: {
-      set: dataCopy.value.map((item, index) => {
-        if (index === 0) {
-          previousId = item.id!;
-          return { id: item.id, position: { start: true } };
-        }
-
-        let afterId = previousId;
-        previousId = item.id!;
-        return { id: item.id, position: { after: afterId } };
-      }),
+  await client(`/learningplans/${props.courseId}/goals`, {
+    method: 'PUT',
+    body: {
+      goals: localData.value.map((item, index) => ({
+        index,
+        verb: {
+          text: item.keyWord,
+          id: item.contentData.verb.id,
+          general: item.contentData.verb.general,
+        },
+        description: item.title,
+        ...(!item.local && { id: item.contentData.id }),
+      })),
+    },
+    onResponse: ({ response }) => {
+      if (!response.ok) {
+        localData.value = [...props.data];
+        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
+        return;
+      }
+      emit('update', t('components.courses.goals.update'));
     },
   });
-  emit('update', t('components.courses.goals.update'));
-  rerender.value -= 1;
-  updateArray.value = [];
-  createArray.value = [];
-  deleteArray.value = [];
 };
-
-watch(canEdit, () => {
-  isEditing.value = props.canEdit;
-});
-watch(data, () => {
-  dataCopy.value = [...props.data];
-});
 watch(
-  dataCopy,
+  localData,
   () => {
-    toggleDisableSave();
+    toggleSave();
   },
   { deep: true },
 );
 </script>
 <style scoped lang="scss">
-.max-width {
-  max-width: 404px;
-}
 .gap-2 {
   gap: 8px;
 }
