@@ -1,22 +1,41 @@
 <template>
-  <v-dialog v-model="dialog" width="1024" persistent>
-    <v-card class="pa-3">
-      <v-container class="d-flex justify-space-between px-3 align-center">
-        <span class="text-h5 font-weight-bold"
-          >Adicione Novos Vídeos ou imagens à Playlist</span
-        >
-        <v-btn
-          variant="text"
-          icon="mdi-close"
-          color="black"
-          class=""
-          @click="dialog = false"
-        />
-      </v-container>
-      <v-card-text>
-        <v-row
-          class="pa-5 rounded inputFile d-flex justify-center align-center drop-area"
-          style="border: 2px dashed #00b8cc; min-height: 150px"
+  <alex-custom-dialog
+    v-model="dialogModel"
+    :title="$t('components.carousel.dialogTitle')"
+    :secondary-button-text="$t('components.carousel.dialogSecondaryButton')"
+    :main-button-text="
+      editSlideMode === 'config'
+        ? $t('components.carousel.dialogMainButtonConfig')
+        : $t('components.carousel.dialogMainButton')
+    "
+    :no-footer="editSlideMode == 'edit'"
+    @on-main-action="() => upload()"
+    @on-secondary-action="() => (dialogModel = false)"
+  >
+    <v-container class="px-3">
+      <p class="text-gray-800 text-body-1">
+        {{ $t('components.carousel.mediaType') }}
+      </p>
+      <alex-inputs-radio-button
+        v-model="addMediaType"
+        style="margin-left: -10px"
+        inline
+        :buttons="[
+          {
+            label: 'Upload',
+            value: 'upload',
+          },
+          {
+            label: 'Url',
+            value: 'url',
+          },
+        ]"
+      />
+      <transition mode="out-in" name="slide-fade">
+        <div
+          v-if="addMediaType == 'upload'"
+          cols="12"
+          class="pa-5 rounded inputFile d-flex justify-center align-center drop-area w-100"
           :data-active="fileDrop"
           @click="$refs.inputFile.click()"
           @dragenter.prevent="fileDrop = true"
@@ -29,164 +48,196 @@
             accept="image/, video/"
             type="file"
             class="d-none"
-            multiple
+            :multiple="editSlideMode === 'edit' ? false : true"
             @change="(file) => addSlides(file, 'input')"
           />
-          <div class="drop-text">
-            <v-col cols="12" class="d-flex justify-center align-itens-center">
-              <v-icon icon="mdi-upload" class="pa-5 bg-accent rounded-xl" />
-            </v-col>
-            <v-col cols="12">
-              <p
-                v-if="!dragActive"
-                class="text-h5 font-weight-bold text-primary text-center"
-              >
-                Arraste e Solte ou
-                <strong class="text-accent">Selecione os arquivos</strong>
-                para fazer upload
-              </p>
-              <p
-                v-else
-                class="text-h5 font-weight-bold text-primary text-center"
-              >
-                Solte os arquivos aqui!
-              </p>
-            </v-col>
-          </div>
-        </v-row>
-        <div id="orRow" class="my-10">
-          <div class="orLine bg-grey-lighten-2"></div>
-          <div id="orText" class="text-blue-grey-lighten-1">OU</div>
-          <div class="orLine bg-grey-lighten-2"></div>
-        </div>
-        <v-row>
-          <v-col cols="12" class="px-0">
-            <p class="text-primary text-h6 font-weight-bold">
-              Adicione através de URL
-            </p>
-          </v-col>
-          <v-col cols="12" class="px-0">
-            <v-text-field
-              v-model="urlInput"
-              placeholder="Insira o link"
-              variant="solo"
-              :error-messages="errors"
-              @keydown.enter="addUrl(urlInput)"
-            >
-              <template #append-inner>
-                <v-btn
-                  icon="mdi-plus"
-                  variant="text"
-                  type="submit"
-                  color="black"
-                  @click="addUrl(urlInput)"
-                ></v-btn>
-              </template>
-            </v-text-field>
-          </v-col>
-          <v-col
-            v-if="slides.length > 0 && !editSlideMode"
-            cols="12"
-            class="px-0"
+          <div
+            class="drop-text d-flex flex-column align-center justify-center"
+            style="max-width: 250px"
           >
-            <p class="text-primary text-h6 font-weight-bold">Playlist</p>
-            <v-list style="max-height: 250px">
-              <transition-group name="flip-list" tag="div">
-                <v-list-item
-                  v-for="(slide, i) in slides"
-                  :key="slide"
-                  class="text-overflow my-1 rounded-lg bg-accent"
-                  :class="over.pos == i && dragging ? 'over' : ''"
-                  draggable="true"
-                  @dragover="(e) => onDragOver(slide, i, e)"
-                  @dragend="(e) => finishDrag(slide, i, e)"
-                  @dragstart="(e) => startDrag(slide, e)"
+            <img src="@/assets/svg/MediaUpload.svg" height="105" width="150" />
+
+            <p
+              v-if="!fileDrop"
+              class="text-h5 font-weight-bold text-gray-600 text-center"
+            >
+              {{ $t('components.carousel.fileDropText') }}
+              <strong class="text-accent text-decoration-underline">
+                {{ $t('components.carousel.fileDropHighlightedText') }}
+              </strong>
+            </p>
+            <p
+              v-else
+              class="text-h5 font-weight-bold text-secondary-0 text-center"
+            >
+              {{ $t('components.carousel.fileDropActionText') }}
+            </p>
+          </div>
+        </div>
+        <div v-else-if="addMediaType == 'url'" class="w-100">
+          <div class="d-flex w-100">
+            <alex-inputs-text-field
+              v-model="urlInput"
+              name="url"
+              :placeholder="$t('components.carousel.linkPlaceholder')"
+              :rules="urlRules"
+              variant="outlined"
+              density="compact"
+              class="w-100"
+            >
+            </alex-inputs-text-field>
+
+            <alex-custom-button
+              icon="mdi-plus"
+              class="ml-2"
+              size="42px"
+              :loading="isLoading"
+              @click="addUrl(urlInput)"
+            ></alex-custom-button>
+          </div>
+          <div class="rounded d-flex justify-center align-center w-100">
+            <div
+              style="position: relative"
+              class="d-flex flex-column align-center justify-center preview-area w-100"
+              :class="urlInput && pastedLink ? '' : 'preview-area-border'"
+            >
+              <transition mode="out-in" name="url-preview">
+                <div
+                  v-if="!pastedLink || urlInput == ''"
+                  class="d-flex flex-column align-center"
                 >
-                  {{ i + 1 }} -
-                  <v-icon class="mr-2">
-                    {{
-                      typeof slide.url === 'string'
-                        ? slide.url.startsWith('https://www.youtube.com') ||
-                          slide.url.startsWith('https://vimeo.com/') ||
-                          slide.url.startsWith('https://youtu.be')
-                          ? 'mdi-play-box'
-                          : 'mdi-image'
-                        : slide.type.includes('video')
-                        ? 'mdi-play-box'
-                        : 'mdi-image'
-                    }}</v-icon
+                  <img
+                    src="@/assets/svg/UrlUpload.svg"
+                    height="95"
+                    width="120"
+                  />
+
+                  <p
+                    style="max-width: 60%"
+                    class="text-h5 font-weight-bold text-gray-600 text-center mt-1"
                   >
-                  <span>
-                    {{ slide.name }}
-                  </span>
-                  <template #append>
-                    <v-btn
-                      icon="mdi-close"
-                      variant="text"
-                      color="white"
-                      @click="removeSlide(i)"
-                    ></v-btn>
-                  </template>
-                </v-list-item>
-              </transition-group>
-            </v-list>
-          </v-col>
-        </v-row>
-      </v-card-text>
-      <v-card-actions v-if="!editSlideMode">
-        <v-spacer></v-spacer>
-        <v-btn
-          class="font-weight-bold text-grey"
-          variant="text"
-          size="large"
-          color="grey"
-          @click="dialog = false"
-        >
-          Cancelar
-        </v-btn>
-        <v-btn
-          class="bg-accent font-weight-bold"
-          size="large"
-          color="white"
-          @click="upload()"
-        >
-          Salvar
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+                    {{ $t('components.carousel.linkPreviewText') }}
+                  </p>
+                </div>
+                <div
+                  v-else
+                  class="w-100 fill-height d-flex justify-center align-center rounded"
+                >
+                  <v-progress-circular
+                    indeterminate
+                    color="accent"
+                    class="loading"
+                    theme="light"
+                  ></v-progress-circular>
+                  <img
+                    v-if="pastedLink == 'image'"
+                    :src="urlInput"
+                    class="rounded preview-content"
+                  />
+                  <iframe
+                    v-if="
+                      pastedLink && pastedLink.startsWith('YouTube') && urlInput
+                    "
+                    class="rounded-lg lazy preview-content"
+                    width="95%"
+                    height="95%"
+                    :src="`https://www.youtube.com/embed/${urlInput.replace(
+                      /.*v=/,
+                      '',
+                    )}`"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  ></iframe>
+                  <iframe
+                    v-if="
+                      pastedLink && pastedLink.startsWith('Vimeo') && urlInput
+                    "
+                    :src="`https://player.vimeo.com/video/${urlInput.replace(
+                      /.*\//,
+                      '',
+                    )}`"
+                    width="95%"
+                    height="95%"
+                    frameborder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    class="rounded-lg lazy"
+                  ></iframe>
+                </div>
+              </transition>
+            </div>
+          </div>
+        </div>
+      </transition>
+      <div v-if="slides.length > 0 && editSlideMode !== 'edit'" class="w-100">
+        <p class="text-primary text-h6 font-weight-bold mt-5 mb-2">Playlist</p>
+        <alex-custom-accordion v-model:data="slides">
+          <template #content="{ index }">
+            <alex-inputs-text-field
+              v-model="slides[index].title"
+              placeholder="Insira o título"
+              label="Titulo da Mídia"
+              :name="`title+${index}`"
+            >
+            </alex-inputs-text-field>
+          </template>
+        </alex-custom-accordion>
+      </div>
+    </v-container>
+  </alex-custom-dialog>
 </template>
+
 <script setup>
 import { ref } from 'vue';
 const messageStore = useMessageStore();
-
 const urlInput = ref('');
 const slides = ref([]);
-const dialog = ref(false);
+const dialogModel = ref(false);
 const fileDrop = ref(false);
-const editSlideMode = ref(false);
+const editSlideMode = ref('add');
 const editIndex = ref(-1);
+const addMediaType = ref('upload');
+const pastedLink = ref(false);
+const isLoading = ref(false);
+const deletedSlides = ref([]);
+const addedSlides = ref([]);
 
 const emit = defineEmits({
   uploadFiles(slides) {
     return slides;
   },
+  changeSlides(slides, deletedSlides, addedSlides) {
+    return { slides, deletedSlides, addedSlides };
+  },
 });
 
 const upload = () => {
   if (slides.value.length === 0) return (dialog.value = false);
-  dialog.value = false;
-  emit('uploadFiles', slides.value, editIndex.value);
+  dialogModel.value = false;
+  if (editSlideMode.value === 'config') {
+    emit('changeSlides', slides.value, deletedSlides.value, addedSlides.value);
+  } else {
+    emit('uploadFiles', slides.value, editIndex.value);
+  }
+
   slides.value = [];
 };
 
-const openModal = (index) => {
+const openModal = (index, editSlides) => {
   urlInput.value = '';
-  slides.value = [];
-  dialog.value = true;
+  dialogModel.value = true;
   fileDrop.value = false;
   editIndex.value = index;
-  editSlideMode.value = index !== -1;
+  slides.value.length =
+    deletedSlides.value.length =
+    addedSlides.value.length =
+      0;
+  if (index !== -1) editSlideMode.value = 'edit';
+  else if (editSlides) {
+    editSlideMode.value = 'config';
+    slides.value = [...editSlides];
+  } else editSlideMode.value = 'add';
+  addMediaType.value = 'upload';
+  pastedLink.value = false;
 };
 
 defineExpose({
@@ -206,127 +257,142 @@ const addSlides = (files, type) => {
       messageStore.show = true;
       return;
     }
-    return slides.value.push(f);
+    const slide = {
+      url: f,
+      title: f.name,
+      type: f.type,
+      icon: f.type.includes('video') ? 'mdi-youtube' : 'mdi-image',
+    };
+    addedSlides.value.push(slide);
+    return slides.value.push(slide);
   });
-  if (editSlideMode.value) upload();
+  if (editSlideMode.value === 'edit') upload();
 };
 
-const addUrl = async (url) => {
-  if (url === '') return;
-  // const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com)\/.+/;
-  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+/;
-  const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com)\/.+/;
-  const imageRegex =
-    /\.(jpg|jpeg|png|gif|bmp|svg|webp)|\/(jpg|jpeg|png|gif|bmp|svg|webp)/i;
+const urlRules = [
+  async (v) => {
+    if (v === '' || urlInput.value === null) {
+      pastedLink.value = false;
+      return true;
+    }
 
-  let videoName = '';
-  if (imageRegex.test(url)) {
-    videoName = url;
-  } else if (youtubeRegex.test(url) || vimeoRegex.test(url)) {
-    videoName = await fetch(`https://noembed.com/embed?url=${url}`).then(
-      (res) =>
-        res.json().then((data) => {
-          return data.title;
-        }),
-    );
-  } else {
-    messageStore.message = 'URL inválida';
-    messageStore.color = 'red';
-    messageStore.show = true;
-    return;
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+/;
+    const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com)\/.+/;
+    const imageRegex =
+      /\.(jpg|jpeg|png|gif|bmp|svg|webp)|\/(jpg|jpeg|png|gif|bmp|svg|webp)/i;
+
+    if (imageRegex.test(v)) {
+      pastedLink.value = 'image';
+      return true;
+    }
+
+    if (youtubeRegex.test(v) || vimeoRegex.test(v)) {
+      const res = await fetch(`https://noembed.com/embed?url=${v}`);
+      const data = await res.json();
+
+      if (!data.error) {
+        pastedLink.value = `${data.provider_name} | ${data.title}`;
+        return true;
+      } else {
+        pastedLink.value = false;
+        return 'A URL para o video inserido é inválida';
+      }
+    } else {
+      pastedLink.value = false;
+      return 'Por favor, insira uma URL válida';
+    }
+  },
+];
+
+const addUrl = (url) => {
+  if (!pastedLink.value || urlInput.value === '') return;
+  isLoading.value = true;
+  let videoTitle = url;
+  let type = 'UrlImage';
+  let icon = 'mdi-image';
+  if (pastedLink.value !== 'image') {
+    videoTitle = pastedLink.value.split(' | ')[1];
+    type = 'UrlVideo';
+    icon = 'mdi-youtube';
   }
-
-  slides.value.push({ url, name: videoName });
+  addedSlides.value.push({ url, title: videoTitle, type, icon });
+  slides.value.push({ url, title: videoTitle, type, icon });
+  if (editSlideMode.value === 'edit') upload();
   urlInput.value = '';
-  if (editSlideMode.value) upload();
-};
-
-const removeSlide = (index) => {
-  slides.value.splice(index, 1);
-};
-const over = reactive({});
-const dragFrom = ref({});
-const dragging = ref(false);
-
-const startDrag = (slide, e) => {
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', slide);
-  dragging.value = true;
-  dragFrom.value = slide;
-};
-
-const finishDrag = (slide, pos) => {
-  slides.value.splice(pos, 1);
-  slides.value.splice(over.pos, 0, slide);
-  over.slide = null;
-  over.pos = null;
-  dragging.value = false;
-};
-
-const onDragOver = (slide, pos) => {
-  over.slide = slide;
-  over.pos = pos;
+  isLoading.value = false;
+  pastedLink.value = false;
 };
 </script>
 
 <style scoped>
-#orRow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-}
-
-.orLine {
-  width: 100%;
-  height: 1px;
-}
-
-#orText {
-  margin: 0 10px;
-  font-family: Sen;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 24px;
-}
-
 .inputFile {
   cursor: pointer;
 }
 
 .drop-area {
   transition: 0.3s ease;
+  border-radius: 8px;
+  border: 2px dashed #ebedef;
+  height: 360px;
   &[data-active='true'] {
     display: block;
-    background-color: rgba(0, 184, 204, 0.1);
+    background-color: #d1f6fa;
+    border: 2px dashed #47d9eb;
   }
+}
+
+.preview-area {
+  border-radius: 8px;
+  height: 360px !important;
+}
+
+.preview-area-border {
+  border: 2px solid #ebedef;
 }
 .drop-text {
   pointer-events: none;
+  gap: 32px;
 }
 
-.text-overflow {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transform: all ease 0.3s;
+.preview-content {
+  max-width: 95%;
+  max-height: 95%;
+  z-index: 1;
 }
 
-.text-overflow:active {
-  background-color: #00b8cca1 !important;
+.loading {
+  position: absolute;
+  z-index: -1;
 }
 
-.over {
-  transform: all ease 3s;
-  opacity: 0.5;
+.url-preview-enter-active,
+.url-preview-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.v-list-item {
-  cursor: grab;
+.url-preview-enter-from,
+.url-preview-leave-to {
+  opacity: 0;
 }
 
-.flip-list-move {
-  transition: transform 0.2s;
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+@media screen and (max-width: 600px) {
+  .preview-area,
+  .drop-area {
+    height: 200px !important;
+  }
 }
 </style>
