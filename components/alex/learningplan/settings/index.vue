@@ -16,6 +16,7 @@
           :end-date="myEndDate"
           :slug="myIdentifier"
           :learning-plan-id="parseInt(id.toString())"
+          :access-url="accessUrl"
           outline
           full-width
           @update="handleGeneralUpdate()"
@@ -60,6 +61,10 @@ const myTitle = ref('');
 const myStartDate = ref('');
 const myEndDate = ref('');
 const myIdentifier = ref('');
+const accessUrl = computed(() => {
+  return `${window.location.origin}/courses/${id}`;
+});
+
 
 const learningPlanStore = useLearningPlanStore();
 const fetchData = async () => {
