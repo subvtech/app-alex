@@ -226,9 +226,11 @@ const learningGoals = computed(() =>
       id: goal.id,
       index,
       description: goal.description,
-      keyWord: goal.verb.text,
-      keyWordId: goal.verb.id,
-      general: goal.verb.general,
+      verb: {
+        id: goal.verb.id,
+        text: goal.verb.text,
+        general: goal.verb.general,
+      },
     },
   })),
 );
