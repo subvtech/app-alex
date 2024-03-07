@@ -1,32 +1,32 @@
 <template>
-  <div class="fill-height d-flex ga-3 flex-column" style="flex: 1">
-    <alex-learningplan-trails-header
-      :trails-description="trailsDescription"
-      :trails-cover="coverImage"
-      :page="0"
-      :trail-id="trailId"
-      :course-id="id"
-      :course-title="learningPlan!.title"
-      :trails-title="trailsTitle"
-    />
-    <div class="bg-white rounded w-100" style="flex: 1">
-      <div id="Início" class="d-flex justify-end px-6 pt-6">
+  <div class="fill-height d-flex ga-3 flex-column">
+    <div class="bg-white rounded w-100 container-min-height">
+      <div
+        id="Início"
+        section="0"
+        class="d-flex justify-end px-6 pt-6"
+        :class="!readOnly ? 'sticky-buttons' : ''"
+      >
         <alex-custom-button
-          v-if="readOnly && professorMode"
+          v-if="
+            readOnly &&
+            learningPlanStore.userIsFacilitator &&
+            !trailStore.loading
+          "
           variant="primary"
           size="large"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
-          >Editar</alex-custom-button
+          >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="professorMode">
+        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
             class="mr-2"
             @click="resetData"
-            >Cancelar</alex-custom-button
+            >{{ $t('pages.trailId.overview.cancelBtn') }}</alex-custom-button
           >
           <alex-custom-button
             variant="primary"
@@ -34,66 +34,115 @@
             size="large"
             prepend-icon="mdi-check"
             @click="saveData"
-            >Salvar</alex-custom-button
+            >{{ $t('pages.trailId.overview.saveBtn') }}</alex-custom-button
           >
         </div>
       </div>
       <div
-        v-if="editorData.blocks.length === 0 && readOnly"
+        v-if="!showEditor && readOnly"
         class="d-flex fill-height align-center justify-center container-min-height"
       >
-        <v-progress-circular
-          v-if="isLoading"
-          color="accent"
-          indeterminate
-          :size="100"
-          :width="6"
-        ></v-progress-circular>
+        <div
+          v-if="trailStore.loading || isLoading"
+          style="max-width: 700px; min-height: 500px"
+          class="w-100"
+        >
+          <alex-custom-skeleton
+            color="gray-200"
+            type="list-item"
+            class="width-50 height-3 mb-4"
+            rounded="lg"
+          ></alex-custom-skeleton>
+          <div class="w-100 d-flex flex-column bg-gray-100 pa-8 rounded-lg">
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-10"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-3 mt-10"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-3 mt-3"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-75 height-3 mt-3"
+              rounded="lg"
+            ></alex-custom-skeleton>
+            <alex-custom-skeleton
+              color="gray-300"
+              type="list-item"
+              class="w-100 height-80 mt-10"
+              rounded="lg"
+            />
+          </div>
+        </div>
         <div v-else>
           <img src="/images/emptyTrail.svg" />
           <p class="text-gray-400 text-h3 empty-state-text text-center">
-            Parece que não há nenhum conteúdo aqui
+            {{ $t('pages.trailId.overview.emptyState') }}
           </p>
         </div>
       </div>
-      <div v-else class="container-min-height d-flex justify-center ma-6">
-        <div style="width: 785px">
+      <div
+        v-else
+        class="container-min-height justify-center ma-6 align-start d-flex"
+      >
+        <div style="width: 750px">
           <p
             v-show="readOnly && editorData.time"
-            class="text-gray-500 text-body-3 mb-4"
+            style="max-width: 700px"
+            class="text-gray-500 text-body-3 mb-4 mx-auto"
           >
-            Ultima atualização: {{ timeStampToDate(editorData.time) }}
+            {{ $t('pages.trailId.overview.lastUpdated') }}
+            {{ timeStampToDate }}
           </p>
           <AppEditor ref="editor" :data="editorData" />
         </div>
-        <div v-if="readOnly" class="sections-container d-lg-block d-none">
-          <p class="text-gray-800 text-h6 mb-4">Seções</p>
-          <div>
-            <v-tooltip
-              v-for="section in sections"
-              :key="section.title"
-              :text="section.title"
-              location="bottom center"
-              content-class="bg-gray-800 pa-6  text-body-3 text-overflow"
-              :disabled="!isAvaliableTooltip(section.title)"
-              max-width="300"
-            >
-              <template #activator="{ props: propsTooltip }">
-                <p
-                  v-bind="propsTooltip"
-                  class="section-text pr-4 text-body-3 align-center py-2 text-truncate"
-                  :class="[
-                    section.active
-                      ? 'text-accent bg-gray-blue'
-                      : 'text-gray-600 section-text-default',
-                    calculateMargin(section.type),
-                  ]"
-                  @click="navigateToSection(section.title)"
-                >
-                  {{ section.title }}
-                </p>
-              </template>
-            </v-tooltip>
+
+        <div
+          v-if="readOnly"
+          class="d-lg-block d-none sections-col h-100"
+          cols="2"
+        >
+          <div class="sections-container">
+            <p class="text-gray-800 text-h6 mb-4">Seções</p>
+            <div>
+              <v-tooltip
+                v-for="(section, index) in sections"
+                :key="section.title"
+                :text="section.title"
+                location="bottom center"
+                content-class="bg-gray-800 pa-6  text-body-3 text-overflow"
+                :disabled="!isAvailableTooltip(section.title)"
+                max-width="300"
+              >
+                <template #activator="{ props: propsTooltip }">
+                  <p
+                    v-bind="propsTooltip"
+                    class="section-text pr-4 text-body-3 align-center py-2 text-truncate"
+                    :class="[
+                      activeSection == index
+                        ? 'text-accent bg-gray-blue'
+                        : 'text-gray-600 section-text-default',
+                      calculateMargin(section.type),
+                    ]"
+                    @click="navigateToSection(section.title)"
+                  >
+                    {{ section.title }}
+                  </p>
+                </template>
+              </v-tooltip>
+            </div>
           </div>
         </div>
       </div>
@@ -103,90 +152,103 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { GetTrail } from '~/assets/queries';
-import { Trail } from '@/models/trail.model';
-const { create, update } = useStrapi();
-const graphql = useStrapiGraphQL();
+const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
+
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
+
+const headerStore = usePageHeaderStore();
+const learningPlanStore = useLearningPlanStore();
 
 definePageMeta({
   hideLearningPlanBanner: true,
 });
 
-const { trail } = useTrailStore();
-const { learningPlan } = useLearningPlanStore();
+const trailStore = useTrailStore();
 
-const professorMode = ref(false);
-const isLoading = ref(false);
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
+const isLoading = ref(false);
 
-const trailsTitle = ref('');
-const trailsDescription = ref('');
-const coverImage = ref('');
-const editorData = ref({
-  id: '',
-  time: 0,
-  version: '',
-  blocks: [],
+const backUpEditorData = ref({ blocks: [] });
+const showEditor = computed(() => {
+  return (
+    !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
+  );
 });
-const backUpEditorData = ref({});
 
-const { trailId, id } = route.params;
-
-const { isProfessor } = useStrapiUser<User>().value;
-professorMode.value = isProfessor;
-
-const getTrailData = async () => {
-  isLoading.value = true;
-  try {
-    const { data } = await useAsyncData('trails', () => {
-      return graphql<{}>(GetTrail, { trailId });
-    });
-    const trail = data.value?.data.trail?.data.attributes;
-    trailsTitle.value = trail.title;
-    trailsDescription.value = trail.description;
-    coverImage.value = trail.cover_image.data?.attributes.url;
-    const structureData = trail.structures.data[0];
-    if (structureData) {
-      editorData.value = {
-        id: structureData.id,
-        time: structureData.attributes.time,
-        version: structureData.attributes.version,
-        blocks: structureData.attributes.blocks.data?.map((block: any) => {
-          return {
-            type: block.attributes.type,
-            data: block.attributes.data,
-            tunes: block.attributes.tunes,
-          };
-        }),
-      };
-    }
-  } catch (e) {
-    setMessage(
-      'Ocorreu um erro ao buscar os dados da trilha, tente novamente',
-      'error',
-      true,
-    );
-  } finally {
-    isLoading.value = false;
-  }
-};
-
+const { t } = useI18n();
+const editorData = computed(() => {
+  const data =
+    trailStore.trail?.structures[trailStore.trail?.structures.length - 1];
+  return {
+    time: data && data.time ? parseInt(data.time.toString()) : 0,
+    version: data?.version || '',
+    blocks:
+      data?.blocks.map((block: any) => {
+        return {
+          type: block.type,
+          data: block.data,
+          tunes: block.tunes || {},
+          id: block.id || '',
+        };
+      }) || [],
+  };
+});
 
 onMounted(async () => {
-  await getTrailData();
-  if (editorData.value.blocks.length > 0) {
-    loadEditor();
-    setSections();
+  isLoading.value = true;
+  while (trailStore.loading) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
+  if (editorData.value.blocks.length) {
+    if (await checkEditorReady()) {
+      readOnly.value = false;
+      await loadEditor();
+      toggleReadOnly();
+    } else {
+      setMessage(t('pages.trailId.overview.loadError'), 'green', true);
+    }
+  }
+  isLoading.value = false;
 });
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+});
+
+watch(
+  () => [learningPlanStore.loading, trailStore.loading],
+  () => {
+    if (!learningPlanStore.loading && !trailStore.loading) {
+      headerStore.title = t('components.trails.header.breadcrumbs.title');
+      headerStore.items = [
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${learningPlanId.value}`,
+        },
+        {
+          title: t('pages.courses.trails'),
+          disabled: false,
+          to: `/courses/${learningPlanId.value}/trails`,
+        },
+        {
+          title: trailStore.trail?.title || '',
+          disabled: true,
+          to: `/courses/${learningPlanId.value}/trails/${trailId}`,
+        },
+      ];
+    }
+  },
+);
 
 const sections = ref([
   {
-    title: 'Início',
+    title: t('pages.trailId.overview.sectionTitle'),
     type: 1,
     active: true,
   },
@@ -197,30 +259,36 @@ const calculateMargin = (index: number) => {
   return `pl-${(index - 1) * 4}`;
 };
 
-const isAvaliableTooltip = (title: string) => {
+const isAvailableTooltip = (title: string) => {
   if (title.length >= 29) return true;
   return false;
 };
 
-const toggleReadOnly = () => {
-  if (readOnly.value) {
-    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
-  } else {
-    setSections();
-  }
+const toggleReadOnly = async () => {
   readOnly.value = !readOnly.value;
-  if (editor.value) editor.value.toggleReadOnly();
+  if (editor.value && editorData.value.blocks.length) {
+    await editor.value.toggleReadOnly();
+  }
+
+  if (!readOnly.value) {
+    backUpEditorData.value = JSON.parse(JSON.stringify(editorData.value));
+    observer.disconnect();
+  } else {
+    setTimeout(() => {
+      setSections();
+      setObserver();
+    }, 300);
+  }
 };
 
 const setSections = () => {
   const newSections = [
     {
-      title: 'Início',
+      title: t('pages.trailId.overview.sectionTitle'),
       type: 1,
       active: true,
     },
   ];
-
   editorData.value.blocks.forEach((block: any) => {
     if (block.type === 'header') {
       newSections.push({
@@ -229,87 +297,160 @@ const setSections = () => {
         active: false,
       });
     }
+    const element = document.querySelector(`[data-id="${block.id}"]`);
+    if (element) {
+      element.setAttribute('section', String(newSections.length - 1));
+    }
   });
   sections.value = newSections;
 };
 
 const navigateToSection = (title: string) => {
-  const index = sections.value.findIndex((item) => item.title === title);
-  sections.value.forEach((item) => {
-    item.active = false;
-  });
-  sections.value[index].active = true;
   if (title === 'Início') {
     const element = document.getElementById(title);
     if (element) {
-      element.scrollIntoView();
+      element.scrollIntoView({
+        block: 'end',
+        inline: 'nearest',
+        behavior: 'smooth',
+      });
     }
   } else editor.value.navigateToId(title);
 };
 
-const loadEditor = () => {
-  if (!editor.value) return;
-  editor.value.loadEditor({
-    id: editorData.value.id,
-    time: editorData.value.time,
-    version: editorData.value.version,
+const loadEditor = async () => {
+  if (!editor.value || !editorData.value) return;
+  const res = await editor.value.loadEditor({
     blocks: editorData.value.blocks,
   });
+  if (res.success) {
+    trailStore.trail?.structures.push({
+      time: editorData.value.time,
+      version: res.data.version,
+      blocks: res.data.blocks,
+      id: res.data.id,
+      trail: trailId.value,
+    });
+  } else {
+    setMessage(t('pages.trailId.overview.loadError'), 'error', true);
+  }
 };
 
 const saveData = async () => {
   saveLoading.value = true;
   try {
-    const data = await editor.value.getData();
-    const blockIds: number[] = [];
-    for (const block of data.blocks) {
-      const res = await create('blocks', {
-        type: block.type,
-        data: block.data,
-        tunes: block.tunes,
-      });
-      blockIds.push(res.data.id);
+    const res = await editor.value.getData();
+    if (!res.success) {
+      setMessage(t('pages.trailId.overview.saveError'), 'error', true);
+      return;
     }
-    if (editorData.value.id) {
-      await update('structures', editorData.value.id, {
-        time: Date.now(),
-        version: data.version,
-        blocks: blockIds,
-      });
-    } else {
-      await create('structures', {
-        time: Date.now(),
-        version: data.version,
-        blocks: blockIds,
-        trail: trailId,
-      });
-    }
-    editorData.value = data;
+    await create('structures', {
+      time: Date.now(),
+      version: res.data.version,
+      blocks: res.data.blocks,
+      trail: trailId.value,
+    });
+    trailStore.trail?.structures.push({
+      time: Date.now(),
+      version: res.data.version,
+      blocks: res.data.blocks,
+      trail: trailId.value,
+    });
     toggleReadOnly();
   } catch (e) {
-    setMessage(
-      'Ocorreu um erro ao salvar os dados da trilha, tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('pages.trailId.overview.saveError'), 'error', true);
   } finally {
     saveLoading.value = false;
   }
 };
 
-const resetData = () => {
-  editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
-  readOnly.value = true;
-  loadEditor();
+const resetData = async () => {
+  if (!backUpEditorData.value.blocks.length) {
+    editor.value.clearEditor();
+  } else {
+    editorData.value = JSON.parse(JSON.stringify(backUpEditorData.value));
+    await loadEditor();
+  }
+
+  toggleReadOnly();
 };
 
-const timeStampToDate = (timeStamp: number) => {
-  const date = new Date(timeStamp);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const checkEditorReady = async () => {
+  let attempts = 0;
+  while (attempts < 10) {
+    try {
+      await editor.value.isReady;
+      return true;
+    } catch (error) {
+      await sleep(100);
+      attempts++;
+    }
+  }
+  return false;
+};
+
+const timeStampToDate = computed(() => {
+  const date = new Date(editorData.value.time);
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
+});
+
+const pageHeight = ref(0);
+const activeSection = ref(0);
+
+const handleIntersection = (entries) => {
+  entries.forEach((entry) => {
+    const entrySection = parseInt(entry.target.getAttribute('section'));
+    if (activeSection.value !== entrySection && entry.isIntersecting) {
+      if (entry.target.id === 'Início') return (activeSection.value = 0);
+      activeSection.value = entrySection;
+    }
+  });
 };
+
+let observer;
+
+const setObserver = () => {
+  if (observer) {
+    observer.disconnect();
+  }
+
+  const observerMargin = Math.floor(pageHeight.value / 2);
+
+  const observerConfig = {
+    rootMargin: `-${
+      pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin
+    }px 0px -${observerMargin}px 0px`,
+  };
+
+  observer = new IntersectionObserver(handleIntersection, observerConfig);
+
+  editorData.value.blocks.forEach((section) => {
+    const element = document.querySelector(`[data-id="${section.id}"]`);
+    if (element) {
+      observer.observe(element);
+    }
+  });
+
+  const startSection = document.getElementById('Início');
+  if (startSection) {
+    observer.observe(startSection);
+  }
+};
+
+pageHeight.value = window.innerHeight;
+setObserver();
+
+window.addEventListener('resize', () => {
+  setTimeout(() => {
+    pageHeight.value = window.innerHeight;
+    setObserver();
+  }, 300);
+});
 </script>
 
 <style scoped lang="scss">
@@ -327,10 +468,15 @@ const timeStampToDate = (timeStamp: number) => {
 
 .sections-container {
   max-width: 240px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 88px;
+  z-index: 1;
+}
+
+.sections-col {
   position: absolute;
-  top: 0;
   right: 0;
-  z-index: 100;
 }
 
 .text-overflow {
@@ -342,9 +488,26 @@ const timeStampToDate = (timeStamp: number) => {
   width: 240px;
   vertical-align: middle;
   cursor: pointer;
+  border-left: 1px solid #d2d6da;
+  transition: all 0.2s ease-in;
 }
-.section-text-default:hover {
-  background-color: #ebedef;
-  color: #30363b !important;
+.section-text-default {
+  &:hover {
+    background-color: #ebedef;
+    color: #30363b !important;
+  }
+  &:active {
+    background-color: #d2d6da;
+    color: #30363b !important;
+  }
+}
+
+@media screen and (min-width: 1380px) {
+  .sticky-buttons {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 88px;
+    z-index: 1;
+  }
 }
 </style>

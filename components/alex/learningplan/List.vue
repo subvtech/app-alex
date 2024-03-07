@@ -174,8 +174,6 @@ const submit = async () => {
       body: formData,
     });
 
-    console.log(res);
-
     router.push(
       isTrail
         ? `/learning-plans/${parentPlanId}/trails/${res.id}`

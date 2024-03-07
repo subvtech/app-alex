@@ -97,7 +97,7 @@
           </template>
         </v-tooltip>
 
-        <div v-if="!isVertical" class="align-self-start">
+        <div v-if="!isVertical && canEdit" class="align-self-start">
           <alex-inputs-dropdown
             v-model="showOptions"
             :close-on-content-click="false"
@@ -167,12 +167,14 @@ interface LearningPlanCard {
   description: string;
   hide?: boolean;
   blocks?: Block[];
+  canEdit: boolean;
 }
 const { t } = useI18n();
 const props = withDefaults(defineProps<LearningPlanCard>(), {
   direction: 'VERTICAL',
   hide: false,
   blocks: undefined,
+  canEdit: false,
 });
 const isHovering = ref(false);
 const direction = useDirection('mobile');
@@ -197,13 +199,15 @@ const blocksInfo = computed(() => {
   }, {});
 });
 
+const isPlural = (value: number) => (value > 1 ? 's' : '');
+
 const listBlocks = computed(() => {
   let stringBlocks = '';
   if (blocksInfo.value) {
     for (const [key, value] of Object.entries(blocksInfo.value)) {
       stringBlocks += `${value} ${t(
         `components.learningPlan.cardTrails.${key}`,
-      )}; `;
+      )}${isPlural(value)}; `;
     }
   }
   return stringBlocks;

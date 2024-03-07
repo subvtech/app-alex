@@ -141,6 +141,11 @@ const menus = [
         title: 'List item user',
         to: '/components/custom/list-item/user',
       },
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Skeleton',
+        to: '/components/custom/skeleton',
+      },
     ],
   },
   {

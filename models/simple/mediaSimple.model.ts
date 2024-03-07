@@ -15,4 +15,5 @@ export interface MediaSimple {
   video: string;
   type: ValueOf<typeof MediaTypes>;
   learningplan: LearningPlanSimple;
+  updatedAt: string | null;
 }
