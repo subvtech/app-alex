@@ -33,8 +33,8 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :avatar="user.avatar"
-      :placeholder="user.fullname"
+      :avatar="user?.avatar"
+      :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
       show-picture
       @click="onClickOutside"
@@ -51,194 +51,76 @@
 <script setup lang="ts">
 import { useMainHorizontalBar } from '~/composables/useMainHorizontalBar';
 import useNavigationDrawer from '~/composables/useNavigationDrawer';
-
-const user = useStrapiUser<User>();
-const userStore = useUserStore();
+import vuefiles from '~/assets/vueFiles.json';
 
 const { profileMenuItems } = useMainHorizontalBar();
 
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
+const user = useStrapiUser<User>();
 
-onBeforeMount(() => {
-  userStore.avatar = user.value?.avatar;
-  userStore.fullname = user.value?.fullname;
-});
-
-const menus = [
-  {
-    title: 'Custom',
-    items: [
-      {
-        icon: 'mdi-account-circle',
-        title: 'AppUserAvatar',
-        to: '/components/custom/Appuseravatar',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Accordion',
-        to: '/components/custom/accordion',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Avatar Group',
-        to: '/components/custom/AvatarGroup',
-      },
-      {
-        icon: 'mdi-image-area',
-        title: 'Banner',
-        to: '/components/custom/banner',
-      },
-
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Button',
-        to: '/components/custom/Button',
-      },
-      {
-        icon: 'mdi-view-carousel',
-        title: 'Carousel',
-        to: '/components/custom/carousel',
-      },
-      {
-        icon: 'mdi-chip',
-        title: 'Chip',
-        to: '/components/custom/chip',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Dialog',
-        to: '/components/custom/dialog',
-      },
-      {
-        icon: 'mdi-image-filter-center-focus-weak',
-        title: 'EmptyPlaceholder',
-        to: '/components/custom/emptyplaceholder',
-      },
-
-      {
-        icon: 'mdi-information-variant',
-        title: 'Info',
-        to: '/components/custom/info',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Dropdown',
-        to: '/components/custom/dropdown',
-      },
-      {
-        icon: 'mdi-tooltip',
-        title: 'Tooltip',
-        to: '/components/custom/tooltip',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'List item',
-        to: '/components/custom/list-item',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'List item user',
-        to: '/components/custom/list-item/user',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Skeleton',
-        to: '/components/custom/skeleton',
-      },
-    ],
-  },
-  {
-    title: 'Navigation',
-    items: [
-      {
-        icon: 'mdi-baguette',
-        title: 'Breadcrumbs',
-        to: '/components/custom/breadcrumbs',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Header',
-        to: '/components/custom/Header',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Horizontalbar',
-        to: '/components/custom/horizontalbar',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Drawable',
-        to: '/components/custom/drawable',
-      },
-      {
-        icon: 'mdi-book-open-page-variant',
-        title: 'Pagination',
-        to: '/components/custom/pagination',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Tabs',
-        to: '/components/custom/tabs',
-      },
-    ],
-  },
-  {
-    title: 'Input',
-    items: [
-      {
-        icon: 'mdi-radio',
-        title: 'Radio-button',
-        to: '/components/inputs/radio-button',
-      },
-      {
-        icon: 'mdi-checkbox-marked',
-        title: 'Checkbox',
-        to: '/components/inputs/checkbox',
-      },
-      {
-        icon: 'mdi-card-text-outline',
-        title: 'Text-field',
-        to: '/components/inputs/text-field',
-      },
-      {
-        icon: 'mdi-card-text-outline',
-        title: 'Textarea',
-        to: '/components/inputs/text-area',
-      },
-      {
-        icon: 'mdi-card-text-outline',
-        title: 'Date Field',
-        to: '/components/inputs/date',
-      },
-      {
-        icon: 'mdi-card-text-outline',
-        title: 'Autocomplete',
-        to: '/components/inputs/autocomplete',
-      },
-      {
-        icon: 'mdi-card-text-outline',
-        title: 'Select',
-        to: '/components/inputs/select',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Card projetos e cursos',
-        to: '/components/learning-plans/card',
-      },
-      {
-        icon: 'mdi-view-dashboard-outline',
-        title: 'Card Trilhas',
-        to: '/components/learning-plans/trails/card',
-      },
-      {
-        icon: 'mdi-shoe-print',
-        title: 'Stepper',
-        to: '/components/inputs/stepper',
-      },
-    ],
-  },
+const icons = [
+  'mdi-account-circle',
+  'mdi-book',
+  'mdi-briefcase',
+  'mdi-image-area',
+  'mdi-view-dashboard-outline',
+  'mdi-view-carousel',
+  'mdi-chip',
+  'mdi-calendar-blank',
+  'mdi-image-filter-center-focus-weak',
+  'mdi-information-variant',
+  'mdi-cards-heart',
+  'mdi-tooltip',
+  'mdi-chart-tree',
+  'mdi-chart-line-stacked',
+  'mdi-chart-pie',
+  'mdi-chart-box',
+  'mdi-chart-box-outline',
+  'mdi-checkbook',
+  'mdi-checkerboard',
+  'mdi-clipboard-text-outline',
+  'mdi-clipboard-text',
+  'mdi-code-equal',
+  'mdi-credit-card',
+  'mdi-bitcoin',
+  'mdi-alert-box',
+  'mdi-baguette',
 ];
+
+function getRandomIcon(): string {
+  const randomIndex = Math.floor(Math.random() * icons.length);
+  return icons[randomIndex];
+}
+
+const menus = computed(() => {
+  // Group input objects by the first element of the 'namespaces' array
+  const groups = vuefiles.reduce((acc, obj) => {
+    const key = obj.namespaces[0];
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(obj);
+    return acc;
+  }, {});
+  const capitaliseString = (str: string) =>
+    str.charAt(0).toUpperCase() + str.slice(1);
+  // Map each group to the desired output format
+  const output = Object.entries(groups).map(([title, items]) => ({
+    title: capitaliseString(title),
+    items: (items as any[]).map((item) => ({
+      icon: getRandomIcon(),
+      title: capitaliseString(
+        item.namespaces[item.namespaces.length - 1] === 'index'
+          ? item.namespaces[item.namespaces.length - 2]
+          : item.namespaces[item.namespaces.length - 1],
+      ),
+      to: `/components/${item.namespaces.join('/').toLowerCase()}`,
+    })),
+  }));
+
+  return output;
+});
 </script>
 
 <style scoped lang="scss">

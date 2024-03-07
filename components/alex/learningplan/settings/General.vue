@@ -92,6 +92,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  accessUrl: {
+    type: String,
+    required: true,
+  },
 });
 
 const i18n = useI18n();
@@ -104,15 +108,13 @@ const myStartDate =
   learningPlanStore.learningPlan?.start_date || startDate.value;
 const myEndDate = learningPlanStore.learningPlan?.end_date || endDate.value;
 const myIdentifier = learningPlanStore.learningPlan?.slug || slug.value;
-
-const accessUrl = ref(
-  `https://app.projetoalex.cc/cursos/${myIdentifier.toLowerCase()}/`,
-);
+const accessUrl = ref(props.accessUrl);
 
 const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   validationSchema: generalCourseSchema,
   keepValuesOnUnmount: true,
 });
+
 
 const onSave = handleSubmit(async (e) => {
   if (controlledValues.value.slug !== slug.value) {

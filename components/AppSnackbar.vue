@@ -1,13 +1,13 @@
 <template>
   <v-snackbar
     v-if="currentShow"
-    class="snackbar"
     v-model="currentShow"
-    @update:model-value="updateModelValue"
+    class="snackbar"
     :color="currentColor"
-    :timeout="timeout"
+    :timeout="timeSpan"
     location="bottom right"
     data-testid="snackbar"
+    @update:model-value="updateModelValue"
   >
     <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8 relative">
       <v-row justify="start" align="center">
@@ -16,7 +16,7 @@
         }}</v-icon>
         <span class="text-white font-weight-bold">{{ currentMessage }}</span>
       </v-row>
-      <v-icon class="close" size="x-small" @click="onClose" role="close-btn"
+      <v-icon class="close" size="x-small" role="close-btn" @click="onClose"
         >mdi-close</v-icon
       >
     </v-row>
@@ -24,7 +24,7 @@
       <div
         class="bar h-100"
         :class="startTimer ? 'w-100' : ''"
-        :style="`transition: width ${timeout}ms linear; background-color: ${currentColor}`"
+        :style="`transition: width ${timeSpan}ms linear; background-color: ${currentColor}`"
       />
     </div>
   </v-snackbar>
@@ -34,6 +34,9 @@
 const messageStore = useMessageStore();
 
 const { show, message, color } = storeToRefs(messageStore);
+
+const { timeoutId, stopTimeout, timeSpan, startTimer, setStartTimer } =
+  useTimeout(5000);
 
 const props = defineProps({
   data: {
@@ -61,21 +64,19 @@ const iconName = computed(() => {
       break;
     case 'blue':
       name = 'mdi-information';
+      break;
     case 'gray':
       name = 'mdi-view-dashboard';
+      break;
   }
   if (props.countdown) name += '-outline';
   return name;
 });
 
-const timeout = ref(5000);
-const timeoutId = ref<NodeJS.Timeout | null>(null);
-const startTimer = ref(false);
-
 const updateModelValue = (newValue) => {
   if (data?.value) data.value.show = newValue;
   show.value = newValue;
-  startTimer.value = true;
+  setStartTimer(true);
 };
 
 const currentShow = computed(() =>
@@ -93,10 +94,6 @@ const currentMessage = computed(() =>
     ? message.value
     : 'done',
 );
-const stopTimeout = () => {
-  if (timeoutId.value) clearTimeout(timeoutId.value);
-  else timeoutId.value = null;
-};
 
 onUnmounted(() => {
   stopTimeout();
@@ -105,13 +102,12 @@ onUnmounted(() => {
 const onClose = () => {
   if (data?.value) data.value.show = false;
   show.value = false;
-  startTimer.value = false;
   stopTimeout();
 };
 
 watch(currentShow, () => {
   timeoutId.value = setTimeout(() => {
-    startTimer.value = !startTimer.value;
+    setStartTimer(!startTimer.value);
   }, 10);
 });
 </script>

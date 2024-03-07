@@ -25,9 +25,9 @@
             width="24"
             height="24"
             role="chat-active"
-          >
+          />
         </v-btn>
-        <v-btn icon color="grey" @click="emit('alert')" class="">
+        <v-btn icon color="grey" @click="emit('alert')">
           <img
             v-if="isBellActive"
             src="/svg/bell.svg"
@@ -38,6 +38,7 @@
           <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
         </v-btn>
       </div>
+
       <v-menu offset-y nudge-bottom="10">
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
