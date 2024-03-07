@@ -19,4 +19,5 @@ export interface UserSimple {
   cover: Upload;
   role: UserRoles;
   phone: string | null;
+  info: null;
 }

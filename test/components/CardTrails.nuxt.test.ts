@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { renderSuspended } from '@nuxt/test-utils/runtime';
 import { createI18n } from 'vue-i18n';
 import { fireEvent, screen } from '@testing-library/vue';
 import Card from '@/components/alex/learningplan/trails/Card.vue';

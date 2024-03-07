@@ -51,7 +51,7 @@ const { delete: _delete } = useStrapi();
 const { setMessage } = useMessageStore();
 const client = useStrapiClient();
 const images = ref([...props.images]);
-const initialImages = ref([...props.images]);
+const initialImages = ref<any[]>(JSON.parse(JSON.stringify(props.images)));
 const isEditing = ref(false);
 const valueWasNotChanged = computed(
   () => JSON.stringify(images.value) === JSON.stringify(initialImages.value),
@@ -68,10 +68,13 @@ const onCancel = async () => {
   images.value = initialImages.value;
   await Promise.all(deletedMedia);
 };
+const setInitialImages = () => {
+  initialImages.value = JSON.parse(JSON.stringify(props.images));
+};
 const toggleIsEditing = () => {
   isEditing.value = !isEditing.value;
+  setInitialImages();
 };
-
 const onSave = async () => {
   const updatedMedia: Omit<TagSimple, 'learningplans'>[] = await client(
     `/learningplans/${props.learningplanId}/media`,

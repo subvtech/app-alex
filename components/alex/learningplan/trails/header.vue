@@ -78,14 +78,20 @@ const tab = {
 };
 
 const trailStore = useTrailStore();
+const learningPlanStore = useLearningPlanStore();
 
 const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
 
-const tabs = [
-  { label: tab.firstTitle, value: '0' },
-  { label: tab.secondTitle, value: '1' },
-  { icon: 'mdi-cog-outline', label: '', value: '2' },
-];
+const tabs = computed(() => {
+  const defaultTabs = [
+    { label: tab.firstTitle, value: '0' },
+    { label: tab.secondTitle, value: '1' },
+  ];
+
+  return learningPlanStore.userIsFacilitator
+    ? [...defaultTabs, { icon: 'mdi-cog-outline', label: '', value: '2' }]
+    : defaultTabs;
+});
 
 const activePage = ref(props.page);
 const defaultURL = computed(() => {
