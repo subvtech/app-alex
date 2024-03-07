@@ -4,7 +4,7 @@
     :title="$t('components.meeting.title')"
     align-content="align-center"
     :show-icon="false"
-    :href="`${learningPlanId}/settings`"
+    :href="canEdit ? `${learningPlanId}/settings` : ''"
   >
     <template #content>
       <div
