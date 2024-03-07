@@ -95,12 +95,16 @@ export const useFormRules = () => {
       ),
   };
   const goalRules = {
-    keyword: yup
-      .string()
-      .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
-      .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
-      .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
-      .required(i18n.t('rules.keyword.required')),
+    verb: yup.lazy((value) =>
+      typeof value === 'string'
+        ? yup
+            .string()
+            .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
+            .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+            .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+            .required(i18n.t('rules.keyword.required'))
+        : yup.object().required(i18n.t('rules.keyword.required')),
+    ),
     description: yup
       .string()
       .required(i18n.t('rules.description.required'))
