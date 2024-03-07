@@ -8,14 +8,18 @@
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
-          v-if="readOnly && professorMode && !trailStore.loading"
+          v-if="
+            readOnly &&
+            learningPlanStore.userIsFacilitator &&
+            !trailStore.loading
+          "
           variant="primary"
           size="large"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="professorMode && !isLoading">
+        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
@@ -163,7 +167,7 @@ definePageMeta({
 });
 
 const trailStore = useTrailStore();
-const professorMode = ref(false);
+
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
@@ -175,9 +179,6 @@ const showEditor = computed(() => {
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
-const { isProfessor } = useStrapiUser<User>().value;
-professorMode.value = isProfessor;
 
 const { t } = useI18n();
 const editorData = computed(() => {
