@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { screen, within, fireEvent } from '@testing-library/vue';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { renderSuspended } from '@nuxt/test-utils/runtime';
 import { vuetify } from '@/plugins/vuetify';
 
 import HeaderComponent from '@/components/alex/custom/Header.vue';

@@ -6,12 +6,12 @@
     show-tooltip
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
-    :save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
-    :cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
+    @click:save="onSave"
+    @click:cancel="onCancel"
     @toggle:is-editing="toggleEditing"
   >
     <template #content>

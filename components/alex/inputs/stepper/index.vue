@@ -1,5 +1,5 @@
 <template>
-  <v-form role="stepper" @submit="onSubmit">
+  <v-form role="tablist" @submit="onSubmit">
     <div
       v-if="!noHeader"
       class="d-flex gap-4 py-3 px-1 align-center justify-center"
