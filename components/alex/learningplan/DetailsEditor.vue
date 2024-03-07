@@ -23,9 +23,8 @@
       <app-editor
         v-else
         ref="editorDetails"
-        class="w-full p-6 sm:p-16 editor-details"
+        class="w-full p-6 sm:p-16"
         :data="data"
-        :spellcheck="isEditing ? 'true' : 'false'"
       />
     </template>
   </alex-custom-card>
@@ -125,50 +124,3 @@ onMounted(async () => {
   isLoading.value = false;
 });
 </script>
-
-<style lang="scss">
-.editor-details {
-  width: 100% !important;
-  .codex-editor__redactor {
-    padding-bottom: 0 !important;
-  }
-  .ce-block__content {
-    margin: 0;
-    max-width: none;
-  }
-  &[spellcheck='true'] {
-    padding-bottom: 300px !important;
-  }
-  &[spellcheck='false'] {
-    .codex-editor--narrow .codex-editor__redactor {
-      margin-right: 0px;
-    }
-  }
-}
-
-@media (min-width: 651px) {
-  .editor-details[spellcheck='true'] {
-    .codex-editor--narrow .ce-block {
-      margin-right: 0;
-      padding-right: 0;
-    }
-    .ce-block__content {
-      margin: 0;
-      margin-left: 40px;
-    }
-
-    .ce-toolbar__actions {
-      right: auto;
-      left: -20px;
-    }
-    .codex-editor--narrow .ce-toolbox .ce-popover,
-    .codex-editor--narrow .ce-settings .ce-popover {
-      right: auto;
-      left: 0;
-    }
-    .ce-toolbar__content {
-      margin: 0;
-    }
-  }
-}
-</style>
