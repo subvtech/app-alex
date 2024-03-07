@@ -61,7 +61,7 @@
             t('components.courses.settings.invite.email')
           }}</span>
           <alex-inputs-text-area
-            v-model="myMessage"
+            v-model="defaultMessage"
             name="message"
             class="w-100"
             :label="$t('components.courses.settings.invite.message')"
@@ -79,7 +79,7 @@
       </div>
     </template>
     <template #footer>
-      <div class="d-flex w-100 pt-6 justify-end gap-4">
+      <div class="d-flex w-100 pt-4 justify-end gap-4">
         <alex-custom-button
           class="button"
           :text="$t('components.courses.settings.invite.cancel')"
@@ -144,7 +144,7 @@ const timeOptions = ref([
     value: 86400,
   },
 ]);
-const selectedTime = ref(timeOptions.value[0].value);
+const selectedTime = ref(timeOptions.value[3].value);
 
 const plainLink = ref();
 
