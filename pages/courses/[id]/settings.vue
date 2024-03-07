@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import { format } from 'date-fns';
+const { t } = useI18n();
 definePageMeta({
   middleware: 'auth',
 });
@@ -34,4 +35,42 @@ const schedules = computed(() =>
   }),
 );
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+
+const headerStore = usePageHeaderStore();
+const { id } = route.params;
+
+onBeforeMount(() => {
+  headerStore.showHeader = true;
+});
+
+watch(
+  () => [learningPlanStore.loading],
+  () => {
+    if (!learningPlanStore.loading) {
+      headerStore.title = t('components.courses.settings.breadcrumbTitle');
+      headerStore.items = [
+        {
+          title: t('components.courses.settings.home'),
+          disabled: false,
+          to: '/',
+        },
+        {
+          title: t('components.courses.settings.myCourses'),
+          disabled: false,
+          to: '/courses/me',
+        },
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${id}`,
+        },
+        {
+          title: t('components.courses.settings.title'),
+          disabled: true,
+          to: `/courses/${id}/settings`,
+        },
+      ];
+    }
+  },
+);
 </script>
