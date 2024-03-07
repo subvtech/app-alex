@@ -23,9 +23,8 @@
       <app-editor
         v-else
         ref="editorDetails"
-        class="editorjs w-full p-6 sm:p-16"
+        class="w-full p-6 sm:p-16 editor-details"
         :data="data"
-        :class="[isEditing ? 'editing-editor' : 'locked']"
         :spellcheck="isEditing ? 'true' : 'false'"
       />
     </template>
@@ -127,30 +126,28 @@ onMounted(async () => {
 });
 </script>
 
-<style global lang="scss">
-#editorjs {
+<style lang="scss">
+.editor-details {
   width: 100% !important;
   .codex-editor__redactor {
     padding-bottom: 0 !important;
   }
-}
-.locked {
-  pointer-events: none;
-  -webkit-user-select: text; /* Chrome, Safari, and Opera */
-  -moz-user-select: text; /* Firefox */
-  -ms-user-select: text; /* Internet Explorer/Edge */
-  user-select: text;
-
-  .ce-toolbar__actions.ce-toolbar__actions--opened {
-    display: none;
+  .ce-block__content {
+    margin: 0;
+    max-width: none;
+  }
+  &[spellcheck='true'] {
+    padding-bottom: 300px !important;
+  }
+  &[spellcheck='false'] {
+    .codex-editor--narrow .codex-editor__redactor {
+      margin-right: 0px;
+    }
   }
 }
 
-#editorjs:not(.locked) {
-  padding-bottom: 300px !important;
-}
 @media (min-width: 651px) {
-  #editorjs:not(.locked) {
+  .editor-details[spellcheck='true'] {
     .codex-editor--narrow .ce-block {
       margin-right: 0;
       padding-right: 0;
@@ -169,24 +166,9 @@ onMounted(async () => {
       right: auto;
       left: 0;
     }
+    .ce-toolbar__content {
+      margin: 0;
+    }
   }
-}
-#editorjs:not(.locked) {
-  .ce-toolbar__content {
-    margin: 0;
-  }
-}
-.ce-block__content {
-  margin: 0;
-  max-width: none;
-}
-.blocks {
-  text-align: justify;
-  text-justify: inter-word;
-  align-self: stretch;
-  color: #5d6872;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 22px;
 }
 </style>
