@@ -1,27 +1,19 @@
 import { defineStore } from 'pinia';
-import { SocialItemType } from '@/models/social.model';
-
-export type TrailStoreType = {
-  avatar: { url: string; id: number } | undefined;
-  cover_image: any | undefined;
-  title: any;
-  editorData: any;
-};
+import { TrailSimple } from '@/models/simple/trailSimple.model';
 
 export const useTrailStore = defineStore('trail', () => {
   const { findOne } = useStrapiUtils();
-  const trail = ref();
+  const trail = ref<TrailSimple>();
 
   const { setMessage } = useMessageStore();
-  const i18n = useI18n();
 
   const populate = [
-    'structures',
+    'structures.blocks',
     'partners',
     'tasks',
     'contributions',
     'cover_image',
-    'learning_structure',
+    'learning_structure.learningplan',
   ];
 
   const loading = ref(false);
@@ -30,17 +22,16 @@ export const useTrailStore = defineStore('trail', () => {
     try {
       loading.value = true;
       const result = (await findOne('trails', id, { populate })).data;
-
-      trail.value = result;
+      trail.value = result as TrailSimple;
       loading.value = false;
       return result;
     } catch (e: any) {
-      loading.value = false;
+      const i18n = useI18n();
       if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
-        setMessage(i18n.t('pages.courses.notfound'), 'red', true);
+        setMessage(i18n.t('pages.trails.notFound'), 'red', true);
       }
     }
   }
 
-  return { loadTrailData, trail };
+  return { loadTrailData, trail, loading };
 });

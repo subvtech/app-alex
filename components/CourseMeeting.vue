@@ -51,12 +51,12 @@ export type MeetingVariantType = 'editing' | 'list';
 export interface MeetingPropsType {
   interval: 0 | 1 | 7 | 14 | 30;
   variant?: MeetingVariantType;
-  date: Date;
+  date: Date | string;
   startHour: string;
   endHour: string;
   shortText?: boolean;
   showOptions?: boolean;
-  id?: string;
+  id?: number;
   dropdownProps?: AlexDropdownItem[];
 }
 
@@ -80,7 +80,6 @@ const props = withDefaults(defineProps<MeetingPropsType>(), {
 });
 
 const date = computed(() => new Date(props.date));
-
 const formattedDate = computed(() => {
   let formatText = ` d '${t('components.courses.meeting.of')}' MMMM '${t(
     'components.courses.meeting.of',
@@ -114,7 +113,7 @@ const frequencyText = computed(() => {
     case 1:
       return t(`components.courses.meeting.everyday`);
 
-      case 7:
+    case 7:
       return t('components.courses.meeting.weekly', {
         day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
       });
@@ -127,7 +126,7 @@ const frequencyText = computed(() => {
       return t('components.courses.meeting.monthly', {
         day: t(`components.courses.meeting.single.${dayOfTheWeek}`),
       });
-   
+
     default:
       return t('components.courses.meeting.interval', { days: props.interval });
   }

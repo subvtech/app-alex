@@ -1,27 +1,21 @@
 <template>
-  <div>
+  <section>
     <alex-custom-banner
       v-if="!route.meta?.hideLearningPlanBanner"
-      :loading="learningPlanStore.loading"
+      :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
       :cover-picture="learningPlanStore.learningPlan?.cover_image"
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
-      show-profile-picture
-      darker-background
-      show-shade
-      show-menu
-      settings-menu
       :title="$t('pages.courses.class')"
       :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
-      is-professor
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
       :subtitle="learningPlanStore.learningPlan?.class_name"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
-      :links="isJoinRoutePath ? [] : links"
+      :links="isJoinRoutePath ? [] : generalLinks"
       :selected-option="selectedOption"
       :copy-object="
         learningPlanStore.activeInvitationLinkUrl &&
@@ -32,47 +26,65 @@
             }
           : undefined
       "
+      :settings="{
+        label: '',
+        icon: 'mdi-cog-outline',
+        value: 5,
+        to: `/courses/${learningPlanId}/settings`,
+      }"
+      show-profile-picture
+      darker-background
+      show-shade
+      show-menu
+      is-professor
       @select:option="selectOption"
-      @display:settings="selectOption(8)"
     />
-
     <NuxtPage @update="fetchData" />
-  </div>
+  </section>
 </template>
 <script setup lang="ts">
+import { TabType } from '~/components/alex/custom/Tabs.vue';
+
 definePageMeta({
   middleware: ['auth'],
 });
 
 const i18n = useI18n();
-
 const user = useStrapiUser<User>();
-
 const route = useRoute();
-
 const learningPlanStore = useLearningPlanStore();
-
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
 
+const isSettingsRoutePath = computed(() => {
+  return (
+    route.name === 'courses-id-settings' ||
+    route.name === 'courses-id-trails-trailid-settings'
+  );
+});
+
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-
-const selectedOption = ref(0);
-
+const headerStore = usePageHeaderStore();
+const selectedOption = ref<number | null>(null);
 const fetchData = async () => {
-  await useAsyncData('user', () =>
+  await useAsyncData('learningPlanDetails', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
-
+  headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/');
+  }
+
+  if (isSettingsRoutePath.value && !learningPlanStore.userIsFacilitator) {
+    return navigateTo(`/courses/${learningPlanId.value}`);
   }
 
   if (
     !learningPlanStore.userIsFacilitator &&
     !learningPlanStore.userIsActiveMember &&
-    !learningPlanStore.userIsPendingMember
+    !learningPlanStore.userIsPendingMember &&
+    !isJoinRoutePath.value
   ) {
     return navigateTo('/courses/me');
   }
@@ -85,83 +97,54 @@ const fetchData = async () => {
     );
 
     if (invite) {
-      return navigateTo(`/courses/${learningPlanId}/join/${invite.hash}`);
+      return navigateTo(`/courses/${learningPlanId.value}/join/${invite.hash}`);
     }
   }
 };
-
 const pageRoute = computed(() => route.name);
-
-onMounted(async () => {
+onBeforeMount(async () => {
+  headerStore.isLoading = true;
   await fetchData();
 });
-
+onUnmounted(() => {
+  learningPlanStore.learningPlan = undefined;
+  learningPlanStore.loading = true;
+  headerStore.isLoading = false;
+});
 watch(pageRoute, async () => {
   if (pageRoute.value?.toString().includes('courses-id')) {
     await fetchData();
   }
 });
 
-const selectOption = (index) => {
+const selectOption = (index: number | null) => {
   selectedOption.value = index;
 };
-
-const links = computed(() => {
-  const generalLinks = [
-    {
-      label: i18n.t('pages.courses.general'),
-      value: '0',
-      disabled: learningPlanStore.loading,
-      to: learningPlanStore.learningPlan
-        ? `/courses/${learningPlanStore.learningPlan?.id}`
-        : '/',
-    },
-    {
-      label: i18n.t('pages.courses.trails'),
-      value: '1',
-      disabled: learningPlanStore.loading,
-      to: learningPlanStore.learningPlan
-        ? `/courses/${learningPlanStore.learningPlan?.id}/trails`
-        : '/',
-    },
-    {
-      label: i18n.t('pages.courses.assignments'),
-      value: '2',
-      disabled: learningPlanStore.loading,
-      to: learningPlanStore.learningPlan
-        ? `/courses/${learningPlanStore.learningPlan?.id}/tasks`
-        : '/',
-    },
-    {
-      label: i18n.t('pages.courses.class'),
-      value: '3',
-      disabled: learningPlanStore.loading,
-      to: learningPlanStore.learningPlan
-        ? `/courses/${learningPlanStore.learningPlan?.id}/class`
-        : '/',
-    },
-    {
-      label: i18n.t('pages.courses.projects'),
-      value: '4',
-      disabled: learningPlanStore.loading,
-      to: learningPlanStore.learningPlan
-        ? `/courses/${learningPlanStore.learningPlan?.id}/projects`
-        : '/',
-    },
-  ];
-
-  const settingsLink = [
-    {
-      label: '',
-      icon: 'mdi-cog-outline',
-      value: '5',
-      disabled: learningPlanStore.loading,
-      to: `/courses/${learningPlanStore.learningPlan?.id}/settings`,
-    },
-  ];
-
-  return learningPlanStore.userIsFacilitator
-    ? [...generalLinks, ...settingsLink]
-    : generalLinks;
-});
+const generalLinks: TabType[] = [
+  {
+    label: i18n.t('pages.courses.general'),
+    value: 0,
+    to: `/courses/${learningPlanId.value}`,
+  },
+  {
+    label: i18n.t('pages.courses.trails'),
+    value: 1,
+    to: `/courses/${learningPlanId.value}/trails`,
+  },
+  {
+    label: i18n.t('pages.courses.assignments'),
+    value: 2,
+    to: `/courses/${learningPlanId.value}/tasks`,
+  },
+  {
+    label: i18n.t('pages.courses.class'),
+    value: 3,
+    to: `/courses/${learningPlanId.value}/class`,
+  },
+  {
+    label: i18n.t('pages.courses.projects'),
+    value: 4,
+    to: `/courses/${learningPlanId.value}/projects`,
+  },
+];
 </script>
