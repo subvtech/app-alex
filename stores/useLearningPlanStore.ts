@@ -96,12 +96,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const standardTrails = computed(() => {
-    return (
-      learningPlan.value?.learning_structures.filter(
-        (structure) =>
-          structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? []
+    const standardStructure = learningPlan.value?.learning_structures.find(
+      (structure) =>
+        structure.type === LearningPlanScructureSimpleType.STANDARD,
     );
+    return standardStructure?.trails ?? [];
   });
 
   const standardTrailsCount = computed(() => {

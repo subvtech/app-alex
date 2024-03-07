@@ -181,6 +181,29 @@ export const alluser = `
     }
   }
 `;
+export const userSocials = `
+query($userId: ID!) {
+  socials(filters: {users_permissions_user: {id: {eq: $userId}}}) {
+    data {
+      id
+      attributes {
+        name
+        url
+      }      
+    }
+  }
+}
+`;
+
+export const userInfo = `
+  query($id: ID) {
+    user(id: $id) {
+      id
+      info
+    
+    }
+  }
+`;
 
 export const user = `
   query($q: JSON) {

@@ -16,11 +16,11 @@
         placeholder
         data-testid="img-avatar"
       />
-      <v-avatar class="img" v-else :size="size" color="accent">
+      <v-avatar v-else class="img" :size="size" color="accent">
         <span class="text-white text-h5">{{ userInitials }}</span>
       </v-avatar>
 
-      <div class="edit" v-if="userIdCanEdit" role="edit">
+      <div v-if="userIdCanEdit" class="edit" role="edit">
         <v-icon
           v-if="avatar"
           class="d-none"
@@ -32,21 +32,22 @@
           >mdi-plus</v-icon
         >
         <input
-          class="d-none"
-          @input="uploadProfilePicture"
-          accept="image/png, image/jpeg"
           id="file-input"
+          class="d-none"
+          accept="image/png, image/jpeg"
           type="file"
           role="input"
+          @input="uploadProfilePicture"
         />
       </div>
     </label>
 
-    <div
+    <alex-custom-button
       v-if="userIdCanEdit && canDelete && avatar"
       role="delete"
       class="delete d-flex justify-center align-center"
-      @click="removeProfilePicture"
+      variant="error"
+      :loading="isLoading"
       :class="[
         xlarge
           ? 'x-large'
@@ -58,61 +59,60 @@
           ? 'x-small'
           : 'xx-small',
       ]"
+      @click="removeProfilePicture"
     >
       <img src="/svg/trash.svg" width="20" height="20" />
-    </div>
+    </alex-custom-button>
   </div>
 </template>
 <script setup lang="ts">
+/*
+  This is a description
+*/
+export interface ProfilePictureItemType {
+  url: string;
+  id: number;
+}
+
+export interface AppUserAvatarComponentType {
+  userId?: number; // user id
+  placeholder?: string;
+  avatarStyle?: string;
+  showBorder?: boolean;
+  canEdit?: boolean;
+  trackCurrentUser?: boolean;
+  canDelete?: boolean;
+  size?: number;
+  profilePicture?: ProfilePictureItemType | null;
+}
 const userStore = useUserStore();
 
-const props = defineProps({
-  userId: {
-    type: Number,
-  },
-  placeholder: {
-    type: String as PropType<string | null>,
-    default: '',
-  },
-  avatarStyle: {
-    type: String,
-  },
-  showBorder: {
-    type: Boolean,
-    default: false,
-  },
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
-  trackCurrentUser: {
-    type: Boolean,
-    default: false,
-  },
-  canDelete: {
-    type: Boolean,
-    default: false,
-  },
-  size: { type: Number, default: 30 },
-
-  profilePicture: {
-    type: Object as PropType<{ url: string; id: number } | null>,
-  },
+const props = withDefaults(defineProps<AppUserAvatarComponentType>(), {
+  userId: undefined,
+  avatarStyle: undefined,
+  placeholder: '',
+  showBorder: false,
+  canDelete: false,
+  canEdit: false,
+  size: 30,
+  profilePicture: null,
 });
 
 const avatar = computed<{ url: string; id: number } | null | undefined>(() =>
-  props.trackCurrentUser ? userStore.avatar : props.profilePicture,
+  props.trackCurrentUser && userStore.user
+    ? userStore.user?.avatar
+    : props.profilePicture,
 );
 
-const fullname = computed<string | null | undefined>(() => props.placeholder);
-const { uploadProfilePicture, removeProfilePicture } = useProfilePicture(
-  avatar,
-  props.userId,
-);
+const fullname = ref<string | null | undefined>(props.placeholder);
+const { uploadProfilePicture, removeProfilePicture, isLoading } =
+  useProfilePicture(avatar, props.userId);
 
 const userInitials = computed(() => {
   return getFullnameInitials(
-    props.trackCurrentUser ? userStore.fullname ?? '' : fullname.value ?? '',
+    props.trackCurrentUser
+      ? userStore.user?.fullname ?? ''
+      : fullname.value ?? '',
   );
 });
 
@@ -143,16 +143,6 @@ const large = computed(() => {
 const xlarge = computed(() => {
   return props.size > 130;
 });
-
-watch(
-  () => userStore.avatar,
-  () => {
-    if (props.trackCurrentUser) {
-      avatar!.value = userStore.avatar;
-      fullname.value = userStore.fullname;
-    }
-  },
-);
 </script>
 
 <style scoped lang="scss">
@@ -218,7 +208,9 @@ watch(
 
   .delete {
     position: absolute;
-
+    max-width: 32px;
+    padding: 0px !important;
+    min-width: 20px;
     border-radius: 8px;
 
     display: flex;

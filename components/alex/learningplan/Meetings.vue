@@ -3,8 +3,8 @@
     class="w-100"
     :title="$t('components.meeting.title')"
     align-content="align-center"
+    :href="`${learningPlanId}/settings`"
     :show-icon="false"
-    :href="canEdit ? `${learningPlanId}/settings` : ''"
   >
     <template #content>
       <div
