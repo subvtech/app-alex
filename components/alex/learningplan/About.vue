@@ -3,7 +3,7 @@
     class="mb-6"
     :title="title"
     :is-editing="isEditingAndCanEdit"
-    :showicon="canEdit"
+    :show-icon="canEdit"
     :cancel="onCancel"
     :save="() => emit('update', isOptional ? text : value)"
     :disable-save="errorMessage !== undefined || textNotChanged"
