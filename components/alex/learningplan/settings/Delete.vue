@@ -12,8 +12,31 @@
     </template>
     <template #footer>
       <div class="d-flex justify-end w-100 pt-6">
-        <alex-learningplan-dialogs-delete-learningplan
-          @update="emit('update')"
+        <alex-learningplan-dialogs-alert
+          :model-value="openDialog"
+          :title="$t('components.trails.settings.delete.deleteConfirmation')"
+          :subtitle="$t('components.trails.settings.delete.deleteDescription')"
+          :image="imageProp"
+          :submit-button-text="
+            $t('components.trails.settings.delete.deleteWord')
+          "
+          :input-word-confirmation="
+            $t('components.trails.settings.delete.deleteWord')
+          "
+          :input-label-confirmation="
+            $t('components.trails.settings.delete.deleteLabel')
+          "
+          :input-placeholder-confirmation="
+            $t('components.trails.settings.delete.deletePlaceholder')
+          "
+          :no-input-confirmation="false"
+          variant="error"
+          :word-confirmation="wordConfirmation"
+          :error-message-text="
+            $t('components.trails.settings.delete.matchError')
+          "
+          @submit="emit('update')"
+          @cancel="openDialog = false"
         />
       </div>
     </template>
@@ -27,18 +50,22 @@ defineProps({
     default: 'courses',
   },
 });
+
+const openDialog = ref(false);
+const wordConfirmation = ref('Excluir');
 </script>
 
 <style scoped lang="scss">
 .text {
-  color: var(--Cinza-Cinza-700, #5A636D);
-text-align: justify;
+  color: var(--Cinza-Cinza-700, #5a636d);
+  text-align: justify;
 
-/* Body/P3 */
-font-family: Sen;
-font-size: 14px;
-font-style: normal;
-font-weight: 400;
-line-height: 135%; /* 18.9px */
-letter-spacing: 0.28px;
-}</style>
+  /* Body/P3 */
+  font-family: Sen;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 135%; /* 18.9px */
+  letter-spacing: 0.28px;
+}
+</style>
