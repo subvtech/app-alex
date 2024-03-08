@@ -85,7 +85,6 @@ const selectedUsers = computed({
 
 const cleanInput = () => {
   search.value = '';
-
   resetField();
 };
 

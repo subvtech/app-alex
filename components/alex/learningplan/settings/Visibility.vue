@@ -1,6 +1,6 @@
 <template>
   <alex-custom-card
-    :title="$t('components.courses.settings.visibility.title')"
+    :title="$t(`components.${variant}.settings.visibility.title`)"
     :show-icon="false"
     show-footer-divider
   >
@@ -9,7 +9,9 @@
         <alex-inputs-radio-button
           v-model="activeButton"
           :buttons="firstButton"
-          :text="$t('components.courses.settings.visibility.showCourse.title')"
+          :text="
+            $t(`components.${variant}.settings.visibility.showCourse.title`)
+          "
         />
         <alex-inputs-radio-button
           v-model="activeButton"
@@ -21,13 +23,13 @@
       <div class="d-flex w-100 justify-end gap-4 pt-6">
         <alex-custom-button
           class="button"
-          :text="$t('components.courses.settings.visibility.cancel')"
+          :text="$t(`components.${variant}.settings.visibility.cancel`)"
           variant="secondary"
           @click="onCancel"
         />
         <alex-custom-button
           class="button"
-          :text="$t('components.courses.settings.visibility.save')"
+          :text="$t(`components.${variant}.settings.visibility.save`)"
           variant="primary"
           @click="$emit('update', { hidden: activeButton === '2' })"
         />
@@ -43,20 +45,28 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  variant: {
+    type: String as PropType<'courses' | 'trails'>,
+    default: 'courses',
+  },
 });
 
 const firstButton = ref([
   {
-    label: t('components.courses.settings.visibility.showCourse.title'),
-    hint: t('components.courses.settings.visibility.showCourse.hint'),
+    label: t(
+      `components.${props.variant}.settings.visibility.showCourse.title`,
+    ),
+    hint: t(`components.${props.variant}.settings.visibility.showCourse.hint`),
     value: '1',
   },
 ]);
 
 const secondButton = ref([
   {
-    label: t('components.courses.settings.visibility.hideCourse.title'),
-    hint: t('components.courses.settings.visibility.hideCourse.hint'),
+    label: t(
+      `components.${props.variant}.settings.visibility.hideCourse.title`,
+    ),
+    hint: t(`components.${props.variant}.settings.visibility.hideCourse.hint`),
     value: '2',
   },
 ]);

@@ -119,10 +119,10 @@
                 type="course"
                 class="w-100"
                 :title="course.raw.title"
-                :options="professorMode"
+                :options="course.raw.userIsFacilitator"
                 :description="course.raw.description"
                 :image="{
-                  url: course.raw.img,
+                  url: course.raw.cover_image?.url,
                 }"
                 :facilitator="{
                   name: course.raw.facilitatorName,
@@ -130,8 +130,7 @@
                 }"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
-                :favorited="course.raw.favorited"
-                @favorite="changeItemFavorited(index)"
+                :hide-favorited-button="true"
                 @toggle-visibility="changeItemVisibility(index, course.raw.id)"
                 @configurations="navigate(course.raw.id, 'settings')"
                 @open="navigate(course.raw.id, 'page')"
@@ -178,7 +177,7 @@
                   <td class="text-overflow" style="max-width: 90px">
                     {{ (item as any).trails }}
                   </td>
-                  <td v-if="professorMode">
+                  <td v-if="(item as any).userIsFacilitator">
                     <alex-custom-dropdown
                       :items="
                         dropdownItems(
@@ -233,45 +232,82 @@
 </template>
 
 <script setup lang="ts">
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
-import { GetLearningPlans } from '~/assets/queries';
-import { LearningPlan } from '@/models/learningPlan.model';
-
 definePageMeta({
   middleware: 'auth',
 });
 
-const router = useRouter();
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
-const professorMode = ref(false);
 const isLoading = ref(false);
 const { t } = useI18n();
-const graphql = useStrapiGraphQL();
+
+const { find } = useStrapiUtils();
 const { update } = useStrapi();
 const createCourseDialog = ref(false);
-interface courseItem {
+interface LearningPlan {
   id?: number;
   description: string;
-  facilitatorName?: string;
-  facilitatorImage?: string;
-  trails?: number;
-  img?: string;
-  institution?: string;
-  tags?: string[];
-  start_date?: string;
-  end_date?: string;
+  facilitatorName: string;
+  facilitatorImage: string;
+  trails: number;
+  cover_image: string;
+  institution: string;
+  tags: string[];
+  start_date: Date;
+  end_date: Date;
   hidden: boolean;
-  favorited: boolean;
   title: string;
+  members?: any;
+  learning_structures?: any;
 }
 
-const courses = ref<courseItem[]>([]);
+const courses = ref<LearningPlanSimple[]>([]);
+const user = useStrapiUser<User>();
+
+const professorMode = computed(
+  () => user.value.role.type === UserRoles.PROFESSOR,
+);
+
+const queryConfig = {
+  filters: {
+    members: {
+      $and: [
+        { user: { id: { $eq: user.value.id } } },
+        { status: { $eq: 'joined' } },
+      ],
+    },
+    $or: [
+      {
+        members: {
+          user: { id: { $eq: user.value.id } },
+          role: { $ne: 'student' },
+        },
+      },
+      {
+        hidden: { $eq: false },
+      },
+    ],
+    archived_at: { $notNull: false },
+  },
+  populate: {
+    cover_image: true,
+    tags: true,
+    learning_structures: {
+      populate: ['trails'],
+    },
+    members: {
+      populate: ['user.institutions', 'user.avatar'],
+      filters: {
+        role: { $eq: 'facilitator' },
+      },
+    },
+  },
+  sort: 'id:desc',
+};
+
 const getCourses = async () => {
-  const { isProfessor, id } = useStrapiUser<User>().value;
-  professorMode.value = isProfessor;
   if (professorMode.value) {
     headers.push({
       title: '',
@@ -280,69 +316,40 @@ const getCourses = async () => {
     });
   }
   isLoading.value = true;
-  const { data } = await useAsyncData('learningPlans', () => {
-    const params = { userId: id };
-    return graphql<{
-      data: {
-        learningplans: Strapi4ResponseMany<LearningPlan>;
-      };
-    }>(GetLearningPlans, params);
-  });
-  if (!data.value?.data.learningplans.data) {
-    return;
-  }
-  courses.value =
-    data.value?.data.learningplans.data.map((plan): courseItem => {
-      const { attributes } = plan;
-      const id = plan.id;
-      const {
-        title,
-        description,
-        start_date: startDate,
-        end_date: endDate,
-        cover_image: coverImage,
-        hidden,
-        members,
-        tags,
-        learning_structure: learningStructure,
-      } = attributes;
-      const facilitatorName =
-        members.data[0]?.attributes?.user.data.attributes.fullname;
-      const facilitatorImage =
-        members.data[0]?.attributes?.user.data.attributes.avatar?.data
-          ?.attributes?.url;
-      const institution =
-        members.data[0]?.attributes?.user.data.attributes.institutions?.data[0]
-          ?.attributes?.name;
-      const img = coverImage?.data?.attributes?.url;
-      const trails =
-        learningStructure?.data?.attributes?.trails.data.length || 0;
+  const getCourses = await find<LearningPlanSimple>(
+    'learningplans',
+    queryConfig,
+  );
+  courses.value = [];
+  getCourses.data.forEach((course) => {
+    const facilitator = course.members.find(
+      (m) => m.role === MemberRoles.FACILITATOR,
+    )?.user;
 
-      return {
-        id,
-        title,
-        description,
-        start_date: startDate,
-        end_date: endDate,
-        img,
-        hidden,
-        facilitatorName,
-        facilitatorImage,
-        institution,
-        tags: tags.data.map((tag) => tag.attributes.text),
-        trails,
-        favorited: false,
-      };
-    }) || [];
+    const tags = course.tags?.map((tag) => tag);
+    const trails =
+      course.learning_structures?.find(
+        (structure) => structure.type === 'standard',
+      )?.trails?.length || 0;
+
+    course.facilitatorImage = facilitator?.avatar?.url;
+    course.facilitatorName = facilitator?.fullname;
+    course.institution = facilitator?.institutions?.[0]?.name;
+    course.tags = tags;
+    course.trails = trails;
+    course.userIsFacilitator = facilitator?.id === user.value.id;
+
+    courses.value.push(course);
+  });
   isLoading.value = false;
 };
-// eslint-disable camelcase
+
 onBeforeMount(async () => await getCourses());
 
 interface Item {
-  raw: courseItem;
+  raw: LearningPlan;
 }
-const setTableData = (items: readonly Item[]): courseItem[] => {
+const setTableData = (items: readonly Item[]): LearningPlan[] => {
   return items.map((item) => item.raw);
 };
 
@@ -368,12 +375,12 @@ const showingData = (groupedItems) => {
 const breadcrumbs = [
   {
     title: t('pages.classes.breadcrumbs.home'),
-    href: '/',
+    to: '/',
     disabled: false,
   },
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
-    href: '/courses/me',
+    to: '/courses/me',
     disabled: false,
   },
 ];
@@ -439,15 +446,11 @@ const changeItemVisibility = (index: number, id) => {
   }
 };
 
-const changeItemFavorited = (index: number) => {
-  courses.value[index].favorited = !courses.value[index].favorited;
-};
-
 const navigate = (id: number, page) => {
   if (page === 'settings') {
-    router.push(`/courses/${id}/settings`);
+    navigateTo(`/courses/${id}/settings`);
   } else {
-    router.push(`/courses/${id}`);
+    navigateTo(`/courses/${id}`);
   }
 };
 </script>

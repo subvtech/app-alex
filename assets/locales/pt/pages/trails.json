@@ -10,7 +10,10 @@
   "newTrailTitleLabel": "Do que se trata sua Trilha de Aprendizagem?",
   "newTrailTitlePlaceholder": "Digite o título da sua trilha",
   "newTrailAction": "Criar Trilha",
-  "newTrailCancel": "Cancelar123",
+  "newTrailCancel": "Cancelar",
   "newTrailCoverText": "Capa da Trilha",
-  "newTrailCoverAction": "Editar"
+  "newTrailCoverAction": "Editar",
+  "notFound": "Trilha não encontrada",
+  "success": "Trilha criada com sucesso!",
+  "error": "Erro ao criar trilha, tente novamente"
 }

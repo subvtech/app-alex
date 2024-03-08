@@ -2,33 +2,48 @@
   <alex-custom-dialog
     v-model="value"
     title=""
-    :width="520"
+    :max-width="520"
     no-footer
-    body-classes="rounded-t-lg pa-6"
+    no-header
+    body-classes="rounded-t-lg"
   >
-    <template #header></template>
     <template #default>
       <div
         class="d-flex flex-column w-100 align-center bg-white py-10 px-6 rounded-t-lg gap-4"
       >
-        <v-img
-          v-if="image"
-          :src="image.src"
-          :width="image.width"
-          :height="image.height"
-          :alt="image.alt"
-        />
-
-        <div class="d-flex flex-column gap-4 align-center text-center">
-          <h4 class="text-h4 text-gray-800">{{ title }}</h4>
-          <p class="text-body-1 text-gray-600">{{ subtitle }}</p>
+        <span>
+          <img
+            v-if="image"
+            :src="image.src"
+            :alt="image.alt"
+            :width="image.width"
+            :height="image.height"
+            :class="imageClass"
+          />
+        </span>
+        <div class="align-center text-center" style="max-width: 310px">
+          <h4 class="text-h4 text-gray-800 mb-4">{{ title }}</h4>
+          <p
+            class="text-body-1 text-gray-600"
+            style="overflow-wrap: break-word"
+          >
+            {{ subtitle }}
+            <slot name="subtitle"></slot>
+          </p>
         </div>
-
+        <div class="d-flex flex-start w-100">
+          <label for="exclusionLabel" class="text-body-1 text-gray-600">
+            {{ inputLabelConfirmation }}
+            <strong> {{ inputWordConfirmation }}</strong>
+          </label>
+        </div>
         <alex-inputs-text-field
           v-if="!noInputConfirmation"
+          v-model="inputValue"
+          class="w-100"
           name="confirmation"
-          :label="inputLabelConfirmation"
           :placeholder="inputPlaceholderConfirmation"
+          :error-messages="errorMessage"
           :scheme="
             yup
               .string()
@@ -46,6 +61,11 @@
             :text="submitButtonText"
             :variant="variant"
             :loading="loading"
+            :disabled="
+              inputWordConfirmation
+                ? inputValue !== inputWordConfirmation
+                : false
+            "
             @click="
               () => {
                 $emit('submit');
@@ -54,6 +74,7 @@
         /></template>
         <template #secondarySlotButton
           ><alex-custom-button
+            v-if="!hideCancelButton"
             size="large"
             :text="$t('components.courses.settings.meetings.delete.cancel')"
             variant="secondary"
@@ -69,19 +90,23 @@
 </template>
 <script setup lang="ts">
 import * as yup from 'yup';
+const { t } = useI18n();
 const emit = defineEmits(['update:modelValue', 'submit', 'cancel']);
 interface AlertDialogProps {
   modelValue: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
   title: string;
-  subtitle: string;
-  image?: { src: string; width: number; height: number; alt?: string };
+  subtitle?: string;
+  image?: { src: string; width?: number; height?: number; alt?: string };
   submitButtonText: string;
   inputWordConfirmation?: string;
   inputLabelConfirmation?: string;
   inputPlaceholderConfirmation?: string;
+  hideCancelButton?: boolean;
   noInputConfirmation?: boolean;
   loading?: boolean;
+  errorMessageText?: string;
+  imageClass?: string;
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
   noInputConfirmation: true,
@@ -91,7 +116,23 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
   inputLabelConfirmation: undefined,
   inputPlaceholderConfirmation: undefined,
   loading: false,
+  errorMessageText: undefined,
+  hideCancelButton: false,
+  subtitle: '',
+  imageClass: '',
 });
+const inputValue = ref('');
+
+const errorMessage = computed(() => {
+  if (
+    inputValue.value.length !== 0 &&
+    inputValue.value !== props.inputWordConfirmation
+  ) {
+    return props.errorMessageText;
+  }
+  return '';
+});
+
 const value = computed({
   get() {
     return props.modelValue;

@@ -354,14 +354,12 @@ query($userId: ID!) {
         start_date
         end_date
         hidden
-        learning_structure {
+        learning_structures{
           data {
             attributes {
               trails {
                 data {
-                  attributes {
-                    createdAt
-                  }
+                  id
                 }
               }
             }
@@ -420,13 +418,11 @@ query($learningPlanId: ID!) {
   learningplan(id: $learningPlanId) {
     data {
       attributes {
-        learning_structure {
+        learning_structures(filters: { type: { eq: "standard" } }) {
           data {
             id
             attributes {
-              trails: trails(sort: "id:desc"
-              pagination: {limit: -1})  	
-               {
+              trails(sort: "id:desc", pagination: { limit: -1 }) {
                 data {
                   id
                   attributes {
@@ -462,5 +458,44 @@ query($learningPlanId: ID!) {
       }
     }
   }
+}
+`;
+
+export const GetTrail = `
+query($trailId: ID!) {
+  trail(id:$trailId ){
+    data{
+      attributes{
+        cover_image{
+          data{
+            attributes{
+              url
+            }
+          }
+        }
+        title
+        description
+      	structures{
+          data{
+            id
+            attributes{
+              time
+              version
+              blocks(
+                pagination: {limit: -1}
+              ){
+                data{
+                  attributes{
+                    data
+                    type
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } 
 }
 `;

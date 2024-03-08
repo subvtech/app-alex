@@ -18,7 +18,9 @@
   "keyword": {
     "required": "Esse campo é obrigatório",
     "noSpaces": "Não pode haver espaços",
-    "onlyLetters": "Apenas letras do alfabeto são permitidas"
+    "onlyLetters": "Apenas letras do alfabeto são permitidas",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres"
   },
 
   "phone": {
@@ -64,13 +66,15 @@
   },
   "startDate": {
     "required": "Data de início é obrigatório",
-    "min": "Data mínima aceita: {min}"
+    "min": "Data mínima aceita: {min}",
+    "typeError": "A data precisa ser válida"
   },
   "endDate": {
     "required": "Data de término é obrigatório",
     "min": "Data mínima aceita: {min}",
     "max": "Data máxima aceita: {max}",
-    "beforeStartDate": "Não pode ser menor que data de início"
+    "beforeStartDate": "Não pode ser menor que data de início",
+    "typeError": "A data precisa ser válida"
   },
   "class": {
     "required": "Turma é obrigatório",

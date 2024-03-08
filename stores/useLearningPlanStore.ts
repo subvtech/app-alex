@@ -11,15 +11,12 @@ import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
-  const user = useStrapiUser<User>();
-
   const { setMessage } = useMessageStore();
+  const { generateUrl } = useInvitationLink();
+  const user = useStrapiUser<User>();
   const i18n = useI18n();
   const learningPlan = ref<LearningPlanSimple>();
   const loading = ref(true);
-
-  const { generateUrl } = useInvitationLink();
-
   const populate = {
     cover_image: true,
     media: true,
@@ -30,8 +27,19 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     groups: {
       populate: ['group_members.student_member.user.avatar'],
     },
+    learning_structures: {
+      populate: {
+        trails: {
+          sort: 'id:desc',
+          populate: ['cover_image', 'structures.blocks'],
+        },
+      },
+    },
+
     tags: true,
-    schedules: true,
+    schedules: {
+      populate: ['meetings'],
+    },
     members: {
       populate: ['user.avatar', 'user.cover'],
     },
@@ -45,7 +53,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       });
 
       learningPlan.value = result.data;
-
       loading.value = false;
       return result;
     } catch (e: any) {
@@ -86,6 +93,19 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         },
       ) || []
     );
+  });
+
+  const standardTrails = computed(() => {
+    return (
+      learningPlan.value?.learning_structures.filter(
+        (structure) =>
+          structure.type === LearningPlanScructureSimpleType.STANDARD,
+      )[0].trails ?? []
+    );
+  });
+
+  const standardTrailsCount = computed(() => {
+    return standardTrails.value.length;
   });
 
   const invitationLink = computed(() => {
@@ -138,6 +158,25 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
+  const schedules = computed<LearningPlanScheduleSimple[]>(() => {
+    return (
+      learningPlan.value?.schedules.map((schedule) => {
+        const earliestMeeting: LearningPlanMeetingSimple[] = sortByDate(
+          schedule.meetings,
+        );
+        if (earliestMeeting[0]) {
+          earliestMeeting[0].earliest = true;
+        }
+        return { ...schedule, meetings: earliestMeeting };
+      }) || []
+    );
+  });
+  const generalTags = computed(
+    () => learningPlan.value?.tags?.filter((tag) => tag.isGeneral),
+  );
+  const technicalTags = computed(
+    () => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral),
+  );
   return {
     learningPlan,
     loadLearningPlan,
@@ -153,5 +192,10 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsActiveMember,
     userIsPendingMember,
     activeInviteLinks,
+    standardTrailsCount,
+    standardTrails,
+    schedules,
+    generalTags,
+    technicalTags,
   };
 });

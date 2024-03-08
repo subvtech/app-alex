@@ -1,34 +1,33 @@
 <template>
-  <div
-    class="user-block my-6 w-100"
-    style="position: relative"
-    data-testid="banner"
-  >
+  <div class="banner user-block my-6 w-100" data-testid="banner">
     <div class="cover-block w-100">
-      <NuxtImg
-        v-if="cover"
-        class="cover"
-        :provider="imgFromStrapi ? 'strapi' : undefined"
-        :src="cover.url"
-        placeholder
-        role="custom-cover"
-      />
-      <img
-        v-else
-        class="cover"
-        src="/images/alex-banner.svg"
-        role="default-cover"
-      />
+      <alex-custom-skeleton v-if="loading" class="height-90" color="gray-200" />
+      <template v-else>
+        <NuxtImg
+          v-if="cover"
+          class="cover"
+          :provider="imgFromStrapi ? 'strapi' : undefined"
+          :src="cover.url"
+          placeholder
+          role="custom-cover"
+        />
+        <img
+          v-else
+          class="cover"
+          src="/images/alex-banner.svg"
+          role="default-cover"
+        />
+      </template>
       <div class="w-100 h-25" :class="showShade ? 'shade' : ''" role="shade" />
       <div v-if="canEdit" class="edit-cover d-flex align-center">
         <v-btn
           v-if="cover && imgFromStrapi"
           class="btn remove"
-          @click="removeCoverPicture"
           size="large"
           icon
           variant="outlined"
           role="delete-cover"
+          @click="removeCoverPicture"
         >
           <img
             src="/svg/trash-dark.svg"
@@ -41,10 +40,10 @@
         <label class="" for="coverInput" data-testid="edit-cover">
           <v-btn
             class="btn label"
-            @click="($refs.coverInput as any).click()"
             size="large"
             icon
             variant="outlined"
+            @click="($refs.coverInput as any).click()"
           >
             <v-icon class="icon" size="20" color="#6E7A87"
               >mdi-pencil-outline</v-icon
@@ -54,20 +53,20 @@
           >
           <v-btn
             class="btn label small"
-            @click="($refs.coverInput as any).click()"
             size="large"
             icon="mdi-pencil-outline"
             variant="outlined"
+            @click="($refs.coverInput as any).click()"
           />
         </label>
 
         <input
-          class="d-none"
-          @input="uploadCoverPicture"
-          accept="image/png, image/jpeg"
-          ref="coverInput"
           id="coverInput"
+          ref="coverInput"
+          class="d-none"
+          accept="image/png, image/jpeg"
           type="file"
+          @input="uploadCoverPicture"
         />
       </div>
     </div>
@@ -84,7 +83,7 @@
       :subtitle="subtitle"
       :copy-object="copyObject"
       :code-style="codeStyle"
-      :settingsIcon="settingsIcon"
+      :settings-icon="settingsIcon"
       :fullname-style="fullnameStyle"
       :username-style="usernameStyle"
       :role-style="roleStyle"
@@ -108,13 +107,22 @@
       :is-professor="isProfessor"
       @display:settings="emit('display:settings')"
     />
-
-    <div class="d-flex">
-      <alex-custom-tabs
-        v-if="showMenu"
-        v-model="bannerSelectedOption"
-        :tabs="links"
-        @update:modelValue="emit('select:option', bannerSelectedOption)"
+    <div class="d-flex justify-space-between align-center px-6">
+      <div class="d-flex">
+        <alex-custom-tabs
+          v-if="showMenu"
+          v-model="selectedOption"
+          :mandatory="false"
+          :tabs="links"
+          @update:model-value="emit('select:option', selectedOption)"
+        />
+      </div>
+      <alex-custom-button
+        v-if="showMenu && showSettings"
+        variant="text"
+        :icon="settingsIcon"
+        :color="isSettingsRoute ? 'secondary-0' : undefined"
+        @click="() => onSelectSettings(settings?.to)"
       />
     </div>
   </div>
@@ -124,182 +132,121 @@ import { TabType } from '@/components/alex/custom/Tabs.vue';
 const emit = defineEmits(['select:option', 'display:settings']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
-
-export type BannerImageType = {
-  url: string;
-  id: number;
-  [x: string | number | symbol]: unknown;
+const route = useRoute();
+const isSettingsRoute = computed(() =>
+  route.name?.toString().includes('courses-id-settings')
+    ? 'secondary-0'
+    : undefined,
+);
+watch(isSettingsRoute, () => {
+  if (isSettingsRoute) {
+    selectedOption.value = null;
+  }
+});
+type BannerProps = {
+  coverPicture?: Upload | null;
+  showSetting?: boolean;
+  imgFromStrapi?: boolean;
+  showProfilePicture?: boolean;
+  profilePicture?: Upload | null;
+  profilePictureSize?: number;
+  darkerBackground?: boolean;
+  descriptionAbove?: boolean;
+  description?: string;
+  distribution?:
+    | 'single-row'
+    | 'single-column'
+    | 'fullname-username-role'
+    | 'fullname-role-username'
+    | 'username-fullname-role'
+    | 'username-role-fullname';
+  settingsIcon?: string;
+  selectedOption?: number | null;
+  isProfessor?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  userId?: number;
+  fullname?: string;
+  startDate?: string;
+  endDate?: string;
+  username?: string;
+  copyObject?: { label: string; copyText: string };
+  fullnameStyle?: string;
+  codeStyle?: string;
+  roleStyle?: string;
+  usernameStyle?: string;
+  startDateStyle?: string;
+  endDateStyle?: string;
+  titleStyle?: string;
+  subtitleStyle?: string;
+  avatarBlockStyle?: string;
+  showBorder?: boolean;
+  floatBeneath?: boolean;
+  settingsMenu?: boolean;
+  dateToTheLeft?: boolean;
+  showShade?: boolean;
+  showRole?: boolean;
+  updateProfilePicture?: boolean;
+  title?: string;
+  subtitle?: string;
+  showMenu?: boolean;
+  showSettings?: boolean;
+  links?: TabType[];
+  settings?: TabType;
+  loading?: boolean;
 };
-
-const props = defineProps({
-  coverPicture: {
-    type: Object as PropType<BannerImageType | null>,
-  },
-
-  showSettings: {
-    type: Boolean,
-    default: false,
-  },
-
-  imgFromStrapi: {
-    type: Boolean,
-    default: true,
-  },
-
-  showProfilePicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  profilePicture: {
-    type: Object as PropType<BannerImageType | null>,
-  },
-  profilePictureSize: {
-    type: Number,
-    default: 50,
-  },
-  darkerBackground: {
-    type: Boolean,
-    default: false,
-  },
-  descriptionAbove: {
-    type: Boolean,
-    default: false,
-  },
-
-  description: {
-    type: String,
-  },
-
-  distribution: {
-    type: String as PropType<
-      | 'single-row'
-      | 'single-column'
-      | 'fullname-username-role'
-      | 'fullname-role-username'
-      | 'username-fullname-role'
-      | 'username-role-fullname'
-    >,
-    default: 'fullname-username-role',
-  },
-  settingsIcon: {
-    type: String,
-    default: 'mdi-cog-outline',
-  },
-
-  copyObject: {
-    type: Object as PropType<{ label: string; copyText: string }>,
-  },
-  fullnameStyle: {
-    type: String,
-  },
-  codeStyle: {
-    type: String,
-  },
-  roleStyle: {
-    type: String,
-  },
-  usernameStyle: {
-    type: String,
-  },
-  startDateStyle: {
-    type: String,
-  },
-  endDateStyle: {
-    type: String,
-  },
-
-  titleStyle: {
-    type: String,
-  },
-
-  subtitleStyle: {
-    type: String,
-  },
-
-  avatarBlockStyle: {
-    type: String,
-  },
-
-  showBorder: {
-    type: Boolean,
-    default: false,
-  },
-
-  floatBeneath: {
-    type: Boolean,
-    default: false,
-  },
-  settingsMenu: {
-    type: Boolean,
-    default: false,
-  },
-
-  dateToTheLeft: {
-    type: Boolean,
-    default: false,
-  },
-
-  showShade: {
-    type: Boolean,
-    default: false,
-  },
-
-  showRole: {
-    type: Boolean,
-    default: false,
-  },
-
-  updateProfilePicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  title: {
-    type: String,
-  },
-
-  subtitle: {
-    type: String,
-  },
-
-  showMenu: { type: Boolean, default: false },
-
-  userId: {
-    type: Number,
-  },
-  fullname: {
-    type: String,
-  },
-  startDate: {
-    type: String,
-  },
-  endDate: {
-    type: String,
-  },
-  username: {
-    type: String,
-  },
-  selectedOption: {
-    type: Number,
-    default: 0,
-  },
-
-  links: {
-    type: Array as PropType<TabType[]>,
-    default: [],
-  },
-  isProfessor: { type: Boolean, default: false },
-  canEdit: { type: Boolean, default: false },
-  canDelete: { type: Boolean, default: false },
+const props = withDefaults(defineProps<BannerProps>(), {
+  coverPicture: null,
+  showSetting: false,
+  imgFromStrapi: false,
+  showProfilePicture: false,
+  profilePicture: null,
+  profilePictureSize: 50,
+  darkerBackground: false,
+  descriptionAbove: false,
+  description: undefined,
+  selectedOption: null,
+  links: () => [],
+  isProfessor: false,
+  canEdit: false,
+  canDelete: false,
+  userId: undefined,
+  fullname: undefined,
+  startDate: undefined,
+  endDate: undefined,
+  username: undefined,
+  copyObject: undefined,
+  floatBeneath: false,
+  settingsMenu: false,
+  dateToTheLeft: false,
+  showShade: false,
+  showRole: false,
+  fullnameStyle: undefined,
+  codeStyle: undefined,
+  roleStyle: undefined,
+  usernameStyle: undefined,
+  startDateStyle: undefined,
+  endDateStyle: undefined,
+  titleStyle: undefined,
+  subtitleStyle: undefined,
+  avatarBlockStyle: undefined,
+  settingsIcon: 'mdi-cog-outline',
+  distribution: 'fullname-username-role',
+  title: undefined,
+  subtitle: undefined,
+  showMenu: false,
+  showSettings: false,
+  settings: undefined,
+  loading: false,
 });
 
-const { selectedOption, coverPicture, fullname, username, canEdit, userId } =
-  toRefs(props);
-
-const bannerSelectedOption = toRef(props.selectedOption);
-
-const cover = ref<BannerImageType | null | undefined>(props.coverPicture);
+const { coverPicture, fullname, username, canEdit, userId } = toRefs(props);
+const selectedOption = toRef(props.selectedOption);
+const onSelectSettings = (to?: string) => {
+  emit('select:option', null);
+  navigateTo(to);
+};
+const cover = ref<Partial<Upload> | null | undefined>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {
   if (cover.value && props.imgFromStrapi) {
@@ -327,249 +274,254 @@ watch(coverPicture!, () => {
   if (coverPicture) cover.value = coverPicture.value;
   else cover.value = undefined;
 });
-
-watch(selectedOption, () => {
-  bannerSelectedOption.value = selectedOption.value;
-});
 </script>
 
-<style scoped lang="scss">
-.cursor-pointer {
-  cursor: pointer;
-}
-.coverPlaceholder {
-  .avatar {
+<style lang="scss">
+.banner {
+  position: relative;
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  &.user-block {
+    background-color: white;
+    border-top-left-radius: 8px;
+    box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border-radius: 100%;
-
-    i {
-      transition: all ease-in-out 0.7s;
-    }
-    .img {
-      aspect-ratio: 1 / 1; /* defining the aspect ratio of the image */
-      object-fit: cover;
-    }
-
-    .img {
-      max-width: 160px;
-      max-height: 160px;
-
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-
-      transition: all ease-in-out 0.4s;
-      border-radius: 100%;
-    }
-    div.img {
-      position: relative;
-      background-color: #ebedef;
-      width: 160px;
-      height: 160px;
-      i {
-        display: flex !important;
-        position: absolute;
-      }
-    }
-  }
-}
-.user-block {
-  background-color: white;
-  border-top-left-radius: 8px;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
-  border-top-right-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-  transition: all ease-in-out 1s;
-
-  .cover-block {
-    position: relative;
-    max-height: 300px;
-    .cover {
-      width: 100%;
-      height: auto;
-      max-height: 300px;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      object-fit: cover;
-      aspect-ratio: 1 / 1;
-    }
-
-    .w-100.h-25 {
-      bottom: 0;
-      left: 0;
-      opacity: 1;
-      height: auto;
-      position: absolute;
-    }
-
-    .shade {
-      background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0.4) 78.65%
-      );
-    }
-
-    .edit-cover {
-      gap: 16px;
-      position: absolute;
-      bottom: 24px;
-      right: 20px;
-      z-index: 10;
-
-      .btn.label {
-        width: 153px;
-
-        border-radius: 8px;
-        border: none;
-        color: #6e7a87 !important;
-        height: 44px;
-        background-color: #f1f5f9;
-        text-transform: none !important;
-
-        p {
-          font-size: 14px;
-          margin-left: 8px;
-          letter-spacing: 0.56px;
-        }
-      }
-      .btn.label.small {
-        width: 44px;
-        height: 44px;
-        display: none;
-      }
-      .btn.remove {
-        width: 44px;
-        height: 44px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #f1f5f9;
-        border: none;
-        cursor: pointer;
-
-        .small-icon {
-          display: none;
-        }
-      }
-    }
-  }
-  .menu {
-    border-top: 1px solid #eaeef1;
-    height: 46px;
-    padding-inline: 24px;
+    flex-direction: column;
+    gap: 0px;
     transition: all ease-in-out 1s;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-    &::-webkit-scrollbar {
-      display: none;
-    }
-    div {
-      height: 100%;
-      display: flex;
-      border-bottom: 2px solid transparent;
-      &:hover {
-        color: #279ee3;
-      }
-      span {
-        color: #454d54;
-        padding-inline: 16px;
-        letter-spacing: 0.32px;
-        font-size: 1rem;
-        min-width: max-content;
-        align-self: center;
-        text-align: center;
+    overflow: hidden;
 
-        /* Body/P1 */
-      }
-    }
-
-    .selected {
-      color: #279ee3;
-      border-bottom: 2px solid #279ee3;
-      span {
-        color: #279ee3;
-      }
-    }
-  }
-}
-
-@media (max-height: 740px) {
-  .user-block {
-    .cover-block {
-      .edit-cover {
-        .btn {
-          height: 33px !important;
-        }
-        .btn.remove {
-          width: 33px !important;
-        }
-        .btn.label {
-          width: 153px !important;
-        }
-        .btn.label.small {
-          width: 33px !important;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 640px) {
-  .user-block {
     .cover-block {
       position: relative;
-      .img {
+      max-height: 360px;
+      .cover {
         width: 100%;
         height: auto;
-        max-width: 100%;
-        max-height: 300px;
+        max-height: 360px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
+        object-fit: cover;
+        aspect-ratio: 1 / 1;
+      }
+
+      .w-100.h-25 {
+        bottom: 0;
+        left: 0;
+        opacity: 1;
+        height: auto;
+        position: absolute;
+      }
+
+      .shade {
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.4) 78.65%
+        );
       }
 
       .edit-cover {
-        .btn.label.small {
-          display: block !important;
-          width: 33px !important;
-          height: 33px !important;
-        }
+        gap: 16px;
+        position: absolute;
+        bottom: 24px;
+        right: 20px;
+        z-index: 10;
+
         .btn.label {
-          display: none !important;
+          width: 153px;
+
+          border-radius: 8px;
+          border: none;
+          color: #6e7a87 !important;
+          height: 44px;
+          background-color: #f1f5f9;
+          text-transform: none !important;
+
+          p {
+            font-size: 14px;
+            margin-left: 8px;
+            letter-spacing: 0.56px;
+          }
+        }
+        .btn.label.small {
+          width: 44px;
+          height: 44px;
+          display: none;
+        }
+        .btn.remove {
+          width: 44px;
+          height: 44px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f1f5f9;
+          border: none;
+          cursor: pointer;
+
+          .small-icon {
+            display: none;
+          }
         }
       }
-
-      p {
-        font-size: 12px;
-      }
     }
-  }
-}
-
-@media (max-width: 608px) {
-  .user-block {
     .menu {
+      border-top: 1px solid #eaeef1;
+      height: 46px;
+      padding-inline: 24px;
+      transition: all ease-in-out 1s;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+      &::-webkit-scrollbar {
+        display: none;
+      }
       div {
+        height: 100%;
+        display: flex;
+        border-bottom: 2px solid transparent;
+        &:hover {
+          color: #279ee3;
+        }
         span {
-          font-size: 14px;
+          color: #454d54;
+          padding-inline: 16px;
+          letter-spacing: 0.32px;
+          font-size: 1rem;
+          min-width: max-content;
+          align-self: center;
+          text-align: center;
+
+          /* Body/P1 */
+        }
+      }
+
+      .selected {
+        color: #279ee3;
+        border-bottom: 2px solid #279ee3;
+        span {
+          color: #279ee3;
         }
       }
     }
   }
-}
 
-@media (max-width: 410px) {
-  .user-block {
-    .cover-block {
-      img {
-        height: 300px !important;
-        max-height: unset !important;
+  .banner-skeleton .v-skeleton-loader__bone.v-skeleton-loader__image {
+    height: 360px !important;
+  }
+  .coverPlaceholder {
+    .avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      border-radius: 100%;
+
+      i {
+        transition: all ease-in-out 0.7s;
+      }
+      .img {
+        aspect-ratio: 1 / 1; /* defining the aspect ratio of the image */
+        object-fit: cover;
+      }
+
+      .img {
+        max-width: 160px;
+        max-height: 160px;
+
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+
+        transition: all ease-in-out 0.4s;
+        border-radius: 100%;
+      }
+      div.img {
+        position: relative;
+        background-color: #ebedef;
+        width: 160px;
+        height: 160px;
+        i {
+          display: flex !important;
+          position: absolute;
+        }
+      }
+    }
+  }
+
+  @media (max-height: 740px) {
+    .user-block {
+      .cover-block {
+        .edit-cover {
+          .btn {
+            height: 33px !important;
+          }
+          .btn.remove {
+            width: 33px !important;
+          }
+          .btn.label {
+            width: 153px !important;
+          }
+          .btn.label.small {
+            width: 33px !important;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .user-block {
+      .cover-block {
+        position: relative;
+        .img {
+          width: 100%;
+          height: auto;
+          max-width: 100%;
+          max-height: 360px;
+          border-top-left-radius: 8px;
+          border-top-right-radius: 8px;
+        }
+
+        .edit-cover {
+          .btn.label.small {
+            display: block !important;
+            width: 33px !important;
+            height: 33px !important;
+          }
+          .btn.label {
+            display: none !important;
+          }
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 608px) {
+    .user-block {
+      .menu {
+        div {
+          span {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 410px) {
+    .user-block {
+      .cover-block {
+        img {
+          height: 360px !important;
+          max-height: unset !important;
+        }
       }
     }
   }

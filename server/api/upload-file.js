@@ -53,9 +53,8 @@ app.post('/api/upload-file', function (req, res) {
       return res.json(response);
     })
     .catch((err) => {
-      console.log(err);
-      res.json({ success: 0 });
+      res.json({ success: 0, error: err });
     });
 });
 
-module.exports = app;
+// module.exports = app;

@@ -49,12 +49,10 @@ export const useUpdateUserStore = () => {
         populate: ['learningplan.tasks'],
       })
     ).data;
+    
     const learningPlans = learningPlanMembers.length;
 
-    const tasks = learningPlanMembers.reduce((count, item) => {
-      return (item.attributes as any).learningplan.data.attributes.tasks.data
-        .length;
-    }, 0);
+    const tasks = 0;
 
     user.tasks = tasks;
     user.learningPlans = learningPlans;

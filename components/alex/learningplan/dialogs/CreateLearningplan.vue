@@ -9,6 +9,7 @@
     step-class="d-flex gap-1"
     stepper-indicator-class="d-flex"
     stepper
+    persistent
     @on-main-action="createCourse"
   >
     <template #step1
@@ -113,7 +114,7 @@
           v-for="schedule in schedules"
           :key="schedule.id"
           :interval="schedule.interval"
-          :date="schedule.date"
+          :date="new Date(schedule.date.toString().replaceAll('-', '/'))"
           :start-hour="schedule.startHour"
           :end-hour="schedule.endHour"
           :variant="'editing'"
@@ -179,8 +180,8 @@ const stepsConfig = {
 };
 const createScheduleModal = ref(false);
 const loading = ref(false);
-const startDate = ref<Date>();
-const endDate = ref<Date>();
+const startDate = ref<string>();
+const endDate = ref<string>();
 const slides = ref([]);
 const title = ref('');
 const description = ref('');
@@ -197,7 +198,7 @@ const disablePastDates = (date: Date) => {
   return parsedDate >= today;
 };
 
-const removeSelf = (id: string) => {
+const removeSelf = (id: number) => {
   schedules.value = schedules.value.filter((item) => item.id !== id);
 };
 
@@ -213,7 +214,7 @@ const editMeeting = (values: MeetingPropsType) => {
 const addMeeting = (values: MeetingPropsType) => {
   schedules.value.push({
     ...values,
-    id: crypto.randomUUID(),
+    id: Number.parseInt((Math.random() * 10000000000).toString()),
   });
 };
 
@@ -232,7 +233,7 @@ const cleanFields = () => {
 const createCourse = async () => {
   try {
     loading.value = true;
-    await create('learningplans', {
+    const courseData = await create('learningplans', {
       title: title.value.trim().replace(/\s+/g, ' '),
       description: description.value,
       start_date: startDate.value,
@@ -243,9 +244,11 @@ const createCourse = async () => {
       invitation_duration: 3600,
       members: selectedUsers.value,
       class_name: learningClass.value,
-      media: slides.value,
       schedules: schedules.value,
     });
+    slides.value.map((item) =>
+      create('medias', { ...item, learningplan: courseData.data.id }),
+    );
     emit('submit');
     emit('update:modelValue', false);
     cleanFields();
@@ -270,12 +273,6 @@ watch(
     }
   },
 );
-
-watch(endDate, (value) => {
-  if (value) {
-    value.setUTCHours(23, 59, 59, 999);
-  }
-});
 </script>
 
 <style scoped>

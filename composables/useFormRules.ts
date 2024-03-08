@@ -27,9 +27,10 @@ export function isValidCpf(val: string) {
 
 export const useFormRules = () => {
   const i18n = useI18n();
+  const locale = i18n.locale.value === 'pt' ? 'pt-BR' : 'en-US';
   const currentDate = new Date();
-  const { isSameOrBeforeHour } = useDatetime();
   currentDate.setHours(0, 0, 0, 0);
+  const { isSameOrBeforeHour } = useDatetime();
   const emailRegex =
     /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/gi;
   const emailRules = {
@@ -93,33 +94,44 @@ export const useFormRules = () => {
         isValidCpf(cpf),
       ),
   };
-
-  const keywordRules = yup
-    .object({
-      text: yup
-        .string()
-        .min(2, i18n.t('rules.keyword.required'))
-        .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
-        .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
-        .required(i18n.t('rules.keyword.required')),
-    })
-    .required(i18n.t('rules.keyword.required'));
-
+  const goalRules = {
+    verb: yup.lazy((value) =>
+      typeof value === 'string'
+        ? yup
+            .string()
+            .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
+            .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+            .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+            .required(i18n.t('rules.keyword.required'))
+        : yup.object().required(i18n.t('rules.keyword.required')),
+    ),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(6, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(4000, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+  };
   const startDateCreationRules = yup
     .date()
     .required(i18n.t('rules.startDate.required'))
-    .min(currentDate.toISOString(), ({ min }) =>
-      i18n.t('rules.startDate.min', { min: min.toString().split('T')[0] }),
-    );
+    .min(currentDate, ({ min }) =>
+      i18n.t('rules.startDate.min', {
+        min: min.toLocaleString(locale).split(',')[0],
+      }),
+    )
+    .typeError(i18n.t('rules.startDate.typeError'));
 
   const startDateUpdateRules = yup
     .date()
-    .required(i18n.t('rules.startDate.required'));
+    .required(i18n.t('rules.startDate.required'))
+    .typeError(i18n.t('rules.startDate.typeError'));
 
   const endDateRules = yup
     .date()
     .required(i18n.t('rules.endDate.required'))
-    .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'));
+    .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'))
+    .typeError('A data precisa ser válida');
 
   const descriptionRules = {
     description: yup
@@ -156,6 +168,16 @@ export const useFormRules = () => {
       .max(20, ({ max }) => i18n.t('rules.slug.max', { max }))
       .required(i18n.t('rules.slug.required'))
       .trim(),
+  });
+
+  const generalTrailSchema = yup.object({
+    title: yup
+      .string()
+      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .required(i18n.t('rules.title.required'))
+      .trim(),
+    ...descriptionRules,
   });
 
   const registerStep1 = yup.object({
@@ -246,18 +268,17 @@ export const useFormRules = () => {
       date: yup
         .date()
         .required(i18n.t('rules.meeting.date.required'))
-        .min(
-          startDate ? startDate.toISOString() : currentDate.toISOString(),
-          ({ min }) =>
-            i18n.t('rules.startDate.min', {
-              min: min.toString().split('T')[0],
-            }),
+        .min(startDate || currentDate, ({ min }) =>
+          i18n.t('rules.startDate.min', {
+            min: min.toLocaleString(i18n.locale.value).split(',')[0],
+          }),
         )
-        .max(endDate ? endDate.toISOString() : undefined, ({ max }) =>
+        .max(endDate || currentDate, ({ max }) =>
           i18n.t('rules.endDate.max', {
-            max: max.toString().split('T')[0],
+            max: max.toLocaleString(i18n.locale.value).split(',')[0],
           }),
         ),
+
       startHour: yup
         .string()
         .required(i18n.t('rules.meeting.startHour.required')),
@@ -310,10 +331,10 @@ export const useFormRules = () => {
     passwordRules,
     fullnameRules,
     descriptionRules,
-    keywordRules,
     cpfRules,
     profileSchema,
     socialsSchema,
+    goalRules,
     nameRules: yup
       .string()
       .min(3, ({ min }) => i18n.t('rules.name.min', { min }))
@@ -336,6 +357,7 @@ export const useFormRules = () => {
     generalCourseSchema,
     loginSchema,
     createCourseRules,
+    generalTrailSchema,
     emailRegex,
     scheduleRules,
     createTrailsRules,

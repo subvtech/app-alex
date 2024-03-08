@@ -18,7 +18,9 @@
   "keyword": {
     "required": "This field is required",
     "noSpaces": "There shall be no spaces",
-    "onlyLetters": "There shall only alphabetic letters"
+    "onlyLetters": "There shall only alphabetic letters",
+    "min": "At least {min} characters long",
+    "max": "At most {max} characters long"
   },
 
   "phone": {
@@ -73,13 +75,15 @@
   },
   "startDate": {
     "required": "Start date is required",
-    "min": "Min accepted date: {min}"
+    "min": "Min accepted date: {min}",
+    "typeError": "Date must be valid"
   },
   "endDate": {
     "required": "End date is required",
     "min": "Min accepted date: {min}",
     "max": "Max accepted date: {max}",
-    "beforeStartDate": "End date can't be before start date"
+    "beforeStartDate": "End date can't be before start date",
+    "typeError": "Date must be valid"
   },
   "class": {
     "required": "Class is required",

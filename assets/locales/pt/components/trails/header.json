@@ -1,0 +1,15 @@
+{
+    "breadcrumbs": {
+        "title": "Trilha de aprendizagem",
+        "0": {
+            "title": "Home"
+        },
+        "1": {
+            "title": "Meus Cursos"
+        }
+    },
+    "imgAlt": "Imagem da trilha",
+    "chip": "Jornada individual",
+    "firstTab": "Visão geral",
+    "secondTab": "Tarefas"
+}

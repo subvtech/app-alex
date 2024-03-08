@@ -85,12 +85,13 @@ const { value, errorMessage } = useField(() => props.name, undefined, {
 
 const convertToDate = (dateValue: Date | string | undefined) => {
   let date: Date | string | undefined = dateValue;
-  if (typeof date === 'string') {
+  if (!date) return undefined;
+  else if (typeof date === 'string') {
     date = new Date(date.replace(/-/g, '/'));
   } else if (date) {
     date = new Date(date);
-    date.setHours(0, 0, 0, 0);
   }
+  date.setHours(0, 0, 0, 0);
   return date;
 };
 
@@ -99,17 +100,17 @@ const dateValue = computed({
     return convertToDate(value.value);
   },
   set(value) {
-    emit('update:modelValue', value);
+    emit('update:modelValue', formatDate(value));
   },
 });
 
 const menu = ref(false);
 const inputValue = computed({
   get() {
-    return formatDate(value.value);
+    return value.value;
   },
   set(value) {
-    emit('update:modelValue', formatDate(value));
+    emit('update:modelValue', value);
   },
 });
 

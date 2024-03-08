@@ -86,6 +86,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'courses/invites',
     'courses/meeting',
     'courses/settings',
+    'courses/tasks',
     'learningPlan/editor',
     'learningPlan/cardTrails',
     'learningPlan/card',
@@ -95,6 +96,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'learningPlan/list',
     'learningPlan/page',
     'learningPlan/viewer',
+    'learningPlan/join',
     'forgot/sendResetPassword',
     'profile/about',
     'profile/courses',
@@ -106,6 +108,9 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'profile/settings',
     'profile/socials',
     'profile/wallets',
+    'trails/settings',
+    'trails/header',
+    'trails/tasks',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

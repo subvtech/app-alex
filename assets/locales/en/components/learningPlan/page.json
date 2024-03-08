@@ -1,5 +1,7 @@
 {
   "close": "Close the Editor?",
   "warning": "You may have some changes that were not saved. Do you still want to leave?",
-  "confirm": "Confirm exit"
+  "confirm": "Confirm exit",
+  "generalCompetencesUpdated": "General competences updated",
+  "technicalCompetencesUpdated": "Technical competences updated"
 }

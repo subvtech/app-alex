@@ -1,8 +1,10 @@
 <template>
   <alex-custom-dialog
+    v-model="dialog"
     :title="$t('pages.trails.newTrailText')"
     no-footer
     body-classes="bg-white px-6 pt-3 rounded-b-lg"
+    @update:model-value="(event) => $emit('update:modelValue', event)"
   >
     <div
       class="bg-gray-blue d-flex flex-column justify-center align-center ga-2 image-container rounded"
@@ -26,10 +28,9 @@
         <alex-custom-button
           aria-label="edit"
           elevation="0"
-          color="blue"
           icon="mdi-pencil-outline"
           class="bg-gray-blue rounded-lg mr-1"
-          size="28px"
+          size="small"
           variant="secondary"
           @click="openFileInput"
         >
@@ -38,12 +39,11 @@
         <alex-custom-button
           aria-label="delete"
           elevation="0"
-          color="red"
           icon="mdi-trash-can-outline"
-          size="28px"
+          size="small"
           variant="secondary"
           class="bg-gray-blue rounded-lg"
-          @click="image = null"
+          @click="clearImage"
         >
           <v-icon
             size="small"
@@ -79,6 +79,7 @@
       />
       <v-file-input
         ref="fileInputRef"
+        v-model="imageRef"
         accept="image/*"
         class="d-none"
         @change="handleFileChange"
@@ -115,12 +116,15 @@ const { create } = useStrapi();
 const strapiClient = useStrapiClient();
 
 const isLoading = ref(false);
-const fileInputRef = ref(null);
+const fileInputRef = ref();
+const imageRef = ref();
 const image = ref(null);
+const dialog = ref(false);
 
 const { setMessage } = useMessageStore();
+const { t } = useI18n();
 
-const emit = defineEmits(['courseCreated']);
+const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
 const props = defineProps({
   learningStructure: {
@@ -128,6 +132,12 @@ const props = defineProps({
     required: true,
   },
 });
+
+const clearImage = () => {
+  image.value = null;
+  imageRef.value = null;
+  fileInputRef.value = null;
+};
 
 const openFileInput = () => {
   fileInputRef.value.click();
@@ -154,7 +164,6 @@ const { handleSubmit } = useForm({
     image: null,
   },
 });
-
 const createTrail = handleSubmit(async (values) => {
   isLoading.value = true;
   const { title, description } = values;
@@ -175,16 +184,14 @@ const createTrail = handleSubmit(async (values) => {
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
-    await create('trails', data);
-    setMessage('Trilha Criada com sucesso!', 'success', true);
-    emit('courseCreated');
+    const trailData = await create('trails', data);
+    setMessage(t('pages.trails.success'), 'success', true);
+    emit('courseCreated', trailData.data.id);
   } catch (error) {
-    setMessage(
-      'Ocorreu um erro ao criar a trilha, tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('pages.trails.error'), 'error', true);
   } finally {
+    fileInputRef.value = null;
+    image.value = null;
     isLoading.value = false;
   }
 });

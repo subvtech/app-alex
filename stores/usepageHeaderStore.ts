@@ -4,13 +4,14 @@ import { ref } from 'vue';
 export const usePageHeaderStore = defineStore('page-header', () => {
   const title = ref('');
   const hasMainButton = ref(false);
+  const isLoading = ref(false);
   const mainButtonText = ref('');
   const mainButtonIcon = ref('');
   const hasSecondaryButton = ref(false);
-  const secondaryButtonText = ref(false);
+  const secondaryButtonText = ref('');
   const secondaryButtonIcon = ref('');
   const noBackArrow = ref(false);
-  const items = ref<any>([]);
+  const items = ref<{ title: string; disabled?: boolean; to?: string }[]>([]);
   const showHeader = ref(false);
 
   const onMainAction = ref();
@@ -44,5 +45,6 @@ export const usePageHeaderStore = defineStore('page-header', () => {
     showHeader,
     onMainAction,
     onSecondaryAction,
+    isLoading,
   };
 });

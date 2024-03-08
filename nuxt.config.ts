@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
-  devtools: { enabled: false },
+  devtools: { enabled: true },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
@@ -10,7 +10,13 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  modules: ['@pinia/nuxt', '@nuxt/image', '@nuxtjs/strapi', 'nuxt-vitest'],
+  modules: [
+    '@pinia/nuxt',
+    '@nuxt/image',
+    '@nuxtjs/strapi',
+    '@nuxt/test-utils/module',
+  ],
+  testUtils: {},
   pinia: {
     autoImports: ['defineStore', 'storeToRefs'],
   },

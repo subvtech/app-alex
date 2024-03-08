@@ -24,7 +24,6 @@
         :text="info"
         :userId="userId"
         :can-edit="canEdit"
-        is-optional
         :about-text-message="$t('components.profile.about.placeholder')"
         :empty-text-message="$t('components.profile.about.placeholder')"
         @update="updateAbout"
@@ -67,7 +66,9 @@
         :institutions="institutions"
         :userId="userId"
         :can-edit="canEdit"
-        @update:user="emit('update:user')"
+        @update:user="
+          emit('update:user', $t('components.profile.institutional.update'))
+        "
       />
     </div>
   </div>
@@ -156,7 +157,7 @@ const updateAbout = async (text) => {
   }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1150px) {
   .content-block {
     flex-wrap: wrap;
   }

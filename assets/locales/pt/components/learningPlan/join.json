@@ -1,0 +1,13 @@
+{
+  "active": {
+    "title": "Deseja participar desse curso?",
+    "description": "Voce foi convidado para participar do curso de",
+    "at": "na turma",
+    "action": "Participar"
+  },
+  "expired": {
+    "title": "Convite expirado",
+    "description": "Esse convite não é mais válido, pois passou do tempo limite de aceitação ou foi cancelado.",
+    "action": "Continuar"
+  }
+}

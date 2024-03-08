@@ -1,4 +1,4 @@
-import { Strapi4ResponseMany } from '@nuxtjs/strapi/dist/runtime/types';
+import { InvitationLinkSimple } from './InvitationLinkSimple.model';
 
 const LearningPlanType = {
   COURSE: 'course',
@@ -14,23 +14,31 @@ export interface LearningPlanSimple {
   description: string;
   start_date: string;
   end_date: string;
-  media: Strapi4ResponseMany<Media>;
+  media: MediaSimple[];
   type: ValueOf<typeof LearningPlanType>;
-  cover_image: Upload;
+  archive_at: string | null;
+  details: any | null;
+  updatedAt: string | null;
+  message: string | null;
+  cover_image: Upload | null;
   slug: string;
   class_name: string;
-  archive_at: string;
   projects: any[];
   courses: any[];
   members: LearningPlanMemberSimple[];
-  learning_structure: any;
-  groups: any[];
+  learning_structures: LearningPlanStructureSimple[];
+  groups: LearningPlanGroupSimple[];
   tasks: any[];
-  tags: any[];
-  invite_enable: boolean;
-  invitation_links: InvitationLink[];
+  tags: TagSimple[];
+  invite_enabled: boolean;
+  invitation_duration: number;
+  invitation_links: InvitationLinkSimple[];
   learning_goals: any;
-  schedules: any[];
+  schedules: LearningPlanScheduleSimple[];
   hidden: boolean;
-  details: any;
+  facilitatorName?: string;
+  facilitatorImage?: string;
+  institution?: string;
+  trails?: number;
+  userIsFacilitator?: boolean;
 }

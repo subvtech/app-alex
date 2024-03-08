@@ -17,12 +17,10 @@
       ]"
     >
       <div class="foretitle d-flex py-6">
-        <span :class="isEditing && showTooltip ? 'min-width' : ''">{{
-          title
-        }}</span>
-        <a v-if="href" :href="href" class="mr-5" role="goback">
+        <span :class="isEditing && showTooltip ? '' : ''">{{ title }}</span>
+        <nuxt-link v-if="href" :to="href" class="mr-5" role="goback">
           <v-icon color="#6E7A87" class="pointer">mdi-chevron-right</v-icon>
-        </a>
+        </nuxt-link>
         <alex-custom-tooltip
           v-if="showTooltip"
           show-icon
@@ -200,9 +198,9 @@ const cancelledAction = async () => {
   &.float {
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
 
-    .outline{
+    .outline {
       box-shadow: none !important;
-      border: 1px solid var(--Cinza-Cinza-100, #EBEDEF);
+      border: 1px solid var(--Cinza-Cinza-100, #ebedef);
     }
   }
   .border-bottom {
