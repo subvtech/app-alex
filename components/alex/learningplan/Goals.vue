@@ -163,6 +163,7 @@ const addGoal = () => {
 };
 const onCancel = () => {
   localData.value = lastGoals.value;
+  isEditing.value = false;
 };
 const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {
@@ -188,6 +189,8 @@ const onSave = async () => {
       emit('update', t('components.courses.goals.update'));
     },
   });
+
+  isEditing.value = false;
 };
 watch(
   localData,

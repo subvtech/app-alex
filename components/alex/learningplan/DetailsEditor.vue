@@ -65,6 +65,7 @@ const updateDetails = async () => {
   });
   isEditing.value = false;
   initialData.value = editorData.data;
+
   emit('update', t('components.courses.editor.update'));
 };
 const toggleIsEditing = () => {
@@ -105,6 +106,8 @@ const resetData = async () => {
     await editorDetails.value?.loadEditor(editorData);
   }
   toggleReadOnly();
+
+  isEditing.value = !isEditing.value;
 };
 onMounted(async () => {
   isLoading.value = true;

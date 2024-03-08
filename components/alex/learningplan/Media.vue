@@ -14,7 +14,7 @@
       <div class="d-flex flex-column w-100 align-self-center gap-8">
         <alex-custom-empty-placeholder
           v-if="images.length === 0 && !isEditingAndCanEdit"
-          :empty-text-image="'/svg/emptyMedia.svg'"
+          :empty-text-image="'/svg/EmptyMedia.svg'"
           :empty-text-message="
             emptyTextMessage ?? $t('pages.courses.media.empty')
           "
@@ -67,6 +67,8 @@ const onCancel = async () => {
     .map((media) => _delete('upload/files', media.imgId));
   images.value = initialImages.value;
   await Promise.all(deletedMedia);
+
+  isEditing.value = !isEditing.value;
 };
 const setInitialImages = () => {
   initialImages.value = JSON.parse(JSON.stringify(props.images));
@@ -93,6 +95,8 @@ const onSave = async () => {
       },
     },
   );
+
+  isEditing.value = !isEditing.value;
 };
 </script>
 
