@@ -1,6 +1,9 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column">
-    <div class="bg-white rounded w-100 container-min-height">
+    <div
+      id="editor-container"
+      class="bg-white rounded w-100 container-min-height"
+    >
       <div
         id="Início"
         section="0"
@@ -95,8 +98,7 @@
       </div>
       <div
         v-else
-        id="editor-container"
-        class="container-min-height justify-center ma-6 align-start d-flex post"
+        class="container-min-height justify-center ma-6 align-start d-flex"
       >
         <div style="width: 750px">
           <p
@@ -506,18 +508,19 @@ window.addEventListener('resize', () => {
   container-name: editor;
 }
 
-@media screen and (min-width: 1380px) {
-  .sticky-buttons {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 88px;
-    z-index: 1;
-  }
+.sticky-buttons {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 88px;
+  z-index: 1;
 }
 
-@container editor (max-width: 1235px) {
+@container editor (max-width: 1310px) {
   .sections-container {
     opacity: 0;
+  }
+  .sticky-buttons {
+    position: static;
   }
 }
 </style>
