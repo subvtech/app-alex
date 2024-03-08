@@ -60,12 +60,12 @@
         <alex-custom-card
           class="mb-6"
           title="Uso Completo"
-          :isEditing="canEdit3"
-          :showIcon="canEdit3"
-          @toggle:isEditing="canEdit3 = !canEdit3"
-          :cancel="() => console.log('cancel')"
-          :save="() => console.log('save')"
+          :is-editing="canEdit3"
+          :show-icon="canEdit3"
           full-width
+          @click:cancel="() => console.log('cancel')"
+          @click:save="() => console.log('save')"
+          @toggle:is-editing="canEdit3 = !canEdit3"
         >
           <template #content class="pa-6">
             This is inside the content tag
@@ -96,8 +96,8 @@
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in propsDocumentation"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -134,8 +134,8 @@
     <h2 class="text-h3 text-gray-800">Eventos disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in eventsDocumentation"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -270,8 +270,8 @@ const examples = [
       :isEditing="canEdit3"
       :showIcon="canEdit3"
       @toggle:isEditing="canEdit3 = !canEdit3"
-      :cancel="() => console.log('cancel')"
-      :save="() => console.log('save')"
+      @click:cancel="() => console.log('cancel')"
+      @click:save="() => console.log('save')"
       full-width
     >
       <template #content class="pa-6">

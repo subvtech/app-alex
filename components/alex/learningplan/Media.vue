@@ -4,10 +4,10 @@
     :title="title"
     :is-editing="isEditingAndCanEdit"
     :show-icon="canEdit"
-    :cancel="onCancel"
-    :save="onSave"
     full-width
     :disable-save="valueWasNotChanged"
+    @click:cancel="onCancel"
+    @click:save="onSave"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
