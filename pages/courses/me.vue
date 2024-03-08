@@ -266,9 +266,9 @@ interface LearningPlan {
 const courses = ref<LearningPlanSimple[]>([]);
 const user = useStrapiUser<User>();
 
-const professorMode = computed(
-  () => user.value.role.type === UserRoles.PROFESSOR,
-);
+const professorMode = computed(() => {
+  return user.value.role.type === UserRoles.PROFESSOR;
+});
 
 const queryConfig = {
   filters: {

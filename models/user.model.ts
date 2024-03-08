@@ -31,6 +31,6 @@ export interface User {
   tags: Tag[];
   avatar: any;
   cover: any;
-  role: UserRoles;
+  role: Role;
   user_wallet?: Wallet;
 }
