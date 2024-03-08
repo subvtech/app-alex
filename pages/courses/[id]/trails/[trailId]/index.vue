@@ -95,7 +95,8 @@
       </div>
       <div
         v-else
-        class="container-min-height justify-center ma-6 align-start d-flex"
+        id="editor-container"
+        class="container-min-height justify-center ma-6 align-start d-flex post"
       >
         <div style="width: 750px">
           <p
@@ -109,11 +110,7 @@
           <AppEditor ref="editor" :data="editorData" />
         </div>
 
-        <div
-          v-if="readOnly"
-          class="d-lg-block d-none sections-col h-100"
-          cols="2"
-        >
+        <div v-if="readOnly" class="d-lg-block sections-col h-100" cols="2">
           <div class="sections-container">
             <p class="text-gray-800 text-h6 mb-4">Seções</p>
             <div>
@@ -472,6 +469,8 @@ window.addEventListener('resize', () => {
   position: sticky;
   top: 88px;
   z-index: 1;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .sections-col {
@@ -502,12 +501,23 @@ window.addEventListener('resize', () => {
   }
 }
 
+#editor-container {
+  container-type: inline-size;
+  container-name: editor;
+}
+
 @media screen and (min-width: 1380px) {
   .sticky-buttons {
     position: -webkit-sticky;
     position: sticky;
     top: 88px;
     z-index: 1;
+  }
+}
+
+@container editor (max-width: 1235px) {
+  .sections-container {
+    opacity: 0;
   }
 }
 </style>
