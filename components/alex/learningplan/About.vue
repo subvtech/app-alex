@@ -4,10 +4,10 @@
     :title="title"
     :is-editing="isEditingAndCanEdit"
     :show-icon="canEdit"
-    :cancel="onCancel"
-    :save="() => emit('update', isOptional ? text : value)"
     :disable-save="errorMessage !== undefined || textNotChanged"
     full-width
+    :@click:cancel="onCancel"
+    :@click:save="() => emit('update', isOptional ? text : value)"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
