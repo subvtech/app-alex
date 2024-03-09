@@ -110,12 +110,12 @@
   </v-app-bar>
 </template>
 <script setup lang="ts">
-import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
-
 /*
   This component is meant to be used on the main screen as a horizontal Menu,
    it's also suitable for use inside smaller components.
 */
+import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+
 export interface HorizontalBarEmits {
   (e: 'alert'): void; // click on the alert button
   (e: 'chat'): void; // click on the chat button

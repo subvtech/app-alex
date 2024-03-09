@@ -2,7 +2,8 @@
   <v-container
     class="page rounded-lg bg-white pa-6 gap-6 d-flex flex-column align-start pb-15"
   >
-    <alex-documentation-header title="horizontalBar" description="undefined" vuetify-link="https://dev.vuetifyjs.com/en/components/v-app-bar/#usage" />
+    <alex-documentation-header title="horizontalBar" description="This component is meant to be used on the main screen as a horizontal Menu,
+it's also suitable for use inside smaller components." vuetify-link="https://dev.vuetifyjs.com/en/components/v-app-bar/#usage" />
     <alex-documentation-accordions-props-list
       :data="myProps"
       :show-positions="propsCount"
