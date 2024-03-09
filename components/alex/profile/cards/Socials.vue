@@ -128,10 +128,11 @@ const supported = ['youtube', 'linkedin', 'instagram'];
 const client = useStrapiClient();
 const socialToAccordionItem = (social) => {
   const { name, url, id } = social;
+  const lowerCaseName = name.toLocaleLowerCase();
   return {
     title: name.toUpperCase(),
-    icon: supported.includes(name.toLocaleLowerCase())
-      ? `/svg/${name}.svg`
+    icon: supported.includes(lowerCaseName)
+      ? `/svg/${lowerCaseName}.svg`
       : '/svg/website.svg',
 
     contentData: {
