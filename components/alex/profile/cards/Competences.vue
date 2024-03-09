@@ -107,6 +107,7 @@ const search = ref<string | null>(null);
 const filteredTags = ref<Tag[]>([]);
 
 const updatedSelectedTags = ref<Tag[]>([...props.selectedTags]);
+const initialState = ref<Tag[]>([...props.selectedTags]);
 const rerender = ref(0);
 
 const disableSave = computed(() =>
@@ -181,7 +182,7 @@ const removeItem = (tag) => {
 };
 
 const onCancel = () => {
-  updatedSelectedTags.value = [...props.selectedTags];
+  updatedSelectedTags.value = [...initialState.value];
   filterTags([...props.selectedTags]);
   deleteArray.value = [];
   updateArray.value = [];
@@ -255,6 +256,8 @@ const onSave = async () => {
   }
   rerender.value -= 1;
   isLoading.value = false;
+
+  initialState.value = [...updatedSelectedTags.value];
 };
 
 const addExistingTag = (data) => {

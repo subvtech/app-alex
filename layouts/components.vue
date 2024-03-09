@@ -32,11 +32,12 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => closeDrawable(!clipped)"
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
+      :track-current-user="userStore.isCurrentUser"
       show-picture
+      @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
 
@@ -58,6 +59,7 @@ const { profileMenuItems } = useMainHorizontalBar();
 const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
   useNavigationDrawer();
 const user = useStrapiUser<User>();
+const userStore = useUserStore();
 
 const icons = [
   'mdi-account-circle',

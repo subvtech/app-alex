@@ -144,11 +144,17 @@ export const useUserStore = defineStore('user', () => {
       });
 
       loadedUser.value = result.data[0];
+
       activeLearningPlans.value = (
         await find<LearningPlanMemberSimple>('learning-plan-members', {
           filters: {
             user: { id: result.data[0].id },
             status: 'joined',
+            learningplan: {
+              archived_at: {
+                $null: true, // Using _eq with null to check for null values
+              },
+            },
           },
         })
       ).data.length;

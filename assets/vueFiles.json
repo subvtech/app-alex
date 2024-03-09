@@ -260,6 +260,12 @@
   {
     "namespaces": [
       "generated",
+      "horizontalBar"
+    ]
+  },
+  {
+    "namespaces": [
+      "generated",
       "InstitutionItem"
     ]
   },
@@ -291,12 +297,6 @@
     "namespaces": [
       "generated",
       "Security"
-    ]
-  },
-  {
-    "namespaces": [
-      "generated",
-      "Social"
     ]
   },
   {

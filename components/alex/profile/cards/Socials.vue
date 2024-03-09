@@ -146,7 +146,7 @@ const socialToAccordionItem = (social) => {
 const sortedSocials = ref<AccordionItemTitleRequiredType[]>(
   socials.value.map(socialToAccordionItem) as AccordionItemTitleRequiredType[],
 );
-const backupSortedSocials = ref<AccordionItemTitleRequiredType[]>(
+const initialState = ref<AccordionItemTitleRequiredType[]>(
   socials.value.map(socialToAccordionItem) as AccordionItemTitleRequiredType[],
 );
 
@@ -253,20 +253,11 @@ const updateItemUrl = (props: SocialFormUpdateValuePayload) => {
   }
 };
 
-const fillSortedSocialsArray = () => {
-  sortedSocials.value = socials.value.map(
-    socialToAccordionItem,
-  ) as AccordionItemTitleRequiredType[];
-  backupSortedSocials.value = socials.value.map(
-    socialToAccordionItem,
-  ) as AccordionItemTitleRequiredType[];
-};
-
 const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
 
-  if (updateSocials) fillSortedSocialsArray();
+  if (updateSocials) sortedSocials.value = [...initialState.value];
 };
 
 const updatedMissingSocials = computed(() => {
@@ -370,6 +361,8 @@ const onSave = async () => {
   }
   toggleIsEditing();
   await Promise.all(promises);
+
+  initialState.value = [...sortedSocials.value];
   resetArrays(false);
   emit('update');
 };

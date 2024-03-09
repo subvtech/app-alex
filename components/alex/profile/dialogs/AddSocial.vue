@@ -18,6 +18,13 @@
       </alex-custom-button>
     </template>
     <div class="d-flex flex-column pt-6 px-6 pb-1">
+      <pre>{{
+        {
+          mainButtonDisabled,
+          errorName: nameField.errorMessage,
+          errorUrl: urlField.errorMessage,
+        }
+      }}</pre>
       <alex-inputs-select
         v-model="selectedSocial"
         class="pb-6"
@@ -30,22 +37,13 @@
       >
         <template #selection="{ item }">
           <img
-            v-if="item.raw === 'Youtube'"
             class="mr-4 icon-size"
-            src="/svg/youtube.svg"
+            :src="
+              supported.includes(item.raw.toLowerCase())
+                ? `/svg/${item.raw.toLowerCase()}.svg`
+                : '/svg/website.svg'
+            "
           />
-          <img
-            v-else-if="item.raw === 'Linkedin'"
-            class="mr-4 icon-size"
-            src="/svg/linkedin.svg"
-          />
-          <img
-            v-else-if="item.raw === 'Instagram'"
-            class="mr-4 icon-size"
-            src="/svg/instagram.svg"
-          />
-
-          <img v-else class="mr-4 icon-size" src="/svg/website.svg" />
           <p class="selected-item">{{ item.raw }}</p>
         </template>
 
@@ -53,22 +51,13 @@
           <v-list-item class="item-option" v-bind="itemProps">
             <template #prepend>
               <img
-                v-if="item.raw === 'Youtube'"
                 class="mr-4 icon-size"
-                src="/svg/youtube.svg"
+                :src="
+                  supported.includes(item.raw.toLowerCase())
+                    ? `/svg/${item.raw.toLowerCase()}.svg`
+                    : '/svg/website.svg'
+                "
               />
-              <img
-                v-else-if="item.raw === 'Linkedin'"
-                class="mr-4 icon-size"
-                src="/svg/linkedin.svg"
-              />
-              <img
-                v-else-if="item.raw === 'Instagram'"
-                class="mr-4 icon-size"
-                src="/svg/instagram.svg"
-              />
-
-              <img v-else class="mr-4 icon-size" src="/svg/website.svg" />
             </template>
           </v-list-item> </template
       ></alex-inputs-select>
@@ -127,6 +116,7 @@ const emit = defineEmits<AddSocialEmits>();
 
 const props = withDefaults(defineProps<AddSocialComponentType>(), {});
 
+const supported = ['youtube', 'linkedin', 'instagram'];
 const { nameRules, urlRules } = useFormRules();
 
 const formattedSocials = computed(() =>
@@ -165,11 +155,11 @@ const nonSupportedSocialMedia = computed(
 
 const mainButtonDisabled = computed(() => {
   return (
-    !!nameField.errorMessage?.value ||
     !!urlField.errorMessage?.value ||
     !urlField.value.value ||
     !selectedSocial.value ||
-    (nonSupportedSocialMedia.value && !nameField.value.value)
+    (nonSupportedSocialMedia.value &&
+      (!nameField.value.value || !!nameField.errorMessage?.value))
   );
 });
 </script>
