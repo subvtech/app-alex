@@ -4,8 +4,8 @@
     :href="absolutePath(contentData?.url)"
     target="_blank"
   >
-    <div class="mr-4 icon-border">
-      <img :src="icon" />
+    <div v-if="icon" class="mr-4 icon-border">
+      <img :src="toLowerCase(icon)" />
     </div>
 
     <span class="text-body-3 text-gray-600 text-overflow">
@@ -35,4 +35,5 @@ const absolutePath = (url: string, https = true) => {
 };
 
 const toUpperCase = (str: string) => str.toUpperCase();
+const toLowerCase = (str: string) => str.toLowerCase();
 </script>

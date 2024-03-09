@@ -137,6 +137,8 @@ const canEditAndIsEditing = computed(() => canEdit.value && isEditing.value);
 const sortedInstitutions = ref<InstitutionComponentType[]>([
   ...props.institutions,
 ]);
+
+const initialState = ref<InstitutionComponentType[]>([...props.institutions]);
 const institutionsIds = ref<number[]>(
   props.institutions.map((item) => item.id),
 );
@@ -193,12 +195,13 @@ const onSave = async () => {
   toggleEditing();
   emit('update');
   deleteArray.value = [];
+  initialState.value = [...sortedInstitutions.value];
 };
 
 const onCancel = () => {
   componentKey.value = componentKey.value + 1;
   deleteArray.value = [];
-  sortedInstitutions.value = [...props.institutions];
+  sortedInstitutions.value = [...initialState.value];
   searchInstitutions.value = [];
   toggleEditing();
 };

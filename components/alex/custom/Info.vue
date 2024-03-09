@@ -234,10 +234,12 @@
 </template>
 
 <script setup lang="ts">
+import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+
 const emit = defineEmits(['display:settings']);
 const props = defineProps({
   profilePicture: {
-    type: Object as PropType<{ url: string; id: number } | null>,
+    type: Object as PropType<ProfilePictureItemType | null>,
   },
 
   userId: {
