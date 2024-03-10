@@ -24,10 +24,21 @@
       >
         <template #content>
           <v-container
-            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue"
+            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue empty"
             elevation="0"
           >
-            <v-icon color="accent" size="100px" icon="mdi-image-area" />
+            <div
+              class="d-flex flex-column align-center max-width-350 justify-center gap-2 text-secondary-0"
+            >
+              <v-icon color="accent" size="80px" icon="alex:RoundAddPhoto" />
+              <p class="text-body-2 text-center">
+                Adicione vídeos ou imagens que aparecerão na página inicial do
+                seu curso
+              </p>
+              <p class="text-body-3 text-center">
+                Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;
+              </p>
+            </div>
           </v-container>
         </template>
       </vueper-slide>
@@ -545,7 +556,15 @@ defineExpose({
   max-width: 213px;
   max-height: 120px;
 }
-
+.max-width-350 {
+  max-width: 350px;
+}
+.empty:hover {
+  background-color: rgb(var(--v-theme-gray-100)) !important;
+}
+.empty:active {
+  background-color: rgb(var(--v-theme-gray-200)) !important;
+}
 @media (max-width: 600px) {
   .video-play-icon {
     left: 70%;

@@ -1,4 +1,9 @@
 {
+  "field": {
+    "required": "This field is required",
+    "min": "Min {min} caracteres ",
+    "max": "Max {max} caracteres "
+  },
   "fullName": {
     "required": "Full name is required",
     "min": "At least 6 characters long",

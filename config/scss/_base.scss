@@ -128,3 +128,8 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
     height: $size * 4px
   }
 }
+
+// Custom text properties
+.text-break-all {
+  word-break: break-all;
+}

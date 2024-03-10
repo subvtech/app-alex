@@ -249,11 +249,11 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
       .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
       .trim(),
-    class: yup
+    slug: yup
       .string()
-      .required(i18n.t('rules.class.required'))
-      .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
+      .required(i18n.t('rules.field.required'))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.slug.max', { max }))
       .trim(),
     startDate: startDateCreationRules,
     endDate: endDateRules,
