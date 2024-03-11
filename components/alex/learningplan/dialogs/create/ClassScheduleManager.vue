@@ -30,9 +30,9 @@ type ClassScheduleProps = {
   title: string;
   subtitle: string;
   img: string;
-  showItens: boolean;
+  showItens?: boolean;
 };
-withDefaults(defineProps<ClassScheduleProps>(), {});
+const { showItens = false } = defineProps<ClassScheduleProps>();
 </script>
 
 <style scoped>

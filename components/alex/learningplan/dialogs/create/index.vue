@@ -75,13 +75,14 @@
       <alex-learningplan-dialogs-create-class-schedule-manager
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
         title="Gerencie suas turmas!"
-        subtitle=" Adicione um nome e um responsável para cada turma."
-        :show-itens="!schedules.length"
-        :img="'/svg/class.svg'"
+        subtitle="Adicione um nome e um responsável para cada turma."
+        :show-itens="!!schedules.length"
+        img="/svg/class.svg"
       >
         <template #action-button>
-          <alex-custom-button append-icon="mdi-plus" variant="secondary"
-            >Nova Turma</alex-custom-button
+          <alex-custom-button append-icon="mdi-plus" variant="secondary">
+            <alex-learningplan-dialogs-class v-model:data="classData" />
+            Nova Turma</alex-custom-button
           ></template
         >
         <template #items>
@@ -196,7 +197,8 @@ const createScheduleModal = ref(false);
 const loading = ref(false);
 const startDate = ref<string>();
 const endDate = ref<string>();
-const slides = ref([]);
+const slides = ref<any>([]);
+const classData = ref(null);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
