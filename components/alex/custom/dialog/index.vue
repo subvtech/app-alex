@@ -28,10 +28,7 @@
       :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
     />
-    <v-container
-      class="pa-1 gap-4 body-height alex-scrollbar-white"
-      :class="{ 'body-height-stepper': stepper }"
-    >
+    <v-container class="pa-1 gap-4 overflow-y-auto alex-scrollbar-white">
       <v-row dense>
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">
           <alex-inputs-stepper
@@ -178,14 +175,3 @@ const slotsList = computed(() =>
   ),
 );
 </script>
-
-<style scoped>
-.body-height-stepper {
-  height: calc(100% - 148px);
-}
-
-.body-height {
-  max-height: calc(100% - 148px);
-  overflow-y: auto;
-}
-</style>
