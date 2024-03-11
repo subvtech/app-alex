@@ -36,6 +36,7 @@
       />
       <alex-inputs-text-field
         v-model="slug"
+        class="mb-4"
         density="comfortable"
         name="slug"
         required

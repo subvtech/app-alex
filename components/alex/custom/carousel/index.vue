@@ -18,7 +18,7 @@
       style="z-index: 0; max-width: 850px"
     >
       <vueper-slide
-        :class="!readOnly && slides.length < 1 ? '' : 'd-none'"
+        :class="!readOnly && slides.length < 1 ? 'scale-1' : 'd-none'"
         class="rounded"
         @click="openAddSlidesDialog(-1)"
       >
@@ -494,6 +494,9 @@ defineExpose({
 }
 </style>
 <style scoped>
+.scale-1 {
+  transform: scale(1) !important;
+}
 .inputFile {
   position: absolute;
   opacity: 0;
