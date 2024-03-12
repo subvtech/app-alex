@@ -160,6 +160,20 @@ const passwordRules = (i18n) => ({
     .required(i18n.t('rules.confirmPassword.required')),
 });
 
+const goalRules = (i18n) => ({
+  verb: yup.lazy((value) =>
+    typeof value === 'string'
+      ? yup
+          .string()
+          .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
+          .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+          .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+          .required(i18n.t('rules.keyword.required'))
+      : yup.object().required(i18n.t('rules.keyword.required')),
+  ),
+  ...longDescriptionRules(i18n),
+});
+
 export const useFormRules = () => {
   /*
     This composable is a cluster of yup rules, 
@@ -317,7 +331,7 @@ export const useFormRules = () => {
         .required(i18n.t('pages.classes.participant.required'))
         .min(2, i18n.t('pages.classes.participant.required')),
     },
-
+    goalRules: goalRules(i18n),
     createCourseRules,
   };
 

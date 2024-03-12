@@ -4,6 +4,7 @@
     :title="$t('components.meeting.title')"
     align-content="align-center"
     :show-icon="false"
+    :href="canEdit ? `${learningPlanId}/settings` : ''"
   >
     <template #content>
       <div
@@ -23,7 +24,7 @@
         v-for="(item, index) in myData"
         v-else
         :key="index"
-        :date="new Date(item.date)"
+        :date="item.date"
         :start-hour="item.startHour"
         :end-hour="item.endHour"
         :interval="item.interval"
@@ -56,6 +57,7 @@
           <alex-learningplan-dialogs-schedule
             v-model="createScheduleModal"
             v-model:data="editData"
+            :end-date="endDate"
             @submit="
               (values) =>
                 !editData ? addMeeting(values) : updateMeeting(values)
@@ -98,11 +100,9 @@ const props = withDefaults(defineProps<MeetingsPropsType>(), {
 
 const { data } = toRefs(props);
 const myData = toRef(data.value);
-
 const createScheduleModal = ref(false);
 const dialogMeetingExclusion = ref(false);
 const deleteId = ref();
-
 const editData = ref<MeetingPropsType | null>(null);
 
 const setDateTime = (
@@ -142,7 +142,7 @@ const addMeeting = async (values: MeetingPropsType) => {
     endDate: meetingEndDate,
   });
 
-  myData.value.push({ ...values, id: result.data.id.toString() });
+  myData.value.push({ ...values, id: result.data.id });
 };
 
 const editMeeting = (values: MeetingPropsType) => {
@@ -160,7 +160,7 @@ const updateMeeting = async (values) => {
   );
 
   myData.value = myData.value.map((meeting) => {
-    if (meeting.id == values.id) {
+    if (meeting.id === values.id) {
       return {
         ...values,
         startDate: meetingStartDate,
@@ -171,7 +171,7 @@ const updateMeeting = async (values) => {
     return meeting;
   });
 
-  const result = await update('learning-plan-meeting-schedules', values.id, {
+  await update('learning-plan-meeting-schedules', values.id, {
     ...values,
     startDate: meetingStartDate,
     endDate: meetingEndDate,

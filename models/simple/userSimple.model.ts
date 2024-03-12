@@ -19,4 +19,5 @@ export interface UserSimple {
   phone: string | null;
   info: null;
   cover: string | null;
+  institutions?: any[];
 }

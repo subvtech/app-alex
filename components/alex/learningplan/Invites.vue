@@ -15,12 +15,12 @@
         >
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
             <template #content>
-              <nuxt-link
-                class="ellipsis lines-1 w-100 text-decoration-none text-secondary-0"
-                :to="url!"
+              <p
+                class="cursor-pointer ellipsis break-word lines-1 w-100 text-decoration-none text-secondary-0"
+                @click="copyToClipboard(url)"
               >
                 {{ url }}
-              </nuxt-link>
+              </p>
             </template>
           </alex-custom-tooltip>
           <span v-else>{{ $t('components.courses.invites.expired') }}</span>
@@ -146,6 +146,9 @@ watch(theresTimeAndUrl, () => {
 </script>
 
 <style scoped lang="scss">
+.cursor-pointer {
+  cursor: pointer;
+}
 .relative {
   position: relative;
   display: block;
@@ -189,6 +192,9 @@ watch(theresTimeAndUrl, () => {
   border-radius: 8px;
   border: 1px solid var(--principais-secundria-secundria-1, #47d9eb);
   background: var(--principais-secundria-secundria-2, #d1f6fa);
+  .break-word {
+    word-break: break-all;
+  }
   &.dark {
     height: 48px !important;
     flex-grow: 1;

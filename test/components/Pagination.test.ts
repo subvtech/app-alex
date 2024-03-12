@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { renderSuspended } from '@nuxt/test-utils/runtime';
 import { screen, within, configure, fireEvent } from '@testing-library/vue';
 import { vuetify } from '../../plugins/vuetify';
 
