@@ -1,6 +1,6 @@
 <template>
   <alex-custom-dialog
-    v-model="value"
+    v-model="openDialog"
     title=""
     :max-width="520"
     no-footer
@@ -68,7 +68,7 @@
             "
             @click="
               () => {
-                $emit('submit');
+                emit('submit');
               }
             "
         /></template>
@@ -76,21 +76,23 @@
           ><alex-custom-button
             v-if="!hideCancelButton"
             size="large"
-            :text="$t('components.courses.settings.meetings.delete.cancel')"
+            :text="cancelButtonText"
             variant="secondary"
             @click="
               () => {
-                $emit('cancel');
+                emit('cancel');
               }
             "
         /></template>
       </alex-custom-dialog-footer>
     </template>
-    <template v-if="innerActivator">
+    <template v-if="innerActivator" #activator>
       <alex-custom-button
         v-bind="props"
         :prepend-icon="innerActivator.prependIcon"
         :variant="innerActivator.variant"
+        :size="innerActivator.size"
+        @click="openDialog = true"
         >{{ innerActivator.text }}</alex-custom-button
       >
     </template>
@@ -98,15 +100,16 @@
 </template>
 <script setup lang="ts">
 import * as yup from 'yup';
+import { ButtonSizeType, VariantType } from './Button.vue';
 const { t } = useI18n();
-const emit = defineEmits(['update:modelValue', 'submit', 'cancel']);
+const emit = defineEmits(['submit', 'cancel']);
 interface AlertDialogProps {
-  modelValue: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
   title: string;
   subtitle?: string;
   image?: { src: string; width?: number; height?: number; alt?: string };
   submitButtonText: string;
+  cancelButtonText: string;
   inputWordConfirmation?: string;
   inputLabelConfirmation?: string;
   inputPlaceholderConfirmation?: string;
@@ -118,7 +121,8 @@ interface AlertDialogProps {
   innerActivator?: {
     text: string;
     prependIcon?: string;
-    variant: string;
+    variant: VariantType;
+    size?: ButtonSizeType;
   };
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
@@ -137,6 +141,8 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
 });
 const inputValue = ref('');
 
+const openDialog = ref(false);
+
 const errorMessage = computed(() => {
   if (
     inputValue.value.length !== 0 &&
@@ -145,14 +151,5 @@ const errorMessage = computed(() => {
     return props.errorMessageText;
   }
   return '';
-});
-
-const value = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
 });
 </script>

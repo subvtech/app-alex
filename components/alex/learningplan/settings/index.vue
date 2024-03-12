@@ -65,7 +65,6 @@ const accessUrl = computed(() => {
   return `${window.location.origin}/courses/${id}`;
 });
 
-
 const learningPlanStore = useLearningPlanStore();
 const fetchData = async () => {
   await learningPlanStore.loadLearningPlan(parseInt(id.toString()));

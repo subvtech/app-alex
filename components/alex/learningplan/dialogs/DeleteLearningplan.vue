@@ -92,7 +92,7 @@ const openDialog = ref(false);
 const closeDialog = () => {
   openDialog.value = false;
 };
-let regex = new RegExp(
+const regex = new RegExp(
   `^${i18n.t(`components.${props.namespace}.settings.delete.word`)}$`,
 );
 
