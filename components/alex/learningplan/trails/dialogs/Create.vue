@@ -111,6 +111,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useForm } from 'vee-validate';
+
+export interface CreateTrailDialogComponentType {
+  learningStructure: number;
+}
+
 const { createTrailsRules } = useFormRules();
 const { create } = useStrapi();
 const strapiClient = useStrapiClient();
@@ -126,12 +131,7 @@ const { t } = useI18n();
 
 const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
-const props = defineProps({
-  learningStructure: {
-    type: Number,
-    required: true,
-  },
-});
+const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), {});
 
 const clearImage = () => {
   image.value = null;

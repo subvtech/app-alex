@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import * as yup from 'yup';
 import { ButtonSizeType, VariantType } from './Button.vue';
-const { t } = useI18n();
+
 const emit = defineEmits(['submit', 'cancel']);
 interface AlertDialogProps {
   variant?: 'primary' | 'success' | 'error' | 'info';

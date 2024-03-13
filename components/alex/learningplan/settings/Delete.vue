@@ -15,7 +15,7 @@
         <alex-custom-confirm-dialog
           :title="$t(`components.${namespace}.settings.delete.confirmation`)"
           :subtitle="$t(`components.${namespace}.settings.delete.warning`)"
-          :image="{ src: 'assets/svg/exclusionImage.svg' }"
+          :image="{ src: '/svg/exclusionImage.svg' }"
           :submit-button-text="
             $t(`components.${namespace}.settings.delete.word`)
           "

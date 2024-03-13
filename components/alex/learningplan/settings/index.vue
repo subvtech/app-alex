@@ -44,7 +44,7 @@
           outline
           @update="updateVisibility"
         />
-        <alex-learningplan-settings-delete outline @update="removeCourse" />
+        <alex-learningplan-settings-delete @update="removeCourse" />
       </div>
     </template>
   </alex-custom-card>
