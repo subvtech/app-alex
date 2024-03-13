@@ -24,5 +24,7 @@
     "syncMeetings": "Synchronous meetings",
     "whatIsYourCourseSlug": "What will be your course identifier?",
     "writeYourCourseIdentifier": "Write your course identifier",
-    "infoSlug": "The course identifier is a name that will serve to differentiate your course from others and allow it to be accessed via the URL."
+    "infoSlug": "The course identifier is a name that will serve to differentiate your course from others and allow it to be accessed via the URL.",
+    "createClass": "Create class",
+    "addClass": "Add class"
 }

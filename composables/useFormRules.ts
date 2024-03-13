@@ -320,6 +320,18 @@ export const useFormRules = () => {
       .min(2, i18n.t('pages.classes.participantsIsRequired')),
   };
 
+  const createEditClassRules = {
+    className: yup
+      .string()
+      .min(4, i18n.t('rules.name.min', { min: 6 }))
+      .max(64, i18n.t('rules.name.max', { max: 64 }))
+      .required(i18n.t('rules.field.required'))
+      .trim(),
+    responsible: yup
+      .mixed()
+      .required(i18n.t('rules.field.required'))
+      .nonNullable(),
+  };
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -358,5 +370,6 @@ export const useFormRules = () => {
     scheduleRules,
     createTrailsRules,
     createGroupRules,
+    createEditClassRules,
   };
 };
