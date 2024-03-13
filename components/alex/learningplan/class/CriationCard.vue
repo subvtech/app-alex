@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="d-flex align-center pa-4 justify-space-between"
+    class="d-flex align-center pa-4 justify-space-between bg-white"
     elevation="0"
     variant="outlined"
     color="gray-200"

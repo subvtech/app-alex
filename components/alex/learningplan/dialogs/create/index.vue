@@ -100,7 +100,7 @@
         <template #items>
           <alex-learningplan-dialogs-create-classes
             v-model="classes"
-            v-model:edit-class="classModal"
+            v-model:edit-modal="classModal"
             v-model:data-class="classData"
           />
         </template>
