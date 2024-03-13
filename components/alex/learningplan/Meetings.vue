@@ -12,7 +12,7 @@
         class="d-flex justify-center w-100"
         :class="isEditing ? 'bordered pa-6' : ''"
       >
-        <span class="desactivated">{{
+        <span class="deactivated">{{
           $t(
             `components.courses.meeting.empty.${
               isFacilitator ? 'facilitator' : 'student'
@@ -43,7 +43,26 @@
           },
         ]"
       />
+      <alex-custom-confirm-dialog
+        v-if="true"
+        :model-value="dialogMeetingExclusion"
+        :title="$t(`components.courses.settings.meetings.delete.confirmation`)"
+        :subtitle="
+          $t(`components.courses.settings.meetings.delete.description`)
+        "
+        :image="{ src: '/svg/exclusionImage.svg' }"
+        :submit-button-text="
+          $t(`components.courses.settings.meetings.delete.button`)
+        "
+        :cancel-button-text="
+          $t(`components.courses.settings.meetings.delete.cancel`)
+        "
+        variant="error"
+        @submit="removeMeeting"
+        @cancel="dialogMeetingExclusion = false"
+      />
       <alex-learningplan-dialogs-delete-schedule
+        v-else
         :dialog="dialogMeetingExclusion"
         :remove-function="removeMeeting"
         @close="dialogMeetingExclusion = false"
@@ -118,7 +137,7 @@ const setDateTime = (
   meetingStartDate.setHours(parseInt(startHours));
   meetingStartDate.setMinutes(parseInt(startMinutes));
 
-  const meetingEndDate = interval === 0 ? date : props.endDate;
+  const meetingEndDate = interval === 0 ? new Date(date) : props.endDate;
   meetingEndDate.setHours(parseInt(endHours));
   meetingEndDate.setMinutes(parseInt(endMinutes));
   return [meetingStartDate, meetingEndDate];
@@ -215,7 +234,7 @@ watch(data, () => {
   border: 1px solid var(--Cinza-Cinza-100, #ebedef);
 }
 
-.desactivated {
+.deactivated {
   color: var(--cinza-cinza-500, #8291a1);
   text-align: center;
 

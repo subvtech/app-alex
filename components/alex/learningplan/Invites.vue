@@ -63,8 +63,8 @@
         </div>
       </div>
       <div v-else class="d-flex justify-center w-100">
-        <span class="desactivated">{{
-          $t('components.courses.invites.desactivated')
+        <span class="deactivated">{{
+          $t('components.courses.invites.deactivated')
         }}</span>
       </div>
     </template>
@@ -165,7 +165,7 @@ watch(theresTimeAndUrl, () => {
   cursor: pointer;
 }
 
-.desactivated {
+.deactivated {
   color: var(--cinza-cinza-500, #8291a1);
   text-align: center;
 

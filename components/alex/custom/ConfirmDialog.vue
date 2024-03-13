@@ -78,11 +78,7 @@
             size="large"
             :text="cancelButtonText"
             variant="secondary"
-            @click="
-              () => {
-                emit('cancel');
-              }
-            "
+            @click="emit('cancel')"
         /></template>
       </alex-custom-dialog-footer>
     </template>
@@ -104,6 +100,7 @@ import { ButtonSizeType, VariantType } from './Button.vue';
 
 const emit = defineEmits(['submit', 'cancel']);
 interface AlertDialogProps {
+  modelValue?: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
   title: string;
   subtitle?: string;
@@ -127,6 +124,7 @@ interface AlertDialogProps {
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
   noInputConfirmation: true,
+  modelValue: false,
   variant: 'primary',
   innerActivator: undefined,
   image: undefined,
@@ -141,7 +139,9 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
 });
 const inputValue = ref('');
 
-const openDialog = ref(false);
+const { modelValue } = toRefs(props);
+
+const openDialog = ref(props.modelValue);
 
 const errorMessage = computed(() => {
   if (
@@ -151,5 +151,9 @@ const errorMessage = computed(() => {
     return props.errorMessageText;
   }
   return '';
+});
+
+watch(modelValue, () => {
+  openDialog.value = modelValue.value;
 });
 </script>

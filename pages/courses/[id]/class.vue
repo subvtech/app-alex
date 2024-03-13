@@ -43,7 +43,7 @@
           :label="$t('components.learningPlan.dialogs.whoParticipate')"
           :placeholder="$t('components.learningPlan.dialogs.searchMember')"
         />
-        <p>Convites pendentes</p>
+        <p>{{ $t('components.courses.pending') }}</p>
         <alex-custom-list-item-user
           v-for="(member, i) in learningPlanStore.pendingMembers"
           :key="`pending-member-${i}`"
@@ -198,23 +198,30 @@
       v-model="dialogShowGroup"
       :show-values-group="showValuesGroup"
     />
-    <alex-learningplan-dialogs-alert
+    <alex-custom-confirm-dialog
       v-model="dialogConfirmDeleteGroup"
       variant="error"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       :title="$t('pages.classes.wantDeleteGroup')"
       :subtitle="$t('pages.classes.deleteGroupSubtitle')"
       :submit-button-text="$t('pages.classes.delete')"
+      :cancel-button-text="
+        $t('components.courses.settings.meetings.delete.cancel')
+      "
       @cancel="dialogConfirmDeleteGroup = false"
       @submit="() => onDeleteGroup(removingGroupId)"
     />
-    <alex-learningplan-dialogs-alert
+
+    <alex-custom-confirm-dialog
       v-model="confirmDeleteMember"
       variant="error"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       :title="$t('pages.classes.wantDeleteMember')"
       :subtitle="$t('pages.classes.deleteMemberSubtitle')"
       :submit-button-text="$t('pages.classes.delete')"
+      :cancel-button-text="
+        $t('components.courses.settings.meetings.delete.cancel')
+      "
       @submit="() => onDeleteParticipant(removingMemberId)"
       @cancel="confirmDeleteMember = false"
     />
