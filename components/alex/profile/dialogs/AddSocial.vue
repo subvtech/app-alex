@@ -18,13 +18,6 @@
       </alex-custom-button>
     </template>
     <div class="d-flex flex-column pt-6 px-6 pb-1">
-      <pre>{{
-        {
-          mainButtonDisabled,
-          errorName: nameField.errorMessage,
-          errorUrl: urlField.errorMessage,
-        }
-      }}</pre>
       <alex-inputs-select
         v-model="selectedSocial"
         class="pb-6"
