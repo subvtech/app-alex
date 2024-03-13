@@ -74,30 +74,34 @@
     /></template>
     <template #step3>
       <alex-learningplan-dialogs-create-class-schedule-manager
+        v-model="classes"
+        v-model:data="classData"
         title="Gerencie suas turmas!"
         subtitle="Adicione um nome e um responsável para cada turma."
         img="/svg/class.svg"
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
-        :show-itens="!!schedules.length"
+        :show-itens="!!classes.length"
       >
-        <template #action-button>
-          <alex-custom-button append-icon="mdi-plus" variant="secondary">
+        <template #action-button="{ clickActionButton, onSubmit }">
+          <alex-custom-button
+            append-icon="mdi-plus"
+            variant="secondary"
+            @click="clickActionButton"
+          >
             <alex-learningplan-dialogs-class
               v-model:data="classData"
+              v-model="classModal"
               no-select-users
-              @submit="(values) => console.log(values)"
+              @submit="(values) => onSubmit(values)"
             />
             Nova Turma</alex-custom-button
           ></template
         >
         <template #items>
-          <alex-learningplan-class-criation-card
-            name="Desenvolvimento de sistemas operacionais"
-            :user="{ name: 'João Victor Zignago santos' }"
-          />
-          <alex-learningplan-class-criation-card
-            name="Turma A"
-            :user="{ name: 'João Victor Zignago' }"
+          <alex-learningplan-dialogs-create-classes
+            v-model="classes"
+            v-model:edit-class="classModal"
+            v-model:data-class="classData"
           />
         </template>
       </alex-learningplan-dialogs-create-class-schedule-manager>
@@ -165,17 +169,9 @@ import { MeetingPropsType } from '@/components/CourseMeeting.vue';
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
-
 const emit = defineEmits(['update:modelValue', 'submit']);
 const { create } = useStrapi4();
-const value = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
+const value = defineModel<boolean>({ required: true });
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { createCourseRules } = useFormRules();
@@ -204,6 +200,8 @@ const startDate = ref<string>();
 const endDate = ref<string>();
 const slides = ref<any>([]);
 const classData = ref(null);
+const classes = ref<any>([]);
+const classModal = ref(false);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
@@ -246,6 +244,8 @@ const addMeeting = (values: MeetingPropsType) => {
 
 const cleanFields = () => {
   schedules.value = [];
+  classData.value = null;
+  classes.value = [];
   slides.value = [];
   selectedUsers.value = [];
   title.value = '';

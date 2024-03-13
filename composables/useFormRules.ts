@@ -327,10 +327,7 @@ export const useFormRules = () => {
       .max(64, i18n.t('rules.name.max', { max: 64 }))
       .required(i18n.t('rules.field.required'))
       .trim(),
-    responsible: yup
-      .mixed()
-      .required(i18n.t('rules.field.required'))
-      .nonNullable(),
+    responsible: yup.mixed().required(i18n.t('rules.field.required')),
   };
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },

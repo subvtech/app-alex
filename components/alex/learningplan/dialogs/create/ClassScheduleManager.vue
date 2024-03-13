@@ -4,7 +4,11 @@
       <p class="text-h5 text-gray-800">
         {{ titleHeader }}
       </p>
-      <slot name="action-button" />
+      <slot
+        name="action-button"
+        :click-action-button="clickActionButton"
+        :on-submit="onSubmit"
+      />
     </div>
     <div
       v-if="!showItens"
@@ -20,11 +24,13 @@
         </p>
       </div>
     </div>
-    <slot v-else name="items" />
+    <div v-else class="d-flex flex-column gap-2">
+      <slot name="items" />
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends { id: number }">
 type ClassScheduleProps = {
   titleHeader: string;
   title: string;
@@ -33,6 +39,25 @@ type ClassScheduleProps = {
   showItens?: boolean;
 };
 const { showItens = false } = defineProps<ClassScheduleProps>();
+const data = defineModel<T | null>('data');
+const model = defineModel<T[]>({ required: true });
+const clickActionButton = () => {
+  data.value = null;
+};
+const onSubmit = (value: T) => {
+  if (!data.value) {
+    data.value = null;
+    model.value.push(value);
+    return;
+  }
+  const updatedData = model.value.map((item) => {
+    if (item.id === value.id) {
+      return value;
+    }
+    return item;
+  });
+  model.value = updatedData;
+};
 </script>
 
 <style scoped>

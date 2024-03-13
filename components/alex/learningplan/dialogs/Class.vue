@@ -1,8 +1,12 @@
 <template>
   <alex-custom-dialog
-    v-model="model"
+    v-model="modal"
     activator="parent"
-    title="Adicionar nova turma"
+    :title="
+      !data
+        ? $t('components.learningPlan.dialogs.createClass')
+        : $t('components.learningPlan.dialogs.editClass')
+    "
     body-classes="pa-0 bg-white rounded-b-lg"
     no-footer
   >
@@ -55,11 +59,11 @@
             :text="
               $t(
                 `components.learningPlan.dialogs.${
-                  !noSelectUsers ? 'createClass' : 'addClass'
+                  !data ? 'createClass' : 'save'
                 }`,
               )
             "
-            :prepend-icon="'mdi-plus'"
+            :prepend-icon="!data ? 'mdi-plus' : 'mdi-check'"
           />
         </template>
         <template #secondarySlotButton>
@@ -68,7 +72,7 @@
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
-            @click="model = false"
+            @click="modal = false"
           />
         </template>
       </alex-custom-dialog-footer>
@@ -78,19 +82,19 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-type ClassData = { className: string; responsible: number } | null;
+type ClassData = { id: number; className: string; responsible: number } | null;
 type ClassDialogProps = {
   noSelectUsers?: boolean;
 };
 const { noSelectUsers = true } = defineProps<ClassDialogProps>();
 const emit = defineEmits(['submit']);
-const model = ref(false);
+const modal = defineModel<boolean>({ required: true });
 const data = defineModel<ClassData>('data', {
   default: null,
 });
 const { createEditClassRules } = useFormRules();
 const members = ref([]);
-const { handleSubmit } = useForm({
+const { handleSubmit, setValues } = useForm({
   initialValues: {
     className: data.value?.className,
     responsible: data.value?.responsible,
@@ -99,10 +103,17 @@ const { handleSubmit } = useForm({
 });
 const onSubmit = handleSubmit(({ className, responsible }) => {
   const membersValue = JSON.parse(JSON.stringify(members.value));
-  emit('submit', { className, responsible, members: membersValue });
+  const id = data.value?.id || Math.round(Math.random() * 12_345_68);
+  emit('submit', {
+    id,
+    className,
+    responsible,
+    members: membersValue,
+  });
+  modal.value = false;
 });
 const owner = useStrapiUser();
-const { find } = useStrapi();
+const { find } = useStrapi<User>();
 const { data: responsiblesData } = await useAsyncData(
   'collaborators',
   () =>
@@ -119,6 +130,7 @@ const { data: responsiblesData } = await useAsyncData(
         id: user.id,
         email: user.email,
         fullname: user.fullname,
+        avatar: user.avatar,
       })),
   },
 );
@@ -132,9 +144,16 @@ const responsibles = computed(() => {
       email: owner.value.email,
       // @ts-ignore
       fullname: owner.value.fullname,
+      // @ts-ignore
+      avatar: owner.value.avatar,
     };
     return [...responsiblesData.value, ownerItem];
   }
   return responsiblesData.value;
+});
+watch(data, (value) => {
+  if (value) {
+    setValues({ className: value.className, responsible: value.responsible });
+  }
 });
 </script>

@@ -26,5 +26,7 @@
   "writeYourCourseIdentifier": "Digite o identificador do curso",
   "infoSlug": "O identificador do curso é um nome que servirá para diferenciar seu curso dos outros e permitir que ele seja acessado através da URL.",
   "createClass": "Criar turma",
-  "addClass": "Adicionar turma"
+  "addClass": "Adicionar turma",
+  "editClass": "Editar turma",
+  "save": "Salvar"
 }

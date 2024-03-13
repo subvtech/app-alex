@@ -23,12 +23,17 @@
         {{ user.name }}
       </p>
     </div>
-    <alex-custom-button
-      class="ml-4"
-      size="small"
-      icon="mdi-dots-vertical"
-      variant="text"
-    />
+    <alex-custom-dropdown :items="dropdownProps">
+      <template #activator="{ props: activeProps }">
+        <alex-custom-button
+          v-bind="activeProps"
+          class="ml-4"
+          size="small"
+          icon="mdi-dots-vertical"
+          variant="text"
+        />
+      </template>
+    </alex-custom-dropdown>
   </v-card>
 </template>
 
@@ -41,6 +46,20 @@ type CriationCardProps = {
   };
 };
 withDefaults(defineProps<CriationCardProps>(), {});
+const emit = defineEmits(['edit', 'delete']);
+const dropdownProps = [
+  {
+    icon: 'mdi-pencil',
+    text: 'Editar', // t('components.courses.meeting.edit'),
+    onClick: () => emit('edit'),
+  },
+  {
+    icon: 'mdi-trash-can',
+    text: 'Excluir', // t('components.courses.meeting.delete'),
+    warning: true,
+    onClick: () => emit('delete'),
+  },
+];
 </script>
 
 <style lang="scss" scoped>
