@@ -58,8 +58,6 @@ import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { AlexDropdownItem } from '../custom/Dropdown.vue';
 import { capitalize } from '@/utils';
-const { t } = useI18n();
-defineEmits(['click:activator', 'click:calendar']);
 export type MeetingVariantType = 'editing' | 'default';
 export type MeetingType = 'onsite' | 'online';
 export interface MeetingPropsType {
@@ -74,35 +72,34 @@ export interface MeetingPropsType {
   id?: number;
   dropdownProps?: AlexDropdownItem[];
 }
-const defaultDropdown = [
-  {
-    icon: 'mdi-pencil',
-    text: 'Editar', // t('components.courses.meeting.edit'),
-  },
-  {
-    icon: 'mdi-trash-can',
-    text: 'Excluir', // t('components.courses.meeting.delete'),
-    warning: true,
-  },
-];
-const {
-  interval = 7,
-  variant = 'default',
-  dropdownProps = defaultDropdown,
-  endHour,
-  local,
-  type = 'onsite',
-  startHour,
-  link,
-  date,
-} = defineProps<MeetingPropsType>();
+const { t } = useI18n();
 
-const isEditing = computed(() => variant === 'editing');
+const props = withDefaults(defineProps<MeetingPropsType>(), {
+  interval: 7,
+  variant: 'default',
+  type: 'onsite',
+  dropdownProps: () => [
+    {
+      icon: 'mdi-pencil',
+      text: 'Editar', // t('components.courses.meeting.edit'),
+    },
+    {
+      icon: 'mdi-trash-can',
+      text: 'Excluir', // t('components.courses.meeting.delete'),
+      warning: true,
+    },
+  ],
+  local: undefined,
+  link: undefined,
+  id: undefined,
+});
+defineEmits(['click:activator', 'click:calendar']);
+const isEditing = computed(() => props.variant === 'editing');
 const dateValue = computed(() => {
-  if (typeof date === 'string') {
-    return new Date(date.replaceAll('-', '/'));
+  if (typeof props.date === 'string') {
+    return new Date(props.date.replaceAll('-', '/'));
   }
-  return new Date(date);
+  return new Date(props.date);
 });
 const formattedDate = computed(() => {
   const temp = format(dateValue.value, 'EEEE', { locale: pt });
@@ -115,14 +112,14 @@ const frequencyTextValues = {
   14: t('components.courses.meeting.biweekly'),
   30: t('components.courses.meeting.monthly'),
 };
-const frequencyText = computed(() => {
-  return (
-    frequencyTextValues[interval] ||
-    t('components.courses.meeting.interval', { days: interval })
-  );
-});
+const frequencyText = computed(
+  () =>
+    frequencyTextValues[props.interval] ||
+    t('components.courses.meeting.interval', { days: props.interval }),
+);
 const duration = computed(
-  () => `${startHour} ${t('components.courses.meeting.at')} ${endHour}`,
+  () =>
+    `${props.startHour} ${t('components.courses.meeting.at')} ${props.endHour}`,
 );
 const title = computed(
   () => `${frequencyText.value}: ${formattedDate.value}, ${duration.value}`,

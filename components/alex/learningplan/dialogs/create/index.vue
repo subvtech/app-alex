@@ -136,6 +136,7 @@
           <div class="d-flex flex-column mt-4 gap-2">
             <alex-learningplan-meeting
               v-for="schedule in schedules"
+              :id="schedule.id"
               :key="schedule.id"
               variant="editing"
               type="onsite"
@@ -303,4 +304,7 @@ watch(
     }
   },
 );
+watch(schedules, (value) => {
+  console.log(value);
+});
 </script>

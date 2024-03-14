@@ -9,15 +9,36 @@
         }`,
       )
     "
-    body-classes="pa-0 bg-white rounded-b-lg"
-    no-footer
+    body-classes="pa-0 bg-white"
   >
-    <v-form @submit="submit" @reset="handleReset">
+    <v-form @reset="handleReset">
       <div class="pa-6">
+        <alex-inputs-autocomplete
+          name="class"
+          label="Turma"
+          density="comfortable"
+          required
+          :items="classes"
+        />
         <alex-inputs-select
-          :items="items"
+          name="type"
+          label="Tipo do encontro"
+          density="comfortable"
+          required
+          :items="['online', 'presencial']"
+        />
+        <alex-inputs-select
           name="interval"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
+          :items="items"
+          density="comfortable"
+          required
+        />
+        <alex-inputs-text-field
+          :name="values.type === 'online' ? 'link' : 'local'"
+          :label="
+            values.type === 'online' ? 'Link do encontro' : 'Local do encontro'
+          "
           density="comfortable"
           required
         />
@@ -27,7 +48,9 @@
           :allowed-dates="(date) => disablePastDates(date)"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
-          class="w-100 mt-4"
+          hint="Data que o encontro se inicia"
+          persistent-hint
+          class="w-100 mb-4"
           density="comfortable"
         />
         <div class="d-flex gap-4">
@@ -49,13 +72,15 @@
           />
         </div>
       </div>
+    </v-form>
+    <template #footer>
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
             :text="$t(`components.courses.meeting.${data ? 'save' : 'add'}`)"
             size="large"
-            type="submit"
             :prepend-icon="data ? 'mdi-check' : 'mdi-plus'"
+            @click="submit"
           />
         </template>
         <template #secondarySlotButton>
@@ -64,11 +89,11 @@
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
-            @click="$emit('update:modelValue', false)"
+            @click="value = false"
           />
         </template>
       </alex-custom-dialog-footer>
-    </v-form>
+    </template>
   </alex-custom-dialog>
 </template>
 
@@ -78,62 +103,47 @@ import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 
 interface ScheduleProps {
   modelValue: boolean;
-  data?: MeetingPropsType | null;
-  endDate?: Date | string;
   startDate?: Date | string;
+  endDate?: Date | string;
+  classes?: LearningClass[];
 }
-
-const props = withDefaults(defineProps<ScheduleProps>(), {
-  modelValue: undefined,
-  data: undefined,
-  endDate: undefined,
-  startDate: undefined,
-});
-
-const emit = defineEmits(['update:modelValue', 'update:data', 'submit']);
+const {
+  startDate = undefined,
+  endDate = undefined,
+  classes = [],
+} = defineProps<ScheduleProps>();
+const emit = defineEmits(['update:data', 'submit']);
 const { scheduleRules } = useFormRules();
-const value = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
+const value = defineModel<boolean>({ required: true });
+const data = defineModel<MeetingPropsType | null>('data');
 const rules = computed(() => {
-  const startDate = props.startDate
-    ? new Date(props.startDate.toString().replace(/-/g, '/'))
+  const startDateValue = startDate
+    ? new Date(startDate.toString().replaceAll(/-/g, '/'))
     : new Date();
-  const endDate = props.endDate
-    ? new Date(props.endDate.toString().replace(/-/g, '/'))
+  const endDateValue = endDate
+    ? new Date(endDate.toString().replaceAll(/-/g, '/'))
     : new Date();
-  endDate.setUTCHours(23, 59, 59, 59);
-  startDate.setHours(0, 0, 0, 0);
-  return scheduleRules(startDate, endDate);
-});
-const data = computed({
-  get() {
-    return props.data;
-  },
-  set(value) {
-    emit('update:data', value);
-  },
+  startDateValue.setUTCHours(0, 0, 0, 0);
+  endDateValue.setHours(23, 59, 59, 59);
+  return scheduleRules(startDateValue, endDateValue);
 });
 
-const { handleSubmit, handleReset, setFieldValue } = useForm({
+const { handleSubmit, handleReset, setFieldValue, values } = useForm({
   validationSchema: rules.value,
   initialValues: {
     interval: data.value?.interval || 0,
     date: data.value?.date,
     startHour: data.value?.startHour || '',
     endHour: data.value?.endHour || '',
+    type: 'online',
+    local: 'presencial',
+    link: 'online',
   },
 });
-
 const meetingDate = ref(data.value?.date);
 const submit = handleSubmit((values) => {
-  emit('submit', { ...values, id: props.data?.id });
-  emit('update:modelValue', false);
+  emit('submit', { ...values, id: data.value?.id });
+  value.value = false;
 });
 
 const disablePastDates = (date: Date) => {
@@ -173,4 +183,3 @@ watch(data, (value) => {
   }
 });
 </script>
-<style scoped lang="scss"></style>
