@@ -108,6 +108,7 @@
     </template>
     <template #step4>
       <alex-learningplan-dialogs-create-class-schedule-manager
+        v-model="classes"
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
         :title="$t('components.courses.meeting.course.title')"
         :subtitle="$t('components.courses.meeting.course.subtitle')"
@@ -130,16 +131,19 @@
             }}</alex-custom-button
           >
         </template>
+        <!-- new Date(schedule.date.toString().replaceAll('-', '/')) -->
         <template #items>
           <div class="d-flex flex-column mt-4 gap-2">
-            <course-meeting
+            <alex-learningplan-meeting
               v-for="schedule in schedules"
               :key="schedule.id"
+              variant="editing"
+              type="onsite"
+              local="Casa do caralho"
               :interval="schedule.interval"
-              :date="new Date(schedule.date.toString().replaceAll('-', '/'))"
+              :date="schedule.date"
               :start-hour="schedule.startHour"
               :end-hour="schedule.endHour"
-              :variant="'editing'"
               :dropdown-props="[
                 {
                   onClick: () => {
@@ -165,7 +169,7 @@
 </template>
 
 <script setup lang="ts">
-import { MeetingPropsType } from '@/components/CourseMeeting.vue';
+import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
