@@ -4,6 +4,7 @@
     :color="color"
     :direction="direction"
     :loading="loading"
+    :show-arrows="showArrows"
   >
     <v-tab
       v-for="tab in tabs"
@@ -53,6 +54,10 @@ const props = defineProps({
     default: false,
   },
   loading: {
+    type: Boolean,
+    default: false,
+  },
+  showArrows: {
     type: Boolean,
     default: false,
   },
