@@ -1,5 +1,5 @@
 <template>
-  <div class="alex-autocomplete" :class="$attrs.class">
+  <div class="alex-combobox" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
       <p class="text-body-1" :class="`text-${textColor}`">
@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { YupSchema, useField } from 'vee-validate';
 
-interface AutoCompleteProps {
+interface ComboboxProps {
   name: string;
   label?: string;
   required?: boolean;
@@ -60,7 +60,7 @@ interface AutoCompleteProps {
   schema?: YupSchema;
 }
 
-const props = withDefaults(defineProps<AutoCompleteProps>(), {
+const props = withDefaults(defineProps<ComboboxProps>(), {
   search: undefined,
   disabled: false,
   theme: 'light',
@@ -84,7 +84,7 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
-.alex-autocomplete {
+.alex-combobox {
   .v-theme--mainTheme {
     --v-border-opacity: 1 !important;
     --v-high-emphasis-opacity: 1 !important;

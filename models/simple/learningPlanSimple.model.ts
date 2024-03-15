@@ -38,4 +38,9 @@ export interface LearningPlanSimple {
   schedules: LearningPlanScheduleSimple[];
   hidden: boolean;
   classes: ClassSimple[];
+  facilitatorName?: string;
+  facilitatorImage?: string;
+  institution?: string;
+  trails?: number;
+  userIsFacilitator?: boolean;
 }

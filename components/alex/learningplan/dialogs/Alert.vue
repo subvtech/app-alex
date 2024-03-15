@@ -2,11 +2,11 @@
   <alex-custom-dialog
     v-model="value"
     title=""
-    :width="520"
+    :max-width="520"
     no-footer
-    body-classes="rounded-t-lg pa-6"
+    no-header
+    body-classes="rounded-t-lg"
   >
-    <template #header></template>
     <template #default>
       <div
         class="d-flex flex-column w-100 align-center bg-white py-10 px-6 rounded-t-lg gap-4"
@@ -18,11 +18,18 @@
             :alt="image.alt"
             :width="image.width"
             :height="image.height"
+            :class="imageClass"
           />
         </span>
-        <div class="d-flex flex-column gap-4 align-center text-center">
-          <h4 class="text-h4 text-gray-800">{{ title }}</h4>
-          <p class="text-body-1 text-gray-600">{{ subtitle }}</p>
+        <div class="align-center text-center" style="max-width: 310px">
+          <h4 class="text-h4 text-gray-800 mb-4">{{ title }}</h4>
+          <p
+            class="text-body-1 text-gray-600"
+            style="overflow-wrap: break-word"
+          >
+            {{ subtitle }}
+            <slot name="subtitle"></slot>
+          </p>
         </div>
         <div class="d-flex flex-start w-100">
           <label for="exclusionLabel" class="text-body-1 text-gray-600">
@@ -65,6 +72,7 @@
         /></template>
         <template #secondarySlotButton
           ><alex-custom-button
+            v-if="!hideCancelButton"
             size="large"
             :text="$t('components.courses.settings.meetings.delete.cancel')"
             variant="secondary"
@@ -86,15 +94,17 @@ interface AlertDialogProps {
   modelValue: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
   title: string;
-  subtitle: string;
+  subtitle?: string;
   image?: { src: string; width?: number; height?: number; alt?: string };
   submitButtonText: string;
   inputWordConfirmation?: string;
   inputLabelConfirmation?: string;
   inputPlaceholderConfirmation?: string;
+  hideCancelButton?: boolean;
   noInputConfirmation?: boolean;
   loading?: boolean;
   errorMessageText?: string;
+  imageClass?: string;
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
   noInputConfirmation: true,
@@ -105,6 +115,9 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
   inputPlaceholderConfirmation: undefined,
   loading: false,
   errorMessageText: undefined,
+  hideCancelButton: false,
+  subtitle: '',
+  imageClass: '',
 });
 const inputValue = ref('');
 

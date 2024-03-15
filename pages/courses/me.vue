@@ -119,7 +119,7 @@
                 type="course"
                 class="w-100"
                 :title="course.raw.title"
-                :options="professorMode"
+                :options="course.raw.userIsFacilitator"
                 :description="course.raw.description"
                 :image="{
                   url: course.raw.cover_image?.url,
@@ -177,7 +177,7 @@
                   <td class="text-overflow" style="max-width: 90px">
                     {{ (item as any).trails }}
                   </td>
-                  <td v-if="professorMode">
+                  <td v-if="(item as any).userIsFacilitator">
                     <alex-custom-dropdown
                       :items="
                         dropdownItems(
@@ -240,7 +240,6 @@ const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
-const professorMode = ref(false);
 const isLoading = ref(false);
 const { t } = useI18n();
 
@@ -264,18 +263,25 @@ interface LearningPlan {
   learning_structures?: any;
 }
 
-const courses = ref<LearningPlan[]>([]);
-const { isProfessor, id } = useStrapiUser<User>().value;
-professorMode.value = isProfessor;
+const courses = ref<LearningPlanSimple[]>([]);
+const user = useStrapiUser<User>();
+
+const professorMode = computed(
+  () => user.value.role.type === UserRoles.PROFESSOR,
+);
+
 const queryConfig = {
   filters: {
     members: {
-      $and: [{ user: { id: { $eq: id } } }, { status: { $eq: 'joined' } }],
+      $and: [
+        { user: { id: { $eq: user.value.id } } },
+        { status: { $eq: 'joined' } },
+      ],
     },
     $or: [
       {
         members: {
-          user: { id: { $eq: id } },
+          user: { id: { $eq: user.value.id } },
           role: { $ne: 'student' },
         },
       },
@@ -310,29 +316,30 @@ const getCourses = async () => {
     });
   }
   isLoading.value = true;
-  const getCourses = await find<LearningPlan>('learningplans', queryConfig);
+  const getCourses = await find<LearningPlanSimple>(
+    'learningplans',
+    queryConfig,
+  );
   courses.value = [];
   getCourses.data.forEach((course) => {
-    const facilitator = course.members[0].user;
+    const facilitator = course.members.find(
+      (m) => m.role === MemberRoles.FACILITATOR,
+    )?.user;
+
     const tags = course.tags?.map((tag) => tag);
     const trails =
       course.learning_structures?.find(
         (structure) => structure.type === 'standard',
       )?.trails?.length || 0;
-    courses.value.push({
-      id: course.id,
-      title: course.title,
-      description: course.description,
-      start_date: course.start_date,
-      end_date: course.end_date,
-      cover_image: course.cover_image,
-      hidden: course.hidden,
-      facilitatorName: facilitator.fullname,
-      facilitatorImage: facilitator.avatar?.url,
-      institution: facilitator.institutions?.[0]?.name,
-      tags,
-      trails,
-    });
+
+    course.facilitatorImage = facilitator?.avatar?.url;
+    course.facilitatorName = facilitator?.fullname;
+    course.institution = facilitator?.institutions?.[0]?.name;
+    course.tags = tags;
+    course.trails = trails;
+    course.userIsFacilitator = facilitator?.id === user.value.id;
+
+    courses.value.push(course);
   });
   isLoading.value = false;
 };
