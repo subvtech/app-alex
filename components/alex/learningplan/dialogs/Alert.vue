@@ -54,7 +54,9 @@
             :text="submitButtonText"
             :variant="variant"
             :loading="loading"
-            :disabled="inputValue !== inputWordConfirmation"
+            :disabled="
+              inputValue !== inputWordConfirmation && !noInputConfirmation
+            "
             @click="
               () => {
                 $emit('submit');
