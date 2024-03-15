@@ -25,7 +25,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['verb'],
     },
     groups: {
-      populate: ['group_members.group_members.group_members.avatar'],
+      populate: ['group_members.student_member.user.avatar'],
     },
     learning_structures: {
       populate: {
@@ -39,7 +39,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: [
         'in_charge_member.user.avatar',
         'learning_plan_members.user.avatar',
-        'learning_plan_groups.group_members.group_members.group_members.avatar',
+        'learning_plan_groups.group_members.student_member.user.avatar',
       ],
     },
     tags: true,

@@ -271,6 +271,7 @@ const selectedGroupMembers = ref<LearningPlanMemberSimple[]>([]);
 const ignoreUserIds = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.user?.id) || [];
 });
+
 const ignoreUserEmails = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
 });
@@ -289,6 +290,7 @@ function removeSelectedGroupMember(id: number) {
     (member) => member.id !== id,
   );
 }
+
 async function onClickSendInvites() {
   if (!usersToInvite.value.length) {
     return;
@@ -315,6 +317,7 @@ async function onClickSendInvites() {
     sendingInvites.value = false;
   }
 }
+
 async function onCreateGroup() {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -353,6 +356,7 @@ async function onCreateGroup() {
     creatingGroup.value = false;
   }
 }
+
 async function onDeleteGroup(id: number) {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -368,6 +372,7 @@ async function onDeleteGroup(id: number) {
     dialogConfirmDeleteGroup.value = false;
   }
 }
+
 async function onUpdateGroup(id: number) {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -404,6 +409,7 @@ async function onUpdateGroup(id: number) {
     setMessage('Erro ao atualizar o grupo!', 'red', true);
   }
 }
+
 function setUpdatedValues(
   id: number,
   title: string,
@@ -431,20 +437,24 @@ function setUpdatedValues(
   selectedInChargeGroupMember.value = selectedLeader;
   formAddGroup.setFieldValue('leader', selectedLeader);
 }
+
 function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
   return (
     groupMembers?.map((groupMember) => {
       return {
         name: groupMember.student_member?.user?.fullname || '',
-        image: {
-          url: groupMember.student_member?.user?.avatar?.url || '',
-          alt: groupMember.student_member?.user?.avatar?.name || '',
-        },
+        image: groupMember.student_member?.user?.avatar
+          ? {
+              url: groupMember.student_member?.user?.avatar?.url || '',
+              alt: groupMember.student_member?.user?.avatar?.name || '',
+            }
+          : undefined,
         role: groupMember.role,
       };
     }) || []
   );
 }
+
 async function onResendInvite(member: LearningPlanMemberSimple) {
   try {
     resendingInviteMemberId.value = member.id;
@@ -455,6 +465,7 @@ async function onResendInvite(member: LearningPlanMemberSimple) {
       duration: 259200,
       emails_to_send: member.email,
       role: member.role,
+      learninng_class: classStore.classId,
     };
 
     await strapi.create('invitation-links', data);
@@ -465,6 +476,7 @@ async function onResendInvite(member: LearningPlanMemberSimple) {
     resendingInviteMember.value = false;
   }
 }
+
 async function onDeleteParticipant(id: number) {
   try {
     removingMember.value = true;
@@ -482,16 +494,19 @@ async function onDeleteParticipant(id: number) {
     confirmDeleteMember.value = false;
   }
 }
+
 function deleteParticipant(id: number) {
   removingMemberId.value = id;
   confirmDeleteMember.value = true;
 }
+
 function searchGroupMembers(_itemTitle: string, queryText: string, item: any) {
   return (
     item.raw.user.fullname.toLowerCase().includes(queryText) ||
     item.raw.user.email.toLowerCase().includes(queryText)
   );
 }
+
 function filterMembersByRole(
   role: keyof typeof learningPlanGroupMemberRolesSimple,
   members?: LearningPlanGroupMemberSimple[],
@@ -500,6 +515,7 @@ function filterMembersByRole(
     (member) => member.role === learningPlanGroupMemberRolesSimple[role],
   );
 }
+
 function openGroupCard(item: any) {
   dialogShowGroup.value = true;
   showValuesGroup.value = {
@@ -507,11 +523,14 @@ function openGroupCard(item: any) {
     members: item.group_members,
   };
 }
+
 function deleteGroupCard(id: number) {
   removingGroupId.value = id;
   dialogConfirmDeleteGroup.value = true;
 }
+
 onBeforeMount(() => (headerStore.showHeader = true));
+
 watch(
   () => learningPlanStore.loading,
   () => {
