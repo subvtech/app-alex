@@ -4,6 +4,12 @@
   "searchPlaceholder": "Buscar...",
   "viewModeTooltip": "Alterar Visualização",
   "filterTooltip": "Filtrar",
+  "editClass": "Editar Turma",
+  "removeClass": "Excluir Turma",
+  "cardTitle": "Turmas",
+  "emptyClasses": "Parece que ainda na há turmas criadas!",
+  "findClasses": "Encontrar turma",
+  "createClass": "Criar turma",
   "tableHeaders": {
     "course": "Curso",
     "description": "Descrição",

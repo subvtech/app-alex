@@ -1,4 +1,5 @@
 import { InvitationLinkSimple } from './InvitationLinkSimple.model';
+import { ClassSimple } from './classSimple.model';
 
 const LearningPlanType = {
   COURSE: 'course',
@@ -36,4 +37,5 @@ export interface LearningPlanSimple {
   learning_goals: any;
   schedules: LearningPlanScheduleSimple[];
   hidden: boolean;
+  classes: ClassSimple[];
 }
