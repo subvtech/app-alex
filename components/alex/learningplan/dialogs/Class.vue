@@ -103,11 +103,10 @@ const { handleSubmit, setValues } = useForm({
 });
 const onSubmit = handleSubmit(({ className, responsible }) => {
   const membersValue = JSON.parse(JSON.stringify(members.value));
-  const id = data.value?.id || Math.round(Math.random() * 12_345_68);
   emit('submit', {
-    id,
-    className,
-    responsible,
+    name: className,
+    in_charge_member: responsible,
+    schedules: [],
     members: membersValue,
   });
   modal.value = false;

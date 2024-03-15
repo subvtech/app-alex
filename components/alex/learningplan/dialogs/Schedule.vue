@@ -1,6 +1,6 @@
 <template>
   <alex-custom-dialog
-    v-model="value"
+    v-model="modal"
     activator="parent"
     :title="
       $t(
@@ -13,24 +13,29 @@
   >
     <v-form @reset="handleReset">
       <div class="pa-6">
-        <alex-inputs-autocomplete
-          name="class"
+        <alex-inputs-select
+          name="className"
           label="Turma"
           density="comfortable"
           required
           :items="classes"
+          placeholder="Selecione a turma para o encontro"
+          item-title="name"
+          item-value="name"
         />
         <alex-inputs-select
           name="type"
           label="Tipo do encontro"
           density="comfortable"
           required
+          placeholder="Selecione o tipo do encontro"
           :items="['online', 'presencial']"
         />
         <alex-inputs-select
           name="interval"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
           :items="items"
+          placeholder="Selecione a frequência do encontro"
           density="comfortable"
           required
         />
@@ -40,6 +45,9 @@
             values.type === 'online' ? 'Link do encontro' : 'Local do encontro'
           "
           density="comfortable"
+          :placeholder="`Digite o ${
+            values.type === 'online' ? 'link de acesso' : 'endereço'
+          } do encontro`"
           required
         />
         <alex-inputs-date
@@ -89,7 +97,7 @@
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
-            @click="value = false"
+            @click="modal = false"
           />
         </template>
       </alex-custom-dialog-footer>
@@ -112,9 +120,9 @@ const {
   endDate = undefined,
   classes = [],
 } = defineProps<ScheduleProps>();
-const emit = defineEmits(['update:data', 'submit']);
+const emit = defineEmits(['update', 'create']);
 const { scheduleRules } = useFormRules();
-const value = defineModel<boolean>({ required: true });
+const modal = defineModel<boolean>({ required: true });
 const data = defineModel<MeetingPropsType | null>('data');
 const rules = computed(() => {
   const startDateValue = startDate
@@ -128,22 +136,30 @@ const rules = computed(() => {
   return scheduleRules(startDateValue, endDateValue);
 });
 
-const { handleSubmit, handleReset, setFieldValue, values } = useForm({
-  validationSchema: rules.value,
-  initialValues: {
-    interval: data.value?.interval || 0,
-    date: data.value?.date,
-    startHour: data.value?.startHour || '',
-    endHour: data.value?.endHour || '',
-    type: 'online',
-    local: 'presencial',
-    link: 'online',
+const { handleSubmit, setValues, values, handleReset, useFieldModel } = useForm(
+  {
+    validationSchema: rules.value,
+    initialValues: {
+      interval: data.value?.interval || 0,
+      date: data.value?.date,
+      startHour: data.value?.startHour,
+      endHour: data.value?.endHour,
+      type: data.value?.type || 'online',
+      local: data.value?.local,
+      link: data.value?.link,
+    },
+    keepValuesOnUnmount: false,
   },
-});
-const meetingDate = ref(data.value?.date);
+);
+const meetingDate = useFieldModel('date');
 const submit = handleSubmit((values) => {
-  emit('submit', { ...values, id: data.value?.id });
-  value.value = false;
+  if (!data.value) {
+    const newId = Math.round(Math.random() * 12_345_68);
+    emit('create', { ...values, id: newId });
+  } else {
+    emit('update', { ...values, id: data.value?.id });
+  }
+  modal.value = false;
 });
 
 const disablePastDates = (date: Date) => {
@@ -152,11 +168,7 @@ const disablePastDates = (date: Date) => {
   const parsedDate = new Date(date);
   return parsedDate >= today;
 };
-
-const items: {
-  title: string;
-  value: number;
-}[] = [
+const items = [
   { title: 'Não se repete', value: 0 },
   { title: 'Diário', value: 1 },
   { title: 'Semanal', value: 7 },
@@ -164,22 +176,42 @@ const items: {
   { title: 'Mensal', value: 30 },
 ];
 
-watch(value, () => {
-  if (!value.value) {
-    emit('update:data', null);
-    meetingDate.value = undefined;
-    handleReset();
-    setFieldValue('interval', 0);
-  }
+// const linkLocalField = {
+//   link: {
+//     name: 'link',
+//     label: 'Link do encontro',
+//     placehoder: 'Digite o Link de acesso do encontro',
+//   },
+//   local: {
+//     name: 'local',
+//     label: 'Local do encontro',
+//     placehoder: 'Digite o endereço do encontro',
+//   },
+// };
+onUnmounted(() => {
+  data.value = null;
+  setValues({
+    interval: 0,
+    type: 'online',
+  });
 });
 
-watch(data, (value) => {
-  if (value) {
-    setFieldValue('interval', value.interval);
-    setFieldValue('startHour', value.startHour);
-    setFieldValue('endHour', value.endHour);
-    setFieldValue('date', value.date);
-    meetingDate.value = value.date;
+onMounted(() => {
+  if (data) {
+    setValues({
+      interval: data.value?.interval,
+      startHour: data.value?.startHour,
+      endHour: data.value?.endHour,
+      date: data.value?.date,
+      type: data.value?.type,
+      local: data.value?.local,
+      link: data.value?.link,
+    });
+    return;
   }
+  setValues({
+    interval: 0,
+    type: 'online',
+  });
 });
 </script>

@@ -6,7 +6,7 @@
       </p>
       <slot
         name="action-button"
-        :click-action-button="clickActionButton"
+        :on-action-button="onActionButton"
         :on-submit="onSubmit"
       />
     </div>
@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends { id: number }">
+<script setup lang="ts" generic="T extends Partial<LearningClass>">
 type ClassScheduleProps = {
   titleHeader: string;
   title: string;
@@ -41,18 +41,27 @@ type ClassScheduleProps = {
 const { showItens = false } = defineProps<ClassScheduleProps>();
 const data = defineModel<T | null>('data');
 const model = defineModel<T[]>({ required: true });
-const clickActionButton = () => {
+const onActionButton = () => {
   data.value = null;
 };
 const onSubmit = (value: T) => {
+  const alreadyHasName = model.value.some((item) => item.name === value.name);
+  if (alreadyHasName) return;
+  // @ts-ignore // FIXME: corrigir tipagem
+  const newItem: T = {
+    name: value.name,
+    meeting_schedules: value.meeting_schedules || [],
+    in_charge_member: value.in_charge_member,
+    learning_plan_members: value.learning_plan_members || [],
+  };
   if (!data.value) {
     data.value = null;
-    model.value.push(value);
+    model.value = [...model.value, newItem];
     return;
   }
   const updatedData = model.value.map((item) => {
-    if (item.id === value.id) {
-      return value;
+    if (item.name === value.name) {
+      return newItem;
     }
     return item;
   });

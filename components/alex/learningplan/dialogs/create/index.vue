@@ -82,11 +82,11 @@
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
         :show-itens="!!classes.length"
       >
-        <template #action-button="{ clickActionButton, onSubmit }">
+        <template #action-button="{ onActionButton, onSubmit }">
           <alex-custom-button
             append-icon="mdi-plus"
             variant="secondary"
-            @click="clickActionButton"
+            @click="onActionButton"
           >
             <alex-learningplan-dialogs-class
               v-model:data="classData"
@@ -112,56 +112,26 @@
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
         :title="$t('components.courses.meeting.course.title')"
         :subtitle="$t('components.courses.meeting.course.subtitle')"
-        :show-itens="!!schedules.length"
-        :img="'/images/schedule-empty.svg'"
+        :show-itens="!!hasSchedules"
+        img="/images/schedule-empty.svg"
       >
         <template #action-button>
           <alex-custom-button append-icon="mdi-plus" variant="secondary"
             ><alex-learningplan-dialogs-schedule
               v-model="createScheduleModal"
               v-model:data="editData"
+              :classes="classes"
               :end-date="endDate"
               :start-date="startDate"
-              @submit="
-                (values) =>
-                  !editData ? addMeeting(values) : editMeeting(values)
-              "
+              @create="addMeeting"
             />{{
               $t('components.learningPlan.dialogs.syncMeetings')
             }}</alex-custom-button
           >
         </template>
-        <!-- new Date(schedule.date.toString().replaceAll('-', '/')) -->
         <template #items>
           <div class="d-flex flex-column mt-4 gap-2">
-            <alex-learningplan-meeting
-              v-for="schedule in schedules"
-              :id="schedule.id"
-              :key="schedule.id"
-              variant="editing"
-              type="onsite"
-              local="Casa do caralho"
-              :interval="schedule.interval"
-              :date="schedule.date"
-              :start-hour="schedule.startHour"
-              :end-hour="schedule.endHour"
-              :dropdown-props="[
-                {
-                  onClick: () => {
-                    editData = schedule;
-                    createScheduleModal = true;
-                  },
-                  text: 'Editar',
-                  icon: 'mdi-pencil',
-                },
-                {
-                  onClick: () => schedule.id && removeSelf(schedule.id),
-                  text: 'Apagar',
-                  icon: 'mdi-trash-can-outline',
-                  warning: true,
-                },
-              ]"
-            />
+            <alex-learningplan-class-meetings :classes="classes" />
           </div>
         </template>
       </alex-learningplan-dialogs-create-class-schedule-manager>
@@ -205,13 +175,12 @@ const startDate = ref<string>();
 const endDate = ref<string>();
 const slides = ref<any>([]);
 const classData = ref(null);
-const classes = ref<any>([]);
+const classes = ref<LearningClass[]>([]);
 const classModal = ref(false);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
 const selectedUsers = ref([]);
-const schedules = ref<MeetingPropsType[]>([]);
 const editData = ref<MeetingPropsType | null>(null);
 const carousel = ref<{ clearSlides: () => unknown } | null>(null);
 const slugFormated = computed(() =>
@@ -226,29 +195,45 @@ const disablePastDates = (date: Date) => {
   const parsedDate = new Date(date);
   return parsedDate >= today;
 };
+const hasSchedules = computed(() =>
+  classes.value.some((item) => item.meeting_schedules.length),
+);
 
-const removeSelf = (id: number) => {
-  schedules.value = schedules.value.filter((item) => item.id !== id);
+// const removeSelf = (id: number) => {
+//   schedules.value = schedules.value.filter((item) => item.id !== id);
+// };
+
+// const editMeeting = (values: MeetingPropsType) => {
+//   const updatedSchedules = schedules.value.map((meeting) => {
+//     if (meeting.id === values.id) {
+//       return { ...meeting, ...values };
+//     }
+//     return meeting;
+//   });
+//   classes.value = updatedSchedules;
+// };
+type ReturnMeeting = Omit<
+  LearningPlanScheduleSimple,
+  'learningplan' | 'meetings' | 'learningplan_class'
+> & {
+  className: string;
 };
-
-const editMeeting = (values: MeetingPropsType) => {
-  const updatedSchedules = schedules.value.map((meeting) => {
-    if (meeting.id === values.id) {
-      return { ...meeting, ...values };
+const addMeeting = (values: ReturnMeeting) => {
+  classes.value = classes.value.map((classValue) => {
+    if (classValue.name === values.className) {
+      const newItem = {
+        ...classValue,
+        meeting_schedules: [...classValue.meeting_schedules, values],
+      };
+      console.log('item', newItem);
+      return newItem;
     }
-    return meeting;
-  });
-  schedules.value = updatedSchedules;
-};
-const addMeeting = (values: MeetingPropsType) => {
-  schedules.value.push({
-    ...values,
-    id: Number.parseInt((Math.random() * 10000000000).toString()),
+    return classValue;
   });
 };
 
 const cleanFields = () => {
-  schedules.value = [];
+  classes.value = [];
   classData.value = null;
   classes.value = [];
   slides.value = [];
@@ -275,9 +260,10 @@ const createCourse = async () => {
       invitation_duration: 3600,
       members: selectedUsers.value,
       class_name: slug.value,
-      schedules: schedules.value,
+      classes: classes.value,
     });
     slides.value.map((item) =>
+      // @ts-ignore
       create('medias', { ...item, learningplan: courseData.data.id }),
     );
     emit('submit');
@@ -304,7 +290,7 @@ watch(
     }
   },
 );
-watch(schedules, (value) => {
-  console.log(value);
+watch(classes, () => {
+  console.log(classes.value);
 });
 </script>
