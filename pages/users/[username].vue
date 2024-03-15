@@ -11,7 +11,7 @@
 
     <alex-custom-breadcrumbs
       v-else
-      :title="$t('pages.profile.learningPlans')"
+      :title="$t('pages.profile.title2')"
       :items="breadCrumbs"
     />
 
@@ -24,7 +24,7 @@
       can-delete
       show-menu
       settings-menu
-      show-settings
+      :show-settings="isCurrentUser"
       :settings="settingsTab"
       show-profile-picture
       show-role
@@ -97,7 +97,11 @@ await fetchData();
 
 const breadCrumbs = [
   { disabled: false, title: i18n.t('pages.profile.home'), href: '/' },
-  { disabled: false, title: i18n.t('pages.profile.learningPlans'), href: '/' },
+  {
+    disabled: false,
+    title: user.value?.username || i18n.t('pages.profile.title2'),
+    href: `/users/${user.value?.username}`,
+  },
 ];
 
 const links = computed<TabType[]>(() => {

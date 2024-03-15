@@ -244,6 +244,7 @@ const { coverPicture, fullname, username, canEdit, userId } = toRefs(props);
 const selectedOption = toRef(props.selectedOption);
 const onSelectSettings = (to?: string) => {
   emit('select:option', null);
+  selectedOption.value = null;
   navigateTo(to);
 };
 const cover = ref<Partial<Upload> | null | undefined>(props.coverPicture);

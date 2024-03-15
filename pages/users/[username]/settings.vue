@@ -1,5 +1,8 @@
 <template>
-  <div v-if="user" class="d-flex flex-column flex-md-row gap-6 w-100">
+  <div
+    v-if="user && isCurrentUser"
+    class="d-flex flex-column flex-md-row gap-6 w-100"
+  >
     <alex-profile-settings-basic-info
       v-model:cpf="user.cpf"
       v-model:phone="user.phone"
@@ -36,8 +39,11 @@ definePageMeta({
   middleware: 'auth',
 });
 
+const router = useRouter();
 const userStore = useUserStore();
-const { user } = toRefs(userStore);
+const { user, isCurrentUser } = toRefs(userStore);
+
+if (!isCurrentUser.value) router.push(`/users/${user.value?.username}`);
 const { id } = useStrapiUser<User>().value;
 </script>
 

@@ -98,7 +98,7 @@ const props = withDefaults(defineProps<AppUserAvatarComponentType>(), {
   profilePicture: null,
 });
 
-const avatar = computed<{ url: string; id: number } | null | undefined>(() =>
+const avatar = computed<ProfilePictureItemType | null | undefined>(() =>
   props.trackCurrentUser && userStore.user
     ? userStore.user?.avatar
     : props.profilePicture,

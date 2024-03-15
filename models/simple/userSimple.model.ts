@@ -1,4 +1,6 @@
-import { UserRoles } from '../user.model';
+import { UserRoles } from '@/models/user.model';
+import { InstitutionsType } from '@/models/institution.model';
+import { Upload } from '@/models/upload.model';
 
 export interface UserSimple {
   id: number;
