@@ -12,7 +12,7 @@ export const i18n = {
         toggler: {
           'Click to tune': 'Clique para ajustar',
           'or drag to move': 'ou puxe para mover',
-          'Anchor': 'Âncora'
+          Anchor: 'Âncora',
         },
       },
       inlineToolbar: {
@@ -46,10 +46,13 @@ export const i18n = {
       'Raw HTML': 'HTML Puro',
       Table: 'Tabela',
       Link: 'Link',
+      Hyperlink: 'Link',
       Marker: 'Marcador',
       Bold: 'Negrito',
       Italic: 'Itálico',
       InlineCode: 'Código Inline',
+      Attachment: 'Anexo',
+      'AI TEXT (experimental)': 'Texto IA',
     },
 
     /**
@@ -92,7 +95,7 @@ export const i18n = {
        * Also, there are few internal block tunes: "delete", "moveUp" and "moveDown"
        */
       delete: {
-        'Delete': 'Deletar',
+        Delete: 'Deletar',
       },
       moveUp: {
         'Move up': 'Acima',
@@ -110,9 +113,9 @@ export const i18n = {
       },
       list: {
         'Ordered': 'Ordenada',
-        'Unordered': 'Desordenada',
+        Unordered: 'Desordenada',
       },
-      image: {
+      Image: {
         'Select an Image': 'Selecione uma Imagem',
         'With border': 'Com borda',
         'With background': 'Com plano de fundo',
