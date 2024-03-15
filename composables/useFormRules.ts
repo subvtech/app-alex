@@ -158,8 +158,8 @@ export const useFormRules = () => {
     endDate: endDateRules,
     title: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
     slug: yup
@@ -173,8 +173,8 @@ export const useFormRules = () => {
   const generalTrailSchema = yup.object({
     title: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
     ...descriptionRules,
