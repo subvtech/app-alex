@@ -79,6 +79,7 @@
               :key="item.raw.title + index"
               :hide="item.raw.hidden"
               :name="item.raw.title"
+              :can-edit="learningPlanStore.userIsFacilitator"
               :description="item.raw.description"
               :image="{
                 url: item.raw?.cover_image?.url,
