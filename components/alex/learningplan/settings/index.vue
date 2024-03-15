@@ -44,7 +44,7 @@
           outline
           @update="updateVisibility"
         />
-        <alex-learningplan-settings-delete outline @update="removeCourse" />
+        <alex-learningplan-settings-delete @update="removeCourse" />
       </div>
     </template>
   </alex-custom-card>
@@ -64,7 +64,6 @@ const myIdentifier = ref('');
 const accessUrl = computed(() => {
   return `${window.location.origin}/courses/${id}`;
 });
-
 
 const learningPlanStore = useLearningPlanStore();
 const fetchData = async () => {
