@@ -40,9 +40,8 @@
       show-picture
       @click="onClickOutside"
     />
-
     <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container class="pa-4 pa-sm-6 overflow-hidden max-width-100">
+      <v-container class="pa-4 pa-sm-6 max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
