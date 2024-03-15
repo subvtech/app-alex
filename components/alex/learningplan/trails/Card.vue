@@ -206,8 +206,8 @@ const listBlocks = computed(() => {
   if (blocksInfo.value) {
     for (const [key, value] of Object.entries(blocksInfo.value)) {
       stringBlocks += `${value} ${t(
-        `components.learningPlan.cardTrails.${key}`,
-      )}${isPlural(value)}; `;
+        `components.learningPlan.cardTrails.${key + isPlural(value)}`,
+      )}; `;
     }
   }
   return stringBlocks;
