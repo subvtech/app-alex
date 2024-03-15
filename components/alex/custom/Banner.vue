@@ -107,11 +107,12 @@
       :is-professor="isProfessor"
       @display:settings="emit('display:settings')"
     />
-    <div class="d-flex justify-space-between align-center px-6">
+    <div class="d-sm-flex justify-space-between align-center px-sm-6">
       <div class="d-flex">
         <alex-custom-tabs
           v-if="showMenu"
           v-model="selectedOption"
+          show-arrows
           :mandatory="false"
           :tabs="links"
           @update:model-value="emit('select:option', selectedOption)"
@@ -119,6 +120,7 @@
       </div>
       <alex-custom-button
         v-if="showMenu && showSettings"
+        class="pl-6"
         variant="text"
         :icon="settingsIcon"
         :color="isSettingsRoute ? 'secondary-0' : undefined"
