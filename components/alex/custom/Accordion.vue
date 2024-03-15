@@ -3,6 +3,7 @@
     variant="accordion"
     role="list"
     class="alex-accordion elevation-0"
+    :class="data.length === 1 && 'one-item'"
   >
     <transition-group name="list">
       <v-expansion-panel
@@ -226,7 +227,7 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
   border: 1px solid var(--color) !important;
   border-radius: 8px;
 }
-.v-expansion-panel {
-  border-radius: 8px;
+.one-item.v-expansion-panels--variant-accordion > :first-child {
+  border-radius: 6px !important;
 }
 </style>

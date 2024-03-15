@@ -16,7 +16,7 @@
           <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
             <template #content>
               <p
-                class="cursor-pointer ellipsis lines-1 w-100 text-decoration-none text-secondary-0"
+                class="cursor-pointer ellipsis break-word lines-1 w-100 text-decoration-none text-secondary-0"
                 @click="copyToClipboard(url)"
               >
                 {{ url }}
@@ -192,6 +192,9 @@ watch(theresTimeAndUrl, () => {
   border-radius: 8px;
   border: 1px solid var(--principais-secundria-secundria-1, #47d9eb);
   background: var(--principais-secundria-secundria-2, #d1f6fa);
+  .break-word {
+    word-break: break-all;
+  }
   &.dark {
     height: 48px !important;
     flex-grow: 1;

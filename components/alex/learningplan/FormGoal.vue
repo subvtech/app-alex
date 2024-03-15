@@ -1,24 +1,25 @@
 <template>
   <form class="d-flex flex-column gap-4">
     <alex-inputs-combobox
-      v-model:search="keyWord"
-      name="keyword"
-      clerable
+      name="verb"
       hide-details="auto"
       :label="$t('components.courses.goals.verb.title')"
       :placeholder="$t('components.courses.goals.verb.placeholder')"
-      :filtered-items="preDefinedVerbs"
+      :items="filteredItems"
+      item-title="text"
+      return-object
+      @update:model-value="handleKeyWord"
     />
-    <alex-inputs-text-field
+    <alex-inputs-text-area
       name="description"
       class="w-100"
-      clearable
       :placeholder="$t('components.courses.goals.description.placeholder')"
       :label="$t('components.courses.goals.description.title')"
       :class="[
         errors.description && 'error',
         !descriptionErrorOrKeywordError && 'success',
       ]"
+      @update:model-value="handleDescription"
     />
   </form>
 </template>
@@ -37,57 +38,61 @@ const { goalRules } = useFormRules();
 type FormGoalProps = {
   index: number;
   data: Goal[];
-  filteredItems: { text: string; id: number }[];
+  filteredItems?: LearningPlanGoalVerb[];
 };
-const props = defineProps<FormGoalProps>();
+const props = withDefaults(defineProps<FormGoalProps>(), {
+  filteredItems: () => [],
+});
 const { filteredItems } = toRefs(props);
 const currentData = computed(() => props.data[props.index]);
-const preDefinedVerbs = ref(
-  filteredItems.value.filter(
-    (item) => item.text !== currentData.value.contentData.keyWord,
-  ),
-);
-const { validateField, errors, setFieldValue, useFieldModel } = useForm({
+const { errors } = useForm({
   validateOnMount: true,
   initialValues: {
-    keyword: currentData.value.contentData.keyWord,
+    verb: currentData.value.contentData.verb.text,
     description: currentData.value.contentData.description,
   },
   validationSchema: goalRules,
 });
-
-const keyWord = useFieldModel('keyword');
-const descriptionRef = useFieldModel('description');
-const handleKeyWord = (value: string) => {
-  validateField('keyword');
-  setFieldValue('keyword', value);
+const handleKeyWord = (
+  value:
+    | string
+    | {
+        id?: number;
+        text: string;
+        general: boolean;
+      },
+) => {
+  const contentData = currentData.value.contentData;
+  if (typeof value !== 'string' && value) {
+    currentData.value.keyWord = value.text;
+    currentData.value.contentData = {
+      ...contentData,
+      verb: value,
+    };
+    return;
+  }
   currentData.value.keyWord = value;
   currentData.value.contentData = {
-    ...currentData.value.contentData,
-    keyWord: value,
+    ...contentData,
+    verb: {
+      text: value,
+      general: false,
+      id: contentData.verb?.id,
+    },
   };
 };
 const handleDescription = (value: string) => {
-  validateField('description');
-  setFieldValue('description', value);
   currentData.value.title = value;
   currentData.value.contentData = {
     ...currentData.value.contentData,
     description: value,
   };
 };
-watch(keyWord, (value) => {
-  handleKeyWord(value);
-});
-watch(descriptionRef, (value) => {
-  handleDescription(value);
-});
-
 const descriptionErrorOrKeywordError = computed(
-  () => errors.value.keyword || errors.value.description,
+  () => errors.value.verb || errors.value.description,
 );
 watch(errors, () => {
-  if (!errors.value.keyword && !errors.value.description) {
+  if (!errors.value.verb && !errors.value.description) {
     emit('success', {
       id: currentData.value.id,
       index: props.index,
@@ -96,7 +101,7 @@ watch(errors, () => {
     });
   }
 
-  if (errors.value.keyword) {
+  if (errors.value.verb) {
     emit('error:keyword', props.index);
   } else {
     emit('success:keyword', props.index);
