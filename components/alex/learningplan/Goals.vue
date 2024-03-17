@@ -16,13 +16,14 @@
   >
     <template #content>
       <alex-custom-empty-placeholder
-        v-if="localData.length === 0"
+        v-if="localData.length === 0 && !isEditing"
         class="align-self-center"
         :empty-text-message="$t('components.courses.goals.empty')"
         empty-text-image="/svg/EmptyGoals.svg"
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion
+          v-if="localData.length > 0"
           v-model="selectedPanel"
           v-model:data="localData"
           show-positions
@@ -40,9 +41,10 @@
             /> </template
         ></alex-custom-accordion>
         <alex-custom-button
-          class="add-button"
+          class="add-button w-100 mt-5"
           prepend-icon="mdi-plus"
           variant="text"
+          size="large"
           @click="addGoal"
         >
           {{ $t('components.courses.goals.add') }}</alex-custom-button
@@ -109,9 +111,16 @@ const toggleEditing = () => {
     setLastGoals();
   }
 };
+
+const isEmpty = (value: string) => value.trim().length === 0;
+
 const toggleSave = () => {
   const errorFound = localData.value.find(
-    (item) => item.errorDescription || item.errorKeyWord,
+    (item) =>
+      item.errorDescription ||
+      item.errorKeyWord ||
+      isEmpty(item.contentData.description) ||
+      isEmpty(item.contentData.keyWord),
   );
   if (errorFound) disableSave.value = true;
   else disableSave.value = false;
@@ -143,7 +152,7 @@ const addGoal = () => {
     local: true,
     contentData: {
       description: '',
-      keyWord: '',
+      keyWord: null,
       index: localData.value.length,
     },
   };

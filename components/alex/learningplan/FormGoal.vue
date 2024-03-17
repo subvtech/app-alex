@@ -3,16 +3,17 @@
     <alex-inputs-combobox
       v-model:search="keyWord"
       name="keyword"
-      clerable
-      hide-details="auto"
+      density="comfortable"
+      clearable
       :label="$t('components.courses.goals.verb.title')"
       :placeholder="$t('components.courses.goals.verb.placeholder')"
       :filtered-items="preDefinedVerbs"
     />
-    <alex-inputs-text-field
+    <alex-inputs-text-area
       name="description"
       class="w-100"
       clearable
+      density="comfortable"
       :placeholder="$t('components.courses.goals.description.placeholder')"
       :label="$t('components.courses.goals.description.title')"
       :class="[
@@ -48,7 +49,7 @@ const preDefinedVerbs = ref(
   ),
 );
 const { validateField, errors, setFieldValue, useFieldModel } = useForm({
-  validateOnMount: true,
+  validateOnMount: false,
   initialValues: {
     keyword: currentData.value.contentData.keyWord,
     description: currentData.value.contentData.description,

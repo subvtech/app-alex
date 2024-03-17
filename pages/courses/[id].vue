@@ -119,20 +119,20 @@ const generalLinks: TabType[] = [
     value: 1,
     to: `/courses/${learningPlanId.value}/trails`,
   },
-  {
-    label: i18n.t('pages.courses.assignments'),
-    value: 2,
-    to: `/courses/${learningPlanId.value}/tasks`,
-  },
+  // {
+  //   label: i18n.t('pages.courses.assignments'),
+  //   value: 2,
+  //   to: `/courses/${learningPlanId.value}/tasks`,
+  // },
   {
     label: i18n.t('pages.courses.class'),
     value: 3,
     to: `/courses/${learningPlanId.value}/class`,
   },
-  {
-    label: i18n.t('pages.courses.projects'),
-    value: 4,
-    to: `/courses/${learningPlanId.value}/projects`,
-  },
+  // {
+  //   label: i18n.t('pages.courses.projects'),
+  //   value: 4,
+  //   to: `/courses/${learningPlanId.value}/projects`,
+  // },
 ];
 </script>

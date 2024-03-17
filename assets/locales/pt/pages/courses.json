@@ -6,7 +6,7 @@
   "projects": "Projetos",
   "events": "Eventos",
   "communication": "Comunicação",
-  "details": "Detalhes",
+  "details": "Dados do curso",
   "invite": "Convite do curso",
   "about": {
     "title": "Sobre o curso",
@@ -16,7 +16,7 @@
   },
   "media": {
     "title": "Sobre o curso",
-    "empty": "Parece que esse curso não tem mídia...",
+    "empty": "Parece que esse curso não tem nenhuma mídia",
     "updated": "Mídia foi atualizada com sucesso."
   },
   "hash": {

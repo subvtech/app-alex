@@ -99,7 +99,7 @@ export const useFormRules = () => {
       .string()
       .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
       .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
-      .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+      .matches(/^\p{L}*$/u, i18n.t('rules.keyword.onlyLetters'))
       .required(i18n.t('rules.keyword.required')),
     description: yup
       .string()

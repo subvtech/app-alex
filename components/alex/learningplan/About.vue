@@ -3,7 +3,7 @@
     class="mb-6"
     :title="title"
     :is-editing="isEditingAndCanEdit"
-    :showicon="canEdit"
+    :show-icon="canEdit"
     :cancel="onCancel"
     :save="() => emit('update', isOptional ? text : value)"
     :disable-save="errorMessage !== undefined || textNotChanged"
@@ -21,7 +21,7 @@
         />
         <span
           v-else-if="usingMyText"
-          class="about-description"
+          class="about-description text-body-1 text-dark-gray"
           :contenteditable="isEditingAndCanEdit"
           :data-placeholder="
             textPlaceholder ?? $t('pages.courses.about.placeholder')
@@ -35,8 +35,11 @@
           density="comfortable"
           name="description"
           autofocus
+          clearable
           theme="light"
-          :label="$t('pages.courses.about.placeholder')"
+          class="mt-2"
+          rows="6"
+          auto-grow
           :placeholder="$t('pages.courses.about.placeholder')"
           :error-messages="errorMessage"
           required
@@ -139,15 +142,7 @@ span[contenteditable='true']:empty::before {
 }
 
 .about-description {
-  text-align: justify;
-  text-justify: inter-word;
-  align-self: stretch;
-  color: #5d6872;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 22px;
-  overflow-wrap: break-word;
-
+  overflow-wrap: break-word !important;
   &:focus {
     outline: none;
   }
