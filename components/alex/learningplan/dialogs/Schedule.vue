@@ -158,9 +158,13 @@ const meetingDate = useFieldModel('date');
 const submit = handleSubmit((values) => {
   if (!data.value) {
     const newId = Math.round(Math.random() * 12_345_68);
-    emit('create', { ...values, id: newId, name: values.className });
+    emit('create', { ...values, id: newId, className: values.className });
   } else {
-    emit('update', { ...values, id: data.value?.id, name: values.className });
+    emit('update', {
+      ...values,
+      id: data.value?.id,
+      className: values.className,
+    });
   }
   modal.value = false;
 });

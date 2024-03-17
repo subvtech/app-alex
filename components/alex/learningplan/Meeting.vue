@@ -135,5 +135,4 @@ const subtitle = computed(
       { locale: pt },
     )}`,
 );
-console.log(props.type);
 </script>

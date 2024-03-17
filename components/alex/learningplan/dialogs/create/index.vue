@@ -130,7 +130,7 @@
               :end-date="endDate"
               :start-date="startDate"
               @create="addMeeting"
-              @update="(values) => editMeeting(values.className, values)"
+              @update="(values) => editMeeting(values)"
             />{{
               $t('components.learningPlan.dialogs.syncMeetings')
             }}</alex-custom-button
@@ -167,6 +167,7 @@ export type LearningScheduleCriation = {
   type: 'onsite' | 'online';
   location?: string;
   link?: string;
+  className: string;
 };
 export type LearningClassType = {
   id: number;

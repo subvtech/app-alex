@@ -50,7 +50,6 @@ const scheduleData = defineModel<
 >('schedules');
 const classes = defineModel<T[]>({ required: true });
 const onActionButton = () => {
-  console.log('classesData');
   classesData.value = null;
   scheduleData.value = null;
 };
@@ -90,10 +89,10 @@ const removeMeeting = (className: string, id: number) => {
     return updatedClass;
   });
 };
-const editMeeting = (className: string, meeting: LearningScheduleCriation) => {
+const editMeeting = (meeting: LearningScheduleCriation) => {
   classes.value = classes.value.map((item) => {
     const updatedClass = JSON.parse(JSON.stringify(item));
-    if (updatedClass.name === className) {
+    if (updatedClass.name === meeting.className) {
       updatedClass.schedules = item.schedules?.map((oldMeeting) => {
         if (oldMeeting.id === meeting.id) {
           return meeting;
@@ -102,6 +101,34 @@ const editMeeting = (className: string, meeting: LearningScheduleCriation) => {
       });
     }
     return updatedClass;
+  });
+  const wrongPlacesItems: LearningScheduleCriation[] = [];
+  for (const classValue of classes.value) {
+    if (!classValue.schedules) {
+      return;
+    }
+    for (
+      let indexSchedule = 0;
+      indexSchedule < classValue.schedules.length;
+      indexSchedule++
+    ) {
+      const schedule = classValue.schedules[indexSchedule];
+      const sameIdWrongLocal =
+        schedule.id === meeting.id && classValue.name !== meeting.className;
+      if (sameIdWrongLocal) {
+        classValue.schedules?.splice(indexSchedule, 1);
+        wrongPlacesItems.push({ ...schedule, className: meeting.className });
+      }
+    }
+  }
+  wrongPlacesItems.forEach((item) => {
+    classes.value = classes.value.map((classValue) => {
+      const updatedClassValue = classValue;
+      if (item.className === classValue.name) {
+        updatedClassValue.schedules?.push(item);
+      }
+      return updatedClassValue;
+    });
   });
 };
 const onSubmit = (value: T) => {
