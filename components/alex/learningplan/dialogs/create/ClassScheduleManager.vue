@@ -53,6 +53,27 @@ const onActionButton = () => {
   classesData.value = null;
   scheduleData.value = null;
 };
+const onSubmit = (value: T) => {
+  // @ts-ignore // FIXME: corrigir tipagem
+  const newItem: T = {
+    id: value.id,
+    name: value.name,
+    schedules: value.schedules || [],
+    in_charge_member: value.in_charge_member,
+    learning_plan_members: value.learning_plan_members || [],
+  };
+  if (!classesData.value) {
+    classes.value = [...classes.value, newItem];
+    return;
+  }
+  const updatedData = classes.value.map((item) => {
+    if (newItem.id === item.id) {
+      return newItem;
+    }
+    return item;
+  });
+  classes.value = updatedData;
+};
 const addMeeting = (meeting: MeetingPropsType & { className: string }) => {
   classes.value = classes.value.map((classValue) => {
     if (classValue.name === meeting.className) {
@@ -89,40 +110,32 @@ const removeMeeting = (className: string, id: number) => {
     return updatedClass;
   });
 };
-const editMeeting = (meeting: LearningScheduleCriation) => {
-  classes.value = classes.value.map((item) => {
-    const updatedClass = JSON.parse(JSON.stringify(item));
-    if (updatedClass.name === meeting.className) {
-      updatedClass.schedules = item.schedules?.map((oldMeeting) => {
-        if (oldMeeting.id === meeting.id) {
-          return meeting;
-        }
-        return oldMeeting;
-      });
-    }
-    return updatedClass;
-  });
+const getWrongPlaceValues = (
+  meeting: LearningScheduleCriation,
+  classes: T[],
+) => {
   const wrongPlacesItems: LearningScheduleCriation[] = [];
-  for (const classValue of classes.value) {
-    if (!classValue.schedules) {
-      return;
-    }
-    for (
-      let indexSchedule = 0;
-      indexSchedule < classValue.schedules.length;
-      indexSchedule++
-    ) {
-      const schedule = classValue.schedules[indexSchedule];
+  classes.forEach((classValue) => {
+    if (!classValue.schedules) return;
+    classValue.schedules = classValue.schedules.filter((schedule) => {
       const sameIdWrongLocal =
         schedule.id === meeting.id && classValue.name !== meeting.className;
       if (sameIdWrongLocal) {
-        classValue.schedules?.splice(indexSchedule, 1);
-        wrongPlacesItems.push({ ...schedule, className: meeting.className });
+        wrongPlacesItems.push({ ...schedule, ...meeting });
+        return false;
       }
-    }
-  }
+      return true;
+    });
+  });
+  return wrongPlacesItems;
+};
+const placeRightLocalItems = (
+  wrongPlacesItems: LearningScheduleCriation[],
+  classes: T[],
+) => {
+  const newClasses = classes;
   wrongPlacesItems.forEach((item) => {
-    classes.value = classes.value.map((classValue) => {
+    newClasses.map((classValue) => {
       const updatedClassValue = classValue;
       if (item.className === classValue.name) {
         updatedClassValue.schedules?.push(item);
@@ -130,27 +143,26 @@ const editMeeting = (meeting: LearningScheduleCriation) => {
       return updatedClassValue;
     });
   });
+  return newClasses;
 };
-const onSubmit = (value: T) => {
-  // @ts-ignore // FIXME: corrigir tipagem
-  const newItem: T = {
-    id: value.id,
-    name: value.name,
-    schedules: value.schedules || [],
-    in_charge_member: value.in_charge_member,
-    learning_plan_members: value.learning_plan_members || [],
-  };
-  if (!classesData.value) {
-    classes.value = [...classes.value, newItem];
-    return;
-  }
-  const updatedData = classes.value.map((item) => {
-    if (newItem.id === item.id) {
-      return newItem;
-    }
-    return item;
-  });
-  classes.value = updatedData;
+const editMeeting = (meeting: LearningScheduleCriation) => {
+  const updatedClasses = JSON.parse(
+    JSON.stringify(
+      classes.value.map((item) => {
+        if (item.name === meeting.className) {
+          return {
+            ...item,
+            schedules: item.schedules?.map((oldMeeting) =>
+              oldMeeting.id === meeting.id ? meeting : oldMeeting,
+            ),
+          };
+        }
+        return item;
+      }),
+    ),
+  );
+  const wrongPlacesItems = getWrongPlaceValues(meeting, updatedClasses);
+  classes.value = placeRightLocalItems(wrongPlacesItems, updatedClasses);
 };
 </script>
 
