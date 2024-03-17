@@ -44,6 +44,7 @@
           required
         />
         <alex-inputs-text-field
+          v-if="values.type"
           :name="values.type === 'online' ? 'link' : 'location'"
           :label="
             values.type === 'online' ? 'Link do encontro' : 'Local do encontro'

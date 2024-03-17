@@ -274,7 +274,6 @@ export const useFormRules = () => {
             max: max.toLocaleString(i18n.locale.value).split(',')[0],
           }),
         ),
-
       startHour: yup
         .string()
         .required(i18n.t('rules.meeting.startHour.required')),
@@ -289,9 +288,27 @@ export const useFormRules = () => {
             return isSameOrBeforeHour(value, startHour) === 1;
           },
         ),
-      className: yup
+      className: yup.string().required(i18n.t('rules.class.required')),
+      type: yup.string().required(i18n.t('rules.meeting.type.required')),
+      interval: yup
+        .number()
+        .required(i18n.t('rules.meeting.interval.required')),
+      location: yup
         .string()
-        .required(i18n.t('rules.meeting.endHour.required')),
+        .notRequired()
+        .when('type', {
+          is: 'onsite',
+          then: (scheme) =>
+            scheme.required(i18n.t('rules.meeting.location.required')),
+        }),
+      link: yup
+        .string()
+        .notRequired()
+        .when('type', {
+          is: 'online',
+          then: (scheme) =>
+            scheme.required(i18n.t('rules.meeting.link.required')),
+        }),
     });
 
   const createTrailsRules = yup.object({
