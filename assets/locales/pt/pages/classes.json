@@ -10,6 +10,7 @@
   "emptyClasses": "Parece que ainda na há turmas criadas!",
   "findClasses": "Encontrar turma",
   "createClass": "Criar turma",
+  "notfound": "Turma não encontrada!",
   "tableHeaders": {
     "course": "Curso",
     "description": "Descrição",

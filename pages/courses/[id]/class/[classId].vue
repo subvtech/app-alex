@@ -5,12 +5,21 @@
 const route = useRoute();
 const classStore = useClassStore();
 const classId = computed(() => parseInt(route.params.classId.toString()));
+const learningPlanId = computed(() => parseInt(route.params.id.toString()));
+
+async function getClass() {
+  await classStore.loadClass(classId.value, learningPlanId.value);
+}
 
 onBeforeMount(async () => {
-  classStore.classId = classId.value;
+  await getClass();
+
+  if (!classStore.currentClass) {
+    return navigateTo(`/courses/${learningPlanId.value}/class`);
+  }
 });
 
-watch(classId, () => {
-  classStore.classId = classId.value;
+watch(classId, async () => {
+  await getClass();
 });
 </script>

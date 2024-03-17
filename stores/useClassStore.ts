@@ -3,17 +3,36 @@ import { ref } from 'vue';
 
 export const useClassStore = defineStore('learning-class', () => {
   const learningPlanStore = useLearningPlanStore();
+  const { setMessage } = useMessageStore();
+  const i18n = useI18n();
   const user = useStrapiUser();
 
   const classId = ref<number>(0);
+  const currentClass = ref<ClassSimple | undefined>();
 
-  const currentClass = computed<ClassSimple | undefined>(() => {
-    if (classId.value && learningPlanStore.learningPlan?.classes.length) {
-      return learningPlanStore.learningPlan?.classes.find(
-        (c) => c.id === classId.value,
-      );
+  async function loadClass(id: number, learningPlanId: number) {
+    classId.value = id;
+
+    if (!learningPlanStore.learningPlan) {
+      await learningPlanStore.loadLearningPlan(learningPlanId);
     }
-  });
+
+    currentClass.value = learningPlanStore.learningPlan?.classes.find(
+      (c) => c.id === classId.value,
+    );
+
+    if (!currentClass.value) {
+      setMessage(i18n.t('pages.classes.notfound'), 'red', true);
+    }
+  }
+
+  // const currentClass = computed<ClassSimple | undefined>(() => {
+  //   if (classId.value && learningPlanStore.learningPlan?.classes.length) {
+  //     return learningPlanStore.learningPlan?.classes.find(
+  //       (c) => c.id === classId.value,
+  //     );
+  //   }
+  // });
 
   const activeMembers = computed(() => {
     return (
@@ -51,5 +70,6 @@ export const useClassStore = defineStore('learning-class', () => {
     pendingMembers,
     inChargeMember,
     userCanEdit,
+    loadClass,
   };
 });
