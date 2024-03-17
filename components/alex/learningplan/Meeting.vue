@@ -19,13 +19,16 @@
         </div>
       </div>
       <div class="d-flex gap-2 align-center">
-        <v-icon color="gray-600" :icon="typeValues[type].icon" />
+        <v-icon
+          color="gray-600"
+          :icon="type === 'onsite' ? 'mdi-map-marker-outline' : 'mdi-link'"
+        />
         <div class="d-flex flex-column align-start">
           <p class="text-body-1 text-gray-800">
-            {{ typeValues[type].title }}
+            {{ type === 'onsite' ? 'Presencial' : 'Online' }}
           </p>
           <p v-if="type === 'onsite'" class="text-body-1 text-gray-500">
-            {{ local }}
+            {{ location }}
           </p>
           <a
             v-else
@@ -67,7 +70,7 @@ export interface MeetingPropsType {
   endHour: string;
   type: MeetingType;
   variant?: MeetingVariantType;
-  local?: string;
+  location?: string;
   link?: string;
   id?: number;
   dropdownProps?: AlexDropdownItem[];
@@ -89,7 +92,7 @@ const props = withDefaults(defineProps<MeetingPropsType>(), {
       warning: true,
     },
   ],
-  local: undefined,
+  location: undefined,
   link: undefined,
   id: undefined,
 });
@@ -132,14 +135,5 @@ const subtitle = computed(
       { locale: pt },
     )}`,
 );
-const typeValues = {
-  onsite: {
-    icon: 'mdi-map-marker-outline',
-    title: 'Presencial',
-  },
-  online: {
-    icon: 'mdi-link',
-    title: 'Online',
-  },
-};
+console.log(props.type);
 </script>

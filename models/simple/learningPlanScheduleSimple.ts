@@ -13,7 +13,7 @@ interface DefaultLearningPlanScheduleSimple {
 }
 interface OnsiteLearningPlanScheduleSimple {
   type: 'onsite';
-  local: string;
+  location: string;
 }
 interface OnlineLearningPlanScheduleSimple {
   type: 'online';

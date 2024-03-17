@@ -1,5 +1,5 @@
 <template>
-  <v-slide-x-transition group>
+  <v-slide-y-transition group disabled>
     <alex-learningplan-class-criation-card
       v-for="classValue in classes"
       :key="`class-${classValue.name}`"
@@ -9,30 +9,21 @@
         img: classValue.in_charge_member.avatar,
       }"
       @delete="() => removeItem(classValue.name)"
-      @edit="
-        () =>
-          editItem({
-            name: classValue.name,
-            in_charge_member: classValue.in_charge_member,
-          })
-      "
+      @edit="() => editItem(classValue, classValue.id)"
     />
-  </v-slide-x-transition>
+  </v-slide-y-transition>
 </template>
 
 <script setup lang="ts">
-type TClass = {
-  name: string;
-  in_charge_member: User;
-};
-const classes = defineModel<TClass[]>({ required: true });
+import { LearningClassType } from './index.vue';
+const classes = defineModel<LearningClassType[]>({ required: true });
 const editModal = defineModel<boolean>('editModal');
-const dataModel = defineModel<TClass | null>('dataClass');
+const dataModel = defineModel<LearningClassType | null>('dataModel');
 const removeItem = (name: string) => {
   classes.value = classes.value.filter((item) => item.name !== name);
 };
-const editItem = (value: TClass) => {
-  dataModel.value = value;
+const editItem = (value: LearningClassType, id: number) => {
+  dataModel.value = { ...value, id };
   editModal.value = true;
 };
 </script>

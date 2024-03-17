@@ -82,32 +82,49 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-type ClassData = { id: number; className: string; responsible: number } | null;
+import { LearningClassType } from './create/index.vue';
 type ClassDialogProps = {
   noSelectUsers?: boolean;
 };
 const { noSelectUsers = true } = defineProps<ClassDialogProps>();
 const emit = defineEmits(['submit']);
 const modal = defineModel<boolean>({ required: true });
-const data = defineModel<ClassData>('data', {
+const data = defineModel<LearningClassType | null>('data', {
+  default: null,
+});
+const classes = defineModel<LearningClassType[]>('classes', {
   default: null,
 });
 const { createEditClassRules } = useFormRules();
 const members = ref([]);
-const { handleSubmit, setValues } = useForm({
+const alreadyHasClassName = ref<LearningClassType>();
+// @ts-ignore
+const { handleSubmit, setValues, setFieldError, resetForm } = useForm({
   initialValues: {
-    className: data.value?.className,
-    responsible: data.value?.responsible,
+    className: data.value?.name,
+    responsible: data.value?.in_charge_member || null,
   },
   validationSchema: createEditClassRules,
+  keepValuesOnUnmount: false,
 });
 const onSubmit = handleSubmit(({ className, responsible }) => {
   const membersValue = JSON.parse(JSON.stringify(members.value));
+  alreadyHasClassName.value = classes.value.find(
+    (item) => item.name === className,
+  );
+  if (
+    alreadyHasClassName.value &&
+    alreadyHasClassName.value.id !== data.value?.id
+  ) {
+    setFieldError('className', 'Já existe essa turma');
+    return;
+  }
   emit('submit', {
     name: className,
     in_charge_member: responsible,
-    schedules: [],
-    members: membersValue,
+    schedules: data.value?.schedules || [],
+    learning_plan_members: membersValue,
+    id: data.value?.id || Math.round(Math.random() * 123_456_789),
   });
   modal.value = false;
 });
@@ -150,9 +167,14 @@ const responsibles = computed(() => {
   }
   return responsiblesData.value;
 });
-watch(data, (value) => {
-  if (value) {
-    setValues({ className: value.className, responsible: value.responsible });
+onUpdated(() => {
+  if (data.value) {
+    setValues({
+      className: data.value.name,
+      responsible: data.value.in_charge_member,
+    });
+    return;
   }
+  resetForm();
 });
 </script>

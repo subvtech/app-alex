@@ -289,6 +289,9 @@ export const useFormRules = () => {
             return isSameOrBeforeHour(value, startHour) === 1;
           },
         ),
+      className: yup
+        .string()
+        .required(i18n.t('rules.meeting.endHour.required')),
     });
 
   const createTrailsRules = yup.object({

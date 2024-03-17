@@ -75,7 +75,7 @@
     <template #step3>
       <alex-learningplan-dialogs-create-class-schedule-manager
         v-model="classes"
-        v-model:data="classData"
+        v-model:classData="classData"
         title="Gerencie suas turmas!"
         subtitle="Adicione um nome e um responsável para cada turma."
         img="/svg/class.svg"
@@ -89,8 +89,9 @@
             @click="onActionButton"
           >
             <alex-learningplan-dialogs-class
-              v-model:data="classData"
               v-model="classModal"
+              v-model:classes="classes"
+              v-model:data="classData"
               no-select-users
               @submit="(values) => onSubmit(values)"
             />
@@ -101,7 +102,7 @@
           <alex-learningplan-dialogs-create-classes
             v-model="classes"
             v-model:edit-modal="classModal"
-            v-model:data-class="classData"
+            v-model:data-model="classData"
           />
         </template>
       </alex-learningplan-dialogs-create-class-schedule-manager>
@@ -109,29 +110,45 @@
     <template #step4>
       <alex-learningplan-dialogs-create-class-schedule-manager
         v-model="classes"
+        v-model:classes="classData"
+        v-model:schedules="scheduleData"
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
         :title="$t('components.courses.meeting.course.title')"
         :subtitle="$t('components.courses.meeting.course.subtitle')"
         :show-itens="!!hasSchedules"
         img="/images/schedule-empty.svg"
       >
-        <template #action-button>
-          <alex-custom-button append-icon="mdi-plus" variant="secondary"
+        <template #action-button="{ addMeeting, editMeeting, onActionButton }">
+          <alex-custom-button
+            append-icon="mdi-plus"
+            variant="secondary"
+            @click="() => onActionButton()"
             ><alex-learningplan-dialogs-schedule
               v-model="createScheduleModal"
-              v-model:data="editData"
+              v-model:data="scheduleData"
               :classes="classes"
               :end-date="endDate"
               :start-date="startDate"
               @create="addMeeting"
+              @update="(values) => editMeeting(values.className, values)"
             />{{
               $t('components.learningPlan.dialogs.syncMeetings')
             }}</alex-custom-button
           >
         </template>
-        <template #items>
+        <template #items="{ removeMeeting }">
           <div class="d-flex flex-column mt-4 gap-2">
-            <alex-learningplan-class-meetings :classes="classes" />
+            <alex-learningplan-class-meetings
+              v-model="classes"
+              variant="editing"
+              @delete="removeMeeting"
+              @update="
+                (className, schedule) => {
+                  scheduleData = { className, ...schedule };
+                  createScheduleModal = true;
+                }
+              "
+            />
           </div>
         </template>
       </alex-learningplan-dialogs-create-class-schedule-manager>
@@ -141,6 +158,23 @@
 
 <script setup lang="ts">
 import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+export type LearningScheduleCriation = {
+  id: number;
+  interval: 0 | 1 | 7 | 14 | 30;
+  date: string;
+  startHour: string;
+  endHour: string;
+  type: 'onsite' | 'online';
+  location?: string;
+  link?: string;
+};
+export type LearningClassType = {
+  id: number;
+  name: string;
+  in_charge_member: User;
+  schedules: LearningScheduleCriation[];
+  learning_plan_members: LearningPlanMemberSimple[];
+};
 const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
@@ -174,14 +208,16 @@ const loading = ref(false);
 const startDate = ref<string>();
 const endDate = ref<string>();
 const slides = ref<any>([]);
-const classData = ref(null);
-const classes = ref<LearningClass[]>([]);
+const classData = ref<LearningClassType | null>(null);
+const classes = ref<LearningClassType[]>([]);
 const classModal = ref(false);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
 const selectedUsers = ref([]);
-const editData = ref<MeetingPropsType | null>(null);
+const scheduleData = ref<(MeetingPropsType & { className: string }) | null>(
+  null,
+);
 const carousel = ref<{ clearSlides: () => unknown } | null>(null);
 const slugFormated = computed(() =>
   slug.value.trim().toLowerCase().replaceAll(' ', '_'),
@@ -192,46 +228,12 @@ const plataformUrl = computed(
 const disablePastDates = (date: Date) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const parsedDate = new Date(date);
-  return parsedDate >= today;
+  const passedDate = new Date(date);
+  return passedDate >= today;
 };
 const hasSchedules = computed(() =>
-  classes.value.some((item) => item.meeting_schedules.length),
+  classes.value.some((item) => item.schedules.length),
 );
-
-// const removeSelf = (id: number) => {
-//   schedules.value = schedules.value.filter((item) => item.id !== id);
-// };
-
-// const editMeeting = (values: MeetingPropsType) => {
-//   const updatedSchedules = schedules.value.map((meeting) => {
-//     if (meeting.id === values.id) {
-//       return { ...meeting, ...values };
-//     }
-//     return meeting;
-//   });
-//   classes.value = updatedSchedules;
-// };
-type ReturnMeeting = Omit<
-  LearningPlanScheduleSimple,
-  'learningplan' | 'meetings' | 'learningplan_class'
-> & {
-  className: string;
-};
-const addMeeting = (values: ReturnMeeting) => {
-  classes.value = classes.value.map((classValue) => {
-    if (classValue.name === values.className) {
-      const newItem = {
-        ...classValue,
-        meeting_schedules: [...classValue.meeting_schedules, values],
-      };
-      console.log('item', newItem);
-      return newItem;
-    }
-    return classValue;
-  });
-};
-
 const cleanFields = () => {
   classes.value = [];
   classData.value = null;
@@ -290,7 +292,4 @@ watch(
     }
   },
 );
-watch(classes, () => {
-  console.log(classes.value);
-});
 </script>
