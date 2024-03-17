@@ -180,8 +180,8 @@ const props = withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
 const emit = defineEmits(['update:modelValue', 'submit']);
-const { create } = useStrapi4();
 const value = defineModel<boolean>({ required: true });
+const { create } = useStrapi4();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { createCourseRules } = useFormRules();
@@ -215,7 +215,6 @@ const classModal = ref(false);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
-const selectedUsers = ref([]);
 const scheduleData = ref<(MeetingPropsType & { className: string }) | null>(
   null,
 );
@@ -236,11 +235,9 @@ const hasSchedules = computed(() =>
   classes.value.some((item) => item.schedules.length),
 );
 const cleanFields = () => {
-  classes.value = [];
   classData.value = null;
   classes.value = [];
   slides.value = [];
-  selectedUsers.value = [];
   title.value = '';
   description.value = '';
   slug.value = '';
@@ -250,6 +247,9 @@ const cleanFields = () => {
 };
 
 const createCourse = async () => {
+  const justIdInChargeMember = classes.value.map((classValue) => {
+    return { ...classValue, in_charge_member: classValue.in_charge_member.id };
+  });
   try {
     loading.value = true;
     const courseData = await create('learningplans', {
@@ -258,12 +258,11 @@ const createCourse = async () => {
       start_date: startDate.value,
       end_date: endDate.value,
       type: 'course',
-      slug: title.value.trim().replace(/\s+/g, '_').toLocaleLowerCase(),
+      slug: slugFormated.value.toLocaleLowerCase(),
       invitation_enabled: true,
       invitation_duration: 3600,
-      members: selectedUsers.value,
       class_name: slug.value,
-      classes: classes.value,
+      classes: justIdInChargeMember,
     });
     slides.value.map((item) =>
       // @ts-ignore
