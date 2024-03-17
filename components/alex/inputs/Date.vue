@@ -78,8 +78,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
 
 const emit = defineEmits(['update:modelValue']);
 
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.modelValue,
+const { value, errorMessage } = useField<string>(() => props.name, undefined, {
   syncVModel: true,
 });
 

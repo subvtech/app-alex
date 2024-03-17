@@ -123,7 +123,7 @@ const slotsList = computed(() =>
       .filter((slot) => slot.includes('step')),
   ),
 );
-const activeStep = ref(3);
+const activeStep = ref(4);
 const activeStepIndex = computed(() => activeStep.value - 1);
 const numberSteps = computed(() => slotsList.value.length);
 const lastStepIndex = computed(() => numberSteps.value - 1);
