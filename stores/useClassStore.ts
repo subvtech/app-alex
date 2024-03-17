@@ -26,14 +26,6 @@ export const useClassStore = defineStore('learning-class', () => {
     }
   }
 
-  // const currentClass = computed<ClassSimple | undefined>(() => {
-  //   if (classId.value && learningPlanStore.learningPlan?.classes.length) {
-  //     return learningPlanStore.learningPlan?.classes.find(
-  //       (c) => c.id === classId.value,
-  //     );
-  //   }
-  // });
-
   const activeMembers = computed(() => {
     return (
       currentClass.value?.learning_plan_members?.filter(

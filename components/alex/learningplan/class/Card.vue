@@ -75,31 +75,37 @@ interface ClassProps {
     };
   }[];
   noOptions?: boolean;
+  canDelete?: boolean;
 }
 
 const showOptions = ref(false);
 const emit = defineEmits(['edit', 'delete', 'open']);
 const props = withDefaults(defineProps<ClassProps>(), {
   noOptions: false,
+  canDelete: true,
 });
 
 const members = computed(() => [props.inChargeMember, ...props.classMembers]);
 
 const leader = computed(() => props.inChargeMember);
 const { t } = useI18n();
-const items = [
-  {
+
+const items = computed(() => {
+  const editAction = {
     text: t('pages.classes.editClass'),
     icon: 'mdi-pencil-outline',
     onClick: () => emit('edit'),
-  },
-  {
+  };
+
+  const deleteAction = {
     text: t('pages.classes.removeClass'),
     icon: 'mdi-trash-can-outline',
     onClick: () => emit('delete'),
     warning: true,
-  },
-];
+  };
+
+  return props.canDelete ? [editAction, deleteAction] : [editAction];
+});
 </script>
 
 <style scoped lang="scss">

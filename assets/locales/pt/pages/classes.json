@@ -11,6 +11,7 @@
   "findClasses": "Encontrar turma",
   "createClass": "Criar turma",
   "notfound": "Turma não encontrada!",
+  "deleteSucess": "Turma removida com sucesso!",
   "tableHeaders": {
     "course": "Curso",
     "description": "Descrição",
@@ -21,7 +22,7 @@
     "myCourses": "Meus Cursos",
     "home": "Home"
   },
-  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} turmas",
   "noData": "Nenhum {object} encontrado!",
   "participant": "Participante",
   "participating": "Participando",

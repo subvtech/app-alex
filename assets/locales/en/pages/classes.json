@@ -4,6 +4,14 @@
   "searchPlaceholder": "Search...",
   "viewModeTooltip": "Change View",
   "filterTooltip": "Filter",
+  "editClass": "Edit Class",
+  "removeClass": "Remove Class",
+  "cardTitle": "Classes",
+  "emptyClasses": "It looks like there isnt any classes!",
+  "findClasses": "Find class",
+  "createClass": "Create class",
+  "notfound": "Class not found!",
+  "deleteSucess": "Class deleted successfully",
   "tableHeaders": {
     "course": "Course",
     "description": "Description",
@@ -14,7 +22,7 @@
     "myCourses": "My Courses",
     "home": "Home"
   },
-  "showingData": "Showing %{from} to %{to} of %{total} courses",
+  "showingData": "Showing %{from} to %{to} of %{total} classes",
   "noData": "No %{object} found!",
   "participant": "Participant",
   "participating": "Participating",

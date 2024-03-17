@@ -33,7 +33,8 @@
           }"
           :class-members="getGroupMembersInfo(item?.learning_plan_members)"
           :no-options="!learningPlanStore.userIsFacilitator"
-          @delete="() => deleteGroupCard(item.id)"
+          :can-delete="!item.learning_plan_members.length"
+          @delete="() => deleteClass(item.id)"
           @edit="
             () => setUpdatedValues(item.id, item.title, item.group_members)
           "
@@ -129,6 +130,16 @@
         </v-form>
       </template>
     </alex-learningplan-class-section-card>
+    <alex-learningplan-dialogs-alert
+      v-model="dialogConfirmDeleteClass"
+      variant="error"
+      :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+      :title="$t('pages.classes.wantDeleteGroup')"
+      :subtitle="$t('pages.classes.deleteGroupSubtitle')"
+      :submit-button-text="$t('pages.classes.delete')"
+      @cancel="dialogConfirmDeleteClass = false"
+      @submit="() => onDeleteClass(removingClassId)"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -144,7 +155,7 @@ const editingGroupId = ref(0);
 const dialogAddMember = ref(false);
 const dialogGroup = ref(false);
 const dialogShowGroup = ref(false);
-const dialogConfirmDeleteGroup = ref(false);
+const dialogConfirmDeleteClass = ref(false);
 const dialogGroupTitle = ref(t('pages.classes.createGroup'));
 const dialogGroupActionText = ref(t('pages.classes.createGroup'));
 //
@@ -167,7 +178,7 @@ const creatingGroup = ref(false);
 // Remove
 
 // const removingGroup = ref(false);
-const removingGroupId = ref(0);
+const removingClassId = ref(0);
 //
 const groupTitle = ref('');
 const headerStore = usePageHeaderStore();
@@ -227,19 +238,19 @@ async function onCreateGroup() {
     creatingGroup.value = false;
   }
 }
-async function onDeleteGroup(id: number) {
+async function onDeleteClass(id: number) {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
     return;
   }
   try {
-    await strapi.delete('learnin-plan-groups', id);
-    setMessage('Grupo excluido com sucesso!', 'green', true);
+    await strapi.delete('classes', id);
+    setMessage(t('pages.classes.deleteSucess'), 'green', true);
     learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
     setMessage('Erro ao excluir grupo!', 'red', true);
   } finally {
-    dialogConfirmDeleteGroup.value = false;
+    dialogConfirmDeleteClass.value = false;
   }
 }
 async function onUpdateGroup(id: number) {
@@ -333,9 +344,9 @@ function filterMembersByRole(
 function openCard(item: ClassSimple) {
   navigateTo(`/courses/${learningPlanStore.learningPlan?.id}/class/${item.id}`);
 }
-function deleteGroupCard(id: number) {
-  removingGroupId.value = id;
-  dialogConfirmDeleteGroup.value = true;
+function deleteClass(id: number) {
+  removingClassId.value = id;
+  dialogConfirmDeleteClass.value = true;
 }
 onBeforeMount(() => (headerStore.showHeader = true));
 watch(
