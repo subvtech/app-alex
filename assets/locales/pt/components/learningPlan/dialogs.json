@@ -28,5 +28,7 @@
   "createClass": "Criar turma",
   "addClass": "Adicionar turma",
   "editClass": "Editar turma",
-  "save": "Salvar"
+  "save": "Salvar",
+  "class": "Turma",
+  "selectClassToMeeting": "Selecione a turma para o encontro"
 }

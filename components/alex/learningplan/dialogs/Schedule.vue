@@ -15,11 +15,13 @@
       <div class="pa-6">
         <alex-inputs-select
           name="className"
-          label="Turma"
+          :label="$t('components.learningPlan.dialogs.class')"
+          :placeholder="
+            $t('components.learningPlan.dialogs.selectClassToMeeting')
+          "
+          :items="classes"
           density="comfortable"
           required
-          :items="classes"
-          placeholder="Selecione a turma para o encontro"
           item-title="name"
           item-value="name"
         />
