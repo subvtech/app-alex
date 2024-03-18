@@ -112,14 +112,16 @@ async function onDeleteClass(id: number) {
 }
 
 function getClassMembersInfo(members: LearningPlanMemberSimple[]) {
-  return members?.map((member) => {
-    return {
-      name: member.user?.fullname || '',
-      image: member.user?.avatar
-        ? { url: member.user?.avatar?.url, alt: member.user?.avatar?.name }
-        : undefined,
-    };
-  });
+  return members
+    ?.filter((member) => member.status === MemberStatus.JOINED)
+    .map((member) => {
+      return {
+        name: member.user?.fullname || '',
+        image: member.user?.avatar
+          ? { url: member.user?.avatar?.url, alt: member.user?.avatar?.name }
+          : undefined,
+      };
+    });
 }
 
 function openCard(item: ClassSimple) {
@@ -162,7 +164,9 @@ async function onCreateClass(data) {
     isSubmitingForm.value = true;
 
     const classData = {
-      ...data,
+      name: data.name,
+      in_charge_member: data.in_charge_member,
+      learning_plan_members: data.learning_plan_members,
       learningplan: learningPlanStore.learningPlan?.id,
     };
 

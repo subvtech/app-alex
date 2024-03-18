@@ -10,11 +10,17 @@ export const useClassStore = defineStore('learning-class', () => {
   const classId = ref<number>(0);
   const currentClass = ref<ClassSimple | undefined>();
 
-  async function loadClass(id: number, learningPlanId: number) {
+  async function loadClass(id: number, reloadLearningPlan = false) {
     classId.value = id;
 
     if (!learningPlanStore.learningPlan) {
-      await learningPlanStore.loadLearningPlan(learningPlanId);
+      return;
+    }
+
+    if (reloadLearningPlan) {
+      await learningPlanStore.loadLearningPlan(
+        learningPlanStore.learningPlan?.id || 0,
+      );
     }
 
     currentClass.value = learningPlanStore.learningPlan?.classes.find(
@@ -24,6 +30,10 @@ export const useClassStore = defineStore('learning-class', () => {
     if (!currentClass.value) {
       setMessage(i18n.t('pages.classes.notfound'), 'red', true);
     }
+  }
+
+  async function reloadClass() {
+    await loadClass(classId.value, true);
   }
 
   const activeMembers = computed(() => {
@@ -63,5 +73,6 @@ export const useClassStore = defineStore('learning-class', () => {
     inChargeMember,
     userCanEdit,
     loadClass,
+    reloadClass,
   };
 });
