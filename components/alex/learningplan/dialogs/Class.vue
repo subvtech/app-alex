@@ -110,7 +110,7 @@ const data = defineModel<LearningClassType | null>('data', {
   default: null,
 });
 const classes = defineModel<LearningClassType[]>('classes', {
-  default: null,
+  default: [],
 });
 const { createEditClassRules } = useFormRules();
 const members = ref([]);

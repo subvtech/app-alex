@@ -69,7 +69,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { da } from 'date-fns/locale';
 import { useForm } from 'vee-validate';
 const { t } = useI18n();
 const route = useRoute();
@@ -135,8 +134,8 @@ function deleteClass(id: number) {
 function onOpenUpdateDialog(itemClass: ClassSimple) {
   updateData.value = {
     id: itemClass.id,
-    className: itemClass.name,
-    responsible: itemClass.in_charge_member.user,
+    name: itemClass.name,
+    in_charge_member: itemClass.in_charge_member.user,
   };
   openUpdateFormDialog.value = true;
 }
