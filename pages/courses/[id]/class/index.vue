@@ -23,8 +23,8 @@
         <alex-learningplan-class-card
           :title="item?.name"
           :in-charge-member="{
-            name: item?.in_charge_member?.user.fullname,
-            image: item?.in_charge_member?.user.avatar,
+            name: item?.in_charge_member?.user?.fullname,
+            image: item?.in_charge_member?.user?.avatar,
           }"
           :class-members="getClassMembersInfo(item?.learning_plan_members)"
           :no-options="!learningPlanStore.userIsFacilitator"

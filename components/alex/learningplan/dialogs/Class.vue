@@ -90,9 +90,9 @@ type ClassDialogProps = {
   noSelectUsers?: boolean;
   closeDialogOnSubmit?: boolean;
   loadingSubmit?: boolean;
-  ignoreUserIds: number[];
-  ignoreUserEmails: string[];
-  parentActivator: boolean;
+  ignoreUserIds?: number[];
+  ignoreUserEmails?: string[];
+  parentActivator?: boolean;
 };
 
 const props = withDefaults(defineProps<ClassDialogProps>(), {
