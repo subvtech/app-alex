@@ -21,5 +21,14 @@
   "whoParticipate": "Quem participará?",
   "searchMember": "Buscar integrantes",
   "newMeeting": "Novo encontro",
-  "syncMeetings": "Encontros síncronos"
+  "syncMeetings": "Encontros síncronos",
+  "whatIsYourCourseSlug": "Qual será o identificador do seu curso?",
+  "writeYourCourseIdentifier": "Digite o identificador do curso",
+  "infoSlug": "O identificador do curso é um nome que servirá para diferenciar seu curso dos outros e permitir que ele seja acessado através da URL.",
+  "createClass": "Criar turma",
+  "addClass": "Adicionar turma",
+  "editClass": "Editar turma",
+  "save": "Salvar",
+  "class": "Turma",
+  "selectClassToMeeting": "Selecione a turma para o encontro"
 }

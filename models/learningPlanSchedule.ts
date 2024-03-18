@@ -10,5 +10,6 @@ export interface LearningPlanSchedule {
   endDate: Date;
   name: string;
   learningplan: Strapi4ResponseSingle<LearningPlan>;
+  learning_class: Strapi4ResponseSingle<LearningClass>;
   meetings: Strapi4ResponseMany<LearningPlanMeeting>;
 }

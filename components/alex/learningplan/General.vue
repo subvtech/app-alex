@@ -168,7 +168,9 @@
 </template>
 <script setup lang="ts">
 import { BoxItemType } from '../profile/BoxItem.vue';
-import { MeetingPropsType } from '~/components/CourseMeeting.vue';
+
+import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;
