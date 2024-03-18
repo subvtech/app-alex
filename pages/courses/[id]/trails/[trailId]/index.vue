@@ -1,6 +1,9 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column">
-    <div class="bg-white rounded w-100 container-min-height">
+    <div
+      id="editor-container"
+      class="bg-white rounded w-100 container-min-height"
+    >
       <div
         id="Início"
         section="0"
@@ -8,14 +11,18 @@
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
-          v-if="readOnly && professorMode && !trailStore.loading"
+          v-if="
+            readOnly &&
+            learningPlanStore.userIsFacilitator &&
+            !trailStore.loading
+          "
           variant="primary"
           size="large"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="professorMode && !isLoading">
+        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
@@ -105,11 +112,7 @@
           <AppEditor ref="editor" :data="editorData" />
         </div>
 
-        <div
-          v-if="readOnly"
-          class="d-lg-block d-none sections-col h-100"
-          cols="2"
-        >
+        <div v-if="readOnly" class="d-lg-block sections-col h-100" cols="2">
           <div class="sections-container">
             <p class="text-gray-800 text-h6 mb-4">Seções</p>
             <div>
@@ -163,7 +166,7 @@ definePageMeta({
 });
 
 const trailStore = useTrailStore();
-const professorMode = ref(false);
+
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
@@ -175,9 +178,6 @@ const showEditor = computed(() => {
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
-const { isProfessor } = useStrapiUser<User>().value;
-professorMode.value = isProfessor;
 
 const { t } = useI18n();
 const editorData = computed(() => {
@@ -471,6 +471,8 @@ window.addEventListener('resize', () => {
   position: sticky;
   top: 88px;
   z-index: 1;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .sections-col {
@@ -501,12 +503,24 @@ window.addEventListener('resize', () => {
   }
 }
 
-@media screen and (min-width: 1380px) {
+#editor-container {
+  container-type: inline-size;
+  container-name: editor;
+}
+
+.sticky-buttons {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 88px;
+  z-index: 1;
+}
+
+@container editor (max-width: 1310px) {
+  .sections-container {
+    opacity: 0;
+  }
   .sticky-buttons {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 88px;
-    z-index: 1;
+    position: static;
   }
 }
 </style>

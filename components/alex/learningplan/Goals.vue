@@ -33,7 +33,7 @@
             <alex-learningplan-form-goal
               :index="index"
               :data="localData"
-              :filtered-items="filteredVerbs"
+              :filtered-items="generalVerbs || []"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
               @success:description="onSuccessDescription"
@@ -73,10 +73,9 @@ export type Goal = {
   errorDescription: boolean;
   contentData: {
     id?: number;
-    keyWordId?: number; // Verb
     index: number;
-    keyWord: string; // Verb
     description: string; // Title
+    verb: { text: string; id?: number; general: boolean };
   };
 };
 type GoalsProps = {
@@ -97,11 +96,20 @@ const localData = ref(props.data);
 const disableSave = ref(true);
 const isEditing = ref(false);
 const selectedPanel = ref(0);
-const filteredVerbs = ref<{ text: string; id: number }[]>([]);
 const withinBreakpoint = computed(() => currentWidth.value < 450);
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
 const lastGoals = ref<Goal[]>([]);
-
+const { find } = useStrapiUtils();
+const { data: generalVerbs } = useAsyncData(
+  'general-verbs',
+  async () =>
+    await find<LearningPlanGoalVerb>('learning-goal-verbs', {
+      filters: {
+        general: true,
+      },
+    }),
+  { transform: (value) => value.data },
+);
 const setLastGoals = () => {
   lastGoals.value = toRaw(localData.value.map((g) => Object.assign({}, g)));
 };
@@ -154,6 +162,11 @@ const addGoal = () => {
       description: '',
       keyWord: null,
       index: localData.value.length,
+      description: '',
+      verb: {
+        text: '',
+        general: false,
+      },
     },
   };
   localData.value.push(newGoal);
@@ -170,7 +183,8 @@ const onSave = async () => {
         index,
         verb: {
           text: item.keyWord,
-          id: item.contentData.keyWordId,
+          id: item.contentData.verb.id,
+          general: item.contentData.verb.general,
         },
         description: item.title,
         ...(!item.local && { id: item.contentData.id }),
@@ -178,8 +192,9 @@ const onSave = async () => {
     },
     onResponse: ({ response }) => {
       if (!response.ok) {
-        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
         localData.value = [...props.data];
+        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
+        return;
       }
       emit('update', t('components.courses.goals.update'));
     },

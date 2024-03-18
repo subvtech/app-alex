@@ -95,12 +95,16 @@ export const useFormRules = () => {
       ),
   };
   const goalRules = {
-    keyword: yup
-      .string()
-      .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
-      .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
-      .matches(/^\p{L}*$/u, i18n.t('rules.keyword.onlyLetters'))
-      .required(i18n.t('rules.keyword.required')),
+    verb: yup.lazy((value) =>
+      typeof value === 'string'
+        ? yup
+            .string()
+            .min(2, ({ min }) => i18n.t('rules.keyword.min', { min }))
+            .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+            .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters'))
+            .required(i18n.t('rules.keyword.required'))
+        : yup.object().required(i18n.t('rules.keyword.required')),
+    ),
     description: yup
       .string()
       .required(i18n.t('rules.description.required'))
@@ -154,8 +158,8 @@ export const useFormRules = () => {
     endDate: endDateRules,
     title: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
     slug: yup
@@ -169,8 +173,8 @@ export const useFormRules = () => {
   const generalTrailSchema = yup.object({
     title: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
     ...descriptionRules,

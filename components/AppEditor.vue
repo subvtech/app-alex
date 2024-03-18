@@ -1,6 +1,11 @@
 <template>
   <client-only>
-    <div id="editorjs" class="editorjs w-100 pa-0" v-bind="$attrs"></div>
+    <div
+      id="editorjs"
+      class="editorjs w-100 pa-0"
+      :is-editing="isEditing"
+      v-bind="$attrs"
+    ></div>
   </client-only>
 </template>
 
@@ -33,6 +38,7 @@ import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
+const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 onMounted(() => {
@@ -300,6 +306,7 @@ const loadEditor = async (data) => {
 const toggleReadOnly = () => {
   instance.value.isReady.then(async () => {
     await instance.value.readOnly.toggle();
+    isEditing.value = !instance.value.readOnly.isEnabled;
     if (!instance.value.readOnly.isEnabled) {
       const index = instance.value.blocks.getBlocksCount();
       await instance.value.blocks.insert(
@@ -309,7 +316,6 @@ const toggleReadOnly = () => {
         index + 1,
         true,
       );
-
       setTimeout(() => {
         instance.value.focus(true);
         const block = instance.value.blocks.getBlockByIndex(index);
@@ -338,7 +344,6 @@ const clearEditor = () => {
 const isReady = async () => {
   return await instance.value.isReady;
 };
-
 defineExpose({
   getData,
   loadEditor,
@@ -349,35 +354,55 @@ defineExpose({
 });
 </script>
 
-<style scoped>
-.editorjs >>> .ce-header {
-  padding: 0 0 1em;
+<style lang="scss">
+.editorjs {
+  width: 100% !important;
+  .codex-editor__redactor {
+    padding-bottom: 0 !important;
+  }
+  .ce-paragraph {
+    word-break: break-word;
+  }
+  .ce-block__content {
+    margin: 0;
+    max-width: none;
+  }
+  &[is-editing='true'] {
+    padding-bottom: 300px !important;
+  }
+  &[is-editing='false'] {
+    .codex-editor--narrow .codex-editor__redactor {
+      margin-right: 0px;
+    }
+  }
+  .codex-editor--narrow {
+    background-color: white !important;
+  }
 }
 
-.editorjs >>> .ce-block {
-  margin-top: 16px;
-}
+@media (min-width: 651px) {
+  .editorjs[is-editing='true'] {
+    .codex-editor--narrow .ce-block {
+      margin-right: 0;
+      padding-right: 0;
+    }
+    .ce-block__content {
+      margin: 0;
+      margin-left: 40px;
+    }
 
-.editorjs >>> .ce-paragraph {
-  word-break: break-word;
-}
-
-.editorjs >>> .ce-block:first-of-type {
-  margin-top: 0;
-}
-
-.editorjs >>> .ce-block:last-of-type {
-  margin-bottom: 0;
-}
-
-/* stylelint-disable */
-.editorjs >>> .ce-block__content,
-.editorjs >>> .ce-toolbar__content {
-  max-width: 64rem;
-  max-width: 100%;
-}
-
-.editorjs >>> .codex-editor--narrow {
-  background-color: white !important;
+    .ce-toolbar__actions {
+      right: auto;
+      left: -20px;
+    }
+    .codex-editor--narrow .ce-toolbox .ce-popover,
+    .codex-editor--narrow .ce-settings .ce-popover {
+      right: auto;
+      left: 0;
+    }
+    .ce-toolbar__content {
+      margin: 0;
+    }
+  }
 }
 </style>

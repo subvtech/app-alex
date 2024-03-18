@@ -56,6 +56,14 @@ const learningPlanStore = useLearningPlanStore();
 const isJoinRoutePath = computed(() => {
   return route.name === 'courses-id-join-hash';
 });
+
+const isSettingsRoutePath = computed(() => {
+  return (
+    route.name === 'courses-id-settings' ||
+    route.name === 'courses-id-trails-trailid-settings'
+  );
+});
+
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const headerStore = usePageHeaderStore();
 const selectedOption = ref<number | null>(null);
@@ -66,6 +74,10 @@ const fetchData = async () => {
   headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/');
+  }
+
+  if (isSettingsRoutePath.value && !learningPlanStore.userIsFacilitator) {
+    return navigateTo(`/courses/${learningPlanId.value}`);
   }
 
   if (
@@ -85,7 +97,7 @@ const fetchData = async () => {
     );
 
     if (invite) {
-      return navigateTo(`/courses/${learningPlanId}/join/${invite.hash}`);
+      return navigateTo(`/courses/${learningPlanId.value}/join/${invite.hash}`);
     }
   }
 };
