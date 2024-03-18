@@ -8,7 +8,7 @@ const classId = computed(() => parseInt(route.params.classId.toString()));
 const learningPlanId = computed(() => parseInt(route.params.id.toString()));
 
 async function getClass() {
-  await classStore.loadClass(classId.value, learningPlanId.value);
+  await classStore.loadClass(classId.value);
 
   if (!classStore.currentClass) {
     return navigateTo(`/courses/${learningPlanId.value}/class`);

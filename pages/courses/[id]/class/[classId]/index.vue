@@ -310,7 +310,8 @@ async function onClickSendInvites() {
     usersToInvite.value = [];
 
     setMessage('Convites enviados com sucesso!', 'green', true);
-    await learningPlanStore.loadLearningPlan(learningPlanId.value);
+
+    await classStore.reloadClass();
   } catch (error) {
     setMessage('Erro ao enviar convites!', 'red', true);
   } finally {
@@ -345,7 +346,7 @@ async function onCreateGroup() {
 
     await strapi.create('learnin-plan-groups', data);
     setMessage('Grupo criado com sucesso!', 'green', true);
-    learningPlanStore.loadLearningPlan(learningPlanId.value);
+    await classStore.reloadClass();
     selectedGroupMembers.value = [];
     selectedInChargeGroupMember.value = null;
     formAddGroup.resetForm();
@@ -365,7 +366,7 @@ async function onDeleteGroup(id: number) {
   try {
     await strapi.delete('learnin-plan-groups', id);
     setMessage('Grupo excluido com sucesso!', 'green', true);
-    learningPlanStore.loadLearningPlan(learningPlanId.value);
+    await classStore.reloadClass();
   } catch (_) {
     setMessage('Erro ao excluir grupo!', 'red', true);
   } finally {
@@ -404,7 +405,7 @@ async function onUpdateGroup(id: number) {
 
     await strapi.update('learnin-plan-groups', id, data);
     setMessage('Grupo atualizado com sucesso!', 'green', true);
-    learningPlanStore.loadLearningPlan(learningPlanId.value);
+    await classStore.reloadClass();
   } catch (_) {
     setMessage('Erro ao atualizar o grupo!', 'red', true);
   }
@@ -484,7 +485,7 @@ async function onDeleteParticipant(id: number) {
 
     const response = await strapi.delete('learning-plan-members', id);
     if (response.data.id) {
-      await learningPlanStore.loadLearningPlan(learningPlanId.value);
+      await classStore.reloadClass();
       setMessage('Participante removido com sucesso!', 'green', true);
     }
   } catch (error) {
