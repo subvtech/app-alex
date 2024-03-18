@@ -1,32 +1,44 @@
 <template>
-  <div v-for="classValue in mappedClasses" :key="classValue.name">
-    <h5 class="text-h5 text-gray-800">
+  <div v-for="(classValue, index) in classes" :key="index">
+    <h5 v-if="classValue.schedules.length" class="text-h5 text-gray-800 mb-2">
       {{ classValue.name }}
     </h5>
     <alex-learningplan-meeting
-      v-for="schedule in classValue.schedules"
-      :key="schedule.id"
+      v-for="(schedule, indexSchedule) in classValue.schedules"
+      :key="indexSchedule"
+      :variant="variant"
+      :class="indexSchedule !== classValue.schedules.length - 1 && 'mb-2'"
       :type="schedule.type"
-      :local="schedule.type === 'onsite' ? schedule.local : undefined"
+      :location="schedule.type === 'onsite' ? schedule.location : undefined"
       :link="schedule.type === 'online' ? schedule.link : undefined"
       :interval="schedule.interval"
       :date="schedule.date"
       :start-hour="schedule.startHour"
       :end-hour="schedule.endHour"
+      :dropdown-props="[
+        {
+          icon: 'mdi-pencil',
+          text: $t('components.courses.meeting.edit'), //,
+          onClick: () => emit('update', classValue.name, schedule),
+        },
+        {
+          icon: 'mdi-trash-can',
+          text: $t('components.courses.meeting.delete'),
+          warning: true,
+          onClick: () => emit('delete', classValue.name, schedule.id),
+        },
+      ]"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+import { MeetingVariantType } from '../Meeting.vue';
+import { LearningClassType } from '../dialogs/create/index.vue';
 type ClassMeetingsProps = {
-  classes: LearningClass[];
+  variant: MeetingVariantType;
 };
-const { classes } = defineProps<ClassMeetingsProps>();
-const mappedClasses = computed(() =>
-  classes.map((classValue) => {
-    return { name: classValue.name, schedules: classValue.meeting_schedules };
-  }),
-);
+const classes = defineModel<LearningClassType[]>({ default: [] });
+const emit = defineEmits(['update', 'delete']);
+const { variant = 'editing' } = defineProps<ClassMeetingsProps>();
 </script>
-
-<style scoped></style>

@@ -15,11 +15,13 @@
       <div class="pa-6">
         <alex-inputs-select
           name="className"
-          label="Turma"
+          :label="$t('components.learningPlan.dialogs.class')"
+          :placeholder="
+            $t('components.learningPlan.dialogs.selectClassToMeeting')
+          "
+          :items="classes"
           density="comfortable"
           required
-          :items="classes"
-          placeholder="Selecione a turma para o encontro"
           item-title="name"
           item-value="name"
         />
@@ -29,7 +31,11 @@
           density="comfortable"
           required
           placeholder="Selecione o tipo do encontro"
-          :items="['online', 'presencial']"
+          item-title="title"
+          :items="[
+            { title: 'Online', value: 'online' },
+            { title: 'Presencial', value: 'onsite' },
+          ]"
         />
         <alex-inputs-select
           name="interval"
@@ -40,7 +46,8 @@
           required
         />
         <alex-inputs-text-field
-          :name="values.type === 'online' ? 'link' : 'local'"
+          v-if="values.type"
+          :name="values.type === 'online' ? 'link' : 'location'"
           :label="
             values.type === 'online' ? 'Link do encontro' : 'Local do encontro'
           "
@@ -107,13 +114,14 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
+import { LearningClassType } from './create/index.vue';
 import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 
 interface ScheduleProps {
   modelValue: boolean;
   startDate?: Date | string;
   endDate?: Date | string;
-  classes?: LearningClass[];
+  classes?: LearningClassType[];
 }
 const {
   startDate = undefined,
@@ -123,7 +131,9 @@ const {
 const emit = defineEmits(['update', 'create']);
 const { scheduleRules } = useFormRules();
 const modal = defineModel<boolean>({ required: true });
-const data = defineModel<MeetingPropsType | null>('data');
+const data = defineModel<(MeetingPropsType & { className: string }) | null>(
+  'data',
+);
 const rules = computed(() => {
   const startDateValue = startDate
     ? new Date(startDate.toString().replaceAll(/-/g, '/'))
@@ -136,28 +146,28 @@ const rules = computed(() => {
   return scheduleRules(startDateValue, endDateValue);
 });
 
-const { handleSubmit, setValues, values, handleReset, useFieldModel } = useForm(
-  {
-    validationSchema: rules.value,
-    initialValues: {
-      interval: data.value?.interval || 0,
-      date: data.value?.date,
-      startHour: data.value?.startHour,
-      endHour: data.value?.endHour,
-      type: data.value?.type || 'online',
-      local: data.value?.local,
-      link: data.value?.link,
-    },
-    keepValuesOnUnmount: false,
-  },
-);
+const {
+  handleSubmit,
+  setValues,
+  values,
+  handleReset,
+  useFieldModel,
+  resetForm,
+} = useForm({
+  validationSchema: rules.value,
+  keepValuesOnUnmount: false,
+});
 const meetingDate = useFieldModel('date');
 const submit = handleSubmit((values) => {
   if (!data.value) {
     const newId = Math.round(Math.random() * 12_345_68);
-    emit('create', { ...values, id: newId });
+    emit('create', { ...values, id: newId, className: values.className });
   } else {
-    emit('update', { ...values, id: data.value?.id });
+    emit('update', {
+      ...values,
+      id: data.value?.id,
+      className: values.className,
+    });
   }
   modal.value = false;
 });
@@ -176,42 +186,21 @@ const items = [
   { title: 'Mensal', value: 30 },
 ];
 
-// const linkLocalField = {
-//   link: {
-//     name: 'link',
-//     label: 'Link do encontro',
-//     placehoder: 'Digite o Link de acesso do encontro',
-//   },
-//   local: {
-//     name: 'local',
-//     label: 'Local do encontro',
-//     placehoder: 'Digite o endereço do encontro',
-//   },
-// };
-onUnmounted(() => {
-  data.value = null;
-  setValues({
-    interval: 0,
-    type: 'online',
-  });
-});
-
-onMounted(() => {
-  if (data) {
+onUpdated(() => {
+  if (data.value) {
     setValues({
+      className: data.value?.className,
       interval: data.value?.interval,
       startHour: data.value?.startHour,
       endHour: data.value?.endHour,
       date: data.value?.date,
       type: data.value?.type,
-      local: data.value?.local,
+      location: data.value?.location,
       link: data.value?.link,
     });
+    meetingDate.value = data.value?.date;
     return;
   }
-  setValues({
-    interval: 0,
-    type: 'online',
-  });
+  resetForm();
 });
 </script>

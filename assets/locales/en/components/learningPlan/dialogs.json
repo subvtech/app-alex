@@ -28,5 +28,7 @@
     "createClass": "Create class",
     "addClass": "Add class",
     "editClass": "Edit class",
-    "save": "Save"
+    "save": "Save",
+    "class": "Class",
+    "selectClassToMeeting": "Select class to your meeting"
 }
