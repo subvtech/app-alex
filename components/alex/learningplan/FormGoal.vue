@@ -45,12 +45,7 @@ const props = withDefaults(defineProps<FormGoalProps>(), {
 });
 const { filteredItems } = toRefs(props);
 const currentData = computed(() => props.data[props.index]);
-const preDefinedVerbs = ref(
-  filteredItems.value.filter(
-    (item) => item.text !== currentData.value.contentData.verb.text,
-  ),
-);
-const { validateField, errors, setFieldValue, useFieldModel } = useForm({
+const { errors } = useForm({
   validateOnMount: false,
   initialValues: {
     verb: currentData.value.contentData.verb.text,

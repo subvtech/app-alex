@@ -128,7 +128,7 @@ const toggleSave = () => {
       item.errorDescription ||
       item.errorKeyWord ||
       isEmpty(item.contentData.description) ||
-      isEmpty(item.contentData.keyWord),
+      isEmpty(item.contentData.verb.text),
   );
   if (errorFound) disableSave.value = true;
   else disableSave.value = false;
@@ -162,9 +162,8 @@ const addGoal = () => {
       description: '',
       keyWord: null,
       index: localData.value.length,
-      description: '',
       verb: {
-        text: '',
+        text: null,
         general: false,
       },
     },
