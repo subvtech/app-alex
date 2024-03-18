@@ -15,7 +15,7 @@
       :ripple="false"
       :disabled="tab.disabled"
       class="text-body-1 tab"
-      exact
+      :exact="exact"
       @click="tab.notification = false"
     >
       <v-icon v-if="tab.icon">{{ tab.icon }}</v-icon>
@@ -38,6 +38,7 @@ export type TabType = {
   notification?: boolean;
   icon?: string;
   disabled?: boolean;
+  exact?: boolean;
 };
 
 const props = defineProps({
@@ -60,6 +61,10 @@ const props = defineProps({
   showArrows: {
     type: Boolean,
     default: false,
+  },
+  exact: {
+    type: Boolean,
+    default: true,
   },
 });
 

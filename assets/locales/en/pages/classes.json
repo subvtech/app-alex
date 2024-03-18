@@ -4,6 +4,20 @@
   "searchPlaceholder": "Search...",
   "viewModeTooltip": "Change View",
   "filterTooltip": "Filter",
+  "editClass": "Edit Class",
+  "removeClass": "Remove Class",
+  "cardTitle": "Classes",
+  "emptyClasses": "It looks like there isnt any classes!",
+  "findClasses": "Find class",
+  "createClass": "Create class",
+  "notfound": "Class not found!",
+  "deleteSucess": "Class deleted successfully",
+  "createSuccess": "Class created successfully",
+  "createError": "Error when creating class!",
+  "updateSuccess": "Class updated successfully",
+  "updateError": "Error when updating class!",
+  "wantDeleteClass": "Do you really want to delete this class?",
+  "deleteClassSubtitle": "By removing this class, all content and students linked to it will lose this connection.",
   "tableHeaders": {
     "course": "Course",
     "description": "Description",
@@ -11,10 +25,11 @@
     "trails": "Trails"
   },
   "breadcrumbs": {
+    "classes": "Classes",
     "myCourses": "My Courses",
     "home": "Home"
   },
-  "showingData": "Showing %{from} to %{to} of %{total} courses",
+  "showingData": "Showing %{from} to %{to} of %{total} classes",
   "noData": "No %{object} found!",
   "participant": "Participant",
   "participating": "Participating",
