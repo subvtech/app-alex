@@ -4,6 +4,20 @@
   "searchPlaceholder": "Buscar...",
   "viewModeTooltip": "Alterar Visualização",
   "filterTooltip": "Filtrar",
+  "editClass": "Editar Turma",
+  "removeClass": "Excluir Turma",
+  "cardTitle": "Turmas",
+  "emptyClasses": "Parece que ainda na há turmas criadas!",
+  "findClasses": "Encontrar turma",
+  "createClass": "Criar turma",
+  "notfound": "Turma não encontrada!",
+  "deleteSucess": "Turma removida com sucesso!",
+  "createSuccess": "Turma criada com sucesso",
+  "createError": "Erro ao criar turma!",
+  "updateSuccess": "Turma atualizada com sucesso",
+  "updateError": "Erro ao atualizar turma!",
+  "wantDeleteClass": "Realmente deseja excluir essa turma?",
+  "deleteClassSubtitle": "Ao desfazer essa turma todos os conteúdos e alunos vinculados à perderão esse vínculo.",
   "tableHeaders": {
     "course": "Curso",
     "description": "Descrição",
@@ -11,10 +25,11 @@
     "trails": "Trilhas"
   },
   "breadcrumbs": {
+    "classes": "Turmas",
     "myCourses": "Meus Cursos",
     "home": "Home"
   },
-  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} cursos",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} turmas",
   "noData": "Nenhum {object} encontrado!",
   "participant": "Participante",
   "participating": "Participando",

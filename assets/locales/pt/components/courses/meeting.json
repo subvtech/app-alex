@@ -27,11 +27,12 @@
   "of": "de",
   "to": "a",
   "at": "às",
+  "unique": "Único",
   "interval": "A cada {days} dias",
   "everyday": "Diário",
-  "weekly": "Semanal: {day}",
-  "biweekly": "Quizenal: {day}",
-  "monthly": "Mensal: {day}",
+  "weekly": "Semanal",
+  "biweekly": "Quizenal",
+  "monthly": "Mensal",
   "empty": {
     "facilitator": "Parece que não há encontros disponíveis",
     "student": "Parece que você não tem encontro síncrono"

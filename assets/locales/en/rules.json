@@ -1,4 +1,9 @@
 {
+  "field": {
+    "required": "This field is required",
+    "min": "Min {min} caracteres ",
+    "max": "Max {max} caracteres "
+  },
   "fullName": {
     "required": "Full name is required",
     "min": "At least 6 characters long",
@@ -90,7 +95,6 @@
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
-
   "description": {
     "required": "Description is required",
     "min": "At least {min} characters long",
@@ -110,6 +114,18 @@
     "copy": {
       "success": "Text copied to clipboard",
       "error": "Couldn't copy to clipboard"
+    },
+    "type": {
+      "required": "Meeting type is required"
+    },
+    "interval": {
+      "required": "Meeting frequency is required"
+    },
+    "location": {
+      "required": "Meeting location is required"
+    },
+    "link": {
+      "required": "Access link is required"
     }
   },
   "copy": {
