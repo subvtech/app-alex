@@ -1,6 +1,6 @@
 <template>
   <v-slide-x-transition group>
-    <alex-learningplan-class-criation-card
+    <alex-learningplan-class-creation-card
       v-for="classValue in classes"
       :key="`class-${classValue.name}`"
       :name="classValue.name"

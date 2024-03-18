@@ -9,14 +9,14 @@ const learningPlanId = computed(() => parseInt(route.params.id.toString()));
 
 async function getClass() {
   await classStore.loadClass(classId.value, learningPlanId.value);
-}
-
-onBeforeMount(async () => {
-  await getClass();
 
   if (!classStore.currentClass) {
     return navigateTo(`/courses/${learningPlanId.value}/class`);
   }
+}
+
+onBeforeMount(async () => {
+  await getClass();
 });
 
 watch(classId, async () => {

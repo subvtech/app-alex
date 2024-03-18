@@ -543,7 +543,7 @@ watch(
           disabled: true,
         },
         {
-          title: 'Meus Cursos',
+          title: t('pages.classes.breadcrumbs.myCourses'),
           to: '/courses/me',
         },
         {
@@ -551,6 +551,14 @@ watch(
             ? learningPlanStore.learningPlan.title
             : 'Curso',
           to: `/courses/${learningPlanId.value}`,
+        },
+        {
+          title: t('pages.classes.breadcrumbs.classes'),
+          to: `/courses/${learningPlanId.value}/class`,
+        },
+        {
+          title: classStore.currentClass?.name || '',
+          to: '',
         },
       ];
     }

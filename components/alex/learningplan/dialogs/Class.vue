@@ -1,7 +1,7 @@
 <template>
   <alex-custom-dialog
     v-model="modal"
-    activator="parent"
+    :activator="parentActivator ? 'parent' : undefined"
     :title="
       !data
         ? $t('components.learningPlan.dialogs.createClass')
@@ -48,6 +48,8 @@
           name="members"
           label="Quem serão os participantes da turma?"
           placeholder="Selecione os participantes para a turma"
+          :ignore-user-ids="ignoreUserIds"
+          :ignore-emails="ignoreUserEmails"
         />
       </div>
 
@@ -56,6 +58,7 @@
           <alex-custom-button
             type="submit"
             size="large"
+            :loading="loadingSubmit"
             :text="
               $t(
                 `components.learningPlan.dialogs.${
@@ -85,8 +88,22 @@ import { useForm } from 'vee-validate';
 type ClassData = { id: number; className: string; responsible: number } | null;
 type ClassDialogProps = {
   noSelectUsers?: boolean;
+  closeDialogOnSubmit?: boolean;
+  loadingSubmit?: boolean;
+  ignoreUserIds: number[];
+  ignoreUserEmails: string[];
+  parentActivator: boolean;
 };
-const { noSelectUsers = true } = defineProps<ClassDialogProps>();
+
+const props = withDefaults(defineProps<ClassDialogProps>(), {
+  noSelectUsers: false,
+  closeDialogOnSubmit: true,
+  loadingSubmit: false,
+  ignoreUserIds: () => [],
+  ignoreUserEmails: () => [],
+  parentActivator: true,
+});
+
 const emit = defineEmits(['submit']);
 const modal = defineModel<boolean>({ required: true });
 const data = defineModel<ClassData>('data', {
@@ -103,14 +120,19 @@ const { handleSubmit, setValues } = useForm({
 });
 const onSubmit = handleSubmit(({ className, responsible }) => {
   const membersValue = JSON.parse(JSON.stringify(members.value));
+
   emit('submit', {
     name: className,
     in_charge_member: responsible,
     schedules: [],
     members: membersValue,
   });
-  modal.value = false;
+
+  if (props.closeDialogOnSubmit) {
+    modal.value = false;
+  }
 });
+
 const owner = useStrapiUser();
 const { find } = useStrapi<User>();
 const { data: responsiblesData } = await useAsyncData(
