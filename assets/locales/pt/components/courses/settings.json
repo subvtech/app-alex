@@ -1,4 +1,7 @@
 {
+  "breadcrumbTitle": "Meus cursos",
+  "home": "Home",
+  "myCourses": "Meus cursos",
   "title": "Configurações",
   "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
   "syncMeetingsTitle": "Encontros síncronos",
@@ -15,9 +18,10 @@
     "courseTitle": "Nome do curso",
     "startDate": "Início",
     "endDate": "Término",
-    "slug": {
-      "label": "Nome ou sigla do curso",
-      "unique": "Nome/Sigla selecionada não disponível"
+    "identifier": {
+      "label": "Identificador do curso",
+      "unique": "Identificador não disponível",
+      "tooltip": "O identificador do curso é um nome que servirá para diferenciar seu curso dos outros e permitir que ele seja acessado através da URL."
     },
     "cancel": "Cancelar",
     "save": "Salvar alterações",

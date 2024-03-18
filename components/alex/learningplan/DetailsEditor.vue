@@ -23,10 +23,8 @@
       <app-editor
         v-else
         ref="editorDetails"
-        class="editorjs w-full p-6 sm:p-16"
+        class="w-full p-6 sm:p-16"
         :data="data"
-        :class="[isEditing ? 'editing-editor' : 'locked']"
-        :spellcheck="isEditing ? 'true' : 'false'"
       />
     </template>
   </alex-custom-card>
@@ -42,12 +40,12 @@ type DetailsBlock = {
 type DetailsEditorProps = {
   data: {
     blocks: DetailsBlock[];
-  };
+  } | null;
   courseId: number;
   title: string;
   canEdit: boolean;
 };
-const props = withDefaults(defineProps<DetailsEditorProps>(), {});
+const props = withDefaults(defineProps<DetailsEditorProps>(), { data: null });
 const emit = defineEmits(['ready', 'update']);
 const { setMessage } = useMessageStore();
 const { data, canEdit } = toRefs(props);
@@ -58,7 +56,7 @@ const editorDetails = ref();
 const initialData = ref();
 const isEditing = ref(false);
 const isEmptyAndIsNotEditing = computed(
-  () => data.value?.blocks?.length === 0 && !isEditing.value,
+  () => !data.value?.blocks?.length && !isEditing.value,
 );
 const updateDetails = async () => {
   const editorData = await editorDetails.value?.getData();
@@ -91,7 +89,7 @@ const checkEditorReady = async () => {
 };
 const toggleReadOnly = async () => {
   readOnly.value = !readOnly.value;
-  if (editorDetails.value && data.value.blocks?.length) {
+  if (editorDetails.value && data.value?.blocks?.length) {
     await editorDetails.value.toggleReadOnly();
   }
 
@@ -100,7 +98,7 @@ const toggleReadOnly = async () => {
   }
 };
 const resetData = async () => {
-  if (!data.value.blocks?.length) {
+  if (!data.value?.blocks?.length) {
     editorDetails.value.clearEditor();
   } else {
     const editorData = JSON.parse(JSON.stringify(initialData.value));
@@ -113,7 +111,7 @@ onMounted(async () => {
   while (learningplanStore.loading) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (data.value.blocks?.length) {
+  if (data.value?.blocks?.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
       const editorData = JSON.parse(JSON.stringify(data.value));
@@ -126,63 +124,3 @@ onMounted(async () => {
   isLoading.value = false;
 });
 </script>
-
-<style global lang="scss">
-#editorjs {
-  width: 100% !important;
-}
-.locked {
-  pointer-events: none;
-  -webkit-user-select: text; /* Chrome, Safari, and Opera */
-  -moz-user-select: text; /* Firefox */
-  -ms-user-select: text; /* Internet Explorer/Edge */
-  user-select: text;
-
-  .ce-toolbar__actions.ce-toolbar__actions--opened {
-    display: none;
-  }
-}
-#editorjs .codex-editor__redactor {
-  padding-bottom: 0 !important;
-}
-@media (min-width: 651px) {
-  #editorjs:not(.locked) {
-    .codex-editor--narrow .ce-block {
-      margin-right: 0;
-      padding-right: 0;
-    }
-    .ce-block__content {
-      margin: 0;
-      margin-left: 40px;
-    }
-
-    .ce-toolbar__actions {
-      right: auto;
-      left: -20px;
-    }
-    .codex-editor--narrow .ce-toolbox .ce-popover,
-    .codex-editor--narrow .ce-settings .ce-popover {
-      right: auto;
-      left: 0;
-    }
-  }
-}
-#editorjs:not(.locked) {
-  .ce-toolbar__content {
-    margin: 0;
-  }
-}
-.ce-block__content {
-  margin: 0;
-  max-width: none;
-}
-.blocks {
-  text-align: justify;
-  text-justify: inter-word;
-  align-self: stretch;
-  color: #5d6872;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 22px;
-}
-</style>

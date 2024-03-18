@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    max-width="720"
+    :max-width="maxWidth"
     transition="dialog-center-transition"
     data-testid="alex-dialog"
     class="custom-alex-dialog"
@@ -22,7 +22,7 @@
       :emit-close="() => emits('update:modelValue', false)"
     />
     <alex-custom-dialog-header
-      v-else
+      v-else-if="!noHeader && !noFooter"
       data-testid="alex-dialog-header"
       :title="title"
       :highlighted-title="highlightedTitle"
@@ -64,6 +64,7 @@
               <alex-custom-dialog-footer
                 v-else-if="!hasFooter && !noFooter"
                 :no-secondary-button="isFirstStep"
+                :main-button-disabled="mainButtonDisabled"
               >
                 <template #mainSlotButton>
                   <alex-custom-button
@@ -108,6 +109,7 @@
       data-testid="alex-dialog-footer"
       :main-button-text="mainButtonText"
       :secondary-button-text="secondaryButtonText"
+      :main-button-disabled="mainButtonDisabled"
       @on-main-action="() => emits('onMainAction')"
       @on-secondary-action="() => emits('onSecondaryAction')"
     />
@@ -125,11 +127,14 @@ interface HeaderProps {
   highlightedTitle?: string;
   mainButtonText?: string;
   secondaryButtonText?: string;
+  mainButtonDisabled?: boolean;
   noFooter?: boolean;
+  noHeader?: boolean;
   stepper?: boolean;
   stepClass?: unknown[] | string;
   stepsConfig?: Record<string, Partial<StepsConfig>>;
   loading?: boolean;
+  maxWidth?: number;
 }
 const props = withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
@@ -138,11 +143,14 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   mainButtonText: undefined,
   secondaryButtonText: undefined,
   noFooter: false,
+  noHeader: false,
+  mainButtonDisabled: false,
   bodyClasses: undefined,
   stepper: false,
   stepsConfig: undefined,
   stepClass: undefined,
   loading: undefined,
+  maxWidth: 720,
 });
 const emits = defineEmits([
   'update:modelValue',
