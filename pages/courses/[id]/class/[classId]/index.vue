@@ -310,11 +310,11 @@ async function onClickSendInvites() {
   try {
     sendingInvites.value = true;
 
-    await strapi.update<LearningPlanSimple>(
+    await strapi.update<ClassSimple>(
       'classes',
       classStore.currentClass?.id || 0,
       {
-        members: usersToInvite.value,
+        learning_plan_members: usersToInvite.value,
       },
     );
 
