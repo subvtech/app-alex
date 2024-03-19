@@ -27,6 +27,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      matomoAppId: process.env.MATOMO_APP_ID,
       showComponentsPage: process.env.COMPONENTS_PAGE === 'on',
     },
   },
