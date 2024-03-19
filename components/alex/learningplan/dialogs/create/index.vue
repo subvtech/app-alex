@@ -184,7 +184,7 @@ const value = defineModel<boolean>({ required: true });
 const { create } = useStrapi4();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
-const { createCourseRules } = useFormRules();
+const { createCourseRules, classRules } = useFormRules();
 const stepsConfig = {
   step1: {
     title: t('components.learningPlan.dialogs.infos'),
@@ -198,6 +198,7 @@ const stepsConfig = {
   step3: {
     title: 'Turmas',
     subtitle: 'Ministradas',
+    scheme: classRules,
   },
   step4: {
     title: t('components.learningPlan.dialogs.meetings'),
