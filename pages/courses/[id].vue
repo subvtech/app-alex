@@ -156,5 +156,5 @@ const generalLinks = computed<TabType[]>(() => [
   //   value: 4,
   //   to: `/courses/${learningPlanId.value}/projects`,
   // },
-];
+]);
 </script>

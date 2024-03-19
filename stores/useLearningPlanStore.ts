@@ -40,6 +40,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'in_charge_member.user.avatar',
         'learning_plan_members.user.avatar',
         'learning_plan_groups.group_members.student_member.user.avatar',
+        'invitation_links',
+        'meeting_schedules',
       ],
     },
     tags: true,

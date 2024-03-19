@@ -106,33 +106,24 @@
                 label: 'assignments',
               },
             ]"
-            hide-dividers
+            hide-divider
           />
         </template>
         <template #footer>
-          <div class="w-100 fix-margin pb-6">
-            <alex-learningplan-meetings
-              is-nested
-              hide-dividers
-              sizing-class="ma-0"
-              :can-edit="learningPlanStore.userIsFacilitator"
-              :data="schedules"
-              :end-date="new Date()"
-              :is-facilitator="learningPlanStore.userIsFacilitator"
-              :to="
-                learningPlanStore.userIsFacilitator
-                  ? `${learningPlan.id}/settings`
-                  : ''
-              "
-              :learning-plan-id="learningPlan.id"
-            />
+          <div v-if="canEdit" class="w-100 fix-margin pb-6">
+            <p class="text-gray-800 text-h5">
+              {{ $t('components.courses.invites.title') }}
+            </p>
             <alex-learningplan-invites
-              v-if="canEdit"
+              v-for="classItem in learningPlanClasses"
+              :key="classItem.id"
               full-width
+              :class-name="classItem.name"
               :enable-invites="learningPlan.invite_enabled"
               :duration="learningPlan.invitation_duration"
               :course-id="learningPlan.id"
-              :data="invitationLink"
+              :class-id="classItem.id"
+              :data="classItem.activeLink"
               @update:link="
                 (data) => {
                   plainLink = data.url;
@@ -142,6 +133,29 @@
             />
           </div>
         </template>
+      </alex-custom-card>
+      <alex-custom-card
+        :title="$t('components.meeting.title')"
+        :show-icon="false"
+        class="w-100"
+      >
+        <div class="w-100 fix-margin pb-6 bg-green">
+          <alex-learningplan-meetings
+            is-nested
+            hide-dividers
+            sizing-class="ma-0"
+            :can-edit="learningPlanStore.userIsFacilitator"
+            :data="schedules"
+            :end-date="new Date()"
+            :is-facilitator="learningPlanStore.userIsFacilitator"
+            :to="
+              learningPlanStore.userIsFacilitator
+                ? `${learningPlan.id}/settings`
+                : ''
+            "
+            :learning-plan-id="learningPlan.id"
+          />
+        </div>
       </alex-custom-card>
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
@@ -183,6 +197,7 @@
 </template>
 <script setup lang="ts">
 import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;
@@ -196,6 +211,7 @@ const props = withDefaults(defineProps<GeneralProps>(), {
   schedules: () => [],
   loading: false,
 });
+
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
@@ -234,6 +250,27 @@ const learningGoals = computed(() =>
     },
   })),
 );
+
+const getActiveLink = (classItem: ClassSimple) => {
+  const activeLinks = classItem?.invitation_links?.filter(
+    (invite) =>
+      !invite.is_expired &&
+      (invite.emails_to_send ||
+        new Date(invite.expires_at).getTime() > new Date().getTime()),
+  );
+
+  return activeLinks && activeLinks.length > 0
+    ? activeLinks[activeLinks.length - 1]
+    : null;
+};
+
+const learningPlanClasses = computed(() => {
+  return props.learningPlan.classes.map((classItem) => ({
+    name: classItem.name,
+    id: classItem.id,
+    activeLink: getActiveLink(classItem),
+  }));
+});
 </script>
 
 <style scope lang="scss">

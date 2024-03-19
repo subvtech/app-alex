@@ -8,6 +8,7 @@
       :items="filteredItems"
       item-title="text"
       return-object
+      class="combobox-input"
       @update:model-value="handleKeyWord"
     />
     <alex-inputs-text-area
@@ -119,5 +120,8 @@ watch(errors, () => {
 .error {
   border-color: red;
   color: red;
+}
+.combobox-input {
+  max-width: 393px;
 }
 </style>
