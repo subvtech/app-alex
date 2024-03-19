@@ -3,7 +3,7 @@ import VueMatomo from 'vue-matomo';
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(VueMatomo, {
     host: 'http://profbrenojac.com.br:8090/',
-    siteId: nuxtApp.$config.public.matomoAppId,
+    siteId: 1,
     router: nuxtApp.$router,
     enableLinkTracking: true,
     requireConsent: false,
