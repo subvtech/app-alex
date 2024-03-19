@@ -22,7 +22,7 @@
       :emit-close="() => emits('update:modelValue', false)"
     />
     <alex-custom-dialog-header
-      v-else-if="!noHeader && !noFooter"
+      v-else-if="!noHeader"
       data-testid="alex-dialog-header"
       :title="title"
       :highlighted-title="highlightedTitle"
