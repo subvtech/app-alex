@@ -25,7 +25,7 @@ ENV STRAPI_URL=$strapi_url
 ENV COMPONENTS_PAGE=$components_page
 ENV MATOMO_APP_ID=$matomo_app_id
 
-
+RUN echo $MATOMO_APP_ID
 
 RUN yarn build
 
