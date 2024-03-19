@@ -141,11 +141,10 @@ const rules = computed(() => {
   const endDateValue = endDate
     ? new Date(endDate.toString().replaceAll(/-/g, '/'))
     : new Date();
-  startDateValue.setUTCHours(0, 0, 0, 0);
+  startDateValue.setHours(0, 0, 0, 0);
   endDateValue.setHours(23, 59, 59, 59);
   return scheduleRules(startDateValue, endDateValue);
 });
-
 const {
   handleSubmit,
   setValues,
