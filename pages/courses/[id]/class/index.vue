@@ -23,8 +23,8 @@
         <alex-learningplan-class-card
           :title="item?.name"
           :in-charge-member="{
-            name: item?.in_charge_member?.user.fullname,
-            image: item?.in_charge_member?.user.avatar,
+            name: item?.in_charge_member?.user?.fullname,
+            image: item?.in_charge_member?.user?.avatar,
           }"
           :class-members="getClassMembersInfo(item?.learning_plan_members)"
           :no-options="!learningPlanStore.userIsFacilitator"
@@ -105,7 +105,7 @@ async function onDeleteClass(id: number) {
     setMessage(t('pages.classes.deleteSucess'), 'green', true);
     learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
-    setMessage('Erro ao excluir grupo!', 'red', true);
+    setMessage(t('pages.classes.deleteError'), 'red', true);
   } finally {
     dialogConfirmDeleteClass.value = false;
   }
