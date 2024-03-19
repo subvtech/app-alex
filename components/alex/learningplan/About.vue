@@ -91,7 +91,7 @@ const props = defineProps({
   },
 });
 const { canEdit } = toRefs(props);
-const { longDescriptionRules } = useFormRules();
+const { longDescriptionRules } = useBasicRules();
 const { value, errorMessage, setValue } = useField(
   'description',
   longDescriptionRules.description,
