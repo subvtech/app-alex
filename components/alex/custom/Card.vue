@@ -200,11 +200,11 @@ const cancelledAction = async () => {
 
     .outline {
       box-shadow: none !important;
-      border: 1px solid var(--Cinza-Cinza-100, #ebedef);
+      border: 1px solid var(--Cinza-Cinza-200, #d2d6da);
     }
   }
   .border-bottom {
-    border-bottom: 1px solid #eaeef1;
+    border-bottom: 1px solid var(--Cinza-Cinza-100, #ebedef);
   }
   .foretitle {
     align-items: center;
