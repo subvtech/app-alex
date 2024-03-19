@@ -16,10 +16,8 @@ export const useProfilePicture = (profile, userId) => {
 
     isLoading.value = true;
     if (profile.value) {
-      const { updatedAt } = await updateImage(event, profile.value.id);
-
-      const url = profile.value.url?.split('?');
-      if (url) profile.value.url = url[0] + '?' + updatedAt;
+      const { url } = await updateImage(event, profile.value.id);
+      profile.value.url = url;
     } else {
       const temp = await uploadImage(event);
       userStore.user.avatar = { url: temp[0].url, id: temp[0].id };
@@ -29,7 +27,6 @@ export const useProfilePicture = (profile, userId) => {
         body: { avatar: temp[0].id },
       });
     }
-
     userStore.user.avatar = profile.value;
     isLoading.value = false;
   }
