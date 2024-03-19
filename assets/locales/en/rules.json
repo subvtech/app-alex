@@ -93,6 +93,7 @@
   },
   "class": {
     "required": "Class is required",
+    "requiredClassArray": "At least one class must be created",
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },

@@ -25,6 +25,9 @@
           {{ subtitle }}
         </p>
       </div>
+      <p class="text-body-5 text-error-0 text-center">
+        {{ errorMessage }}
+      </p>
     </div>
     <div v-else class="d-flex flex-column gap-2">
       <slot name="items" :remove-meeting="removeMeeting" />
@@ -33,6 +36,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends Partial<LearningClassType>">
+import { useField } from 'vee-validate';
 import { MeetingPropsType } from '../../Meeting.vue';
 import { LearningClassType, LearningScheduleCriation } from './index.vue';
 
@@ -48,7 +52,11 @@ const classesData = defineModel<T | null>('classData');
 const scheduleData = defineModel<
   (MeetingPropsType & { className: string }) | null
 >('schedules');
-const classes = defineModel<T[]>({ required: true });
+const classesModel = defineModel<T[]>({ required: true });
+const { value: classes, errorMessage } = useField<T[]>('classes', undefined, {
+  initialValue: classesModel.value,
+  syncVModel: true,
+});
 const onActionButton = () => {
   classesData.value = null;
   scheduleData.value = null;
