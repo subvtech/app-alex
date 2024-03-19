@@ -78,12 +78,18 @@ const hasMainSlotButton = computed(() => !!slots.mainSlotButton);
 const hasSecondarySlotButton = computed(() => !!slots.secondarySlotButton);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .border-top-gray-100 {
   border-top: 1px solid rgb(var(--v-theme-gray-100)) !important;
 }
 .min-height-76 {
   min-height: fit-content;
   height: 76px;
+}
+
+@media (max-width: 420px) {
+  .min-height-76 {
+    height: unset;
+  }
 }
 </style>
