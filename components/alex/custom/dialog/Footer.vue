@@ -14,6 +14,7 @@
           v-else
           size="large"
           variant="secondary"
+          :prepend-icon="secondaryButtonIcon"
           :text="secondaryButtonText"
           @click="() => emits('onSecondaryAction')"
         />
@@ -29,6 +30,7 @@
           size="large"
           variant="primary"
           :text="mainButtonText"
+          :prepend-icon="mainButtonIcon"
           :loading="mainButtonLoading"
           :disabled="mainButtonDisabled"
           @click="() => emits('onMainAction')"
@@ -41,7 +43,9 @@
 <script setup lang="ts">
 interface HeaderProps {
   mainButtonText?: string;
+  mainButtonIcon?: string;
   secondaryButtonText?: string;
+  secondaryButtonIcon?: string;
   noMainButton?: boolean;
   noSecondaryButton?: boolean;
   mainButtonLoading?: boolean;
@@ -55,15 +59,19 @@ interface HeaderProps {
     | 'space-evenly'
     | 'stretch';
 }
+
 withDefaults(defineProps<HeaderProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
+  mainButtonIcon: undefined,
+  secondaryButtonIcon: undefined,
   noMainButton: false,
   noSecondaryButton: false,
   mainButtonLoading: false,
   mainButtonDisabled: false,
   justify: 'end',
 });
+
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
 const hasMainSlotButton = computed(() => !!slots.mainSlotButton);
