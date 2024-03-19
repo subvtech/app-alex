@@ -3,7 +3,11 @@
     <alex-learningplan-class-section-card
       v-model:search="searchMembers"
       v-model:dialog-model="dialogAddMember"
-      :title="$t('pages.classes.classMembers')"
+      :title="
+        $t('pages.classes.classMembers', {
+          class: classStore?.currentClass?.name,
+        })
+      "
       :loading="learningPlanStore.loading"
       :show-empty-state="!classStore?.activeMembers?.length"
       :items="classStore.activeMembers || []"

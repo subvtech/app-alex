@@ -105,7 +105,7 @@ async function onDeleteClass(id: number) {
     setMessage(t('pages.classes.deleteSucess'), 'green', true);
     learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
-    setMessage('Erro ao excluir grupo!', 'red', true);
+    setMessage(t('pages.classes.deleteError'), 'red', true);
   } finally {
     dialogConfirmDeleteClass.value = false;
   }
