@@ -96,11 +96,13 @@ async function onConfirm() {
     loading.value = true;
 
     if (learningPlanStore.userIsPendingMember) {
-      const id = learningPlanStore.pendingMembers.find(
+      const member = learningPlanStore.pendingMembers.find(
         (member) =>
           member.user?.id === user.value?.id ||
           member.email === user.value?.email,
-      )?.id;
+      );
+
+      const id = member?.id;
 
       if (id && user.value) {
         await strapi.update('learning-plan-members', id, {
