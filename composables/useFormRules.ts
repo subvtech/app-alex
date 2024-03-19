@@ -200,7 +200,9 @@ export const useFormRules = () => {
         then: (scheme) => scheme.required(i18n.t('rules.institution.required')),
       }),
   });
-
+  const classRules = yup.object({
+    classes: yup.array().min(1, i18n.t('rules.class.requiredClassArray')),
+  });
   const registerStep3 = yup.object({
     ...passwordRules,
     ...usernameRules,
@@ -383,5 +385,6 @@ export const useFormRules = () => {
     createTrailsRules,
     createGroupRules,
     createEditClassRules,
+    classRules,
   };
 };

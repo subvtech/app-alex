@@ -84,6 +84,7 @@
   },
   "class": {
     "required": "Turma é obrigatório",
+    "requiredClassArray": "É necessário criar pelo menos uma turma",
     "min": "Mínimo de {min} caracteres",
     "max": "Máximo de {max} caracteres"
   },
