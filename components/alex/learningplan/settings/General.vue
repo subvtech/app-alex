@@ -115,7 +115,6 @@ const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   keepValuesOnUnmount: true,
 });
 
-
 const onSave = handleSubmit(async (e) => {
   if (controlledValues.value.slug !== slug.value) {
     const isSlugAvailable = await find('learningplans', {
@@ -125,10 +124,10 @@ const onSave = handleSubmit(async (e) => {
     if (isSlugAvailable.data.length !== 0) {
       setFieldError(
         'slug',
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
       );
       setMessage(
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
         'red',
         true,
       );
