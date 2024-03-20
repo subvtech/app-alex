@@ -117,11 +117,20 @@ const classes = defineModel<LearningClassType[]>('classes', {
 const { createEditClassRules } = useFormRules();
 const members = ref([]);
 const alreadyHasClassName = ref<LearningClassType>();
+const owner = useStrapiUser();
+const ownerItem = computed(() => ({
+  id: owner.value?.id,
+  email: owner.value?.email,
+  // @ts-ignore
+  fullname: owner.value?.fullname,
+  // @ts-ignore
+  avatar: owner.value?.avatar,
+}));
 // @ts-ignore
 const { handleSubmit, setValues, setFieldError, resetForm } = useForm({
   initialValues: {
     className: data.value?.name,
-    responsible: data.value?.in_charge_member || null,
+    responsible: data.value?.in_charge_member || ownerItem.value,
   },
   validationSchema: createEditClassRules,
   keepValuesOnUnmount: false,
@@ -151,7 +160,6 @@ const onSubmit = handleSubmit(({ className, responsible }) => {
   }
 });
 
-const owner = useStrapiUser();
 const { find } = useStrapi<User>();
 const { data: responsiblesData } = await useAsyncData(
   'collaborators',
@@ -178,15 +186,7 @@ const responsibles = computed(() => {
     (responsible) => responsible.id === owner.value?.id,
   );
   if (!hasOwner && owner.value && responsiblesData.value) {
-    const ownerItem = {
-      id: owner.value.id,
-      email: owner.value.email,
-      // @ts-ignore
-      fullname: owner.value.fullname,
-      // @ts-ignore
-      avatar: owner.value.avatar,
-    };
-    return [...responsiblesData.value, ownerItem];
+    return [...responsiblesData.value, ownerItem.value];
   }
   return responsiblesData.value;
 });
