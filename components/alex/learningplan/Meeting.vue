@@ -56,11 +56,12 @@
 
 <script setup lang="ts">
 // eslint-disable-next-line import/no-duplicates
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { pt } from 'date-fns/locale';
 import { AlexDropdownItem } from '../custom/Dropdown.vue';
 import { capitalize } from '@/utils';
+import date from '~/pages/components/inputs/date.vue';
 export type MeetingVariantType = 'editing' | 'default';
 export type MeetingType = 'onsite' | 'online';
 export interface MeetingPropsType {
@@ -105,6 +106,10 @@ const dateValue = computed(() => {
   return new Date(props.date);
 });
 const formattedDate = computed(() => {
+  if (!isValid(dateValue.value)) {
+    return '';
+  }
+
   const temp = format(dateValue.value, 'EEEE', { locale: pt });
   return capitalize(temp);
 });
@@ -127,12 +132,13 @@ const duration = computed(
 const title = computed(
   () => `${frequencyText.value}: ${formattedDate.value}, ${duration.value}`,
 );
-const subtitle = computed(
-  () =>
-    `Próximo encontro: ${format(
-      dateValue.value,
-      `d '${t('components.courses.meeting.of')}' MMMM`,
-      { locale: pt },
-    )}`,
+const subtitle = computed(() =>
+  isValid(dateValue.value)
+    ? `Próximo encontro: ${format(
+        dateValue.value,
+        `d '${t('components.courses.meeting.of')}' MMMM`,
+        { locale: pt },
+      )}`
+    : '',
 );
 </script>

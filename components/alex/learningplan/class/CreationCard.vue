@@ -38,14 +38,14 @@
 </template>
 
 <script setup lang="ts">
-type CriationCardProps = {
+type CreationCardProps = {
   name: string;
   user: {
     img?: string;
     name: string;
   };
 };
-withDefaults(defineProps<CriationCardProps>(), {});
+withDefaults(defineProps<CreationCardProps>(), {});
 const emit = defineEmits(['edit', 'delete']);
 const dropdownProps = [
   {

@@ -90,6 +90,7 @@
     "videojs-youtube": "^3.0.1",
     "vite-plugin-vuetify": "^1.0.2",
     "vue-i18n": "^9.2.2",
+    "vue-matomo": "^4.2.0",
     "vue-plyr": "^7.0.0",
     "vue-prism-component": "^2.0.0",
     "vuedraggable": "^4.1.0",

@@ -1,7 +1,7 @@
 <template>
   <alex-custom-dialog
     v-model="modal"
-    activator="parent"
+    :activator="parentActivator ? 'parent' : undefined"
     :title="
       !data
         ? $t('components.learningPlan.dialogs.createClass')
@@ -50,6 +50,8 @@
           :placeholder="
             $t('components.learningPlan.dialogs.selectClassPartipant')
           "
+          :ignore-user-ids="ignoreUserIds"
+          :ignore-emails="ignoreUserEmails"
         />
       </div>
 
@@ -58,6 +60,7 @@
           <alex-custom-button
             type="submit"
             size="large"
+            :loading="loadingSubmit"
             :text="
               $t(
                 `components.learningPlan.dialogs.${
@@ -87,15 +90,29 @@ import { useForm } from 'vee-validate';
 import { LearningClassType } from './create/index.vue';
 type ClassDialogProps = {
   noSelectUsers?: boolean;
+  closeDialogOnSubmit?: boolean;
+  loadingSubmit?: boolean;
+  ignoreUserIds?: number[];
+  ignoreUserEmails?: string[];
+  parentActivator?: boolean;
 };
-const { noSelectUsers = true } = defineProps<ClassDialogProps>();
+
+const props = withDefaults(defineProps<ClassDialogProps>(), {
+  noSelectUsers: false,
+  closeDialogOnSubmit: true,
+  loadingSubmit: false,
+  ignoreUserIds: () => [],
+  ignoreUserEmails: () => [],
+  parentActivator: true,
+});
+
 const emit = defineEmits(['submit']);
 const modal = defineModel<boolean>({ required: true });
 const data = defineModel<LearningClassType | null>('data', {
   default: null,
 });
 const classes = defineModel<LearningClassType[]>('classes', {
-  default: null,
+  default: [],
 });
 const { createEditClassRules } = useFormRules();
 const members = ref([]);
@@ -128,8 +145,12 @@ const onSubmit = handleSubmit(({ className, responsible }) => {
     learning_plan_members: membersValue,
     id: data.value?.id || Math.round(Math.random() * 123_456_789),
   });
-  modal.value = false;
+
+  if (props.closeDialogOnSubmit) {
+    modal.value = false;
+  }
 });
+
 const owner = useStrapiUser();
 const { find } = useStrapi<User>();
 const { data: responsiblesData } = await useAsyncData(
