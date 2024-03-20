@@ -47,7 +47,7 @@
           :label="$t('components.learningPlan.dialogs.whoParticipate')"
           :placeholder="$t('components.learningPlan.dialogs.searchMember')"
         />
-        <p>{{ $t('components.courses.pending') }}</p>
+        <p>{{ $t('components.courses.invites.pending') }}</p>
         <alex-custom-list-item-user
           v-for="(member, i) in classStore.pendingMembers"
           :key="`pending-member-${i}`"

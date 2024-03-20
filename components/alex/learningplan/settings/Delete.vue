@@ -44,21 +44,26 @@
             $t(`components.${namespace}.settings.delete.matchError`)
           "
           @submit="emit('update')"
+          @cancel="emit('cancel')"
         />
       </div>
     </template>
   </alex-custom-card>
 </template>
 <script setup lang="ts">
-const emit = defineEmits(['update']);
-defineProps({
-  namespace: {
-    type: String as PropType<'courses' | 'trails'>,
-    default: 'courses',
-  },
+const { t } = useI18n();
+const emit = defineEmits(['update', 'cancel']);
+export interface DeleteDialogProps {
+  namespace?: 'courses' | 'trails';
+}
+
+const props = withDefaults(defineProps<DeleteDialogProps>(), {
+  namespace: 'courses',
 });
 
-const wordConfirmation = ref('Excluir');
+const wordConfirmation = ref(
+  t(`components.${props.namespace}.settings.delete.word`),
+);
 </script>
 
 <style scoped lang="scss">

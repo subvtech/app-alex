@@ -66,11 +66,7 @@
                 ? inputValue !== inputWordConfirmation
                 : false
             "
-            @click="
-              () => {
-                emit('submit');
-              }
-            "
+            @click="emit('submit')"
         /></template>
         <template #secondarySlotButton
           ><alex-custom-button
@@ -78,7 +74,12 @@
             size="large"
             :text="cancelButtonText"
             variant="secondary"
-            @click="emit('cancel')"
+            @click="
+              () => {
+                emit('cancel');
+                openDialog = false;
+              }
+            "
         /></template>
       </alex-custom-dialog-footer>
     </template>
@@ -95,6 +96,9 @@
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
+/*
+  This component standardises usages of alex-custom-dialog, mostly used on /courses
+*/
 import * as yup from 'yup';
 import { ButtonSizeType, VariantType } from './Button.vue';
 
