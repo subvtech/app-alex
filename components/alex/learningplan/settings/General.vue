@@ -12,8 +12,9 @@
           :label="$t('components.courses.settings.general.courseTitle')"
           class="w-100"
           :error-messages="errors.title"
+          density="comfortable"
           required
-        ></alex-inputs-text-field>
+        />
         <div class="d-flex w-100 gap-6">
           <alex-inputs-date
             v-model="myStartDate"
@@ -21,6 +22,7 @@
             :label="$t('components.courses.settings.general.startDate')"
             :allowed-dates="disablePastDates"
             required
+            density="comfortable"
             :error-messages="errors.startDate"
             class="w-100"
           />
@@ -31,6 +33,7 @@
             :allowed-dates="disablePastDates"
             :label="$t('components.courses.settings.general.endDate')"
             required
+            density="comfortable"
             :error-messages="errors.endDate"
             class="w-100"
           />
@@ -45,6 +48,7 @@
           required
           :info="$t('components.courses.settings.general.identifier.tooltip')"
           :hint="accessUrl"
+          density="comfortable"
           persistent-hint
         />
       </div>
@@ -114,7 +118,6 @@ const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   validationSchema: generalCourseSchema,
   keepValuesOnUnmount: true,
 });
-
 
 const onSave = handleSubmit(async (e) => {
   if (controlledValues.value.slug !== slug.value) {
