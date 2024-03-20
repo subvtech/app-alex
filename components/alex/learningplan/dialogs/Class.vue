@@ -15,15 +15,15 @@
         <alex-inputs-text-field
           name="className"
           density="comfortable"
-          label="Qual o nome da turma?"
-          placeholder="Digite o nome da turma"
+          :label="$t('components.learningPlan.dialogs.whatClassName')"
+          :placeholder="$t('components.learningPlan.dialogs.typeClassName')"
           required
         />
         <alex-inputs-autocomplete
           name="responsible"
           density="comfortable"
-          label="Quem será o responsável pela turma?"
-          placeholder="Selecione o responsável"
+          :label="$t('components.learningPlan.dialogs.whosIsClassResponsible')"
+          :placeholder="$t('components.learningPlan.dialogs.selectResponsible')"
           required
           :items="responsibles"
           item-title="fullname"
@@ -46,8 +46,10 @@
           v-if="!noSelectUsers"
           v-model="members"
           name="members"
-          label="Quem serão os participantes da turma?"
-          placeholder="Selecione os participantes para a turma"
+          :label="$t('components.learningPlan.dialogs.whoAreClassParticipants')"
+          :placeholder="
+            $t('components.learningPlan.dialogs.selectClassPartipant')
+          "
         />
       </div>
 

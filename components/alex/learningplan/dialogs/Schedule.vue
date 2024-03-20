@@ -27,10 +27,10 @@
         />
         <alex-inputs-select
           name="type"
-          label="Tipo do encontro"
+          :label="$t('components.learningPlan.dialogs.meetingType')"
           density="comfortable"
           required
-          placeholder="Selecione o tipo do encontro"
+          :placeholder="$t('components.learningPlan.dialogs.selectMeetingType')"
           item-title="title"
           :items="[
             { title: 'Online', value: 'online' },
@@ -41,7 +41,9 @@
           name="interval"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
           :items="items"
-          placeholder="Selecione a frequência do encontro"
+          :placeholder="
+            $t('components.learningPlan.dialogs.selectFrequencyMeeting')
+          "
           density="comfortable"
           required
         />
@@ -49,12 +51,16 @@
           v-if="values.type"
           :name="values.type === 'online' ? 'link' : 'location'"
           :label="
-            values.type === 'online' ? 'Link do encontro' : 'Local do encontro'
+            values.type === 'online'
+              ? $t('components.learningPlan.dialogs.meetingLink')
+              : $t('components.learningPlan.dialogs.meetingAddress')
           "
           density="comfortable"
-          :placeholder="`Digite o ${
-            values.type === 'online' ? 'link de acesso' : 'endereço'
-          } do encontro`"
+          :placeholder="
+            values.type === 'online'
+              ? $t('components.learningPlan.dialogs.typeMeetingLink')
+              : $t('components.learningPlan.dialogs.typeMeetingAddress')
+          "
           required
         />
         <alex-inputs-date
@@ -63,7 +69,7 @@
           :allowed-dates="(date) => disablePastDates(date)"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
-          hint="Data que o encontro se inicia"
+          :hint="$t('components.learningPlan.dialogs.addressDataStarts')"
           persistent-hint
           class="w-100 mb-4"
           density="comfortable"
