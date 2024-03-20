@@ -1,4 +1,8 @@
+import { ClassSimple } from './classSimple.model';
+
 import { LearningPlanSimple } from './learningPlanSimple.model';
+
+// export interface LearningPlanScheduleSimple {
 
 interface DefaultLearningPlanScheduleSimple {
   id: number;
@@ -8,7 +12,7 @@ interface DefaultLearningPlanScheduleSimple {
   name: string;
   learningplan: LearningPlanSimple;
   meetings: LearningPlanMeetingSimple[];
-  learning_class: LearningClass;
+  learning_class?: ClassSimple;
   type: 'onsite' | 'online';
 }
 interface OnsiteLearningPlanScheduleSimple {
