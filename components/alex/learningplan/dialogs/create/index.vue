@@ -48,23 +48,23 @@
         :info="$t('components.learningPlan.dialogs.infoSlug')"
         :hint="plataformUrl"
       />
-      <div class="w-100 d-flex gap-4">
+      <div class="w-100 d-flex gap-4 flex-wrap">
         <alex-inputs-date
           v-model="startDate"
+          class="flex-grow-1 min-w"
           name="startDate"
           :label="$t('components.learningPlan.dialogs.startDateLabel')"
           required
-          class="w-100"
           density="comfortable"
           :allowed-dates="disablePastDates"
         />
         <alex-inputs-date
           v-model="endDate"
+          class="flex-grow-1 min-w"
           density="comfortable"
           name="endDate"
           required
           :label="$t('components.learningPlan.dialogs.endDateLabel')"
-          class="w-100"
           :allowed-dates="disablePastDates"
         />
       </div>
@@ -296,3 +296,9 @@ watch(
   },
 );
 </script>
+
+<style>
+.min-w {
+  min-width: 250px;
+}
+</style>

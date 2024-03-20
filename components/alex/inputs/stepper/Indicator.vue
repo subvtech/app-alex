@@ -3,7 +3,7 @@
     <div
       v-bind="props"
       class="d-flex rounded-lg align-center justify-center gap-4 w-fit pa-2 cursor-pointer active"
-      :class="useClasses(active, disabled, isHovering).container"
+      :class="[attrs.class, useClasses(active, disabled, isHovering).container]"
       @click="emit('onSelect')"
     >
       <div
@@ -99,6 +99,7 @@ const useClasses = (
   else if (active) return states.active;
   else return states.default;
 };
+const attrs = useAttrs();
 </script>
 
 <style scoped lang="scss">
