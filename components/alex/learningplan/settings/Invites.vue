@@ -6,7 +6,7 @@
   >
     <template #content>
       <div class="d-flex flex-column w-100">
-        <div class="d-flex flex-column border-bottom mb-5">
+        <div class="d-flex flex-column border-bottom">
           <span class="header-h5 title">{{
             $t('components.courses.settings.invite.label')
           }}</span>
@@ -31,11 +31,11 @@
               :items="timeOptions"
               :info="$t('components.courses.settings.invite.tooltip')"
             />
-            <div class="d-flex flex-column mt-3 align-self-center">
-              <span class="description">
+            <div class="d-flex flex-column align-self-center">
+              <!-- <span class="description">
                 {{ t('components.courses.settings.invite.linkAddress') }}
-              </span>
-              <alex-learningplan-invites
+              </span> -->
+              <!-- <alex-learningplan-invites
                 href=""
                 no-header
                 dark
@@ -50,13 +50,13 @@
                   }
                 "
                 @link:expired="invitationLink = null"
-              />
+              /> -->
             </div>
           </div>
         </div>
-        <v-divider :thickness="1" class="bg-white w-100 my-6" />
+        <!-- <v-divider :thickness="1" class="bg-white w-100 my-6" /> -->
 
-        <div class="d-flex flex-column gap-6">
+        <!-- <div class="d-flex flex-column gap-6">
           <span class="header-h5 title">{{
             t('components.courses.settings.invite.email')
           }}</span>
@@ -75,7 +75,7 @@
             "
             @click:append-inner="myMessage = defaultMessage"
           />
-        </div>
+        </div> -->
       </div>
     </template>
     <template #footer>
