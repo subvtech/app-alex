@@ -7,7 +7,7 @@
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
-      :title="$t('pages.courses.class')"
+      :title="$t('pages.courses.identifier')"
       :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
       :fullname="learningPlanStore.facilitator?.user?.fullname"

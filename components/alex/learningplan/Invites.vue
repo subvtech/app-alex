@@ -1,5 +1,5 @@
 <template>
-  <div v-if="enableInvites" class="relative mt-4">
+  <div class="relative mt-4">
     <p class="text-body-1 text-gray-800">{{ className }}</p>
     <div
       class="invite justify-space-between my-2"
@@ -52,11 +52,6 @@
       <p>{{ msToHHMMSS(remainingTime) }}</p>
     </div>
   </div>
-  <div v-else class="d-flex justify-center w-100">
-    <span class="desactivated">{{
-      $t('components.courses.invites.desactivated')
-    }}</span>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -68,14 +63,12 @@ type InviteProps = {
   classId: number;
   courseId: number;
   data?: InvitationLinkSimple | null;
-  enableInvites?: boolean;
   dark?: boolean;
   className: string;
 };
 
 const props = withDefaults(defineProps<InviteProps>(), {
   dark: false,
-  enableInvites: false,
   data: null,
   className: '',
 });

@@ -110,53 +110,45 @@
           />
         </template>
         <template #footer>
-          <div v-if="canEdit" class="w-100 fix-margin pb-6">
-            <p class="text-gray-800 text-h5">
+          <div
+            v-if="canEdit && learningPlanClasses.length"
+            class="w-100 fix-margin pb-6"
+          >
+            <p class="text-gray-800 text-h5 pb-6">
               {{ $t('components.courses.invites.title') }}
             </p>
-            <alex-learningplan-invites
-              v-for="classItem in learningPlanClasses"
-              :key="classItem.id"
-              full-width
-              :class-name="classItem.name"
-              :enable-invites="learningPlan.invite_enabled"
-              :duration="learningPlan.invitation_duration"
-              :course-id="learningPlan.id"
-              :class-id="classItem.id"
-              :data="classItem.activeLink"
-              @update:link="
-                (data) => {
-                  plainLink = data.url;
-                }
-              "
-              @link:expired="plainLink = null"
-            />
+            <div v-if="learningPlan.invite_enabled">
+              <alex-learningplan-invites
+                v-for="classItem in learningPlanClasses"
+                :key="classItem.id"
+                full-width
+                :class-name="classItem.name"
+                :duration="learningPlan.invitation_duration"
+                :course-id="learningPlan.id"
+                :class-id="classItem.id"
+                :data="classItem.activeLink"
+                @update:link="
+                  (data) => {
+                    plainLink = data.url;
+                  }
+                "
+                @link:expired="plainLink = null"
+              />
+            </div>
+            <div v-else class="d-flex justify-center w-100">
+              <span class="text-body-1 text-gray-500">{{
+                $t('components.courses.invites.desactivated')
+              }}</span>
+            </div>
           </div>
         </template>
       </alex-custom-card>
-      <alex-custom-card
-        :title="$t('components.meeting.title')"
-        :show-icon="false"
-        class="w-100"
-      >
-        <div class="w-100 fix-margin pb-6 bg-green">
-          <alex-learningplan-meetings
-            is-nested
-            hide-dividers
-            sizing-class="ma-0"
-            :can-edit="learningPlanStore.userIsFacilitator"
-            :data="schedules"
-            :end-date="new Date()"
-            :is-facilitator="learningPlanStore.userIsFacilitator"
-            :to="
-              learningPlanStore.userIsFacilitator
-                ? `${learningPlan.id}/settings`
-                : ''
-            "
-            :learning-plan-id="learningPlan.id"
-          />
-        </div>
-      </alex-custom-card>
+      <alex-learningplan-meetings
+        :learning-plan-classes="learningPlanClasses"
+        :learning-plan-id="learningPlan?.id"
+        :can-edit="learningPlanStore.userIsFacilitator"
+        :class-info="classInfo"
+      />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
@@ -218,6 +210,7 @@ const i18n = useI18n();
 const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
 const user = useStrapiUser<User>();
+
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
@@ -265,11 +258,19 @@ const getActiveLink = (classItem: ClassSimple) => {
 };
 
 const learningPlanClasses = computed(() => {
-  return props.learningPlan.classes.map((classItem) => ({
+  return props.learningPlan?.classes.map((classItem) => ({
     name: classItem.name,
     id: classItem.id,
     activeLink: getActiveLink(classItem),
+    meeting_schedules: classItem.meeting_schedules,
   }));
+});
+
+const classInfo = computed(() => {
+  return {
+    start: props.learningPlan?.start_date,
+    end: props.learningPlan?.end_date,
+  };
 });
 </script>
 
