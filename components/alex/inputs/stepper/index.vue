@@ -260,8 +260,10 @@ const onSelectStep = async (step: number) => {
 .stepper :deep(.v-slide-group__next) {
   min-width: 44px;
 }
-.stepper :deep(.first-indicator),
+.stepper :deep(.first-indicator) {
+  margin-left: auto !important;
+}
 .stepper :deep(.last-indicator) {
-  margin: 0 auto;
+  margin-right: auto !important;
 }
 </style>

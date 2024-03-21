@@ -201,3 +201,11 @@ onUpdated(() => {
   resetForm();
 });
 </script>
+
+<style scoped>
+@media screen and (max-width: 400px) {
+  .footer-buttons {
+    width: 100%;
+  }
+}
+</style>

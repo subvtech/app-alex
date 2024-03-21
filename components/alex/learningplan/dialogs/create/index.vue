@@ -51,7 +51,7 @@
       <div class="w-100 d-flex gap-4 flex-wrap">
         <alex-inputs-date
           v-model="startDate"
-          class="flex-grow-1 min-w"
+          class="flex-grow-1 min-w-60"
           name="startDate"
           :label="$t('components.learningPlan.dialogs.startDateLabel')"
           required
@@ -60,7 +60,7 @@
         />
         <alex-inputs-date
           v-model="endDate"
-          class="flex-grow-1 min-w"
+          class="flex-grow-1 min-w-60"
           density="comfortable"
           name="endDate"
           required
@@ -296,9 +296,3 @@ watch(
   },
 );
 </script>
-
-<style>
-.min-w {
-  min-width: 250px;
-}
-</style>

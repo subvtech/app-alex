@@ -74,13 +74,13 @@
           class="w-100 mb-4"
           density="comfortable"
         />
-        <div class="d-flex gap-4">
+        <div class="w-100 d-flex gap-4-md-0 flex-wrap">
           <alex-inputs-text-field
             type="time"
             name="startHour"
             :label="$t('components.courses.meeting.course.startTime')"
             required
-            class="w-100"
+            class="flex-grow-1 min-w-60"
             density="comfortable"
           />
           <alex-inputs-text-field
@@ -88,7 +88,7 @@
             name="endHour"
             :label="$t('components.courses.meeting.course.endTime')"
             required
-            class="w-100"
+            class="flex-grow-1 min-w-60"
             density="comfortable"
           />
         </div>
@@ -209,3 +209,14 @@ onUpdated(() => {
   resetForm();
 });
 </script>
+
+<style scoped>
+.gap-4-md-0 {
+  gap: 16px;
+}
+@media screen and (max-width: 590px) {
+  .gap-4-md-0 {
+    gap: 0;
+  }
+}
+</style>
