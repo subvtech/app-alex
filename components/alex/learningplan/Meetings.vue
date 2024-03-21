@@ -16,6 +16,7 @@
           prepend-icon="mdi-plus"
           variant="text"
           size="large"
+          @click="scheduleToUpdate = null"
         >
           <alex-learningplan-dialogs-schedule
             v-model="scheduleModal"
@@ -26,6 +27,7 @@
             :end-date="classInfo?.end"
             @update:schedules="scheduleModal"
             @create="handleCreate"
+            @update="confirmUpdate"
           />
           {{
             $t('components.courses.meeting.course.addButton')
@@ -66,7 +68,7 @@ const { setMessage } = useMessageStore();
 const i18n = useI18n();
 const editMeetings = ref(false);
 const scheduleModal = ref(false);
-const isLoading = ref(false);
+// const isLoading = ref(false);
 const deleteModal = ref(false);
 const props = defineProps({
   canEdit: {
@@ -107,8 +109,18 @@ const getSchedules = (classItem) => {
     const earliestMeeting = item.meetings?.find(
       (meeting) => new Date(meeting.date) >= new Date(),
     );
-    const startHour = item.startDate.split('T')[1].slice(0, 5);
-    const endHour = item.endDate.split('T')[1].slice(0, 5);
+
+    const startDate = new Date(item.startDate);
+    const endDate = new Date(item.endDate);
+
+    const startHour =
+      String(startDate.getHours()).padStart(2, '0') +
+      ':' +
+      String(startDate.getMinutes()).padStart(2, '0');
+    const endHour =
+      String(endDate.getHours()).padStart(2, '0') +
+      ':' +
+      String(endDate.getMinutes()).padStart(2, '0');
     return {
       id: item.id,
       startHour,
@@ -141,7 +153,7 @@ function deepClone(obj) {
 
   const clone = Array.isArray(obj) ? [] : {};
 
-  for (let i in obj) {
+  for (const i in obj) {
     if (obj[i] instanceof Date) {
       clone[i] = new Date(obj[i].valueOf());
     } else if (typeof obj[i] === 'object' && obj[i] !== null) {
@@ -201,7 +213,6 @@ const handleCreate = (newSchedule) => {
 
   const schedule = { ...newSchedule };
   delete schedule.id;
-
   schedulesChanges.value.push({
     schedule: {
       ...schedule,
