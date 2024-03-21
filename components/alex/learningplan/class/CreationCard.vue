@@ -6,10 +6,12 @@
     color="gray-200"
     :rounded="'lg'"
   >
-    <h4 class="text-gray-800 text-h4 w-100 ellipsis lines-1 text-break-all">
+    <h4
+      class="text-gray-800 text-h4 w-100 ellipsis lines-1 text-break-all min-w-80"
+    >
       {{ name }}
     </h4>
-    <div class="d-flex align-center gap-2 ml-4">
+    <div class="d-flex align-center gap-2 ml-4 w-100">
       <v-avatar :size="48" :image="user?.img" color="gray-100">
         <template v-if="!user.img" #default>
           <p class="text-h4 text-gray-600">
@@ -18,7 +20,7 @@
         </template>
       </v-avatar>
       <p
-        class="text-body-2 text-gray-600 user-name ellipsis lines-1 text-break-al"
+        class="text-body-2 text-gray-600 user-name ellipsis lines-1 text-break-all min-w-80"
       >
         {{ user.name }}
       </p>
@@ -63,8 +65,7 @@ const dropdownProps = [
 </script>
 
 <style lang="scss" scoped>
-.user-name {
-  width: max-content;
-  max-width: 185px;
+.min-w-80 {
+  min-width: 80px;
 }
 </style>
