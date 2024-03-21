@@ -37,7 +37,7 @@
               'd-flex flex-column max-height-stepper pa-6',
               stepClass,
             ]"
-            stepper-indicator-class="px-6 pt-6 pb-1"
+            :stepper-indicator-class="`px-${mobile ? '2' : '6'} pt-6 pb-1`"
             :loading="loading"
             @on-success="emits('onMainAction')"
           >
@@ -117,6 +117,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
 
 interface HeaderProps {
@@ -152,6 +153,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   loading: undefined,
   maxWidth: 720,
 });
+const { mobile } = useDisplay();
 const emits = defineEmits([
   'update:modelValue',
   'update:loading',

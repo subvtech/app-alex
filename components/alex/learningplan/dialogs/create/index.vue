@@ -48,23 +48,23 @@
         :info="$t('components.learningPlan.dialogs.infoSlug')"
         :hint="plataformUrl"
       />
-      <div class="w-100 d-flex gap-4">
+      <div class="w-100 d-flex gap-4 flex-wrap">
         <alex-inputs-date
           v-model="startDate"
+          class="flex-grow-1 min-w-60"
           name="startDate"
           :label="$t('components.learningPlan.dialogs.startDateLabel')"
           required
-          class="w-100"
           density="comfortable"
           :allowed-dates="disablePastDates"
         />
         <alex-inputs-date
           v-model="endDate"
+          class="flex-grow-1 min-w-60"
           density="comfortable"
           name="endDate"
           required
           :label="$t('components.learningPlan.dialogs.endDateLabel')"
-          class="w-100"
           :allowed-dates="disablePastDates"
         />
       </div>
@@ -76,8 +76,10 @@
       <alex-learningplan-dialogs-create-class-schedule-manager
         v-model="classes"
         v-model:classData="classData"
-        title="Gerencie suas turmas!"
-        subtitle="Adicione um nome e um responsável para cada turma."
+        :title="$t('components.learningPlan.dialogs.manageClasses')"
+        :subtitle="
+          $t('components.learningPlan.dialogs.addNameResponsibleToClass')
+        "
         img="/svg/class.svg"
         :title-header="$t('components.learningPlan.dialogs.newMeeting')"
         :show-itens="!!classes.length"
@@ -196,8 +198,8 @@ const stepsConfig = {
     subtitle: t('components.learningPlan.dialogs.descriptive'),
   },
   step3: {
-    title: 'Turmas',
-    subtitle: 'Ministradas',
+    title: t('components.learningPlan.dialogs.class'),
+    subtitle: t('components.learningPlan.dialogs.taught'),
     scheme: classRules,
   },
   step4: {
