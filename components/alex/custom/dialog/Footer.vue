@@ -14,6 +14,7 @@
           v-else
           size="large"
           variant="secondary"
+          class="footer-buttons"
           :text="secondaryButtonText"
           @click="() => emits('onSecondaryAction')"
         />
@@ -28,6 +29,7 @@
           v-else
           size="large"
           variant="primary"
+          class="footer-buttons"
           :text="mainButtonText"
           :loading="mainButtonLoading"
           :disabled="mainButtonDisabled"
@@ -70,12 +72,16 @@ const hasMainSlotButton = computed(() => !!slots.mainSlotButton);
 const hasSecondarySlotButton = computed(() => !!slots.secondarySlotButton);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .border-top-gray-100 {
   border-top: 1px solid rgb(var(--v-theme-gray-100)) !important;
 }
 .min-height-76 {
-  min-height: fit-content;
-  height: 76px;
+  min-height: 76px;
+}
+@media screen and (max-width: 400px) {
+  .footer-buttons {
+    width: 100%;
+  }
 }
 </style>
