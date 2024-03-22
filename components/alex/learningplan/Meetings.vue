@@ -36,7 +36,6 @@
         <alex-learningplan-class-meetings
           v-model="classModel"
           :variant="editMeetings ? 'editing' : 'default'"
-          :no-edit="true"
           @update="handleUpdate"
           @delete="handleDelete"
         />
@@ -104,6 +103,14 @@ const hasMeetings = computed(() => {
   return classModel.value?.some((classItem) => classItem.schedules?.length > 0);
 });
 
+const findClassByName = (className) => {
+  return classModel.value?.find((classItem) => classItem?.name === className);
+};
+
+const addScheduleChange = (change) => {
+  schedulesChanges.value.push(change);
+};
+
 const getSchedules = (classItem) => {
   return classItem.meeting_schedules?.map((item) => {
     const earliestMeeting = item.meetings?.find(
@@ -126,7 +133,7 @@ const getSchedules = (classItem) => {
       startHour,
       endHour,
       interval: item.interval,
-      date: earliestMeeting?.date ? new Date(earliestMeeting.date) : new Date(),
+      date: earliestMeeting?.date ? new Date(earliestMeeting.date) : false,
       location: item.type === 'onsite' ? item.location : undefined,
       link: item.type === 'online' ? item.link : undefined,
       type: item.type,
@@ -173,27 +180,23 @@ const toggleEditMode = () => {
   }
 };
 const onSave = async () => {
+  const endpoint = 'learning-plan-meeting-schedules';
   try {
-    for (const element of schedulesChanges.value) {
+    const tasks = schedulesChanges.value.map((element) => {
       switch (element.type) {
         case 'create':
-          await strapi.create(
-            'learning-plan-meeting-schedules',
-            element.schedule,
-          );
-          break;
+          return strapi.create(endpoint, element.schedule);
         case 'delete':
-          await strapi.delete('learning-plan-meeting-schedules', element.id);
-          break;
+          return strapi.delete(endpoint, element.id);
         case 'update':
-          await strapi.update(
-            'learning-plan-meeting-schedules',
-            element.schedule.id,
-            element.schedule,
-          );
-          break;
+          return strapi.update(endpoint, element.schedule.id, element.schedule);
+        default:
+          return Promise.resolve();
       }
-    }
+    });
+
+    await Promise.all(tasks);
+
     setMessage(i18n.t('components.courses.meeting.success'), 'green', true);
   } catch (error) {
     setMessage(i18n.t('components.courses.meeting.errorSaving'), 'error', true);
@@ -206,16 +209,19 @@ const onCancel = () => {
   schedulesChanges.value = [];
 };
 
-const handleCreate = (newSchedule) => {
-  const classId = classModel.value?.find(
-    (classItem) => classItem?.name === newSchedule.className,
-  ).id;
+const convertDate = (date, startHour) => {
+  const [hour, minute] = startHour.split(':');
+  const [year, month, day] = date.split('-');
+  return new Date(year, month - 1, day, hour, minute);
+};
 
-  const schedule = { ...newSchedule };
-  delete schedule.id;
-  schedulesChanges.value.push({
+const handleCreate = (newSchedule) => {
+  const { className, id, ...schedule } = newSchedule;
+  const classId = findClassByName(className)?.id;
+  addScheduleChange({
     schedule: {
       ...schedule,
+      date: convertDate(newSchedule.date, newSchedule.startHour),
       startDate: props.classInfo?.start,
       endDate: props.classInfo?.end,
       learningplan: props.learningPlanId,
@@ -223,9 +229,7 @@ const handleCreate = (newSchedule) => {
     },
     type: 'create',
   });
-  classModel.value
-    .find((classItem) => classItem.name === newSchedule.className)
-    .schedules.push(newSchedule);
+  findClassByName(className)?.schedules.push(newSchedule);
 };
 
 const handleDelete = (className: string, scheduleID: number) => {
@@ -241,14 +245,13 @@ const confirmDelete = () => {
   const DeletedSchedule =
     schedulesChanges.value[schedulesChanges.value.length - 1];
   deleteModal.value = false;
-  classModel.value
-    .find((classItem) => classItem.name === DeletedSchedule.name)
-    .schedules.splice(
-      classModel.value
-        .find((classItem) => classItem.name === DeletedSchedule.name)
-        .schedules.findIndex((schedule) => schedule.id === DeletedSchedule.id),
-      1,
-    );
+  const classItem = findClassByName(DeletedSchedule.name);
+  classItem?.schedules.splice(
+    classItem?.schedules.findIndex(
+      (schedule) => schedule.id === DeletedSchedule.id,
+    ),
+    1,
+  );
 };
 
 const cancelDelete = () => {
@@ -259,6 +262,9 @@ const cancelDelete = () => {
 const scheduleToUpdate = ref();
 
 const handleUpdate = (className: string, newSchedule) => {
+  if (typeof newSchedule.date !== 'string') {
+    newSchedule.date = newSchedule.date.toISOString().split('T')[0];
+  }
   scheduleToUpdate.value = {
     ...newSchedule,
     className,
@@ -266,21 +272,41 @@ const handleUpdate = (className: string, newSchedule) => {
   scheduleModal.value = true;
 };
 
-const confirmUpdate = (className: string, newSchedule) => {
-  schedulesChanges.value.push({
-    name: className,
-    type: 'update',
-    schedule: newSchedule,
-  });
-  classModel.value
-    .find((classItem) => classItem.name === className)
-    .schedules.splice(
-      classModel.value
-        .find((classItem) => classItem.name === className)
-        .schedules.findIndex((schedule) => schedule.id === newSchedule.id),
+const confirmUpdate = (newSchedule) => {
+  const scheduleUpdateClass = findClassByName(newSchedule.className);
+
+  if (newSchedule.className === scheduleToUpdate.value.className) {
+    scheduleUpdateClass?.schedules.splice(
+      scheduleUpdateClass?.schedules.findIndex(
+        (schedule) => schedule.id === newSchedule.id,
+      ),
       1,
       newSchedule,
     );
+  } else {
+    const scheduleOldClass = findClassByName(scheduleToUpdate.value.className);
+    scheduleOldClass?.schedules.splice(
+      scheduleOldClass?.schedules.findIndex(
+        (schedule) => schedule.id === newSchedule.id,
+      ),
+      1,
+    );
+    scheduleUpdateClass?.schedules.push(newSchedule);
+  }
+
+  const classId = findClassByName(newSchedule.className)?.id;
+  scheduleModal.value = true;
+  schedulesChanges.value.push({
+    type: 'update',
+    schedule: {
+      ...newSchedule,
+      date: convertDate(newSchedule.date, newSchedule.startHour),
+      startDate: props.classInfo?.start,
+      endDate: props.classInfo?.end,
+      learningplan: props.learningPlanId,
+      learning_class: classId,
+    },
+  });
 };
 </script>
 
