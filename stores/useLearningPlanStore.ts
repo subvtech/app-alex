@@ -20,7 +20,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const populate = {
     cover_image: true,
     media: true,
-    invitation_links: true,
+    invitation_links: {
+      populate: ['learning_class'],
+    },
     learning_goals: {
       populate: ['verb'],
     },
