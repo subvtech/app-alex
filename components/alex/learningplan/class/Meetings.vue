@@ -1,6 +1,6 @@
 <template>
-  <div v-for="(classValue, index) in classes" :key="index">
-    <h5 v-if="classValue.schedules.length" class="text-h5 text-gray-800 mb-2">
+  <div v-for="(classValue, index) in classes" :key="index" class="mb-6">
+    <h5 v-if="classValue?.schedules?.length" class="text-h5 text-gray-800 mb-4">
       {{ classValue.name }}
     </h5>
     <alex-learningplan-meeting
@@ -16,11 +16,15 @@
       :start-hour="schedule.startHour"
       :end-hour="schedule.endHour"
       :dropdown-props="[
-        {
-          icon: 'mdi-pencil',
-          text: $t('components.courses.meeting.edit'), //,
-          onClick: () => emit('update', classValue.name, schedule),
-        },
+        ...(noEdit
+          ? []
+          : [
+              {
+                icon: 'mdi-pencil',
+                text: $t('components.courses.meeting.edit'),
+                onClick: () => emit('update', classValue.name, schedule),
+              },
+            ]),
         {
           icon: 'mdi-trash-can',
           text: $t('components.courses.meeting.delete'),
@@ -37,8 +41,13 @@ import { MeetingVariantType } from '../Meeting.vue';
 import { LearningClassType } from '../dialogs/create/index.vue';
 type ClassMeetingsProps = {
   variant: MeetingVariantType;
+  noEdit?: boolean;
 };
-const classes = defineModel<LearningClassType[]>({ default: [] });
+const classes = defineModel<Pick<LearningClassType, 'schedules' | 'name'>[]>({
+  default: [],
+});
+
 const emit = defineEmits(['update', 'delete']);
-const { variant = 'editing' } = defineProps<ClassMeetingsProps>();
+const { variant = 'editing', noEdit = true } =
+  defineProps<ClassMeetingsProps>();
 </script>
