@@ -33,11 +33,12 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :toggle-drawer="() => closeDrawable(!clipped)"
-      :avatar="user.avatar"
-      :placeholder="user.fullname"
+      :avatar="user?.avatar"
+      :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
+      :track-current-user="userStore.isCurrentUser"
       show-picture
+      @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
     <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
@@ -78,8 +79,9 @@ const headerStore = usePageHeaderStore();
 const { profileMenuItems } = useMainHorizontalBar();
 
 onBeforeMount(() => {
-  userStore.avatar = user.value?.avatar;
-  userStore.fullname = user.value?.fullname;
+  if (!userStore.user) return;
+  userStore.user.avatar = user.value?.avatar;
+  userStore.user.fullname = user.value?.fullname;
 });
 
 // const steps = [
