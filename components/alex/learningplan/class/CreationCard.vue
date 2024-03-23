@@ -6,7 +6,7 @@
     color="gray-200"
     rounded="lg"
   >
-    <h4 class="text-gray-800 text-h4 ellipsis lines-1 text-break-all min-w-94">
+    <h4 class="text-gray-800 text-h4 ellipsis lines-1 text-break-all min-w-64">
       {{ name }}
     </h4>
     <div class="d-flex align-center justify-end gap-2 ml-4">
@@ -63,8 +63,8 @@ const dropdownProps = [
 </script>
 
 <style lang="scss" scoped>
-.min-w-94 {
-  min-width: 94px;
+.min-w-64 {
+  min-width: 64px;
 }
 .user-name {
   min-width: 60px;

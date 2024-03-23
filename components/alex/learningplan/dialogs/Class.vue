@@ -59,6 +59,7 @@
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
+            class="footer-buttons"
             type="submit"
             size="large"
             :loading="loadingSubmit"
@@ -74,6 +75,7 @@
         </template>
         <template #secondarySlotButton>
           <alex-custom-button
+            class="footer-buttons"
             :text="$t('components.courses.meeting.cancel')"
             variant="secondary"
             size="large"
@@ -205,7 +207,7 @@ onUpdated(() => {
 </script>
 
 <style scoped>
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 599px) {
   .footer-buttons {
     width: 100%;
   }
