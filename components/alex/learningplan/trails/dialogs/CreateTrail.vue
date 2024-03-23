@@ -67,20 +67,25 @@
         </alex-custom-button>
       </div>
     </div>
-    <v-form class="d-flex flex-column gap-6 mt-6">
+    <div class="d-flex flex-column gap-6 mt-6">
+      <pre>{{ createTrailsRules }}</pre>
       <alex-inputs-text-field
+        v-model="title"
         class="mt-2 mb-1"
         :label="$t('pages.trails.newTrailTitleLabel')"
         :placeholder="$t('pages.trails.newTrailTitlePlaceholder')"
         required
         density="comfortable"
+        :schema="createTrailsRules.title"
         name="title"
       />
       <alex-inputs-text-area
+        v-model="description"
         :label="$t('pages.trails.newTrailDescriptionLabel')"
         :placeholder="$t('pages.trails.newTrailDescriptionPlaceholder')"
         required
         density="comfortable"
+        :schema="createTrailsRules.description"
         name="description"
       />
       <v-file-input
@@ -90,13 +95,12 @@
         class="d-none"
         @change="handleFileChange"
       ></v-file-input>
-    </v-form>
+    </div>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useForm } from 'vee-validate';
 const { createTrailsRules } = useFormRules();
 const { create } = useStrapi();
 const strapiClient = useStrapiClient();
@@ -106,6 +110,9 @@ const fileInputRef = ref();
 const imageRef = ref();
 const image = ref(null);
 const dialog = ref(false);
+
+const title = ref();
+const description = ref();
 
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
@@ -142,12 +149,8 @@ const handleFileChange = () => {
   }
 };
 
-const { handleSubmit } = useForm({
-  validationSchema: createTrailsRules,
-});
-const createTrail = handleSubmit(async (values) => {
+const createTrail = async () => {
   isLoading.value = true;
-  const { title, description } = values;
   const uploadImage = fileInputRef.value.files[0];
   const formData = new FormData();
   formData.append('files', uploadImage);
@@ -175,7 +178,7 @@ const createTrail = handleSubmit(async (values) => {
     image.value = null;
     isLoading.value = false;
   }
-});
+};
 </script>
 
 <style scoped>

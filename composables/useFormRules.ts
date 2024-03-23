@@ -294,8 +294,7 @@ export const useFormRules = () => {
           },
         ),
     });
-
-  const createTrailsRules = yup.object({
+  const createTrailsRules = {
     title: yup
       .string()
       .required(i18n.t('rules.title.required'))
@@ -308,7 +307,9 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
       .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
       .trim(),
-  });
+  };
+
+  const createTrailsScheme = yup.object(createTrailsRules);
 
   const createGroupRules = {
     groupTitle: yup
@@ -360,7 +361,8 @@ export const useFormRules = () => {
     generalTrailSchema,
     emailRegex,
     scheduleRules,
-    createTrailsRules,
+    createTrailsScheme,
     createGroupRules,
+    createTrailsRules,
   };
 };
