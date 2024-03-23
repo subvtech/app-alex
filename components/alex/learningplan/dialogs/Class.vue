@@ -36,6 +36,7 @@
               :user="{
                 email: item.raw.email,
                 name: item.raw.fullname,
+                image: item.raw.avatar?.url,
               }"
               no-delete
               no-checkbox
@@ -170,6 +171,7 @@ const { data: responsiblesData } = await useAsyncData(
           name: 'Professor',
         },
       },
+      populate: ['avatar'],
     }) as unknown as Promise<UserSimple[]>,
   {
     transform: (value) =>
