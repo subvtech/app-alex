@@ -52,5 +52,13 @@
     "meetingDate": "Meeting Date",
     "startTime": "Start time",
     "endTime": "End time"
-  }
+  },
+  "deleteModal": {
+    "confirmation": "Do you really want to delete the meeting?",
+    "description": "By confirming, you will delete the registered synchronous meeting.",
+    "button": "Delete",
+    "cancel": "Cancel"
+  },
+  "errorSaving": "An error occurred while saving the meetings. Please try again later.",
+  "success": "The meetings have been saved successfully!"
 }
