@@ -107,19 +107,21 @@
       :is-professor="isProfessor"
       @display:settings="emit('display:settings')"
     />
-    <div class="d-flex justify-space-between align-center px-6">
+    <div class="d-flex justify-space-between align-center px-6 overflow-x-auto">
       <div class="d-flex">
         <alex-custom-tabs
           v-if="showMenu"
           v-model="selectedOption"
           :mandatory="false"
           :tabs="links"
+          class="tabs"
           @update:model-value="emit('select:option', selectedOption)"
         />
       </div>
       <alex-custom-button
         v-if="showMenu && showSettings"
         variant="text"
+        class="ml-2"
         :icon="settingsIcon"
         :color="isSettingsRoute ? 'secondary-0' : undefined"
         @click="() => onSelectSettings(settings?.to)"
@@ -304,7 +306,7 @@ watch(coverPicture!, () => {
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
         object-fit: cover;
-        aspect-ratio: 1 / 1;
+        aspect-ratio: 1/1;
       }
 
       .w-100.h-25 {
