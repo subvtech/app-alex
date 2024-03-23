@@ -63,12 +63,13 @@ $btn-icon-density: (
 }
 
 .v-dialog.custom-alex-dialog > .v-overlay__content {
-  max-height: calc(100vh - 160px);
+  --padding-top-bot: 160px;
+  max-height: calc(100vh - var(--padding-top-bot));
 }
 
-@supports (max-height: calc(100svh - 160px)) {
+@supports (max-height: calc(100svh - var(--padding-top-bot))) {
   .v-dialog.custom-alex-dialog > .v-overlay__content {
-    max-height: calc(100svh - 160px);
+    max-height: calc(100svh - var(--padding-top-bot));
   }
 }
 
@@ -91,8 +92,24 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 
 // Dialog Stepper
 .max-height-stepper {
-  max-height: calc(100svh - 400px);
+  --header: 72px;
+  --footer: 76px;
+  --stepper: 84px;
+  --padding-top-bot: 170px; // 16.16%;
+  --total: calc(
+    var(--header) + var(--footer) + var(--stepper) + var(--padding-top-bot)
+  );
+  max-height: calc(100svh - var(--total));
   overflow-y: auto;
+}
+
+@media screen and (max-height: 740px) {
+  .v-dialog.custom-alex-dialog > .v-overlay__content {
+    --padding-top-bot: calc(100svh * 0.16); // 120px
+  }
+  .max-height-stepper {
+    --padding-top-bot: calc((100svh * 0.16) + 10px);
+  }
 }
 
 /* Autocomplete inputs */
@@ -122,9 +139,24 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 
 @for $size from 2 through 256 {
   .width-#{$size} {
-    width: $size * 4px
+    width: $size * 4px;
   }
   .height-#{$size} {
-    height: $size * 4px
+    height: $size * 4px;
+  }
+}
+
+// Custom text properties
+.text-break-all {
+  word-break: break-all;
+}
+
+
+@for $size from 2 through 256 {
+  .min-w-#{$size} {
+    min-width: $size * 4px;
+  }
+  .min-h-#{$size} {
+    min-height: $size * 4px;
   }
 }
