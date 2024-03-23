@@ -3,7 +3,7 @@
     class="mb-6"
     :title="title"
     :is-editing="isEditingAndCanEdit"
-    :show-icon="canEdit"
+    no-icon="canEdit"
     :disable-save="errorMessage !== undefined || textNotChanged"
     full-width
     :@click:cancel="onCancel"

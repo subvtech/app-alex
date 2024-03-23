@@ -1,5 +1,5 @@
 <template>
-  <alex-custom-card title="Projetos" :show-icon="false" />
+  <alex-custom-card title="Projetos" />
 </template>
 <script setup lang="ts">
 definePageMeta({

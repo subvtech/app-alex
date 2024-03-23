@@ -71,7 +71,7 @@
     <div
       class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
     >
-      <alex-custom-card v-if="loading" title="" :show-icon="false">
+      <alex-custom-card v-if="loading" title="">
         <template #content>
           <div class="d-flex bg-white rounded-lg align-center w-100 gap-4">
             <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
@@ -84,7 +84,6 @@
       <alex-custom-card
         v-else
         :title="$t('pages.courses.details')"
-        :show-icon="false"
         class="w-100"
       >
         <template #content>

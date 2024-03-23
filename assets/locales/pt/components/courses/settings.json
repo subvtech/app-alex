@@ -15,7 +15,7 @@
   },
   "general": {
     "title": "Informações Gerais",
-    "courseTitle": "Nome do curso",
+    "name": "Nome do curso",
     "startDate": "Início",
     "endDate": "Término",
     "identifier": {
@@ -81,11 +81,11 @@
   },
   "visibility": {
     "title": "Visibilidade do curso",
-    "showCourse": {
+    "show": {
       "title": "Mostrar curso (Público)",
       "hint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca."
     },
-    "hideCourse": {
+    "hide": {
       "title": "Ocultar curso (Privado)",
       "hint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso."
     },

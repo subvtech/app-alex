@@ -1,6 +1,5 @@
 <template>
   <alex-custom-card
-    :show-icon="false"
     :title="$t('components.courses.invites.title')"
     :href="`${courseId}/settings`"
     hide-dividers

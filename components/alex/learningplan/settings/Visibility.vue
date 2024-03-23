@@ -1,7 +1,6 @@
 <template>
   <alex-custom-card
     :title="$t(`components.${variant}.settings.visibility.title`)"
-    :show-icon="false"
     show-footer-divider
   >
     <template #content>
@@ -9,9 +8,7 @@
         <alex-inputs-radio-button
           v-model="activeButton"
           :buttons="firstButton"
-          :text="
-            $t(`components.${variant}.settings.visibility.showCourse.title`)
-          "
+          :text="$t(`components.${variant}.settings.visibility.show.title`)"
         />
         <alex-inputs-radio-button
           v-model="activeButton"
@@ -23,15 +20,10 @@
       <div class="d-flex w-100 justify-end gap-4 pt-6">
         <alex-custom-button
           class="button"
-          :text="$t(`components.${variant}.settings.visibility.cancel`)"
-          variant="secondary"
-          @click="onCancel"
-        />
-        <alex-custom-button
-          class="button"
+          prepend-icon="mdi-check"
           :text="$t(`components.${variant}.settings.visibility.save`)"
           variant="primary"
-          @click="$emit('update', { hidden: activeButton === '2' })"
+          @click="emit('update', { hidden: activeButton === '2' })"
         />
       </div>
     </template>
@@ -53,29 +45,21 @@ const props = defineProps({
 
 const firstButton = ref([
   {
-    label: t(
-      `components.${props.variant}.settings.visibility.showCourse.title`,
-    ),
-    hint: t(`components.${props.variant}.settings.visibility.showCourse.hint`),
+    label: t(`components.${props.variant}.settings.visibility.show.title`),
+    hint: t(`components.${props.variant}.settings.visibility.show.hint`),
     value: '1',
   },
 ]);
 
 const secondButton = ref([
   {
-    label: t(
-      `components.${props.variant}.settings.visibility.hideCourse.title`,
-    ),
-    hint: t(`components.${props.variant}.settings.visibility.hideCourse.hint`),
+    label: t(`components.${props.variant}.settings.visibility.hide.title`),
+    hint: t(`components.${props.variant}.settings.visibility.hide.hint`),
     value: '2',
   },
 ]);
 
 const activeButton = ref(props.isHidden ? '2' : '1');
-
-const onCancel = () => {
-  activeButton.value = props.isHidden ? '2' : '1';
-};
 </script>
 <style scoped lang="scss">
 .radioButtons {
