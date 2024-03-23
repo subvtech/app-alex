@@ -6,8 +6,8 @@
     :show-icon="canEdit"
     :disable-save="errorMessage !== undefined || textNotChanged"
     full-width
-    :@click:cancel="onCancel"
-    :@click:save="() => emit('update', isOptional ? text : value)"
+    @click:cancel="onCancel"
+    @click:save="() => emit('update', isOptional ? text : value)"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
