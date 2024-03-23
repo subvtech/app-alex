@@ -20,7 +20,7 @@
           :user="{
             email: item.raw.email,
             name: item.raw.fullname,
-            image: item.raw.avatar?.url,
+            image: item.raw.avatar?.formats?.small?.url || item.raw.avatar?.url,
           }"
           no-delete
           no-checkbox
@@ -35,7 +35,7 @@
         :user="{
           email: item.email,
           name: item.fullname,
-          image: item.avatar?.url,
+          image: item.avatar?.formats?.small?.url || item.avatar?.url,
         }"
         remove-selection
         @delete="() => removeSelf(item.email)"
@@ -52,7 +52,7 @@ type User = {
   email: string;
   fullname?: string;
   local?: boolean;
-  avatar?: { url: string } | null;
+  avatar?: { url: string; formats?: { small: { url: string } } } | null;
 };
 interface AutoCompleteUsersProps {
   name: string;

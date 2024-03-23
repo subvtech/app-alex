@@ -250,6 +250,13 @@ const onSelectStep = async (step: number) => {
   }
   activeStep.value = step;
 };
+defineExpose({
+  onPrevStep,
+  isValid,
+  isLastStep: activeStep.value === numberSteps.value,
+  isFirstStep: activeStep.value === 1,
+  onSubmit,
+});
 </script>
 
 <style scoped>
