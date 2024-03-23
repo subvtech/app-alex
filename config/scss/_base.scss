@@ -150,3 +150,13 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 .text-break-all {
   word-break: break-all;
 }
+
+
+@for $size from 2 through 256 {
+  .min-w-#{$size} {
+    min-width: $size * 4px;
+  }
+  .min-h-#{$size} {
+    min-height: $size * 4px;
+  }
+}

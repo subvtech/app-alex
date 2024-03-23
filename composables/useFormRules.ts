@@ -200,7 +200,9 @@ export const useFormRules = () => {
         then: (scheme) => scheme.required(i18n.t('rules.institution.required')),
       }),
   });
-
+  const classRules = yup.object({
+    classes: yup.array().min(1, i18n.t('rules.class.requiredClassArray')),
+  });
   const registerStep3 = yup.object({
     ...passwordRules,
     ...usernameRules,
@@ -268,11 +270,11 @@ export const useFormRules = () => {
       date: yup
         .date()
         .required(i18n.t('rules.meeting.date.required'))
-        .min(startDate || currentDate, ({ min }) =>
-          i18n.t('rules.startDate.min', {
+        .min(startDate || currentDate, ({ min }) => {
+          return i18n.t('rules.startDate.min', {
             min: min.toLocaleString(i18n.locale.value).split(',')[0],
-          }),
-        )
+          });
+        })
         .max(endDate || currentDate, ({ max }) =>
           i18n.t('rules.endDate.max', {
             max: max.toLocaleString(i18n.locale.value).split(',')[0],
@@ -347,8 +349,8 @@ export const useFormRules = () => {
   const createEditClassRules = {
     className: yup
       .string()
-      .min(4, i18n.t('rules.name.min', { min: 6 }))
-      .max(64, i18n.t('rules.name.max', { max: 64 }))
+      .min(4, ({ min }) => i18n.t('rules.name.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.name.max', { max }))
       .required(i18n.t('rules.field.required'))
       .trim(),
     responsible: yup.mixed().required(i18n.t('rules.field.required')),
@@ -392,5 +394,6 @@ export const useFormRules = () => {
     createTrailsRules,
     createGroupRules,
     createEditClassRules,
+    classRules,
   };
 };
