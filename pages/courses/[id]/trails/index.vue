@@ -118,6 +118,7 @@
       :model-value="createTrailDialog"
       :learning-structure="learningStructure"
       @course-created="handleCreatedTrail"
+      @update:model-value="(e) => (createTrailDialog = e)"
     />
   </div>
 </template>

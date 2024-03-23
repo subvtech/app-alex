@@ -61,21 +61,27 @@
         </alex-custom-button>
       </div>
     </div>
-    <v-form @submit.prevent="createTrail">
+    <div>
       <alex-inputs-text-field
+        v-model="titleValue"
         class="mt-2 mb-1"
         :label="$t('pages.trails.newTrailTitleLabel')"
         :placeholder="$t('pages.trails.newTrailTitlePlaceholder')"
         required
+        :error-messages="titleErrorMsg"
         density="comfortable"
         name="title"
       />
+
       <alex-inputs-text-area
+        v-model="descriptionValue"
         :label="$t('pages.trails.newTrailDescriptionLabel')"
         :placeholder="$t('pages.trails.newTrailDescriptionPlaceholder')"
+        name="description"
         required
         density="comfortable"
-        name="description"
+        :schema="createTrailsRules.description"
+        :error-messages="descriptionErrorMsg"
       />
       <v-file-input
         ref="fileInputRef"
@@ -88,10 +94,11 @@
         <template #mainSlotButton>
           <alex-custom-button
             :loading="isLoading"
+            prepend-icon="mdi-plus"
             :text="$t('pages.trails.newTrailAction')"
             size="large"
-            type="submit"
-            prepend-icon="mdi-plus"
+            :disabled="disabledButton"
+            @click="createTrail"
           />
         </template>
         <template #secondarySlotButton>
@@ -104,13 +111,13 @@
           />
         </template>
       </alex-custom-dialog-footer>
-    </v-form>
+    </div>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useForm } from 'vee-validate';
+import { useField } from 'vee-validate';
 
 export interface CreateTrailDialogComponentType {
   learningStructure: number;
@@ -132,6 +139,15 @@ const { t } = useI18n();
 const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
 const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), {});
+const { value: descriptionValue, errorMessage: descriptionErrorMsg } = useField(
+  'description',
+  createTrailsRules.description,
+);
+
+const { value: titleValue, errorMessage: titleErrorMsg } = useField(
+  'title',
+  createTrailsRules.title,
+);
 
 const clearImage = () => {
   image.value = null;
@@ -156,17 +172,16 @@ const handleFileChange = () => {
   }
 };
 
-const { handleSubmit } = useForm({
-  validationSchema: createTrailsRules,
-  initialValues: {
-    title: '',
-    description: '',
-    image: null,
-  },
-});
-const createTrail = handleSubmit(async (values) => {
+const disabledButton = computed(
+  () =>
+    !!descriptionErrorMsg.value ||
+    !!titleErrorMsg.value ||
+    !titleValue.value ||
+    !descriptionValue.value,
+);
+
+const createTrail = async () => {
   isLoading.value = true;
-  const { title, description } = values;
   const uploadImage = fileInputRef.value.files[0];
   const formData = new FormData();
   formData.append('files', uploadImage);
@@ -179,8 +194,8 @@ const createTrail = handleSubmit(async (values) => {
       });
     }
     const data = {
-      title,
-      description,
+      title: titleValue.value,
+      description: descriptionValue.value,
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
@@ -194,7 +209,7 @@ const createTrail = handleSubmit(async (values) => {
     image.value = null;
     isLoading.value = false;
   }
-});
+};
 </script>
 
 <style scoped>
