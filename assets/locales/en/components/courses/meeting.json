@@ -27,12 +27,11 @@
   "of": "of",
   "to": "to",
   "at": "at",
-  "unique": "Unique",
   "interval": "Every {days} days",
   "everyday": "Daily",
-  "weekly": "Weekly",
-  "biweekly": "Biweekly",
-  "monthly": "Monthly",
+  "weekly": "Weekly: {day}",
+  "biweekly": "Biweekly: {day}",
+  "monthly": "Monthly: {day}",
   "empty": {
     "facilitator": "It seems that there are no meetings available",
     "student": "It seems that you don't have any meetings scheduled"

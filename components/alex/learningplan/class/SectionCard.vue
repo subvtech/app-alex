@@ -47,9 +47,7 @@
             size="large"
           >
             {{ actionText }}
-            <slot v-if="useCustomDialog" name="custom-dialog"></slot>
             <alex-custom-dialog
-              v-else
               v-model="dialogModelValue"
               :title="dialogTitle"
               activator="parent"
@@ -209,10 +207,6 @@ const props = defineProps({
   emptyStateObjectName: {
     type: String,
     default: 'pages.classes.participant',
-  },
-  useCustomDialog: {
-    type: Boolean,
-    default: false,
   },
 });
 

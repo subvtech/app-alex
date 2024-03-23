@@ -20,7 +20,7 @@
           )
         }}</span>
       </div>
-      <alex-learningplan-meeting
+      <course-meeting
         v-for="(item, index) in myData"
         v-else
         :key="index"
@@ -73,7 +73,7 @@
 import {
   MeetingVariantType,
   MeetingPropsType,
-} from '@/components/alex/learningplan/Meeting.vue';
+} from '@/components/CourseMeeting.vue';
 
 const { create, update, delete: _delete } = useStrapi();
 
@@ -94,7 +94,7 @@ export interface MeetingsPropsType {
 const props = withDefaults(defineProps<MeetingsPropsType>(), {
   data: () => [],
   canEdit: false,
-  variant: 'default',
+  variant: 'list',
   isFacilitator: false,
 });
 

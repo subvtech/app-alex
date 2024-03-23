@@ -1,34 +1,24 @@
 <template>
-  <v-form role="tablist" class="stepper" @submit="onSubmit">
-    <v-slide-group
+  <v-form role="tablist" @submit="onSubmit">
+    <div
       v-if="!noHeader"
-      class="py-3 px-1"
+      class="d-flex gap-4 py-3 px-1 align-center justify-center"
       :class="stepperIndicatorClass"
-      :show-arrows="mdAndDown"
-      center-active
     >
-      <v-slide-group-item
+      <alex-inputs-stepper-indicator
         v-for="({ title, subtitle, icon, completed }, index) in stepsList"
         :key="index"
-      >
-        <alex-inputs-stepper-indicator
-          class="mr-2"
-          :class="[
-            index === 0 && 'first-indicator',
-            stepsList.length - 1 === index && 'last-indicator',
-          ]"
-          :step-number="index + 1"
-          :active="index == activeStep - 1"
-          :checked="activeStep - 1 > index"
-          :title="title"
-          :subtitle="subtitle"
-          :icon="icon"
-          :completed="completed"
-          :disabled="false"
-          @on-select="() => onSelectStep(index + 1)"
-        />
-      </v-slide-group-item>
-    </v-slide-group>
+        :step-number="index + 1"
+        :active="index == activeStep - 1"
+        :checked="activeStep - 1 > index"
+        :title="title"
+        :subtitle="subtitle"
+        :icon="icon"
+        :completed="completed"
+        :disabled="false"
+        @on-select="() => onSelectStep(index + 1)"
+      />
+    </div>
     <template v-for="(_, index) in stepsList" :key="index">
       <v-slide-x-transition hide-on-leave>
         <div
@@ -77,7 +67,6 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { useDisplay } from 'vuetify/lib/framework.mjs';
 import * as yup from 'yup';
 
 interface Validate {
@@ -125,7 +114,7 @@ const emit = defineEmits(['onSuccess', 'updateLoading']);
 // Slots
 const slots = useSlots();
 const showControls = computed(() => !!slots.controls);
-const { mdAndDown } = useDisplay();
+
 // Steps Logic
 const slotsList = computed(() =>
   literalArray(
@@ -251,19 +240,3 @@ const onSelectStep = async (step: number) => {
   activeStep.value = step;
 };
 </script>
-
-<style scoped>
-.stepper :deep(.v-slide-group__content) {
-  margin: 2px 0;
-}
-.stepper :deep(.v-slide-group__prev),
-.stepper :deep(.v-slide-group__next) {
-  min-width: 44px;
-}
-.stepper :deep(.first-indicator) {
-  margin-left: auto !important;
-}
-.stepper :deep(.last-indicator) {
-  margin-right: auto !important;
-}
-</style>

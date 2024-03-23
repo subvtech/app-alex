@@ -1,9 +1,4 @@
 {
-  "field": {
-    "required": "Esse campo é obrigatório",
-    "min": "Mínimo {min} caracteres ",
-    "max": "Máximo {max} caracteres "
-  },
   "fullName": {
     "required": "Nome completo é necessário",
     "min": "Mínimo de 6 caracteres",
@@ -83,7 +78,6 @@
   },
   "class": {
     "required": "Turma é obrigatório",
-    "requiredClassArray": "É necessário criar pelo menos uma turma",
     "min": "Mínimo de {min} caracteres",
     "max": "Máximo de {max} caracteres"
   },
@@ -116,18 +110,6 @@
     "copy": {
       "success": "Texto copiado.",
       "error": "Não foi possível copiar o texto."
-    },
-    "type": {
-      "required": "Tipo do encontro é obrigatório"
-    },
-    "interval": {
-      "required": "Frequência do encontro é obrigatório"
-    },
-    "location": {
-      "required": "Endereço do encontro é obrigatório"
-    },
-    "link": {
-      "required": "Link de acesso do encontro é obrigatório"
     }
   },
   "copy": {

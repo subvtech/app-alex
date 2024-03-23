@@ -38,6 +38,9 @@ const emits = defineEmits(['onClose']);
   border-bottom: 1px solid rgb(var(--v-theme-gray-100)) !important;
 }
 .h-72 {
-  min-height: 72px;
+  height: 72px;
+}
+.h-76 {
+  height: 76px;
 }
 </style>

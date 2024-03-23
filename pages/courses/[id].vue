@@ -54,12 +54,7 @@ const user = useStrapiUser<User>();
 const route = useRoute();
 const learningPlanStore = useLearningPlanStore();
 const isJoinRoutePath = computed(() => {
-  if (!route?.name) {
-    return false;
-  }
-  const isRoute = route.name === 'courses-id-join-hash';
-
-  return isRoute;
+  return route.name === 'courses-id-join-hash';
 });
 
 const isSettingsRoutePath = computed(() => {
@@ -76,7 +71,6 @@ const fetchData = async () => {
   await useAsyncData('learningPlanDetails', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
-
   headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/');
@@ -108,20 +102,17 @@ const fetchData = async () => {
   }
 };
 const pageRoute = computed(() => route.name);
-
 onBeforeMount(async () => {
   headerStore.isLoading = true;
   await fetchData();
 });
-
 onUnmounted(() => {
   learningPlanStore.learningPlan = undefined;
   learningPlanStore.loading = true;
   headerStore.isLoading = false;
 });
-
 watch(pageRoute, async () => {
-  if ((pageRoute.value?.toString() || '').includes('courses-id')) {
+  if (pageRoute.value?.toString().includes('courses-id')) {
     await fetchData();
   }
 });
@@ -129,8 +120,7 @@ watch(pageRoute, async () => {
 const selectOption = (index: number | null) => {
   selectedOption.value = index;
 };
-
-const generalLinks = computed<TabType[]>(() => [
+const generalLinks: TabType[] = [
   {
     label: i18n.t('pages.courses.general'),
     value: 0,
@@ -156,5 +146,5 @@ const generalLinks = computed<TabType[]>(() => [
     value: 4,
     to: `/courses/${learningPlanId.value}/projects`,
   },
-]);
+];
 </script>

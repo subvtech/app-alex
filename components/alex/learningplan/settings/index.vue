@@ -21,6 +21,15 @@
           full-width
           @update="handleGeneralUpdate()"
         />
+        <alex-learningplan-meetings
+          can-edit
+          is-facilitator
+          :learning-plan-id="parseInt(id.toString())"
+          :data="schedules"
+          :end-date="new Date(learningPlan.end_date.replaceAll('-', '/'))"
+          variant="editing"
+          outline
+        />
         <alex-learningplan-settings-invites
           :learning-plan-id="parseInt(id.toString())"
           :invite-enabled="learningPlan.invite_enabled"
@@ -55,6 +64,7 @@ const myIdentifier = ref('');
 const accessUrl = computed(() => {
   return `${window.location.origin}/courses/${id}`;
 });
+
 
 const learningPlanStore = useLearningPlanStore();
 const fetchData = async () => {

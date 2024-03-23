@@ -1,5 +1,3 @@
-import { ClassSimple } from './classSimple.model';
-
 export enum MemberRoles {
   STUDENT = 'student',
   PARTNER = 'partner',
@@ -24,5 +22,4 @@ export interface LearningPlanMemberSimple {
   trail_contribuitions: any[];
   group_members: any[];
   task_members: any[];
-  learning_class?: ClassSimple;
 }

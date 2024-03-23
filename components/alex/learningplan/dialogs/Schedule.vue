@@ -1,6 +1,6 @@
 <template>
   <alex-custom-dialog
-    v-model="modal"
+    v-model="value"
     activator="parent"
     :title="
       $t(
@@ -9,58 +9,16 @@
         }`,
       )
     "
-    body-classes="pa-0 bg-white"
+    body-classes="pa-0 bg-white rounded-b-lg"
+    no-footer
   >
-    <v-form @reset="handleReset">
+    <v-form @submit="submit" @reset="handleReset">
       <div class="pa-6">
         <alex-inputs-select
-          name="className"
-          :label="$t('components.learningPlan.dialogs.class')"
-          :placeholder="
-            $t('components.learningPlan.dialogs.selectClassToMeeting')
-          "
-          :items="classes"
-          density="comfortable"
-          required
-          item-title="name"
-          item-value="name"
-        />
-        <alex-inputs-select
-          name="type"
-          :label="$t('components.learningPlan.dialogs.meetingType')"
-          density="comfortable"
-          required
-          :placeholder="$t('components.learningPlan.dialogs.selectMeetingType')"
-          item-title="title"
-          :items="[
-            { title: 'Online', value: 'online' },
-            { title: 'Presencial', value: 'onsite' },
-          ]"
-        />
-        <alex-inputs-select
+          :items="items"
           name="interval"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
-          :items="items"
-          :placeholder="
-            $t('components.learningPlan.dialogs.selectFrequencyMeeting')
-          "
           density="comfortable"
-          required
-        />
-        <alex-inputs-text-field
-          v-if="values.type"
-          :name="values.type === 'online' ? 'link' : 'location'"
-          :label="
-            values.type === 'online'
-              ? $t('components.learningPlan.dialogs.meetingLink')
-              : $t('components.learningPlan.dialogs.meetingAddress')
-          "
-          density="comfortable"
-          :placeholder="
-            values.type === 'online'
-              ? $t('components.learningPlan.dialogs.typeMeetingLink')
-              : $t('components.learningPlan.dialogs.typeMeetingAddress')
-          "
           required
         />
         <alex-inputs-date
@@ -69,18 +27,16 @@
           :allowed-dates="(date) => disablePastDates(date)"
           :label="$t('components.courses.meeting.course.meetingDate')"
           required
-          :hint="$t('components.learningPlan.dialogs.addressDataStarts')"
-          persistent-hint
-          class="w-100 mb-4"
+          class="w-100 mt-4"
           density="comfortable"
         />
-        <div class="w-100 d-flex gap-4-md-0 flex-wrap">
+        <div class="d-flex gap-4">
           <alex-inputs-text-field
             type="time"
             name="startHour"
             :label="$t('components.courses.meeting.course.startTime')"
             required
-            class="flex-grow-1 min-w-60"
+            class="w-100"
             density="comfortable"
           />
           <alex-inputs-text-field
@@ -88,20 +44,18 @@
             name="endHour"
             :label="$t('components.courses.meeting.course.endTime')"
             required
-            class="flex-grow-1 min-w-60"
+            class="w-100"
             density="comfortable"
           />
         </div>
       </div>
-    </v-form>
-    <template #footer>
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
             :text="$t(`components.courses.meeting.${data ? 'save' : 'add'}`)"
             size="large"
+            type="submit"
             :prepend-icon="data ? 'mdi-check' : 'mdi-plus'"
-            @click="submit"
           />
         </template>
         <template #secondarySlotButton>
@@ -110,71 +64,76 @@
             variant="secondary"
             size="large"
             prepend-icon="mdi-close"
-            @click="modal = false"
+            @click="$emit('update:modelValue', false)"
           />
         </template>
       </alex-custom-dialog-footer>
-    </template>
+    </v-form>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { LearningClassType } from './create/index.vue';
-import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import { MeetingPropsType } from '@/components/CourseMeeting.vue';
 
 interface ScheduleProps {
   modelValue: boolean;
-  startDate?: Date | string;
+  data?: MeetingPropsType | null;
   endDate?: Date | string;
-  classes?: LearningClassType[];
+  startDate?: Date | string;
 }
-const {
-  startDate = undefined,
-  endDate = undefined,
-  classes = [],
-} = defineProps<ScheduleProps>();
-const emit = defineEmits(['update', 'create']);
+
+const props = withDefaults(defineProps<ScheduleProps>(), {
+  modelValue: undefined,
+  data: undefined,
+  endDate: undefined,
+  startDate: undefined,
+});
+
+const emit = defineEmits(['update:modelValue', 'update:data', 'submit']);
 const { scheduleRules } = useFormRules();
-const modal = defineModel<boolean>({ required: true });
-const data = defineModel<(MeetingPropsType & { className: string }) | null>(
-  'data',
-);
+const value = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit('update:modelValue', value);
+  },
+});
 const rules = computed(() => {
-  const startDateValue = startDate
-    ? new Date(startDate.toString().replaceAll(/-/g, '/'))
+  const startDate = props.startDate
+    ? new Date(props.startDate.toString().replace(/-/g, '/'))
     : new Date();
-  const endDateValue = endDate
-    ? new Date(endDate.toString().replaceAll(/-/g, '/'))
+  const endDate = props.endDate
+    ? new Date(props.endDate.toString().replace(/-/g, '/'))
     : new Date();
-  startDateValue.setHours(0, 0, 0, 0);
-  endDateValue.setHours(23, 59, 59, 59);
-  return scheduleRules(startDateValue, endDateValue);
+  endDate.setUTCHours(23, 59, 59, 59);
+  startDate.setHours(0, 0, 0, 0);
+  return scheduleRules(startDate, endDate);
 });
-const {
-  handleSubmit,
-  setValues,
-  values,
-  handleReset,
-  useFieldModel,
-  resetForm,
-} = useForm({
+const data = computed({
+  get() {
+    return props.data;
+  },
+  set(value) {
+    emit('update:data', value);
+  },
+});
+
+const { handleSubmit, handleReset, setFieldValue } = useForm({
   validationSchema: rules.value,
-  keepValuesOnUnmount: false,
+  initialValues: {
+    interval: data.value?.interval || 0,
+    date: data.value?.date,
+    startHour: data.value?.startHour || '',
+    endHour: data.value?.endHour || '',
+  },
 });
-const meetingDate = useFieldModel('date');
+
+const meetingDate = ref(data.value?.date);
 const submit = handleSubmit((values) => {
-  if (!data.value) {
-    const newId = Math.round(Math.random() * 12_345_68);
-    emit('create', { ...values, id: newId, className: values.className });
-  } else {
-    emit('update', {
-      ...values,
-      id: data.value?.id,
-      className: values.className,
-    });
-  }
-  modal.value = false;
+  emit('submit', { ...values, id: props.data?.id });
+  emit('update:modelValue', false);
 });
 
 const disablePastDates = (date: Date) => {
@@ -183,7 +142,11 @@ const disablePastDates = (date: Date) => {
   const parsedDate = new Date(date);
   return parsedDate >= today;
 };
-const items = [
+
+const items: {
+  title: string;
+  value: number;
+}[] = [
   { title: 'Não se repete', value: 0 },
   { title: 'Diário', value: 1 },
   { title: 'Semanal', value: 7 },
@@ -191,32 +154,23 @@ const items = [
   { title: 'Mensal', value: 30 },
 ];
 
-onUpdated(() => {
-  if (data.value) {
-    setValues({
-      className: data.value?.className,
-      interval: data.value?.interval,
-      startHour: data.value?.startHour,
-      endHour: data.value?.endHour,
-      date: data.value?.date,
-      type: data.value?.type,
-      location: data.value?.location,
-      link: data.value?.link,
-    });
-    meetingDate.value = data.value?.date;
-    return;
+watch(value, () => {
+  if (!value.value) {
+    emit('update:data', null);
+    meetingDate.value = undefined;
+    handleReset();
+    setFieldValue('interval', 0);
   }
-  resetForm();
+});
+
+watch(data, (value) => {
+  if (value) {
+    setFieldValue('interval', value.interval);
+    setFieldValue('startHour', value.startHour);
+    setFieldValue('endHour', value.endHour);
+    setFieldValue('date', value.date);
+    meetingDate.value = value.date;
+  }
 });
 </script>
-
-<style scoped>
-.gap-4-md-0 {
-  gap: 16px;
-}
-@media screen and (max-width: 590px) {
-  .gap-4-md-0 {
-    gap: 0;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
