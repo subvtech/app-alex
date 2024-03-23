@@ -5,7 +5,7 @@
       <p class="text-body-1" :class="`text-${textColor}`">
         {{ label }}
       </p>
-      <alex-custom-tooltip v-if="info" show-icon :text="info" />
+      <alex-custom-tooltip v-if="info" show-icon :text="info"/>
     </div>
     <v-select
       v-model="value"
@@ -15,7 +15,8 @@
       no-resize
       role="select"
       clear-icon="mdi-close"
-      :class="[theme]"
+      class="height-44"
+      :class="[theme, smaller ? 'height-44' : '']"
       :error-messages="errorMessage"
       :disabled="disabled"
       :menu-props="{
@@ -83,6 +84,12 @@ const textColor = computed(() => {
 </script>
 
 <style lang="scss">
+.height-44 {
+  height: 44px !important;
+  min-height: unset !important;
+  max-height: 44px;
+  width: auto;
+}
 .alex-select {
   &.v-theme--mainTheme {
     --v-border-opacity: 1 !important;

@@ -3,14 +3,10 @@
     <alex-learningplan-class-section-card
       v-model:search="searchMembers"
       v-model:dialog-model="dialogAddMember"
-      :title="
-        $t('pages.classes.classMembers', {
-          class: classStore?.currentClass?.name,
-        })
-      "
+      :title="$t('pages.classes.classMembers')"
       :loading="learningPlanStore.loading"
-      :show-empty-state="!classStore?.activeMembers?.length"
-      :items="classStore.activeMembers || []"
+      :show-empty-state="!learningPlanStore?.activeMembers?.length"
+      :items="learningPlanStore.activeMembers || []"
       empty-state-image="/svg/no-team-members.svg"
       image-height="250px"
       image-width="335px"
@@ -20,7 +16,7 @@
       action-icon="mdi-email-outline"
       :dialog-title="$t('pages.classes.courseInvites')"
       :filter-keys="['user.fullname', 'email']"
-      :show-action="classStore.userCanEdit"
+      :show-action="learningPlanStore.userIsFacilitator"
       :dialog-action-text="$t('pages.classes.sendInvites')"
       :dialog-action-loading="sendingInvites"
       :dialog-action-disabled="!usersToInvite.length"
@@ -33,7 +29,7 @@
           :avatar-image="item?.user?.avatar?.url"
           :cover-image="item?.user?.cover"
           :role="item?.role"
-          :no-options="!classStore.userCanEdit"
+          :no-options="!learningPlanStore.userIsFacilitator"
           @delete="() => deleteParticipant(item.id)"
         />
       </template>
@@ -49,7 +45,7 @@
         />
         <p>Convites pendentes</p>
         <alex-custom-list-item-user
-          v-for="(member, i) in classStore.pendingMembers"
+          v-for="(member, i) in learningPlanStore.pendingMembers"
           :key="`pending-member-${i}`"
           :user="{
             name: member.user?.fullname,
@@ -78,8 +74,8 @@
       v-model:dialog-model="dialogGroup"
       :title="$t('pages.classes.membersGroup')"
       :loading="learningPlanStore.loading"
-      :items="classStore.currentClass?.learning_plan_groups"
-      :show-empty-state="!classStore.currentClass?.learning_plan_groups?.length"
+      :items="learningPlanStore.learningPlan?.groups"
+      :show-empty-state="!learningPlanStore.learningPlan?.groups?.length"
       empty-state-image="/svg/no-group-members.svg"
       image-height="200px"
       image-width="250px"
@@ -91,7 +87,7 @@
       :dialog-action-text="dialogGroupActionText"
       :dialog-title="dialogGroupTitle"
       :filter-keys="['title']"
-      :show-action="classStore.userCanEdit"
+      :show-action="learningPlanStore.userIsFacilitator"
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="!formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
@@ -101,7 +97,7 @@
         <alex-learningplan-class-group-card
           :title="item?.title"
           :members="getGroupMembersInfo(item.group_members)"
-          :no-options="!classStore.userCanEdit"
+          :no-options="!learningPlanStore.userIsFacilitator"
           @delete="() => deleteGroupCard(item.id)"
           @edit="
             () => setUpdatedValues(item.id, item.title, item.group_members)
@@ -129,7 +125,7 @@
             density="comfortable"
             item-title="user.fullname"
             :custom-filter="searchGroupMembers"
-            :items="classStore.activeMembers"
+            :items="learningPlanStore.activeMembers"
             return-object
           >
             <template #item="{ props: propsItem, item, index }">
@@ -153,7 +149,7 @@
             variant="outlined"
             density="comfortable"
             item-title="user.fullname"
-            :items="classStore.activeMembers || []"
+            :items="learningPlanStore.activeMembers || []"
             :custom-filter="searchGroupMembers"
             return-object
             multiple
@@ -219,7 +215,6 @@
       :title="$t('pages.classes.wantDeleteMember')"
       :subtitle="$t('pages.classes.deleteMemberSubtitle')"
       :submit-button-text="$t('pages.classes.delete')"
-      no-input-confirmation
       @submit="() => onDeleteParticipant(removingMemberId)"
       @cancel="confirmDeleteMember = false"
     />
@@ -253,8 +248,6 @@ const searchGroups = ref('');
 //
 const usersToInvite = ref([]);
 const learningPlanStore = useLearningPlanStore();
-const classStore = useClassStore();
-
 const route = useRoute();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const sendingInvites = ref(false);
@@ -275,7 +268,6 @@ const selectedGroupMembers = ref<LearningPlanMemberSimple[]>([]);
 const ignoreUserIds = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.user?.id) || [];
 });
-
 const ignoreUserEmails = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
 });
@@ -294,7 +286,6 @@ function removeSelectedGroupMember(id: number) {
     (member) => member.id !== id,
   );
 }
-
 async function onClickSendInvites() {
   if (!usersToInvite.value.length) {
     return;
@@ -303,26 +294,24 @@ async function onClickSendInvites() {
   try {
     sendingInvites.value = true;
 
-    await strapi.update<ClassSimple>(
-      'classes',
-      classStore.currentClass?.id || 0,
+    await strapi.update<LearningPlanSimple>(
+      'learningplans',
+      learningPlanId.value,
       {
-        learning_plan_members: usersToInvite.value,
+        members: usersToInvite.value,
       },
     );
 
     usersToInvite.value = [];
 
     setMessage('Convites enviados com sucesso!', 'green', true);
-
-    await classStore.reloadClass();
+    await learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (error) {
     setMessage('Erro ao enviar convites!', 'red', true);
   } finally {
     sendingInvites.value = false;
   }
 }
-
 async function onCreateGroup() {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -344,13 +333,12 @@ async function onCreateGroup() {
     const data = {
       title: groupTitle.value,
       learningplan: learningPlanId.value,
-      learning_class: classStore.currentClass?.id || 0,
       group_members: members,
     };
 
     await strapi.create('learnin-plan-groups', data);
     setMessage('Grupo criado com sucesso!', 'green', true);
-    await classStore.reloadClass();
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
     selectedGroupMembers.value = [];
     selectedInChargeGroupMember.value = null;
     formAddGroup.resetForm();
@@ -361,7 +349,6 @@ async function onCreateGroup() {
     creatingGroup.value = false;
   }
 }
-
 async function onDeleteGroup(id: number) {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -370,14 +357,13 @@ async function onDeleteGroup(id: number) {
   try {
     await strapi.delete('learnin-plan-groups', id);
     setMessage('Grupo excluido com sucesso!', 'green', true);
-    await classStore.reloadClass();
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
     setMessage('Erro ao excluir grupo!', 'red', true);
   } finally {
     dialogConfirmDeleteGroup.value = false;
   }
 }
-
 async function onUpdateGroup(id: number) {
   const { valid } = await formAddGroup.validate();
   if (!valid) {
@@ -409,12 +395,11 @@ async function onUpdateGroup(id: number) {
 
     await strapi.update('learnin-plan-groups', id, data);
     setMessage('Grupo atualizado com sucesso!', 'green', true);
-    await classStore.reloadClass();
+    learningPlanStore.loadLearningPlan(learningPlanId.value);
   } catch (_) {
     setMessage('Erro ao atualizar o grupo!', 'red', true);
   }
 }
-
 function setUpdatedValues(
   id: number,
   title: string,
@@ -442,24 +427,15 @@ function setUpdatedValues(
   selectedInChargeGroupMember.value = selectedLeader;
   formAddGroup.setFieldValue('leader', selectedLeader);
 }
-
 function getGroupMembersInfo(groupMembers: LearningPlanGroupMemberSimple[]) {
-  return (
-    groupMembers?.map((groupMember) => {
-      return {
-        name: groupMember.student_member?.user?.fullname || '',
-        image: groupMember.student_member?.user?.avatar
-          ? {
-              url: groupMember.student_member?.user?.avatar?.url || '',
-              alt: groupMember.student_member?.user?.avatar?.name || '',
-            }
-          : undefined,
-        role: groupMember.role,
-      };
-    }) || []
-  );
+  return groupMembers?.map((groupMember) => {
+    return {
+      name: groupMember.student_member?.user?.fullname || '',
+      image: groupMember.student_member?.user?.avatar || '',
+      role: groupMember.role,
+    };
+  });
 }
-
 async function onResendInvite(member: LearningPlanMemberSimple) {
   try {
     resendingInviteMemberId.value = member.id;
@@ -470,7 +446,6 @@ async function onResendInvite(member: LearningPlanMemberSimple) {
       duration: 259200,
       emails_to_send: member.email,
       role: member.role,
-      learninng_class: classStore.classId,
     };
 
     await strapi.create('invitation-links', data);
@@ -481,7 +456,6 @@ async function onResendInvite(member: LearningPlanMemberSimple) {
     resendingInviteMember.value = false;
   }
 }
-
 async function onDeleteParticipant(id: number) {
   try {
     removingMember.value = true;
@@ -489,7 +463,7 @@ async function onDeleteParticipant(id: number) {
 
     const response = await strapi.delete('learning-plan-members', id);
     if (response.data.id) {
-      await classStore.reloadClass();
+      await learningPlanStore.loadLearningPlan(learningPlanId.value);
       setMessage('Participante removido com sucesso!', 'green', true);
     }
   } catch (error) {
@@ -499,19 +473,16 @@ async function onDeleteParticipant(id: number) {
     confirmDeleteMember.value = false;
   }
 }
-
 function deleteParticipant(id: number) {
   removingMemberId.value = id;
   confirmDeleteMember.value = true;
 }
-
 function searchGroupMembers(_itemTitle: string, queryText: string, item: any) {
   return (
     item.raw.user.fullname.toLowerCase().includes(queryText) ||
     item.raw.user.email.toLowerCase().includes(queryText)
   );
 }
-
 function filterMembersByRole(
   role: keyof typeof learningPlanGroupMemberRolesSimple,
   members?: LearningPlanGroupMemberSimple[],
@@ -520,7 +491,6 @@ function filterMembersByRole(
     (member) => member.role === learningPlanGroupMemberRolesSimple[role],
   );
 }
-
 function openGroupCard(item: any) {
   dialogShowGroup.value = true;
   showValuesGroup.value = {
@@ -528,14 +498,11 @@ function openGroupCard(item: any) {
     members: item.group_members,
   };
 }
-
 function deleteGroupCard(id: number) {
   removingGroupId.value = id;
   dialogConfirmDeleteGroup.value = true;
 }
-
 onBeforeMount(() => (headerStore.showHeader = true));
-
 watch(
   () => learningPlanStore.loading,
   () => {
@@ -548,7 +515,7 @@ watch(
           disabled: true,
         },
         {
-          title: t('pages.classes.breadcrumbs.myCourses'),
+          title: 'Meus Cursos',
           to: '/courses/me',
         },
         {
@@ -556,14 +523,6 @@ watch(
             ? learningPlanStore.learningPlan.title
             : 'Curso',
           to: `/courses/${learningPlanId.value}`,
-        },
-        {
-          title: t('pages.classes.breadcrumbs.classes'),
-          to: `/courses/${learningPlanId.value}/class`,
-        },
-        {
-          title: classStore.currentClass?.name || '',
-          to: '',
         },
       ];
     }

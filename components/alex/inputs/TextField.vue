@@ -5,17 +5,14 @@
       <p class="text-body-1" :class="`text-${textColor}`">
         {{ label }}
       </p>
-      <alex-custom-tooltip v-if="info" :text="info">
-        <template #content>
-          <v-icon
-            v-if="info"
-            class="ml-1 align-self-center"
-            size="20"
-            :color="textColor"
-            >mdi-information-outline</v-icon
-          >
-        </template>
-      </alex-custom-tooltip>
+      <v-icon
+        v-if="info"
+        class="ml-1 align-self-center"
+        size="20"
+        :title="info"
+        :color="textColor"
+        >mdi-information-outline</v-icon
+      >
     </div>
     <v-text-field
       v-model="value"

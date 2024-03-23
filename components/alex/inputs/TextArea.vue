@@ -31,12 +31,7 @@
       <template #append-inner>
         <alex-custom-tooltip v-if="appendInnerIcon" :text="appendInnerIconHint">
           <template #content>
-            <v-icon
-              class="pointer"
-              color="#6E7A87"
-              @click="$emit('click:append-inner')"
-              >{{ appendInnerIcon }}</v-icon
-            >
+            <v-icon class="pointer" color="#6E7A87" @click="$emit('click:append-inner')">{{ appendInnerIcon }}</v-icon>
           </template>
         </alex-custom-tooltip>
       </template>
@@ -58,7 +53,6 @@ interface TextAreaProps {
   appendInnerIconHint?: string;
   theme?: 'light' | 'dark';
 }
-defineEmits(['click:append-inner']);
 const props = withDefaults(defineProps<TextAreaProps>(), {
   disabled: false,
   theme: 'light',

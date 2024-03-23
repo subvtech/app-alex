@@ -182,7 +182,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import { MeetingPropsType } from '~/components/CourseMeeting.vue';
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;

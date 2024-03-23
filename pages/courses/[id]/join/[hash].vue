@@ -60,17 +60,19 @@ const strapi = useStrapi();
 const loading = ref(false);
 const user = useStrapiUser();
 const hash = route.params.hash?.toString();
-const invitationHash = ref<InvitationLinkSimple>();
+const invitationHash = ref();
 const { t } = useI18n();
 
 watch(learningPlanStore, () => {
-  invitationHash.value = learningPlanStore.activeInviteLinks.find((link) => {
-    return (
-      link.hash === hash &&
-      (!link.emails_to_send ||
-        link.emails_to_send.includes(user.value?.email || ''))
-    );
-  });
+  invitationHash.value = learningPlanStore.learningPlan?.invitation_links.find(
+    (link) => {
+      return (
+        link.hash === hash &&
+        (!link.emails_to_send ||
+          link.emails_to_send.includes(user.value?.email || ''))
+      );
+    },
+  );
   const isLinkEnabled = learningPlanStore.learningPlan?.invite_enabled;
   if (
     learningPlanStore.userIsActiveMember ||
@@ -96,13 +98,11 @@ async function onConfirm() {
     loading.value = true;
 
     if (learningPlanStore.userIsPendingMember) {
-      const member = learningPlanStore.pendingMembers.find(
+      const id = learningPlanStore.pendingMembers.find(
         (member) =>
           member.user?.id === user.value?.id ||
           member.email === user.value?.email,
-      );
-
-      const id = member?.id;
+      )?.id;
 
       if (id && user.value) {
         await strapi.update('learning-plan-members', id, {
@@ -117,7 +117,6 @@ async function onConfirm() {
         status: 'joined',
         joined_at: new Date(),
         learningplan: learningPlanStore.learningPlan?.id,
-        learning_class: invitationHash.value?.learning_class?.id,
         role: 'student',
       };
 

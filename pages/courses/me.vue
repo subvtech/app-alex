@@ -10,7 +10,7 @@
       no-back-arrow
       @main-action="() => (createCourseDialog = true)"
     />
-    <alex-learningplan-dialogs-create
+    <alex-learningplan-dialogs-create-learningplan
       v-model="createCourseDialog"
       @submit="getCourses()"
     />

@@ -1,5 +1,3 @@
-import { ClassSimple } from './classSimple.model';
-
 const InvitationLinkRole = {
   STUDENT: 'student',
   PARTNER: 'partner',
@@ -15,5 +13,4 @@ export interface InvitationLinkSimple {
   is_expired: boolean;
   createdAt?: string;
   updatedAt?: string;
-  learning_class?: ClassSimple;
 }

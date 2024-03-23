@@ -8,8 +8,6 @@ RUN apk update && \
 
 ARG strapi_url
 ARG components_page
-ARG matomo_app_id
-ARG matomo_url
 
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
@@ -24,8 +22,6 @@ ADD --chown=alex:alex . .
 
 ENV STRAPI_URL=$strapi_url
 ENV COMPONENTS_PAGE=$components_page
-ENV MATOMO_APP_ID=$matomo_app_id
-ENV MATOMO_URL=$matomo_url
 
 RUN yarn build
 
