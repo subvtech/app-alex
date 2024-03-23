@@ -11,7 +11,7 @@
               dense
             />
           </v-col>
-          <alex-custom-button @click="openModal = true">
+          <alex-custom-button size="small" @click="openModal = true">
             {{ newButtonText }}
           </alex-custom-button>
         </v-row>

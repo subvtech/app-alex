@@ -4,7 +4,7 @@
     class="d-flex bg-white flex-column rounded-lg pa-6 wrapper"
   >
     <div
-      class="d-flex flex-wrap w-100"
+      class="d-flex flex-wrap w-100 gap-2"
       :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
     >
       <alex-inputs-text-field
@@ -16,8 +16,9 @@
         variant="outlined"
         hide-details
         class="w-50"
+        size="default"
         style="min-width: 160px; max-width: 320px"
-        density="compact"
+        density="comfortable"
       />
       <alex-custom-button
         v-if="learningPlanStore.userIsFacilitator"

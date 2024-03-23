@@ -4,7 +4,7 @@
     show-footer-divider
   >
     <template #content>
-      <div class="radioButtons">
+      <div class="radioButtons d-flex align-start gap-2">
         <alex-inputs-radio-button
           v-model="activeButton"
           :buttons="firstButton"
@@ -63,9 +63,12 @@ const activeButton = ref(props.isHidden ? '2' : '1');
 </script>
 <style scoped lang="scss">
 .radioButtons {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
   flex: 1 0 0;
+}
+
+@media (max-width: 420px) {
+  .radioButtons {
+    flex-direction: column;
+  }
 }
 </style>
