@@ -106,43 +106,49 @@
                 label: 'assignments',
               },
             ]"
-            hide-dividers
+            hide-divider
           />
         </template>
         <template #footer>
-          <div class="w-100 fix-margin pb-6">
-            <alex-learningplan-meetings
-              is-nested
-              hide-dividers
-              sizing-class="ma-0"
-              :can-edit="learningPlanStore.userIsFacilitator"
-              :data="schedules"
-              :end-date="new Date()"
-              :is-facilitator="learningPlanStore.userIsFacilitator"
-              :to="
-                learningPlanStore.userIsFacilitator
-                  ? `${learningPlan.id}/settings`
-                  : ''
-              "
-              :learning-plan-id="learningPlan.id"
-            />
-            <alex-learningplan-invites
-              v-if="canEdit"
-              full-width
-              :enable-invites="learningPlan.invite_enabled"
-              :duration="learningPlan.invitation_duration"
-              :course-id="learningPlan.id"
-              :data="invitationLink"
-              @update:link="
-                (data) => {
-                  plainLink = data.url;
-                }
-              "
-              @link:expired="plainLink = null"
-            />
+          <div
+            v-if="canEdit && learningPlanClasses.length"
+            class="w-100 fix-margin pb-6"
+          >
+            <p class="text-gray-800 text-h5 pb-6">
+              {{ $t('components.courses.invites.title') }}
+            </p>
+            <div v-if="learningPlan.invite_enabled">
+              <alex-learningplan-invites
+                v-for="classItem in learningPlanClasses"
+                :key="classItem.id"
+                full-width
+                :class-name="classItem.name"
+                :duration="learningPlan.invitation_duration"
+                :course-id="learningPlan.id"
+                :class-id="classItem.id"
+                :data="classItem.activeLink"
+                @update:link="
+                  (data) => {
+                    plainLink = data.url;
+                  }
+                "
+                @link:expired="plainLink = null"
+              />
+            </div>
+            <div v-else class="d-flex justify-center w-100">
+              <span class="text-body-1 text-gray-500">{{
+                $t('components.courses.invites.desactivated')
+              }}</span>
+            </div>
           </div>
         </template>
       </alex-custom-card>
+      <alex-learningplan-meetings
+        :learning-plan-classes="learningPlanClasses"
+        :learning-plan-id="learningPlan?.id"
+        :can-edit="learningPlanStore.userIsFacilitator"
+        :class-info="classInfo"
+      />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
@@ -183,6 +189,7 @@
 </template>
 <script setup lang="ts">
 import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;
@@ -196,12 +203,14 @@ const props = withDefaults(defineProps<GeneralProps>(), {
   schedules: () => [],
   loading: false,
 });
+
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
 const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
 const user = useStrapiUser<User>();
+
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
@@ -234,6 +243,35 @@ const learningGoals = computed(() =>
     },
   })),
 );
+
+const getActiveLink = (classItem: ClassSimple) => {
+  const activeLinks = classItem?.invitation_links?.filter(
+    (invite) =>
+      !invite.is_expired &&
+      (invite.emails_to_send ||
+        new Date(invite.expires_at).getTime() > new Date().getTime()),
+  );
+
+  return activeLinks && activeLinks.length > 0
+    ? activeLinks[activeLinks.length - 1]
+    : null;
+};
+
+const learningPlanClasses = computed(() => {
+  return props.learningPlan?.classes.map((classItem) => ({
+    name: classItem.name,
+    id: classItem.id,
+    activeLink: getActiveLink(classItem),
+    meeting_schedules: classItem.meeting_schedules,
+  }));
+});
+
+const classInfo = computed(() => {
+  return {
+    start: props.learningPlan?.start_date,
+    end: props.learningPlan?.end_date,
+  };
+});
 </script>
 
 <style scope lang="scss">
