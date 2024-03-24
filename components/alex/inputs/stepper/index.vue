@@ -243,7 +243,7 @@ const onPrevStep = () => {
 
 const onSelectStep = async (step: number) => {
   const valid = await validate();
-  if (!valid.valid) return;
+  if (!valid.valid && activeStep.value < step) return;
 
   if (step > activeStep.value) {
     stepsList.value[activeStepIndex.value].completed = true;

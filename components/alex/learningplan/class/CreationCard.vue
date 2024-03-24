@@ -18,6 +18,7 @@
         </template>
       </v-avatar>
       <p
+        v-if="!mobile"
         class="text-body-2 text-gray-600 user-name ellipsis lines-1 text-break-all user-name"
       >
         {{ user.name }}
@@ -38,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify/lib/framework.mjs';
+
 type CreationCardProps = {
   name: string;
   user: {
@@ -46,6 +49,7 @@ type CreationCardProps = {
   };
 };
 withDefaults(defineProps<CreationCardProps>(), {});
+const { mobile } = useDisplay({ mobileBreakpoint: 600 });
 const emit = defineEmits(['edit', 'delete']);
 const dropdownProps = [
   {
