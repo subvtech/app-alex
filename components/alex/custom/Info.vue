@@ -968,7 +968,7 @@ const startDateOrEndDate = computed(() => {
 
       .extra {
         justify-content: flex-start;
-        margin-top: -50px;
+        // margin-top: -50px; remove to avoid text above the image
         .block {
           flex-direction: row !important;
 

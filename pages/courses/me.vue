@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper d-flex flex-column">
     <alex-custom-header
-      class="mb-6"
+      class="mb-6 mt-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"
@@ -110,14 +110,14 @@
           <template #default="{ items }">
             <div
               v-if="coursesView === 'grid'"
-              class="d-flex ga-6 grid-container flex-wrap w-100"
+              class="d-flex ga-6 grid-container justify-center flex-wrap w-100"
             >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="w-100"
+                class="w-auto flex-stretch"
                 :title="course.raw.title"
                 :options="course.raw.userIsFacilitator"
                 :description="course.raw.description"

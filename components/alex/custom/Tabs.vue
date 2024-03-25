@@ -1,23 +1,24 @@
 <template>
   <v-tabs
-    class="text-gray-800"
+    class="text-gray-800 w-100"
     :color="color"
     :direction="direction"
     :loading="loading"
+    :show-arrows="showArrows"
   >
     <v-tab
       v-for="tab in tabs"
       :key="tab.value"
       :value="tab.value"
       :to="tab.to"
-      :class="!tab.notification ? 'px-4' : ''"
+      :class="[!tab.notification ? 'px-4' : '', tab.classes]"
       :ripple="false"
       :disabled="tab.disabled"
       class="text-body-1 tab"
       :exact="exact"
       @click="tab.notification = false"
     >
-      <v-icon v-if="tab.icon">{{ tab.icon }}</v-icon>
+      <v-icon v-if="tab.icon" size="large">{{ tab.icon }}</v-icon>
       <span v-else>{{ tab.label }}</span>
       <v-icon
         v-if="tab.notification"
@@ -37,6 +38,7 @@ export type TabType = {
   notification?: boolean;
   icon?: string;
   disabled?: boolean;
+  classes?: string;
   exact?: boolean;
 };
 
@@ -54,6 +56,10 @@ const props = defineProps({
     default: false,
   },
   loading: {
+    type: Boolean,
+    default: false,
+  },
+  showArrows: {
     type: Boolean,
     default: false,
   },
