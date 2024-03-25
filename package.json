@@ -1,7 +1,55 @@
 {
   "name": "nuxt-app",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Luiz",
+    "email": "lvmcs1@aluno.ifal.edu.br"
+  },
+  "main": "dist-electron/main.js",
   "private": true,
-  "type": "module",
+  "build": {
+    "appId": "com.electron.ALEX_IPFS",
+    "asar": false,
+    "productName": "electron ipfs file uploader",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "${productName}_${version}.${ext}"
+    },
+    "mac": {
+      "artifactName": "${productName}_${version}.${ext}",
+      "target": [
+        "dmg"
+      ]
+    },
+    "directories": {
+      "output": "release",
+      "buildResources": "resources"
+    },
+    "extraFiles": [
+      {
+        "from": "resources",
+        "to": "resources/downloads"
+      }
+    ],
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      ".output/**/*",
+      "dist-electron"
+    ],
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
+  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -13,6 +61,7 @@
     "lint:js": "eslint --ext \".ts,.vue\" --ignore-path .gitignore .",
     "lint:prettier": "prettier --check .",
     "lint": "yarn lint:js && yarn lint:prettier",
+    "build:app": "nuxt build --prerender && electron-builder",
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix"
   },
   "devDependencies": {
@@ -25,6 +74,12 @@
     "@typescript-eslint/parser": "^6.2.1",
     "@vitest/coverage-v8": "^0.34.3",
     "@vue/test-utils": "^2.4.4",
+    "electron": "^28.2.1",
+    "electron-builder": "^24.12.0",
+    "nuxt-electron": "^0.7.0",
+    "vite-plugin-electron": "^0.15.6",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vue-router": "^4.2.5",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
@@ -65,6 +120,10 @@
     "@postlight/parser": "^2.2.3",
     "@vee-validate/yup": "^4.11.1",
     "@vee-validate/zod": "^4.11.1",
+    "@nftstorage/ipfs-cluster": "^5.0.1",
+    "adm-zip": "^0.5.12",
+    "electron-is-dev": "^3.0.1",
+    "kubo-rpc-client": "^3.0.2",
     "body-parser": "^1.20.2",
     "date-fns": "^2.30.0",
     "editorjs-alert": "^1.1.3",

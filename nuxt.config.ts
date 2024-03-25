@@ -7,6 +7,28 @@ export default defineNuxtConfig({
     'plyr/dist/plyr.css',
     '@mdi/font/css/materialdesignicons.min.css',
   ],
+  electron: {
+    build: [
+      {
+        entry: 'electron/preload.ts',
+        onstart(args) {
+          args.reload();
+        },
+      },
+      {
+        entry: 'electron/main.ts',
+      },
+    ],
+    renderer: {},
+  },
+  router: {
+    options: {
+      hashMode: true,
+    },
+  },
+  app: {
+    baseURL: './',
+  },
   build: {
     transpile: ['vuetify'],
   },
@@ -15,6 +37,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/strapi',
     '@nuxt/test-utils/module',
+    'nuxt-electron',
   ],
   testUtils: {},
   pinia: {
