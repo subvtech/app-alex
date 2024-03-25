@@ -6,7 +6,7 @@
       :name="classValue.name"
       :user="{
         name: classValue.in_charge_member.fullname,
-        img: classValue.in_charge_member.avatar,
+        img: classValue.in_charge_member.avatar?.url,
       }"
       @delete="() => removeItem(classValue.name)"
       @edit="() => editItem(classValue, classValue.id)"
