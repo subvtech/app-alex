@@ -92,8 +92,8 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
 
 // Dialog Stepper
 .max-height-stepper {
-  --header: 72px;
-  --footer: 76px;
+  --header: 80px;
+  --footer: 80px;
   --stepper: 84px;
   --padding-top-bot: 170px; // 16.16%;
   --total: calc(
@@ -103,12 +103,22 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
   overflow-y: auto;
 }
 
-@media screen and (max-height: 740px) {
+@media screen and (max-width: 599px) {
+  .v-dialog.custom-alex-dialog {
+    align-items: flex-end;
+    margin-top: 80px;
+  }
   .v-dialog.custom-alex-dialog > .v-overlay__content {
-    --padding-top-bot: calc(100svh * 0.16); // 120px
+    width: 100% !important;
+  }
+  .v-dialog.custom-alex-dialog > .v-overlay__content {
+    --padding-top-bot: 80px;
+    margin: 0;
+    margin-top: 80px;
+    max-height: calc(100vh - var(--padding-top-bot));
   }
   .max-height-stepper {
-    --padding-top-bot: calc((100svh * 0.16) + 10px);
+    --padding-top-bot: 145px;
   }
 }
 
@@ -151,12 +161,17 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
   word-break: break-all;
 }
 
-
 @for $size from 2 through 256 {
   .min-w-#{$size} {
     min-width: $size * 4px;
   }
   .min-h-#{$size} {
     min-height: $size * 4px;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .footer-buttons {
+    width: 100%;
   }
 }

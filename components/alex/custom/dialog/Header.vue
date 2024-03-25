@@ -5,7 +5,9 @@
   >
     <v-row dense>
       <v-col class="w-100 d-flex align-center justify-start gap-2">
-        <h4 class="text-h4 text-gray-800">{{ title }}</h4>
+        <h4 class="text-h4 text-gray-800 ellipsis lines-2 overflow-x-hidden">
+          {{ title }}
+        </h4>
         <h4 v-if="highlightedTitle" class="text-h4 text-secondary-0">
           {{ highlightedTitle }}
         </h4>

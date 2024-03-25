@@ -243,13 +243,20 @@ const onPrevStep = () => {
 
 const onSelectStep = async (step: number) => {
   const valid = await validate();
-  if (!valid.valid) return;
+  if (!valid.valid && activeStep.value < step) return;
 
   if (step > activeStep.value) {
     stepsList.value[activeStepIndex.value].completed = true;
   }
   activeStep.value = step;
 };
+defineExpose({
+  onPrevStep,
+  isValid,
+  isLastStep: activeStep.value === numberSteps.value,
+  isFirstStep: activeStep.value === 1,
+  onSubmit,
+});
 </script>
 
 <style scoped>
