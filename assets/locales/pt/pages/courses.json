@@ -6,7 +6,9 @@
   "class": "Turmas",
   "projects": "Projetos",
   "events": "Eventos",
+  "courses": "Cursos",
   "communication": "Comunicação",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
   "details": "Dados do curso",
   "invite": "Convite do curso",
   "about": {
