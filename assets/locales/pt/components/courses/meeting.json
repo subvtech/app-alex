@@ -27,29 +27,35 @@
   "of": "de",
   "to": "a",
   "at": "às",
+  "unique": "Único",
   "interval": "A cada {days} dias",
   "everyday": "Diário",
-  "weekly": "Semanal: {day}",
-  "biweekly": "Quizenal: {day}",
-  "monthly": "Mensal: {day}",
-  "empty": {
-    "facilitator": "Parece que não há encontros disponíveis",
-    "student": "Parece que você não tem encontro síncrono"
-  },
+  "weekly": "Semanal",
+  "biweekly": "Quinzenal",
+  "monthly": "Mensal",
+  "empty": "Parece que não há nenhum encontro síncrono",
   "edit": "Editar",
   "add": "Adicionar",
   "save": "Salvar",
   "cancel": "Cancelar",
   "delete": "Excluir",
   "course": {
-    "addButton": "Criar Encontro",
+    "addButton": "Adicionar encontro",
     "title": "Deixe salvos seus encontros síncronos",
     "subtitle": "Adicione uma data e uma frequência para cada encontro",
     "addMeeting": "Adicionar encontros síncronos",
     "editMeeting": "Editar encontros síncronos",
-    "meetingFrequency": "Frequencia do encontro",
+    "meetingFrequency": "Frequência do encontro",
     "meetingDate": "Data do encontro",
     "startTime": "Hora de início",
     "endTime": "Hora de término"
-  }
+  },
+  "deleteModal": {
+    "confirmation": "Realmente deseja excluir o encontro?",
+    "description": "Ao confirmar você irá excluir o encontro síncrono cadastrado.",
+    "button": "Excluir",
+    "cancel": "Cancelar"
+  },
+  "errorSaving": "Ocorreu um erro ao editar os encontros, por favor tente novamente mais tarde.",
+  "success": "Encontros atualizados com sucesso"
 }

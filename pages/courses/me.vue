@@ -10,7 +10,7 @@
       no-back-arrow
       @main-action="() => (createCourseDialog = true)"
     />
-    <alex-learningplan-dialogs-create-learningplan
+    <alex-learningplan-dialogs-create
       v-model="createCourseDialog"
       @submit="getCourses()"
     />
@@ -266,9 +266,9 @@ interface LearningPlan {
 const courses = ref<LearningPlanSimple[]>([]);
 const user = useStrapiUser<User>();
 
-const professorMode = computed(
-  () => user.value.role.type === UserRoles.PROFESSOR,
-);
+const professorMode = computed(() => {
+  return user.value?.role?.type === UserRoles.PROFESSOR;
+});
 
 const queryConfig = {
   filters: {
