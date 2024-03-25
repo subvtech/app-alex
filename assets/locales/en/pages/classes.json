@@ -44,6 +44,7 @@
   "participantsIsRequired": "Participants are required",
   "groupNameIsRequired": "Group name is required",
   "group": "Group",
+  "groups": "Groups",
   "emptyStateMemberClass": "Looks like there are no participants in this class yet!",
   "classMembers": "Members: %{class}",
   "sendInvites": "Send Invites",

@@ -24,6 +24,7 @@
       :dialog-action-text="$t('pages.classes.sendInvites')"
       :dialog-action-loading="sendingInvites"
       :dialog-action-disabled="!usersToInvite.length"
+      entity="member"
       @action="onClickSendInvites"
     >
       <template #item="{ item }">
@@ -95,6 +96,7 @@
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="!formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
+      entity="group"
       @action="!editing ? onCreateGroup() : onUpdateGroup(editingGroupId)"
     >
       <template #item="{ item }">
