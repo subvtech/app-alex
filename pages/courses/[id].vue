@@ -156,5 +156,12 @@ const generalLinks = computed<TabType[]>(() => [
   //   value: 4,
   //   to: `/courses/${learningPlanId.value}/projects`,
   // },
+  {
+    label: '',
+    icon: 'mdi-cog-outline',
+    value: 5,
+    to: `/courses/${learningPlanId.value}/settings`,
+    classes: 'ml-auto',
+  },
 ]);
 </script>

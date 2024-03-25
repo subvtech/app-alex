@@ -71,3 +71,11 @@ watch(pageRoute, async () => {
   }
 });
 </script>
+<style lang="scss">
+@media screen and (max-width: 579px) {
+  .breadcrumb-block {
+    padding-top: 24px !important;
+    gap: 0px !important;
+  }
+}
+</style>
