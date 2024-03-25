@@ -34,8 +34,8 @@
       :drawer="drawer"
       fixed
       :toggle-drawer="() => closeDrawable(!clipped)"
-      :avatar="user.avatar"
-      :placeholder="user.fullname"
+      :avatar="user?.avatar"
+      :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
       show-picture
       @click="onClickOutside"

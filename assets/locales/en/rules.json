@@ -1,8 +1,6 @@
 {
   "fullName": {
     "required": "Full name is required",
-    "min": "At least 6 characters long",
-    "max": "At most 64 characters long",
     "onlyLetters": "It must have only letters"
   },
   "email": {
@@ -14,7 +12,6 @@
     "length": "Must be 11 characters long",
     "invalid": "Invalid CPF"
   },
-
   "keyword": {
     "required": "This field is required",
     "noSpaces": "There shall be no spaces",
@@ -22,13 +19,11 @@
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
-
   "phone": {
     "required": "Phone is required",
     "length": "Must be 11 characters long",
     "invalid": "Invalid phone number"
   },
-
   "yourRole": {
     "required": "User type is required"
   },
@@ -37,8 +32,6 @@
   },
   "username": {
     "required": "Username is required",
-    "min": "At least 6 characters long",
-    "max": "At most 64 characters long",
     "onlyLetters": "It must have only letters and numbers"
   },
   "password": {
@@ -54,24 +47,16 @@
     "matchError": "The passwords do no match"
   },
   "slug": {
-    "required": "Acronym/Name is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
+    "required": "Acronym/Name is required"
   },
   "name": {
-    "required": "Name is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
+    "required": "Name is required"
   },
   "title": {
-    "required": "Title is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
+    "required": "Title is required"
   },
   "url": {
-    "required": "Url is required",
-    "min": "At least 3 characters long",
-    "max": "At most 64 characters long"
+    "required": "Url is required"
   },
   "startDate": {
     "required": "Start date is required",
@@ -85,16 +70,14 @@
     "beforeStartDate": "End date can't be before start date",
     "typeError": "Date must be valid"
   },
-  "class": {
-    "required": "Class is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
-  },
+  "min": "At least {min} characters long",
+  "max": "At most {max} characters long",
 
+  "class": {
+    "required": "Turma é obrigatório"
+  },
   "description": {
-    "required": "Description is required",
-    "min": "At least {min} characters long",
-    "max": "At most {max} characters long"
+    "required": "Description is required"
   },
   "meeting": {
     "date": {

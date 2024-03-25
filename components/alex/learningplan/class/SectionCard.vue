@@ -206,7 +206,7 @@ const props = defineProps({
   },
   emptyStateObjectName: {
     type: String,
-    default: 'pages.classes.participant',
+    default: 'pages.classes.participant.singular',
   },
 });
 

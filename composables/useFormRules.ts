@@ -1,99 +1,43 @@
 import * as yup from 'yup';
 
-export function isValidCpf(val: string) {
-  val = val.replace(/\D/g, '');
-  if (val === '00000000000') return false;
-
-  let sum: number;
-  let left: number;
-  sum = 0;
-
-  for (let i = 1; i <= 9; i++)
-    sum = sum + parseInt(val.substring(i - 1, i)) * (11 - i);
-  left = (sum * 10) % 11;
-
-  if (left === 10 || left === 11) left = 0;
-  if (left !== parseInt(val.substring(9, 10))) return false;
-
-  sum = 0;
-  for (let i = 1; i <= 10; i++)
-    sum = sum + parseInt(val.substring(i - 1, i)) * (12 - i);
-  left = (sum * 10) % 11;
-
-  if (left === 10 || left === 11) left = 0;
-  if (left !== parseInt(val.substring(10, 11))) return false;
-  return true;
-}
+const emailRegex =
+  /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/gi;
+const phoneRegex =
+  /^\((?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\) (?:9[0-9])[0-9]{3}\-[0-9]{4}$/;
+const usernameRegex =
+  /^[a-zA-Z0-9_-]*[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+[a-zA-Z0-9_-]*$/;
 
 export const useFormRules = () => {
+  /*
+    This composable is a cluster of yup rules, 
+    it's being used throughout the entire application to validate forms
+
+  */
   const i18n = useI18n();
+  const {
+    fullnameRules,
+    getMin3Max20StringRule,
+    getMin4Max64StringRule,
+    getStringRule,
+    longDescriptionRules,
+    longTitleRules,
+    cpfRules,
+    shortDescriptionRules,
+  } = useBasicRules();
+
   const locale = i18n.locale.value === 'pt' ? 'pt-BR' : 'en-US';
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
   const { isSameOrBeforeHour } = useDatetime();
-  const emailRegex =
-    /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/gi;
-  const emailRules = {
-    email: yup
-      .string()
-      .required(i18n.t('rules.email.required'))
-      .trim()
-      .matches(emailRegex, i18n.t('rules.email.invalid')),
-  };
 
-  const passwordRules = {
-    password: yup.string().required(i18n.t('rules.password.required')),
-    /*
-    .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
-    .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
-    .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
-    .matches(
-        /(?=.*[^a-zA-Z0-9])/,
-        i18n.t('rules.password.character'),
-      )
-    .min(8, i18n.t('rules.password.min'))
-    */
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))
-      .required(i18n.t('rules.confirmPassword.required')),
-  };
+  const keywordSchema = yup
+    .object({
+      text: getStringRule(i18n, 'text', { min: 2, required: true })
+        .matches(/^[^\s]*$/, i18n.t('rules.keyword.noSpaces'))
+        .matches(/^[a-zA-Z]*$/, i18n.t('rules.keyword.onlyLetters')),
+    })
+    .required(i18n.t('rules.keyword.required'));
 
-  const usernameRules = {
-    username: yup
-      .string()
-      .required(i18n.t('rules.username.required'))
-      .min(6, i18n.t('rules.username.min'))
-      .max(64, i18n.t('rules.username.max'))
-      .matches(
-        /^[a-zA-Z0-9_-]*[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ]+[a-zA-Z0-9_-]*$/,
-        i18n.t('rules.username.onlyLetters'),
-      )
-      .trim(),
-  };
-
-  const fullnameRules = {
-    fullname: yup
-      .string()
-      .required(i18n.t('rules.fullName.required'))
-      .min(6, i18n.t('rules.fullName.min'))
-      .max(64, i18n.t('rules.fullName.max'))
-      .matches(
-        /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
-        i18n.t('rules.fullName.onlyLetters'),
-      )
-      .trim(),
-  };
-
-  const cpfRules = {
-    cpf: yup
-      .string()
-      .required(i18n.t('rules.cpf.required'))
-      .length(14, i18n.t('rules.cpf.length'))
-      .test('test-invalid-cpf', i18n.t('rules.cpf.invalid'), (cpf) =>
-        isValidCpf(cpf),
-      ),
-  };
   const goalRules = {
     verb: yup.lazy((value) =>
       typeof value === 'string'
@@ -105,13 +49,38 @@ export const useFormRules = () => {
             .required(i18n.t('rules.keyword.required'))
         : yup.object().required(i18n.t('rules.keyword.required')),
     ),
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(6, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(4000, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
+    ...longDescriptionRules,
   };
+
+  const passwordRules = {
+    password: getStringRule(i18n, 'password', {
+      required: true,
+    }),
+    /*
+      .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
+      .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))
+      .matches(/^(?=.*\d)/, i18n.t('rules.password.number'))
+      .matches(
+          /(?=.*[^a-zA-Z0-9])/,
+          i18n.t('rules.password.character'),
+        )
+      .min(8, i18n.t('rules.password.min'))
+      */
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref('password')], i18n.t('rules.confirmPassword.matchError'))
+      .required(i18n.t('rules.confirmPassword.required')),
+  };
+
+  const emailRules = {
+    email: getStringRule(i18n, 'email', {
+      required: true,
+      min: 2,
+      matches: { regex: emailRegex },
+      trim: true,
+    }),
+  };
+
   const startDateCreationRules = yup
     .date()
     .required(i18n.t('rules.startDate.required'))
@@ -131,53 +100,18 @@ export const useFormRules = () => {
     .date()
     .required(i18n.t('rules.endDate.required'))
     .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'))
-    .typeError('A data precisa ser válida');
-
-  const descriptionRules = {
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(6, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(4000, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
-  };
-
-  const phoneRules = {
-    phone: yup
-      .string()
-      .matches(
-        // eslint-disable-next-line no-useless-escape
-        /^\((?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\) (?:9[0-9])[0-9]{3}\-[0-9]{4}$/,
-        i18n.t('rules.phone.invalid'),
-      )
-      .required(i18n.t('rules.phone.required')),
-  };
+    .typeError(i18n.t('rules.endDate.typeError'));
 
   const generalCourseSchema = yup.object({
     startDate: startDateUpdateRules,
     endDate: endDateRules,
-    title: yup
-      .string()
-      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
-      .required(i18n.t('rules.title.required'))
-      .trim(),
-    slug: yup
-      .string()
-      .min(3, ({ min }) => i18n.t('rules.slug.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.slug.max', { max }))
-      .required(i18n.t('rules.slug.required'))
-      .trim(),
+    slug: getMin3Max20StringRule('slug'),
+    ...longTitleRules,
   });
 
   const generalTrailSchema = yup.object({
-    title: yup
-      .string()
-      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
-      .required(i18n.t('rules.title.required'))
-      .trim(),
-    ...descriptionRules,
+    ...longTitleRules,
+    ...longDescriptionRules,
   });
 
   const registerStep1 = yup.object({
@@ -187,10 +121,10 @@ export const useFormRules = () => {
   });
 
   const registerStep2 = yup.object({
-    yourRole: yup
-      .string()
-      .required(i18n.t('rules.yourRole.required'))
-      .oneOf(['professor', 'aluno'] as const),
+    yourRole: getStringRule(i18n, 'yourRole', { required: true }).oneOf([
+      'professor',
+      'aluno',
+    ] as const),
     institution: yup
       .number()
       .optional()
@@ -202,65 +136,29 @@ export const useFormRules = () => {
   });
 
   const registerStep3 = yup.object({
+    username: getMin4Max64StringRule('username').matches(
+      usernameRegex,
+      i18n.t('rules.username.onlyLetters'),
+    ),
     ...passwordRules,
-    ...usernameRules,
   });
+
   const loginSchema = {
     ...emailRules,
     password: passwordRules.password,
   };
 
-  const profileSchema = yup.object({
-    ...fullnameRules,
-    ...phoneRules,
-    ...cpfRules,
-  });
-
   const socialsSchema = yup.object({
-    name: yup
-      .string()
-      .min(3, i18n.t('rules.name.min', { min: 3 }))
-      .max(20, i18n.t('rules.name.max', { min: 20 }))
-      .required()
-      .trim(),
-
-    url: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .required()
-      .trim(),
+    name: getMin3Max20StringRule('name'),
+    url: getMin4Max64StringRule('url'),
   });
 
-  // const urlSchema = yup.object({
-  //   url: yup
-  //     .string()
-  //     .min(4, i18n.t('rules.url.min'))
-  //     .max(64, i18n.t('rules.url.max'))
-  //     .required()
-  //     .trim(),
-  // });
   const createCourseRules = yup.object({
-    title: yup
-      .string()
-      .required(i18n.t('rules.title.required'))
-      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
-      .trim(),
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
-    class: yup
-      .string()
-      .required(i18n.t('rules.class.required'))
-      .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
-      .trim(),
+    class: getMin4Max64StringRule('class'),
     startDate: startDateCreationRules,
     endDate: endDateRules,
+    ...shortDescriptionRules,
+    ...longTitleRules,
   });
 
   const scheduleRules = (startDate?: Date, endDate?: Date) =>
@@ -279,88 +177,71 @@ export const useFormRules = () => {
           }),
         ),
 
-      startHour: yup
-        .string()
-        .required(i18n.t('rules.meeting.startHour.required')),
-      endHour: yup
-        .string()
-        .required(i18n.t('rules.meeting.endHour.required'))
-        .test(
-          'endHourTest',
-          i18n.t('rules.meeting.endHour.beforeStartHour'),
-          (value, ctx) => {
-            const { startHour } = ctx.parent;
-            return isSameOrBeforeHour(value, startHour) === 1;
-          },
-        ),
+      startHour: getStringRule(i18n, 'meeting.startHour', { required: true }),
+      endHour: getStringRule(i18n, 'meeting.endHour', { required: true }).test(
+        'endHourTest',
+        i18n.t('rules.meeting.endHour.beforeStartHour'),
+        (value, ctx) => {
+          const { startHour } = ctx.parent;
+          return isSameOrBeforeHour(value!, startHour) === 1;
+        },
+      ),
     });
 
   const createTrailsRules = yup.object({
-    title: yup
-      .string()
-      .required(i18n.t('rules.title.required'))
-      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
-      .trim(),
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
+    ...shortDescriptionRules,
+    ...longTitleRules,
   });
 
-  const createGroupRules = {
-    groupTitle: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .required(i18n.t('pages.classes.groupNameIsRequired'))
-      .trim(),
-    leader: yup.mixed().required(i18n.t('pages.classes.responsibleIsRequired')),
-    members: yup
-      .array()
-      .required(i18n.t('pages.classes.participantsIsRequired'))
-      .min(2, i18n.t('pages.classes.participantsIsRequired')),
+  const allRules = {
+    passwordRules: passwordRules,
+
+    cpfRules: cpfRules,
+    nameRules: getMin3Max20StringRule('name').matches(
+      /^((?!instagram\b)(?!linkedin\b)(?!youtube\b).)*/,
+    ),
+    urlRules: getMin4Max64StringRule('url'),
+    scheduleRules,
+    createTrailsRules,
+    createGroupRules: {
+      groupTitle: getMin4Max64StringRule('groupName'),
+      leader: yup
+        .mixed()
+        .required(i18n.t('pages.classes.responsibleIsRequired')),
+      members: yup
+        .array()
+        .required(i18n.t('pages.classes.participant.required'))
+        .min(2, i18n.t('pages.classes.participant.required')),
+    },
+    goalRules: goalRules,
+    createCourseRules,
+  };
+
+  const allSchemas = {
+    registerSchemas: { registerStep1, registerStep2, registerStep3 },
+    schema4: yup.object(passwordRules),
+    emailSchema: yup.object(emailRules),
+    keywordSchema,
+    profileSchema: yup.object({
+      phone: getStringRule(i18n, 'phone', {
+        matches: {
+          regex: phoneRegex,
+        },
+        required: true,
+      }),
+      ...fullnameRules,
+      ...cpfRules,
+    }),
+    socialsSchema,
+    generalTrailSchema,
+
+    generalCourseSchema,
+    loginSchema,
   };
 
   return {
-    registerSchemas: { registerStep1, registerStep2, registerStep3 },
-    schema4: yup.object(passwordRules),
-    emailRules: yup.object(emailRules),
-    passwordRules,
-    fullnameRules,
-    descriptionRules,
-    cpfRules,
-    profileSchema,
-    socialsSchema,
-    goalRules,
-    nameRules: yup
-      .string()
-      .min(3, ({ min }) => i18n.t('rules.name.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.name.max', { max }))
-      .matches(/^((?!instagram\b)(?!linkedin\b)(?!youtube\b).)*/)
-      .required(i18n.t('rules.name.required'))
-      .trim(),
-    titleRules: yup
-      .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
-      .required(i18n.t('rules.title.required'))
-      .trim(),
-    urlRules: yup
-      .string()
-      .min(4, i18n.t('rules.url.min'))
-      .max(64, i18n.t('rules.url.max'))
-      .required()
-      .trim(),
-    generalCourseSchema,
-    loginSchema,
-    createCourseRules,
-    generalTrailSchema,
     emailRegex,
-    scheduleRules,
-    createTrailsRules,
-    createGroupRules,
+    ...allSchemas,
+    ...allRules,
   };
 };

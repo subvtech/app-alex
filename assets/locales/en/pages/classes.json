@@ -16,17 +16,21 @@
   },
   "showingData": "Showing %{from} to %{to} of %{total} courses",
   "noData": "No %{object} found!",
-  "participant": "Participant",
   "participating": "Participating",
-  "participants": "Participants",
   "noOneResponsible": "No one responsible",
   "removeParticipant": "Remove participant",
   "removeGroup": "Delete group",
   "editGroup": "Edit group",
   "sendMessage": "Send message",
   "responsibleIsRequired": "Responsible is required",
-  "participantsIsRequired": "Participants are required",
-  "groupNameIsRequired": "Group name is required",
+  "participant": {
+    "singular": "Participant",
+    "plural": "Participants",
+    "required": "Participants are required"
+  },
+  "groupName": {
+    "required": "Group name is required"
+  },
   "group": "Group",
   "emptyStateMemberClass": "Looks like there are no participants in this class yet!",
   "classMembers": "Class participants",
@@ -51,5 +55,5 @@
   "findMember": "Find Member",
   "courseInvites": "Course invites",
   "invites": "Invites",
-  "cantRemoveResponsible":"You cannot remove the person responsible from the members"
+  "cantRemoveResponsible": "You cannot remove the person responsible from the members"
 }
