@@ -44,6 +44,7 @@
   "participantsIsRequired":"É necessário ter integrantes",
   "groupNameIsRequired":"Nome do grupo é obrigatório",
   "group": "Grupo",
+  "groups": "Grupos",
   "emptyStateMemberClass": "Parece que ainda não há participantes nessa turma!",
   "classMembers": "Participantes: %{class}",
   "sendInvites": "Enviar Convites",

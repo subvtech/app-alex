@@ -6,9 +6,11 @@
   "class": "Classes",
   "projects": "Projects",
   "events": "Events",
+  "courses": "Courses",
   "communication": "Communication",
   "invite": "Course invite",
   "details": "Course data",
+  "showingData": "Showing %{from} to %{to} of %{total} %{entity}",
   "about": {
     "title": "About the course",
     "empty": "It seems that this course doesn't have a description...",
