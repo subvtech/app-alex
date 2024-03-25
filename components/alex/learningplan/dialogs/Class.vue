@@ -36,6 +36,7 @@
               :user="{
                 email: item.raw.email,
                 name: item.raw.fullname,
+                image: item.raw.avatar?.url,
               }"
               no-delete
               no-checkbox
@@ -58,6 +59,7 @@
       <alex-custom-dialog-footer>
         <template #mainSlotButton>
           <alex-custom-button
+            class="footer-buttons"
             type="submit"
             size="large"
             :loading="loadingSubmit"
@@ -73,6 +75,7 @@
         </template>
         <template #secondarySlotButton>
           <alex-custom-button
+            class="footer-buttons"
             :text="$t('components.courses.meeting.cancel')"
             variant="secondary"
             size="large"
@@ -170,6 +173,7 @@ const { data: responsiblesData } = await useAsyncData(
           name: 'Professor',
         },
       },
+      populate: ['avatar'],
     }) as unknown as Promise<UserSimple[]>,
   {
     transform: (value) =>
@@ -203,7 +207,7 @@ onUpdated(() => {
 </script>
 
 <style scoped>
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 599px) {
   .footer-buttons {
     width: 100%;
   }

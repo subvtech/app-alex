@@ -20,6 +20,7 @@
           :user="{
             email: item.raw.email,
             name: item.raw.fullname,
+            image: item.raw.avatar?.formats?.small?.url || item.raw.avatar?.url,
           }"
           no-delete
           no-checkbox
@@ -34,6 +35,7 @@
         :user="{
           email: item.email,
           name: item.fullname,
+          image: item.avatar?.formats?.small?.url || item.avatar?.url,
         }"
         remove-selection
         @delete="() => removeSelf(item.email)"
@@ -45,7 +47,13 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = { id?: string; email: string; fullname?: string; local?: boolean };
+type User = {
+  id?: string;
+  email: string;
+  fullname?: string;
+  local?: boolean;
+  avatar?: { url: string; formats?: { small: { url: string } } } | null;
+};
 interface AutoCompleteUsersProps {
   name: string;
   modelValue: User[];
@@ -108,6 +116,7 @@ useOnStopTyping(search, async () => {
       ],
       id: { $notIn: props.ignoreUserIds || [] },
     },
+    populate: ['avatar'],
   })) as unknown as User[];
   if (registeredFields.length) {
     items.value = registeredFields.filter(

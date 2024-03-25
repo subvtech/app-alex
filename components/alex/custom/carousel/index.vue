@@ -9,7 +9,7 @@
     <vueper-slides
       ref="vueperslides1"
       class="no-shadow mb-4 rounded d-block w-100"
-      :slide-ratio="2 / 4"
+      :slide-ratio="!readOnly && slides.length < 1 && mobile ? 1 : 2 / 4"
       :bullets="false"
       :arrows="false"
       :dragging-distance="200"
@@ -195,6 +195,7 @@
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
@@ -217,7 +218,7 @@ const props = defineProps({
     default: false,
   },
 });
-
+const { mobile } = useDisplay({ mobileBreakpoint: 600 });
 const emit = defineEmits(['update:modelValue', 'slidesChanged']);
 
 const slides = computed({
