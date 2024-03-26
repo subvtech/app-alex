@@ -54,3 +54,7 @@ export const sortByDate = <T extends { date: string | Date }>(array: T[]) =>
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export const capitalize = (value: string) => {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};

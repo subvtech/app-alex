@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper d-flex flex-column">
     <alex-custom-header
-      class="mb-6"
+      class="mb-6 mt-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"
@@ -10,7 +10,7 @@
       no-back-arrow
       @main-action="() => (createCourseDialog = true)"
     />
-    <alex-learningplan-dialogs-create-learningplan
+    <alex-learningplan-dialogs-create
       v-model="createCourseDialog"
       @submit="getCourses()"
     />
@@ -110,14 +110,14 @@
           <template #default="{ items }">
             <div
               v-if="coursesView === 'grid'"
-              class="d-flex ga-6 grid-container flex-wrap w-100"
+              class="d-flex ga-6 grid-container justify-center flex-wrap w-100"
             >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="w-100"
+                class="w-auto flex-stretch"
                 :title="course.raw.title"
                 :options="course.raw.userIsFacilitator"
                 :description="course.raw.description"
@@ -266,9 +266,9 @@ interface LearningPlan {
 const courses = ref<LearningPlanSimple[]>([]);
 const user = useStrapiUser<User>();
 
-const professorMode = computed(
-  () => user.value.role.type === UserRoles.PROFESSOR,
-);
+const professorMode = computed(() => {
+  return user.value?.role?.type === UserRoles.PROFESSOR;
+});
 
 const queryConfig = {
   filters: {
@@ -362,10 +362,11 @@ const showingData = (groupedItems) => {
       ? courses.value.length
       : page.value * itemsPerPage;
   const total = courses.value.length;
-  const message = t('pages.classes.showingData', {
+  const message = t('pages.courses.showingData', {
     from,
     to,
     total,
+    entity: t('pages.courses.courses'),
   });
   if (to === 0) {
     return t('pages.classes.noData');

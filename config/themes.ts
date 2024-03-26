@@ -23,6 +23,7 @@ export const AlexThemeColors = {
   'gray-700': '#5A636D',
   'gray-800': '#454D54',
   'gray-900': '#30363B',
+  'dark-gray': '#5D6872',
   'success--2': '#BFF2D6',
   'success--1': '#40D984',
   'success-0': '#26BF6B',
