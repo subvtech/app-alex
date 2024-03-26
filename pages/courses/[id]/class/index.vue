@@ -18,6 +18,7 @@
       :show-action="learningPlanStore.userIsFacilitator"
       empty-state-object-name="pages.classes.participant"
       :use-custom-dialog="true"
+      entity="class"
     >
       <template #item="{ item }">
         <alex-learningplan-class-card

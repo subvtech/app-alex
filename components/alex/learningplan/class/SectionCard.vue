@@ -219,6 +219,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  entity: {
+    type: String,
+    default: 'class',
+  },
 });
 
 const modelSearch = computed({
@@ -241,6 +245,7 @@ const pagination = usePagination(
   page,
   cardItems,
   t(props.emptyStateObjectName),
+  props.entity,
 );
 </script>
 
