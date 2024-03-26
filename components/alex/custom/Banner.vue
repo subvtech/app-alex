@@ -107,22 +107,15 @@
       :is-professor="isProfessor"
       @display:settings="emit('display:settings')"
     />
-    <div class="d-flex justify-space-between align-center px-6">
-      <div class="d-flex">
-        <alex-custom-tabs
-          v-if="showMenu"
-          v-model="selectedOption"
-          :mandatory="false"
-          :tabs="links"
-          @update:model-value="emit('select:option', selectedOption)"
-        />
-      </div>
-      <alex-custom-button
-        v-if="showMenu && showSettings"
-        variant="text"
-        :icon="settingsIcon"
-        :color="isSettingsRoute ? 'secondary-0' : undefined"
-        @click="() => onSelectSettings(settings?.to)"
+    <div class="d-flex justify-space-between align-center px-6 overflow-x-auto">
+      <alex-custom-tabs
+        v-if="showMenu"
+        v-model="selectedOption"
+        show-arrows
+        :mandatory="false"
+        :tabs="links"
+        class="tabs"
+        @update:model-value="emit('select:option', selectedOption)"
       />
     </div>
   </div>
@@ -132,17 +125,6 @@ import { TabType } from '@/components/alex/custom/Tabs.vue';
 const emit = defineEmits(['select:option', 'display:settings']);
 const { updateImage, uploadImage, removeImage } = useUploadedImage();
 const client = useStrapiClient();
-const route = useRoute();
-const isSettingsRoute = computed(() =>
-  route.name?.toString().includes('courses-id-settings')
-    ? 'secondary-0'
-    : undefined,
-);
-watch(isSettingsRoute, () => {
-  if (isSettingsRoute) {
-    selectedOption.value = null;
-  }
-});
 type BannerProps = {
   coverPicture?: Upload | null;
   showSetting?: boolean;
@@ -304,7 +286,7 @@ watch(coverPicture!, () => {
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
         object-fit: cover;
-        aspect-ratio: 1 / 1;
+        aspect-ratio: 1/1;
       }
 
       .w-100.h-25 {

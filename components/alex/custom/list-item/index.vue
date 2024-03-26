@@ -11,7 +11,7 @@
       'v-list-item-light-warning': !isDarkMode && warning,
     }"
     :ripple="false"
-    @click="onClick(link, emit('click'))"
+    @click="onClick(link, () => emit('click'))"
   >
     <template #title></template>
     <div class="d-flex gap-4 text-body-4 align-center justify-center">

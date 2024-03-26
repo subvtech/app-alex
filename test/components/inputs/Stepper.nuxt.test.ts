@@ -18,7 +18,7 @@ describe('Stepper component', () => {
   });
 
   it('should render the stepper component', async () => {
-    const stepper = await screen.findByRole('stepper');
+    const stepper = await screen.findByRole('tablist');
     expect(stepper).not.toBeNull();
   });
 
@@ -35,7 +35,7 @@ describe('Stepper component', () => {
   });
 
   it('should have render slot 2 when click on next button', async () => {
-    const stepper = await screen.findByRole('stepper');
+    const stepper = await screen.findByRole('tablist');
     const nextButton = await within(stepper).findByText('Avançar');
     await fireEvent.click(nextButton);
     const step2 = await within(stepper).findByText('step2');
@@ -46,7 +46,7 @@ describe('Stepper component', () => {
   });
 
   it('should have go back to slot 1 when click on previous button', async () => {
-    const stepper = await screen.findByRole('stepper');
+    const stepper = await screen.findByRole('tablist');
     const nextButton = await within(stepper).findByText('Avançar');
     await fireEvent.click(nextButton);
     const previousButton = await within(stepper).findByText('Voltar');
