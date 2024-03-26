@@ -61,6 +61,14 @@ const onActionButton = () => {
   classesData.value = null;
   scheduleData.value = null;
 };
+
+const convertDate = (date, time) => {
+  console.log(date, time);
+  const [hour, minute] = time.split(':');
+  const [year, month, day] = date.split('-');
+  return new Date(year, month - 1, day, hour, minute);
+};
+
 const onSubmit = (value: T) => {
   // @ts-ignore // FIXME: corrigir tipagem
   const newItem: T = {
@@ -89,12 +97,15 @@ const addMeeting = (meeting: MeetingPropsType & { className: string }) => {
         id: meeting.id,
         interval: meeting.interval,
         date: meeting.date,
+        startDate: convertDate(meeting.date, meeting.startHour),
+        endDate: convertDate(meeting.endDate, meeting.endHour),
         startHour: meeting.startHour,
         endHour: meeting.endHour,
         type: meeting.type,
         location: meeting.location,
         link: meeting.link,
       };
+      console.log(newMetting);
       const updatedClass = {
         ...classValue,
         schedules: [
@@ -158,6 +169,11 @@ const editMeeting = (meeting: LearningScheduleCriation) => {
     JSON.stringify(
       classes.value.map((item) => {
         if (item.name === meeting.className) {
+          console.log(meeting);
+          meeting.startDate = convertDate(meeting.date, meeting.startHour);
+          console.log(meeting.date);
+          meeting.endDate = convertDate(meeting.endDate, meeting.endHour);
+          console.log(meeting);
           return {
             ...item,
             schedules: item.schedules?.map((oldMeeting) =>

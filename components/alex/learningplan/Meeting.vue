@@ -69,6 +69,7 @@ export interface MeetingPropsType {
   date: Date | string;
   startHour: string;
   endHour: string;
+  endDate: Date | string;
   type: MeetingType;
   variant?: MeetingVariantType;
   location?: string;
