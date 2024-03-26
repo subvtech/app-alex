@@ -164,6 +164,8 @@ export type LearningScheduleCriation = {
   id: number;
   interval: 0 | 1 | 7 | 14 | 30;
   date: string;
+  startDate: Date | string;
+  endDate: Date | string;
   startHour: string;
   endHour: string;
   type: 'onsite' | 'online';
