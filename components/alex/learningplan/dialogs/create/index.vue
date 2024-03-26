@@ -81,7 +81,7 @@
           $t('components.learningPlan.dialogs.addNameResponsibleToClass')
         "
         img="/svg/class.svg"
-        :title-header="$t('components.learningPlan.dialogs.newMeeting')"
+        :title-header="$t('components.learningPlan.dialogs.taughtClasses')"
         :show-itens="!!classes.length"
       >
         <template #action-button="{ onActionButton, onSubmit }">
@@ -114,7 +114,7 @@
         v-model="classes"
         v-model:classes="classData"
         v-model:schedules="scheduleData"
-        :title-header="$t('components.learningPlan.dialogs.newMeeting')"
+        :title-header="$t('components.learningPlan.dialogs.syncMeetings')"
         :title="$t('components.courses.meeting.course.title')"
         :subtitle="$t('components.courses.meeting.course.subtitle')"
         :show-itens="!!hasSchedules"
@@ -134,7 +134,7 @@
               @create="addMeeting"
               @update="(values) => editMeeting(values)"
             />{{
-              $t('components.learningPlan.dialogs.syncMeetings')
+              $t('components.learningPlan.dialogs.newMeeting')
             }}</alex-custom-button
           >
         </template>

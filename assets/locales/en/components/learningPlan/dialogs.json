@@ -32,6 +32,7 @@
   "class": "Class",
   "selectClassToMeeting": "Select the class for the meeting",
   "taught": "Taught",
+  "taughtClasses": "Taught classes",
   "meetingType": "Meeting type",
   "manageClasses": "Manage your classes!",
   "addNameResponsibleToClass": "Add a name and a responsible person for each class.",
@@ -48,5 +49,6 @@
   "whosIsClassResponsible": "Who will be responsible for the class?",
   "selectResponsible": "Select the responsible person",
   "whoAreClassParticipants": "Who will be the participants of the class?",
-  "selectClassPartipant": "Select participants for the class"
+  "selectClassPartipant": "Select participants for the class",
+  "pendingInvites": "Pending invites"
 }
