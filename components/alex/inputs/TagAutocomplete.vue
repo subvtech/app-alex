@@ -9,7 +9,7 @@
     :items="filteredItems"
     :name="name"
     v-bind="$attrs"
-    :no-data-text="'Adiciona novas competências'"
+    hide-no-data
     @keydown.enter="selectOnEnter"
   />
 </template>

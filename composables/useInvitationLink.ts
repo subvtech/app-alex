@@ -37,6 +37,7 @@ export const useInvitationLink = () => {
     inviteId: number | string | null,
     duration: number,
     learningplanId: number | string,
+    classId: number | string,
   ) => {
     try {
       if (inviteId) await _delete('invitation-links', inviteId);
@@ -45,6 +46,7 @@ export const useInvitationLink = () => {
     const result: any = await create('invitation-links', {
       duration,
       learningplan: learningplanId,
+      learning_class: classId,
     });
 
     return result;
