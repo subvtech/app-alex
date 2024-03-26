@@ -9,7 +9,7 @@
     <vueper-slides
       ref="vueperslides1"
       class="no-shadow mb-4 rounded d-block w-100"
-      :slide-ratio="2 / 4"
+      :slide-ratio="!readOnly && slides.length < 1 && mobile ? 1 : 2 / 4"
       :bullets="false"
       :arrows="false"
       :dragging-distance="200"
@@ -18,16 +18,27 @@
       style="z-index: 0; max-width: 850px"
     >
       <vueper-slide
-        :class="!readOnly && slides.length < 1 ? '' : 'd-none'"
+        :class="!readOnly && slides.length < 1 ? 'scale-1' : 'd-none'"
         class="rounded"
         @click="openAddSlidesDialog(-1)"
       >
         <template #content>
           <v-container
-            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue"
+            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue empty"
             elevation="0"
           >
-            <v-icon color="accent" size="100px" icon="mdi-image-area" />
+            <div
+              class="d-flex flex-column align-center max-width-350 justify-center gap-2 text-secondary-0"
+            >
+              <v-icon color="accent" size="80px" icon="alex:RoundAddPhoto" />
+              <p class="text-body-2 text-center">
+                Adicione vídeos ou imagens que aparecerão na página inicial do
+                seu curso
+              </p>
+              <p class="text-body-3 text-center">
+                Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;
+              </p>
+            </div>
           </v-container>
         </template>
       </vueper-slide>
@@ -184,6 +195,7 @@
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
@@ -206,7 +218,7 @@ const props = defineProps({
     default: false,
   },
 });
-
+const { mobile } = useDisplay({ mobileBreakpoint: 600 });
 const emit = defineEmits(['update:modelValue', 'slidesChanged']);
 
 const slides = computed({
@@ -483,6 +495,9 @@ defineExpose({
 }
 </style>
 <style scoped>
+.scale-1 {
+  transform: scale(1) !important;
+}
 .inputFile {
   position: absolute;
   opacity: 0;
@@ -545,7 +560,15 @@ defineExpose({
   max-width: 213px;
   max-height: 120px;
 }
-
+.max-width-350 {
+  max-width: 350px;
+}
+.empty:hover {
+  background-color: rgb(var(--v-theme-gray-100)) !important;
+}
+.empty:active {
+  background-color: rgb(var(--v-theme-gray-200)) !important;
+}
 @media (max-width: 600px) {
   .video-play-icon {
     left: 70%;
