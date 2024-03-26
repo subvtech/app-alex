@@ -41,13 +41,16 @@
         <alex-inputs-users-autocomplete
           v-model="usersToInvite"
           name="usersToInvite"
-          class="w-100"
+          class="w-100 mb-4"
+          hide-details="auto"
           :ignore-user-ids="ignoreUserIds"
           :ignore-emails="ignoreUserEmails"
           :label="$t('components.learningPlan.dialogs.whoParticipate')"
           :placeholder="$t('components.learningPlan.dialogs.searchMember')"
         />
-        <p>Convites pendentes</p>
+        <p class="text-body-4 text-gray-900">
+          {{ $t('components.learningPlan.dialogs.pendingInvites') }}
+        </p>
         <alex-custom-list-item-user
           v-for="(member, i) in classStore.pendingMembers"
           :key="`pending-member-${i}`"
