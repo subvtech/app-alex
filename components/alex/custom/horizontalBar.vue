@@ -12,7 +12,10 @@
       :class="reverse ? 'flex-row-reverse' : ''"
       :role="reverse ? 'reversed' : ''"
     >
-      <v-app-bar-nav-icon @click.stop="toggleDrawer" class="text-gray-900" />
+      <v-app-bar-nav-icon
+        class="text-gray-900"
+        @click.stop="emit('toggle:drawer')"
+      />
 
       <v-spacer />
 
@@ -25,9 +28,9 @@
             width="24"
             height="24"
             role="chat-active"
-          >
+          />
         </v-btn>
-        <v-btn icon color="grey" @click="emit('alert')" class="">
+        <v-btn icon color="grey" @click="emit('alert')">
           <img
             v-if="isBellActive"
             src="/svg/bell.svg"
@@ -38,6 +41,7 @@
           <v-icon v-else color="#6E7A87">mdi-bell-outline</v-icon>
         </v-btn>
       </div>
+
       <v-menu offset-y nudge-bottom="10">
         <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
@@ -51,7 +55,7 @@
                 :profile-picture="avatar"
                 :placeholder="computedPlaceholder"
                 :size="pictureSize"
-                track-current-user
+                :track-current-user="trackCurrentUser"
                 show-border
                 avatar-style="border: 1px solid #A0A8B1;"
                 class="mr-2"
@@ -106,57 +110,52 @@
   </v-app-bar>
 </template>
 <script setup lang="ts">
-const emit = defineEmits(['alert', 'chat']);
+/*
+  This component is meant to be used on the main screen as a horizontal Menu,
+   it's also suitable for use inside smaller components.
+*/
+import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+
+export interface HorizontalBarEmits {
+  (e: 'alert'): void; // click on the alert button
+  (e: 'chat'): void; // click on the chat button
+  (e: 'toggle:drawer'): void; // click on the main button to change the drawer state
+}
+
+export interface HorizontalBarMenuItemType {
+  title: string;
+  to?: string;
+  action?: () => void;
+}
+
+export interface HorizontalBarComponentType {
+  avatar?: ProfilePictureItemType;
+  placeholder?: string;
+  notFixed?: boolean;
+  menuItems: HorizontalBarMenuItemType[];
+  isBellActive?: boolean;
+  isChatActive?: boolean;
+  reverse?: boolean;
+  showPicture?: boolean;
+  pictureSize?: number;
+  trackCurrentUser?: boolean;
+}
+
+const emit = defineEmits<HorizontalBarEmits>();
 const placeholderFallback = 'user';
 const router = useRouter();
 
-const props = defineProps({
-  avatar: {
-    type: Object as PropType<{ id: number; url: string }>,
-  },
-  placeholder: {
-    type: String, //expects the user's placeholder
-  },
-  notFixed: {
-    type: Boolean,
-    default: false,
-  },
-
-  menuItems: {
-    type: Array as PropType<
-      { title: string; to?: string; action?: () => void }[]
-    >,
-    default: [],
-  },
-
-  toggleDrawer: {
-    type: Function as PropType<(payload: MouseEvent) => void>,
-    default: () => {},
-  },
-
-  isBellActive: {
-    type: Boolean,
-    default: false,
-  },
-
-  isChatActive: {
-    type: Boolean,
-    default: false,
-  },
-  reverse: {
-    type: Boolean,
-    default: false,
-  },
-
-  showPicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  pictureSize: {
-    type: Number,
-    default: 40,
-  },
+const props = withDefaults(defineProps<HorizontalBarComponentType>(), {
+  avatar: undefined,
+  placeholder: undefined,
+  notFixed: false,
+  menuItems: () => [],
+  isBellActive: false,
+  isChatActive: false,
+  reverse: false,
+  showPicture: false,
+  pictureSize: 40,
+  trackCurrentUser: false,
 });
 
 const computedPlaceholder = computed(() =>

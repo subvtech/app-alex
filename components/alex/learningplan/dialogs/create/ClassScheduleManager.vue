@@ -63,7 +63,6 @@ const onActionButton = () => {
 };
 
 const convertDate = (date, time) => {
-  console.log(date, time);
   const [hour, minute] = time.split(':');
   const [year, month, day] = date.split('-');
   return new Date(year, month - 1, day, hour, minute);
@@ -105,7 +104,6 @@ const addMeeting = (meeting: MeetingPropsType & { className: string }) => {
         location: meeting.location,
         link: meeting.link,
       };
-      console.log(newMetting);
       const updatedClass = {
         ...classValue,
         schedules: [
@@ -169,11 +167,8 @@ const editMeeting = (meeting: LearningScheduleCriation) => {
     JSON.stringify(
       classes.value.map((item) => {
         if (item.name === meeting.className) {
-          console.log(meeting);
           meeting.startDate = convertDate(meeting.date, meeting.startHour);
-          console.log(meeting.date);
           meeting.endDate = convertDate(meeting.endDate, meeting.endHour);
-          console.log(meeting);
           return {
             ...item,
             schedules: item.schedules?.map((oldMeeting) =>
