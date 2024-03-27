@@ -65,6 +65,7 @@
     "max": "Máximo de {max} caracteres"
   },
   "url": {
+    "valid": "Deve ser uma url válida",
     "required": "Url é necessário",
     "min": "Mínimo de 4 caracteres",
     "max": "Máximo de 64 caracteres"
@@ -114,6 +115,7 @@
       "beforeStartHour": "Hora de término deve ser maior que início"
     },
     "copy": {
+      "hint": "Copiar Texto",
       "success": "Texto copiado.",
       "error": "Não foi possível copiar o texto."
     },

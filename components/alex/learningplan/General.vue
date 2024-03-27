@@ -31,7 +31,7 @@
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
-          <alex-learningplan-about
+          <app-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
@@ -88,25 +88,10 @@
         class="w-100"
       >
         <template #content>
-          <app-general-boxes
-            :boxes="[
-              {
-                icon: 'mdi-account-outline',
-                number: learningPlanStore.activeMembers.length,
-                label: 'students',
-              },
-              {
-                icon: 'trails.svg',
-                number: learningPlanStore.standardTrails.length,
-                label: 'trails',
-              },
-              {
-                icon: 'mdi-newspaper-variant-multiple-outline',
-                number: 0,
-                label: 'assignments',
-              },
-            ]"
-            hide-divider
+          <alex-profile-detail-boxes
+            class="max-w-125"
+            :boxes="detailBoxes"
+            :loading="loading"
           />
         </template>
         <template #footer>
@@ -188,6 +173,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 import { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
@@ -272,6 +258,24 @@ const classInfo = computed(() => {
     end: props.learningPlan?.end_date,
   };
 });
+
+const detailBoxes = computed<BoxItemType[]>(() => [
+  {
+    icon: 'mdi-account-outline',
+    number: learningPlanStore.activeMembers.length,
+    label: 'students',
+  },
+  {
+    icon: 'trails.svg',
+    number: learningPlanStore.standardTrails.length,
+    label: 'trails',
+  },
+  {
+    icon: 'mdi-newspaper-variant-multiple-outline',
+    number: 0,
+    label: 'assignments',
+  },
+]);
 </script>
 
 <style scope lang="scss">

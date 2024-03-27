@@ -32,12 +32,13 @@
 </template>
 
 <script setup lang="ts">
+interface AvatarImageType {
+  url: string;
+  alt?: string;
+}
 interface avatar {
   name: string;
-  image?: {
-    url: string;
-    alt?: string;
-  };
+  image?: AvatarImageType;
 }
 interface AvatarGroupProps {
   avatarItems: avatar[];

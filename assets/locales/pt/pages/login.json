@@ -13,6 +13,7 @@
   "passwordHolder": "Digite sua senha",
   "divider": "OU",
   "blocked": "Você está banido.",
+  "notfound": "Usuário não encontrado.",
   "metamask": {
     "btn": "Acessar com a Metamask",
     "notFound": "Metamask not detected",

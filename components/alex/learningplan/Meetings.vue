@@ -5,8 +5,8 @@
     class="w-100"
     :is-editing="editMeetings"
     :disable-save="!schedulesChanges.length"
-    :save="onSave"
-    :cancel="onCancel"
+    @click:save="onSave"
+    @click:cancel="onCancel"
     @toggle:is-editing="toggleEditMode"
   >
     <template #content>
