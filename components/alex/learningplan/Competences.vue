@@ -33,27 +33,27 @@
           />
         </div>
 
-        <div class="d-flex flex-column align-start gap-2">
-          <div class="d-flex flex-wrap justify-start gap-2">
-            <template v-if="temporaryTags.length !== 0">
-              <alex-custom-chip
-                v-for="(tag, index) in temporaryTags"
-                :key="index"
-                :text="tag.text"
-                :closable="isEditing"
-                :uncloseable="isEditing"
-                variant="outlined"
-                color="#000"
-                @click:close="isEditing && onRemove(tag.text)"
-              />
-            </template>
-
+        <div class="d-flex flex-wrap justify-start gap-2">
+          <template v-if="temporaryTags.length !== 0">
             <alex-custom-chip
-              v-else
+              v-for="(tag, index) in temporaryTags"
+              :key="index"
+              :text="tag.text"
+              :closable="isEditing"
+              :uncloseable="isEditing"
               variant="outlined"
               color="#000"
-              :text="emptyMessage"
+              @click:close="isEditing && onRemove(tag.text)"
             />
+          </template>
+          <div v-else-if="!isEditing" class="d-flex justify-center w-100">
+            <span class="text-body-1 text-gray-500 text-center w-75">{{
+              $t(
+                `components.competences.empty.${
+                  isGeneral ? 'general' : 'technical'
+                }`,
+              )
+            }}</span>
           </div>
         </div>
       </div>

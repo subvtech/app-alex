@@ -158,8 +158,8 @@ export const useFormRules = () => {
     endDate: endDateRules,
     title: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
     slug: yup
@@ -173,8 +173,8 @@ export const useFormRules = () => {
   const generalTrailSchema = yup.object({
     title: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.title.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
     ...descriptionRules,
@@ -200,7 +200,9 @@ export const useFormRules = () => {
         then: (scheme) => scheme.required(i18n.t('rules.institution.required')),
       }),
   });
-
+  const classRules = yup.object({
+    classes: yup.array().min(1, i18n.t('rules.class.requiredClassArray')),
+  });
   const registerStep3 = yup.object({
     ...passwordRules,
     ...usernameRules,
@@ -249,11 +251,11 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
       .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
       .trim(),
-    class: yup
+    slug: yup
       .string()
-      .required(i18n.t('rules.class.required'))
-      .min(4, ({ min }) => i18n.t('rules.class.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.class.max', { max }))
+      .required(i18n.t('rules.field.required'))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.slug.max', { max }))
       .trim(),
     startDate: startDateCreationRules,
     endDate: endDateRules,
@@ -264,17 +266,16 @@ export const useFormRules = () => {
       date: yup
         .date()
         .required(i18n.t('rules.meeting.date.required'))
-        .min(startDate || currentDate, ({ min }) =>
-          i18n.t('rules.startDate.min', {
+        .min(startDate || currentDate, ({ min }) => {
+          return i18n.t('rules.startDate.min', {
             min: min.toLocaleString(i18n.locale.value).split(',')[0],
-          }),
-        )
+          });
+        })
         .max(endDate || currentDate, ({ max }) =>
           i18n.t('rules.endDate.max', {
             max: max.toLocaleString(i18n.locale.value).split(',')[0],
           }),
         ),
-
       startHour: yup
         .string()
         .required(i18n.t('rules.meeting.startHour.required')),
@@ -289,6 +290,27 @@ export const useFormRules = () => {
             return isSameOrBeforeHour(value, startHour) === 1;
           },
         ),
+      className: yup.string().required(i18n.t('rules.class.required')),
+      type: yup.string().required(i18n.t('rules.meeting.type.required')),
+      interval: yup
+        .number()
+        .required(i18n.t('rules.meeting.interval.required')),
+      location: yup
+        .string()
+        .notRequired()
+        .when('type', {
+          is: 'onsite',
+          then: (scheme) =>
+            scheme.required(i18n.t('rules.meeting.location.required')),
+        }),
+      link: yup
+        .string()
+        .notRequired()
+        .when('type', {
+          is: 'online',
+          then: (scheme) =>
+            scheme.required(i18n.t('rules.meeting.link.required')),
+        }),
     });
 
   const createTrailsRules = yup.object({
@@ -320,6 +342,15 @@ export const useFormRules = () => {
       .min(2, i18n.t('pages.classes.participantsIsRequired')),
   };
 
+  const createEditClassRules = {
+    className: yup
+      .string()
+      .min(4, ({ min }) => i18n.t('rules.name.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.name.max', { max }))
+      .required(i18n.t('rules.field.required'))
+      .trim(),
+    responsible: yup.mixed().required(i18n.t('rules.field.required')),
+  };
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -353,5 +384,7 @@ export const useFormRules = () => {
     scheduleRules,
     createTrailsRules,
     createGroupRules,
+    createEditClassRules,
+    classRules,
   };
 };

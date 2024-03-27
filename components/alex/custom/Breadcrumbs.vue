@@ -1,7 +1,6 @@
 <template>
   <div
-    class="breadcrumb-block d-flex align-center flex-wrap"
-    style="gap: 8px"
+    class="breadcrumb-block d-flex align-center flex-wrap ga-2 mt-2"
     :style="
       backgroundColor
         ? `background-color: ${backgroundColor}`
@@ -36,14 +35,14 @@
       />
     </div>
     <v-breadcrumbs
-      class="pl-0"
+      class="pa-0"
       :class="breadcrumbsVClasses"
       :items="items"
       :divider="divider"
     >
       <template #title="{ item }">
         <v-breadcrumbs-item
-          class="text-body-3 text-gray-700"
+          class="text-body-3 text-gray-700 ellipsis lines-1"
           :disabled="item.disabled"
           :style="[itemStyle ?? '']"
           :to="item.to"

@@ -41,9 +41,8 @@
       @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
-
     <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container class="pa-4 pa-sm-6 overflow-hidden max-width-100">
+      <v-container class="pa-4 pa-sm-6 max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -208,69 +207,69 @@ const defaultMenus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: i18n.t('layouts.default.dashboard'),
-        to: '/dashboard',
+        to: '/',
       },
       {
-        icon: 'mdi-book-cog-outline',
+        icon: 'mdi-book-outline',
         title: i18n.t('layouts.default.myClasses'),
         to: '/courses/me',
       },
-      {
-        icon: 'mdi-clipboard-multiple-outline',
-        title: i18n.t('layouts.default.myProjects'),
-        to: '/classes/active-links',
-      },
-      {
-        icon: 'mdi-heart-outline',
-        title: i18n.t('layouts.default.favourites'),
-        to: '/classes/active-links',
-      },
+      // {
+      //   icon: 'mdi-clipboard-multiple-outline',
+      //   title: i18n.t('layouts.default.myProjects'),
+      //   to: '/classes/active-links',
+      // },
+      // {
+      //   icon: 'mdi-heart-outline',
+      //   title: i18n.t('layouts.default.favourites'),
+      //   to: '/classes/active-links',
+      // },
     ],
   },
 
-  {
-    title: i18n.t('layouts.default.BrowseOnAlex'),
-    items: [
-      {
-        icon: 'mdi-book-outline',
-        dataTour: 'step-navigation',
-        title: i18n.t('layouts.default.courses'),
-        to: '/learning-plans',
-      },
-      {
-        icon: 'mdi-clipboard-text-outline',
-        title: i18n.t('layouts.default.projects'),
-        to: '/learning-plans/user',
-      },
-    ],
-  },
+  // {
+  //   title: i18n.t('layouts.default.BrowseOnAlex'),
+  //   items: [
+  //     {
+  //       icon: 'mdi-book-outline',
+  //       dataTour: 'step-navigation',
+  //       title: i18n.t('layouts.default.courses'),
+  //       to: '/learning-plans',
+  //     },
+  //     {
+  //       icon: 'mdi-clipboard-text-outline',
+  //       title: i18n.t('layouts.default.projects'),
+  //       to: '/learning-plans/user',
+  //     },
+  //   ],
+  // },
 
-  {
-    title: i18n.t('layouts.default.professorTitle'),
-    dataTour: 'step-professor',
-    items: [
-      {
-        icon: 'mdi-account-multiple-outline',
-        title: i18n.t('layouts.default.userList'),
-        to: '/classes',
-      },
-      {
-        icon: 'mdi-account-multiple-outline',
-        title: i18n.t('layouts.default.institutionList'),
-        to: '/classes',
-      },
-      {
-        icon: 'mdi-lock-outline',
-        title: i18n.t('layouts.default.accessControl'),
-        to: '/classes',
-      },
-      {
-        icon: 'mdi-cog-outline',
-        title: i18n.t('layouts.default.settings'),
-        to: '/projects',
-      },
-    ],
-  },
+  // {
+  //   title: i18n.t('layouts.default.professorTitle'),
+  //   dataTour: 'step-professor',
+  //   items: [
+  //     {
+  //       icon: 'mdi-account-multiple-outline',
+  //       title: i18n.t('layouts.default.userList'),
+  //       to: '/classes',
+  //     },
+  //     {
+  //       icon: 'mdi-account-multiple-outline',
+  //       title: i18n.t('layouts.default.institutionList'),
+  //       to: '/classes',
+  //     },
+  //     {
+  //       icon: 'mdi-lock-outline',
+  //       title: i18n.t('layouts.default.accessControl'),
+  //       to: '/classes',
+  //     },
+  //     {
+  //       icon: 'mdi-cog-outline',
+  //       title: i18n.t('layouts.default.settings'),
+  //       to: '/projects',
+  //     },
+  //   ],
+  // },
 ];
 
 const componentsMenu = [
