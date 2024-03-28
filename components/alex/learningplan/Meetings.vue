@@ -214,6 +214,7 @@ const onSave = async () => {
 
 const onCancel = () => {
   classModel.value = deepClone(backUpSchedules.value);
+  editMeetings.value = false;
   schedulesChanges.value = [];
   editMeetings.value = false;
 };

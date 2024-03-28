@@ -164,11 +164,7 @@ const toggleIsEditing = () => {
 const disableSave = computed(() => {
   return (
     arraysAreEqual(
-      props.socials.map((item) => ({
-        title: item.name,
-        url: item.url,
-        id: item.id,
-      })),
+      initialState.value.map((item) => ({ ...item.contentData })),
       sortedSocials.value.map((item) => ({ ...item.contentData })),
     ) || errors.value.length !== 0
   );

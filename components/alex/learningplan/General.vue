@@ -209,24 +209,25 @@ const showDetails = computed(() => {
   return props.learningPlan.details?.data?.length !== 0;
 });
 
-const learningGoals = computed(() =>
-  props.learningPlan.learning_goals.map((goal, index) => ({
-    id: goal.id,
-    title: goal.description,
-    keyWord: goal.verb.text,
-    errorKeyWord: false,
-    errorTitle: false,
-    contentData: {
+const learningGoals = computed(
+  () =>
+    props.learningPlan.learning_goals?.map((goal, index) => ({
       id: goal.id,
-      index,
-      description: goal.description,
-      verb: {
-        id: goal.verb.id,
-        text: goal.verb.text,
-        general: goal.verb.general,
+      title: goal.description,
+      keyWord: goal.verb.text,
+      errorKeyWord: false,
+      errorTitle: false,
+      contentData: {
+        id: goal.id,
+        index,
+        description: goal.description,
+        verb: {
+          id: goal.verb.id,
+          text: goal.verb.text,
+          general: goal.verb.general,
+        },
       },
-    },
-  })),
+    })),
 );
 
 const getActiveLink = (classItem: ClassSimple) => {
