@@ -8,6 +8,7 @@
       :items="filteredItems"
       item-title="text"
       return-object
+      class="combobox-input"
       @update:model-value="handleKeyWord"
     />
     <alex-inputs-text-area
@@ -46,7 +47,7 @@ const props = withDefaults(defineProps<FormGoalProps>(), {
 const { filteredItems } = toRefs(props);
 const currentData = computed(() => props.data[props.index]);
 const { errors } = useForm({
-  validateOnMount: true,
+  validateOnMount: false,
   initialValues: {
     verb: currentData.value.contentData.verb.text,
     description: currentData.value.contentData.description,
@@ -119,5 +120,8 @@ watch(errors, () => {
 .error {
   border-color: red;
   color: red;
+}
+.combobox-input {
+  max-width: 393px;
 }
 </style>

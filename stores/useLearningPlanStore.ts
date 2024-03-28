@@ -20,7 +20,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const populate = {
     cover_image: true,
     media: true,
-    invitation_links: true,
+    invitation_links: {
+      populate: ['learning_class'],
+    },
     learning_goals: {
       populate: ['verb'],
     },
@@ -35,7 +37,15 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         },
       },
     },
-
+    classes: {
+      populate: [
+        'in_charge_member.user.avatar',
+        'learning_plan_members.user.avatar',
+        'learning_plan_groups.group_members.student_member.user.avatar',
+        'invitation_links',
+        'meeting_schedules.meetings',
+      ],
+    },
     tags: true,
     schedules: {
       populate: ['meetings'],

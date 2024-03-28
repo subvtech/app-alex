@@ -1,6 +1,6 @@
 const client = useStrapiClient();
 export const useUploadedImage = () => {
-  const updateImage = async (event, imageId) => {
+  const updateImage = async (event: Event, imageId: string): Promise<any> => {
     const files: FileList | null | undefined = event.target
       ? (event.target as HTMLInputElement).files
       : null;
@@ -10,12 +10,15 @@ export const useUploadedImage = () => {
     const formData = new FormData();
 
     formData.append('files', files[0]);
-    const data = await client<any>(`/upload?id=${imageId}`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    return data;
+    try {
+      const data = await client<any>(`/upload?id=${imageId}`, {
+        method: 'POST',
+        body: formData,
+      });
+      return data;
+    } catch (error) {
+      console.error(`Error updating image: ${error}`);
+    }
   };
 
   const uploadImage = async (event) => {
