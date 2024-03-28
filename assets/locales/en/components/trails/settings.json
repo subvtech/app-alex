@@ -24,11 +24,11 @@
     "title": "Trail visibility",
     "show": {
       "title": "Show trail (Public)",
-      "hint": "Makes the trail public, allowing any course member to see it.",
+      "hint": "Makes the trail public, allowing any course member to see it."
     },
     "hide": {
       "title": "Hide trail (Private)",
-      "hint": "Makes the trail private, ensuring only its creator can see the trail.",
+      "hint": "Makes the trail private, ensuring only its creator can see the trail."
     },
     "cancel": "Cancel",
     "save": "Save Changes",
