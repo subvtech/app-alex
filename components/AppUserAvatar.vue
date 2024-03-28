@@ -104,7 +104,11 @@ const avatar = computed<ProfilePictureItemType | null | undefined>(() =>
     : props.profilePicture,
 );
 
-const fullname = ref<string | null | undefined>(props.placeholder);
+const fullname = computed<string | null | undefined>(() =>
+  props.trackCurrentUser && userStore.user
+    ? userStore.user?.fullname
+    : props.placeholder,
+);
 const { uploadProfilePicture, removeProfilePicture, isLoading } =
   useProfilePicture(avatar, props.userId);
 

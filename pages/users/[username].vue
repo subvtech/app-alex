@@ -112,25 +112,13 @@ const links = computed<TabType[]>(() => {
       value: '0',
       to: `/users/${username}`,
     },
+
     {
-      label: i18n.t('pages.profile.courses'),
-      value: '1',
-      to: `/users/${username}/courses`,
-    },
-    {
-      label: i18n.t('pages.profile.projects'),
-      value: '2',
-      to: `/users/${username}/projects`,
-    },
-    {
-      label: i18n.t('pages.profile.assignments'),
-      value: '3',
-      to: `/users/${username}/tasks`,
-    },
-    {
-      label: i18n.t('pages.profile.events'),
-      value: '4',
-      to: `/users/${username}/events`,
+      label: '',
+      icon: 'mdi-cog-outline',
+      value: 1,
+      to: `/users/${username}/settings`,
+      classes: 'ml-auto',
     },
   ];
 });
