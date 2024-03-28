@@ -6,7 +6,7 @@ export interface UserSimple {
   email: string;
   fullname: string;
   password: string;
-  institute: string;
+  institutions: InstitutionsType[];
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;
@@ -14,10 +14,10 @@ export interface UserSimple {
   confirmed: boolean;
   isProfessor: boolean;
   tags: any[];
+  socials: any[];
   avatar: Upload | null;
+  cover: Upload;
   role: UserRoles;
   phone: string | null;
   info: null;
-  cover: string | null;
-  institutions?: any[];
 }

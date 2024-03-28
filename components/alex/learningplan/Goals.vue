@@ -6,23 +6,24 @@
     show-tooltip
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
-    :save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
-    :cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
     :show-icon="canEdit"
+    @click:save="onSave"
+    @click:cancel="onCancel"
     @toggle:is-editing="toggleEditing"
   >
     <template #content>
       <alex-custom-empty-placeholder
-        v-if="localData.length === 0"
+        v-if="localData.length === 0 && !isEditing"
         class="align-self-center"
         :empty-text-message="$t('components.courses.goals.empty')"
         empty-text-image="/svg/EmptyGoals.svg"
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion
+          v-if="localData.length > 0"
           v-model="selectedPanel"
           v-model:data="localData"
           show-positions
@@ -40,9 +41,10 @@
             /> </template
         ></alex-custom-accordion>
         <alex-custom-button
-          class="add-button"
+          class="add-button w-100 mt-5"
           prepend-icon="mdi-plus"
           variant="text"
+          size="large"
           @click="addGoal"
         >
           {{ $t('components.courses.goals.add') }}</alex-custom-button
@@ -117,9 +119,16 @@ const toggleEditing = () => {
     setLastGoals();
   }
 };
+
+const isEmpty = (value: string) => value.trim().length === 0;
+
 const toggleSave = () => {
   const errorFound = localData.value.find(
-    (item) => item.errorDescription || item.errorKeyWord,
+    (item) =>
+      item.errorDescription ||
+      item.errorKeyWord ||
+      isEmpty(item.contentData.description) ||
+      isEmpty(item.contentData.verb.text),
   );
   if (errorFound) disableSave.value = true;
   else disableSave.value = false;
@@ -150,10 +159,11 @@ const addGoal = () => {
     errorKeyWord: true,
     local: true,
     contentData: {
-      index: localData.value.length,
       description: '',
+      keyWord: null,
+      index: localData.value.length,
       verb: {
-        text: '',
+        text: null,
         general: false,
       },
     },
@@ -163,6 +173,7 @@ const addGoal = () => {
 };
 const onCancel = () => {
   localData.value = lastGoals.value;
+  isEditing.value = false;
 };
 const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {
@@ -188,6 +199,8 @@ const onSave = async () => {
       emit('update', t('components.courses.goals.update'));
     },
   });
+
+  isEditing.value = false;
 };
 watch(
   localData,

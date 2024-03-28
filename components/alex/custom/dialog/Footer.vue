@@ -1,43 +1,37 @@
 <template>
-  <v-container
-    class="bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100"
+  <div
+    class="d-flex gap-4 justify-end flex-wrap bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100 alex-dialog-footer"
     data-testid="alex-dialog-footer"
   >
-    <v-row dense :justify="justify">
-      <v-col v-if="!noSecondaryButton" dense cols="auto">
-        <slot
-          v-if="hasSecondarySlotButton"
-          name="secondarySlotButton"
-          :on-second-action="() => emits('onSecondaryAction')"
-        />
-        <alex-custom-button
-          v-else
-          size="large"
-          variant="secondary"
-          :prepend-icon="secondaryButtonIcon"
-          :text="secondaryButtonText"
-          @click="() => emits('onSecondaryAction')"
-        />
-      </v-col>
-      <v-col v-if="!noMainButton" dense cols="auto">
-        <slot
-          v-if="hasMainSlotButton"
-          name="mainSlotButton"
-          :on-main-action="() => emits('onMainAction')"
-        />
-        <alex-custom-button
-          v-else
-          size="large"
-          variant="primary"
-          :text="mainButtonText"
-          :prepend-icon="mainButtonIcon"
-          :loading="mainButtonLoading"
-          :disabled="mainButtonDisabled"
-          @click="() => emits('onMainAction')"
-        />
-      </v-col>
-    </v-row>
-  </v-container>
+    <slot
+      v-if="!noSecondaryButton && hasSecondarySlotButton"
+      name="secondarySlotButton"
+      :on-second-action="() => emits('onSecondaryAction')"
+    />
+    <alex-custom-button
+      v-else
+      size="large"
+      variant="secondary"
+      :prepend-icon="secondaryButtonIcon"
+      :text="secondaryButtonText"
+      @click="() => emits('onSecondaryAction')"
+    />
+    <slot
+      v-if="!noMainButton && hasMainSlotButton"
+      name="mainSlotButton"
+      :on-main-action="() => emits('onMainAction')"
+    />
+    <alex-custom-button
+      v-else
+      size="large"
+      variant="primary"
+      :prepend-icon="mainButtonIcon"
+      :text="mainButtonText"
+      :loading="mainButtonLoading"
+      :disabled="mainButtonDisabled"
+      @click="() => emits('onMainAction')"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -82,9 +76,11 @@ const hasSecondarySlotButton = computed(() => !!slots.secondarySlotButton);
 .border-top-gray-100 {
   border-top: 1px solid rgb(var(--v-theme-gray-100)) !important;
 }
-.min-height-76 {
-  min-height: fit-content;
-  height: 76px;
+
+@media screen and (max-width: 599px) {
+  .alex-dialog-footer :deep(button) {
+    width: 100% !important;
+  }
 }
 
 @media (max-width: 420px) {

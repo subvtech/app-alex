@@ -69,7 +69,6 @@
       <v-container>
         <v-row align="center"
           ><alex-custom-horizontal-bar
-            :toggle-drawer="() => {}"
             :menu-items="[
               {
                 title: 'profile',
@@ -89,6 +88,7 @@
             not-fixed
             :avatar="user.avatar"
             :placeholder="user.fullname"
+            @toggle-drawer="() => {}"
           /> </v-row
       ></v-container>
       <prism>{{ examples[1] }}</prism>
@@ -118,16 +118,16 @@
         <v-container>
           <v-row align="center"
             ><alex-custom-horizontalBar
-              :toggle-drawer="
-                () => {
-                  drawer = !drawer;
-                }
-              "
               :menu-items="menuItems"
               show-picture
               not-fixed
               :placeholder="user.fullname"
               :avatar="user.avatar"
+              @toggle:drawer="
+                () => {
+                  drawer = !drawer;
+                }
+              "
             /> </v-row
         ></v-container>
         <prism>{{ examples[2] }}</prism>
@@ -157,17 +157,17 @@
         <v-container>
           <v-row align="center"
             ><alex-custom-horizontalBar
-              :toggle-drawer="
-                () => {
-                  drawer = !drawer;
-                }
-              "
               :menu-items="menuItems"
               reverse
               show-picture
               not-fixed
               :placeholder="user.fullname"
               :avatar="user.avatar"
+              @toggle:drawer="
+                () => {
+                  drawer = !drawer;
+                }
+              "
             /> </v-row
         ></v-container>
         <prism>{{ examples[3] }}</prism>
@@ -198,11 +198,11 @@
         <v-container>
           <v-row align="center"
             ><alex-custom-horizontal-bar
-              :toggle-drawer="() => (drawer = !drawer)"
               is-chat-active
               is-bell-active
               not-fixed
               :menu-items="menuItems"
+              @toggle:drawer="() => (drawer = !drawer)"
             /> </v-row
         ></v-container>
         <prism>{{ examples[4] }}</prism>
@@ -230,20 +230,21 @@
           <v-container>
             <v-row align="center"
               ><alex-custom-horizontal-bar
-                :toggle-drawer="() => (drawer = !drawer)"
                 reverse
                 not-fixed
-                show-picture :placeholder="user.fullname"
-              :avatar="user.avatar"
+                show-picture
+                :placeholder="user.fullname"
+                :avatar="user.avatar"
                 :is-chat-active="isChatActive"
                 :is-bell-active="isBellActive"
-                @alert="isBellActive = !isBellActive"
-                @chat="isChatActive = !isChatActive"
                 :menu-items="[
                   { title: 'title1', to: '/' },
                   { title: 'title2', to: '/' },
                   { title: 'title3', to: '/' },
                 ]"
+                @toggle:drawer="() => (drawer = !drawer)"
+                @alert="isBellActive = !isBellActive"
+                @chat="isChatActive = !isChatActive"
               /> </v-row
           ></v-container>
           <prism>{{ examples[5] }}</prism>
@@ -267,8 +268,9 @@
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in propsDocumentation"
+        :key="index"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -299,8 +301,9 @@
     <h2 class="text-h3 text-gray-800">Eventos disponíveis</h2>
     <div class="d-flex flex-column w-100" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline w-100"
         v-for="(item, index) in eventsDocumentation"
+        :key="index"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline w-100"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -322,6 +325,7 @@
 import 'prismjs';
 import 'prismjs/themes/prism.css';
 import Prism from 'vue-prism-component';
+import { HorizontalBarMenuItemType } from '~/components/alex/custom/horizontalBar.vue';
 
 definePageMeta({
   layout: 'components',
@@ -341,7 +345,7 @@ const drawer = ref(false);
 const isChatActive = ref(false);
 const isBellActive = ref(false);
 
-const menuItems: { title: string; to?: string; action?: () => void }[] = [
+const menuItems: HorizontalBarMenuItemType[] = [
   {
     title: 'profile',
     to: '/',
@@ -360,7 +364,7 @@ const menuItems: { title: string; to?: string; action?: () => void }[] = [
 const examples = [
   `<alex-custom-horizontal-bar not-fixed/>`,
   `<alex-custom-horizontal-bar
-      :toggle-drawer="() => {}"
+      @toggle:drawer="() => {}"
       :menu-items="[
         {
           title: 'profile',
@@ -379,7 +383,7 @@ const examples = [
       :avatar="user.avatar"
     />`,
   `<alex-custom-horizontalBar
-      :toggle-drawer="() => (drawer = !drawer)"
+      @toggle:drawer="() => (drawer = !drawer)"
       :menu-items="profileMenuItems"
       show-picture
       not-fixed 
@@ -388,7 +392,7 @@ const examples = [
     />
      `,
   `<alex-custom-horizontalBar
-      :toggle-drawer="() => (drawer = !drawer)"
+      @toggle:drawer="() => (drawer = !drawer)"
       :menu-items="profileMenuItems"
       reverse
       show-picture
@@ -398,7 +402,7 @@ const examples = [
     />
      `,
   `<alex-custom-horizontalBar
-      :toggle-drawer="() => (drawer = !drawer)"
+      @toggle:drawer="() => (drawer = !drawer)"
       is-chat-active
       is-bell-active
       not-fixed
@@ -409,7 +413,7 @@ const examples = [
       ]"
     /> `,
   `<alex-custom-horizontalBar
-      :toggle-drawer="() => (drawer = !drawer)"
+      @toggle:drawer="() => (drawer = !drawer)"
       reverse
       not-fixed
       show-picture

@@ -28,10 +28,7 @@
       :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
     />
-    <v-container
-      class="pa-1 gap-4 body-height alex-scrollbar-white"
-      :class="{ 'body-height-stepper': stepper }"
-    >
+    <v-container class="pa-1 gap-4 overflow-y-auto alex-scrollbar-white">
       <v-row dense>
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">
           <alex-inputs-stepper
@@ -40,7 +37,7 @@
               'd-flex flex-column max-height-stepper pa-6',
               stepClass,
             ]"
-            stepper-indicator-class="px-6 pt-6 pb-1"
+            :stepper-indicator-class="`px-${mobile ? '2' : '6'} pt-6 pb-1`"
             :loading="loading"
             @on-success="emits('onMainAction')"
           >
@@ -122,6 +119,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
 
 interface HeaderProps {
@@ -161,7 +159,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   loading: undefined,
   maxWidth: 720,
 });
-
+const { mobile } = useDisplay();
 const emits = defineEmits([
   'update:modelValue',
   'update:loading',
@@ -193,14 +191,3 @@ const slotsList = computed(() =>
   ),
 );
 </script>
-
-<style scoped>
-.body-height-stepper {
-  height: calc(100% - 148px);
-}
-
-.body-height {
-  max-height: calc(100% - 148px);
-  overflow-y: auto;
-}
-</style>

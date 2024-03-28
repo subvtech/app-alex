@@ -20,7 +20,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const populate = {
     cover_image: true,
     media: true,
-    invitation_links: true,
+    invitation_links: {
+      populate: ['learning_class'],
+    },
     learning_goals: {
       populate: ['verb'],
     },
@@ -35,7 +37,15 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         },
       },
     },
-
+    classes: {
+      populate: [
+        'in_charge_member.user.avatar',
+        'learning_plan_members.user.avatar',
+        'learning_plan_groups.group_members.student_member.user.avatar',
+        'invitation_links',
+        'meeting_schedules.meetings',
+      ],
+    },
     tags: true,
     schedules: {
       populate: ['meetings'],
@@ -96,12 +106,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const standardTrails = computed(() => {
-    return (
-      learningPlan.value?.learning_structures.filter(
-        (structure) =>
-          structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? []
+    const standardStructure = learningPlan.value?.learning_structures.find(
+      (structure) =>
+        structure.type === LearningPlanScructureSimpleType.STANDARD,
     );
+    return standardStructure?.trails ?? [];
   });
 
   const standardTrailsCount = computed(() => {

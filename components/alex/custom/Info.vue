@@ -11,14 +11,14 @@
     data-testid="info"
   >
     <div
-      class="card d-flex flex-row justify-space-between w-100 h-100"
+      class="card d-flex flex-row justify-space-between w-100 h-100 flex-wrap"
       :class="[
         canEdit && userId ? 'hover' : '',
         startDateOrEndDate ? 'wrap' : '',
       ]"
     >
-      <div class="d-flex flex-column justify-space-between" style="gap: 8px">
-        <div class="d-flex flex-column" style="gap: 8px">
+      <div class="d-flex flex-column justify-space-between ga-2">
+        <div class="d-flex flex-column ga-2">
           <div
             v-if="title || subtitle"
             class="title-block d-flex flex-column"
@@ -35,7 +35,7 @@
             >
             <span
               v-if="subtitle"
-              class="subtitle font-weight-bold"
+              class="subtitle font-weight-bold ellipsis lines-2"
               :class="[startDateOrEndDate ? 'wrap' : '']"
               :style="[subtitleStyle ?? 'color: white;']"
               >{{ subtitle }}</span
@@ -128,7 +128,7 @@
         <div v-if="!descriptionAbove" class="description-block">
           <span
             v-if="description"
-            class="title mt-0 font-weight-bold text-h2"
+            class="mt-0 font-weight-bold text-h4 text-md-h3 text-lg-h2"
             :class="[floatBeneath ? 'ml-2' : '']"
             :style="titleStyle ?? 'color: white;'"
             role="below"
@@ -140,7 +140,7 @@
         <div class="block d-flex flex-column">
           <div
             v-if="startDateOrEndDate"
-            class="date d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-sm-6"
+            class="date d-flex py-1 py-sm-2 px-2 px-sm-4 rounded-lg"
             :class="[
               !floatBeneath
                 ? darkerBackground
@@ -188,8 +188,8 @@
               }}</span>
             </div>
           </div>
-
-          <div
+          <!-- removido temporiariamente -->
+          <!-- <div
             v-if="copyObject"
             class="code d-flex align-center py-1 py-sm-2 px-2 px-sm-4 rounded-lg ml-4 ml-sm-6"
             :class="[
@@ -206,7 +206,7 @@
           >
             <v-icon class="flex-grow-0" size="20">mdi-content-copy</v-icon>
             <span class="flex-grow-0">{{ copyObject.label }}</span>
-          </div>
+          </div> -->
         </div>
         <alex-custom-tooltip
           v-if="canEdit && showSettings"
@@ -234,10 +234,12 @@
 </template>
 
 <script setup lang="ts">
+import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+
 const emit = defineEmits(['display:settings']);
 const props = defineProps({
   profilePicture: {
-    type: Object as PropType<{ url: string; id: number } | null>,
+    type: Object as PropType<ProfilePictureItemType | null>,
   },
 
   userId: {
@@ -490,7 +492,6 @@ const startDateOrEndDate = computed(() => {
 
   .card {
     .d-flex.flex-column.justify-space-between {
-      padding-bottom: 24px;
       .info {
         padding-left: 0px !important;
       }
@@ -520,9 +521,7 @@ const startDateOrEndDate = computed(() => {
 .info-block {
   display: flex;
   flex-direction: row;
-
   transition: all ease-in-out 1s;
-
   .card {
     position: relative;
     background-color: transparent;
@@ -629,12 +628,12 @@ const startDateOrEndDate = computed(() => {
   }
 
   .title-block {
-    width: max-content;
     .title {
       font-size: 16px;
     }
     .subtitle {
       font-size: 24px;
+      word-wrap: break-word;
     }
   }
 }
@@ -870,7 +869,7 @@ const startDateOrEndDate = computed(() => {
       .extra {
         .block {
           .date {
-            flex-direction: column;
+            flex-direction: row;
             .d-flex {
               margin-right: 0px !important;
               align-items: center !important;
@@ -962,14 +961,16 @@ const startDateOrEndDate = computed(() => {
 
   .float-cover {
     padding-inline: 8px !important;
-
+    .title-block {
+      max-width: 350px;
+    }
     .card {
       gap: 4px;
       flex-wrap: wrap;
 
       .extra {
         justify-content: flex-start;
-        margin-top: -50px;
+        // margin-top: -50px; remove to avoid text above the image
         .block {
           flex-direction: row !important;
 
@@ -1055,6 +1056,9 @@ const startDateOrEndDate = computed(() => {
   }
 
   .float-cover {
+    .title-block {
+      max-width: 300px !important;
+    }
     .card {
       .d-flex.flex-row.align-center {
         padding-left: 16px;

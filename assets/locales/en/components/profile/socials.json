@@ -1,9 +1,20 @@
 {
   "title": "Socials",
-  "editSocialName": "What's the name of the website?",
-  "editSocialUrl": "What's the url of the website?",
-  "addSocial": "Which website do you want to add?",
+  "addDialog": {
+    "label": "Which website do you want to add?",
+    "placeholder": "Select one"
+  },
+  "editForm": {
+    "name": {
+      "placeholder": "Select one",
+      "label": "What's the name of the website?"
+    },
+    "url": {
+      "placeholder": "URL",
+      "label": "What's the url of the website"
+    }
+  },
   "empty": "No social media added",
-  "otherSocial": "Other social",
+  "otherSocial": "Another social",
   "update": "Social Media updated"
 }

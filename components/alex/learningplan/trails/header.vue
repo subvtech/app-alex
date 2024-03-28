@@ -38,12 +38,27 @@
           </div>
         </div>
       </div>
-      <alex-custom-tabs v-model="activePage" :tabs="tabs" class="customTabs" />
+      <div class="d-flex flex-row justify-space-between align-center pr-2">
+        <div class="d-flex">
+          <alex-custom-tabs
+            v-model="activePage"
+            :tabs="tabs"
+            class="customTabs"
+          />
+        </div>
+        <alex-custom-button
+          v-if="learningPlanStore.userIsFacilitator"
+          class="px-6"
+          variant="text"
+          icon="mdi-cog-outline"
+          @click="activePage = '2'"
+        />
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { watch } from 'vue';
+import { TabType } from '@/components/alex/custom/Tabs.vue';
 const router = useRouter();
 const props = defineProps({
   trailsTitle: {
@@ -88,15 +103,14 @@ const tabs = computed(() => {
     { label: tab.secondTitle, value: '1' },
   ];
 
-  return learningPlanStore.userIsFacilitator
-    ? [...defaultTabs, { icon: 'mdi-cog-outline', label: '', value: '2' }]
-    : defaultTabs;
+  return defaultTabs;
 });
 
 const activePage = ref(props.page);
 const defaultURL = computed(() => {
   return `/courses/${props.courseId}/trails/${props.trailId}`;
 });
+
 watch(activePage, () => {
   switch (activePage.value) {
     case '0':
