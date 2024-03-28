@@ -62,9 +62,7 @@
             :variant="variant"
             :loading="loading"
             :disabled="
-              inputWordConfirmation
-                ? inputValue !== inputWordConfirmation
-                : false
+              inputValue !== inputWordConfirmation && !noInputConfirmation
             "
             @click="
               () => {

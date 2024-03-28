@@ -8,7 +8,10 @@
       :src="emptyTextImage"
     />
 
-    <span class="info max-width align-self-center text-center text-color">
+    <span
+      class="info max-width align-self-center text-center text-color"
+      style="text-wrap: pretty"
+    >
       {{ emptyTextMessage }}
     </span>
   </div>

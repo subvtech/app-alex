@@ -29,7 +29,7 @@
       </v-row>
       <v-container v-else fluid class="pa-1 ga-2">
         <v-row justify="space-between" align="center" dense class="mb-6">
-          <v-col cols="4">
+          <v-col>
             <alex-inputs-text-field
               v-model="modelSearch"
               :name="`search-${$attrs.title}`"
@@ -40,29 +40,34 @@
               class="max-width-320"
             />
           </v-col>
-          <alex-custom-button
-            v-if="showAction"
-            :prepend-icon="actionIcon"
-            size="large"
-          >
-            {{ actionText }}
-            <alex-custom-dialog
-              v-model="dialogModelValue"
-              :title="dialogTitle"
-              activator="parent"
+          <v-col cols="auto"
+            ><alex-custom-button
+              v-if="showAction"
+              size="large"
+              :prepend-icon="!mobile ? actionIcon : undefined"
+              :icon="mobile ? actionIcon : undefined"
             >
-              <slot name="dialog-content"></slot>
-              <template #footer>
-                <alex-custom-dialog-footer
-                  no-secondary-button
-                  :main-button-text="dialogActionText"
-                  :main-button-loading="dialogActionLoading"
-                  :main-button-disabled="dialogActionDisabled"
-                  @on-main-action="emit('action')"
-                />
-              </template>
-            </alex-custom-dialog>
-          </alex-custom-button>
+              <template v-if="!mobile">{{ actionText }}</template>
+              <template v-else><v-icon :icon="actionIcon" /></template>
+              <slot v-if="useCustomDialog" name="custom-dialog"></slot>
+              <alex-custom-dialog
+                v-else
+                v-model="dialogModelValue"
+                :title="dialogTitle"
+                activator="parent"
+              >
+                <slot name="dialog-content"></slot>
+                <template #footer>
+                  <alex-custom-dialog-footer
+                    no-secondary-button
+                    :main-button-text="dialogActionText"
+                    :main-button-loading="dialogActionLoading"
+                    :main-button-disabled="dialogActionDisabled"
+                    @on-main-action="emit('action')"
+                  />
+                </template>
+              </alex-custom-dialog> </alex-custom-button
+          ></v-col>
         </v-row>
         <v-row v-if="!items.length" dense align="center" justify="center">
           <div class="d-flex flex-column align-center ga-6">
@@ -122,10 +127,12 @@
   </alex-custom-card>
 </template>
 <script setup lang="ts">
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { usePagination } from '~/composables/usePagination';
 const { t } = useI18n();
 const page = ref(1);
-const emit = defineEmits(['update:search', 'action', 'update:dialogModel']);
+const { mobile } = useDisplay({ mobileBreakpoint: 600 });
+const emit = defineEmits(['update:search', 'action']);
 const props = defineProps({
   loading: {
     type: Boolean,
@@ -207,6 +214,14 @@ const props = defineProps({
     type: String,
     default: 'pages.classes.participant',
   },
+  useCustomDialog: {
+    type: Boolean,
+    default: false,
+  },
+  entity: {
+    type: String,
+    default: 'class',
+  },
 });
 
 const modelSearch = computed({
@@ -218,13 +233,8 @@ const modelSearch = computed({
   },
 });
 
-const dialogModelValue = computed({
-  get() {
-    return props.dialogModel;
-  },
-  set(value) {
-    emit('update:dialogModel', value);
-  },
+const dialogModelValue = defineModel<boolean>('dialogModel', {
+  default: false,
 });
 
 const cardItems = computed(() => props.items);
@@ -234,6 +244,7 @@ const pagination = usePagination(
   page,
   cardItems,
   t(props.emptyStateObjectName),
+  props.entity,
 );
 </script>
 

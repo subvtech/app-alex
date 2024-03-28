@@ -59,6 +59,7 @@ interface TextAreaProps {
   expandHeight?: boolean;
   theme?: 'light' | 'dark';
 }
+defineEmits(['click:append-inner']);
 const props = withDefaults(defineProps<TextAreaProps>(), {
   disabled: false,
   expandHeight: false,
