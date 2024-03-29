@@ -26,7 +26,8 @@
     },
     "cancel": "Cancel",
     "save": "Save Changes",
-    "update": "General information successfully updated"
+    "update": "General information successfully updated",
+    "error": "An error occurred while updating the course. Please try again later."
   },
   "meetings": {
     "title": "Edit synchronous meeting",
