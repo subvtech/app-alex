@@ -4,7 +4,7 @@
     "label": "What's the new Technical competence?",
     "placeholder": "Type in a technical competence",
     "empty": "No competences...",
-    "updated": "Technical competences successfuly updated.",
+    "updated": "Technical competences successfully updated.",
     "tooltip": "Technical competences are specific skills required to work in a determined field, examples:  JavaScript, Calculation and English (Hard skills)."
   },
   "general": {
@@ -12,8 +12,12 @@
     "label": "What's the new General Competence?",
     "placeholder": "Type in a general competence",
     "empty": "No competences...",
-    "updated": "General competences successfuly updated.",
-    "tooltip": "General competences are essencial skills that are useful in different fields, examples: Comunication, problem solving and teamwork (Soft skills)."
+    "updated": "General competences successfully updated.",
+    "tooltip": "General competences are essential skills that are useful in different fields, examples: Communication, problem solving and teamwork (Soft skills)."
+  },
+  "empty": { 
+     "general": "It seems like this course doesn't have any general competences saved...",
+     "technical": "It seems like this course doesn't have any technical competences saved..."
   },
   "duplicatedText": "There's already a tag with this description, please pick another name.",
   "alreadyAdded": "Tag already added",
