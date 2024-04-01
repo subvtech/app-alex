@@ -142,7 +142,10 @@ definePageMeta({
   middleware: 'control-access',
 });
 
-const redirect = route.query.redirect as string | undefined;
+const redirect =
+  (route.query.redirect as string) || useCookie('redirect').value;
+
+console.log(redirect);
 
 const { login } = useStrapiAuth();
 const router = useRouter();
@@ -174,9 +177,9 @@ const submit = handleSubmit(async () => {
       identifier: values.email,
       password: values.password,
     });
-
     if (redirect) {
       router.push(redirect);
+      useCookie('redirect').value = null;
     } else {
       router.push('/');
     }
