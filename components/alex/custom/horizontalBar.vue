@@ -78,6 +78,7 @@
               <app-user-avatar
                 :placeholder="computedPlaceholder"
                 :size="pictureSize"
+                :track-current-user="trackCurrentUser"
                 class="mr-2"
               />
               <span class="placeholder mr-1" style="cursor: pointer">

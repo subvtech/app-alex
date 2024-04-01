@@ -51,7 +51,7 @@ const { value, errorMessage, setErrors } = useField(
 const { t } = useI18n();
 const isTyping = ref(false);
 const fetching = ref(false);
-const noDataText = ref(t('components.institutions.searchForIntitutions'));
+const noDataText = ref(t('components.institutions.searchForInstitutions'));
 const { find } = useStrapiUtils();
 const i18n = useI18n();
 

@@ -96,7 +96,7 @@
         </template>
         <template #footer>
           <div
-            v-if="canEdit && learningPlanClasses.length"
+            v-if="canEdit && learningPlanClasses?.length"
             class="w-100 fix-margin pb-6"
           >
             <p class="text-gray-800 text-h5 pb-6">
@@ -210,24 +210,25 @@ const showDetails = computed(() => {
   return props.learningPlan.details?.data?.length !== 0;
 });
 
-const learningGoals = computed(() =>
-  props.learningPlan.learning_goals.map((goal, index) => ({
-    id: goal.id,
-    title: goal.description,
-    keyWord: goal.verb.text,
-    errorKeyWord: false,
-    errorTitle: false,
-    contentData: {
+const learningGoals = computed(
+  () =>
+    props.learningPlan.learning_goals?.map((goal, index) => ({
       id: goal.id,
-      index,
-      description: goal.description,
-      verb: {
-        id: goal.verb.id,
-        text: goal.verb.text,
-        general: goal.verb.general,
+      title: goal.description,
+      keyWord: goal.verb.text,
+      errorKeyWord: false,
+      errorTitle: false,
+      contentData: {
+        id: goal.id,
+        index,
+        description: goal.description,
+        verb: {
+          id: goal.verb.id,
+          text: goal.verb.text,
+          general: goal.verb.general,
+        },
       },
-    },
-  })),
+    })),
 );
 
 const getActiveLink = (classItem: ClassSimple) => {
@@ -244,7 +245,7 @@ const getActiveLink = (classItem: ClassSimple) => {
 };
 
 const learningPlanClasses = computed(() => {
-  return props.learningPlan?.classes.map((classItem) => ({
+  return props.learningPlan?.classes?.map((classItem) => ({
     name: classItem.name,
     id: classItem.id,
     activeLink: getActiveLink(classItem),
