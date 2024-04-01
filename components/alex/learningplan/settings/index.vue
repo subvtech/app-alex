@@ -10,8 +10,6 @@
           namespace="courses"
           @update="fetchData"
         />
-        {{ myStartDate }}
-        {{ myEndDate }}
         <alex-learningplan-settings-general
           :title="myTitle"
           :start-date="myStartDate"
