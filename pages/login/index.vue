@@ -145,8 +145,6 @@ definePageMeta({
 const redirect =
   (route.query.redirect as string) || useCookie('redirect').value;
 
-console.log(redirect);
-
 const { login } = useStrapiAuth();
 const router = useRouter();
 
