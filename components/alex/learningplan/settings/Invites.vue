@@ -144,7 +144,16 @@ const timeOptions = ref([
     value: 86400,
   },
 ]);
-const selectedTime = ref(timeOptions.value[3].value);
+
+const inviteDuration = computed(() => {
+  const selected =
+    timeOptions.value.find(
+      (option) => option.value === props.invitationDuration,
+    ) || timeOptions.value[3];
+  return selected.value;
+});
+
+const selectedTime = ref(inviteDuration.value);
 
 const plainLink = ref();
 

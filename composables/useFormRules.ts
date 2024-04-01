@@ -164,8 +164,7 @@ export const useFormRules = () => {
       .trim(),
     slug: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.slug.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.slug.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
       .required(i18n.t('rules.slug.required'))
       .trim(),
   });
@@ -255,7 +254,6 @@ export const useFormRules = () => {
       .string()
       .required(i18n.t('rules.field.required'))
       .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.slug.max', { max }))
       .trim(),
     startDate: startDateCreationRules,
     endDate: endDateRules,
