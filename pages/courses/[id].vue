@@ -12,7 +12,7 @@
       distribution="fullname-username-role"
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
-      :subtitle="learningPlanStore.learningPlan?.class_name"
+      :subtitle="learningPlanStore.learningPlan?.slug"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
       :links="isJoinRoutePath ? [] : generalLinks"
