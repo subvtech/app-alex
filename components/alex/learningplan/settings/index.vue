@@ -19,7 +19,7 @@
           :access-url="accessUrl"
           outline
           full-width
-          @update="handleGeneralUpdate()"
+          @update="handleGeneralUpdate"
         />
         <alex-learningplan-settings-invites
           :learning-plan-id="parseInt(id.toString())"
@@ -61,15 +61,28 @@ const fetchData = async () => {
   await learningPlanStore.loadLearningPlan(parseInt(id.toString()));
 };
 
-const handleGeneralUpdate = async () => {
-  await update(`learningplans/${id}`, {
-    title: myTitle.value,
-    start_date: new Date(myStartDate.value).toISOString(),
-    end_date: new Date(myEndDate.value).toISOString(),
-    slug: myIdentifier.value,
-  });
-  setMessage(t('components.courses.settings.general.update'), 'green', true);
-  fetchData();
+const handleGeneralUpdate = async (id, data) => {
+  try {
+    await update(`learningplans/${id}`, {
+      title: data.title,
+      start_date: new Date(data.start_date).toISOString(),
+      end_date: new Date(data.end_date).toISOString(),
+      slug: data.slug,
+    });
+    setMessage(t('components.courses.settings.general.update'), 'green', true);
+    if (learningPlanStore.learningPlan) {
+      learningPlanStore.learningPlan = {
+        ...learningPlanStore.learningPlan,
+        title: data.title,
+        start_date: data.start_date,
+        end_date: data.end_date,
+        slug: data.slug,
+      };
+    }
+  } catch (error) {
+    setMessage(t('components.courses.settings.general.error'), 'red', true);
+    fetchData();
+  }
 };
 
 const props = defineProps({
