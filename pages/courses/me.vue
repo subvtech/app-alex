@@ -5,6 +5,7 @@
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"
+      :button-size="'large'"
       :main-button-text="$t('pages.classes.newCourse')"
       main-button-icon="mdi-plus"
       no-back-arrow
@@ -49,7 +50,7 @@
             hide-details
             class="w-50"
             style="min-width: 160px; max-width: 320px"
-            density="compact"
+            density="comfortable"
           />
           <div>
             <v-tooltip
