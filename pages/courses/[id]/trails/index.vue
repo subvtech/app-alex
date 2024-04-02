@@ -4,7 +4,7 @@
     class="d-flex bg-white flex-column rounded-lg pa-6 wrapper"
   >
     <div
-      class="d-flex flex-wrap w-100"
+      class="d-flex flex-wrap w-100 gap-4 gap-sm-1"
       :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
     >
       <alex-inputs-text-field
@@ -66,13 +66,16 @@
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
+        class="d-flex flex-column justify-space-between flex-start flex-grow-1 flex-shrink-1 position-relative"
         :items="trails ?? []"
         :items-per-page="12"
         :filter-keys="['name', 'description', 'blocks']"
-        style="flex: 1; position: relative"
+        style="flex-basis: 0"
       >
         <template #default="{ items }">
-          <div class="d-flex flex-row flex-wrap gap-6 w-100 flex-start">
+          <div
+            class="d-flex flex-row flex-wrap gap-6 w-100 flex-start justify-center justify-sm-start"
+          >
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
               :key="item.raw.title + index"
