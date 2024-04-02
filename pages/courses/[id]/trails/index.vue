@@ -48,7 +48,7 @@
           <alex-learningplan-skeleton-trail-card
             v-for="index in 3"
             :key="index"
-          ></alex-learningplan-skeleton-trail-card>
+          />
         </div>
       </div>
       <div v-else class="d-flex align-center justify-center flex-column">
@@ -69,11 +69,10 @@
         :items="trails ?? []"
         :items-per-page="12"
         :filter-keys="['name', 'description', 'blocks']"
-        class="d-flex flex-wrap"
         style="flex: 1; position: relative"
       >
         <template #default="{ items }">
-          <div class="d-flex ga-6 flex-wrap w-100 card-container">
+          <div class="d-flex flex-row flex-wrap gap-6 w-100 flex-start">
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
               :key="item.raw.title + index"
@@ -255,10 +254,6 @@ watch(
   max-height: 360px;
 }
 
-.card-container {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-}
 .flex-stretch {
   box-sizing: border-box !important;
 }
