@@ -2,7 +2,7 @@
 {
     "newTrail": "New Trail",
     "emptyStateText": "Looks like there are no trails created!",
-    "searchPlaceholder": "Search...",
+    "searchPlaceholder": "New Trail",
     "showingData": "Showing %{from} to %{to} out of a total of %{total} trails",
     "noData": "No trails found!",
     "newTrailText": "Create a new Learning Trail",
