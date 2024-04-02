@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { FieldOptions, useField } from 'vee-validate';
+import { useField } from 'vee-validate';
 const { createTrailsRules } = useFormRules();
 const { create } = useStrapi();
 const strapiClient = useStrapiClient();
