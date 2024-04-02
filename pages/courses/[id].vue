@@ -12,7 +12,7 @@
       distribution="fullname-username-role"
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
-      :subtitle="learningPlanStore.learningPlan?.class_name"
+      :subtitle="learningPlanStore.learningPlan?.slug"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
       :links="isJoinRoutePath ? [] : generalLinks"
@@ -156,12 +156,16 @@ const generalLinks = computed<TabType[]>(() => [
   //   value: 4,
   //   to: `/courses/${learningPlanId.value}/projects`,
   // },
-  {
-    label: '',
-    icon: 'mdi-cog-outline',
-    value: 5,
-    to: `/courses/${learningPlanId.value}/settings`,
-    classes: 'ml-auto',
-  },
+  ...(learningPlanStore.userIsFacilitator
+    ? [
+        {
+          label: '',
+          icon: 'mdi-cog-outline',
+          value: 5,
+          to: `/courses/${learningPlanId.value}/settings`,
+          classes: 'ml-auto',
+        },
+      ]
+    : []),
 ]);
 </script>

@@ -104,9 +104,12 @@ const { generalCourseSchema } = useFormRules();
 const learningPlanStore = useLearningPlanStore();
 const { title, startDate, endDate, slug } = toRefs(props);
 const myTitle = learningPlanStore.learningPlan?.title || title.value;
-const myStartDate =
-  learningPlanStore.learningPlan?.start_date || startDate.value;
-const myEndDate = learningPlanStore.learningPlan?.end_date || endDate.value;
+const myStartDate = ref(
+  learningPlanStore.learningPlan?.start_date || startDate.value,
+);
+const myEndDate = ref(
+  learningPlanStore.learningPlan?.end_date || endDate.value,
+);
 const myIdentifier = learningPlanStore.learningPlan?.slug || slug.value;
 const accessUrl = ref(props.accessUrl);
 
@@ -115,20 +118,22 @@ const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   keepValuesOnUnmount: true,
 });
 
-
 const onSave = handleSubmit(async (e) => {
   if (controlledValues.value.slug !== slug.value) {
     const isSlugAvailable = await find('learningplans', {
       filters: { slug: controlledValues.value.slug },
     });
 
-    if (isSlugAvailable.data.length !== 0) {
+    if (
+      isSlugAvailable.data.length &&
+      isSlugAvailable.data[0]?.id !== props.learningPlanId
+    ) {
       setFieldError(
         'slug',
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
       );
       setMessage(
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
         'red',
         true,
       );
@@ -136,14 +141,12 @@ const onSave = handleSubmit(async (e) => {
     }
   }
 
-  await update(`learningplans/${props.learningPlanId}`, {
+  emit('update', props.learningPlanId, {
     title: controlledValues.value.title,
-    start_date: new Date(controlledValues.value.startDate).toISOString(),
-    end_date: new Date(controlledValues.value.endDate).toISOString(),
+    start_date: controlledValues.value.startDate,
+    end_date: controlledValues.value.endDate,
     slug: controlledValues.value.slug,
   });
-
-  emit('update', i18n.t('components.courses.settings.general.update'));
 });
 
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
