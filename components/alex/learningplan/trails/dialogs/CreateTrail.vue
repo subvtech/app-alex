@@ -68,7 +68,6 @@
       </div>
     </div>
     <div class="d-flex flex-column gap-6 mt-6">
-      <pre>{{ createTrailsRules }}</pre>
       <alex-inputs-text-field
         v-model="title"
         class="mt-2 mb-1"
@@ -155,6 +154,7 @@ const createTrail = async () => {
   const formData = new FormData();
   formData.append('files', uploadImage);
   let imageData = null;
+
   try {
     if (uploadImage) {
       imageData = await strapiClient('/upload', {
@@ -163,11 +163,12 @@ const createTrail = async () => {
       });
     }
     const data = {
-      title,
-      description,
+      title: title.value,
+      description: description.value,
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
+
     const trailData = await create('trails', data);
     setMessage(t('pages.trails.success'), 'success', true);
     emit('courseCreated', trailData.data.id);
