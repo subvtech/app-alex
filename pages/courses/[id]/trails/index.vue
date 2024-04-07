@@ -73,9 +73,7 @@
         style="flex-basis: 0"
       >
         <template #default="{ items }">
-          <div
-            class="d-flex flex-row flex-wrap gap-6 w-100 flex-start justify-center justify-sm-start"
-          >
+          <div class="card-container">
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
               :key="item.raw.title + index"
@@ -261,6 +259,15 @@ watch(
   box-sizing: border-box !important;
 }
 
+.card-container {
+  display: grid !important;
+  max-width: 1300px;
+  row-gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  justify-content: center; /* Centers the grid items horizontally */
+  align-items: center;
+}
+
 .footer {
   border-top: 1px #ebedef solid;
   max-height: 95px;
@@ -271,10 +278,14 @@ watch(
   opacity: 0.5;
 }
 
-@media (max-width: 580px) {
+@media (max-width: 700px) {
   .card-container {
     justify-content: center !important;
     align-items: center !important;
+  }
+
+  .flex-stretch {
+    justify-self: center;
   }
 }
 </style>
