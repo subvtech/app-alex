@@ -16,8 +16,9 @@
         variant="outlined"
         hide-details
         class="w-50"
+        size="default"
         style="min-width: 160px; max-width: 320px"
-        density="compact"
+        density="comfortable"
       />
       <alex-custom-button
         v-if="learningPlanStore.userIsFacilitator"

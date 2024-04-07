@@ -1,10 +1,12 @@
 <template>
   <alex-custom-card
     :title="$t('components.meeting.title')"
-    :show-icon="canEdit"
+    :no-icon="canEdit"
     class="w-100"
     :is-editing="editMeetings"
     :disable-save="!schedulesChanges.length"
+    align-content="align-center"
+    :href="canEdit ? `${learningPlanId}/settings` : ''"
     @click:save="onSave"
     @click:cancel="onCancel"
     @toggle:is-editing="toggleEditMode"
@@ -214,6 +216,7 @@ const onCancel = () => {
   classModel.value = deepClone(backUpSchedules.value);
   editMeetings.value = false;
   schedulesChanges.value = [];
+  editMeetings.value = false;
 };
 
 const convertDate = (date, time) => {

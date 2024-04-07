@@ -2,7 +2,6 @@
   <alex-custom-card
     class="max-h-96"
     :title="$t('components.profile.settings.title')"
-    :show-icon="false"
     align-content="align-center"
     full-width
     no-footer

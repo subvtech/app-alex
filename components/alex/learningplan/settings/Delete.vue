@@ -3,7 +3,6 @@
     :title="$t(`components.${namespace}.settings.delete.courseTitle`)"
     full-width
     show-footer-divider
-    :show-icon="false"
   >
     <template #content>
       <p class="text">
@@ -31,14 +30,15 @@ defineProps({
 
 <style scoped lang="scss">
 .text {
-  color: var(--Cinza-Cinza-700, #5A636D);
-text-align: justify;
+  color: var(--Cinza-Cinza-700, #5a636d);
+  text-align: justify;
 
-/* Body/P3 */
-font-family: Sen;
-font-size: 14px;
-font-style: normal;
-font-weight: 400;
-line-height: 135%; /* 18.9px */
-letter-spacing: 0.28px;
-}</style>
+  /* Body/P3 */
+  font-family: Sen;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 135%; /* 18.9px */
+  letter-spacing: 0.28px;
+}
+</style>

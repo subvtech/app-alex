@@ -14,29 +14,39 @@
   },
   "general": {
     "title": "Informações Gerais",
-    "trailTitle": "Nome da trilha",
+    "name": "Nome da trilha",
     "description": "Descrição da trilha",
     "cancel": "Cancelar",
     "save": "Salvar alterações",
     "update": "Informações gerais atualizadas com sucesso"
   },
-    "visibilityTitle": "Visibilidade da trilha",
-    "showtrailTitle": "Mostrar trilha (Público)",
-    "showtrailHint": "Torna a trilha pública, permitindo que qualquer participante do curso possa vê-la.",
-    "hidetrailTitle": "Ocultar trilha (Privado)",
-    "hidetrailHint": "Torna a trilha privada, garantindo que somente seu criador tenha acesso a ela.",
-    "visibilityUpdate": "Visibilidade da trilha atualizada com sucesso",
-    "delete": {
-        "deleteTrailTitle": "Excluir trilha",
-        "deleteImgAlt": "Imagem de atenção",
-        "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
-        "deleteButton": "Excluir trilha",
-        "deleteConfirmation": "Realmente deseja excluir a trilha?",
-        "deleteDescription": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",
-        "deleteLabel": "Digite a palavra:",
-        "deletePlaceholder": "Digite a frase",
-        "deleteWord": "Excluir",
-        "update": "Trilha excluída com sucesso",
-        "matchError": "A palavra digitada não corresponde a palavra correta para excluir a trilha. Tente novamente."
-      }
+  "visibility": {
+    "title": "Visibilidade da trilha",
+    "show": {
+      "title": "Mostrar trilha (Público)",
+      "hint": "Torna a trilha pública, permitindo que qualquer participante do curso possa vê-la."
+    },
+    "hide": {
+      "title": "Ocultar trilha (Privado)",
+      "hint": "Torna a trilha privada, garantindo que somente seu criador tenha acesso a ela."
+    },
+
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "update": "Visibilidade da trilha atualizada com sucesso"
+  },
+
+  "delete": {
+    "deleteTrailTitle": "Excluir trilha",
+    "deleteImgAlt": "Imagem de atenção",
+    "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
+    "deleteButton": "Excluir trilha",
+    "deleteConfirmation": "Realmente deseja excluir a trilha?",
+    "deleteDescription": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",
+    "deleteLabel": "Digite a palavra:",
+    "deletePlaceholder": "Digite a frase",
+    "deleteWord": "Excluir",
+    "update": "Trilha excluída com sucesso",
+    "matchError": "A palavra digitada não corresponde a palavra correta para excluir a trilha. Tente novamente."
+  }
 }

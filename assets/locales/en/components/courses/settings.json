@@ -16,7 +16,7 @@
   },
   "general": {
     "title": "General Information",
-    "courseTitle": "Course name",
+    "name": "Course name",
     "startDate": "Start date",
     "endDate": "End date",
     "identifier": {
@@ -84,11 +84,11 @@
   },
   "visibility": {
     "title": "Course Visibility",
-    "showCourse": {
+    "show": {
       "title": "Show Course (Public)",
       "hint": "Makes the course public, allowing any user to find it through search."
     },
-    "hideCourse": {
+    "hide": {
       "title": "Hide Course (Private)",
       "hint": "Makes the course private, ensuring only members can see the course."
     },

@@ -1,7 +1,6 @@
 <template>
   <alex-custom-card
     :title="$t('components.courses.settings.title')"
-    :show-icon="false"
     :align-content="'align-center'"
   >
     <template #content>
@@ -11,11 +10,11 @@
           @update="fetchData"
         />
         <alex-learningplan-settings-general
-          :title="myTitle"
-          :start-date="myStartDate"
-          :end-date="myEndDate"
-          :slug="myIdentifier"
-          :learning-plan-id="parseInt(id.toString())"
+          :id="parseInt(id.toString())"
+          :title="learningPlan.title"
+          :start-date="learningPlan.start_date"
+          :end-date="learningPlan.end_date"
+          :slug="learningPlan.slug"
           :access-url="accessUrl"
           outline
           full-width
@@ -48,10 +47,6 @@ const { setMessage } = useMessageStore();
 const router = useRouter();
 const route = useRoute();
 const { id } = route.params;
-const myTitle = ref('');
-const myStartDate = ref('');
-const myEndDate = ref('');
-const myIdentifier = ref('');
 const accessUrl = computed(() => {
   return `${window.location.origin}/courses/${id}`;
 });
@@ -61,28 +56,10 @@ const fetchData = async () => {
   await learningPlanStore.loadLearningPlan(parseInt(id.toString()));
 };
 
-const handleGeneralUpdate = async (id, data) => {
-  try {
-    await update(`learningplans/${id}`, {
-      title: data.title,
-      start_date: new Date(data.start_date).toISOString(),
-      end_date: new Date(data.end_date).toISOString(),
-      slug: data.slug,
-    });
-    setMessage(t('components.courses.settings.general.update'), 'green', true);
-    if (learningPlanStore.learningPlan) {
-      learningPlanStore.learningPlan = {
-        ...learningPlanStore.learningPlan,
-        title: data.title,
-        start_date: data.start_date,
-        end_date: data.end_date,
-        slug: data.slug,
-      };
-    }
-  } catch (error) {
-    setMessage(t('components.courses.settings.general.error'), 'red', true);
-    fetchData();
-  }
+const handleGeneralUpdate = async (data) => {
+  await update(`learningplans/${id}`, { ...data });
+  setMessage(t('components.courses.settings.general.update'), 'green', true);
+  fetchData();
 };
 
 const props = defineProps({

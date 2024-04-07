@@ -2,7 +2,6 @@
   <alex-custom-card
     class="security"
     :title="$t('components.profile.security.title')"
-    :show-icon="false"
     full-width
     no-footer
   >

@@ -3,40 +3,50 @@
   "formats": "Supported Formats: .jpeg, .png, .wav, .mp4, .jpg;",
   "update": "Trail successfully updated",
 
-"cover": {
-  "add": "Add Videos or Photos",
-  "title": "Trail Cover",
-  "update": "Trail cover image successfully updated",
-  "addCover": "Upload",
-  "error": "Error uploading trail cover image",
-  "removeError": "Error removing trail cover image",
-  "removeSuccess": "Trail cover image successfully removed"
-},
-"general": {
-  "title": "General Information",
-  "trailTitle": "Trail name",
-  "description": "Trail description",
-  "cancel": "Cancel",
-  "save": "Save Changes",
-  "update": "General information successfully updated"
-},
-  "visibilityTitle": "Trail visibility",
-  "showtrailTitle": "Show trail (Public)",
-  "showtrailHint": "Makes the trail public, allowing any course member to see it.",
-  "hidetrailTitle": "Hide trail (Private)",
-  "hidetrailHint": "Makes the trail private, ensuring only its creator can see the trail.",
-  "visibilityUpdate": "Trail visibility successfully updated",
+  "cover": {
+    "add": "Add Videos or Photos",
+    "title": "Trail Cover",
+    "update": "Trail cover image successfully updated",
+    "addCover": "Upload",
+    "error": "Error uploading trail cover image",
+    "removeError": "Error removing trail cover image",
+    "removeSuccess": "Trail cover image successfully removed"
+  },
+  "general": {
+    "title": "General Information",
+    "name": "Trail name",
+    "description": "Trail description",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "update": "General information successfully updated"
+  },
+  "visibility": {
+    "title": "Trail visibility",
+    "show": {
+      "title": "Show trail (Public)",
+      "hint": "Makes the trail public, allowing any course member to see it."
+    },
+    "hide": {
+      "title": "Hide trail (Private)",
+      "hint": "Makes the trail private, ensuring only its creator can see the trail."
+    },
+    "cancel": "Cancel",
+    "save": "Save Changes",
+   
+    "update": "Trail visibility successfully updated"
+  },
+
   "delete": {
-      "deleteCourseTitle": "Delete trail",
-      "deleteImgAlt": "Attention image",
-      "deleteCourseDescription": "After deleting the trail, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this trail. So please be sure before proceeding.",
-      "deleteButton": "Delete trail",
-      "deleteConfirmation": "Do you really wish to delete the trail?",
-      "deleteDescription": "By deleting a trail you will lose all the content associated with it.",
-      "deleteLabel": "Enter the word:",
-      "deletePlaceholder": "Enter the word to confirm",
-      "deleteWord": "Delete",
-      "update": "Trail successfully deleted",
-      "matchError": "The word entered does not match the correct word to delete the trail. Please try again."
-    }
+    "deleteCourseTitle": "Delete trail",
+    "deleteImgAlt": "Attention image",
+    "deleteCourseDescription": "After deleting the trail, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this trail. So please be sure before proceeding.",
+    "deleteButton": "Delete trail",
+    "deleteConfirmation": "Do you really wish to delete the trail?",
+    "deleteDescription": "By deleting a trail you will lose all the content associated with it.",
+    "deleteLabel": "Enter the word:",
+    "deletePlaceholder": "Enter the word to confirm",
+    "deleteWord": "Delete",
+    "update": "Trail successfully deleted",
+    "matchError": "The word entered does not match the correct word to delete the trail. Please try again."
+  }
 }

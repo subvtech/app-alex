@@ -3,7 +3,6 @@
     title=""
     class="participantes-card mb-6"
     align-content="align-center"
-    :show-icon="false"
   >
     <template #content>
       <v-row v-if="loading" class="w-100 gap-4">
