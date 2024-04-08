@@ -168,6 +168,12 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
+  const userClass = computed(() => {
+    return learningPlan.value?.classes.find(
+      (c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id),
+    );
+  });
+
   const schedules = computed<LearningPlanScheduleSimple[]>(() => {
     return (
       learningPlan.value?.schedules.map((schedule) => {
@@ -201,6 +207,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsFacilitator,
     userIsActiveMember,
     userIsPendingMember,
+    userClass,
     activeInviteLinks,
     standardTrailsCount,
     standardTrails,
