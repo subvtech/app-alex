@@ -1,32 +1,34 @@
 export const useProfilePicture = (profile, userId) => {
   const client = useStrapiClient();
   const userStore = useUserStore();
-
+  const isLoading = ref(false);
   const { updateImage, uploadImage, removeImage } = useUploadedImage();
   async function removeProfilePicture() {
-    if (!profile.value) return;
+    if (!(profile.value && userStore.user)) return;
+    isLoading.value = true;
     await removeImage(profile.value.id);
-    profile.value = null;
-    userStore.avatar = undefined;
+    userStore.user.avatar = undefined;
+    isLoading.value = false;
   }
 
   async function uploadProfilePicture(event: any) {
-    if (profile.value) {
-      const { updatedAt } = await updateImage(event, profile.value.id);
+    if (!userStore.user) return;
 
-      const url = profile.value.url?.split('?');
-      if (url) profile.value.url = url[0] + '?' + updatedAt;
+    isLoading.value = true;
+    if (profile.value) {
+      const { url } = await updateImage(event, profile.value.id);
+      profile.value.url = url;
     } else {
       const temp = await uploadImage(event);
-      profile.value = { url: temp[0].url, id: temp[0].id };
+      userStore.user.avatar = { url: temp[0].url, id: temp[0].id };
 
       await client(`/users/${userId}`, {
         method: 'PUT',
         body: { avatar: temp[0].id },
       });
     }
-
-    userStore.avatar = profile.value;
+    userStore.user.avatar = profile.value;
+    isLoading.value = false;
   }
-  return { uploadProfilePicture, removeProfilePicture };
+  return { uploadProfilePicture, removeProfilePicture, isLoading };
 };

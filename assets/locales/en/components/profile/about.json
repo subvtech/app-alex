@@ -1,6 +1,7 @@
 {
-    "title": "About",
-    "general": "General Competences",
-    "technical": "Technical Competences",
-    "placeholder": "No description added."
+  "title": "About",
+  "general": "General Competences",
+  "technical": "Technical Competences",
+  "placeholder": "No description added.",
+  "updated": "About section was successfully updated."
 }
