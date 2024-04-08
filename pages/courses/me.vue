@@ -193,7 +193,7 @@
                     >
                       <template #activator="{ props: propsMenu }">
                         <v-tooltip
-                          text="Opções"
+                          :text="$t('components.learningPlan.card.options')"
                           location="bottom"
                           content-class="bg-gray-800"
                         >
