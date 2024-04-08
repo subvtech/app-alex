@@ -31,7 +31,7 @@
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
-          <alex-learningplan-about
+          <app-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
@@ -88,30 +88,15 @@
         class="w-100"
       >
         <template #content>
-          <app-general-boxes
-            :boxes="[
-              {
-                icon: 'mdi-account-outline',
-                number: learningPlanStore.activeMembers.length,
-                label: 'students',
-              },
-              {
-                icon: 'trails.svg',
-                number: learningPlanStore.standardTrails.length,
-                label: 'trails',
-              },
-              {
-                icon: 'mdi-newspaper-variant-multiple-outline',
-                number: 0,
-                label: 'assignments',
-              },
-            ]"
-            hide-divider
+          <alex-profile-detail-boxes
+            class="max-w-125"
+            :boxes="detailBoxes"
+            :loading="loading"
           />
         </template>
         <template #footer>
           <div
-            v-if="canEdit && learningPlanClasses.length"
+            v-if="canEdit && learningPlanClasses?.length"
             class="w-100 fix-margin pb-6"
           >
             <p class="text-gray-800 text-h5 pb-6">
@@ -188,6 +173,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
 import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
 import { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
@@ -224,24 +210,25 @@ const showDetails = computed(() => {
   return props.learningPlan.details?.data?.length !== 0;
 });
 
-const learningGoals = computed(() =>
-  props.learningPlan.learning_goals.map((goal, index) => ({
-    id: goal.id,
-    title: goal.description,
-    keyWord: goal.verb.text,
-    errorKeyWord: false,
-    errorTitle: false,
-    contentData: {
+const learningGoals = computed(
+  () =>
+    props.learningPlan.learning_goals?.map((goal, index) => ({
       id: goal.id,
-      index,
-      description: goal.description,
-      verb: {
-        id: goal.verb.id,
-        text: goal.verb.text,
-        general: goal.verb.general,
+      title: goal.description,
+      keyWord: goal.verb.text,
+      errorKeyWord: false,
+      errorTitle: false,
+      contentData: {
+        id: goal.id,
+        index,
+        description: goal.description,
+        verb: {
+          id: goal.verb.id,
+          text: goal.verb.text,
+          general: goal.verb.general,
+        },
       },
-    },
-  })),
+    })),
 );
 
 const getActiveLink = (classItem: ClassSimple) => {
@@ -258,7 +245,7 @@ const getActiveLink = (classItem: ClassSimple) => {
 };
 
 const learningPlanClasses = computed(() => {
-  return props.learningPlan?.classes.map((classItem) => ({
+  return props.learningPlan?.classes?.map((classItem) => ({
     name: classItem.name,
     id: classItem.id,
     activeLink: getActiveLink(classItem),
@@ -272,6 +259,24 @@ const classInfo = computed(() => {
     end: props.learningPlan?.end_date,
   };
 });
+
+const detailBoxes = computed<BoxItemType[]>(() => [
+  {
+    icon: 'mdi-account-outline',
+    number: learningPlanStore.activeMembers.length,
+    label: 'students',
+  },
+  {
+    icon: 'trails.svg',
+    number: learningPlanStore.standardTrails.length,
+    label: 'trails',
+  },
+  {
+    icon: 'mdi-newspaper-variant-multiple-outline',
+    number: 0,
+    label: 'assignments',
+  },
+]);
 </script>
 
 <style scope lang="scss">

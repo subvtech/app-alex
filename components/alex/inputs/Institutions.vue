@@ -24,13 +24,6 @@
 <script setup lang="ts">
 import { useField } from 'vee-validate';
 
-export type InstitutionsType = {
-  name: string;
-  acronym: string;
-  id: number;
-  cover: any;
-};
-
 export type InstitutionProps = {
   search: string;
   institutions: InstitutionsType[];
@@ -58,8 +51,8 @@ const { value, errorMessage, setErrors } = useField(
 const { t } = useI18n();
 const isTyping = ref(false);
 const fetching = ref(false);
-const noDataText = ref(t('components.institutions.searchForIntitutions'));
-const { find } = useStrapi();
+const noDataText = ref(t('components.institutions.searchForInstitutions'));
+const { find } = useStrapiUtils();
 const i18n = useI18n();
 
 const fetchInstitutions = async (institution: string) => {
@@ -81,8 +74,7 @@ const fetchInstitutions = async (institution: string) => {
       const dataInstitutions: InstitutionsType[] = result.data.map(
         (institution: any) => {
           return {
-            id: institution.id,
-            ...institution.attributes
+            ...institution,
           };
         },
       );

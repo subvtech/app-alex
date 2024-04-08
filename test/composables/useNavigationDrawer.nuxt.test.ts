@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 describe('useNavigationDrawer', () => {
-  it('should initialize with default values', async () => {
+  it('should initialize with default values', () => {
     const { clipped, drawer, isPermanent } = useNavigationDrawer();
 
     expect(clipped.value).toBe(false);

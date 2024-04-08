@@ -74,6 +74,7 @@
     "max": "At most {max} characters long"
   },
   "url": {
+    "valid": "Must be a valid url",
     "required": "Url is required",
     "min": "At least 3 characters long",
     "max": "At most 64 characters long"
@@ -113,6 +114,7 @@
       "beforeStartHour": "End hour must be after start Hour"
     },
     "copy": {
+      "hint": "Copy Text",
       "success": "Text copied to clipboard",
       "error": "Couldn't copy to clipboard"
     },
