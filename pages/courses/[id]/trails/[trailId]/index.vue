@@ -472,7 +472,9 @@ window.addEventListener('resize', () => {
   top: 88px;
   z-index: 1;
   opacity: 1;
-  transition: opacity 0.2s ease-in-out;
+  transition:
+    opacity 200ms,
+    display 200ms;
 }
 
 .sections-col {
@@ -508,6 +510,26 @@ window.addEventListener('resize', () => {
   container-name: editor;
 }
 
+@keyframes slideaway {
+  from {
+    display: block;
+  }
+  to {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+@keyframes slidein {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    display: block;
+  }
+}
+
 .sticky-buttons {
   position: -webkit-sticky;
   position: sticky;
@@ -517,10 +539,17 @@ window.addEventListener('resize', () => {
 
 @container editor (max-width: 1310px) {
   .sections-container {
-    opacity: 0;
+    animation: slideaway 200ms;
+    display: none;
   }
   .sticky-buttons {
     position: static;
+  }
+}
+@container editor (min-width: 1310px) {
+  .sections-container {
+    animation: slidein 200ms;
+    display: block;
   }
 }
 </style>
