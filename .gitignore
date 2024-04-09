@@ -3,6 +3,7 @@
 .nuxt
 .nitro
 .cache
+.husky
 dist
 
 # Node dependencies

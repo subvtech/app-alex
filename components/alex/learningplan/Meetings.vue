@@ -5,8 +5,8 @@
     class="w-100"
     :is-editing="editMeetings"
     :disable-save="!schedulesChanges.length"
-    :save="onSave"
-    :cancel="onCancel"
+    @click:save="onSave"
+    @click:cancel="onCancel"
     @toggle:is-editing="toggleEditMode"
   >
     <template #content>
@@ -231,10 +231,12 @@ const onSave = async () => {
     setMessage(i18n.t('components.courses.meeting.errorSaving'), 'error', true);
   }
   schedulesChanges.value = [];
+  editMeetings.value = false;
 };
 
 const onCancel = () => {
   classModel.value = deepClone(backUpSchedules.value);
+  editMeetings.value = false;
   schedulesChanges.value = [];
 };
 
