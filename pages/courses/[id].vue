@@ -7,12 +7,12 @@
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
-      :title="bannerTitle.title"
+      :title="$t('pages.courses.identifier')"
       :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
-      :subtitle="bannerTitle.subtitle"
+      :subtitle="learningPlanStore.learningPlan?.slug"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
       :links="isJoinRoutePath ? [] : generalLinks"
@@ -109,19 +109,6 @@ const fetchData = async () => {
 };
 const pageRoute = computed(() => route.name);
 
-const bannerTitle = computed(() => {
-  if (learningPlanStore.userIsFacilitator) {
-    return {
-      title: i18n.t('pages.courses.identifier'),
-      subtitle: learningPlanStore.learningPlan?.slug,
-    };
-  }
-  return {
-    title: i18n.t('pages.courses.class'),
-    subtitle: learningPlanStore.userClass?.name,
-  };
-});
-
 onBeforeMount(async () => {
   headerStore.isLoading = true;
   await fetchData();
@@ -160,7 +147,7 @@ const generalLinks = computed<TabType[]>(() => [
   //   to: `/courses/${learningPlanId.value}/tasks`,
   // },
   {
-    label: i18n.t('pages.courses.classes'),
+    label: i18n.t('pages.courses.class'),
     value: 3,
     to: `/courses/${learningPlanId.value}/class`,
   },
