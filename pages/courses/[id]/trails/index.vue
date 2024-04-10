@@ -73,7 +73,7 @@
         style="flex-basis: 0"
       >
         <template #default="{ items }">
-          <div class="card-container">
+          <div class="card-container w-100">
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
               :key="item.raw.title + index"
@@ -97,7 +97,7 @@
           <div
             class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
           >
-            <p class="text-body-3 text-gray-600">
+            <p class="show-cardlist text-body-3 text-gray-600">
               {{ showingData(groupedItems) }}
             </p>
             <alex-custom-pagination
@@ -105,6 +105,7 @@
               v-model="page"
               :length="pageCount"
               :total-visible="5"
+              class="extra-mb"
             />
           </div>
         </template>
@@ -261,11 +262,13 @@ watch(
 
 .card-container {
   display: grid !important;
-  max-width: 1300px;
   row-gap: 24px;
+  column-gap: 24px;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
   justify-content: center; /* Centers the grid items horizontally */
   align-items: center;
+
+  display: grid !important;
 }
 
 .footer {
@@ -278,7 +281,7 @@ watch(
   opacity: 0.5;
 }
 
-@media (max-width: 700px) {
+@media (min-width: 959px) and (max-width: 976px) {
   .card-container {
     justify-content: center !important;
     align-items: center !important;
@@ -286,6 +289,30 @@ watch(
 
   .flex-stretch {
     justify-self: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .card-container {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .flex-stretch {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 477px) {
+  .show-cardlist {
+    font-size: 12px !important;
+    letter-spacing: 0.4px !important;
+  }
+}
+
+@media (max-width: 431px) {
+  .extra-mb {
+    translate: 0 -16px;
   }
 }
 </style>
