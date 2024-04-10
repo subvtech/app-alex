@@ -109,7 +109,7 @@ const props = withDefaults(defineProps<SettingsGeneralComponentType>(), {
 const i18n = useI18n();
 const { generalCourseSchema, generalTrailSchema } = useFormRules();
 
-const { title } = toRefs(props);
+const { title, slug } = toRefs(props);
 const myTitle = title.value;
 
 const learningPlanStore = useLearningPlanStore();
@@ -119,11 +119,11 @@ const myStartDate = ref(
 const myEndDate = ref(
   learningPlanStore.learningPlan?.end_date || props.endDate,
 );
-const myIdentifier = ref(props.slug);
-const myDescription = ref(props.description);
+const myIdentifier = learningPlanStore.learningPlan?.slug || slug.value;
 const accessUrl = ref(props.accessUrl);
 
 const isCourses = computed(() => props.variant === 'courses');
+const myDescription = ref(props.description);
 
 const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   validationSchema: isCourses.value ? generalCourseSchema : generalTrailSchema,
@@ -136,10 +136,7 @@ const onSave = handleSubmit(async (e) => {
       filters: { slug: controlledValues.value.slug },
     });
 
-    if (
-      isSlugAvailable.data.length &&
-      isSlugAvailable.data[0]?.id !== props.learningPlanId
-    ) {
+    if (isSlugAvailable.data.length !== 0) {
       setFieldError(
         'slug',
         i18n.t('components.courses.settings.general.identifier.unique'),
