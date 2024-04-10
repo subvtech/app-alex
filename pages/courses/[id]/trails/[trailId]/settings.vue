@@ -23,7 +23,7 @@
             @update="updateVisibility"
           />
 
-          <alex-learningplan-trails-settings-delete />
+          <alex-learningplan-settings-delete @update="removeTrail" />
         </div>
       </template>
     </alex-custom-card>
@@ -35,8 +35,10 @@ definePageMeta({
   hideLearningPlanBanner: true,
 });
 
-const { update } = useStrapi();
+const { update, delete: _delete } = useStrapi();
 const { setMessage } = useMessageStore();
+
+const router = useRouter();
 const { t } = useI18n();
 const route = useRoute();
 const { trailId, id } = route.params;
@@ -63,6 +65,13 @@ const updateVisibility = async (data) => {
 };
 
 const learningPlanStore = useLearningPlanStore();
+
+const removeTrail = async () => {
+  await _delete('trails', parseInt(trailId.toString()));
+
+  router.push(`/courses/me`);
+  setMessage(t('components.trails.settings.delete.update'), 'green', true);
+};
 
 onBeforeMount(() => {
   headerStore.showHeader = true;

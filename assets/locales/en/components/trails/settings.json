@@ -37,15 +37,15 @@
   },
 
   "delete": {
-    "deleteCourseTitle": "Delete trail",
-    "deleteImgAlt": "Attention image",
-    "deleteCourseDescription": "After deleting the trail, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this trail. So please be sure before proceeding.",
-    "deleteButton": "Delete trail",
-    "deleteConfirmation": "Do you really wish to delete the trail?",
-    "deleteDescription": "By deleting a trail you will lose all the content associated with it.",
-    "deleteLabel": "Enter the word:",
-    "deletePlaceholder": "Enter the word to confirm",
-    "deleteWord": "Delete",
+    "title": "Delete trail",
+    "imgAlt": "Attention image",
+    "warning": "After deleting the trail, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this trail. So please be sure before proceeding.",
+    "button": "Delete trail",
+    "confirmation": "Do you really wish to delete the trail?",
+    "description": "By deleting a trail you will lose all the content associated with it.",
+    "label": "Enter the word:",
+    "placeholder": "Enter the word to confirm",
+    "word": "Delete",
     "update": "Trail successfully deleted",
     "matchError": "The word entered does not match the correct word to delete the trail. Please try again."
   }
