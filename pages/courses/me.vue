@@ -131,7 +131,7 @@
                   name: course.raw.facilitatorName,
                   imageURL: course.raw.facilitatorImage,
                 }"
-                class="flex-stretch w-100"
+                class="flex-stretch w-100 h-100"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
                 :hide-favorited-button="true"
