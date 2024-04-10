@@ -131,7 +131,7 @@
                   name: course.raw.facilitatorName,
                   imageURL: course.raw.facilitatorImage,
                 }"
-                class="flex-stretch"
+                class="flex-stretch w-100"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
                 :hide-favorited-button="true"
@@ -218,7 +218,7 @@
             <div
               class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
             >
-              <p class="text-body-3 text-gray-600">
+              <p class="show-cardlist text-body-3 text-gray-600">
                 {{ showingData(groupedItems) }}
               </p>
               <alex-custom-pagination
@@ -226,6 +226,7 @@
                 v-model="page"
                 :length="pageCount"
                 :total-visible="5"
+                class="extra-mb"
               />
             </div>
           </template>
@@ -502,7 +503,7 @@ const navigate = (id: number, page) => {
 
 .grid-container {
   display: grid !important;
-  max-width: 1280px;
+
   height: min-content;
   column-gap: 24px;
   row-gap: 24px;
@@ -537,6 +538,19 @@ const navigate = (id: number, page) => {
 @media (max-width: 725px) {
   .flex-stretch {
     justify-self: center;
+  }
+}
+
+@media (max-width: 477px) {
+  .show-cardlist {
+    font-size: 12px !important;
+    letter-spacing: 0.4px !important;
+  }
+}
+
+@media (max-width: 431px) {
+  .extra-mb {
+    translate: 0 -16px;
   }
 }
 </style>
