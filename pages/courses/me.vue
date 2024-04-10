@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper d-flex flex-column">
+  <div class="d-flex flex-column">
     <alex-custom-header
       class="mb-6 mt-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
@@ -106,19 +106,21 @@
             'tags',
           ]"
           class="d-flex flex-wrap"
-          style="flex: 1; position: relative"
+          style="flex: 1; position: relative; max-height: min-content"
         >
           <template #default="{ items }">
             <div
               v-if="coursesView === 'grid'"
-              class="d-flex ga-6 grid-container justify-center flex-wrap w-100"
+              :class="[
+                'grid-container w-100',
+                isSingleColumn ? 'grid-none' : '',
+              ]"
             >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="w-auto flex-stretch"
                 :title="course.raw.title"
                 :options="course.raw.userIsFacilitator"
                 :description="course.raw.description"
@@ -129,6 +131,7 @@
                   name: course.raw.facilitatorName,
                   imageURL: course.raw.facilitatorImage,
                 }"
+                class="flex-stretch w-100"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
                 :hide-favorited-button="true"
@@ -190,7 +193,7 @@
                     >
                       <template #activator="{ props: propsMenu }">
                         <v-tooltip
-                          text="Opções"
+                          :text="$t('components.learningPlan.card.options')"
                           location="bottom"
                           content-class="bg-gray-800"
                         >
@@ -215,7 +218,7 @@
             <div
               class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
             >
-              <p class="text-body-3 text-gray-600">
+              <p class="show-cardlist text-body-3 text-gray-600">
                 {{ showingData(groupedItems) }}
               </p>
               <alex-custom-pagination
@@ -223,6 +226,7 @@
                 v-model="page"
                 :length="pageCount"
                 :total-visible="5"
+                class="extra-mb"
               />
             </div>
           </template>
@@ -262,6 +266,12 @@ interface LearningPlan {
   title: string;
   members?: any;
   learning_structures?: any;
+}
+
+interface DataTableHeader {
+  title: string;
+  key: string;
+  sortable?: boolean;
 }
 
 const courses = ref<LearningPlanSimple[]>([]);
@@ -408,12 +418,7 @@ const dropdownItems = (hidden, index, id) => {
   ];
 };
 
-interface DataTableHeader {
-  title: string;
-  key: string;
-  sortable?: boolean;
-}
-
+const direction = useDirection();
 const headers: DataTableHeader[] = [
   {
     title: t('pages.classes.tableHeaders.course'),
@@ -432,6 +437,8 @@ const headers: DataTableHeader[] = [
     key: 'trails',
   },
 ];
+
+const isSingleColumn = computed(() => direction.value !== 'VERTICAL');
 
 const changeViewMode = () => {
   coursesView.value = coursesView.value === 'grid' ? 'table' : 'grid';
@@ -497,7 +504,12 @@ const navigate = (id: number, page) => {
 
 .grid-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+
+  height: min-content;
+  column-gap: 24px;
+  row-gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  justify-content: center; /* Centers the grid items horizontally */
 }
 
 .flex-stretch {
@@ -514,13 +526,32 @@ const navigate = (id: number, page) => {
   opacity: 0.5;
 }
 
+.grid-none {
+  grid-template-columns: 1fr !important;
+}
+
 @media (max-width: 1280px) {
-  .grid-container {
-    display: flex !important;
-  }
   .flex-stretch {
     flex: 1;
     box-sizing: border-box !important;
+  }
+}
+@media (max-width: 725px) {
+  .flex-stretch {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 477px) {
+  .show-cardlist {
+    font-size: 12px !important;
+    letter-spacing: 0.4px !important;
+  }
+}
+
+@media (max-width: 431px) {
+  .extra-mb {
+    translate: 0 -16px;
   }
 }
 </style>

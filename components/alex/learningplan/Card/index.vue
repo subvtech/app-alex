@@ -171,8 +171,11 @@
         />
       </div>
     </div>
-
-    <div v-if="!isVertical && options" class="h-full">
+    <div
+      v-if="!isVertical && options"
+      class="h-full position-absolute"
+      style="right: 9px; top: 9px"
+    >
       <alex-inputs-dropdown
         v-model="showOptions"
         :close-on-content-click="false"
@@ -256,7 +259,7 @@ const dropdownItems = (hidden: boolean) => {
   ];
 };
 const width = computed(() =>
-  isVertical.value ? { min: 300, max: 375 } : { min: 688, max: 959 },
+  isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 959 },
 );
 const statusConfig = computed<{ icon: string; variant: any }>(() => {
   switch (props.status) {
