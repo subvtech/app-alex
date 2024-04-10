@@ -17,7 +17,9 @@
         startDateOrEndDate ? 'wrap' : '',
       ]"
     >
-      <div class="d-flex flex-column justify-space-between ga-2">
+      <div
+        class="d-flex flex-column justify-space-between ga-2 title-container"
+      >
         <div class="d-flex flex-column ga-2">
           <div
             v-if="title || subtitle"
@@ -414,6 +416,9 @@ const startDateOrEndDate = computed(() => {
 .white-bg {
   background-color: white;
   color: #232b32;
+}
+.title-container {
+  max-width: 80%;
 }
 
 .float-beneath {

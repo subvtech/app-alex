@@ -109,15 +109,20 @@ const props = withDefaults(defineProps<SettingsGeneralComponentType>(), {
 const i18n = useI18n();
 const { generalCourseSchema, generalTrailSchema } = useFormRules();
 
-const { title } = toRefs(props);
-const myTitle = title.value;
-const myStartDate = ref(props.startDate);
-const myEndDate = ref(props.endDate);
-const myIdentifier = ref(props.slug);
-const myDescription = ref(props.description);
+const learningPlanStore = useLearningPlanStore();
+const { title, startDate, endDate, slug } = toRefs(props);
+const myTitle = learningPlanStore.learningPlan?.title || title.value;
+const myStartDate = ref(
+  learningPlanStore.learningPlan?.start_date || startDate.value,
+);
+const myEndDate = ref(
+  learningPlanStore.learningPlan?.end_date || endDate.value,
+);
+const myIdentifier = learningPlanStore.learningPlan?.slug || slug.value;
 const accessUrl = ref(props.accessUrl);
 
 const isCourses = computed(() => props.variant === 'courses');
+const myDescription = ref(props.description);
 
 const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   validationSchema: isCourses.value ? generalCourseSchema : generalTrailSchema,
@@ -133,10 +138,10 @@ const onSave = handleSubmit(async (e) => {
     if (isSlugAvailable.data.length !== 0) {
       setFieldError(
         'slug',
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
       );
       setMessage(
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
         'red',
         true,
       );
