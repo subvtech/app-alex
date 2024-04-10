@@ -47,9 +47,9 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
+          <img :id="`image-slide-${slide.id}`" :src="slide.image" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -197,6 +197,8 @@
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import 'vueperslides/dist/vueperslides.css';
+import 'viewerjs/dist/viewer.css';
+import Viewer from 'viewerjs';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
 import {
@@ -241,9 +243,22 @@ onMounted(() => {
       } else {
         slide.icon = 'mdi-image';
       }
+      createImageViewer();
     });
   }
 });
+onUpdated(() => {
+  createImageViewer();
+});
+const createImageViewer = () => {
+  if (slides.value.length === 0) return;
+  slides.value.map((slide) => {
+    return new Viewer(document.querySelector(`#image-slide-${slide.id}`), {
+      navbar: false,
+      title: [1, () => slide.title],
+    });
+  });
+};
 
 const videoPlayerOptions = (slide) => {
   let type = slide.type;
@@ -487,6 +502,8 @@ const clearSlides = () => {
 defineExpose({
   clearSlides,
 });
+
+const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
 <style>
@@ -576,5 +593,11 @@ defineExpose({
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>
