@@ -100,7 +100,7 @@
         v-else
         class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 750px">
+        <div style="width: 780px">
           <p
             v-show="readOnly && editorData.time"
             style="max-width: 700px"

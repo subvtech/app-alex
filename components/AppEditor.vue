@@ -33,6 +33,7 @@ import AIText from '@alkhipce/editorjs-aitext';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
+import Fileset from '../editor-js/plugins/fileset/FilesetBlock';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
@@ -262,6 +263,42 @@ onMounted(() => {
               strapiClient(`/upload/files/${file.imgId}`, {
                 method: 'DELETE',
               });
+          },
+        },
+      },
+      fileset: {
+        class: Fileset,
+        config: {
+          uploadFiles: (files) => {
+            const formData = new FormData();
+            const filesArray: File[] = Array.from(files);
+            filesArray.forEach((file: File) => {
+              formData.append('files', file, file.name);
+            });
+            return strapiClient<Upload[]>('/upload', {
+              method: 'POST',
+              body: formData,
+            })
+              .then((res) => {
+                return {
+                  success: 1,
+                  files: res.map((file) => ({
+                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                    extension: file.ext?.slice(1),
+                    size: file.size,
+                    id: file.id,
+                    url: file.url,
+                  })),
+                };
+              })
+              .catch((err) => {
+                return { success: 0, error: err };
+              });
+          },
+          handleDeletedFiles: async (id: string) => {
+            await strapiClient(`/upload/files/${id}`, {
+              method: 'DELETE',
+            });
           },
         },
       },

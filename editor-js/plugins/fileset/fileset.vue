@@ -1,39 +1,61 @@
 <template>
   <div class="d-flex flex-wrap ga-2">
-    <div
-      class="fileInput d-flex align-center justify-center px-6 py-3 rounded text-body-2 text-gray-800 width-60 h-62 ga-3"
+    <v-btn
+      v-if="!readOnly"
+      class="fileInput d-flex align-center justify-center px-6 py-3 rounded-lg text-body-2 text-gray-800 width-60 h-62 elevation-0"
+      :loading="isLoading"
       @click="fileInputRef.click()"
     >
-      <v-icon icon="mdi-plus"></v-icon>
-      <p>Adicionar Arquivo</p>
+      <v-icon class="mr-3" icon="mdi-plus"></v-icon>
+      Adicionar Arquivo
       <input
         ref="fileInputRef"
         type="file"
         multiple
         class="d-none"
-        @change="onFileChange"
+        @change="
+          (event) => {
+            const files = (event.target as HTMLInputElement).files;
+            if (files) {
+              addFile(files);
+            }
+          }
+        "
       />
-    </div>
+    </v-btn>
 
     <div
-      v-for="file in files"
+      v-for="file in filesArray"
       :key="file.title"
-      class="fileItem d-flex rounded text-body-2 text-gray-800 width-60 h-62"
+      class="fileItem d-flex rounded-lg text-body-2 text-gray-800 width-60 h-62"
     >
       <div
-        class="min-w-16 rounded-s-lg d-flex justify-center align-center"
+        class="min-w-16 teste d-flex justify-center align-center"
         :class="`bg-${setFileColor(file.extension)}`"
       >
         <span class="text-body-2 text-uppercase">{{ file.extension }}</span>
       </div>
       <div class="ma-3 d-flex ga-3 w-100">
         <div class="w-100 d-flex flex-column">
-          <!-- Add ellipsis -->
-          <span class="text-body-2 text-gray-900">{{ file.title }}</span>
-          <span class="text-body-5 text-gray-500">{{ file.size }}</span>
+          <span class="text-body-2 text-gray-900 ellipsis lines-1 width-28">{{
+            file.title
+          }}</span>
+          <span class="text-body-5 text-gray-500">{{
+            convertFileSize(file.size)
+          }}</span>
         </div>
         <div class="min-w-7 d-flex justify-center align-center">
-          <v-icon icon="mdi-trash-can-outline"></v-icon>
+          <alex-custom-button
+            v-if="!readOnly"
+            color="error--1"
+            variant="text"
+            icon="mdi-trash-can-outline"
+            @click="() => deleteFile(file)"
+          >
+          </alex-custom-button>
+          <alex-custom-button v-else variant="text" icon="mdi">
+            <v-icon icon="mdi-cloud-download-outline" size="20" />
+          </alex-custom-button>
         </div>
       </div>
     </div>
@@ -42,52 +64,134 @@
 
 <script setup lang="ts">
 const fileInputRef = ref();
-const editMode = ref(false);
-
-const files = [
-  { title: 'File1', extension: 'txt', size: 1000 },
-  { title: 'File2', extension: 'pdf', size: 2000 },
-  { title: 'File3', extension: 'doc', size: 3000 },
-];
-
-const setFileColor = (extension: string) => {
-  const fileColors: { [key: string]: string } = {
-    pdf: 'red',
-    doc: 'blue',
-    docx: 'blue',
-    txt: 'blue',
-    rtf: 'blue',
-    odt: 'blue',
-    xls: 'green',
-    xlsx: 'green',
-    csv: 'green',
-  };
-
-  return fileColors[extension] || 'gray';
+const isLoading = ref(false);
+type FileType = {
+  title: string;
+  extension: string;
+  size: number;
+  id: string;
+  url: string;
 };
 
-const onFileChange = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  const files = target.files;
-  if (files) {
-    for (let i = 0; i < files.length; i++) {
-      console.log(files[i]);
-    }
+const props = defineProps({
+  files: {
+    type: Array as PropType<FileType[]>,
+    default: () => [],
+  },
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+  onAddFiles: {
+    type: Function,
+    default: () => {},
+  },
+  onDeleteFile: {
+    type: Function,
+    default: () => {},
+  },
+  onUpdateFiles: {
+    type: Function,
+    default: () => {},
+  },
+});
+
+const convertFileSize = (size: number) => {
+  if (size < 1024) {
+    return `${size} B`;
+  } else if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(1)} KB`;
+  } else {
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   }
+};
+
+const filesArray = ref<FileType[]>([...(props.files as FileType[])]);
+
+const fileColors: { [key: string]: string } = {
+  pdf: 'red',
+  doc: 'blue',
+  docx: 'blue',
+  txt: 'blue',
+  rtf: 'blue',
+  odt: 'blue',
+  xls: 'green',
+  xlsx: 'green',
+  csv: 'green',
+  ppt: 'orange',
+  pptx: 'orange',
+  key: 'orange',
+  jpg: 'purple',
+  jpeg: 'purple',
+  png: 'purple',
+  gif: 'purple',
+  bmp: 'purple',
+  svg: 'purple',
+  mp4: 'pink',
+  avi: 'pink',
+  mov: 'pink',
+  wmv: 'pink',
+  mp3: 'brown',
+  wav: 'brown',
+  flac: 'brown',
+  aac: 'brown',
+  zip: 'grey',
+  rar: 'grey',
+  '7z': 'grey',
+  exe: 'black',
+  app: 'black',
+  html: 'lime',
+  css: 'lime',
+  js: 'lime',
+  py: 'lime',
+  java: 'lime',
+  cpp: 'lime',
+  cs: 'lime',
+  c: 'lime',
+  php: 'lime',
+  sql: 'lime',
+  json: 'lime',
+};
+
+const setFileColor = (extension: string) => {
+  return fileColors[extension.toLocaleLowerCase()] || 'gray';
+};
+
+const addFile = async (files: FileList) => {
+  isLoading.value = true;
+  const res = await props.onAddFiles(files);
+  if (res.success) {
+    filesArray.value.push(...res.files);
+  }
+  props.onUpdateFiles(filesArray.value);
+  isLoading.value = false;
+};
+
+const deleteFile = (file: FileType) => {
+  const index = filesArray.value.findIndex((f) => f.id === file.id);
+  filesArray.value.splice(index, 1);
+  props.onDeleteFile(file);
+  props.onUpdateFiles(filesArray.value);
 };
 </script>
 
 <style scoped>
 .fileInput {
-  cursor: pointer;
-  border-radius: 8px;
   border: 2px dashed var(--Cinza-Cinza-200, #d2d6da);
-  display: flex;
+  &:hover {
+    border: 2px dashed var(--Cinza-Cinza-300, #b9bfc6);
+  }
 }
 
 .fileItem {
-  border-radius: 8px;
   border: 1px solid var(--Cinza-Cinza-100, #ebedef);
+  &:hover {
+    border: 1px solid var(--Cinza-Cinza-300, #b9bfc6);
+  }
+}
+
+.teste {
+  border-radius: 7px 0 0 7px;
 }
 
 .h-62 {
