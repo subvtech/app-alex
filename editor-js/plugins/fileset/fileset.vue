@@ -7,7 +7,7 @@
       @click="fileInputRef.click()"
     >
       <v-icon class="mr-3" icon="mdi-plus"></v-icon>
-      Adicionar Arquivo
+      {{ t('components.editorjs.fileSet.addFile') }}
       <input
         ref="fileInputRef"
         type="file"
@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 const { setMessage } = useMessageStore();
-// const { t } = useI18n();
+const { t } = useI18n();
 const fileInputRef = ref();
 const isLoading = ref(false);
 type FileType = {
@@ -192,7 +192,7 @@ const downloadFile = (url: string, title: string, id: string) => {
     })
     .catch((_) => {
       setMessage(
-        'Ocorreu um erro ao baixar o arquivo, tente novamente',
+        t('components.editorjs.fileSet.error.download'),
         'error',
         true,
       );
@@ -201,19 +201,34 @@ const downloadFile = (url: string, title: string, id: string) => {
       isDownloading.value.splice(isDownloading.value.indexOf(id), 1);
     });
 };
-
+// 283076100;
 const addFile = async (files: FileList) => {
+  const addFiles = Array.from(files);
   isLoading.value = true;
-  const res = await props.onAddFiles(files);
+  for (let i = 0; i < addFiles.length; i++) {
+    const file = addFiles[i];
+    if (file.size > 200 * 1024 * 1024) {
+      setMessage(
+        t('components.editorjs.fileSet.error.maxFileSize', {
+          maxFilesize: '200MB',
+          filename: file.name,
+        }),
+        'error',
+        true,
+      );
+      addFiles.splice(i, 1);
+      if (!addFiles.length) {
+        isLoading.value = false;
+        return;
+      }
+    }
+  }
+  const res = await props.onAddFiles(addFiles);
   if (res.success) {
     filesArray.value.push(...res.files);
     props.onUpdateFiles(filesArray.value);
   } else {
-    setMessage(
-      'Ocorreu um erro ao adicionar o(s) arquivo(s), tente novamente',
-      'error',
-      true,
-    );
+    setMessage(t('components.editorjs.fileSet.error.addFile'), 'error', true);
   }
   isLoading.value = false;
 };
@@ -226,7 +241,7 @@ const deleteFile = async (file: FileType) => {
     props.onUpdateFiles(filesArray.value);
   } else {
     setMessage(
-      'Ocorreu um erro ao deletar o arquivo, tente novamente',
+      t('components.editorjs.fileSet.error.removeFile'),
       'error',
       true,
     );
