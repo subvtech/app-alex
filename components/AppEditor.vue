@@ -42,6 +42,21 @@ const strapiClient = useStrapiClient();
 const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
+const mediaToDelete = ref<string[]>([]);
+
+const deletePendingMediaOnSave = async () => {
+  if (mediaToDelete.value.length > 0) {
+    await Promise.all(
+      mediaToDelete.value.map((id) =>
+        strapiClient(`/upload/files/${id}`, {
+          method: 'DELETE',
+        }),
+      ),
+    );
+    mediaToDelete.value = [];
+  }
+};
+
 onMounted(() => {
   instance.value = new EditorJS({
     autofocus: true,
@@ -294,15 +309,8 @@ onMounted(() => {
               return { success: 0, error };
             }
           },
-          handleDeletedFiles: async (id: string) => {
-            try {
-              await strapiClient(`/upload/files/${id}`, {
-                method: 'DELETE',
-              });
-              return { success: 1 };
-            } catch (error) {
-              return { success: 0, error };
-            }
+          handleDeletedFiles: (id: string) => {
+            mediaToDelete.value.push(id);
           },
         },
       },
@@ -365,6 +373,8 @@ const toggleReadOnly = () => {
           element.scrollIntoView({ block: 'center', behavior: 'smooth' });
         }
       }, 100);
+    } else {
+      deletePendingMediaOnSave();
     }
   });
 };

@@ -15,9 +15,7 @@ interface FilesetConfig {
   uploadFiles: (
     files: FileList,
   ) => Promise<{ success: number; files?: FilesetBlockData[]; error?: string }>;
-  handleDeletedFiles: (
-    id: string,
-  ) => Promise<{ succes: number; error?: string }>;
+  handleDeletedFiles: (id: string) => void;
   onUpdateFiles: (files: FilesetBlockData[]) => void;
 }
 
@@ -64,9 +62,8 @@ class FilesetBlock {
       onAddFiles: async (files: FileList) => {
         return await this.config.uploadFiles(files);
       },
-      onDeletedFile: async (id: string) => {
-        const res = await this.config.handleDeletedFiles(id);
-        return res;
+      onDeletedFile: (id: string) => {
+        this.config.handleDeletedFiles(id);
       },
     });
     app.use(vuetify);
