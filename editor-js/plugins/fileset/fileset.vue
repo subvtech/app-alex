@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-wrap ga-2">
+  <div class="d-flex flex-wrap ga-2 my-2">
     <v-btn
       v-if="!readOnly"
       class="fileInput d-flex align-center justify-center px-6 py-3 rounded-lg text-body-2 text-gray-800 width-60 h-62 elevation-0"
@@ -41,7 +41,7 @@
             file.title
           }}</span>
           <span class="text-body-5 text-gray-500">{{
-            convertFileSize(file.size)
+            formatFileSize(file.size)
           }}</span>
         </div>
         <div class="min-w-7 d-flex justify-center align-center">
@@ -53,7 +53,12 @@
             @click="() => deleteFile(file)"
           >
           </alex-custom-button>
-          <alex-custom-button v-else variant="text" icon="mdi">
+          <alex-custom-button
+            v-else
+            variant="text"
+            icon="mdi"
+            @click="downloadFile(file.url, file.title)"
+          >
             <v-icon icon="mdi-cloud-download-outline" size="20" />
           </alex-custom-button>
         </div>
@@ -96,13 +101,14 @@ const props = defineProps({
   },
 });
 
-const convertFileSize = (size: number) => {
+const formatFileSize = (size: number) => {
+  size = size * 1000;
   if (size < 1024) {
-    return `${size} B`;
+    return `${size.toFixed(2)} B`;
   } else if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / 1024).toFixed(2)} KB`;
   } else {
-    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
   }
 };
 
@@ -155,6 +161,20 @@ const fileColors: { [key: string]: string } = {
 
 const setFileColor = (extension: string) => {
   return fileColors[extension.toLocaleLowerCase()] || 'gray';
+};
+
+const downloadFile = (url: string, title: string) => {
+  fetch(url)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const link = document.createElement('a');
+      link.setAttribute('download', title);
+      link.download = title;
+      const href = URL.createObjectURL(blob);
+      link.href = href;
+      link.click();
+      URL.revokeObjectURL(href);
+    });
 };
 
 const addFile = async (files: FileList) => {
