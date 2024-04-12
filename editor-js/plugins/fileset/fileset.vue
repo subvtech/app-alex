@@ -29,9 +29,16 @@
       :key="file.title"
       class="fileItem d-flex rounded-lg text-body-2 text-gray-800 width-60 h-62"
     >
+      <v-img
+        v-if="setFileBackground(file.extension) === 'img'"
+        class="min-w-16 file-border"
+        cover
+        :src="file.url"
+      ></v-img>
       <div
-        class="min-w-16 teste d-flex justify-center align-center"
-        :class="`bg-${setFileColor(file.extension)}`"
+        v-else
+        class="min-w-16 file-border d-flex justify-center align-center"
+        :class="`bg-${setFileBackground(file.extension)}`"
       >
         <span class="text-body-2 text-uppercase">{{ file.extension }}</span>
       </div>
@@ -114,25 +121,25 @@ const formatFileSize = (size: number) => {
 
 const filesArray = ref<FileType[]>([...(props.files as FileType[])]);
 
-const fileColors: { [key: string]: string } = {
-  pdf: 'red',
-  doc: 'blue',
-  docx: 'blue',
-  txt: 'blue',
-  rtf: 'blue',
-  odt: 'blue',
+const fileBackground: { [key: string]: string } = {
+  pdf: 'error-0',
+  doc: 'blue-darken-3',
+  docx: 'blue-darken-3',
+  txt: 'blue-darken-3',
+  rtf: 'blue-darken-3',
+  odt: 'blue-darken-3',
   xls: 'green',
   xlsx: 'green',
   csv: 'green',
-  ppt: 'orange',
-  pptx: 'orange',
-  key: 'orange',
-  jpg: 'purple',
-  jpeg: 'purple',
-  png: 'purple',
-  gif: 'purple',
-  bmp: 'purple',
-  svg: 'purple',
+  ppt: 'orange-darken-1',
+  pptx: 'orange-darken-1',
+  key: 'orange-darken-1',
+  jpg: 'img',
+  jpeg: 'img',
+  png: 'img',
+  gif: 'img',
+  bmp: 'img',
+  svg: 'img',
   mp4: 'pink',
   avi: 'pink',
   mov: 'pink',
@@ -141,31 +148,34 @@ const fileColors: { [key: string]: string } = {
   wav: 'brown',
   flac: 'brown',
   aac: 'brown',
-  zip: 'grey',
-  rar: 'grey',
-  '7z': 'grey',
+  zip: 'deep-purple-darken-1',
+  rar: 'deep-purple-darken-1',
+  '7z': 'deep-purple-darken-1',
   exe: 'black',
   app: 'black',
-  html: 'lime',
-  css: 'lime',
-  js: 'lime',
-  py: 'lime',
-  java: 'lime',
-  cpp: 'lime',
-  cs: 'lime',
-  c: 'lime',
-  php: 'lime',
-  sql: 'lime',
-  json: 'lime',
+  html: 'deep-orange',
+  css: 'light-blue-lighten-3',
+  js: 'amber-lighten-1',
+  py: 'blue-lighten-1',
+  java: 'orange-darken-3',
+  cpp: 'light-blue-darken-4',
+  cs: 'deep-purple-darken-3',
+  c: 'light-blue-darken-4',
+  php: 'indigo-lighten-3',
 };
 
-const setFileColor = (extension: string) => {
-  return fileColors[extension.toLocaleLowerCase()] || 'gray';
+const setFileBackground = (extension: string) => {
+  return fileBackground[extension.toLocaleLowerCase()] || 'gray';
 };
 
 const downloadFile = (url: string, title: string) => {
+  if (!url.startsWith('http')) {
+    url = 'https://' + url;
+  }
   fetch(url)
-    .then((response) => response.blob())
+    .then((response) => {
+      return response.blob();
+    })
     .then((blob) => {
       const link = document.createElement('a');
       link.setAttribute('download', title);
@@ -210,7 +220,7 @@ const deleteFile = (file: FileType) => {
   }
 }
 
-.teste {
+.file-border {
   border-radius: 7px 0 0 7px;
 }
 
