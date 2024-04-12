@@ -269,36 +269,40 @@ onMounted(() => {
       fileset: {
         class: Fileset,
         config: {
-          uploadFiles: (files) => {
+          uploadFiles: async (files) => {
             const formData = new FormData();
             const filesArray: File[] = Array.from(files);
             filesArray.forEach((file: File) => {
               formData.append('files', file, file.name);
             });
-            return strapiClient<Upload[]>('/upload', {
-              method: 'POST',
-              body: formData,
-            })
-              .then((res) => {
-                return {
-                  success: 1,
-                  files: res.map((file) => ({
-                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
-                    extension: file.ext?.slice(1),
-                    size: file.size,
-                    id: file.id,
-                    url: file.url,
-                  })),
-                };
-              })
-              .catch((err) => {
-                return { success: 0, error: err };
+            try {
+              const res = await strapiClient<Upload[]>('/upload', {
+                method: 'POST',
+                body: formData,
               });
+              return {
+                success: 1,
+                files: res.map((file) => ({
+                  title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                  extension: file.ext?.slice(1),
+                  size: file.size,
+                  id: file.id,
+                  url: file.url,
+                })),
+              };
+            } catch (error) {
+              return { success: 0, error };
+            }
           },
           handleDeletedFiles: async (id: string) => {
-            await strapiClient(`/upload/files/${id}`, {
-              method: 'DELETE',
-            });
+            try {
+              await strapiClient(`/upload/files/${id}`, {
+                method: 'DELETE',
+              });
+              return { success: 1 };
+            } catch (error) {
+              return { success: 0, error };
+            }
           },
         },
       },

@@ -52,22 +52,23 @@
           }}</span>
         </div>
         <div class="min-w-7 d-flex justify-center align-center">
-          <alex-custom-button
+          <v-btn
             v-if="!readOnly"
-            color="error--1"
+            color="error-0"
             variant="text"
             icon="mdi-trash-can-outline"
             @click="() => deleteFile(file)"
           >
-          </alex-custom-button>
-          <alex-custom-button
+          </v-btn>
+          <v-btn
             v-else
+            :loading="isDownloading.includes(file.id)"
             variant="text"
             icon="mdi"
-            @click="downloadFile(file.url, file.title)"
+            @click="downloadFile(file.url, file.title, file.id)"
           >
             <v-icon icon="mdi-cloud-download-outline" size="20" />
-          </alex-custom-button>
+          </v-btn>
         </div>
       </div>
     </div>
@@ -75,6 +76,8 @@
 </template>
 
 <script setup lang="ts">
+const { setMessage } = useMessageStore();
+// const { t } = useI18n();
 const fileInputRef = ref();
 const isLoading = ref(false);
 type FileType = {
@@ -98,7 +101,7 @@ const props = defineProps({
     type: Function,
     default: () => {},
   },
-  onDeleteFile: {
+  onDeletedFile: {
     type: Function,
     default: () => {},
   },
@@ -120,6 +123,7 @@ const formatFileSize = (size: number) => {
 };
 
 const filesArray = ref<FileType[]>([...(props.files as FileType[])]);
+const isDownloading = ref<string[]>([]);
 
 const fileBackground: { [key: string]: string } = {
   pdf: 'error-0',
@@ -168,7 +172,8 @@ const setFileBackground = (extension: string) => {
   return fileBackground[extension.toLocaleLowerCase()] || 'gray';
 };
 
-const downloadFile = (url: string, title: string) => {
+const downloadFile = (url: string, title: string, id: string) => {
+  isDownloading.value.push(id);
   if (!url.startsWith('http')) {
     url = 'https://' + url;
   }
@@ -184,6 +189,16 @@ const downloadFile = (url: string, title: string) => {
       link.href = href;
       link.click();
       URL.revokeObjectURL(href);
+    })
+    .catch((_) => {
+      setMessage(
+        'Ocorreu um erro ao baixar o arquivo, tente novamente',
+        'error',
+        true,
+      );
+    })
+    .finally(() => {
+      isDownloading.value.splice(isDownloading.value.indexOf(id), 1);
     });
 };
 
@@ -192,16 +207,30 @@ const addFile = async (files: FileList) => {
   const res = await props.onAddFiles(files);
   if (res.success) {
     filesArray.value.push(...res.files);
+    props.onUpdateFiles(filesArray.value);
+  } else {
+    setMessage(
+      'Ocorreu um erro ao adicionar o(s) arquivo(s), tente novamente',
+      'error',
+      true,
+    );
   }
-  props.onUpdateFiles(filesArray.value);
   isLoading.value = false;
 };
 
-const deleteFile = (file: FileType) => {
-  const index = filesArray.value.findIndex((f) => f.id === file.id);
-  filesArray.value.splice(index, 1);
-  props.onDeleteFile(file);
-  props.onUpdateFiles(filesArray.value);
+const deleteFile = async (file: FileType) => {
+  const res = await props.onDeletedFile(file.id);
+  if (res.success) {
+    const index = filesArray.value.findIndex((f) => f.id === file.id);
+    filesArray.value.splice(index, 1);
+    props.onUpdateFiles(filesArray.value);
+  } else {
+    setMessage(
+      'Ocorreu um erro ao deletar o arquivo, tente novamente',
+      'error',
+      true,
+    );
+  }
 };
 </script>
 

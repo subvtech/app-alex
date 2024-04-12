@@ -3,20 +3,22 @@ import { BlockToolConstructorOptions } from '@editorjs/editorjs';
 import Fileset from './Fileset.vue';
 import { vuetify } from '@/plugins/vuetify';
 
-interface FilesetConfig {
-  uploadFiles: (
-    files: FileList,
-  ) => Promise<{ success: number; files?: any[]; error?: any }>;
-  handleDeletedFiles: (id: string) => Promise<void>;
-  onUpdateFiles: (files: any[]) => void;
-}
-
 interface FilesetBlockData {
   title: string;
   extension: string;
   size: number;
   id: string;
   url: string;
+}
+
+interface FilesetConfig {
+  uploadFiles: (
+    files: FileList,
+  ) => Promise<{ success: number; files?: FilesetBlockData[]; error?: string }>;
+  handleDeletedFiles: (
+    id: string,
+  ) => Promise<{ succes: number; error?: string }>;
+  onUpdateFiles: (files: FilesetBlockData[]) => void;
 }
 
 class FilesetBlock {
@@ -52,8 +54,9 @@ class FilesetBlock {
       onAddFiles: async (files: FileList) => {
         return await this.config.uploadFiles(files);
       },
-      onDeletedFile: (id: string) => {
-        this.config.handleDeletedFiles(id);
+      onDeletedFile: async (id: string) => {
+        const res = await this.config.handleDeletedFiles(id);
+        return res;
       },
     });
     app.use(vuetify);
