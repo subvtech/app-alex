@@ -222,7 +222,10 @@ const videoJS = ref();
 const videoJSWeb = ref();
 const uploading = ref(false);
 const viewerInstances = ref([]);
-const viewer = ref<null | { createInstances: () => void }>(null);
+const viewer = ref<null | {
+  createInstances: () => void;
+  destroyInstances: () => void;
+}>(null);
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -462,7 +465,6 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
 onMounted(() => {
   setTimeout(() => {
     if (viewer.value) {
-      console.log('criou né');
       viewer.value.createInstances();
     }
   }, 100);

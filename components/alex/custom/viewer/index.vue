@@ -21,43 +21,22 @@ const createInstances = () => {
     if (!slideImage) return [];
     const viewer = new Viewer(slideImage, {
       ready() {
-        const alexViewer = document.querySelector(
-          `.alex-viewer-${i} .viewer-footer`,
-        );
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('alex-viewer-controls');
-        const app = createApp(AlexCustomViewerControls, {
-          onPlus: () => {
-            viewer.zoom(0.2);
-          },
-          onMinus: () => {
-            viewer.zoom(-0.2);
-          },
-          onReset: () => {
-            viewer.reset();
-          },
-          onFlipH: () => {
-            // @ts-ignore
-            const scaleX = viewer?.imageData?.scaleX;
-            viewer.scaleX(scaleX === -1 ? 1 : -1);
-          },
-          onFlipV: () => {
-            // @ts-ignore
-            const scaleY = viewer?.imageData?.scaleY;
-            viewer.scaleY(scaleY === -1 ? 1 : -1);
-          },
-          onRotate: () => {
-            viewer.rotate(90);
-          },
-        });
-        app.use(vuetify);
-        app.mount(wrapper);
-        alexViewer?.append(wrapper);
+        mountAlexControls(i, viewer);
       },
+      view() {
+        const html = document.querySelector('html');
+        if (!html) return;
+        html.classList.add('v-overlay-scroll-blocked');
+      },
+      hide() {
+        const html = document.querySelector('html');
+        if (!html) return;
+        html.classList.remove('v-overlay-scroll-blocked');
+      },
+      fullscreen: true,
       navbar: false,
       title: [1, () => image.caption],
       className: `alex-viewer alex-viewer-${i}`,
-      container: 'html',
       toolbar: false,
       zIndex: 1999,
     });
@@ -66,11 +45,47 @@ const createInstances = () => {
 };
 const destroyInstances = () => {
   viewerInstances.value.forEach((image) => {
-    if (image instanceof Viewer) {
-      image.destroy();
-    }
+    image.destroy();
   });
 };
+
+const mountAlexControls = (index: number, viewer: Viewer) => {
+  // TODO: check if exist better options to not use createApp.
+  const alexViewer = document.querySelector(
+    `.alex-viewer-${index} .viewer-footer`,
+  );
+  if (!alexViewer) return;
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('alex-viewer-controls');
+  const app = createApp(AlexCustomViewerControls, {
+    onPlus: () => {
+      viewer.zoom(0.2);
+    },
+    onMinus: () => {
+      viewer.zoom(-0.2);
+    },
+    onReset: () => {
+      viewer.reset();
+    },
+    onFlipH: () => {
+      // @ts-ignore
+      const scaleX = viewer?.imageData?.scaleX;
+      viewer.scaleX(scaleX === -1 ? 1 : -1);
+    },
+    onFlipV: () => {
+      // @ts-ignore
+      const scaleY = viewer?.imageData?.scaleY;
+      viewer.scaleY(scaleY === -1 ? 1 : -1);
+    },
+    onRotate: () => {
+      viewer.rotate(90);
+    },
+  });
+  app.use(vuetify);
+  app.mount(wrapper);
+  alexViewer.append(wrapper);
+};
+
 onUnmounted(() => {
   destroyInstances();
 });
@@ -106,12 +121,24 @@ defineExpose({
     height: 36px;
     right: 24px;
     top: 24px;
+    background-color: rgb(var(--v-theme-white));
   }
+  .viewer-button.viewer-close:hover {
+    background-color: rgb(var(--v-theme-gray-blue));
+  }
+  .viewer-button.viewer-close:active {
+    background-color: rgb(var(--v-theme-gray-100));
+  }
+  .viewer-button.viewer-close:focus {
+    box-shadow: none;
+  }
+
   .viewer-button.viewer-close::before {
     color: rgb(var(--v-theme-gray-800));
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    filter: brightness(0);
   }
   .alex-viewer-controls {
     display: flex;
