@@ -1,8 +1,32 @@
 <template>
-  <div class="d-flex flex-wrap ga-2 my-2">
+  <div
+    class="d-flex flex-wrap ga-2 my-2 drop-area"
+    :data-active="fileDrop && !readOnly"
+    @dragenter.prevent="
+      if (!readOnly) {
+        fileDrop = true;
+      }
+    "
+    @dragover.prevent="
+      if (!readOnly) {
+        fileDrop = true;
+      }
+    "
+    @dragleave.prevent="
+      if (!readOnly) {
+        fileDrop = false;
+      }
+    "
+    @drop.prevent="
+      if (!readOnly) {
+        fileDrop = false;
+        addFileFromDrop($event);
+      }
+    "
+  >
     <v-btn
       v-if="!readOnly"
-      class="fileInput d-flex align-center justify-center px-6 py-3 rounded-lg text-body-2 text-gray-800 width-60 h-62 elevation-0"
+      class="fileInput d-flex align-center justify-center px-6 py-3 rounded-lg text-body-2 text-gray-800 width-60 h-62 elevation-0 bg-transparent"
       :loading="isLoading"
       @click="fileInputRef.click()"
     >
@@ -80,6 +104,7 @@ const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const fileInputRef = ref();
 const isLoading = ref(false);
+const fileDrop = ref(false);
 type FileType = {
   title: string;
   extension: string;
@@ -201,7 +226,16 @@ const downloadFile = (url: string, title: string, id: string) => {
       isDownloading.value.splice(isDownloading.value.indexOf(id), 1);
     });
 };
-// 283076100;
+
+const addFileFromDrop = (event: DragEvent) => {
+  event.preventDefault();
+  fileDrop.value = false;
+  const dropFiles = event.dataTransfer?.files;
+  if (dropFiles) {
+    addFile(dropFiles);
+  }
+};
+
 const addFile = async (files: FileList) => {
   const addFiles = Array.from(files);
   isLoading.value = true;
@@ -233,19 +267,11 @@ const addFile = async (files: FileList) => {
   isLoading.value = false;
 };
 
-const deleteFile = async (file: FileType) => {
-  const res = await props.onDeletedFile(file.id);
-  if (res.success) {
-    const index = filesArray.value.findIndex((f) => f.id === file.id);
-    filesArray.value.splice(index, 1);
-    props.onUpdateFiles(filesArray.value);
-  } else {
-    setMessage(
-      t('components.editorjs.fileSet.error.removeFile'),
-      'error',
-      true,
-    );
-  }
+const deleteFile = (file: FileType) => {
+  props.onDeletedFile(file.id);
+  const index = filesArray.value.findIndex((f) => f.id === file.id);
+  filesArray.value.splice(index, 1);
+  props.onUpdateFiles(filesArray.value);
 };
 </script>
 
@@ -270,5 +296,14 @@ const deleteFile = async (file: FileType) => {
 
 .h-62 {
   height: 62px;
+}
+
+.drop-area {
+  transition: 0.3s ease;
+  border-radius: 8px;
+  &[data-active='true']:not([readonly]) {
+    display: block;
+    background-color: #d1f6fa;
+  }
 }
 </style>
