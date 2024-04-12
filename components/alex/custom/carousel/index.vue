@@ -49,7 +49,7 @@
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
       >
         <template #content>
-          <img :id="`image-slide-${slide.id}`" :src="slide.image" />
+          <img :id="`image-slide-${i}`" :src="slide.image" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -191,14 +191,18 @@
     @upload-files="addSlide"
     @change-slides="editSlides"
   />
+  <alex-custom-viewer
+    ref="viewer"
+    v-model="viewerInstances"
+    image-id="image-slide"
+    :images="slides.map((slide) => ({ caption: slide.title }))"
+  />
 </template>
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import 'vueperslides/dist/vueperslides.css';
-import 'viewerjs/dist/viewer.css';
-import Viewer from 'viewerjs';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
 import {
@@ -220,6 +224,7 @@ const props = defineProps({
     default: false,
   },
 });
+const viewer = ref(null);
 const { mobile } = useDisplay({ mobileBreakpoint: 600 });
 const emit = defineEmits(['update:modelValue', 'slidesChanged']);
 
@@ -231,6 +236,7 @@ const slides = computed({
     emit('update:modelValue', value);
   },
 });
+const viewerInstances = ref([]);
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {
@@ -243,23 +249,19 @@ onMounted(() => {
       } else {
         slide.icon = 'mdi-image';
       }
-      createImageViewer();
     });
   }
+  if (viewer.value) {
+    viewer.value.createInstances();
+  }
 });
-onUpdated(() => {
-  createImageViewer();
+// Resolve o bug: ao editar e sair do modo de edição perdia o vinculo com a instancia do viewer
+onBeforeUpdate(() => {
+  if (viewer.value) {
+    viewer.value.destroyInstances();
+    viewer.value.createInstances();
+  }
 });
-const createImageViewer = () => {
-  if (slides.value.length === 0) return;
-  slides.value.map((slide) => {
-    return new Viewer(document.querySelector(`#image-slide-${slide.id}`), {
-      navbar: false,
-      title: [1, () => slide.title],
-    });
-  });
-};
-
 const videoPlayerOptions = (slide) => {
   let type = slide.type;
   let url = slide.video;

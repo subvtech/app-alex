@@ -36,9 +36,9 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
+          <img :id="`image-slide-${i}`" :src="slide.image" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -180,6 +180,12 @@
       @change-slides="editSlides"
     />
   </div>
+  <alex-custom-viewer
+    ref="viewer"
+    v-model="viewerInstances"
+    image-id="image-slide"
+    :images="slides.map((slide) => ({ caption: slide.title }))"
+  />
 </template>
 
 <script setup lang="ts">
@@ -215,7 +221,8 @@ const vueperslides2 = ref();
 const videoJS = ref();
 const videoJSWeb = ref();
 const uploading = ref(false);
-
+const viewerInstances = ref([]);
+const viewer = ref<null | { createInstances: () => void }>(null);
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -340,7 +347,6 @@ function newSlide(file, res) {
 }
 const activeSlide = ref(0);
 const dialog = ref();
-
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
@@ -452,6 +458,15 @@ const editSlides = async (files, deleted, added) => {
     props.onUpdateSlides(slides.value);
   }
 };
+const backgroundImgColor = AlexThemeColors['gray-blue'];
+onMounted(() => {
+  setTimeout(() => {
+    if (viewer.value) {
+      console.log('criou né');
+      viewer.value.createInstances();
+    }
+  }, 100);
+});
 </script>
 
 <style scoped>
@@ -525,5 +540,11 @@ const editSlides = async (files, deleted, added) => {
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>
