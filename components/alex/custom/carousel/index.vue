@@ -49,7 +49,7 @@
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
       >
         <template #content>
-          <img :id="`image-slide-${i}`" :src="slide.image" />
+          <nuxt-img :src="slide.image" :alt="slide.title" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -191,12 +191,6 @@
     @upload-files="addSlide"
     @change-slides="editSlides"
   />
-  <alex-custom-viewer
-    ref="viewer"
-    v-model="viewerInstances"
-    image-id="image-slide"
-    :images="slides.map((slide) => ({ caption: slide.title }))"
-  />
 </template>
 
 <script setup>
@@ -224,7 +218,6 @@ const props = defineProps({
     default: false,
   },
 });
-const viewer = ref(null);
 const { mobile } = useDisplay({ mobileBreakpoint: 600 });
 const emit = defineEmits(['update:modelValue', 'slidesChanged']);
 
@@ -236,7 +229,7 @@ const slides = computed({
     emit('update:modelValue', value);
   },
 });
-const viewerInstances = ref([]);
+
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {
@@ -251,17 +244,8 @@ onMounted(() => {
       }
     });
   }
-  if (viewer.value) {
-    viewer.value.createInstances();
-  }
 });
-// Resolve o bug: ao editar e sair do modo de edição perdia o vinculo com a instancia do viewer
-onBeforeUpdate(() => {
-  if (viewer.value) {
-    viewer.value.destroyInstances();
-    viewer.value.createInstances();
-  }
-});
+
 const videoPlayerOptions = (slide) => {
   let type = slide.type;
   let url = slide.video;

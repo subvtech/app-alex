@@ -146,39 +146,37 @@
         </div>
       </div>
     </div>
+    <alex-custom-viewer
+      ref="viewer"
+      v-model="viewerInstance"
+      container="vueperslides"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-const { create } = useStrapi();
-const route = useRoute();
-const { setMessage } = useMessageStore();
-
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-
-const headerStore = usePageHeaderStore();
-const learningPlanStore = useLearningPlanStore();
-
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
+const { create } = useStrapi();
+const route = useRoute();
+const { setMessage } = useMessageStore();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
+const headerStore = usePageHeaderStore();
+const learningPlanStore = useLearningPlanStore();
 const trailStore = useTrailStore();
-
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
-
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
   return (
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
 const { t } = useI18n();
 const editorData = computed(() => {
   const data =
@@ -197,7 +195,11 @@ const editorData = computed(() => {
       }) || [],
   };
 });
-
+const viewerInstance = ref(null);
+const viewer = ref<null | {
+  createInstance: () => void;
+  destroyInstance: () => void;
+}>(null);
 onMounted(async () => {
   isLoading.value = true;
   while (trailStore.loading) {
@@ -213,12 +215,15 @@ onMounted(async () => {
     }
   }
   isLoading.value = false;
+  setTimeout(() => {
+    if (viewer.value) {
+      viewer.value.createInstance();
+    }
+  }, 100);
 });
-
 onBeforeMount(() => {
   headerStore.showHeader = true;
 });
-
 watch(
   () => [learningPlanStore.loading, trailStore.loading],
   () => {
@@ -244,7 +249,14 @@ watch(
     }
   },
 );
-
+watch(readOnly, () => {
+  if (viewer.value) {
+    viewer.value.destroyInstance();
+    setTimeout(() => {
+      viewer.value?.createInstance();
+    }, 100);
+  }
+});
 const sections = ref([
   {
     title: t('pages.trailId.overview.sectionTitle'),

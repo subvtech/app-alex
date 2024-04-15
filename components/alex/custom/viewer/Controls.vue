@@ -31,12 +31,18 @@ type ControlsProps = {
   onRotate: () => void;
   onFlipH: () => void;
   onFlipV: () => void;
+  onFullscreen: () => void;
 };
 const props = defineProps<ControlsProps>();
 const items = [
   { text: 'Inverter - H', icon: 'mdi-flip-horizontal', onClick: props.onFlipH },
   { text: 'Inverter - V', icon: 'mdi-flip-vertical', onClick: props.onFlipV },
   { text: 'Rotacionar', icon: 'mdi-cached', onClick: props.onRotate },
+  {
+    text: 'Apresentar',
+    icon: 'mdi-play',
+    onClick: props.onFullscreen,
+  },
 ];
 </script>
 

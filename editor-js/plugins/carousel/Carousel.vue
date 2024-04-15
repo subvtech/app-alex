@@ -38,7 +38,7 @@
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
       >
         <template #content>
-          <img :id="`image-slide-${i}`" :src="slide.image" />
+          <nuxt-img :src="slide.image" :alt="slide.title" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -180,12 +180,6 @@
       @change-slides="editSlides"
     />
   </div>
-  <alex-custom-viewer
-    ref="viewer"
-    v-model="viewerInstances"
-    image-id="image-slide"
-    :images="slides.map((slide) => ({ caption: slide.title }))"
-  />
 </template>
 
 <script setup lang="ts">
@@ -221,11 +215,6 @@ const vueperslides2 = ref();
 const videoJS = ref();
 const videoJSWeb = ref();
 const uploading = ref(false);
-const viewerInstances = ref([]);
-const viewer = ref<null | {
-  createInstances: () => void;
-  destroyInstances: () => void;
-}>(null);
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -462,13 +451,6 @@ const editSlides = async (files, deleted, added) => {
   }
 };
 const backgroundImgColor = AlexThemeColors['gray-blue'];
-onMounted(() => {
-  setTimeout(() => {
-    if (viewer.value) {
-      viewer.value.createInstances();
-    }
-  }, 100);
-});
 </script>
 
 <style scoped>

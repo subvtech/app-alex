@@ -9,51 +9,57 @@ import { AlexCustomViewerControls } from '#components';
 import 'viewerjs/dist/viewer.css';
 import { vuetify } from '~/plugins/vuetify';
 type ViewerProps = {
-  imageId: string;
-  images: { caption: string }[];
+  container: string;
 };
 const props = defineProps<ViewerProps>();
-const viewerInstances = defineModel<Array<any>>({ required: true });
-const createInstances = () => {
-  if (props.images.length === 0) return;
-  viewerInstances.value = props.images.flatMap((image, i) => {
-    const slideImage = document.getElementById(`${props.imageId}-${i}`);
-    if (!slideImage) return [];
-    const viewer = new Viewer(slideImage, {
-      ready() {
-        mountAlexControls(i, viewer);
+const viewer = defineModel<Viewer | null>({ required: true });
+const createInstance = () => {
+  const containerImages = document.querySelector(
+    `.${props.container}`,
+  ) as HTMLElement;
+  if (!containerImages) return;
+  const viewerInstance = new Viewer(containerImages, {
+    ready() {
+      mountAlexControls(viewerInstance, viewerInstance.id);
+    },
+    view() {
+      const html = document.querySelector('html');
+      if (!html) return;
+      html.classList.add('v-overlay-scroll-blocked');
+    },
+    hide() {
+      const html = document.querySelector('html');
+      if (!html) return;
+      html.classList.remove('v-overlay-scroll-blocked');
+    },
+    play() {
+      return true;
+    },
+    button: true,
+    fullscreen: true,
+    navbar: false,
+    toolbar: false,
+    title: [
+      4,
+      (image: HTMLImageElement) => {
+        return image.alt;
       },
-      view() {
-        const html = document.querySelector('html');
-        if (!html) return;
-        html.classList.add('v-overlay-scroll-blocked');
-      },
-      hide() {
-        const html = document.querySelector('html');
-        if (!html) return;
-        html.classList.remove('v-overlay-scroll-blocked');
-      },
-      fullscreen: true,
-      navbar: false,
-      title: [1, () => image.caption],
-      className: `alex-viewer alex-viewer-${i}`,
-      toolbar: false,
-      zIndex: 1999,
-    });
-    return viewer;
-  });
+    ],
+    className: `alex-viewer`,
+    zIndex: 1999,
+  }) as Viewer & { id: number };
+  viewer.value = viewerInstance;
 };
-const destroyInstances = () => {
-  viewerInstances.value.forEach((image) => {
-    image.destroy();
-  });
+const destroyInstance = () => {
+  if (viewer.value) {
+    viewer.value.destroy();
+    viewer.value = null;
+  }
 };
 
-const mountAlexControls = (index: number, viewer: Viewer) => {
+const mountAlexControls = (viewer: Viewer, id: number) => {
   // TODO: check if exist better options to not use createApp.
-  const alexViewer = document.querySelector(
-    `.alex-viewer-${index} .viewer-footer`,
-  );
+  const alexViewer = document.querySelector(`#viewer${id} .viewer-footer`);
   if (!alexViewer) return;
   const wrapper = document.createElement('div');
   wrapper.classList.add('alex-viewer-controls');
@@ -80,18 +86,26 @@ const mountAlexControls = (index: number, viewer: Viewer) => {
     onRotate: () => {
       viewer.rotate(90);
     },
+    onFullscreen: () => {
+      viewer.play(true);
+    },
   });
   app.use(vuetify);
+  app.use(i18n);
   app.mount(wrapper);
   alexViewer.append(wrapper);
 };
-
 onUnmounted(() => {
-  destroyInstances();
+  if (viewer.value) {
+    viewer.value.destroy();
+  }
+});
+onMounted(() => {
+  createInstance();
 });
 defineExpose({
-  createInstances,
-  destroyInstances,
+  createInstance,
+  destroyInstance,
 });
 </script>
 
