@@ -42,18 +42,20 @@ const strapiClient = useStrapiClient();
 const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
-const mediaToDelete = ref<string[]>([]);
+const mediaToDelete = ref<number[]>([]);
+const temporaryMedia = ref<number[]>([]);
 
-const deletePendingMediaOnSave = async () => {
-  if (mediaToDelete.value.length > 0) {
+const deletePendingMediaOnSave = async (mediaArray: Array<number>) => {
+  if (mediaArray.length > 0) {
     await Promise.all(
-      mediaToDelete.value.map((id) =>
+      mediaArray.map((id) =>
         strapiClient(`/upload/files/${id}`, {
           method: 'DELETE',
         }),
       ),
     );
     mediaToDelete.value = [];
+    temporaryMedia.value = [];
   }
 };
 
@@ -295,21 +297,25 @@ onMounted(() => {
                 method: 'POST',
                 body: formData,
               });
+
               return {
                 success: 1,
-                files: res.map((file) => ({
-                  title: file.name?.slice(0, file.name?.lastIndexOf('.')),
-                  extension: file.ext?.slice(1),
-                  size: file.size,
-                  id: file.id,
-                  url: file.url,
-                })),
+                files: res.map((file) => {
+                  temporaryMedia.value.push(file.id);
+                  return {
+                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                    extension: file.ext?.slice(1),
+                    size: file.size,
+                    id: file.id,
+                    url: file.url,
+                  };
+                }),
               };
             } catch (error) {
               return { success: 0, error };
             }
           },
-          handleDeletedFiles: (id: string) => {
+          handleDeletedFiles: (id: number) => {
             mediaToDelete.value.push(id);
           },
         },
@@ -352,7 +358,7 @@ const loadEditor = async (data) => {
   }
 };
 
-const toggleReadOnly = () => {
+const toggleReadOnly = (mode: string) => {
   instance.value.isReady.then(async () => {
     await instance.value.readOnly.toggle();
     isEditing.value = !instance.value.readOnly.isEnabled;
@@ -373,9 +379,8 @@ const toggleReadOnly = () => {
           element.scrollIntoView({ block: 'center', behavior: 'smooth' });
         }
       }, 100);
-    } else {
-      deletePendingMediaOnSave();
-    }
+    } else if (mode === 'save') deletePendingMediaOnSave(mediaToDelete.value);
+    else if (mode === 'cancel') deletePendingMediaOnSave(temporaryMedia.value);
   });
 };
 
