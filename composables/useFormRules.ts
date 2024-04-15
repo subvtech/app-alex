@@ -218,6 +218,7 @@ export const useFormRules = () => {
   });
   const urlRegex =
     /^(?=.{4,2048}$)((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]{1,63}(\.[a-zA-Z]{1,63}){1,5}(\/)?.([\w\?[a-zA-Z-_%\/@?]+)*([^\/\w\?[a-zA-Z0-9_-]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/;
+  /^(?=.{4,2048}$)((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]{1,63}(\.[a-zA-Z]{1,63}){1,5}(\/)?.([\w\?[a-zA-Z-_%\/@?]+)*([^\/\w\?[a-zA-Z0-9_-]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/;
   const urlRules = yup
     .string()
     .matches(urlRegex, i18n.t('rules.url.valid'))
@@ -297,15 +298,10 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .trim(),
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
+    ...descriptionRules,
   };
 
-  const createTrailsSchema = yup.object(createTrailsRules);
+  const createTrailsScheme = yup.object(createTrailsRules);
 
   const createGroupRules = {
     groupTitle: yup
@@ -361,10 +357,9 @@ export const useFormRules = () => {
     generalTrailSchema,
     emailRegex,
     scheduleRules,
-    createTrailsSchema,
+    createTrailsScheme,
     createGroupRules,
     createTrailsRules,
-    createGroupRules,
     createEditClassRules,
     classRules,
   };

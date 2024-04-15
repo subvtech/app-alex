@@ -2,8 +2,15 @@
   <alex-custom-dialog
     v-model="dialog"
     :title="$t('pages.trails.newTrailText')"
-    no-footer
-    body-classes="bg-white px-6 pt-3 rounded-b-lg"
+    justify="end"
+    :main-button-text="$t('pages.trails.newTrailAction')"
+    main-button-icon="mdi-plus"
+    :loading="isLoading"
+    secondary-button-icon="mdi-close"
+    body-classes="bg-white px-6 py-6"
+    :main-button-disabled="disableSave"
+    @on-main-action="createTrail"
+    @on-secondary-action="(event) => $emit('update:modelValue', event)"
     @update:model-value="(event) => $emit('update:modelValue', event)"
   >
     <div
@@ -16,14 +23,8 @@
       >
         <img
           :src="image"
-          class="rounded-lg w-100 h-100"
-          style="
-            position: absolute;
-            top: 0;
-            left: 0;
-
-            object-fit: cover;
-          "
+          class="rounded-lg w-100 h-100 position-absolute top-0 left-0"
+          style="object-fit: cover"
         />
         <alex-custom-button
           aria-label="edit"
@@ -61,27 +62,25 @@
         </alex-custom-button>
       </div>
     </div>
-    <div>
+    <div class="d-flex flex-column gap-6 mt-6">
       <alex-inputs-text-field
-        v-model="titleValue"
+        v-model="titleField.value.value"
         class="mt-2 mb-1"
         :label="$t('pages.trails.newTrailTitleLabel')"
         :placeholder="$t('pages.trails.newTrailTitlePlaceholder')"
         required
-        :error-messages="titleErrorMsg"
         density="comfortable"
+        :error-messages="titleField.errorMessage.value"
         name="title"
       />
-
       <alex-inputs-text-area
-        v-model="descriptionValue"
+        v-model="descriptionField.value.value"
         :label="$t('pages.trails.newTrailDescriptionLabel')"
         :placeholder="$t('pages.trails.newTrailDescriptionPlaceholder')"
-        name="description"
         required
         density="comfortable"
-        :schema="createTrailsRules.description"
-        :error-messages="descriptionErrorMsg"
+        :error-messages="descriptionField.errorMessage.value"
+        name="description"
       />
       <v-file-input
         ref="fileInputRef"
@@ -90,39 +89,12 @@
         class="d-none"
         @change="handleFileChange"
       ></v-file-input>
-      <alex-custom-dialog-footer class="rounded mt-1">
-        <template #mainSlotButton>
-          <alex-custom-button
-            :loading="isLoading"
-            prepend-icon="mdi-plus"
-            :text="$t('pages.trails.newTrailAction')"
-            size="large"
-            :disabled="disabledButton"
-            @click="createTrail"
-          />
-        </template>
-        <template #secondarySlotButton>
-          <alex-custom-button
-            :text="$t('pages.trails.newTrailCancel')"
-            variant="secondary"
-            size="large"
-            prepend-icon="mdi-close"
-            @click="$emit('update:modelValue', false)"
-          />
-        </template>
-      </alex-custom-dialog-footer>
     </div>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useField } from 'vee-validate';
-
-export interface CreateTrailDialogComponentType {
-  learningStructure: number;
-}
-
 const { createTrailsRules } = useFormRules();
 const { create } = useStrapi();
 const strapiClient = useStrapiClient();
@@ -138,16 +110,15 @@ const { t } = useI18n();
 
 const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
-const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), {});
-const { value: descriptionValue, errorMessage: descriptionErrorMsg } = useField(
-  'description',
-  createTrailsRules.description,
-);
+const props = defineProps({
+  learningStructure: {
+    type: Number,
+    required: true,
+  },
+});
 
-const { value: titleValue, errorMessage: titleErrorMsg } = useField(
-  'title',
-  createTrailsRules.title,
-);
+const titleField = useField('title', createTrailsRules.title);
+const descriptionField = useField('description', createTrailsRules.description);
 
 const clearImage = () => {
   image.value = null;
@@ -172,20 +143,13 @@ const handleFileChange = () => {
   }
 };
 
-const disabledButton = computed(
-  () =>
-    !!descriptionErrorMsg.value ||
-    !!titleErrorMsg.value ||
-    !titleValue.value ||
-    !descriptionValue.value,
-);
-
 const createTrail = async () => {
   isLoading.value = true;
-  const uploadImage = fileInputRef.value.files[0];
+  const uploadImage = fileInputRef.value?.files[0];
   const formData = new FormData();
   formData.append('files', uploadImage);
   let imageData = null;
+
   try {
     if (uploadImage) {
       imageData = await strapiClient('/upload', {
@@ -194,12 +158,16 @@ const createTrail = async () => {
       });
     }
     const data = {
-      title: titleValue.value,
-      description: descriptionValue.value,
+      title: titleField.value.value,
+      description: descriptionField.value.value,
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
+
     const trailData = await create('trails', data);
+    titleField.resetField();
+    descriptionField.resetField();
+
     setMessage(t('pages.trails.success'), 'success', true);
     emit('courseCreated', trailData.data.id);
   } catch (error) {
@@ -210,6 +178,15 @@ const createTrail = async () => {
     isLoading.value = false;
   }
 };
+
+const disableSave = computed(() => {
+  return (
+    !!descriptionField.errorMessage.value ||
+    !!titleField.errorMessage.value ||
+    !titleField.value.value ||
+    !descriptionField.value.value
+  );
+});
 </script>
 
 <style scoped>
