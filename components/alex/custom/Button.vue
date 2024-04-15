@@ -20,18 +20,22 @@
 </template>
 
 <script setup lang="ts">
+export type VariantType =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'text'
+  | 'error'
+  | 'success'
+  | 'warning'
+  | 'info';
+
+export type ButtonSizeType = 'small' | 'default' | 'large';
+
 const props = withDefaults(
   defineProps<{
-    variant?:
-      | 'primary'
-      | 'secondary'
-      | 'tertiary'
-      | 'text'
-      | 'error'
-      | 'success'
-      | 'warning'
-      | 'info';
-    size?: 'small' | 'default' | 'large';
+    variant?: VariantType;
+    size?: ButtonSizeType;
     disabled?: boolean;
     theme?: 'light' | 'dark';
     color?: AlexColors;
