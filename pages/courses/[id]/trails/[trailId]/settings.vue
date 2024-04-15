@@ -41,7 +41,8 @@ const { t } = useI18n();
 const route = useRoute();
 const { trailId, id } = route.params;
 const trailStore = useTrailStore();
-const headerStore = usePageHeaderStore();
+
+useHeaderTrails();
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(parseInt(trailId.toString()));
@@ -61,43 +62,6 @@ const updateVisibility = async (data) => {
   });
   setMessage(t('components.trails.settings.update'), 'green', true);
 };
-
-const learningPlanStore = useLearningPlanStore();
-
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
-
-watch(
-  () => [learningPlanStore.loading, trailStore.loading],
-  () => {
-    if (!learningPlanStore.loading && !trailStore.loading) {
-      headerStore.title = t('components.trails.header.breadcrumbs.title');
-      headerStore.items = [
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${id}`,
-        },
-        {
-          title: t('pages.courses.trails'),
-          disabled: false,
-          to: `/courses/${id}/trails`,
-        },
-        {
-          title: trailStore.trail?.title || '',
-          disabled: false,
-          to: `/courses/${id}/trails/${trailId}`,
-        },
-        {
-          title: t('components.trails.settings.title'),
-          disabled: true,
-          to: `/courses/${id}/trails/${trailId}/settings`,
-        },
-      ];
-    }
-  },
-);
 </script>
 <style scoped lang="scss">
 .w-201 {

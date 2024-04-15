@@ -56,7 +56,7 @@
         <img
           class="emptyProjects-img"
           src="/images/emptyTrails.svg"
-          alt="Empty Projects"
+          :alt="$t('pages.trails.emptyStateText')"
         />
         <p class="text-h3 text-gray-400 mt-4">
           {{ $t('pages.trails.emptyStateText') }}
@@ -193,6 +193,7 @@ const changeItemVisibility = (index: number, id: number) => {
 const { id } = route.params;
 
 const navigate = (trailId: number, page) => {
+  console.log(`navigate to ${page}`, page === 'settings');
   if (page === 'settings') {
     router.push(`/courses/${id}/trails/${trailId}/settings/`);
   } else {
