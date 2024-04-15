@@ -105,7 +105,7 @@
       </div>
     </div>
     <div
-      class="d-flex flex-column gap-4 justify-space-between"
+      class="d-flex flex-column gap-4 justify-space-between overflow-auto"
       data-testid="alex-learningplan-card-content-area"
       :class="{
         'grayscale-2': hide,
@@ -298,6 +298,7 @@ const emits = defineEmits([
 .card {
   min-height: 460px !important;
 }
+
 .grid {
   display: grid;
   align-content: stretch;
