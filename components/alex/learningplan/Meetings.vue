@@ -48,13 +48,16 @@
       </div>
     </template>
   </alex-custom-card>
-  <alex-learningplan-dialogs-alert
+  <alex-custom-confirm-dialog
     v-model="deleteModal"
     variant="error"
     :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
     :title="$t('components.courses.meeting.deleteModal.confirmation')"
     :subtitle="$t('components.courses.meeting.deleteModal.description')"
     :submit-button-text="$t('components.courses.meeting.deleteModal.button')"
+    :cancel-button-text="
+      $t('components.courses.settings.meetings.delete.cancel')
+    "
     no-input-confirmation
     @submit="confirmDelete"
     @cancel="cancelDelete"

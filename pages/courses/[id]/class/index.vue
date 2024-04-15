@@ -46,13 +46,16 @@
         />
       </template>
     </alex-learningplan-class-section-card>
-    <alex-learningplan-dialogs-alert
+    <alex-custom-confirm-dialog
       v-model="dialogConfirmDeleteClass"
       variant="error"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       :title="$t('pages.classes.wantDeleteClass')"
       :subtitle="$t('pages.classes.deleteClassSubtitle')"
       :submit-button-text="$t('pages.classes.delete')"
+      :cancel-button-text="
+        $t('components.courses.settings.meetings.delete.cancel')
+      "
       @cancel="dialogConfirmDeleteClass = false"
       @submit="() => onDeleteClass(removingClassId)"
     />

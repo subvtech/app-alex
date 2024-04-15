@@ -92,6 +92,7 @@
             class="max-w-125"
             :boxes="detailBoxes"
             :loading="loading"
+            hide-divider
           />
         </template>
         <template #footer>
