@@ -1,5 +1,6 @@
 <template>
   <div
+    id="fileset-block"
     class="d-flex flex-wrap ga-2 my-2 drop-area"
     :data-active="fileDrop && !readOnly"
     @dragenter.prevent="
@@ -19,7 +20,6 @@
     "
     @drop.prevent="
       if (!readOnly) {
-        fileDrop = false;
         addFileFromDrop($event);
       }
     "
@@ -115,7 +115,7 @@ type FileType = {
 
 const props = defineProps({
   files: {
-    type: Array as PropType<FileType[]>,
+    type: Array as PropType<FileType[]> | PropType<{ dropFiles: FileList }>,
     default: () => [],
   },
   readOnly: {
@@ -136,6 +136,17 @@ const props = defineProps({
   },
 });
 
+const filesArray = ref<FileType[]>(
+  Array.isArray(props.files) ? [...(props.files as FileType[])] : [],
+);
+const isDownloading = ref<string[]>([]);
+
+onBeforeMount(() => {
+  if (!Array.isArray(props.files) && props.files.dropFiles) {
+    addFile(props.files.dropFiles);
+  }
+});
+
 const formatFileSize = (size: number) => {
   size = size * 1000;
   if (size < 1024) {
@@ -146,9 +157,6 @@ const formatFileSize = (size: number) => {
     return `${(size / (1024 * 1024)).toFixed(2)} MB`;
   }
 };
-
-const filesArray = ref<FileType[]>([...(props.files as FileType[])]);
-const isDownloading = ref<string[]>([]);
 
 const fileBackground: { [key: string]: string } = {
   pdf: 'error-0',
@@ -303,7 +311,7 @@ const deleteFile = (file: FileType) => {
   border-radius: 8px;
   &[data-active='true']:not([readonly]) {
     display: block;
-    background-color: #d1f6fa;
+    background-color: #d1f6fa7e;
   }
 }
 </style>

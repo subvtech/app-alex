@@ -2,9 +2,14 @@
   <client-only>
     <div
       id="editorjs"
-      class="editorjs w-100 pa-0"
+      class="editorjs w-100 pa-0 show-drop-area"
       :is-editing="isEditing"
       v-bind="$attrs"
+      :data-active="fileDrop && isEditing"
+      @dragenter.prevent="handleDragEnter"
+      @dragover.prevent="handleDragEnter"
+      @dragleave.prevent="handleDragLeave"
+      @drop.prevent="handleDrop"
     ></div>
   </client-only>
 </template>
@@ -44,6 +49,7 @@ const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
+const fileDrop = ref(false);
 
 const deletePendingMediaOnSave = async (mediaArray: Array<number>) => {
   if (mediaArray.length > 0) {
@@ -56,6 +62,41 @@ const deletePendingMediaOnSave = async (mediaArray: Array<number>) => {
     );
     mediaToDelete.value = [];
     temporaryMedia.value = [];
+  }
+};
+
+const dropIsTargetEditor = (event: DragEvent) => {
+  const targetElement = event.target as Element;
+  return isEditing && targetElement.id === 'editorjs';
+};
+
+const handleDragEnter = (event: DragEvent) => {
+  if (dropIsTargetEditor(event)) {
+    fileDrop.value = true;
+  }
+};
+
+const handleDragLeave = () => {
+  if (isEditing) {
+    fileDrop.value = false;
+  }
+};
+
+const handleDrop = (event: DragEvent) => {
+  if (dropIsTargetEditor(event)) {
+    fileDrop.value = false;
+    const dropFiles = event.dataTransfer?.files;
+    if (dropFiles?.length === 1 && dropFiles[0].type.startsWith('image')) {
+      console.log('image');
+    } else if (dropFiles) {
+      instance.value.blocks.insert(
+        'fileset',
+        { dropFiles },
+        {},
+        instance.value.blocks.getBlocksCount() + 1,
+        false,
+      );
+    }
   }
 };
 
@@ -318,6 +359,9 @@ onMounted(() => {
           handleDeletedFiles: (id: number) => {
             mediaToDelete.value.push(id);
           },
+          // handleCopyPaste: (file: File) => {
+          //   copyAndPasteFiles.value.push(file);
+          // },
         },
       },
     },
@@ -459,6 +503,15 @@ defineExpose({
     .ce-toolbar__content {
       margin: 0;
     }
+  }
+}
+.show-drop-area {
+  transition: 0.3s ease;
+  border-radius: 4px;
+  border: 2px dashed transparent;
+  &[data-active='true'] {
+    display: block;
+    background-color: #d1f6fa7e;
   }
 }
 </style>

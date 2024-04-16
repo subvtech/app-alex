@@ -100,7 +100,7 @@
         v-else
         class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 780px">
+        <div style="width: 800px">
           <p
             v-show="readOnly && editorData.time"
             style="max-width: 700px"
@@ -515,7 +515,7 @@ window.addEventListener('resize', () => {
   z-index: 1;
 }
 
-@container editor (max-width: 1310px) {
+@container editor (max-width: 1330px) {
   .sections-container {
     opacity: 0;
   }

@@ -20,11 +20,10 @@ interface FilesetConfig {
 }
 
 class FilesetBlock {
-  data: Array<FilesetBlockData>;
+  data: Array<FilesetBlockData> | { dropFiles: FileList };
   readOnly: boolean;
   config: FilesetConfig;
   wrapper: HTMLDivElement = document.createElement('div');
-  // pendingFiles: File[] = [];
   static get toolbox() {
     return {
       title: 'Fileset',
@@ -32,27 +31,21 @@ class FilesetBlock {
     };
   }
 
-  // static get pasteConfig() {
-  //   return {
-  //     tags: ['fileset'],
-  //     files: {
-  //       mimeTypes: ['image/*', 'video/*', 'audio/*', 'application/*'],
-  //     },
-  //   };
-  // }
-
   constructor({
     data,
     readOnly,
     config,
   }: BlockToolConstructorOptions<FilesetBlockData[], FilesetConfig>) {
-    this.data = Array.isArray(data) ? data : [];
+    this.data = data;
     this.readOnly = readOnly;
     this.config = config as FilesetConfig;
   }
 
   render() {
     this.wrapper = document.createElement('div');
+    this.wrapper.addEventListener('drop', (event) => {
+      event.preventDefault();
+    });
     const app = createApp(Fileset, {
       files: this.data,
       readOnly: this.readOnly,
@@ -87,24 +80,6 @@ class FilesetBlock {
     }
     return false;
   }
-
-  // onPaste(event) {
-  //   console.log(event);
-  //   const { file } = event.detail;
-
-  //   this.pendingFiles.push(file);
-
-  //   setTimeout(() => {
-  //     if (this.pendingFiles[this.pendingFiles.length - 1] === file) {
-  //       this.config.uploadFiles(new FileList(this.pendingFiles)).then((res) => {
-  //         if (res.success) {
-  //           this.data = res.files;
-  //           this.pendingFiles = [];
-  //         }
-  //       });
-  //     }
-  //   }, 100);
-  // }
 }
 
 export default FilesetBlock;
