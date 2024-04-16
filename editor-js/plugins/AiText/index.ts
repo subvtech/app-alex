@@ -1,81 +1,86 @@
+import Paragraph from '@editorjs/paragraph';
 import { createApp } from 'vue';
-import { createVuetify } from 'vuetify';
-import { mdi } from 'vuetify/iconsets/mdi';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
-import { alexIcons } from 'assets/icons';
 import {
-  TAITextApi,
   TAITextCSS,
   TAITextCallback,
   TAITextConstructor,
   TAITextData,
-  TAITextElement,
-  TAITextReadOnly,
+  TAITextApi,
 } from './aitext';
 import AiText from './AiText.vue';
-
-const vuetify = createVuetify({
-  components,
-  directives,
-  defaults,
-  theme: {
-    defaultTheme: MAIN_THEME,
-    themes: {
-      mainTheme,
-      mainDarkTheme,
-    },
-  },
-  icons: {
-    defaultSet: 'mdi',
-    sets: {
-      mdi,
-      alex: alexIcons,
-    },
-  },
-});
-
-class AIText {
+import { vuetify } from '@/plugins/vuetify';
+class AIText extends Paragraph {
   private callback: TAITextCallback;
-  private _element: TAITextElement = null;
   private _CSS: TAITextCSS;
-  private _data: TAITextData;
   private _placeholder: string = 'Peça para a IA escrever algo...';
-  private readOnly: TAITextReadOnly = false;
-  private api: TAITextApi;
-  static get toolbox() {
-    return {
-      title: 'AI TEXT',
-      icon: `<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 4V20M17 12V20M6 20H10M15 20H19M13 7V4H3V7M21 14V12H13V14" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>`,
-    };
-  }
-
+  private _element: HTMLElement | null;
+  private _data: TAITextData;
+  private _readOnly: boolean;
+  private _api: TAITextApi;
+  private _ceID: string;
+  private DEFAULT_PARAGRAPH_CSS: string = 'ce-paragraph';
   constructor({ api, config, data, readOnly }: TAITextConstructor) {
-    this.api = api;
-    this.readOnly = readOnly;
-    this._CSS = {
-      block: 'block',
-      wrapper: 'ce-ia-text',
-    };
-
-    this._placeholder = config.placeholder || this._placeholder;
-    this._data = data ?? {};
-    this._element = null;
-
+    super({
+      data,
+      config,
+      api,
+      readOnly,
+    });
     if (!config.callback) {
       throw new Error('Callback function is required!');
     }
-
+    this._CSS = {
+      block: api.styles.block,
+      wrapper: 'ce-ia-text',
+    };
+    this._element = null;
+    this._placeholder = config.placeholder || this._placeholder;
     this.callback = config.callback;
+    this._data = data ?? { text: '' };
+    this._readOnly = readOnly;
+    this._api = api;
+    this._ceID = `ce-ia-text-${api.blocks.getCurrentBlockIndex()}`;
   }
 
-  drawView() {
-    const wrapper = document.createElement('div');
+  toggleContentEditable(value: boolean) {
+    const element = document.getElementById('ce-ia-text');
+    if (!element) return;
+    element.contentEditable = value ? 'true' : 'false';
+    this._element = element;
+  }
+
+  convertToParagraph() {
+    const iaTextGenerated =
+      document.querySelector('.ia-text-generated')?.textContent;
+    if (!iaTextGenerated || !this._element) return;
+    const inputWrapper = document.querySelector('.ce-ia-wrapper');
+    if (!inputWrapper) return;
+    this._data = { text: iaTextGenerated };
+    inputWrapper.remove();
+    this._element = this.renderParagraph(this._element, iaTextGenerated);
+  }
+
+  renderParagraph(wrapper: HTMLElement, text: string) {
+    wrapper.innerHTML = text;
+    wrapper.classList.add(this.DEFAULT_PARAGRAPH_CSS);
+    wrapper.contentEditable = !this._readOnly ? 'true' : 'false';
+    return wrapper;
+  }
+
+  renderIaInput(wrapper: HTMLDivElement) {
     const app = createApp(AiText, {
       placeholder: this._placeholder,
-      onSend: (text: string) => this.callback(text),
+      onSend: async (text: string) => {
+        const response = await this.callback(text);
+        if (!response) {
+          return;
+        }
+        this._data = { text: response };
+        return response;
+      },
+      onCancel: () => {
+        this.convertToParagraph();
+      },
     });
     app.use(vuetify);
     app.use(i18n);
@@ -88,12 +93,29 @@ class AIText {
     return this._element;
   }
 
-  save() {
-    return this._data;
+  drawView() {
+    const wrapper = document.createElement('div');
+    wrapper.id = this._ceID;
+    wrapper.classList.add(this._CSS.wrapper, this._CSS.block);
+    if (this._data.text) {
+      this.renderParagraph(wrapper, this._data.text);
+      return wrapper;
+    }
+    this.renderIaInput(wrapper);
+    return wrapper;
   }
 
   static get isReadOnlySupported() {
     return true;
+  }
+
+  static get toolbox() {
+    return {
+      title: 'AI TEXT',
+      icon: `<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 4V20M17 12V20M6 20H10M15 20H19M13 7V4H3V7M21 14V12H13V14" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+    };
   }
 }
 

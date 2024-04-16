@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper d-flex flex-column">
+    <ai-text />
     <alex-custom-header
       class="mb-6 mt-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
@@ -232,6 +233,7 @@
 </template>
 
 <script setup lang="ts">
+import aiText from '@/editor-js/plugins/AiText';
 definePageMeta({
   middleware: 'auth',
 });
