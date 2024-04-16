@@ -50,8 +50,8 @@ class AIText extends Paragraph {
   }
 
   convertToParagraph() {
-    const iaTextGenerated =
-      document.querySelector('.ia-text-generated')?.textContent;
+    const iaTextGenerated = document.querySelector('.ia-text-generated.active')
+      ?.textContent;
     if (!iaTextGenerated || !this._element) return;
     const inputWrapper = document.querySelector('.ce-ia-wrapper');
     if (!inputWrapper) return;
@@ -70,17 +70,9 @@ class AIText extends Paragraph {
   renderIaInput(wrapper: HTMLDivElement) {
     const app = createApp(AiText, {
       placeholder: this._placeholder,
-      onSend: async (text: string) => {
-        const response = await this.callback(text);
-        if (!response) {
-          return;
-        }
-        this._data = { text: response };
-        return response;
-      },
-      onCancel: () => {
-        this.convertToParagraph();
-      },
+      onSend: (text: string) => this.getIaCompletition(text),
+      onCancel: () => this.convertToParagraph(),
+      onSave: () => this.convertToParagraph(),
     });
     app.use(vuetify);
     app.use(i18n);
@@ -103,6 +95,15 @@ class AIText extends Paragraph {
     }
     this.renderIaInput(wrapper);
     return wrapper;
+  }
+
+  async getIaCompletition(text: string) {
+    const response = await this.callback(text);
+    if (!response) {
+      return;
+    }
+    this._data = { text: response };
+    return response;
   }
 
   static get isReadOnlySupported() {

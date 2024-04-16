@@ -1,10 +1,32 @@
 <template>
   <div class="ce-ia-wrapper">
     <div
-      v-if="generatedText"
-      class="ia-text-generated bg-gray-blue pa-4 rounded-lg text-gray-800"
+      v-if="answers.length"
+      class="ia-container-answer bg-gray-blue pa-4 rounded-lg text-gray-800"
     >
-      {{ generatedText }}
+      <v-window v-model="activeAnswer" class="flex-grow-1">
+        <v-window-item v-for="(answer, i) in answers" :key="i">
+          <p class="ia-text-generated" :class="{ active: i === activeAnswer }">
+            {{ answer }}
+          </p>
+        </v-window-item>
+      </v-window>
+      <div v-if="answers.length > 1" class="w-100 d-flex gap-1 align-center">
+        <alex-custom-button
+          variant="text"
+          class="ml-auto"
+          icon="mdi-chevron-left"
+          :disabled="activeAnswer === 0"
+          @click="prevAnswer"
+        />
+        <span class="h-fit">{{ activeAnswer + 1 }}/{{ answers.length }}</span>
+        <alex-custom-button
+          variant="text"
+          icon="mdi-chevron-right"
+          :disabled="activeAnswer === answers.length - 1"
+          @click="nextAnswer"
+        />
+      </div>
     </div>
     <alex-inputs-text-field
       v-model="text"
@@ -24,7 +46,7 @@
           variant="secondary"
           size="small"
           :class="{ 'is-generating-button': !isGenerating }"
-          @click="onCancelBind"
+          @click="onCancel"
         />
         <v-icon
           class="send-button"
@@ -38,7 +60,7 @@
         >
       </template>
     </alex-inputs-text-field>
-    <div v-if="generatedText && !isGenerating" class="ia-text-controls">
+    <div v-if="answers.length && !isGenerating" class="ia-text-controls">
       <alex-custom-button
         text="Cancelar"
         prepend-icon="mdi-close"
@@ -51,7 +73,7 @@
         prepend-icon="mdi-replay"
         variant="secondary"
         size="small"
-        @click="reSend"
+        @click="onReSend"
       />
       <alex-custom-button
         text="Aceitar resposta"
@@ -70,38 +92,57 @@ interface IaTextProps {
   onSend: (content: string) => Promise<string>;
   onCancel: () => void;
   onSave?: () => void;
-  reSend?: () => Promise<string>;
 }
 defineEmits(['cancel']);
 const text = ref<null | string>(null);
 const isGenerating = ref(false);
-const generatedText = ref<null | string>(null);
+const answers = ref<string[]>([]);
+const activeAnswer = ref(0);
+const firstValue = ref<string | null>(null);
 const props = withDefaults(defineProps<IaTextProps>(), {
   placeholder: 'Peça para a IA escrever algo...',
-  reSend: undefined,
   onSave: undefined,
 });
-const getAICompletion = async () => {
-  if (!text.value) return;
+const onReSend = async () => {
   isGenerating.value = true;
-  const oldValue = text.value;
-  text.value = 'A IA está pensando...';
   try {
-    const response = await props.onSend(oldValue);
-    generatedText.value = response;
-    text.value = oldValue;
+    if (!firstValue.value) return;
+    const response = await props.onSend(firstValue.value);
+    answers.value = [...answers.value, response];
   } catch (error) {
   } finally {
     isGenerating.value = false;
   }
 };
+const getAICompletion = async () => {
+  if (!text.value) return;
+  isGenerating.value = true;
+  firstValue.value = text.value;
+  text.value = 'A IA está pensando...';
+  try {
+    const response = await props.onSend(firstValue.value);
+    answers.value = [...answers.value, response];
+    text.value = firstValue.value;
+  } catch (error) {
+  } finally {
+    isGenerating.value = false;
+  }
+};
+const nextAnswer = () => {
+  const nextAnswerValue = activeAnswer.value + 1;
+  if (nextAnswerValue < answers.value.length) {
+    activeAnswer.value = nextAnswerValue;
+  }
+};
+const prevAnswer = () => {
+  const nextAnswerValue = activeAnswer.value - 1;
+  if (nextAnswerValue > -1) {
+    activeAnswer.value = nextAnswerValue;
+  }
+};
 const isGeneratingColor = {
   color: AlexThemeColors['secondary-0'],
   outline: AlexThemeColors['secondary-0'],
-};
-const onCancelBind = () => {
-  if (!generatedText.value) return;
-  props.onCancel();
 };
 </script>
 
@@ -140,5 +181,13 @@ const onCancelBind = () => {
 }
 :global(.ce-ia-text[contenteditable='true']) {
   outline: 0px solid transparent;
+}
+.ia-container-answer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+}
+.h-fit {
+  height: fit-content;
 }
 </style>
