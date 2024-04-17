@@ -42,7 +42,7 @@ const route = useRoute();
 const { trailId, id } = route.params;
 const trailStore = useTrailStore();
 
-useHeaderTrails();
+useHeaderTrails('settings', 'components.trails.settings.title');
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(parseInt(trailId.toString()));

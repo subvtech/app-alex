@@ -154,18 +154,14 @@ import { ref, onMounted } from 'vue';
 const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
-
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailStore = useTrailStore();
 const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-
-useHeaderTrails();
+useHeaderTrails('');
 const learningPlanStore = useLearningPlanStore();
 
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
-const trailStore = useTrailStore();
 
 const saveLoading = ref(false);
 const readOnly = ref(true);

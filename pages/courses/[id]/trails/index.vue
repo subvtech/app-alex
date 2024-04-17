@@ -193,12 +193,11 @@ const changeItemVisibility = (index: number, id: number) => {
 const { id } = route.params;
 
 const navigate = (trailId: number, page) => {
-  console.log(`navigate to ${page}`, page === 'settings');
-  if (page === 'settings') {
-    router.push(`/courses/${id}/trails/${trailId}/settings/`);
-  } else {
-    router.push(`/courses/${id}/trails/${trailId}/`);
-  }
+  const isSettingsPage = page === 'settings';
+
+  navigateTo(
+    `/courses/${id}/trails/${trailId}${isSettingsPage ? '/settings' : ''}/`,
+  );
 };
 
 const handleCreatedTrail = async (id) => {

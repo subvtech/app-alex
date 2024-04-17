@@ -1,44 +1,49 @@
-const headerStore = usePageHeaderStore();
-const trailStore = useTrailStore();
-const learningPlanStore = useLearningPlanStore();
-const { t } = useI18n();
-
-export const useHeaderTrails = () => {
+export const useHeaderTrails = (currentPageRoute, currentPageTitle = '') => {
   const route = useRoute();
+  const headerStore = usePageHeaderStore();
+  const trailStore = useTrailStore();
+  const learningPlanStore = useLearningPlanStore();
+  const { t } = useI18n();
+
   const { trailId, id } = route.params;
   onBeforeMount(() => {
     headerStore.showHeader = true;
   });
 
-  const headerItems = computed(() => {
-    if (!learningPlanStore.loading || !trailStore.loading) return [];
+  watch(
+    () => [learningPlanStore.loading || trailStore.loading],
+    () => {
+      if (learningPlanStore.loading || trailStore.loading) return [];
 
-    return [
-      {
-        title: learningPlanStore.learningPlan?.title || '',
-        disabled: false,
-        to: `/courses/${id}`,
-      },
-      {
-        title: t('pages.courses.trails'),
-        disabled: false,
-        to: `/courses/${id}/trails`,
-      },
-      {
-        title: trailStore.trail?.title || '',
-        disabled: false,
-        to: `/courses/${id}/trails/${trailId}`,
-      },
-      {
-        title: t('components.trails.settings.title'),
-        disabled: true,
-        to: `/courses/${id}/trails/${trailId}/settings`,
-      },
-    ];
-  });
+      const items = [
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          disabled: false,
+          to: `/courses/${id}`,
+        },
+        {
+          title: t('pages.courses.trails'),
+          disabled: false,
+          to: `/courses/${id}/trails`,
+        },
+        {
+          title: trailStore.trail?.title || '',
+          disabled: !currentPageRoute,
+          to: `/courses/${id}/trails/${trailId}`,
+        },
+      ];
 
+      if (currentPageRoute)
+        items.push({
+          title: t(currentPageTitle),
+          disabled: true,
+          to: `/courses/${id}/trails/${trailId}/${currentPageRoute}`,
+        });
+      headerStore.items = items;
+    },
+    { deep: true },
+  );
   headerStore.title = t('components.trails.header.breadcrumbs.title');
-  headerStore.items = headerItems.value;
 
   return {};
 };
