@@ -17,7 +17,6 @@ class AIText extends Paragraph {
   private _data: TAITextData;
   private _readOnly: boolean;
   private _api: TAITextApi;
-  private _ceID: string;
   private DEFAULT_PARAGRAPH_CSS: string = 'ce-paragraph';
   constructor({ api, config, data, readOnly }: TAITextConstructor) {
     super({
@@ -39,35 +38,28 @@ class AIText extends Paragraph {
     this._data = data ?? { text: '' };
     this._readOnly = readOnly;
     this._api = api;
-    this._ceID = `ce-ia-text-${api.blocks.getCurrentBlockIndex()}`;
   }
 
-  toggleContentEditable(value: boolean) {
-    const element = document.getElementById('ce-ia-text');
-    if (!element) return;
-    element.contentEditable = value ? 'true' : 'false';
-    this._element = element;
-  }
-
-  convertToParagraph() {
-    const iaTextGenerated = document.querySelector('.ia-text-generated.active')
-      ?.textContent;
-    if (!iaTextGenerated || !this._element) return;
-    const inputWrapper = document.querySelector('.ce-ia-wrapper');
-    if (!inputWrapper) return;
+  private convertToParagraph() {
+    if (!this._element) return;
+    const iaTextGenerated = this._element.querySelector(
+      '.ia-text-generated.active',
+    )?.textContent;
+    const inputWrapper = this._element.querySelector('.ce-ia-wrapper');
+    if (!iaTextGenerated || !inputWrapper) return;
     this._data = { text: iaTextGenerated };
     inputWrapper.remove();
     this._element = this.renderParagraph(this._element, iaTextGenerated);
   }
 
-  renderParagraph(wrapper: HTMLElement, text: string) {
+  private renderParagraph(wrapper: HTMLElement, text: string) {
     wrapper.innerHTML = text;
     wrapper.classList.add(this.DEFAULT_PARAGRAPH_CSS);
     wrapper.contentEditable = !this._readOnly ? 'true' : 'false';
     return wrapper;
   }
 
-  renderIaInput(wrapper: HTMLDivElement) {
+  private renderIaInput(wrapper: HTMLDivElement) {
     const app = createApp(AiText, {
       placeholder: this._placeholder,
       onSend: (text: string) => this.getIaCompletition(text),
@@ -87,7 +79,6 @@ class AIText extends Paragraph {
 
   drawView() {
     const wrapper = document.createElement('div');
-    wrapper.id = this._ceID;
     wrapper.classList.add(this._CSS.wrapper, this._CSS.block);
     if (this._data.text) {
       this.renderParagraph(wrapper, this._data.text);
@@ -112,10 +103,8 @@ class AIText extends Paragraph {
 
   static get toolbox() {
     return {
-      title: 'AI TEXT',
-      icon: `<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 4V20M17 12V20M6 20H10M15 20H19M13 7V4H3V7M21 14V12H13V14" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>`,
+      title: 'AI Text',
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>creation</title><path d="M19,1L17.74,3.75L15,5L17.74,6.26L19,9L20.25,6.26L23,5L20.25,3.75M9,4L6.5,9.5L1,12L6.5,14.5L9,20L11.5,14.5L17,12L11.5,9.5M19,15L17.74,17.74L15,19L17.74,20.25L19,23L20.25,20.25L23,19L20.25,17.74" /></svg>`,
     };
   }
 }

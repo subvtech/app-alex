@@ -32,7 +32,7 @@
       v-model="text"
       name="ia-text"
       hide-details
-      prepend-inner-icon="mdi-lightbulb-on"
+      :prepend-inner-icon="isGenerating ? 'mdi-robot-love' : 'mdi-robot'"
       class="w-100"
       :class="{ 'is-generating': isGenerating }"
       :readonly="isGenerating"
@@ -189,5 +189,9 @@ const isGeneratingColor = {
 }
 .h-fit {
   height: fit-content;
+}
+
+:deep(.is-generating .v-field--dirty > .v-field__field > .v-field__input) {
+  color: v-bind('isGeneratingColor.color') !important;
 }
 </style>
