@@ -66,8 +66,8 @@
       >
         <span class="text-body-2 text-uppercase">{{ file.extension }}</span>
       </div>
-      <div class="ma-3 d-flex ga-3 w-100">
-        <div class="w-100 d-flex flex-column">
+      <div class="d-flex ga-3 w-100 pa-3">
+        <div class="d-flex flex-column">
           <span class="text-body-2 text-gray-900 ellipsis lines-1 width-28">{{
             file.title
           }}</span>
@@ -81,6 +81,7 @@
             color="error-0"
             variant="text"
             icon="mdi-trash-can-outline"
+            size="small"
             @click="() => deleteFile(file)"
           >
           </v-btn>
@@ -88,10 +89,10 @@
             v-else
             :loading="isDownloading.includes(file.id)"
             variant="text"
-            icon="mdi"
+            size="small"
+            icon="mdi-cloud-download-outline"
             @click="downloadFile(file.url, file.title, file.id)"
           >
-            <v-icon icon="mdi-cloud-download-outline" size="20" />
           </v-btn>
         </div>
       </div>
@@ -202,7 +203,7 @@ const fileBackground: { [key: string]: string } = {
 };
 
 const setFileBackground = (extension: string) => {
-  return fileBackground[extension.toLocaleLowerCase()] || 'gray';
+  return fileBackground[extension.toLocaleLowerCase()] || 'gray-blue';
 };
 
 const downloadFile = (url: string, title: string, id: string) => {

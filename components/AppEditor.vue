@@ -17,7 +17,6 @@
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
 import Delimiter from '@editorjs/delimiter';
-import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
 import InlineCode from '@editorjs/inline-code';
 import Link from '@editorjs/link';
@@ -38,7 +37,8 @@ import AIText from '@alkhipce/editorjs-aitext';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
-import Fileset from '../editor-js/plugins/fileset/FilesetBlock';
+import Fileset from '../editor-js/plugins/fileset/filesetBlock';
+import CustomImage from '../editor-js/plugins/image/ImageBlock';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
@@ -87,7 +87,8 @@ const handleDrop = (event: DragEvent) => {
     fileDrop.value = false;
     const dropFiles = event.dataTransfer?.files;
     if (dropFiles?.length === 1 && dropFiles[0].type.startsWith('image')) {
-      console.log('image');
+      instance.value.blocks.insert('image', { file: dropFiles });
+
     } else if (dropFiles) {
       instance.value.blocks.insert(
         'fileset',
@@ -96,6 +97,16 @@ const handleDrop = (event: DragEvent) => {
         instance.value.blocks.getBlocksCount() + 1,
         false,
       );
+      setTimeout(() => {
+        instance.value.blocks.insert(
+          'paragraph',
+          {},
+          {},
+          instance.value.blocks.getBlocksCount() + 1,
+          true,
+        );
+        instance.value.caret.setToLastBlock('start', 0);
+      }, 0);
     }
   }
 };
@@ -116,7 +127,7 @@ onMounted(() => {
         },
       },
       image: {
-        class: Image,
+        class: CustomImage,
         config: {
           uploader: {
             uploadByFile: (file) => {
@@ -139,7 +150,7 @@ onMounted(() => {
           },
         },
       },
-      imageUrl: ImageUrl,
+      /* imageUrl: ImageUrl, */
       aiText: {
         class: AIText,
         config: {
@@ -359,9 +370,6 @@ onMounted(() => {
           handleDeletedFiles: (id: number) => {
             mediaToDelete.value.push(id);
           },
-          // handleCopyPaste: (file: File) => {
-          //   copyAndPasteFiles.value.push(file);
-          // },
         },
       },
     },
