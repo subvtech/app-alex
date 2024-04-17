@@ -240,17 +240,18 @@
 definePageMeta({
   middleware: 'auth',
 });
+const { find } = useStrapiUtils();
+const { update } = useStrapi();
+const learningPlanStore = useLearningPlanStore();
+const { t } = useI18n();
 
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
 const isLoading = ref(false);
-const { t } = useI18n();
-
-const { find } = useStrapiUtils();
-const { update } = useStrapi();
 const createCourseDialog = ref(false);
+
 interface LearningPlan {
   id?: number;
   description: string;
@@ -336,19 +337,19 @@ const getCourses = async () => {
     const facilitator = course.members.find(
       (m) => m.role === MemberRoles.FACILITATOR,
     )?.user;
-
+    course.userIsFacilitator = facilitator?.id === user.value.id;
     const tags = course.tags?.map((tag) => tag);
     const trails =
       course.learning_structures?.find(
         (structure) => structure.type === 'standard',
-      )?.trails?.length || 0;
-
+      )?.trails || [];
     course.facilitatorImage = facilitator?.avatar?.url;
     course.facilitatorName = facilitator?.fullname;
     course.institution = facilitator?.institutions?.[0]?.name;
     course.tags = tags;
-    course.trails = trails;
-    course.userIsFacilitator = facilitator?.id === user.value.id;
+    course.trails = course.userIsFacilitator
+      ? trails.length
+      : trails.filter((trail) => !trail.hidden).length;
 
     courses.value.push(course);
   });
