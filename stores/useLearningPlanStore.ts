@@ -106,12 +106,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const standardTrails = computed(() => {
-    return (
+    const trails =
       learningPlan.value?.learning_structures.filter(
         (structure) =>
           structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? []
-    );
+      )[0].trails ?? [];
+
+    if (userIsFacilitator.value) return trails;
+    else return trails.filter((trail) => !trail.hidden);
   });
 
   const standardTrailsCount = computed(() => {
