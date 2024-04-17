@@ -16,10 +16,9 @@ class AIText extends Paragraph {
   private _placeholder: string = 'Peça para a IA escrever algo...';
   private _element: HTMLElement | null;
   private _data: TAITextData;
-  private _readOnly: boolean;
   private _api: TAITextApi;
   private openAI: OpenAI;
-  private DEFAULT_PARAGRAPH_CSS: string = 'ce-paragraph';
+  private controller: AbortController;
   constructor({ api, config, data, readOnly }: TAITextConstructor) {
     super({
       data,
@@ -35,14 +34,17 @@ class AIText extends Paragraph {
     this._placeholder = config.placeholder || this._placeholder;
     this.callback = config.callback;
     this._data = data ?? { text: '' };
-    this._readOnly = readOnly;
     this._api = api;
+    this.controller = new AbortController();
     this.openAI = new OpenAI({
       apiKey: config.openAiKey,
       dangerouslyAllowBrowser: true,
     });
     if (!this.openAI) {
       throw new OpenAIError('failed to initialize openai connection');
+    }
+    if (!this.controller) {
+      throw new Error('Error to start AbortController');
     }
   }
 
@@ -55,10 +57,10 @@ class AIText extends Paragraph {
     if (!iaTextGenerated || !inputWrapper) return;
     this._data = { text: iaTextGenerated };
     inputWrapper.remove();
-    this._element = this.renderParagraph(this._element, iaTextGenerated);
+    this._element = this.renderParagraphs(this._element, iaTextGenerated);
   }
 
-  private renderParagraph(
+  private renderParagraphs(
     wrapper: HTMLElement,
     text: string,
     deleteBlock: boolean = true,
@@ -98,6 +100,9 @@ class AIText extends Paragraph {
       onSend: (text: string) => this.getIaCompletition(text),
       onCancel: () => this.convertToParagraph(),
       onSave: () => this.convertToParagraph(),
+      onStop: () => {
+        this.controller.abort();
+      },
     });
     app.use(vuetify);
     app.use(i18n);
@@ -114,7 +119,7 @@ class AIText extends Paragraph {
     const wrapper = document.createElement('div');
     wrapper.classList.add(this._CSS.wrapper, this._CSS.block);
     if (this._data.text) {
-      this.renderParagraph(wrapper, this._data.text, false);
+      this.renderParagraphs(wrapper, this._data.text, false);
       return wrapper;
     }
     this.renderIaInput(wrapper);
@@ -122,10 +127,13 @@ class AIText extends Paragraph {
   }
 
   async getIaCompletition(text: string) {
-    const response = await this.openAI.chat.completions.create({
-      messages: [{ role: 'user', content: text }],
-      model: 'gpt-3.5-turbo',
-    });
+    const response = await this.openAI.chat.completions.create(
+      {
+        messages: [{ role: 'user', content: text }],
+        model: 'gpt-3.5-turbo',
+      },
+      { signal: this.controller.signal },
+    );
     if (!response) {
       return;
     }

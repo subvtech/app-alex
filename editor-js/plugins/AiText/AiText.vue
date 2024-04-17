@@ -46,7 +46,7 @@
           variant="secondary"
           size="small"
           :class="{ 'is-generating-button': !isGenerating }"
-          @click="onCancel"
+          @click="onStopGetting"
         />
         <v-icon
           class="send-button"
@@ -91,6 +91,7 @@ interface IaTextProps {
   placeholder?: string;
   onSend: (content: string) => Promise<string[]>;
   onCancel: () => void;
+  onStop: () => void;
   onSave?: () => void;
 }
 defineEmits(['cancel']);
@@ -139,6 +140,10 @@ const prevAnswer = () => {
   if (nextAnswerValue > -1) {
     activeAnswer.value = nextAnswerValue;
   }
+};
+const onStopGetting = () => {
+  props.onStop();
+  text.value = null;
 };
 const isGeneratingColor = {
   color: AlexThemeColors['secondary-0'],
