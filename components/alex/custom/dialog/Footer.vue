@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-interface HeaderProps {
+interface FooterProps {
   mainButtonText?: string;
   secondaryButtonText?: string;
   noMainButton?: boolean;
@@ -51,7 +51,7 @@ interface HeaderProps {
     | 'space-evenly'
     | 'stretch';
 }
-withDefaults(defineProps<HeaderProps>(), {
+withDefaults(defineProps<FooterProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
   noMainButton: false,
