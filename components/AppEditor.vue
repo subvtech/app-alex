@@ -30,7 +30,6 @@ import Code from '@editorjs/code';
 import Alert from 'editorjs-alert';
 import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
-import Attaches from '@editorjs/attaches';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
 import AIText from '@alkhipce/editorjs-aitext';
@@ -88,7 +87,6 @@ const handleDrop = (event: DragEvent) => {
     const dropFiles = event.dataTransfer?.files;
     if (dropFiles?.length === 1 && dropFiles[0].type.startsWith('image')) {
       instance.value.blocks.insert('image', { file: dropFiles });
-
     } else if (dropFiles) {
       instance.value.blocks.insert(
         'fileset',
@@ -97,16 +95,14 @@ const handleDrop = (event: DragEvent) => {
         instance.value.blocks.getBlocksCount() + 1,
         false,
       );
-      setTimeout(() => {
-        instance.value.blocks.insert(
-          'paragraph',
-          {},
-          {},
-          instance.value.blocks.getBlocksCount() + 1,
-          true,
-        );
-        instance.value.caret.setToLastBlock('start', 0);
-      }, 0);
+      instance.value.blocks.insert(
+        'paragraph',
+        {},
+        {},
+        instance.value.blocks.getBlocksCount() + 1,
+        true,
+      );
+      instance.value.caret.setToLastBlock('start', 0);
     }
   }
 };
@@ -241,39 +237,6 @@ onMounted(() => {
         config: {
           titlePlaceholder: 'Título',
           messagePlaceholder: 'Mensagem',
-        },
-      },
-      attaches: {
-        class: Attaches,
-        config: {
-          uploader: {
-            uploadByFile: (file) => {
-              const formData = new FormData();
-
-              formData.append('files', file, file.name);
-
-              return strapiClient<Upload>('/upload', {
-                method: 'POST',
-                body: formData,
-              })
-                .then((res) => {
-                  const data = res[0];
-                  return {
-                    success: 1,
-                    file: {
-                      url: data.url,
-                      title: data.name,
-                      extension: data.ext.slice(1),
-                    },
-                  };
-                })
-                .catch((err) => {
-                  return { success: 0, file: { error: err } };
-                });
-            },
-          },
-          buttonText: 'Selecionar arquivo',
-          errorMessage: 'Erro no upload do arquivo',
         },
       },
       carousel: {
