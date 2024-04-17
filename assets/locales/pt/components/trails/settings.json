@@ -13,18 +13,28 @@
   },
   "general": {
     "title": "Informações Gerais",
-    "trailTitle": "Nome da trilha",
+    "name": "Nome da trilha",
     "description": "Descrição da trilha",
     "cancel": "Cancelar",
     "save": "Salvar alterações",
     "update": "Informações gerais atualizadas com sucesso"
   },
-  "visibilityTitle": "Visibilidade da trilha",
-  "showtrailTitle": "Mostrar trilha (Público)",
-  "showtrailHint": "Torna a trilha pública, permitindo que qualquer participante do curso possa vê-la.",
-  "hidetrailTitle": "Ocultar trilha (Privado)",
-  "hidetrailHint": "Torna a trilha privada, garantindo que somente seu criador tenha acesso a ela.",
-  "visibilityUpdate": "Visibilidade da trilha atualizada com sucesso",
+  "visibility": {
+    "title": "Visibilidade da trilha",
+    "show": {
+      "title": "Mostrar trilha (Público)",
+      "hint": "Torna a trilha pública, permitindo que qualquer participante do curso possa vê-la."
+    },
+    "hide": {
+      "title": "Ocultar trilha (Privado)",
+      "hint": "Torna a trilha privada, garantindo que somente seu criador tenha acesso a ela."
+    },
+
+    "cancel": "Cancelar",
+    "save": "Salvar alterações",
+    "update": "Visibilidade da trilha atualizada com sucesso"
+  },
+
   "delete": {
     "title": "Excluir trilha",
     "imgAlt": "Imagem de atenção",

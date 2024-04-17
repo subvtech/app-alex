@@ -62,6 +62,7 @@
         </alex-custom-button>
       </div>
     </div>
+
     <div class="d-flex flex-column gap-6 mt-6">
       <alex-inputs-text-field
         v-model="titleField.value.value"
@@ -175,8 +176,8 @@ const createTrail = async () => {
   } finally {
     fileInputRef.value = null;
     image.value = null;
-    isLoading.value = false;
   }
+  isLoading.value = false;
 };
 
 const disableSave = computed(() => {

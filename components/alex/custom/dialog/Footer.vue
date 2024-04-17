@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-interface HeaderProps {
+interface FooterProps {
   mainButtonText?: string;
   mainButtonIcon?: string;
   secondaryButtonText?: string;
@@ -54,7 +54,7 @@ interface HeaderProps {
     | 'stretch';
 }
 
-withDefaults(defineProps<HeaderProps>(), {
+withDefaults(defineProps<FooterProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
   mainButtonIcon: undefined,

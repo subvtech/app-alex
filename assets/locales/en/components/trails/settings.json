@@ -2,6 +2,7 @@
   "title": "Settings",
   "formats": "Supported Formats: .jpeg, .png, .wav, .mp4, .jpg;",
   "update": "Trail successfully updated",
+
   "cover": {
     "add": "Add Videos or Photos",
     "title": "Trail Cover",
@@ -13,18 +14,28 @@
   },
   "general": {
     "title": "General Information",
-    "trailTitle": "Trail name",
+    "name": "Trail name",
     "description": "Trail description",
     "cancel": "Cancel",
     "save": "Save Changes",
     "update": "General information successfully updated"
   },
-  "visibilityTitle": "Trail visibility",
-  "showtrailTitle": "Show trail (Public)",
-  "showtrailHint": "Makes the trail public, allowing any course member to see it.",
-  "hidetrailTitle": "Hide trail (Private)",
-  "hidetrailHint": "Makes the trail private, ensuring only its creator can see the trail.",
-  "visibilityUpdate": "Trail visibility successfully updated",
+  "visibility": {
+    "title": "Trail visibility",
+    "show": {
+      "title": "Show trail (Public)",
+      "hint": "Makes the trail public, allowing any course member to see it."
+    },
+    "hide": {
+      "title": "Hide trail (Private)",
+      "hint": "Makes the trail private, ensuring only its creator can see the trail."
+    },
+    "cancel": "Cancel",
+    "save": "Save Changes",
+   
+    "update": "Trail visibility successfully updated"
+  },
+
   "delete": {
     "title": "Delete trail",
     "imgAlt": "Attention image",
