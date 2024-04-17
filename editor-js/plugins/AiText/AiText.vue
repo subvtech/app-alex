@@ -89,7 +89,7 @@
 import { AlexThemeColors } from '@/config/themes';
 interface IaTextProps {
   placeholder?: string;
-  onSend: (content: string) => Promise<string>;
+  onSend: (content: string) => Promise<string[]>;
   onCancel: () => void;
   onSave?: () => void;
 }
@@ -108,7 +108,7 @@ const onReSend = async () => {
   try {
     if (!firstValue.value) return;
     const response = await props.onSend(firstValue.value);
-    answers.value = [...answers.value, response];
+    answers.value = [...answers.value, ...response];
   } catch (error) {
   } finally {
     isGenerating.value = false;
@@ -121,7 +121,7 @@ const getAICompletion = async () => {
   text.value = 'A IA está pensando...';
   try {
     const response = await props.onSend(firstValue.value);
-    answers.value = [...answers.value, response];
+    answers.value = [...answers.value, ...response];
     text.value = firstValue.value;
   } catch (error) {
   } finally {
@@ -193,5 +193,8 @@ const isGeneratingColor = {
 
 :deep(.is-generating .v-field--dirty > .v-field__field > .v-field__input) {
   color: v-bind('isGeneratingColor.color') !important;
+}
+.ia-text-generated {
+  white-space: pre-wrap;
 }
 </style>

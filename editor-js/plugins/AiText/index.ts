@@ -1,4 +1,5 @@
 import Paragraph from '@editorjs/paragraph';
+import { OpenAI, OpenAIError } from 'openai';
 import { createApp } from 'vue';
 import {
   TAITextCSS,
@@ -10,13 +11,14 @@ import {
 import AiText from './AiText.vue';
 import { vuetify } from '@/plugins/vuetify';
 class AIText extends Paragraph {
-  private callback: TAITextCallback;
+  private callback: TAITextCallback | null = null;
   private _CSS: TAITextCSS;
   private _placeholder: string = 'Peça para a IA escrever algo...';
   private _element: HTMLElement | null;
   private _data: TAITextData;
   private _readOnly: boolean;
   private _api: TAITextApi;
+  private openAI: OpenAI;
   private DEFAULT_PARAGRAPH_CSS: string = 'ce-paragraph';
   constructor({ api, config, data, readOnly }: TAITextConstructor) {
     super({
@@ -25,9 +27,6 @@ class AIText extends Paragraph {
       api,
       readOnly,
     });
-    if (!config.callback) {
-      throw new Error('Callback function is required!');
-    }
     this._CSS = {
       block: api.styles.block,
       wrapper: 'ce-ia-text',
@@ -38,6 +37,13 @@ class AIText extends Paragraph {
     this._data = data ?? { text: '' };
     this._readOnly = readOnly;
     this._api = api;
+    this.openAI = new OpenAI({
+      apiKey: config.openAiKey,
+      dangerouslyAllowBrowser: true,
+    });
+    if (!this.openAI) {
+      throw new OpenAIError('failed to initialize openai connection');
+    }
   }
 
   private convertToParagraph() {
@@ -52,11 +58,38 @@ class AIText extends Paragraph {
     this._element = this.renderParagraph(this._element, iaTextGenerated);
   }
 
-  private renderParagraph(wrapper: HTMLElement, text: string) {
-    wrapper.innerHTML = text;
-    wrapper.classList.add(this.DEFAULT_PARAGRAPH_CSS);
-    wrapper.contentEditable = !this._readOnly ? 'true' : 'false';
+  private renderParagraph(
+    wrapper: HTMLElement,
+    text: string,
+    deleteBlock: boolean = true,
+  ) {
+    if (deleteBlock) {
+      this._api.blocks.delete();
+    }
+    const paragraphs = this.getParagraphs(text);
+    paragraphs.forEach((text) => {
+      this._api.blocks.insert(
+        'paragraph',
+        {
+          text,
+        },
+        {},
+        undefined,
+        true,
+      );
+    });
+
+    if (deleteBlock) {
+      this._api.caret.setToBlock(
+        this._api.blocks.getCurrentBlockIndex(),
+        'start',
+      );
+    }
     return wrapper;
+  }
+
+  private getParagraphs(text: string) {
+    return text.split('\n\n');
   }
 
   private renderIaInput(wrapper: HTMLDivElement) {
@@ -81,7 +114,7 @@ class AIText extends Paragraph {
     const wrapper = document.createElement('div');
     wrapper.classList.add(this._CSS.wrapper, this._CSS.block);
     if (this._data.text) {
-      this.renderParagraph(wrapper, this._data.text);
+      this.renderParagraph(wrapper, this._data.text, false);
       return wrapper;
     }
     this.renderIaInput(wrapper);
@@ -89,12 +122,17 @@ class AIText extends Paragraph {
   }
 
   async getIaCompletition(text: string) {
-    const response = await this.callback(text);
+    const response = await this.openAI.chat.completions.create({
+      messages: [{ role: 'user', content: text }],
+      model: 'gpt-3.5-turbo',
+    });
     if (!response) {
       return;
     }
-    this._data = { text: response };
-    return response;
+    const answers = response.choices.flatMap((answer) =>
+      answer.message.content ? [answer.message.content] : [],
+    );
+    return answers;
   }
 
   static get isReadOnlySupported() {

@@ -32,7 +32,6 @@ import Embed from '@editorjs/embed';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
-
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
 import AIText from '~/editor-js/plugins/AiText';
@@ -84,14 +83,7 @@ onMounted(() => {
       aiText: {
         class: AIText,
         config: {
-          openaiKey: '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',
-          callback: (text: string) => {
-            return new Promise((resolve) => {
-              setTimeout(() => {
-                resolve('AI: ' + text);
-              }, 3000);
-            });
-          },
+          openAiKey: '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',
         },
       },
       inlineCode: {

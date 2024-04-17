@@ -1,3 +1,5 @@
+import { BlockToolData } from "@editorjs/editorjs";
+
 export type TAITextApi = {
   i18n: {
     t: (_placeholder: any) => string | undefined;
@@ -5,14 +7,14 @@ export type TAITextApi = {
   blocks: {
     clear: () => void;
     render: (config: renderConfig) => void;
-    delete: (index: number) => void;
+    delete: (index?: number) => void;
     swap: (fromIndex: number, toIndex: number) => void;
     move: (fromIndex: number, toIndex: number) => void;
     getBlockByIndex: (index: number) => HTMLElement;
     getCurrentBlockIndex: () => number;
     getBlocksCount: () => number;
     stretchBlock: (index: number) => void;
-    insert: (index: number, data: object) => void;
+    insert: (type: string, data: BlockToolData, config?: ToolConfig, index?: number, focus?: boolean) => void;
   };
   selection: {
     findParentTag: (tag: string, className: string) => HTMLElement;
@@ -30,7 +32,7 @@ export type TAITextApi = {
     setToLastBlock: () => void;
     setToPreviousBlock: () => void;
     setToNextBlock: () => void;
-    setToBlock: (index: number) => void;
+    setToBlock: (index: number, position?: caret) => void;
     focus: () => void;
   };
   listeners: {
@@ -45,10 +47,10 @@ export type TAITextApi = {
   };
 };
 export type TAITextElement = HTMLElement | null;
-export type TAITextCallback = (text: string) => Promise<string>;
+export type TAITextCallback = (value: any) => any;
 export type TAITextCSS = { block: string; wrapper: string };
 export type TAITextData = { text: string };
-export type TAITextConfig = { callback: TAITextCallback; placeholder: string };
+export type TAITextConfig = { callback: TAITextCallback; placeholder: string, openAiKey: string };
 export type TAITextReadOnly = boolean;
 export type TAITextConstructor = {
   api: TAITextApi;
