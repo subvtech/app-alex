@@ -4,15 +4,16 @@
     :title="title"
     :is-editing="isEditing && canEdit"
     :show-icon="canEdit"
-    :cancel="onCancel"
-    :save="onSave"
     align-content="align-start"
     show-tooltip
+    no-footer
     :tooltip="
       isGeneral
         ? $t('components.competences.general.tooltip')
         : $t('components.competences.technical.tooltip')
     "
+    @click:cancel="onCancel"
+    @click:save="onSave"
     @toggle:is-editing="isEditing = !isEditing"
   >
     <template #content>
@@ -84,6 +85,7 @@ const temporaryTags = ref<Omit<TagSimple, 'learningplans'>[]>(props.tags);
 const client = useStrapiClient();
 const onCancel = () => {
   temporaryTags.value = initialTags.value;
+  isEditing.value = !isEditing.value;
 };
 const onSave = async () => {
   const updatedArray: Omit<TagSimple, 'learningplans'>[] = await client(
@@ -109,6 +111,7 @@ const onSave = async () => {
     'green',
     true,
   );
+  isEditing.value = !isEditing.value;
 };
 const onRemove = (text?: string) => {
   temporaryTags.value = temporaryTags.value.filter(

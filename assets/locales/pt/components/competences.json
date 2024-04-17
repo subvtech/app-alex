@@ -2,6 +2,7 @@
   "technical": {
     "title": "Competências técnicas",
     "label": "Qual é a nova competência técnica?",
+    "empty": "Nenhuma competência...",
     "placeholder": "Digite uma competência técnica",
     "updated": "Competências Técnicas atualizadas com sucesso.",
     "tooltip": "Competências técnicas são habilidades específicas para atuação em uma determinada área, como:  JavaScript, cálculo e inglês (Hard skills)."
@@ -10,6 +11,7 @@
     "title": "Competências gerais",
     "label": "Qual é a nova competência geral?",
     "placeholder": "Digite uma competência geral",
+    "empty": "Nenhuma competência...",
     "updated": "Competências Gerais atualizadas com sucesso.",
     "tooltip": "Competências gerais são habilidades essenciais aplicáveis em diferentes áreas, como: Comunicação, resolução de problemas e trabalho em equipe (Soft skills)."
   },
@@ -18,5 +20,6 @@
     "technical": "Parece que o curso não tem nenhuma competência técnica cadastrada..."
   },
   "duplicatedText": "Já existe uma tag com essa descrição, por favor escolha outro nome.",
-  "alreadyAdded": "Tag já adicionada."
+  "alreadyAdded": "Tag já adicionada.",
+  "notFound": "Nenhuma competência encontrada"
 }

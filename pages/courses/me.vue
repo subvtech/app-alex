@@ -374,10 +374,11 @@ const showingData = (groupedItems) => {
       ? courses.value.length
       : page.value * itemsPerPage;
   const total = courses.value.length;
-  const message = t('pages.classes.showingData', {
+  const message = t('pages.courses.showingData', {
     from,
     to,
     total,
+    entity: t('pages.courses.courses'),
   });
   if (to === 0) {
     return t('pages.classes.noData');

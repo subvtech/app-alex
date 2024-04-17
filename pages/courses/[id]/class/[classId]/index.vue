@@ -24,6 +24,7 @@
       :dialog-action-text="$t('pages.classes.sendInvites')"
       :dialog-action-loading="sendingInvites"
       :dialog-action-disabled="!usersToInvite.length"
+      entity="member"
       @action="onClickSendInvites"
     >
       <template #item="{ item }">
@@ -41,13 +42,16 @@
         <alex-inputs-users-autocomplete
           v-model="usersToInvite"
           name="usersToInvite"
-          class="w-100"
+          class="w-100 mb-4"
+          hide-details="auto"
           :ignore-user-ids="ignoreUserIds"
           :ignore-emails="ignoreUserEmails"
           :label="$t('components.learningPlan.dialogs.whoParticipate')"
           :placeholder="$t('components.learningPlan.dialogs.searchMember')"
         />
-        <p>Convites pendentes</p>
+        <p class="text-body-4 text-gray-900">
+          {{ $t('components.learningPlan.dialogs.pendingInvites') }}
+        </p>
         <alex-custom-list-item-user
           v-for="(member, i) in classStore.pendingMembers"
           :key="`pending-member-${i}`"
@@ -95,6 +99,7 @@
       :dialog-action-loading="creatingGroup"
       :dialog-action-disabled="!formAddGroup.meta.value.valid"
       empty-state-object-name="pages.classes.participant"
+      entity="group"
       @action="!editing ? onCreateGroup() : onUpdateGroup(editingGroupId)"
     >
       <template #item="{ item }">

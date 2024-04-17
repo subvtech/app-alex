@@ -4,8 +4,9 @@
     :show-icon="canEdit"
     class="w-100"
     :is-editing="editMeetings"
-    :save="onSave"
-    :cancel="onCancel"
+    :disable-save="!schedulesChanges.length"
+    @click:save="onSave"
+    @click:cancel="onCancel"
     @toggle:is-editing="toggleEditMode"
   >
     <template #content>
@@ -87,12 +88,13 @@ const props = defineProps({
     required: true,
   },
 });
-
+// corrigir tipagem
 type ScheduleChange = {
   name?: string;
   id?: number;
   type: 'create' | 'delete' | 'update';
   schedule?: any;
+  ref?: classItem;
 };
 
 const backUpSchedules = ref();
@@ -185,7 +187,10 @@ const onSave = async () => {
     const tasks = schedulesChanges.value.map((element) => {
       switch (element.type) {
         case 'create':
-          return strapi.create(endpoint, element.schedule);
+          return strapi.create(endpoint, element.schedule).then((res) => {
+            element.ref.id = res.data.id;
+          });
+
         case 'delete':
           return strapi.delete(endpoint, element.id);
         case 'update':
@@ -202,34 +207,37 @@ const onSave = async () => {
     setMessage(i18n.t('components.courses.meeting.errorSaving'), 'error', true);
   }
   schedulesChanges.value = [];
+  editMeetings.value = false;
 };
 
 const onCancel = () => {
   classModel.value = deepClone(backUpSchedules.value);
+  editMeetings.value = false;
   schedulesChanges.value = [];
 };
 
-const convertDate = (date, startHour) => {
-  const [hour, minute] = startHour.split(':');
+const convertDate = (date, time) => {
+  const [hour, minute] = time.split(':');
   const [year, month, day] = date.split('-');
   return new Date(year, month - 1, day, hour, minute);
 };
 
 const handleCreate = (newSchedule) => {
   const { className, id, ...schedule } = newSchedule;
-  const classId = findClassByName(className)?.id;
+  const scheduleClass = findClassByName(className);
+  scheduleClass?.schedules.push(newSchedule);
   addScheduleChange({
     schedule: {
       ...schedule,
-      date: convertDate(newSchedule.date, newSchedule.startHour),
-      startDate: props.classInfo?.start,
-      endDate: props.classInfo?.end,
+      date: newSchedule.date,
+      startDate: convertDate(newSchedule.date, newSchedule.startHour),
+      endDate: convertDate(props.classInfo?.end, newSchedule.endHour),
       learningplan: props.learningPlanId,
-      learning_class: classId,
+      learning_class: scheduleClass.id,
     },
+    ref: scheduleClass.schedules[scheduleClass.schedules.length - 1],
     type: 'create',
   });
-  findClassByName(className)?.schedules.push(newSchedule);
 };
 
 const handleDelete = (className: string, scheduleID: number) => {
@@ -300,9 +308,9 @@ const confirmUpdate = (newSchedule) => {
     type: 'update',
     schedule: {
       ...newSchedule,
-      date: convertDate(newSchedule.date, newSchedule.startHour),
-      startDate: props.classInfo?.start,
-      endDate: props.classInfo?.end,
+      date: newSchedule.date,
+      startDate: convertDate(newSchedule.date, newSchedule.startHour),
+      endDate: convertDate(props.classInfo?.end, newSchedule.endHour),
       learningplan: props.learningPlanId,
       learning_class: classId,
     },

@@ -32,6 +32,7 @@
   "class": "Turma",
   "selectClassToMeeting": "Selecione a turma para o encontro",
   "taught": "Ministradas",
+  "taughtClasses": "Turmas Ministradas",
   "meetingType": "Tipo do encontro",
   "manageClasses": "Gerencie suas turmas!",
   "addNameResponsibleToClass": "Adicione um nome e um responsável para cada turma.",
@@ -48,5 +49,6 @@
   "whosIsClassResponsible": "Quem será o responsável pela turma?",
   "selectResponsible": "Selecione o responsável",
   "whoAreClassParticipants":"Quem serão os participantes da turma?",
-  "selectClassPartipant":"Selecione os participantes para a turma"
+  "selectClassPartipant":"Selecione os participantes para a turma",
+  "pendingInvites": "Convites pendentes"
 }

@@ -166,7 +166,12 @@ const meetingDate = useFieldModel('date');
 const submit = handleSubmit((values) => {
   if (!data.value) {
     const newId = Math.round(Math.random() * 12_345_68);
-    emit('create', { ...values, id: newId, className: values.className });
+    emit('create', {
+      ...values,
+      id: newId,
+      className: values.className,
+      endDate,
+    });
   } else {
     emit('update', {
       ...values,
@@ -202,6 +207,7 @@ onUpdated(() => {
       type: data.value?.type,
       location: data.value?.location,
       link: data.value?.link,
+      endDate,
     });
     meetingDate.value = data.value?.date;
     return;

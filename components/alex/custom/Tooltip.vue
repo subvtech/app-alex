@@ -45,7 +45,7 @@ defineProps({
   }
   .px-4 {
     position: absolute;
-    display: none;  
+    display: none;
     z-index: 999;
     top: 120%;
     left: 50%;
