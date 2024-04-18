@@ -1,61 +1,52 @@
-<template>
-  <v-container fluid class="bg-white rounded">
-    <div v-if="learningPlanStore.loading" class="pa-12">
-      <alex-custom-skeleton color="gray-300" class="w-100 height-96" />
-    </div>
-    <div
-      v-else
-      class="d-flex height-100 pa-6 align-center justify-center rounded text-gray-600"
-    >
-      <span class="text-h4 text-gray-800">{{
-        $t('components.courses.tasks.noTasks')
-      }}</span>
-    </div></v-container
-  >
-</template>
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth',
-});
-
-const route = useRoute();
-const { t } = useI18n();
-const learningPlanStore = useLearningPlanStore();
+// const { t } = useI18n();
 const headerStore = usePageHeaderStore();
-const { id } = route.params;
+
+const isOpen = ref(false);
+
+definePageMeta({ middleware: 'auth' });
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
 });
-
-watch(
-  () => [learningPlanStore.loading],
-  () => {
-    if (!learningPlanStore.loading) {
-      headerStore.title = t('components.courses.settings.breadcrumbTitle');
-      headerStore.items = [
-        {
-          title: t('components.courses.settings.home'),
-          disabled: false,
-          to: '/',
-        },
-        {
-          title: t('components.courses.settings.myCourses'),
-          disabled: false,
-          to: '/courses/me',
-        },
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${id}`,
-        },
-        {
-          title: t('components.courses.tasks.title'),
-          disabled: true,
-          to: `/courses/${id}/tasks`,
-        },
-      ];
-    }
-  },
-);
 </script>
+
+<template>
+  <div class="bg-white p-4 rounded">
+    <div class="flex flex-column bg-white rounded">
+      <div class="flex items-start justify-space-between">
+        <alex-inputs-text-field
+          name="search"
+          class="w-[300px]"
+          density="compact"
+          placeholder="Encontrar tarefa"
+          prepend-inner-icon="mdi-magnify"
+        />
+        <Button size="auto" variant="ghost">
+          <v-icon icon="mdi-filter-variant" />
+        </Button>
+      </div>
+      <Collapsible
+        v-model:open="isOpen"
+        class="rounded-md border p-2 space-y-2"
+      >
+        <div class="flex items-center space-x-2">
+          <CollapsibleTrigger as-child>
+            <Button variant="ghost" size="auto" class="w-9 p-0">
+              <v-icon :icon="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+            </Button>
+          </CollapsibleTrigger>
+          <h4 class="font-semibold">Rascunho</h4>
+        </div>
+        <CollapsibleContent class="space-y-2">
+          <div class="rounded-md border px-4 py-3 font-mono text-sm">
+            @radix-ui/colors
+          </div>
+          <div class="rounded-md border px-4 py-3 font-mono text-sm">
+            @stitches/react
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  </div>
+</template>

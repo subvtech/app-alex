@@ -1,7 +1,9 @@
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+  },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
@@ -15,6 +17,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/strapi',
     '@nuxt/test-utils/module',
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
   ],
   testUtils: {},
   pinia: {
@@ -31,6 +35,23 @@ export default defineNuxtConfig({
       matomoUrl: process.env.MATOMO_URL,
       showComponentsPage: process.env.COMPONENTS_PAGE === 'on',
     },
+  },
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+  shadcn: {
+    /**
+     * Prefix for all the imported component
+     */
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * @default "./components/ui"
+     */
+    componentDir: './components/ui',
   },
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
