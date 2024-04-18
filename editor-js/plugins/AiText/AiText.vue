@@ -7,7 +7,7 @@
       <v-window v-model="activeAnswer" class="flex-grow-1">
         <v-window-item v-for="(answer, i) in answers" :key="i">
           <p class="ia-text-generated" :class="{ active: i === activeAnswer }">
-            {{ answer }}
+            {{ answer.content }}
           </p>
         </v-window-item>
       </v-window>
@@ -37,7 +37,7 @@
       :class="{ 'is-generating': isGenerating }"
       :readonly="isGenerating"
       :placeholder="placeholder"
-      @keyup.enter="getAICompletion"
+      @keyup.enter="onSendValue"
     >
       <template #append-inner>
         <alex-custom-button
@@ -54,7 +54,7 @@
             'is-generating-button': isGenerating,
             'send-button-disabled': !text,
           }"
-          @click="getAICompletion"
+          @click="onSendValue"
         >
           mdi-arrow-up-bold-box</v-icon
         >
@@ -86,10 +86,19 @@
 </template>
 
 <script setup lang="ts">
+import { Stream } from 'openai/streaming';
+import { OpenAI } from 'openai';
 import { AlexThemeColors } from '@/config/themes';
+interface Answer {
+  id: string;
+  index: number;
+  content: string;
+}
 interface IaTextProps {
   placeholder?: string;
-  onSend: (content: string) => Promise<string[]>;
+  getAICompletion: (
+    content: string,
+  ) => Promise<Stream<OpenAI.Chat.Completions.ChatCompletionChunk>>;
   onCancel: () => void;
   onStop: () => void;
   onSave?: () => void;
@@ -97,38 +106,69 @@ interface IaTextProps {
 defineEmits(['cancel']);
 const text = ref<null | string>(null);
 const isGenerating = ref(false);
-const answers = ref<string[]>([]);
+const answers = ref<Answer[]>([]);
 const activeAnswer = ref(0);
 const firstValue = ref<string | null>(null);
 const props = withDefaults(defineProps<IaTextProps>(), {
   placeholder: 'Peça para a IA escrever algo...',
   onSave: undefined,
 });
-const onReSend = async () => {
+const onGetAICompletion = async (value: string | null) => {
+  if (!value) return;
   isGenerating.value = true;
+  firstValue.value = value;
+  text.value = 'Gerando resposta...';
   try {
-    if (!firstValue.value) return;
-    const response = await props.onSend(firstValue.value);
-    answers.value = [...answers.value, ...response];
-  } catch (error) {
-  } finally {
-    isGenerating.value = false;
-  }
-};
-const getAICompletion = async () => {
-  if (!text.value) return;
-  isGenerating.value = true;
-  firstValue.value = text.value;
-  text.value = 'A IA está pensando...';
-  try {
-    const response = await props.onSend(firstValue.value);
-    answers.value = [...answers.value, ...response];
+    const response = await props.getAICompletion(firstValue.value);
+    let i = 0;
+    for await (const chunk of response) {
+      if (answers.value.length !== 0) {
+        activeAnswer.value = answers.value.length - 1;
+      }
+      if (i === 0) {
+        setInitialChunkData(chunk);
+      }
+      concatContentChoices(chunk);
+      i++;
+    }
     text.value = firstValue.value;
   } catch (error) {
   } finally {
     isGenerating.value = false;
   }
 };
+const onReSend = () => onGetAICompletion(firstValue.value);
+const onSendValue = () => onGetAICompletion(text.value);
+const concatContentChoices = (
+  chunk: OpenAI.Chat.Completions.ChatCompletionChunk,
+) => {
+  chunk.choices.forEach((choice) => {
+    if (!choice.delta.content) {
+      return;
+    }
+    answers.value = answers.value.map((answer) => {
+      const isSelectedChoice =
+        answer.id === chunk.id && choice.index === answer.index;
+      if (isSelectedChoice) {
+        answer.content += choice.delta.content;
+      }
+      return answer;
+    });
+  });
+};
+
+const setInitialChunkData = (
+  chunk: OpenAI.Chat.Completions.ChatCompletionChunk,
+) => {
+  answers.value.push(
+    ...chunk.choices.map((choice) => ({
+      id: chunk.id,
+      index: choice.index,
+      content: choice?.delta?.content || '',
+    })),
+  );
+};
+
 const nextAnswer = () => {
   const nextAnswerValue = activeAnswer.value + 1;
   if (nextAnswerValue < answers.value.length) {

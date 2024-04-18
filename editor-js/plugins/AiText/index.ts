@@ -60,14 +60,8 @@ class AIText extends Paragraph {
     this._element = this.renderParagraphs(this._element, iaTextGenerated);
   }
 
-  private renderParagraphs(
-    wrapper: HTMLElement,
-    text: string,
-    deleteBlock: boolean = true,
-  ) {
-    if (deleteBlock) {
-      this._api.blocks.delete();
-    }
+  private renderParagraphs(wrapper: HTMLElement, text: string) {
+    this._api.blocks.delete();
     const paragraphs = this.getParagraphs(text);
     paragraphs.forEach((text) => {
       this._api.blocks.insert(
@@ -81,12 +75,7 @@ class AIText extends Paragraph {
       );
     });
 
-    if (deleteBlock) {
-      this._api.caret.setToBlock(
-        this._api.blocks.getCurrentBlockIndex(),
-        'start',
-      );
-    }
+    this._api.caret.setToBlock(this._api.blocks.getCurrentBlockIndex(), 'end');
     return wrapper;
   }
 
@@ -97,7 +86,7 @@ class AIText extends Paragraph {
   private renderIaInput(wrapper: HTMLDivElement) {
     const app = createApp(AiText, {
       placeholder: this._placeholder,
-      onSend: (text: string) => this.getIaCompletition(text),
+      getAICompletion: (text: string) => this.getAICompletion(text),
       onCancel: () => this.convertToParagraph(),
       onSave: () => this.convertToParagraph(),
       onStop: () => {
@@ -111,6 +100,15 @@ class AIText extends Paragraph {
   }
 
   render() {
+    this._api.blocks.insert(
+      'paragraph',
+      {
+        text: '',
+      },
+      {},
+      this._api.blocks.getCurrentBlockIndex() + 1,
+      false,
+    );
     this._element = this.drawView();
     return this._element;
   }
@@ -118,29 +116,20 @@ class AIText extends Paragraph {
   drawView() {
     const wrapper = document.createElement('div');
     wrapper.classList.add(this._CSS.wrapper, this._CSS.block);
-    if (this._data.text) {
-      this.renderParagraphs(wrapper, this._data.text, false);
-      return wrapper;
-    }
     this.renderIaInput(wrapper);
     return wrapper;
   }
 
-  async getIaCompletition(text: string) {
+  async getAICompletion(text: string) {
     const response = await this.openAI.chat.completions.create(
       {
         messages: [{ role: 'user', content: text }],
         model: 'gpt-3.5-turbo',
+        stream: true,
       },
       { signal: this.controller.signal },
     );
-    if (!response) {
-      return;
-    }
-    const answers = response.choices.flatMap((answer) =>
-      answer.message.content ? [answer.message.content] : [],
-    );
-    return answers;
+    return response;
   }
 
   static get isReadOnlySupported() {
