@@ -27,6 +27,7 @@
                 return { ...item };
               })
             "
+            :no-icon="learningPlanStore.userIsFacilitator"
             :course-id="learningPlan.id"
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
@@ -38,6 +39,7 @@
             full-width
             :text="learningPlan.description"
             :user-id="user.id"
+            :no-icon="learningPlanStore.userIsFacilitator"
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
@@ -50,6 +52,7 @@
             :course-id="learningPlan.id"
             :user-id="user.id"
             :data="learningGoals"
+            :no-icon="learningPlanStore.userIsFacilitator"
             :tooltip="$t('components.courses.goals.tooltip')"
             @update="(data) => emit('update', data)"
           />
@@ -62,6 +65,7 @@
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="learningPlanStore.userIsFacilitator"
+            :no-icon="learningPlanStore.userIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
