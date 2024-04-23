@@ -1,0 +1,16 @@
+{
+  "inputPlaceholder": "Encontrar Estudante",
+  "contribute": "Contribuir",
+  "emptyText": "Parece que não temos contribuições!",
+  "blocked": "Contribuição bloqueada",
+  "myContributions": "Minhas Contribuições",
+  "otherContributions": "Outras Contribuições",
+  "card": {
+    "delete": "Apagar contribuição",
+    "edit": "Editar contribuição",
+    "highlight": "Destacar",
+    "removeHighlight": "Desfazer destaque",
+    "block": "Bloquear Contribuição",
+    "unblock": "Desbloquear Contribuição"
+  }
+}

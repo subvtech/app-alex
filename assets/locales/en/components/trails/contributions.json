@@ -1,0 +1,16 @@
+{
+  "inputPlaceholder": "Find Student",
+  "contribute": "Contribute",
+  "emptyText": "It seems we have no contributions!",
+  "blocked": "Blocked contribution",
+  "myContributions": "My Contributions",
+  "otherContributions": "Other Contributions",
+  "card": {
+    "delete": "Delete Contribution",
+    "edit": "Edit Contribution",
+    "highlight": "Highlight Contribution",
+    "removeHighlight": "Remove Highlight",
+    "block": "Block Contribution",
+    "unblock": "Unblock Contribution"
+  }
+}

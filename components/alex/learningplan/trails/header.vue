@@ -38,21 +38,12 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-row justify-space-between align-center pr-2">
-        <div class="d-flex">
-          <alex-custom-tabs
-            v-model="activePage"
-            :tabs="tabs"
-            class="customTabs"
-          />
+      <div
+        class="d-flex flex-row justify-space-between align-center pr-2 customTabs"
+      >
+        <div class="d-flex w-100">
+          <alex-custom-tabs v-model="activePage" :tabs="tabs" show-arrows />
         </div>
-        <alex-custom-button
-          v-if="learningPlanStore.userIsFacilitator"
-          class="px-6"
-          variant="text"
-          icon="mdi-cog-outline"
-          @click="activePage = '2'"
-        />
       </div>
     </div>
   </div>
@@ -101,6 +92,8 @@ const tabs = computed(() => {
   const defaultTabs = [
     { label: tab.firstTitle, value: '0' },
     { label: tab.secondTitle, value: '1' },
+    { label: 'Contribuições', value: '2' },
+    { label: '', icon: 'mdi-cog-outline', value: '3', classes: 'ml-auto' },
   ];
 
   return defaultTabs;
@@ -116,11 +109,14 @@ watch(activePage, () => {
     case '0':
       router.replace(`${defaultURL.value}`);
       break;
-    case '2':
+    case '3':
       router.replace(`${defaultURL.value}/settings`);
       break;
     case '1':
       router.replace(`${defaultURL.value}/tasks`);
+      break;
+    case '2':
+      router.replace(`${defaultURL.value}/contributions`);
       break;
   }
 });
