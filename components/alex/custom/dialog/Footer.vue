@@ -1,5 +1,5 @@
 <template>
-  <div
+  <v-container
     class="d-flex gap-4 justify-end flex-wrap bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100 alex-dialog-footer"
     data-testid="alex-dialog-footer"
   >
@@ -31,7 +31,7 @@
       :disabled="mainButtonDisabled"
       @click="() => emits('onMainAction')"
     />
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
