@@ -24,14 +24,13 @@
         density="comfortable"
       />
       <alex-custom-button
+        v-if="!isProfessor"
         prepend-icon="mdi-plus"
         size="large"
         @click="createContributionDialog = true"
       >
-        {{
-          $t('components.trails.contributions.contribute')
-        }}</alex-custom-button
-      >
+        {{ $t('components.trails.contributions.contribute') }}
+      </alex-custom-button>
     </div>
     <div
       v-if="studentsContributions.length || myContributions.length"
@@ -138,6 +137,9 @@
         </p>
       </div>
     </div>
+    <alex-learningplan-trails-dialogs-create-contribution
+      v-model="createContributionDialog"
+    />
   </div>
 </template>
 
@@ -158,6 +160,10 @@ interface studentsContributionsType {
 }
 
 const studentSearch = ref('');
+const isLoading = ref(false);
+const isProfessor = ref(false);
+const createContributionDialog = ref(false);
+
 const myContributions = ref<contributionType[]>([
   {
     title: 'Title 1',
@@ -206,7 +212,6 @@ const studentsContributions = ref<studentsContributionsType[]>([
     ],
   },
 ]);
-const createContributionDialog = ref(false);
 
 const handleHighlight = (student: number, contributionIndex: number) => {
   const contribution =
@@ -233,9 +238,6 @@ const handleDelete = (index: number) => {
 const handleEdit = (index: number) => {
   console.log('edit' + index);
 };
-
-const isLoading = ref(false);
-const isProfessor = ref(true);
 </script>
 
 <style>

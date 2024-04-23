@@ -3,8 +3,10 @@
     <div
       v-for="(contribution, index) in contributions"
       :key="contribution.title + index"
-      class="bg-white pa-3 px-4 rounded"
+      v-ripple
+      class="bg-white pa-3 px-4 rounded cursor-pointer"
       :class="displayBorder(contribution)"
+      @click="emits('open', index)"
     >
       <div class="w-100 py-3 h-10 d-flex justify-space-between">
         <div class="d-flex flex-column">
@@ -42,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-const emits = defineEmits(['edit', 'delete', 'highlight', 'block']);
+const emits = defineEmits(['edit', 'delete', 'highlight', 'block', 'open']);
 const { t } = useI18n();
 
 interface Contribution {
@@ -139,5 +141,9 @@ const dropDownItems = (contribution: Contribution, index: number) => {
 }
 .border-highlighted {
   border-left: 3px solid #ff9733 !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

@@ -43,7 +43,7 @@ const emit = defineEmits(['ready', 'change']);
 const instance = ref();
 onMounted(() => {
   instance.value = new EditorJS({
-    autofocus: true,
+    autofocus: false,
     tools: {
       delimiter: Delimiter,
       embed: Embed,
