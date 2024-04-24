@@ -36,9 +36,9 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
+          <nuxt-img :src="slide.image" :alt="slide.title" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -215,7 +215,6 @@ const vueperslides2 = ref();
 const videoJS = ref();
 const videoJSWeb = ref();
 const uploading = ref(false);
-
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -340,7 +339,6 @@ function newSlide(file, res) {
 }
 const activeSlide = ref(0);
 const dialog = ref();
-
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
@@ -452,6 +450,7 @@ const editSlides = async (files, deleted, added) => {
     props.onUpdateSlides(slides.value);
   }
 };
+const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
 <style scoped>
@@ -525,5 +524,11 @@ const editSlides = async (files, deleted, added) => {
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>

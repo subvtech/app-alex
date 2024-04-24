@@ -47,9 +47,9 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
+          <nuxt-img :src="slide.image" :alt="slide.title" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -229,6 +229,7 @@ const slides = computed({
     emit('update:modelValue', value);
   },
 });
+
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {
@@ -487,6 +488,8 @@ const clearSlides = () => {
 defineExpose({
   clearSlides,
 });
+
+const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
 <style>
@@ -576,5 +579,11 @@ defineExpose({
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>
