@@ -33,26 +33,34 @@
       </alex-custom-button>
     </div>
     <div
-      v-if="studentsContributions.length || myContributions.length"
+      v-if="studentsContributions.length"
       class="ga-3 py-6 d-flex flex-column"
     >
-      <p v-if="!isProfessor" class="text-gray-800 text-h5">
+      <p v-if="myContributions.length" class="text-gray-800 text-h5">
         {{ $t('components.trails.contributions.myContributions') }}
       </p>
-      <div class="w-100 pa-4 bg-gray-blue rounded">
+      <div
+        v-if="myContributions.length"
+        class="w-100 pa-4 bg-gray-blue rounded"
+      >
         <alex-learningplan-trails-contribution-card
           :contributions="myContributions"
           :is-professor="false"
-          @highlight="handleHighlight"
-          @block="handleBlock"
           @delete="handleDelete"
           @edit="handleEdit"
+          @show="handleShow"
         />
       </div>
-      <p v-if="!isProfessor" class="text-gray-800 text-h5">
+      <p
+        v-if="!isProfessor && studentsContributions.length"
+        class="text-gray-800 text-h5"
+      >
         {{ $t('components.trails.contributions.otherContributions') }}
       </p>
-      <div class="w-100 pa-4 bg-gray-blue rounded">
+      <div
+        v-if="studentsContributions.length"
+        class="w-100 pa-4 bg-gray-blue rounded"
+      >
         <v-expansion-panels
           id="contributions-panels"
           class="ga-1"
@@ -91,8 +99,7 @@
                 :student-index="index"
                 @highlight="handleHighlight"
                 @block="handleBlock"
-                @delete="handleDelete"
-                @edit="handleEdit"
+                @show="handleShow"
               />
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -147,8 +154,9 @@
 interface contributionType {
   title: string;
   dateAndTime: string;
-  highlight: boolean;
+  highlighted: boolean;
   blocked: boolean;
+  contribution?: JSON;
 }
 
 interface studentsContributionsType {
@@ -160,30 +168,56 @@ interface studentsContributionsType {
 }
 
 const studentSearch = ref('');
-const isLoading = ref(false);
+const isLoading = computed(
+  () => trailStore.loading || learningPlanStore.loading,
+);
 const isProfessor = ref(false);
 const createContributionDialog = ref(false);
 
-const myContributions = ref<contributionType[]>([
-  {
-    title: 'Title 1',
-    dateAndTime: '2021-09-01T00:00:00',
-    highlight: true,
-    blocked: false,
-  },
-  {
-    title: 'Title 2',
-    dateAndTime: '2021-09-01T00:00:00',
-    highlight: false,
-    blocked: true,
-  },
-  {
-    title: 'Title 3',
-    dateAndTime: '2021-09-01T00:00:00',
-    highlight: false,
-    blocked: false,
-  },
-]);
+const trailStore = useTrailStore();
+const learningPlanStore = useLearningPlanStore();
+const user = useStrapiUser<User>();
+
+/*
+const getContributions = () => {
+  const contributions = trailStore.trail?.contribuitions;
+
+  isProfessor.value = learningPlanStore.userIsFacilitator;
+}; */
+
+onBeforeMount(() => {
+  // isProfessor.value = learningPlanStore.userIsFacilitator;
+});
+
+const myContributions = computed<contributionType[]>(() => {
+  return (
+    trailStore.trail?.contributions.filter(
+      (contribution) => contribution.student_member.id === user.value.id,
+    ) || []
+  );
+});
+
+// const myContributions = ref<contributionType[]>([
+//   {
+//     title: 'Title 1',
+//     dateAndTime: '2021-09-01T00:00:00',
+//     highlight: true,
+//     blocked: false,
+//   },
+//   {
+//     title: 'Title 2',
+//     dateAndTime: '2021-09-01T00:00:00',
+//     highlight: false,
+//     blocked: true,
+//   },
+//   {
+//     title: 'Title 3',
+//     dateAndTime: '2021-09-01T00:00:00',
+//     highlight: false,
+//     blocked: false,
+//   },
+// ]);
+
 const studentsContributions = ref<studentsContributionsType[]>([
   {
     name: 'Robert Judson',
@@ -194,19 +228,19 @@ const studentsContributions = ref<studentsContributionsType[]>([
       {
         title: 'Novas features VUE 3.4',
         dateAndTime: '2021-09-01T00:00:00',
-        highlight: true,
+        highlighted: true,
         blocked: false,
       },
       {
         title: 'Title 2',
         dateAndTime: '2021-09-01T00:00:00',
-        highlight: false,
+        highlighted: false,
         blocked: true,
       },
       {
         title: 'Title 3',
         dateAndTime: '2021-09-01T00:00:00',
-        highlight: false,
+        highlighted: false,
         blocked: false,
       },
     ],
@@ -216,7 +250,7 @@ const studentsContributions = ref<studentsContributionsType[]>([
 const handleHighlight = (student: number, contributionIndex: number) => {
   const contribution =
     studentsContributions.value[student].contributions[contributionIndex];
-  contribution.highlight = !contribution.highlight;
+  contribution.highlighted = !contribution.highlighted;
   if (contribution.blocked) {
     contribution.blocked = false;
   }
@@ -226,8 +260,8 @@ const handleBlock = (student: number, contributionIndex: number) => {
   const contribution =
     studentsContributions.value[student].contributions[contributionIndex];
   contribution.blocked = !contribution.blocked;
-  if (contribution.highlight) {
-    contribution.highlight = false;
+  if (contribution.highlighted) {
+    contribution.highlighted = false;
   }
 };
 
@@ -237,6 +271,10 @@ const handleDelete = (index: number) => {
 
 const handleEdit = (index: number) => {
   console.log('edit' + index);
+};
+
+const handleShow = (index: number) => {
+  console.log('show' + index);
 };
 </script>
 
@@ -256,6 +294,7 @@ const handleEdit = (index: number) => {
   .v-expansion-panel-title {
     height: 65px !important;
     background-color: #fff !important;
+    border-color: #ebedef !important;
   }
 
   .v-expansion-panel-title--active {

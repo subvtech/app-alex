@@ -3,10 +3,9 @@
     <div
       v-for="(contribution, index) in contributions"
       :key="contribution.title + index"
-      v-ripple
-      class="bg-white pa-3 px-4 rounded cursor-pointer"
+      class="bg-white pa-3 px-4 rounded cursor-pointer left-border"
       :class="displayBorder(contribution)"
-      @click="emits('open', index)"
+      @click="emits('show', index)"
     >
       <div class="w-100 py-3 h-10 d-flex justify-space-between">
         <div class="d-flex flex-column">
@@ -24,13 +23,13 @@
           <v-btn
             v-else
             :icon="
-              contribution.highlight
+              contribution.highlighted
                 ? 'mdi-star-check'
                 : 'mdi-star-check-outline'
             "
             variant="text"
-            :color="contribution.highlight ? 'warning-0' : 'gray-800'"
-            @click="emits('highlight')"
+            :color="contribution.highlighted ? 'warning-0' : 'gray-800'"
+            @click.stop="emits('highlight', studentIndex, index)"
           ></v-btn>
         </div>
         <alex-custom-dropdown
@@ -44,14 +43,14 @@
 </template>
 
 <script setup lang="ts">
-const emits = defineEmits(['edit', 'delete', 'highlight', 'block', 'open']);
+const emits = defineEmits(['edit', 'delete', 'highlight', 'block', 'show']);
 const { t } = useI18n();
 
 interface Contribution {
   title: string;
   dateAndTime: string;
   blocked: boolean;
-  highlight: boolean;
+  highlighted: boolean;
 }
 
 const props = defineProps<{
@@ -72,7 +71,7 @@ const formatDateTime = (date: string) => {
 const displayBorder = (contribution: Contribution) => {
   if (!props.isProfessor) return;
   if (contribution.blocked) return 'border-blocked';
-  if (contribution.highlight) return 'border-highlighted';
+  if (contribution.highlighted) return 'border-highlighted';
   return 'bg-green';
 };
 
@@ -83,10 +82,10 @@ const professorOptions = (
 ) => {
   return [
     {
-      text: contribution.highlight
+      text: contribution.highlighted
         ? t('components.trails.contributions.card.removeHighlight')
         : t('components.trails.contributions.card.highlight'),
-      icon: contribution.highlight
+      icon: contribution.highlighted
         ? 'mdi-star-remove-outline'
         : 'mdi-star-check-outline',
       onClick: () => {
@@ -137,10 +136,14 @@ const dropDownItems = (contribution: Contribution, index: number) => {
 
 <style scoped>
 .border-blocked {
-  border-left: 3px solid #ff8484 !important;
+  border-left-color: #ff8484 !important;
 }
 .border-highlighted {
-  border-left: 3px solid #ff9733 !important;
+  border-left-color: #ff9733 !important;
+}
+
+.left-border {
+  border-left: 3px solid transparent;
 }
 
 .cursor-pointer {
