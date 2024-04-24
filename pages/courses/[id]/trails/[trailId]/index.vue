@@ -426,6 +426,14 @@ window.addEventListener('resize', () => {
     setObserver();
   }, 300);
 });
+watch(readOnly, () => {
+  if (viewer.value) {
+    viewer.value.destroyInstance();
+    setTimeout(() => {
+      viewer.value?.createInstance();
+    }, 100);
+  }
+});
 </script>
 
 <style scoped lang="scss">
