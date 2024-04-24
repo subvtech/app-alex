@@ -40,6 +40,7 @@ const strapiClient = useStrapiClient();
 const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
+const app = useNuxtApp();
 onMounted(() => {
   instance.value = new EditorJS({
     autofocus: true,
@@ -83,7 +84,7 @@ onMounted(() => {
       aiText: {
         class: AIText,
         config: {
-          openAiKey: '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',
+          openAiKey: app.$config.public.openAiKey,
         },
       },
       inlineCode: {
