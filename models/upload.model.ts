@@ -3,4 +3,5 @@ export interface Upload {
   url: string;
   name?: string;
   ext?: string;
+  size?: number;
 }
