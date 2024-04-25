@@ -49,18 +49,6 @@
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
       >
         <template #content>
-          <nuxt-img :src="slide.image" :alt="slide.title" />
-          <div v-if="!readOnly" class="ma-2 config-icon">
-            <alex-custom-button
-              color="gray-500"
-              icon="mdi-cog"
-              style="
-                background-color: rgba(255, 255, 255, 0.25) !important;
-                z-index: 0 !important;
-              "
-              @click="openAddSlidesDialog(-1, slides)"
-            />
-          </div>
           <video-player
             v-if="slide.type.includes('File') && slide.video"
             class="w-100 fill-height video-js"
@@ -78,6 +66,18 @@
             :is-active="activeSlide == i"
             :data-setup="JSON.stringify({ techOrder: [slide.type] })"
           ></video-player>
+          <nuxt-img v-else :src="slide.image" :alt="slide.title" />
+          <div v-if="!readOnly" class="ma-2 config-icon">
+            <alex-custom-button
+              color="gray-500"
+              icon="mdi-cog"
+              style="
+                background-color: rgba(255, 255, 255, 0.25) !important;
+                z-index: 0 !important;
+              "
+              @click="openAddSlidesDialog(-1, slides)"
+            />
+          </div>
         </template>
       </vueper-slide>
     </vueper-slides>
@@ -251,7 +251,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = `https://${slide.video}`;
+    url = slide.video;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
