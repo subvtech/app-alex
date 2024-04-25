@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import { BlockToolConstructorOptions } from '@editorjs/editorjs';
-import Fileset from './Fileset.vue';
+import Fileset from './fileset.vue';
 import { vuetify } from '@/plugins/vuetify';
 
 interface FilesetBlockData {
