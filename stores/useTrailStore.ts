@@ -7,14 +7,34 @@ export const useTrailStore = defineStore('trail', () => {
 
   const { setMessage } = useMessageStore();
 
-  const populate = [
-    'structures.blocks',
-    'partners',
-    'tasks',
-    'contributions',
-    'cover_image',
-    'learning_structure.learningplan',
-  ];
+  const populate = {
+    tasks: true,
+    cover_image: true,
+    partners: true,
+    structures: {
+      populate: ['blocks'],
+    },
+    learning_structure: {
+      populate: ['learningplan.classes'],
+    },
+    contributions: {
+      populate: {
+        student_member: {
+          populate: {
+            learning_class: true,
+            user: {
+              fields: ['id', 'fullname', 'email'],
+              populate: {
+                avatar: {
+                  populate: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
 
   const loading = ref(false);
 

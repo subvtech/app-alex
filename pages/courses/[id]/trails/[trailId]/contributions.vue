@@ -6,13 +6,13 @@
       v-if="!isLoading"
       class="d-flex flex-wrap w-100"
       :class="
-        !studentsContributions.length
+        !contributions.otherContributions.length
           ? 'justify-end'
           : 'justify-space-between mb-6'
       "
     >
       <alex-inputs-text-field
-        v-show="studentsContributions.length"
+        v-show="contributions.otherContributions.length"
         v-model="studentSearch"
         name="search"
         :placeholder="$t('components.trails.contributions.inputPlaceholder')"
@@ -27,24 +27,30 @@
         v-if="!isProfessor"
         prepend-icon="mdi-plus"
         size="large"
-        @click="createContributionDialog = true"
+        @click="handleShow(-1, -1)"
       >
         {{ $t('components.trails.contributions.contribute') }}
       </alex-custom-button>
     </div>
     <div
-      v-if="studentsContributions.length"
+      v-if="
+        contributions.otherContributions.length ||
+        contributions.myContributions.length
+      "
       class="ga-3 py-6 d-flex flex-column"
     >
-      <p v-if="myContributions.length" class="text-gray-800 text-h5">
+      <p
+        v-if="contributions.myContributions.length"
+        class="text-gray-800 text-h5"
+      >
         {{ $t('components.trails.contributions.myContributions') }}
       </p>
       <div
-        v-if="myContributions.length"
+        v-if="contributions.myContributions.length"
         class="w-100 pa-4 bg-gray-blue rounded"
       >
         <alex-learningplan-trails-contribution-card
-          :contributions="myContributions"
+          :contributions="contributions.myContributions"
           :is-professor="false"
           @delete="handleDelete"
           @edit="handleEdit"
@@ -52,13 +58,13 @@
         />
       </div>
       <p
-        v-if="!isProfessor && studentsContributions.length"
+        v-if="!isProfessor && contributions.otherContributions.length"
         class="text-gray-800 text-h5"
       >
         {{ $t('components.trails.contributions.otherContributions') }}
       </p>
       <div
-        v-if="studentsContributions.length"
+        v-if="contributions.otherContributions.length"
         class="w-100 pa-4 bg-gray-blue rounded"
       >
         <v-expansion-panels
@@ -67,16 +73,18 @@
           variant="accordion"
         >
           <v-expansion-panel
-            v-for="(student, index) in studentsContributions"
+            v-for="(student, index) in contributions.otherContributions"
             :key="student.name + index"
             elevation="0"
           >
             <v-expansion-panel-title class="elevation-0 px-6 py-3 d-flex ga-4">
-              <img
-                class="width-10 height-10 rounded-pill"
-                cover
-                src="https://cdn.vuetifyjs.com/images/cards/desert.jpg"
-              />
+              <app-user-avatar
+                :size="40"
+                :profile-picture="
+                  student.photo ? { url: student.photo, id: student.id } : null
+                "
+                :placeholder="student.name"
+              ></app-user-avatar>
               <div class="d-flex flex-column ellipsis">
                 <span class="text-gray-700 text-body-2 ellipsis lines-1">{{
                   student.name
@@ -87,7 +95,8 @@
               </div>
               <v-spacer />
               <alex-custom-chip
-                text="Turma A"
+                v-if="student.class"
+                :text="student.class"
                 status="primary"
                 class="d-none d-sm-flex"
               />
@@ -144,22 +153,22 @@
         </p>
       </div>
     </div>
-    <alex-learningplan-trails-dialogs-create-contribution
-      v-model="createContributionDialog"
-    />
+    <alex-learningplan-trails-dialogs-create-contribution ref="dialog" />
   </div>
 </template>
 
 <script setup lang="ts">
 interface contributionType {
+  id: number;
   title: string;
-  dateAndTime: string;
+  updatedAt: string;
   highlighted: boolean;
   blocked: boolean;
   contribution?: JSON;
 }
 
 interface studentsContributionsType {
+  id: number;
   name: string;
   email: string;
   class: string;
@@ -172,84 +181,49 @@ const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
 const isProfessor = ref(false);
-const createContributionDialog = ref(false);
+const dialog = ref();
 
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 const user = useStrapiUser<User>();
 
-/*
-const getContributions = () => {
-  const contributions = trailStore.trail?.contribuitions;
-
-  isProfessor.value = learningPlanStore.userIsFacilitator;
-}; */
-
 onBeforeMount(() => {
   // isProfessor.value = learningPlanStore.userIsFacilitator;
 });
 
-const myContributions = computed<contributionType[]>(() => {
-  return (
-    trailStore.trail?.contributions.filter(
-      (contribution) => contribution.student_member.id === user.value.id,
-    ) || []
-  );
+const contributions = computed(() => {
+  const contributions = trailStore.trail?.contributions;
+  const myContributions = [];
+  const otherContributions: studentsContributionsType[] = [];
+  contributions?.forEach((contribution) => {
+    if (contribution.student_member.user.id === user.value.id) {
+      myContributions.push(contribution);
+    } else {
+      const studentIndex = otherContributions.findIndex(
+        (student) => student.id === contribution.student_member.user.id,
+      );
+      if (studentIndex > -1) {
+        otherContributions[studentIndex].contributions.push(contribution);
+      } else {
+        otherContributions.push({
+          id: contribution.student_member.user.id,
+          name: contribution.student_member.user.fullname,
+          email: contribution.student_member.user.email,
+          class: contribution.student_member.learning_class?.name,
+          photo: contribution.student_member.user.avatar?.url,
+          contributions: [contribution],
+        });
+      }
+    }
+  });
+  return { myContributions, otherContributions };
 });
-
-// const myContributions = ref<contributionType[]>([
-//   {
-//     title: 'Title 1',
-//     dateAndTime: '2021-09-01T00:00:00',
-//     highlight: true,
-//     blocked: false,
-//   },
-//   {
-//     title: 'Title 2',
-//     dateAndTime: '2021-09-01T00:00:00',
-//     highlight: false,
-//     blocked: true,
-//   },
-//   {
-//     title: 'Title 3',
-//     dateAndTime: '2021-09-01T00:00:00',
-//     highlight: false,
-//     blocked: false,
-//   },
-// ]);
-
-const studentsContributions = ref<studentsContributionsType[]>([
-  {
-    name: 'Robert Judson',
-    email: 'RobertJudson@gmail.com',
-    class: 'Turma A',
-    photo: 'https://cdn.vuetifyjs.com/images/cards/desert.jpg',
-    contributions: [
-      {
-        title: 'Novas features VUE 3.4',
-        dateAndTime: '2021-09-01T00:00:00',
-        highlighted: true,
-        blocked: false,
-      },
-      {
-        title: 'Title 2',
-        dateAndTime: '2021-09-01T00:00:00',
-        highlighted: false,
-        blocked: true,
-      },
-      {
-        title: 'Title 3',
-        dateAndTime: '2021-09-01T00:00:00',
-        highlighted: false,
-        blocked: false,
-      },
-    ],
-  },
-]);
 
 const handleHighlight = (student: number, contributionIndex: number) => {
   const contribution =
-    studentsContributions.value[student].contributions[contributionIndex];
+    contributions.value.otherContributions[student].contributions[
+      contributionIndex
+    ];
   contribution.highlighted = !contribution.highlighted;
   if (contribution.blocked) {
     contribution.blocked = false;
@@ -258,7 +232,9 @@ const handleHighlight = (student: number, contributionIndex: number) => {
 
 const handleBlock = (student: number, contributionIndex: number) => {
   const contribution =
-    studentsContributions.value[student].contributions[contributionIndex];
+    contributions.value.otherContributions[student].contributions[
+      contributionIndex
+    ];
   contribution.blocked = !contribution.blocked;
   if (contribution.highlighted) {
     contribution.highlighted = false;
@@ -266,15 +242,31 @@ const handleBlock = (student: number, contributionIndex: number) => {
 };
 
 const handleDelete = (index: number) => {
-  myContributions.value.splice(index, 1);
+  contributions.value.myContributions.splice(index, 1);
 };
 
 const handleEdit = (index: number) => {
   console.log('edit' + index);
 };
 
-const handleShow = (index: number) => {
-  console.log('show' + index);
+const handleShow = (studentIndex: number, index: number) => {
+  if (studentIndex > -1) {
+    dialog.value.openDialog(
+      'readonly',
+      contributions.value.otherContributions[studentIndex].contributions[index]
+        .contribution,
+      contributions.value.otherContributions[studentIndex].contributions[index]
+        .title,
+    );
+  } else if (index > -1) {
+    dialog.value.openDialog(
+      'edit',
+      contributions.value.myContributions[index].contribution,
+      contributions.value.myContributions[index].title,
+    );
+  } else {
+    dialog.value.openDialog('create');
+  }
 };
 </script>
 
@@ -322,3 +314,11 @@ const handleShow = (index: number) => {
   }
 }
 </style>
+
+<!-- Todo:
+-i18n
+single contribution type
+passar o id junto do show pra salvar e editar
+dropdown do professor dentro do dialog
+filtro de estudantes
+-->

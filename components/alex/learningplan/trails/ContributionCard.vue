@@ -5,12 +5,12 @@
       :key="contribution.title + index"
       class="bg-white pa-3 px-4 rounded cursor-pointer left-border"
       :class="displayBorder(contribution)"
-      @click="emits('show', index)"
+      @click="emits('show', studentIndex, index)"
     >
       <div class="w-100 py-3 h-10 d-flex justify-space-between">
         <div class="d-flex flex-column">
           <span class="text-gray-600 text-body-5">{{
-            formatDateTime(contribution.dateAndTime)
+            formatDateTime(contribution.updatedAt)
           }}</span>
           <span class="text-gray-700 text-body-2">{{
             contribution.title
@@ -48,16 +48,21 @@ const { t } = useI18n();
 
 interface Contribution {
   title: string;
-  dateAndTime: string;
+  updatedAt: string;
   blocked: boolean;
   highlighted: boolean;
 }
 
-const props = defineProps<{
-  contributions: Contribution[];
-  isProfessor: boolean;
-  studentIndex?: number;
-}>();
+const props = withDefaults(
+  defineProps<{
+    contributions: Contribution[];
+    isProfessor: boolean;
+    studentIndex?: number;
+  }>(),
+  {
+    studentIndex: -1,
+  },
+);
 
 const formatDateTime = (date: string) => {
   const dateTime = new Date(date);
