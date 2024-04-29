@@ -122,18 +122,18 @@ const onGetAICompletion = async (value: string | null) => {
     const response = await props.getAICompletion(firstValue.value);
     let i = 0;
     for await (const chunk of response) {
-      if (answers.value.length !== 0) {
-        activeAnswer.value = answers.value.length - 1;
-      }
       if (i === 0) {
         setInitialChunkData(chunk);
+        if (answers.value.length !== 0) {
+          activeAnswer.value = answers.value.length - 1;
+        }
       }
       concatContentChoices(chunk);
       i++;
     }
-    text.value = firstValue.value;
   } catch (error) {
   } finally {
+    text.value = firstValue.value;
     isGenerating.value = false;
   }
 };
