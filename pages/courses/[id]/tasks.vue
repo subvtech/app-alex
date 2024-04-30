@@ -13,7 +13,7 @@ onBeforeMount(() => {
 
 <template>
   <div class="bg-white p-4 rounded">
-    <div class="flex flex-column bg-white rounded">
+    <div class="flex flex-col bg-white rounded">
       <div class="flex items-start justify-space-between">
         <alex-inputs-text-field
           name="search"
@@ -28,7 +28,7 @@ onBeforeMount(() => {
       </div>
       <Collapsible
         v-model:open="isOpen"
-        class="rounded-md border p-2 space-y-2"
+        class="rounded-md border p-3 space-y-2"
       >
         <div class="flex items-center space-x-2">
           <CollapsibleTrigger as-child>
@@ -38,7 +38,7 @@ onBeforeMount(() => {
           </CollapsibleTrigger>
           <h4 class="font-semibold">Rascunho</h4>
         </div>
-        <CollapsibleContent class="space-y-2">
+        <CollapsibleContent class="space-y-3">
           <div class="rounded-md border px-4 py-3 font-mono text-sm">
             @radix-ui/colors
           </div>
