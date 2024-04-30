@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import Viewer from 'viewerjs';
+import 'viewerjs/dist/viewer.css';
 import { createApp } from 'vue';
 import { AlexCustomViewerControls } from '#components';
-import 'viewerjs/dist/viewer.css';
 import { vuetify } from '~/plugins/vuetify';
 type ViewerProps = {
   container: string;
@@ -17,20 +17,14 @@ const createInstance = () => {
   const containerImages = document.querySelector(
     `.${props.container}`,
   ) as HTMLElement;
+  const vContainer = document.querySelector(
+    '.v-overlay-container',
+  ) as HTMLElement;
+  if (!vContainer) return;
   if (!containerImages) return;
   const viewerInstance = new Viewer(containerImages, {
     ready() {
       mountAlexControls(viewerInstance, viewerInstance.id);
-    },
-    view() {
-      const html = document.querySelector('html');
-      if (!html) return;
-      html.classList.add('v-overlay-scroll-blocked');
-    },
-    hide() {
-      const html = document.querySelector('html');
-      if (!html) return;
-      html.classList.remove('v-overlay-scroll-blocked');
     },
     play() {
       return true;
@@ -45,8 +39,9 @@ const createInstance = () => {
         return image.alt;
       },
     ],
-    className: `alex-viewer`,
-    zIndex: 1999,
+    container: vContainer,
+    className: `alex-viewer v-overlay__content`,
+    zIndex: 2000,
   }) as Viewer & { id: number };
   viewer.value = viewerInstance;
 };
@@ -56,7 +51,10 @@ const destroyInstance = () => {
     viewer.value = null;
   }
 };
-
+const reCreateInstance = () => {
+  destroyInstance();
+  createInstance();
+};
 const mountAlexControls = (viewer: Viewer, id: number) => {
   // TODO: check if exist better options to not use createApp.
   const alexViewer = document.querySelector(`#viewer${id} .viewer-footer`);
@@ -101,15 +99,30 @@ onUnmounted(() => {
   }
 });
 onMounted(() => {
-  createInstance();
+  setTimeout(() => {
+    createInstance();
+  }, 100);
 });
 defineExpose({
   createInstance,
   destroyInstance,
+  reCreateInstance,
 });
 </script>
 
 <style lang="scss">
+body {
+  padding-right: 0 !important;
+}
+
+// .v-overlay-scroll-hidden::-webkit-scrollbar {
+//   display: none;
+// }
+// /* Hide scrollbar firefox */
+// .v-overlay-scroll-hidden {
+//   -ms-overflow-style: none;
+//   scrollbar-width: none;
+// }
 .alex-viewer {
   .viewer-title {
     background-color: rgb(var(--v-theme-gray-800));

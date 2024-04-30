@@ -9,6 +9,7 @@
     <vueper-slides
       ref="vueperslides1"
       class="no-shadow mb-4 rounded d-block w-100"
+      :class="viewerId"
       :slide-ratio="2 / 4"
       :bullets="false"
       :arrows="false"
@@ -31,14 +32,12 @@
           </v-container>
         </template>
       </vueper-slide>
-
       <vueper-slide
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
       >
         <template #content>
-          <nuxt-img :src="slide.image" :alt="slide.title" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -69,6 +68,12 @@
             :is-active="activeSlide == i"
             :data-setup="JSON.stringify({ techOrder: [slide.type] })"
           ></video-player>
+          <nuxt-img
+            v-else
+            :key="slide.title"
+            :src="slide.image"
+            :alt="slide.title"
+          />
         </template>
       </vueper-slide>
     </vueper-slides>
@@ -141,23 +146,23 @@
                 elevation="0"
                 icon="mdi-pencil-outline"
                 class="bg-gray-blue rounded-lg mr-1"
-                size="28px"
+                size="small"
                 variant="secondary"
                 @click="openAddSlidesDialog(i, false)"
               >
-                <v-icon size="small" icon="mdi-pencil-outline" color="accent" />
+                <v-icon size="20px" icon="mdi-pencil-outline" color="accent" />
               </alex-custom-button>
               <alex-custom-button
                 aria-label="delete"
                 elevation="0"
                 icon="mdi-trash-can-outline"
-                size="28px"
+                size="small"
                 variant="secondary"
                 class="bg-gray-blue rounded-lg"
                 @click="deleteSlide(slide)"
               >
                 <v-icon
-                  size="small"
+                  size="20px"
                   color="red"
                   icon="mdi-trash-can-outline"
                 ></v-icon>
@@ -178,6 +183,11 @@
       ref="dialog"
       @upload-files="addSlide"
       @change-slides="editSlides"
+    />
+    <alex-custom-viewer
+      ref="viewer"
+      v-model="viewerInstance"
+      :container="viewerId"
     />
   </div>
 </template>
@@ -209,7 +219,13 @@ const props = defineProps({
     default: () => {},
   },
 });
-
+const viewerInstance = ref(null);
+const viewer = ref<null | {
+  createInstance: () => void;
+  destroyInstance: () => void;
+  reCreateInstance: () => void;
+}>(null);
+const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
 const vueperslides1 = ref();
 const vueperslides2 = ref();
 const videoJS = ref();
@@ -314,6 +330,7 @@ interface Slide {
   imgId?: string;
   videoId?: string;
   video?: string;
+  url?: string;
 }
 
 function newSlide(file, res) {
@@ -342,7 +359,6 @@ const dialog = ref();
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
-
 const slides = ref<Slide[]>([...(props.slides as Slide[])]);
 
 const deleteSlide = (item) => {
@@ -397,7 +413,7 @@ const addSlideByFile = async (slide, index) => {
 const addSlideByUrl = (slide, index) => {
   const slidesChanged = index !== -1;
 
-  let newSlide = {};
+  let newSlide = {} as Slide;
   if (
     slide.url.startsWith('https://www.youtube.com') ||
     slide.url.startsWith('https://vimeo.com/')
@@ -470,10 +486,12 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   cursor: pointer;
   -webkit-transition: opacity 1s;
   transition: opacity 1s;
-  transform: scale(0.9);
   transition: all 1s;
 }
-
+.slides-track-container .vueperslide {
+  transform: scale(0.9);
+}
+.slides-track-container .vueperslide-active,
 .vueperslide-active {
   opacity: 1;
   transform: scale(1);

@@ -24,11 +24,6 @@
           v-model="images"
           :read-only="!isEditingAndCanEdit"
         />
-        <alex-custom-viewer
-          ref="viewer"
-          v-model="viewerInstance"
-          container="vueperslides"
-        />
       </div>
     </template>
   </alex-custom-card>
@@ -54,11 +49,6 @@ const props = withDefaults(defineProps<AppMediaProps>(), {
 });
 const { delete: _delete } = useStrapi();
 const { setMessage } = useMessageStore();
-const viewerInstance = ref(null);
-const viewer = ref<null | {
-  createInstance: () => void;
-  destroyInstance: () => void;
-}>(null);
 const client = useStrapiClient();
 const images = ref([...props.images]);
 const initialImages = ref<any[]>(JSON.parse(JSON.stringify(props.images)));
@@ -108,12 +98,6 @@ const onSave = async () => {
 
   isEditing.value = !isEditing.value;
 };
-watch(isEditing, () => {
-  if (viewer.value) {
-    viewer.value.destroyInstance();
-    viewer.value.createInstance();
-  }
-});
 </script>
 
 <style scoped lang="scss">
