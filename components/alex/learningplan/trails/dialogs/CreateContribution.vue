@@ -2,10 +2,8 @@
   <alex-custom-dialog
     v-model="dialog"
     :title="dialogItens.title"
-    persistent
-    :main-button-text="dialogItens.mainButtonText"
+    :persistent="!dialogItens.isReadonly"
     :body-classes="dialogItens.bodyClasses"
-    :no-footer="dialogItens.isReadonly"
     :max-width="1080"
     @on-main-action="saveContribution"
     @on-secondary-action="dialog = false"
@@ -18,7 +16,8 @@
         <template #default>
           <div class="ml-auto">
             <alex-custom-dropdown
-              :items="[{ text: 'edit' }]"
+              v-if="studentId === -1"
+              :items="dropdownItems"
               variant="text"
               icon="mdi-dots-vertical"
               class="mr-auto"
@@ -47,14 +46,37 @@
       ></v-progress-circular>
       <app-editor ref="editor" />
     </div>
+    <template #footer>
+      <alex-custom-dialog-footer v-if="!dialogItens.isReadonly">
+        <template #mainSlotButton>
+          <alex-custom-button
+            :text="dialogItens.mainButtonText"
+            size="large"
+            :prepend-icon="mode === 'create' ? 'mdi-plus' : 'mdi-pencil'"
+            :loading="isSaving"
+            @click="saveContribution"
+          />
+        </template>
+      </alex-custom-dialog-footer>
+    </template>
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
+import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+const props = defineProps<{ studentId?: number; trailId?: number }>();
+const emits = defineEmits(['saveContribution', 'highlight', 'block']);
+const { t } = useI18n();
+
 const dialog = ref(false);
-const title = ref();
+const contribution = ref<contributionType>();
+const user = useStrapiUser<User>();
+const title = ref('');
 const editor = ref();
 const mode = ref('create');
 const isLoading = ref(false);
+const isSaving = ref(false);
+const { create, update } = useStrapi();
+const trailStore = useTrailStore();
 
 const dialogItens = computed(() => {
   return {
@@ -83,21 +105,45 @@ const checkEditorReady = async () => {
 };
 
 const saveContribution = async () => {
-  const res = await editor.value?.getData();
-  console.log(res);
+  isSaving.value = true;
+  const editorValue = await editor.value?.getData();
+  if (mode.value === 'create') {
+    const res = await create('trail-contributions', {
+      title: title.value,
+      contribution: editorValue.data,
+      trail: props.trailId,
+      student_member: props.studentId,
+    });
+    if (trailStore.trail?.contributions !== undefined)
+      trailStore.trail.contributions.push({
+        ...res.data.attributes,
+        student_member: {
+          user: {
+            id: user.value.id,
+          },
+        },
+      });
+    emits('saveContribution', res, title.value, mode.value);
+  } else {
+    emits('saveContribution', data, title.value, mode.value);
+  }
+  isSaving.value = false;
+  dialog.value = false;
 };
 
 const openDialog = async (
   editMode: string,
-  editorData?: JSON,
-  contributionTitle?: string,
+  contributionData: contributionType,
 ) => {
   mode.value = editMode;
   dialog.value = true;
-  title.value = contributionTitle;
+  contribution.value = contributionData;
+  title.value = contributionData?.title;
   isLoading.value = true;
-  if ((await checkEditorReady()) && editorData) {
-    await editor.value?.loadEditor(JSON.parse(JSON.stringify(editorData)));
+  if ((await checkEditorReady()) && contribution.value?.contribution) {
+    await editor.value?.loadEditor(
+      JSON.parse(JSON.stringify(contribution.value.contribution)),
+    );
     if (editMode === 'readonly') editor.value?.toggleReadOnly();
   }
   isLoading.value = false;
@@ -105,6 +151,35 @@ const openDialog = async (
 
 defineExpose({
   openDialog,
+});
+
+const dropdownItems = computed(() => {
+  return [
+    {
+      text: contribution.value?.highlighted
+        ? t('components.trails.contributions.card.removeHighlight')
+        : t('components.trails.contributions.card.highlight'),
+      icon: contribution.value?.highlighted
+        ? 'mdi-star-remove-outline'
+        : 'mdi-star-check-outline',
+      onClick: () => {
+        console.log('highlight', contribution.value);
+        // emits('highlight', student, contributionIndex);
+      },
+    },
+    {
+      text: contribution.value?.blocked
+        ? t('components.trails.contributions.card.unblock')
+        : t('components.trails.contributions.card.block'),
+      icon: contribution.value?.blocked
+        ? 'mdi-shield-lock-open-outline'
+        : 'mdi-shield-alert-outline',
+      warning: true,
+      onClick: () => {
+        // emits('block', student, contributionIndex);
+      },
+    },
+  ];
 });
 </script>
 
