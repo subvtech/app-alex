@@ -153,12 +153,16 @@
         </p>
       </div>
     </div>
-    <alex-learningplan-trails-dialogs-create-contribution ref="dialog" />
+    <alex-learningplan-trails-dialogs-create-contribution
+      ref="dialog"
+      :student-id="contributions.userId"
+      :trail-id="contributions.trailId"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-interface contributionType {
+export interface contributionType {
   id: number;
   title: string;
   updatedAt: string;
@@ -176,28 +180,40 @@ interface studentsContributionsType {
   contributions: contributionType[];
 }
 
-const studentSearch = ref('');
-const isLoading = computed(
-  () => trailStore.loading || learningPlanStore.loading,
-);
-const isProfessor = ref(false);
-const dialog = ref();
-
+const { update, delete: _delete } = useStrapi();
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 const user = useStrapiUser<User>();
+const messageStore = useMessageStore();
+const { t } = useI18n();
+
+const isProfessor = ref(false);
+const dialog = ref();
+const studentSearch = ref('');
+
+const isLoading = computed(
+  () => trailStore.loading || learningPlanStore.loading,
+);
 
 onBeforeMount(() => {
   // isProfessor.value = learningPlanStore.userIsFacilitator;
 });
 
 const contributions = computed(() => {
-  const contributions = trailStore.trail?.contributions;
-  const myContributions = [];
+  const myContributions: contributionType[] = [];
   const otherContributions: studentsContributionsType[] = [];
+  const contributions = trailStore.trail?.contributions;
+  const trailId = trailStore.trail?.id;
+  const userId = learningPlanStore.userIsFacilitator
+    ? -1
+    : learningPlanStore.activeMembers.find(
+        (member) => member.user.id === user.value.id,
+      )?.id;
+
   contributions?.forEach((contribution) => {
-    if (contribution.student_member.user.id === user.value.id) {
-      myContributions.push(contribution);
+    const student = contribution.student_member;
+    if (contribution.student_member?.user.id === user.value.id) {
+      myContributions.unshift(contribution);
     } else {
       const studentIndex = otherContributions.findIndex(
         (student) => student.id === contribution.student_member.user.id,
@@ -205,65 +221,87 @@ const contributions = computed(() => {
       if (studentIndex > -1) {
         otherContributions[studentIndex].contributions.push(contribution);
       } else {
-        otherContributions.push({
-          id: contribution.student_member.user.id,
-          name: contribution.student_member.user.fullname,
-          email: contribution.student_member.user.email,
-          class: contribution.student_member.learning_class?.name,
-          photo: contribution.student_member.user.avatar?.url,
+        otherContributions.unshift({
+          id: student.user.id,
+          name: student.user.fullname,
+          email: student.user.email,
+          class: student.learning_class?.name,
+          photo: student.user.avatar?.url,
           contributions: [contribution],
         });
       }
     }
   });
-  return { myContributions, otherContributions };
+  return { myContributions, otherContributions, trailId, userId };
 });
 
-const handleHighlight = (student: number, contributionIndex: number) => {
-  const contribution =
-    contributions.value.otherContributions[student].contributions[
-      contributionIndex
-    ];
-  contribution.highlighted = !contribution.highlighted;
-  if (contribution.blocked) {
+const handleError = (text: string) => {
+  messageStore.setMessage(text, 'red', true);
+  if (trailStore.trail?.id !== undefined)
+    trailStore.loadTrailData(trailStore.trail.id);
+};
+
+const handleHighlight = async (student: number, contributionIndex: number) => {
+  try {
+    const contribution =
+      contributions.value.otherContributions[student].contributions[
+        contributionIndex
+      ];
+    contribution.highlighted = !contribution.highlighted;
     contribution.blocked = false;
+    await update('trail-contributions', contribution.id, {
+      highlighted: contribution.highlighted,
+      blocked: false,
+    });
+  } catch (e) {
+    handleError(t('components.trails.contributions.highlightError'));
   }
 };
 
-const handleBlock = (student: number, contributionIndex: number) => {
-  const contribution =
-    contributions.value.otherContributions[student].contributions[
-      contributionIndex
-    ];
-  contribution.blocked = !contribution.blocked;
-  if (contribution.highlighted) {
+const handleBlock = async (student: number, contributionIndex: number) => {
+  try {
+    const contribution =
+      contributions.value.otherContributions[student].contributions[
+        contributionIndex
+      ];
+    contribution.blocked = !contribution.blocked;
     contribution.highlighted = false;
+    await update('trail-contributions', contribution.id, {
+      blocked: contribution.blocked,
+      highlighted: false,
+    });
+  } catch (e) {
+    handleError(t('components.trails.contributions.blockError'));
   }
 };
 
-const handleDelete = (index: number) => {
-  contributions.value.myContributions.splice(index, 1);
+const handleDelete = async (index: number) => {
+  try {
+    const contributionId = contributions.value.myContributions[index].id;
+    const deleteIntex = trailStore.trail?.contributions.findIndex(
+      (contribution) => contribution.id === contributionId,
+    );
+    if (typeof deleteIntex === 'number') {
+      trailStore.trail?.contributions.splice(deleteIntex, 1);
+    }
+    await _delete('trail-contributions', contributionId);
+  } catch (e) {
+    handleError(t('components.trails.contributions.deleteError'));
+  }
 };
 
 const handleEdit = (index: number) => {
-  console.log('edit' + index);
+  dialog.value.openDialog('edit', contributions.value.myContributions[index]);
 };
 
 const handleShow = (studentIndex: number, index: number) => {
   if (studentIndex > -1) {
     dialog.value.openDialog(
       'readonly',
-      contributions.value.otherContributions[studentIndex].contributions[index]
-        .contribution,
-      contributions.value.otherContributions[studentIndex].contributions[index]
-        .title,
+      contributions.value.otherContributions[studentIndex].contributions[index],
     );
   } else if (index > -1) {
-    dialog.value.openDialog(
-      'edit',
-      contributions.value.myContributions[index].contribution,
-      contributions.value.myContributions[index].title,
-    );
+    dialog.value.openDialog('edit', contributions.value.myContributions[index]);
   } else {
     dialog.value.openDialog('create');
   }
@@ -315,10 +353,3 @@ const handleShow = (studentIndex: number, index: number) => {
 }
 </style>
 
-<!-- Todo:
--i18n
-single contribution type
-passar o id junto do show pra salvar e editar
-dropdown do professor dentro do dialog
-filtro de estudantes
--->
