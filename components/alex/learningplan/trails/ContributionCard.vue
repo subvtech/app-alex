@@ -7,7 +7,10 @@
       :class="displayBorder(contribution)"
       @click="emits('show', studentIndex, index)"
     >
-      <div class="w-100 py-3 h-10 d-flex justify-space-between">
+      <div
+        v-if="hideBlocked(contribution)"
+        class="w-100 py-3 h-10 d-flex justify-space-between"
+      >
         <div class="d-flex flex-column">
           <span class="text-gray-600 text-body-5"
             >{{ timeStampToDate(contribution.contribution.time) }}
@@ -132,6 +135,12 @@ const dropDownItems = (contribution: contributionType, index: number) => {
 
 const showDropdown = () => {
   return props.isProfessor || props.studentIndex === -1;
+};
+
+const hideBlocked = (contribution: contributionType) => {
+  return (
+    !contribution.blocked || props.isProfessor || props.studentIndex === -1
+  );
 };
 </script>
 

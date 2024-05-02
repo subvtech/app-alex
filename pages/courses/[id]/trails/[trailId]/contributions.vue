@@ -231,9 +231,9 @@ const contributions = computed(() => {
       const studentIndex = otherContributions.findIndex(
         (student) => student.id === contribution.student_member.user.id,
       );
-      if (studentIndex > -1) {
+      if (studentIndex > -1 && !hideBlocked(contribution)) {
         otherContributions[studentIndex].contributions.push(contribution);
-      } else {
+      } else if (!hideBlocked(contribution)) {
         otherContributions.push({
           id: student.user.id,
           name: student.user.fullname,
@@ -320,6 +320,10 @@ const handleShow = (studentIndex: number, index: number) => {
   } else {
     dialog.value.openDialog('create');
   }
+};
+
+const hideBlocked = (contributions: contributionType) => {
+  return contributions.blocked && !isProfessor.value;
 };
 </script>
 
