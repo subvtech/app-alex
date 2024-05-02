@@ -51,7 +51,6 @@
       >
         <alex-learningplan-trails-contribution-card
           :contributions="contributions.myContributions"
-          :is-professor="false"
           @delete="handleDelete"
           @edit="handleEdit"
           @show="handleShow"
@@ -73,7 +72,7 @@
           variant="accordion"
         >
           <v-expansion-panel
-            v-for="(student, index) in contributions.otherContributions"
+            v-for="(student, index) in filteredStudents"
             :key="student.name + index"
             elevation="0"
           >
@@ -104,7 +103,7 @@
             <v-expansion-panel-text>
               <alex-learningplan-trails-contribution-card
                 :contributions="student.contributions"
-                is-professor
+                :is-professor="isProfessor"
                 :student-index="index"
                 @highlight="handleHighlight"
                 @block="handleBlock"
@@ -112,6 +111,11 @@
               />
             </v-expansion-panel-text>
           </v-expansion-panel>
+          <div v-if="!filteredStudents.length" class="w-100 pa-4">
+            <p class="text-gray-600 text-body-3 text-center">
+              {{ $t('components.trails.contributions.emptyStudentsFilter') }}
+            </p>
+          </div>
         </v-expansion-panels>
       </div>
     </div>
@@ -157,18 +161,25 @@
       ref="dialog"
       :student-id="contributions.userId"
       :trail-id="contributions.trailId"
+      @highlight="handleHighlight"
+      @block="handleBlock"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+interface editorData {
+  time: number;
+  version: string;
+  blocks: JSON[];
+}
+
 export interface contributionType {
   id: number;
   title: string;
-  updatedAt: string;
   highlighted: boolean;
   blocked: boolean;
-  contribution?: JSON;
+  contribution: editorData;
 }
 
 interface studentsContributionsType {
@@ -187,7 +198,6 @@ const user = useStrapiUser<User>();
 const messageStore = useMessageStore();
 const { t } = useI18n();
 
-const isProfessor = ref(false);
 const dialog = ref();
 const studentSearch = ref('');
 
@@ -195,8 +205,12 @@ const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
 
-onBeforeMount(() => {
-  // isProfessor.value = learningPlanStore.userIsFacilitator;
+const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
+
+const filteredStudents = computed(() => {
+  return contributions.value.otherContributions.filter((student) =>
+    student.name.toLowerCase().includes(studentSearch.value.toLowerCase()),
+  );
 });
 
 const contributions = computed(() => {
@@ -209,11 +223,10 @@ const contributions = computed(() => {
     : learningPlanStore.activeMembers.find(
         (member) => member.user.id === user.value.id,
       )?.id;
-
   contributions?.forEach((contribution) => {
     const student = contribution.student_member;
     if (contribution.student_member?.user.id === user.value.id) {
-      myContributions.unshift(contribution);
+      myContributions.push(contribution);
     } else {
       const studentIndex = otherContributions.findIndex(
         (student) => student.id === contribution.student_member.user.id,
@@ -221,7 +234,7 @@ const contributions = computed(() => {
       if (studentIndex > -1) {
         otherContributions[studentIndex].contributions.push(contribution);
       } else {
-        otherContributions.unshift({
+        otherContributions.push({
           id: student.user.id,
           name: student.user.fullname,
           email: student.user.email,
@@ -232,6 +245,7 @@ const contributions = computed(() => {
       }
     }
   });
+
   return { myContributions, otherContributions, trailId, userId };
 });
 
@@ -241,12 +255,16 @@ const handleError = (text: string) => {
     trailStore.loadTrailData(trailStore.trail.id);
 };
 
-const handleHighlight = async (student: number, contributionIndex: number) => {
+const findTrailById = (id: number) => {
+  return trailStore.trail?.contributions.find(
+    (contribution) => contribution.id === id,
+  );
+};
+
+const handleHighlight = async (contributionId: number) => {
   try {
-    const contribution =
-      contributions.value.otherContributions[student].contributions[
-        contributionIndex
-      ];
+    const contribution = findTrailById(contributionId);
+    if (!contribution) return;
     contribution.highlighted = !contribution.highlighted;
     contribution.blocked = false;
     await update('trail-contributions', contribution.id, {
@@ -258,12 +276,10 @@ const handleHighlight = async (student: number, contributionIndex: number) => {
   }
 };
 
-const handleBlock = async (student: number, contributionIndex: number) => {
+const handleBlock = async (contributionId: number) => {
   try {
-    const contribution =
-      contributions.value.otherContributions[student].contributions[
-        contributionIndex
-      ];
+    const contribution = findTrailById(contributionId);
+    if (!contribution) return;
     contribution.blocked = !contribution.blocked;
     contribution.highlighted = false;
     await update('trail-contributions', contribution.id, {
@@ -275,14 +291,13 @@ const handleBlock = async (student: number, contributionIndex: number) => {
   }
 };
 
-const handleDelete = async (index: number) => {
+const handleDelete = async (contributionId: number) => {
   try {
-    const contributionId = contributions.value.myContributions[index].id;
-    const deleteIntex = trailStore.trail?.contributions.findIndex(
+    const deleteIndex = trailStore.trail?.contributions.findIndex(
       (contribution) => contribution.id === contributionId,
     );
-    if (typeof deleteIntex === 'number') {
-      trailStore.trail?.contributions.splice(deleteIntex, 1);
+    if (typeof deleteIndex === 'number') {
+      trailStore.trail?.contributions.splice(deleteIndex, 1);
     }
     await _delete('trail-contributions', contributionId);
   } catch (e) {
@@ -298,7 +313,7 @@ const handleShow = (studentIndex: number, index: number) => {
   if (studentIndex > -1) {
     dialog.value.openDialog(
       'readonly',
-      contributions.value.otherContributions[studentIndex].contributions[index],
+      filteredStudents.value[studentIndex].contributions[index],
     );
   } else if (index > -1) {
     dialog.value.openDialog('edit', contributions.value.myContributions[index]);
@@ -352,4 +367,3 @@ const handleShow = (studentIndex: number, index: number) => {
   }
 }
 </style>
-

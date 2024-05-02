@@ -5,6 +5,9 @@
   "blocked": "Blocked contribution",
   "myContributions": "My Contributions",
   "otherContributions": "Other Contributions",
+  "saveError": "An error occurred while saving the contribution.",
+  "emptyContribution": "You must write something to contribute.",
+  "emptyStudentsFilter": "No students found with this name...",
   "card": {
     "delete": "Delete Contribution",
     "edit": "Edit Contribution",

@@ -5,8 +5,6 @@
     :persistent="!dialogItens.isReadonly"
     :body-classes="dialogItens.bodyClasses"
     :max-width="1080"
-    @on-main-action="saveContribution"
-    @on-secondary-action="dialog = false"
   >
     <template #header>
       <alex-custom-dialog-header
@@ -47,13 +45,17 @@
       <app-editor ref="editor" />
     </div>
     <template #footer>
-      <alex-custom-dialog-footer v-if="!dialogItens.isReadonly">
+      <alex-custom-dialog-footer
+        v-if="!dialogItens.isReadonly"
+        @on-secondary-action="dialog = false"
+      >
         <template #mainSlotButton>
           <alex-custom-button
             :text="dialogItens.mainButtonText"
             size="large"
             :prepend-icon="mode === 'create' ? 'mdi-plus' : 'mdi-pencil'"
             :loading="isSaving"
+            :disabled="!title || isSaving"
             @click="saveContribution"
           />
         </template>
@@ -64,8 +66,9 @@
 <script setup lang="ts">
 import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 const props = defineProps<{ studentId?: number; trailId?: number }>();
-const emits = defineEmits(['saveContribution', 'highlight', 'block']);
+const emits = defineEmits(['highlight', 'block']);
 const { t } = useI18n();
+const messageStore = useMessageStore();
 
 const dialog = ref(false);
 const contribution = ref<contributionType>();
@@ -104,31 +107,74 @@ const checkEditorReady = async () => {
   return false;
 };
 
+const createContribution = async (
+  editorValue: contributionType['contribution'],
+) => {
+  const res = await create('trail-contributions', {
+    title: title.value,
+    contribution: editorValue,
+    trail: props.trailId,
+    student_member: props.studentId,
+  });
+  if (trailStore.trail?.contributions !== undefined)
+    trailStore.trail.contributions.unshift({
+      ...res.data.attributes,
+      id: res.data.id,
+      student_member: {
+        user: {
+          id: user.value.id,
+        },
+      },
+    });
+};
+
+const updateContribution = async (
+  editorValue: contributionType['contribution'],
+) => {
+  if (contribution.value?.id === undefined) {
+    throw new Error('Contribution id not found');
+  }
+  const res = await update('trail-contributions', contribution.value.id, {
+    title: title.value,
+    contribution: editorValue,
+  });
+  if (trailStore.trail === undefined)
+    throw new Error('Trail contributions not found');
+  const index = trailStore.trail?.contributions.findIndex(
+    (c) => c.id === res.data.id,
+  );
+  trailStore.trail.contributions[index].title = res.data.attributes.title;
+  trailStore.trail.contributions[index].contribution =
+    res.data.attributes.contribution;
+};
+
 const saveContribution = async () => {
   isSaving.value = true;
-  const editorValue = await editor.value?.getData();
-  if (mode.value === 'create') {
-    const res = await create('trail-contributions', {
-      title: title.value,
-      contribution: editorValue.data,
-      trail: props.trailId,
-      student_member: props.studentId,
-    });
-    if (trailStore.trail?.contributions !== undefined)
-      trailStore.trail.contributions.push({
-        ...res.data.attributes,
-        student_member: {
-          user: {
-            id: user.value.id,
-          },
-        },
-      });
-    emits('saveContribution', res, title.value, mode.value);
-  } else {
-    emits('saveContribution', data, title.value, mode.value);
+  try {
+    const editorValue = await editor.value?.getData();
+    if (editorValue.data.blocks.length === 0) {
+      messageStore.setMessage(
+        t('components.trails.contributions.emptyContribution'),
+        'red',
+        true,
+      );
+      return;
+    }
+    if (mode.value === 'create') {
+      await createContribution(editorValue.data);
+    } else {
+      await updateContribution(editorValue.data);
+    }
+    dialog.value = false;
+  } catch (e) {
+    messageStore.setMessage(
+      t('components.trails.contributions.saveError'),
+      'red',
+      true,
+    );
+  } finally {
+    isSaving.value = false;
   }
-  isSaving.value = false;
-  dialog.value = false;
 };
 
 const openDialog = async (
@@ -163,8 +209,9 @@ const dropdownItems = computed(() => {
         ? 'mdi-star-remove-outline'
         : 'mdi-star-check-outline',
       onClick: () => {
-        console.log('highlight', contribution.value);
-        // emits('highlight', student, contributionIndex);
+        if (contribution.value) {
+          emits('highlight', contribution.value.id);
+        }
       },
     },
     {
@@ -176,7 +223,9 @@ const dropdownItems = computed(() => {
         : 'mdi-shield-alert-outline',
       warning: true,
       onClick: () => {
-        // emits('block', student, contributionIndex);
+        if (contribution.value) {
+          emits('block', contribution.value.id);
+        }
       },
     },
   ];

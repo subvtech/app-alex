@@ -9,9 +9,9 @@
     >
       <div class="w-100 py-3 h-10 d-flex justify-space-between">
         <div class="d-flex flex-column">
-          <span class="text-gray-600 text-body-5">{{
-            formatDateTime(contribution.updatedAt)
-          }}</span>
+          <span class="text-gray-600 text-body-5"
+            >{{ timeStampToDate(contribution.contribution.time) }}
+          </span>
           <span class="text-gray-700 text-body-2">{{
             contribution.title
           }}</span>
@@ -29,10 +29,11 @@
             "
             variant="text"
             :color="contribution.highlighted ? 'warning-0' : 'gray-800'"
-            @click.stop="emits('highlight', studentIndex, index)"
+            @click.stop="emits('highlight', contribution.id)"
           ></v-btn>
         </div>
         <alex-custom-dropdown
+          v-if="showDropdown()"
           :items="dropDownItems(contribution, index)"
           variant="text"
           icon="mdi-dots-vertical"
@@ -43,29 +44,24 @@
 </template>
 
 <script setup lang="ts">
+import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 const emits = defineEmits(['edit', 'delete', 'highlight', 'block', 'show']);
 const { t } = useI18n();
 
-interface Contribution {
-  title: string;
-  updatedAt: string;
-  blocked: boolean;
-  highlighted: boolean;
-}
-
 const props = withDefaults(
   defineProps<{
-    contributions: Contribution[];
-    isProfessor: boolean;
+    contributions: contributionType[];
+    isProfessor?: boolean;
     studentIndex?: number;
   }>(),
   {
     studentIndex: -1,
+    isProfessor: false,
   },
 );
 
-const formatDateTime = (date: string) => {
-  const dateTime = new Date(date);
+const timeStampToDate = (timeStamp: number) => {
+  const dateTime = new Date(timeStamp);
   return `${dateTime.toLocaleDateString()} - ${dateTime.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -73,18 +69,14 @@ const formatDateTime = (date: string) => {
   })}`;
 };
 
-const displayBorder = (contribution: Contribution) => {
+const displayBorder = (contribution: contributionType) => {
   if (!props.isProfessor) return;
   if (contribution.blocked) return 'border-blocked';
   if (contribution.highlighted) return 'border-highlighted';
   return 'bg-green';
 };
 
-const professorOptions = (
-  contribution: Contribution,
-  student: number,
-  contributionIndex: number,
-) => {
+const professorOptions = (contribution: contributionType) => {
   return [
     {
       text: contribution.highlighted
@@ -94,7 +86,7 @@ const professorOptions = (
         ? 'mdi-star-remove-outline'
         : 'mdi-star-check-outline',
       onClick: () => {
-        emits('highlight', student, contributionIndex);
+        emits('highlight', contribution.id);
       },
     },
     {
@@ -106,13 +98,13 @@ const professorOptions = (
         : 'mdi-shield-alert-outline',
       warning: true,
       onClick: () => {
-        emits('block', student, contributionIndex);
+        emits('block', contribution.id);
       },
     },
   ];
 };
 
-const studentOption = (index: number) => {
+const studentOption = (contributionId: number, index: number) => {
   return [
     {
       text: t('components.trails.contributions.card.edit'),
@@ -126,25 +118,29 @@ const studentOption = (index: number) => {
       icon: 'mdi-delete-outline',
       warning: true,
       onClick: () => {
-        emits('delete', index);
+        emits('delete', contributionId);
       },
     },
   ];
 };
 
-const dropDownItems = (contribution: Contribution, index: number) => {
+const dropDownItems = (contribution: contributionType, index: number) => {
   return props.isProfessor && props.studentIndex !== undefined
-    ? professorOptions(contribution, props.studentIndex, index)
-    : studentOption(index);
+    ? professorOptions(contribution)
+    : studentOption(contribution.id, index);
+};
+
+const showDropdown = () => {
+  return props.isProfessor || props.studentIndex === -1;
 };
 </script>
 
 <style scoped>
 .border-blocked {
-  border-left-color: #ff8484 !important;
+  border-left-color: rgb(var(--v-theme-tag-red-light)) !important;
 }
 .border-highlighted {
-  border-left-color: #ff9733 !important;
+  border-left-color: rgb(var(--v-theme-warning-0)) !important;
 }
 
 .left-border {

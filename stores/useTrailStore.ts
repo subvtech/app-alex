@@ -33,6 +33,7 @@ export const useTrailStore = defineStore('trail', () => {
           },
         },
       },
+      sort: 'id:desc',
     },
   };
 

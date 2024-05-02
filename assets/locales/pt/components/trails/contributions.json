@@ -5,6 +5,9 @@
   "blocked": "Contribuição bloqueada",
   "myContributions": "Minhas Contribuições",
   "otherContributions": "Outras Contribuições",
+  "saveError": "Erro ao salvar contribuição",
+  "emptyContribution": "Você não pode enviar uma contribuição vazia",
+  "emptyStudentsFilter": "Nenhum estudante encontrado com esse nome...",
   "card": {
     "delete": "Apagar contribuição",
     "edit": "Editar contribuição",
