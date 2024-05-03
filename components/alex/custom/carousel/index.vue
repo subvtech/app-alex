@@ -377,10 +377,11 @@ const addSlideByUrl = (slide, index) => {
   let newSlide = {};
   if (
     slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://youtu.be') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
     let image, type;
-    if (slide.url.includes('www.youtube')) {
+    if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = useGetYoutubeThumbnail(slide.url);
     } else {

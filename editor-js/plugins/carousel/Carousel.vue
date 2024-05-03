@@ -250,6 +250,12 @@ const captureVideoFrame = (file) => {
 };
 
 function getYoutubeThumbnail(url: string) {
+  const isEncurtedLink = url.match(/\b(\.be)\b/);
+  if (isEncurtedLink) {
+    return `https://img.youtube.com/vi/${
+      url.split('.be/')[1].split('?')[0]
+    }/0.jpg`;
+  }
   return `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`;
 }
 
@@ -402,10 +408,11 @@ const addSlideByUrl = (slide, index) => {
   let newSlide = {} as Slide;
   if (
     slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://youtu.be') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
     let image, type;
-    if (slide.url.includes('www.youtube')) {
+    if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = getYoutubeThumbnail(slide.url);
     } else {
