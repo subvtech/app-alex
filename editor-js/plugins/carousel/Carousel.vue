@@ -488,7 +488,7 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   top: 75%;
   left: 80%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.25);
+  background: #0006;
   width: 36px;
   height: 36px;
 }
