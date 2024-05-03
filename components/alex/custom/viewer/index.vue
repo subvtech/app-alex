@@ -12,7 +12,10 @@ type ViewerProps = {
   container: string;
 };
 const props = defineProps<ViewerProps>();
-const viewer = defineModel<Viewer | null>({ required: true });
+const images = ref<HTMLImageElement[]>([]);
+const viewer = defineModel<
+  (Viewer & { id: number; images: HTMLImageElement[] }) | null
+>({ required: true });
 const createInstance = () => {
   const containerImages = document.querySelector(
     `.${props.container}`,
@@ -42,7 +45,7 @@ const createInstance = () => {
     container: vContainer,
     className: `alex-viewer v-overlay__content`,
     zIndex: 2000,
-  }) as Viewer & { id: number };
+  }) as Viewer & { id: number; images: HTMLImageElement[] };
   viewer.value = viewerInstance;
 };
 const destroyInstance = () => {
@@ -93,6 +96,12 @@ const mountAlexControls = (viewer: Viewer, id: number) => {
   app.mount(wrapper);
   alexViewer.append(wrapper);
 };
+onUpdated(() => {
+  const imagesArray = getImages();
+  images.value = imagesArray;
+  if (!viewer.value) return;
+  viewer.value.images = images.value;
+});
 onUnmounted(() => {
   if (viewer.value) {
     viewer.value.destroy();
@@ -100,9 +109,19 @@ onUnmounted(() => {
 });
 onMounted(() => {
   setTimeout(() => {
+    const imagesArray = getImages();
+    images.value = imagesArray;
     createInstance();
-  }, 100);
+    if (!viewer.value || !imagesArray.length) return;
+    viewer.value.images = images.value;
+  }, 300);
 });
+const getImages = () => {
+  const imagesArray = document.querySelectorAll(
+    `.${props.container} img`,
+  ) as NodeListOf<HTMLImageElement>;
+  return Array.from(imagesArray);
+};
 defineExpose({
   createInstance,
   destroyInstance,

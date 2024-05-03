@@ -9,7 +9,6 @@
     <vueper-slides
       ref="vueperslides1"
       class="no-shadow mb-4 rounded d-block w-100"
-      :class="viewerId"
       :slide-ratio="2 / 4"
       :bullets="false"
       :arrows="false"
@@ -184,11 +183,6 @@
       @upload-files="addSlide"
       @change-slides="editSlides"
     />
-    <alex-custom-viewer
-      ref="viewer"
-      v-model="viewerInstance"
-      :container="viewerId"
-    />
   </div>
 </template>
 
@@ -219,13 +213,6 @@ const props = defineProps({
     default: () => {},
   },
 });
-const viewerInstance = ref(null);
-const viewer = ref<null | {
-  createInstance: () => void;
-  destroyInstance: () => void;
-  reCreateInstance: () => void;
-}>(null);
-const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
 const vueperslides1 = ref();
 const vueperslides2 = ref();
 const videoJS = ref();
@@ -465,16 +452,6 @@ const editSlides = async (files, deleted, added) => {
     props.onUpdateSlides(slides.value);
   }
 };
-watch(
-  () => props.readOnly,
-  () => {
-    console.log('test');
-  },
-);
-onUpdated(() => {
-  console.log(slides.value);
-  console.log(props.readOnly);
-});
 const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 

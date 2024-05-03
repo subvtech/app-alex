@@ -3,9 +3,15 @@
     <div
       id="editorjs"
       class="editorjs w-100 pa-0"
+      :class="viewerId"
       :is-editing="isEditing"
       v-bind="$attrs"
     ></div>
+    <alex-custom-viewer
+      ref="viewer"
+      v-model="viewerInstance"
+      :container="viewerId"
+    />
   </client-only>
 </template>
 
@@ -41,6 +47,13 @@ const strapiClient = useStrapiClient();
 const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
+const viewerInstance = ref(null);
+const viewer = ref<null | {
+  createInstance: () => void;
+  destroyInstance: () => void;
+  reCreateInstance: () => void;
+}>(null);
+const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
 onMounted(() => {
   instance.value = new EditorJS({
     autofocus: true,
@@ -283,7 +296,12 @@ onMounted(() => {
     onChange: () => emit('change'),
   });
 });
-
+watch(isEditing, () => {
+  if (!viewer.value) return;
+  if (!viewerInstance.value) return;
+  viewer.value.destroyInstance();
+  viewer.value.createInstance();
+});
 const getData = async () => {
   try {
     const data = await instance.value.save();
