@@ -275,7 +275,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = `https://${slide.video}`;
+    url = slide.video;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -412,7 +412,6 @@ const addSlideByFile = async (slide, index) => {
 
 const addSlideByUrl = (slide, index) => {
   const slidesChanged = index !== -1;
-
   let newSlide = {} as Slide;
   if (
     slide.url.startsWith('https://www.youtube.com') ||
@@ -466,6 +465,16 @@ const editSlides = async (files, deleted, added) => {
     props.onUpdateSlides(slides.value);
   }
 };
+watch(
+  () => props.readOnly,
+  () => {
+    console.log('test');
+  },
+);
+onUpdated(() => {
+  console.log(slides.value);
+  console.log(props.readOnly);
+});
 const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
