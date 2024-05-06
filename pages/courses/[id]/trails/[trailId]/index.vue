@@ -1,5 +1,13 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column">
+    <alex-learningplan-trails-contributions-side-bar
+      :model-value="sidebar"
+      @update:model-value="
+        (value) => {
+          sidebar = value;
+        }
+      "
+    />
     <div
       id="editor-container"
       class="bg-white rounded w-100 container-min-height"
@@ -11,6 +19,12 @@
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
+          icon="mdi-text-box-outline"
+          variant="secondary"
+          size="large"
+          @click="sidebar = !sidebar"
+        />
+        <alex-custom-button
           v-if="
             readOnly &&
             learningPlanStore.userIsFacilitator &&
@@ -18,6 +32,7 @@
           "
           variant="primary"
           size="large"
+          class="ml-2"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
@@ -166,11 +181,11 @@ definePageMeta({
 });
 
 const trailStore = useTrailStore();
-
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
+const sidebar = ref(false);
 
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
