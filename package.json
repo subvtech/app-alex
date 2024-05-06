@@ -72,6 +72,7 @@
     "@postlight/parser": "^2.2.3",
     "@vee-validate/yup": "^4.11.1",
     "@vee-validate/zod": "^4.11.1",
+    "@vueuse/core": "^10.9.0",
     "body-parser": "^1.20.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
