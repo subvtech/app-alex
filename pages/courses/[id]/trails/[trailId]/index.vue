@@ -2,6 +2,8 @@
   <div class="fill-height d-flex ga-3 flex-column">
     <alex-learningplan-trails-contributions-side-bar
       :model-value="sidebar"
+      :contributions="highlightedContributions"
+      :is-professor="learningPlanStore.userIsFacilitator"
       @update:model-value="
         (value) => {
           sidebar = value;
@@ -13,12 +15,12 @@
       class="bg-white rounded w-100 container-min-height"
     >
       <div
-        id="Início"
         section="0"
         class="d-flex justify-end px-6 pt-6"
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
+          v-if="readOnly && !trailStore.loading"
           icon="mdi-text-box-outline"
           variant="secondary"
           size="large"
@@ -122,11 +124,41 @@
             class="text-gray-500 text-body-3 mb-4 mx-auto"
           >
             {{ $t('pages.trailId.overview.lastUpdated') }}
-            {{ timeStampToDate }}
+            {{ timeStampToDate(editorData.time) }}
           </p>
           <AppEditor ref="editor" :data="editorData" />
+          <div v-if="readOnly">
+            <div
+              v-for="contribution in highlightedContributions"
+              :id="`${contribution.title}-${contribution.id}`"
+              :key="contribution.id"
+              class="w-100 my-12"
+            >
+              <div class="d-flex w-100 mb-2 align-center">
+                <app-user-avatar
+                  class="mr-2"
+                  :size="24"
+                  :profile-picture="
+                    contribution.student.photo
+                      ? {
+                          url: contribution.student.photo,
+                          id: contribution.student.id,
+                        }
+                      : null
+                  "
+                  :placeholder="contribution.student.name"
+                ></app-user-avatar>
+                <span class="text-gray-600 text-body-5">
+                  {{ timeStampToDate(contribution.time) }}
+                </span>
+              </div>
+              <h3 class="text-gray-800 text-h3 ellipsis lines-1 mb-4">
+                {{ contribution.title }}
+              </h3>
+              <div class="bg-gray-100 w-100 height-40"></div>
+            </div>
+          </div>
         </div>
-
         <div v-if="readOnly" class="d-lg-block sections-col h-100" cols="2">
           <div class="sections-container">
             <p class="text-gray-800 text-h6 mb-4">Seções</p>
@@ -150,7 +182,7 @@
                         : 'text-gray-600 section-text-default',
                       calculateMargin(section.type),
                     ]"
-                    @click="navigateToSection(section.title)"
+                    @click="navigateToSection(index)"
                   >
                     {{ section.title }}
                   </p>
@@ -211,6 +243,25 @@ const editorData = computed(() => {
         };
       }) || [],
   };
+});
+
+const highlightedContributions = computed(() => {
+  return trailStore.trail?.contributions
+    .filter((contribution) => contribution.highlighted)
+    .map((contribution) => {
+      return {
+        id: contribution.id,
+        title: contribution.title,
+        contribution: contribution.contribution,
+        time: contribution.contribution.time,
+        student: {
+          id: contribution.student_member.user.id,
+          name: contribution.student_member.user.fullname,
+          photo: contribution.student_member.user.avatar?.url,
+          email: contribution.student_member.user.email,
+        },
+      };
+    });
 });
 
 onMounted(async () => {
@@ -311,25 +362,40 @@ const setSections = () => {
         active: false,
       });
     }
-    const element = document.querySelector(`[data-id="${block.id}"]`);
-    if (element) {
-      element.setAttribute('section', String(newSections.length - 1));
+    const sectionBlock = document.querySelector(`[data-id="${block.id}"]`);
+    if (sectionBlock) {
+      sectionBlock.setAttribute('section', String(newSections.length - 1));
     }
   });
+  highlightedContributions.value?.forEach((contribution) => {
+    newSections.push({
+      title: contribution.title,
+      type: 3,
+      active: false,
+    });
+    const contributionSection = document.getElementById(
+      `${contribution.title}-${contribution.id}`,
+    );
+    if (contributionSection) {
+      contributionSection.setAttribute(
+        'section',
+        String(newSections.length - 1),
+      );
+    }
+  });
+
   sections.value = newSections;
 };
 
-const navigateToSection = (title: string) => {
-  if (title === 'Início') {
-    const element = document.getElementById(title);
-    if (element) {
-      element.scrollIntoView({
-        block: 'end',
-        inline: 'nearest',
-        behavior: 'smooth',
-      });
-    }
-  } else editor.value.navigateToId(title);
+const navigateToSection = (index: number) => {
+  const element = document.querySelector(`[section="${index}"]`);
+  if (element) {
+    element.scrollIntoView({
+      block: 'center',
+      inline: 'nearest',
+      behavior: 'smooth',
+    });
+  }
 };
 
 const loadEditor = async () => {
@@ -405,13 +471,13 @@ const checkEditorReady = async () => {
   return false;
 };
 
-const timeStampToDate = computed(() => {
-  const date = new Date(editorData.value.time);
+const timeStampToDate = (timeStamp: number) => {
+  const date = new Date(timeStamp);
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
-});
+};
 
 const pageHeight = ref(0);
 const activeSection = ref(0);
@@ -420,7 +486,6 @@ const handleIntersection = (entries) => {
   entries.forEach((entry) => {
     const entrySection = parseInt(entry.target.getAttribute('section'));
     if (activeSection.value !== entrySection && entry.isIntersecting) {
-      if (entry.target.id === 'Início') return (activeSection.value = 0);
       activeSection.value = entrySection;
     }
   });
@@ -443,17 +508,10 @@ const setObserver = () => {
 
   observer = new IntersectionObserver(handleIntersection, observerConfig);
 
-  editorData.value.blocks.forEach((section) => {
-    const element = document.querySelector(`[data-id="${section.id}"]`);
-    if (element) {
-      observer.observe(element);
-    }
+  const elements = document.querySelectorAll('[section]');
+  elements.forEach((element) => {
+    observer.observe(element);
   });
-
-  const startSection = document.getElementById('Início');
-  if (startSection) {
-    observer.observe(startSection);
-  }
 };
 
 pageHeight.value = window.innerHeight;
