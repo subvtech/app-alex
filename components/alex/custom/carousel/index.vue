@@ -191,6 +191,11 @@
     @upload-files="addSlide"
     @change-slides="editSlides"
   />
+  <alex-custom-viewer
+    ref="viewer"
+    v-model="viewerInstance"
+    container="vueperslides"
+  />
 </template>
 
 <script setup>
@@ -229,7 +234,8 @@ const slides = computed({
     emit('update:modelValue', value);
   },
 });
-
+const viewerInstance = ref(null);
+const viewer = ref(null);
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {
@@ -371,10 +377,11 @@ const addSlideByUrl = (slide, index) => {
   let newSlide = {};
   if (
     slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://youtu.be') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
     let image, type;
-    if (slide.url.includes('www.youtube')) {
+    if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = useGetYoutubeThumbnail(slide.url);
     } else {
@@ -485,6 +492,15 @@ const clearSlides = () => {
   slides.value = [];
   emit('update:modelValue', slides.value);
 };
+watch(
+  () => props.readOnly,
+  () => {
+    if (viewer.value) {
+      viewer.value.destroyInstance();
+      viewer.value.createInstance();
+    }
+  },
+);
 defineExpose({
   clearSlides,
 });

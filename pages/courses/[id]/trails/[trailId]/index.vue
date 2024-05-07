@@ -146,11 +146,6 @@
         </div>
       </div>
     </div>
-    <alex-custom-viewer
-      ref="viewer"
-      v-model="viewerInstance"
-      container="vueperslides"
-    />
   </div>
 </template>
 
@@ -195,11 +190,6 @@ const editorData = computed(() => {
       }) || [],
   };
 });
-const viewerInstance = ref(null);
-const viewer = ref<null | {
-  createInstance: () => void;
-  destroyInstance: () => void;
-}>(null);
 onMounted(async () => {
   isLoading.value = true;
   while (trailStore.loading) {
@@ -215,11 +205,6 @@ onMounted(async () => {
     }
   }
   isLoading.value = false;
-  setTimeout(() => {
-    if (viewer.value) {
-      viewer.value.createInstance();
-    }
-  }, 100);
 });
 const sections = ref([
   {
@@ -425,14 +410,6 @@ window.addEventListener('resize', () => {
     pageHeight.value = window.innerHeight;
     setObserver();
   }, 300);
-});
-watch(readOnly, () => {
-  if (viewer.value) {
-    viewer.value.destroyInstance();
-    setTimeout(() => {
-      viewer.value?.createInstance();
-    }, 100);
-  }
 });
 </script>
 
