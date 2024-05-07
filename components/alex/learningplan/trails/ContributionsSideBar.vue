@@ -20,42 +20,81 @@
     </template>
     <template #default>
       <div class="w-100 fill-height bg-gray-blue rounded pa-3">
-        <div
-          class="w-100 height-16 bg-white rounded px-4 py-3 d-flex justify-space-between align-center"
-        >
-          <!-- <div class="w-100 py-3 bg-blue d-flex justify-space-between"> -->
-          <div class="d-flex flex-column">
-            <span class="text-gray-600 text-body-5">
-              19/02/2023 - 22:00
-              <!-- {{ timeStampToDate(contribution.contribution.time) }} -->
-            </span>
-            <span class="text-gray-700 text-body-2"
-              ><!-- {{
-                contribution.title
-              }} -->Novas features VUE 3.4</span
+        <transition-group name="list">
+          <div
+            v-for="(contribution, index) in contributions"
+            :key="contribution.id"
+            class="w-100 height-16 rounded px-4 py-3 d-flex align-center mb-1 ga-4 contribution-container bg-white"
+            :class="
+              over == index && dragging && dragFrom !== contribution
+                ? 'over'
+                : ''
+            "
+            @dragover="(e) => onDragOver(index, e)"
+            @dragend="
+              () => {
+                finishDrag(contribution, index, contributionsArray);
+                // emit('dragged:item', index);
+              }
+            "
+            @dragenter="(e) => e.preventDefault()"
+          >
+            <div
+              class="drag-indicator"
+              draggable="true"
+              @dragstart="
+                (e) => {
+                  // console.log('dragging', contribution, index);
+                  startDrag(contribution, e, '.contribution-container');
+                }
+              "
             >
-          </div>
+              <v-icon
+                v-if="isProfessor"
+                icon="alex:DragIndicator"
+                color="gray-600"
+                size="20px"
+              />
+            </div>
+            <div class="d-flex flex-column w-100">
+              <span class="text-gray-600 text-body-5">
+                {{ timeStampToDate(contribution.contribution.time) }}
+              </span>
+              <span class="text-gray-700 text-body-2 ellipsis lines-1">{{
+                contribution.title
+              }}</span>
+            </div>
 
-          <alex-custom-dropdown
-            v-if="isProfessor"
-            :items="dropDownItems(13)"
-            variant="text"
-            icon="mdi-dots-vertical"
-          ></alex-custom-dropdown>
-        </div>
+            <alex-custom-dropdown
+              v-if="isProfessor"
+              :items="dropDownItems(13)"
+              variant="text"
+              icon="mdi-dots-vertical"
+            ></alex-custom-dropdown>
+          </div>
+        </transition-group>
       </div>
-      <!--       </div>
- -->
     </template>
   </v-navigation-drawer>
 </template>
 <script setup lang="ts">
-const isProfessor = ref(true);
+import { useDragDrop } from '@/composables/useDragDrop';
+import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 const { t } = useI18n();
 
-const props = defineProps({
-  modelValue: Boolean,
+interface SideBar {
+  modelValue: boolean;
+  contributions: contributionType[] | [];
+  isProfessor: boolean;
+}
+
+const props = withDefaults(defineProps<SideBar>(), {
+  modelValue: false,
+  contributions: () => [],
+  isProfessor: false,
 });
+
+const contributionsArray = computed(() => props.contributions);
 
 const emits = defineEmits(['update:modelValue', 'removeHighlight']);
 const handleChange = (value: boolean) => {
@@ -80,10 +119,46 @@ const dropDownItems = (contributionId: number) => {
     },
   ];
 };
+
+const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
+  useDragDrop();
 </script>
 
 <style scoped>
 .sidebar {
   margin-top: 1px;
+}
+
+.drag-indicator {
+  cursor: grab;
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.over {
+  background-color: #ebedef !important;
+}
+
+.contribution-container {
+  transition: all 0.2s ease-in;
+  &:hover {
+    background-color: #ebedef !important;
+  }
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(40px);
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(-40px);
 }
 </style>
