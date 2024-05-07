@@ -100,7 +100,7 @@
         v-else
         class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 750px">
+        <div style="width: 800px">
           <p
             v-show="readOnly && editorData.time"
             style="max-width: 700px"
@@ -207,7 +207,7 @@ onMounted(async () => {
     if (await checkEditorReady()) {
       readOnly.value = false;
       await loadEditor();
-      toggleReadOnly();
+      toggleReadOnly('save');
     } else {
       setMessage(t('pages.trailId.overview.loadError'), 'green', true);
     }
@@ -263,10 +263,10 @@ const isAvailableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = async () => {
+const toggleReadOnly = async (mode: string | '') => {
   readOnly.value = !readOnly.value;
   if (editor.value && editorData.value.blocks.length) {
-    await editor.value.toggleReadOnly();
+    await editor.value.toggleReadOnly(mode);
   }
 
   if (!readOnly.value) {
@@ -355,7 +355,7 @@ const saveData = async () => {
       blocks: res.data.blocks,
       trail: trailId.value,
     });
-    toggleReadOnly();
+    toggleReadOnly('save');
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'error', true);
   } finally {
@@ -371,7 +371,7 @@ const resetData = async () => {
     await loadEditor();
   }
 
-  toggleReadOnly();
+  toggleReadOnly('cancel');
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -537,7 +537,7 @@ window.addEventListener('resize', () => {
   z-index: 1;
 }
 
-@container editor (max-width: 1310px) {
+@container editor (max-width: 1330px) {
   .sections-container {
     animation: slideaway 200ms;
     display: none;
