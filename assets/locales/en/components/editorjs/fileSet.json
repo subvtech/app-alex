@@ -1,0 +1,9 @@
+{
+  "addFile": "Add File",
+  "error": {
+    "download": "An error occurred while downloading the file, please try again",
+    "maxFileSize": "The file {filename} is too large, the maximum allowed size is {maxFilesize}",
+    "addFile": "An error occurred while adding the file(s), please try again",
+    "removeFile": "An error occurred while deleting the file, please try again"
+  }
+}

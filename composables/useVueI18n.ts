@@ -111,6 +111,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'trails/settings',
     'trails/header',
     'trails/tasks',
+    'editorjs/fileSet',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',
