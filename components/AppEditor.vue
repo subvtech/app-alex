@@ -328,13 +328,6 @@ const toggleReadOnly = () => {
   });
 };
 
-const navigateToId = (id) => {
-  const element = document.getElementById(id);
-  if (element) {
-    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-};
-
 const clearEditor = () => {
   instance.value.isReady.then(() => {
     instance.value.clear();
@@ -348,7 +341,6 @@ defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
-  navigateToId,
   clearEditor,
   isReady,
 });
