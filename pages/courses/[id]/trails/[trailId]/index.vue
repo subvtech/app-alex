@@ -380,7 +380,6 @@ const setObserver = () => {
   }
 
   const observerMargin = Math.floor(pageHeight.value / 2);
-
   const observerConfig = {
     rootMargin: `-${
       pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin
