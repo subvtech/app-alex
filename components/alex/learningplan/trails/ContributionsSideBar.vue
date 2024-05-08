@@ -25,11 +25,13 @@
             v-for="(contribution, index) in contributions"
             :key="contribution.id"
             class="w-100 height-16 rounded px-4 py-3 d-flex align-center mb-1 ga-4 contribution-container bg-white"
-            :class="
+            :class="[
               over == index && dragging && dragFrom !== contribution
                 ? 'over'
-                : ''
-            "
+                : '',
+              { 'dropdown-hover': dropdownHover },
+            ]"
+            @click="() => emits('showContribution', contribution)"
             @dragover="(e) => onDragOver(index, e)"
             @dragend="
               () => {
@@ -64,13 +66,17 @@
                 contribution.title
               }}</span>
             </div>
-
-            <alex-custom-dropdown
-              v-if="isProfessor"
-              :items="dropDownItems(13)"
-              variant="text"
-              icon="mdi-dots-vertical"
-            ></alex-custom-dropdown>
+            <div
+              @mouseenter="dropdownHover = true"
+              @mouseleave="dropdownHover = false"
+            >
+              <alex-custom-dropdown
+                v-if="isProfessor"
+                :items="dropDownItems(contribution)"
+                variant="text"
+                icon="mdi-dots-vertical"
+              ></alex-custom-dropdown>
+            </div>
           </div>
         </transition-group>
       </div>
@@ -81,6 +87,7 @@
 import { useDragDrop } from '@/composables/useDragDrop';
 import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
 const { t } = useI18n();
+const dropdownHover = ref(false);
 
 interface SideBar {
   modelValue: boolean;
@@ -96,7 +103,11 @@ const props = withDefaults(defineProps<SideBar>(), {
 
 const contributionsArray = computed(() => props.contributions);
 
-const emits = defineEmits(['update:modelValue', 'removeHighlight']);
+const emits = defineEmits([
+  'update:modelValue',
+  'removeHighlight',
+  'showContribution',
+]);
 const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
 };
@@ -110,12 +121,12 @@ const timeStampToDate = (timeStamp: number) => {
   })}`;
 };
 
-const dropDownItems = (contributionId: number) => {
+const dropDownItems = (contribution: contributionType) => {
   return [
     {
       text: t('components.trails.contributions.card.removeHighlight'),
       icon: 'mdi-star-remove-outline',
-      onClick: () => emits('removeHighlight', contributionId),
+      onClick: () => emits('removeHighlight', contribution),
     },
   ];
 };
@@ -137,13 +148,17 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 }
 
 .over {
-  background-color: #ebedef !important;
+  background-color: rgb(var(--v-theme-gray-100)) !important;
 }
 
 .contribution-container {
+  cursor: pointer;
   transition: all 0.2s ease-in;
-  &:hover {
-    background-color: #ebedef !important;
+  &:hover:not(.dropdown-hover) {
+    background-color: rgb(var(--v-theme-gray-100)) !important;
+  }
+  &:active:not(.dropdown-hover) {
+    background-color: rgb(var(--v-theme-gray-200)) !important;
   }
 }
 

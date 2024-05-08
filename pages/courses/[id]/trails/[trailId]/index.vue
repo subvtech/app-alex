@@ -4,6 +4,8 @@
       :model-value="sidebar"
       :contributions="highlightedContributions"
       :is-professor="learningPlanStore.userIsFacilitator"
+      @show-contribution="showContribution"
+      @remove-highlight="removeContributionHighlight"
       @update:model-value="
         (value) => {
           sidebar = value;
@@ -198,7 +200,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-const { create } = useStrapi();
+import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+
+const { update, create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
 
@@ -395,6 +399,38 @@ const navigateToSection = (index: number) => {
       inline: 'nearest',
       behavior: 'smooth',
     });
+  }
+};
+
+const removeContributionHighlight = async (id: number) => {
+  try {
+    const contribution = trailStore.trail?.contributions.find(
+      (contribution) => contribution.id === id,
+    );
+    if (!contribution) return;
+    contribution.highlighted = false;
+    await update('trail-contributions', contribution.id, {
+      highlighted: contribution.highlighted,
+      blocked: false,
+    });
+  } catch (e) {
+    setMessage(
+      t('components.trails.contributions.highlightError'),
+      'red',
+      true,
+    );
+    if (trailStore.trail?.id !== undefined)
+      trailStore.loadTrailData(trailStore.trail.id);
+  }
+};
+
+const showContribution = (contribution: contributionType) => {
+  const element = document.getElementById(
+    `${contribution.title}-${contribution.id}`,
+  );
+  const section = element?.getAttribute('section');
+  if (section) {
+    navigateToSection(parseInt(section));
   }
 };
 
