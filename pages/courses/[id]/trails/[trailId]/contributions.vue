@@ -19,18 +19,24 @@
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
-        class="w-50"
-        style="min-width: 160px; max-width: 320px"
+        class="w-75 min-w-40 max-w-80"
         density="comfortable"
       />
-      <alex-custom-button
-        v-if="!isProfessor"
-        prepend-icon="mdi-plus"
-        size="large"
-        @click="handleShow(-1, -1)"
-      >
-        {{ $t('components.trails.contributions.contribute') }}
-      </alex-custom-button>
+
+      <div v-if="!isProfessor" @click="handleShow(-1, -1)">
+        <alex-custom-button
+          class="d-none d-sm-flex"
+          prepend-icon="mdi-plus"
+          size="large"
+        >
+          {{ $t('components.trails.contributions.contribute') }}
+        </alex-custom-button>
+        <alex-custom-button
+          class="d-flex d-sm-none"
+          icon="mdi-plus"
+          size="large"
+        />
+      </div>
     </div>
     <div
       v-if="
@@ -205,7 +211,8 @@ const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
 
-const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
+// const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
+const isProfessor = false;
 
 const filteredStudents = computed(() => {
   return contributions.value.otherContributions.filter((student) =>
