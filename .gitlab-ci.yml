@@ -56,3 +56,14 @@ deploy:
   only:
     - master
     - test
+
+deploy_preview:
+  stage: deploy
+  image: node:20
+  script:
+    - npm install --global vercel
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - NITRO_PRESET=vercel vercel build --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --archive=tgz --token=$VERCEL_TOKEN
+  only:
+    - merge_requests
