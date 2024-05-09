@@ -304,25 +304,6 @@ const countHighlights = async () => {
   return 0;
 };
 
-// perguntar pro djalma se precisa deixar a ordem certinha 1,2,3,4 ou se pode deixar com intervalos, ja que o novo sempre vai ser o ultimo
-
-const updateHighlightsOrder = async (deletedOrder: number) => {
-  const highlights = await find<contributionType>('trail-contributions', {
-    filters: { trail: trailStore.trail?.id, highlighted: true },
-  });
-
-  highlights.data?.forEach(async (highlight) => {
-    if (
-      highlight.attributes.highlighted_order &&
-      highlight.attributes.highlighted_order > deletedOrder
-    ) {
-      await update('trail-contributions', highlight.id, {
-        highlighted_order: highlight.attributes.highlighted_order - 1,
-      });
-    }
-  });
-};
-
 const handleHighlight = async (contributionId: number) => {
   try {
     const contribution = findTrailById(contributionId);
@@ -331,16 +312,12 @@ const handleHighlight = async (contributionId: number) => {
     contribution.blocked = false;
     const order = contribution.highlighted
       ? (await countHighlights()) + 1
-      : contribution.highlighted_order;
+      : null;
     await update('trail-contributions', contribution.id, {
       highlighted: contribution.highlighted,
-      highlighted_order: contribution.highlighted ? order : null,
+      highlighted_order: order,
       blocked: false,
     });
-    if (!contribution.highlighted && order) {
-      contribution.highlighted_order = null;
-      await updateHighlightsOrder(order);
-    }
   } catch (e) {
     handleError(t('components.trails.contributions.error.updateHighlight'));
   }
@@ -352,15 +329,11 @@ const handleBlock = async (contributionId: number) => {
     if (!contribution) return;
     contribution.blocked = !contribution.blocked;
     contribution.highlighted = false;
-    const order = contribution.highlighted_order;
     await update('trail-contributions', contribution.id, {
       blocked: contribution.blocked,
       highlighted: false,
       highlighted_order: null,
     });
-    if (order) {
-      await updateHighlightsOrder(order);
-    }
   } catch (e) {
     handleError(t('components.trails.contributions.error.updateBlock'));
   }

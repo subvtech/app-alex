@@ -131,7 +131,7 @@ const dropDownItems = (contribution: ContributionSimple) => {
     {
       text: t('components.trails.contributions.card.removeHighlight'),
       icon: 'mdi-star-remove-outline',
-      onClick: () => emits('removeHighlight', contribution),
+      onClick: () => emits('removeHighlight', contribution.id),
     },
   ];
 };
