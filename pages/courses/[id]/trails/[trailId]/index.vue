@@ -6,11 +6,8 @@
       :is-professor="learningPlanStore.userIsFacilitator"
       @show-contribution="showContribution"
       @remove-highlight="removeContributionHighlight"
-      @update:model-value="
-        (value) => {
-          sidebar = value;
-        }
-      "
+      @update:model-value="(value) => (sidebar = value)"
+      @update:contributions="(value) => (highlightedContributions = value)"
     />
     <div
       id="editor-container"
@@ -407,7 +404,7 @@ const removeContributionHighlight = async (id: number) => {
     const contribution = trailStore.trail?.contributions.find(
       (contribution) => contribution.id === id,
     );
-    if (!contribution) return;
+    if (!contribution) throw new Error('Contribution not found');
     contribution.highlighted = false;
     await update('trail-contributions', contribution.id, {
       highlighted: contribution.highlighted,
@@ -415,7 +412,7 @@ const removeContributionHighlight = async (id: number) => {
     });
   } catch (e) {
     setMessage(
-      t('components.trails.contributions.highlightError'),
+      t('components.trails.contributions.error.updateHighlight'),
       'red',
       true,
     );

@@ -211,8 +211,7 @@ const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
 
-// const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
-const isProfessor = false;
+const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
 
 const filteredStudents = computed(() => {
   return contributions.value.otherContributions.filter((student) =>
@@ -279,7 +278,7 @@ const handleHighlight = async (contributionId: number) => {
       blocked: false,
     });
   } catch (e) {
-    handleError(t('components.trails.contributions.highlightError'));
+    handleError(t('components.trails.contributions.error.updateHighlight'));
   }
 };
 
@@ -294,7 +293,7 @@ const handleBlock = async (contributionId: number) => {
       highlighted: false,
     });
   } catch (e) {
-    handleError(t('components.trails.contributions.blockError'));
+    handleError(t('components.trails.contributions.error.updateBlock'));
   }
 };
 

@@ -15,5 +15,9 @@
     "removeHighlight": "Desfazer destaque",
     "block": "Bloquear Contribuição",
     "unblock": "Desbloquear Contribuição"
+  },
+  "error":{
+    "updateHighlight": "Erro ao atualizar destaque",
+    "updateBlock": "Erro ao atualizar bloqueio"
   }
 }

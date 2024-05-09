@@ -15,5 +15,9 @@
     "removeHighlight": "Remove Highlight",
     "block": "Block Contribution",
     "unblock": "Unblock Contribution"
+  },
+  "error": {
+    "updateHighlight": "Error updating highlight",
+    "updateBlock": "Error updating block status"
   }
 }
