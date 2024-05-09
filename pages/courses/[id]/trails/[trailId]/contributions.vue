@@ -198,6 +198,8 @@ interface studentsContributionsType {
 }
 
 const { update, delete: _delete } = useStrapi();
+const route = useRoute();
+const router = useRouter();
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 const user = useStrapiUser<User>();
@@ -210,6 +212,13 @@ const studentSearch = ref('');
 const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
+
+onMounted(() => {
+  if (route.query?.openModal) {
+    dialog.value.openDialog('create');
+    router.replace({ query: { ...route.query, openModal: undefined } });
+  }
+});
 
 const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
 

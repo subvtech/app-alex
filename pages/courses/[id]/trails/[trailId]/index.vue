@@ -161,6 +161,19 @@
                 />
               </div>
             </div>
+            <div
+              v-if="learningPlanStore.userIsFacilitator"
+              class="w-100 pt-12 d-flex justify-center align-center contributions-container"
+            >
+              <alex-custom-button
+                class="ma-auto"
+                prepend-icon="mdi-plus"
+                size="large"
+                @click="goToContributions()"
+              >
+                {{ t('pages.trailId.overview.contribute') }}
+              </alex-custom-button>
+            </div>
           </div>
         </div>
         <div v-if="readOnly" class="d-lg-block sections-col h-100" cols="2">
@@ -437,6 +450,13 @@ const showContribution = (contribution: contributionType) => {
   }
 };
 
+const goToContributions = () => {
+  navigateTo({
+    path: `/courses/${learningPlanId.value}/trails/${trailId.value}/contributions`,
+    query: { openModal: 'true' },
+  });
+};
+
 const loadEditor = async () => {
   if (!editor.value || !editorData.value) return;
   const res = await editor.value.loadEditor({
@@ -615,9 +635,14 @@ window.addEventListener('resize', () => {
   }
 }
 
+.contributions-container {
+  border-top: 1px solid rgb(var(--v-theme-gray-100));
+}
+
 #editor-container {
   container-type: inline-size;
   container-name: editor;
+  padding-bottom: 100px;
 }
 
 .sticky-buttons {
