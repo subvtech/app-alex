@@ -47,10 +47,7 @@
               class="drag-indicator"
               draggable="true"
               @dragstart="
-                (e) => {
-                  // console.log('dragging', contribution, index);
-                  startDrag(contribution, e, '.contribution-container');
-                }
+                (e) => startDrag(contribution, e, '.contribution-container')
               "
             >
               <v-icon
