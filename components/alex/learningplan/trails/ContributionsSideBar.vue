@@ -10,7 +10,9 @@
   >
     <template #prepend>
       <div class="d-flex align-center justify-space-between mb-6">
-        <p class="text-h4 text-gray-800">Contribuições destacadas</p>
+        <p class="text-h4 text-gray-800">
+          {{ $t('components.trails.contributions.highlightedContributions') }}
+        </p>
         <alex-custom-button
           icon="mdi-close"
           variant="text"

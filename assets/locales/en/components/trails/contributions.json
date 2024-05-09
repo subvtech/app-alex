@@ -8,6 +8,7 @@
   "saveError": "An error occurred while saving the contribution.",
   "emptyContribution": "You must write something to contribute.",
   "emptyStudentsFilter": "No students found with this name...",
+  "highlightedContributions": "Highlighted Contributions",
   "card": {
     "delete": "Delete Contribution",
     "edit": "Edit Contribution",

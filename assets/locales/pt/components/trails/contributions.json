@@ -8,6 +8,7 @@
   "saveError": "Erro ao salvar contribuição",
   "emptyContribution": "Você não pode enviar uma contribuição vazia",
   "emptyStudentsFilter": "Nenhum estudante encontrado com esse nome...",
+  "highlightedContributions": "Contribuições Destacadas",
   "card": {
     "delete": "Apagar contribuição",
     "edit": "Editar contribuição",
