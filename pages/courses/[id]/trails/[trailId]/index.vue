@@ -19,7 +19,11 @@
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
         <alex-custom-button
-          v-if="readOnly && !trailStore.loading"
+          v-if="
+            readOnly &&
+            !trailStore.loading &&
+            highlightedContributionsSimple.length
+          "
           icon="mdi-text-box-outline"
           variant="secondary"
           size="large"
@@ -38,7 +42,13 @@
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
+        <div
+          v-else-if="
+            learningPlanStore.userIsFacilitator &&
+            !isLoading &&
+            highlightedContributionsSimple.length
+          "
+        >
           <alex-custom-button
             variant="secondary"
             size="large"
