@@ -63,8 +63,7 @@
       >
         <div
           v-if="trailStore.loading || isLoading"
-          style="max-width: 700px; min-height: 500px"
-          class="w-100"
+          class="w-100 max-w-175 min-h-125"
         >
           <alex-custom-skeleton
             color="gray-200"
@@ -116,16 +115,15 @@
         v-else
         class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 750px">
+        <div class="width-187">
           <p
             v-show="readOnly && editorData.time"
-            style="max-width: 700px"
-            class="text-gray-500 text-body-3 mb-4 mx-auto"
+            class="text-gray-500 text-body-3 mb-4 mx-auto max-width-187"
           >
             {{ $t('pages.trailId.overview.lastUpdated') }}
             {{ timeStampToDate(editorData.time) }}
           </p>
-          <AppEditor ref="editor" :data="editorData" />
+          <AppEditor ref="editor" key-id="editorjs" />
           <div v-if="readOnly">
             <div
               v-for="contribution in highlightedContributions"
@@ -154,7 +152,14 @@
               <h3 class="text-gray-800 text-h3 ellipsis lines-1 mb-4">
                 {{ contribution.title }}
               </h3>
-              <div class="bg-gray-100 w-100 height-40"></div>
+              <div>
+                <AppEditor
+                  :ref="`contribution-${contribution.id}`"
+                  :key-id="`contribution-${contribution.id}`"
+                  :data="contribution.contribution"
+                  :read-only="readOnly"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -273,10 +278,11 @@ onMounted(async () => {
   if (editorData.value.blocks.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
+
       await loadEditor();
       toggleReadOnly();
     } else {
-      setMessage(t('pages.trailId.overview.loadError'), 'green', true);
+      setMessage(t('pages.trailId.overview.loadError'), 'red', true);
     }
   }
   isLoading.value = false;
