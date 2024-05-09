@@ -24,7 +24,7 @@
       <div class="w-100 fill-height bg-gray-blue rounded pa-3">
         <transition-group name="list">
           <div
-            v-for="(contribution, index) in contributions"
+            v-for="(contribution, index) in contributionsArray"
             :key="contribution.id"
             class="w-100 height-16 rounded px-4 py-3 d-flex align-center mb-1 ga-4 contribution-container bg-white"
             :class="[
@@ -38,7 +38,7 @@
             @dragend="
               () => {
                 finishDrag(contribution, index, contributionsArray);
-                // emit('dragged:item', index);
+                emits('dragged:items', contributionsArray);
               }
             "
             @dragenter="(e) => e.preventDefault()"
@@ -91,9 +91,11 @@ import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contribu
 const { t } = useI18n();
 const dropdownHover = ref(false);
 
+type ContributionSimple = Omit<contributionType, 'highlighted' | 'blocked'>;
+
 interface SideBar {
   modelValue: boolean;
-  contributions: contributionType[] | [];
+  contributions: ContributionSimple[] | [];
   isProfessor: boolean;
 }
 
@@ -109,6 +111,7 @@ const emits = defineEmits([
   'update:modelValue',
   'removeHighlight',
   'showContribution',
+  'dragged:items',
 ]);
 const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
@@ -123,7 +126,7 @@ const timeStampToDate = (timeStamp: number) => {
   })}`;
 };
 
-const dropDownItems = (contribution: contributionType) => {
+const dropDownItems = (contribution: ContributionSimple) => {
   return [
     {
       text: t('components.trails.contributions.card.removeHighlight'),

@@ -2,12 +2,12 @@
   <div class="fill-height d-flex ga-3 flex-column">
     <alex-learningplan-trails-contributions-side-bar
       :model-value="sidebar"
-      :contributions="highlightedContributions"
+      :contributions="highlightedContributionsSimple"
       :is-professor="learningPlanStore.userIsFacilitator"
       @show-contribution="showContribution"
       @remove-highlight="removeContributionHighlight"
       @update:model-value="(value) => (sidebar = value)"
-      @update:contributions="(value) => (highlightedContributions = value)"
+      @dragged:items="(value) => handlePositions(value)"
     />
     <div
       id="editor-container"
@@ -162,7 +162,7 @@
               </div>
             </div>
             <div
-              v-if="learningPlanStore.userIsFacilitator"
+              v-if="!learningPlanStore.userIsFacilitator"
               class="w-100 pt-12 d-flex justify-center align-center contributions-container"
             >
               <alex-custom-button
@@ -267,6 +267,7 @@ const editorData = computed(() => {
 const highlightedContributions = computed(() => {
   return trailStore.trail?.contributions
     .filter((contribution) => contribution.highlighted)
+    .sort((a, b) => (a.highlighted_order > b.highlighted_order ? 1 : -1))
     .map((contribution) => {
       return {
         id: contribution.id,
@@ -281,6 +282,18 @@ const highlightedContributions = computed(() => {
         },
       };
     });
+});
+
+const highlightedContributionsSimple = computed(() => {
+  if (!highlightedContributions.value) return [];
+  return highlightedContributions.value.map((contribution) => {
+    return {
+      id: contribution.id,
+      title: contribution.title,
+      contribution: contribution.contribution,
+      time: contribution.contribution.time,
+    };
+  });
 });
 
 onMounted(async () => {
@@ -454,6 +467,19 @@ const goToContributions = () => {
   navigateTo({
     path: `/courses/${learningPlanId.value}/trails/${trailId.value}/contributions`,
     query: { openModal: 'true' },
+  });
+};
+
+const handlePositions = (contributions) => {
+  contributions.forEach(async (contribution, index) => {
+    const contributionData = trailStore.trail?.contributions.find(
+      (c) => c.id === contribution.id,
+    );
+    if (!contributionData) return;
+    contributionData.highlighted_order = index + 1;
+    await update('trail-contributions', contribution.id, {
+      highlighted_order: contributionData.highlighted_order,
+    });
   });
 };
 
