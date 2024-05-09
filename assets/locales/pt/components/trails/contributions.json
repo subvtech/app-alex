@@ -8,6 +8,7 @@
   "saveError": "Erro ao salvar contribuição",
   "emptyContribution": "Você não pode enviar uma contribuição vazia",
   "emptyStudentsFilter": "Nenhum estudante encontrado com esse nome...",
+  "highlightedContributions": "Contribuições Destacadas",
   "card": {
     "delete": "Apagar contribuição",
     "edit": "Editar contribuição",
@@ -15,5 +16,14 @@
     "removeHighlight": "Desfazer destaque",
     "block": "Bloquear Contribuição",
     "unblock": "Desbloquear Contribuição"
+  },
+  "userCard": {
+    "contributions": "Contribuições",
+    "highlighted": "Destacadas",
+    "accomplished": "Realizadas"
+  },
+  "error": {
+    "updateHighlight": "Erro ao atualizar destaque",
+    "updateBlock": "Erro ao atualizar bloqueio"
   }
 }

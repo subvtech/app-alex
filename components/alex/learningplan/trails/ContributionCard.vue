@@ -15,12 +15,15 @@
           <span class="text-gray-600 text-body-5"
             >{{ timeStampToDate(contribution.contribution.time) }}
           </span>
-          <span class="text-gray-700 text-body-2">{{
+          <span class="text-gray-700 text-body-2 ellipsis lines-1">{{
             contribution.title
           }}</span>
         </div>
         <div v-if="isProfessor" class="ml-auto mr-4 d-flex align-center">
-          <span v-if="contribution.blocked" class="text-body-4 text-error--1">
+          <span
+            v-if="contribution.blocked"
+            class="text-body-4 text-error--1 d-none d-sm-block"
+          >
             {{ t('components.trails.contributions.blocked') }}
           </span>
           <v-btn

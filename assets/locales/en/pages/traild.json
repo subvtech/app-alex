@@ -6,8 +6,11 @@
     "editBtn": "Edit",
     "cancelBtn": "Cancel",
     "saveBtn": "Save",
+    "sectionTitle": "Start",
     "searchError": "There was an error searching for content, please try again.",
     "saveError": "There was an error saving the content, please try again.",
-    "sectionTitle": "Start"
+    "loadError": "There was an error loading the content, please try again.",
+    "contribute": "Contribute to this trail"
+
   }
 }

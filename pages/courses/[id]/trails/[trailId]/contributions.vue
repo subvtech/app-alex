@@ -19,18 +19,24 @@
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
-        class="w-50"
-        style="min-width: 160px; max-width: 320px"
+        class="w-75 min-w-40 max-w-80"
         density="comfortable"
       />
-      <alex-custom-button
-        v-if="!isProfessor"
-        prepend-icon="mdi-plus"
-        size="large"
-        @click="handleShow(-1, -1)"
-      >
-        {{ $t('components.trails.contributions.contribute') }}
-      </alex-custom-button>
+
+      <div v-if="!isProfessor" @click="handleShow(-1, -1)">
+        <alex-custom-button
+          class="d-none d-sm-flex"
+          prepend-icon="mdi-plus"
+          size="large"
+        >
+          {{ $t('components.trails.contributions.contribute') }}
+        </alex-custom-button>
+        <alex-custom-button
+          class="d-flex d-sm-none"
+          icon="mdi-plus"
+          size="large"
+        />
+      </div>
     </div>
     <div
       v-if="
@@ -68,6 +74,7 @@
       >
         <v-expansion-panels
           id="contributions-panels"
+          v-model="expanded"
           class="ga-1"
           variant="accordion"
         >
@@ -180,6 +187,7 @@ export interface contributionType {
   highlighted: boolean;
   blocked: boolean;
   contribution: editorData;
+  highlighted_order?: number;
 }
 
 interface studentsContributionsType {
@@ -191,7 +199,9 @@ interface studentsContributionsType {
   contributions: contributionType[];
 }
 
-const { update, delete: _delete } = useStrapi();
+const { update, delete: _delete, find } = useStrapi();
+const route = useRoute();
+const router = useRouter();
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 const user = useStrapiUser<User>();
@@ -200,6 +210,7 @@ const { t } = useI18n();
 
 const dialog = ref();
 const studentSearch = ref('');
+const expanded = ref();
 
 const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
@@ -249,6 +260,26 @@ const contributions = computed(() => {
   return { myContributions, otherContributions, trailId, userId };
 });
 
+onMounted(() => {
+  if (route.query?.openModal) {
+    dialog.value.openDialog('create');
+    router.replace({ query: { ...route.query, openModal: undefined } });
+  }
+  if (route.query?.studentId) {
+    const queryId = Number(route.query.studentId);
+    if (queryId !== contributions.value.userId) {
+      const student = contributions.value.otherContributions.find(
+        (student) => student.id === queryId,
+      );
+      studentSearch.value = student?.name || '';
+      expanded.value = student
+        ? contributions.value.otherContributions.indexOf(student)
+        : 1;
+    }
+    router.replace({ query: { ...route.query, studentId: undefined } });
+  }
+});
+
 const handleError = (text: string) => {
   messageStore.setMessage(text, 'red', true);
   if (trailStore.trail?.id !== undefined)
@@ -261,18 +292,34 @@ const findTrailById = (id: number) => {
   );
 };
 
+const countHighlights = async () => {
+  const highlights = await find<contributionType>('trail-contributions', {
+    filters: { trail: trailStore.trail?.id, highlighted: true },
+  });
+  if (highlights.data) {
+    return Math.max(
+      ...highlights.data.map((item) => item.attributes.highlighted_order || 0),
+    );
+  }
+  return 0;
+};
+
 const handleHighlight = async (contributionId: number) => {
   try {
     const contribution = findTrailById(contributionId);
     if (!contribution) return;
     contribution.highlighted = !contribution.highlighted;
     contribution.blocked = false;
+    const order = contribution.highlighted
+      ? (await countHighlights()) + 1
+      : null;
     await update('trail-contributions', contribution.id, {
       highlighted: contribution.highlighted,
+      highlighted_order: order,
       blocked: false,
     });
   } catch (e) {
-    handleError(t('components.trails.contributions.highlightError'));
+    handleError(t('components.trails.contributions.error.updateHighlight'));
   }
 };
 
@@ -285,9 +332,10 @@ const handleBlock = async (contributionId: number) => {
     await update('trail-contributions', contribution.id, {
       blocked: contribution.blocked,
       highlighted: false,
+      highlighted_order: null,
     });
   } catch (e) {
-    handleError(t('components.trails.contributions.blockError'));
+    handleError(t('components.trails.contributions.error.updateBlock'));
   }
 };
 
