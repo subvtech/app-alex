@@ -74,6 +74,7 @@
       >
         <v-expansion-panels
           id="contributions-panels"
+          v-model="expanded"
           class="ga-1"
           variant="accordion"
         >
@@ -209,17 +210,11 @@ const { t } = useI18n();
 
 const dialog = ref();
 const studentSearch = ref('');
+const expanded = ref();
 
 const isLoading = computed(
   () => trailStore.loading || learningPlanStore.loading,
 );
-
-onMounted(() => {
-  if (route.query?.openModal) {
-    dialog.value.openDialog('create');
-    router.replace({ query: { ...route.query, openModal: undefined } });
-  }
-});
 
 const isProfessor = computed(() => learningPlanStore.userIsFacilitator);
 
@@ -265,6 +260,26 @@ const contributions = computed(() => {
   return { myContributions, otherContributions, trailId, userId };
 });
 
+onMounted(() => {
+  if (route.query?.openModal) {
+    dialog.value.openDialog('create');
+    router.replace({ query: { ...route.query, openModal: undefined } });
+  }
+  if (route.query?.studentId) {
+    const queryId = Number(route.query.studentId);
+    if (queryId !== contributions.value.userId) {
+      const student = contributions.value.otherContributions.find(
+        (student) => student.id === queryId,
+      );
+      studentSearch.value = student?.name || '';
+      expanded.value = student
+        ? contributions.value.otherContributions.indexOf(student)
+        : 1;
+    }
+    router.replace({ query: { ...route.query, studentId: undefined } });
+  }
+});
+
 const handleError = (text: string) => {
   messageStore.setMessage(text, 'red', true);
   if (trailStore.trail?.id !== undefined)
@@ -288,7 +303,6 @@ const countHighlights = async () => {
   }
   return 0;
 };
-
 
 // perguntar pro djalma se precisa deixar a ordem certinha 1,2,3,4 ou se pode deixar com intervalos, ja que o novo sempre vai ser o ultimo
 

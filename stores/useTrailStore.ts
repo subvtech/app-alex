@@ -28,6 +28,9 @@ export const useTrailStore = defineStore('trail', () => {
                 avatar: {
                   populate: true,
                 },
+                cover: {
+                  populate: true,
+                },
               },
             },
           },

@@ -17,7 +17,12 @@
     "block": "Bloquear Contribuição",
     "unblock": "Desbloquear Contribuição"
   },
-  "error":{
+  "userCard": {
+    "contributions": "Contribuições",
+    "highlighted": "Destacadas",
+    "accomplished": "Realizadas"
+  },
+  "error": {
     "updateHighlight": "Erro ao atualizar destaque",
     "updateBlock": "Erro ao atualizar bloqueio"
   }

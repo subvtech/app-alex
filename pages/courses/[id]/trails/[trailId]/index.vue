@@ -131,9 +131,9 @@
               :key="contribution.id"
               class="w-100 my-12"
             >
-              <div class="d-flex w-100 mb-2 align-center">
+              <div class="d-flex w-100 mb-2 align-center position-relative">
                 <app-user-avatar
-                  class="mr-2"
+                  class="mr-2 user-avatar"
                   :size="24"
                   :profile-picture="
                     contribution.student.photo
@@ -145,6 +145,13 @@
                   "
                   :placeholder="contribution.student.name"
                 ></app-user-avatar>
+                <alex-learningplan-trails-user-card
+                  class="user-card"
+                  :student="contribution.student"
+                  :trail-id="trailId"
+                  :learning-plan-id="learningPlanId"
+                />
+
                 <span class="text-gray-600 text-body-5">
                   {{ timeStampToDate(contribution.time) }}
                 </span>
@@ -279,6 +286,7 @@ const highlightedContributions = computed(() => {
           name: contribution.student_member.user.fullname,
           photo: contribution.student_member.user.avatar?.url,
           email: contribution.student_member.user.email,
+          cover: contribution.student_member.user.cover?.url,
         },
       };
     });
@@ -676,6 +684,24 @@ window.addEventListener('resize', () => {
   position: sticky;
   top: 88px;
   z-index: 1;
+}
+
+.user-card {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  bottom: 30px;
+  &:hover {
+    display: block;
+  }
+}
+
+.user-avatar {
+  padding: 4px 0px 4px 0px;
+}
+
+.user-avatar:hover ~ .user-card {
+  display: block !important;
 }
 
 @container editor (max-width: 1310px) {

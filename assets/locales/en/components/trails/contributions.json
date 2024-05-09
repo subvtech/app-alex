@@ -17,6 +17,11 @@
     "block": "Block Contribution",
     "unblock": "Unblock Contribution"
   },
+  "userCard": {
+    "contributions": "Contributions",
+    "highlighted": "Highlights",
+    "accomplished": "Accomplishers"
+  },
   "error": {
     "updateHighlight": "Error updating highlight",
     "updateBlock": "Error updating block status"
