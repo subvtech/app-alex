@@ -23,7 +23,7 @@
       {{ t('components.learningPlan.join.active.description') }}
       <strong>{{ learningPlanStore.learningPlan?.title }}</strong>
       {{ t('components.learningPlan.join.active.at') }}
-      <strong>{{ learningPlanStore.learningPlan?.class_name }}</strong>
+      <strong>{{ invitationHash?.learning_class?.name }}</strong>
     </template>
   </alex-learningplan-dialogs-alert>
   <alex-learningplan-dialogs-alert
@@ -71,6 +71,7 @@ watch(learningPlanStore, () => {
         link.emails_to_send.includes(user.value?.email || ''))
     );
   });
+
   const isLinkEnabled = learningPlanStore.learningPlan?.invite_enabled;
   if (
     learningPlanStore.userIsActiveMember ||
