@@ -10736,6 +10736,11 @@ videojs-youtube@^3.0.1:
   dependencies:
     video.js "5.x || 6.x || 7.x || 8.x"
 
+viewerjs@^1.11.6:
+  version "1.11.6"
+  resolved "https://registry.yarnpkg.com/viewerjs/-/viewerjs-1.11.6.tgz#19a1e78c15eba5a9fbbf34ebc5ab312d6e8932ed"
+  integrity sha512-TlhdSp2oEOLFXvEp4psKaeTjR5zBjTRcM/sHUN8PkV1UWuY8HKC8n7GaVdW5Xqnwdr/F1OmzLik1QwDjI4w/nw==
+
 viewerjs@^1.5.0:
   version "1.11.5"
   resolved "https://registry.yarnpkg.com/viewerjs/-/viewerjs-1.11.5.tgz#01228f383abd6febb04ab1bae26a6592fb2e4f15"
