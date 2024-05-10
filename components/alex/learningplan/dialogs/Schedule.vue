@@ -74,13 +74,13 @@
           class="w-100 mb-4"
           density="comfortable"
         />
-        <div class="w-100 d-flex gap-4-md-0 flex-wrap">
+        <div class="w-100 d-flex gap-4-md-0 flex-wrap flex-sm-nowrap">
           <alex-inputs-text-field
             type="time"
             name="startHour"
             :label="$t('components.courses.meeting.course.startTime')"
             required
-            class="flex-grow-1 min-w-60"
+            class="flex-sm-grow-0 w-100 min-w-60"
             density="comfortable"
           />
           <alex-inputs-text-field
@@ -88,7 +88,7 @@
             name="endHour"
             :label="$t('components.courses.meeting.course.endTime')"
             required
-            class="flex-grow-1 min-w-60"
+            class="flex-sm-grow-0 w-100"
             density="comfortable"
           />
         </div>

@@ -118,6 +118,10 @@ const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   keepValuesOnUnmount: true,
 });
 
+const slugFormated = computed(() =>
+  controlledValues.value.slug.trim().toLowerCase().replaceAll(' ', '_'),
+);
+
 const onSave = handleSubmit(async (e) => {
   if (controlledValues.value.slug !== slug.value) {
     const isSlugAvailable = await find('learningplans', {
@@ -145,7 +149,7 @@ const onSave = handleSubmit(async (e) => {
     title: controlledValues.value.title,
     start_date: controlledValues.value.startDate,
     end_date: controlledValues.value.endDate,
-    slug: controlledValues.value.slug,
+    slug: slugFormated.value.toLocaleLowerCase(),
   });
 });
 
