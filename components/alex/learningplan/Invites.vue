@@ -150,7 +150,7 @@ watch(theresTimeAndUrl, () => {
   cursor: pointer;
 }
 
-.desactivated {
+.deactivated {
   color: var(--cinza-cinza-500, #8291a1);
   text-align: center;
 

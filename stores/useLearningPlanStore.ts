@@ -106,11 +106,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const standardTrails = computed(() => {
-    const standardStructure = learningPlan.value?.learning_structures.find(
-      (structure) =>
-        structure.type === LearningPlanScructureSimpleType.STANDARD,
-    );
-    return standardStructure?.trails ?? [];
+    const trails =
+      learningPlan.value?.learning_structures.filter(
+        (structure) =>
+          structure.type === LearningPlanScructureSimpleType.STANDARD,
+      )[0].trails ?? [];
+
+    if (userIsFacilitator.value) return trails;
+    else return trails.filter((trail) => !trail.hidden);
   });
 
   const standardTrailsCount = computed(() => {
@@ -167,6 +170,12 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
+  const userClass = computed(() => {
+    return learningPlan.value?.classes.find(
+      (c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id),
+    );
+  });
+
   const schedules = computed<LearningPlanScheduleSimple[]>(() => {
     return (
       learningPlan.value?.schedules.map((schedule) => {
@@ -200,6 +209,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsFacilitator,
     userIsActiveMember,
     userIsPendingMember,
+    userClass,
     activeInviteLinks,
     standardTrailsCount,
     standardTrails,

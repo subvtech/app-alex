@@ -1,15 +1,34 @@
 <template>
   <div class="fill-height d-flex ga-3 flex-column">
+    <alex-learningplan-trails-contributions-side-bar
+      :model-value="sidebar"
+      :contributions="highlightedContributionsSimple"
+      :is-professor="learningPlanStore.userIsFacilitator"
+      @show-contribution="showContribution"
+      @remove-highlight="removeContributionHighlight"
+      @update:model-value="(value) => (sidebar = value)"
+      @dragged:items="(value) => handlePositions(value)"
+    />
     <div
       id="editor-container"
       class="bg-white rounded w-100 container-min-height"
     >
       <div
-        id="Início"
         section="0"
         class="d-flex justify-end px-6 pt-6"
         :class="!readOnly ? 'sticky-buttons' : ''"
       >
+        <alex-custom-button
+          v-if="
+            readOnly &&
+            !trailStore.loading &&
+            highlightedContributionsSimple.length
+          "
+          icon="mdi-text-box-outline"
+          variant="secondary"
+          size="large"
+          @click="sidebar = !sidebar"
+        />
         <alex-custom-button
           v-if="
             readOnly &&
@@ -18,6 +37,7 @@
           "
           variant="primary"
           size="large"
+          class="ml-2"
           prepend-icon="mdi-pencil-outline"
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
@@ -47,8 +67,7 @@
       >
         <div
           v-if="trailStore.loading || isLoading"
-          style="max-width: 700px; min-height: 500px"
-          class="w-100"
+          class="w-100 max-w-175 min-h-125"
         >
           <alex-custom-skeleton
             color="gray-200"
@@ -100,18 +119,74 @@
         v-else
         class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 750px">
+        <div style="width: 800px">
           <p
             v-show="readOnly && editorData.time"
-            style="max-width: 700px"
-            class="text-gray-500 text-body-3 mb-4 mx-auto"
+            class="text-gray-500 text-body-3 mb-4 mx-auto max-width-187"
           >
             {{ $t('pages.trailId.overview.lastUpdated') }}
-            {{ timeStampToDate }}
+            {{ timeStampToDate(editorData.time) }}
           </p>
-          <AppEditor ref="editor" :data="editorData" />
-        </div>
+          <AppEditor ref="editor" key-id="editorjs" />
+          <div v-if="readOnly">
+            <div
+              v-for="contribution in highlightedContributions"
+              :id="`${contribution.title}-${contribution.id}`"
+              :key="contribution.id"
+              class="w-100 my-12"
+            >
+              <div class="d-flex w-100 mb-2 align-center position-relative">
+                <app-user-avatar
+                  class="mr-2 user-avatar"
+                  :size="24"
+                  :profile-picture="
+                    contribution.student.photo
+                      ? {
+                          url: contribution.student.photo,
+                          id: contribution.student.id,
+                        }
+                      : null
+                  "
+                  :placeholder="contribution.student.name"
+                ></app-user-avatar>
+                <alex-learningplan-trails-user-card
+                  class="user-card"
+                  :student="contribution.student"
+                  :trail-id="trailId"
+                  :learning-plan-id="learningPlanId"
+                />
 
+                <span class="text-gray-600 text-body-5">
+                  {{ timeStampToDate(contribution.time) }}
+                </span>
+              </div>
+              <h3 class="text-gray-800 text-h3 ellipsis lines-1 mb-4">
+                {{ contribution.title }}
+              </h3>
+              <div>
+                <AppEditor
+                  :ref="`contribution-${contribution.id}`"
+                  :key-id="`contribution-${contribution.id}`"
+                  :data="contribution.contribution"
+                  :read-only="readOnly"
+                />
+              </div>
+            </div>
+            <div
+              v-if="!learningPlanStore.userIsFacilitator"
+              class="w-100 pt-12 d-flex justify-center align-center contributions-container"
+            >
+              <alex-custom-button
+                class="ma-auto"
+                prepend-icon="mdi-plus"
+                size="large"
+                @click="goToContributions()"
+              >
+                {{ t('pages.trailId.overview.contribute') }}
+              </alex-custom-button>
+            </div>
+          </div>
+        </div>
         <div v-if="readOnly" class="d-lg-block sections-col h-100" cols="2">
           <div class="sections-container">
             <p class="text-gray-800 text-h6 mb-4">Seções</p>
@@ -135,7 +210,7 @@
                         : 'text-gray-600 section-text-default',
                       calculateMargin(section.type),
                     ]"
-                    @click="navigateToSection(section.title)"
+                    @click="navigateToSection(index)"
                   >
                     {{ section.title }}
                   </p>
@@ -151,26 +226,28 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-const { create } = useStrapi();
+import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
+definePageMeta({
+  hideLearningPlanBanner: true,
+});
+const { update, create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
-
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailStore = useTrailStore();
 const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-
-const headerStore = usePageHeaderStore();
+useHeaderTrails('');
 const learningPlanStore = useLearningPlanStore();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 definePageMeta({
   hideLearningPlanBanner: true,
 });
 
-const trailStore = useTrailStore();
-
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
+const sidebar = ref(false);
 
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
@@ -178,7 +255,6 @@ const showEditor = computed(() => {
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
 const { t } = useI18n();
 const editorData = computed(() => {
   const data =
@@ -198,6 +274,39 @@ const editorData = computed(() => {
   };
 });
 
+const highlightedContributions = computed(() => {
+  return trailStore.trail?.contributions
+    .filter((contribution) => contribution.highlighted)
+    .sort((a, b) => (a.highlighted_order > b.highlighted_order ? 1 : -1))
+    .map((contribution) => {
+      return {
+        id: contribution.id,
+        title: contribution.title,
+        contribution: contribution.contribution,
+        time: contribution.contribution.time,
+        student: {
+          id: contribution.student_member.user.id,
+          name: contribution.student_member.user.fullname,
+          photo: contribution.student_member.user.avatar?.url,
+          email: contribution.student_member.user.email,
+          cover: contribution.student_member.user.cover?.url,
+        },
+      };
+    });
+});
+
+const highlightedContributionsSimple = computed(() => {
+  if (!highlightedContributions.value) return [];
+  return highlightedContributions.value.map((contribution) => {
+    return {
+      id: contribution.id,
+      title: contribution.title,
+      contribution: contribution.contribution,
+      time: contribution.contribution.time,
+    };
+  });
+});
+
 onMounted(async () => {
   isLoading.value = true;
   while (trailStore.loading) {
@@ -206,44 +315,15 @@ onMounted(async () => {
   if (editorData.value.blocks.length) {
     if (await checkEditorReady()) {
       readOnly.value = false;
+
       await loadEditor();
-      toggleReadOnly();
+      toggleReadOnly('save');
     } else {
-      setMessage(t('pages.trailId.overview.loadError'), 'green', true);
+      setMessage(t('pages.trailId.overview.loadError'), 'red', true);
     }
   }
   isLoading.value = false;
 });
-
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
-
-watch(
-  () => [learningPlanStore.loading, trailStore.loading],
-  () => {
-    if (!learningPlanStore.loading && !trailStore.loading) {
-      headerStore.title = t('components.trails.header.breadcrumbs.title');
-      headerStore.items = [
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${learningPlanId.value}`,
-        },
-        {
-          title: t('pages.courses.trails'),
-          disabled: false,
-          to: `/courses/${learningPlanId.value}/trails`,
-        },
-        {
-          title: trailStore.trail?.title || '',
-          disabled: true,
-          to: `/courses/${learningPlanId.value}/trails/${trailId}`,
-        },
-      ];
-    }
-  },
-);
 
 const sections = ref([
   {
@@ -263,10 +343,10 @@ const isAvailableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = async () => {
+const toggleReadOnly = async (mode: string | '') => {
   readOnly.value = !readOnly.value;
   if (editor.value && editorData.value.blocks.length) {
-    await editor.value.toggleReadOnly();
+    await editor.value.toggleReadOnly(mode);
   }
 
   if (!readOnly.value) {
@@ -296,25 +376,92 @@ const setSections = () => {
         active: false,
       });
     }
-    const element = document.querySelector(`[data-id="${block.id}"]`);
-    if (element) {
-      element.setAttribute('section', String(newSections.length - 1));
+    const sectionBlock = document.querySelector(`[data-id="${block.id}"]`);
+    if (sectionBlock) {
+      sectionBlock.setAttribute('section', String(newSections.length - 1));
     }
   });
+  highlightedContributions.value?.forEach((contribution) => {
+    newSections.push({
+      title: contribution.title,
+      type: 3,
+      active: false,
+    });
+    const contributionSection = document.getElementById(
+      `${contribution.title}-${contribution.id}`,
+    );
+    if (contributionSection) {
+      contributionSection.setAttribute(
+        'section',
+        String(newSections.length - 1),
+      );
+    }
+  });
+
   sections.value = newSections;
 };
 
-const navigateToSection = (title: string) => {
-  if (title === 'Início') {
-    const element = document.getElementById(title);
-    if (element) {
-      element.scrollIntoView({
-        block: 'end',
-        inline: 'nearest',
-        behavior: 'smooth',
-      });
-    }
-  } else editor.value.navigateToId(title);
+const navigateToSection = (index: number) => {
+  const element = document.querySelector(`[section="${index}"]`);
+  if (element) {
+    element.scrollIntoView({
+      block: 'center',
+      inline: 'nearest',
+      behavior: 'smooth',
+    });
+  }
+};
+
+const removeContributionHighlight = async (id: number) => {
+  try {
+    const contribution = trailStore.trail?.contributions.find(
+      (contribution) => contribution.id === id,
+    );
+    if (!contribution) throw new Error('Contribution not found');
+    contribution.highlighted = false;
+    await update('trail-contributions', contribution.id, {
+      highlighted: contribution.highlighted,
+      blocked: false,
+    });
+  } catch (e) {
+    setMessage(
+      t('components.trails.contributions.error.updateHighlight'),
+      'red',
+      true,
+    );
+    if (trailStore.trail?.id !== undefined)
+      trailStore.loadTrailData(trailStore.trail.id);
+  }
+};
+
+const showContribution = (contribution: contributionType) => {
+  const element = document.getElementById(
+    `${contribution.title}-${contribution.id}`,
+  );
+  const section = element?.getAttribute('section');
+  if (section) {
+    navigateToSection(parseInt(section));
+  }
+};
+
+const goToContributions = () => {
+  navigateTo({
+    path: `/courses/${learningPlanId.value}/trails/${trailId.value}/contributions`,
+    query: { openModal: 'true' },
+  });
+};
+
+const handlePositions = (contributions) => {
+  contributions.forEach(async (contribution, index) => {
+    const contributionData = trailStore.trail?.contributions.find(
+      (c) => c.id === contribution.id,
+    );
+    if (!contributionData) return;
+    contributionData.highlighted_order = index + 1;
+    await update('trail-contributions', contribution.id, {
+      highlighted_order: contributionData.highlighted_order,
+    });
+  });
 };
 
 const loadEditor = async () => {
@@ -355,7 +502,7 @@ const saveData = async () => {
       blocks: res.data.blocks,
       trail: trailId.value,
     });
-    toggleReadOnly();
+    toggleReadOnly('save');
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'error', true);
   } finally {
@@ -371,7 +518,7 @@ const resetData = async () => {
     await loadEditor();
   }
 
-  toggleReadOnly();
+  toggleReadOnly('cancel');
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -390,13 +537,13 @@ const checkEditorReady = async () => {
   return false;
 };
 
-const timeStampToDate = computed(() => {
-  const date = new Date(editorData.value.time);
+const timeStampToDate = (timeStamp: number) => {
+  const date = new Date(timeStamp);
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
-});
+};
 
 const pageHeight = ref(0);
 const activeSection = ref(0);
@@ -405,7 +552,6 @@ const handleIntersection = (entries) => {
   entries.forEach((entry) => {
     const entrySection = parseInt(entry.target.getAttribute('section'));
     if (activeSection.value !== entrySection && entry.isIntersecting) {
-      if (entry.target.id === 'Início') return (activeSection.value = 0);
       activeSection.value = entrySection;
     }
   });
@@ -428,17 +574,10 @@ const setObserver = () => {
 
   observer = new IntersectionObserver(handleIntersection, observerConfig);
 
-  editorData.value.blocks.forEach((section) => {
-    const element = document.querySelector(`[data-id="${section.id}"]`);
-    if (element) {
-      observer.observe(element);
-    }
+  const elements = document.querySelectorAll('[section]');
+  elements.forEach((element) => {
+    observer.observe(element);
   });
-
-  const startSection = document.getElementById('Início');
-  if (startSection) {
-    observer.observe(startSection);
-  }
 };
 
 pageHeight.value = window.innerHeight;
@@ -472,7 +611,9 @@ window.addEventListener('resize', () => {
   top: 88px;
   z-index: 1;
   opacity: 1;
-  transition: opacity 0.2s ease-in-out;
+  transition:
+    opacity 200ms,
+    display 200ms;
 }
 
 .sections-col {
@@ -503,9 +644,34 @@ window.addEventListener('resize', () => {
   }
 }
 
+.contributions-container {
+  border-top: 1px solid rgb(var(--v-theme-gray-100));
+}
+
 #editor-container {
   container-type: inline-size;
   container-name: editor;
+  padding-bottom: 100px;
+}
+
+@keyframes slideaway {
+  from {
+    display: block;
+  }
+  to {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+@keyframes slidein {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    display: block;
+  }
 }
 
 .sticky-buttons {
@@ -515,12 +681,37 @@ window.addEventListener('resize', () => {
   z-index: 1;
 }
 
-@container editor (max-width: 1310px) {
+.user-card {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  bottom: 30px;
+  &:hover {
+    display: block;
+  }
+}
+
+.user-avatar {
+  padding: 4px 0px 4px 0px;
+}
+
+.user-avatar:hover ~ .user-card {
+  display: block !important;
+}
+
+@container editor (max-width: 1330px) {
   .sections-container {
-    opacity: 0;
+    animation: slideaway 200ms;
+    display: none;
   }
   .sticky-buttons {
     position: static;
+  }
+}
+@container editor (min-width: 1310px) {
+  .sections-container {
+    animation: slidein 200ms;
+    display: block;
   }
 }
 </style>

@@ -25,6 +25,7 @@
         variant="tertiary"
         :prepend-icon="secondaryButtonIcon"
         class="mr-2"
+        :size="buttonSize"
         @click="() => emits('secondary-action')"
       >
         {{ secondaryButtonText }}
@@ -33,6 +34,7 @@
         v-if="hasMainButton"
         variant="primary"
         :prepend-icon="mainButtonIcon"
+        :size="buttonSize"
         @click="() => emits('main-action')"
       >
         {{ mainButtonText }}
@@ -56,49 +58,38 @@
   </div>
 </template>
 <script setup lang="ts">
-defineProps({
-  title: {
-    type: String,
-    default: 'Page Title',
-  },
-  hasMainButton: {
-    type: Boolean,
-    default: false,
-  },
-  hasSecondaryButton: {
-    type: Boolean,
-    default: false,
-  },
-  mainButtonText: {
-    type: String,
-    default: 'Main Button',
-  },
-  mainButtonIcon: {
-    type: String,
-    default: null,
-  },
-  secondaryButtonIcon: {
-    type: String,
-    default: null,
-  },
-  secondaryButtonText: {
-    type: String,
-    default: 'Secondary Button',
-  },
-  noBackArrow: {
-    type: Boolean,
-    default: false,
-  },
-  items: {
-    type: Array as PropType<
-      { title: string; disabled?: boolean; to?: string }[]
-    >,
-    default: () => [],
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
+interface itemType {
+  title: string;
+  disabled?: boolean;
+  to?: string;
+}
+
+export interface HeaderComponentType {
+  title?: string;
+  hasMainButton?: boolean;
+  hasSecondaryButton?: boolean;
+  mainButtonText?: string;
+  mainButtonIcon?: string;
+  buttonSize?: 'default' | 'large' | 'small';
+  secondaryButtonIcon?: string;
+  secondaryButtonText?: string;
+  noBackArrow: boolean;
+  loading: boolean;
+  items: itemType[];
+}
+
+withDefaults(defineProps<HeaderComponentType>(), {
+  title: 'Page Title',
+  hasMainButton: false,
+  hasSecondaryButton: false,
+  mainButtonText: 'Main Button',
+  mainButtonIcon: undefined,
+  buttonSize: 'default',
+  secondaryButtonIcon: undefined,
+  secondaryButtonText: 'Secondary Button',
+  noBackArrow: false,
+  items: () => [],
+  loading: false,
 });
 
 const emits = defineEmits(['main-action', 'secondary-action']);

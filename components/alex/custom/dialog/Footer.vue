@@ -1,5 +1,5 @@
 <template>
-  <div
+  <v-container
     class="d-flex gap-4 justify-end flex-wrap bg-white min-height-76 rounded-b-lg px-6 py-4 border-top-gray-100 alex-dialog-footer"
     data-testid="alex-dialog-footer"
   >
@@ -12,7 +12,7 @@
       v-else
       size="large"
       variant="secondary"
-      prepend-icon="mdi-close"
+      :prepend-icon="secondaryButtonIcon"
       :text="secondaryButtonText"
       @click="() => emits('onSecondaryAction')"
     />
@@ -25,19 +25,21 @@
       v-else
       size="large"
       variant="primary"
-      prepend-icon="mdi-plus"
+      :prepend-icon="mainButtonIcon"
       :text="mainButtonText"
       :loading="mainButtonLoading"
       :disabled="mainButtonDisabled"
       @click="() => emits('onMainAction')"
     />
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
-interface HeaderProps {
+interface FooterProps {
   mainButtonText?: string;
+  mainButtonIcon?: string;
   secondaryButtonText?: string;
+  secondaryButtonIcon?: string;
   noMainButton?: boolean;
   noSecondaryButton?: boolean;
   mainButtonLoading?: boolean;
@@ -51,15 +53,18 @@ interface HeaderProps {
     | 'space-evenly'
     | 'stretch';
 }
-withDefaults(defineProps<HeaderProps>(), {
+withDefaults(defineProps<FooterProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
+  mainButtonIcon: undefined,
+  secondaryButtonIcon: undefined,
   noMainButton: false,
   noSecondaryButton: false,
   mainButtonLoading: false,
   mainButtonDisabled: false,
   justify: 'end',
 });
+
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
 const hasMainSlotButton = computed(() => !!slots.mainSlotButton);
@@ -74,6 +79,12 @@ const hasSecondarySlotButton = computed(() => !!slots.secondarySlotButton);
 @media screen and (max-width: 599px) {
   .alex-dialog-footer :deep(button) {
     width: 100% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .min-height-76 {
+    height: unset;
   }
 }
 </style>

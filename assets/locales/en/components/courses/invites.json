@@ -1,8 +1,9 @@
-{
-  "title": "Course Invites",
+{ 
+  "pending": "Pending Invites",
+  "title": "Course Invite",
   "expired": "Invite expired",
   "countdown": "Remaining Time: ",
-  "desactivated": "Invites are disallowed",
+  "deactivated": "Invites are disallowed",
   "refresh": "Refresh link",
   "copy": "Copy"
 }

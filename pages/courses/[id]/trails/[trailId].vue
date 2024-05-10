@@ -46,13 +46,12 @@ const getTrailData = async () => {
 };
 
 const activePage = computed(() => {
-  if (route.name?.toString().includes('tasks')) {
-    return '1';
-  } else if (route.name?.toString().includes('settings')) {
-    return '2';
-  }
-  return '0';
+  const routeName = route.name?.toString() || '';
+  const routes = ['---', 'tasks', 'contributions', 'settings'];
+  const index = routes.findIndex((a) => routeName.includes(a));
+  return (index < 0 ? 0 : index).toString();
 });
+
 onBeforeMount(async () => {
   headerStore.isLoading = true;
   await getTrailData();
