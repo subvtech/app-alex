@@ -19,10 +19,12 @@
         style="min-width: 160px; max-width: 320px"
         density="compact"
       />
+
       <alex-custom-button
         v-if="learningPlanStore.userIsFacilitator"
         prepend-icon="mdi-plus"
         size="large"
+        :disabled="!learningStructure"
         @click="createTrailDialog = true"
       >
         {{ $t('pages.trails.newTrail') }}</alex-custom-button
@@ -111,12 +113,14 @@
         </template>
       </v-data-iterator>
     </div>
-    <CreateDialog
-      v-if="learningPlanStore.userIsFacilitator && learningStructure"
-      v-model="createTrailDialog"
+
+    <alex-learningplan-trails-dialogs-create
+      v-if="learningPlanStore.userIsFacilitator && !!learningStructure"
+      :model-value="createTrailDialog"
       :learning-structure="learningStructure"
       @course-created="handleCreatedTrail"
-    ></CreateDialog>
+      @update:model-value="(e) => (createTrailDialog = e)"
+    />
   </div>
 </template>
 

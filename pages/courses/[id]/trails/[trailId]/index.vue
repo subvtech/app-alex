@@ -233,21 +233,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { contributionType } from '~/pages/courses/[id]/trails/[trailId]/contributions.vue';
-
-const { update, create } = useStrapi();
-const route = useRoute();
-const { setMessage } = useMessageStore();
-
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-
-const headerStore = usePageHeaderStore();
-const learningPlanStore = useLearningPlanStore();
-
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
+const { update, create } = useStrapi();
+const route = useRoute();
+const { setMessage } = useMessageStore();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
+const headerStore = usePageHeaderStore();
+const learningPlanStore = useLearningPlanStore();
 const trailStore = useTrailStore();
 const saveLoading = ref(false);
 const readOnly = ref(true);
@@ -261,7 +256,6 @@ const showEditor = computed(() => {
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
 const { t } = useI18n();
 const editorData = computed(() => {
   const data =
@@ -331,11 +325,9 @@ onMounted(async () => {
   }
   isLoading.value = false;
 });
-
 onBeforeMount(() => {
   headerStore.showHeader = true;
 });
-
 watch(
   () => [learningPlanStore.loading, trailStore.loading],
   () => {
@@ -361,7 +353,6 @@ watch(
     }
   },
 );
-
 const sections = ref([
   {
     title: t('pages.trailId.overview.sectionTitle'),
