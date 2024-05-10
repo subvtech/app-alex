@@ -1,9 +1,5 @@
 <template>
-  <alex-custom-card
-    :title="$t('components.profile.wallets.title')"
-    :show-icon="false"
-    no-footer
-  >
+  <alex-custom-card :title="$t('components.profile.wallets.title')" no-footer>
     <template #content>
       <div class="item d-flex w-100 justify-space-between">
         <div class="d-flex align-center gap-4">

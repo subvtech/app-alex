@@ -1,7 +1,7 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.socials.title')"
-    :show-icon="canEdit"
+    no-icon="canEdit"
     :disable-save="disableSave"
     :is-editing="canEditAndIsEditing"
     full-width
