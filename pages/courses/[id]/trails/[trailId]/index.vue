@@ -237,6 +237,7 @@ const trailStore = useTrailStore();
 const trailId = computed(() => parseInt(route.params?.trailId.toString()));
 useHeaderTrails('');
 const learningPlanStore = useLearningPlanStore();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 definePageMeta({
   hideLearningPlanBanner: true,

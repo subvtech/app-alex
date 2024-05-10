@@ -110,6 +110,13 @@ const tabs = computed(() => {
 });
 
 const activePage = ref(props.page);
+
+watch(
+  () => props.page,
+  (newPage) => {
+    activePage.value = newPage;
+  },
+);
 const defaultURL = computed(() => {
   return `/courses/${props.courseId}/trails/${props.trailId}`;
 });
