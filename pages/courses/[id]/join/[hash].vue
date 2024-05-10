@@ -1,5 +1,5 @@
 <template>
-  <alex-learningplan-dialogs-alert
+  <alex-custom-confirm-dialog
     v-if="
       !learningPlanStore.loading && invitationHash && !invitationHash.is_expired
     "
@@ -10,12 +10,15 @@
     image-class="mb-6"
     :image="{
       src: '/svg/Invite.svg',
-      alt: 'Convite',
+      alt: $t('components.learningPlan.invite'),
       width: 300,
       height: 200,
     }"
     :loading="loading"
     :submit-button-text="$t('components.learningPlan.join.active.action')"
+    :cancel-button-text="
+      $t('components.courses.settings.meetings.delete.cancel')
+    "
     @submit="onConfirm"
     @cancel="onCancel"
   >
@@ -23,10 +26,10 @@
       {{ t('components.learningPlan.join.active.description') }}
       <strong>{{ learningPlanStore.learningPlan?.title }}</strong>
       {{ t('components.learningPlan.join.active.at') }}
-      <strong>{{ learningPlanStore.learningPlan?.class_name }}</strong>
+      <strong>{{ invitationHash?.learning_class?.name }}</strong>
     </template>
-  </alex-learningplan-dialogs-alert>
-  <alex-learningplan-dialogs-alert
+  </alex-custom-confirm-dialog>
+  <alex-custom-confirm-dialog
     v-else-if="
       !learningPlanStore.loading && invitationHash && invitationHash.is_expired
     "
@@ -37,12 +40,15 @@
     :title="$t('components.learningPlan.join.expired.title')"
     :image="{
       src: '/svg/InviteExpired.svg',
-      alt: 'Convite Expirado',
+      alt: $t('components.courses.invites.expired'),
       width: 300,
       height: 200,
     }"
     :subtitle="$t('components.learningPlan.join.expired.description')"
     :submit-button-text="$t('components.learningPlan.join.expired.action')"
+    :cancel-button-text="
+      $t('components.courses.settings.meetings.delete.cancel')
+    "
     :loading="loading"
     @submit="onCancel"
   />
@@ -71,6 +77,7 @@ watch(learningPlanStore, () => {
         link.emails_to_send.includes(user.value?.email || ''))
     );
   });
+
   const isLinkEnabled = learningPlanStore.learningPlan?.invite_enabled;
   if (
     learningPlanStore.userIsActiveMember ||

@@ -9,7 +9,7 @@ export const usePagination = (
 ) => {
   const i18n = useI18n();
   const entityNames = {
-    class: i18n.t('pages.courses.class'),
+    class: i18n.t('pages.courses.classes'),
     group: i18n.t('pages.classes.groups'),
     member: i18n.t('pages.classes.participants'),
   };

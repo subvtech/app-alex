@@ -3,7 +3,7 @@
     class="mb-6"
     :title="title"
     :is-editing="isEditingAndCanEdit"
-    :show-icon="canEdit"
+    no-icon="canEdit"
     full-width
     :disable-save="valueWasNotChanged"
     @click:cancel="onCancel"
@@ -78,23 +78,22 @@ const toggleIsEditing = () => {
   setInitialImages();
 };
 const onSave = async () => {
-  const updatedMedia: Omit<TagSimple, 'learningplans'>[] = await client(
-    `/learningplans/${props.learningplanId}/media`,
-    {
-      method: 'PUT',
-      body: {
-        media: images.value,
-      },
-      onResponse: ({ response }) => {
-        if (!response.ok) {
-          setMessage('Algo deu errado ao salvar as alterações', 'red', true);
-          return;
-        }
-        initialImages.value = updatedMedia;
-        images.value = updatedMedia;
-      },
+  await client(`/learningplans/${props.learningplanId}/media`, {
+    method: 'PUT',
+    body: {
+      media: images.value,
     },
-  );
+    onResponse: async ({ response }) => {
+      if (!response.ok) {
+        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
+        return;
+      }
+      const updatedMedia: Omit<TagSimple, 'learningplans'>[] =
+        await response._data;
+      initialImages.value = updatedMedia;
+      images.value = updatedMedia;
+    },
+  });
 
   isEditing.value = !isEditing.value;
 };

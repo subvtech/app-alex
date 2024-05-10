@@ -31,12 +31,10 @@
           </v-container>
         </template>
       </vueper-slide>
-
       <vueper-slide
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
           <div v-if="!readOnly" class="ma-2 config-icon">
@@ -69,6 +67,12 @@
             :is-active="activeSlide == i"
             :data-setup="JSON.stringify({ techOrder: [slide.type] })"
           ></video-player>
+          <nuxt-img
+            v-else
+            :key="slide.title"
+            :src="slide.image"
+            :alt="slide.title"
+          />
         </template>
       </vueper-slide>
     </vueper-slides>
@@ -141,23 +145,23 @@
                 elevation="0"
                 icon="mdi-pencil-outline"
                 class="bg-gray-blue rounded-lg mr-1"
-                size="28px"
+                size="small"
                 variant="secondary"
                 @click="openAddSlidesDialog(i, false)"
               >
-                <v-icon size="small" icon="mdi-pencil-outline" color="accent" />
+                <v-icon size="20px" icon="mdi-pencil-outline" color="accent" />
               </alex-custom-button>
               <alex-custom-button
                 aria-label="delete"
                 elevation="0"
                 icon="mdi-trash-can-outline"
-                size="28px"
+                size="small"
                 variant="secondary"
                 class="bg-gray-blue rounded-lg"
                 @click="deleteSlide(slide)"
               >
                 <v-icon
-                  size="small"
+                  size="20px"
                   color="red"
                   icon="mdi-trash-can-outline"
                 ></v-icon>
@@ -209,13 +213,11 @@ const props = defineProps({
     default: () => {},
   },
 });
-
 const vueperslides1 = ref();
 const vueperslides2 = ref();
 const videoJS = ref();
 const videoJSWeb = ref();
 const uploading = ref(false);
-
 const captureVideoFrame = (file) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
@@ -248,6 +250,12 @@ const captureVideoFrame = (file) => {
 };
 
 function getYoutubeThumbnail(url: string) {
+  const isEncurtedLink = url.match(/\b(\.be)\b/);
+  if (isEncurtedLink) {
+    return `https://img.youtube.com/vi/${
+      url.split('.be/')[1].split('?')[0]
+    }/0.jpg`;
+  }
   return `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`;
 }
 
@@ -260,7 +268,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = `https://${slide.video}`;
+    url = slide.video;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -315,6 +323,7 @@ interface Slide {
   imgId?: string;
   videoId?: string;
   video?: string;
+  url?: string;
 }
 
 function newSlide(file, res) {
@@ -340,11 +349,9 @@ function newSlide(file, res) {
 }
 const activeSlide = ref(0);
 const dialog = ref();
-
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
-
 const slides = ref<Slide[]>([...(props.slides as Slide[])]);
 
 const deleteSlide = (item) => {
@@ -398,14 +405,14 @@ const addSlideByFile = async (slide, index) => {
 
 const addSlideByUrl = (slide, index) => {
   const slidesChanged = index !== -1;
-
-  let newSlide = {};
+  let newSlide = {} as Slide;
   if (
     slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://youtu.be') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
     let image, type;
-    if (slide.url.includes('www.youtube')) {
+    if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = getYoutubeThumbnail(slide.url);
     } else {
@@ -452,6 +459,7 @@ const editSlides = async (files, deleted, added) => {
     props.onUpdateSlides(slides.value);
   }
 };
+const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
 <style scoped>
@@ -471,10 +479,12 @@ const editSlides = async (files, deleted, added) => {
   cursor: pointer;
   -webkit-transition: opacity 1s;
   transition: opacity 1s;
-  transform: scale(0.9);
   transition: all 1s;
 }
-
+.slides-track-container .vueperslide {
+  transform: scale(0.9);
+}
+.slides-track-container .vueperslide-active,
 .vueperslide-active {
   opacity: 1;
   transform: scale(1);
@@ -485,7 +495,7 @@ const editSlides = async (files, deleted, added) => {
   top: 75%;
   left: 80%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.25);
+  background: #0006;
   width: 36px;
   height: 36px;
 }
@@ -525,5 +535,11 @@ const editSlides = async (files, deleted, added) => {
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>

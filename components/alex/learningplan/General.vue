@@ -27,6 +27,7 @@
                 return { ...item };
               })
             "
+            :no-icon="learningPlanStore.userIsFacilitator"
             :course-id="learningPlan.id"
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
@@ -38,6 +39,7 @@
             full-width
             :text="learningPlan.description"
             :user-id="user.id"
+            :no-icon="learningPlanStore.userIsFacilitator"
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
@@ -50,6 +52,7 @@
             :course-id="learningPlan.id"
             :user-id="user.id"
             :data="learningGoals"
+            :no-icon="learningPlanStore.userIsFacilitator"
             :tooltip="$t('components.courses.goals.tooltip')"
             @update="(data) => emit('update', data)"
           />
@@ -62,6 +65,7 @@
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="learningPlanStore.userIsFacilitator"
+            :no-icon="learningPlanStore.userIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
@@ -71,7 +75,7 @@
     <div
       class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
     >
-      <alex-custom-card v-if="loading" title="" :show-icon="false">
+      <alex-custom-card v-if="loading" title="">
         <template #content>
           <div class="d-flex bg-white rounded-lg align-center w-100 gap-4">
             <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
@@ -84,7 +88,6 @@
       <alex-custom-card
         v-else
         :title="$t('pages.courses.details')"
-        :show-icon="false"
         class="w-100"
       >
         <template #content>
@@ -92,6 +95,7 @@
             class="max-w-125"
             :boxes="detailBoxes"
             :loading="loading"
+            hide-divider
           />
         </template>
         <template #footer>

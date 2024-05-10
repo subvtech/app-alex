@@ -1,7 +1,6 @@
 <template>
   <alex-custom-card
     :title="$t('components.profile.general.title')"
-    :show-icon="false"
     align-content="align-center"
   >
     <template #content>

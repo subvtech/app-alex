@@ -11,6 +11,7 @@
         <h4 v-if="highlightedTitle" class="text-h4 text-secondary-0">
           {{ highlightedTitle }}
         </h4>
+        <slot name="default"></slot>
       </v-col>
       <v-col cols="auto"
         ><alex-custom-button

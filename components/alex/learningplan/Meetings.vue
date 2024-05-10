@@ -1,10 +1,12 @@
 <template>
   <alex-custom-card
     :title="$t('components.meeting.title')"
-    :show-icon="canEdit"
+    :no-icon="canEdit"
     class="w-100"
     :is-editing="editMeetings"
     :disable-save="!schedulesChanges.length"
+    align-content="align-center"
+    :href="canEdit ? `${learningPlanId}/settings` : ''"
     @click:save="onSave"
     @click:cancel="onCancel"
     @toggle:is-editing="toggleEditMode"
@@ -48,13 +50,16 @@
       </div>
     </template>
   </alex-custom-card>
-  <alex-learningplan-dialogs-alert
+  <alex-custom-confirm-dialog
     v-model="deleteModal"
     variant="error"
     :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
     :title="$t('components.courses.meeting.deleteModal.confirmation')"
     :subtitle="$t('components.courses.meeting.deleteModal.description')"
     :submit-button-text="$t('components.courses.meeting.deleteModal.button')"
+    :cancel-button-text="
+      $t('components.courses.settings.meetings.delete.cancel')
+    "
     no-input-confirmation
     @submit="confirmDelete"
     @cancel="cancelDelete"
@@ -88,13 +93,27 @@ const props = defineProps({
     required: true,
   },
 });
-// corrigir tipagem
+
+interface newSchedule {
+  id?: number;
+  date: string;
+  type: 'online' | 'onsite';
+  interval: number;
+  startHour: string;
+  endHour: string;
+  link?: string;
+  location?: string;
+  endDate: string;
+  startDate: string;
+  learningplan: number;
+  learning_class: number;
+}
+
 type ScheduleChange = {
-  name?: string;
+  className?: string;
   id?: number;
   type: 'create' | 'delete' | 'update';
-  schedule?: any;
-  ref?: classItem;
+  schedule?: newSchedule;
 };
 
 const backUpSchedules = ref();
@@ -107,10 +126,6 @@ const hasMeetings = computed(() => {
 
 const findClassByName = (className) => {
   return classModel.value?.find((classItem) => classItem?.name === className);
-};
-
-const addScheduleChange = (change) => {
-  schedulesChanges.value.push(change);
 };
 
 const getSchedules = (classItem) => {
@@ -181,19 +196,33 @@ const toggleEditMode = () => {
     backUpSchedules.value = deepClone(classModel.value);
   }
 };
+
+const updateScheduleId = (className, scheduleID, resID) => {
+  const classItem = findClassByName(className);
+  const schedule = classItem?.schedules.find(
+    (schedule) => schedule.id === scheduleID,
+  );
+  schedule.id = resID;
+};
+
 const onSave = async () => {
   const endpoint = 'learning-plan-meeting-schedules';
   try {
     const tasks = schedulesChanges.value.map((element) => {
       switch (element.type) {
         case 'create':
+          if (element.schedule === undefined) {
+            throw new Error('element.schedule is undefined');
+          }
           return strapi.create(endpoint, element.schedule).then((res) => {
-            element.ref.id = res.data.id;
+            updateScheduleId(element.className, element.id, res.data.id);
           });
-
         case 'delete':
           return strapi.delete(endpoint, element.id);
         case 'update':
+          if (element.schedule?.id === undefined) {
+            throw new Error('element.schedule.id is undefined');
+          }
           return strapi.update(endpoint, element.schedule.id, element.schedule);
         default:
           return Promise.resolve();
@@ -214,6 +243,7 @@ const onCancel = () => {
   classModel.value = deepClone(backUpSchedules.value);
   editMeetings.value = false;
   schedulesChanges.value = [];
+  editMeetings.value = false;
 };
 
 const convertDate = (date, time) => {
@@ -226,7 +256,7 @@ const handleCreate = (newSchedule) => {
   const { className, id, ...schedule } = newSchedule;
   const scheduleClass = findClassByName(className);
   scheduleClass?.schedules.push(newSchedule);
-  addScheduleChange({
+  schedulesChanges.value.push({
     schedule: {
       ...schedule,
       date: newSchedule.date,
@@ -235,7 +265,8 @@ const handleCreate = (newSchedule) => {
       learningplan: props.learningPlanId,
       learning_class: scheduleClass.id,
     },
-    ref: scheduleClass.schedules[scheduleClass.schedules.length - 1],
+    id,
+    className,
     type: 'create',
   });
 };
@@ -243,7 +274,7 @@ const handleCreate = (newSchedule) => {
 const handleDelete = (className: string, scheduleID: number) => {
   deleteModal.value = true;
   schedulesChanges.value.push({
-    name: className,
+    className,
     id: scheduleID,
     type: 'delete',
   });
@@ -253,7 +284,7 @@ const confirmDelete = () => {
   const DeletedSchedule =
     schedulesChanges.value[schedulesChanges.value.length - 1];
   deleteModal.value = false;
-  const classItem = findClassByName(DeletedSchedule.name);
+  const classItem = findClassByName(DeletedSchedule.className);
   classItem?.schedules.splice(
     classItem?.schedules.findIndex(
       (schedule) => schedule.id === DeletedSchedule.id,
