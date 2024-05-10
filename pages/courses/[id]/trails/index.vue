@@ -4,7 +4,7 @@
     class="d-flex bg-white flex-column rounded-lg pa-6 wrapper"
   >
     <div
-      class="d-flex flex-wrap w-100 gap-2"
+      class="d-flex flex-wrap w-100 gap-4 gap-sm-1"
       :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
     >
       <alex-inputs-text-field
@@ -49,7 +49,7 @@
           <alex-learningplan-skeleton-trail-card
             v-for="index in 3"
             :key="index"
-          ></alex-learningplan-skeleton-trail-card>
+          />
         </div>
       </div>
       <div v-else class="d-flex align-center justify-center flex-column">
@@ -67,14 +67,14 @@
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
+        class="d-flex flex-column justify-space-between flex-start flex-grow-1 flex-shrink-1 position-relative"
         :items="trails ?? []"
         :items-per-page="12"
         :filter-keys="['name', 'description', 'blocks']"
-        class="d-flex flex-wrap"
-        style="flex: 1; position: relative"
+        style="flex-basis: 0"
       >
         <template #default="{ items }">
-          <div class="d-flex ga-6 flex-wrap w-100 card-container">
+          <div class="card-container w-100">
             <alex-learningplan-trails-card
               v-for="(item, index) in items"
               :key="item.raw.title + index"
@@ -98,7 +98,7 @@
           <div
             class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
           >
-            <p class="text-body-3 text-gray-600">
+            <p class="show-cardlist text-body-3 text-gray-600">
               {{ showingData(groupedItems) }}
             </p>
             <alex-custom-pagination
@@ -106,6 +106,7 @@
               v-model="page"
               :length="pageCount"
               :total-visible="5"
+              class="extra-mb"
             />
           </div>
         </template>
@@ -256,12 +257,19 @@ watch(
   max-height: 360px;
 }
 
-.card-container {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-}
 .flex-stretch {
   box-sizing: border-box !important;
+}
+
+.card-container {
+  display: grid !important;
+  row-gap: 24px;
+  column-gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  justify-content: center; /* Centers the grid items horizontally */
+  align-items: center;
+
+  display: grid !important;
 }
 
 .footer {
@@ -274,10 +282,38 @@ watch(
   opacity: 0.5;
 }
 
-@media (max-width: 580px) {
+@media (min-width: 959px) and (max-width: 976px) {
   .card-container {
     justify-content: center !important;
     align-items: center !important;
+  }
+
+  .flex-stretch {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .card-container {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .flex-stretch {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 477px) {
+  .show-cardlist {
+    font-size: 12px !important;
+    letter-spacing: 0.4px !important;
+  }
+}
+
+@media (max-width: 431px) {
+  .extra-mb {
+    translate: 0 -16px;
   }
 }
 </style>

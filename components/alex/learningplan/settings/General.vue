@@ -129,6 +129,10 @@ const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   keepValuesOnUnmount: true,
 });
 
+const slugFormated = computed(() =>
+  controlledValues.value.slug.trim().toLowerCase().replaceAll(' ', '_'),
+);
+
 const onSave = handleSubmit(async (e) => {
   if (controlledValues.value.slug !== props.slug && isCourses.value) {
     const isSlugAvailable = await find('learningplans', {

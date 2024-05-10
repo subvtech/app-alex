@@ -12,7 +12,7 @@
       v-else
       size="large"
       variant="secondary"
-      prepend-icon="mdi-close"
+      :prepend-icon="secondaryButtonIcon"
       :text="secondaryButtonText"
       @click="() => emits('onSecondaryAction')"
     />
@@ -25,7 +25,7 @@
       v-else
       size="large"
       variant="primary"
-      prepend-icon="mdi-plus"
+      :prepend-icon="mainButtonIcon"
       :text="mainButtonText"
       :loading="mainButtonLoading"
       :disabled="mainButtonDisabled"
@@ -37,7 +37,9 @@
 <script setup lang="ts">
 interface FooterProps {
   mainButtonText?: string;
+  mainButtonIcon?: string;
   secondaryButtonText?: string;
+  secondaryButtonIcon?: string;
   noMainButton?: boolean;
   noSecondaryButton?: boolean;
   mainButtonLoading?: boolean;
@@ -54,12 +56,15 @@ interface FooterProps {
 withDefaults(defineProps<FooterProps>(), {
   mainButtonText: 'Salvar',
   secondaryButtonText: 'Cancelar',
+  mainButtonIcon: undefined,
+  secondaryButtonIcon: undefined,
   noMainButton: false,
   noSecondaryButton: false,
   mainButtonLoading: false,
   mainButtonDisabled: false,
   justify: 'end',
 });
+
 const emits = defineEmits(['onMainAction', 'onSecondaryAction']);
 const slots = useSlots();
 const hasMainSlotButton = computed(() => !!slots.mainSlotButton);
@@ -74,6 +79,12 @@ const hasSecondarySlotButton = computed(() => !!slots.secondarySlotButton);
 @media screen and (max-width: 599px) {
   .alex-dialog-footer :deep(button) {
     width: 100% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .min-height-76 {
+    height: unset;
   }
 }
 </style>

@@ -90,13 +90,27 @@ const props = defineProps({
     required: true,
   },
 });
-// corrigir tipagem
+
+interface newSchedule {
+  id?: number;
+  date: string;
+  type: 'online' | 'onsite';
+  interval: number;
+  startHour: string;
+  endHour: string;
+  link?: string;
+  location?: string;
+  endDate: string;
+  startDate: string;
+  learningplan: number;
+  learning_class: number;
+}
+
 type ScheduleChange = {
-  name?: string;
+  className?: string;
   id?: number;
   type: 'create' | 'delete' | 'update';
-  schedule?: any;
-  ref?: classItem;
+  schedule?: newSchedule;
 };
 
 const backUpSchedules = ref();
@@ -109,10 +123,6 @@ const hasMeetings = computed(() => {
 
 const findClassByName = (className) => {
   return classModel.value?.find((classItem) => classItem?.name === className);
-};
-
-const addScheduleChange = (change) => {
-  schedulesChanges.value.push(change);
 };
 
 const getSchedules = (classItem) => {
@@ -183,19 +193,33 @@ const toggleEditMode = () => {
     backUpSchedules.value = deepClone(classModel.value);
   }
 };
+
+const updateScheduleId = (className, scheduleID, resID) => {
+  const classItem = findClassByName(className);
+  const schedule = classItem?.schedules.find(
+    (schedule) => schedule.id === scheduleID,
+  );
+  schedule.id = resID;
+};
+
 const onSave = async () => {
   const endpoint = 'learning-plan-meeting-schedules';
   try {
     const tasks = schedulesChanges.value.map((element) => {
       switch (element.type) {
         case 'create':
+          if (element.schedule === undefined) {
+            throw new Error('element.schedule is undefined');
+          }
           return strapi.create(endpoint, element.schedule).then((res) => {
-            element.ref.id = res.data.id;
+            updateScheduleId(element.className, element.id, res.data.id);
           });
-
         case 'delete':
           return strapi.delete(endpoint, element.id);
         case 'update':
+          if (element.schedule?.id === undefined) {
+            throw new Error('element.schedule.id is undefined');
+          }
           return strapi.update(endpoint, element.schedule.id, element.schedule);
         default:
           return Promise.resolve();
@@ -229,7 +253,7 @@ const handleCreate = (newSchedule) => {
   const { className, id, ...schedule } = newSchedule;
   const scheduleClass = findClassByName(className);
   scheduleClass?.schedules.push(newSchedule);
-  addScheduleChange({
+  schedulesChanges.value.push({
     schedule: {
       ...schedule,
       date: newSchedule.date,
@@ -238,7 +262,8 @@ const handleCreate = (newSchedule) => {
       learningplan: props.learningPlanId,
       learning_class: scheduleClass.id,
     },
-    ref: scheduleClass.schedules[scheduleClass.schedules.length - 1],
+    id,
+    className,
     type: 'create',
   });
 };
@@ -246,7 +271,7 @@ const handleCreate = (newSchedule) => {
 const handleDelete = (className: string, scheduleID: number) => {
   deleteModal.value = true;
   schedulesChanges.value.push({
-    name: className,
+    className,
     id: scheduleID,
     type: 'delete',
   });
@@ -256,7 +281,7 @@ const confirmDelete = () => {
   const DeletedSchedule =
     schedulesChanges.value[schedulesChanges.value.length - 1];
   deleteModal.value = false;
-  const classItem = findClassByName(DeletedSchedule.name);
+  const classItem = findClassByName(DeletedSchedule.className);
   classItem?.schedules.splice(
     classItem?.schedules.findIndex(
       (schedule) => schedule.id === DeletedSchedule.id,
