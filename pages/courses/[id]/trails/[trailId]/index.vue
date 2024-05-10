@@ -42,13 +42,7 @@
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div
-          v-else-if="
-            learningPlanStore.userIsFacilitator &&
-            !isLoading &&
-            highlightedContributionsSimple.length
-          "
-        >
+        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
