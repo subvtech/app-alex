@@ -217,7 +217,7 @@ export const useFormRules = () => {
     ...cpfRules,
   });
   const urlRegex =
-  /^(?=.{4,2048}$)((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]{1,63}(\.[a-zA-Z]{1,63}){1,5}(\/)?.([\w\?[a-zA-Z-_%\/@?]+)*([^\/\w\?[a-zA-Z0-9_-]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/;
+    /^(?=.{4,2048}$)((http|https):\/\/)?(www.)?(?!.*(http|https|www.))[a-zA-Z0-9_-]{1,63}(\.[a-zA-Z]{1,63}){1,5}(\/)?.([\w\?[a-zA-Z-_%\/@?]+)*([^\/\w\?[a-zA-Z0-9_-]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/;
   const urlRules = yup
     .string()
     .matches(urlRegex, i18n.t('rules.url.valid'))
@@ -288,43 +288,19 @@ export const useFormRules = () => {
             return isSameOrBeforeHour(value, startHour) === 1;
           },
         ),
-      className: yup.string().required(i18n.t('rules.class.required')),
-      type: yup.string().required(i18n.t('rules.meeting.type.required')),
-      interval: yup
-        .number()
-        .required(i18n.t('rules.meeting.interval.required')),
-      location: yup
-        .string()
-        .notRequired()
-        .when('type', {
-          is: 'onsite',
-          then: (scheme) =>
-            scheme.required(i18n.t('rules.meeting.location.required')),
-        }),
-      link: yup
-        .string()
-        .notRequired()
-        .when('type', {
-          is: 'online',
-          then: (scheme) =>
-            scheme.required(i18n.t('rules.meeting.link.required')),
-        }),
     });
 
-  const createTrailsRules = yup.object({
+  const createTrailsRules = {
     title: yup
       .string()
       .required(i18n.t('rules.title.required'))
       .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .trim(),
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
-  });
+    ...descriptionRules,
+  };
+
+  const createTrailsScheme = yup.object(createTrailsRules);
 
   const createGroupRules = {
     groupTitle: yup
@@ -373,15 +349,16 @@ export const useFormRules = () => {
       .max(20, ({ max }) => i18n.t('rules.title.max', { max }))
       .required(i18n.t('rules.title.required'))
       .trim(),
-    urlRules: urlRules,
+    urlRules,
     generalCourseSchema,
     loginSchema,
     createCourseRules,
+    createTrailsScheme,
     generalTrailSchema,
+    createGroupRules,
     emailRegex,
     scheduleRules,
     createTrailsRules,
-    createGroupRules,
     createEditClassRules,
     classRules,
   };

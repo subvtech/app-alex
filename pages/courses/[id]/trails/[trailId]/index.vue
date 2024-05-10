@@ -100,7 +100,7 @@
         v-else
         class="container-min-height justify-center ma-6 align-start d-flex"
       >
-        <div style="width: 750px">
+        <div style="width: 800px">
           <p
             v-show="readOnly && editorData.time"
             style="max-width: 700px"
@@ -151,34 +151,27 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-const { create } = useStrapi();
-const route = useRoute();
-const { setMessage } = useMessageStore();
-
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-
-const headerStore = usePageHeaderStore();
-const learningPlanStore = useLearningPlanStore();
-
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
+const { create } = useStrapi();
+const route = useRoute();
+const { setMessage } = useMessageStore();
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
+const headerStore = usePageHeaderStore();
+const learningPlanStore = useLearningPlanStore();
 const trailStore = useTrailStore();
-
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
-
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
   return (
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
 const { t } = useI18n();
 const editorData = computed(() => {
   const data =
@@ -197,7 +190,6 @@ const editorData = computed(() => {
       }) || [],
   };
 });
-
 onMounted(async () => {
   isLoading.value = true;
   while (trailStore.loading) {
@@ -207,18 +199,16 @@ onMounted(async () => {
     if (await checkEditorReady()) {
       readOnly.value = false;
       await loadEditor();
-      toggleReadOnly();
+      toggleReadOnly('save');
     } else {
       setMessage(t('pages.trailId.overview.loadError'), 'green', true);
     }
   }
   isLoading.value = false;
 });
-
 onBeforeMount(() => {
   headerStore.showHeader = true;
 });
-
 watch(
   () => [learningPlanStore.loading, trailStore.loading],
   () => {
@@ -244,7 +234,6 @@ watch(
     }
   },
 );
-
 const sections = ref([
   {
     title: t('pages.trailId.overview.sectionTitle'),
@@ -263,10 +252,10 @@ const isAvailableTooltip = (title: string) => {
   return false;
 };
 
-const toggleReadOnly = async () => {
+const toggleReadOnly = async (mode: string | '') => {
   readOnly.value = !readOnly.value;
   if (editor.value && editorData.value.blocks.length) {
-    await editor.value.toggleReadOnly();
+    await editor.value.toggleReadOnly(mode);
   }
 
   if (!readOnly.value) {
@@ -355,7 +344,7 @@ const saveData = async () => {
       blocks: res.data.blocks,
       trail: trailId.value,
     });
-    toggleReadOnly();
+    toggleReadOnly('save');
   } catch (e) {
     setMessage(t('pages.trailId.overview.saveError'), 'error', true);
   } finally {
@@ -371,7 +360,7 @@ const resetData = async () => {
     await loadEditor();
   }
 
-  toggleReadOnly();
+  toggleReadOnly('cancel');
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -472,7 +461,9 @@ window.addEventListener('resize', () => {
   top: 88px;
   z-index: 1;
   opacity: 1;
-  transition: opacity 0.2s ease-in-out;
+  transition:
+    opacity 200ms,
+    display 200ms;
 }
 
 .sections-col {
@@ -508,6 +499,26 @@ window.addEventListener('resize', () => {
   container-name: editor;
 }
 
+@keyframes slideaway {
+  from {
+    display: block;
+  }
+  to {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+}
+
+@keyframes slidein {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    display: block;
+  }
+}
+
 .sticky-buttons {
   position: -webkit-sticky;
   position: sticky;
@@ -515,12 +526,19 @@ window.addEventListener('resize', () => {
   z-index: 1;
 }
 
-@container editor (max-width: 1310px) {
+@container editor (max-width: 1330px) {
   .sections-container {
-    opacity: 0;
+    animation: slideaway 200ms;
+    display: none;
   }
   .sticky-buttons {
     position: static;
+  }
+}
+@container editor (min-width: 1310px) {
+  .sections-container {
+    animation: slidein 200ms;
+    display: block;
   }
 }
 </style>
