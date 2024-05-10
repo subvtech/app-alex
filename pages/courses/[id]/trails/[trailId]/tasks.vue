@@ -14,44 +14,7 @@
   >
 </template>
 <script setup lang="ts">
-const headerStore = usePageHeaderStore();
-const { t } = useI18n();
-const { id, trailId } = useRoute().params;
-const learningPlanStore = useLearningPlanStore();
 const trailStore = useTrailStore();
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
-
-watch(
-  () => [learningPlanStore.loading, trailStore.loading],
-  () => {
-    if (!learningPlanStore.loading && !trailStore.loading) {
-      headerStore.title = t('components.trails.header.breadcrumbs.title');
-      headerStore.items = [
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${id}`,
-        },
-        {
-          title: t('pages.courses.trails'),
-          disabled: false,
-          to: `/courses/${id}/trails`,
-        },
-        {
-          title: trailStore.trail?.title || '',
-          disabled: false,
-          to: `/courses/${id}/trails/${trailId}/`,
-        },
-        {
-          title: t('components.trails.header.secondTab'),
-          disabled: true,
-          to: `/courses/${id}/trails/${trailId}/tasks`,
-        },
-      ];
-    }
-  },
-);
+useHeaderTrails('tasks', 'components.trails.header.secondTab');
 </script>
 <style scoped lang="scss"></style>

@@ -112,6 +112,7 @@
       :secondary-button-text="secondaryButtonText"
       :secondary-button-icon="secondaryButtonIcon"
       :main-button-disabled="mainButtonDisabled"
+      :main-button-loading="loading"
       @on-main-action="() => emits('onMainAction')"
       @on-secondary-action="() => emits('onSecondaryAction')"
     />

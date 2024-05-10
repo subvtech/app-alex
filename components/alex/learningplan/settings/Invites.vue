@@ -1,7 +1,6 @@
 <template>
   <alex-custom-card
     :title="$t('components.courses.settings.invite.title')"
-    :show-icon="false"
     show-footer-divider
   >
     <template #content>
@@ -82,12 +81,7 @@
       <div class="d-flex w-100 pt-4 justify-end gap-4">
         <alex-custom-button
           class="button"
-          :text="$t('components.courses.settings.invite.cancel')"
-          variant="secondary"
-          @click="onCancel"
-        />
-        <alex-custom-button
-          class="button"
+          prepend-icon="mdi-check"
           :text="$t('components.courses.settings.invite.save')"
           variant="primary"
           @click="onSave"
