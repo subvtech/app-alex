@@ -47,11 +47,8 @@ const getTrailData = async () => {
 
 const activePage = computed(() => {
   const routeName = route.name?.toString() || '';
-  const routes = ['---', 'tasks', 'settings'];
+  const routes = ['---', 'tasks', 'contributions', 'settings'];
   const index = routes.findIndex((a) => routeName.includes(a));
-
-  console.log({ activePage: index, routeName });
-
   return (index < 0 ? 0 : index).toString();
 });
 
@@ -72,8 +69,6 @@ watch(pageRoute, async () => {
     await getTrailData();
   }
 });
-
-watch(activePage, () => console.log({ trailId: activePage.value }));
 </script>
 <style lang="scss">
 @media screen and (max-width: 579px) {

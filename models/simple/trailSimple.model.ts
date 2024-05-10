@@ -7,7 +7,7 @@ export interface TrailSimple {
   cover_image: Upload;
   learning_structure: LearningPlanStructureSimple;
   partners: LearningPlanMemberSimple[];
-  contribuitions: any[];
+  contributions: any[];
   structures: StructureSimple[];
   tasks: any[];
 }
