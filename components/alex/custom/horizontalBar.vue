@@ -142,6 +142,7 @@ export interface HorizontalBarComponentType {
   trackCurrentUser?: boolean;
 }
 
+const userStore = useUserStore();
 const emit = defineEmits<HorizontalBarEmits>();
 const placeholderFallback = 'user';
 const router = useRouter();
@@ -160,7 +161,11 @@ const props = withDefaults(defineProps<HorizontalBarComponentType>(), {
 });
 
 const computedPlaceholder = computed(() =>
-  props ? props.placeholder ?? placeholderFallback : placeholderFallback,
+  props.trackCurrentUser && userStore.user
+    ? userStore.user?.fullname
+    : props.placeholder
+    ? props.placeholder
+    : placeholderFallback,
 );
 </script>
 

@@ -108,7 +108,9 @@
       v-else-if="!hasFooter && !noFooter && !stepper"
       data-testid="alex-dialog-footer"
       :main-button-text="mainButtonText"
+      :main-button-icon="mainButtonIcon"
       :secondary-button-text="secondaryButtonText"
+      :secondary-button-icon="secondaryButtonIcon"
       :main-button-disabled="mainButtonDisabled"
       @on-main-action="() => emits('onMainAction')"
       @on-secondary-action="() => emits('onSecondaryAction')"
@@ -129,6 +131,8 @@ interface HeaderProps {
   mainButtonText?: string;
   secondaryButtonText?: string;
   mainButtonDisabled?: boolean;
+  mainButtonIcon: string;
+  secondaryButtonIcon: string;
   noFooter?: boolean;
   noHeader?: boolean;
   stepper?: boolean;
@@ -143,6 +147,8 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   highlightedTitle: undefined,
   mainButtonText: undefined,
   secondaryButtonText: undefined,
+  mainButtonIcon: undefined,
+  secondaryButtonIcon: undefined,
   noFooter: false,
   noHeader: false,
   mainButtonDisabled: false,

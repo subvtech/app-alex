@@ -24,7 +24,8 @@
     },
     "cancel": "Cancelar",
     "save": "Salvar alterações",
-    "update": "Informações Gerais atualizadas com sucesso"
+    "update": "Informações Gerais atualizadas com sucesso",
+    "error": "Ocorreu um erro ao atualizar o curso. Por favor, tente novamente mais tarde."
   },
   "meetings": {
     "title": "Editar encontro síncrono",

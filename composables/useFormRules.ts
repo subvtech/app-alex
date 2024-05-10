@@ -164,8 +164,7 @@ export const useFormRules = () => {
       .trim(),
     slug: yup
       .string()
-      .min(3, ({ min }) => i18n.t('rules.slug.min', { min }))
-      .max(20, ({ max }) => i18n.t('rules.slug.max', { max }))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
       .required(i18n.t('rules.slug.required'))
       .trim(),
   });
@@ -255,7 +254,6 @@ export const useFormRules = () => {
       .string()
       .required(i18n.t('rules.field.required'))
       .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
-      .max(64, ({ max }) => i18n.t('rules.slug.max', { max }))
       .trim(),
     startDate: startDateCreationRules,
     endDate: endDateRules,
@@ -299,15 +297,10 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .trim(),
-    description: yup
-      .string()
-      .required(i18n.t('rules.description.required'))
-      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
-      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
-      .trim(),
+    ...descriptionRules,
   };
 
-  const createTrailsSchema = yup.object(createTrailsRules);
+  const createTrailsScheme = yup.object(createTrailsRules);
 
   const createGroupRules = {
     groupTitle: yup
@@ -360,13 +353,12 @@ export const useFormRules = () => {
     generalCourseSchema,
     loginSchema,
     createCourseRules,
+    createTrailsScheme,
     generalTrailSchema,
+    createGroupRules,
     emailRegex,
     scheduleRules,
-    createTrailsSchema,
-    createGroupRules,
     createTrailsRules,
-    createGroupRules,
     createEditClassRules,
     classRules,
   };
