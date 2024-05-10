@@ -31,6 +31,7 @@ before_script:
 
 stages: # List of stages for jobs, and their order of execution
   - build
+  - preview
   - deploy
   #- test
 
@@ -57,8 +58,8 @@ deploy:
     - master
     - test
 
-deploy_preview:
-  stage: deploy
+deploy_vercel:
+  stage: preview
   script:
     - npm install --global vercel
     - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
