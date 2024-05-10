@@ -10,6 +10,7 @@ ARG strapi_url
 ARG components_page
 ARG matomo_app_id
 ARG matomo_url
+ARG open_ai_key
 
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
