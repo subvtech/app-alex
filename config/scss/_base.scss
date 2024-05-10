@@ -170,6 +170,15 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
   }
 }
 
+@for $size from 2 through 256 {
+  .max-w-#{$size} {
+    max-width: $size * 4px;
+  }
+  .max-h-#{$size} {
+    max-height: $size * 4px;
+  }
+}
+
 @media screen and (max-width: 599px) {
   .footer-buttons {
     width: 100%;

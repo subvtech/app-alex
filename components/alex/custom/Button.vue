@@ -20,35 +20,30 @@
 </template>
 
 <script setup lang="ts">
-export type VariantType =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'text'
-  | 'error'
-  | 'success'
-  | 'warning'
-  | 'info';
+export interface ButtonProps {
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'text'
+    | 'error'
+    | 'success'
+    | 'warning'
+    | 'info';
+  size?: 'small' | 'default' | 'large';
+  disabled?: boolean;
+  theme?: 'light' | 'dark';
+  color?: AlexColors;
+}
 
-export type ButtonSizeType = 'small' | 'default' | 'large';
-
-const props = withDefaults(
-  defineProps<{
-    variant?: VariantType;
-    size?: ButtonSizeType;
-    disabled?: boolean;
-    theme?: 'light' | 'dark';
-    color?: AlexColors;
-  }>(),
-  {
-    variant: 'primary',
-    size: 'default',
-    icon: undefined,
-    disabled: false,
-    theme: 'light',
-    color: undefined,
-  },
-);
+const props = withDefaults(defineProps<ButtonProps>(), {
+  variant: 'primary',
+  size: 'default',
+  icon: undefined,
+  disabled: false,
+  theme: 'light',
+  color: undefined,
+});
 
 const variants = {
   primary: { textColor: 'white', bgColor: 'secondary-0' },

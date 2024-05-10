@@ -5,6 +5,8 @@
         v-if="!hasActivatorSlot"
         v-bind="propsActivator"
         icon="mdi-dots-vertical"
+        :variant="props.variant"
+        :size="props.buttonSize"
       />
       <slot
         v-else
@@ -35,18 +37,24 @@
 
 <script setup lang="ts">
 import { AlexListItem } from '@/components/alex/custom/list-item/index.vue';
+import { ButtonProps } from '@/components/alex/custom/Button.vue';
 
 export interface AlexDropdownItem extends Omit<AlexListItem, 'theme'> {
   onClick?: () => unknown;
 }
+
 interface DropdownProps {
   items: AlexDropdownItem[];
   theme?: 'light' | 'dark';
+  variant?: ButtonProps['variant'];
+  buttonSize?: ButtonProps['size'];
 }
 
 const props = withDefaults(defineProps<DropdownProps>(), {
   theme: 'light',
   warning: false,
+  variant: 'primary',
+  buttonSize: 'default',
 });
 
 const slots = useSlots();
