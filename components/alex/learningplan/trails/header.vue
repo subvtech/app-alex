@@ -43,6 +43,7 @@
           <alex-custom-tabs
             v-model="activePage"
             :tabs="tabs"
+            :mandatory="false"
             class="customTabs"
           />
         </div>
@@ -75,7 +76,7 @@ const props = defineProps({
   },
   page: {
     type: String as PropType<string>,
-    default: '0',
+    required: true,
   },
   courseId: {
     type: Number as PropType<number>,
@@ -87,23 +88,17 @@ const props = defineProps({
   },
 });
 const { t } = useI18n();
-const tab = {
-  firstTitle: t('components.trails.header.firstTab'),
-  secondTitle: t('components.trails.header.secondTab'),
-};
 
 const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 
 const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
 
-const tabs = computed(() => {
-  const defaultTabs = [
-    { label: tab.firstTitle, value: '0' },
-    { label: tab.secondTitle, value: '1' },
+const tabs = computed<TabType[]>(() => {
+  return [
+    { label: t('components.trails.header.firstTab'), value: '0' },
+    { label: t('components.trails.header.secondTab'), value: '1' },
   ];
-
-  return defaultTabs;
 });
 
 const activePage = ref(props.page);
@@ -116,11 +111,11 @@ watch(activePage, () => {
     case '0':
       router.replace(`${defaultURL.value}`);
       break;
-    case '2':
-      router.replace(`${defaultURL.value}/settings`);
-      break;
     case '1':
       router.replace(`${defaultURL.value}/tasks`);
+      break;
+    case '2':
+      router.replace(`${defaultURL.value}/settings`);
       break;
   }
 });

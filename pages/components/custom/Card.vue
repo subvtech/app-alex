@@ -11,14 +11,14 @@
       <strong>alex-custom-tooltip</strong>.
     </p>
 
-    <h2 class="text-h2 text-gray-800">Uso Básico</h2>
+    <h2 class="text-h2 text-gray-800">Uso Básio</h2>
     <p class="text-subtitle-2 text-gray-500">
       Todas as propriedades são opcionais com exceção do title. Aqui
       ilustraremos apenas os comportamentos mais comuns.
     </p>
 
     <h2 class="text-h3 text-gray-800">Adicionando propriedades básicas</h2>
-    <div v-for="(item, index) in documentation">
+    <div v-for="(item, index) in documentation" :key="index">
       <p class="text-subtitle-2 text-gray-500" v-html="item.text" />
 
       <div class="d-flex flex-column w-100">
@@ -61,18 +61,14 @@
           class="mb-6"
           title="Uso Completo"
           :is-editing="canEdit3"
-          :show-icon="canEdit3"
+          :no-icon="canEdit3"
           full-width
           @click:cancel="() => console.log('cancel')"
           @click:save="() => console.log('save')"
           @toggle:is-editing="canEdit3 = !canEdit3"
         >
-          <template #content class="pa-6">
-            This is inside the content tag
-          </template>
-          <template #footer class="pa-6">
-            This is inside the footer tag
-          </template>
+          <template #content> This is inside the content tag </template>
+          <template #footer> This is inside the footer tag </template>
         </alex-custom-card>
         <div class="px-3" style="position: relative">
           <prism>{{ examples[5] }}</prism>
@@ -97,6 +93,7 @@
     <div class="d-flex flex-column" style="gap: 8px">
       <div
         v-for="(item, index) in propsDocumentation"
+        :key="index"
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
@@ -135,6 +132,7 @@
     <div class="d-flex flex-column" style="gap: 8px">
       <div
         v-for="(item, index) in eventsDocumentation"
+        :key="index"
         class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
@@ -170,7 +168,7 @@ definePageMeta({
 });
 
 const copyText = useCopyText();
-const copyToClipboard = async (index) => {
+const copyToClipboard = (index) => {
   try {
     copyText.copyToClipboard(examples[index]);
     copiedValue.value = examples[index];
@@ -200,7 +198,7 @@ const documentation = [
     },
   },
   {
-    text: "Por padrão ele exibe o ícone de editar, para esconder é necessário passar <strong>:show-icon='false'</strong> para esconder o ícone.",
+    text: "Por padrão ele exibe o ícone de editar, para esconder é necessário passar <strong>: no-icon='false'</strong> para esconder o ícone.",
     props: {
       title: 'Title',
       fullWidth: true,
@@ -247,7 +245,7 @@ const documentation = [
 const examples = [
   `<alex-custom-card title="Title" />`,
   `<alex-custom-card title="Title" full-width />`,
-  `<alex-custom-card title="Title" full-width :show-icon="false" />`,
+  `<alex-custom-card title="Title" full-width />`,
   `<alex-custom-card 
           title="Title"
           full-width

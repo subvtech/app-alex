@@ -2,7 +2,7 @@
   <alex-custom-card
     :title="$t('components.profile.institutional.title')"
     :is-editing="canEditAndIsEditing"
-    :show-icon="canEdit"
+    no-icon="canEdit"
     align-content="align-center"
     full-width
     no-footer

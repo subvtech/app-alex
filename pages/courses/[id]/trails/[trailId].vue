@@ -46,13 +46,15 @@ const getTrailData = async () => {
 };
 
 const activePage = computed(() => {
-  if (route.name?.toString().includes('tasks')) {
-    return '1';
-  } else if (route.name?.toString().includes('settings')) {
-    return '2';
-  }
-  return '0';
+  const routeName = route.name?.toString() || '';
+  const routes = ['---', 'tasks', 'settings'];
+  const index = routes.findIndex((a) => routeName.includes(a));
+
+  console.log({ activePage: index, routeName });
+
+  return (index < 0 ? 0 : index).toString();
 });
+
 onBeforeMount(async () => {
   headerStore.isLoading = true;
   await getTrailData();
@@ -70,6 +72,8 @@ watch(pageRoute, async () => {
     await getTrailData();
   }
 });
+
+watch(activePage, () => console.log({ trailId: activePage.value }));
 </script>
 <style lang="scss">
 @media screen and (max-width: 579px) {
