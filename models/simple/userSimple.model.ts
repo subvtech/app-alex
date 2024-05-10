@@ -1,4 +1,6 @@
-import { UserRoles } from '../user.model';
+import { UserRoles } from '@/models/user.model';
+import { InstitutionsType } from '@/models/institution.model';
+import { Upload } from '@/models/upload.model';
 
 export interface UserSimple {
   id: number;
@@ -16,8 +18,8 @@ export interface UserSimple {
   tags: any[];
   socials: any[];
   avatar: Upload | null;
-  cover: Upload;
+  cover: Upload | null;
   role: UserRoles;
   phone: string | null;
-  info: null;
+  info?: null;
 }

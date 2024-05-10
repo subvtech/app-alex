@@ -25,7 +25,7 @@
             <img
               :src="trailsCover || '/images/cover_image_course.svg'"
               :alt="$t('components.trails.header.imgAlt')"
-              class="trailImg justify-end align-start object-cover"
+              class="trailImg justify-end align-start"
             />
           </div>
           <div class="h-text">
@@ -133,11 +133,9 @@ watch(activePage, () => {
   width: 200px !important;
   height: 150px !important;
   border-radius: 12px;
+  object-fit: cover;
 }
 
-.header-img {
-  max-width: 25%;
-}
 .header-text {
   display: flex;
   gap: 8px;

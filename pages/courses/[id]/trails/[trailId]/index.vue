@@ -151,6 +151,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+definePageMeta({
+  hideLearningPlanBanner: true,
+});
 const { create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
@@ -167,14 +170,12 @@ const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
 const isLoading = ref(false);
-
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
   return (
     !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
   );
 });
-
 const { t } = useI18n();
 const editorData = computed(() => {
   const data =
@@ -193,7 +194,6 @@ const editorData = computed(() => {
       }) || [],
   };
 });
-
 onMounted(async () => {
   isLoading.value = true;
   while (trailStore.loading) {

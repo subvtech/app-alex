@@ -2,7 +2,6 @@
   "title": "Configurações",
   "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
   "update": "Trilha atualizada com sucesso",
-
   "cover": {
     "add": "Adicione Vídeos ou Fotos",
     "title": "Capa da trilha",
@@ -37,15 +36,16 @@
   },
 
   "delete": {
-    "deleteTrailTitle": "Excluir trilha",
-    "deleteImgAlt": "Imagem de atenção",
-    "deleteTrailDescription": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
-    "deleteButton": "Excluir trilha",
-    "deleteConfirmation": "Realmente deseja excluir a trilha?",
-    "deleteDescription": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",
-    "deleteLabel": "Digite a palavra:",
-    "deletePlaceholder": "Digite a frase",
-    "deleteWord": "Excluir",
+    "title": "Excluir trilha",
+    "imgAlt": "Imagem de atenção",
+    "warning": "Após a exclusão da trilha, fotos, vídeos, e outros arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo desta trilha. sendo assim tenha certeza antes de continuar.",
+    "button": "Excluir trilha",
+    "confirmation": "Realmente deseja excluir a trilha?",
+    "description": "Ao excluir uma trilha todo o conteúdo criado dentro dela também será excluído.",
+    "label": "Digite a palavra:",
+    "placeholder": "Digite a frase",
+    "word": "Excluir",
+    "cancel": "Cancelar",
     "update": "Trilha excluída com sucesso",
     "matchError": "A palavra digitada não corresponde a palavra correta para excluir a trilha. Tente novamente."
   }

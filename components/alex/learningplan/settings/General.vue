@@ -129,7 +129,7 @@ const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
   keepValuesOnUnmount: true,
 });
 
-const slugFormated = computed(() =>
+const slugFormatted = computed(() =>
   controlledValues.value.slug.trim().toLowerCase().replaceAll(' ', '_'),
 );
 
@@ -159,7 +159,7 @@ const onSave = handleSubmit(async (e) => {
           title: controlledValues.value.title,
           start_date: new Date(controlledValues.value.startDate).toISOString(),
           end_date: new Date(controlledValues.value.endDate).toISOString(),
-          slug: controlledValues.value.slug,
+          slug: slugFormatted.value.toLocaleLowerCase(),
         }
       : {
           title: controlledValues.value.title,

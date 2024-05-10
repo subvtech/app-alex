@@ -27,7 +27,12 @@
       :class="theme"
       :disabled="disabled"
       v-bind="$attrs"
-    ></v-text-field>
+    >
+      <!-- Bind all slots  -->
+      <template v-for="(_, slot) in $slots" #[slot]="scope">
+        <slot :name="slot" v-bind="scope" />
+      </template>
+    </v-text-field>
   </div>
 </template>
 

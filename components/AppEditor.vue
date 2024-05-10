@@ -3,6 +3,7 @@
     <div
       id="editorjs"
       class="editorjs w-100 pa-0 show-drop-area"
+      :class="viewerId"
       :is-editing="isEditing"
       v-bind="$attrs"
       :data-active="fileDrop && isEditing"
@@ -11,6 +12,11 @@
       @dragleave.prevent="handleDragLeave"
       @drop.prevent="handleDrop"
     ></div>
+    <alex-custom-viewer
+      ref="viewer"
+      v-model="viewerInstance"
+      :container="viewerId"
+    />
   </client-only>
 </template>
 
@@ -32,7 +38,6 @@ import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
-import AIText from '@alkhipce/editorjs-aitext';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
@@ -41,11 +46,20 @@ import CustomImage from '../editor-js/plugins/image/ImageBlock';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
+import AIText from '~/editor-js/plugins/AiText';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
+const app = useNuxtApp();
+const viewerInstance = ref(null);
+const viewer = ref<null | {
+  createInstance: () => void;
+  destroyInstance: () => void;
+  reCreateInstance: () => void;
+}>(null);
+const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
 const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 const fileDrop = ref(false);
@@ -150,7 +164,7 @@ onMounted(() => {
       aiText: {
         class: AIText,
         config: {
-          openaiKey: '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',
+          openAiKey: app.$config.public.openAiKey,
         },
       },
       inlineCode: {
@@ -353,7 +367,12 @@ onMounted(() => {
     onChange: () => emit('change'),
   });
 });
-
+watch(isEditing, () => {
+  if (!viewer.value) return;
+  if (!viewerInstance.value) return;
+  viewer.value.destroyInstance();
+  viewer.value.createInstance();
+});
 const getData = async () => {
   try {
     const data = await instance.value.save();
