@@ -1,7 +1,7 @@
 <template>
   <client-only>
     <div
-      id="editorjs"
+      :id="keyId"
       class="editorjs w-100 pa-0 show-drop-area"
       :class="viewerId"
       :is-editing="isEditing"
@@ -52,6 +52,15 @@ const strapiClient = useStrapiClient();
 const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
+
+interface editorData {
+  time: number;
+  blocks: Array<{
+    type: string;
+    data: any;
+  }>;
+  version: string;
+}
 const app = useNuxtApp();
 const viewerInstance = ref(null);
 const viewer = ref<null | {
@@ -123,7 +132,7 @@ const handleDrop = (event: DragEvent) => {
 
 onMounted(() => {
   instance.value = new EditorJS({
-    autofocus: true,
+    autofocus: false,
     tools: {
       delimiter: Delimiter,
       embed: Embed,
@@ -352,21 +361,41 @@ onMounted(() => {
     },
     i18n,
     minHeight: 400,
-    data: { blocks: [] },
-    holder: 'editorjs',
+    data: props.data,
+    holder: props.keyId,
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
     onReady: async () => {
       const data = await instance.value.save();
-      if (data.blocks.length > 0) {
+      if (data.blocks.length > 0 && !props.keyId.includes('contribution')) {
         /* eslint-disable-next-line */
         new Undo({ editor: instance.value });
+      }
+      if (props.readOnly) {
+        instance.value.readOnly.toggle();
+        isEditing.value = false;
       }
       emit('ready');
     },
     onChange: () => emit('change'),
   });
 });
+
+const props = defineProps({
+  data: {
+    type: Object as PropType<editorData>,
+    default: () => ({ blocks: [] }),
+  },
+  keyId: {
+    type: String,
+    default: 'editor',
+  },
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 watch(isEditing, () => {
   if (!viewer.value) return;
   if (!viewerInstance.value) return;
@@ -396,7 +425,7 @@ const toggleReadOnly = (mode: string) => {
   instance.value.isReady.then(async () => {
     await instance.value.readOnly.toggle();
     isEditing.value = !instance.value.readOnly.isEnabled;
-    if (!instance.value.readOnly.isEnabled) {
+    if (!instance.value.readOnly.isEnabled && props.keyId === 'editorjs') {
       const index = instance.value.blocks.getBlocksCount();
       await instance.value.blocks.insert(
         'paragraph',
@@ -418,13 +447,6 @@ const toggleReadOnly = (mode: string) => {
   });
 };
 
-const navigateToId = (id) => {
-  const element = document.getElementById(id);
-  if (element) {
-    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-};
-
 const clearEditor = () => {
   instance.value.isReady.then(() => {
     instance.value.clear();
@@ -438,7 +460,6 @@ defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
-  navigateToId,
   clearEditor,
   isReady,
 });

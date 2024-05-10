@@ -20,12 +20,7 @@
           :empty-text-message="$t('components.courses.editor.emptyPlaceholder')"
         />
       </div>
-      <app-editor
-        v-else
-        ref="editorDetails"
-        class="w-full p-6 sm:p-16"
-        :data="data"
-      />
+      <app-editor v-else ref="editorDetails" class="w-full p-6 sm:p-16" />
     </template>
   </alex-custom-card>
 </template>
