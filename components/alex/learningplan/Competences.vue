@@ -3,7 +3,7 @@
     full-width
     :title="title"
     :is-editing="isEditing && canEdit"
-    :show-icon="canEdit"
+    :no-icon="canEdit"
     align-content="align-start"
     show-tooltip
     no-footer

@@ -1,8 +1,7 @@
 <template>
-  <div class="container-min-height bg-white">
+  <div v-if="trailStore.trail" class="container-min-height bg-white">
     <alex-custom-card
       :title="$t('components.trails.settings.title')"
-      :show-icon="false"
       :align-content="'align-center'"
     >
       <template #content>
@@ -11,17 +10,23 @@
             namespace="trails"
             full-width
           />
-          <alex-learningplan-trails-settings-general
-            :name="trailTitle"
-            :description="trailDescription"
-            @update="handleUpdateGeneral"
+          <alex-learningplan-settings-general
+            :title="trailStore.trail.title"
+            :description="trailStore.trail.description"
+            variant="trails"
+            @update="updateGeneral"
           />
-          <alex-learningplan-trails-settings-visibility
-            :active-button="visibilityButton"
-            @update="handleUpdateVisibility"
+          <alex-learningplan-settings-visibility
+            :is-hidden="trailStore.trail.hidden"
+            outline
+            variant="trails"
+            @update="updateVisibility"
           />
 
-          <alex-learningplan-settings-delete @update="removeTrail" />
+          <alex-learningplan-settings-delete
+            namespace="trails"
+            @update="removeTrail"
+          />
         </div>
       </template>
     </alex-custom-card>
@@ -41,43 +46,27 @@ const { t } = useI18n();
 const route = useRoute();
 const { trailId, id } = route.params;
 const trailStore = useTrailStore();
-const trailTitle = ref('');
-const trailDescription = ref('');
-const visibilityButton = ref('');
-const headerStore = usePageHeaderStore();
+
+useHeaderTrails('settings', 'components.trails.settings.title');
 
 const getTrailData = async () => {
   await trailStore.loadTrailData(parseInt(trailId.toString()));
 };
 
-const handleUpdateGeneral = (name, description) => {
-  trailTitle.value = name;
-  trailDescription.value = description;
-  updateGeneral();
-};
-
-const updateGeneral = async () => {
+const updateGeneral = async (data) => {
   await update(`trails/${trailId}`, {
-    title: trailTitle.value,
-    description: trailDescription.value,
+    ...data,
   });
   setMessage(t('components.trails.settings.general.update'), 'green', true);
   getTrailData();
 };
 
-const handleUpdateVisibility = (activeButton) => {
-  visibilityButton.value = activeButton;
-  updateVisibility();
-};
-
-const updateVisibility = async () => {
+const updateVisibility = async (data) => {
   await update('trails', parseInt(trailId.toString()), {
-    hidden: visibilityButton.value,
+    ...data,
   });
-  setMessage(t('components.trails.settings.visibilityUpdate'), 'green', true);
+  setMessage(t('components.trails.settings.update'), 'green', true);
 };
-
-const learningPlanStore = useLearningPlanStore();
 
 const removeTrail = async () => {
   await _delete('trails', parseInt(trailId.toString()));
@@ -85,41 +74,6 @@ const removeTrail = async () => {
   router.push(`/courses/me`);
   setMessage(t('components.trails.settings.delete.update'), 'green', true);
 };
-
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
-
-watch(
-  () => [learningPlanStore.loading, trailStore.loading],
-  () => {
-    if (!learningPlanStore.loading && !trailStore.loading) {
-      headerStore.title = t('components.trails.header.breadcrumbs.title');
-      headerStore.items = [
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${id}`,
-        },
-        {
-          title: t('pages.courses.trails'),
-          disabled: false,
-          to: `/courses/${id}/trails`,
-        },
-        {
-          title: trailStore.trail?.title || '',
-          disabled: false,
-          to: `/courses/${id}/trails/${trailId}`,
-        },
-        {
-          title: t('components.trails.settings.title'),
-          disabled: true,
-          to: `/courses/${id}/trails/${trailId}/settings`,
-        },
-      ];
-    }
-  },
-);
 </script>
 <style scoped lang="scss">
 .w-201 {

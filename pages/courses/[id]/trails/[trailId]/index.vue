@@ -233,11 +233,15 @@ definePageMeta({
 const { update, create } = useStrapi();
 const route = useRoute();
 const { setMessage } = useMessageStore();
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const trailId = computed(() => parseInt(route.params?.trailId.toString()));
-const headerStore = usePageHeaderStore();
-const learningPlanStore = useLearningPlanStore();
 const trailStore = useTrailStore();
+const trailId = computed(() => parseInt(route.params?.trailId.toString()));
+useHeaderTrails('');
+const learningPlanStore = useLearningPlanStore();
+
+definePageMeta({
+  hideLearningPlanBanner: true,
+});
+
 const saveLoading = ref(false);
 const readOnly = ref(true);
 const editor = ref();
@@ -319,34 +323,7 @@ onMounted(async () => {
   }
   isLoading.value = false;
 });
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
-watch(
-  () => [learningPlanStore.loading, trailStore.loading],
-  () => {
-    if (!learningPlanStore.loading && !trailStore.loading) {
-      headerStore.title = t('components.trails.header.breadcrumbs.title');
-      headerStore.items = [
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/courses/${learningPlanId.value}`,
-        },
-        {
-          title: t('pages.courses.trails'),
-          disabled: false,
-          to: `/courses/${learningPlanId.value}/trails`,
-        },
-        {
-          title: trailStore.trail?.title || '',
-          disabled: true,
-          to: `/courses/${learningPlanId.value}/trails/${trailId}`,
-        },
-      ];
-    }
-  },
-);
+
 const sections = ref([
   {
     title: t('pages.trailId.overview.sectionTitle'),

@@ -4,7 +4,7 @@
     :is-editing="isEditing && canEdit"
     align-content="align-start"
     full-width
-    :show-icon="canEdit"
+    no-icon="canEdit"
     show-tooltip
     no-footer
     :tooltip="

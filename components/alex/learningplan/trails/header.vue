@@ -51,6 +51,7 @@
 <script setup lang="ts">
 import { TabType } from '@/components/alex/custom/Tabs.vue';
 const router = useRouter();
+
 const props = defineProps({
   trailsTitle: {
     type: String,
@@ -66,7 +67,7 @@ const props = defineProps({
   },
   page: {
     type: String as PropType<string>,
-    default: '0',
+    required: true,
   },
   courseId: {
     type: Number as PropType<number>,
@@ -78,23 +79,32 @@ const props = defineProps({
   },
 });
 const { t } = useI18n();
+
+const trailStore = useTrailStore();
+const learningPlanStore = useLearningPlanStore();
+
 const tab = {
   firstTitle: t('components.trails.header.firstTab'),
   secondTitle: t('components.trails.header.secondTab'),
 };
 
-const trailStore = useTrailStore();
-const learningPlanStore = useLearningPlanStore();
-
 const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
 
 const tabs = computed(() => {
-  const defaultTabs = [
+  const defaultTabs: TabType[] = [
     { label: tab.firstTitle, value: '0' },
     { label: tab.secondTitle, value: '1' },
     { label: 'Contribuições', value: '2' },
-    { label: '', icon: 'mdi-cog-outline', value: '3', classes: 'ml-auto' },
   ];
+
+  if (learningPlanStore.userIsFacilitator) {
+    defaultTabs.push({
+      label: '',
+      icon: 'mdi-cog-outline',
+      value: '3',
+      classes: 'ml-auto',
+    });
+  }
 
   return defaultTabs;
 });
@@ -109,17 +119,19 @@ watch(activePage, () => {
     case '0':
       router.replace(`${defaultURL.value}`);
       break;
-    case '3':
-      router.replace(`${defaultURL.value}/settings`);
-      break;
     case '1':
       router.replace(`${defaultURL.value}/tasks`);
       break;
     case '2':
       router.replace(`${defaultURL.value}/contributions`);
       break;
+    case '3':
+      router.replace(`${defaultURL.value}/settings`);
+      break;
   }
 });
+
+computed(() => {});
 </script>
 <style scoped lang="scss">
 .header-row {

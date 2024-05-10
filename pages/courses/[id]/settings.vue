@@ -8,7 +8,6 @@
     :can-edit="learningPlanStore.userIsFacilitator"
     :schedules="schedules"
   />
-  <div v-else />
 </template>
 
 <script setup lang="ts">
