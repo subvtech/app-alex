@@ -1,0 +1,29 @@
+{
+  "inputPlaceholder": "Find Student",
+  "contribute": "Contribute",
+  "emptyText": "It seems we have no contributions!",
+  "blocked": "Blocked contribution",
+  "myContributions": "My Contributions",
+  "otherContributions": "Other Contributions",
+  "saveError": "An error occurred while saving the contribution.",
+  "emptyContribution": "You must write something to contribute.",
+  "emptyStudentsFilter": "No students found with this name...",
+  "highlightedContributions": "Highlighted Contributions",
+  "card": {
+    "delete": "Delete Contribution",
+    "edit": "Edit Contribution",
+    "highlight": "Highlight Contribution",
+    "removeHighlight": "Remove Highlight",
+    "block": "Block Contribution",
+    "unblock": "Unblock Contribution"
+  },
+  "userCard": {
+    "contributions": "Contributions",
+    "highlighted": "Highlights",
+    "accomplished": "Accomplishers"
+  },
+  "error": {
+    "updateHighlight": "Error updating highlight",
+    "updateBlock": "Error updating block status"
+  }
+}

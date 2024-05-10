@@ -5,7 +5,7 @@
     full-width
     :title="title"
     :is-editing="isEditing && canEdit"
-    :show-icon="canEdit"
+    no-icon="canEdit"
     @click:cancel="resetData"
     @click:save="updateDetails"
     @toggle:is-editing="toggleIsEditing"
@@ -20,12 +20,7 @@
           :empty-text-message="$t('components.courses.editor.emptyPlaceholder')"
         />
       </div>
-      <app-editor
-        v-else
-        ref="editorDetails"
-        class="w-full p-6 sm:p-16"
-        :data="data"
-      />
+      <app-editor v-else ref="editorDetails" class="w-full p-6 sm:p-16" />
     </template>
   </alex-custom-card>
 </template>

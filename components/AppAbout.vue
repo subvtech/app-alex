@@ -2,7 +2,7 @@
   <alex-custom-card
     :title="title"
     :is-editing="isEditingAndCanEdit"
-    :show-icon="canEdit"
+    no-icon="canEdit"
     :align-content="displayEmptyPlaceholder ? 'align-center' : 'align-start'"
     :disable-save="disableSave"
     no-footer

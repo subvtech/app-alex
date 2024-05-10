@@ -73,7 +73,7 @@
       </div>
     </div>
     <div
-      class="d-flex flex-column gap-3"
+      class="d-flex flex-column gap-3 overflow-auto"
       :class="{
         'py-2': !isVertical,
         'pa-4 pb-6': isVertical,

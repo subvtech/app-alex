@@ -16,14 +16,8 @@
       >
         <img
           :src="image"
-          class="rounded-lg w-100 h-100"
-          style="
-            position: absolute;
-            top: 0;
-            left: 0;
-
-            object-fit: cover;
-          "
+          class="rounded-lg w-100 h-100 position-absolute top-0 left-0"
+          style="object-fit: cover"
         />
         <alex-custom-button
           aria-label="edit"
@@ -61,21 +55,27 @@
         </alex-custom-button>
       </div>
     </div>
-    <v-form @submit.prevent="createTrail">
+    <div class="d-flex flex-column gap-6 mt-6">
       <alex-inputs-text-field
+        v-model="titleValue"
         class="mt-2 mb-1"
         :label="$t('pages.trails.newTrailTitleLabel')"
         :placeholder="$t('pages.trails.newTrailTitlePlaceholder')"
         required
+        :error-messages="titleErrorMsg"
         density="comfortable"
         name="title"
       />
+
       <alex-inputs-text-area
+        v-model="descriptionValue"
         :label="$t('pages.trails.newTrailDescriptionLabel')"
         :placeholder="$t('pages.trails.newTrailDescriptionPlaceholder')"
+        name="description"
         required
         density="comfortable"
-        name="description"
+        :schema="createTrailsRules.description"
+        :error-messages="descriptionErrorMsg"
       />
       <v-file-input
         ref="fileInputRef"
@@ -88,10 +88,11 @@
         <template #mainSlotButton>
           <alex-custom-button
             :loading="isLoading"
+            prepend-icon="mdi-plus"
             :text="$t('pages.trails.newTrailAction')"
             size="large"
-            type="submit"
-            prepend-icon="mdi-plus"
+            :disabled="disabledButton"
+            @click="createTrail"
           />
         </template>
         <template #secondarySlotButton>
@@ -104,13 +105,18 @@
           />
         </template>
       </alex-custom-dialog-footer>
-    </v-form>
+    </div>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useForm } from 'vee-validate';
+import { useField } from 'vee-validate';
+
+export interface CreateTrailDialogComponentType {
+  learningStructure: number;
+}
+
 const { createTrailsRules } = useFormRules();
 const { create } = useStrapi();
 const strapiClient = useStrapiClient();
@@ -126,12 +132,18 @@ const { t } = useI18n();
 
 const emit = defineEmits(['courseCreated', 'update:modelValue']);
 
-const props = defineProps({
-  learningStructure: {
-    type: Number,
-    required: true,
-  },
-});
+const props = withDefaults(defineProps<CreateTrailDialogComponentType>(), {});
+const {
+  value: descriptionValue,
+  errorMessage: descriptionErrorMsg,
+  resetField: resetDescriptionField,
+} = useField('description', createTrailsRules.description);
+
+const {
+  value: titleValue,
+  errorMessage: titleErrorMsg,
+  resetField: resetTitleField,
+} = useField('title', createTrailsRules.title);
 
 const clearImage = () => {
   image.value = null;
@@ -156,21 +168,21 @@ const handleFileChange = () => {
   }
 };
 
-const { handleSubmit } = useForm({
-  validationSchema: createTrailsRules,
-  initialValues: {
-    title: '',
-    description: '',
-    image: null,
-  },
-});
-const createTrail = handleSubmit(async (values) => {
+const disabledButton = computed(
+  () =>
+    !!descriptionErrorMsg.value ||
+    !!titleErrorMsg.value ||
+    !titleValue.value ||
+    !descriptionValue.value,
+);
+
+const createTrail = async () => {
   isLoading.value = true;
-  const { title, description } = values;
-  const uploadImage = fileInputRef.value.files[0];
+  const uploadImage = fileInputRef.value?.files[0];
   const formData = new FormData();
   formData.append('files', uploadImage);
   let imageData = null;
+
   try {
     if (uploadImage) {
       imageData = await strapiClient('/upload', {
@@ -179,12 +191,16 @@ const createTrail = handleSubmit(async (values) => {
       });
     }
     const data = {
-      title,
-      description,
+      title: titleValue.value,
+      description: descriptionValue.value,
       cover_image: imageData,
       learning_structure: props.learningStructure,
     };
+
     const trailData = await create('trails', data);
+    resetTitleField();
+    resetDescriptionField();
+
     setMessage(t('pages.trails.success'), 'success', true);
     emit('courseCreated', trailData.data.id);
   } catch (error) {
@@ -194,6 +210,15 @@ const createTrail = handleSubmit(async (values) => {
     image.value = null;
     isLoading.value = false;
   }
+};
+
+const disableSave = computed(() => {
+  return (
+    !!descriptionErrorMsg.value ||
+    !!titleErrorMsg.value ||
+    !titleValue.value ||
+    !descriptionValue.value
+  );
 });
 </script>
 

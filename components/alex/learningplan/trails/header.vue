@@ -25,7 +25,7 @@
             <img
               :src="trailsCover || '/images/cover_image_course.svg'"
               :alt="$t('components.trails.header.imgAlt')"
-              class="trailImg justify-end align-start object-cover"
+              class="trailImg justify-end align-start"
             />
           </div>
           <div class="h-text">
@@ -38,21 +38,12 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-row justify-space-between align-center pr-2">
-        <div class="d-flex">
-          <alex-custom-tabs
-            v-model="activePage"
-            :tabs="tabs"
-            class="customTabs"
-          />
+      <div
+        class="d-flex flex-row justify-space-between align-center pr-2 customTabs"
+      >
+        <div class="d-flex w-100">
+          <alex-custom-tabs v-model="activePage" :tabs="tabs" show-arrows />
         </div>
-        <alex-custom-button
-          v-if="learningPlanStore.userIsFacilitator"
-          class="px-6"
-          variant="text"
-          icon="mdi-cog-outline"
-          @click="activePage = '2'"
-        />
       </div>
     </div>
   </div>
@@ -60,6 +51,7 @@
 <script setup lang="ts">
 import { TabType } from '@/components/alex/custom/Tabs.vue';
 const router = useRouter();
+
 const props = defineProps({
   trailsTitle: {
     type: String,
@@ -75,7 +67,7 @@ const props = defineProps({
   },
   page: {
     type: String as PropType<string>,
-    default: '0',
+    required: true,
   },
   courseId: {
     type: Number as PropType<number>,
@@ -87,26 +79,44 @@ const props = defineProps({
   },
 });
 const { t } = useI18n();
+
+const trailStore = useTrailStore();
+const learningPlanStore = useLearningPlanStore();
+
 const tab = {
   firstTitle: t('components.trails.header.firstTab'),
   secondTitle: t('components.trails.header.secondTab'),
 };
 
-const trailStore = useTrailStore();
-const learningPlanStore = useLearningPlanStore();
-
 const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
 
 const tabs = computed(() => {
-  const defaultTabs = [
+  const defaultTabs: TabType[] = [
     { label: tab.firstTitle, value: '0' },
     { label: tab.secondTitle, value: '1' },
+    { label: 'Contribuições', value: '2' },
   ];
+
+  if (learningPlanStore.userIsFacilitator) {
+    defaultTabs.push({
+      label: '',
+      icon: 'mdi-cog-outline',
+      value: '3',
+      classes: 'ml-auto',
+    });
+  }
 
   return defaultTabs;
 });
 
 const activePage = ref(props.page);
+
+watch(
+  () => props.page,
+  (newPage) => {
+    activePage.value = newPage;
+  },
+);
 const defaultURL = computed(() => {
   return `/courses/${props.courseId}/trails/${props.trailId}`;
 });
@@ -116,14 +126,19 @@ watch(activePage, () => {
     case '0':
       router.replace(`${defaultURL.value}`);
       break;
-    case '2':
-      router.replace(`${defaultURL.value}/settings`);
-      break;
     case '1':
       router.replace(`${defaultURL.value}/tasks`);
       break;
+    case '2':
+      router.replace(`${defaultURL.value}/contributions`);
+      break;
+    case '3':
+      router.replace(`${defaultURL.value}/settings`);
+      break;
   }
 });
+
+computed(() => {});
 </script>
 <style scoped lang="scss">
 .header-row {
@@ -138,11 +153,9 @@ watch(activePage, () => {
   width: 200px !important;
   height: 150px !important;
   border-radius: 12px;
+  object-fit: cover;
 }
 
-.header-img {
-  max-width: 25%;
-}
 .header-text {
   display: flex;
   gap: 8px;

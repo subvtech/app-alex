@@ -10,6 +10,7 @@ ARG strapi_url
 ARG components_page
 ARG matomo_app_id
 ARG matomo_url
+ARG open_ai_key
 
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
@@ -26,6 +27,7 @@ ENV STRAPI_URL=$strapi_url
 ENV COMPONENTS_PAGE=$components_page
 ENV MATOMO_APP_ID=$matomo_app_id
 ENV MATOMO_URL=$matomo_url
+ENV OPEN_AI_KEY=$open_ai_key
 
 RUN yarn build
 
