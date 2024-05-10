@@ -141,10 +141,7 @@
                     class="rounded-lg lazy preview-content"
                     width="95%"
                     height="95%"
-                    :src="`https://www.youtube.com/embed/${urlInput.replace(
-                      /.*v=/,
-                      '',
-                    )}`"
+                    :src="reWriteEncurtedUrl(urlInput)"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   ></iframe>
@@ -209,7 +206,15 @@ const emit = defineEmits({
     return { slides, deletedSlides, addedSlides };
   },
 });
-
+const reWriteEncurtedUrl = (url) => {
+  const isEncurtedLink = url.match(/\b(\.be)\b/);
+  if (isEncurtedLink) {
+    return `https://www.youtube.com/embed/${
+      url.split('.be/')[1].split('?')[0]
+    }`;
+  }
+  return `https://www.youtube.com/embed/${url.replace(/.*v=/, '')}`;
+};
 const upload = () => {
   if (slides.value.length === 0) return (dialog.value = false);
   dialog.value = false;

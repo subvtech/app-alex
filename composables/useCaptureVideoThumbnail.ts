@@ -30,6 +30,12 @@ export function useCaptureVideoThumbnail(file: File) {
 }
 
 export function useGetYoutubeThumbnail(url: string) {
+  const isEncurtedLink = url.match(/\b(\.be)\b/);
+  if (isEncurtedLink) {
+    return `https://img.youtube.com/vi/${
+      url.split('.be/')[1].split('?')[0]
+    }/0.jpg`;
+  }
   return `https://img.youtube.com/vi/${url.split('v=')[1]}/0.jpg`;
 }
 

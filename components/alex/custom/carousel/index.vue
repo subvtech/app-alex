@@ -47,20 +47,8 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
-          <div v-if="!readOnly" class="ma-2 config-icon">
-            <alex-custom-button
-              color="gray-500"
-              icon="mdi-cog"
-              style="
-                background-color: rgba(255, 255, 255, 0.25) !important;
-                z-index: 0 !important;
-              "
-              @click="openAddSlidesDialog(-1, slides)"
-            />
-          </div>
           <video-player
             v-if="slide.type.includes('File') && slide.video"
             class="w-100 fill-height video-js"
@@ -78,6 +66,18 @@
             :is-active="activeSlide == i"
             :data-setup="JSON.stringify({ techOrder: [slide.type] })"
           ></video-player>
+          <nuxt-img v-else :src="slide.image" :alt="slide.title" />
+          <div v-if="!readOnly" class="ma-2 config-icon">
+            <alex-custom-button
+              color="gray-500"
+              icon="mdi-cog"
+              style="
+                background-color: rgba(255, 255, 255, 0.25) !important;
+                z-index: 0 !important;
+              "
+              @click="openAddSlidesDialog(-1, slides)"
+            />
+          </div>
         </template>
       </vueper-slide>
     </vueper-slides>
@@ -191,6 +191,11 @@
     @upload-files="addSlide"
     @change-slides="editSlides"
   />
+  <alex-custom-viewer
+    ref="viewer"
+    v-model="viewerInstance"
+    container="vueperslides"
+  />
 </template>
 
 <script setup>
@@ -229,6 +234,8 @@ const slides = computed({
     emit('update:modelValue', value);
   },
 });
+const viewerInstance = ref(null);
+const viewer = ref(null);
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {
@@ -250,7 +257,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = `https://${slide.video}`;
+    url = slide.video;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -370,10 +377,11 @@ const addSlideByUrl = (slide, index) => {
   let newSlide = {};
   if (
     slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://youtu.be') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
     let image, type;
-    if (slide.url.includes('www.youtube')) {
+    if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = useGetYoutubeThumbnail(slide.url);
     } else {
@@ -484,9 +492,20 @@ const clearSlides = () => {
   slides.value = [];
   emit('update:modelValue', slides.value);
 };
+watch(
+  () => props.readOnly,
+  () => {
+    if (viewer.value) {
+      viewer.value.destroyInstance();
+      viewer.value.createInstance();
+    }
+  },
+);
 defineExpose({
   clearSlides,
 });
+
+const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
 <style>
@@ -576,5 +595,11 @@ defineExpose({
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>
