@@ -293,7 +293,7 @@ const onSlideClick = (slide) => {
 };
 
 const onCarouselSlide = (event) => {
-  if (slides.value[activeSlide.value].video) {
+  if (slides.value[activeSlide.value]?.video) {
     if (slides.value[activeSlide.value].type.includes('File')) {
       videoJS.value.forEach((video) => {
         video.pause();
@@ -571,7 +571,7 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   position: absolute;
   z-index: 99;
   right: 25px;
-  top: 25px;
+  top: 0;
 }
 
 .addSlide {

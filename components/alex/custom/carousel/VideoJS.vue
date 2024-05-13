@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onUnmounted, watch, defineProps } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import 'videojs-vimeo-tech';
@@ -34,20 +34,35 @@ const props = defineProps({
   },
 });
 const videoPlayer = ref(null);
-onMounted(() => {
-  const options = JSON.parse(props.options);
-  videoPlayer.value = videojs(videoPlayer.value, options);
+let player;
+
+watch(
+  videoPlayer,
+  (video) => {
+    if (video) {
+      const options = JSON.parse(props.options);
+      player = videojs(video, options);
+    }
+  },
+  { immediate: true },
+);
+
+onUnmounted(() => {
+  if (player) {
+    player.dispose();
+  }
 });
 
 const pause = () => {
-  videoPlayer.value.pause();
+  if (player) {
+    player.pause();
+  }
 };
 
 defineExpose({
   pause,
 });
 </script>
-
 <style>
 @keyframes rotate {
   to {

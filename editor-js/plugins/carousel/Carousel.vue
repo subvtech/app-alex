@@ -35,6 +35,7 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
+        class="main-slide"
       >
         <template #content>
           <div v-if="!readOnly" class="ma-2 config-icon">
@@ -191,9 +192,21 @@ import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
+
+interface Slide {
+  title: string;
+  image: string;
+  type: string;
+  icon: string;
+  imgId?: string;
+  videoId?: string;
+  video?: string;
+  url?: string;
+}
+
 const props = defineProps({
   slides: {
-    type: Array,
+    type: Array as PropType<Slide[]>,
     default: () => [],
   },
   readOnly: {
@@ -314,17 +327,6 @@ const onCarouselSlide = (event) => {
   vueperslides1.value.goToSlide(event.currentSlide.index, { emit: false });
   activeSlide.value = event.currentSlide.index;
 };
-
-interface Slide {
-  title: string;
-  image: string;
-  type: string;
-  icon: string;
-  imgId?: string;
-  videoId?: string;
-  video?: string;
-  url?: string;
-}
 
 function newSlide(file, res) {
   if (file.type.includes('image')) {
@@ -504,6 +506,7 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   position: absolute;
   z-index: 99;
   right: 25px;
+  top: 0;
 }
 
 .addSlide {
@@ -537,12 +540,21 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   }
 }
 
-
-.vueperslide img {
+.main-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
+  background: v-bind('backgroundImgColor');
+}
+
+.vueperslide img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   border-radius: 4px;
-  background: v-bind('backgroundImgColor');
 }
 </style>
