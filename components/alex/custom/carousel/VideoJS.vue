@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-red">
+  <div>
     <video
       ref="videoPlayer"
       class="video-js vjs-lime w-100 fill-height rounded"
@@ -37,6 +37,14 @@ const videoPlayer = ref(null);
 onMounted(() => {
   const options = JSON.parse(props.options);
   videoPlayer.value = videojs(videoPlayer.value, options);
+});
+
+const pause = () => {
+  videoPlayer.value.pause();
+};
+
+defineExpose({
+  pause,
 });
 </script>
 

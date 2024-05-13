@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-red">
+  <div>
     <video
       ref="videoPlayer"
       class="video-js vjs-lime w-100 fill-height rounded"
