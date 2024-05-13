@@ -261,7 +261,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = slide.video;
+    url = url.startsWith('https') ? url : `https://${url}`;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -571,6 +571,7 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   position: absolute;
   z-index: 99;
   right: 25px;
+  top: 25px;
 }
 
 .addSlide {

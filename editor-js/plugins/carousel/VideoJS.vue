@@ -54,6 +54,11 @@ defineExpose({
     transform: rotate(360deg);
   }
 }
+.video-js,
+.vjs-poster {
+  border-radius: 8px;
+}
+
 .video-js.vjs-lime {
   border-radius: 0.5em;
 }

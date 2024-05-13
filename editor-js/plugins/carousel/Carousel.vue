@@ -268,7 +268,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = slide.video;
+    url = url.startsWith('https') ? url : `https://${url}`;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -536,10 +536,13 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
     height: 80px;
   }
 }
+
+
 .vueperslide img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border-radius: 4px;
   background: v-bind('backgroundImgColor');
 }
 </style>
