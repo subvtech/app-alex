@@ -34,7 +34,7 @@
       ><alex-custom-chip
         v-if="!noChip && !hasChip && selected"
         :text="$t('pages.classes.participating')"
-        status="success"
+        status="green"
         size="small"
       />
       <slot name="chip" />

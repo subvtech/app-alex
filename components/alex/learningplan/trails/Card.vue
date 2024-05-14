@@ -35,7 +35,7 @@
             v-if="hide"
             v-bind="propsTooltip"
             class="hidden-icon"
-            status="dark"
+            status="primary"
             icon="mdi-eye-off-outline"
             variant="elevated"
           >

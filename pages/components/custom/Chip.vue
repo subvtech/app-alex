@@ -95,7 +95,7 @@
       do texto, o background é um shade da cor escolhida
     </p>
     <div class="w-100 d-flex flex-wrap" style="gap: 8px">
-      <alex-custom-chip text="#FFFFFF" :color="'#FFFFFF'" />
+      <alex-custom-chip text="#000000" :color="'#000000'" />
       <alex-custom-chip text="#6E7A87" :color="'#6E7A87'" />
       <alex-custom-chip text="#156A3B" :color="'#156A3B'" />
       <alex-custom-chip text="#B61617" :color="'#B61617'" />
@@ -113,16 +113,13 @@
       sobrescreve color
     </p>
     <div class="w-100 d-flex flex-wrap" style="gap: 8px">
-      <alex-custom-chip text="blue" :status="'blue'" />
-      <alex-custom-chip text="dark" :status="'dark'" />
-      <alex-custom-chip text="error" :status="'error'" />
       <alex-custom-chip text="primary" :status="'primary'" />
       <alex-custom-chip text="secondary" :status="'secondary'" />
-      <alex-custom-chip text="grey" :status="'grey'" />
-      <alex-custom-chip text="success" :status="'success'" />
-      <alex-custom-chip text="warning" :status="'warning'" />
+      <alex-custom-chip text="blue" :status="'blue'" />
+      <alex-custom-chip text="red" :status="'red'" />
+      <alex-custom-chip text="green" :status="'green'" />
+      <alex-custom-chip text="orange" :status="'orange'" />
     </div>
-
     <div class="w-100" style="position: relative">
       <prism>{{ examples[3] }}</prism>
       <v-btn
@@ -140,37 +137,177 @@
         <v-icon v-else size="x-large" icon="mdi-content-copy" />
       </v-btn>
     </div>
+    <h2 class="text-h3 text-gray-800">Outlined</h2>
 
     <p class="text-subtitle-2 text-gray-500">
-      É possível definir eles como <strong>clickable</strong>
+      Com a propriedade <strong>Variant</strong> podemos alterar o estilo do
+      chip
     </p>
     <div class="w-100 d-flex flex-wrap" style="gap: 8px">
-      <alex-custom-chip text="blue" :status="'blue'" clickable />
-      <alex-custom-chip text="dark" :status="'dark'" clickable />
-      <alex-custom-chip text="error" :status="'error'" clickable />
-      <alex-custom-chip text="primary" :status="'primary'" clickable />
-      <alex-custom-chip text="secondary" :status="'secondary'" clickable />
-      <alex-custom-chip text="grey" :status="'grey'" clickable />
-      <alex-custom-chip text="success" :status="'success'" clickable />
-      <alex-custom-chip text="warning" :status="'warning'" clickable />
+      <alex-custom-chip text="primary" :status="'primary'" variant="outlined" />
+      <alex-custom-chip
+        text="secondary"
+        :status="'secondary'"
+        variant="outlined"
+      />
+
+      <alex-custom-chip text="blue" :status="'blue'" variant="outlined" />
+      <alex-custom-chip text="red" :status="'red'" variant="outlined" />
+      <alex-custom-chip text="green" :status="'green'" variant="outlined" />
+      <alex-custom-chip text="orange" :status="'orange'" variant="outlined" />
     </div>
 
     <div class="w-100" style="position: relative">
-      <prism>{{ examples[4] }}</prism>
+      <prism>{{ examples[8] }}</prism>
       <v-btn
         class="copy-icon"
         variant="text"
         color="gray-400"
-        @click="copyToClipboard(4)"
+        @click="copyToClipboard(8)"
       >
         <v-icon
-          v-if="copiedIndex === 4"
+          v-if="copiedIndex === 8"
           size="x-large"
           icon="mdi-clipboard-check-multiple-outline"
           color="green-lighten-1"
         />
         <v-icon v-else size="x-large" icon="mdi-content-copy" />
       </v-btn>
+    </div>
+
+    <h2 class="text-h3 text-gray-800">Disabled</h2>
+
+    <p class="text-subtitle-2 text-gray-500">
+      Com a propriedade <strong>Disabled</strong> podemos desabilitar o o chip
+    </p>
+    <div class="w-100 d-flex flex-wrap" style="gap: 8px">
+      <alex-custom-chip
+        text="primary"
+        :status="'primary'"
+        variant="outlined"
+        disabled
+      />
+      <alex-custom-chip
+        text="secondary"
+        :status="'secondary'"
+        variant="outlined"
+        disabled
+      />
+      <alex-custom-chip text="primary" :status="'primary'" disabled />
+      <alex-custom-chip text="secondary" :status="'secondary'" disabled />
+      <alex-custom-chip text="primary" :status="'primary'" disabled clickable />
+      <alex-custom-chip
+        text="secondary"
+        :status="'secondary'"
+        disabled
+        clickable
+      />
+    </div>
+
+    <div class="w-100" style="position: relative">
+      <prism>{{ examples[9] }}</prism>
+      <v-btn
+        class="copy-icon"
+        variant="text"
+        color="gray-400"
+        @click="copyToClipboard(9)"
+      >
+        <v-icon
+          v-if="copiedIndex === 9"
+          size="x-large"
+          icon="mdi-clipboard-check-multiple-outline"
+          color="green-lighten-1"
+        />
+        <v-icon v-else size="x-large" icon="mdi-content-copy" />
+      </v-btn>
+    </div>
+    <h2 class="text-h3 text-gray-800">Clickable</h2>
+
+    <p class="text-subtitle-2 text-gray-500">
+      Com a propriedade <strong>Clickable</strong> podemos deixa o chip clicável
+    </p>
+    <div class="w-100 d-flex flex-wrap" style="gap: 8px">
+      <alex-custom-chip text="primary" status="primary" clickable />
+      <alex-custom-chip text="secondary" status="secondary" clickable />
+      <alex-custom-chip
+        text="primary"
+        status="primary"
+        variant="outlined"
+        clickable
+      />
+      <alex-custom-chip
+        text="secondary"
+        status="secondary"
+        variant="outlined"
+        clickable
+      />
+    </div>
+    <h2 class="text-h3 text-gray-800">Active</h2>
+
+    <p class="text-subtitle-2 text-gray-500">
+      Com a propriedade <strong>active</strong> podemos mudar o estilo do chip
+      para ativo
+    </p>
+    <div class="w-100 d-flex flex-wrap" style="gap: 8px">
+      <alex-custom-chip text="primary" status="primary" active clickable />
+      <alex-custom-chip text="secondary" status="secondary" active clickable />
+      <alex-custom-chip
+        text="primary"
+        status="primary"
+        variant="outlined"
+        active
+        clickable
+      />
+      <alex-custom-chip
+        text="secondary"
+        status="secondary"
+        variant="outlined"
+        active
+        clickable
+      />
+    </div>
+    <h2 class="text-h3 text-gray-800">Closable</h2>
+
+    <p class="text-subtitle-2 text-gray-500">
+      Com a propriedade <strong>closable</strong> podemos apagar o chip, porém
+      só poderá ser utilizado com o clickable
+    </p>
+    <div class="w-100 d-flex flex-wrap" style="gap: 8px">
+      <alex-custom-chip text="primary" status="primary" closable clickable />
+      <alex-custom-chip
+        text="secondary"
+        status="secondary"
+        closable
+        clickable
+      />
+      <alex-custom-chip
+        text="primary"
+        status="primary"
+        variant="outlined"
+        closable
+        clickable
+      />
+      <alex-custom-chip
+        text="secondary"
+        status="secondary"
+        variant="outlined"
+        closable
+        clickable
+      />
+      <alex-custom-chip
+        text="primary"
+        status="primary"
+        closable
+        clickable
+        active
+      />
+      <alex-custom-chip
+        text="secondary"
+        status="secondary"
+        closable
+        clickable
+        active
+      />
     </div>
 
     <h2 class="text-h3 text-gray-800">Icons</h2>
@@ -183,12 +320,10 @@
     <div class="w-100">
       <div class="w-100 d-flex flex-wrap" style="gap: 8px">
         <alex-custom-chip icon="mdi-book" :status="'blue'" />
-        <alex-custom-chip icon="mdi-map" :status="'dark'" />
-        <alex-custom-chip icon="mdi-book-outline" :status="'error'" />
+        <alex-custom-chip icon="mdi-book-outline" :status="'red'" />
         <alex-custom-chip icon="mdi-account-outline" :status="'secondary'" />
         <alex-custom-chip icon="mdi-book" :status="'primary'" />
-        <alex-custom-chip icon="mdi-pencil" :status="'grey'" />
-        <alex-custom-chip icon="mdi-circle" :status="'success'" />
+        <alex-custom-chip icon="mdi-circle" :status="'green'" />
         <alex-custom-chip icon="mdi-close" :color="'#005C66'" />
         <alex-custom-chip icon="mdi-book" :color="'#156A3B'" />
         <alex-custom-chip icon="mdi-map" :color="'#B61617'" />
@@ -196,7 +331,6 @@
         <alex-custom-chip icon="mdi-book" :color="'#CC6400'" />
         <alex-custom-chip icon="mdi-pencil" :color="'#FFFFFF'" />
         <alex-custom-chip icon="mdi-box" :status="'primary'" />
-        <alex-custom-chip icon="mdi-close" :status="'grey'" />
       </div>
       <div class="px-3" style="position: relative">
         <prism>{{ examples[5] }}</prism>
@@ -230,14 +364,9 @@
           :status="'blue'"
         />
         <alex-custom-chip
-          text="mdi-map"
-          prepend-icon="mdi-map"
-          :status="'dark'"
-        />
-        <alex-custom-chip
           text="mdi-book-outline"
           prepend-icon="mdi-book-outline"
-          :status="'error'"
+          :status="'red'"
         />
         <alex-custom-chip
           text="mdi-account"
@@ -250,14 +379,9 @@
           :status="'secondary'"
         />
         <alex-custom-chip
-          text="mdi-pencil"
-          prepend-icon="mdi-pencil"
-          :status="'grey'"
-        />
-        <alex-custom-chip
           text="mdi-box"
           prepend-icon="mdi-box"
-          :status="'success'"
+          :status="'green'"
         />
         <alex-custom-chip
           text="mdi-close"
@@ -330,9 +454,10 @@
         <alex-custom-chip
           text="mdi-pencil"
           prepend-icon="mdi-pencil"
-          status="dark"
+          status="primary"
           clickable
           closable
+          active
         />
         <div class="px-3" style="position: relative">
           <prism>{{ examples[7] }}</prism>
@@ -356,8 +481,9 @@
     <h2 class="text-h3 text-gray-800">Propriedades disponíveis</h2>
     <div class="d-flex flex-column" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in propsDocumentation"
+        :key="index"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -387,8 +513,9 @@
     <h2 class="text-h3 text-gray-800">Eventos disponíveis</h2>
     <div class="d-flex flex-column w-100" style="gap: 8px">
       <div
-        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         v-for="(item, index) in eventsDocumentation"
+        :key="index"
+        class="pa-6 d-flex flex-column rounded-lg align-baseline"
         :style="
           index % 2 === 0
             ? 'background-color: #EBEDEF'
@@ -416,13 +543,6 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const model1 = ref(false);
-const model2 = ref(false);
-const model3 = ref(false);
-const model4 = ref(false);
-const model5 = ref(false);
-const model6 = ref(false);
-
 const copiedValue = ref('');
 const copiedIndex = ref(-1);
 const examples = [
@@ -431,17 +551,26 @@ const examples = [
   `<alex-custom-chip text="large" :size="'large'" />
    `,
   `<alex-custom-chip text="#B61617" :color="'#B61617'" />`,
-  `<alex-custom-chip text="success" :status="'success'" />`,
-  `<alex-custom-chip text="success" :status="'success' clickable" />`,
+  `<alex-custom-chip text="green" :status="'green'" />`,
+  `<alex-custom-chip text="green" :status="'green' clickable" />`,
   `<alex-custom-chip icon="mdi-book" :color="'#EBEDEF'" />`,
   `<alex-custom-chip text="mdi-book" predend-icon="mdi-book" :color="'#EBEDEF'" />`,
   ` <alex-custom-chip
       text="mdi-pencil"
       prepend-icon="mdi-pencil"
-      status="dark"
       clickable
       closable
+      active
     />`,
+  `<alex-custom-chip text="large" :size="'large'" variant="outlined" />
+   `,
+  ` <alex-custom-chip
+        text="primary"
+        :status="'primary'"
+        variant="outlined"
+        disabled
+      />
+   `,
 ];
 
 const propsDocumentation = [
@@ -456,13 +585,6 @@ const propsDocumentation = [
     type: 'Boolean',
     default: 'false',
     description: 'Ativa hover, border e animações de clique,',
-  },
-  {
-    name: 'isActive',
-    type: 'Boolean',
-    default: 'false',
-    description:
-      'Define se um chip está ativo/desativo, funciona apenas em clickables',
   },
   {
     name: 'prependIcon',
@@ -486,7 +608,7 @@ const propsDocumentation = [
 
   {
     name: 'status',
-    type: " 'warning' | 'success' | 'error' | 'blue' | 'grey' | 'dark' | 'secondary' | 'primary'",
+    type: "  'primary' | 'secondary' | 'orange' | 'green' | 'red' | 'blue'",
 
     default: 'undefined',
     description:

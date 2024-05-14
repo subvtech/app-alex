@@ -194,7 +194,7 @@
               #chip
             >
               <alex-custom-chip
-                status="dark"
+                status="primary"
                 size="small"
                 :text="$t('pages.classes.responsible')"
               />
