@@ -147,7 +147,7 @@
         remove-selection
       >
         <template #chip>
-          <alex-custom-chip status="dark" size="small" text="Responsável" />
+          <alex-custom-chip status="primary" size="small" text="Responsável" />
         </template>
       </alex-custom-list-item-user>
       <alex-custom-list-item-user
