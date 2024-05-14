@@ -40,7 +40,7 @@ watch(
   videoPlayer,
   (video) => {
     if (video) {
-      const options = JSON.parse(props.options);
+      const options = props.options;
       player = videojs(video, options);
     }
   },

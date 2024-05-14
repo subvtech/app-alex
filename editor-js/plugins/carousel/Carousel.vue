@@ -293,7 +293,7 @@ const videoPlayerOptions = (slide) => {
       },
     ],
   };
-  return JSON.stringify(data);
+  return data;
 };
 
 const carouselBreakPoints = computed(() => {
@@ -313,7 +313,7 @@ const onSlideClick = (slide) => {
 };
 
 const onCarouselSlide = (event) => {
-  if (slides.value[activeSlide.value].video) {
+  if (slides.value[activeSlide.value]?.video) {
     if (slides.value[activeSlide.value].type.includes('File')) {
       videoJS.value.forEach((video) => {
         video.pause();
