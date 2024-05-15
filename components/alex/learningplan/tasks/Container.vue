@@ -9,24 +9,15 @@
       <v-expansion-panel-title class="cursor-default" disabled hide-actions>
         <v-icon
           :icon="expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
-          @click="toggleExpand(i - 1)"
+          @click="toggleExpand(i)"
         />
-        <span class="text-h5 text-gray-800">{{
-          taskSections[i - 1].title
-        }}</span>
+        <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
         <alex-custom-chip status="secondary" text="0"></alex-custom-chip>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <div class="w-100 d-flex justify-center align-center pb-4">
-          <div class="py-4 pb-4">
-            <v-img
-              :src="taskSections[i - 1].image"
-              class="max-w-40 mb-4 mx-auto"
-            ></v-img>
-            <p class="text-h4 text-gray-400">{{ taskSections[i - 1].text }}</p>
-          </div>
-        </div>
-        <div v-if="i === 1 && learningPlanStore.userIsFacilitator" class="mb-4">
+        <alex-learningplan-tasks-empty-state :index="i" />
+        <alex-learningplan-tasks-table :index="i" />
+        <div v-if="i === 1" class="mb-4">
           <alex-custom-button
             v-if="!isCreatingTask"
             size="large"
@@ -60,7 +51,6 @@
 const expand = ref([0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
-const learningPlanStore = useLearningPlanStore();
 
 const handleCreateTask = () => {
   if (!taskTitle.value) return;
@@ -70,51 +60,10 @@ const handleCreateTask = () => {
 };
 
 const toggleExpand = (index: number) => {
-  expand.value[index] = !expand.value[index] ? -1 : 0;
+  expand.value[index - 1] = !expand.value[index - 1] ? -1 : 0;
 };
 
-const taskSections = [
-  {
-    title: 'Rascunho',
-    text: 'Nenhuma tarefa em rascunho!',
-    image: '/images/emptyDraftTasks.svg',
-  },
-  {
-    title: 'Publicadas',
-    text: 'Nenhuma tarefa publicada!',
-    image: '/images/emptyPublishedTasks.svg',
-  },
-  {
-    title: 'Encerradas',
-    text: 'Nenhuma tarefa encerrada!',
-    image: '/images/emptyFinishedTasks.svg',
-  },
-];
-
-// const tasks = [
-//   {
-//     name: 'Criar um mapa mental sobre o vídeo',
-//     deadline: '10/10/2024',
-//     type: 'individual',
-//     students: [
-//       { name: 'João', avatar: 'https://picsum.photos/100/100' },
-//       { name: 'Maria Santos' },
-//     ],
-//     delivered: 1,
-//   },
-//   {
-//     name: 'Ler as páginas 9-12, 19-23 do livro',
-//     deadline: '05/11/2024',
-//     type: 'group',
-//     students: [
-//       { name: 'João', avatar: 'https://picsum.photos/110/100' },
-//       { name: 'Maria', avatar: 'https://picsum.photos/100/110' },
-//       { name: 'José', avatar: 'https://picsum.photos/110/110' },
-//     ],
-//     delivered: -1,
-//   },
-//   {},
-// ];
+const taskSections = ['Rascunho', 'Publicadas', 'Encerradas'];
 </script>
 
 <style>

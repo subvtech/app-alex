@@ -1,0 +1,141 @@
+<template>
+  <v-data-table
+    v-if="index == 1"
+    class="rounded-lg border-sm mb-4 text-gray-800 text-body-3"
+    :items="tasks"
+    :headers="header"
+  >
+    <template #item="{ item }">
+      <tr class="text-5 text-gray-600 text-center text-md-left">
+        <td class="text-body-4 text-gray-800 max-w-178 text-overflow text-left">
+          {{ item.name }}
+        </td>
+        <td>
+          <alex-custom-chip
+            status="secondary"
+            :text="item.deadline"
+            prepend-icon="mdi-calendar-range"
+          ></alex-custom-chip>
+        </td>
+        <td>
+          <v-icon
+            class="mr-1"
+            :icon="
+              item.type === 'group'
+                ? 'mdi-account-multiple-outline'
+                : 'mdi-account-outline'
+            "
+          />
+          {{ item.type }}
+        </td>
+        <td>
+          <alex-custom-avatar-group :avatar-items="item.students" :max="3" />
+        </td>
+        <td>
+          <v-icon
+            class="mr-1"
+            :icon="
+              item.delivered === -1
+                ? 'mdi-close-circle-outline'
+                : 'mdi-paperclip'
+            "
+          ></v-icon>
+          <span v-if="item.delivered >= 0">
+            {{ item.delivered }} entregas
+          </span>
+          <span v-else>Sem entrega</span>
+        </td>
+        <td class="d-flex align-center">
+          <v-tooltip text="Ver kanban" location="bottom">
+            <template #activator="{ props }">
+              <alex-custom-button
+                v-bind="props"
+                icon="alex:Kanban"
+                variant="text"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Opções" location="bottom" :open-on-click="false">
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <alex-custom-dropdown
+                  :items="dropDownItems"
+                  variant="text"
+                  prepend-icon="mdi-dots-vertical"
+                ></alex-custom-dropdown>
+              </div>
+            </template>
+          </v-tooltip>
+        </td>
+      </tr>
+    </template>
+    <template #bottom></template>
+  </v-data-table>
+</template>
+
+<script setup lang="ts">
+defineProps<{
+  index: number;
+}>();
+
+const dropDownItems = [
+  { text: 'Excluir', warning: true, onClick: () => console.log('Excluir') },
+];
+
+const header = [
+  { title: 'Nome', key: 'name', sortable: true },
+  { title: 'Prazo', key: 'deadline' },
+  { title: 'Tipo', key: 'type' },
+  { title: 'Integrantes', key: 'students', sortable: false },
+  { title: 'Entrega', key: 'delivered' },
+  { title: '', key: 'actions', sortable: false },
+];
+
+const tasks = [
+  {
+    name: 'Criar um mapa mental sobre o vídeo',
+    deadline: '10/10/2024',
+    type: 'individual',
+    students: [
+      { name: 'João', avatar: 'https://picsum.photos/100/100' },
+      { name: 'Maria Santos' },
+    ],
+    delivered: 1,
+  },
+  {
+    name: 'Ler as páginas 9-12, 19-23 do livro',
+    deadline: '05/11/2024',
+    type: 'group',
+    students: [
+      { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
+      { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
+      { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
+      { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
+      { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
+    ],
+    delivered: -1,
+  },
+  {
+    name: 'Criar uma protótipagem para a página de dashboard e depois assistir o jogo do Flamengo contra o bolivar que o flamengo tem que e vai ganhar pelo amor de Deus',
+    deadline: '05/11/2024',
+    type: 'group',
+    students: [
+      { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
+      { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
+      { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
+      { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
+      { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
+    ],
+    delivered: -1,
+  },
+];
+</script>
+
+<style scoped>
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+</style>
