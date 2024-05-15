@@ -3,33 +3,21 @@
     :class="[
       size,
       status ?? '',
-      isActive ? '' : 'disabled',
-      icon ? 'icon pa-2' : '',
-      clickable ? 'clickable' : '',
+      active && 'active',
+      clickable && 'clickable',
+      disabled && 'disabled',
+      icon && 'icon pa-2',
+      color && 'border-none',
     ]"
-    :variant="
-      status
-        ? ['outlined', 'elevated', 'text', 'plain', 'filled'].includes(
-            variant ?? '',
-          )
-          ? variant
-          : 'outlined'
-        : variant
-    "
+    :variant="variant"
     :color="status ? undefined : color"
-    @click:chip="clickable ? emit('click:chip') : () => {}"
-    @click:close="
-      () => {
-        emit('click:close');
-        chip = uncloseable;
-      }
-    "
-    :style="[color ? '' : 'border: none']"
+    :disabled="disabled"
     close-icon="mdi-close"
-    style="width: min-content"
     data-testid="chip"
+    @click:chip="clickable ? emit('click:chip') : undefined"
+    @click:close="emit('click:close')"
   >
-    <template #close v-if="uncloseable">
+    <template v-if="closable && clickable" #close>
       <v-icon
         icon="mdi-close"
         @click.stop="
@@ -39,13 +27,14 @@
         "
       />
     </template>
-    <v-icon
-      v-if="prependIcon"
-      class="mr-1"
-      slot="prependIcon"
-      :size="['x-small', 'small'].includes(size) ? 'medium' : '20'"
-      >{{ prependIcon }}</v-icon
+    <template v-if="prependIcon" #prepend>
+      <v-icon
+        class="mr-1"
+        :size="['x-small', 'small'].includes(size) ? 'medium' : '20'"
+        >{{ prependIcon }}</v-icon
+      ></template
     >
+
     <div v-if="icon" style="display: inline-flex" data-testid="icon">
       <v-icon
         class="mx-0"
@@ -53,7 +42,7 @@
         >{{ icon }}</v-icon
       >
     </div>
-    <div class="w-100 overflow-hidden" v-else>
+    <div v-else class="w-100 overflow-hidden">
       <span>{{ text }}</span>
     </div></v-chip
   >
@@ -61,64 +50,33 @@
 
 <script setup lang="ts">
 const emit = defineEmits(['click:close', 'click:chip']);
-const props = defineProps({
-  text: {
-    type: String,
-  },
-  clickable: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  text?: string;
+  clickable?: boolean;
+  active?: boolean;
+  prependIcon?: string;
+  icon?: string;
+  closable?: boolean;
+  disabled?: boolean;
+  size?: 'x-small' | 'small' | 'medium' | 'large';
+  status?: 'primary' | 'secondary' | 'orange' | 'green' | 'red' | 'blue';
+  color?: string;
+  variant?: 'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain';
+}
 
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-
-  prependIcon: {
-    type: String,
-  },
-  icon: {
-    type: String,
-  },
-  uncloseable: {
-    type: Boolean,
-    default: false,
-  },
-
-  size: {
-    type: String as PropType<'x-small' | 'small' | 'medium' | 'large'>,
-    default: 'medium',
-  },
-  status: {
-    type: String as PropType<
-      | 'warning'
-      | 'success'
-      | 'error'
-      | 'blue'
-      | 'grey'
-      | 'dark'
-      | 'primary'
-      | 'secondary'
-    >,
-  },
-  color: {
-    type: String,
-    validator: (value: string) => {
-      const regExp = new RegExp('^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$');
-      return regExp.test(value);
-    },
-  },
-  variant: {
-    type: String as PropType<
-      'elevated' | 'flat' | 'tonal' | 'outlined' | 'text' | 'plain'
-    >,
-  },
+withDefaults(defineProps<Props>(), {
+  text: undefined,
+  clickable: false,
+  active: false,
+  prependIcon: undefined,
+  icon: undefined,
+  closable: false,
+  disabled: false,
+  size: 'medium',
+  status: undefined,
+  color: '',
+  variant: undefined,
 });
-
-const { isActive } = toRefs(props);
-
-const chip = ref(false);
 </script>
 
 <style scoped lang="scss">
@@ -126,94 +84,150 @@ const chip = ref(false);
   cursor: pointer;
 }
 .v-chip__content {
-  width: 100%;
-  display: flex;
+  width: min-content;
 }
 
-.success {
-  background-color: #bff2d6;
-  color: #156a3b;
-  border: 1px solid #156a3b;
+.green {
+  color: rgb(var(--v-theme-success-2));
+  &:not(.v-chip--variant-outlined) {
+    background-color: rgb(var(--v-theme-success--2));
+  }
+  &.v-chip--variant-outlined {
+    border: 1px solid rgb(var(--v-theme-success-1));
+    color: rgb(var(--v-theme-success-1));
+  }
 }
 
-.error {
-  background-color: #f9d1d1;
-  color: #b61617;
-  border: 1px solid #b61617;
+.red {
+  color: rgb(var(--v-theme-error-2));
+  &:not(.v-chip--variant-outlined) {
+    background-color: rgb(var(--v-theme-error--2));
+  }
+  &.v-chip--variant-outlined {
+    border: 1px solid rgb(var(--v-theme-error-1));
+    color: rgb(var(--v-theme-error-1));
+  }
 }
 
-.warning {
-  background-color: #ffe5cc;
-  color: #cc6400;
-  border: 1px solid #cc6400;
+.orange {
+  color: rgb(var(--v-theme-warning-2));
+  &:not(.v-chip--variant-outlined) {
+    background-color: rgb(var(--v-theme-warning--2));
+  }
+  &.v-chip--variant-outlined {
+    border: 1px solid rgb(var(--v-theme-warning-1));
+    color: rgb(var(--v-theme-warning-1));
+  }
 }
 
 .blue {
-  background-color: #cceeff;
-  color: #005c66;
-  border: 1px solid #005c66;
-}
-
-.grey {
-  background-color: #ebedef;
-  color: #6e7a87;
-  border: 1px solid #6e7a87;
-}
-
-.dark {
-  background-color: #001a33;
-  color: #ffffff;
-  border: 1px solid #ffffff;
-}
-
-.primary {
-  background-color: #d1f6fa;
-  color: #008a99;
-  border: 1px solid #008a99;
-  .disabled {
-    border: 1px solid #b9bfc6 !important;
-    background-color: #ebedef !important;
+  color: rgb(var(--v-theme-secondary-2));
+  &:not(.v-chip--variant-outlined) {
+    background-color: rgb(var(--v-theme-info--2));
   }
-  &.clickable {
-    &:hover {
-      color: #005c66;
-    }
-  }
-
-  &:active {
-    background-color: #00b7cc;
-    color: #fff;
-    &:hover {
-      background-color: #47d9eb;
-      border: 1px solid #00b7cc;
-    }
+  &.v-chip--variant-outlined {
+    border: 1px solid rgb(var(--v-theme-info-2));
+    color: rgb(var(--v-theme-info-2));
   }
 }
 
 .secondary {
-  background-color: #f1f5f9;
-  color: #6e7a87;
-  border: 1px solid #6e7a87;
-
-  .disabled {
-    border: 1px solid #b9bfc6 !important;
-    background-color: #ebedef !important;
+  color: rgb(var(--v-theme-gray-600));
+  background-color: transparent;
+  &:not(.v-chip--variant-outlined) {
+    background-color: rgb(var(--v-theme-gray-100));
   }
-  &.clickable {
-    &:hover {
-      color: #005c66;
-      background-color: #ebedef;
+  &.v-chip--variant-outlined {
+    border: 1px solid rgb(var(--v-theme-gray-400));
+    &.disabled {
+      border: 1px solid rgb(var(--v-theme-gray-300)) !important;
     }
   }
+  &.disabled {
+    border: none;
+    color: rgb(var(--v-theme-gray-300));
+    background-color: rgb(var(--v-theme-gray-100)) !important;
+  }
 
-  &:active {
-    background-color: #30363b;
-    color: #fff;
+  &.clickable {
+    &.v-chip--variant-outlined {
+      border: 1px solid rgb(var(--v-theme-gray-500));
+      &.disabled {
+        border: 1px solid rgb(var(--v-theme-gray-300)) !important;
+        color: rgb(var(--v-theme-gray-300)) !important;
+      }
+    }
+    &.disabled {
+      border: 1px solid #b9bfc6 !important;
+      background-color: #ebedef !important;
+    }
     &:hover {
-      background-color: #6e7a87;
+      color: rgb(var(--v-theme-gray-900));
+      background-color: rgb(var(--v-theme-gray-100));
+    }
+    &.active {
+      background-color: rgb(var(--v-theme-primary-2));
+      color: rgb(var(--v-theme-white));
+      &:hover {
+        color: rgb(var(--v-theme-white));
+        background-color: rgb(var(--v-theme-gray-600));
+      }
     }
   }
 }
+.primary {
+  color: rgb(var(--v-theme-white));
+  &:not(.v-chip--variant-outlined) {
+    background-color: rgb(var(--v-theme-primary-2));
+    &.disabled {
+      border: none;
+      background-color: rgb(var(--v-theme-gray-600)) !important;
+    }
+  }
+  &.v-chip--variant-outlined {
+    color: rgb(var(--v-theme-primary-1));
+    border: 1px solid rgb(var(--v-theme-primary-1));
+    &.disabled {
+      border: 1px solid rgb(var(--v-theme-gray-800)) !important;
+    }
+  }
+
+  &.clickable {
+    color: rgb(var(--v-theme-secondary-1));
+    border: 1px solid rgb(var(--v-theme-secondary-1));
+    &:not(.v-chip--variant-outlined) {
+      background-color: rgb(var(--v-theme-secondary--2));
+    }
+    &:not(.active).v-chip--variant-outlined:hover {
+      color: rgb(var(--v-theme-secondary-1));
+    }
+    &.v-chip--variant-outlined .disabled {
+      border: 1px solid rgb(var(--v-theme-gray-300)) !important;
+      color: rgb(var(--v-theme-gray-300));
+      background-color: transparent !important;
+    }
+    &.disabled {
+      border: 1px solid rgb(var(--v-theme-gray-400)) !important;
+      color: rgb(var(--v-theme-gray-300));
+      background-color: rgb(var(--v-theme-gray-100)) !important;
+    }
+    &:hover {
+      color: rgb(var(--v-theme-secondary-2));
+      background-color: rgb(var(--v-theme-secondary--2));
+    }
+
+    &.active {
+      color: rgb(var(--v-theme-white));
+      background-color: rgb(var(--v-theme-secondary-0));
+
+      &:hover {
+        background-color: rgb(var(--v-theme-secondary--1));
+        border: 1px solid rgb(var(--v-theme-secondary-0));
+      }
+    }
+  }
+}
+
 .icon {
   gap: 0px !important;
 }
