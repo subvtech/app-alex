@@ -35,7 +35,7 @@
           )
         "
         size="small"
-        status="dark"
+        status="primary"
         class="type"
         variant="elevated"
       />
@@ -49,7 +49,7 @@
             v-bind="hiddenTooltipProps"
             class="hidden-icon"
             size="large"
-            status="dark"
+            status="primary"
             icon="mdi-eye-off-outline"
             variant="elevated"
           >
