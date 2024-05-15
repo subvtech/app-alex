@@ -154,11 +154,11 @@ const generalLinks = computed<TabType[]>(() => [
     value: 1,
     to: `/courses/${learningPlanId.value}/trails`,
   },
-  // {
-  //   label: i18n.t('pages.courses.assignments'),
-  //   value: 2,
-  //   to: `/courses/${learningPlanId.value}/tasks`,
-  // },
+  {
+    label: i18n.t('pages.courses.assignments'),
+    value: 2,
+    to: `/courses/${learningPlanId.value}/tasks`,
+  },
   {
     label: i18n.t('pages.courses.classes'),
     value: 3,

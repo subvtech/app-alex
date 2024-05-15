@@ -1,28 +1,42 @@
 <template>
-  <v-container fluid class="bg-white rounded">
+  <div class="bg-white rounded wrapper">
     <div v-if="learningPlanStore.loading" class="pa-12">
       <alex-custom-skeleton color="gray-300" class="w-100 height-96" />
     </div>
-    <div
-      v-else
-      class="d-flex height-100 pa-6 align-center justify-center rounded text-gray-600"
-    >
-      <span class="text-h4 text-gray-800">{{
-        $t('components.courses.tasks.noTasks')
-      }}</span>
-    </div></v-container
-  >
+    <div v-else>
+      <div
+        class="w-100 d-flex justify-space-between align-center height-18 header px-6"
+      >
+        <alex-inputs-text-field
+          v-model="search"
+          placeholder="Encontrar tarefa"
+          prepend-inner-icon="mdi-magnify"
+          class="w-100 max-w-80 mr-6 min-w-60"
+          density="comfortable"
+          name="search"
+          hide-details
+        />
+        <alex-custom-button
+          size="large"
+          icon="mdi-filter-variant"
+          variant="secondary"
+          @click="console.log('filter')"
+        />
+      </div>
+      <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
+        <alex-learningplan-tasks-container />
+      </div>
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth',
-});
-
 const route = useRoute();
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const { id } = route.params;
+
+const search = ref('');
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
@@ -59,3 +73,13 @@ watch(
   },
 );
 </script>
+
+<style scoped>
+.header {
+  border-bottom: 1px solid var(--Cinza-Cinza-100, #ebedef);
+}
+
+.wrapper {
+  min-height: calc(100vh - 548px);
+}
+</style>
