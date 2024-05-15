@@ -6,11 +6,15 @@
     class="task-accordion"
   >
     <v-expansion-panel>
-      <v-expansion-panel-title>
-        <alex-custom-chip status="secondary" text="0"></alex-custom-chip>
+      <v-expansion-panel-title class="cursor-default" disabled hide-actions>
+        <v-icon
+          :icon="expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
+          @click="toggleExpand(i - 1)"
+        />
         <span class="text-h5 text-gray-800">{{
           taskSections[i - 1].title
         }}</span>
+        <alex-custom-chip status="secondary" text="0"></alex-custom-chip>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <div class="w-100 d-flex justify-center align-center pb-4">
@@ -65,6 +69,10 @@ const handleCreateTask = () => {
   isCreatingTask.value = false;
 };
 
+const toggleExpand = (index: number) => {
+  expand.value[index] = !expand.value[index] ? -1 : 0;
+};
+
 const taskSections = [
   {
     title: 'Rascunho',
@@ -110,11 +118,16 @@ const taskSections = [
 </script>
 
 <style>
+.cursor-default {
+  cursor: default;
+}
+
 .create-task-btn {
   border: 1px dashed var(--Cinza-Cinza-600, #6e7a87);
 }
 
 .task-accordion {
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   .v-theme--mainTheme {
     --v-border-opacity: unset !important;
   }
@@ -126,8 +139,7 @@ const taskSections = [
   .v-expansion-panel-title {
     transition: all 0.3s ease;
     height: 52px !important;
-    flex-direction: row-reverse !important;
-    justify-content: flex-end !important;
+    justify-content: flex-start !important;
     gap: 8px;
     width: 100%;
     padding: 16px;
