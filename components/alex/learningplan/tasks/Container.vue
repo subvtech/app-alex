@@ -36,6 +36,7 @@
               density="comfortable"
               name="taskTitle"
               hide-details
+              @keyup.enter="handleCreateTask"
             />
             <alex-custom-button size="large" @click="handleCreateTask">
               Adicionar
@@ -55,6 +56,7 @@ const taskTitle = ref('');
 const handleCreateTask = () => {
   if (!taskTitle.value) return;
   console.log('Criar tarefa', taskTitle.value);
+  console.log(taskTitle);
   taskTitle.value = '';
   isCreatingTask.value = false;
 };

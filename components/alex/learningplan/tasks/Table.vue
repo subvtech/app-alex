@@ -1,6 +1,8 @@
 <template>
   <v-data-table
     v-if="index == 1"
+    sort-asc-icon="mdi-arrow-up-thin"
+    sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3"
     :items="tasks"
     :headers="header"
@@ -11,11 +13,10 @@
           {{ item.name }}
         </td>
         <td>
-          <alex-custom-chip
-            status="secondary"
-            :text="item.deadline"
-            prepend-icon="mdi-calendar-range"
-          ></alex-custom-chip>
+          <alex-learningplan-tasks-date-chip
+            :date="item.deadline"
+            is-published
+          />
         </td>
         <td>
           <v-icon
@@ -104,7 +105,7 @@ const tasks = [
   },
   {
     name: 'Ler as páginas 9-12, 19-23 do livro',
-    deadline: '05/11/2024',
+    deadline: '05/16/2024',
     type: 'group',
     students: [
       { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
@@ -128,6 +129,19 @@ const tasks = [
     ],
     delivered: -1,
   },
+  {
+    name: 'Ser feliz né',
+    deadline: '05/18/2024',
+    type: 'group',
+    students: [
+      { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
+      { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
+      { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
+      { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
+      { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
+    ],
+    delivered: -1,
+  },
 ];
 </script>
 
@@ -137,5 +151,4 @@ const tasks = [
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 </style>
