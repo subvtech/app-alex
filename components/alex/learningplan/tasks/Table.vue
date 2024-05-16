@@ -56,17 +56,23 @@
               />
             </template>
           </v-tooltip>
-          <v-tooltip text="Opções" location="bottom" :open-on-click="false">
-            <template #activator="{ props }">
-              <div v-bind="props">
-                <alex-custom-dropdown
-                  :items="dropDownItems"
-                  variant="text"
-                  prepend-icon="mdi-dots-vertical"
-                ></alex-custom-dropdown>
-              </div>
+          <alex-custom-dropdown
+            :items="dropDownItems"
+            variant="text"
+            prepend-icon="mdi-dots-vertical"
+          >
+            <template #activator="{ props: propsMenu }">
+              <v-tooltip text="Opções" location="bottom center">
+                <template #activator="{ props: optionsTooltipProps }">
+                  <alex-custom-button
+                    variant="text"
+                    v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                    icon="mdi-dots-vertical"
+                  />
+                </template>
+              </v-tooltip>
             </template>
-          </v-tooltip>
+          </alex-custom-dropdown>
         </td>
       </tr>
     </template>
@@ -131,7 +137,7 @@ const tasks = [
   },
   {
     name: 'Ser feliz né',
-    deadline: '05/18/2024',
+    deadline: '05/17/2024',
     type: 'group',
     students: [
       { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
