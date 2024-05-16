@@ -8,8 +8,8 @@
     :headers="header"
   >
     <template #item="{ item }">
-      <tr class="text-5 text-gray-600 text-center text-md-left">
-        <td class="text-body-4 text-gray-800 max-w-178 text-overflow text-left">
+      <tr class="text-5 text-gray-600 text-no-wrap">
+        <td class="text-body-4 text-gray-800 max-w-170 text-overflow text-left">
           {{ item.name }}
         </td>
         <td>
@@ -33,18 +33,17 @@
           <alex-custom-avatar-group :avatar-items="item.students" :max="3" />
         </td>
         <td>
-          <v-icon
-            class="mr-1"
-            :icon="
-              item.delivered === -1
-                ? 'mdi-close-circle-outline'
-                : 'mdi-paperclip'
-            "
-          ></v-icon>
-          <span v-if="item.delivered >= 0">
-            {{ item.delivered }} entregas
-          </span>
-          <span v-else>Sem entrega</span>
+          <alex-learningplan-tasks-task-submissions
+            v-if="item.delivered >= 0"
+            :to-do="0"
+            :doing="0"
+            :under-review="0"
+            :completed="11"
+          />
+          <div v-else>
+            <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
+            <span>Sem entrega</span>
+          </div>
         </td>
         <td class="d-flex align-center">
           <v-tooltip text="Ver kanban" location="bottom">
