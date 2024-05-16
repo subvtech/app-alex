@@ -18,30 +18,32 @@
         <alex-learningplan-tasks-empty-state :index="i" />
         <alex-learningplan-tasks-table :index="i" />
         <div v-if="i === 1" class="mb-4">
-          <alex-custom-button
-            v-if="!isCreatingTask"
-            size="large"
-            variant="text"
-            prepend-icon="mdi-plus"
-            class="w-100 create-task-btn"
-            @click="isCreatingTask = true"
-          >
-            Adicionar tarefa
-          </alex-custom-button>
-          <div v-else class="d-flex ga-2">
-            <alex-inputs-text-field
-              v-model="taskTitle"
-              placeholder="Digite o titulo da tarefa"
-              class="w-100"
-              density="comfortable"
-              name="taskTitle"
-              hide-details
-              @keyup.enter="handleCreateTask"
-            />
-            <alex-custom-button size="large" @click="handleCreateTask">
-              Adicionar
+          <Transition mode="out-in" name="add-task">
+            <alex-custom-button
+              v-if="!isCreatingTask"
+              size="large"
+              variant="text"
+              prepend-icon="mdi-plus"
+              class="w-100 create-task-btn"
+              @click="isCreatingTask = true"
+            >
+              Adicionar tarefa
             </alex-custom-button>
-          </div>
+            <div v-else class="d-flex ga-2">
+              <alex-inputs-text-field
+                v-model="taskTitle"
+                placeholder="Digite o titulo da tarefa"
+                class="w-100"
+                density="comfortable"
+                name="taskTitle"
+                hide-details
+                @keyup.enter="handleCreateTask"
+              />
+              <alex-custom-button size="large" @click="handleCreateTask">
+                Adicionar
+              </alex-custom-button>
+            </div>
+          </Transition>
         </div>
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -62,6 +64,8 @@ const handleCreateTask = () => {
 };
 
 const toggleExpand = (index: number) => {
+  isCreatingTask.value = false;
+  taskTitle.value = '';
   expand.value[index - 1] = !expand.value[index - 1] ? -1 : 0;
 };
 
@@ -123,5 +127,19 @@ const taskSections = ['Rascunho', 'Publicadas', 'Encerradas'];
   .v-expansion-panel__shadow {
     display: none !important;
   }
+}
+
+.add-task-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.add-task-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.add-task-enter-from,
+.add-task-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 </style>
