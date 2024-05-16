@@ -28,6 +28,7 @@ const deadline = computed(() => {
 
 const differenceInDays = (date: Date, date2: Date) => {
   const date1 = new Date(date);
+  date1.setHours(23, 59, 59, 999);
   const diffTime = date1.getTime() - date2.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60));
 };
