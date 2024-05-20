@@ -23,6 +23,7 @@
           v-else
           :index="i"
           :tasks="tasks[i - 1]"
+          :filter="search"
         />
         <div v-if="i === 1" class="mb-4">
           <Transition mode="out-in" name="add-task">
@@ -73,6 +74,11 @@ interface TasksType {
     completed: number;
   };
 }
+
+const props = defineProps<{
+  // tasks: TasksType[];
+  search: string;
+}>();
 
 const expand = ref([0, 0, 0]);
 const isCreatingTask = ref(false);

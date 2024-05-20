@@ -15,6 +15,7 @@
           density="comfortable"
           name="search"
           hide-details
+          clearable
         />
         <alex-custom-button
           size="large"
@@ -24,7 +25,7 @@
         />
       </div>
       <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
-        <alex-learningplan-tasks-container />
+        <alex-learningplan-tasks-container :search="search" />
       </div>
     </div>
   </div>

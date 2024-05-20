@@ -5,6 +5,7 @@
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3"
     :items="tasks"
     :headers="header"
+    :search="filter"
   >
     <template #item="{ item }">
       <tr class="text-5 text-gray-600 text-no-wrap">
@@ -95,6 +96,7 @@ defineProps<{
       completed: number;
     };
   }[];
+  filter: string;
 }>();
 
 const dropDownItems = [
