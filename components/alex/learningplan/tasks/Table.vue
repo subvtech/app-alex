@@ -16,23 +16,33 @@
         </td>
         <td>
           <alex-learningplan-tasks-date-chip
+            v-if="item.deadline"
             :date="item.deadline"
             :is-published="item.status === 'published'"
           />
+          <span v-else>Indefinido</span>
         </td>
         <td>
-          <v-icon
-            class="mr-1"
-            :icon="
-              item.type === 'group'
-                ? 'mdi-account-multiple-outline'
-                : 'mdi-account-outline'
-            "
+          <div v-if="item.type">
+            <v-icon
+              class="mr-1"
+              :icon="
+                item.type === 'group'
+                  ? 'mdi-account-multiple-outline'
+                  : 'mdi-account-outline'
+              "
+            />
+            {{ item.type }}
+          </div>
+          <span v-else>Indefinido</span>
+        </td>
+        <td>
+          <alex-custom-avatar-group
+            v-if="item.students"
+            :avatar-items="item.students || []"
+            :max="3"
           />
-          {{ item.type }}
-        </td>
-        <td>
-          <alex-custom-avatar-group :avatar-items="item.students" :max="3" />
+          <span v-else>Nenhum</span>
         </td>
         <td>
           <alex-learningplan-tasks-task-submissions
@@ -86,9 +96,9 @@ defineProps<{
     id: number;
     status: string;
     name: string;
-    deadline: string;
-    type: string;
-    students: { name: string; image?: { url: string } }[];
+    deadline?: string;
+    type?: string;
+    students?: { name: string; image?: { url: string } }[];
     delivered?: {
       toDo: number;
       doing: number;

@@ -64,9 +64,9 @@ interface TasksType {
   id: number;
   status: string;
   name: string;
-  deadline: string;
-  type: string;
-  students: { name: string; image?: { url: string } }[];
+  deadline?: string;
+  type?: string;
+  students?: { name: string; image?: { url: string } }[];
   delivered?: {
     toDo: number;
     doing: number;
@@ -85,8 +85,11 @@ const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const handleCreateTask = () => {
   if (!taskTitle.value) return;
-  console.log('Criar tarefa', taskTitle.value);
-  console.log(taskTitle);
+  tasksArray.value.push({
+    id: Math.floor(Math.random() * 100),
+    name: taskTitle.value,
+    status: 'draft',
+  });
   taskTitle.value = '';
   isCreatingTask.value = false;
 };
@@ -161,7 +164,6 @@ onMounted(() => {
     tasks.forEach((task, index) => {
       tasksArray.value.push({ ...task, id: index + 1 });
     });
-    console.log(tasksArray);
   }, 1000);
 });
 
@@ -174,7 +176,6 @@ const tasks = computed(() => {
     if (task.status === 'published') published.push(task);
     if (task.status === 'closed') closed.push(task);
   });
-  console.log(draft, published, closed);
   return [draft, published, closed];
 });
 </script>
