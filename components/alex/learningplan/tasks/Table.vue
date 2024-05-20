@@ -1,6 +1,5 @@
 <template>
   <v-data-table
-    v-if="index == 1"
     sort-asc-icon="mdi-arrow-up-thin"
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3"
@@ -9,13 +8,15 @@
   >
     <template #item="{ item }">
       <tr class="text-5 text-gray-600 text-no-wrap">
-        <td class="text-body-4 text-gray-800 max-w-170 text-overflow text-left">
+        <td
+          class="text-body-4 text-gray-800 max-w-170 width-170 text-overflow text-left"
+        >
           {{ item.name }}
         </td>
         <td>
           <alex-learningplan-tasks-date-chip
             :date="item.deadline"
-            is-published
+            :is-published="item.status === 'published'"
           />
         </td>
         <td>
@@ -34,11 +35,8 @@
         </td>
         <td>
           <alex-learningplan-tasks-task-submissions
-            v-if="item.delivered >= 0"
-            :to-do="0"
-            :doing="0"
-            :under-review="0"
-            :completed="11"
+            v-if="item.delivered"
+            :submitted="item.delivered"
           />
           <div v-else>
             <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
@@ -80,8 +78,23 @@
 </template>
 
 <script setup lang="ts">
+// import { Task } from "@/models/task.model"
+
 defineProps<{
-  index: number;
+  tasks: {
+    id: number;
+    status: string;
+    name: string;
+    deadline: string;
+    type: string;
+    students: { name: string; image?: { url: string } }[];
+    delivered?: {
+      toDo: number;
+      doing: number;
+      underReview: number;
+      completed: number;
+    };
+  }[];
 }>();
 
 const dropDownItems = [
@@ -95,58 +108,6 @@ const header = [
   { title: 'Integrantes', key: 'students', sortable: false },
   { title: 'Entrega', key: 'delivered' },
   { title: '', key: 'actions', sortable: false },
-];
-
-const tasks = [
-  {
-    name: 'Criar um mapa mental sobre o vídeo',
-    deadline: '10/10/2024',
-    type: 'individual',
-    students: [
-      { name: 'João', avatar: 'https://picsum.photos/100/100' },
-      { name: 'Maria Santos' },
-    ],
-    delivered: 1,
-  },
-  {
-    name: 'Ler as páginas 9-12, 19-23 do livro',
-    deadline: '05/16/2024',
-    type: 'group',
-    students: [
-      { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-      { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-      { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-      { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-      { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-    ],
-    delivered: -1,
-  },
-  {
-    name: 'Criar uma protótipagem para a página de dashboard e depois assistir o jogo do Flamengo contra o bolivar que o flamengo tem que e vai ganhar pelo amor de Deus',
-    deadline: '05/11/2024',
-    type: 'group',
-    students: [
-      { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-      { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-      { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-      { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-      { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-    ],
-    delivered: -1,
-  },
-  {
-    name: 'Ser feliz né',
-    deadline: '05/17/2024',
-    type: 'group',
-    students: [
-      { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-      { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-      { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-      { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-      { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-    ],
-    delivered: -1,
-  },
 ];
 </script>
 

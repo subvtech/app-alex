@@ -1,5 +1,5 @@
 <template>
-  <div v-if="index !== 1" class="w-100 d-flex justify-center align-center pb-4">
+  <div class="w-100 d-flex justify-center align-center pb-4">
     <div class="py-4 pb-4">
       <v-img
         :src="taskSections[index - 1].image"

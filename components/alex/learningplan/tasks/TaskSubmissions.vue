@@ -2,7 +2,7 @@
   <HoverCard>
     <HoverCardTrigger>
       <v-icon icon="mdi-paperclip" />
-      {{ completed + underReview }}
+      {{ submitted.completed + submitted.underReview }}
       entregas
     </HoverCardTrigger>
     <HoverCardContent>
@@ -26,12 +26,13 @@
 
 <script setup lang="ts">
 interface Submissions {
-  toDo: number;
-  doing: number;
-  underReview: number;
-  completed: number;
+  submitted: {
+    toDo: number;
+    doing: number;
+    underReview: number;
+    completed: number;
+  };
 }
-
 type TaskStatus = {
   text: string;
   color: 'secondary' | 'blue' | 'orange' | 'green' | 'primary' | 'red';
@@ -39,22 +40,30 @@ type TaskStatus = {
 };
 
 const props = withDefaults(defineProps<Submissions>(), {
-  toDo: 0,
-  doing: 0,
-  underReview: 0,
-  completed: 0,
+  submitted: () => ({
+    toDo: 0,
+    doing: 0,
+    underReview: 0,
+    completed: 0,
+  }),
 });
 
 const taskStatus: TaskStatus[] = [
-  { text: 'A fazer', color: 'secondary', value: props.toDo },
-  { text: 'Fazendo', color: 'blue', value: props.doing },
-  { text: 'Em avaliação', color: 'orange', value: props.underReview },
-  { text: 'Concluída', color: 'green', value: props.completed },
+  { text: 'A fazer', color: 'secondary', value: props.submitted.toDo },
+  { text: 'Fazendo', color: 'blue', value: props.submitted.doing },
+  { text: 'Em avaliação', color: 'orange', value: props.submitted.underReview },
+  { text: 'Concluída', color: 'green', value: props.submitted.completed },
 ];
 
 const completedPercentage = computed(() => {
-  const total = props.toDo + props.doing + props.underReview + props.completed;
-  return total === 0 ? 0 : Math.round((props.completed / total) * 100);
+  const total =
+    props.submitted.toDo +
+    props.submitted.doing +
+    props.submitted.underReview +
+    props.submitted.completed;
+  return total === 0
+    ? 0
+    : Math.round((props.submitted.completed / total) * 100);
 });
 </script>
 
