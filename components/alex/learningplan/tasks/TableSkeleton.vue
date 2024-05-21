@@ -10,7 +10,7 @@
       :headers="header"
     >
       <template #body>
-        <tr v-for="i in 3" :key="i">
+        <tr v-for="table in 3" :key="table">
           <td class="max-w-170 width-170">
             <alex-custom-skeleton color="gray-300" class="w-100 height-5" />
           </td>
@@ -49,6 +49,11 @@
       </template>
       <template #bottom></template>
     </v-data-table>
+    <alex-custom-skeleton
+      v-if="i === 1"
+      color="gray-200"
+      class="w-100 height-11 rounded-lg"
+    />
   </div>
 </template>
 

@@ -33,8 +33,14 @@
     </div>
 
     <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
-      <alex-learningplan-tasks-table-skeleton v-if="isLoading" />
-      <alex-learningplan-tasks-container v-else :search="search" />
+      <Transition name="fade" mode="out-in">
+        <div v-if="isLoading">
+          <alex-learningplan-tasks-table-skeleton />
+        </div>
+        <div v-else>
+          <alex-learningplan-tasks-container :search="search" />
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
@@ -98,5 +104,15 @@ watch(
 
 .wrapper {
   min-height: calc(100vh - 548px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
