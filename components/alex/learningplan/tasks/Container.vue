@@ -12,7 +12,10 @@
           @click="toggleExpand(i)"
         />
         <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
-        <alex-custom-chip status="secondary" text="0"></alex-custom-chip>
+        <alex-custom-chip
+          status="secondary"
+          :text="tasks[i - 1].length.toString()"
+        ></alex-custom-chip>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <alex-learningplan-tasks-empty-state
@@ -107,74 +110,72 @@ const taskSections = [
 const tasksArray = ref<TasksType[]>([]);
 
 onMounted(() => {
-  setTimeout(() => {
-    const tasks = [
-      {
-        name: 'Criar um mapa mental sobre o vídeo',
-        deadline: '10/10/2024',
-        status: 'draft',
-        type: 'individual',
-        students: [
-          { name: 'João', image: { url: 'https://picsum.photos/100/100' } },
-          { name: 'Maria Santos' },
-        ],
-        delivered: {
-          toDo: 1,
-          doing: 1,
-          underReview: 2,
-          completed: 6,
-        },
+  const tasks = [
+    {
+      name: 'Criar um mapa mental sobre o vídeo',
+      deadline: '10/10/2024',
+      status: 'draft',
+      type: 'individual',
+      students: [
+        { name: 'João', image: { url: 'https://picsum.photos/100/100' } },
+        { name: 'Maria Santos' },
+      ],
+      delivered: {
+        toDo: 1,
+        doing: 1,
+        underReview: 2,
+        completed: 6,
       },
-      {
-        name: 'Ler as páginas 9-12, 19-23 do livro',
-        deadline: '05/16/2024',
-        status: 'published',
-        type: 'group',
-        students: [
-          { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-          { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-          { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-          { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-          { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-        ],
-        delivered: {
-          toDo: 1,
-          doing: 1,
-          underReview: 2,
-          completed: 6,
-        },
+    },
+    {
+      name: 'Ler as páginas 9-12, 19-23 do livro',
+      deadline: '05/16/2024',
+      status: 'published',
+      type: 'group',
+      students: [
+        { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
+        { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
+        { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
+        { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
+        { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
+      ],
+      delivered: {
+        toDo: 1,
+        doing: 1,
+        underReview: 2,
+        completed: 6,
       },
-      {
-        name: 'Criar uma protótipagem para a página de dashboard e depois assistir o jogo do Flamengo contra o bolivar que o flamengo tem que e vai ganhar pelo amor de Deus',
-        deadline: '05/11/2024',
-        status: 'published',
-        type: 'group',
-        students: [
-          { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-          { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-          { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-          { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-          { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-        ],
-      },
-      {
-        name: 'Ser feliz né',
-        deadline: '05/17/2024',
-        status: 'closed',
-        type: 'group',
-        students: [
-          { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-          { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-          { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-          { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-          { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-        ],
-      },
-    ];
-    tasks.forEach((task, index) => {
-      tasksArray.value.push({ ...task, id: index + 1 });
-    });
-  }, 1000);
+    },
+    {
+      name: 'Criar uma protótipagem para a página de dashboard e depois assistir o jogo do Flamengo contra o bolivar que o flamengo tem que e vai ganhar pelo amor de Deus',
+      deadline: '05/11/2024',
+      status: 'published',
+      type: 'group',
+      students: [
+        { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
+        { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
+        { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
+        { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
+        { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
+      ],
+    },
+    {
+      name: 'Ser feliz né',
+      deadline: '05/17/2024',
+      status: 'closed',
+      type: 'group',
+      students: [
+        { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
+        { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
+        { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
+        { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
+        { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
+      ],
+    },
+  ];
+  tasks.forEach((task, index) => {
+    tasksArray.value.push({ ...task, id: index + 1 });
+  });
 });
 
 const tasks = computed(() => {

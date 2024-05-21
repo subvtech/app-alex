@@ -1,32 +1,40 @@
 <template>
   <div class="bg-white rounded wrapper">
-    <div v-if="learningPlanStore.loading" class="pa-12">
-      <alex-custom-skeleton color="gray-300" class="w-100 height-96" />
+    <div
+      v-if="isLoading"
+      class="w-100 d-flex justify-space-between align-center height-18 header px-6"
+    >
+      <alex-custom-skeleton
+        color="gray-300"
+        class="w-100 max-w-80 mr-6 min-w-60 height-11"
+      />
+      <alex-custom-skeleton color="gray-300" class="w-100 max-w-11 height-11" />
     </div>
-    <div v-else>
-      <div
-        class="w-100 d-flex justify-space-between align-center height-18 header px-6"
-      >
-        <alex-inputs-text-field
-          v-model="search"
-          :placeholder="t('pages.task.searchPlaceholder')"
-          prepend-inner-icon="mdi-magnify"
-          class="w-100 max-w-80 mr-6 min-w-60"
-          density="comfortable"
-          name="search"
-          hide-details
-          clearable
-        />
-        <alex-custom-button
-          size="large"
-          icon="mdi-filter-variant"
-          variant="secondary"
-          @click="console.log('filter')"
-        />
-      </div>
-      <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
-        <alex-learningplan-tasks-container :search="search" />
-      </div>
+    <div
+      v-else
+      class="w-100 d-flex justify-space-between align-center height-18 header px-6"
+    >
+      <alex-inputs-text-field
+        v-model="search"
+        :placeholder="t('pages.task.searchPlaceholder')"
+        prepend-inner-icon="mdi-magnify"
+        class="w-100 max-w-80 mr-6 min-w-60"
+        density="comfortable"
+        name="search"
+        hide-details
+        clearable
+      />
+      <alex-custom-button
+        size="large"
+        icon="mdi-filter-variant"
+        variant="secondary"
+        @click="console.log('filter')"
+      />
+    </div>
+
+    <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
+      <alex-learningplan-tasks-table-skeleton v-if="isLoading" />
+      <alex-learningplan-tasks-container v-else :search="search" />
     </div>
   </div>
 </template>
@@ -37,10 +45,18 @@ const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const { id } = route.params;
 
+const isLoading = ref(true);
+
 const search = ref('');
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
+});
+
+onMounted(() => {
+  setTimeout(() => {
+    isLoading.value = false;
+  }, 2000);
 });
 
 watch(

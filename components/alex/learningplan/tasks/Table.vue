@@ -51,11 +51,12 @@
             }}</span>
           </td>
           <td>
-            <alex-custom-avatar-group
-              v-if="item.students"
-              :avatar-items="item.students || []"
-              :max="3"
-            />
+            <div v-if="item.students" class="ml-2">
+              <alex-custom-avatar-group
+                :avatar-items="item.students || []"
+                :max="3"
+              />
+            </div>
             <span v-else>{{
               $t('pages.task.table.placeholders.noMembers')
             }}</span>
