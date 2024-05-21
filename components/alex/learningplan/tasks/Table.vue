@@ -26,7 +26,9 @@
               :date="item.deadline"
               :is-published="item.status === 'published'"
             />
-            <span v-else>Indefinido</span>
+            <span v-else>{{
+              $t('pages.task.table.placeholders.undefined')
+            }}</span>
           </td>
           <td>
             <div v-if="item.type">
@@ -38,9 +40,15 @@
                     : 'mdi-account-outline'
                 "
               />
-              {{ item.type }}
+              <span>{{
+                item.type === 'group'
+                  ? $t('pages.task.table.type.group')
+                  : $t('pages.task.table.type.individual')
+              }}</span>
             </div>
-            <span v-else>Indefinido</span>
+            <span v-else>{{
+              $t('pages.task.table.placeholders.undefined')
+            }}</span>
           </td>
           <td>
             <alex-custom-avatar-group
@@ -48,7 +56,9 @@
               :avatar-items="item.students || []"
               :max="3"
             />
-            <span v-else>Nenhum</span>
+            <span v-else>{{
+              $t('pages.task.table.placeholders.noMembers')
+            }}</span>
           </td>
           <td>
             <alex-learningplan-tasks-task-submissions
@@ -57,11 +67,14 @@
             />
             <div v-else>
               <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
-              <span>Sem entrega</span>
+              <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
             </div>
           </td>
           <td class="d-flex align-center">
-            <v-tooltip text="Ver kanban" location="bottom">
+            <v-tooltip
+              :text="t('pages.task.table.tooltips.kanban')"
+              location="bottom center"
+            >
               <template #activator="{ props }">
                 <alex-custom-button
                   v-bind="props"
@@ -76,7 +89,10 @@
               prepend-icon="mdi-dots-vertical"
             >
               <template #activator="{ props: propsMenu }">
-                <v-tooltip text="Opções" location="bottom center">
+                <v-tooltip
+                  :text="t('pages.task.table.tooltips.options')"
+                  location="bottom center"
+                >
                   <template #activator="{ props: optionsTooltipProps }">
                     <alex-custom-button
                       variant="text"
@@ -92,7 +108,7 @@
       </transition-group>
       <tr v-if="!items.length">
         <td :colspan="headers[0].length" class="text-center">
-          Nenhuma tarefa encontrada
+          {{ $t('pages.task.table.placeholders.noTasks') }}
         </td>
       </tr>
     </template>
@@ -131,6 +147,7 @@ const props = defineProps<{
   }[];
   filter: string;
 }>();
+const { t } = useI18n();
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',
 );
@@ -154,7 +171,7 @@ const confirmDelete = () => {
 const dropDownItems = (index: number, type: string) => {
   const items = [
     {
-      text: 'Ver kanban',
+      text: t('pages.task.table.dropdown.kanban'),
       onClick: () => console.log('kanban', index),
       warning: false,
     },
@@ -168,7 +185,7 @@ const dropDownItems = (index: number, type: string) => {
     )
   ) {
     items.push({
-      text: 'Excluir',
+      text: t('pages.task.table.dropdown.delete'),
       warning: true,
       onClick: () => {
         taskToDelete.value = tasksArray.value[index].id;
@@ -180,11 +197,15 @@ const dropDownItems = (index: number, type: string) => {
 };
 
 const header = [
-  { title: 'Nome', key: 'name', sortable: true },
-  { title: 'Prazo', key: 'deadline' },
-  { title: 'Tipo', key: 'type' },
-  { title: 'Integrantes', key: 'students', sortable: false },
-  { title: 'Entrega', key: 'delivered' },
+  { title: t('pages.task.table.header.name'), key: 'name' },
+  { title: t('pages.task.table.header.deadline'), key: 'deadline' },
+  { title: t('pages.task.table.header.type'), key: 'type' },
+  {
+    title: t('pages.task.table.header.members'),
+    key: 'students',
+    sortable: false,
+  },
+  { title: t('pages.task.table.header.delivery'), key: 'delivered' },
   { title: '', key: 'actions', sortable: false },
 ];
 </script>

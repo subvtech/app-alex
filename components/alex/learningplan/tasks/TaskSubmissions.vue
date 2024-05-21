@@ -3,11 +3,17 @@
     <HoverCardTrigger>
       <v-icon icon="mdi-paperclip" />
       {{ submitted.completed + submitted.underReview }}
-      entregas
+      {{
+        submitted.completed + submitted.underReview > 1
+          ? $t('pages.task.submissions.deliveries')
+          : $t('pages.task.submissions.delivery')
+      }}
     </HoverCardTrigger>
     <HoverCardContent>
       <div class="d-flex justify-space-between pb-4 divider-row">
-        <span class="text-gray-800 text-h5">Progresso</span>
+        <span class="text-gray-800 text-h5">{{
+          $t('pages.task.submissions.progress')
+        }}</span>
         <span class="text-secondary-0 text-h5">{{ completedPercentage }}%</span>
       </div>
       <div class="d-flex ga-4 flex-column mt-4 text-gray-600 text-body-1">
@@ -17,7 +23,11 @@
             :text="taskStatus[i - 1].text"
           />
           {{ taskStatus[i - 1].value }}
-          Alunos
+          {{
+            taskStatus[i - 1].value > 1
+              ? $t('pages.task.submissions.students')
+              : $t('pages.task.submissions.student')
+          }}
         </span>
       </div>
     </HoverCardContent>
@@ -39,6 +49,7 @@ type TaskStatus = {
   value: number;
 };
 
+const { t } = useI18n();
 const props = withDefaults(defineProps<Submissions>(), {
   submitted: () => ({
     toDo: 0,
@@ -49,10 +60,26 @@ const props = withDefaults(defineProps<Submissions>(), {
 });
 
 const taskStatus: TaskStatus[] = [
-  { text: 'A fazer', color: 'secondary', value: props.submitted.toDo },
-  { text: 'Fazendo', color: 'blue', value: props.submitted.doing },
-  { text: 'Em avaliação', color: 'orange', value: props.submitted.underReview },
-  { text: 'Concluída', color: 'green', value: props.submitted.completed },
+  {
+    text: t('pages.task.submissions.toDo'),
+    color: 'secondary',
+    value: props.submitted.toDo,
+  },
+  {
+    text: t('pages.task.submissions.doing'),
+    color: 'blue',
+    value: props.submitted.doing,
+  },
+  {
+    text: t('pages.task.submissions.underReview'),
+    color: 'orange',
+    value: props.submitted.underReview,
+  },
+  {
+    text: t('pages.task.submissions.done'),
+    color: 'green',
+    value: props.submitted.completed,
+  },
 ];
 
 const completedPercentage = computed(() => {

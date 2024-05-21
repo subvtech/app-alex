@@ -9,7 +9,7 @@
       >
         <alex-inputs-text-field
           v-model="search"
-          placeholder="Encontrar tarefa"
+          :placeholder="t('pages.task.searchPlaceholder')"
           prepend-inner-icon="mdi-magnify"
           class="w-100 max-w-80 mr-6 min-w-60"
           density="comfortable"

@@ -11,21 +11,23 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 defineProps<{
   index: number;
 }>();
 
 const taskSections = [
   {
-    text: 'Nenhuma tarefa em rascunho!',
+    text: t('pages.task.emptyState.draft'),
     image: '/images/emptyDraftTasks.svg',
   },
   {
-    text: 'Nenhuma tarefa publicada!',
+    text: t('pages.task.emptyState.published'),
     image: '/images/emptyPublishedTasks.svg',
   },
   {
-    text: 'Nenhuma tarefa encerrada!',
+    text: t('pages.task.emptyState.done'),
     image: '/images/emptyFinishedTasks.svg',
   },
 ];

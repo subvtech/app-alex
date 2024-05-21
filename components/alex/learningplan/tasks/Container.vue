@@ -36,12 +36,12 @@
               class="w-100 create-task-btn"
               @click="isCreatingTask = true"
             >
-              Adicionar tarefa
+              {{ $t('pages.task.add') }}
             </alex-custom-button>
             <div v-else class="d-flex ga-2">
               <alex-inputs-text-field
                 v-model="taskTitle"
-                placeholder="Digite o titulo da tarefa"
+                :placeholder="t('pages.task.addPlaceholder')"
                 class="w-100"
                 density="comfortable"
                 name="taskTitle"
@@ -49,7 +49,7 @@
                 @keyup.enter="handleCreateTask"
               />
               <alex-custom-button size="large" @click="handleCreateTask">
-                Adicionar
+                {{ $t('pages.task.addButton') }}
               </alex-custom-button>
             </div>
           </Transition>
@@ -79,7 +79,7 @@ interface TasksType {
 defineProps<{
   search: string;
 }>();
-
+const { t } = useI18n();
 const expand = ref([0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
@@ -98,7 +98,11 @@ const toggleExpand = (index: number) => {
   taskTitle.value = '';
   expand.value[index - 1] = !expand.value[index - 1] ? -1 : 0;
 };
-const taskSections = ['Rascunho', 'Publicadas', 'Encerradas'];
+const taskSections = [
+  t('pages.task.draft'),
+  t('pages.task.published'),
+  t('pages.task.done'),
+];
 
 const tasksArray = ref<TasksType[]>([]);
 

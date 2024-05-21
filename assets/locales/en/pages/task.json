@@ -1,0 +1,53 @@
+{
+    "searchPlaceholder": "Find task",
+    "draft": "Draft",
+    "published": "Published",
+    "done": "Closed",
+    "emptyState": {
+      "draft": "No tasks in draft!",
+      "published": "No published tasks!",
+      "done": "No closed tasks!"
+    },
+    "submissions": {
+      "toDo": "To Do",
+      "doing": "Doing",
+      "underReview": "Under Review",
+      "done": "Done",
+      "progress": "Progress",
+      "deliveries": "Deliveries",
+      "delivery": "Delivery",
+      "noSubmissions": "No submissions",
+      "student": "Student",
+      "students": "Students"
+    },
+    "table": {
+      "header": {
+        "name": "Name",
+        "deadline": "Deadline",
+        "type": "Type",
+        "members": "Members",
+        "delivery": "Delivery"
+      },
+      "type": {
+        "individual": "Individual",
+        "group": "Group"
+      },
+      "placeholders": {
+        "undefined": "Undefined",
+        "noMembers": "None",
+        "noTasks": "No tasks found"
+      },
+      "dropdown": {
+        "kanban": "View Kanban",
+        "delete": "Delete"
+      },
+      "tooltips": {
+        "options": "Options",
+        "kanban": "View Kanban"
+      },
+      "add": "Add task",
+      "addPlaceholder": "Enter the task title",
+      "addButton": "Add"
+    }
+  }
+  

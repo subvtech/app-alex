@@ -1,0 +1,52 @@
+{
+  "searchPlaceholder": "Encontrar a tarefa",
+  "draft": "Rascunho",
+  "published": "Publicadas",
+  "done": "Encerradas",
+  "emptyState": {
+    "draft": "Nenhuma tarefa em rascunho!",
+    "published": "Nenhuma tarefa publicada!",
+    "done": "Nenhuma tarefa encerrada!"
+  },
+  "submissions": {
+    "toDo": "A fazer",
+    "doing": "Fazendo",
+    "underReview": "Em avaliação",
+    "done": "Concluído",
+    "progress": "Progresso",
+    "deliveries": "Entregas",
+    "delivery": "Entrega",
+    "noSubmissions": "Sem entrega",
+    "student": "Aluno",
+    "students": "Alunos"
+  },
+  "table": {
+    "header": {
+      "name": "Nome",
+      "deadline": "Prazo",
+      "type": "Tipo",
+      "members": "Integrantes",
+      "delivery": "Entrega"
+    },
+    "type": {
+      "individual": "Individual",
+      "group": "Grupo"
+    },
+    "placeholders": {
+      "undefined": "Indefinido",
+      "noMembers": "Nenhum",
+      "noTasks": "Nenhuma tarefa encontrada"
+    },
+    "dropdown": {
+      "kanban": "Ver Kanban",
+      "delete": "Excluir"
+    },
+    "tooltips": {
+      "options": "Opções",
+      "kanban": "Ver Kanban"
+    }
+  },
+  "add": "Adicionar tarefa",
+  "addPlaceholder": "Digite o título da tarefa",
+  "addButton": "Adicionar"
+}
