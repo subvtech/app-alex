@@ -24,6 +24,7 @@
           :index="i"
           :tasks="tasks[i - 1]"
           :filter="search"
+          @delete-task="handleDeleteTask"
         />
         <div v-if="i === 1" class="mb-4">
           <Transition mode="out-in" name="add-task">
@@ -75,8 +76,7 @@ interface TasksType {
   };
 }
 
-const props = defineProps<{
-  // tasks: TasksType[];
+defineProps<{
   search: string;
 }>();
 
@@ -114,6 +114,12 @@ onMounted(() => {
           { name: 'João', image: { url: 'https://picsum.photos/100/100' } },
           { name: 'Maria Santos' },
         ],
+        delivered: {
+          toDo: 1,
+          doing: 1,
+          underReview: 2,
+          completed: 6,
+        },
       },
       {
         name: 'Ler as páginas 9-12, 19-23 do livro',
@@ -178,6 +184,10 @@ const tasks = computed(() => {
   });
   return [draft, published, closed];
 });
+
+const handleDeleteTask = (id: number) => {
+  tasksArray.value = tasksArray.value.filter((task) => task.id !== id);
+};
 </script>
 
 <style>
@@ -238,16 +248,11 @@ const tasks = computed(() => {
 }
 
 .add-task-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.add-task-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.5s ease-in-out;
 }
 
 .add-task-enter-from,
 .add-task-leave-to {
-  transform: translateX(20px);
   opacity: 0;
 }
 </style>
