@@ -3,7 +3,7 @@
     v-for="i in 3"
     :key="i"
     v-model="expand[i - 1]"
-    class="task-accordion"
+    class="task-accordion my-6 rounded-lg border-sm"
   >
     <v-expansion-panel>
       <v-expansion-panel-title class="cursor-default" disabled hide-actions>
@@ -14,18 +14,18 @@
         <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
         <alex-custom-chip
           status="secondary"
-          :text="tasks[i - 1].length.toString()"
+          :text="tasksArray[i - 1].length.toString()"
         ></alex-custom-chip>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <alex-learningplan-tasks-empty-state
-          v-if="!tasks[i - 1].length"
+          v-if="!tasksArray[i - 1].length"
           :index="i"
         />
         <alex-learningplan-tasks-table
           v-else
           :index="i"
-          :tasks="tasks[i - 1]"
+          :tasks="tasksArray[i - 1]"
           :filter="search"
           @delete-task="handleDeleteTask"
         />
@@ -63,15 +63,15 @@
 </template>
 
 <script setup lang="ts">
-// import { Task } from "@/models/task.model"
-interface TasksType {
+// import { Task } from '@/models/task.model';
+export interface TaskType {
   id: number;
+  title: string;
   status: string;
-  name: string;
-  deadline?: string;
+  deadline_at: string;
   type?: string;
-  students?: { name: string; image?: { url: string } }[];
-  delivered?: {
+  students?: { name: string; avatar: { url: string } }[];
+  delivered: {
     toDo: number;
     doing: number;
     underReview: number;
@@ -82,17 +82,33 @@ interface TasksType {
 defineProps<{
   search: string;
 }>();
+
+const { create, delete: _delete } = useStrapi();
 const { t } = useI18n();
 const expand = ref([0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
-const handleCreateTask = () => {
+const route = useRoute();
+const { setMessage } = useMessageStore();
+const learningPlanStore = useLearningPlanStore();
+
+const handleCreateTask = async () => {
   if (!taskTitle.value) return;
-  tasksArray.value.push({
-    id: Math.floor(Math.random() * 100),
-    name: taskTitle.value,
+  learningPlanStore.learningPlan?.tasks.push({
+    title: taskTitle.value,
     status: 'draft',
   });
+  try {
+    const res = await create('tasks', {
+      title: taskTitle.value,
+      status: 'draft',
+      learningplan: route.params.id,
+      start_at: new Date(),
+    });
+    setMessage('Tarefa criada com sucesso', 'success', true);
+  } catch (e) {
+    setMessage('Erro ao criar a tarefa', 'error', true);
+  }
   taskTitle.value = '';
   isCreatingTask.value = false;
 };
@@ -107,91 +123,60 @@ const taskSections = [
   t('pages.task.done'),
 ];
 
-const tasksArray = ref<TasksType[]>([]);
+const tasksArray = computed(() => {
+  const draft: TaskType[] = [];
+  const published: TaskType[] = [];
+  const closed: TaskType[] = [];
 
-onMounted(() => {
-  const tasks = [
-    {
-      name: 'Criar um mapa mental sobre o vídeo',
-      deadline: '10/10/2024',
-      status: 'draft',
-      type: 'individual',
-      students: [
-        { name: 'João', image: { url: 'https://picsum.photos/100/100' } },
-        { name: 'Maria Santos' },
-      ],
-      delivered: {
-        toDo: 1,
-        doing: 1,
-        underReview: 2,
-        completed: 6,
-      },
-    },
-    {
-      name: 'Ler as páginas 9-12, 19-23 do livro',
-      deadline: '05/16/2024',
-      status: 'published',
-      type: 'group',
-      students: [
-        { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-        { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-        { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-        { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-        { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-      ],
-      delivered: {
-        toDo: 1,
-        doing: 1,
-        underReview: 2,
-        completed: 6,
-      },
-    },
-    {
-      name: 'Criar uma protótipagem para a página de dashboard e depois assistir o jogo do Flamengo contra o bolivar que o flamengo tem que e vai ganhar pelo amor de Deus',
-      deadline: '05/11/2024',
-      status: 'published',
-      type: 'group',
-      students: [
-        { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-        { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-        { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-        { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-        { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-      ],
-    },
-    {
-      name: 'Ser feliz né',
-      deadline: '05/17/2024',
-      status: 'closed',
-      type: 'group',
-      students: [
-        { name: 'João', image: { url: 'https://picsum.photos/110/100' } },
-        { name: 'Maria', image: { url: 'https://picsum.photos/100/110' } },
-        { name: 'José', image: { url: 'https://picsum.photos/110/105' } },
-        { name: 'Ana', image: { url: 'https://picsum.photos/120/100}' } },
-        { name: 'Carlos', image: { url: 'https://picsum.photos/100/120}' } },
-      ],
-    },
-  ];
-  tasks.forEach((task, index) => {
-    tasksArray.value.push({ ...task, id: index + 1 });
-  });
-});
+  learningPlanStore.learningPlan?.tasks.forEach((task) => {
+    const delivered = {
+      toDo: 0,
+      doing: 0,
+      underReview: 0,
+      completed: 0,
+    };
 
-const tasks = computed(() => {
-  const draft: TasksType[] = [];
-  const published: TasksType[] = [];
-  const closed: TasksType[] = [];
-  tasksArray.value.forEach((task) => {
-    if (task.status === 'draft') draft.push(task);
-    if (task.status === 'published') published.push(task);
-    if (task.status === 'closed') closed.push(task);
+    const students = task.task_members.map((student) => {
+      if (student.status === 'to_do') delivered.toDo += 1;
+      if (student.status === 'in_progress') delivered.doing += 1;
+      if (student.status === 'in_review') delivered.underReview += 1;
+      if (student.status === 'done') delivered.completed += 1;
+      return {
+        name: student.student_member.user.fullname,
+        avatar: { url: student.student_member.user.avatar.url },
+      };
+    });
+
+    const taskItem = {
+      id: task.id,
+      title: task.title,
+      status: task.status,
+      deadline_at: task.deadline_at,
+      start_at: task.start_at,
+      type: task.type,
+      students,
+      delivered,
+    };
+
+    if (task.status === 'draft') draft.push(taskItem);
+    if (task.status === 'published') published.push(taskItem);
+    if (task.status === 'closed') closed.push(taskItem);
   });
   return [draft, published, closed];
 });
 
-const handleDeleteTask = (id: number) => {
-  tasksArray.value = tasksArray.value.filter((task) => task.id !== id);
+const handleDeleteTask = async (id: number) => {
+  try {
+    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex(
+      (task) => task.id === id,
+    );
+    if (typeof deleteIndex === 'number' && deleteIndex > -1) {
+      learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
+    }
+    await _delete('tasks', id);
+  } catch (e) {
+    console.log(e);
+  }
 };
 </script>
 

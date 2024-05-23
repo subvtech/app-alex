@@ -18,12 +18,12 @@
           <td
             class="text-body-4 text-gray-800 max-w-170 width-170 text-overflow text-left"
           >
-            {{ item.name }}
+            {{ item.title }}
           </td>
           <td>
             <alex-learningplan-tasks-date-chip
-              v-if="item.deadline"
-              :date="item.deadline"
+              v-if="item.deadline_at"
+              :date="item.deadline_at"
               :is-published="item.status === 'published'"
             />
             <span v-else>{{
@@ -51,7 +51,7 @@
             }}</span>
           </td>
           <td>
-            <div v-if="item.students" class="ml-2">
+            <div v-if="item.students?.length" class="ml-2">
               <alex-custom-avatar-group
                 :avatar-items="item.students || []"
                 :max="3"
@@ -115,6 +115,7 @@
     </template>
     <template #bottom></template>
   </v-data-table>
+  <!-- add i18n -->
   <alex-custom-confirm-dialog
     v-model="deleteModal"
     variant="error"
@@ -130,24 +131,15 @@
 </template>
 
 <script setup lang="ts">
-// import { Task } from "@/models/task.model"
+import { TaskType } from './Container.vue';
+
 const props = defineProps<{
-  tasks: {
-    id: number;
-    status: string;
-    name: string;
-    deadline?: string;
-    type?: string;
-    students?: { name: string; image?: { url: string } }[];
-    delivered?: {
-      toDo: number;
-      doing: number;
-      underReview: number;
-      completed: number;
-    };
-  }[];
+  tasks: TaskType[];
   filter: string;
 }>();
+
+console.log(props.tasks);
+
 const { t } = useI18n();
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',

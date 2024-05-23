@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded wrapper">
     <div
-      v-if="isLoading"
+      v-if="learningPlanStore.loading"
       class="w-100 d-flex justify-space-between align-center height-18 header px-6"
     >
       <alex-custom-skeleton
@@ -34,7 +34,7 @@
 
     <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
       <Transition name="fade" mode="out-in">
-        <div v-if="isLoading">
+        <div v-if="learningPlanStore.loading">
           <alex-learningplan-tasks-table-skeleton />
         </div>
         <div v-else>
@@ -51,18 +51,10 @@ const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const { id } = route.params;
 
-const isLoading = ref(true);
-
 const search = ref('');
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
-});
-
-onMounted(() => {
-  setTimeout(() => {
-    isLoading.value = false;
-  }, 2000);
 });
 
 watch(
