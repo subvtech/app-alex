@@ -84,12 +84,14 @@
         {{ $t('components.learningPlan.drawer.task.submission.label') }}
       </p>
       <v-row class="mx-0 mt-3 mb-4">
+      <v-row class="mx-0 mt-3 mb-4">
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="hasSubmission"
             :label="
               $t('components.learningPlan.drawer.task.submission.reqSubmission')
             "
+          />
           />
         </v-col>
         <v-col class="pa-0 d-flex align-center" cols="6">
@@ -98,6 +100,7 @@
             :label="
               $t('components.learningPlan.drawer.task.submission.aftrDeadline')
             "
+          />
           />
         </v-col>
         <v-col class="mt-4 pa-0" cols="12"
@@ -117,6 +120,8 @@
             $t('components.learningPlan.drawer.task.learningResources.label')
           }}
         </p>
+        <alex-custom-button
+          prepend-icon="alex:trail"
         <alex-custom-button
           prepend-icon="alex:trail"
           :text="
@@ -145,6 +150,10 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
+
+// Date picker
+const startDate = ref(null);
+const finalDate = ref(null);
 
 interface TaskTeacherDrawerProps {
   title: string;
@@ -207,4 +216,48 @@ function handleCloseModal() {
 }
 </script>
 
-<style></style>
+<style scoped>
+/** Estilização da página */
+.text-p3 {
+  /* Body/P3 */
+  font-family: Sen;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 135%; /* 18.9px */
+  letter-spacing: 0.28px;
+}
+
+.text-p4 {
+  /* Body/P4 */
+  font-family: Sen;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 135%; /* 18.9px */
+  letter-spacing: 0.28px;
+}
+</style>
+
+<style>
+/** Override do v-switch */
+.switches .v-switch.v-switch--inset .v-selection-control__wrapper {
+  /** Para de comprimir o input */
+  width: auto !important;
+}
+
+.switches .v-input__details {
+  /** Remove espaços desnecessários */
+  display: none !important;
+}
+
+.switches .v-switch__thumb {
+  /** Para de mudar a aparência do toggle ao selecionar */
+  transform: none !important;
+}
+
+.switches .v-selection-control__wrapper {
+  /** Alinha o componente ao resto do drawer */
+  margin-left: 0 !important;
+}
+</style>
