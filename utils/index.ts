@@ -58,3 +58,9 @@ export const sleep = (ms: number) =>
 export const capitalize = (value: string) => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
+
+export function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
