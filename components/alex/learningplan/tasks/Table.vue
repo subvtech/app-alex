@@ -115,15 +115,14 @@
     </template>
     <template #bottom></template>
   </v-data-table>
-  <!-- add i18n -->
   <alex-custom-confirm-dialog
     v-model="deleteModal"
     variant="error"
     :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-    title="Realmente deseja excluir essa Tarefa?"
-    subtitle="Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído."
-    submit-button-text="Excluir"
-    cancel-button-text="Cancelar"
+    :title="t('pages.task.deleteModal.title')"
+    :subtitle="t('pages.task.deleteModal.subtitle')"
+    :submit-button-text="t('pages.task.deleteModal.delete')"
+    :cancel-button-text="t('pages.task.deleteModal.cancel')"
     no-input-confirmation
     @submit="confirmDelete"
     @cancel="cancelDelete"

@@ -46,6 +46,21 @@
       "kanban": "Ver Kanban"
     }
   },
+  "crud": {
+    "addSuccess": "Tarefa criada com sucesso!",
+    "editSuccess": "Tarefa editada com sucesso!",
+    "deleteSuccess": "Tarefa excluída com sucesso!",
+    "addError": "Erro ao criar tarefa, tente novamente!",
+    "editError": "Erro ao editar tarefa, tente novamente!",
+    "deleteError": "Erro ao excluir tarefa, tente novamente!"
+  },
+  "deleteModal": {
+    "title": "Realmente deseja excluir essa Tarefa?",
+    "subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
+  },
+
   "add": "Adicionar tarefa",
   "addPlaceholder": "Digite o título da tarefa",
   "addButton": "Adicionar"

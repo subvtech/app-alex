@@ -108,9 +108,9 @@ const handleCreateTask = async () => {
       start_at: new Date(),
     });
     learningPlanStore.learningPlan?.tasks.push(res.data.attributes);
-    setMessage('Tarefa criada com sucesso', 'success', true);
+    setMessage(t('pages.task.crud.addSuccess'), 'success', true);
   } catch (e) {
-    setMessage('Erro ao criar a tarefa', 'error', true);
+    setMessage(t('pages.task.crud.addError'), 'error', true);
   }
   loader.value = false;
   taskTitle.value = '';
@@ -177,10 +177,10 @@ const handleDeleteTask = async (id: number) => {
     if (typeof deleteIndex === 'number' && deleteIndex > -1) {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
     }
-    await _delete('tasks', 123908);
-    setMessage('Tarefa deletada com sucesso', 'success', true);
+    await _delete('tasks', id);
+    setMessage(t('pages.task.crud.deleteSuccess'), 'success', true);
   } catch (e) {
-    setMessage('Erro ao deletar a tarefa', 'error', true);
+    setMessage(t('pages.task.crud.deleteError'), 'error', true);
     if (learningPlanStore.learningPlan)
       learningPlanStore.loadLearningPlan(
         learningPlanStore.learningPlan.id,

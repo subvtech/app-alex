@@ -1,53 +1,66 @@
 {
-    "searchPlaceholder": "Find task",
-    "draft": "Draft",
-    "published": "Published",
-    "done": "Closed",
-    "emptyState": {
-      "draft": "No tasks in draft!",
-      "published": "No published tasks!",
-      "done": "No closed tasks!"
+  "searchPlaceholder": "Find task",
+  "draft": "Draft",
+  "published": "Published",
+  "done": "Closed",
+  "emptyState": {
+    "draft": "No tasks in draft!",
+    "published": "No published tasks!",
+    "done": "No closed tasks!"
+  },
+  "submissions": {
+    "toDo": "To Do",
+    "doing": "Doing",
+    "underReview": "Under Review",
+    "done": "Done",
+    "progress": "Progress",
+    "deliveries": "Deliveries",
+    "delivery": "Delivery",
+    "noSubmissions": "No submissions",
+    "student": "Student",
+    "students": "Students"
+  },
+  "table": {
+    "header": {
+      "name": "Name",
+      "deadline": "Deadline",
+      "type": "Type",
+      "members": "Members",
+      "delivery": "Delivery"
     },
-    "submissions": {
-      "toDo": "To Do",
-      "doing": "Doing",
-      "underReview": "Under Review",
-      "done": "Done",
-      "progress": "Progress",
-      "deliveries": "Deliveries",
-      "delivery": "Delivery",
-      "noSubmissions": "No submissions",
-      "student": "Student",
-      "students": "Students"
+    "type": {
+      "individual": "Individual",
+      "group": "Group"
     },
-    "table": {
-      "header": {
-        "name": "Name",
-        "deadline": "Deadline",
-        "type": "Type",
-        "members": "Members",
-        "delivery": "Delivery"
-      },
-      "type": {
-        "individual": "Individual",
-        "group": "Group"
-      },
-      "placeholders": {
-        "undefined": "Undefined",
-        "noMembers": "None",
-        "noTasks": "No tasks found"
-      },
-      "dropdown": {
-        "kanban": "View Kanban",
-        "delete": "Delete"
-      },
-      "tooltips": {
-        "options": "Options",
-        "kanban": "View Kanban"
-      },
-      "add": "Add task",
-      "addPlaceholder": "Enter the task title",
-      "addButton": "Add"
-    }
+    "placeholders": {
+      "undefined": "Undefined",
+      "noMembers": "None",
+      "noTasks": "No tasks found"
+    },
+    "dropdown": {
+      "kanban": "View Kanban",
+      "delete": "Delete"
+    },
+    "tooltips": {
+      "options": "Options",
+      "kanban": "View Kanban"
+    },
+    "crud": {
+      "addSuccess": "Task added successfully!",
+      "editSuccess": "Task edited successfully!",
+      "deleteSuccess": "Task deleted successfully!",
+      "addError": "An error occurred while adding the task, please try again later.",
+      "editError": "An error occurred while editing the task, please try again later.",
+      "deleteError": "An error occurred while deleting the task, please try again later."
+    },
+    "deleteModal": {
+      "title": "Do you really want to delete this Task?",
+      "subtitle": "When deleting a task, all content created within it will also be deleted.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "add": "Add task",
+    "addPlaceholder": "Enter the task title",
+    "addButton": "Add"
   }
-  
+}
