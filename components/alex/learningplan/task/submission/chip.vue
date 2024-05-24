@@ -32,28 +32,20 @@
 
         <!-- Subtexto ou nota -->
         <p
-          v-if="submission.grade && submission.maxGrade"
+          v-if="submission.mark && submission.maxMark"
           :class="
-            submission.status === 'accepted'
+            submission.status === 'reviewed'
               ? ' text-gray-600 text-h5 font-weight-bold '
               : 'text-gray-500 text-p5'
           "
         >
-          {{ formatGrade(submission.grade) }}/{{
-            formatGrade(submission.maxGrade)
+          {{ formatGrade(submission.mark) }}/{{
+            formatGrade(submission.maxMark)
           }}
         </p>
-
-        <p v-if="submission.status === 'done'" class="text-p5 text-gray-500">
-          {{ $t('components.learningPlan.submissions.done.subtitle') }}
-        </p>
       </div>
-
       <!-- Seção 3 (opções) -->
-      <div
-        v-if="submission.status !== 'done'"
-        class="d-none d-sm-block flex-fill text-end"
-      >
+      <div class="d-none d-sm-block flex-fill text-end">
         <p v-if="submission.time" class="text-gray-500 text-p5">
           {{ formatTime(submission.time) }}
         </p>
@@ -63,7 +55,7 @@
             >mdi-text-box-outline</v-icon
           >
           <v-icon
-            v-if="submission.text || submission.audioUrl"
+            v-if="submission.justification"
             color="gray-600"
             class="medium-icon ml-2"
             >mdi-message-outline</v-icon
@@ -73,32 +65,26 @@
     </div>
 
     <!-- Justificativa -->
-    <div v-if="submission.text || submission.audioUrl" class="pa-3 border-t">
+    <div v-if="submission.justification" class="pa-3 border-t">
       <p class="text-p4 text-gray-600 font-weight-bold mb-2">
         {{ $t('components.learningPlan.submissions.justification') }}
       </p>
 
       <!-- Audio e/ou video -->
-      <p v-if="submission.audioUrl" class="text-gray-600 text-p5">
-        <alex-learningplan-task-audio :src="submission.audioUrl" />
+      <p v-if="submission.justification.audioUrl" class="text-gray-600 text-p5">
+        <alex-learningplan-task-audio
+          :src="submission.justification.audioUrl"
+        />
       </p>
-      <p v-if="submission.text" class="text-gray-600 text-p5">
-        >{{ submission.text }}
+      <p v-if="submission.justification.text" class="text-gray-600 text-p5">
+        >{{ submission.justification.text }}
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-interface SubmissionProps {
-  status: 'denied' | 'accepted' | 'done';
-  time?: Date;
-  grade?: number;
-  maxGrade?: number;
-  text?: string | null;
-  audioUrl?: string;
-}
-
+type SubmissionProps = AttachedSubmission;
 const props = defineProps({
   hideInfos: {
     type: Boolean,
@@ -111,8 +97,7 @@ const props = defineProps({
   },
 });
 
-const i18n = useI18n();
-const t = i18n.t;
+const { t } = useI18n();
 
 // Formatação de valores
 function formatTime(dt: Date) {
@@ -147,11 +132,11 @@ interface StatusProps {
 }
 
 type StatusConfigProps = {
-  [status in 'accepted' | 'denied' | 'done']: StatusProps;
+  [status in 'reviewed' | 'denied']: StatusProps;
 };
 
 const config: StatusConfigProps = {
-  accepted: {
+  reviewed: {
     icon: 'mdi-check',
     title: t('components.learningPlan.submissions.accepted.title'),
     color: 'success-0',
@@ -160,14 +145,6 @@ const config: StatusConfigProps = {
     icon: 'mdi-alert-circle-outline',
     title: t('components.learningPlan.submissions.denied.title'),
     color: 'error-0',
-  },
-  done: {
-    icon: 'mdi-text-box-outline',
-    title: t('components.learningPlan.submissions.done.title'),
-    color: 'secondary-0',
-    iconColor: 'gray-500',
-    bg: 'gray-blue',
-    reversed: true,
   },
 };
 </script>

@@ -27,6 +27,7 @@
           :key="index"
           :submission="submission"
           hide-infos
+          @click="$emit('click:select-submission', submission)"
         />
       </div>
     </div>
@@ -34,32 +35,11 @@
 </template>
 
 <script setup lang="ts">
-type Submissions = {
-  justification: string;
-  status: 'in_review' | 'reviewed' | 'denied';
-  mark?: number;
-  maxMark?: number;
-};
 type MenuSubmission = {
-  submissions: Submissions[];
+  submissions: AttachedSubmission[];
 };
-/*
-  status: 'denied' | 'accepted' | 'done';
-  time?: Date;
-  grade?: number;
-  maxGrade?: number;
-  text?: string | null;
-  audioUrl?: string; 
-*/
-const props = defineProps<MenuSubmission>();
-const submissions = computed(() =>
-  props.submissions.map((submission) => ({
-    status: 'accepted' as 'denied' | 'accepted' | 'done',
-    text: submission.justification,
-    grade: submission.mark,
-    maxGrade: submission.maxMark,
-  })),
-);
+defineProps<MenuSubmission>();
+defineEmits(['click:select-submission']);
 </script>
 
 <style scoped>

@@ -1,0 +1,27 @@
+{
+  "accepted": {
+    "title": "Submission Rated"
+  },
+  "denied": {
+    "title": "Submission Refused"
+  },
+  "done": {
+    "title": "Submission Completed",
+    "subtitle": "Click to Rate"
+  },
+  "months": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  "justification": "Justification"
+}
