@@ -103,4 +103,7 @@ const formattedDate = computed(() =>
   user-select: none;
   cursor: pointer;
 }
+:global(.card-kanban.ghost) {
+  filter: brightness(90%);
+}
 </style>

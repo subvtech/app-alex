@@ -34,9 +34,8 @@
     >
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
-        :id="index"
         :key="index"
-        :tasks="column.tasks"
+        v-model="column.tasks"
         :title="column.title"
         :color="column.color"
         @click:card="handleClickCard"
@@ -58,6 +57,7 @@ const columns = ref<
     color: 'gray',
     tasks: [
       {
+        id: 1,
         status: 'to_do',
         date: new Date(),
         studentClass: 'Classe A',
@@ -68,6 +68,7 @@ const columns = ref<
         maxMark: 10,
       },
       {
+        id: 2,
         status: 'to_do',
         date: new Date(),
         studentClass: 'Classe b',
@@ -78,6 +79,7 @@ const columns = ref<
         maxMark: 10,
       },
       {
+        id: 3,
         status: 'to_do',
         date: new Date(),
         studentClass: 'Classe c',
@@ -94,6 +96,7 @@ const columns = ref<
     color: 'blue',
     tasks: [
       {
+        id: 4,
         status: 'in_progress',
         date: new Date(),
         studentClass: 'Classe A',
@@ -104,6 +107,7 @@ const columns = ref<
         maxMark: 10,
       },
       {
+        id: 5,
         status: 'in_progress',
         date: new Date(),
         studentClass: 'Classe A',
