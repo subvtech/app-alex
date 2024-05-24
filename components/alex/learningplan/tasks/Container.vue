@@ -3,9 +3,9 @@
     v-for="i in 3"
     :key="i"
     v-model="expand[i - 1]"
-    class="task-accordion my-6 rounded-lg border-sm"
+    class="task-accordion my-6 rounded-lg"
   >
-    <v-expansion-panel>
+    <v-expansion-panel class="rounded-lg">
       <v-expansion-panel-title class="cursor-default" disabled hide-actions>
         <v-icon
           :icon="expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
@@ -196,11 +196,12 @@ const handleDeleteTask = async (id: number) => {
 }
 
 .create-task-btn {
-  border: 1px dashed var(--Cinza-Cinza-600, #6e7a87);
+  border: 1px dashed rgb(var(--v-theme-gray-200));
 }
 
 .task-accordion {
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  border: solid 1px rgb(var(--v-theme-gray-200));
   .v-theme--mainTheme {
     --v-border-opacity: unset !important;
   }

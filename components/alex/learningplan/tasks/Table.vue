@@ -20,7 +20,7 @@
           >
             {{ item.title }}
           </td>
-          <td>
+          <td class="width-35">
             <alex-learningplan-tasks-date-chip
               v-if="item.deadline_at"
               :date="item.deadline_at"
