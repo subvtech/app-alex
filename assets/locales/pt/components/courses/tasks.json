@@ -1,5 +1,49 @@
-{ 
+{
     "title": "Tarefas",
     "description": "Aqui você pode ver as tarefas que você tem que fazer para completar o curso.",
-    "noTasks": "Nenhuma tarefa encontrada."
-}
+    "noTasks": "Nenhuma tarefa encontrada.",
+    "noTitle": "Sem título",
+    "noDesc": "Sem descrição",
+    "noDate": "Sem data",
+    "draft": "Rascunho",
+    "closed": "Encerrada",
+    "published": "Publicada",
+    "infos": {
+      "type": "Tipo",
+      "course": "Curso",
+      "submission": "Entrega",
+      "startAt": "Data início",
+      "deadlineAt": "Data final"
+    },
+    "srchStudent": "Encontrar aluno",
+    "expand": "Ver mais...",
+    "retract": "...Ver menos",
+    "submission": {
+      "submission": "Entrega",
+      "no_submission": "Sem Entrega",
+      "last_submission": "Última Entrega",
+      "description": "Descrição da Entrega",
+      "constraint": "Restrições",
+      "status": "Status",
+      "no_started": "Não iniciada",
+      "started": "Entrega em andamento",
+      "in_review": "Em avaliação",
+      "denied": "Entrega recusada",
+      "reviewed": "Entrega avaliada",
+      "click_to_start": "Clique para começar",
+      "click_to_continue": "Clique para continuar",
+      "click_to_remake": "Clique para refazer",
+      "click_to_review": "Clique para avaliar",
+      "sent_task": "Tarefa enviada"
+    },
+    "task": {
+      "status": {
+        "draft": "Rascunho",
+        "to_do": "A fazer",
+        "in_progress": "Em progresso",
+        "in_review": "Em Avaliação",
+        "done": "Concluído"
+      }
+    }
+  }
+  
