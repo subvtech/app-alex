@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-8 bg-white rounded-lg py-6 px-4 md:p-6">
+  <div class="mt-8 bg-white rounded-lg py-6 px-4 md:p-6 relative">
     <!-- Inputs -->
     <div class="d-flex align-center ga-3">
       <alex-inputs-text-field
@@ -30,7 +30,8 @@
 
     <!-- Categorias e seus respectivos alunos -->
     <div
-      class="w-full flex gap-4 pa-0 overflow-x-auto overflow-y-hidden scroll-snap-mandatory"
+      ref="kanban"
+      class="w-full flex gap-4 pa-0 overflow-x-auto overflow-y-hidden"
     >
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
@@ -45,6 +46,8 @@
 </template>
 
 <script setup lang="ts">
+import { useMouse } from '@vueuse/core';
+
 const columns = ref<
   {
     title: string;
@@ -132,12 +135,31 @@ const columns = ref<
 ]);
 // interface Kanban {}
 const emit = defineEmits(['clickFilter', 'clickCard']);
+const { x: mouseX } = useMouse();
+const kanban = ref<HTMLDivElement | null>(null);
 const handleClickFilter = () => {
   emit('clickFilter');
 };
 const handleClickCard = () => {
   emit('clickCard');
 };
+const mouseInElement = () => {
+  if (!kanban.value) return;
+  const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
+  if (!isDragging) return;
+  const rect = kanban.value.getBoundingClientRect();
+  const x = mouseX.value - rect.left;
+  const padding = 0;
+  if (x < padding) {
+    kanban.value.scrollTo({ left: 0, behavior: 'smooth' });
+  }
+  if (x > rect.width - padding) {
+    kanban.value.scrollTo({ left: rect.width, behavior: 'smooth' });
+  }
+};
+watch(mouseX, () => {
+  mouseInElement();
+});
 </script>
 
 <style scoped>

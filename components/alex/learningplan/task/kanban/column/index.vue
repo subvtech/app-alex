@@ -1,39 +1,40 @@
 <template>
-  <div class="flex-1 scroll-snap min-w-[280px]">
+  <div class="flex-1 scroll-snap min-w-[280px] select-none">
     <alex-learningplan-task-kanban-column-header
       :title="title"
       :quantity="tasks.length"
       :color="color"
     />
-    <draggable
-      v-model="tasks"
-      tag="transition-group"
-      :component-data="{ name: 'flip-list', tag: 'div' }"
-      class="flex flex-col gap-2 mt-2 h-full"
+    <SlickList
+      v-model:list="tasks"
       group="tasks"
-      ghost-class="ghost"
-      animation="100"
+      class="flex flex-col py-2"
+      helper-class="kanban-helper"
     >
-      <template #item="{ element }">
+      <SlickItem
+        v-for="(task, i) in tasks"
+        :key="task.id"
+        :index="i"
+        class="kanban-card-item"
+      >
         <alex-learningplan-task-card
-          :key="element.id"
-          :date="element.date"
-          :name="element.user.name"
-          :student-class="element.studentClass"
-          :status="mappedStates[color]"
-          :avatar="element?.user.avatar"
-          :mark="element.mark"
-          :max-mark="element.maxMark"
+          class="kanban-card-item-inner mt-2 select-none"
+          :date="task.date"
+          :name="task.user.name"
+          :student-class="task.studentClass"
+          :status="status"
+          :avatar="task?.user.avatar"
+          :mark="task.mark"
+          :max-mark="task.maxMark"
           @click="handleClickCard"
         />
-      </template>
-    </draggable>
-    <div class="d-flex flex-column"></div>
+      </SlickItem>
+    </SlickList>
   </div>
 </template>
 
 <script setup lang="ts">
-import draggable from 'vuedraggable';
+import { SlickList, SlickItem } from 'vue-slicksort';
 interface Task {
   id: number;
   status: string;
@@ -47,22 +48,33 @@ interface ColumnProps {
   title: string;
   color: 'orange' | 'green' | 'blue' | 'gray';
 }
-defineProps<ColumnProps>();
+const props = defineProps<ColumnProps>();
 const tasks = defineModel<Task[]>({ required: true });
 const emit = defineEmits(['click:card', 'dragged:task']);
 const handleClickCard = () => {
   emit('click:card');
 };
-const mappedStates = {
+const mappedStatus = {
   gray: 'to_do',
   blue: 'in_progress',
   orange: 'in_review',
   green: 'done',
 };
+const status = computed(() => mappedStatus[props.color]);
 </script>
 
-<style scoped>
-.scroll-snap-align-start {
-  scroll-snap-align: start;
+<style lang="scss" scoped>
+.kanban-card-item {
+  .kanban-card-item-inner {
+    cursor: grab;
+    transition:
+      background 0.2s,
+      transform 0.2s;
+  }
+
+  &.kanban-helper .kanban-card-item-inner {
+    transform: rotate(5deg);
+    box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.15);
+  }
 }
 </style>
