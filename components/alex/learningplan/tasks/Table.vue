@@ -138,8 +138,6 @@ const props = defineProps<{
   filter: string;
 }>();
 
-console.log(props.tasks);
-
 const { t } = useI18n();
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',

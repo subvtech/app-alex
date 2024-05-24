@@ -37,6 +37,7 @@
               variant="text"
               prepend-icon="mdi-plus"
               class="w-100 create-task-btn"
+              :loading="loader"
               @click="isCreatingTask = true"
             >
               {{ $t('pages.task.add') }}
@@ -49,9 +50,14 @@
                 density="comfortable"
                 name="taskTitle"
                 hide-details
+                :disabled="loader"
                 @keyup.enter="handleCreateTask"
               />
-              <alex-custom-button size="large" @click="handleCreateTask">
+              <alex-custom-button
+                size="large"
+                :loading="loader"
+                @click="handleCreateTask"
+              >
                 {{ $t('pages.task.addButton') }}
               </alex-custom-button>
             </div>
@@ -63,7 +69,6 @@
 </template>
 
 <script setup lang="ts">
-// import { Task } from '@/models/task.model';
 export interface TaskType {
   id: number;
   title: string;
@@ -88,16 +93,13 @@ const { t } = useI18n();
 const expand = ref([0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
+const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 
 const handleCreateTask = async () => {
-  if (!taskTitle.value) return;
-  learningPlanStore.learningPlan?.tasks.push({
-    title: taskTitle.value,
-    status: 'draft',
-  });
+  loader.value = true;
   try {
     const res = await create('tasks', {
       title: taskTitle.value,
@@ -105,10 +107,12 @@ const handleCreateTask = async () => {
       learningplan: route.params.id,
       start_at: new Date(),
     });
+    learningPlanStore.learningPlan?.tasks.push(res.data.attributes);
     setMessage('Tarefa criada com sucesso', 'success', true);
   } catch (e) {
     setMessage('Erro ao criar a tarefa', 'error', true);
   }
+  loader.value = false;
   taskTitle.value = '';
   isCreatingTask.value = false;
 };
@@ -136,7 +140,7 @@ const tasksArray = computed(() => {
       completed: 0,
     };
 
-    const students = task.task_members.map((student) => {
+    const students = task.task_members?.map((student) => {
       if (student.status === 'to_do') delivered.toDo += 1;
       if (student.status === 'in_progress') delivered.doing += 1;
       if (student.status === 'in_review') delivered.underReview += 1;
@@ -173,9 +177,15 @@ const handleDeleteTask = async (id: number) => {
     if (typeof deleteIndex === 'number' && deleteIndex > -1) {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
     }
-    await _delete('tasks', id);
+    await _delete('tasks', 123908);
+    setMessage('Tarefa deletada com sucesso', 'success', true);
   } catch (e) {
-    console.log(e);
+    setMessage('Erro ao deletar a tarefa', 'error', true);
+    if (learningPlanStore.learningPlan)
+      learningPlanStore.loadLearningPlan(
+        learningPlanStore.learningPlan.id,
+        true,
+      );
   }
 };
 </script>
