@@ -6,14 +6,14 @@
       class="w-full"
       :content="message.content"
       :user="message.user"
-      @click="$emit('click:message')"
+      @click="$emit('click:message', message)"
     />
     <alex-learningplan-task-submission-chip
       v-if="submission"
       class="bg-gray-blue w-full"
       :submission="submission"
       hide-info
-      @click="$emit('click:submission')"
+      @click="$emit('click:submission', submission)"
     />
     <alex-custom-button
       icon="mdi-close"

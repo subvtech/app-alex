@@ -12,6 +12,7 @@
             time: new Date(),
           },
         ]"
+        @submit="(values) => console.log(values)"
       />
     </v-col>
   </v-row>

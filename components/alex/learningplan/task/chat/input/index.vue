@@ -7,6 +7,8 @@
         :message="attachedMessage"
         :submission="attachedSubmission"
         @click:close="handleCloseAttached"
+        @click:message="$emit('click:message', attachedMessage)"
+        @click:submission="$emit('click:submission', attachedSubmission)"
       />
     </v-scroll-y-reverse-transition>
 
@@ -59,14 +61,21 @@
 interface InputProps {
   submissions?: AttachedSubmission[];
 }
-
 withDefaults(defineProps<InputProps>(), { submissions: () => [] });
-const emits = defineEmits({
-  submit: ({ audio, text }: { audio?: Blob | null; text: string }) => ({
-    audio,
-    text,
-  }),
-});
+const emits = defineEmits<{
+  (e: 'click:message', message?: Message): void;
+  (e: 'click:submission', submission?: AttachedSubmission): void;
+  (
+    e: 'submit',
+    values: {
+      audio?: Blob | null;
+      text: string;
+      attachedMessage?: Message;
+      attachedSubmission?: AttachedSubmission;
+    },
+  ): void;
+}>();
+
 const text = ref('');
 
 // Audio manipulation
@@ -84,15 +93,15 @@ const {
 } = UseRecording();
 
 // Attached
-const attachedMessage = ref<Message | undefined>({
-  date: new Date(),
-  id: 1,
-  user: { name: 'jorge' },
-  content: {
-    text: 'complicado moreno',
-  },
+const attachedMessage = defineModel<Message | undefined>('attachedMessage', {
+  default: undefined,
 });
-const attachedSubmission = ref<AttachedSubmission>();
+const attachedSubmission = defineModel<AttachedSubmission | undefined>(
+  'attachedSubmission',
+  {
+    default: undefined,
+  },
+);
 const handleCloseAttached = () => {
   attachedMessage.value = undefined;
   attachedSubmission.value = undefined;
@@ -106,15 +115,12 @@ const handleSelectSubmission = (submission: AttachedSubmission) => {
 const handleSubmit = async () => {
   isRecording.value = false;
   await stop();
-  emits('submit', { audio: audio.value, text: text.value });
-  attachedMessage.value = {
-    date: new Date(),
-    id: 1,
-    user: { name: 'jorge' },
-    content: {
-      text: text.value,
-    },
-  };
+  emits('submit', {
+    audio: audio.value,
+    text: text.value,
+    attachedMessage: attachedMessage.value,
+    attachedSubmission: attachedSubmission.value,
+  });
   resetValues();
 };
 
