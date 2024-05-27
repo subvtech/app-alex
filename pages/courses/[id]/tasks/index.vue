@@ -22,7 +22,6 @@
         density="comfortable"
         name="search"
         hide-details
-        clearable
       />
       <alex-custom-button
         size="large"
