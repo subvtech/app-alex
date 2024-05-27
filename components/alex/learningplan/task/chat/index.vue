@@ -6,7 +6,11 @@
       :key="message.id"
       :date="message.date"
       :user="message.user"
-      :content="message.content"
+      :content="{
+        audio: message.content.audio?.src,
+        text: message.content.text,
+      }"
+      :duration="message.content.audio?.duration"
       :current="message.current"
       :reference="message.reference"
     />
@@ -14,10 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { Message } from '~/models/simple/message';
-
 type ChatProps = {
-  messages: Message[];
+  messages: ChatMessage[];
 };
 defineProps<ChatProps>();
 </script>

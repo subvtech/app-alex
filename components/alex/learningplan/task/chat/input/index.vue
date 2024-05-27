@@ -44,6 +44,7 @@
             density="comfortable"
             hide-details
             placeholder="Digite alguma mensagem"
+            @keydown.enter="handleSubmit"
           />
           <alex-custom-button
             icon="mdi-microphone"
@@ -68,7 +69,10 @@ const emits = defineEmits<{
   (
     e: 'submit',
     values: {
-      audio?: Blob | null;
+      audio?: {
+        duration?: number;
+        blob: Blob | null;
+      };
       text: string;
       attachedMessage?: Message;
       attachedSubmission?: AttachedSubmission;
@@ -116,7 +120,10 @@ const handleSubmit = async () => {
   isRecording.value = false;
   await stop();
   emits('submit', {
-    audio: audio.value,
+    audio: {
+      blob: audio.value,
+      duration: duration.value,
+    },
     text: text.value,
     attachedMessage: attachedMessage.value,
     attachedSubmission: attachedSubmission.value,

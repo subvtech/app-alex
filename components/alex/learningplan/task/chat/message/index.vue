@@ -30,6 +30,7 @@
         <alex-learningplan-task-audio
           v-if="content?.audio"
           :src="content.audio"
+          :default-max-time="duration"
         />
         <p v-else class="text-body-3 text-gray-800">{{ content?.text }}</p>
       </div>
@@ -45,10 +46,12 @@ import { ptBR, enIN } from 'date-fns/locale';
 import { Message } from '~/models/simple/message';
 type MessageProps = Message & {
   current: boolean;
+  duration?: number;
 };
 const props = withDefaults(defineProps<MessageProps>(), {
   current: false,
   reference: undefined,
+  duration: undefined,
 });
 defineEmits(['click-reference']);
 const i18n = useI18n();
