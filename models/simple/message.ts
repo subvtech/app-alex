@@ -12,3 +12,13 @@ export interface Message {
   current?: boolean;
   reference?: Message;
 }
+
+export type ChatMessage = Omit<Message, 'content'> & {
+  content: {
+    text?: string;
+    audio?: {
+      src: string;
+      duration?: number;
+    };
+  };
+};

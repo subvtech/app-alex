@@ -1,0 +1,27 @@
+{
+  "accepted": {
+    "title": "Entrega avaliada"
+  },
+  "denied": {
+    "title": "Entrega recusada"
+  },
+  "done": {
+    "title": "Entrega realizada",
+    "subtitle": "Clique para avaliar"
+  },
+  "months": [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
+  ],
+  "justification": "Justificativa"
+}
