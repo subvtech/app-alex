@@ -39,6 +39,8 @@
         v-model="column.tasks"
         :title="column.title"
         :color="column.color"
+        :group="column.group"
+        :accept="column.accept"
         @click:card="handleClickCard"
       />
     </div>
@@ -53,6 +55,8 @@ const columns = ref<
     title: string;
     color: 'orange' | 'green' | 'blue' | 'gray';
     tasks: any[];
+    group: string;
+    accept?: string[];
   }[]
 >([
   {
@@ -93,6 +97,8 @@ const columns = ref<
         maxMark: 10,
       },
     ],
+    group: 'to_do',
+    accept: ['to_do', 'in_progress', 'in_review', 'done'],
   },
   {
     title: 'Em andamento',
@@ -121,16 +127,22 @@ const columns = ref<
         maxMark: 10,
       },
     ],
+    group: 'in_progress',
+    accept: ['to_do', 'in_progress', 'in_review', 'done'],
   },
   {
     title: 'Em avaliação',
     color: 'orange',
     tasks: [],
+    group: 'in_review',
+    accept: ['to_do', 'in_progress', 'in_review', 'done'],
   },
   {
     title: 'Concluído',
     color: 'green',
     tasks: [],
+    group: 'done',
+    accept: ['to_do', 'in_progress', 'in_review', 'done'],
   },
 ]);
 // interface Kanban {}
@@ -143,7 +155,7 @@ const handleClickFilter = () => {
 const handleClickCard = () => {
   emit('clickCard');
 };
-const mouseInElement = () => {
+const mouseXInElement = () => {
   if (!kanban.value) return;
   const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
   if (!isDragging) return;
@@ -154,12 +166,10 @@ const mouseInElement = () => {
     kanban.value.scrollTo({ left: 0, behavior: 'smooth' });
   }
   if (x > rect.width - padding) {
-    kanban.value.scrollTo({ left: rect.width, behavior: 'smooth' });
+    kanban.value.scrollTo({ left: rect.width * 2, behavior: 'smooth' });
   }
 };
-watch(mouseX, () => {
-  mouseInElement();
-});
+watch(mouseX, mouseXInElement);
 </script>
 
 <style scoped>

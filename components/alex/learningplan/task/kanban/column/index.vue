@@ -7,9 +7,10 @@
     />
     <SlickList
       v-model:list="tasks"
-      group="tasks"
+      :group="group"
       class="flex flex-col py-2"
       helper-class="kanban-helper"
+      :accept="accept"
     >
       <SlickItem
         v-for="(task, i) in tasks"
@@ -47,6 +48,8 @@ interface Task {
 interface ColumnProps {
   title: string;
   color: 'orange' | 'green' | 'blue' | 'gray';
+  accept?: string[];
+  group: string;
 }
 const props = defineProps<ColumnProps>();
 const tasks = defineModel<Task[]>({ required: true });
