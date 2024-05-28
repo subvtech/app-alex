@@ -1,19 +1,21 @@
 <template>
   <div class="bg-white flex gap-2 p-2 items-center">
-    <alex-learningplan-task-chat-message-reference
-      v-if="message"
-      :id="message.id"
+    <alex-learningplan-task-chat-message-response
+      v-if="messageResponse"
+      :id="messageResponse.id"
       class="w-full"
-      :content="message.content"
-      :user="message.user"
-      @click="$emit('click:message', message)"
+      :audio="messageResponse.audio"
+      :message="messageResponse"
+      :user="messageResponse.user"
+      @click="$emit('click:message', messageResponse)"
     />
     <alex-learningplan-task-submission-chip
-      v-if="submission"
+      v-if="submissionResponse"
       class="bg-gray-blue w-full"
-      :submission="submission"
+      :submission="submissionResponse"
+      no-justification
       hide-info
-      @click="$emit('click:submission', submission)"
+      @click="$emit('click:submission', submissionResponse)"
     />
     <alex-custom-button
       icon="mdi-close"
@@ -25,12 +27,12 @@
 
 <script setup lang="ts">
 interface AttachedProps {
-  message?: Message;
-  submission?: AttachedSubmission;
+  messageResponse?: Message;
+  submissionResponse?: AttachedSubmission;
 }
 withDefaults(defineProps<AttachedProps>(), {
-  message: undefined,
-  submission: undefined,
+  messageResponse: undefined,
+  submissionResponse: undefined,
 });
 defineEmits(['click:close', 'click:message', 'click:submission']);
 </script>

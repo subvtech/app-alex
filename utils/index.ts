@@ -64,3 +64,10 @@ export function wait(ms: number): Promise<void> {
     setTimeout(resolve, ms);
   });
 }
+
+export const isMessage = (
+  response?: Message | AttachedSubmission,
+): response is Message => {
+  if (!response) return false;
+  return 'user' in response;
+};

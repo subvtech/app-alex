@@ -19,8 +19,16 @@
       <alex-learningplan-task-chat :messages="messages" class="w-full" />
       <alex-learningplan-task-chat-input
         class="w-full"
+        :submissions="submissions"
         @submit="
-          ({ text, audio }) => handleSubmit(text, audio?.blob, audio?.duration)
+          ({ text, audio, attachedMessage, attachedSubmission }) =>
+            handleSubmitMessage(
+              text,
+              audio?.blob,
+              audio?.duration,
+              attachedMessage,
+              attachedSubmission,
+            )
         "
       />
     </div>
@@ -48,7 +56,19 @@ const listProps: PlaygroundItemType[] = [
     initialValue: [],
   },
 ];
-const messages = ref<ChatMessage[]>([]);
+const messages = ref<Message[]>([]);
+const submissions: Array<AttachedSubmission> = [
+  {
+    id: 1,
+    status: 'reviewed',
+    time: new Date(),
+    mark: 9.5,
+    maxMark: 10,
+    justification: {
+      text: 'Amigos, a mobilidade dos capitais internacionais não pode mais se dissociar das formas de ação. A prática cotidiana prova que a crescente influência da mídia oferece uma interessante oportunidade para verificação dos relacionamentos verticais entre as hierarquias. ',
+    },
+  },
+];
 const examples = ref<ExampleComponentType[]>([
   {
     snippets: [
@@ -69,22 +89,32 @@ const examples = ref<ExampleComponentType[]>([
     description: '',
   },
 ]);
-const handleSubmit = (text: string, audio?: Blob | null, duration?: number) => {
+const handleSubmitMessage = (
+  text: string,
+  audio?: Blob | null,
+  duration?: number,
+  attachedMessage?: Message,
+  attachedSubmission?: AttachedSubmission,
+) => {
   if (!text && !audio) return;
-  const message: ChatMessage = {
-    date: new Date(),
+  const message: Message = {
+    sentAt: new Date(),
     id: 1,
     user: { name: 'zig' },
-    content: {
-      text,
-    },
+    message: text,
     current: true,
   };
   if (audio) {
-    message.content.audio = {
+    message.audio = {
       src: URL.createObjectURL(audio),
       duration,
     };
+  }
+  if (attachedMessage) {
+    message.response = attachedMessage;
+  }
+  if (attachedSubmission) {
+    message.response = attachedSubmission;
   }
   messages.value.push(message);
 };

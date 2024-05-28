@@ -26,7 +26,8 @@
           v-for="(submission, index) in submissions"
           :key="index"
           :submission="submission"
-          hide-infos
+          hide-info
+          no-justification
           @click="$emit('click:select-submission', submission)"
         />
       </div>

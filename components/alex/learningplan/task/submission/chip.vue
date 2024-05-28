@@ -50,12 +50,12 @@
           {{ formatTime(submission.time) }}
         </p>
 
-        <div v-if="!props.hideInfos">
+        <div v-if="!props.hideInfo">
           <v-icon color="gray-600" class="medium-icon"
             >mdi-text-box-outline</v-icon
           >
           <v-icon
-            v-if="submission.justification"
+            v-if="submission.justification && !noJustification"
             color="gray-600"
             class="medium-icon ml-2"
             >mdi-message-outline</v-icon
@@ -65,7 +65,10 @@
     </div>
 
     <!-- Justificativa -->
-    <div v-if="submission.justification" class="pa-3 border-t">
+    <div
+      v-if="submission.justification && !noJustification"
+      class="pa-3 border-t"
+    >
       <p class="text-p4 text-gray-600 font-weight-bold mb-2">
         {{ $t('components.learningPlan.submissions.justification') }}
       </p>
@@ -84,17 +87,14 @@
 </template>
 
 <script setup lang="ts">
-type SubmissionProps = AttachedSubmission;
-const props = defineProps({
-  hideInfos: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  submission: {
-    type: Object as PropType<SubmissionProps>,
-    required: true,
-  },
+type SubmissonChipProps = {
+  submission: AttachedSubmission;
+  hideInfo?: boolean;
+  noJustification?: boolean;
+};
+const props = withDefaults(defineProps<SubmissonChipProps>(), {
+  noJustification: false,
+  hideInfo: false,
 });
 
 const { t } = useI18n();
