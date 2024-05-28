@@ -11,16 +11,14 @@
     <template #body="{ items, headers }">
       <transition-group :name="transitionName">
         <tr
-          v-for="(item, index) in items"
+          v-for="item in items"
           :key="item.id"
           class="text-5 text-gray-600 text-no-wrap staggered-fade-item"
         >
-          <td
-            class="text-body-4 text-gray-800 max-w-170 width-170 text-overflow text-left"
-          >
+          <td class="text-body-4 text-gray-800 text-overflow text-left">
             {{ item.title }}
           </td>
-          <td class="width-35">
+          <td>
             <alex-learningplan-tasks-date-chip
               v-if="item.deadline_at"
               :date="item.deadline_at"
@@ -85,7 +83,7 @@
               </template>
             </v-tooltip>
             <alex-custom-dropdown
-              :items="dropDownItems(index, item.status)"
+              :items="dropDownItems(item)"
               variant="text"
               prepend-icon="mdi-dots-vertical"
             >
@@ -131,7 +129,6 @@
 
 <script setup lang="ts">
 import { TaskType } from './Container.vue';
-
 const props = defineProps<{
   tasks: TaskType[];
   filter: string;
@@ -141,7 +138,7 @@ const { t } = useI18n();
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',
 );
-const emit = defineEmits(['deleteTask']);
+const emit = defineEmits(['deleteTask', 'moveTask']);
 
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
@@ -158,44 +155,117 @@ const confirmDelete = () => {
   cancelDelete();
 };
 
-const dropDownItems = (index: number, type: string) => {
+const dropDownItems = (task: TaskType) => {
+  const deliveredTotal = task.delivered
+    ? task.delivered.underReview + task.delivered.completed
+    : 0;
   const items = [
-    {
-      text: t('pages.task.table.dropdown.kanban'),
-      onClick: () => console.log('kanban', index),
-      warning: false,
-    },
+    getDropDownAction('details', task.id),
+    getDropDownAction('kanban', task.id),
   ];
-
-  if (
-    type !== 'closed' &&
-    !(
-      tasksArray.value[index].delivered?.completed ||
-      tasksArray.value[index].delivered?.underReview
-    )
-  ) {
-    items.push({
-      text: t('pages.task.table.dropdown.delete'),
-      warning: true,
-      onClick: () => {
-        taskToDelete.value = tasksArray.value[index].id;
-        deleteModal.value = true;
-      },
-    });
+  switch (task.status) {
+    case 'draft':
+      items.push(getDropDownAction('publish', task.id));
+      items.push(getDropDownAction('delete', task.id));
+      break;
+    case 'published':
+      if (deliveredTotal === 0) {
+        items.push(getDropDownAction('draft', task.id));
+        items.push(getDropDownAction('close', task.id));
+        items.push(getDropDownAction('delete', task.id));
+      } else if (task.archived) {
+        items.push(getDropDownAction('unarchive', task.id));
+      } else {
+        items.push(getDropDownAction('close', task.id));
+        items.push(getDropDownAction('archive', task.id));
+      }
+      break;
+    case 'done':
+      if (deliveredTotal === 0) {
+        items.push(getDropDownAction('draft', task.id));
+        items.push(getDropDownAction('publish', task.id));
+        items.push(getDropDownAction('delete', task.id));
+      } else if (task.archived) {
+        items.push(getDropDownAction('unarchive', task.id));
+      } else {
+        items.push(getDropDownAction('publish', task.id));
+        items.push(getDropDownAction('archive', task.id));
+      }
+      break;
+    default:
+      break;
   }
   return items;
 };
 
+const getDropDownAction = (action: string, id: number) => {
+  const dropdown = {
+    delete: {
+      text: t('pages.task.table.dropdown.delete'),
+      warning: true,
+      onClick: () => {
+        taskToDelete.value = id;
+        deleteModal.value = true;
+      },
+    },
+    publish: {
+      text: t('pages.task.table.dropdown.publish'),
+      onClick: () =>
+        emit('moveTask', {
+          id,
+          status: 'published',
+        }),
+    },
+    details: {
+      text: t('pages.task.table.dropdown.details'),
+      onClick: () => console.log('details', id),
+    },
+    kanban: {
+      text: t('pages.task.table.dropdown.kanban'),
+      onClick: () => console.log('kanban', id),
+    },
+    draft: {
+      text: t('pages.task.table.dropdown.draft'),
+      onClick: () => emit('moveTask', { id, status: 'draft' }),
+    },
+    close: {
+      text: t('pages.task.table.dropdown.close'),
+      onClick: () => emit('moveTask', { id, status: 'done' }),
+    },
+    archive: {
+      text: t('pages.task.table.dropdown.archive'),
+      onClick: () => console.log('archive', id),
+    },
+    unarchive: {
+      text: t('pages.task.table.dropdown.unarchive'),
+      onClick: () => console.log('unarchive', id),
+    },
+  };
+
+  return dropdown[action];
+};
+
 const header = [
-  { title: t('pages.task.table.header.name'), key: 'name' },
-  { title: t('pages.task.table.header.deadline'), key: 'deadline' },
+  {
+    title: t('pages.task.table.header.name'),
+    key: 'title',
+    sortable: true,
+    width: 680,
+  },
+  {
+    title: t('pages.task.table.header.deadline'),
+    key: 'deadline_at',
+    width: 140,
+  },
   { title: t('pages.task.table.header.type'), key: 'type' },
   {
     title: t('pages.task.table.header.members'),
     key: 'students',
-    sortable: false,
   },
-  { title: t('pages.task.table.header.delivery'), key: 'delivered' },
+  {
+    title: t('pages.task.table.header.delivery'),
+    key: 'delivered',
+  },
   { title: '', key: 'actions', sortable: false },
 ];
 </script>
@@ -210,6 +280,15 @@ const header = [
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s ease;
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
 }
 
 .staggered-fade-item {

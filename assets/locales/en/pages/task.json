@@ -39,7 +39,13 @@
     },
     "dropdown": {
       "kanban": "View Kanban",
-      "delete": "Delete"
+      "delete": "Delete",
+      "publish": "Publish",
+      "details": "View details",
+      "draft": "Draft",
+      "close": "Close",
+      "archive": "Archive",
+      "unarchive": "Unarchive"
     },
     "tooltips": {
       "options": "Options",
@@ -51,7 +57,9 @@
       "deleteSuccess": "Task deleted successfully!",
       "addError": "An error occurred while adding the task, please try again later.",
       "editError": "An error occurred while editing the task, please try again later.",
-      "deleteError": "An error occurred while deleting the task, please try again later."
+      "deleteError": "An error occurred while deleting the task, please try again later.",
+      "moveSuccess": "Task moved successfully!",
+      "moveError": "An error occurred while moving the task, please try again later!"
     },
     "deleteModal": {
       "title": "Do you really want to delete this Task?",
