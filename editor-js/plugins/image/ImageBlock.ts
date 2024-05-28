@@ -74,6 +74,12 @@ class CustomImage extends Image {
     if (this.data.file instanceof FileList) {
       this.uploadFile(this.data.file[0]);
     }
+
+    Image.querySelector('.image-tool__caption').setAttribute(
+      'style',
+      'word-break: break-word',
+    );
+
     if (this.readOnly && !this.data.caption) {
       Image.querySelector('.image-tool__caption').setAttribute(
         'style',

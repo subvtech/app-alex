@@ -294,7 +294,7 @@ onMounted(() => {
                 formData.append('files', imageFile, imageFile.name);
               }
             });
-            const res = await strapiClient('/upload', {
+            const res = await strapiClient<Upload[]>('/upload', {
               method: 'POST',
               body: formData,
             });
@@ -303,21 +303,55 @@ onMounted(() => {
               const videoId = res[0].id;
               const thumbnail = res[1].url;
               const imgId = res[1].id;
+              temporaryMedia.value.push(videoId);
+              temporaryMedia.value.push(imgId);
               return { success: 1, url, thumbnail, videoId, imgId };
             } else {
               const { url, id } = res[0];
+              temporaryMedia.value.push(id);
               return { success: 1, url, imgId: id };
             }
           },
-          handleDeletedFiles: async (file) => {
-            if (file.videoId)
-              await strapiClient(`/upload/files/${file.videoId}`, {
-                method: 'DELETE',
+          handleDeletedFiles: (file) => {
+            if (file.videoId) mediaToDelete.value.push(file.videoId);
+            if (file.imgId) mediaToDelete.value.push(file.imgId);
+          },
+        },
+      },
+      fileset: {
+        class: Fileset,
+        config: {
+          uploadFiles: async (files) => {
+            const formData = new FormData();
+            const filesArray: File[] = Array.from(files);
+            filesArray.forEach((file: File) => {
+              formData.append('files', file, file.name);
+            });
+            try {
+              const res = await strapiClient<Upload[]>('/upload', {
+                method: 'POST',
+                body: formData,
               });
-            if (file.imgId)
-              strapiClient(`/upload/files/${file.imgId}`, {
-                method: 'DELETE',
-              });
+
+              return {
+                success: 1,
+                files: res.map((file) => {
+                  temporaryMedia.value.push(file.id);
+                  return {
+                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                    extension: file.ext?.slice(1),
+                    size: file.size,
+                    id: file.id,
+                    url: file.url,
+                  };
+                }),
+              };
+            } catch (error) {
+              return { success: 0, error };
+            }
+          },
+          handleDeletedFiles: (id: number) => {
+            mediaToDelete.value.push(id);
           },
         },
       },

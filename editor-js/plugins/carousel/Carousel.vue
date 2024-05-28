@@ -35,6 +35,7 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
+        class="main-slide"
       >
         <template #content>
           <div v-if="!readOnly" class="ma-2 config-icon">
@@ -191,9 +192,21 @@ import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
+
+interface Slide {
+  title: string;
+  image: string;
+  type: string;
+  icon: string;
+  imgId?: string;
+  videoId?: string;
+  video?: string;
+  url?: string;
+}
+
 const props = defineProps({
   slides: {
-    type: Array,
+    type: Array as PropType<Slide[]>,
     default: () => [],
   },
   readOnly: {
@@ -268,7 +281,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = slide.video;
+    url = url.startsWith('https') ? url : `https://${url}`;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -280,7 +293,7 @@ const videoPlayerOptions = (slide) => {
       },
     ],
   };
-  return JSON.stringify(data);
+  return data;
 };
 
 const carouselBreakPoints = computed(() => {
@@ -300,7 +313,7 @@ const onSlideClick = (slide) => {
 };
 
 const onCarouselSlide = (event) => {
-  if (slides.value[activeSlide.value].video) {
+  if (slides.value[activeSlide.value]?.video) {
     if (slides.value[activeSlide.value].type.includes('File')) {
       videoJS.value.forEach((video) => {
         video.pause();
@@ -504,6 +517,7 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   position: absolute;
   z-index: 99;
   right: 25px;
+  top: 0;
 }
 
 .addSlide {
@@ -536,10 +550,23 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
     height: 80px;
   }
 }
-.vueperslide img {
+
+.main-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
-  object-fit: contain;
   background: v-bind('backgroundImgColor');
 }
+
+.vueperslide img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
 </style>
