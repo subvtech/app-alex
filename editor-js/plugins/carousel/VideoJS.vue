@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-red">
+  <div>
     <video
       ref="videoPlayer"
       class="video-js vjs-lime w-100 fill-height rounded"
@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onUnmounted, watch, defineProps } from 'vue';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import 'videojs-vimeo-tech';
@@ -34,13 +34,29 @@ const props = defineProps({
   },
 });
 const videoPlayer = ref(null);
-onMounted(() => {
-  const options = JSON.parse(props.options);
-  videoPlayer.value = videojs(videoPlayer.value, options);
+let player;
+
+watch(
+  videoPlayer,
+  (video) => {
+    if (video) {
+      const options = props.options;
+      player = videojs(video, options);
+    }
+  },
+  { immediate: true },
+);
+
+onUnmounted(() => {
+  if (player) {
+    player.dispose();
+  }
 });
 
 const pause = () => {
-  videoPlayer.value.pause();
+  if (player) {
+    player.pause();
+  }
 };
 
 defineExpose({
@@ -54,6 +70,11 @@ defineExpose({
     transform: rotate(360deg);
   }
 }
+.video-js,
+.vjs-poster {
+  border-radius: 8px;
+}
+
 .video-js.vjs-lime {
   border-radius: 0.5em;
 }

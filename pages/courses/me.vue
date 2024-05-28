@@ -15,7 +15,10 @@
       v-model="createCourseDialog"
       @submit="getCourses()"
     />
-    <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
+    <div
+      style="flex: 1"
+      class="d-flex bg-white wrapper flex-column rounded-lg pa-6"
+    >
       <div
         v-if="courses.length == 0"
         style="flex: 1"
