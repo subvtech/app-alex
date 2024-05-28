@@ -294,7 +294,7 @@ onMounted(() => {
                 formData.append('files', imageFile, imageFile.name);
               }
             });
-            const res = await strapiClient('/upload', {
+            const res = await strapiClient<Upload[]>('/upload', {
               method: 'POST',
               body: formData,
             });
@@ -303,21 +303,18 @@ onMounted(() => {
               const videoId = res[0].id;
               const thumbnail = res[1].url;
               const imgId = res[1].id;
+              temporaryMedia.value.push(videoId);
+              temporaryMedia.value.push(imgId);
               return { success: 1, url, thumbnail, videoId, imgId };
             } else {
               const { url, id } = res[0];
+              temporaryMedia.value.push(id);
               return { success: 1, url, imgId: id };
             }
           },
-          handleDeletedFiles: async (file) => {
-            if (file.videoId)
-              await strapiClient(`/upload/files/${file.videoId}`, {
-                method: 'DELETE',
-              });
-            if (file.imgId)
-              strapiClient(`/upload/files/${file.imgId}`, {
-                method: 'DELETE',
-              });
+          handleDeletedFiles: (file) => {
+            if (file.videoId) mediaToDelete.value.push(file.videoId);
+            if (file.imgId) mediaToDelete.value.push(file.imgId);
           },
         },
       },
