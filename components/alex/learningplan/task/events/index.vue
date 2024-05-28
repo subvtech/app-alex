@@ -1,0 +1,116 @@
+<template>
+  <v-expansion-panels class="events-rows" flat>
+    <alex-learningplan-task-events-card
+      v-for="(event, index) in eventDays"
+      :key="index"
+      :date="event.date"
+      :events="event.events"
+    />
+  </v-expansion-panels>
+</template>
+
+<script setup lang="ts">
+interface EventProps {
+  user: string;
+  action: string;
+  time: string;
+}
+
+interface DayEventsProps {
+  date: string;
+  events: Array<EventProps>;
+}
+
+// Exemplo
+const eventDays: Array<DayEventsProps> = [
+  {
+    date: '24/02/2024',
+    events: [
+      {
+        user: 'Lucas da Silva Sobrenome',
+        action: 'criou dois blocos',
+        time: '15:03',
+      },
+      {
+        user: 'Sérgio Ramos de Almeida',
+        action: 'entregou uma tarefa',
+        time: '15:03',
+      },
+      {
+        user: 'Daniel Sílvio Macedo',
+        action: 'se matriculou na turma',
+        time: '15:03',
+      },
+    ],
+  },
+  {
+    date: '20/02/2024',
+    events: [
+      {
+        user: 'Lucas da Silva Sobrenome',
+        action: 'criou dois blocos',
+        time: '15:03',
+      },
+      {
+        user: 'Daniel Sílvio Macedo',
+        action: 'se matriculou na turma',
+        time: '15:03',
+      },
+    ],
+  },
+  {
+    date: '19/02/2024',
+    events: [
+      {
+        user: 'Lucas da Silva Sobrenome',
+        action: 'criou dois blocos',
+        time: '15:03',
+      },
+      {
+        user: 'Sérgio Ramos de Almeida',
+        action: 'entregou uma tarefa',
+        time: '15:03',
+      },
+    ],
+  },
+];
+</script>
+
+<style>
+.events-rows.v-expansion-panels {
+  border: none !important;
+}
+
+/** Remove a sombra divisora dentro do painel */
+.events-rows .v-expansion-panels {
+  position: inherit !important;
+}
+
+/** Personaliza layout do expandivel */
+.events-rows .v-expansion-panel-title {
+  flex-direction: row-reverse;
+  gap: 3px;
+
+  padding: 0 12px;
+}
+
+/** Remove o padding natural do componente  */
+.events-rows .v-expansion-panel-text > div {
+  padding: 0 !important;
+}
+
+/** Remove a sombra do v-panel-text (flat não resolveu) */
+.events-rows .v-expansion-panel__shadow {
+  display: none !important;
+}
+
+/** Remove a linha que divide os expandiveis */
+.events-rows .v-expansion-panel:not(:first-child)::after {
+  border-top-style: none !important;
+}
+
+/** Dps 'enxugar' umas classes */
+.events-rows .v-expansion-panel * {
+  box-shadow: none !important;
+}
+</style>
