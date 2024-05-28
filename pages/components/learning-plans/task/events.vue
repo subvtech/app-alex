@@ -36,9 +36,8 @@ definePageMeta({
   middleware: 'auth',
 });
 
-const title = 'Copy Button';
-const description =
-  'É usado um alex-documentation-buttons-tooltip para copiar textos';
+const title = 'Events';
+const description = 'É usado em tarefas para mostrar os eventos que ocorreram';
 const copyButtonProps: CopyButtonComponentType = {
   tooltipText: 'text',
   copyIcon: 'mdi-content-copy',
@@ -56,10 +55,14 @@ const listProps: PlaygroundItemType[] = [
     initialValue: undefined,
   },
   {
-    name: 'text',
-    type: 'string',
+    name: 'Event',
+    type: `{
+  user: string;
+  action: string;
+  time: string;
+}`,
     required: true,
-    description: 'The text to be copied',
+    description: 'Events that happened',
     initialValue: copyButtonProps.text,
   },
 ];
