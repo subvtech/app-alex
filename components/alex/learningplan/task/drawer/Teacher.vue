@@ -10,12 +10,14 @@
     class="pa-6 pt-2 rounded-s-lg"
   >
     <template #prepend>
-      <alex-custom-button
-        icon="mdi-close"
-        size="small"
-        variant="text"
-        @click="handleCloseModal"
-      />
+      <div class="d-flex align-center justify-end">
+        <alex-custom-button
+          icon="mdi-close"
+          size="small"
+          variant="text"
+          @click="handleCloseModal"
+        />
+      </div>
     </template>
 
     <div>
@@ -155,11 +157,29 @@
           variant="tertiary"
         />
       </div>
+
+      <!-- Eventos e atribuições -->
+      <alex-custom-tabs v-model="activePage" :tabs="tabs"></alex-custom-tabs>
+      <v-window v-model="activePage">
+        <v-window-item value="1">
+          <alex-learningplan-task-events
+        /></v-window-item>
+        <v-window-item value="2">
+          <alex-learningplan-task-members
+        /></v-window-item>
+      </v-window>
     </div>
+    <template v-if="activePage === '3'" #append>
+      <alex-learningplan-task-chat-input
+        @submit="(data) => console.log(data)"
+      />
+    </template>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 // Date picker
 const startDate = ref(null);
 const finalDate = ref(null);
@@ -177,8 +197,34 @@ function handleCloseModal() {
 
 // Tags
 const tags = ref<Array<string>>(['Desenvolvimento', 'UI/UX']);
+
+// Tabs
+const activePage = ref('1');
+const tabs = [
+  { label: t('components.learningPlan.drawer.tabs.events.label'), value: '1' },
+  { label: t('components.learningPlan.drawer.tabs.members.label'), value: '2' },
+];
 </script>
 
-<style scoped></style>
+<style>
+/** Override do v-switch */
+.switches .v-switch.v-switch--inset .v-selection-control__wrapper {
+  /** Para de comprimir o input */
+  width: auto !important;
+}
 
-<style></style>
+.switches .v-input__details {
+  /** Remove espaços desnecessários */
+  display: none !important;
+}
+
+.switches .v-switch__thumb {
+  /** Para de mudar a aparência do toggle ao selecionar */
+  transform: none !important;
+}
+
+.switches .v-selection-control__wrapper {
+  /** Alinha o componente ao resto do drawer */
+  margin-left: 0 !important;
+}
+</style>

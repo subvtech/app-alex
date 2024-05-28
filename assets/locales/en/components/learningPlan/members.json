@@ -1,0 +1,28 @@
+{
+  "invite": {
+    "label": "Invite",
+    "search": "Search to add",
+    "classes": "Classes",
+    "members": "People"
+  },
+  "menu": {
+    "profile": "View profile",
+    "invite": "Resend invitation",
+    "remove": "Remove student"
+  },
+  "member": {
+    "label": "Member",
+    "pending": "Pending"
+  },
+  "pagination": {
+    "main": "Displaying ${page} to ${page + members.length} of ${pages} results"
+  },
+  "search": "Search",
+  "class": "Class",
+  "missing": {
+    "member": "No members added",
+    "name": "No name",
+    "class": "No class",
+    "email": "No email"
+  }
+}
