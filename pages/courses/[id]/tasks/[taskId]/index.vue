@@ -18,40 +18,40 @@ definePageMeta({
 });
 
 // Caminho até a página (Acima do header)
-// const learningPlanStore = useLearningPlanStore();
-// const i18n = useI18n();
-// const headerStore = usePageHeaderStore();
-// // onBeforeMount(() => (headerStore.showHeader = true));
-// // watch(
-// //   () => learningPlanStore.loading,
-// //   () => {
-// //     if (!learningPlanStore.loading) {
-// //       headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
-// //       headerStore.items = [
-// //         {
-// //           title: i18n.t('pages.classes.breadcrumbs.home'),
-// //           to: '/',
-// //           disabled: true,
-// //         },
-// //         {
-// //           title: i18n.t('pages.classes.breadcrumbs.myCourses'),
-// //           to: '/courses/me',
-// //           disabled: false,
-// //         },
-// //         {
-// //           title: learningPlanStore.learningPlan?.title || '',
-// //           to: `/courses/${learningPlanStore.learningPlan?.id}`,
-// //           disabled: false,
-// //         },
-// //         {
-// //           title: `${task.title}`,
-// //           to: `/courses/${learningPlanStore.learningPlan?.id}/tasks/${task.id}`,
-// //           disabled: false,
-// //         },
-// //       ];
-// //     }
-// //   },
-// // );
+const learningPlanStore = useLearningPlanStore();
+const i18n = useI18n();
+const headerStore = usePageHeaderStore();
+onBeforeMount(() => (headerStore.showHeader = true));
+watch(
+  () => learningPlanStore.loading,
+  () => {
+    if (!learningPlanStore.loading) {
+      headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
+      headerStore.items = [
+        {
+          title: i18n.t('pages.classes.breadcrumbs.home'),
+          to: '/',
+          disabled: true,
+        },
+        {
+          title: i18n.t('pages.classes.breadcrumbs.myCourses'),
+          to: '/courses/me',
+          disabled: false,
+        },
+        {
+          title: learningPlanStore.learningPlan?.title || '',
+          to: `/courses/${learningPlanStore.learningPlan?.id}`,
+          disabled: false,
+        },
+        {
+          title: `${task.title}`,
+          to: `/courses/${learningPlanStore.learningPlan?.id}/tasks/${task.id}`,
+          disabled: false,
+        },
+      ];
+    }
+  },
+);
 
 // Refs
 const editDrawer = ref(false);
