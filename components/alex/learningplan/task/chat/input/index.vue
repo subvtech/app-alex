@@ -4,15 +4,15 @@
       <alex-learningplan-task-chat-input-attached
         v-if="attachedMessage || attachedSubmission"
         class="w-100"
-        :message="attachedMessage"
-        :submission="attachedSubmission"
+        :message-response="attachedMessage"
+        :submission-response="attachedSubmission"
         @click:close="handleCloseAttached"
         @click:message="$emit('click:message', attachedMessage)"
         @click:submission="$emit('click:submission', attachedSubmission)"
       />
     </v-scroll-y-reverse-transition>
 
-    <div class="task-chat-input border-top-1 border-gray-100 relative">
+    <div class="task-chat-input relative">
       <v-slide-x-reverse-transition hide-on-leave group>
         <alex-learningplan-task-chat-input-recording
           v-if="isRecording"
@@ -62,7 +62,9 @@
 interface InputProps {
   submissions?: AttachedSubmission[];
 }
-withDefaults(defineProps<InputProps>(), { submissions: () => [] });
+withDefaults(defineProps<InputProps>(), {
+  submissions: () => [],
+});
 const emits = defineEmits<{
   (e: 'click:message', message?: Message): void;
   (e: 'click:submission', submission?: AttachedSubmission): void;
@@ -136,6 +138,8 @@ const resetValues = () => {
   audio.value = null;
   isPaused.value = false;
   isRecording.value = false;
+  attachedSubmission.value = undefined;
+  attachedMessage.value = undefined;
 };
 </script>
 

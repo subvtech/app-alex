@@ -4,22 +4,20 @@
       v-for="message in messages"
       :id="message.id"
       :key="message.id"
-      :date="message.date"
+      :sent-at="message.sentAt"
       :user="message.user"
-      :content="{
-        audio: message.content.audio?.src,
-        text: message.content.text,
-      }"
-      :duration="message.content.audio?.duration"
+      :audio="message.audio"
+      :message="message.message"
+      :duration="message.audio?.duration"
       :current="message.current"
-      :reference="message.reference"
+      :response="message.response"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 type ChatProps = {
-  messages: ChatMessage[];
+  messages: Message[];
 };
 defineProps<ChatProps>();
 </script>

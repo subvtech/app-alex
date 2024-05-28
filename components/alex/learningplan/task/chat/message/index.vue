@@ -1,13 +1,13 @@
 <template>
   <div
     class="flex flex-col gap-3 border-1 border-gray-100 bg-white p-4 rounded-lg mx-[40px] sm:mx-[60px] md:mx-[80px]"
-    :class="[current ? 'left' : 'right', reference && 'p-3']"
+    :class="[current ? 'left' : 'right', response && 'p-3']"
   >
-    <alex-learningplan-task-chat-message-reference
-      v-if="reference"
-      :id="reference.id"
-      :content="reference.content"
-      :user="reference.user"
+    <alex-learningplan-task-chat-message-response
+      :message-response="isMessage(response) ? response : undefined"
+      :submission-response="!isMessage(response) ? response : undefined"
+      @click:message="$emit('click-response-message')"
+      @click:submission="$emit('click-response-submission')"
     />
     <div class="flex gap-3">
       <v-avatar
@@ -28,11 +28,11 @@
           <p class="text-body-5 text-gray-400">{{ formattedDate }}</p>
         </div>
         <alex-learningplan-task-audio
-          v-if="content?.audio"
-          :src="content.audio"
-          :default-max-time="duration"
+          v-if="audio"
+          :src="audio.src"
+          :default-max-time="audio.duration"
         />
-        <p v-else class="text-body-3 text-gray-800">{{ content?.text }}</p>
+        <p v-else class="text-body-3 text-gray-800">{{ message }}</p>
       </div>
     </div>
   </div>
@@ -43,23 +43,20 @@
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { ptBR, enIN } from 'date-fns/locale';
-import { Message } from '~/models/simple/message';
-type MessageProps = Message & {
-  current: boolean;
-  duration?: number;
-};
+import { Message } from '@/models/simple/learninplanTaskMemberMessage';
+type MessageProps = Message;
 const props = withDefaults(defineProps<MessageProps>(), {
   current: false,
-  reference: undefined,
+  response: undefined,
   duration: undefined,
 });
-defineEmits(['click-reference']);
+defineEmits(['click-response-message', 'click-response-submission']);
 const i18n = useI18n();
 const initials = computed(() => {
   return getInitials(props.user.name);
 });
 const formattedDate = computed(() =>
-  format(props.date, `d MMM y '-' HH:mm`, {
+  format(props.sentAt, `d MMM y '-' HH:mm`, {
     locale: i18n.locale.value === 'pt' ? ptBR : enIN,
   }),
 );
