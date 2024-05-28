@@ -14,21 +14,24 @@
         <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
         <alex-custom-chip
           status="secondary"
-          :text="tasksArray[i - 1].length.toString()"
+          :text="filteredTasks[i - 1].toString()"
         ></alex-custom-chip>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <alex-learningplan-tasks-empty-state
-          v-if="!tasksArray[i - 1].length"
-          :index="i"
-        />
-        <alex-learningplan-tasks-table
-          v-else
-          :index="i"
-          :tasks="tasksArray[i - 1]"
-          :filter="search"
-          @delete-task="handleDeleteTask"
-        />
+        <Transition name="slide-up">
+          <alex-learningplan-tasks-empty-state
+            v-if="!tasksArray[i - 1].length"
+            :index="i"
+          />
+          <alex-learningplan-tasks-table
+            v-else-if="tasksArray[i - 1].length"
+            :index="i"
+            :tasks="tasksArray[i - 1]"
+            :filter="search"
+            @delete-task="handleDeleteTask"
+            @move-task="handleMoveTask"
+          />
+        </Transition>
         <div v-if="i === 1" class="mb-4">
           <Transition mode="out-in" name="add-task">
             <alex-custom-button
@@ -75,6 +78,7 @@ export interface TaskType {
   status: string;
   deadline_at: string;
   type?: string;
+  archived?: boolean;
   students?: { name: string; avatar: { url: string } }[];
   delivered: {
     toDo: number;
@@ -84,11 +88,11 @@ export interface TaskType {
   };
 }
 
-defineProps<{
+const props = defineProps<{
   search: string;
 }>();
 
-const { create, delete: _delete } = useStrapi();
+const { create, delete: _delete, update } = useStrapi();
 const { t } = useI18n();
 const expand = ref([0, 0, 0]);
 const isCreatingTask = ref(false);
@@ -97,6 +101,8 @@ const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
+
+const filter = computed(() => props.search.toLowerCase());
 
 const handleCreateTask = async () => {
   loader.value = true;
@@ -107,7 +113,10 @@ const handleCreateTask = async () => {
       learningplan: route.params.id,
       start_at: new Date(),
     });
-    learningPlanStore.learningPlan?.tasks.push(res.data.attributes);
+    learningPlanStore.learningPlan?.tasks.push({
+      id: res.data.id,
+      ...res.data.attributes,
+    });
     setMessage(t('pages.task.crud.addSuccess'), 'success', true);
   } catch (e) {
     setMessage(t('pages.task.crud.addError'), 'error', true);
@@ -164,8 +173,21 @@ const tasksArray = computed(() => {
 
     if (task.status === 'draft') draft.push(taskItem);
     if (task.status === 'published') published.push(taskItem);
-    if (task.status === 'closed') closed.push(taskItem);
+    if (task.status === 'done') closed.push(taskItem);
   });
+  return [draft, published, closed];
+});
+
+const filteredTasks = computed(() => {
+  const draft = tasksArray.value[0].filter((task) =>
+    task.title.toLowerCase().includes(filter.value.toLowerCase()),
+  ).length;
+  const published = tasksArray.value[1].filter((task) =>
+    task.title.toLowerCase().includes(filter.value.toLowerCase()),
+  ).length;
+  const closed = tasksArray.value[2].filter((task) =>
+    task.title.toLowerCase().includes(filter.value.toLowerCase()),
+  ).length;
   return [draft, published, closed];
 });
 
@@ -181,6 +203,30 @@ const handleDeleteTask = async (id: number) => {
     setMessage(t('pages.task.crud.deleteSuccess'), 'success', true);
   } catch (e) {
     setMessage(t('pages.task.crud.deleteError'), 'error', true);
+    if (learningPlanStore.learningPlan)
+      learningPlanStore.loadLearningPlan(
+        learningPlanStore.learningPlan.id,
+        true,
+      );
+  }
+};
+
+const handleMoveTask = async ({
+  id,
+  status,
+}: {
+  id: number;
+  status: string;
+}) => {
+  try {
+    const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
+    if (task) {
+      task.status = status;
+      await update('tasks', id, { status });
+      setMessage(t('pages.task.crud.moveSuccess'), 'success', true);
+    }
+  } catch (e) {
+    setMessage(t('pages.task.crud.moveError'), 'error', true);
     if (learningPlanStore.learningPlan)
       learningPlanStore.loadLearningPlan(
         learningPlanStore.learningPlan.id,
@@ -255,5 +301,20 @@ const handleDeleteTask = async (id: number) => {
 .add-task-enter-from,
 .add-task-leave-to {
   opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.25s ease-out;
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 </style>

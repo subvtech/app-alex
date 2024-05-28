@@ -39,7 +39,13 @@
     },
     "dropdown": {
       "kanban": "Ver Kanban",
-      "delete": "Excluir"
+      "delete": "Excluir",
+      "publish": "Publicar",
+      "details": "Ver detalhes",
+      "draft": "Rascunho",
+      "close": "Encerrar",
+      "archive": "Arquivar",
+      "unarchive": "Desarquivar"
     },
     "tooltips": {
       "options": "Opções",
@@ -52,7 +58,9 @@
     "deleteSuccess": "Tarefa excluída com sucesso!",
     "addError": "Erro ao criar tarefa, tente novamente!",
     "editError": "Erro ao editar tarefa, tente novamente!",
-    "deleteError": "Erro ao excluir tarefa, tente novamente!"
+    "deleteError": "Erro ao excluir tarefa, tente novamente!",
+    "moveSuccess": "Tarefa movida com sucesso!",
+    "moveError": "Erro ao mover tarefa, tente novamente!"
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",
