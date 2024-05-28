@@ -5,23 +5,22 @@
       class="width-39 height-7 ml-2 mb-4"
     />
     <v-data-table
-      color="gray-300"
-      class="w-100 height-56 rounded-lg border-sm mb-4 text-gray-800 text-body-3"
+      class="w-100 height-56 rounded-lg border-sm mb-4 text-gray-300 text-body-3"
       :headers="header"
     >
       <template #body>
         <tr v-for="table in 3" :key="table">
-          <td class="max-w-170 width-170">
+          <td class="width-170">
             <alex-custom-skeleton color="gray-300" class="w-100 height-5" />
           </td>
           <td>
             <alex-custom-skeleton
               color="gray-300"
-              class="w-75 height-7 rounded-lg"
+              class="w-100 height-8 rounded-lg"
             />
           </td>
           <td>
-            <alex-custom-skeleton color="gray-300" class="w-75 height-5" />
+            <alex-custom-skeleton color="gray-300" class="w-100 height-5" />
           </td>
           <td>
             <div class="d-flex align-center ml-2">
@@ -34,7 +33,7 @@
             </div>
           </td>
           <td>
-            <alex-custom-skeleton color="gray-300" class="w-75 height-7" />
+            <alex-custom-skeleton color="gray-300" class="w-100 height-7" />
           </td>
           <td class="max-w-40 width-30">
             <div class="d-flex ga-5">
@@ -61,23 +60,37 @@
 const { t } = useI18n();
 
 const header = [
-  { title: t('pages.task.table.header.name'), key: 'name', sortable: false },
+  {
+    title: t('pages.task.table.header.name'),
+    key: 'name',
+    sortable: false,
+    width: '680',
+    minWidth: '150',
+  },
   {
     title: t('pages.task.table.header.deadline'),
     key: 'deadline',
     sortable: false,
+    width: '170',
+    minWidth: '150',
   },
   {
     title: t('pages.task.table.header.type'),
     key: 'type',
     sortable: false,
+    minWidth: '100',
   },
   {
     title: t('pages.task.table.header.members'),
     key: 'students',
     sortable: false,
+    minWidth: '150',
   },
-  { title: t('pages.task.table.header.delivery'), key: 'delivered' },
+  {
+    title: t('pages.task.table.header.delivery'),
+    key: 'delivered',
+    minWidth: '120',
+  },
   { title: '', key: 'actions', sortable: false },
 ];
 </script>
