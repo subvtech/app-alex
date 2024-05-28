@@ -328,6 +328,17 @@ const onCarouselSlide = (event) => {
   activeSlide.value = event.currentSlide.index;
 };
 
+interface Slide {
+  title: string;
+  image: string;
+  type: string;
+  icon: string;
+  imgId?: string;
+  videoId?: string;
+  video?: string;
+  url?: string;
+}
+
 function newSlide(file, res) {
   if (file.type.includes('image')) {
     return {
@@ -557,4 +568,5 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   object-fit: contain;
   border-radius: 4px;
 }
+
 </style>

@@ -355,6 +355,43 @@ onMounted(() => {
           },
         },
       },
+      fileset: {
+        class: Fileset,
+        config: {
+          uploadFiles: async (files) => {
+            const formData = new FormData();
+            const filesArray: File[] = Array.from(files);
+            filesArray.forEach((file: File) => {
+              formData.append('files', file, file.name);
+            });
+            try {
+              const res = await strapiClient<Upload[]>('/upload', {
+                method: 'POST',
+                body: formData,
+              });
+
+              return {
+                success: 1,
+                files: res.map((file) => {
+                  temporaryMedia.value.push(file.id);
+                  return {
+                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                    extension: file.ext?.slice(1),
+                    size: file.size,
+                    id: file.id,
+                    url: file.url,
+                  };
+                }),
+              };
+            } catch (error) {
+              return { success: 0, error };
+            }
+          },
+          handleDeletedFiles: (id: number) => {
+            mediaToDelete.value.push(id);
+          },
+        },
+      },
     },
     i18n,
     minHeight: 400,
