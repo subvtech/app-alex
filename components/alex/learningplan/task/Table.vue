@@ -19,7 +19,7 @@
             {{ item.title }}
           </td>
           <td>
-            <alex-learningplan-tasks-date-chip
+            <alex-learningplan-task-date-chip
               v-if="item.deadline_at"
               :date="item.deadline_at"
               :is-published="item.status === 'published'"
@@ -60,7 +60,7 @@
             }}</span>
           </td>
           <td>
-            <alex-learningplan-tasks-task-submissions
+            <alex-learningplan-task-submissions
               v-if="item.delivered"
               :submitted="item.delivered"
             />

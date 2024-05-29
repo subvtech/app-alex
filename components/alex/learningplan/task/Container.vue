@@ -19,11 +19,11 @@
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <Transition name="slide-up">
-          <alex-learningplan-tasks-empty-state
+          <alex-learningplan-task-empty-state
             v-if="!tasksArray[i - 1].length"
             :index="i"
           />
-          <alex-learningplan-tasks-table
+          <alex-learningplan-task-table
             v-else-if="tasksArray[i - 1].length"
             :index="i"
             :tasks="tasksArray[i - 1]"

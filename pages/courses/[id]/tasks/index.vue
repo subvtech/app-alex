@@ -27,20 +27,25 @@
         size="large"
         icon="mdi-filter-variant"
         variant="secondary"
-        @click="console.log('filter')"
+        @click="filterDrawer = true"
       />
     </div>
 
     <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
       <Transition name="fade" mode="out-in">
         <div v-if="learningPlanStore.loading">
-          <alex-learningplan-tasks-table-skeleton />
+          <alex-learningplan-task-table-skeleton />
         </div>
         <div v-else>
-          <alex-learningplan-tasks-container :search="search" />
+          <alex-learningplan-task-container :search="search" />
         </div>
       </Transition>
     </div>
+    <alex-learningplan-task-filter
+      :model-value="filterDrawer"
+      @filter="(value) => console.log(value)"
+      @update:model-value="(value) => (filterDrawer = value)"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -51,6 +56,7 @@ const headerStore = usePageHeaderStore();
 const { id } = route.params;
 
 const search = ref('');
+const filterDrawer = ref(false);
 
 onBeforeMount(() => {
   headerStore.showHeader = true;

@@ -1,63 +1,69 @@
 {
-    "task": {
-      "type": {
-        "label": "Type",
-        "individual": "Individual",
-        "collective": "Collective"
-      },
-      "status": {
-        "label": "Status",
-        "draft": "Draft",
-        "published": "Published",
-        "closed": "Closed"
-      },
-      "date": {
-        "startLabel": "Start date",
-        "finalLabel": "Final date"
-      },
-      "postClosingSubmission": {
-        "label": "Submission after closing",
-        "accept": "Accept",
-        "deny": "Deny"
-      },
-      "description": {
-        "label": "Description",
-        "placeHolder": "Enter description"
-      },
-      "submission": {
-        "label": "Submission",
-        "reqSubmission": "Request submission",
-        "aftrDeadline": "Allow submissions after deadline"
-      },
-      "restrictions": {
-        "label": "Restrictions"
-      },
-      "learningResources": {
-        "label": "Learning resources",
-        "noneSelected": "No trails selected"
-      }
+  "task": {
+    "type": {
+      "label": "Type",
+      "individual": "Individual",
+      "collective": "Collective"
     },
-    "tabs": {
-      "events": {
-        "label": "Events"
-      },
-      "members": {
-        "label": "Members"
-      },
-      "assignments": {
-        "label": "Assignments"
-      }
+    "status": {
+      "label": "Status",
+      "draft": "Draft",
+      "published": "Published",
+      "closed": "Closed"
     },
-    "missing": {
-      "title": "No title",
-      "tags": "No tags",
-      "date": "No date",
-      "restrictions": "No restrictions"
+    "date": {
+      "startLabel": "Start date",
+      "finalLabel": "Final date"
     },
-    "filter": "Filter",
-    "class": "Class",
-    "finalDate": "Final date",
-    "clean": "Clean",
-    "srchClass": "Search class"
-  }
-  
+    "postClosingSubmission": {
+      "label": "Submission after closing",
+      "accept": "Accept",
+      "deny": "Deny"
+    },
+    "description": {
+      "label": "Description",
+      "placeHolder": "Enter description"
+    },
+    "submission": {
+      "label": "Submission",
+      "reqSubmission": "Request submission",
+      "aftrDeadline": "Allow submissions after deadline"
+    },
+    "restrictions": {
+      "label": "Restrictions"
+    },
+    "learningResources": {
+      "label": "Learning resources",
+      "noneSelected": "No trails selected"
+    }
+  },
+  "tabs": {
+    "events": {
+      "label": "Events"
+    },
+    "members": {
+      "label": "Members"
+    },
+    "assignments": {
+      "label": "Assignments"
+    }
+  },
+  "missing": {
+    "title": "No title",
+    "tags": "No tags",
+    "date": "No date",
+    "restrictions": "No restrictions"
+  },
+  "filter": "Filter",
+  "filterTasks": "Filter tasks",
+  "class": "Class",
+  "type": "Type",
+  "group": "Group",
+  "individual": "Individual",
+  "finalDate": "Final date",
+  "startDate": "Start date",
+  "clean": "Clean",
+  "archivedTasks": "Archived tasks",
+  "selectClassPlaceholder": "Select class",
+  "selectTypePlaceholder": "Select type"
+}
