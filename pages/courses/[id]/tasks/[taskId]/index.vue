@@ -9,6 +9,7 @@
       :status="task.status"
     />
     <alex-learningplan-task-kanban
+      type="professor"
       :columns="[
         {
           title: 'A fazer',
@@ -40,144 +41,10 @@
           id: 1,
           status: 'to_do',
           date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
           mark: 1,
           maxMark: 10,
-        },
-        {
-          id: 2,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 3,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 4,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 5,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 6,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 7,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 8,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 9,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 10,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 11,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 12,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
-        },
-        {
-          id: 13,
-          status: 'to_do',
-          date: new Date(),
-          studentClass: 'Classe c',
-          user: {
-            name: 'Jorge',
-          },
-          mark: 1,
-          maxMark: 10,
+          studentClass: 'turma A',
+          user: { name: 'test' },
         },
       ]"
     />

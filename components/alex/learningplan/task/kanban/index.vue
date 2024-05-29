@@ -13,9 +13,9 @@
       />
       <!-- Deixar filtrar funcional -->
       <v-tooltip text="Filtrar" location="bottom" content-class="bg-gray-800">
-        <template #activator="{ props }">
+        <template #activator="{ props: propsFilter }">
           <alex-custom-button
-            v-bind="props"
+            v-bind="propsFilter"
             icon="mdi-filter-variant"
             size="large"
             variant="secondary"
@@ -36,36 +36,93 @@
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
         :key="index"
-        :tasks="tasks.filter((task) => column.group === task.status)"
+        :items="tasks.filter((task) => column.group === task.status)"
         :title="column.title"
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
         @click:card="handleClickCard"
         @change-card="handleChangeCard"
-      />
+      >
+        <template #card="{ item, status }">
+          <template v-if="type === 'professor'">
+            <alex-learningplan-task-card
+              v-if="!isTaskStudent(item)"
+              class="kanban-card-item-inner mt-2 select-none"
+              :date="item.date"
+              :name="item.user.name"
+              :student-class="item.studentClass"
+              :status="status"
+              :avatar="item?.user.avatar"
+              :mark="item.mark"
+              :max-mark="item.maxMark"
+            />
+          </template>
+          <template v-if="type === 'student'">
+            <alex-learningplan-task-student-card
+              v-if="isTaskStudent(item)"
+              class="kanban-card-item-inner mt-2 select-none"
+              :title="item.title"
+              :date="item.date"
+              :group="item.group"
+              :name-group="item.nameGroup"
+              :status="status"
+              :avatar="item?.avatar"
+              :mark="item.mark"
+              :max-mark="item.maxMark"
+            />
+          </template>
+        </template>
+      </alex-learningplan-task-kanban-column>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends 'professor' | 'student'">
 import { useMouse } from '@vueuse/core';
-import { Accept, Task } from './column/index.vue';
+import { Accept } from './column/index.vue';
+import { TaskStatus } from '~/models/simple/taskSimple.model';
+
+export interface Task {
+  id: number;
+  status: string;
+  date: Date;
+  studentClass: string;
+  user: { name: string; avatar?: string | null };
+  mark?: number;
+  maxMark?: number;
+}
+export interface TaskStudent {
+  id: number;
+  date: Date;
+  title: string;
+  group?: boolean;
+  nameGroup?: string;
+  avatar?: string | null;
+  status?: TaskStatus | (string & {});
+  mark?: number;
+  maxMark?: number;
+}
 type Colors = 'orange' | 'green' | 'blue' | 'gray';
-interface Column {
+type KanbanType = 'professor' | 'student';
+type Card<T extends KanbanType> = T extends 'professor' ? Task : TaskStudent;
+interface Column<T extends 'professor' | 'student'> {
   title: string;
   group: string;
   color: Colors;
-  accept: Accept<Task>;
+  accept: Accept<Card<T>>;
 }
 interface KanbanProps {
-  columns: Column[];
+  type: T;
 }
-defineProps<KanbanProps>();
-const tasks = defineModel<Task[]>('tasks', { required: true });
+const props = defineProps<KanbanProps>();
+const tasks = defineModel<Card<typeof props.type>[]>('tasks', {
+  required: true,
+});
+const columns = defineModel<Column<typeof props.type>[]>('columns', {
+  required: true,
+});
 const emit = defineEmits(['click:filter', 'click:card']);
-const { x: mouseX, y: mouseY } = useMouse({ window, type: 'client' });
-const kanban = ref<HTMLDivElement | null>(null);
 const handleClickFilter = () => {
   emit('click:filter');
 };
@@ -77,7 +134,7 @@ const handleChangeCard = ({
   group,
 }: {
   newIndex: number;
-  value: Task;
+  value: Card<typeof props.type>;
   group: string;
 }) => {
   tasks.value = tasks.value.map((task) => {
@@ -87,6 +144,14 @@ const handleChangeCard = ({
     return task;
   });
 };
+
+const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
+  return 'title' in card;
+};
+
+// Scroll X and Y
+const kanban = ref<HTMLDivElement | null>(null);
+const { x: mouseX, y: mouseY } = useMouse({ window, type: 'client' });
 const moveViewX = () => {
   if (!kanban.value) return;
   const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
@@ -95,10 +160,10 @@ const moveViewX = () => {
   const x = mouseX.value - rect.left;
   const padding = 20;
   if (x < padding) {
-    kanban.value.scrollTo({ left: 0, behavior: 'smooth' });
+    kanban.value.scrollLeft -= 10;
   }
   if (x > rect.width - padding) {
-    kanban.value.scrollTo({ left: rect.width * 2, behavior: 'smooth' });
+    kanban.value.scrollLeft += 10;
   }
 };
 const moveViewY = () => {
@@ -110,7 +175,7 @@ const moveViewY = () => {
   if (y < window.innerHeight * 0.22) {
     html.scrollTop -= 8;
   }
-  if (y > window.innerHeight * 0.65) {
+  if (y > window.innerHeight * 0.68) {
     html.scrollTop += 8;
   }
 };
