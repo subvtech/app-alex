@@ -1,15 +1,15 @@
 <template>
-  <v-menu>
+  <v-menu :disabled="!edit">
     <!-- Chip de exibição -->
     <template #activator="{ props }">
       <alex-custom-chip
         v-bind="props"
         :text="config[curr].title"
         :status="config[curr].variant"
-        prepend-icon="mdi-chevron-down"
+        :prepend-icon="edit ? 'mdi-chevron-down' : ''"
+        :clickable="edit"
         variant="tonal"
         size="x-small"
-        clickable
       />
     </template>
 
@@ -54,4 +54,10 @@ const config: Record<TaskStatus, StateProps> = {
 };
 
 const curr = ref<TaskStatus>('draft');
+
+interface CompProps {
+  edit?: boolean;
+}
+
+defineProps<CompProps>();
 </script>

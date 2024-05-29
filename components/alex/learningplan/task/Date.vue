@@ -1,10 +1,14 @@
 <template>
   <div>
-    <p class="date-output pa-1 text-p3 text-gray-800 rounded-md cursor-pointer">
+    <p
+      class="pa-1 text-body-3 text-gray-800 rounded-md"
+      :class="edit ? 'date-output cursor-pointer' : ''"
+    >
       {{ formattedDate }}
     </p>
     <v-menu
       v-model="open"
+      :disabled="!edit"
       class="alex-picker"
       transition="scale-transition"
       offset-y
@@ -30,6 +34,12 @@
 
 <script setup lang="ts">
 import { format } from 'date-fns';
+
+interface CompProps {
+  edit?: boolean;
+}
+
+defineProps<CompProps>();
 
 const open = ref<boolean>(false);
 const selectedDate = ref<Date>(new Date());

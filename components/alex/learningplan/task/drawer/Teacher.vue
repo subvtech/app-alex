@@ -22,24 +22,7 @@
 
     <div>
       <!-- Tags -->
-      <div class="d-flex flex-wrap align-stretch gap-3">
-        <alex-custom-button
-          icon="mdi-plus"
-          size="small"
-          variant="secondary"
-          @click="tags.push('Tag')"
-        />
-        <alex-custom-chip
-          v-for="(tag, index) in tags"
-          :key="index"
-          :text="tag"
-          size="small"
-          status="blue"
-          variant="tonal"
-          clickable
-          closable
-        />
-      </div>
+      <alex-learningplan-task-tags edit />
 
       <!-- Informações -->
       <p class="mt-4 text-h2 ellipsis lines-2">
@@ -52,22 +35,22 @@
           ><p class="text-body-4 text-gray-800 mb-2">
             {{ $t('components.learningPlan.drawer.task.status.label') }}
           </p>
-          <alex-learningplan-task-state />
+          <alex-learningplan-task-state edit />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
             <span class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.type.label') }}
           </p>
-          <alex-learningplan-task-type
-        /></v-col>
+          <alex-learningplan-task-options :items="types" edit />
+        </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
             <span class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="startDate" />
+          <alex-learningplan-task-date ref="startDate" edit />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -75,7 +58,7 @@
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="finalDate" />
+          <alex-learningplan-task-date ref="finalDate" edit />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -86,28 +69,14 @@
               )
             }}
           </p>
-          <p class="text-body-3 text-gray-800">
-            {{
-              $t(
-                'components.learningPlan.drawer.task.postClosingSubmission.accept',
-              )
-            }}
-          </p></v-col
-        >
+          <alex-learningplan-task-options :items="postClosingOptions" edit
+        /></v-col>
       </v-row>
 
-      <p class="text-body-4 text-gray-800 mb-2">
-        {{ $t('components.learningPlan.drawer.task.description.label') }}
-      </p>
-      <alex-inputs-text-area
-        name="aluno"
-        :placeholder="
-          $t('components.learningPlan.drawer.task.description.placeHolder')
-        "
-        variant="outlined"
-        hide-details
-        density="comfortable"
-      />
+      <alex-learningplan-task-description edit />
+
+      <!-- Objetivos de aprendizagem -->
+      <alex-learningplan-task-goals edit />
 
       <!-- Entregas-->
       <p class="text-h3 mt-6">
@@ -195,8 +164,17 @@ function handleCloseModal() {
   model.value = false;
 }
 
-// Tags
-const tags = ref<Array<string>>(['Desenvolvimento', 'UI/UX']);
+// Tipos
+const types = ref<string[]>([
+  t('components.learningPlan.drawer.task.type.individual'),
+  t('components.learningPlan.drawer.task.type.collective'),
+]);
+
+// Aceitar depois do prazo
+const postClosingOptions = ref<string[]>([
+  t('components.learningPlan.drawer.task.postClosingSubmission.accept'),
+  t('components.learningPlan.drawer.task.postClosingSubmission.deny'),
+]);
 
 // Tabs
 const activePage = ref('1');

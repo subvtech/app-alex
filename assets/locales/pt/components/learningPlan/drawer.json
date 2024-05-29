@@ -1,62 +1,71 @@
 {
-    "task": {
-      "type": {
-        "label": "Tipo",
-        "individual": "Individual",
-        "collective": "Coletiva"
-      },
-      "status": {
-        "label": "Status",
-        "draft": "Rascunho",
-        "published": "Publicado",
-        "closed": "Fechado"
-      },
-      "date": {
-        "startLabel": "Data de início",
-        "finalLabel": "Data final"
-      },
-      "postClosingSubmission": {
-        "label": "Entrega após fechamento",
-        "accept": "Aceitar",
-        "deny": "Recusar"
-      },
-      "description": {
-        "label": "Descrição",
-        "placeHolder": "Digite a descrição"
-      },
-      "submission": {
-        "label": "Entrega",
-        "reqSubmission": "Solicitar entrega",
-        "aftrDeadline": "Envio após prazo"
-      },
-      "restrictions": {
-        "label": "Restrições"
-      },
-      "learningResources": {
-        "label": "Recursos de aprendizagem",
-        "noneSelected": "Nenhuma trilha selecionada"
-      }
+  "task": {
+    "type": {
+      "label": "Tipo",
+      "individual": "Individual",
+      "collective": "Em grupo"
     },
-    "tabs": {
-      "events": {
-        "label": "Eventos"
-      },
-      "members": {
-        "label": "Integrantes"
-      },
-      "assignments": {
-        "label": "Atribuições"
-      }
+    "status": {
+      "label": "Status",
+      "draft": "Rascunho",
+      "published": "Publicado",
+      "closed": "Fechado"
     },
-    "missing": {
-      "title": "Sem título",
-      "tags": "Sem marcações",
-      "date": "Sem data",
-      "restrictions": "Sem restrições"
+    "date": {
+      "startLabel": "Data de início",
+      "finalLabel": "Data final"
     },
-    "filter": "Filtrar",
-    "class": "Turma",
-    "finalDate": "Data de término",
-    "clean": "Limpar",
-    "srchClass": "Buscar turma"
-  }
+    "postClosingSubmission": {
+      "label": "Entrega após fechamento",
+      "accept": "Aceitar",
+      "deny": "Recusar"
+    },
+    "description": {
+      "label": "Descrição",
+      "placeHolder": "Digite a descrição"
+    },
+    "submission": {
+      "label": "Entrega",
+      "reqSubmission": "Solicitar entrega",
+      "aftrDeadline": "Envio após prazo"
+    },
+    "restrictions": {
+      "label": "Restrições"
+    },
+    "learningResources": {
+      "label": "Recursos de aprendizagem",
+      "noneSelected": "Nenhuma trilha selecionada"
+    }
+  },
+  "goals": {
+    "label": "Objetivos de aprendizagem",
+    "select": "Selecione um objetivo",
+    "search": "Digite um nome"
+  },
+  "tabs": {
+    "events": {
+      "label": "Eventos"
+    },
+    "members": {
+      "label": "Integrantes"
+    },
+    "assignments": {
+      "label": "Atribuições"
+    }
+  },
+  "tags": {
+    "subtitle": "Informe um marcador",
+    "placeHolder": "Digite um nome"
+  },
+  "missing": {
+    "title": "Sem título",
+    "tags": "Sem marcações",
+    "date": "Sem data",
+    "restrictions": "Sem restrições"
+  },
+  "filter": "Filtrar",
+  "class": "Turma",
+  "finalDate": "Data de término",
+  "clean": "Limpar",
+  "srchClass": "Buscar turma"
+}
