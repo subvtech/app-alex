@@ -8,7 +8,179 @@
       :start-at="task.start_at"
       :status="task.status"
     />
-    <alex-learningplan-task-kanban />
+    <alex-learningplan-task-kanban
+      :columns="[
+        {
+          title: 'A fazer',
+          color: 'gray',
+          group: 'to_do',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+        {
+          title: 'A fazer',
+          color: 'blue',
+          group: 'in_progress',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+        {
+          title: 'A fazer',
+          color: 'orange',
+          group: 'in_review',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+        {
+          title: 'A fazer',
+          color: 'green',
+          group: 'done',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+      ]"
+      :tasks="[
+        {
+          id: 1,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 2,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 3,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 4,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 5,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 6,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 7,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 8,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 9,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 10,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 11,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 12,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+        {
+          id: 13,
+          status: 'to_do',
+          date: new Date(),
+          studentClass: 'Classe c',
+          user: {
+            name: 'Jorge',
+          },
+          mark: 1,
+          maxMark: 10,
+        },
+      ]"
+    />
   </section>
 </template>
 

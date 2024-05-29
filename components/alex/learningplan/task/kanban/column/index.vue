@@ -11,6 +11,10 @@
       class="flex flex-col py-2"
       helper-class="kanban-helper"
       :accept="accept"
+      @sort-insert="
+        ({ newIndex, value }) =>
+          $emit('change-card', { newIndex, value, group })
+      "
     >
       <SlickItem
         v-for="(task, i) in tasks"
@@ -36,7 +40,19 @@
 
 <script setup lang="ts">
 import { SlickList, SlickItem } from 'vue-slicksort';
-interface Task {
+export type Accept<T> =
+  | true
+  | string[]
+  | (({
+      source,
+      dest,
+      payload,
+    }: {
+      source: HTMLElement;
+      dest: HTMLElement;
+      payload: T;
+    }) => boolean);
+export interface Task {
   id: number;
   status: string;
   date: Date;
@@ -48,12 +64,13 @@ interface Task {
 interface ColumnProps {
   title: string;
   color: 'orange' | 'green' | 'blue' | 'gray';
-  accept?: string[];
+  accept?: Accept<Task>;
   group: string;
+  tasks: Task[];
 }
 const props = defineProps<ColumnProps>();
-const tasks = defineModel<Task[]>({ required: true });
-const emit = defineEmits(['click:card', 'dragged:task']);
+const tasks = ref(props.tasks);
+const emit = defineEmits(['click:card', 'dragged:task', 'change-card']);
 const handleClickCard = () => {
   emit('click:card');
 };

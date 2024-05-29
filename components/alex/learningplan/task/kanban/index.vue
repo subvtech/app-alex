@@ -36,7 +36,7 @@
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
         :key="index"
-        v-model="column.tasks"
+        :tasks="tasks.filter((task) => column.group === task.status)"
         :title="column.title"
         :color="column.color"
         :group="column.group"
@@ -49,119 +49,36 @@
 
 <script setup lang="ts">
 import { useMouse } from '@vueuse/core';
+import { Accept, Task } from './column/index.vue';
+type Colors = 'orange' | 'green' | 'blue' | 'gray';
+interface Column {
+  title: string;
+  group: string;
+  color: Colors;
+  accept: Accept<Task>;
+}
 
-const columns = ref<
-  {
-    title: string;
-    color: 'orange' | 'green' | 'blue' | 'gray';
-    tasks: any[];
-    group: string;
-    accept?: string[];
-  }[]
->([
-  {
-    title: 'A fazer',
-    color: 'gray',
-    tasks: [
-      {
-        id: 1,
-        status: 'to_do',
-        date: new Date(),
-        studentClass: 'Classe A',
-        user: {
-          name: 'Jorge',
-        },
-        mark: 1,
-        maxMark: 10,
-      },
-      {
-        id: 2,
-        status: 'to_do',
-        date: new Date(),
-        studentClass: 'Classe b',
-        user: {
-          name: 'Jorge',
-        },
-        mark: 1,
-        maxMark: 10,
-      },
-      {
-        id: 3,
-        status: 'to_do',
-        date: new Date(),
-        studentClass: 'Classe c',
-        user: {
-          name: 'Jorge',
-        },
-        mark: 1,
-        maxMark: 10,
-      },
-    ],
-    group: 'to_do',
-    accept: ['to_do', 'in_progress', 'in_review', 'done'],
-  },
-  {
-    title: 'Em andamento',
-    color: 'blue',
-    tasks: [
-      {
-        id: 4,
-        status: 'in_progress',
-        date: new Date(),
-        studentClass: 'Classe A',
-        user: {
-          name: 'Jorge',
-        },
-        mark: 1,
-        maxMark: 10,
-      },
-      {
-        id: 5,
-        status: 'in_progress',
-        date: new Date(),
-        studentClass: 'Classe A',
-        user: {
-          name: 'Jorge',
-        },
-        mark: 1,
-        maxMark: 10,
-      },
-    ],
-    group: 'in_progress',
-    accept: ['to_do', 'in_progress', 'in_review', 'done'],
-  },
-  {
-    title: 'Em avaliação',
-    color: 'orange',
-    tasks: [],
-    group: 'in_review',
-    accept: ['to_do', 'in_progress', 'in_review', 'done'],
-  },
-  {
-    title: 'Concluído',
-    color: 'green',
-    tasks: [],
-    group: 'done',
-    accept: ['to_do', 'in_progress', 'in_review', 'done'],
-  },
-]);
-// interface Kanban {}
-const emit = defineEmits(['clickFilter', 'clickCard']);
-const { x: mouseX } = useMouse();
+interface KanbanProps {
+  columns: Column[];
+}
+defineProps<KanbanProps>();
+const tasks = defineModel<Task[]>('tasks', { required: true });
+const emit = defineEmits(['click:filter', 'click:card']);
+const { x: mouseX, y: mouseY } = useMouse({ window, type: 'client' });
 const kanban = ref<HTMLDivElement | null>(null);
 const handleClickFilter = () => {
-  emit('clickFilter');
+  emit('click:filter');
 };
 const handleClickCard = () => {
-  emit('clickCard');
+  emit('click:card');
 };
-const mouseXInElement = () => {
+const moveViewX = () => {
   if (!kanban.value) return;
   const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
   if (!isDragging) return;
   const rect = kanban.value.getBoundingClientRect();
   const x = mouseX.value - rect.left;
-  const padding = 0;
+  const padding = 20;
   if (x < padding) {
     kanban.value.scrollTo({ left: 0, behavior: 'smooth' });
   }
@@ -169,7 +86,21 @@ const mouseXInElement = () => {
     kanban.value.scrollTo({ left: rect.width * 2, behavior: 'smooth' });
   }
 };
-watch(mouseX, mouseXInElement);
+const moveViewY = () => {
+  const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
+  if (!isDragging) return;
+  const html = document.querySelector('html');
+  if (!html) return;
+  const y = Math.abs(mouseY.value);
+  if (y < window.innerHeight * 0.22) {
+    html.scrollTop -= 8;
+  }
+  if (y > window.innerHeight * 0.65) {
+    html.scrollTop += 8;
+  }
+};
+watch(mouseX, moveViewX);
+watch(mouseY, moveViewY);
 </script>
 
 <style scoped>
