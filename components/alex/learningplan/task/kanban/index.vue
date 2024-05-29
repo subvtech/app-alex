@@ -42,6 +42,7 @@
         :group="column.group"
         :accept="column.accept"
         @click:card="handleClickCard"
+        @change-card="handleChangeCard"
       />
     </div>
   </div>
@@ -57,7 +58,6 @@ interface Column {
   color: Colors;
   accept: Accept<Task>;
 }
-
 interface KanbanProps {
   columns: Column[];
 }
@@ -71,6 +71,21 @@ const handleClickFilter = () => {
 };
 const handleClickCard = () => {
   emit('click:card');
+};
+const handleChangeCard = ({
+  value,
+  group,
+}: {
+  newIndex: number;
+  value: Task;
+  group: string;
+}) => {
+  tasks.value = tasks.value.map((task) => {
+    if (task.id === value.id) {
+      return { ...task, status: group };
+    }
+    return task;
+  });
 };
 const moveViewX = () => {
   if (!kanban.value) return;

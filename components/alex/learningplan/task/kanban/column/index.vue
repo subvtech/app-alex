@@ -70,7 +70,16 @@ interface ColumnProps {
 }
 const props = defineProps<ColumnProps>();
 const tasks = ref(props.tasks);
-const emit = defineEmits(['click:card', 'dragged:task', 'change-card']);
+const emit = defineEmits<{
+  'click:card': [];
+  'change-card': [
+    values: {
+      newIndex: number;
+      value: Task;
+      group: string;
+    },
+  ];
+}>();
 const handleClickCard = () => {
   emit('click:card');
 };
