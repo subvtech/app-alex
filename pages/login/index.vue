@@ -134,9 +134,13 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
+
+const { signIn } = useAuth();
+
 const hasError = ref(false);
 const errorMessage = ref('');
 const route = useRoute();
+
 definePageMeta({
   layout: 'auth',
   middleware: 'control-access',
@@ -145,7 +149,6 @@ definePageMeta({
 const redirect =
   (route.query.redirect as string) || useCookie('redirect').value;
 
-const { login } = useStrapiAuth();
 const router = useRouter();
 
 const { loginSchema } = useFormRules();
@@ -165,16 +168,14 @@ const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-const { metalogin } = useMetamask(logging2);
+const { metalogin } = useMetamask();
 
 const submit = handleSubmit(async () => {
   logging.value = true;
 
   try {
-    await login({
-      identifier: values.email,
-      password: values.password,
-    });
+    await signIn('credentials', values);
+
     if (redirect) {
       router.push(redirect);
       useCookie('redirect').value = null;
