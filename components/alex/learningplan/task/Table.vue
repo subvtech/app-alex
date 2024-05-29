@@ -138,7 +138,7 @@ const { t } = useI18n();
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',
 );
-const emit = defineEmits(['deleteTask', 'moveTask']);
+const emit = defineEmits(['deleteTask', 'moveTask', 'toggleArchive']);
 
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
@@ -234,11 +234,11 @@ const getDropDownAction = (action: string, id: number) => {
     },
     archive: {
       text: t('pages.task.table.dropdown.archive'),
-      onClick: () => console.log('archive', id),
+      onClick: () => emit('toggleArchive', id),
     },
     unarchive: {
       text: t('pages.task.table.dropdown.unarchive'),
-      onClick: () => console.log('unarchive', id),
+      onClick: () => emit('toggleArchive', id),
     },
   };
 

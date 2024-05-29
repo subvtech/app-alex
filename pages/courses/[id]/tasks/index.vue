@@ -27,7 +27,7 @@
         size="large"
         icon="mdi-filter-variant"
         variant="secondary"
-        @click="filterDrawer = true"
+        @click="openFilter"
       />
     </div>
 
@@ -37,15 +37,13 @@
           <alex-learningplan-task-table-skeleton />
         </div>
         <div v-else>
-          <alex-learningplan-task-container :search="search" />
+          <alex-learningplan-task-container
+            ref="tasksContainer"
+            :search="search"
+          />
         </div>
       </Transition>
     </div>
-    <alex-learningplan-task-filter
-      :model-value="filterDrawer"
-      @filter="(value) => console.log(value)"
-      @update:model-value="(value) => (filterDrawer = value)"
-    />
   </div>
 </template>
 <script setup lang="ts">
@@ -56,11 +54,15 @@ const headerStore = usePageHeaderStore();
 const { id } = route.params;
 
 const search = ref('');
-const filterDrawer = ref(false);
+const tasksContainer = ref();
 
 onBeforeMount(() => {
   headerStore.showHeader = true;
 });
+
+const openFilter = () => {
+  tasksContainer.value?.openFilterDrawer();
+};
 
 watch(
   () => [learningPlanStore.loading],
