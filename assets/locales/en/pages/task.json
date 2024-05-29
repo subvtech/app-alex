@@ -52,14 +52,20 @@
       "kanban": "View Kanban"
     },
     "crud": {
-      "addSuccess": "Task added successfully!",
-      "editSuccess": "Task edited successfully!",
-      "deleteSuccess": "Task deleted successfully!",
-      "addError": "An error occurred while adding the task, please try again later.",
-      "editError": "An error occurred while editing the task, please try again later.",
-      "deleteError": "An error occurred while deleting the task, please try again later.",
-      "moveSuccess": "Task moved successfully!",
-      "moveError": "An error occurred while moving the task, please try again later!"
+      "addSuccess": "created",
+      "editSuccess": "edited",
+      "deleteSuccess": "deleted",
+      "archiveSuccess": "archived",
+      "unarchiveSuccess": "unarchived",
+      "addError": "create",
+      "archiveError": "archive",
+      "unarchiveError": "unarchive",
+      "editError": "edit",
+      "deleteError": "delete",
+      "moveSuccess": "moved",
+      "moveError": "move",
+      "errorMessage": "Error while trying to {action} task, please try again!",
+      "successMessage": "Task {action} successfully!"
     },
     "deleteModal": {
       "title": "Do you really want to delete this Task?",

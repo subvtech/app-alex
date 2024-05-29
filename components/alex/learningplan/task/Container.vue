@@ -30,6 +30,7 @@
             :filter="search"
             @delete-task="handleDeleteTask"
             @move-task="handleMoveTask"
+            @toggle-archive="handleToggleArchive"
           />
         </Transition>
         <div v-if="i === 1" class="mb-4">
@@ -69,6 +70,11 @@
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
+  <alex-learningplan-task-filter
+    :model-value="filterDrawer"
+    @filter="(value) => console.log(value)"
+    @update:model-value="(value) => (filterDrawer = value)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -92,6 +98,14 @@ const props = defineProps<{
   search: string;
 }>();
 
+const filterDrawer = ref(false);
+
+const openFilterDrawer = () => {
+  filterDrawer.value = true;
+};
+
+defineExpose({ openFilterDrawer });
+
 const { create, delete: _delete, update } = useStrapi();
 const { t } = useI18n();
 const expand = ref([0, 0, 0]);
@@ -102,7 +116,30 @@ const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 
-const filter = computed(() => props.search.toLowerCase());
+
+const searchField = computed(() => props.search.toLowerCase());
+
+const displayError = (message: string) => {
+  setMessage(
+    t('pages.task.crud.errorMessage', {
+      action: t(`pages.task.crud.${message}`),
+    }),
+    'error',
+    true,
+  );
+  if (learningPlanStore.learningPlan)
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
+};
+
+const displaySuccess = (message: string) => {
+  setMessage(
+    t('pages.task.crud.successMessage', {
+      action: t(`pages.task.crud.${message}`),
+    }),
+    'success',
+    true,
+  );
+};
 
 const handleCreateTask = async () => {
   loader.value = true;
@@ -117,7 +154,7 @@ const handleCreateTask = async () => {
       id: res.data.id,
       ...res.data.attributes,
     });
-    setMessage(t('pages.task.crud.addSuccess'), 'success', true);
+    displaySuccess('addSuccess');
   } catch (e) {
     setMessage(t('pages.task.crud.addError'), 'error', true);
   }
@@ -140,6 +177,7 @@ const tasksArray = computed(() => {
   const draft: TaskType[] = [];
   const published: TaskType[] = [];
   const closed: TaskType[] = [];
+  const archived: TaskType[] = [];
 
   learningPlanStore.learningPlan?.tasks.forEach((task) => {
     const delivered = {
@@ -171,22 +209,23 @@ const tasksArray = computed(() => {
       delivered,
     };
 
+    if (task.archived) archived.push(taskItem);
     if (task.status === 'draft') draft.push(taskItem);
     if (task.status === 'published') published.push(taskItem);
     if (task.status === 'done') closed.push(taskItem);
   });
-  return [draft, published, closed];
+  return [draft, published, closed, archived];
 });
 
 const filteredTasks = computed(() => {
   const draft = tasksArray.value[0].filter((task) =>
-    task.title.toLowerCase().includes(filter.value.toLowerCase()),
+    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
   ).length;
   const published = tasksArray.value[1].filter((task) =>
-    task.title.toLowerCase().includes(filter.value.toLowerCase()),
+    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
   ).length;
   const closed = tasksArray.value[2].filter((task) =>
-    task.title.toLowerCase().includes(filter.value.toLowerCase()),
+    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
   ).length;
   return [draft, published, closed];
 });
@@ -200,14 +239,9 @@ const handleDeleteTask = async (id: number) => {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
     }
     await _delete('tasks', id);
-    setMessage(t('pages.task.crud.deleteSuccess'), 'success', true);
+    displaySuccess('deleteSuccess');
   } catch (e) {
-    setMessage(t('pages.task.crud.deleteError'), 'error', true);
-    if (learningPlanStore.learningPlan)
-      learningPlanStore.loadLearningPlan(
-        learningPlanStore.learningPlan.id,
-        true,
-      );
+    displayError('deleteError');
   }
 };
 
@@ -223,15 +257,23 @@ const handleMoveTask = async ({
     if (task) {
       task.status = status;
       await update('tasks', id, { status });
-      setMessage(t('pages.task.crud.moveSuccess'), 'success', true);
+      displaySuccess('moveSuccess');
     }
   } catch (e) {
-    setMessage(t('pages.task.crud.moveError'), 'error', true);
-    if (learningPlanStore.learningPlan)
-      learningPlanStore.loadLearningPlan(
-        learningPlanStore.learningPlan.id,
-        true,
-      );
+    displayError('moveError');
+  }
+};
+
+const handleToggleArchive = async (id: number) => {
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
+  try {
+    if (task) {
+      task.archived = !task.archived;
+      await update('tasks', id, { archived: task.archived });
+      displaySuccess(task.archived ? 'archiveSuccess' : 'unarchiveSuccess');
+    }
+  } catch (e) {
+    displayError(task.archived ? 'archiveError' : 'unarchiveError');
   }
 };
 </script>

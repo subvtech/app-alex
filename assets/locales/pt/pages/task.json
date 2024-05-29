@@ -53,14 +53,20 @@
     }
   },
   "crud": {
-    "addSuccess": "Tarefa criada com sucesso!",
-    "editSuccess": "Tarefa editada com sucesso!",
-    "deleteSuccess": "Tarefa excluída com sucesso!",
-    "addError": "Erro ao criar tarefa, tente novamente!",
-    "editError": "Erro ao editar tarefa, tente novamente!",
-    "deleteError": "Erro ao excluir tarefa, tente novamente!",
-    "moveSuccess": "Tarefa movida com sucesso!",
-    "moveError": "Erro ao mover tarefa, tente novamente!"
+    "addSuccess": "criada",
+    "editSuccess": "editada",
+    "deleteSuccess": "excluída",
+    "archiveSuccess": "arquivada",
+    "unarchiveSuccess": "desarquivada",
+    "addError": "criar",
+    "archiveError": "arquivar",
+    "unarchiveError": "desarquivar",
+    "editError": "editar",
+    "deleteError": "excluir",
+    "moveSuccess": "movida",
+    "moveError": "mover",
+    "errorMessage": "Erro ao {action} tarefa, tente novamente!",
+    "successMessage": "Tarefa {action} com sucesso!"
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",
