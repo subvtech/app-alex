@@ -3,10 +3,12 @@
   "draft": "Draft",
   "published": "Published",
   "done": "Closed",
+  "archived": "Archived",
   "emptyState": {
     "draft": "No tasks in draft!",
     "published": "No published tasks!",
-    "done": "No closed tasks!"
+    "done": "No closed tasks!",
+    "archived": "No archived tasks!"
   },
   "submissions": {
     "toDo": "To Do",
@@ -52,20 +54,32 @@
       "kanban": "View Kanban"
     },
     "crud": {
-      "addSuccess": "Task added successfully!",
-      "editSuccess": "Task edited successfully!",
-      "deleteSuccess": "Task deleted successfully!",
-      "addError": "An error occurred while adding the task, please try again later.",
-      "editError": "An error occurred while editing the task, please try again later.",
-      "deleteError": "An error occurred while deleting the task, please try again later.",
-      "moveSuccess": "Task moved successfully!",
-      "moveError": "An error occurred while moving the task, please try again later!"
+      "addSuccess": "created",
+      "editSuccess": "edited",
+      "deleteSuccess": "deleted",
+      "archiveSuccess": "archived",
+      "unarchiveSuccess": "unarchived",
+      "addError": "create",
+      "archiveError": "archive",
+      "unarchiveError": "unarchive",
+      "editError": "edit",
+      "deleteError": "delete",
+      "moveSuccess": "moved",
+      "moveError": "move",
+      "errorMessage": "Error while trying to {action} task, please try again!",
+      "successMessage": "Task {action} successfully!"
     },
     "deleteModal": {
       "title": "Do you really want to delete this Task?",
       "subtitle": "When deleting a task, all content created within it will also be deleted.",
       "cancel": "Cancel",
       "delete": "Delete"
+    },
+    "filterChip": {
+      "select": "Type",
+      "archivedTasks": "Archived Tasks",
+      "startDate": "Start Date",
+      "finalDate": "End Date"
     },
     "add": "Add task",
     "addPlaceholder": "Enter the task title",

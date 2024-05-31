@@ -3,10 +3,12 @@
   "draft": "Rascunho",
   "published": "Publicadas",
   "done": "Encerradas",
+  "archived": "Arquivadas",
   "emptyState": {
     "draft": "Nenhuma tarefa em rascunho!",
     "published": "Nenhuma tarefa publicada!",
-    "done": "Nenhuma tarefa encerrada!"
+    "done": "Nenhuma tarefa encerrada!",
+    "archived": "Nenhuma tarefa arquivada!"
   },
   "submissions": {
     "toDo": "A fazer",
@@ -53,20 +55,32 @@
     }
   },
   "crud": {
-    "addSuccess": "Tarefa criada com sucesso!",
-    "editSuccess": "Tarefa editada com sucesso!",
-    "deleteSuccess": "Tarefa excluída com sucesso!",
-    "addError": "Erro ao criar tarefa, tente novamente!",
-    "editError": "Erro ao editar tarefa, tente novamente!",
-    "deleteError": "Erro ao excluir tarefa, tente novamente!",
-    "moveSuccess": "Tarefa movida com sucesso!",
-    "moveError": "Erro ao mover tarefa, tente novamente!"
+    "addSuccess": "criada",
+    "editSuccess": "editada",
+    "deleteSuccess": "excluída",
+    "archiveSuccess": "arquivada",
+    "unarchiveSuccess": "desarquivada",
+    "addError": "criar",
+    "archiveError": "arquivar",
+    "unarchiveError": "desarquivar",
+    "editError": "editar",
+    "deleteError": "excluir",
+    "moveSuccess": "movida",
+    "moveError": "mover",
+    "errorMessage": "Erro ao {action} tarefa, tente novamente!",
+    "successMessage": "Tarefa {action} com sucesso!"
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",
     "subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
     "cancel": "Cancelar",
     "delete": "Excluir"
+  },
+  "filterChip": {
+    "select": "Tipo",
+    "archivedTasks": "Tarefas arquivadas",
+    "startDate": "Data de início",
+    "finalDate": "Data de término"
   },
 
   "add": "Adicionar tarefa",

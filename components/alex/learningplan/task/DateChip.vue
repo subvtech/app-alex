@@ -2,6 +2,7 @@
   <alex-custom-chip
     :status="color"
     :text="deadline"
+    size="small"
     prepend-icon="mdi-calendar-range"
   ></alex-custom-chip>
 </template>
