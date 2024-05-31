@@ -3,10 +3,12 @@
   "draft": "Draft",
   "published": "Published",
   "done": "Closed",
+  "archived": "Archived",
   "emptyState": {
     "draft": "No tasks in draft!",
     "published": "No published tasks!",
-    "done": "No closed tasks!"
+    "done": "No closed tasks!",
+    "archived": "No archived tasks!"
   },
   "submissions": {
     "toDo": "To Do",
@@ -72,6 +74,12 @@
       "subtitle": "When deleting a task, all content created within it will also be deleted.",
       "cancel": "Cancel",
       "delete": "Delete"
+    },
+    "filterChip": {
+      "select": "Type",
+      "archivedTasks": "Archived Tasks",
+      "startDate": "Start Date",
+      "finalDate": "End Date"
     },
     "add": "Add task",
     "addPlaceholder": "Enter the task title",

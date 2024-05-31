@@ -3,10 +3,12 @@
   "draft": "Rascunho",
   "published": "Publicadas",
   "done": "Encerradas",
+  "archived": "Arquivadas",
   "emptyState": {
     "draft": "Nenhuma tarefa em rascunho!",
     "published": "Nenhuma tarefa publicada!",
-    "done": "Nenhuma tarefa encerrada!"
+    "done": "Nenhuma tarefa encerrada!",
+    "archived": "Nenhuma tarefa arquivada!"
   },
   "submissions": {
     "toDo": "A fazer",
@@ -73,6 +75,12 @@
     "subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
     "cancel": "Cancelar",
     "delete": "Excluir"
+  },
+  "filterChip": {
+    "select": "Tipo",
+    "archivedTasks": "Tarefas arquivadas",
+    "startDate": "Data de início",
+    "finalDate": "Data de término"
   },
 
   "add": "Adicionar tarefa",

@@ -44,14 +44,14 @@
           </p>
           <div class="d-flex align-center ga-1">
             <alex-inputs-date
-              v-model="filters.beginDateStart"
+              v-model="filters.startDate.start"
               class="flex-1-1"
               name="startDate"
               hide-details
               density="comfortable"
             />
             <alex-inputs-date
-              v-model="filters.beginDateEnd"
+              v-model="filters.startDate.end"
               class="flex-1-1"
               hide-details
               name="finalDate"
@@ -64,14 +64,14 @@
         </p>
         <div class="d-flex align-center ga-1">
           <alex-inputs-date
-            v-model="filters.deadLineStart"
+            v-model="filters.finalDate.start"
             class="flex-1-1"
             name="startDate"
             hide-details
             density="comfortable"
           />
           <alex-inputs-date
-            v-model="filters.deadLineEnd"
+            v-model="filters.finalDate.end"
             class="flex-1-1"
             hide-details
             name="finalDate"
@@ -128,11 +128,15 @@ const props = withDefaults(defineProps<Filter>(), {
 
 const filters = ref({
   select: null,
-  beginDateStart: '',
-  beginDateEnd: '',
-  deadLineStart: '',
-  deadLineEnd: '',
   archivedTasks: false,
+  startDate: {
+    start: '',
+    end: '',
+  },
+  finalDate: {
+    start: '',
+    end: '',
+  },
 });
 
 const i18Texts = computed(() => {
@@ -151,8 +155,11 @@ const i18Texts = computed(() => {
 });
 
 const types = [
-  t('components.learningPlan.drawer.group'),
-  t('components.learningPlan.drawer.individual'),
+  { title: t('components.learningPlan.drawer.group'), value: 'group' },
+  {
+    title: t('components.learningPlan.drawer.individual'),
+    value: 'individual',
+  },
 ];
 
 const emits = defineEmits(['update:modelValue', 'filter']);
@@ -162,20 +169,53 @@ const handleChange = (value: boolean) => {
 };
 
 const handleFilter = () => {
-  emits('filter', filters.value);
+  const nonEmptyFilters = Object.fromEntries(
+    Object.entries(filters.value).filter(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ([key, value]) => {
+        if (value === null || value === false) {
+          return false;
+        }
+        if (typeof value === 'object') {
+          return value.start !== '' || value.end !== '';
+        }
+        return true;
+      },
+    ),
+  );
+  emits('filter', nonEmptyFilters);
   handleChange(false);
 };
+
+const removeFilter = (key: string) => {
+  if (key === 'archivedTasks') filters.value[key] = false;
+  else if (key === 'select') filters.value[key] = null;
+  else
+    filters.value[key] = {
+      start: '',
+      end: '',
+    };
+  handleFilter();
+};
+
+defineExpose({
+  removeFilter,
+});
 
 const clearFilters = () => {
   filters.value = {
     select: null,
-    beginDateStart: '',
-    beginDateEnd: '',
-    deadLineStart: '',
-    deadLineEnd: '',
     archivedTasks: false,
+    startDate: {
+      start: '',
+      end: '',
+    },
+    finalDate: {
+      start: '',
+      end: '',
+    },
   };
-  handleChange(false);
+  emits('filter', {});
 };
 </script>
 
