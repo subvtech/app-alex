@@ -152,12 +152,14 @@ const emit = defineEmits<Emits>();
 
 const handleInsertCard = ({ newIndex, value, group }) => {
   // Update task status
-  tasks.value = tasks.value.map((task) => {
-    if (task.id === value.id) {
-      return { ...task, status: group };
-    }
-    return task;
-  });
+  if (value) {
+    tasks.value = tasks.value.map((task) => {
+      if (task.id === value.id) {
+        return { ...task, status: group };
+      }
+      return task;
+    });
+  }
   emit('insert-card', newIndex, value, group);
 };
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {

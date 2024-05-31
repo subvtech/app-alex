@@ -49,10 +49,20 @@ definePageMeta({
 });
 const changeStatusTask = async (
   _newIndex: number,
-  _value: Task,
+  value: Task,
   _group: string,
 ) => {
-  await new Promise((resolve) => setTimeout(() => resolve(true), 2000));
+  const success = await new Promise((resolve) =>
+    setTimeout(() => resolve(false), 2000),
+  );
+  if (!success) {
+    tasks.value = tasks.value.map((task) => {
+      if (task.id === value.id) {
+        return { ...task, status: value.status };
+      }
+      return task;
+    });
+  }
 };
 // Caminho até a página (Acima do header)
 const tasks = ref([
@@ -63,7 +73,16 @@ const tasks = ref([
     mark: 1,
     maxMark: 10,
     studentClass: 'turma A',
-    user: { name: 'test' },
+    user: { name: 'test1' },
+  },
+  {
+    id: 2,
+    status: 'to_do',
+    date: new Date(),
+    mark: 1,
+    maxMark: 10,
+    studentClass: 'turma A',
+    user: { name: 'test2' },
   },
 ]);
 const learningPlanStore = useLearningPlanStore();
