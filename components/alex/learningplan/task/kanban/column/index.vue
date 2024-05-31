@@ -6,14 +6,13 @@
       :color="color"
     />
     <SlickList
-      v-model:list="items"
+      :list="items"
       :group="group"
+      :accept="accept"
       class="flex flex-col py-2"
       helper-class="kanban-helper"
-      :accept="accept"
       @sort-insert="
-        ({ newIndex, value }) =>
-          $emit('change-card', { newIndex, value, group })
+        ({ newIndex, value }) => handleInsertCard({ newIndex, value, group })
       "
     >
       <SlickItem
@@ -22,13 +21,19 @@
         :index="i"
         class="kanban-card-item"
       >
-        <slot name="card" :item="item" :index="i" :status="status" />
+        <slot
+          name="card"
+          :item="item"
+          :index="i"
+          :status="status"
+          :click="$emit('click:card', i, item as T)"
+        />
       </SlickItem>
     </SlickList>
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends { id: number }">
+<script setup lang="ts" generic="T extends { id: number; status: string }">
 import { SlickList, SlickItem } from 'vue-slicksort';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 export type Accept<T> =
@@ -46,22 +51,42 @@ export type Accept<T> =
 interface ColumnProps {
   title: string;
   color: 'orange' | 'green' | 'blue' | 'gray';
-  accept?: Accept<T>;
+  accept?: Accept<T> | null;
   group: string;
-  items: T[];
 }
-const props = defineProps<ColumnProps>();
-const items = ref(props.items);
-defineEmits<{
-  'click:card': [];
-  'change-card': [
+const props = withDefaults(defineProps<ColumnProps>(), { accept: null });
+const items = defineModel<T[]>({ required: true });
+const emit = defineEmits<{
+  'click:card': [index: number, item: T];
+  'insert-card': [
     values: {
       newIndex: number;
       value: T;
       group: string;
     },
   ];
+  'move-card': [
+    values: {
+      oldIndex: number;
+      newIndex: number;
+      event: MouseEvent;
+    },
+  ];
 }>();
+const isDragging = () => {
+  const isDraggingCard = document.querySelector(
+    '.kanban-card-item.kanban-helper',
+  );
+  return !!isDraggingCard;
+};
+const handleInsertCard = (values: {
+  newIndex: number;
+  value: T;
+  group: string;
+}) => {
+  if (isDragging()) return;
+  emit('insert-card', values);
+};
 const mappedStatus = {
   gray: 'to_do',
   blue: 'in_progress',

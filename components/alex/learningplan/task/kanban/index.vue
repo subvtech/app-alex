@@ -19,7 +19,7 @@
             icon="mdi-filter-variant"
             size="large"
             variant="secondary"
-            @click="handleClickFilter"
+            @click="$emit('click:filter')"
           />
         </template>
       </v-tooltip>
@@ -36,13 +36,13 @@
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
         :key="index"
-        :items="tasks.filter((task) => column.group === task.status)"
+        v-model="columnsTasks[column.group]"
         :title="column.title"
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
-        @click:card="handleClickCard"
-        @change-card="handleChangeCard"
+        @click:card="$emit('click:card')"
+        @insert-card="handleInsertCard"
       >
         <template #card="{ item, status }">
           <template v-if="type === 'professor'">
@@ -83,9 +83,10 @@ import { useMouse } from '@vueuse/core';
 import { Accept } from './column/index.vue';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 
+// Types
 export interface Task {
   id: number;
-  status: string;
+  status: TaskStatus | (string & {});
   date: Date;
   studentClass: string;
   user: { name: string; avatar?: string | null };
@@ -95,11 +96,11 @@ export interface Task {
 export interface TaskStudent {
   id: number;
   date: Date;
+  status: TaskStatus | (string & {});
   title: string;
   group?: boolean;
   nameGroup?: string;
   avatar?: string | null;
-  status?: TaskStatus | (string & {});
   mark?: number;
   maxMark?: number;
 }
@@ -110,41 +111,55 @@ interface Column<T extends 'professor' | 'student'> {
   title: string;
   group: string;
   color: Colors;
-  accept: Accept<Card<T>>;
+  accept?: Accept<Card<T>> | null;
 }
 interface KanbanProps {
   type: T;
 }
+
+// Models/props
 const props = defineProps<KanbanProps>();
-const tasks = defineModel<Card<typeof props.type>[]>('tasks', {
+const tasks = defineModel<Card<typeof props.type>[]>({
   required: true,
 });
+
 const columns = defineModel<Column<typeof props.type>[]>('columns', {
   required: true,
 });
-const emit = defineEmits(['click:filter', 'click:card']);
-const handleClickFilter = () => {
-  emit('click:filter');
+
+const columnsTasks = computed(() =>
+  columns.value.reduce((acc, item) => {
+    if (!acc[item.group]) {
+      acc[item.group] = tasks.value.filter(
+        (task) => item.group === task.status,
+      );
+    }
+    return acc;
+  }, {}),
+); // returns { status1: [], status2: [ {id:...} ]...}
+
+type Emits = {
+  (e: 'click:filter'): void;
+  (e: 'click:card'): void;
+  (
+    e: 'insert-card',
+    newIndex: number,
+    value: Card<typeof props.type>,
+    group: string,
+  ): Promise<boolean>;
 };
-const handleClickCard = () => {
-  emit('click:card');
-};
-const handleChangeCard = ({
-  value,
-  group,
-}: {
-  newIndex: number;
-  value: Card<typeof props.type>;
-  group: string;
-}) => {
+const emit = defineEmits<Emits>();
+
+const handleInsertCard = ({ newIndex, value, group }) => {
+  // Update task status
   tasks.value = tasks.value.map((task) => {
     if (task.id === value.id) {
       return { ...task, status: group };
     }
     return task;
   });
+  emit('insert-card', newIndex, value, group);
 };
-
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
   return 'title' in card;
 };

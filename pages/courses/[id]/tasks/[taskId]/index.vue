@@ -9,54 +9,63 @@
       :status="task.status"
     />
     <alex-learningplan-task-kanban
+      v-model="tasks"
       type="professor"
       :columns="[
         {
           title: 'A fazer',
           color: 'gray',
           group: 'to_do',
-          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+          accept: null,
         },
         {
-          title: 'A fazer',
+          title: 'Em progresso',
           color: 'blue',
           group: 'in_progress',
           accept: ['to_do', 'in_progress', 'in_review', 'done'],
         },
         {
-          title: 'A fazer',
+          title: 'Em avaliação',
           color: 'orange',
           group: 'in_review',
           accept: ['to_do', 'in_progress', 'in_review', 'done'],
         },
         {
-          title: 'A fazer',
+          title: 'Concluído',
           color: 'green',
           group: 'done',
           accept: ['to_do', 'in_progress', 'in_review', 'done'],
         },
       ]"
-      :tasks="[
-        {
-          id: 1,
-          status: 'to_do',
-          date: new Date(),
-          mark: 1,
-          maxMark: 10,
-          studentClass: 'turma A',
-          user: { name: 'test' },
-        },
-      ]"
+      @insert-card="changeStatusTask"
     />
   </section>
 </template>
 
 <script setup lang="ts">
+import { Task } from '~/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
+const changeStatusTask = async (
+  _newIndex: number,
+  _value: Task,
+  _group: string,
+) => {
+  await new Promise((resolve) => setTimeout(() => resolve(true), 2000));
+};
 // Caminho até a página (Acima do header)
+const tasks = ref([
+  {
+    id: 1,
+    status: 'to_do',
+    date: new Date(),
+    mark: 1,
+    maxMark: 10,
+    studentClass: 'turma A',
+    user: { name: 'test' },
+  },
+]);
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
 const headerStore = usePageHeaderStore();
