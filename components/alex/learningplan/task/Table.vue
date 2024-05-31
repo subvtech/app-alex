@@ -13,16 +13,20 @@
         <tr
           v-for="item in items"
           :key="item.id"
-          class="text-5 text-gray-600 text-no-wrap staggered-fade-item"
+          class="text-5 text-no-wrap staggered-fade-item"
+          :class="isArchived ? 'text-gray-400' : 'text-gray-600'"
         >
-          <td class="text-body-4 text-gray-800 text-overflow text-left">
+          <td
+            class="text-body-4 text-overflow text-left"
+            :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
+          >
             {{ item.title }}
           </td>
           <td>
             <alex-learningplan-task-date-chip
               v-if="item.deadline_at"
               :date="item.deadline_at"
-              :is-published="item.status === 'published'"
+              :is-published="item.status === 'published' && !isArchived"
             />
             <span v-else>{{
               $t('pages.task.table.placeholders.undefined')
@@ -49,7 +53,11 @@
             }}</span>
           </td>
           <td>
-            <div v-if="item.students?.length" class="ml-2">
+            <div
+              v-if="item.students?.length"
+              class="ml-2"
+              :class="{ 'gray-filter': isArchived }"
+            >
               <alex-custom-avatar-group
                 :avatar-items="item.students || []"
                 :max="3"
@@ -132,6 +140,7 @@ import { TaskType } from './Container.vue';
 const props = defineProps<{
   tasks: TaskType[];
   filter: string;
+  isArchived: boolean;
 }>();
 
 const { t } = useI18n();
@@ -171,7 +180,6 @@ const dropDownItems = (task: TaskType) => {
     case 'published':
       if (deliveredTotal === 0) {
         items.push(getDropDownAction('draft', task.id));
-        items.push(getDropDownAction('close', task.id));
         items.push(getDropDownAction('delete', task.id));
       } else if (task.archived) {
         items.push(getDropDownAction('unarchive', task.id));
@@ -275,6 +283,10 @@ const header = [
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.gray-filter {
+  filter: grayscale(1);
 }
 
 .list-enter-active,

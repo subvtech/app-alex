@@ -20,15 +20,19 @@ defineProps<{
 const taskSections = [
   {
     text: t('pages.task.emptyState.draft'),
-    image: '/images/emptyDraftTasks.svg',
+    image: '/svg/emptyDraftTasks.svg',
   },
   {
     text: t('pages.task.emptyState.published'),
-    image: '/images/emptyPublishedTasks.svg',
+    image: '/svg/emptyPublishedTasks.svg',
   },
   {
     text: t('pages.task.emptyState.done'),
-    image: '/images/emptyFinishedTasks.svg',
+    image: '/svg/emptyFinishedTasks.svg',
+  },
+  {
+    text: t('pages.task.emptyState.archived'),
+    image: '/svg/emptyArchivedTasks.svg',
   },
 ];
 </script>

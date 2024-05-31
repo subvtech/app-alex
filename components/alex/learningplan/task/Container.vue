@@ -1,83 +1,89 @@
 <template>
-  <v-expansion-panels
-    v-for="i in 3"
-    :key="i"
-    v-model="expand[i - 1]"
-    class="task-accordion my-6 rounded-lg"
-  >
-    <v-expansion-panel class="rounded-lg">
-      <v-expansion-panel-title class="cursor-default" disabled hide-actions>
-        <v-icon
-          :icon="expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
-          @click="toggleExpand(i)"
-        />
-        <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
-        <alex-custom-chip
-          status="secondary"
-          :text="filteredTasks[i - 1].toString()"
-        ></alex-custom-chip>
-      </v-expansion-panel-title>
-      <v-expansion-panel-text>
-        <Transition name="slide-up">
-          <alex-learningplan-task-empty-state
-            v-if="!tasksArray[i - 1].length"
-            :index="i"
-          />
-          <alex-learningplan-task-table
-            v-else-if="tasksArray[i - 1].length"
-            :index="i"
-            :tasks="tasksArray[i - 1]"
-            :filter="search"
-            @delete-task="handleDeleteTask"
-            @move-task="handleMoveTask"
-            @toggle-archive="handleToggleArchive"
-          />
-        </Transition>
-        <div v-if="i === 1" class="mb-4">
-          <Transition mode="out-in" name="add-task">
-            <alex-custom-button
-              v-if="!isCreatingTask"
-              size="large"
-              variant="text"
-              prepend-icon="mdi-plus"
-              class="w-100 create-task-btn"
-              :loading="loader"
-              @click="isCreatingTask = true"
-            >
-              {{ $t('pages.task.add') }}
-            </alex-custom-button>
-            <div v-else class="d-flex ga-2">
-              <alex-inputs-text-field
-                v-model="taskTitle"
-                :placeholder="t('pages.task.addPlaceholder')"
-                class="w-100"
-                density="comfortable"
-                name="taskTitle"
-                hide-details
-                :disabled="loader"
-                @keyup.enter="handleCreateTask"
-              />
-              <alex-custom-button
-                size="large"
-                :loading="loader"
-                @click="handleCreateTask"
-              >
-                {{ $t('pages.task.addButton') }}
-              </alex-custom-button>
+  <div v-for="i in 4" :key="i">
+    <Transition name="slide">
+      <v-expansion-panels
+        v-if="shouldDisplay(i)"
+        v-model="expand[i - 1]"
+        class="task-accordion my-6 rounded-lg"
+      >
+        <v-expansion-panel class="rounded-lg">
+          <v-expansion-panel-title class="cursor-default" disabled hide-actions>
+            <v-icon
+              :icon="
+                expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
+              "
+              @click="toggleExpand(i)"
+            />
+            <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
+            <alex-custom-chip
+              status="secondary"
+              :text="filteredTasks[i - 1].toString()"
+            ></alex-custom-chip>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <Transition :name="slideTransition(i)" mode="out-in">
+              <div v-if="!tasksArray[i - 1].length && i">
+                <alex-learningplan-task-empty-state
+                  key="empty-state"
+                  :index="i"
+                />
+              </div>
+              <div v-else>
+                <alex-learningplan-task-table
+                  key="table"
+                  :index="i"
+                  :tasks="tasksArray[i - 1]"
+                  :filter="search"
+                  :is-archived="i === 4"
+                  @delete-task="handleDeleteTask"
+                  @move-task="handleMoveTask"
+                  @toggle-archive="handleToggleArchive"
+                />
+              </div>
+            </Transition>
+            <div v-if="i === 1" class="mb-4">
+              <Transition mode="out-in" name="add-task">
+                <alex-custom-button
+                  v-if="!isCreatingTask"
+                  size="large"
+                  variant="text"
+                  prepend-icon="mdi-plus"
+                  class="w-100 create-task-btn"
+                  :loading="loader"
+                  @click="isCreatingTask = true"
+                >
+                  {{ $t('pages.task.add') }}
+                </alex-custom-button>
+                <div v-else class="d-flex ga-2">
+                  <alex-inputs-text-field
+                    v-model="taskTitle"
+                    :placeholder="t('pages.task.addPlaceholder')"
+                    class="w-100"
+                    density="comfortable"
+                    name="taskTitle"
+                    hide-details
+                    :disabled="loader"
+                    @keyup.enter="handleCreateTask"
+                  />
+                  <alex-custom-button
+                    size="large"
+                    :loading="loader"
+                    @click="handleCreateTask"
+                  >
+                    {{ $t('pages.task.addButton') }}
+                  </alex-custom-button>
+                </div>
+              </Transition>
             </div>
-          </Transition>
-        </div>
-      </v-expansion-panel-text>
-    </v-expansion-panel>
-  </v-expansion-panels>
-  <alex-learningplan-task-filter
-    :model-value="filterDrawer"
-    @filter="(value) => console.log(value)"
-    @update:model-value="(value) => (filterDrawer = value)"
-  />
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 export interface TaskType {
   id: number;
   title: string;
@@ -85,7 +91,7 @@ export interface TaskType {
   deadline_at: string;
   type?: string;
   archived?: boolean;
-  students?: { name: string; avatar: { url: string } }[];
+  students?: { name: string; image: { url: string } }[];
   delivered: {
     toDo: number;
     doing: number;
@@ -96,19 +102,12 @@ export interface TaskType {
 
 const props = defineProps<{
   search: string;
+  filter: filterType | undefined;
 }>();
-
-const filterDrawer = ref(false);
-
-const openFilterDrawer = () => {
-  filterDrawer.value = true;
-};
-
-defineExpose({ openFilterDrawer });
 
 const { create, delete: _delete, update } = useStrapi();
 const { t } = useI18n();
-const expand = ref([0, 0, 0]);
+const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
@@ -116,9 +115,16 @@ const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 
+const slideTransition = (i: number) =>
+  tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
 
 const searchField = computed(() => props.search.toLowerCase());
+const tasksFilter = computed(() => props.filter);
 
+const shouldDisplay = (i: number) => {
+  const { archivedTasks } = tasksFilter.value || {};
+  return (!archivedTasks && i !== 4) || (i === 4 && archivedTasks);
+};
 const displayError = (message: string) => {
   setMessage(
     t('pages.task.crud.errorMessage', {
@@ -139,6 +145,15 @@ const displaySuccess = (message: string) => {
     'success',
     true,
   );
+};
+
+const isDateInRange = (date: Date, range) => {
+  if (!range) return true;
+  if (!date) return false;
+  const { start, end } = range;
+  if (start && new Date(date) < new Date(start)) return false;
+  if (end && new Date(date) > new Date(end)) return false;
+  return true;
 };
 
 const handleCreateTask = async () => {
@@ -171,6 +186,7 @@ const taskSections = [
   t('pages.task.draft'),
   t('pages.task.published'),
   t('pages.task.done'),
+  t('pages.task.archived'),
 ];
 
 const tasksArray = computed(() => {
@@ -178,7 +194,6 @@ const tasksArray = computed(() => {
   const published: TaskType[] = [];
   const closed: TaskType[] = [];
   const archived: TaskType[] = [];
-
   learningPlanStore.learningPlan?.tasks.forEach((task) => {
     const delivered = {
       toDo: 0,
@@ -187,6 +202,11 @@ const tasksArray = computed(() => {
       completed: 0,
     };
 
+    if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
+      return;
+    if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
+    if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate)) return;
+
     const students = task.task_members?.map((student) => {
       if (student.status === 'to_do') delivered.toDo += 1;
       if (student.status === 'in_progress') delivered.doing += 1;
@@ -194,7 +214,7 @@ const tasksArray = computed(() => {
       if (student.status === 'done') delivered.completed += 1;
       return {
         name: student.student_member.user.fullname,
-        avatar: { url: student.student_member.user.avatar.url },
+        image: { url: student.student_member.user.avatar.url },
       };
     });
 
@@ -205,14 +225,14 @@ const tasksArray = computed(() => {
       deadline_at: task.deadline_at,
       start_at: task.start_at,
       type: task.type,
+      archived: task.archived,
       students,
       delivered,
     };
-
     if (task.archived) archived.push(taskItem);
-    if (task.status === 'draft') draft.push(taskItem);
-    if (task.status === 'published') published.push(taskItem);
-    if (task.status === 'done') closed.push(taskItem);
+    else if (task.status === 'draft') draft.push(taskItem);
+    else if (task.status === 'published') published.push(taskItem);
+    else if (task.status === 'done') closed.push(taskItem);
   });
   return [draft, published, closed, archived];
 });
@@ -227,7 +247,11 @@ const filteredTasks = computed(() => {
   const closed = tasksArray.value[2].filter((task) =>
     task.title.toLowerCase().includes(searchField.value.toLowerCase()),
   ).length;
-  return [draft, published, closed];
+  const archived = tasksArray.value[3].filter((task) =>
+    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
+  ).length;
+
+  return [draft, published, closed, archived];
 });
 
 const handleDeleteTask = async (id: number) => {
@@ -346,17 +370,31 @@ const handleToggleArchive = async (id: number) => {
 }
 
 .slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.25s ease-out;
+.slide-up-leave-active,
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s ease;
 }
 
-.slide-up-enter-from {
+.slide-up-enter-from,
+.slide-down-leave-to {
   opacity: 0;
   transform: translateY(30px);
 }
 
-.slide-up-leave-to {
+.slide-up-leave-to,
+.slide-down-enter-from {
   opacity: 0;
   transform: translateY(-30px);
+}
+
+.slide-enter-active {
+  transition: all 0.5s ease-out;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 </style>
