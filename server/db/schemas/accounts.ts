@@ -1,4 +1,6 @@
 import { integer, pgTable, primaryKey, text } from 'drizzle-orm/pg-core';
+import { z } from 'zod';
+
 import { users } from './users';
 
 export const accounts = pgTable(
@@ -24,3 +26,12 @@ export const accounts = pgTable(
     }),
   }),
 );
+
+export const LoginSchema = z.object({
+  email: z.string().email({
+    message: 'Email is required',
+  }),
+  password: z.string().min(3, {
+    message: 'Password is required',
+  }),
+});

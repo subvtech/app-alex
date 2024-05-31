@@ -132,24 +132,21 @@
 </template>
 
 <script setup lang="ts">
-import { useForm } from 'vee-validate';
 import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
+import { useForm } from 'vee-validate';
 
 const { signIn } = useAuth();
-
 const hasError = ref(false);
 const errorMessage = ref('');
 const route = useRoute();
 
 definePageMeta({
   layout: 'auth',
-  middleware: 'control-access',
+  middleware: ['control-access', 'guest-only'],
 });
 
 const redirect =
   (route.query.redirect as string) || useCookie('redirect').value;
-
-const router = useRouter();
 
 const { loginSchema } = useFormRules();
 const { mapStrapiErrors } = useStrapiHelpers();
@@ -158,11 +155,12 @@ const { handleSubmit, errors, values, controlledValues } = useForm({
   keepValuesOnUnmount: true,
 });
 
-const isValid = computed(
-  () =>
+const isValid = computed(() => {
+  return (
     !Object.values(controlledValues.value).includes(undefined) &&
-    !Object.values(errors.value).length,
-);
+    !Object.values(errors.value).length
+  );
+});
 
 const logging = ref(false);
 const logging2 = ref(false);
@@ -174,26 +172,27 @@ const submit = handleSubmit(async () => {
   logging.value = true;
 
   try {
-    await signIn('credentials', values);
-
-    if (redirect) {
-      router.push(redirect);
-      useCookie('redirect').value = null;
-    } else {
-      router.push('/');
-    }
+    await signIn('credentials', {
+      ...values,
+      callbackUrl: redirect || undefined,
+    });
   } catch (err: unknown) {
+    if ((err as Error).message === 'CredentialsSignin') {
+      console.log('invalid credentials');
+    }
+
     hasError.value = true;
+
     const error = err as Strapi4Error;
     const catchErrorMessage = error?.error?.message;
+
     if (catchErrorMessage) {
       errorMessage.value = mapStrapiErrors(catchErrorMessage);
     }
   } finally {
     logging.value = false;
-    setTimeout(() => {
-      hasError.value = false;
-    }, 5000);
+
+    setTimeout(() => (hasError.value = false), 5000);
   }
 });
 </script>

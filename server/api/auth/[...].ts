@@ -1,53 +1,70 @@
+import Credentials from '@auth/core/providers/credentials';
 import type { AuthConfig } from '@auth/core/types';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
-import Credentials from '@auth/core/providers/credentials';
+import { compare } from 'bcrypt';
 import { NuxtAuthHandler } from '#auth';
-import db from '@/server/db';
-import {
-  accounts,
-  sessions,
-  users,
-  verificationTokens,
-} from '@/server/db/schemas/auth';
 
-// The #auth virtual import comes from this module. You can use it on the client
-// and server side, however not every export is universal. For example do not
-// use sign-in and sign-out on the server side.
+import db from '@/server/db';
+import { getUserByEmail, getUserById } from '@/server/db/queries/users';
+import { LoginSchema } from '@/server/db/schemas/accounts';
 
 const runtimeConfig = useRuntimeConfig();
 
-// Refer to Auth.js docs for more details
 export const authOptions: AuthConfig = {
   basePath: '/api/auth',
   secret: runtimeConfig.authJs?.secret || '',
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  adapter: DrizzleAdapter(db),
+  session: {
+    strategy: 'jwt',
+  },
   providers: [
     Credentials({
-      type: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        const user = null;
-        // const user = { id: '1', name: 'Djalma' };
-        await console.log(credentials);
+        const validate = LoginSchema.safeParse(credentials);
+        if (!validate.success) return null;
 
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // meaning this is also the place you could do registration
-          throw new Error('User not found.');
-        }
+        const { email, password } = validate.data;
+
+        const user = await getUserByEmail(email);
+        if (!user || !user.password) return null;
+
+        const passwordMatch = await compare(password, user.password);
+        if (!passwordMatch) return null;
 
         return user;
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token }) {
+      if (!token.sub) return token;
+
+      const user = await getUserById(token.sub);
+      if (!user) return token;
+
+      // token.isOAuth = !!(await getAccountByUserId(user.id));
+      token.name = user.name;
+      token.email = user.email;
+      // token.role = user.role;
+      // token.isTwoFactorEnabled = user.isTwoFactorEnabled;
+
+      return token;
+    },
+    session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.sub!;
+        // session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+        // session.user.role = token.role as UserRole;
+        // session.user.isOAuth = token.isOAuth as boolean;
+      }
+
+      return session;
+    },
+  },
 };
 
 export default NuxtAuthHandler(authOptions, runtimeConfig);

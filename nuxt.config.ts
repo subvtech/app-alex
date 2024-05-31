@@ -3,8 +3,9 @@ import { resolve } from 'node:path';
 const { BASE_URL = 'http://localhost:3000' } = process.env;
 
 export default defineNuxtConfig({
-  pages: true,
   ssr: false,
+  pages: true,
+  sourcemap: true,
   devtools: { enabled: true },
   alias: {
     cookie: resolve(__dirname, 'node_modules/cookie'),
