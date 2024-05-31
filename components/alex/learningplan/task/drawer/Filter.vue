@@ -155,8 +155,11 @@ const i18Texts = computed(() => {
 });
 
 const types = [
-  t('components.learningPlan.drawer.group'),
-  t('components.learningPlan.drawer.individual'),
+  { title: t('components.learningPlan.drawer.group'), value: 'group' },
+  {
+    title: t('components.learningPlan.drawer.individual'),
+    value: 'individual',
+  },
 ];
 
 const emits = defineEmits(['update:modelValue', 'filter']);
