@@ -1,18 +1,20 @@
 <template>
   <v-menu :disabled="!edit">
-    <template #activator="{ props }">
+    <template #activator="{ props: vMenuProps }">
       <p
-        v-bind="props"
+        v-bind="vMenuProps"
         class="pa-1 text-body-3 text-gray-800 rounded-md"
         :class="edit ? 'output cursor-pointer' : ''"
       >
-        {{ curr }}
+        {{ model }}
       </p>
     </template>
 
     <v-list>
       <v-list-item v-for="(item, index) in items" :key="index" :value="item">
-        <v-list-item-title @click="curr = item">{{ item }}</v-list-item-title>
+        <v-list-item-title @click="() => handleClickItem(item)">{{
+          item
+        }}</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-menu>
@@ -25,8 +27,15 @@ interface CompProps {
 }
 
 const props = defineProps<CompProps>();
-
-const curr = ref<string>(props?.items[0] || '');
+const model = defineModel<string>();
+const handleClickItem = (item: string) => {
+  model.value = item;
+};
+onBeforeMount(() => {
+  if (props.items.length) {
+    model.value = props.items[0];
+  }
+});
 </script>
 
 <style scoped>

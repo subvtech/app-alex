@@ -42,8 +42,7 @@ interface CompProps {
 defineProps<CompProps>();
 
 const open = ref<boolean>(false);
-const selectedDate = ref<Date>(new Date());
-
+const selectedDate = defineModel<Date>({ required: true });
 const emit = defineEmits(['updateDate', 'input']);
 
 function updateParentDate() {
@@ -62,27 +61,6 @@ const formattedDate = computed(() => {
 </script>
 
 <style scoped>
-/** Estilização da página */
-.text-p3 {
-  /* Body/P3 */
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
-
-.text-p4 {
-  /* Body/P4 */
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
-
 .date-output:hover {
   --v-theme-overlay-multiplier: var(--v-theme-gray-blue-overlay-multiplier);
   background-color: rgb(var(--v-theme-gray-blue)) !important;

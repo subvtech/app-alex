@@ -36,6 +36,7 @@
         description: 'Teste',
         status: 'not_started',
       }"
+      :deadline="new Date()"
       send-submission
       :submissions="submissions"
       :task="{ finalDate: new Date(), status: 'to_do' }"
@@ -43,7 +44,12 @@
     />
     <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
+      title="Criar um mapa mental sobre o assunto abordado em sala de aula
+        previamente e isso é um título muito grande grande grande"
       :messages="[]"
+      :editable="true"
+      has-submission
+      send-after-deadline
     />
   </v-container>
 </template>

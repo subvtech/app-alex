@@ -12,6 +12,12 @@
     <template #prepend>
       <div class="d-flex align-center justify-end">
         <alex-custom-button
+          v-if="kanbanButton"
+          icon="alex:Kanban"
+          size="small"
+          variant="text"
+        />
+        <alex-custom-button
           icon="mdi-close"
           size="small"
           variant="text"
@@ -22,12 +28,11 @@
 
     <div>
       <!-- Tags -->
-      <alex-learningplan-task-tags edit />
+      <alex-learningplan-task-tags :edit="editable" />
 
       <!-- Informações -->
       <p class="mt-4 text-h2 ellipsis lines-2">
-        Criar um mapa mental sobre o assunto abordado em sala de aula
-        previamente e isso é um título muito grande grande grande
+        {{ title }}
       </p>
 
       <v-row class="my-5">
@@ -35,48 +40,44 @@
           ><p class="text-body-4 text-gray-800 mb-2">
             {{ $t('components.learningPlan.drawer.task.status.label') }}
           </p>
-          <alex-learningplan-task-state edit />
+          <alex-learningplan-task-state
+            v-model="status"
+            :edit="editable"
+            :items="itemsStatus"
+          />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
-            <span class="text-tag-orange-light">* </span
+            <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.type.label') }}
           </p>
-          <alex-learningplan-task-options :items="types" edit />
+          <alex-learningplan-task-options :items="types" :edit="editable" />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
-            <span class="text-tag-orange-light">* </span
+            <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="startDate" edit />
+          <alex-learningplan-task-date v-model="startDate" :edit="editable" />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
-            <span class="text-tag-orange-light">* </span
+            <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="finalDate" edit />
+          <alex-learningplan-task-date v-model="finalDate" :edit="editable" />
         </v-col>
-        <v-col cols="6"
-          ><p class="text-body-4 text-gray-800 mb-1">
-            <span class="text-tag-orange-light">* </span
-            >{{
-              $t(
-                'components.learningPlan.drawer.task.postClosingSubmission.label',
-              )
-            }}
-          </p>
-          <alex-learningplan-task-options :items="postClosingOptions" edit
-        /></v-col>
       </v-row>
 
-      <alex-learningplan-task-description edit />
+      <alex-learningplan-task-description
+        v-model="description"
+        :edit="editable"
+      />
 
       <!-- Objetivos de aprendizagem -->
-      <alex-learningplan-task-goals edit />
+      <alex-learningplan-task-goals :edit="editable" />
 
       <!-- Entregas-->
       <p class="text-h3 mt-6">
@@ -85,6 +86,7 @@
       <v-row class="mx-0 mt-3 mb-4">
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
+            v-model="hasSubmission"
             :label="
               $t('components.learningPlan.drawer.task.submission.reqSubmission')
             "
@@ -92,6 +94,7 @@
         </v-col>
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
+            v-model="sendAfterDeadline"
             :label="
               $t('components.learningPlan.drawer.task.submission.aftrDeadline')
             "
@@ -122,6 +125,7 @@
             )
           "
           variant="tertiary"
+          @click="$emit('click:attached-trail')"
         />
       </div>
 
@@ -136,42 +140,59 @@
         /></v-window-item>
       </v-window>
     </div>
-    <template v-if="activePage === '3'" #append>
-      <alex-learningplan-task-chat-input
-        @submit="(data) => console.log(data)"
-      />
-    </template>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
 const { t } = useI18n();
 
-// Date picker
-const startDate = ref(null);
-const finalDate = ref(null);
-
 interface TaskTeacherDrawerProps {
+  title: string;
   messages: Message[];
+  description?: string;
+  editable?: boolean;
+  hasSubmission?: boolean;
+  sendAfterDeadline?: boolean;
+  kanbanButton?: boolean;
 }
-defineProps<TaskTeacherDrawerProps>();
+const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
+  editable: true,
+  hasSubmission: false,
+  sendAfterDeadline: false,
+  kanbanButton: false,
+  description: undefined,
+});
+const description = toRef(props.description);
+const hasSubmission = toRef(props.hasSubmission);
+const sendAfterDeadline = toRef(props.sendAfterDeadline);
 const model = defineModel({ default: false });
 
-// Close drawer
-function handleCloseModal() {
-  model.value = false;
-}
+defineEmits(['click:kanban', 'click:attached-trail']);
+
+const itemsStatus = {
+  draft: {
+    title: t('components.learningPlan.drawer.task.status.draft'),
+    variant: 'secondary' as 'secondary' | 'blue',
+  },
+  published: {
+    title: t('components.learningPlan.drawer.task.status.published'),
+    variant: 'blue' as 'secondary' | 'blue',
+  },
+  closed: {
+    title: t('components.learningPlan.drawer.task.status.closed'),
+    variant: 'red' as 'secondary' | 'red',
+  },
+};
+// Status
+const status = ref('draft');
+// Date picker
+const startDate = ref(new Date());
+const finalDate = ref(new Date());
 
 // Tipos
 const types = ref<string[]>([
   t('components.learningPlan.drawer.task.type.individual'),
   t('components.learningPlan.drawer.task.type.collective'),
-]);
-
-// Aceitar depois do prazo
-const postClosingOptions = ref<string[]>([
-  t('components.learningPlan.drawer.task.postClosingSubmission.accept'),
-  t('components.learningPlan.drawer.task.postClosingSubmission.deny'),
 ]);
 
 // Tabs
@@ -180,27 +201,10 @@ const tabs = [
   { label: t('components.learningPlan.drawer.tabs.events.label'), value: '1' },
   { label: t('components.learningPlan.drawer.tabs.members.label'), value: '2' },
 ];
+// Close drawer
+function handleCloseModal() {
+  model.value = false;
+}
 </script>
 
-<style>
-/** Override do v-switch */
-.switches .v-switch.v-switch--inset .v-selection-control__wrapper {
-  /** Para de comprimir o input */
-  width: auto !important;
-}
-
-.switches .v-input__details {
-  /** Remove espaços desnecessários */
-  display: none !important;
-}
-
-.switches .v-switch__thumb {
-  /** Para de mudar a aparência do toggle ao selecionar */
-  transform: none !important;
-}
-
-.switches .v-selection-control__wrapper {
-  /** Alinha o componente ao resto do drawer */
-  margin-left: 0 !important;
-}
-</style>
+<style></style>

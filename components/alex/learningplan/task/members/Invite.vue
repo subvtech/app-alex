@@ -1,5 +1,5 @@
 <template>
-  <v-menu class="invite-member">
+  <v-menu class="invite-member" :close-on-content-click="false">
     <!-- Exibição -->
     <template #activator="{ props }">
       <alex-custom-button

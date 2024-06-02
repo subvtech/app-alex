@@ -8,9 +8,9 @@
       :close-on-content-click="false"
     >
       <!-- Exibição -->
-      <template #activator="{ props }">
+      <template #activator="{ props: vMenuProps }">
         <alex-custom-button
-          v-bind="props"
+          v-bind="vMenuProps"
           icon="mdi-plus"
           size="small"
           variant="secondary"
@@ -21,7 +21,7 @@
         <p class="text-body-1 text-gray-800 mb-2">
           {{ $t('components.learningPlan.drawer.tags.subtitle') }}
         </p>
-        <alex-inputs-select
+        <alex-inputs-combobox
           v-model="selected"
           class="hide-select-icon"
           style="min-width: 220px"

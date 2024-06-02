@@ -54,7 +54,7 @@
             >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="startDate" edit />
+          <alex-learningplan-task-date v-model="deadline" edit />
         </div>
       </div>
       <div class="task-submission">
@@ -176,6 +176,7 @@ interface Task {
 interface TaskUserDrawerProps {
   student: Student;
   task: Task;
+  deadline: Date;
   submission?: Submission;
   submissions: AttachedSubmission[];
   sendSubmission: boolean;
@@ -188,6 +189,7 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
 const messages = ref<Message[]>([]);
 const model = defineModel({ default: false });
 const sendSubmission = toRef(props.sendSubmission);
+const deadline = toRef(props.deadline);
 const activePage = ref('1');
 const initials = computed(() => {
   return getInitials(props.student.name);

@@ -4,12 +4,12 @@
   </p>
 
   <alex-inputs-text-area
-    v-model="descValue"
+    v-model="model"
     name="student"
     :placeholder="
       $t('components.learningPlan.drawer.task.description.placeHolder')
     "
-    :readonly="!props.edit"
+    :readonly="!edit"
     variant="outlined"
     density="comfortable"
     hide-details
@@ -17,12 +17,10 @@
 </template>
 
 <script setup lang="ts">
-interface CompProps {
-  description?: string;
+interface DescriptionProps {
   edit?: boolean;
 }
+defineProps<DescriptionProps>();
 
-const props = defineProps<CompProps>();
-
-const descValue = ref<string>(props.description || '');
+const model = defineModel<string>();
 </script>

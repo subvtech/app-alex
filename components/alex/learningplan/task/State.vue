@@ -4,8 +4,8 @@
     <template #activator="{ props }">
       <alex-custom-chip
         v-bind="props"
-        :text="config[curr].title"
-        :status="config[curr].variant"
+        :text="items[model].title"
+        :status="items[model].variant"
         :prepend-icon="edit ? 'mdi-chevron-down' : ''"
         :clickable="edit"
         variant="tonal"
@@ -16,11 +16,11 @@
     <!-- Opções -->
     <v-list>
       <v-list-item
-        v-for="(data, status) in config"
+        v-for="(data, status) in items"
         :key="status"
         :value="status"
       >
-        <v-list-item-title @click="curr = status">{{
+        <v-list-item-title @click="model = status">{{
           data.title
         }}</v-list-item-title>
       </v-list-item>
@@ -29,35 +29,18 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n();
-
 type TaskStatus = 'draft' | 'published' | 'closed';
 
-interface StateProps {
+interface ItemProps {
   title: string;
-  variant: 'secondary' | 'blue' | 'red';
+  variant: 'secondary' | 'blue' | 'red' | 'orange';
 }
+const model = defineModel<string>({ required: true });
 
-const config: Record<TaskStatus, StateProps> = {
-  draft: {
-    title: t('components.learningPlan.drawer.task.status.draft'),
-    variant: 'secondary',
-  },
-  published: {
-    title: t('components.learningPlan.drawer.task.status.published'),
-    variant: 'blue',
-  },
-  closed: {
-    title: t('components.learningPlan.drawer.task.status.closed'),
-    variant: 'red',
-  },
-};
-
-const curr = ref<TaskStatus>('draft');
-
-interface CompProps {
+interface StateProps {
   edit?: boolean;
+  items: Record<TaskStatus, ItemProps>;
 }
 
-defineProps<CompProps>();
+defineProps<StateProps>();
 </script>
