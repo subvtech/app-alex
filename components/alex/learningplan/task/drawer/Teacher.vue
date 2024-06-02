@@ -85,7 +85,6 @@
       <v-row class="mx-0 mt-3 mb-4">
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
-            color="blue"
             :label="
               $t('components.learningPlan.drawer.task.submission.reqSubmission')
             "
@@ -93,7 +92,6 @@
         </v-col>
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
-            color="blue"
             :label="
               $t('components.learningPlan.drawer.task.submission.aftrDeadline')
             "

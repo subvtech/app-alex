@@ -38,14 +38,23 @@
       </div>
 
       <div class="task-info">
-        <div class="d-flex flex-column gap-2 w-fit">
+        <div class="d-flex flex-column gap-2 w-full">
           <p class="text-body-4">
             {{ $t('components.courses.tasks.submission.status') }}
           </p>
           <alex-custom-chip
+            class="w-fit"
             status="blue"
             :text="$t(`components.courses.tasks.task.status.${task.status}`)"
           />
+        </div>
+        <div class="d-flex flex-column gap-2 w-full">
+          <p class="text-body-4 text-gray-800 mb-1">
+            <span class="text-tag-orange-light">* </span
+            >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
+          </p>
+
+          <alex-learningplan-task-date ref="startDate" edit />
         </div>
       </div>
       <div class="task-submission">
@@ -53,17 +62,35 @@
           <h4 class="text-h4">
             {{ $t('components.courses.tasks.submission.submission') }}
           </h4>
+
           <div class="d-flex flex-column gap-2 w-fit">
+            <div class="d-flex gap-2">
+              <alex-custom-switch
+                v-model="sendSubmission"
+                :label="
+                  $t(
+                    'components.learningPlan.drawer.task.allowSendAfterSubmission',
+                  )
+                "
+                :disabled="!editSendSubmission"
+              />
+            </div>
             <p class="text-body-4">
               {{ $t('components.courses.tasks.submission.constraint') }}
             </p>
             <div class="d-flex gap-2">
               <alex-custom-chip
-                v-for="(constraint, index) in submission.constraints"
-                :key="index"
+                v-if="!submission.constraints.length"
                 status="secondary"
-                :text="constraint"
+                :text="$t('components.learningPlan.drawer.task.freeEditor')"
               />
+              <template v-else
+                ><alex-custom-chip
+                  v-for="(constraint, index) in submission.constraints"
+                  :key="index"
+                  status="secondary"
+                  :text="constraint"
+              /></template>
             </div>
           </div>
           <div class="d-flex flex-column gap-2 w-100">
@@ -102,7 +129,7 @@
 
       <alex-learningplan-task-tabs
         v-model="activePage"
-        submission
+        :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :messages="messages"
         :submissions="submissions"
@@ -151,12 +178,16 @@ interface TaskUserDrawerProps {
   task: Task;
   submission?: Submission;
   submissions: AttachedSubmission[];
+  sendSubmission: boolean;
+  editSendSubmission?: boolean;
 }
 const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   submission: undefined,
+  editSendSubmission: true,
 });
 const messages = ref<Message[]>([]);
 const model = defineModel({ default: false });
+const sendSubmission = toRef(props.sendSubmission);
 const activePage = ref('1');
 const initials = computed(() => {
   return getInitials(props.student.name);
@@ -214,7 +245,10 @@ const handleSubmitMessage = (
 .user-info .v-avatar {
   grid-row: span 2;
 }
-
+.task-info {
+  display: flex;
+  gap: 2em;
+}
 .task-submission {
   display: flex;
   gap: 16px;

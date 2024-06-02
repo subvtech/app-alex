@@ -31,6 +31,12 @@
     <alex-learningplan-task-drawer-student
       v-model="studentDrawer"
       :messages="[]"
+      :submission="{
+        constraints: [],
+        description: 'Teste',
+        status: 'not_started',
+      }"
+      send-submission
       :submissions="submissions"
       :task="{ finalDate: new Date(), status: 'to_do' }"
       :student="{ name: 'Jorge santos lima', studentClass: 'Turma A' }"

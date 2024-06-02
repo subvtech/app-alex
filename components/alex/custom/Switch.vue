@@ -9,12 +9,12 @@
 
 <script setup lang="ts">
 interface SwitchProps {
-  color: string | undefined;
-  label: string | undefined;
+  color?: string;
+  label?: string;
 }
 
 const props = withDefaults(defineProps<SwitchProps>(), {
-  color: 'blue',
+  color: 'secondary-0',
   label: undefined,
 });
 </script>
