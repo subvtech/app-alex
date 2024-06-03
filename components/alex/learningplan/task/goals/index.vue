@@ -5,7 +5,7 @@
     </p>
 
     <div class="d-flex align-center flex-wrap ga-2">
-      <v-menu v-model="open" :close-on-content-click="false" v-if="props.edit">
+      <v-menu v-if="props.edit" v-model="open" :close-on-content-click="false">
         <!-- Adicionar objetivo -->
         <template #activator="{ props }">
           <alex-custom-button
@@ -37,7 +37,7 @@
               :id="goal.id"
               :key="goal.id"
               :description="goal.description"
-              @click="open = false"
+              @click="addGoal(goal.chip)"
             />
           </div>
         </v-list>
@@ -68,9 +68,12 @@ const props = defineProps<CompProps>();
 const open = ref<boolean>(false);
 
 // Objetivos em si
+type SelectedGoal = string;
+
 interface Goal {
   id: number;
   description: string;
+  chip: SelectedGoal;
 }
 
 const availableGoals = ref<Goal[]>([
@@ -78,23 +81,32 @@ const availableGoals = ref<Goal[]>([
     id: 1,
     description:
       '*Melhorar* o aprendizado do aluno por meio de metodologias funcionais.',
+    chip: 'CH #5',
   },
   {
     id: 3,
     description:
       '*Pesquisar* o aprendizado do aluno por meio de *metodologias funcionais* com o o aprendizado do aluno por meio de aprendizado.',
+    chip: 'PA #8',
   },
   {
     id: 6,
     description:
       '*Criar* o aprendizado do aluno por meio de metodologias funcionais.',
+    chip: 'LM #1',
   },
 ]);
 
 // Exibidos no drawe
-type selectedGoal = string;
+const selectedGoals = ref<SelectedGoal[]>(['C1 #3', 'B4 #5', 'C1 #3', 'B4 #5']);
 
-const selectedGoals = ref<selectedGoal[]>(['C1 #3', 'B4 #5', 'C1 #3', 'B4 #5']);
+function addGoal(goal: SelectedGoal) {
+  if (!selectedGoals.value.includes(goal)) {
+    selectedGoals.value.push(goal);
+  }
+
+  open.value = false;
+}
 </script>
 
 <style>
