@@ -6,7 +6,7 @@ definePageMeta({
 
 const { $trpc } = useNuxtApp();
 
-const hello = await $trpc.hello.useQuery();
+const hello = await $trpc.hello.useQuery({ text: 'Djalma' });
 </script>
 
 <template>

@@ -142,7 +142,7 @@ const route = useRoute();
 
 definePageMeta({
   layout: 'auth',
-  middleware: ['control-access', 'guest-only'],
+  middleware: ['guest-only'],
 });
 
 const redirect =
@@ -177,8 +177,17 @@ const submit = handleSubmit(async () => {
       callbackUrl: redirect || undefined,
     });
   } catch (err: unknown) {
-    if ((err as Error).message === 'CredentialsSignin') {
-      console.log('invalid credentials');
+    const code = (err as Error).message;
+
+    switch (code) {
+      case 'AccessDenied':
+        console.log('email not verified');
+        break;
+      case 'CredentialsSignin':
+        console.log('invalid credentials');
+        break;
+      default:
+        console.log('unknown error');
     }
 
     hasError.value = true;

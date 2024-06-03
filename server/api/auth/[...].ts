@@ -5,15 +5,19 @@ import { compare } from 'bcrypt';
 import { NuxtAuthHandler } from '#auth';
 
 import db from '@/server/db';
-import { getUserByEmail, getUserById } from '@/server/db/queries/users';
-import { LoginSchema } from '@/server/db/schemas/accounts';
+import { getUserByEmail } from '@/server/db/queries/users';
+import { LoginSchema, accounts } from '@/server/db/schemas/accounts';
+import { users } from '@/server/db/schemas/users';
 
 const runtimeConfig = useRuntimeConfig();
 
 export const authOptions: AuthConfig = {
   basePath: '/api/auth',
   secret: runtimeConfig.authJs?.secret || '',
-  adapter: DrizzleAdapter(db),
+  adapter: DrizzleAdapter(db, {
+    accountsTable: accounts,
+    usersTable: users,
+  }),
   session: {
     strategy: 'jwt',
   },
@@ -28,7 +32,6 @@ export const authOptions: AuthConfig = {
         if (!validate.success) return null;
 
         const { email, password } = validate.data;
-
         const user = await getUserByEmail(email);
         if (!user || !user.password) return null;
 
@@ -40,27 +43,27 @@ export const authOptions: AuthConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token }) {
-      if (!token.sub) return token;
+    async signIn({ user }) {
+      const dbUser = await getUserByEmail(user.email!);
 
-      const user = await getUserById(token.sub);
-      if (!user) return token;
-
-      // token.isOAuth = !!(await getAccountByUserId(user.id));
-      token.name = user.name;
-      token.email = user.email;
-      // token.role = user.role;
-      // token.isTwoFactorEnabled = user.isTwoFactorEnabled;
+      return !!dbUser?.emailVerified;
+    },
+    jwt({ token, user }) {
+      if (user) {
+        token.email = user.email;
+        token.name = user.name;
+        // token.isOAuth = !!(await getAccountByUserId(user.id));
+        // token.isTwoFactorEnabled = user.isTwoFactorEnabled;
+        // token.role = user.role;
+      }
 
       return token;
     },
     session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.sub!;
-        // session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
-        // session.user.role = token.role as UserRole;
-        // session.user.isOAuth = token.isOAuth as boolean;
-      }
+      session.user.id = token.sub!;
+      // session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      // session.user.isOAuth = token.isOAuth as boolean;
+      // session.user.role = token.role as UserRole;
 
       return session;
     },
