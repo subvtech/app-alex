@@ -5,11 +5,10 @@ import { compare } from 'bcrypt';
 import { NuxtAuthHandler } from '#auth';
 
 import db from '@/server/db';
-import { getUserByEmail } from '@/server/db/repository/get-user-by-email';
-import { setEmailVerified } from '@/server/db/repository/set-email-verified';
+import { getUserByEmail, setEmailVerified } from '@/server/db/repository/users';
 import { LoginSchema, accounts } from '@/server/db/schemas/accounts';
 import { users } from '@/server/db/schemas/users';
-import { verificationTokens } from '@/server/db/schemas/verification-token';
+import { verificationTokens } from '@/server/db/schemas/verification-tokens';
 
 const runtimeConfig = useRuntimeConfig();
 

@@ -1,5 +1,7 @@
-import { createVerificationToken } from '@/server/db/repository/create-verification-token';
-import { removeVerificationTokensByEmail } from '@/server/db/repository/remove-verification-tokens-by-email';
+import {
+  createVerificationToken,
+  removeVerificationTokensByEmail,
+} from '@/server/db/repository/verification-tokens';
 
 const ONE_HOUR = 3600 * 1000;
 

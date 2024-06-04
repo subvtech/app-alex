@@ -3,7 +3,7 @@ import postgres from 'postgres';
 
 import { accounts } from './schemas/accounts';
 import { users } from './schemas/users';
-import { verificationTokens } from './schemas/verification-token';
+import { verificationTokens } from './schemas/verification-tokens';
 
 const conn = postgres(process.env.DATABASE_URL!);
 
