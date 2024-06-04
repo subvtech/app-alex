@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import {
   pgTable,
   serial,
@@ -9,6 +10,8 @@ import {
   json,
   date,
 } from 'drizzle-orm/pg-core';
+import { learningPlanMembers } from './learning-plans-members';
+import { classes } from './classes';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -29,5 +32,10 @@ export const learningPlans = pgTable('learning-plans', {
   details: json('details'),
   createdAt: timestamp('created_at`', { mode: 'date' }).defaultNow(),
 });
+
+export const learningPlansRelations = relations(learningPlans, ({ many }) => ({
+  members: many(learningPlanMembers),
+  classes: many(classes),
+}));
 
 export type LearningPlan = typeof learningPlans.$inferSelect;

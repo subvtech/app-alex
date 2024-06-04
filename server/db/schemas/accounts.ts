@@ -1,6 +1,7 @@
 import { integer, pgTable, primaryKey, text } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
+import { relations } from 'drizzle-orm';
 import { users } from './users';
 
 export const accounts = pgTable(
@@ -26,6 +27,13 @@ export const accounts = pgTable(
     }),
   }),
 );
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  }),
+}));
 
 export const LoginSchema = z.object({
   email: z.string().email({
