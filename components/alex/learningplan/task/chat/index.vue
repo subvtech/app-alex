@@ -26,7 +26,6 @@ const handleAttachMessage = (content: Message) => {
   attachedMessage.value = content;
 };
 defineProps<ChatProps>();
-defineEmits(['reply']);
 </script>
 
 <style scoped></style>
