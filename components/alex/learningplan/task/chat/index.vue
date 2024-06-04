@@ -1,0 +1,47 @@
+<template>
+  <div class="flex flex-col bg-gray-blue min-h-[400px] p-4 gap-2">
+    <alex-learningplan-task-chat-message
+      v-for="message in messages"
+      :id="message.id"
+      :key="message.id"
+      :sent-at="message.sentAt"
+      :user="message.user"
+      :audio="message.audio"
+      :message="message.message"
+      :duration="message.audio?.duration"
+      :response="message.response"
+      :align="user?.id !== message.user.id ? 'left' : 'right'"
+      @reply="(value) => handleAttachMessage(value)"
+      @message-click="(value) => handleReplyMessageClick(value?.id)"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+type ChatProps = {
+  messages: Message[];
+};
+const user = useStrapiUser();
+const attachedMessage = defineModel<Message>('attachedMessage');
+const handleAttachMessage = (content: Message) => {
+  attachedMessage.value = content;
+};
+const handleReplyMessageClick = (id?: number) => {
+  if (!id) return;
+  const element = document.querySelector(`#chat-message-${id}`);
+  if (!element) return;
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  element.classList.add('highlight-message');
+  setTimeout(() => {
+    element.classList.remove('highlight-message');
+  }, 2000);
+};
+defineProps<ChatProps>();
+</script>
+
+<style scoped>
+.highlight-message {
+  background-color: rgb(var(--v-theme-gray-200)) !important;
+  transition: background ease-in-out 700ms;
+}
+</style>
