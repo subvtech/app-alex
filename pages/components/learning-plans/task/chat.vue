@@ -16,8 +16,13 @@
       has-example
     />
     <div class="flex flex-col gap-2 w-full">
-      <alex-learningplan-task-chat :messages="messages" class="w-full" />
+      <alex-learningplan-task-chat
+        v-model:attached-message="attachedMessage"
+        :messages="messages"
+        class="w-full"
+      />
       <alex-learningplan-task-chat-input
+        v-model:attached-message="attachedMessage"
         class="w-full"
         :submissions="submissions"
         @submit="
@@ -56,7 +61,20 @@ const listProps: PlaygroundItemType[] = [
     initialValue: [],
   },
 ];
-const messages = ref<Message[]>([]);
+const messages = ref<Message[]>([
+  {
+    id: 1,
+    message: 'as',
+    sentAt: new Date(),
+    user: { id: 2, name: 'test' },
+    response: {
+      id: 1,
+      message: '2',
+      sentAt: new Date(),
+      user: { id: 1, name: 'test' },
+    },
+  },
+]);
 const submissions: Array<AttachedSubmission> = [
   {
     id: 1,
@@ -69,6 +87,7 @@ const submissions: Array<AttachedSubmission> = [
     },
   },
 ];
+const attachedMessage = ref<Message>();
 const examples = ref<ExampleComponentType[]>([
   {
     snippets: [
@@ -99,10 +118,9 @@ const handleSubmitMessage = (
   if (!text && !audio) return;
   const message: Message = {
     sentAt: new Date(),
-    id: 1,
-    user: { name: 'zig' },
+    id: 2,
+    user: { id: 1, name: 'zig' },
     message: text,
-    current: true,
   };
   if (audio) {
     message.audio = {

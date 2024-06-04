@@ -11,6 +11,7 @@ export interface TaskMemberMessage {
 export interface Message {
   id: number;
   user: {
+    id: number;
     name: string;
     avatar?: string | null;
   };
@@ -20,6 +21,5 @@ export interface Message {
   };
   message: string;
   sentAt: Date;
-  current?: boolean;
   response?: Message | AttachedSubmission;
 }

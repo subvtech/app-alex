@@ -9,8 +9,9 @@
       :audio="message.audio"
       :message="message.message"
       :duration="message.audio?.duration"
-      :current="message.current"
       :response="message.response"
+      :align="user?.id !== message.user.id ? 'left' : 'right'"
+      @reply="(value) => handleAttachMessage(value)"
     />
   </div>
 </template>
@@ -19,7 +20,13 @@
 type ChatProps = {
   messages: Message[];
 };
+const user = useStrapiUser();
+const attachedMessage = defineModel<Message>('attachedMessage');
+const handleAttachMessage = (content: Message) => {
+  attachedMessage.value = content;
+};
 defineProps<ChatProps>();
+defineEmits(['reply']);
 </script>
 
 <style scoped></style>

@@ -1,13 +1,25 @@
 <template>
   <div
-    class="flex flex-col gap-3 border-1 border-gray-100 bg-white p-4 rounded-lg mx-[40px] sm:mx-[60px] md:mx-[80px]"
-    :class="[current ? 'left' : 'right', response && 'p-3']"
+    class="flex flex-col gap-3 border-1 border-gray-100 bg-white p-4 rounded-lg mx-[40px] sm:mx-[60px] md:mx-[80px] relative group"
+    :class="[align, response && 'p-3']"
   >
+    <alex-custom-dropdown :items="menuItems">
+      <template #activator="{ props: dropdownProps }">
+        <alex-custom-button
+          v-bind="dropdownProps"
+          variant="secondary"
+          icon="mdi-chevron-down"
+          size="small"
+          class="menu-button group-hover:visible"
+        />
+      </template>
+    </alex-custom-dropdown>
     <alex-learningplan-task-chat-message-response
-      :message-response="isMessage(response) ? response : undefined"
-      :submission-response="!isMessage(response) ? response : undefined"
-      @click:message="$emit('click-response-message')"
-      @click:submission="$emit('click-response-submission')"
+      v-if="attachedMessage || attachedSubmission"
+      :message="attachedMessage"
+      :submission="attachedSubmission"
+      @message-click="(value) => $emit('message-click', value)"
+      @submission-click="(value) => $emit('submission-click', value)"
     />
     <div class="flex gap-3">
       <v-avatar
@@ -44,13 +56,21 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { ptBR, enIN } from 'date-fns/locale';
 import { Message } from '@/models/simple/learninplanTaskMemberMessage';
-type MessageProps = Message;
+type MessageProps = Message & {
+  align?: 'left' | 'right';
+};
 const props = withDefaults(defineProps<MessageProps>(), {
   current: false,
   response: undefined,
   duration: undefined,
+  align: 'right',
 });
-defineEmits(['click-response-message', 'click-response-submission']);
+type Emits = {
+  reply: [value: Message];
+  'submission-click': [value?: AttachedSubmission];
+  'message-click': [value?: Message];
+};
+const emit = defineEmits<Emits>();
 const i18n = useI18n();
 const initials = computed(() => {
   return getInitials(props.user.name);
@@ -60,16 +80,38 @@ const formattedDate = computed(() =>
     locale: i18n.locale.value === 'pt' ? ptBR : enIN,
   }),
 );
+const handleAttachMessage = () => {
+  const message: Message = {
+    id: props.id,
+    message: props.message,
+    sentAt: props.sentAt,
+    user: props.user,
+    audio: props.audio,
+  };
+  emit('reply', message);
+};
+const attachedMessage = computed(() =>
+  isMessage(props.response) ? props.response : undefined,
+);
+const attachedSubmission = computed(() =>
+  !isMessage(props.response) ? props.response : undefined,
+);
+const menuItems = [{ text: 'responder', onClick: handleAttachMessage }];
 </script>
 
 <style scoped>
 .left {
+  margin-left: 0;
+  border-top-left-radius: 0 !important;
+}
+.right {
   margin-right: 0;
   border-top-right-radius: 0 !important;
 }
-
-.right {
-  margin-left: 0;
-  border-top-left-radius: 0 !important;
+.menu-button {
+  visibility: hidden;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 </style>

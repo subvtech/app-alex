@@ -121,6 +121,7 @@ const handleSelectSubmission = (submission: AttachedSubmission) => {
 const handleSubmit = async () => {
   isRecording.value = false;
   await stop();
+  if (!text.value && !audio.value) return;
   emits('submit', {
     audio: {
       blob: audio.value,
