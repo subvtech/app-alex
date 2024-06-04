@@ -1,7 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, serial, text, pgEnum, integer } from 'drizzle-orm/pg-core';
-import { learningPlanMembers } from './learning-plans-members';
+import { learningPlanMembers } from './learning-plan-members';
 import { learningPlans } from './learning-plans';
+import { learningPlanGroups } from './learning-plan-groups';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -16,7 +17,7 @@ export const classes = pgTable('classes', {
   ),
 });
 
-export const classesRelations = relations(classes, ({ one }) => ({
+export const classesRelations = relations(classes, ({ one, many }) => ({
   learningPlan: one(learningPlans, {
     fields: [classes.learningPlanId],
     references: [learningPlans.id],
@@ -26,6 +27,11 @@ export const classesRelations = relations(classes, ({ one }) => ({
     references: [learningPlanMembers.id],
     relationName: 'inChargeMember',
   }),
+  // invitation link
+  // meeting schedules
+
+  learningPlanMember: many(learningPlanMembers),
+  learningPlanGroups: many(learningPlanGroups),
 }));
 
 export type LearningPlan = typeof classes.$inferSelect;

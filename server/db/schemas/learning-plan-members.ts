@@ -10,6 +10,7 @@ import {
 import { learningPlans } from './learning-plans';
 import { users } from './users';
 import { classes } from './classes';
+import { learningPlanGroupMembers } from './learning-plan-group-members';
 
 export const roleEnum = pgEnum('role', [
   'student',
@@ -22,15 +23,15 @@ export const statusEnum = pgEnum('status', ['pending_invitation', 'joined']);
 
 export const learningPlanMembers = pgTable('learning-plan-members', {
   id: serial('id').primaryKey(),
+  userId: text('user_id').references(() => users.id),
+  learningPlanId: integer('learning_plan_id')
+    .references(() => learningPlans.id)
+    .notNull(),
   email: text('email'),
   description: text('description'),
   joinedAt: timestamp('joined_at', { mode: 'date' }),
   role: roleEnum('role').default('student'),
   status: statusEnum('status').default('pending_invitation'),
-  learningPlanId: integer('learning_plan_id')
-    .references(() => learningPlans.id)
-    .notNull(),
-  userId: text('user_id').references(() => users.id),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
@@ -46,6 +47,7 @@ export const learningPlanMembersRelations = relations(
       references: [users.id],
     }),
     inChargeClasses: many(classes),
+    learningPlanGroupMember: many(learningPlanGroupMembers),
   }),
 );
 
