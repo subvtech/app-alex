@@ -7,17 +7,85 @@
       :deadline-at="task.deadline_at"
       :start-at="task.start_at"
       :status="task.status"
-      @click-edit="editDrawer = true"
+    />
+    <alex-learningplan-task-kanban
+      v-model="tasks"
+      type="professor"
+      :columns="[
+        {
+          title: 'A fazer',
+          color: 'gray',
+          group: 'to_do',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+        {
+          title: 'Em progresso',
+          color: 'blue',
+          group: 'in_progress',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+        {
+          title: 'Em avaliação',
+          color: 'orange',
+          group: 'in_review',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+        {
+          title: 'Concluído',
+          color: 'green',
+          group: 'done',
+          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+        },
+      ]"
+      @insert-card="changeStatusTask"
     />
   </section>
 </template>
 
 <script setup lang="ts">
+import { Task } from '~/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-
+const changeStatusTask = async (
+  _newIndex: number,
+  value: Task,
+  _group: string,
+) => {
+  const success = await new Promise((resolve) =>
+    setTimeout(() => resolve(false), 2000),
+  );
+  // Can't be dragging when this code block execute, bug if was dragging.
+  if (!success) {
+    tasks.value = tasks.value.map((task) => {
+      if (task.id === value.id) {
+        return { ...task, status: value.status };
+      }
+      return task;
+    });
+  }
+};
 // Caminho até a página (Acima do header)
+const tasks = ref([
+  {
+    id: 1,
+    status: 'to_do',
+    date: new Date(),
+    mark: 1,
+    maxMark: 10,
+    studentClass: 'turma A',
+    user: { name: 'test1' },
+  },
+  {
+    id: 2,
+    status: 'to_do',
+    date: new Date(),
+    mark: 1,
+    maxMark: 10,
+    studentClass: 'turma A',
+    user: { name: 'test2' },
+  },
+]);
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
 const headerStore = usePageHeaderStore();
@@ -53,27 +121,25 @@ watch(
   },
 );
 
-// Refs
-const editDrawer = ref(false);
 // Task de exemplo
 const task = {
   id: 1,
   title: 'Título do rascunho',
   status: 'published',
   description: `A sinergia cósmica transcende a compreensão humana, erguendo-se como o
-            néctar da existência primordial. Navegar pelas correntes do infinito é
-            como dançar com os ventos etéreos da consciência, num êxtase
-            transcendental. A sinergia cósmica transcende a compreensão humana,
-            erguendo-se como o néctar da existência primordial. Navegar pelas
-            correntes do infinito é como dançar com os ventos etéreos da
-            consciência, num êxtase transcendental. A sinergia cósmica transcende
-            a compreensão humana, erguendo-se como o néctar da existência
-            primordial. Navegar pelas correntes do infinito é como dançar com os
-            ventos etéreos da consciência, num êxtase transcendental. A sinergia
-            cósmica transcende a compreensão humana, erguendo-se como o néctar da
-            existência primordial. Navegar pelas correntes do infinito é como
-            dançar com os ventos etéreos da consciência, num êxtase
-            transcendental.`,
+          néctar da existência primordial. Navegar pelas correntes do infinito é
+          como dançar com os ventos etéreos da consciência, num êxtase
+          transcendental. A sinergia cósmica transcende a compreensão humana,
+          erguendo-se como o néctar da existência primordial. Navegar pelas
+          correntes do infinito é como dançar com os ventos etéreos da
+          consciência, num êxtase transcendental. A sinergia cósmica transcende
+          a compreensão humana, erguendo-se como o néctar da existência
+          primordial. Navegar pelas correntes do infinito é como dançar com os
+          ventos etéreos da consciência, num êxtase transcendental. A sinergia
+          cósmica transcende a compreensão humana, erguendo-se como o néctar da
+          existência primordial. Navegar pelas correntes do infinito é como
+          dançar com os ventos etéreos da consciência, num êxtase
+          transcendental.`,
   tags: ['Desenvolvimento', 'UI/UX'],
   start_at: new Date(),
   deadline_at: new Date(),
