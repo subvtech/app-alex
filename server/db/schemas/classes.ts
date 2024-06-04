@@ -4,6 +4,7 @@ import { learningPlanMembers } from './learning-plan-members';
 import { learningPlans } from './learning-plans';
 import { learningPlanGroups } from './learning-plan-groups';
 import { invitationLink } from './invitation-link';
+import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -29,8 +30,7 @@ export const classesRelations = relations(classes, ({ one, many }) => ({
     relationName: 'inChargeMember',
   }),
   // invitation link
-  // meeting schedules
-
+  meetingSchedules: many(learningPlanMeetingSchedule),
   learningPlanMember: many(learningPlanMembers),
   learningPlanGroups: many(learningPlanGroups),
   invitationLinks: many(invitationLink),

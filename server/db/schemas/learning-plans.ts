@@ -14,6 +14,7 @@ import { learningPlanMembers } from './learning-plan-members';
 import { classes } from './classes';
 import { learningPlanGroups } from './learning-plan-groups';
 import { invitationLink } from './invitation-link';
+import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -45,7 +46,7 @@ export const learningPlansRelations = relations(learningPlans, ({ many }) => ({
   groups: many(learningPlanGroups),
   // task
   invitationLinks: many(invitationLink),
-  // schedules
+  schedules: many(learningPlanMeetingSchedule),
   // learning structure
   // tag
   // learning goal
