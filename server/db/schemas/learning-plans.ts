@@ -22,7 +22,7 @@ export const learningPlans = pgTable('learning-plans', {
   description: text('description'),
   startDate: date('start_date', { mode: 'date' }),
   endDate: date('end_date', { mode: 'date' }),
-  archivedAt: timestamp('archived_at`', { mode: 'date' }),
+  archivedAt: timestamp('archived_at', { mode: 'date' }),
   type: typeEnum('type'),
   coverImage: text('cover_image'),
   slug: text('slug'),
@@ -32,7 +32,7 @@ export const learningPlans = pgTable('learning-plans', {
   hidden: boolean('hidden'),
   details: json('details'),
   message: text('message'),
-  createdAt: timestamp('created_at`', { mode: 'date' }).defaultNow(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export const learningPlansRelations = relations(learningPlans, ({ many }) => ({
