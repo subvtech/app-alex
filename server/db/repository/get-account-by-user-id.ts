@@ -5,7 +5,9 @@ import { accounts } from '@/server/db/schemas/accounts';
 
 export const getAccountByUserId = async (id: string) => {
   try {
-    return (await db.select().from(accounts).where(eq(accounts.userId, id)))[0];
+    return await db.query.accounts.findFirst({
+      where: eq(accounts.userId, id),
+    });
   } catch {
     return null;
   }

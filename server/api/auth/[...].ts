@@ -5,9 +5,11 @@ import { compare } from 'bcrypt';
 import { NuxtAuthHandler } from '#auth';
 
 import db from '@/server/db';
-import { getUserByEmail } from '@/server/db/queries/users';
+import { getUserByEmail } from '@/server/db/repository/get-user-by-email';
+import { setEmailVerified } from '@/server/db/repository/set-email-verified';
 import { LoginSchema, accounts } from '@/server/db/schemas/accounts';
 import { users } from '@/server/db/schemas/users';
+import { verificationTokens } from '@/server/db/schemas/verification-token';
 
 const runtimeConfig = useRuntimeConfig();
 
@@ -17,6 +19,7 @@ export const authOptions: AuthConfig = {
   adapter: DrizzleAdapter(db, {
     accountsTable: accounts,
     usersTable: users,
+    verificationTokensTable: verificationTokens,
   }),
   session: {
     strategy: 'jwt',
@@ -42,11 +45,16 @@ export const authOptions: AuthConfig = {
       },
     }),
   ],
+  events: {
+    async linkAccount({ user }) {
+      await setEmailVerified(user.email!);
+    },
+  },
   callbacks: {
     async signIn({ user }) {
-      const dbUser = await getUserByEmail(user.email!);
+      const existingUser = await getUserByEmail(user.email!);
 
-      return !!dbUser?.emailVerified;
+      return !!existingUser?.emailVerified;
     },
     jwt({ token, user }) {
       if (user) {

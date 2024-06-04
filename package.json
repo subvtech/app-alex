@@ -6,6 +6,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "test": "vitest --watch",
