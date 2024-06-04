@@ -61,20 +61,7 @@ const listProps: PlaygroundItemType[] = [
     initialValue: [],
   },
 ];
-const messages = ref<Message[]>([
-  {
-    id: 1,
-    message: 'as',
-    sentAt: new Date(),
-    user: { id: 2, name: 'test' },
-    response: {
-      id: 1,
-      message: '2',
-      sentAt: new Date(),
-      user: { id: 1, name: 'test' },
-    },
-  },
-]);
+const messages = ref<Message[]>([]);
 const submissions: Array<AttachedSubmission> = [
   {
     id: 1,
@@ -118,7 +105,7 @@ const handleSubmitMessage = (
   if (!text && !audio) return;
   const message: Message = {
     sentAt: new Date(),
-    id: 2,
+    id: Math.round(Math.random() * 10000),
     user: { id: 1, name: 'zig' },
     message: text,
   };

@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="`chat-message-${id}`"
     class="flex flex-col gap-3 border-1 border-gray-100 bg-white p-4 rounded-lg mx-[40px] sm:mx-[60px] md:mx-[80px] relative group"
     :class="[align, response && 'p-3']"
   >
