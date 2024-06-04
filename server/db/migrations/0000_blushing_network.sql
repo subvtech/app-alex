@@ -1,3 +1,9 @@
+DO $$ BEGIN
+ CREATE TYPE "public"."type" AS ENUM('course', 'project', 'course_project');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "accounts" (
 	"userId" text NOT NULL,
 	"type" text NOT NULL,
@@ -11,6 +17,24 @@ CREATE TABLE IF NOT EXISTS "accounts" (
 	"id_token" text,
 	"session_state" text,
 	CONSTRAINT "accounts_provider_providerAccountId_pk" PRIMARY KEY("provider","providerAccountId")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "learning-plans" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"description" text,
+	"start_date" date,
+	"end_date" date,
+	"archived_at`" timestamp,
+	"type" "type",
+	"cover_image" text,
+	"slug" text,
+	"class_name" text,
+	"invite_enabled" boolean DEFAULT true,
+	"invitation_duration" integer,
+	"hidden" boolean,
+	"details" json,
+	"created_at`" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
