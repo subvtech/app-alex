@@ -34,7 +34,7 @@ const handleReplyMessageClick = (id?: number) => {
   element.classList.add('highlight-message');
   setTimeout(() => {
     element.classList.remove('highlight-message');
-  }, 2000);
+  }, 600);
 };
 defineProps<ChatProps>();
 </script>
@@ -42,6 +42,6 @@ defineProps<ChatProps>();
 <style scoped>
 .highlight-message {
   background-color: rgb(var(--v-theme-gray-200)) !important;
-  transition: background ease-in-out 700ms;
+  transition: background ease-in-out 400ms;
 }
 </style>
