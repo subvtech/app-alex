@@ -10,6 +10,7 @@ import { relations } from 'drizzle-orm';
 import { learningPlanStructures } from './learning-plan-structures';
 import { medias } from './medias';
 import { trailContributions } from './trail-contributions';
+import { structures } from './structures';
 
 export const trails = pgTable('trails', {
   id: serial('id').primaryKey(),
@@ -34,7 +35,7 @@ export const trailsRelations = relations(trails, ({ one, many }) => ({
     references: [medias.id],
   }),
   // learningPlanMember:
-  // structure:
+  structures: many(structures),
   trailContribution: many(trailContributions),
   // task:
 }));
