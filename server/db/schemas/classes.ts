@@ -1,5 +1,12 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, serial, text, pgEnum, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  pgEnum,
+  integer,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { learningPlanMembers } from './learning-plan-members';
 import { learningPlans } from './learning-plans';
 import { learningPlanGroups } from './learning-plan-groups';
@@ -15,9 +22,7 @@ export const classes = pgTable('classes', {
     () => learningPlans.id,
   ),
   inChargeMemberId: integer('in_charge_member_id'),
-  //   .references(
-  //   () => learningPlanMembers.id,
-  // ),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export const classesRelations = relations(classes, ({ one, many }) => ({

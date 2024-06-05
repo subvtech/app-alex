@@ -1,5 +1,12 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgEnum, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { learningPlans } from './learning-plans';
 import { learningPlanMembers } from './learning-plan-members';
 import { trails } from './trails';
@@ -14,6 +21,7 @@ export const learningPlanStructures = pgTable('learning-plan-structures', {
   memberId: integer('member_id').references(() => learningPlanMembers.id),
   title: text('title'),
   type: StructureTypeEnum('name'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
   // TODO image: media
 });
 

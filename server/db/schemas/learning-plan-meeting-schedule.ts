@@ -40,6 +40,7 @@ export const learningPlanMeetingSchedule = pgTable(
     type: typeEnum('type'),
     location: text('location'),
     link: text('link'),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
   },
 );
 

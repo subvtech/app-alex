@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { learningPlans } from './learning-plans';
 import { classes } from './classes';
 import { learningPlanGroupMembers } from './learning-plan-group-members';
@@ -15,7 +15,7 @@ export const learningPlanGroups = pgTable('learning-plan-groups', {
     .notNull(),
   title: text('title'),
   imageId: integer('image_id').references(() => medias.id),
-  // TODO image: media
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export const learningPlanGroupsRelations = relations(

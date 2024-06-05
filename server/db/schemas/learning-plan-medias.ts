@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, primaryKey } from 'drizzle-orm/pg-core';
+import { integer, pgTable, primaryKey, timestamp } from 'drizzle-orm/pg-core';
 import { learningPlans } from './learning-plans';
 import { medias } from './medias';
 
@@ -12,6 +12,7 @@ export const learningPlanMedias = pgTable(
     mediaId: integer('media_id')
       .notNull()
       .references(() => medias.id),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.learningPlanId, t.mediaId] }),

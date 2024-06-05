@@ -24,6 +24,7 @@ export const invitationLinks = pgTable('invitation-link', {
   hash: text('hash'),
   expiresAt: timestamp('expires_at', { mode: 'date' }),
   isExpired: boolean('is_expired').default(false),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export const initationRelation = relations(invitationLinks, ({ one }) => ({

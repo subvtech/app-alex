@@ -1,4 +1,10 @@
-import { integer, pgEnum, pgTable, serial } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { learningPlanMembers } from './learning-plan-members';
 import { learningPlanGroups } from './learning-plan-groups';
@@ -14,6 +20,7 @@ export const learningPlanGroupMembers = pgTable('learning-plan-group-members', {
     .references(() => learningPlanMembers.id)
     .notNull(),
   role: GroupMemberRoleEnum('role'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export const learningPlanGroupMembersRelation = relations(

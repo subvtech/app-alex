@@ -5,6 +5,7 @@ import {
   pgTable,
   serial,
   text,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 
 export const mediaTypeEnum = pgEnum('media_type', [
@@ -25,6 +26,7 @@ export const medias = pgTable('medias', {
   url: text('url'),
   mediaType: mediaTypeEnum('media_type').default('file'),
   external: boolean('external').default(false),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export type Media = typeof medias.$inferSelect;

@@ -1,4 +1,11 @@
-import { boolean, integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { learningPlanStructures } from './learning-plan-structures';
 import { medias } from './medias';
@@ -10,6 +17,7 @@ export const trails = pgTable('trails', {
   order: integer('order'),
   description: text('description'),
   coverImageId: integer('cover_image_id').references(() => medias.id),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
   learningStructureId: integer('learning_structure_id').references(
     () => learningPlanStructures.id,
   ),

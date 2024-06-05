@@ -15,6 +15,7 @@ export const learningPlanMeetings = pgTable('learning-plan-meeting', {
   ),
   isExpired: boolean('is_expired').default(false),
   date: timestamp('date', { mode: 'date' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
 export const learningPlanMeetingRelation = relations(
