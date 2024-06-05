@@ -19,6 +19,7 @@ import { medias } from './medias';
 import { learningPlanStructures } from './learning-plan-structures';
 import { learningPlanMedias } from './learning-plan-medias';
 import { learningGoals } from './learning-goals';
+import { tags } from './tags';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -59,7 +60,7 @@ export const learningPlansRelations = relations(
     }),
     learningStructures: many(learningPlanStructures),
     medias: many(learningPlanMedias),
-    // tag
+    tags: many(tags),
     learningGoals: many(learningGoals),
   }),
 );
