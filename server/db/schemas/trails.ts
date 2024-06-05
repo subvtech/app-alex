@@ -9,6 +9,7 @@ import {
 import { relations } from 'drizzle-orm';
 import { learningPlanStructures } from './learning-plan-structures';
 import { medias } from './medias';
+import { trailContributions } from './trail-contributions';
 
 export const trails = pgTable('trails', {
   id: serial('id').primaryKey(),
@@ -23,7 +24,7 @@ export const trails = pgTable('trails', {
   ),
 });
 
-export const trailsRelations = relations(trails, ({ one }) => ({
+export const trailsRelations = relations(trails, ({ one, many }) => ({
   learningStructure: one(learningPlanStructures, {
     fields: [trails.learningStructureId],
     references: [learningPlanStructures.id],
@@ -32,6 +33,10 @@ export const trailsRelations = relations(trails, ({ one }) => ({
     fields: [trails.coverImageId],
     references: [medias.id],
   }),
+  // learningPlanMember:
+  // structure:
+  trailContribution: many(trailContributions),
+  // task:
 }));
 
 export type Trail = typeof trails.$inferSelect;

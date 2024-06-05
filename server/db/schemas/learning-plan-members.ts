@@ -11,6 +11,7 @@ import { learningPlans } from './learning-plans';
 import { users } from './users';
 import { classes } from './classes';
 import { learningPlanGroupMembers } from './learning-plan-group-members';
+import { trailContributions } from './trail-contributions';
 
 export const roleEnum = pgEnum('role', [
   'student',
@@ -47,13 +48,18 @@ export const learningPlanMembersRelations = relations(
       fields: [learningPlanMembers.userId],
       references: [users.id],
     }),
+    // learningPlanStructure:
+    // partnerTrail:
+    learningPlanGroupMembers: many(learningPlanGroupMembers),
+    trailContributions: many(trailContributions),
+    // learningPlanGroupMember
+    // TaskMember
     inChargeClasses: many(classes, { relationName: 'inChargeMember' }),
     learningClass: one(classes, {
       fields: [learningPlanMembers.classId],
       references: [classes.id],
       relationName: 'learningClass',
     }),
-    learningPlanGroupMembers: many(learningPlanGroupMembers),
   }),
 );
 
