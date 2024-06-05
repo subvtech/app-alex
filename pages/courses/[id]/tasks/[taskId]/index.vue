@@ -53,7 +53,7 @@ const changeStatusTask = async (
   _group: string,
 ) => {
   const success = await new Promise((resolve) =>
-    setTimeout(() => resolve(false), 2000),
+    setTimeout(() => resolve(true), 2000),
   );
   // Can't be dragging when this code block execute, bug if was dragging.
   if (!success) {
