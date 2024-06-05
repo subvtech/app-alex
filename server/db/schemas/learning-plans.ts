@@ -13,7 +13,7 @@ import {
 import { learningPlanMembers } from './learning-plan-members';
 import { classes } from './classes';
 import { learningPlanGroups } from './learning-plan-groups';
-import { invitationLink } from './invitation-link';
+import { invitationLinks } from './invitation-link';
 import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule';
 import { medias } from './medias';
 import { learningPlanStructures } from './learning-plan-structures';
@@ -50,7 +50,7 @@ export const learningPlansRelations = relations(
     // course (auto relacionamento)
     groups: many(learningPlanGroups),
     // task
-    invitationLinks: many(invitationLink),
+    invitationLinks: many(invitationLinks),
     schedules: many(learningPlanMeetingSchedule),
     coverImage: one(medias, {
       fields: [learningPlans.coverImageId],

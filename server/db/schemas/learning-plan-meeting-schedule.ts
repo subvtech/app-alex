@@ -12,9 +12,9 @@ import { classes } from './classes';
 import { learningPlanMeetings } from './learning-plan-meetings';
 
 export const frequencyEnum = pgEnum('frequency', [
-  'mondey',
+  'monday',
   'tuesday',
-  'wednsday',
+  'wednesday',
   'thursday',
   'friday',
   'saturday',
