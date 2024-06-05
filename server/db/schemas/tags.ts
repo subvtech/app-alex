@@ -21,7 +21,7 @@ export const tags = pgTable('tags', {
   isGeneral: boolean('is_general'),
   verified: boolean('verified'),
   verifiedDate: timestamp('verified_date', { mode: 'date' }),
-  verifiedBy: integer('verified_by').references(() => tagsToUsers.userId),
+  verifiedBy: integer('verified_by'),
 });
 
 // tasks
@@ -75,16 +75,13 @@ export const tagsToUsers = pgTable(
   }),
 );
 
-export const tagsToUsersRelations = relations(
-    tagsToUsers,
-  ({ one }) => ({
-    tag: one(tags, {
-      fields: [tagsToUsers.tagId],
-      references: [tags.id],
-    }),
-    user: one(users, {
-      fields: [tagsToUsers.userId],
-      references: [users.id],
-    }),
+export const tagsToUsersRelations = relations(tagsToUsers, ({ one }) => ({
+  tag: one(tags, {
+    fields: [tagsToUsers.tagId],
+    references: [tags.id],
   }),
-);
+  user: one(users, {
+    fields: [tagsToUsers.userId],
+    references: [users.id],
+  }),
+}));
