@@ -11,26 +11,30 @@ import {
 import { learningPlans } from './learning-plans';
 import { classes } from './classes';
 
-export const invitationRole = pgEnum('role', ['student', 'partner']);
+export const invitationRoleEnum = pgEnum('role', ['student', 'partner']);
 
-export const invitationLink = pgTable('invitation-link', {
+export const invitationLinks = pgTable('invitation-link', {
   id: serial('id').primaryKey(),
-  learningPlanId: integer('learningPlanId').references(() => learningPlans.id),
-  classId: integer('classId').references(() => classes.id),
-  role: invitationRole('role'),
+  learningPlanId: integer('learning_plan_id').references(
+    () => learningPlans.id,
+  ),
+  classId: integer('class_id').references(() => classes.id),
+  role: invitationRoleEnum('role'),
   emailsToSend: text('emails_to_send'),
   hash: text('hash'),
-  expiresAt: timestamp('expiresAt', { mode: 'date' }),
-  isExpired: boolean('isExpired').default(false),
+  expiresAt: timestamp('expires_at', { mode: 'date' }),
+  isExpired: boolean('is_expired').default(false),
 });
 
-export const initationRelation = relations(invitationLink, ({ one }) => ({
+export const initationRelation = relations(invitationLinks, ({ one }) => ({
   learningPlan: one(learningPlans, {
-    fields: [invitationLink.learningPlanId],
+    fields: [invitationLinks.learningPlanId],
     references: [learningPlans.id],
   }),
-  classId: one(classes, {
-    fields: [invitationLink.classId],
+  learningClass: one(classes, {
+    fields: [invitationLinks.classId],
     references: [classes.id],
   }),
 }));
+
+export type InvitationLink = typeof invitationLinks.$inferSelect;

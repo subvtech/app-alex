@@ -11,7 +11,7 @@ import { learningPlans } from './learning-plans';
 import { classes } from './classes';
 import { learningPlanMeetings } from './learning-plan-meetings';
 
-export const frequencyEnum = pgEnum('frequencyEnum', [
+export const frequencyEnum = pgEnum('frequency', [
   'mondey',
   'tuesday',
   'wednsday',
@@ -22,22 +22,22 @@ export const frequencyEnum = pgEnum('frequencyEnum', [
   'everyday',
   'none',
 ]);
-export const typeEnum = pgEnum('typeEnum', ['onsite', 'online']);
+export const typeEnum = pgEnum('type', ['onsite', 'online']);
 
 export const learningPlanMeetingSchedule = pgTable(
   'learning-plan-meeting-schedule',
   {
     id: serial('id').primaryKey(),
-    learningPlanId: integer('learningPlanId').references(
+    learningPlanId: integer('learning_plan_id').references(
       () => learningPlans.id,
     ),
-    classId: integer('classId').references(() => classes.id),
-    frequency: frequencyEnum('frequencyEnum'),
-    startDate: timestamp('startDate', { mode: 'date' }),
-    endDate: timestamp('endDate', { mode: 'date' }),
+    classId: integer('class_id').references(() => classes.id),
+    frequency: frequencyEnum('frequency'),
+    startDate: timestamp('start_date', { mode: 'date' }),
+    endDate: timestamp('end_date', { mode: 'date' }),
     name: text('name'),
     interval: integer('interval'),
-    type: typeEnum('typeEnum'),
+    type: typeEnum('type'),
     location: text('location'),
     link: text('link'),
   },
@@ -51,9 +51,12 @@ export const learningPlanMeetingScheduleRelation = relations(
       fields: [learningPlanMeetingSchedule.learningPlanId],
       references: [learningPlans.id],
     }),
-    classId: one(classes, {
+    class: one(classes, {
       fields: [learningPlanMeetingSchedule.classId],
       references: [classes.id],
     }),
   }),
 );
+
+export type LearningPlanMeetingSchedule =
+  typeof learningPlanMeetingSchedule.$inferSelect;

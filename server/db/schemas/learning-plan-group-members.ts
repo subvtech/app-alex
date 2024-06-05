@@ -3,32 +3,32 @@ import { relations } from 'drizzle-orm';
 import { learningPlanMembers } from './learning-plan-members';
 import { learningPlanGroups } from './learning-plan-groups';
 
-export const LpGroupMemberRoleEnum = pgEnum('roleEnum', [
-  'standart',
-  'in_charge',
-]);
+export const GroupMemberRoleEnum = pgEnum('role', ['standard', 'in_charge']);
 
 export const learningPlanGroupMembers = pgTable('learning-plan-group-members', {
   id: serial('id').primaryKey(),
-  groups: integer('groups')
+  groupId: integer('group_id')
     .references(() => learningPlanGroups.id)
     .notNull(),
-  studentMember: integer('studentMember')
+  studentMemberId: integer('student_member_id')
     .references(() => learningPlanMembers.id)
     .notNull(),
-  role: LpGroupMemberRoleEnum('roleEnum'),
+  role: GroupMemberRoleEnum('role'),
 });
 
 export const learningPlanGroupMembersRelation = relations(
   learningPlanGroupMembers,
   ({ one }) => ({
     learningPlanGroup: one(learningPlanGroups, {
-      fields: [learningPlanGroupMembers.groups],
+      fields: [learningPlanGroupMembers.groupId],
       references: [learningPlanGroups.id],
     }),
-    learningPlanMember: one(learningPlanMembers, {
-      fields: [learningPlanGroupMembers.studentMember],
+    studentMember: one(learningPlanMembers, {
+      fields: [learningPlanGroupMembers.studentMemberId],
       references: [learningPlanMembers.id],
     }),
   }),
 );
+
+export type LearningPlanGroupMember =
+  typeof learningPlanGroupMembers.$inferSelect;

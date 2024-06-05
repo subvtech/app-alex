@@ -3,16 +3,18 @@ import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { learningPlans } from './learning-plans';
 import { classes } from './classes';
 import { learningPlanGroupMembers } from './learning-plan-group-members';
+import { medias } from './medias';
 
 export const learningPlanGroups = pgTable('learning-plan-groups', {
   id: serial('id').primaryKey(),
-  class_id: integer('class_id')
+  classId: integer('class_id')
     .references(() => classes.id)
     .notNull(),
-  learningPlan_id: integer('learningPlan_id')
+  learningPlanId: integer('learning_plan_id')
     .references(() => learningPlans.id)
     .notNull(),
   title: text('title'),
+  imageId: integer('image_id').references(() => medias.id),
   // TODO image: media
 });
 
@@ -20,14 +22,19 @@ export const learningPlanGroupsRelations = relations(
   learningPlanGroups,
   ({ one, many }) => ({
     learningPlan: one(learningPlans, {
-      fields: [learningPlanGroups.learningPlan_id],
+      fields: [learningPlanGroups.learningPlanId],
       references: [learningPlans.id],
     }),
     groupMembers: many(learningPlanGroupMembers),
-    // task_members:
     learningClass: one(classes, {
-      fields: [learningPlanGroups.class_id],
+      fields: [learningPlanGroups.classId],
       references: [classes.id],
+    }),
+    image: one(medias, {
+      fields: [learningPlanGroups.imageId],
+      references: [medias.id],
     }),
   }),
 );
+
+export type LearningPlanGroup = typeof learningPlanGroups.$inferSelect;

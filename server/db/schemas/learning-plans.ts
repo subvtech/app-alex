@@ -15,6 +15,9 @@ import { classes } from './classes';
 import { learningPlanGroups } from './learning-plan-groups';
 import { invitationLink } from './invitation-link';
 import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule';
+import { medias } from './medias';
+import { learningPlanStructures } from './learning-plan-structures';
+import { learningPlanMedias } from './learning-plan-medias';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -34,22 +37,30 @@ export const learningPlans = pgTable('learning-plans', {
   hidden: boolean('hidden'),
   details: json('details'),
   message: text('message'),
+  coverImageId: integer('cover_image_id').references(() => medias.id),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
-export const learningPlansRelations = relations(learningPlans, ({ many }) => ({
-  members: many(learningPlanMembers),
-  classes: many(classes),
-  // media
-  // projects (auto relacionamento)
-  // course (auto relacionamento)
-  groups: many(learningPlanGroups),
-  // task
-  invitationLinks: many(invitationLink),
-  schedules: many(learningPlanMeetingSchedule),
-  // learning structure
-  // tag
-  // learning goal
-}));
+export const learningPlansRelations = relations(
+  learningPlans,
+  ({ many, one }) => ({
+    members: many(learningPlanMembers),
+    classes: many(classes),
+    // projects (auto relacionamento)
+    // course (auto relacionamento)
+    groups: many(learningPlanGroups),
+    // task
+    invitationLinks: many(invitationLink),
+    schedules: many(learningPlanMeetingSchedule),
+    coverImage: one(medias, {
+      fields: [learningPlans.coverImageId],
+      references: [medias.id],
+    }),
+    learningStructures: many(learningPlanStructures),
+    medias: many(learningPlanMedias),
+    // tag
+    // learning goal
+  }),
+);
 
 export type LearningPlan = typeof learningPlans.$inferSelect;

@@ -33,6 +33,7 @@ export const learningPlanMembers = pgTable('learning-plan-members', {
   role: roleEnum('role').default('student'),
   status: statusEnum('status').default('pending_invitation'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
+  classId: integer('class_id').references(() => classes.id),
 });
 
 export const learningPlanMembersRelations = relations(
@@ -46,8 +47,13 @@ export const learningPlanMembersRelations = relations(
       fields: [learningPlanMembers.userId],
       references: [users.id],
     }),
-    inChargeClasses: many(classes),
-    learningPlanGroupMember: many(learningPlanGroupMembers),
+    inChargeClasses: many(classes, { relationName: 'inChargeMember' }),
+    learningClass: one(classes, {
+      fields: [learningPlanMembers.classId],
+      references: [classes.id],
+      relationName: 'learningClass',
+    }),
+    learningPlanGroupMembers: many(learningPlanGroupMembers),
   }),
 );
 
