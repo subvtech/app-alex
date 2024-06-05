@@ -1,9 +1,11 @@
 <template>
-  <div class="mt-8 bg-white rounded-lg py-6 px-4 md:p-6 relative">
+  <div class="mt-8 bg-white rounded-lg relative">
     <!-- Inputs -->
-    <div class="d-flex align-center ga-3">
+    <div
+      class="d-flex align-center pa-3 px-6 ga-3 border-bottom-1 border-gray-100"
+    >
       <alex-inputs-text-field
-        name="aluno"
+        name="student"
         :placeholder="$t('components.courses.tasks.srchStudent')"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
@@ -19,19 +21,33 @@
             icon="mdi-filter-variant"
             size="large"
             variant="secondary"
-            @click="$emit('click:filter')"
+            @click="handleFilter"
           />
         </template>
       </v-tooltip>
     </div>
 
-    <!-- "Hr" decorativo -->
-    <v-divider class="my-4" />
-
+    <v-slide-y-transition>
+      <div
+        v-if="filters.select.value || filters.finalDate.value"
+        class="flex gap-2 px-6 pt-4"
+      >
+        <template v-for="filter in filters" :key="filter.title">
+          <alex-custom-chip
+            v-if="filter.value"
+            :text="filter.title"
+            status="secondary"
+            clickable
+            closable
+            @click:close="filter.value = null"
+          />
+        </template>
+      </div>
+    </v-slide-y-transition>
     <!-- Categorias e seus respectivos alunos -->
     <div
       ref="kanban"
-      class="w-full flex gap-4 pa-0 overflow-x-auto overflow-y-hidden"
+      class="w-full flex gap-4 pa-6 overflow-x-auto overflow-y-hidden"
     >
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
@@ -41,7 +57,7 @@
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
-        @click:card="$emit('click:card')"
+        @click:card="$emit('card-click')"
         @insert-card="handleInsertCard"
       >
         <template #card="{ item, status }">
@@ -75,14 +91,20 @@
         </template>
       </alex-learningplan-task-kanban-column>
     </div>
+    <alex-learningplan-task-drawer-filter
+      v-model="filterDrawer"
+      :classes="classes"
+      kanban-filter
+      @filter="applyFilters"
+    />
   </div>
 </template>
 
 <script setup lang="ts" generic="T extends 'professor' | 'student'">
+import { isWithinInterval } from 'date-fns';
 import { useMouse } from '@vueuse/core';
 import { Accept } from './column/index.vue';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
-
 // Types
 export interface Task {
   id: number;
@@ -115,6 +137,7 @@ interface Column<T extends 'professor' | 'student'> {
 }
 interface KanbanProps {
   type: T;
+  classes?: string[];
 }
 
 // Models/props
@@ -122,7 +145,6 @@ const props = defineProps<KanbanProps>();
 const tasks = defineModel<Card<typeof props.type>[]>({
   required: true,
 });
-
 const columns = defineModel<Column<typeof props.type>[]>('columns', {
   required: true,
 });
@@ -130,19 +152,19 @@ const columns = defineModel<Column<typeof props.type>[]>('columns', {
 const columnsTasks = computed(() =>
   columns.value.reduce((acc, item) => {
     if (!acc[item.group]) {
-      acc[item.group] = tasks.value.filter(
+      acc[item.group] = filteredByFinalDate.value.filter(
         (task) => item.group === task.status,
       );
     }
     return acc;
   }, {}),
-); // returns { status1: [], status2: [ {id:...} ]...}
+);
 
 type Emits = {
-  (e: 'click:filter'): void;
-  (e: 'click:card'): void;
+  (e: 'filter-click'): void;
+  (e: 'card-click'): void;
   (
-    e: 'insert-card',
+    e: 'card-insert',
     newIndex: number,
     value: Card<typeof props.type>,
     group: string,
@@ -160,10 +182,102 @@ const handleInsertCard = ({ newIndex, value, group }) => {
       return task;
     });
   }
-  emit('insert-card', newIndex, value, group);
+  emit('card-insert', newIndex, value, group);
 };
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
   return 'title' in card;
+};
+const { t } = useI18n();
+// Filter
+type Filters = {
+  select: string;
+  finalDate: { start: string; end: string };
+};
+type FiltersValue = {
+  select: {
+    title: string;
+    value: string | null;
+  };
+  finalDate: {
+    title: string;
+    value: { start: string; end: string } | null;
+  };
+};
+const i18Texts = computed(() => {
+  const drawer = 'components.learningPlan.drawer';
+  return props.classes?.length
+    ? {
+        title: t(`${drawer}.class`),
+      }
+    : {
+        title: t(`${drawer}.type`),
+      };
+});
+const filterDrawer = ref(false);
+const filters = ref<FiltersValue>({
+  select: {
+    title: i18Texts.value.title,
+    value: null,
+  },
+  finalDate: {
+    title: t('components.learningPlan.drawer.finalDate'),
+    value: null,
+  },
+});
+const handleFilter = () => {
+  filterDrawer.value = true;
+};
+const applyFilters = (values: Filters) => {
+  if (values.select) {
+    filters.value.select.value = values.select;
+  }
+  if (values.finalDate) {
+    filters.value.finalDate.value = values.finalDate;
+  }
+};
+
+const filteredByClassTasks = computed(() =>
+  !filters.value.select.value
+    ? tasks.value
+    : filterByClassOrType(
+        props.type === 'student',
+        tasks.value,
+        filters.value.select.value,
+      ),
+);
+
+const filteredByFinalDate = computed(() => {
+  const hasStartEndDate =
+    filters.value.finalDate.value?.end && filters.value.finalDate.value?.start;
+  if (hasStartEndDate) {
+    return filteredByClassTasks.value.filter((task) =>
+      checkIntervalOfDates(
+        task.date,
+        filters.value.finalDate.value!.start,
+        filters.value.finalDate.value!.end,
+      ),
+    );
+  }
+  return filteredByClassTasks.value;
+});
+
+const checkIntervalOfDates = (initial: Date, first: string, second: string) =>
+  isWithinInterval(initial, {
+    start: new Date(first.replaceAll('-', '/')),
+    end: new Date(second.replaceAll('-', '/')).setHours(23, 59, 59),
+  });
+
+const filterByClassOrType = (
+  isStudent: boolean,
+  tasks: Card<T>[],
+  value: string,
+) => {
+  if (!isStudent) {
+    return tasks.filter((task) => (task as Task).studentClass === value);
+  }
+  return tasks.filter(
+    (task) => (task as TaskStudent).group === (value === 'group'),
+  );
 };
 
 // Scroll X and Y

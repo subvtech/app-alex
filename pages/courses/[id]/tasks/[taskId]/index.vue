@@ -11,33 +11,34 @@
     <alex-learningplan-task-kanban
       v-model="tasks"
       type="professor"
+      :classes="['turma A']"
       :columns="[
         {
           title: 'A fazer',
           color: 'gray',
           group: 'to_do',
-          accept: null,
+          accept: true,
         },
         {
           title: 'Em progresso',
           color: 'blue',
           group: 'in_progress',
-          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+          accept: true,
         },
         {
           title: 'Em avaliação',
           color: 'orange',
           group: 'in_review',
-          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+          accept: true,
         },
         {
           title: 'Concluído',
           color: 'green',
           group: 'done',
-          accept: ['to_do', 'in_progress', 'in_review', 'done'],
+          accept: true,
         },
       ]"
-      @insert-card="changeStatusTask"
+      @card-insert="changeStatusTask"
     />
   </section>
 </template>
@@ -53,7 +54,7 @@ const changeStatusTask = async (
   _group: string,
 ) => {
   const success = await new Promise((resolve) =>
-    setTimeout(() => resolve(false), 2000),
+    setTimeout(() => resolve(true), 2000),
   );
   if (!success) {
     tasks.value = tasks.value.map((task) => {
@@ -63,6 +64,7 @@ const changeStatusTask = async (
       return task;
     });
   }
+  return true;
 };
 // Caminho até a página (Acima do header)
 const tasks = ref([
@@ -72,13 +74,13 @@ const tasks = ref([
     date: new Date(),
     mark: 1,
     maxMark: 10,
-    studentClass: 'turma A',
+    studentClass: 'turma b',
     user: { name: 'test1' },
   },
   {
     id: 2,
-    status: 'to_do',
-    date: new Date(),
+    status: 'done',
+    date: new Date('2024/06/03'),
     mark: 1,
     maxMark: 10,
     studentClass: 'turma A',

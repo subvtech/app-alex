@@ -11,7 +11,7 @@
     @update:model-value="handleChange"
   >
     <div class="d-flex flex-column ga-4 h-full w-full bg-white">
-      <div class="d-flex align-center ga-4 pb-2 px-4">
+      <div class="d-flex align-center ga-4 px-4">
         <p class="text-h4 flex-fill">
           {{ i18Texts.title }}
         </p>
@@ -82,17 +82,17 @@
           <p class="text-body-1 text-gray-800">
             {{ $t('components.learningPlan.drawer.archivedTasks') }}
           </p>
-          <v-switch
+          <alex-custom-switch
             v-model="filters.archivedTasks"
             class="archived-switch"
             inset
             hide-details
-          ></v-switch>
+          ></alex-custom-switch>
         </div>
       </div>
       <hr />
 
-      <div class="d-flex ga-1 pa-4">
+      <div class="d-flex ga-1 px-4">
         <alex-custom-button
           class="flex-1-1"
           variant="secondary"
@@ -116,8 +116,8 @@ const { t } = useI18n();
 
 interface Filter {
   modelValue: boolean;
-  classes: Array<string>;
   kanbanFilter: boolean;
+  classes?: Array<string>;
 }
 
 const props = withDefaults(defineProps<Filter>(), {
@@ -177,7 +177,7 @@ const handleFilter = () => {
           return false;
         }
         if (typeof value === 'object') {
-          return value.start !== '' || value.end !== '';
+          return value.start !== '' && value.end !== '';
         }
         return true;
       },
@@ -219,25 +219,4 @@ const clearFilters = () => {
 };
 </script>
 
-<style>
-.archived-switch {
-  .v-switch__thumb {
-    transform: none !important;
-  }
-  .v-switch__track {
-    background-color: rgb(var(--v-theme-gray-200)) !important;
-  }
-  .v-switch__track {
-    background-color: rgb(var(--v-theme-gray-200)) !important;
-  }
-  .v-selection-control--dirty .v-switch__track {
-    background-color: #ade8ee !important;
-  }
-  .v-switch__thumb {
-    background-color: rgb(var(--v-theme-gray-500)) !important;
-  }
-  .v-selection-control--dirty .v-switch__thumb {
-    background-color: rgb(var(--v-theme-secondary-0)) !important;
-  }
-}
-</style>
+<style></style>
