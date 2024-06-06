@@ -94,6 +94,7 @@
     <alex-learningplan-task-drawer-filter
       ref="filterRef"
       v-model="filterDrawer"
+      kanban-filter
       :classes="classes"
       @filter="applyFilters"
     />

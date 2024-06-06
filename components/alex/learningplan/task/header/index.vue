@@ -150,7 +150,7 @@ const { isSmaller } = useBreakpoints({
 });
 const ellipsis = ref(true);
 const descRef = ref(null);
-const formatDate = (date: Date) => format(date, 'd/MM/yyyy');
+const formatDate = (date: Date) => format(date, 'dd/MM/yyyy');
 </script>
 
 <style scoped></style>
