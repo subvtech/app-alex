@@ -13,6 +13,7 @@
       :align="user?.id !== message.user.id ? 'left' : 'right'"
       @reply="(value) => handleAttachMessage(value)"
       @message-click="(value) => handleReplyMessageClick(value?.id)"
+      @submission-click="(value) => $emit('submission-click', value)"
     />
   </div>
 </template>
@@ -22,6 +23,7 @@ type ChatProps = {
   messages: Message[];
 };
 const user = useStrapiUser();
+defineEmits(['submission-click']);
 const attachedMessage = defineModel<Message>('attachedMessage');
 const handleAttachMessage = (content: Message) => {
   attachedMessage.value = content;
@@ -34,7 +36,7 @@ const handleReplyMessageClick = (id?: number) => {
   element.classList.add('highlight-message');
   setTimeout(() => {
     element.classList.remove('highlight-message');
-  }, 2000);
+  }, 1000);
 };
 defineProps<ChatProps>();
 </script>

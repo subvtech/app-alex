@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="id"
     class="submission d-flex flex-column overflow-hidden border border-red rounded-lg"
     :class="
       config[submission.status]?.bg ? `bg-${config[submission.status]?.bg}` : ''
@@ -100,6 +101,7 @@ const props = withDefaults(defineProps<SubmissonChipProps>(), {
 });
 
 const { t } = useI18n();
+const id = computed(() => `submission-chip-${props.submission.id}`);
 defineEmits(['click:message']);
 // Formatação de valores
 function formatTime(dt: Date) {
@@ -177,5 +179,8 @@ const config: StatusConfigProps = {
 
 .submission .header.done:active {
   background-color: rgb(var(--v-theme-gray-200));
+}
+.highlight-submission-chip {
+  background-color: rgb(var(--v-theme-gray-100)) !important;
 }
 </style>
