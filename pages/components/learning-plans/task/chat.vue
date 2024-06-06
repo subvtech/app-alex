@@ -16,8 +16,13 @@
       has-example
     />
     <div class="flex flex-col gap-2 w-full">
-      <alex-learningplan-task-chat :messages="messages" class="w-full" />
+      <alex-learningplan-task-chat
+        v-model:attached-message="attachedMessage"
+        :messages="messages"
+        class="w-full"
+      />
       <alex-learningplan-task-chat-input
+        v-model:attached-message="attachedMessage"
         class="w-full"
         :submissions="submissions"
         @submit="
@@ -69,6 +74,7 @@ const submissions: Array<AttachedSubmission> = [
     },
   },
 ];
+const attachedMessage = ref<Message>();
 const examples = ref<ExampleComponentType[]>([
   {
     snippets: [
@@ -99,10 +105,9 @@ const handleSubmitMessage = (
   if (!text && !audio) return;
   const message: Message = {
     sentAt: new Date(),
-    id: 1,
-    user: { name: 'zig' },
+    id: Math.round(Math.random() * 10000),
+    user: { id: 1, name: 'zig' },
     message: text,
-    current: true,
   };
   if (audio) {
     message.audio = {

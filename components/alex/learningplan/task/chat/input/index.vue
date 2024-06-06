@@ -6,9 +6,9 @@
         class="w-100"
         :message-response="attachedMessage"
         :submission-response="attachedSubmission"
-        @click:close="handleCloseAttached"
-        @click:message="$emit('click:message', attachedMessage)"
-        @click:submission="$emit('click:submission', attachedSubmission)"
+        @close-click="handleCloseAttached"
+        @message-click="$emit('message-click', attachedMessage)"
+        @submission-click="$emit('submission-click', attachedSubmission)"
       />
     </v-scroll-y-reverse-transition>
 
@@ -21,8 +21,8 @@
           :src="src"
           :time="time"
           :duration="duration"
-          @click:delete="handleDelete"
-          @click:pause="handlePause"
+          @delete="handleDelete"
+          @pause="handlePause"
         />
         <div v-else key="task-chat-input" class="task-chat-container">
           <alex-learningplan-task-submission-menu
@@ -66,8 +66,8 @@ withDefaults(defineProps<InputProps>(), {
   submissions: () => [],
 });
 const emits = defineEmits<{
-  (e: 'click:message', message?: Message): void;
-  (e: 'click:submission', submission?: AttachedSubmission): void;
+  (e: 'message-click', message?: Message): void;
+  (e: 'submission-click', submission?: AttachedSubmission): void;
   (
     e: 'submit',
     values: {
@@ -121,6 +121,7 @@ const handleSelectSubmission = (submission: AttachedSubmission) => {
 const handleSubmit = async () => {
   isRecording.value = false;
   await stop();
+  if (!text.value && !audio.value) return;
   emits('submit', {
     audio: {
       blob: audio.value,

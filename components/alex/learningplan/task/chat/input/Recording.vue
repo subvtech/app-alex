@@ -3,7 +3,7 @@
     <alex-custom-button
       icon="mdi-trash-can-outline"
       variant="text"
-      @click="$emit('click:delete')"
+      @click="$emit('delete')"
     />
     <v-slide-x-reverse-transition hide-on-leave group>
       <div v-if="paused" class="task-chat-audio-player">
@@ -18,7 +18,7 @@
         <alex-custom-button
           icon="mdi-pause"
           variant="text"
-          @click="$emit('click:pause')"
+          @click="$emit('pause')"
         />
       </div>
     </v-slide-x-reverse-transition>
@@ -33,7 +33,7 @@ interface RecordingProps {
   time: number;
 }
 const props = defineProps<RecordingProps>();
-defineEmits(['click:pause', 'click:delete']);
+defineEmits(['pause', 'delete']);
 const formatTime = computed(() =>
   new Date(1000 * props.time).toISOString().slice(14, 19),
 );

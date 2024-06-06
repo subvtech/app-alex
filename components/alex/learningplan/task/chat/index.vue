@@ -9,8 +9,10 @@
       :audio="message.audio"
       :message="message.message"
       :duration="message.audio?.duration"
-      :current="message.current"
       :response="message.response"
+      :align="user?.id !== message.user.id ? 'left' : 'right'"
+      @reply="(value) => handleAttachMessage(value)"
+      @message-click="(value) => handleReplyMessageClick(value?.id)"
     />
   </div>
 </template>
@@ -19,7 +21,27 @@
 type ChatProps = {
   messages: Message[];
 };
+const user = useStrapiUser();
+const attachedMessage = defineModel<Message>('attachedMessage');
+const handleAttachMessage = (content: Message) => {
+  attachedMessage.value = content;
+};
+const handleReplyMessageClick = (id?: number) => {
+  if (!id) return;
+  const element = document.querySelector(`#chat-message-${id}`);
+  if (!element) return;
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  element.classList.add('highlight-message');
+  setTimeout(() => {
+    element.classList.remove('highlight-message');
+  }, 2000);
+};
 defineProps<ChatProps>();
 </script>
 
-<style scoped></style>
+<style scoped>
+.highlight-message {
+  background-color: rgb(var(--v-theme-gray-200)) !important;
+  transition: background ease-in-out 700ms;
+}
+</style>
