@@ -4,6 +4,7 @@ import { accounts } from './accounts';
 import { learningPlanMembers } from './learning-plan-members';
 import { learningGoalVerbs } from './learning-goal-verbs';
 import { tags } from './tags';
+import { userToInstitution } from './institutions';
 
 export const users = pgTable('users', {
   id: text('id')
@@ -21,6 +22,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   learningPlanMembers: many(learningPlanMembers),
   learningGoalVerb: one(learningGoalVerbs),
   tags: many(tags),
+  institutions: many(userToInstitution),
 }));
 
 export type User = typeof users.$inferSelect;
