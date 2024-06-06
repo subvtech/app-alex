@@ -32,14 +32,14 @@
         v-if="filters.select.value || filters.finalDate.value"
         class="flex gap-2 px-6 pt-4"
       >
-        <template v-for="filter in filters" :key="filter.title">
+        <template v-for="(filter, key) in filters" :key="filter.title">
           <alex-custom-chip
             v-if="filter.value"
             :text="filter.title"
             status="secondary"
             clickable
             closable
-            @click:close="filter.value = null"
+            @click:close="() => handleRemoveFilter(key)"
           />
         </template>
       </div>
@@ -92,9 +92,9 @@
       </alex-learningplan-task-kanban-column>
     </div>
     <alex-learningplan-task-drawer-filter
+      ref="filterRef"
       v-model="filterDrawer"
       :classes="classes"
-      kanban-filter
       @filter="applyFilters"
     />
   </div>
@@ -129,7 +129,7 @@ export interface TaskStudent {
 type Colors = 'orange' | 'green' | 'blue' | 'gray';
 type KanbanType = 'professor' | 'student';
 type Card<T extends KanbanType> = T extends 'professor' ? Task : TaskStudent;
-interface Column<T extends 'professor' | 'student'> {
+interface Column<T extends KanbanType> {
   title: string;
   group: string;
   color: Colors;
@@ -139,7 +139,7 @@ interface KanbanProps {
   type: T;
   classes?: string[];
 }
-
+const { t } = useI18n();
 // Models/props
 const props = defineProps<KanbanProps>();
 const tasks = defineModel<Card<typeof props.type>[]>({
@@ -187,7 +187,7 @@ const handleInsertCard = ({ newIndex, value, group }) => {
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
   return 'title' in card;
 };
-const { t } = useI18n();
+
 // Filter
 type Filters = {
   select: string;
@@ -203,20 +203,15 @@ type FiltersValue = {
     value: { start: string; end: string } | null;
   };
 };
-const i18Texts = computed(() => {
+const filterTitleSelect = computed(() => {
   const drawer = 'components.learningPlan.drawer';
-  return props.classes?.length
-    ? {
-        title: t(`${drawer}.class`),
-      }
-    : {
-        title: t(`${drawer}.type`),
-      };
+  return props.classes?.length ? t(`${drawer}.class`) : t(`${drawer}.type`);
 });
+const filterRef = ref<{ removeFilter: (key: string) => void } | null>(null);
 const filterDrawer = ref(false);
 const filters = ref<FiltersValue>({
   select: {
-    title: i18Texts.value.title,
+    title: filterTitleSelect.value,
     value: null,
   },
   finalDate: {
@@ -227,6 +222,14 @@ const filters = ref<FiltersValue>({
 const handleFilter = () => {
   filterDrawer.value = true;
 };
+
+const handleRemoveFilter = (key: string) => {
+  filters.value[key].value = null;
+  if (filterRef.value) {
+    filterRef.value.removeFilter(key);
+  }
+};
+
 const applyFilters = (values: Filters) => {
   if (values.select) {
     filters.value.select.value = values.select;
@@ -247,9 +250,7 @@ const filteredByClassTasks = computed(() =>
 );
 
 const filteredByFinalDate = computed(() => {
-  const hasStartEndDate =
-    filters.value.finalDate.value?.end && filters.value.finalDate.value?.start;
-  if (hasStartEndDate) {
+  if (filters.value.finalDate.value) {
     return filteredByClassTasks.value.filter((task) =>
       checkIntervalOfDates(
         task.date,
@@ -284,9 +285,8 @@ const filterByClassOrType = (
 const kanban = ref<HTMLDivElement | null>(null);
 const { x: mouseX, y: mouseY } = useMouse({ window, type: 'client' });
 const moveViewX = () => {
-  if (!kanban.value) return;
   const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
-  if (!isDragging) return;
+  if (!kanban.value || !isDragging) return;
   const rect = kanban.value.getBoundingClientRect();
   const x = mouseX.value - rect.left;
   const padding = 20;
@@ -299,14 +299,15 @@ const moveViewX = () => {
 };
 const moveViewY = () => {
   const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
-  if (!isDragging) return;
   const html = document.querySelector('html');
-  if (!html) return;
+  if (!isDragging || !html) return;
   const y = Math.abs(mouseY.value);
-  if (y < window.innerHeight * 0.22) {
+  const paddingTop = 0.22;
+  const paddingBottom = 0.68;
+  if (y < window.innerHeight * paddingTop) {
     html.scrollTop -= 8;
   }
-  if (y > window.innerHeight * 0.68) {
+  if (y > window.innerHeight * paddingBottom) {
     html.scrollTop += 8;
   }
 };
