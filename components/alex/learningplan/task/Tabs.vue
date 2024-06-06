@@ -8,7 +8,9 @@
     <v-window v-model="activePage">
       <v-window-item value="1"><alex-learningplan-events /></v-window-item>
       <v-window-item class="v-window-item-full" value="2">
-        <alex-learningplan-task-submissions :submissions="submissions"
+        <alex-learningplan-task-submissions
+          :submissions="submissions"
+          @redirect-to-chat="(submission) => handleRedirectToChat(submission)"
       /></v-window-item>
       <v-window-item class="v-window-item-full" value="3">
         <alex-learningplan-task-chat
@@ -35,6 +37,8 @@ const props = withDefaults(defineProps<TaskTabsProps>(), {
 });
 const activePage = defineModel({ required: true, default: '1' });
 const attachedMessage = defineModel<Message>('attachedMessage');
+const attachedSubmission =
+  defineModel<AttachedSubmission>('attachedSubmission');
 const tabs = computed(() => {
   const submissions = {
     label: 'Entregas',
@@ -56,14 +60,19 @@ const tabs = computed(() => {
   return [...defaultTabs.slice(0, 1), submissions, ...defaultTabs.slice(1)];
 });
 const handleSubmission = (value: AttachedSubmission) => {
-  const element = document.querySelector(`#submission-chip-${value.id}`);
-  if (!element) return;
   activePage.value = '2';
-  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  element.classList.add('highlight-submission-chip');
-  setTimeout(() => {
-    element.classList.remove('highlight-submission-chip');
-  }, 1000);
+  setTimeout(
+    () =>
+      scrollAndHighlightElement(
+        `#submission-chip-${value.id}`,
+        'highlight-submission-chip',
+      ),
+    500,
+  );
+};
+const handleRedirectToChat = (submission: AttachedSubmission) => {
+  attachedSubmission.value = submission;
+  activePage.value = '3';
 };
 watch(activePage, () => {
   if (!props.selectorParent || activePage.value !== '3') return;

@@ -30,13 +30,7 @@ const handleAttachMessage = (content: Message) => {
 };
 const handleReplyMessageClick = (id?: number) => {
   if (!id) return;
-  const element = document.querySelector(`#chat-message-${id}`);
-  if (!element) return;
-  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  element.classList.add('highlight-message');
-  setTimeout(() => {
-    element.classList.remove('highlight-message');
-  }, 1000);
+  scrollAndHighlightElement(`#chat-message-${id}`, 'highlight-message');
 };
 defineProps<ChatProps>();
 </script>
