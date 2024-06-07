@@ -37,11 +37,12 @@
       v-for="(tag, index) in tags"
       :key="index"
       :text="tag"
-      :clickable="props.edit"
       :closable="props.edit"
+      :clickable="false"
       size="small"
       status="blue"
       variant="tonal"
+      @click:close="console.log('a')"
     />
   </div>
 </template>
@@ -51,15 +52,23 @@ interface CompProps {
   edit?: boolean;
 }
 
+type TagProps = string | undefined;
+
 const props = defineProps<CompProps>();
 
 const open = ref<boolean>(false);
 
-const tags = ref<string[]>(['Desenvolvimento', 'UI/UX']);
+const tags = ref<TagProps[]>(['Desenvolvimento', 'UI/UX']);
 const selected = ref<string | null>();
 
-const availableTags: string[] = ['Desenvolvimento', 'UI/UX', 'Música', 'Vídeo'];
+const availableTags: TagProps[] = [
+  'Desenvolvimento',
+  'UI/UX',
+  'Música',
+  'Vídeo',
+];
 
+// Adiciona tag quando item é selecionado no dropdown
 watch(selected, (value) => {
   open.value = false;
 

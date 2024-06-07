@@ -32,7 +32,10 @@
 
       <!-- Informações -->
       <p class="mt-4 text-h2 ellipsis lines-2">
-        {{ title }}
+        {{
+          title ||
+          '(' + $t('components.learningPlan.drawer.missing.title') + ')'
+        }}
       </p>
 
       <v-row class="my-5">
