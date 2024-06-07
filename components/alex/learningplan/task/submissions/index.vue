@@ -6,17 +6,20 @@
       :key="index"
       :submission="submission"
       :hide-infos="props.hideInfo"
+      @redirect-to-chat="(submission) => $emit('redirect-to-chat', submission)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 interface CompProps {
-  // Esconde os icones laterais de informação em TODOS os registros
   hideInfo?: boolean;
   submissions: AttachedSubmission[];
 }
-
+type Emits = {
+  'redirect-to-chat': [submission: AttachedSubmission];
+};
+defineEmits<Emits>();
 const props = withDefaults(defineProps<CompProps>(), {
   hideInfo: false,
 });

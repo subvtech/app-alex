@@ -129,6 +129,8 @@
 
       <alex-learningplan-task-tabs
         v-model="activePage"
+        v-model:attached-message="attachedMessage"
+        v-model:attached-submission="attachedSubmission"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :messages="messages"
@@ -138,6 +140,8 @@
 
     <template v-if="activePage === '3'" #append>
       <alex-learningplan-task-chat-input
+        v-model:attached-message="attachedMessage"
+        v-model:attached-submission="attachedSubmission"
         class="border-top-1 border-gray-100 pt-3"
         :submissions="submissions"
         @submit="
@@ -198,6 +202,8 @@ const handleCloseModal = () => {
   model.value = false;
 };
 const drawerId = computed(() => `student-drawer-${crypto.randomUUID()}`);
+const attachedMessage = ref<Message>();
+const attachedSubmission = ref<AttachedSubmission>();
 const handleSubmitMessage = (
   text: string,
   audio?: Blob | null,
@@ -208,10 +214,9 @@ const handleSubmitMessage = (
   if (!text && !audio) return;
   const message: Message = {
     sentAt: new Date(),
-    id: 1,
-    user: { name: 'zig' },
+    id: Math.round(Math.random() * 10),
+    user: { id: 1, name: 'zig' },
     message: text,
-    current: true,
   };
   if (audio) {
     message.audio = {

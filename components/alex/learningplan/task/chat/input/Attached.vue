@@ -7,7 +7,7 @@
       :audio="messageResponse.audio"
       :message="messageResponse"
       :user="messageResponse.user"
-      @click="$emit('click:message', messageResponse)"
+      @click="$emit('message-click', messageResponse)"
     />
     <alex-learningplan-task-submission-chip
       v-if="submissionResponse"
@@ -15,12 +15,12 @@
       :submission="submissionResponse"
       no-justification
       hide-info
-      @click="$emit('click:submission', submissionResponse)"
+      @click="$emit('submission-click', submissionResponse)"
     />
     <alex-custom-button
       icon="mdi-close"
       variant="text"
-      @click="$emit('click:close')"
+      @click="$emit('close-click')"
     />
   </div>
 </template>
@@ -34,7 +34,7 @@ withDefaults(defineProps<AttachedProps>(), {
   messageResponse: undefined,
   submissionResponse: undefined,
 });
-defineEmits(['click:close', 'click:message', 'click:submission']);
+defineEmits(['close-click', 'message-click', 'submission-click']);
 </script>
 
 <style scoped></style>

@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="id"
     class="submission d-flex flex-column overflow-hidden border border-red rounded-lg"
     :class="
       config[submission.status]?.bg ? `bg-${config[submission.status]?.bg}` : ''
@@ -57,7 +58,7 @@
             size="small"
             icon="mdi-message-outline"
             color="gray-600"
-            @click="$emit('click:message')"
+            @click="() => $emit('redirect-to-chat', submission)"
           />
         </div>
       </div>
@@ -100,7 +101,11 @@ const props = withDefaults(defineProps<SubmissonChipProps>(), {
 });
 
 const { t } = useI18n();
-defineEmits(['click:message']);
+const id = computed(() => `submission-chip-${props.submission.id}`);
+type Emits = {
+  'redirect-to-chat': [submission: AttachedSubmission];
+};
+defineEmits<Emits>();
 // Formatação de valores
 function formatTime(dt: Date) {
   let hours: number | string = dt.getHours();
@@ -119,7 +124,6 @@ function formatGrade(grade: number) {
   if (Number.isInteger(grade)) {
     return grade;
   }
-
   return grade.toFixed(1);
 }
 
@@ -177,5 +181,8 @@ const config: StatusConfigProps = {
 
 .submission .header.done:active {
   background-color: rgb(var(--v-theme-gray-200));
+}
+.highlight-submission-chip {
+  background-color: rgb(var(--v-theme-gray-100)) !important;
 }
 </style>

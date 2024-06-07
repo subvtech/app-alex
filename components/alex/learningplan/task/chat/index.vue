@@ -9,8 +9,11 @@
       :audio="message.audio"
       :message="message.message"
       :duration="message.audio?.duration"
-      :current="message.current"
       :response="message.response"
+      :align="user?.id !== message.user.id ? 'left' : 'right'"
+      @reply="(value) => handleAttachMessage(value)"
+      @message-click="(value) => handleReplyMessageClick(value?.id)"
+      @submission-click="(value) => $emit('submission-click', value)"
     />
   </div>
 </template>
@@ -19,7 +22,22 @@
 type ChatProps = {
   messages: Message[];
 };
+const user = useStrapiUser();
+defineEmits(['submission-click']);
+const attachedMessage = defineModel<Message>('attachedMessage');
+const handleAttachMessage = (content: Message) => {
+  attachedMessage.value = content;
+};
+const handleReplyMessageClick = (id?: number) => {
+  if (!id) return;
+  scrollAndHighlightElement(`#chat-message-${id}`, 'highlight-message');
+};
 defineProps<ChatProps>();
 </script>
 
-<style scoped></style>
+<style scoped>
+.highlight-message {
+  background-color: rgb(var(--v-theme-gray-200)) !important;
+  transition: background ease-in-out 700ms;
+}
+</style>
