@@ -11,10 +11,33 @@
     <template #body="{ items, headers }">
       <transition-group :name="transitionName">
         <tr
-          v-for="item in items"
+          v-for="(item, index) in items"
           :key="item.id"
-          class="text-5 text-no-wrap staggered-fade-item"
-          :class="isArchived ? 'text-gray-400' : 'text-gray-600'"
+          :draggable="!isArchived"
+          class="text-5 text-no-wrap staggered-fade-item table-row"
+          :class="[
+            isArchived ? 'text-gray-400' : 'text-gray-600',
+            over == index && isActiveGroup && dragFrom != item ? 'over' : '',
+            dragging && dragFrom == item ? 'dragging' : '',
+          ]"
+          @dragstart="
+            (e) => {
+              if (!isArchived) startDrag(item, e);
+            }
+          "
+          @dragover="
+            (e) => {
+              if (!isArchived) {
+                onDragOver(index, e);
+                updateStatus(group);
+              }
+            }
+          "
+          @dragend="
+            () => {
+              if (!isArchived) finishDragTest(item.id, index);
+            }
+          "
         >
           <td
             class="text-body-4 text-overflow text-left"
@@ -77,7 +100,7 @@
               <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
             </div>
           </td>
-          <td class="d-flex align-center">
+          <td>
             <v-tooltip
               :text="t('pages.task.table.tooltips.kanban')"
               location="bottom center"
@@ -137,17 +160,26 @@
 
 <script setup lang="ts">
 import { TaskType } from './Container.vue';
+import { useDragDrop } from '@/composables/useDragDrop';
 const props = defineProps<{
   tasks: TaskType[];
   filter: string;
-  isArchived: boolean;
+  group: 'draft' | 'published' | 'done' | 'archived';
+  isActiveGroup: boolean;
 }>();
 
 const { t } = useI18n();
+const isArchived = computed(() => props.group === 'archived');
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',
 );
-const emit = defineEmits(['deleteTask', 'moveTask', 'toggleArchive']);
+const emit = defineEmits([
+  'deleteTask',
+  'moveTask',
+  'toggleArchive',
+  'dragOver',
+  'dragFinish',
+]);
 
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
@@ -180,6 +212,7 @@ const dropDownItems = (task: TaskType) => {
     case 'published':
       if (deliveredTotal === 0) {
         items.push(getDropDownAction('draft', task.id));
+        items.push(getDropDownAction('close', task.id));
         items.push(getDropDownAction('delete', task.id));
       } else if (task.archived) {
         items.push(getDropDownAction('unarchive', task.id));
@@ -276,6 +309,18 @@ const header = [
   },
   { title: '', key: 'actions', sortable: false },
 ];
+
+const updateStatus = (status: string) => {
+  emit('dragOver', status);
+};
+
+const { over, dragFrom, dragging, startDrag, dragEnd, onDragOver } =
+  useDragDrop();
+
+const finishDragTest = (taskId: number, index: number) => {
+  emit('dragFinish', taskId, index, over);
+  dragEnd();
+};
 </script>
 
 <style scoped>
@@ -283,6 +328,19 @@ const header = [
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.table-row {
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.dragging {
+  opacity: 0;
+}
+
+.over {
+  background-color: aliceblue;
 }
 
 .gray-filter {

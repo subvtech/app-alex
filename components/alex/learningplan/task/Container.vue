@@ -35,6 +35,10 @@
                   :tasks="tasksArray[i - 1]"
                   :filter="search"
                   :is-archived="i === 4"
+                  :group="groups[i - 1]"
+                  :is-active-group="dragEnterGroup === groups[i - 1]"
+                  @drag-finish="handleDrop"
+                  @drag-over="dragEnterGroup = $event"
                   @delete-task="handleDeleteTask"
                   @move-task="handleMoveTask"
                   @toggle-archive="handleToggleArchive"
@@ -57,6 +61,7 @@
                 <div v-else class="d-flex ga-2">
                   <alex-inputs-text-field
                     v-model="taskTitle"
+                    autofocus
                     :placeholder="t('pages.task.addPlaceholder')"
                     class="w-100"
                     density="comfortable"
@@ -114,6 +119,17 @@ const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
+const groups = ['draft', 'published', 'done', 'archived'];
+const dragEnterGroup = ref('');
+
+const handleDrop = async (taskId: number, index: number, newPos: number) => {
+  const status = dragEnterGroup.value;
+  console.log(taskId, status, index, newPos);
+  if (dragEnterGroup.value) {
+    await handleMoveTask({ id: taskId, status });
+  }
+  dragEnterGroup.value = '';
+};
 
 const slideTransition = (i: number) =>
   tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
