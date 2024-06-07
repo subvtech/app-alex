@@ -17,27 +17,13 @@
           class="text-5 text-no-wrap staggered-fade-item table-row"
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
-            over == index && isActiveGroup && dragFrom != item ? 'over' : '',
-            dragging && dragFrom == item ? 'dragging' : '',
+            over == item.id ? 'over' : '',
+            dragging && dragFrom == item.id ? 'dragging' : '',
           ]"
-          @dragstart="
-            (e) => {
-              if (!isArchived) startDrag(item, e);
-            }
-          "
-          @dragover="
-            (e) => {
-              if (!isArchived) {
-                onDragOver(index, e);
-                updateStatus(group);
-              }
-            }
-          "
-          @dragend="
-            () => {
-              if (!isArchived) finishDragTest(item.id, index);
-            }
-          "
+          @dragstart="(e) => setDragStart(item.id, e)"
+          @dragover="(e) => setDragOver(item.id, index, e)"
+          @dragend="setFinishDrag(item.id, index)"
+          @dragleave="emit('dragLeave')"
         >
           <td
             class="text-body-4 text-overflow text-left"
@@ -160,12 +146,13 @@
 
 <script setup lang="ts">
 import { TaskType } from './Container.vue';
-import { useDragDrop } from '@/composables/useDragDrop';
 const props = defineProps<{
   tasks: TaskType[];
   filter: string;
   group: 'draft' | 'published' | 'done' | 'archived';
-  isActiveGroup: boolean;
+  dragging: boolean;
+  over: number;
+  dragFrom: number;
 }>();
 
 const { t } = useI18n();
@@ -178,12 +165,13 @@ const emit = defineEmits([
   'moveTask',
   'toggleArchive',
   'dragOver',
-  'dragFinish',
+  'dragEnd',
+  'startDrag',
+  'dragLeave',
 ]);
 
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
-
 const tasksArray = computed(() => props.tasks);
 
 const cancelDelete = () => {
@@ -310,16 +298,17 @@ const header = [
   { title: '', key: 'actions', sortable: false },
 ];
 
-const updateStatus = (status: string) => {
-  emit('dragOver', status);
+const setDragStart = (itemID: number, e: DragEvent) => {
+  // set accepted groups
+  if (!isArchived.value) emit('startDrag', itemID, e);
 };
 
-const { over, dragFrom, dragging, startDrag, dragEnd, onDragOver } =
-  useDragDrop();
+const setDragOver = (id: number, index: number, e: DragEvent) => {
+  if (!isArchived.value) emit('dragOver', props.group, id, index, e);
+};
 
-const finishDragTest = (taskId: number, index: number) => {
-  emit('dragFinish', taskId, index, over);
-  dragEnd();
+const setFinishDrag = (id: number, index: number) => {
+  emit('dragEnd', id, index);
 };
 </script>
 

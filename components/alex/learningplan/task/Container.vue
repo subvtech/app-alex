@@ -36,9 +36,13 @@
                   :filter="search"
                   :is-archived="i === 4"
                   :group="groups[i - 1]"
-                  :is-active-group="dragEnterGroup === groups[i - 1]"
-                  @drag-finish="handleDrop"
-                  @drag-over="dragEnterGroup = $event"
+                  :over="setOver(i - 1)"
+                  :drag-from="dragFrom"
+                  :dragging="dragging"
+                  @start-drag="startDrag"
+                  @drag-over="onDragOver"
+                  @drag-end="dragEnd"
+                  @drag-leave="onDragLeave"
                   @delete-task="handleDeleteTask"
                   @move-task="handleMoveTask"
                   @toggle-archive="handleToggleArchive"
@@ -89,6 +93,8 @@
 
 <script setup lang="ts">
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
+import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
+
 export interface TaskType {
   id: number;
   title: string;
@@ -122,14 +128,14 @@ const learningPlanStore = useLearningPlanStore();
 const groups = ['draft', 'published', 'done', 'archived'];
 const dragEnterGroup = ref('');
 
-const handleDrop = async (taskId: number, index: number, newPos: number) => {
+/* const handleDrop = async (taskId: number, index: number, newPos: number) => {
   const status = dragEnterGroup.value;
   console.log(taskId, status, index, newPos);
   if (dragEnterGroup.value) {
     await handleMoveTask({ id: taskId, status });
   }
   dragEnterGroup.value = '';
-};
+}; */
 
 const slideTransition = (i: number) =>
   tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
@@ -315,6 +321,21 @@ const handleToggleArchive = async (id: number) => {
   } catch (e) {
     displayError(task.archived ? 'archiveError' : 'unarchiveError');
   }
+};
+
+const {
+  over,
+  dragFrom,
+  dragging,
+  startDrag,
+  dragEnd,
+  onDragOver,
+  onDragLeave,
+} = useMultipleDragDrop();
+
+const setOver = (groupIndex: number) => {
+  if (over.value.list === groups[groupIndex]) return over.value.id;
+  return -1;
 };
 </script>
 
