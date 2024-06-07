@@ -9,7 +9,11 @@
       "label": "Status",
       "draft": "Rascunho",
       "published": "Publicado",
-      "closed": "Fechado"
+      "closed": "Fechado",
+      "toDo": "A fazer",
+      "inProgress": "Fazendo",
+      "underReview": "Em avaliação",
+      "finished": "Concluída"
     },
     "date": {
       "startLabel": "Data de início",
@@ -30,14 +34,17 @@
       "aftrDeadline": "Envio após prazo"
     },
     "restrictions": {
-      "label": "Restrições"
+      "label": "Restrições",
+      "link": "Link",
+      "media": "Mídia",
+      "document": "Documento",
+      "image": "Imagem",
+      "text": "Texto"
     },
     "learningResources": {
       "label": "Recursos de aprendizagem",
       "noneSelected": "Nenhuma trilha selecionada"
-    },
-    "freeEditor": "Editor Livre",
-    "allowSendAfterSubmission": "Permitir envio após entrega"
+    }
   },
   "goals": {
     "label": "Objetivos de aprendizagem",

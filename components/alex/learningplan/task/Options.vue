@@ -1,41 +1,28 @@
 <template>
-  <v-menu :disabled="!edit">
-    <template #activator="{ props: vMenuProps }">
-      <p
-        v-bind="vMenuProps"
+  <alex-custom-dropdown :disabled="!edit" :items="items">
+    <template #activator="{ props }"
+      ><p
+        v-bind="props"
         class="pa-1 text-body-3 text-gray-800 rounded-md"
-        :class="edit ? 'output cursor-pointer' : ''"
+        :class="edit && 'output cursor-pointer'"
       >
         {{ model }}
       </p>
     </template>
-
-    <v-list>
-      <v-list-item v-for="(item, index) in items" :key="index" :value="item">
-        <v-list-item-title @click="() => handleClickItem(item)">{{
-          item
-        }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-menu>
+  </alex-custom-dropdown>
 </template>
 
 <script setup lang="ts">
+import { AlexDropdownItem } from '../../custom/Dropdown.vue';
+
 interface CompProps {
-  items: string[];
+  items: AlexDropdownItem[];
   edit?: boolean;
 }
 
-const props = defineProps<CompProps>();
-const model = defineModel<string>();
-const handleClickItem = (item: string) => {
-  model.value = item;
-};
-onBeforeMount(() => {
-  if (props.items.length) {
-    model.value = props.items[0];
-  }
-});
+defineProps<CompProps>();
+
+const model = defineModel<string>({ required: true });
 </script>
 
 <style scoped>

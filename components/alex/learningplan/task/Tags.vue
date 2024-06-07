@@ -4,13 +4,13 @@
     <v-menu
       v-if="props.edit"
       v-model="open"
-      class="invite-member"
       :close-on-content-click="false"
+      class="invite-member"
     >
       <!-- Exibição -->
-      <template #activator="{ props: vMenuProps }">
+      <template #activator="{ props }">
         <alex-custom-button
-          v-bind="vMenuProps"
+          v-bind="props"
           icon="mdi-plus"
           size="small"
           variant="secondary"
@@ -21,7 +21,7 @@
         <p class="text-body-1 text-gray-800 mb-2">
           {{ $t('components.learningPlan.drawer.tags.subtitle') }}
         </p>
-        <alex-inputs-combobox
+        <alex-inputs-select
           v-model="selected"
           class="hide-select-icon"
           style="min-width: 220px"
@@ -71,13 +71,13 @@ const availableTags: TagProps[] = [
 // Adiciona tag quando item é selecionado no dropdown
 watch(selected, (value) => {
   open.value = false;
+  selected.value = null;
 
   if (value == null || tags.value.includes(value)) {
     return;
   }
 
   tags.value.push(value);
-  selected.value = null;
 });
 </script>
 

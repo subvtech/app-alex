@@ -83,7 +83,7 @@
         />
       </p>
       <p v-if="submission.justification.text" class="text-gray-600 text-body-5">
-        >{{ submission.justification.text }}
+        {{ submission.justification.text }}
       </p>
     </div>
   </div>

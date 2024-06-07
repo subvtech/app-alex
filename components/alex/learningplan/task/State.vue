@@ -14,31 +14,27 @@
         variant="tonal"
       />
     </template>
-
-    <!-- Opções -->
-    <v-list>
-      <v-list-item
-        v-for="(data, status) in items"
-        :key="status"
-        :value="status"
-      >
-        <v-list-item-title @click="model = status">{{
-          data.title
-        }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-menu>
+  </alex-custom-dropdown>
 </template>
 
 <script setup lang="ts">
-type TaskStatus = 'draft' | 'published' | 'closed';
+import { AlexDropdownItem } from '../../custom/Dropdown.vue';
 
-interface ItemProps {
-  title: string;
-  variant: 'secondary' | 'blue' | 'red' | 'orange';
+// Tipos
+export type TeacherTaskStatus = 'draft' | 'published' | 'closed';
+export type StudentTaskStatus =
+  | 'toDo'
+  | 'inProgress'
+  | 'underReview'
+  | 'finished';
+
+interface StateConfig {
+  text: string;
+  status: 'secondary' | 'blue' | 'orange' | 'green' | 'red';
+  immutable?: boolean;
 }
-const model = defineModel<string>({ required: true });
 
+// Props e model do componente
 interface StateProps {
   // Visão do professor
   edit?: boolean;
@@ -150,4 +146,9 @@ const filteredStudent = computed(() =>
     .filter((item) => item !== undefined)
     .filter((item) => item.text !== config[model.value].text),
 );
+
+onMounted(() => {
+  console.log(filteredTeacher);
+  console.log(filteredStudent);
+});
 </script>

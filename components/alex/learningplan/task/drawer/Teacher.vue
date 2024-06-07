@@ -43,18 +43,18 @@
           ><p class="text-body-4 text-gray-800 mb-2">
             {{ $t('components.learningPlan.drawer.task.status.label') }}
           </p>
-          <alex-learningplan-task-state
-            v-model="status"
-            :edit="editable"
-            :items="itemsStatus"
-          />
+          <alex-learningplan-task-state v-model="status" :edit="editable" />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
             <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.type.label') }}
           </p>
-          <alex-learningplan-task-options :items="types" :edit="editable" />
+          <alex-learningplan-task-options
+            v-model="currType"
+            :items="types"
+            :edit="editable"
+          />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -87,14 +87,12 @@
         {{ $t('components.learningPlan.drawer.task.submission.label') }}
       </p>
       <v-row class="mx-0 mt-3 mb-4">
-      <v-row class="mx-0 mt-3 mb-4">
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="hasSubmission"
             :label="
               $t('components.learningPlan.drawer.task.submission.reqSubmission')
             "
-          />
           />
         </v-col>
         <v-col class="pa-0 d-flex align-center" cols="6">
@@ -103,7 +101,6 @@
             :label="
               $t('components.learningPlan.drawer.task.submission.aftrDeadline')
             "
-          />
           />
         </v-col>
         <v-col class="mt-4 pa-0" cols="12"
@@ -123,8 +120,6 @@
             $t('components.learningPlan.drawer.task.learningResources.label')
           }}
         </p>
-        <alex-custom-button
-          prepend-icon="alex:trail"
         <alex-custom-button
           prepend-icon="alex:trail"
           :text="
@@ -152,11 +147,10 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n();
+import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
-// Date picker
-const startDate = ref(null);
-const finalDate = ref(null);
+const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
   title: string;
@@ -181,30 +175,31 @@ const model = defineModel({ default: false });
 
 defineEmits(['click:kanban', 'click:attached-trail']);
 
-const itemsStatus = {
-  draft: {
-    title: t('components.learningPlan.drawer.task.status.draft'),
-    variant: 'secondary' as 'secondary' | 'blue',
-  },
-  published: {
-    title: t('components.learningPlan.drawer.task.status.published'),
-    variant: 'blue' as 'secondary' | 'blue',
-  },
-  closed: {
-    title: t('components.learningPlan.drawer.task.status.closed'),
-    variant: 'red' as 'secondary' | 'red',
-  },
-};
 // Status
-const status = ref('draft');
+const status = ref<TeacherTaskStatus | StudentTaskStatus>('draft');
+
 // Date picker
 const startDate = ref(new Date());
 const finalDate = ref(new Date());
 
 // Tipos
-const types = ref<string[]>([
+const currType = ref<string>(
   t('components.learningPlan.drawer.task.type.individual'),
-  t('components.learningPlan.drawer.task.type.collective'),
+);
+
+const types = ref<AlexDropdownItem[]>([
+  {
+    text: t('components.learningPlan.drawer.task.type.individual'),
+    onClick: () => {
+      currType.value = t('components.learningPlan.drawer.task.type.individual');
+    },
+  },
+  {
+    text: t('components.learningPlan.drawer.task.type.collective'),
+    onClick: () => {
+      currType.value = t('components.learningPlan.drawer.task.type.collective');
+    },
+  },
 ]);
 
 // Tabs

@@ -9,7 +9,11 @@
       "label": "Status",
       "draft": "Draft",
       "published": "Published",
-      "closed": "Closed"
+      "closed": "Closed",
+      "toDo": "To do",
+      "inProgress": "In progress",
+      "underReview": "Under review",
+      "finished": "Finished"
     },
     "date": {
       "startLabel": "Start date",
@@ -30,14 +34,17 @@
       "aftrDeadline": "Allow submissions after deadline"
     },
     "restrictions": {
-      "label": "Restrictions"
+      "label": "Restrictions",
+      "link": "Link",
+      "media": "Media",
+      "document": "Document",
+      "image": "Image",
+      "text": "Text"
     },
     "learningResources": {
       "label": "Learning resources",
       "noneSelected": "No trails selected"
-    },
-    "freeEditor": "Free Editor",
-    "allowSendAfterSubmission": "Allow send after submission date"
+    }
   },
   "goals": {
     "label": "Learning goals",
