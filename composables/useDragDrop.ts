@@ -1,5 +1,3 @@
-import { ref } from 'vue';
-
 export function useDragDrop() {
   const over = ref(-1);
   const dragFrom = ref({});
@@ -11,18 +9,13 @@ export function useDragDrop() {
     dragging.value = true;
     dragFrom.value = item;
     if (dragGhost)
-      e.dataTransfer.setDragImage(e.target.closest(dragGhost), 100, 100);
+      e.dataTransfer.setDragImage(e.target.closest(dragGhost), 10, 10);
   };
 
   const finishDrag = (item, pos, list) => {
     if (over.value < 0 || pos < 0) return;
     list.splice(pos, 1);
     list.splice(over.value, 0, item);
-    over.value = -1;
-    dragging.value = false;
-  };
-
-  const dragEnd = () => {
     over.value = -1;
     dragging.value = false;
   };
@@ -37,7 +30,6 @@ export function useDragDrop() {
     over,
     dragFrom,
     dragging,
-    dragEnd,
     startDrag,
     finishDrag,
     onDragOver,
