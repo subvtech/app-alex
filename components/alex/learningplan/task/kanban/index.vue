@@ -94,6 +94,7 @@
     <alex-learningplan-task-drawer-filter
       ref="filterRef"
       v-model="filterDrawer"
+      kanban-filter
       :classes="classes"
       @filter="applyFilters"
     />
@@ -101,7 +102,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends 'professor' | 'student'">
-import { isWithinInterval } from 'date-fns';
+import { isWithinInterval, isBefore, isAfter, isEqual } from 'date-fns';
 import { useMouse } from '@vueuse/core';
 import { Accept } from './column/index.vue';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
@@ -262,11 +263,33 @@ const filteredByFinalDate = computed(() => {
   return filteredByClassTasks.value;
 });
 
-const checkIntervalOfDates = (initial: Date, first: string, second: string) =>
-  isWithinInterval(initial, {
-    start: new Date(first.replaceAll('-', '/')),
-    end: new Date(second.replaceAll('-', '/')).setHours(23, 59, 59),
-  });
+const checkIntervalOfDates = (
+  initial: Date,
+  first?: string,
+  second?: string,
+) => {
+  if (!first && !second) {
+    return true;
+  }
+  if (first && second) {
+    return isWithinInterval(initial, {
+      start: new Date(first.replaceAll('-', '/')),
+      end: new Date(second.replaceAll('-', '/')).setHours(23, 59, 59),
+    });
+  }
+  if (first) {
+    const firstDate = new Date(first.replaceAll('-', '/'));
+    return isAfter(initial, firstDate) || isEqual(initial, firstDate);
+  }
+  if (second) {
+    const secondDate = new Date(second.replaceAll('-', '/')).setHours(
+      23,
+      59,
+      59,
+    );
+    return isBefore(initial, secondDate) || isEqual(initial, secondDate);
+  }
+};
 
 const filterByClassOrType = (
   isStudent: boolean,
