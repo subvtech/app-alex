@@ -169,34 +169,30 @@ const i18Texts = computed(() => {
 });
 const schema = yup.object().shape(
   {
-    finalDateStart: yup.date().when('finalDateEnd', (value, scheme) => {
-      if (!value[0]) {
-        return scheme.optional();
-      }
-      return scheme.required(t('rules.startDate.required'));
-    }),
-    finalDateEnd: yup.date().when('finalDateStart', (value, scheme) => {
-      if (!value[0]) {
-        return scheme.optional();
-      }
-      return scheme
-        .required(t('rules.endDate.required'))
-        .min(yup.ref('finalDateStart'), t('rules.endDate.beforeStartDate'));
-    }),
-    startDateStart: yup.date().when('startDateEnd', (value, scheme) => {
-      if (!value[0]) {
-        return scheme.optional();
-      }
-      return scheme.required(t('rules.startDate.required'));
-    }),
-    startDateEnd: yup.date().when('startDateStart', (value, scheme) => {
-      if (!value[0]) {
-        return scheme.optional();
-      }
-      return scheme
-        .required(t('rules.endDate.required'))
-        .min(yup.ref('startDateStart'), t('rules.endDate.beforeStartDate'));
-    }),
+    finalDateStart: yup.date().optional(),
+    finalDateEnd: yup
+      .date()
+      .optional()
+      .when('finalDateStart', (value, scheme) => {
+        if (!value[0]) {
+          return scheme;
+        }
+        return scheme
+          .optional()
+          .min(yup.ref('finalDateStart'), t('rules.endDate.beforeStartDate'));
+      }),
+    startDateStart: yup.date().optional(),
+    startDateEnd: yup
+      .date()
+      .optional()
+      .when('startDateStart', (value, scheme) => {
+        if (!value[0]) {
+          return scheme;
+        }
+        return scheme
+          .optional()
+          .min(yup.ref('startDateStart'), t('rules.endDate.beforeStartDate'));
+      }),
   },
   [
     ['finalDateStart', 'finalDateEnd'],
@@ -230,7 +226,7 @@ const onSubmit = handleSubmit(() => {
         return false;
       }
       if (typeof value === 'object') {
-        return value.start && value.end;
+        return value.start || value.end;
       }
       return true;
     }),
