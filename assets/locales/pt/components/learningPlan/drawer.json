@@ -44,7 +44,9 @@
     "learningResources": {
       "label": "Recursos de aprendizagem",
       "noneSelected": "Nenhuma trilha selecionada"
-    }
+    },
+    "freeEditor": "Editor Livre",
+    "allowSendAfterSubmission": "Permitir envio após o prazo"
   },
   "goals": {
     "label": "Objetivos de aprendizagem",

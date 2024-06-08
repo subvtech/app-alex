@@ -44,7 +44,9 @@
     "learningResources": {
       "label": "Learning resources",
       "noneSelected": "No trails selected"
-    }
+    },
+    "freeEditor": "Free Editor",
+    "allowSendAfterSubmission": "Allow send after submission"
   },
   "goals": {
     "label": "Learning goals",

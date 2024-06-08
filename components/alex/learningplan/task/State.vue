@@ -146,9 +146,4 @@ const filteredStudent = computed(() =>
     .filter((item) => item !== undefined)
     .filter((item) => item.text !== config[model.value].text),
 );
-
-onMounted(() => {
-  console.log(filteredTeacher);
-  console.log(filteredStudent);
-});
 </script>
