@@ -7,6 +7,7 @@
       :deadline-at="task.deadline_at"
       :start-at="task.start_at"
       :status="task.status"
+      @edit-click="teacherDrawer = true"
     />
     <alex-learningplan-task-kanban
       v-model="tasks"
@@ -38,35 +39,38 @@
           accept: true,
         },
       ]"
-      @card-insert="changeStatusTask"
+      @card-click="console.log(true)"
+    />
+    <alex-learningplan-task-drawer-student
+      v-model="studentDrawer"
+      :messages="[]"
+      :submission="{
+        constraints: [],
+        description: 'Teste',
+        status: 'not_started',
+      }"
+      :deadline="new Date()"
+      send-submission
+      :submissions="submissions"
+      :task="{ finalDate: new Date(), status: 'to_do' }"
+      :student="{ name: 'Jorge santos lima', studentClass: 'Turma A' }"
+    />
+    <alex-learningplan-task-drawer-teacher
+      v-model="teacherDrawer"
+      title="Criar um mapa mental sobre o assunto abordado em sala de aula
+        previamente e isso é um título muito grande grande grande"
+      :messages="[]"
+      :editable="true"
+      has-submission
+      send-after-deadline
     />
   </section>
 </template>
 
 <script setup lang="ts">
-import { Task } from '~/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
-const changeStatusTask = async (
-  _newIndex: number,
-  value: Task,
-  _group: string,
-) => {
-  const success = await new Promise((resolve) =>
-    setTimeout(() => resolve(true), 2000),
-  );
-  // Can't be dragging when this code block execute, bug if was dragging.
-  if (!success) {
-    tasks.value = tasks.value.map((task) => {
-      if (task.id === value.id) {
-        return { ...task, status: value.status };
-      }
-      return task;
-    });
-  }
-  return true;
-};
 // Caminho até a página (Acima do header)
 const tasks = ref([
   {
@@ -91,6 +95,20 @@ const tasks = ref([
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
 const headerStore = usePageHeaderStore();
+const teacherDrawer = ref(false);
+const studentDrawer = ref(false);
+const submissions: Array<AttachedSubmission> = [
+  {
+    id: 1,
+    status: 'reviewed',
+    time: new Date(),
+    mark: 9.5,
+    maxMark: 10,
+    justification: {
+      text: 'Amigos, a mobilidade dos capitais internacionais não pode mais se dissociar das formas de ação. A prática cotidiana prova que a crescente influência da mídia oferece uma interessante oportunidade para verificação dos relacionamentos verticais entre as hierarquias. ',
+    },
+  },
+];
 onBeforeMount(() => (headerStore.showHeader = true));
 watch(
   () => learningPlanStore.loading,

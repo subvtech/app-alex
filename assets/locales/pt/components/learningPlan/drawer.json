@@ -65,5 +65,6 @@
   "clean": "Limpar",
   "archivedTasks": "Tarefas arquivadas",
   "selectClassPlaceholder": "Selecione a turma",
-  "selectTypePlaceholder": "Selecione o tipo"
+  "selectTypePlaceholder": "Selecione o tipo",
+  "srchClass": "Buscar turma"
 }

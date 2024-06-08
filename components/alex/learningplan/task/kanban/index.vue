@@ -57,10 +57,9 @@
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
-        @click:card="$emit('card-click')"
         @insert-card="handleInsertCard"
       >
-        <template #card="{ item, status }">
+        <template #card="{ item, status, index: itemIndex }">
           <template v-if="type === 'professor'">
             <alex-learningplan-task-card
               v-if="!isTaskStudent(item)"
@@ -72,6 +71,7 @@
               :avatar="item?.user.avatar"
               :mark="item.mark"
               :max-mark="item.maxMark"
+              @click="$emit('card-click', itemIndex, item)"
             />
           </template>
           <template v-if="type === 'student'">
@@ -163,7 +163,7 @@ const columnsTasks = computed(() =>
 
 type Emits = {
   (e: 'filter-click'): void;
-  (e: 'card-click'): void;
+  (e: 'card-click', index: number, item: Card<T>): void;
   (
     e: 'card-insert',
     newIndex: number,

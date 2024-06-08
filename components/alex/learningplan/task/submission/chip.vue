@@ -1,5 +1,6 @@
 <template>
   <div
+    :id="id"
     class="submission d-flex flex-column overflow-hidden border border-red rounded-lg"
     :class="
       config[submission.status]?.bg ? `bg-${config[submission.status]?.bg}` : ''
@@ -24,7 +25,7 @@
       <!-- Seção 2 (Título e nota/subtexto) -->
       <div class="flex-fill">
         <p
-          class="font-weight-bold text-p4"
+          class="font-weight-bold text-body-4"
           :class="`text-${config[submission.status].color}`"
         >
           {{ config[submission.status].title }}
@@ -36,7 +37,7 @@
           :class="
             submission.status === 'reviewed'
               ? ' text-gray-600 text-h5 font-weight-bold '
-              : 'text-gray-500 text-p5'
+              : 'text-gray-500 text-body-5'
           "
         >
           {{ formatGrade(submission.mark) }}/{{
@@ -46,20 +47,19 @@
       </div>
       <!-- Seção 3 (opções) -->
       <div class="d-none d-sm-block flex-fill text-end">
-        <p v-if="submission.time" class="text-gray-500 text-p5">
+        <p v-if="submission.time" class="text-gray-500 text-body-5">
           {{ formatTime(submission.time) }}
         </p>
 
         <div v-if="!props.hideInfo">
-          <v-icon color="gray-600" class="medium-icon"
-            >mdi-text-box-outline</v-icon
-          >
-          <v-icon
+          <alex-custom-button
             v-if="submission.justification && !noJustification"
+            variant="text"
+            size="small"
+            icon="mdi-message-outline"
             color="gray-600"
-            class="medium-icon ml-2"
-            >mdi-message-outline</v-icon
-          >
+            @click="() => $emit('redirect-to-chat', submission)"
+          />
         </div>
       </div>
     </div>
@@ -69,18 +69,21 @@
       v-if="submission.justification && !noJustification"
       class="pa-3 border-t"
     >
-      <p class="text-p4 text-gray-600 font-weight-bold mb-2">
+      <p class="text-body-4 text-gray-600 font-weight-bold mb-2">
         {{ $t('components.learningPlan.submissions.justification') }}
       </p>
 
       <!-- Audio e/ou video -->
-      <p v-if="submission.justification.audioUrl" class="text-gray-600 text-p5">
+      <p
+        v-if="submission.justification.audioUrl"
+        class="text-gray-600 text-body-5"
+      >
         <alex-learningplan-task-audio
           :src="submission.justification.audioUrl"
         />
       </p>
-      <p v-if="submission.justification.text" class="text-gray-600 text-p5">
-        >{{ submission.justification.text }}
+      <p v-if="submission.justification.text" class="text-gray-600 text-body-5">
+        {{ submission.justification.text }}
       </p>
     </div>
   </div>
@@ -98,7 +101,11 @@ const props = withDefaults(defineProps<SubmissonChipProps>(), {
 });
 
 const { t } = useI18n();
-
+const id = computed(() => `submission-chip-${props.submission.id}`);
+type Emits = {
+  'redirect-to-chat': [submission: AttachedSubmission];
+};
+defineEmits<Emits>();
 // Formatação de valores
 function formatTime(dt: Date) {
   let hours: number | string = dt.getHours();
@@ -117,7 +124,6 @@ function formatGrade(grade: number) {
   if (Number.isInteger(grade)) {
     return grade;
   }
-
   return grade.toFixed(1);
 }
 
@@ -154,34 +160,6 @@ const config: StatusConfigProps = {
   cursor: pointer;
 }
 
-/** Formatação de textos e icones */
-.text-p4 {
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
-
-.text-p5 {
-  font-family: Sen;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 135%; /* 16.2px */
-  letter-spacing: 0.24px;
-}
-
-.text-h5 {
-  font-family: Sen;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.36px;
-}
-
 .medium-icon {
   font-size: 20px;
 }
@@ -203,5 +181,8 @@ const config: StatusConfigProps = {
 
 .submission .header.done:active {
   background-color: rgb(var(--v-theme-gray-200));
+}
+.highlight-submission-chip {
+  background-color: rgb(var(--v-theme-gray-100)) !important;
 }
 </style>

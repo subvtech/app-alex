@@ -21,13 +21,7 @@
         :index="i"
         class="kanban-card-item"
       >
-        <slot
-          name="card"
-          :item="item"
-          :index="i"
-          :status="status"
-          :click="$emit('click:card', i, item as T)"
-        />
+        <slot name="card" :item="item" :index="i" :status="status" />
       </SlickItem>
     </SlickList>
   </div>
@@ -57,7 +51,6 @@ interface ColumnProps {
 const props = withDefaults(defineProps<ColumnProps>(), { accept: null });
 const items = defineModel<T[]>({ required: true });
 const emit = defineEmits<{
-  'click:card': [index: number, item: T];
   'insert-card': [
     values: {
       newIndex: number;

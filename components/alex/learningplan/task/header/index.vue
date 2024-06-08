@@ -17,20 +17,20 @@
       </p>
       <div>
         <p
-          ref="descRef"
+          ref="descEl"
           class="text-body-3 text-gray-800"
-          :class="ellipsis ? 'ellipsis lines-2' : ''"
+          :class="!expanded ? 'ellipsis lines-2' : ''"
         >
           {{ description || `(${$t('components.courses.tasks.noDesc')})` }}
         </p>
       </div>
-      <div class="d-flex justify-end">
+      <div v-if="ellipsis" class="d-flex justify-end">
         <alex-custom-button
           variant="text"
           class="mt-2 px-3 text-p6 text-gray-800"
-          @click="ellipsis = !ellipsis"
+          @click="expanded = !expanded"
           >{{
-            ellipsis
+            !expanded
               ? $t('components.courses.tasks.expand')
               : $t('components.courses.tasks.retract')
           }}
@@ -120,26 +120,49 @@ interface HeaderProps {
   status: 'draft' | 'published' | 'done' | (string & {});
   description: string;
   tags: string[];
-  startAt?: Date;
-  deadlineAt?: Date;
+  startAt?: Date | string;
+  deadlineAt?: Date | string;
+  type?: 'group' | 'individual';
+  sendSubmission?: boolean;
+  sendSubmissionAfterDeadline?: boolean;
 }
+
 defineProps<HeaderProps>();
-const emit = defineEmits(['clickEdit']);
-const i18n = useI18n();
+const emit = defineEmits(['edit-click']);
+const { t } = useI18n();
 const handleEdit = () => {
-  emit('clickEdit');
+  emit('edit-click');
 };
 
 const statusCfg = {
   draft: {
-    text: i18n.t('components.courses.tasks.draft'),
+    text: t('components.learningPlan.drawer.task.status.draft'),
     status: 'secondary',
   },
   published: {
-    text: i18n.t('components.courses.tasks.published'),
+    text: t('components.learningPlan.drawer.task.status.published'),
     status: 'blue',
   },
-  closed: { text: i18n.t('components.courses.tasks.closed'), status: 'red' },
+  closed: {
+    text: t('components.learningPlan.drawer.task.status.closed'),
+    status: 'red',
+  },
+  toDo: {
+    text: t('components.learningPlan.drawer.task.status.toDo'),
+    status: 'secondary',
+  },
+  inProgress: {
+    text: t('components.learningPlan.drawer.task.status.inProgress'),
+    status: 'blue',
+  },
+  underReview: {
+    text: t('components.learningPlan.drawer.task.status.underReview'),
+    status: 'orange',
+  },
+  finished: {
+    text: t('components.learningPlan.drawer.task.status.finished'),
+    status: 'green',
+  },
 };
 
 // Refs
@@ -148,9 +171,34 @@ const { isSmaller } = useBreakpoints({
   mobile: 0, // optional
   tablet: 980,
 });
-const ellipsis = ref(true);
-const descRef = ref(null);
-const formatDate = (date: Date) => format(date, 'dd/MM/yyyy');
+
+const descEl = ref<HTMLParagraphElement | undefined>(undefined);
+const expanded = ref<boolean>(false);
+const ellipsis = ref<boolean>(false);
+const formatDate = (date: Date | string) => {
+  if (typeof date === 'string') {
+    return format(new Date(date.replaceAll('-', '/')), 'dd/MM/yyyy');
+  }
+  return format(date, 'dd/MM/yyyy');
+};
+
+function hasEllipsis() {
+  if (!descEl.value) return false;
+
+  ellipsis.value = descEl.value.offsetHeight < descEl.value.scrollHeight;
+}
+
+watch(descEl, () => hasEllipsis());
+
+onMounted(() => {
+  hasEllipsis();
+
+  window.addEventListener('resize', hasEllipsis);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', hasEllipsis);
+});
 </script>
 
 <style scoped></style>

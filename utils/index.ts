@@ -71,3 +71,16 @@ export const isMessage = (
   if (!response) return false;
   return 'user' in response;
 };
+
+export const scrollAndHighlightElement = (
+  querySelector: string,
+  highlightClass: string,
+) => {
+  const element = document.querySelector(querySelector);
+  if (!element) return;
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  element.classList.add(highlightClass);
+  setTimeout(() => {
+    element.classList.remove(highlightClass);
+  }, 1000);
+};
