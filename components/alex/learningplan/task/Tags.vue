@@ -8,9 +8,9 @@
       class="invite-member"
     >
       <!-- Exibição -->
-      <template #activator="{ props }">
+      <template #activator="{ props: vMenuProps }">
         <alex-custom-button
-          v-bind="props"
+          v-bind="vMenuProps"
           icon="mdi-plus"
           size="small"
           variant="secondary"
@@ -27,7 +27,7 @@
           style="min-width: 220px"
           name="tag"
           :items="availableTags"
-          :placeholder="$t('components.learningPlan.drawer.tags.placeHolder')"
+          :placeholder="$t('components.learningPlan.drawer.tags.placeholder')"
           density="compact"
         />
       </v-list>

@@ -37,6 +37,15 @@
       "noneSelected": "Nenhuma trilha selecionada"
     }
   },
+  "goals": {
+    "select": "Selecione um objetivo",
+    "search": "Digite um nome",
+    "label": "Objetivos de aprendizagem"
+  },
+  "tags": {
+    "subtitle": "Informe um marcardor",
+    "placeholder": "Digite um nome"
+  },
   "tabs": {
     "events": {
       "label": "Eventos"

@@ -37,6 +37,15 @@
       "noneSelected": "No trails selected"
     }
   },
+  "goals": {
+    "select": "Enter a goal",
+    "search": "Write a name",
+    "label": "Learning goals"
+  },
+  "tags": {
+    "subtitle": "Enter a tag",
+    "placeholder": "Write a name"
+  },
   "tabs": {
     "events": {
       "label": "Events"

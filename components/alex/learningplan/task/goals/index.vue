@@ -7,9 +7,9 @@
     <div class="d-flex align-center flex-wrap ga-2">
       <v-menu v-if="props.edit" v-model="open" :close-on-content-click="false">
         <!-- Adicionar objetivo -->
-        <template #activator="{ props }">
+        <template #activator="{ props: vMenuProps }">
           <alex-custom-button
-            v-bind="props"
+            v-bind="vMenuProps"
             icon="mdi-plus"
             size="small"
             variant="tertiary"
@@ -37,7 +37,7 @@
               :id="goal.id"
               :key="goal.id"
               :description="goal.description"
-              @click="addGoal(goal.chip)"
+              @click="addGoal(goal.verb.text)"
             />
           </div>
         </v-list>
@@ -61,44 +61,20 @@
 <script setup lang="ts">
 interface CompProps {
   edit?: boolean;
+  availableGoals?: LearningPlanGoalSimple[];
 }
 
-const props = defineProps<CompProps>();
+const props = withDefaults(defineProps<CompProps>(), {
+  availableGoals: () => [],
+});
 
 const open = ref<boolean>(false);
 
 // Objetivos em si
 type SelectedGoal = string;
 
-interface Goal {
-  id: number;
-  description: string;
-  chip: SelectedGoal;
-}
-
-const availableGoals = ref<Goal[]>([
-  {
-    id: 1,
-    description:
-      '*Melhorar* o aprendizado do aluno por meio de metodologias funcionais.',
-    chip: 'CH #5',
-  },
-  {
-    id: 3,
-    description:
-      '*Pesquisar* o aprendizado do aluno por meio de *metodologias funcionais* com o o aprendizado do aluno por meio de aprendizado.',
-    chip: 'PA #8',
-  },
-  {
-    id: 6,
-    description:
-      '*Criar* o aprendizado do aluno por meio de metodologias funcionais.',
-    chip: 'LM #1',
-  },
-]);
-
 // Exibidos no drawe
-const selectedGoals = ref<SelectedGoal[]>(['C1 #3', 'B4 #5', 'C1 #3', 'B4 #5']);
+const selectedGoals = defineModel<SelectedGoal[]>({ default: [] });
 
 function addGoal(goal: SelectedGoal) {
   if (!selectedGoals.value.includes(goal)) {

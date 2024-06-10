@@ -60,14 +60,14 @@
                 {{ $t('components.courses.tasks.infos.type') }}
               </p>
               <p class="text-body-3 text-gray-800">
-                {{ $t('components.courses.tasks.infos.course') }}
+                {{ $t(`components.courses.tasks.${type}`) }}
               </p>
             </v-col>
             <v-col cols="6">
               <p class="text-body-4 text-gray-800">
                 {{ $t('components.courses.tasks.infos.submission') }}
               </p>
-              <p class="text-body-3 text-gray-800">Até o prazo</p>
+              <p class="text-body-3 text-gray-800">{{ typeSubmission }}</p>
             </v-col>
           </v-row>
           <v-row>
@@ -119,15 +119,22 @@ interface HeaderProps {
   title: string;
   status: 'draft' | 'published' | 'done' | (string & {});
   description: string;
-  tags: string[];
+  type?: 'group' | 'individual';
+  tags?: string[];
   startAt?: Date | string;
   deadlineAt?: Date | string;
-  type?: 'group' | 'individual';
   sendSubmission?: boolean;
   sendSubmissionAfterDeadline?: boolean;
 }
 
-defineProps<HeaderProps>();
+const props = withDefaults(defineProps<HeaderProps>(), {
+  tags: () => [],
+  startAt: undefined,
+  deadlineAt: undefined,
+  type: 'group',
+  sendSubmission: false,
+  sendSubmissionAfterDeadline: false,
+});
 const emit = defineEmits(['edit-click']);
 const { t } = useI18n();
 const handleEdit = () => {
@@ -181,7 +188,15 @@ const formatDate = (date: Date | string) => {
   }
   return format(date, 'dd/MM/yyyy');
 };
-
+const typeSubmission = computed(() => {
+  if (props.sendSubmission && props.sendSubmissionAfterDeadline) {
+    return t('components.courses.tasks.submission.sendAfterDeadline');
+  }
+  if (props.sendSubmission) {
+    return t('components.courses.tasks.submission.sendUntilDeadline');
+  }
+  return t('components.courses.tasks.submission.noSubmission');
+});
 function hasEllipsis() {
   if (!descEl.value) return false;
 
