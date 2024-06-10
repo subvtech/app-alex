@@ -26,6 +26,9 @@
                 <alex-learningplan-task-empty-state
                   key="empty-state"
                   :index="i"
+                  :drop-area="over.list === groups[i - 1]"
+                  @drag-over="handleEmptyStateOver"
+                  @drag-leave="onDragLeave"
                 />
               </div>
               <div v-else>
@@ -176,7 +179,6 @@ const isDateInRange = (date: Date, range) => {
 };
 
 const getHigherIndex = (taskStatus: string) => {
-  // const index = groups.findIndex((group) => group === taskStatus);
   const tasks = tasksArray.value[groups[taskStatus]];
   return tasks[tasks.length - 1]?.position + 1 || 0;
 };
@@ -348,6 +350,10 @@ const setOver = (groupIndex: number) => {
   return -1;
 };
 
+const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
+  onDragOver(groups[index - 1], -index, -1, dragEvent);
+};
+
 const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
   const groupIndex = groups[tasksStatus];
   const targeIndex = tasksArray.value[groupIndex].findIndex(
@@ -395,7 +401,6 @@ const onDrop = async (item: TaskType) => {
         ),
         'warning',
         true,
-        false,
       );
     } else if (task) {
       try {

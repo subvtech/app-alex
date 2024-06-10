@@ -24,7 +24,7 @@
           ]"
           @dragstart="(e) => setDragStart(item, e)"
           @dragleave="emit('dragLeave')"
-          @dragover="(e) => setDragOver(item.id, item.position, e)"
+          @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
           @dragend="emit('dragEnd', item)"
         >
           <td

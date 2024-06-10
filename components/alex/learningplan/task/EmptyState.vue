@@ -1,21 +1,36 @@
 <template>
-  <div class="w-100 d-flex justify-center align-center pb-4">
-    <div class="py-4 pb-4">
-      <v-img
-        :src="taskSections[index - 1].image"
-        class="max-w-40 mb-4 mx-auto height-30 width-40"
-      ></v-img>
-      <p class="text-h4 text-gray-400">{{ taskSections[index - 1].text }}</p>
+  <div class="w-100 d-flex justify-center align-center pb-4 min-h-67">
+    <div
+      class="rounded-lg min-h-48 w-100 d-flex justify-center align-center"
+      :class="dropArea ? 'drop-area' : 'empty-state'"
+      @dragover.prevent="(e) => emits('dragOver', index, e)"
+      @dragleave="(e) => emits('dragLeave', index, e)"
+    >
+      <v-fade-transition>
+        <div v-if="!dropArea">
+          <v-img
+            :src="taskSections[index - 1].image"
+            class="max-w-40 mb-4 mx-auto height-30 width-40"
+          ></v-img>
+          <p class="text-h4 text-gray-400 text-center">
+            {{ taskSections[index - 1].text }}
+          </p>
+        </div>
+      </v-fade-transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const { t } = useI18n();
-
-defineProps<{
+const props = defineProps<{
   index: number;
+  dropArea: boolean;
 }>();
+
+const dropArea = computed(() => props.dropArea);
+
+const emits = defineEmits(['dragOver', 'dragLeave']);
 
 const taskSections = [
   {
@@ -36,3 +51,12 @@ const taskSections = [
   },
 ];
 </script>
+
+<style scoped>
+.drop-area {
+  border: 1px dashed rgb(var(--v-theme-gray-400));
+}
+.empty-state {
+  border: 1px solid transparent;
+}
+</style>
