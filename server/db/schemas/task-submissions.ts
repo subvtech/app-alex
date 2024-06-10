@@ -9,6 +9,7 @@ import {
   text,
 } from 'drizzle-orm/pg-core';
 import { taskMembers } from './task-members';
+import { taskMembersMessages } from './task-members-messages';
 
 export const taskSubmissions = pgTable('task_submission', {
   id: serial('id').primaryKey(),
@@ -24,5 +25,7 @@ export const taskSubmissions = pgTable('task_submission', {
 
 export const taskSubmissionRelations = relations(
   taskSubmissions,
-  ({ one, many }) => ({}),
+  ({ one, many }) => ({
+    taskMembersMessage: many(taskMembersMessages),
+  }),
 );

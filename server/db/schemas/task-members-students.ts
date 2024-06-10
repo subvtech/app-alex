@@ -1,4 +1,5 @@
 import { integer, pgEnum, pgTable, serial } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import { taskMembers } from './task-members';
 
 export const roleEnum = pgEnum('role', ['standart', 'in_charge']);
@@ -9,3 +10,8 @@ export const taskMembersStudents = pgTable('task_members_students', {
   // studentMember: é do LP members ?
   role: roleEnum('role'),
 });
+
+export const taskMembersStudentsRelations = relations(
+  taskMembersStudents,
+  ({ one, many }) => ({}),
+);

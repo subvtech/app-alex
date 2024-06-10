@@ -3,6 +3,7 @@ import { relations } from 'drizzle-orm';
 import { learningPlanMembers } from './learning-plan-members';
 import { taskMembers } from './task-members';
 import { taskSubmissions } from './task-submissions';
+import { medias } from './medias';
 
 export const taskMembersMessages = pgTable('task_members_messages', {
   id: serial('id').primaryKey(),
@@ -15,13 +16,30 @@ export const taskMembersMessages = pgTable('task_members_messages', {
   ),
   sentAt: timestamp('sent_at', { mode: 'date' }),
   message: text('message'),
-  // audio:
-  // responseToMessage:
+  audioId: text('audio_id'),
+  responseToMessage: integer('response_to_message'), // .references(
+  //   () => taskMembersMessages.id,
+  // ),
 });
 
 export const taskMembersMessagesRelations = relations(
   taskMembersMessages,
-  ({ one, many }) => ({
-
+  ({ one }) => ({
+    learninPlanMemberId: one(learningPlanMembers, {
+      fields: [taskMembersMessages.learningPlanMemberId],
+      references: [learningPlanMembers.id],
+    }),
+    audio: one(medias, {
+      fields: [taskMembersMessages.audioId],
+      references: [medias.id],
+    }),
+    responseToMessage: one(taskMembersMessages, {
+      fields: [taskMembersMessages.responseToMessage],
+      references: [taskMembersMessages.id],
+    }),
+    taskSubmission: one(taskSubmissions, {
+      fields: [taskMembersMessages.taskSubmissionId],
+      references: [taskSubmissions.id],
+    }),
   }),
 );
