@@ -152,13 +152,14 @@
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
 import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
   title: string;
+  type: TaskType;
   status: TaskStatus;
   goals: LearningPlanGoalSimple[];
   messages?: Message[];
@@ -203,7 +204,7 @@ const endDate = toRef(props.endDate);
 const restrictions = toRef(props.restrictions);
 const restrictionsValue = computed({
   get() {
-    return props.restrictions ? props.restrictions.split(',') : [];
+    return restrictions.value ? restrictions.value.split(',') : [];
   },
   set(newValue) {
     restrictions.value = newValue.join(',');
@@ -211,7 +212,7 @@ const restrictionsValue = computed({
 }) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const currType = ref<string>();
+const currType = toRef<string>(props.type);
 
 const types = ref<AlexDropdownItem[]>([
   {

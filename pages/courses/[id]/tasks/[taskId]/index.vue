@@ -63,6 +63,7 @@
     <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
       :title="taskStore.task.title"
+      :type="taskStore.task.type"
       :status="taskStore.task.status"
       :goals="taskStore.task.learning_goals"
       :description="taskStore.task.description"
@@ -71,6 +72,7 @@
       :start-date="taskStore.task.start_at"
       :end-date="taskStore.task.finish_at"
       :messages="[]"
+      :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
     />
   </section>

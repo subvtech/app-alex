@@ -29,7 +29,7 @@
         size="small"
         status="secondary"
         variant="tonal"
-        @click:close="remove"
+        @click:close="remove(restriction)"
       />
     </div>
     <div v-else>
@@ -66,6 +66,7 @@ const config: Record<RestrictionValue, string> = {
 };
 
 const add = (option: RestrictionValue) => {
+  if (model.value.includes(option)) return;
   model.value = [...model.value, option];
 };
 
