@@ -15,6 +15,7 @@ import { learningPlans } from './learning-plans';
 import { tags } from './tags';
 import { taskMembers } from './task-members';
 import { taskEvents } from './task-events';
+import { learningGoals } from './learning-goals';
 
 export const typeEnum = pgEnum('type', ['individual', 'group']);
 export const statusEnum = pgEnum('status', ['published', 'draft', 'finished']);
@@ -30,6 +31,7 @@ export const tasks = pgTable('tasks', {
   taskMemberId: integer('task_member_id')
     .references(() => taskMembers.id)
     .notNull(),
+  position: integer('position'),
   title: text('tile'),
   description: text('description'),
   type: typeEnum('type'),
@@ -43,19 +45,27 @@ export const tasks = pgTable('tasks', {
   submitionDescription: json('submition_description'),
 });
 
-// learningGoal
-
 export const taskRelations = relations(tasks, ({ one, many }) => ({
   tags: many(tasksToTags),
   events: many(taskEvents),
+  learningGoal: many(tasksToLearningGoals),
   taskMember: one(taskMembers, {
     fields: [tasks.taskMemberId],
     references: [taskMembers.id],
   }),
+  learningPlan: one(learningPlans, {
+    fields: [tasks.learningPlanId],
+    references: [learningPlans.id],
+  }),
+  trail: one(trails, {
+    fields: [tasks.id],
+    references: [trails.id],
+  }),
 }));
 
+/** Tags */
 export const tasksToTags = pgTable(
-  'tasks_to_Tags',
+  'tasks_to_tags',
   {
     taskId: integer('task_id')
       .notNull()
@@ -69,7 +79,7 @@ export const tasksToTags = pgTable(
   }),
 );
 
-export const usersToGroupsRelations = relations(tasksToTags, ({ one }) => ({
+export const tasksToTagsRelation = relations(tasksToTags, ({ one }) => ({
   task: one(tasks, {
     fields: [tasksToTags.taskId],
     references: [tasks.id],
@@ -79,3 +89,33 @@ export const usersToGroupsRelations = relations(tasksToTags, ({ one }) => ({
     references: [tags.id],
   }),
 }));
+
+/** Learning goal */
+export const tasksToLearningGoals = pgTable(
+  'tasks_to_learning_goals',
+  {
+    taskId: integer('task_id')
+      .notNull()
+      .references(() => tasks.id),
+    learningGoalId: integer('learning_goal_id')
+      .notNull()
+      .references(() => learningGoals.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.taskId, t.learningGoalId] }),
+  }),
+);
+
+export const tasksToLearningGoalsRelations = relations(
+  tasksToLearningGoals,
+  ({ one }) => ({
+    task: one(tasks, {
+      fields: [tasksToLearningGoals.taskId],
+      references: [tasks.id],
+    }),
+    learningGoal: one(tasksToLearningGoals, {
+      fields: [tasksToLearningGoals.learningGoalId],
+      references: [learningGoals.id],
+    }),
+  }),
+);

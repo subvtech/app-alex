@@ -2,6 +2,7 @@ import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { learningPlans } from './learning-plans';
 import { learningGoalVerbs } from './learning-goal-verbs';
+import { tasksToLearningGoals } from './tasks';
 
 export const learningGoals = pgTable('learning-goal', {
   id: serial('id').primaryKey(),
@@ -12,11 +13,14 @@ export const learningGoals = pgTable('learning-goal', {
   description: text('description'),
 });
 
-export const learningGoalRelations = relations(learningGoals, ({ one }) => ({
-  learningPlan: one(learningPlans, {
-    fields: [learningGoals.learningPlanId],
-    references: [learningPlans.id],
+export const learningGoalRelations = relations(
+  learningGoals,
+  ({ one, many }) => ({
+    tasks: many(tasksToLearningGoals),
+    learningPlan: one(learningPlans, {
+      fields: [learningGoals.learningPlanId],
+      references: [learningPlans.id],
+    }),
+    learningGoalVerb: one(learningGoalVerbs),
   }),
-  learningGoalVerb: one(learningGoalVerbs),
-  // tasks
-}));
+);

@@ -12,6 +12,7 @@ import { medias } from './medias';
 import { trailContributions } from './trail-contributions';
 import { structures } from './structures';
 import { LPMembersToTrails } from './learning-plan-members';
+import { tasks } from './tasks';
 
 export const trails = pgTable('trails', {
   id: serial('id').primaryKey(),
@@ -38,7 +39,7 @@ export const trailsRelations = relations(trails, ({ one, many }) => ({
   learningPlanMember: many(LPMembersToTrails),
   structures: many(structures),
   trailContribution: many(trailContributions),
-  // task:
+  task: many(tasks),
 }));
 
 export type Trail = typeof trails.$inferSelect;

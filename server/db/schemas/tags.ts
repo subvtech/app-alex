@@ -24,8 +24,6 @@ export const tags = pgTable('tags', {
   verifiedBy: integer('verified_by'),
 });
 
-// tasks
-
 export const tagsRelations = relations(tags, ({ many }) => ({
   tagsToLearningPlans: many(learningPlans),
   tagsToUsers: many(users),
