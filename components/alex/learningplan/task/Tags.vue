@@ -8,9 +8,9 @@
       class="invite-member"
     >
       <!-- Exibição -->
-      <template #activator="{ props }">
+      <template #activator="{ props: vMenuProps }">
         <alex-custom-button
-          v-bind="props"
+          v-bind="vMenuProps"
           icon="mdi-plus"
           size="small"
           variant="secondary"

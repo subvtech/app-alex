@@ -29,7 +29,6 @@
         size="small"
         status="secondary"
         variant="tonal"
-        @click:close="model.splice(index, 1)"
       />
     </div>
     <div v-else>
