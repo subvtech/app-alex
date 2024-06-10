@@ -102,7 +102,7 @@ export interface TaskType {
   id: number;
   title: string;
   status: string;
-  deadline_at: string;
+  deadline_at?: string;
   position: number;
   type?: string;
   archived?: boolean;

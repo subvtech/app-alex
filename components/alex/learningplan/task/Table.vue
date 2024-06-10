@@ -8,22 +8,20 @@
     :headers="header"
     :search="filter"
     hide-default-header
+    @dragleave="(e) => emit('dragLeave', e)"
     @update:sort-by="(e) => (tableSortBy = e)"
   >
-    <template #body="{ items, headers }">
+    <template #item="{ item, columns }">
       <transition-group :name="transitionName">
         <tr
-          v-for="item in items"
-          :key="item.id"
+          v-if="item.id !== -1"
           :draggable="!isArchived"
           class="text-5 text-no-wrap staggered-fade-item table-row"
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
-            over == item.id && !tableSortBy.length ? 'over' : '',
             dragging && dragFrom == item.id ? 'dragging' : '',
           ]"
           @dragstart="(e) => setDragStart(item, e)"
-          @dragleave="emit('dragLeave')"
           @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
           @dragend="emit('dragEnd', item)"
         >
@@ -123,12 +121,11 @@
             </alex-custom-dropdown>
           </td>
         </tr>
+
+        <tr v-else class="row-drop row-preview">
+          <td :colspan="columns.length"></td>
+        </tr>
       </transition-group>
-      <tr v-if="!items.length">
-        <td :colspan="headers[0].length" class="text-center">
-          {{ $t('pages.task.table.placeholders.noTasks') }}
-        </td>
-      </tr>
     </template>
     <template #bottom></template>
   </v-data-table>
@@ -186,7 +183,35 @@ const emit = defineEmits([
 const tableSortBy = ref<string[]>([]);
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
-const tasksArray = computed(() => props.tasks);
+const tasksArray = computed(() => {
+  const array = [...props.tasks];
+  const index = array.findIndex((task) => task.id === props.over);
+  const oldIndex = array.findIndex((task) => task.id === -1);
+  if (oldIndex === props.over || tableSortBy.value.length) return array;
+  if (oldIndex !== -1) {
+    array.splice(oldIndex, 1);
+  }
+  const item = {
+    id: -1,
+    title: '',
+    status: '',
+    position: index,
+    delivered: {
+      toDo: 0,
+      doing: 0,
+      underReview: 0,
+      completed: 0,
+    },
+  };
+  if (index !== -1) {
+    if (index + 1 === array.length) {
+      array.push(item);
+    } else {
+      array.splice(index, 0, item);
+    }
+  }
+  return array;
+});
 const cancelDelete = () => {
   deleteModal.value = false;
   taskToDelete.value = -1;
@@ -319,7 +344,9 @@ const setAcceptedGroups = (task: TaskType) => {
   const statusMap: { [key: string]: string[] } = {
     draft: ['published', 'draft'],
     published:
-      deliveredTotal === 0 ? ['draft', 'done', 'published'] : ['published'],
+      deliveredTotal === 0
+        ? ['draft', 'done', 'published']
+        : ['published', 'done'],
     done: ['published', 'done'],
   };
 
@@ -349,12 +376,16 @@ const setDragOver = (id: number, position: number, e: DragEvent) => {
   background-color: #fff;
 }
 
-.table-drop {
-  border: 1px dashed rgb(var(--v-theme-gray-400)) !important;
+.table-drop,
+.row-drop {
+  border: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
 }
 
 .dragging {
-  opacity: 0;
+  background-color: rgb(var(--v-theme-gray-blue));
+  & td {
+    opacity: 0 !important;
+  }
 }
 
 .over {
@@ -383,6 +414,12 @@ const setDragOver = (id: number, position: number, e: DragEvent) => {
 .staggered-fade-item {
   transition-timing-function: cubic-bezier(0.57, 0.06, 0, 1.06);
   transition-duration: 500ms;
+  transition-property: opacity, transform;
+}
+
+.row-drop {
+  transition-timing-function: cubic-bezier(0.57, 0.06, 0, 1.06);
+  transition-duration: 1200ms;
   transition-property: opacity, transform;
 }
 
