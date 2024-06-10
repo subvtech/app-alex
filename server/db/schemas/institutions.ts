@@ -7,6 +7,7 @@ import {
   text,
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
+import { medias } from './medias';
 
 export const institutions = pgTable('institution', {
   id: serial('id').primaryKey(),
@@ -15,12 +16,19 @@ export const institutions = pgTable('institution', {
   socialName: text('social_name').unique().notNull(),
   acronym: text('acronym').unique().notNull(),
   sector: text('sector').unique().notNull(),
-  // cover: media
+  coverImageId: integer('cover_image_id').references(() => medias.id),
 });
 
-export const institutionRelations = relations(institutions, ({ many }) => ({
-  users: many(userToInstitution),
-}));
+export const institutionRelations = relations(
+  institutions,
+  ({ one, many }) => ({
+    users: many(userToInstitution),
+    coverImageId: one(medias, {
+      fields: [institutions.coverImageId],
+      references: [medias.id],
+    }),
+  }),
+);
 
 export const userToInstitution = pgTable(
   'user_to_institution',
