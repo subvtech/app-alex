@@ -30,11 +30,25 @@
       "aftrDeadline": "Allow submissions after deadline"
     },
     "restrictions": {
-      "label": "Restrictions"
+      "label": "Restrictions",
+      "text": "Text",
+      "video": "Video",
+      "image": "Image",
+      "document": "Document",
+      "link": "Link"
+    },
+    "goals": {
+      "label": "Learning goals",
+      "select": "Select a goal",
+      "search": "Search a name"
     },
     "learningResources": {
       "label": "Learning resources",
       "noneSelected": "No trails selected"
+    },
+    "tags": {
+      "subtitle": "Enter a tag",
+      "search": "Search a name"
     }
   },
   "tabs": {

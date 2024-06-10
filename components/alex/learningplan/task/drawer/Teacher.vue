@@ -103,14 +103,9 @@
             "
           />
         </v-col>
-        <v-col class="mt-4 pa-0" cols="12"
-          ><p class="text-gray-800 font-weight-bold mb-2">
-            {{ $t('components.learningPlan.drawer.task.restrictions.label') }}
-          </p>
-          <p class="text-body-3 text-gray-800">
-            {{ $t('components.learningPlan.drawer.missing.restrictions') }}
-          </p></v-col
-        >
+        <v-col class="mt-4 pa-0" cols="12">
+          <alex-learningplan-task-restrictions v-model="restrictions" edit />
+        </v-col>
       </v-row>
 
       <!-- Recursos de aprendizagem -->
@@ -147,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import { RestrictionValue } from '../Restrictions.vue';
 import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
@@ -181,6 +177,9 @@ const status = ref<TeacherTaskStatus | StudentTaskStatus>('draft');
 // Date picker
 const startDate = ref(new Date());
 const finalDate = ref(new Date());
+
+// Restrições
+const restrictions = ref<RestrictionValue[]>(['text']);
 
 // Tipos
 const currType = ref<string>(

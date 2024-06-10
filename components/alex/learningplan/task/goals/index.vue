@@ -1,7 +1,7 @@
 <template>
   <div class="mt-6">
     <p class="text-body-4 text-gray-800 mb-2">
-      {{ $t('components.learningPlan.drawer.goals.label') }}
+      {{ $t('components.learningPlan.drawer.task.goals.label') }}
     </p>
 
     <div class="d-flex align-center flex-wrap ga-2">
@@ -19,13 +19,15 @@
         <v-list class="pa-4 rounded-lg" style="width: 320px; max-height: 95%">
           <!-- Header -->
           <p class="text-body-1 text-gray-800">
-            {{ $t('components.learningPlan.drawer.goals.select') }}
+            {{ $t('components.learningPlan.drawer.task.goals.select') }}
           </p>
 
           <alex-inputs-text-field
             class="alex-goals-search w-full my-2"
             name="member"
-            :placeholder="$t('components.learningPlan.drawer.goals.search')"
+            :placeholder="
+              $t('components.learningPlan.drawer.task.goals.search')
+            "
             append-inner-icon="mdi-magnify"
             density="compact"
           />
