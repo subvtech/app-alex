@@ -41,7 +41,7 @@
                   :dragging="dragging"
                   @start-drag="startDrag"
                   @drag-over="onDragOver"
-                  @drag-end="dragEnd"
+                  @drag-end="onDrop"
                   @drag-leave="onDragLeave"
                   @delete-task="handleDeleteTask"
                   @move-task="handleMoveTask"
@@ -100,6 +100,7 @@ export interface TaskType {
   title: string;
   status: string;
   deadline_at: string;
+  position: number;
   type?: string;
   archived?: boolean;
   students?: { name: string; image: { url: string } }[];
@@ -125,9 +126,16 @@ const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
-const groups = ['draft', 'published', 'done', 'archived'];
 const slideTransition = (i: number) =>
   tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
+
+const groupsArray = ['draft', 'published', 'done', 'archived'];
+const groups = {};
+
+groupsArray.forEach((group, index) => {
+  groups[group] = index;
+  groups[index] = group;
+});
 
 const searchField = computed(() => props.search.toLowerCase());
 const tasksFilter = computed(() => props.filter);
@@ -167,14 +175,22 @@ const isDateInRange = (date: Date, range) => {
   return true;
 };
 
+const getHigherIndex = (taskStatus: string) => {
+  // const index = groups.findIndex((group) => group === taskStatus);
+  const tasks = tasksArray.value[groups[taskStatus]];
+  return tasks[tasks.length - 1]?.position + 1 || 0;
+};
+
 const handleCreateTask = async () => {
   loader.value = true;
+  const higherIndex = getHigherIndex('draft');
   try {
     const res = await create('tasks', {
       title: taskTitle.value,
       status: 'draft',
       learningplan: route.params.id,
       start_at: new Date(),
+      position: higherIndex,
     });
     learningPlanStore.learningPlan?.tasks.push({
       id: res.data.id,
@@ -205,46 +221,50 @@ const tasksArray = computed(() => {
   const published: TaskType[] = [];
   const closed: TaskType[] = [];
   const archived: TaskType[] = [];
-  learningPlanStore.learningPlan?.tasks.forEach((task) => {
-    const delivered = {
-      toDo: 0,
-      doing: 0,
-      underReview: 0,
-      completed: 0,
-    };
-
-    if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
-      return;
-    if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
-    if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate)) return;
-
-    const students = task.task_members?.map((student) => {
-      if (student.status === 'to_do') delivered.toDo += 1;
-      if (student.status === 'in_progress') delivered.doing += 1;
-      if (student.status === 'in_review') delivered.underReview += 1;
-      if (student.status === 'done') delivered.completed += 1;
-      return {
-        name: student.student_member.user.fullname,
-        image: { url: student.student_member.user.avatar.url },
+  learningPlanStore.learningPlan?.tasks
+    .sort((a, b) => (a.position > b.position ? 1 : -1))
+    .forEach((task) => {
+      const delivered = {
+        toDo: 0,
+        doing: 0,
+        underReview: 0,
+        completed: 0,
       };
-    });
 
-    const taskItem = {
-      id: task.id,
-      title: task.title,
-      status: task.status,
-      deadline_at: task.deadline_at,
-      start_at: task.start_at,
-      type: task.type,
-      archived: task.archived,
-      students,
-      delivered,
-    };
-    if (task.archived) archived.push(taskItem);
-    else if (task.status === 'draft') draft.push(taskItem);
-    else if (task.status === 'published') published.push(taskItem);
-    else if (task.status === 'done') closed.push(taskItem);
-  });
+      if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
+        return;
+      if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
+      if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate))
+        return;
+
+      const students = task.task_members?.map((student) => {
+        if (student.status === 'to_do') delivered.toDo += 1;
+        if (student.status === 'in_progress') delivered.doing += 1;
+        if (student.status === 'in_review') delivered.underReview += 1;
+        if (student.status === 'done') delivered.completed += 1;
+        return {
+          name: student.student_member.user.fullname,
+          image: { url: student.student_member.user.avatar.url },
+        };
+      });
+
+      const taskItem = {
+        id: task.id,
+        title: task.title,
+        status: task.status,
+        deadline_at: task.deadline_at,
+        start_at: task.start_at,
+        type: task.type,
+        archived: task.archived,
+        position: task.position,
+        students,
+        delivered,
+      };
+      if (task.archived) archived.push(taskItem);
+      else if (task.status === 'draft') draft.push(taskItem);
+      else if (task.status === 'published') published.push(taskItem);
+      else if (task.status === 'done') closed.push(taskItem);
+    });
   return [draft, published, closed, archived];
 });
 
@@ -288,10 +308,12 @@ const handleMoveTask = async ({
   status: string;
 }) => {
   try {
+    const taskPosition = getHigherIndex(status);
     const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
     if (task) {
       task.status = status;
-      await update('tasks', id, { status });
+      task.position = taskPosition;
+      await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
   } catch (e) {
@@ -321,10 +343,79 @@ const {
   onDragOver,
   onDragLeave,
 } = useMultipleDragDrop();
-
 const setOver = (groupIndex: number) => {
   if (over.value.list === groups[groupIndex]) return over.value.id;
   return -1;
+};
+
+const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
+  const groupIndex = groups[tasksStatus];
+  const targeIndex = tasksArray.value[groupIndex].findIndex(
+    (t) => t.id === over.value.id,
+  );
+  const cloneArray = JSON.parse(JSON.stringify(tasksArray.value[groupIndex]));
+
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === item.id,
+  );
+
+  if (task.status === tasksStatus) {
+    const removeIndex = cloneArray.findIndex((t: TaskType) => t.id === task.id);
+    cloneArray.splice(removeIndex, 1);
+  }
+
+  if (targeIndex + 1 === tasksArray.value[groupIndex].length) {
+    cloneArray.push(item);
+  } else {
+    cloneArray.splice(targeIndex, 0, item);
+  }
+
+  task.status = tasksStatus;
+  item.status = tasksStatus;
+  cloneArray.forEach((t: TaskType, index: number) => {
+    if (t.position !== index || t.id === task.id) {
+      t.position = index;
+      if (t.id === task.id) {
+        update('tasks', t.id, { position: index, status: tasksStatus });
+      } else update('tasks', t.id, { position: index });
+    }
+  });
+  tasksArray.value[groupIndex] = cloneArray;
+};
+
+const onDrop = async (item: TaskType) => {
+  if (over.value.list) {
+    const task = learningPlanStore.learningPlan?.tasks.find(
+      (t) => t.id === item.id,
+    );
+    if (task.status === over.value.list && over.value.index === -1) {
+      setMessage(
+        t(
+          'Não é possível alterar a posição da tarefa quando a ordenação por prazo está ativa',
+        ),
+        'warning',
+        true,
+        false,
+      );
+    } else if (task) {
+      try {
+        if (over.value.index === -1) {
+          task.position = getHigherIndex(over.value.list);
+          task.status = over.value.list;
+          await update('tasks', item.id, {
+            status: over.value.list,
+            position: getHigherIndex(over.value.list),
+          });
+        } else {
+          updateTaskPositions(over.value.list, item);
+        }
+        displaySuccess('moveSuccess');
+      } catch (e) {
+        displayError('moveError');
+      }
+    }
+  }
+  dragEnd();
 };
 </script>
 
