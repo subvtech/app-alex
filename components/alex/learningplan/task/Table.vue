@@ -3,27 +3,29 @@
     sort-asc-icon="mdi-arrow-up-thin"
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
+    :class="over != -1 && tableSortBy.length ? 'table-drop' : ''"
     :items="tasksArray"
     :headers="header"
     :search="filter"
     hide-default-header
+    @update:sort-by="(e) => (tableSortBy = e)"
   >
     <template #body="{ items, headers }">
       <transition-group :name="transitionName">
         <tr
-          v-for="(item, index) in items"
+          v-for="item in items"
           :key="item.id"
           :draggable="!isArchived"
           class="text-5 text-no-wrap staggered-fade-item table-row"
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
-            over == item.id ? 'over' : '',
+            over == item.id && !tableSortBy.length ? 'over' : '',
             dragging && dragFrom == item.id ? 'dragging' : '',
           ]"
           @dragstart="(e) => setDragStart(item, e)"
           @dragleave="emit('dragLeave')"
-          @dragover="(e) => setDragOver(item.id, index, e)"
-          @dragend="setFinishDrag(item.id, index)"
+          @dragover="(e) => setDragOver(item.id, item.position, e)"
+          @dragend="emit('dragEnd', item)"
         >
           <td
             class="text-body-4 text-overflow text-left"
@@ -157,8 +159,19 @@ const props = defineProps<{
 
 const { t } = useI18n();
 const isArchived = computed(() => props.group === 'archived');
+const typing = ref(false);
+
+const filter = computed(() => props.filter);
+
+watch(filter, () => {
+  typing.value = true;
+  setTimeout(() => {
+    typing.value = false;
+  }, 1000);
+});
+
 const transitionName = computed(() =>
-  props.filter ? 'staggered-fade' : 'list',
+  typing.value ? 'staggered-fade' : 'list',
 );
 const emit = defineEmits([
   'deleteTask',
@@ -170,10 +183,10 @@ const emit = defineEmits([
   'dragLeave',
 ]);
 
+const tableSortBy = ref<string[]>([]);
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
 const tasksArray = computed(() => props.tasks);
-
 const cancelDelete = () => {
   deleteModal.value = false;
   taskToDelete.value = -1;
@@ -307,7 +320,7 @@ const setAcceptedGroups = (task: TaskType) => {
     draft: ['published', 'draft'],
     published:
       deliveredTotal === 0 ? ['draft', 'done', 'published'] : ['published'],
-    done: deliveredTotal === 0 ? ['draft', 'published', 'done'] : ['done'],
+    done: ['published', 'done'],
   };
 
   return statusMap[task.status] || [];
@@ -318,12 +331,9 @@ const setDragStart = (task: TaskType, e: DragEvent) => {
   if (!isArchived.value) emit('startDrag', task.id, e, acceptedGroups);
 };
 
-const setDragOver = (id: number, index: number, e: DragEvent) => {
-  if (!isArchived.value) emit('dragOver', props.group, id, index, e);
-};
-
-const setFinishDrag = (id: number, index: number) => {
-  emit('dragEnd', id, index);
+const setDragOver = (id: number, position: number, e: DragEvent) => {
+  const newIndex = tableSortBy.value.length ? -1 : position;
+  if (!isArchived.value) emit('dragOver', props.group, id, newIndex, e);
 };
 </script>
 
@@ -339,6 +349,10 @@ const setFinishDrag = (id: number, index: number) => {
   background-color: #fff;
 }
 
+.table-drop {
+  border: 1px dashed rgb(var(--v-theme-gray-400)) !important;
+}
+
 .dragging {
   opacity: 0;
 }
@@ -351,6 +365,7 @@ const setFinishDrag = (id: number, index: number) => {
   filter: grayscale(1);
 }
 
+.list-move,
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s ease;
