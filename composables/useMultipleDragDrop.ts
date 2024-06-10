@@ -49,8 +49,25 @@ export function useMultipleDragDrop() {
     dragging.value = false;
   };
 
-  const onDragLeave = () => {
-    over.value = { list: '', id: -1, index: -1 };
+  const onDragLeave = (event: DragEvent) => {
+    const mouseIsOutSideViewport =
+      !event.relatedTarget || (event.clientX === 0 && event.clientY === 0);
+
+    if (mouseIsOutSideViewport) {
+      over.value = { list: '', id: -1, index: -1 };
+      return true;
+    }
+
+    const rect = (event.currentTarget as any).getBoundingClientRect();
+    const withinX = event.clientX >= rect.left && event.clientX <= rect.right;
+    const withinY = event.clientY >= rect.top && event.clientY <= rect.bottom;
+    const mouseIsOutSideCurrentTarget = !(withinX && withinY);
+
+    if (mouseIsOutSideCurrentTarget) {
+      over.value = { list: '', id: -1, index: -1 };
+    }
+
+    return mouseIsOutSideCurrentTarget;
   };
 
   return {
