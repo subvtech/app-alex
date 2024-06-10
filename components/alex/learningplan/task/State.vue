@@ -3,9 +3,9 @@
     :disabled="config[model]?.immutable"
     :items="mode == 'teacher' ? filteredTeacher : filteredStudent"
   >
-    <template #activator="{ props }">
+    <template #activator="{ props: vMenuProps }">
       <alex-custom-chip
-        v-bind="props"
+        v-bind="vMenuProps"
         :text="config[model]?.text"
         :status="config[model]?.status"
         :prepend-icon="!config[model]?.immutable ? 'mdi-chevron-down' : ''"

@@ -29,7 +29,7 @@
 
     <div>
       <!-- Tags -->
-      <alex-learningplan-task-tags :edit="editable" />
+      <alex-learningplan-task-tags v-model="tags" :edit="editable" />
 
       <!-- Informações -->
       <p class="mt-4 text-h2 ellipsis lines-2">
@@ -55,6 +55,7 @@
             v-model="currType"
             :items="types"
             :edit="editable"
+            placeholder="Selecione um tipo"
           />
         </v-col>
         <v-col cols="6"
@@ -105,7 +106,10 @@
           />
         </v-col>
         <v-col class="mt-4 pa-0" cols="12">
-          <alex-learningplan-task-restrictions v-model="restrictions" edit />
+          <alex-learningplan-task-restrictions
+            v-model="restrictionsValue"
+            edit
+          />
         </v-col>
       </v-row>
 
@@ -117,7 +121,9 @@
           }}
         </p>
         <alex-custom-button
+          size="large"
           prepend-icon="alex:trail"
+          append-icon="mdi-chevron-right"
           :text="
             $t(
               'components.learningPlan.drawer.task.learningResources.noneSelected',
@@ -143,6 +149,7 @@
 </template>
 
 <script setup lang="ts">
+import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
 import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
@@ -156,12 +163,13 @@ interface TaskTeacherDrawerProps {
   goals: LearningPlanGoalSimple[];
   messages?: Message[];
   description?: string;
+  restrictions?: string;
   editable?: boolean;
   hasSubmission?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: Date | string;
+  endDate?: Date | string;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   editable: true,
@@ -170,12 +178,14 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   kanbanButton: false,
   description: undefined,
   messages: () => [],
-  startDate: () => new Date(),
-  endDate: () => new Date(),
+  startDate: undefined,
+  endDate: undefined,
+  restrictions: '',
 });
 const description = toRef(props.description);
 const hasSubmission = toRef(props.hasSubmission);
 const sendAfterDeadline = toRef(props.sendAfterDeadline);
+const tags = ref<TagSimple[]>([]);
 const model = defineModel({ default: false });
 
 defineEmits(['kanban-click', 'attached-trail-click']);
@@ -190,12 +200,18 @@ const startDate = toRef(props.startDate);
 const endDate = toRef(props.endDate);
 
 // Restrições
-const restrictions = ref<RestrictionValue[]>(['text']);
+const restrictions = toRef(props.restrictions);
+const restrictionsValue = computed({
+  get() {
+    return props.restrictions ? props.restrictions.split(',') : [];
+  },
+  set(newValue) {
+    restrictions.value = newValue.join(',');
+  },
+}) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const currType = ref<string>(
-  t('components.learningPlan.drawer.task.type.individual'),
-);
+const currType = ref<string>();
 
 const types = ref<AlexDropdownItem[]>([
   {
@@ -224,48 +240,6 @@ function handleCloseModal() {
 }
 </script>
 
-<style scoped>
-/** Estilização da página */
-.text-p3 {
-  /* Body/P3 */
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
+<style scoped></style>
 
-.text-p4 {
-  /* Body/P4 */
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
-</style>
-
-<style>
-/** Override do v-switch */
-.switches .v-switch.v-switch--inset .v-selection-control__wrapper {
-  /** Para de comprimir o input */
-  width: auto !important;
-}
-
-.switches .v-input__details {
-  /** Remove espaços desnecessários */
-  display: none !important;
-}
-
-.switches .v-switch__thumb {
-  /** Para de mudar a aparência do toggle ao selecionar */
-  transform: none !important;
-}
-
-.switches .v-selection-control__wrapper {
-  /** Alinha o componente ao resto do drawer */
-  margin-left: 0 !important;
-}
-</style>
+<style></style>

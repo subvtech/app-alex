@@ -21,13 +21,12 @@
         <p class="text-body-1 text-gray-800 mb-2">
           {{ $t('components.learningPlan.drawer.task.tags.subtitle') }}
         </p>
-        <alex-inputs-select
-          v-model="selected"
-          class="hide-select-icon"
-          style="min-width: 220px"
+        <alex-inputs-tag-autocomplete
+          v-model="tags"
+          is-general
+          class="hide-select-icon min-w-[264px]"
           name="tag"
-          :items="availableTags"
-          :placeholder="$t('components.learningPlan.drawer.task.tags.search')"
+          :placeholder="$t('components.learningPlan.drawer.tags.placeholder')"
           density="compact"
         />
       </v-list>
@@ -36,13 +35,13 @@
     <alex-custom-chip
       v-for="(tag, index) in tags"
       :key="index"
-      :text="tag"
+      :text="tag.text"
       :closable="props.edit"
-      :clickable="false"
+      :clickable="props.edit"
       size="small"
       status="blue"
       variant="tonal"
-      @click:close="console.log('a')"
+      @click:close="() => handleRemoveTag(tag)"
     />
   </div>
 </template>
@@ -52,40 +51,22 @@ interface CompProps {
   edit?: boolean;
 }
 
-type TagProps = string | undefined;
-
-const props = defineProps<CompProps>();
-
-const open = ref<boolean>(false);
-
-const tags = ref<TagProps[]>(['Desenvolvimento', 'UI/UX']);
-const selected = ref<string | null>();
-
-const availableTags: TagProps[] = [
-  'Desenvolvimento',
-  'UI/UX',
-  'Música',
-  'Vídeo',
-];
-
-// Adiciona tag quando item é selecionado no dropdown
-watch(selected, (value) => {
-  open.value = false;
-  selected.value = null;
-
-  if (value == null || tags.value.includes(value)) {
-    return;
-  }
-
-  tags.value.push(value);
+const props = withDefaults(defineProps<CompProps>(), {
+  edit: true,
+  tags: () => [],
 });
+const open = ref<boolean>(false);
+const tags = defineModel<TagSimple[]>({ default: [] });
+const handleRemoveTag = (tag: TagSimple) => {
+  tags.value = tags.value.filter((tagValue) => tagValue.text !== tag.text);
+};
 </script>
 
 <style scoped>
 .hide-select-icon
-  .v-select__selections
-  .v-select__selection
-  .v-select__selection-icon {
+  .v-autocomplete__selections
+  .v-autocomplete__selection
+  .v-autocomplete__selection-icon {
   display: none !important;
 }
 </style>

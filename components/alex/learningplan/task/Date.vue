@@ -1,10 +1,16 @@
 <template>
   <div>
     <p
-      class="pa-1 text-body-3 text-gray-800 rounded-md"
-      :class="edit ? 'date-output cursor-pointer' : ''"
+      class="pa-1 text-body-3 min-h-6 rounded-md"
+      :class="[
+        edit && 'date-output cursor-pointer',
+        !formattedDate && 'text-gray-400',
+        formattedDate && 'text-gray-800',
+      ]"
     >
-      {{ formattedDate }}
+      {{
+        formattedDate || $t('components.learningPlan.drawer.date.placeholder')
+      }}
     </p>
     <v-menu
       v-model="open"
@@ -18,7 +24,7 @@
       :close-on-content-click="true"
     >
       <v-date-picker
-        v-model="selectedDate"
+        v-model="selectedDateValue"
         color="secondary-0"
         rounded="lg"
         location="bottom start"
@@ -26,7 +32,6 @@
         :header="$t('components.date.enterDate')"
         :landscape="true"
         :max-width="360"
-        @input="$emit('input', () => (open = false))"
       />
     </v-menu>
   </div>
@@ -42,22 +47,33 @@ interface CompProps {
 defineProps<CompProps>();
 
 const open = ref<boolean>(false);
-const selectedDate = defineModel<Date>({ required: true });
-const emit = defineEmits(['updateDate', 'input']);
+const selectedDate = defineModel<Date | string>();
+const emit = defineEmits(['change', 'input']);
+
+const selectedDateValue = computed({
+  get() {
+    if (typeof selectedDate.value === 'string') {
+      return new Date(selectedDate.value.replaceAll('-', '/'));
+    }
+    return selectedDate.value;
+  },
+  set(newValue) {
+    selectedDate.value = newValue;
+  },
+});
+
+const formattedDate = computed(() => {
+  if (!selectedDateValue.value) {
+    return '';
+  }
+  return format(selectedDateValue.value.getTime(), 'dd/MM/yyyy');
+});
 
 function updateParentDate() {
-  emit('updateDate', selectedDate.value);
+  emit('change', selectedDateValue.value);
 }
 
 watch(selectedDate, updateParentDate);
-
-const formattedDate = computed(() => {
-  if (!selectedDate.value) {
-    return '';
-  }
-
-  return format(selectedDate.value, 'dd/MM/yyyy');
-});
 </script>
 
 <style scoped>

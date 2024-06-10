@@ -9,9 +9,9 @@
       class="d-flex align-center flex-wrap ga-2"
     >
       <alex-custom-dropdown v-if="props.edit" :items="options">
-        <template #activator="{ props }">
+        <template #activator="{ props: dropdownProps }">
           <alex-custom-button
-            v-bind="props"
+            v-bind="dropdownProps"
             icon="mdi-plus"
             size="small"
             variant="tertiary"
@@ -23,12 +23,13 @@
       <alex-custom-chip
         v-for="(restriction, index) in model"
         :key="index"
-        :text="config[restriction].label"
+        :text="config[restriction]"
         :clickable="props.edit"
         :closable="props.edit"
         size="small"
         status="secondary"
         variant="tonal"
+        @click:close="remove"
       />
     </div>
     <div v-else>
@@ -50,59 +51,46 @@ const props = defineProps<CompProps>();
 
 export type RestrictionValue = 'text' | 'image' | 'video' | 'document' | 'link';
 
-interface RestrictionProps {
-  label: string;
-}
-
 const { t } = useI18n();
 
 const model = defineModel<RestrictionValue[]>({
   required: true,
 });
 
-const config: Record<RestrictionValue, RestrictionProps> = {
-  text: {
-    label: t('components.learningPlan.drawer.task.restrictions.text'),
-  },
-  image: {
-    label: t('components.learningPlan.drawer.task.restrictions.image'),
-  },
-  video: {
-    label: t('components.learningPlan.drawer.task.restrictions.video'),
-  },
-  document: {
-    label: t('components.learningPlan.drawer.task.restrictions.document'),
-  },
-  link: {
-    label: t('components.learningPlan.drawer.task.restrictions.link'),
-  },
+const config: Record<RestrictionValue, string> = {
+  text: t('components.learningPlan.drawer.task.restrictions.text'),
+  image: t('components.learningPlan.drawer.task.restrictions.image'),
+  video: t('components.learningPlan.drawer.task.restrictions.video'),
+  document: t('components.learningPlan.drawer.task.restrictions.document'),
+  link: t('components.learningPlan.drawer.task.restrictions.link'),
 };
 
 const add = (option: RestrictionValue) => {
-  if (!model.value.includes(option)) {
-    model.value.push(option);
-  }
+  model.value = [...model.value, option];
 };
 
+const remove = (value: RestrictionValue) => {
+  model.value = model.value.filter((tag) => tag !== value);
+};
 const options: AlexDropdownItem[] = [
   {
-    text: config.text.label,
+    text: config.text,
     onClick: () => add('text'),
   },
   {
-    text: config.image.label,
+    text: config.image,
     onClick: () => add('image'),
   },
   {
-    text: config.video.label,
+    text: config.video,
     onClick: () => add('video'),
   },
   {
-    text: config.document.label,
+    text: config.document,
     onClick: () => add('document'),
   },
   {
-    text: config.link.label,
+    text: config.link,
     onClick: () => add('link'),
   },
 ];

@@ -49,5 +49,6 @@
       "in_review": "In Review",
       "done": "Done"
     }
-  }
+  },
+  "null": "(No type)"
 }

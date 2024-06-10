@@ -68,8 +68,8 @@
       :description="taskStore.task.description"
       :has-submission="taskStore.task.submission_required"
       :send-after-deadline="taskStore.task.can_submit_after_deadline"
-      :start-date="new Date(taskStore.task.start_at.replaceAll('-', '/'))"
-      :end-date="new Date(taskStore.task.finish_at.replaceAll('-', '/'))"
+      :start-date="taskStore.task.start_at"
+      :end-date="taskStore.task.finish_at"
       :messages="[]"
       :editable="true"
     />
@@ -89,7 +89,7 @@ const headerStore = usePageHeaderStore();
 const route = useRoute();
 const taskId = computed(() => parseInt(route.params?.taskId.toString()));
 const taskStore = useTaskStore();
-const tasks = ref<any>([]);
+const tasks = ref([]);
 const tags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
   return taskStore.task.tags.map((tag) => tag.text);

@@ -8,10 +8,12 @@ export const useTaskStore = defineStore('task', () => {
 
   const populate = {
     task_members: {
-      populate: ['student_member.user.avatar'],
+      populate: ['task_submission'],
     },
     tags: true,
-    learning_goals: true,
+    learning_goals: {
+      populate: ['verb'],
+    },
   };
 
   async function loadTaskData(id: number, showMessageIfNotFound = true) {

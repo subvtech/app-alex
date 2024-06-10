@@ -3,10 +3,14 @@
     <template #activator="{ props }"
       ><p
         v-bind="props"
-        class="pa-1 text-body-3 text-gray-800 rounded-md"
-        :class="edit && 'output cursor-pointer'"
+        class="pa-1 text-body-3 rounded-md"
+        :class="[
+          edit && 'output cursor-pointer',
+          !model && 'text-gray-400',
+          model && 'text-gray-800',
+        ]"
       >
-        {{ model }}
+        {{ model || placeholder }}
       </p>
     </template>
   </alex-custom-dropdown>
@@ -18,11 +22,12 @@ import { AlexDropdownItem } from '../../custom/Dropdown.vue';
 interface CompProps {
   items: AlexDropdownItem[];
   edit?: boolean;
+  placeholder: string;
 }
 
 defineProps<CompProps>();
 
-const model = defineModel<string>({ required: true });
+const model = defineModel<string>();
 </script>
 
 <style scoped>

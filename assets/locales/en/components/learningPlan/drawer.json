@@ -89,5 +89,8 @@
   "archivedTasks": "Archived tasks",
   "selectClassPlaceholder": "Select class",
   "selectTypePlaceholder": "Select type",
-  "srchClass": "Search class"
+  "srchClass": "Search class",
+  "date": {
+    "placeholder": "Choose a date"
+  }
 }

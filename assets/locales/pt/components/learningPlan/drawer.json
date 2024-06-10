@@ -89,5 +89,8 @@
   "archivedTasks": "Tarefas arquivadas",
   "selectClassPlaceholder": "Selecione a turma",
   "selectTypePlaceholder": "Selecione o tipo",
-  "srchClass": "Buscar turma"
+  "srchClass": "Buscar turma",
+  "date": {
+    "placeholder": "Selecione uma data"
+  }
 }
