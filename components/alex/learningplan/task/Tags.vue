@@ -8,9 +8,9 @@
       class="invite-member"
     >
       <!-- Exibição -->
-      <template #activator="{ props }">
+      <template #activator="{ props: vMenuProps }">
         <alex-custom-button
-          v-bind="props"
+          v-bind="vMenuProps"
           icon="mdi-plus"
           size="small"
           variant="secondary"
@@ -19,7 +19,7 @@
 
       <v-list class="pa-4 rounded-lg">
         <p class="text-body-1 text-gray-800 mb-2">
-          {{ $t('components.learningPlan.drawer.tags.subtitle') }}
+          {{ $t('components.learningPlan.drawer.task.tags.subtitle') }}
         </p>
         <alex-inputs-select
           v-model="selected"
@@ -27,7 +27,7 @@
           style="min-width: 220px"
           name="tag"
           :items="availableTags"
-          :placeholder="$t('components.learningPlan.drawer.tags.placeHolder')"
+          :placeholder="$t('components.learningPlan.drawer.task.tags.search')"
           density="compact"
         />
       </v-list>

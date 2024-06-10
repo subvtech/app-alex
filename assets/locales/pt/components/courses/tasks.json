@@ -8,6 +8,8 @@
     "draft": "Rascunho",
     "closed": "Encerrada",
     "published": "Publicada",
+    "group": "Grupo",
+    "individual": "Individual",
     "infos": {
       "type": "Tipo",
       "course": "Curso",
@@ -34,7 +36,10 @@
       "click_to_continue": "Clique para continuar",
       "click_to_remake": "Clique para refazer",
       "click_to_review": "Clique para avaliar",
-      "sent_task": "Tarefa enviada"
+      "sent_task": "Tarefa enviada",
+      "sendAfterDeadline": "Após o prazo",
+      "sendUntilDeadline": "Até o prazo",
+      "noSubmission": "Sem entrega"
     },
     "task": {
       "status": {

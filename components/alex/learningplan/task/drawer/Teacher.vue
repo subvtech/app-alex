@@ -16,6 +16,7 @@
           icon="alex:Kanban"
           size="small"
           variant="text"
+          @click="$emit('kanban-click')"
         />
         <alex-custom-button
           icon="mdi-close"
@@ -70,7 +71,7 @@
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date v-model="finalDate" :edit="editable" />
+          <alex-learningplan-task-date v-model="endDate" :edit="editable" />
         </v-col>
       </v-row>
 
@@ -80,7 +81,7 @@
       />
 
       <!-- Objetivos de aprendizagem -->
-      <alex-learningplan-task-goals :edit="editable" />
+      <alex-learningplan-task-goals :edit="editable" :goals="goals" />
 
       <!-- Entregas-->
       <p class="text-h3 mt-6">
@@ -103,14 +104,9 @@
             "
           />
         </v-col>
-        <v-col class="mt-4 pa-0" cols="12"
-          ><p class="text-gray-800 font-weight-bold mb-2">
-            {{ $t('components.learningPlan.drawer.task.restrictions.label') }}
-          </p>
-          <p class="text-body-3 text-gray-800">
-            {{ $t('components.learningPlan.drawer.missing.restrictions') }}
-          </p></v-col
-        >
+        <v-col class="mt-4 pa-0" cols="12">
+          <alex-learningplan-task-restrictions v-model="restrictions" edit />
+        </v-col>
       </v-row>
 
       <!-- Recursos de aprendizagem -->
@@ -128,7 +124,7 @@
             )
           "
           variant="tertiary"
-          @click="$emit('click:attached-trail')"
+          @click="$emit('attached-trail-click')"
         />
       </div>
 
@@ -147,19 +143,25 @@
 </template>
 
 <script setup lang="ts">
+import { RestrictionValue } from '../Restrictions.vue';
 import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
+import { TaskStatus } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
   title: string;
-  messages: Message[];
+  status: TaskStatus;
+  goals: LearningPlanGoalSimple[];
+  messages?: Message[];
   description?: string;
   editable?: boolean;
   hasSubmission?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
+  startDate?: Date;
+  endDate?: Date;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   editable: true,
@@ -167,20 +169,28 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   sendAfterDeadline: false,
   kanbanButton: false,
   description: undefined,
+  messages: () => [],
+  startDate: () => new Date(),
+  endDate: () => new Date(),
 });
 const description = toRef(props.description);
 const hasSubmission = toRef(props.hasSubmission);
 const sendAfterDeadline = toRef(props.sendAfterDeadline);
 const model = defineModel({ default: false });
 
-defineEmits(['click:kanban', 'click:attached-trail']);
+defineEmits(['kanban-click', 'attached-trail-click']);
 
 // Status
-const status = ref<TeacherTaskStatus | StudentTaskStatus>('draft');
+const status = ref<TeacherTaskStatus | StudentTaskStatus>(
+  props.status as TeacherTaskStatus,
+);
 
 // Date picker
-const startDate = ref(new Date());
-const finalDate = ref(new Date());
+const startDate = toRef(props.startDate);
+const endDate = toRef(props.endDate);
+
+// Restrições
+const restrictions = ref<RestrictionValue[]>(['text']);
 
 // Tipos
 const currType = ref<string>(

@@ -30,12 +30,35 @@
       "aftrDeadline": "Envio após prazo"
     },
     "restrictions": {
-      "label": "Restrições"
+      "label": "Restrições",
+      "text": "Texto",
+      "video": "Vídeo",
+      "image": "Imagem",
+      "document": "Documento",
+      "link": "Link"
+    },
+    "goals": {
+      "label": "Objetivos de aprendizagem",
+      "select": "Selecione um objetivo",
+      "search": "Digite um nome"
     },
     "learningResources": {
       "label": "Recursos de aprendizagem",
       "noneSelected": "Nenhuma trilha selecionada"
+    },
+    "tags": {
+      "subtitle": "Informe um marcador",
+      "search": "Digite um nome"
     }
+  },
+  "goals": {
+    "select": "Selecione um objetivo",
+    "search": "Digite um nome",
+    "label": "Objetivos de aprendizagem"
+  },
+  "tags": {
+    "subtitle": "Informe um marcardor",
+    "placeholder": "Digite um nome"
   },
   "tabs": {
     "events": {
