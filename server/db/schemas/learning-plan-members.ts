@@ -57,6 +57,7 @@ export const learningPlanMembersRelations = relations(
     partnerTrail: many(LPMembersToTrails),
     learningPlanGroupMembers: many(learningPlanGroupMembers),
     trailContributions: many(trailContributions),
+    taskMember: many(taskMembers),
     learningPlanEvents: many(learningPlanEvents),
     inChargeClasses: many(classes, { relationName: 'inChargeMember' }),
     learningClass: one(classes, {

@@ -1,5 +1,6 @@
 import {
   boolean,
+  integer,
   pgEnum,
   pgTable,
   serial,
@@ -8,6 +9,7 @@ import {
 import { relations } from 'drizzle-orm';
 import { tasks } from './tasks';
 import { taskEvents } from './task-events';
+import { learningPlanMembers } from './learning-plan-members';
 
 export const statusEnum = pgEnum('type', [
   'to_do',
@@ -18,6 +20,9 @@ export const statusEnum = pgEnum('type', [
 
 export const taskMembers = pgTable('task_members', {
   id: serial('id').primaryKey(),
+  learningPlanMemberId: integer('learning_plan_member_id').references(
+    () => learningPlanMembers.id,
+  ),
   status: statusEnum('status'),
   canSubmitAfterDeadLine: boolean('can_submit_after_deadLine').default(false),
   startAt: timestamp('start_at', { mode: 'date' }),
@@ -25,7 +30,11 @@ export const taskMembers = pgTable('task_members', {
   lastSubmitionAt: timestamp('last_submition_at', { mode: 'date' }),
 });
 
-export const taskMemberRelations = relations(taskMembers, ({ many }) => ({
+export const taskMemberRelations = relations(taskMembers, ({ one, many }) => ({
   tasks: many(tasks),
   events: many(taskEvents),
+  learningPlanMembers: one(learningPlanMembers, {
+    fields: [taskMembers.learningPlanMemberId],
+    references: [learningPlanMembers.id],
+  }),
 }));
