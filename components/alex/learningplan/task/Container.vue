@@ -126,17 +126,6 @@ const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const groups = ['draft', 'published', 'done', 'archived'];
-const dragEnterGroup = ref('');
-
-/* const handleDrop = async (taskId: number, index: number, newPos: number) => {
-  const status = dragEnterGroup.value;
-  console.log(taskId, status, index, newPos);
-  if (dragEnterGroup.value) {
-    await handleMoveTask({ id: taskId, status });
-  }
-  dragEnterGroup.value = '';
-}; */
-
 const slideTransition = (i: number) =>
   tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
 

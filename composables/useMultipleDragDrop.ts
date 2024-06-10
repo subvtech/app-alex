@@ -63,5 +63,3 @@ export function useMultipleDragDrop() {
     onDragLeave,
   };
 }
-
-// add drag leave and check if dragging from is different from over

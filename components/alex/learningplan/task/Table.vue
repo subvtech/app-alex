@@ -20,10 +20,10 @@
             over == item.id ? 'over' : '',
             dragging && dragFrom == item.id ? 'dragging' : '',
           ]"
-          @dragstart="(e) => setDragStart(item.id, e)"
+          @dragstart="(e) => setDragStart(item, e)"
+          @dragleave="emit('dragLeave')"
           @dragover="(e) => setDragOver(item.id, index, e)"
           @dragend="setFinishDrag(item.id, index)"
-          @dragleave="emit('dragLeave')"
         >
           <td
             class="text-body-4 text-overflow text-left"
@@ -149,7 +149,7 @@ import { TaskType } from './Container.vue';
 const props = defineProps<{
   tasks: TaskType[];
   filter: string;
-  group: 'draft' | 'published' | 'done' | 'archived';
+  group: string;
   dragging: boolean;
   over: number;
   dragFrom: number;
@@ -298,9 +298,24 @@ const header = [
   { title: '', key: 'actions', sortable: false },
 ];
 
-const setDragStart = (itemID: number, e: DragEvent) => {
-  // set accepted groups
-  if (!isArchived.value) emit('startDrag', itemID, e);
+const setAcceptedGroups = (task: TaskType) => {
+  const deliveredTotal = task.delivered
+    ? task.delivered.underReview + task.delivered.completed
+    : 0;
+
+  const statusMap: { [key: string]: string[] } = {
+    draft: ['published', 'draft'],
+    published:
+      deliveredTotal === 0 ? ['draft', 'done', 'published'] : ['published'],
+    done: deliveredTotal === 0 ? ['draft', 'published', 'done'] : ['done'],
+  };
+
+  return statusMap[task.status] || [];
+};
+
+const setDragStart = (task: TaskType, e: DragEvent) => {
+  const acceptedGroups = setAcceptedGroups(task);
+  if (!isArchived.value) emit('startDrag', task.id, e, acceptedGroups);
 };
 
 const setDragOver = (id: number, index: number, e: DragEvent) => {
