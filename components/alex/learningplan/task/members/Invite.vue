@@ -1,23 +1,23 @@
 <template>
-  <v-menu class="invite-member" :close-on-content-click="false">
+  <v-menu
+    class="invite-member"
+    :close-on-content-click="false"
+    location="top"
+    :offset="4"
+  >
     <!-- Exibição -->
-    <template #activator="{ props }">
-      <alex-custom-button
-        v-bind="props"
-        class="ml-auto"
-        variant="secondary"
-        prepend-icon="mdi-plus"
-        >{{
-          $t('components.learningPlan.members.invite.label')
-        }}</alex-custom-button
-      >
+    <template #activator="{ props: vMenuProps }">
+      <slot name="activator" :menu-props="vMenuProps" />
     </template>
 
     <!-- Opções -->
-    <v-list class="list pt-1">
+
+    <v-list class="list pt-1" :selectable="false" :activable="false">
       <alex-inputs-text-field
+        v-model="search"
         class="px-4 py-2"
         name="member"
+        autofocus
         :placeholder="$t('components.learningPlan.members.invite.search')"
         prepend-inner-icon="mdi-magnify"
         density="compact"
@@ -27,31 +27,40 @@
       <hr />
 
       <!-- Turmas -->
-      <p class="pa-4 pb-2 text-body-4 text-gray-800 lines-1 ellipsis">
+      <p
+        v-if="filteredClasses?.length"
+        class="pa-4 pb-2 lines-1 ellipsis text-body-4 text-gray-800"
+      >
         {{ $t('components.learningPlan.members.invite.classes') }}
+      </p>
+      <p
+        v-if="!filteredClasses?.length && !hasFilteredMember"
+        class="pa-4 pb-2 lines-1 ellipsis text-body-3 text-center text-gray-400"
+      >
+        Parece que não tem nada por aqui!
       </p>
 
       <v-list-item
-        v-for="(group, index) in classes"
+        v-for="(studentClass, index) in filteredClasses"
         :key="index"
-        :value="index"
         class="px-4 py-2"
+        @click="$emit('select-class-click', studentClass)"
       >
         <v-list-item-title
           ><div class="d-flex align-center ga-4">
-            <v-img
-              class="avatar flex-0-0 rounded-circle"
-              :src="
-                group.avatarUrl ||
-                'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
-              "
-              :alt="$t('components.learningPlan.members.class')"
-              aspect-ratio="1"
-              cover
-            />
+            <v-avatar
+              :size="40"
+              class="alex-avatar-group-border alex-avatar-group-margin"
+              color="gray-100"
+            >
+              <p class="text-gray-300 text-body-2">
+                {{ getInitials(studentClass.name) }}
+              </p>
+            </v-avatar>
             <p class="text-body-4 text-gray-900 lines-1 ellipsis">
               {{
-                group.name || $t('components.learningPlan.members.missing.name')
+                studentClass.name ||
+                $t('components.learningPlan.members.missing.name')
               }}
             </p>
           </div></v-list-item-title
@@ -59,118 +68,121 @@
       </v-list-item>
 
       <!-- Alunos -->
-      <div v-for="(group, index) in classes" :key="index">
-        <p class="pa-4 pb-2 text-body-4 text-gray-800 lines-1 ellipsis">
+      <div v-for="(studentClass, index) in filteredClassMembers" :key="index">
+        <p
+          v-if="studentClass.learning_plan_members?.length"
+          class="pa-4 pb-2 text-body-4 text-gray-800 lines-1 ellipsis"
+        >
           {{ $t('components.learningPlan.members.invite.members') }} ({{
-            group.name
+            studentClass.name
           }})
         </p>
 
-        <v-list-item
-          v-for="(student, studentIndex) in group.students"
-          :key="group.name + studentIndex"
-          :value="studentIndex"
-          class="px-4 py-2"
-        >
-          <v-list-item-title
-            ><div class="d-flex align-center ga-4">
-              <v-img
-                class="avatar flex-0-0 rounded-circle"
-                :src="
-                  student.avatarUrl ||
-                  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
-                "
-                :alt="$t('components.learningPlan.members.class')"
-                aspect-ratio="1"
-                cover
-              />
-              <div>
-                <p class="text-body-4 text-gray-900 lines-1 ellipsis">
-                  {{
-                    student.name ||
-                    $t('components.learningPlan.members.missing.name')
-                  }}
-                </p>
-                <p class="text-body-5 text-gray-500 lines-1 ellipsis">
-                  {{
-                    student.email ||
-                    $t('components.learningPlan.members.missing.email')
-                  }}
-                </p>
-              </div>
-            </div></v-list-item-title
+        <template v-if="studentClass.learning_plan_members?.length">
+          <v-list-item
+            v-for="(
+              student, studentIndex
+            ) in studentClass.learning_plan_members"
+            :key="studentClass.name + studentIndex"
+            class="px-4 py-2"
+            @click="$emit('select-member-click', student)"
           >
-        </v-list-item>
+            <v-list-item-title
+              ><div class="d-flex align-center ga-4">
+                <v-img
+                  class="avatar flex-0-0 rounded-circle"
+                  :src="student.user?.avatar?.url || ''"
+                  :alt="$t('components.learningPlan.members.class')"
+                  aspect-ratio="1"
+                  cover
+                />
+                <div>
+                  <p class="text-body-4 text-gray-900 lines-1 ellipsis">
+                    {{
+                      student.user.fullname ||
+                      $t('components.learningPlan.members.missing.name')
+                    }}
+                  </p>
+                  <p class="text-body-5 text-gray-500 lines-1 ellipsis">
+                    {{
+                      student.email ||
+                      $t('components.learningPlan.members.missing.email')
+                    }}
+                  </p>
+                </div>
+              </div></v-list-item-title
+            >
+          </v-list-item>
+        </template>
       </div>
     </v-list>
   </v-menu>
 </template>
 
 <script setup lang="ts">
-interface StudentProps {
-  name: string;
-  email: string;
-  avatarUrl: string;
+interface InviteMemberProps {
+  learningplanId: number;
 }
+const props = defineProps<InviteMemberProps>();
+type Emits = {
+  'select-member-click': [value: LearningPlanMemberSimple];
+  'select-class-click': [value: ClassSimple];
+};
+defineEmits<Emits>();
+const search = ref('');
+const strapi = useStrapiUtils();
+const getMembers = (learningplanId: number) =>
+  strapi.find<ClassSimple>('classes', {
+    populate: ['learning_plan_members.user.avatar'],
+    filters: {
+      learningplan: learningplanId,
+    },
+  });
+const { data: classes } = await useAsyncData('classes-member-invite', () =>
+  getMembers(props.learningplanId),
+);
 
-interface ClassesProps {
-  name: string;
-  avatarUrl: string;
-  students: StudentProps[];
-}
+const filteredClasses = computed(() => {
+  if (!classes.value?.data) {
+    return [];
+  }
+  return classes.value.data.filter((classValue) =>
+    classValue.name.toLowerCase().includes(search.value),
+  );
+});
 
-const classes: ClassesProps[] = [
-  {
-    name: 'Turma A',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    students: [
-      {
-        name: 'Lucas Cassiano Teste Teste Teste Teste Teste Teste Teste',
-        email: 'lucascassiano@gmail.com',
-        avatarUrl:
-          'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-      },
-      {
-        name: 'Jorge Almeida',
-        email: 'jorgealmeida@hotmail.com',
-        avatarUrl:
-          'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-      },
-      {
-        name: 'José Pereira da Silva',
-        email: 'josepereiradasilva@gmail.com',
-        avatarUrl:
-          'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-      },
-    ],
-  },
-  {
-    name: 'Turma B',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    students: [
-      {
-        name: 'Lucas Cassiano',
-        email: 'lucascassiano@gmail.com',
-        avatarUrl:
-          'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-      },
-      {
-        name: 'Jorge Almeida',
-        email: 'jorgealmeida@hotmail.com',
-        avatarUrl:
-          'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-      },
-    ],
-  },
-];
+const filteredClassMembers = computed(() => {
+  if (!classes.value?.data) {
+    return [];
+  }
+  return classes.value.data.map((classValue) => ({
+    ...classValue,
+    learning_plan_members: filterLearningMembers(
+      classValue.learning_plan_members,
+    ),
+  }));
+});
+
+const hasFilteredMember = computed(
+  () =>
+    filteredClassMembers.value.filter(
+      (classValue) => classValue.learning_plan_members?.length,
+    ).length,
+);
+const filterLearningMembers = (list?: LearningPlanMemberSimple[]) =>
+  list?.filter(
+    (member) =>
+      member.user.fullname.toLowerCase().includes(search.value) ||
+      member.user.email.toLowerCase().includes(search.value) ||
+      member.user.username.toLowerCase().includes(search.value),
+  );
 </script>
 
 <style scoped>
 .invite-member .list {
   width: 320px;
-  max-height: 95%;
+  height: 400px;
+  max-height: 500px;
 }
 
 .avatar {
@@ -182,5 +194,9 @@ const classes: ClassesProps[] = [
 <style>
 .invite-member .v-input__details {
   display: none !important;
+}
+.invite-member .v-overlay__content .v-list {
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 8px;
 }
 </style>

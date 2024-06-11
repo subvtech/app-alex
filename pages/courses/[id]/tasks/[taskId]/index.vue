@@ -1,7 +1,11 @@
 <template>
   <alex-learningplan-task-header-loader v-if="taskStore.loading">
   </alex-learningplan-task-header-loader>
-  <section v-else-if="!taskStore.loading && taskStore.task">
+  <section
+    v-else-if="
+      !taskStore.loading && taskStore.task && learningPlanStore.learningPlan?.id
+    "
+  >
     <alex-learningplan-task-header
       :title="taskStore.task.title"
       :tags="tags"
@@ -62,6 +66,7 @@
     />
     <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
+      :learningplan-id="learningPlanStore.learningPlan.id"
       :title="taskStore.task.title"
       :type="taskStore.task.type"
       :status="taskStore.task.status"

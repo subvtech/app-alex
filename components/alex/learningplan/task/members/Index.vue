@@ -11,7 +11,19 @@
         clearable
       />
 
-      <alex-learningplan-task-members-invite />
+      <alex-learningplan-task-members-invite :learningplan-id="learningplanId">
+        <template #activator="{ menuProps }">
+          <alex-custom-button
+            v-bind="menuProps"
+            class="ml-auto"
+            variant="secondary"
+            prepend-icon="mdi-plus"
+            >{{
+              $t('components.learningPlan.members.invite.label')
+            }}</alex-custom-button
+          >
+        </template>
+      </alex-learningplan-task-members-invite>
     </div>
 
     <!-- Cards -->
@@ -60,67 +72,11 @@ interface MemberProps {
   submitted?: boolean;
   accepted?: boolean;
 }
-
-const members: MemberProps[] = [
-  {
-    name: 'Lucas da Silva Santos',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma A',
-    pending: true,
-    accepted: true,
-  },
-  {
-    name: 'Estudante de Exemplo Almeida',
-    class: 'Turma B',
-    submitted: true,
-  },
-  {
-    name: 'Rafael Soares Chagas',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma A',
-    pending: true,
-    accepted: true,
-    submitted: true,
-  },
-  {
-    name: 'Nome de Pessoa Muito Grande Para Testar',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-  },
-  {
-    name: 'Rodrigo Alves Monteiro',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma D',
-  },
-  {
-    name: 'Lucas Lucas Lucas Lucas',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma T',
-  },
-  {
-    name: 'Jefferson Maciel Almeida',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma Z',
-  },
-  {
-    name: 'Lorem Ipsum Lorem Ipsum',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma T',
-  },
-  {
-    name: 'Lucas da Silva Santos',
-    avatarUrl:
-      'https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg',
-    class: 'Turma L',
-    pending: true,
-  },
-];
+interface MembersProps {
+  members?: MemberProps[];
+  learningplanId: number;
+}
+withDefaults(defineProps<MembersProps>(), { members: () => [] });
 </script>
 
 <style>

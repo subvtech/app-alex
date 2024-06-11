@@ -5,7 +5,7 @@ export const useOnStopTyping = (
 ) => {
   const isTyping = ref(false);
   watchEffect(async (onInvalidate) => {
-    if (search.value.length > 0) {
+    if (search.value?.length > 0) {
       isTyping.value = true;
 
       const getData = setTimeout(async () => {

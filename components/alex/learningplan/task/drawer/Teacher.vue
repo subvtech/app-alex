@@ -129,7 +129,7 @@
               'components.learningPlan.drawer.task.learningResources.noneSelected',
             )
           "
-          variant="tertiary"
+          variant="secondary"
           @click="$emit('attached-trail-click')"
         />
       </div>
@@ -141,7 +141,7 @@
           <alex-learningplan-task-events v-model="taskEvents"
         /></v-window-item>
         <v-window-item value="2">
-          <alex-learningplan-task-members
+          <alex-learningplan-task-members :learningplan-id="learningplanId"
         /></v-window-item>
       </v-window>
     </div>
@@ -159,6 +159,7 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
+  learningplanId: number;
   title: string;
   status: TaskStatus;
   type?: TaskType | null;
