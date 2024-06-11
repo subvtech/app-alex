@@ -1,6 +1,14 @@
 import { resolve } from 'node:path';
 
-const { BASE_URL = 'http://localhost:3000' } = process.env;
+const {
+  COMPONENTS_PAGE,
+  MATOMO_APP_ID,
+  MATOMO_URL,
+  NUXT_AUTH_JS_SECRET,
+  NUXT_BASE_URL = 'http://localhost:3000',
+  OPEN_AI_KEY,
+  STRAPI_URL = 'http://localhost:1337',
+} = process.env;
 
 export default defineNuxtConfig({
   ssr: false,
@@ -13,7 +21,7 @@ export default defineNuxtConfig({
   authJs: {
     authenticatedRedirectTo: '/',
     guestRedirectTo: '/login',
-    baseUrl: BASE_URL,
+    baseUrl: NUXT_BASE_URL,
   },
   css: [
     'vuetify/lib/styles/main.sass',
@@ -36,26 +44,27 @@ export default defineNuxtConfig({
   },
   image: {
     strapi: {
-      baseURL: process.env.STRAPI_URL || 'http://localhost:1337',
+      baseURL: STRAPI_URL,
     },
   },
   runtimeConfig: {
     authJs: {
-      secret: process.env.NUXT_NEXTAUTH_SECRET, // You can generate one with `openssl rand -base64 32`
+      secret: NUXT_AUTH_JS_SECRET, // You can generate one with `openssl rand -base64 32`
     },
+    baseUrl: NUXT_BASE_URL,
     public: {
       authJs: {
-        baseUrl: BASE_URL,
+        baseUrl: NUXT_BASE_URL,
         verifyClientOnEveryRequest: true,
       },
-      matomoAppId: process.env.MATOMO_APP_ID,
-      matomoUrl: process.env.MATOMO_URL,
-      showComponentsPage: process.env.COMPONENTS_PAGE === 'on',
-      openAiKey: process.env.OPEN_AI_KEY,
+      matomoAppId: MATOMO_APP_ID,
+      matomoUrl: MATOMO_URL,
+      openAiKey: OPEN_AI_KEY,
+      showComponentsPage: COMPONENTS_PAGE === 'on',
     },
   },
   strapi: {
-    url: process.env.STRAPI_URL || 'http://localhost:1337',
+    url: STRAPI_URL,
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },

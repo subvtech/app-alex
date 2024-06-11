@@ -3,19 +3,15 @@ definePageMeta({
   middleware: 'auth',
   layout: 'default',
 });
-
-const { $trpc } = useNuxtApp();
-
-const hello = await $trpc.hello.useQuery({ text: 'Djalma' });
 </script>
 
 <template>
   <v-row justify="center" align="center">
-    <v-col cols="12">{{ hello.data.value?.greeting }}</v-col>
+    <v-col cols="12">Welcome</v-col>
   </v-row>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .max-w-200 {
   max-width: 200px;
 }

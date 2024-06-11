@@ -39,7 +39,6 @@
               color="white"
               theme="dark"
             />
-
             <alex-inputs-text-field
               :label="$t('pages.login.password')"
               :placeholder="$t('pages.login.passwordHolder')"
@@ -81,7 +80,6 @@
                 {{ $t('pages.login.forgot') }}
               </nuxt-link>
             </div>
-
             <alex-custom-button
               block
               size="large"
@@ -97,7 +95,6 @@
             class="text-white text-center font-weight-bold text-body-2"
           >
             {{ $t('pages.login.noAccount') }}
-
             <nuxt-link to="/register" class="blue-label text-decoration-none">
               {{ $t('pages.login.register') }}
             </nuxt-link>
@@ -115,7 +112,6 @@
               class="border-opacity-100"
             ></v-divider>
           </div>
-
           <v-btn
             block
             class="card-btn metamask d-flex"
@@ -132,10 +128,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Strapi4Error } from '@nuxtjs/strapi/dist/runtime/types/v4';
 import { useForm } from 'vee-validate';
 
+const { t } = useI18n();
 const { signIn } = useAuth();
+const { metalogin } = useMetamask();
+
 const hasError = ref(false);
 const errorMessage = ref('');
 const route = useRoute();
@@ -149,7 +147,6 @@ const redirect =
   (route.query.redirect as string) || useCookie('redirect').value;
 
 const { loginSchema } = useFormRules();
-const { mapStrapiErrors } = useStrapiHelpers();
 const { handleSubmit, errors, values, controlledValues } = useForm({
   validationSchema: loginSchema,
   keepValuesOnUnmount: true,
@@ -166,7 +163,6 @@ const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-const { metalogin } = useMetamask();
 
 const submit = handleSubmit(async () => {
   logging.value = true;
@@ -181,23 +177,16 @@ const submit = handleSubmit(async () => {
 
     switch (code) {
       case 'AccessDenied':
-        console.log('email not verified');
+        errorMessage.value = t('errors.emailIsNotConfirmed');
         break;
       case 'CredentialsSignin':
-        console.log('invalid credentials');
+        errorMessage.value = t('errors.invalidIdentifierPassword');
         break;
       default:
-        console.log('unknown error');
+        errorMessage.value = t('errors.default');
     }
 
     hasError.value = true;
-
-    const error = err as Strapi4Error;
-    const catchErrorMessage = error?.error?.message;
-
-    if (catchErrorMessage) {
-      errorMessage.value = mapStrapiErrors(catchErrorMessage);
-    }
   } finally {
     logging.value = false;
 

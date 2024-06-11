@@ -1,25 +1,22 @@
+import { NuxtAuthHandler } from '#auth';
 import Credentials from '@auth/core/providers/credentials';
 import type { AuthConfig } from '@auth/core/types';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { compare } from 'bcrypt';
-import { NuxtAuthHandler } from '#auth';
 
-import db from '@/server/db';
-import { getUserByEmail, setEmailVerified } from '@/server/db/repository/users';
-import { LoginSchema, accounts } from '@/server/db/schemas/accounts';
-import { users } from '@/server/db/schemas/users';
-import { verificationTokens } from '@/server/db/schemas/verification-tokens';
+import db from '@/server/lib/drizzle';
+import { LoginSchema } from '@/server/modules/accounts/accounts.validator';
+import {
+  getUserByEmail,
+  setEmailVerified,
+} from '@/server/modules/users/users.service';
 
 const runtimeConfig = useRuntimeConfig();
 
 export const authOptions: AuthConfig = {
   basePath: '/api/auth',
-  secret: runtimeConfig.authJs?.secret || '',
-  adapter: DrizzleAdapter(db, {
-    accountsTable: accounts,
-    usersTable: users,
-    verificationTokensTable: verificationTokens,
-  }),
+  secret: runtimeConfig.authJs.secret || '',
+  adapter: DrizzleAdapter(db),
   session: {
     strategy: 'jwt',
   },

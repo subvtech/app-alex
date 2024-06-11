@@ -1,5 +1,6 @@
 import { createTRPCNuxtClient, httpBatchLink } from 'trpc-nuxt/client';
-import type { AppRouter } from '@/server/trpc/routes';
+
+import type { AppRouter } from '@/server/api/trpc/[trpc]';
 
 export default defineNuxtPlugin(() => {
   /**
@@ -7,16 +8,10 @@ export default defineNuxtPlugin(() => {
    * built on top of `useAsyncData`.
    */
   const trpc = createTRPCNuxtClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        url: '/api/trpc',
-      }),
-    ],
+    links: [httpBatchLink({ url: '/api/trpc' })],
   });
 
   return {
-    provide: {
-      trpc,
-    },
+    provide: { trpc },
   };
 });

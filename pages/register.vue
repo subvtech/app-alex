@@ -3,17 +3,14 @@
     <div class="image justify-center align-center d-none d-md-flex pa-0">
       <img class="signUp" src="/images/signUp.svg" />
     </div>
-
     <div class="bg-primary-0 pa-0 content-field">
       <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end" />
-
       <SuccessMessage
         v-if="registeredUser"
         :title="$t('pages.register.success.title')"
         :subtitle="$t('pages.register.success.subtitle')"
       />
-
-      <RegisterFields v-else @success:message="onRegisteredUser" />
+      <RegisterFields v-else @success:message="registeredUser = true" />
     </div>
   </v-container>
 </template>
@@ -21,12 +18,10 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'auth',
-  middleware: 'control-access',
+  middleware: ['guest-only'],
 });
+
 const registeredUser = ref(false);
-const onRegisteredUser = () => {
-  registeredUser.value = true;
-};
 </script>
 
 <style scoped lang="scss">

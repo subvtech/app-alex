@@ -1,7 +1,8 @@
-import { boolean, integer, pgTable, serial } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { users } from './users';
+import { boolean, integer, pgTable, serial } from 'drizzle-orm/pg-core';
+
 import { learningGoals } from './learning-goals';
+import { users } from '@/server/modules/users/users.schema';
 
 export const learningGoalVerbs = pgTable('learning-goal-verbs', {
   id: serial('id').primaryKey(),

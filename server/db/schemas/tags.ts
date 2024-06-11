@@ -8,8 +8,10 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+
 import { learningPlans } from './learning-plans';
-import { users } from './users';
+
+import { users } from '@/server/modules/users/users.schema';
 
 export const tags = pgTable('tags', {
   id: serial('id').primaryKey(),

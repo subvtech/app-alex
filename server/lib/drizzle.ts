@@ -1,9 +1,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-import { accounts } from './schemas/accounts';
-import { users } from './schemas/users';
-import { verificationTokens } from './schemas/verification-tokens';
+import { accounts } from '@@/server/modules/accounts/accounts.schema';
+import { users } from '@@/server/modules/users/users.schema';
+import { verificationTokens } from '@@/server/modules/verification-tokens/verification-tokens.schema';
 
 const conn = postgres(process.env.DATABASE_URL!);
 

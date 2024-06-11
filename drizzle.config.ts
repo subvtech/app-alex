@@ -7,8 +7,8 @@ const { DATABASE_URL = '' } = process.env;
 export default {
   dbCredentials: { url: DATABASE_URL },
   dialect: 'postgresql',
-  schema: './server/db/schemas/*',
-  out: './server/db/migrations',
+  schema: './server/**/*.schema.ts',
+  out: './migrations',
   strict: true,
   verbose: true,
   migrations: {

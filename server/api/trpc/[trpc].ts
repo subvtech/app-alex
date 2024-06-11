@@ -3,7 +3,15 @@
  * On a bigger app, you will probably want to split this file up into multiple files.
  */
 import { createNuxtApiHandler } from 'trpc-nuxt';
-import { appRouter } from '~/server/trpc/routes';
+
+import { router } from '@/server/lib/trpc';
+import { usersRouter } from '@/server/modules/users/users.route';
+
+export const appRouter = router({
+  users: usersRouter,
+});
+
+export type AppRouter = typeof appRouter;
 
 export default createNuxtApiHandler({
   router: appRouter,
