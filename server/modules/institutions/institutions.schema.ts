@@ -34,7 +34,7 @@ export const institutionRelations = relations(
 export const userToInstitution = pgTable(
   'user_to_institution',
   {
-    userId: integer('user_id')
+    userId: text('user_id')
       .notNull()
       .references(() => users.id),
     institutionId: integer('intitution_id')

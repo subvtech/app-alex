@@ -65,7 +65,7 @@ export const tagsToUsers = pgTable(
     tagId: integer('tag_id')
       .notNull()
       .references(() => tags.id),
-    userId: integer('user_id')
+    userId: text('user_id')
       .notNull()
       .references(() => users.id),
   },
