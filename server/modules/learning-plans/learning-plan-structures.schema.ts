@@ -12,7 +12,7 @@ import { trails } from '../trails/trails.schema';
 import { learningPlans } from './learning-plans.schema';
 import { learningPlanMembers } from './learning-plan-members.schema';
 
-export const StructureTypeEnum = pgEnum('type', ['standard', 'student']);
+export const structureTypeEnum = pgEnum('type', ['standard', 'student']);
 
 export const learningPlanStructures = pgTable('learning-plan-structures', {
   id: serial('id').primaryKey(),
@@ -21,7 +21,7 @@ export const learningPlanStructures = pgTable('learning-plan-structures', {
     .notNull(),
   memberId: integer('member_id').references(() => learningPlanMembers.id),
   title: text('title'),
-  type: StructureTypeEnum('name'),
+  type: structureTypeEnum('name'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 
