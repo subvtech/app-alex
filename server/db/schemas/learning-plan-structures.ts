@@ -22,7 +22,6 @@ export const learningPlanStructures = pgTable('learning-plan-structures', {
   title: text('title'),
   type: StructureTypeEnum('name'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
-  // TODO image: media
 });
 
 export const learningPlanStructuresRelations = relations(

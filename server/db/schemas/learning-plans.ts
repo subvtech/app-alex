@@ -20,6 +20,7 @@ import { learningPlanStructures } from './learning-plan-structures';
 import { learningPlanMedias } from './learning-plan-medias';
 import { learningGoals } from './learning-goals';
 import { tags } from './tags';
+import { tasks } from './tasks';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
@@ -51,7 +52,7 @@ export const learningPlansRelations = relations(
     // projects (auto relacionamento)
     // course (auto relacionamento)
     groups: many(learningPlanGroups),
-    // task
+    task: many(tasks),
     invitationLinks: many(invitationLinks),
     schedules: many(learningPlanMeetingSchedule),
     coverImage: one(medias, {

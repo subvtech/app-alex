@@ -1,27 +1,24 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
-import { accounts } from '../accounts/accounts.schema';
+import { userToInstitution } from './institutions';
+import { learningGoalVerbs } from './learning-goal-verbs';
+import { learningPlanMembers } from './learning-plan-members';
+import { medias } from './medias';
+import { tags } from './tags';
 
-import { userToInstitution } from '~/server/db/schemas/institutions';
-import { learningGoalVerbs } from '~/server/db/schemas/learning-goal-verbs';
-import { learningPlanMembers } from '~/server/db/schemas/learning-plan-members';
-import { medias } from '~/server/db/schemas/medias';
-import { tags } from '~/server/db/schemas/tags';
+import { accounts } from '~/server/modules/accounts/accounts.schema';
 
 export const users = pgTable('users', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  cpf: text('name'),
   name: text('name').notNull(),
   email: text('email').notNull(),
-  image: text('image'),
   emailVerified: timestamp('emailVerified', { mode: 'date' }),
   avatarId: text('avatar_id'),
   coverId: text('cover_id'),
-  username: text('username'),
-  password: text('password'),
+  password: text('password').notNull(),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -41,5 +38,3 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 }));
 
 export type User = typeof users.$inferSelect;
-
-export type UserInsert = typeof users.$inferInsert;

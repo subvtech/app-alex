@@ -3,18 +3,18 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
 
 import { classes } from './classes';
+import { learningPlanEvents } from './learning-plan-events';
 import { learningPlanGroupMembers } from './learning-plan-group-members';
 import { learningPlanStructures } from './learning-plan-structures';
-import { learningPlans } from './learning-plans';
-import { trailContributions } from './trail-contributions';
-
-import { users } from '@/server/modules/users/users.schema';
+import { taskMembers } from './task-members';
+import { trails } from './trails';
 
 export const roleEnum = pgEnum('role', [
   'student',
@@ -52,15 +52,45 @@ export const learningPlanMembersRelations = relations(
       references: [users.id],
     }),
     learningPlanStructure: one(learningPlanStructures),
-    // partnerTrail:
+    partnerTrail: many(LPMembersToTrails),
     learningPlanGroupMembers: many(learningPlanGroupMembers),
     trailContributions: many(trailContributions),
-    // TaskMember
+    taskMember: many(taskMembers),
+    learningPlanEvents: many(learningPlanEvents),
     inChargeClasses: many(classes, { relationName: 'inChargeMember' }),
     learningClass: one(classes, {
       fields: [learningPlanMembers.classId],
       references: [classes.id],
       relationName: 'learningClass',
+    }),
+  }),
+);
+
+export const LPMembersToTrails = pgTable(
+  'learning_plan_members_to_trails',
+  {
+    partnerTrail: integer('partner_trail')
+      .notNull()
+      .references(() => learningPlanMembers.id),
+    trailId: integer('partner')
+      .notNull()
+      .references(() => trails.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.partnerTrail, t.trailId] }),
+  }),
+);
+
+export const LPMembersToTrailsRelations = relations(
+  LPMembersToTrails,
+  ({ one }) => ({
+    member: one(learningPlanMembers, {
+      fields: [LPMembersToTrails.partnerTrail],
+      references: [learningPlanMembers.id],
+    }),
+    trail: one(trails, {
+      fields: [LPMembersToTrails.trailId],
+      references: [trails.id],
     }),
   }),
 );
