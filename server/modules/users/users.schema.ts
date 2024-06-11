@@ -2,12 +2,11 @@ import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { accounts } from '../accounts/accounts.schema';
-
-import { userToInstitution } from '~/server/db/schemas/institutions';
-import { learningGoalVerbs } from '~/server/db/schemas/learning-goal-verbs';
-import { learningPlanMembers } from '~/server/db/schemas/learning-plan-members';
-import { medias } from '~/server/db/schemas/medias';
-import { tags } from '~/server/db/schemas/tags';
+import { userToInstitution } from '../institutions/institutions.schema';
+import { learningGoalVerbs } from '../learning-plans/learning-goal-verbs.schema';
+import { learningPlanMembers } from '../learning-plans/learning-plan-members.schema';
+import { medias } from '../medias/medias.schema';
+import { tags } from '../tags/tags.schema';
 
 export const users = pgTable('users', {
   id: text('id')

@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm';
 
+import db from '@@/server/lib/drizzle';
+
 import {
   VerificationToken,
   verificationTokens,
 } from './verification-tokens.schema';
-
-import db from '@@/server/lib/drizzle';
 
 const ONE_HOUR = 3600 * 1000;
 

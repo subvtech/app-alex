@@ -2,6 +2,9 @@ import { TRPCError } from '@trpc/server';
 import { hash } from 'bcrypt';
 import { z } from 'zod';
 
+import { publicProcedure, router } from '@@/server/lib/trpc';
+import { sendVerificationEmail } from '@@/server/lib/mail';
+
 import { generateVerificationToken } from '../verification-tokens/verification-tokens.service';
 import {
   getUserBy,
@@ -10,9 +13,6 @@ import {
   register,
 } from './users.service';
 import { registerUserSchema, selectUserSchema } from './users.validator';
-
-import { publicProcedure, router } from '@@/server/lib/trpc';
-import { sendVerificationEmail } from '@@/server/lib/mail';
 
 export const usersRouter = router({
   getById: publicProcedure

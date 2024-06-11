@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 
-import { User, UserInsert, users } from './users.schema';
-
 import db from '@@/server/lib/drizzle';
 import { curry } from '@@/utils/curry';
+
+import { User, UserInsert, users } from './users.schema';
 
 export async function register(data: UserInsert) {
   return (await db.insert(users).values(data).returning())[0];
