@@ -3,14 +3,6 @@ import { LearningPlanGoalSimple } from './learningPlanGoalSimple.model';
 export type TaskStatus = 'published' | 'draft' | 'finished';
 export type TaskType = 'individual' | 'group';
 export type TaskMemberStatus = 'to_do' | 'in_progress' | 'in_review' | 'done';
-export interface TaskMember {
-  id: number;
-  status: TaskMemberStatus;
-  can_submit_after_deadline: boolean;
-  started_at: string;
-  finished_at: string;
-  last_submission_at: string;
-}
 export interface Task {
   id: number;
   trail_id: number;
@@ -29,4 +21,5 @@ export interface Task {
   submission_description: string;
   learning_goals: LearningPlanGoalSimple[];
   task_members: TaskMember[];
+  task_events: TaskEvent[];
 }

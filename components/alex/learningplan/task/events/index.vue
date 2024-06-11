@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panels class="events-rows" flat>
     <alex-learningplan-task-events-card
-      v-for="(event, index) in eventDays"
+      v-for="(event, index) in events"
       :key="index"
       :date="event.date"
       :events="event.events"
@@ -20,60 +20,7 @@ interface DayEventsProps {
   date: string;
   events: Array<EventProps>;
 }
-
-// Exemplo
-const eventDays: Array<DayEventsProps> = [
-  {
-    date: '24/02/2024',
-    events: [
-      {
-        user: 'Lucas da Silva Sobrenome',
-        action: 'criou dois blocos',
-        time: '15:03',
-      },
-      {
-        user: 'Sérgio Ramos de Almeida',
-        action: 'entregou uma tarefa',
-        time: '15:03',
-      },
-      {
-        user: 'Daniel Sílvio Macedo',
-        action: 'se matriculou na turma',
-        time: '15:03',
-      },
-    ],
-  },
-  {
-    date: '20/02/2024',
-    events: [
-      {
-        user: 'Lucas da Silva Sobrenome',
-        action: 'criou dois blocos',
-        time: '15:03',
-      },
-      {
-        user: 'Daniel Sílvio Macedo',
-        action: 'se matriculou na turma',
-        time: '15:03',
-      },
-    ],
-  },
-  {
-    date: '19/02/2024',
-    events: [
-      {
-        user: 'Lucas da Silva Sobrenome',
-        action: 'criou dois blocos',
-        time: '15:03',
-      },
-      {
-        user: 'Sérgio Ramos de Almeida',
-        action: 'entregou uma tarefa',
-        time: '15:03',
-      },
-    ],
-  },
-];
+const events = defineModel<DayEventsProps[]>();
 </script>
 
 <style>

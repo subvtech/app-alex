@@ -138,7 +138,7 @@
       <alex-custom-tabs v-model="activePage" :tabs="tabs"></alex-custom-tabs>
       <v-window v-model="activePage">
         <v-window-item value="1">
-          <alex-learningplan-task-events
+          <alex-learningplan-task-events v-model="taskEvents"
         /></v-window-item>
         <v-window-item value="2">
           <alex-learningplan-task-members
@@ -161,7 +161,8 @@ interface TaskTeacherDrawerProps {
   title: string;
   type: TaskType;
   status: TaskStatus;
-  goals: LearningPlanGoalSimple[];
+  goals?: LearningPlanGoalSimple[];
+  events?: TaskEvent[];
   messages?: Message[];
   description?: string;
   restrictions?: string;
@@ -182,6 +183,8 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   startDate: undefined,
   endDate: undefined,
   restrictions: '',
+  goals: () => [],
+  events: () => [],
 });
 const description = toRef(props.description);
 const hasSubmission = toRef(props.hasSubmission);
@@ -213,7 +216,6 @@ const restrictionsValue = computed({
 
 // Tipos
 const currType = toRef<string>(props.type);
-
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
@@ -235,6 +237,20 @@ const tabs = [
   { label: t('components.learningPlan.drawer.tabs.events.label'), value: '1' },
   { label: t('components.learningPlan.drawer.tabs.members.label'), value: '2' },
 ];
+
+// Events
+
+const taskEvents = computed(() => [
+  {
+    date: new Date().toISOString(),
+    events: props.events.map((event) => ({
+      user: 'user',
+      action: event.event as string,
+      time: event.createdAt.toString(),
+    })),
+  },
+]);
+
 // Close drawer
 function handleCloseModal() {
   model.value = false;

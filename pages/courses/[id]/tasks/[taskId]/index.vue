@@ -65,6 +65,7 @@
       :title="taskStore.task.title"
       :type="taskStore.task.type"
       :status="taskStore.task.status"
+      :events="taskStore.task.task_events"
       :goals="taskStore.task.learning_goals"
       :description="taskStore.task.description"
       :has-submission="taskStore.task.submission_required"
