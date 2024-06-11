@@ -160,8 +160,8 @@ const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
   title: string;
-  type: TaskType;
   status: TaskStatus;
+  type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
   events?: TaskEvent[];
   messages?: Message[];
@@ -171,8 +171,8 @@ interface TaskTeacherDrawerProps {
   hasSubmission?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
-  startDate?: Date | string;
-  endDate?: Date | string;
+  startDate?: Date | string | null;
+  endDate?: Date | string | null;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   editable: true,
@@ -186,6 +186,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   restrictions: '',
   goals: () => [],
   events: () => [],
+  type: undefined,
 });
 const description = toRef(props.description);
 const hasSubmission = toRef(props.hasSubmission);
@@ -216,7 +217,7 @@ const restrictionsValue = computed({
 }) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const currType = toRef<string>(props.type);
+const currType = toRef<string>(props.type || '');
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
