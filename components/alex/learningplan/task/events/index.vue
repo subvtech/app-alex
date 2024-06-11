@@ -13,11 +13,11 @@
 interface EventProps {
   user: string;
   action: string;
-  time: string;
+  time: string | Date;
 }
 
 interface DayEventsProps {
-  date: string;
+  date: string | Date;
   events: Array<EventProps>;
 }
 const events = defineModel<DayEventsProps[]>();

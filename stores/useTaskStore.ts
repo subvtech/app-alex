@@ -10,7 +10,6 @@ export const useTaskStore = defineStore('task', () => {
     task_members: {
       populate: [
         'task_submission',
-        'task_events',
         'task_member_students.student_member.user.avatar',
       ],
     },
@@ -18,7 +17,9 @@ export const useTaskStore = defineStore('task', () => {
     learning_goals: {
       populate: ['verb'],
     },
-    task_events: true,
+    task_events: {
+      populate: ['task_member.task_member_students.student_member.user.avatar'],
+    },
   };
 
   async function loadTaskData(id: number, showMessageIfNotFound = true) {

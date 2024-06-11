@@ -149,6 +149,7 @@
 </template>
 
 <script setup lang="ts">
+import { isSameDay } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
 import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
@@ -239,18 +240,30 @@ const tabs = [
 ];
 
 // Events
-
-const taskEvents = computed(() => [
-  {
-    date: new Date().toISOString(),
-    events: props.events.map((event) => ({
-      user: 'user',
-      action: event.event as string,
-      time: event.createdAt.toString(),
-    })),
-  },
-]);
-
+const taskEvents = computed(() => orderToDateEvents(props.events));
+const orderToDateEvents = (events: TaskEvent[]) => {
+  const eventsGroups: { date: Date; events: any[] }[] = [];
+  events.forEach((current) => {
+    const currentDate = new Date(current.publishedAt);
+    const currentElement = {
+      user: 'test',
+      action: current.event,
+      time: current.publishedAt,
+    };
+    const group = eventsGroups.find((group) =>
+      isSameDay(currentDate, new Date(group.date)),
+    );
+    if (group) {
+      group.events.push(currentElement);
+      return;
+    }
+    eventsGroups.push({
+      date: currentDate,
+      events: [currentElement],
+    });
+  });
+  return eventsGroups;
+};
 // Close drawer
 function handleCloseModal() {
   model.value = false;
