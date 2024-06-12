@@ -9,6 +9,7 @@ export function useMultipleDragDrop() {
   const dragFrom = ref(-1);
   const dragging = ref(false);
   const acceptedGroups = ref<string[]>([]);
+  const dragoverTimeout = ref<NodeJS.Timeout | null>(null);
 
   const startDrag = (
     id: number,
@@ -34,15 +35,26 @@ export function useMultipleDragDrop() {
     index: number,
     e: DragEvent,
   ) => {
-    if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
-      if (dragFrom.value !== id) over.value = { list, id, index };
-      else {
-        onDragLeave(e);
+    clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
+
+    const handleDragOver = () => {
+      if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
+        if (dragFrom.value !== id) over.value = { list, id, index };
+        else {
+          onDragLeave(e);
+        }
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      } else if (e.dataTransfer) {
+        e.dataTransfer.dropEffect = 'none';
       }
-      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-    } else if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'none';
+    };
+
+    if (over.value.id === -1) {
+      dragoverTimeout.value = setTimeout(handleDragOver, 200);
+    } else {
+      handleDragOver();
     }
+
     e.preventDefault();
   };
 
@@ -50,6 +62,7 @@ export function useMultipleDragDrop() {
     over.value = { list: '', id: -1, index: -1 };
     dragFrom.value = -1;
     dragging.value = false;
+    clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
   };
 
   const onDragLeave = (event: DragEvent) => {
@@ -57,6 +70,7 @@ export function useMultipleDragDrop() {
       !event.relatedTarget || (event.clientX === 0 && event.clientY === 0);
 
     if (mouseIsOutSideViewport) {
+      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
       over.value = { list: '', id: -1, index: -1 };
       return true;
     }
@@ -67,6 +81,7 @@ export function useMultipleDragDrop() {
     const mouseIsOutSideCurrentTarget = !(withinX && withinY);
 
     if (mouseIsOutSideCurrentTarget) {
+      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
       over.value = { list: '', id: -1, index: -1 };
     }
 
