@@ -11,6 +11,7 @@ export interface TaskEvent {
   id: number;
   event: ValueOf<typeof events>;
   task_member: TaskMember;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
 }

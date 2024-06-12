@@ -119,10 +119,10 @@ interface HeaderProps {
   title: string;
   status: 'draft' | 'published' | 'done' | (string & {});
   description: string;
-  type?: 'group' | 'individual';
+  type?: 'group' | 'individual' | null;
   tags?: string[];
-  startAt?: Date | string;
-  deadlineAt?: Date | string;
+  startAt?: Date | string | null;
+  deadlineAt?: Date | string | null;
   sendSubmission?: boolean;
   sendSubmissionAfterDeadline?: boolean;
 }

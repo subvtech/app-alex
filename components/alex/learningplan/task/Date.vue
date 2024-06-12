@@ -47,7 +47,7 @@ interface CompProps {
 defineProps<CompProps>();
 
 const open = ref<boolean>(false);
-const selectedDate = defineModel<Date | string>();
+const selectedDate = defineModel<Date | string | null>();
 const emit = defineEmits(['change', 'input']);
 
 const selectedDateValue = computed({

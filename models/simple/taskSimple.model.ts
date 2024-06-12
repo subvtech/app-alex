@@ -9,13 +9,13 @@ export interface Task {
   learning_plan_id: number;
   title: string;
   description: string;
-  type: TaskType;
+  type?: TaskType | null;
   tags: Tag[];
   status: TaskStatus;
   submission_required: boolean;
-  start_at: string;
-  finish_at: string;
-  archived_at: string | null;
+  start_at?: string | null;
+  finish_at?: string | null;
+  archived_at?: string | null;
   can_submit_after_deadline: boolean;
   allowed_editor_plugins: string; // 'string, string, string';
   submission_description: string;

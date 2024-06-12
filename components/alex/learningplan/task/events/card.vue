@@ -3,7 +3,7 @@
     <!-- Data -->
     <v-expansion-panel-title flat style="border: none; outline: none">
       <hr class="ml-3 w-full border-sm border-gray-600" />
-      <span class="ml-2 text-gray-600">{{ date }}</span>
+      <span class="ml-2 text-gray-600">{{ formatDate(date) }}</span>
     </v-expansion-panel-title>
 
     <!-- Eventos -->
@@ -16,7 +16,7 @@
             }}</span
             ><span class="text-gray-800">{{ event.action }}</span>
           </p>
-          <span class="text-gray-700">{{ event.time }}</span>
+          <span class="text-gray-700">{{ formatHour(event.time) }}</span>
         </div>
         <hr v-if="index < events.length - 1" class="mt-2 border-thin" />
       </div>
@@ -25,16 +25,31 @@
 </template>
 
 <script setup lang="ts">
+import { format } from 'date-fns';
+
 interface EventProps {
   user: string;
   action: string;
-  time: string;
+  time: string | Date;
 }
 interface DayEventsProps {
-  date: string;
+  date: string | Date;
   events: Array<EventProps>;
 }
 defineProps<DayEventsProps>();
+const threeHours = 0;
+const formatHour = (date: string | Date) => {
+  if (typeof date === 'string') {
+    return format(Date.parse(date) + threeHours, 'HH:mm');
+  }
+  return format(date, 'HH:mm');
+};
+const formatDate = (date: string | Date) => {
+  if (typeof date === 'string') {
+    return format(Date.parse(date) + threeHours, 'dd/MM/yyyy');
+  }
+  return format(date, 'dd/MM/yyyy');
+};
 </script>
 
 <style></style>

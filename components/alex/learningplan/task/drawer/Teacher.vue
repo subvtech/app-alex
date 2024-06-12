@@ -129,7 +129,7 @@
               'components.learningPlan.drawer.task.learningResources.noneSelected',
             )
           "
-          variant="tertiary"
+          variant="secondary"
           @click="$emit('attached-trail-click')"
         />
       </div>
@@ -141,7 +141,7 @@
           <alex-learningplan-task-events v-model="taskEvents"
         /></v-window-item>
         <v-window-item value="2">
-          <alex-learningplan-task-members
+          <alex-learningplan-task-members :learningplan-id="learningplanId"
         /></v-window-item>
       </v-window>
     </div>
@@ -149,6 +149,7 @@
 </template>
 
 <script setup lang="ts">
+import { isSameDay } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
 import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
@@ -158,9 +159,10 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
+  learningplanId: number;
   title: string;
-  type: TaskType;
   status: TaskStatus;
+  type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
   events?: TaskEvent[];
   messages?: Message[];
@@ -170,8 +172,8 @@ interface TaskTeacherDrawerProps {
   hasSubmission?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
-  startDate?: Date | string;
-  endDate?: Date | string;
+  startDate?: Date | string | null;
+  endDate?: Date | string | null;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   editable: true,
@@ -185,6 +187,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   restrictions: '',
   goals: () => [],
   events: () => [],
+  type: undefined,
 });
 const description = toRef(props.description);
 const hasSubmission = toRef(props.hasSubmission);
@@ -215,7 +218,7 @@ const restrictionsValue = computed({
 }) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const currType = toRef<string>(props.type);
+const currType = toRef<string>(props.type || '');
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
@@ -239,18 +242,30 @@ const tabs = [
 ];
 
 // Events
-
-const taskEvents = computed(() => [
-  {
-    date: new Date().toISOString(),
-    events: props.events.map((event) => ({
-      user: 'user',
-      action: event.event as string,
-      time: event.createdAt.toString(),
-    })),
-  },
-]);
-
+const taskEvents = computed(() => orderToDateEvents(props.events));
+const orderToDateEvents = (events: TaskEvent[]) => {
+  const eventsGroups: { date: Date; events: any[] }[] = [];
+  events.forEach((current) => {
+    const currentDate = new Date(current.publishedAt);
+    const currentElement = {
+      user: 'test',
+      action: current.event,
+      time: current.publishedAt,
+    };
+    const group = eventsGroups.find((group) =>
+      isSameDay(currentDate, new Date(group.date)),
+    );
+    if (group) {
+      group.events.push(currentElement);
+      return;
+    }
+    eventsGroups.push({
+      date: currentDate,
+      events: [currentElement],
+    });
+  });
+  return eventsGroups;
+};
 // Close drawer
 function handleCloseModal() {
   model.value = false;
