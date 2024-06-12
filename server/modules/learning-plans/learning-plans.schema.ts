@@ -15,14 +15,14 @@ import { medias } from '../medias/medias.schema';
 import { tagsToLearningPlans } from '../tags/tags.schema';
 import { tasks } from '../tasks/tasks.schema';
 
-import { classes } from './classes.schema';
-import { invitationLinks } from './invitation-link.schema';
-import { learningGoals } from './learning-goals.schema';
-import { learningPlanGroups } from './learning-plan-groups.schema';
-import { learningPlanMedias } from './learning-plan-medias.schema';
-import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule.schema';
-import { learningPlanMembers } from './learning-plan-members.schema';
-import { learningPlanStructures } from './learning-plan-structures.schema';
+import { invitationLinks } from '../invitation-link/invitation-link.schema';
+import { learningGoals } from '../learning-goals/learning-goals.schema';
+import { learningPlanGroups } from '../learning-plan-groups/learning-plan-groups.schema';
+import { learningPlanMedias } from '../learning-plan-medias/learning-plan-medias.schema';
+import { learningPlanMeetingSchedule } from '../learning-plan-meetings/learning-plan-meeting-schedule.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
+import { learningPlanStructures } from '../learning-plan-structure/learning-plan-structures.schema';
+import { classes } from '../classes-folder/classes.schema';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 

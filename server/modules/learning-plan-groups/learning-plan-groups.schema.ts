@@ -2,9 +2,9 @@ import { relations } from 'drizzle-orm';
 import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { medias } from '../medias/medias.schema';
-import { classes } from './classes.schema';
-import { learningPlanGroupMembers } from './learning-plan-group-members.schema';
-import { learningPlans } from './learning-plans.schema';
+import { learningPlanGroupMembers } from '../learning-plan-group-members/learning-plan-group-members.schema';
+import { learningPlans } from '../learning-plans/learning-plans.schema';
+import { classes } from '../classes-folder/classes.schema';
 
 export const learningPlanGroups = pgTable('learning-plan-groups', {
   id: serial('id').primaryKey(),

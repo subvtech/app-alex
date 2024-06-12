@@ -7,8 +7,8 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { learningPlanGroups } from './learning-plan-groups.schema';
-import { learningPlanMembers } from './learning-plan-members.schema';
+import { learningPlanGroups } from '../learning-plan-groups/learning-plan-groups.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
 
 export const GroupMemberRoleEnum = pgEnum('role', ['standard', 'in_charge']);
 

@@ -10,15 +10,15 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { taskMembers } from '../tasks/task-members.schema';
-import { trailContributions } from '../trails/trail-contributions.schema';
+import { trailContributions } from '../trail-contributions/trail-contributions.schema';
 import { trails } from '../trails/trails.schema';
 import { users } from '../users/users.schema';
 
-import { classes } from './classes.schema';
-import { learningPlanEvents } from './learning-plan-events.schema';
-import { learningPlanGroupMembers } from './learning-plan-group-members.schema';
-import { learningPlanStructures } from './learning-plan-structures.schema';
-import { learningPlans } from './learning-plans.schema';
+import { classes } from '../classes-folder/classes.schema';
+import { learningPlanEvents } from '../learning-plan-events/learning-plan-events.schema';
+import { learningPlanGroupMembers } from '../learning-plan-group-members/learning-plan-group-members.schema';
+import { learningPlanStructures } from '../learning-plan-structure/learning-plan-structures.schema';
+import { learningPlans } from '../learning-plans/learning-plans.schema';
 
 export const roleEnum = pgEnum('role', [
   'student',

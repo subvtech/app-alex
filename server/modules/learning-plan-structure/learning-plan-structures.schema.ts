@@ -9,8 +9,8 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { trails } from '../trails/trails.schema';
-import { learningPlans } from './learning-plans.schema';
-import { learningPlanMembers } from './learning-plan-members.schema';
+import { learningPlans } from '../learning-plans/learning-plans.schema';
+import { learningPlanMembers } from './learning-plan-members/learning-plan-members.schema';
 
 export const structureTypeEnum = pgEnum('type', ['standard', 'student']);
 

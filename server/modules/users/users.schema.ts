@@ -3,8 +3,8 @@ import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { accounts } from '../accounts/accounts.schema';
 import { userToInstitution } from '../institutions/institutions.schema';
-import { learningGoalVerbs } from '../learning-plans/learning-goal-verbs.schema';
-import { learningPlanMembers } from '../learning-plans/learning-plan-members.schema';
+import { learningGoalVerbs } from '../learning-goal-verbs/learning-goal-verbs.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
 import { medias } from '../medias/medias.schema';
 import { tagsToUsers } from '../tags/tags.schema';
 

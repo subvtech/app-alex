@@ -8,8 +8,8 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { LPMembersToTrails } from '../learning-plans/learning-plan-members.schema';
-import { learningPlanStructures } from '../learning-plans/learning-plan-structures.schema';
+import { LPMembersToTrails } from '../learning-plans/learning-plan-members/learning-plan-members.schema';
+import { learningPlanStructures } from '../learning-plan-structure/learning-plan-structures.schema';
 import { medias } from '../medias/medias.schema';
 import { tasks } from '../tasks/tasks.schema';
 

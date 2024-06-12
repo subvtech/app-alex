@@ -11,7 +11,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { learningGoals } from '../learning-plans/learning-goals.schema';
+import { learningGoals } from '../learning-goals/learning-goals.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
 import { tags } from '../tags/tags.schema';
 import { trails } from '../trails/trails.schema';

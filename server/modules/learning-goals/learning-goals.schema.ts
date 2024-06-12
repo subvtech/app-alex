@@ -2,7 +2,7 @@ import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 import { tasksToLearningGoals } from '../tasks/tasks.schema';
-import { learningPlans } from './learning-plans.schema';
+import { learningPlans } from '../learning-plans/learning-plans.schema';
 import { learningGoalVerbs } from './learning-goal-verbs.schema';
 
 export const learningGoals = pgTable('learning-goal', {

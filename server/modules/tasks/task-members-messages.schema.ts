@@ -2,7 +2,7 @@ import { integer, pgTable, serial, timestamp, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 import { medias } from '../medias/medias.schema';
-import { learningPlanMembers } from '../learning-plans/learning-plan-members.schema';
+import { learningPlanMembers } from '../learning-plans/learning-plan-members/learning-plan-members.schema';
 
 import { taskMembers } from './task-members.schema';
 import { taskSubmissions } from './task-submissions.schema';
