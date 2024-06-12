@@ -4,7 +4,7 @@
       class="rounded-lg min-h-48 w-100 d-flex justify-center align-center"
       :class="dropArea ? 'drop-area' : 'empty-state'"
       @dragover.prevent="(e) => emits('dragOver', index, e)"
-      @dragleave="(e) => emits('dragLeave', index, e)"
+      @dragleave="(e) => emits('dragLeave', e)"
     >
       <v-fade-transition>
         <div v-if="!dropArea">

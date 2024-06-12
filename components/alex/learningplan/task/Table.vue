@@ -3,129 +3,137 @@
     sort-asc-icon="mdi-arrow-up-thin"
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
-    :class="over != -1 && tableSortBy.length ? 'table-drop' : ''"
+    :class="
+      over != -1 && (tableSortBy.length || activeFilter) ? 'table-drop' : ''
+    "
     :items="tasksArray"
     :headers="header"
-    :search="filter"
+    :search="searchFilter"
     hide-default-header
     @dragleave="(e) => emit('dragLeave', e)"
     @update:sort-by="(e) => (tableSortBy = e)"
   >
-    <template #item="{ item, columns }">
+    <template #body="{ items, columns }">
       <transition-group :name="transitionName">
         <tr
-          v-if="item.id !== -1"
+          v-for="item in items"
+          :key="item.id"
           :draggable="!isArchived"
           class="text-5 text-no-wrap staggered-fade-item table-row"
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
             dragging && dragFrom == item.id ? 'dragging' : '',
+            previewRow(item.id) ? 'row-drop' : '',
           ]"
           @dragstart="(e) => setDragStart(item, e)"
           @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
-          @dragend="emit('dragEnd', item)"
+          @dragend="emit('dragEnd', item, tableSortBy[0].key)"
         >
-          <td
-            class="text-body-4 text-overflow text-left"
-            :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
-          >
-            {{ item.title }}
-          </td>
-          <td>
-            <alex-learningplan-task-date-chip
-              v-if="item.deadline_at"
-              :date="item.deadline_at"
-              :is-published="item.status === 'published' && !isArchived"
-            />
-            <span v-else>{{
-              $t('pages.task.table.placeholders.undefined')
-            }}</span>
-          </td>
-          <td>
-            <div v-if="item.type">
-              <v-icon
-                class="mr-1"
-                :icon="
-                  item.type === 'group'
-                    ? 'mdi-account-multiple-outline'
-                    : 'mdi-account-outline'
-                "
+          <template v-if="!previewRow(item.id)">
+            <td
+              class="text-body-4 text-overflow text-left"
+              :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
+            >
+              {{ item.title }}
+            </td>
+            <td>
+              <alex-learningplan-task-date-chip
+                v-if="item.deadline_at"
+                :date="item.deadline_at"
+                :is-published="item.status === 'published' && !isArchived"
               />
-              <span>{{
-                item.type === 'group'
-                  ? $t('pages.task.table.type.group')
-                  : $t('pages.task.table.type.individual')
+              <span v-else>{{
+                $t('pages.task.table.placeholders.undefined')
               }}</span>
-            </div>
-            <span v-else>{{
-              $t('pages.task.table.placeholders.undefined')
-            }}</span>
-          </td>
-          <td>
-            <div
-              v-if="item.students?.length"
-              class="ml-2"
-              :class="{ 'gray-filter': isArchived }"
-            >
-              <alex-custom-avatar-group
-                :avatar-items="item.students || []"
-                :max="3"
-              />
-            </div>
-            <span v-else>{{
-              $t('pages.task.table.placeholders.noMembers')
-            }}</span>
-          </td>
-          <td>
-            <alex-learningplan-task-submissions
-              v-if="item.delivered"
-              :submitted="item.delivered"
-            />
-            <div v-else>
-              <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
-              <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
-            </div>
-          </td>
-          <td>
-            <v-tooltip
-              :text="t('pages.task.table.tooltips.kanban')"
-              location="bottom center"
-            >
-              <template #activator="{ props }">
-                <alex-custom-button
-                  v-bind="props"
-                  icon="alex:Kanban"
-                  variant="text"
+            </td>
+            <td>
+              <div v-if="item.type">
+                <v-icon
+                  class="mr-1"
+                  :icon="
+                    item.type === 'group'
+                      ? 'mdi-account-multiple-outline'
+                      : 'mdi-account-outline'
+                  "
                 />
-              </template>
-            </v-tooltip>
-            <alex-custom-dropdown
-              :items="dropDownItems(item)"
-              variant="text"
-              prepend-icon="mdi-dots-vertical"
-            >
-              <template #activator="{ props: propsMenu }">
-                <v-tooltip
-                  :text="t('pages.task.table.tooltips.options')"
-                  location="bottom center"
-                >
-                  <template #activator="{ props: optionsTooltipProps }">
-                    <alex-custom-button
-                      variant="text"
-                      v-bind="{ ...propsMenu, ...optionsTooltipProps }"
-                      icon="mdi-dots-vertical"
-                    />
-                  </template>
-                </v-tooltip>
-              </template>
-            </alex-custom-dropdown>
-          </td>
-        </tr>
-
-        <tr v-else class="row-drop row-preview">
-          <td :colspan="columns.length"></td>
+                <span>{{
+                  item.type === 'group'
+                    ? $t('pages.task.table.type.group')
+                    : $t('pages.task.table.type.individual')
+                }}</span>
+              </div>
+              <span v-else>{{
+                $t('pages.task.table.placeholders.undefined')
+              }}</span>
+            </td>
+            <td>
+              <div
+                v-if="item.students?.length"
+                class="ml-2"
+                :class="{ 'gray-filter': isArchived }"
+              >
+                <alex-custom-avatar-group
+                  :avatar-items="item.students || []"
+                  :max="3"
+                />
+              </div>
+              <span v-else>{{
+                $t('pages.task.table.placeholders.noMembers')
+              }}</span>
+            </td>
+            <td>
+              <alex-learningplan-task-submissions
+                v-if="item.delivered"
+                :submitted="item.delivered"
+              />
+              <div v-else>
+                <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
+                <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
+              </div>
+            </td>
+            <td>
+              <v-tooltip
+                :text="t('pages.task.table.tooltips.kanban')"
+                location="bottom center"
+              >
+                <template #activator="{ props }">
+                  <alex-custom-button
+                    v-bind="props"
+                    icon="alex:Kanban"
+                    variant="text"
+                  />
+                </template>
+              </v-tooltip>
+              <alex-custom-dropdown
+                :items="dropDownItems(item)"
+                variant="text"
+                prepend-icon="mdi-dots-vertical"
+              >
+                <template #activator="{ props: propsMenu }">
+                  <v-tooltip
+                    :text="t('pages.task.table.tooltips.options')"
+                    location="bottom center"
+                  >
+                    <template #activator="{ props: optionsTooltipProps }">
+                      <alex-custom-button
+                        variant="text"
+                        v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                        icon="mdi-dots-vertical"
+                      />
+                    </template>
+                  </v-tooltip>
+                </template>
+              </alex-custom-dropdown>
+            </td>
+          </template>
+          <td v-else :colspan="columns.length"></td>
         </tr>
       </transition-group>
+      <tr v-if="!items.length">
+        <td :colspan="columns.length" class="text-center">
+          {{ $t('pages.task.table.placeholders.noTasks') }}
+        </td>
+      </tr>
     </template>
     <template #bottom></template>
   </v-data-table>
@@ -145,9 +153,16 @@
 
 <script setup lang="ts">
 import { TaskType } from './Container.vue';
+
+interface sortType {
+  key: string;
+  order: string;
+}
+
 const props = defineProps<{
   tasks: TaskType[];
-  filter: string;
+  search: string;
+  activeFilter: boolean;
   group: string;
   dragging: boolean;
   over: number;
@@ -158,9 +173,9 @@ const { t } = useI18n();
 const isArchived = computed(() => props.group === 'archived');
 const typing = ref(false);
 
-const filter = computed(() => props.filter);
+const searchFilter = computed(() => props.search);
 
-watch(filter, () => {
+watch(searchFilter, () => {
   typing.value = true;
   setTimeout(() => {
     typing.value = false;
@@ -180,14 +195,15 @@ const emit = defineEmits([
   'dragLeave',
 ]);
 
-const tableSortBy = ref<string[]>([]);
+const tableSortBy = ref<sortType[]>([]);
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
 const tasksArray = computed(() => {
   const array = [...props.tasks];
   const index = array.findIndex((task) => task.id === props.over);
   const oldIndex = array.findIndex((task) => task.id === -1);
-  if (oldIndex === props.over || tableSortBy.value.length) return array;
+  if (oldIndex === props.over || tableSortBy.value.length || props.activeFilter)
+    return array;
   if (oldIndex !== -1) {
     array.splice(oldIndex, 1);
   }
@@ -314,23 +330,23 @@ const getDropDownAction = (action: string, id: number) => {
 
 const header = [
   {
-    title: t('pages.task.table.header.name'),
+    title: t('pages.task.table.header.title'),
     key: 'title',
     sortable: true,
     width: 680,
   },
   {
-    title: t('pages.task.table.header.deadline'),
+    title: t('pages.task.table.header.deadline_at'),
     key: 'deadline_at',
     width: 140,
   },
   { title: t('pages.task.table.header.type'), key: 'type' },
   {
-    title: t('pages.task.table.header.members'),
+    title: t('pages.task.table.header.students'),
     key: 'students',
   },
   {
-    title: t('pages.task.table.header.delivery'),
+    title: t('pages.task.table.header.delivered'),
     key: 'delivered',
   },
   { title: '', key: 'actions', sortable: false },
@@ -354,13 +370,20 @@ const setAcceptedGroups = (task: TaskType) => {
 };
 
 const setDragStart = (task: TaskType, e: DragEvent) => {
+  if (previewRow(task.id)) return;
   const acceptedGroups = setAcceptedGroups(task);
   if (!isArchived.value) emit('startDrag', task.id, e, acceptedGroups);
 };
 
 const setDragOver = (id: number, position: number, e: DragEvent) => {
-  const newIndex = tableSortBy.value.length ? -1 : position;
+  if (previewRow(id)) return;
+  const newIndex =
+    tableSortBy.value.length || props.activeFilter ? -1 : position;
   if (!isArchived.value) emit('dragOver', props.group, id, newIndex, e);
+};
+
+const previewRow = (id: number) => {
+  return id === -1;
 };
 </script>
 
@@ -378,7 +401,9 @@ const setDragOver = (id: number, position: number, e: DragEvent) => {
 
 .table-drop,
 .row-drop {
-  border: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
+  border: 1px dashed rgb(var(--v-theme-gray-400)) !important;
+  z-index: 2 !important;
+  border-radius: 8px !important;
 }
 
 .dragging {
@@ -401,6 +426,15 @@ const setDragOver = (id: number, position: number, e: DragEvent) => {
 .list-leave-active {
   transition: all 0.5s ease;
 }
+
+.list-move {
+  transition: all 0.25s ease;
+}
+
+.list-leave-active {
+  opacity: 0;
+}
+
 .list-leave-to {
   opacity: 0;
   transform: translateX(30px);
@@ -414,12 +448,6 @@ const setDragOver = (id: number, position: number, e: DragEvent) => {
 .staggered-fade-item {
   transition-timing-function: cubic-bezier(0.57, 0.06, 0, 1.06);
   transition-duration: 500ms;
-  transition-property: opacity, transform;
-}
-
-.row-drop {
-  transition-timing-function: cubic-bezier(0.57, 0.06, 0, 1.06);
-  transition-duration: 1200ms;
   transition-property: opacity, transform;
 }
 

@@ -36,6 +36,9 @@ export function useMultipleDragDrop() {
   ) => {
     if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
       if (dragFrom.value !== id) over.value = { list, id, index };
+      else {
+        onDragLeave(e);
+      }
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
     } else if (e.dataTransfer) {
       e.dataTransfer.dropEffect = 'none';

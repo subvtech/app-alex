@@ -36,7 +36,8 @@
                   key="table"
                   :index="i"
                   :tasks="tasksArray[i - 1]"
-                  :filter="search"
+                  :search="search"
+                  :active-filter="isFilterActive"
                   :is-archived="i === 4"
                   :group="groups[i - 1]"
                   :over="setOver(i - 1)"
@@ -142,6 +143,10 @@ groupsArray.forEach((group, index) => {
 
 const searchField = computed(() => props.search.toLowerCase());
 const tasksFilter = computed(() => props.filter);
+const isFilterActive = computed(() => {
+  if (tasksFilter.value) return Object.keys(tasksFilter.value).length !== 0;
+  return false;
+});
 
 const shouldDisplay = (i: number) => {
   const { archivedTasks } = tasksFilter.value || {};
@@ -389,19 +394,21 @@ const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
   tasksArray.value[groupIndex] = cloneArray;
 };
 
-const onDrop = async (item: TaskType) => {
+const onDrop = async (item: TaskType, tableSort: string) => {
   if (over.value.list) {
     const task = learningPlanStore.learningPlan?.tasks.find(
       (t) => t.id === item.id,
     );
-    if (task.status === over.value.list && over.value.index === -1) {
-      setMessage(
-        t(
-          'Não é possível alterar a posição da tarefa quando a ordenação por prazo está ativa',
-        ),
-        'warning',
-        true,
-      );
+    if (
+      task.status === over.value.list &&
+      (over.value.index === -1 || isFilterActive.value)
+    ) {
+      const message = isFilterActive.value
+        ? t('pages.task.crud.dndFilterError')
+        : t('pages.task.crud.dndSortError', {
+            type: t(`pages.task.table.header.${tableSort}`).toLowerCase(),
+          });
+      setMessage(message, 'warning', true, false, true);
     } else if (task) {
       try {
         if (over.value.index === -1) {
