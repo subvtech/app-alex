@@ -61,14 +61,14 @@ const { t } = useI18n();
 
 const header = [
   {
-    title: t('pages.task.table.header.name'),
+    title: t('pages.task.table.header.title'),
     key: 'name',
     sortable: false,
     width: '680',
     minWidth: '150',
   },
   {
-    title: t('pages.task.table.header.deadline'),
+    title: t('pages.task.table.header.deadline_at'),
     key: 'deadline',
     sortable: false,
     width: '170',
@@ -81,13 +81,13 @@ const header = [
     minWidth: '100',
   },
   {
-    title: t('pages.task.table.header.members'),
+    title: t('pages.task.table.header.students'),
     key: 'students',
     sortable: false,
     minWidth: '150',
   },
   {
-    title: t('pages.task.table.header.delivery'),
+    title: t('pages.task.table.header.delivered'),
     key: 'delivered',
     minWidth: '120',
   },
