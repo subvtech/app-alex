@@ -114,7 +114,7 @@ export const tasksToLearningGoalsRelations = relations(
       fields: [tasksToLearningGoals.taskId],
       references: [tasks.id],
     }),
-    learningGoal: one(tasksToLearningGoals, {
+    learningGoal: one(learningGoals, {
       fields: [tasksToLearningGoals.learningGoalId],
       references: [learningGoals.id],
     }),

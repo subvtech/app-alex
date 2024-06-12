@@ -6,7 +6,7 @@ import { userToInstitution } from '../institutions/institutions.schema';
 import { learningGoalVerbs } from '../learning-plans/learning-goal-verbs.schema';
 import { learningPlanMembers } from '../learning-plans/learning-plan-members.schema';
 import { medias } from '../medias/medias.schema';
-import { tags } from '../tags/tags.schema';
+import { tagsToUsers } from '../tags/tags.schema';
 
 export const users = pgTable('users', {
   id: text('id')
@@ -27,7 +27,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
   learningPlanMembers: many(learningPlanMembers),
   learningGoalVerb: one(learningGoalVerbs),
-  tags: many(tags),
+  tags: many(tagsToUsers),
   institutions: many(userToInstitution),
   avatarId: one(medias, {
     fields: [users.avatarId],

@@ -26,8 +26,8 @@ export const tags = pgTable('tags', {
 });
 
 export const tagsRelations = relations(tags, ({ many }) => ({
-  tagsToLearningPlans: many(learningPlans),
-  tagsToUsers: many(users),
+  tagsToLearningPlans: many(tagsToLearningPlans),
+  tagsToUsers: many(tagsToUsers),
 }));
 
 export const tagsToLearningPlans = pgTable(

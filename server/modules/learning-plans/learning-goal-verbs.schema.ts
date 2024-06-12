@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { boolean, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
 import { users } from '../users/users.schema';
 import { learningGoals } from './learning-goals.schema';
@@ -7,6 +7,7 @@ import { learningGoals } from './learning-goals.schema';
 export const learningGoalVerbs = pgTable('learning-goal-verbs', {
   id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
+  learningGoalId: integer('learning_goal_id'),
   general: boolean('general').default(true),
 });
 
@@ -17,6 +18,9 @@ export const learningGoalVerbRelations = relations(
       fields: [learningGoalVerbs.userId],
       references: [users.id],
     }),
-    learningGoal: one(learningGoals),
+    learningGoal: one(learningGoals, {
+      fields: [learningGoalVerbs.learningGoalId],
+      references: [learningGoals.id],
+    }),
   }),
 );

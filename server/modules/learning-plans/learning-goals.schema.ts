@@ -11,6 +11,9 @@ export const learningGoals = pgTable('learning-goal', {
   learningPlanId: integer('learning_plan_id').references(
     () => learningPlans.id,
   ),
+  learningGoalVerbId: integer('learning_goal_verb_id').references(
+    () => learningGoalVerbs.id,
+  ),
   description: text('description'),
 });
 
@@ -22,6 +25,9 @@ export const learningGoalRelations = relations(
       fields: [learningGoals.learningPlanId],
       references: [learningPlans.id],
     }),
-    learningGoalVerb: one(learningGoalVerbs),
+    learningGoalVerb: one(learningGoalVerbs, {
+      fields: [learningGoals.learningGoalVerbId],
+      references: [learningGoalVerbs.id],
+    }),
   }),
 );

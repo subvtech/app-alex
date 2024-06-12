@@ -12,7 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { medias } from '../medias/medias.schema';
-import { tags } from '../tags/tags.schema';
+import { tagsToLearningPlans } from '../tags/tags.schema';
 import { tasks } from '../tasks/tasks.schema';
 
 import { classes } from './classes.schema';
@@ -63,7 +63,7 @@ export const learningPlansRelations = relations(
     }),
     learningStructures: many(learningPlanStructures),
     medias: many(learningPlanMedias),
-    tags: many(tags),
+    tags: many(tagsToLearningPlans),
     learningGoals: many(learningGoals),
   }),
 );
