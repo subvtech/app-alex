@@ -79,7 +79,7 @@
                 {{
                   startAt
                     ? formatDate(startAt)
-                    : `(${$t('components.courses.tasks.noDate')})`
+                    : $t('components.courses.tasks.noDate')
                 }}
               </p>
             </v-col>

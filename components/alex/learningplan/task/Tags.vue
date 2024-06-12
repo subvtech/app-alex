@@ -57,6 +57,7 @@ const props = withDefaults(defineProps<CompProps>(), {
 });
 const open = ref<boolean>(false);
 const tags = defineModel<TagSimple[]>({ default: [] });
+
 const handleRemoveTag = (tag: TagSimple) => {
   tags.value = tags.value.filter((tagValue) => tagValue.text !== tag.text);
 };
