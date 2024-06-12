@@ -12,10 +12,10 @@
 
     <!-- Opções -->
 
-    <v-list class="list pt-1" :selectable="false" :activable="false">
+    <v-list class="list py-0 relative" :selectable="false" :activable="false">
       <alex-inputs-text-field
         v-model="search"
-        class="px-4 py-2"
+        class="px-4 py-2 sticky top-0 left-0 bg-white z-10"
         name="member"
         autofocus
         :placeholder="$t('components.learningPlan.members.invite.search')"
@@ -39,7 +39,6 @@
       >
         Parece que não tem nada por aqui!
       </p>
-
       <v-list-item
         v-for="(studentClass, index) in filteredClasses"
         :key="index"
@@ -66,7 +65,6 @@
           </div></v-list-item-title
         >
       </v-list-item>
-
       <!-- Alunos -->
       <div v-for="(studentClass, index) in filteredClassMembers" :key="index">
         <p
@@ -89,13 +87,18 @@
           >
             <v-list-item-title
               ><div class="d-flex align-center ga-4">
-                <v-img
-                  class="avatar flex-0-0 rounded-circle"
-                  :src="student.user?.avatar?.url || ''"
+                <v-avatar
+                  :size="40"
+                  :image="student.user?.avatar?.url"
                   :alt="$t('components.learningPlan.members.class')"
-                  aspect-ratio="1"
-                  cover
-                />
+                  color="gray-100"
+                >
+                  <template v-if="!student.user?.avatar?.url" #default>
+                    <p class="text-gray-300 text-body-2">
+                      {{ getInitials(student.user.fullname) }}
+                    </p>
+                  </template>
+                </v-avatar>
                 <div>
                   <p class="text-body-4 text-gray-900 lines-1 ellipsis">
                     {{
