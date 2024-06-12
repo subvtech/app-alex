@@ -27,7 +27,7 @@
           ]"
           @dragstart="(e) => setDragStart(item, e)"
           @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
-          @dragend="emit('dragEnd', item, tableSortBy[0].key)"
+          @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
         >
           <template v-if="!previewRow(item.id)">
             <td
@@ -182,9 +182,10 @@ watch(searchFilter, () => {
   }, 1000);
 });
 
-const transitionName = computed(() =>
-  typing.value ? 'staggered-fade' : 'list',
-);
+const transitionName = computed(() => {
+  if (props.dragging) return 'dnd-list';
+  return typing.value ? 'staggered-fade' : 'list';
+});
 const emit = defineEmits([
   'deleteTask',
   'moveTask',
@@ -376,7 +377,10 @@ const setDragStart = (task: TaskType, e: DragEvent) => {
 };
 
 const setDragOver = (id: number, position: number, e: DragEvent) => {
-  if (previewRow(id)) return;
+  if (previewRow(id)) {
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    return;
+  }
   const newIndex =
     tableSortBy.value.length || props.activeFilter ? -1 : position;
   if (!isArchived.value) emit('dragOver', props.group, id, newIndex, e);
@@ -398,12 +402,14 @@ const previewRow = (id: number) => {
   cursor: pointer;
   background-color: #fff;
 }
+/* ..row-drop, */
+.table-drop {
+  outline: 1.5px dashed rgb(var(--v-theme-gray-400));
+}
 
-.table-drop,
-.row-drop {
-  border: 1px dashed rgb(var(--v-theme-gray-400)) !important;
-  z-index: 2 !important;
-  border-radius: 8px !important;
+:global(.table table) {
+  position: relative !important;
+  overflow: hidden !important;
 }
 
 .dragging {
@@ -421,18 +427,9 @@ const previewRow = (id: number) => {
   filter: grayscale(1);
 }
 
-.list-move,
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s ease;
-}
-
-.list-move {
-  transition: all 0.25s ease;
-}
-
-.list-leave-active {
-  opacity: 0;
 }
 
 .list-leave-to {
@@ -455,5 +452,28 @@ const previewRow = (id: number) => {
 .staggered-fade-leave-to {
   opacity: 0;
   transform: translateY(-30px);
+}
+
+.dnd-list-enter-active,
+.dnd-list-leave-active,
+.dnd-list-move {
+  transition: all 0.25s ease;
+}
+
+.dnd-list-enter-from,
+.dnd-list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.dnd-list-leave-active,
+.list-leave-active {
+  position: absolute;
+  width: 80%;
+  opacity: 0;
+}
+
+.list-enter-from {
+  opacity: 0;
 }
 </style>

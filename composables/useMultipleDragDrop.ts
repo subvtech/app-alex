@@ -36,7 +36,6 @@ export function useMultipleDragDrop() {
     e: DragEvent,
   ) => {
     clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
-
     const handleDragOver = () => {
       if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
         if (dragFrom.value !== id) over.value = { list, id, index };
@@ -50,7 +49,7 @@ export function useMultipleDragDrop() {
     };
 
     if (over.value.id === -1) {
-      dragoverTimeout.value = setTimeout(handleDragOver, 200);
+      dragoverTimeout.value = setTimeout(handleDragOver, 150);
     } else {
       handleDragOver();
     }
