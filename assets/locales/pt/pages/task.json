@@ -24,11 +24,11 @@
   },
   "table": {
     "header": {
-      "name": "Nome",
-      "deadline": "Prazo",
+      "title": "Nome",
+      "deadline_at": "Prazo",
       "type": "Tipo",
-      "members": "Integrantes",
-      "delivery": "Entrega"
+      "students": "Integrantes",
+      "delivered": "Entrega"
     },
     "type": {
       "individual": "Individual",
@@ -66,9 +66,11 @@
     "editError": "editar",
     "deleteError": "excluir",
     "moveSuccess": "movida",
-    "moveError": "mover",
+    "moveError": "Ocorreu um erro ao mover a tarefa, tente novamente!",
     "errorMessage": "Erro ao {action} tarefa, tente novamente!",
-    "successMessage": "Tarefa {action} com sucesso!"
+    "successMessage": "Tarefa {action} com sucesso!",
+    "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
+    "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem estiver ativa"
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",
