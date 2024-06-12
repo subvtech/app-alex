@@ -38,7 +38,6 @@
                   :tasks="tasksArray[i - 1]"
                   :search="search"
                   :active-filter="isFilterActive"
-                  :is-archived="i === 4"
                   :group="groups[i - 1]"
                   :over="setOver(i - 1)"
                   :drag-from="dragFrom"

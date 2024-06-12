@@ -27,9 +27,9 @@
             dragging && dragFrom == item.id ? 'dragging' : '',
             previewRow(item.id) ? 'row-drop' : '',
           ]"
+          @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
           @dragstart="(e) => setDragStart(item, e)"
           @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
-          @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
         >
           <template v-if="!previewRow(item.id)">
             <td
