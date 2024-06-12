@@ -350,9 +350,10 @@ const {
   onDragOver,
   onDragLeave,
 } = useMultipleDragDrop();
+
 const setOver = (groupIndex: number) => {
-  if (over.value.list === groups[groupIndex]) return over.value.id;
-  return -1;
+  if (over.value.list === groups[groupIndex]) return over.value;
+  return { ...over.value, id: -1 };
 };
 
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
@@ -361,9 +362,7 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
 
 const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
   const groupIndex = groups[tasksStatus];
-  const targeIndex = tasksArray.value[groupIndex].findIndex(
-    (t) => t.id === over.value.id,
-  );
+
   const cloneArray = JSON.parse(JSON.stringify(tasksArray.value[groupIndex]));
 
   const task = learningPlanStore.learningPlan?.tasks.find(
@@ -375,11 +374,9 @@ const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
     cloneArray.splice(removeIndex, 1);
   }
 
-  if (targeIndex + 1 === tasksArray.value[groupIndex].length) {
-    cloneArray.push(item);
-  } else {
-    cloneArray.splice(targeIndex, 0, item);
-  }
+  let targeIndex = cloneArray.findIndex((t) => t.id === over.value.id);
+  targeIndex = over.value.position === 'top' ? targeIndex : targeIndex + 1;
+  cloneArray.splice(targeIndex, 0, item);
 
   task.status = tasksStatus;
   item.status = tasksStatus;

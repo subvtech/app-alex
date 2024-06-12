@@ -2,6 +2,7 @@ interface dragItemType {
   list: string;
   id: number;
   index: number;
+  position?: 'top' | 'bottom';
 }
 
 export function useMultipleDragDrop() {
@@ -36,24 +37,32 @@ export function useMultipleDragDrop() {
     e: DragEvent,
   ) => {
     clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
+
     const handleDragOver = () => {
-      if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
-        if (dragFrom.value !== id) over.value = { list, id, index };
-        else {
-          onDragLeave(e);
-        }
-        if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-      } else if (e.dataTransfer) {
-        e.dataTransfer.dropEffect = 'none';
+      if (dragFrom.value !== id) over.value = { list, id, index, position };
+      else {
+        onDragLeave(e);
       }
     };
 
-    if (over.value.id === -1) {
-      dragoverTimeout.value = setTimeout(handleDragOver, 150);
-    } else {
-      handleDragOver();
+    let position;
+    if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      const rect = (e.target as HTMLElement).getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+      if (e.clientY < midpoint) position = 'top';
+      else position = 'bottom';
+      if (over.value.id === id && over.value.position === position) {
+        return;
+      }
+      if (over.value.id === -1) {
+        dragoverTimeout.value = setTimeout(handleDragOver, 0);
+      } else {
+        handleDragOver();
+      }
+    } else if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'none';
     }
-
     e.preventDefault();
   };
 
@@ -69,8 +78,9 @@ export function useMultipleDragDrop() {
       !event.relatedTarget || (event.clientX === 0 && event.clientY === 0);
 
     if (mouseIsOutSideViewport) {
-      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
       over.value = { list: '', id: -1, index: -1 };
+
+      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
       return true;
     }
 
@@ -80,8 +90,8 @@ export function useMultipleDragDrop() {
     const mouseIsOutSideCurrentTarget = !(withinX && withinY);
 
     if (mouseIsOutSideCurrentTarget) {
-      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
       over.value = { list: '', id: -1, index: -1 };
+      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
     }
 
     return mouseIsOutSideCurrentTarget;

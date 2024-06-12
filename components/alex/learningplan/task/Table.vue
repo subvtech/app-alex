@@ -4,7 +4,9 @@
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
     :class="
-      over != -1 && (tableSortBy.length || activeFilter) ? 'table-drop' : ''
+      over.list === group && (tableSortBy.length || activeFilter)
+        ? 'table-drop'
+        : ''
     "
     :items="tasksArray"
     :headers="header"
@@ -19,7 +21,7 @@
           v-for="item in items"
           :key="item.id"
           :draggable="!isArchived"
-          class="text-5 text-no-wrap staggered-fade-item table-row"
+          class="text-5 text-no-wrap staggered-fade-item table-row bg-white"
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
             dragging && dragFrom == item.id ? 'dragging' : '',
@@ -126,7 +128,7 @@
               </alex-custom-dropdown>
             </td>
           </template>
-          <td v-else :colspan="columns.length"></td>
+          <td v-else :colspan="columns.length" class="preview-row"></td>
         </tr>
       </transition-group>
       <tr v-if="!items.length">
@@ -165,7 +167,12 @@ const props = defineProps<{
   activeFilter: boolean;
   group: string;
   dragging: boolean;
-  over: number;
+  over: {
+    id: number;
+    index?: number;
+    position?: 'top' | 'bottom';
+    list?: string;
+  };
   dragFrom: number;
 }>();
 
@@ -201,9 +208,13 @@ const deleteModal = ref(false);
 const taskToDelete = ref(-1);
 const tasksArray = computed(() => {
   const array = [...props.tasks];
-  const index = array.findIndex((task) => task.id === props.over);
+  const index = array.findIndex((task) => task.id === props.over.id);
   const oldIndex = array.findIndex((task) => task.id === -1);
-  if (oldIndex === props.over || tableSortBy.value.length || props.activeFilter)
+  if (
+    oldIndex === props.over.id ||
+    tableSortBy.value.length ||
+    props.activeFilter
+  )
     return array;
   if (oldIndex !== -1) {
     array.splice(oldIndex, 1);
@@ -221,11 +232,9 @@ const tasksArray = computed(() => {
     },
   };
   if (index !== -1) {
-    if (index + 1 === array.length) {
-      array.push(item);
-    } else {
-      array.splice(index, 0, item);
-    }
+    props.over.position === 'top'
+      ? array.splice(index, 0, item)
+      : array.splice(index + 1, 0, item);
   }
   return array;
 });
@@ -373,7 +382,11 @@ const setAcceptedGroups = (task: TaskType) => {
 const setDragStart = (task: TaskType, e: DragEvent) => {
   if (previewRow(task.id)) return;
   const acceptedGroups = setAcceptedGroups(task);
-  if (!isArchived.value) emit('startDrag', task.id, e, acceptedGroups);
+  if (!isArchived.value) {
+    setTimeout(() => {
+      emit('startDrag', task.id, e, acceptedGroups);
+    }, 0);
+  }
 };
 
 const setDragOver = (id: number, position: number, e: DragEvent) => {
@@ -401,10 +414,15 @@ const previewRow = (id: number) => {
 .table-row {
   cursor: pointer;
   background-color: #fff;
+  opacity: 0.99;
 }
-/* ..row-drop, */
-.table-drop {
+
+/*  .row-drop, {
   outline: 1.5px dashed rgb(var(--v-theme-gray-400));
+} */
+
+.table-drop {
+  border: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
 }
 
 :global(.table table) {
@@ -413,7 +431,7 @@ const previewRow = (id: number) => {
 }
 
 .dragging {
-  background-color: rgb(var(--v-theme-gray-blue));
+  background-color: rgb(var(--v-theme-gray-blue)) !important;
   & td {
     opacity: 0 !important;
   }
@@ -457,13 +475,7 @@ const previewRow = (id: number) => {
 .dnd-list-enter-active,
 .dnd-list-leave-active,
 .dnd-list-move {
-  transition: all 0.25s ease;
-}
-
-.dnd-list-enter-from,
-.dnd-list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
+  transition: all 0.125s linear;
 }
 
 .dnd-list-leave-active,
