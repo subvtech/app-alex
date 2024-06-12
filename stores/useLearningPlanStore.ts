@@ -53,6 +53,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     members: {
       populate: ['user.avatar', 'user.cover'],
     },
+    tasks: {
+      populate: ['blocks', 'trail', 'task_members.student_member.user.avatar'],
+    },
   };
 
   async function loadLearningPlan(id: number, showMessageIfNotFound = true) {
