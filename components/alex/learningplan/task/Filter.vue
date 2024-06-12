@@ -116,8 +116,8 @@ const { t } = useI18n();
 
 interface Filter {
   modelValue: boolean;
-  classes: Array<string>;
-  kanbanFilter: boolean;
+  classes?: Array<string>;
+  kanbanFilter?: boolean;
 }
 
 const props = withDefaults(defineProps<Filter>(), {

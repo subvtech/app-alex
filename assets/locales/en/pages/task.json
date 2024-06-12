@@ -24,11 +24,11 @@
   },
   "table": {
     "header": {
-      "name": "Name",
-      "deadline": "Deadline",
+      "title": "Name",
+      "deadline_at": "Deadline",
       "type": "Type",
-      "members": "Members",
-      "delivery": "Delivery"
+      "students": "Members",
+      "delivered": "Delivery"
     },
     "type": {
       "individual": "Individual",
@@ -67,7 +67,9 @@
       "moveSuccess": "moved",
       "moveError": "move",
       "errorMessage": "Error while trying to {action} task, please try again!",
-      "successMessage": "Task {action} successfully!"
+      "successMessage": "Task {action} successfully!",
+      "dndSortError": "It is not possible to change the task position when sorting by {type} is active",
+      "dndFilterError": "It is not possible to change the task position when filtering is active"
     },
     "deleteModal": {
       "title": "Do you really want to delete this Task?",
