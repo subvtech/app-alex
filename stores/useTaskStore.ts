@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import { Task } from '@/models/simple/taskSimple.model';
 export const useTaskStore = defineStore('task', () => {
-  const { findOne } = useStrapiUtils();
+  const { find } = useStrapiUtils();
   const task = ref<Task>();
   const loading = ref(false);
   const { setMessage } = useMessageStore();
+  const i18n = useI18n();
 
   const populate = {
     task_members: {
@@ -22,15 +23,31 @@ export const useTaskStore = defineStore('task', () => {
     },
   };
 
-  async function loadTaskData(id: number, showMessageIfNotFound = true) {
+  async function loadTaskData(
+    id: number,
+    learningplanID: number,
+    showMessageIfNotFound = true,
+  ) {
     try {
       loading.value = true;
-      const response = await findOne<Task>('tasks', id, { populate });
-      task.value = response.data;
+      const response = await find<Task>('tasks', {
+        populate,
+        filters: {
+          id,
+          learningplan: learningplanID,
+        },
+      });
+      if (!response.data.length) {
+        throw new Error('NotFoundError');
+      }
+      task.value = response.data[0];
       return response;
     } catch (e: any) {
-      const i18n = useI18n();
-      if (e?.error.name === 'NotFoundError' && showMessageIfNotFound) {
+      if (
+        (e?.error?.name === 'NotFoundError' ||
+          e?.message === 'NotFoundError') &&
+        showMessageIfNotFound
+      ) {
         setMessage(i18n.t('pages.tasks.notFound'), 'red', true);
       }
     } finally {

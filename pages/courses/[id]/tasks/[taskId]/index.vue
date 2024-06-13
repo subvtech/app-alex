@@ -104,10 +104,13 @@ const tags = computed(() => {
 });
 onBeforeMount(() => {
   headerStore.showHeader = true;
-  if (!route.params.id && !taskId.value) {
-    return;
+  if (!route.params.id || !taskId.value) {
+    return navigateTo(`/courses/`);
   }
-  taskStore.loadTaskData(taskId.value, true);
+  if (!Number.isInteger(Number(route.params.id))) {
+    return navigateTo(`/courses/${route.params.id}`);
+  }
+  taskStore.loadTaskData(taskId.value, Number(route.params.id));
 });
 
 watch(
@@ -137,6 +140,9 @@ watch(
           disabled: false,
         },
       ];
+    }
+    if (!taskStore.task && !taskStore.loading) {
+      navigateTo(`/courses/${route.params.id}/tasks`);
     }
   },
 );
