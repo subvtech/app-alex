@@ -69,13 +69,9 @@
 <script setup lang="ts">
 interface CompProps {
   edit?: boolean;
-  availableGoals?: LearningPlanGoalSimple[];
 }
 
-const props = withDefaults(defineProps<CompProps>(), {
-  availableGoals: () => [],
-});
-
+const props = defineProps<CompProps>();
 const selectedGoals = defineModel<LearningPlanGoalSimple[]>({ default: [] });
 
 const open = ref<boolean>(false);
@@ -93,7 +89,7 @@ function addGoal(goal: LearningPlanGoalSimple) {
   const selectedGoalsId = selectedGoals.value.map((goal) => goal.id);
 
   if (!selectedGoalsId.includes(goal.id)) {
-    selectedGoals.value.push(goal);
+    selectedGoals.value = [...selectedGoals.value, goal];
   }
 
   open.value = false;
@@ -118,8 +114,7 @@ async function queryGoals() {
           $or: [
             { description: { $containsi: search.value.toLowerCase() } },
             { verb: { text: { $containsi: firstWord.toLowerCase() } } },
-            { id: { $notIn: [1, 2] } },
-
+            // { id: { $notIn: [1, 2] } },
             // Condicionais
             isNumber ? { id: { $eq: search.value } } : null,
           ].filter((item) => item),

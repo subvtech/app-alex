@@ -82,7 +82,7 @@
       />
 
       <!-- Objetivos de aprendizagem -->
-      <alex-learningplan-task-goals :edit="editable" :goals="goals" />
+      <alex-learningplan-task-goals v-model="goals" :edit="editable" />
 
       <!-- Entregas-->
       <p class="text-h3 mt-6">
@@ -216,6 +216,7 @@ const description = toRef(props.description);
 const submissionDescription = toRef(props.submissionDescription);
 const hasSubmission = toRef(props.hasSubmission);
 const sendAfterDeadline = toRef(props.sendAfterDeadline);
+const goals = toRef(props.goals);
 const tags = ref<TagSimple[]>([]);
 const model = defineModel({ default: false });
 
@@ -322,6 +323,7 @@ watch(
     endDate.value,
     type.value,
     status.value,
+    goals.value,
   ],
   () => {
     const values = {
@@ -331,7 +333,9 @@ watch(
       finish_at: endDate.value,
       can_submit_after_deadline: sendAfterDeadline.value,
       submission_required: hasSubmission.value,
+      learning_goals: goals.value,
     };
+    const goalsId = goals.value.map((goal) => goal.id);
     emit('change-values', values as ChangeValues);
     strapi.update('tasks', props.taskId, {
       type: type.value,
@@ -340,27 +344,13 @@ watch(
       finish_at: endDate.value,
       can_submit_after_deadline: sendAfterDeadline.value,
       submission_required: hasSubmission.value,
+      learning_goals: {
+        set: goalsId,
+      },
     });
   },
 );
-// watch(hasSubmission, () => {
-//   console.log(hasSubmission.value);
-// });
-// watch(sendAfterDeadline, () => {
-//   console.log(sendAfterDeadline.value);
-// });
-// watch(startDate, () => {
-//   console.log(startDate.value);
-// });
-// watch(endDate, () => {
-//   console.log(endDate.value);
-// });
-// watch(type, () => {
-//   console.log(type.value);
-// });
-// watch(status, () => {
-//   console.log(status.value);
-// });
+
 // Close drawer
 function handleCloseModal() {
   model.value = false;
