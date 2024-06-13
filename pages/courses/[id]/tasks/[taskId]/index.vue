@@ -1,6 +1,8 @@
 <template>
-  <alex-learningplan-task-header-loader v-if="taskStore.loading">
-  </alex-learningplan-task-header-loader>
+  <div v-if="taskStore.loading">
+    <alex-learningplan-task-header-loader />
+    <alex-learningplan-task-kanban-loader />
+  </div>
   <section
     v-else-if="
       !taskStore.loading && taskStore.task && learningPlanStore.learningPlan?.id

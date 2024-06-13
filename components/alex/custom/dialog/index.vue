@@ -133,7 +133,7 @@ interface HeaderProps {
   secondaryButtonText?: string;
   mainButtonDisabled?: boolean;
   mainButtonIcon?: string;
-  secondaryButtonIcon: string;
+  secondaryButtonIcon?: string;
   noFooter?: boolean;
   noHeader?: boolean;
   stepper?: boolean;
