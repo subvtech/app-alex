@@ -76,14 +76,16 @@ const props = withDefaults(defineProps<CompProps>(), {
   availableGoals: () => [],
 });
 
-const open = ref<boolean>(false);
-
-// Exibidos no drawer
 const selectedGoals = defineModel<LearningPlanGoalSimple[]>({ default: [] });
+
+const open = ref<boolean>(false);
+const search = ref<string>('');
+const searchedGoals = ref<LearningPlanGoalSimple[]>([]);
+
+const { find } = useStrapiUtils();
 
 function resetTextField() {
   searchedGoals.value = [];
-  open.value = false;
   search.value = '';
 }
 
@@ -94,7 +96,7 @@ function addGoal(goal: LearningPlanGoalSimple) {
     selectedGoals.value.push(goal);
   }
 
-  resetTextField();
+  open.value = false;
 }
 
 function removeGoal(goal: LearningPlanGoalSimple) {
@@ -103,24 +105,46 @@ function removeGoal(goal: LearningPlanGoalSimple) {
   );
 }
 
-const { find } = useStrapiUtils();
+async function queryGoals() {
+  // Procurar verbos com objetivos
+  const firstWord = search.value.split(' ')[0];
+  const isNumber = !isNaN(Number(search.value));
 
-const search = ref<string>('');
-const searchedGoals = ref<LearningPlanGoalSimple[]>([]);
-
-useOnStopTyping(search, async () => {
-  const goals = await find<LearningPlanGoalSimple>('learning-goals', {
+  const query = await find<LearningPlanGoalSimple>('learning-goals', {
     populate: ['verb'],
     filters: {
-      $or: [
-        { description: { $containsi: search.value.toLowerCase() } },
-        { verb: { text: { $containsi: search.value.toLowerCase() } } },
+      $and: [
+        {
+          $or: [
+            { description: { $containsi: search.value.toLowerCase() } },
+            { verb: { text: { $containsi: firstWord.toLowerCase() } } },
+            { id: { $notIn: [1, 2] } },
+
+            // Condicionais
+            isNumber ? { id: { $eq: search.value } } : null,
+          ].filter((item) => item),
+        },
+        { id: { $notIn: selectedGoals.value.map((goal) => goal.id) } },
       ],
     },
   });
 
-  searchedGoals.value = goals.data;
-});
+  const goals: LearningPlanGoalSimple[] = query.data.filter((goal) => {
+    const verb: string = goal.verb?.text.toLowerCase() || '';
+    const description: string = goal.description.toLowerCase();
+
+    const targetText: string = `${verb}${verb ? ' ' : ''}${description}`;
+
+    return (
+      targetText.includes(search.value.toLowerCase().trim()) ||
+      (isNumber && goal.id === parseInt(search.value))
+    );
+  });
+
+  searchedGoals.value = goals;
+}
+
+useOnStopTyping(search, queryGoals);
 
 watch(open, () => {
   if (!open.value) {
