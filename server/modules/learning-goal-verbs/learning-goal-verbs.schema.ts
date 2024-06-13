@@ -2,7 +2,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
 import { users } from '../users/users.schema';
-import { learningGoals } from './learning-goals.schema';
+import { learningGoals } from '../learning-goals/learning-goals.schema';
 
 export const learningGoalVerbs = pgTable('learning-goal-verbs', {
   id: serial('id').primaryKey(),

@@ -8,9 +8,9 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { classes } from './classes.schema';
+import { classes } from '../classes-folder/classes.schema';
+import { learningPlans } from '../learning-plans/learning-plans.schema';
 import { learningPlanMeetings } from './learning-plan-meetings.schema';
-import { learningPlans } from './learning-plans.schema';
 
 export const frequencyEnum = pgEnum('frequency', [
   'monday',

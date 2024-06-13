@@ -8,9 +8,9 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-import { learningPlanMembers } from '../learning-plans/learning-plan-members/learning-plan-members.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
+import { taskEvents } from '../task-events/task-events.schema';
 import { tasks } from './tasks.schema';
-import { taskEvents } from './task-events.schema';
 
 export const statusEnum = pgEnum('type', [
   'to_do',

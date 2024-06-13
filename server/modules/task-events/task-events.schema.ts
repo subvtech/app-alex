@@ -7,8 +7,8 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { taskMembers } from './task-members.schema';
-import { tasks } from './tasks.schema';
+import { tasks } from '../tasks/tasks.schema';
+import { taskMembers } from '../tasks/task-members.schema';
 
 export const taskStatusEventEnum = pgEnum('status', [
   'submission',

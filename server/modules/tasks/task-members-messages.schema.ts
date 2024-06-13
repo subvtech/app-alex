@@ -2,10 +2,10 @@ import { integer, pgTable, serial, timestamp, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 import { medias } from '../medias/medias.schema';
-import { learningPlanMembers } from '../learning-plans/learning-plan-members/learning-plan-members.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
 
+import { taskSubmissions } from '../task-submissions/task-submissions.schema';
 import { taskMembers } from './task-members.schema';
-import { taskSubmissions } from './task-submissions.schema';
 
 export const taskMembersMessages = pgTable('task_members_messages', {
   id: serial('id').primaryKey(),

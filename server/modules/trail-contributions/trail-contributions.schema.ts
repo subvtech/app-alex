@@ -8,8 +8,8 @@ import {
   text,
 } from 'drizzle-orm/pg-core';
 
-import { learningPlanMembers } from '../learning-plans/learning-plan-members/learning-plan-members.schema';
-import { trails } from './trails.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
+import { trails } from '../trails/trails.schema';
 
 export const trailContributions = pgTable('trail-contribution', {
   id: serial('id').primaryKey(),

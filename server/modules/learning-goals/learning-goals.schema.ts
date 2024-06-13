@@ -3,7 +3,7 @@ import { relations } from 'drizzle-orm';
 
 import { tasksToLearningGoals } from '../tasks/tasks.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
-import { learningGoalVerbs } from './learning-goal-verbs.schema';
+import { learningGoalVerbs } from '../learning-goal-verbs/learning-goal-verbs.schema';
 
 export const learningGoals = pgTable('learning-goal', {
   id: serial('id').primaryKey(),

@@ -9,8 +9,8 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { taskMembersMessages } from './task-members-messages.schema';
-import { taskMembers } from './task-members.schema';
+import { taskMembersMessages } from '../tasks/task-members-messages.schema';
+import { taskMembers } from '../tasks/task-members.schema';
 
 export const taskSubmissions = pgTable('task_submission', {
   id: serial('id').primaryKey(),

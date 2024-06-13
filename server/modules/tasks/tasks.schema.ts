@@ -15,7 +15,7 @@ import { learningGoals } from '../learning-goals/learning-goals.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
 import { tags } from '../tags/tags.schema';
 import { trails } from '../trails/trails.schema';
-import { taskEvents } from './task-events.schema';
+import { taskEvents } from '../task-events/task-events.schema';
 import { taskMembers } from './task-members.schema';
 
 export const typeEnum = pgEnum('type', ['individual', 'group']);

@@ -8,11 +8,11 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { invitationLinks } from './invitation-link.schema';
-import { learningPlanGroups } from './learning-plan-groups.schema';
-import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule.schema';
-import { learningPlanMembers } from './learning-plan-members.schema';
-import { learningPlans } from './learning-plans.schema';
+import { invitationLinks } from '../invitation-link/invitation-link.schema';
+import { learningPlanGroups } from '../learning-plan-groups/learning-plan-groups.schema';
+import { learningPlanMeetingSchedule } from '../learning-plan-meetings/learning-plan-meeting-schedule.schema';
+import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
+import { learningPlans } from '../learning-plans/learning-plans.schema';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
