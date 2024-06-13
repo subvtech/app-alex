@@ -33,6 +33,8 @@
         "placeHolder": "Digite a descrição"
       }
     },
+    "freeEditor": "Editor Livre",
+    "allowSendAfterSubmission": "Permitir envio após o prazo",
     "restrictions": {
       "label": "Restrições",
       "text": "Texto",

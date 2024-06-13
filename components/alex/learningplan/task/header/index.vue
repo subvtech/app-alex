@@ -60,7 +60,7 @@
                 {{ $t('components.courses.tasks.infos.type') }}
               </p>
               <p class="text-body-3 text-gray-800">
-                {{ $t(`components.courses.tasks.${type}`) }}
+                {{ $t(`components.courses.tasks.${type || 'noType'}`) }}
               </p>
             </v-col>
             <v-col cols="6">

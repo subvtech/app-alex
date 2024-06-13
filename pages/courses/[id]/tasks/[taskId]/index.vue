@@ -87,7 +87,7 @@
       @change-values="
         (values) => {
           taskStore.task = {
-            ...(taskStore.task as Task),
+            ...(taskStore.task as TaskSimple),
             status: values.status,
             type: values.type,
             start_at: values.start_at,
@@ -100,7 +100,7 @@
       @change-description="
         (value) =>
           (taskStore.task = {
-            ...(taskStore.task as Task),
+            ...(taskStore.task as TaskSimple),
             description: value,
           })
       "
@@ -116,66 +116,78 @@ definePageMeta({
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
 const learningPlanStore = useLearningPlanStore();
-const i18n = useI18n();
+const { t } = useI18n();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
-const taskId = computed(() => parseInt(route.params?.taskId.toString()));
+const { id, taskId: taskIdValue } = route.params;
+const taskId = computed(() => parseInt(taskIdValue.toString()));
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
-const tasks = ref([
-  {
-    id: 1,
-    status: 'in_progress',
-    date: new Date(),
-    studentClass: 'Turma a',
-    user: { name: 'test' },
-  },
-]);
+const tasks = ref<any[]>([]);
 const tags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
   return taskStore.task.tags.map((tag) => tag.text);
 });
 onBeforeMount(() => {
   headerStore.showHeader = true;
-  if (!route.params.id || !taskId.value) {
+  if (!id || !taskId.value) {
     return navigateTo(`/courses/`);
   }
-  if (!Number.isInteger(Number(route.params.id))) {
-    return navigateTo(`/courses/${route.params.id}`);
+  if (!Number.isInteger(Number(id))) {
+    return navigateTo(`/courses/${id}`);
   }
-  taskStore.loadTaskData(taskId.value, Number(route.params.id));
+  taskStore.loadTaskData(taskId.value, Number(id));
 });
 
 watch(
   () => [learningPlanStore.loading, taskStore.loading],
   () => {
     if (!learningPlanStore.loading) {
-      headerStore.title = i18n.t('pages.classes.breadcrumbs.myCourses');
+      headerStore.title = t('pages.classes.breadcrumbs.myCourses');
       headerStore.items = [
         {
-          title: i18n.t('pages.classes.breadcrumbs.home'),
+          title: t('pages.classes.breadcrumbs.home'),
           to: '/',
           disabled: true,
         },
         {
-          title: i18n.t('pages.classes.breadcrumbs.myCourses'),
+          title: t('pages.classes.breadcrumbs.myCourses'),
           to: '/courses/me',
           disabled: false,
         },
         {
           title: learningPlanStore.learningPlan?.title || '',
-          to: `/courses/${learningPlanStore.learningPlan?.id}`,
+          to: `/courses/${id}`,
           disabled: false,
         },
         {
-          title: `${taskStore.task?.title || ''}`,
-          to: `/courses/${learningPlanStore.learningPlan?.id}/tasks/${taskStore.task?.id}`,
+          title: t('components.courses.tasks.title'),
           disabled: false,
+          to: `/courses/${id}/tasks`,
+        },
+        {
+          title: `${taskStore.task?.title || ''}`,
+          to: `/courses/${id}/tasks/${taskStore.task?.id}`,
+          disabled: true,
         },
       ];
     }
     if (!taskStore.task && !taskStore.loading) {
       navigateTo(`/courses/${route.params.id}/tasks`);
+    }
+    if (taskStore.task) {
+      tasks.value = taskStore.task.task_members.map((task) => ({
+        id: task.id,
+        status: task.status,
+        date: new Date(task.finished_at.replaceAll('-', '/')),
+        user: {
+          name:
+            task.task_member_students[0]?.student_member.user.fullname || '',
+        },
+        studentClass:
+          task.task_member_students[0]?.student_member.learning_class?.name ||
+          '',
+      }));
     }
   },
 );

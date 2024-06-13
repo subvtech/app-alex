@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
-import { Task } from '@/models/simple/taskSimple.model';
+import { TaskSimple } from '@/models/simple/taskSimple.model';
 export const useTaskStore = defineStore('task', () => {
   const { find } = useStrapiUtils();
-  const task = ref<Task>();
+  const task = ref<TaskSimple>();
   const loading = ref(false);
   const { setMessage } = useMessageStore();
   const i18n = useI18n();
@@ -12,6 +12,7 @@ export const useTaskStore = defineStore('task', () => {
       populate: [
         'task_submission',
         'task_member_students.student_member.user.avatar',
+        'task_member_students.student_member.learning_class',
       ],
     },
     tags: true,
@@ -30,7 +31,7 @@ export const useTaskStore = defineStore('task', () => {
   ) {
     try {
       loading.value = true;
-      const response = await find<Task>('tasks', {
+      const response = await find<TaskSimple>('tasks', {
         populate,
         filters: {
           id,

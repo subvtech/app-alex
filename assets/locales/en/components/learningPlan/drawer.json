@@ -33,6 +33,8 @@
         "placeHolder": "Enter description"
       }
     },
+    "freeEditor": "Free editor",
+    "allowSendAfterSubmission": "Allow submission after deadline",
     "restrictions": {
       "label": "Restrictions",
       "text": "Text",
