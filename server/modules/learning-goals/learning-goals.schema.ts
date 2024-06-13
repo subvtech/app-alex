@@ -7,13 +7,15 @@ import { learningGoalVerbs } from '../learning-goal-verbs/learning-goal-verbs.sc
 
 export const learningGoals = pgTable('learning-goal', {
   id: serial('id').primaryKey(),
-  verbId: integer('verb_id').references(() => learningGoalVerbs.id),
-  learningPlanId: integer('learning_plan_id').references(
-    () => learningPlans.id,
-  ),
-  learningGoalVerbId: integer('learning_goal_verb_id').references(
-    () => learningGoalVerbs.id,
-  ),
+  verbId: integer('verb_id')
+    .references(() => learningGoalVerbs.id)
+    .notNull(),
+  learningPlanId: integer('learning_plan_id')
+    .references(() => learningPlans.id)
+    .notNull(),
+  learningGoalVerbId: integer('learning_goal_verb_id')
+    .references(() => learningGoalVerbs.id)
+    .notNull(),
   description: text('description'),
 });
 
@@ -31,3 +33,5 @@ export const learningGoalRelations = relations(
     }),
   }),
 );
+
+export type LearningGoals = typeof learningGoals.$inferSelect;

@@ -44,4 +44,4 @@ export const trailsRelations = relations(trails, ({ one, many }) => ({
   task: many(tasks),
 }));
 
-export type Trail = typeof trails.$inferSelect;
+export type Trails = typeof trails.$inferSelect;

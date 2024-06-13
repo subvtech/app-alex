@@ -16,3 +16,5 @@ export const taskMembersStudentsRelations = relations(
   taskMembersStudents,
   () => ({}),
 );
+
+export type TaskMembersStudents = typeof taskMembersStudents.$inferSelect;

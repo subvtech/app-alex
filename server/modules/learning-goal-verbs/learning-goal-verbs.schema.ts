@@ -24,3 +24,5 @@ export const learningGoalVerbRelations = relations(
     }),
   }),
 );
+
+export type LearningGoalVerbs = typeof learningGoalVerbs.$inferSelect;

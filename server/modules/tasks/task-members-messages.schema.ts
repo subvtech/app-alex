@@ -45,3 +45,5 @@ export const taskMembersMessagesRelations = relations(
     }),
   }),
 );
+
+export type TaskMembersMessage = typeof taskMembersMessages.$inferSelect;

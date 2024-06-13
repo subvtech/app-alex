@@ -37,7 +37,6 @@ export const learningPlanMembers = pgTable('learning-plan-members', {
     .references(() => learningPlans.id)
     .notNull(),
   email: text('email'),
-  description: text('description'),
   joinedAt: timestamp('joined_at', { mode: 'date' }),
   role: roleEnum('role'), // TODO: default to student
   status: statusEnum('status'), // TODO: default to pending_invitation

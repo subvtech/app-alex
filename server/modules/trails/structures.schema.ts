@@ -20,3 +20,5 @@ export const structureRelations = relations(structures, ({ one, many }) => ({
   }),
   blocks: many(blocks),
 }));
+
+export type Structures = typeof structures.$inferSelect;

@@ -20,3 +20,5 @@ export const learningPlanEventsRelations = relations(
     }),
   }),
 );
+
+export type LearningPlanEvents = typeof learningPlanEvents.$inferSelect;

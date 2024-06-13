@@ -84,3 +84,5 @@ export const tagsToUsersRelations = relations(tagsToUsers, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export type Tags = typeof tags.$inferSelect;

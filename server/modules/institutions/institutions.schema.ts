@@ -59,3 +59,5 @@ export const userToInstitutionRelations = relations(
     }),
   }),
 );
+
+export type institutions = typeof institutions.$inferSelect;

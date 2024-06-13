@@ -120,3 +120,5 @@ export const tasksToLearningGoalsRelations = relations(
     }),
   }),
 );
+
+export type Tasks = typeof tasks.$inferSelect;

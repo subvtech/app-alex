@@ -38,5 +38,5 @@ export const learningPlanGroupMembersRelation = relations(
   }),
 );
 
-export type LearningPlanGroupMember =
+export type LearningPlanGroupMembers =
   typeof learningPlanGroupMembers.$inferSelect;

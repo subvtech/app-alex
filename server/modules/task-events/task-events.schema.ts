@@ -37,3 +37,5 @@ export const taskEventRelations = relations(taskEvents, ({ one }) => ({
     references: [taskMembers.id],
   }),
 }));
+
+export type TaskEvents = typeof taskEvents.$inferSelect;

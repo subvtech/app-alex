@@ -39,3 +39,5 @@ export const trailContributionRelations = relations(
     }),
   }),
 );
+
+export type TrailContributions = typeof trailContributions.$inferSelect;

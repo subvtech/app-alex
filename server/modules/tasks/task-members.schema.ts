@@ -39,3 +39,5 @@ export const taskMemberRelations = relations(taskMembers, ({ one, many }) => ({
     references: [learningPlanMembers.id],
   }),
 }));
+
+export type TaskMembers = typeof taskMembers.$inferSelect;
