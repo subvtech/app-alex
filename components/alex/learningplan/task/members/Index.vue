@@ -27,11 +27,14 @@
     </div>
 
     <!-- Cards -->
-    <div v-if="members.length">
+    <div v-if="members?.data.length">
       <alex-learningplan-task-members-card
-        v-for="(member, index) in members"
+        v-for="(member, index) in members.data"
         :key="index"
-        :member="member"
+        :member="{
+          name: member.student_member?.user.fullname,
+          class: member.student_member.learning_class?.name,
+        }"
       />
     </div>
     <div
@@ -50,33 +53,46 @@
     </div>
 
     <!-- Menu -->
-    <div v-if="members.length" class="d-flex align-center ga-2 pa-6">
-      <span class="flex-1-1"
-        >Exibindo {{ page }} a {{ page + members.length }} de
-        {{ pages }} resultados</span
+    <div
+      v-if="members?.meta.pagination.pageCount > 1"
+      class="d-flex align-center ga-2 pa-6"
+    >
+      <span class="flex-1-1">
+        Mostrando do
+        {{ members?.meta.pagination.pageCount }} ao {{ totalVisible }} de um
+        total de {{ members?.meta.pagination.total }} Alunos</span
       >
-      <alex-custom-pagination v-model="page" :length="3" :total-visible="3" />
+      <alex-custom-pagination
+        v-model="page"
+        :length="members?.meta.pagination.pageCount"
+        :total-visible="totalVisible"
+        class="extra-mb"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const pages: number = 30;
 const page = ref<number>(1);
-
-interface MemberProps {
-  name: string;
-  avatarUrl?: string;
-  class?: string;
-  pending?: boolean;
-  submitted?: boolean;
-  accepted?: boolean;
-}
+const totalVisible = 10;
 interface MembersProps {
-  members?: MemberProps[];
   learningplanId: number;
+  taskId: number;
 }
-withDefaults(defineProps<MembersProps>(), { members: () => [] });
+const props = defineProps<MembersProps>();
+const strapi = useStrapiUtils();
+const getMembers = (taskId: number) =>
+  strapi.find<TaskMemberStudent>('task-member-students', {
+    populate: ['student_member.user.avatar', 'student_member.learning_class'],
+    filters: {
+      task_member: {
+        task: taskId,
+      },
+    },
+  });
+const { data: members } = await useAsyncData('task-members-students', () =>
+  getMembers(props.taskId),
+);
 </script>
 
 <style>

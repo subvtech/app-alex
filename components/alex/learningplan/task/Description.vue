@@ -5,7 +5,7 @@
 
   <alex-inputs-text-area
     v-model="model"
-    name="student"
+    name="description"
     :placeholder="
       $t('components.learningPlan.drawer.task.description.placeHolder')
     "

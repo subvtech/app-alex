@@ -66,13 +66,15 @@
     />
     <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
-      :learningplan-id="learningPlanStore.learningPlan.id"
+      :learningplan-id="learningPlanId"
+      :task-id="taskId"
       :title="taskStore.task.title"
       :type="taskStore.task.type"
       :status="taskStore.task.status"
       :events="taskStore.task.task_events"
       :goals="taskStore.task.learning_goals"
       :description="taskStore.task.description"
+      :submission-description="taskStore.task.submission_description"
       :has-submission="taskStore.task.submission_required"
       :send-after-deadline="taskStore.task.can_submit_after_deadline"
       :start-date="taskStore.task.start_at"
@@ -96,6 +98,7 @@ const i18n = useI18n();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
 const taskId = computed(() => parseInt(route.params?.taskId.toString()));
+const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref([]);
 const tags = computed(() => {

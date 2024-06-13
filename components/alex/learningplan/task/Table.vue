@@ -98,11 +98,12 @@
                 :text="t('pages.task.table.tooltips.kanban')"
                 location="bottom center"
               >
-                <template #activator="{ props }">
+                <template #activator="{ props: tooltipKanban }">
                   <alex-custom-button
-                    v-bind="props"
+                    v-bind="tooltipKanban"
                     icon="alex:Kanban"
                     variant="text"
+                    @click="navigateTo(`tasks/${item.id}`)"
                   />
                 </template>
               </v-tooltip>
@@ -315,7 +316,7 @@ const getDropDownAction = (action: string, id: number) => {
     },
     kanban: {
       text: t('pages.task.table.dropdown.kanban'),
-      onClick: () => console.log('kanban', id),
+      onClick: () => navigateTo(`tasks/${id}`),
     },
     draft: {
       text: t('pages.task.table.dropdown.draft'),

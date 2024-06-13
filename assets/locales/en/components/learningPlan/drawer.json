@@ -27,7 +27,11 @@
     "submission": {
       "label": "Submission",
       "reqSubmission": "Request submission",
-      "aftrDeadline": "Allow submissions after deadline"
+      "aftrDeadline": "Allow submissions after deadline",
+      "description": {
+        "label": "Submission Description",
+        "placeHolder": "Enter description"
+      }
     },
     "restrictions": {
       "label": "Restrictions",

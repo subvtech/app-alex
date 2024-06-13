@@ -97,7 +97,7 @@
             "
           />
         </v-col>
-        <v-col class="pa-0 d-flex align-center" cols="6">
+        <v-col v-if="hasSubmission" class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="sendAfterDeadline"
             :label="
@@ -105,7 +105,7 @@
             "
           />
         </v-col>
-        <v-col class="mt-4 pa-0" cols="12">
+        <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
           <alex-learningplan-task-restrictions
             v-model="restrictionsValue"
             edit
@@ -113,6 +113,25 @@
         </v-col>
       </v-row>
 
+      <p v-if="hasSubmission" class="text-body-4 text-gray-800 mb-2">
+        {{
+          $t('components.learningPlan.drawer.task.submission.description.label')
+        }}
+      </p>
+
+      <alex-inputs-text-area
+        v-if="hasSubmission"
+        v-model="submissionDescription"
+        name="submissionDescription"
+        :placeholder="
+          $t(
+            'components.learningPlan.drawer.task.submission.description.placeHolder',
+          )
+        "
+        variant="outlined"
+        density="comfortable"
+        hide-details
+      />
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
         <p class="text-h3 mb-4">
@@ -141,7 +160,9 @@
           <alex-learningplan-task-events v-model="taskEvents"
         /></v-window-item>
         <v-window-item value="2">
-          <alex-learningplan-task-members :learningplan-id="learningplanId"
+          <alex-learningplan-task-members
+            :learningplan-id="learningplanId"
+            :task-id="taskId"
         /></v-window-item>
       </v-window>
     </div>
@@ -160,6 +181,7 @@ const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
+  taskId: number;
   title: string;
   status: TaskStatus;
   type?: TaskType | null;
@@ -167,6 +189,7 @@ interface TaskTeacherDrawerProps {
   events?: TaskEvent[];
   messages?: Message[];
   description?: string;
+  submissionDescription?: string;
   restrictions?: string;
   editable?: boolean;
   hasSubmission?: boolean;
@@ -188,8 +211,10 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   goals: () => [],
   events: () => [],
   type: undefined,
+  submissionDescription: '',
 });
 const description = toRef(props.description);
+const submissionDescription = toRef(props.submissionDescription);
 const hasSubmission = toRef(props.hasSubmission);
 const sendAfterDeadline = toRef(props.sendAfterDeadline);
 const tags = ref<TagSimple[]>([]);

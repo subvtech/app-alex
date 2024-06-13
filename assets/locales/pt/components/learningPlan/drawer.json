@@ -27,7 +27,11 @@
     "submission": {
       "label": "Entrega",
       "reqSubmission": "Solicitar entrega",
-      "aftrDeadline": "Envio após prazo"
+      "aftrDeadline": "Envio após prazo",
+      "description": {
+        "label": "Descrição da entrega",
+        "placeHolder": "Digite a descrição"
+      }
     },
     "restrictions": {
       "label": "Restrições",
