@@ -9,7 +9,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { classes } from './classes.schema';
+import { classes } from '../classes-folder/classes.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
 
 export const invitationRoleEnum = pgEnum('role', ['student', 'partner']);
