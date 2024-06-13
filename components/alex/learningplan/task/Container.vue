@@ -249,8 +249,8 @@ const tasksArray = computed(() => {
         if (student.status === 'in_review') delivered.underReview += 1;
         if (student.status === 'done') delivered.completed += 1;
         return {
-          name: student.student_member.user.fullname,
-          image: { url: student.student_member.user.avatar.url },
+          name: student.student_member?.user?.fullname,
+          image: { url: student.student_member?.user?.avatar.url },
         };
       });
 

@@ -84,7 +84,7 @@
               }}</span>
             </td>
             <td>
-              <alex-learningplan-task-submissions
+              <alex-learningplan-task-submissions-status
                 v-if="item.delivered"
                 :submitted="item.delivered"
               />
