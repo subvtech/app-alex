@@ -11,10 +11,8 @@
       <div v-for="(event, index) in events" :key="index" class="py-2 my-1">
         <div class="d-flex align-center ga-3">
           <p class="flex-fill">
-            <span class="font-weight-bold text-gray-800">{{
-              event.user + ' '
-            }}</span
-            ><span class="text-gray-800">{{ event.action }}</span>
+            <span class="font-weight-bold text-gray-800">{{ event.user }}</span
+            ><span class="text-gray-800">{{ ' ' + event.action }}</span>
           </p>
           <span class="text-gray-700">{{ formatHour(event.time) }}</span>
         </div>
@@ -28,7 +26,7 @@
 import { format } from 'date-fns';
 
 interface EventProps {
-  user: string;
+  user?: string;
   action: string;
   time: string | Date;
 }

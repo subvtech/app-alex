@@ -52,7 +52,7 @@
             >{{ $t('components.learningPlan.drawer.task.type.label') }}
           </p>
           <alex-learningplan-task-options
-            v-model="currType"
+            v-model="type"
             :items="types"
             :edit="editable"
             placeholder="Selecione um tipo"
@@ -173,7 +173,6 @@
 import { isSameDay } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
-import { StudentTaskStatus, TeacherTaskStatus } from '../State.vue';
 import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
@@ -220,12 +219,15 @@ const sendAfterDeadline = toRef(props.sendAfterDeadline);
 const tags = ref<TagSimple[]>([]);
 const model = defineModel({ default: false });
 
-defineEmits(['kanban-click', 'attached-trail-click']);
+const emit = defineEmits([
+  'kanban-click',
+  'attached-trail-click',
+  'change-values',
+  'change-description',
+]);
 
 // Status
-const status = ref<TeacherTaskStatus | StudentTaskStatus>(
-  props.status as TeacherTaskStatus,
-);
+const status = ref<TaskStatus | TaskMemberStatus>(props.status);
 
 // Date picker
 const startDate = toRef(props.startDate);
@@ -243,18 +245,18 @@ const restrictionsValue = computed({
 }) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const currType = toRef<string>(props.type || '');
+const type = toRef<string>(props.type || '');
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
     onClick: () => {
-      currType.value = t('components.learningPlan.drawer.task.type.individual');
+      type.value = 'individual';
     },
   },
   {
     text: t('components.learningPlan.drawer.task.type.collective'),
     onClick: () => {
-      currType.value = t('components.learningPlan.drawer.task.type.collective');
+      type.value = 'group';
     },
   },
 ]);
@@ -273,7 +275,6 @@ const orderToDateEvents = (events: TaskEvent[]) => {
   events.forEach((current) => {
     const currentDate = new Date(current.publishedAt);
     const currentElement = {
-      user: 'test',
       action: current.event,
       time: current.publishedAt,
     };
@@ -291,6 +292,65 @@ const orderToDateEvents = (events: TaskEvent[]) => {
   });
   return eventsGroups;
 };
+const strapi = useStrapi();
+useOnStopTyping(
+  description,
+  () => {
+    strapi.update('tasks', props.taskId, {
+      description: description.value,
+    });
+  },
+  1000,
+  false,
+  false,
+);
+watch(
+  () => [
+    hasSubmission.value,
+    sendAfterDeadline.value,
+    startDate.value,
+    endDate.value,
+    type.value,
+    status.value,
+  ],
+  () => {
+    const values = {
+      type: type.value,
+      status: status.value,
+      start_at: startDate.value,
+      finish_at: endDate.value,
+      can_submit_after_deadline: sendAfterDeadline.value,
+      submission_required: hasSubmission.value,
+    };
+    emit('change-values', values);
+    strapi.update('tasks', props.taskId, {
+      type: type.value,
+      status: status.value,
+      start_at: startDate.value,
+      finish_at: endDate.value,
+      can_submit_after_deadline: sendAfterDeadline.value,
+      submission_required: hasSubmission.value,
+    });
+  },
+);
+// watch(hasSubmission, () => {
+//   console.log(hasSubmission.value);
+// });
+// watch(sendAfterDeadline, () => {
+//   console.log(sendAfterDeadline.value);
+// });
+// watch(startDate, () => {
+//   console.log(startDate.value);
+// });
+// watch(endDate, () => {
+//   console.log(endDate.value);
+// });
+// watch(type, () => {
+//   console.log(type.value);
+// });
+// watch(status, () => {
+//   console.log(status.value);
+// });
 // Close drawer
 function handleCloseModal() {
   model.value = false;

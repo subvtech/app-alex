@@ -3,13 +3,13 @@
     "type": {
       "label": "Type",
       "individual": "Individual",
-      "collective": "Collective"
+      "collective": "Group"
     },
     "status": {
       "label": "Status",
       "draft": "Draft",
       "published": "Published",
-      "closed": "Closed"
+      "finished": "Finished"
     },
     "date": {
       "startLabel": "Start date",

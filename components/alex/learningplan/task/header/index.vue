@@ -114,10 +114,11 @@
 import { useBreakpoints } from '@vueuse/core';
 import { format } from 'date-fns';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
+import { TaskStatus } from '~/models/simple/taskSimple.model';
 
 interface HeaderProps {
   title: string;
-  status: 'draft' | 'published' | 'done' | (string & {});
+  status: TaskStatus | (string & {});
   description: string;
   type?: 'group' | 'individual' | null;
   tags?: string[];
@@ -150,23 +151,23 @@ const statusCfg = {
     text: t('components.learningPlan.drawer.task.status.published'),
     status: 'blue',
   },
-  closed: {
-    text: t('components.learningPlan.drawer.task.status.closed'),
+  finished: {
+    text: t('components.learningPlan.drawer.task.status.finished'),
     status: 'red',
   },
   toDo: {
     text: t('components.learningPlan.drawer.task.status.toDo'),
     status: 'secondary',
   },
-  inProgress: {
+  in_progress: {
     text: t('components.learningPlan.drawer.task.status.inProgress'),
     status: 'blue',
   },
-  underReview: {
+  in_review: {
     text: t('components.learningPlan.drawer.task.status.underReview'),
     status: 'orange',
   },
-  finished: {
+  done: {
     text: t('components.learningPlan.drawer.task.status.finished'),
     status: 'green',
   },

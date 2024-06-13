@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 interface EventProps {
-  user: string;
+  user?: string;
   action: string;
   time: string | Date;
 }

@@ -19,15 +19,9 @@
 
 <script setup lang="ts">
 import { AlexDropdownItem } from '../../custom/Dropdown.vue';
+import { TaskMemberStatus, TaskStatus } from '~/models/simple/taskSimple.model';
 
 // Tipos
-export type TeacherTaskStatus = 'draft' | 'published' | 'closed';
-export type StudentTaskStatus =
-  | 'toDo'
-  | 'inProgress'
-  | 'underReview'
-  | 'finished';
-
 interface StateConfig {
   text: string;
   status: 'secondary' | 'blue' | 'orange' | 'green' | 'red';
@@ -52,14 +46,14 @@ const props = withDefaults(defineProps<StateProps>(), {
   readonly: false,
 });
 
-const model = defineModel<TeacherTaskStatus | StudentTaskStatus>({
+const model = defineModel<TaskStatus | TaskMemberStatus>({
   required: true,
 });
 
 const { t } = useI18n();
 
 // Estilização e props
-const config: Record<TeacherTaskStatus | StudentTaskStatus, StateConfig> = {
+const config: Record<TaskStatus | TaskMemberStatus, StateConfig> = {
   // Professor
   draft: {
     text: t('components.learningPlan.drawer.task.status.draft'),
@@ -71,28 +65,28 @@ const config: Record<TeacherTaskStatus | StudentTaskStatus, StateConfig> = {
     status: 'blue',
     immutable: !props.edit,
   },
-  closed: {
-    text: t('components.learningPlan.drawer.task.status.closed'),
+  finished: {
+    text: t('components.learningPlan.drawer.task.status.finished'),
     status: 'red',
     immutable: !props.edit,
   },
   // Aluno
-  toDo: {
+  to_do: {
     text: t('components.learningPlan.drawer.task.status.toDo'),
     status: 'secondary',
     immutable: props.edit,
   },
-  inProgress: {
+  in_progress: {
     text: t('components.learningPlan.drawer.task.status.inProgress'),
     status: 'blue',
     immutable: props.edit,
   },
-  underReview: {
+  in_review: {
     text: t('components.learningPlan.drawer.task.status.underReview'),
     status: 'orange',
     immutable: !props.edit,
   },
-  finished: {
+  done: {
     text: t('components.learningPlan.drawer.task.status.finished'),
     status: 'green',
     immutable: true,
@@ -110,28 +104,28 @@ const teacherOptions: AlexDropdownItem[] = [
     onClick: () => (model.value = 'published'),
   },
   {
-    text: config.closed.text,
-    onClick: () => (model.value = 'closed'),
+    text: config.finished.text,
+    onClick: () => (model.value = 'finished'),
   },
 ];
 
 // Aluno (Opções do dropdown)
 const studentOptions: AlexDropdownItem[] = [
   {
-    text: config.toDo.text,
-    onClick: () => (model.value = 'toDo'),
+    text: config.to_do.text,
+    onClick: () => (model.value = 'to_do'),
   },
   {
-    text: config.inProgress.text,
-    onClick: () => (model.value = 'inProgress'),
+    text: config.in_progress.text,
+    onClick: () => (model.value = 'in_progress'),
   },
   {
-    text: config.underReview.text,
-    onClick: () => (model.value = 'underReview'),
+    text: config.in_review.text,
+    onClick: () => (model.value = 'in_review'),
   },
   {
-    text: config.finished.text,
-    onClick: () => (model.value = 'finished'),
+    text: config.done.text,
+    onClick: () => (model.value = 'done'),
   },
 ];
 
