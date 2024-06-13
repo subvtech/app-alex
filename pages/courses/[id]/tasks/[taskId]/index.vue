@@ -84,6 +84,26 @@
       :messages="[]"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
+      @change-values="
+        (values) => {
+          taskStore.task = {
+            ...(taskStore.task as Task),
+            status: values.status,
+            type: values.type,
+            start_at: values.start_at,
+            finish_at: values.finish_at,
+            submission_required: values.submission_required,
+            can_submit_after_deadline: values.can_submit_after_deadline,
+          };
+        }
+      "
+      @change-description="
+        (value) =>
+          (taskStore.task = {
+            ...(taskStore.task as Task),
+            description: value,
+          })
+      "
     />
   </section>
 </template>

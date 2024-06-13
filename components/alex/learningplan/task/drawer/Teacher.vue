@@ -219,12 +219,21 @@ const sendAfterDeadline = toRef(props.sendAfterDeadline);
 const tags = ref<TagSimple[]>([]);
 const model = defineModel({ default: false });
 
-const emit = defineEmits([
-  'kanban-click',
-  'attached-trail-click',
-  'change-values',
-  'change-description',
-]);
+type ChangeValues = {
+  type: TaskType | null;
+  status: TaskStatus;
+  start_at?: string | null;
+  finish_at?: string | null;
+  can_submit_after_deadline: boolean;
+  submission_required: boolean;
+};
+type Emits = {
+  'kanban-click': [];
+  'attached-trail-click': [];
+  'change-values': [values: ChangeValues];
+  'change-description': [value: string];
+};
+const emit = defineEmits<Emits>();
 
 // Status
 const status = ref<TaskStatus | TaskMemberStatus>(props.status);
@@ -299,6 +308,7 @@ useOnStopTyping(
     strapi.update('tasks', props.taskId, {
       description: description.value,
     });
+    emit('change-description', description.value || '');
   },
   1000,
   false,
@@ -322,7 +332,7 @@ watch(
       can_submit_after_deadline: sendAfterDeadline.value,
       submission_required: hasSubmission.value,
     };
-    emit('change-values', values);
+    emit('change-values', values as ChangeValues);
     strapi.update('tasks', props.taskId, {
       type: type.value,
       status: status.value,
