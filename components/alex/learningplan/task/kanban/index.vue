@@ -63,7 +63,7 @@
           <template v-if="type === 'professor'">
             <alex-learningplan-task-card
               v-if="!isTaskStudent(item)"
-              class="kanban-card-item-inner mt-2 select-none"
+              class="kanban-card-item-inner select-none"
               :date="item.date"
               :name="item.user.name"
               :student-class="item.studentClass"
@@ -77,7 +77,7 @@
           <template v-if="type === 'student'">
             <alex-learningplan-task-student-card
               v-if="isTaskStudent(item)"
-              class="kanban-card-item-inner mt-2 select-none"
+              class="kanban-card-item-inner select-none"
               :title="item.title"
               :date="item.date"
               :group="item.group"

@@ -50,7 +50,7 @@
           accept: true,
         },
       ]"
-      @card-click="console.log(true)"
+      @card-click="studentDrawer = true"
     />
     <alex-learningplan-task-drawer-student
       v-model="studentDrawer"
@@ -122,7 +122,15 @@ const route = useRoute();
 const taskId = computed(() => parseInt(route.params?.taskId.toString()));
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
-const tasks = ref([]);
+const tasks = ref([
+  {
+    id: 1,
+    status: 'in_progress',
+    date: new Date(),
+    studentClass: 'Turma a',
+    user: { name: 'test' },
+  },
+]);
 const tags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
   return taskStore.task.tags.map((tag) => tag.text);

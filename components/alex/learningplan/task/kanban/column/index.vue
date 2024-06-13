@@ -11,6 +11,7 @@
       :accept="accept"
       class="flex flex-col py-2"
       helper-class="kanban-helper"
+      :press-delay="100"
       @sort-insert="
         ({ newIndex, value }) => handleInsertCard({ newIndex, value, group })
       "
@@ -98,8 +99,7 @@ const status = computed(() => mappedStatus[props.color] as TaskStatus);
       transform 0.2s;
   }
 
-  &.kanban-helper .kanban-card-item-inner {
-    transform: rotate(5deg);
+  &.kanban-helper {
     box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.15);
   }
 }
