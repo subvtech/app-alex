@@ -59,6 +59,12 @@
             v-model="type"
             :items="types"
             :edit="editable"
+            :config="{
+              group: $t('components.learningPlan.drawer.task.type.collective'),
+              individual: $t(
+                'components.learningPlan.drawer.task.type.individual',
+              ),
+            }"
             placeholder="Selecione um tipo"
           />
         </v-col>
