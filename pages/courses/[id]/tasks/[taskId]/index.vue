@@ -85,20 +85,9 @@
       :messages="[]"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
-      @change-values="
-        (values) => {
-          taskStore.task = {
-            ...(taskStore.task as TaskSimple),
-            status: values.status,
-            type: values.type,
-            start_at: values.start_at,
-            finish_at: values.finish_at,
-            submission_required: values.submission_required,
-            can_submit_after_deadline: values.can_submit_after_deadline,
-          };
-        }
-      "
+      @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
+      @change-submission-description="handleChangeSubmissionDescription"
       @change-tags="handleChangeTags"
     />
   </section>
@@ -136,6 +125,25 @@ const handleChangeDescription = (description: string) => {
   taskStore.task = {
     ...taskStore.task,
     description,
+  };
+};
+const handleChangeSubmissionDescription = (description: string) => {
+  if (!taskStore.task) return;
+  taskStore.task = {
+    ...taskStore.task,
+    submission_description: description,
+  };
+};
+const handleChangeValues = (values: Partial<TaskSimple>) => {
+  if (!taskStore.task) return;
+  taskStore.task = {
+    ...(taskStore.task as TaskSimple),
+    status: values.status!,
+    type: values.type,
+    start_at: values.start_at,
+    finish_at: values.finish_at,
+    submission_required: values.submission_required!,
+    can_submit_after_deadline: values.can_submit_after_deadline!,
   };
 };
 onBeforeMount(() => {

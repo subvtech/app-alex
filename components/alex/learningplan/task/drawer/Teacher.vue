@@ -245,6 +245,7 @@ type Emits = {
   'attached-trail-click': [];
   'change-values': [values: ChangeValues];
   'change-description': [value: string];
+  'change-submission-description': [value: string];
   'change-tags': [value: TagSimple[]];
 };
 const emit = defineEmits<Emits>();
@@ -318,7 +319,7 @@ const orderToDateEvents = (events: TaskEvent[]) => {
 };
 const notifyFieldError = (field: string) => {
   setMessage(
-    t('components.learningPlan.drawer.task.errors.genericSave', {
+    t('components.learningPlan.drawer.task.errors.save', {
       field: t(`components.learningPlan.drawer.task.${field}.label`),
     }),
     'error',
@@ -349,6 +350,22 @@ useOnStopTyping(
   false,
   false,
 );
+useOnStopTyping(
+  submissionDescription,
+  async () => {
+    try {
+      await strapi.update('tasks', props.taskId, {
+        submission_description: submissionDescription.value,
+      });
+      emit('change-submission-description', submissionDescription.value || '');
+    } catch (error) {
+      notifyFieldError('submissionDescription');
+    }
+  },
+  1000,
+  false,
+  false,
+);
 watch(
   () => [
     hasSubmission.value,
@@ -358,6 +375,7 @@ watch(
     type.value,
     status.value,
     goals.value,
+    restrictions.value,
   ],
   async () => {
     const values = {
@@ -368,6 +386,7 @@ watch(
       can_submit_after_deadline: sendAfterDeadline.value,
       submission_required: hasSubmission.value,
       learning_goals: goals.value,
+      allowed_editor_plugins: restrictions.value,
     };
     const goalsId = goals.value.map((goal) => goal.id);
     try {
@@ -378,6 +397,7 @@ watch(
         finish_at: endDate.value,
         can_submit_after_deadline: sendAfterDeadline.value,
         submission_required: hasSubmission.value,
+        allowed_editor_plugins: restrictions.value,
         learning_goals: {
           set: goalsId,
         },

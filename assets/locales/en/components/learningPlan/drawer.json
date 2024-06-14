@@ -20,6 +20,9 @@
       "accept": "Accept",
       "deny": "Deny"
     },
+    "submissionDescription": {
+      "label": "Submission Description"
+    },
     "description": {
       "label": "Description",
       "placeHolder": "Enter description"
