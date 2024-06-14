@@ -26,6 +26,7 @@
           class="hide-select-icon min-w-[264px]"
           name="tag"
           all
+          autofocus
           density="compact"
           :placeholder="$t('components.learningPlan.drawer.tags.placeholder')"
           @add-tag="(tag) => addTag(tag)"

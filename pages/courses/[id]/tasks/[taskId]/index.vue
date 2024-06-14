@@ -10,7 +10,7 @@
   >
     <alex-learningplan-task-header
       :title="taskStore.task.title"
-      :tags="tags"
+      :tags="headerTags"
       :type="taskStore.task.type"
       :description="taskStore.task.description"
       :deadline-at="taskStore.task.finish_at"
@@ -109,30 +109,21 @@ const taskId = computed(() => parseInt(taskIdValue.toString()));
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<any[]>([]);
-const tags = computed(() => {
+const headerTags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
   return taskStore.task.tags.map((tag) => tag.text);
 });
 const handleChangeTags = (tags: TagSimple[]) => {
   if (!taskStore.task) return;
-  taskStore.task = {
-    ...taskStore.task,
-    tags,
-  };
+  taskStore.task.tags = tags;
 };
 const handleChangeDescription = (description: string) => {
   if (!taskStore.task) return;
-  taskStore.task = {
-    ...taskStore.task,
-    description,
-  };
+  taskStore.task.description = description;
 };
 const handleChangeSubmissionDescription = (description: string) => {
   if (!taskStore.task) return;
-  taskStore.task = {
-    ...taskStore.task,
-    submission_description: description,
-  };
+  taskStore.task.submission_description = description;
 };
 const handleChangeValues = (values: Partial<TaskSimple>) => {
   if (!taskStore.task) return;

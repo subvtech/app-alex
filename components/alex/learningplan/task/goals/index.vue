@@ -27,6 +27,7 @@
 
           <alex-inputs-text-field
             v-model="search"
+            autofocus
             name="goals"
             class="alex-search-goals w-full mt-2"
             :placeholder="
