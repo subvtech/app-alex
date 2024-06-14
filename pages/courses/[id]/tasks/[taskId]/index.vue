@@ -12,7 +12,7 @@
       :title="taskStore.task.title"
       :tags="headerTags"
       :type="taskStore.task.type"
-      :description="taskStore.task.description"
+      :description="taskStore.task.description || ''"
       :deadline-at="taskStore.task.finish_at"
       :start-at="taskStore.task.start_at"
       :status="taskStore.task.status"
@@ -76,7 +76,7 @@
       :status="taskStore.task.status"
       :events="taskStore.task.task_events"
       :goals="taskStore.task.learning_goals"
-      :description="taskStore.task.description"
+      :description="taskStore.task.description || ''"
       :submission-description="taskStore.task.submission_description"
       :has-submission="taskStore.task.submission_required"
       :send-after-deadline="taskStore.task.can_submit_after_deadline"
@@ -191,10 +191,10 @@ watch(
         date: new Date(task.finished_at.replaceAll('-', '/')),
         user: {
           name:
-            task.task_member_students[0]?.student_member.user.fullname || '',
+            task.task_member_students[0]?.student_member?.user.fullname || '',
         },
         studentClass:
-          task.task_member_students[0]?.student_member.learning_class?.name ||
+          task.task_member_students[0]?.student_member?.learning_class?.name ||
           '',
       }));
     }

@@ -164,7 +164,11 @@
       </div>
 
       <!-- Eventos e atribuições -->
-      <alex-custom-tabs v-model="activePage" :tabs="tabs"></alex-custom-tabs>
+      <alex-custom-tabs
+        v-model="activePage"
+        :tabs="tabs"
+        class="border-bottom-1 border-gray-100"
+      />
       <v-window v-model="activePage">
         <v-window-item value="1">
           <alex-learningplan-task-events v-model="taskEvents"

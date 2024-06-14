@@ -35,6 +35,8 @@
     <alex-learningplan-task-members-menu
       :submitted="member.submitted"
       :accepted="member.accepted"
+      @remove-click="$emit('remove-click')"
+      @to-profile="$emit('to-profile')"
     />
   </div>
 
@@ -56,6 +58,7 @@ interface CompProps {
 }
 
 defineProps<CompProps>();
+defineEmits(['remove-click', 'to-profile']);
 </script>
 
 <style scoped>

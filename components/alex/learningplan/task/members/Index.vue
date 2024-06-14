@@ -30,22 +30,18 @@
     </div>
 
     <!-- Cards -->
-    <div v-if="members?.data.length">
-      <Transition
-        v-for="(member, index) in members.data"
-        :key="index"
-        mode="out-in"
-        name="add-member"
-      >
-        <alex-learningplan-task-members-card
-          :member="{
-            name: member.student_member?.user.fullname,
-            class: member.student_member.learning_class?.name,
-            avatarUrl: member.student_member.user.avatar?.url,
-          }"
-        />
-      </Transition>
-    </div>
+    <template v-if="members?.data.length">
+      <alex-learningplan-task-members-card
+        v-for="member in members.data"
+        :key="`student-member${member.id}`"
+        :member="{
+          name: member.student_member?.user.fullname,
+          class: member.student_member?.learning_class?.name,
+          avatarUrl: member.student_member?.user.avatar?.url,
+        }"
+        @remove-click="() => removeMember(member.task_member.id, member.id)"
+      />
+    </template>
     <div
       v-else
       class="d-flex align-center justify-center flex-column ga-4 text-center"
@@ -96,12 +92,18 @@ const props = withDefaults(defineProps<MembersProps>(), {
   startAt: null,
   finishAt: null,
 });
-const strapi = useStrapiUtils();
+const strapiUtils = useStrapiUtils();
+const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const getMembers = (taskId: number) =>
-  strapi.find<TaskMemberStudent>('task-member-students', {
-    populate: ['student_member.user.avatar', 'student_member.learning_class'],
+  strapiUtils.find<TaskMemberStudent>('task-member-students', {
+    populate: {
+      student_member: {
+        populate: ['user.avatar', 'learning_class'],
+      },
+      task_member: true,
+    },
     filters: {
       task_member: {
         task: taskId,
@@ -143,8 +145,8 @@ const addMember = async (member: LearningPlanMemberSimple) => {
     return;
   }
   try {
-    const { data: taskMember } = await strapi.create<TaskMember>(
-      'task-membears',
+    const { data: taskMember } = await strapiUtils.create<TaskMember>(
+      'task-members',
       {
         // @ts-ignore
         task: props.taskId,
@@ -154,7 +156,7 @@ const addMember = async (member: LearningPlanMemberSimple) => {
         can_submit_after_deadline: props.sendAfterDeadline,
       },
     );
-    strapi.create('task-member-studentas', {
+    strapiUtils.create('task-member-students', {
       role: 'in_charge',
       student_member: member.id,
       task_member: taskMember.id,
@@ -166,7 +168,7 @@ const addMember = async (member: LearningPlanMemberSimple) => {
       'success',
       true,
     );
-    refresh({ dedupe: 'cancel' });
+    setTimeout(refresh, 100);
   } catch (error) {
     setMessage(
       t('components.learningPlan.drawer.task.errors.addMember'),
@@ -174,6 +176,11 @@ const addMember = async (member: LearningPlanMemberSimple) => {
       true,
     );
   }
+};
+const removeMember = async (taskMemberID: number, memberID: number) => {
+  await strapi.delete('task-members', taskMemberID);
+  await strapi.delete('task-member-students', memberID);
+  setTimeout(refresh, 100);
 };
 </script>
 
