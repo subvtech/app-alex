@@ -23,11 +23,12 @@
         </p>
         <alex-inputs-tag-autocomplete
           v-model="tags"
-          is-general
           class="hide-select-icon min-w-[264px]"
           name="tag"
-          :placeholder="$t('components.learningPlan.drawer.tags.placeholder')"
+          all
           density="compact"
+          :placeholder="$t('components.learningPlan.drawer.tags.placeholder')"
+          @add-tag="(tag) => addTag(tag)"
         />
       </v-list>
     </v-menu>
@@ -49,6 +50,7 @@
 <script setup lang="ts">
 interface CompProps {
   edit?: boolean;
+  taskId: number;
 }
 
 const props = withDefaults(defineProps<CompProps>(), {
@@ -57,9 +59,47 @@ const props = withDefaults(defineProps<CompProps>(), {
 });
 const open = ref<boolean>(false);
 const tags = defineModel<TagSimple[]>({ default: [] });
+const strapiUtils = useStrapiUtils();
+const strapi = useStrapi();
+type EmitTag = {
+  isPublic: boolean;
+  local?: boolean;
+  isGeneral?: boolean;
+  id?: number;
+  text: string;
+};
 
 const handleRemoveTag = (tag: TagSimple) => {
-  tags.value = tags.value.filter((tagValue) => tagValue.text !== tag.text);
+  strapi.update('tasks', props.taskId, {
+    tags: {
+      disconnect: [tag.id],
+    },
+  });
+  tags.value = tags.value.filter((tagValue) => tagValue.id !== tag.id);
+};
+const addTag = async (value: EmitTag | null) => {
+  if (!value) return;
+  if (!value.id) {
+    const { data: tag } = await strapiUtils.create<TagSimple>('tags', {
+      text: value.text,
+      isGeneral: value.isGeneral,
+      isPublic: value.isPublic,
+      // @ts-ignore
+      tasks: props.taskId,
+    });
+    value.id = tag.id;
+    tags.value = tags.value.map((oldTag) => {
+      if (oldTag.text === tag.text) {
+        return tag;
+      }
+      return oldTag;
+    });
+  }
+  strapi.update('tasks', props.taskId, {
+    tags: {
+      connect: [value.id],
+    },
+  });
 };
 </script>
 
