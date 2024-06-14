@@ -11,7 +11,10 @@
         clearable
       />
 
-      <alex-learningplan-task-members-invite :learningplan-id="learningplanId">
+      <alex-learningplan-task-members-invite
+        :learningplan-id="learningplanId"
+        @select-member-click="addMember"
+      >
         <template #activator="{ menuProps }">
           <alex-custom-button
             v-bind="menuProps"
@@ -28,14 +31,20 @@
 
     <!-- Cards -->
     <div v-if="members?.data.length">
-      <alex-learningplan-task-members-card
+      <Transition
         v-for="(member, index) in members.data"
         :key="index"
-        :member="{
-          name: member.student_member?.user.fullname,
-          class: member.student_member.learning_class?.name,
-        }"
-      />
+        mode="out-in"
+        name="add-member"
+      >
+        <alex-learningplan-task-members-card
+          :member="{
+            name: member.student_member?.user.fullname,
+            class: member.student_member.learning_class?.name,
+            avatarUrl: member.student_member.user.avatar?.url,
+          }"
+        />
+      </Transition>
     </div>
     <div
       v-else
@@ -78,9 +87,18 @@ const totalVisible = 10;
 interface MembersProps {
   learningplanId: number;
   taskId: number;
+  startAt?: string | null;
+  finishAt?: string | null;
+  sendAfterDeadline?: boolean;
 }
-const props = defineProps<MembersProps>();
+const props = withDefaults(defineProps<MembersProps>(), {
+  sendAfterDeadline: false,
+  startAt: null,
+  finishAt: null,
+});
 const strapi = useStrapiUtils();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
 const getMembers = (taskId: number) =>
   strapi.find<TaskMemberStudent>('task-member-students', {
     populate: ['student_member.user.avatar', 'student_member.learning_class'],
@@ -90,9 +108,73 @@ const getMembers = (taskId: number) =>
       },
     },
   });
-const { data: members } = await useAsyncData('task-members-students', () =>
-  getMembers(props.taskId),
+const { data: members, refresh } = await useAsyncData(
+  'task-members-students',
+  () => getMembers(props.taskId),
 );
+const checkAlreadyHasMember = (member: LearningPlanMemberSimple) => {
+  if (members.value?.data) {
+    const alreadyInTask = members.value.data.find(
+      (alreadyMember) => alreadyMember.student_member.id === member.id,
+    );
+    if (alreadyInTask) {
+      setMessage(
+        t('components.learningPlan.drawer.task.memberAlreadyInTask', {
+          member: alreadyInTask.student_member.user.fullname,
+        }),
+        'warning',
+        true,
+      );
+      return true;
+    }
+  }
+  return false;
+};
+const addMember = async (member: LearningPlanMemberSimple) => {
+  if (checkAlreadyHasMember(member)) {
+    return;
+  }
+  if (!props.finishAt || !props.startAt) {
+    setMessage(
+      t('components.learningPlan.drawer.task.pleaseFillDates'),
+      'warning',
+      true,
+    );
+    return;
+  }
+  try {
+    const { data: taskMember } = await strapi.create<TaskMember>(
+      'task-membears',
+      {
+        // @ts-ignore
+        task: props.taskId,
+        status: 'to_do',
+        started_at: props.startAt!,
+        finished_at: props.finishAt!,
+        can_submit_after_deadline: props.sendAfterDeadline,
+      },
+    );
+    strapi.create('task-member-studentas', {
+      role: 'in_charge',
+      student_member: member.id,
+      task_member: taskMember.id,
+    });
+    setMessage(
+      t('components.learningPlan.drawer.task.addMember', {
+        member: member.user.fullname,
+      }),
+      'success',
+      true,
+    );
+    refresh({ dedupe: 'cancel' });
+  } catch (error) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.addMember'),
+      'error',
+      true,
+    );
+  }
+};
 </script>
 
 <style>
@@ -104,5 +186,12 @@ const { data: members } = await useAsyncData('task-members-students', () =>
 }
 .members .v-input__details {
   display: none !important;
+}
+.add-member-enter-active {
+  transition: all 0.5s ease-in-out;
+}
+.add-member-enter-from,
+.add-member-leave-to {
+  opacity: 0;
 }
 </style>

@@ -33,6 +33,9 @@
         "placeHolder": "Digite a descrição"
       }
     },
+    "memberAlreadyInTask": "{member} já está na tarefa",
+    "pleaseFillDates": "Por favor coloque uma data de inicio e término antes de adicionar",
+    "addMember": "{member} foi adicionado a tarefa",
     "freeEditor": "Editor Livre",
     "allowSendAfterSubmission": "Permitir envio após o prazo",
     "restrictions": {
@@ -61,7 +64,8 @@
     },
     "errors": {
       "save": "Não foi possível salvar o campo {field}",
-      "genericSave": "Não foi possível salvar os dados"
+      "genericSave": "Não foi possível salvar os dados",
+       "addMember": "Erro ao adicionar o membro"
     }
   },
   "goals": {

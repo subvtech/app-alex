@@ -36,6 +36,9 @@
         "placeHolder": "Enter description"
       }
     },
+    "memberAlreadyInTask": "{member} already in task",
+    "pleaseFillDates": "Please fill start and finish dates before add",
+    "addMember": "{member} was added in task",
     "freeEditor": "Free editor",
     "allowSendAfterSubmission": "Allow submission after deadline",
     "restrictions": {
@@ -64,7 +67,8 @@
     },
     "errors": {
       "save": "Can't save the field {field}",
-       "genericSave": "Can't save the data"
+      "genericSave": "Can't save the data",
+      "addMember": "Error when adding member"
     }
   },
   "goals": {

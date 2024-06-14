@@ -173,6 +173,9 @@
           <alex-learningplan-task-members
             :learningplan-id="learningplanId"
             :task-id="taskId"
+            :start-at="startDate"
+            :finish-at="endDate"
+            :submit-after-deadline="sendAfterDeadline"
         /></v-window-item>
       </v-window>
     </div>
@@ -205,8 +208,8 @@ interface TaskTeacherDrawerProps {
   hasSubmission?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
-  startDate?: Date | string | null;
-  endDate?: Date | string | null;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   editable: true,
@@ -391,13 +394,20 @@ watch(
     const goalsId = goals.value.map((goal) => goal.id);
     try {
       await strapi.update('tasks', props.taskId, {
-        type: type.value,
+        ...(type.value && { type: type.value }),
+        ...(goalsId.length && {
+          learning_goals: {
+            set: goalsId,
+          },
+        }),
+        ...(restrictions.value && {
+          allowed_editor_plugins: restrictions.value,
+        }),
         status: status.value,
         start_at: startDate.value,
         finish_at: endDate.value,
         can_submit_after_deadline: sendAfterDeadline.value,
         submission_required: hasSubmission.value,
-        allowed_editor_plugins: restrictions.value,
         learning_goals: {
           set: goalsId,
         },

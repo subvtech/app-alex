@@ -6,4 +6,5 @@ export interface TaskMember {
   finished_at: string;
   last_submission_at: string;
   task_member_students: TaskMemberStudent[];
+  task?: TaskSimple;
 }
