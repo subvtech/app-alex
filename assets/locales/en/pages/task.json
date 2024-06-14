@@ -20,7 +20,9 @@
     "delivery": "Delivery",
     "noSubmissions": "No submissions",
     "student": "Student",
-    "students": "Students"
+    "students": "Students",
+    "group": "Group",
+    "groups": "Groups"
   },
   "table": {
     "header": {

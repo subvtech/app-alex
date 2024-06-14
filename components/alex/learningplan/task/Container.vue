@@ -104,7 +104,7 @@ export interface TaskType {
   status: string;
   deadline_at?: string;
   position: number;
-  type?: string;
+  type?: 'group' | 'individual';
   archived?: boolean;
   students?: { name: string; image: { url: string } }[];
   delivered: {
@@ -204,7 +204,7 @@ const handleCreateTask = async () => {
     });
     displaySuccess('addSuccess');
   } catch (e) {
-    setMessage(t('pages.task.crud.addError'), 'error', true);
+    displayError('addError');
   }
   loader.value = false;
   taskTitle.value = '';
@@ -236,7 +236,6 @@ const tasksArray = computed(() => {
         underReview: 0,
         completed: 0,
       };
-
       if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
         return;
       if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;

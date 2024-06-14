@@ -20,7 +20,9 @@
     "delivery": "Entrega",
     "noSubmissions": "Sem entrega",
     "student": "Aluno",
-    "students": "Alunos"
+    "students": "Alunos",
+    "group": "Grupo",
+    "groups": "Grupos"
   },
   "table": {
     "header": {
@@ -66,8 +68,8 @@
     "editError": "editar",
     "deleteError": "excluir",
     "moveSuccess": "movida",
-    "moveError": "Ocorreu um erro ao mover a tarefa, tente novamente!",
-    "errorMessage": "Erro ao {action} tarefa, tente novamente!",
+    "moveError": "mover",
+    "errorMessage": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",
     "successMessage": "Tarefa {action} com sucesso!",
     "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
     "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem estiver ativa"
