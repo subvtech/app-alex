@@ -23,11 +23,7 @@
             :text="taskStatus[i - 1].text"
           />
           {{ taskStatus[i - 1].value }}
-          {{
-            taskStatus[i - 1].value > 1
-              ? $t('pages.task.submissions.students')
-              : $t('pages.task.submissions.student')
-          }}
+          {{ $t(`${taskType}${taskStatus[i - 1].value > 1 ? 's' : ''}`) }}
         </span>
       </div>
     </HoverCardContent>
@@ -42,6 +38,7 @@ interface Submissions {
     underReview: number;
     completed: number;
   };
+  type?: 'group' | 'individual';
 }
 type TaskStatus = {
   text: string;
@@ -57,6 +54,7 @@ const props = withDefaults(defineProps<Submissions>(), {
     underReview: 0,
     completed: 0,
   }),
+  type: 'individual',
 });
 
 const taskStatus: TaskStatus[] = [
@@ -81,6 +79,12 @@ const taskStatus: TaskStatus[] = [
     value: props.submitted.completed,
   },
 ];
+
+const taskType = computed(() =>
+  props.type === 'group'
+    ? 'pages.task.submissions.group'
+    : 'pages.task.submissions.student',
+);
 
 const completedPercentage = computed(() => {
   const total =

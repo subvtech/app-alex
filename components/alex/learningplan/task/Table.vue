@@ -25,7 +25,6 @@
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
             dragging && dragFrom == item.id ? 'dragging' : '',
-            previewRow(item.id) ? 'row-drop' : '',
           ]"
           @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
           @dragstart="(e) => setDragStart(item, e)"
@@ -87,6 +86,7 @@
               <alex-learningplan-task-submissions-status
                 v-if="item.delivered"
                 :submitted="item.delivered"
+                :type="item.type"
               />
               <div v-else>
                 <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
@@ -103,7 +103,7 @@
                     v-bind="tooltipKanban"
                     icon="alex:Kanban"
                     variant="text"
-                    @click="navigateTo(`tasks/${item.id}`)"
+                    color="gray-600"
                   />
                 </template>
               </v-tooltip>
@@ -120,6 +120,7 @@
                     <template #activator="{ props: optionsTooltipProps }">
                       <alex-custom-button
                         variant="text"
+                        color="gray-600"
                         v-bind="{ ...propsMenu, ...optionsTooltipProps }"
                         icon="mdi-dots-vertical"
                       />
@@ -129,7 +130,7 @@
               </alex-custom-dropdown>
             </td>
           </template>
-          <td v-else :colspan="columns.length" class="preview-row"></td>
+          <td v-else :colspan="columns.length" class="row-drop"></td>
         </tr>
       </transition-group>
       <tr v-if="!items.length">
@@ -418,8 +419,9 @@ const previewRow = (id: number) => {
   opacity: 0.99;
 }
 
-/*  .row-drop, {
-  outline: 1.5px dashed rgb(var(--v-theme-gray-400));
+/* .row-drop {
+  outline: 1px dashed rgb(var(--v-theme-gray-400));
+  border-bottom: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
 } */
 
 .table-drop {
