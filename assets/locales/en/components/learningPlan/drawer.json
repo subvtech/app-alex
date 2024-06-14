@@ -54,7 +54,14 @@
     },
     "tags": {
       "subtitle": "Enter a tag",
-      "search": "Search a name"
+      "search": "Search a name",
+      "errors": {
+        "save": "Can't save tag"
+      }
+    },
+    "errors": {
+      "save": "Can't save the field {field}",
+       "genericSave": "Can't save the data"
     }
   },
   "goals": {

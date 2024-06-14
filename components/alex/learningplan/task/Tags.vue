@@ -61,6 +61,7 @@ const open = ref<boolean>(false);
 const tags = defineModel<TagSimple[]>({ default: [] });
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
+const { t } = useI18n();
 type EmitTag = {
   isPublic: boolean;
   local?: boolean;
@@ -69,37 +70,53 @@ type EmitTag = {
   text: string;
 };
 
+const { setMessage } = useMessageStore();
+const notifyError = () => {
+  setMessage(
+    t('components.learningPlan.drawer.task.tags.errors.save'),
+    'error',
+    true,
+  );
+};
 const handleRemoveTag = (tag: TagSimple) => {
-  strapi.update('tasks', props.taskId, {
-    tags: {
-      disconnect: [tag.id],
-    },
-  });
-  tags.value = tags.value.filter((tagValue) => tagValue.id !== tag.id);
+  if (tag.id) {
+    strapi.update('tasks', props.taskId, {
+      tags: {
+        disconnect: [tag.id],
+      },
+    });
+    tags.value = tags.value.filter((tagValue) => tagValue.id !== tag.id);
+    return;
+  }
+  tags.value = tags.value.filter((tagValue) => tagValue.text !== tag.text);
 };
 const addTag = async (value: EmitTag | null) => {
   if (!value) return;
-  if (!value.id) {
-    const { data: tag } = await strapiUtils.create<TagSimple>('tags', {
-      text: value.text,
-      isGeneral: value.isGeneral,
-      isPublic: value.isPublic,
-      // @ts-ignore
-      tasks: props.taskId,
+  try {
+    if (!value.id) {
+      const { data: tag } = await strapiUtils.create<TagSimple>('tags', {
+        text: value.text,
+        isGeneral: value.isGeneral,
+        isPublic: value.isPublic,
+        // @ts-ignore
+        tasks: props.taskId,
+      });
+      value.id = tag.id;
+      tags.value = tags.value.map((oldTag) => {
+        if (oldTag.text === tag.text) {
+          return tag;
+        }
+        return oldTag;
+      });
+    }
+    strapi.update('tasks', props.taskId, {
+      tags: {
+        connect: [value.id],
+      },
     });
-    value.id = tag.id;
-    tags.value = tags.value.map((oldTag) => {
-      if (oldTag.text === tag.text) {
-        return tag;
-      }
-      return oldTag;
-    });
+  } catch (error) {
+    notifyError();
   }
-  strapi.update('tasks', props.taskId, {
-    tags: {
-      connect: [value.id],
-    },
-  });
 };
 </script>
 

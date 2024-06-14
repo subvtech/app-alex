@@ -37,15 +37,19 @@
           />
 
           <!-- Opções -->
-          <div v-if="searchedGoals.length" class="d-flex flex-column ga-1 mt-2">
-            <alex-learningplan-task-goals-card
-              v-for="goal in searchedGoals"
-              :id="goal.id"
-              :key="goal.id"
-              :verb="goal.verb?.text"
-              :description="goal.description"
-              @click="addGoal(goal)"
-            />
+          <div class="d-flex flex-column ga-1 mt-2">
+            <template v-if="searchedGoals.length">
+              <alex-learningplan-task-goals-card
+                v-for="goal in searchedGoals"
+                :id="goal.id"
+                :key="goal.id"
+                :verb="goal.verb?.text"
+                :description="goal.description"
+                @click="addGoal(goal)"
+            /></template>
+            <div v-else class="text-center text-gray-400">
+              Parece que não tem nada por aqui
+            </div>
           </div>
         </v-list>
       </v-menu>

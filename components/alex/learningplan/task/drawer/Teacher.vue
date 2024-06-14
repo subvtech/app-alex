@@ -249,6 +249,7 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
+const { setMessage } = useMessageStore();
 // Status
 const status = ref<TaskStatus | TaskMemberStatus>(props.status);
 
@@ -315,14 +316,34 @@ const orderToDateEvents = (events: TaskEvent[]) => {
   });
   return eventsGroups;
 };
+const notifyFieldError = (field: string) => {
+  setMessage(
+    t('components.learningPlan.drawer.task.errors.genericSave', {
+      field: t(`components.learningPlan.drawer.task.${field}.label`),
+    }),
+    'error',
+    true,
+  );
+};
+const notifyError = () => {
+  setMessage(
+    t('components.learningPlan.drawer.task.errors.genericSave'),
+    'error',
+    true,
+  );
+};
 const strapi = useStrapi();
 useOnStopTyping(
   description,
-  () => {
-    strapi.update('tasks', props.taskId, {
-      description: description.value,
-    });
-    emit('change-description', description.value || '');
+  async () => {
+    try {
+      await strapi.update('tasks', props.taskId, {
+        description: description.value,
+      });
+      emit('change-description', description.value || '');
+    } catch (error) {
+      notifyFieldError('description');
+    }
   },
   1000,
   false,
@@ -338,7 +359,7 @@ watch(
     status.value,
     goals.value,
   ],
-  () => {
+  async () => {
     const values = {
       type: type.value,
       status: status.value,
@@ -349,23 +370,25 @@ watch(
       learning_goals: goals.value,
     };
     const goalsId = goals.value.map((goal) => goal.id);
-    emit('change-values', values as ChangeValues);
-    strapi.update('tasks', props.taskId, {
-      type: type.value,
-      status: status.value,
-      start_at: startDate.value,
-      finish_at: endDate.value,
-      can_submit_after_deadline: sendAfterDeadline.value,
-      submission_required: hasSubmission.value,
-      learning_goals: {
-        set: goalsId,
-      },
-    });
+    try {
+      await strapi.update('tasks', props.taskId, {
+        type: type.value,
+        status: status.value,
+        start_at: startDate.value,
+        finish_at: endDate.value,
+        can_submit_after_deadline: sendAfterDeadline.value,
+        submission_required: hasSubmission.value,
+        learning_goals: {
+          set: goalsId,
+        },
+      });
+      emit('change-values', values as ChangeValues);
+    } catch (error) {
+      notifyError();
+    }
   },
 );
-watch(tags, (value) => {
-  emit('change-tags', value);
-});
+watch(tags, (value) => emit('change-tags', value));
 // Close drawer
 function handleCloseModal() {
   model.value = false;

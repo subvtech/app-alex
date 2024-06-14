@@ -54,7 +54,14 @@
     },
     "tags": {
       "subtitle": "Informe um marcador",
-      "search": "Digite um nome"
+      "search": "Digite um nome",
+      "errors": {
+        "save": "Não foi possível salvar a tag"
+      }
+    },
+    "errors": {
+      "save": "Não foi possível salvar o campo {field}",
+      "genericSave": "Não foi possível salvar os dados"
     }
   },
   "goals": {
