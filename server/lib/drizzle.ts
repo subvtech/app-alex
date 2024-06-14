@@ -7,6 +7,7 @@ import { classes } from '@@/server/modules/classes-folder/classes.schema';
 import { users } from '@@/server/modules/users/users.schema';
 import { verificationTokens } from '@@/server/modules/verification-tokens/verification-tokens.schema';
 import { learningPlans } from '../modules/learning-plans/learning-plans.schema';
+import { tags } from '../modules/tags/tags.schema';
 
 const conn = postgres(process.env.DATABASE_URL!);
 
@@ -19,5 +20,6 @@ export default drizzle(conn, {
     institutions,
     classes,
     learningPlans,
+    tags,
   },
 });

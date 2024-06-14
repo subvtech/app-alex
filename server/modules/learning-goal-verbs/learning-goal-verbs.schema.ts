@@ -8,6 +8,7 @@ export const learningGoalVerbs = pgTable('learning-goal-verbs', {
   id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   learningGoalId: integer('learning_goal_id'),
+  descripton: text('descripton'),
   general: boolean('general').default(true),
 });
 
