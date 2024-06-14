@@ -104,6 +104,7 @@
                     icon="alex:Kanban"
                     variant="text"
                     color="gray-600"
+                    @click="navigateTo(`tasks/${item.id}`)"
                   />
                 </template>
               </v-tooltip>
