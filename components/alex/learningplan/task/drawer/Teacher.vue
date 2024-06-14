@@ -29,7 +29,11 @@
 
     <div>
       <!-- Tags -->
-      <alex-learningplan-task-tags v-model="tags" :edit="editable" />
+      <alex-learningplan-task-tags
+        v-model="tags"
+        :edit="editable"
+        :task-id="taskId"
+      />
 
       <!-- Informações -->
       <p class="mt-4 text-h2 ellipsis lines-2">
@@ -55,6 +59,12 @@
             v-model="type"
             :items="types"
             :edit="editable"
+            :config="{
+              group: $t('components.learningPlan.drawer.task.type.collective'),
+              individual: $t(
+                'components.learningPlan.drawer.task.type.individual',
+              ),
+            }"
             placeholder="Selecione um tipo"
           />
         </v-col>
@@ -183,6 +193,7 @@ interface TaskTeacherDrawerProps {
   taskId: number;
   title: string;
   status: TaskStatus;
+  tags?: TagSimple[];
   type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
   events?: TaskEvent[];
@@ -208,6 +219,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   endDate: undefined,
   restrictions: '',
   goals: () => [],
+  tags: () => [],
   events: () => [],
   type: undefined,
   submissionDescription: '',
@@ -217,7 +229,7 @@ const submissionDescription = toRef(props.submissionDescription);
 const hasSubmission = toRef(props.hasSubmission);
 const sendAfterDeadline = toRef(props.sendAfterDeadline);
 const goals = toRef(props.goals);
-const tags = ref<TagSimple[]>([]);
+const tags = toRef(props.tags);
 const model = defineModel({ default: false });
 
 type ChangeValues = {
@@ -233,6 +245,7 @@ type Emits = {
   'attached-trail-click': [];
   'change-values': [values: ChangeValues];
   'change-description': [value: string];
+  'change-tags': [value: TagSimple[]];
 };
 const emit = defineEmits<Emits>();
 
@@ -350,7 +363,9 @@ watch(
     });
   },
 );
-
+watch(tags, (value) => {
+  emit('change-tags', value);
+});
 // Close drawer
 function handleCloseModal() {
   model.value = false;

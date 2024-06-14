@@ -10,7 +10,7 @@ export interface TaskSimple {
   title: string;
   description: string;
   type?: TaskType | null;
-  tags: Tag[];
+  tags: TagSimple[];
   status: TaskStatus;
   submission_required: boolean;
   start_at?: string | null;

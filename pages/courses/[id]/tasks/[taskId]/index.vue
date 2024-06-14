@@ -70,6 +70,7 @@
       v-model="teacherDrawer"
       :learningplan-id="learningPlanId"
       :task-id="taskId"
+      :tags="taskStore.task.tags"
       :title="taskStore.task.title"
       :type="taskStore.task.type"
       :status="taskStore.task.status"
@@ -97,13 +98,8 @@
           };
         }
       "
-      @change-description="
-        (value) =>
-          (taskStore.task = {
-            ...(taskStore.task as TaskSimple),
-            description: value,
-          })
-      "
+      @change-description="handleChangeDescription"
+      @change-tags="handleChangeTags"
     />
   </section>
 </template>
@@ -128,6 +124,20 @@ const tags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
   return taskStore.task.tags.map((tag) => tag.text);
 });
+const handleChangeTags = (tags: TagSimple[]) => {
+  if (!taskStore.task) return;
+  taskStore.task = {
+    ...taskStore.task,
+    tags,
+  };
+};
+const handleChangeDescription = (description: string) => {
+  if (!taskStore.task) return;
+  taskStore.task = {
+    ...taskStore.task,
+    description,
+  };
+};
 onBeforeMount(() => {
   headerStore.showHeader = true;
   if (!id || !taskId.value) {

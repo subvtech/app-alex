@@ -47,27 +47,6 @@ const curr = ref<TaskTypes>('individual');
 </script>
 
 <style scoped>
-/** Estilização da página */
-.text-p3 {
-  /* Body/P3 */
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
-
-.text-p4 {
-  /* Body/P4 */
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
-}
-
 .output:hover {
   --v-theme-overlay-multiplier: var(--v-theme-gray-blue-overlay-multiplier);
   background-color: rgb(var(--v-theme-gray-blue)) !important;
