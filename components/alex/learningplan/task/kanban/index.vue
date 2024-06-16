@@ -57,6 +57,7 @@
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
+        :disabled="!canDrag || column.disable"
         @insert-card="handleInsertCard"
       >
         <template #card="{ item, status, index: itemIndex }">
@@ -131,6 +132,7 @@ interface Column<T extends KanbanType> {
   group: string;
   color: Colors;
   accept?: Accept<Card<T>> | null;
+  disable?: boolean;
 }
 interface KanbanProps {
   type: T;
@@ -138,6 +140,7 @@ interface KanbanProps {
 }
 const { t } = useI18n();
 // Models/props
+const canDrag = ref(true);
 const props = defineProps<KanbanProps>();
 const tasks = defineModel<Card<typeof props.type>[]>({
   required: true,
@@ -332,6 +335,14 @@ const moveViewY = () => {
 };
 watch(mouseX, moveViewX);
 watch(mouseY, moveViewY);
+
+const setCanDrag = (value: boolean) => {
+  canDrag.value = value;
+};
+defineExpose({
+  canDrag,
+  setCanDrag,
+});
 </script>
 
 <style scoped>

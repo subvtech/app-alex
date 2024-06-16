@@ -1,4 +1,7 @@
 {
   "notFound": "Task not found",
-  "cantUpdateMembers": "Can't update members"
+  "cantUpdateMembers": "Can't update members",
+  "errors": {
+    "updateStatusTask": "Error when updating task status"
+  }
 }

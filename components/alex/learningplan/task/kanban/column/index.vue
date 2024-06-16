@@ -21,6 +21,7 @@
         :key="item.id"
         :index="i"
         class="kanban-card-item"
+        :disabled="disabled"
       >
         <slot name="card" :item="item" :index="i" :status="status" />
       </SlickItem>
@@ -48,8 +49,12 @@ interface ColumnProps {
   color: 'orange' | 'green' | 'blue' | 'gray';
   accept?: Accept<T> | null;
   group: string;
+  disabled?: boolean;
 }
-const props = withDefaults(defineProps<ColumnProps>(), { accept: null });
+const props = withDefaults(defineProps<ColumnProps>(), {
+  accept: null,
+  disable: false,
+});
 const items = defineModel<T[]>({ required: true });
 const emit = defineEmits<{
   'insert-card': [

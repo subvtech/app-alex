@@ -21,6 +21,7 @@
       @edit-click="teacherDrawer = true"
     />
     <alex-learningplan-task-kanban
+      ref="kanban"
       v-model="tasks"
       type="professor"
       :classes="['turma A']"
@@ -51,6 +52,10 @@
         },
       ]"
       @card-click="studentDrawer = true"
+      @card-insert="
+        (newIndex, value, newStatus) =>
+          handleUpdateStatus(newIndex, value, newStatus)
+      "
     />
     <alex-learningplan-task-drawer-student
       v-model="studentDrawer"
@@ -95,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import { Task } from '@/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
@@ -102,14 +108,20 @@ definePageMeta({
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
 const learningPlanStore = useLearningPlanStore();
-const { t } = useI18n();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
+const { t } = useI18n();
 const { id, taskId: taskIdValue } = route.params;
+const { setMessage } = useMessageStore();
+const strapi = useStrapi();
 const taskId = computed(() => parseInt(taskIdValue.toString()));
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<any[]>([]);
+const kanban = ref<{
+  canDrag: boolean;
+  setCanDrag: (value: boolean) => void;
+} | null>(null);
 const headerTags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
   return taskStore.task.tags.map((tag) => tag.text);
@@ -137,6 +149,31 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     submission_required: values.submission_required!,
     can_submit_after_deadline: values.can_submit_after_deadline!,
   };
+};
+const handleUpdateStatus = async (
+  _newIndex: number,
+  item: Task,
+  newStatus: string,
+) => {
+  if (!kanban.value) {
+    return;
+  }
+  try {
+    kanban.value.setCanDrag(false);
+    await strapi.update<TaskMember>('task-members', item.id, {
+      status: newStatus as TaskMemberStatus,
+    });
+  } catch (error) {
+    tasks.value = tasks.value.map((task) => {
+      if (task.id === item.id) {
+        return { ...task, status: item.status };
+      }
+      return task;
+    });
+    setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
+  } finally {
+    kanban.value.setCanDrag(true);
+  }
 };
 onBeforeMount(() => {
   headerStore.showHeader = true;
