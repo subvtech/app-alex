@@ -37,7 +37,6 @@ export function useMultipleDragDrop() {
     e: DragEvent,
   ) => {
     clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
-
     const handleDragOver = () => {
       if (dragFrom.value !== id) over.value = { list, id, index, position };
       else {
@@ -56,7 +55,7 @@ export function useMultipleDragDrop() {
         return;
       }
       if (over.value.id === -1) {
-        dragoverTimeout.value = setTimeout(handleDragOver, 0);
+        dragoverTimeout.value = setTimeout(handleDragOver, 50);
       } else {
         handleDragOver();
       }
@@ -74,16 +73,6 @@ export function useMultipleDragDrop() {
   };
 
   const onDragLeave = (event: DragEvent) => {
-    const mouseIsOutSideViewport =
-      !event.relatedTarget || (event.clientX === 0 && event.clientY === 0);
-
-    if (mouseIsOutSideViewport) {
-      over.value = { list: '', id: -1, index: -1 };
-
-      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
-      return true;
-    }
-
     const rect = (event.currentTarget as any).getBoundingClientRect();
     const withinX = event.clientX >= rect.left && event.clientX <= rect.right;
     const withinY = event.clientY >= rect.top && event.clientY <= rect.bottom;
