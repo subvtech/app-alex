@@ -114,5 +114,6 @@
   "srchClass": "Search class",
   "date": {
     "placeholder": "Choose a date"
-  }
+  },
+  "students": "Students"
 }
