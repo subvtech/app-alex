@@ -5,6 +5,7 @@
 import { createNuxtApiHandler } from 'trpc-nuxt';
 
 import { router } from '@/server/lib/trpc';
+import { createContext } from '@/server/lib/trpc.context';
 import { usersRouter } from '@/server/modules/users/users.route';
 
 export const appRouter = router({
@@ -15,5 +16,5 @@ export type AppRouter = typeof appRouter;
 
 export default createNuxtApiHandler({
   router: appRouter,
-  createContext: () => ({}),
+  createContext,
 });

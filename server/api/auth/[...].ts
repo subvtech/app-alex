@@ -1,8 +1,8 @@
-import { NuxtAuthHandler } from '#auth';
 import Credentials from '@auth/core/providers/credentials';
 import type { AuthConfig } from '@auth/core/types';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { compare } from 'bcrypt';
+import { NuxtAuthHandler } from '#auth';
 
 import db from '@/server/lib/drizzle';
 import { LoginSchema } from '@/server/modules/accounts/accounts.validator';

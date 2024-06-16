@@ -2,8 +2,12 @@ import { TRPCError } from '@trpc/server';
 import { hash } from 'bcrypt';
 import { z } from 'zod';
 
-import { publicProcedure, router } from '@@/server/lib/trpc';
 import { sendVerificationEmail } from '@@/server/lib/mail';
+import {
+  protectedProcedure,
+  publicProcedure,
+  router,
+} from '@@/server/lib/trpc';
 
 import { generateVerificationToken } from '../verification-tokens/verification-tokens.service';
 import {
@@ -12,14 +16,14 @@ import {
   getUserById,
   register,
 } from './users.service';
-import { registerUserSchema, selectUserSchema } from './users.validator';
+import { registerUserSchema } from './users.validator';
 
 // TODO: Reenviar email de confirmação de cadastro ao tentar fazer login sem ter confirmado antes
 
 export const usersRouter = router({
-  getById: publicProcedure
-    .input(selectUserSchema.pick({ id: true }))
-    .query(({ input }) => getUserById(input.id)),
+  getById: protectedProcedure
+    .input(z.string().optional())
+    .query(({ input: id }) => (id ? getUserById(id) : null)),
 
   isAlreadyTaken: publicProcedure
     .input(z.object({ field: z.string(), value: z.string() }))

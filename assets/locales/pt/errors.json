@@ -1,6 +1,7 @@
 {
-    "invalidIdentifierPassword":  "Nome de usuário ou senha incorretos!",
-    "blockedByAdministrator": "Usuário bloqueado, entre em contato com o suporte.",
-    "emailIsNotConfirmed": "Por favor, valide seu e-mail antes de continuar.",
-    "default": "Ocorreu um erro, tente novamente mais tarde."
+  "blockedByAdministrator": "Usuário bloqueado, entre em contato com o suporte.",
+  "default": "Ocorreu um erro, tente novamente mais tarde.",
+  "emailIsNotConfirmed": "Por favor, valide seu e-mail antes de continuar.",
+  "invalidIdentifierPassword": "Nome de usuário ou senha incorretos!",
+  "unauthorized": "Acesso não autorizado"
 }

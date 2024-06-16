@@ -7,14 +7,22 @@
  * @see https://trpc.io/docs/server/routers
  * @see https://trpc.io/docs/server/procedures
  */
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 
-const t = initTRPC.create();
+import { Context } from './trpc.context';
 
-/**
- * Unprotected procedure
- **/
-export const publicProcedure = t.procedure;
+const t = initTRPC.context<Context>().create();
 
 export const router = t.router;
-export const middleware = t.middleware;
+
+export const publicProcedure = t.procedure;
+
+export const protectedProcedure = t.procedure.use(function (opts) {
+  const { ctx, next } = opts;
+
+  if (!ctx.session?.user || new Date(ctx.session.expires) < new Date()) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'unauthorized' });
+  }
+
+  return next({ ctx });
+});

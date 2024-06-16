@@ -208,10 +208,7 @@ const submit = (values: {
   });
 };
 
-const verifyField = curry(async function (
-  field: keyof User | 'confirmPassword',
-  value: string,
-) {
+const verifyField = curry(async function (field: keyof User, value: string) {
   const { data: isAlreadyTaken } = await $trpc.users.isAlreadyTaken.useQuery({
     field,
     value,
