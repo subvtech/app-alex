@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import db from '@@/server/lib/drizzle';
 
@@ -7,16 +7,22 @@ import {
   verificationTokens,
 } from './verification-tokens.schema';
 
+// TODO: Verificar se vale a pena colocar um tempo de expiração para confirmação de cadastro.
+// TODO: Colocar como variável de ambiente (ao menos o do reset de senha).
 const ONE_HOUR = 3600 * 1000;
 
 export const createVerificationToken = async (data: VerificationToken) => {
   return (await db.insert(verificationTokens).values(data).returning())[0];
 };
 
-export const generateVerificationToken = async (email: string) => {
-  await removeVerificationTokensByEmail(email);
+export const generateVerificationToken = async (
+  email: string,
+  type: VerificationToken['type'],
+) => {
+  await removeVerificationTokens(email, type);
 
   return await createVerificationToken({
+    type,
     identifier: email,
     token: crypto.randomUUID(),
     expires: new Date(new Date().getTime() + ONE_HOUR),
@@ -43,8 +49,16 @@ export const getVerificationTokenByToken = async (token: string) => {
   }
 };
 
-export const removeVerificationTokensByEmail = async (email: string) => {
+export const removeVerificationTokens = async (
+  email: string,
+  type: VerificationToken['type'],
+) => {
   await db
     .delete(verificationTokens)
-    .where(eq(verificationTokens.identifier, email));
+    .where(
+      and(
+        eq(verificationTokens.identifier, email),
+        eq(verificationTokens.type, type),
+      ),
+    );
 };

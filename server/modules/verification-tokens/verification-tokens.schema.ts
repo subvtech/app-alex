@@ -1,10 +1,22 @@
-import { pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
+
+export const typeEnum = pgEnum('type', [
+  'email_confirmation',
+  'reset_password',
+]);
 
 export const verificationTokens = pgTable(
   'verificationTokens',
   {
     identifier: text('identifier').notNull(),
     token: text('token').notNull(),
+    type: typeEnum('token').notNull(),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   (verificationToken) => ({

@@ -14,6 +14,8 @@ import {
 } from './users.service';
 import { registerUserSchema, selectUserSchema } from './users.validator';
 
+// TODO: Reenviar email de confirmação de cadastro ao tentar fazer login sem ter confirmado antes
+
 export const usersRouter = router({
   getById: publicProcedure
     .input(selectUserSchema.pick({ id: true }))
@@ -40,7 +42,11 @@ export const usersRouter = router({
     const hashedPassword = await hash(input.password, 10);
     await register({ ...input, password: hashedPassword });
 
-    const verificationToken = await generateVerificationToken(input.email);
+    const verificationToken = await generateVerificationToken(
+      input.email,
+      'email_confirmation',
+    );
+
     await sendVerificationEmail(
       verificationToken.identifier,
       verificationToken.token,
