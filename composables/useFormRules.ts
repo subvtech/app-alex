@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import { MIN_PASSWORD_SIZE } from '@/server/modules/users/users.validator';
 
 export function isValidCpf(val: string) {
   val = val.replace(/\D/g, '');
@@ -42,7 +43,10 @@ export const useFormRules = () => {
   };
 
   const passwordRules = {
-    password: yup.string().required(i18n.t('rules.password.required')),
+    password: yup
+      .string()
+      .required(i18n.t('rules.password.required'))
+      .min(MIN_PASSWORD_SIZE, i18n.t('rules.username.min')),
     /*
     .matches(/^(?=.*[a-z])/, i18n.t('rules.password.lowercase'))
     .matches(/^(?=.*[A-Z])/, i18n.t('rules.password.upperCase'))

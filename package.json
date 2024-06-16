@@ -78,6 +78,7 @@
     "plyr": "3.7.8",
     "postgres": "3.4.4",
     "prismjs": "1.29.0",
+    "remeda": "^2.0.10",
     "sass": "1.64.2",
     "shepherd.js": "11.2.0",
     "strapi-sdk-js": "2.2.0",

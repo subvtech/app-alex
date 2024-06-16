@@ -13,7 +13,7 @@
         align="left"
         step-class="d-flex flex-column gap-1"
         :steps-config="stepConfig"
-        :loading="registerUser.pending.value"
+        :loading="registerUser.status.value === 'pending'"
         @on-success="submit"
       >
         <template
@@ -145,13 +145,13 @@
           class="border-opacity-100"
           color="secondary"
           :thickness="1"
-        ></v-divider>
+        />
         <p class="mx-4">{{ $t('pages.register.divider') }}</p>
         <v-divider
           class="border-opacity-100"
           color="secondary"
           :thickness="1"
-        ></v-divider>
+        />
       </div>
       <v-card-text class="text-white font-bold haveAccount text-body-2">
         {{ $t('pages.register.hasAccount') }}
@@ -164,6 +164,8 @@
 </template>
 
 <script setup lang="ts">
+import { omit } from 'remeda';
+
 import { type User } from '@/server/modules/users/users.schema';
 import { curry } from '@/utils/curry';
 
@@ -184,32 +186,38 @@ const confirmationVisible = ref(false);
 const passwordVisible = ref(false);
 
 const submit = (values: {
-  fullname: string;
-  username: string;
-  email: string;
-  cpf: string;
-  password: string;
-  confirmPassword: string;
-  yourRole: string;
-  institution: string;
   address?: string;
+  confirmPassword: string;
+  cpf: string;
+  email: string;
+  institution: string;
+  fullname: string;
+  password: string;
+  username: string;
+  yourRole: string;
 }) => {
   const isProfessor = values.yourRole.toLowerCase() === 'professor';
 
   registerUser.mutate({
-    ...values,
+    ...omit(values, ['fullname']),
+    name: values.fullname,
+    cpf: values.cpf.replace(/\D/g, ''),
     address: wallet?.address ?? wallet?.address,
     institution: isProfessor ? values.institution : undefined,
     isProfessor,
   });
 };
 
-const verifyField = curry(async (field: keyof User, value: string) => {
-  const { data: isAlreadyTaken } = await useAsyncData(() =>
-    $trpc.users.isAlreadyTaken.useQuery({ field, value }),
-  );
+const verifyField = curry(async function (
+  field: keyof User | 'confirmPassword',
+  value: string,
+) {
+  const { data: isAlreadyTaken } = await $trpc.users.isAlreadyTaken.useQuery({
+    field,
+    value,
+  });
 
-  if (isAlreadyTaken) {
+  if (isAlreadyTaken.value) {
     return {
       status: false,
       message: `${t(`pages.register.${field}`)} ${t(

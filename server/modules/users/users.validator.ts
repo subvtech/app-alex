@@ -3,6 +3,8 @@ import { z } from 'zod';
 
 import { users } from './users.schema';
 
+export const MIN_PASSWORD_SIZE = 8;
+
 export const registerUserSchema = z.object({
   cpf: z.string().length(11),
   name: z.string().min(3),
@@ -11,7 +13,7 @@ export const registerUserSchema = z.object({
   institution: z.string().optional(),
   isProfessor: z.boolean(),
   username: z.string().min(3).max(60),
-  password: z.string().min(8).max(60),
+  password: z.string().min(MIN_PASSWORD_SIZE).max(60),
 });
 
 export const selectUserSchema = createSelectSchema(users);
