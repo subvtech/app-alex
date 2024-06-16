@@ -60,34 +60,30 @@
         @insert-card="handleInsertCard"
       >
         <template #card="{ item, status, index: itemIndex }">
-          <template v-if="type === 'professor'">
-            <alex-learningplan-task-card
-              v-if="!isTaskStudent(item)"
-              class="kanban-card-item-inner select-none"
-              :date="item.date"
-              :name="item.user.name"
-              :student-class="item.studentClass"
-              :status="status"
-              :avatar="item?.user.avatar"
-              :mark="item.mark"
-              :max-mark="item.maxMark"
-              @click="$emit('card-click', itemIndex, item)"
-            />
-          </template>
-          <template v-if="type === 'student'">
-            <alex-learningplan-task-student-card
-              v-if="isTaskStudent(item)"
-              class="kanban-card-item-inner select-none"
-              :title="item.title"
-              :date="item.date"
-              :group="item.group"
-              :name-group="item.nameGroup"
-              :status="status"
-              :avatar="item?.avatar"
-              :mark="item.mark"
-              :max-mark="item.maxMark"
-            />
-          </template>
+          <alex-learningplan-task-card
+            v-if="!isTaskStudent(item)"
+            class="kanban-card-item-inner select-none"
+            :date="item.date"
+            :name="item.user.name"
+            :student-class="item.studentClass"
+            :status="status"
+            :avatar="item?.user.avatar"
+            :mark="item.mark"
+            :max-mark="item.maxMark"
+            @click="$emit('card-click', itemIndex, item)"
+          />
+          <alex-learningplan-task-student-card
+            v-else
+            class="kanban-card-item-inner select-none"
+            :title="item.title"
+            :date="item.date"
+            :group="item.group"
+            :name-group="item.nameGroup"
+            :status="status"
+            :avatar="item?.avatar"
+            :mark="item.mark"
+            :max-mark="item.maxMark"
+          />
         </template>
       </alex-learningplan-task-kanban-column>
     </div>
