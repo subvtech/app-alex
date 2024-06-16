@@ -8,7 +8,7 @@ export interface TaskSimple {
   trail_id: number;
   learning_plan_id: number;
   title: string;
-  description: string;
+  description: string | null;
   type?: TaskType | null;
   tags: TagSimple[];
   status: TaskStatus;
