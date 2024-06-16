@@ -3,6 +3,7 @@
     <!-- Header -->
     <div class="header d-flex align-center py-4 px-2">
       <alex-inputs-text-field
+        v-model="searchFilter"
         name="member"
         class="w-50"
         :placeholder="$t('components.learningPlan.members.search')"
@@ -30,20 +31,18 @@
     </div>
 
     <!-- Cards -->
-    <template v-if="members?.data.length">
-      <alex-learningplan-task-members-card
-        v-for="member in members.data"
-        :key="`student-member${member.id}`"
-        :member="{
-          name: member.student_member?.user.fullname,
-          class: member.student_member?.learning_class?.name,
-          avatarUrl: member.student_member?.user.avatar?.url,
-        }"
-        @remove-click="() => removeMember(member.task_member.id, member.id)"
-      />
-    </template>
+    <alex-learningplan-task-members-card
+      v-for="member in filteredMembers"
+      :key="`student-member${member.id}`"
+      :member="{
+        name: member.student_member?.user.fullname,
+        class: member.student_member?.learning_class?.name,
+        avatarUrl: member.student_member?.user.avatar?.url,
+      }"
+      @remove-click="() => removeMember(member.task_member.id, member)"
+    />
     <div
-      v-else
+      v-if="!filteredMembers.length"
       class="d-flex align-center justify-center flex-column ga-4 text-center"
     >
       <img
@@ -96,6 +95,7 @@ const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
+const searchFilter = ref('');
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMemberStudent>('task-member-students', {
     populate: {
@@ -114,6 +114,21 @@ const { data: members, refresh } = await useAsyncData(
   'task-members-students',
   () => getMembers(props.taskId),
 );
+
+const filteredMembers = computed(() => {
+  if (!members.value?.data) {
+    return [];
+  }
+  return members.value?.data.filter((member) => {
+    const search = searchFilter.value.toLowerCase();
+    return (
+      member.student_member?.user?.fullname?.toLowerCase().includes(search) ||
+      member.student_member?.user?.email?.toLowerCase().includes(search) ||
+      member.student_member?.user?.username?.toLowerCase().includes(search)
+    );
+  });
+});
+
 const checkAlreadyHasMember = (member: LearningPlanMemberSimple) => {
   if (members.value?.data) {
     const alreadyInTask = members.value.data.find(
@@ -177,10 +192,28 @@ const addMember = async (member: LearningPlanMemberSimple) => {
     );
   }
 };
-const removeMember = async (taskMemberID: number, memberID: number) => {
-  await strapi.delete('task-members', taskMemberID);
-  await strapi.delete('task-member-students', memberID);
-  setTimeout(refresh, 100);
+const removeMember = async (
+  taskMemberID: number,
+  member: TaskMemberStudent,
+) => {
+  try {
+    await strapi.delete('task-members', taskMemberID);
+    await strapi.delete('task-member-students', member.id);
+    setTimeout(refresh, 100);
+    setMessage(
+      t('components.learningPlan.drawer.task.removeMember', {
+        member: member.student_member?.user?.fullname,
+      }),
+      'success',
+      true,
+    );
+  } catch (error) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.removeMember'),
+      'error',
+      true,
+    );
+  }
 };
 </script>
 
