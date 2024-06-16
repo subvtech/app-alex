@@ -30,16 +30,16 @@ export const usersRouter = router({
   confirmEmail: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }) => {
-      const verificationToken = await getVerificationToken(input.token);
+      const vToken = await getVerificationToken(input.token);
 
-      if (!verificationToken) {
+      if (!vToken) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'invalid_token',
         });
       }
 
-      const user = await getUserByEmail(verificationToken.identifier);
+      const user = await getUserByEmail(vToken.identifier);
 
       if (!user) {
         throw new TRPCError({
@@ -49,11 +49,7 @@ export const usersRouter = router({
       }
 
       await update({ id: user.id, emailVerified: new Date() });
-
-      await removeVerificationTokens(
-        verificationToken.identifier,
-        'email_confirmation',
-      );
+      await removeVerificationTokens(user.email, 'email_confirmation');
 
       return { success: 'email_confirmed' };
     }),
@@ -71,9 +67,7 @@ export const usersRouter = router({
   register: publicProcedure
     .input(registerUserSchema)
     .mutation(async ({ input }) => {
-      const existingUser = await getUserByEmail(input.email);
-
-      if (existingUser) {
+      if (await getUserByEmail(input.email)) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'email_already_taken',
@@ -102,16 +96,16 @@ export const usersRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const verificationToken = await getVerificationToken(input.token);
+      const vToken = await getVerificationToken(input.token);
 
-      if (!verificationToken) {
+      if (!vToken || new Date(vToken.expires) < new Date()) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'invalid_token',
         });
       }
 
-      const user = await getUserByEmail(verificationToken.identifier);
+      const user = await getUserByEmail(vToken.identifier);
 
       if (!user) {
         throw new TRPCError({
@@ -130,11 +124,7 @@ export const usersRouter = router({
       // TODO: Fazer blacklist de senhas utilizadas?
       const hashed = await hash(input.password, 10);
       await update({ id: user.id, password: hashed });
-
-      await removeVerificationTokens(
-        verificationToken.identifier,
-        'reset_password',
-      );
+      await removeVerificationTokens(user.email, 'reset_password');
 
       return { success: 'password_updated' };
     }),
