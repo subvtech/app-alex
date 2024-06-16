@@ -12,133 +12,137 @@
     :headers="header"
     :search="searchFilter"
     hide-default-header
-    @dragleave="(e) => emit('dragLeave', e)"
     @update:sort-by="(e) => (tableSortBy = e)"
   >
-    <template #body="{ items, columns }">
-      <transition-group :name="transitionName">
-        <tr
-          v-for="item in items"
-          :key="item.id"
-          :draggable="!isArchived"
-          class="text-5 text-no-wrap staggered-fade-item table-row bg-white"
-          :class="[
-            isArchived ? 'text-gray-400' : 'text-gray-600',
-            dragging && dragFrom == item.id ? 'dragging' : '',
-          ]"
-          @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
-          @dragstart="(e) => setDragStart(item, e)"
-          @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
-        >
-          <template v-if="!previewRow(item.id)">
-            <td
-              class="text-body-4 text-overflow text-left"
-              :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
-            >
-              {{ item.title }}
-            </td>
-            <td>
-              <alex-learningplan-task-date-chip
-                v-if="item.deadline_at"
-                :date="item.deadline_at"
-                :is-published="item.status === 'published' && !isArchived"
-              />
-              <span v-else>{{
-                $t('pages.task.table.placeholders.undefined')
-              }}</span>
-            </td>
-            <td>
-              <div v-if="item.type">
-                <v-icon
-                  class="mr-1"
-                  :icon="
-                    item.type === 'group'
-                      ? 'mdi-account-multiple-outline'
-                      : 'mdi-account-outline'
-                  "
+    <template #default="{ items, columns }">
+      <tbody @dragleave="(e) => emit('dragLeave', e)">
+        <transition-group :name="transitionName">
+          <tr
+            v-for="item in items"
+            :key="item.id"
+            :draggable="!isArchived"
+            class="text-5 text-no-wrap staggered-fade-item table-row bg-white"
+            :class="[
+              isArchived ? 'text-gray-400' : 'text-gray-600',
+              dragging && dragFrom == item.id ? 'dragging' : '',
+            ]"
+            @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
+            @dragstart="(e) => setDragStart(item, e)"
+            @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
+          >
+            <template v-if="!previewRow(item.id)">
+              <td
+                class="text-body-4 text-overflow text-left"
+                :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
+              >
+                {{ item.title }}
+              </td>
+              <td>
+                <alex-learningplan-task-date-chip
+                  v-if="item.deadline_at"
+                  :date="item.deadline_at"
+                  :is-published="item.status === 'published' && !isArchived"
                 />
-                <span>{{
-                  item.type === 'group'
-                    ? $t('pages.task.table.type.group')
-                    : $t('pages.task.table.type.individual')
+                <span v-else>{{
+                  $t('pages.task.table.placeholders.undefined')
                 }}</span>
-              </div>
-              <span v-else>{{
-                $t('pages.task.table.placeholders.undefined')
-              }}</span>
-            </td>
-            <td>
-              <div
-                v-if="item.students?.length"
-                class="ml-2"
-                :class="{ 'gray-filter': isArchived }"
-              >
-                <alex-custom-avatar-group
-                  :avatar-items="item.students || []"
-                  :max="3"
-                />
-              </div>
-              <span v-else>{{
-                $t('pages.task.table.placeholders.noMembers')
-              }}</span>
-            </td>
-            <td>
-              <alex-learningplan-task-submissions-status
-                v-if="item.delivered"
-                :submitted="item.delivered"
-                :type="item.type"
-              />
-              <div v-else>
-                <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
-                <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
-              </div>
-            </td>
-            <td>
-              <v-tooltip
-                :text="t('pages.task.table.tooltips.kanban')"
-                location="bottom center"
-              >
-                <template #activator="{ props: tooltipKanban }">
-                  <alex-custom-button
-                    v-bind="tooltipKanban"
-                    icon="alex:Kanban"
-                    variant="text"
-                    color="gray-600"
-                    @click="navigateTo(`tasks/${item.id}`)"
+              </td>
+              <td>
+                <div v-if="item.type">
+                  <v-icon
+                    class="mr-1"
+                    :icon="
+                      item.type === 'group'
+                        ? 'mdi-account-multiple-outline'
+                        : 'mdi-account-outline'
+                    "
                   />
-                </template>
-              </v-tooltip>
-              <alex-custom-dropdown
-                :items="dropDownItems(item)"
-                variant="text"
-                prepend-icon="mdi-dots-vertical"
-              >
-                <template #activator="{ props: propsMenu }">
-                  <v-tooltip
-                    :text="t('pages.task.table.tooltips.options')"
-                    location="bottom center"
-                  >
-                    <template #activator="{ props: optionsTooltipProps }">
-                      <alex-custom-button
-                        variant="text"
-                        color="gray-600"
-                        v-bind="{ ...propsMenu, ...optionsTooltipProps }"
-                        icon="mdi-dots-vertical"
-                      />
-                    </template>
-                  </v-tooltip>
-                </template>
-              </alex-custom-dropdown>
-            </td>
-          </template>
-          <td v-else :colspan="columns.length" class="row-drop"></td>
+                  <span>{{
+                    item.type === 'group'
+                      ? $t('pages.task.table.type.group')
+                      : $t('pages.task.table.type.individual')
+                  }}</span>
+                </div>
+                <span v-else>{{
+                  $t('pages.task.table.placeholders.undefined')
+                }}</span>
+              </td>
+              <td>
+                <div
+                  v-if="item.students?.length"
+                  class="ml-2"
+                  :class="{ 'gray-filter': isArchived }"
+                >
+                  <alex-custom-avatar-group
+                    :avatar-items="item.students || []"
+                    :max="3"
+                  />
+                </div>
+                <span v-else>{{
+                  $t('pages.task.table.placeholders.noMembers')
+                }}</span>
+              </td>
+              <td>
+                <alex-learningplan-task-submissions-status
+                  v-if="item.delivered"
+                  :submitted="item.delivered"
+                  :type="item.type"
+                />
+                <div v-else>
+                  <v-icon
+                    class="mr-1"
+                    icon="mdi-close-circle-outline "
+                  ></v-icon>
+                  <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
+                </div>
+              </td>
+              <td>
+                <v-tooltip
+                  :text="t('pages.task.table.tooltips.kanban')"
+                  location="bottom center"
+                >
+                  <template #activator="{ props: tooltipKanban }">
+                    <alex-custom-button
+                      v-bind="tooltipKanban"
+                      icon="alex:Kanban"
+                      variant="text"
+                      color="gray-600"
+                      @click="navigateTo(`tasks/${item.id}`)"
+                    />
+                  </template>
+                </v-tooltip>
+                <alex-custom-dropdown
+                  :items="dropDownItems(item)"
+                  variant="text"
+                  prepend-icon="mdi-dots-vertical"
+                >
+                  <template #activator="{ props: propsMenu }">
+                    <v-tooltip
+                      :text="t('pages.task.table.tooltips.options')"
+                      location="bottom center"
+                    >
+                      <template #activator="{ props: optionsTooltipProps }">
+                        <alex-custom-button
+                          variant="text"
+                          color="gray-600"
+                          v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                          icon="mdi-dots-vertical"
+                        />
+                      </template>
+                    </v-tooltip>
+                  </template>
+                </alex-custom-dropdown>
+              </td>
+            </template>
+            <td v-else :colspan="columns.length" class="row-drop"></td>
+          </tr>
+        </transition-group>
+        <tr v-if="!items.length">
+          <td :colspan="columns.length" class="text-center">
+            {{ $t('pages.task.table.placeholders.noTasks') }}
+          </td>
         </tr>
-      </transition-group>
-      <tr v-if="!items.length">
-        <td :colspan="columns.length" class="text-center">
-          {{ $t('pages.task.table.placeholders.noTasks') }}
-        </td>
-      </tr>
+      </tbody>
     </template>
     <template #bottom></template>
   </v-data-table>
