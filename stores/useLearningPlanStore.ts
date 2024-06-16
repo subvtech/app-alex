@@ -54,7 +54,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['user.avatar', 'user.cover'],
     },
     tasks: {
-      populate: ['blocks', 'trail', 'task_members.student_member.user.avatar'],
+      populate: [
+        'blocks',
+        'trail',
+        'task_members.task_member_students.student_member.user.avatar',
+      ],
     },
   };
 

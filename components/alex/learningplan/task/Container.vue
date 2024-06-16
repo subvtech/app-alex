@@ -106,7 +106,7 @@ export interface TaskType {
   position: number;
   type?: 'group' | 'individual';
   archived?: boolean;
-  students?: { name: string; image: { url: string } }[];
+  students?: { name: string; image?: { url: string } }[];
   delivered: {
     toDo: number;
     doing: number;
@@ -195,7 +195,6 @@ const handleCreateTask = async () => {
       title: taskTitle.value,
       status: 'draft',
       learningplan: route.params.id,
-      start_at: new Date(),
       position: higherIndex,
     });
     learningPlanStore.learningPlan?.tasks.push({
@@ -241,18 +240,22 @@ const tasksArray = computed(() => {
       if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
       if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate))
         return;
-
-      const students = task.task_members?.map((student) => {
-        if (student.status === 'to_do') delivered.toDo += 1;
-        if (student.status === 'in_progress') delivered.doing += 1;
-        if (student.status === 'in_review') delivered.underReview += 1;
-        if (student.status === 'done') delivered.completed += 1;
-        return {
-          name: student.student_member?.user?.fullname,
-          image: { url: student.student_member?.user?.avatar.url },
-        };
+      const students: TaskType['students'] = [];
+      task.task_members?.forEach((taskMember) => {
+        if (taskMember.status === 'to_do') delivered.toDo += 1;
+        if (taskMember.status === 'in_progress') delivered.doing += 1;
+        if (taskMember.status === 'in_review') delivered.underReview += 1;
+        if (taskMember.status === 'done') delivered.completed += 1;
+        taskMember.task_member_students?.forEach((student) => {
+          const studentUser = student.student_member?.user;
+          students.push({
+            name: studentUser?.fullname,
+            image: studentUser?.avatar?.url
+              ? { url: studentUser.avatar.url }
+              : undefined,
+          });
+        });
       });
-
       const taskItem = {
         id: task.id,
         title: task.title,
