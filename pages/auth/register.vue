@@ -1,39 +1,28 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'auth',
+  middleware: 'guest-only',
+});
+
+const registeredUser = ref(false);
+</script>
+
 <template>
-  <v-container class="pa-0 container-grid" fluid>
+  <v-container id="register" class="pa-0 container-grid overflow-hidden" fluid>
     <div class="image justify-center align-center d-none d-md-flex pa-0">
-      <img class="left-image" src="/images/imagem_forgot.png" />
+      <img class="signUp" src="/images/signUp.svg" />
     </div>
     <div class="bg-primary-0 pa-0 content-field">
-      <div class="mt-0 mt-sm-0" align="center" style="align-self: flex-end" />
-
-      <ForgotPasswordSendResetPasswordEmail
-        v-if="!emailSent"
-        @confirmation-message="handleSentEmail"
+      <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end" />
+      <SuccessMessage
+        v-if="registeredUser"
+        :title="$t('pages.register.success.title')"
+        :subtitle="$t('pages.register.success.subtitle')"
       />
-      <ForgotPasswordConfirmationMessage
-        v-else
-        :title="$t('pages.forgot.success.title')"
-        :text="$t('pages.forgot.success.subtitle1')"
-        :email="userEmail"
-        :text2="$t('pages.forgot.success.subtitle2')"
-      />
+      <RegisterFields v-else @success:message="registeredUser = true" />
     </div>
   </v-container>
 </template>
-
-<script setup lang="ts">
-const emailSent = ref(false);
-const userEmail = ref('');
-definePageMeta({
-  layout: 'auth',
-  middleware: 'control-access',
-});
-
-const handleSentEmail = (email) => {
-  userEmail.value = email;
-  emailSent.value = true;
-};
-</script>
 
 <style scoped lang="scss">
 .content-field {
@@ -68,15 +57,15 @@ const handleSentEmail = (email) => {
   background-color: rgb(var(--v-theme-primary)) !important;
 }
 
-.left-image {
-  width: clamp(500px, 55%, 800px);
+.signUp {
+  width: clamp(500px, 65%, 1000px);
 }
 
 @media screen and (max-width: 959px) {
   .container-grid {
     grid-template-columns: 1fr;
   }
-  .left-image {
+  .signUp {
     display: none;
   }
 }

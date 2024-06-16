@@ -16,27 +16,27 @@ const mailer = createTransport({
   },
 });
 
-export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
+// TODO: Limitar o envio de e-mails por X horas.
+export const sendResetPasswordEmail = async ({
+  email,
+  token,
+}: {
+  email: string;
+  token: string;
+}) => {
+  const html = readFileSync('./templates/reset-password.html', 'utf-8');
+  const link = `${NUXT_BASE_URL}/auth/reset-password?token=${token}`;
+
   await mailer.sendMail({
     from: SENDGRID_FROM,
     to: email,
-    subject: '2FA Code',
-    html: `<p>Your 2FA code: ${token}</p>`,
+    subject: 'Redefinição de senha', // TODO: I18n
+    html: template(html, { link }),
   });
 };
 
-export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetLink = `${NUXT_BASE_URL}/auth/new-password?token=${token}`;
-
-  await mailer.sendMail({
-    from: SENDGRID_FROM,
-    to: email,
-    subject: 'Reset your password',
-    html: `<p>Click <a href="${resetLink}">here</a> to reset password.</p>`,
-  });
-};
-
-export const sendVerificationEmail = async ({
+// TODO: Limitar o envio de e-mails por X horas.
+export const sendConfirmationEmail = async ({
   email,
   token,
   user,
@@ -51,7 +51,7 @@ export const sendVerificationEmail = async ({
   await mailer.sendMail({
     from: SENDGRID_FROM,
     to: email,
-    subject: 'Confirm your email',
+    subject: 'Confirmação de e-mail', // TODO: I18n
     html: template(html, { link, user }),
   });
 };

@@ -1,40 +1,41 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'auth',
+  middleware: 'guest-only',
+});
+
+const emailSent = ref(false);
+const userEmail = ref('');
+
+const handleSentEmail = (email: string) => {
+  userEmail.value = email;
+  emailSent.value = true;
+};
+</script>
+
 <template>
   <v-container class="pa-0 container-grid" fluid>
     <div class="image justify-center align-center d-none d-md-flex pa-0">
       <img class="left-image" src="/images/imagem_forgot.png" />
     </div>
     <div class="bg-primary-0 pa-0 content-field">
-      <div class="mt-12 mt-sm-16 align-self-end" align="center" />
-      <ForgotPasswordResetPassword
-        v-if="!passwordChanged"
-        @confirmation-message="handlePasswordChanged"
+      <div class="mt-0 mt-sm-0" align="center" style="align-self: flex-end" />
+      <ForgotPasswordSendResetPasswordEmail
+        v-if="!emailSent"
+        @confirmation-message="handleSentEmail"
       />
       <ForgotPasswordConfirmationMessage
         v-else
-        :title="$t('pages.reset.passwordChanged')"
-        :text="$t('pages.reset.info')"
+        :email="userEmail"
+        :title="$t('pages.forgot.success.title')"
+        :text2="$t('pages.forgot.success.subtitle2')"
+        :text="$t('pages.forgot.success.subtitle1')"
       />
     </div>
   </v-container>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-const passwordChanged = ref(false);
-definePageMeta({
-  layout: 'auth',
-  middleware: 'control-access',
-});
-
-const handlePasswordChanged = () => {
-  passwordChanged.value = true;
-};
-</script>
-
 <style scoped lang="scss">
-.align-self-end {
-  align-self: flex-end;
-}
 .content-field {
   background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
@@ -75,6 +76,7 @@ const handlePasswordChanged = () => {
   .container-grid {
     grid-template-columns: 1fr;
   }
+
   .left-image {
     display: none;
   }

@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   },
   authJs: {
     authenticatedRedirectTo: '/',
-    guestRedirectTo: '/login',
+    guestRedirectTo: '/auth/login',
     baseUrl: NUXT_BASE_URL,
   },
   css: [

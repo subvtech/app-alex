@@ -1,30 +1,39 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+
+definePageMeta({
+  layout: 'auth',
+  middleware: 'guest-only',
+});
+
+const passwordChanged = ref(false);
+</script>
+
 <template>
-  <v-container id="register" class="pa-0 container-grid overflow-hidden" fluid>
+  <v-container class="pa-0 container-grid" fluid>
     <div class="image justify-center align-center d-none d-md-flex pa-0">
-      <img class="signUp" src="/images/signUp.svg" />
+      <img class="left-image" src="/images/imagem_forgot.png" />
     </div>
     <div class="bg-primary-0 pa-0 content-field">
-      <div class="mt-12 mt-sm-16" align="center" style="align-self: flex-end" />
-      <SuccessMessage
-        v-if="registeredUser"
-        :title="$t('pages.register.success.title')"
-        :subtitle="$t('pages.register.success.subtitle')"
+      <div class="mt-12 mt-sm-16 align-self-end" align="center" />
+      <ForgotPasswordConfirmationMessage
+        v-if="passwordChanged"
+        :title="$t('pages.reset.passwordChanged')"
+        :text="$t('pages.reset.info')"
       />
-      <RegisterFields v-else @success:message="registeredUser = true" />
+      <ForgotPasswordResetPassword
+        v-else
+        @confirmation-message="passwordChanged = true"
+      />
     </div>
   </v-container>
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  layout: 'auth',
-  middleware: ['guest-only'],
-});
-
-const registeredUser = ref(false);
-</script>
-
 <style scoped lang="scss">
+.align-self-end {
+  align-self: flex-end;
+}
+
 .content-field {
   background-image: url('/images/login-bg.svg');
   background-repeat: no-repeat;
@@ -39,6 +48,7 @@ const registeredUser = ref(false);
   grid-template-columns: 1fr minmax(auto, 629px);
   height: 100%;
 }
+
 .content-field {
   overflow-y: auto !important;
 }
@@ -57,15 +67,16 @@ const registeredUser = ref(false);
   background-color: rgb(var(--v-theme-primary)) !important;
 }
 
-.signUp {
-  width: clamp(500px, 65%, 1000px);
+.left-image {
+  width: clamp(500px, 55%, 800px);
 }
 
 @media screen and (max-width: 959px) {
   .container-grid {
     grid-template-columns: 1fr;
   }
-  .signUp {
+
+  .left-image {
     display: none;
   }
 }

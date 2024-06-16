@@ -3,17 +3,21 @@ import { hash } from 'bcrypt';
 import { z } from 'zod';
 
 import {
+  sendConfirmationEmail,
+  sendResetPasswordEmail,
+} from '@@/server/lib/mail';
+import {
   protectedProcedure,
   publicProcedure,
   router,
 } from '@@/server/lib/trpc';
 
 import {
-  getVerificationTokenByToken,
+  generateVerificationToken,
+  getVerificationToken,
   removeVerificationTokens,
 } from '../verification-tokens/verification-tokens.service';
 import {
-  generateAndSendVerificationEmail,
   getUserBy,
   getUserByEmail,
   getUserById,
@@ -26,7 +30,7 @@ export const usersRouter = router({
   confirmEmail: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }) => {
-      const verificationToken = await getVerificationTokenByToken(input.token);
+      const verificationToken = await getVerificationToken(input.token);
 
       if (!verificationToken) {
         throw new TRPCError({
@@ -79,9 +83,60 @@ export const usersRouter = router({
       const hashed = await hash(input.password, 10);
       const user = await register({ ...input, password: hashed });
 
-      await generateAndSendVerificationEmail(user);
+      const { token } = await generateVerificationToken({
+        email: user.email,
+        type: 'email_confirmation',
+      });
+
+      await sendConfirmationEmail({ email: user.email, token, user });
 
       return { success: 'confirmation_email_sent' };
+    }),
+
+  resetPassword: publicProcedure
+    .input(
+      z.object({
+        password: z.string(),
+        passwordConfirm: z.string(),
+        token: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const verificationToken = await getVerificationToken(input.token);
+
+      if (!verificationToken) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'invalid_token',
+        });
+      }
+
+      const user = await getUserByEmail(verificationToken.identifier);
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'invalid_email',
+        });
+      }
+
+      if (input.password !== input.passwordConfirm) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'passwords_do_not_match',
+        });
+      }
+
+      // TODO: Fazer blacklist de senhas utilizadas?
+      const hashed = await hash(input.password, 10);
+      await update({ id: user.id, password: hashed });
+
+      await removeVerificationTokens(
+        verificationToken.identifier,
+        'reset_password',
+      );
+
+      return { success: 'password_updated' };
     }),
 
   sendConfirmEmail: publicProcedure
@@ -89,6 +144,35 @@ export const usersRouter = router({
     .mutation(async ({ input: email }) => {
       const user = await getUserByEmail(email);
 
-      if (user) await generateAndSendVerificationEmail(user);
+      if (user) {
+        const { token } = await generateVerificationToken({
+          email: user.email,
+          type: 'email_confirmation',
+        });
+
+        await sendConfirmationEmail({ email: user.email, token, user });
+      }
+    }),
+
+  sendResetPasswordEmail: publicProcedure
+    .input(z.string())
+    .mutation(async ({ input: email }) => {
+      const user = await getUserByEmail(email);
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'invalid_email',
+        });
+      }
+
+      const { token } = await generateVerificationToken({
+        email: user.email,
+        type: 'reset_password',
+      });
+
+      await sendResetPasswordEmail({ email: user.email, token });
+
+      return { success: 'reset_password_email_sent' };
     }),
 });

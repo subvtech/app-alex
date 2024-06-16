@@ -1,3 +1,74 @@
+<script setup lang="ts">
+import { useForm } from 'vee-validate';
+
+definePageMeta({
+  layout: 'auth',
+  middleware: 'guest-only',
+});
+
+const { $trpc } = useNuxtApp();
+const { t } = useI18n();
+const { signIn } = useAuth();
+const { metalogin } = useMetamask();
+
+const sendConfirmEmail = $trpc.users.sendConfirmEmail.useMutation();
+const errorMessage = ref('');
+const hasError = ref(false);
+const route = useRoute();
+
+const redirect =
+  (route.query.redirect as string) || useCookie('redirect').value;
+
+const { loginSchema } = useFormRules();
+const { handleSubmit, errors, values, controlledValues } = useForm({
+  validationSchema: loginSchema,
+  keepValuesOnUnmount: true,
+});
+
+const isValid = computed(() => {
+  return (
+    !Object.values(controlledValues.value).includes(undefined) &&
+    !Object.values(errors.value).length
+  );
+});
+
+const logging = ref(false);
+const logging2 = ref(false);
+const checkbox = ref(false);
+const passwordVisible = ref(false);
+
+const submit = handleSubmit(async () => {
+  logging.value = true;
+
+  try {
+    await signIn('credentials', {
+      ...values,
+      callbackUrl: redirect || undefined,
+    });
+  } catch (err: unknown) {
+    const code = (err as Error).message;
+
+    switch (code) {
+      case 'AccessDenied':
+        errorMessage.value = t('errors.emailIsNotConfirmed');
+        sendConfirmEmail.mutate(values.email);
+        break;
+      case 'CredentialsSignin':
+        errorMessage.value = t('errors.invalidIdentifierPassword');
+        break;
+      default:
+        errorMessage.value = t('errors.default');
+    }
+
+    hasError.value = true;
+  } finally {
+    logging.value = false;
+
+    setTimeout(() => (hasError.value = false), 5000);
+  }
+});
+</script>
+
 <template>
   <v-row id="login-page" data-testid="login">
     <v-col>
@@ -74,7 +145,7 @@
                 </template>
               </v-checkbox>
               <nuxt-link
-                to="/forgot"
+                to="/auth/forgot"
                 class="blue-label smaller-text text-decoration-none"
               >
                 {{ $t('pages.login.forgot') }}
@@ -95,7 +166,10 @@
             class="text-white text-center font-weight-bold text-body-2"
           >
             {{ $t('pages.login.noAccount') }}
-            <nuxt-link to="/register" class="blue-label text-decoration-none">
+            <nuxt-link
+              to="/auth/register"
+              class="blue-label text-decoration-none"
+            >
               {{ $t('pages.login.register') }}
             </nuxt-link>
           </v-card-text>
@@ -126,77 +200,6 @@
     </v-col>
   </v-row>
 </template>
-
-<script setup lang="ts">
-import { useForm } from 'vee-validate';
-
-const { $trpc } = useNuxtApp();
-const { t } = useI18n();
-const { signIn } = useAuth();
-const { metalogin } = useMetamask();
-
-const sendConfirmEmail = $trpc.users.sendConfirmEmail.useMutation();
-const hasError = ref(false);
-const errorMessage = ref('');
-const route = useRoute();
-
-definePageMeta({
-  layout: 'auth',
-  middleware: ['guest-only'],
-});
-
-const redirect =
-  (route.query.redirect as string) || useCookie('redirect').value;
-
-const { loginSchema } = useFormRules();
-const { handleSubmit, errors, values, controlledValues } = useForm({
-  validationSchema: loginSchema,
-  keepValuesOnUnmount: true,
-});
-
-const isValid = computed(() => {
-  return (
-    !Object.values(controlledValues.value).includes(undefined) &&
-    !Object.values(errors.value).length
-  );
-});
-
-const logging = ref(false);
-const logging2 = ref(false);
-const checkbox = ref(false);
-const passwordVisible = ref(false);
-
-const submit = handleSubmit(async () => {
-  logging.value = true;
-
-  try {
-    await signIn('credentials', {
-      ...values,
-      callbackUrl: redirect || undefined,
-    });
-  } catch (err: unknown) {
-    const code = (err as Error).message;
-
-    switch (code) {
-      case 'AccessDenied':
-        errorMessage.value = t('errors.emailIsNotConfirmed');
-        sendConfirmEmail.mutate(values.email);
-        break;
-      case 'CredentialsSignin':
-        errorMessage.value = t('errors.invalidIdentifierPassword');
-        break;
-      default:
-        errorMessage.value = t('errors.default');
-    }
-
-    hasError.value = true;
-  } finally {
-    logging.value = false;
-
-    setTimeout(() => (hasError.value = false), 5000);
-  }
-});
-</script>
 
 <style scoped lang="scss">
 #login-page {

@@ -105,7 +105,7 @@ export const useMetamask = () => {
     }
     if (address) {
       setWallet({ address });
-      router.push({ path: '/register' });
+      router.push({ path: '/auth/register' });
     }
   };
 

@@ -11,35 +11,26 @@ import {
 // TODO: Colocar como variável de ambiente (ao menos o do reset de senha).
 const ONE_HOUR = 3600 * 1000;
 
-export const createVerificationToken = async (data: VerificationToken) => {
-  return (await db.insert(verificationTokens).values(data).returning())[0];
-};
-
-export const generateVerificationToken = async (
-  email: string,
-  type: VerificationToken['type'],
-) => {
+export const generateVerificationToken = async ({
+  email,
+  type,
+}: {
+  email: string;
+  type: VerificationToken['type'];
+}) => {
   await removeVerificationTokens(email, type);
 
-  return await createVerificationToken({
+  const data = {
     type,
     identifier: email,
     token: crypto.randomUUID(),
     expires: new Date(new Date().getTime() + ONE_HOUR),
-  });
+  };
+
+  return (await db.insert(verificationTokens).values(data).returning())[0];
 };
 
-export const getVerificationTokenByEmail = async (email: string) => {
-  try {
-    return await db.query.verificationTokens.findFirst({
-      where: eq(verificationTokens.identifier, email),
-    });
-  } catch {
-    return null;
-  }
-};
-
-export const getVerificationTokenByToken = async (token: string) => {
+export const getVerificationToken = async (token: string) => {
   try {
     return await db.query.verificationTokens.findFirst({
       where: eq(verificationTokens.token, token),

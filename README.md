@@ -2,14 +2,26 @@
 
 ## Menu
 
-- [Requisitos para rodar o projeto](#requisitos-para-rodar-o-projeto)
-- [Ferramentas](#ferramentas)
-- [Criando um banco de dados](#criando-um-banco-de-dados)
-- [Clonando o repositório](#clonando-o-repositório)
-- [ENV](#env)
-- [Fluxo de merge request](#fluxo-de-merge-request)
-- [Tecnologias](#tecnologias)
-- [Links úteis](#links-úteis)
+- [Projeto Alex](#projeto-alex)
+  - [Menu](#menu)
+  - [Requisitos para rodar o projeto](#requisitos-para-rodar-o-projeto)
+  - [Ferramentas](#ferramentas)
+  - [Criando um banco de dados](#criando-um-banco-de-dados)
+  - [Clonando o repositório](#clonando-o-repositório)
+  - [.env](#env)
+  - [Fluxo de merge request](#fluxo-de-merge-request)
+    - [Cenário: Desenvolvimento da task](#cenário-desenvolvimento-da-task)
+    - [Task criada](#task-criada)
+    - [Task finalizada](#task-finalizada)
+    - [Merge Request aprovado](#merge-request-aprovado)
+    - [Cenário: PR 'mergeado' no ambiente de teste](#cenário-pr-mergeado-no-ambiente-de-teste)
+    - [Todos devem](#todos-devem)
+    - [Componente/função foi TESTADO](#componentefunção-foi-testado)
+    - [Componente/função foi REPROVADO](#componentefunção-foi-reprovado)
+  - [Tecnologias](#tecnologias)
+  - [Links úteis](#links-úteis)
+    - [Web:](#web)
+    - [Protótipo:](#protótipo)
 
 ## Requisitos para rodar o projeto
 
@@ -111,7 +123,7 @@ Passo 6
 
 ### Web:
 
-[Plataforma](https://app2-test.projetoalex.cc/login)
+[Plataforma](https://app2-test.projetoalex.cc/auth/login)
 
 [Landing page](https://projetoalex.cc/)
 

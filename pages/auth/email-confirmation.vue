@@ -10,7 +10,7 @@ const route = useRoute();
 const errorMessage = ref('');
 const emailConfirmed = $trpc.users.confirmEmail.useMutation();
 
-onMounted(() => {
+onBeforeMount(() => {
   emailConfirmed.mutate({ token: route.query.token as string });
 });
 

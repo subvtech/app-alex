@@ -2,24 +2,8 @@ import { eq } from 'drizzle-orm';
 
 import db from '@@/server/lib/drizzle';
 import { curry } from '@@/utils/curry';
-import { sendVerificationEmail } from '@@/server/lib/mail';
 
-import { generateVerificationToken } from '../verification-tokens/verification-tokens.service';
 import { User, UserInsert, users } from './users.schema';
-
-// TODO: Limitar o envio de e-mails por X horas.
-export async function generateAndSendVerificationEmail(user: User) {
-  const verificationToken = await generateVerificationToken(
-    user.email,
-    'email_confirmation',
-  );
-
-  await sendVerificationEmail({
-    email: verificationToken.identifier,
-    token: verificationToken.token,
-    user: user!,
-  });
-}
 
 export const getUserBy = curry(async (field: keyof User, value: string) => {
   try {

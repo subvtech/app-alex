@@ -19,7 +19,7 @@
         </template>
       </v-card-text>
     </v-card>
-    <NuxtLink to="/login" class="text-accent text-decoration-none mt-6">
+    <NuxtLink to="/auth/login" class="text-accent text-decoration-none mt-6">
       <v-icon icon="mdi-arrow-left" class="mr-1" />{{
         $t('pages.forgot.success.return')
       }}

@@ -155,7 +155,10 @@
       </div>
       <v-card-text class="text-white font-bold haveAccount text-body-2">
         {{ $t('pages.register.hasAccount') }}
-        <nuxt-link to="/login" class="text-white haveAccount-link font-bold">
+        <nuxt-link
+          to="/auth/login"
+          class="text-white haveAccount-link font-bold"
+        >
           {{ $t('pages.register.login') }}
         </nuxt-link>
       </v-card-text>
