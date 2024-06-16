@@ -180,6 +180,7 @@
             :start-at="startDate"
             :finish-at="endDate"
             :submit-after-deadline="sendAfterDeadline"
+            @change-members="$emit('change-members')"
         /></v-window-item>
       </v-window>
     </div>
@@ -254,6 +255,7 @@ type Emits = {
   'change-description': [value: string];
   'change-submission-description': [value: string];
   'change-tags': [value: TagSimple[]];
+  'change-members': [];
 };
 const emit = defineEmits<Emits>();
 

@@ -54,8 +54,9 @@
           class: member.raw.student_member?.learning_class?.name,
           avatarUrl: member.raw.student_member?.user.avatar?.url,
         }"
-        @remove-click="
-          () => removeMember(member.raw.task_member.id, member.raw)
+        @remove-click="removeMember(member.raw.task_member.id, member.raw)"
+        @to-profile="
+          navigateTo(`/users/${member.raw.student_member.user.username}`)
         "
       />
     </template>
@@ -75,7 +76,6 @@
       </div>
     </template>
 
-    <!-- Menu -->
     <template #footer="{ pageCount, groupedItems }">
       <div
         v-if="groupedItems.length && members.data.length > itemsPerPage"
@@ -114,6 +114,7 @@ const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
+const emit = defineEmits(['change-members']);
 const page = ref<number>(1);
 const itemsPerPage = 12;
 const search = ref('');
@@ -218,6 +219,7 @@ const addMember = async (member: LearningPlanMemberSimple) => {
       student_member: member.id,
       task_member: taskMember.id,
     });
+    setTimeout(refresh, 100);
     setMessage(
       t('components.learningPlan.drawer.task.addMember', {
         member: member.user.fullname,
@@ -225,7 +227,7 @@ const addMember = async (member: LearningPlanMemberSimple) => {
       'success',
       true,
     );
-    setTimeout(refresh, 100);
+    emit('change-members');
   } catch (error) {
     setMessage(
       t('components.learningPlan.drawer.task.errors.addMember'),
@@ -249,6 +251,7 @@ const removeMember = async (
       'success',
       true,
     );
+    emit('change-members');
   } catch (error) {
     setMessage(
       t('components.learningPlan.drawer.task.errors.removeMember'),

@@ -56,5 +56,32 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
-  return { loadTaskData, task, loading };
+  async function updateTaskMembers(taskId: number) {
+    try {
+      const response = await find<TaskMember>('task-members', {
+        populate: [
+          'task_submission',
+          'task_member_students.student_member.user.avatar',
+          'task_member_students.student_member.learning_class',
+        ],
+        filters: {
+          task: taskId,
+        },
+      });
+      if (!response.data.length) {
+        throw new Error('cantUpdateMembers');
+      }
+      const { data } = response;
+      if (task.value) {
+        task.value.task_members = data;
+      }
+      return response;
+    } catch (e: any) {
+      if (e?.message === 'cantUpdateMembers') {
+        setMessage(i18n.t('pages.tasks.cantUpdateMembers'), 'red', true);
+      }
+    }
+  }
+
+  return { loadTaskData, task, loading, updateTaskMembers };
 });

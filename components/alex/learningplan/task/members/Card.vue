@@ -34,7 +34,7 @@
 
     <alex-learningplan-task-members-menu
       :submitted="member.submitted"
-      :accepted="member.accepted"
+      accepted
       @remove-click="$emit('remove-click')"
       @to-profile="$emit('to-profile')"
     />

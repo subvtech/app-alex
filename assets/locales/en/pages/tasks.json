@@ -1,3 +1,4 @@
 {
-  "notFound": "Task not found"
+  "notFound": "Task not found",
+  "cantUpdateMembers": "Can't update members"
 }

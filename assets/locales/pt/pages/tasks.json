@@ -1,3 +1,4 @@
 {
-  "notFound": "Tarefa não encontrada"
+  "notFound": "Tarefa não encontrada",
+  "cantUpdateMembers": "Não foi possível atualizar os members"
 }

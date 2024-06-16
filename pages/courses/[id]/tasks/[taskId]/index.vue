@@ -89,6 +89,7 @@
       @change-description="handleChangeDescription"
       @change-submission-description="handleChangeSubmissionDescription"
       @change-tags="handleChangeTags"
+      @change-members="taskStore.updateTaskMembers(taskId)"
     />
   </section>
 </template>
@@ -184,7 +185,12 @@ watch(
     if (!taskStore.task && !taskStore.loading) {
       navigateTo(`/courses/${route.params.id}/tasks`);
     }
-    if (taskStore.task) {
+  },
+);
+watch(
+  () => taskStore.task?.task_members,
+  () => {
+    if (taskStore.task?.task_members) {
       tasks.value = taskStore.task.task_members.map((task) => ({
         id: task.id,
         status: task.status,
@@ -192,6 +198,9 @@ watch(
         user: {
           name:
             task.task_member_students[0]?.student_member?.user.fullname || '',
+          avatar:
+            task.task_member_students[0]?.student_member?.user.avatar?.url ||
+            undefined,
         },
         studentClass:
           task.task_member_students[0]?.student_member?.learning_class?.name ||
