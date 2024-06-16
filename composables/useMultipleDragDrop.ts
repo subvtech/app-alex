@@ -10,7 +10,7 @@ export function useMultipleDragDrop() {
   const dragFrom = ref(-1);
   const dragging = ref(false);
   const acceptedGroups = ref<string[]>([]);
-  const dragoverTimeout = ref<NodeJS.Timeout | null>(null);
+  const delayPassed = ref(false);
 
   const startDrag = (
     id: number,
@@ -28,6 +28,10 @@ export function useMultipleDragDrop() {
     }
     dragging.value = true;
     dragFrom.value = id;
+    delayPassed.value = false;
+    setTimeout(() => {
+      delayPassed.value = true;
+    }, 250);
   };
 
   const onDragOver = (
@@ -36,15 +40,6 @@ export function useMultipleDragDrop() {
     index: number,
     e: DragEvent,
   ) => {
-    clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
-
-    const handleDragOver = () => {
-      if (dragFrom.value !== id) over.value = { list, id, index, position };
-      else {
-        onDragLeave(e);
-      }
-    };
-
     let position;
     if (!acceptedGroups.value.length || acceptedGroups.value.includes(list)) {
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
@@ -55,10 +50,11 @@ export function useMultipleDragDrop() {
       if (over.value.id === id && over.value.position === position) {
         return;
       }
-      if (over.value.id === -1) {
-        dragoverTimeout.value = setTimeout(handleDragOver, 0);
-      } else {
-        handleDragOver();
+      if (delayPassed.value) {
+        if (dragFrom.value !== id) over.value = { list, id, index, position };
+        else {
+          onDragLeave(e);
+        }
       }
     } else if (e.dataTransfer) {
       e.dataTransfer.dropEffect = 'none';
@@ -70,7 +66,6 @@ export function useMultipleDragDrop() {
     over.value = { list: '', id: -1, index: -1 };
     dragFrom.value = -1;
     dragging.value = false;
-    clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
   };
 
   const onDragLeave = (event: DragEvent) => {
@@ -78,9 +73,6 @@ export function useMultipleDragDrop() {
       !event.relatedTarget || (event.clientX === 0 && event.clientY === 0);
 
     if (mouseIsOutSideViewport) {
-      over.value = { list: '', id: -1, index: -1 };
-
-      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
       return true;
     }
 
@@ -91,7 +83,6 @@ export function useMultipleDragDrop() {
 
     if (mouseIsOutSideCurrentTarget) {
       over.value = { list: '', id: -1, index: -1 };
-      clearTimeout(dragoverTimeout.value as NodeJS.Timeout);
     }
 
     return mouseIsOutSideCurrentTarget;

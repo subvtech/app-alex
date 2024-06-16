@@ -11,9 +11,8 @@
     :items="tasksArray"
     :headers="header"
     :search="searchFilter"
-    hide-default-header
-    @dragleave="(e) => emit('dragLeave', e)"
     @update:sort-by="(e) => (tableSortBy = e)"
+    @dragleave="(e) => emit('dragLeave', e)"
   >
     <template #body="{ items, columns }">
       <transition-group :name="transitionName">
