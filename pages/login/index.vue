@@ -130,10 +130,12 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
+const { $trpc } = useNuxtApp();
 const { t } = useI18n();
 const { signIn } = useAuth();
 const { metalogin } = useMetamask();
 
+const sendConfirmEmail = $trpc.users.sendConfirmEmail.useMutation();
 const hasError = ref(false);
 const errorMessage = ref('');
 const route = useRoute();
@@ -178,6 +180,7 @@ const submit = handleSubmit(async () => {
     switch (code) {
       case 'AccessDenied':
         errorMessage.value = t('errors.emailIsNotConfirmed');
+        sendConfirmEmail.mutate(values.email);
         break;
       case 'CredentialsSignin':
         errorMessage.value = t('errors.invalidIdentifierPassword');

@@ -12,11 +12,11 @@ export const typeEnum = pgEnum('type', [
 ]);
 
 export const verificationTokens = pgTable(
-  'verificationTokens',
+  'verification_token',
   {
     identifier: text('identifier').notNull(),
     token: text('token').notNull(),
-    type: typeEnum('token').notNull(),
+    type: typeEnum('type').notNull(),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   (verificationToken) => ({

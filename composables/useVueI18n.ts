@@ -51,9 +51,14 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   }
 
   // If the language hasn't been loaded yet
+
+  const auth = (await import(`../assets/locales/${lang}/auth.json`)).default;
+
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
+
   const errors = (await import(`../assets/locales/${lang}/errors.json`))
     .default;
+
   const pages = await useImportLanguages('pages', lang, [
     'login',
     'register',
@@ -67,6 +72,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'emailConfirmation',
     'trails',
   ]);
+
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
     'articleViewer',
@@ -114,17 +120,22 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'trails/contributions',
     'editorjs/fileSet',
   ]);
+
   const layouts = await useImportLanguages('layouts', lang, [
     'default',
     'error',
   ]);
+
   i18n.global.setLocaleMessage(lang, {
-    pages,
-    errors,
-    rules,
+    auth,
     components,
+    errors,
     layouts,
+    pages,
+    rules,
   });
+
   loadedLanguages.push(lang);
+
   return setI18nLanguage(lang);
 }

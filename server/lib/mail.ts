@@ -1,12 +1,10 @@
+import { readFileSync } from 'node:fs';
 import { createTransport } from 'nodemailer';
 
-const baseUrl = process.env.NUXT_BASE_URL;
+import { User } from '@/server/modules/users/users.schema';
+import { template } from '@/utils/template';
 
-// const mailer = createTransport({
-//   sendmail: true,
-//   newline: 'unix',
-//   path: '/usr/sbin/sendmail',
-// });
+const { NUXT_BASE_URL, SENDGRID_FROM, SENDGRID_KEY } = process.env;
 
 const mailer = createTransport({
   host: 'smtp.sendgrid.net',
@@ -14,43 +12,46 @@ const mailer = createTransport({
   port: 465,
   auth: {
     user: 'apikey',
-    pass: process.env.SENDGRID_KEY,
+    pass: SENDGRID_KEY,
   },
 });
 
 export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
-  const info = await mailer.sendMail({
-    from: process.env.SENDGRID_FROM,
+  await mailer.sendMail({
+    from: SENDGRID_FROM,
     to: email,
     subject: '2FA Code',
     html: `<p>Your 2FA code: ${token}</p>`,
   });
-
-  console.log(info);
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetLink = `${baseUrl}/auth/new-password?token=${token}`;
+  const resetLink = `${NUXT_BASE_URL}/auth/new-password?token=${token}`;
 
-  const info = await mailer.sendMail({
-    from: process.env.SENDGRID_FROM,
+  await mailer.sendMail({
+    from: SENDGRID_FROM,
     to: email,
     subject: 'Reset your password',
     html: `<p>Click <a href="${resetLink}">here</a> to reset password.</p>`,
   });
-
-  console.log(info);
 };
 
-export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmLink = `${baseUrl}/auth/new-verification?token=${token}`;
+export const sendVerificationEmail = async ({
+  email,
+  token,
+  user,
+}: {
+  email: string;
+  token: string;
+  user: User;
+}) => {
+  const html = readFileSync('./templates/email-confirmation.html', 'utf-8');
+  const link = `${NUXT_BASE_URL}/auth/email-confirmation?token=${token}`;
 
-  const info = await mailer.sendMail({
-    from: process.env.SENDGRID_FROM,
+  await mailer.sendMail({
+    from: SENDGRID_FROM,
     to: email,
     subject: 'Confirm your email',
-    html: `<p>Click <a href="${confirmLink}">here</a> to confirm email.</p>`,
+    html: template(html, { link, user }),
   });
-
-  console.log(info);
 };

@@ -2,6 +2,5 @@
   "blockedByAdministrator": "User blocked, please contact support",
   "default": "Something went wrong, please try again later",
   "emailIsNotConfirmed": "Please validate your email before proceeding.",
-  "invalidIdentifierPassword": "Invalid identifier or password",
-  "unauthorized": "Unauthorized"
+  "invalidIdentifierPassword": "Invalid identifier or password"
 }

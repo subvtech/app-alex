@@ -16,11 +16,11 @@ variables:
 
 before_script:
   - export TAG=$([ $CI_COMMIT_BRANCH == "master" ] && echo "prod" || echo "test" )
-  - export COMPONENTS_PAGE=$([ $CI_COMMIT_BRANCH == "master" ] && echo "off" || echo "on" )
+  - export NUXT_PUBLIC_SHOW_COMPONENTS_PAGE=$([ $CI_COMMIT_BRANCH == "master" ] && echo "off" || echo "on" )
   - export VERSION=$CI_COMMIT_SHORT_SHA
   - export STRAPI_URL=$([ $CI_COMMIT_BRANCH == "master" ] && echo "$STRAPI_URL" || echo "$STRAPI_TEST_URL" )
-  - export OPEN_AI_KEY=$([ $CI_COMMIT_BRANCH == "master" ] && echo "$OPEN_AI_KEY" || echo "$OPEN_AI_KEY_TEST" )
-  - export MATOMO_APP_ID=$([ $CI_COMMIT_BRANCH == "master" ] && echo "$MATOMO_APP_ID" || echo "$MATOMO_APP_ID_TEST" )
+  - export NUXT_PUBLIC_OPEN_AI_KEY=$([ $CI_COMMIT_BRANCH == "master" ] && echo "$NUXT_PUBLIC_OPEN_AI_KEY" || echo "$NUXT_PUBLIC_OPEN_AI_KEY_TEST" )
+  - export NUXT_PUBLIC_MATOMO_APP_ID=$([ $CI_COMMIT_BRANCH == "master" ] && echo "$NUXT_PUBLIC_MATOMO_APP_ID" || echo "$NUXT_PUBLIC_MATOMO_APP_ID_TEST" )
   - if [ -d "${CI_PROJECT_DIR}" ]; then rm -rf "${CI_PROJECT_DIR}"; fi
   - mkdir -p "${CI_PROJECT_DIR}"
   - cd "${CI_PROJECT_DIR}"
@@ -39,7 +39,7 @@ build-app2: # This job runs in the build stage, which runs first.
   stage: build
   script:
     - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
-    - docker build -t "projetoalex/alex-app:v2-$TAG" --build-arg matomo_url="$MATOMO_URL" --build-arg matomo_app_id=$MATOMO_APP_ID --build-arg strapi_url=$STRAPI_URL --build-arg components_page=$COMPONENTS_PAGE --build-arg open_ai_key="$OPEN_AI_KEY" -f Dockerfile  .
+    - docker build -t "projetoalex/alex-app:v2-$TAG" --build-arg matomo_url="$NUXT_PUBLIC_MATOMO_URL" --build-arg matomo_app_id=$NUXT_PUBLIC_MATOMO_APP_ID --build-arg strapi_url=$STRAPI_URL --build-arg components_page=$NUXT_PUBLIC_SHOW_COMPONENTS_PAGE --build-arg open_ai_key="$NUXT_PUBLIC_OPEN_AI_KEY" -f Dockerfile  .
     - docker push "projetoalex/alex-app:v2-$TAG"
   only:
     - master

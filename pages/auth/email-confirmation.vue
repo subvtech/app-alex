@@ -1,6 +1,51 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: 'auth',
+  middleware: 'guest-only',
+});
+
+const { $trpc } = useNuxtApp();
+const { t } = useI18n();
+const route = useRoute();
+const errorMessage = ref('');
+const emailConfirmed = $trpc.users.confirmEmail.useMutation();
+
+onMounted(() => {
+  emailConfirmed.mutate({ token: route.query.token as string });
+});
+
+watchEffect(() => {
+  if (emailConfirmed.error.value) {
+    switch (emailConfirmed.error.value.message) {
+      case 'invalid_email':
+        errorMessage.value = t('auth.invalid_email');
+        break;
+
+      case 'invalid_token':
+        errorMessage.value = t('auth.invalid_token');
+        break;
+
+      default: {
+        const zodError = emailConfirmed.error.value.data?.zodError;
+        errorMessage.value = zodError?.fieldErrors.token?.includes('Required')
+          ? t('auth.confirmation_token_required')
+          : t('errors.default');
+        break;
+      }
+    }
+  }
+});
+</script>
+
 <template>
   <div class="container fill-height">
-    <div class="row fill-height d-flex">
+    <div v-if="errorMessage">
+      {{ errorMessage }}
+    </div>
+    <div
+      v-if="emailConfirmed.data.value?.success"
+      class="row fill-height d-flex"
+    >
       <div
         id="img"
         class="img col fill-height d-flex justify-center align-center"
@@ -26,12 +71,6 @@
   </div>
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  layout: 'auth',
-  middleware: 'control-access',
-});
-</script>
 <style scoped lang="scss">
 html,
 body {

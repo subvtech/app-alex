@@ -7,10 +7,10 @@ type Curried<A extends any[], R> = <P extends Partial<A>>(
 ) => P extends A
   ? R
   : A extends [...SameLength<P>, ...infer S]
-    ? S extends any[]
-      ? Curried<S, R>
-      : never
-    : never;
+  ? S extends any[]
+    ? Curried<S, R>
+    : never
+  : never;
 
 export const __ = Symbol('curry');
 

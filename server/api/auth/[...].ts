@@ -6,10 +6,7 @@ import { NuxtAuthHandler } from '#auth';
 
 import db from '@/server/lib/drizzle';
 import { LoginSchema } from '@/server/modules/accounts/accounts.validator';
-import {
-  getUserByEmail,
-  setEmailVerified,
-} from '@/server/modules/users/users.service';
+import { getUserByEmail, update } from '@/server/modules/users/users.service';
 
 const runtimeConfig = useRuntimeConfig();
 
@@ -43,7 +40,7 @@ export const authOptions: AuthConfig = {
   ],
   events: {
     async linkAccount({ user }) {
-      await setEmailVerified(user.email!);
+      await update({ email: user.email!, emailVerified: new Date() });
     },
   },
   callbacks: {
