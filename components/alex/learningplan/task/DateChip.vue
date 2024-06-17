@@ -3,6 +3,7 @@
     :status="color"
     :text="deadline"
     size="small"
+    class="width-30"
     prepend-icon="mdi-calendar-range"
   ></alex-custom-chip>
 </template>

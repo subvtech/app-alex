@@ -19,11 +19,12 @@
         <tr
           v-for="item in items"
           :key="item.id"
-          :draggable="!isArchived"
-          class="text-5 text-no-wrap staggered-fade-item table-row bg-white"
+          :draggable="isTaskMovable(item)"
+          class="text-5 text-no-wrap staggered-fade-item bg-white"
           :class="[
             isArchived ? 'text-gray-400' : 'text-gray-600',
             dragging && dragFrom == item.id ? 'dragging' : '',
+            isTaskMovable(item) ? 'draggable-row' : '',
           ]"
           @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
           @dragstart="(e) => setDragStart(item, e)"
@@ -260,8 +261,9 @@ const dropDownItems = (task: TaskType) => {
   ];
   switch (task.status) {
     case 'draft':
-      items.push(getDropDownAction('publish', task.id));
       items.push(getDropDownAction('delete', task.id));
+      if (isTaskMovable(task))
+        items.push(getDropDownAction('publish', task.id));
       break;
     case 'published':
       if (deliveredTotal === 0) {
@@ -275,7 +277,7 @@ const dropDownItems = (task: TaskType) => {
         items.push(getDropDownAction('archive', task.id));
       }
       break;
-    case 'done':
+    case 'finished':
       if (deliveredTotal === 0) {
         items.push(getDropDownAction('draft', task.id));
         items.push(getDropDownAction('publish', task.id));
@@ -373,16 +375,27 @@ const setAcceptedGroups = (task: TaskType) => {
     draft: ['published', 'draft'],
     published:
       deliveredTotal === 0
-        ? ['draft', 'done', 'published']
-        : ['published', 'done'],
-    done: ['published', 'done'],
+        ? ['draft', 'finished', 'published']
+        : ['published', 'finished'],
+    finished: ['published', 'finished'],
   };
 
   return statusMap[task.status] || [];
 };
 
+const isTaskMovable = (task: TaskType) => {
+  return (
+    (task.title &&
+      task.deadline_at &&
+      task.type &&
+      task.start_at &&
+      !task.archived) ||
+    false
+  );
+};
+
 const setDragStart = (task: TaskType, e: DragEvent) => {
-  if (previewRow(task.id)) return;
+  if (previewRow(task.id) || !isTaskMovable(task)) return;
   const acceptedGroups = setAcceptedGroups(task);
   if (!isArchived.value) {
     setTimeout(() => {
@@ -413,10 +426,11 @@ const previewRow = (id: number) => {
   white-space: nowrap;
 }
 
-.table-row {
+.draggable-row {
   cursor: pointer;
   background-color: #fff;
   opacity: 0.99;
+  user-select: none;
 }
 
 /* .row-drop {

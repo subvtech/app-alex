@@ -72,7 +72,10 @@
     "errorMessage": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",
     "successMessage": "Tarefa {action} com sucesso!",
     "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
-    "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem estiver ativa"
+    "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem estiver ativa",
+    "TASK_MOVE_INVALID": "Não é possível mover a tarefa diretamente para esta coluna",
+    "TASK_DATA_INCOMPLETE": "Você precisa preencher as informações da tarefa antes de defini-la como publicada",
+    "TASK_MOVE_HAS_DELIVERIES": "Não é possível mover a tarefa para rascunho porque ela possui entregas"
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",

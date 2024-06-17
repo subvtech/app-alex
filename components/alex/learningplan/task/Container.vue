@@ -103,6 +103,7 @@ export interface TaskType {
   title: string;
   status: string;
   deadline_at?: string;
+  start_at?: string;
   position: number;
   type?: 'group' | 'individual';
   archived?: boolean;
@@ -112,6 +113,19 @@ export interface TaskType {
     doing: number;
     underReview: number;
     completed: number;
+  };
+}
+
+interface ApplicationError {
+  data: null | any;
+  error: {
+    status: number;
+    name: string;
+    message: string;
+    details?: {
+      policy: string;
+      errCode: string;
+    };
   };
 }
 
@@ -133,7 +147,7 @@ const learningPlanStore = useLearningPlanStore();
 const slideTransition = (i: number) =>
   tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
 
-const groupsArray = ['draft', 'published', 'done', 'archived'];
+const groupsArray = ['draft', 'published', 'finished', 'archived'];
 const groups = {};
 
 groupsArray.forEach((group, index) => {
@@ -152,14 +166,15 @@ const shouldDisplay = (i: number) => {
   const { archivedTasks } = tasksFilter.value || {};
   return (!archivedTasks && i !== 4) || (i === 4 && archivedTasks);
 };
-const displayError = (message: string) => {
-  setMessage(
-    t('pages.task.crud.errorMessage', {
-      action: t(`pages.task.crud.${message}`),
-    }),
-    'error',
-    true,
-  );
+const displayError = (message: string, e?: ApplicationError) => {
+  let displayMessage = t('pages.task.crud.errorMessage', {
+    action: t(`pages.task.crud.${message}`),
+  });
+  const error = e?.error;
+  if (error?.name === 'ApplicationError' && error?.details) {
+    displayMessage = t(`pages.task.crud.${error.details.errCode}`);
+  }
+  setMessage(displayMessage, 'error', true);
   if (learningPlanStore.learningPlan)
     learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
 };
@@ -246,7 +261,7 @@ const tasksArray = computed(() => {
         if (taskMember.status === 'to_do') delivered.toDo += 1;
         if (taskMember.status === 'in_progress') delivered.doing += 1;
         if (taskMember.status === 'in_review') delivered.underReview += 1;
-        if (taskMember.status === 'done') delivered.completed += 1;
+        if (taskMember.status === 'finished') delivered.completed += 1;
         taskMember.task_member_students?.forEach((student) => {
           const studentUser = student.student_member?.user;
           students.push({
@@ -261,7 +276,7 @@ const tasksArray = computed(() => {
         id: task.id,
         title: task.title,
         status: task.status,
-        deadline_at: task.deadline_at,
+        deadline_at: task.finish_at,
         start_at: task.start_at,
         type: task.type,
         archived: task.archived,
@@ -272,7 +287,7 @@ const tasksArray = computed(() => {
       if (task.archived) archived.push(taskItem);
       else if (task.status === 'draft') draft.push(taskItem);
       else if (task.status === 'published') published.push(taskItem);
-      else if (task.status === 'done') closed.push(taskItem);
+      else if (task.status === 'finished') closed.push(taskItem);
     });
   return [draft, published, closed, archived];
 });
@@ -325,8 +340,8 @@ const handleMoveTask = async ({
       await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
-  } catch (e) {
-    displayError('moveError');
+  } catch (e: ApplicationError) {
+    displayError('moveError', e);
   }
 };
 
@@ -429,8 +444,8 @@ const onDrop = async (item: TaskType, tableSort: string) => {
           await updateTaskPositions(over.value.list, item);
         }
         displaySuccess('moveSuccess');
-      } catch (e) {
-        displayError('moveError');
+      } catch (e: ApplicationError) {
+        displayError('moveError', e);
       }
     }
   }
