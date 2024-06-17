@@ -307,7 +307,9 @@ const filterByClassOrType = (
 const kanban = ref<HTMLDivElement | null>(null);
 const { x: mouseX, y: mouseY } = useMouse({ window, type: 'client' });
 const moveViewX = () => {
-  const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
+  const isDragging = document.querySelector(
+    '.kanban-card-item.kanban-card-dragging',
+  );
   if (!kanban.value || !isDragging) return;
   const rect = kanban.value.getBoundingClientRect();
   const x = mouseX.value - rect.left;
@@ -320,7 +322,9 @@ const moveViewX = () => {
   }
 };
 const moveViewY = () => {
-  const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
+  const isDragging = document.querySelector(
+    '.kanban-card-item.kanban-card-dragging',
+  );
   const html = document.querySelector('html');
   if (!isDragging || !html) return;
   const y = Math.abs(mouseY.value);
