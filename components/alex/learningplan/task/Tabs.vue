@@ -6,7 +6,9 @@
       <alex-custom-tabs v-model="activePage" :tabs="tabs" color="accent" />
     </div>
     <v-window v-model="activePage">
-      <v-window-item value="1"><alex-learningplan-events /></v-window-item>
+      <v-window-item value="1"
+        ><alex-learningplan-task-events v-model="taskEvents"
+      /></v-window-item>
       <v-window-item class="v-window-item-full" value="2">
         <alex-learningplan-task-submissions
           class="w-full"
@@ -26,11 +28,14 @@
 </template>
 
 <script setup lang="ts">
+import { isSameDay } from 'date-fns';
+
 interface TaskTabsProps {
   messages: Message[];
   submission?: boolean;
   submissions: AttachedSubmission[];
   selectorParent?: string;
+  events: TaskEvent[];
 }
 const props = withDefaults(defineProps<TaskTabsProps>(), {
   submission: false,
@@ -60,6 +65,29 @@ const tabs = computed(() => {
   }
   return [...defaultTabs.slice(0, 1), submissions, ...defaultTabs.slice(1)];
 });
+const taskEvents = computed(() => orderToDateEvents(props.events));
+const orderToDateEvents = (events: TaskEvent[]) => {
+  const eventsGroups: { date: Date; events: any[] }[] = [];
+  events.forEach((current) => {
+    const currentDate = new Date(current.publishedAt);
+    const currentElement = {
+      action: current.event,
+      time: current.publishedAt,
+    };
+    const group = eventsGroups.find((group) =>
+      isSameDay(currentDate, new Date(group.date)),
+    );
+    if (group) {
+      group.events.push(currentElement);
+      return;
+    }
+    eventsGroups.push({
+      date: currentDate,
+      events: [currentElement],
+    });
+  });
+  return eventsGroups;
+};
 const handleSubmission = (value: AttachedSubmission) => {
   activePage.value = '2';
   setTimeout(
