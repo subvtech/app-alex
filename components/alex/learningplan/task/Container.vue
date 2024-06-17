@@ -121,6 +121,7 @@ const props = defineProps<{
 }>();
 
 const { create, delete: _delete, update } = useStrapi();
+const client = useStrapiClient();
 const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
@@ -361,7 +362,7 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
   onDragOver(groups[index - 1], -index, -1, dragEvent);
 };
 
-const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
+const updateTaskPositions = async (tasksStatus: string, item: TaskType) => {
   const groupIndex = groups[tasksStatus];
 
   const cloneArray = JSON.parse(JSON.stringify(tasksArray.value[groupIndex]));
@@ -381,13 +382,21 @@ const updateTaskPositions = (tasksStatus: string, item: TaskType) => {
 
   task.status = tasksStatus;
   item.status = tasksStatus;
-  cloneArray.forEach((t: TaskType, index: number) => {
+  /* cloneArray.forEach((t: TaskType, index: number) => {
     if (t.position !== index || t.id === task.id) {
       t.position = index;
       if (t.id === task.id) {
         update('tasks', t.id, { position: index, status: tasksStatus });
       } else update('tasks', t.id, { position: index });
     }
+  }); */
+  await update('tasks', task.id, { status: tasksStatus });
+  await client('tasks/update-multiple', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: cloneArray,
   });
   tasksArray.value[groupIndex] = cloneArray;
 };
@@ -417,7 +426,7 @@ const onDrop = async (item: TaskType, tableSort: string) => {
             position: getHigherIndex(over.value.list),
           });
         } else {
-          updateTaskPositions(over.value.list, item);
+          await updateTaskPositions(over.value.list, item);
         }
         displaySuccess('moveSuccess');
       } catch (e) {
