@@ -45,7 +45,7 @@
           <alex-custom-chip
             class="w-fit"
             :status="statusColor"
-            :text="$t(`components.courses.tasks.task.status.${task.status}`)"
+            :text="$t(`components.courses.tasks.task.status.${status}`)"
           />
         </div>
         <div class="d-flex flex-column gap-2 w-full">
@@ -173,14 +173,11 @@ interface Submission {
   mark?: number;
   maxMark?: number;
 }
-interface Task {
-  id: number;
-  status: TStatus;
-  finishAt?: string | null;
-}
 interface TaskUserDrawerProps {
   student: Student;
-  task: Task;
+  taskMemberId: number;
+  status: TStatus;
+  finishAt?: string | null;
   submission?: Submission;
   submissions: AttachedSubmission[];
   sendSubmission: boolean;
@@ -189,6 +186,7 @@ interface TaskUserDrawerProps {
 const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   submission: undefined,
   canSubmitAfterDeadline: false,
+  finishAt: null,
 });
 const messages = ref<Message[]>([]);
 const { t } = useI18n();
@@ -199,7 +197,7 @@ type Emit = {
 };
 const emit = defineEmits<Emit>();
 const sendSubmission = toRef(props.sendSubmission);
-const deadline = toRef(props.task.finishAt);
+const deadline = toRef(props.finishAt);
 const activePage = ref('1');
 const initials = computed(() => {
   return getInitials(props.student.name);
@@ -247,11 +245,7 @@ const statusColor = computed(() => {
     in_review: 'orange',
     done: 'green',
   };
-  return mapedColors[props.task.status] as
-    | 'secondary'
-    | 'blue'
-    | 'orange'
-    | 'green';
+  return mapedColors[props.status] as 'secondary' | 'blue' | 'orange' | 'green';
 });
 const config: Record<string, string> = {
   text: t('components.learningPlan.drawer.task.restrictions.text'),
@@ -263,16 +257,16 @@ const config: Record<string, string> = {
 const changeDeadline = async (value?: string | null) => {
   try {
     if (!value) return;
-    await strapi.update<TaskMember>('task-members', props.task.id, {
+    await strapi.update<TaskMember>('task-members', props.taskMemberId, {
       finished_at: value,
     });
     if (typeof value === 'string') {
-      emit('change-finish-at', props.task.id, value);
+      emit('change-finish-at', props.taskMemberId, value);
       return;
     }
     emit(
       'change-finish-at',
-      props.task.id,
+      props.taskMemberId,
       (value as Date).toISOString().split('T')[0],
     );
   } catch (error) {
@@ -281,16 +275,20 @@ const changeDeadline = async (value?: string | null) => {
 };
 const changeSendAfterDeadline = async (value: boolean) => {
   try {
-    await strapi.update<TaskMember>('task-members', props.task.id, {
+    await strapi.update<TaskMember>('task-members', props.taskMemberId, {
       can_submit_after_deadline: value,
     });
-    emit('change-submit-after-deadline', props.task.id, value);
+    emit('change-submit-after-deadline', props.taskMemberId, value);
   } catch (error) {
     setMessage(t('pages.tasks.errors.updateSendAfterDeadline'), 'error', true);
   }
 };
 watch(deadline, changeDeadline);
 watch(sendSubmission, changeSendAfterDeadline);
+watch(props, (value) => {
+  deadline.value = value.finishAt;
+  sendSubmission.value = value.sendSubmission;
+});
 </script>
 
 <style scoped lang="scss">

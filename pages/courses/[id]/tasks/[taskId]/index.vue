@@ -71,15 +71,12 @@
         description: taskStore.task.submission_description,
         status: 'not_started',
       }"
-      :deadline="new Date(studentDetails.finished_at)"
       :can-submit-after-deadline="taskStore.task.can_submit_after_deadline"
       :send-submission="studentDetails.can_submit_after_deadline"
       :submissions="[]"
-      :task="{
-        id: studentDetails.id,
-        finishAt: studentDetails.finished_at,
-        status: studentDetails.status,
-      }"
+      :task-member-id="studentDetails.id"
+      :finish-at="studentDetails.finished_at"
+      :status="studentDetails.status"
       :student="{
         name: studentDetails.task_member_students[0].student_member.user
           .fullname,
@@ -227,7 +224,6 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
     });
   }
 };
-
 onBeforeMount(() => {
   headerStore.showHeader = true;
   if (!id || !taskId.value) {
