@@ -325,7 +325,7 @@ const getDropDownAction = (action: string, id: number) => {
     },
     close: {
       text: t('pages.task.table.dropdown.close'),
-      onClick: () => emit('moveTask', { id, status: 'done' }),
+      onClick: () => emit('moveTask', { id, status: 'finished' }),
     },
     archive: {
       text: t('pages.task.table.dropdown.archive'),
