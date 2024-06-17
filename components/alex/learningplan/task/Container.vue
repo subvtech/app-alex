@@ -103,6 +103,7 @@ export interface TaskType {
   title: string;
   status: string;
   deadline_at?: string;
+  start_at?: string;
   position: number;
   type?: 'group' | 'individual';
   archived?: boolean;
