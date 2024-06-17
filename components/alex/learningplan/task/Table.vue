@@ -275,7 +275,7 @@ const dropDownItems = (task: TaskType) => {
         items.push(getDropDownAction('archive', task.id));
       }
       break;
-    case 'done':
+    case 'finished':
       if (deliveredTotal === 0) {
         items.push(getDropDownAction('draft', task.id));
         items.push(getDropDownAction('publish', task.id));
@@ -373,9 +373,9 @@ const setAcceptedGroups = (task: TaskType) => {
     draft: ['published', 'draft'],
     published:
       deliveredTotal === 0
-        ? ['draft', 'done', 'published']
-        : ['published', 'done'],
-    done: ['published', 'done'],
+        ? ['draft', 'finished', 'published']
+        : ['published', 'finished'],
+    finished: ['published', 'finished'],
   };
 
   return statusMap[task.status] || [];
