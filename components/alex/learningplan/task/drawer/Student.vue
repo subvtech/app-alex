@@ -134,7 +134,7 @@
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :messages="messages"
-        :submissions="submissions"
+        :submissions="submissions.data"
       />
     </template>
 
@@ -143,7 +143,7 @@
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
         class="border-top-1 border-gray-100 pt-3"
-        :submissions="submissions"
+        :submissions="submissions.data"
         @submit="
           (data) =>
             handleSubmitMessage(
@@ -160,6 +160,8 @@
 </template>
 
 <script setup lang="ts">
+import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
+
 type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
 interface Student {
   name: string;
@@ -179,7 +181,6 @@ interface TaskUserDrawerProps {
   status: TStatus;
   finishAt?: string | null;
   submission?: Submission;
-  submissions: AttachedSubmission[];
   sendSubmission: boolean;
   canSubmitAfterDeadline?: boolean;
 }
@@ -210,6 +211,38 @@ const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
+const strapiUtils = useStrapiUtils();
+const getSubmissions = (memberID: number) =>
+  strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
+    filters: {
+      task_member: memberID,
+    },
+  });
+const { data: submissions, execute } = await useAsyncData(
+  'task-submissions',
+  () => getSubmissions(props.taskMemberId),
+  {
+    default: () => ({
+      meta: { total: 0 },
+      data: [] as AttachedSubmission[],
+    }),
+    transform: ({ data }) => ({
+      data: data.map(
+        (submission) =>
+          ({
+            id: submission.id,
+            justification: {
+              text: submission.justification,
+            },
+            mark: submission.grade,
+            maxMark: submission.grade,
+            time: new Date(submission.evaluated_at || submission.created_at),
+            status: submission.evaluated_at ? 'reviewed' : 'in_review',
+          }) as AttachedSubmission,
+      ),
+    }),
+  },
+);
 const handleSubmitMessage = (
   text: string,
   audio?: Blob | null,
@@ -285,10 +318,15 @@ const changeSendAfterDeadline = async (value: boolean) => {
 };
 watch(deadline, changeDeadline);
 watch(sendSubmission, changeSendAfterDeadline);
-watch(props, (value) => {
-  deadline.value = value.finishAt;
-  sendSubmission.value = value.sendSubmission;
+watch(model, (value) => {
+  if (value) {
+    execute();
+  }
 });
+// watch(props, (value) => {
+//   deadline.value = value.finishAt;
+//   sendSubmission.value = value.sendSubmission;
+// });
 </script>
 
 <style scoped lang="scss">
