@@ -9,6 +9,7 @@
       <v-window-item value="1"><alex-learningplan-events /></v-window-item>
       <v-window-item class="v-window-item-full" value="2">
         <alex-learningplan-task-submissions
+          class="w-full"
           :submissions="submissions"
           @redirect-to-chat="(submission) => handleRedirectToChat(submission)"
       /></v-window-item>

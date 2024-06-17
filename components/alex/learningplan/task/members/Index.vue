@@ -1,84 +1,103 @@
 <template>
-  <div class="members">
+  <v-data-iterator
+    :search="search"
+    :page="page"
+    :items="members.data"
+    :items-per-page="itemsPerPage"
+    class="members"
+    :filter-keys="[
+      'student_member.user.fullname',
+      'student_member.user.name',
+      'student_member.user.email',
+      'student_member.learning_class.name',
+    ]"
+    :loading="true"
+  >
     <!-- Header -->
-    <div class="header d-flex align-center py-4 px-2">
-      <alex-inputs-text-field
-        v-model="searchFilter"
-        name="member"
-        class="w-50"
-        :placeholder="$t('components.learningPlan.members.search')"
-        prepend-inner-icon="mdi-magnify"
-        density="compact"
-        clearable
-      />
+    <template #header>
+      <div class="header d-flex align-center py-4 px-2">
+        <alex-inputs-text-field
+          v-model="search"
+          name="member"
+          class="w-50"
+          :placeholder="$t('components.learningPlan.members.search')"
+          prepend-inner-icon="mdi-magnify"
+          density="compact"
+          clearable
+        />
 
-      <alex-learningplan-task-members-invite
-        :learningplan-id="learningplanId"
-        @select-member-click="addMember"
-      >
-        <template #activator="{ menuProps }">
-          <alex-custom-button
-            v-bind="menuProps"
-            class="ml-auto"
-            variant="secondary"
-            prepend-icon="mdi-plus"
-            >{{
-              $t('components.learningPlan.members.invite.label')
-            }}</alex-custom-button
-          >
-        </template>
-      </alex-learningplan-task-members-invite>
-    </div>
-
+        <alex-learningplan-task-members-invite
+          :learningplan-id="learningplanId"
+          @select-member-click="addMember"
+        >
+          <template #activator="{ menuProps }">
+            <alex-custom-button
+              v-bind="menuProps"
+              class="ml-auto"
+              variant="secondary"
+              prepend-icon="mdi-plus"
+              >{{
+                $t('components.learningPlan.members.invite.label')
+              }}</alex-custom-button
+            >
+          </template>
+        </alex-learningplan-task-members-invite>
+      </div>
+    </template>
     <!-- Cards -->
-    <alex-learningplan-task-members-card
-      v-for="member in filteredMembers"
-      :key="`student-member${member.id}`"
-      :member="{
-        name: member.student_member?.user.fullname,
-        class: member.student_member?.learning_class?.name,
-        avatarUrl: member.student_member?.user.avatar?.url,
-      }"
-      @remove-click="() => removeMember(member.task_member.id, member)"
-    />
-    <div
-      v-if="!filteredMembers.length"
-      class="d-flex align-center justify-center flex-column ga-4 text-center"
-    >
-      <img
-        class="no-members-svg"
-        src="/svg/no-members.svg"
-        :alt="$t('components.learningPlan.members.missing.member')"
-        role="no-members"
+    <template #default="{ items }">
+      <alex-learningplan-task-members-card
+        v-for="member in items"
+        :key="`student-member${member.raw.id}`"
+        :member="{
+          name: member.raw.student_member?.user.fullname,
+          class: member.raw.student_member?.learning_class?.name,
+          avatarUrl: member.raw.student_member?.user.avatar?.url,
+        }"
+        @remove-click="removeMember(member.raw.task_member.id, member.raw)"
+        @to-profile="
+          navigateTo(`/users/${member.raw.student_member.user.username}`)
+        "
       />
-      <p class="text-body-3 text-gray-400">
-        {{ $t('components.learningPlan.members.missing.member') }}
-      </p>
-    </div>
-
-    <!-- Menu -->
-    <div
-      v-if="members?.meta.pagination.pageCount > 1"
-      class="d-flex align-center ga-2 pa-6"
-    >
-      <span class="flex-1-1">
-        Mostrando do
-        {{ members?.meta.pagination.pageCount }} ao {{ totalVisible }} de um
-        total de {{ members?.meta.pagination.total }} Alunos</span
+    </template>
+    <template #no-data>
+      <div
+        class="d-flex align-center justify-center flex-column ga-4 text-center"
       >
-      <alex-custom-pagination
-        v-model="page"
-        :length="members?.meta.pagination.pageCount"
-        :total-visible="totalVisible"
-        class="extra-mb"
-      />
-    </div>
-  </div>
+        <img
+          class="no-members-svg"
+          src="/svg/no-members.svg"
+          :alt="$t('components.learningPlan.members.missing.member')"
+          role="no-members"
+        />
+        <p class="text-body-3 text-gray-400">
+          {{ $t('components.learningPlan.members.missing.member') }}
+        </p>
+      </div>
+    </template>
+
+    <template #footer="{ pageCount, groupedItems }">
+      <div
+        v-if="groupedItems.length && members.data.length > itemsPerPage"
+        class="d-flex align-center ga-2 pa-6"
+      >
+        <span class="flex-1-1">
+          {{
+            showingData(members.data, groupedItems as any[], search, pageCount)
+          }}
+        </span>
+        <alex-custom-pagination
+          v-model="page"
+          :length="pageCount"
+          :total-visible="3"
+          class="extra-mb"
+        />
+      </div>
+    </template>
+  </v-data-iterator>
 </template>
 
 <script setup lang="ts">
-const page = ref<number>(1);
-const totalVisible = 10;
 interface MembersProps {
   learningplanId: number;
   taskId: number;
@@ -95,7 +114,10 @@ const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-const searchFilter = ref('');
+const emit = defineEmits(['change-members']);
+const page = ref<number>(1);
+const itemsPerPage = 12;
+const search = ref('');
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMemberStudent>('task-member-students', {
     populate: {
@@ -109,25 +131,46 @@ const getMembers = (taskId: number) =>
         task: taskId,
       },
     },
+    // pagination: {
+    //   pageSize: 3,
+    //   page,
+    //   withCount: true,
+    // },
   });
+const showingData = (
+  items: any[],
+  pageItems: any[],
+  search: string,
+  pageCount: number,
+) => {
+  const itemsPerPageCalc = search ? itemsPerPage : pageItems.length;
+  const range = pageItems.length < itemsPerPage ? 2 : 1;
+  const from =
+    itemsPerPageCalc === 1
+      ? items.length
+      : (page.value - 1) * itemsPerPageCalc + range;
+  const to =
+    page.value === pageCount ? items.length : page.value * itemsPerPageCalc;
+  const total = items.length;
+  const message = t('pages.courses.showingData', {
+    from,
+    to,
+    total,
+    entity: t('components.learningPlan.drawer.students'),
+  });
+
+  return message;
+};
 const { data: members, refresh } = await useAsyncData(
   'task-members-students',
   () => getMembers(props.taskId),
+  {
+    default: () => ({
+      meta: { total: 0 },
+      data: [] as TaskMemberStudent[],
+    }),
+  },
 );
-
-const filteredMembers = computed(() => {
-  if (!members.value?.data) {
-    return [];
-  }
-  return members.value?.data.filter((member) => {
-    const search = searchFilter.value.toLowerCase();
-    return (
-      member.student_member?.user?.fullname?.toLowerCase().includes(search) ||
-      member.student_member?.user?.email?.toLowerCase().includes(search) ||
-      member.student_member?.user?.username?.toLowerCase().includes(search)
-    );
-  });
-});
 
 const checkAlreadyHasMember = (member: LearningPlanMemberSimple) => {
   if (members.value?.data) {
@@ -171,11 +214,12 @@ const addMember = async (member: LearningPlanMemberSimple) => {
         can_submit_after_deadline: props.sendAfterDeadline,
       },
     );
-    strapiUtils.create('task-member-students', {
+    await strapiUtils.create('task-member-students', {
       role: 'in_charge',
       student_member: member.id,
       task_member: taskMember.id,
     });
+    setTimeout(refresh, 100);
     setMessage(
       t('components.learningPlan.drawer.task.addMember', {
         member: member.user.fullname,
@@ -183,7 +227,7 @@ const addMember = async (member: LearningPlanMemberSimple) => {
       'success',
       true,
     );
-    setTimeout(refresh, 100);
+    emit('change-members');
   } catch (error) {
     setMessage(
       t('components.learningPlan.drawer.task.errors.addMember'),
@@ -207,6 +251,7 @@ const removeMember = async (
       'success',
       true,
     );
+    emit('change-members');
   } catch (error) {
     setMessage(
       t('components.learningPlan.drawer.task.errors.removeMember'),

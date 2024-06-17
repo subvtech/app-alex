@@ -57,37 +57,34 @@
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
+        :disabled="!canDrag || column.disable"
         @insert-card="handleInsertCard"
       >
         <template #card="{ item, status, index: itemIndex }">
-          <template v-if="type === 'professor'">
-            <alex-learningplan-task-card
-              v-if="!isTaskStudent(item)"
-              class="kanban-card-item-inner select-none"
-              :date="item.date"
-              :name="item.user.name"
-              :student-class="item.studentClass"
-              :status="status"
-              :avatar="item?.user.avatar"
-              :mark="item.mark"
-              :max-mark="item.maxMark"
-              @click="$emit('card-click', itemIndex, item)"
-            />
-          </template>
-          <template v-if="type === 'student'">
-            <alex-learningplan-task-student-card
-              v-if="isTaskStudent(item)"
-              class="kanban-card-item-inner select-none"
-              :title="item.title"
-              :date="item.date"
-              :group="item.group"
-              :name-group="item.nameGroup"
-              :status="status"
-              :avatar="item?.avatar"
-              :mark="item.mark"
-              :max-mark="item.maxMark"
-            />
-          </template>
+          <alex-learningplan-task-card
+            v-if="!isTaskStudent(item)"
+            class="kanban-card-item-inner select-none"
+            :date="item.date"
+            :name="item.user.name"
+            :student-class="item.studentClass"
+            :status="status"
+            :avatar="item?.user.avatar"
+            :mark="item.mark"
+            :max-mark="item.maxMark"
+            @click="$emit('card-click', itemIndex, item)"
+          />
+          <alex-learningplan-task-student-card
+            v-else
+            class="kanban-card-item-inner select-none"
+            :title="item.title"
+            :date="item.date"
+            :group="item.group"
+            :name-group="item.nameGroup"
+            :status="status"
+            :avatar="item?.avatar"
+            :mark="item.mark"
+            :max-mark="item.maxMark"
+          />
         </template>
       </alex-learningplan-task-kanban-column>
     </div>
@@ -135,6 +132,7 @@ interface Column<T extends KanbanType> {
   group: string;
   color: Colors;
   accept?: Accept<Card<T>> | null;
+  disable?: boolean;
 }
 interface KanbanProps {
   type: T;
@@ -142,6 +140,7 @@ interface KanbanProps {
 }
 const { t } = useI18n();
 // Models/props
+const canDrag = ref(true);
 const props = defineProps<KanbanProps>();
 const tasks = defineModel<Card<typeof props.type>[]>({
   required: true,
@@ -308,7 +307,9 @@ const filterByClassOrType = (
 const kanban = ref<HTMLDivElement | null>(null);
 const { x: mouseX, y: mouseY } = useMouse({ window, type: 'client' });
 const moveViewX = () => {
-  const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
+  const isDragging = document.querySelector(
+    '.kanban-card-item.kanban-card-dragging',
+  );
   if (!kanban.value || !isDragging) return;
   const rect = kanban.value.getBoundingClientRect();
   const x = mouseX.value - rect.left;
@@ -321,7 +322,9 @@ const moveViewX = () => {
   }
 };
 const moveViewY = () => {
-  const isDragging = document.querySelector('.kanban-card-item.kanban-helper');
+  const isDragging = document.querySelector(
+    '.kanban-card-item.kanban-card-dragging',
+  );
   const html = document.querySelector('html');
   if (!isDragging || !html) return;
   const y = Math.abs(mouseY.value);
@@ -336,6 +339,14 @@ const moveViewY = () => {
 };
 watch(mouseX, moveViewX);
 watch(mouseY, moveViewY);
+
+const setCanDrag = (value: boolean) => {
+  canDrag.value = value;
+};
+defineExpose({
+  canDrag,
+  setCanDrag,
+});
 </script>
 
 <style scoped>

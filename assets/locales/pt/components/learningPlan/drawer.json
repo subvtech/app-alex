@@ -111,5 +111,6 @@
   "srchClass": "Buscar turma",
   "date": {
     "placeholder": "Selecione uma data"
-  }
+  },
+  "students": "Alunos"
 }

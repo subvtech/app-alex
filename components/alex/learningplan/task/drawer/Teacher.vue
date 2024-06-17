@@ -180,6 +180,7 @@
             :start-at="startDate"
             :finish-at="endDate"
             :submit-after-deadline="sendAfterDeadline"
+            @change-members="$emit('change-members')"
         /></v-window-item>
       </v-window>
     </div>
@@ -204,7 +205,6 @@ interface TaskTeacherDrawerProps {
   type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
   events?: TaskEvent[];
-  messages?: Message[];
   description?: string;
   submissionDescription?: string;
   restrictions?: string;
@@ -221,7 +221,6 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   sendAfterDeadline: false,
   kanbanButton: false,
   description: undefined,
-  messages: () => [],
   startDate: undefined,
   endDate: undefined,
   restrictions: '',
@@ -254,6 +253,7 @@ type Emits = {
   'change-description': [value: string];
   'change-submission-description': [value: string];
   'change-tags': [value: TagSimple[]];
+  'change-members': [];
 };
 const emit = defineEmits<Emits>();
 

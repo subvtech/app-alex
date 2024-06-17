@@ -44,14 +44,14 @@
           </p>
           <alex-custom-chip
             class="w-fit"
-            status="blue"
-            :text="$t(`components.courses.tasks.task.status.${task.status}`)"
+            :status="statusColor"
+            :text="$t(`components.courses.tasks.task.status.${status}`)"
           />
         </div>
         <div class="d-flex flex-column gap-2 w-full">
           <p class="text-body-4 text-gray-800 mb-1">
             <span class="text-tag-orange-light">* </span
-            >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
+            >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
           <alex-learningplan-task-date v-model="deadline" edit />
@@ -72,7 +72,7 @@
                     'components.learningPlan.drawer.task.allowSendAfterSubmission',
                   )
                 "
-                :disabled="!editSendSubmission"
+                :disabled="canSubmitAfterDeadline"
               />
             </div>
             <p class="text-body-4">
@@ -89,7 +89,7 @@
                   v-for="(constraint, index) in submission.constraints"
                   :key="index"
                   status="secondary"
-                  :text="constraint"
+                  :text="config[constraint]"
               /></template>
             </div>
           </div>
@@ -134,7 +134,7 @@
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :messages="messages"
-        :submissions="submissions"
+        :submissions="submissions.data"
       />
     </template>
 
@@ -143,7 +143,7 @@
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
         class="border-top-1 border-gray-100 pt-3"
-        :submissions="submissions"
+        :submissions="submissions.data"
         @submit="
           (data) =>
             handleSubmitMessage(
@@ -160,6 +160,8 @@
 </template>
 
 <script setup lang="ts">
+import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
+
 type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
 interface Student {
   name: string;
@@ -173,27 +175,30 @@ interface Submission {
   mark?: number;
   maxMark?: number;
 }
-interface Task {
-  status: TStatus;
-  finalDate: Date;
-}
 interface TaskUserDrawerProps {
   student: Student;
-  task: Task;
-  deadline: Date;
+  taskMemberId: number;
+  status: TStatus;
+  finishAt?: string | null;
   submission?: Submission;
-  submissions: AttachedSubmission[];
   sendSubmission: boolean;
-  editSendSubmission?: boolean;
+  canSubmitAfterDeadline?: boolean;
 }
 const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   submission: undefined,
-  editSendSubmission: true,
+  canSubmitAfterDeadline: false,
+  finishAt: null,
 });
 const messages = ref<Message[]>([]);
+const { t } = useI18n();
 const model = defineModel({ default: false });
+type Emit = {
+  'change-finish-at': [taskId: number, value: string];
+  'change-submit-after-deadline': [taskId: number, value: boolean];
+};
+const emit = defineEmits<Emit>();
 const sendSubmission = toRef(props.sendSubmission);
-const deadline = toRef(props.deadline);
+const deadline = toRef(props.finishAt);
 const activePage = ref('1');
 const initials = computed(() => {
   return getInitials(props.student.name);
@@ -204,6 +209,40 @@ const handleCloseModal = () => {
 const drawerId = computed(() => `student-drawer-${crypto.randomUUID()}`);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
+const strapi = useStrapi();
+const { setMessage } = useMessageStore();
+const strapiUtils = useStrapiUtils();
+const getSubmissions = (memberID: number) =>
+  strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
+    filters: {
+      task_member: memberID,
+    },
+  });
+const { data: submissions, execute } = await useAsyncData(
+  'task-submissions',
+  () => getSubmissions(props.taskMemberId),
+  {
+    default: () => ({
+      meta: { total: 0 },
+      data: [] as AttachedSubmission[],
+    }),
+    transform: ({ data }) => ({
+      data: data.map(
+        (submission) =>
+          ({
+            id: submission.id,
+            justification: {
+              text: submission.justification,
+            },
+            mark: submission.grade,
+            maxMark: submission.grade,
+            time: new Date(submission.evaluated_at || submission.created_at),
+            status: submission.evaluated_at ? 'reviewed' : 'in_review',
+          }) as AttachedSubmission,
+      ),
+    }),
+  },
+);
 const handleSubmitMessage = (
   text: string,
   audio?: Blob | null,
@@ -232,6 +271,62 @@ const handleSubmitMessage = (
   }
   messages.value.push(message);
 };
+const statusColor = computed(() => {
+  const mapedColors = {
+    to_do: 'secondary',
+    in_progress: 'blue',
+    in_review: 'orange',
+    done: 'green',
+  };
+  return mapedColors[props.status] as 'secondary' | 'blue' | 'orange' | 'green';
+});
+const config: Record<string, string> = {
+  text: t('components.learningPlan.drawer.task.restrictions.text'),
+  image: t('components.learningPlan.drawer.task.restrictions.image'),
+  video: t('components.learningPlan.drawer.task.restrictions.video'),
+  document: t('components.learningPlan.drawer.task.restrictions.document'),
+  link: t('components.learningPlan.drawer.task.restrictions.link'),
+};
+const changeDeadline = async (value?: string | null) => {
+  try {
+    if (!value) return;
+    await strapi.update<TaskMember>('task-members', props.taskMemberId, {
+      finished_at: value,
+    });
+    if (typeof value === 'string') {
+      emit('change-finish-at', props.taskMemberId, value);
+      return;
+    }
+    emit(
+      'change-finish-at',
+      props.taskMemberId,
+      (value as Date).toISOString().split('T')[0],
+    );
+  } catch (error) {
+    setMessage(t('pages.tasks.errors.updateDeadlineMember'), 'error', true);
+  }
+};
+const changeSendAfterDeadline = async (value: boolean) => {
+  try {
+    await strapi.update<TaskMember>('task-members', props.taskMemberId, {
+      can_submit_after_deadline: value,
+    });
+    emit('change-submit-after-deadline', props.taskMemberId, value);
+  } catch (error) {
+    setMessage(t('pages.tasks.errors.updateSendAfterDeadline'), 'error', true);
+  }
+};
+watch(deadline, changeDeadline);
+watch(sendSubmission, changeSendAfterDeadline);
+watch(model, (value) => {
+  if (value) {
+    execute();
+  }
+});
+// watch(props, (value) => {
+//   deadline.value = value.finishAt;
+//   sendSubmission.value = value.sendSubmission;
+// });
 </script>
 
 <style scoped lang="scss">

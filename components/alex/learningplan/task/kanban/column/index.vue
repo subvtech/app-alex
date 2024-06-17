@@ -6,12 +6,12 @@
       :color="color"
     />
     <SlickList
+      class="flex flex-col py-2"
+      helper-class="kanban-card-dragging"
       :list="items"
       :group="group"
       :accept="accept"
-      class="flex flex-col py-2"
-      helper-class="kanban-helper"
-      :press-delay="100"
+      :distance="15"
       @sort-insert="
         ({ newIndex, value }) => handleInsertCard({ newIndex, value, group })
       "
@@ -21,6 +21,7 @@
         :key="item.id"
         :index="i"
         class="kanban-card-item"
+        :disabled="disabled"
       >
         <slot name="card" :item="item" :index="i" :status="status" />
       </SlickItem>
@@ -48,8 +49,12 @@ interface ColumnProps {
   color: 'orange' | 'green' | 'blue' | 'gray';
   accept?: Accept<T> | null;
   group: string;
+  disabled?: boolean;
 }
-const props = withDefaults(defineProps<ColumnProps>(), { accept: null });
+const props = withDefaults(defineProps<ColumnProps>(), {
+  accept: null,
+  disable: false,
+});
 const items = defineModel<T[]>({ required: true });
 const emit = defineEmits<{
   'insert-card': [
@@ -69,7 +74,7 @@ const emit = defineEmits<{
 }>();
 const isDragging = () => {
   const isDraggingCard = document.querySelector(
-    '.kanban-card-item.kanban-helper',
+    '.kanban-card-item.kanban-card-dragging',
   );
   return !!isDraggingCard;
 };
@@ -92,15 +97,17 @@ const status = computed(() => mappedStatus[props.color] as TaskStatus);
 
 <style lang="scss" scoped>
 .kanban-card-item {
-  .kanban-card-item-inner {
+  border-radius: 8px;
+  &.kanban-card-dragging {
     cursor: grab;
-    transition:
-      background 0.2s,
-      transform 0.2s;
-  }
-
-  &.kanban-helper {
+    max-height: 118px;
     box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.15);
   }
+}
+:deep(.kanban-card-item-inner) {
+  margin-top: 8px;
+}
+:global(.kanban-card-dragging .kanban-card-item-inner) {
+  margin-top: 0px;
 }
 </style>

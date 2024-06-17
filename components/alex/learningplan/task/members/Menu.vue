@@ -15,27 +15,31 @@ interface MenuProps {
 
 const props = withDefaults(defineProps<MenuProps>(), {
   submitted: false,
-  accepted: false,
+  accepted: true,
 });
 
 const { t } = useI18n();
-const emit = defineEmits(['remove-click', 'to-profile']);
-const items: AlexDropdownItem[] = [
-  {
-    text: t('components.learningPlan.members.menu.profile'),
-    onClick: () => emit('to-profile'),
-  },
-  !props.accepted
-    ? {
-        text: t('components.learningPlan.members.menu.invite'),
-      }
-    : undefined,
-  !props.submitted
-    ? {
-        text: t('components.learningPlan.members.menu.remove'),
-        warning: true,
-        onClick: () => emit('remove-click'),
-      }
-    : undefined,
-].filter((item) => item !== undefined);
+const emit = defineEmits(['remove-click', 'to-profile', 'invite-click']);
+const items = computed(() => {
+  const defaultItems: AlexDropdownItem[] = [
+    {
+      text: t('components.learningPlan.members.menu.profile'),
+      onClick: () => emit('to-profile'),
+    },
+  ];
+  if (!props.accepted) {
+    defaultItems.push({
+      text: t('components.learningPlan.members.menu.invite'),
+      onClick: () => emit('invite-click'),
+    });
+  }
+  if (!props.submitted) {
+    defaultItems.push({
+      text: t('components.learningPlan.members.menu.remove'),
+      warning: true,
+      onClick: () => emit('remove-click'),
+    });
+  }
+  return defaultItems;
+});
 </script>
