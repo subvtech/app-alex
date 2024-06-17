@@ -131,6 +131,7 @@
         v-model="activePage"
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
+        :events="events.data"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :messages="messages"
@@ -218,6 +219,12 @@ const getSubmissions = (memberID: number) =>
       task_member: memberID,
     },
   });
+const getEvents = (memberID: number) =>
+  strapiUtils.find<TaskEvent>('task-events', {
+    filters: {
+      task_member: memberID,
+    },
+  });
 const { data: submissions, execute } = await useAsyncData(
   'task-submissions',
   () => getSubmissions(props.taskMemberId),
@@ -240,6 +247,16 @@ const { data: submissions, execute } = await useAsyncData(
             status: submission.evaluated_at ? 'reviewed' : 'in_review',
           }) as AttachedSubmission,
       ),
+    }),
+  },
+);
+const { data: events, execute: executeEvents } = await useAsyncData(
+  'task-events',
+  () => getEvents(props.taskMemberId),
+  {
+    default: () => ({
+      meta: { total: 0 },
+      data: [] as TaskEvent[],
     }),
   },
 );
@@ -321,6 +338,7 @@ watch(sendSubmission, changeSendAfterDeadline);
 watch(model, (value) => {
   if (value) {
     execute();
+    executeEvents();
   }
 });
 // watch(props, (value) => {
