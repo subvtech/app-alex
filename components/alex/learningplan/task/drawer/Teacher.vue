@@ -205,7 +205,6 @@ interface TaskTeacherDrawerProps {
   type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
   events?: TaskEvent[];
-  messages?: Message[];
   description?: string;
   submissionDescription?: string;
   restrictions?: string;
@@ -222,7 +221,6 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   sendAfterDeadline: false,
   kanbanButton: false,
   description: undefined,
-  messages: () => [],
   startDate: undefined,
   endDate: undefined,
   restrictions: '',

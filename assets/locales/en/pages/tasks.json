@@ -2,6 +2,8 @@
   "notFound": "Task not found",
   "cantUpdateMembers": "Can't update members",
   "errors": {
-    "updateStatusTask": "Error when updating task status"
+    "updateStatusTask": "Error when updating task status",
+    "updateDeadlineMember": "Error when updating student deadline",
+    "updateSendAfterDeadline": "Error when updating student send after deadline"
   }
 }

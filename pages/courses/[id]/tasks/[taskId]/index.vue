@@ -51,25 +51,47 @@
           accept: true,
         },
       ]"
-      @card-click="studentDrawer = true"
+      @card-click="
+        (_index, item) => {
+          studentDrawer = true;
+          studentDetailsId = item.id;
+        }
+      "
       @card-insert="
         (newIndex, value, newStatus) =>
           handleUpdateStatus(newIndex, value, newStatus)
       "
     />
     <alex-learningplan-task-drawer-student
+      v-if="studentDetails"
       v-model="studentDrawer"
       :messages="[]"
       :submission="{
-        constraints: [],
-        description: 'Teste',
+        constraints: taskStore.task.allowed_editor_plugins?.split(',') || [],
+        description: taskStore.task.submission_description,
         status: 'not_started',
       }"
-      :deadline="new Date()"
-      send-submission
+      :deadline="new Date(studentDetails.finished_at)"
+      :can-submit-after-deadline="taskStore.task.can_submit_after_deadline"
+      :send-submission="studentDetails.can_submit_after_deadline"
       :submissions="[]"
-      :task="{ finalDate: new Date(), status: 'to_do' }"
-      :student="{ name: 'Jorge santos lima', studentClass: 'Turma A' }"
+      :task="{
+        id: studentDetails.id,
+        finishAt: studentDetails.finished_at,
+        status: studentDetails.status,
+      }"
+      :student="{
+        name: studentDetails.task_member_students[0].student_member.user
+          .fullname,
+        studentClass:
+          studentDetails.task_member_students[0].student_member?.learning_class
+            ?.name || '',
+        avatar:
+          studentDetails.task_member_students[0].student_member.user?.avatar
+            ?.url,
+      }"
+      @change-finish-at="handleChangeFinishAt"
+      @change-submit-after-deadline="handleChangeSendAfterDeadline"
     />
     <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
@@ -87,7 +109,6 @@
       :send-after-deadline="taskStore.task.can_submit_after_deadline"
       :start-date="taskStore.task.start_at"
       :end-date="taskStore.task.finish_at"
-      :messages="[]"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
       @change-values="handleChangeValues"
@@ -118,6 +139,16 @@ const taskId = computed(() => parseInt(taskIdValue.toString()));
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<any[]>([]);
+const studentDetailsId = ref<number>(-1);
+const studentDetails = computed(() => {
+  if (!taskStore.task?.task_members) {
+    return null;
+  }
+  const member = taskStore.task?.task_members.find(
+    (member) => member.id === studentDetailsId.value,
+  );
+  return member || null;
+});
 const kanban = ref<{
   canDrag: boolean;
   setCanDrag: (value: boolean) => void;
@@ -148,6 +179,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     finish_at: values.finish_at,
     submission_required: values.submission_required!,
     can_submit_after_deadline: values.can_submit_after_deadline!,
+    allowed_editor_plugins: values.allowed_editor_plugins!,
   };
 };
 const handleUpdateStatus = async (
@@ -175,6 +207,27 @@ const handleUpdateStatus = async (
     kanban.value.setCanDrag(true);
   }
 };
+const handleChangeFinishAt = (memberID: number, value: string) => {
+  if (taskStore.task?.task_members) {
+    taskStore.task.task_members = taskStore.task?.task_members.map((member) => {
+      if (member.id === memberID) {
+        return { ...member, finished_at: value };
+      }
+      return member;
+    });
+  }
+};
+const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
+  if (taskStore.task?.task_members) {
+    taskStore.task.task_members = taskStore.task?.task_members.map((member) => {
+      if (member.id === memberID) {
+        return { ...member, can_submit_after_deadline: value };
+      }
+      return member;
+    });
+  }
+};
+
 onBeforeMount(() => {
   headerStore.showHeader = true;
   if (!id || !taskId.value) {
@@ -231,7 +284,7 @@ watch(
       tasks.value = taskStore.task.task_members.map((task) => ({
         id: task.id,
         status: task.status,
-        date: new Date(task.finished_at.replaceAll('-', '/')),
+        date: new Date(task.finished_at?.replaceAll('-', '/')),
         user: {
           name:
             task.task_member_students[0]?.student_member?.user.fullname || '',
