@@ -115,6 +115,19 @@ export interface TaskType {
   };
 }
 
+interface ApplicationError {
+  data: null | any;
+  error: {
+    status: number;
+    name: string;
+    message: string;
+    details?: {
+      policy: string;
+      errCode: string;
+    };
+  };
+}
+
 const props = defineProps<{
   search: string;
   filter: filterType | undefined;
@@ -152,14 +165,15 @@ const shouldDisplay = (i: number) => {
   const { archivedTasks } = tasksFilter.value || {};
   return (!archivedTasks && i !== 4) || (i === 4 && archivedTasks);
 };
-const displayError = (message: string) => {
-  setMessage(
-    t('pages.task.crud.errorMessage', {
-      action: t(`pages.task.crud.${message}`),
-    }),
-    'error',
-    true,
-  );
+const displayError = (message: string, e?: ApplicationError) => {
+  let displayMessage = t('pages.task.crud.errorMessage', {
+    action: t(`pages.task.crud.${message}`),
+  });
+  const error = e?.error;
+  if (error?.name === 'ApplicationError' && error?.details) {
+    displayMessage = t(`pages.task.crud.${error.details.errCode}`);
+  }
+  setMessage(displayMessage, 'error', true);
   if (learningPlanStore.learningPlan)
     learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
 };
@@ -322,12 +336,11 @@ const handleMoveTask = async ({
     if (task) {
       task.status = status;
       task.position = taskPosition;
-      console.log('task', task);
       await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
-  } catch (e) {
-    displayError('moveError');
+  } catch (e: ApplicationError) {
+    displayError('moveError', e);
   }
 };
 
@@ -430,8 +443,8 @@ const onDrop = async (item: TaskType, tableSort: string) => {
           await updateTaskPositions(over.value.list, item);
         }
         displaySuccess('moveSuccess');
-      } catch (e) {
-        displayError('moveError');
+      } catch (e: ApplicationError) {
+        displayError('moveError', e);
       }
     }
   }
