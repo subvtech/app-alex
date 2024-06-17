@@ -35,16 +35,15 @@ interface DayEventsProps {
   events: Array<EventProps>;
 }
 defineProps<DayEventsProps>();
-const threeHours = 0;
 const formatHour = (date: string | Date) => {
   if (typeof date === 'string') {
-    return format(Date.parse(date) + threeHours, 'HH:mm');
+    return format(Date.parse(date), 'HH:mm');
   }
   return format(date, 'HH:mm');
 };
 const formatDate = (date: string | Date) => {
   if (typeof date === 'string') {
-    return format(Date.parse(date) + threeHours, 'dd/MM/yyyy');
+    return format(Date.parse(date), 'dd/MM/yyyy');
   }
   return format(date, 'dd/MM/yyyy');
 };

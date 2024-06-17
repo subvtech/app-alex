@@ -6,5 +6,6 @@ export interface TaskSubmissionSimple {
   submitted_at: string;
   evaluated_at: string;
   task_member?: TaskMember;
-  created_at: string;
+  createdAt: string;
+  updatedAt: string;
 }

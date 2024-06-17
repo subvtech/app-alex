@@ -1,5 +1,4 @@
 <template>
-  <!-- *Colocar o componente de audio na linha 89 -->
   <div class="d-flex flex-column ga-4 py-4">
     <alex-learningplan-task-submission-chip
       v-for="(submission, index) in submissions"

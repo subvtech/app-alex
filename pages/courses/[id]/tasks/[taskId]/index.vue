@@ -65,15 +65,12 @@
     <alex-learningplan-task-drawer-student
       v-if="studentDetails"
       v-model="studentDrawer"
-      :messages="[]"
       :submission="{
         constraints: taskStore.task.allowed_editor_plugins?.split(',') || [],
         description: taskStore.task.submission_description,
-        status: 'not_started',
       }"
-      :can-submit-after-deadline="taskStore.task.can_submit_after_deadline"
-      :send-submission="studentDetails.can_submit_after_deadline"
-      :submissions="[]"
+      :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
+      :can-submit-after-deadline="studentDetails.can_submit_after_deadline"
       :task-member-id="studentDetails.id"
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
