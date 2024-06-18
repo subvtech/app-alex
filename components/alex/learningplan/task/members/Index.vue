@@ -29,6 +29,7 @@
         <alex-learningplan-task-members-invite
           :learningplan-id="learningplanId"
           @select-member-click="addMember"
+          @select-class-click="addClass"
         >
           <template #activator="{ menuProps }">
             <alex-custom-button
@@ -118,6 +119,7 @@ const emit = defineEmits(['change-members']);
 const page = ref<number>(1);
 const itemsPerPage = 12;
 const search = ref('');
+const client = useStrapiClient();
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMemberStudent>('task-member-students', {
     populate: {
@@ -131,11 +133,6 @@ const getMembers = (taskId: number) =>
         task: taskId,
       },
     },
-    // pagination: {
-    //   pageSize: 3,
-    //   page,
-    //   withCount: true,
-    // },
   });
 const showingData = (
   items: any[],
@@ -259,6 +256,47 @@ const removeMember = async (
       true,
     );
   }
+};
+const addClass = async (classSimple: ClassSimple) => {
+  await client(`/tasks/${props.taskId}/add-class`, {
+    method: 'PUT',
+    body: {
+      classId: classSimple.id,
+    },
+    onResponse: ({ response }) => {
+      if (!response.ok) {
+        setMessage(
+          t('components.learningPlan.drawer.task.errors.addClas', {
+            name: classSimple.name,
+          }),
+          'error',
+          true,
+        );
+      }
+      const data: TaskMemberStudent[] = response._data;
+      if (!data.length) {
+        setMessage(
+          t('components.learningPlan.drawer.task.members.allClass', {
+            name: classSimple.name,
+          }),
+          'warning',
+          true,
+        );
+        return;
+      }
+      setTimeout(refresh, 100);
+      emit('change-members');
+    },
+    onRequestError: () => {
+      setMessage(
+        t('components.learningPlan.drawer.task.errors.addClass', {
+          name: classSimple.name,
+        }),
+        'error',
+        true,
+      );
+    },
+  });
 };
 </script>
 

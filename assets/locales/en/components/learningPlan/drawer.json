@@ -70,7 +70,11 @@
       "save": "Can't save the field {field}",
       "genericSave": "Can't save the data",
       "addMember": "Error when adding member",
-      "removeMember": "Error when removing member"
+      "removeMember": "Error when removing member",
+      "addClass": "Error while trying to add class students from class {name}"
+    },
+    "members": {
+      "allClass": "The entire class {name} was added in task"
     }
   },
   "goals": {

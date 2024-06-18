@@ -67,7 +67,11 @@
       "save": "Não foi possível salvar o campo {field}",
       "genericSave": "Não foi possível salvar os dados",
       "addMember": "Erro ao adicionar o membro",
-      "removeMember": "Erro ao remover o membro"
+      "removeMember": "Erro ao remover o membro",
+      "addClass": "Erro ao adicionar os integrantes da turma {name}"
+    },
+    "members": {
+      "allClass": "A turma {name} já foi adicionada na tarefa"
     }
   },
   "goals": {
