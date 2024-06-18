@@ -195,6 +195,7 @@ import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 const { t } = useI18n();
+const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
@@ -257,6 +258,7 @@ watch(model, (value) => {
     startDate.value = props.startDate;
     endDate.value = props.endDate;
     restrictions.value = props.restrictions;
+    isFirstTimeOpened.value = true;
   }
 });
 
@@ -407,6 +409,10 @@ watch(
     restrictions.value,
   ],
   async () => {
+    if (isFirstTimeOpened.value) {
+      isFirstTimeOpened.value = false;
+      return;
+    }
     const values = {
       type: type.value,
       status: status.value,
