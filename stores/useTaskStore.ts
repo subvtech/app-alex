@@ -68,18 +68,13 @@ export const useTaskStore = defineStore('task', () => {
           task: taskId,
         },
       });
-      if (!response.data.length) {
-        throw new Error('cantUpdateMembers');
-      }
       const { data } = response;
       if (task.value) {
         task.value.task_members = data;
       }
       return response;
     } catch (e: any) {
-      if (e?.message === 'cantUpdateMembers') {
-        setMessage(i18n.t('pages.tasks.cantUpdateMembers'), 'red', true);
-      }
+      setMessage(i18n.t('pages.tasks.cantUpdateMembers'), 'red', true);
     }
   }
 
