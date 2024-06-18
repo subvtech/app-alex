@@ -200,21 +200,15 @@ const addMember = async (member: LearningPlanMemberSimple) => {
     return;
   }
   try {
-    const { data: taskMember } = await strapiUtils.create<TaskMember>(
-      'task-members',
-      {
-        // @ts-ignore
-        task: props.taskId,
-        status: 'to_do',
-        started_at: props.startAt!,
-        finished_at: props.finishAt!,
-        can_submit_after_deadline: props.sendAfterDeadline,
-      },
-    );
-    await strapiUtils.create('task-member-students', {
-      role: 'in_charge',
-      student_member: member.id,
-      task_member: taskMember.id,
+    await strapiUtils.create<TaskMember>('task-members', {
+      // @ts-ignore
+      task: props.taskId,
+      status: 'to_do',
+      started_at: props.startAt!,
+      finished_at: props.finishAt!,
+      can_submit_after_deadline: props.sendAfterDeadline,
+      students: [member.id],
+      in_charge: member.id,
     });
     setTimeout(refresh, 100);
     setMessage(
@@ -266,7 +260,7 @@ const addClass = async (classSimple: ClassSimple) => {
     onResponse: ({ response }) => {
       if (!response.ok) {
         setMessage(
-          t('components.learningPlan.drawer.task.errors.addClas', {
+          t('components.learningPlan.drawer.task.errors.addClass', {
             name: classSimple.name,
           }),
           'error',
