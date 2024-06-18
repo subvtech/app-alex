@@ -75,6 +75,20 @@
     },
     "members": {
       "allClass": "The entire class {name} was added in task"
+    },
+    "events": {
+      "task_created": "Task was created",
+      "task_deadline": "{name} change task deadline",
+      "task_start_date": "{name} change task start date",
+      "task_submission": "{name} change task submission info",
+      "task_archived": "Task was archived",
+      "task_deadline_ended": "The task reached its end date and was automatically closed.",
+      "student_deadline": "{name} changed the end time of {name_two} task.",
+      "student_status": "{name} alterou o status da tarefa.",
+      "submission_send": "{name} changed the status of the task.",
+      "submission_denied": "Submission denied.",
+      "submission_evaluated": "Submission evaluated.",
+      "message": "{name} sent a message."
     }
   },
   "goals": {

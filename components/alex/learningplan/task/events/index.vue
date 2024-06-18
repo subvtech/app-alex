@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-interface EventProps {
+export interface EventProps {
   user?: string;
   action: string;
   time: string | Date;

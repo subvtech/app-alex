@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { isSameDay } from 'date-fns';
+import { EventProps } from './events/index.vue';
 
 interface TaskTabsProps {
   messages: Message[];
@@ -67,25 +68,29 @@ const tabs = computed(() => {
 });
 const taskEvents = computed(() => orderToDateEvents(props.events));
 const orderToDateEvents = (events: TaskEvent[]) => {
-  const eventsGroups: { date: Date; events: any[] }[] = [];
-  events.forEach((current) => {
-    const currentDate = new Date(current.publishedAt);
-    const currentElement = {
-      action: current.event,
-      time: current.publishedAt,
-    };
-    const group = eventsGroups.find((group) =>
-      isSameDay(currentDate, new Date(group.date)),
-    );
-    if (group) {
-      group.events.push(currentElement);
-      return;
-    }
-    eventsGroups.push({
-      date: currentDate,
-      events: [currentElement],
+  const eventsGroups: { date: Date; events: EventProps[] }[] = [];
+  events
+    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .forEach((current) => {
+      const currentDate = new Date(current.publishedAt);
+      const currentElement: EventProps = {
+        action: current.event,
+        time: current.publishedAt,
+        user: current.learning_plan_member.user.fullname,
+      };
+      const group = eventsGroups.find((group) =>
+        isSameDay(currentDate, new Date(group.date)),
+      );
+      if (group) {
+        group.events.push(currentElement);
+        return;
+      }
+      eventsGroups.push({
+        date: currentDate,
+        events: [currentElement],
+      });
     });
-  });
+
   return eventsGroups;
 };
 const handleSubmission = (value: AttachedSubmission) => {
