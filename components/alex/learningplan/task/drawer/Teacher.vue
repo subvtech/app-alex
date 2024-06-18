@@ -8,7 +8,6 @@
     scrim="transparent"
     sticky
     class="pa-6 pt-2 rounded-s-lg"
-    @update:model-value="emit('close', false)"
   >
     <template #prepend>
       <div class="d-flex align-center justify-end">
@@ -235,13 +234,31 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   submissionDescription: '',
 });
 
-const description = toRef(props);
-const submissionDescription = toRef(props.submissionDescription);
-const hasSubmission = toRef(props.hasSubmission);
-const sendAfterDeadline = toRef(props.sendAfterDeadline);
-const goals = toRef(props.goals);
-const tags = toRef(props.tags);
+const description = ref(props.description);
+const submissionDescription = ref(props.submissionDescription);
+const hasSubmission = ref(props.hasSubmission);
+const sendAfterDeadline = ref(props.sendAfterDeadline);
+const goals = ref(props.goals);
+const tags = ref(props.tags);
 const model = defineModel({ default: false });
+
+// TODO: Think about a better way to handle this
+
+watch(model, (value) => {
+  if (value) {
+    description.value = props.description;
+    submissionDescription.value = props.submissionDescription;
+    hasSubmission.value = props.hasSubmission;
+    sendAfterDeadline.value = props.sendAfterDeadline;
+    goals.value = props.goals;
+    tags.value = props.tags;
+    status.value = props.status;
+    type.value = props.type || '';
+    startDate.value = props.startDate;
+    endDate.value = props.endDate;
+    restrictions.value = props.restrictions;
+  }
+});
 
 type ChangeValues = {
   type: TaskType | null;
@@ -259,7 +276,6 @@ type Emits = {
   'change-submission-description': [value: string];
   'change-tags': [value: TagSimple[]];
   'change-members': [];
-  close: [value: boolean];
 };
 const emit = defineEmits<Emits>();
 
@@ -268,11 +284,11 @@ const { setMessage } = useMessageStore();
 const status = ref<TaskStatus | TaskMemberStatus>(props.status);
 
 // Date picker
-const startDate = toRef(props.startDate);
-const endDate = toRef(props.endDate);
+const startDate = ref(props.startDate);
+const endDate = ref(props.endDate);
 
 // Restrições
-const restrictions = toRef(props.restrictions);
+const restrictions = ref(props.restrictions);
 const restrictionsValue = computed({
   get() {
     return restrictions.value ? restrictions.value.split(',') : [];
@@ -283,7 +299,7 @@ const restrictionsValue = computed({
 }) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const type = toRef<string>(props.type || '');
+const type = ref<string>(props.type || '');
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),

@@ -94,7 +94,6 @@
     </Transition>
   </div>
   <alex-learningplan-task-drawer-teacher
-    v-if="editTaskId !== -1"
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
     :title="taskDetails?.title"
@@ -112,12 +111,13 @@
     :end-date="taskDetails?.finish_at"
     :restrictions="taskDetails?.allowed_editor_plugins"
     :editable="true"
-    @close="closeDrawer"
+    :kanban-button="true"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"
     @change-submission-description="handleChangeSubmissionDescription"
     @change-tags="handleChangeTags"
     @change-members="handleChangeMembers"
+    @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
   />
 </template>
 
@@ -161,7 +161,8 @@ const props = defineProps<{
   filter: filterType | undefined;
 }>();
 
-const { create, delete: _delete, update, find } = useStrapi();
+const { create, delete: _delete, update } = useStrapi();
+const { find } = useStrapiUtils();
 const client = useStrapiClient();
 const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
@@ -485,16 +486,7 @@ const onDrop = async (item: TaskItem, tableSort: string) => {
 
 const openDrawer = (id: number) => {
   editTaskId.value = id;
-  setTimeout(() => {
-    teacherDrawer.value = true;
-  }, 50);
-};
-
-const closeDrawer = () => {
-  teacherDrawer.value = false;
-  setTimeout(() => {
-    editTaskId.value = -1;
-  }, 50);
+  teacherDrawer.value = true;
 };
 
 const handleChangeValues = (values: Partial<TaskSimple>) => {
@@ -540,29 +532,33 @@ const handleChangeTags = (tags: TagSimple[]) => {
 };
 
 const handleChangeMembers = async () => {
-  /*   const task = learningPlanStore.learningPlan?.tasks.find(
+  const task = learningPlanStore.learningPlan?.tasks.find(
     (t) => t.id === editTaskId.value,
   );
-  const members = await find('task-members', {
-    filters: { task: task?.id },
-    populate: ['task_member_students'],
-  });
-  console.log(members);
-  if (task) {
-    members.data.forEach((member) => {
-      const taskMemberStudentsAttributes =
-        member.attributes.task_member_students.data.map(
-          (student) => student.attributes,
-        );
-      console.log(taskMemberStudentsAttributes);
-      task.task_members?.push({
-        ...member,
-        task_member_students: taskMemberStudentsAttributes,
-      });
+  try {
+    const response = await find<TaskMember>('task-members', {
+      populate: [
+        'task_submission',
+        'task_member_students.student_member.user.avatar',
+        'task_member_students.student_member.learning_class',
+      ],
+      filters: {
+        task: editTaskId.value,
+      },
     });
+    const { data } = response;
+    if (task) {
+      task.task_members = data;
+    }
+    return response;
+  } catch (e: any) {
+    setMessage(t('pages.tasks.cantUpdateMembers'), 'red', true);
+    if (learningPlanStore.learningPlan)
+      learningPlanStore.loadLearningPlan(
+        learningPlanStore.learningPlan.id,
+        true,
+      );
   }
-  console.log(task);
-  console.log(learningPlanStore.learningPlan?.tasks); */
 };
 </script>
 
