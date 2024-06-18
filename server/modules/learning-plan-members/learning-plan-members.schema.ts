@@ -30,7 +30,7 @@ export const roleEnum = pgEnum('role', [
 export const statusEnum = pgEnum('status', ['pending_invitation', 'joined']);
 
 // XXX: default enums https://github.com/drizzle-team/drizzle-orm/issues/2299
-export const learningPlanMembers = pgTable('learning-plan-members', {
+export const learningPlanMembers = pgTable('learning_plan_members', {
   id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   learningPlanId: integer('learning_plan_id')

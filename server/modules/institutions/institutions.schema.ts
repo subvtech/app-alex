@@ -60,4 +60,4 @@ export const userToInstitutionRelations = relations(
   }),
 );
 
-export type institutions = typeof institutions.$inferSelect;
+export type Institutions = typeof institutions.$inferSelect;
