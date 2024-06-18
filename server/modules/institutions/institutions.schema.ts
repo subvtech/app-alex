@@ -10,7 +10,7 @@ import {
 import { medias } from '../medias/medias.schema';
 import { users } from '../users/users.schema';
 
-export const institutions = pgTable('institution', {
+export const institutions = pgTable('institutions', {
   id: serial('id').primaryKey(),
   cnpj: text('cnpj').unique().notNull(),
   name: text('name').unique().notNull(),

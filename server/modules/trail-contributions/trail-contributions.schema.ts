@@ -11,7 +11,7 @@ import {
 import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
 import { trails } from '../trails/trails.schema';
 
-export const trailContributions = pgTable('trail-contribution', {
+export const trailContributions = pgTable('trail_contribution', {
   id: serial('id').primaryKey(),
   studentMember: integer('id')
     .references(() => learningPlanMembers.id)

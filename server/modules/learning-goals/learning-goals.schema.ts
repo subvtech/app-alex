@@ -5,7 +5,7 @@ import { tasksToLearningGoals } from '../tasks/tasks.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
 import { learningGoalVerbs } from '../learning-goal-verbs/learning-goal-verbs.schema';
 
-export const learningGoals = pgTable('learning-goal', {
+export const learningGoals = pgTable('learning_goal', {
   id: serial('id').primaryKey(),
   verbId: integer('verb_id')
     .references(() => learningGoalVerbs.id)

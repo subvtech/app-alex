@@ -9,12 +9,12 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-import { classes } from '../classes-folder/classes.schema';
+import { classes } from '../classes/classes.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
 
 export const invitationRoleEnum = pgEnum('role', ['student', 'partner']);
 
-export const invitationLinks = pgTable('invitation-link', {
+export const invitationLinks = pgTable('invitation_links', {
   id: serial('id').primaryKey(),
   learningPlanId: integer('learning_plan_id').references(
     () => learningPlans.id,

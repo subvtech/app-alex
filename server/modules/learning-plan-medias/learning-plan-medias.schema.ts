@@ -5,7 +5,7 @@ import { medias } from '../medias/medias.schema';
 import { learningPlans } from '../learning-plans/learning-plans.schema';
 
 export const learningPlanMedias = pgTable(
-  'learning-plan-medias',
+  'learning_plan_medias',
   {
     learningPlanId: integer('learning_plan_id')
       .notNull()
