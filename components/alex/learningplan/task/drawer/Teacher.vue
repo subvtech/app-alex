@@ -8,6 +8,7 @@
     scrim="transparent"
     sticky
     class="pa-6 pt-2 rounded-s-lg"
+    @update:model-value="emit('close', false)"
   >
     <template #prepend>
       <div class="d-flex align-center justify-end">
@@ -198,9 +199,9 @@ const { t } = useI18n();
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
-  taskId: number;
-  title: string;
-  status: TaskStatus;
+  taskId?: number;
+  title?: string;
+  status?: TaskStatus;
   tags?: TagSimple[];
   type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
@@ -216,6 +217,9 @@ interface TaskTeacherDrawerProps {
   endDate?: string | null;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
+  taskId: -1,
+  title: '',
+  status: 'draft',
   editable: true,
   hasSubmission: false,
   sendAfterDeadline: false,
@@ -230,7 +234,8 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   type: undefined,
   submissionDescription: '',
 });
-const description = toRef(props.description);
+
+const description = toRef(props);
 const submissionDescription = toRef(props.submissionDescription);
 const hasSubmission = toRef(props.hasSubmission);
 const sendAfterDeadline = toRef(props.sendAfterDeadline);
@@ -254,6 +259,7 @@ type Emits = {
   'change-submission-description': [value: string];
   'change-tags': [value: TagSimple[]];
   'change-members': [];
+  close: [value: boolean];
 };
 const emit = defineEmits<Emits>();
 
