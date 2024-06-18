@@ -49,6 +49,7 @@
                   @delete-task="handleDeleteTask"
                   @move-task="handleMoveTask"
                   @toggle-archive="handleToggleArchive"
+                  @edit-task="openDrawer"
                 />
               </div>
             </Transition>
@@ -92,13 +93,39 @@
       </v-expansion-panels>
     </Transition>
   </div>
+  <alex-learningplan-task-drawer-teacher
+    v-model="teacherDrawer"
+    :task-id="taskDetails?.id"
+    :title="taskDetails?.title"
+    :status="taskDetails?.status"
+    :learningplan-id="learningPlanStore.learningPlan?.id || 0"
+    :tags="taskDetails?.tags"
+    :type="taskDetails?.type"
+    :events="taskDetails?.task_events"
+    :goals="taskDetails?.learning_goals"
+    :description="taskDetails?.description"
+    :submission-description="taskDetails?.submission_description"
+    :has-submission="taskDetails?.submission_required"
+    :send-after-deadline="taskDetails?.can_submit_after_deadline"
+    :start-date="taskDetails?.start_at"
+    :end-date="taskDetails?.finish_at"
+    :restrictions="taskDetails?.allowed_editor_plugins"
+    :editable="true"
+    :kanban-button="true"
+    @change-values="handleChangeValues"
+    @change-description="handleChangeDescription"
+    @change-submission-description="handleChangeSubmissionDescription"
+    @change-tags="handleChangeTags"
+    @change-members="handleChangeMembers"
+    @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
+  />
 </template>
 
 <script setup lang="ts">
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
 
-export interface TaskType {
+export interface TaskItem {
   id: number;
   title: string;
   status: string;
@@ -135,6 +162,7 @@ const props = defineProps<{
 }>();
 
 const { create, delete: _delete, update } = useStrapi();
+const { find } = useStrapiUtils();
 const client = useStrapiClient();
 const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
@@ -144,6 +172,7 @@ const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
+const teacherDrawer = ref(false);
 const slideTransition = (i: number) =>
   tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
 
@@ -238,10 +267,10 @@ const taskSections = [
 ];
 
 const tasksArray = computed(() => {
-  const draft: TaskType[] = [];
-  const published: TaskType[] = [];
-  const closed: TaskType[] = [];
-  const archived: TaskType[] = [];
+  const draft: TaskItem[] = [];
+  const published: TaskItem[] = [];
+  const closed: TaskItem[] = [];
+  const archived: TaskItem[] = [];
   learningPlanStore.learningPlan?.tasks
     .sort((a, b) => (a.position > b.position ? 1 : -1))
     .forEach((task) => {
@@ -256,7 +285,7 @@ const tasksArray = computed(() => {
       if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
       if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate))
         return;
-      const students: TaskType['students'] = [];
+      const students: TaskItem['students'] = [];
       task.task_members?.forEach((taskMember) => {
         if (taskMember.status === 'to_do') delivered.toDo += 1;
         if (taskMember.status === 'in_progress') delivered.doing += 1;
@@ -290,6 +319,17 @@ const tasksArray = computed(() => {
       else if (task.status === 'finished') closed.push(taskItem);
     });
   return [draft, published, closed, archived];
+});
+
+const editTaskId = ref<number>(-1);
+
+const taskDetails = computed(() => {
+  if (editTaskId.value) {
+    return learningPlanStore.learningPlan?.tasks.find(
+      (t) => t.id === editTaskId.value,
+    );
+  }
+  return null;
 });
 
 const filteredTasks = computed(() => {
@@ -377,7 +417,7 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
   onDragOver(groups[index - 1], -index, -1, dragEvent);
 };
 
-const updateTaskPositions = async (tasksStatus: string, item: TaskType) => {
+const updateTaskPositions = async (tasksStatus: string, item: TaskItem) => {
   const groupIndex = groups[tasksStatus];
 
   const cloneArray = JSON.parse(JSON.stringify(tasksArray.value[groupIndex]));
@@ -387,7 +427,7 @@ const updateTaskPositions = async (tasksStatus: string, item: TaskType) => {
   );
 
   if (task.status === tasksStatus) {
-    const removeIndex = cloneArray.findIndex((t: TaskType) => t.id === task.id);
+    const removeIndex = cloneArray.findIndex((t: TaskItem) => t.id === task.id);
     cloneArray.splice(removeIndex, 1);
   }
 
@@ -397,14 +437,6 @@ const updateTaskPositions = async (tasksStatus: string, item: TaskType) => {
 
   task.status = tasksStatus;
   item.status = tasksStatus;
-  /* cloneArray.forEach((t: TaskType, index: number) => {
-    if (t.position !== index || t.id === task.id) {
-      t.position = index;
-      if (t.id === task.id) {
-        update('tasks', t.id, { position: index, status: tasksStatus });
-      } else update('tasks', t.id, { position: index });
-    }
-  }); */
   await update('tasks', task.id, { status: tasksStatus });
   await client('tasks/update-multiple', {
     method: 'POST',
@@ -416,7 +448,7 @@ const updateTaskPositions = async (tasksStatus: string, item: TaskType) => {
   tasksArray.value[groupIndex] = cloneArray;
 };
 
-const onDrop = async (item: TaskType, tableSort: string) => {
+const onDrop = async (item: TaskItem, tableSort: string) => {
   if (over.value.list) {
     const task = learningPlanStore.learningPlan?.tasks.find(
       (t) => t.id === item.id,
@@ -450,6 +482,83 @@ const onDrop = async (item: TaskType, tableSort: string) => {
     }
   }
   dragEnd();
+};
+
+const openDrawer = (id: number) => {
+  editTaskId.value = id;
+  teacherDrawer.value = true;
+};
+
+const handleChangeValues = (values: Partial<TaskSimple>) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  if (task) {
+    task.status = values.status!;
+    task.type = values.type;
+    task.start_at = values.start_at;
+    task.finish_at = values.finish_at;
+    task.submission_required = values.submission_required!;
+    task.can_submit_after_deadline = values.can_submit_after_deadline!;
+    task.allowed_editor_plugins = values.allowed_editor_plugins!;
+  }
+};
+
+const handleChangeDescription = (description: string) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  if (task) {
+    task.description = description;
+  }
+};
+
+const handleChangeSubmissionDescription = (description: string) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  if (task) {
+    task.submission_description = description;
+  }
+};
+
+const handleChangeTags = (tags: TagSimple[]) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  if (task) {
+    task.tags = tags;
+  }
+};
+
+const handleChangeMembers = async () => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  try {
+    const response = await find<TaskMember>('task-members', {
+      populate: [
+        'task_submission',
+        'task_member_students.student_member.user.avatar',
+        'task_member_students.student_member.learning_class',
+      ],
+      filters: {
+        task: editTaskId.value,
+      },
+    });
+    const { data } = response;
+    if (task) {
+      task.task_members = data;
+    }
+    return response;
+  } catch (e: any) {
+    setMessage(t('pages.tasks.cantUpdateMembers'), 'red', true);
+    if (learningPlanStore.learningPlan)
+      learningPlanStore.loadLearningPlan(
+        learningPlanStore.learningPlan.id,
+        true,
+      );
+  }
 };
 </script>
 

@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { TaskType } from './Container.vue';
+import { TaskItem } from './Container.vue';
 
 interface sortType {
   key: string;
@@ -165,7 +165,7 @@ interface sortType {
 }
 
 const props = defineProps<{
-  tasks: TaskType[];
+  tasks: TaskItem[];
   search: string;
   activeFilter: boolean;
   group: string;
@@ -204,6 +204,7 @@ const emit = defineEmits([
   'dragEnd',
   'startDrag',
   'dragLeave',
+  'editTask',
 ]);
 
 const tableSortBy = ref<sortType[]>([]);
@@ -251,7 +252,7 @@ const confirmDelete = () => {
   cancelDelete();
 };
 
-const dropDownItems = (task: TaskType) => {
+const dropDownItems = (task: TaskItem) => {
   const deliveredTotal = task.delivered
     ? task.delivered.underReview + task.delivered.completed
     : 0;
@@ -261,9 +262,10 @@ const dropDownItems = (task: TaskType) => {
   ];
   switch (task.status) {
     case 'draft':
-      items.push(getDropDownAction('delete', task.id));
-      if (isTaskMovable(task))
+      if (isTaskMovable(task)) {
         items.push(getDropDownAction('publish', task.id));
+      }
+      items.push(getDropDownAction('delete', task.id));
       break;
     case 'published':
       if (deliveredTotal === 0) {
@@ -315,7 +317,7 @@ const getDropDownAction = (action: string, id: number) => {
     },
     details: {
       text: t('pages.task.table.dropdown.details'),
-      onClick: () => console.log('details', id),
+      onClick: () => emit('editTask', id),
     },
     kanban: {
       text: t('pages.task.table.dropdown.kanban'),
@@ -366,7 +368,7 @@ const header = [
   { title: '', key: 'actions', sortable: false },
 ];
 
-const setAcceptedGroups = (task: TaskType) => {
+const setAcceptedGroups = (task: TaskItem) => {
   const deliveredTotal = task.delivered
     ? task.delivered.underReview + task.delivered.completed
     : 0;
@@ -383,7 +385,7 @@ const setAcceptedGroups = (task: TaskType) => {
   return statusMap[task.status] || [];
 };
 
-const isTaskMovable = (task: TaskType) => {
+const isTaskMovable = (task: TaskItem) => {
   return (
     (task.title &&
       task.deadline_at &&
@@ -394,7 +396,7 @@ const isTaskMovable = (task: TaskType) => {
   );
 };
 
-const setDragStart = (task: TaskType, e: DragEvent) => {
+const setDragStart = (task: TaskItem, e: DragEvent) => {
   if (previewRow(task.id) || !isTaskMovable(task)) return;
   const acceptedGroups = setAcceptedGroups(task);
   if (!isArchived.value) {
