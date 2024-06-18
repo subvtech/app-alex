@@ -30,8 +30,8 @@
 
 <script setup lang="ts">
 interface Submission {
-  mark?: number;
-  maxMark?: number;
+  mark?: number | null;
+  maxMark?: number | null;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';

@@ -6,8 +6,8 @@ export type Submission = {
   id: number;
   justification: Justification;
   status: 'in_review' | 'reviewed' | 'denied';
-  mark?: number;
-  maxMark?: number;
+  mark?: number | null;
+  maxMark?: number | null;
   time: Date;
 };
 
