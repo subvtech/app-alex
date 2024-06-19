@@ -113,7 +113,7 @@
                 :mark="mostRecentSubmission?.grade"
               />
               <p v-else class="text-body-3 text-gray-400">
-                Nenhuma entrega realizada
+                {{ $t('components.learningPlan.drawer.task.submission.empty') }}
               </p>
             </template>
             <template v-else>
@@ -334,49 +334,57 @@ const handleSubmitMessage = async (
   attachedMessage?: Message,
   attachedSubmission?: AttachedSubmission,
 ) => {
-  if ((!text && !audio) || !user.value) return;
-  let learningMember = learningplanStore.activeMembers.find(
-    (member) => member.user.id === user?.value?.id,
-  );
-  if (learningplanStore.facilitator?.user.id === user.value.id) {
-    learningMember = learningplanStore.facilitator;
-  }
-  if (!learningMember) {
-    return;
-  }
-  const { data } = await client<{
-    meta: any;
-    data: { id: number; attributes: Omit<TaskMemberMessage, 'id'> };
-  }>(`/task-member-messages`, {
-    method: 'POST',
-    body: {
-      data: {
-        learning_plan_member: learningMember.id,
-        task_member: props.taskMemberId,
-        message: text,
-        sent_at: new Date(),
-        ...(attachedMessage && { response_to_message: attachedMessage.id }),
-        ...(attachedSubmission && { task_submission: attachedSubmission.id }),
-      },
-    },
-    params: {
-      populate: {
-        learning_plan_member: {
-          populate: ['user.avatar'],
+  try {
+    if ((!text && !audio) || !user.value) return;
+    let learningMember = learningplanStore.activeMembers.find(
+      (member) => member.user.id === user?.value?.id,
+    );
+    if (learningplanStore.facilitator?.user.id === user.value.id) {
+      learningMember = learningplanStore.facilitator;
+    }
+    if (!learningMember) {
+      return;
+    }
+    const { data } = await client<{
+      meta: any;
+      data: { id: number; attributes: Omit<TaskMemberMessage, 'id'> };
+    }>(`/task-member-messages`, {
+      method: 'POST',
+      body: {
+        data: {
+          learning_plan_member: learningMember.id,
+          task_member: props.taskMemberId,
+          message: text,
+          sent_at: new Date(),
+          ...(attachedMessage && { response_to_message: attachedMessage.id }),
+          ...(attachedSubmission && { task_submission: attachedSubmission.id }),
         },
-        response_to_message: {
-          populate: {
-            learning_plan_member: {
-              populate: ['user.avatar'],
+      },
+      params: {
+        populate: {
+          learning_plan_member: {
+            populate: ['user.avatar'],
+          },
+          response_to_message: {
+            populate: {
+              learning_plan_member: {
+                populate: ['user.avatar'],
+              },
             },
           },
+          task_submission: true,
         },
-        task_submission: true,
       },
-    },
-  });
-  const message: TaskMemberMessage = formatResult(data);
-  messages.value.data = [...messages.value.data, message];
+    });
+    const message: TaskMemberMessage = formatResult(data);
+    messages.value.data = [...messages.value.data, message];
+  } catch (error) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.sendMessage'),
+      'error',
+      true,
+    );
+  }
 };
 
 const changeDeadline = async (value?: string | null) => {

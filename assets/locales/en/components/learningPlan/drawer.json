@@ -34,7 +34,8 @@
       "description": {
         "label": "Submission Description",
         "placeHolder": "Enter description"
-      }
+      },
+      "empty": "No submission realized"
     },
     "memberAlreadyInTask": "{member} already in task",
     "pleaseFillDates": "Please fill start and finish dates before add",
@@ -75,7 +76,8 @@
       "genericSave": "Can't save the data",
       "addMember": "Error when adding member",
       "removeMember": "Error when removing member",
-      "addClass": "Error while trying to add class students from class {name}"
+      "addClass": "Error while trying to add class students from class {name}",
+      "sendMessage": "Erro while trying send a message"
     },
     "members": {
       "allClass": "The entire class {name} was added in task"
