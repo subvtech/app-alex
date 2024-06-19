@@ -1,5 +1,5 @@
 // Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
-import { compareDesc } from 'date-fns';
+import { compareDesc, isSameDay } from 'date-fns';
 export type ElementType<T extends ReadonlyArray<unknown>> =
   T extends ReadonlyArray<infer ElementType> ? ElementType : never;
 
@@ -57,4 +57,61 @@ export const sleep = (ms: number) =>
 
 export const capitalize = (value: string) => {
   return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+export function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+export const isMessage = (
+  response?: Message | AttachedSubmission,
+): response is Message => {
+  if (!response) return false;
+  return 'user' in response;
+};
+
+export const scrollAndHighlightElement = (
+  querySelector: string,
+  highlightClass: string,
+) => {
+  const element = document.querySelector(querySelector);
+  if (!element) return;
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  element.classList.add(highlightClass);
+  setTimeout(() => {
+    element.classList.remove(highlightClass);
+  }, 1000);
+};
+interface EventProps {
+  user?: string;
+  action: string;
+  time: string | Date;
+}
+export const orderEvents = (events: TaskEvent[]) => {
+  const eventsGroups: { date: Date; events: EventProps[] }[] = [];
+  events
+    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .forEach((current) => {
+      const currentDate = new Date(current.publishedAt);
+      const currentElement: EventProps = {
+        action: current.event,
+        time: current.publishedAt,
+        user: current.learning_plan_member.user.fullname,
+      };
+      const group = eventsGroups.find((group) =>
+        isSameDay(currentDate, new Date(group.date)),
+      );
+      if (group) {
+        group.events.push(currentElement);
+        return;
+      }
+      eventsGroups.push({
+        date: currentDate,
+        events: [currentElement],
+      });
+    });
+
+  return eventsGroups;
 };

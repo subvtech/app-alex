@@ -3,27 +3,42 @@
     v-if="currentShow"
     v-model="currentShow"
     class="snackbar"
-    :color="currentColor"
+    :color="currentFill ? currentColor : 'white'"
     :timeout="timeSpan"
     location="bottom right"
     data-testid="snackbar"
+    content-class="pa-4 pr-8 d-flex"
     @update:model-value="updateModelValue"
   >
-    <v-row justify="space-between" align="end" class="py-4 pl-4 pr-8 relative">
-      <v-row justify="start" align="center">
-        <v-icon :color="countdown ? currentColor : 'white'">{{
+    <div>
+      <v-row justify="start" align="center" class="ga-5">
+        <v-icon :color="countdown || !currentFill ? currentColor : 'white'">{{
           iconName
         }}</v-icon>
-        <span class="text-white font-weight-bold">{{ currentMessage }}</span>
+        <p
+          class="text-body-4 max-w-138"
+          :class="currentFill ? 'text-white' : 'text-gray-800'"
+        >
+          {{ currentMessage }}
+        </p>
       </v-row>
-      <v-icon class="close" size="x-small" role="close-btn" @click="onClose"
+      <v-icon
+        :color="currentFill ? 'white' : 'gray-600'"
+        class="close"
+        size="16px"
+        role="close-btn"
+        @click="onClose"
         >mdi-close</v-icon
       >
-    </v-row>
-    <div v-if="countdown" class="w-100 bg-white lowbar">
+    </div>
+    <div v-if="currentCountdown" class="w-100 lowbar">
       <div
         class="bar h-100"
-        :class="startTimer ? 'w-100' : ''"
+        :class="[
+          currentFill ? 'opacity-80' : '',
+          `bg-${currentColor}`,
+          startTimer ? 'w-100' : '',
+        ]"
         :style="`transition: width ${timeSpan}ms linear; background-color: ${currentColor}`"
       />
     </div>
@@ -33,14 +48,19 @@
 <script setup lang="ts">
 const messageStore = useMessageStore();
 
-const { show, message, color } = storeToRefs(messageStore);
+const { show, message, color, fill, showCountdown } = storeToRefs(messageStore);
 
 const { timeoutId, stopTimeout, timeSpan, startTimer, setStartTimer } =
   useTimeout(5000);
 
 const props = defineProps({
   data: {
-    type: Object as PropType<{ show: boolean; color: string; message: string }>,
+    type: Object as PropType<{
+      show: boolean;
+      color: string;
+      message: string;
+      fill: boolean;
+    }>,
   },
   countdown: {
     type: Boolean,
@@ -53,23 +73,26 @@ const { data } = toRefs(props);
 const iconName = computed(() => {
   let name = '';
   switch (currentColor.value) {
+    case 'error':
     case 'red':
-      name = 'mdi-close-circle';
+      name = 'mdi-close-circle-outline';
       break;
     case 'green':
+    case 'success':
       name = 'mdi-check-circle';
       break;
     case 'warning':
-      name = 'mdi-alert-circle';
+      name = 'mdi-alert-circle-outline';
       break;
     case 'blue':
-      name = 'mdi-information';
+    case 'info':
+      name = 'mdi-information-outline';
       break;
     case 'gray':
+    case 'custom':
       name = 'mdi-view-dashboard';
       break;
   }
-  if (props.countdown) name += '-outline';
   return name;
 });
 
@@ -85,6 +108,22 @@ const currentShow = computed(() =>
 
 const currentColor = computed(() =>
   data?.value?.color ? data.value.color : color.value ? color.value : 'green',
+);
+
+const currentCountdown = computed(() =>
+  props.countdown
+    ? props.countdown
+    : showCountdown.value !== undefined
+    ? showCountdown.value
+    : false,
+);
+
+const currentFill = computed(() =>
+  data?.value?.fill
+    ? data.value.fill
+    : fill.value !== undefined
+    ? fill.value
+    : true,
 );
 
 const currentMessage = computed(() =>
@@ -118,7 +157,6 @@ watch(currentShow, () => {
   bottom: 0px;
   left: 0px;
   height: 4px;
-  background-color: white;
   position: absolute;
 }
 
@@ -132,6 +170,7 @@ watch(currentShow, () => {
 .snackbar {
   display: inline-flex;
   min-width: 300px;
+  padding: 16px !important;
   flex-direction: column-reverse;
   justify-content: center;
   align-items: flex-start;
@@ -141,22 +180,14 @@ watch(currentShow, () => {
     0px 4px 4px 0px rgba(0, 0, 0, 0.1),
     0px 0px 2px 0px rgba(0, 0, 0, 0.1);
 }
-span {
-  margin-left: 10px;
-  color: var(--Principais-Branco, #fff);
 
-  font-family: Sen;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 135%; /* 18.9px */
-  letter-spacing: 0.28px;
+.opacity-80 {
+  opacity: 0.8;
 }
 
 .close {
   position: absolute;
-  top: 4px;
+  top: 8px;
   right: 8px;
-  color: white;
 }
 </style>

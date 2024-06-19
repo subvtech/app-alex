@@ -3,13 +3,13 @@
     "type": {
       "label": "Tipo",
       "individual": "Individual",
-      "collective": "Coletiva"
+      "collective": "Grupo"
     },
     "status": {
       "label": "Status",
       "draft": "Rascunho",
       "published": "Publicado",
-      "closed": "Fechado"
+      "finished": "Fechado"
     },
     "date": {
       "startLabel": "Data de início",
@@ -27,15 +27,78 @@
     "submission": {
       "label": "Entrega",
       "reqSubmission": "Solicitar entrega",
-      "aftrDeadline": "Envio após prazo"
+      "aftrDeadline": "Envio após prazo",
+      "description": {
+        "label": "Descrição da entrega",
+        "placeHolder": "Digite a descrição"
+      }
     },
+    "memberAlreadyInTask": "{member} já está na tarefa",
+    "pleaseFillDates": "Por favor coloque uma data de inicio e término antes de adicionar",
+    "addMember": "{member} foi adicionado a tarefa",
+    "removeMember": "{member} foi removido da tarefa",
+    "freeEditor": "Editor Livre",
+    "allowSendAfterSubmission": "Permitir envio após o prazo",
     "restrictions": {
-      "label": "Restrições"
+      "label": "Restrições",
+      "text": "Texto",
+      "video": "Vídeo",
+      "image": "Imagem",
+      "document": "Documento",
+      "link": "Link"
+    },
+    "goals": {
+      "label": "Objetivos de aprendizagem",
+      "select": "Selecione um objetivo",
+      "search": "Digite um nome"
     },
     "learningResources": {
       "label": "Recursos de aprendizagem",
       "noneSelected": "Nenhuma trilha selecionada"
+    },
+    "tags": {
+      "subtitle": "Informe um marcador",
+      "search": "Digite um nome",
+      "errors": {
+        "save": "Não foi possível salvar a tag"
+      }
+    },
+    "errors": {
+      "save": "Não foi possível salvar o campo {field}",
+      "genericSave": "Não foi possível salvar os dados",
+      "addMember": "Erro ao adicionar o membro",
+      "removeMember": "Erro ao remover o membro",
+      "addClass": "Erro ao adicionar os integrantes da turma {name}"
+    },
+    "members": {
+      "allClass": "A turma {name} já foi adicionada na tarefa"
+    },
+    "events": {
+      "task_created": "Tarefa criada.",
+      "task_deadline": "{name} alterou o tempo final da tarefa.",
+      "task_start_date": "{name} alterou o tempo inicial da tarefa.",
+      "task_submission": "{name} alterou as informações da entrega.",
+      "task_archived": "A tarefa foi arquivada.",
+      "task_deadline_ended": "A tarefa atingiu a data final foi automaticamente fechada.",
+      "student_deadline": "{name} alterou o tempo final da tarefa de {name_two}.",
+      "student_status": "{name} alterou o status da tarefa.",
+      "submission_send": "{name} realizou uma entrega.",
+      "submission_denied": "Entrega recusada.",
+      "submission_evaluated": "Entrega avaliada.",
+      "message": "{name} enviou uma mensagem."
+    },
+    "chat": {
+      "you": "{name} (Você)"
     }
+  },
+  "goals": {
+    "select": "Selecione um objetivo",
+    "search": "Digite um nome",
+    "label": "Objetivos de aprendizagem"
+  },
+  "tags": {
+    "subtitle": "Informe um marcardor",
+    "placeholder": "Digite um nome"
   },
   "tabs": {
     "events": {
@@ -65,5 +128,10 @@
   "clean": "Limpar",
   "archivedTasks": "Tarefas arquivadas",
   "selectClassPlaceholder": "Selecione a turma",
-  "selectTypePlaceholder": "Selecione o tipo"
+  "selectTypePlaceholder": "Selecione o tipo",
+  "srchClass": "Buscar turma",
+  "date": {
+    "placeholder": "Selecione uma data"
+  },
+  "students": "Alunos"
 }

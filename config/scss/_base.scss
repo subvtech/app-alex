@@ -184,3 +184,16 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
     width: 100%;
   }
 }
+
+$side-border: ('left', 'right', 'top', 'bottom');
+
+@for $size from 1 through 64 {
+  .border-#{$size} {
+    border: ($size * 1px) solid rgb(var(--v-border-color));
+  }
+  @each $side in $side-border {
+    .border-#{$side}-#{$size} {
+      border-#{$side}: ($size * 1px) solid rgb(var(--v-border-color));
+    }
+  }
+}

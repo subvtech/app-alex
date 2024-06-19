@@ -260,7 +260,7 @@ const updateUser = async (show = true) => {
     'trails',
     'role',
     'user_descriptions',
-    'user_wallet',
+    'wallet',
   ];
 
   user.value = await findOne<User>('users', id, {

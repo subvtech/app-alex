@@ -1,5 +1,54 @@
 {
-    "title": "Tasks",
-    "description": "Here you can find all the tasks for this course.",
-    "noTasks": "No tasks found."
+  "title": "Tasks",
+  "description": "Here you can find all the tasks for this course.",
+  "noTasks": "No tasks found.",
+  "noTitle": "No title",
+  "noDesc": "No description",
+  "noDate": "No date",
+  "draft": "Draft",
+  "closed": "Closed",
+  "published": "Published",
+  "group": "group",
+  "individual": "individual",
+  "infos": {
+    "type": "Type",
+    "course": "Course",
+    "submission": "Submission",
+    "startAt": "Start date",
+    "deadlineAt": "Final date"
+  },
+  "srchStudent": "Search student",
+  "expand": "See more...",
+  "retract": "...See less",
+  "submission": {
+    "submission": "Submission",
+    "no_submission": "No Submission",
+    "last_submission": "Last Submission",
+    "description": "Submission Description",
+    "constraint": "Constraints",
+    "status": "Status",
+    "no_started": "Not started",
+    "started": "Submission in progress",
+    "in_review": "Under review",
+    "denied": "Submission refused",
+    "reviewed": "Submission reviewed",
+    "click_to_start": "Click to start",
+    "click_to_continue": "Click to continue",
+    "click_to_remake": "Click to remake",
+    "click_to_review": "Click to review",
+    "sent_task": "Task sent",
+    "sendAfterDeadline": "After deadline",
+    "sendUntilDeadline": "Until the deadline",
+    "noSubmission": "No submission"
+  },
+  "task": {
+    "status": {
+      "draft": "Draft",
+      "to_do": "To Do",
+      "in_progress": "In Progress",
+      "in_review": "In Review",
+      "done": "Done"
+    }
+  },
+  "noType": "(No type)"
 }

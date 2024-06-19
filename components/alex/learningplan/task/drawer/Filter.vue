@@ -10,8 +10,11 @@
     class="py-6 rounded-s-lg"
     @update:model-value="handleChange"
   >
-    <div class="d-flex flex-column ga-4 h-full w-full bg-white">
-      <div class="d-flex align-center ga-4 pb-2 px-4">
+    <form
+      class="d-flex flex-column ga-4 h-full w-full bg-white"
+      @submit="onSubmit"
+    >
+      <div class="d-flex align-center ga-4 px-4">
         <p class="text-h4 flex-fill">
           {{ i18Texts.title }}
         </p>
@@ -29,7 +32,7 @@
       <div class="flex-fill px-4">
         <alex-inputs-select
           v-model="filters.select"
-          name="convite"
+          name="select"
           :items="classes.length ? classes : types"
           :placeholder="i18Texts.selectPlaceholder"
           clearable
@@ -46,7 +49,7 @@
             <alex-inputs-date
               v-model="filters.startDate.start"
               class="flex-1-1"
-              name="startDate"
+              name="startDateStart"
               hide-details
               density="comfortable"
             />
@@ -54,45 +57,57 @@
               v-model="filters.startDate.end"
               class="flex-1-1"
               hide-details
-              name="finalDate"
+              name="startDateEnd"
               density="comfortable"
             />
           </div>
         </div>
+        <p
+          v-if="errors['startDateStart'] || errors['startDateEnd']"
+          class="text-error-0 text-body-3 mt-2"
+        >
+          {{ errors['startDateStart'] || errors['startDateEnd'] }}
+        </p>
         <p class="text-p1 text-gray-800 mt-4 mb-2">
           {{ $t('components.learningPlan.drawer.finalDate') }}
         </p>
         <div class="d-flex align-center ga-1">
           <alex-inputs-date
             v-model="filters.finalDate.start"
+            name="finalDateStart"
             class="flex-1-1"
-            name="startDate"
             hide-details
             density="comfortable"
           />
           <alex-inputs-date
             v-model="filters.finalDate.end"
+            name="finalDateEnd"
             class="flex-1-1"
             hide-details
-            name="finalDate"
             density="comfortable"
           />
         </div>
+        <p
+          v-if="errors['finalDateStart'] || errors['finalDateEnd']"
+          class="text-error-0 text-body-3 mt-2"
+        >
+          {{ errors['finalDateStart'] || errors['finalDateEnd'] }}
+        </p>
         <div v-if="!kanbanFilter" class="mt-4">
           <p class="text-body-1 text-gray-800">
             {{ $t('components.learningPlan.drawer.archivedTasks') }}
           </p>
-          <v-switch
+          <alex-custom-switch
             v-model="filters.archivedTasks"
             class="archived-switch"
             inset
             hide-details
-          ></v-switch>
+          ></alex-custom-switch>
         </div>
       </div>
       <hr />
 
-      <div class="d-flex ga-1 pa-4">
+      <div class="d-flex ga-1 px-4">
         <alex-custom-button
           class="flex-1-1"
           variant="secondary"
@@ -100,24 +115,23 @@
           @click="clearFilters"
           >{{ $t('components.learningPlan.drawer.clean') }}</alex-custom-button
         >
-        <alex-custom-button
-          class="flex-1-1"
-          size="large"
-          @click="handleFilter"
-          >{{ $t('components.learningPlan.drawer.filter') }}</alex-custom-button
-        >
+        <alex-custom-button class="flex-1-1" size="large" type="submit">{{
+          $t('components.learningPlan.drawer.filter')
+        }}</alex-custom-button>
       </div>
-    </div>
+    </form>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
+import * as yup from 'yup';
+import { useForm } from 'vee-validate';
 const { t } = useI18n();
 
 interface Filter {
   modelValue: boolean;
-  classes: Array<string>;
-  kanbanFilter: boolean;
+  kanbanFilter?: boolean;
+  classes?: Array<string>;
 }
 
 const props = withDefaults(defineProps<Filter>(), {
@@ -130,12 +144,12 @@ const filters = ref({
   select: null,
   archivedTasks: false,
   startDate: {
-    start: '',
-    end: '',
+    start: undefined,
+    end: undefined,
   },
   finalDate: {
-    start: '',
-    end: '',
+    start: undefined,
+    end: undefined,
   },
 });
 
@@ -153,6 +167,43 @@ const i18Texts = computed(() => {
         selectLabel: t(`${drawer}.type`),
       };
 });
+const schema = yup.object().shape(
+  {
+    finalDateStart: yup.date().optional(),
+    finalDateEnd: yup
+      .date()
+      .optional()
+      .when('finalDateStart', (value, scheme) => {
+        if (!value[0]) {
+          return scheme;
+        }
+        return scheme
+          .optional()
+          .min(yup.ref('finalDateStart'), t('rules.endDate.beforeStartDate'));
+      }),
+    startDateStart: yup.date().optional(),
+    startDateEnd: yup
+      .date()
+      .optional()
+      .when('startDateStart', (value, scheme) => {
+        if (!value[0]) {
+          return scheme;
+        }
+        return scheme
+          .optional()
+          .min(yup.ref('startDateStart'), t('rules.endDate.beforeStartDate'));
+      }),
+  },
+  [
+    ['finalDateStart', 'finalDateEnd'],
+    ['startDateStart', 'startDateEnd'],
+  ],
+);
+
+const { handleSubmit, errors } = useForm({
+  validationSchema: schema,
+  keepValuesOnUnmount: true,
+});
 
 const types = [
   { title: t('components.learningPlan.drawer.group'), value: 'group' },
@@ -168,34 +219,31 @@ const handleChange = (value: boolean) => {
   emits('update:modelValue', value);
 };
 
-const handleFilter = () => {
+const onSubmit = handleSubmit(() => {
   const nonEmptyFilters = Object.fromEntries(
-    Object.entries(filters.value).filter(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ([key, value]) => {
-        if (value === null || value === false) {
-          return false;
-        }
-        if (typeof value === 'object') {
-          return value.start !== '' || value.end !== '';
-        }
-        return true;
-      },
-    ),
+    Object.entries(filters.value).filter(([_key, value]) => {
+      if (value === null || value === false) {
+        return false;
+      }
+      if (typeof value === 'object') {
+        return value.start || value.end;
+      }
+      return true;
+    }),
   );
   emits('filter', nonEmptyFilters);
   handleChange(false);
-};
+});
 
 const removeFilter = (key: string) => {
   if (key === 'archivedTasks') filters.value[key] = false;
   else if (key === 'select') filters.value[key] = null;
   else
     filters.value[key] = {
-      start: '',
-      end: '',
+      start: undefined,
+      end: undefined,
     };
-  handleFilter();
+  onSubmit();
 };
 
 defineExpose({
@@ -207,37 +255,16 @@ const clearFilters = () => {
     select: null,
     archivedTasks: false,
     startDate: {
-      start: '',
-      end: '',
+      start: undefined,
+      end: undefined,
     },
     finalDate: {
-      start: '',
-      end: '',
+      start: undefined,
+      end: undefined,
     },
   };
   emits('filter', {});
 };
 </script>
 
-<style>
-.archived-switch {
-  .v-switch__thumb {
-    transform: none !important;
-  }
-  .v-switch__track {
-    background-color: rgb(var(--v-theme-gray-200)) !important;
-  }
-  .v-switch__track {
-    background-color: rgb(var(--v-theme-gray-200)) !important;
-  }
-  .v-selection-control--dirty .v-switch__track {
-    background-color: #ade8ee !important;
-  }
-  .v-switch__thumb {
-    background-color: rgb(var(--v-theme-gray-500)) !important;
-  }
-  .v-selection-control--dirty .v-switch__thumb {
-    background-color: rgb(var(--v-theme-secondary-0)) !important;
-  }
-}
-</style>
+<style></style>

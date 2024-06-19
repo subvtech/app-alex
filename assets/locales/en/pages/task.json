@@ -20,15 +20,17 @@
     "delivery": "Delivery",
     "noSubmissions": "No submissions",
     "student": "Student",
-    "students": "Students"
+    "students": "Students",
+    "group": "Group",
+    "groups": "Groups"
   },
   "table": {
     "header": {
-      "name": "Name",
-      "deadline": "Deadline",
+      "title": "Name",
+      "deadline_at": "Deadline",
       "type": "Type",
-      "members": "Members",
-      "delivery": "Delivery"
+      "students": "Members",
+      "delivered": "Delivery"
     },
     "type": {
       "individual": "Individual",
@@ -67,7 +69,11 @@
       "moveSuccess": "moved",
       "moveError": "move",
       "errorMessage": "Error while trying to {action} task, please try again!",
-      "successMessage": "Task {action} successfully!"
+      "successMessage": "Task {action} successfully!",
+      "dndSortError": "It is not possible to change the task position when sorting by {type} is active",
+      "dndFilterError": "It is not possible to change the task position when filtering is active",
+      "TASK_DATA_INCOMPLETE": "You need to fill in the task info before setting it as published",
+      "TASK_MOVE_HAS_DELIVERIES": "It is not possible to move the task to draft because it has deliveries"
     },
     "deleteModal": {
       "title": "Do you really want to delete this Task?",

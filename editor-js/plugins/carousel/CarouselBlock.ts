@@ -1,32 +1,30 @@
 import { createApp } from 'vue';
-import { createVuetify } from 'vuetify';
-import { mdi } from 'vuetify/iconsets/mdi';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
-import { alexIcons } from 'assets/icons';
+import { BlockToolConstructorOptions } from '@editorjs/editorjs';
 import Carousel from './Carousel.vue';
+import { vuetify } from '@/plugins/vuetify';
 
-const vuetify = createVuetify({
-  components,
-  directives,
-  defaults,
-  theme: {
-    defaultTheme: MAIN_THEME,
-    themes: {
-      mainTheme,
-      mainDarkTheme,
-    },
-  },
-  icons: {
-    defaultSet: 'mdi',
-    sets: {
-      mdi,
-      alex: alexIcons,
-    },
-  },
-});
+interface CarouselBlockData {
+  title: string;
+  image: string;
+  type: string;
+  icon: string;
+  imgId?: string;
+  videoId?: string;
+  video?: string;
+  url?: string;
+}
+
+interface CarouselConfig {
+  handleFileSelected: (file: File) => Promise<string>;
+  handleDeletedFiles: (id: string) => void;
+  onUpdateSlides: (slides: CarouselBlockData[]) => void;
+}
 
 class CarouselBlock {
+  data: Array<CarouselBlockData>;
+  config: CarouselConfig;
+  readOnly: boolean;
+  wrapper: HTMLDivElement = document.createElement('div');
   static get toolbox() {
     return {
       title: 'Playlist',
@@ -34,25 +32,28 @@ class CarouselBlock {
     };
   }
 
-  constructor({ data, readOnly, config }) {
+  constructor({
+    data,
+    readOnly,
+    config,
+  }: BlockToolConstructorOptions<CarouselBlockData[], CarouselConfig>) {
     this.data = data;
     this.readOnly = readOnly;
-    this.config = config;
+    this.config = config as CarouselConfig;
   }
 
   render() {
     this.wrapper = document.createElement('div');
     const app = createApp(Carousel, {
-      slides: this.data.slides,
+      slides: this.data,
       readOnly: this.readOnly,
-      uploadBaseUrl: this.config.uploadBaseUrl,
       onUpdateSlides: (slides) => {
-        this.data.slides = slides;
+        this.data = slides;
       },
-      onSelectFile: async (file) => {
+      onSelectFile: async (file: File) => {
         return await this.config.handleFileSelected(file);
       },
-      onDeletedSlide: (id) => {
+      onDeletedSlide: (id: string) => {
         this.config.handleDeletedFiles(id);
       },
     });
@@ -72,7 +73,7 @@ class CarouselBlock {
   }
 
   validate(savedData) {
-    if (savedData.slides) {
+    if (savedData.length > 0) {
       return true;
     }
     return false;

@@ -20,15 +20,17 @@
     "delivery": "Entrega",
     "noSubmissions": "Sem entrega",
     "student": "Aluno",
-    "students": "Alunos"
+    "students": "Alunos",
+    "group": "Grupo",
+    "groups": "Grupos"
   },
   "table": {
     "header": {
-      "name": "Nome",
-      "deadline": "Prazo",
+      "title": "Nome",
+      "deadline_at": "Prazo",
       "type": "Tipo",
-      "members": "Integrantes",
-      "delivery": "Entrega"
+      "students": "Integrantes",
+      "delivered": "Entrega"
     },
     "type": {
       "individual": "Individual",
@@ -67,8 +69,12 @@
     "deleteError": "excluir",
     "moveSuccess": "movida",
     "moveError": "mover",
-    "errorMessage": "Erro ao {action} tarefa, tente novamente!",
-    "successMessage": "Tarefa {action} com sucesso!"
+    "errorMessage": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",
+    "successMessage": "Tarefa {action} com sucesso!",
+    "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
+    "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem estiver ativa",
+    "TASK_DATA_INCOMPLETE": "Você precisa preencher as informações da tarefa antes de defini-la como publicada",
+    "TASK_MOVE_HAS_DELIVERIES": "Não é possível mover a tarefa para rascunho porque ela possui entregas"
   },
   "deleteModal": {
     "title": "Realmente deseja excluir essa Tarefa?",

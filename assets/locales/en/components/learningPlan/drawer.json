@@ -3,13 +3,13 @@
     "type": {
       "label": "Type",
       "individual": "Individual",
-      "collective": "Collective"
+      "collective": "Group"
     },
     "status": {
       "label": "Status",
       "draft": "Draft",
       "published": "Published",
-      "closed": "Closed"
+      "finished": "Finished"
     },
     "date": {
       "startLabel": "Start date",
@@ -20,6 +20,9 @@
       "accept": "Accept",
       "deny": "Deny"
     },
+    "submissionDescription": {
+      "label": "Submission Description"
+    },
     "description": {
       "label": "Description",
       "placeHolder": "Enter description"
@@ -27,15 +30,78 @@
     "submission": {
       "label": "Submission",
       "reqSubmission": "Request submission",
-      "aftrDeadline": "Allow submissions after deadline"
+      "aftrDeadline": "Allow submissions after deadline",
+      "description": {
+        "label": "Submission Description",
+        "placeHolder": "Enter description"
+      }
     },
+    "memberAlreadyInTask": "{member} already in task",
+    "pleaseFillDates": "Please fill start and finish dates before add",
+    "addMember": "{member} was added in task",
+    "removeMember": "{member} was removed of task",
+    "freeEditor": "Free editor",
+    "allowSendAfterSubmission": "Allow submission after deadline",
     "restrictions": {
-      "label": "Restrictions"
+      "label": "Restrictions",
+      "text": "Text",
+      "video": "Video",
+      "image": "Image",
+      "document": "Document",
+      "link": "Link"
+    },
+    "goals": {
+      "label": "Learning goals",
+      "select": "Select a goal",
+      "search": "Search a name"
     },
     "learningResources": {
       "label": "Learning resources",
       "noneSelected": "No trails selected"
+    },
+    "tags": {
+      "subtitle": "Enter a tag",
+      "search": "Search a name",
+      "errors": {
+        "save": "Can't save tag"
+      }
+    },
+    "errors": {
+      "save": "Can't save the field {field}",
+      "genericSave": "Can't save the data",
+      "addMember": "Error when adding member",
+      "removeMember": "Error when removing member",
+      "addClass": "Error while trying to add class students from class {name}"
+    },
+    "members": {
+      "allClass": "The entire class {name} was added in task"
+    },
+    "events": {
+      "task_created": "Task was created",
+      "task_deadline": "{name} change task deadline",
+      "task_start_date": "{name} change task start date",
+      "task_submission": "{name} change task submission info",
+      "task_archived": "Task was archived",
+      "task_deadline_ended": "The task reached its end date and was automatically closed.",
+      "student_deadline": "{name} changed the end time of {name_two} task.",
+      "student_status": "{name} alterou o status da tarefa.",
+      "submission_send": "{name} changed the status of the task.",
+      "submission_denied": "Submission denied.",
+      "submission_evaluated": "Submission evaluated.",
+      "message": "{name} sent a message."
+    },
+    "chat": {
+      "you": "{name} (you)"
     }
+  },
+  "goals": {
+    "select": "Enter a goal",
+    "search": "Write a name",
+    "label": "Learning goals"
+  },
+  "tags": {
+    "subtitle": "Enter a tag",
+    "placeholder": "Write a name"
   },
   "tabs": {
     "events": {
@@ -65,5 +131,10 @@
   "clean": "Clean",
   "archivedTasks": "Archived tasks",
   "selectClassPlaceholder": "Select class",
-  "selectTypePlaceholder": "Select type"
+  "selectTypePlaceholder": "Select type",
+  "srchClass": "Search class",
+  "date": {
+    "placeholder": "Choose a date"
+  },
+  "students": "Students"
 }

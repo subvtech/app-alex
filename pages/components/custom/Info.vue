@@ -43,7 +43,11 @@
     </p>
     <h2 class="text-h3 text-gray-800">Adicionando propriedades básicas</h2>
 
-    <div v-if="user" v-for="(item, index) in documentation" class="d-flex flex-column w-100">
+    <div
+      v-if="user"
+      v-for="(item, index) in documentation"
+      class="d-flex flex-column w-100"
+    >
       <h2 v-if="item.title" class="text-h2 text-gray-800">{{ item.title }}</h2>
 
       <div class="d-flex flex-column w-100 overflow-hidden">
@@ -198,13 +202,13 @@ const updateUser = async (show = true) => {
     'trails',
     'role',
     'user_descriptions',
-    'user_wallet',
+    'wallet',
   ];
 
   user.value = await findOne<User>('users', id, {
     populate: populate,
   });
-  
+
   if (!user.value.avatar) user.value.avatar = profilePicture;
   if (!user.value.cover) {
     user.value.cover = coverPicture;

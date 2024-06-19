@@ -3,6 +3,7 @@
     :status="color"
     :text="deadline"
     size="small"
+    class="width-30"
     prepend-icon="mdi-calendar-range"
   ></alex-custom-chip>
 </template>
@@ -22,7 +23,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const deadline = computed(() => {
-  return format(new Date(props.date), 'dd MMM yyyy', {
+  const date =
+    typeof props.date === 'string'
+      ? props.date.replaceAll('-', '/')
+      : props.date;
+  return format(new Date(date), 'dd MMM yyyy', {
     locale: i18.locale.value === 'pt' ? ptBR : enIN,
   });
 });
