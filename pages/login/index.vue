@@ -116,6 +116,8 @@
             ></v-divider>
           </div>
 
+          <alex-custom-button text="Coinbase" @click="metalogin(true)" />
+
           <v-btn
             block
             class="card-btn metamask d-flex"
@@ -165,7 +167,7 @@ const logging = ref(false);
 const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-const { metalogin } = useMetamask(logging2);
+const { metalogin } = useMetamask();
 
 const submit = handleSubmit(async () => {
   logging.value = true;

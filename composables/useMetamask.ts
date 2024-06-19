@@ -20,15 +20,35 @@ export const useMetamask = () => {
 
   const loading = ref(false);
 
-  const linkWallet = async (userId?) => {
+  const linkWallet = async (userId = undefined, coinbase = true) => {
     try {
       loading.value = true;
+
       if (!window.ethereum) {
         setMessage(i18n.t('pages.login.metamask.notFound'), 'red', true);
 
         return {};
       }
-      const provider = new ethers.BrowserProvider(window.ethereum);
+
+      let provider: ethers.BrowserProvider;
+      console.log({ coinbase, providers: window.ethereum.providers });
+      if (coinbase && window.ethereum.providers) {
+        const providers = Array.from(window.ethereum.providers);
+        provider = providers.find(
+          (provider: any) => provider.isCoinbaseWallet,
+        ) as ethers.BrowserProvider;
+
+        if (provider) {
+          console.log('User is using Coinbase Wallet');
+          // Proceed with Coinbase Wallet integration
+        } else {
+          setMessage(i18n.t('pages.login.metamask.notFound'), 'red', true);
+
+          return {};
+        }
+      } else {
+        provider = new ethers.BrowserProvider(window.ethereum);
+      }
 
       const signer = await withTimeout(8000, provider.getSigner());
 
@@ -95,8 +115,9 @@ export const useMetamask = () => {
     }
   };
 
-  const metalogin = async () => {
-    const { jwt, user, address } = await linkWallet();
+  const metalogin = async (coinbase = false) => {
+    console.log({ coinbase, metalogin: 'metalogin' });
+    const { jwt, user, address } = await linkWallet(undefined, coinbase);
 
     if (jwt && user) {
       setToken(jwt);

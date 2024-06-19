@@ -63,7 +63,16 @@
                     name="taskTitle"
                     hide-details
                     :disabled="loader"
-                    @keyup.enter="handleCreateTask"
+                  />
+                  <alex-inputs-text-field
+                    v-model="taskReward"
+                    :placeholder="'Task Prize'"
+                    class="w-100"
+                    type="number"
+                    density="comfortable"
+                    name="taskReward"
+                    hide-details
+                    :disabled="loader"
                   />
                   <alex-custom-button
                     size="large"
@@ -91,6 +100,7 @@ export interface TaskType {
   deadline_at: string;
   type?: string;
   archived?: boolean;
+  contract_address?: string;
   students?: { name: string; image: { url: string } }[];
   delivered: {
     toDo: number;
@@ -99,6 +109,8 @@ export interface TaskType {
     completed: number;
   };
 }
+
+const { createTaskContract } = useContracts();
 
 const props = defineProps<{
   search: string;
@@ -110,6 +122,7 @@ const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
+const taskReward = ref(0);
 const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();
@@ -157,12 +170,16 @@ const isDateInRange = (date: Date, range) => {
 };
 
 const handleCreateTask = async () => {
+  console.log('CREATE TASK');
   loader.value = true;
   try {
+    const contractAddress = await createTaskContract(taskReward.value || 0);
+
     const res = await create('tasks', {
       title: taskTitle.value,
       status: 'draft',
       learningplan: route.params.id,
+      contractAddress: contractAddress,
       start_at: new Date(),
     });
     learningPlanStore.learningPlan?.tasks.push({
@@ -208,6 +225,7 @@ const tasksArray = computed(() => {
     if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate)) return;
 
     const students = task.task_members?.map((student) => {
+      console.log({ student });
       if (student.status === 'to_do') delivered.toDo += 1;
       if (student.status === 'in_progress') delivered.doing += 1;
       if (student.status === 'in_review') delivered.underReview += 1;

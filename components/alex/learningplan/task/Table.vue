@@ -147,12 +147,15 @@ const { t } = useI18n();
 const transitionName = computed(() =>
   props.filter ? 'staggered-fade' : 'list',
 );
+const { rewardStudents } = useContracts();
+
 const emit = defineEmits(['deleteTask', 'moveTask', 'toggleArchive']);
 
 const deleteModal = ref(false);
 const taskToDelete = ref(-1);
 
 const tasksArray = computed(() => props.tasks);
+console.log({ tasks: props.tasks });
 
 const cancelDelete = () => {
   deleteModal.value = false;
@@ -181,6 +184,13 @@ const dropDownItems = (task: TaskType) => {
       if (deliveredTotal === 0) {
         items.push(getDropDownAction('draft', task.id));
         items.push(getDropDownAction('delete', task.id));
+
+        items.push(
+          getDropDownAction('payReward', task.id, {
+            address: task.contract_address,
+            students: task.students,
+          }),
+        );
       } else if (task.archived) {
         items.push(getDropDownAction('unarchive', task.id));
       } else {
@@ -206,7 +216,13 @@ const dropDownItems = (task: TaskType) => {
   return items;
 };
 
-const getDropDownAction = (action: string, id: number) => {
+const getDropDownAction = (
+  action: string,
+  id: number,
+  contract: { address?: string; students: string[] } = {
+    students: [],
+  },
+) => {
   const dropdown = {
     delete: {
       text: t('pages.task.table.dropdown.delete'),
@@ -227,6 +243,14 @@ const getDropDownAction = (action: string, id: number) => {
     details: {
       text: t('pages.task.table.dropdown.details'),
       onClick: () => console.log('details', id),
+    },
+
+    payReward: {
+      text: 'pay students',
+      onClick: async () => {
+        console.log({ contract });
+        await rewardStudents(contract.address, contract.students);
+      },
     },
     kanban: {
       text: t('pages.task.table.dropdown.kanban'),
