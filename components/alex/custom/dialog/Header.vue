@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="bg-white h-72 rounded-t-lg px-6 border-bottom-gray-100"
+    class="bg-white min-h-[72px] rounded-t-lg px-6 border-bottom-gray-100"
     data-testid="alex-dialog-header"
   >
     <v-row dense>
@@ -39,8 +39,5 @@ const emits = defineEmits(['onClose']);
 <style scoped>
 .border-bottom-gray-100 {
   border-bottom: 1px solid rgb(var(--v-theme-gray-100)) !important;
-}
-.h-72 {
-  min-height: 72px;
 }
 </style>

@@ -144,23 +144,7 @@
       />
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
-        <p class="text-h3 mb-4">
-          {{
-            $t('components.learningPlan.drawer.task.learningResources.label')
-          }}
-        </p>
-        <alex-custom-button
-          size="large"
-          prepend-icon="alex:trail"
-          append-icon="mdi-chevron-right"
-          :text="
-            $t(
-              'components.learningPlan.drawer.task.learningResources.noneSelected',
-            )
-          "
-          variant="secondary"
-          @click="$emit('attached-trail-click')"
-        />
+        <alex-learningplan-task-resources v-model="openResources" />
       </div>
 
       <!-- Eventos e atribuições -->
@@ -242,6 +226,7 @@ const sendAfterDeadline = ref(props.sendAfterDeadline);
 const goals = ref(props.goals);
 const tags = ref(props.tags);
 const model = defineModel({ default: false });
+const openResources = ref<boolean>(false);
 
 // TODO: Think about a better way to handle this
 

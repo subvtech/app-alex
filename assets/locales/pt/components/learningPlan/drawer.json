@@ -54,7 +54,11 @@
     },
     "learningResources": {
       "label": "Recursos de aprendizagem",
-      "noneSelected": "Nenhuma trilha selecionada"
+      "noneSelected": "Nenhuma trilha selecionada",
+      "select": "Selecione uma trilha",
+      "new": "Nova trilha",
+      "emptyTitle": "Parece que não há trilhas criadas",
+      "emptySubtitle": "Para selecionar os recursos de aprendizagem é necessário criar e selecionar uma trilha."
     },
     "tags": {
       "subtitle": "Informe um marcador",
