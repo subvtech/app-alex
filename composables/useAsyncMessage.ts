@@ -29,6 +29,7 @@ export const useAsyncMessage = (
             },
           },
         },
+        task_submission: true,
       },
       pagination: {
         limit: 1000,

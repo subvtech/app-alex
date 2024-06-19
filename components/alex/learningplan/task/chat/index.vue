@@ -21,20 +21,7 @@
         :align="
           user?.id !== message.learning_plan_member.user.id ? 'left' : 'right'
         "
-        :response="
-          message.response_to_message
-            ? {
-                id: message.response_to_message.id,
-                message: message.response_to_message.message,
-                user: {
-                  id: message.response_to_message.learning_plan_member.user.id,
-                  name: message.response_to_message.learning_plan_member.user
-                    .fullname,
-                },
-                sentAt: message.response_to_message.sent_at,
-              }
-            : undefined
-        "
+        :response="getResponse(message)"
         @reply="(value) => handleAttachMessage(value)"
         @message-click="(value) => handleReplyMessageClick(value?.id)"
         @submission-click="(value) => $emit('submission-click', value)"
@@ -89,6 +76,34 @@ const getCurrentUserName = (
     });
   }
   return member.user.fullname;
+};
+
+const getResponse = (
+  message: TaskMemberMessage,
+): AttachedSubmission | Message | undefined => {
+  const response = message?.response_to_message;
+  const submission = message?.task_submission;
+  if (response) {
+    return {
+      id: response.id,
+      message: response.message,
+      user: {
+        id: response.learning_plan_member.user.id,
+        name: response.learning_plan_member.user.fullname,
+      },
+      sentAt: response.sent_at,
+    };
+  }
+  if (submission) {
+    return {
+      id: submission.id,
+      justification: { text: submission.justification },
+      status: 'reviewed',
+      mark: submission.grade,
+      time: new Date(submission.submitted_at),
+    };
+  }
+  return undefined;
 };
 
 // Handlers

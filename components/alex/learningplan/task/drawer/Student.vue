@@ -111,7 +111,6 @@
                 type="professor"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :mark="mostRecentSubmission?.grade"
-                :max-mark="mostRecentSubmission?.grade"
               />
               <p v-else class="text-body-3 text-gray-400">
                 Nenhuma entrega realizada
@@ -301,7 +300,6 @@ const evaluatedSubmissions = computed(() =>
               text: submission.justification,
             },
             mark: submission.grade,
-            maxMark: submission.grade,
             time: new Date(submission.evaluated_at || submission.createdAt),
             status: submission.evaluated_at ? 'reviewed' : 'in_review',
           } as AttachedSubmission,
@@ -334,10 +332,9 @@ const handleSubmitMessage = async (
   audio?: Blob | null,
   _duration?: number,
   attachedMessage?: Message,
-  _attachedSubmission?: AttachedSubmission,
+  attachedSubmission?: AttachedSubmission,
 ) => {
-  if (!text && !audio) return;
-  if (!user.value) return;
+  if ((!text && !audio) || !user.value) return;
   let learningMember = learningplanStore.activeMembers.find(
     (member) => member.user.id === user?.value?.id,
   );
@@ -359,6 +356,7 @@ const handleSubmitMessage = async (
         message: text,
         sent_at: new Date(),
         ...(attachedMessage && { response_to_message: attachedMessage.id }),
+        ...(attachedSubmission && { task_submission: attachedSubmission.id }),
       },
     },
     params: {
@@ -373,6 +371,7 @@ const handleSubmitMessage = async (
             },
           },
         },
+        task_submission: true,
       },
     },
   });

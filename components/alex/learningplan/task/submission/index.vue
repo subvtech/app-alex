@@ -53,7 +53,15 @@ const { t } = useI18n();
 const slots = useSlots();
 const hasPrepend = computed(() => !!slots.prependIcon);
 const hasAppend = computed(() => !!slots.appendIcon);
-const formattedMark = computed(() => `${props.mark}/${props.maxMark}`);
+const formattedMark = computed(() => {
+  if (!props.mark) {
+    return '';
+  }
+  if (props.maxMark) {
+    return `${props.mark}/${props.maxMark}`;
+  }
+  return `${props.mark}`;
+});
 const clickable = computed(
   () =>
     ['not_started', 'started'].includes(props.status) ||
