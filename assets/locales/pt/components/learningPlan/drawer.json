@@ -86,6 +86,9 @@
       "submission_denied": "Entrega recusada.",
       "submission_evaluated": "Entrega avaliada.",
       "message": "{name} enviou uma mensagem."
+    },
+    "chat": {
+      "you": "{name} (Você)"
     }
   },
   "goals": {

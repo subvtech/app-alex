@@ -89,6 +89,9 @@
       "submission_denied": "Submission denied.",
       "submission_evaluated": "Submission evaluated.",
       "message": "{name} sent a message."
+    },
+    "chat": {
+      "you": "{name} (you)"
     }
   },
   "goals": {

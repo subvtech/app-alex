@@ -1,8 +1,8 @@
 export interface TaskMemberMessage {
   id: number;
-  learning_plan_member_id: number;
-  task_member_id: number;
-  task_submission_id: number;
+  learning_plan_member: LearningPlanMemberSimple;
+  task_member: TaskMember;
+  task_submission: TaskSubmissionSimple;
   audio: Media;
   message: string;
   response_to_message?: TaskMemberMessage;

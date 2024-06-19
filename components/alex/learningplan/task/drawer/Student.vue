@@ -145,10 +145,10 @@
         v-model="activePage"
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
+        :task-member-id="taskMemberId"
         :events="events.data"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
-        :messages="messages"
         :submissions="evaluatedSubmissions"
       />
     </template>
@@ -201,7 +201,6 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   canSubmitAfterDeadlineTask: false,
   finishAt: null,
 });
-const messages = ref<Message[]>([]);
 const { t } = useI18n();
 const model = defineModel({ default: false });
 type Emit = {
@@ -222,6 +221,9 @@ const drawerId = computed(() => `student-drawer-${crypto.randomUUID()}`);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const strapi = useStrapi();
+const user = useStrapiUser();
+const learningplanStore = useLearningPlanStore();
+const strapiUtils = useStrapiUtils();
 const { setMessage } = useMessageStore();
 const statusColor = computed(() => {
   const mapedColors = {
@@ -239,15 +241,17 @@ const config: Record<string, string> = {
   document: t('components.learningPlan.drawer.task.restrictions.document'),
   link: t('components.learningPlan.drawer.task.restrictions.link'),
 };
-const strapiUtils = useStrapiUtils();
 
 // Get data
 const getSubmissions = (memberID: number) =>
   strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
     filters: {
       task_member: memberID,
+      evaluated_at: {
+        $notNull: true,
+      },
     },
-    sort: 'createdAt:asc',
+    sort: 'createdAt:desc',
   });
 const getEvents = (memberID: number) =>
   strapiUtils.find<TaskEvent>('task-events', {
@@ -311,34 +315,49 @@ const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   }
   return 'in_review';
 };
-
-const handleSubmitMessage = (
+const getMessages = (memberID: number) =>
+  strapiUtils.find<TaskMemberMessage>('task-member-messages', {
+    filters: {
+      task_member: memberID,
+    },
+    populate: {
+      learning_plan_member: {
+        populate: ['user.avatar'],
+      },
+    },
+  });
+const { refresh } = await useAsyncData(
+  'task-submissions',
+  () => getMessages(props.taskMemberId),
+  {
+    immediate: false,
+  },
+);
+const handleSubmitMessage = async (
   text: string,
   audio?: Blob | null,
-  duration?: number,
-  attachedMessage?: Message,
-  attachedSubmission?: AttachedSubmission,
+  _duration?: number,
+  _attachedMessage?: Message,
+  _attachedSubmission?: AttachedSubmission,
 ) => {
   if (!text && !audio) return;
-  const message: Message = {
-    sentAt: new Date(),
-    id: Math.round(Math.random() * 10),
-    user: { id: 1, name: 'zig' },
+  if (!user.value) return;
+  let learningMember = learningplanStore.activeMembers.find(
+    (member) => member.user.id === user?.value?.id,
+  );
+  if (learningplanStore.facilitator?.user.id === user.value.id) {
+    learningMember = learningplanStore.facilitator;
+  }
+  if (!learningMember) {
+    return;
+  }
+  await strapi.create('task-member-messages', {
+    learning_plan_member: learningMember.id,
+    task_member: props.taskMemberId,
     message: text,
-  };
-  if (audio) {
-    message.audio = {
-      src: URL.createObjectURL(audio),
-      duration,
-    };
-  }
-  if (attachedMessage) {
-    message.response = attachedMessage;
-  }
-  if (attachedSubmission) {
-    message.response = attachedSubmission;
-  }
-  messages.value.push(message);
+    sent_at: new Date(),
+  });
+  refresh();
 };
 
 const changeDeadline = async (value?: string | null) => {
