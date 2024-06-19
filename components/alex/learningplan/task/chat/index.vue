@@ -1,5 +1,11 @@
 <template>
   <div class="flex flex-col bg-gray-blue min-h-[400px] p-4 gap-2">
+    <p
+      v-if="error"
+      class="text-body-1 w-full text-center text-error--1 my-auto"
+    >
+      Erro ao carregar as mensagens :/
+    </p>
     <template v-if="user">
       <alex-learningplan-task-chat-message
         v-for="message in messages.data"
@@ -9,59 +15,70 @@
         :user="{
           id: message.learning_plan_member.user.id,
           name: getCurrentUserName(user.id, message.learning_plan_member),
-          avatar: message.learning_plan_member.user?.avatar?.url,
+          avatar: message.learning_plan_member.user?.avatar?.formats.small.url,
         }"
         :message="message.message"
         :align="
           user?.id !== message.learning_plan_member.user.id ? 'left' : 'right'
+        "
+        :response="
+          message.response_to_message
+            ? {
+                id: message.response_to_message.id,
+                message: message.response_to_message.message,
+                user: {
+                  id: message.response_to_message.learning_plan_member.user.id,
+                  name: message.response_to_message.learning_plan_member.user
+                    .fullname,
+                },
+                sentAt: message.response_to_message.sent_at,
+              }
+            : undefined
         "
         @reply="(value) => handleAttachMessage(value)"
         @message-click="(value) => handleReplyMessageClick(value?.id)"
         @submission-click="(value) => $emit('submission-click', value)"
       />
     </template>
+    <div
+      v-if="(status === 'pending' || loading) && !error"
+      class="flex flex-col justify-center items-center gap-2 mt-2"
+    >
+      <v-progress-circular
+        indeterminate
+        color="secondary-0"
+        size="40"
+        width="4"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 type ChatProps = {
   taskMemberId: number;
+  loading?: boolean;
 };
-const props = defineProps<ChatProps>();
+const props = withDefaults(defineProps<ChatProps>(), {
+  loading: false,
+});
 defineEmits(['submission-click']);
 const { t } = useI18n();
 const user = useStrapiUser();
-const strapiUtils = useStrapiUtils();
 const attachedMessage = defineModel<Message>('attachedMessage');
-const getMessages = (memberID: number) =>
-  strapiUtils.find<TaskMemberMessage>('task-member-messages', {
-    filters: {
-      task_member: memberID,
-    },
-    populate: {
-      learning_plan_member: {
-        populate: ['user.avatar'],
-      },
-    },
-  });
-const { data: messages } = await useAsyncData(
-  'task-submissions',
-  () => getMessages(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskMemberMessage[],
-    }),
-    immediate: true,
-  },
-);
-const handleAttachMessage = (content: Message) => {
-  attachedMessage.value = content;
-};
-const handleReplyMessageClick = (id?: number) => {
-  if (!id) return;
-  scrollAndHighlightElement(`#chat-message-${id}`, 'highlight-message');
-};
+const {
+  data: messages,
+  status,
+  error,
+} = await useAsyncMessage(props.taskMemberId, {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskMemberMessage[],
+  }),
+  dedupe: 'cancel',
+});
+
+// Utils
 const getCurrentUserName = (
   currentUserID: number,
   member: LearningPlanMemberSimple,
@@ -72,6 +89,15 @@ const getCurrentUserName = (
     });
   }
   return member.user.fullname;
+};
+
+// Handlers
+const handleAttachMessage = (content: Message) => {
+  attachedMessage.value = content;
+};
+const handleReplyMessageClick = (id?: number) => {
+  if (!id) return;
+  scrollAndHighlightElement(`#chat-message-${id}`, 'highlight-message');
 };
 </script>
 

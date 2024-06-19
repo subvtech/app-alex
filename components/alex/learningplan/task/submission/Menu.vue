@@ -18,7 +18,7 @@
           {{ submissions.length }}
         </p>
       </div>
-      <div class="p-4 max-h-[400px] overflow-y-scroll">
+      <div class="p-4 max-h-[400px] overflow-y-scroll flex flex-col gap-2">
         <div v-if="!submissions.length">
           <h3 class="text-gray-500">Parece que não temos entregas ainda</h3>
         </div>

@@ -146,7 +146,8 @@
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
         :task-member-id="taskMemberId"
-        :events="events.data"
+        :message="{ isLoading: pendingMessages }"
+        :event="{ events: events.data, isLoading: eventLoading }"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :submissions="evaluatedSubmissions"
@@ -175,6 +176,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatResult } from '~/composables/useStrapiUtils';
 import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
 
 type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
@@ -224,6 +226,7 @@ const strapi = useStrapi();
 const user = useStrapiUser();
 const learningplanStore = useLearningPlanStore();
 const strapiUtils = useStrapiUtils();
+const client = useStrapiClient();
 const { setMessage } = useMessageStore();
 const statusColor = computed(() => {
   const mapedColors = {
@@ -272,19 +275,21 @@ const {
       meta: { total: 0 },
       data: [] as TaskSubmissionSimple[],
     }),
+    lazy: true,
   },
 );
 
-const { data: events, execute: executeEvents } = await useAsyncData(
-  'task-events',
-  () => getEvents(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskEvent[],
-    }),
-  },
-);
+const {
+  data: events,
+  execute: executeEvents,
+  pending: eventLoading,
+} = await useAsyncData('task-events', () => getEvents(props.taskMemberId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskEvent[],
+  }),
+  lazy: true,
+});
 
 const evaluatedSubmissions = computed(() =>
   submissions.value.data.flatMap((submission) => {
@@ -315,29 +320,20 @@ const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   }
   return 'in_review';
 };
-const getMessages = (memberID: number) =>
-  strapiUtils.find<TaskMemberMessage>('task-member-messages', {
-    filters: {
-      task_member: memberID,
-    },
-    populate: {
-      learning_plan_member: {
-        populate: ['user.avatar'],
-      },
-    },
-  });
-const { refresh } = await useAsyncData(
-  'task-submissions',
-  () => getMessages(props.taskMemberId),
-  {
-    immediate: false,
-  },
-);
+const {
+  data: messages,
+  pending: pendingMessages,
+  execute: executeMessages,
+} = await useAsyncMessage(props.taskMemberId, {
+  dedupe: 'cancel',
+  lazy: true,
+});
+
 const handleSubmitMessage = async (
   text: string,
   audio?: Blob | null,
   _duration?: number,
-  _attachedMessage?: Message,
+  attachedMessage?: Message,
   _attachedSubmission?: AttachedSubmission,
 ) => {
   if (!text && !audio) return;
@@ -351,13 +347,37 @@ const handleSubmitMessage = async (
   if (!learningMember) {
     return;
   }
-  await strapi.create('task-member-messages', {
-    learning_plan_member: learningMember.id,
-    task_member: props.taskMemberId,
-    message: text,
-    sent_at: new Date(),
+  const { data } = await client<{
+    meta: any;
+    data: { id: number; attributes: Omit<TaskMemberMessage, 'id'> };
+  }>(`/task-member-messages`, {
+    method: 'POST',
+    body: {
+      data: {
+        learning_plan_member: learningMember.id,
+        task_member: props.taskMemberId,
+        message: text,
+        sent_at: new Date(),
+        ...(attachedMessage && { response_to_message: attachedMessage.id }),
+      },
+    },
+    params: {
+      populate: {
+        learning_plan_member: {
+          populate: ['user.avatar'],
+        },
+        response_to_message: {
+          populate: {
+            learning_plan_member: {
+              populate: ['user.avatar'],
+            },
+          },
+        },
+      },
+    },
   });
-  refresh();
+  const message: TaskMemberMessage = formatResult(data);
+  messages.value.data = [...messages.value.data, message];
 };
 
 const changeDeadline = async (value?: string | null) => {
@@ -401,10 +421,16 @@ watch(model, (value) => {
     canSubmitAfterDeadline.value = props.canSubmitAfterDeadline;
     executeSubmissions();
     executeEvents();
+    executeMessages();
     return;
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
+});
+watch(activePage, (value) => {
+  if (value === '3') {
+    executeMessages();
+  }
 });
 </script>
 
