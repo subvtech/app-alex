@@ -72,7 +72,6 @@
       "successMessage": "Task {action} successfully!",
       "dndSortError": "It is not possible to change the task position when sorting by {type} is active",
       "dndFilterError": "It is not possible to change the task position when filtering is active",
-      "TASK_MOVE_INVALID": "It is not possible to move the task directly to this column",
       "TASK_DATA_INCOMPLETE": "You need to fill in the task info before setting it as published",
       "TASK_MOVE_HAS_DELIVERIES": "It is not possible to move the task to draft because it has deliveries"
     },

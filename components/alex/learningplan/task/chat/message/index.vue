@@ -25,11 +25,11 @@
     <div class="flex gap-3">
       <v-avatar
         :size="32"
-        :image="user.avatar || undefined"
+        :image="user?.avatar || undefined"
         class="alex-avatar-group-border alex-avatar-group-margin"
         color="gray-100"
       >
-        <template v-if="!user.avatar" #default>
+        <template v-if="!user?.avatar" #default>
           <p class="text-gray-300 text-body-2">
             {{ initials }}
           </p>

@@ -76,6 +76,23 @@
     },
     "members": {
       "allClass": "A turma {name} já foi adicionada na tarefa"
+    },
+    "events": {
+      "task_created": "Tarefa criada.",
+      "task_deadline": "{name} alterou o tempo final da tarefa.",
+      "task_start_date": "{name} alterou o tempo inicial da tarefa.",
+      "task_submission": "{name} alterou as informações da entrega.",
+      "task_archived": "A tarefa foi arquivada.",
+      "task_deadline_ended": "A tarefa atingiu a data final foi automaticamente fechada.",
+      "student_deadline": "{name} alterou o tempo final da tarefa de {name_two}.",
+      "student_status": "{name} alterou o status da tarefa.",
+      "submission_send": "{name} realizou uma entrega.",
+      "submission_denied": "Entrega recusada.",
+      "submission_evaluated": "Entrega avaliada.",
+      "message": "{name} enviou uma mensagem."
+    },
+    "chat": {
+      "you": "{name} (Você)"
     }
   },
   "goals": {

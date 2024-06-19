@@ -264,6 +264,7 @@ const dropDownItems = (task: TaskItem) => {
     case 'draft':
       if (isTaskMovable(task)) {
         items.push(getDropDownAction('publish', task.id));
+        items.push(getDropDownAction('close', task.id));
       }
       items.push(getDropDownAction('delete', task.id));
       break;
@@ -373,13 +374,16 @@ const setAcceptedGroups = (task: TaskItem) => {
     ? task.delivered.underReview + task.delivered.completed
     : 0;
 
+  const withDeliveries = computed(() => {
+    return deliveredTotal > 0
+      ? ['published', 'finished']
+      : ['draft', 'published', 'finished'];
+  });
+
   const statusMap: { [key: string]: string[] } = {
-    draft: ['published', 'draft'],
-    published:
-      deliveredTotal === 0
-        ? ['draft', 'finished', 'published']
-        : ['published', 'finished'],
-    finished: ['published', 'finished'],
+    draft: ['published', 'draft', 'finished'],
+    published: withDeliveries.value,
+    finished: withDeliveries.value,
   };
 
   return statusMap[task.status] || [];

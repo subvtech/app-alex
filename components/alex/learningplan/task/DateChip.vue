@@ -23,7 +23,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const deadline = computed(() => {
-  const date = props.date.replaceAll('-', '/');
+  const date =
+    typeof props.date === 'string'
+      ? props.date.replaceAll('-', '/')
+      : props.date;
   return format(new Date(date), 'dd MMM yyyy', {
     locale: i18.locale.value === 'pt' ? ptBR : enIN,
   });

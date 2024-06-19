@@ -172,11 +172,11 @@
 </template>
 
 <script setup lang="ts">
-import { isSameDay } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
 import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { orderEvents } from '~/utils';
 
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
@@ -310,29 +310,8 @@ const tabs = [
 ];
 
 // Events
-const taskEvents = computed(() => orderToDateEvents(props.events));
-const orderToDateEvents = (events: TaskEvent[]) => {
-  const eventsGroups: { date: Date; events: any[] }[] = [];
-  events.forEach((current) => {
-    const currentDate = new Date(current.publishedAt);
-    const currentElement = {
-      action: current.event,
-      time: current.publishedAt,
-    };
-    const group = eventsGroups.find((group) =>
-      isSameDay(currentDate, new Date(group.date)),
-    );
-    if (group) {
-      group.events.push(currentElement);
-      return;
-    }
-    eventsGroups.push({
-      date: currentDate,
-      events: [currentElement],
-    });
-  });
-  return eventsGroups;
-};
+const taskEvents = computed(() => orderEvents(props.events));
+
 const notifyFieldError = (field: string) => {
   setMessage(
     t('components.learningPlan.drawer.task.errors.save', {

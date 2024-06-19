@@ -20,7 +20,14 @@ export const useTaskStore = defineStore('task', () => {
       populate: ['verb'],
     },
     task_events: {
-      populate: ['task_member.task_member_students.student_member.user.avatar'],
+      populate: {
+        task_member: {
+          populate: ['task_member_students.student_member.user.avatar'],
+        },
+        learning_plan_member: {
+          populate: ['user.avatar'],
+        },
+      },
     },
   };
 

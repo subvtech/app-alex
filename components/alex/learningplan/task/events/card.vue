@@ -11,8 +11,14 @@
       <div v-for="(event, index) in events" :key="index" class="py-2 my-1">
         <div class="d-flex align-center ga-3">
           <p class="flex-fill">
-            <span class="font-weight-bold text-gray-800">{{ event.user }}</span
-            ><span class="text-gray-800">{{ ' ' + event.action }}</span>
+            <span
+              v-if="hasUserName(event.action)"
+              class="font-weight-bold text-gray-800"
+              >{{ event.user }}</span
+            ><span class="text-gray-800">{{
+              ' ' +
+              $t(`components.learningPlan.drawer.task.events.${event.action}`)
+            }}</span>
           </p>
           <span class="text-gray-700">{{ formatHour(event.time) }}</span>
         </div>
@@ -47,6 +53,14 @@ const formatDate = (date: string | Date) => {
   }
   return format(date, 'dd/MM/yyyy');
 };
+const taskWithoutUser = [
+  'task_created',
+  'task_archived',
+  'task_deadline_ended',
+  'submission_denied',
+  'submission_evaluated',
+];
+const hasUserName = (event: string) => !taskWithoutUser.includes(event);
 </script>
 
 <style></style>
