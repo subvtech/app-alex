@@ -61,18 +61,20 @@ const props = withDefaults(defineProps<ChatProps>(), {
 });
 defineEmits(['submission-click']);
 const { t } = useI18n();
+const taskMemberId = toRef(props, 'taskMemberId');
 const user = useStrapiUser();
 const attachedMessage = defineModel<Message>('attachedMessage');
 const {
   data: messages,
   status,
   error,
-} = await useAsyncMessage(props.taskMemberId, {
+} = await useAsyncMessage(taskMemberId, {
   default: () => ({
     meta: { total: 0 },
     data: [] as TaskMemberMessage[],
+    dedupe: 'cancel',
+    watch: [taskMemberId],
   }),
-  dedupe: 'cancel',
 });
 
 // Utils
@@ -138,6 +140,9 @@ const checkIsValidDuration = (duration?: string) => {
     return undefined;
   }
 };
+watch(taskMemberId, () => {
+  messages.value.data = [];
+});
 </script>
 
 <style scoped>

@@ -204,6 +204,7 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
 });
 const { t } = useI18n();
 const isSendingMessage = ref(false);
+const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
@@ -323,9 +324,10 @@ const {
   data: messages,
   pending: pendingMessages,
   execute: executeMessages,
-} = await useAsyncMessage(props.taskMemberId, {
-  dedupe: 'cancel',
+} = await useAsyncMessage(taskMemberId, {
   lazy: true,
+  watch: [taskMemberId],
+  dedupe: 'cancel',
 });
 
 const handleSubmitMessage = async (
@@ -436,6 +438,7 @@ watch(model, (value) => {
   if (value) {
     finishAt.value = props.finishAt;
     canSubmitAfterDeadline.value = props.canSubmitAfterDeadline;
+    activePage.value = '1';
     executeSubmissions();
     executeEvents();
     executeMessages();

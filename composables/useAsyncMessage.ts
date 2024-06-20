@@ -4,7 +4,7 @@ type KeysOf<T> = Array<
   T extends T ? (keyof T extends string ? keyof T : never) : never
 >;
 export const useAsyncMessage = (
-  taskMemberId: number,
+  taskMemberId: Ref<number>,
   options?: AsyncDataOptions<
     { meta: any; data: TaskMemberMessage[] },
     { meta: any; data: TaskMemberMessage[] },
@@ -40,8 +40,8 @@ export const useAsyncMessage = (
       sort: 'sent_at:asc',
     });
   return useAsyncData(
-    'task-member-messages',
-    () => getMessages(taskMemberId),
-    options,
+    `task-member-messages-${taskMemberId}`,
+    () => getMessages(taskMemberId.value),
+    { ...options },
   );
 };
