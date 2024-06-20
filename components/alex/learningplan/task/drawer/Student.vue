@@ -438,7 +438,6 @@ watch(model, (value) => {
   if (value) {
     finishAt.value = props.finishAt;
     canSubmitAfterDeadline.value = props.canSubmitAfterDeadline;
-    activePage.value = '1';
     executeSubmissions();
     executeEvents();
     executeMessages();
@@ -446,6 +445,8 @@ watch(model, (value) => {
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
+  activePage.value = '1';
+  messages.value.data = [];
 });
 watch(activePage, (value) => {
   if (value === '3') {

@@ -140,9 +140,6 @@ const checkIsValidDuration = (duration?: string) => {
     return undefined;
   }
 };
-watch(taskMemberId, () => {
-  messages.value.data = [];
-});
 </script>
 
 <style scoped>
