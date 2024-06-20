@@ -5,6 +5,7 @@
     "classes": "Classes",
     "members": "People"
   },
+  "add": { "label": "Add" },
   "menu": {
     "profile": "View profile",
     "invite": "Resend invitation",

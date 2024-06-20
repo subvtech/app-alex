@@ -84,7 +84,9 @@
       "cantChangeType": "You can't chage task type after add students"
     },
     "members": {
-      "allClass": "The entire class {name} was added in task"
+      "allClass": "The entire class {name} was added in task",
+      "allSelectedMembers": "All selected members already added in task",
+      "addMembers": "The selected members was added in task"
     },
     "events": {
       "task_created": "Task was created",
