@@ -1,5 +1,8 @@
 <template>
-  <div v-if="isProfessor" class="bg-white rounded wrapper">
+  <div
+    v-if="isProfessor || learningPlanStore.loading"
+    class="bg-white rounded wrapper"
+  >
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
@@ -73,7 +76,7 @@
   </div>
   <!-- Kanban -->
   <alex-learningplan-task-kanban-loader
-    v-else-if="!isProfessor && learningPlanStore.loading"
+    v-else-if="!isProfessor || learningPlanStore.loading"
   />
   <alex-learningplan-task-kanban
     v-else
