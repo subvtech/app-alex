@@ -82,7 +82,11 @@
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date v-model="endDate" :edit="editable" />
+          <alex-learningplan-task-date
+            v-model="endDate"
+            :edit="editable"
+            :can-set-value="checkEndDate(startDate, endDate)"
+          />
         </v-col>
       </v-row>
 
@@ -164,6 +168,7 @@
           <alex-learningplan-task-members
             :learningplan-id="learningplanId"
             :task-id="taskId"
+            :type="type"
             :start-at="startDate"
             :finish-at="endDate"
             :submit-after-deadline="sendAfterDeadline"
@@ -175,12 +180,16 @@
 </template>
 
 <script setup lang="ts">
+import { isAfter, isBefore } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
-import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import {
+  TaskSimple,
+  TaskStatus,
+  TaskType,
+} from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { orderEvents } from '~/utils';
-
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 
@@ -202,6 +211,7 @@ interface TaskTeacherDrawerProps {
   kanbanButton?: boolean;
   startDate?: string | null;
   endDate?: string | null;
+  membersLength: number;
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
@@ -218,8 +228,9 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   goals: () => [],
   tags: () => [],
   events: () => [],
-  type: undefined,
+  type: null,
   submissionDescription: '',
+  membersLength: 0,
 });
 
 const description = ref(props.description);
@@ -228,9 +239,17 @@ const hasSubmission = ref(props.hasSubmission);
 const sendAfterDeadline = ref(props.sendAfterDeadline);
 const goals = ref(props.goals);
 const tags = ref(props.tags);
+const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
+const membersLength = toRef(props, 'membersLength');
 const openResources = ref<boolean>(false);
-
+const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
+  if (!startDate || !endDate) return true;
+  if (isBefore(Date.parse(endDate), Date.parse(startDate))) {
+    return false;
+  }
+  return true;
+};
 // TODO: Think about a better way to handle this
 
 watch(model, (value) => {
@@ -242,11 +261,14 @@ watch(model, (value) => {
     goals.value = props.goals;
     tags.value = props.tags;
     status.value = props.status;
-    type.value = props.type || '';
+    type.value = props.type || null;
     startDate.value = props.startDate;
     endDate.value = props.endDate;
     restrictions.value = props.restrictions;
     isFirstTimeOpened.value = true;
+    setTimeout(() => {
+      isFirstTimeOpened.value = false;
+    }, 1100);
   }
 });
 
@@ -289,17 +311,33 @@ const restrictionsValue = computed({
 }) as WritableComputedRef<RestrictionValue[]>;
 
 // Tipos
-const type = ref<string>(props.type || '');
+const type = ref<TaskType | null>(props.type);
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
     onClick: () => {
+      if (membersLength.value) {
+        setMessage(
+          t('components.learningPlan.drawer.task.errors.cantChangeType'),
+          'warning',
+          true,
+        );
+        return;
+      }
       type.value = 'individual';
     },
   },
   {
     text: t('components.learningPlan.drawer.task.type.collective'),
     onClick: () => {
+      if (membersLength.value) {
+        setMessage(
+          t('components.learningPlan.drawer.task.errors.cantChangeType'),
+          'warning',
+          true,
+        );
+        return;
+      }
       type.value = 'group';
     },
   },
@@ -332,10 +370,42 @@ const notifyError = () => {
   );
 };
 const strapi = useStrapi();
+const updateTaskValues = async (
+  taskId: number,
+  values: Partial<
+    Record<
+      keyof TaskSimple,
+      string | number | boolean | null | undefined | Object
+    >
+  >,
+) => {
+  try {
+    if (isFirstTimeOpened.value) {
+      return;
+    }
+    const valuesEmit = {
+      type: type.value,
+      status: status.value,
+      start_at: startDate.value,
+      finish_at: endDate.value,
+      can_submit_after_deadline: sendAfterDeadline.value,
+      submission_required: hasSubmission.value,
+      learning_goals: goals.value,
+      allowed_editor_plugins: restrictions.value,
+    };
+    await strapi.update('tasks', taskId, values);
+    emit('change-values', valuesEmit as ChangeValues);
+  } catch (error) {
+    notifyError();
+  }
+};
 useOnStopTyping(
   description,
   async () => {
     try {
+      if (isFirstTimeOpened.value) {
+        return;
+      }
       await strapi.update('tasks', props.taskId, {
         description: description.value,
       });
@@ -352,6 +422,9 @@ useOnStopTyping(
   submissionDescription,
   async () => {
     try {
+      if (isFirstTimeOpened.value) {
+        return;
+      }
       await strapi.update('tasks', props.taskId, {
         submission_description: submissionDescription.value,
       });
@@ -364,59 +437,75 @@ useOnStopTyping(
   false,
   false,
 );
-watch(
-  () => [
-    hasSubmission.value,
-    sendAfterDeadline.value,
-    startDate.value,
-    endDate.value,
-    type.value,
-    status.value,
-    goals.value,
-    restrictions.value,
-  ],
-  async () => {
-    if (isFirstTimeOpened.value) {
-      isFirstTimeOpened.value = false;
-      return;
-    }
-    const values = {
-      type: type.value,
-      status: status.value,
-      start_at: startDate.value,
-      finish_at: endDate.value,
-      can_submit_after_deadline: sendAfterDeadline.value,
-      submission_required: hasSubmission.value,
-      learning_goals: goals.value,
-      allowed_editor_plugins: restrictions.value,
-    };
-    const goalsId = goals.value.map((goal) => goal.id);
-    try {
-      await strapi.update('tasks', props.taskId, {
-        ...(type.value && { type: type.value }),
-        ...(goalsId.length && {
-          learning_goals: {
-            set: goalsId,
-          },
-        }),
-        ...(restrictions.value && {
-          allowed_editor_plugins: restrictions.value,
-        }),
-        status: status.value,
-        start_at: startDate.value,
-        finish_at: endDate.value,
-        can_submit_after_deadline: sendAfterDeadline.value,
-        submission_required: hasSubmission.value,
-        learning_goals: {
-          set: goalsId,
-        },
-      });
-      emit('change-values', values as ChangeValues);
-    } catch (error) {
-      notifyError();
-    }
-  },
-);
+watch(endDate, async (value) => {
+  if (!value) return;
+  if (
+    startDate.value &&
+    isBefore(Date.parse(value), Date.parse(startDate.value))
+  ) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.endDateBeforeStartDate'),
+      'warning',
+      true,
+    );
+    return;
+  }
+  await updateTaskValues(taskId.value, {
+    finish_at: value,
+  });
+});
+watch(startDate, async (value) => {
+  if (!value) return;
+  if (endDate.value && isAfter(Date.parse(value), Date.parse(endDate.value))) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.startDateAfterEndDate'),
+      'warning',
+      true,
+    );
+    return;
+  }
+  await updateTaskValues(taskId.value, {
+    start_at: value,
+  });
+});
+watch(restrictions, async (value) => {
+  if (!value) return;
+  await updateTaskValues(taskId.value, {
+    allowed_editor_plugins: value,
+  });
+});
+watch(type, async (value) => {
+  if (!value) return;
+  await updateTaskValues(taskId.value, {
+    type: value,
+  });
+});
+watch(status, async (value) => {
+  if (!value) return;
+  await updateTaskValues(taskId.value, {
+    status: value,
+  });
+});
+watch(goals, async (value) => {
+  if (!value) return;
+  const goalsId = goals.value.map((goal) => goal.id);
+  if (!goalsId.length) return;
+  await updateTaskValues(taskId.value, {
+    learning_goals: {
+      set: goalsId,
+    },
+  });
+});
+watch(sendAfterDeadline, async (value) => {
+  await updateTaskValues(taskId.value, {
+    can_submit_after_deadline: value,
+  });
+});
+watch(hasSubmission, async (value) => {
+  await updateTaskValues(taskId.value, {
+    submission_required: value,
+  });
+});
 watch(tags, (value) => emit('change-tags', value));
 // Close drawer
 function handleCloseModal() {
