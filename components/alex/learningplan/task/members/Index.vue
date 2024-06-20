@@ -102,6 +102,7 @@
 interface MembersProps {
   learningplanId: number;
   taskId: number;
+  type?: TaskType | null;
   startAt?: string | null;
   finishAt?: string | null;
   sendAfterDeadline?: boolean;
@@ -110,6 +111,7 @@ const props = withDefaults(defineProps<MembersProps>(), {
   sendAfterDeadline: false,
   startAt: null,
   finishAt: null,
+  type: null,
 });
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
@@ -189,6 +191,14 @@ const checkAlreadyHasMember = (member: LearningPlanMemberSimple) => {
 };
 const addMember = async (member: LearningPlanMemberSimple) => {
   if (checkAlreadyHasMember(member)) {
+    return;
+  }
+  if (!props.type) {
+    setMessage(
+      t('components.learningPlan.drawer.task.pleaseFillType'),
+      'warning',
+      true,
+    );
     return;
   }
   if (!props.finishAt || !props.startAt) {

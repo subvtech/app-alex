@@ -39,6 +39,7 @@
     },
     "memberAlreadyInTask": "{member} already in task",
     "pleaseFillDates": "Please fill start and finish dates before add",
+    "pleaseFillType": "Please fill type before add",
     "addMember": "{member} was added in task",
     "removeMember": "{member} was removed of task",
     "freeEditor": "Free editor",
@@ -77,7 +78,10 @@
       "addMember": "Error when adding member",
       "removeMember": "Error when removing member",
       "addClass": "Error while trying to add class students from class {name}",
-      "sendMessage": "Erro while trying send a message"
+      "sendMessage": "Error while trying send a message",
+      "endDateBeforeStartDate": "End date must be after start date",
+      "startDateAfterEndDate": "Start date must be before end date",
+      "cantChangeType": "You can't chage task type after add students"
     },
     "members": {
       "allClass": "The entire class {name} was added in task"
