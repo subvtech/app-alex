@@ -1,25 +1,29 @@
 <template>
-  <div class="w-100 height-15 mb-6 d-flex ga-4">
-    <div
-      class="trail-img width-15 height-15 rounded-lg bg-cover"
-      :style="`background-image: url('${trailCover}')`"
-    />
-    <div>
-      <p class="text-gray-500 text-h5">Trilha Selecionada</p>
-      <p class="text-gray-800 text-h3">{{ selectedTrail.title }}</p>
+  <div class="bg-white">
+    <div class="w-100 height-27 mb-6 d-flex ga-4 pa-6 header-border">
+      <div
+        class="trail-img width-15 height-15 rounded-lg bg-cover"
+        :style="`background-image: url('${trailCover}')`"
+      />
+      <div>
+        <p class="text-gray-500 text-h5">Trilha Selecionada</p>
+        <p class="text-gray-800 text-h3">{{ selectedTrail.title }}</p>
+      </div>
+    </div>
+    <div class="px-6">
+      <alex-custom-skeleton
+        v-if="isEditorLoading"
+        class="w-100 height-150 bg-blue"
+        color="gray-200"
+      />
+      <app-editor
+        ref="editor"
+        :select-blocks-mode="blocks"
+        :class="isEditorLoading ? 'opacity-0' : ''"
+        @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
+      />
     </div>
   </div>
-  <alex-custom-skeleton
-    v-if="isEditorLoading"
-    class="w-100 height-150 bg-blue"
-    color="gray-200"
-  />
-  <app-editor
-    ref="editor"
-    :select-blocks-mode="blocks"
-    :class="isEditorLoading ? 'opacity-0' : ''"
-    @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
-  />
 </template>
 
 <script setup lang="ts">
@@ -99,5 +103,8 @@ defineExpose({
 <style scoped>
 .trail-img {
   background-position: center;
+}
+.header-border {
+  border-bottom: 1px solid rgb(var(--v-theme-gray-100));
 }
 </style>

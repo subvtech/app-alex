@@ -2,6 +2,7 @@
   <alex-custom-dialog
     v-model="open"
     class="alex-trails-modal"
+    body-classes="pa-0"
     :title="$t('components.learningPlan.drawer.task.learningResources.label')"
     :no-footer="paginationLength <= 1 && !selectedTrail"
     :max-width="selectedTrail ? 1080 : 769"
@@ -44,44 +45,42 @@
     </template>
 
     <!-- Content -->
-    <v-scale-transition hide-on-leave>
-      <div v-if="!selectedTrail">
-        <div class="d-flex align-center mb-4">
-          <p class="flex-1-1 text-h5 text-gray-800 lines-1 ellipsis">
-            {{
-              $t('components.learningPlan.drawer.task.learningResources.select')
-            }}
-          </p>
+    <div v-if="!selectedTrail" class="pa-6 bg-white rounded-b-lg">
+      <div class="d-flex align-center mb-4">
+        <p class="flex-1-1 text-h5 text-gray-800 lines-1 ellipsis">
+          {{
+            $t('components.learningPlan.drawer.task.learningResources.select')
+          }}
+        </p>
 
-          <alex-custom-button variant="secondary" append-icon="mdi-plus">{{
-            $t('components.learningPlan.drawer.task.learningResources.new')
-          }}</alex-custom-button>
-        </div>
-
-        <div
-          v-if="trails.length || learningPlanStore.loading"
-          class="cards d-flex align-center flex-wrap ga-4"
-        >
-          <template v-if="trails.length && !selectedTrail">
-            <alex-learningplan-task-resources-card
-              v-for="trailItem in trailsView"
-              :key="trailItem.id"
-              :title="trailItem.title"
-              :cover="trailItem.cover_image?.url"
-              @click="selectedTrail = trailItem"
-            />
-          </template>
-          <alex-learningplan-task-resources-loader v-else />
-        </div>
-        <alex-learningplan-task-resources-empty v-else />
+        <alex-custom-button variant="secondary" append-icon="mdi-plus">{{
+          $t('components.learningPlan.drawer.task.learningResources.new')
+        }}</alex-custom-button>
       </div>
-      <alex-learningplan-task-resources-editor
-        v-else
-        ref="editor"
-        :selected-trail="selectedTrail"
-        :blocks="blocks"
-      />
-    </v-scale-transition>
+
+      <div
+        v-if="trails.length || learningPlanStore.loading"
+        class="cards d-flex align-center flex-wrap ga-4"
+      >
+        <template v-if="trails.length && !selectedTrail">
+          <alex-learningplan-task-resources-card
+            v-for="trailItem in trailsView"
+            :key="trailItem.id"
+            :title="trailItem.title"
+            :cover="trailItem.cover_image?.url"
+            @click="selectedTrail = trailItem"
+          />
+        </template>
+        <alex-learningplan-task-resources-loader v-else />
+      </div>
+      <alex-learningplan-task-resources-empty v-else />
+    </div>
+    <alex-learningplan-task-resources-editor
+      v-else
+      ref="editor"
+      :selected-trail="selectedTrail"
+      :blocks="blocks"
+    />
     <template v-if="paginationLength > 1 && !selectedTrail" #footer
       ><div class="border-top-gray-100 rounded-b-lg bg-white">
         <alex-custom-pagination
