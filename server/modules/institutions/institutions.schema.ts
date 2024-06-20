@@ -20,17 +20,6 @@ export const institutions = pgTable('institutions', {
   coverImageId: integer('cover_image_id').references(() => medias.id),
 });
 
-export const institutionRelations = relations(
-  institutions,
-  ({ one, many }) => ({
-    users: many(userToInstitution),
-    coverImageId: one(medias, {
-      fields: [institutions.coverImageId],
-      references: [medias.id],
-    }),
-  }),
-);
-
 export const userToInstitution = pgTable(
   'user_to_institution',
   {
@@ -46,16 +35,31 @@ export const userToInstitution = pgTable(
   }),
 );
 
+export const institutionRelations = relations(
+  institutions,
+  ({ one, many }) => ({
+    userToInstitution: many(userToInstitution, {
+      relationName: 'user',
+    }),
+    coverImageId: one(medias, {
+      fields: [institutions.coverImageId],
+      references: [medias.id],
+    }),
+  }),
+);
+
 export const userToInstitutionRelations = relations(
   userToInstitution,
   ({ one }) => ({
     user: one(users, {
       fields: [userToInstitution.userId],
       references: [users.id],
+      relationName: 'user',
     }),
     institution: one(institutions, {
       fields: [userToInstitution.institutionId],
       references: [institutions.id],
+      relationName: 'institution',
     }),
   }),
 );

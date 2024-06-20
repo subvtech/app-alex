@@ -28,7 +28,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   learningPlanMembers: many(learningPlanMembers),
   learningGoalVerb: one(learningGoalVerbs),
   tags: many(tagsToUsers),
-  institutions: many(userToInstitution),
+  institutions: many(userToInstitution, { relationName: 'institution' }),
   avatarId: one(medias, {
     fields: [users.avatarId],
     references: [medias.id],
