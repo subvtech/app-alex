@@ -30,6 +30,7 @@ export const useAsyncMessage = (
           },
         },
         task_submission: true,
+        audio: true,
       },
       pagination: {
         limit: 1000,

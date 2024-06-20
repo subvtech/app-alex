@@ -21,6 +21,14 @@
         :align="
           user?.id !== message.learning_plan_member.user.id ? 'left' : 'right'
         "
+        :audio="
+          message.audio
+            ? {
+                src: message.audio.url,
+                duration: checkIsValidDuration(message.audio.name),
+              }
+            : undefined
+        "
         :response="getResponse(message)"
         @reply="(value) => handleAttachMessage(value)"
         @message-click="(value) => handleReplyMessageClick(value?.id)"
@@ -113,6 +121,14 @@ const handleAttachMessage = (content: Message) => {
 const handleReplyMessageClick = (id?: number) => {
   if (!id) return;
   scrollAndHighlightElement(`#chat-message-${id}`, 'highlight-message');
+};
+const checkIsValidDuration = (duration?: string) => {
+  try {
+    if (!duration) return undefined;
+    return Number.parseFloat(duration);
+  } catch (error) {
+    return undefined;
+  }
 };
 </script>
 

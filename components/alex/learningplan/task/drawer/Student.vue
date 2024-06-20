@@ -175,7 +175,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatResult } from '~/composables/useStrapiUtils';
 import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
 
 type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
@@ -330,7 +329,7 @@ const {
 const handleSubmitMessage = async (
   text: string,
   audio?: Blob | null,
-  _duration?: number,
+  duration?: number,
   attachedMessage?: Message,
   attachedSubmission?: AttachedSubmission,
 ) => {
@@ -345,21 +344,28 @@ const handleSubmitMessage = async (
     if (!learningMember) {
       return;
     }
-    const { data } = await client<{
-      meta: any;
-      data: { id: number; attributes: Omit<TaskMemberMessage, 'id'> };
-    }>(`/task-member-messages`, {
+    const formData = new FormData();
+    const newMessage = {
+      learning_plan_member: learningMember.id,
+      task_member: props.taskMemberId,
+      message: text,
+      sent_at: new Date().toISOString(),
+      ...(attachedMessage && { response_to_message: attachedMessage.id }),
+      ...(attachedSubmission && { task_submission: attachedSubmission.id }),
+    };
+    for (const key in newMessage) {
+      if (Object.prototype.hasOwnProperty.call(newMessage, key)) {
+        const value = newMessage[key];
+        formData.append(key, value);
+      }
+    }
+    if (audio) {
+      formData.append('files', audio);
+      formData.append('audio_duration', String(duration));
+    }
+    const message = await client<TaskMemberMessage>(`/task-member-messages`, {
       method: 'POST',
-      body: {
-        data: {
-          learning_plan_member: learningMember.id,
-          task_member: props.taskMemberId,
-          message: text,
-          sent_at: new Date(),
-          ...(attachedMessage && { response_to_message: attachedMessage.id }),
-          ...(attachedSubmission && { task_submission: attachedSubmission.id }),
-        },
-      },
+      body: formData,
       params: {
         populate: {
           learning_plan_member: {
@@ -376,7 +382,6 @@ const handleSubmitMessage = async (
         },
       },
     });
-    const message: TaskMemberMessage = formatResult(data);
     messages.value.data = [...messages.value.data, message];
   } catch (error) {
     setMessage(
