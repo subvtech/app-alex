@@ -43,6 +43,7 @@ import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
 import Fileset from '../editor-js/plugins/fileset/filesetBlock';
 import CustomImage from '../editor-js/plugins/image/ImageBlock';
+import Wrapper from '../editor-js/plugins/wrapper/tune';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
@@ -50,7 +51,7 @@ import AIText from '~/editor-js/plugins/AiText';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const isEditing = ref(true);
-const emit = defineEmits(['ready', 'change']);
+const emit = defineEmits(['ready', 'change', 'update:selectedBlocks']);
 const instance = ref();
 
 interface editorData {
@@ -71,6 +72,7 @@ const viewer = ref<null | {
 const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
 const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
+const selectedBlocks = ref<string[]>([]);
 const fileDrop = ref(false);
 
 const deletePendingMediaOnSave = async (mediaArray: Array<number>) => {
@@ -139,7 +141,10 @@ onMounted(() => {
       header: {
         class: header,
         shortcut: 'CMD+SHIFT+H',
-        tunes: ['alignmentBlockTune'],
+        tunes: [
+          'alignmentBlockTune',
+          ...(props.selectBlocksMode ? ['wrapper'] : []),
+        ],
         config: {
           allowAnchor: true,
           anchorLength: 100,
@@ -251,7 +256,10 @@ onMounted(() => {
       paragraph: {
         class: Paragraph,
         inlineToolbar: true,
-        tunes: ['alignmentBlockTune'],
+        tunes: [
+          'alignmentBlockTune',
+          ...(props.selectBlocksMode ? ['wrapper'] : []),
+        ],
       },
       warning: {
         class: Warning,
@@ -392,7 +400,19 @@ onMounted(() => {
           },
         },
       },
+      wrapper: {
+        class: Wrapper,
+        config: {
+          toggleSelect: (value, block) => {
+            selectedBlocks.value = value
+              ? [...selectedBlocks.value, block.id]
+              : selectedBlocks.value.filter((id) => id !== block.id);
+            emit('update:selectedBlocks', selectedBlocks.value);
+          },
+        },
+      },
     },
+    tunes: props.selectBlocksMode ? ['wrapper'] : [],
     i18n,
     minHeight: 400,
     data: props.data,
@@ -425,6 +445,10 @@ const props = defineProps({
     default: 'editor',
   },
   readOnly: {
+    type: Boolean,
+    default: false,
+  },
+  selectBlocksMode: {
     type: Boolean,
     default: false,
   },
@@ -490,12 +514,18 @@ const clearEditor = () => {
 const isReady = async () => {
   return await instance.value.isReady;
 };
+
+const getSelectedBlocks = () => {
+  return selectedBlocks.value;
+};
+
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
   clearEditor,
   isReady,
+  getSelectedBlocks,
 });
 </script>
 
