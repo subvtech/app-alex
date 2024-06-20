@@ -31,7 +31,8 @@
       "description": {
         "label": "Descrição da entrega",
         "placeHolder": "Digite a descrição"
-      }
+      },
+      "empty": "Nenhuma entrega realizada"
     },
     "memberAlreadyInTask": "{member} já está na tarefa",
     "pleaseFillDates": "Por favor coloque uma data de inicio e término antes de adicionar",
@@ -72,7 +73,8 @@
       "genericSave": "Não foi possível salvar os dados",
       "addMember": "Erro ao adicionar o membro",
       "removeMember": "Erro ao remover o membro",
-      "addClass": "Erro ao adicionar os integrantes da turma {name}"
+      "addClass": "Erro ao adicionar os integrantes da turma {name}",
+      "sendMessage": "Erro ao enviar a mensagem"
     },
     "members": {
       "allClass": "A turma {name} já foi adicionada na tarefa"

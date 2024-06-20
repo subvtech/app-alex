@@ -22,6 +22,7 @@
           v-model:attached-message="attachedMessage"
           class="w-100 grow task-chat"
           :task-member-id="taskMemberId"
+          :is-sending-message="isSendingMessage"
           :loading="message.isLoading"
           @submission-click="handleSubmission"
         />
@@ -45,11 +46,13 @@ interface TaskTabsProps {
     events: TaskEvent[];
     isLoading?: boolean;
   };
+  isSendingMessage?: boolean;
 }
 const props = withDefaults(defineProps<TaskTabsProps>(), {
   submission: false,
   selectorParent: undefined,
   message: () => ({ isLoading: false }),
+  isSendingMessage: false,
 });
 const activePage = defineModel({ required: true, default: '1' });
 const attachedMessage = defineModel<Message>('attachedMessage');
@@ -91,17 +94,26 @@ const handleRedirectToChat = (submission: AttachedSubmission) => {
   attachedSubmission.value = submission;
   activePage.value = '3';
 };
-watch(activePage, () => {
+watch(activePage, (value) => {
+  scrollToEnd(value, props.selectorParent);
+});
+watch(
+  () => props.isSendingMessage,
+  () => {
+    scrollToEnd(activePage.value, props.selectorParent, 100);
+  },
+);
+const scrollToEnd = (page: string, selectorParent?: string, ms = 500) => {
   setTimeout(() => {
-    if (!props.selectorParent || activePage.value !== '3') return;
-    const parent = document.querySelector(props.selectorParent);
-    const chat = document.querySelector(`${props.selectorParent} .task-chat`);
+    if (!selectorParent || page !== '3') return;
+    const parent = document.querySelector(selectorParent);
+    const chat = document.querySelector(`${selectorParent} .task-chat`);
     if (!chat || !parent) {
       return;
     }
     parent.scrollTo({ behavior: 'smooth', top: chat.clientHeight });
-  }, 500);
-});
+  }, ms);
+};
 </script>
 
 <style scoped lang="scss">

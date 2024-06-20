@@ -21,11 +21,20 @@
         :align="
           user?.id !== message.learning_plan_member.user.id ? 'left' : 'right'
         "
+        :audio="
+          message.audio
+            ? {
+                src: message.audio.url,
+                duration: checkIsValidDuration(message.audio.name),
+              }
+            : undefined
+        "
         :response="getResponse(message)"
         @reply="(value) => handleAttachMessage(value)"
         @message-click="(value) => handleReplyMessageClick(value?.id)"
         @submission-click="(value) => $emit('submission-click', value)"
       />
+      <alex-learningplan-task-chat-message-loader v-if="isSendingMessage" />
     </template>
     <div
       v-if="(status === 'pending' || loading) && !error"
@@ -45,24 +54,27 @@
 type ChatProps = {
   taskMemberId: number;
   loading?: boolean;
+  isSendingMessage: boolean;
 };
 const props = withDefaults(defineProps<ChatProps>(), {
   loading: false,
 });
 defineEmits(['submission-click']);
 const { t } = useI18n();
+const taskMemberId = toRef(props, 'taskMemberId');
 const user = useStrapiUser();
 const attachedMessage = defineModel<Message>('attachedMessage');
 const {
   data: messages,
   status,
   error,
-} = await useAsyncMessage(props.taskMemberId, {
+} = await useAsyncMessage(taskMemberId, {
   default: () => ({
     meta: { total: 0 },
     data: [] as TaskMemberMessage[],
+    dedupe: 'cancel',
+    watch: [taskMemberId],
   }),
-  dedupe: 'cancel',
 });
 
 // Utils
@@ -92,6 +104,12 @@ const getResponse = (
         name: response.learning_plan_member.user.fullname,
       },
       sentAt: response.sent_at,
+      audio: response.audio
+        ? {
+            src: response.audio.url,
+            duration: checkIsValidDuration(response.audio.name),
+          }
+        : undefined,
     };
   }
   if (submission) {
@@ -113,6 +131,14 @@ const handleAttachMessage = (content: Message) => {
 const handleReplyMessageClick = (id?: number) => {
   if (!id) return;
   scrollAndHighlightElement(`#chat-message-${id}`, 'highlight-message');
+};
+const checkIsValidDuration = (duration?: string) => {
+  try {
+    if (!duration) return undefined;
+    return Number.parseFloat(duration);
+  } catch (error) {
+    return undefined;
+  }
 };
 </script>
 
