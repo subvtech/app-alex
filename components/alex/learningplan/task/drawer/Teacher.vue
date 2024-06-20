@@ -144,7 +144,10 @@
       />
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
-        <alex-learningplan-task-resources v-model="openResources" />
+        <alex-learningplan-task-resources
+          v-model="openResources"
+          :task-id="taskId"
+        />
       </div>
 
       <!-- Eventos e atribuições -->
