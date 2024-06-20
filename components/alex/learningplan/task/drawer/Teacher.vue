@@ -147,6 +147,8 @@
         <alex-learningplan-task-resources
           v-model="openResources"
           :task-id="taskId"
+          :trail-id="trail?.id"
+          :blocks="blocks"
         />
       </div>
 
@@ -187,8 +189,10 @@ const isFirstTimeOpened = ref(true);
 interface TaskTeacherDrawerProps {
   learningplanId: number;
   taskId?: number;
+  trail?: TrailSimple;
   title?: string;
   status?: TaskStatus;
+  blocks?: BlockSimple[];
   tags?: TagSimple[];
   type?: TaskType | null;
   goals?: LearningPlanGoalSimple[];
@@ -207,6 +211,8 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
   title: '',
   status: 'draft',
+  blocks: undefined,
+  trail: undefined,
   editable: true,
   hasSubmission: false,
   sendAfterDeadline: false,

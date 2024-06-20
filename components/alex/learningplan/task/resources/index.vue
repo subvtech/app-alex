@@ -15,7 +15,20 @@
         {{ $t('components.learningPlan.drawer.task.learningResources.label') }}
       </p>
 
+      <alex-learningplan-task-resources-card
+        v-if="trail && blocks"
+        :title="trail?.title"
+        :cover="trail?.cover_image?.url"
+        :delete-button="true"
+        @open-trail="
+          () => {
+            selectedTrail = trail;
+            open = true;
+          }
+        "
+      />
       <alex-custom-button
+        v-else
         v-bind="props"
         size="large"
         prepend-icon="alex:trail"
@@ -51,16 +64,11 @@
         >
           <template v-if="trails.length && !selectedTrail">
             <alex-learningplan-task-resources-card
-              v-for="trail in trailsView"
-              :key="trail.id"
-              :title="trail.title"
-              :cover="trail.cover_image?.url"
-              @click="
-                () => {
-                  selectedTrail = trail;
-                  console.log(selectedTrail);
-                }
-              "
+              v-for="trailItem in trailsView"
+              :key="trailItem.id"
+              :title="trailItem.title"
+              :cover="trailItem.cover_image?.url"
+              @click="selectedTrail = trailItem"
             />
           </template>
           <alex-learningplan-task-resources-loader v-else />
@@ -71,6 +79,7 @@
         v-else
         ref="editor"
         :selected-trail="selectedTrail"
+        :blocks="blocks"
       />
     </v-scale-transition>
     <template v-if="paginationLength > 1 && !selectedTrail" #footer
@@ -92,8 +101,16 @@ const taskStore = useTaskStore();
 const paginationBlock: number = 12;
 const open = defineModel<boolean>({ required: true });
 
-const props = withDefaults(defineProps<{ taskId: number }>(), {
+interface propsType {
+  taskId: number;
+  trailId?: number;
+  blocks?: BlockSimple[];
+}
+
+const props = withDefaults(defineProps<propsType>(), {
   taskId: -1,
+  trailId: undefined,
+  blocks: undefined,
 });
 
 const editor = ref();
@@ -101,6 +118,10 @@ const activePage = ref<number>(1);
 const structures = ref<LearningPlanStructureSimple[]>([]);
 
 structures.value = learningPlanStore.learningPlan?.learning_structures || [];
+
+const trail = computed(() => {
+  return trails.value.find((trail) => trail.id === props.trailId);
+});
 
 const trails = computed(() => {
   const trailsList: TrailSimple[] = [];

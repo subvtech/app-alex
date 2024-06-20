@@ -1,8 +1,18 @@
 <template>
   <div
     class="card w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover d-flex align-end"
+    :class="{ cardHover: !deleteButton }"
     :style="`background-image: url('${cover}')`"
+    @click="emit('openTrail')"
   >
+    <alex-custom-button
+      v-if="deleteButton"
+      class="delete-btn rounded-lg"
+      variant="secondary"
+      size="small"
+      icon="mdi-trash-can-outline"
+      @click.stop="emit('delete')"
+    />
     <div class="text-shadow height-15 w-100">
       <p class="ellipsis lines-2 text-body-6 text-white mx-2 my-4">
         {{ title }}
@@ -15,7 +25,10 @@
 interface CardProps {
   title: string;
   cover?: string;
+  deleteButton?: boolean;
 }
+
+const emit = defineEmits(['delete', 'openTrail']);
 
 withDefaults(defineProps<CardProps>(), {
   cover: '/images/cover_image_course.svg',
@@ -40,7 +53,13 @@ withDefaults(defineProps<CardProps>(), {
   );
 }
 
-.card:hover {
+.cardHover:hover {
   transform: scale(1.05);
+}
+
+.delete-btn {
+  position: absolute !important;
+  top: 8px;
+  right: 8px;
 }
 </style>

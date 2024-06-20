@@ -62,6 +62,14 @@ interface editorData {
   }>;
   version: string;
 }
+
+interface propsType {
+  data?: editorData;
+  keyId?: string;
+  readOnly?: boolean;
+  selectBlocksMode?: number[];
+}
+
 const app = useNuxtApp();
 const viewerInstance = ref(null);
 const viewer = ref<null | {
@@ -409,6 +417,7 @@ onMounted(() => {
               : selectedBlocks.value.filter((id) => id !== block.id);
             emit('update:selectedBlocks', selectedBlocks.value);
           },
+          isSelected: (block) => props.selectBlocksMode?.includes(block.id),
         },
       },
     },
@@ -435,23 +444,11 @@ onMounted(() => {
   });
 });
 
-const props = defineProps({
-  data: {
-    type: Object as PropType<editorData>,
-    default: () => ({ blocks: [] }),
-  },
-  keyId: {
-    type: String,
-    default: 'editor',
-  },
-  readOnly: {
-    type: Boolean,
-    default: false,
-  },
-  selectBlocksMode: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<propsType>(), {
+  keyId: 'editor',
+  readOnly: false,
+  data: undefined,
+  selectBlocksMode: undefined,
 });
 
 watch(isEditing, () => {

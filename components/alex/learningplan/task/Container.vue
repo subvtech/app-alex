@@ -98,6 +98,8 @@
     :task-id="taskDetails?.id"
     :title="taskDetails?.title"
     :status="taskDetails?.status"
+    :blocks="taskDetails?.blocks"
+    :trail="taskDetails?.trail"
     :learningplan-id="learningPlanStore.learningPlan?.id || 0"
     :tags="taskDetails?.tags"
     :type="taskDetails?.type"

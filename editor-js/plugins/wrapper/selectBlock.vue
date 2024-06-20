@@ -13,7 +13,7 @@
 
 <script setup>
 const props = defineProps({
-  value: {
+  modelValue: {
     type: Boolean,
     default: false,
   },
@@ -23,7 +23,7 @@ const props = defineProps({
   },
 });
 
-const check = ref(props.value);
+const check = ref(props.modelValue);
 defineEmits(['update:modelValue']);
 </script>
 

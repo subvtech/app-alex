@@ -4,8 +4,8 @@ import selectBlock from './selectBlock.vue';
 import { vuetify } from '@/plugins/vuetify';
 
 interface selectBlockTuneConfig {
-  modelValue: boolean;
   toggleSelect: (value: boolean, block: BlockAPI) => void;
+  isSelected: (block: BlockAPI) => boolean;
 }
 
 class selectBlockTune {
@@ -37,7 +37,7 @@ class selectBlockTune {
 
   wrap(blockContent: HTMLElement) {
     const myWrapper = document.createElement('div');
-    let modelValue = false;
+    let modelValue = this.config.isSelected(this.block);
     const vueComponentContainer = document.createElement('div');
     const app = createApp(selectBlock, {
       modelValue,
@@ -56,10 +56,11 @@ class selectBlockTune {
     myWrapper.addEventListener('mouseenter', () => {
       if (!modelValue) myWrapper.classList.add('bg-gray-100');
     });
-
     myWrapper.addEventListener('mouseleave', () => {
       myWrapper.classList.remove('bg-gray-100');
     });
+
+    if (modelValue) myWrapper.classList.add('bg-secondary--2');
 
     return myWrapper;
   }

@@ -14,17 +14,30 @@
     class="w-100 height-150 bg-blue"
     color="gray-200"
   />
-  {{ selectedBlocks }}
   <app-editor
     ref="editor"
-    :select-blocks-mode="true"
+    :select-blocks-mode="blocks"
     :class="isEditorLoading ? 'opacity-0' : ''"
     @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
   />
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ selectedTrail: TrailSimple }>();
+interface propsType {
+  selectedTrail: TrailSimple;
+  blocks?: BlockSimple[];
+}
+
+const props = withDefaults(defineProps<propsType>(), {
+  blocks: undefined,
+});
+
+const blocks = computed(() => {
+  return props.blocks?.map((block) => {
+    return block.id;
+  });
+});
+
 const trailCover = computed(
   () =>
     props.selectedTrail.cover_image?.url || '/images/cover_image_course.svg',
