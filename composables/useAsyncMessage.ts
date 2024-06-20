@@ -27,6 +27,7 @@ export const useAsyncMessage = (
             learning_plan_member: {
               populate: ['user.avatar'],
             },
+            audio: true,
           },
         },
         task_submission: true,

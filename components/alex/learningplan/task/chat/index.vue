@@ -100,6 +100,12 @@ const getResponse = (
         name: response.learning_plan_member.user.fullname,
       },
       sentAt: response.sent_at,
+      audio: response.audio
+        ? {
+            src: response.audio.url,
+            duration: checkIsValidDuration(response.audio.name),
+          }
+        : undefined,
     };
   }
   if (submission) {
