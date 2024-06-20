@@ -166,6 +166,7 @@
       <alex-learningplan-task-drawer-contracts
         v-model="status"
         :edit="editable"
+        :contract-address="contractAddress"
       />
 
       <!-- Eventos e atribuições -->
@@ -241,6 +242,8 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   submissionDescription: '',
   contractAddress: null,
 });
+
+console.log({ props: props.contractAddress });
 
 const description = ref(props.description);
 const submissionDescription = ref(props.submissionDescription);

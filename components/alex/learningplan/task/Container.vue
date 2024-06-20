@@ -93,6 +93,7 @@
       </v-expansion-panels>
     </Transition>
   </div>
+
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
@@ -100,6 +101,7 @@
     :status="taskDetails?.status"
     :learningplan-id="learningPlanStore.learningPlan?.id || 0"
     :tags="taskDetails?.tags"
+    :contract-address="taskDetails?.contract_address"
     :type="taskDetails?.type"
     :events="taskDetails?.task_events"
     :goals="taskDetails?.learning_goals"
@@ -144,8 +146,6 @@ export interface TaskItem {
   };
 }
 
-const { createTaskContract } = useContracts();
-
 interface ApplicationError {
   data: null | any;
   error: {
@@ -171,7 +171,6 @@ const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
-const taskReward = ref(0);
 const loader = ref(false);
 const route = useRoute();
 const { setMessage } = useMessageStore();

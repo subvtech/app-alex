@@ -196,7 +196,6 @@ const transitionName = computed(() => {
   if (props.dragging) return 'dnd-list';
   return typing.value ? 'staggered-fade' : 'list';
 });
-const { rewardStudents } = useContracts();
 
 const emit = defineEmits([
   'deleteTask',
@@ -287,12 +286,6 @@ const dropDownItems = (task: TaskItem) => {
         items.push(getDropDownAction('draft', task.id));
         items.push(getDropDownAction('publish', task.id));
         items.push(getDropDownAction('delete', task.id));
-        items.push(
-          getDropDownAction('payReward', task.id, {
-            address: task.contract_address,
-            students: task.students,
-          }),
-        );
       } else if (task.archived) {
         items.push(getDropDownAction('unarchive', task.id));
       } else {
@@ -333,13 +326,6 @@ const getDropDownAction = (
     details: {
       text: t('pages.task.table.dropdown.details'),
       onClick: () => emit('editTask', id),
-    },
-
-    payReward: {
-      text: 'pay students',
-      onClick: async () => {
-        await rewardStudents(contract.address, contract.students);
-      },
     },
 
     kanban: {

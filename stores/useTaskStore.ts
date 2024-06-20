@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { TaskSimple } from '@/models/simple/taskSimple.model';
 export const useTaskStore = defineStore('task', () => {
   const { find } = useStrapiUtils();
+  const { update } = useStrapi();
   const task = ref<TaskSimple>();
   const loading = ref(false);
   const { setMessage } = useMessageStore();
@@ -86,5 +87,30 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
-  return { loadTaskData, task, loading, updateTaskMembers };
+  async function addTaskContractAddress(
+    taskId: number,
+    contractAddress: string,
+  ) {
+    try {
+      const response = await await update(`tasks`, taskId, {
+        contractAddress,
+      });
+      console.log(response);
+      const { data } = response;
+      if (task.value) {
+        task.value.contract_address = data.attributes.contractAddress;
+      }
+      return response;
+    } catch (e: any) {
+      setMessage(i18n.t('pages.tasks.cantUpdateMembers'), 'red', true);
+    }
+  }
+
+  return {
+    loadTaskData,
+    task,
+    loading,
+    updateTaskMembers,
+    addTaskContractAddress,
+  };
 });
