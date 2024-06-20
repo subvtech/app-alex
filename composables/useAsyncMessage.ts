@@ -37,6 +37,7 @@ export const useAsyncMessage = (
         limit: 1000,
         start: 0,
       },
+      sort: 'sent_at:asc',
     });
   return useAsyncData(
     'task-member-messages',

@@ -34,6 +34,7 @@
         @message-click="(value) => handleReplyMessageClick(value?.id)"
         @submission-click="(value) => $emit('submission-click', value)"
       />
+      <alex-learningplan-task-chat-message-loader v-if="isSendingMessage" />
     </template>
     <div
       v-if="(status === 'pending' || loading) && !error"
@@ -53,6 +54,7 @@
 type ChatProps = {
   taskMemberId: number;
   loading?: boolean;
+  isSendingMessage: boolean;
 };
 const props = withDefaults(defineProps<ChatProps>(), {
   loading: false,

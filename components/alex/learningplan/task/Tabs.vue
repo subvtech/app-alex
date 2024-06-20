@@ -22,6 +22,7 @@
           v-model:attached-message="attachedMessage"
           class="w-100 grow task-chat"
           :task-member-id="taskMemberId"
+          :is-sending-message="isSendingMessage"
           :loading="message.isLoading"
           @submission-click="handleSubmission"
         />
@@ -45,11 +46,13 @@ interface TaskTabsProps {
     events: TaskEvent[];
     isLoading?: boolean;
   };
+  isSendingMessage?: boolean;
 }
 const props = withDefaults(defineProps<TaskTabsProps>(), {
   submission: false,
   selectorParent: undefined,
   message: () => ({ isLoading: false }),
+  isSendingMessage: false,
 });
 const activePage = defineModel({ required: true, default: '1' });
 const attachedMessage = defineModel<Message>('attachedMessage');

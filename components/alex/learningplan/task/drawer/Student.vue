@@ -144,6 +144,7 @@
         v-model="activePage"
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
+        :is-sending-message="isSendingMessage"
         :task-member-id="taskMemberId"
         :message="{ isLoading: pendingMessages }"
         :event="{ events: events.data, isLoading: eventLoading }"
@@ -202,6 +203,7 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   finishAt: null,
 });
 const { t } = useI18n();
+const isSendingMessage = ref(false);
 const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
@@ -344,6 +346,7 @@ const handleSubmitMessage = async (
     if (!learningMember) {
       return;
     }
+    isSendingMessage.value = true;
     const formData = new FormData();
     const newMessage = {
       learning_plan_member: learningMember.id,
@@ -389,6 +392,8 @@ const handleSubmitMessage = async (
       'error',
       true,
     );
+  } finally {
+    isSendingMessage.value = false;
   }
 };
 
