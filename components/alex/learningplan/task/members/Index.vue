@@ -30,6 +30,7 @@
           v-if="type === 'individual'"
           v-model="addMemberDialog"
           :learningplan-id="props.learningplanId"
+          :members="members.data"
           @add-click="addMember"
         />
         <alex-learningplan-task-dialog-add-group

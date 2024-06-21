@@ -3,7 +3,7 @@
     v-model="model"
     title="Adicionar integrantes"
     main-button-text="Adicionar"
-    @on-main-action="$emit('add-click', selectedUsers)"
+    @on-main-action="handleSubmit"
   >
     <template #activator="{ isActive, props: activatorProps }">
       <slot name="activator" :is-active="isActive" :props="activatorProps" />
@@ -18,52 +18,51 @@
       hide-details
     />
     <v-expansion-panels class="task-student-card" multiple>
-      <v-expansion-panel
-        v-for="classValue in filteredClasses"
-        :key="classValue.id"
-      >
-        <v-expansion-panel-title
-          ><alex-inputs-checkbox
-            :model-value="
-              !!getSelectedUsersStatus(
-                classValue.id,
-                filteredClasses,
-                selectedUsers,
-              )
-            "
-            :indeterminate="
-              getSelectedUsersStatus(
-                classValue.id,
-                filteredClasses,
-                selectedUsers,
-              ) === -1
-            "
-            class="checkbox"
-            @click.stop="selectAllUsers(classValue.id, classes.data)"
-          />
-          <p class="text-body-2 w-full text-gray-900">
-            {{ classValue.name }}
-          </p></v-expansion-panel-title
-        >
-        <v-expansion-panel-text>
-          <v-slide-y-transition group hide-on-leave>
-            <alex-custom-list-item-user
-              v-for="member in classValue.learning_plan_members"
-              :key="member.id"
-              :user="{
-                name: member.user.fullname,
-                email: member.email,
-                image: member.user?.avatar?.formats.small.url,
-              }"
-              no-chip
-              :is-selected-value="
-                !!selectedUsers.find((user) => user.id === member.id)
+      <template v-for="classValue in filteredClasses" :key="classValue.id">
+        <v-expansion-panel v-if="classValue.learning_plan_members?.length">
+          <v-expansion-panel-title
+            ><alex-inputs-checkbox
+              :model-value="
+                !!getSelectedUsersStatus(
+                  classValue.id,
+                  filteredClasses,
+                  selectedUsers,
+                )
               "
-              @click.stop="selectUser(member)"
+              :indeterminate="
+                getSelectedUsersStatus(
+                  classValue.id,
+                  filteredClasses,
+                  selectedUsers,
+                ) === -1
+              "
+              class="checkbox"
+              @click.stop="selectAllUsers(classValue.id, classes.data)"
             />
-          </v-slide-y-transition>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+            <p class="text-body-2 w-full text-gray-900">
+              {{ classValue.name }}
+            </p></v-expansion-panel-title
+          >
+          <v-expansion-panel-text>
+            <v-slide-y-transition group hide-on-leave>
+              <alex-custom-list-item-user
+                v-for="member in classValue.learning_plan_members"
+                :key="member.id"
+                :user="{
+                  name: member.user.fullname,
+                  email: member.email,
+                  image: member.user?.avatar?.formats.small.url,
+                }"
+                no-chip
+                :is-selected-value="
+                  !!selectedUsers.find((user) => user.id === member.id)
+                "
+                @click.stop="selectUser(member)"
+              />
+            </v-slide-y-transition>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </template>
     </v-expansion-panels>
   </alex-custom-dialog>
 </template>
@@ -71,15 +70,19 @@
 <script setup lang="ts">
 interface AddStudent {
   learningplanId: number;
+  members: TaskMemberStudent[];
 }
 const model = defineModel<boolean>();
 const props = defineProps<AddStudent>();
 type Emits = {
   'add-click': [members: LearningPlanMemberSimple[]];
 };
-defineEmits<Emits>();
+const emit = defineEmits<Emits>();
 const strapi = useStrapiUtils();
 const search = ref('');
+const membersID = computed(() =>
+  props.members.map((member) => member.student_member.id),
+);
 const getMembers = (learningplanId: number) =>
   strapi.find<ClassSimple>('classes', {
     populate: {
@@ -92,19 +95,27 @@ const getMembers = (learningplanId: number) =>
             fields: ['id'],
           },
         },
+        filters: {
+          id: {
+            $notIn: membersID.value,
+          },
+        },
       },
     },
-    filters: {
-      learningplan: learningplanId,
-    },
+    filters: { learningplan: learningplanId },
   });
 const selectedUsers = ref<LearningPlanMemberSimple[]>([]);
 
-const { data: classes, execute } = await useAsyncData(
+const {
+  data: classes,
+  execute,
+  refresh,
+} = await useAsyncData(
   'classes-member-invite',
   () => getMembers(props.learningplanId),
   {
     default: () => ({ meta: 0, data: [] as ClassSimple[] }),
+    lazy: true,
   },
 );
 const filteredClasses = computed(() => {
@@ -169,8 +180,15 @@ const selectAllUsers = (classID: number, classesArray: ClassSimple[]) => {
   selectedUsers.value = [...selectedUsers.value, ...users];
 };
 
+const handleSubmit = () => {
+  emit('add-click', selectedUsers.value);
+  setTimeout(() => {
+    refresh();
+  }, 1000);
+};
 watch(model, (value) => {
   if (value) {
+    selectedUsers.value = [];
     execute();
   }
 });

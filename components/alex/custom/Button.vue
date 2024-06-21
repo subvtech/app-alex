@@ -25,6 +25,7 @@ export interface ButtonProps {
     | 'primary'
     | 'secondary'
     | 'tertiary'
+    | 'outlined'
     | 'text'
     | 'error'
     | 'success'
@@ -55,6 +56,7 @@ const variants = {
     textColor: 'gray-800',
     bgColor: 'gray-100',
   },
+  outlined: { textColor: 'gray-800', bgColor: '' },
   text: { textColor: 'gray-800', bgColor: '' },
   error: { textColor: 'white', bgColor: 'error-0' },
   success: { textColor: 'white', bgColor: 'success-0' },
@@ -82,7 +84,8 @@ $otherVariants:
   'primary' 'secondary-1' 'secondary-2',
   'secondary' 'gray-100' 'gray-200',
   'tertiary' 'gray-200' 'gray-300',
-  'text' 'gray-blue' 'gray-100';
+  'text' 'gray-blue' 'gray-100',
+  'outlined' 'gray-100' 'gray-200';
 
 .alex-button {
   &.v-btn {
@@ -113,5 +116,8 @@ $otherVariants:
       background-color: rgb(var(--v-theme-#{$active})) !important;
     }
   }
+}
+.alex-button.outlined {
+  border: 1px solid rgb(var(--v-theme-gray-200)) !important;
 }
 </style>
