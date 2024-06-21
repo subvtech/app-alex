@@ -3,13 +3,18 @@
     "type": {
       "label": "Type",
       "individual": "Individual",
-      "collective": "Group"
+      "collective": "Group",
+      "select": "Select a type"
     },
     "status": {
       "label": "Status",
       "draft": "Draft",
       "published": "Published",
-      "finished": "Finished"
+      "finished": "Finished",
+      "toDo": "To do",
+      "inProgress": "In progress",
+      "underReview": "Under review",
+      "done": "Done"
     },
     "date": {
       "startLabel": "Start date",
@@ -25,6 +30,7 @@
     },
     "description": {
       "label": "Description",
+      "submissionLabel": "Submission description",
       "placeHolder": "Enter description"
     },
     "submission": {
@@ -116,13 +122,18 @@
     },
     "assignments": {
       "label": "Assignments"
+    },
+    "comments": {
+      "label": "Comments"
     }
   },
   "missing": {
+    "type": "No type",
     "title": "No title",
     "tags": "No tags",
     "date": "No date",
-    "restrictions": "No restrictions"
+    "restrictions": "No restrictions",
+    "description": "No description"
   },
   "filter": "Filter",
   "filterTasks": "Filter tasks",

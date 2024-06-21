@@ -1,6 +1,7 @@
 <template>
   <div
     class="card relative w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover"
+    :class="edit && 'edit'"
     :style="`background-image: url('${cover}')`"
   >
     <p
@@ -15,10 +16,12 @@
 interface CardProps {
   title: string;
   cover?: string;
+  edit?: boolean;
 }
 
 withDefaults(defineProps<CardProps>(), {
   cover: '/images/cover_image_course.svg',
+  edit: false,
 });
 </script>
 
@@ -32,6 +35,9 @@ withDefaults(defineProps<CardProps>(), {
 
 .card:hover {
   box-shadow: black 0px -50px 36px -20px inset;
+}
+
+.card.edit:hover {
   transform: scale(1.05);
 }
 </style>

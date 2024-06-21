@@ -45,7 +45,9 @@
           <alex-custom-chip
             class="w-fit"
             :status="statusColor"
-            :text="$t(`components.courses.tasks.task.status.${status}`)"
+            :text="
+              $t(`components.courses.tasks.task.status.${status || 'draft'}`)
+            "
           />
         </div>
         <div class="d-flex flex-column gap-2 w-full">
@@ -54,7 +56,7 @@
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date v-model="finishAt" edit />
+          <alex-learningplan-task-date v-model="finishAt" />
         </div>
       </div>
       <div class="task-submission">

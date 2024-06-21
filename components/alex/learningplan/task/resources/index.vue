@@ -7,22 +7,33 @@
   >
     <!-- Activate -->
     <template #activator="{ props }">
-      <p class="text-h3 mb-4">
-        {{ $t('components.learningPlan.drawer.task.learningResources.label') }}
-      </p>
+      <div>
+        <p class="text-h3 mb-4">
+          {{
+            $t('components.learningPlan.drawer.task.learningResources.label')
+          }}
+        </p>
 
-      <alex-custom-button
-        v-bind="props"
-        size="large"
-        prepend-icon="alex:trail"
-        append-icon="mdi-chevron-right"
-        :text="
-          $t(
-            'components.learningPlan.drawer.task.learningResources.noneSelected',
-          )
-        "
-        variant="secondary"
-      />
+        <alex-custom-button
+          v-if="edit"
+          v-bind="props"
+          size="large"
+          prepend-icon="alex:trail"
+          append-icon="mdi-chevron-right"
+          :text="
+            $t(
+              'components.learningPlan.drawer.task.learningResources.noneSelected',
+            )
+          "
+          variant="secondary"
+        />
+        <alex-learningplan-task-resources-cards
+          v-else
+          :trails="trailsView"
+          :loading="learningPlanStore.loading"
+          justify="start"
+        />
+      </div>
     </template>
 
     <!-- Content -->
@@ -39,21 +50,13 @@
         }}</alex-custom-button>
       </div>
 
-      <div
+      <alex-learningplan-task-resources-cards
         v-if="trails.length || learningPlanStore.loading"
-        class="cards d-flex align-center justify-center flex-wrap ga-4"
-      >
-        <template v-if="trails.length">
-          <alex-learningplan-task-resources-card
-            v-for="trail in trailsView"
-            :key="trail.id"
-            :title="trail.title"
-            :cover="trail.cover_image?.url"
-          />
-        </template>
+        :trails="trailsView"
+        :loading="learningPlanStore.loading"
+        edit
+      />
 
-        <alex-learningplan-task-resources-loader v-else />
-      </div>
       <alex-learningplan-task-resources-empty v-else />
     </div>
 
@@ -73,6 +76,14 @@
 const paginationBlock: number = 12;
 
 const learningPlanStore = useLearningPlanStore();
+
+interface CompProps {
+  edit?: boolean;
+}
+
+withDefaults(defineProps<CompProps>(), {
+  edit: false,
+});
 
 const open = defineModel<boolean>({ required: true });
 

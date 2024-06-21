@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-gray-800 font-weight-bold mb-2">
+    <p class="text-body-4 text-gray-800 font-weight-bold mb-2">
       {{ $t('components.learningPlan.drawer.task.restrictions.label') }}
     </p>
 
@@ -33,8 +33,8 @@
       />
     </div>
     <div v-else>
-      <p class="text-body-3 text-gray-800">
-        {{ $t('components.learningPlan.drawer.task.missing.restrictions') }}
+      <p class="text-body-3 text-gray-400">
+        {{ $t('components.learningPlan.drawer.missing.restrictions') }}
       </p>
     </div>
   </div>
