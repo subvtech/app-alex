@@ -104,6 +104,7 @@ const { data: tasks } = await useAsyncData(
               task?.task_member_students[0]?.student_member?.user.avatar?.url ||
               undefined,
           },
+          group: task.task?.type === 'group',
           studentClass:
             task?.task_member_students[0]?.student_member?.learning_class
               ?.name || '',

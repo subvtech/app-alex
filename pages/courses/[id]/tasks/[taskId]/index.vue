@@ -46,7 +46,7 @@
       ref="kanban"
       v-model="tasks"
       type="professor"
-      :classes="['turma A']"
+      :classes="getClassesOfTaskMembers(taskStore.task.task_members)"
       :columns="[
         {
           title: 'A fazer',
@@ -249,6 +249,18 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
     });
   }
 };
+
+const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
+  const classes = taskMembers.flatMap((taskMember) =>
+    taskMember.task_member_students.flatMap((student) =>
+      student.student_member.learning_class?.name
+        ? student.student_member.learning_class?.name
+        : [],
+    ),
+  );
+  return Array.from(new Set(classes));
+};
+
 onBeforeMount(() => {
   if (!id || !taskId.value) {
     return navigateTo(`/courses`);
