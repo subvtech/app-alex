@@ -55,7 +55,7 @@ interface CompProps {
 }
 
 const props = withDefaults(defineProps<CompProps>(), {
-  edit: true,
+  edit: false,
   tags: () => [],
 });
 const open = ref<boolean>(false);

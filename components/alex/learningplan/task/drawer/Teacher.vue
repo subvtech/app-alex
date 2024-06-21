@@ -44,10 +44,7 @@
       </p>
 
       <v-row class="my-5">
-        <v-col cols="6"
-          ><p class="text-body-4 text-gray-800 mb-2">
-            {{ $t('components.learningPlan.drawer.task.status.label') }}
-          </p>
+        <v-col cols="6">
           <alex-learningplan-task-state v-model="status" :edit="editable" />
         </v-col>
         <v-col cols="6"
@@ -65,7 +62,13 @@
                 'components.learningPlan.drawer.task.type.individual',
               ),
             }"
-            placeholder="Selecione um tipo"
+            :placeholder="
+              $t(
+                `components.learningPlan.drawer.${
+                  editable ? 'task.type.select' : 'missing.type'
+                }`,
+              )
+            "
           />
         </v-col>
         <v-col cols="6"
@@ -122,7 +125,7 @@
         <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
           <alex-learningplan-task-restrictions
             v-model="restrictionsValue"
-            edit
+            :edit="editable"
           />
         </v-col>
       </v-row>
@@ -150,9 +153,13 @@
       <div class="my-6">
         <alex-learningplan-task-resources
           v-model="openResources"
+<<<<<<< HEAD
+          :edit="editable"
+=======
           :task-id="taskId"
           :trail-id="trail?.id"
           :blocks="blocks"
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
         />
       </div>
 
@@ -217,6 +224,7 @@ interface TaskTeacherDrawerProps {
   endDate?: string | null;
   membersLength: number;
 }
+
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
   title: '',

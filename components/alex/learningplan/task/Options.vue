@@ -1,5 +1,5 @@
 <template>
-  <alex-custom-dropdown :disabled="!edit" :items="items">
+  <alex-custom-dropdown :disabled="!edit" :items="items || []">
     <template #activator="{ props: dropdownProps }"
       ><p
         v-bind="dropdownProps"
@@ -20,7 +20,7 @@
 import { AlexDropdownItem } from '../../custom/Dropdown.vue';
 
 interface CompProps {
-  items: AlexDropdownItem[];
+  items?: AlexDropdownItem[];
   edit?: boolean;
   placeholder: string;
   config?: Record<string, string>;

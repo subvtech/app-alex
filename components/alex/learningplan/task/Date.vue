@@ -9,7 +9,12 @@
       ]"
     >
       {{
-        formattedDate || $t('components.learningPlan.drawer.date.placeholder')
+        formattedDate ||
+        $t(
+          `components.learningPlan.drawer.${
+            edit ? 'date.placeholder' : 'missing.date'
+          }`,
+        )
       }}
     </p>
     <v-menu

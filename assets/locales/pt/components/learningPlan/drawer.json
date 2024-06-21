@@ -3,13 +3,18 @@
     "type": {
       "label": "Tipo",
       "individual": "Individual",
-      "collective": "Grupo"
+      "collective": "Grupo",
+      "select": "Selecione um tipo"
     },
     "status": {
       "label": "Status",
       "draft": "Rascunho",
       "published": "Publicado",
-      "finished": "Fechado"
+      "finished": "Fechado",
+      "toDo": "A fazer",
+      "inProgress": "Fazendo",
+      "underReview": "Em avaliação",
+      "done": "Concluído"
     },
     "date": {
       "startLabel": "Data de início",
@@ -22,6 +27,7 @@
     },
     "description": {
       "label": "Descrição",
+      "submissionLabel": "Descrição da entrega",
       "placeHolder": "Digite a descrição"
     },
     "submission": {
@@ -122,13 +128,18 @@
     },
     "assignments": {
       "label": "Atribuições"
+    },
+    "comments": {
+      "label": "Comentários"
     }
   },
   "missing": {
+    "type": "Sem tipo",
     "title": "Sem título",
     "tags": "Sem marcações",
     "date": "Sem data",
-    "restrictions": "Sem restrições"
+    "restrictions": "Sem restrições",
+    "description": "Sem descrição"
   },
   "filter": "Filtrar",
   "filterTasks": "Filtrar tarefas",
