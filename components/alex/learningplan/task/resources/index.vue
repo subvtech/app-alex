@@ -70,7 +70,7 @@
             :key="trailItem.id"
             :title="trailItem.title"
             :cover="trailItem.cover_image?.url"
-            @click="selectedTrail = trailItem"
+            @click="handleTrailClick(trailItem)"
           />
         </template>
         <alex-learningplan-task-resources-loader v-else />
@@ -137,9 +137,29 @@ const trails = computed(() => {
       trailsList.push(trail);
     });
   });
-
   return trailsList;
 });
+
+const isValidTrail = (trail: TrailSimple) => {
+  if (!trail.structures.length) return false;
+  if (!trail.structures[trail.structures.length - 1].blocks.length)
+    return false;
+  return true;
+};
+
+const handleTrailClick = (trail: TrailSimple) => {
+  if (isValidTrail(trail)) {
+    selectedTrail.value = trail;
+  } else {
+    setMessage(
+      'Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha.',
+      'warning',
+      true,
+      false,
+      true,
+    );
+  }
+};
 
 const selectedTrail = ref<TrailSimple | undefined>();
 
