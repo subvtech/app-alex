@@ -147,7 +147,7 @@ definePageMeta({
 
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
-const detailsDrawer = ref<boolean>(false);
+// const detailsDrawer = ref<boolean>(false);
 const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
@@ -250,13 +250,11 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
   }
 };
 onBeforeMount(() => {
-  headerStore.showHeader = true;
   if (!id || !taskId.value) {
-    return navigateTo(`/courses/`);
+    return navigateTo(`/courses`);
   }
-  if (!Number.isInteger(Number(id))) {
-    return navigateTo(`/courses/${id}`);
-  }
+  headerStore.showHeader = true;
+  learningPlanStore.loadLearningPlan(Number(id));
   taskStore.loadTaskData(taskId.value, Number(id));
 });
 
@@ -292,9 +290,12 @@ watch(
           disabled: true,
         },
       ];
-    }
-    if (!taskStore.task && !taskStore.loading) {
-      navigateTo(`/courses/${route.params.id}/tasks`);
+      if (!taskStore.task && !taskStore.loading) {
+        navigateTo(`/courses/${route.params.id}/tasks`);
+      }
+      if (!learningPlanStore.userIsFacilitator) {
+        navigateTo(`/courses/${route.params.id}/tasks`);
+      }
     }
   },
 );

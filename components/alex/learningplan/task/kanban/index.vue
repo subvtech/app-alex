@@ -84,6 +84,7 @@
             :avatar="item?.avatar"
             :mark="item.mark"
             :max-mark="item.maxMark"
+            @click="$emit('card-click', itemIndex, item)"
           />
         </template>
       </alex-learningplan-task-kanban-column>

@@ -42,7 +42,12 @@
       <p class="text-body-5 text-gray-600 ellipsis lines-2">{{ name }}</p>
     </div>
     <div class="d-flex gap-2 justify-end w-100 mt-4">
-      <alex-custom-chip status="secondary" :text="studentClass" size="small" />
+      <alex-custom-chip
+        status="secondary"
+        :text="studentClass"
+        size="small"
+        class="chip"
+      />
       <alex-custom-chip
         :status="dateColor"
         :text="formattedDate"
@@ -105,5 +110,22 @@ const formattedDate = computed(() =>
 }
 :global(.card-kanban.ghost) {
   filter: brightness(90%);
+}
+.chip {
+  max-width: 50%;
+}
+@media screen and (min-width: 1600px) {
+  .chip {
+    max-width: 60%;
+  }
+}
+:deep(.chip .v-chip__content span) {
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+:deep(.chip .v-chip__content),
+:deep(.chip .v-chip__content span) {
+  display: block;
+  width: 100%;
 }
 </style>

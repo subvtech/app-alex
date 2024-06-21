@@ -203,6 +203,12 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const technicalTags = computed(
     () => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral),
   );
+  const userLearningMember = computed(
+    () =>
+      learningPlan.value?.members.find(
+        (member) => member.user.id === user.value.id,
+      ),
+  );
   return {
     learningPlan,
     loadLearningPlan,
@@ -224,5 +230,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     schedules,
     generalTags,
     technicalTags,
+    userLearningMember,
   };
 });
