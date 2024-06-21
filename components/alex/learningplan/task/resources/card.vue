@@ -1,7 +1,12 @@
 <template>
   <div
+<<<<<<< HEAD
+    class="card relative w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover"
+    :class="edit && 'edit'"
+=======
     class="card w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover d-flex align-end"
     :class="{ cardHover: !deleteButton }"
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
     :style="`background-image: url('${cover}')`"
     @click="emit('openTrail')"
   >
@@ -25,13 +30,18 @@
 interface CardProps {
   title: string;
   cover?: string;
+<<<<<<< HEAD
+  edit?: boolean;
+=======
   deleteButton?: boolean;
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
 }
 
 const emit = defineEmits(['delete', 'openTrail']);
 
 withDefaults(defineProps<CardProps>(), {
   cover: '/images/cover_image_course.svg',
+  edit: false,
 });
 </script>
 
@@ -44,6 +54,13 @@ withDefaults(defineProps<CardProps>(), {
     transform 0.3s;
 }
 
+<<<<<<< HEAD
+.card:hover {
+  box-shadow: black 0px -50px 36px -20px inset;
+}
+
+.card.edit:hover {
+=======
 .text-shadow {
   background: linear-gradient(
     180deg,
@@ -54,6 +71,7 @@ withDefaults(defineProps<CardProps>(), {
 }
 
 .cardHover:hover {
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
   transform: scale(1.05);
 }
 

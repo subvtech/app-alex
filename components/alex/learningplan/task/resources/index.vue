@@ -13,6 +13,17 @@
   >
     <!-- Activate -->
     <template #activator="{ props }">
+<<<<<<< HEAD
+      <div>
+        <p class="text-h3 mb-4">
+          {{
+            $t('components.learningPlan.drawer.task.learningResources.label')
+          }}
+        </p>
+
+        <alex-custom-button
+          v-if="edit"
+=======
       <p class="text-h3 mb-4">
         {{ $t('components.learningPlan.drawer.task.learningResources.label') }}
       </p>
@@ -32,6 +43,7 @@
         />
         <alex-custom-button
           v-else
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
           v-bind="props"
           size="large"
           prepend-icon="alex:trail"
@@ -42,9 +54,20 @@
             )
           "
           variant="secondary"
+<<<<<<< HEAD
+        />
+        <alex-learningplan-task-resources-cards
+          v-else
+          :trails="trailsView"
+          :loading="learningPlanStore.loading"
+          justify="start"
+        />
+      </div>
+=======
           @click="selectedTrail = undefined"
         />
       </v-scroll-x-transition>
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
     </template>
     <!-- Content -->
     <div v-if="!selectedTrail" class="pa-6 bg-white rounded-b-lg">
@@ -60,8 +83,15 @@
         }}</alex-custom-button>
       </div>
 
-      <div
+      <alex-learningplan-task-resources-cards
         v-if="trails.length || learningPlanStore.loading"
+<<<<<<< HEAD
+        :trails="trailsView"
+        :loading="learningPlanStore.loading"
+        edit
+      />
+
+=======
         class="cards d-flex align-center flex-wrap ga-4"
       >
         <template v-if="trails.length && !selectedTrail">
@@ -70,11 +100,12 @@
             :key="trailItem.id"
             :title="trailItem.title"
             :cover="trailItem.cover_image?.url"
-            @click="selectedTrail = trailItem"
+            @click="handleTrailClick(trailItem)"
           />
         </template>
         <alex-learningplan-task-resources-loader v-else />
       </div>
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
       <alex-learningplan-task-resources-empty v-else />
     </div>
     <alex-learningplan-task-resources-editor
@@ -98,11 +129,23 @@
 <script setup lang="ts">
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
+<<<<<<< HEAD
+
+interface CompProps {
+  edit?: boolean;
+}
+
+withDefaults(defineProps<CompProps>(), {
+  edit: false,
+});
+
+=======
 const taskStore = useTaskStore();
 const isLoading = ref(false);
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const paginationBlock: number = 12;
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
 const open = defineModel<boolean>({ required: true });
 
 interface propsType {
@@ -137,9 +180,29 @@ const trails = computed(() => {
       trailsList.push(trail);
     });
   });
-
   return trailsList;
 });
+
+const isValidTrail = (trail: TrailSimple) => {
+  if (!trail.structures.length) return false;
+  if (!trail.structures[trail.structures.length - 1].blocks.length)
+    return false;
+  return true;
+};
+
+const handleTrailClick = (trail: TrailSimple) => {
+  if (isValidTrail(trail)) {
+    selectedTrail.value = trail;
+  } else {
+    setMessage(
+      'Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha.',
+      'warning',
+      true,
+      false,
+      true,
+    );
+  }
+};
 
 const selectedTrail = ref<TrailSimple | undefined>();
 

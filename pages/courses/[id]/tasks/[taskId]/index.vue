@@ -8,6 +8,28 @@
       !taskStore.loading && taskStore.task && learningPlanStore.learningPlan?.id
     "
   >
+    <!-- Testando
+    <alex-custom-button @click="detailsDrawer = true"
+      >Testar drawer novo</alex-custom-button
+    >
+    <alex-learningplan-task-drawer-details
+      v-model="detailsDrawer"
+      :task-id="taskId"
+      :tags="taskStore.task.tags"
+      :title="taskStore.task.title"
+      :status="taskStore.task.status"
+      :type="taskStore.task?.type || undefined"
+      :start-date="taskStore.task?.start_at || undefined"
+      :final-date="taskStore.task?.finish_at || undefined"
+      :description="taskStore.task?.description || undefined"
+      :restrictions="taskStore.task.allowed_editor_plugins || ''"
+      :task-member-id="studentDetailsId || -1"
+      :submission="{
+        constraints: taskStore.task.allowed_editor_plugins?.split(',') || [],
+        description: taskStore.task.submission_description,
+      }"
+    /> -->
+    <!-- Testando -->
     <alex-learningplan-task-header
       :title="taskStore.task.title"
       :tags="headerTags"
@@ -125,6 +147,7 @@ definePageMeta({
 
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
+const detailsDrawer = ref<boolean>(false);
 const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
@@ -137,6 +160,7 @@ const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<any[]>([]);
 const studentDetailsId = ref<number>(-1);
+
 const studentDetails = computed(() => {
   if (!taskStore.task?.task_members) {
     return null;
@@ -146,6 +170,7 @@ const studentDetails = computed(() => {
   );
   return member || null;
 });
+
 const kanban = ref<{
   canDrag: boolean;
   setCanDrag: (value: boolean) => void;
@@ -283,13 +308,13 @@ watch(
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         user: {
           name:
-            task.task_member_students[0]?.student_member?.user.fullname || '',
+            task?.task_member_students[0]?.student_member?.user.fullname || '',
           avatar:
-            task.task_member_students[0]?.student_member?.user.avatar?.url ||
+            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
             undefined,
         },
         studentClass:
-          task.task_member_students[0]?.student_member?.learning_class?.name ||
+          task?.task_member_students[0]?.student_member?.learning_class?.name ||
           '',
       }));
     }

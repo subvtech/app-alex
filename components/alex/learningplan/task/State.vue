@@ -4,6 +4,9 @@
     :items="mode == 'teacher' ? filteredTeacher : filteredStudent"
   >
     <template #activator="{ props: vMenuProps }">
+      <p class="text-body-4 text-gray-800 mb-2">
+        {{ $t('components.learningPlan.drawer.task.status.label') }}
+      </p>
       <alex-custom-chip
         v-bind="vMenuProps"
         :text="config[model]?.text"
@@ -132,12 +135,12 @@ const studentOptions: AlexDropdownItem[] = [
 const filteredTeacher = computed(() =>
   teacherOptions
     .filter((item) => item !== undefined)
-    .filter((item) => item.text !== config[model.value].text),
+    .filter((item) => item.text !== config[model.value]?.text),
 );
 
 const filteredStudent = computed(() =>
   studentOptions
     .filter((item) => item !== undefined)
-    .filter((item) => item.text !== config[model.value].text),
+    .filter((item) => item.text !== config[model.value]?.text),
 );
 </script>
