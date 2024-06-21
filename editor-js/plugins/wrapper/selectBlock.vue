@@ -26,9 +26,3 @@ const props = defineProps({
 const check = ref(props.modelValue);
 defineEmits(['update:modelValue']);
 </script>
-
-<style>
-.v-selection-control__wrapper {
-  color: #6e7a87 !important;
-}
-</style>

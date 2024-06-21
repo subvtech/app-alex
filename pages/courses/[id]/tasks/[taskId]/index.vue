@@ -94,6 +94,8 @@
       :tags="taskStore.task.tags"
       :title="taskStore.task.title"
       :type="taskStore.task.type"
+      :trail="taskStore.task.trail"
+      :blocks="taskStore.task.blocks"
       :status="taskStore.task.status"
       :events="taskStore.task.task_events"
       :goals="taskStore.task.learning_goals"

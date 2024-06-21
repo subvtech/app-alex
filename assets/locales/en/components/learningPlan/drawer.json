@@ -63,7 +63,8 @@
       "select": "Select a trail",
       "new": "New trail",
       "emptyTitle": "It looks like there are no trails created",
-      "emptySubtitle": "To select learning resources, you need to create and select a trail."
+      "emptySubtitle": "To select learning resources, you need to create and select a trail.",
+      "updateError": "Error updating learning resources, try again later"
     },
     "tags": {
       "subtitle": "Enter a tag",

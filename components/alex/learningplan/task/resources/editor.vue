@@ -18,7 +18,7 @@
       />
       <app-editor
         ref="editor"
-        :select-blocks-mode="blocks"
+        :select-blocks-mode="blocksIds"
         :class="isEditorLoading ? 'opacity-0' : ''"
         @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
       />
@@ -29,17 +29,17 @@
 <script setup lang="ts">
 interface propsType {
   selectedTrail: TrailSimple;
-  blocks?: BlockSimple[];
+  blocks?: BlockSimple[] | number[];
 }
 
 const props = withDefaults(defineProps<propsType>(), {
-  blocks: undefined,
+  blocks: () => [],
 });
 
-const blocks = computed(() => {
+const blocksIds = computed(() => {
   return props.blocks?.map((block) => {
-    return block.id;
-  });
+    return block.id ? block.id : block;
+  }) as number[];
 });
 
 const trailCover = computed(

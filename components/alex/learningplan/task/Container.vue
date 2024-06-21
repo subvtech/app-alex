@@ -235,22 +235,24 @@ const getHigherIndex = (taskStatus: string) => {
 };
 
 const handleCreateTask = async () => {
-  loader.value = true;
-  const higherIndex = getHigherIndex('draft');
-  try {
-    const res = await create('tasks', {
-      title: taskTitle.value,
-      status: 'draft',
-      learningplan: route.params.id,
-      position: higherIndex,
-    });
-    learningPlanStore.learningPlan?.tasks.push({
-      id: res.data.id,
-      ...res.data.attributes,
-    });
-    displaySuccess('addSuccess');
-  } catch (e) {
-    displayError('addError');
+  if (taskTitle.value) {
+    loader.value = true;
+    const higherIndex = getHigherIndex('draft');
+    try {
+      const res = await create('tasks', {
+        title: taskTitle.value,
+        status: 'draft',
+        learningplan: route.params.id,
+        position: higherIndex,
+      });
+      learningPlanStore.learningPlan?.tasks.push({
+        id: res.data.id,
+        ...res.data.attributes,
+      });
+      displaySuccess('addSuccess');
+    } catch (e) {
+      displayError('addError');
+    }
   }
   loader.value = false;
   taskTitle.value = '';
