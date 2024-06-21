@@ -259,7 +259,7 @@ onBeforeMount(() => {
 });
 
 watch(
-  () => [learningPlanStore.loading, taskStore.loading],
+  () => [learningPlanStore.loading],
   () => {
     if (!learningPlanStore.loading) {
       headerStore.title = t('pages.classes.breadcrumbs.myCourses');
@@ -290,9 +290,6 @@ watch(
           disabled: true,
         },
       ];
-      if (!taskStore.task && !taskStore.loading) {
-        navigateTo(`/courses/${route.params.id}/tasks`);
-      }
       if (!learningPlanStore.userIsFacilitator) {
         navigateTo(`/courses/${route.params.id}/tasks`);
       }
@@ -318,6 +315,14 @@ watch(
           task?.task_member_students[0]?.student_member?.learning_class?.name ||
           '',
       }));
+    }
+  },
+);
+watch(
+  () => taskStore.loading,
+  (value) => {
+    if (!taskStore.task && !value) {
+      navigateTo(`/courses/${route.params.id}/tasks`);
     }
   },
 );
