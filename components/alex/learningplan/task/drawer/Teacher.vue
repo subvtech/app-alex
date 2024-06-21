@@ -153,13 +153,10 @@
       <div class="my-6">
         <alex-learningplan-task-resources
           v-model="openResources"
-<<<<<<< HEAD
           :edit="editable"
-=======
           :task-id="taskId"
           :trail-id="trail?.id"
           :blocks="blocks"
->>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
         />
       </div>
 
