@@ -1,6 +1,7 @@
+import { eq } from 'drizzle-orm';
+import { LearningPlan, learningPlans } from './learning-plans.schema';
 import db from '@@/server/lib/drizzle';
 // import { tags, Tags, tagsToLearningPlans } from '../tags/tags.schema';
-import { LearningPlan, learningPlans } from './learning-plans.schema';
 
 type learningPlanParams = Omit<LearningPlan, 'id'>;
 
@@ -23,8 +24,14 @@ export const createLearningPlan = async (params: learningPlanParams) => {
       message: params.message,
       createdAt: new Date(),
     })
-    .returning({ learningPlanId: learningPlans.id })
+    .returning()
     .onConflictDoNothing();
+};
+
+export const findOneLearningPlan = async (id: number) => {
+  return await db.query.learningPlans.findFirst({
+    where: eq(learningPlans.id, id),
+  });
 };
 
 // export const addTags = async (

@@ -20,7 +20,7 @@ export const learningPlanGroupMembers = pgTable('learning_plan_group_members', {
   studentMemberId: integer('student_member_id')
     .references(() => learningPlanMembers.id)
     .notNull(),
-  role: GroupMemberRoleEnum('role'),
+  role: GroupMemberRoleEnum('role').notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 

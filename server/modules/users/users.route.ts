@@ -2,15 +2,8 @@ import { TRPCError } from '@trpc/server';
 import { hash } from 'bcrypt';
 import { z } from 'zod';
 
-import {
-  sendConfirmationEmail,
-  sendResetPasswordEmail,
-} from '@@/server/lib/mail';
-import {
-  protectedProcedure,
-  publicProcedure,
-  router,
-} from '@@/server/lib/trpc';
+import { sendConfirmationEmail, sendResetPasswordEmail } from '../../lib/mail';
+import { protectedProcedure, publicProcedure, router } from '../../lib/trpc';
 
 import {
   generateVerificationToken,
