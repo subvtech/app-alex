@@ -47,6 +47,11 @@ export function UseRecording() {
     if (!recorder.value) return;
     pause();
     recorder.value.stop();
+    if (startRecordingTime.value) {
+      const durationValue =
+        differenceInMilliseconds(new Date(), startRecordingTime.value) / 1000;
+      duration.value = durationValue;
+    }
     await wait(100);
     if (deleteAudio) {
       audio.value = null;

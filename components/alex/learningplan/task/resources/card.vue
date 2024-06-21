@@ -1,14 +1,28 @@
 <template>
   <div
+<<<<<<< HEAD
     class="card relative w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover"
     :class="edit && 'edit'"
+=======
+    class="card w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover d-flex align-end"
+    :class="{ cardHover: !deleteButton }"
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
     :style="`background-image: url('${cover}')`"
+    @click="emit('openTrail')"
   >
-    <p
-      class="absolute bottom-0 px-2 mb-3 ellipsis lines-2 text-body-6 text-white"
-    >
-      {{ title }}
-    </p>
+    <alex-custom-button
+      v-if="deleteButton"
+      class="delete-btn rounded-lg"
+      variant="secondary"
+      size="small"
+      icon="mdi-trash-can-outline"
+      @click.stop="emit('delete')"
+    />
+    <div class="text-shadow height-15 w-100">
+      <p class="ellipsis lines-2 text-body-6 text-white mx-2 my-4">
+        {{ title }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -16,8 +30,14 @@
 interface CardProps {
   title: string;
   cover?: string;
+<<<<<<< HEAD
   edit?: boolean;
+=======
+  deleteButton?: boolean;
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
 }
+
+const emit = defineEmits(['delete', 'openTrail']);
 
 withDefaults(defineProps<CardProps>(), {
   cover: '/images/cover_image_course.svg',
@@ -27,17 +47,37 @@ withDefaults(defineProps<CardProps>(), {
 
 <style scoped>
 .card {
-  box-shadow: black 0px -50px 36px -28px inset;
+  position: relative;
+  background-position: center;
   transition:
     box-shadow 0.5s,
     transform 0.3s;
 }
 
+<<<<<<< HEAD
 .card:hover {
   box-shadow: black 0px -50px 36px -20px inset;
 }
 
 .card.edit:hover {
+=======
+.text-shadow {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 10.81%,
+    rgba(0, 0, 0, 0.37) 48.72%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+.cardHover:hover {
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
   transform: scale(1.05);
+}
+
+.delete-btn {
+  position: absolute !important;
+  top: 8px;
+  right: 8px;
 }
 </style>

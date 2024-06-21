@@ -40,10 +40,12 @@
       "description": {
         "label": "Submission Description",
         "placeHolder": "Enter description"
-      }
+      },
+      "empty": "No submission realized"
     },
     "memberAlreadyInTask": "{member} already in task",
     "pleaseFillDates": "Please fill start and finish dates before add",
+    "pleaseFillType": "Please fill type before add",
     "addMember": "{member} was added in task",
     "removeMember": "{member} was removed of task",
     "freeEditor": "Free editor",
@@ -67,7 +69,8 @@
       "select": "Select a trail",
       "new": "New trail",
       "emptyTitle": "It looks like there are no trails created",
-      "emptySubtitle": "To select learning resources, you need to create and select a trail."
+      "emptySubtitle": "To select learning resources, you need to create and select a trail.",
+      "updateError": "Error updating learning resources, try again later"
     },
     "tags": {
       "subtitle": "Enter a tag",
@@ -81,10 +84,16 @@
       "genericSave": "Can't save the data",
       "addMember": "Error when adding member",
       "removeMember": "Error when removing member",
-      "addClass": "Error while trying to add class students from class {name}"
+      "addClass": "Error while trying to add class students from class {name}",
+      "sendMessage": "Error while trying send a message",
+      "endDateBeforeStartDate": "End date must be after start date",
+      "startDateAfterEndDate": "Start date must be before end date",
+      "cantChangeType": "You can't chage task type after add students"
     },
     "members": {
-      "allClass": "The entire class {name} was added in task"
+      "allClass": "The entire class {name} was added in task",
+      "allSelectedMembers": "All selected members already added in task",
+      "addMembers": "The selected members was added in task"
     },
     "events": {
       "task_created": "Task was created",

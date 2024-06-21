@@ -73,6 +73,7 @@
             :key="slide.title"
             :src="slide.image"
             :alt="slide.title"
+            :draggable="false"
           />
         </template>
       </vueper-slide>
@@ -328,17 +329,6 @@ const onCarouselSlide = (event) => {
   activeSlide.value = event.currentSlide.index;
 };
 
-interface Slide {
-  title: string;
-  image: string;
-  type: string;
-  icon: string;
-  imgId?: string;
-  videoId?: string;
-  video?: string;
-  url?: string;
-}
-
 function newSlide(file, res) {
   if (file.type.includes('image')) {
     return {
@@ -365,7 +355,10 @@ const dialog = ref();
 const openAddSlidesDialog = (index, slides) => {
   dialog.value.openModal(index, slides);
 };
-const slides = ref<Slide[]>([...(props.slides as Slide[])]);
+
+const slides = ref<Slide[]>(
+  Array.isArray(props.slides) ? [...props.slides] : [],
+);
 
 const deleteSlide = (item) => {
   if (item.type.includes('File')) {
@@ -569,4 +562,7 @@ const backgroundImgColor = AlexThemeColors['gray-blue'];
   border-radius: 4px;
 }
 
+.disable-select {
+  user-select: none;
+}
 </style>

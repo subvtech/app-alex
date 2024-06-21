@@ -5,13 +5,14 @@ export type TaskType = 'individual' | 'group';
 export type TaskMemberStatus = 'to_do' | 'in_progress' | 'in_review' | 'done';
 export interface TaskSimple {
   id: number;
-  trail_id: number;
+  trail?: TrailSimple;
   learning_plan_id: number;
   title: string;
   description: string | null;
-  type?: TaskType | null;
+  type?: TaskType;
   tags: TagSimple[];
   status: TaskStatus;
+  blocks?: BlockSimple[];
   submission_required: boolean;
   start_at?: string | null;
   finish_at?: string | null;

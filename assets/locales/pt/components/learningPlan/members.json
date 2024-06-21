@@ -5,6 +5,7 @@
     "classes": "Turmas",
     "members": "Pessoas"
   },
+  "add": { "label": "Adicionar" },
   "menu": {
     "profile": "Ver perfil",
     "invite": "Reenviar convite",

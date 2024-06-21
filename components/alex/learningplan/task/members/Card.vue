@@ -1,5 +1,8 @@
 <template>
-  <div class="d-flex align-center ga-2 pa-2">
+  <div
+    class="d-flex align-center ga-2 pa-2 list-card"
+    @click="$emit('to-profile')"
+  >
     <v-img
       class="avatar flex-0-0 rounded-circle"
       :src="
@@ -31,12 +34,11 @@
       status="secondary"
       variant="outlined"
     />
-
-    <alex-learningplan-task-members-menu
-      :submitted="member.submitted"
-      accepted
-      @remove-click="$emit('remove-click')"
-      @to-profile="$emit('to-profile')"
+    <alex-custom-button
+      icon="mdi-trash-can-outline"
+      size="small"
+      variant="text"
+      @click.stop="$emit('remove-click')"
     />
   </div>
 
@@ -65,5 +67,15 @@ defineEmits(['remove-click', 'to-profile']);
 .avatar {
   width: 32px;
   height: 32px;
+}
+.list-card {
+  cursor: pointer;
+  border-radius: 8px;
+}
+.list-card:hover {
+  background: rgb(var(--v-theme-gray-blue)) !important;
+}
+.list-card:active {
+  background: rgb(var(--v-theme-gray-100)) !important;
 }
 </style>

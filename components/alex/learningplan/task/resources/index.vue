@@ -2,11 +2,18 @@
   <alex-custom-dialog
     v-model="open"
     class="alex-trails-modal"
+    body-classes="pa-0"
     :title="$t('components.learningPlan.drawer.task.learningResources.label')"
-    :no-footer="paginationLength <= 1"
+    :no-footer="paginationLength <= 1 && !selectedTrail"
+    :max-width="selectedTrail ? 1080 : 769"
+    main-button-text="Selecionar Recursos"
+    :loading="isLoading"
+    @on-secondary-action="open = false"
+    @on-main-action="updateBlocks('ADD')"
   >
     <!-- Activate -->
     <template #activator="{ props }">
+<<<<<<< HEAD
       <div>
         <p class="text-h3 mb-4">
           {{
@@ -16,6 +23,27 @@
 
         <alex-custom-button
           v-if="edit"
+=======
+      <p class="text-h3 mb-4">
+        {{ $t('components.learningPlan.drawer.task.learningResources.label') }}
+      </p>
+      <v-scroll-x-transition leave-absolute>
+        <alex-learningplan-task-resources-card
+          v-if="trail && blocks"
+          :title="trail?.title"
+          :cover="trail?.cover_image?.url"
+          :delete-button="true"
+          @delete="updateBlocks('REMOVE')"
+          @open-trail="
+            () => {
+              selectedTrail = trail;
+              open = true;
+            }
+          "
+        />
+        <alex-custom-button
+          v-else
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
           v-bind="props"
           size="large"
           prepend-icon="alex:trail"
@@ -26,6 +54,7 @@
             )
           "
           variant="secondary"
+<<<<<<< HEAD
         />
         <alex-learningplan-task-resources-cards
           v-else
@@ -34,10 +63,14 @@
           justify="start"
         />
       </div>
+=======
+          @click="selectedTrail = undefined"
+        />
+      </v-scroll-x-transition>
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
     </template>
-
     <!-- Content -->
-    <div>
+    <div v-if="!selectedTrail" class="pa-6 bg-white rounded-b-lg">
       <div class="d-flex align-center mb-4">
         <p class="flex-1-1 text-h5 text-gray-800 lines-1 ellipsis">
           {{
@@ -52,15 +85,36 @@
 
       <alex-learningplan-task-resources-cards
         v-if="trails.length || learningPlanStore.loading"
+<<<<<<< HEAD
         :trails="trailsView"
         :loading="learningPlanStore.loading"
         edit
       />
 
+=======
+        class="cards d-flex align-center flex-wrap ga-4"
+      >
+        <template v-if="trails.length && !selectedTrail">
+          <alex-learningplan-task-resources-card
+            v-for="trailItem in trailsView"
+            :key="trailItem.id"
+            :title="trailItem.title"
+            :cover="trailItem.cover_image?.url"
+            @click="selectedTrail = trailItem"
+          />
+        </template>
+        <alex-learningplan-task-resources-loader v-else />
+      </div>
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
       <alex-learningplan-task-resources-empty v-else />
     </div>
-
-    <template v-if="paginationLength > 1" #footer
+    <alex-learningplan-task-resources-editor
+      v-else
+      ref="editor"
+      :selected-trail="selectedTrail"
+      :blocks="blocks"
+    />
+    <template v-if="paginationLength > 1 && !selectedTrail" #footer
       ><div class="border-top-gray-100 rounded-b-lg bg-white">
         <alex-custom-pagination
           v-model="activePage"
@@ -73,9 +127,9 @@
 </template>
 
 <script setup lang="ts">
-const paginationBlock: number = 12;
-
+const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
+<<<<<<< HEAD
 
 interface CompProps {
   edit?: boolean;
@@ -85,12 +139,36 @@ withDefaults(defineProps<CompProps>(), {
   edit: false,
 });
 
+=======
+const taskStore = useTaskStore();
+const isLoading = ref(false);
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
+const paginationBlock: number = 12;
+>>>>>>> b215bb2ccdf9050299ca47a811d1b055e68eb827
 const open = defineModel<boolean>({ required: true });
 
+interface propsType {
+  taskId: number;
+  trailId?: number;
+  blocks?: BlockSimple[] | number[];
+}
+
+const props = withDefaults(defineProps<propsType>(), {
+  taskId: -1,
+  trailId: undefined,
+  blocks: undefined,
+});
+
+const editor = ref();
 const activePage = ref<number>(1);
 const structures = ref<LearningPlanStructureSimple[]>([]);
 
 structures.value = learningPlanStore.learningPlan?.learning_structures || [];
+
+const trail = computed(() =>
+  trails.value.find((trail) => trail.id === props.trailId),
+);
 
 const trails = computed(() => {
   const trailsList: TrailSimple[] = [];
@@ -105,6 +183,8 @@ const trails = computed(() => {
 
   return trailsList;
 });
+
+const selectedTrail = ref<TrailSimple | undefined>();
 
 const trailsView = computed(() => {
   const length = trails.value.length;
@@ -127,6 +207,65 @@ const paginationLength = computed(() => {
     Math.floor(length / paginationBlock) + (length % paginationBlock ? 1 : 0)
   );
 });
+
+const updateBlocks = async (type: 'ADD' | 'REMOVE') => {
+  try {
+    isLoading.value = true;
+    const blocks = editor.value?.getSelectedBlocks() || [];
+    if ((!blocks.length || props.taskId === -1) && type === 'ADD') return;
+    await updateTask(blocks, type);
+    taskStore.task?.id === props.taskId
+      ? updateTaskStore(blocks, type)
+      : updateLearningplanStore(blocks, type);
+  } catch (e) {
+    setMessage(
+      t('components.learningPlan.drawer.task.learningResources.updateError'),
+      'red',
+      true,
+    );
+  } finally {
+    isLoading.value = false;
+    open.value = false;
+  }
+};
+
+const updateTask = async (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
+  await update('tasks', props.taskId, {
+    blocks: type === 'ADD' ? blocks : [],
+    trail: type === 'ADD' ? selectedTrail.value : null,
+  });
+};
+
+const updateLearningplanStore = (
+  blocks: BlockSimple[],
+  type: 'ADD' | 'REMOVE',
+) => {
+  if (learningPlanStore.learningPlan?.tasks) {
+    const taskIndex = learningPlanStore.learningPlan?.tasks.findIndex(
+      (task) => task.id === props.taskId,
+    );
+    const taskToUpdate = learningPlanStore.learningPlan.tasks[taskIndex];
+    if (taskIndex !== -1) {
+      const updatedTask = {
+        ...taskToUpdate,
+        blocks: type === 'ADD' ? blocks : [],
+        trail: type === 'ADD' ? selectedTrail.value : null,
+      };
+      learningPlanStore.learningPlan.tasks[taskIndex] = updatedTask;
+      learningPlanStore.learningPlan = {
+        ...learningPlanStore.learningPlan,
+        tasks: [...learningPlanStore.learningPlan.tasks],
+      };
+    }
+  }
+};
+
+const updateTaskStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
+  if (taskStore.task?.id === props.taskId && selectedTrail.value) {
+    taskStore.task.blocks = type === 'ADD' ? blocks : [];
+    taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
+  }
+};
 
 watch(
   () => [learningPlanStore.loading],

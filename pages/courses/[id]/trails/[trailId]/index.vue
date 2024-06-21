@@ -339,7 +339,7 @@ const calculateMargin = (index: number) => {
 };
 
 const isAvailableTooltip = (title: string) => {
-  if (title.length >= 29) return true;
+  if (title?.length >= 29) return true;
   return false;
 };
 

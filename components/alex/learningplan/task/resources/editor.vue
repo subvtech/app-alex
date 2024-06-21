@@ -1,0 +1,110 @@
+<template>
+  <div class="bg-white">
+    <div class="w-100 height-27 mb-6 d-flex ga-4 pa-6 header-border">
+      <div
+        class="trail-img width-15 height-15 rounded-lg bg-cover"
+        :style="`background-image: url('${trailCover}')`"
+      />
+      <div>
+        <p class="text-gray-500 text-h5">Trilha Selecionada</p>
+        <p class="text-gray-800 text-h3">{{ selectedTrail.title }}</p>
+      </div>
+    </div>
+    <div class="px-6">
+      <alex-custom-skeleton
+        v-if="isEditorLoading"
+        class="w-100 height-150 bg-blue"
+        color="gray-200"
+      />
+      <app-editor
+        ref="editor"
+        :select-blocks-mode="blocksIds"
+        :class="isEditorLoading ? 'opacity-0' : ''"
+        @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+interface propsType {
+  selectedTrail: TrailSimple;
+  blocks?: BlockSimple[] | number[];
+}
+
+const props = withDefaults(defineProps<propsType>(), {
+  blocks: () => [],
+});
+
+const blocksIds = computed(() => {
+  return props.blocks?.map((block) => {
+    return block.id ? block.id : block;
+  }) as number[];
+});
+
+const trailCover = computed(
+  () =>
+    props.selectedTrail.cover_image?.url || '/images/cover_image_course.svg',
+);
+const isEditorLoading = ref(true);
+const editorData = computed(() => {
+  const data =
+    props.selectedTrail?.structures[props.selectedTrail?.structures.length - 1];
+  return {
+    time: data && data.time ? parseInt(data.time.toString()) : 0,
+    version: data?.version || '',
+    blocks:
+      data?.blocks.map((block: any) => {
+        return {
+          type: block.type,
+          data: block.data,
+          tunes: block.tunes || {},
+          id: block.id || '',
+        };
+      }) || [],
+  };
+});
+
+const editor = ref();
+const checkEditorReady = async () => {
+  let attempts = 0;
+  while (attempts < 10) {
+    try {
+      await editor.value.isReady;
+      return true;
+    } catch (error) {
+      await sleep(100);
+      attempts++;
+    }
+  }
+  return false;
+};
+
+onMounted(async () => {
+  isEditorLoading.value = true;
+  await checkEditorReady();
+  await editor.value.loadEditor({
+    blocks: editorData.value.blocks,
+  });
+  await editor.value.toggleReadOnly();
+  isEditorLoading.value = false;
+});
+
+const selectedBlocks = ref<String[]>([]);
+const getSelectedBlocks = () => {
+  return selectedBlocks.value;
+};
+
+defineExpose({
+  getSelectedBlocks,
+});
+</script>
+
+<style scoped>
+.trail-img {
+  background-position: center;
+}
+.header-border {
+  border-bottom: 1px solid rgb(var(--v-theme-gray-100));
+}
+</style>

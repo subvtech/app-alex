@@ -116,6 +116,8 @@
       :tags="taskStore.task.tags"
       :title="taskStore.task.title"
       :type="taskStore.task.type"
+      :trail="taskStore.task.trail"
+      :blocks="taskStore.task.blocks"
       :status="taskStore.task.status"
       :events="taskStore.task.task_events"
       :goals="taskStore.task.learning_goals"
@@ -127,6 +129,7 @@
       :end-date="taskStore.task.finish_at"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
+      :members-length="taskStore.task.task_members?.length"
       @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
       @change-submission-description="handleChangeSubmissionDescription"
@@ -174,7 +177,7 @@ const kanban = ref<{
 } | null>(null);
 const headerTags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
-  return ['a', 'b']; // taskStore.task.tags.map((tag) => tag.text);
+  return taskStore.task.tags.map((tag) => tag.text);
 });
 const handleChangeTags = (tags: TagSimple[]) => {
   if (!taskStore.task) return;

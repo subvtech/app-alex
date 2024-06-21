@@ -113,10 +113,9 @@
                 type="professor"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :mark="mostRecentSubmission?.grade"
-                :max-mark="mostRecentSubmission?.grade"
               />
               <p v-else class="text-body-3 text-gray-400">
-                Nenhuma entrega realizada
+                {{ $t('components.learningPlan.drawer.task.submission.empty') }}
               </p>
             </template>
             <template v-else>
@@ -147,8 +146,10 @@
         v-model="activePage"
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
+        :is-sending-message="isSendingMessage"
         :task-member-id="taskMemberId"
-        :events="events.data"
+        :message="{ isLoading: pendingMessages }"
+        :event="{ events: events.data, isLoading: eventLoading }"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :submissions="evaluatedSubmissions"
@@ -204,6 +205,8 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   finishAt: null,
 });
 const { t } = useI18n();
+const isSendingMessage = ref(false);
+const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
@@ -226,6 +229,7 @@ const strapi = useStrapi();
 const user = useStrapiUser();
 const learningplanStore = useLearningPlanStore();
 const strapiUtils = useStrapiUtils();
+const client = useStrapiClient();
 const { setMessage } = useMessageStore();
 const statusColor = computed(() => {
   const mapedColors = {
@@ -274,19 +278,21 @@ const {
       meta: { total: 0 },
       data: [] as TaskSubmissionSimple[],
     }),
+    lazy: true,
   },
 );
 
-const { data: events, execute: executeEvents } = await useAsyncData(
-  'task-events',
-  () => getEvents(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskEvent[],
-    }),
-  },
-);
+const {
+  data: events,
+  execute: executeEvents,
+  pending: eventLoading,
+} = await useAsyncData('task-events', () => getEvents(props.taskMemberId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskEvent[],
+  }),
+  lazy: true,
+});
 
 const evaluatedSubmissions = computed(() =>
   submissions.value.data.flatMap((submission) => {
@@ -298,7 +304,6 @@ const evaluatedSubmissions = computed(() =>
               text: submission.justification,
             },
             mark: submission.grade,
-            maxMark: submission.grade,
             time: new Date(submission.evaluated_at || submission.createdAt),
             status: submission.evaluated_at ? 'reviewed' : 'in_review',
           } as AttachedSubmission,
@@ -317,49 +322,83 @@ const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   }
   return 'in_review';
 };
-const getMessages = (memberID: number) =>
-  strapiUtils.find<TaskMemberMessage>('task-member-messages', {
-    filters: {
-      task_member: memberID,
-    },
-    populate: {
-      learning_plan_member: {
-        populate: ['user.avatar'],
-      },
-    },
-  });
-const { refresh } = await useAsyncData(
-  'task-submissions',
-  () => getMessages(props.taskMemberId),
-  {
-    immediate: false,
-  },
-);
+const {
+  data: messages,
+  pending: pendingMessages,
+  execute: executeMessages,
+} = await useAsyncMessage(taskMemberId, {
+  lazy: true,
+  watch: [taskMemberId],
+  dedupe: 'cancel',
+});
+
 const handleSubmitMessage = async (
   text: string,
   audio?: Blob | null,
-  _duration?: number,
-  _attachedMessage?: Message,
-  _attachedSubmission?: AttachedSubmission,
+  duration?: number,
+  attachedMessage?: Message,
+  attachedSubmission?: AttachedSubmission,
 ) => {
-  if (!text && !audio) return;
-  if (!user.value) return;
-  let learningMember = learningplanStore.activeMembers.find(
-    (member) => member.user.id === user?.value?.id,
-  );
-  if (learningplanStore.facilitator?.user.id === user.value.id) {
-    learningMember = learningplanStore.facilitator;
+  try {
+    if ((!text && !audio) || !user.value) return;
+    let learningMember = learningplanStore.activeMembers.find(
+      (member) => member.user.id === user?.value?.id,
+    );
+    if (learningplanStore.facilitator?.user.id === user.value.id) {
+      learningMember = learningplanStore.facilitator;
+    }
+    if (!learningMember) {
+      return;
+    }
+    isSendingMessage.value = true;
+    const formData = new FormData();
+    const newMessage = {
+      learning_plan_member: learningMember.id,
+      task_member: props.taskMemberId,
+      message: text,
+      sent_at: new Date().toISOString(),
+      ...(attachedMessage && { response_to_message: attachedMessage.id }),
+      ...(attachedSubmission && { task_submission: attachedSubmission.id }),
+    };
+    for (const key in newMessage) {
+      if (Object.prototype.hasOwnProperty.call(newMessage, key)) {
+        const value = newMessage[key];
+        formData.append(key, value);
+      }
+    }
+    if (audio) {
+      formData.append('files', audio);
+      formData.append('audio_duration', String(duration));
+    }
+    const message = await client<TaskMemberMessage>(`/task-member-messages`, {
+      method: 'POST',
+      body: formData,
+      params: {
+        populate: {
+          learning_plan_member: {
+            populate: ['user.avatar'],
+          },
+          response_to_message: {
+            populate: {
+              learning_plan_member: {
+                populate: ['user.avatar'],
+              },
+            },
+          },
+          task_submission: true,
+        },
+      },
+    });
+    messages.value.data = [...messages.value.data, message];
+  } catch (error) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.sendMessage'),
+      'error',
+      true,
+    );
+  } finally {
+    isSendingMessage.value = false;
   }
-  if (!learningMember) {
-    return;
-  }
-  await strapi.create('task-member-messages', {
-    learning_plan_member: learningMember.id,
-    task_member: props.taskMemberId,
-    message: text,
-    sent_at: new Date(),
-  });
-  refresh();
 };
 
 const changeDeadline = async (value?: string | null) => {
@@ -403,10 +442,18 @@ watch(model, (value) => {
     canSubmitAfterDeadline.value = props.canSubmitAfterDeadline;
     executeSubmissions();
     executeEvents();
+    executeMessages();
     return;
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
+  activePage.value = '1';
+  messages.value.data = [];
+});
+watch(activePage, (value) => {
+  if (value === '3') {
+    executeMessages();
+  }
 });
 </script>
 

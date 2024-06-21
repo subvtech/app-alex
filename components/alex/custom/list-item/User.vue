@@ -8,13 +8,14 @@
     :disabled="selected"
     v-bind="$attrs"
   >
-    <template #prepend="{ isSelected }">
+    <template #prepend="{ isSelected, select }">
       <div class="d-flex gap-4">
         <alex-inputs-checkbox
           v-if="!noCheckbox && !removeSelection"
-          :model-value="isSelected"
+          :model-value="isSelected || isSelectedValue"
           :disabled="selected"
           class="checkbox"
+          @click="() => select(true)"
         />
         <v-avatar
           :size="40"
@@ -98,6 +99,7 @@ interface AlexListItemUser {
   selected?: boolean;
   noCheckbox?: boolean;
   noSecondButton?: boolean;
+  isSelectedValue?: boolean;
 }
 
 defineEmits(['delete', 'secondButtonAction']);
@@ -112,6 +114,7 @@ const props = withDefaults(defineProps<AlexListItemUser>(), {
   noReload: false,
   loadingDelete: false,
   loadingSecondButton: false,
+  isSelectedValue: false,
 });
 const initials = computed(() => {
   return getInitials(props.user?.name || props.user.email);
