@@ -75,9 +75,9 @@
     />
   </div>
   <!-- Kanban -->
-  <alex-learningplan-task-kanban-loader
-    v-else-if="!isProfessor || learningPlanStore.loading"
-  />
+  <!-- <alex-learningplan-task-kanban-loader
+    v-else-if="!isProfessor  learningPlanStore.loading"
+  /> -->
   <alex-learningplan-task-kanban
     v-else
     v-model="tasks"
@@ -166,7 +166,7 @@ watch(
       // Kanban
       tasks.value = learningPlanStore.learningPlan?.tasks || [];
       classes.value =
-        learningPlanStore.learningPlan?.classes.map((group) => group.name) ||
+        learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
         [];
 
       headerStore.title = t('components.courses.settings.breadcrumbTitle');
