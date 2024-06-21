@@ -245,7 +245,7 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
 .v-expansion-panel__shadow {
   display: none !important;
 }
-.v-expansion-panels {
+.alex-accordion.v-expansion-panels {
   --color: rgb(var(--v-theme-gray-100)) !important;
   border: 1px solid var(--color) !important;
   border-radius: 8px;

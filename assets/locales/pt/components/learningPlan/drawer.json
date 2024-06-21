@@ -82,7 +82,9 @@
       "cantChangeType": "Você não pode alterar o tipo da tarefa após adicionar alunos"
     },
     "members": {
-      "allClass": "A turma {name} já foi adicionada na tarefa"
+      "allClass": "A turma {name} já foi adicionada na tarefa",
+      "allSelectedMembers": "Todos os alunos selecionados já foram adicionados a tarefa",
+      "addMembers": "Os alunos selecionados foram adicionados a tarefa"
     },
     "events": {
       "task_created": "Tarefa criada.",
