@@ -3,14 +3,24 @@
     <template #activator="{ isActive, props: activatorProps }">
       <slot name="activator" :is-active="isActive" :props="activatorProps" />
     </template>
-    <alex-inputs-text-field
-      v-model="search"
-      name="search"
-      placeholder="Buscar Grupos do curso"
-    />
+    <div class="flex gap-4">
+      <alex-inputs-text-field
+        v-model="search"
+        name="search"
+        placeholder="Buscar Grupos do curso"
+        class="w-full"
+        density="comfortable"
+      />
+      <alex-custom-button
+        size="large"
+        variant="secondary"
+        prepend-icon="mdi-plus"
+        >Novo grupo</alex-custom-button
+      >
+    </div>
     <v-expansion-panels class="task-student-card group" multiple>
       <v-expansion-panel
-        v-for="classValue in classes.data"
+        v-for="classValue in filteredClasses"
         :key="classValue.id"
       >
         <v-expansion-panel-title>
@@ -19,13 +29,11 @@
           </p></v-expansion-panel-title
         >
         <v-expansion-panel-text>
-          <div
+          <alex-learningplan-task-dialog-add-group-card
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
-            class="bg-white mt-2 p-4 rounded-md"
-          >
-            <h4 class="text-body-4 text-gray-900">{{ group.title }}</h4>
-          </div>
+            :group="group"
+          />
           <p
             v-if="!classValue.learning_plan_groups?.length"
             class="text-gray-500"
@@ -60,6 +68,17 @@ const { data: classes, execute } = await useAsyncData(
     default: () => ({ meta: 0, data: [] as ClassSimple[] }),
   },
 );
+
+const filteredClasses = computed(() => {
+  if (!search.value) return classes.value.data;
+  const lowerCaseSearch = search.value.toLowerCase();
+  return classes.value.data.map((classValue) => ({
+    ...classValue,
+    learning_plan_groups: classValue.learning_plan_groups?.filter((group) =>
+      group.title.toLowerCase().includes(lowerCaseSearch),
+    ),
+  }));
+});
 
 watch(model, (value) => {
   if (value) {
