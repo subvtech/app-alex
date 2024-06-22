@@ -13,7 +13,7 @@
       icon="mdi-trash-can-outline"
       @click.stop="emit('delete')"
     />
-    <div class="text-shadow height-15 w-100">
+    <div class="text-shadow height-15 w-100 d-flex align-end">
       <p class="ellipsis lines-2 text-body-6 text-white mx-2 my-4">
         {{ title }}
       </p>
@@ -41,6 +41,7 @@ withDefaults(defineProps<CardProps>(), {
 .card {
   position: relative;
   background-position: center;
+  min-width: 150px;
   transition:
     box-shadow 0.5s,
     transform 0.3s;

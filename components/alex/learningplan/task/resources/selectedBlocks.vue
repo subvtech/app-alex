@@ -48,7 +48,7 @@ const trailCover = computed(
   () =>
     props.selectedTrail.cover_image?.url || '/images/cover_image_course.svg',
 );
-const isEditorLoading = ref(true);
+const isEditorLoading = ref(false);
 const editorData = computed(() => {
   const data =
     props.selectedTrail?.structures[props.selectedTrail?.structures.length - 1];
@@ -85,13 +85,15 @@ const checkEditorReady = async () => {
 };
 
 onMounted(async () => {
-  isEditorLoading.value = true;
-  await checkEditorReady();
-  await editor.value.loadEditor({
-    blocks: editorData.value.blocks,
-  });
-  await editor.value.toggleReadOnly();
-  isEditorLoading.value = false;
+  if (editorData.value.blocks.length) {
+    isEditorLoading.value = true;
+    await checkEditorReady();
+    await editor.value.loadEditor({
+      blocks: editorData.value.blocks,
+    });
+    await editor.value.toggleReadOnly();
+    isEditorLoading.value = false;
+  }
 });
 
 const selectedBlocks = ref<String[]>([]);
@@ -99,8 +101,13 @@ const getSelectedBlocks = () => {
   return selectedBlocks.value;
 };
 
+const handleNewTrail = async () => {
+  return await editor.value.getData();
+};
+
 defineExpose({
   getSelectedBlocks,
+  handleNewTrail,
 });
 </script>
 
