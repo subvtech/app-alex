@@ -1,6 +1,6 @@
 <template>
   <div
-    class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 min-w-300 card-kanban bg-white"
+    class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white"
   >
     <div class="d-flex gap-2 align-center">
       <p class="text-body-2 ellipsis lines-1 w-100">
@@ -14,7 +14,7 @@
       />
     </div>
     <div v-if="group" class="d-flex gap-2 align-center mt-2"></div>
-    <div class="d-flex gap-2 justify-end w-100 mt-4">
+    <div class="d-flex gap-2 justify-end w-100 mt-8">
       <alex-custom-chip
         status="secondary"
         variant="outlined"

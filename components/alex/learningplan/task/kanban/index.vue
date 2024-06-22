@@ -5,6 +5,7 @@
       class="d-flex align-center pa-3 px-6 ga-3 border-bottom-1 border-gray-100"
     >
       <alex-inputs-text-field
+        v-model="search"
         name="student"
         :placeholder="$t('components.courses.tasks.srchStudent')"
         prepend-inner-icon="mdi-magnify"
@@ -84,6 +85,7 @@
             :avatar="item?.avatar"
             :mark="item.mark"
             :max-mark="item.maxMark"
+            @click="$emit('card-click', itemIndex, item)"
           />
         </template>
       </alex-learningplan-task-kanban-column>
@@ -203,6 +205,7 @@ type FiltersValue = {
     value: { start: string; end: string } | null;
   };
 };
+const search = ref('');
 const filterTitleSelect = computed(() => {
   const drawer = 'components.learningPlan.drawer';
   return props.classes?.length ? t(`${drawer}.class`) : t(`${drawer}.type`);
@@ -238,13 +241,21 @@ const applyFilters = (values: Filters) => {
     filters.value.finalDate.value = values.finalDate;
   }
 };
-
+const filteredBySearch = computed(() => {
+  const searchValue = search.value.toLowerCase();
+  return tasks.value.filter((task) => {
+    if (isTaskStudent(task)) {
+      return task.title.toLowerCase().includes(searchValue);
+    }
+    return task.user.name.toLowerCase().includes(searchValue);
+  });
+});
 const filteredByClassTasks = computed(() =>
   !filters.value.select.value
-    ? tasks.value
+    ? filteredBySearch.value
     : filterByClassOrType(
         props.type === 'student',
-        tasks.value,
+        filteredBySearch.value,
         filters.value.select.value,
       ),
 );
@@ -298,9 +309,16 @@ const filterByClassOrType = (
   if (!isStudent) {
     return tasks.filter((task) => (task as Task).studentClass === value);
   }
-  return tasks.filter(
-    (task) => (task as TaskStudent).group === (value === 'group'),
-  );
+  return tasks.filter((task) => {
+    const taskStudent = task as TaskStudent;
+    if (value === 'individual' && !taskStudent.group) {
+      return true;
+    }
+    if (value === 'group' && taskStudent.group) {
+      return true;
+    }
+    return false;
+  });
 };
 
 // Scroll X and Y

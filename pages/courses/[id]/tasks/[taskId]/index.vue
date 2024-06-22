@@ -46,7 +46,7 @@
       ref="kanban"
       v-model="tasks"
       type="professor"
-      :classes="['turma A']"
+      :classes="getClassesOfTaskMembers(taskStore.task.task_members)"
       :columns="[
         {
           title: 'A fazer',
@@ -147,7 +147,7 @@ definePageMeta({
 
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
-const detailsDrawer = ref<boolean>(false);
+// const detailsDrawer = ref<boolean>(false);
 const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const route = useRoute();
@@ -249,19 +249,29 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
     });
   }
 };
+
+const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
+  const classes = taskMembers.flatMap((taskMember) =>
+    taskMember.task_member_students.flatMap((student) =>
+      student.student_member.learning_class?.name
+        ? student.student_member.learning_class?.name
+        : [],
+    ),
+  );
+  return Array.from(new Set(classes));
+};
+
 onBeforeMount(() => {
-  headerStore.showHeader = true;
   if (!id || !taskId.value) {
-    return navigateTo(`/courses/`);
+    return navigateTo(`/courses`);
   }
-  if (!Number.isInteger(Number(id))) {
-    return navigateTo(`/courses/${id}`);
-  }
+  headerStore.showHeader = true;
+  learningPlanStore.loadLearningPlan(Number(id));
   taskStore.loadTaskData(taskId.value, Number(id));
 });
 
 watch(
-  () => [learningPlanStore.loading, taskStore.loading],
+  () => [learningPlanStore.loading],
   () => {
     if (!learningPlanStore.loading) {
       headerStore.title = t('pages.classes.breadcrumbs.myCourses');
@@ -292,9 +302,9 @@ watch(
           disabled: true,
         },
       ];
-    }
-    if (!taskStore.task && !taskStore.loading) {
-      navigateTo(`/courses/${route.params.id}/tasks`);
+      if (!learningPlanStore.userIsFacilitator) {
+        navigateTo(`/courses/${route.params.id}/tasks`);
+      }
     }
   },
 );
@@ -317,6 +327,14 @@ watch(
           task?.task_member_students[0]?.student_member?.learning_class?.name ||
           '',
       }));
+    }
+  },
+);
+watch(
+  () => taskStore.loading,
+  (value) => {
+    if (!taskStore.task && !value) {
+      navigateTo(`/courses/${route.params.id}/tasks`);
     }
   },
 );

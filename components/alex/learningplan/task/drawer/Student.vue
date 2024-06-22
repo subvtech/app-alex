@@ -33,8 +33,10 @@
             </p>
           </template>
         </v-avatar>
-        <h2 class="text-h2">{{ student.name }}</h2>
-        <p class="text-subtitle-2">{{ student.studentClass }}</p>
+        <h2 class="text-h2 ellipsis lines-1">{{ student.name }}</h2>
+        <p class="text-subtitle-2 ellipsis lines-1">
+          {{ student.studentClass }}
+        </p>
       </div>
 
       <div class="task-info">
@@ -56,7 +58,7 @@
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date v-model="finishAt" />
+          <alex-learningplan-task-date v-model="finishAt" edit />
         </div>
       </div>
       <div class="task-submission">

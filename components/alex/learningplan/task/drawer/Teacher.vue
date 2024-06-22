@@ -283,18 +283,10 @@ watch(model, (value) => {
   }
 });
 
-type ChangeValues = {
-  type: TaskType | null;
-  status: TaskStatus;
-  start_at?: string | null;
-  finish_at?: string | null;
-  can_submit_after_deadline: boolean;
-  submission_required: boolean;
-};
 type Emits = {
   'kanban-click': [];
   'attached-trail-click': [];
-  'change-values': [values: ChangeValues];
+  'change-values': [values: Partial<TaskSimple>];
   'change-description': [value: string];
   'change-submission-description': [value: string];
   'change-tags': [value: TagSimple[]];
@@ -403,9 +395,9 @@ const updateTaskValues = async (
       submission_required: hasSubmission.value,
       learning_goals: goals.value,
       allowed_editor_plugins: restrictions.value,
-    };
+    } as Partial<TaskSimple>;
     await strapi.update('tasks', taskId, values);
-    emit('change-values', valuesEmit as ChangeValues);
+    emit('change-values', valuesEmit);
   } catch (error) {
     notifyError();
   }

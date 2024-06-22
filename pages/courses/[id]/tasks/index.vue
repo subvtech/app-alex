@@ -74,41 +74,10 @@
       @update:model-value="(value) => (openFilterDrawer = value)"
     />
   </div>
-  <!-- Kanban -->
-  <!-- <alex-learningplan-task-kanban-loader
-    v-else-if="!isProfessor  learningPlanStore.loading"
-  /> -->
-  <alex-learningplan-task-kanban
+  <alex-learningplan-task-student
     v-else
-    v-model="tasks"
-    type="student"
-    :classes="classes"
-    :columns="[
-      {
-        title: 'A fazer',
-        color: 'gray',
-        group: 'to_do',
-        accept: true,
-      },
-      {
-        title: 'Em progresso',
-        color: 'blue',
-        group: 'in_progress',
-        accept: true,
-      },
-      {
-        title: 'Em avaliação',
-        color: 'orange',
-        group: 'in_review',
-        accept: true,
-      },
-      {
-        title: 'Concluído',
-        color: 'green',
-        group: 'done',
-        accept: true,
-      },
-    ]"
+    :learningplan-id="learningPlanStore.learningPlan!.id!"
+    :student-id="learningPlanStore.userLearningMember!.id!"
   />
 </template>
 <script setup lang="ts">

@@ -115,7 +115,7 @@
       v-model:attached-submission="attachedSubmission"
       class="mt-6"
       :task-member-id="taskMemberId"
-      :events="events.data"
+      :event="{ events: events.data }"
       :submission="!!submission"
       :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
       :submissions="evaluatedSubmissions"
