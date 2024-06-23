@@ -8,28 +8,6 @@
       !taskStore.loading && taskStore.task && learningPlanStore.learningPlan?.id
     "
   >
-    <!-- Testando
-    <alex-custom-button @click="detailsDrawer = true"
-      >Testar drawer novo</alex-custom-button
-    >
-    <alex-learningplan-task-drawer-details
-      v-model="detailsDrawer"
-      :task-id="taskId"
-      :tags="taskStore.task.tags"
-      :title="taskStore.task.title"
-      :status="taskStore.task.status"
-      :type="taskStore.task?.type || undefined"
-      :start-date="taskStore.task?.start_at || undefined"
-      :final-date="taskStore.task?.finish_at || undefined"
-      :description="taskStore.task?.description || undefined"
-      :restrictions="taskStore.task.allowed_editor_plugins || ''"
-      :task-member-id="studentDetailsId || -1"
-      :submission="{
-        constraints: taskStore.task.allowed_editor_plugins?.split(',') || [],
-        description: taskStore.task.submission_description,
-      }"
-    /> -->
-    <!-- Testando -->
     <alex-learningplan-task-header
       :title="taskStore.task.title"
       :tags="headerTags"
@@ -147,7 +125,6 @@ definePageMeta({
 
 const teacherDrawer = ref(false);
 const studentDrawer = ref(false);
-// const detailsDrawer = ref<boolean>(false);
 const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const route = useRoute();

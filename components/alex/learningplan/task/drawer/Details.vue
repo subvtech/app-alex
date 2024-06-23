@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    :id="drawerId"
     v-model="model"
     location="right"
     temporary

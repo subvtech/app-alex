@@ -35,8 +35,28 @@
         (newIndex, value, newStatus) =>
           handleUpdateStatus(newIndex, value, newStatus)
       "
+      @card-click="openDrawer"
     />
   </div>
+
+  <alex-learningplan-task-drawer-details
+    v-if="task"
+    v-model="detailsDrawer"
+    :task-id="task.id"
+    :tags="task.tags"
+    :title="task.title"
+    :status="task.status"
+    :type="task.type"
+    :start-date="task.start_at"
+    :final-date="task?.finish_at"
+    :description="task.description"
+    :restrictions="task?.allowed_editor_plugins || ''"
+    :task-member-id="studentId"
+    :submission="{
+      constraints: task?.allowed_editor_plugins?.split(',') || [],
+      description: task?.submission_description,
+    }"
+  />
 </template>
 
 <script setup lang="ts">
@@ -49,6 +69,7 @@ interface StudentProps {
 const props = defineProps<StudentProps>();
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
+const taskStore = useTaskStore();
 const { setMessage } = useMessageStore();
 const kanban = ref<{
   canDrag: boolean;
@@ -113,6 +134,7 @@ const { data: tasks } = await useAsyncData(
     },
   },
 );
+
 const handleUpdateStatus = async (
   _newIndex: number,
   item: TaskStudent,
@@ -138,6 +160,25 @@ const handleUpdateStatus = async (
     kanban.value.setCanDrag(true);
   }
 };
+
+const task = ref<TaskSimple | undefined>(undefined);
+const detailsDrawer = ref<boolean>(false);
+
+async function openDrawer(_, submission) {
+  const taskReq = await taskStore.loadTaskData(
+    submission,
+    props.learningplanId,
+  );
+
+  task.value = taskReq?.data[0];
+  detailsDrawer.value = true;
+}
+
+watch(detailsDrawer, () => {
+  if (!detailsDrawer.value) {
+    // task.value = undefined;
+  }
+});
 </script>
 
 <style scoped></style>
