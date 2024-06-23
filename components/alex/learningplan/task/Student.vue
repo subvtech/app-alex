@@ -40,21 +40,21 @@
   </div>
 
   <alex-learningplan-task-drawer-details
-    v-if="task"
+    v-if="selectedTask?.task"
     v-model="detailsDrawer"
-    :task-id="task.id"
-    :tags="task.tags"
-    :title="task.title"
-    :status="task.status"
-    :type="task.type"
-    :start-date="task.start_at"
-    :final-date="task?.finish_at"
-    :description="task.description"
-    :restrictions="task?.allowed_editor_plugins || ''"
+    :task-id="selectedTask.task.id"
+    :tags="selectedTask.task.tags"
+    :title="selectedTask.task.title"
+    :status="selectedTask.status"
+    :type="selectedTask.task.type"
+    :start-date="selectedTask.task.start_at || undefined"
+    :final-date="selectedTask.task?.finish_at || undefined"
+    :description="selectedTask.task.description || undefined"
+    :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
     :task-member-id="studentId"
     :submission="{
-      constraints: task?.allowed_editor_plugins?.split(',') || [],
-      description: task?.submission_description,
+      constraints: selectedTask.task?.allowed_editor_plugins?.split(',') || [],
+      description: selectedTask.task?.submission_description,
     }"
   />
 </template>
@@ -69,17 +69,21 @@ interface StudentProps {
 const props = defineProps<StudentProps>();
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
-const taskStore = useTaskStore();
 const { setMessage } = useMessageStore();
+const selectedTask = ref<TaskStudent | undefined>(undefined);
+const detailsDrawer = ref<boolean>(false);
 const kanban = ref<{
   canDrag: boolean;
   setCanDrag: (value: boolean) => void;
 } | null>(null);
 const { t } = useI18n();
+
 const getStudentTasks = (learningplanId: number, memberId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
-      task: true,
+      task: {
+        populate: ['tags'],
+      },
       task_events: {
         populate: {
           learning_plan_member: {
@@ -105,36 +109,60 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
     },
   });
 const { data: tasks } = await useAsyncData(
-  'classes-member-invite',
+  'task-members-student',
   () => getStudentTasks(props.learningplanId, props.studentId),
   {
     default: () => ({ meta: 0, data: [] as TaskStudent[] }),
-    transform({ meta, data }) {
+    transform: ({ data, meta }) => {
+      const dataValue = data.map((task) => ({
+        id: task.id,
+        status: task.status,
+        date: new Date(task.finished_at?.replaceAll('-', '/')),
+        title: task.task?.title,
+        user: {
+          name:
+            task?.task_member_students[0]?.student_member?.user.fullname || '',
+          avatar:
+            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
+            undefined,
+        },
+        group: task.task?.type === 'group',
+        studentClass:
+          task?.task_member_students[0]?.student_member?.learning_class?.name ||
+          '',
+        task: task.task,
+      })) as TaskStudent[];
       return {
         meta,
-        data: data.map((task) => ({
-          id: task.id,
-          status: task.status,
-          date: new Date(task.finished_at?.replaceAll('-', '/')),
-          title: task.task?.title,
-          user: {
-            name:
-              task?.task_member_students[0]?.student_member?.user.fullname ||
-              '',
-            avatar:
-              task?.task_member_students[0]?.student_member?.user.avatar?.url ||
-              undefined,
-          },
-          group: task.task?.type === 'group',
-          studentClass:
-            task?.task_member_students[0]?.student_member?.learning_class
-              ?.name || '',
-        })),
+        data: dataValue,
       };
     },
   },
 );
-
+// const tasksStudent = computed({
+//   get() {
+//     return tasks.value.data.map((task) => ({
+//       id: task.id,
+//       status: task.status,
+//       date: new Date(task.finished_at?.replaceAll('-', '/')),
+//       title: task.task?.title,
+//       user: {
+//         name:
+//           task?.task_member_students[0]?.student_member?.user.fullname || '',
+//         avatar:
+//           task?.task_member_students[0]?.student_member?.user.avatar?.url ||
+//           undefined,
+//       },
+//       group: task.task?.type === 'group',
+//       studentClass:
+//         task?.task_member_students[0]?.student_member?.learning_class?.name ||
+//         '',
+//     }));
+//   },
+//   set() {
+//     // tasks.value.data.map((item) => item);
+//   },
+// });
 const handleUpdateStatus = async (
   _newIndex: number,
   item: TaskStudent,
@@ -161,22 +189,13 @@ const handleUpdateStatus = async (
   }
 };
 
-const task = ref<TaskSimple | undefined>(undefined);
-const detailsDrawer = ref<boolean>(false);
-
-async function openDrawer(_, submission) {
-  const taskReq = await taskStore.loadTaskData(
-    submission,
-    props.learningplanId,
-  );
-
-  task.value = taskReq?.data[0];
+function openDrawer(_index: number, card: TaskStudent) {
+  selectedTask.value = card;
   detailsDrawer.value = true;
 }
-
-watch(detailsDrawer, () => {
-  if (!detailsDrawer.value) {
-    // task.value = undefined;
+watch(detailsDrawer, (value) => {
+  if (!value) {
+    selectedTask.value = undefined;
   }
 });
 </script>

@@ -127,7 +127,7 @@
 <script setup lang="ts">
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import { TaskMemberStatus } from '~/models/simple/taskSimple.model';
 
 const model = defineModel<boolean>({ required: true });
 
@@ -141,7 +141,7 @@ interface DetailsDrawerProps {
   tags?: TagSimple[];
   title?: string;
   description?: string;
-  status?: TaskStatus;
+  status?: TaskMemberStatus;
   type?: string;
   startDate?: string;
   finalDate?: string;
@@ -150,7 +150,7 @@ interface DetailsDrawerProps {
   submissionDescription?: string;
   // lastSubmission;
   // Tabs
-  taskEvents: TaskEvent[];
+  taskEvents?: TaskEvent[];
   taskMemberId: number;
   submission: Submission;
 }
@@ -159,7 +159,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   tags: () => [],
   title: '',
   description: '',
-  status: 'draft',
+  status: 'to_do',
   type: undefined,
   startDate: undefined,
   finalDate: undefined,
@@ -171,7 +171,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
 
 // Pegar esses dados
 const tags = ref<TagSimple[]>(props.tags);
-const status = ref<TaskStatus>(props.status);
+const status = ref<TaskMemberStatus>(props.status);
 const type = ref<string | undefined>(props.type);
 const startDate = ref<string | undefined>(props.startDate);
 const finalDate = ref<string | undefined>(props.finalDate);
@@ -181,7 +181,7 @@ const submissionDescription = ref<string>(props.submissionDescription);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 
-const activeTab = ref<Number>(1);
+const activeTab = ref('1');
 const resourcesOpen = ref<boolean>(false);
 
 const drawerId = computed(() => `details-drawer-${crypto.randomUUID()}`);
@@ -219,6 +219,7 @@ const {
       meta: { total: 0 },
       data: [] as TaskSubmissionSimple[],
     }),
+    lazy: true,
   },
 );
 
@@ -230,6 +231,7 @@ const { data: events, execute: executeEvents } = await useAsyncData(
       meta: { total: 0 },
       data: [] as TaskEvent[],
     }),
+    lazy: true,
   },
 );
 

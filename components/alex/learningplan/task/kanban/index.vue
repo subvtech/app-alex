@@ -104,7 +104,11 @@
 import { isWithinInterval, isBefore, isAfter, isEqual } from 'date-fns';
 import { useMouse } from '@vueuse/core';
 import { Accept } from './column/index.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import {
+  TaskMemberStatus,
+  TaskSimple,
+  TaskStatus,
+} from '~/models/simple/taskSimple.model';
 // Types
 export interface Task {
   id: number;
@@ -118,13 +122,14 @@ export interface Task {
 export interface TaskStudent {
   id: number;
   date: Date;
-  status: TaskStatus | (string & {});
+  status: TaskMemberStatus;
   title: string;
   group?: boolean;
   nameGroup?: string;
   avatar?: string | null;
   mark?: number;
   maxMark?: number;
+  task?: TaskSimple;
 }
 type Colors = 'orange' | 'green' | 'blue' | 'gray';
 type KanbanType = 'professor' | 'student';
