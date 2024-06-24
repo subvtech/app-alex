@@ -56,17 +56,22 @@
           selectedTask.task?.allowed_editor_plugins?.split(',') || [],
         description: selectedTask.task?.submission_description,
       }"
+      @update-status="
+        (newIndex, value, newStatus) =>
+          handleUpdateStatus(newIndex, value, newStatus, true)
+      "
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { TaskStudent } from './kanban/index.vue';
+import { TaskStudent, InsertCardProps } from './kanban/index.vue';
 
 interface StudentProps {
   studentId: number;
   learningplanId: number;
 }
+
 type Emits = {};
 defineEmits<Emits>();
 const props = defineProps<StudentProps>();
@@ -78,6 +83,7 @@ const detailsDrawer = ref<boolean>(false);
 const kanban = ref<{
   canDrag: boolean;
   setCanDrag: (value: boolean) => void;
+  handleInsertCard: (data: InsertCardProps) => void;
 } | null>(null);
 const { t } = useI18n();
 
@@ -143,13 +149,20 @@ const { data: tasks } = await useAsyncData(
   },
 );
 const handleUpdateStatus = async (
-  _newIndex: number,
+  newIndex: number,
   item: TaskStudent,
   newStatus: string,
+  emitEvt: boolean = false,
 ) => {
   if (!kanban.value) {
     return;
   }
+
+  if (emitEvt) {
+    kanban.value.handleInsertCard({ newIndex, value: item, group: newStatus });
+    return;
+  }
+
   try {
     kanban.value.setCanDrag(false);
     await strapi.update<TaskMember>('task-members', item.id, {
@@ -162,6 +175,7 @@ const handleUpdateStatus = async (
       }
       return task;
     });
+
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
   } finally {
     kanban.value.setCanDrag(true);

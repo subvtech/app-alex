@@ -8,6 +8,7 @@
     :max-width="selectedTrail ? 1080 : 769"
     main-button-text="Selecionar Recursos"
     :loading="isLoading"
+    :disabled="!props.edit"
     @on-secondary-action="open = false"
     @on-main-action="selectMode ? updateBlocks('ADD') : handleNewTrail()"
   >

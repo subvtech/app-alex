@@ -91,6 +91,7 @@ interface EventProps {
 }
 export const orderEvents = (events: TaskEvent[]) => {
   const eventsGroups: { date: Date; events: EventProps[] }[] = [];
+
   events
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
     .forEach((current) => {

@@ -151,6 +151,7 @@
 <script setup lang="ts">
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
+import { TaskStudent } from '../kanban/index.vue';
 import { TaskMemberStatus } from '~/models/simple/taskSimple.model';
 
 const model = defineModel<boolean>({ required: true });
@@ -171,7 +172,6 @@ interface DetailsDrawerProps {
   finalDate?: string;
   // Entregas
   restrictions?: string;
-  submissionDescription?: string;
   // lastSubmission;
   // Tabs
   taskEvents?: TaskEvent[];
@@ -188,7 +188,6 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   startDate: undefined,
   finalDate: undefined,
   restrictions: '',
-  submissionDescription: '',
   taskEvents: () => [],
   submission: undefined,
 });
@@ -201,7 +200,7 @@ const startDate = ref<string | undefined>(props.startDate);
 const finalDate = ref<string | undefined>(props.finalDate);
 const description = ref<string>(props.description);
 const restrictions = ref<string>(props.restrictions);
-const submissionDescription = ref<string>(props.submissionDescription);
+const submissionDescription = ref<string>(props.submission.description);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
@@ -215,6 +214,13 @@ const { setMessage } = useMessageStore();
 const isSendingMessage = ref(false);
 const client = useStrapiClient();
 const { t } = useI18n();
+
+type Emits = {
+  (e: 'update-status', newIndex: number, value: TaskStudent, newStatus: string);
+};
+
+const emit = defineEmits<Emits>();
+
 // Get submissions
 const strapiUtils = useStrapiUtils();
 
@@ -406,7 +412,7 @@ watch(activeTab, (value) => {
 watch(model, (value) => {
   if (value) {
     description.value = props.description;
-    submissionDescription.value = props.submissionDescription;
+    submissionDescription.value = props.submission.description;
     tags.value = props.tags;
     status.value = props.status;
     startDate.value = props.startDate;
@@ -417,6 +423,20 @@ watch(model, (value) => {
       isFirstTimeOpened.value = false;
     }, 1100);
   }
+});
+
+watch(status, (newStatus, oldStatus) => {
+  emit(
+    'update-status',
+    0,
+    {
+      id: props.taskMemberId,
+      status: oldStatus,
+      title: props.title,
+      date: new Date(),
+    },
+    newStatus,
+  );
 });
 </script>
 

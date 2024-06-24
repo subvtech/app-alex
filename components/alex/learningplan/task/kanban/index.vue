@@ -131,6 +131,13 @@ export interface TaskStudent {
   maxMark?: number;
   task?: TaskSimple;
 }
+
+export interface InsertCardProps {
+  newIndex: number;
+  value: any; // TaskStudent Problema com o export
+  group: string;
+}
+
 type Colors = 'orange' | 'green' | 'blue' | 'gray';
 type KanbanType = 'professor' | 'student';
 type Card<T extends KanbanType> = T extends 'professor' ? Task : TaskStudent;
@@ -145,6 +152,7 @@ interface KanbanProps {
   type: T;
   classes?: string[];
 }
+
 const { t } = useI18n();
 // Models/props
 const canDrag = ref(true);
@@ -173,13 +181,13 @@ type Emits = {
   (
     e: 'card-insert',
     newIndex: number,
-    value: Card<typeof props.type>,
+    value: Card<typeof props.type> | TaskStudent,
     group: string,
   ): Promise<boolean>;
 };
 const emit = defineEmits<Emits>();
 
-const handleInsertCard = ({ newIndex, value, group }) => {
+const handleInsertCard = ({ newIndex, value, group }: InsertCardProps) => {
   // Update task status
   if (value) {
     tasks.value = tasks.value.map((task) => {
@@ -189,6 +197,7 @@ const handleInsertCard = ({ newIndex, value, group }) => {
       return task;
     });
   }
+
   emit('card-insert', newIndex, value, group);
 };
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
@@ -369,6 +378,7 @@ const setCanDrag = (value: boolean) => {
 defineExpose({
   canDrag,
   setCanDrag,
+  handleInsertCard,
 });
 </script>
 
