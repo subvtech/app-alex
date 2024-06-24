@@ -50,7 +50,7 @@
       :final-date="selectedTask.task?.finish_at || undefined"
       :description="selectedTask.task.description || undefined"
       :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
-      :task-member-id="studentId"
+      :task-member-id="selectedTask.id"
       :submission="{
         constraints:
           selectedTask.task?.allowed_editor_plugins?.split(',') || [],

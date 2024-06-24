@@ -120,11 +120,31 @@
       v-model:attached-submission="attachedSubmission"
       class="mt-6"
       :task-member-id="taskMemberId"
-      :event="{ events: events.data }"
+      :is-sending-message="isSendingMessage"
+      :message="{ isLoading: pendingMessages }"
+      :event="{ events: events.data, isLoading: eventLoading }"
       :submission="!!submission"
       :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
       :submissions="evaluatedSubmissions"
     />
+    <template v-if="activeTab === '3'" #append>
+      <alex-learningplan-task-chat-input
+        v-model:attached-message="attachedMessage"
+        v-model:attached-submission="attachedSubmission"
+        class="border-top-1 border-gray-100 pt-3"
+        :submissions="evaluatedSubmissions"
+        @submit="
+          (data) =>
+            handleSubmitMessage(
+              data.text,
+              data.audio?.blob,
+              data.audio?.duration,
+              data.attachedMessage,
+              data.attachedSubmission,
+            )
+        "
+      />
+    </template>
   </v-navigation-drawer>
 </template>
 
@@ -187,9 +207,14 @@ const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
 const activeTab = ref('1');
 const resourcesOpen = ref<boolean>(false);
-
+const taskMemberId = toRef(props, 'taskMemberId');
 const drawerId = computed(() => `details-drawer-${crypto.randomUUID()}`);
-
+const user = useStrapiUser();
+const learningplanStore = useLearningPlanStore();
+const { setMessage } = useMessageStore();
+const isSendingMessage = ref(false);
+const client = useStrapiClient();
+const { t } = useI18n();
 // Get submissions
 const strapiUtils = useStrapiUtils();
 
@@ -227,18 +252,17 @@ const {
   },
 );
 
-const { data: events, execute: executeEvents } = await useAsyncData(
-  'task-events',
-  () => getEvents(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskEvent[],
-    }),
-    lazy: true,
-  },
-);
-
+const {
+  data: events,
+  execute: executeEvents,
+  pending: eventLoading,
+} = await useAsyncData('task-events', () => getEvents(props.taskMemberId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskEvent[],
+  }),
+  lazy: true,
+});
 const evaluatedSubmissions = computed(() =>
   submissions.value.data.flatMap((submission) => {
     return submission.evaluated_at
@@ -274,6 +298,84 @@ const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   }
   return 'started';
 };
+const {
+  data: messages,
+  pending: pendingMessages,
+  execute: executeMessages,
+} = await useAsyncMessage(taskMemberId, {
+  lazy: true,
+  watch: [taskMemberId],
+  dedupe: 'cancel',
+});
+
+const handleSubmitMessage = async (
+  text: string,
+  audio?: Blob | null,
+  duration?: number,
+  attachedMessage?: Message,
+  attachedSubmission?: AttachedSubmission,
+) => {
+  try {
+    if ((!text && !audio) || !user.value) return;
+    let learningMember = learningplanStore.activeMembers.find(
+      (member) => member.user.id === user?.value?.id,
+    );
+    if (learningplanStore.facilitator?.user.id === user.value.id) {
+      learningMember = learningplanStore.facilitator;
+    }
+    if (!learningMember) {
+      return;
+    }
+    isSendingMessage.value = true;
+    const formData = new FormData();
+    const newMessage = {
+      learning_plan_member: learningMember.id,
+      task_member: props.taskMemberId,
+      message: text,
+      sent_at: new Date().toISOString(),
+      ...(attachedMessage && { response_to_message: attachedMessage.id }),
+      ...(attachedSubmission && { task_submission: attachedSubmission.id }),
+    };
+    for (const key in newMessage) {
+      if (Object.prototype.hasOwnProperty.call(newMessage, key)) {
+        const value = newMessage[key];
+        formData.append(key, value);
+      }
+    }
+    if (audio) {
+      formData.append('files', audio);
+      formData.append('audio_duration', String(duration));
+    }
+    const message = await client<TaskMemberMessage>(`/task-member-messages`, {
+      method: 'POST',
+      body: formData,
+      params: {
+        populate: {
+          learning_plan_member: {
+            populate: ['user.avatar'],
+          },
+          response_to_message: {
+            populate: {
+              learning_plan_member: {
+                populate: ['user.avatar'],
+              },
+            },
+          },
+          task_submission: true,
+        },
+      },
+    });
+    messages.value.data = [...messages.value.data, message];
+  } catch (error) {
+    setMessage(
+      t('components.learningPlan.drawer.task.errors.sendMessage'),
+      'error',
+      true,
+    );
+  } finally {
+    isSendingMessage.value = false;
+  }
+};
 
 const restrictionsValue = computed({
   get() {
@@ -286,13 +388,20 @@ const restrictionsValue = computed({
 
 watch(model, (value) => {
   if (value) {
-    finalDate.value = props.finalDate;
     executeSubmissions();
     executeEvents();
+    executeMessages();
     return;
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
+  activeTab.value = '1';
+  messages.value.data = [];
+});
+watch(activeTab, (value) => {
+  if (value === '3') {
+    executeMessages();
+  }
 });
 watch(model, (value) => {
   if (value) {
