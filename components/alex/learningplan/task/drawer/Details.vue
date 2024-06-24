@@ -70,7 +70,7 @@
         {{ $t('components.learningPlan.drawer.task.submission.label') }}
       </p>
 
-      <template v-if="mostRecentSubmission?.submitted_at">
+      <template v-if="submission">
         <alex-learningplan-task-restrictions
           v-model="restrictionsValue"
           class="mt-4"
@@ -92,7 +92,7 @@
             {{ $t('components.courses.tasks.submission.last_submission') }}
           </p>
           <alex-learningplan-task-submission
-            type="professor"
+            type="student"
             :status="getSubmissionStatus(mostRecentSubmission)"
             :mark="mostRecentSubmission?.grade"
             :max-mark="mostRecentSubmission?.grade"
@@ -108,7 +108,11 @@
       />
     </div>
 
-    <alex-learningplan-task-resources v-model="resourcesOpen" class="mt-6" />
+    <alex-learningplan-task-resources
+      v-model="resourcesOpen"
+      class="mt-6"
+      :edit="false"
+    />
 
     <alex-learningplan-task-tabs
       v-model="activeTab"
@@ -180,7 +184,7 @@ const restrictions = ref<string>(props.restrictions);
 const submissionDescription = ref<string>(props.submissionDescription);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
-
+const isFirstTimeOpened = ref(true);
 const activeTab = ref('1');
 const resourcesOpen = ref<boolean>(false);
 
@@ -259,10 +263,16 @@ const mostRecentSubmission = computed(
     submissions.value.data.filter((submission) => submission.submitted_at)[0],
 );
 const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
+  if (!submission) {
+    return 'not_started';
+  }
   if (submission?.evaluated_at) {
     return 'reviewed';
   }
-  return 'in_review';
+  if (submission?.submitted_at) {
+    return 'in_review';
+  }
+  return 'started';
 };
 
 const restrictionsValue = computed({
@@ -283,6 +293,21 @@ watch(model, (value) => {
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
+});
+watch(model, (value) => {
+  if (value) {
+    description.value = props.description;
+    submissionDescription.value = props.submissionDescription;
+    tags.value = props.tags;
+    status.value = props.status;
+    startDate.value = props.startDate;
+    finalDate.value = props.finalDate;
+    restrictions.value = props.restrictions;
+    isFirstTimeOpened.value = true;
+    setTimeout(() => {
+      isFirstTimeOpened.value = false;
+    }, 1100);
+  }
 });
 </script>
 

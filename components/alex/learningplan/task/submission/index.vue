@@ -116,27 +116,32 @@ const text = computed(() => {
       title: t('components.courses.tasks.submission.no_started'),
       subtitle: t('components.courses.tasks.submission.click_to_start'),
     };
-  } else if (props.status === 'started') {
+  }
+  if (props.status === 'started') {
     return {
       title: t('components.courses.tasks.submission.started'),
       subtitle: t('components.courses.tasks.submission.click_to_continue'),
     };
-  } else if (props.status === 'in_review' && props.type === 'student') {
+  }
+  if (props.status === 'in_review' && props.type === 'student') {
     return {
       title: t('components.courses.tasks.submission.in_review'),
       subtitle: t('components.courses.tasks.submission.sent_task'),
     };
-  } else if (props.status === 'denied' && props.type === 'professor') {
+  }
+  if (props.status === 'denied' && props.type === 'professor') {
     return {
       title: t('components.courses.tasks.submission.denied'),
       subtitle: formattedMark.value,
     };
-  } else if (props.status === 'denied' && props.type === 'student') {
+  }
+  if (props.status === 'denied' && props.type === 'student') {
     return {
       title: t('components.courses.tasks.submission.denied'),
       subtitle: t('components.courses.tasks.submission.click_to_remake'),
     };
-  } else if (props.status === 'reviewed') {
+  }
+  if (props.status === 'reviewed') {
     return {
       title: t('components.courses.tasks.submission.reviewed'),
       subtitle: formattedMark.value,

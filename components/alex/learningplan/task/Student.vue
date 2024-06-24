@@ -37,26 +37,27 @@
       "
       @card-click="openDrawer"
     />
-  </div>
 
-  <alex-learningplan-task-drawer-details
-    v-if="selectedTask?.task"
-    v-model="detailsDrawer"
-    :task-id="selectedTask.task.id"
-    :tags="selectedTask.task.tags"
-    :title="selectedTask.task.title"
-    :status="selectedTask.status"
-    :type="selectedTask.task.type"
-    :start-date="selectedTask.task.start_at || undefined"
-    :final-date="selectedTask.task?.finish_at || undefined"
-    :description="selectedTask.task.description || undefined"
-    :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
-    :task-member-id="studentId"
-    :submission="{
-      constraints: selectedTask.task?.allowed_editor_plugins?.split(',') || [],
-      description: selectedTask.task?.submission_description,
-    }"
-  />
+    <alex-learningplan-task-drawer-details
+      v-if="selectedTask?.task"
+      v-model="detailsDrawer"
+      :task-id="selectedTask.task.id"
+      :tags="selectedTask.task.tags"
+      :title="selectedTask.task.title"
+      :status="selectedTask.status"
+      :type="selectedTask.task.type"
+      :start-date="selectedTask.task.start_at || undefined"
+      :final-date="selectedTask.task?.finish_at || undefined"
+      :description="selectedTask.task.description || undefined"
+      :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
+      :task-member-id="studentId"
+      :submission="{
+        constraints:
+          selectedTask.task?.allowed_editor_plugins?.split(',') || [],
+        description: selectedTask.task?.submission_description,
+      }"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -66,6 +67,8 @@ interface StudentProps {
   studentId: number;
   learningplanId: number;
 }
+type Emits = {};
+defineEmits<Emits>();
 const props = defineProps<StudentProps>();
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
@@ -139,30 +142,6 @@ const { data: tasks } = await useAsyncData(
     },
   },
 );
-// const tasksStudent = computed({
-//   get() {
-//     return tasks.value.data.map((task) => ({
-//       id: task.id,
-//       status: task.status,
-//       date: new Date(task.finished_at?.replaceAll('-', '/')),
-//       title: task.task?.title,
-//       user: {
-//         name:
-//           task?.task_member_students[0]?.student_member?.user.fullname || '',
-//         avatar:
-//           task?.task_member_students[0]?.student_member?.user.avatar?.url ||
-//           undefined,
-//       },
-//       group: task.task?.type === 'group',
-//       studentClass:
-//         task?.task_member_students[0]?.student_member?.learning_class?.name ||
-//         '',
-//     }));
-//   },
-//   set() {
-//     // tasks.value.data.map((item) => item);
-//   },
-// });
 const handleUpdateStatus = async (
   _newIndex: number,
   item: TaskStudent,
@@ -189,15 +168,10 @@ const handleUpdateStatus = async (
   }
 };
 
-function openDrawer(_index: number, card: TaskStudent) {
+const openDrawer = (_index: number, card: TaskStudent) => {
   selectedTask.value = card;
   detailsDrawer.value = true;
-}
-watch(detailsDrawer, (value) => {
-  if (!value) {
-    selectedTask.value = undefined;
-  }
-});
+};
 </script>
 
 <style scoped></style>
