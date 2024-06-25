@@ -57,7 +57,6 @@ const props = withDefaults(defineProps<submissionProps>(), {
   lastSubmission: undefined,
 });
 
-const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const dialog = ref(false);
 const editor = ref();
@@ -65,7 +64,7 @@ const isLoading = ref(false);
 const { create, update } = useStrapi();
 const savedTime = ref<number>(-1);
 const currentData = ref<string>();
-
+const taskMemberId = toRef(props, 'taskMemberId');
 const checkEditorReady = async () => {
   let attempts = 0;
   while (attempts < 10) {
@@ -130,12 +129,14 @@ const saveContent = async () => {
     });
   }
 };
+const { execute: executeSubmissions } = useTaskSubmission(taskMemberId);
 const saveSubmission = async () => {
   isLoading.value = true;
   await checkEditorReady();
   try {
-    saveContent();
+    await saveContent();
     setMessage('Submissão salva com sucesso', 'success', true);
+    executeSubmissions();
   } catch (error) {
     setMessage('Erro ao salvar, tente novamente', 'error', true);
   } finally {

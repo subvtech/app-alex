@@ -182,10 +182,7 @@ interface DetailsDrawerProps {
   finalDate?: string;
   blocks?: BlockSimple[];
   trail?: TrailSimple;
-  // Entregas
   restrictions?: string;
-  // lastSubmission;
-  // Tabs
   taskEvents?: TaskEvent[];
   taskMemberId: number;
   submission: Submission;
@@ -238,14 +235,6 @@ const emit = defineEmits<Emits>();
 // Get submissions
 const strapiUtils = useStrapiUtils();
 
-const getSubmissions = (memberID: number) =>
-  strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
-    filters: {
-      task_member: memberID,
-    },
-    sort: 'createdAt:desc',
-  });
-
 const getEvents = (memberID: number) =>
   strapiUtils.find<TaskEvent>('task-events', {
     filters: {
@@ -253,22 +242,12 @@ const getEvents = (memberID: number) =>
     },
   });
 
-const {
-  data: submissions,
-  execute: executeSubmissions,
-  // pending,
-} = await useAsyncData(
-  'task-submissions',
-  () => getSubmissions(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskSubmissionSimple[],
-    }),
+const { data: submissions, execute: executeSubmissions } =
+  await useTaskSubmission(taskMemberId, {
     lazy: true,
-  },
-);
-
+    watch: [taskMemberId],
+    dedupe: 'cancel',
+  });
 const {
   data: events,
   execute: executeEvents,

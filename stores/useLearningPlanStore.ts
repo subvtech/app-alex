@@ -209,6 +209,22 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         (member) => member.user.id === user.value.id,
       ),
   );
+
+  const userTasks = computed(
+    () =>
+      learningPlan.value?.tasks.flatMap((task) => {
+        const taskMembers = task.task_members.filter((taskMember) =>
+          taskMember.task_member_students.find(
+            (studentMember) =>
+              userLearningMember.value?.id === studentMember.student_member.id,
+          ),
+        );
+        if (taskMembers.length) {
+          return [{ ...task, task_members: taskMembers }];
+        }
+        return [];
+      }) || [],
+  );
   return {
     learningPlan,
     loadLearningPlan,
@@ -231,5 +247,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     generalTags,
     technicalTags,
     userLearningMember,
+    userTasks,
   };
 });
