@@ -15,7 +15,9 @@
         size="large"
         variant="secondary"
         prepend-icon="mdi-plus"
-        >Novo grupo</alex-custom-button
+        >{{
+          $t('components.learningPlan.drawer.task.dialog.newGroup')
+        }}</alex-custom-button
       >
     </div>
     <v-expansion-panels class="task-student-card group" multiple>
@@ -38,7 +40,7 @@
             v-if="!classValue.learning_plan_groups?.length"
             class="text-gray-500"
           >
-            Não há grupos nessa turma
+            {{ $t('components.learningPlan.drawer.missing.groups') }}
           </p>
         </v-expansion-panel-text>
       </v-expansion-panel>

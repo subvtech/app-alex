@@ -6,26 +6,26 @@
       type="student"
       :columns="[
         {
-          title: 'A fazer',
+          title: $t('components.learningPlan.drawer.task.status.toDo'),
           color: 'gray',
           group: 'to_do',
           accept: ['in_progress'],
         },
         {
-          title: 'Em progresso',
+          title: $t('components.learningPlan.drawer.task.status.inProgress'),
           color: 'blue',
           group: 'in_progress',
           accept: ['to_do'],
         },
         {
-          title: 'Em avaliação',
+          title: $t('components.learningPlan.drawer.task.status.underReview'),
           color: 'orange',
           group: 'in_review',
           accept: ['in_progress', 'to_do'],
           disable: true,
         },
         {
-          title: 'Concluído',
+          title: $t('components.learningPlan.drawer.task.status.done'),
           color: 'green',
           group: 'done',
           disable: true,

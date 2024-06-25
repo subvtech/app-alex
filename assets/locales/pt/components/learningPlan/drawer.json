@@ -25,10 +25,20 @@
       "accept": "Aceitar",
       "deny": "Recusar"
     },
+    "submissions": {
+      "label": "Entregas"
+    },
     "description": {
       "label": "Descrição",
       "submissionLabel": "Descrição da entrega",
       "placeHolder": "Digite a descrição"
+    },
+    "dialog": {
+      "responsible": "Responsável",
+      "add": "Adicionar",
+      "newGroup": "Novo grupo",
+      "newMembers": "Adicionar integrantes",
+      "searchMembers": "Buscar participantes do curso"
     },
     "submission": {
       "label": "Entrega",
@@ -64,6 +74,7 @@
       "label": "Recursos de aprendizagem",
       "noneSelected": "Nenhuma trilha selecionada",
       "select": "Selecione uma trilha",
+      "selected": "Trilha selecionada",
       "new": "Nova trilha",
       "emptyTitle": "Parece que não há trilhas criadas",
       "emptySubtitle": "Para selecionar os recursos de aprendizagem é necessário criar e selecionar uma trilha.",
@@ -107,7 +118,12 @@
       "message": "{name} enviou uma mensagem."
     },
     "chat": {
-      "you": "{name} (Você)"
+      "you": "{name} (Você)",
+      "reply": "Responder",
+      "audio": "Áudio",
+      "error": {
+        "messages": "Erro ao carregar as mensagens"
+      }
     }
   },
   "goals": {
@@ -129,6 +145,9 @@
     "assignments": {
       "label": "Atribuições"
     },
+    "submissions": {
+      "label": "Entregas"
+    },
     "comments": {
       "label": "Comentários"
     }
@@ -139,7 +158,10 @@
     "tags": "Sem marcações",
     "date": "Sem data",
     "restrictions": "Sem restrições",
-    "description": "Sem descrição"
+    "submissions": "Parece que ainda não temos entregas",
+    "description": "Sem descrição",
+    "groups": "Não há grupos nessa turma",
+    "general": "Parece que não tem nada por aqui"
   },
   "filter": "Filtrar",
   "filterTasks": "Filtrar tarefas",

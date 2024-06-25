@@ -37,7 +37,7 @@
         v-if="!filteredClasses?.length && !hasFilteredMember"
         class="pa-4 pb-2 lines-1 ellipsis text-body-3 text-center text-gray-400"
       >
-        Parece que não tem nada por aqui!
+        {{ $t('components.learningPlan.drawer.missing.general') }}
       </p>
       <v-list-item
         v-for="(studentClass, index) in filteredClasses"

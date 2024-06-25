@@ -4,7 +4,7 @@
       v-if="error"
       class="text-body-1 w-full text-center text-error--1 my-auto"
     >
-      Erro ao carregar as mensagens :/
+      {{ $t('components.learningPlan.drawer.task.chat.error.messages') }} :/
     </p>
     <template v-if="user">
       <alex-learningplan-task-chat-message
