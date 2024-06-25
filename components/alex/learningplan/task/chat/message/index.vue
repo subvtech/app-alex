@@ -97,7 +97,12 @@ const attachedMessage = computed(() =>
 const attachedSubmission = computed(() =>
   !isMessage(props.response) ? props.response : undefined,
 );
-const menuItems = [{ text: 'responder', onClick: handleAttachMessage }];
+const menuItems = [
+  {
+    text: i18n.t('components.learningPlan.drawer.task.chat.reply'),
+    onClick: handleAttachMessage,
+  },
+];
 </script>
 
 <style scoped>

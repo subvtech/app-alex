@@ -58,18 +58,19 @@ const activePage = defineModel({ required: true, default: '1' });
 const attachedMessage = defineModel<Message>('attachedMessage');
 const attachedSubmission =
   defineModel<AttachedSubmission>('attachedSubmission');
+const { t } = useI18n();
 const tabs = computed(() => {
   const submissions = {
-    label: 'Entregas',
+    label: t('components.learningPlan.drawer.tabs.submissions.label'),
     value: '2',
   };
   const defaultTabs = [
     {
-      label: 'Eventos',
+      label: t('components.learningPlan.drawer.tabs.events.label'),
       value: '1',
     },
     {
-      label: 'Comentários',
+      label: t('components.learningPlan.drawer.tabs.comments.label'),
       value: '3',
     },
   ];

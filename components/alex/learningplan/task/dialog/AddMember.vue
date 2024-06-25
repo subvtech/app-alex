@@ -1,8 +1,8 @@
 <template>
   <alex-custom-dialog
     v-model="model"
-    title="Adicionar integrantes"
-    main-button-text="Adicionar"
+    :title="$t('components.learningPlan.drawer.task.dialog.addMembers')"
+    :main-button-text="$t('components.learningPlan.drawer.task.dialog.add')"
     @on-main-action="handleSubmit"
   >
     <template #activator="{ isActive, props: activatorProps }">
@@ -12,7 +12,9 @@
       v-model="search"
       name="search"
       class="mb-6"
-      placeholder="Buscar participantes do curso"
+      :placeholder="
+        $t('components.learningPlan.drawer.task.dialog.searchMembers')
+      "
       prepend-inner-icon="mdi-magnify"
       density="comfortable"
       hide-details

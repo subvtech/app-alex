@@ -25,6 +25,9 @@
       "accept": "Accept",
       "deny": "Deny"
     },
+    "submissions": {
+      "label": "Entregas"
+    },
     "submissionDescription": {
       "label": "Submission Description"
     },
@@ -32,6 +35,13 @@
       "label": "Description",
       "submissionLabel": "Submission description",
       "placeHolder": "Enter description"
+    },
+    "dialog": {
+      "responsible": "Responsible",
+      "add": "Add",
+      "newGroup": "New group",
+      "newMembers": "Add members",
+      "searchMembers": "Search course members"
     },
     "submission": {
       "label": "Submission",
@@ -67,6 +77,7 @@
       "label": "Learning resources",
       "noneSelected": "No trails selected",
       "select": "Select a trail",
+      "selected": "Selected trail",
       "new": "New trail",
       "emptyTitle": "It looks like there are no trails created",
       "emptySubtitle": "To select learning resources, you need to create and select a trail.",
@@ -110,7 +121,12 @@
       "message": "{name} sent a message."
     },
     "chat": {
-      "you": "{name} (you)"
+      "you": "{name} (you)",
+      "reply": "Reply",
+      "audio": "Audio",
+      "error": {
+        "messages": "Error loading messages"
+      }
     }
   },
   "goals": {
@@ -132,6 +148,9 @@
     "assignments": {
       "label": "Assignments"
     },
+    "submissions": {
+      "label": "Submissions"
+    },
     "comments": {
       "label": "Comments"
     }
@@ -142,7 +161,10 @@
     "tags": "No tags",
     "date": "No date",
     "restrictions": "No restrictions",
-    "description": "No description"
+    "submissions": "It looks like we don't have any deliveries yet",
+    "description": "No description",
+    "groups": "There are no groups in this class",
+    "general": "It seems like there's nothing here"
   },
   "filter": "Filter",
   "filterTasks": "Filter tasks",

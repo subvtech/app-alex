@@ -6,7 +6,11 @@
         :style="`background-image: url('${trailCover}')`"
       />
       <div>
-        <p class="text-gray-500 text-h5">Trilha Selecionada</p>
+        <p class="text-gray-500 text-h5">
+          {{
+            $t('components.learningPlan.drawer.task.learningResources.selected')
+          }}
+        </p>
         <p class="text-gray-800 text-h3">{{ selectedTrail.title }}</p>
       </div>
     </div>

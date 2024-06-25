@@ -49,7 +49,7 @@
                 @click="addGoal(goal)"
             /></template>
             <div v-else class="text-center text-gray-400">
-              Parece que não tem nada por aqui
+              {{ $t('components.learningPlan.drawer.missing.general') }}
             </div>
           </div>
         </v-list>
