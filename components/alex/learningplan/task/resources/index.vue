@@ -10,7 +10,7 @@
     :loading="isLoading"
     :disabled="!props.edit"
     @on-secondary-action="open = false"
-    @on-main-action="selectMode ? updateBlocks('ADD') : handleNewTrail()"
+    @on-main-action="editMode ? updateBlocks('ADD') : handleNewTrail()"
   >
     <!-- Activate -->
     <template #activator="{ props }">
@@ -22,12 +22,12 @@
           v-if="trail && blocks"
           :title="trail?.title"
           :cover="trail?.cover_image?.url"
-          :delete-button="true"
+          :delete-button="editMode"
+          :edit="editMode"
           @delete="updateBlocks('REMOVE')"
           @open-trail="
             () => {
               selectedTrail = trail;
-              selectMode = true;
               open = true;
             }
           "
@@ -47,7 +47,7 @@
           @click="
             () => {
               selectedTrail = undefined;
-              selectMode = true;
+              editMode = true;
               activePage = 1;
             }
           "
@@ -83,6 +83,7 @@
           :key="trailItem.id"
           :title="trailItem.title"
           :cover="trailItem.cover_image?.url"
+          :edit="editMode"
           @click="handleTrailClick(trailItem)"
         />
       </div>
@@ -94,9 +95,8 @@
       ref="editor"
       :selected-trail="selectedTrail"
       :blocks="blocks"
-      :select-mode="selectMode"
+      :edit-mode="editMode"
     />
-
     <template v-if="paginationLength > 1 && !selectedTrail" #footer
       ><div class="border-top-gray-100 rounded-b-lg bg-white">
         <alex-custom-pagination
@@ -125,7 +125,6 @@ const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const paginationBlock: number = 12;
 const createTrailDialog = ref(false);
-const selectMode = ref(true);
 const open = defineModel<boolean>({ required: true });
 
 interface propsType {
@@ -142,6 +141,8 @@ const props = withDefaults(defineProps<propsType>(), {
   edit: false,
 });
 
+const editMode = ref(props.edit);
+
 const learningStructure = computed(() => {
   return (
     learningPlanStore.learningPlan?.learning_structures.find(
@@ -152,8 +153,9 @@ const learningStructure = computed(() => {
 
 const hideFooter = computed(() => {
   if (selectedTrail.value) {
-    return false;
+    return !editMode.value;
   }
+
   return paginationLength.value <= 1;
 });
 
@@ -166,7 +168,7 @@ const handleCreatedTrail = async (id) => {
     ...trail,
   });
   selectedTrail.value = trail;
-  selectMode.value = false;
+  editMode.value = false;
   createTrailDialog.value = false;
 };
 
@@ -245,6 +247,7 @@ const updateBlocks = async (
   try {
     isLoading.value = true;
     const blocks = selectedBlocks || editor.value?.getSelectedBlocks() || [];
+    blocks.push(...(props.blocks as number[]));
     if ((!blocks.length || props.taskId === -1) && type === 'ADD') return;
     await updateTask(blocks, type);
     taskStore.task?.id === props.taskId

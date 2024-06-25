@@ -109,9 +109,13 @@
     </div>
 
     <alex-learningplan-task-resources
+      v-if="blocks && blocks.length > 0 && trail"
       v-model="resourcesOpen"
       class="mt-6"
       :edit="false"
+      :task-id="taskId"
+      :trail-id="trail?.id"
+      :blocks="blocks"
     />
 
     <alex-learningplan-task-tabs
@@ -170,6 +174,8 @@ interface DetailsDrawerProps {
   type?: string;
   startDate?: string;
   finalDate?: string;
+  blocks?: BlockSimple[];
+  trail?: TrailSimple;
   // Entregas
   restrictions?: string;
   // lastSubmission;
@@ -187,6 +193,8 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   type: undefined,
   startDate: undefined,
   finalDate: undefined,
+  blocks: undefined,
+  trail: undefined,
   restrictions: '',
   taskEvents: () => [],
   submission: undefined,

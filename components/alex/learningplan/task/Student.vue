@@ -44,7 +44,9 @@
       :task-id="selectedTask.task.id"
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
+      :trail="selectedTask.task.trail"
       :status="selectedTask.status"
+      :blocks="selectedTask.task.blocks"
       :type="selectedTask.task.type"
       :start-date="selectedTask.task.start_at || undefined"
       :final-date="selectedTask.task?.finish_at || undefined"
@@ -91,7 +93,7 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
       task: {
-        populate: ['tags'],
+        populate: ['tags', 'blocks', 'trail'],
       },
       task_events: {
         populate: {
@@ -148,6 +150,7 @@ const { data: tasks } = await useAsyncData(
     },
   },
 );
+
 const handleUpdateStatus = async (
   newIndex: number,
   item: TaskStudent,

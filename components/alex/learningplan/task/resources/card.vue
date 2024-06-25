@@ -1,7 +1,7 @@
 <template>
   <div
     class="card w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover d-flex align-end elevation-1"
-    :class="{ cardHover: !deleteButton, edit }"
+    :class="{ cardHover: edit && !deleteButton }"
     :style="`background-image: url('${cover}')`"
     @click="emit('openTrail')"
   >

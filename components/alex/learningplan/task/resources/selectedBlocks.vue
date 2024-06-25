@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white">
+  <div class="bg-white" :class="{ 'rounded-b-lg': !editMode }">
     <div class="w-100 height-27 mb-6 d-flex ga-4 pa-6 header-border">
       <div
         class="trail-img width-15 height-15 rounded-lg bg-cover"
@@ -14,7 +14,7 @@
         <p class="text-gray-800 text-h3">{{ selectedTrail.title }}</p>
       </div>
     </div>
-    <div class="px-6">
+    <div class="px-6 min-h-150">
       <alex-custom-skeleton
         v-if="isEditorLoading"
         class="w-100 height-150 bg-blue"
@@ -22,7 +22,7 @@
       />
       <app-editor
         ref="editor"
-        :selected-blocks="selectMode ? blocksIds : undefined"
+        :selected-blocks="editMode ? blocksIds : undefined"
         :class="isEditorLoading ? 'opacity-0' : ''"
         @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
       />
@@ -34,12 +34,12 @@
 interface propsType {
   selectedTrail: TrailSimple;
   blocks?: BlockSimple[] | number[];
-  selectMode?: boolean;
+  editMode?: boolean;
 }
 
 const props = withDefaults(defineProps<propsType>(), {
   blocks: () => [],
-  selectMode: false,
+  editMode: false,
 });
 
 const blocksIds = computed(() => {
@@ -61,9 +61,7 @@ const editorData = computed(() => {
     version: data?.version || '',
     blocks:
       data?.blocks
-        .filter(
-          (block) => props.selectMode || blocksIds.value.includes(block.id),
-        )
+        .filter((block) => props.editMode || blocksIds.value.includes(block.id))
         .map((block) => ({
           type: block.type,
           data: block.data,
