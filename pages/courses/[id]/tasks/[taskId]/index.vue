@@ -113,12 +113,16 @@
       @change-submission-description="handleChangeSubmissionDescription"
       @change-tags="handleChangeTags"
       @change-members="taskStore.updateTaskMembers(taskId)"
+      @change-title="handleChangeTitle"
     />
   </section>
 </template>
 
 <script setup lang="ts">
-import { Task } from '@/components/alex/learningplan/task/kanban/index.vue';
+import {
+  Task,
+  TaskStudent,
+} from '@/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
@@ -164,6 +168,10 @@ const handleChangeDescription = (description: string) => {
   if (!taskStore.task) return;
   taskStore.task.description = description;
 };
+const handleChangeTitle = (title: string) => {
+  if (!taskStore.task) return;
+  taskStore.task.title = title;
+};
 const handleChangeSubmissionDescription = (description: string) => {
   if (!taskStore.task) return;
   taskStore.task.submission_description = description;
@@ -183,7 +191,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
 };
 const handleUpdateStatus = async (
   _newIndex: number,
-  item: Task,
+  item: Task | TaskStudent,
   newStatus: string,
 ) => {
   if (!kanban.value) {

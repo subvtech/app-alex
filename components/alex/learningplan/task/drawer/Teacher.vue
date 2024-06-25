@@ -36,12 +36,15 @@
       />
 
       <!-- Informações -->
-      <p class="mt-4 text-h2 ellipsis lines-2">
-        {{
-          title ||
+      <alex-inputs-editable-text
+        v-model="title"
+        tag="h1"
+        class="mt-4 text-h2 ellipsis lines-2"
+        :cant-edit="editable"
+        :placeholder="
           '(' + $t('components.learningPlan.drawer.missing.title') + ')'
-        }}
-      </p>
+        "
+      ></alex-inputs-editable-text>
 
       <v-row class="my-5">
         <v-col cols="6">
@@ -250,6 +253,7 @@ const hasSubmission = ref(props.hasSubmission);
 const sendAfterDeadline = ref(props.sendAfterDeadline);
 const goals = ref(props.goals);
 const tags = ref(props.tags);
+const title = ref(props.title);
 const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
 const membersLength = toRef(props, 'membersLength');
@@ -289,6 +293,7 @@ type Emits = {
   'change-values': [values: Partial<TaskSimple>];
   'change-description': [value: string];
   'change-submission-description': [value: string];
+  'change-title': [value: string];
   'change-tags': [value: TagSimple[]];
   'change-members': [];
 };
@@ -440,6 +445,25 @@ useOnStopTyping(
   false,
   false,
 );
+useOnStopTyping(
+  title,
+  async (value) => {
+    try {
+      if (isFirstTimeOpened.value) {
+        return;
+      }
+      await strapi.update('tasks', props.taskId, {
+        title: value || '',
+      });
+      emit('change-title', value || '');
+    } catch (error) {
+      notifyFieldError('submissionDescription');
+    }
+  },
+  1000,
+  false,
+  false,
+);
 watch(endDate, async (value) => {
   if (!value) return;
   if (
@@ -515,7 +539,3 @@ function handleCloseModal() {
   model.value = false;
 }
 </script>
-
-<style scoped></style>
-
-<style></style>
