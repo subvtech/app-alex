@@ -93,9 +93,14 @@
           </p>
           <alex-learningplan-task-submission
             type="student"
-            :status="getSubmissionStatus(mostRecentSubmission)"
+            :status="getSubmissionStatus(submissions.data[0])"
             :mark="mostRecentSubmission?.grade"
             :max-mark="mostRecentSubmission?.grade"
+            :task-title="title"
+            :task-deadline="finalDate"
+            :restrictions="restrictionsValue"
+            :task-member-id="taskMemberId"
+            :content="submissions.data[0]"
           />
         </div>
       </template>
@@ -116,6 +121,7 @@
       :task-id="taskId"
       :trail-id="trail?.id"
       :blocks="blocks"
+      :task-member-id="taskMemberId"
     />
 
     <alex-learningplan-task-tabs
@@ -236,9 +242,6 @@ const getSubmissions = (memberID: number) =>
   strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
     filters: {
       task_member: memberID,
-      evaluated_at: {
-        $notNull: true,
-      },
     },
     sort: 'createdAt:desc',
   });
@@ -298,7 +301,7 @@ const evaluatedSubmissions = computed(() =>
 
 const mostRecentSubmission = computed(
   () =>
-    submissions.value.data.filter((submission) => submission.submitted_at)[0],
+    submissions.value.data.filter((submission) => submission.evaluated_at)[0],
 );
 const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   if (!submission) {
