@@ -30,30 +30,48 @@ export const useMetamask = () => {
         return {};
       }
 
-      let provider: ethers.BrowserProvider;
+      let provider;
+      let signer;
+      let signedMessage;
+      let data;
       console.log({ coinbase, providers: window.ethereum.providers });
-      if (coinbase && window.ethereum.providers) {
+      if (window.ethereum.providers) {
         const providers = Array.from(window.ethereum.providers);
-        provider = providers.find(
-          (provider: any) => provider.isCoinbaseWallet,
-        ) as ethers.BrowserProvider;
 
-        if (provider) {
-          console.log('User is using Coinbase Wallet');
-          // Proceed with Coinbase Wallet integration
-        } else {
+        provider = coinbase
+          ? providers.find((provider: any) => provider.isCoinbaseWallet)
+          : providers.find((provider: any) => provider.isMetaMask);
+
+        if (!provider) {
           setMessage(i18n.t('pages.login.metamask.notFound'), 'red', true);
 
           return {};
         }
+        console.log(
+          coinbase
+            ? 'User is using Coinbase Wallet'
+            : 'User is using MetaMask, but they have the Coinbase Wallet too',
+        );
+
+        signer = await withTimeout(
+          8000,
+          provider.request({
+            method: 'personal_sign',
+            params: [],
+          }),
+        );
+        data = await find('wallets/auth');
+
+        console.log(signer);
       } else {
         provider = new ethers.BrowserProvider(window.ethereum);
+        console.log('User is using MetaMask');
+
+        await withTimeout(8000, provider.getSigner());
+        data = await find('wallets/auth');
+
+        signedMessage = await signer.signMessage(data.token);
       }
-
-      const signer = await withTimeout(8000, provider.getSigner());
-
-      const data: any = await find('wallets/auth');
-      const signedMessage = await signer.signMessage(data.token);
 
       let endpoint: string;
       let requestData: any;
@@ -96,11 +114,8 @@ export const useMetamask = () => {
         }
       }
     } catch (err: any) {
-      setMessage(
-        err.info ? err.info.error?.message : err.error?.message,
-        'red',
-        true,
-      );
+      console.log({ err });
+      setMessage(err.message, 'red', true);
     } finally {
       loading.value = false;
     }

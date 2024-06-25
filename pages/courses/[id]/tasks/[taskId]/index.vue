@@ -106,6 +106,7 @@
       :end-date="taskStore.task.finish_at"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
+      :task-members="taskStore.task.task_members"
       @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
       @change-submission-description="handleChangeSubmissionDescription"

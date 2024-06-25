@@ -93,7 +93,7 @@
       </v-expansion-panels>
     </Transition>
   </div>
-
+  <pre>{{ taskDetails }}</pre>
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
@@ -112,6 +112,7 @@
     :start-date="taskDetails?.start_at"
     :end-date="taskDetails?.finish_at"
     :restrictions="taskDetails?.allowed_editor_plugins"
+    :task-members="taskDetails?.task_members"
     :editable="true"
     :kanban-button="true"
     @change-values="handleChangeValues"
@@ -544,6 +545,7 @@ const handleChangeMembers = async () => {
       populate: [
         'task_submission',
         'task_member_students.student_member.user.avatar',
+        'task_member_students.student_member.user.wallet',
         'task_member_students.student_member.learning_class',
       ],
       filters: {

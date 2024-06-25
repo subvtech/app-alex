@@ -92,13 +92,13 @@ export const useTaskStore = defineStore('task', () => {
     contractAddress: string,
   ) {
     try {
-      const response = await await update(`tasks`, taskId, {
-        contractAddress,
+      const response = await update(`tasks/${taskId}`, {
+        contract_address: contractAddress,
       });
       console.log(response);
       const { data } = response;
       if (task.value) {
-        task.value.contract_address = data.attributes.contractAddress;
+        task.value.contract_address = data.attributes.contract_address;
       }
       return response;
     } catch (e: any) {
@@ -106,9 +106,15 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
+  const taskStudents = computed(() => {
+    console.log({ taskStudents: task.value });
+    return task.value;
+  });
+
   return {
     loadTaskData,
     task,
+    taskStudents,
     loading,
     updateTaskMembers,
     addTaskContractAddress,

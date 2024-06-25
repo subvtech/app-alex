@@ -1,12 +1,22 @@
 import { BigNumberish, ethers } from 'ethers';
 
 import TaskOwnerReedemsContract from '@/build/contracts/TaskOwnerReedemsContract.json';
+import TaskOwnerReedemsContract2 from '@/build/contracts/TaskOwnerReedemsContract2.json';
 import GiveawayContract from '@/build/contracts/GiveawayContract.json';
 
 declare global {
   interface Window {
     ethereum: any;
   }
+}
+
+export type AvailableContracts =
+  | 'TaskOwnerReedemsContract'
+  | 'TaskOwnerReedemsContract2';
+
+export interface CreateContractProps {
+  budget: number;
+  chosenContract: AvailableContracts;
 }
 
 const localGanacheChainId = 1337; // '0x1691';
@@ -40,8 +50,11 @@ export const useContracts = () => {
     return ethToUsd(parseFloat(ethers.formatEther(weiAmount)));
   };
 
-  const getContractBalance = async (contractAddress: string) => {
+  const getContractBalance = async (
+    contractAddress: string | null | undefined,
+  ) => {
     try {
+      if (!contractAddress) return;
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
       const contractBalance = (await browserProvider.getBalance(
         contractAddress,
@@ -53,7 +66,8 @@ export const useContracts = () => {
     }
   };
 
-  const createTaskContract = async (budget: number) => {
+  const createTaskContract = async (props: CreateContractProps) => {
+    const { budget, chosenContract } = props;
     loading.value = true;
     console.log({ createTaskContract: budget });
     try {
@@ -63,18 +77,24 @@ export const useContracts = () => {
 
       const wallet = await withTimeout(12000, browserProvider.getSigner());
       const budgetInWei = ethers.parseEther(usdToEth(budget).toString());
+      let contractABI;
+      let contractBinary;
+      if (chosenContract === 'TaskOwnerReedemsContract') {
+        contractABI = TaskOwnerReedemsContract.abi;
+        contractBinary = TaskOwnerReedemsContract.bytecode;
+      } else {
+        contractABI = TaskOwnerReedemsContract2.abi;
+        contractBinary = TaskOwnerReedemsContract2.bytecode;
+      }
 
-      const contractABI = TaskOwnerReedemsContract.abi;
-      const contractBinary = TaskOwnerReedemsContract.bytecode;
       const contractFactory = new ethers.ContractFactory(
         contractABI,
         contractBinary,
         wallet,
       );
-      const unlockTime = Math.floor(Date.now() / 1000) + 600;
 
       console.log({ usdt: budget, wei: budgetInWei });
-      const contract = await contractFactory.deploy(unlockTime, {
+      const contract = await contractFactory.deploy({
         value: budgetInWei,
       });
       console.log({ contractAddress: contract.target });
@@ -153,10 +173,12 @@ export const useContracts = () => {
   const rewardStudents = async (
     contractAddress: string | undefined,
     addressList: string[] = [],
+    gradeList: number[] = [],
   ) => {
     console.log({ addressList });
     if (!contractAddress) return;
     if (addressList.length === 0) return;
+    if (addressList.length !== gradeList.length) return;
     loading.value = true;
 
     const contractABI = TaskOwnerReedemsContract.abi;
@@ -171,7 +193,7 @@ export const useContracts = () => {
         contractABI,
         signer,
       );
-      const tx = await TaskContract.redeemRewards(addressList);
+      const tx = await TaskContract.redeemRewards(addressList, gradeList);
       await tx.wait(); // Wait for the transaction to be mined
       console.log('Students paid successfully!');
     } catch (error) {

@@ -164,9 +164,16 @@
       </div>
 
       <alex-learningplan-task-drawer-contracts
-        v-model="status"
-        :edit="editable"
+        v-model:status="status"
         :contract-address="contractAddress"
+        :edit="editable"
+        :task-members="taskMembers"
+        @deploy:contract-draft="(cb) => (deployContract = cb)"
+        @cancel:contract-draft="deployContract = null"
+        @update:contract-address="
+          async (newAddress) =>
+            await addTaskContractAddress(props.taskId, newAddress as string)
+        "
       />
 
       <!-- Eventos e atribuições -->
@@ -200,7 +207,9 @@ import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { orderEvents } from '~/utils';
 
+const strapi = useStrapi();
 const { t } = useI18n();
+const { addTaskContractAddress } = useTaskStore();
 const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
@@ -222,6 +231,7 @@ interface TaskTeacherDrawerProps {
   startDate?: string | null;
   endDate?: string | null;
   contractAddress: string | null;
+  taskMembers: any[];
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
@@ -238,12 +248,11 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   goals: () => [],
   tags: () => [],
   events: () => [],
+  taskMembers: () => [],
   type: undefined,
   submissionDescription: '',
   contractAddress: null,
 });
-
-console.log({ props: props.contractAddress });
 
 const description = ref(props.description);
 const submissionDescription = ref(props.submissionDescription);
@@ -353,7 +362,9 @@ const notifyError = () => {
     true,
   );
 };
-const strapi = useStrapi();
+
+const deployContract = ref<(() => Promise<string | undefined>) | null>(null);
+
 useOnStopTyping(
   description,
   async () => {
@@ -433,6 +444,14 @@ watch(
           set: goalsId,
         },
       });
+      if (deployContract.value) {
+        const newContractAddress = await deployContract.value();
+        if (!newContractAddress) return;
+        await addTaskContractAddress(
+          props.taskId,
+          newContractAddress as string,
+        );
+      }
       emit('change-values', values as ChangeValues);
     } catch (error) {
       notifyError();

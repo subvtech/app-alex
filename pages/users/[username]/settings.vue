@@ -23,7 +23,7 @@
         :wallet="user.wallet"
         :is-loading="loading"
         full-width
-        @update:wallet="linkWallet(id)"
+        @update:wallet="linkWallet(id, false)"
         @remove:wallet="(walletId) => unlinkWallet(walletId)"
       />
     </div>
