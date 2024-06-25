@@ -13,7 +13,7 @@ export const createLearninggoal = async (params: learningGoalParams) => {
       learningPlanId: params.learningPlanId,
       description: params.description,
     })
-    .returning({ learninggoalId: learningGoals.id })
+    .returning()
     .onConflictDoNothing();
 };
 
@@ -21,5 +21,9 @@ export const deleteLearninggoal = async (lgId: number) => {
   return await db
     .delete(learningGoals)
     .where(eq(learningGoals.id, lgId))
-    .returning({ deletedLGId: learningGoals.id });
+    .returning();
 };
+
+export const updateLearningGoal = async () => {
+  return await db.insert
+}

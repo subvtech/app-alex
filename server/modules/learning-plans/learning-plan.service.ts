@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { LearningPlan, learningPlans } from './learning-plans.schema';
 import db from '@@/server/lib/drizzle';
-// import { tags, Tags, tagsToLearningPlans } from '../tags/tags.schema';
 
 type learningPlanParams = Omit<LearningPlan, 'id'>;
 
@@ -34,33 +33,64 @@ export const findOneLearningPlan = async (id: number) => {
   });
 };
 
-// export const addTags = async (
-//   userId: number,
-//   learningPlanID: number,
-//   learningplanTags: Tags[],
-//   tags: Tags[],
-//   isGeneral: boolean,
-// ) => {
-//   const defaultTagsId = learningplanTags.flatMap((tag) =>
-//     !tag.isGeneral === isGeneral ? [tag.id] : [],
-//   );
-//   const noCreatedTags = tags
-//     .filter((tag) => !tag.id)
-//     .map(({ text, isGeneral }) => ({
-//       text,
-//       verified: true,
-//       isGeneral,
-//       verified_by: userId,
-//       isPublic: false,
-//     }));
-//   const alreadyCreatedTagsId = tags.flatMap((tag) => (tag.id ? [tag.id] : []));
-//   let createdTagsId = { count: 0, ids: [] };
-//   if (noCreatedTags.length) {
-//     createdTagsId = await db.insert(tags).values([noCreatedTags]);
-//   }
-//   const learningplan = await db.update(tagsToLearningPlans).set({
-//     learningPlanId: learningPlanID,
-//     tagId: defaultTagsId,
-//   });
-//   return learningplan.tags.filter((tag) => tag.isGeneral === isGeneral);
-// };
+export const findLearningPlanBySlug = async (slug: string) => {
+  return await db.query.learningPlans.findFirst({
+    where: eq(learningPlans.slug, slug),
+  });
+};
+
+export const updateDescription = async (id: number, newDescription: string) => {
+  return await db
+    .update(learningPlans)
+    .set({
+      description: newDescription,
+    })
+    .where(eq(learningPlans.id, id))
+    .returning();
+};
+
+export const updateArchivedAt = async (id: number) => {
+  return await db
+    .update(learningPlans)
+    .set({
+      archivedAt: new Date(),
+    })
+    .where(eq(learningPlans.id, id))
+    .returning();
+};
+
+export const updateInviteEnable = async (
+  id: number,
+  inviteEnabled: boolean,
+) => {
+  return await db
+    .update(learningPlans)
+    .set({
+      inviteEnabled,
+    })
+    .where(eq(learningPlans.id, id))
+    .returning();
+};
+
+export const updateInvitationDuration = async (
+  id: number,
+  invitationDuration: number,
+) => {
+  return await db
+    .update(learningPlans)
+    .set({
+      invitationDuration,
+    })
+    .where(eq(learningPlans.id, id))
+    .returning();
+};
+
+export const updateMessage = async (id: number, message: string) => {
+  return await db
+    .update(learningPlans)
+    .set({
+      message,
+    })
+    .where(eq(learningPlans.id, id))
+    .returning();
+};

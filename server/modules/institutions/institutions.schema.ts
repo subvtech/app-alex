@@ -38,9 +38,7 @@ export const userToInstitution = pgTable(
 export const institutionRelations = relations(
   institutions,
   ({ one, many }) => ({
-    userToInstitution: many(userToInstitution, {
-      relationName: 'user',
-    }),
+    userToInstitution: many(userToInstitution),
     coverImageId: one(medias, {
       fields: [institutions.coverImageId],
       references: [medias.id],
