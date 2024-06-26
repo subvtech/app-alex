@@ -42,6 +42,7 @@
           text="Enviar para avaliação"
           :loading="isLoading"
           :disabled="!currentData?.blocks.length"
+          @click="sendSubmission"
         />
       </v-container>
     </template>
@@ -159,6 +160,23 @@ const saveSubmission = async () => {
     executeSubmissions();
   } catch (error) {
     setMessage('Erro ao salvar, tente novamente', 'error', true);
+  } finally {
+    isLoading.value = false;
+  }
+};
+const sendSubmission = async () => {
+  isLoading.value = true;
+  try {
+    if (!props.lastSubmission?.id) {
+      return;
+    }
+    await update('task-submissions', props.lastSubmission.id, {
+      submitted_at: new Date(),
+    });
+    executeSubmissions();
+    dialog.value = false;
+  } catch (error) {
+    setMessage('Erro ao entregar, tente novamente', 'error', true);
   } finally {
     isLoading.value = false;
   }
