@@ -3,7 +3,7 @@
     <div
       :id="keyId"
       class="editorjs w-100 pa-0 show-drop-area"
-      :class="viewerId"
+      :class="[viewerId, { 'disabled-paragraph': allowedBlocks?.length === 1 }]"
       :is-editing="isEditing"
       v-bind="$attrs"
       :data-active="fileDrop && isEditing"
@@ -151,6 +151,8 @@ onMounted(() => {
     minHeight: 400,
     data: props.data,
     holder: props.keyId,
+    defaultBlock:
+      props.allowedBlocks?.length === 1 ? props.allowedBlocks[0] : 'paragraph',
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
     onReady: async () => {
@@ -426,7 +428,7 @@ const blockToolsMap = {
       },
     },
   },
-  fileset: {
+  fileSet: {
     class: Fileset,
     config: {
       uploadFiles: async (files) => {
@@ -522,6 +524,12 @@ defineExpose({
   }
   .codex-editor--narrow {
     background-color: white !important;
+  }
+}
+
+.disabled-paragraph {
+  [data-item-name='paragraph'] {
+    display: none;
   }
 }
 

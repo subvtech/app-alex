@@ -38,7 +38,7 @@ export const i18n = {
       Alert: 'Alerta',
       Image: 'Imagem',
       'Social Post': 'Post Social',
-      Attaches: 'Anexo',
+      Fileset: 'Anexo',
       Checklist: 'Checklist',
       Quote: 'Citação',
       Code: 'Código',

@@ -66,7 +66,8 @@
       "video": "Video",
       "image": "Image",
       "document": "Document",
-      "link": "Link"
+      "link": "Link",
+      "gallery": "Gallery"
     },
     "goals": {
       "label": "Learning goals",

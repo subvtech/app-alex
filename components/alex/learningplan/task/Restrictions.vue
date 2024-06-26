@@ -49,7 +49,13 @@ interface CompProps {
 
 const props = defineProps<CompProps>();
 
-export type RestrictionValue = 'text' | 'image' | 'video' | 'document' | 'link';
+export type RestrictionValue =
+  | 'text'
+  | 'image'
+  | 'video'
+  | 'document'
+  | 'link'
+  | 'gallery';
 
 const { t } = useI18n();
 
@@ -63,6 +69,7 @@ const config: Record<RestrictionValue, string> = {
   video: t('components.learningPlan.drawer.task.restrictions.video'),
   document: t('components.learningPlan.drawer.task.restrictions.document'),
   link: t('components.learningPlan.drawer.task.restrictions.link'),
+  gallery: t('components.learningPlan.drawer.task.restrictions.gallery'),
 };
 
 const add = (option: RestrictionValue) => {
@@ -85,6 +92,10 @@ const options: AlexDropdownItem[] = [
   {
     text: config.video,
     onClick: () => add('video'),
+  },
+  {
+    text: config.gallery,
+    onClick: () => add('gallery'),
   },
   {
     text: config.document,

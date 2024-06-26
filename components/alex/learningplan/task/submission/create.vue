@@ -16,7 +16,7 @@
       {{ restrictions }}
       <app-editor
         ref="editor"
-        :allowed-blocks="['embed', 'link', 'header']"
+        :allowed-blocks="allowedBlocks"
         @change="() => (hasEditorChanges = true)"
       />
     </div>
@@ -185,10 +185,39 @@ const sendSubmission = async () => {
   }
 };
 
-/* const allowedBlocks = computed(() => {
-  const blocks = [];
-  
-}); */
+const allowedBlocks = computed(() => {
+  const blocks = <string[]>[];
+  props.restrictions?.forEach((restriction) => {
+    if (restriction === 'text') {
+      blocks.push('Paragraph');
+      blocks.push('header');
+      blocks.push('delimiter');
+      blocks.push('list');
+      blocks.push('inlineCode');
+      blocks.push('marker');
+      blocks.push('quote');
+      blocks.push('table');
+      blocks.push('alert');
+      blocks.push('warning');
+      blocks.push('code');
+      blocks.push('alignmentBlockTune');
+    }
+    if (restriction === 'link') {
+      blocks.push('link');
+    }
+    if (restriction === 'image') {
+      blocks.push('image');
+    }
+    if (restriction === 'gallery') {
+      blocks.push('carousel');
+      blocks.push('image');
+    }
+    if (restriction === 'document') {
+      blocks.push('fileSet');
+    }
+  });
+  return blocks;
+});
 watch(dialog, (value) => {
   if (!value) {
     lastSaveDate.value = null;
