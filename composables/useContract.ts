@@ -19,6 +19,11 @@ export interface CreateContractProps {
   chosenContract: AvailableContracts;
 }
 
+export interface CancelledContractProps {
+  contractAddress: string;
+  chosenContract: AvailableContracts;
+}
+
 const localGanacheChainId = 1337; // '0x1691';
 const sepoliaChainId = 11155111; // '0xaa36a7';
 const networkUrl = 'http://127.0.0.1:7545';
@@ -53,17 +58,29 @@ export const useContracts = () => {
   const getContractBalance = async (
     contractAddress: string | null | undefined,
   ) => {
+    console.log('getContractBalance');
     try {
       if (!contractAddress) return;
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
       const contractBalance = (await browserProvider.getBalance(
         contractAddress,
       )) as BigNumberish;
-      console.log({ contractBalance });
       return contractBalance;
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const getCompiledContract = (chosenContract: AvailableContracts) => {
+    let contractABI, contractBinary;
+    if (chosenContract === 'TaskOwnerReedemsContract') {
+      contractABI = TaskOwnerReedemsContract.abi;
+      contractBinary = TaskOwnerReedemsContract.bytecode;
+    } else {
+      contractABI = TaskOwnerReedemsContract2.abi;
+      contractBinary = TaskOwnerReedemsContract2.bytecode;
+    }
+    return { contractABI, contractBinary };
   };
 
   const createTaskContract = async (props: CreateContractProps) => {
@@ -77,15 +94,9 @@ export const useContracts = () => {
 
       const wallet = await withTimeout(12000, browserProvider.getSigner());
       const budgetInWei = ethers.parseEther(usdToEth(budget).toString());
-      let contractABI;
-      let contractBinary;
-      if (chosenContract === 'TaskOwnerReedemsContract') {
-        contractABI = TaskOwnerReedemsContract.abi;
-        contractBinary = TaskOwnerReedemsContract.bytecode;
-      } else {
-        contractABI = TaskOwnerReedemsContract2.abi;
-        contractBinary = TaskOwnerReedemsContract2.bytecode;
-      }
+
+      const { contractABI, contractBinary } =
+        getCompiledContract(chosenContract);
 
       const contractFactory = new ethers.ContractFactory(
         contractABI,
@@ -170,6 +181,35 @@ export const useContracts = () => {
     // window.location.reload();
   };
 
+  const cancelContract = async (props: CancelledContractProps) => {
+    const { chosenContract, contractAddress } = props;
+    console.log(props);
+    if (!contractAddress) return;
+
+    loading.value = true;
+
+    const { contractABI } = getCompiledContract(chosenContract);
+
+    try {
+      // Replace with the actual freelancer address
+      console.log({ contractABI });
+      const browserProvider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await withTimeout(12000, browserProvider.getSigner());
+      const TaskContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer,
+      );
+      const tx = await TaskContract.cancelDeal();
+      await tx.wait(); // Wait for the transaction to be mined
+      console.log('The contract was cancelled successfully!');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    loading.value = false;
+  };
+
   const rewardStudents = async (
     contractAddress: string | undefined,
     addressList: string[] = [],
@@ -210,5 +250,6 @@ export const useContracts = () => {
     weiToUsd,
     usdToEth,
     loading,
+    cancelContract,
   };
 };

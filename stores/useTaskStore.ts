@@ -89,16 +89,18 @@ export const useTaskStore = defineStore('task', () => {
 
   async function addTaskContractAddress(
     taskId: number,
-    contractAddress: string,
+    contractAddress: string | null,
   ) {
     try {
       const response = await update(`tasks/${taskId}`, {
         contract_address: contractAddress,
       });
+      console.log({ addTaskContractAddress: contractAddress });
       console.log(response);
       const { data } = response;
       if (task.value) {
-        task.value.contract_address = data.attributes.contract_address;
+        task.value.contract_address =
+          data.attributes.contract_address || undefined;
       }
       return response;
     } catch (e: any) {

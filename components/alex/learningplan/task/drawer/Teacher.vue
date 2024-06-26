@@ -165,15 +165,13 @@
 
       <alex-learningplan-task-drawer-contracts
         v-model:status="status"
-        :contract-address="contractAddress"
+        v-model:contract-address="contractAddress"
         :edit="editable"
         :task-members="taskMembers"
         @deploy:contract-draft="(cb) => (deployContract = cb)"
         @cancel:contract-draft="deployContract = null"
-        @update:contract-address="
-          async (newAddress) =>
-            await addTaskContractAddress(props.taskId, newAddress as string)
-        "
+        @update:contract-address="handleUpdateContract"
+        @delete:contract-address="handleDeleteContract"
       />
 
       <!-- Eventos e atribuições -->
@@ -230,7 +228,7 @@ interface TaskTeacherDrawerProps {
   kanbanButton?: boolean;
   startDate?: string | null;
   endDate?: string | null;
-  contractAddress: string | null;
+  contractAddress?: string;
   taskMembers: any[];
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -251,8 +249,9 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskMembers: () => [],
   type: undefined,
   submissionDescription: '',
-  contractAddress: null,
+  contractAddress: undefined,
 });
+const { contractAddress } = toRefs(props);
 
 const description = ref(props.description);
 const submissionDescription = ref(props.submissionDescription);
@@ -270,6 +269,7 @@ watch(model, (value) => {
     submissionDescription.value = props.submissionDescription;
     hasSubmission.value = props.hasSubmission;
     sendAfterDeadline.value = props.sendAfterDeadline;
+    contractAddress.value = props.contractAddress;
     goals.value = props.goals;
     tags.value = props.tags;
     status.value = props.status;
@@ -397,18 +397,28 @@ useOnStopTyping(
   false,
   false,
 );
+
 watch(
   () => [
     hasSubmission.value,
     sendAfterDeadline.value,
     startDate.value,
     endDate.value,
+    contractAddress.value,
     type.value,
     status.value,
     goals.value,
     restrictions.value,
   ],
+
   async () => {
+    console.log('teacher watch');
+    console.log({
+      watch: status.value,
+      isFirstTimeOpened: isFirstTimeOpened.value,
+      contractAddress: contractAddress.value,
+      type: type.value,
+    });
     if (isFirstTimeOpened.value) {
       isFirstTimeOpened.value = false;
       return;
@@ -418,6 +428,7 @@ watch(
       status: status.value,
       start_at: startDate.value,
       finish_at: endDate.value,
+      contract_address: contractAddress.value,
       can_submit_after_deadline: sendAfterDeadline.value,
       submission_required: hasSubmission.value,
       learning_goals: goals.value,
@@ -444,13 +455,19 @@ watch(
           set: goalsId,
         },
       });
-      if (deployContract.value) {
+      console.log({
+        status: status.value,
+        deployContract: deployContract.value,
+      });
+      if (deployContract.value && status.value !== 'draft') {
         const newContractAddress = await deployContract.value();
         if (!newContractAddress) return;
         await addTaskContractAddress(
           props.taskId,
           newContractAddress as string,
         );
+        deployContract.value = null;
+        contractAddress.value = newContractAddress;
       }
       emit('change-values', values as ChangeValues);
     } catch (error) {
@@ -459,10 +476,22 @@ watch(
   },
 );
 watch(tags, (value) => emit('change-tags', value));
+
 // Close drawer
 function handleCloseModal() {
   model.value = false;
 }
+
+const handleUpdateContract = async (newAddress) => {
+  await addTaskContractAddress(props.taskId, newAddress as string);
+  contractAddress.value = newAddress || undefined;
+};
+
+const handleDeleteContract = async () => {
+  console.log('delete contract address');
+  await addTaskContractAddress(props.taskId, null);
+  contractAddress.value = undefined;
+};
 </script>
 
 <style scoped></style>

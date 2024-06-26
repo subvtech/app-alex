@@ -93,7 +93,7 @@
       </v-expansion-panels>
     </Transition>
   </div>
-  <pre>{{ taskDetails }}</pre>
+  <pre>{{ { teacherDrawer, taskDetails } }}</pre>
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
@@ -503,6 +503,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.type = values.type;
     task.start_at = values.start_at;
     task.finish_at = values.finish_at;
+    task.contract_address = values.contract_address;
     task.submission_required = values.submission_required!;
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
