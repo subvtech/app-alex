@@ -240,6 +240,11 @@ const getEvents = (memberID: number) =>
     filters: {
       task_member: memberID,
     },
+    populate: {
+      learning_plan_member: {
+        populate: ['user.avatar'],
+      },
+    },
   });
 
 const { data: submissions, execute: executeSubmissions } =
