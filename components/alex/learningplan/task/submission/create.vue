@@ -14,21 +14,26 @@
     </template>
     <div class="mx-auto editor my-6 px-sm-6 px-1 px-md-0 w-100">
       {{ restrictions }}
-      <app-editor ref="editor" :allowed-blocks="['embed', 'link', 'header']" />
+      <app-editor
+        ref="editor"
+        :allowed-blocks="['embed', 'link', 'header']"
+        @change="() => (hasEditorChanges = true)"
+      />
     </div>
     <template #footer>
       <v-container
         class="bg-white rounded-b-lg border-top-gray-100 d-flex justify-end ga-3 pa-6 align-center"
       >
-        <p v-if="savedTime > 0" class="text-body-4 text-gray-400">
+        <p v-if="lastSaveDate" class="text-body-4 text-gray-400">
           Salvo Automaticamente há
-          {{ savedTime }} minutos
+          {{ differenceInMinutes(currentDate, lastSaveDate) }} minutos
         </p>
         <alex-custom-button
           size="large"
           variant="secondary"
           text="Salvar"
           :loading="isLoading"
+          :disabled="!hasEditorChanges"
           @click="saveSubmission"
         />
         <alex-custom-button
@@ -36,12 +41,17 @@
           variant="primary"
           text="Enviar para avaliação"
           :loading="isLoading"
+          :disabled="!currentData?.blocks.length"
         />
       </v-container>
     </template>
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
+import { differenceInMinutes } from 'date-fns';
+import { useIntervalFn } from '@vueuse/core';
+import lodash from 'lodash';
+import { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
 interface submissionProps {
   title: string;
   deadline: string;
@@ -62,9 +72,29 @@ const dialog = ref(false);
 const editor = ref();
 const isLoading = ref(false);
 const { create, update } = useStrapi();
-const savedTime = ref<number>(-1);
-const currentData = ref<string>();
+const currentData = ref<EditorSubmission>();
 const taskMemberId = toRef(props, 'taskMemberId');
+const hasEditorChanges = ref(false);
+const lastSaveDate = ref<Date | null>(null);
+const currentDate = ref<Date>(new Date());
+const { resume: resumeCurrentDate, pause: pauseCurrentDate } = useIntervalFn(
+  () => {
+    currentDate.value = new Date();
+  },
+  1000,
+  { immediate: false },
+);
+const { resume, pause } = useIntervalFn(
+  async () => {
+    hasEditorChanges.value = await checkDataChanges();
+    if (hasEditorChanges.value) {
+      await saveContent();
+      lastSaveDate.value = new Date();
+    }
+  },
+  6000,
+  { immediate: false },
+);
 const checkEditorReady = async () => {
   let attempts = 0;
   while (attempts < 10) {
@@ -79,34 +109,24 @@ const checkEditorReady = async () => {
   return false;
 };
 
-const checkDataChanges = computed(async () => {
+const checkDataChanges = async () => {
   await checkEditorReady();
   const editorData = await editor.value?.getData();
-  const data1 = JSON.stringify(editorData.data.blocks);
-  const data2 = JSON.stringify(props.lastSubmission?.submission.blocks);
-  console.log(data1, data2);
-  const test = Object.is(data1, data2);
-  return test;
-});
-
-const autoSave = async () => {
-  setInterval(async () => {
-    const teste = await checkDataChanges.value;
-    console.log(teste);
-    // check if the editor data is different from the last submission
-    // if (currentData.value != (await editor.value?.getData()).data) {
-    //   // saveContent();
-    //   console.log('saved');
-    //   savedTime.value = 0;
-    // } else if (savedTime.value >= 0) savedTime.value += 1;
-  }, 6000);
+  const data1 = editorData?.data?.blocks;
+  if (!data1 || !data1.length) return false;
+  const data2 = toRaw(currentData.value?.blocks);
+  const test = lodash.isEqual(data1, data2);
+  return !test;
 };
 
 const openDialog = async () => {
   dialog.value = true;
   isLoading.value = true;
-  currentData.value = props.lastSubmission?.submission || '';
-  autoSave();
+  currentData.value = props.lastSubmission?.submission || undefined;
+  resume();
+  resumeCurrentDate();
+  await executeSubmissions();
+  hasEditorChanges.value = await checkDataChanges();
   if ((await checkEditorReady()) && props.lastSubmission?.submission) {
     await editor.value?.loadEditor(
       JSON.parse(JSON.stringify(props.lastSubmission?.submission)),
@@ -114,7 +134,6 @@ const openDialog = async () => {
   }
   isLoading.value = false;
 };
-
 const saveContent = async () => {
   const content = await editor.value.getData();
   currentData.value = content.data;
@@ -128,6 +147,7 @@ const saveContent = async () => {
       submission: content.data,
     });
   }
+  hasEditorChanges.value = await checkDataChanges();
 };
 const { execute: executeSubmissions } = useTaskSubmission(taskMemberId);
 const saveSubmission = async () => {
@@ -148,7 +168,13 @@ const saveSubmission = async () => {
   const blocks = [];
   
 }); */
-
+watch(dialog, (value) => {
+  if (!value) {
+    lastSaveDate.value = null;
+    pause();
+    pauseCurrentDate();
+  }
+});
 defineExpose({
   openDialog,
 });

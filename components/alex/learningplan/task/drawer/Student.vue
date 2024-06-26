@@ -115,6 +115,7 @@
                 type="professor"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :mark="mostRecentSubmission?.grade"
+                :task-member-id="taskMemberId"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}

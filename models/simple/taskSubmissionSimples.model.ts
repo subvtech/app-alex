@@ -1,6 +1,11 @@
+export interface EditorSubmission {
+  blocks: Array<any>;
+  time: number;
+  version: string;
+}
 export interface TaskSubmissionSimple {
   id: number;
-  submission: string;
+  submission: EditorSubmission;
   justification: string;
   grade: number;
   submitted_at: string;
