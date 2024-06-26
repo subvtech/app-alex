@@ -37,3 +37,10 @@ export const updateLearningPlanGroup = async (
     })
     .where(eq(learningPlanGroupMembers.id, params.memberId));
 };
+
+export const deleteLearningPlanGroup = async (id: number) => {
+  return await db
+    .delete(learningPlanGroupMembers)
+    .where(eq(learningPlanGroupMembers.id, id))
+    .returning();
+};

@@ -59,6 +59,16 @@ export const updateArchivedAt = async (id: number) => {
     .returning();
 };
 
+export const updateHidden = async (id: number, isHidden: boolean) => {
+  return await db
+    .update(learningPlans)
+    .set({
+      hidden: isHidden,
+    })
+    .where(eq(learningPlans.id, id))
+    .returning();
+};
+
 export const updateInviteEnable = async (
   id: number,
   inviteEnabled: boolean,

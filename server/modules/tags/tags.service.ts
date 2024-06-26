@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { tags, Tags } from './tags.schema';
 import db from '@@/server/lib/drizzle';
 
@@ -18,16 +19,29 @@ export const createTags = async (params: tagsParams) => {
     .returning();
 };
 
-export const findTags = async (search: string, general: boolean) => {
+export const findTags = async (
+  search: string,
+  isPublic: boolean,
+  general: boolean,
+) => {
   return await db.query.tags.findMany({
     where: (tags, { like, and, eq }) =>
       and(
         like(tags.text, `%${search}%`),
-        eq(tags.isPublic, true),
+        eq(tags.isPublic, isPublic),
         eq(tags.isGeneral, general),
       ),
     with: {
       verifiedBy: true,
     },
   });
+};
+
+export const updateTags = async (id: number, verifiedBy: number) => {
+  return await db
+    .update(tags)
+    .set({
+      verifiedBy,
+    })
+    .where(eq(tags.id, id));
 };

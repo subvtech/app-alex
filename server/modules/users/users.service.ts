@@ -1,9 +1,8 @@
 import { eq } from 'drizzle-orm';
 
+import { User, UserInsert, users } from './users.schema';
 import db from '@@/server/lib/drizzle';
 import { curry } from '@@/utils/curry';
-
-import { User, UserInsert, users } from './users.schema';
 
 export const getUserBy = curry(async (field: keyof User, value: string) => {
   try {
@@ -16,6 +15,8 @@ export const getUserBy = curry(async (field: keyof User, value: string) => {
 export const getUserByEmail = getUserBy('email');
 
 export const getUserById = getUserBy('id');
+
+export const getuserByPhone = getUserBy('phone');
 
 export async function register(data: UserInsert) {
   return (await db.insert(users).values(data).returning())[0];
