@@ -114,8 +114,10 @@
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
                 :status="getSubmissionStatus(mostRecentSubmission)"
+                :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
                 :task-member-id="taskMemberId"
+                :content="mostRecentSubmission"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -256,9 +258,6 @@ const getSubmissions = (memberID: number) =>
   strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
     filters: {
       task_member: memberID,
-      evaluated_at: {
-        $notNull: true,
-      },
     },
     sort: 'createdAt:desc',
   });
@@ -266,6 +265,11 @@ const getEvents = (memberID: number) =>
   strapiUtils.find<TaskEvent>('task-events', {
     filters: {
       task_member: memberID,
+    },
+    populate: {
+      learning_plan_member: {
+        populate: ['user.avatar'],
+      },
     },
   });
 

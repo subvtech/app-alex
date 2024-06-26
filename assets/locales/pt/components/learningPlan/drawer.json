@@ -110,6 +110,7 @@
       "task_submission": "{name} alterou as informações da entrega.",
       "task_archived": "A tarefa foi arquivada.",
       "task_deadline_ended": "A tarefa atingiu a data final foi automaticamente fechada.",
+      "student_added": "{name} foi adicionado a tarefa.",
       "student_deadline": "{name} alterou o tempo final da tarefa de {name_two}.",
       "student_status": "{name} alterou o status da tarefa.",
       "submission_send": "{name} realizou uma entrega.",

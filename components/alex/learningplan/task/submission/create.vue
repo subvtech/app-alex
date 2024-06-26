@@ -63,11 +63,10 @@ interface submissionProps {
 
 const props = withDefaults(defineProps<submissionProps>(), {
   title: '',
-  deadline: '',
+  deadline: undefined,
   restrictions: undefined,
   lastSubmission: undefined,
 });
-
 const { setMessage } = useMessageStore();
 const dialog = ref(false);
 const editor = ref();
