@@ -8,6 +8,8 @@ import { learningPlans } from '../modules/learning-plans/learning-plans.schema';
 import { tags } from '../modules/tags/tags.schema';
 import { users } from '../modules/users/users.schema';
 import { verificationTokens } from '../modules/verification-tokens/verification-tokens.schema';
+import { trails } from '../modules/trails/trails.schema';
+import { trailContributions } from '../modules/trail-contributions/trail-contributions.schema';
 
 const conn = postgres(process.env.DATABASE_URL!);
 
@@ -22,5 +24,7 @@ export default drizzle(conn, {
     classes,
     learningPlans,
     tags,
+    trails,
+    trailContributions,
   },
 });
