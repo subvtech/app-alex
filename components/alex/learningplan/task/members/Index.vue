@@ -110,12 +110,14 @@ interface MembersProps {
   startAt?: string | null;
   finishAt?: string | null;
   sendAfterDeadline?: boolean;
+  blockDelete?: boolean;
 }
 const props = withDefaults(defineProps<MembersProps>(), {
   sendAfterDeadline: false,
   startAt: null,
   finishAt: null,
   type: null,
+  blockDelete: false,
 });
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
@@ -231,6 +233,14 @@ const removeMember = async (
   member: TaskMemberStudent,
 ) => {
   try {
+    if (props.blockDelete) {
+      setMessage(
+        t('Você não pode remover alunos após alguém ter feito uma entrega'),
+        'warning',
+        true,
+      );
+      return;
+    }
     await strapi.delete('task-members', taskMemberID);
     await strapi.delete('task-member-students', member.id);
     setTimeout(refresh, 100);

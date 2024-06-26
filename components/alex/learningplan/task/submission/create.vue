@@ -169,8 +169,12 @@ const sendSubmission = async () => {
     if (!props.lastSubmission?.id) {
       return;
     }
+    const time = new Date();
     await update('task-submissions', props.lastSubmission.id, {
-      submitted_at: new Date(),
+      submitted_at: time,
+    });
+    await update('task-members', props.taskMemberId, {
+      last_submission_at: time,
     });
     executeSubmissions();
     dialog.value = false;
