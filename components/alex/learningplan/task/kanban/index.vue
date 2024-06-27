@@ -11,7 +11,7 @@
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
-        class="w-full mr-auto min-w-40 max-w-80"
+        class="tw-w-full tw-mr-auto tw-min-w-40 tw-max-w-80"
         density="comfortable"
       />
       <!-- Deixar filtrar funcional -->
