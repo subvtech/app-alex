@@ -38,7 +38,7 @@
         <alex-custom-button
           size="large"
           variant="secondary"
-          text="Salvar"
+          :text="t('components.courses.tasks.submission_modal.save_btn')"
           :loading="isLoading"
           :disabled="!hasEditorChanges"
           @click="saveSubmission"
@@ -46,7 +46,9 @@
         <alex-custom-button
           size="large"
           variant="primary"
-          text="Enviar para avaliação"
+          :text="
+            t('components.courses.tasks.submission_modal.send_to_review_btn')
+          "
           :loading="isLoading"
           :disabled="!currentData?.blocks.length"
           @click="sendSubmission"
