@@ -20,7 +20,7 @@
         '(' + $t('components.learningPlan.members.missing.name') + ')'
       }}</span>
 
-      <span class="text-body-3 text-gray-400 ml-2">{{
+      <span class="text-body-3 text-gray-400 tw-ml-2">{{
         `(${
           member.class || $t('components.learningPlan.members.missing.class')
         })`
@@ -42,7 +42,7 @@
     />
   </div>
 
-  <hr class="w-full" />
+  <hr class="tw-w-full" />
 </template>
 
 <script setup lang="ts">

@@ -25,7 +25,7 @@
       <!-- Seção 2 (Título e nota/subtexto) -->
       <div class="flex-fill">
         <p
-          class="font-weight-bold text-body-4"
+          class="tw-font-weight-bold text-body-4"
           :class="`text-${config[submission.status].color}`"
         >
           {{ config[submission.status].title }}

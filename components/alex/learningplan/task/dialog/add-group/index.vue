@@ -8,7 +8,7 @@
         v-model="search"
         name="search"
         placeholder="Buscar Grupos do curso"
-        class="w-full"
+        class="tw-w-full"
         density="comfortable"
       />
       <alex-custom-button

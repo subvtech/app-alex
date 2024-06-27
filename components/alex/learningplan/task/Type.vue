@@ -4,7 +4,7 @@
     <template #activator="{ props }">
       <p
         v-bind="props"
-        class="output pa-1 text-p3 text-gray-800 rounded-md cursor-pointer"
+        class="output pa-1 text-p3 text-gray-800 tw-rounded-md tw-cursor-pointer"
       >
         {{ config[curr].title }}
       </p>

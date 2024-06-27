@@ -56,7 +56,9 @@
     "save_success": "Submissão salva com sucesso",
     "save_error": "Erro ao salvar submissão, tente novamente",
     "deliver_success": "Submissão enviada com sucesso",
-    "deliver_error": "Erro ao enviar submissão, tente novamente"
+    "deliver_error": "Erro ao enviar submissão, tente novamente",
+    "save_btn": "Salvar",
+    "send_to_review_btn": "Enviar para avaliação"
   },
   "noType": "(Sem tipo)"
 }

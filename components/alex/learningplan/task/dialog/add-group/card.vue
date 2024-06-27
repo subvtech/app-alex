@@ -1,6 +1,6 @@
 <template>
   <div class="tw-flex tw-gap-2 bg-white tw-mt-2 tw-p-4 tw-rounded-md">
-    <div class="w-full">
+    <div class="tw-w-full">
       <h4 class="text-body-4 text-gray-900">{{ group.title }}</h4>
       <div class="tw-flex tw-gap-2 text-body-5 text-gray-500">
         <p>
@@ -13,7 +13,7 @@
         </h4>
       </div>
       <alex-custom-avatar-group
-        class="ml-2"
+        class="tw-ml-2"
         :avatar-items="getGroupMemberAvatars(group.group_members)"
       />
     </div>

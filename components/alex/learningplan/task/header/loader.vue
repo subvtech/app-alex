@@ -1,15 +1,17 @@
 <template>
-  <div class="d-flex w-full h-[200px] gap-4 ga-4 mt-6 pa-6 bg-white rounded-lg">
-    <div class="d-flex flex-col w-full gap-4">
-      <alex-custom-skeleton class="w-24 h-8" color="gray-100" />
-      <alex-custom-skeleton class="w-[60%] h-6" color="gray-100" />
-      <div class="flex flex-col gap-2">
-        <alex-custom-skeleton class="w-full h-4" color="gray-100" />
-        <alex-custom-skeleton class="w-full h-4" color="gray-100" />
-        <alex-custom-skeleton class="w-full h-4" color="gray-100" />
+  <div
+    class="d-flex tw-w-full tw-h-[200px] tw-gap-4 ga-4 tw-mt-6 pa-6 tw-bg-white tw-rounded-lg"
+  >
+    <div class="d-flex tw-flex-col tw-w-full tw-gap-4">
+      <alex-custom-skeleton class="tw-w-24 tw-h-8" color="gray-100" />
+      <alex-custom-skeleton class="w-[60%] tw-h-6" color="gray-100" />
+      <div class="tw-flex tw-flex-col tw-gap-2">
+        <alex-custom-skeleton class="tw-w-full tw-h-4" color="gray-100" />
+        <alex-custom-skeleton class="tw-w-full tw-h-4" color="gray-100" />
+        <alex-custom-skeleton class="tw-w-full tw-h-4" color="gray-100" />
       </div>
     </div>
-    <alex-custom-skeleton class="w-full h-full" color="gray-100" />
+    <alex-custom-skeleton class="tw-w-full tw-h-full" color="gray-100" />
   </div>
 </template>
 
