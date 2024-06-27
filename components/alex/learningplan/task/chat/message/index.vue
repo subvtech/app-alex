@@ -1,8 +1,8 @@
 <template>
   <div
     :id="`chat-message-${id}`"
-    class="tw-flex tw-flex-col tw-gap-3 border-1 tw-border-gray-100 tw-bg-white tw-p-4 tw-rounded-lg tw-mx-[40px] tw-sm:mx-[60px] tw-md:mx-[80px] tw-relative group"
-    :class="[align, response && 'p-3']"
+    class="tw-flex tw-flex-col tw-gap-3 border-1 border-gray-100 tw-bg-white tw-p-4 tw-rounded-lg tw-mx-[40px] tw-sm:mx-[60px] tw-md:mx-[80px] tw-relative tw-group"
+    :class="[align, response && 'tw-p-3']"
   >
     <alex-custom-dropdown :items="menuItems">
       <template #activator="{ props: dropdownProps }">
@@ -11,7 +11,7 @@
           variant="secondary"
           icon="mdi-chevron-down"
           size="small"
-          class="menu-button group-hover:visible"
+          class="menu-button"
         />
       </template>
     </alex-custom-dropdown>
@@ -121,5 +121,8 @@ const menuItems = [
   position: absolute;
   top: 1rem;
   right: 1rem;
+}
+.tw-group:hover .menu-button {
+  visibility: visible;
 }
 </style>

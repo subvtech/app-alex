@@ -1,6 +1,6 @@
 <template>
   <div
-    class="tw-flex tw-gap-2 tw-ml-[40px] tw-sm:ml-[60px] tw-md:ml-[80px] tw-relative group tw-h-[75px] bg-white tw-rounded-lg tw-p-4 border-1 tw-border-gray-100"
+    class="tw-flex tw-gap-2 tw-ml-[40px] tw-sm:ml-[60px] tw-md:ml-[80px] tw-relative group tw-h-[75px] bg-white tw-rounded-lg tw-p-4 border-1 border-gray-100"
   >
     <alex-custom-skeleton
       color="gray-200"
