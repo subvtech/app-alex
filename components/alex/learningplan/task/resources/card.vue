@@ -1,13 +1,13 @@
 <template>
   <div
-    class="card w-[150px] h-[100px] rounded-lg overflow-hidden cursor-pointer bg-cover d-flex align-end elevation-1"
+    class="card tw-w-[150px] tw-h-[100px] rounded-lg tw-overflow-hidden tw-cursor-pointer tw-bg-cover d-flex align-end elevation-1"
     :class="{ cardHover: edit && !deleteButton }"
     :style="`background-image: url('${cover}')`"
     @click="emit('openTrail')"
   >
     <alex-custom-button
       v-if="deleteButton"
-      class="delete-btn rounded-l"
+      class="delete-btn tw-rounded-l"
       variant="secondary"
       size="small"
       icon="mdi-trash-can-outline"

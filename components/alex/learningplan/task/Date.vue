@@ -1,7 +1,7 @@
 <template>
   <div>
     <p
-      class="pa-1 text-body-3 min-h-6 rounded-md"
+      class="pa-1 text-body-3 tw-min-h-6 rounded-md"
       :class="[
         edit && 'date-output cursor-pointer',
         !formattedDate && 'text-gray-400',

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="response w-full bg-gray-blue rounded-lg border-1 border-gray-100"
+    class="response tw-w-full bg-gray-blue tw-rounded-lg border-1 tw-border-gray-100"
     :class="[message && 'px-3 py-2']"
   >
     <div v-if="message" @click="$emit('message-click', message)">

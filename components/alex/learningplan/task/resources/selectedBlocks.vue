@@ -2,7 +2,7 @@
   <div class="bg-white" :class="{ 'rounded-b-lg': !editMode }">
     <div class="w-100 height-27 mb-6 d-flex ga-4 pa-6 header-border">
       <div
-        class="trail-img width-15 height-15 rounded-lg bg-cover"
+        class="trail-img width-15 height-15 rounded-lg tw-bg-cover"
         :style="`background-image: url('${trailCover}')`"
       />
       <div>
@@ -23,7 +23,7 @@
       <app-editor
         ref="editor"
         :selected-blocks="editMode ? blocksIds : undefined"
-        :class="isEditorLoading ? 'opacity-0' : ''"
+        :class="isEditorLoading ? 'tw-opacity-0' : ''"
         @update:selected-blocks="(blocks) => (selectedBlocks = blocks)"
       />
     </div>

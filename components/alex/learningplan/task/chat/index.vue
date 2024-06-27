@@ -1,8 +1,10 @@
 <template>
-  <div class="flex flex-col bg-gray-blue min-h-[400px] p-4 gap-2">
+  <div
+    class="tw-flex tw-flex-col bg-gray-blue tw-min-h-[400px] tw-p-4 tw-gap-2"
+  >
     <p
       v-if="error"
-      class="text-body-1 w-full text-center text-error--1 my-auto"
+      class="text-body-1 tw-w-full text-center text-error--1 tw-my-auto"
     >
       {{ $t('components.learningPlan.drawer.task.chat.error.messages') }} :/
     </p>
@@ -38,7 +40,7 @@
     </template>
     <div
       v-if="(status === 'pending' || loading) && !error"
-      class="flex flex-col justify-center items-center gap-2 mt-2"
+      class="tw-flex tw-flex-col tw-justify-center tw-items-center tw-gap-2 mt-2"
     >
       <v-progress-circular
         indeterminate

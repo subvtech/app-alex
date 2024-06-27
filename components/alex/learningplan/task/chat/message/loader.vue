@@ -1,23 +1,23 @@
 <template>
   <div
-    class="flex gap-2 ml-[40px] sm:ml-[60px] md:ml-[80px] relative group h-[75px] bg-white rounded-lg p-4 border-1 border-gray-100"
+    class="tw-flex tw-gap-2 tw-ml-[40px] tw-sm:ml-[60px] tw-md:ml-[80px] tw-relative group tw-h-[75px] bg-white tw-rounded-lg tw-p-4 border-1 tw-border-gray-100"
   >
     <alex-custom-skeleton
       color="gray-200"
-      class="w-[32px] h-[32px] rounded-pill"
+      class="tw-w-[32px] tw-h-[32px] rounded-pill"
     />
-    <div class="flex-grow flex flex-col gap-1">
+    <div class="tw-flex-grow tw-flex tw-flex-col tw-gap-1">
       <alex-custom-skeleton
         color="gray-200"
-        class="w-[50%] h-[14px] rounded-sm mb-1"
+        class="tw-w-[50%] tw-h-[14px] tw-rounded-sm tw-mb-1"
       />
       <alex-custom-skeleton
         color="gray-200"
-        class="w-[30%] h-[10px] rounded-sm"
+        class="tw-w-[30%] tw-h-[10px] tw-rounded-sm"
       />
       <alex-custom-skeleton
         color="gray-200"
-        class="w-[60%] h-[10px] rounded-sm"
+        class="tw-w-[60%] tw-h-[10px] tw-rounded-sm"
       />
     </div>
   </div>

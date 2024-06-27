@@ -1,6 +1,6 @@
 <template>
   <div
-    class="delivery d-flex flex-column overflow-hidden border border-red rounded-lg"
+    class="delivery d-flex flex-column tw-overflow-hidden border border-red tw-rounded-lg"
     :class="
       config[delivery.status]?.bg ? `bg-${config[delivery.status]?.bg}` : ''
     "
@@ -8,9 +8,9 @@
     <!-- Header -->
     <div
       class="header d-flex align-center ga-3 pa-3 cursor-pointer"
-      :class="`${config[delivery.status]?.reversed ? 'flex-row-reverse' : ''} ${
-        delivery.status
-      }`"
+      :class="`${
+        config[delivery.status]?.reversed ? 'tw-flex-row-reverse' : ''
+      } ${delivery.status}`"
     >
       <!-- Seção 1 (Ícone) -->
       <v-icon

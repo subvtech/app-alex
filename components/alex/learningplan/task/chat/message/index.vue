@@ -1,7 +1,7 @@
 <template>
   <div
     :id="`chat-message-${id}`"
-    class="flex flex-col gap-3 border-1 border-gray-100 bg-white p-4 rounded-lg mx-[40px] sm:mx-[60px] md:mx-[80px] relative group"
+    class="tw-flex tw-flex-col tw-gap-3 border-1 tw-border-gray-100 tw-bg-white tw-p-4 tw-rounded-lg tw-mx-[40px] tw-sm:mx-[60px] tw-md:mx-[80px] tw-relative group"
     :class="[align, response && 'p-3']"
   >
     <alex-custom-dropdown :items="menuItems">
@@ -22,7 +22,7 @@
       @message-click="(value) => $emit('message-click', value)"
       @submission-click="(value) => $emit('submission-click', value)"
     />
-    <div class="flex gap-3">
+    <div class="tw-flex tw-gap-3">
       <v-avatar
         :size="32"
         :image="user?.avatar || undefined"
@@ -35,9 +35,11 @@
           </p>
         </template>
       </v-avatar>
-      <div class="flex flex-col w-full gap-1">
-        <div class="flex flex-col-reverse gap-1 sm:flex-row sm:gap-2 w-full">
-          <h6 class="text-body-4 text-gray-800 grow">{{ user.name }}</h6>
+      <div class="tw-flex tw-flex-col tw-w-full tw-gap-1">
+        <div
+          class="tw-flex tw-flex-col-reverse tw-gap-1 tw-sm:flex-row tw-sm:gap-2 tw-w-full"
+        >
+          <h6 class="text-body-4 text-gray-800 tw-grow">{{ user.name }}</h6>
           <p class="text-body-5 text-gray-400">{{ formattedDate }}</p>
         </div>
         <alex-learningplan-task-audio

@@ -3,7 +3,7 @@
     <template #activator="{ isActive, props: activatorProps }">
       <slot name="activator" :is-active="isActive" :props="activatorProps" />
     </template>
-    <div class="flex gap-4">
+    <div class="tw-flex tw-gap-4">
       <alex-inputs-text-field
         v-model="search"
         name="search"

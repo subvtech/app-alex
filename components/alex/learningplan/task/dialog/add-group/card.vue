@@ -1,8 +1,8 @@
 <template>
-  <div class="flex gap-2 bg-white mt-2 p-4 rounded-md">
+  <div class="tw-flex tw-gap-2 bg-white tw-mt-2 tw-p-4 tw-rounded-md">
     <div class="w-full">
       <h4 class="text-body-4 text-gray-900">{{ group.title }}</h4>
-      <div class="flex gap-2 text-body-5 text-gray-500">
+      <div class="tw-flex tw-gap-2 text-body-5 text-gray-500">
         <p>
           {{ $t('components.learningPlan.drawer.task.dialog.responsible') }}
         </p>

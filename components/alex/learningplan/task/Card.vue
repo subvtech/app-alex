@@ -2,7 +2,7 @@
   <div
     class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white"
   >
-    <div class="d-flex gap-2 align-center">
+    <div class="d-flex tw-gap-2 align-center">
       <v-avatar
         v-if="!group"
         :size="40"
@@ -26,7 +26,7 @@
         size="small"
       />
     </div>
-    <div v-if="group" class="d-flex gap-2 align-center mt-2">
+    <div v-if="group" class="d-flex tw-gap-2 align-center mt-2">
       <v-avatar
         :size="24"
         :image="avatar || undefined"
@@ -41,7 +41,7 @@
       </v-avatar>
       <p class="text-body-5 text-gray-600 ellipsis lines-2">{{ name }}</p>
     </div>
-    <div class="d-flex gap-2 justify-end w-100 mt-4">
+    <div class="d-flex tw-gap-2 justify-end w-100 mt-4">
       <alex-custom-chip
         status="secondary"
         :text="studentClass"

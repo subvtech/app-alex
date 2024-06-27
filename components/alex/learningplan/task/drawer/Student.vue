@@ -45,7 +45,7 @@
             {{ $t('components.courses.tasks.submission.status') }}
           </p>
           <alex-custom-chip
-            class="w-fit"
+            class="tw-w-fit"
             :status="statusColor"
             :text="
               $t(`components.courses.tasks.task.status.${status || 'draft'}`)
@@ -67,7 +67,7 @@
             {{ $t('components.courses.tasks.submission.submission') }}
           </h4>
 
-          <div class="d-flex flex-column gap-2 w-fit">
+          <div class="d-flex flex-column gap-2 tw-w-fit">
             <div class="d-flex gap-2">
               <alex-custom-switch
                 v-model="canSubmitAfterDeadline"
@@ -105,7 +105,7 @@
               {{ submission.description }}
             </p>
           </div>
-          <div class="d-flex flex-column gap-2 w-fit">
+          <div class="d-flex flex-column gap-2 tw-w-fit">
             <template v-if="!pending">
               <p class="text-body-4">
                 {{ $t('components.courses.tasks.submission.last_submission') }}
@@ -128,15 +128,15 @@
             <template v-else>
               <alex-custom-skeleton
                 color="gray-blue"
-                class="w-[96px] h-[19px]" />
+                class="tw-w-[96px] tw-h-[19px]" />
               <alex-custom-skeleton
                 color="gray-blue"
-                class="w-[256px] h-[64px]"
+                class="tw-w-[256px] tw-h-[64px]"
             /></template>
           </div>
         </template>
         <template v-else>
-          <div class="d-flex gap-2 flex-column w-fit">
+          <div class="d-flex gap-2 flex-column tw-w-fit">
             <h4 class="text-h4">
               {{ $t('components.courses.tasks.submission.submission') }}
             </h4>
@@ -167,7 +167,7 @@
       <alex-learningplan-task-chat-input
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
-        class="border-top-1 border-gray-100 pt-3"
+        class="border-top-1 tw-border-gray-100 pt-3"
         :submissions="evaluatedSubmissions"
         @submit="
           (data) =>

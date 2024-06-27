@@ -3,7 +3,7 @@
     <v-list-item-title class="d-flex ga-1 pa-2"
       ><p class="text-body-3 text-gray-600">{{ goal.id }}.</p>
 
-      <p class="flex-1-1 text-body-3 text-gray-600 text-wrap">
+      <p class="flex-1-1 text-body-3 text-gray-600 tw-text-wrap">
         <span v-if="goal.verb" class="font-weight-bold text-secondary-0">{{
           `${goal.verb} `
         }}</span
