@@ -252,6 +252,7 @@ const config: Record<string, string> = {
   video: t('components.learningPlan.drawer.task.restrictions.video'),
   document: t('components.learningPlan.drawer.task.restrictions.document'),
   link: t('components.learningPlan.drawer.task.restrictions.link'),
+  gallery: t('components.learningPlan.drawer.task.restrictions.gallery'),
 };
 
 // Get data
