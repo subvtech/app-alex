@@ -125,7 +125,9 @@ const { data: tasks } = await useAsyncData(
   {
     default: () => ({ meta: 0, data: [] as TaskStudent[] }),
     transform: ({ data, meta }) => {
-      const dataValue = data.map((task) => ({
+      const filteredData = data.filter((task) => task.task?.status !== 'draft');
+
+      const dataValue = filteredData.map((task) => ({
         id: task.id,
         status: task.status,
         date: new Date(task.finished_at?.replaceAll('-', '/')),

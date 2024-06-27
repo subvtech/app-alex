@@ -26,7 +26,7 @@
       min-width="auto"
       location="top start"
       activator="parent"
-      :close-on-content-click="true"
+      :close-on-content-click="false"
     >
       <v-date-picker
         v-model="selectedDateValue"
@@ -78,7 +78,10 @@ function updateParentDate() {
   emit('change', selectedDateValue.value);
 }
 
-watch(selectedDate, updateParentDate);
+watch(selectedDate, () => {
+  open.value = false;
+  updateParentDate();
+});
 </script>
 
 <style scoped>

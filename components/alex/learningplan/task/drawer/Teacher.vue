@@ -496,7 +496,7 @@ watch(startDate, async (value) => {
   });
 });
 watch(restrictions, async (value) => {
-  if (!value) return;
+  // if (!value) return;
   await updateTaskValues(taskId.value, {
     allowed_editor_plugins: value,
   });
