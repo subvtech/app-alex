@@ -172,7 +172,7 @@
       <alex-custom-tabs
         v-model="activePage"
         :tabs="tabs"
-        class="border-bottom-1 border-gray-100"
+        class="border-bottom-1 tw-border-gray-100"
       />
       <v-window v-model="activePage">
         <v-window-item value="1">

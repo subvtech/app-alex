@@ -29,7 +29,7 @@
             v-model="search"
             autofocus
             name="goals"
-            class="alex-search-goals w-full mt-2"
+            class="alex-search-goals tw-w-full mt-2"
             :placeholder="
               $t('components.learningPlan.drawer.task.goals.search')
             "

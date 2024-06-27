@@ -5,7 +5,7 @@
         v-bind="dropdownProps"
         class="pa-1 text-body-3 rounded-md"
         :class="[
-          edit && 'output cursor-pointer',
+          edit && 'output tw-cursor-pointer',
           !model && 'text-gray-400',
           model && 'text-gray-800',
         ]"

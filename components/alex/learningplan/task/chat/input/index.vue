@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col overflow-hidden">
+  <div class="tw-flex tw-flex-col tw-overflow-hidden">
     <v-scroll-y-reverse-transition hide-on-leave group>
       <alex-learningplan-task-chat-input-attached
         v-if="attachedMessage || attachedSubmission"
@@ -12,7 +12,7 @@
       />
     </v-scroll-y-reverse-transition>
 
-    <div class="task-chat-input relative">
+    <div class="task-chat-input tw-relative">
       <v-slide-x-reverse-transition hide-on-leave group>
         <alex-learningplan-task-chat-input-recording
           v-if="isRecording"

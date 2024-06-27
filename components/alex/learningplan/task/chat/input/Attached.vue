@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-white flex gap-2 p-2 items-center">
+  <div class="bg-white tw-flex tw-gap-2 tw-p-2 tw-items-center">
     <alex-learningplan-task-chat-message-response
       v-if="messageResponse"
       :id="messageResponse.id"
-      class="w-full"
+      class="tw-w-full"
       :audio="messageResponse.audio"
       :message="messageResponse"
       :user="messageResponse.user"
@@ -11,7 +11,7 @@
     />
     <alex-learningplan-task-submission-chip
       v-if="submissionResponse"
-      class="bg-gray-blue w-full"
+      class="bg-gray-blue tw-w-full"
       :submission="submissionResponse"
       no-justification
       hide-info
