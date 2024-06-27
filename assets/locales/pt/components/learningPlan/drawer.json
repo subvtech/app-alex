@@ -79,7 +79,8 @@
       "new": "Nova trilha",
       "emptyTitle": "Parece que não há trilhas criadas",
       "emptySubtitle": "Para selecionar os recursos de aprendizagem é necessário criar e selecionar uma trilha.",
-      "updateError": "Erro ao atualizar os recursos de aprendizagem, tente novamente mais tarde."
+      "updateError": "Erro ao atualizar os recursos de aprendizagem, tente novamente mais tarde.",
+      "invalidTrail": "Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha."
     },
     "tags": {
       "subtitle": "Informe um marcador",

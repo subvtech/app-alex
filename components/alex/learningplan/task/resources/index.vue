@@ -207,7 +207,7 @@ const handleTrailClick = (trail: TrailSimple) => {
     selectedTrail.value = trail;
   } else {
     setMessage(
-      'Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha.',
+      t('components.learningPlan.drawer.task.learningResources.invalidTrail'),
       'warning',
       true,
       false,
@@ -285,7 +285,7 @@ const updateLearningplanStore = (
       const updatedTask = {
         ...taskToUpdate,
         blocks: type === 'ADD' ? blocks : [],
-        trail: type === 'ADD' ? selectedTrail.value : null,
+        trail: type === 'ADD' ? selectedTrail.value : undefined,
       };
       learningPlanStore.learningPlan.tasks[taskIndex] = updatedTask;
       learningPlanStore.learningPlan = {
