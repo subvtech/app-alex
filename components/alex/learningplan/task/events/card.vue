@@ -2,8 +2,8 @@
   <v-expansion-panel flat>
     <!-- Data -->
     <v-expansion-panel-title flat style="border: none; outline: none">
-      <hr class="ml-3 w-full border-sm border-gray-600" />
-      <span class="ml-2 text-gray-600">{{ formatDate(date) }}</span>
+      <hr class="tw-ml-3 tw-w-full tw-border-sm border-gray-600" />
+      <span class="tw-ml-2 text-gray-600">{{ formatDate(date) }}</span>
     </v-expansion-panel-title>
 
     <!-- Eventos -->
@@ -22,7 +22,7 @@
           </p>
           <span class="text-gray-700">{{ formatHour(event.time) }}</span>
         </div>
-        <hr v-if="index < events.length - 1" class="mt-2 border-thin" />
+        <hr v-if="index < events.length - 1" class="tw-mt-2 border-thin" />
       </div>
     </v-expansion-panel-text>
   </v-expansion-panel>

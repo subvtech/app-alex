@@ -7,7 +7,7 @@
       :events="event.events"
     />
   </v-expansion-panels>
-  <div v-else class="w-full flex flex-col gap-2 py-4">
+  <div v-else class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-py-4">
     <alex-custom-skeleton class="w-full h-16" color="gray-blue" />
     <alex-custom-skeleton class="w-full h-16" color="gray-blue" />
     <alex-custom-skeleton class="w-full h-16" color="gray-blue" />

@@ -15,11 +15,11 @@
   >
     <!-- Header -->
     <template #header>
-      <div class="header d-flex align-center py-4 px-2">
+      <div class="header d-flex tw-align-center py-4 px-2">
         <alex-inputs-text-field
           v-model="search"
           name="member"
-          class="w-100 mr-4"
+          class="w-100 tw-mr-4"
           :placeholder="$t('components.learningPlan.members.search')"
           prepend-inner-icon="mdi-magnify"
           density="compact"
@@ -39,7 +39,7 @@
           :learningplan-id="props.learningplanId"
         />
         <alex-custom-button
-          class="ml-auto"
+          class="tw-ml-auto"
           variant="secondary"
           prepend-icon="mdi-plus"
           @click="handleAddMemberOrClass"

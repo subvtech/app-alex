@@ -1,10 +1,13 @@
 <template>
-  <div class="pa-4 py-0 rounded-lg border-1 border-gray-100">
-    <div class="flex-fill h-0 py-1 rounded-b-lg" :class="selectedColor"></div>
-    <div class="d-flex align-center mt-1 py-4 px-0">
-      <span class="flex-1-1 text-h5 text-gray-800">{{ title }}</span>
+  <div class="tw-p-4 tw-py-0 tw-rounded-lg border-1 border-gray-100">
+    <div
+      class="tw-flex-fill tw-h-0 tw-py-1 tw-rounded-b-lg"
+      :class="selectedColor"
+    ></div>
+    <div class="tw-flex tw-align-center tw-mt-1 tw-py-4 tw-px-0">
+      <span class="flex-1-1 text-h5 tw-text-gray-800">{{ title }}</span>
       <span
-        class="flex items-center justify-center pt-[1px] bg-gray-100 rounded-lg h-7 w-6"
+        class="tw-flex tw-items-center tw-justify-center tw-pt-[1px] tw-bg-gray-100 tw-rounded-lg tw-h-7 tw-w-6"
         >{{ quantity }}</span
       >
     </div>

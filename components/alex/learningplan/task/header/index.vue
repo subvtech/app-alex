@@ -27,7 +27,7 @@
       <div v-if="ellipsis" class="d-flex justify-end">
         <alex-custom-button
           variant="text"
-          class="mt-2 px-3 text-p6 text-gray-800"
+          class="tw-mt-2 px-3 text-p6 text-gray-800"
           @click="expanded = !expanded"
           >{{
             !expanded

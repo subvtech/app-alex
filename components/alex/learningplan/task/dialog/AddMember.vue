@@ -11,7 +11,7 @@
     <alex-inputs-text-field
       v-model="search"
       name="search"
-      class="mb-6"
+      class="tw-mb-6"
       :placeholder="
         $t('components.learningPlan.drawer.task.dialog.searchMembers')
       "
@@ -41,7 +41,7 @@
               class="checkbox"
               @click.stop="selectAllUsers(classValue.id, classes.data)"
             />
-            <p class="text-body-2 w-full text-gray-900">
+            <p class="text-body-2 tw-w-full text-gray-900">
               {{ classValue.name }}
             </p></v-expansion-panel-title
           >

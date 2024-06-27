@@ -1,6 +1,6 @@
 <template>
   <!-- Tags -->
-  <div class="d-flex flex-wrap align-stretch gap-3">
+  <div class="d-flex tw-flex-wrap tw-align-stretch tw-gap-3">
     <v-menu
       v-if="props.edit"
       v-model="open"
@@ -17,13 +17,13 @@
         />
       </template>
 
-      <v-list class="pa-4 rounded-lg">
-        <p class="text-body-1 text-gray-800 mb-2">
+      <v-list class="pa-4 tw-rounded-lg">
+        <p class="text-body-1 text-gray-800 tw-mb-2">
           {{ $t('components.learningPlan.drawer.task.tags.subtitle') }}
         </p>
         <alex-inputs-tag-autocomplete
           v-model="tags"
-          class="hide-select-icon min-w-[264px]"
+          class="hide-select-icon tw-min-w-[264px]"
           name="tag"
           all
           autofocus

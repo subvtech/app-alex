@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col item-start w-100 grow">
+  <div class="tw-flex tw-flex-col tw-item-start tw-w-100 tw-grow">
     <div
-      class="top-0 h-fit sticky bg-white w-100 z-[1] border-bottom-1 border-gray-200"
+      class="tw-top-0 tw-h-fit tw-sticky tw-bg-white tw-w-100 z-[1] tw-border-bottom-1 tw-border-gray-200"
     >
       <alex-custom-tabs v-model="activePage" :tabs="tabs" color="accent" />
     </div>
@@ -13,14 +13,14 @@
       /></v-window-item>
       <v-window-item class="v-window-item-full" value="2">
         <alex-learningplan-task-submissions
-          class="w-full"
+          class="tw-w-full"
           :submissions="submissions"
           @redirect-to-chat="(submission) => handleRedirectToChat(submission)"
       /></v-window-item>
       <v-window-item class="v-window-item-full" value="3">
         <alex-learningplan-task-chat
           v-model:attached-message="attachedMessage"
-          class="w-100 grow task-chat"
+          class="tw-w-100 grow task-chat"
           :task-member-id="taskMemberId"
           :is-sending-message="isSendingMessage"
           :loading="message.isLoading"

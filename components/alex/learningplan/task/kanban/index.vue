@@ -1,8 +1,8 @@
 <template>
-  <div class="mt-8 bg-white rounded-lg relative">
+  <div class="tw-mt-8 bg-white tw-rounded-lg tw-relative">
     <!-- Inputs -->
     <div
-      class="d-flex align-center pa-3 px-6 ga-3 border-bottom-1 border-gray-100"
+      class="d-flex tw-align-center pa-3 tw-px-6 ga-3 border-bottom-1 border-gray-100"
     >
       <alex-inputs-text-field
         v-model="search"
@@ -31,7 +31,7 @@
     <v-slide-y-transition>
       <div
         v-if="filters.select.value || filters.finalDate.value"
-        class="flex gap-2 px-6 pt-4"
+        class="tw-flex gap-2 tw-px-6 tw-pt-4"
       >
         <template v-for="(filter, key) in filters" :key="filter.title">
           <alex-custom-chip
@@ -48,7 +48,7 @@
     <!-- Categorias e seus respectivos alunos -->
     <div
       ref="kanban"
-      class="w-full flex gap-4 pa-6 overflow-x-auto overflow-y-hidden"
+      class="tw-w-full tw-flex tw-gap-4 pa-6 tw-overflow-x-auto tw-overflow-y-hidden"
     >
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"

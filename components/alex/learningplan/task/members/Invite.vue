@@ -12,10 +12,14 @@
 
     <!-- Opções -->
 
-    <v-list class="list py-0 relative" :selectable="false" :activable="false">
+    <v-list
+      class="list tw-py-0 tw-relative"
+      :selectable="false"
+      :activable="false"
+    >
       <alex-inputs-text-field
         v-model="search"
-        class="px-4 py-2 sticky top-0 left-0 bg-white z-10"
+        class="tw-px-4 tw-py-2 tw-sticky tw-top-0 tw-left-0 bg-white tw-z-10"
         name="member"
         autofocus
         :placeholder="$t('components.learningPlan.members.invite.search')"
@@ -29,13 +33,13 @@
       <!-- Turmas -->
       <p
         v-if="filteredClasses?.length"
-        class="pa-4 pb-2 lines-1 ellipsis text-body-4 text-gray-800"
+        class="tw-pa-4 tw-pb-2 lines-1 ellipsis text-body-4 text-gray-800"
       >
         {{ $t('components.learningPlan.members.invite.classes') }}
       </p>
       <p
         v-if="!filteredClasses?.length && !hasFilteredMember"
-        class="pa-4 pb-2 lines-1 ellipsis text-body-3 text-center text-gray-400"
+        class="tw-pa-4 tw-pb-2 lines-1 ellipsis text-body-3 text-center text-gray-400"
       >
         {{ $t('components.learningPlan.drawer.missing.general') }}
       </p>
@@ -69,7 +73,7 @@
       <div v-for="(studentClass, index) in filteredClassMembers" :key="index">
         <p
           v-if="studentClass.learning_plan_members?.length"
-          class="pa-4 pb-2 text-body-4 text-gray-800 lines-1 ellipsis"
+          class="tw-pa-4 tw-pb-2 text-body-4 text-gray-800 lines-1 ellipsis"
         >
           {{ $t('components.learningPlan.members.invite.members') }} ({{
             studentClass.name
@@ -82,7 +86,7 @@
               student, studentIndex
             ) in studentClass.learning_plan_members"
             :key="studentClass.name + studentIndex"
-            class="px-4 py-2"
+            class="tw-px-4 tw-py-2"
             @click="$emit('select-member-click', student)"
           >
             <v-list-item-title
