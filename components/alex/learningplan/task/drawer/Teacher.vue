@@ -80,7 +80,11 @@
             >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
-          <alex-learningplan-task-date v-model="startDate" :edit="editable" />
+          <alex-learningplan-task-date
+            ref="startDateComp"
+            v-model="startDate"
+            :edit="editable"
+          />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -89,6 +93,7 @@
           </p>
 
           <alex-learningplan-task-date
+            ref="endDateComp"
             v-model="endDate"
             :edit="editable"
             :can-set-value="checkEndDate(startDate, endDate)"
@@ -262,6 +267,12 @@ const openResources = ref<boolean>(false);
 const hasAtLeastSubmission = computed(() =>
   members.value.filter((member) => member.last_submission_at),
 );
+const startDateComp = ref<{
+  close: () => void;
+} | null>(null);
+const endDateComp = ref<{
+  close: () => void;
+} | null>(null);
 const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
   if (!startDate || !endDate) return true;
   if (isBefore(Date.parse(endDate), Date.parse(startDate))) {
@@ -483,6 +494,8 @@ watch(endDate, async (value) => {
     );
     return;
   }
+
+  endDateComp.value?.close();
   await updateTaskValues(taskId.value, {
     finish_at: value,
   });
@@ -497,6 +510,8 @@ watch(startDate, async (value) => {
     );
     return;
   }
+
+  startDateComp.value?.close();
   await updateTaskValues(taskId.value, {
     start_at: value,
   });

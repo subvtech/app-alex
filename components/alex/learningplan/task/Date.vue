@@ -55,6 +55,10 @@ const open = ref<boolean>(false);
 const selectedDate = defineModel<Date | string | null>();
 const emit = defineEmits(['change', 'input']);
 
+defineExpose({
+  close: () => (open.value = false),
+});
+
 const selectedDateValue = computed({
   get() {
     if (typeof selectedDate.value === 'string') {
@@ -79,7 +83,6 @@ function updateParentDate() {
 }
 
 watch(selectedDate, () => {
-  open.value = false;
   updateParentDate();
 });
 </script>
