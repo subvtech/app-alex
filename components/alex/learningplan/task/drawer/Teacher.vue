@@ -278,6 +278,7 @@ watch(model, (value) => {
     hasSubmission.value = props.hasSubmission;
     sendAfterDeadline.value = props.sendAfterDeadline;
     goals.value = props.goals;
+    title.value = props.title;
     tags.value = props.tags;
     status.value = props.status;
     type.value = props.type || null;
@@ -397,6 +398,7 @@ const updateTaskValues = async (
     }
     const valuesEmit = {
       type: type.value,
+      title: title.value,
       status: status.value,
       start_at: startDate.value,
       finish_at: endDate.value,
