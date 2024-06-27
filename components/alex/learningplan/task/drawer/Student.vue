@@ -167,7 +167,7 @@
       <alex-learningplan-task-chat-input
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
-        class="border-top-1 tw-border-gray-100 pt-3"
+        class="border-top-1 border-gray-100 pt-3"
         :submissions="evaluatedSubmissions"
         @submit="
           (data) =>

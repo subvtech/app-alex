@@ -1,12 +1,12 @@
 <template>
   <div class="tw-flex tw-flex-col tw-item-start tw-w-100 tw-grow">
     <div
-      class="tw-top-0 tw-h-fit tw-sticky tw-bg-white tw-w-100 z-[1] tw-border-bottom-1 tw-border-gray-200"
+      class="tw-top-0 tw-h-fit tw-sticky tw-bg-white tw-w-100 z-[1] border-bottom-1 border-gray-200"
     >
       <alex-custom-tabs v-model="activePage" :tabs="tabs" color="accent" />
     </div>
     <v-window v-model="activePage">
-      <v-window-item value="1" class="v-window-item-full"
+      <v-window-item value="1"
         ><alex-learningplan-task-events
           v-model="taskEvents"
           :loading="event.isLoading"
