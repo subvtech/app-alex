@@ -40,7 +40,7 @@
       </div>
 
       <div class="task-info">
-        <div class="d-flex flex-column gap-2 w-full">
+        <div class="d-flex flex-column gap-2 tw-w-full">
           <p class="text-body-4">
             {{ $t('components.courses.tasks.submission.status') }}
           </p>
@@ -52,7 +52,7 @@
             "
           />
         </div>
-        <div class="d-flex flex-column gap-2 w-full">
+        <div class="d-flex flex-column gap-2 tw-w-full">
           <p class="text-body-4 text-gray-800 mb-1">
             <span class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
