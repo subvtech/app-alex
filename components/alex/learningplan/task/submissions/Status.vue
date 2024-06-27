@@ -9,7 +9,7 @@
           : $t('pages.task.submissions.delivery')
       }}
     </HoverCardTrigger>
-    <HoverCardContent>
+    <HoverCardContent class="bg-white">
       <div class="d-flex justify-space-between pb-4 divider-row">
         <span class="text-gray-800 text-h5">{{
           $t('pages.task.submissions.progress')
