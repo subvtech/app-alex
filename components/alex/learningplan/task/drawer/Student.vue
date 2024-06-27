@@ -167,7 +167,7 @@
       <alex-learningplan-task-chat-input
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
-        class="border-top-1 tw-border-gray-100 pt-3"
+        class="border-top-1 border-gray-100 pt-3"
         :submissions="evaluatedSubmissions"
         @submit="
           (data) =>
@@ -252,6 +252,7 @@ const config: Record<string, string> = {
   video: t('components.learningPlan.drawer.task.restrictions.video'),
   document: t('components.learningPlan.drawer.task.restrictions.document'),
   link: t('components.learningPlan.drawer.task.restrictions.link'),
+  gallery: t('components.learningPlan.drawer.task.restrictions.gallery'),
 };
 
 // Get data

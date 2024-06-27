@@ -62,7 +62,6 @@ const { t } = useI18n();
 const model = defineModel<RestrictionValue[]>({
   required: true,
 });
-
 const config: Record<RestrictionValue, string> = {
   text: t('components.learningPlan.drawer.task.restrictions.text'),
   image: t('components.learningPlan.drawer.task.restrictions.image'),
@@ -71,7 +70,6 @@ const config: Record<RestrictionValue, string> = {
   link: t('components.learningPlan.drawer.task.restrictions.link'),
   gallery: t('components.learningPlan.drawer.task.restrictions.gallery'),
 };
-
 const add = (option: RestrictionValue) => {
   if (model.value.includes(option)) return;
   model.value = [...model.value, option];

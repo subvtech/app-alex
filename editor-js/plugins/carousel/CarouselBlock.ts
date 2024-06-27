@@ -36,10 +36,12 @@ class CarouselBlock {
     data,
     readOnly,
     config,
+    api,
   }: BlockToolConstructorOptions<CarouselBlockData[], CarouselConfig>) {
     this.data = data;
     this.readOnly = readOnly;
     this.config = config as CarouselConfig;
+    this._api = api;
   }
 
   render() {
@@ -61,6 +63,17 @@ class CarouselBlock {
     app.use(i18n);
     app.mount(this.wrapper);
 
+    // TODO - the insert before error only happens when the carousel is the only block in the editor, need to investigate
+
+    this._api.blocks.insert(
+      'paragraph',
+      {
+        text: '',
+      },
+      {},
+      this._api.blocks.getCurrentBlockIndex() + 1,
+      false,
+    );
     return this.wrapper;
   }
 
