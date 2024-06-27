@@ -29,7 +29,7 @@ export interface LearningPlanSimple {
   members: LearningPlanMemberSimple[];
   learning_structures: LearningPlanStructureSimple[];
   groups: LearningPlanGroupSimple[];
-  tasks: any[];
+  tasks: TaskSimple[];
   tags: TagSimple[];
   invite_enabled: boolean;
   invitation_duration: number;

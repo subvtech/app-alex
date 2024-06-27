@@ -66,7 +66,9 @@
       v-if="studentDetails"
       v-model="studentDrawer"
       :submission="{
-        constraints: taskStore.task.allowed_editor_plugins?.split(',') || [],
+        constraints: taskStore.task.allowed_editor_plugins
+          ? taskStore.task.allowed_editor_plugins?.split(',')
+          : [],
         description: taskStore.task.submission_description,
       }"
       :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
@@ -107,7 +109,7 @@
       :end-date="taskStore.task.finish_at"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
-      :members-length="taskStore.task.task_members?.length"
+      :members="taskStore.task.task_members"
       @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
       @change-submission-description="handleChangeSubmissionDescription"

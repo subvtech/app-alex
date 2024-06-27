@@ -181,6 +181,7 @@
             :start-at="startDate"
             :finish-at="endDate"
             :submit-after-deadline="sendAfterDeadline"
+            :block-delete="!!hasAtLeastSubmission.length"
             @change-members="$emit('change-members')"
         /></v-window-item>
       </v-window>
@@ -222,7 +223,7 @@ interface TaskTeacherDrawerProps {
   kanbanButton?: boolean;
   startDate?: string | null;
   endDate?: string | null;
-  membersLength: number;
+  members?: TaskMember[];
 }
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -244,7 +245,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   events: () => [],
   type: null,
   submissionDescription: '',
-  membersLength: 0,
+  members: () => [],
 });
 
 const description = ref(props.description);
@@ -256,8 +257,11 @@ const tags = ref(props.tags);
 const title = ref(props.title);
 const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
-const membersLength = toRef(props, 'membersLength');
+const members = toRef(props, 'members');
 const openResources = ref<boolean>(false);
+const hasAtLeastSubmission = computed(() =>
+  members.value.filter((member) => member.last_submission_at),
+);
 const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
   if (!startDate || !endDate) return true;
   if (isBefore(Date.parse(endDate), Date.parse(startDate))) {
@@ -274,6 +278,7 @@ watch(model, (value) => {
     hasSubmission.value = props.hasSubmission;
     sendAfterDeadline.value = props.sendAfterDeadline;
     goals.value = props.goals;
+    title.value = props.title;
     tags.value = props.tags;
     status.value = props.status;
     type.value = props.type || null;
@@ -324,7 +329,7 @@ const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
     onClick: () => {
-      if (membersLength.value) {
+      if (members.value.length) {
         setMessage(
           t('components.learningPlan.drawer.task.errors.cantChangeType'),
           'warning',
@@ -338,7 +343,7 @@ const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.collective'),
     onClick: () => {
-      if (membersLength.value) {
+      if (members.value.length) {
         setMessage(
           t('components.learningPlan.drawer.task.errors.cantChangeType'),
           'warning',
@@ -393,6 +398,7 @@ const updateTaskValues = async (
     }
     const valuesEmit = {
       type: type.value,
+      title: title.value,
       status: status.value,
       start_at: startDate.value,
       finish_at: endDate.value,

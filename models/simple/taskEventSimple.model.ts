@@ -6,6 +6,7 @@ export const events = {
   TASK_SUBMISSION: 'task_submission',
   TASK_ARCHIVED: 'task_archived',
   TASK_DEADLINE_ENDED: 'task_deadline_ended',
+  STUDENT_ADDED: 'student_added',
   STUDENT_DEADLINE: 'student_deadline',
   STUDENT_STATUS: 'student_status',
   SUBMISSION_SEND: 'submission_send',

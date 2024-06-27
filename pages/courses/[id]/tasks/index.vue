@@ -81,8 +81,6 @@
   />
 </template>
 <script setup lang="ts">
-import { TaskStudent } from '~/components/alex/learningplan/task/kanban/index.vue';
-
 export interface filterType {
   select?: string | null;
   archivedTasks?: boolean;
@@ -105,7 +103,6 @@ const search = ref('');
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
 const isProfessor = ref<boolean>(false);
-const tasks = ref<TaskStudent[]>([]);
 const classes = ref<string[]>([]);
 
 onBeforeMount(() => {
@@ -133,11 +130,9 @@ watch(
       isProfessor.value = learningPlanStore.userIsFacilitator;
 
       // Kanban
-      tasks.value = learningPlanStore.learningPlan?.tasks || [];
       classes.value =
         learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
         [];
-
       headerStore.title = t('components.courses.settings.breadcrumbTitle');
       headerStore.items = [
         {

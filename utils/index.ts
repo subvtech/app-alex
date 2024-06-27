@@ -93,12 +93,12 @@ export const orderEvents = (events: TaskEvent[]) => {
   const eventsGroups: { date: Date; events: EventProps[] }[] = [];
 
   events
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
     .forEach((current) => {
-      const currentDate = new Date(current.publishedAt);
+      const currentDate = new Date(current.updatedAt);
       const currentElement: EventProps = {
         action: current.event,
-        time: current.publishedAt,
+        time: current.updatedAt,
         user: current.learning_plan_member.user.fullname,
       };
       const group = eventsGroups.find((group) =>

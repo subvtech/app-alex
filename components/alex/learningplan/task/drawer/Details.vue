@@ -93,9 +93,16 @@
           </p>
           <alex-learningplan-task-submission
             type="student"
-            :status="getSubmissionStatus(mostRecentSubmission)"
+            :status="getSubmissionStatus(submissions.data[0])"
             :mark="mostRecentSubmission?.grade"
             :max-mark="mostRecentSubmission?.grade"
+            :task-title="title"
+            :task-deadline="finalDate"
+            :restrictions="restrictionsValue"
+            :task-member-id="taskMemberId"
+            :content="submissions.data[0]"
+            :task-status="status"
+            @update-task-status="handleChangeStatus"
           />
         </div>
       </template>
@@ -116,6 +123,7 @@
       :task-id="taskId"
       :trail-id="trail?.id"
       :blocks="blocks"
+      :task-member-id="taskMemberId"
     />
 
     <alex-learningplan-task-tabs
@@ -176,10 +184,7 @@ interface DetailsDrawerProps {
   finalDate?: string;
   blocks?: BlockSimple[];
   trail?: TrailSimple;
-  // Entregas
   restrictions?: string;
-  // lastSubmission;
-  // Tabs
   taskEvents?: TaskEvent[];
   taskMemberId: number;
   submission: Submission;
@@ -232,40 +237,24 @@ const emit = defineEmits<Emits>();
 // Get submissions
 const strapiUtils = useStrapiUtils();
 
-const getSubmissions = (memberID: number) =>
-  strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
-    filters: {
-      task_member: memberID,
-      evaluated_at: {
-        $notNull: true,
-      },
-    },
-    sort: 'createdAt:desc',
-  });
-
 const getEvents = (memberID: number) =>
   strapiUtils.find<TaskEvent>('task-events', {
     filters: {
       task_member: memberID,
     },
+    populate: {
+      learning_plan_member: {
+        populate: ['user.avatar'],
+      },
+    },
   });
 
-const {
-  data: submissions,
-  execute: executeSubmissions,
-  // pending,
-} = await useAsyncData(
-  'task-submissions',
-  () => getSubmissions(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskSubmissionSimple[],
-    }),
+const { data: submissions, execute: executeSubmissions } =
+  await useTaskSubmission(taskMemberId, {
     lazy: true,
-  },
-);
-
+    watch: [taskMemberId],
+    dedupe: 'cancel',
+  });
 const {
   data: events,
   execute: executeEvents,
@@ -298,7 +287,7 @@ const evaluatedSubmissions = computed(() =>
 
 const mostRecentSubmission = computed(
   () =>
-    submissions.value.data.filter((submission) => submission.submitted_at)[0],
+    submissions.value.data.filter((submission) => submission.evaluated_at)[0],
 );
 const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   if (!submission) {
@@ -432,6 +421,21 @@ watch(model, (value) => {
     }, 1100);
   }
 });
+
+const handleChangeStatus = (statusValue: TaskMemberStatus) => {
+  emit(
+    'update-status',
+    0,
+    {
+      id: props.taskMemberId,
+      title: props.title,
+      status: statusValue,
+      date: new Date(),
+    },
+    statusValue,
+  );
+  status.value = statusValue;
+};
 
 watch(status, (newStatus, oldStatus) => {
   emit(

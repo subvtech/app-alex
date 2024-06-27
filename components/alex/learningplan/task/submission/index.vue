@@ -2,6 +2,7 @@
   <div
     class="submission pa-3 rounded-lg min-w-64 border-1 border-gray-200"
     :class="[colorsAndSizes.background, (clickable || remake) && 'clickable']"
+    @click="openDialog"
   >
     <v-icon
       v-if="!hasPrepend && icons.prependIcon"
@@ -26,12 +27,28 @@
       :size="24"
     />
   </div>
+  <alex-learningplan-task-submission-create
+    ref="dialog"
+    :title="taskTitle"
+    :deadline="taskDeadline"
+    :restrictions="restrictions"
+    :task-member-id="taskMemberId"
+    :last-submission="content"
+    :task-status="taskStatus"
+    @update-task-status="(status) => $emit('update-task-status', status)"
+  />
 </template>
 
 <script setup lang="ts">
 interface Submission {
   mark?: number | null;
   maxMark?: number | null;
+  taskTitle?: string;
+  taskDeadline?: string;
+  restrictions?: string[];
+  content?: TaskSubmissionSimple;
+  taskMemberId: number;
+  taskStatus: TaskMemberStatus;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -48,11 +65,20 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
   clickable: false,
   mark: 0,
   maxMark: 0,
+  taskTitle: undefined,
+  taskDeadline: undefined,
+  restrictions: undefined,
+  content: undefined,
 });
+type Emits = {
+  'update-task-status': [status: TaskMemberStatus];
+};
+defineEmits<Emits>();
 const { t } = useI18n();
 const slots = useSlots();
 const hasPrepend = computed(() => !!slots.prependIcon);
 const hasAppend = computed(() => !!slots.appendIcon);
+const dialog = ref();
 const formattedMark = computed(() => {
   if (!props.mark) {
     return '';
@@ -152,6 +178,12 @@ const text = computed(() => {
     subtitle: t('components.courses.tasks.submission.click_to_review'),
   };
 });
+
+const openDialog = () => {
+  if (clickable.value) {
+    dialog.value.openDialog('edit');
+  }
+};
 </script>
 
 <style scoped>

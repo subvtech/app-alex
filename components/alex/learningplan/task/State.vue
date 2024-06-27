@@ -126,10 +126,6 @@ const studentOptions: AlexDropdownItem[] = [
     text: config.in_review.text,
     onClick: () => (model.value = 'in_review'),
   },
-  {
-    text: config.done.text,
-    onClick: () => (model.value = 'done'),
-  },
 ];
 
 const filteredTeacher = computed(() =>

@@ -114,7 +114,11 @@
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
                 :status="getSubmissionStatus(mostRecentSubmission)"
+                :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
+                :task-member-id="taskMemberId"
+                :content="mostRecentSubmission"
+                :task-status="status"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -182,7 +186,6 @@
 <script setup lang="ts">
 import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
 
-type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
 interface Student {
   name: string;
   studentClass: string;
@@ -195,7 +198,7 @@ interface Submission {
 interface TaskUserDrawerProps {
   student: Student;
   taskMemberId: number;
-  status: TStatus;
+  status: TaskMemberStatus;
   finishAt?: string | null;
   submission?: Submission;
   canSubmitAfterDeadline: boolean;
@@ -255,9 +258,6 @@ const getSubmissions = (memberID: number) =>
   strapiUtils.find<TaskSubmissionSimple>('task-submissions', {
     filters: {
       task_member: memberID,
-      evaluated_at: {
-        $notNull: true,
-      },
     },
     sort: 'createdAt:desc',
   });
@@ -265,6 +265,11 @@ const getEvents = (memberID: number) =>
   strapiUtils.find<TaskEvent>('task-events', {
     filters: {
       task_member: memberID,
+    },
+    populate: {
+      learning_plan_member: {
+        populate: ['user.avatar'],
+      },
     },
   });
 

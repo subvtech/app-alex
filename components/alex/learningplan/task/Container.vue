@@ -105,7 +105,7 @@
     :type="taskDetails?.type"
     :events="taskDetails?.task_events"
     :goals="taskDetails?.learning_goals"
-    :description="taskDetails?.description"
+    :description="taskDetails?.description || undefined"
     :submission-description="taskDetails?.submission_description"
     :has-submission="taskDetails?.submission_required"
     :send-after-deadline="taskDetails?.can_submit_after_deadline"
@@ -119,6 +119,7 @@
     @change-submission-description="handleChangeSubmissionDescription"
     @change-tags="handleChangeTags"
     @change-members="handleChangeMembers"
+    @change-title="handleChangeTitle"
     @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
   />
 </template>
@@ -514,6 +515,14 @@ const handleChangeDescription = (description: string) => {
   );
   if (task) {
     task.description = description;
+  }
+};
+const handleChangeTitle = (title: string) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  if (task) {
+    task.title = title;
   }
 };
 
