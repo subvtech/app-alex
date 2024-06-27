@@ -1,5 +1,10 @@
 <template>
-  <alex-custom-dialog v-model="dialog" :persistent="true" :max-width="1080">
+  <alex-custom-dialog
+    v-model="dialog"
+    :persistent="true"
+    :max-width="1080"
+    :no-footer="props.readOnly"
+  >
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
         <template #default>
@@ -13,14 +18,13 @@
       </alex-custom-dialog-header>
     </template>
     <div class="mx-auto editor my-6 px-sm-6 px-1 px-md-0 w-100">
-      {{ restrictions }}
       <app-editor
         ref="editor"
         :allowed-blocks="allowedBlocks"
         @change="() => (hasEditorChanges = true)"
       />
     </div>
-    <template #footer>
+    <template #footer v-if="!props.readOnly">
       <v-container
         class="bg-white rounded-b-lg border-top-gray-100 d-flex justify-end ga-3 pa-6 align-center"
       >
@@ -60,6 +64,7 @@ interface submissionProps {
   taskMemberId: number;
   restrictions?: string[];
   lastSubmission?: TaskSubmissionSimple;
+  readOnly?: boolean;
 }
 
 const props = withDefaults(defineProps<submissionProps>(), {
@@ -67,6 +72,7 @@ const props = withDefaults(defineProps<submissionProps>(), {
   deadline: undefined,
   restrictions: undefined,
   lastSubmission: undefined,
+  readOnly: false,
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
@@ -136,6 +142,9 @@ const openDialog = async () => {
     await editor.value?.loadEditor(
       JSON.parse(JSON.stringify(props.lastSubmission?.submission)),
     );
+    if (props.readOnly) {
+      await editor.value?.toggleReadOnly();
+    }
   }
   isLoading.value = false;
 };
@@ -160,6 +169,7 @@ const saveContent = async () => {
   }
   hasEditorChanges.value = await checkDataChanges();
 };
+
 const { execute: executeSubmissions } = useTaskSubmission(taskMemberId);
 const saveSubmission = async () => {
   isLoading.value = true;
@@ -174,6 +184,7 @@ const saveSubmission = async () => {
     isLoading.value = false;
   }
 };
+
 const sendSubmission = async () => {
   isLoading.value = true;
   try {
@@ -231,6 +242,7 @@ const allowedBlocks = computed(() => {
   });
   return blocks;
 });
+
 watch(dialog, (value) => {
   if (!value) {
     lastSaveDate.value = null;

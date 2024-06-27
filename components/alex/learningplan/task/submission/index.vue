@@ -1,7 +1,7 @@
 <template>
   <div
-    class="submission pa-3 rounded-lg min-w-64 border-1 border-gray-200"
-    :class="[colorsAndSizes.background, (clickable || remake) && 'clickable']"
+    class="submission pa-3 rounded-lg min-w-64 border-1 border-gray-200 clickable"
+    :class="[colorsAndSizes.background, remake]"
     @click="openDialog"
   >
     <v-icon
@@ -35,6 +35,7 @@
     :task-member-id="taskMemberId"
     :last-submission="content"
     :task-status="taskStatus"
+    :read-only="readOnly"
     @update-task-status="(status) => $emit('update-task-status', status)"
   />
 </template>
@@ -88,11 +89,18 @@ const formattedMark = computed(() => {
   }
   return `${props.mark}`;
 });
-const clickable = computed(
+
+const defaultChip = computed(
   () =>
     ['not_started', 'started'].includes(props.status) ||
     (props.status === 'in_review' && props.type === 'professor'),
 );
+
+const readOnly = computed(
+  () =>
+    ['in_review', 'done'].includes(props.status) || props.type === 'professor',
+);
+
 const remake = computed(
   () => props.status === 'denied' && props.type === 'student',
 );
@@ -101,7 +109,7 @@ const colorsAndSizes = computed(() => {
   let subtitleSize = 'text-body-5';
   let background = 'bg-white';
   let title = 'text-secondary-0';
-  if (clickable.value) {
+  if (defaultChip.value) {
     background = 'bg-gray-blue';
     subtitle = 'text-gray-500';
   } else if (remake.value) {
@@ -174,15 +182,13 @@ const text = computed(() => {
     };
   }
   return {
-    title: t('components.courses.tasks.submission.reviewed'),
+    title: t('components.courses.tasks.submission.done'),
     subtitle: t('components.courses.tasks.submission.click_to_review'),
   };
 });
 
 const openDialog = () => {
-  if (clickable.value) {
-    dialog.value.openDialog('edit');
-  }
+  dialog.value.openDialog();
 };
 </script>
 
