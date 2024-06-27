@@ -51,5 +51,12 @@
       "done": "Done"
     }
   },
+  "submission_modal": {
+    "saved_at": "Automatically saved { time } minutes ago",
+    "save_success": "Submission saved successfully",
+    "save_error": "Error saving submission, please try again",
+    "deliver_success": "Submission sent successfully",
+    "deliver_error": "Error sending submission, please try again"
+  },
   "noType": "(No type)"
 }

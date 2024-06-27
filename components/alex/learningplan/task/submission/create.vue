@@ -24,13 +24,16 @@
         @change="() => (hasEditorChanges = true)"
       />
     </div>
-    <template #footer v-if="!props.readOnly">
+    <template v-if="!props.readOnly" #footer>
       <v-container
         class="bg-white rounded-b-lg border-top-gray-100 d-flex justify-end ga-3 pa-6 align-center"
       >
         <p v-if="lastSaveDate" class="text-body-4 text-gray-400">
-          Salvo Automaticamente há
-          {{ differenceInMinutes(currentDate, lastSaveDate) }} minutos
+          {{
+            $t('components.courses.tasks.submission_modal.saved_at', {
+              time: differenceInMinutes(currentDate, lastSaveDate),
+            })
+          }}
         </p>
         <alex-custom-button
           size="large"
@@ -78,6 +81,7 @@ type Emits = {
   'update-task-status': [status: TaskMemberStatus];
 };
 const emit = defineEmits<Emits>();
+const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const dialog = ref(false);
 const editor = ref();
@@ -176,10 +180,18 @@ const saveSubmission = async () => {
   await checkEditorReady();
   try {
     await saveContent();
-    setMessage('Submissão salva com sucesso', 'success', true);
+    setMessage(
+      t('components.courses.tasks.submission_modal.save_success'),
+      'success',
+      true,
+    );
     executeSubmissions();
   } catch (error) {
-    setMessage('Erro ao salvar, tente novamente', 'error', true);
+    setMessage(
+      t('components.courses.tasks.submission_modal.save_error'),
+      'error',
+      true,
+    );
   } finally {
     isLoading.value = false;
   }
@@ -201,46 +213,53 @@ const sendSubmission = async () => {
     });
     emit('update-task-status', 'in_review');
     executeSubmissions();
+    setMessage(
+      t('components.courses.tasks.submission_modal.deliver_success'),
+      'success',
+      true,
+    );
     dialog.value = false;
   } catch (error) {
-    setMessage('Erro ao entregar, tente novamente', 'error', true);
+    setMessage(
+      t('components.courses.tasks.submission_modal.deliver_error'),
+      'error',
+      true,
+    );
   } finally {
     isLoading.value = false;
   }
 };
 
 const allowedBlocks = computed(() => {
-  const blocks: string[] = [];
+  const restrictionMap = {
+    text: [
+      'Paragraph',
+      'header',
+      'delimiter',
+      'list',
+      'inlineCode',
+      'marker',
+      'quote',
+      'table',
+      'alert',
+      'warning',
+      'code',
+      'alignmentBlockTune',
+    ],
+    link: ['link'],
+    image: ['image'],
+    gallery: ['carousel', 'image'],
+    video: ['embed', 'Paragraph'],
+    document: ['fileSet'],
+  };
+
+  const blocksSet = new Set();
   props.restrictions?.forEach((restriction) => {
-    if (restriction === 'text') {
-      blocks.push('Paragraph');
-      blocks.push('header');
-      blocks.push('delimiter');
-      blocks.push('list');
-      blocks.push('inlineCode');
-      blocks.push('marker');
-      blocks.push('quote');
-      blocks.push('table');
-      blocks.push('alert');
-      blocks.push('warning');
-      blocks.push('code');
-      blocks.push('alignmentBlockTune');
-    }
-    if (restriction === 'link') {
-      blocks.push('link');
-    }
-    if (restriction === 'image') {
-      blocks.push('image');
-    }
-    if (restriction === 'gallery') {
-      blocks.push('carousel');
-      blocks.push('image');
-    }
-    if (restriction === 'document') {
-      blocks.push('fileSet');
-    }
+    const blocksToAdd = restrictionMap[restriction];
+    blocksToAdd?.forEach((block: string) => blocksSet.add(block));
   });
-  return blocks;
+
+  return Array.from(blocksSet) as string[];
 });
 
 watch(dialog, (value) => {
