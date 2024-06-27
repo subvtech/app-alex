@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="bg-white min-h-[72px] rounded-t-lg px-6 border-bottom-gray-100"
+    class="bg-white tw-min-h-[72px] rounded-t-lg px-6 border-bottom-gray-100"
     data-testid="alex-dialog-header"
   >
     <v-row dense>

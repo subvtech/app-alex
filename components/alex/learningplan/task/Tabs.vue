@@ -20,7 +20,7 @@
       <v-window-item class="v-window-item-full" value="3">
         <alex-learningplan-task-chat
           v-model:attached-message="attachedMessage"
-          class="tw-w-100 grow task-chat"
+          class="tw-w-100 tw-grow task-chat"
           :task-member-id="taskMemberId"
           :is-sending-message="isSendingMessage"
           :loading="message.isLoading"
