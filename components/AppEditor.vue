@@ -151,10 +151,9 @@ onMounted(() => {
     minHeight: 400,
     data: props.data,
     holder: props.keyId,
-    defaultBlock:
-      props.allowedBlocks?.length === 1 ? props.allowedBlocks[0] : 'paragraph',
+    defaultBlock: defaultBlock.value,
     // logLevel: 'ERROR',
-    placeholder: 'Clique para iniciar...',
+    placeholder: editorPlaceholder.value,
     onReady: async () => {
       const data = await instance.value.save();
       if (data.blocks.length > 0 && !props.keyId.includes('contribution')) {
@@ -178,6 +177,24 @@ const props = withDefaults(defineProps<propsType>(), {
   selectedBlocks: undefined,
   selectedBlocksMode: false,
   allowedBlocks: undefined,
+});
+
+const editorPlaceholder = computed(() => {
+  if (
+    props.allowedBlocks?.length === 2 &&
+    props.allowedBlocks.includes('embed') &&
+    props.allowedBlocks.includes('Paragraph')
+  ) {
+    return 'Cole o link do vídeo aqui...';
+  }
+  return 'Clique para iniciar...';
+});
+
+const defaultBlock = computed(() => {
+  if (props.allowedBlocks?.length === 1) {
+    return props.allowedBlocks[0];
+  }
+  return 'paragraph';
 });
 
 const editorBlocks = ref<string[]>(props.allowedBlocks || []);
