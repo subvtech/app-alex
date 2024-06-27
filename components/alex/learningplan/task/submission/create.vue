@@ -56,6 +56,7 @@ import { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
 interface submissionProps {
   title: string;
   deadline: string;
+  taskStatus: TaskMemberStatus;
   taskMemberId: number;
   restrictions?: string[];
   lastSubmission?: TaskSubmissionSimple;
@@ -67,6 +68,10 @@ const props = withDefaults(defineProps<submissionProps>(), {
   restrictions: undefined,
   lastSubmission: undefined,
 });
+type Emits = {
+  'update-task-status': [status: TaskMemberStatus];
+};
+const emit = defineEmits<Emits>();
 const { setMessage } = useMessageStore();
 const dialog = ref(false);
 const editor = ref();
@@ -147,6 +152,12 @@ const saveContent = async () => {
       submission: content.data,
     });
   }
+  if (props.taskStatus === 'to_do') {
+    await update('task-members', props.taskMemberId, {
+      status: 'in_progress',
+    });
+    emit('update-task-status', 'in_progress');
+  }
   hasEditorChanges.value = await checkDataChanges();
 };
 const { execute: executeSubmissions } = useTaskSubmission(taskMemberId);
@@ -175,7 +186,9 @@ const sendSubmission = async () => {
     });
     await update('task-members', props.taskMemberId, {
       last_submission_at: time,
+      status: 'in_review',
     });
+    emit('update-task-status', 'in_review');
     executeSubmissions();
     dialog.value = false;
   } catch (error) {
@@ -186,7 +199,7 @@ const sendSubmission = async () => {
 };
 
 const allowedBlocks = computed(() => {
-  const blocks = <string[]>[];
+  const blocks: string[] = [];
   props.restrictions?.forEach((restriction) => {
     if (restriction === 'text') {
       blocks.push('Paragraph');

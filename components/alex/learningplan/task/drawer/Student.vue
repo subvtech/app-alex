@@ -118,6 +118,7 @@
                 :mark="mostRecentSubmission?.grade"
                 :task-member-id="taskMemberId"
                 :content="mostRecentSubmission"
+                :task-status="status"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -185,7 +186,6 @@
 <script setup lang="ts">
 import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.model';
 
-type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
 interface Student {
   name: string;
   studentClass: string;
@@ -198,7 +198,7 @@ interface Submission {
 interface TaskUserDrawerProps {
   student: Student;
   taskMemberId: number;
-  status: TStatus;
+  status: TaskMemberStatus;
   finishAt?: string | null;
   submission?: Submission;
   canSubmitAfterDeadline: boolean;

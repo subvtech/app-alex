@@ -101,6 +101,8 @@
             :restrictions="restrictionsValue"
             :task-member-id="taskMemberId"
             :content="submissions.data[0]"
+            :task-status="status"
+            @update-task-status="handleChangeStatus"
           />
         </div>
       </template>
@@ -419,6 +421,21 @@ watch(model, (value) => {
     }, 1100);
   }
 });
+
+const handleChangeStatus = (statusValue: TaskMemberStatus) => {
+  emit(
+    'update-status',
+    0,
+    {
+      id: props.taskMemberId,
+      title: props.title,
+      status: statusValue,
+      date: new Date(),
+    },
+    statusValue,
+  );
+  status.value = statusValue;
+};
 
 watch(status, (newStatus, oldStatus) => {
   emit(

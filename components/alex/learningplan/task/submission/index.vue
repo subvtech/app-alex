@@ -34,6 +34,8 @@
     :restrictions="restrictions"
     :task-member-id="taskMemberId"
     :last-submission="content"
+    :task-status="taskStatus"
+    @update-task-status="(status) => $emit('update-task-status', status)"
   />
 </template>
 
@@ -46,6 +48,7 @@ interface Submission {
   restrictions?: string[];
   content?: TaskSubmissionSimple;
   taskMemberId: number;
+  taskStatus: TaskMemberStatus;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -67,6 +70,10 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
   restrictions: undefined,
   content: undefined,
 });
+type Emits = {
+  'update-task-status': [status: TaskMemberStatus];
+};
+defineEmits<Emits>();
 const { t } = useI18n();
 const slots = useSlots();
 const hasPrepend = computed(() => !!slots.prependIcon);
