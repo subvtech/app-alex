@@ -3,9 +3,9 @@
     <template #activator="{ props: dropdownProps }"
       ><p
         v-bind="dropdownProps"
-        class="pa-1 text-body-3 rounded-md"
+        class="py-1 text-body-3 tw-rounded-md"
         :class="[
-          edit && 'output tw-cursor-pointer',
+          edit && 'px-1 output tw-cursor-pointer',
           !model && 'text-gray-400',
           model && 'text-gray-800',
         ]"
