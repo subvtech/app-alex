@@ -82,7 +82,8 @@
       "new": "New trail",
       "emptyTitle": "It looks like there are no trails created",
       "emptySubtitle": "To select learning resources, you need to create and select a trail.",
-      "updateError": "Error updating learning resources, try again later"
+      "updateError": "Error updating learning resources, try again later",
+      "invalidTrail": "This trail has no content. Please select another trail or add content to this trail."
     },
     "tags": {
       "subtitle": "Enter a tag",
