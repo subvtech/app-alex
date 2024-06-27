@@ -113,6 +113,7 @@
               <alex-learningplan-task-submission
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
+                :task-title="student.name"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
