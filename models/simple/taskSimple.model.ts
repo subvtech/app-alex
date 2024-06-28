@@ -8,9 +8,9 @@ export interface TaskSimple {
   trail?: TrailSimple;
   learning_plan_id: number;
   title: string;
-  description: string | null;
-  type?: TaskType;
-  tags: TagSimple[];
+  description?: string | null;
+  type?: TaskType | null;
+  tags?: TagSimple[];
   status: TaskStatus;
   blocks?: BlockSimple[];
   submission_required: boolean;
@@ -21,6 +21,7 @@ export interface TaskSimple {
   allowed_editor_plugins: string; // 'string, string, string';
   submission_description: string;
   learning_goals: LearningPlanGoalSimple[];
-  task_members: TaskMember[];
-  task_events: TaskEvent[];
+  task_members?: TaskMember[];
+  task_events?: TaskEvent[];
+  position: number;
 }

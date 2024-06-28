@@ -39,8 +39,8 @@
             </td>
             <td>
               <alex-learningplan-task-date-chip
-                v-if="item.deadline_at"
-                :date="item.deadline_at"
+                v-if="item.finish_at"
+                :date="item.finish_at"
                 :is-published="item.status === 'published' && !isArchived"
               />
               <span v-else>{{
@@ -158,6 +158,7 @@
 
 <script setup lang="ts">
 import { TaskItem } from './Container.vue';
+import { TaskStatus } from '~/models/simple/taskSimple.model';
 
 interface sortType {
   key: string;
@@ -226,7 +227,7 @@ const tasksArray = computed(() => {
   const item = {
     id: -1,
     title: '',
-    status: '',
+    status: props.over.list as TaskStatus,
     position: index,
     delivered: {
       toDo: 0,
@@ -273,7 +274,7 @@ const dropDownItems = (task: TaskItem) => {
         items.push(getDropDownAction('draft', task.id));
         items.push(getDropDownAction('close', task.id));
         items.push(getDropDownAction('delete', task.id));
-      } else if (task.archived) {
+      } else if (task.archived_at) {
         items.push(getDropDownAction('unarchive', task.id));
       } else {
         items.push(getDropDownAction('close', task.id));
@@ -285,7 +286,7 @@ const dropDownItems = (task: TaskItem) => {
         items.push(getDropDownAction('draft', task.id));
         items.push(getDropDownAction('publish', task.id));
         items.push(getDropDownAction('delete', task.id));
-      } else if (task.archived) {
+      } else if (task.archived_at) {
         items.push(getDropDownAction('unarchive', task.id));
       } else {
         items.push(getDropDownAction('publish', task.id));
@@ -392,10 +393,10 @@ const setAcceptedGroups = (task: TaskItem) => {
 const isTaskMovable = (task: TaskItem) => {
   return (
     (task.title &&
-      task.deadline_at &&
+      task.finish_at &&
       task.type &&
       task.start_at &&
-      !task.archived) ||
+      !task.archived_at) ||
     false
   );
 };
@@ -438,11 +439,6 @@ const previewRow = (id: number) => {
   opacity: 0.99;
   user-select: none;
 }
-
-/* .row-drop {
-  outline: 1px dashed rgb(var(--v-theme-gray-400));
-  border-bottom: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
-} */
 
 .table-drop {
   border: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
