@@ -184,13 +184,13 @@ export const useContracts = () => {
   const cancelContract = async (props: CancelledContractProps) => {
     const { chosenContract, contractAddress } = props;
     console.log(props);
-    if (!contractAddress) return;
 
     loading.value = true;
 
-    const { contractABI } = getCompiledContract(chosenContract);
-
     try {
+      if (!contractAddress) throw new Error('Contract address not provided');
+      const { contractABI } = getCompiledContract(chosenContract);
+
       // Replace with the actual freelancer address
       console.log({ contractABI });
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
@@ -203,11 +203,13 @@ export const useContracts = () => {
       const tx = await TaskContract.cancelDeal();
       await tx.wait(); // Wait for the transaction to be mined
       console.log('The contract was cancelled successfully!');
+      return true;
     } catch (error) {
       console.error('Error:', error);
+      return false;
+    } finally {
+      loading.value = false;
     }
-
-    loading.value = false;
   };
 
   const rewardStudents = async (
@@ -215,10 +217,11 @@ export const useContracts = () => {
     addressList: string[] = [],
     gradeList: number[] = [],
   ) => {
-    console.log({ addressList });
-    if (!contractAddress) return;
-    if (addressList.length === 0) return;
-    if (addressList.length !== gradeList.length) return;
+    if (!contractAddress) throw new Error('Contract address not provided');
+    if (addressList.length === 0)
+      throw new Error('Address list cannot be empty');
+    if (addressList.length !== gradeList.length)
+      throw new Error('Address list and gradeList must have the same length');
     loading.value = true;
 
     const contractABI = TaskOwnerReedemsContract.abi;
@@ -236,11 +239,67 @@ export const useContracts = () => {
       const tx = await TaskContract.redeemRewards(addressList, gradeList);
       await tx.wait(); // Wait for the transaction to be mined
       console.log('Students paid successfully!');
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const getRewardStudentsFee = async (
+    contractAddress: string | undefined,
+    addressList: string[] = [],
+    gradeList: number[] = [],
+  ) => {
+    if (!contractAddress) return;
+
+    loading.value = true;
+
+    const contractABI = TaskOwnerReedemsContract.abi;
+
+    try {
+      // Replace with the actual freelancer address
+
+      const gasPrice = await ethers.getDefaultProvider(networkUrl).getFeeData();
+      const TaskContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        ethers.getDefaultProvider(networkUrl),
+      );
+      const estimatedGas = TaskContract.estimateGas.redeemRewards(
+        addressList,
+        gradeList,
+      );
+
+      console.log(
+        `Estimated gas cost: ${ethers.formatEther(estimatedGas)} ETH`,
+        gasPrice,
+      );
+      return estimatedGas;
     } catch (error) {
       console.error('Error:', error);
     }
 
     loading.value = false;
+  };
+
+  const getDeployContractFee = async () => {
+    const { contractABI, contractBinary } = getCompiledContract(chosenContract);
+
+    const contractFactory = new ethers.ContractFactory(
+      contractABI,
+      contractBinary,
+      ethers.getDefaultProvider(networkUrl),
+    );
+
+    // Estimate gas for deployment
+    const estimatedGas = await ethers
+      .getDefaultProvider(networkUrl)
+      .estimateGas(contractFactory.getDeployTransaction().data);
+
+    return estimatedGas;
   };
 
   return {
@@ -249,6 +308,7 @@ export const useContracts = () => {
     getContractBalance,
     weiToUsd,
     usdToEth,
+    getRewardStudentsFee,
     loading,
     cancelContract,
   };

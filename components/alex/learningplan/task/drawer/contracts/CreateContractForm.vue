@@ -74,12 +74,16 @@
         <v-tooltip text="Warning, transaction fees do apply ">
           <template #activator="{ props: tooltipProps }">
             <alex-custom-button
-              text="Revert previous contract and be refunded"
+              text="Revert previous contract and get refunded"
               variant="error"
               v-bind="tooltipProps"
               :loading="loading"
               @click="
-                emit('delete:contract-address', selectedContract || undefined)
+                emit(
+                  'delete:contract-address',
+                  selectedContract || undefined,
+                  true,
+                )
               "
             />
           </template>
@@ -94,12 +98,7 @@
             v-bind="tooltipProps"
             :disabled="theresError"
             :loading="loading"
-            @click="
-              emit('create:contract-address', {
-                chosenContract: selectedContract,
-                budget: totalReward,
-              } as CreateContractProps)
-            "
+            @click="handleCreateTaskContract"
           />
         </template>
       </v-tooltip>
@@ -113,12 +112,7 @@
           v-bind="tooltipProps"
           :disabled="theresError"
           :loading="loading"
-          @click="
-            emit('create:contract-address', {
-              chosenContract: selectedContract,
-              budget: totalReward,
-            } as CreateContractProps)
-          "
+          @click="handleCreateTaskContract"
         />
       </template>
     </v-tooltip>
@@ -135,13 +129,13 @@ interface CreateContractFormProps {
   displayDraftWarning?: boolean;
   isDraft?: boolean;
   rewardLabel: string;
-  contractAddress?: string;
+  contractAddress: string | null;
   updateContract?: boolean;
 }
 
 const props = withDefaults(defineProps<CreateContractFormProps>(), {
   taskMemberStudents: () => [],
-  contractAddress: undefined,
+  contractAddress: null,
 });
 
 const emit = defineEmits([
@@ -172,7 +166,13 @@ const {
   useFieldModel,
 } = useForm({
   validationSchema: createTaskContractSchema2,
-  keepValuesOnUnmount: true,
+});
+
+const handleCreateTaskContract = handleSubmit(() => {
+  emit('create:contract-address', {
+    chosenContract: selectedContract.value,
+    budget: totalReward.value,
+  } as CreateContractProps);
 });
 
 const reward = useFieldModel<string>('reward');

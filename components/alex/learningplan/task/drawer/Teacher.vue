@@ -171,7 +171,6 @@
         @deploy:contract-draft="(cb) => (deployContract = cb)"
         @cancel:contract-draft="deployContract = null"
         @update:contract-address="handleUpdateContract"
-        @delete:contract-address="handleDeleteContract"
       />
 
       <!-- Eventos e atribuições -->
@@ -228,7 +227,7 @@ interface TaskTeacherDrawerProps {
   kanbanButton?: boolean;
   startDate?: string | null;
   endDate?: string | null;
-  contractAddress?: string;
+  contractAddress?: string | null;
   taskMembers: any[];
 }
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -249,10 +248,10 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskMembers: () => [],
   type: undefined,
   submissionDescription: '',
-  contractAddress: undefined,
+  contractAddress: null,
 });
-const { contractAddress } = toRefs(props);
 
+const contractAddress = ref(props.contractAddress);
 const description = ref(props.description);
 const submissionDescription = ref(props.submissionDescription);
 const hasSubmission = ref(props.hasSubmission);
@@ -482,15 +481,10 @@ function handleCloseModal() {
   model.value = false;
 }
 
-const handleUpdateContract = async (newAddress) => {
-  await addTaskContractAddress(props.taskId, newAddress as string);
-  contractAddress.value = newAddress || undefined;
-};
-
-const handleDeleteContract = async () => {
-  console.log('delete contract address');
-  await addTaskContractAddress(props.taskId, null);
-  contractAddress.value = undefined;
+const handleUpdateContract = async (newAddress: string | null) => {
+  console.log('handleUpdateContract');
+  await addTaskContractAddress(props.taskId, newAddress);
+  contractAddress.value = newAddress;
 };
 </script>
 

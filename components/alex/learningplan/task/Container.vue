@@ -508,6 +508,10 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
   }
+
+  console.log({
+    values,
+  });
 };
 
 const handleChangeDescription = (description: string) => {
