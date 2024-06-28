@@ -9,20 +9,25 @@
           title: $t('components.learningPlan.drawer.task.status.toDo'),
           color: 'gray',
           group: 'to_do',
-          accept: ['in_progress'],
+          accept: selectedTask?.task?.submission_required
+            ? ['in_progress', 'in_review']
+            : true,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.inProgress'),
           color: 'blue',
           group: 'in_progress',
-          accept: ['to_do'],
+          accept: selectedTask?.task?.submission_required
+            ? ['to_do', 'in_review']
+            : true,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.underReview'),
           color: 'orange',
           group: 'in_review',
-          accept: ['in_progress', 'to_do'],
-          disable: true,
+          accept: selectedTask?.task?.submission_required
+            ? ['to_do', 'in_progress']
+            : true,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.done'),
@@ -102,7 +107,9 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
           },
         },
       },
-      task_submissions: true,
+      task_submissions: {
+        sort: 'submitted_at:desc',
+      },
       task_member_students: {
         populate: [
           'student_member.user.avatar',
@@ -119,8 +126,8 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
       },
     },
   });
-const { data: tasks } = await useAsyncData(
-  'task-members-student',
+const { data: tasks, execute } = await useAsyncData(
+  'task-members',
   () => getStudentTasks(props.learningplanId, props.studentId),
   {
     default: () => ({ meta: 0, data: [] as TaskStudent[] }),
@@ -144,6 +151,7 @@ const { data: tasks } = await useAsyncData(
           task?.task_member_students[0]?.student_member?.learning_class?.name ||
           '',
         task: task.task,
+        submissions: task.task_submissions,
       })) as TaskStudent[];
       return {
         meta,
@@ -170,8 +178,29 @@ const handleUpdateStatus = async (
 
   try {
     kanban.value.setCanDrag(false);
+    const submissionValidationStatus = ['in_review', 'in_progress'];
+    const time = new Date();
+    if (newStatus === 'in_review') {
+      if (!item.submissions?.length && item.task?.submission_required) {
+        throw new Error('missingSubmission');
+      }
+    }
+    if (item.submissions?.length) {
+      const lastSubmission = item.submissions[0];
+      if (submissionValidationStatus.includes(newStatus)) {
+        await strapi.update('task-submissions', lastSubmission.id, {
+          submitted_at: newStatus === 'in_review' ? time : null,
+        });
+      }
+    }
     await strapi.update<TaskMember>('task-members', item.id, {
       status: newStatus as TaskMemberStatus,
+      ...(submissionValidationStatus.includes(newStatus) && {
+        last_submission_at:
+          newStatus === 'in_progress' && item.submissions
+            ? null
+            : time.toISOString(),
+      }),
     });
   } catch (error) {
     tasks.value.data = tasks.value.data.map((task) => {
@@ -180,9 +209,17 @@ const handleUpdateStatus = async (
       }
       return task;
     });
-
+    if ((error as any).message === 'missingSubmission') {
+      setMessage(
+        t('components.learningPlan.drawer.task.errors.missingSubmission'),
+        'error',
+        true,
+      );
+      return;
+    }
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
   } finally {
+    await execute();
     kanban.value.setCanDrag(true);
   }
 };

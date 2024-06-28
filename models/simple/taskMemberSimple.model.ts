@@ -4,7 +4,8 @@ export interface TaskMember {
   can_submit_after_deadline: boolean;
   started_at: string;
   finished_at: string;
-  last_submission_at: string;
+  last_submission_at?: string | null;
   task_member_students: TaskMemberStudent[];
   task?: TaskSimple;
+  task_submissions?: TaskSubmissionSimple[];
 }

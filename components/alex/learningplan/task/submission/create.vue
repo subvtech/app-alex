@@ -127,7 +127,6 @@ const checkEditorReady = async () => {
 };
 
 const checkDataChanges = async () => {
-  console.log('Checando');
   await checkEditorReady();
   const editorData = await editor.value?.getData();
   const data1 = editorData?.data?.blocks;
@@ -138,7 +137,6 @@ const checkDataChanges = async () => {
 };
 
 const openDialog = async () => {
-  console.log('Abrindo dialog (dentro)');
   dialog.value = true;
   isLoading.value = true;
   currentData.value = props.lastSubmission?.submission || undefined;
