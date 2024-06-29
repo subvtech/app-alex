@@ -1,7 +1,6 @@
 <template>
   <div
-    class="position-relative d-flex flex-column ga-6 mt-6 pa-6 bg-white rounded-lg"
-    :class="isSmaller('tablet') || 'flex-md-row'"
+    class="position-relative tw-flex tw-gap-6 mt-6 pa-6 bg-white rounded-lg tw-flex-col md:tw-flex-row"
   >
     <!-- Seção 1 (Descrição) -->
     <div style="flex: 1 1 50%">
@@ -101,7 +100,7 @@
     </div>
     <!-- Editar (Apenas ícone) -->
     <alex-custom-button
-      :class="isSmaller('tablet') && 'position-absolute top-6 right-6'"
+      class="!tw-absolute md:!tw-relative tw-top-6 md:!tw-top-[auto] tw-right-6 md:!tw-right-[auto]"
       size="large"
       variant="text"
       icon="mdi-pencil-outline"
@@ -111,7 +110,6 @@
 </template>
 
 <script setup lang="ts">
-import { useBreakpoints } from '@vueuse/core';
 import { format } from 'date-fns';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
@@ -175,11 +173,6 @@ const statusCfg = {
 
 // Refs
 const { md } = useDisplay();
-const { isSmaller } = useBreakpoints({
-  mobile: 0, // optional
-  tablet: 980,
-});
-
 const descEl = ref<HTMLParagraphElement | undefined>(undefined);
 const expanded = ref<boolean>(false);
 const ellipsis = ref<boolean>(false);

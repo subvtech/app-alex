@@ -92,6 +92,7 @@
             {{ $t('components.courses.tasks.submission.last_submission') }}
           </p>
           <alex-learningplan-task-submission
+            v-if="!loadingSubmission"
             type="student"
             :status="getSubmissionStatus(submissions.data[0])"
             :mark="mostRecentSubmission?.grade"
@@ -104,6 +105,12 @@
             :task-status="status"
             @update-task-status="handleChangeStatus"
           />
+          <div v-if="loadingSubmission">
+            <alex-custom-skeleton
+              color="gray-blue"
+              class="tw-w-full tw-h-[61px]"
+            />
+          </div>
         </div>
       </template>
       <alex-custom-chip
@@ -217,6 +224,7 @@ const submissionDescription = ref<string>(props.submission.description);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
+const loadingSubmission = ref(true);
 const activeTab = ref('1');
 const resourcesOpen = ref<boolean>(false);
 const taskMemberId = toRef(props, 'taskMemberId');
@@ -419,7 +427,12 @@ watch(model, (value) => {
     setTimeout(() => {
       isFirstTimeOpened.value = false;
     }, 1100);
+    setTimeout(() => {
+      loadingSubmission.value = false;
+    }, 800);
+    return;
   }
+  loadingSubmission.value = true;
 });
 
 const handleChangeStatus = (statusValue: TaskMemberStatus) => {

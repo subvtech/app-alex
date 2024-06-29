@@ -118,6 +118,8 @@ export interface Task {
   user: { name: string; avatar?: string | null };
   mark?: number;
   maxMark?: number;
+  task?: TaskSimple;
+  submissions?: TaskSubmissionSimple[];
 }
 export interface TaskStudent {
   id: number;
@@ -130,6 +132,7 @@ export interface TaskStudent {
   mark?: number;
   maxMark?: number;
   task?: TaskSimple;
+  submissions?: TaskSubmissionSimple[];
 }
 
 export interface InsertCardProps {

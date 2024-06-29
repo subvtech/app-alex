@@ -98,7 +98,8 @@
       "sendMessage": "Erro ao enviar a mensagem",
       "endDateBeforeStartDate": "Data de término deve ser maior que a data de início",
       "startDateAfterEndDate": "Data de início deve ser menor que a data de término",
-      "cantChangeType": "Você não pode alterar o tipo da tarefa após adicionar alunos"
+      "cantChangeType": "Você não pode alterar o tipo da tarefa após adicionar alunos",
+      "missingSubmission": "É necessário realizar alguma entrega"
     },
     "members": {
       "allClass": "A turma {name} já foi adicionada na tarefa",

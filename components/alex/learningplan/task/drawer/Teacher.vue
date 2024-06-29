@@ -120,6 +120,7 @@
             :label="
               $t('components.learningPlan.drawer.task.submission.reqSubmission')
             "
+            :disabled="hasAtLeastSubmission"
           />
         </v-col>
         <v-col v-if="hasSubmission" class="pa-0 d-flex align-center" cols="6">
@@ -186,7 +187,7 @@
             :start-at="startDate"
             :finish-at="endDate"
             :submit-after-deadline="sendAfterDeadline"
-            :block-delete="!!hasAtLeastSubmission.length"
+            :block-delete="hasAtLeastSubmission"
             @change-members="$emit('change-members')"
             @set-type="(value: TaskType) => (type = value)"
         /></v-window-item>
@@ -265,8 +266,8 @@ const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
 const members = toRef(props, 'members');
 const openResources = ref<boolean>(false);
-const hasAtLeastSubmission = computed(() =>
-  members.value.filter((member) => member.last_submission_at),
+const hasAtLeastSubmission = computed(
+  () => !!members.value.filter((member) => member.last_submission_at).length,
 );
 const startDateComp = ref<{
   close: () => void;

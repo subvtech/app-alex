@@ -24,7 +24,9 @@
       ref="kanban"
       v-model="tasks"
       type="professor"
-      :classes="getClassesOfTaskMembers(taskStore.task.task_members)"
+      :classes="
+        getClassesOfTaskMembers(taskStore.task.task_members as TaskMember[])
+      "
       :columns="[
         {
           title: $t('components.learningPlan.drawer.task.status.toDo'),
@@ -42,7 +44,7 @@
           title: $t('components.learningPlan.drawer.task.status.underReview'),
           color: 'orange',
           group: 'in_review',
-          accept: true,
+          accept: taskStore.task.submission_required ? true : null,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.done'),
@@ -160,7 +162,7 @@ const kanban = ref<{
 } | null>(null);
 const headerTags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
-  return taskStore.task.tags.map((tag) => tag.text);
+  return taskStore.task?.tags?.map((tag) => tag.text);
 });
 const handleChangeTags = (tags: TagSimple[]) => {
   if (!taskStore.task) return;
