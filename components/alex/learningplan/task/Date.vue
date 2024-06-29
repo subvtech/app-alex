@@ -3,7 +3,7 @@
     <p
       class="py-1 text-body-3 tw-min-h-6 tw-rounded-md"
       :class="[
-        edit && 'px-1 date-output cursor-pointer',
+        edit && 'px-1 date-output tw-cursor-pointer',
         !formattedDate && 'text-gray-400',
         formattedDate && 'text-gray-800',
       ]"

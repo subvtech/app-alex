@@ -11,7 +11,7 @@
     @update:model-value="handleChange"
   >
     <form
-      class="d-flex flex-column ga-4 h-full w-full bg-white"
+      class="d-flex flex-column ga-4 tw-h-full tw-w-full bg-white"
       @submit="onSubmit"
     >
       <div class="d-flex align-center ga-4 px-4">

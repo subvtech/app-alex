@@ -11,7 +11,6 @@
     </template>
 
     <!-- Opções -->
-
     <v-list
       class="list tw-py-0 tw-relative"
       :selectable="false"

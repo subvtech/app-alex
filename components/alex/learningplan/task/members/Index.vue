@@ -34,19 +34,25 @@
           @add-click="addMember"
         />
         <alex-learningplan-task-dialog-add-group
-          v-else
+          v-else-if="type === 'group'"
           v-model="addGroupDialog"
           :learningplan-id="props.learningplanId"
         />
-        <alex-custom-button
-          class="tw-ml-auto"
-          variant="secondary"
-          prepend-icon="mdi-plus"
-          @click="handleAddMemberOrClass"
-          >{{
-            $t('components.learningPlan.members.add.label')
-          }}</alex-custom-button
-        >
+
+        <alex-custom-dropdown :items="typeOptions" :disabled="type">
+          <template #activator="{ props }">
+            <alex-custom-button
+              v-bind="props"
+              class="tw-ml-auto"
+              variant="secondary"
+              prepend-icon="mdi-plus"
+              @click="handleAddMemberOrClass"
+              >{{
+                $t('components.learningPlan.members.add.label')
+              }}</alex-custom-button
+            >
+          </template>
+        </alex-custom-dropdown>
       </div>
     </template>
     <!-- Cards -->
@@ -59,6 +65,7 @@
           class: member.raw.student_member?.learning_class?.name,
           avatarUrl: member.raw.student_member?.user.avatar?.url,
         }"
+        :type="props.type"
         @remove-click="removeMember(member.raw.task_member.id, member.raw)"
         @to-profile="
           navigateTo(`/users/${member.raw.student_member.user.username}`)
@@ -103,6 +110,8 @@
 </template>
 
 <script setup lang="ts">
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+
 interface MembersProps {
   learningplanId: number;
   taskId: number;
@@ -119,17 +128,40 @@ const props = withDefaults(defineProps<MembersProps>(), {
   type: null,
   blockDelete: false,
 });
+
+type Emits = {
+  'change-members': [];
+  'set-type': [value: TaskType];
+};
+
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-const emit = defineEmits(['change-members']);
+const emit = defineEmits<Emits>();
 const addMemberDialog = ref(false);
 const addGroupDialog = ref(false);
+const setTypeDropdown = ref<boolean>(false);
 const page = ref<number>(1);
 const itemsPerPage = 12;
 const search = ref('');
 const client = useStrapiClient();
+const typeOptions: AlexDropdownItem[] = [
+  {
+    text: t('components.learningPlan.drawer.task.type.individual'),
+    onClick: () => {
+      emit('set-type', 'individual');
+      addMemberDialog.value = true;
+    },
+  },
+  {
+    text: t('components.learningPlan.drawer.task.type.collective'),
+    onClick: () => {
+      emit('set-type', 'group');
+      addGroupDialog.value = true;
+    },
+  },
+];
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMemberStudent>('task-member-students', {
     populate: {
@@ -263,9 +295,11 @@ const removeMember = async (
 const handleAddMemberOrClass = () => {
   if (props.type === 'individual') {
     addMemberDialog.value = true;
-    return;
+  } else if (props.type === 'group') {
+    addGroupDialog.value = true;
+  } else {
+    setTypeDropdown.value = true;
   }
-  addGroupDialog.value = true;
 };
 </script>
 

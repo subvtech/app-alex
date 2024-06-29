@@ -188,6 +188,7 @@
             :submit-after-deadline="sendAfterDeadline"
             :block-delete="!!hasAtLeastSubmission.length"
             @change-members="$emit('change-members')"
+            @set-type="(value: TaskType) => (type = value)"
         /></v-window-item>
       </v-window>
     </div>
@@ -537,7 +538,7 @@ watch(status, async (value) => {
 watch(goals, async (value) => {
   if (!value) return;
   const goalsId = goals.value.map((goal) => goal.id);
-  if (!goalsId.length) return;
+  // if (!goalsId.length) return;
   await updateTaskValues(taskId.value, {
     learning_goals: {
       set: goalsId,

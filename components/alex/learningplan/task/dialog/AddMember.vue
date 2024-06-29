@@ -1,7 +1,7 @@
 <template>
   <alex-custom-dialog
     v-model="model"
-    :title="$t('components.learningPlan.drawer.task.dialog.addMembers')"
+    :title="$t('components.learningPlan.drawer.task.dialog.newMembers')"
     :main-button-text="$t('components.learningPlan.drawer.task.dialog.add')"
     @on-main-action="handleSubmit"
   >

@@ -42,7 +42,7 @@
             <template v-if="searchedGoals.length">
               <alex-learningplan-task-goals-card
                 v-for="goal in searchedGoals"
-                :id="goal.id"
+                :id="ids[goal.id]"
                 :key="goal.id"
                 :verb="goal.verb?.text"
                 :description="goal.description"
@@ -59,7 +59,7 @@
       <alex-custom-chip
         v-for="goal in selectedGoals"
         :key="goal.id"
-        :text="`OA #${goal.id}`"
+        :text="`OA #${ids[goal.id]}`"
         :clickable="props.edit"
         :closable="props.edit"
         size="small"
@@ -83,7 +83,27 @@ const open = ref<boolean>(false);
 const search = ref<string>('');
 const searchedGoals = ref<LearningPlanGoalSimple[]>([]);
 
-const { find } = useStrapiUtils();
+const learningPlanStore = useLearningPlanStore();
+
+const selectedIds = computed(() => selectedGoals.value.map((goal) => goal.id));
+
+// Id dos objetivos baseado no seu index no learning plan
+const ids = computed(() => {
+  const goals = learningPlanStore.learningPlan?.learning_goals;
+
+  if (!goals) {
+    return {};
+  }
+
+  const idsIndex = {};
+  let index = 1;
+
+  goals.forEach((goal) => {
+    idsIndex[goal.id] = index++;
+  });
+
+  return idsIndex;
+});
 
 function resetTextField() {
   searchedGoals.value = [];
@@ -94,7 +114,10 @@ function addGoal(goal: LearningPlanGoalSimple) {
   const selectedGoalsId = selectedGoals.value.map((goal) => goal.id);
 
   if (!selectedGoalsId.includes(goal.id)) {
-    selectedGoals.value = [...selectedGoals.value, goal];
+    const selected = [...selectedGoals.value, goal];
+    selectedGoals.value = selected.sort(
+      (a, b) => ids.value[a.id] - ids.value[b.id],
+    );
   }
 
   open.value = false;
@@ -106,30 +129,17 @@ function removeGoal(goal: LearningPlanGoalSimple) {
   );
 }
 
-async function queryGoals() {
-  // Procurar verbos com objetivos
-  const firstWord = search.value.split(' ')[0];
+function queryGoals() {
   const isNumber = !isNaN(Number(search.value));
 
-  const query = await find<LearningPlanGoalSimple>('learning-goals', {
-    populate: ['verb'],
-    filters: {
-      $and: [
-        {
-          $or: [
-            { description: { $containsi: search.value.toLowerCase() } },
-            { verb: { text: { $containsi: firstWord.toLowerCase() } } },
-            // { id: { $notIn: [1, 2] } },
-            // Condicionais
-            isNumber ? { id: { $eq: search.value } } : null,
-          ].filter((item) => item),
-        },
-        { id: { $notIn: selectedGoals.value.map((goal) => goal.id) } },
-      ],
-    },
-  });
+  const unfilteredGoals =
+    learningPlanStore.learningPlan?.learning_goals.map((goal) => goal) || [];
 
-  const goals: LearningPlanGoalSimple[] = query.data.filter((goal) => {
+  const goals: LearningPlanGoalSimple[] = unfilteredGoals.filter((goal) => {
+    if (selectedIds.value.includes(goal.id)) {
+      return false;
+    }
+
     const verb: string = goal.verb?.text.toLowerCase() || '';
     const description: string = goal.description.toLowerCase();
 
