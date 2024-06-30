@@ -22,11 +22,11 @@ import { learningPlanMedias } from '../learning-plan-medias/learning-plan-medias
 import { learningPlanMeetingSchedule } from '../learning-plan-meetings/learning-plan-meeting-schedule.schema';
 import { learningPlanMembers } from '../learning-plan-members/learning-plan-members.schema';
 import { learningPlanStructures } from '../learning-plan-structure/learning-plan-structures.schema';
-import { classes } from '../classes-folder/classes.schema';
+import { classes } from '../classes/classes.schema';
 
 export const typeEnum = pgEnum('type', ['course', 'project', 'course_project']);
 
-export const learningPlans = pgTable('learning-plans', {
+export const learningPlans = pgTable('learning_plans', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description'),

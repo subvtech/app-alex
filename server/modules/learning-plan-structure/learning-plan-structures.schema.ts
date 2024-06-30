@@ -14,7 +14,7 @@ import { learningPlanMembers } from '../learning-plan-members/learning-plan-memb
 
 export const structureTypeEnum = pgEnum('type', ['standard', 'student']);
 
-export const learningPlanStructures = pgTable('learning-plan-structures', {
+export const learningPlanStructures = pgTable('learning_plan_structures', {
   id: serial('id').primaryKey(),
   learningPlanId: integer('learning_plan_id')
     .references(() => learningPlans.id)

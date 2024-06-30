@@ -14,7 +14,7 @@ import { trailContributions } from '../trail-contributions/trail-contributions.s
 import { trails } from '../trails/trails.schema';
 import { users } from '../users/users.schema';
 
-import { classes } from '../classes-folder/classes.schema';
+import { classes } from '../classes/classes.schema';
 import { learningPlanEvents } from '../learning-plan-events/learning-plan-events.schema';
 import { learningPlanGroupMembers } from '../learning-plan-group-members/learning-plan-group-members.schema';
 import { learningPlanStructures } from '../learning-plan-structure/learning-plan-structures.schema';
@@ -30,7 +30,7 @@ export const roleEnum = pgEnum('role', [
 export const statusEnum = pgEnum('status', ['pending_invitation', 'joined']);
 
 // XXX: default enums https://github.com/drizzle-team/drizzle-orm/issues/2299
-export const learningPlanMembers = pgTable('learning-plan-members', {
+export const learningPlanMembers = pgTable('learning_plan_members', {
   id: serial('id').primaryKey(),
   userId: text('user_id').references(() => users.id),
   learningPlanId: integer('learning_plan_id')

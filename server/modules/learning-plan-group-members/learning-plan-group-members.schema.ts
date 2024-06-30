@@ -12,7 +12,7 @@ import { learningPlanMembers } from '../learning-plan-members/learning-plan-memb
 
 export const GroupMemberRoleEnum = pgEnum('role', ['standard', 'in_charge']);
 
-export const learningPlanGroupMembers = pgTable('learning-plan-group-members', {
+export const learningPlanGroupMembers = pgTable('learning_plan_group_members', {
   id: serial('id').primaryKey(),
   groupId: integer('group_id')
     .references(() => learningPlanGroups.id)
@@ -20,7 +20,7 @@ export const learningPlanGroupMembers = pgTable('learning-plan-group-members', {
   studentMemberId: integer('student_member_id')
     .references(() => learningPlanMembers.id)
     .notNull(),
-  role: GroupMemberRoleEnum('role'),
+  role: GroupMemberRoleEnum('role').notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
 });
 

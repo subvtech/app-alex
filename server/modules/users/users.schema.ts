@@ -21,6 +21,7 @@ export const users = pgTable('users', {
   coverId: text('cover_id'),
   username: text('username'),
   password: text('password'),
+  phone: text('phone'),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({

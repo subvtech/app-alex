@@ -29,4 +29,4 @@ export const taskSubmissionRelations = relations(
   ({ many }) => ({ taskMembersMessage: many(taskMembersMessages) }),
 );
 
-export type taskSubmissions = typeof taskSubmissions.$inferSelect;
+export type TaskSubmissions = typeof taskSubmissions.$inferSelect;

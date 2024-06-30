@@ -14,7 +14,7 @@ import { medias } from '../medias/medias.schema';
 import { tasks } from '../tasks/tasks.schema';
 
 import { trailContributions } from '../trail-contributions/trail-contributions.schema';
-import { structures } from './structures.schema';
+import { trailContents } from '../trail-contents/trail-contents.schema';
 
 export const trails = pgTable('trails', {
   id: serial('id').primaryKey(),
@@ -39,7 +39,7 @@ export const trailsRelations = relations(trails, ({ one, many }) => ({
     references: [medias.id],
   }),
   learningPlanMember: many(LPMembersToTrails),
-  structures: many(structures),
+  contents: many(trailContents),
   trailContribution: many(trailContributions),
   task: many(tasks),
 }));

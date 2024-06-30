@@ -10,7 +10,7 @@ import {
 import { medias } from '../medias/medias.schema';
 import { users } from '../users/users.schema';
 
-export const institutions = pgTable('institution', {
+export const institutions = pgTable('institutions', {
   id: serial('id').primaryKey(),
   cnpj: text('cnpj').unique().notNull(),
   name: text('name').unique().notNull(),
@@ -19,17 +19,6 @@ export const institutions = pgTable('institution', {
   sector: text('sector').unique().notNull(),
   coverImageId: integer('cover_image_id').references(() => medias.id),
 });
-
-export const institutionRelations = relations(
-  institutions,
-  ({ one, many }) => ({
-    users: many(userToInstitution),
-    coverImageId: one(medias, {
-      fields: [institutions.coverImageId],
-      references: [medias.id],
-    }),
-  }),
-);
 
 export const userToInstitution = pgTable(
   'user_to_institution',
@@ -46,18 +35,31 @@ export const userToInstitution = pgTable(
   }),
 );
 
+export const institutionRelations = relations(
+  institutions,
+  ({ one, many }) => ({
+    userToInstitution: many(userToInstitution),
+    coverImageId: one(medias, {
+      fields: [institutions.coverImageId],
+      references: [medias.id],
+    }),
+  }),
+);
+
 export const userToInstitutionRelations = relations(
   userToInstitution,
   ({ one }) => ({
     user: one(users, {
       fields: [userToInstitution.userId],
       references: [users.id],
+      relationName: 'user',
     }),
     institution: one(institutions, {
       fields: [userToInstitution.institutionId],
       references: [institutions.id],
+      relationName: 'institution',
     }),
   }),
 );
 
-export type institutions = typeof institutions.$inferSelect;
+export type Institutions = typeof institutions.$inferSelect;
