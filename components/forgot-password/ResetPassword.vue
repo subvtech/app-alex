@@ -114,7 +114,7 @@ watchEffect(() => {
         type="submit"
         size="large"
         :disabled="!isValid"
-        :loading="resetPassword.status.value === 'pending'"
+        :loading="resetPassword.pending.value"
       >
         {{ $t('components.forgot.sendResetPassword.changePassword') }}
       </alex-custom-button>

@@ -17,6 +17,8 @@ export const getUserByEmail = getUserBy('email');
 
 export const getUserById = getUserBy('id');
 
+export const getUserByUsername = getUserBy('username');
+
 export async function register(data: UserInsert) {
   return (await db.insert(users).values(data).returning())[0];
 }

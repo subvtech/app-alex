@@ -16,11 +16,11 @@ export default drizzle(conn, {
   logger: true,
   schema: {
     accounts,
-    users,
-    verificationTokens,
-    institutions,
     classes,
+    institutions,
     learningPlans,
     tags,
+    users,
+    verificationTokens,
   },
 });
