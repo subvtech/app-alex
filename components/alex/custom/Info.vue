@@ -236,7 +236,7 @@
 </template>
 
 <script setup lang="ts">
-import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+import { type ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
 
 const emit = defineEmits(['display:settings']);
 const props = defineProps({
