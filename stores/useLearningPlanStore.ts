@@ -180,9 +180,17 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const userClass = computed(() => {
-    return learningPlan.value?.classes.find(
-      (c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id),
-    );
+    const classes = learningPlan.value?.classes;
+    const userId = user.value?.id;
+    if (!classes || !userId) {
+      return undefined;
+    }
+
+    for (const c of classes) {
+      if (c.learning_plan_members?.some((m) => m.user.id === userId)) {
+        return c;
+      }
+    }
   });
 
   const schedules = computed<LearningPlanScheduleSimple[]>(() => {

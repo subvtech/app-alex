@@ -163,7 +163,7 @@ watch(
       // Kanban
       tasks.value = learningPlanStore.learningPlan?.tasks || [];
       classes.value =
-        learningPlanStore.learningPlan?.classes.map((group) => group.name) ||
+        learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
         [];
 
       headerStore.title = t('components.courses.settings.breadcrumbTitle');

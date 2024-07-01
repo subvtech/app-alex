@@ -149,16 +149,19 @@ onMounted(async () => {
   await fetchContractBalance();
 });
 
-watch(isThereAContract, () => {
+watch(isThereAContract, async () => {
   canEdit.value = isThereAContract.value || isUpdatingContract.value;
+  console.log('is there a contract', isThereAContract.value);
+  await fetchContractBalance();
 });
 
 watch(isThereBalance, () => {
   isUpdatingContract.value = isThereBalance.value;
+  console.log('is there Balance', isThereBalance.value);
 });
 
 watch(contractAddress, async () => {
-  console.log('watch');
+  console.log('contractAddress has changed');
   console.log({ contractAddress: contractAddress.value });
   await fetchContractBalance();
 });
@@ -166,9 +169,14 @@ watch(contractAddress, async () => {
 const fetchContractBalance = async () => {
   if (!contractAddress.value) return;
   const balance = await getContractBalance(contractAddress.value);
-  console.log({ balance });
-  if (!balance) return;
+  console.log('fetchedBalance', { balance });
+  if (!Number(balance)) {
+    console.log('0n is false', balance);
+    return;
+  }
+
   contractBalance.value = weiToUsd(balance);
+  console.log('newBalance', { newBalance: weiToUsd(balance) });
 };
 
 const handleCancelContract = async (

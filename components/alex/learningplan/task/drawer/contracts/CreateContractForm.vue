@@ -39,7 +39,9 @@
       placeholder="Select Contract"
       class="w-100"
       required
-      hint="Pick one among the available contracts"
+      :hint="
+        !selectedContract ? 'Pick one among the available contracts' : undefined
+      "
       persistent-hint
       clearable
       info="Insira o nome de um contrato"
