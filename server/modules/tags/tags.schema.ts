@@ -22,7 +22,7 @@ export const tags = pgTable('tags', {
   isGeneral: boolean('is_general'),
   verified: boolean('verified'),
   verifiedDate: timestamp('verified_date', { mode: 'date' }),
-  verifiedBy: integer('verified_by'),
+  verifiedBy: integer('verified_by'), // TODO: Não está sendo usado
 });
 
 export const tagsRelations = relations(tags, ({ many }) => ({

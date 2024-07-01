@@ -27,11 +27,15 @@ export const createLearningPlan = async (params: learningPlanParams) => {
     .onConflictDoNothing();
 };
 
+export const findAll = async () => {
+  return await db.query.learningPlans.findMany();
+};
+
 export const findOneLearningPlan = async (id: number) => {
   return await db.query.learningPlans.findFirst({
     where: and(eq(learningPlans.id, id), eq(learningPlans.hidden, false)),
     with: {
-      tags: true,
+      tagsToLearningPlan: true,
     },
   });
 };

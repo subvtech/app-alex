@@ -20,9 +20,9 @@ export const createTags = async (params: tagsParams) => {
 };
 
 export const findTags = async (
-  search: string,
-  isPublic: boolean,
-  general: boolean,
+  search: string = '',
+  isPublic: boolean = true,
+  general: boolean = true,
 ) => {
   return await db.query.tags.findMany({
     where: (tags, { like, and, eq }) =>
@@ -31,9 +31,6 @@ export const findTags = async (
         eq(tags.isPublic, isPublic),
         eq(tags.isGeneral, general),
       ),
-    with: {
-      verifiedBy: true,
-    },
   });
 };
 

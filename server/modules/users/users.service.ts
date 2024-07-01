@@ -1,14 +1,13 @@
 import { eq } from 'drizzle-orm';
 
+import { User, UserInsert, users } from './users.schema';
 import db from '@@/server/lib/drizzle';
 import { curry } from '@@/utils/curry';
-import { User, UserInsert, users } from './users.schema';
 
 export const getUserBy = curry(async (field: keyof User, value: string) => {
   try {
     return await db.query.users.findFirst({
       where: eq(users[field], value),
-      // with: { avatarId: true }, // TODO: add all user properties
     });
   } catch (_) {
     return null;
