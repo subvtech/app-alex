@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { useField, YupSchema } from 'vee-validate';
+import { useField } from 'vee-validate';
 defineOptions({
   inheritAttrs: false,
 });
