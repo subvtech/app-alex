@@ -313,6 +313,7 @@ type Emits = {
   'change-submission-description': [value: string];
   'change-title': [value: string];
   'change-tags': [value: TagSimple[]];
+  'change-goals': [value: LearningPlanGoalSimple[]];
   'change-members': [];
 };
 const emit = defineEmits<Emits>();
@@ -545,6 +546,7 @@ watch(goals, async (value) => {
       set: goalsId,
     },
   });
+  emit('change-goals', value);
 });
 watch(sendAfterDeadline, async (value) => {
   await updateTaskValues(taskId.value, {
