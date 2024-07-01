@@ -32,6 +32,7 @@
     "in_review": "Under review",
     "denied": "Submission refused",
     "reviewed": "Submission reviewed",
+    "done": "Submission done",
     "click_to_start": "Click to start",
     "click_to_continue": "Click to continue",
     "click_to_remake": "Click to remake",
@@ -49,6 +50,15 @@
       "in_review": "In Review",
       "done": "Done"
     }
+  },
+  "submission_modal": {
+    "saved_at": "Automatically saved { time } minutes ago",
+    "save_success": "Submission saved successfully",
+    "save_error": "Error saving submission, please try again",
+    "deliver_success": "Submission sent successfully",
+    "deliver_error": "Error sending submission, please try again",
+    "save_btn": "Save",
+    "send_to_review_btn": "Send to review"
   },
   "noType": "(No type)"
 }

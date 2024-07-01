@@ -1,16 +1,17 @@
 <template>
-  <div class="mt-8 bg-white rounded-lg relative">
+  <div class="tw-mt-8 bg-white tw-rounded-lg tw-relative">
     <!-- Inputs -->
     <div
-      class="d-flex align-center pa-3 px-6 ga-3 border-bottom-1 border-gray-100"
+      class="d-flex tw-align-center pa-3 tw-px-6 ga-3 border-bottom-1 border-gray-100"
     >
       <alex-inputs-text-field
+        v-model="search"
         name="student"
         :placeholder="$t('components.courses.tasks.srchStudent')"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         hide-details
-        class="w-full mr-auto min-w-40 max-w-80"
+        class="tw-w-full tw-mr-auto tw-min-w-40 tw-max-w-80"
         density="comfortable"
       />
       <!-- Deixar filtrar funcional -->
@@ -30,7 +31,7 @@
     <v-slide-y-transition>
       <div
         v-if="filters.select.value || filters.finalDate.value"
-        class="flex gap-2 px-6 pt-4"
+        class="tw-flex gap-2 tw-px-6 tw-pt-4"
       >
         <template v-for="(filter, key) in filters" :key="filter.title">
           <alex-custom-chip
@@ -47,7 +48,7 @@
     <!-- Categorias e seus respectivos alunos -->
     <div
       ref="kanban"
-      class="w-full flex gap-4 pa-6 overflow-x-auto overflow-y-hidden"
+      class="tw-w-full tw-flex tw-gap-4 pa-6 tw-overflow-x-auto tw-overflow-y-hidden"
     >
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
@@ -84,6 +85,7 @@
             :avatar="item?.avatar"
             :mark="item.mark"
             :max-mark="item.maxMark"
+            @click="$emit('card-click', itemIndex, item)"
           />
         </template>
       </alex-learningplan-task-kanban-column>
@@ -102,7 +104,11 @@
 import { isWithinInterval, isBefore, isAfter, isEqual } from 'date-fns';
 import { useMouse } from '@vueuse/core';
 import { Accept } from './column/index.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+import {
+  TaskMemberStatus,
+  TaskSimple,
+  TaskStatus,
+} from '~/models/simple/taskSimple.model';
 // Types
 export interface Task {
   id: number;
@@ -112,18 +118,29 @@ export interface Task {
   user: { name: string; avatar?: string | null };
   mark?: number;
   maxMark?: number;
+  task?: TaskSimple;
+  submissions?: TaskSubmissionSimple[];
 }
 export interface TaskStudent {
   id: number;
   date: Date;
-  status: TaskStatus | (string & {});
+  status: TaskMemberStatus;
   title: string;
   group?: boolean;
   nameGroup?: string;
   avatar?: string | null;
   mark?: number;
   maxMark?: number;
+  task?: TaskSimple;
+  submissions?: TaskSubmissionSimple[];
 }
+
+export interface InsertCardProps {
+  newIndex: number;
+  value: any; // TaskStudent Problema com o export
+  group: string;
+}
+
 type Colors = 'orange' | 'green' | 'blue' | 'gray';
 type KanbanType = 'professor' | 'student';
 type Card<T extends KanbanType> = T extends 'professor' ? Task : TaskStudent;
@@ -138,6 +155,7 @@ interface KanbanProps {
   type: T;
   classes?: string[];
 }
+
 const { t } = useI18n();
 // Models/props
 const canDrag = ref(true);
@@ -166,13 +184,13 @@ type Emits = {
   (
     e: 'card-insert',
     newIndex: number,
-    value: Card<typeof props.type>,
+    value: Card<typeof props.type> | TaskStudent,
     group: string,
   ): Promise<boolean>;
 };
 const emit = defineEmits<Emits>();
 
-const handleInsertCard = ({ newIndex, value, group }) => {
+const handleInsertCard = ({ newIndex, value, group }: InsertCardProps) => {
   // Update task status
   if (value) {
     tasks.value = tasks.value.map((task) => {
@@ -182,6 +200,7 @@ const handleInsertCard = ({ newIndex, value, group }) => {
       return task;
     });
   }
+
   emit('card-insert', newIndex, value, group);
 };
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
@@ -203,6 +222,7 @@ type FiltersValue = {
     value: { start: string; end: string } | null;
   };
 };
+const search = ref('');
 const filterTitleSelect = computed(() => {
   const drawer = 'components.learningPlan.drawer';
   return props.classes?.length ? t(`${drawer}.class`) : t(`${drawer}.type`);
@@ -238,13 +258,21 @@ const applyFilters = (values: Filters) => {
     filters.value.finalDate.value = values.finalDate;
   }
 };
-
+const filteredBySearch = computed(() => {
+  const searchValue = search.value.toLowerCase();
+  return tasks.value.filter((task) => {
+    if (isTaskStudent(task)) {
+      return task.title.toLowerCase().includes(searchValue);
+    }
+    return task.user.name.toLowerCase().includes(searchValue);
+  });
+});
 const filteredByClassTasks = computed(() =>
   !filters.value.select.value
-    ? tasks.value
+    ? filteredBySearch.value
     : filterByClassOrType(
         props.type === 'student',
-        tasks.value,
+        filteredBySearch.value,
         filters.value.select.value,
       ),
 );
@@ -298,9 +326,16 @@ const filterByClassOrType = (
   if (!isStudent) {
     return tasks.filter((task) => (task as Task).studentClass === value);
   }
-  return tasks.filter(
-    (task) => (task as TaskStudent).group === (value === 'group'),
-  );
+  return tasks.filter((task) => {
+    const taskStudent = task as TaskStudent;
+    if (value === 'individual' && !taskStudent.group) {
+      return true;
+    }
+    if (value === 'group' && taskStudent.group) {
+      return true;
+    }
+    return false;
+  });
 };
 
 // Scroll X and Y
@@ -346,6 +381,7 @@ const setCanDrag = (value: boolean) => {
 defineExpose({
   canDrag,
   setCanDrag,
+  handleInsertCard,
 });
 </script>
 

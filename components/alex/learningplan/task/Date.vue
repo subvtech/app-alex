@@ -1,15 +1,20 @@
 <template>
   <div>
     <p
-      class="pa-1 text-body-3 min-h-6 rounded-md"
+      class="py-1 text-body-3 tw-min-h-6 tw-rounded-md"
       :class="[
-        edit && 'date-output cursor-pointer',
+        edit && 'px-1 date-output tw-cursor-pointer',
         !formattedDate && 'text-gray-400',
         formattedDate && 'text-gray-800',
       ]"
     >
       {{
-        formattedDate || $t('components.learningPlan.drawer.date.placeholder')
+        formattedDate ||
+        $t(
+          `components.learningPlan.drawer.${
+            edit ? 'date.placeholder' : 'missing.date'
+          }`,
+        )
       }}
     </p>
     <v-menu
@@ -21,7 +26,7 @@
       min-width="auto"
       location="top start"
       activator="parent"
-      :close-on-content-click="true"
+      :close-on-content-click="false"
     >
       <v-date-picker
         v-model="selectedDateValue"
@@ -50,6 +55,10 @@ const open = ref<boolean>(false);
 const selectedDate = defineModel<Date | string | null>();
 const emit = defineEmits(['change', 'input']);
 
+defineExpose({
+  close: () => (open.value = false),
+});
+
 const selectedDateValue = computed({
   get() {
     if (typeof selectedDate.value === 'string') {
@@ -73,7 +82,9 @@ function updateParentDate() {
   emit('change', selectedDateValue.value);
 }
 
-watch(selectedDate, updateParentDate);
+watch(selectedDate, () => {
+  updateParentDate();
+});
 </script>
 
 <style scoped>

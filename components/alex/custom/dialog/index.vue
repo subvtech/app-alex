@@ -99,13 +99,13 @@
       </v-row>
     </v-container>
     <slot
-      v-if="hasFooter && !stepper"
+      v-if="slots.footer !== undefined && !stepper"
       name="footer"
       :emit-main-action="() => emits('onMainAction')"
       :emit-secondary-action="() => emits('onSecondaryAction')"
     />
     <alex-custom-dialog-footer
-      v-else-if="!hasFooter && !noFooter && !stepper"
+      v-else-if="slots.footer === undefined && !noFooter && !stepper"
       data-testid="alex-dialog-footer"
       :main-button-text="mainButtonText"
       :main-button-icon="mainButtonIcon"
@@ -173,7 +173,8 @@ const handleChange = (value: boolean) => {
 const slots = useSlots();
 const hasCustomActivator = computed(() => !!slots.activator);
 const hasHeader = computed(() => !!slots.header);
-const hasFooter = computed(() => !!slots.footer);
+const hasFooter = computed(() => slots.footer !== undefined);
+
 const bodyStyles = computed(
   () =>
     props.bodyClasses || {

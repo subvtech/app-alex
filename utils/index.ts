@@ -45,7 +45,10 @@ export const formRules = {
 
 export const getInitials = (name: string) => {
   const names = name.split(' ');
-  if (names.length >= 2) return names[0][0] + names[1][0];
+  if (names.length >= 2 && names[1][0] !== '(') {
+    return names[0][0] + names[1][0];
+  }
+
   return names[0][0];
 };
 
@@ -91,13 +94,14 @@ interface EventProps {
 }
 export const orderEvents = (events: TaskEvent[]) => {
   const eventsGroups: { date: Date; events: EventProps[] }[] = [];
+
   events
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+    .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
     .forEach((current) => {
-      const currentDate = new Date(current.publishedAt);
+      const currentDate = new Date(current.updatedAt);
       const currentElement: EventProps = {
         action: current.event,
-        time: current.publishedAt,
+        time: current.updatedAt,
         user: current.learning_plan_member.user.fullname,
       };
       const group = eventsGroups.find((group) =>

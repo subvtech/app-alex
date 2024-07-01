@@ -9,7 +9,7 @@
           : $t('pages.task.submissions.delivery')
       }}
     </HoverCardTrigger>
-    <HoverCardContent>
+    <HoverCardContent class="bg-white">
       <div class="d-flex justify-space-between pb-4 divider-row">
         <span class="text-gray-800 text-h5">{{
           $t('pages.task.submissions.progress')
@@ -31,6 +31,8 @@
 </template>
 
 <script setup lang="ts">
+import { TaskType } from '~/models/simple/taskSimple.model';
+
 interface Submissions {
   submitted: {
     toDo: number;
@@ -38,7 +40,7 @@ interface Submissions {
     underReview: number;
     completed: number;
   };
-  type?: 'group' | 'individual';
+  type?: TaskType | null;
 }
 type TaskStatus = {
   text: string;

@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="page rounded-lg bg-white pa-6 d-flex flex-column gap-6 align-center pb-15"
+    class="page rounded-lg bg-white pa-6 d-flex flex-column tw-gap-6 align-center pb-15"
   >
     <alex-documentation-header :title="title" :description="description" />
     <alex-documentation-accordions-props-list
@@ -15,15 +15,15 @@
       :description="item.description"
       has-example
     />
-    <div class="flex flex-col gap-2 w-full">
+    <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
       <alex-learningplan-task-chat
         v-model:attached-message="attachedMessage"
         :messages="messages"
-        class="w-full"
+        class="tw-w-full"
       />
       <alex-learningplan-task-chat-input
         v-model:attached-message="attachedMessage"
-        class="w-full"
+        class="tw-w-full"
         :submissions="submissions"
         @submit="
           ({ text, audio, attachedMessage, attachedSubmission }) =>
@@ -79,9 +79,9 @@ const examples = ref<ExampleComponentType[]>([
   {
     snippets: [
       {
-        template: `<div class="flex flex-col gap-2 w-full">
-      <alex-learningplan-task-chat :messages="messages" class="w-full" />
-      <alex-learningplan-task-chat-input class="w-full" />
+        template: `<div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
+      <alex-learningplan-task-chat :messages="messages" class="tw-w-full" />
+      <alex-learningplan-task-chat-input class="tw-w-full" />
 </div>`,
         label: 'Template',
       },

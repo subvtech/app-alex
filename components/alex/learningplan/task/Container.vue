@@ -99,13 +99,15 @@
     :task-id="taskDetails?.id"
     :title="taskDetails?.title"
     :status="taskDetails?.status"
+    :blocks="taskDetails?.blocks"
+    :trail="taskDetails?.trail"
     :learningplan-id="learningPlanStore.learningPlan?.id || 0"
     :tags="taskDetails?.tags"
     :contract-address="taskDetails?.contract_address"
     :type="taskDetails?.type"
     :events="taskDetails?.task_events"
     :goals="taskDetails?.learning_goals"
-    :description="taskDetails?.description"
+    :description="taskDetails?.description || undefined"
     :submission-description="taskDetails?.submission_description"
     :has-submission="taskDetails?.submission_required"
     :send-after-deadline="taskDetails?.can_submit_after_deadline"
@@ -115,11 +117,13 @@
     :task-members="taskDetails?.task_members"
     :editable="true"
     :kanban-button="true"
+    @change-goals="handleChangeGoals"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"
     @change-submission-description="handleChangeSubmissionDescription"
     @change-tags="handleChangeTags"
     @change-members="handleChangeMembers"
+    @change-title="handleChangeTitle"
     @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
   />
 </template>
@@ -127,13 +131,18 @@
 <script setup lang="ts">
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
+import {
+  TaskSimple,
+  TaskStatus,
+  TaskType,
+} from '~/models/simple/taskSimple.model';
 
 export interface TaskItem {
   id: number;
   title: string;
-  status: string;
-  deadline_at?: string;
-  start_at?: string;
+  status: TaskStatus;
+  finish_at?: string | null;
+  start_at?: string | null;
   position: number;
   type?: 'group' | 'individual';
   archived?: boolean;
@@ -173,7 +182,6 @@ const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
-const route = useRoute();
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const teacherDrawer = ref(false);
@@ -222,7 +230,7 @@ const displaySuccess = (message: string) => {
   );
 };
 
-const isDateInRange = (date: Date, range) => {
+const isDateInRange = (date?: string | null, range) => {
   if (!range) return true;
   if (!date) return false;
   const { start, end } = range;
@@ -237,23 +245,36 @@ const getHigherIndex = (taskStatus: string) => {
 };
 
 const handleCreateTask = async () => {
-  console.log('CREATE TASK');
-  loader.value = true;
-  const higherIndex = getHigherIndex('draft');
-  try {
-    const res = await create('tasks', {
-      title: taskTitle.value,
-      status: 'draft',
-      learningplan: route.params.id,
-      position: higherIndex,
-    });
-    learningPlanStore.learningPlan?.tasks.push({
-      id: res.data.id,
-      ...res.data.attributes,
-    });
-    displaySuccess('addSuccess');
-  } catch (e) {
-    displayError('addError');
+  if (taskTitle.value) {
+    loader.value = true;
+    const learningPlanId = learningPlanStore.learningPlan?.id;
+    if (!learningPlanId) return;
+    const higherIndex = getHigherIndex('draft');
+    try {
+      const res = await create('tasks', {
+        title: taskTitle.value,
+        status: 'draft' as TaskStatus,
+        learningplan: learningPlanId,
+        position: higherIndex,
+        allowed_editor_plugins: '',
+        submission_description: '',
+        submission_required: false,
+        can_submit_after_deadline: false,
+      });
+      learningPlanStore.learningPlan?.tasks.push({
+        id: res.data.id,
+        learning_plan_id: learningPlanId,
+        learning_goals: [],
+        trail: undefined,
+        task_events: undefined,
+        task_members: undefined,
+        tags: undefined,
+        ...res.data.attributes,
+      });
+      displaySuccess('addSuccess');
+    } catch (e) {
+      displayError('addError');
+    }
   }
   loader.value = false;
   taskTitle.value = '';
@@ -288,14 +309,13 @@ const tasksArray = computed(() => {
       if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
         return;
       if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
-      if (!isDateInRange(task.deadline_at, tasksFilter.value?.finalDate))
-        return;
+      if (!isDateInRange(task.finish_at, tasksFilter.value?.finalDate)) return;
       const students: TaskItem['students'] = [];
       task.task_members?.forEach((taskMember) => {
         if (taskMember.status === 'to_do') delivered.toDo += 1;
         if (taskMember.status === 'in_progress') delivered.doing += 1;
         if (taskMember.status === 'in_review') delivered.underReview += 1;
-        if (taskMember.status === 'finished') delivered.completed += 1;
+        if (taskMember.status === 'done') delivered.completed += 1;
         taskMember.task_member_students?.forEach((student) => {
           const studentUser = student.student_member?.user;
           students.push({
@@ -310,15 +330,15 @@ const tasksArray = computed(() => {
         id: task.id,
         title: task.title,
         status: task.status,
-        deadline_at: task.finish_at,
+        finish_at: task.finish_at,
         start_at: task.start_at,
         type: task.type,
-        archived: task.archived,
+        archived_at: task.archived_at,
         position: task.position,
         students,
         delivered,
       };
-      if (task.archived) archived.push(taskItem);
+      if (task.archived_at) archived.push(taskItem);
       else if (task.status === 'draft') draft.push(taskItem);
       else if (task.status === 'published') published.push(taskItem);
       else if (task.status === 'finished') closed.push(taskItem);
@@ -374,7 +394,7 @@ const handleMoveTask = async ({
   status,
 }: {
   id: number;
-  status: string;
+  status: TaskStatus;
 }) => {
   try {
     const taskPosition = getHigherIndex(status);
@@ -392,14 +412,22 @@ const handleMoveTask = async ({
 
 const handleToggleArchive = async (id: number) => {
   const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
+  if (!task) return;
   try {
     if (task) {
-      task.archived = !task.archived;
-      await update('tasks', id, { archived: task.archived });
-      displaySuccess(task.archived ? 'archiveSuccess' : 'unarchiveSuccess');
+      const newPosition = getHigherIndex(
+        !task.archived_at ? 'archived' : task.status,
+      );
+      task.position = newPosition;
+      task.archived_at = task.archived_at ? null : new Date().toISOString();
+      await update('tasks', id, {
+        archived_at: task.archived_at,
+        position: newPosition,
+      });
+      displaySuccess(task.archived_at ? 'archiveSuccess' : 'unarchiveSuccess');
     }
   } catch (e) {
-    displayError(task.archived ? 'archiveError' : 'unarchiveError');
+    displayError(task.archived_at ? 'archiveError' : 'unarchiveError');
   }
 };
 
@@ -422,7 +450,7 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
   onDragOver(groups[index - 1], -index, -1, dragEvent);
 };
 
-const updateTaskPositions = async (tasksStatus: string, item: TaskItem) => {
+const updateTaskPositions = async (tasksStatus: TaskStatus, item: TaskItem) => {
   const groupIndex = groups[tasksStatus];
 
   const cloneArray = JSON.parse(JSON.stringify(tasksArray.value[groupIndex]));
@@ -431,7 +459,9 @@ const updateTaskPositions = async (tasksStatus: string, item: TaskItem) => {
     (t) => t.id === item.id,
   );
 
-  if (task.status === tasksStatus) {
+  if (!task) return;
+
+  if (task?.status === tasksStatus) {
     const removeIndex = cloneArray.findIndex((t: TaskItem) => t.id === task.id);
     cloneArray.splice(removeIndex, 1);
   }
@@ -459,7 +489,7 @@ const onDrop = async (item: TaskItem, tableSort: string) => {
       (t) => t.id === item.id,
     );
     if (
-      task.status === over.value.list &&
+      task?.status === over.value.list &&
       (over.value.index === -1 || isFilterActive.value)
     ) {
       const message = isFilterActive.value
@@ -472,13 +502,13 @@ const onDrop = async (item: TaskItem, tableSort: string) => {
       try {
         if (over.value.index === -1) {
           task.position = getHigherIndex(over.value.list);
-          task.status = over.value.list;
+          task.status = over.value.list as TaskStatus;
           await update('tasks', item.id, {
             status: over.value.list,
             position: getHigherIndex(over.value.list),
           });
         } else {
-          await updateTaskPositions(over.value.list, item);
+          await updateTaskPositions(over.value.list as TaskStatus, item);
         }
         displaySuccess('moveSuccess');
       } catch (e: ApplicationError) {
@@ -520,6 +550,25 @@ const handleChangeDescription = (description: string) => {
   );
   if (task) {
     task.description = description;
+  }
+};
+
+const handleChangeTitle = (title: string) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+  if (task) {
+    task.title = title;
+  }
+};
+
+const handleChangeGoals = (learningGoals: LearningPlanGoalSimple[]) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+
+  if (task) {
+    task.learning_goals = learningGoals;
   }
 };
 

@@ -1,7 +1,8 @@
 <template>
   <div
-    class="submission pa-3 rounded-lg min-w-64 border-1 border-gray-200"
-    :class="[colorsAndSizes.background, (clickable || remake) && 'clickable']"
+    class="submission pa-3 rounded-lg min-w-64 border-1 border-gray-200 clickable"
+    :class="[colorsAndSizes.background, remake]"
+    @click="openDialog"
   >
     <v-icon
       v-if="!hasPrepend && icons.prependIcon"
@@ -26,12 +27,29 @@
       :size="24"
     />
   </div>
+  <alex-learningplan-task-submission-create
+    ref="dialog"
+    :title="taskTitle"
+    :deadline="taskDeadline"
+    :restrictions="restrictions"
+    :task-member-id="taskMemberId"
+    :last-submission="content"
+    :task-status="taskStatus"
+    :read-only="readOnly"
+    @update-task-status="(status) => $emit('update-task-status', status)"
+  />
 </template>
 
 <script setup lang="ts">
 interface Submission {
   mark?: number | null;
   maxMark?: number | null;
+  taskTitle?: string;
+  taskDeadline?: string;
+  restrictions?: string[];
+  content?: TaskSubmissionSimple;
+  taskMemberId: number;
+  taskStatus: TaskMemberStatus;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -48,17 +66,41 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
   clickable: false,
   mark: 0,
   maxMark: 0,
+  taskTitle: undefined,
+  taskDeadline: undefined,
+  restrictions: undefined,
+  content: undefined,
 });
+type Emits = {
+  'update-task-status': [status: TaskMemberStatus];
+};
+defineEmits<Emits>();
 const { t } = useI18n();
 const slots = useSlots();
 const hasPrepend = computed(() => !!slots.prependIcon);
 const hasAppend = computed(() => !!slots.appendIcon);
-const formattedMark = computed(() => `${props.mark}/${props.maxMark}`);
-const clickable = computed(
+const dialog = ref();
+const formattedMark = computed(() => {
+  if (!props.mark) {
+    return '';
+  }
+  if (props.maxMark) {
+    return `${props.mark}/${props.maxMark}`;
+  }
+  return `${props.mark}`;
+});
+
+const defaultChip = computed(
   () =>
     ['not_started', 'started'].includes(props.status) ||
     (props.status === 'in_review' && props.type === 'professor'),
 );
+
+const readOnly = computed(
+  () =>
+    ['in_review', 'done'].includes(props.status) || props.type === 'professor',
+);
+
 const remake = computed(
   () => props.status === 'denied' && props.type === 'student',
 );
@@ -67,7 +109,7 @@ const colorsAndSizes = computed(() => {
   let subtitleSize = 'text-body-5';
   let background = 'bg-white';
   let title = 'text-secondary-0';
-  if (clickable.value) {
+  if (defaultChip.value) {
     background = 'bg-gray-blue';
     subtitle = 'text-gray-500';
   } else if (remake.value) {
@@ -108,37 +150,46 @@ const text = computed(() => {
       title: t('components.courses.tasks.submission.no_started'),
       subtitle: t('components.courses.tasks.submission.click_to_start'),
     };
-  } else if (props.status === 'started') {
+  }
+  if (props.status === 'started') {
     return {
       title: t('components.courses.tasks.submission.started'),
       subtitle: t('components.courses.tasks.submission.click_to_continue'),
     };
-  } else if (props.status === 'in_review' && props.type === 'student') {
+  }
+  if (props.status === 'in_review' && props.type === 'student') {
     return {
       title: t('components.courses.tasks.submission.in_review'),
       subtitle: t('components.courses.tasks.submission.sent_task'),
     };
-  } else if (props.status === 'denied' && props.type === 'professor') {
+  }
+  if (props.status === 'denied' && props.type === 'professor') {
     return {
       title: t('components.courses.tasks.submission.denied'),
       subtitle: formattedMark.value,
     };
-  } else if (props.status === 'denied' && props.type === 'student') {
+  }
+  if (props.status === 'denied' && props.type === 'student') {
     return {
       title: t('components.courses.tasks.submission.denied'),
       subtitle: t('components.courses.tasks.submission.click_to_remake'),
     };
-  } else if (props.status === 'reviewed') {
+  }
+  if (props.status === 'reviewed') {
     return {
       title: t('components.courses.tasks.submission.reviewed'),
       subtitle: formattedMark.value,
     };
   }
   return {
-    title: t('components.courses.tasks.submission.reviewed'),
+    title: t('components.courses.tasks.submission.done'),
     subtitle: t('components.courses.tasks.submission.click_to_review'),
   };
 });
+
+const openDialog = () => {
+  dialog.value.openDialog();
+};
 </script>
 
 <style scoped>

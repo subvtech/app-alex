@@ -24,28 +24,30 @@
       ref="kanban"
       v-model="tasks"
       type="professor"
-      :classes="['turma A']"
+      :classes="
+        getClassesOfTaskMembers(taskStore.task.task_members as TaskMember[])
+      "
       :columns="[
         {
-          title: 'A fazer',
+          title: $t('components.learningPlan.drawer.task.status.toDo'),
           color: 'gray',
           group: 'to_do',
           accept: true,
         },
         {
-          title: 'Em progresso',
+          title: $t('components.learningPlan.drawer.task.status.inProgress'),
           color: 'blue',
           group: 'in_progress',
           accept: true,
         },
         {
-          title: 'Em avaliação',
+          title: $t('components.learningPlan.drawer.task.status.underReview'),
           color: 'orange',
           group: 'in_review',
-          accept: true,
+          accept: taskStore.task.submission_required ? true : null,
         },
         {
-          title: 'Concluído',
+          title: $t('components.learningPlan.drawer.task.status.done'),
           color: 'green',
           group: 'done',
           accept: true,
@@ -66,7 +68,9 @@
       v-if="studentDetails"
       v-model="studentDrawer"
       :submission="{
-        constraints: taskStore.task.allowed_editor_plugins?.split(',') || [],
+        constraints: taskStore.task.allowed_editor_plugins
+          ? taskStore.task.allowed_editor_plugins?.split(',')
+          : [],
         description: taskStore.task.submission_description,
       }"
       :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
@@ -94,6 +98,8 @@
       :tags="taskStore.task.tags"
       :title="taskStore.task.title"
       :type="taskStore.task.type"
+      :trail="taskStore.task.trail"
+      :blocks="taskStore.task.blocks"
       :status="taskStore.task.status"
       :events="taskStore.task.task_events"
       :contract-address="taskStore.task.contract_address"
@@ -106,18 +112,22 @@
       :end-date="taskStore.task.finish_at"
       :restrictions="taskStore.task.allowed_editor_plugins || ''"
       :editable="true"
-      :task-members="taskStore.task.task_members"
+      :members="taskStore.task.task_members"
       @change-values="handleChangeValues"
       @change-description="handleChangeDescription"
       @change-submission-description="handleChangeSubmissionDescription"
       @change-tags="handleChangeTags"
       @change-members="taskStore.updateTaskMembers(taskId)"
+      @change-title="handleChangeTitle"
     />
   </section>
 </template>
 
 <script setup lang="ts">
-import { Task } from '@/components/alex/learningplan/task/kanban/index.vue';
+import {
+  Task,
+  TaskStudent,
+} from '@/components/alex/learningplan/task/kanban/index.vue';
 definePageMeta({
   hideLearningPlanBanner: true,
 });
@@ -136,6 +146,7 @@ const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const taskStore = useTaskStore();
 const tasks = ref<any[]>([]);
 const studentDetailsId = ref<number>(-1);
+
 const studentDetails = computed(() => {
   if (!taskStore.task?.task_members) {
     return null;
@@ -145,13 +156,14 @@ const studentDetails = computed(() => {
   );
   return member || null;
 });
+
 const kanban = ref<{
   canDrag: boolean;
   setCanDrag: (value: boolean) => void;
 } | null>(null);
 const headerTags = computed(() => {
   if (!(taskStore && taskStore.task) || !taskStore) return [];
-  return taskStore.task.tags.map((tag) => tag.text);
+  return taskStore.task?.tags?.map((tag) => tag.text);
 });
 const handleChangeTags = (tags: TagSimple[]) => {
   if (!taskStore.task) return;
@@ -160,6 +172,10 @@ const handleChangeTags = (tags: TagSimple[]) => {
 const handleChangeDescription = (description: string) => {
   if (!taskStore.task) return;
   taskStore.task.description = description;
+};
+const handleChangeTitle = (title: string) => {
+  if (!taskStore.task) return;
+  taskStore.task.title = title;
 };
 const handleChangeSubmissionDescription = (description: string) => {
   if (!taskStore.task) return;
@@ -180,7 +196,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
 };
 const handleUpdateStatus = async (
   _newIndex: number,
-  item: Task,
+  item: Task | TaskStudent,
   newStatus: string,
 ) => {
   if (!kanban.value) {
@@ -223,19 +239,29 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
     });
   }
 };
+
+const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
+  const classes = taskMembers.flatMap((taskMember) =>
+    taskMember.task_member_students.flatMap((student) =>
+      student.student_member.learning_class?.name
+        ? student.student_member.learning_class?.name
+        : [],
+    ),
+  );
+  return Array.from(new Set(classes));
+};
+
 onBeforeMount(() => {
-  headerStore.showHeader = true;
   if (!id || !taskId.value) {
-    return navigateTo(`/courses/`);
+    return navigateTo(`/courses`);
   }
-  if (!Number.isInteger(Number(id))) {
-    return navigateTo(`/courses/${id}`);
-  }
+  headerStore.showHeader = true;
+  learningPlanStore.loadLearningPlan(Number(id));
   taskStore.loadTaskData(taskId.value, Number(id));
 });
 
 watch(
-  () => [learningPlanStore.loading, taskStore.loading],
+  () => [learningPlanStore.loading],
   () => {
     if (!learningPlanStore.loading) {
       headerStore.title = t('pages.classes.breadcrumbs.myCourses');
@@ -266,9 +292,9 @@ watch(
           disabled: true,
         },
       ];
-    }
-    if (!taskStore.task && !taskStore.loading) {
-      navigateTo(`/courses/${route.params.id}/tasks`);
+      if (!learningPlanStore.userIsFacilitator) {
+        navigateTo(`/courses/${route.params.id}/tasks`);
+      }
     }
   },
 );
@@ -282,15 +308,23 @@ watch(
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         user: {
           name:
-            task.task_member_students[0]?.student_member?.user.fullname || '',
+            task?.task_member_students[0]?.student_member?.user.fullname || '',
           avatar:
-            task.task_member_students[0]?.student_member?.user.avatar?.url ||
+            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
             undefined,
         },
         studentClass:
-          task.task_member_students[0]?.student_member?.learning_class?.name ||
+          task?.task_member_students[0]?.student_member?.learning_class?.name ||
           '',
       }));
+    }
+  },
+);
+watch(
+  () => taskStore.loading,
+  (value) => {
+    if (!taskStore.task && !value) {
+      navigateTo(`/courses/${route.params.id}/tasks`);
     }
   },
 );

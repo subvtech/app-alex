@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-gray-800 font-weight-bold mb-2">
+    <p class="text-body-4 text-gray-800 tw-font-weight-bold mb-2">
       {{ $t('components.learningPlan.drawer.task.restrictions.label') }}
     </p>
 
@@ -33,8 +33,8 @@
       />
     </div>
     <div v-else>
-      <p class="text-body-3 text-gray-800">
-        {{ $t('components.learningPlan.drawer.task.missing.restrictions') }}
+      <p class="text-body-3 text-gray-400">
+        {{ $t('components.learningPlan.drawer.missing.restrictions') }}
       </p>
     </div>
   </div>
@@ -49,22 +49,27 @@ interface CompProps {
 
 const props = defineProps<CompProps>();
 
-export type RestrictionValue = 'text' | 'image' | 'video' | 'document' | 'link';
+export type RestrictionValue =
+  | 'text'
+  | 'image'
+  | 'video'
+  | 'document'
+  | 'link'
+  | 'gallery';
 
 const { t } = useI18n();
 
 const model = defineModel<RestrictionValue[]>({
   required: true,
 });
-
 const config: Record<RestrictionValue, string> = {
   text: t('components.learningPlan.drawer.task.restrictions.text'),
   image: t('components.learningPlan.drawer.task.restrictions.image'),
   video: t('components.learningPlan.drawer.task.restrictions.video'),
   document: t('components.learningPlan.drawer.task.restrictions.document'),
   link: t('components.learningPlan.drawer.task.restrictions.link'),
+  gallery: t('components.learningPlan.drawer.task.restrictions.gallery'),
 };
-
 const add = (option: RestrictionValue) => {
   if (model.value.includes(option)) return;
   model.value = [...model.value, option];
@@ -85,6 +90,10 @@ const options: AlexDropdownItem[] = [
   {
     text: config.video,
     onClick: () => add('video'),
+  },
+  {
+    text: config.gallery,
+    onClick: () => add('gallery'),
   },
   {
     text: config.document,

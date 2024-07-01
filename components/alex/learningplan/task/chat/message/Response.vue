@@ -1,11 +1,13 @@
 <template>
   <div
-    class="response w-full bg-gray-blue rounded-lg border-1 border-gray-100"
+    class="response tw-w-full bg-gray-blue tw-rounded-lg border-1 border-gray-100"
     :class="[message && 'px-3 py-2']"
   >
     <div v-if="message" @click="$emit('message-click', message)">
       <h6 class="text-body-6 text-gray-600">{{ message.user.name }}</h6>
-      <p v-if="message.audio" class="text-body-5 text-gray-400">Áudio</p>
+      <p v-if="message.audio" class="text-body-5 text-gray-400">
+        {{ $t('components.learningPlan.drawer.task.chat.audio') }}
+      </p>
       <p v-else class="text-body-5 text-gray-400 ellipsis lines-1">
         {{ message.message }}
       </p>

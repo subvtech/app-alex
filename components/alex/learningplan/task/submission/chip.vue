@@ -25,7 +25,7 @@
       <!-- Seção 2 (Título e nota/subtexto) -->
       <div class="flex-fill">
         <p
-          class="font-weight-bold text-body-4"
+          class="tw-font-weight-bold text-body-4"
           :class="`text-${config[submission.status].color}`"
         >
           {{ config[submission.status].title }}
@@ -33,16 +33,14 @@
 
         <!-- Subtexto ou nota -->
         <p
-          v-if="submission.mark && submission.maxMark"
+          v-if="submission.mark"
           :class="
             submission.status === 'reviewed'
               ? ' text-gray-600 text-h5 font-weight-bold '
               : 'text-gray-500 text-body-5'
           "
         >
-          {{ formatGrade(submission.mark) }}/{{
-            formatGrade(submission.maxMark)
-          }}
+          {{ formattedMark }}
         </p>
       </div>
       <!-- Seção 3 (opções) -->
@@ -127,6 +125,17 @@ function formatGrade(grade: number) {
   return grade.toFixed(1);
 }
 
+const formattedMark = computed(() => {
+  if (!props.submission.mark) {
+    return '';
+  }
+  if (props.submission.maxMark) {
+    return `${formatGrade(props.submission.mark)}/${formatGrade(
+      props.submission.maxMark,
+    )}`;
+  }
+  return `${formatGrade(props.submission.mark)}`;
+});
 // Propriedades de cada tipo de entrega (Avaliada, Recusada ou entregue)
 interface StatusProps {
   icon: string;

@@ -1,5 +1,8 @@
 <template>
-  <div class="d-flex align-center ga-2 pa-2">
+  <div
+    class="d-flex align-center ga-2 pa-2 list-card"
+    @click="$emit('to-profile')"
+  >
     <v-img
       class="avatar flex-0-0 rounded-circle"
       :src="
@@ -17,7 +20,7 @@
         '(' + $t('components.learningPlan.members.missing.name') + ')'
       }}</span>
 
-      <span class="text-body-3 text-gray-400 ml-2">{{
+      <span class="text-body-3 text-gray-400 tw-ml-2">{{
         `(${
           member.class || $t('components.learningPlan.members.missing.class')
         })`
@@ -31,16 +34,15 @@
       status="secondary"
       variant="outlined"
     />
-
-    <alex-learningplan-task-members-menu
-      :submitted="member.submitted"
-      accepted
-      @remove-click="$emit('remove-click')"
-      @to-profile="$emit('to-profile')"
+    <alex-custom-button
+      icon="mdi-trash-can-outline"
+      size="small"
+      variant="text"
+      @click.stop="$emit('remove-click')"
     />
   </div>
 
-  <hr class="w-full" />
+  <hr class="tw-w-full" />
 </template>
 
 <script setup lang="ts">
@@ -65,5 +67,15 @@ defineEmits(['remove-click', 'to-profile']);
 .avatar {
   width: 32px;
   height: 32px;
+}
+.list-card {
+  cursor: pointer;
+  border-radius: 8px;
+}
+.list-card:hover {
+  background: rgb(var(--v-theme-gray-blue)) !important;
+}
+.list-card:active {
+  background: rgb(var(--v-theme-gray-100)) !important;
 }
 </style>

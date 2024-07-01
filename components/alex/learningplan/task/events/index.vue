@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels class="events-rows" flat>
+  <v-expansion-panels v-if="!loading" class="events-rows" flat>
     <alex-learningplan-task-events-card
       v-for="(event, index) in events"
       :key="index"
@@ -7,6 +7,11 @@
       :events="event.events"
     />
   </v-expansion-panels>
+  <div v-else class="tw-w-full tw-flex tw-flex-col gap-2 tw-py-4">
+    <alex-custom-skeleton class="w-full h-16" color="gray-blue" />
+    <alex-custom-skeleton class="w-full h-16" color="gray-blue" />
+    <alex-custom-skeleton class="w-full h-16" color="gray-blue" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -21,6 +26,7 @@ interface DayEventsProps {
   events: Array<EventProps>;
 }
 const events = defineModel<DayEventsProps[]>();
+withDefaults(defineProps<{ loading?: boolean }>(), { loading: false });
 </script>
 
 <style>

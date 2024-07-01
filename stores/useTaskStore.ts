@@ -18,6 +18,8 @@ export const useTaskStore = defineStore('task', () => {
       ],
     },
     tags: true,
+    blocks: true,
+    trail: true,
     learning_goals: {
       populate: ['verb'],
     },

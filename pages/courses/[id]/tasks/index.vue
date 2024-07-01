@@ -1,5 +1,8 @@
 <template>
-  <div v-if="isProfessor" class="bg-white rounded wrapper">
+  <div
+    v-if="isProfessor || learningPlanStore.loading"
+    class="bg-white rounded wrapper"
+  >
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
@@ -71,46 +74,13 @@
       @update:model-value="(value) => (openFilterDrawer = value)"
     />
   </div>
-  <!-- Kanban -->
-  <alex-learningplan-task-kanban-loader
-    v-else-if="!isProfessor && learningPlanStore.loading"
-  />
-  <alex-learningplan-task-kanban
+  <alex-learningplan-task-student
     v-else
-    v-model="tasks"
-    type="student"
-    :classes="classes"
-    :columns="[
-      {
-        title: 'A fazer',
-        color: 'gray',
-        group: 'to_do',
-        accept: true,
-      },
-      {
-        title: 'Em progresso',
-        color: 'blue',
-        group: 'in_progress',
-        accept: true,
-      },
-      {
-        title: 'Em avaliação',
-        color: 'orange',
-        group: 'in_review',
-        accept: true,
-      },
-      {
-        title: 'Concluído',
-        color: 'green',
-        group: 'done',
-        accept: true,
-      },
-    ]"
+    :learningplan-id="learningPlanStore.learningPlan!.id!"
+    :student-id="learningPlanStore.userLearningMember!.id!"
   />
 </template>
 <script setup lang="ts">
-import { TaskStudent } from '~/components/alex/learningplan/task/kanban/index.vue';
-
 export interface filterType {
   select?: string | null;
   archivedTasks?: boolean;
@@ -133,7 +103,6 @@ const search = ref('');
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
 const isProfessor = ref<boolean>(false);
-const tasks = ref<TaskStudent[]>([]);
 const classes = ref<string[]>([]);
 
 onBeforeMount(() => {
@@ -161,11 +130,9 @@ watch(
       isProfessor.value = learningPlanStore.userIsFacilitator;
 
       // Kanban
-      tasks.value = learningPlanStore.learningPlan?.tasks || [];
       classes.value =
         learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
         [];
-
       headerStore.title = t('components.courses.settings.breadcrumbTitle');
       headerStore.items = [
         {

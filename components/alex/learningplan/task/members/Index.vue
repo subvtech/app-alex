@@ -15,34 +15,44 @@
   >
     <!-- Header -->
     <template #header>
-      <div class="header d-flex align-center py-4 px-2">
+      <div class="header d-flex tw-align-center py-4 px-2">
         <alex-inputs-text-field
           v-model="search"
           name="member"
-          class="w-50"
+          class="w-100 tw-mr-4"
           :placeholder="$t('components.learningPlan.members.search')"
           prepend-inner-icon="mdi-magnify"
           density="compact"
           clearable
         />
 
-        <alex-learningplan-task-members-invite
-          :learningplan-id="learningplanId"
-          @select-member-click="addMember"
-          @select-class-click="addClass"
-        >
-          <template #activator="{ menuProps }">
+        <alex-learningplan-task-dialog-add-member
+          v-if="type === 'individual'"
+          v-model="addMemberDialog"
+          :learningplan-id="props.learningplanId"
+          :members="members.data"
+          @add-click="addMember"
+        />
+        <alex-learningplan-task-dialog-add-group
+          v-else-if="type === 'group'"
+          v-model="addGroupDialog"
+          :learningplan-id="props.learningplanId"
+        />
+
+        <alex-custom-dropdown :items="typeOptions" :disabled="type">
+          <template #activator="{ props }">
             <alex-custom-button
-              v-bind="menuProps"
-              class="ml-auto"
+              v-bind="props"
+              class="tw-ml-auto"
               variant="secondary"
               prepend-icon="mdi-plus"
+              @click="handleAddMemberOrClass"
               >{{
-                $t('components.learningPlan.members.invite.label')
+                $t('components.learningPlan.members.add.label')
               }}</alex-custom-button
             >
           </template>
-        </alex-learningplan-task-members-invite>
+        </alex-custom-dropdown>
       </div>
     </template>
     <!-- Cards -->
@@ -55,6 +65,7 @@
           class: member.raw.student_member?.learning_class?.name,
           avatarUrl: member.raw.student_member?.user.avatar?.url,
         }"
+        :type="props.type"
         @remove-click="removeMember(member.raw.task_member.id, member.raw)"
         @to-profile="
           navigateTo(`/users/${member.raw.student_member.user.username}`)
@@ -99,27 +110,58 @@
 </template>
 
 <script setup lang="ts">
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+
 interface MembersProps {
   learningplanId: number;
   taskId: number;
+  type?: TaskType | null;
   startAt?: string | null;
   finishAt?: string | null;
   sendAfterDeadline?: boolean;
+  blockDelete?: boolean;
 }
 const props = withDefaults(defineProps<MembersProps>(), {
   sendAfterDeadline: false,
   startAt: null,
   finishAt: null,
+  type: null,
+  blockDelete: false,
 });
+
+type Emits = {
+  'change-members': [];
+  'set-type': [value: TaskType];
+};
+
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-const emit = defineEmits(['change-members']);
+const emit = defineEmits<Emits>();
+const addMemberDialog = ref(false);
+const addGroupDialog = ref(false);
+const setTypeDropdown = ref<boolean>(false);
 const page = ref<number>(1);
 const itemsPerPage = 12;
 const search = ref('');
 const client = useStrapiClient();
+const typeOptions: AlexDropdownItem[] = [
+  {
+    text: t('components.learningPlan.drawer.task.type.individual'),
+    onClick: () => {
+      emit('set-type', 'individual');
+      addMemberDialog.value = true;
+    },
+  },
+  {
+    text: t('components.learningPlan.drawer.task.type.collective'),
+    onClick: () => {
+      emit('set-type', 'group');
+      addGroupDialog.value = true;
+    },
+  },
+];
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMemberStudent>('task-member-students', {
     populate: {
@@ -168,27 +210,13 @@ const { data: members, refresh } = await useAsyncData(
     }),
   },
 );
-
-const checkAlreadyHasMember = (member: LearningPlanMemberSimple) => {
-  if (members.value?.data) {
-    const alreadyInTask = members.value.data.find(
-      (alreadyMember) => alreadyMember.student_member.id === member.id,
+const addMember = async (members: LearningPlanMemberSimple[]) => {
+  if (!props.type) {
+    setMessage(
+      t('components.learningPlan.drawer.task.pleaseFillType'),
+      'warning',
+      true,
     );
-    if (alreadyInTask) {
-      setMessage(
-        t('components.learningPlan.drawer.task.memberAlreadyInTask', {
-          member: alreadyInTask.student_member.user.fullname,
-        }),
-        'warning',
-        true,
-      );
-      return true;
-    }
-  }
-  return false;
-};
-const addMember = async (member: LearningPlanMemberSimple) => {
-  if (checkAlreadyHasMember(member)) {
     return;
   }
   if (!props.finishAt || !props.startAt) {
@@ -200,25 +228,30 @@ const addMember = async (member: LearningPlanMemberSimple) => {
     return;
   }
   try {
-    await strapiUtils.create<TaskMember>('task-members', {
-      // @ts-ignore
-      task: props.taskId,
-      status: 'to_do',
-      started_at: props.startAt!,
-      finished_at: props.finishAt!,
-      can_submit_after_deadline: props.sendAfterDeadline,
-      students: [member.id],
-      in_charge: member.id,
+    await client(`/tasks/${props.taskId}/add-students`, {
+      method: 'PUT',
+      body: {
+        students: members,
+      },
+      onResponse(context) {
+        const data: TaskMemberStudent[] = context.response._data;
+        if (!data.length) {
+          setMessage(
+            t('components.learningPlan.drawer.task.members.allSelectedMembers'),
+            'warning',
+            true,
+          );
+          return;
+        }
+        setMessage(
+          t('components.learningPlan.drawer.task.members.addMembers'),
+          'success',
+          true,
+        );
+        setTimeout(refresh, 100);
+        emit('change-members');
+      },
     });
-    setTimeout(refresh, 100);
-    setMessage(
-      t('components.learningPlan.drawer.task.addMember', {
-        member: member.user.fullname,
-      }),
-      'success',
-      true,
-    );
-    emit('change-members');
   } catch (error) {
     setMessage(
       t('components.learningPlan.drawer.task.errors.addMember'),
@@ -232,6 +265,14 @@ const removeMember = async (
   member: TaskMemberStudent,
 ) => {
   try {
+    if (props.blockDelete) {
+      setMessage(
+        t('Você não pode remover alunos após alguém ter feito uma entrega'),
+        'warning',
+        true,
+      );
+      return;
+    }
     await strapi.delete('task-members', taskMemberID);
     await strapi.delete('task-member-students', member.id);
     setTimeout(refresh, 100);
@@ -251,46 +292,14 @@ const removeMember = async (
     );
   }
 };
-const addClass = async (classSimple: ClassSimple) => {
-  await client(`/tasks/${props.taskId}/add-class`, {
-    method: 'PUT',
-    body: {
-      classId: classSimple.id,
-    },
-    onResponse: ({ response }) => {
-      if (!response.ok) {
-        setMessage(
-          t('components.learningPlan.drawer.task.errors.addClass', {
-            name: classSimple.name,
-          }),
-          'error',
-          true,
-        );
-      }
-      const data: TaskMemberStudent[] = response._data;
-      if (!data.length) {
-        setMessage(
-          t('components.learningPlan.drawer.task.members.allClass', {
-            name: classSimple.name,
-          }),
-          'warning',
-          true,
-        );
-        return;
-      }
-      setTimeout(refresh, 100);
-      emit('change-members');
-    },
-    onRequestError: () => {
-      setMessage(
-        t('components.learningPlan.drawer.task.errors.addClass', {
-          name: classSimple.name,
-        }),
-        'error',
-        true,
-      );
-    },
-  });
+const handleAddMemberOrClass = () => {
+  if (props.type === 'individual') {
+    addMemberDialog.value = true;
+  } else if (props.type === 'group') {
+    addGroupDialog.value = true;
+  } else {
+    setTypeDropdown.value = true;
+  }
 };
 </script>
 

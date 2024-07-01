@@ -1,0 +1,233 @@
+<template>
+  <div>
+    <alex-learningplan-task-kanban
+      ref="kanban"
+      v-model="tasks.data"
+      type="student"
+      :columns="[
+        {
+          title: $t('components.learningPlan.drawer.task.status.toDo'),
+          color: 'gray',
+          group: 'to_do',
+          accept: selectedTask?.task?.submission_required
+            ? ['in_progress', 'in_review']
+            : true,
+        },
+        {
+          title: $t('components.learningPlan.drawer.task.status.inProgress'),
+          color: 'blue',
+          group: 'in_progress',
+          accept: selectedTask?.task?.submission_required
+            ? ['to_do', 'in_review']
+            : true,
+        },
+        {
+          title: $t('components.learningPlan.drawer.task.status.underReview'),
+          color: 'orange',
+          group: 'in_review',
+          accept: selectedTask?.task?.submission_required
+            ? ['to_do', 'in_progress']
+            : true,
+        },
+        {
+          title: $t('components.learningPlan.drawer.task.status.done'),
+          color: 'green',
+          group: 'done',
+          disable: true,
+        },
+      ]"
+      @card-insert="
+        (newIndex, value, newStatus) =>
+          handleUpdateStatus(newIndex, value, newStatus)
+      "
+      @card-click="openDrawer"
+    />
+
+    <alex-learningplan-task-drawer-details
+      v-if="selectedTask?.task"
+      v-model="detailsDrawer"
+      :task-id="selectedTask.task.id"
+      :tags="selectedTask.task.tags"
+      :title="selectedTask.task.title"
+      :trail="selectedTask.task.trail"
+      :status="selectedTask.status"
+      :blocks="selectedTask.task.blocks"
+      :type="selectedTask.task.type"
+      :start-date="selectedTask.task.start_at || undefined"
+      :final-date="selectedTask.task?.finish_at || undefined"
+      :description="selectedTask.task.description || undefined"
+      :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
+      :task-member-id="selectedTask.id"
+      :submission="{
+        constraints:
+          selectedTask.task?.allowed_editor_plugins?.split(',') || [],
+        description: selectedTask.task?.submission_description,
+      }"
+      @update-status="
+        (newIndex, value, newStatus) =>
+          handleUpdateStatus(newIndex, value, newStatus, true)
+      "
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { TaskStudent, InsertCardProps } from './kanban/index.vue';
+
+interface StudentProps {
+  studentId: number;
+  learningplanId: number;
+}
+
+type Emits = {};
+defineEmits<Emits>();
+const props = defineProps<StudentProps>();
+const strapiUtils = useStrapiUtils();
+const strapi = useStrapi();
+const { setMessage } = useMessageStore();
+const selectedTask = ref<TaskStudent | undefined>(undefined);
+const detailsDrawer = ref<boolean>(false);
+const kanban = ref<{
+  canDrag: boolean;
+  setCanDrag: (value: boolean) => void;
+  handleInsertCard: (data: InsertCardProps) => void;
+} | null>(null);
+const { t } = useI18n();
+
+const getStudentTasks = (learningplanId: number, memberId: number) =>
+  strapiUtils.find<TaskMember>('task-members', {
+    populate: {
+      task: {
+        populate: ['tags', 'blocks', 'trail'],
+      },
+      task_events: {
+        populate: {
+          learning_plan_member: {
+            populate: ['user.avatar'],
+          },
+        },
+      },
+      task_submissions: {
+        sort: 'submitted_at:desc',
+      },
+      task_member_students: {
+        populate: [
+          'student_member.user.avatar',
+          'student_member.learning_class',
+        ],
+      },
+    },
+    filters: {
+      task_member_students: {
+        student_member: { id: memberId },
+      },
+      task: {
+        learningplan: learningplanId,
+      },
+    },
+  });
+const { data: tasks, execute } = await useAsyncData(
+  'task-members',
+  () => getStudentTasks(props.learningplanId, props.studentId),
+  {
+    default: () => ({ meta: 0, data: [] as TaskStudent[] }),
+    transform: ({ data, meta }) => {
+      const filteredData = data.filter((task) => task.task?.status !== 'draft');
+
+      const dataValue = filteredData.map((task) => ({
+        id: task.id,
+        status: task.status,
+        date: new Date(task.finished_at?.replaceAll('-', '/')),
+        title: task.task?.title,
+        user: {
+          name:
+            task?.task_member_students[0]?.student_member?.user.fullname || '',
+          avatar:
+            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
+            undefined,
+        },
+        group: task.task?.type === 'group',
+        studentClass:
+          task?.task_member_students[0]?.student_member?.learning_class?.name ||
+          '',
+        task: task.task,
+        submissions: task.task_submissions,
+      })) as TaskStudent[];
+      return {
+        meta,
+        data: dataValue,
+      };
+    },
+  },
+);
+
+const handleUpdateStatus = async (
+  newIndex: number,
+  item: TaskStudent,
+  newStatus: string,
+  emitEvt: boolean = false,
+) => {
+  if (!kanban.value) {
+    return;
+  }
+
+  if (emitEvt) {
+    kanban.value.handleInsertCard({ newIndex, value: item, group: newStatus });
+    return;
+  }
+
+  try {
+    kanban.value.setCanDrag(false);
+    const submissionValidationStatus = ['in_review', 'in_progress'];
+    const time = new Date();
+    if (newStatus === 'in_review') {
+      if (!item.submissions?.length && item.task?.submission_required) {
+        throw new Error('missingSubmission');
+      }
+    }
+    if (item.submissions?.length) {
+      const lastSubmission = item.submissions[0];
+      if (submissionValidationStatus.includes(newStatus)) {
+        await strapi.update('task-submissions', lastSubmission.id, {
+          submitted_at: newStatus === 'in_review' ? time : null,
+        });
+      }
+    }
+    await strapi.update<TaskMember>('task-members', item.id, {
+      status: newStatus as TaskMemberStatus,
+      ...(submissionValidationStatus.includes(newStatus) && {
+        last_submission_at:
+          newStatus === 'in_progress' && item.submissions
+            ? null
+            : time.toISOString(),
+      }),
+    });
+  } catch (error) {
+    tasks.value.data = tasks.value.data.map((task) => {
+      if (task.id === item.id) {
+        return { ...task, status: item.status };
+      }
+      return task;
+    });
+    if ((error as any).message === 'missingSubmission') {
+      setMessage(
+        t('components.learningPlan.drawer.task.errors.missingSubmission'),
+        'error',
+        true,
+      );
+      return;
+    }
+    setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
+  } finally {
+    await execute();
+    kanban.value.setCanDrag(true);
+  }
+};
+
+const openDrawer = (_index: number, card: TaskStudent) => {
+  selectedTask.value = card;
+  detailsDrawer.value = true;
+};
+</script>
+
+<style scoped></style>

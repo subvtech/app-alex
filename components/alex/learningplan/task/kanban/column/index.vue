@@ -1,12 +1,12 @@
 <template>
-  <div class="flex-1 scroll-snap min-w-[280px] select-none">
+  <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
     <alex-learningplan-task-kanban-column-header
       :title="title"
       :quantity="items.length"
       :color="color"
     />
     <SlickList
-      class="flex flex-col py-2"
+      class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
       :list="items"
       :group="group"
