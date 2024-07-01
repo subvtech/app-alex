@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { createTransport } from 'nodemailer';
 
-import { User } from '@/server/modules/users/users.schema';
-import { template } from '@/utils/template';
+import { template } from '../../utils/template';
+import { User } from '../modules/users/users.schema';
 
 const { NUXT_BASE_URL, SENDGRID_FROM, SENDGRID_KEY } = process.env;
 
