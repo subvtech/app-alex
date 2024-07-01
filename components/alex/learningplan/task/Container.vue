@@ -114,6 +114,7 @@
     :restrictions="taskDetails?.allowed_editor_plugins"
     :editable="true"
     :kanban-button="true"
+    @change-goals="handleChangeGoals"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"
     @change-submission-description="handleChangeSubmissionDescription"
@@ -542,12 +543,23 @@ const handleChangeDescription = (description: string) => {
     task.description = description;
   }
 };
+
 const handleChangeTitle = (title: string) => {
   const task = learningPlanStore.learningPlan?.tasks.find(
     (t) => t.id === editTaskId.value,
   );
   if (task) {
     task.title = title;
+  }
+};
+
+const handleChangeGoals = (learningGoals: LearningPlanGoalSimple[]) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+
+  if (task) {
+    task.learning_goals = learningGoals;
   }
 };
 
