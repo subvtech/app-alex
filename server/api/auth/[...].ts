@@ -6,7 +6,11 @@ import { NuxtAuthHandler } from '#auth';
 
 import db from '@/server/lib/drizzle';
 import { LoginSchema } from '@/server/modules/accounts/accounts.validator';
-import { getUserByEmail, update } from '@/server/modules/users/users.service';
+import {
+  getUserByEmail,
+  getUserById,
+  update,
+} from '@/server/modules/users/users.service';
 
 const runtimeConfig = useRuntimeConfig();
 
@@ -49,22 +53,10 @@ export const authOptions: AuthConfig = {
 
       return !!existingUser?.emailVerified;
     },
-    jwt({ token, user }) {
-      if (user) {
-        token.email = user.email;
-        token.name = user.name;
-        // token.isOAuth = !!(await getAccountByUserId(user.id));
-        // token.isTwoFactorEnabled = user.isTwoFactorEnabled;
-        // token.role = user.role;
-      }
+    async session({ session, token }) {
+      const user = await getUserById(token.sub!);
 
-      return token;
-    },
-    session({ session, token }) {
-      session.user.id = token.sub!;
-      // session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
-      // session.user.isOAuth = token.isOAuth as boolean;
-      // session.user.role = token.role as UserRole;
+      Object.assign(session.user, user);
 
       return session;
     },

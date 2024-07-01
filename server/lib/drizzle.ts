@@ -6,10 +6,10 @@ import { classes } from '../modules/classes/classes.schema';
 import { institutions } from '../modules/institutions/institutions.schema';
 import { learningPlans } from '../modules/learning-plans/learning-plans.schema';
 import { tags } from '../modules/tags/tags.schema';
+import { trailContributions } from '../modules/trail-contributions/trail-contributions.schema';
+import { trails } from '../modules/trails/trails.schema';
 import { users } from '../modules/users/users.schema';
 import { verificationTokens } from '../modules/verification-tokens/verification-tokens.schema';
-import { trails } from '../modules/trails/trails.schema';
-import { trailContributions } from '../modules/trail-contributions/trail-contributions.schema';
 
 const conn = postgres(process.env.DATABASE_URL!);
 
@@ -18,13 +18,13 @@ export default drizzle(conn, {
   logger: true,
   schema: {
     accounts,
-    users,
-    verificationTokens,
-    institutions,
     classes,
+    institutions,
     learningPlans,
     tags,
-    trails,
     trailContributions,
+    trails,
+    users,
+    verificationTokens,
   },
 });

@@ -14,6 +14,7 @@ import {
   getUserBy,
   getUserByEmail,
   getUserById,
+  getUserByUsername,
   register,
   update,
 } from './users.service';
@@ -47,9 +48,17 @@ export const usersRouter = router({
       return { success: 'email_confirmed' };
     }),
 
+  getBy: protectedProcedure
+    .input(z.object({ field: z.string(), value: z.string() }))
+    .query(({ input }) => getUserBy(input.field as never, input.value)),
+
   getById: protectedProcedure
     .input(z.string().optional())
     .query(({ input: id }) => (id ? getUserById(id) : null)),
+
+  getUserByUsername: protectedProcedure
+    .input(z.string().optional())
+    .query(({ input }) => (input ? getUserByUsername(input) : null)),
 
   isAlreadyTaken: publicProcedure
     .input(z.object({ field: z.string(), value: z.string() }))
