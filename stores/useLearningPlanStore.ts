@@ -59,7 +59,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'learning_goals',
         'trail',
         'tags',
-        'task_members.task_member_students.student_member.user.avatar',
+        'task_members.learning_plan_member.user.avatar',
+        'task_members.learning_plan_group.group_members.student_member.user.avatar',
       ],
     },
   };
@@ -211,21 +212,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       ),
   );
 
-  const userTasks = computed(
-    () =>
-      learningPlan.value?.tasks.flatMap((task) => {
-        const taskMembers = task.task_members.filter((taskMember) =>
-          taskMember.task_member_students.find(
-            (studentMember) =>
-              userLearningMember.value?.id === studentMember.student_member.id,
-          ),
-        );
-        if (taskMembers.length) {
-          return [{ ...task, task_members: taskMembers }];
-        }
-        return [];
-      }) || [],
-  );
   return {
     learningPlan,
     loadLearningPlan,
@@ -248,6 +234,5 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     generalTags,
     technicalTags,
     userLearningMember,
-    userTasks,
   };
 });

@@ -79,14 +79,10 @@
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
       :student="{
-        name: studentDetails.task_member_students[0].student_member.user
-          .fullname,
+        name: studentDetails.learning_plan_member?.user.fullname,
         studentClass:
-          studentDetails.task_member_students[0].student_member?.learning_class
-            ?.name || '',
-        avatar:
-          studentDetails.task_member_students[0].student_member.user?.avatar
-            ?.url,
+          studentDetails.learning_plan_member?.learning_class?.name || '',
+        avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
       }"
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"
@@ -241,11 +237,9 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
 
 const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
   const classes = taskMembers.flatMap((taskMember) =>
-    taskMember.task_member_students.flatMap((student) =>
-      student.student_member.learning_class?.name
-        ? student.student_member.learning_class?.name
-        : [],
-    ),
+    taskMember.learning_plan_member.learning_class
+      ? taskMember.learning_plan_member.learning_class.name
+      : [],
   );
   return Array.from(new Set(classes));
 };
@@ -306,15 +300,10 @@ watch(
         status: task.status,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         user: {
-          name:
-            task?.task_member_students[0]?.student_member?.user.fullname || '',
-          avatar:
-            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
-            undefined,
+          name: task?.learning_plan_member?.user.fullname || '',
+          avatar: task?.learning_plan_member?.user.avatar?.url || undefined,
         },
-        studentClass:
-          task?.task_member_students[0]?.student_member?.learning_class?.name ||
-          '',
+        studentClass: task?.learning_plan_member?.learning_class?.name || '',
       }));
     }
   },
