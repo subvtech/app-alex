@@ -41,6 +41,8 @@ import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
 import * as Y from 'yjs';
+import Commands from './slash-menu/commands.js';
+import suggestion from './slash-menu/suggestion.js';
 
 const doc = new Y.Doc();
 
@@ -64,6 +66,7 @@ const collors = [
 
 onMounted(() => {
   const user = useStrapiUser();
+  console.log();
   const provider = new TiptapCollabProvider({
     name: encodeURIComponent('document.name'), // Unique document identifier for syncing. This is your document name.
     appId: '7j9y6m10', // Your Cloud Dashboard AppID or `baseURL` for on-premises
@@ -86,6 +89,9 @@ onMounted(() => {
   editor.value = new Editor({
     extensions: [
       StarterKit,
+      Commands.configure({
+        suggestion,
+      }),
       Collaboration.configure({
         document: doc,
       }),
