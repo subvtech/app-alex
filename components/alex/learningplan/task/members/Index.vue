@@ -39,10 +39,10 @@
           :learningplan-id="props.learningplanId"
         />
 
-        <alex-custom-dropdown :items="typeOptions" :disabled="type">
-          <template #activator="{ props }">
+        <alex-custom-dropdown :items="typeOptions" :disabled="!!type">
+          <template #activator="{ props: propsDropdown }">
             <alex-custom-button
-              v-bind="props"
+              v-bind="propsDropdown"
               class="tw-ml-auto"
               variant="secondary"
               prepend-icon="mdi-plus"
@@ -61,14 +61,13 @@
         v-for="member in items"
         :key="`student-member${member.raw.id}`"
         :member="{
-          name: member.raw.student_member?.user.fullname,
-          class: member.raw.student_member?.learning_class?.name,
-          avatarUrl: member.raw.student_member?.user.avatar?.url,
+          name: member.raw.learning_plan_member?.user.fullname,
+          class: member.raw.learning_plan_member?.learning_class?.name,
+          avatarUrl: member.raw.learning_plan_member?.user.avatar?.url,
         }"
-        :type="props.type"
-        @remove-click="removeMember(member.raw.task_member.id, member.raw)"
+        @remove-click="removeMember(member.raw)"
         @to-profile="
-          navigateTo(`/users/${member.raw.student_member.user.username}`)
+          navigateTo(`/users/${member.raw.learning_plan_member.user.username}`)
         "
       />
     </template>
@@ -163,17 +162,14 @@ const typeOptions: AlexDropdownItem[] = [
   },
 ];
 const getMembers = (taskId: number) =>
-  strapiUtils.find<TaskMemberStudent>('task-member-students', {
+  strapiUtils.find<TaskMember>('task-members', {
     populate: {
-      student_member: {
+      learning_plan_member: {
         populate: ['user.avatar', 'learning_class'],
       },
-      task_member: true,
     },
     filters: {
-      task_member: {
-        task: taskId,
-      },
+      task: taskId,
     },
   });
 const showingData = (
@@ -201,12 +197,12 @@ const showingData = (
   return message;
 };
 const { data: members, refresh } = await useAsyncData(
-  'task-members-students',
+  'task-members',
   () => getMembers(props.taskId),
   {
     default: () => ({
       meta: { total: 0 },
-      data: [] as TaskMemberStudent[],
+      data: [] as TaskMember[],
     }),
   },
 );
@@ -260,10 +256,7 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
     );
   }
 };
-const removeMember = async (
-  taskMemberID: number,
-  member: TaskMemberStudent,
-) => {
+const removeMember = async (member: TaskMember) => {
   try {
     if (props.blockDelete) {
       setMessage(
@@ -273,12 +266,11 @@ const removeMember = async (
       );
       return;
     }
-    await strapi.delete('task-members', taskMemberID);
-    await strapi.delete('task-member-students', member.id);
+    await strapi.delete('task-members', member.id);
     setTimeout(refresh, 100);
     setMessage(
       t('components.learningPlan.drawer.task.removeMember', {
-        member: member.student_member?.user?.fullname,
+        member: member.learning_plan_member?.user?.fullname,
       }),
       'success',
       true,

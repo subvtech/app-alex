@@ -34,7 +34,6 @@
               <div v-else>
                 <alex-learningplan-task-table
                   key="table"
-                  :index="i"
                   :tasks="tasksArray[i - 1]"
                   :search="search"
                   :active-filter="isFilterActive"
@@ -312,7 +311,7 @@ const tasksArray = computed(() => {
         if (taskMember.status === 'in_progress') delivered.doing += 1;
         if (taskMember.status === 'in_review') delivered.underReview += 1;
         if (taskMember.status === 'done') delivered.completed += 1;
-        taskMember.task_member_students?.forEach((student) => {
+        taskMember.learning_plan_group?.group_members?.forEach((student) => {
           const studentUser = student.student_member?.user;
           students.push({
             name: studentUser?.fullname,
@@ -321,6 +320,15 @@ const tasksArray = computed(() => {
               : undefined,
           });
         });
+
+        if (taskMember.learning_plan_member) {
+          students.push({
+            name: taskMember.learning_plan_member.user?.fullname,
+            image: taskMember.learning_plan_member.user?.avatar?.url
+              ? { url: taskMember.learning_plan_member.user?.avatar.url }
+              : undefined,
+          });
+        }
       });
       const taskItem = {
         id: task.id,
@@ -401,7 +409,7 @@ const handleMoveTask = async ({
       await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
-  } catch (e: ApplicationError) {
+  } catch (e: unknown) {
     displayError('moveError', e);
   }
 };
@@ -589,8 +597,8 @@ const handleChangeMembers = async () => {
     const response = await find<TaskMember>('task-members', {
       populate: [
         'task_submission',
-        'task_member_students.student_member.user.avatar',
-        'task_member_students.student_member.learning_class',
+        'learning_plan_member.user.avatar',
+        'learning_plan_member.learning_class',
       ],
       filters: {
         task: editTaskId.value,

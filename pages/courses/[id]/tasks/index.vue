@@ -45,7 +45,7 @@
           <alex-learningplan-task-table-skeleton />
         </div>
         <div v-else>
-          <TransitionGroup name="list" mode="out-in">
+          <TransitionGroup name="list">
             <alex-custom-chip
               v-for="chip in chips"
               :key="chip"

@@ -52,7 +52,7 @@
       :trail="selectedTask.task.trail"
       :status="selectedTask.status"
       :blocks="selectedTask.task.blocks"
-      :type="selectedTask.task.type"
+      :type="selectedTask.task.type || undefined"
       :start-date="selectedTask.task.start_at || undefined"
       :final-date="selectedTask.task?.finish_at || undefined"
       :description="selectedTask.task.description || undefined"
@@ -110,17 +110,12 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
       task_submissions: {
         sort: 'submitted_at:desc',
       },
-      task_member_students: {
-        populate: [
-          'student_member.user.avatar',
-          'student_member.learning_class',
-        ],
+      learning_plan_member: {
+        populate: ['user.avatar', 'learning_class'],
       },
     },
     filters: {
-      task_member_students: {
-        student_member: { id: memberId },
-      },
+      learning_plan_member: { id: memberId },
       task: {
         learningplan: learningplanId,
       },
@@ -140,16 +135,11 @@ const { data: tasks, execute } = await useAsyncData(
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         title: task.task?.title,
         user: {
-          name:
-            task?.task_member_students[0]?.student_member?.user.fullname || '',
-          avatar:
-            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
-            undefined,
+          name: task?.learning_plan_member?.user.fullname || '',
+          avatar: task?.learning_plan_member?.user.avatar?.url || undefined,
         },
         group: task.task?.type === 'group',
-        studentClass:
-          task?.task_member_students[0]?.student_member?.learning_class?.name ||
-          '',
+        studentClass: task?.learning_plan_member?.learning_class?.name || '',
         task: task.task,
         submissions: task.task_submissions,
       })) as TaskStudent[];
