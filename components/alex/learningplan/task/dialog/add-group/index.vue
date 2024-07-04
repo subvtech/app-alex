@@ -15,6 +15,7 @@
         size="large"
         variant="secondary"
         prepend-icon="mdi-plus"
+        @click="openDialog(undefined)"
         >{{
           $t('components.learningPlan.drawer.task.dialog.newGroup')
         }}</alex-custom-button
@@ -35,7 +36,7 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
-            @add-click="(id) => $emit('add-group', id)"
+            @add-members="openDialog"
           />
           <p
             v-if="!classValue.learning_plan_groups?.length"
@@ -47,23 +48,45 @@
       </v-expansion-panel>
     </v-expansion-panels>
   </alex-custom-dialog>
+
+  <alex-learningplan-task-dialog-create-group
+    v-model="groupDialog"
+    :learning-plan-id="props.learningplanId"
+    :classes="classes.data"
+    :group="groupInfo"
+  />
 </template>
 
 <script setup lang="ts">
 interface AddStudent {
   learningplanId: number;
 }
-const model = defineModel<boolean>();
+
+const model = defineModel<boolean>({ required: true });
 const props = defineProps<AddStudent>();
 type Emits = {
   'add-group': [id: number];
 };
 defineEmits<Emits>();
 const strapi = useStrapiUtils();
+
+const groupDialog = ref<boolean>(false);
+const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const search = ref('');
+
+function openDialog(group: LearningPlanGroupSimple | undefined) {
+  groupDialog.value = true;
+  groupInfo.value = group;
+}
+
 const getGroups = (learningplanId: number) =>
   strapi.find<ClassSimple>('classes', {
-    populate: ['learning_plan_groups.group_members.student_member.user.avatar'],
+    populate: [
+      'learning_plan_groups.group_members.student_member.user.avatar',
+      'learning_plan_groups.learning_class',
+      'learning_plan_members',
+      'learning_plan_members.user.fullname',
+    ],
     filters: {
       learningplan: learningplanId,
     },
@@ -79,6 +102,7 @@ const { data: classes, execute } = await useAsyncData(
 const filteredClasses = computed(() => {
   if (!search.value) return classes.value.data;
   const lowerCaseSearch = search.value.toLowerCase();
+
   return classes.value.data.map((classValue) => ({
     ...classValue,
     learning_plan_groups: classValue.learning_plan_groups?.filter((group) =>

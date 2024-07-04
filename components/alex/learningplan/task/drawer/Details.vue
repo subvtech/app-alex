@@ -397,9 +397,15 @@ const restrictionsValue = computed({
   },
 }) as WritableComputedRef<RestrictionValue[]>;
 
+onMounted(() => {
+  executeSubmissions().then(() => (loadingSubmission.value = false));
+  executeEvents();
+  executeMessages();
+});
+
 watch(model, (value) => {
   if (value) {
-    executeSubmissions();
+    executeSubmissions().then(() => (loadingSubmission.value = false));
     executeEvents();
     executeMessages();
     return;
@@ -409,11 +415,7 @@ watch(model, (value) => {
   activeTab.value = '1';
   messages.value.data = [];
 });
-watch(activeTab, (value) => {
-  if (value === '3') {
-    executeMessages();
-  }
-});
+
 watch(model, (value) => {
   if (value) {
     description.value = props.description;
@@ -427,12 +429,18 @@ watch(model, (value) => {
     setTimeout(() => {
       isFirstTimeOpened.value = false;
     }, 1100);
-    setTimeout(() => {
-      loadingSubmission.value = false;
-    }, 800);
+    // setTimeout(() => {
+    //  loadingSubmission.value = false;
+    // }, 800);
     return;
   }
   loadingSubmission.value = true;
+});
+
+watch(activeTab, (value) => {
+  if (value === '3') {
+    executeMessages();
+  }
 });
 
 const handleChangeStatus = (statusValue: TaskMemberStatus) => {

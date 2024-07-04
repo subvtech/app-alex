@@ -20,7 +20,7 @@
     <alex-custom-button
       size="small"
       variant="outlined"
-      @click="() => $emit('add-click', group.id)"
+      @click="emit('add-members', group)"
       >{{
         $t('components.learningPlan.drawer.task.dialog.add')
       }}</alex-custom-button
@@ -32,18 +32,21 @@
 interface GroupCard {
   group: LearningPlanGroupSimple;
 }
-type Emits = {
-  'add-click': [id: number];
-};
-defineEmits<Emits>();
 defineProps<GroupCard>();
+
+type Emit = {
+  'add-members': [group: LearningPlanGroupSimple];
+};
+
+const emit = defineEmits<Emit>();
+
 const getInChargeMember = (members: LearningPlanGroupMemberSimple[]) =>
   members.find((member) => member.role === 'in_charge');
 
 const getGroupMemberAvatars = (members: LearningPlanGroupMemberSimple[]) =>
   members.map((member) => ({
-    name: member.student_member.user.fullname,
-    image: member.student_member.user.avatar?.formats.small,
+    name: member.student_member?.user.fullname || '',
+    image: member.student_member?.user.avatar?.formats.small,
   }));
 </script>
 
