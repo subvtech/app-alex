@@ -113,12 +113,39 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
       learning_plan_member: {
         populate: ['user.avatar', 'learning_class'],
       },
+      learning_plan_group: {
+        populate: {
+          group_members: {
+            populate: ['student_member.user.avatar'],
+          },
+          learning_class: true,
+        },
+      },
     },
     filters: {
-      learning_plan_member: { id: memberId },
-      task: {
-        learningplan: learningplanId,
-      },
+      $and: [
+        {
+          $or: [
+            { learning_plan_member: { id: memberId } },
+            {
+              learning_plan_group: {
+                group_members: {
+                  student_member: {
+                    id: {
+                      $in: [memberId],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        {
+          task: {
+            learningplan: learningplanId,
+          },
+        },
+      ],
     },
   });
 const { data: tasks, execute } = await useAsyncData(
@@ -128,7 +155,6 @@ const { data: tasks, execute } = await useAsyncData(
     default: () => ({ meta: 0, data: [] as TaskStudent[] }),
     transform: ({ data, meta }) => {
       const filteredData = data.filter((task) => task.task?.status !== 'draft');
-
       const dataValue = filteredData.map((task) => ({
         id: task.id,
         status: task.status,
@@ -138,7 +164,21 @@ const { data: tasks, execute } = await useAsyncData(
           name: task?.learning_plan_member?.user.fullname || '',
           avatar: task?.learning_plan_member?.user.avatar?.url || undefined,
         },
-        group: task.task?.type === 'group',
+        ...(task.learning_plan_group?.learning_class?.name && {
+          group: {
+            name: task.learning_plan_group?.learning_class?.name || '',
+            participants: task.learning_plan_group?.group_members.map(
+              (member) => ({
+                name: member.student_member.user.fullname,
+                ...(member.student_member.user.avatar?.url && {
+                  image: {
+                    url: member.student_member.user.avatar?.url,
+                  },
+                }),
+              }),
+            ),
+          },
+        }),
         studentClass: task?.learning_plan_member?.learning_class?.name || '',
         task: task.task,
         submissions: task.task_submissions,
@@ -150,7 +190,6 @@ const { data: tasks, execute } = await useAsyncData(
     },
   },
 );
-
 const handleUpdateStatus = async (
   newIndex: number,
   item: TaskStudent,

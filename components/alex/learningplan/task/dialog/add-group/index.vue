@@ -35,6 +35,7 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
+            @add-click="(id) => $emit('add-group', id)"
           />
           <p
             v-if="!classValue.learning_plan_groups?.length"
@@ -54,6 +55,10 @@ interface AddStudent {
 }
 const model = defineModel<boolean>();
 const props = defineProps<AddStudent>();
+type Emits = {
+  'add-group': [id: number];
+};
+defineEmits<Emits>();
 const strapi = useStrapiUtils();
 const search = ref('');
 const getGroups = (learningplanId: number) =>

@@ -78,12 +78,21 @@
       :task-member-id="studentDetails.id"
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
-      :student="{
-        name: studentDetails.learning_plan_member?.user.fullname,
-        studentClass:
-          studentDetails.learning_plan_member?.learning_class?.name || '',
-        avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
-      }"
+      :task-title="taskStore.task.title"
+      :group="studentDetails.learning_plan_group"
+      :student-class="
+        studentDetails.learning_plan_member?.learning_class?.name ||
+        studentDetails.learning_plan_group?.learning_class?.name ||
+        ''
+      "
+      :student="
+        studentDetails.learning_plan_member
+          ? {
+              name: studentDetails.learning_plan_member?.user.fullname || '',
+              avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
+            }
+          : undefined
+      "
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"
     />
@@ -237,8 +246,8 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
 
 const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
   const classes = taskMembers.flatMap((taskMember) =>
-    taskMember.learning_plan_member.learning_class
-      ? taskMember.learning_plan_member.learning_class.name
+    taskMember.learning_plan_member?.learning_class
+      ? taskMember.learning_plan_member?.learning_class.name
       : [],
   );
   return Array.from(new Set(classes));
@@ -299,11 +308,33 @@ watch(
         id: task.id,
         status: task.status,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
-        user: {
-          name: task?.learning_plan_member?.user.fullname || '',
-          avatar: task?.learning_plan_member?.user.avatar?.url || undefined,
-        },
-        studentClass: task?.learning_plan_member?.learning_class?.name || '',
+        ...(!task.learning_plan_group && {
+          user: {
+            name: task?.learning_plan_member?.user.fullname || '',
+            avatar: task?.learning_plan_member?.user.avatar?.url,
+          },
+        }),
+        ...(task.learning_plan_group && {
+          group: {
+            name: task.learning_plan_group?.title,
+            participants: task.learning_plan_group?.group_members.map(
+              (member) => {
+                return {
+                  name: member.student_member.user.fullname,
+                  ...(member.student_member.user.avatar?.url && {
+                    image: {
+                      url: member.student_member.user.avatar?.url,
+                    },
+                  }),
+                };
+              },
+            ),
+          },
+        }),
+        studentClass:
+          task?.learning_plan_member?.learning_class?.name ||
+          task.learning_plan_group?.learning_class?.name ||
+          '',
       }));
     }
   },

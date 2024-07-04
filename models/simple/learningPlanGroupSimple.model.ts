@@ -7,6 +7,6 @@ export interface LearningPlanGroupSimple {
   image: Media;
   learningplan: LearningPlanSimple;
   group_members: LearningPlanGroupMemberSimple[];
-  task_members: any[];
+  task_members?: TaskMember[];
   learning_class?: ClassSimple;
 }
