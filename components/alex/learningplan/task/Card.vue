@@ -17,7 +17,7 @@
         </template>
       </v-avatar>
       <p class="text-body-2 ellipsis lines-1 w-100">
-        {{ group ? nameGroup : name }}
+        {{ name || group?.name }}
       </p>
       <alex-custom-chip
         v-if="mark && maxMark && status === 'done'"
@@ -26,20 +26,12 @@
         size="small"
       />
     </div>
-    <div v-if="group" class="d-flex tw-gap-2 align-center mt-2">
-      <v-avatar
-        :size="24"
-        :image="avatar || undefined"
-        class="alex-avatar-group-border alex-avatar-group-margin"
-        color="gray-100"
-      >
-        <template v-if="!avatar" #default>
-          <p class="text-gray-300 text-body-6">
-            {{ initials }}
-          </p>
-        </template>
-      </v-avatar>
-      <p class="text-body-5 text-gray-600 ellipsis lines-2">{{ name }}</p>
+    <div v-if="group" class="d-flex tw-gap-2 align-center tw-mt-2">
+      <alex-custom-avatar-group
+        :avatar-items="group.participants"
+        :size="34"
+        class="ml-2"
+      />
     </div>
     <div class="d-flex tw-gap-2 justify-end w-100 mt-4">
       <alex-custom-chip
@@ -69,7 +61,10 @@ type TaskCardProps = {
   date: Date;
   name: string;
   studentClass: string;
-  group?: boolean;
+  group?: {
+    name: string;
+    participants: { name: string; image?: { url: string } }[];
+  };
   nameGroup?: string;
   avatar?: string | null;
   status?: TStatus;
@@ -77,7 +72,7 @@ type TaskCardProps = {
   maxMark?: number;
 };
 const props = withDefaults(defineProps<TaskCardProps>(), {
-  group: false,
+  group: undefined,
   status: 'to_do',
   avatar: undefined,
   nameGroup: undefined,

@@ -37,6 +37,7 @@
           v-else-if="type === 'group'"
           v-model="addGroupDialog"
           :learningplan-id="props.learningplanId"
+          @add-group="(id: number) => addGroup(id)"
         />
 
         <alex-custom-dropdown :items="typeOptions" :disabled="!!type">
@@ -288,6 +289,17 @@ const removeMember = async (member: TaskMember) => {
     );
   }
 };
+const addGroup = async (id: number) => {
+  await strapi.create('task-members', {
+    status: 'to_do',
+    can_submit_after_deadline: true,
+    finished_at: props.finishAt,
+    started_at: props.startAt,
+    task: props.taskId,
+    learning_plan_group: id,
+  });
+};
+
 const handleAddMemberOrClass = () => {
   if (props.type === 'individual') {
     addMemberDialog.value = true;

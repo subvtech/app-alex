@@ -71,6 +71,10 @@ interface AddStudent {
 
 const model = defineModel<boolean>({ required: true });
 const props = defineProps<AddStudent>();
+type Emits = {
+  'add-group': [id: number];
+};
+defineEmits<Emits>();
 const strapi = useStrapiUtils();
 
 // Dialog
