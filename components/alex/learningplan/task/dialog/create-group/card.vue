@@ -18,15 +18,17 @@
     </div>
 
     <template v-if="anotherGroup !== undefined">
-      <alex-custom-chip
+      <alex-documentation-buttons-tooltip
         v-if="anotherGroup"
-        color="orange"
-        variant="text"
         icon="mdi-alert-circle-outline"
-        size="small"
-        :title="
+        icon-size="small"
+        variant="text"
+        tooltip-location="bottom"
+        color="warning-0"
+        :tooltip-text="
           $t('components.learningPlan.drawer.task.dialog.message.onGroup')
         "
+        rounded
       />
     </template>
 
