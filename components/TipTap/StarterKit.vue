@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="control-group">
       <label>
         <input type="checkbox" :checked="isEditable" @change="toggleEditable" />
@@ -239,10 +239,7 @@ watch(
   border-radius: 8px;
 }
 
-.container {
-  max-width: 90%;
-  margin: auto;
-}
+
 
 .collaboration-cursor__caret {
   border-left: 1px solid #0d0d0d;

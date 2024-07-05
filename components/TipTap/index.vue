@@ -1,46 +1,55 @@
 <template>
-  <div class="container">
+  <div>
     <div class="control-group">
       <label>
         <input type="checkbox" :checked="isEditable" @change="toggleEditable" />
         Editable
       </label>
     </div>
-    <div v-if="editor" :editor="editor" :tippy-options="{ duration: 100 }">
-      <div class="floating-menu">
+
+    <div class="bubble-menu-wrapper">
+      <!-- <bubble-menu
+        v-if="editor"
+        :editor="editor"
+        :tippy-options="{ duration: 100 }"
+      > -->
+      <div class="bubble-menu text-dark-gray text-body-3 pa-3 d-flex ga-2">
         <button
-          @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-          :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
+          :class="{ 'is-active': editor?.isActive('bold') }"
+          @click="editor.chain().focus().toggleBold().run()"
         >
-          H1
+          Bold
         </button>
         <button
-          @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-          :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
+          :class="{ 'is-active': editor?.isActive('italic') }"
+          @click="editor.chain().focus().toggleItalic().run()"
         >
-          H2
+          Italic
         </button>
         <button
-          @click="editor.chain().focus().toggleBulletList().run()"
-          :class="{ 'is-active': editor.isActive('bulletList') }"
+          :class="{ 'is-active': editor?.isActive('strike') }"
+          @click="editor.chain().focus().toggleStrike().run()"
         >
-          Bullet list
+          Strike
         </button>
       </div>
+      <!-- </bubble-menu> -->
     </div>
     <editor-content :editor="editor" />
-    {{ user?.username }}
   </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import StarterKit from '@tiptap/starter-kit';
-import { Editor, EditorContent } from '@tiptap/vue-3';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import BubbleMenu from '@tiptap/extension-bubble-menu';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
+// import { WebrtcProvider } from 'y-webrtc';
 import * as Y from 'yjs';
+
 import Commands from './slash-menu/commands.js';
 import suggestion from './slash-menu/suggestion.js';
 
@@ -66,7 +75,6 @@ const collors = [
 
 onMounted(() => {
   const user = useStrapiUser();
-  console.log();
   const provider = new TiptapCollabProvider({
     name: encodeURIComponent('document.name'), // Unique document identifier for syncing. This is your document name.
     appId: '7j9y6m10', // Your Cloud Dashboard AppID or `baseURL` for on-premises
@@ -77,18 +85,22 @@ onMounted(() => {
     onSynced() {
       if (!doc.getMap('config').get('initialContentLoaded') && editor) {
         doc.getMap('config').set('initialContentLoaded', true);
-
-        editor.value.commands.setContent(`
-          <p>This is a radically reduced version of Tiptap. It has support for a document, with paragraphs and text. That’s it. It’s probably too much for real minimalists though.</p>
-          <p>The paragraph extension is not really required, but you need at least one node. Sure, that node can be something different.</p>
-          `);
       }
     },
   });
 
   editor.value = new Editor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        history: false,
+      }),
+      BubbleMenu.configure({
+        element: document.querySelector('.bubble-menu-wrapper'),
+        tippyOptions: {
+          duration: 100,
+          theme: 'transparent',
+        },
+      }),
       Commands.configure({
         suggestion,
       }),
@@ -281,29 +293,27 @@ watch(
   white-space: nowrap;
 }
 
-/* Floating menu */
-.floating-menu {
-  display: flex;
-  background-color: rgb(var(--v-theme-gray-blue));
-  padding: 0.1rem;
-  border-radius: 0.5rem;
+.bubble-menu {
+  background: #fff;
+  border: 1px solid rgb(var(--v-theme-gray-100));
+  overflow: auto;
+  position: relative;
 
   button {
-    background-color: unset;
-    padding: 0.275rem 0.425rem;
-    border-radius: 0.3rem;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+    padding: 6px;
+    border-radius: 4px;
 
     &:hover {
-      background-color: rgb(var(--v-theme-gray-200));
+      background-color: #f5f5f5;
+      color: rgb(var(--v-theme-gray-900)) !important;
     }
 
     &.is-active {
-      background-color: #fff;
-      color: var(--purple);
-
-      &:hover {
-        color: var(--purple-contrast);
-      }
+      background-color: #e5e5e5;
+      color: rgb(var(--v-theme-gray-900)) !important;
     }
   }
 }
