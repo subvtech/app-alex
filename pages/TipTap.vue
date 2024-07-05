@@ -5,11 +5,11 @@
       <TipTap v-model="editorData" />
       <p class="output">{{ editorData }}</p>
     </div>
-    <div class="pa-4">
+    <!-- <div class="pa-4">
       <p class="text-primary text-h2">TipTap StarterKit</p>
       <TipTap-Starter-kit v-model="editorData2" />
       <p class="output">{{ editorData2 }}</p>
-    </div>
+    </div> -->
   </div>
 </template>
 

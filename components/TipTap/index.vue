@@ -103,7 +103,11 @@ onMounted(() => {
         },
       }),
       Placeholder.configure({
-        placeholder: 'Type / to choose a block',
+        placeholder: ({ node }) => {
+          if (node.type.name === 'paragraph') {
+            return 'Type / to choose a block';
+          }
+        },
       }),
       Commands.configure({
         suggestion,
