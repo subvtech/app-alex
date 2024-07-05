@@ -36,7 +36,9 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
-            @add-members="openDialog"
+            @add-members="
+              (member) => openDialog(member, classValue.learning_plan_groups)
+            "
           />
           <p
             v-if="!classValue.learning_plan_groups?.length"
@@ -55,6 +57,11 @@
     :classes="classes.data"
     :group="groupInfo"
   />
+  <!-- <alex-learningplan-task-dialog-edit-group
+    v-model="groupDialog"
+    :group="groupInfo"
+    :all-groups="allGroups"
+  /> -->
 </template>
 
 <script setup lang="ts">
@@ -66,13 +73,20 @@ const model = defineModel<boolean>({ required: true });
 const props = defineProps<AddStudent>();
 const strapi = useStrapiUtils();
 
+// Dialog
 const groupDialog = ref<boolean>(false);
 const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
+const allGroups = ref<LearningPlanGroupSimple[]>([]);
+
 const search = ref('');
 
-function openDialog(group: LearningPlanGroupSimple | undefined) {
+function openDialog(
+  group: LearningPlanGroupSimple | undefined,
+  lpGroups: LearningPlanGroupSimple[] | undefined = undefined,
+) {
   groupDialog.value = true;
   groupInfo.value = group;
+  allGroups.value = lpGroups || [];
 }
 
 const getGroups = (learningplanId: number) =>

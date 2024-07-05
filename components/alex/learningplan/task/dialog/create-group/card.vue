@@ -1,5 +1,5 @@
 <template>
-  <div class="group-card d-flex align-center ga-4 py-2">
+  <div class="group_card d-flex align-center ga-4 py-2">
     <v-avatar
       :size="40"
       :image="imageUrl || undefined"
@@ -17,10 +17,23 @@
       <p class="text-body-5 text-gray-500 tw-truncate">{{ email }}</p>
     </div>
 
+    <template v-if="anotherGroup !== undefined">
+      <alex-custom-chip
+        v-if="anotherGroup"
+        color="orange"
+        variant="text"
+        icon="mdi-alert-circle-outline"
+        size="small"
+        :title="
+          $t('components.learningPlan.drawer.task.dialog.message.onGroup')
+        "
+      />
+    </template>
+
     <template v-if="!hideDetails"
       ><alex-custom-chip
         v-if="inCharge"
-        text="Responsável"
+        :text="$t('components.learningPlan.drawer.task.dialog.responsible')"
         status="primary"
         size="x-small" />
 
@@ -42,6 +55,7 @@ interface CardProps {
   inCharge?: boolean;
   hideDetails?: boolean;
   iconColor?: 'red' | undefined;
+  anotherGroup?: boolean;
 }
 
 defineProps<CardProps>();
@@ -55,7 +69,6 @@ const emit = defineEmits<Emit>();
 
 <style>
 .group_card .red_icon i::before {
-  transform: translateX(3rem);
   color: red;
 }
 </style>

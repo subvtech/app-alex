@@ -38,7 +38,40 @@
       "add": "Adicionar",
       "newGroup": "Novo grupo",
       "newMembers": "Adicionar integrantes",
-      "searchMembers": "Buscar participantes do curso"
+      "searchMembers": "Buscar participantes do curso",
+      "noMembers": "Este grupo não possui membros",
+      "member": "Membro",
+      "members": "Membros",
+      "save": "Salvar alterações",
+      "create": "Criar novo grupo",
+      "title": {
+        "edit": "Editar grupo",
+        "create": "Criar grupo",
+        "add": "Adicionar Grupo",
+        "members": "Grupo de integrantes"
+      },
+      "label": {
+        "class": "A qual turma o grupo pertence?",
+        "name": "Qual o nome do grupo?",
+        "responsible": "Quem será o responsável pelo grupo?",
+        "members": "Quem serão os participantes do grupo?"
+      },
+      "select": {
+        "class": "Selecione a turma do grupo",
+        "name": "Digite o nome do grupo",
+        "responsible": "Selecione o responsável pelo grupo",
+        "members": "Selecione os participantes do grupo"
+      },
+      "message": {
+        "onlyMembers": "Só serão listados os usuários participantes do curso e que não façam parte do grupo",
+        "onGroup": "Esse usuário já pertence a outro grupo",
+        "missResponsible": "O grupo precisa de um responsável para ser salvo",
+        "missClass": "Selecione uma turma pra o grupo",
+        "missName": "Informe o nome do grupo",
+        "updated": "Grupo atualizado com sucesso",
+        "created": "Grupo criado com sucesso",
+        "updateError": "Falha ao atualizar grupo"
+      }
     },
     "submission": {
       "label": "Entrega",
@@ -161,6 +194,7 @@
     "title": "Sem título",
     "tags": "Sem marcações",
     "date": "Sem data",
+    "class": "Sem turma",
     "restrictions": "Sem restrições",
     "submissions": "Parece que ainda não temos entregas",
     "description": "Sem descrição",

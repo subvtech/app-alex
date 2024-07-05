@@ -41,7 +41,40 @@
       "add": "Add",
       "newGroup": "New group",
       "newMembers": "Add members",
-      "searchMembers": "Search course members"
+      "searchMembers": "Search course members",
+      "noMembers": "No members",
+      "member": "Member",
+      "members": "Members",
+      "save": "Save changes",
+      "create": "Create new group",
+      "title": {
+        "edit": "Edit group",
+        "create": "Create group",
+        "add": "Add Group",
+        "members": "Group members"
+      },
+      "label": {
+        "class": "Which class does the group belong to?",
+        "name": "What is the name of the group?",
+        "responsible": "Who will be responsible for the group?",
+        "members": "Who will be the participants of the group?"
+      },
+      "select": {
+        "class": "Select the class of the group",
+        "name": "Enter the name of the group",
+        "responsible": "Select the group leader",
+        "members": "Select the group participants"
+      },
+      "message": {
+        "onlyMembers": "Only users who are participants of the course and who are not part of the group will be listed",
+        "onGroup": "This user already belongs to another group",
+        "missResponsible": "A group leader is required to save the group",
+        "missClass": "Select a class for the group",
+        "missName": "Enter a name for the group",
+        "updated": "Group updated successfully",
+        "created": "Group created successfully",
+        "updateError": "Failed to update group"
+      }
     },
     "submission": {
       "label": "Submission",
@@ -163,6 +196,7 @@
     "type": "No type",
     "title": "No title",
     "tags": "No tags",
+    "class": "No class",
     "date": "No date",
     "restrictions": "No restrictions",
     "submissions": "It looks like we don't have any deliveries yet",

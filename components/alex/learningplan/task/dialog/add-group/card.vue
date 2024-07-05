@@ -32,7 +32,7 @@
 interface GroupCard {
   group: LearningPlanGroupSimple;
 }
-const props = defineProps<GroupCard>();
+defineProps<GroupCard>();
 
 type Emit = {
   'add-members': [group: LearningPlanGroupSimple];

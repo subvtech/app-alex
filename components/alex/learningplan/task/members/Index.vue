@@ -206,6 +206,10 @@ const { data: members, refresh } = await useAsyncData(
     }),
   },
 );
+
+watch(members, () => {
+  console.log(members);
+});
 const addMember = async (members: LearningPlanMemberSimple[]) => {
   if (!props.type) {
     setMessage(
