@@ -55,6 +55,12 @@
           </template>
         </alex-custom-dropdown>
       </div>
+      <alex-learningplan-task-dialog-create-group
+        v-model="groupDialog"
+        :learning-plan-id="props.learningplanId"
+        :classes="classes.data"
+        :group="groupInfo"
+      />
     </template>
     <!-- Cards -->
     <template #default="{ items }">
@@ -62,13 +68,29 @@
         v-for="member in items"
         :key="`student-member${member.raw.id}`"
         :member="{
-          name: member.raw.learning_plan_member?.user.fullname,
-          class: member.raw.learning_plan_member?.learning_class?.name,
+          name:
+            member.raw.learning_plan_member?.user.fullname ||
+            member.raw.learning_plan_group?.title,
+          class:
+            member.raw.learning_plan_member?.learning_class?.name ||
+            member.raw.learning_plan_group?.learning_class.name,
           avatarUrl: member.raw.learning_plan_member?.user.avatar?.url,
+          group: !!member.raw.learning_plan_group,
+          participants: member.raw.learning_plan_group
+            ? getMembersOfGroup(member.raw.learning_plan_group)
+            : undefined,
         }"
+        :edit="edit"
         @remove-click="removeMember(member.raw)"
+        @edit-click="
+          () => handleEditClick(member.raw.learning_plan_group, items)
+        "
         @to-profile="
-          navigateTo(`/users/${member.raw.learning_plan_member.user.username}`)
+          member.raw.learning_plan_member
+            ? navigateTo(
+                `/users/${member.raw.learning_plan_member.user.username}`,
+              )
+            : undefined
         "
       />
     </template>
@@ -120,6 +142,7 @@ interface MembersProps {
   finishAt?: string | null;
   sendAfterDeadline?: boolean;
   blockDelete?: boolean;
+  edit?: boolean;
 }
 const props = withDefaults(defineProps<MembersProps>(), {
   sendAfterDeadline: false,
@@ -127,6 +150,7 @@ const props = withDefaults(defineProps<MembersProps>(), {
   finishAt: null,
   type: null,
   blockDelete: false,
+  edit: true,
 });
 
 type Emits = {
@@ -141,6 +165,9 @@ const { t } = useI18n();
 const emit = defineEmits<Emits>();
 const addMemberDialog = ref(false);
 const addGroupDialog = ref(false);
+const groupDialog = ref<boolean>(false);
+const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
+const allGroups = ref<LearningPlanGroupSimple[]>([]);
 const setTypeDropdown = ref<boolean>(false);
 const page = ref<number>(1);
 const itemsPerPage = 12;
@@ -167,6 +194,14 @@ const getMembers = (taskId: number) =>
     populate: {
       learning_plan_member: {
         populate: ['user.avatar', 'learning_class'],
+      },
+      learning_plan_group: {
+        populate: {
+          group_members: {
+            populate: ['student_member.user.avatar'],
+          },
+          learning_class: true,
+        },
       },
     },
     filters: {
@@ -207,10 +242,6 @@ const { data: members, refresh } = await useAsyncData(
     }),
   },
 );
-
-watch(members, () => {
-  console.log(members);
-});
 const addMember = async (members: LearningPlanMemberSimple[]) => {
   if (!props.type) {
     setMessage(
@@ -300,6 +331,22 @@ const addGroup = async (id: number) => {
   });
 };
 
+const getMembersOfGroup = (group: LearningPlanGroupSimple) =>
+  group.group_members.map((member) => ({
+    name: member.student_member.user.fullname,
+    image: { url: member.student_member.user?.avatar?.url || '' },
+    className: 'text-body-3',
+  }));
+const handleEditClick = (
+  selectedGroup: LearningPlanGroupSimple,
+  taskMembers: { raw: TaskMember }[],
+) => {
+  groupInfo.value = selectedGroup;
+  allGroups.value = taskMembers.map(
+    (member) => member.raw.learning_plan_group!,
+  );
+  groupDialog.value = true;
+};
 const handleAddMemberOrClass = () => {
   if (props.type === 'individual') {
     addMemberDialog.value = true;
@@ -309,6 +356,25 @@ const handleAddMemberOrClass = () => {
     setTypeDropdown.value = true;
   }
 };
+const getGroups = (learningplanId: number) =>
+  strapiUtils.find<ClassSimple>('classes', {
+    populate: [
+      'learning_plan_groups.group_members.student_member.user.avatar',
+      'learning_plan_groups.learning_class',
+      'learning_plan_members',
+      'learning_plan_members.user.fullname',
+    ],
+    filters: {
+      learningplan: learningplanId,
+    },
+  });
+const { data: classes } = await useAsyncData(
+  'classes-member-invite',
+  () => getGroups(props.learningplanId),
+  {
+    default: () => ({ meta: 0, data: [] as ClassSimple[] }),
+  },
+);
 </script>
 
 <style>

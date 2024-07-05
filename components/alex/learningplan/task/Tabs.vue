@@ -47,12 +47,14 @@ interface TaskTabsProps {
     isLoading?: boolean;
   };
   isSendingMessage?: boolean;
+  members?: boolean;
 }
 const props = withDefaults(defineProps<TaskTabsProps>(), {
   submission: false,
   selectorParent: undefined,
   message: () => ({ isLoading: false }),
   isSendingMessage: false,
+  members: false,
 });
 const activePage = defineModel({ required: true, default: '1' });
 const attachedMessage = defineModel<Message>('attachedMessage');

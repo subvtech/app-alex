@@ -15,7 +15,7 @@
         size="large"
         variant="secondary"
         prepend-icon="mdi-plus"
-        @click="openDialog(undefined)"
+        @click="handleOpenCreateGroup()"
         >{{
           $t('components.learningPlan.drawer.task.dialog.newGroup')
         }}</alex-custom-button
@@ -52,16 +52,16 @@
   </alex-custom-dialog>
 
   <alex-learningplan-task-dialog-create-group
-    v-model="groupDialog"
+    v-model="addGroupDialog"
     :learning-plan-id="props.learningplanId"
     :classes="classes.data"
     :group="groupInfo"
   />
-  <!-- <alex-learningplan-task-dialog-edit-group
+  <alex-learningplan-task-dialog-edit-group
     v-model="groupDialog"
     :group="groupInfo"
     :all-groups="allGroups"
-  /> -->
+  />
 </template>
 
 <script setup lang="ts">
@@ -79,6 +79,7 @@ const strapi = useStrapiUtils();
 
 // Dialog
 const groupDialog = ref<boolean>(false);
+const addGroupDialog = ref<boolean>(false);
 const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const allGroups = ref<LearningPlanGroupSimple[]>([]);
 
@@ -91,6 +92,10 @@ function openDialog(
   groupDialog.value = true;
   groupInfo.value = group;
   allGroups.value = lpGroups || [];
+}
+
+function handleOpenCreateGroup() {
+  addGroupDialog.value = true;
 }
 
 const getGroups = (learningplanId: number) =>
