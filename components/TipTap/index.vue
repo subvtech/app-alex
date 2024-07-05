@@ -44,6 +44,7 @@ import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import BubbleMenu from '@tiptap/extension-bubble-menu';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
@@ -100,6 +101,9 @@ onMounted(() => {
           duration: 100,
           theme: 'transparent',
         },
+      }),
+      Placeholder.configure({
+        placeholder: 'Type / to choose a block',
       }),
       Commands.configure({
         suggestion,
@@ -316,5 +320,13 @@ watch(
       color: rgb(var(--v-theme-gray-900)) !important;
     }
   }
+}
+
+.is-empty::before {
+  color: rgb(var(--v-theme-gray-300));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
 </style>

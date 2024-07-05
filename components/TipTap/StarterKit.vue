@@ -239,8 +239,6 @@ watch(
   border-radius: 8px;
 }
 
-
-
 .collaboration-cursor__caret {
   border-left: 1px solid #0d0d0d;
   border-right: 1px solid #0d0d0d;
