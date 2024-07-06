@@ -47,9 +47,11 @@
       v-if="selectedTask?.task"
       v-model="detailsDrawer"
       :task-id="selectedTask.task.id"
+      :learningplan-id="learningplanId"
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
       :trail="selectedTask.task.trail"
+      :group="selectedTask.group"
       :status="selectedTask.status"
       :blocks="selectedTask.task.blocks"
       :type="selectedTask.task.type || undefined"
@@ -116,7 +118,10 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
       learning_plan_group: {
         populate: {
           group_members: {
-            populate: ['student_member.user.avatar'],
+            populate: [
+              'student_member.user.avatar',
+              'student_member.learning_class',
+            ],
           },
           learning_class: true,
         },
@@ -174,12 +179,17 @@ const { data: tasks, execute } = await useAsyncData(
                   image: {
                     url: member.student_member.user.avatar?.url,
                   },
+                  learning_class: member.student_member.learning_class?.name,
+                  role: member.role,
                 }),
               }),
             ),
           },
         }),
-        studentClass: task?.learning_plan_member?.learning_class?.name || '',
+        studentClass:
+          task?.learning_plan_member?.learning_class?.name ||
+          task.learning_plan_group?.learning_class?.name ||
+          '',
         task: task.task,
         submissions: task.task_submissions,
       })) as TaskStudent[];

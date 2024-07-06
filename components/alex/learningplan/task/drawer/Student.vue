@@ -143,7 +143,7 @@
               <alex-learningplan-task-submission
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
-                :task-title="taskTitle"
+                :task-title="task.title"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
@@ -184,13 +184,24 @@
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
         :is-sending-message="isSendingMessage"
-        :task-member-id="taskMemberId"
+        :task-member="{
+          id: taskMemberId,
+        }"
+        :show-member-tab="!!group"
         :message="{ isLoading: pendingMessages }"
         :event="{ events: events.data, isLoading: eventLoading }"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :submissions="evaluatedSubmissions"
-      />
+      >
+        <template #members>
+          <alex-learningplan-task-members
+            list-group-members
+            :learningplan-id="learningplanId"
+            :task-id="task.id"
+          />
+        </template>
+      </alex-learningplan-task-tabs>
     </template>
 
     <template v-if="activePage === '3'" #append>
@@ -226,10 +237,17 @@ interface Submission {
   constraints: string[];
 }
 interface TaskUserDrawerProps {
+  learningplanId: number;
+  task: {
+    id: number;
+    title: string;
+    startDate?: string | null;
+    endDate?: string | null;
+    sendAfterDeadline?: boolean;
+  };
+  taskMemberId: number;
   student?: Student;
   group?: LearningPlanGroupSimple;
-  taskTitle: string;
-  taskMemberId: number;
   status: TaskMemberStatus;
   finishAt?: string | null;
   submission?: Submission;
@@ -255,7 +273,7 @@ type Emit = {
 const emit = defineEmits<Emit>();
 const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline);
 const finishAt = toRef(props.finishAt);
-const activePage = ref('1');
+const activePage = ref(props.group ? '0' : '1');
 const initials = computed(() => {
   return getInitials(props.student?.name || '');
 });
@@ -308,7 +326,6 @@ const getEvents = (memberID: number) =>
       },
     },
   });
-
 const {
   data: submissions,
   execute: executeSubmissions,
@@ -491,10 +508,10 @@ watch(model, (value) => {
     executeMessages();
     return;
   }
-  submissions.value = { data: [], meta: { total: 0 } };
-  events.value = { data: [], meta: { total: 0 } };
-  activePage.value = '1';
+  submissions.value.data = [];
+  events.value.data = [];
   messages.value.data = [];
+  activePage.value = props.group ? '0' : '1';
 });
 watch(activePage, (value) => {
   if (value === '3') {

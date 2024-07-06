@@ -41,6 +41,12 @@
       :avatar-items="member.participants"
       class="tw-ml-2"
     />
+    <alex-custom-chip
+      v-if="member.responsable"
+      status="primary"
+      text="Responsável"
+      size="x-small"
+    />
     <alex-custom-button
       v-if="edit && member.group"
       icon="mdi-pencil-outline"
@@ -49,7 +55,7 @@
       @click.stop="$emit('edit-click')"
     />
     <alex-custom-button
-      v-if="edit"
+      v-if="edit && !member.responsable"
       icon="mdi-trash-can-outline"
       size="small"
       variant="text"

@@ -14,7 +14,7 @@
     :loading="true"
   >
     <!-- Header -->
-    <template #header>
+    <template v-if="!listGroupMembers" #header>
       <div class="header d-flex tw-align-center py-4 px-2">
         <alex-inputs-text-field
           v-model="search"
@@ -64,35 +64,57 @@
     </template>
     <!-- Cards -->
     <template #default="{ items }">
-      <alex-learningplan-task-members-card
-        v-for="member in items"
-        :key="`student-member${member.raw.id}`"
-        :member="{
-          name:
-            member.raw.learning_plan_member?.user.fullname ||
-            member.raw.learning_plan_group?.title,
-          class:
-            member.raw.learning_plan_member?.learning_class?.name ||
-            member.raw.learning_plan_group?.learning_class.name,
-          avatarUrl: member.raw.learning_plan_member?.user.avatar?.url,
-          group: !!member.raw.learning_plan_group,
-          participants: member.raw.learning_plan_group
-            ? getMembersOfGroup(member.raw.learning_plan_group)
-            : undefined,
-        }"
-        :edit="edit"
-        @remove-click="removeMember(member.raw)"
-        @edit-click="
-          () => handleEditClick(member.raw.learning_plan_group, items)
-        "
-        @to-profile="
-          member.raw.learning_plan_member
-            ? navigateTo(
-                `/users/${member.raw.learning_plan_member.user.username}`,
-              )
-            : undefined
-        "
-      />
+      <template v-if="!listGroupMembers">
+        <alex-learningplan-task-members-card
+          v-for="member in items"
+          :key="`student-member${member.raw.id}`"
+          :member="{
+            name:
+              member.raw.learning_plan_member?.user.fullname ||
+              member.raw.learning_plan_group?.title,
+            class:
+              member.raw.learning_plan_member?.learning_class?.name ||
+              member.raw.learning_plan_group?.learning_class.name,
+            avatarUrl: member.raw.learning_plan_member?.user.avatar?.url,
+            group: !!member.raw.learning_plan_group,
+            participants: member.raw.learning_plan_group
+              ? getMembersOfGroup(member.raw.learning_plan_group)
+              : undefined,
+          }"
+          :edit="edit"
+          @remove-click="removeMember(member.raw)"
+          @edit-click="
+            () => handleEditClick(member.raw.learning_plan_group, items)
+          "
+          @to-profile="
+            member.raw.learning_plan_member
+              ? navigateTo(
+                  `/users/${member.raw.learning_plan_member.user.username}`,
+                )
+              : undefined
+          "
+        />
+      </template>
+      <template v-else>
+        <template
+          v-for="member in items"
+          :key="`student-member${member.raw.id}`"
+        >
+          <alex-learningplan-task-members-card
+            v-for="groupMember in member.raw.learning_plan_group.group_members"
+            :key="`group-member${groupMember.id}`"
+            :member="{
+              name: groupMember.student_member.user.fullname,
+              class: member.raw.learning_plan_group?.learning_class.name,
+              avatarUrl: groupMember.student_member.user.avatar?.url,
+              responsable: groupMember.role === 'in_charge',
+            }"
+            :edit="false"
+            @to-profile="
+              navigateTo(`/users/${groupMember.student_member.user.username}`)
+            "
+        /></template>
+      </template>
     </template>
     <template #no-data>
       <div
@@ -137,6 +159,7 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 interface MembersProps {
   learningplanId: number;
   taskId: number;
+  listGroupMembers?: boolean;
   type?: TaskType | null;
   startAt?: string | null;
   finishAt?: string | null;
@@ -151,6 +174,7 @@ const props = withDefaults(defineProps<MembersProps>(), {
   type: null,
   blockDelete: false,
   edit: true,
+  listGroupMembers: false,
 });
 
 type Emits = {
@@ -302,11 +326,14 @@ const removeMember = async (member: TaskMember) => {
       );
       return;
     }
+    const memberName = member.learning_plan_member
+      ? member.learning_plan_member?.user?.fullname
+      : member.learning_plan_group?.title;
     await strapi.delete('task-members', member.id);
     setTimeout(refresh, 100);
     setMessage(
       t('components.learningPlan.drawer.task.removeMember', {
-        member: member.learning_plan_member?.user?.fullname,
+        member: memberName,
       }),
       'success',
       true,

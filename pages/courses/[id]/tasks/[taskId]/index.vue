@@ -73,6 +73,15 @@
           : [],
         description: taskStore.task.submission_description,
       }"
+      :task="{
+        id: taskStore.task.id,
+        title: taskStore.task.title,
+        startDate: taskStore.task.start_at,
+        endDate: taskStore.task.finish_at,
+        sendAfterDeadline: taskStore.task.can_submit_after_deadline,
+      }"
+      :type="studentDetails?.task?.type"
+      :learningplan-id="learningPlanStore.learningPlan.id"
       :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
       :can-submit-after-deadline="studentDetails.can_submit_after_deadline"
       :task-member-id="studentDetails.id"

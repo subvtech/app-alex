@@ -92,9 +92,11 @@ const dateColor = computed(() => {
   return mapedColors[props.status] as 'secondary' | 'blue' | 'orange' | 'green';
 });
 const formattedDate = computed(() =>
-  format(props.date, `d MMM y`, {
-    locale: i18n.locale.value === 'pt' ? ptBR : enIN,
-  }),
+  props.date
+    ? format(props.date, `d MMM y`, {
+        locale: i18n.locale.value === 'pt' ? ptBR : enIN,
+      })
+    : '',
 );
 </script>
 
