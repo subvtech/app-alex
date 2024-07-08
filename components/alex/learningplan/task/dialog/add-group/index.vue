@@ -60,7 +60,7 @@
     :can-submit-after="canSubmitAfter"
     :classes="classes.data"
     :group="groupInfo"
-    @add-group="execute()"
+    @add-group="handleAddGroup"
   />
   <alex-learningplan-task-dialog-edit-group
     v-model="groupDialog"
@@ -71,7 +71,7 @@
     :can-submit-after="canSubmitAfter"
     :group="groupInfo"
     :all-groups="allGroups"
-    @add-group="execute()"
+    @add-group="handleAddGroup"
   />
 </template>
 
@@ -89,7 +89,7 @@ const props = defineProps<AddStudent>();
 type Emits = {
   'add-group': [id: number];
 };
-defineEmits<Emits>();
+const emit = defineEmits<Emits>();
 const strapi = useStrapiUtils();
 
 // Dialog
@@ -114,6 +114,11 @@ function handleOpenCreateGroup() {
   groupInfo.value = undefined;
 }
 
+function handleAddGroup() {
+  emit('add-group', 0);
+  execute();
+}
+
 const getGroups = (learningplanId: number) =>
   strapi.find<ClassSimple>('classes', {
     populate: [
@@ -121,22 +126,10 @@ const getGroups = (learningplanId: number) =>
       'learning_plan_groups.learning_class',
       'learning_plan_members',
       'learning_plan_members.user.fullname',
+      'learning_plan_members.user.avatar',
       'learning_plan_groups.task_members',
     ],
-    filters: {
-      $and: [
-        { learningplan: learningplanId },
-        {
-          learning_plan_groups: {
-            task_members: {
-              id: {
-                $null: true,
-              },
-            },
-          },
-        },
-      ],
-    },
+    filters: { learningplan: learningplanId },
   });
 const { data: classes, execute } = await useAsyncData(
   'classes-member-invite',
