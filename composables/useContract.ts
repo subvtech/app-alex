@@ -108,9 +108,13 @@ export const useContracts = () => {
       const contract = await contractFactory.deploy({
         value: budgetInWei,
       });
-      console.log({ contractAddress: contract.target });
-      if (!contract) throw new Error('failed to create contract');
+      await contract.waitForDeployment();
 
+      if (!contract) throw new Error('failed to create contract');
+      const balance = await getContractBalance(
+        contract.target as string | null,
+      );
+      console.log({ createdContractBalance: balance });
       loading.value = false;
       return contract.target;
     } catch (err) {
@@ -202,7 +206,9 @@ export const useContracts = () => {
       );
       const tx = await TaskContract.cancelDeal();
       await tx.wait(); // Wait for the transaction to be mined
+
       console.log('The contract was cancelled successfully!');
+
       return true;
     } catch (error) {
       console.error('Error:', error);

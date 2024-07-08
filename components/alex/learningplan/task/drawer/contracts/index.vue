@@ -63,6 +63,7 @@
         </div>
       </div>
       <div class="mt-6" />
+
       <alex-learningplan-task-drawer-contracts-create-contract-form
         v-if="(isThereAContract && isThereBalance) || !isThereAContract"
         :is-draft="isDraft"
@@ -130,23 +131,22 @@ const canEdit = ref(isThereAContract.value || isUpdatingContract.value);
 
 const taskMemberStudents = computed(() => {
   return props.taskMembers.flatMap(
-    (member) => member.task_member_students?.map((m) => m.student_member) || [],
+    (member) =>
+      member.task_member_students?.map((m) => {
+        return { taskStatus: member.status, ...m };
+      }) || [],
   );
 });
 
 const taskWallets = computed(() => {
   return taskMemberStudents.value
-    .map((m) => m.user?.wallet?.address)
+    .filter((m) => m.taskStatus === 'done')
+    .map((m) => m.student_member?.user?.wallet?.address)
     .filter(Boolean); // Check for null or undefined values
 });
 
 const taskGrades = computed(() => {
   return taskWallets.value.map(() => Math.floor(Math.random() * 11));
-});
-
-onMounted(async () => {
-  console.log('onMounted');
-  await fetchContractBalance();
 });
 
 watch(isThereAContract, async () => {
@@ -160,20 +160,14 @@ watch(isThereBalance, () => {
   console.log('is there Balance', isThereBalance.value);
 });
 
-watch(contractAddress, async () => {
+watch(contractAddress, () => {
   console.log('contractAddress has changed');
-  console.log({ contractAddress: contractAddress.value });
-  await fetchContractBalance();
 });
 
 const fetchContractBalance = async () => {
   if (!contractAddress.value) return;
   const balance = await getContractBalance(contractAddress.value);
   console.log('fetchedBalance', { balance });
-  if (!Number(balance)) {
-    console.log('0n is false', balance);
-    return;
-  }
 
   contractBalance.value = weiToUsd(balance);
   console.log('newBalance', { newBalance: weiToUsd(balance) });

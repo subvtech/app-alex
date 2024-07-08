@@ -173,7 +173,7 @@
         v-model:status="status"
         v-model:contract-address="contractAddress"
         :edit="editable"
-        :task-members="taskMembers"
+        :task-members="members"
         @deploy:contract-draft="(cb) => (deployContract = cb)"
         @cancel:contract-draft="deployContract = null"
         @update:contract-address="handleUpdateContract"
@@ -440,6 +440,14 @@ const updateTaskValues = async (
       learning_goals: goals.value,
       allowed_editor_plugins: restrictions.value,
     } as Partial<TaskSimple>;
+
+    if (deployContract.value && status.value !== 'draft') {
+      const newContractAddress = await deployContract.value();
+      if (!newContractAddress) return;
+      await addTaskContractAddress(props.taskId, newContractAddress as string);
+      deployContract.value = null;
+      contractAddress.value = newContractAddress;
+    }
     await strapi.update('tasks', taskId, values);
     emit('change-values', valuesEmit);
   } catch (error) {
@@ -494,21 +502,7 @@ useOnStopTyping(
       await strapi.update('tasks', props.taskId, {
         title: value || '',
       });
-      console.log({
-        status: status.value,
-        deployContract: deployContract.value,
-      });
-      if (deployContract.value && status.value !== 'draft') {
-        const newContractAddress = await deployContract.value();
-        if (!newContractAddress) return;
-        await addTaskContractAddress(
-          props.taskId,
-          newContractAddress as string,
-        );
-        deployContract.value = null;
-        contractAddress.value = newContractAddress;
-      }
-      emit('change-values', values as ChangeValues);
+      emit('change-title', value || '');
     } catch (error) {
       notifyFieldError('submissionDescription');
     }
@@ -517,6 +511,7 @@ useOnStopTyping(
   false,
   false,
 );
+
 watch(endDate, async (value) => {
   if (!value) return;
   if (
@@ -566,6 +561,13 @@ watch(type, async (value) => {
 });
 watch(status, async (value) => {
   if (!value) return;
+  if (deployContract.value && status.value !== 'draft') {
+    const newContractAddress = await deployContract.value();
+    if (!newContractAddress) return;
+    await addTaskContractAddress(props.taskId, newContractAddress as string);
+    deployContract.value = null;
+    contractAddress.value = newContractAddress;
+  }
   await updateTaskValues(taskId.value, {
     status: value,
   });

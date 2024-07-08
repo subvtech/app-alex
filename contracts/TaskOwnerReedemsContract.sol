@@ -7,8 +7,6 @@ pragma solidity ^0.8.19;
 contract TaskOwnerReedemsContract {
     address payable public owner;
 
-    event Withdrawal(address payable[] _students, uint when);
-
     constructor() payable {
         require(msg.value > 0, 'Reward must be greater than zero');
 
@@ -53,7 +51,6 @@ contract TaskOwnerReedemsContract {
             require(success, 'Transfer failed.');
         }
         owner.transfer(address(this).balance);
-        emit Withdrawal(_students, block.timestamp);
     }
 
     function cancelDeal() public payable {

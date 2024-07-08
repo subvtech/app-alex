@@ -114,7 +114,7 @@
     :start-date="taskDetails?.start_at"
     :end-date="taskDetails?.finish_at"
     :restrictions="taskDetails?.allowed_editor_plugins"
-    :task-members="taskDetails?.task_members"
+    :members="taskDetails?.task_members"
     :editable="true"
     :kanban-button="true"
     @change-goals="handleChangeGoals"
@@ -174,7 +174,7 @@ const props = defineProps<{
   filter: filterType | undefined;
 }>();
 
-const { create, delete: _delete, update } = useStrapi();
+const { create, delete: _delete, update, findOne } = useStrapi();
 const { find } = useStrapiUtils();
 const client = useStrapiClient();
 const { t } = useI18n();
@@ -382,7 +382,9 @@ const handleDeleteTask = async (id: number) => {
     if (typeof deleteIndex === 'number' && deleteIndex > -1) {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
     }
-    await _delete('tasks', id);
+    const taskTobeDeleted = await findOne('tasks', id);
+    console.log(taskTobeDeleted);
+    // await _delete('tasks', id);
     displaySuccess('deleteSuccess');
   } catch (e) {
     displayError('deleteError');
