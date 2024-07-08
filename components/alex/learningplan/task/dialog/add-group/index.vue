@@ -121,9 +121,21 @@ const getGroups = (learningplanId: number) =>
       'learning_plan_groups.learning_class',
       'learning_plan_members',
       'learning_plan_members.user.fullname',
+      'learning_plan_groups.task_members',
     ],
     filters: {
-      learningplan: learningplanId,
+      $and: [
+        { learningplan: learningplanId },
+        {
+          learning_plan_groups: {
+            task_members: {
+              id: {
+                $null: true,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 const { data: classes, execute } = await useAsyncData(
@@ -135,6 +147,12 @@ const { data: classes, execute } = await useAsyncData(
 );
 
 const filteredClasses = computed(() => {
+  classes.value.data = classes.value.data.map((classValue) => ({
+    ...classValue,
+    learning_plan_groups: classValue.learning_plan_groups?.filter(
+      (group) => !group.task_members?.length,
+    ),
+  }));
   if (!search.value) return classes.value.data;
   const lowerCaseSearch = search.value.toLowerCase();
 

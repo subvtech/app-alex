@@ -41,7 +41,7 @@
           :start-at="startAt"
           :finish-at="finishAt"
           :can-submit-after="props.sendAfterDeadline"
-          @add-group="(id: number) => addGroup(id)"
+          @add-group="(id: number) => console.log(id)"
         />
 
         <alex-custom-dropdown :items="typeOptions" :disabled="!!type">
@@ -355,16 +355,6 @@ const removeMember = async (member: TaskMember) => {
       true,
     );
   }
-};
-const addGroup = async (id: number) => {
-  await strapi.create('task-members', {
-    status: 'to_do',
-    can_submit_after_deadline: true,
-    finished_at: props.finishAt,
-    started_at: props.startAt,
-    task: props.taskId,
-    learning_plan_group: id,
-  });
 };
 
 const getMembersOfGroup = (group: LearningPlanGroupSimple) =>

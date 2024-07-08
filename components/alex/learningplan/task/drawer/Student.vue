@@ -195,10 +195,16 @@
         :submissions="evaluatedSubmissions"
       >
         <template #members>
-          <alex-learningplan-task-members
-            list-group-members
-            :learningplan-id="learningplanId"
-            :task-id="task.id"
+          <alex-learningplan-task-members-card
+            v-for="member in group?.group_members"
+            :key="`group-member${member.id}`"
+            :member="{
+              name: member.student_member.user.fullname,
+              class: group?.learning_class?.name,
+              avatarUrl: member.student_member.user?.avatar?.url,
+              responsable: member.role === 'in_charge',
+            }"
+            :edit="false"
           />
         </template>
       </alex-learningplan-task-tabs>
