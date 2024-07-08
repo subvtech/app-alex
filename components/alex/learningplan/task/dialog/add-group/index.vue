@@ -54,19 +54,34 @@
   <alex-learningplan-task-dialog-create-group
     v-model="addGroupDialog"
     :learning-plan-id="props.learningplanId"
+    :task-id="taskId"
+    :start-at="startAt"
+    :finish-at="finishAt"
+    :can-submit-after="canSubmitAfter"
     :classes="classes.data"
     :group="groupInfo"
+    @add-group="execute()"
   />
   <alex-learningplan-task-dialog-edit-group
     v-model="groupDialog"
+    :learning-plan-id="props.learningplanId"
+    :task-id="taskId"
+    :start-at="startAt"
+    :finish-at="finishAt"
+    :can-submit-after="canSubmitAfter"
     :group="groupInfo"
     :all-groups="allGroups"
+    @add-group="execute()"
   />
 </template>
 
 <script setup lang="ts">
 interface AddStudent {
   learningplanId: number;
+  taskId: number;
+  startAt: string | null;
+  finishAt: string | null;
+  canSubmitAfter: boolean;
 }
 
 const model = defineModel<boolean>({ required: true });
@@ -96,6 +111,7 @@ function openDialog(
 
 function handleOpenCreateGroup() {
   addGroupDialog.value = true;
+  groupInfo.value = undefined;
 }
 
 const getGroups = (learningplanId: number) =>

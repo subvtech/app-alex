@@ -70,7 +70,8 @@
         "missName": "Informe o nome do grupo",
         "updated": "Grupo atualizado com sucesso",
         "created": "Grupo criado com sucesso",
-        "updateError": "Falha ao atualizar grupo"
+        "updateError": "Falha ao atualizar grupo",
+        "createError": "Falha ao criar grupo"
       }
     },
     "submission": {

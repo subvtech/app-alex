@@ -37,6 +37,10 @@
           v-else-if="type === 'group'"
           v-model="addGroupDialog"
           :learningplan-id="props.learningplanId"
+          :task-id="taskId"
+          :start-at="startAt"
+          :finish-at="finishAt"
+          :can-submit-after="props.sendAfterDeadline"
           @add-group="(id: number) => addGroup(id)"
         />
 
@@ -58,8 +62,13 @@
       <alex-learningplan-task-dialog-create-group
         v-model="groupDialog"
         :learning-plan-id="props.learningplanId"
+        :task-id="props.taskId"
+        :start-at="props.startAt"
+        :finish-at="props.finishAt"
+        :can-submit-after="props.sendAfterDeadline"
         :classes="classes.data"
         :group="groupInfo"
+        @add-group="refresh()"
       />
     </template>
     <!-- Cards -->
@@ -402,6 +411,12 @@ const { data: classes } = await useAsyncData(
     default: () => ({ meta: 0, data: [] as ClassSimple[] }),
   },
 );
+
+watch(addGroupDialog, (value) => {
+  if (!value) {
+    refresh();
+  }
+});
 </script>
 
 <style>

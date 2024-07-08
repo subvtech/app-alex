@@ -127,12 +127,18 @@ const model = defineModel<boolean>({ required: true });
 
 interface CompProps {
   learningPlanId: number;
+  taskId: number;
+  startAt?: string | null;
+  finishAt?: string | null;
+  canSubmitAfter?: boolean;
   classes: ClassSimple[];
   // Se essa props estiver definida, está no modo editar
   group?: LearningPlanGroupSimple;
 }
 
 const props = defineProps<CompProps>();
+
+const emit = defineEmits(['add-group']);
 
 const learningClass = ref<string | undefined>(undefined);
 const name = ref<string>('');
@@ -259,30 +265,41 @@ async function saveGroup() {
     (group) => group.name === learningClass.value,
   );
 
-  const data = {
+  const groupInfo = {
     title: name.value,
     learningplan: props.learningPlanId,
     learning_class: selectedClass?.id || 0,
     group_members: membersData,
   };
 
-  if (props.group) {
-    strapi.update('learnin-plan-groups', props.group.id, data);
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.updated'),
-      'success',
-      true,
-    );
-  } else {
-    await strapi.create('learnin-plan-groups', data);
+  try {
+    const { data } = await strapi.create('learnin-plan-groups', groupInfo);
+
+    await strapi.create('task-members', {
+      status: 'to_do',
+      can_submit_after_deadline:
+        props.canSubmitAfter !== undefined ? props.canSubmitAfter : true,
+      started_at: props.startAt || null,
+      finished_at: props.finishAt || null,
+      task: props.taskId,
+      learning_plan_group: data.id,
+    });
+
+    emit('add-group');
     setMessage(
       t('components.learningPlan.drawer.task.dialog.message.created'),
       'success',
       true,
     );
+  } catch (e) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.createError'),
+      'error',
+      true,
+    );
+  } finally {
+    model.value = false;
   }
-
-  model.value = false;
 }
 
 // Fazer função

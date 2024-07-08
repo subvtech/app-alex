@@ -84,11 +84,18 @@
 
 <script setup lang="ts">
 interface CompProps {
+  learningPlanId: number;
+  taskId: number;
+  startAt?: string | null;
+  finishAt?: string | null;
+  canSubmitAfter?: boolean;
   group?: LearningPlanGroupSimple; // Tirar opcional
   allGroups: LearningPlanGroupSimple[];
 }
 
 const props = defineProps<CompProps>();
+
+const emit = defineEmits(['add-group']);
 
 const model = defineModel<boolean>({ required: true });
 
@@ -153,30 +160,46 @@ async function updateGroup() {
     return;
   }
 
-  const membersData = [...members.value, responsible.value].map(
-    ({ id, role }) => ({
-      member_id: id,
-      role,
-    }),
-  );
+  const membersData = [...members.value, responsible.value].map((member) => ({
+    member_id: member.student_member.id,
+    role: member.role,
+  }));
 
-  await strapi
-    .update('learnin-plan-groups', props.group?.id || 0, membersData)
-    .then(() => {
-      setMessage(
-        t('components.learningPlan.drawer.task.dialog.message.updated'),
-        'success',
-        true,
-      );
-      model.value = false;
-    })
-    .catch(() =>
-      setMessage(
-        t('components.learningPlan.drawer.task.dialog.message.updateError'),
-        'error',
-        true,
-      ),
+  const groupInfo = {
+    title: props.group?.title || '',
+    learningplan: props.learningPlanId,
+    learning_class: props.group?.learning_class?.id || 0,
+    group_members: membersData,
+  };
+
+  try {
+    const { data } = await strapi.create('learnin-plan-groups', groupInfo);
+
+    await strapi.create('task-members', {
+      status: 'to_do',
+      can_submit_after_deadline:
+        props.canSubmitAfter !== undefined ? props.canSubmitAfter : true,
+      started_at: props.startAt || null,
+      finished_at: props.finishAt || null,
+      task: props.taskId,
+      learning_plan_group: data.id,
+    });
+
+    emit('add-group');
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.created'),
+      'success',
+      true,
     );
+  } catch (e) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.createError'),
+      'error',
+      true,
+    );
+  } finally {
+    model.value = false;
+  }
 }
 
 watch(model, () => {
