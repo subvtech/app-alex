@@ -2520,6 +2520,13 @@
     "@testing-library/dom" "^9.0.1"
     "@vue/test-utils" "^2.3.1"
 
+"@tiptap-pro/extension-unique-id@^2.9.3":
+  version "2.9.3"
+  resolved "https://registry.tiptap.dev/@tiptap-pro%2fextension-unique-id/-/extension-unique-id-2.9.3.tgz#0bc37a1f4bf8d5e81b366f57f12079520a5210d5"
+  integrity sha512-PI/YbQ8/k9Uk+fp7erKqRgl9lWOS4Q46CT36KjLzZnsrnQL8sJFI/w+IJjVrD08yOFpir2whLh76xwi5JqUYeA==
+  dependencies:
+    uuid "^10.0.0"
+
 "@tiptap/core@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@tiptap/core/-/core-2.4.0.tgz#6f8eee8beb5b89363582366b201ccc4798ac98a9"
@@ -13513,6 +13520,11 @@ utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
+
+uuid@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
+  integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
 uuid@^8.3.2:
   version "8.3.2"

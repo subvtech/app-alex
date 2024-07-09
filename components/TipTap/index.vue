@@ -8,55 +8,36 @@
     </div>
 
     <div class="bubble-menu-wrapper">
-      <!-- <bubble-menu
-        v-if="editor"
-        :editor="editor"
-        :tippy-options="{ duration: 100 }"
-      > -->
-      <div class="bubble-menu text-dark-gray text-body-3 pa-3 d-flex ga-2">
-        <button
-          :class="{ 'is-active': editor?.isActive('bold') }"
-          @click="editor.chain().focus().toggleBold().run()"
-        >
-          Bold
-        </button>
-        <button
-          :class="{ 'is-active': editor?.isActive('italic') }"
-          @click="editor.chain().focus().toggleItalic().run()"
-        >
-          Italic
-        </button>
-        <button
-          :class="{ 'is-active': editor?.isActive('strike') }"
-          @click="editor.chain().focus().toggleStrike().run()"
-        >
-          Strike
-        </button>
-      </div>
-      <!-- </bubble-menu> -->
+      <tip-tap-bubble-menu :editor="editor" />
     </div>
     <editor-content :editor="editor" />
   </div>
 </template>
 
-<script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
-import StarterKit from '@tiptap/starter-kit';
-import Collaboration from '@tiptap/extension-collaboration';
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
-import Placeholder from '@tiptap/extension-placeholder';
+<script setup lang="ts">
+// import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { StarterKit } from '@tiptap/starter-kit';
+import { Collaboration } from '@tiptap/extension-collaboration';
+import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
+import { Placeholder } from '@tiptap/extension-placeholder';
+import { UniqueID } from '@tiptap-pro/extension-unique-id';
 import { Editor, EditorContent } from '@tiptap/vue-3';
-import BubbleMenu from '@tiptap/extension-bubble-menu';
+import { BubbleMenu } from '@tiptap/extension-bubble-menu';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
-// import { WebrtcProvider } from 'y-webrtc';
 import * as Y from 'yjs';
 
 import Commands from './slash-menu/commands.js';
 import suggestion from './slash-menu/suggestion.js';
 
-const doc = new Y.Doc();
+import FileSet from './file-set/Extension';
 
-const editor = ref(null);
+const doc = new Y.Doc();
+const strapiClient = useStrapiClient();
+const app = useNuxtApp();
+// const mediaToDelete = ref<number[]>([]);
+const temporaryMedia = ref<number[]>([]);
+
+const editor = ref();
 const isEditable = ref(true);
 
 const collors = [
@@ -77,9 +58,10 @@ const collors = [
 onMounted(() => {
   const user = useStrapiUser();
   const provider = new TiptapCollabProvider({
-    name: encodeURIComponent('document.name'), // Unique document identifier for syncing. This is your document name.
-    appId: '7j9y6m10', // Your Cloud Dashboard AppID or `baseURL` for on-premises
-    token: 'notoken', // Your JWT token
+    name: encodeURIComponent('alex-tiptap'), // Unique document identifier for syncing. This is your document name.
+    appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
+    token:
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjAzOTYzNjUsIm5iZiI6MTcyMDM5NjM2NSwiZXhwIjoxNzIwNDgyNzY1LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.gk8cJlcWUPKIaxP9SYvyFFQHE3wpIbI3UXlVbBFjjeY', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
@@ -91,12 +73,15 @@ onMounted(() => {
   });
 
   editor.value = new Editor({
+    editable: isEditable.value,
     extensions: [
       StarterKit.configure({
         history: false,
       }),
       BubbleMenu.configure({
-        element: document.querySelector('.bubble-menu-wrapper'),
+        element: document.querySelector(
+          '.bubble-menu-wrapper',
+        ) as HTMLElement | null,
         tippyOptions: {
           duration: 100,
           theme: 'transparent',
@@ -107,6 +92,7 @@ onMounted(() => {
           if (node.type.name === 'paragraph') {
             return 'Type / to choose a block';
           }
+          return '';
         },
       }),
       Commands.configure({
@@ -120,6 +106,50 @@ onMounted(() => {
         user: {
           name: user.value ? user.value.username : 'Anonymous',
           color: collors[Math.floor(Math.random() * collors.length)],
+        },
+      }),
+      UniqueID.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      FileSet.configure({
+        uploadFiles: async (files: FileList) => {
+          const formData = new FormData();
+          const filesArray: File[] = Array.from(files);
+          filesArray.forEach((file: File) => {
+            formData.append('files', file, file.name);
+          });
+          try {
+            const res = await strapiClient<Upload[]>('/upload', {
+              method: 'POST',
+              body: formData,
+            });
+
+            return {
+              success: 1,
+              files: res.map((file) => {
+                temporaryMedia.value.push(file.id);
+                return {
+                  title:
+                    file.name?.slice(0, file.name?.lastIndexOf('.')) ||
+                    'Untitled',
+                  extension: file.ext?.slice(1) || 'file',
+                  size: file.size || 0,
+                  id: file.id,
+                  url: file.url,
+                };
+              }),
+            };
+          } catch (error) {
+            return {
+              success: 0,
+              error: error instanceof Error ? error.message : String(error),
+            };
+          }
+        },
+        handleDeletedFiles: (id: string) => {
+          strapiClient(`/upload/files/${id}`, {
+            method: 'DELETE',
+          });
         },
       }),
     ],
@@ -198,6 +228,14 @@ watch(
     }
   }
 
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
   /* Heading styles */
   h1,
   h2,
@@ -260,9 +298,10 @@ watch(
   }
 
   blockquote {
-    border-left: 3px solid rgb(var(--v-theme-gray-300));
+    border-left: 3px solid rgb(var(--v-theme-secondary--1));
     margin: 1.5rem 0;
     padding-left: 1rem;
+    color: rgb(var(--v-theme-gray-600)) !important;
   }
 
   hr {
@@ -299,31 +338,6 @@ watch(
   top: -1.4em;
   user-select: none;
   white-space: nowrap;
-}
-
-.bubble-menu {
-  background: #fff;
-  border: 1px solid rgb(var(--v-theme-gray-100));
-  overflow: auto;
-  position: relative;
-
-  button {
-    align-items: center;
-    gap: 0.25rem;
-    transition: all 0.2s ease;
-    padding: 6px;
-    border-radius: 4px;
-
-    &:hover {
-      background-color: #f5f5f5;
-      color: rgb(var(--v-theme-gray-900)) !important;
-    }
-
-    &.is-active {
-      background-color: #e5e5e5;
-      color: rgb(var(--v-theme-gray-900)) !important;
-    }
-  }
 }
 
 .is-empty::before {

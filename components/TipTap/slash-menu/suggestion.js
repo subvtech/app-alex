@@ -47,15 +47,38 @@ export default {
         },
       },
       {
-        title: 'Bold',
+        title: 'Blockquote',
+        icon: 'mdi-format-quote-close-outline',
         command: ({ editor, range }) => {
-          editor.chain().focus().deleteRange(range).setMark('bold').run();
+          editor.chain().focus().deleteRange(range).toggleBlockquote().run();
         },
       },
       {
-        title: 'Italic',
+        title: 'Bullet List',
+        icon: 'mdi-format-list-bulleted',
         command: ({ editor, range }) => {
-          editor.chain().focus().deleteRange(range).setMark('italic').run();
+          editor.chain().focus().deleteRange(range).toggleBulletList().run();
+        },
+      },
+      {
+        title: 'Ordered List',
+        icon: 'mdi-format-list-numbered',
+        command: ({ editor, range }) => {
+          editor.chain().focus().deleteRange(range).toggleOrderedList().run();
+        },
+      },
+      {
+        title: 'fileSet',
+        icon: 'mdi-file-multiple',
+        command: ({ editor, range }) => {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .insertContent({
+              type: 'fileSet',
+            })
+            .run();
         },
       },
     ]
