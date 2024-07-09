@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-// import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
@@ -61,7 +60,7 @@ onMounted(() => {
     name: encodeURIComponent('alex-tiptap'), // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjAzOTYzNjUsIm5iZiI6MTcyMDM5NjM2NSwiZXhwIjoxNzIwNDgyNzY1LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.gk8cJlcWUPKIaxP9SYvyFFQHE3wpIbI3UXlVbBFjjeY', // Your JWT token
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA0ODUwNTAsIm5iZiI6MTcyMDQ4NTA1MCwiZXhwIjoxNzIwNTcxNDUwLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.FGqteWwLDkiEJqllxsW-4bahYxLbhfkOe0lRwBVGBag', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
