@@ -89,9 +89,15 @@ export default {
         },
       },
     ]
-      .filter((item) =>
-        item.title.toLowerCase().startsWith(query.toLowerCase()),
-      )
+      .filter((item) => {
+        if (query) {
+          return (
+            item.title.toLowerCase().includes(query.toLowerCase()) &&
+            !item.divider
+          );
+        }
+        return true;
+      })
       .slice(0, 10);
   },
 
@@ -120,7 +126,7 @@ export default {
           showOnCreate: true,
           interactive: true,
           trigger: 'manual',
-          placement: 'auto-end',
+          placement: 'bottom-start',
           theme: 'transparent',
         });
       },
