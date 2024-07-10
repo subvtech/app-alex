@@ -15,23 +15,26 @@
 </template>
 
 <script setup lang="ts">
-import { StarterKit } from '@tiptap/starter-kit';
-import { Collaboration } from '@tiptap/extension-collaboration';
-import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
-import { Placeholder } from '@tiptap/extension-placeholder';
-import { UniqueID } from '@tiptap-pro/extension-unique-id';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
+
+import { Collaboration } from '@tiptap/extension-collaboration';
+import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
+
+import { StarterKit } from '@tiptap/starter-kit';
+import { Placeholder } from '@tiptap/extension-placeholder';
+import { UniqueID } from '@tiptap-pro/extension-unique-id';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
 import { ListItem } from '@tiptap/extension-list-item';
+import { FontFamily } from '@tiptap/extension-font-family';
+import { TextStyle } from '@tiptap/extension-text-style';
 
 import * as Y from 'yjs';
 
 import Commands from './slash-menu/commands.js';
 import suggestion from './slash-menu/suggestion.js';
-
 import FileSet from './file-set/Extension';
 
 const doc = new Y.Doc();
@@ -89,6 +92,16 @@ onMounted(() => {
           duration: 100,
           theme: 'transparent',
         },
+        updateDelay: 100,
+        // shouldShow: ({ editor, view, state, oldState, from, to }) => {
+        //   if (!view) {
+        //     return false;
+        //   }
+        //   const domAtPos = view.domAtPos(from || 0).node as HTMLElement;
+        //   const nodeDOM = view.nodeDOM(from || 0) as HTMLElement;
+        //   const node = nodeDOM || domAtPos;
+        //   return true;
+        // },
       }),
       Placeholder.configure({
         placeholder: ({ node }) => {
@@ -160,6 +173,8 @@ onMounted(() => {
         nested: true,
       }),
       ListItem,
+      TextStyle,
+      FontFamily,
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {

@@ -31,28 +31,28 @@
         </template>
       </MenubarContent>
     </MenubarMenu>
-    <!-- Text Font -->
+    <!-- Font Size -->
     <MenubarMenu>
       <MenubarTrigger>
-        <span>{{ activeTextSize?.name.split(' ', 1)[0] }}</span>
+        <span>{{ activeFontSize?.name.split(' ', 1)[0] }}</span>
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
       </MenubarTrigger>
       <MenubarContent>
         <MenubarItem
-          v-for="item in textSizeList"
+          v-for="item in fontSizeList"
           :key="`${item.name}-item`"
-          :data-highlighted="activeTextSize?.value === item.value"
+          :data-highlighted="activeFontSize?.value === item.value"
           :style="{ fontSize: item?.value }"
-          @select="activeTextSize = item"
+          @select="activeFontSize = item"
         >
           {{ item.name }}
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
-    <!-- Text Size -->
+    <!-- Font Family -->
     <MenubarMenu>
       <MenubarTrigger>
-        <span>{{ activeFontFamily?.name.split(' ', 1)[0] }}</span>
+        <span>{{ activeFontFamily }}</span>
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
       </MenubarTrigger>
       <MenubarContent>
@@ -67,9 +67,9 @@
           <MenubarItem
             v-else
             :key="`${item.name}-item`"
-            :data-highlighted="activeFontFamily?.value === item.value"
+            :data-highlighted="activeFontFamily === item.value"
             :style="{ fontFamily: item?.value }"
-            @select="activeFontFamily = item"
+            @select="setFontFamily(item.value || '')"
           >
             {{ item.name }}
           </MenubarItem>
@@ -189,7 +189,7 @@ const contentTypeList: menuItens[] = [
   },
 ];
 
-const textSizeList: menuItens[] = [
+const fontSizeList: menuItens[] = [
   {
     name: 'Smaller',
     value: '12px',
@@ -235,7 +235,7 @@ const fontFamilyList: menuItens[] = [
   },
   {
     name: 'Times New Roman',
-    value: 'Times New Roman',
+    value: 'Times',
   },
   {
     name: 'Georgia',
@@ -251,9 +251,22 @@ const fontFamilyList: menuItens[] = [
   },
 ];
 
+const setFontFamily = (fontFamily: string) => {
+  if (!fontFamily || fontFamily.length === 0) {
+    return props.editor.chain().focus().unsetFontFamily().run();
+  }
+  props.editor.chain().focus().setFontFamily(fontFamily).run();
+};
+
 const activeContentType = computed(() =>
   contentTypeList.find((item) => item.isActive?.()),
 );
-const activeTextSize = ref<menuItens | null>(textSizeList[2]);
-const activeFontFamily = ref<menuItens | null>(fontFamilyList[3]);
+const activeFontSize = ref<menuItens | null>(fontSizeList[2]);
+
+const activeFontFamily = computed(() => {
+  if (props.editor) {
+    return props.editor.getAttributes('textStyle')?.fontFamily || 'Sen';
+  }
+  return 'Sen';
+});
 </script>

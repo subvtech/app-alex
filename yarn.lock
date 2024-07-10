@@ -2596,6 +2596,11 @@
   dependencies:
     tippy.js "^6.3.7"
 
+"@tiptap/extension-font-family@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-font-family/-/extension-font-family-2.4.0.tgz#e66b36b11630cb68edee9553cf54b093db9af76b"
+  integrity sha512-viWyQJSxJBRn2ni7G2QgMdBqx7ysE60JBo0/1ptt5mD81+czaYYm8WkUNljljrIMV9djC8qGUlFqhI1Kx+ONaQ==
+
 "@tiptap/extension-gapcursor@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-gapcursor/-/extension-gapcursor-2.4.0.tgz#2a738509d40f5f856492c11e32b10e4462f71216"
@@ -2707,6 +2712,11 @@
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-task-list/-/extension-task-list-2.4.0.tgz#61a500fe4a89d5c789ad4fb64c8d7eeedfe26b63"
   integrity sha512-vmUB3wEJU81QbiHUygBlselQW8YIW8/85UTwANvWx8+KEWyM7EUF4utcm5R2UobIprIcWb4hyVkvW/5iou25gg==
+
+"@tiptap/extension-text-style@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-text-style/-/extension-text-style-2.4.0.tgz#9f86d8de4606bc37090b7b02c2aaf40bb37a860f"
+  integrity sha512-H0uPWeZ4sXz3o836TDWnpd38qClqzEM2d6QJ9TK+cQ1vE5Gp8wQ5W4fwUV1KAHzpJKE/15+BXBjLyVYQdmXDaQ==
 
 "@tiptap/extension-text@^2.4.0":
   version "2.4.0"

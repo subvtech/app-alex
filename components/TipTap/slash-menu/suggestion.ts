@@ -108,9 +108,6 @@ export default {
     return {
       onStart: (props) => {
         component = new VueRenderer(CommandsList, {
-          // using vue 2:
-          // parent: this,
-          // propsData: props,
           props,
           editor: props.editor,
         });
