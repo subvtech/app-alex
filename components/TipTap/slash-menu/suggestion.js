@@ -68,6 +68,13 @@ export default {
         },
       },
       {
+        title: 'Todo List',
+        icon: 'mdi-format-list-checks',
+        command: ({ editor, range }) => {
+          editor.chain().focus().deleteRange(range).toggleTaskList().run();
+        },
+      },
+      {
         title: 'fileSet',
         icon: 'mdi-file-multiple',
         command: ({ editor, range }) => {
