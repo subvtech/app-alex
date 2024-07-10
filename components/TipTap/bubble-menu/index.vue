@@ -1,19 +1,19 @@
 <template>
   <div class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex ga-2 rounded">
-    <menubar />
+    <menubar :editor="editor" />
   </div>
 </template>
 
 <script setup lang="ts">
-// import { Editor } from '@tiptap/vue-3';
+import { Editor } from '@tiptap/vue-3';
 import menubar from './menubar.vue';
 
-// const props = defineProps({
-//   editor: {
-//     type: Editor,
-//     required: true,
-//   },
-// });
+defineProps({
+  editor: {
+    type: Editor,
+    required: true,
+  },
+});
 </script>
 
 <!-- 

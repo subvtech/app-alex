@@ -1,14 +1,17 @@
 <template>
-  <Menubar class="border-0">
+  <Menubar v-if="props.editor" class="border-0">
     <!-- Text Type -->
 
     <MenubarMenu>
       <MenubarTrigger>
-        <v-icon :icon="activeTextType?.icon" size="16px" />
+        <v-icon
+          :icon="activeContentType?.icon || 'mdi-format-pilcrow'"
+          size="16px"
+        />
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
       </MenubarTrigger>
       <MenubarContent>
-        <template v-for="item in textTypeList">
+        <template v-for="item in contentTypeList">
           <p
             v-if="item.isLabel"
             :key="`${item.name}-label`"
@@ -19,8 +22,8 @@
           <MenubarItem
             v-else
             :key="`${item.name}-item`"
-            :data-highlighted="activeTextType?.value === item.value"
-            @select="activeTextType = item"
+            :data-highlighted="item.isActive?.()"
+            @select="item.onClick?.()"
           >
             <v-icon :icon="item.icon" class="tw-mt-0.5 mr-2" size="14px" />
             {{ item.name }}
@@ -77,14 +80,24 @@
 </template>
 
 <script setup lang="ts">
+import { Editor } from '@tiptap/vue-3';
+const props = defineProps({
+  editor: {
+    type: Editor,
+    required: true,
+  },
+});
+
 interface menuItens {
   name: string;
   icon?: string;
   value?: string;
   isLabel?: boolean;
+  isActive?: () => boolean;
+  onClick?: () => void;
 }
 
-const textTypeList: menuItens[] = [
+const contentTypeList: menuItens[] = [
   {
     name: 'HIERARQUIA',
     isLabel: true,
@@ -93,21 +106,61 @@ const textTypeList: menuItens[] = [
     name: 'Paragraph',
     icon: 'mdi-format-pilcrow',
     value: 'Paragraph',
+    onClick: () =>
+      props.editor
+        .chain()
+        .focus()
+        .lift('taskItem')
+        .liftListItem('listItem')
+        .setParagraph()
+        .run(),
+    isActive: () =>
+      props.editor.isActive('paragraph') &&
+      !props.editor.isActive('orderedList') &&
+      !props.editor.isActive('bulletList') &&
+      !props.editor.isActive('taskList'),
   },
   {
     name: 'Heading 1',
     icon: 'mdi-format-header-1',
     value: 'h1',
+    onClick: () =>
+      props.editor
+        .chain()
+        .focus()
+        .lift('taskItem')
+        .liftListItem('listItem')
+        .setHeading({ level: 1 })
+        .run(),
+    isActive: () => props.editor.isActive('heading', { level: 1 }),
   },
   {
     name: 'Heading 2',
     icon: 'mdi-format-header-2',
     value: 'h2',
+    onClick: () =>
+      props.editor
+        .chain()
+        .focus()
+        .lift('taskItem')
+        .liftListItem('listItem')
+        .setHeading({ level: 2 })
+        .run(),
+    isActive: () => props.editor.isActive('heading', { level: 2 }),
   },
   {
     name: 'Heading 3',
     icon: 'mdi-format-header-3',
     value: 'h3',
+    onClick: () =>
+      props.editor
+        .chain()
+        .focus()
+        .lift('taskItem')
+        .liftListItem('listItem')
+        .setHeading({ level: 3 })
+        .run(),
+    isActive: () => props.editor.isActive('heading', { level: 3 }),
   },
   {
     name: 'LISTAS',
@@ -117,16 +170,22 @@ const textTypeList: menuItens[] = [
     name: 'Bulleted List',
     icon: 'mdi-format-list-bulleted',
     value: 'bulletList',
+    onClick: () => props.editor.chain().focus().toggleBulletList().run(),
+    isActive: () => props.editor.isActive('bulletList'),
   },
   {
     name: 'Numbered List',
     icon: 'mdi-format-list-numbered',
     value: 'orderedList',
+    onClick: () => props.editor.chain().focus().toggleOrderedList().run(),
+    isActive: () => props.editor.isActive('orderedList'),
   },
   {
     name: 'Todo List',
     icon: 'mdi-format-list-checks',
     value: 'todoList',
+    onClick: () => props.editor.chain().focus().toggleTaskList().run(),
+    isActive: () => props.editor.isActive('taskList'),
   },
 ];
 
@@ -192,7 +251,9 @@ const fontFamilyList: menuItens[] = [
   },
 ];
 
-const activeTextType = ref<menuItens | null>(textTypeList[1]);
+const activeContentType = computed(() =>
+  contentTypeList.find((item) => item.isActive?.()),
+);
 const activeTextSize = ref<menuItens | null>(textSizeList[2]);
 const activeFontFamily = ref<menuItens | null>(fontFamilyList[3]);
 </script>
