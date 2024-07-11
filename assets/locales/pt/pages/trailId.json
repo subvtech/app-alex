@@ -9,6 +9,7 @@
     "sectionTitle": "Início",
     "searchError": "Ocorreu um erro ao buscar os dados da trilha, tente novamente.",
     "saveError": "Ocorreu um erro ao salvar os dados da trilha, tente novamente.",
-    "loadError": "Ocorreu um erro ao carregar os dados da trilha, tente novamente."
+    "loadError": "Ocorreu um erro ao carregar os dados da trilha, tente novamente.",
+    "contribute": "Contribuir nesta trilha"
   }
 }

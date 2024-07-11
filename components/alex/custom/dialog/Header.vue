@@ -5,10 +5,13 @@
   >
     <v-row dense>
       <v-col class="w-100 d-flex align-center justify-start gap-2">
-        <h4 class="text-h4 text-gray-800">{{ title }}</h4>
+        <h4 class="text-h4 text-gray-800 ellipsis lines-2 overflow-x-hidden">
+          {{ title }}
+        </h4>
         <h4 v-if="highlightedTitle" class="text-h4 text-secondary-0">
           {{ highlightedTitle }}
         </h4>
+        <slot name="default"></slot>
       </v-col>
       <v-col cols="auto"
         ><alex-custom-button
@@ -38,9 +41,6 @@ const emits = defineEmits(['onClose']);
   border-bottom: 1px solid rgb(var(--v-theme-gray-100)) !important;
 }
 .h-72 {
-  height: 72px;
-}
-.h-76 {
-  height: 76px;
+  min-height: 72px;
 }
 </style>

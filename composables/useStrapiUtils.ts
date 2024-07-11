@@ -45,8 +45,14 @@ export const useStrapiUtils = () => {
     params?: Strapi4RequestParams,
   ): Promise<{ meta: any; data: T[] }> {
     const result = await strapi.find<T>(contentType, params);
+    const formattedResult = result.data
+      ? result.data.map(formatResult<T>)
+      : (result as unknown as T[]);
 
-    return { meta: result.meta, data: result.data.map(formatResult<T>) };
+    return {
+      meta: result.meta,
+      data: formattedResult,
+    };
   }
   async function create<T>(
     contentType: string,

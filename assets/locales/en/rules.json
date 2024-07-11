@@ -1,4 +1,9 @@
 {
+  "field": {
+    "required": "This field is required",
+    "min": "Min {min} caracteres ",
+    "max": "Max {max} caracteres "
+  },
   "fullName": {
     "required": "Full name is required",
     "min": "At least 6 characters long",
@@ -69,6 +74,7 @@
     "max": "At most {max} characters long"
   },
   "url": {
+    "valid": "Must be a valid url",
     "required": "Url is required",
     "min": "At least 3 characters long",
     "max": "At most 64 characters long"
@@ -87,10 +93,10 @@
   },
   "class": {
     "required": "Class is required",
+    "requiredClassArray": "At least one class must be created",
     "min": "At least {min} characters long",
     "max": "At most {max} characters long"
   },
-
   "description": {
     "required": "Description is required",
     "min": "At least {min} characters long",
@@ -108,8 +114,21 @@
       "beforeStartHour": "End hour must be after start Hour"
     },
     "copy": {
+      "hint": "Copy Text",
       "success": "Text copied to clipboard",
       "error": "Couldn't copy to clipboard"
+    },
+    "type": {
+      "required": "Meeting type is required"
+    },
+    "interval": {
+      "required": "Meeting frequency is required"
+    },
+    "location": {
+      "required": "Meeting location is required"
+    },
+    "link": {
+      "required": "Access link is required"
     }
   },
   "copy": {

@@ -1,87 +1,78 @@
 <template>
   <alex-custom-card
-    :title="$t('components.courses.settings.general.title')"
-    :show-icon="false"
+    :title="$t(`components.${variant}.settings.general.title`)"
     show-footer-divider
   >
     <template #content>
-      <div v-if="isTrail" class="d-flex flex-column w-100 content-body">
-        <alex-inputs-text-field
-          :v-model="trailsTitle"
-          :label="trails.labelTitle"
-          name="title"
-          class="w-100"
-          density="comfortable"
-          :error-messages="errors.title"
-          required
-        ></alex-inputs-text-field>
-        <alex-inputs-text-area
-          :v-model="trailsDescription"
-          :label="trails.labelDescription"
-          name="description"
-          class="w-100"
-          density="comfortable"
-          :error-messages="errors.description"
-          required
-        ></alex-inputs-text-area>
-      </div>
-      <div v-else class="d-flex flex-column w-100">
+      <div class="d-flex flex-column w-100">
         <alex-inputs-text-field
           v-model="myTitle"
-          :label="$t('components.courses.settings.general.courseTitle')"
           name="title"
+          :label="$t(`components.${variant}.settings.general.name`)"
           class="w-100"
           :error-messages="errors.title"
-          required
-        ></alex-inputs-text-field>
-        <div class="d-flex w-100 gap-6">
-          <alex-inputs-date
-            v-model="myStartDate"
-            name="startDate"
-            :label="$t('components.courses.settings.general.startDate')"
-            required
-            :error-messages="errors.startDate"
-            class="w-100"
-          />
-
-          <alex-inputs-date
-            v-model="myEndDate"
-            name="endDate"
-            :allowed-dates="disablePastStartDates"
-            :label="$t('components.courses.settings.general.endDate')"
-            required
-            :error-messages="errors.endDate"
-            class="w-100"
-          />
-        </div>
-
-        <alex-inputs-text-field
-          v-model="mySlug"
-          :label="$t('components.courses.settings.general.slug.label')"
-          name="slug"
-          :error-messages="errors.slug"
-          class="w-100"
+          density="comfortable"
           required
         />
+        <div v-if="isCourses" class="d-flex flex-column w-100">
+          <div class="d-flex w-100 gap-6">
+            <alex-inputs-date
+              v-model="myStartDate"
+              name="startDate"
+              :label="$t(`components.courses.settings.general.startDate`)"
+              :allowed-dates="disablePastDates"
+              required
+              density="comfortable"
+              :error-messages="errors.startDate"
+              class="w-100"
+            />
+
+            <alex-inputs-date
+              v-model="myEndDate"
+              name="endDate"
+              :allowed-dates="disablePastDates"
+              :label="$t(`components.courses.settings.general.endDate`)"
+              required
+              density="comfortable"
+              :error-messages="errors.endDate"
+              class="w-100"
+            />
+          </div>
+
+          <alex-inputs-text-field
+            v-model="myIdentifier"
+            name="slug"
+            :label="$t(`components.courses.settings.general.identifier.label`)"
+            :error-messages="errors.identifier"
+            class="w-100"
+            required
+            :info="$t(`components.courses.settings.general.identifier.tooltip`)"
+            :hint="accessUrl"
+            density="comfortable"
+            persistent-hint
+          />
+        </div>
+        <div v-else>
+          <alex-inputs-text-area
+            v-model="myDescription"
+            :label="$t('components.trails.settings.general.description')"
+            name="description"
+            class="w-100"
+            density="comfortable"
+            required
+          />
+        </div>
       </div>
     </template>
     <template #footer>
       <div class="d-flex w-100 justify-end gap-4 pt-6">
         <alex-custom-button
-          variant="secondary"
-          prepend-icon="mdi-close"
-          @click="onCancel"
-          >{{
-            $t('components.courses.settings.general.cancel')
-          }}</alex-custom-button
-        >
-        <alex-custom-button
           variant="primary"
           prepend-icon="mdi-check"
-          @click="onSave"
           :disabled="theresError"
+          @click="onSave"
           >{{
-            $t('components.courses.settings.general.save')
+            $t(`components.${variant}.settings.general.save`)
           }}</alex-custom-button
         >
       </div>
@@ -91,80 +82,59 @@
 
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-
-import { useI18n } from 'vue-i18n';
-
-const { find, update } = useStrapi();
+const { find } = useStrapi();
 const { setMessage } = useMessageStore();
 
+export interface SettingsGeneralComponentType {
+  title: string;
+  startDate?: string;
+  endDate?: string;
+  slug?: string;
+  accessUrl?: string;
+  description?: string;
+  variant: 'courses' | 'trails';
+}
+
 const emit = defineEmits(['update']);
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  startDate: {
-    type: String,
-    required: true,
-  },
-  endDate: {
-    type: String,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-  },
-  learningPlanId: {
-    type: Number,
-    required: true,
-  },
-  isTrail: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  trailsTitle: {
-    type: String,
-    required: false,
-    default: '',
-  },
-  trailsDescription: {
-    type: String,
-    required: false,
-    default: '',
-  },
+
+const props = withDefaults(defineProps<SettingsGeneralComponentType>(), {
+  variant: 'courses',
+  startDate: undefined,
+  endDate: undefined,
+  slug: undefined,
+  description: undefined,
+  accessUrl: undefined,
 });
 
 const i18n = useI18n();
+const { generalCourseSchema, generalTrailSchema } = useFormRules();
 
-const { generalCourseSchema } = useFormRules();
-
+const learningPlanStore = useLearningPlanStore();
 const { title, startDate, endDate, slug } = toRefs(props);
-const myStartDate = toRef(startDate.value);
-const myEndDate = toRef(endDate.value);
-const myTitle = toRef(title.value);
-const mySlug = toRef(slug.value);
+const myTitle = learningPlanStore.learningPlan?.title || title.value;
+const myStartDate = ref(
+  learningPlanStore.learningPlan?.start_date || startDate.value,
+);
+const myEndDate = ref(
+  learningPlanStore.learningPlan?.end_date || endDate.value,
+);
+const myIdentifier = learningPlanStore.learningPlan?.slug || slug.value;
+const accessUrl = ref(props.accessUrl);
 
-const isTrail = toRef(props, 'isTrail');
-const trails = ref({
-  title: '',
-  description: '',
-  labelTitle: 'Nome da trilha',
-  labelDescription: 'Descrição da trilha',
+const isCourses = computed(() => props.variant === 'courses');
+const myDescription = ref(props.description);
+
+const { handleSubmit, errors, controlledValues, setFieldError } = useForm({
+  validationSchema: isCourses.value ? generalCourseSchema : generalTrailSchema,
+  keepValuesOnUnmount: true,
 });
 
-const trailsTitle = toRef(props, 'trailsTitle');
-const trailsDescription = toRef(props, 'trailsDescription');
-
-const { handleSubmit, errors, values, controlledValues, setFieldError } =
-  useForm({
-    validationSchema: generalCourseSchema,
-    keepValuesOnUnmount: true,
-  });
+const slugFormatted = computed(() =>
+  controlledValues.value.slug.trim().toLowerCase().replaceAll(' ', '_'),
+);
 
 const onSave = handleSubmit(async (e) => {
-  if (controlledValues.value.slug !== slug.value) {
+  if (controlledValues.value.slug !== props.slug && isCourses.value) {
     const isSlugAvailable = await find('learningplans', {
       filters: { slug: controlledValues.value.slug },
     });
@@ -172,75 +142,39 @@ const onSave = handleSubmit(async (e) => {
     if (isSlugAvailable.data.length !== 0) {
       setFieldError(
         'slug',
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
       );
       setMessage(
-        i18n.t('components.courses.settings.general.slug.unique'),
+        i18n.t('components.courses.settings.general.identifier.unique'),
         'red',
         true,
       );
       return;
     }
   }
-
-  await update(`learningplans/${props.learningPlanId}`, {
-    title: controlledValues.value.title,
-    start_date: new Date(controlledValues.value.startDate).toISOString(),
-    end_date: new Date(controlledValues.value.endDate).toISOString(),
-    slug: controlledValues.value.slug,
-  });
-
-  emit('update', i18n.t('components.courses.settings.general.update'));
+  emit(
+    'update',
+    isCourses.value
+      ? {
+          title: controlledValues.value.title,
+          start_date: new Date(controlledValues.value.startDate).toISOString(),
+          end_date: new Date(controlledValues.value.endDate).toISOString(),
+          slug: slugFormatted.value.toLocaleLowerCase(),
+        }
+      : {
+          title: controlledValues.value.title,
+          description: controlledValues.value.description,
+        },
+  );
 });
-
-const onCancel = () => {
-  myStartDate.value = props.startDate;
-  myEndDate.value = props.endDate;
-  mySlug.value = props.slug;
-  myTitle.value = props.title;
-};
 
 const theresError = computed(() => Object.keys(errors.value).length !== 0);
 
-const disablePastDates = (date) => {
+const disablePastDates = (date: Date) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
-  // Vuetify uses strings in the format 'YYYY-MM-DD' for dates, so convert the date argument to a Date object
   const parsedDate = new Date(date);
-
-  // If the parsed date is earlier than today, return false to disable it
   return parsedDate >= today;
 };
-
-const disablePastStartDates = (date) => {
-  if (!disablePastDates(date)) return false;
-
-  const tempDate = new Date(myStartDate.value);
-  tempDate.setHours(0, 0, 0, 0);
-
-  const parsedDate = new Date(date);
-
-  return parsedDate >= tempDate;
-};
-
-watch(startDate, () => {
-  myStartDate.value = startDate.value;
-});
-watch(endDate, () => {
-  myEndDate.value = endDate.value;
-});
-watch(title, () => {
-  myTitle.value = title.value;
-});
-watch(slug, () => {
-  mySlug.value = slug.value;
-});
 </script>
-<style scoped lang="scss">
-.content-area {
-  margin-top: 24px;
-  border: 1px solid var(--cinza-cinza-200, #d2d6da) !important;
-  box-shadow: none !important;
-}
-</style>
+<style scoped lang="scss"></style>

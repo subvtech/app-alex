@@ -4,5 +4,10 @@
   "editor.quickSuggestions": {
     "strings": true
   },
-  "zenMode.hideLineNumbers": false
+  "zenMode.hideLineNumbers": false,
+  "vitest.debugExclude": [
+    "<node_internals>/**",
+    "**/node_modules/**"
+  ],
+  "vitest.disabledWorkspaceFolders": []
 }

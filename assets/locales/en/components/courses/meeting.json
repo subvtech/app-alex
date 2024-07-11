@@ -27,11 +27,12 @@
   "of": "of",
   "to": "to",
   "at": "at",
+  "unique": "Unique",
   "interval": "Every {days} days",
   "everyday": "Daily",
-  "weekly": "Weekly: {day}",
-  "biweekly": "Biweekly: {day}",
-  "monthly": "Monthly: {day}",
+  "weekly": "Weekly",
+  "biweekly": "Biweekly",
+  "monthly": "Monthly",
   "empty": {
     "facilitator": "It seems that there are no meetings available",
     "student": "It seems that you don't have any meetings scheduled"
@@ -51,5 +52,13 @@
     "meetingDate": "Meeting Date",
     "startTime": "Start time",
     "endTime": "End time"
-  }
+  },
+  "deleteModal": {
+    "confirmation": "Do you really want to delete the meeting?",
+    "description": "By confirming, you will delete the registered synchronous meeting.",
+    "button": "Delete",
+    "cancel": "Cancel"
+  },
+  "errorSaving": "An error occurred while saving the meetings. Please try again later.",
+  "success": "The meetings have been saved successfully!"
 }

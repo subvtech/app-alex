@@ -6,23 +6,24 @@
     show-tooltip
     :disable-save="disableSave"
     :is-editing="isEditingAndCanEdit"
-    :save="onSave"
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
-    :cancel="onCancel"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
-    :show-icon="canEdit"
+    no-icon="canEdit"
+    @click:save="onSave"
+    @click:cancel="onCancel"
     @toggle:is-editing="toggleEditing"
   >
     <template #content>
       <alex-custom-empty-placeholder
-        v-if="localData.length === 0"
+        v-if="localData.length === 0 && !isEditing"
         class="align-self-center"
         :empty-text-message="$t('components.courses.goals.empty')"
         empty-text-image="/svg/EmptyGoals.svg"
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion
+          v-if="localData.length > 0"
           v-model="selectedPanel"
           v-model:data="localData"
           show-positions
@@ -32,7 +33,7 @@
             <alex-learningplan-form-goal
               :index="index"
               :data="localData"
-              :filtered-items="filteredVerbs"
+              :filtered-items="generalVerbs || []"
               @error:description="onErrorDescription"
               @error:keyword="onErrorKeyword"
               @success:description="onSuccessDescription"
@@ -40,9 +41,10 @@
             /> </template
         ></alex-custom-accordion>
         <alex-custom-button
-          class="add-button"
+          class="add-button w-100 mt-5"
           prepend-icon="mdi-plus"
           variant="text"
+          size="large"
           @click="addGoal"
         >
           {{ $t('components.courses.goals.add') }}</alex-custom-button
@@ -71,10 +73,9 @@ export type Goal = {
   errorDescription: boolean;
   contentData: {
     id?: number;
-    keyWordId?: number; // Verb
     index: number;
-    keyWord: string; // Verb
     description: string; // Title
+    verb: { text: string; id?: number; general: boolean };
   };
 };
 type GoalsProps = {
@@ -95,11 +96,20 @@ const localData = ref(props.data);
 const disableSave = ref(true);
 const isEditing = ref(false);
 const selectedPanel = ref(0);
-const filteredVerbs = ref<{ text: string; id: number }[]>([]);
 const withinBreakpoint = computed(() => currentWidth.value < 450);
 const isEditingAndCanEdit = computed(() => props.canEdit && isEditing.value);
 const lastGoals = ref<Goal[]>([]);
-
+const { find } = useStrapiUtils();
+const { data: generalVerbs } = useAsyncData(
+  'general-verbs',
+  async () =>
+    await find<LearningPlanGoalVerb>('learning-goal-verbs', {
+      filters: {
+        general: true,
+      },
+    }),
+  { transform: (value) => value.data },
+);
 const setLastGoals = () => {
   lastGoals.value = toRaw(localData.value.map((g) => Object.assign({}, g)));
 };
@@ -109,9 +119,16 @@ const toggleEditing = () => {
     setLastGoals();
   }
 };
+
+const isEmpty = (value: string) => value.trim().length === 0;
+
 const toggleSave = () => {
   const errorFound = localData.value.find(
-    (item) => item.errorDescription || item.errorKeyWord,
+    (item) =>
+      item.errorDescription ||
+      item.errorKeyWord ||
+      isEmpty(item.contentData.description) ||
+      isEmpty(item.contentData.verb.text),
   );
   if (errorFound) disableSave.value = true;
   else disableSave.value = false;
@@ -143,8 +160,12 @@ const addGoal = () => {
     local: true,
     contentData: {
       description: '',
-      keyWord: '',
+      keyWord: null,
       index: localData.value.length,
+      verb: {
+        text: null,
+        general: false,
+      },
     },
   };
   localData.value.push(newGoal);
@@ -152,6 +173,7 @@ const addGoal = () => {
 };
 const onCancel = () => {
   localData.value = lastGoals.value;
+  isEditing.value = false;
 };
 const onSave = async () => {
   await client(`/learningplans/${props.courseId}/goals`, {
@@ -161,7 +183,8 @@ const onSave = async () => {
         index,
         verb: {
           text: item.keyWord,
-          id: item.contentData.keyWordId,
+          id: item.contentData.verb.id,
+          general: item.contentData.verb.general,
         },
         description: item.title,
         ...(!item.local && { id: item.contentData.id }),
@@ -169,12 +192,15 @@ const onSave = async () => {
     },
     onResponse: ({ response }) => {
       if (!response.ok) {
-        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
         localData.value = [...props.data];
+        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
+        return;
       }
       emit('update', t('components.courses.goals.update'));
     },
   });
+
+  isEditing.value = false;
 };
 watch(
   localData,

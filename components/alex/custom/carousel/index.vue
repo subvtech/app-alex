@@ -9,7 +9,7 @@
     <vueper-slides
       ref="vueperslides1"
       class="no-shadow mb-4 rounded d-block w-100"
-      :slide-ratio="2 / 4"
+      :slide-ratio="!readOnly && slides.length < 1 && mobile ? 1 : 2 / 4"
       :bullets="false"
       :arrows="false"
       :dragging-distance="200"
@@ -18,16 +18,27 @@
       style="z-index: 0; max-width: 850px"
     >
       <vueper-slide
-        :class="!readOnly && slides.length < 1 ? '' : 'd-none'"
+        :class="!readOnly && slides.length < 1 ? 'scale-1' : 'd-none'"
         class="rounded"
         @click="openAddSlidesDialog(-1)"
       >
         <template #content>
           <v-container
-            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue"
+            class="w-100 fill-height d-flex align-center justify-center rounded py-10 bg-gray-blue empty"
             elevation="0"
           >
-            <v-icon color="accent" size="100px" icon="mdi-image-area" />
+            <div
+              class="d-flex flex-column align-center max-width-350 justify-center gap-2 text-secondary-0"
+            >
+              <v-icon color="accent" size="80px" icon="alex:RoundAddPhoto" />
+              <p class="text-body-2 text-center">
+                Adicione vídeos ou imagens que aparecerão na página inicial do
+                seu curso
+              </p>
+              <p class="text-body-3 text-center">
+                Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;
+              </p>
+            </div>
           </v-container>
         </template>
       </vueper-slide>
@@ -36,9 +47,28 @@
         v-for="(slide, i) in slides"
         :key="slide"
         :class="activeSlide == i ? 'vueperslide-active rounded' : 'rounded'"
-        :image="slide.image"
       >
         <template #content>
+          <video-player
+            v-if="slide.type.includes('File') && slide.video"
+            ref="videoJS"
+            class="w-100 fill-height video-js"
+            controls
+            :is-active="activeSlide == i"
+            :options="videoPlayerOptions(slide)"
+          ></video-player>
+          <video-player
+            v-else-if="
+              slide.type.includes('youtube') || slide.type.includes('vimeo')
+            "
+            ref="videoJSWeb"
+            class="w-100 fill-height video-js"
+            controls
+            :options="videoPlayerOptions(slide)"
+            :is-active="activeSlide == i"
+            :data-setup="JSON.stringify({ techOrder: [slide.type] })"
+          ></video-player>
+          <nuxt-img v-else :src="slide.image" :alt="slide.title" />
           <div v-if="!readOnly" class="ma-2 config-icon">
             <alex-custom-button
               color="gray-500"
@@ -50,23 +80,6 @@
               @click="openAddSlidesDialog(-1, slides)"
             />
           </div>
-          <video-player
-            v-if="slide.type.includes('File') && slide.video"
-            class="w-100 fill-height video-js"
-            controls
-            :is-active="activeSlide == i"
-            :options="videoPlayerOptions(slide)"
-          ></video-player>
-          <video-player
-            v-else-if="
-              slide.type.includes('youtube') || slide.type.includes('vimeo')
-            "
-            class="w-100 fill-height video-js"
-            controls
-            :options="videoPlayerOptions(slide)"
-            :is-active="activeSlide == i"
-            :data-setup="JSON.stringify({ techOrder: [slide.type] })"
-          ></video-player>
         </template>
       </vueper-slide>
     </vueper-slides>
@@ -180,10 +193,16 @@
     @upload-files="addSlide"
     @change-slides="editSlides"
   />
+  <alex-custom-viewer
+    ref="viewer"
+    v-model="viewerInstance"
+    container="vueperslides"
+  />
 </template>
 
 <script setup>
 import { VueperSlides, VueperSlide } from 'vueperslides';
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from './VideoJS.vue';
 import FileModal from './FileModal.vue';
@@ -194,6 +213,8 @@ import {
 } from '@/composables/useCaptureVideoThumbnail';
 const vueperslides1 = ref();
 const vueperslides2 = ref();
+const videoJS = ref();
+const videoJSWeb = ref();
 const uploading = ref(false);
 const strapiClient = useStrapiClient();
 const props = defineProps({
@@ -206,7 +227,7 @@ const props = defineProps({
     default: false,
   },
 });
-
+const { mobile } = useDisplay({ mobileBreakpoint: 600 });
 const emit = defineEmits(['update:modelValue', 'slidesChanged']);
 
 const slides = computed({
@@ -217,6 +238,8 @@ const slides = computed({
     emit('update:modelValue', value);
   },
 });
+const viewerInstance = ref(null);
+const viewer = ref(null);
 onMounted(() => {
   if (slides.value.length > 0) {
     slides.value.forEach((slide) => {
@@ -238,7 +261,7 @@ const videoPlayerOptions = (slide) => {
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = `https://${slide.video}`;
+    url = url.startsWith('https') ? url : `https://${url}`;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -270,6 +293,17 @@ const onSlideClick = (slide) => {
 };
 
 const onCarouselSlide = (event) => {
+  if (slides.value[activeSlide.value]?.video) {
+    if (slides.value[activeSlide.value].type.includes('File')) {
+      videoJS.value.forEach((video) => {
+        video.pause();
+      });
+    } else {
+      videoJSWeb.value.forEach((video) => {
+        video.pause();
+      });
+    }
+  }
   vueperslides1.value.goToSlide(event.currentSlide.index, { emit: false });
   activeSlide.value = event.currentSlide.index;
 };
@@ -358,10 +392,11 @@ const addSlideByUrl = (slide, index) => {
   let newSlide = {};
   if (
     slide.url.startsWith('https://www.youtube.com') ||
+    slide.url.startsWith('https://youtu.be') ||
     slide.url.startsWith('https://vimeo.com/')
   ) {
     let image, type;
-    if (slide.url.includes('www.youtube')) {
+    if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = useGetYoutubeThumbnail(slide.url);
     } else {
@@ -472,9 +507,20 @@ const clearSlides = () => {
   slides.value = [];
   emit('update:modelValue', slides.value);
 };
+watch(
+  () => props.readOnly,
+  () => {
+    if (viewer.value) {
+      viewer.value.destroyInstance();
+      viewer.value.createInstance();
+    }
+  },
+);
 defineExpose({
   clearSlides,
 });
+
+const backgroundImgColor = AlexThemeColors['gray-blue'];
 </script>
 
 <style>
@@ -483,6 +529,9 @@ defineExpose({
 }
 </style>
 <style scoped>
+.scale-1 {
+  transform: scale(1) !important;
+}
 .inputFile {
   position: absolute;
   opacity: 0;
@@ -522,6 +571,7 @@ defineExpose({
   position: absolute;
   z-index: 99;
   right: 25px;
+  top: 0;
 }
 
 .addSlide {
@@ -545,7 +595,15 @@ defineExpose({
   max-width: 213px;
   max-height: 120px;
 }
-
+.max-width-350 {
+  max-width: 350px;
+}
+.empty:hover {
+  background-color: rgb(var(--v-theme-gray-100)) !important;
+}
+.empty:active {
+  background-color: rgb(var(--v-theme-gray-200)) !important;
+}
 @media (max-width: 600px) {
   .video-play-icon {
     left: 70%;
@@ -553,5 +611,11 @@ defineExpose({
   .addSlide {
     height: 80px;
   }
+}
+.vueperslide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: v-bind('backgroundImgColor');
 }
 </style>

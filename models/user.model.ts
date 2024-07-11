@@ -1,8 +1,16 @@
 import { Tag } from './tag.model';
+import { InstitutionsType } from './institution.model';
 
 export enum UserRoles {
   PROFESSOR = 'professor',
-  AUTHENTICATED = 'Authenticated',
+  AUTHENTICATED = 'authenticated',
+}
+
+interface Role {
+  id: number;
+  description: string;
+  name: string;
+  type: UserRoles;
 }
 export interface User {
   id: number;
@@ -10,14 +18,19 @@ export interface User {
   email: string;
   fullname: string;
   password: string;
-  institute: string;
+  institutions: InstitutionsType[];
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;
+  info: string;
+  phone: string;
   blocked: boolean;
   confirmed: boolean;
   isProfessor: boolean;
+  socials: any[];
   tags: Tag[];
   avatar: any;
-  role: UserRoles;
+  cover: any;
+  role: Role;
+  user_wallet?: Wallet;
 }

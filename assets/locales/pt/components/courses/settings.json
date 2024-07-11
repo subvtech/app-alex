@@ -1,9 +1,11 @@
 {
+  "breadcrumbTitle": "Meus cursos",
+  "home": "Home",
+  "myCourses": "Meus cursos",
   "title": "Configurações",
   "formats": "Formatos Suportados: .jpeg, .png, .wav, .mp4, .jpg;",
   "syncMeetingsTitle": "Encontros síncronos",
   "noSyncMeetings": "Parece que não há nenhum encontro síncrono.",
-
   "update": "Curso atualizado com sucesso",
   "cover": {
     "title": "Capa do curso",
@@ -12,16 +14,18 @@
   },
   "general": {
     "title": "Informações Gerais",
-    "courseTitle": "Nome do curso",
+    "name": "Nome do curso",
     "startDate": "Início",
     "endDate": "Término",
-    "slug": {
-      "label": "Nome ou sigla do curso",
-      "unique": "Nome/Sigla selecionada não disponível"
+    "identifier": {
+      "label": "Identificador do curso",
+      "unique": "Identificador não disponível",
+      "tooltip": "O identificador do curso é um nome que servirá para diferenciar seu curso dos outros e permitir que ele seja acessado através da URL."
     },
     "cancel": "Cancelar",
     "save": "Salvar alterações",
-    "update": "Informações Gerais atualizadas com sucesso"
+    "update": "Informações Gerais atualizadas com sucesso",
+    "error": "Ocorreu um erro ao atualizar o curso. Por favor, tente novamente mais tarde."
   },
   "meetings": {
     "title": "Editar encontro síncrono",
@@ -41,8 +45,8 @@
     }
   },
   "delete": {
-    "courseTitle": "Excluir curso",
-    "courseDescription": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
+    "title": "Excluir curso",
+    "warning": "Após a exclusão do curso, todas as trilhas, fotos, vídeos, arquivos, serão perdidos. Você não terá mais acesso a nenhum conteúdo deste curso. sendo assim tenha certeza antes de continuar.",
     "button": "Excluir curso",
     "confirmation": "Realmente deseja excluir o curso?",
     "description": "Ao excluir um curso todo o conteúdo criado dentro dele também será excluído.",
@@ -50,7 +54,7 @@
     "placeholder": "Digite a palavra",
     "word": "Excluir",
     "cancel": "Cancelar",
-    "match": "Não corresponde a Excluir",
+    "matchError": "Não corresponde a Excluir",
     "update": "Curso deletado"
   },
   "invite": {
@@ -77,11 +81,11 @@
   },
   "visibility": {
     "title": "Visibilidade do curso",
-    "showCourse": {
+    "show": {
       "title": "Mostrar curso (Público)",
       "hint": "Torna o curso público, permitindo que qualquer usuário possa encontra-lo através da busca."
     },
-    "hideCourse": {
+    "hide": {
       "title": "Ocultar curso (Privado)",
       "hint": "Torna o curso privado, garantindo que somente os integrantes possam ver o curso."
     },

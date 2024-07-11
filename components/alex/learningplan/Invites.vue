@@ -1,74 +1,57 @@
 <template>
-  <alex-custom-card
-    :show-icon="false"
-    :title="$t('components.courses.invites.title')"
-    :href="`${courseId}/settings`"
-    hide-dividers
-    sizing-class="ma-0"
-    is-nested
-  >
-    <template #content>
-      <div v-if="enableInvites" class="relative">
-        <div
-          class="invite justify-space-between"
-          :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
-        >
-          <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
-            <template #content>
-              <p
-                class="cursor-pointer ellipsis lines-1 w-100 text-decoration-none text-secondary-0"
-                @click="copyToClipboard(url)"
-              >
-                {{ url }}
-              </p>
-            </template>
-          </alex-custom-tooltip>
-          <span v-else>{{ $t('components.courses.invites.expired') }}</span>
+  <div class="relative mt-4">
+    <p class="text-body-1 text-gray-800">{{ className }}</p>
+    <div
+      class="invite justify-space-between my-2"
+      :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
+    >
+      <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
+        <template #content>
+          <p
+            class="cursor-pointer ellipsis break-word lines-1 w-100 text-decoration-none text-secondary-0"
+            @click="copyToClipboard(url)"
+          >
+            {{ url }}
+          </p>
+        </template>
+      </alex-custom-tooltip>
+      <span v-else>{{ $t('components.courses.invites.expired') }}</span>
 
-          <div class="d-flex align-center gap-2">
-            <alex-custom-tooltip
-              :text="$t('components.courses.invites.refresh')"
+      <div class="d-flex align-center gap-2">
+        <alex-custom-tooltip :text="$t('components.courses.invites.refresh')">
+          <template #content>
+            <img
+              class="pointer"
+              :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
+              width="20"
+              height="20"
+              @click="updateLink"
+            />
+          </template>
+        </alex-custom-tooltip>
+        <alex-custom-tooltip :text="$t('components.courses.invites.copy')">
+          <template #content>
+            <v-icon
+              v-if="theresTimeAndUrl"
+              class="pointer"
+              :color="dark ? '#6E7A87' : '#00B7CC'"
+              size="small"
+              @click="copyToClipboard(url)"
+              >mdi-content-copy</v-icon
             >
-              <template #content>
-                <img
-                  class="pointer"
-                  :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
-                  width="20"
-                  height="20"
-                  @click="updateLink"
-                />
-              </template>
-            </alex-custom-tooltip>
-            <alex-custom-tooltip :text="$t('components.courses.invites.copy')">
-              <template #content>
-                <v-icon
-                  v-if="theresTimeAndUrl"
-                  class="pointer"
-                  :color="dark ? '#6E7A87' : '#00B7CC'"
-                  size="small"
-                  @click="copyToClipboard(url)"
-                  >mdi-content-copy</v-icon
-                >
-              </template>
-            </alex-custom-tooltip>
-          </div>
-        </div>
-        <div
-          v-if="theresTime"
-          class="timer d-flex pt-2 justify-end gap-1"
-          :class="dark ? 'dark' : ''"
-        >
-          <span>{{ $t('components.courses.invites.countdown') }}</span>
-          <p>{{ msToHHMMSS(remainingTime) }}</p>
-        </div>
+          </template>
+        </alex-custom-tooltip>
       </div>
-      <div v-else class="d-flex justify-center w-100">
-        <span class="desactivated">{{
-          $t('components.courses.invites.desactivated')
-        }}</span>
-      </div>
-    </template>
-  </alex-custom-card>
+    </div>
+    <div
+      v-if="theresTime"
+      class="timer d-flex justify-end gap-1"
+      :class="dark ? 'dark' : ''"
+    >
+      <span>{{ $t('components.courses.invites.countdown') }}</span>
+      <p>{{ msToHHMMSS(remainingTime) }}</p>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -77,16 +60,17 @@ const emit = defineEmits(['update:link', 'link:expired']);
 
 type InviteProps = {
   duration: number;
+  classId: number;
   courseId: number;
   data?: InvitationLinkSimple | null;
-  enableInvites?: boolean;
   dark?: boolean;
+  className: string;
 };
 
 const props = withDefaults(defineProps<InviteProps>(), {
   dark: false,
-  enableInvites: false,
   data: null,
+  className: '',
 });
 
 const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =
@@ -101,6 +85,7 @@ const updateLink = async () => {
     inviteId.value,
     props.duration,
     props.courseId,
+    props.classId,
   );
   stopTimeout();
 
@@ -165,7 +150,7 @@ watch(theresTimeAndUrl, () => {
   cursor: pointer;
 }
 
-.desactivated {
+.deactivated {
   color: var(--cinza-cinza-500, #8291a1);
   text-align: center;
 
@@ -192,6 +177,9 @@ watch(theresTimeAndUrl, () => {
   border-radius: 8px;
   border: 1px solid var(--principais-secundria-secundria-1, #47d9eb);
   background: var(--principais-secundria-secundria-2, #d1f6fa);
+  .break-word {
+    word-break: break-all;
+  }
   &.dark {
     height: 48px !important;
     flex-grow: 1;
@@ -214,9 +202,6 @@ watch(theresTimeAndUrl, () => {
   }
 }
 .timer {
-  position: absolute;
-  bottom: -28px;
-  right: 0px;
   span {
     color: var(--cinza-cinza-800, #454d54);
 

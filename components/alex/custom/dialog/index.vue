@@ -22,16 +22,13 @@
       :emit-close="() => emits('update:modelValue', false)"
     />
     <alex-custom-dialog-header
-      v-else-if="!noHeader && !noFooter"
+      v-else-if="!noHeader"
       data-testid="alex-dialog-header"
       :title="title"
       :highlighted-title="highlightedTitle"
       @on-close="() => emits('update:modelValue', false)"
     />
-    <v-container
-      class="pa-1 gap-4 body-height alex-scrollbar-white"
-      :class="{ 'body-height-stepper': stepper }"
-    >
+    <v-container class="pa-1 gap-4 overflow-y-auto alex-scrollbar-white">
       <v-row dense>
         <v-col v-if="stepper" dense :class="bodyStyles" class="rounded-b-lg">
           <alex-inputs-stepper
@@ -40,7 +37,7 @@
               'd-flex flex-column max-height-stepper pa-6',
               stepClass,
             ]"
-            stepper-indicator-class="px-6 pt-6 pb-1"
+            :stepper-indicator-class="`px-${mobile ? '2' : '6'} pt-6 pb-1`"
             :loading="loading"
             @on-success="emits('onMainAction')"
           >
@@ -111,8 +108,11 @@
       v-else-if="!hasFooter && !noFooter && !stepper"
       data-testid="alex-dialog-footer"
       :main-button-text="mainButtonText"
+      :main-button-icon="mainButtonIcon"
       :secondary-button-text="secondaryButtonText"
+      :secondary-button-icon="secondaryButtonIcon"
       :main-button-disabled="mainButtonDisabled"
+      :main-button-loading="loading"
       @on-main-action="() => emits('onMainAction')"
       @on-secondary-action="() => emits('onSecondaryAction')"
     />
@@ -120,6 +120,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
 
 interface HeaderProps {
@@ -131,6 +132,8 @@ interface HeaderProps {
   mainButtonText?: string;
   secondaryButtonText?: string;
   mainButtonDisabled?: boolean;
+  mainButtonIcon: string;
+  secondaryButtonIcon: string;
   noFooter?: boolean;
   noHeader?: boolean;
   stepper?: boolean;
@@ -145,6 +148,8 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   highlightedTitle: undefined,
   mainButtonText: undefined,
   secondaryButtonText: undefined,
+  mainButtonIcon: undefined,
+  secondaryButtonIcon: undefined,
   noFooter: false,
   noHeader: false,
   mainButtonDisabled: false,
@@ -155,6 +160,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   loading: undefined,
   maxWidth: 720,
 });
+const { mobile } = useDisplay();
 const emits = defineEmits([
   'update:modelValue',
   'update:loading',
@@ -186,14 +192,3 @@ const slotsList = computed(() =>
   ),
 );
 </script>
-
-<style scoped>
-.body-height-stepper {
-  height: calc(100% - 148px);
-}
-
-.body-height {
-  max-height: calc(100% - 148px);
-  overflow-y: auto;
-}
-</style>

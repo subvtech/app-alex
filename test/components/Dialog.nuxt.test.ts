@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderSuspended } from 'nuxt-vitest/utils';
+import { renderSuspended } from '@nuxt/test-utils/runtime';
 import { screen } from '@testing-library/vue';
 import Dialog from '../../components/alex/custom/dialog/index.vue';
 import Header from '../../components/alex/custom/dialog/Header.vue';

@@ -1,4 +1,6 @@
-import { UserRoles } from '../user.model';
+import { UserRoles } from '@/models/user.model';
+import { InstitutionsType } from '@/models/institution.model';
+import { Upload } from '@/models/upload.model';
 
 export interface UserSimple {
   id: number;
@@ -6,7 +8,7 @@ export interface UserSimple {
   email: string;
   fullname: string;
   password: string;
-  institute: string;
+  institutions: InstitutionsType[];
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;
@@ -14,9 +16,10 @@ export interface UserSimple {
   confirmed: boolean;
   isProfessor: boolean;
   tags: any[];
+  socials: any[];
   avatar: Upload | null;
+  cover: Upload | null;
   role: UserRoles;
   phone: string | null;
-  info: null;
-  cover: string | null;
+  info?: null;
 }

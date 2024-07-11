@@ -29,6 +29,7 @@
       v-bind="$attrs"
     >
       <v-menu
+        v-if="!mobile"
         v-model="menu"
         class="alex-picker"
         transition="scale-transition"
@@ -47,6 +48,7 @@
           :header="$t('components.date.enterDate')"
           :landscape="true"
           :allowed-dates="allowedDates"
+          :max-width="360"
         />
       </v-menu>
     </v-text-field>
@@ -65,7 +67,7 @@ interface DatePickerProps {
   theme?: 'light' | 'dark';
   allowedDates?: (value?: any) => boolean;
 }
-
+const mobile = navigator.userAgent.toLowerCase().includes('mobile');
 const props = withDefaults(defineProps<DatePickerProps>(), {
   label: undefined,
   modelValue: undefined,
@@ -78,8 +80,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
 
 const emit = defineEmits(['update:modelValue']);
 
-const { value, errorMessage } = useField(() => props.name, undefined, {
-  initialValue: props.modelValue,
+const { value, errorMessage } = useField<string>(() => props.name, undefined, {
   syncVModel: true,
 });
 

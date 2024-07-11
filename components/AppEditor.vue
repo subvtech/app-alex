@@ -1,13 +1,28 @@
 <template>
   <client-only>
-    <div id="editorjs" class="editorjs w-100 pa-0" v-bind="$attrs"></div>
+    <div
+      :id="keyId"
+      class="editorjs w-100 pa-0 show-drop-area"
+      :class="viewerId"
+      :is-editing="isEditing"
+      v-bind="$attrs"
+      :data-active="fileDrop && isEditing"
+      @dragenter.prevent="handleDragEnter"
+      @dragover.prevent="handleDragEnter"
+      @dragleave.prevent="handleDragLeave"
+      @drop.prevent="handleDrop"
+    ></div>
+    <alex-custom-viewer
+      ref="viewer"
+      v-model="viewerInstance"
+      :container="viewerId"
+    />
   </client-only>
 </template>
 
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
 import Delimiter from '@editorjs/delimiter';
-import Image from '@editorjs/image';
 import ImageUrl from '@editorjs/simple-image';
 import InlineCode from '@editorjs/inline-code';
 import Link from '@editorjs/link';
@@ -21,23 +36,103 @@ import Code from '@editorjs/code';
 import Alert from 'editorjs-alert';
 import Paragraph from '@editorjs/paragraph';
 import Warning from '@editorjs/warning';
-import Attaches from '@editorjs/attaches';
 import Undo from 'editorjs-undo';
 import Embed from '@editorjs/embed';
-import AIText from '@alkhipce/editorjs-aitext';
 import { Upload } from '../models/upload.model';
 import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
+import Fileset from '../editor-js/plugins/fileset/filesetBlock';
+import CustomImage from '../editor-js/plugins/image/ImageBlock';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
+import AIText from '~/editor-js/plugins/AiText';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
+const isEditing = ref(true);
 const emit = defineEmits(['ready', 'change']);
 const instance = ref();
+
+interface editorData {
+  time: number;
+  blocks: Array<{
+    type: string;
+    data: any;
+  }>;
+  version: string;
+}
+const app = useNuxtApp();
+const viewerInstance = ref(null);
+const viewer = ref<null | {
+  createInstance: () => void;
+  destroyInstance: () => void;
+  reCreateInstance: () => void;
+}>(null);
+const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
+const mediaToDelete = ref<number[]>([]);
+const temporaryMedia = ref<number[]>([]);
+const fileDrop = ref(false);
+
+const deletePendingMediaOnSave = async (mediaArray: Array<number>) => {
+  if (mediaArray.length > 0) {
+    await Promise.all(
+      mediaArray.map((id) =>
+        strapiClient(`/upload/files/${id}`, {
+          method: 'DELETE',
+        }),
+      ),
+    );
+    mediaToDelete.value = [];
+    temporaryMedia.value = [];
+  }
+};
+
+const dropIsTargetEditor = (event: DragEvent) => {
+  const targetElement = event.target as Element;
+  return isEditing && targetElement.id === 'editorjs';
+};
+
+const handleDragEnter = (event: DragEvent) => {
+  if (dropIsTargetEditor(event)) {
+    fileDrop.value = true;
+  }
+};
+
+const handleDragLeave = () => {
+  if (isEditing) {
+    fileDrop.value = false;
+  }
+};
+
+const handleDrop = (event: DragEvent) => {
+  if (dropIsTargetEditor(event)) {
+    fileDrop.value = false;
+    const dropFiles = event.dataTransfer?.files;
+    if (dropFiles?.length === 1 && dropFiles[0].type.startsWith('image')) {
+      instance.value.blocks.insert('image', { file: dropFiles });
+    } else if (dropFiles) {
+      instance.value.blocks.insert(
+        'fileset',
+        { dropFiles },
+        {},
+        instance.value.blocks.getBlocksCount() + 1,
+        false,
+      );
+      instance.value.blocks.insert(
+        'paragraph',
+        {},
+        {},
+        instance.value.blocks.getBlocksCount() + 1,
+        true,
+      );
+      instance.value.caret.setToLastBlock('start', 0);
+    }
+  }
+};
+
 onMounted(() => {
   instance.value = new EditorJS({
-    autofocus: true,
+    autofocus: false,
     tools: {
       delimiter: Delimiter,
       embed: Embed,
@@ -51,7 +146,7 @@ onMounted(() => {
         },
       },
       image: {
-        class: Image,
+        class: CustomImage,
         config: {
           uploader: {
             uploadByFile: (file) => {
@@ -74,11 +169,11 @@ onMounted(() => {
           },
         },
       },
-      imageUrl: ImageUrl,
+      /* imageUrl: ImageUrl, */
       aiText: {
         class: AIText,
         config: {
-          openaiKey: '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',
+          openAiKey: app.$config.public.openAiKey,
         },
       },
       inlineCode: {
@@ -167,39 +262,6 @@ onMounted(() => {
           messagePlaceholder: 'Mensagem',
         },
       },
-      attaches: {
-        class: Attaches,
-        config: {
-          uploader: {
-            uploadByFile: (file) => {
-              const formData = new FormData();
-
-              formData.append('files', file, file.name);
-
-              return strapiClient<Upload>('/upload', {
-                method: 'POST',
-                body: formData,
-              })
-                .then((res) => {
-                  const data = res[0];
-                  return {
-                    success: 1,
-                    file: {
-                      url: data.url,
-                      title: data.name,
-                      extension: data.ext.slice(1),
-                    },
-                  };
-                })
-                .catch((err) => {
-                  return { success: 0, file: { error: err } };
-                });
-            },
-          },
-          buttonText: 'Selecionar arquivo',
-          errorMessage: 'Erro no upload do arquivo',
-        },
-      },
       carousel: {
         class: Carousel,
         config: {
@@ -232,7 +294,7 @@ onMounted(() => {
                 formData.append('files', imageFile, imageFile.name);
               }
             });
-            const res = await strapiClient('/upload', {
+            const res = await strapiClient<Upload[]>('/upload', {
               method: 'POST',
               body: formData,
             });
@@ -241,36 +303,111 @@ onMounted(() => {
               const videoId = res[0].id;
               const thumbnail = res[1].url;
               const imgId = res[1].id;
+              temporaryMedia.value.push(videoId);
+              temporaryMedia.value.push(imgId);
               return { success: 1, url, thumbnail, videoId, imgId };
             } else {
               const { url, id } = res[0];
+              temporaryMedia.value.push(id);
               return { success: 1, url, imgId: id };
             }
           },
-          handleDeletedFiles: async (file) => {
-            if (file.videoId)
-              await strapiClient(`/upload/files/${file.videoId}`, {
-                method: 'DELETE',
+          handleDeletedFiles: (file) => {
+            if (file.videoId) mediaToDelete.value.push(file.videoId);
+            if (file.imgId) mediaToDelete.value.push(file.imgId);
+          },
+        },
+      },
+      fileset: {
+        class: Fileset,
+        config: {
+          uploadFiles: async (files) => {
+            const formData = new FormData();
+            const filesArray: File[] = Array.from(files);
+            filesArray.forEach((file: File) => {
+              formData.append('files', file, file.name);
+            });
+            try {
+              const res = await strapiClient<Upload[]>('/upload', {
+                method: 'POST',
+                body: formData,
               });
-            if (file.imgId)
-              strapiClient(`/upload/files/${file.imgId}`, {
-                method: 'DELETE',
+
+              return {
+                success: 1,
+                files: res.map((file) => {
+                  temporaryMedia.value.push(file.id);
+                  return {
+                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                    extension: file.ext?.slice(1),
+                    size: file.size,
+                    id: file.id,
+                    url: file.url,
+                  };
+                }),
+              };
+            } catch (error) {
+              return { success: 0, error };
+            }
+          },
+          handleDeletedFiles: (id: number) => {
+            mediaToDelete.value.push(id);
+          },
+        },
+      },
+      fileset: {
+        class: Fileset,
+        config: {
+          uploadFiles: async (files) => {
+            const formData = new FormData();
+            const filesArray: File[] = Array.from(files);
+            filesArray.forEach((file: File) => {
+              formData.append('files', file, file.name);
+            });
+            try {
+              const res = await strapiClient<Upload[]>('/upload', {
+                method: 'POST',
+                body: formData,
               });
+
+              return {
+                success: 1,
+                files: res.map((file) => {
+                  temporaryMedia.value.push(file.id);
+                  return {
+                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                    extension: file.ext?.slice(1),
+                    size: file.size,
+                    id: file.id,
+                    url: file.url,
+                  };
+                }),
+              };
+            } catch (error) {
+              return { success: 0, error };
+            }
+          },
+          handleDeletedFiles: (id: number) => {
+            mediaToDelete.value.push(id);
           },
         },
       },
     },
     i18n,
     minHeight: 400,
-    data: { blocks: [] },
-    holder: 'editorjs',
+    data: props.data,
+    holder: props.keyId,
     // logLevel: 'ERROR',
     placeholder: 'Clique para iniciar...',
     onReady: async () => {
       const data = await instance.value.save();
-      if (data.blocks.length > 0) {
+      if (data.blocks.length > 0 && !props.keyId.includes('contribution')) {
         /* eslint-disable-next-line */
         new Undo({ editor: instance.value });
+      }
+      if (props.readOnly) {
+        instance.value.readOnly.toggle();
+        isEditing.value = false;
       }
       emit('ready');
     },
@@ -278,6 +415,27 @@ onMounted(() => {
   });
 });
 
+const props = defineProps({
+  data: {
+    type: Object as PropType<editorData>,
+    default: () => ({ blocks: [] }),
+  },
+  keyId: {
+    type: String,
+    default: 'editor',
+  },
+  readOnly: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+watch(isEditing, () => {
+  if (!viewer.value) return;
+  if (!viewerInstance.value) return;
+  viewer.value.destroyInstance();
+  viewer.value.createInstance();
+});
 const getData = async () => {
   try {
     const data = await instance.value.save();
@@ -297,10 +455,11 @@ const loadEditor = async (data) => {
   }
 };
 
-const toggleReadOnly = () => {
+const toggleReadOnly = (mode: string) => {
   instance.value.isReady.then(async () => {
     await instance.value.readOnly.toggle();
-    if (!instance.value.readOnly.isEnabled) {
+    isEditing.value = !instance.value.readOnly.isEnabled;
+    if (!instance.value.readOnly.isEnabled && props.keyId === 'editorjs') {
       const index = instance.value.blocks.getBlocksCount();
       await instance.value.blocks.insert(
         'paragraph',
@@ -309,7 +468,6 @@ const toggleReadOnly = () => {
         index + 1,
         true,
       );
-
       setTimeout(() => {
         instance.value.focus(true);
         const block = instance.value.blocks.getBlockByIndex(index);
@@ -318,15 +476,9 @@ const toggleReadOnly = () => {
           element.scrollIntoView({ block: 'center', behavior: 'smooth' });
         }
       }, 100);
-    }
+    } else if (mode === 'save') deletePendingMediaOnSave(mediaToDelete.value);
+    else if (mode === 'cancel') deletePendingMediaOnSave(temporaryMedia.value);
   });
-};
-
-const navigateToId = (id) => {
-  const element = document.getElementById(id);
-  if (element) {
-    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
 };
 
 const clearEditor = () => {
@@ -338,46 +490,73 @@ const clearEditor = () => {
 const isReady = async () => {
   return await instance.value.isReady;
 };
-
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
-  navigateToId,
   clearEditor,
   isReady,
 });
 </script>
 
-<style scoped>
-.editorjs >>> .ce-header {
-  padding: 0 0 1em;
+<style lang="scss">
+.editorjs {
+  width: 100% !important;
+  .codex-editor__redactor {
+    padding-bottom: 0 !important;
+  }
+  .ce-paragraph {
+    word-break: break-word;
+  }
+  .ce-block__content {
+    margin: 0;
+    max-width: none;
+  }
+  &[is-editing='true'] {
+    padding-bottom: 300px !important;
+  }
+  &[is-editing='false'] {
+    .codex-editor--narrow .codex-editor__redactor {
+      margin-right: 0px;
+    }
+  }
+  .codex-editor--narrow {
+    background-color: white !important;
+  }
 }
 
-.editorjs >>> .ce-block {
-  margin-top: 16px;
-}
+@media (min-width: 651px) {
+  .editorjs[is-editing='true'] {
+    .codex-editor--narrow .ce-block {
+      margin-right: 0;
+      padding-right: 0;
+    }
+    .ce-block__content {
+      margin: 0;
+      margin-left: 40px;
+    }
 
-.editorjs >>> .ce-paragraph {
-  word-break: break-word;
+    .ce-toolbar__actions {
+      right: auto;
+      left: -20px;
+    }
+    .codex-editor--narrow .ce-toolbox .ce-popover,
+    .codex-editor--narrow .ce-settings .ce-popover {
+      right: auto;
+      left: 0;
+    }
+    .ce-toolbar__content {
+      margin: 0;
+    }
+  }
 }
-
-.editorjs >>> .ce-block:first-of-type {
-  margin-top: 0;
-}
-
-.editorjs >>> .ce-block:last-of-type {
-  margin-bottom: 0;
-}
-
-/* stylelint-disable */
-.editorjs >>> .ce-block__content,
-.editorjs >>> .ce-toolbar__content {
-  max-width: 64rem;
-  max-width: 100%;
-}
-
-.editorjs >>> .codex-editor--narrow {
-  background-color: white !important;
+.show-drop-area {
+  transition: 0.3s ease;
+  border-radius: 4px;
+  border: 2px dashed transparent;
+  &[data-active='true'] {
+    display: block;
+    background-color: #d1f6fa7e;
+  }
 }
 </style>

@@ -1,3 +1,5 @@
+import { HorizontalBarMenuItemType } from '~/components/alex/custom/horizontalBar.vue';
+
 export const useMainHorizontalBar = () => {
   const { logout } = useStrapiAuth();
   const i18n = useI18n();
@@ -8,11 +10,7 @@ export const useMainHorizontalBar = () => {
     router.push('/login');
   };
 
-  const profileMenuItems: {
-    title: string;
-    to?: string;
-    action?: () => void;
-  }[] = [
+  const profileMenuItems: HorizontalBarMenuItemType[] = [
     {
       title: i18n.t('layouts.default.profile'),
       to: `/users/${user.value ? user.value.username : ''}`,
