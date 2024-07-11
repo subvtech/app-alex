@@ -10,7 +10,7 @@
         />
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
       </MenubarTrigger>
-      <MenubarContent>
+      <MenubarContent class="menuContent">
         <template v-for="item in contentTypeList">
           <p
             v-if="item.isLabel"
@@ -37,7 +37,7 @@
         <span>{{ activeFontSize?.name.split(' ', 1)[0] }}</span>
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
       </MenubarTrigger>
-      <MenubarContent>
+      <MenubarContent class="menuContent">
         <MenubarItem
           v-for="item in fontSizeList"
           :key="`${item.name}-item`"
@@ -55,7 +55,7 @@
         <span>{{ activeFontFamily }}</span>
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
       </MenubarTrigger>
-      <MenubarContent>
+      <MenubarContent class="menuContent">
         <template v-for="item in fontFamilyList">
           <p
             v-if="item.isLabel"
@@ -270,3 +270,9 @@ const activeFontFamily = computed(() => {
   return 'Sen';
 });
 </script>
+
+<style>
+.menuContent {
+  z-index: 99999;
+}
+</style>

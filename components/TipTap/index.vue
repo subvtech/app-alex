@@ -91,6 +91,9 @@ onMounted(() => {
         tippyOptions: {
           duration: 100,
           theme: 'transparent',
+          maxWidth: 1500,
+          interactive: true,
+          placement: 'auto-start',
         },
         updateDelay: 100,
         // shouldShow: ({ editor, view, state, oldState, from, to }) => {
