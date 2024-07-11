@@ -5,7 +5,7 @@
     <menubar :editor="editor" />
     <v-divider
       :class="dividerClass"
-      class="divider mx-1"
+      class="divider"
       :vertical="isVerticalDivider"
     ></v-divider>
     <toggleGroup :editor="editor" />
@@ -30,30 +30,10 @@ const { width } = useWindowSize();
 const isVerticalDivider = computed(() => width.value > 850);
 
 const dividerClass = computed(() => ({
-  'vertical-divider': isVerticalDivider.value,
-  'horizontal-divider': !isVerticalDivider.value,
+  'vertical-divider mx-1': isVerticalDivider.value,
+  'horizontal-divider my-1': !isVerticalDivider.value,
 }));
 </script>
-
-<!-- 
-<button
-:class="{ 'is-active': props.editor?.isActive('bold') }"
-@click="props.editor.chain().focus().toggleBold().run()"
->
-Bold
-</button>
-<button
-:class="{ 'is-active': props.editor?.isActive('italic') }"
-@click="props.editor.chain().focus().toggleItalic().run()"
->
-Italic
-</button>
-<button
-:class="{ 'is-active': props.editor?.isActive('strike') }"
-@click="props.editor.chain().focus().toggleStrike().run()"
->
-Strike
-</button> -->
 
 <style scoped>
 .bubble-menu {
@@ -87,7 +67,7 @@ Strike
 
 @media (max-width: 850px) {
   .bubble-menu {
-    max-width: 250px;
+    max-width: 235px;
     justify-content: center;
   }
 }

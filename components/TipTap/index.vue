@@ -30,6 +30,9 @@ import { TaskList } from '@tiptap/extension-task-list';
 import { ListItem } from '@tiptap/extension-list-item';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
+import { Underline } from '@tiptap/extension-underline';
+import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
+import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
@@ -83,6 +86,7 @@ onMounted(() => {
     extensions: [
       StarterKit.configure({
         history: false,
+        codeBlock: false,
       }),
       BubbleMenu.configure({
         element: document.querySelector(
@@ -178,6 +182,10 @@ onMounted(() => {
       ListItem,
       TextStyle,
       FontFamily,
+      CodeBlockLowlight.configure({
+        lowlight: createLowlight(common),
+      }),
+      Underline,
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {
@@ -331,26 +339,78 @@ watch(
 
   /* Code and preformatted text styles */
   code {
-    background-color: var(--purple-light);
+    background-color: #212121;
     border-radius: 0.4rem;
-    color: var(--black);
+    color: #fff;
     font-size: 0.85rem;
     padding: 0.25em 0.3em;
   }
 
   pre {
-    background: var(--black);
-    border-radius: 0.5rem;
-    color: var(--white);
+    background: rgb(var(--v-theme-gray-900));
+    border-radius: 4px;
+    color: #fff;
     font-family: 'JetBrainsMono', monospace;
     margin: 1.5rem 0;
-    padding: 0.75rem 1rem;
+    padding: 1rem;
 
     code {
       background: none;
       color: inherit;
       font-size: 0.8rem;
       padding: 0;
+    }
+
+    .hljs-comment,
+    .hljs-quote {
+      color: #616161;
+    }
+
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-attribute,
+    .hljs-tag,
+    .hljs-name,
+    .hljs-regexp,
+    .hljs-link,
+    .hljs-name,
+    .hljs-selector-id,
+    .hljs-selector-class {
+      color: #f98181;
+    }
+
+    .hljs-number,
+    .hljs-meta,
+    .hljs-built_in,
+    .hljs-builtin-name,
+    .hljs-literal,
+    .hljs-type,
+    .hljs-params {
+      color: #fbbc88;
+    }
+
+    .hljs-string,
+    .hljs-symbol,
+    .hljs-bullet {
+      color: #b9f18d;
+    }
+
+    .hljs-title,
+    .hljs-section {
+      color: #faf594;
+    }
+
+    .hljs-keyword,
+    .hljs-selector-tag {
+      color: #70cff8;
+    }
+
+    .hljs-emphasis {
+      font-style: italic;
+    }
+
+    .hljs-strong {
+      font-weight: 700;
     }
   }
 

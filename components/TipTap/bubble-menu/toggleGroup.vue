@@ -1,5 +1,6 @@
 <template>
   <ToggleGroup
+    v-if="props.editor"
     type="multiple"
     class="d-flex flex-wrap justify-center"
     size="sm"
