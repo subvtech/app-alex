@@ -36,7 +36,6 @@ import {
   Underline,
   Strikethrough,
   Code,
-  CodeXml,
   Link,
   Highlighter,
   Palette,
@@ -87,12 +86,6 @@ const toggleItens = [
     ariaLabel: 'Inline Code',
     onClick: () => props.editor.chain().focus().toggleCode().run(),
     isActive: () => props.editor.isActive('code'),
-  },
-  {
-    value: 'codeXml',
-    icon: CodeXml,
-    ariaLabel: 'Code Block',
-    onClick: () => props.editor.chain().focus().toggleCodeBlock().run(),
   },
   {
     value: 'link',

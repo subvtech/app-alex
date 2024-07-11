@@ -75,7 +75,7 @@ export default {
         },
       },
       {
-        title: 'fileSet',
+        title: 'Attaches',
         icon: 'mdi-file-multiple',
         command: ({ editor, range }) => {
           editor
@@ -86,6 +86,13 @@ export default {
               type: 'fileSet',
             })
             .run();
+        },
+      },
+      {
+        title: 'Code Block',
+        icon: 'mdi-code-not-equal-variant',
+        command: ({ editor, range }) => {
+          editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
         },
       },
     ]
@@ -100,7 +107,14 @@ export default {
       })
       .slice(0, 10);
   },
+  /* 
 
+  {
+    value: 'codeXml',
+    icon: CodeXml,
+    ariaLabel: 'Code Block',
+    onClick: () => props.editor.chain().focus().toggleCodeBlock().run(),
+  }, */
   render: () => {
     let component;
     let popup;

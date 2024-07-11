@@ -31,6 +31,7 @@ import { ListItem } from '@tiptap/extension-list-item';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Underline } from '@tiptap/extension-underline';
+import { TextAlign } from '@tiptap/extension-text-align';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 
@@ -70,7 +71,7 @@ onMounted(() => {
     name: encodeURIComponent('alex-tiptap'), // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA2MTM3OTMsIm5iZiI6MTcyMDYxMzc5MywiZXhwIjoxNzIwNzAwMTkzLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.IxTN4_2mL38zyey06xQOlIW-JOKGqpz4BM4aK8-qXFA', // Your JWT token
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA3MDA4NDUsIm5iZiI6MTcyMDcwMDg0NSwiZXhwIjoxNzIwNzg3MjQ1LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.SFu13aWqyQd4RVPY4_gr33oQmqIfrjlMmwDb89cgj0s', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
@@ -186,6 +187,9 @@ onMounted(() => {
         lowlight: createLowlight(common),
       }),
       Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {

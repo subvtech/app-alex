@@ -32,7 +32,7 @@
       </MenubarContent>
     </MenubarMenu>
     <!-- Font Size -->
-    <MenubarMenu>
+    <!-- <MenubarMenu>
       <MenubarTrigger>
         <span>{{ activeFontSize?.name.split(' ', 1)[0] }}</span>
         <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
@@ -48,7 +48,7 @@
           {{ item.name }}
         </MenubarItem>
       </MenubarContent>
-    </MenubarMenu>
+    </MenubarMenu> -->
     <!-- Font Family -->
     <MenubarMenu>
       <MenubarTrigger>
@@ -74,6 +74,29 @@
             {{ item.name }}
           </MenubarItem>
         </template>
+      </MenubarContent>
+    </MenubarMenu>
+    <!-- Text Align -->
+    <MenubarMenu>
+      <MenubarTrigger>
+        <v-icon
+          :icon="activeTextAlign.icon"
+          class="tw-mt-0.5 mr-2"
+          size="16px"
+        />
+        <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
+      </MenubarTrigger>
+      <MenubarContent class="menuContent min-w-12">
+        <MenubarItem
+          v-for="item in textAlignOptions"
+          :key="`${item.name}-item`"
+          :data-highlighted="activeTextAlign.value === item.value"
+          :style="{ fontSize: item?.value }"
+          class="d-flex justify-center"
+          @select="setTextAlign(item.value || '')"
+        >
+          <v-icon :icon="item.icon" size="14px" />
+        </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
   </Menubar>
@@ -189,28 +212,28 @@ const contentTypeList: menuItens[] = [
   },
 ];
 
-const fontSizeList: menuItens[] = [
-  {
-    name: 'Smaller',
-    value: '12px',
-  },
-  {
-    name: 'Small',
-    value: '14px',
-  },
-  {
-    name: 'Medium',
-    value: '16px',
-  },
-  {
-    name: 'Large',
-    value: '18px',
-  },
-  {
-    name: 'Extra Large',
-    value: '24px',
-  },
-];
+// const fontSizeList: menuItens[] = [
+//   {
+//     name: 'Smaller',
+//     value: '12px',
+//   },
+//   {
+//     name: 'Small',
+//     value: '14px',
+//   },
+//   {
+//     name: 'Medium',
+//     value: '16px',
+//   },
+//   {
+//     name: 'Large',
+//     value: '18px',
+//   },
+//   {
+//     name: 'Extra Large',
+//     value: '24px',
+//   },
+// ];
 
 const fontFamilyList: menuItens[] = [
   {
@@ -251,6 +274,33 @@ const fontFamilyList: menuItens[] = [
   },
 ];
 
+const textAlignOptions: menuItens[] = [
+  {
+    name: 'Left',
+    icon: 'mdi-format-align-left',
+    value: 'left',
+    isActive: () => props.editor.isActive({ textAlign: 'left' }),
+  },
+  {
+    name: 'Center',
+    icon: 'mdi-format-align-center',
+    value: 'center',
+    isActive: () => props.editor.isActive({ textAlign: 'center' }),
+  },
+  {
+    name: 'Right',
+    icon: 'mdi-format-align-right',
+    value: 'right',
+    isActive: () => props.editor.isActive({ textAlign: 'right' }),
+  },
+  {
+    name: 'Justify',
+    icon: 'mdi-format-align-justify',
+    value: 'justify',
+    isActive: () => props.editor.isActive({ textAlign: 'justify' }),
+  },
+];
+
 const setFontFamily = (fontFamily: string) => {
   if (!fontFamily || fontFamily.length === 0) {
     return props.editor.chain().focus().unsetFontFamily().run();
@@ -258,10 +308,17 @@ const setFontFamily = (fontFamily: string) => {
   props.editor.chain().focus().setFontFamily(fontFamily).run();
 };
 
+const setTextAlign = (textAlign: string) => {
+  if (!textAlign || textAlign.length === 0) {
+    return props.editor.chain().focus().unsetTextAlign().run();
+  }
+  props.editor.chain().focus().setTextAlign(textAlign).run();
+};
+
 const activeContentType = computed(() =>
   contentTypeList.find((item) => item.isActive?.()),
 );
-const activeFontSize = ref<menuItens | null>(fontSizeList[2]);
+// const activeFontSize = ref<menuItens | null>(fontSizeList[2]);
 
 const activeFontFamily = computed(() => {
   if (props.editor) {
@@ -269,6 +326,11 @@ const activeFontFamily = computed(() => {
   }
   return 'Sen';
 });
+
+const activeTextAlign = computed(
+  () =>
+    textAlignOptions.find((item) => item.isActive?.()) || textAlignOptions[0],
+);
 </script>
 
 <style>
