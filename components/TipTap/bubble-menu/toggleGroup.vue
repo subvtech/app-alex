@@ -5,17 +5,27 @@
     class="d-flex flex-wrap justify-center"
     size="sm"
   >
-    <ToggleGroupItem
+    <v-tooltip
       v-for="option in toggleItens"
       :key="option.value"
-      :value="option.value"
-      :aria-label="option.ariaLabel"
-      :disabled="option.disabled"
-      :data-active="option.isActive?.()"
-      @click="option.onClick?.()"
+      :text="option.ariaLabel"
+      content-class="bg-white tw-text-white tw-rounded-md tw-p-2 tw-shadow-md"
+      location="top center"
+      transition="fade-transition"
     >
-      <component :is="option.icon" class="tw-h-4 tw-w-4" />
-    </ToggleGroupItem>
+      <template #activator="{ props: tooltip }">
+        <ToggleGroupItem
+          :value="option.value"
+          :aria-label="option.ariaLabel"
+          :disabled="option.disabled"
+          :data-active="option.isActive?.()"
+          v-bind="tooltip"
+          @click="option.onClick?.()"
+        >
+          <component :is="option.icon" class="tw-h-4 tw-w-4" />
+        </ToggleGroupItem>
+      </template>
+    </v-tooltip>
   </ToggleGroup>
 </template>
 
@@ -46,66 +56,66 @@ const toggleItens = [
   {
     value: 'bold',
     icon: Bold,
-    ariaLabel: 'Toggle bold',
+    ariaLabel: 'Negrito',
     onClick: () => props.editor.chain().focus().toggleBold().run(),
     isActive: () => props.editor.isActive('bold'),
   },
   {
     value: 'italic',
     icon: Italic,
-    ariaLabel: 'Toggle italic',
+    ariaLabel: 'Itálico',
     onClick: () => props.editor.chain().focus().toggleItalic().run(),
     isActive: () => props.editor.isActive('italic'),
   },
   {
     value: 'underline',
     icon: Underline,
-    ariaLabel: 'Toggle underline',
+    ariaLabel: 'Sublinhar',
     onClick: () => props.editor.chain().focus().toggleUnderline().run(),
     isActive: () => props.editor.isActive('underline'),
   },
   {
     value: 'strikethrough',
     icon: Strikethrough,
-    ariaLabel: 'Toggle strikethrough',
+    ariaLabel: 'Tachar',
     onClick: () => props.editor.chain().focus().toggleStrike().run(),
     isActive: () => props.editor.isActive('strike'),
   },
   {
     value: 'code',
     icon: Code,
-    ariaLabel: 'Toggle code',
+    ariaLabel: 'Inline Code',
     onClick: () => props.editor.chain().focus().toggleCode().run(),
     isActive: () => props.editor.isActive('code'),
   },
   {
     value: 'codeXml',
     icon: CodeXml,
-    ariaLabel: 'Toggle code xml',
+    ariaLabel: 'Code Block',
     onClick: () => props.editor.chain().focus().toggleCodeBlock().run(),
   },
   {
     value: 'link',
     icon: Link,
-    ariaLabel: 'Toggle link',
+    ariaLabel: 'Inserir link',
     disabled: true,
   },
   {
     value: 'highlighter',
     icon: Highlighter,
-    ariaLabel: 'Toggle highlighter',
+    ariaLabel: 'Cor do texto',
     disabled: true,
   },
   {
     value: 'palette',
     icon: Palette,
-    ariaLabel: 'Toggle palette',
+    ariaLabel: 'Cor de destaque',
     disabled: true,
   },
   {
     value: 'ellipsisVertical',
     icon: EllipsisVertical,
-    ariaLabel: 'Toggle ellipsis vertical',
+    ariaLabel: 'Mais opções',
     disabled: true,
   },
 ];
