@@ -15,6 +15,7 @@
     >
       <template #activator="{ props: tooltip }">
         <ToggleGroupItem
+          v-if="!option.popover"
           :value="option.value"
           :aria-label="option.ariaLabel"
           :disabled="option.disabled"
@@ -24,6 +25,28 @@
         >
           <component :is="option.icon" class="tw-h-4 tw-w-4" />
         </ToggleGroupItem>
+        <Popover v-else>
+          <PopoverTrigger
+            v-bind="tooltip"
+            :data-active="option.isActive?.()"
+            class="tw-h-9 tw-px-2.5 tw-rounded-md hover:tw-bg-muted hover:tw-text-muted-foreground data-[active=true]:tw-bg-accent data-[active=true]:tw-text-accent-foreground"
+          >
+            <component :is="option.icon" class="tw-h-4 tw-w-4" />
+          </PopoverTrigger>
+          <PopoverContent class="max-w-55 pa-2">
+            <colorSelector
+              v-if="
+                option.popover === 'color' || option.popover === 'highlight'
+              "
+              :type="option.popover"
+              :active-color="
+                option.popover === 'color' ? currentColor : currentHighLight
+              "
+              @set-text-color="setColor"
+              @set-highlight-color="setHighlight"
+            />
+          </PopoverContent>
+        </Popover>
       </template>
     </v-tooltip>
   </ToggleGroup>
@@ -43,6 +66,7 @@ import {
 } from 'lucide-vue-next';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Editor } from '@tiptap/vue-3';
+import colorSelector from './colorSelector.vue';
 
 const props = defineProps({
   editor: {
@@ -91,19 +115,21 @@ const toggleItens = [
     value: 'link',
     icon: Link,
     ariaLabel: 'Inserir link',
-    disabled: true,
+    popover: 'link',
   },
   {
     value: 'highlighter',
     icon: Highlighter,
-    ariaLabel: 'Cor do texto',
-    disabled: true,
+    ariaLabel: 'Cor do  destaque',
+    popover: 'highlight',
+    isActive: () => currentHighLight.value !== undefined,
   },
   {
     value: 'palette',
     icon: Palette,
-    ariaLabel: 'Cor de destaque',
-    disabled: true,
+    ariaLabel: 'Cor de texto ',
+    popover: 'color',
+    isActive: () => currentColor.value !== undefined,
   },
   {
     value: 'ellipsisVertical',
@@ -112,4 +138,28 @@ const toggleItens = [
     disabled: true,
   },
 ];
+
+const currentColor = computed(
+  () => props.editor.getAttributes('textStyle')?.color || undefined,
+);
+
+const setColor = (color: string) => {
+  if (color && color !== currentColor.value && color !== '#000') {
+    props.editor.commands.setColor(color);
+  } else {
+    props.editor.chain().focus().unsetColor().run();
+  }
+};
+
+const setHighlight = (color: string) => {
+  if (color && color !== currentColor.value && color !== '#fff') {
+    props.editor.chain().setHighlight({ color }).run();
+  } else {
+    props.editor.chain().focus().unsetHighlight().run();
+  }
+};
+
+const currentHighLight = computed(
+  () => props.editor.getAttributes('highlight')?.color || undefined,
+);
 </script>

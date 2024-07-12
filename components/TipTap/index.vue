@@ -32,6 +32,8 @@ import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Underline } from '@tiptap/extension-underline';
 import { TextAlign } from '@tiptap/extension-text-align';
+import { Highlight } from '@tiptap/extension-highlight';
+import { Color } from '@tiptap/extension-color';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 
@@ -190,6 +192,8 @@ onMounted(() => {
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
+      Color,
+      Highlight.configure({ multicolor: true }),
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {
