@@ -52,6 +52,7 @@
             "
           />
         </div>
+
         <div class="d-flex flex-column gap-2 tw-w-full">
           <p class="text-body-4 text-gray-800 mb-1">
             <span class="text-tag-orange-light">* </span
@@ -148,6 +149,18 @@
           </div>
         </template>
       </div>
+      <v-tooltip text="Warning, you're about to spend real money">
+        <template #activator="{ props: tooltipProps }">
+          <alex-custom-button
+            text="Reward students"
+            variant="warning"
+            v-bind="tooltipProps"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="rewardSingleStudent"
+          />
+        </template>
+      </v-tooltip>
 
       <alex-learningplan-task-tabs
         v-model="activePage"
@@ -211,6 +224,7 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   finishAt: null,
 });
 const { t } = useI18n();
+const { rewardSingleStudent, loading: contractLoading } = useContracts();
 const isSendingMessage = ref(false);
 const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });

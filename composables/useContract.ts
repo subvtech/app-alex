@@ -254,6 +254,42 @@ export const useContracts = () => {
     }
   };
 
+  const rewardSingleStudent = async (
+    contractAddress: string | undefined,
+    studentAddress: string,
+    studentGrade: number,
+  ) => {
+    if (!contractAddress) throw new Error('Contract address not provided');
+
+    loading.value = true;
+
+    const contractABI = TaskOwnerReedemsContract.abi;
+
+    try {
+      // Replace with the actual freelancer address
+
+      const browserProvider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await withTimeout(12000, browserProvider.getSigner());
+      const TaskContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer,
+      );
+      const tx = await TaskContract.redeemSingleReward(
+        studentAddress,
+        studentGrade,
+      );
+      await tx.wait(); // Wait for the transaction to be mined
+      console.log('Student paid successfully!');
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const getRewardStudentsFee = async (
     contractAddress: string | undefined,
     addressList: string[] = [],
@@ -317,5 +353,6 @@ export const useContracts = () => {
     getRewardStudentsFee,
     loading,
     cancelContract,
+    rewardSingleStudent,
   };
 };
