@@ -33,7 +33,10 @@
           >
             <component :is="option.icon" class="tw-h-4 tw-w-4" />
           </PopoverTrigger>
-          <PopoverContent class="max-w-55 pa-2">
+          <PopoverContent
+            class="pa-2"
+            :class="option.popover !== 'link' ? 'max-w-55 ' : 'width-65'"
+          >
             <colorSelector
               v-if="
                 option.popover === 'color' || option.popover === 'highlight'
@@ -44,6 +47,11 @@
               "
               @set-text-color="setColor"
               @set-highlight-color="setHighlight"
+            />
+            <linkInput
+              v-else-if="option.popover === 'link'"
+              :active-link="getCurrentLink()"
+              @update:model-value="setLink($event)"
             />
           </PopoverContent>
         </Popover>
@@ -65,8 +73,9 @@ import {
   EllipsisVertical,
 } from 'lucide-vue-next';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Editor } from '@tiptap/vue-3';
+import { Editor, isActive } from '@tiptap/vue-3';
 import colorSelector from './colorSelector.vue';
+import linkInput from './linkInput.vue';
 
 const props = defineProps({
   editor: {
@@ -116,6 +125,7 @@ const toggleItens = [
     icon: Link,
     ariaLabel: 'Inserir link',
     popover: 'link',
+    isActive: () => getCurrentLink() !== '',
   },
   {
     value: 'highlighter',
@@ -162,4 +172,21 @@ const setHighlight = (color: string) => {
 const currentHighLight = computed(
   () => props.editor.getAttributes('highlight')?.color || undefined,
 );
+
+const getCurrentLink = () => {
+  return props.editor?.getAttributes('link')?.href || '';
+};
+
+const setLink = (link: string) => {
+  if (link) {
+    props.editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ href: link, target: '_blank' })
+      .run();
+  } else {
+    props.editor.chain().focus().extendMarkRange('link').unsetLink().run();
+  }
+};
 </script>

@@ -28,6 +28,7 @@ import { UniqueID } from '@tiptap-pro/extension-unique-id';
 import { TaskItem } from '@tiptap/extension-task-item';
 import { TaskList } from '@tiptap/extension-task-list';
 import { ListItem } from '@tiptap/extension-list-item';
+import { Link } from '@tiptap/extension-link';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Underline } from '@tiptap/extension-underline';
@@ -73,7 +74,7 @@ onMounted(() => {
     name: encodeURIComponent('alex-tiptap'), // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA3MDA4NDUsIm5iZiI6MTcyMDcwMDg0NSwiZXhwIjoxNzIwNzg3MjQ1LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.SFu13aWqyQd4RVPY4_gr33oQmqIfrjlMmwDb89cgj0s', // Your JWT token
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA4OTYwMTcsIm5iZiI6MTcyMDg5NjAxNywiZXhwIjoxNzIwOTgyNDE3LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.TmtfwqpLYQoSYrf6nNVCRxg_EqlOpOm8fRFuNcT3Wd8', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
@@ -194,6 +195,9 @@ onMounted(() => {
       }),
       Color,
       Highlight.configure({ multicolor: true }),
+      Link.configure({
+        openOnClick: true,
+      }),
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {
@@ -343,6 +347,19 @@ watch(
   h5,
   h6 {
     font-size: 1rem;
+  }
+
+  /* Link styles */
+  a {
+    color: #99c3ff;
+    cursor: pointer;
+
+    &:visited {
+      color: #c58af9;
+    }
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   /* Code and preformatted text styles */
