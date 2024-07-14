@@ -18,7 +18,7 @@
           'active-color': color.value === props.activeColor,
         },
       ]"
-      @click="handleClick(color.value)"
+      @click.stop="handleClick(color.value)"
     />
     <ToggleGroupItem
       v-if="false"
@@ -26,7 +26,7 @@
       aria-label="black"
       data-active="false"
       class="width-5 height-5 pa-0 hover:tw-scale-125 hover:tw-bg-white hover:tw-text-black tw-transition-all"
-      @click="console.log('color', '#000')"
+      @click.stop="console.log('color', '#000')"
     >
       <RotateCcw :size="18" />
     </ToggleGroupItem>
@@ -126,5 +126,6 @@ const colors = [
 .white {
   --tw-shadow-color: rgb(var(--v-theme-gray-200));
   outline: 1px solid rgb(var(--v-theme-gray-100));
+  border-color: #000 !important;
 }
 </style>

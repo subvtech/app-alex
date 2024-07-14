@@ -8,7 +8,7 @@
     </div>
 
     <div class="bubble-menu-wrapper">
-      <tip-tap-bubble-menu :editor="editor" />
+      <tip-tap-bubble-menu :editor="editor" @click.stop.prevent />
     </div>
     <editor-content :editor="editor" />
   </div>
@@ -43,6 +43,7 @@ import * as Y from 'yjs';
 import Commands from './slash-menu/commands.js';
 import suggestion from './slash-menu/suggestion.js';
 import FileSet from './file-set/Extension';
+import { isTextSelected } from './bubble-menu/isTextSelected';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
@@ -71,10 +72,10 @@ const collors = [
 onMounted(() => {
   const user = useStrapiUser();
   const provider = new TiptapCollabProvider({
-    name: encodeURIComponent('alex-tiptap'), // Unique document identifier for syncing. This is your document name.
+    name: 'alex-tiptap', // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA4OTYwMTcsIm5iZiI6MTcyMDg5NjAxNywiZXhwIjoxNzIwOTgyNDE3LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.TmtfwqpLYQoSYrf6nNVCRxg_EqlOpOm8fRFuNcT3Wd8', // Your JWT token
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA5ODI3ODMsIm5iZiI6MTcyMDk4Mjc4MywiZXhwIjoxNzIxMDY5MTgzLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.jMvLIDR0tqv-C7XEUhU-uNHTap8GF0o0fuBDkikuScU', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
@@ -100,19 +101,15 @@ onMounted(() => {
           duration: 100,
           theme: 'transparent',
           maxWidth: 1500,
-          interactive: true,
           placement: 'auto-start',
         },
         updateDelay: 100,
-        // shouldShow: ({ editor, view, state, oldState, from, to }) => {
-        //   if (!view) {
-        //     return false;
-        //   }
-        //   const domAtPos = view.domAtPos(from || 0).node as HTMLElement;
-        //   const nodeDOM = view.nodeDOM(from || 0) as HTMLElement;
-        //   const node = nodeDOM || domAtPos;
-        //   return true;
-        // },
+        shouldShow: ({ view }) => {
+          if (!view) {
+            return false;
+          }
+          return isTextSelected({ editor: editor.value });
+        },
       }),
       Placeholder.configure({
         placeholder: ({ node }) => {

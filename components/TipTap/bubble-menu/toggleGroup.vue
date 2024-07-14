@@ -73,7 +73,7 @@ import {
   EllipsisVertical,
 } from 'lucide-vue-next';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Editor, isActive } from '@tiptap/vue-3';
+import { Editor } from '@tiptap/vue-3';
 import colorSelector from './colorSelector.vue';
 import linkInput from './linkInput.vue';
 
@@ -132,14 +132,16 @@ const toggleItens = [
     icon: Highlighter,
     ariaLabel: 'Cor do  destaque',
     popover: 'highlight',
-    isActive: () => currentHighLight.value !== undefined,
+    isActive: () =>
+      currentHighLight.value !== undefined && currentHighLight.value !== '#fff',
   },
   {
     value: 'palette',
     icon: Palette,
     ariaLabel: 'Cor de texto ',
     popover: 'color',
-    isActive: () => currentColor.value !== undefined,
+    isActive: () =>
+      currentColor.value !== undefined && currentColor.value !== '#000',
   },
   {
     value: 'ellipsisVertical',
@@ -154,19 +156,11 @@ const currentColor = computed(
 );
 
 const setColor = (color: string) => {
-  if (color && color !== currentColor.value && color !== '#000') {
-    props.editor.commands.setColor(color);
-  } else {
-    props.editor.chain().focus().unsetColor().run();
-  }
+  props.editor.chain().focus().setColor(color).run();
 };
 
 const setHighlight = (color: string) => {
-  if (color && color !== currentColor.value && color !== '#fff') {
-    props.editor.chain().setHighlight({ color }).run();
-  } else {
-    props.editor.chain().focus().unsetHighlight().run();
-  }
+  props.editor.chain().focus().setHighlight({ color }).run();
 };
 
 const currentHighLight = computed(
