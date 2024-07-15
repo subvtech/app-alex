@@ -23,7 +23,11 @@
       <alex-custom-chip
         status="secondary"
         variant="outlined"
-        :text="group ? 'group' : 'individual'"
+        :text="
+          group
+            ? $t('pages.task.table.type.group')
+            : $t('pages.task.table.type.individual')
+        "
         size="small"
       />
       <alex-custom-chip

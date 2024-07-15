@@ -201,7 +201,7 @@ interface Submission {
 interface DetailsDrawerProps {
   taskId: number;
   taskMemberId: number;
-  submission: Submission;
+  submission?: Submission;
   tags?: TagSimple[];
   group?: {
     name: string;
@@ -243,6 +243,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   taskEvents: () => [],
   submission: undefined,
 });
+
 // Pegar esses dados
 const tags = ref<TagSimple[]>(props.tags);
 const status = ref<TaskMemberStatus>(props.status);
@@ -252,7 +253,7 @@ const finalDate = ref<string | undefined>(props.finalDate);
 const description = ref<string>(props.description);
 const restrictions = ref<string>(props.restrictions);
 const isGroup = toRef(props, 'group');
-const submissionDescription = ref<string>(props.submission.description);
+const submissionDescription = ref<string>(props?.submission?.description || '');
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
@@ -451,7 +452,7 @@ watch(model, (value) => {
 watch(model, (value) => {
   if (value) {
     description.value = props.description;
-    submissionDescription.value = props.submission.description;
+    submissionDescription.value = props?.submission?.description || '';
     tags.value = props.tags;
     status.value = props.status;
     startDate.value = props.startDate;
@@ -461,9 +462,6 @@ watch(model, (value) => {
     setTimeout(() => {
       isFirstTimeOpened.value = false;
     }, 1100);
-    // setTimeout(() => {
-    //  loadingSubmission.value = false;
-    // }, 800);
     return;
   }
   loadingSubmission.value = true;
