@@ -91,6 +91,8 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 const strapi = useStrapiUtils();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
 
 // Dialog
 const groupDialog = ref<boolean>(false);
@@ -104,6 +106,17 @@ function openDialog(
   group: LearningPlanGroupSimple | undefined,
   lpGroups: LearningPlanGroupSimple[] | undefined = undefined,
 ) {
+  const taskMember = group?.task_members;
+
+  if (taskMember && taskMember[0]?.task_submissions?.length) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
   groupDialog.value = true;
   groupInfo.value = group;
   allGroups.value = lpGroups || [];
@@ -128,6 +141,7 @@ const getGroups = (learningplanId: number) =>
       'learning_plan_members.user.fullname',
       'learning_plan_members.user.avatar',
       'learning_plan_groups.task_members',
+      'learning_plan_groups.task_members.task_submissions',
     ],
     filters: { learningplan: learningplanId },
   });

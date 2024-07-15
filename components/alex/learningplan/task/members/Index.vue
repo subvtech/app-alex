@@ -231,6 +231,9 @@ const handleAddGroup = () => {
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
+      task_submissions: {
+        populate: ['justification'],
+      },
       learning_plan_member: {
         populate: ['user.avatar', 'learning_class'],
       },
@@ -372,12 +375,28 @@ const getMembersOfGroup = (group: LearningPlanGroupSimple) =>
   }));
 const handleEditClick = (
   selectedGroup: LearningPlanGroupSimple,
-  taskMembers: { raw: TaskMember }[],
+  taskMembers: { raw: TaskMember }[] | any,
 ) => {
+  // Checa se o grupo tem submissões
+  const selectedTaskMember = taskMembers.find(
+    (member) => member.raw.learning_plan_group?.id === selectedGroup.id,
+  );
+
+  if (selectedTaskMember?.raw.task_submissions?.length) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
+  // Atualiza os dados para abrir o modal
   groupInfo.value = selectedGroup;
   allGroups.value = taskMembers.map(
     (member) => member.raw.learning_plan_group!,
   );
+
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {

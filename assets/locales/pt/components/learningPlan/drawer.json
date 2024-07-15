@@ -70,6 +70,7 @@
         "missName": "Informe o nome do grupo",
         "updated": "Grupo atualizado com sucesso",
         "created": "Grupo criado com sucesso",
+        "hasSubmission": "O grupo não pode ser editado porque já possui submissão",
         "updateError": "Falha ao atualizar grupo",
         "createError": "Falha ao criar grupo"
       }
