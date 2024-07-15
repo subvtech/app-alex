@@ -60,11 +60,15 @@
       :description="selectedTask.task.description || undefined"
       :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
       :task-member-id="selectedTask.id"
-      :submission="{
-        constraints:
-          selectedTask.task?.allowed_editor_plugins?.split(',') || [],
-        description: selectedTask.task?.submission_description,
-      }"
+      :submission="
+        selectedTask.task?.submission_required
+          ? {
+              constraints:
+                selectedTask.task?.allowed_editor_plugins?.split(',') || [],
+              description: selectedTask.task?.submission_description,
+            }
+          : undefined
+      "
       @update-status="
         (newIndex, value, newStatus) =>
           handleUpdateStatus(newIndex, value, newStatus, true)

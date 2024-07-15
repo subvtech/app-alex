@@ -81,9 +81,6 @@ const tabs = computed(() => {
       value: '3',
     },
   ];
-  if (!props.submission) {
-    return defaultTabs;
-  }
   if (props.showMemberTab) {
     defaultTabs = [
       {
@@ -92,6 +89,11 @@ const tabs = computed(() => {
       },
       ...defaultTabs,
     ];
+  }
+  if (!props.submission) {
+    return defaultTabs;
+  }
+  if (props.showMemberTab) {
     return [...defaultTabs.slice(0, 2), submissions, ...defaultTabs.slice(2)];
   }
   return [...defaultTabs.slice(0, 1), submissions, ...defaultTabs.slice(1)];
