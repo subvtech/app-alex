@@ -597,6 +597,7 @@ const handleChangeMembers = async () => {
     const response = await find<TaskMember>('task-members', {
       populate: [
         'task_submission',
+        'learning_plan_group.group_members.student_member.user.avatar',
         'learning_plan_member.user.avatar',
         'learning_plan_member.learning_class',
       ],
@@ -604,6 +605,7 @@ const handleChangeMembers = async () => {
         task: editTaskId.value,
       },
     });
+
     const { data } = response;
     if (task) {
       task.task_members = data;

@@ -41,7 +41,7 @@
           :start-at="startAt"
           :finish-at="finishAt"
           :can-submit-after="props.sendAfterDeadline"
-          @add-group="(id: number) => console.log(id)"
+          @add-group="handleAddGroup"
         />
 
         <alex-custom-dropdown :items="typeOptions" :disabled="!!type">
@@ -68,7 +68,7 @@
         :can-submit-after="props.sendAfterDeadline"
         :classes="classes.data"
         :group="groupInfo"
-        @add-group="refresh()"
+        @add-group="handleAddGroup"
       />
     </template>
     <!-- Cards -->
@@ -222,6 +222,12 @@ const typeOptions: AlexDropdownItem[] = [
     },
   },
 ];
+
+const handleAddGroup = () => {
+  emit('change-members');
+  refresh();
+};
+
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
@@ -265,6 +271,7 @@ const showingData = (
 
   return message;
 };
+
 const { data: members, refresh } = await useAsyncData(
   'task-members',
   () => getMembers(props.taskId),
@@ -389,6 +396,7 @@ const getGroups = (learningplanId: number) =>
       'learning_plan_groups.learning_class',
       'learning_plan_members',
       'learning_plan_members.user.fullname',
+      'learning_plan_members.user.avatar',
     ],
     filters: {
       learningplan: learningplanId,
