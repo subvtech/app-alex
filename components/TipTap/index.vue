@@ -17,11 +17,9 @@
 <script setup lang="ts">
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
-
 import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
-
 import { StarterKit } from '@tiptap/starter-kit';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { UniqueID } from '@tiptap-pro/extension-unique-id';
@@ -43,11 +41,13 @@ import * as Y from 'yjs';
 import Commands from './slash-menu/commands.js';
 import suggestion from './slash-menu/suggestion.js';
 import FileSet from './file-set/Extension';
+import VueDragHandle from './drag-menu/Extension';
 import { isTextSelected } from './bubble-menu/isTextSelected';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
 const app = useNuxtApp();
+
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 
@@ -75,7 +75,7 @@ onMounted(() => {
     name: 'alex-tiptap', // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjA5ODI3ODMsIm5iZiI6MTcyMDk4Mjc4MywiZXhwIjoxNzIxMDY5MTgzLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.jMvLIDR0tqv-C7XEUhU-uNHTap8GF0o0fuBDkikuScU', // Your JWT token
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjEwODY1NDEsIm5iZiI6MTcyMTA4NjU0MSwiZXhwIjoxNzIxMTcyOTQxLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.T4F4VaFwifMq3PCKv0kKPswvj_nTAxN_m3LC4_b0r4A', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
@@ -194,6 +194,11 @@ onMounted(() => {
       Highlight.configure({ multicolor: true }),
       Link.configure({
         openOnClick: true,
+      }),
+
+      VueDragHandle.configure({
+        editor: () => editor.value,
+        tippyOptions: { offset: [-2, 16], zIndex: 99 },
       }),
     ],
     content: props.modelValue,

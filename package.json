@@ -71,6 +71,8 @@
     "@pinia/nuxt": "^0.4.11",
     "@postlight/parser": "^2.2.3",
     "@syfxlin/tiptap-starter-kit": "^1.0.3",
+    "@tiptap-pro/extension-drag-handle": "^2.9.3",
+    "@tiptap-pro/extension-node-range": "^2.9.3",
     "@tiptap/extension-bubble-menu": "^2.4.0",
     "@tiptap/extension-code-block-lowlight": "^2.4.0",
     "@tiptap/extension-collaboration": "^2.4.0",
