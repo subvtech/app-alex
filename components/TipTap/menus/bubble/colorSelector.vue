@@ -20,22 +20,10 @@
       ]"
       @click.stop="handleClick(color.value)"
     />
-    <ToggleGroupItem
-      v-if="false"
-      value="#000"
-      aria-label="black"
-      data-active="false"
-      class="width-5 height-5 pa-0 hover:tw-scale-125 hover:tw-bg-white hover:tw-text-black tw-transition-all"
-      @click.stop="console.log('color', '#000')"
-    >
-      <RotateCcw :size="18" />
-    </ToggleGroupItem>
   </ToggleGroup>
 </template>
 
 <script setup lang="ts">
-import { RotateCcw } from 'lucide-vue-next';
-
 interface propsType {
   type: 'highlight' | 'color';
   activeColor: string;
