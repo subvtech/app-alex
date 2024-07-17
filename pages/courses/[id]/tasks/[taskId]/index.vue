@@ -78,6 +78,7 @@
       :task-member-id="studentDetails.id"
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
+      :contract-address="taskStore.task.contract_address"
       :student="{
         name: studentDetails.task_member_students[0].student_member.user
           .fullname,
@@ -87,6 +88,8 @@
         avatar:
           studentDetails.task_member_students[0].student_member.user?.avatar
             ?.url,
+        wallet:
+          studentDetails.task_member_students[0].student_member.user.wallet,
       }"
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"

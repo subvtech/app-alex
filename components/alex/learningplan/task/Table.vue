@@ -178,6 +178,7 @@ const props = defineProps<{
     list?: string;
   };
   dragFrom: number;
+  handlePendingContract: () => Promise<boolean>;
 }>();
 
 const { t } = useI18n();
@@ -311,7 +312,10 @@ const getDropDownAction = (
     delete: {
       text: t('pages.task.table.dropdown.delete'),
       warning: true,
-      onClick: () => {
+      onClick: async () => {
+        const isTherePendingContract = await props.handlePendingContract();
+        console.log(isTherePendingContract);
+        if (isTherePendingContract) return;
         taskToDelete.value = id;
         deleteModal.value = true;
       },

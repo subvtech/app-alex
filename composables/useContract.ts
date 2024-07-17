@@ -1,7 +1,7 @@
 import { BigNumberish, ethers } from 'ethers';
 
 import TaskOwnerReedemsContract from '@/build/contracts/TaskOwnerReedemsContract.json';
-import TaskOwnerReedemsContract2 from '@/build/contracts/TaskOwnerReedemsContract2.json';
+import TaskOwnerSingleRedeem from '@/build/contracts/TaskOwnerSingleRedeem.json';
 import GiveawayContract from '@/build/contracts/GiveawayContract.json';
 
 declare global {
@@ -10,18 +10,13 @@ declare global {
   }
 }
 
-export type AvailableContracts =
-  | 'TaskOwnerReedemsContract'
-  | 'TaskOwnerReedemsContract2';
-
 export interface CreateContractProps {
   budget: number;
-  chosenContract: AvailableContracts;
+  totalNumberOfStudents: number;
 }
 
 export interface CancelledContractProps {
   contractAddress: string;
-  chosenContract: AvailableContracts;
 }
 
 const localGanacheChainId = 1337; // '0x1691';
@@ -71,20 +66,15 @@ export const useContracts = () => {
     }
   };
 
-  const getCompiledContract = (chosenContract: AvailableContracts) => {
-    let contractABI, contractBinary;
-    if (chosenContract === 'TaskOwnerReedemsContract') {
-      contractABI = TaskOwnerReedemsContract.abi;
-      contractBinary = TaskOwnerReedemsContract.bytecode;
-    } else {
-      contractABI = TaskOwnerReedemsContract2.abi;
-      contractBinary = TaskOwnerReedemsContract2.bytecode;
-    }
-    return { contractABI, contractBinary };
+  const getCompiledContract = () => {
+    return {
+      contractABI: TaskOwnerSingleRedeem.abi,
+      contractBinary: TaskOwnerSingleRedeem.bytecode,
+    };
   };
 
   const createTaskContract = async (props: CreateContractProps) => {
-    const { budget, chosenContract } = props;
+    const { budget, totalNumberOfStudents } = props;
     loading.value = true;
     console.log({ createTaskContract: budget });
     try {
@@ -95,8 +85,7 @@ export const useContracts = () => {
       const wallet = await withTimeout(12000, browserProvider.getSigner());
       const budgetInWei = ethers.parseEther(usdToEth(budget).toString());
 
-      const { contractABI, contractBinary } =
-        getCompiledContract(chosenContract);
+      const { contractABI, contractBinary } = getCompiledContract();
 
       const contractFactory = new ethers.ContractFactory(
         contractABI,
@@ -105,7 +94,7 @@ export const useContracts = () => {
       );
 
       console.log({ usdt: budget, wei: budgetInWei });
-      const contract = await contractFactory.deploy({
+      const contract = await contractFactory.deploy(totalNumberOfStudents, {
         value: budgetInWei,
       });
       await contract.waitForDeployment();
@@ -119,38 +108,6 @@ export const useContracts = () => {
       return contract.target;
     } catch (err) {
       console.log(err);
-    }
-
-    loading.value = false;
-  };
-
-  const earnFunds = async (luckyAddress: string, budgetInWei: bigint) => {
-    loading.value = true;
-    const provider = new ethers.JsonRpcProvider(networkUrl);
-
-    const wallet = new ethers.Wallet(
-      '0x5d921ddd849ea879278f3d87b97399364c159440e475a0ebfa49bcefb6f5e212',
-      provider,
-    );
-    const contractABI = GiveawayContract.abi;
-    const contractBinary = GiveawayContract.bytecode;
-    const contractFactory = new ethers.ContractFactory(
-      contractABI,
-      contractBinary,
-      wallet,
-    );
-
-    const contract = await contractFactory.deploy({
-      value: budgetInWei,
-    });
-
-    try {
-      const tx = await contract.withdraw(luckyAddress);
-      await tx.wait(); // Wait for the transaction to be mined
-      console.log({ balance: await provider.getBalance(contract.target) });
-      console.log('Withdrawal successful!');
-    } catch (error) {
-      console.error('Error:', error);
     }
 
     loading.value = false;
@@ -186,25 +143,25 @@ export const useContracts = () => {
   };
 
   const cancelContract = async (props: CancelledContractProps) => {
-    const { chosenContract, contractAddress } = props;
+    const { contractAddress } = props;
     console.log(props);
 
     loading.value = true;
 
     try {
       if (!contractAddress) throw new Error('Contract address not provided');
-      const { contractABI } = getCompiledContract(chosenContract);
+      const { contractABI } = getCompiledContract();
 
       // Replace with the actual freelancer address
       console.log({ contractABI });
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
       const signer = await withTimeout(12000, browserProvider.getSigner());
-      const TaskContract = new ethers.Contract(
+      const taskContract = new ethers.Contract(
         contractAddress,
         contractABI,
         signer,
       );
-      const tx = await TaskContract.cancelDeal();
+      const tx = await taskContract.cancelDeal();
       await tx.wait(); // Wait for the transaction to be mined
 
       console.log('The contract was cancelled successfully!');
@@ -216,6 +173,38 @@ export const useContracts = () => {
     } finally {
       loading.value = false;
     }
+  };
+
+  const hasTheStudentBeenPaid = async (
+    contractAddress: string | undefined,
+    studentAddress: string | undefined,
+  ) => {
+    if (!contractAddress) throw new Error('Contract address not provided');
+    if (!studentAddress) throw new Error('Student address not provided');
+    const provider = await ethers.getDefaultProvider(networkUrl);
+    const { contractABI } = getCompiledContract();
+
+    const taskContract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider,
+    );
+    const redeemers: string[] = [];
+    try {
+      let i = 0;
+      try {
+        while (i < 100) {
+          redeemers.push(await taskContract.redeemers(i));
+          i++;
+        }
+      } catch (err) {}
+
+      console.log({ redeemers });
+      console.log(`Redeemers: ${redeemers.join(', ')}`); // Assuming redeemers is an array
+    } catch (error) {
+      console.error('Error reading public variables:', error);
+    }
+    return redeemers.includes(studentAddress);
   };
 
   const rewardStudents = async (
@@ -230,19 +219,19 @@ export const useContracts = () => {
       throw new Error('Address list and gradeList must have the same length');
     loading.value = true;
 
-    const contractABI = TaskOwnerReedemsContract.abi;
+    const { contractABI } = getCompiledContract();
 
     try {
       // Replace with the actual freelancer address
 
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
       const signer = await withTimeout(12000, browserProvider.getSigner());
-      const TaskContract = new ethers.Contract(
+      const taskContract = new ethers.Contract(
         contractAddress,
         contractABI,
         signer,
       );
-      const tx = await TaskContract.redeemRewards(addressList, gradeList);
+      const tx = await taskContract.redeemRewards(addressList, gradeList);
       await tx.wait(); // Wait for the transaction to be mined
       console.log('Students paid successfully!');
       return true;
@@ -263,19 +252,19 @@ export const useContracts = () => {
 
     loading.value = true;
 
-    const contractABI = TaskOwnerReedemsContract.abi;
+    const contractABI = TaskOwnerSingleRedeem.abi;
 
     try {
       // Replace with the actual freelancer address
 
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
       const signer = await withTimeout(12000, browserProvider.getSigner());
-      const TaskContract = new ethers.Contract(
+      const taskContract = new ethers.Contract(
         contractAddress,
         contractABI,
         signer,
       );
-      const tx = await TaskContract.redeemSingleReward(
+      const tx = await taskContract.redeemSingleReward(
         studentAddress,
         studentGrade,
       );
@@ -303,14 +292,14 @@ export const useContracts = () => {
 
     try {
       // Replace with the actual freelancer address
-
-      const gasPrice = await ethers.getDefaultProvider(networkUrl).getFeeData();
-      const TaskContract = new ethers.Contract(
+      const provider = await ethers.getDefaultProvider(networkUrl);
+      const gasPrice = await provider.getFeeData();
+      const taskContract = new ethers.Contract(
         contractAddress,
         contractABI,
-        ethers.getDefaultProvider(networkUrl),
+        provider,
       );
-      const estimatedGas = TaskContract.estimateGas.redeemRewards(
+      const estimatedGas = taskContract.estimateGas.redeemRewards(
         addressList,
         gradeList,
       );
@@ -328,20 +317,37 @@ export const useContracts = () => {
   };
 
   const getDeployContractFee = async () => {
-    const { contractABI, contractBinary } = getCompiledContract(chosenContract);
-
+    const { contractABI, contractBinary } = getCompiledContract();
+    const provider = await ethers.getDefaultProvider(networkUrl);
     const contractFactory = new ethers.ContractFactory(
       contractABI,
       contractBinary,
-      ethers.getDefaultProvider(networkUrl),
+      provider,
     );
 
-    // Estimate gas for deployment
-    const estimatedGas = await ethers
-      .getDefaultProvider(networkUrl)
-      .estimateGas(contractFactory.getDeployTransaction().data);
+    const deployedTransaction = await contractFactory.getDeployTransaction(2);
 
-    return estimatedGas;
+    console.log({ deployedTransaction });
+    const estimatedGas = await provider.estimateGas(deployedTransaction);
+    // Estimate gas for deployment
+    console.log({ estimatedGas });
+    // Step 3: Get current gas price
+    const feeData = await provider.getFeeData();
+    // Step 4: Calculate the fee
+    const gasPrice = feeData.gasPrice;
+
+    if (!gasPrice) return;
+    // Convert the gas price from Wei to Gwei or Ether for better readability
+    const gasPriceInEth = ethers.formatUnits(gasPrice, 'ether');
+    const gasPriceInGwei = ethers.formatUnits(gasPrice, 'gwei');
+    const gasPriceInWei = ethers.formatUnits(gasPrice, 'wei');
+    console.log(estimatedGas);
+    console.log(feeData);
+    console.log(`Estimated deployment fee: ${gasPriceInEth} ETH`);
+    console.log(`Estimated deployment fee: ${gasPriceInGwei} Gwei`);
+    console.log(`Estimated deployment fee: ${gasPriceInWei} Wei`);
+
+    return weiToUsd(gasPrice);
   };
 
   return {
@@ -352,7 +358,9 @@ export const useContracts = () => {
     usdToEth,
     getRewardStudentsFee,
     loading,
+    hasTheStudentBeenPaid,
     cancelContract,
+    getDeployContractFee,
     rewardSingleStudent,
   };
 };

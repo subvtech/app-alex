@@ -132,6 +132,7 @@ export interface TaskStudent {
   mark?: number;
   maxMark?: number;
   task?: TaskSimple;
+  wallet?: { address: string };
   submissions?: TaskSubmissionSimple[];
 }
 

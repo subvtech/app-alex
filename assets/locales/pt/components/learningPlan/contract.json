@@ -1,0 +1,30 @@
+{
+  "warning": {
+    "experimental": "Mostrar area experimental",
+    "isDraft": "O contrato será criado quando esta tarefa for publicada",
+    "notFinished": "Só é possível recompesar os alunos depois que a tarefa estiver concluída",
+    "noStudents": "Por favor adicione alunos à tarefa para que seja possível calcular o total de recompensa",
+    "secondThoughts": "Pensamento melhor quanto a recompensar os alunos?",
+    "editContract": "Lembre-se que editar/cancelar a recompensa tem custos financeiros",
+    "abort": "Eu mudei de ideia",
+    "update": "É preciso cancelar o contrato antigo e criar um novo",
+    "cancel": "Reverter contrato anterior e ser reembolsado",
+
+    "tooltip": {
+      "abort": "Clique aqui para desistir de criar um contrato",
+      "fee": "Atenção, taxas de transação são aplicavéis",
+      "spend": "Atenção, você está prestes a gastar dinheiro de verdade"
+    }
+  },
+  "reward": {
+    "total": "Recompensa total: ",
+    "stored": "Recompensa atribuída a tarefa",
+    "remaining": "Recompensa restante na tarefa: $ ",
+    "rewardStudents": "Recompensar alunos",
+    "rewardSingleStudent": "Recompensar aluno",
+    "redeemed": "Esse foi finalizada e os alunos foram recompensados.",
+    "value": "Defina o valor que será recompensado para cada aluno (em USDT/Dollar)",
+    "deploy": "Ativar recompensa",
+    "placeholder": "Recompensa da tarefa"
+  }
+}

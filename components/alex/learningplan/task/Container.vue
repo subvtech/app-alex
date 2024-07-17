@@ -42,6 +42,7 @@
                   :over="setOver(i - 1)"
                   :drag-from="dragFrom"
                   :dragging="dragging"
+                  :handle-pending-contract="handlePendingContract"
                   @start-drag="startDrag"
                   @drag-over="onDragOver"
                   @drag-end="onDrop"
@@ -177,6 +178,7 @@ const props = defineProps<{
 const { create, delete: _delete, update, findOne } = useStrapi();
 const { find } = useStrapiUtils();
 const client = useStrapiClient();
+const { cancelContract, getContractBalance } = useContracts();
 const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
@@ -195,6 +197,23 @@ groupsArray.forEach((group, index) => {
   groups[group] = index;
   groups[index] = group;
 });
+
+const handlePendingContract = async () => {
+  let isThereAPendingContract = !!taskDetails?.value?.contract_address;
+  console.log({ isThereAPendingContract });
+  if (isThereAPendingContract) {
+    const contractAddress = taskDetails!.value!.contract_address!;
+    const balance = await getContractBalance(contractAddress);
+    console.log({ balance });
+    if (balance && Number(balance) > 0) {
+      await cancelContract({
+        contractAddress,
+      });
+      isThereAPendingContract = false;
+    }
+  }
+  return isThereAPendingContract;
+};
 
 const searchField = computed(() => props.search.toLowerCase());
 const tasksFilter = computed(() => props.filter);

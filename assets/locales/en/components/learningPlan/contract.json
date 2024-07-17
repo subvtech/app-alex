@@ -1,0 +1,29 @@
+{
+  "warning": {
+    "experimental": "Show experimental area",
+    "isDraft": "Your contract will be created when you publish this task",
+    "notFinished": "You can only reward your students after the task is finished",
+    "noStudents": "Please add students to this task so we can calculate the total reward",
+    "secondThoughts": "Second thoughts about rewarding your students?",
+    "editContract": "Bear in mind that editing/cancelling the rewards has monetary costs",
+    "abort": "I've changed my mind",
+    "update": "You have to cancel the previous one to just then create this new one",
+    "cancel": "Revert previous contract and get refunded",
+    "tooltip": {
+      "abort":  "Click here to give up on creating a smart contract",
+      "fee": "Warning, transaction fees do apply",
+      "spend": "Warning, you're about to spend real money"
+    }
+  },
+  "reward": {
+    "total": "Total reward: ",
+    "stored": "Reward stored in the task",
+    "remaining": "Reward left in the task: $ ",
+    "rewardStudents": "Reward Students",
+    "rewardSingleStudent": "Reward Student",
+    "redeemed": "This contract was already redeemed and the students were rewarded",
+    "value": "Set the value to be rewarded to each student (in USDT/Dollar)",
+    "deploy": "Deploy contract",
+    "placeholder": "Task prize"
+  }
+}

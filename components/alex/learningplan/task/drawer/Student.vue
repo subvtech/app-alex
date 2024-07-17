@@ -149,15 +149,22 @@
           </div>
         </template>
       </div>
-      <v-tooltip text="Warning, you're about to spend real money">
+
+      <span v-if="isRewarded">The student was rewarded already</span>
+      <v-tooltip
+        v-else
+        :text="$t('components.learningPlan.contract.warning.tooltip.fee')"
+      >
         <template #activator="{ props: tooltipProps }">
           <alex-custom-button
-            text="Reward students"
+            :text="
+              $t('components.learningPlan.contract.reward.rewardSingleStudent')
+            "
             variant="warning"
             v-bind="tooltipProps"
             :loading="contractLoading"
             :disabled="status !== 'done'"
-            @click="rewardSingleStudent"
+            @click="handleRewardSingleStudent"
           />
         </template>
       </v-tooltip>
@@ -204,6 +211,7 @@ interface Student {
   name: string;
   studentClass: string;
   avatar?: string | null;
+  wallet?: { address: string };
 }
 interface Submission {
   description: string;
@@ -215,6 +223,8 @@ interface TaskUserDrawerProps {
   status: TaskMemberStatus;
   finishAt?: string | null;
   submission?: Submission;
+  contractAddress?: string;
+
   canSubmitAfterDeadline: boolean;
   canSubmitAfterDeadlineTask?: boolean;
 }
@@ -222,9 +232,29 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   submission: undefined,
   canSubmitAfterDeadlineTask: false,
   finishAt: null,
+  contractAddress: undefined,
 });
 const { t } = useI18n();
-const { rewardSingleStudent, loading: contractLoading } = useContracts();
+const {
+  rewardSingleStudent,
+  hasTheStudentBeenPaid,
+  loading: contractLoading,
+} = useContracts();
+const isRewarded = ref(
+  await hasTheStudentBeenPaid(
+    props.contractAddress,
+    props.student.wallet?.address,
+  ),
+);
+
+const handleRewardSingleStudent = async () => {
+  if (!props.student?.wallet) return;
+  rewardSingleStudent(props.contractAddress, props.student.wallet.address, 88);
+  isRewarded.value = await hasTheStudentBeenPaid(
+    props.contractAddress,
+    props.student.wallet?.address,
+  );
+};
 const isSendingMessage = ref(false);
 const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });

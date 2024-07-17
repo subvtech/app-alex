@@ -1,37 +1,36 @@
 <template>
   <div class="gap-3">
-    <p class="text-h3 my-6">Smart Contract {{ contractAddress }}</p>
     <alex-custom-switch
       v-model="canEdit"
-      label="
-            Show experimental area
-          "
+      :label="$t('components.learningPlan.contract.warning.experimental')"
       :disabled="isThereAContract"
     />
-    <span
-      >isUpdatingContract: {{ isUpdatingContract }} contractBalance:
-      {{ contractBalance }}</span
-    >
+
     <div v-if="canEdit">
       <div v-if="contractAddress" class="flex flex-column mt-6 gap-4">
         <div v-if="isThereBalance">
           <div class="flex flex-col">
-            <p class="text-body-4 text-gray-800">Reward stored in the task</p>
+            <p class="text-body-4 text-gray-800">
+              {{ $t('components.learningPlan.contract.reward.stored') }}
+            </p>
             <p class="text-body-3 text-gray-800">
               $ {{ contractBalance.toFixed(2) }}
             </p>
           </div>
           <div v-if="itsNotFinished">
-            <span class="text-red-500"
-              >You can only reward your students after the task is
-              finished</span
-            >
+            <span class="text-red-500">{{
+              $t('components.learningPlan.contract.warning.notFinished')
+            }}</span>
           </div>
 
-          <v-tooltip text="Warning, you're about to spend real money">
+          <v-tooltip
+            :text="$t('components.learningPlan.contract.tooltip.spend')"
+          >
             <template #activator="{ props: tooltipProps }">
               <alex-custom-button
-                text="Reward students"
+                :text="
+                  $t('components.learningPlan.contract.reward.rewardStudents')
+                "
                 variant="warning"
                 v-bind="tooltipProps"
                 :loading="loading"
@@ -42,11 +41,12 @@
           </v-tooltip>
           <div class="flex flex-column gap-1 mt-6">
             <p class="text-h4 text-gray-800">
-              Second thoughts about the rewarding your students?
+              {{
+                $t('components.learningPlan.contract.warning.secondThoughts')
+              }}
             </p>
             <p class="text-body-3 text-gray-500">
-              Bear in mind that editing/cancelling the rewards has monetary
-              costs
+              {{ $t('components.learningPlan.contract.warning.editContract') }}
             </p>
           </div>
         </div>
@@ -54,11 +54,12 @@
         <div v-else>
           <div class="flex flex-col">
             <p class="text-body-4 text-gray-800">
-              Reward left in the task: $ {{ contractBalance }}
+              {{ $t('components.learningPlan.contract.reward.remaining') }}
+              {{ contractBalance }}
             </p>
           </div>
           <span class="text-red-500">
-            This contract was redeemed and the students were rewarded.
+            {{ $t('components.learningPlan.contract.reward.redeemed') }}
           </span>
         </div>
       </div>
@@ -71,9 +72,7 @@
         :task-member-students="taskMemberStudents"
         :loading="loading"
         :contract-address="contractAddress"
-        :reward-label="`Set the ${
-          isUpdatingContract ? 'NEW ' : ''
-        }value to be rewarded to each student (in USDT/dollar)`"
+        :reward-label="$t('components.learningPlan.contract.reward.value')"
         :update-contract="isUpdatingContract"
         @create:contract-address="handleCreateTaskContract"
         @cancel:contract-draft="handleAbortContract"
@@ -100,6 +99,7 @@ const {
   rewardStudents,
   getContractBalance,
   cancelContract,
+  getDeployContractFee,
   weiToUsd,
   loading,
 } = useContracts();
@@ -173,13 +173,9 @@ const fetchContractBalance = async () => {
   console.log('newBalance', { newBalance: weiToUsd(balance) });
 };
 
-const handleCancelContract = async (
-  selectedContract: AvailableContracts = 'TaskOwnerReedemsContract',
-  isUpdating = false,
-) => {
-  if (!selectedContract || !contractAddress.value) return;
+const handleCancelContract = async (isUpdating = false) => {
+  if (!contractAddress.value) return;
   const result = await cancelContract({
-    chosenContract: selectedContract,
     contractAddress: contractAddress.value,
   });
   if (!result) return;
@@ -192,12 +188,12 @@ const handleCancelContract = async (
 };
 
 const handleCreateTaskContract = async (props: CreateContractProps) => {
-  const { budget, chosenContract } = props;
+  const { budget, totalNumberOfStudents } = props;
   if (isDraft.value) {
     emit('deploy:contract-draft', async () => {
       const result = await createTaskContract({
         budget,
-        chosenContract,
+        totalNumberOfStudents,
       });
       await fetchContractBalance();
       return result;
@@ -208,7 +204,7 @@ const handleCreateTaskContract = async (props: CreateContractProps) => {
 
   const newContractAddress = await createTaskContract({
     budget,
-    chosenContract,
+    totalNumberOfStudents,
   });
 
   if (!newContractAddress) return;

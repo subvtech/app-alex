@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract TaskOwnerReedemsContract {
+contract TaskOwnerSingleRedeem {
     address payable public owner;
     address[] public redeemers;
     uint public redeemersCount;
