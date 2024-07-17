@@ -73,6 +73,7 @@
         "missName": "Enter a name for the group",
         "updated": "Group updated successfully",
         "created": "Group created successfully",
+        "oneMember": "The group needs at least 2 members",
         "hasSubmission": "Group cannot be edited as it already has submission",
         "updateError": "Failed to update group",
         "createError": "Failed to create group"

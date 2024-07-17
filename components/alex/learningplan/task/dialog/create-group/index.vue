@@ -254,6 +254,15 @@ async function saveGroup() {
     return;
   }
 
+  if (selectedMembers.value.length === 1) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.oneMember'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
   const membersData = selectedMembers.value.map((member) => {
     return {
       member_id: member.id,

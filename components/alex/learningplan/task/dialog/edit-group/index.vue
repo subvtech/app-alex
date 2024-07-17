@@ -160,6 +160,15 @@ async function updateGroup() {
     return;
   }
 
+  if (!members.value.length) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.oneMember'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
   const membersData = [...members.value, responsible.value].map((member) => ({
     member_id: member.student_member.id,
     role: member.role,
