@@ -84,53 +84,58 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
+
+const getTranslation = (key: string) =>
+  t(`components.tiptap.menus.bubbleMenu.tooltip.${key}`);
+
 const toggleItens = [
   {
     value: 'bold',
     icon: Bold,
-    ariaLabel: 'Negrito',
+    ariaLabel: getTranslation('bold'),
     onClick: () => props.editor.chain().focus().toggleBold().run(),
     isActive: () => props.editor.isActive('bold'),
   },
   {
     value: 'italic',
     icon: Italic,
-    ariaLabel: 'Itálico',
+    ariaLabel: getTranslation('italic'),
     onClick: () => props.editor.chain().focus().toggleItalic().run(),
     isActive: () => props.editor.isActive('italic'),
   },
   {
     value: 'underline',
     icon: Underline,
-    ariaLabel: 'Sublinhar',
+    ariaLabel: getTranslation('underline'),
     onClick: () => props.editor.chain().focus().toggleUnderline().run(),
     isActive: () => props.editor.isActive('underline'),
   },
   {
     value: 'strikethrough',
     icon: Strikethrough,
-    ariaLabel: 'Tachar',
+    ariaLabel: getTranslation('strike'),
     onClick: () => props.editor.chain().focus().toggleStrike().run(),
     isActive: () => props.editor.isActive('strike'),
   },
   {
     value: 'code',
     icon: Code,
-    ariaLabel: 'Inline Code',
+    ariaLabel: getTranslation('inlineCode'),
     onClick: () => props.editor.chain().focus().toggleCode().run(),
     isActive: () => props.editor.isActive('code'),
   },
   {
     value: 'link',
     icon: Link,
-    ariaLabel: 'Inserir link',
+    ariaLabel: getTranslation('link'),
     popover: 'link',
     isActive: () => getCurrentLink() !== '',
   },
   {
     value: 'highlighter',
     icon: Highlighter,
-    ariaLabel: 'Cor do  destaque',
+    ariaLabel: getTranslation('highlightColor'),
     popover: 'highlight',
     isActive: () =>
       currentHighLight.value !== undefined && currentHighLight.value !== '#fff',
@@ -138,7 +143,7 @@ const toggleItens = [
   {
     value: 'palette',
     icon: Palette,
-    ariaLabel: 'Cor de texto ',
+    ariaLabel: getTranslation('textColor'),
     popover: 'color',
     isActive: () =>
       currentColor.value !== undefined && currentColor.value !== '#000',
@@ -146,14 +151,14 @@ const toggleItens = [
   {
     value: 'superscript',
     icon: Superscript,
-    ariaLabel: 'sobrescrito',
+    ariaLabel: getTranslation('subscript'),
     onClick: () => props.editor.chain().focus().toggleSuperscript().run(),
     isActive: () => props.editor.isActive('superscript'),
   },
   {
     value: 'subscript',
     icon: Subscript,
-    ariaLabel: 'subscrito',
+    ariaLabel: getTranslation('superscript'),
     onClick: () => props.editor.chain().focus().toggleSubscript().run(),
     isActive: () => props.editor.isActive('subscript'),
   },

@@ -6,7 +6,9 @@
         :key="index"
         class="text-gray-600 text-body-3 row"
       >
-        <p v-if="item.divider" class="px-2 divider">{{ item.title }}</p>
+        <p v-if="item.divider" class="px-2 divider">
+          {{ $t(`components.tiptap.menus.slashMenu.${item.title}`) }}
+        </p>
         <button
           v-else
           class="d-flex ga-3 w-100 tw-p-[6px] rounded w-100"
@@ -14,12 +16,12 @@
           @click="selectItem(index)"
         >
           <v-icon v-if="item.icon" :icon="item.icon" size="small" />
-          {{ item.title }}
+          {{ $t(`components.tiptap.menus.slashMenu.${item.title}`) }}
         </button>
       </div>
     </template>
     <div v-else class="text-dark-gray text-body-1 pa-2 rounded w-100">
-      No result
+      {{ $t('components.tiptap.menus.slashMenu.noResults') }}
     </div>
   </div>
 </template>

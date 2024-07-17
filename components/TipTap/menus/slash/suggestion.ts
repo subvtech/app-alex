@@ -8,10 +8,10 @@ export default {
     return [
       {
         divider: true,
-        title: 'Format',
+        title: 'format',
       },
       {
-        title: 'Heading 1',
+        title: 'heading1',
         icon: 'mdi-format-header-1',
         command: ({ editor, range }) => {
           editor
@@ -23,7 +23,7 @@ export default {
         },
       },
       {
-        title: 'Heading 2',
+        title: 'heading2',
         icon: 'mdi-format-header-2',
         command: ({ editor, range }) => {
           editor
@@ -35,7 +35,7 @@ export default {
         },
       },
       {
-        title: 'Heading 3',
+        title: 'heading3',
         icon: 'mdi-format-header-3',
         command: ({ editor, range }) => {
           editor
@@ -47,35 +47,35 @@ export default {
         },
       },
       {
-        title: 'Blockquote',
+        title: 'quote',
         icon: 'mdi-format-quote-close-outline',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleBlockquote().run();
         },
       },
       {
-        title: 'Bullet List',
+        title: 'bulletList',
         icon: 'mdi-format-list-bulleted',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleBulletList().run();
         },
       },
       {
-        title: 'Ordered List',
+        title: 'orderedList',
         icon: 'mdi-format-list-numbered',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleOrderedList().run();
         },
       },
       {
-        title: 'Todo List',
+        title: 'todoList',
         icon: 'mdi-format-list-checks',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleTaskList().run();
         },
       },
       {
-        title: 'Code Block',
+        title: 'codeBlock',
         icon: 'mdi-code-not-equal-variant',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
@@ -83,10 +83,10 @@ export default {
       },
       {
         divider: true,
-        title: 'Insert',
+        title: 'insert',
       },
       {
-        title: 'Attaches',
+        title: 'attaches',
         icon: 'mdi-file-multiple',
         command: ({ editor, range }) => {
           editor
@@ -100,14 +100,14 @@ export default {
         },
       },
       {
-        title: 'Horizontal Rule',
+        title: 'horizontalRule',
         icon: 'mdi-minus',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).setHorizontalRule().run();
         },
       },
       {
-        title: 'Table',
+        title: 'table',
         icon: 'mdi-table',
         command: ({ editor, range }) => {
           editor

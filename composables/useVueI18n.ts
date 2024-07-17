@@ -118,6 +118,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'trails/tasks',
     'trails/contributions',
     'editorjs/fileSet',
+    'tiptap/menus',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

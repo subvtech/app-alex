@@ -43,6 +43,7 @@ const props = defineProps<{
 }>();
 
 const menu = ref(false);
+const { t } = useI18n();
 
 watch(menu, () => {
   if (menu.value) {
@@ -53,11 +54,13 @@ watch(menu, () => {
 });
 
 const actions = useContentItemActions(props.editor);
+const getTranslation = (key: string) =>
+  t(`components.tiptap.menus.dragMenu.${key}`);
 
 const popoverItens = [
   {
     value: 'clearFormatting',
-    text: 'Clear formatting',
+    text: getTranslation('clearFormatting'),
     icon: 'mdi-format-clear',
     ariaLabel: 'Clear formatting',
     onClick: () => {
@@ -67,7 +70,7 @@ const popoverItens = [
   },
   {
     value: 'copyToClipboard',
-    text: 'Copy to clipboard',
+    text: getTranslation('copyToClipboard'),
     icon: 'mdi-clipboard-outline',
     ariaLabel: 'Copy to clipboard',
     onClick: () => {
@@ -77,7 +80,7 @@ const popoverItens = [
   },
   {
     value: 'duplicate',
-    text: 'Duplicate',
+    text: getTranslation('duplicate'),
     icon: 'mdi-content-duplicate',
     ariaLabel: 'Duplicate',
     onClick: () => {
@@ -87,7 +90,7 @@ const popoverItens = [
   },
   {
     value: 'delete',
-    text: 'Delete',
+    text: getTranslation('delete'),
     icon: 'mdi-trash-can-outline',
     ariaLabel: 'Delete',
     onClick: () => {

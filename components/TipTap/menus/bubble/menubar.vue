@@ -1,7 +1,6 @@
 <template>
   <Menubar v-if="props.editor" class="border-0">
     <!-- Text Type -->
-
     <MenubarMenu>
       <MenubarTrigger>
         <v-icon
@@ -120,13 +119,18 @@ interface menuItens {
   onClick?: () => void;
 }
 
+const { t } = useI18n();
+
+const getTranslation = (key: string) =>
+  t(`components.tiptap.menus.bubbleMenu.blocks.${key}`);
+
 const contentTypeList: menuItens[] = [
   {
     name: 'HIERARQUIA',
     isLabel: true,
   },
   {
-    name: 'Paragraph',
+    name: getTranslation('paragraph'),
     icon: 'mdi-format-pilcrow',
     value: 'Paragraph',
     onClick: () =>
@@ -144,7 +148,7 @@ const contentTypeList: menuItens[] = [
       !props.editor.isActive('taskList'),
   },
   {
-    name: 'Heading 1',
+    name: getTranslation('heading1'),
     icon: 'mdi-format-header-1',
     value: 'h1',
     onClick: () =>
@@ -158,7 +162,7 @@ const contentTypeList: menuItens[] = [
     isActive: () => props.editor.isActive('heading', { level: 1 }),
   },
   {
-    name: 'Heading 2',
+    name: getTranslation('heading2'),
     icon: 'mdi-format-header-2',
     value: 'h2',
     onClick: () =>
@@ -172,7 +176,7 @@ const contentTypeList: menuItens[] = [
     isActive: () => props.editor.isActive('heading', { level: 2 }),
   },
   {
-    name: 'Heading 3',
+    name: getTranslation('heading3'),
     icon: 'mdi-format-header-3',
     value: 'h3',
     onClick: () =>
@@ -186,25 +190,25 @@ const contentTypeList: menuItens[] = [
     isActive: () => props.editor.isActive('heading', { level: 3 }),
   },
   {
-    name: 'LISTAS',
+    name: getTranslation('lists'),
     isLabel: true,
   },
   {
-    name: 'Bulleted List',
+    name: getTranslation('bulletList'),
     icon: 'mdi-format-list-bulleted',
     value: 'bulletList',
     onClick: () => props.editor.chain().focus().toggleBulletList().run(),
     isActive: () => props.editor.isActive('bulletList'),
   },
   {
-    name: 'Numbered List',
+    name: getTranslation('orderedList'),
     icon: 'mdi-format-list-numbered',
     value: 'orderedList',
     onClick: () => props.editor.chain().focus().toggleOrderedList().run(),
     isActive: () => props.editor.isActive('orderedList'),
   },
   {
-    name: 'Todo List',
+    name: getTranslation('todoList'),
     icon: 'mdi-format-list-checks',
     value: 'todoList',
     onClick: () => props.editor.chain().focus().toggleTaskList().run(),

@@ -5,7 +5,7 @@
     density="comfortable"
     class="width-60 tiptap-link-selector"
     hide-details
-    placeholder="Insira o link"
+    :placeholder="$t('components.tiptap.menus.bubbleMenu.linkPlaceholder')"
     prepend-inner-icon="mdi-link-variant"
     @input="() => $emit('update:modelValue', link)"
   ></alex-inputs-text-field>

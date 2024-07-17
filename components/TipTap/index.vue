@@ -5,6 +5,10 @@
         <input type="checkbox" :checked="isEditable" @change="toggleEditable" />
         Editable
       </label>
+      <span class="tw-text-[10px]"
+        >Alterar o modo de edição em tempo real por enquanto não esta
+        atualizando os componentes customizados</span
+      >
     </div>
 
     <div class="bubble-menu-wrapper">
@@ -55,6 +59,8 @@ import { isTextSelected } from './menus/bubble/isTextSelected.js';
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
 const app = useNuxtApp();
+
+const { t } = useI18n();
 
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
@@ -122,7 +128,7 @@ onMounted(() => {
       Placeholder.configure({
         placeholder: ({ node }) => {
           if (node.type.name === 'paragraph') {
-            return 'Type / to choose a block';
+            return t('components.tiptap.menus.placeholder');
           }
           return '';
         },

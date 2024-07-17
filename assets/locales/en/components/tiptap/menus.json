@@ -1,0 +1,51 @@
+{
+  "slashMenu": {
+    "format": "Formatting",
+    "heading1": "Heading 1",
+    "heading2": "Heading 2",
+    "heading3": "Heading 3",
+    "quote": "Quote",
+    "bulletList": "Bullet List",
+    "orderedList": "Ordered List",
+    "todoList": "Todo List",
+    "codeBlock": "Code Block",
+    "insert": "Insert",
+    "attaches": "Attachments",
+    "horizontalRule": "Horizontal Rule",
+    "table": "Table",
+    "noResults": "No results found"
+  },
+  "bubbleMenu": {
+    "blocks": {
+      "hierarchy": "Hierarchy",
+      "paragraph": "Paragraph",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "lists": "Lists",
+      "bulletList": "Bullet List",
+      "orderedList": "Ordered List",
+      "todoList": "Todo List"
+    },
+    "tooltip": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "strike": "Strikethrough",
+      "underline": "Underline",
+      "inlineCode": "Inline Code",
+      "link": "Link",
+      "highlightColor": "Highlight Color",
+      "textColor": "Text Color",
+      "subscript": "Subscript",
+      "superscript": "Superscript"
+    },
+    "linkPlaceholder": "Insert a link"
+  },
+  "dragMenu": {
+    "clearFormatting": "Clear Formatting",
+    "copyToClipboard": "Copy to Clipboard",
+    "duplicate": "Duplicate",
+    "delete": "Delete"
+  },
+  "placeholder": "Insert / to choose a block"
+}
