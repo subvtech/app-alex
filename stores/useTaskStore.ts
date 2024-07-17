@@ -12,9 +12,10 @@ export const useTaskStore = defineStore('task', () => {
     task_members: {
       populate: [
         'task_submission',
-        'task_member_students.student_member.user.avatar',
-        'task_member_students.student_member.learning_class',
-        'task_member_students.student_member.user.wallet',
+        'learning_plan_member.user.avatar',
+        'learning_plan_member.learning_class',
+        'learning_plan_group.group_members.student_member.user.avatar',
+        'learning_plan_group.learning_class',
       ],
     },
     tags: true,
@@ -26,7 +27,7 @@ export const useTaskStore = defineStore('task', () => {
     task_events: {
       populate: {
         task_member: {
-          populate: ['task_member_students.student_member.user.avatar'],
+          populate: ['learning_plan_member.user.avatar'],
         },
         learning_plan_member: {
           populate: ['user.avatar'],
@@ -72,8 +73,9 @@ export const useTaskStore = defineStore('task', () => {
       const response = await find<TaskMember>('task-members', {
         populate: [
           'task_submission',
-          'task_member_students.student_member.user.avatar',
-          'task_member_students.student_member.learning_class',
+          'learning_plan_member.user.avatar',
+          'learning_plan_member.learning_class',
+          'learning_plan_group.group_members.student_member.user.avatar',
         ],
         filters: {
           task: taskId,

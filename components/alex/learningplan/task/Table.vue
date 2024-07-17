@@ -450,7 +450,7 @@ const previewRow = (id: number) => {
 }
 
 .draggable-row {
-  cursor: pointer;
+  cursor: move;
   background-color: #fff;
   opacity: 0.99;
   user-select: none;

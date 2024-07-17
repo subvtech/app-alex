@@ -280,8 +280,8 @@ const tags = ref(props.tags);
 const title = ref(props.title);
 const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
-const members = toRef(props, 'members');
 const openResources = ref<boolean>(false);
+const members = toRef(props, 'members');
 const hasAtLeastSubmission = computed(
   () => !!members.value.filter((member) => member.last_submission_at).length,
 );

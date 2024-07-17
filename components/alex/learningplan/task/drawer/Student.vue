@@ -20,7 +20,7 @@
     </template>
 
     <template #default>
-      <div class="user-info text-gray-800">
+      <div v-if="student" class="user-info text-gray-800">
         <v-avatar
           :size="80"
           :image="student.avatar || undefined"
@@ -35,8 +35,38 @@
         </v-avatar>
         <h2 class="text-h2 ellipsis lines-1">{{ student.name }}</h2>
         <p class="text-subtitle-2 ellipsis lines-1">
-          {{ student.studentClass }}
+          {{ studentClass }}
         </p>
+      </div>
+      <div v-if="group" class="tw-flex tw-flex-col tw-gap-2 text-gray-800">
+        <alex-custom-chip class="tw-w-fit" :text="studentClass" />
+        <h2 class="text-h2 ellipsis lines-1">{{ group.title }}</h2>
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <v-avatar
+            :size="40"
+            :image="
+              inChargeMember?.student_member.user.avatar?.url || undefined
+            "
+            class="alex-avatar-group-border alex-avatar-group-margin"
+            color="gray-100"
+          >
+            <template
+              v-if="!inChargeMember?.student_member.user.avatar?.url"
+              #default
+            >
+              <p class="text-gray-300 text-h4">
+                {{
+                  getInitials(
+                    inChargeMember?.student_member.user.fullname || '',
+                  )
+                }}
+              </p>
+            </template>
+          </v-avatar>
+          <p class="text-subtitle-2 ellipsis lines-1">
+            {{ inChargeMember?.student_member.user.fullname }}
+          </p>
+        </div>
       </div>
 
       <div class="task-info">
@@ -114,7 +144,7 @@
               <alex-learningplan-task-submission
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
-                :task-title="student.name"
+                :task-title="task.title"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
@@ -174,13 +204,30 @@
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
         :is-sending-message="isSendingMessage"
-        :task-member-id="taskMemberId"
+        :task-member="{
+          id: taskMemberId,
+        }"
+        :show-member-tab="!!group"
         :message="{ isLoading: pendingMessages }"
         :event="{ events: events.data, isLoading: eventLoading }"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :submissions="evaluatedSubmissions"
-      />
+      >
+        <template #members>
+          <alex-learningplan-task-members-card
+            v-for="member in group?.group_members"
+            :key="`group-member${member.id}`"
+            :member="{
+              name: member.student_member.user.fullname,
+              class: group?.learning_class?.name,
+              avatarUrl: member.student_member.user?.avatar?.url,
+              responsable: member.role === 'in_charge',
+            }"
+            :edit="false"
+          />
+        </template>
+      </alex-learningplan-task-tabs>
     </template>
 
     <template v-if="activePage === '3'" #append>
@@ -209,7 +256,6 @@ import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.mode
 
 interface Student {
   name: string;
-  studentClass: string;
   avatar?: string | null;
   wallet?: { address: string };
 }
@@ -218,11 +264,21 @@ interface Submission {
   constraints: string[];
 }
 interface TaskUserDrawerProps {
-  student: Student;
+  learningplanId: number;
+  task: {
+    id: number;
+    title: string;
+    startDate?: string | null;
+    endDate?: string | null;
+    sendAfterDeadline?: boolean;
+  };
   taskMemberId: number;
+  student?: Student;
+  group?: LearningPlanGroupSimple;
   status: TaskMemberStatus;
   finishAt?: string | null;
   submission?: Submission;
+  studentClass: string;
   contractAddress?: string;
 
   canSubmitAfterDeadline: boolean;
@@ -230,9 +286,11 @@ interface TaskUserDrawerProps {
 }
 const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   submission: undefined,
+  student: undefined,
   canSubmitAfterDeadlineTask: false,
   finishAt: null,
   contractAddress: undefined,
+  group: undefined,
 });
 const { t } = useI18n();
 const {
@@ -265,9 +323,9 @@ type Emit = {
 const emit = defineEmits<Emit>();
 const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline);
 const finishAt = toRef(props.finishAt);
-const activePage = ref('1');
+const activePage = ref(props.group ? '0' : '1');
 const initials = computed(() => {
-  return getInitials(props.student.name);
+  return getInitials(props.student?.name || '');
 });
 const handleCloseModal = () => {
   model.value = false;
@@ -318,7 +376,6 @@ const getEvents = (memberID: number) =>
       },
     },
   });
-
 const {
   data: submissions,
   execute: executeSubmissions,
@@ -487,6 +544,9 @@ const changeSendAfterDeadline = async (value: boolean) => {
   }
 };
 
+const getInChargeMember = (group?: LearningPlanGroupSimple) =>
+  group?.group_members.find((member) => member.role === 'in_charge');
+const inChargeMember = computed(() => getInChargeMember(props.group));
 watch(finishAt, changeDeadline);
 watch(canSubmitAfterDeadline, changeSendAfterDeadline);
 watch(model, (value) => {
@@ -498,10 +558,10 @@ watch(model, (value) => {
     executeMessages();
     return;
   }
-  submissions.value = { data: [], meta: { total: 0 } };
-  events.value = { data: [], meta: { total: 0 } };
-  activePage.value = '1';
+  submissions.value.data = [];
+  events.value.data = [];
   messages.value.data = [];
+  activePage.value = props.group ? '0' : '1';
 });
 watch(activePage, (value) => {
   if (value === '3') {

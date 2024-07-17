@@ -3,7 +3,13 @@
     <div
       :id="keyId"
       class="editorjs w-100 pa-0 show-drop-area"
-      :class="[viewerId, { 'disabled-paragraph': allowedBlocks?.length === 1 }]"
+      :class="[
+        viewerId,
+        {
+          'disabled-paragraph':
+            allowedBlocks !== undefined && allowedBlocks?.length <= 2,
+        },
+      ]"
       :is-editing="isEditing"
       v-bind="$attrs"
       :data-active="fileDrop && isEditing"

@@ -47,22 +47,28 @@
       v-if="selectedTask?.task"
       v-model="detailsDrawer"
       :task-id="selectedTask.task.id"
+      :learningplan-id="learningplanId"
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
       :trail="selectedTask.task.trail"
+      :group="selectedTask.group"
       :status="selectedTask.status"
       :blocks="selectedTask.task.blocks"
-      :type="selectedTask.task.type"
+      :type="selectedTask.task.type || undefined"
       :start-date="selectedTask.task.start_at || undefined"
       :final-date="selectedTask.task?.finish_at || undefined"
       :description="selectedTask.task.description || undefined"
       :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
       :task-member-id="selectedTask.id"
-      :submission="{
-        constraints:
-          selectedTask.task?.allowed_editor_plugins?.split(',') || [],
-        description: selectedTask.task?.submission_description,
-      }"
+      :submission="
+        selectedTask.task?.submission_required
+          ? {
+              constraints:
+                selectedTask.task?.allowed_editor_plugins?.split(',') || [],
+              description: selectedTask.task?.submission_description,
+            }
+          : undefined
+      "
       @update-status="
         (newIndex, value, newStatus) =>
           handleUpdateStatus(newIndex, value, newStatus, true)
@@ -110,20 +116,45 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
       task_submissions: {
         sort: 'submitted_at:desc',
       },
-      task_member_students: {
-        populate: [
-          'student_member.user.avatar',
-          'student_member.learning_class',
-        ],
+      learning_plan_member: {
+        populate: ['user.avatar', 'learning_class'],
+      },
+      learning_plan_group: {
+        populate: {
+          group_members: {
+            populate: [
+              'student_member.user.avatar',
+              'student_member.learning_class',
+            ],
+          },
+          learning_class: true,
+        },
       },
     },
     filters: {
-      task_member_students: {
-        student_member: { id: memberId },
-      },
-      task: {
-        learningplan: learningplanId,
-      },
+      $and: [
+        {
+          $or: [
+            { learning_plan_member: { id: memberId } },
+            {
+              learning_plan_group: {
+                group_members: {
+                  student_member: {
+                    id: {
+                      $in: [memberId],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        {
+          task: {
+            learningplan: learningplanId,
+          },
+        },
+      ],
     },
   });
 const { data: tasks, execute } = await useAsyncData(
@@ -133,22 +164,35 @@ const { data: tasks, execute } = await useAsyncData(
     default: () => ({ meta: 0, data: [] as TaskStudent[] }),
     transform: ({ data, meta }) => {
       const filteredData = data.filter((task) => task.task?.status !== 'draft');
-
       const dataValue = filteredData.map((task) => ({
         id: task.id,
         status: task.status,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         title: task.task?.title,
         user: {
-          name:
-            task?.task_member_students[0]?.student_member?.user.fullname || '',
-          avatar:
-            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
-            undefined,
+          name: task?.learning_plan_member?.user.fullname || '',
+          avatar: task?.learning_plan_member?.user.avatar?.url || undefined,
         },
-        group: task.task?.type === 'group',
+        ...(task.learning_plan_group?.learning_class?.name && {
+          group: {
+            name: task.learning_plan_group?.learning_class?.name || '',
+            participants: task.learning_plan_group?.group_members.map(
+              (member) => ({
+                name: member.student_member.user.fullname,
+                ...(member.student_member.user.avatar?.url && {
+                  image: {
+                    url: member.student_member.user.avatar?.url,
+                  },
+                  learning_class: member.student_member.learning_class?.name,
+                  role: member.role,
+                }),
+              }),
+            ),
+          },
+        }),
         studentClass:
-          task?.task_member_students[0]?.student_member?.learning_class?.name ||
+          task?.learning_plan_member?.learning_class?.name ||
+          task.learning_plan_group?.learning_class?.name ||
           '',
         task: task.task,
         submissions: task.task_submissions,
@@ -160,7 +204,6 @@ const { data: tasks, execute } = await useAsyncData(
     },
   },
 );
-
 const handleUpdateStatus = async (
   newIndex: number,
   item: TaskStudent,

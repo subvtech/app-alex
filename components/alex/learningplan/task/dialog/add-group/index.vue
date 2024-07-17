@@ -15,6 +15,7 @@
         size="large"
         variant="secondary"
         prepend-icon="mdi-plus"
+        @click="handleOpenCreateGroup()"
         >{{
           $t('components.learningPlan.drawer.task.dialog.newGroup')
         }}</alex-custom-button
@@ -35,6 +36,9 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
+            @add-members="
+              (member) => openDialog(member, classValue.learning_plan_groups)
+            "
           />
           <p
             v-if="!classValue.learning_plan_groups?.length"
@@ -46,22 +50,100 @@
       </v-expansion-panel>
     </v-expansion-panels>
   </alex-custom-dialog>
+
+  <alex-learningplan-task-dialog-create-group
+    v-model="addGroupDialog"
+    :learning-plan-id="props.learningplanId"
+    :task-id="taskId"
+    :start-at="startAt"
+    :finish-at="finishAt"
+    :can-submit-after="canSubmitAfter"
+    :classes="classes.data"
+    :group="groupInfo"
+    @add-group="handleAddGroup"
+  />
+  <alex-learningplan-task-dialog-edit-group
+    v-model="groupDialog"
+    :learning-plan-id="props.learningplanId"
+    :task-id="taskId"
+    :start-at="startAt"
+    :finish-at="finishAt"
+    :can-submit-after="canSubmitAfter"
+    :group="groupInfo"
+    :all-groups="allGroups"
+    @add-group="handleAddGroup"
+  />
 </template>
 
 <script setup lang="ts">
 interface AddStudent {
   learningplanId: number;
+  taskId: number;
+  startAt: string | null;
+  finishAt: string | null;
+  canSubmitAfter: boolean;
 }
-const model = defineModel<boolean>();
+
+const model = defineModel<boolean>({ required: true });
 const props = defineProps<AddStudent>();
+type Emits = {
+  'add-group': [id: number];
+};
+const emit = defineEmits<Emits>();
 const strapi = useStrapiUtils();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
+
+// Dialog
+const groupDialog = ref<boolean>(false);
+const addGroupDialog = ref<boolean>(false);
+const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
+const allGroups = ref<LearningPlanGroupSimple[]>([]);
+
 const search = ref('');
+
+function openDialog(
+  group: LearningPlanGroupSimple | undefined,
+  lpGroups: LearningPlanGroupSimple[] | undefined = undefined,
+) {
+  const taskMember = group?.task_members;
+
+  if (taskMember && taskMember[0]?.task_submissions?.length) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
+  groupDialog.value = true;
+  groupInfo.value = group;
+  allGroups.value = lpGroups || [];
+}
+
+function handleOpenCreateGroup() {
+  addGroupDialog.value = true;
+  groupInfo.value = undefined;
+}
+
+function handleAddGroup() {
+  emit('add-group', 0);
+  execute();
+}
+
 const getGroups = (learningplanId: number) =>
   strapi.find<ClassSimple>('classes', {
-    populate: ['learning_plan_groups.group_members.student_member.user.avatar'],
-    filters: {
-      learningplan: learningplanId,
-    },
+    populate: [
+      'learning_plan_groups.group_members.student_member.user.avatar',
+      'learning_plan_groups.learning_class',
+      'learning_plan_members',
+      'learning_plan_members.user.fullname',
+      'learning_plan_members.user.avatar',
+      'learning_plan_groups.task_members',
+      'learning_plan_groups.task_members.task_submissions',
+    ],
+    filters: { learningplan: learningplanId },
   });
 const { data: classes, execute } = await useAsyncData(
   'classes-member-invite',
@@ -72,8 +154,15 @@ const { data: classes, execute } = await useAsyncData(
 );
 
 const filteredClasses = computed(() => {
+  classes.value.data = classes.value.data.map((classValue) => ({
+    ...classValue,
+    learning_plan_groups: classValue.learning_plan_groups?.filter(
+      (group) => !group.task_members?.length,
+    ),
+  }));
   if (!search.value) return classes.value.data;
   const lowerCaseSearch = search.value.toLowerCase();
+
   return classes.value.data.map((classValue) => ({
     ...classValue,
     learning_plan_groups: classValue.learning_plan_groups?.filter((group) =>

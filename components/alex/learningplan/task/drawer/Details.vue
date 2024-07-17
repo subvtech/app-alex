@@ -138,14 +138,31 @@
       v-model:attached-message="attachedMessage"
       v-model:attached-submission="attachedSubmission"
       class="mt-6"
-      :task-member-id="taskMemberId"
+      :task-member="{
+        id: taskMemberId,
+      }"
+      :show-member-tab="!!group"
       :is-sending-message="isSendingMessage"
       :message="{ isLoading: pendingMessages }"
       :event="{ events: events.data, isLoading: eventLoading }"
       :submission="!!submission"
       :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
       :submissions="evaluatedSubmissions"
-    />
+    >
+      <template v-if="learningplanStore.learningPlan" #members>
+        <alex-learningplan-task-members-card
+          v-for="member in group?.participants"
+          :key="`group-member${member.name}`"
+          :member="{
+            name: member.name,
+            class: group?.name,
+            avatarUrl: member.image?.url,
+            responsable: member.role === 'in_charge',
+          }"
+          :edit="false"
+        />
+      </template>
+    </alex-learningplan-task-tabs>
     <template v-if="activeTab === '3'" #append>
       <alex-learningplan-task-chat-input
         v-model:attached-message="attachedMessage"
@@ -172,6 +189,7 @@ import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { RestrictionValue } from '../Restrictions.vue';
 import { TaskStudent } from '../kanban/index.vue';
 import { TaskMemberStatus } from '~/models/simple/taskSimple.model';
+import { learningPlanGroupMemberRoles } from '#imports';
 
 const model = defineModel<boolean>({ required: true });
 
@@ -182,7 +200,22 @@ interface Submission {
 
 interface DetailsDrawerProps {
   taskId: number;
+  taskMemberId: number;
+  submission?: Submission;
   tags?: TagSimple[];
+  group?: {
+    name: string;
+    participants: {
+      image?:
+        | {
+            url: string;
+          }
+        | undefined;
+      name: string;
+      learning_class?: string;
+      role?: learningPlanGroupMemberRoles;
+    }[];
+  };
   title?: string;
   description?: string;
   status?: TaskMemberStatus;
@@ -193,8 +226,6 @@ interface DetailsDrawerProps {
   trail?: TrailSimple;
   restrictions?: string;
   taskEvents?: TaskEvent[];
-  taskMemberId: number;
-  submission: Submission;
 }
 
 const props = withDefaults(defineProps<DetailsDrawerProps>(), {
@@ -207,6 +238,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   finalDate: undefined,
   blocks: undefined,
   trail: undefined,
+  group: undefined,
   restrictions: '',
   taskEvents: () => [],
   submission: undefined,
@@ -220,12 +252,13 @@ const startDate = ref<string | undefined>(props.startDate);
 const finalDate = ref<string | undefined>(props.finalDate);
 const description = ref<string>(props.description);
 const restrictions = ref<string>(props.restrictions);
-const submissionDescription = ref<string>(props.submission.description);
+const isGroup = toRef(props, 'group');
+const submissionDescription = ref<string>(props?.submission?.description || '');
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
 const loadingSubmission = ref(true);
-const activeTab = ref('1');
+const activeTab = ref(isGroup.value ? '0' : '1');
 const resourcesOpen = ref<boolean>(false);
 const taskMemberId = toRef(props, 'taskMemberId');
 const drawerId = computed(() => `details-drawer-${crypto.randomUUID()}`);
@@ -397,27 +430,29 @@ const restrictionsValue = computed({
   },
 }) as WritableComputedRef<RestrictionValue[]>;
 
+onMounted(() => {
+  executeSubmissions().then(() => (loadingSubmission.value = false));
+  executeEvents();
+  executeMessages();
+});
+
 watch(model, (value) => {
+  activeTab.value = isGroup.value ? '0' : '1';
   if (value) {
-    executeSubmissions();
+    executeSubmissions().then(() => (loadingSubmission.value = false));
     executeEvents();
     executeMessages();
     return;
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
-  activeTab.value = '1';
   messages.value.data = [];
 });
-watch(activeTab, (value) => {
-  if (value === '3') {
-    executeMessages();
-  }
-});
+
 watch(model, (value) => {
   if (value) {
     description.value = props.description;
-    submissionDescription.value = props.submission.description;
+    submissionDescription.value = props?.submission?.description || '';
     tags.value = props.tags;
     status.value = props.status;
     startDate.value = props.startDate;
@@ -427,12 +462,15 @@ watch(model, (value) => {
     setTimeout(() => {
       isFirstTimeOpened.value = false;
     }, 1100);
-    setTimeout(() => {
-      loadingSubmission.value = false;
-    }, 800);
     return;
   }
   loadingSubmission.value = true;
+});
+
+watch(activeTab, (value) => {
+  if (value === '3') {
+    executeMessages();
+  }
 });
 
 const handleChangeStatus = (statusValue: TaskMemberStatus) => {

@@ -6,6 +6,9 @@
       <alex-custom-tabs v-model="activePage" :tabs="tabs" color="accent" />
     </div>
     <v-window v-model="activePage">
+      <v-window-item value="0">
+        <slot name="members" />
+      </v-window-item>
       <v-window-item value="1"
         ><alex-learningplan-task-events
           v-model="taskEvents"
@@ -21,7 +24,7 @@
         <alex-learningplan-task-chat
           v-model:attached-message="attachedMessage"
           class="tw-w-100 tw-grow task-chat"
-          :task-member-id="taskMemberId"
+          :task-member-id="taskMember.id"
           :is-sending-message="isSendingMessage"
           :loading="message.isLoading"
           @submission-click="handleSubmission"
@@ -35,7 +38,9 @@
 import { orderEvents } from '~/utils';
 
 interface TaskTabsProps {
-  taskMemberId: number;
+  taskMember: {
+    id: number;
+  };
   submission?: boolean;
   submissions: AttachedSubmission[];
   selectorParent?: string;
@@ -47,14 +52,16 @@ interface TaskTabsProps {
     isLoading?: boolean;
   };
   isSendingMessage?: boolean;
+  showMemberTab?: boolean;
 }
 const props = withDefaults(defineProps<TaskTabsProps>(), {
   submission: false,
   selectorParent: undefined,
   message: () => ({ isLoading: false }),
   isSendingMessage: false,
+  showMemberTab: false,
 });
-const activePage = defineModel({ required: true, default: '1' });
+const activePage = defineModel({ required: true, default: '0' });
 const attachedMessage = defineModel<Message>('attachedMessage');
 const attachedSubmission =
   defineModel<AttachedSubmission>('attachedSubmission');
@@ -64,7 +71,7 @@ const tabs = computed(() => {
     label: t('components.learningPlan.drawer.tabs.submissions.label'),
     value: '2',
   };
-  const defaultTabs = [
+  let defaultTabs = [
     {
       label: t('components.learningPlan.drawer.tabs.events.label'),
       value: '1',
@@ -74,8 +81,20 @@ const tabs = computed(() => {
       value: '3',
     },
   ];
+  if (props.showMemberTab) {
+    defaultTabs = [
+      {
+        label: 'Integrantes',
+        value: '0',
+      },
+      ...defaultTabs,
+    ];
+  }
   if (!props.submission) {
     return defaultTabs;
+  }
+  if (props.showMemberTab) {
+    return [...defaultTabs.slice(0, 2), submissions, ...defaultTabs.slice(2)];
   }
   return [...defaultTabs.slice(0, 1), submissions, ...defaultTabs.slice(1)];
 });

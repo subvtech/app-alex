@@ -73,24 +73,36 @@
           : [],
         description: taskStore.task.submission_description,
       }"
+      :task="{
+        id: taskStore.task.id,
+        title: taskStore.task.title,
+        startDate: taskStore.task.start_at,
+        endDate: taskStore.task.finish_at,
+        sendAfterDeadline: taskStore.task.can_submit_after_deadline,
+      }"
+      :type="studentDetails?.task?.type"
+      :learningplan-id="learningPlanStore.learningPlan.id"
       :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
       :can-submit-after-deadline="studentDetails.can_submit_after_deadline"
       :task-member-id="studentDetails.id"
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
+      :task-title="taskStore.task.title"
+      :group="studentDetails.learning_plan_group"
+      :student-class="
+        studentDetails.learning_plan_member?.learning_class?.name ||
+        studentDetails.learning_plan_group?.learning_class?.name ||
+        ''
+      "
+      :student="
+        studentDetails.learning_plan_member
+          ? {
+              name: studentDetails.learning_plan_member?.user.fullname || '',
+              avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
+            }
+          : undefined
+      "
       :contract-address="taskStore.task.contract_address"
-      :student="{
-        name: studentDetails.task_member_students[0].student_member.user
-          .fullname,
-        studentClass:
-          studentDetails.task_member_students[0].student_member?.learning_class
-            ?.name || '',
-        avatar:
-          studentDetails.task_member_students[0].student_member.user?.avatar
-            ?.url,
-        wallet:
-          studentDetails.task_member_students[0].student_member.user.wallet,
-      }"
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"
     />
@@ -245,11 +257,9 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
 
 const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
   const classes = taskMembers.flatMap((taskMember) =>
-    taskMember.task_member_students.flatMap((student) =>
-      student.student_member.learning_class?.name
-        ? student.student_member.learning_class?.name
-        : [],
-    ),
+    taskMember.learning_plan_member?.learning_class
+      ? taskMember.learning_plan_member?.learning_class.name
+      : [],
   );
   return Array.from(new Set(classes));
 };
@@ -309,15 +319,32 @@ watch(
         id: task.id,
         status: task.status,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
-        user: {
-          name:
-            task?.task_member_students[0]?.student_member?.user.fullname || '',
-          avatar:
-            task?.task_member_students[0]?.student_member?.user.avatar?.url ||
-            undefined,
-        },
+        ...(!task.learning_plan_group && {
+          user: {
+            name: task?.learning_plan_member?.user.fullname || '',
+            avatar: task?.learning_plan_member?.user.avatar?.url,
+          },
+        }),
+        ...(task.learning_plan_group && {
+          group: {
+            name: task.learning_plan_group?.title,
+            participants: task.learning_plan_group?.group_members.map(
+              (member) => {
+                return {
+                  name: member.student_member.user.fullname,
+                  ...(member.student_member.user.avatar?.url && {
+                    image: {
+                      url: member.student_member.user.avatar?.url,
+                    },
+                  }),
+                };
+              },
+            ),
+          },
+        }),
         studentClass:
-          task?.task_member_students[0]?.student_member?.learning_class?.name ||
+          task?.learning_plan_member?.learning_class?.name ||
+          task.learning_plan_group?.learning_class?.name ||
           '',
       }));
     }

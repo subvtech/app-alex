@@ -219,7 +219,7 @@ const learningGoals = computed(
     props.learningPlan.learning_goals?.map((goal, index) => ({
       id: goal.id,
       title: goal.description,
-      keyWord: goal.verb.text,
+      keyWord: goal.verb?.text,
       errorKeyWord: false,
       errorTitle: false,
       contentData: {
