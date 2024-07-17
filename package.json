@@ -82,6 +82,8 @@
     "@tiptap/extension-link": "^2.4.0",
     "@tiptap/extension-list-item": "^2.4.0",
     "@tiptap/extension-placeholder": "^2.4.0",
+    "@tiptap/extension-subscript": "^2.5.1",
+    "@tiptap/extension-superscript": "^2.5.1",
     "@tiptap/extension-table": "^2.5.1",
     "@tiptap/extension-table-cell": "^2.5.1",
     "@tiptap/extension-table-header": "^2.5.1",

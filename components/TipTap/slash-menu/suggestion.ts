@@ -101,7 +101,7 @@ export default {
       },
       {
         title: 'Horizontal Rule',
-        icon: 'mdi-color-helper',
+        icon: 'mdi-minus',
         command: ({ editor, range }) => {
           editor.chain().focus().deleteRange(range).setHorizontalRule().run();
         },

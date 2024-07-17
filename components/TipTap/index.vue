@@ -39,6 +39,8 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableRow } from '@tiptap/extension-table-row';
 import { Typography } from '@tiptap/extension-typography';
+import { Superscript } from '@tiptap/extension-superscript';
+import { Subscript } from '@tiptap/extension-subscript';
 
 import { common, createLowlight } from 'lowlight';
 
@@ -198,6 +200,8 @@ onMounted(() => {
       TableHeader,
       TableCell,
       Typography,
+      Superscript,
+      Subscript,
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {

@@ -18,7 +18,6 @@
           v-if="!option.popover"
           :value="option.value"
           :aria-label="option.ariaLabel"
-          :disabled="option.disabled"
           :data-active="option.isActive?.()"
           v-bind="tooltip"
           @click="option.onClick?.()"
@@ -70,7 +69,8 @@ import {
   Link,
   Highlighter,
   Palette,
-  EllipsisVertical,
+  Superscript,
+  Subscript,
 } from 'lucide-vue-next';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Editor } from '@tiptap/vue-3';
@@ -144,10 +144,18 @@ const toggleItens = [
       currentColor.value !== undefined && currentColor.value !== '#000',
   },
   {
-    value: 'ellipsisVertical',
-    icon: EllipsisVertical,
-    ariaLabel: 'Mais opções',
-    disabled: true,
+    value: 'superscript',
+    icon: Superscript,
+    ariaLabel: 'sobrescrito',
+    onClick: () => props.editor.chain().focus().toggleSuperscript().run(),
+    isActive: () => props.editor.isActive('superscript'),
+  },
+  {
+    value: 'subscript',
+    icon: Subscript,
+    ariaLabel: 'subscrito',
+    onClick: () => props.editor.chain().focus().toggleSubscript().run(),
+    isActive: () => props.editor.isActive('subscript'),
   },
 ];
 
