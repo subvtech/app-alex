@@ -66,6 +66,7 @@
         "onlyMembers": "Só serão listados os usuários participantes do curso e que não façam parte do grupo",
         "onGroup": "Esse usuário já pertence a outro grupo",
         "missResponsible": "O grupo precisa de um responsável para ser salvo",
+        "oneGroupMemberBlocked": "Grupos de apenas um aluno não são permitidos",
         "missClass": "Selecione uma turma pra o grupo",
         "missName": "Informe o nome do grupo",
         "updated": "Grupo atualizado com sucesso",

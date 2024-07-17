@@ -69,6 +69,7 @@
         "onlyMembers": "Only users who are participants of the course and who are not part of the group will be listed",
         "onGroup": "This user already belongs to another group",
         "missResponsible": "A group leader is required to save the group",
+        "oneGroupMemberBlocked": "Groups with one student aren't allowed",
         "missClass": "Select a class for the group",
         "missName": "Enter a name for the group",
         "updated": "Group updated successfully",
