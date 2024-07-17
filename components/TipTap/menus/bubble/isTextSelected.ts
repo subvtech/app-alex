@@ -16,6 +16,7 @@ export const isTextSelected = ({ editor }: { editor: Editor }) => {
   const isEmptyTextBlock =
     !doc.textBetween(from, to).length && isTextSelection(selection);
 
+  console.log(editor);
   if (empty || isEmptyTextBlock || !editor.isEditable) {
     return false;
   }

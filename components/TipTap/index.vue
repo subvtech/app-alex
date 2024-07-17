@@ -8,7 +8,7 @@
     </div>
 
     <div class="bubble-menu-wrapper">
-      <tip-tap-bubble-menu :editor="editor" @click.stop.prevent />
+      <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
     </div>
     <editor-content :editor="editor" />
   </div>
@@ -46,11 +46,11 @@ import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
-import Commands from './slash-menu/commands.js';
-import suggestion from './slash-menu/suggestion.js';
-import FileSet from './file-set/Extension';
-import VueDragHandle from './drag-menu/Extension';
-import { isTextSelected } from './bubble-menu/isTextSelected';
+import Commands from './menus/slash/commands.js';
+import suggestion from './menus/slash/suggestion.js';
+import FileSet from './custom-plugins/file-set/Extension.js';
+import VueDragHandle from './menus/drag/Extension.js';
+import { isTextSelected } from './menus/bubble/isTextSelected.js';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
