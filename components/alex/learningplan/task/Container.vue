@@ -200,18 +200,19 @@ groupsArray.forEach((group, index) => {
 
 const handlePendingContract = async () => {
   let isThereAPendingContract = !!taskDetails?.value?.contract_address;
-  console.log({ isThereAPendingContract });
+  console.log({ isThereContract: isThereAPendingContract });
   if (isThereAPendingContract) {
     const contractAddress = taskDetails!.value!.contract_address!;
     const balance = await getContractBalance(contractAddress);
     console.log({ balance });
     if (balance && Number(balance) > 0) {
-      await cancelContract({
+      const result = await cancelContract({
         contractAddress,
       });
-      isThereAPendingContract = false;
+      if (result) isThereAPendingContract = false;
     }
   }
+
   return isThereAPendingContract;
 };
 

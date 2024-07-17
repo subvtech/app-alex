@@ -313,11 +313,15 @@ const getDropDownAction = (
       text: t('pages.task.table.dropdown.delete'),
       warning: true,
       onClick: async () => {
-        const isTherePendingContract = await props.handlePendingContract();
-        console.log(isTherePendingContract);
-        if (isTherePendingContract) return;
-        taskToDelete.value = id;
-        deleteModal.value = true;
+        try {
+          const isTherePendingContract = await props.handlePendingContract();
+          console.log({ isTherePendingContract });
+          if (isTherePendingContract) return;
+          taskToDelete.value = id;
+          deleteModal.value = true;
+        } catch (err) {
+          console.log(err);
+        }
       },
     },
     publish: {
