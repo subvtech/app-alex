@@ -75,6 +75,17 @@ export default {
         },
       },
       {
+        title: 'Code Block',
+        icon: 'mdi-code-not-equal-variant',
+        command: ({ editor, range }) => {
+          editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
+        },
+      },
+      {
+        divider: true,
+        title: 'Insert',
+      },
+      {
         title: 'Attaches',
         icon: 'mdi-file-multiple',
         command: ({ editor, range }) => {
@@ -89,10 +100,22 @@ export default {
         },
       },
       {
-        title: 'Code Block',
-        icon: 'mdi-code-not-equal-variant',
+        title: 'Horizontal Rule',
+        icon: 'mdi-color-helper',
         command: ({ editor, range }) => {
-          editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
+          editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+        },
+      },
+      {
+        title: 'Table',
+        icon: 'mdi-table',
+        command: ({ editor, range }) => {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+            .run();
         },
       },
     ]
@@ -105,7 +128,7 @@ export default {
         }
         return true;
       })
-      .slice(0, 10);
+      .slice(0, 20);
   },
   /* 
 

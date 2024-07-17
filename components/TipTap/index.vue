@@ -34,6 +34,12 @@ import { TextAlign } from '@tiptap/extension-text-align';
 import { Highlight } from '@tiptap/extension-highlight';
 import { Color } from '@tiptap/extension-color';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
+import { Table } from '@tiptap/extension-table';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableRow } from '@tiptap/extension-table-row';
+import { Typography } from '@tiptap/extension-typography';
+
 import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
@@ -75,7 +81,7 @@ onMounted(() => {
     name: 'alex-tiptap', // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjEwODY1NDEsIm5iZiI6MTcyMTA4NjU0MSwiZXhwIjoxNzIxMTcyOTQxLCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.T4F4VaFwifMq3PCKv0kKPswvj_nTAxN_m3LC4_b0r4A', // Your JWT token
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjExNzQ4MTgsIm5iZiI6MTcyMTE3NDgxOCwiZXhwIjoxNzIxMjYxMjE4LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.-opqFm9oflwj0K8gLHfVlguWVrenGS3EHVZEJ-l80w8', // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
@@ -119,12 +125,8 @@ onMounted(() => {
           return '';
         },
       }),
-      Commands.configure({
-        suggestion,
-      }),
-      Collaboration.configure({
-        document: doc,
-      }),
+      Commands.configure({ suggestion }),
+      Collaboration.configure({ document: doc }),
       CollaborationCursor.configure({
         provider,
         user: {
@@ -177,29 +179,25 @@ onMounted(() => {
         },
       }),
       TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
+      TaskItem.configure({ nested: true }),
       ListItem,
       TextStyle,
       FontFamily,
-      CodeBlockLowlight.configure({
-        lowlight: createLowlight(common),
-      }),
+      CodeBlockLowlight.configure({ lowlight: createLowlight(common) }),
       Underline,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Color,
       Highlight.configure({ multicolor: true }),
-      Link.configure({
-        openOnClick: true,
-      }),
-
+      Link.configure({ openOnClick: true }),
       VueDragHandle.configure({
         editor: () => editor.value,
         tippyOptions: { offset: [-2, 16], zIndex: 99 },
       }),
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Typography,
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {
@@ -456,6 +454,67 @@ watch(
   background-color: #fff;
   padding: 18px;
   border-radius: 8px;
+
+  /* Table-specific styling */
+  table {
+    border-collapse: collapse;
+    margin: 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+
+    td,
+    th {
+      border: 1px solid rgb(var(--v-theme-gray-300));
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 6px 8px;
+      position: relative;
+      vertical-align: top;
+
+      > * {
+        margin-bottom: 0;
+      }
+    }
+
+    th {
+      background-color: var(--gray-1);
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .selectedCell:after {
+      background: var(--gray-2);
+      content: '';
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .column-resize-handle {
+      background-color: var(--purple);
+      bottom: -2px;
+      pointer-events: none;
+      position: absolute;
+      right: -2px;
+      top: 0;
+      width: 4px;
+    }
+  }
+
+  .tableWrapper {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
 }
 
 .collaboration-cursor__caret {

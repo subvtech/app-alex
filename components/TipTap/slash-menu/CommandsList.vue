@@ -4,12 +4,12 @@
       <div
         v-for="(item, index) in items"
         :key="index"
-        class="text-dark-gray text-body-3"
+        class="text-gray-600 text-body-3 row"
       >
-        <p v-if="item.divider" class="px-2">{{ item.title }}</p>
+        <p v-if="item.divider" class="px-2 divider">{{ item.title }}</p>
         <button
           v-else
-          class="d-flex ga-3 w-100 pa-2 rounded w-100"
+          class="d-flex ga-3 w-100 tw-p-[6px] rounded w-100"
           :class="{ 'is-selected': index === selectedIndex }"
           @click="selectItem(index)"
         >
@@ -103,6 +103,10 @@ export default {
   display: none;
 }
 
+div.row:not(:first-of-type) .divider {
+  margin-top: 16px;
+}
+
 /* Dropdown menu */
 .slash-menu {
   background: #fff;
@@ -112,11 +116,14 @@ export default {
   gap: 0.1rem;
   overflow: auto;
   position: relative;
+  max-height: 350px !important;
+  max-width: 240px !important;
+  overscroll-behavior: contain;
 
   button {
     align-items: center;
     gap: 0.25rem;
-    transition: all 0.2s ease;
+    // transition: all 0.2s ease;
 
     &:hover,
     &:hover.is-selected {
@@ -129,5 +136,19 @@ export default {
       color: rgb(var(--v-theme-gray-900)) !important;
     }
   }
+}
+
+.slash-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.slash-menu::-webkit-scrollbar-track {
+  border-radius: 0 8px 8px 0;
+  background-color: #e7e7e7;
+}
+
+.slash-menu::-webkit-scrollbar-thumb {
+  border-radius: 0 8px 8px 0;
+  background-color: #cacaca;
 }
 </style>
