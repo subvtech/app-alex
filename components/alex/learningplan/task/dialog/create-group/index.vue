@@ -198,12 +198,27 @@ function updateItems() {
   const classStudents = selectedClass.learning_plan_members || [];
   const selectedIds = selectedMembers.value.map(({ id }) => id);
 
+  // Lista de usuários em outros grupos, que não serão exibidos nas opções
+  const onOtherGroups: number[] = [];
+
+  selectedClass.learning_plan_groups?.forEach((group) => {
+    if (
+      group.task_members &&
+      group.task_members[0]?.task?.id === props.taskId
+    ) {
+      // Adiciona o id de todos os participantes dos grupos da tarefa
+      onOtherGroups.push(
+        ...group.group_members.map((member) => member.student_member.id),
+      );
+    }
+  });
+
   const newMembers = classStudents.filter(
-    ({ id }) => id !== responsible.value?.id,
+    ({ id }) => id !== responsible.value?.id && !onOtherGroups.includes(id),
   );
 
   const newFilteredMembers = classStudents.filter(
-    ({ id }) => !selectedIds.includes(id),
+    ({ id }) => !selectedIds.includes(id) && !onOtherGroups.includes(id),
   );
 
   if (newMembers !== members.value) {

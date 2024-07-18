@@ -430,6 +430,13 @@ const { data: classes } = await useAsyncData(
   },
 );
 
+watch(
+  () => props.taskId,
+  () => {
+    refresh();
+  },
+);
+
 watch(addGroupDialog, (value) => {
   if (!value) {
     refresh();

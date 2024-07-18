@@ -141,6 +141,7 @@ const getGroups = (learningplanId: number) =>
       'learning_plan_members.user.fullname',
       'learning_plan_members.user.avatar',
       'learning_plan_groups.task_members',
+      'learning_plan_groups.task_members.task',
       'learning_plan_groups.task_members.task_submissions',
     ],
     filters: { learningplan: learningplanId },
