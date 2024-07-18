@@ -12,6 +12,7 @@
         ? $t('components.learningPlan.drawer.task.dialog.save')
         : $t('components.learningPlan.drawer.task.dialog.create')
     "
+    :loading="isLoading"
     @on-main-action="saveGroup"
     @on-secondary-action="model = false"
   >
@@ -138,13 +139,13 @@ interface CompProps {
 
 const props = defineProps<CompProps>();
 
-const emit = defineEmits(['add-group']);
+const emit = defineEmits(['add-group', 'update-group']);
 
 const learningClass = ref<string | undefined>(undefined);
 const name = ref<string>('');
 const responsible = ref<LearningPlanMemberSimple | undefined>(undefined);
 const member = ref();
-
+const isLoading = ref(false);
 // Items do autocomplete
 const members = ref<LearningPlanMemberSimple[]>([]); // Membros da turma
 const filteredMembers = ref<LearningPlanMemberSimple[]>([]); // Membros não selecionados
@@ -253,16 +254,17 @@ async function saveGroup() {
     );
     return;
   }
-
-  if (selectedMembers.value.length === 1) {
+  if (selectedMembers.value?.length <= 1) {
     setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.oneMember'),
+      t(
+        'components.learningPlan.drawer.task.dialog.message.oneGroupMemberBlocked',
+      ),
       'warning',
       true,
     );
     return;
   }
-
+  isLoading.value = true;
   const membersData = selectedMembers.value.map((member) => {
     return {
       member_id: member.id,
@@ -282,24 +284,30 @@ async function saveGroup() {
   };
 
   try {
-    const { data } = await strapi.create('learnin-plan-groups', groupInfo);
-
-    await strapi.create('task-members', {
-      status: 'to_do',
-      can_submit_after_deadline:
-        props.canSubmitAfter !== undefined ? props.canSubmitAfter : true,
-      started_at: props.startAt || null,
-      finished_at: props.finishAt || null,
-      task: props.taskId,
-      learning_plan_group: data.id,
+    if (!props.group) {
+      const { data } = await strapi.create('learnin-plan-groups', groupInfo);
+      await strapi.create('task-members', {
+        status: 'to_do',
+        can_submit_after_deadline:
+          props.canSubmitAfter !== undefined ? props.canSubmitAfter : true,
+        started_at: props.startAt || null,
+        finished_at: props.finishAt || null,
+        task: props.taskId,
+        learning_plan_group: data.id,
+      });
+      emit('add-group');
+      setMessage(
+        t('components.learningPlan.drawer.task.dialog.message.created'),
+        'success',
+        true,
+      );
+      return;
+    }
+    await strapi.update('learnin-plan-groups', props.group.id, {
+      title: name.value,
+      members: membersData,
     });
-
-    emit('add-group');
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.created'),
-      'success',
-      true,
-    );
+    emit('update-group');
   } catch (e) {
     setMessage(
       t('components.learningPlan.drawer.task.dialog.message.createError'),
@@ -307,6 +315,7 @@ async function saveGroup() {
       true,
     );
   } finally {
+    isLoading.value = false;
     model.value = false;
   }
 }

@@ -69,6 +69,7 @@
         :classes="classes.data"
         :group="groupInfo"
         @add-group="handleAddGroup"
+        @update-group="handleAddGroup"
       />
     </template>
     <!-- Cards -->
