@@ -209,7 +209,9 @@ function updateItems() {
       ),
   );
   const newMembers = classStudents.filter(
-    ({ id }) => id !== responsible.value?.id && !onOtherGroups.includes(id),
+    ({ id }) =>
+      id !== responsible.value?.id &&
+      (selectedIds.includes(id) || !onOtherGroups.includes(id)),
   );
 
   const newFilteredMembers = classStudents.filter(
