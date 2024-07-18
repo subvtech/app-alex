@@ -180,24 +180,69 @@
         </template>
       </div>
 
-      <span v-if="isRewarded">The student was rewarded already</span>
-      <v-tooltip
-        v-else
-        :text="$t('components.learningPlan.contract.warning.tooltip.fee')"
-      >
-        <template #activator="{ props: tooltipProps }">
-          <alex-custom-button
-            :text="
-              $t('components.learningPlan.contract.reward.rewardSingleStudent')
-            "
-            variant="warning"
-            v-bind="tooltipProps"
-            :loading="contractLoading"
-            :disabled="status !== 'done'"
-            @click="handleRewardSingleStudent"
-          />
-        </template>
-      </v-tooltip>
+      <div v-if="contractAddress" class="d-flex flex-column gap-8">
+        <div v-if="disablePayment" class="d-flex flex-column gap-3">
+          <span class="text-h5 text-gray-800">
+            {{ $t('components.learningPlan.contract.reward.studentRewarded') }}
+          </span>
+          <div class="flex flex-col">
+            <p class="text-body-4 text-gray-500">
+              {{ $t('components.learningPlan.contract.reward.remaining') }}
+              {{ contractBalance }}
+            </p>
+          </div>
+        </div>
+
+        <div v-else class="d-flex flex-column gap-6">
+          <div class="flex flex-col">
+            <p class="text-body-4 text-gray-500">
+              {{ $t('components.learningPlan.contract.reward.remaining') }}
+              {{ contractBalance }}
+            </p>
+          </div>
+          <v-tooltip
+            :text="$t('components.learningPlan.contract.warning.tooltip.once')"
+          >
+            <template #activator="{ props: tooltipProps }">
+              <alex-custom-button
+                :text="
+                  $t(
+                    'components.learningPlan.contract.reward.rewardSingleStudent',
+                  )
+                "
+                variant="warning"
+                v-bind="tooltipProps"
+                :loading="contractLoading"
+                :disabled="status !== 'done'"
+                @click="handleRewardSingleStudent"
+              />
+            </template>
+          </v-tooltip>
+        </div>
+        <div class="d-flex flex-column items-start gap-3">
+          <p class="text-h5 text-gray-800">
+            {{ $t('components.learningPlan.contract.warning.secondThoughts') }}
+          </p>
+          <p class="text-body-4 text-gray-500">
+            {{
+              $t('components.learningPlan.contract.warning.abortConsequences')
+            }}
+          </p>
+          <v-tooltip
+            :text="$t('components.learningPlan.contract.warning.tooltip.fee')"
+          >
+            <template #activator="{ props: tooltipProps }">
+              <alex-custom-button
+                :text="$t('components.learningPlan.contract.warning.finish')"
+                variant="error"
+                v-bind="tooltipProps"
+                :loading="contractLoading"
+                @click="handleCancelContract"
+              />
+            </template>
+          </v-tooltip>
+        </div>
+      </div>
 
       <alex-learningplan-task-tabs
         v-model="activePage"
@@ -279,7 +324,6 @@ interface TaskUserDrawerProps {
   finishAt?: string | null;
   submission?: Submission;
   studentClass: string;
-  contractAddress?: string;
 
   canSubmitAfterDeadline: boolean;
   canSubmitAfterDeadlineTask?: boolean;
@@ -289,36 +333,76 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   student: undefined,
   canSubmitAfterDeadlineTask: false,
   finishAt: null,
-  contractAddress: undefined,
   group: undefined,
 });
 const { t } = useI18n();
+const contractAddress = defineModel<string | null>('contractAddress', {
+  default: null,
+});
 const {
   rewardSingleStudent,
   hasTheStudentBeenPaid,
+  cancelContract,
+  getContractBalance,
+  weiToUsd,
   loading: contractLoading,
 } = useContracts();
-const isRewarded = ref(
-  await hasTheStudentBeenPaid(
-    props.contractAddress,
-    props.student.wallet?.address,
-  ),
-);
+
+const isRewarded = ref(false);
+const contractBalance = ref(0);
+
+if (contractAddress.value)
+  isRewarded.value = await hasTheStudentBeenPaid(
+    contractAddress.value,
+    props.student?.wallet?.address,
+  );
+
+const fetchContractBalance = async () => {
+  if (!contractAddress.value) return;
+  const balance = await getContractBalance(contractAddress.value);
+  console.log('fetchedBalance', { balance });
+  if (!balance) return;
+  contractBalance.value = weiToUsd(balance);
+  console.log('newBalance', { newBalance: weiToUsd(balance) });
+};
 
 const handleRewardSingleStudent = async () => {
   if (!props.student?.wallet) return;
-  rewardSingleStudent(props.contractAddress, props.student.wallet.address, 88);
-  isRewarded.value = await hasTheStudentBeenPaid(
-    props.contractAddress,
+  if (!contractAddress.value) return;
+  await rewardSingleStudent(
+    contractAddress.value,
+    props.student.wallet.address,
+    88,
+  );
+  const result = await hasTheStudentBeenPaid(
+    contractAddress.value,
     props.student.wallet?.address,
   );
+  console.log({ result, isRewarded: isRewarded.value });
+  isRewarded.value = result;
+  await fetchContractBalance();
 };
+const handleCancelContract = async () => {
+  if (!contractAddress.value) return;
+  const result = await cancelContract({
+    contractAddress: contractAddress.value,
+  });
+  if (!result) return;
+
+  contractAddress.value = null;
+  await fetchContractBalance();
+  emit('update:contract-address', null);
+};
+const disablePayment = computed(
+  () => isRewarded.value && props.status === 'done',
+);
 const isSendingMessage = ref(false);
 const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
   'change-submit-after-deadline': [taskId: number, value: boolean];
+  'update:contract-address': [value: string | null];
 };
 const emit = defineEmits<Emit>();
 const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline);
@@ -330,6 +414,8 @@ const initials = computed(() => {
 const handleCloseModal = () => {
   model.value = false;
 };
+
+const isThereAContract = computed(() => !!contractAddress.value);
 const drawerId = computed(() => `student-drawer-${crypto.randomUUID()}`);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
@@ -441,7 +527,7 @@ const {
   watch: [taskMemberId],
   dedupe: 'cancel',
 });
-
+await fetchContractBalance();
 const handleSubmitMessage = async (
   text: string,
   audio?: Blob | null,
@@ -567,6 +653,9 @@ watch(activePage, (value) => {
   if (value === '3') {
     executeMessages();
   }
+});
+watch(isThereAContract, async () => {
+  await fetchContractBalance();
 });
 </script>
 

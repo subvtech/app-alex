@@ -54,11 +54,8 @@
       </v-tooltip>
     </div>
 
-    <div v-else-if="updateContract">
-      <div v-if="contractAddress">
-        <span v-if="!theresError">{{
-          $t('components.learningPlan.contract.warning.update')
-        }}</span>
+    <div v-else-if="updateContract" class="mt-4">
+      <div v-if="contractAddress" class="d-flex flex-column gap-1">
         <v-tooltip
           :text="$t('components.learningPlan.contract.warning.tooltip.fee')"
         >
@@ -72,6 +69,9 @@
             />
           </template>
         </v-tooltip>
+        <span v-if="!theresError" class="text-body-3 text-gray-500">{{
+          $t('components.learningPlan.contract.warning.update')
+        }}</span>
       </div>
 
       <v-tooltip

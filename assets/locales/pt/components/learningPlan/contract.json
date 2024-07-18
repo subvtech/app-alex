@@ -5,12 +5,14 @@
     "notFinished": "Só é possível recompesar os alunos depois que a tarefa estiver concluída",
     "noOneHasFinished": "Só é possível recompensar os alunos quando ao menos um aluno concluir a tarefa",
     "noStudents": "Por favor adicione alunos à tarefa para que seja possível calcular o total de recompensa",
-    "secondThoughts": "Pensamento melhor quanto a recompensar os alunos?",
+    "secondThoughts": "Pensando melhor quanto a recompensar os alunos?",
     "editContract": "Lembre-se que editar/cancelar a recompensa tem custos financeiros",
     "abort": "Eu mudei de ideia",
     "elligibleStudents": "Apenas alunos que tenham completado a tarefa serão recompensados",
+    "abortConsequences": "A recompensa restante no contrato será reembolsada e contrato será apagado. Para recompensar os alunos um novo contrato precisará ser criado.",
     "update": "É preciso cancelar o contrato antigo e criar um novo",
     "cancel": "Reverter contrato anterior e ser reembolsado",
+    "finish": "Encerrar contrato e reembolsar dinheiro restante",
 
     "tooltip": {
       "abort": "Clique aqui para desistir de criar um contrato",
@@ -24,6 +26,7 @@
     "stored": "Recompensa atribuída a tarefa",
     "remaining": "Recompensa restante na tarefa: $ ",
     "rewardStudents": "Recompensar alunos",
+    "studentRewarded": "Esse estudante já foi recompensado",
     "rewardSingleStudent": "Recompensar aluno",
     "redeemed": "Esse foi finalizada e os alunos foram recompensados.",
     "value": "Defina o valor que será recompensado para cada aluno (em USDT/Dollar)",

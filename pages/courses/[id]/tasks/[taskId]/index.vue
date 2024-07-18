@@ -67,6 +67,7 @@
     <alex-learningplan-task-drawer-student
       v-if="studentDetails"
       v-model="studentDrawer"
+      :contract-address="taskStore.task.contract_address"
       :submission="{
         constraints: taskStore.task.allowed_editor_plugins
           ? taskStore.task.allowed_editor_plugins?.split(',')
@@ -99,12 +100,13 @@
           ? {
               name: studentDetails.learning_plan_member?.user.fullname || '',
               avatar: studentDetails.learning_plan_member?.user?.avatar?.url,
+              wallet: studentDetails.learning_plan_member?.user?.wallet,
             }
           : undefined
       "
-      :contract-address="taskStore.task.contract_address"
       @change-finish-at="handleChangeFinishAt"
       @change-submit-after-deadline="handleChangeSendAfterDeadline"
+      @update:contract-address="handleChangeContractAddress"
     />
     <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
@@ -253,6 +255,13 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
       return member;
     });
   }
+};
+
+const handleChangeContractAddress = async (value: string | null) => {
+  if (!taskStore.task) return;
+  taskStore.task.contract_address = value;
+  console.log({ taskId: taskId.value, value });
+  await taskStore.updateTaskContractAddress(taskId.value, value);
 };
 
 const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {

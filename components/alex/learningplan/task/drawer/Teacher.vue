@@ -220,7 +220,7 @@ import { orderEvents } from '~/utils';
 
 const strapi = useStrapi();
 const { t } = useI18n();
-const { addTaskContractAddress } = useTaskStore();
+const { updateTaskContractAddress } = useTaskStore();
 const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
@@ -444,7 +444,10 @@ const updateTaskValues = async (
     if (deployContract.value && status.value !== 'draft') {
       const newContractAddress = await deployContract.value();
       if (!newContractAddress) return;
-      await addTaskContractAddress(props.taskId, newContractAddress as string);
+      await updateTaskContractAddress(
+        props.taskId,
+        newContractAddress as string,
+      );
       deployContract.value = null;
       contractAddress.value = newContractAddress;
     }
@@ -564,7 +567,7 @@ watch(status, async (value) => {
   if (deployContract.value && status.value !== 'draft') {
     const newContractAddress = await deployContract.value();
     if (!newContractAddress) return;
-    await addTaskContractAddress(props.taskId, newContractAddress as string);
+    await updateTaskContractAddress(props.taskId, newContractAddress as string);
     deployContract.value = null;
     contractAddress.value = newContractAddress;
   }
@@ -602,7 +605,7 @@ function handleCloseModal() {
 
 const handleUpdateContract = async (newAddress: string | null) => {
   console.log('handleUpdateContract');
-  await addTaskContractAddress(props.taskId, newAddress);
+  await updateTaskContractAddress(props.taskId, newAddress);
   contractAddress.value = newAddress;
 };
 </script>

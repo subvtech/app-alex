@@ -99,6 +99,7 @@
         @cancel:contract-draft="handleAbortContract"
         @delete:contract-address="handleCancelContract"
       />
+      <div class="mt-6" />
     </div>
   </div>
 </template>
@@ -187,11 +188,6 @@ watch(isThereAContract, async () => {
 
 watch(isThereBalance, () => {
   isUpdatingContract.value = isThereBalance.value;
-  console.log('is there Balance', isThereBalance.value);
-});
-
-watch(contractAddress, () => {
-  console.log('contractAddress has changed');
 });
 
 const fetchContractBalance = async () => {
