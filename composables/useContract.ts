@@ -1,8 +1,6 @@
 import { BigNumberish, ethers } from 'ethers';
 
-import TaskOwnerReedemsContract from '@/build/contracts/TaskOwnerReedemsContract.json';
-import TaskOwnerSingleRedeem from '@/build/contracts/TaskOwnerSingleRedeem.json';
-import GiveawayContract from '@/build/contracts/GiveawayContract.json';
+import TaskOwnerSingleRedeem2 from '@/build/contracts/TaskOwnerSingleRedeem2.json';
 
 declare global {
   interface Window {
@@ -68,15 +66,14 @@ export const useContracts = () => {
 
   const getCompiledContract = () => {
     return {
-      contractABI: TaskOwnerSingleRedeem.abi,
-      contractBinary: TaskOwnerSingleRedeem.bytecode,
+      contractABI: TaskOwnerSingleRedeem2.abi,
+      contractBinary: TaskOwnerSingleRedeem2.bytecode,
     };
   };
 
   const createTaskContract = async (props: CreateContractProps) => {
     const { budget, totalNumberOfStudents } = props;
     loading.value = true;
-    console.log({ createTaskContract: budget });
     try {
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
 
@@ -93,7 +90,6 @@ export const useContracts = () => {
         wallet,
       );
 
-      console.log({ usdt: budget, wei: budgetInWei });
       const contract = await contractFactory.deploy(totalNumberOfStudents, {
         value: budgetInWei,
       });
@@ -103,7 +99,6 @@ export const useContracts = () => {
       const balance = await getContractBalance(
         contract.target as string | null,
       );
-      console.log({ createdContractBalance: balance });
       loading.value = false;
       return contract.target;
     } catch (err) {
@@ -153,7 +148,6 @@ export const useContracts = () => {
       const { contractABI } = getCompiledContract();
 
       // Replace with the actual freelancer address
-      console.log({ contractABI });
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
       const signer = await withTimeout(12000, browserProvider.getSigner());
       const taskContract = new ethers.Contract(
@@ -199,7 +193,7 @@ export const useContracts = () => {
         }
       } catch (err) {}
 
-      console.log({ redeemers });
+      console.log({ redeemers, studentAddress });
       console.log(`Redeemers: ${redeemers.join(', ')}`); // Assuming redeemers is an array
     } catch (error) {
       console.error('Error reading public variables:', error);
@@ -211,6 +205,7 @@ export const useContracts = () => {
     contractAddress: string | undefined,
     addressList: string[] = [],
     gradeList: number[] = [],
+    redeemAll = true,
   ) => {
     if (!contractAddress) throw new Error('Contract address not provided');
     if (addressList.length === 0)
@@ -231,7 +226,11 @@ export const useContracts = () => {
         contractABI,
         signer,
       );
-      const tx = await taskContract.redeemRewards(addressList, gradeList);
+      const tx = await taskContract.redeemRewards(
+        addressList,
+        gradeList,
+        redeemAll,
+      );
       await tx.wait(); // Wait for the transaction to be mined
       console.log('Students paid successfully!');
       return true;
@@ -252,7 +251,7 @@ export const useContracts = () => {
 
     loading.value = true;
 
-    const contractABI = TaskOwnerSingleRedeem.abi;
+    const contractABI = TaskOwnerSingleRedeem2.abi;
 
     try {
       // Replace with the actual freelancer address
@@ -288,7 +287,7 @@ export const useContracts = () => {
 
     loading.value = true;
 
-    const contractABI = TaskOwnerReedemsContract.abi;
+    const contractABI = TaskOwnerSingleRedeem2.abi;
 
     try {
       // Replace with the actual freelancer address

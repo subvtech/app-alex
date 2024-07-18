@@ -64,6 +64,7 @@
           handleUpdateStatus(newIndex, value, newStatus)
       "
     />
+
     <alex-learningplan-task-drawer-student
       v-if="studentDetails"
       v-model="studentDrawer"

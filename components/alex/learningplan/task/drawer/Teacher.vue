@@ -604,7 +604,6 @@ function handleCloseModal() {
 }
 
 const handleUpdateContract = async (newAddress: string | null) => {
-  console.log('handleUpdateContract');
   await updateTaskContractAddress(props.taskId, newAddress);
   contractAddress.value = newAddress;
 };

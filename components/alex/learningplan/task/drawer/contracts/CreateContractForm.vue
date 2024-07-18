@@ -16,10 +16,7 @@
         required
         @keypress="isNumber($event)"
       />
-      <p
-        v-if="taskMemberStudents.length === 0"
-        class="text-body-3 text-gray-800"
-      >
+      <p v-if="taskMemberStudents === 0" class="text-body-3 text-gray-800">
         {{ $t('components.learningPlan.contract.warning.noStudents') }}
       </p>
 
@@ -28,7 +25,7 @@
         class="text-body-3 text-gray-800"
       >
         {{ $t('components.learningPlan.contract.reward.total') }}
-        {{ reward }} * {{ taskMemberStudents.length }} = $
+        {{ reward }} * {{ taskMemberStudents }} = $
         {{ totalReward }}
       </p>
     </div>
@@ -100,7 +97,7 @@ import * as yup from 'yup';
 interface CreateContractFormProps {
   loading?: boolean;
   canEdit?: boolean;
-  taskMemberStudents?: any[];
+  taskMemberStudents: number;
   displayDraftWarning?: boolean;
   isDraft?: boolean;
   rewardLabel: string;
@@ -109,7 +106,6 @@ interface CreateContractFormProps {
 }
 
 const props = withDefaults(defineProps<CreateContractFormProps>(), {
-  taskMemberStudents: () => [],
   contractAddress: null,
 });
 
@@ -136,7 +132,7 @@ const { handleSubmit, errors, useFieldModel } = useForm({
 const handleCreateTaskContract = handleSubmit(() => {
   emit('create:contract-address', {
     budget: totalReward.value,
-    totalNumberOfStudents: props.taskMemberStudents.length,
+    totalNumberOfStudents: props.taskMemberStudents,
   } as CreateContractProps);
 });
 
@@ -146,12 +142,12 @@ const theresError = computed(() => {
     Object.keys(errors.value).length !== 0 ||
     !reward.value ||
     props.canEdit ||
-    props.taskMemberStudents.length === 0
+    props.taskMemberStudents === 0
   );
 });
 
 const totalReward = computed(
-  () => parseFloat(reward.value) * props.taskMemberStudents.length,
+  () => parseFloat(reward.value) * props.taskMemberStudents,
 );
 
 function isNumber(evt) {

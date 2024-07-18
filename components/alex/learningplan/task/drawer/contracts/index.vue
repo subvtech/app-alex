@@ -80,7 +80,7 @@
         v-if="(isThereAContract && isThereBalance) || !isThereAContract"
         :is-draft="isDraft"
         :display-draft-warning="displayDraftWarning"
-        :task-member-students="taskMemberStudents"
+        :task-member-students="taskMemberCount"
         :loading="loading"
         :contract-address="contractAddress"
         :reward-label="$t('components.learningPlan.contract.reward.value')"
@@ -139,6 +139,26 @@ const isDraft = computed(() => status.value === 'draft');
 
 const canEdit = ref(isThereAContract.value || isUpdatingContract.value);
 
+const taskMemberCount = computed(() => {
+  let count = 0;
+  taskMemberStudents.value.forEach((m) => {
+    if (m.learning_plan_member) {
+      const wallet = m.learning_plan_member?.user?.wallet;
+      if (wallet?.address) {
+        count++;
+      }
+    } else if (m.learning_plan_group?.group_members) {
+      m.learning_plan_group.group_members.forEach((gm) => {
+        const wallet = gm.student_member.user.wallet;
+        if (wallet?.address) {
+          count++;
+        }
+      });
+    }
+  });
+  return count;
+});
+
 const taskMemberStudents = computed(() => {
   return props.taskMembers.flatMap(
     (member) =>
@@ -146,16 +166,32 @@ const taskMemberStudents = computed(() => {
         {
           taskStatus: member.status,
           learning_plan_member: member.learning_plan_member,
+          learning_plan_group: member.learning_plan_group,
         },
       ] || [],
   );
 });
 
 const taskWallets = computed(() => {
-  return taskMemberStudents.value
+  const result: string[] = [];
+  taskMemberStudents.value
     .filter((m) => m.taskStatus === 'done')
-    .map((m) => m.learning_plan_member?.user?.wallet?.address)
-    .filter(Boolean); // Check for null or undefined values
+    .forEach((m) => {
+      if (m.learning_plan_member) {
+        const wallet = m.learning_plan_member?.user?.wallet;
+        if (wallet && wallet.address) {
+          result.push(wallet.address);
+        }
+      } else if (m.learning_plan_group?.group_members) {
+        m.learning_plan_group.group_members.forEach((gm) => {
+          const wallet = gm.student_member.user.wallet;
+          if (wallet && wallet.address) {
+            result.push(wallet.address);
+          }
+        });
+      }
+    });
+  return result;
 });
 
 const taskGrades = computed(() => {
@@ -164,7 +200,6 @@ const taskGrades = computed(() => {
 
 watch(isThereAContract, async () => {
   canEdit.value = isThereAContract.value || isUpdatingContract.value;
-  console.log('is there a contract', isThereAContract.value);
   await fetchContractBalance();
 });
 
@@ -175,10 +210,8 @@ watch(isThereBalance, () => {
 const fetchContractBalance = async () => {
   if (!contractAddress.value) return;
   const balance = await getContractBalance(contractAddress.value);
-  console.log('fetchedBalance', { balance, bool: !balance });
   if (balance === undefined) return;
   contractBalance.value = weiToUsd(balance);
-  console.log('newBalance', { newBalance: weiToUsd(balance) });
 };
 await fetchContractBalance();
 const handleCancelContract = async (isUpdating = false) => {
@@ -191,7 +224,6 @@ const handleCancelContract = async (isUpdating = false) => {
   if (isUpdating) isUpdatingContract.value = true;
   contractAddress.value = null;
   await fetchContractBalance();
-  console.log({ result, contractAddress: contractAddress.value });
   emit('update:contract-address', null);
 };
 
@@ -217,7 +249,6 @@ const handleCreateTaskContract = async (props: CreateContractProps) => {
 
   if (!newContractAddress) return;
   isUpdatingContract.value = true;
-  console.log({ newContractAddress });
   contractAddress.value = newContractAddress as string;
   await fetchContractBalance();
   emit('update:contract-address', newContractAddress as string);

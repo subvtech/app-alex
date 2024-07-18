@@ -198,6 +198,7 @@
           />
 
           <alex-learningplan-task-drawer-contracts-button
+            v-if="student"
             :tooltip-text="
               $t('components.learningPlan.contract.warning.tooltip.once')
             "
@@ -209,8 +210,19 @@
             :disabled="status !== 'done'"
             @click="handleRewardSingleStudent"
           />
+          <alex-learningplan-task-drawer-contracts-button
+            v-else-if="group"
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.once')
+            "
+            :text="$t('components.learningPlan.contract.reward.rewardStudents')"
+            variant="warning"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="handleRewardGroup"
+          />
         </div>
-        <div class="d-flex flex-column items-start gap-3">
+        <div v-if="isThereBalance" class="d-flex flex-column items-start gap-3">
           <p class="text-h5 text-gray-800">
             {{ $t('components.learningPlan.contract.warning.secondThoughts') }}
           </p>
@@ -328,6 +340,7 @@ const { contractAddress } = toRefs(props);
 
 const {
   rewardSingleStudent,
+  rewardStudents,
   hasTheStudentBeenPaid,
   cancelContract,
   getContractBalance,
@@ -338,19 +351,11 @@ const {
 const isRewarded = ref(false);
 const contractBalance = ref(0);
 
-if (contractAddress.value)
-  isRewarded.value = await hasTheStudentBeenPaid(
-    contractAddress.value,
-    props.student?.wallet?.address,
-  );
-
 const fetchContractBalance = async () => {
   if (!contractAddress.value) return;
   const balance = await getContractBalance(contractAddress.value);
-  console.log('fetchedBalance', { balance });
   if (!balance) return;
   contractBalance.value = weiToUsd(balance);
-  console.log('newBalance', { newBalance: weiToUsd(balance) });
 };
 
 const handleRewardSingleStudent = async () => {
@@ -365,10 +370,64 @@ const handleRewardSingleStudent = async () => {
     contractAddress.value,
     props.student.wallet?.address,
   );
-  console.log({ result, isRewarded: isRewarded.value });
   isRewarded.value = result;
   await fetchContractBalance();
 };
+
+const wallets = computed(
+  () =>
+    (props.group?.group_members
+      .map((m) => m.student_member.user.wallet?.address)
+      .filter(Boolean) || []) as string[],
+);
+
+const handleRewardGroup = async () => {
+  if (!contractAddress.value) return;
+
+  await rewardStudents(
+    contractAddress.value,
+    wallets.value,
+    wallets.value.map(() => 88),
+    false,
+  );
+  const result = await handleHasTheStudentBeenPaid();
+  isRewarded.value = result;
+  await fetchContractBalance();
+};
+
+const handleHasTheStudentBeenPaid = async () => {
+  let temp = false;
+  if (props.group) {
+    temp = await Promise.all(
+      props.group.group_members.map(async (member, index) => {
+        const walletAddress = member.student_member.user.wallet?.address;
+        if (!walletAddress) {
+          return false;
+        }
+        const hasBeenPaid = await hasTheStudentBeenPaid(
+          contractAddress.value,
+          walletAddress,
+        );
+        return hasBeenPaid;
+      }),
+    ).then((results) => results.some((result) => result));
+  } else {
+    const walletAddress = props.student?.wallet?.address;
+    if (!walletAddress) {
+      return false;
+    }
+    temp = await hasTheStudentBeenPaid(contractAddress.value, walletAddress);
+  }
+  console.log({ temp, isRewarded: isRewarded.value });
+
+  return temp;
+};
+
+if (contractAddress.value)
+  isRewarded.value = await handleHasTheStudentBeenPaid();
+
+const isThereBalance = computed(() => contractBalance.value > 0);
+
 const handleCancelContract = async () => {
   if (!contractAddress.value) return;
   const result = await cancelContract({
@@ -402,7 +461,6 @@ const handleCloseModal = () => {
   model.value = false;
 };
 
-const isThereAContract = computed(() => !!contractAddress.value);
 const drawerId = computed(() => `student-drawer-${crypto.randomUUID()}`);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
@@ -640,9 +698,6 @@ watch(activePage, (value) => {
   if (value === '3') {
     executeMessages();
   }
-});
-watch(isThereAContract, async () => {
-  await fetchContractBalance();
 });
 </script>
 

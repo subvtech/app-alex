@@ -194,11 +194,9 @@ groupsArray.forEach((group, index) => {
 
 const handlePendingContract = async () => {
   let isThereAPendingContract = !!taskDetails?.value?.contract_address;
-  console.log({ isThereContract: isThereAPendingContract });
   if (isThereAPendingContract) {
     const contractAddress = taskDetails!.value!.contract_address!;
     const balance = await getContractBalance(contractAddress);
-    console.log({ balance });
     if (balance && Number(balance) > 0) {
       const result = await cancelContract({
         contractAddress,
@@ -624,6 +622,7 @@ const handleChangeMembers = async () => {
       populate: [
         'task_submission',
         'learning_plan_group.group_members.student_member.user.avatar',
+        'learning_plan_group.group_members.student_member.user.wallet',
         'learning_plan_member.user.avatar',
         'learning_plan_member.user.wallet',
         'learning_plan_member.learning_class',

@@ -78,6 +78,7 @@ export const useTaskStore = defineStore('task', () => {
           'learning_plan_member.user.avatar',
           'learning_plan_member.learning_class',
           'learning_plan_group.group_members.student_member.user.avatar',
+          'learning_plan_group.group_members.student_member.user.wallet',
         ],
         filters: {
           task: taskId,
