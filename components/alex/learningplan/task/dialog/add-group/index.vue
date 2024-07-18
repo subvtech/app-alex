@@ -36,9 +36,7 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
-            @add-members="
-              (member) => openDialog(member, classValue.learning_plan_groups)
-            "
+            @add-members="(member) => openDialog(member)"
           />
           <p
             v-if="!classValue.learning_plan_groups?.length"
@@ -60,6 +58,7 @@
     :can-submit-after="canSubmitAfter"
     :classes="classes.data"
     :group="groupInfo"
+    :task-members="taskMembers"
     @add-group="handleAddGroup"
   />
   <alex-learningplan-task-dialog-edit-group
@@ -82,10 +81,13 @@ interface AddStudent {
   startAt: string | null;
   finishAt: string | null;
   canSubmitAfter: boolean;
+  taskMembers?: TaskMember[];
 }
 
 const model = defineModel<boolean>({ required: true });
-const props = defineProps<AddStudent>();
+const props = withDefaults(defineProps<AddStudent>(), {
+  taskMembers: () => [],
+});
 type Emits = {
   'add-group': [id: number];
 };
@@ -101,26 +103,6 @@ const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const allGroups = ref<LearningPlanGroupSimple[]>([]);
 
 const search = ref('');
-
-function openDialog(
-  group: LearningPlanGroupSimple | undefined,
-  lpGroups: LearningPlanGroupSimple[] | undefined = undefined,
-) {
-  const taskMember = group?.task_members;
-
-  if (taskMember && taskMember[0]?.task_submissions?.length) {
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
-      'warning',
-      true,
-    );
-    return;
-  }
-
-  groupDialog.value = true;
-  groupInfo.value = group;
-  allGroups.value = lpGroups || [];
-}
 
 function handleOpenCreateGroup() {
   addGroupDialog.value = true;
@@ -153,6 +135,24 @@ const { data: classes, execute } = await useAsyncData(
     default: () => ({ meta: 0, data: [] as ClassSimple[] }),
   },
 );
+function openDialog(group: LearningPlanGroupSimple | undefined) {
+  const taskMember = group?.task_members;
+
+  if (taskMember && taskMember[0]?.task_submissions?.length) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
+  groupDialog.value = true;
+  groupInfo.value = group;
+  allGroups.value = props.taskMembers.flatMap((taskMember) =>
+    taskMember.learning_plan_group ? [taskMember.learning_plan_group] : [],
+  );
+}
 
 const filteredClasses = computed(() => {
   classes.value.data = classes.value.data.map((classValue) => ({

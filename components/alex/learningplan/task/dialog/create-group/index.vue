@@ -133,11 +133,17 @@ interface CompProps {
   finishAt?: string | null;
   canSubmitAfter?: boolean;
   classes: ClassSimple[];
+  taskMembers?: TaskMember[];
   // Se essa props estiver definida, está no modo editar
   group?: LearningPlanGroupSimple;
 }
 
-const props = defineProps<CompProps>();
+const props = withDefaults(defineProps<CompProps>(), {
+  startAt: null,
+  finishAt: null,
+  taskMembers: () => [],
+  group: undefined,
+});
 
 const emit = defineEmits(['add-group', 'update-group']);
 
@@ -149,9 +155,7 @@ const isLoading = ref(false);
 // Items do autocomplete
 const members = ref<LearningPlanMemberSimple[]>([]); // Membros da turma
 const filteredMembers = ref<LearningPlanMemberSimple[]>([]); // Membros não selecionados
-//
 const selectedMembers = ref<LearningPlanMemberSimple[]>([]);
-
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
@@ -177,7 +181,6 @@ function setForms() {
 
   const allMembers = props.group.group_members;
   const inCharge = allMembers.find(({ role }) => role === 'in_charge');
-
   selectedMembers.value = allMembers.map((member) => member.student_member);
   responsible.value = inCharge?.student_member;
   learningClass.value = props.group.learning_class?.name;
@@ -199,20 +202,12 @@ function updateItems() {
   const selectedIds = selectedMembers.value.map(({ id }) => id);
 
   // Lista de usuários em outros grupos, que não serão exibidos nas opções
-  const onOtherGroups: number[] = [];
-
-  selectedClass.learning_plan_groups?.forEach((group) => {
-    if (
-      group.task_members &&
-      group.task_members[0]?.task?.id === props.taskId
-    ) {
-      // Adiciona o id de todos os participantes dos grupos da tarefa
-      onOtherGroups.push(
-        ...group.group_members.map((member) => member.student_member.id),
-      );
-    }
-  });
-
+  const onOtherGroups: (number | undefined)[] = props.taskMembers.flatMap(
+    (taskMember) =>
+      taskMember.learning_plan_group?.group_members.map(
+        (groupMember) => groupMember.student_member.id,
+      ),
+  );
   const newMembers = classStudents.filter(
     ({ id }) => id !== responsible.value?.id && !onOtherGroups.includes(id),
   );
@@ -220,11 +215,9 @@ function updateItems() {
   const newFilteredMembers = classStudents.filter(
     ({ id }) => !selectedIds.includes(id) && !onOtherGroups.includes(id),
   );
-
   if (newMembers !== members.value) {
     members.value = newMembers;
   }
-
   if (newFilteredMembers !== filteredMembers.value) {
     filteredMembers.value = newFilteredMembers;
   }

@@ -41,6 +41,7 @@
           :start-at="startAt"
           :finish-at="finishAt"
           :can-submit-after="props.sendAfterDeadline"
+          :task-members="members.data"
           @add-group="handleAddGroup"
         />
 
@@ -67,6 +68,7 @@
         :finish-at="props.finishAt"
         :can-submit-after="props.sendAfterDeadline"
         :classes="classes.data"
+        :task-members="members.data"
         :group="groupInfo"
         @add-group="handleAddGroup"
         @update-group="handleAddGroup"

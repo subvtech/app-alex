@@ -4,7 +4,7 @@
     :main-button-text="
       $t('components.learningPlan.drawer.task.dialog.title.add')
     "
-    :main-button-disabled="responsible ? onAnotherGroup(responsible) : true"
+    :main-button-disabled="hasMembersInOtherGroups"
     @on-main-action="updateGroup"
     @on-secondary-action="model = false"
   >
@@ -24,11 +24,7 @@
             {{ props.group?.learning_class?.name || '(Sem turma)' }}
           </p>
         </div>
-        <alex-custom-button
-          icon="mdi-dots-vertical"
-          variant="text"
-          @click="console.log('abrir opções')"
-        />
+        <alex-custom-button icon="mdi-dots-vertical" variant="text" />
       </header>
     </template>
 
@@ -110,18 +106,16 @@ const otherGroupIds = computed<number[]>(() => {
   const filteredGroups = props.allGroups.filter(
     ({ id }) => id !== props.group?.id,
   );
-
-  const ids: number[] = [];
-
-  filteredGroups.forEach((group) => {
-    group.group_members.forEach((member) =>
-      ids.push(member.student_member.user.id),
-    );
-  });
-
-  return ids;
+  return filteredGroups.flatMap((group) =>
+    group.group_members.map((groupMember) => groupMember.student_member.id),
+  );
 });
-
+const hasMembersInOtherGroups = computed(
+  () =>
+    !!members.value.filter((member) =>
+      otherGroupIds.value.includes(member.student_member.id),
+    ).length,
+);
 const filteredMembers = computed<LearningPlanGroupMemberSimple[]>(() =>
   members.value.filter((member) =>
     member.student_member.user.fullname
@@ -143,7 +137,7 @@ const responsible = computed<LearningPlanGroupMemberSimple | undefined>(() => {
 });
 
 function onAnotherGroup(member: LearningPlanGroupMemberSimple): boolean {
-  return otherGroupIds.value.includes(member.student_member.user.id);
+  return otherGroupIds.value.includes(member.student_member.id);
 }
 
 function removeMember(member: LearningPlanGroupMemberSimple) {
