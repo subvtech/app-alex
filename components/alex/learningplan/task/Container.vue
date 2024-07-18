@@ -130,11 +130,7 @@
 <script setup lang="ts">
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import {
-  TaskSimple,
-  TaskStatus,
-  TaskType,
-} from '~/models/simple/taskSimple.model';
+import { TaskSimple, TaskStatus } from '~/models/simple/taskSimple.model';
 
 export interface TaskItem {
   id: number;
@@ -562,7 +558,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.type = values.type;
     task.start_at = values.start_at;
     task.finish_at = values.finish_at;
-    task.contract_address = values.contract_address;
+    task.contract_address = values.contract_address!;
     task.submission_required = values.submission_required!;
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;

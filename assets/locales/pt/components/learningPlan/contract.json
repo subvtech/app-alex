@@ -24,11 +24,11 @@
   "reward": {
     "total": "Recompensa total: ",
     "stored": "Recompensa atribuída a tarefa",
-    "remaining": "Recompensa restante na tarefa: $ ",
+    "remaining": "Recompensa restante na tarefa: ",
     "rewardStudents": "Recompensar alunos",
     "studentRewarded": "Esse estudante já foi recompensado",
     "rewardSingleStudent": "Recompensar aluno",
-    "redeemed": "Esse foi finalizada e os alunos foram recompensados.",
+    "redeemed": "Essa tarefa foi finalizada e os alunos foram recompensados.",
     "value": "Defina o valor que será recompensado para cada aluno (em USDT/Dollar)",
     "deploy": "Ativar recompensa",
     "placeholder": "Recompensa da tarefa"

@@ -8,14 +8,11 @@
     <div v-if="canEdit">
       <div v-if="contractAddress" class="flex flex-column mt-6 gap-4">
         <div v-if="isThereBalance">
-          <div class="flex flex-col">
-            <p class="text-body-4 text-gray-800">
-              {{ $t('components.learningPlan.contract.reward.stored') }}
-            </p>
-            <p class="text-body-3 text-gray-800">
-              $ {{ contractBalance.toFixed(2) }}
-            </p>
-          </div>
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.stored')"
+          />
+
           <div class="flex my-6">
             <div v-if="itsNotFinished">
               <span class="text-body-2 text-error-0">{{
@@ -30,33 +27,28 @@
             </div>
 
             <div class="d-flex flex-column gap-1 my-2">
-              <v-tooltip
-                :text="
+              <alex-learningplan-task-drawer-contracts-button
+                :tooltip-text="
                   $t('components.learningPlan.contract.warning.tooltip.once')
                 "
-              >
-                <template #activator="{ props: tooltipProps }">
-                  <alex-custom-button
-                    :text="
-                      $t(
-                        'components.learningPlan.contract.reward.rewardStudents',
-                      )
-                    "
-                    variant="warning"
-                    v-bind="tooltipProps"
-                    :loading="loading"
-                    :disabled="
-                      itsNotFinished ||
-                      isRewardCompleted ||
-                      taskWallets.length === 0
-                    "
-                    @click="handleRewardStudents"
-                  />
-                </template>
-              </v-tooltip>
-              <span class="text-body-3 text-gray-500">{{
-                $t('components.learningPlan.contract.warning.elligibleStudents')
-              }}</span>
+                :text="
+                  $t('components.learningPlan.contract.reward.rewardStudents')
+                "
+                variant="warning"
+                :loading="loading"
+                :disabled="
+                  itsNotFinished ||
+                  isRewardCompleted ||
+                  taskWallets.length === 0
+                "
+                show-hint
+                :hint="
+                  $t(
+                    'components.learningPlan.contract.warning.elligibleStudents',
+                  )
+                "
+                @click:button="handleRewardStudents"
+              />
             </div>
           </div>
 
@@ -72,14 +64,12 @@
           </div>
         </div>
 
-        <div v-else>
-          <div class="flex flex-col">
-            <p class="text-body-4 text-gray-800">
-              {{ $t('components.learningPlan.contract.reward.remaining') }}
-              {{ contractBalance }}
-            </p>
-          </div>
-          <span class="text-red-500">
+        <div v-else class="d-flex flex-column gap-2">
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+          <span class="text-body-2 text-gray-800">
             {{ $t('components.learningPlan.contract.reward.redeemed') }}
           </span>
         </div>
@@ -150,10 +140,6 @@ const isDraft = computed(() => status.value === 'draft');
 const canEdit = ref(isThereAContract.value || isUpdatingContract.value);
 
 const taskMemberStudents = computed(() => {
-  console.log({
-    taskMembers: props.taskMembers,
-    typeTaskMembers: typeof props.taskMembers,
-  });
   return props.taskMembers.flatMap(
     (member) =>
       [
@@ -166,10 +152,6 @@ const taskMemberStudents = computed(() => {
 });
 
 const taskWallets = computed(() => {
-  console.log({
-    taskMemberStudents: taskMemberStudents.value,
-    typeTaskMemberStudents: typeof taskMemberStudents.value,
-  });
   return taskMemberStudents.value
     .filter((m) => m.taskStatus === 'done')
     .map((m) => m.learning_plan_member?.user?.wallet?.address)
@@ -193,12 +175,12 @@ watch(isThereBalance, () => {
 const fetchContractBalance = async () => {
   if (!contractAddress.value) return;
   const balance = await getContractBalance(contractAddress.value);
-  console.log('fetchedBalance', { balance });
-  if (!balance) return;
+  console.log('fetchedBalance', { balance, bool: !balance });
+  if (balance === undefined) return;
   contractBalance.value = weiToUsd(balance);
   console.log('newBalance', { newBalance: weiToUsd(balance) });
 };
-
+await fetchContractBalance();
 const handleCancelContract = async (isUpdating = false) => {
   if (!contractAddress.value) return;
   const result = await cancelContract({
@@ -260,4 +242,8 @@ const handleRewardStudents = async () => {
   if (result) isUpdatingContract.value = false;
   await fetchContractBalance();
 };
+
+watch(status, async () => {
+  await fetchContractBalance();
+});
 </script>

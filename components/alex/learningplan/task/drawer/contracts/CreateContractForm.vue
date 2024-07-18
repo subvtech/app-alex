@@ -37,75 +37,60 @@
       v-if="displayDraftWarning && isDraft"
       class="flex flex-column w-full gap-4 text-orange-800"
     >
-      <span>{{ $t('components.learningPlan.contract.warning.isDraft') }}</span>
-      <v-tooltip
-        :text="$t('components.learningPlan.contract.warning.tooltip.abort')"
-      >
-        <template #activator="{ props: tooltipProps }">
-          <alex-custom-button
-            :text="$t('components.learningPlan.contract.warning.abort')"
-            variant="error"
-            v-bind="tooltipProps"
-            :disabled="theresError"
-            :loading="loading"
-            @click="emit('cancel:contract-draft')"
-          />
-        </template>
-      </v-tooltip>
+      <span class="text-body-4 text-error-0 my-1">{{
+        $t('components.learningPlan.contract.warning.isDraft')
+      }}</span>
+
+      <alex-learningplan-task-drawer-contracts-button
+        :tooltip-text="
+          $t('components.learningPlan.contract.warning.tooltip.abort')
+        "
+        :text="$t('components.learningPlan.contract.warning.abort')"
+        variant="error"
+        :disabled="theresError"
+        :loading="loading"
+        @click:button="emit('cancel:contract-draft')"
+      />
     </div>
 
     <div v-else-if="updateContract" class="mt-4">
-      <div v-if="contractAddress" class="d-flex flex-column gap-1">
-        <v-tooltip
-          :text="$t('components.learningPlan.contract.warning.tooltip.fee')"
-        >
-          <template #activator="{ props: tooltipProps }">
-            <alex-custom-button
-              :text="$t('components.learningPlan.contract.warning.cancel')"
-              variant="error"
-              v-bind="tooltipProps"
-              :loading="loading"
-              @click="emit('delete:contract-address', true)"
-            />
-          </template>
-        </v-tooltip>
-        <span v-if="!theresError" class="text-body-3 text-gray-500">{{
-          $t('components.learningPlan.contract.warning.update')
-        }}</span>
-      </div>
+      <alex-learningplan-task-drawer-contracts-button
+        v-if="contractAddress"
+        :tooltip-text="
+          $t('components.learningPlan.contract.warning.tooltip.fee')
+        "
+        :text="$t('components.learningPlan.contract.warning.cancel')"
+        variant="error"
+        :loading="loading"
+        :show-hint="!theresError"
+        :hint="$t('components.learningPlan.contract.warning.update')"
+        @click:button="emit('delete:contract-address', true)"
+      />
 
-      <v-tooltip
+      <alex-learningplan-task-drawer-contracts-button
         v-else
-        :text="$t('components.learningPlan.contract.warning.tooltip.spend')"
-      >
-        <template #activator="{ props: tooltipProps }">
-          <alex-custom-button
-            :text="$t('components.learningPlan.contract.reward.deploy')"
-            variant="warning"
-            v-bind="tooltipProps"
-            :disabled="theresError"
-            :loading="loading"
-            @click="handleCreateTaskContract"
-          />
-        </template>
-      </v-tooltip>
+        :tooltip-text="
+          $t('components.learningPlan.contract.warning.tooltip.spend')
+        "
+        :text="$t('components.learningPlan.contract.reward.deploy')"
+        variant="warning"
+        :disabled="theresError"
+        :loading="loading"
+        @click:button="handleCreateTaskContract"
+      />
     </div>
 
-    <v-tooltip
+    <alex-learningplan-task-drawer-contracts-button
       v-else
-      :text="$t('components.learningPlan.contract.warning.tooltip.spend')"
-    >
-      <template #activator="{ props: tooltipProps }">
-        <alex-custom-button
-          :text="$t('components.learningPlan.contract.reward.deploy')"
-          variant="warning"
-          v-bind="tooltipProps"
-          :disabled="theresError"
-          :loading="loading"
-          @click="handleCreateTaskContract"
-        />
-      </template>
-    </v-tooltip>
+      :tooltip-text="
+        $t('components.learningPlan.contract.warning.tooltip.spend')
+      "
+      :text="$t('components.learningPlan.contract.reward.deploy')"
+      variant="warning"
+      :disabled="theresError"
+      :loading="loading"
+      @click:button="handleCreateTaskContract"
+    />
   </div>
 </template>
 
@@ -144,15 +129,7 @@ const createTaskContractSchema2 = yup.object({
     .required(),
 });
 
-const {
-  handleSubmit,
-  errors,
-  values,
-  controlledValues,
-  setFieldError,
-  validate,
-  useFieldModel,
-} = useForm({
+const { handleSubmit, errors, useFieldModel } = useForm({
   validationSchema: createTaskContractSchema2,
 });
 

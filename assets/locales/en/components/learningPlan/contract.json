@@ -23,7 +23,7 @@
   "reward": {
     "total": "Total reward: ",
     "stored": "Reward stored in the task",
-    "remaining": "Reward left in the task: $ ",
+    "remaining": "Reward left in the task: ",
     "rewardStudents": "Reward Students",
     "rewardSingleStudent": "Reward Student",    
     "studentRewarded": "This student was already rewaded",

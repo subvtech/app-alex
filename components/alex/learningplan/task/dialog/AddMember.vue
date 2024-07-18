@@ -201,6 +201,7 @@ const handleSubmit = async () => {
       await refresh();
       loadingAdd.value = false;
     }, 1000);
+    model.value = false;
   } catch (error) {}
 };
 watch(model, (value) => {

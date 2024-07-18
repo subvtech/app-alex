@@ -185,39 +185,30 @@
           <span class="text-h5 text-gray-800">
             {{ $t('components.learningPlan.contract.reward.studentRewarded') }}
           </span>
-          <div class="flex flex-col">
-            <p class="text-body-4 text-gray-500">
-              {{ $t('components.learningPlan.contract.reward.remaining') }}
-              {{ contractBalance }}
-            </p>
-          </div>
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
         </div>
 
         <div v-else class="d-flex flex-column gap-6">
-          <div class="flex flex-col">
-            <p class="text-body-4 text-gray-500">
-              {{ $t('components.learningPlan.contract.reward.remaining') }}
-              {{ contractBalance }}
-            </p>
-          </div>
-          <v-tooltip
-            :text="$t('components.learningPlan.contract.warning.tooltip.once')"
-          >
-            <template #activator="{ props: tooltipProps }">
-              <alex-custom-button
-                :text="
-                  $t(
-                    'components.learningPlan.contract.reward.rewardSingleStudent',
-                  )
-                "
-                variant="warning"
-                v-bind="tooltipProps"
-                :loading="contractLoading"
-                :disabled="status !== 'done'"
-                @click="handleRewardSingleStudent"
-              />
-            </template>
-          </v-tooltip>
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+
+          <alex-learningplan-task-drawer-contracts-button
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.once')
+            "
+            :text="
+              $t('components.learningPlan.contract.reward.rewardSingleStudent')
+            "
+            variant="warning"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="handleRewardSingleStudent"
+          />
         </div>
         <div class="d-flex flex-column items-start gap-3">
           <p class="text-h5 text-gray-800">
@@ -228,19 +219,16 @@
               $t('components.learningPlan.contract.warning.abortConsequences')
             }}
           </p>
-          <v-tooltip
-            :text="$t('components.learningPlan.contract.warning.tooltip.fee')"
-          >
-            <template #activator="{ props: tooltipProps }">
-              <alex-custom-button
-                :text="$t('components.learningPlan.contract.warning.finish')"
-                variant="error"
-                v-bind="tooltipProps"
-                :loading="contractLoading"
-                @click="handleCancelContract"
-              />
-            </template>
-          </v-tooltip>
+
+          <alex-learningplan-task-drawer-contracts-button
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.fee')
+            "
+            :text="$t('components.learningPlan.contract.warning.finish')"
+            variant="error"
+            :loading="contractLoading"
+            @click:button="handleCancelContract"
+          />
         </div>
       </div>
 
@@ -324,7 +312,7 @@ interface TaskUserDrawerProps {
   finishAt?: string | null;
   submission?: Submission;
   studentClass: string;
-
+  contractAddress: string | null;
   canSubmitAfterDeadline: boolean;
   canSubmitAfterDeadlineTask?: boolean;
 }
@@ -336,9 +324,8 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   group: undefined,
 });
 const { t } = useI18n();
-const contractAddress = defineModel<string | null>('contractAddress', {
-  default: null,
-});
+const { contractAddress } = toRefs(props);
+
 const {
   rewardSingleStudent,
   hasTheStudentBeenPaid,
