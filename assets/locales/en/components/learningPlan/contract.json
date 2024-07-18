@@ -2,17 +2,20 @@
   "warning": {
     "experimental": "Show experimental area",
     "isDraft": "Your contract will be created when you publish this task",
-    "notFinished": "You can only reward your students after the task is finished",
+    "notFinished": "You can only reward your students after the task is set as finished",
+    "noOneHasFinished": "It's only possible to reward students when at least one student has finished the task",  
     "noStudents": "Please add students to this task so we can calculate the total reward",
     "secondThoughts": "Second thoughts about rewarding your students?",
     "editContract": "Bear in mind that editing/cancelling the rewards has monetary costs",
     "abort": "I've changed my mind",
     "update": "You have to cancel the previous one to just then create this new one",
+    "elligibleStudents": "Only students who have completed the task will be rewarded",
     "cancel": "Revert previous contract and get refunded",
     "tooltip": {
       "abort":  "Click here to give up on creating a smart contract",
       "fee": "Warning, transaction fees do apply",
-      "spend": "Warning, you're about to spend real money"
+      "spend": "Warning, you're about to spend real money",
+      "once": "Warning, this action can be perfomed only once"    
     }
   },
   "reward": {

@@ -93,7 +93,6 @@
       </v-expansion-panels>
     </Transition>
   </div>
-  <pre>{{ { teacherDrawer, taskDetails } }}</pre>
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
@@ -630,6 +629,7 @@ const handleChangeMembers = async () => {
         'task_submission',
         'learning_plan_group.group_members.student_member.user.avatar',
         'learning_plan_member.user.avatar',
+        'learning_plan_member.user.wallet',
         'learning_plan_member.learning_class',
       ],
       filters: {

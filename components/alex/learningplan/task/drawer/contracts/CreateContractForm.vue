@@ -68,13 +68,7 @@
               variant="error"
               v-bind="tooltipProps"
               :loading="loading"
-              @click="
-                emit(
-                  'delete:contract-address',
-
-                  true,
-                )
-              "
+              @click="emit('delete:contract-address', true)"
             />
           </template>
         </v-tooltip>

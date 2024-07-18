@@ -173,7 +173,7 @@
         v-model:status="status"
         v-model:contract-address="contractAddress"
         :edit="editable"
-        :task-members="members"
+        :task-members="members || []"
         @deploy:contract-draft="(cb) => (deployContract = cb)"
         @cancel:contract-draft="deployContract = null"
         @update:contract-address="handleUpdateContract"

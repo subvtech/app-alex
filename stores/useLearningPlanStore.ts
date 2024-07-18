@@ -51,7 +51,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['meetings'],
     },
     members: {
-      populate: ['user.avatar', 'user.cover'],
+      populate: ['user.avatar', 'user.wallet', 'user.cover'],
     },
     tasks: {
       populate: [
@@ -61,6 +61,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'tags',
         'task_members.learning_plan_member.user.avatar',
         'task_members.learning_plan_group.group_members.student_member.user.avatar',
+        'task_members.learning_plan_member.user.wallet',
+        'task_members.learning_plan_group.group_members.student_member.user.wallet',
       ],
     },
   };
