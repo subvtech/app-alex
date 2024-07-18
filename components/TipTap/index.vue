@@ -50,11 +50,12 @@ import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
-import Commands from './menus/slash/commands.js';
-import suggestion from './menus/slash/suggestion.js';
-import FileSet from './custom-plugins/file-set/Extension.js';
+import Commands from './menus/slash/commands';
+import suggestion from './menus/slash/suggestion';
+import FileSet from './custom-plugins/file-set/Extension';
+import Carousel from './custom-plugins/carousel/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
-import { isTextSelected } from './menus/bubble/isTextSelected.js';
+import { isTextSelected } from './menus/bubble/isTextSelected';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
@@ -86,7 +87,7 @@ const collors = [
 onMounted(() => {
   const user = useStrapiUser();
   const provider = new TiptapCollabProvider({
-    name: 'alex-tiptap', // Unique document identifier for syncing. This is your document name.
+    name: 'alex-teste', // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjExNzQ4MTgsIm5iZiI6MTcyMTE3NDgxOCwiZXhwIjoxNzIxMjYxMjE4LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.-opqFm9oflwj0K8gLHfVlguWVrenGS3EHVZEJ-l80w8', // Your JWT token
@@ -208,6 +209,63 @@ onMounted(() => {
       Typography,
       Superscript,
       Subscript,
+      Carousel.configure({
+        handleFileSelected: async (slides) => {
+          const formData = new FormData();
+          slides.forEach((slide) => {
+            if (slide.url instanceof File) {
+              formData.append('files', slide.url, slide.title);
+            } else if (
+              typeof slide.url === 'string' &&
+              slide.url.startsWith('data:')
+            ) {
+              const base64Data = slide.url.split(',')[1];
+              const binaryString = window.atob(base64Data);
+              const byteArray = new Uint8Array(binaryString.length);
+
+              for (let i = 0; i < binaryString.length; i++) {
+                byteArray[i] = binaryString.charCodeAt(i);
+              }
+
+              let mimeType = 'image/png';
+              if (slide.url.startsWith('data:image/jpeg')) {
+                mimeType = 'image/jpeg';
+              }
+
+              const blob = new Blob([byteArray], { type: mimeType });
+              const imageFile = new File([blob], slide.title, {
+                type: mimeType,
+              });
+              formData.append('files', imageFile, imageFile.name);
+            }
+          });
+          const res = await strapiClient<Upload[]>('/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          if (slides.length > 1) {
+            const url = res[0].url;
+            const videoId = res[0].id;
+            const thumbnail = res[1].url;
+            const imgId = res[1].id;
+            temporaryMedia.value.push(videoId);
+            temporaryMedia.value.push(imgId);
+            return { success: 1, url, thumbnail, videoId, imgId };
+          } else {
+            const { url, id } = res[0];
+            temporaryMedia.value.push(id);
+            return { success: 1, url, imgId: id };
+          }
+        },
+        handleDeletedFiles: (id: string) => {
+          console.log(id);
+          // if (file.videoId) mediaToDelete.value.push(file.videoId);
+          // if (file.imgId) mediaToDelete.value.push(file.imgId);
+          strapiClient(`/upload/files/${id}`, {
+            method: 'DELETE',
+          });
+        },
+      }),
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {

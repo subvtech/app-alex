@@ -187,6 +187,7 @@ const { over, dragFrom, dragging, startDrag, finishDrag, onDragOver } =
   min-width: 16px !important;
   height: 16px;
   width: 16px;
+  cursor: move;
 }
 
 .drag-icon {

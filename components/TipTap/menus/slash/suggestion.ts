@@ -100,6 +100,20 @@ export default {
         },
       },
       {
+        title: 'carousel',
+        icon: 'mdi-view-carousel',
+        command: ({ editor, range }) => {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .insertContent({
+              type: 'carousel',
+            })
+            .run();
+        },
+      },
+      {
         title: 'horizontalRule',
         icon: 'mdi-minus',
         command: ({ editor, range }) => {
