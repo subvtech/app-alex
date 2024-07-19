@@ -43,16 +43,6 @@
           :disabled="!hasEditorChanges"
           @click="saveSubmission"
         />
-        <alex-custom-button
-          size="large"
-          variant="primary"
-          :text="
-            t('components.courses.tasks.submission_modal.send_to_review_btn')
-          "
-          :loading="isLoading"
-          :disabled="!currentData?.blocks.length"
-          @click="sendSubmission"
-        />
       </v-container>
     </template>
   </alex-custom-dialog>
@@ -191,39 +181,6 @@ const saveSubmission = async () => {
   } catch (error) {
     setMessage(
       t('components.courses.tasks.submission_modal.save_error'),
-      'error',
-      true,
-    );
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const sendSubmission = async () => {
-  isLoading.value = true;
-  try {
-    if (!props.lastSubmission?.id) {
-      return;
-    }
-    const time = new Date();
-    await update('task-submissions', props.lastSubmission.id, {
-      submitted_at: time,
-    });
-    await update('task-members', props.taskMemberId, {
-      last_submission_at: time,
-      status: 'in_review',
-    });
-    emit('update-task-status', 'in_review');
-    executeSubmissions();
-    setMessage(
-      t('components.courses.tasks.submission_modal.deliver_success'),
-      'success',
-      true,
-    );
-    dialog.value = false;
-  } catch (error) {
-    setMessage(
-      t('components.courses.tasks.submission_modal.deliver_error'),
       'error',
       true,
     );

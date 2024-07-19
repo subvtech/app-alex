@@ -113,6 +113,7 @@
     :restrictions="taskDetails?.allowed_editor_plugins"
     :editable="true"
     :kanban-button="true"
+    :members="taskDetails?.task_members"
     @change-goals="handleChangeGoals"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"

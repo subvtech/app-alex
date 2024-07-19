@@ -172,7 +172,6 @@ const tasks = defineModel<Card<typeof props.type>[]>({
 const columns = defineModel<Column<typeof props.type>[]>('columns', {
   required: true,
 });
-
 const columnsTasks = computed(() =>
   columns.value.reduce((acc, item) => {
     if (!acc[item.group]) {

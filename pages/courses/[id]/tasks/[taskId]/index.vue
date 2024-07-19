@@ -206,20 +206,53 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     can_submit_after_deadline: values.can_submit_after_deadline!,
     allowed_editor_plugins: values.allowed_editor_plugins!,
   };
+  setTasks();
 };
 const handleUpdateStatus = async (
   _newIndex: number,
-  item: Task | TaskStudent,
+  item: TaskStudent | Task,
   newStatus: string,
 ) => {
   if (!kanban.value) {
     return;
   }
+
   try {
     kanban.value.setCanDrag(false);
+    const submissionValidationStatus = ['in_review', 'in_progress'];
+    const time = new Date();
+    if (newStatus === 'in_review') {
+      if (!item.submissions?.length && item.task?.submission_required) {
+        throw new Error('missingSubmission');
+      }
+    }
+    if (item.submissions?.length) {
+      const lastSubmission = item.submissions[0];
+      if (submissionValidationStatus.includes(newStatus)) {
+        await strapi.update('task-submissions', lastSubmission.id, {
+          submitted_at: newStatus === 'in_review' ? time : null,
+        });
+      }
+    }
     await strapi.update<TaskMember>('task-members', item.id, {
       status: newStatus as TaskMemberStatus,
+      ...(submissionValidationStatus.includes(newStatus) && {
+        last_submission_at:
+          newStatus === 'in_progress' && item.submissions
+            ? null
+            : time.toISOString(),
+      }),
     });
+    if (taskStore.task) {
+      taskStore.task.task_members = taskStore?.task?.task_members?.map(
+        (task) => {
+          if (task.id === item.id) {
+            return { ...task, status: newStatus as TaskMemberStatus };
+          }
+          return task;
+        },
+      );
+    }
   } catch (error) {
     tasks.value = tasks.value.map((task) => {
       if (task.id === item.id) {
@@ -227,6 +260,14 @@ const handleUpdateStatus = async (
       }
       return task;
     });
+    if ((error as any).message === 'missingSubmission') {
+      setMessage(
+        t('components.learningPlan.drawer.task.errors.missingSubmission'),
+        'error',
+        true,
+      );
+      return;
+    }
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
   } finally {
     kanban.value.setCanDrag(true);
@@ -309,43 +350,53 @@ watch(
     }
   },
 );
+function setTasks() {
+  if (!taskStore.task?.task_members) {
+    return;
+  }
+  if (taskStore.task.status === 'draft') {
+    tasks.value = [];
+    return;
+  }
+  tasks.value = taskStore.task.task_members.map((task) => ({
+    id: task.id,
+    status: task.status,
+    date: new Date(task.finished_at?.replaceAll('-', '/')),
+    ...(!task.learning_plan_group && {
+      user: {
+        name: task?.learning_plan_member?.user.fullname || '',
+        avatar: task?.learning_plan_member?.user.avatar?.url,
+      },
+    }),
+    ...(task.learning_plan_group && {
+      group: {
+        name: task.learning_plan_group?.title,
+        participants: task.learning_plan_group?.group_members.map((member) => {
+          return {
+            name: member.student_member.user.fullname,
+            ...(member.student_member.user.avatar?.url && {
+              image: {
+                url: member.student_member.user.avatar?.url,
+              },
+            }),
+          };
+        }),
+      },
+    }),
+    studentClass:
+      task?.learning_plan_member?.learning_class?.name ||
+      task.learning_plan_group?.learning_class?.name ||
+      '',
+    submissions: task.task_submissions,
+  }));
+}
 watch(
   () => taskStore.task?.task_members,
   () => {
-    if (taskStore.task?.task_members) {
-      tasks.value = taskStore.task.task_members.map((task) => ({
-        id: task.id,
-        status: task.status,
-        date: new Date(task.finished_at?.replaceAll('-', '/')),
-        ...(!task.learning_plan_group && {
-          user: {
-            name: task?.learning_plan_member?.user.fullname || '',
-            avatar: task?.learning_plan_member?.user.avatar?.url,
-          },
-        }),
-        ...(task.learning_plan_group && {
-          group: {
-            name: task.learning_plan_group?.title,
-            participants: task.learning_plan_group?.group_members.map(
-              (member) => {
-                return {
-                  name: member.student_member.user.fullname,
-                  ...(member.student_member.user.avatar?.url && {
-                    image: {
-                      url: member.student_member.user.avatar?.url,
-                    },
-                  }),
-                };
-              },
-            ),
-          },
-        }),
-        studentClass:
-          task?.learning_plan_member?.learning_class?.name ||
-          task.learning_plan_group?.learning_class?.name ||
-          '',
-      }));
+    if (!taskStore.task?.task_members) {
+      return;
     }
+    setTasks();
   },
 );
 watch(

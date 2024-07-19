@@ -277,7 +277,9 @@ type Emit = {
   'change-submit-after-deadline': [taskId: number, value: boolean];
 };
 const emit = defineEmits<Emit>();
-const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline);
+const canSubmitAfterDeadline = toRef(
+  props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask,
+);
 const finishAt = toRef(props.finishAt);
 const activePage = ref(props.group ? '0' : '1');
 const initials = computed(() => {
@@ -508,7 +510,8 @@ watch(canSubmitAfterDeadline, changeSendAfterDeadline);
 watch(model, (value) => {
   if (value) {
     finishAt.value = props.finishAt;
-    canSubmitAfterDeadline.value = props.canSubmitAfterDeadline;
+    canSubmitAfterDeadline.value =
+      props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
     executeSubmissions();
     executeEvents();
     executeMessages();

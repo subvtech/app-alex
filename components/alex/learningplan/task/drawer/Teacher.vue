@@ -301,7 +301,7 @@ watch(model, (value) => {
     isFirstTimeOpened.value = true;
     setTimeout(() => {
       isFirstTimeOpened.value = false;
-    }, 1100);
+    }, 2000);
   }
 });
 
@@ -422,7 +422,7 @@ const updateTaskValues = async (
       allowed_editor_plugins: restrictions.value,
     } as Partial<TaskSimple>;
     await strapi.update('tasks', taskId, values);
-    emit('change-values', valuesEmit);
+    emit('change-values', { ...valuesEmit, task_members: props.members });
   } catch (error) {
     notifyError();
   }
@@ -520,7 +520,6 @@ watch(startDate, async (value) => {
   });
 });
 watch(restrictions, async (value) => {
-  // if (!value) return;
   await updateTaskValues(taskId.value, {
     allowed_editor_plugins: value,
   });
