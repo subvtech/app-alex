@@ -77,7 +77,7 @@ export const useContracts = () => {
     try {
       const browserProvider = new ethers.BrowserProvider(window.ethereum);
 
-      await switchNetwork(localGanacheChainId);
+      await switchNetwork(sepoliaChainId);
 
       const wallet = await withTimeout(12000, browserProvider.getSigner());
       const budgetInWei = ethers.parseEther(usdToEth(budget).toString());
@@ -113,7 +113,7 @@ export const useContracts = () => {
       method: 'eth_chainId',
     });
 
-    if (localGanacheChainId === targetedNetwork) {
+    if (sepoliaChainId === targetedNetwork) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [ganacheTestnet],
