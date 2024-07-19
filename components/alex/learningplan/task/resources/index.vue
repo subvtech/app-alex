@@ -13,7 +13,7 @@
     @on-main-action="editMode ? updateBlocks('ADD') : handleNewTrail()"
   >
     <!-- Activate -->
-    <template #activator="{ props }">
+    <template #activator="{ props: propsActivator }">
       <p class="text-h3 mb-4">
         {{ $t('components.learningPlan.drawer.task.learningResources.label') }}
       </p>
@@ -34,7 +34,7 @@
         />
         <alex-custom-button
           v-else
-          v-bind="props"
+          v-bind="propsActivator"
           size="large"
           prepend-icon="alex:trail"
           append-icon="mdi-chevron-right"
@@ -247,7 +247,9 @@ const updateBlocks = async (
   try {
     isLoading.value = true;
     const blocks = selectedBlocks || editor.value?.getSelectedBlocks() || [];
-    blocks.push(...(props.blocks as number[]));
+    if (props.blocks) {
+      blocks.push(...(props.blocks as number[]));
+    }
     if ((!blocks.length || props.taskId === -1) && type === 'ADD') return;
     await updateTask(blocks, type);
     taskStore.task?.id === props.taskId
