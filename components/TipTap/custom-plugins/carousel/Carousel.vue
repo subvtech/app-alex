@@ -71,7 +71,7 @@
             :data-setup="JSON.stringify({ techOrder: [slide.type] })"
           ></video-player>
           <nuxt-img
-            v-else
+            v-else-if="slide.image"
             :key="slide.title"
             :src="slide.image"
             :alt="slide.title"
@@ -362,8 +362,14 @@ const slides = ref<Slide[]>(
   Array.isArray(props.node.attrs.slides) ? [...props.node.attrs.slides] : [],
 );
 
+watch(
+  () => props.node.attrs.slides,
+  (newVal) => {
+    slides.value = Array.isArray(newVal) ? [...newVal] : [];
+  },
+);
+
 const deleteSlide = (item) => {
-  console.log(item);
   if (item.type.includes('File')) {
     const id = item.imgId || item.videoId;
     props.extension.options.handleDeletedFiles(id);
@@ -452,7 +458,6 @@ const addSlideByUrl = (slide, index) => {
 };
 
 const editSlides = async (files, deleted, added) => {
-  console.log(files, deleted, added);
   await deleted.forEach((slide) => {
     deleteSlide(slide);
   });

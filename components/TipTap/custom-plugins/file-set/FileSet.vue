@@ -142,6 +142,16 @@ const filesArray = ref<FileType[]>(
     ? [...(props.node.attrs.files as FileType[])]
     : [],
 );
+
+watch(
+  () => props.node.attrs.files,
+  (newValue) => {
+    if (Array.isArray(newValue)) {
+      filesArray.value = [...(newValue as FileType[])];
+    }
+  },
+);
+
 const isDownloading = ref<string[]>([]);
 
 // onBeforeMount(() => {

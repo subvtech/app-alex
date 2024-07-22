@@ -209,9 +209,6 @@ const emit = defineEmits({
     return slides;
   },
   changeSlides(slides, deletedSlides, addedSlides) {
-    // console.log('slides :', slides);
-    // console.log('deletedSlides :', deletedSlides);
-    // console.log('addedSlides :', addedSlides);
     return { slides, deletedSlides, addedSlides };
   },
 });
@@ -220,9 +217,6 @@ const upload = () => {
   if (slides.value.length === 0) return (dialog.value = false);
   dialogModel.value = false;
   if (editSlideMode.value === 'config') {
-    console.log('slides :', slides.value);
-    console.log('deletedSlides :', deletedSlides.value);
-    console.log('addedSlides :', addedSlides.value);
     emit('changeSlides', slides.value, deletedSlides.value, addedSlides.value);
   } else {
     emit('uploadFiles', slides.value, editIndex.value);
