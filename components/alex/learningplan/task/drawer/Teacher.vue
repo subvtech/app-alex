@@ -178,7 +178,6 @@
         @cancel:contract-draft="deployContract = null"
         @update:contract-address="handleUpdateContract"
       />
-      <pre>{{ members }}</pre>
 
       <!-- Eventos e atribuições -->
       <alex-custom-tabs

@@ -113,7 +113,7 @@ export const useContracts = () => {
       method: 'eth_chainId',
     });
 
-    if (sepoliaChainId === targetedNetwork) {
+    if (localGanacheChainId === targetedNetwork) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [ganacheTestnet],
