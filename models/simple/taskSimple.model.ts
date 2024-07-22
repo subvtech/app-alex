@@ -23,6 +23,6 @@ export interface TaskSimple {
   learning_goals: LearningPlanGoalSimple[];
   task_members?: TaskMember[];
   task_events?: TaskEvent[];
-  contract_address?: string;
+  contract_address: string | null;
   position: number;
 }

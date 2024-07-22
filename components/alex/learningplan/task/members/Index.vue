@@ -14,7 +14,7 @@
     :loading="true"
   >
     <!-- Header -->
-    <template #header>
+    <template v-if="!listGroupMembers" #header>
       <div class="header d-flex tw-align-center py-4 px-2">
         <alex-inputs-text-field
           v-model="search"
@@ -37,12 +37,17 @@
           v-else-if="type === 'group'"
           v-model="addGroupDialog"
           :learningplan-id="props.learningplanId"
+          :task-id="taskId"
+          :start-at="startAt"
+          :finish-at="finishAt"
+          :can-submit-after="props.sendAfterDeadline"
+          @add-group="handleAddGroup"
         />
 
-        <alex-custom-dropdown :items="typeOptions" :disabled="type">
-          <template #activator="{ props }">
+        <alex-custom-dropdown :items="typeOptions" :disabled="!!type">
+          <template #activator="{ props: propsDropdown }">
             <alex-custom-button
-              v-bind="props"
+              v-bind="propsDropdown"
               class="tw-ml-auto"
               variant="secondary"
               prepend-icon="mdi-plus"
@@ -54,23 +59,71 @@
           </template>
         </alex-custom-dropdown>
       </div>
+      <alex-learningplan-task-dialog-create-group
+        v-model="groupDialog"
+        :learning-plan-id="props.learningplanId"
+        :task-id="props.taskId"
+        :start-at="props.startAt"
+        :finish-at="props.finishAt"
+        :can-submit-after="props.sendAfterDeadline"
+        :classes="classes.data"
+        :group="groupInfo"
+        @add-group="handleAddGroup"
+      />
     </template>
     <!-- Cards -->
     <template #default="{ items }">
-      <alex-learningplan-task-members-card
-        v-for="member in items"
-        :key="`student-member${member.raw.id}`"
-        :member="{
-          name: member.raw.student_member?.user.fullname,
-          class: member.raw.student_member?.learning_class?.name,
-          avatarUrl: member.raw.student_member?.user.avatar?.url,
-        }"
-        :type="props.type"
-        @remove-click="removeMember(member.raw.task_member.id, member.raw)"
-        @to-profile="
-          navigateTo(`/users/${member.raw.student_member.user.username}`)
-        "
-      />
+      <template v-if="!listGroupMembers">
+        <alex-learningplan-task-members-card
+          v-for="member in items"
+          :key="`student-member${member.raw.id}`"
+          :member="{
+            name:
+              member.raw.learning_plan_member?.user.fullname ||
+              member.raw.learning_plan_group?.title,
+            class:
+              member.raw.learning_plan_member?.learning_class?.name ||
+              member.raw.learning_plan_group?.learning_class.name,
+            avatarUrl: member.raw.learning_plan_member?.user.avatar?.url,
+            group: !!member.raw.learning_plan_group,
+            participants: member.raw.learning_plan_group
+              ? getMembersOfGroup(member.raw.learning_plan_group)
+              : undefined,
+          }"
+          :edit="edit"
+          @remove-click="removeMember(member.raw)"
+          @edit-click="
+            () => handleEditClick(member.raw.learning_plan_group, items)
+          "
+          @to-profile="
+            member.raw.learning_plan_member
+              ? navigateTo(
+                  `/users/${member.raw.learning_plan_member.user.username}`,
+                )
+              : undefined
+          "
+        />
+      </template>
+      <template v-else>
+        <template
+          v-for="member in items"
+          :key="`student-member${member.raw.id}`"
+        >
+          <alex-learningplan-task-members-card
+            v-for="groupMember in member.raw.learning_plan_group.group_members"
+            :key="`group-member${groupMember.id}`"
+            :member="{
+              name: groupMember.student_member.user.fullname,
+              class: member.raw.learning_plan_group?.learning_class.name,
+              avatarUrl: groupMember.student_member.user.avatar?.url,
+              responsable: groupMember.role === 'in_charge',
+            }"
+            :edit="false"
+            @to-profile="
+              navigateTo(`/users/${groupMember.student_member.user.username}`)
+            "
+        /></template>
+      </template>
     </template>
     <template #no-data>
       <div
@@ -115,11 +168,13 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 interface MembersProps {
   learningplanId: number;
   taskId: number;
+  listGroupMembers?: boolean;
   type?: TaskType | null;
   startAt?: string | null;
   finishAt?: string | null;
   sendAfterDeadline?: boolean;
   blockDelete?: boolean;
+  edit?: boolean;
 }
 const props = withDefaults(defineProps<MembersProps>(), {
   sendAfterDeadline: false,
@@ -127,6 +182,8 @@ const props = withDefaults(defineProps<MembersProps>(), {
   finishAt: null,
   type: null,
   blockDelete: false,
+  edit: true,
+  listGroupMembers: false,
 });
 
 type Emits = {
@@ -141,6 +198,9 @@ const { t } = useI18n();
 const emit = defineEmits<Emits>();
 const addMemberDialog = ref(false);
 const addGroupDialog = ref(false);
+const groupDialog = ref<boolean>(false);
+const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
+const allGroups = ref<LearningPlanGroupSimple[]>([]);
 const setTypeDropdown = ref<boolean>(false);
 const page = ref<number>(1);
 const itemsPerPage = 12;
@@ -162,18 +222,32 @@ const typeOptions: AlexDropdownItem[] = [
     },
   },
 ];
+
+const handleAddGroup = () => {
+  emit('change-members');
+  refresh();
+};
+
 const getMembers = (taskId: number) =>
-  strapiUtils.find<TaskMemberStudent>('task-member-students', {
+  strapiUtils.find<TaskMember>('task-members', {
     populate: {
-      student_member: {
+      task_submissions: {
+        populate: ['justification'],
+      },
+      learning_plan_member: {
         populate: ['user.avatar', 'learning_class'],
       },
-      task_member: true,
+      learning_plan_group: {
+        populate: {
+          group_members: {
+            populate: ['student_member.user.avatar'],
+          },
+          learning_class: true,
+        },
+      },
     },
     filters: {
-      task_member: {
-        task: taskId,
-      },
+      task: taskId,
     },
   });
 const showingData = (
@@ -200,13 +274,14 @@ const showingData = (
 
   return message;
 };
+
 const { data: members, refresh } = await useAsyncData(
-  'task-members-students',
+  'task-members',
   () => getMembers(props.taskId),
   {
     default: () => ({
       meta: { total: 0 },
-      data: [] as TaskMemberStudent[],
+      data: [] as TaskMember[],
     }),
   },
 );
@@ -260,10 +335,7 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
     );
   }
 };
-const removeMember = async (
-  taskMemberID: number,
-  member: TaskMemberStudent,
-) => {
+const removeMember = async (member: TaskMember) => {
   try {
     if (props.blockDelete) {
       setMessage(
@@ -273,12 +345,14 @@ const removeMember = async (
       );
       return;
     }
-    await strapi.delete('task-members', taskMemberID);
-    await strapi.delete('task-member-students', member.id);
+    const memberName = member.learning_plan_member
+      ? member.learning_plan_member?.user?.fullname
+      : member.learning_plan_group?.title;
+    await strapi.delete('task-members', member.id);
     setTimeout(refresh, 100);
     setMessage(
       t('components.learningPlan.drawer.task.removeMember', {
-        member: member.student_member?.user?.fullname,
+        member: memberName,
       }),
       'success',
       true,
@@ -292,6 +366,39 @@ const removeMember = async (
     );
   }
 };
+
+const getMembersOfGroup = (group: LearningPlanGroupSimple) =>
+  group.group_members.map((member) => ({
+    name: member.student_member.user.fullname,
+    image: { url: member.student_member.user?.avatar?.url || '' },
+    className: 'text-body-3',
+  }));
+const handleEditClick = (
+  selectedGroup: LearningPlanGroupSimple,
+  taskMembers: { raw: TaskMember }[] | any,
+) => {
+  // Checa se o grupo tem submissões
+  const selectedTaskMember = taskMembers.find(
+    (member) => member.raw.learning_plan_group?.id === selectedGroup.id,
+  );
+
+  if (selectedTaskMember?.raw.task_submissions?.length) {
+    setMessage(
+      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
+      'warning',
+      true,
+    );
+    return;
+  }
+
+  // Atualiza os dados para abrir o modal
+  groupInfo.value = selectedGroup;
+  allGroups.value = taskMembers.map(
+    (member) => member.raw.learning_plan_group!,
+  );
+
+  groupDialog.value = true;
+};
 const handleAddMemberOrClass = () => {
   if (props.type === 'individual') {
     addMemberDialog.value = true;
@@ -301,6 +408,32 @@ const handleAddMemberOrClass = () => {
     setTypeDropdown.value = true;
   }
 };
+const getGroups = (learningplanId: number) =>
+  strapiUtils.find<ClassSimple>('classes', {
+    populate: [
+      'learning_plan_groups.group_members.student_member.user.avatar',
+      'learning_plan_groups.learning_class',
+      'learning_plan_members',
+      'learning_plan_members.user.fullname',
+      'learning_plan_members.user.avatar',
+    ],
+    filters: {
+      learningplan: learningplanId,
+    },
+  });
+const { data: classes } = await useAsyncData(
+  'classes-member-invite',
+  () => getGroups(props.learningplanId),
+  {
+    default: () => ({ meta: 0, data: [] as ClassSimple[] }),
+  },
+);
+
+watch(addGroupDialog, (value) => {
+  if (!value) {
+    refresh();
+  }
+});
 </script>
 
 <style>

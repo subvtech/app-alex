@@ -3,7 +3,9 @@
     v-model="model"
     :title="$t('components.learningPlan.drawer.task.dialog.newMembers')"
     :main-button-text="$t('components.learningPlan.drawer.task.dialog.add')"
+    :loading="loadingAdd"
     @on-main-action="handleSubmit"
+    @on-secondary-action="model = false"
   >
     <template #activator="{ isActive, props: activatorProps }">
       <slot name="activator" :is-active="isActive" :props="activatorProps" />
@@ -19,6 +21,9 @@
       density="comfortable"
       hide-details
     />
+    <p v-if="!hasStudentsToAdd" class="text-body-1 text-gray-400 text-center">
+      Parece que todos os alunos foram adicionados a esta tarefa.
+    </p>
     <v-expansion-panels class="task-student-card" multiple>
       <template v-for="classValue in filteredClasses" :key="classValue.id">
         <v-expansion-panel v-if="classValue.learning_plan_members?.length">
@@ -72,7 +77,7 @@
 <script setup lang="ts">
 interface AddStudent {
   learningplanId: number;
-  members: TaskMemberStudent[];
+  members: TaskMember[];
 }
 const model = defineModel<boolean>();
 const props = defineProps<AddStudent>();
@@ -80,10 +85,11 @@ type Emits = {
   'add-click': [members: LearningPlanMemberSimple[]];
 };
 const emit = defineEmits<Emits>();
-const strapi = useStrapiUtils();
 const search = ref('');
+const loadingAdd = ref(false);
+const strapi = useStrapiUtils();
 const membersID = computed(() =>
-  props.members.map((member) => member.student_member.id),
+  props.members.map((member) => member.learning_plan_member?.id),
 );
 const getMembers = (learningplanId: number) =>
   strapi.find<ClassSimple>('classes', {
@@ -106,8 +112,6 @@ const getMembers = (learningplanId: number) =>
     },
     filters: { learningplan: learningplanId },
   });
-const selectedUsers = ref<LearningPlanMemberSimple[]>([]);
-
 const {
   data: classes,
   execute,
@@ -120,6 +124,7 @@ const {
     lazy: true,
   },
 );
+const selectedUsers = ref<LearningPlanMemberSimple[]>([]);
 const filteredClasses = computed(() => {
   if (!search.value) return classes.value.data;
   const lowerCaseSearch = search.value.toLowerCase();
@@ -133,6 +138,12 @@ const filteredClasses = computed(() => {
     ),
   }));
 });
+const hasStudentsToAdd = computed(
+  () =>
+    filteredClasses.value.filter(
+      (studentClass) => !!studentClass.learning_plan_members?.length,
+    ).length > 0,
+);
 const selectUser = (user: LearningPlanMemberSimple) => {
   const alreadyUser = selectedUsers.value.find(
     (already) => user.id === already.id,
@@ -182,11 +193,16 @@ const selectAllUsers = (classID: number, classesArray: ClassSimple[]) => {
   selectedUsers.value = [...selectedUsers.value, ...users];
 };
 
-const handleSubmit = () => {
-  emit('add-click', selectedUsers.value);
-  setTimeout(() => {
-    refresh();
-  }, 1000);
+const handleSubmit = async () => {
+  try {
+    loadingAdd.value = true;
+    emit('add-click', selectedUsers.value);
+    await setTimeout(async () => {
+      await refresh();
+      loadingAdd.value = false;
+    }, 1000);
+    model.value = false;
+  } catch (error) {}
 };
 watch(model, (value) => {
   if (value) {

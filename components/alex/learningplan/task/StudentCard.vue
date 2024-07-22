@@ -1,10 +1,10 @@
 <template>
   <div
-    class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white"
+    class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white tw-h-[120px]"
   >
     <div class="d-flex gap-2 align-center">
       <p class="text-body-2 ellipsis lines-1 w-100">
-        {{ group ? nameGroup : title }}
+        {{ title }}
       </p>
       <alex-custom-chip
         v-if="mark && maxMark && status === 'done'"
@@ -13,12 +13,21 @@
         size="small"
       />
     </div>
-    <div v-if="group" class="d-flex gap-2 align-center mt-2"></div>
-    <div class="d-flex gap-2 justify-end w-100 mt-8">
+    <div v-if="group" class="d-flex gap-2 align-center mt-2">
+      <alex-custom-avatar-group
+        :avatar-items="group.participants"
+        class="tw-ml-2"
+      />
+    </div>
+    <div class="d-flex gap-2 justify-end w-100 tw-mt-auto">
       <alex-custom-chip
         status="secondary"
         variant="outlined"
-        :text="group ? 'Group' : 'Individual'"
+        :text="
+          group
+            ? $t('pages.task.table.type.group')
+            : $t('pages.task.table.type.individual')
+        "
         size="small"
       />
       <alex-custom-chip
@@ -41,20 +50,21 @@ type TStatus = 'to_do' | 'in_progress' | 'in_review' | 'done' | (string & {});
 type StudentCardProps = {
   date: Date;
   title: string;
-  group?: boolean;
-  nameGroup?: string;
+  group?: {
+    name: string;
+    participants: { name: string; avatar?: string }[];
+  };
   avatar?: string | null;
   status?: TStatus;
   mark?: number;
   maxMark?: number;
 };
 const props = withDefaults(defineProps<StudentCardProps>(), {
-  group: false,
   status: 'to_do',
   avatar: undefined,
-  nameGroup: '',
   mark: undefined,
   maxMark: undefined,
+  group: undefined,
 });
 const dateColor = computed(() => {
   const mapedColors = {

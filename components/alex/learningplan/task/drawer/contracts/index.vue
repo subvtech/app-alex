@@ -1,64 +1,76 @@
 <template>
   <div class="gap-3">
-    <p class="text-h3 my-6">Smart Contract {{ contractAddress }}</p>
     <alex-custom-switch
       v-model="canEdit"
-      label="
-            Show experimental area
-          "
+      :label="$t('components.learningPlan.contract.warning.experimental')"
       :disabled="isThereAContract"
     />
-    <span
-      >isUpdatingContract: {{ isUpdatingContract }} contractBalance:
-      {{ contractBalance }}</span
-    >
     <div v-if="canEdit">
       <div v-if="contractAddress" class="flex flex-column mt-6 gap-4">
         <div v-if="isThereBalance">
-          <div class="flex flex-col">
-            <p class="text-body-4 text-gray-800">Reward stored in the task</p>
-            <p class="text-body-3 text-gray-800">
-              $ {{ contractBalance.toFixed(2) }}
-            </p>
-          </div>
-          <div v-if="itsNotFinished">
-            <span class="text-red-500"
-              >You can only reward your students after the task is
-              finished</span
-            >
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.stored')"
+          />
+
+          <div class="flex my-6">
+            <div v-if="itsNotFinished">
+              <span class="text-body-2 text-error-0">{{
+                $t('components.learningPlan.contract.warning.notFinished')
+              }}</span>
+            </div>
+
+            <div v-else-if="taskWallets.length === 0">
+              <span class="text-body-2 text-error-0">{{
+                $t('components.learningPlan.contract.warning.noOneHasFinished')
+              }}</span>
+            </div>
+
+            <div class="d-flex flex-column gap-1 my-2">
+              <alex-learningplan-task-drawer-contracts-button
+                :tooltip-text="
+                  $t('components.learningPlan.contract.warning.tooltip.once')
+                "
+                :text="
+                  $t('components.learningPlan.contract.reward.rewardStudents')
+                "
+                variant="warning"
+                :loading="loading"
+                :disabled="
+                  itsNotFinished ||
+                  isRewardCompleted ||
+                  taskWallets.length === 0
+                "
+                show-hint
+                :hint="
+                  $t(
+                    'components.learningPlan.contract.warning.elligibleStudents',
+                  )
+                "
+                @click:button="handleRewardStudents"
+              />
+            </div>
           </div>
 
-          <v-tooltip text="Warning, you're about to spend real money">
-            <template #activator="{ props: tooltipProps }">
-              <alex-custom-button
-                text="Reward students"
-                variant="warning"
-                v-bind="tooltipProps"
-                :loading="loading"
-                :disabled="itsNotFinished || isRewardCompleted"
-                @click="handleRewardStudents"
-              />
-            </template>
-          </v-tooltip>
           <div class="flex flex-column gap-1 mt-6">
             <p class="text-h4 text-gray-800">
-              Second thoughts about the rewarding your students?
+              {{
+                $t('components.learningPlan.contract.warning.secondThoughts')
+              }}
             </p>
             <p class="text-body-3 text-gray-500">
-              Bear in mind that editing/cancelling the rewards has monetary
-              costs
+              {{ $t('components.learningPlan.contract.warning.editContract') }}
             </p>
           </div>
         </div>
 
-        <div v-else>
-          <div class="flex flex-col">
-            <p class="text-body-4 text-gray-800">
-              Reward left in the task: $ {{ contractBalance }}
-            </p>
-          </div>
-          <span class="text-red-500">
-            This contract was redeemed and the students were rewarded.
+        <div v-else class="d-flex flex-column gap-2">
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+          <span class="text-body-2 text-gray-800">
+            {{ $t('components.learningPlan.contract.reward.redeemed') }}
           </span>
         </div>
       </div>
@@ -68,17 +80,16 @@
         v-if="(isThereAContract && isThereBalance) || !isThereAContract"
         :is-draft="isDraft"
         :display-draft-warning="displayDraftWarning"
-        :task-member-students="taskMemberStudents"
+        :task-member-students="taskMemberCount"
         :loading="loading"
         :contract-address="contractAddress"
-        :reward-label="`Set the ${
-          isUpdatingContract ? 'NEW ' : ''
-        }value to be rewarded to each student (in USDT/dollar)`"
+        :reward-label="$t('components.learningPlan.contract.reward.value')"
         :update-contract="isUpdatingContract"
         @create:contract-address="handleCreateTaskContract"
         @cancel:contract-draft="handleAbortContract"
         @delete:contract-address="handleCancelContract"
       />
+      <div class="mt-6" />
     </div>
   </div>
 </template>
@@ -87,11 +98,10 @@
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 interface ContractsProps {
   edit?: boolean;
-  taskMembers?: any[];
+  taskMembers: TaskMember[];
 }
 
 const props = withDefaults(defineProps<ContractsProps>(), {
-  taskMembers: () => [],
   edit: false,
 });
 
@@ -129,20 +139,59 @@ const isDraft = computed(() => status.value === 'draft');
 
 const canEdit = ref(isThereAContract.value || isUpdatingContract.value);
 
+const taskMemberCount = computed(() => {
+  let count = 0;
+  taskMemberStudents.value.forEach((m) => {
+    if (m.learning_plan_member) {
+      const wallet = m.learning_plan_member?.user?.wallet;
+      if (wallet?.address) {
+        count++;
+      }
+    } else if (m.learning_plan_group?.group_members) {
+      m.learning_plan_group.group_members.forEach((gm) => {
+        const wallet = gm.student_member.user.wallet;
+        if (wallet?.address) {
+          count++;
+        }
+      });
+    }
+  });
+  return count;
+});
+
 const taskMemberStudents = computed(() => {
   return props.taskMembers.flatMap(
     (member) =>
-      member.task_member_students?.map((m) => {
-        return { taskStatus: member.status, ...m };
-      }) || [],
+      [
+        {
+          taskStatus: member.status,
+          learning_plan_member: member.learning_plan_member,
+          learning_plan_group: member.learning_plan_group,
+        },
+      ] || [],
   );
 });
 
 const taskWallets = computed(() => {
-  return taskMemberStudents.value
+  const result: string[] = [];
+  taskMemberStudents.value
     .filter((m) => m.taskStatus === 'done')
-    .map((m) => m.student_member?.user?.wallet?.address)
-    .filter(Boolean); // Check for null or undefined values
+    .forEach((m) => {
+      if (m.learning_plan_member) {
+        const wallet = m.learning_plan_member?.user?.wallet;
+        if (wallet && wallet.address) {
+          result.push(wallet.address);
+        }
+      } else if (m.learning_plan_group?.group_members) {
+        m.learning_plan_group.group_members.forEach((gm) => {
+          const wallet = gm.student_member.user.wallet;
+          if (wallet && wallet.address) {
+            result.push(wallet.address);
+          }
+        });
+      }
+    });
+  return result;
 });
 
 const taskGrades = computed(() => {
@@ -151,35 +200,23 @@ const taskGrades = computed(() => {
 
 watch(isThereAContract, async () => {
   canEdit.value = isThereAContract.value || isUpdatingContract.value;
-  console.log('is there a contract', isThereAContract.value);
   await fetchContractBalance();
 });
 
 watch(isThereBalance, () => {
   isUpdatingContract.value = isThereBalance.value;
-  console.log('is there Balance', isThereBalance.value);
-});
-
-watch(contractAddress, () => {
-  console.log('contractAddress has changed');
 });
 
 const fetchContractBalance = async () => {
   if (!contractAddress.value) return;
   const balance = await getContractBalance(contractAddress.value);
-  console.log('fetchedBalance', { balance });
-
+  if (balance === undefined) return;
   contractBalance.value = weiToUsd(balance);
-  console.log('newBalance', { newBalance: weiToUsd(balance) });
 };
-
-const handleCancelContract = async (
-  selectedContract: AvailableContracts = 'TaskOwnerReedemsContract',
-  isUpdating = false,
-) => {
-  if (!selectedContract || !contractAddress.value) return;
+await fetchContractBalance();
+const handleCancelContract = async (isUpdating = false) => {
+  if (!contractAddress.value) return;
   const result = await cancelContract({
-    chosenContract: selectedContract,
     contractAddress: contractAddress.value,
   });
   if (!result) return;
@@ -187,17 +224,16 @@ const handleCancelContract = async (
   if (isUpdating) isUpdatingContract.value = true;
   contractAddress.value = null;
   await fetchContractBalance();
-  console.log({ result, contractAddress: contractAddress.value });
   emit('update:contract-address', null);
 };
 
 const handleCreateTaskContract = async (props: CreateContractProps) => {
-  const { budget, chosenContract } = props;
+  const { budget, totalNumberOfStudents } = props;
   if (isDraft.value) {
     emit('deploy:contract-draft', async () => {
       const result = await createTaskContract({
         budget,
-        chosenContract,
+        totalNumberOfStudents,
       });
       await fetchContractBalance();
       return result;
@@ -208,12 +244,11 @@ const handleCreateTaskContract = async (props: CreateContractProps) => {
 
   const newContractAddress = await createTaskContract({
     budget,
-    chosenContract,
+    totalNumberOfStudents,
   });
 
   if (!newContractAddress) return;
   isUpdatingContract.value = true;
-  console.log({ newContractAddress });
   contractAddress.value = newContractAddress as string;
   await fetchContractBalance();
   emit('update:contract-address', newContractAddress as string);
@@ -228,13 +263,18 @@ const handleAbortContract = async () => {
 
 const handleRewardStudents = async () => {
   if (!contractAddress.value) return;
+
   const result = await rewardStudents(
     contractAddress.value,
     taskWallets.value,
     taskGrades.value,
   );
   isRewardCompleted.value = result;
-  isUpdatingContract.value = false;
+  if (result) isUpdatingContract.value = false;
   await fetchContractBalance();
 };
+
+watch(status, async () => {
+  await fetchContractBalance();
+});
 </script>

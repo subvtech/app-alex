@@ -173,11 +173,12 @@
         v-model:status="status"
         v-model:contract-address="contractAddress"
         :edit="editable"
-        :task-members="members"
+        :task-members="members || []"
         @deploy:contract-draft="(cb) => (deployContract = cb)"
         @cancel:contract-draft="deployContract = null"
         @update:contract-address="handleUpdateContract"
       />
+      <pre>{{ members }}</pre>
 
       <!-- Eventos e atribuições -->
       <alex-custom-tabs
@@ -220,7 +221,7 @@ import { orderEvents } from '~/utils';
 
 const strapi = useStrapi();
 const { t } = useI18n();
-const { addTaskContractAddress } = useTaskStore();
+const { updateTaskContractAddress } = useTaskStore();
 const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
@@ -280,8 +281,8 @@ const tags = ref(props.tags);
 const title = ref(props.title);
 const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
-const members = toRef(props, 'members');
 const openResources = ref<boolean>(false);
+const members = toRef(props, 'members');
 const hasAtLeastSubmission = computed(
   () => !!members.value.filter((member) => member.last_submission_at).length,
 );
@@ -444,7 +445,10 @@ const updateTaskValues = async (
     if (deployContract.value && status.value !== 'draft') {
       const newContractAddress = await deployContract.value();
       if (!newContractAddress) return;
-      await addTaskContractAddress(props.taskId, newContractAddress as string);
+      await updateTaskContractAddress(
+        props.taskId,
+        newContractAddress as string,
+      );
       deployContract.value = null;
       contractAddress.value = newContractAddress;
     }
@@ -564,7 +568,7 @@ watch(status, async (value) => {
   if (deployContract.value && status.value !== 'draft') {
     const newContractAddress = await deployContract.value();
     if (!newContractAddress) return;
-    await addTaskContractAddress(props.taskId, newContractAddress as string);
+    await updateTaskContractAddress(props.taskId, newContractAddress as string);
     deployContract.value = null;
     contractAddress.value = newContractAddress;
   }
@@ -601,8 +605,7 @@ function handleCloseModal() {
 }
 
 const handleUpdateContract = async (newAddress: string | null) => {
-  console.log('handleUpdateContract');
-  await addTaskContractAddress(props.taskId, newAddress);
+  await updateTaskContractAddress(props.taskId, newAddress);
   contractAddress.value = newAddress;
 };
 </script>

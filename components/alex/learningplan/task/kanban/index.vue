@@ -66,10 +66,11 @@
             v-if="!isTaskStudent(item)"
             class="kanban-card-item-inner select-none"
             :date="item.date"
-            :name="item.user.name"
+            :name="item.user?.name || ''"
             :student-class="item.studentClass"
+            :group="item.group"
             :status="status"
-            :avatar="item?.user.avatar"
+            :avatar="item?.user?.avatar"
             :mark="item.mark"
             :max-mark="item.maxMark"
             @click="$emit('card-click', itemIndex, item)"
@@ -80,7 +81,6 @@
             :title="item.title"
             :date="item.date"
             :group="item.group"
-            :name-group="item.nameGroup"
             :status="status"
             :avatar="item?.avatar"
             :mark="item.mark"
@@ -115,7 +115,11 @@ export interface Task {
   status: TaskStatus | (string & {});
   date: Date;
   studentClass: string;
-  user: { name: string; avatar?: string | null };
+  user?: { name: string; avatar?: string | null };
+  group?: {
+    name: string;
+    participants: { name: string; avatar?: string }[];
+  };
   mark?: number;
   maxMark?: number;
   task?: TaskSimple;
@@ -126,12 +130,15 @@ export interface TaskStudent {
   date: Date;
   status: TaskMemberStatus;
   title: string;
-  group?: boolean;
-  nameGroup?: string;
+  group?: {
+    name: string;
+    participants: { name: string; avatar?: string }[];
+  };
   avatar?: string | null;
   mark?: number;
   maxMark?: number;
   task?: TaskSimple;
+  wallet?: { address: string };
   submissions?: TaskSubmissionSimple[];
 }
 
@@ -261,10 +268,14 @@ const applyFilters = (values: Filters) => {
 const filteredBySearch = computed(() => {
   const searchValue = search.value.toLowerCase();
   return tasks.value.filter((task) => {
+    if (!searchValue) return true;
     if (isTaskStudent(task)) {
       return task.title.toLowerCase().includes(searchValue);
     }
-    return task.user.name.toLowerCase().includes(searchValue);
+    return (
+      task.user?.name.toLowerCase().includes(searchValue) ||
+      task.group?.name.toLowerCase().includes(searchValue)
+    );
   });
 });
 const filteredByClassTasks = computed(() =>
@@ -289,7 +300,6 @@ const filteredByFinalDate = computed(() => {
   }
   return filteredByClassTasks.value;
 });
-
 const checkIntervalOfDates = (
   initial: Date,
   first?: string,
@@ -328,6 +338,7 @@ const filterByClassOrType = (
   }
   return tasks.filter((task) => {
     const taskStudent = task as TaskStudent;
+    if (!value) return true;
     if (value === 'individual' && !taskStudent.group) {
       return true;
     }

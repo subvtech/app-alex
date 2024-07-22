@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-column gap-4">
-    <div class="flex flex-column">
+    <div class="flex flex-column mb-2">
       <alex-inputs-text-field
         v-model="reward"
         :label="rewardLabel"
-        :placeholder="'Task Prize'"
+        :placeholder="$t('components.learningPlan.contract.reward.placeholder')"
         class="w-100"
         type="number"
         density="comfortable"
@@ -16,108 +16,78 @@
         required
         @keypress="isNumber($event)"
       />
-      <p
-        v-if="taskMemberStudents.length === 0"
-        class="text-body-3 text-gray-800"
-      >
-        Please add students to this task so we can calculate the total reward
+      <p v-if="taskMemberStudents === 0" class="text-body-3 text-gray-800">
+        {{ $t('components.learningPlan.contract.warning.noStudents') }}
       </p>
 
       <p
         v-else-if="reward && isNumber(reward) && reward !== ''"
         class="text-body-3 text-gray-800"
       >
-        Total reward: {{ reward }} * {{ taskMemberStudents.length }} = $
+        {{ $t('components.learningPlan.contract.reward.total') }}
+        {{ reward }} * {{ taskMemberStudents }} = $
         {{ totalReward }}
       </p>
     </div>
-
-    <alex-inputs-select
-      v-model="selectedContract"
-      name="Contract"
-      :items="['TaskOwnerRedeemsContract', 'TaskOwnerRedeemsContract2']"
-      placeholder="Select Contract"
-      class="w-100"
-      required
-      :hint="
-        !selectedContract ? 'Pick one among the available contracts' : undefined
-      "
-      persistent-hint
-      clearable
-      info="Insira o nome de um contrato"
-      label="Which contract do you want to deploy?"
-    />
 
     <div
       v-if="displayDraftWarning && isDraft"
       class="flex flex-column w-full gap-4 text-orange-800"
     >
-      <span>Your contract will be created when you publish this task</span>
-      <v-tooltip text="Click here to give up on creating a smart contract">
-        <template #activator="{ props: tooltipProps }">
-          <alex-custom-button
-            text="I've changed my mind"
-            variant="error"
-            v-bind="tooltipProps"
-            :disabled="theresError"
-            :loading="loading"
-            @click="emit('cancel:contract-draft')"
-          />
-        </template>
-      </v-tooltip>
+      <span class="text-body-4 text-error-0 my-1">{{
+        $t('components.learningPlan.contract.warning.isDraft')
+      }}</span>
+
+      <alex-learningplan-task-drawer-contracts-button
+        :tooltip-text="
+          $t('components.learningPlan.contract.warning.tooltip.abort')
+        "
+        :text="$t('components.learningPlan.contract.warning.abort')"
+        variant="error"
+        :disabled="theresError"
+        :loading="loading"
+        @click:button="emit('cancel:contract-draft')"
+      />
     </div>
 
-    <div v-else-if="updateContract">
-      <div v-if="contractAddress">
-        <span v-if="!theresError"
-          >You have the cancel the previous one to just then create this new
-          one</span
-        >
-        <v-tooltip text="Warning, transaction fees do apply ">
-          <template #activator="{ props: tooltipProps }">
-            <alex-custom-button
-              text="Revert previous contract and get refunded"
-              variant="error"
-              v-bind="tooltipProps"
-              :loading="loading"
-              @click="
-                emit(
-                  'delete:contract-address',
-                  selectedContract || undefined,
-                  true,
-                )
-              "
-            />
-          </template>
-        </v-tooltip>
-      </div>
+    <div v-else-if="updateContract" class="mt-4">
+      <alex-learningplan-task-drawer-contracts-button
+        v-if="contractAddress"
+        :tooltip-text="
+          $t('components.learningPlan.contract.warning.tooltip.fee')
+        "
+        :text="$t('components.learningPlan.contract.warning.cancel')"
+        variant="error"
+        :loading="loading"
+        :show-hint="!theresError"
+        :hint="$t('components.learningPlan.contract.warning.update')"
+        @click:button="emit('delete:contract-address', true)"
+      />
 
-      <v-tooltip v-else text="Warning, you're about to spend real money">
-        <template #activator="{ props: tooltipProps }">
-          <alex-custom-button
-            text="Deploy contract"
-            variant="warning"
-            v-bind="tooltipProps"
-            :disabled="theresError"
-            :loading="loading"
-            @click="handleCreateTaskContract"
-          />
-        </template>
-      </v-tooltip>
+      <alex-learningplan-task-drawer-contracts-button
+        v-else
+        :tooltip-text="
+          $t('components.learningPlan.contract.warning.tooltip.spend')
+        "
+        :text="$t('components.learningPlan.contract.reward.deploy')"
+        variant="warning"
+        :disabled="theresError"
+        :loading="loading"
+        @click:button="handleCreateTaskContract"
+      />
     </div>
 
-    <v-tooltip v-else text="Warning, you're about to spend real money">
-      <template #activator="{ props: tooltipProps }">
-        <alex-custom-button
-          text="Deploy contract"
-          variant="warning"
-          v-bind="tooltipProps"
-          :disabled="theresError"
-          :loading="loading"
-          @click="handleCreateTaskContract"
-        />
-      </template>
-    </v-tooltip>
+    <alex-learningplan-task-drawer-contracts-button
+      v-else
+      :tooltip-text="
+        $t('components.learningPlan.contract.warning.tooltip.spend')
+      "
+      :text="$t('components.learningPlan.contract.reward.deploy')"
+      variant="warning"
+      :disabled="theresError"
+      :loading="loading"
+      @click:button="handleCreateTaskContract"
+    />
   </div>
 </template>
 
@@ -127,7 +97,7 @@ import * as yup from 'yup';
 interface CreateContractFormProps {
   loading?: boolean;
   canEdit?: boolean;
-  taskMemberStudents?: any[];
+  taskMemberStudents: number;
   displayDraftWarning?: boolean;
   isDraft?: boolean;
   rewardLabel: string;
@@ -136,7 +106,6 @@ interface CreateContractFormProps {
 }
 
 const props = withDefaults(defineProps<CreateContractFormProps>(), {
-  taskMemberStudents: () => [],
   contractAddress: null,
 });
 
@@ -148,8 +117,6 @@ const emit = defineEmits([
   'delete:contract-address',
 ]);
 
-const selectedContract = ref<AvailableContracts | null>(null);
-
 const createTaskContractSchema2 = yup.object({
   reward: yup
     .string()
@@ -158,22 +125,14 @@ const createTaskContractSchema2 = yup.object({
     .required(),
 });
 
-const {
-  handleSubmit,
-  errors,
-  values,
-  controlledValues,
-  setFieldError,
-  validate,
-  useFieldModel,
-} = useForm({
+const { handleSubmit, errors, useFieldModel } = useForm({
   validationSchema: createTaskContractSchema2,
 });
 
 const handleCreateTaskContract = handleSubmit(() => {
   emit('create:contract-address', {
-    chosenContract: selectedContract.value,
     budget: totalReward.value,
+    totalNumberOfStudents: props.taskMemberStudents,
   } as CreateContractProps);
 });
 
@@ -183,13 +142,12 @@ const theresError = computed(() => {
     Object.keys(errors.value).length !== 0 ||
     !reward.value ||
     props.canEdit ||
-    selectedContract.value === null ||
-    props.taskMemberStudents.length === 0
+    props.taskMemberStudents === 0
   );
 });
 
 const totalReward = computed(
-  () => parseFloat(reward.value) * props.taskMemberStudents.length,
+  () => parseFloat(reward.value) * props.taskMemberStudents,
 );
 
 function isNumber(evt) {

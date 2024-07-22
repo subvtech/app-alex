@@ -4,6 +4,7 @@
     @click="$emit('to-profile')"
   >
     <v-img
+      v-if="!member.group"
       class="avatar flex-0-0 rounded-circle"
       :src="
         member.avatarUrl ||
@@ -13,6 +14,14 @@
       aspect-ratio="1"
       cover
     />
+    <div
+      v-else
+      class="avatar bg-gray-blue tw-grid tw-place-items-center tw-rounded-full"
+    >
+      <v-icon class="text-gray-600" size="small"
+        >mdi-account-group-outline</v-icon
+      >
+    </div>
 
     <div class="flex-1-1">
       <span class="text-body-4 text-gray-800">{{
@@ -20,21 +29,33 @@
         '(' + $t('components.learningPlan.members.missing.name') + ')'
       }}</span>
 
-      <span class="text-body-3 text-gray-400 tw-ml-2">{{
+      <span v-if="!noClass" class="text-body-3 text-gray-400 tw-ml-2">{{
         `(${
           member.class || $t('components.learningPlan.members.missing.class')
         })`
       }}</span>
     </div>
 
+    <alex-custom-avatar-group
+      v-if="member.participants"
+      :avatar-items="member.participants"
+      class="tw-ml-2"
+    />
     <alex-custom-chip
-      v-if="member.pending"
-      :text="$t('components.learningPlan.members.member.pending')"
-      size="small"
-      status="secondary"
-      variant="outlined"
+      v-if="member.responsable"
+      status="primary"
+      text="Responsável"
+      size="x-small"
     />
     <alex-custom-button
+      v-if="edit && member.group"
+      icon="mdi-pencil-outline"
+      size="small"
+      variant="text"
+      @click.stop="$emit('edit-click')"
+    />
+    <alex-custom-button
+      v-if="edit && !member.responsable"
       icon="mdi-trash-can-outline"
       size="small"
       variant="text"
@@ -49,18 +70,23 @@
 interface MemberProps {
   name?: string;
   avatarUrl?: string;
+  responsable?: boolean;
   class?: string;
-  pending?: boolean;
-  submitted?: boolean;
-  accepted?: boolean;
+  group?: boolean;
+  participants?: { name: string; image: { url: string } }[];
 }
 
 interface CompProps {
   member: MemberProps;
+  noClass?: boolean;
+  edit?: boolean;
 }
 
-defineProps<CompProps>();
-defineEmits(['remove-click', 'to-profile']);
+withDefaults(defineProps<CompProps>(), {
+  noClass: false,
+  edit: true,
+});
+defineEmits(['remove-click', 'to-profile', 'edit-click']);
 </script>
 
 <style scoped>

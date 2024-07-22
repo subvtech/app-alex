@@ -178,6 +178,7 @@ const props = defineProps<{
     list?: string;
   };
   dragFrom: number;
+  handlePendingContract: () => Promise<boolean>;
 }>();
 
 const { t } = useI18n();
@@ -311,9 +312,16 @@ const getDropDownAction = (
     delete: {
       text: t('pages.task.table.dropdown.delete'),
       warning: true,
-      onClick: () => {
-        taskToDelete.value = id;
-        deleteModal.value = true;
+      onClick: async () => {
+        try {
+          const isTherePendingContract = await props.handlePendingContract();
+          console.log({ isTherePendingContract });
+          if (isTherePendingContract) return;
+          taskToDelete.value = id;
+          deleteModal.value = true;
+        } catch (err) {
+          console.log(err);
+        }
       },
     },
     publish: {
@@ -442,7 +450,7 @@ const previewRow = (id: number) => {
 }
 
 .draggable-row {
-  cursor: pointer;
+  cursor: move;
   background-color: #fff;
   opacity: 0.99;
   user-select: none;

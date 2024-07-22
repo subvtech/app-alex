@@ -20,7 +20,7 @@
     </template>
 
     <template #default>
-      <div class="user-info text-gray-800">
+      <div v-if="student" class="user-info text-gray-800">
         <v-avatar
           :size="80"
           :image="student.avatar || undefined"
@@ -35,8 +35,38 @@
         </v-avatar>
         <h2 class="text-h2 ellipsis lines-1">{{ student.name }}</h2>
         <p class="text-subtitle-2 ellipsis lines-1">
-          {{ student.studentClass }}
+          {{ studentClass }}
         </p>
+      </div>
+      <div v-if="group" class="tw-flex tw-flex-col tw-gap-2 text-gray-800">
+        <alex-custom-chip class="tw-w-fit" :text="studentClass" />
+        <h2 class="text-h2 ellipsis lines-1">{{ group.title }}</h2>
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <v-avatar
+            :size="40"
+            :image="
+              inChargeMember?.student_member.user.avatar?.url || undefined
+            "
+            class="alex-avatar-group-border alex-avatar-group-margin"
+            color="gray-100"
+          >
+            <template
+              v-if="!inChargeMember?.student_member.user.avatar?.url"
+              #default
+            >
+              <p class="text-gray-300 text-h4">
+                {{
+                  getInitials(
+                    inChargeMember?.student_member.user.fullname || '',
+                  )
+                }}
+              </p>
+            </template>
+          </v-avatar>
+          <p class="text-subtitle-2 ellipsis lines-1">
+            {{ inChargeMember?.student_member.user.fullname }}
+          </p>
+        </div>
       </div>
 
       <div class="task-info">
@@ -52,6 +82,7 @@
             "
           />
         </div>
+
         <div class="d-flex flex-column gap-2 tw-w-full">
           <p class="text-body-4 text-gray-800 mb-1">
             <span class="text-tag-orange-light">* </span
@@ -113,7 +144,7 @@
               <alex-learningplan-task-submission
                 v-if="mostRecentSubmission?.submitted_at"
                 type="professor"
-                :task-title="student.name"
+                :task-title="task.title"
                 :status="getSubmissionStatus(mostRecentSubmission)"
                 :task-deadline="finishAt || undefined"
                 :mark="mostRecentSubmission?.grade"
@@ -149,18 +180,99 @@
         </template>
       </div>
 
+      <div v-if="contractAddress" class="d-flex flex-column gap-8">
+        <div v-if="disablePayment" class="d-flex flex-column gap-3">
+          <span class="text-h5 text-gray-800">
+            {{ $t('components.learningPlan.contract.reward.studentRewarded') }}
+          </span>
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+        </div>
+
+        <div v-else class="d-flex flex-column gap-6">
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+
+          <alex-learningplan-task-drawer-contracts-button
+            v-if="student"
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.once')
+            "
+            :text="
+              $t('components.learningPlan.contract.reward.rewardSingleStudent')
+            "
+            variant="warning"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="handleRewardSingleStudent"
+          />
+          <alex-learningplan-task-drawer-contracts-button
+            v-else-if="group"
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.once')
+            "
+            :text="$t('components.learningPlan.contract.reward.rewardStudents')"
+            variant="warning"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="handleRewardGroup"
+          />
+        </div>
+        <div v-if="isThereBalance" class="d-flex flex-column items-start gap-3">
+          <p class="text-h5 text-gray-800">
+            {{ $t('components.learningPlan.contract.warning.secondThoughts') }}
+          </p>
+          <p class="text-body-4 text-gray-500">
+            {{
+              $t('components.learningPlan.contract.warning.abortConsequences')
+            }}
+          </p>
+
+          <alex-learningplan-task-drawer-contracts-button
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.fee')
+            "
+            :text="$t('components.learningPlan.contract.warning.finish')"
+            variant="error"
+            :loading="contractLoading"
+            @click:button="handleCancelContract"
+          />
+        </div>
+      </div>
+
       <alex-learningplan-task-tabs
         v-model="activePage"
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
         :is-sending-message="isSendingMessage"
-        :task-member-id="taskMemberId"
+        :task-member="{
+          id: taskMemberId,
+        }"
+        :show-member-tab="!!group"
         :message="{ isLoading: pendingMessages }"
         :event="{ events: events.data, isLoading: eventLoading }"
         :submission="!!submission"
         :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :submissions="evaluatedSubmissions"
-      />
+      >
+        <template #members>
+          <alex-learningplan-task-members-card
+            v-for="member in group?.group_members"
+            :key="`group-member${member.id}`"
+            :member="{
+              name: member.student_member.user.fullname,
+              class: group?.learning_class?.name,
+              avatarUrl: member.student_member.user?.avatar?.url,
+              responsable: member.role === 'in_charge',
+            }"
+            :edit="false"
+          />
+        </template>
+      </alex-learningplan-task-tabs>
     </template>
 
     <template v-if="activePage === '3'" #append>
@@ -189,45 +301,166 @@ import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.mode
 
 interface Student {
   name: string;
-  studentClass: string;
   avatar?: string | null;
+  wallet?: { address: string };
 }
 interface Submission {
   description: string;
   constraints: string[];
 }
 interface TaskUserDrawerProps {
-  student: Student;
+  learningplanId: number;
+  task: {
+    id: number;
+    title: string;
+    startDate?: string | null;
+    endDate?: string | null;
+    sendAfterDeadline?: boolean;
+  };
   taskMemberId: number;
+  student?: Student;
+  group?: LearningPlanGroupSimple;
   status: TaskMemberStatus;
   finishAt?: string | null;
   submission?: Submission;
+  studentClass: string;
+  contractAddress: string | null;
   canSubmitAfterDeadline: boolean;
   canSubmitAfterDeadlineTask?: boolean;
 }
 const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   submission: undefined,
+  student: undefined,
   canSubmitAfterDeadlineTask: false,
   finishAt: null,
+  group: undefined,
 });
 const { t } = useI18n();
+const { contractAddress } = toRefs(props);
+
+const {
+  rewardSingleStudent,
+  rewardStudents,
+  hasTheStudentBeenPaid,
+  cancelContract,
+  getContractBalance,
+  weiToUsd,
+  loading: contractLoading,
+} = useContracts();
+
+const isRewarded = ref(false);
+const contractBalance = ref(0);
+
+const fetchContractBalance = async () => {
+  if (!contractAddress.value) return;
+  const balance = await getContractBalance(contractAddress.value);
+  if (!balance) return;
+  contractBalance.value = weiToUsd(balance);
+};
+
+const handleRewardSingleStudent = async () => {
+  if (!props.student?.wallet) return;
+  if (!contractAddress.value) return;
+  await rewardSingleStudent(
+    contractAddress.value,
+    props.student.wallet.address,
+    88,
+  );
+  const result = await hasTheStudentBeenPaid(
+    contractAddress.value,
+    props.student.wallet?.address,
+  );
+  isRewarded.value = result;
+  await fetchContractBalance();
+};
+
+const wallets = computed(
+  () =>
+    (props.group?.group_members
+      .map((m) => m.student_member.user.wallet?.address)
+      .filter(Boolean) || []) as string[],
+);
+
+const handleRewardGroup = async () => {
+  if (!contractAddress.value) return;
+
+  await rewardStudents(
+    contractAddress.value,
+    wallets.value,
+    wallets.value.map(() => 88),
+    false,
+  );
+  const result = await handleHasTheStudentBeenPaid();
+  isRewarded.value = result;
+  await fetchContractBalance();
+};
+
+const handleHasTheStudentBeenPaid = async () => {
+  let temp = false;
+  if (props.group) {
+    temp = await Promise.all(
+      props.group.group_members.map(async (member, index) => {
+        const walletAddress = member.student_member.user.wallet?.address;
+        if (!walletAddress) {
+          return false;
+        }
+        const hasBeenPaid = await hasTheStudentBeenPaid(
+          contractAddress.value,
+          walletAddress,
+        );
+        return hasBeenPaid;
+      }),
+    ).then((results) => results.some((result) => result));
+  } else {
+    const walletAddress = props.student?.wallet?.address;
+    if (!walletAddress) {
+      return false;
+    }
+    temp = await hasTheStudentBeenPaid(contractAddress.value, walletAddress);
+  }
+  console.log({ temp, isRewarded: isRewarded.value });
+
+  return temp;
+};
+
+if (contractAddress.value)
+  isRewarded.value = await handleHasTheStudentBeenPaid();
+
+const isThereBalance = computed(() => contractBalance.value > 0);
+
+const handleCancelContract = async () => {
+  if (!contractAddress.value) return;
+  const result = await cancelContract({
+    contractAddress: contractAddress.value,
+  });
+  if (!result) return;
+
+  contractAddress.value = null;
+  await fetchContractBalance();
+  emit('update:contract-address', null);
+};
+const disablePayment = computed(
+  () => isRewarded.value && props.status === 'done',
+);
 const isSendingMessage = ref(false);
 const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
   'change-submit-after-deadline': [taskId: number, value: boolean];
+  'update:contract-address': [value: string | null];
 };
 const emit = defineEmits<Emit>();
 const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline);
 const finishAt = toRef(props.finishAt);
-const activePage = ref('1');
+const activePage = ref(props.group ? '0' : '1');
 const initials = computed(() => {
-  return getInitials(props.student.name);
+  return getInitials(props.student?.name || '');
 });
 const handleCloseModal = () => {
   model.value = false;
 };
+
 const drawerId = computed(() => `student-drawer-${crypto.randomUUID()}`);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
@@ -274,7 +507,6 @@ const getEvents = (memberID: number) =>
       },
     },
   });
-
 const {
   data: submissions,
   execute: executeSubmissions,
@@ -340,7 +572,7 @@ const {
   watch: [taskMemberId],
   dedupe: 'cancel',
 });
-
+await fetchContractBalance();
 const handleSubmitMessage = async (
   text: string,
   audio?: Blob | null,
@@ -443,6 +675,9 @@ const changeSendAfterDeadline = async (value: boolean) => {
   }
 };
 
+const getInChargeMember = (group?: LearningPlanGroupSimple) =>
+  group?.group_members.find((member) => member.role === 'in_charge');
+const inChargeMember = computed(() => getInChargeMember(props.group));
 watch(finishAt, changeDeadline);
 watch(canSubmitAfterDeadline, changeSendAfterDeadline);
 watch(model, (value) => {
@@ -454,10 +689,10 @@ watch(model, (value) => {
     executeMessages();
     return;
   }
-  submissions.value = { data: [], meta: { total: 0 } };
-  events.value = { data: [], meta: { total: 0 } };
-  activePage.value = '1';
+  submissions.value.data = [];
+  events.value.data = [];
   messages.value.data = [];
+  activePage.value = props.group ? '0' : '1';
 });
 watch(activePage, (value) => {
   if (value === '3') {

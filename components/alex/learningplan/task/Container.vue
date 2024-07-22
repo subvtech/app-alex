@@ -34,7 +34,6 @@
               <div v-else>
                 <alex-learningplan-task-table
                   key="table"
-                  :index="i"
                   :tasks="tasksArray[i - 1]"
                   :search="search"
                   :active-filter="isFilterActive"
@@ -42,6 +41,7 @@
                   :over="setOver(i - 1)"
                   :drag-from="dragFrom"
                   :dragging="dragging"
+                  :handle-pending-contract="handlePendingContract"
                   @start-drag="startDrag"
                   @drag-over="onDragOver"
                   @drag-end="onDrop"
@@ -93,7 +93,7 @@
       </v-expansion-panels>
     </Transition>
   </div>
-  <pre>{{ { teacherDrawer, taskDetails } }}</pre>
+  <pre>{{ taskDetails }}</pre>
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
@@ -131,11 +131,7 @@
 <script setup lang="ts">
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import {
-  TaskSimple,
-  TaskStatus,
-  TaskType,
-} from '~/models/simple/taskSimple.model';
+import { TaskSimple, TaskStatus } from '~/models/simple/taskSimple.model';
 
 export interface TaskItem {
   id: number;
@@ -177,6 +173,7 @@ const props = defineProps<{
 const { create, delete: _delete, update, findOne } = useStrapi();
 const { find } = useStrapiUtils();
 const client = useStrapiClient();
+const { cancelContract, getContractBalance } = useContracts();
 const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
@@ -195,6 +192,22 @@ groupsArray.forEach((group, index) => {
   groups[group] = index;
   groups[index] = group;
 });
+
+const handlePendingContract = async () => {
+  let isThereAPendingContract = !!taskDetails?.value?.contract_address;
+  if (isThereAPendingContract) {
+    const contractAddress = taskDetails!.value!.contract_address!;
+    const balance = await getContractBalance(contractAddress);
+    if (balance && Number(balance) > 0) {
+      const result = await cancelContract({
+        contractAddress,
+      });
+      if (result) isThereAPendingContract = false;
+    }
+  }
+
+  return isThereAPendingContract;
+};
 
 const searchField = computed(() => props.search.toLowerCase());
 const tasksFilter = computed(() => props.filter);
@@ -316,7 +329,7 @@ const tasksArray = computed(() => {
         if (taskMember.status === 'in_progress') delivered.doing += 1;
         if (taskMember.status === 'in_review') delivered.underReview += 1;
         if (taskMember.status === 'done') delivered.completed += 1;
-        taskMember.task_member_students?.forEach((student) => {
+        taskMember.learning_plan_group?.group_members?.forEach((student) => {
           const studentUser = student.student_member?.user;
           students.push({
             name: studentUser?.fullname,
@@ -325,6 +338,15 @@ const tasksArray = computed(() => {
               : undefined,
           });
         });
+
+        if (taskMember.learning_plan_member) {
+          students.push({
+            name: taskMember.learning_plan_member.user?.fullname,
+            image: taskMember.learning_plan_member.user?.avatar?.url
+              ? { url: taskMember.learning_plan_member.user?.avatar.url }
+              : undefined,
+          });
+        }
       });
       const taskItem = {
         id: task.id,
@@ -407,7 +429,7 @@ const handleMoveTask = async ({
       await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
-  } catch (e: ApplicationError) {
+  } catch (e: unknown) {
     displayError('moveError', e);
   }
 };
@@ -535,7 +557,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.type = values.type;
     task.start_at = values.start_at;
     task.finish_at = values.finish_at;
-    task.contract_address = values.contract_address;
+    task.contract_address = values.contract_address!;
     task.submission_required = values.submission_required!;
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
@@ -600,14 +622,17 @@ const handleChangeMembers = async () => {
     const response = await find<TaskMember>('task-members', {
       populate: [
         'task_submission',
-        'task_member_students.student_member.user.avatar',
-        'task_member_students.student_member.user.wallet',
-        'task_member_students.student_member.learning_class',
+        'learning_plan_group.group_members.student_member.user.avatar',
+        'learning_plan_group.group_members.student_member.user.wallet',
+        'learning_plan_member.user.avatar',
+        'learning_plan_member.user.wallet',
+        'learning_plan_member.learning_class',
       ],
       filters: {
         task: editTaskId.value,
       },
     });
+
     const { data } = response;
     if (task) {
       task.task_members = data;

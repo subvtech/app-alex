@@ -250,9 +250,9 @@ const allowedBlocks = computed(() => {
     ],
     link: ['link'],
     image: ['image'],
-    gallery: ['carousel', 'image'],
+    gallery: ['carousel', 'Paragraph'],
     video: ['embed', 'Paragraph'],
-    document: ['fileSet'],
+    document: ['fileSet', 'Paragraph'],
   };
 
   const blocksSet = new Set();
