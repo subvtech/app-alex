@@ -5,6 +5,9 @@
   "denied": {
     "title": "Entrega recusada"
   },
+  "in_review": {
+    "title": "Entrega em avaliação"
+  },
   "done": {
     "title": "Entrega realizada",
     "subtitle": "Clique para avaliar"

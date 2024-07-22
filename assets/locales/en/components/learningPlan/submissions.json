@@ -5,6 +5,9 @@
   "denied": {
     "title": "Submission Refused"
   },
+  "in_review": {
+    "title": "Submission in review"
+  },
   "done": {
     "title": "Submission Completed",
     "subtitle": "Click to Rate"

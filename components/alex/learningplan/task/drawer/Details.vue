@@ -308,24 +308,19 @@ const {
   lazy: true,
 });
 const evaluatedSubmissions = computed(() =>
-  submissions.value.data.flatMap((submission) => {
-    return submission.evaluated_at
-      ? [
-          {
-            id: submission.id,
-            justification: {
-              text: submission.justification,
-            },
-            mark: submission.grade,
-            maxMark: submission.grade,
-            time: new Date(submission.evaluated_at || submission.createdAt),
-            status: submission.evaluated_at ? 'reviewed' : 'in_review',
-          } as AttachedSubmission,
-        ]
-      : [];
-  }),
+  submissions.value.data.map(
+    (submission) =>
+      ({
+        id: submission.id,
+        justification: {
+          text: submission.justification,
+        },
+        mark: submission.grade,
+        time: new Date(submission.evaluated_at || submission.createdAt),
+        status: submission.evaluated_at ? 'reviewed' : 'in_review',
+      }) as AttachedSubmission,
+  ),
 );
-
 const mostRecentSubmission = computed(
   () =>
     submissions.value.data.filter((submission) => submission.evaluated_at)[0],

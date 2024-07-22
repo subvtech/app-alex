@@ -4,6 +4,7 @@
       v-for="(submission, index) in submissions"
       :key="index"
       :submission="submission"
+      :no-justification="submission.status === 'in_review'"
       :hide-infos="props.hideInfo"
       @redirect-to-chat="(submission) => $emit('redirect-to-chat', submission)"
     />

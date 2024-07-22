@@ -8,7 +8,7 @@
   >
     <!-- Header -->
     <div
-      class="header d-flex align-center ga-3 pa-3"
+      class="header d-flex align-center ga-3 pa-3 tw-min-h-[62px]"
       :class="`${
         config[submission.status]?.reversed ? 'flex-row-reverse' : ''
       } ${submission.status}`"
@@ -51,7 +51,6 @@
 
         <div v-if="!props.hideInfo">
           <alex-custom-button
-            v-if="submission.justification && !noJustification"
             variant="text"
             size="small"
             icon="mdi-message-outline"
@@ -147,7 +146,7 @@ interface StatusProps {
 }
 
 type StatusConfigProps = {
-  [status in 'reviewed' | 'denied']: StatusProps;
+  [status in 'reviewed' | 'denied' | 'in_review']: StatusProps;
 };
 
 const config: StatusConfigProps = {
@@ -155,6 +154,11 @@ const config: StatusConfigProps = {
     icon: 'mdi-check',
     title: t('components.learningPlan.submissions.accepted.title'),
     color: 'success-0',
+  },
+  in_review: {
+    icon: 'mdi-text-box-outline',
+    title: t('components.learningPlan.submissions.in_review.title'),
+    color: 'warning-0',
   },
   denied: {
     icon: 'mdi-alert-circle-outline',

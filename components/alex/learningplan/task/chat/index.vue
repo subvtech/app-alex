@@ -118,7 +118,7 @@ const getResponse = (
     return {
       id: submission.id,
       justification: { text: submission.justification },
-      status: 'reviewed',
+      status: submission.evaluated_at ? 'reviewed' : 'in_review',
       mark: submission.grade,
       time: new Date(submission.submitted_at),
     };

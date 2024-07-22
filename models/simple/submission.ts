@@ -11,10 +11,6 @@ export type Submission = {
   time: Date;
 };
 
-export type AttachedSubmission = Omit<
-  Submission,
-  'justification' | 'status'
-> & {
+export type AttachedSubmission = Omit<Submission, 'justification'> & {
   justification?: Justification;
-  status: 'reviewed' | 'denied';
 };
