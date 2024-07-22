@@ -5,8 +5,11 @@ import { useImportLanguages } from './useImportedLanguages';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
+export const defaultBrowserLanguage = navigator.language.startsWith('pt')
+  ? 'pt'
+  : 'en';
 export const i18n = createI18n({
-  locale: 'pt',
+  locale: defaultBrowserLanguage,
   legacy: false,
   missingWarn: false,
   globalInjection: true,
