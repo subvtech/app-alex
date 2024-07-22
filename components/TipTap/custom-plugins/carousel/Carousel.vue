@@ -191,7 +191,7 @@
 </template>
 
 <script setup lang="ts">
-import { NodeViewWrapper } from '@tiptap/vue-3';
+import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
 import VideoPlayer from './VideoJS.vue';
@@ -209,25 +209,21 @@ interface Slide {
 }
 
 const props = defineProps({
-  editor: {
-    type: Object,
-    required: true,
-  },
   node: {
-    type: Object,
+    type: Object as PropType<NodeViewProps['node']>,
     required: true,
   },
   extension: {
-    type: Object,
+    type: Object as PropType<NodeViewProps['extension']>,
     required: true,
   },
   updateAttributes: {
-    type: Function,
+    type: Function as PropType<NodeViewProps['updateAttributes']>,
     default: () => {},
   },
 });
 
-const readOnly = computed(() => !props.editor.options.editable);
+const readOnly = computed(() => props.extension.options.readOnly());
 
 const vueperslides1 = ref();
 const vueperslides2 = ref();

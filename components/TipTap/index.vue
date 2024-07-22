@@ -87,7 +87,7 @@ const collors = [
 onMounted(() => {
   const user = useStrapiUser();
   const provider = new TiptapCollabProvider({
-    name: 'alex-teste', // Unique document identifier for syncing. This is your document name.
+    name: 'alex-tiptap', // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token:
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjExNzQ4MTgsIm5iZiI6MTcyMTE3NDgxOCwiZXhwIjoxNzIxMjYxMjE4LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.-opqFm9oflwj0K8gLHfVlguWVrenGS3EHVZEJ-l80w8', // Your JWT token
@@ -186,6 +186,7 @@ onMounted(() => {
             method: 'DELETE',
           });
         },
+        readOnly: () => !isEditable.value,
       }),
       TaskList,
       TaskItem.configure({ nested: true }),
@@ -258,13 +259,13 @@ onMounted(() => {
           }
         },
         handleDeletedFiles: (id: string) => {
-          console.log(id);
           // if (file.videoId) mediaToDelete.value.push(file.videoId);
           // if (file.imgId) mediaToDelete.value.push(file.imgId);
           strapiClient(`/upload/files/${id}`, {
             method: 'DELETE',
           });
         },
+        readOnly: () => !isEditable.value,
       }),
     ],
     content: props.modelValue,
@@ -280,13 +281,8 @@ onMounted(() => {
 
 const toggleEditable = () => {
   isEditable.value = !isEditable.value;
+  editor.value.setEditable(isEditable.value);
 };
-
-watch(isEditable, (value) => {
-  if (editor.value) {
-    editor.value.setEditable(value);
-  }
-});
 
 onBeforeUnmount(() => {
   if (editor.value) {

@@ -29,6 +29,7 @@ interface CarouselConfig {
   }>;
   handleDeletedFiles: (id: string) => void;
   onUpdateSlides: (slides: CarouselBlockData[]) => void;
+  readOnly: () => boolean;
 }
 
 export default Node.create<CarouselConfig>({
@@ -49,6 +50,7 @@ export default Node.create<CarouselConfig>({
       handleFileSelected: () => Promise.resolve({ success: 1 }),
       handleDeletedFiles: () => {},
       onUpdateSlides: () => {},
+      readOnly: () => false,
     };
   },
 

@@ -18,6 +18,7 @@ interface FilesetConfig {
     error?: string;
   }>;
   handleDeletedFiles: (id: string) => void;
+  readOnly: () => boolean;
 }
 
 export default Node.create<FilesetConfig>({
@@ -37,6 +38,7 @@ export default Node.create<FilesetConfig>({
     return {
       uploadFiles: () => Promise.resolve({ success: 1 }),
       handleDeletedFiles: () => {},
+      readOnly: () => false,
     };
   },
   parseHTML() {

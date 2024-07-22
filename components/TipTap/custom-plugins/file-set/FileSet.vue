@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { NodeViewWrapper } from '@tiptap/vue-3';
+import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const fileInputRef = ref();
@@ -117,25 +117,21 @@ type FileType = {
 };
 
 const props = defineProps({
-  updateAttributes: {
-    type: Function,
-    default: () => {},
-  },
   node: {
-    type: Object,
+    type: Object as PropType<NodeViewProps['node']>,
     required: true,
   },
   extension: {
-    type: Object,
+    type: Object as PropType<NodeViewProps['extension']>,
     required: true,
   },
-  editor: {
-    type: Object,
-    required: true,
+  updateAttributes: {
+    type: Function as PropType<NodeViewProps['updateAttributes']>,
+    default: () => {},
   },
 });
 
-const readOnly = computed(() => !props.editor.options.editable);
+const readOnly = computed(() => props.extension.options.readOnly());
 
 const filesArray = ref<FileType[]>(
   Array.isArray(props.node.attrs.files)
