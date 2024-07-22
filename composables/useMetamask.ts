@@ -69,7 +69,7 @@ export const useMetamask = () => {
 
         await withTimeout(8000, provider.getSigner());
         data = await find('wallets/auth');
-
+        signer = await withTimeout(8000, provider.getSigner());
         signedMessage = await signer.signMessage(data.token);
       }
 
