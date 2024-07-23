@@ -1,230 +1,357 @@
 <template>
   <alex-custom-card
-    class="w-100"
     :title="$t('components.meeting.title')"
+    :no-icon="canEdit"
+    class="w-100"
+    :is-editing="editMeetings"
+    :disable-save="!schedulesChanges.length"
     align-content="align-center"
-    :show-icon="false"
     :href="canEdit ? `${learningPlanId}/settings` : ''"
+    @click:save="onSave"
+    @click:cancel="onCancel"
+    @toggle:is-editing="toggleEditMode"
   >
     <template #content>
-      <div
-        v-if="myData.length === 0"
-        class="d-flex justify-center w-100"
-        :class="isEditing ? 'bordered pa-6' : ''"
-      >
-        <span class="desactivated">{{
-          $t(
-            `components.courses.meeting.empty.${
-              isFacilitator ? 'facilitator' : 'student'
-            }`,
-          )
-        }}</span>
-      </div>
-      <course-meeting
-        v-for="(item, index) in myData"
-        v-else
-        :key="index"
-        :date="item.date"
-        :start-hour="item.startHour"
-        :end-hour="item.endHour"
-        :interval="item.interval"
-        :variant="variant"
-        :dropdown-props="[
-          {
-            onClick: () => editMeeting(item),
-            text: 'Editar',
-            icon: 'mdi-pencil',
-          },
-          {
-            onClick: () => openExclusionDialog(item.id),
-            text: 'Apagar',
-            icon: 'mdi-trash-can-outline',
-            warning: true,
-          },
-        ]"
-      />
-      <alex-learningplan-dialogs-delete-schedule
-        :dialog="dialogMeetingExclusion"
-        :remove-function="removeMeeting"
-        @close="dialogMeetingExclusion = false"
-      />
-    </template>
-
-    <template v-if="variant === 'editing' && canEdit" #footer>
-      <div class="d-flex w-100 justify-end">
-        <alex-custom-button prepend-icon="mdi-plus" variant="primary"
-          >{{ $t('components.courses.settings.meetings.add') }}
+      <div class="w-100">
+        <alex-custom-button
+          v-if="editMeetings"
+          class="add-button w-100 mb-6"
+          prepend-icon="mdi-plus"
+          variant="text"
+          size="large"
+          @click="scheduleToUpdate = null"
+        >
           <alex-learningplan-dialogs-schedule
-            v-model="createScheduleModal"
-            v-model:data="editData"
-            :end-date="endDate"
-            @submit="
-              (values) =>
-                !editData ? addMeeting(values) : updateMeeting(values)
-            "
+            v-model="scheduleModal"
+            :learning-plan-id="learningPlanId"
+            :classes="classModel"
+            :data="scheduleToUpdate"
+            :start-date="classInfo?.start"
+            :end-date="classInfo?.end"
+            @update:schedules="scheduleModal"
+            @create="handleCreate"
+            @update="confirmUpdate"
           />
-        </alex-custom-button>
+          {{
+            $t('components.courses.meeting.course.addButton')
+          }}</alex-custom-button
+        >
+        <alex-learningplan-class-meetings
+          v-model="classModel"
+          :variant="editMeetings ? 'editing' : 'default'"
+          @update="handleUpdate"
+          @delete="handleDelete"
+        />
+      </div>
+      <div v-if="!hasMeetings" class="w-100">
+        <p class="text-gray-500 text-center">
+          {{ $t('components.courses.meeting.empty') }}
+        </p>
       </div>
     </template>
   </alex-custom-card>
+  <alex-custom-confirm-dialog
+    v-model="deleteModal"
+    variant="error"
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    :title="$t('components.courses.meeting.deleteModal.confirmation')"
+    :subtitle="$t('components.courses.meeting.deleteModal.description')"
+    :submit-button-text="$t('components.courses.meeting.deleteModal.button')"
+    :cancel-button-text="
+      $t('components.courses.settings.meetings.delete.cancel')
+    "
+    no-input-confirmation
+    @submit="confirmDelete"
+    @cancel="cancelDelete"
+  />
 </template>
 
 <script setup lang="ts">
-import {
-  MeetingVariantType,
-  MeetingPropsType,
-} from '@/components/CourseMeeting.vue';
+import { LearningClassType } from './dialogs/create/index.vue';
+const strapi = useStrapi();
+const { setMessage } = useMessageStore();
+const i18n = useI18n();
+const editMeetings = ref(false);
+const scheduleModal = ref(false);
+// const isLoading = ref(false);
+const deleteModal = ref(false);
+const props = defineProps({
+  canEdit: {
+    type: Boolean,
+    default: false,
+  },
+  learningPlanClasses: {
+    type: Array as PropType<LearningClassType[]>,
+    required: true,
+  },
+  learningPlanId: {
+    type: Number,
+    required: true,
+  },
+  classInfo: {
+    type: Object,
+    required: true,
+  },
+});
 
-const { create, update, delete: _delete } = useStrapi();
-
-export type ScheduleResponseType = {
-  id: number;
-  attributes: MeetingPropsType;
-};
-
-export interface MeetingsPropsType {
-  variant?: MeetingVariantType;
-  data: MeetingPropsType[];
-  endDate: Date;
-  canEdit: boolean;
-  learningPlanId: number;
-  isFacilitator: boolean;
+interface newSchedule {
+  id?: number;
+  date: string;
+  type: 'online' | 'onsite';
+  interval: number;
+  startHour: string;
+  endHour: string;
+  link?: string;
+  location?: string;
+  endDate: string;
+  startDate: string;
+  learningplan: number;
+  learning_class: number;
 }
 
-const props = withDefaults(defineProps<MeetingsPropsType>(), {
-  data: () => [],
-  canEdit: false,
-  variant: 'list',
-  isFacilitator: false,
+type ScheduleChange = {
+  className?: string;
+  id?: number;
+  type: 'create' | 'delete' | 'update';
+  schedule?: newSchedule;
+};
+
+const backUpSchedules = ref();
+const schedulesChanges = ref<ScheduleChange[]>([]);
+const classModel = ref();
+
+const hasMeetings = computed(() => {
+  return classModel.value?.some((classItem) => classItem.schedules?.length > 0);
 });
 
-const { data } = toRefs(props);
-const myData = toRef(data.value);
-const createScheduleModal = ref(false);
-const dialogMeetingExclusion = ref(false);
-const deleteId = ref();
-const editData = ref<MeetingPropsType | null>(null);
-
-const setDateTime = (
-  endHour: string,
-  startHour: string,
-  date: Date,
-  interval: number,
-) => {
-  const [endHours, endMinutes] = endHour.split(':');
-  const [startHours, startMinutes] = startHour.split(':');
-
-  const meetingStartDate = new Date(date);
-  meetingStartDate.setHours(parseInt(startHours));
-  meetingStartDate.setMinutes(parseInt(startMinutes));
-
-  const meetingEndDate = interval === 0 ? date : props.endDate;
-  meetingEndDate.setHours(parseInt(endHours));
-  meetingEndDate.setMinutes(parseInt(endMinutes));
-  return [meetingStartDate, meetingEndDate];
+const findClassByName = (className) => {
+  return classModel.value?.find((classItem) => classItem?.name === className);
 };
 
-const addMeeting = async (values: MeetingPropsType) => {
-  createScheduleModal.value = false;
+const getSchedules = (classItem) => {
+  return classItem.meeting_schedules?.map((item) => {
+    const earliestMeeting = item.meetings?.find(
+      (meeting) => new Date(meeting.date) >= new Date(),
+    );
 
-  const [meetingStartDate, meetingEndDate] = setDateTime(
-    values.endHour,
-    values.startHour,
-    values.date,
-    values.interval,
-  );
+    const startDate = new Date(item.startDate);
+    const endDate = new Date(item.endDate);
 
-  const result = await create('learning-plan-meeting-schedules', {
-    ...values,
-    name: 'name',
-    learningplan: props.learningPlanId,
-    startDate: meetingStartDate,
-    endDate: meetingEndDate,
+    const startHour =
+      String(startDate.getHours()).padStart(2, '0') +
+      ':' +
+      String(startDate.getMinutes()).padStart(2, '0');
+    const endHour =
+      String(endDate.getHours()).padStart(2, '0') +
+      ':' +
+      String(endDate.getMinutes()).padStart(2, '0');
+    return {
+      id: item.id,
+      startHour,
+      endHour,
+      interval: item.interval,
+      date: earliestMeeting?.date ? new Date(earliestMeeting.date) : false,
+      location: item.type === 'onsite' ? item.location : undefined,
+      link: item.type === 'online' ? item.link : undefined,
+      type: item.type,
+      name: classItem.name,
+    };
   });
-
-  myData.value.push({ ...values, id: result.data.id });
 };
 
-const editMeeting = (values: MeetingPropsType) => {
-  createScheduleModal.value = true;
-  editData.value = values;
-};
+watch(
+  () => props.learningPlanClasses,
+  (newClasses) => {
+    classModel.value = newClasses?.map((classItem) => ({
+      name: classItem.name,
+      id: classItem.id,
+      schedules: getSchedules(classItem),
+    }));
+  },
+);
 
-const updateMeeting = async (values) => {
-  createScheduleModal.value = false;
-  const [meetingStartDate, meetingEndDate] = setDateTime(
-    values.endHour,
-    values.startHour,
-    values.date,
-    values.interval,
-  );
+function deepClone(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
 
-  myData.value = myData.value.map((meeting) => {
-    if (meeting.id === values.id) {
-      return {
-        ...values,
-        startDate: meetingStartDate,
-        endDate: meetingEndDate,
-        learningplan: props.learningPlanId,
-      };
+  const clone = Array.isArray(obj) ? [] : {};
+
+  for (const i in obj) {
+    if (obj[i] instanceof Date) {
+      clone[i] = new Date(obj[i].valueOf());
+    } else if (typeof obj[i] === 'object' && obj[i] !== null) {
+      clone[i] = deepClone(obj[i]);
+    } else {
+      clone[i] = obj[i];
     }
-    return meeting;
+  }
+
+  return clone;
+}
+
+const toggleEditMode = () => {
+  editMeetings.value = !editMeetings.value;
+  if (editMeetings.value) {
+    backUpSchedules.value = deepClone(classModel.value);
+  }
+};
+
+const updateScheduleId = (className, scheduleID, resID) => {
+  const classItem = findClassByName(className);
+  const schedule = classItem?.schedules.find(
+    (schedule) => schedule.id === scheduleID,
+  );
+  schedule.id = resID;
+};
+
+const onSave = async () => {
+  const endpoint = 'learning-plan-meeting-schedules';
+  try {
+    const tasks = schedulesChanges.value.map((element) => {
+      switch (element.type) {
+        case 'create':
+          if (element.schedule === undefined) {
+            throw new Error('element.schedule is undefined');
+          }
+          return strapi.create(endpoint, element.schedule).then((res) => {
+            updateScheduleId(element.className, element.id, res.data.id);
+          });
+        case 'delete':
+          return strapi.delete(endpoint, element.id);
+        case 'update':
+          if (element.schedule?.id === undefined) {
+            throw new Error('element.schedule.id is undefined');
+          }
+          return strapi.update(endpoint, element.schedule.id, element.schedule);
+        default:
+          return Promise.resolve();
+      }
+    });
+
+    await Promise.all(tasks);
+
+    setMessage(i18n.t('components.courses.meeting.success'), 'green', true);
+  } catch (error) {
+    setMessage(i18n.t('components.courses.meeting.errorSaving'), 'error', true);
+  }
+  schedulesChanges.value = [];
+  editMeetings.value = false;
+};
+
+const onCancel = () => {
+  classModel.value = deepClone(backUpSchedules.value);
+  editMeetings.value = false;
+  schedulesChanges.value = [];
+  editMeetings.value = false;
+};
+
+const convertDate = (date, time) => {
+  const [hour, minute] = time.split(':');
+  const [year, month, day] = date.split('-');
+  return new Date(year, month - 1, day, hour, minute);
+};
+
+const handleCreate = (newSchedule) => {
+  const { className, id, ...schedule } = newSchedule;
+  const scheduleClass = findClassByName(className);
+  scheduleClass?.schedules.push(newSchedule);
+  schedulesChanges.value.push({
+    schedule: {
+      ...schedule,
+      date: newSchedule.date,
+      startDate: convertDate(newSchedule.date, newSchedule.startHour),
+      endDate: convertDate(props.classInfo?.end, newSchedule.endHour),
+      learningplan: props.learningPlanId,
+      learning_class: scheduleClass.id,
+    },
+    id,
+    className,
+    type: 'create',
   });
+};
 
-  await update('learning-plan-meeting-schedules', values.id, {
-    ...values,
-    startDate: meetingStartDate,
-    endDate: meetingEndDate,
+const handleDelete = (className: string, scheduleID: number) => {
+  deleteModal.value = true;
+  schedulesChanges.value.push({
+    className,
+    id: scheduleID,
+    type: 'delete',
   });
-  editData.value = null;
 };
 
-const openExclusionDialog = (id) => {
-  dialogMeetingExclusion.value = true;
-  if (id) deleteId.value = id;
+const confirmDelete = () => {
+  const DeletedSchedule =
+    schedulesChanges.value[schedulesChanges.value.length - 1];
+  deleteModal.value = false;
+  const classItem = findClassByName(DeletedSchedule.className);
+  classItem?.schedules.splice(
+    classItem?.schedules.findIndex(
+      (schedule) => schedule.id === DeletedSchedule.id,
+    ),
+    1,
+  );
 };
 
-const removeMeeting = async () => {
-  dialogMeetingExclusion.value = false;
-  await _delete('learning-plan-meeting-schedules', deleteId.value);
-  myData.value = myData.value.filter((item) => item.id !== deleteId.value);
+const cancelDelete = () => {
+  deleteModal.value = false;
+  schedulesChanges.value.pop();
 };
 
-const isEditing = computed(() => props.variant === 'editing');
+const scheduleToUpdate = ref();
 
-watch(data, () => {
-  myData.value = data.value;
-});
+const handleUpdate = (className: string, newSchedule) => {
+  if (typeof newSchedule.date !== 'string') {
+    newSchedule.date = newSchedule.date.toISOString().split('T')[0];
+  }
+  scheduleToUpdate.value = {
+    ...newSchedule,
+    className,
+  };
+  scheduleModal.value = true;
+};
+
+const confirmUpdate = (newSchedule) => {
+  const scheduleUpdateClass = findClassByName(newSchedule.className);
+
+  if (newSchedule.className === scheduleToUpdate.value.className) {
+    scheduleUpdateClass?.schedules.splice(
+      scheduleUpdateClass?.schedules.findIndex(
+        (schedule) => schedule.id === newSchedule.id,
+      ),
+      1,
+      newSchedule,
+    );
+  } else {
+    const scheduleOldClass = findClassByName(scheduleToUpdate.value.className);
+    scheduleOldClass?.schedules.splice(
+      scheduleOldClass?.schedules.findIndex(
+        (schedule) => schedule.id === newSchedule.id,
+      ),
+      1,
+    );
+    scheduleUpdateClass?.schedules.push(newSchedule);
+  }
+
+  const classId = findClassByName(newSchedule.className)?.id;
+  scheduleModal.value = true;
+  schedulesChanges.value.push({
+    type: 'update',
+    schedule: {
+      ...newSchedule,
+      date: newSchedule.date,
+      startDate: convertDate(newSchedule.date, newSchedule.startHour),
+      endDate: convertDate(props.classInfo?.end, newSchedule.endHour),
+      learningplan: props.learningPlanId,
+      learning_class: classId,
+    },
+  });
+};
 </script>
 
 <style scoped lang="scss">
-.title {
-  color: var(--Cinza-Cinza-800, #454d54);
-
-  /* Header/H5 */
-  font-family: Sen;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: 0.36px;
-}
-
-.bordered {
-  border-radius: 8px;
-  border: 1px solid var(--Cinza-Cinza-100, #ebedef);
-}
-
-.desactivated {
-  color: var(--cinza-cinza-500, #8291a1);
-  text-align: center;
-
-  /* Body/P1 */
-  font-family: Sen;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 135%; /* 21.6px */
-  letter-spacing: 0.32px;
+.add-button {
+  text-transform: none;
+  border: 1px dashed var(--cinza-cinza-600, #6e7a87);
 }
 </style>

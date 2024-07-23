@@ -2,10 +2,12 @@ import { h } from 'vue';
 import type { IconSet, IconProps } from 'vuetify';
 import trail from './Trail.vue';
 import DragIndicator from './DragIndicator.vue';
+import RoundAddPhoto from './RoundAddPhoto.vue';
 
 const alexAliases = {
   trail,
   DragIndicator,
+  RoundAddPhoto,
 };
 
 const alexIcons: IconSet = {

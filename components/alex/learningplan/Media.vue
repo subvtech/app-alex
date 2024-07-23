@@ -3,18 +3,18 @@
     class="mb-6"
     :title="title"
     :is-editing="isEditingAndCanEdit"
-    :show-icon="canEdit"
-    :cancel="onCancel"
-    :save="onSave"
+    no-icon="canEdit"
     full-width
     :disable-save="valueWasNotChanged"
+    @click:cancel="onCancel"
+    @click:save="onSave"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
       <div class="d-flex flex-column w-100 align-self-center gap-8">
         <alex-custom-empty-placeholder
           v-if="images.length === 0 && !isEditingAndCanEdit"
-          :empty-text-image="'/svg/emptyMedia.svg'"
+          :empty-text-image="'/svg/EmptyMedia.svg'"
           :empty-text-message="
             emptyTextMessage ?? $t('pages.courses.media.empty')
           "
@@ -67,6 +67,8 @@ const onCancel = async () => {
     .map((media) => _delete('upload/files', media.imgId));
   images.value = initialImages.value;
   await Promise.all(deletedMedia);
+
+  isEditing.value = !isEditing.value;
 };
 const setInitialImages = () => {
   initialImages.value = JSON.parse(JSON.stringify(props.images));
@@ -76,23 +78,24 @@ const toggleIsEditing = () => {
   setInitialImages();
 };
 const onSave = async () => {
-  const updatedMedia: Omit<TagSimple, 'learningplans'>[] = await client(
-    `/learningplans/${props.learningplanId}/media`,
-    {
-      method: 'PUT',
-      body: {
-        media: images.value,
-      },
-      onResponse: ({ response }) => {
-        if (!response.ok) {
-          setMessage('Algo deu errado ao salvar as alterações', 'red', true);
-          return;
-        }
-        initialImages.value = updatedMedia;
-        images.value = updatedMedia;
-      },
+  await client(`/learningplans/${props.learningplanId}/media`, {
+    method: 'PUT',
+    body: {
+      media: images.value,
     },
-  );
+    onResponse: async ({ response }) => {
+      if (!response.ok) {
+        setMessage('Algo deu errado ao salvar as alterações', 'red', true);
+        return;
+      }
+      const updatedMedia: Omit<TagSimple, 'learningplans'>[] =
+        await response._data;
+      initialImages.value = updatedMedia;
+      images.value = updatedMedia;
+    },
+  });
+
+  isEditing.value = !isEditing.value;
 };
 </script>
 

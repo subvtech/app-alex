@@ -53,6 +53,20 @@
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
+            </tr>
+            <tr>
+              <td>variant</td>
+              <td>string</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+            </tr>
+            <tr>
+              <td>size</td>
+              <td>string</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
             </tr></tbody
         ></v-table>
       </div>

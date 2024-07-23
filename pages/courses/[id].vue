@@ -7,12 +7,12 @@
       :profile-picture-size="24"
       :profile-picture="learningPlanStore.facilitator?.user?.avatar"
       :user-id="user.id"
-      :title="$t('pages.courses.class')"
+      :title="bannerTitle.title"
       :show-settings="learningPlanStore.userIsFacilitator"
       distribution="fullname-username-role"
       :fullname="learningPlanStore.facilitator?.user?.fullname"
       :description="learningPlanStore.learningPlan?.title"
-      :subtitle="learningPlanStore.learningPlan?.class_name"
+      :subtitle="bannerTitle.subtitle"
       :start-date="learningPlanStore.startDateFormated"
       :end-date="learningPlanStore.endDateFormated"
       :links="isJoinRoutePath ? [] : generalLinks"
@@ -54,7 +54,12 @@ const user = useStrapiUser<User>();
 const route = useRoute();
 const learningPlanStore = useLearningPlanStore();
 const isJoinRoutePath = computed(() => {
-  return route.name === 'courses-id-join-hash';
+  if (!route?.name) {
+    return false;
+  }
+  const isRoute = route.name === 'courses-id-join-hash';
+
+  return isRoute;
 });
 
 const isSettingsRoutePath = computed(() => {
@@ -71,6 +76,7 @@ const fetchData = async () => {
   await useAsyncData('learningPlanDetails', () =>
     learningPlanStore.loadLearningPlan(learningPlanId.value),
   );
+
   headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/');
@@ -102,17 +108,33 @@ const fetchData = async () => {
   }
 };
 const pageRoute = computed(() => route.name);
+
+const bannerTitle = computed(() => {
+  if (learningPlanStore.userIsFacilitator) {
+    return {
+      title: i18n.t('pages.courses.identifier'),
+      subtitle: learningPlanStore.learningPlan?.slug,
+    };
+  }
+  return {
+    title: i18n.t('pages.courses.class'),
+    subtitle: learningPlanStore.userClass?.name,
+  };
+});
+
 onBeforeMount(async () => {
   headerStore.isLoading = true;
   await fetchData();
 });
+
 onUnmounted(() => {
   learningPlanStore.learningPlan = undefined;
   learningPlanStore.loading = true;
   headerStore.isLoading = false;
 });
+
 watch(pageRoute, async () => {
-  if (pageRoute.value?.toString().includes('courses-id')) {
+  if ((pageRoute.value?.toString() || '').includes('courses-id')) {
     await fetchData();
   }
 });
@@ -120,7 +142,8 @@ watch(pageRoute, async () => {
 const selectOption = (index: number | null) => {
   selectedOption.value = index;
 };
-const generalLinks: TabType[] = [
+
+const generalLinks = computed<TabType[]>(() => [
   {
     label: i18n.t('pages.courses.general'),
     value: 0,
@@ -131,20 +154,31 @@ const generalLinks: TabType[] = [
     value: 1,
     to: `/courses/${learningPlanId.value}/trails`,
   },
+  // {
+  //   label: i18n.t('pages.courses.assignments'),
+  //   value: 2,
+  //   to: `/courses/${learningPlanId.value}/tasks`,
+  // },
   {
-    label: i18n.t('pages.courses.assignments'),
-    value: 2,
-    to: `/courses/${learningPlanId.value}/tasks`,
-  },
-  {
-    label: i18n.t('pages.courses.class'),
+    label: i18n.t('pages.courses.classes'),
     value: 3,
     to: `/courses/${learningPlanId.value}/class`,
   },
-  {
-    label: i18n.t('pages.courses.projects'),
-    value: 4,
-    to: `/courses/${learningPlanId.value}/projects`,
-  },
-];
+  // {
+  //   label: i18n.t('pages.courses.projects'),
+  //   value: 4,
+  //   to: `/courses/${learningPlanId.value}/projects`,
+  // },
+  ...(learningPlanStore.userIsFacilitator
+    ? [
+        {
+          label: '',
+          icon: 'mdi-cog-outline',
+          value: 5,
+          to: `/courses/${learningPlanId.value}/settings`,
+          classes: 'ml-auto',
+        },
+      ]
+    : []),
+]);
 </script>

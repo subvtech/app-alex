@@ -35,7 +35,7 @@
             v-if="hide"
             v-bind="propsTooltip"
             class="hidden-icon"
-            status="dark"
+            status="primary"
             icon="mdi-eye-off-outline"
             variant="elevated"
           >
@@ -73,7 +73,7 @@
       </div>
     </div>
     <div
-      class="d-flex flex-column gap-3"
+      class="d-flex flex-column gap-3 overflow-auto"
       :class="{
         'py-2': !isVertical,
         'pa-4 pb-6': isVertical,

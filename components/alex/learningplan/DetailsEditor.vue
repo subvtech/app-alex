@@ -5,9 +5,9 @@
     full-width
     :title="title"
     :is-editing="isEditing && canEdit"
-    :show-icon="canEdit"
-    :cancel="resetData"
-    :save="updateDetails"
+    no-icon="canEdit"
+    @click:cancel="resetData"
+    @click:save="updateDetails"
     @toggle:is-editing="toggleIsEditing"
   >
     <template #content>
@@ -20,12 +20,7 @@
           :empty-text-message="$t('components.courses.editor.emptyPlaceholder')"
         />
       </div>
-      <app-editor
-        v-else
-        ref="editorDetails"
-        class="w-full p-6 sm:p-16"
-        :data="data"
-      />
+      <app-editor v-else ref="editorDetails" class="w-full p-6 sm:p-16" />
     </template>
   </alex-custom-card>
 </template>
@@ -65,6 +60,7 @@ const updateDetails = async () => {
   });
   isEditing.value = false;
   initialData.value = editorData.data;
+
   emit('update', t('components.courses.editor.update'));
 };
 const toggleIsEditing = () => {
@@ -105,6 +101,8 @@ const resetData = async () => {
     await editorDetails.value?.loadEditor(editorData);
   }
   toggleReadOnly();
+
+  isEditing.value = !isEditing.value;
 };
 onMounted(async () => {
   isLoading.value = true;

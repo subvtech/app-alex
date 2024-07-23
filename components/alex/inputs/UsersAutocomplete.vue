@@ -20,6 +20,7 @@
           :user="{
             email: item.raw.email,
             name: item.raw.fullname,
+            image: item.raw.avatar?.formats?.small?.url || item.raw.avatar?.url,
           }"
           no-delete
           no-checkbox
@@ -34,6 +35,7 @@
         :user="{
           email: item.email,
           name: item.fullname,
+          image: item.avatar?.formats?.small?.url || item.avatar?.url,
         }"
         remove-selection
         @delete="() => removeSelf(item.email)"
@@ -45,17 +47,20 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = { id?: string; email: string; fullname?: string; local?: boolean };
-
+type User = {
+  id?: string;
+  email: string;
+  fullname?: string;
+  local?: boolean;
+  avatar?: { url: string; formats?: { small: { url: string } } } | null;
+};
 interface AutoCompleteUsersProps {
   name: string;
   modelValue: User[];
   ignoreUserIds?: number[];
   ignoreEmails?: string[];
 }
-
 const props = defineProps<AutoCompleteUsersProps>();
-
 const emit = defineEmits([
   'update:modelValue',
   'refresh:invite',
@@ -63,7 +68,7 @@ const emit = defineEmits([
 ]);
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
-const user = useStrapiUser().value;
+const user = useStrapiUser();
 const { value: selectedUser, resetField } = useField<User | null>(
   () => props.name,
   undefined,
@@ -73,16 +78,7 @@ const { value: selectedUser, resetField } = useField<User | null>(
 );
 const search = ref('');
 const items = ref<User[]>([]);
-
-const selectedUsers = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
-
+const selectedUsers = defineModel<User[]>({ required: true });
 const cleanInput = () => {
   search.value = '';
   resetField();
@@ -101,10 +97,10 @@ const filteredItems = computed(() => {
 });
 
 const updateModelValue = () => {
-  if (
-    selectedUser.value &&
-    !selectedUsers.value.find((v) => v.email === selectedUser.value?.email)
-  ) {
+  const wasNotSelectedUser = !selectedUsers.value.find(
+    (v) => v.email === selectedUser.value?.email,
+  );
+  if (selectedUser.value && wasNotSelectedUser) {
     selectedUsers.value.push(selectedUser.value);
   }
   cleanInput();
@@ -120,12 +116,13 @@ useOnStopTyping(search, async () => {
       ],
       id: { $notIn: props.ignoreUserIds || [] },
     },
+    populate: ['avatar'],
   })) as unknown as User[];
   if (registeredFields.length) {
     items.value = registeredFields.filter(
       (itemRequest) =>
         !selectedUsers.value.find((item) => item.id === itemRequest?.id) &&
-        itemRequest.email !== user?.email,
+        itemRequest.email !== user.value?.email,
     );
   }
 });

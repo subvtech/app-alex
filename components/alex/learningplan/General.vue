@@ -27,17 +27,19 @@
                 return { ...item };
               })
             "
+            :no-icon="learningPlanStore.userIsFacilitator"
             :course-id="learningPlan.id"
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.media.empty')"
           />
-          <alex-learningplan-about
+          <app-about
             sizing-class="pa-0"
             is-nested
             hide-dividers
             full-width
             :text="learningPlan.description"
             :user-id="user.id"
+            :no-icon="learningPlanStore.userIsFacilitator"
             :can-edit="learningPlanStore.userIsFacilitator"
             :empty-text-message="$t('pages.courses.about.empty')"
             @update="updateAbout"
@@ -50,6 +52,7 @@
             :course-id="learningPlan.id"
             :user-id="user.id"
             :data="learningGoals"
+            :no-icon="learningPlanStore.userIsFacilitator"
             :tooltip="$t('components.courses.goals.tooltip')"
             @update="(data) => emit('update', data)"
           />
@@ -62,6 +65,7 @@
             :course-id="learningPlan.id"
             :title="$t('components.courses.editor.title')"
             :can-edit="learningPlanStore.userIsFacilitator"
+            :no-icon="learningPlanStore.userIsFacilitator"
             @update="(data) => emit('update', data)"
           />
         </div>
@@ -71,7 +75,7 @@
     <div
       class="d-flex flex-column w-100 gap-6 min-w-card flex-wrap max-width-card-right"
     >
-      <alex-custom-card v-if="loading" title="" :show-icon="false">
+      <alex-custom-card v-if="loading" title="">
         <template #content>
           <div class="d-flex bg-white rounded-lg align-center w-100 gap-4">
             <alex-custom-skeleton class="w-100 height-32" color="gray-200" />
@@ -84,65 +88,56 @@
       <alex-custom-card
         v-else
         :title="$t('pages.courses.details')"
-        :show-icon="false"
         class="w-100"
       >
         <template #content>
-          <app-general-boxes
-            :boxes="[
-              {
-                icon: 'mdi-account-outline',
-                number: learningPlanStore.activeMembers.length,
-                label: 'students',
-              },
-              {
-                icon: 'trails.svg',
-                number: learningPlanStore.standardTrails.length,
-                label: 'trails',
-              },
-              {
-                icon: 'mdi-newspaper-variant-multiple-outline',
-                number: 0,
-                label: 'assignments',
-              },
-            ]"
-            hide-dividers
+          <alex-profile-detail-boxes
+            class="max-w-125"
+            :boxes="detailBoxes"
+            :loading="loading"
+            hide-divider
           />
         </template>
         <template #footer>
-          <div class="w-100 fix-margin pb-6">
-            <alex-learningplan-meetings
-              is-nested
-              hide-dividers
-              sizing-class="ma-0"
-              :can-edit="learningPlanStore.userIsFacilitator"
-              :data="schedules"
-              :end-date="new Date()"
-              :is-facilitator="learningPlanStore.userIsFacilitator"
-              :to="
-                learningPlanStore.userIsFacilitator
-                  ? `${learningPlan.id}/settings`
-                  : ''
-              "
-              :learning-plan-id="learningPlan.id"
-            />
-            <alex-learningplan-invites
-              v-if="canEdit"
-              full-width
-              :enable-invites="learningPlan.invite_enabled"
-              :duration="learningPlan.invitation_duration"
-              :course-id="learningPlan.id"
-              :data="invitationLink"
-              @update:link="
-                (data) => {
-                  plainLink = data.url;
-                }
-              "
-              @link:expired="plainLink = null"
-            />
+          <div
+            v-if="canEdit && learningPlanClasses?.length"
+            class="w-100 fix-margin pb-6"
+          >
+            <p class="text-gray-800 text-h5 pb-6">
+              {{ $t('components.courses.invites.title') }}
+            </p>
+            <div v-if="learningPlan.invite_enabled">
+              <alex-learningplan-invites
+                v-for="classItem in learningPlanClasses"
+                :key="classItem.id"
+                full-width
+                :class-name="classItem.name"
+                :duration="learningPlan.invitation_duration"
+                :course-id="learningPlan.id"
+                :class-id="classItem.id"
+                :data="classItem.activeLink"
+                @update:link="
+                  (data) => {
+                    plainLink = data.url;
+                  }
+                "
+                @link:expired="plainLink = null"
+              />
+            </div>
+            <div v-else class="d-flex justify-center w-100">
+              <span class="text-body-1 text-gray-500">{{
+                $t('components.courses.invites.desactivated')
+              }}</span>
+            </div>
           </div>
         </template>
       </alex-custom-card>
+      <alex-learningplan-meetings
+        :learning-plan-classes="learningPlanClasses"
+        :learning-plan-id="learningPlan?.id"
+        :can-edit="learningPlanStore.userIsFacilitator"
+        :class-info="classInfo"
+      />
       <alex-learningplan-skeleton-competence v-if="loading" />
       <alex-learningplan-competences
         v-if="
@@ -182,7 +177,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { MeetingPropsType } from '~/components/CourseMeeting.vue';
+import { BoxItemType } from '@/components/alex/profile/BoxItem.vue';
+import { MeetingPropsType } from '@/components/alex/learningplan/Meeting.vue';
+import { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;
@@ -196,12 +193,14 @@ const props = withDefaults(defineProps<GeneralProps>(), {
   schedules: () => [],
   loading: false,
 });
+
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
 const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
 const user = useStrapiUser<User>();
+
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
     description: text,
@@ -215,25 +214,73 @@ const showDetails = computed(() => {
   return props.learningPlan.details?.data?.length !== 0;
 });
 
-const learningGoals = computed(() =>
-  props.learningPlan.learning_goals.map((goal, index) => ({
-    id: goal.id,
-    title: goal.description,
-    keyWord: goal.verb.text,
-    errorKeyWord: false,
-    errorTitle: false,
-    contentData: {
+const learningGoals = computed(
+  () =>
+    props.learningPlan.learning_goals?.map((goal, index) => ({
       id: goal.id,
-      index,
-      description: goal.description,
-      verb: {
-        id: goal.verb.id,
-        text: goal.verb.text,
-        general: goal.verb.general,
+      title: goal.description,
+      keyWord: goal.verb.text,
+      errorKeyWord: false,
+      errorTitle: false,
+      contentData: {
+        id: goal.id,
+        index,
+        description: goal.description,
+        verb: {
+          id: goal.verb.id,
+          text: goal.verb.text,
+          general: goal.verb.general,
+        },
       },
-    },
-  })),
+    })),
 );
+
+const getActiveLink = (classItem: ClassSimple) => {
+  const activeLinks = classItem?.invitation_links?.filter(
+    (invite) =>
+      !invite.is_expired &&
+      (invite.emails_to_send ||
+        new Date(invite.expires_at).getTime() > new Date().getTime()),
+  );
+
+  return activeLinks && activeLinks.length > 0
+    ? activeLinks[activeLinks.length - 1]
+    : null;
+};
+
+const learningPlanClasses = computed(() => {
+  return props.learningPlan?.classes?.map((classItem) => ({
+    name: classItem.name,
+    id: classItem.id,
+    activeLink: getActiveLink(classItem),
+    meeting_schedules: classItem.meeting_schedules,
+  }));
+});
+
+const classInfo = computed(() => {
+  return {
+    start: props.learningPlan?.start_date,
+    end: props.learningPlan?.end_date,
+  };
+});
+
+const detailBoxes = computed<BoxItemType[]>(() => [
+  {
+    icon: 'mdi-account-outline',
+    number: learningPlanStore.activeMembers.length,
+    label: 'students',
+  },
+  {
+    icon: 'trails.svg',
+    number: learningPlanStore.standardTrails.length,
+    label: 'trails',
+  },
+  {
+    icon: 'mdi-newspaper-variant-multiple-outline',
+    number: 0,
+    label: 'assignments',
+  },
+]);
 </script>
 
 <style scope lang="scss">

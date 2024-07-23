@@ -22,7 +22,7 @@
       no-resize
       role="textarea"
       clear-icon="mdi-close"
-      :class="theme"
+      :class="[theme, $attrs.hasOwnProperty('auto-grow') ? 'auto-height' : '']"
       :error-messages="errorMessage"
       :disabled="disabled"
       v-bind="$attrs"
@@ -31,7 +31,12 @@
       <template #append-inner>
         <alex-custom-tooltip v-if="appendInnerIcon" :text="appendInnerIconHint">
           <template #content>
-            <v-icon class="pointer" color="#6E7A87" @click="$emit('click:append-inner')">{{ appendInnerIcon }}</v-icon>
+            <v-icon
+              class="pointer"
+              color="#6E7A87"
+              @click="$emit('click:append-inner')"
+              >{{ appendInnerIcon }}</v-icon
+            >
           </template>
         </alex-custom-tooltip>
       </template>
@@ -51,10 +56,13 @@ interface TextAreaProps {
   disabled?: boolean;
   appendInnerIcon?: string;
   appendInnerIconHint?: string;
+  expandHeight?: boolean;
   theme?: 'light' | 'dark';
 }
+defineEmits(['click:append-inner']);
 const props = withDefaults(defineProps<TextAreaProps>(), {
   disabled: false,
+  expandHeight: false,
   theme: 'light',
   info: undefined,
   label: undefined,
@@ -88,6 +96,11 @@ const textColor = computed(() => {
     --v-border-color: rgb(var(--v-theme-gray-400));
   }
 
+  .auto-height {
+    .v-field__input {
+      height: auto !important;
+    }
+  }
   .v-field__input {
     color: rgb(var(--v-theme-gray-300));
     border-color: rgb(var(--v-theme-gray-400));

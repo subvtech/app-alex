@@ -1,7 +1,6 @@
 <template>
   <alex-custom-card
     :title="$t('components.courses.settings.title')"
-    :show-icon="false"
     :align-content="'align-center'"
   >
     <template #content>
@@ -11,24 +10,15 @@
           @update="fetchData"
         />
         <alex-learningplan-settings-general
-          :title="myTitle"
-          :start-date="myStartDate"
-          :end-date="myEndDate"
-          :slug="myIdentifier"
-          :learning-plan-id="parseInt(id.toString())"
+          :id="parseInt(id.toString())"
+          :title="learningPlan.title"
+          :start-date="learningPlan.start_date"
+          :end-date="learningPlan.end_date"
+          :slug="learningPlan.slug"
           :access-url="accessUrl"
           outline
           full-width
-          @update="handleGeneralUpdate()"
-        />
-        <alex-learningplan-meetings
-          can-edit
-          is-facilitator
-          :learning-plan-id="parseInt(id.toString())"
-          :data="schedules"
-          :end-date="new Date(learningPlan.end_date.replaceAll('-', '/'))"
-          variant="editing"
-          outline
+          @update="handleGeneralUpdate"
         />
         <alex-learningplan-settings-invites
           :learning-plan-id="parseInt(id.toString())"
@@ -44,7 +34,7 @@
           outline
           @update="updateVisibility"
         />
-        <alex-learningplan-settings-delete outline @update="removeCourse" />
+        <alex-learningplan-settings-delete @update="removeCourse" />
       </div>
     </template>
   </alex-custom-card>
@@ -57,27 +47,17 @@ const { setMessage } = useMessageStore();
 const router = useRouter();
 const route = useRoute();
 const { id } = route.params;
-const myTitle = ref('');
-const myStartDate = ref('');
-const myEndDate = ref('');
-const myIdentifier = ref('');
 const accessUrl = computed(() => {
   return `${window.location.origin}/courses/${id}`;
 });
-
 
 const learningPlanStore = useLearningPlanStore();
 const fetchData = async () => {
   await learningPlanStore.loadLearningPlan(parseInt(id.toString()));
 };
 
-const handleGeneralUpdate = async () => {
-  await update(`learningplans/${id}`, {
-    title: myTitle.value,
-    start_date: new Date(myStartDate.value).toISOString(),
-    end_date: new Date(myEndDate.value).toISOString(),
-    slug: myIdentifier.value,
-  });
+const handleGeneralUpdate = async (data) => {
+  await update(`learningplans/${id}`, { ...data });
   setMessage(t('components.courses.settings.general.update'), 'green', true);
   fetchData();
 };

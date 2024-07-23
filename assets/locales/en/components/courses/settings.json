@@ -4,10 +4,8 @@
   "myCourses": "My courses",
   "title": "Settings",
   "formats": "Supported Formats: .jpeg, .png, .wav, .mp4, .jpg;",
-
   "syncMeetingsTitle": "Synchronous Meetings",
   "noSyncMeetings": "It seems there are no synchronous meetings.",
-
   "update": "Course successfully updated",
   "cover": {
     "title": "Course Cover",
@@ -16,7 +14,7 @@
   },
   "general": {
     "title": "General Information",
-    "courseTitle": "Course name",
+    "name": "Course name",
     "startDate": "Start date",
     "endDate": "End date",
     "identifier": {
@@ -26,7 +24,8 @@
     },
     "cancel": "Cancel",
     "save": "Save Changes",
-    "update": "General information successfully updated"
+    "update": "General information successfully updated",
+    "error": "An error occurred while updating the course. Please try again later."
   },
   "meetings": {
     "title": "Edit synchronous meeting",
@@ -45,18 +44,17 @@
       "cancel": "Cancel"
     }
   },
-
   "delete": {
-    "courseTitle": "Delete Course",
-    "courseDescription": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
+    "title": "Delete Course",
+    "warning": "After deleting the course, all tracks, photos, videos, files will be lost. You will no longer have access to any content from this course. So please be sure before proceeding.",
     "button": "Delete Course",
-    "deleteConfirmation": "Do you really wish to delete the course?",
+    "confirmation": "Do you really wish to delete the course?",
     "description": "By deleting a course you will lose all the content associated with it.",
     "label": "Enter the word:",
     "placeholder": "Enter the word to confirm",
     "word": "Delete",
     "cancel": "Cancel",
-    "match": "It doesn't match with the Delete",
+    "matchError": "It doesn't match with the Delete",
     "update": "The Course was deleted"
   },
   "invite": {
@@ -83,11 +81,11 @@
   },
   "visibility": {
     "title": "Course Visibility",
-    "showCourse": {
+    "show": {
       "title": "Show Course (Public)",
       "hint": "Makes the course public, allowing any user to find it through search."
     },
-    "hideCourse": {
+    "hide": {
       "title": "Hide Course (Private)",
       "hint": "Makes the course private, ensuring only members can see the course."
     },

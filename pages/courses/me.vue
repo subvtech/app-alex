@@ -1,20 +1,24 @@
 <template>
-  <div class="wrapper d-flex flex-column">
+  <div class="d-flex flex-column">
     <alex-custom-header
-      class="mb-6"
+      class="mb-6 mt-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"
+      :button-size="'large'"
       :main-button-text="$t('pages.classes.newCourse')"
       main-button-icon="mdi-plus"
       no-back-arrow
       @main-action="() => (createCourseDialog = true)"
     />
-    <alex-learningplan-dialogs-create-learningplan
+    <alex-learningplan-dialogs-create
       v-model="createCourseDialog"
       @submit="getCourses()"
     />
-    <div style="flex: 1" class="d-flex bg-white flex-column rounded-lg pa-6">
+    <div
+      style="flex: 1"
+      class="d-flex bg-white wrapper flex-column rounded-lg pa-6"
+    >
       <div
         v-if="courses.length == 0"
         style="flex: 1"
@@ -49,7 +53,7 @@
             hide-details
             class="w-50"
             style="min-width: 160px; max-width: 320px"
-            density="compact"
+            density="comfortable"
           />
           <div>
             <v-tooltip
@@ -105,19 +109,21 @@
             'tags',
           ]"
           class="d-flex flex-wrap"
-          style="flex: 1; position: relative"
+          style="flex: 1; position: relative; max-height: min-content"
         >
           <template #default="{ items }">
             <div
               v-if="coursesView === 'grid'"
-              class="d-flex ga-6 grid-container flex-wrap w-100"
+              :class="[
+                'grid-container w-100',
+                isSingleColumn ? 'grid-none' : '',
+              ]"
             >
               <alex-learningplan-card
                 v-for="(course, index) in items"
                 v-show="!course.raw.hidden || professorMode"
                 :key="course.raw.title + index"
                 type="course"
-                class="w-100"
                 :title="course.raw.title"
                 :options="course.raw.userIsFacilitator"
                 :description="course.raw.description"
@@ -128,6 +134,7 @@
                   name: course.raw.facilitatorName,
                   imageURL: course.raw.facilitatorImage,
                 }"
+                class="flex-stretch w-100 h-100"
                 :trails-count="course.raw.trails"
                 :hide="course.raw.hidden"
                 :hide-favorited-button="true"
@@ -189,7 +196,7 @@
                     >
                       <template #activator="{ props: propsMenu }">
                         <v-tooltip
-                          text="Opções"
+                          :text="$t('components.learningPlan.card.options')"
                           location="bottom"
                           content-class="bg-gray-800"
                         >
@@ -214,7 +221,7 @@
             <div
               class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
             >
-              <p class="text-body-3 text-gray-600">
+              <p class="show-cardlist text-body-3 text-gray-600">
                 {{ showingData(groupedItems) }}
               </p>
               <alex-custom-pagination
@@ -222,6 +229,7 @@
                 v-model="page"
                 :length="pageCount"
                 :total-visible="5"
+                class="extra-mb"
               />
             </div>
           </template>
@@ -235,17 +243,18 @@
 definePageMeta({
   middleware: 'auth',
 });
+const { find } = useStrapiUtils();
+const { update } = useStrapi();
+const learningPlanStore = useLearningPlanStore();
+const { t } = useI18n();
 
 const coursesView = ref('grid');
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
 const isLoading = ref(false);
-const { t } = useI18n();
-
-const { find } = useStrapiUtils();
-const { update } = useStrapi();
 const createCourseDialog = ref(false);
+
 interface LearningPlan {
   id?: number;
   description: string;
@@ -263,12 +272,18 @@ interface LearningPlan {
   learning_structures?: any;
 }
 
+interface DataTableHeader {
+  title: string;
+  key: string;
+  sortable?: boolean;
+}
+
 const courses = ref<LearningPlanSimple[]>([]);
 const user = useStrapiUser<User>();
 
-const professorMode = computed(
-  () => user.value.role.type === UserRoles.PROFESSOR,
-);
+const professorMode = computed(() => {
+  return user.value?.role?.type === UserRoles.PROFESSOR;
+});
 
 const queryConfig = {
   filters: {
@@ -325,19 +340,19 @@ const getCourses = async () => {
     const facilitator = course.members.find(
       (m) => m.role === MemberRoles.FACILITATOR,
     )?.user;
-
+    course.userIsFacilitator = facilitator?.id === user.value.id;
     const tags = course.tags?.map((tag) => tag);
     const trails =
       course.learning_structures?.find(
         (structure) => structure.type === 'standard',
-      )?.trails?.length || 0;
-
+      )?.trails || [];
     course.facilitatorImage = facilitator?.avatar?.url;
     course.facilitatorName = facilitator?.fullname;
     course.institution = facilitator?.institutions?.[0]?.name;
     course.tags = tags;
-    course.trails = trails;
-    course.userIsFacilitator = facilitator?.id === user.value.id;
+    course.trails = course.userIsFacilitator
+      ? trails.length
+      : trails.filter((trail) => !trail.hidden).length;
 
     courses.value.push(course);
   });
@@ -362,10 +377,11 @@ const showingData = (groupedItems) => {
       ? courses.value.length
       : page.value * itemsPerPage;
   const total = courses.value.length;
-  const message = t('pages.classes.showingData', {
+  const message = t('pages.courses.showingData', {
     from,
     to,
     total,
+    entity: t('pages.courses.courses'),
   });
   if (to === 0) {
     return t('pages.classes.noData');
@@ -406,12 +422,7 @@ const dropdownItems = (hidden, index, id) => {
   ];
 };
 
-interface DataTableHeader {
-  title: string;
-  key: string;
-  sortable?: boolean;
-}
-
+const direction = useDirection();
 const headers: DataTableHeader[] = [
   {
     title: t('pages.classes.tableHeaders.course'),
@@ -430,6 +441,8 @@ const headers: DataTableHeader[] = [
     key: 'trails',
   },
 ];
+
+const isSingleColumn = computed(() => direction.value !== 'VERTICAL');
 
 const changeViewMode = () => {
   coursesView.value = coursesView.value === 'grid' ? 'table' : 'grid';
@@ -495,7 +508,12 @@ const navigate = (id: number, page) => {
 
 .grid-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+
+  height: min-content;
+  column-gap: 24px;
+  row-gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  justify-content: center; /* Centers the grid items horizontally */
 }
 
 .flex-stretch {
@@ -512,13 +530,32 @@ const navigate = (id: number, page) => {
   opacity: 0.5;
 }
 
+.grid-none {
+  grid-template-columns: 1fr !important;
+}
+
 @media (max-width: 1280px) {
-  .grid-container {
-    display: flex !important;
-  }
   .flex-stretch {
     flex: 1;
     box-sizing: border-box !important;
+  }
+}
+@media (max-width: 725px) {
+  .flex-stretch {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 477px) {
+  .show-cardlist {
+    font-size: 12px !important;
+    letter-spacing: 0.4px !important;
+  }
+}
+
+@media (max-width: 431px) {
+  .extra-mb {
+    translate: 0 -16px;
   }
 }
 </style>

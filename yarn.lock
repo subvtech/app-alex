@@ -9429,6 +9429,20 @@ openai@^4.17.3:
     node-fetch "^2.6.7"
     web-streams-polyfill "^3.2.1"
 
+openai@^4.37.0:
+  version "4.37.0"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-4.37.0.tgz#7a43850626da4670e9a6723c5b29f89845c3c514"
+  integrity sha512-dB0XXg6k0TPIC/QgmsDfcbpxxPCNRrG4sB13Ut/6RER0t5eifBRqC/5U6KQS4D6DRxXzQhtiizDxDwy1o67xfQ==
+  dependencies:
+    "@types/node" "^18.11.18"
+    "@types/node-fetch" "^2.6.4"
+    abort-controller "^3.0.0"
+    agentkeepalive "^4.2.1"
+    form-data-encoder "1.7.2"
+    formdata-node "^4.3.2"
+    node-fetch "^2.6.7"
+    web-streams-polyfill "^3.2.1"
+
 openapi-typescript@^6.7.1:
   version "6.7.3"
   resolved "https://registry.yarnpkg.com/openapi-typescript/-/openapi-typescript-6.7.3.tgz#7fe131a28551c8996e4a680e4698d0e1206635ba"
@@ -12331,6 +12345,11 @@ videojs-youtube@^3.0.1:
   dependencies:
     video.js "5.x || 6.x || 7.x || 8.x"
 
+viewerjs@^1.11.6:
+  version "1.11.6"
+  resolved "https://registry.yarnpkg.com/viewerjs/-/viewerjs-1.11.6.tgz#19a1e78c15eba5a9fbbf34ebc5ab312d6e8932ed"
+  integrity sha512-TlhdSp2oEOLFXvEp4psKaeTjR5zBjTRcM/sHUN8PkV1UWuY8HKC8n7GaVdW5Xqnwdr/F1OmzLik1QwDjI4w/nw==
+
 viewerjs@^1.5.0:
   version "1.11.5"
   resolved "https://registry.yarnpkg.com/viewerjs/-/viewerjs-1.11.5.tgz#01228f383abd6febb04ab1bae26a6592fb2e4f15"
@@ -12612,6 +12631,11 @@ vue-i18n@^9.2.2:
     "@intlify/shared" "9.3.0"
     "@intlify/vue-devtools" "9.3.0"
     "@vue/devtools-api" "^6.5.0"
+
+vue-matomo@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/vue-matomo/-/vue-matomo-4.2.0.tgz#d65e369e4ead1d95ef790bef3627512cac3d25e9"
+  integrity sha512-m5hCw7LH3wPDcERaF4sp/ojR9sEx7Rl8TpOyH/4jjQxMF2DuY/q5pO+i9o5Dx+BXLSa9+IQ0qhAbWYRyESQXmA==
 
 vue-plyr@^7.0.0:
   version "7.0.0"

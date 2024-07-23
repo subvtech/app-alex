@@ -1,8 +1,9 @@
 {
-  "title": "Convite do curso",
+  "pending": "Convites Pendentes",
+  "title": "Convites do curso",
   "expired": "Convite expirado",
   "countdown": "Tempo Restante: ",
-  "desactivated": "Convite desativado",
-  "refresh": "Refresh link",
+  "deactivated": "Convite desativado",
+  "refresh": "Renovar",
   "copy": "Copiar"
 }

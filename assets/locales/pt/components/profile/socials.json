@@ -1,9 +1,20 @@
 {
   "title": "Redes sociais",
-  "editSocialName": "Qual o nome do site?",
-  "editSocialUrl": "Qual o endereço do site?",
-  "addSocial": "Qual rede deseja adicionar?",
+  "addDialog": {
+    "label": "Qual rede deseja adicionar?",
+    "placeholder": "Selecione um tipo"
+  },
+  "editForm": {
+    "name": {
+      "placeholder": "Selecione um tipo",
+      "label": "Qual o nome do site?"
+    },
+    "url": {
+      "placeholder": "URL",
+      "label": "Qual o endereço do site?"
+    }
+  },
   "empty": "Nenhuma rede social adicionada",
   "otherSocial": "Outra rede",
-  "update": "Rede Social atualizada"
+  "update": "Rede sociais atualizadas"
 }

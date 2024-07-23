@@ -1,5 +1,5 @@
 <template>
-  <alex-custom-card title="" :show-icon="false">
+  <alex-custom-card title="">
     <template #content>
       <div class="d-flex bg-white rounded-lg align-center w-100 gap-4">
         <alex-custom-skeleton

@@ -34,7 +34,7 @@
       ><alex-custom-chip
         v-if="!noChip && !hasChip && selected"
         :text="$t('pages.classes.participating')"
-        status="success"
+        status="green"
         size="small"
       />
       <slot name="chip" />
@@ -62,13 +62,23 @@
       </template>
     </template>
     <template #title
-      ><p v-if="!user.name" class="text-body-4 text-gray-900">
+      ><p
+        v-if="!user.name"
+        class="text-body-4 text-gray-900 ellipsis lines-1 overflow-x-hidden"
+      >
         {{ user.email }}
       </p>
-      <p v-else class="text-body-4 text-gray-900">{{ user.name }}</p></template
+      <p
+        v-else
+        class="text-body-4 text-gray-900 ellipsis lines-1 overflow-x-hidden"
+      >
+        {{ user.name }}
+      </p></template
     >
     <template v-if="user.name" #subtitle
-      ><p class="text-body-5 text-gray-500">{{ user?.email }}</p></template
+      ><p class="text-body-5 text-gray-500 ellipsis lines-1 overflow-x-hidden">
+        {{ user?.email }}
+      </p></template
     >
   </v-list-item>
 </template>
@@ -103,7 +113,6 @@ const props = withDefaults(defineProps<AlexListItemUser>(), {
   loadingDelete: false,
   loadingSecondButton: false,
 });
-
 const initials = computed(() => {
   return getInitials(props.user?.name || props.user.email);
 });
@@ -170,6 +179,12 @@ const hasSecondButton = computed(() => !!slots.secondButton);
   }
   &.no-select .v-list-item__prepend.v-list-item__prepend {
     grid-template-columns: auto;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .alex-list-item-user.no-select {
+    padding: 8px 0px !important;
   }
 }
 </style>
