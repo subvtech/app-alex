@@ -1,15 +1,16 @@
 {
-    "breadcrumbs": {
-        "title": "Trilha de aprendizagem",
-        "0": {
-            "title": "Home"
-        },
-        "1": {
-            "title": "Meus Cursos"
-        }
+  "breadcrumbs": {
+    "title": "Trilha de aprendizagem",
+    "0": {
+      "title": "Home"
     },
-    "imgAlt": "Imagem da trilha",
-    "chip": "Jornada individual",
-    "firstTab": "Visão geral",
-    "secondTab": "Tarefas"
+    "1": {
+      "title": "Meus Cursos"
+    }
+  },
+  "imgAlt": "Imagem da trilha",
+  "chip": "Jornada individual",
+  "overview": "Visão geral",
+  "tasks": "Tarefas",
+  "contributions": "Contribuições"
 }

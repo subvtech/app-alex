@@ -94,7 +94,7 @@
           <alex-learningplan-task-submission
             v-if="!loadingSubmission"
             type="student"
-            :status="getSubmissionStatus(submissions.data[0])"
+            :status="getSubmissionStatus(submissions.data[0], status)"
             :mark="mostRecentSubmission?.grade"
             :max-mark="mostRecentSubmission?.grade"
             :task-title="title"
@@ -104,6 +104,7 @@
             :content="submissions.data[0]"
             :task-status="status"
             @update-task-status="handleChangeStatus"
+            @update-submission="$emit('update-submission')"
           />
           <div v-if="loadingSubmission">
             <alex-custom-skeleton
@@ -271,6 +272,7 @@ const { t } = useI18n();
 
 type Emits = {
   (e: 'update-status', newIndex: number, value: TaskStudent, newStatus: string);
+  (e: 'update-submission');
 };
 
 const emit = defineEmits<Emits>();
@@ -308,31 +310,37 @@ const {
   lazy: true,
 });
 const evaluatedSubmissions = computed(() =>
-  submissions.value.data.map(
-    (submission) =>
-      ({
-        id: submission.id,
-        justification: {
-          text: submission.justification,
-        },
-        mark: submission.grade,
-        time: new Date(submission.evaluated_at || submission.createdAt),
-        status: submission.evaluated_at ? 'reviewed' : 'in_review',
-      }) as AttachedSubmission,
+  submissions.value.data.flatMap((submission) =>
+    submission.submitted_at
+      ? [
+          {
+            id: submission.id,
+            justification: {
+              text: submission.justification,
+            },
+            mark: submission.grade,
+            time: new Date(submission.evaluated_at || submission.createdAt),
+            status: submission.evaluated_at ? 'reviewed' : 'in_review',
+          } as AttachedSubmission,
+        ]
+      : [],
   ),
 );
 const mostRecentSubmission = computed(
   () =>
     submissions.value.data.filter((submission) => submission.evaluated_at)[0],
 );
-const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
+const getSubmissionStatus = (
+  submission?: TaskSubmissionSimple,
+  status?: TaskMemberStatus,
+) => {
   if (!submission) {
     return 'not_started';
   }
   if (submission?.evaluated_at) {
     return 'reviewed';
   }
-  if (submission?.submitted_at) {
+  if (status === 'in_review') {
     return 'in_review';
   }
   return 'started';

@@ -1,16 +1,16 @@
 {
-    "breadcrumbs": {
-        "title": "Learning Trail",
-        "0": {
-            "title": "Home"
-        },
-        "1": {
-            "title": "My courses"
-        }
+  "breadcrumbs": {
+    "title": "Learning Trail",
+    "0": {
+      "title": "Home"
     },
-    "imgAlt": "Trail image",
-    "chip": "Individual journey",
-    "firstTab": "Overview",
-    "secondTab": "Tasks"
+    "1": {
+      "title": "My courses"
+    }
+  },
+  "imgAlt": "Trail image",
+  "chip": "Individual journey",
+  "overview": "Overview",
+  "tasks": "Tasks",
+  "contributions": "Contributions"
 }
-

@@ -71,6 +71,7 @@ const props = withDefaults(defineProps<submissionProps>(), {
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
+  'update-submission': [];
 };
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
@@ -151,11 +152,13 @@ const saveContent = async () => {
     await update('task-submissions', props.lastSubmission.id, {
       submission: content.data,
     });
+    emit('update-submission');
   } else {
     await create('task-submissions', {
       task_member: props.taskMemberId,
       submission: content.data,
     });
+    emit('update-submission');
   }
   if (props.taskStatus === 'to_do') {
     await update('task-members', props.taskMemberId, {

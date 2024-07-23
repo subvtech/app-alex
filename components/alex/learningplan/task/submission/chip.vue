@@ -5,6 +5,7 @@
     :class="
       config[submission.status]?.bg ? `bg-${config[submission.status]?.bg}` : ''
     "
+    @click="$emit('click', submission)"
   >
     <!-- Header -->
     <div
@@ -101,6 +102,7 @@ const { t } = useI18n();
 const id = computed(() => `submission-chip-${props.submission.id}`);
 type Emits = {
   'redirect-to-chat': [submission: AttachedSubmission];
+  click: [submission: AttachedSubmission];
 };
 defineEmits<Emits>();
 // Formatação de valores

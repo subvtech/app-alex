@@ -20,7 +20,7 @@
       :is-editing="isEditing"
       :small-buttons="smallButtons"
       :href="href"
-      :class="tooltip"
+      :tooltip="tooltip"
       :disable-save="disableSave"
       :tooltip-extra-class="tooltipExtraClass"
       @click:cancel="emit('click:cancel')"

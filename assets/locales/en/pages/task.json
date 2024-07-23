@@ -90,5 +90,6 @@
     "add": "Add task",
     "addPlaceholder": "Enter the task title",
     "addButton": "Add"
-  }
+  },
+  "add": "Add task"
 }

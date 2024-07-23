@@ -73,6 +73,7 @@
         (newIndex, value, newStatus) =>
           handleUpdateStatus(newIndex, value, newStatus, true)
       "
+      @update-submission="execute()"
     />
   </div>
 </template>
@@ -114,7 +115,7 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
         },
       },
       task_submissions: {
-        sort: 'submitted_at:desc',
+        sort: 'updatedAt:desc',
       },
       learning_plan_member: {
         populate: ['user.avatar', 'learning_class'],
@@ -230,9 +231,11 @@ const handleUpdateStatus = async (
     }
     if (item.submissions?.length) {
       const lastSubmission = item.submissions[0];
-      if (submissionValidationStatus.includes(newStatus)) {
-        await strapi.update('task-submissions', lastSubmission.id, {
-          submitted_at: newStatus === 'in_review' ? time : null,
+      if (newStatus === 'in_review') {
+        await strapi.create('task-submissions', {
+          task_member: item.id,
+          submission: lastSubmission.submission,
+          submitted_at: time,
         });
       }
     }
@@ -266,7 +269,6 @@ const handleUpdateStatus = async (
     kanban.value.setCanDrag(true);
   }
 };
-
 const openDrawer = (_index: number, card: TaskStudent) => {
   selectedTask.value = card;
   detailsDrawer.value = true;
