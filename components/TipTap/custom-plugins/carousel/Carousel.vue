@@ -48,7 +48,7 @@
                 background-color: rgba(255, 255, 255, 0.25) !important;
                 z-index: 0 !important;
               "
-              @click="openAddSlidesDialog(-1, slides)"
+              @click="openAddSlidesDialog(-1, true)"
             />
           </div>
           <video-player
@@ -184,6 +184,7 @@
     </div>
     <FileModal
       ref="dialog"
+      :slides-array="slides"
       @upload-files="addSlide"
       @change-slides="editSlides"
     />
@@ -230,7 +231,7 @@ const vueperslides2 = ref();
 const videoJS = ref();
 const videoJSWeb = ref();
 const uploading = ref(false);
-const captureVideoFrame = (file) => {
+const captureVideoFrame = (file: File) => {
   return new Promise((resolve, reject) => {
     const videoEl = document.createElement('video');
     videoEl.muted = true;
@@ -275,12 +276,12 @@ function getVimeoThumbnail(url: string) {
   return `https://vumbnail.com/${url.split('vimeo.com/')[1]}.jpg`;
 }
 
-const videoPlayerOptions = (slide) => {
+const videoPlayerOptions = (slide: Slide) => {
   let type = slide.type;
   let url = slide.video;
   if (slide.type.includes('File')) {
     type = 'mp4';
-    url = url.startsWith('https') ? url : `https://${url}`;
+    url = url?.startsWith('https') ? url : `https://${url}`;
   }
   const data = {
     playbackRates: [0.5, 1, 1.5, 2],
@@ -305,7 +306,7 @@ const carouselBreakPoints = computed(() => {
   };
 });
 
-const onSlideClick = (slide) => {
+const onSlideClick = (slide: Slide) => {
   const index = slides.value.indexOf(slide);
   if (index === -1) return;
   vueperslides2.value.goToSlide(index);
@@ -350,8 +351,8 @@ function newSlide(file, res) {
 }
 const activeSlide = ref(0);
 const dialog = ref();
-const openAddSlidesDialog = (index, slides) => {
-  dialog.value.openModal(index, slides);
+const openAddSlidesDialog = (index: number, configMode: boolean) => {
+  dialog.value.openModal(index, configMode);
 };
 
 const slides = ref<Slide[]>(
@@ -416,15 +417,16 @@ const addSlideByFile = async (slide, index) => {
   uploading.value = false;
 };
 
-const addSlideByUrl = (slide, index) => {
+const addSlideByUrl = (slide: Slide, index: number) => {
   const slidesChanged = index !== -1;
   let newSlide = {} as Slide;
   if (
-    slide.url.startsWith('https://www.youtube.com') ||
-    slide.url.startsWith('https://youtu.be') ||
-    slide.url.startsWith('https://vimeo.com/')
+    typeof slide.url === 'string' &&
+    (slide.url.startsWith('https://www.youtube.com') ||
+      slide.url.startsWith('https://youtu.be') ||
+      slide.url.startsWith('https://vimeo.com/'))
   ) {
-    let image, type;
+    let image: string, type: string;
     if (slide.url.includes('www.youtube') || slide.url.includes('youtu.be')) {
       type = 'youtube';
       image = getYoutubeThumbnail(slide.url);
@@ -439,10 +441,10 @@ const addSlideByUrl = (slide, index) => {
       type,
       icon: slide.icon,
     };
-  } else {
+  } else if (typeof slide.url === 'string') {
     newSlide = {
       title: slide.title,
-      image: slide.url,
+      image: slide?.url,
       type: 'UrlImage',
       icon: slide.icon,
     };
@@ -453,7 +455,7 @@ const addSlideByUrl = (slide, index) => {
   props.updateAttributes({ slides: slides.value });
 };
 
-const editSlides = async (files, deleted, added) => {
+const editSlides = async (files: Slide[], deleted: Slide[], added: Slide[]) => {
   await deleted.forEach((slide) => {
     deleteSlide(slide);
   });

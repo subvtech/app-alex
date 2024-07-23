@@ -8,7 +8,7 @@
     <transition-group name="list">
       <v-expansion-panel
         v-for="(item, index) in list"
-        :key="item.id"
+        :key="`${item.id}-${item.title}`"
         role="listItem"
         :class="over == index && dragging && dragFrom != item ? 'over' : ''"
         @dragover="(e) => onDragOver(index, e)"
@@ -120,12 +120,22 @@ const id = ref(0);
 
 const list = ref(props.data);
 
-watch(data, () => {
-  list.value.map((item) => {
-    if (!item.id) item.id = id.value += 1;
-    return item;
-  });
-});
+watch(
+  () => props.data,
+  () => {
+    const tempList = props.data;
+    tempList.forEach((item, index) => {
+      if (!item.id) {
+        if (list.value[index]?.id) {
+          item.id = list.value[index].id;
+        } else {
+          item.id = Math.floor(Math.random() * (1000 - id.value) + id.value);
+        }
+      }
+    });
+    list.value = tempList;
+  },
+);
 
 watch(
   list,

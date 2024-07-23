@@ -204,6 +204,13 @@ const isLoading = ref(false);
 const deletedSlides = ref([]);
 const addedSlides = ref([]);
 
+const props = defineProps({
+  slidesArray: {
+    type: Array,
+    default: () => [],
+  },
+});
+
 const emit = defineEmits({
   uploadFiles(slides) {
     return slides;
@@ -214,7 +221,6 @@ const emit = defineEmits({
 });
 
 const upload = () => {
-  if (slides.value.length === 0) return (dialog.value = false);
   dialogModel.value = false;
   if (editSlideMode.value === 'config') {
     emit('changeSlides', slides.value, deletedSlides.value, addedSlides.value);
@@ -225,7 +231,7 @@ const upload = () => {
   slides.value = [];
 };
 
-const openModal = (index, editSlides) => {
+const openModal = (index, configMode) => {
   urlInput.value = '';
   dialogModel.value = true;
   fileDrop.value = false;
@@ -235,13 +241,22 @@ const openModal = (index, editSlides) => {
     addedSlides.value.length =
       0;
   if (index !== -1) editSlideMode.value = 'edit';
-  else if (editSlides) {
+  else if (configMode) {
     editSlideMode.value = 'config';
-    slides.value = [...editSlides];
+    slides.value = [...props.slidesArray];
   } else editSlideMode.value = 'add';
   addMediaType.value = 'upload';
   pastedLink.value = false;
 };
+
+watch(
+  () => props.slidesArray,
+  (newValue) => {
+    if (editSlideMode.value === 'config') {
+      slides.value = [...newValue];
+    }
+  },
+);
 
 defineExpose({
   openModal,
