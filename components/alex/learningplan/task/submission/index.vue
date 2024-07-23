@@ -37,6 +37,7 @@
     :task-status="taskStatus"
     :read-only="readOnly"
     @update-task-status="(status) => $emit('update-task-status', status)"
+    @update-submission="() => $emit('update-submission')"
   />
 </template>
 
@@ -73,6 +74,7 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
+  'update-submission': [];
 };
 defineEmits<Emits>();
 const { t } = useI18n();

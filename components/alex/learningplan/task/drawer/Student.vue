@@ -363,17 +363,20 @@ const {
 });
 
 const evaluatedSubmissions = computed(() =>
-  submissions.value.data.map(
-    (submission) =>
-      ({
-        id: submission.id,
-        justification: {
-          text: submission.justification,
-        },
-        mark: submission.grade,
-        time: new Date(submission.evaluated_at || submission.createdAt),
-        status: submission.evaluated_at ? 'reviewed' : 'in_review',
-      }) as AttachedSubmission,
+  submissions.value.data.flatMap((submission) =>
+    submission.submitted_at
+      ? [
+          {
+            id: submission.id,
+            justification: {
+              text: submission.justification,
+            },
+            mark: submission.grade,
+            time: new Date(submission.evaluated_at || submission.createdAt),
+            status: submission.evaluated_at ? 'reviewed' : 'in_review',
+          } as AttachedSubmission,
+        ]
+      : [],
   ),
 );
 

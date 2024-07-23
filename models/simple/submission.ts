@@ -9,6 +9,7 @@ export type Submission = {
   mark?: number | null;
   maxMark?: number | null;
   time: Date;
+  task_member?: TaskMember;
 };
 
 export type AttachedSubmission = Omit<Submission, 'justification'> & {
