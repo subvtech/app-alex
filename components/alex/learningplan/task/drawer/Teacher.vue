@@ -298,11 +298,10 @@ watch(model, (value) => {
     startDate.value = props.startDate;
     endDate.value = props.endDate;
     restrictions.value = props.restrictions;
-    isFirstTimeOpened.value = true;
-    setTimeout(() => {
-      isFirstTimeOpened.value = false;
-    }, 1400);
+    isFirstTimeOpened.value = false;
+    return;
   }
+  isFirstTimeOpened.value = true;
 });
 
 type Emits = {

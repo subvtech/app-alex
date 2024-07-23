@@ -28,7 +28,7 @@ interface CompProps {
 
 const props = defineProps<CompProps>();
 
-const model = defineModel<string>();
+const model = defineModel<string | null>();
 const title = computed(() => {
   if (props.config && model.value) {
     return props.config[model.value];

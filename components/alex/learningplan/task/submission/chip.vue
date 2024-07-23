@@ -56,7 +56,7 @@
             size="small"
             icon="mdi-message-outline"
             color="gray-600"
-            @click="() => $emit('redirect-to-chat', submission)"
+            @click.stop="() => $emit('redirect-to-chat', submission)"
           />
         </div>
       </div>
