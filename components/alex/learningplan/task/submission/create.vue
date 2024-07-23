@@ -135,10 +135,12 @@ const openDialog = async () => {
   resumeCurrentDate();
   await executeSubmissions();
   hasEditorChanges.value = await checkDataChanges();
-  if ((await checkEditorReady()) && props.lastSubmission?.submission) {
-    await editor.value?.loadEditor(
-      JSON.parse(JSON.stringify(props.lastSubmission?.submission)),
-    );
+  if (await checkEditorReady()) {
+    if (props.lastSubmission?.submission) {
+      await editor.value?.loadEditor(
+        JSON.parse(JSON.stringify(props.lastSubmission?.submission)),
+      );
+    }
     if (props.readOnly) {
       await editor.value?.toggleReadOnly();
     }

@@ -5,15 +5,16 @@ export type TaskType = 'individual' | 'group';
 export type TaskMemberStatus = 'to_do' | 'in_progress' | 'in_review' | 'done';
 export interface TaskSimple {
   id: number;
-  trail?: TrailSimple;
-  learning_plan_id: number;
+  position: number;
+  submission_required: boolean;
+  status: TaskStatus;
   title: string;
+  learning_plan_id: number;
+  trail?: TrailSimple;
   description?: string | null;
   type?: TaskType | null;
   tags?: TagSimple[];
-  status: TaskStatus;
   blocks?: BlockSimple[];
-  submission_required: boolean;
   start_at?: string | null;
   finish_at?: string | null;
   archived_at?: string | null;
@@ -21,8 +22,7 @@ export interface TaskSimple {
   can_change_from_review: boolean;
   allowed_editor_plugins: string; // 'string, string, string';
   submission_description: string;
-  learning_goals: LearningPlanGoalSimple[];
+  learning_goals?: LearningPlanGoalSimple[];
   task_members?: TaskMember[];
   task_events?: TaskEvent[];
-  position: number;
 }

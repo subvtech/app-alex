@@ -186,6 +186,13 @@
         :is-sending-message="isSendingMessage"
         :task-member="{
           id: taskMemberId,
+          status,
+        }"
+        :task="{
+          id: task.id,
+          title: task.title,
+          finalDate: finishAt || undefined,
+          restrictions: submission?.constraints || [],
         }"
         :show-member-tab="!!group"
         :message="{ isLoading: pendingMessages }"
@@ -374,6 +381,7 @@ const evaluatedSubmissions = computed(() =>
             mark: submission.grade,
             time: new Date(submission.evaluated_at || submission.createdAt),
             status: submission.evaluated_at ? 'reviewed' : 'in_review',
+            submission,
           } as AttachedSubmission,
         ]
       : [],

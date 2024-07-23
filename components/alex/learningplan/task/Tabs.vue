@@ -17,6 +17,14 @@
       <v-window-item class="v-window-item-full" value="2">
         <alex-learningplan-task-submissions
           class="tw-w-full"
+          :task="{
+            id: task.id,
+            taskMemberId: taskMember.id,
+            deadline: task.finalDate,
+            title: task.title,
+            status: taskMember.status,
+            restrictions: task.restrictions,
+          }"
           :submissions="submissions"
           @redirect-to-chat="(submission) => handleRedirectToChat(submission)"
       /></v-window-item>
@@ -40,6 +48,13 @@ import { orderEvents } from '~/utils';
 interface TaskTabsProps {
   taskMember: {
     id: number;
+    status: TaskMemberStatus;
+  };
+  task: {
+    id: number;
+    title: string;
+    finalDate?: string;
+    restrictions: string[];
   };
   submission?: boolean;
   submissions: AttachedSubmission[];

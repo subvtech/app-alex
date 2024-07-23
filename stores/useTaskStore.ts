@@ -9,13 +9,20 @@ export const useTaskStore = defineStore('task', () => {
 
   const populate = {
     task_members: {
-      populate: [
-        'task_submissions',
-        'learning_plan_member.user.avatar',
-        'learning_plan_member.learning_class',
-        'learning_plan_group.group_members.student_member.user.avatar',
-        'learning_plan_group.learning_class',
-      ],
+      populate: {
+        task_submissions: {
+          sort: 'updatedAt:desc',
+        },
+        learning_plan_member: {
+          populate: ['user.avatar', 'learning_class'],
+        },
+        learning_plan_group: {
+          populate: [
+            'group_members.student_member.user.avatar',
+            'learning_class',
+          ],
+        },
+      },
     },
     tags: true,
     blocks: true,

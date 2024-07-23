@@ -141,6 +141,13 @@
       class="mt-6"
       :task-member="{
         id: taskMemberId,
+        status,
+      }"
+      :task="{
+        id: taskId,
+        title,
+        finalDate,
+        restrictions: submission?.constraints || [],
       }"
       :show-member-tab="!!group"
       :is-sending-message="isSendingMessage"
@@ -321,6 +328,7 @@ const evaluatedSubmissions = computed(() =>
             mark: submission.grade,
             time: new Date(submission.evaluated_at || submission.createdAt),
             status: submission.evaluated_at ? 'reviewed' : 'in_review',
+            submission,
           } as AttachedSubmission,
         ]
       : [],
@@ -452,23 +460,25 @@ watch(model, (value) => {
   messages.value.data = [];
 });
 
-watch(model, (value) => {
-  if (value) {
-    description.value = props.description;
-    submissionDescription.value = props?.submission?.description || '';
-    tags.value = props.tags;
-    status.value = props.status;
-    startDate.value = props.startDate;
-    finalDate.value = props.finalDate;
-    restrictions.value = props.restrictions;
-    isFirstTimeOpened.value = true;
-    setTimeout(() => {
+watch(
+  model,
+  (value) => {
+    if (value) {
+      description.value = props.description;
+      submissionDescription.value = props?.submission?.description || '';
+      tags.value = props.tags;
+      status.value = props.status;
+      startDate.value = props.startDate;
+      finalDate.value = props.finalDate;
+      restrictions.value = props.restrictions;
       isFirstTimeOpened.value = false;
-    }, 1100);
-    return;
-  }
-  loadingSubmission.value = true;
-});
+      return;
+    }
+    isFirstTimeOpened.value = true;
+    loadingSubmission.value = true;
+  },
+  { immediate: true },
+);
 
 watch(activeTab, (value) => {
   if (value === '3') {
@@ -492,17 +502,19 @@ const handleChangeStatus = (statusValue: TaskMemberStatus) => {
 };
 
 watch(status, (newStatus, oldStatus) => {
-  emit(
-    'update-status',
-    0,
-    {
-      id: props.taskMemberId,
-      status: oldStatus,
-      title: props.title,
-      date: new Date(),
-    },
-    newStatus,
-  );
+  if (!isFirstTimeOpened.value) {
+    emit(
+      'update-status',
+      0,
+      {
+        id: props.taskMemberId,
+        status: oldStatus,
+        title: props.title,
+        date: new Date(),
+      },
+      newStatus,
+    );
+  }
 });
 </script>
 

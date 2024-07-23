@@ -301,7 +301,7 @@ watch(model, (value) => {
     isFirstTimeOpened.value = true;
     setTimeout(() => {
       isFirstTimeOpened.value = false;
-    }, 2000);
+    }, 1400);
   }
 });
 
