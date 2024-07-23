@@ -1,5 +1,5 @@
 <template>
-  <div v-if="editor" class="tw-flex">
+  <div v-if="editor && shouldShowDragHandle" class="tw-flex">
     <alex-custom-button variant="text" icon="mdi-plus" @click="addNode">
       <v-icon icon="mdi-plus" size="small" />
     </alex-custom-button>
@@ -40,6 +40,7 @@ const props = defineProps<{
   editor: Editor;
   currentNode: Ref<Node | null>;
   currentNodePos: Ref<number>;
+  showDragHandle: Ref<boolean>;
 }>();
 
 const menu = ref(false);
@@ -51,6 +52,10 @@ watch(menu, () => {
   } else {
     props.editor.commands.setMeta('lockDragHandle', false);
   }
+});
+
+const shouldShowDragHandle = computed(() => {
+  return props.showDragHandle.value;
 });
 
 const actions = useContentItemActions(props.editor);

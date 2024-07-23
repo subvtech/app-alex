@@ -11,6 +11,7 @@ import { vuetify } from '@/plugins/vuetify';
 
 interface VueDragHandleOptions extends Omit<DragHandleOptions, 'onNodeChange'> {
   editor: () => Editor | null;
+  showDragHandle: () => boolean;
   onNodeChange?: (data: {
     node: Node | null;
     editor: Editor;
@@ -31,14 +32,22 @@ const VueDragHandle = DragHandle.extend<VueDragHandleOptions>({
 
       render() {
         const wrapper = document.createElement('div');
+        const showDragHandleRef = ref(this.showDragHandle());
         const checkEditor = async () => {
           while (!this.editor()) {
             await new Promise((resolve) => setTimeout(resolve, 100));
           }
+          watch(
+            () => this.showDragHandle(),
+            () => {
+              showDragHandleRef.value = this.showDragHandle();
+            },
+          );
           const app = createApp(Component, {
             editor: this.editor(),
             currentNode: data.currentNode,
             currentNodePos: data.currentNodePos,
+            showDragHandle: showDragHandleRef,
           });
           app.use(vuetify);
           app.use(i18n);

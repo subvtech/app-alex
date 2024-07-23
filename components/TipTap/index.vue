@@ -202,6 +202,7 @@ onMounted(() => {
       VueDragHandle.configure({
         editor: () => editor.value,
         tippyOptions: { offset: [-2, 16], zIndex: 99 },
+        showDragHandle: () => isEditable.value,
       }),
       Table.configure({ resizable: true }),
       TableRow,
