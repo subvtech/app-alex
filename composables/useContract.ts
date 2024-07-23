@@ -19,7 +19,8 @@ export interface CancelledContractProps {
 
 const localGanacheChainId = 1337; // '0x1691';
 const sepoliaChainId = 11155111; // '0xaa36a7';
-const networkUrl = 'http://127.0.0.1:7545';
+const sepoliaNetworkUrl = 'https://rpc.sepolia.org';
+const networkUrl = sepoliaNetworkUrl ?? 'http://127.0.0.1:7545';
 
 const ganacheTestnet = {
   chainId: '0x539', // '1337'
@@ -113,7 +114,7 @@ export const useContracts = () => {
       method: 'eth_chainId',
     });
 
-    if (localGanacheChainId === targetedNetwork) {
+    if (sepoliaChainId === targetedNetwork) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [ganacheTestnet],
