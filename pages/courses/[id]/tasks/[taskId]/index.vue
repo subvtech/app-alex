@@ -354,10 +354,10 @@ function setTasks() {
   if (!taskStore.task?.task_members) {
     return;
   }
-  if (taskStore.task.status === 'draft') {
-    tasks.value = [];
-    return;
-  }
+  // if (taskStore.task.status === 'draft') {
+  //   tasks.value = [];
+  //   return;
+  // }
   tasks.value = taskStore.task.task_members.map((task) => ({
     id: task.id,
     status: task.status,

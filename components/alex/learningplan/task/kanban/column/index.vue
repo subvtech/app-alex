@@ -27,9 +27,38 @@
       </SlickItem>
     </SlickList>
   </div>
+  <alex-custom-confirm-dialog
+    v-model="confirm"
+    variant="info"
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    :title="$t('components.learningPlan.drawer.task.status.move.title')"
+    :subtitle="$t('components.learningPlan.drawer.task.status.move.subtitle')"
+    :submit-button-text="
+      $t('components.learningPlan.drawer.task.status.move.submit')
+    "
+    :cancel-button-text="
+      $t('components.learningPlan.drawer.task.status.move.cancel')
+    "
+    no-input-confirmation
+    @submit="
+      if (confirmData !== undefined) {
+        emit('insert-card', confirmData);
+      }
+
+      confirm = false;
+    "
+    @cancel="
+      confirmData = undefined;
+      confirm = false;
+    "
+  />
 </template>
 
-<script setup lang="ts" generic="T extends { id: number; status: string }">
+<script
+  setup
+  lang="ts"
+  generic="T extends { id: number; status: string; task?: TaskSimple }"
+>
 import { SlickList, SlickItem } from 'vue-slicksort';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 export type Accept<T> =
@@ -72,6 +101,14 @@ const emit = defineEmits<{
     },
   ];
 }>();
+
+// Confirm dialog
+const confirm = ref<boolean>(false);
+const confirmData = ref<any | undefined>(undefined);
+
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
+
 const isDragging = () => {
   const isDraggingCard = document.querySelector(
     '.kanban-card-item.kanban-card-dragging',
@@ -84,7 +121,24 @@ const handleInsertCard = (values: {
   group: string;
 }) => {
   if (isDragging()) return;
-  emit('insert-card', values);
+
+  const cameFrom = values.value.status;
+
+  if (cameFrom !== 'in_review') {
+    emit('insert-card', values);
+    return;
+  }
+
+  if (values.value.task?.can_change_from_review) {
+    setMessage(
+      t('components.learningPlan.drawer.task.status.move.warning'),
+      'warning',
+      true,
+    );
+  } else {
+    confirm.value = true;
+    confirmData.value = values;
+  }
 };
 const mappedStatus = {
   gray: 'to_do',

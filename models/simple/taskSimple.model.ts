@@ -18,6 +18,7 @@ export interface TaskSimple {
   finish_at?: string | null;
   archived_at?: string | null;
   can_submit_after_deadline: boolean;
+  can_change_from_review: boolean;
   allowed_editor_plugins: string; // 'string, string, string';
   submission_description: string;
   learning_goals: LearningPlanGoalSimple[];

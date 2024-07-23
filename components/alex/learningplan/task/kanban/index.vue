@@ -169,6 +169,7 @@ const props = defineProps<KanbanProps>();
 const tasks = defineModel<Card<typeof props.type>[]>({
   required: true,
 });
+
 const columns = defineModel<Column<typeof props.type>[]>('columns', {
   required: true,
 });

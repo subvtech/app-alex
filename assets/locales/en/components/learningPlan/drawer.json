@@ -14,7 +14,14 @@
       "toDo": "To do",
       "inProgress": "In progress",
       "underReview": "Under review",
-      "done": "Done"
+      "done": "Done",
+      "move": {
+        "title": "Remove task from review",
+        "subtitle": "Do you want to move this task from the review?",
+        "cancel": "Cancel",
+        "submit": "Move",
+        "warning": "This activity cannot be moved from the assessment"
+      }
     },
     "date": {
       "startLabel": "Start date",

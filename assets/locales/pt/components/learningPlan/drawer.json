@@ -14,7 +14,14 @@
       "toDo": "A fazer",
       "inProgress": "Fazendo",
       "underReview": "Em avaliação",
-      "done": "Concluído"
+      "done": "Concluído",
+      "move": {
+        "title": "Tirar tarefa da avaliação",
+        "subtitle": "Você deseja mover esta tarefa da avaliação?",
+        "cancel": "Cancelar",
+        "submit": "Mover",
+        "warning": "Esta atividade não pode ser movida da avaliação"
+      }
     },
     "date": {
       "startLabel": "Data de início",
