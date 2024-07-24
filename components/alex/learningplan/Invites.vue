@@ -22,7 +22,9 @@
           <template #content>
             <img
               class="pointer"
-              :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
+              :src="
+                dark ? 'public/svg/refresh-dark.svg' : 'public/svg/refresh.svg'
+              "
               width="20"
               height="20"
               @click="updateLink"

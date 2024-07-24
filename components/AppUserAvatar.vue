@@ -61,7 +61,7 @@
       ]"
       @click="removeProfilePicture"
     >
-      <img src="/svg/trash.svg" width="20" height="20" />
+      <img src="public/svg/trash.svg" width="20" height="20" />
     </alex-custom-button>
   </div>
 </template>

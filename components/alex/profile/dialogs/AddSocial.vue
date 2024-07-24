@@ -33,8 +33,8 @@
             class="mr-4 icon-size"
             :src="
               supported.includes(item.raw.toLowerCase())
-                ? `/svg/${item.raw.toLowerCase()}.svg`
-                : '/svg/website.svg'
+                ? `public/svg/${item.raw.toLowerCase()}.svg`
+                : 'public/svg/website.svg'
             "
           />
           <p class="selected-item">{{ item.raw }}</p>
@@ -47,8 +47,8 @@
                 class="mr-4 icon-size"
                 :src="
                   supported.includes(item.raw.toLowerCase())
-                    ? `/svg/${item.raw.toLowerCase()}.svg`
-                    : '/svg/website.svg'
+                    ? `public/svg/${item.raw.toLowerCase()}.svg`
+                    : 'public/svg/website.svg'
                 "
               />
             </template>

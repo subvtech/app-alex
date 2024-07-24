@@ -3,20 +3,18 @@ import type { IPFSHTTPClient } from 'kubo-rpc-client';
 import { Cluster } from '@nftstorage/ipfs-cluster';
 
 function createClient(): IPFSHTTPClient {
-  let client = create({
+  return create({
     host: '127.0.0.1',
     port: 5001,
   });
-  return client;
 }
 
 function createCluster(): Cluster {
-  let cluster = new Cluster('http://127.0.0.1:9094');
-  return cluster;
+  return new Cluster('http://127.0.0.1:9094');
 }
 
-let client = createClient();
-let cluster = createCluster();
+const client = createClient();
+const cluster = createCluster();
 
 const uploadFile = async (file: File) => {
   try {
@@ -26,7 +24,7 @@ const uploadFile = async (file: File) => {
       create: true,
     });
 
-    let info = [];
+    const info = [];
     for await (const data of client.files.ls(`/${name}`)) {
       info.push(data);
     }
@@ -40,4 +38,19 @@ const uploadFile = async (file: File) => {
   }
 };
 
-export { uploadFile };
+const deleteFile = async (file) => {
+  // console.log("Deleting", file);
+  const name = file.name;
+  try {
+    const info = [];
+    for await (const chunck of client.files.ls(`/${name}`)) {
+      info.push(chunck);
+    }
+    await client.files.rm(`/${name}`);
+    cluster.unpin(info[0].cid);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export { uploadFile, deleteFile };

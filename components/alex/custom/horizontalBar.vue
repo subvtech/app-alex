@@ -23,7 +23,9 @@
         <v-btn icon color="#6E7A87" @click="emit('chat')">
           <img
             :src="
-              isChatActive ? '/svg/chat-read-active.svg' : '/svg/chat-read.svg'
+              isChatActive
+                ? 'public/svg/chat-read-active.svg'
+                : 'public/svg/chat-read.svg'
             "
             width="24"
             height="24"
@@ -33,7 +35,7 @@
         <v-btn icon color="grey" @click="emit('alert')">
           <img
             v-if="isBellActive"
-            src="/svg/bell.svg"
+            src="public/svg/bell.svg"
             width="24"
             height="24"
             role="bell-active"

@@ -125,7 +125,7 @@
     "@nftstorage/ipfs-cluster": "^5.0.1",
     "adm-zip": "^0.5.12",
     "electron-is-dev": "^3.0.1",
-    "kubo-rpc-client": "^3.0.2",
+    "kubo-rpc-client": "^4.1.1",
     "body-parser": "^1.20.2",
     "date-fns": "^2.30.0",
     "editorjs-alert": "^1.1.3",

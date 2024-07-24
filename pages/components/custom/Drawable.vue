@@ -158,11 +158,16 @@
               <NuxtLink to="/">
                 <img
                   v-if="true"
-                  src="/images/alex-mini.svg"
+                  src="public/images/alex-mini.svg"
                   height="28"
                   width="43"
                 />
-                <img v-else src="/images/alex.svg" height="28" width="84" />
+                <img
+                  v-else
+                  src="public/images/alex.svg"
+                  height="28"
+                  width="84"
+                />
               </NuxtLink>
             </div>
           </div>
@@ -258,11 +263,16 @@
                   <NuxtLink to="/">
                     <img
                       v-if="clipped"
-                      src="/images/alex-mini.svg"
+                      src="public/images/alex-mini.svg"
                       height="28"
                       width="43"
                     />
-                    <img v-else src="/images/alex.svg" height="28" width="84" />
+                    <img
+                      v-else
+                      src="public/images/alex.svg"
+                      height="28"
+                      width="84"
+                    />
                   </NuxtLink>
                 </div>
               </div>

@@ -4,7 +4,7 @@
       <div class="item d-flex w-100 justify-space-between">
         <div class="d-flex align-center gap-4">
           <div class="label d-flex align-center">
-            <img src="/images/metamask.png" alt="" />
+            <img src="public/images/metamask.png" alt="" />
             <span>{{ $t('components.profile.wallets.metamask') }}</span>
           </div>
           <alex-documentation-buttons-copy
@@ -21,7 +21,11 @@
           :loading="isLoading"
           @click="handleClick"
         >
-          <img class="hide mr-1" src="/images/metamask.png" alt="" /><span>
+          <img
+            class="hide mr-1"
+            src="public/images/metamask.png"
+            alt=""
+          /><span>
             {{
               wallet
                 ? $t('components.profile.wallets.unlink')
