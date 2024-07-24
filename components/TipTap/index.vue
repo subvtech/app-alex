@@ -62,6 +62,7 @@ const strapiClient = useStrapiClient();
 const app = useNuxtApp();
 
 const { t } = useI18n();
+const { setMessage } = useMessageStore();
 
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
@@ -84,13 +85,42 @@ const collors = [
   '#f683a6',
 ];
 
-onMounted(() => {
+interface TipTapResponse {
+  token: string;
+}
+
+const getTipTapToken = async (userID: number | undefined) => {
+  try {
+    const TipTapToken = await strapiClient<TipTapResponse>(`tiptap/${userID}`, {
+      method: 'GET',
+    });
+    return TipTapToken.token;
+  } catch (error) {
+    const typedError = error as { error: { status: number } };
+    if (typedError.error.status === 400) {
+      setMessage(
+        t('components.tiptap.messages.userNotLoggedIn'),
+        'error',
+        true,
+      );
+    } else {
+      setMessage(
+        t('components.tiptap.messages.errorGettingToken'),
+        'error',
+        true,
+      );
+    }
+    return '';
+  }
+};
+
+onMounted(async () => {
   const user = useStrapiUser();
+  const TipTapToken = await getTipTapToken(user.value?.id);
   const provider = new TiptapCollabProvider({
-    name: 'alex-tiptap', // Unique document identifier for syncing. This is your document name.
+    name: 'teste2', // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
-    token:
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MjExNzQ4MTgsIm5iZiI6MTcyMTE3NDgxOCwiZXhwIjoxNzIxMjYxMjE4LCJpc3MiOiJodHRwczovL2Nsb3VkLnRpcHRhcC5kZXYiLCJhdWQiOiJ4azJ2ZHc5MiJ9.-opqFm9oflwj0K8gLHfVlguWVrenGS3EHVZEJ-l80w8', // Your JWT token
+    token: TipTapToken, // Your JWT token
     document: doc,
 
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
