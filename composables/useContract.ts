@@ -30,6 +30,14 @@ const ganacheTestnet = {
   blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
 };
 
+const sepoliaTestnet = {
+  chainId: '0xaa36a7', // Hypothetical chain ID for Sepolia; replace with the actual value
+  chainName: 'Sepolia Testnet',
+  nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+  rpcUrls: ['https://rpc.sepolia.org'], // Replace with actual RPC URL(s)
+  blockExplorerUrls: ['https://sepolia.etherscan.io'], // Replace with actual block explorer URL(s)
+};
+
 export const useContracts = () => {
   const loading = ref(false);
   const usdToEth = (usdAmount: number) => {
@@ -108,13 +116,40 @@ export const useContracts = () => {
 
     loading.value = false;
   };
-
   const switchNetwork = async (targetedNetwork: number) => {
+    const currentChainId =
+      '0x' +
+      (await window.ethereum.request({ method: 'eth_chainId' })).slice(2);
+    const chainConfig =
+      targetedNetwork === sepoliaChainId
+        ? sepoliaTestnet
+        : targetedNetwork === localGanacheChainId
+        ? ganacheTestnet
+        : null;
+    const hexTargetedNetwork = '0x' + targetedNetwork.toString(16);
+
+    if (chainConfig && currentChainId !== hexTargetedNetwork) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [chainConfig],
+      });
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: hexTargetedNetwork }],
+      });
+    }
+  };
+  const switchNetwork2 = async (targetedNetwork: number) => {
     const currentChainId = await window.ethereum.request({
       method: 'eth_chainId',
     });
 
     if (sepoliaChainId === targetedNetwork) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [sepoliaTestnet],
+      });
+    } else if (localGanacheChainId === targetedNetwork) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [ganacheTestnet],

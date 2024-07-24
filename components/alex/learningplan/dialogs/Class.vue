@@ -173,7 +173,7 @@ const { data: responsiblesData } = await useAsyncData(
           name: 'Professor',
         },
       },
-      populate: ['avatar'],
+      populate: ['avatar', 'wallet'],
     }) as unknown as Promise<UserSimple[]>,
   {
     transform: (value) =>

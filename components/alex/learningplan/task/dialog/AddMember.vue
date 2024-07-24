@@ -97,7 +97,7 @@ const getMembers = (learningplanId: number) =>
       learning_plan_members: {
         populate: {
           user: {
-            populate: ['avatar'],
+            populate: ['avatar', 'wallet'],
           },
           learning_class: {
             fields: ['id'],
