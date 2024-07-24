@@ -42,7 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { YupSchema, useField } from 'vee-validate';
+import { useField } from 'vee-validate';
+import { type YupSchema } from '../../../models/yupSchema.model';
 
 interface SelectProps {
   modelValue?: string | number | boolean | unknown[] | any;

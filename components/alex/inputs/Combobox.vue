@@ -48,7 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { YupSchema, useField } from 'vee-validate';
+import { useField } from 'vee-validate';
+import { type YupSchema } from '../../../models/yupSchema.model';
 
 interface ComboboxProps {
   name: string;

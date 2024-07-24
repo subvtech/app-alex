@@ -117,7 +117,7 @@
   This component is meant to be used on the main screen as a horizontal Menu,
    it's also suitable for use inside smaller components.
 */
-import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+import { type ProfilePictureItemType } from '../../AppUserAvatar.vue';
 
 export interface HorizontalBarEmits {
   (e: 'alert'): void; // click on the alert button

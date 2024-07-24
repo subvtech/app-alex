@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { YupSchema } from 'vee-validate';
+import { type YupSchema } from '../../../../../models/yupSchema.model';
 
 export interface SecurityFormComponentType {
   label: string;
