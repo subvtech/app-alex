@@ -99,13 +99,13 @@ const getTipTapToken = async (userID: number | undefined) => {
     const typedError = error as { error: { status: number } };
     if (typedError.error.status === 400) {
       setMessage(
-        t('components.tiptap.messages.userNotLoggedIn'),
+        t('components.tiptap.messages.error.userNotLoggedIn'),
         'error',
         true,
       );
     } else {
       setMessage(
-        t('components.tiptap.messages.errorGettingToken'),
+        t('components.tiptap.messages.error.gettingToken'),
         'error',
         true,
       );

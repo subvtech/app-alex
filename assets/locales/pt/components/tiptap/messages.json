@@ -1,6 +1,6 @@
 {
   "error": {
     "userNotLoggedIn": "Você deve estar logado para acessar o editor.",
-    "errorGettingToken": "Erro ao tentar se conectar ao servidor. Por favor, tente novamente mais tarde."
+    "gettingToken": "Erro ao tentar se conectar ao servidor. Por favor, tente novamente mais tarde."
   }
 }
