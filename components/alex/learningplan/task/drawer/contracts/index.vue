@@ -80,7 +80,7 @@
         v-if="(isThereAContract && isThereBalance) || !isThereAContract"
         :is-draft="isDraft"
         :display-draft-warning="displayDraftWarning"
-        :task-member-students="taskMemberCount"
+        :task-member-students="taskMemberStudents.length"
         :loading="loading"
         :contract-address="contractAddress"
         :reward-label="$t('components.learningPlan.contract.reward.value')"
