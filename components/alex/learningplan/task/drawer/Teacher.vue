@@ -48,7 +48,10 @@
 
       <v-row class="my-5">
         <v-col cols="6">
-          <alex-learningplan-task-state v-model="status" :edit="editable" />
+          <alex-learningplan-task-state
+            v-model="status"
+            :edit="editable && wasFilledMainInfo"
+          />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -269,6 +272,12 @@ const members = toRef(props, 'members');
 const hasAtLeastSubmission = computed(
   () => !!members.value.filter((member) => member.last_submission_at).length,
 );
+const wasFilledMainInfo = computed(() => {
+  if (!startDate.value || !endDate.value || !type.value) {
+    return false;
+  }
+  return true;
+});
 const startDateComp = ref<{
   close: () => void;
 } | null>(null);
