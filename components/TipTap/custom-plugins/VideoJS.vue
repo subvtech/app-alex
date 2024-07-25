@@ -2,7 +2,8 @@
   <div>
     <video
       ref="videoPlayer"
-      class="video-js vjs-lime w-100 fill-height rounded"
+      class="video-js vjs-lime w-100 fill-height rounded teste"
+      :class="customClasses"
       :data-setup="dataSetup"
       controls
       :options="options"
@@ -32,7 +33,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  customClasses: {
+    type: String,
+    default: '',
+  },
 });
+
 const videoPlayer = ref(null);
 let player;
 
@@ -171,5 +177,34 @@ defineExpose({
   .vjs-menu
   li.vjs-menu-item:hover:not(.vjs-selected) {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+.video-fluid:not(.vjs-fullscreen).vjs-fluid,
+.video-fluid.vjs-16-9,
+.video-fluid.vjs-4-3,
+video.video-fluid,
+video.vjs-tech {
+  max-height: 700px;
+  position: relative !important;
+  width: 100%;
+  height: auto !important;
+  max-width: 100% !important;
+  line-height: 0;
+}
+
+.videoFile .video-fluid.vjs-fluid,
+.video-fluid.vjs-16-9,
+.video-fluid.vjs-4-3,
+video.video-fluid,
+video.vjs-tech {
+  padding-top: 0 !important;
+}
+
+.vjs-fullscreen video.vjs-tech {
+  max-height: 100vh !important;
+}
+
+.vjs-control-bar {
+  line-height: 1;
 }
 </style>

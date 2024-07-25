@@ -23,7 +23,7 @@
         v-else-if="media.src"
         class="tw-w-4/5 d-flex flex-column justify-center align-center position-relative"
       >
-        <div class="ma-2 delete-icon">
+        <div class="ma-2 delete-button">
           <alex-custom-button
             color="gray-500"
             icon="mdi-close"
@@ -32,12 +32,28 @@
           />
         </div>
         <nuxt-img
+          v-if="contentType === 'image'"
           :key="media.title"
           :src="media.src"
           :alt="media.title"
           class="w-100"
           :draggable="false"
         />
+        <div v-else class="w-100">
+          <video-player
+            ref="videoPlayer"
+            :options="videoPlayerOptions(media)"
+            class="w-100 min-h-100"
+            :class="{ videoFile: isLocalMedia }"
+            :custom-classes="'video-fluid'"
+            controls
+            :data-setup="
+              !isLocalMedia
+                ? JSON.stringify({ techOrder: [getVideoProvider()] })
+                : ''
+            "
+          />
+        </div>
       </div>
     </v-expand-transition>
     <UploadModal ref="dialog" @upload-media="uploadMedia" />
@@ -46,9 +62,11 @@
 
 <script setup lang="ts">
 import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
+import VideoPlayer from '../VideoJS.vue';
 import UploadModal from './FileUploader.vue';
 
 // TODO : Adicionar um popup de resize, com opções de alinhamento
+// TODO: Watch de attrs para atualizar o media
 
 const { t } = useI18n();
 
@@ -91,6 +109,7 @@ const uploadMedia = async (newMedia: File | string) => {
       };
       props.updateAttributes({ media: media.value });
     } else {
+      // TODO: I18N
       setMessage('Erro ao fazer o upload, tente novamente', 'error', true);
     }
   }
@@ -98,7 +117,7 @@ const uploadMedia = async (newMedia: File | string) => {
 };
 
 const removeMedia = () => {
-  if (media.value.id) {
+  if (isLocalMedia) {
     props.extension.options.deleteMedia(media.value.id);
   }
   media.value = { src: '', title: '', id: null };
@@ -116,13 +135,52 @@ interface Media {
 }
 
 const media = ref<Media>(props.node.attrs.media);
+
+const isLocalMedia = computed(() => media.value.id);
+
+const getVideoProvider = () => {
+  if (!isLocalMedia.value) {
+    if (
+      media.value.src.includes('www.youtube') ||
+      media.value.src.includes('youtu.be')
+    )
+      return 'youtube';
+    return 'vimeo';
+  }
+  return 'mp4';
+};
+
+const videoPlayerOptions = (media: Media) => {
+  let url = media.src;
+  if (isLocalMedia.value) {
+    url = url?.startsWith('https') ? url : `https://${url}`;
+  }
+  const type = getVideoProvider();
+
+  const data = {
+    playbackRates: [0.5, 1, 1.5, 2],
+    controls: true,
+    fluid: true,
+    sources: [
+      {
+        src: url,
+        type: `video/${type}`,
+      },
+    ],
+  };
+  return data;
+};
 </script>
 
 <style scoped>
-.delete-icon {
+.delete-button {
   position: absolute;
   z-index: 99;
   right: 5px;
   top: 0;
+  transition: all 0.3s ease;
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 </style>
