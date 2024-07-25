@@ -56,58 +56,61 @@ const model = defineModel<TaskStatus | TaskMemberStatus>({
 const { t } = useI18n();
 
 // Estilização e props
-const config: Record<TaskStatus | TaskMemberStatus, StateConfig> = {
-  // Professor
-  draft: {
-    text: t('components.learningPlan.drawer.task.status.draft'),
-    status: 'secondary',
-    immutable: !props.edit,
-  },
-  published: {
-    text: t('components.learningPlan.drawer.task.status.published'),
-    status: 'blue',
-    immutable: !props.edit,
-  },
-  finished: {
-    text: t('components.learningPlan.drawer.task.status.finished'),
-    status: 'red',
-    immutable: !props.edit,
-  },
-  // Aluno
-  to_do: {
-    text: t('components.learningPlan.drawer.task.status.toDo'),
-    status: 'secondary',
-    immutable: props.edit,
-  },
-  in_progress: {
-    text: t('components.learningPlan.drawer.task.status.inProgress'),
-    status: 'blue',
-    immutable: props.edit,
-  },
-  in_review: {
-    text: t('components.learningPlan.drawer.task.status.underReview'),
-    status: 'orange',
-    immutable: !props.edit,
-  },
-  done: {
-    text: t('components.learningPlan.drawer.task.status.finished'),
-    status: 'green',
-    immutable: true,
-  },
-};
+const config = computed(() => {
+  const value: Record<TaskStatus | TaskMemberStatus, StateConfig> = {
+    // Professor
+    draft: {
+      text: t('components.learningPlan.drawer.task.status.draft'),
+      status: 'secondary',
+      immutable: !props.edit,
+    },
+    published: {
+      text: t('components.learningPlan.drawer.task.status.published'),
+      status: 'blue',
+      immutable: !props.edit,
+    },
+    finished: {
+      text: t('components.learningPlan.drawer.task.status.finished'),
+      status: 'red',
+      immutable: !props.edit,
+    },
+    // Aluno
+    to_do: {
+      text: t('components.learningPlan.drawer.task.status.toDo'),
+      status: 'secondary',
+      immutable: props.edit,
+    },
+    in_progress: {
+      text: t('components.learningPlan.drawer.task.status.inProgress'),
+      status: 'blue',
+      immutable: props.edit,
+    },
+    in_review: {
+      text: t('components.learningPlan.drawer.task.status.underReview'),
+      status: 'orange',
+      immutable: !props.edit,
+    },
+    done: {
+      text: t('components.learningPlan.drawer.task.status.finished'),
+      status: 'green',
+      immutable: true,
+    },
+  };
+  return value;
+});
 
 // Professor (Items do dropdown)
 const teacherOptions: AlexDropdownItem[] = [
   {
-    text: config.draft.text,
+    text: config.value.draft.text,
     onClick: () => (model.value = 'draft'),
   },
   {
-    text: config.published.text,
+    text: config.value.published.text,
     onClick: () => (model.value = 'published'),
   },
   {
-    text: config.finished.text,
+    text: config.value.finished.text,
     onClick: () => (model.value = 'finished'),
   },
 ];
@@ -115,15 +118,15 @@ const teacherOptions: AlexDropdownItem[] = [
 // Aluno (Opções do dropdown)
 const studentOptions: AlexDropdownItem[] = [
   {
-    text: config.to_do.text,
+    text: config.value.to_do.text,
     onClick: () => (model.value = 'to_do'),
   },
   {
-    text: config.in_progress.text,
+    text: config.value.in_progress.text,
     onClick: () => (model.value = 'in_progress'),
   },
   {
-    text: config.in_review.text,
+    text: config.value.in_review.text,
     onClick: () => (model.value = 'in_review'),
   },
 ];
