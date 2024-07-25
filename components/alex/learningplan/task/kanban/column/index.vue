@@ -31,8 +31,8 @@
     v-model="confirm"
     variant="info"
     :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-    :title="$t('components.learningPlan.drawer.task.status.move.title')"
-    :subtitle="$t('components.learningPlan.drawer.task.status.move.subtitle')"
+    :title="dialogText?.title || ''"
+    :subtitle="dialogText?.subtitle || ''"
     :submit-button-text="
       $t('components.learningPlan.drawer.task.status.move.submit')
     "
@@ -42,7 +42,7 @@
     no-input-confirmation
     @submit="
       if (confirmData !== undefined) {
-        emit('insert-card', confirmData);
+        emit('insert-card', confirmData.values);
       }
 
       confirm = false;
@@ -123,22 +123,31 @@ const handleInsertCard = (values: {
   if (isDragging()) return;
 
   const cameFrom = values.value.status;
+  const to = values.group;
 
-  if (cameFrom !== 'in_review') {
-    emit('insert-card', values);
-    return;
-  }
-
-  if (values.value.task?.can_change_from_review) {
+  if (cameFrom === 'in_review' && !values.value.task?.can_change_from_review) {
     setMessage(
       t('components.learningPlan.drawer.task.status.move.warning'),
       'warning',
       true,
     );
-  } else {
-    confirm.value = true;
-    confirmData.value = values;
+
+    return;
   }
+
+  if (to === 'in_review') {
+    confirm.value = true;
+    confirmData.value = { values, text: 'add' };
+    return;
+  }
+
+  if (cameFrom === 'in_review' && to !== 'done') {
+    confirm.value = true;
+    confirmData.value = { values, text: 'remove' };
+    return;
+  }
+
+  emit('insert-card', values);
 };
 const mappedStatus = {
   gray: 'to_do',
@@ -147,6 +156,26 @@ const mappedStatus = {
   green: 'done',
 };
 const status = computed(() => mappedStatus[props.color] as TaskStatus);
+
+const dialogText = computed(() => {
+  if (confirmData.value === undefined) {
+    return undefined;
+  }
+
+  const textSet: 'remove' | 'add' = confirmData.value.text;
+
+  const title: string = t(
+    `components.learningPlan.drawer.task.status.${textSet}.title`,
+  );
+  const subtitle: string = t(
+    `components.learningPlan.drawer.task.status.${textSet}.subtitle`,
+  );
+
+  return {
+    title,
+    subtitle,
+  };
+});
 </script>
 
 <style lang="scss" scoped>

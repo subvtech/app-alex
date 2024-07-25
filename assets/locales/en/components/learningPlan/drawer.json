@@ -15,12 +15,19 @@
       "inProgress": "In progress",
       "underReview": "Under review",
       "done": "Done",
+      "canChangeFromReview": "Can change from review",
       "move": {
-        "title": "Remove task from review",
-        "subtitle": "Do you want to move this task from the review?",
         "cancel": "Cancel",
         "submit": "Move",
-        "warning": "This activity cannot be moved from the assessment"
+        "warning": "This task cannot be moved from the review"
+      },
+      "add": {
+        "title": "Add task to review",
+        "subtitle": "Do you want to add this task to the review?"
+      },
+      "remove": {
+        "title": "Remove task from review",
+        "subtitle": "Do you want to remove this task from the review?"
       }
     },
     "date": {

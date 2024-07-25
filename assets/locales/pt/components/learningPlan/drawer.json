@@ -15,12 +15,19 @@
       "inProgress": "Fazendo",
       "underReview": "Em avaliação",
       "done": "Concluído",
+      "canChangeFromReview": "Permitir voltar da avaliação",
       "move": {
-        "title": "Tirar tarefa da avaliação",
-        "subtitle": "Você deseja mover esta tarefa da avaliação?",
         "cancel": "Cancelar",
         "submit": "Mover",
-        "warning": "Esta atividade não pode ser movida da avaliação"
+        "warning": "Esta tarefa não pode ser movida da avaliação"
+      },
+      "add": {
+        "title": "Adicionar tarefa à avaliação",
+        "subtitle": "Você deseja adicionar esta tarefa à avaliação?"
+      },
+      "remove": {
+        "title": "Remover tarefa da avaliação",
+        "subtitle": "Você deseja remover esta tarefa da avaliação?"
       }
     },
     "date": {

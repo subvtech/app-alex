@@ -245,7 +245,6 @@ definePageMeta({
 });
 const { find } = useStrapiUtils();
 const { update } = useStrapi();
-const learningPlanStore = useLearningPlanStore();
 const { t } = useI18n();
 
 const coursesView = ref('grid');

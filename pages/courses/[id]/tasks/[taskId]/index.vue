@@ -120,6 +120,7 @@
       :description="taskStore.task.description || ''"
       :submission-description="taskStore.task.submission_description"
       :has-submission="taskStore.task.submission_required"
+      :can-change-from-review="taskStore.task.can_change_from_review"
       :send-after-deadline="taskStore.task.can_submit_after_deadline"
       :start-date="taskStore.task.start_at"
       :end-date="taskStore.task.finish_at"
@@ -132,6 +133,7 @@
       @change-tags="handleChangeTags"
       @change-members="taskStore.updateTaskMembers(taskId)"
       @change-title="handleChangeTitle"
+      @change-can-alter-from-review="handleChangeAlterFromReview"
     />
   </section>
 </template>
@@ -208,6 +210,11 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     allowed_editor_plugins: values.allowed_editor_plugins!,
   };
   setTasks();
+};
+const handleChangeAlterFromReview = (val: boolean) => {
+  if (!taskStore.task) return;
+
+  taskStore.task.can_change_from_review = val;
 };
 const handleUpdateStatus = async (
   newIndex: number,

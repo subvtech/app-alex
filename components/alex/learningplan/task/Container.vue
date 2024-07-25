@@ -107,6 +107,7 @@
     :description="taskDetails?.description || undefined"
     :submission-description="taskDetails?.submission_description"
     :has-submission="taskDetails?.submission_required"
+    :can-change-from-review="taskDetails?.can_change_from_review"
     :send-after-deadline="taskDetails?.can_submit_after_deadline"
     :start-date="taskDetails?.start_at"
     :end-date="taskDetails?.finish_at"
@@ -121,6 +122,7 @@
     @change-tags="handleChangeTags"
     @change-members="handleChangeMembers"
     @change-title="handleChangeTitle"
+    @change-can-alter-from-review="handleChangeAlterFromReview"
     @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
   />
 </template>
@@ -226,7 +228,7 @@ const displaySuccess = (message: string) => {
   );
 };
 
-const isDateInRange = (date?: string | null, range) => {
+const isDateInRange = (range, date?: string | null) => {
   if (!range) return true;
   if (!date) return false;
   const { start, end } = range;
@@ -256,6 +258,7 @@ const handleCreateTask = async () => {
         submission_description: '',
         submission_required: false,
         can_submit_after_deadline: false,
+        can_change_from_review: false,
       });
       learningPlanStore.learningPlan?.tasks.push({
         id: res.data.id,
@@ -304,8 +307,8 @@ const tasksArray = computed(() => {
       };
       if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
         return;
-      if (!isDateInRange(task.start_at, tasksFilter.value?.startDate)) return;
-      if (!isDateInRange(task.finish_at, tasksFilter.value?.finalDate)) return;
+      if (!isDateInRange(tasksFilter.value?.startDate, task.start_at)) return;
+      if (!isDateInRange(tasksFilter.value?.finalDate, task.finish_at)) return;
       const students: TaskItem['students'] = [];
       task.task_members?.forEach((taskMember) => {
         if (taskMember.status === 'to_do') delivered.toDo += 1;
@@ -410,7 +413,7 @@ const handleMoveTask = async ({
       await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
-  } catch (e: unknown) {
+  } catch (e: any) {
     displayError('moveError', e);
   }
 };
@@ -516,7 +519,7 @@ const onDrop = async (item: TaskItem, tableSort: string) => {
           await updateTaskPositions(over.value.list as TaskStatus, item);
         }
         displaySuccess('moveSuccess');
-      } catch (e: ApplicationError) {
+      } catch (e: any) {
         displayError('moveError', e);
       }
     }
@@ -550,6 +553,16 @@ const handleChangeDescription = (description: string) => {
   );
   if (task) {
     task.description = description;
+  }
+};
+
+const handleChangeAlterFromReview = (val: boolean) => {
+  const task = learningPlanStore.learningPlan?.tasks.find(
+    (t) => t.id === editTaskId.value,
+  );
+
+  if (task) {
+    task.can_change_from_review = val;
   }
 };
 

@@ -131,6 +131,16 @@
             "
           />
         </v-col>
+        <v-col class="pa-0 d-flex align-center" cols="6">
+          <alex-custom-switch
+            v-model="canChangeFromReview"
+            :label="
+              $t(
+                'components.learningPlan.drawer.task.status.canChangeFromReview',
+              )
+            "
+          />
+        </v-col>
         <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
           <alex-learningplan-task-restrictions
             v-model="restrictionsValue"
@@ -226,6 +236,7 @@ interface TaskTeacherDrawerProps {
   restrictions?: string;
   editable?: boolean;
   hasSubmission?: boolean;
+  canChangeFromReview?: boolean;
   sendAfterDeadline?: boolean;
   kanbanButton?: boolean;
   startDate?: string | null;
@@ -241,6 +252,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   trail: undefined,
   editable: true,
   hasSubmission: false,
+  canChangeFromReview: false,
   sendAfterDeadline: false,
   kanbanButton: false,
   description: undefined,
@@ -258,6 +270,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
 const description = ref(props.description);
 const submissionDescription = ref(props.submissionDescription);
 const hasSubmission = ref(props.hasSubmission);
+const canChangeFromReview = ref<boolean>(props.canChangeFromReview);
 const sendAfterDeadline = ref(props.sendAfterDeadline);
 const goals = ref(props.goals);
 const tags = ref(props.tags);
@@ -289,6 +302,7 @@ watch(model, (value) => {
     description.value = props.description;
     submissionDescription.value = props.submissionDescription;
     hasSubmission.value = props.hasSubmission;
+    canChangeFromReview.value = props.canChangeFromReview;
     sendAfterDeadline.value = props.sendAfterDeadline;
     goals.value = props.goals;
     title.value = props.title;
@@ -313,6 +327,7 @@ type Emits = {
   'change-title': [value: string];
   'change-tags': [value: TagSimple[]];
   'change-goals': [value: LearningPlanGoalSimple[]];
+  'change-can-alter-from-review': [value: boolean];
   'change-members': [];
 };
 const emit = defineEmits<Emits>();
@@ -555,6 +570,16 @@ watch(hasSubmission, async (value) => {
   await updateTaskValues(taskId.value, {
     submission_required: value,
   });
+});
+watch(canChangeFromReview, async (value) => {
+  try {
+    await strapi.update('tasks', props.taskId, {
+      can_change_from_review: value,
+    });
+    emit('change-can-alter-from-review', value);
+  } catch (e) {
+    notifyFieldError('status');
+  }
 });
 watch(tags, (value) => emit('change-tags', value));
 // Close drawer
