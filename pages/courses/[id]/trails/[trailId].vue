@@ -6,7 +6,7 @@
       :trails-cover="
         trailStore.trail.cover_image
           ? trailStore.trail.cover_image.url
-          : '/images/cover_image_course.svg'
+          : 'images/cover_image_course.svg'
       "
       :trail-id="trailId"
       :course-id="learningPlanId"

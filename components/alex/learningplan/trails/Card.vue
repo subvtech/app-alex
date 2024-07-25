@@ -18,7 +18,7 @@
   >
     <div class="header">
       <v-img
-        :src="image.url || '/images/cover_image_course.svg'"
+        :src="image.url || 'images/cover_image_course.svg'"
         :alt="image.alt"
         :class="{ grayscale: hide }"
         cover

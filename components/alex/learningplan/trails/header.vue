@@ -23,7 +23,7 @@
         <div class="header-row">
           <div class="d-flex header-img d-flex align-start align-self-stretch">
             <img
-              :src="trailsCover || 'public/images/cover_image_course.svg'"
+              :src="trailsCover || 'images/cover_image_course.svg'"
               :alt="$t('components.trails.header.imgAlt')"
               class="trailImg justify-end align-start"
             />

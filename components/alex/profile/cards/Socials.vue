@@ -14,7 +14,7 @@
       <div class="d-flex flex-column justify-center w-100">
         <alex-custom-empty-placeholder
           v-if="sortedSocials.length === 0"
-          empty-text-image="/svg/EmptySocials.svg"
+          empty-text-image="svg/EmptySocials.svg"
           :empty-text-message="$t('components.profile.socials.empty')"
         />
 

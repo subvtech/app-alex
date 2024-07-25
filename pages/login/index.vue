@@ -226,7 +226,7 @@ const submit = handleSubmit(async () => {
     }
 
     &-acesso {
-      background-image: url('/images/login-bg.svg');
+      background-image: url('public/images/login-bg.svg');
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
@@ -375,7 +375,7 @@ const submit = handleSubmit(async () => {
       .form {
         gap: 22px;
 
-        ::v-deep .smaller-text {
+        :deep(.smaller-text) {
           font-size: 12px !important;
           .v-selection-control__wrapper {
             font-size: 12px !important;

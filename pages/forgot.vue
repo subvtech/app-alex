@@ -37,7 +37,7 @@ const handleSentEmail = (email) => {
 
 <style scoped lang="scss">
 .content-field {
-  background-image: url('/images/login-bg.svg');
+  background-image: url('public/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

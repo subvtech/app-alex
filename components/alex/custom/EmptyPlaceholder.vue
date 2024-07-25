@@ -21,7 +21,7 @@
 const props = defineProps({
   emptyTextImage: {
     type: String,
-    default: '/svg/EmptyAbout.svg',
+    default: 'svg/EmptyAbout.svg',
   },
   emptyTextMessage: {
     type: String,

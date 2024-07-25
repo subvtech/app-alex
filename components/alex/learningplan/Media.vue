@@ -14,7 +14,7 @@
       <div class="d-flex flex-column w-100 align-self-center gap-8">
         <alex-custom-empty-placeholder
           v-if="images.length === 0 && !isEditingAndCanEdit"
-          :empty-text-image="'/svg/EmptyMedia.svg'"
+          :empty-text-image="'svg/EmptyMedia.svg'"
           :empty-text-message="
             emptyTextMessage ?? $t('pages.courses.media.empty')
           "

@@ -31,11 +31,11 @@ defineProps({
 
 <style scoped lang="scss">
 .goal {
+  border-radius: 8px;
+  background: var(--cinza-cinza-azulado, #f1f5f9);
   .word-break {
     word-break: break-all;
   }
-  border-radius: 8px;
-  background: var(--cinza-cinza-azulado, #f1f5f9);
   .title {
     color: var(--principais-secundria-secundria-0, #00b7cc);
 

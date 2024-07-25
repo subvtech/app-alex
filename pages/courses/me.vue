@@ -162,7 +162,7 @@
                     <div class="d-flex align-center">
                       <v-img
                         :src="
-                          (item as any).img || '/images/cover_image_course.svg'
+                          (item as any).img || 'images/cover_image_course.svg'
                         "
                         width="48"
                         height="36"

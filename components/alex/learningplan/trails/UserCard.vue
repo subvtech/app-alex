@@ -2,7 +2,7 @@
   <div class="bg-white width-87 height-75 rounded-lg elevation-5">
     <v-img
       cover
-      :src="student.cover || '/images/cover_image_course.svg'"
+      :src="student.cover || 'images/cover_image_course.svg'"
       class="height-25 bg-blue w-100 rounded-t-lg banner"
     />
     <div class="d-flex justify-center user-info py-2 px-6">

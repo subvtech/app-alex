@@ -6,7 +6,7 @@
   />
   <div v-else class="box-info d-flex">
     <v-icon v-if="icon.startsWith('mdi')" color="#00B8CC">{{ icon }}</v-icon>
-    <img v-else :src="`/svg/${icon}`" width="24" height="24" />
+    <img v-else :src="`svg/${icon}`" width="24" height="24" />
     <div class="d-flex">
       <h6>{{ number }}</h6>
       <p>

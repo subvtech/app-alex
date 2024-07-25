@@ -49,23 +49,23 @@ watch(
 </script>
 
 <style scoped lang="scss">
-::v-deep .theme--light.v-label,
-::v-deep .theme--light.v-input input,
-::v-deep .theme--light.v-input textarea,
-::v-deep .theme--light.v-icon {
+:deep(.theme--light.v-label),
+:deep(.theme--light.v-input) input,
+:deep(.theme--light.v-input) textarea,
+:deep(.theme--light.v-icon) {
   color: rgba(255, 255, 255, 1);
 }
 
-::v-deep .v-input .v-label {
+:deep(.v-input .v-label) {
   left: 0 !important;
   top: -25px !important;
 }
 
-::v-deep .v-text-field .v-label--active {
+:deep(.v-text-field .v-label)--active {
   transform: none !important;
 }
 
-::v-deep .v-text-field--outlined fieldset {
+:deep(.v-text-field--outlined) fieldset {
   border-collapse: collapse;
   border-color: white;
   border-style: solid;

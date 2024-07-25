@@ -48,7 +48,7 @@ body {
 }
 
 #message {
-  background-image: url('/images/login-bg.svg');
+  background-image: url('public/images/login-bg.svg');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

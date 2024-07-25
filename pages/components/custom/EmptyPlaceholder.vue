@@ -137,7 +137,7 @@ const documentation = [
     text: 'Para alterar a imagem é preciso passar o caminho em <strong>emptyTextImage</strong>',
     props: {
       emptyTextMessage: 'Empty text',
-      emptyTextImage: '/svg/EmptyGoals.svg',
+      emptyTextImage: 'svg/EmptyGoals.svg',
     },
   },
 ];
@@ -161,7 +161,7 @@ const propsDocumentation = [
     name: 'emptyTextImage',
     type: 'String',
     description: 'O caminho da imagem que vai ser usada',
-    default: '/svg/EmptyAbout.svg',
+    default: 'svg/EmptyAbout.svg',
   },
   {
     name: 'emptyTextMessage',

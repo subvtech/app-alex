@@ -16,7 +16,7 @@
         class="d-flex flex-column w-100 justify-center align-center gap-4"
       >
         <alex-custom-empty-placeholder
-          empty-text-image="/svg/EmptyAbout.svg"
+          empty-text-image="svg/EmptyAbout.svg"
           :empty-text-message="$t('components.courses.editor.emptyPlaceholder')"
         />
       </div>

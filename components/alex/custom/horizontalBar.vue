@@ -21,16 +21,7 @@
 
       <div :class="[reverse ? 'ml-4' : 'mr-4']">
         <v-btn icon color="#6E7A87" @click="emit('chat')">
-          <img
-            :src="
-              isChatActive
-                ? 'public/svg/chat-read-active.svg'
-                : 'public/svg/chat-read.svg'
-            "
-            width="24"
-            height="24"
-            role="chat-active"
-          />
+          <img :src="chatIcon" width="24" height="24" role="chat-active" />
         </v-btn>
         <v-btn icon color="grey" @click="emit('alert')">
           <img
@@ -101,8 +92,8 @@
               item.to
                 ? router.push({ path: item.to })
                 : item.action
-                ? item.action()
-                : () => {}
+                  ? item.action()
+                  : () => {}
             "
           >
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -162,12 +153,16 @@ const props = withDefaults(defineProps<HorizontalBarComponentType>(), {
   trackCurrentUser: false,
 });
 
+const chatIcon = computed(() =>
+  props.isChatActive ? 'svg/chat-read-active.svg' : 'svg/chat-read.svg',
+);
+
 const computedPlaceholder = computed(() =>
   props.trackCurrentUser && userStore.user
     ? userStore.user?.fullname
     : props.placeholder
-    ? props.placeholder
-    : placeholderFallback,
+      ? props.placeholder
+      : placeholderFallback,
 );
 </script>
 

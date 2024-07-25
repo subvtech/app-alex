@@ -19,7 +19,7 @@
         v-if="localData.length === 0 && !isEditing"
         class="align-self-center"
         :empty-text-message="$t('components.courses.goals.empty')"
-        empty-text-image="/svg/EmptyGoals.svg"
+        empty-text-image="svg/EmptyGoals.svg"
       />
       <div v-if="isEditing" class="d-flex flex-column w-100 gap-4 align-center">
         <alex-custom-accordion

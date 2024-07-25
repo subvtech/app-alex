@@ -150,7 +150,7 @@ async function onConfirm() {
 <style scoped lang="scss">
 #join {
   .bg-img {
-    background-image: url('/images/login-bg.svg');
+    background-image: url('public/images/login-bg.svg');
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
