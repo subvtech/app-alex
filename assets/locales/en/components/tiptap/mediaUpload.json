@@ -1,0 +1,31 @@
+{
+  "image": {
+    "button": "Select an image",
+    "title": "Upload an image",
+    "selectType": "How do you want to upload the image?",
+    "filePlaceholder": "Drop the image here or ",
+    "action": "click to upload",
+    "urlPlaceholder": "Your image will be displayed here",
+    "dropMessage": "Drop the image here to upload"
+  },
+  "video": {
+    "button": "Select a video",
+    "title": "Upload a video",
+    "selectType": "How do you want to upload the video?",
+    "filePlaceholder": "Drop the video here or ",
+    "action": "click to upload",
+    "urlPlaceholder": "Your video will be displayed here",
+    "dropMessage": "Drop the video here to upload"
+  },
+  "errors": {
+    "fileType": "The file type is invalid.",
+    "fileSize": "The file size is too large.",
+    "imageSelected": "The inserted URL is an image. Please select a video url.",
+    "videoSelected": "The inserted URL is a video. Please select an image url.",
+    "invalidVideo": "The video URL is not valid.",
+    "url": "Please, insert a valid URL."
+  },
+  "inputPlaceholder": "Paste the URL here",
+  "fileButton": "File",
+  "urlButton": "URL"
+}

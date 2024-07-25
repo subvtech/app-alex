@@ -5,10 +5,6 @@
         <input type="checkbox" :checked="isEditable" @change="toggleEditable" />
         Editable
       </label>
-      <span class="tw-text-[10px]"
-        >Alterar o modo de edição em tempo real por enquanto não esta
-        atualizando os componentes customizados</span
-      >
     </div>
 
     <div class="bubble-menu-wrapper">
@@ -54,6 +50,7 @@ import Commands from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
 import Carousel from './custom-plugins/carousel/Extension';
+import Image from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
 import { isTextSelected } from './menus/bubble/isTextSelected';
 
@@ -290,6 +287,7 @@ onMounted(async () => {
           }
         },
         handleDeletedFiles: (id: string) => {
+          // Para editores com botão de salvar, temos que guardar o ID dos arquivos e apenas deletar com a confirmação do usuário
           // if (file.videoId) mediaToDelete.value.push(file.videoId);
           // if (file.imgId) mediaToDelete.value.push(file.imgId);
           strapiClient(`/upload/files/${id}`, {
@@ -297,6 +295,38 @@ onMounted(async () => {
           });
         },
         readOnly: () => !isEditable.value,
+      }),
+      Image.configure({
+        readOnly: () => !isEditable.value,
+        uploadMedia: async (file: File) => {
+          const formData = new FormData();
+          formData.append('files', file, file.name);
+          try {
+            const res = await strapiClient<Upload[]>('/upload', {
+              method: 'POST',
+              body: formData,
+            });
+            const { url, id } = res[0];
+            temporaryMedia.value.push(id);
+            return {
+              success: 1,
+              url,
+              id,
+              title:
+                file.name?.slice(0, file.name?.lastIndexOf('.')) || 'Untitled',
+            };
+          } catch (error) {
+            return {
+              success: 0,
+            };
+          }
+        },
+        deleteMedia: (id: string) => {
+          // mediaToDelete.value.push(id);
+          strapiClient(`/upload/files/${id}`, {
+            method: 'DELETE',
+          });
+        },
       }),
     ],
     content: props.modelValue,

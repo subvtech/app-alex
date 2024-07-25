@@ -120,6 +120,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'editorjs/fileSet',
     'tiptap/menus',
     'tiptap/messages',
+    'tiptap/mediaUpload',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

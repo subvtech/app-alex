@@ -14,6 +14,8 @@
     "horizontalRule": "Horizontal Rule",
     "table": "Table",
     "carousel": "Carousel",
+    "image": "Image",
+    "video": "Video",
     "noResults": "No results found"
   },
   "bubbleMenu": {

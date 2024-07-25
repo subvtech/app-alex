@@ -132,6 +132,40 @@ export default {
             .run();
         },
       },
+      {
+        title: 'image',
+        icon: 'mdi-image',
+        command: ({ editor, range }) => {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .insertContent({
+              type: 'mediaUpload',
+              attrs: {
+                format: 'image',
+              },
+            })
+            .run();
+        },
+      },
+      {
+        title: 'video',
+        icon: 'mdi-movie-play',
+        command: ({ editor, range }) => {
+          editor
+            .chain()
+            .focus()
+            .deleteRange(range)
+            .insertContent({
+              type: 'mediaUpload',
+              attrs: {
+                format: 'video',
+              },
+            })
+            .run();
+        },
+      },
     ]
       .filter((item) => {
         if (query) {
@@ -144,14 +178,6 @@ export default {
       })
       .slice(0, 20);
   },
-  /* 
-
-  {
-    value: 'codeXml',
-    icon: CodeXml,
-    ariaLabel: 'Code Block',
-    onClick: () => props.editor.chain().focus().toggleCodeBlock().run(),
-  }, */
   render: () => {
     let component;
     let popup;
