@@ -20,20 +20,17 @@ export const useMetamask = () => {
 
   const loading = ref(false);
 
-  const signMessage = async (coinbase: boolean) => {
+  const signMessage = async () => {
     if (window.ethereum.providers) {
       const providers = Array.from(window.ethereum.providers);
+      let provider = providers.find(
+        (provider: any) => provider.isCoinbaseWallet,
+      );
 
-      const provider = coinbase
-        ? providers.find((provider: any) => provider.isCoinbaseWallet)
-        : providers.find((provider: any) => provider.isMetaMask);
+      if (!provider)
+        provider = providers.find((provider: any) => provider.isMetaMask);
 
       if (!provider) throw new Error('Provider not found');
-      console.log(
-        coinbase
-          ? 'User is using Coinbase Wallet'
-          : 'User is using MetaMask, but they have the Coinbase Wallet too',
-      );
 
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
@@ -72,7 +69,7 @@ export const useMetamask = () => {
     };
   };
 
-  const linkWallet = async (userId = undefined, coinbase = true) => {
+  const linkWallet = async (userId = undefined) => {
     try {
       loading.value = true;
 
@@ -80,9 +77,8 @@ export const useMetamask = () => {
         throw new Error(i18n.t('pages.login.metamask.notFound'));
       }
 
-      console.log({ coinbase, providers: window.ethereum.providers });
-      const { address, signedMessage, provider, token } =
-        await signMessage(coinbase);
+      console.log({ providers: window.ethereum.providers });
+      const { address, signedMessage, provider, token } = await signMessage();
       console.log({ address, signedMessage, token });
       let endpoint: string;
       let requestData: any;
@@ -125,8 +121,11 @@ export const useMetamask = () => {
         }
       }
     } catch (err: any) {
-      console.log({ err });
-      setMessage(err.message ?? err, 'red', true);
+      const errorMsg =
+        err.code && err.code === 'ACTION_REJECTED'
+          ? i18n.t('pages.login.metamask.rejected')
+          : err.message ?? err;
+      setMessage(errorMsg, 'red', true);
     } finally {
       loading.value = false;
     }
@@ -136,14 +135,14 @@ export const useMetamask = () => {
     try {
       const result = await _delete('user-wallets', walletId);
       if (result.data) userStore.setWallet();
-    } catch (err) {
-      setMessage(err as string, 'red', true);
+    } catch (err: any) {
+      console.log('unlinkWallet', { err });
+      setMessage(err.message ?? err, 'red', true);
     }
   };
 
-  const metalogin = async (coinbase = false) => {
-    console.log({ coinbase, metalogin: 'metalogin' });
-    const { jwt, user, address } = await linkWallet(undefined, coinbase);
+  const metalogin = async () => {
+    const { jwt, user, address } = await linkWallet(undefined);
 
     if (jwt && user) {
       setToken(jwt);

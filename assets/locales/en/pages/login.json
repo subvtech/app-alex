@@ -17,7 +17,8 @@
   "metamask": {
     "btn": "Login with Metamask",
     "notFound": "Metamask wallet wasn't detected",
-    "tokenExpired": "Token expired, try again"
+    "tokenExpired": "Token expired, try again",
+     "rejected": "The user cancelled the action"
   },
   "loginError": "Invalid email or invalid password, maybe both",
   "confirmEmail": "Please validate your email before proceeding.",

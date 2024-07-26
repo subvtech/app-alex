@@ -17,7 +17,8 @@
   "metamask": {
     "btn": "Acessar com a Metamask",
     "notFound": "Metamask not detected",
-    "tokenExpired": "Token expirado, tente novamente"
+    "tokenExpired": "Token expirado, tente novamente",
+    "rejected": "O usuário cancelou a operação"
   },
   "loginError": "Email ou senha incorretos!",
   "confirmEmail": "Por favor, valide seu e-mail antes de continuar.",
