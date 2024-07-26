@@ -21,7 +21,14 @@
       </v-tooltip>
     </ToggleGroup>
     <v-divider class="divider mx-2" vertical></v-divider>
-    <Slider v-model="imageSize" :max="100" :min="25" :step="25" color="green" />
+    <Slider
+      v-model="imageSize"
+      :max="100"
+      :min="25"
+      :step="25"
+      color="green"
+      class="tw-cursor-pointer"
+    />
     <span class="mx-2">{{ imageSize[0] }}%</span>
   </div>
 </template>
