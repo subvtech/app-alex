@@ -9,6 +9,7 @@ export default Extension.create({
       suggestion: {
         char: '/',
         command: ({ editor, range, props }) => {
+          if (!props.command) return;
           props.command({ editor, range });
         },
       },
