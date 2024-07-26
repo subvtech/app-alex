@@ -1,8 +1,8 @@
 <template>
   <div class="slash-menu pa-3 width-75 rounded-lg">
-    <template v-if="items.length">
+    <template v-if="filteredItems.length">
       <div
-        v-for="(item, index) in items"
+        v-for="(item, index) in filteredItems"
         :key="index"
         class="text-gray-600 text-body-3 row"
       >
@@ -33,9 +33,12 @@ export default {
       type: Array,
       required: true,
     },
-
     command: {
       type: Function,
+      required: true,
+    },
+    query: {
+      type: String,
       required: true,
     },
   },
@@ -44,6 +47,27 @@ export default {
     return {
       selectedIndex: 0,
     };
+  },
+
+  computed: {
+    filteredItems() {
+      if (!this.query) {
+        return this.items;
+      }
+
+      const lowerQuery = this.query.toLowerCase();
+
+      return this.items.filter((item) => {
+        if (item.divider) {
+          return false;
+        }
+
+        const title = this.$t(
+          `components.tiptap.menus.slashMenu.${item.title}`,
+        );
+        return title.toLowerCase().includes(lowerQuery);
+      });
+    },
   },
 
   watch: {
@@ -74,11 +98,12 @@ export default {
 
     upHandler() {
       this.selectedIndex =
-        (this.selectedIndex + this.items.length - 1) % this.items.length;
+        (this.selectedIndex + this.filteredItems.length - 1) %
+        this.filteredItems.length;
     },
 
     downHandler() {
-      this.selectedIndex = (this.selectedIndex + 1) % this.items.length;
+      this.selectedIndex = (this.selectedIndex + 1) % this.filteredItems.length;
     },
 
     enterHandler() {
@@ -86,7 +111,7 @@ export default {
     },
 
     selectItem(index) {
-      const item = this.items[index];
+      const item = this.filteredItems[index];
 
       if (item) {
         this.command(item);
@@ -125,7 +150,6 @@ div.row:not(:first-of-type) .divider {
   button {
     align-items: center;
     gap: 0.25rem;
-    // transition: all 0.2s ease;
 
     &:hover,
     &:hover.is-selected {
