@@ -23,7 +23,13 @@
     "imageSelected": "The inserted URL is an image. Please select a video url.",
     "videoSelected": "The inserted URL is a video. Please select an image url.",
     "invalidVideo": "The video URL is not valid.",
-    "url": "Please, insert a valid URL."
+    "url": "Please, insert a valid URL.",
+    "upload": "An error occurred while uploading the file."
+  },
+  "tooltip": {
+    "center": "Align Center",
+    "start": "Align Left",
+    "end": "Align Right"
   },
   "inputPlaceholder": "Paste the URL here",
   "fileButton": "File",
