@@ -80,7 +80,12 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const userIsFacilitator = computed(() => {
-    return facilitator.value?.user?.id === user.value.id;
+    return learningPlan.value?.members.some(
+      (m: LearningPlanMemberSimple) =>
+        (m.role === MemberRoles.FACILITATOR ||
+          m.role === MemberRoles.COLLABORATOR) &&
+        m.user?.id === user.value.id,
+    );
   });
 
   const startDateFormated = computed(() => {
