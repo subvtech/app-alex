@@ -71,6 +71,13 @@ export default function useContentItemActions(editor: Editor) {
         ? currentNodePos.value + 2
         : insertPos + 2;
 
+      const docSize = editor.state.doc.content.size;
+
+      // TODO: Fix position out of range, acredito que seja relacionado ao tamanho do bloco
+
+      const validInsertPos = Math.min(insertPos, docSize);
+      // const validFocusPos = Math.min(focusPos, docSize);
+
       editor
         .chain()
         .command(({ dispatch, tr, state }) => {
@@ -83,7 +90,7 @@ export default function useContentItemActions(editor: Editor) {
               );
             } else {
               tr.insert(
-                insertPos,
+                validInsertPos,
                 state.schema.nodes.paragraph.create(null, [
                   state.schema.text('/'),
                 ]),

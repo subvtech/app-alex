@@ -4,7 +4,7 @@ import tippy from 'tippy.js';
 import CommandsList from './CommandsList.vue';
 
 export default {
-  items: ({ query }) => {
+  items: () => {
     return [
       {
         divider: true,
@@ -166,17 +166,7 @@ export default {
             .run();
         },
       },
-    ]
-      .filter((item) => {
-        if (query) {
-          return (
-            item.title.toLowerCase().includes(query.toLowerCase()) &&
-            !item.divider
-          );
-        }
-        return true;
-      })
-      .slice(0, 20);
+    ].slice(0, 20);
   },
   render: () => {
     let component;

@@ -23,7 +23,13 @@
     "imageSelected": "A URL inserida é uma imagem. Por favor, selecione uma url para um vídeo.",
     "videoSelected": "A URL inserida é um vídeo. Por favor, selecione uma url para uma imagem.",
     "invalidVideo": "A URL do vídeo não é válida.",
-    "url": "Por favor, insira uma URL válida."
+    "url": "Por favor, insira uma URL válida.",
+    "upload": "Ocorreu um erro ao fazer o upload do arquivo."
+  },
+  "tooltip": {
+    "center": "Alinhar ao Centro",
+    "start": "Alinhar à Esquerda",
+    "end": "Alinhar à Direita"
   },
   "inputPlaceholder": "Cole a URL aqui",
   "fileButton": "Arquivo",

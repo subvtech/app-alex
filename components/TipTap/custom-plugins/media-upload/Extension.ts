@@ -33,6 +33,8 @@ export default Node.create<MediaConfig>({
         default: {
           src: '',
           title: '',
+          size: 100,
+          align: 'center',
           id: null,
         } as MediaType,
       },

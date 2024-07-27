@@ -195,7 +195,7 @@
 import { NodeViewWrapper, NodeViewProps } from '@tiptap/vue-3';
 import { VueperSlides, VueperSlide } from 'vueperslides';
 import 'vueperslides/dist/vueperslides.css';
-import VideoPlayer from './VideoJS.vue';
+import VideoPlayer from '../VideoJS.vue';
 import FileModal from './FileModal.vue';
 
 interface Slide {
@@ -390,9 +390,9 @@ const addSlide = async (slide, index) => {
     }
   }
   if (slidesChanged) {
-    vueperslides2.value.goToSlide(index);
+    vueperslides2.value?.goToSlide(index);
   } else {
-    vueperslides2.value.goToSlide(slides.value.length - 1);
+    vueperslides2.value?.goToSlide(slides.value.length - 1);
   }
 };
 
