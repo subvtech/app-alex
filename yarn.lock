@@ -2604,6 +2604,11 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-list-item/-/extension-list-item-2.4.0.tgz#a97a48850b81e94b9a60cc2aa16e515aa5311456"
   integrity sha512-reUVUx+2cI2NIAqMZhlJ9uK/+zvRzm1GTmlU2Wvzwc7AwLN4yemj6mBDsmBLEXAKPvitfLh6EkeHaruOGymQtg==
 
+"@tiptap/extension-mention@^2.5.6":
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-mention/-/extension-mention-2.5.6.tgz#593fd688063f391a71f84873f2841cfce642d219"
+  integrity sha512-C+YMzuFhrJD1NqHOwzwJXjy6eFu6gTj3Cs2gvYIT+jyRFK7eBvupqCUX0Vg71QMkLu211ijo32UG3AgfeEsDNQ==
+
 "@tiptap/extension-ordered-list@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-ordered-list/-/extension-ordered-list-2.4.0.tgz#6cf82e10d7e7f7cc44156d29b0b71a22dec31612"
@@ -2738,10 +2743,10 @@
     "@tiptap/extension-strike" "^2.4.0"
     "@tiptap/extension-text" "^2.4.0"
 
-"@tiptap/suggestion@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@tiptap/suggestion/-/suggestion-2.4.0.tgz#1926cde5f197d116baf7794f55bd971245540e5c"
-  integrity sha512-6dCkjbL8vIzcLWtS6RCBx0jlYPKf2Beuyq5nNLrDDZZuyJow5qJAY0eGu6Xomp9z0WDK/BYOxT4hHNoGMDkoAg==
+"@tiptap/suggestion@^2.5.6":
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/@tiptap/suggestion/-/suggestion-2.5.6.tgz#7383366bb0554d67ba8361482bfc2c69ddf1ed64"
+  integrity sha512-Al/iRURUMPc5LnZO4Qn6iPr05qfTW9Xo6qaw0XqKjPg6dabDQ0Gdx7gs28jC6CXxlphrgEpkMmmIGU7o7ovLJw==
 
 "@tiptap/vue-3@^2.4.0":
   version "2.4.0"

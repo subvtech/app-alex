@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <div class="control-group">
+  <div class="rounded-lg">
+    <!-- <div class="control-group">
       <label>
         <input type="checkbox" :checked="isEditable" @change="toggleEditable" />
         Editable
       </label>
-    </div>
+    </div> -->
 
     <div class="bubble-menu-wrapper">
       <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { Editor, EditorContent } from '@tiptap/vue-3';
+import { Editor, EditorContent, mergeAttributes } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
 import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
@@ -46,6 +46,7 @@ import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
+import Mention from '@tiptap/extension-mention';
 import Commands from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
@@ -53,6 +54,7 @@ import Carousel from './custom-plugins/carousel/Extension';
 import Image from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
 import { isTextSelected } from './menus/bubble/isTextSelected';
+import mentionSuggestion from './mentions/Suggestions';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
@@ -61,11 +63,26 @@ const app = useNuxtApp();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: '',
+  },
+  edit: {
+    type: Boolean,
+    default: true,
+  },
+  taskId: {
+    type: Number,
+    default: 0,
+  },
+});
+
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 
 const editor = ref();
-const isEditable = ref(true);
+const isEditable = ref(props.edit);
 
 const collors = [
   '#f783ac',
@@ -115,7 +132,7 @@ onMounted(async () => {
   const user = useStrapiUser();
   const TipTapToken = await getTipTapToken(user.value?.id);
   const provider = new TiptapCollabProvider({
-    name: 'teste2', // Unique document identifier for syncing. This is your document name.
+    name: `task-${props.taskId}`, // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token: TipTapToken, // Your JWT token
     document: doc,
@@ -151,6 +168,30 @@ onMounted(async () => {
             return false;
           }
           return isTextSelected({ editor: editor.value });
+        },
+      }),
+      Mention.configure({
+        HTMLAttributes: {
+          class: 'mention',
+        },
+        renderHTML({ options, node }) {
+          return [
+            'a',
+            mergeAttributes(
+              {
+                href: `/users/${node.attrs.id.username}`,
+                alt: node.attrs.id.fullname,
+              },
+              options.HTMLAttributes,
+            ),
+            `${options.suggestion.char}${
+              node.attrs.id.username ?? node.attrs.id.id
+            }`,
+          ];
+        },
+        suggestion: {
+          items: (editor) => mentionSuggestion.items(editor, props.taskId),
+          render: mentionSuggestion.render,
         },
       }),
       Placeholder.configure({
@@ -340,10 +381,10 @@ onMounted(async () => {
   });
 });
 
-const toggleEditable = () => {
-  isEditable.value = !isEditable.value;
-  editor.value.setEditable(isEditable.value);
-};
+// const toggleEditable = () => {
+//   isEditable.value = !isEditable.value;
+//   editor.value.setEditable(isEditable.value);
+// };
 
 onBeforeUnmount(() => {
   if (editor.value) {
@@ -351,14 +392,15 @@ onBeforeUnmount(() => {
   }
 });
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: '',
-  },
-});
-
 const emits = defineEmits(['update:modelValue']);
+
+watch(
+  () => props.edit,
+  (val) => {
+    editor.value.setEditable(val);
+    isEditable.value = val;
+  },
+);
 
 watch(
   () => props.modelValue,
@@ -381,6 +423,9 @@ watch(
 </script>
 
 <style lang="scss">
+.tippy-box {
+  background: white;
+}
 /* Basic editor styles */
 .tiptap {
   outline: none !important;
@@ -564,6 +609,14 @@ watch(
     }
   }
 
+  .mention {
+    background-color: var(--purple-light);
+    border-radius: 0.4rem;
+    box-decoration-break: clone;
+    color: var(--purple);
+    padding: 0.1rem 0.3rem;
+  }
+
   blockquote {
     border-left: 3px solid rgb(var(--v-theme-secondary--1));
     margin: 1.5rem 0;
@@ -676,3 +729,4 @@ watch(
   pointer-events: none;
 }
 </style>
+./mentions/Suggestions

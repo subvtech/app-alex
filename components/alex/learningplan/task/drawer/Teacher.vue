@@ -104,6 +104,7 @@
       <alex-learningplan-task-description
         v-model="description"
         :edit="editable"
+        :task-id="taskId"
       />
 
       <!-- Objetivos de aprendizagem -->
@@ -139,25 +140,25 @@
         </v-col>
       </v-row>
 
-      <p v-if="hasSubmission" class="text-body-4 text-gray-800 mb-2">
-        {{
-          $t('components.learningPlan.drawer.task.submission.description.label')
-        }}
-      </p>
-
-      <alex-inputs-text-area
+      <alex-learningplan-task-description
         v-if="hasSubmission"
         v-model="submissionDescription"
         name="submissionDescription"
-        :placeholder="
-          $t(
-            'components.learningPlan.drawer.task.submission.description.placeHolder',
-          )
+        :edit="editable"
+        :task-id="taskId"
+        :title="
+          $t('components.learningPlan.drawer.task.submission.description.label')
         "
-        variant="outlined"
-        density="comfortable"
-        hide-details
       />
+      <!-- <alex-learningplan-task-description
+        v-if="hasSubmission"
+        v-model="submissionDescription"
+        name="submissionDescription"
+        :edit="editable"
+        :title="
+          $t('components.learningPlan.drawer.task.submission.description.label')
+        "
+      /> -->
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
         <alex-learningplan-task-resources
@@ -255,7 +256,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   members: () => [],
 });
 
-const description = ref(props.description);
+const description = ref<string | undefined>(props.description);
 const submissionDescription = ref(props.submissionDescription);
 const hasSubmission = ref(props.hasSubmission);
 const sendAfterDeadline = ref(props.sendAfterDeadline);
@@ -434,9 +435,10 @@ useOnStopTyping(
       if (isFirstTimeOpened.value) {
         return;
       }
-      await strapi.update('tasks', props.taskId, {
-        description: description.value,
-      });
+      // console.log(description.value);
+      // await strapi.update('tasks', props.taskId, {
+      //   description: description.value,
+      // });
       emit('change-description', description.value || '');
     } catch (error) {
       notifyFieldError('description');
@@ -453,9 +455,9 @@ useOnStopTyping(
       if (isFirstTimeOpened.value) {
         return;
       }
-      await strapi.update('tasks', props.taskId, {
-        submission_description: submissionDescription.value,
-      });
+      // await strapi.update('tasks', props.taskId, {
+      //   submission_description: submissionDescription.value,
+      // });
       emit('change-submission-description', submissionDescription.value || '');
     } catch (error) {
       notifyFieldError('submissionDescription');

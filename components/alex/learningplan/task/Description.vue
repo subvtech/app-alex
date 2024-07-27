@@ -4,30 +4,20 @@
       {{ title || $t('components.learningPlan.drawer.task.description.label') }}
     </p>
 
-    <alex-inputs-text-area
-      v-if="edit"
+    <TipTap
       v-model="model"
-      name="description"
-      :placeholder="
-        $t('components.learningPlan.drawer.task.description.placeHolder')
-      "
-      variant="outlined"
-      density="comfortable"
-      hide-details
+      class="rounded-lg pa-0"
+      :class="edit && 'border tw-min-h-[102px]'"
+      :task-id="taskId"
+      :edit="edit"
     />
-    <p
-      v-else
-      class="text-body-3"
-      :class="model ? 'text-gray-800' : 'text-gray-400'"
-    >
-      {{ model || $t('components.learningPlan.drawer.missing.description') }}
-    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 interface DescriptionProps {
   // Tipar certinho
+  taskId?: number;
   edit?: boolean;
   title?: string;
 }
