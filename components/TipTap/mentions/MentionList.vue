@@ -1,33 +1,40 @@
 <template>
-  <div class="dropdown-menu tw-rounded-sm tw-shadow">
+  <div class="dropdown-menu tw-rounded-sm tw-shadow ga-2 py-2 px-0">
     <template v-if="items.length">
       <div
         v-for="(user, index) in items"
         :key="index"
         :class="{ 'is-selected': index === selectedIndex }"
-        class="d-flex align-center flex-wrap ga-3 pa-2 text-gray-800 hover:tw-bg-gray-100 tw-cursor-pointer tw-transition"
+        class="d-flex align-center flex-wrap ga-3 py-2 px-3 text-gray-800 hover:tw-bg-gray-100 tw-cursor-pointer tw-transition"
         role="button"
         @click="selectItem(index)"
       >
-        <app-user-avatar
-          :size="35"
-          :placeholder="user.fullname"
-          :profile-picture="
-            user.avatar && { url: user.avatar.url, id: user.avatar.id }
-          "
-          show-border
-        />
+        <v-avatar
+          :size="40"
+          :image="user.avatar?.url"
+          class="alex-avatar-group-border alex-avatar-group-margin"
+          color="gray-100"
+        >
+          <template v-if="!user.avatar?.url" #default>
+            <p class="text-gray-300 text-body-2">
+              {{ getInitials(name) }}
+            </p>
+          </template>
+        </v-avatar>
+
         <div>
-          <p class="text-gray-800">
+          <p class="text-body-4 text-gray-900 tw-truncate">
             {{ user.fullname || 'Sem nome' }}
           </p>
-          <p class="tw-text-xs text-gray-600">
+          <p class="text-body-5 text-gray-500 tw-truncate">
             {{ user.username || 'Sem username' }}
           </p>
         </div>
       </div>
     </template>
-    <div v-else class="item">Sem alunos</div>
+    <div v-else class="item">
+      {{ $t('components.learningPlan.drawer.missing.members') }}
+    </div>
   </div>
 </template>
 
@@ -114,6 +121,11 @@ export default {
   overflow: auto;
   padding: 0.4rem;
   position: relative;
+  border-radius: 8px;
+  box-shadow:
+    0px 5px 5px -3px var(--v-shadow-key-umbra-opacity, rgba(0, 0, 0, 0.2)),
+    0px 8px 10px 1px var(--v-shadow-key-penumbra-opacity, rgba(0, 0, 0, 0.14)),
+    0px 3px 14px 2px var(--v-shadow-key-penumbra-opacity, rgba(0, 0, 0, 0.12));
 
   button {
     align-items: center;

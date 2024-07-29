@@ -142,6 +142,75 @@
                 @configurations="navigate(course.raw.id, 'settings')"
                 @open="navigate(course.raw.id, 'page')"
               />
+              <alex-learningplan-card
+                v-for="(course, index) in items"
+                v-show="!course.raw.hidden || professorMode"
+                :key="course.raw.title + index"
+                type="course"
+                :title="course.raw.title"
+                :options="course.raw.userIsFacilitator"
+                :description="course.raw.description"
+                :image="{
+                  url: course.raw.cover_image?.url,
+                }"
+                :facilitator="{
+                  name: course.raw.facilitatorName,
+                  imageURL: course.raw.facilitatorImage,
+                }"
+                class="flex-stretch w-100 h-100"
+                :trails-count="course.raw.trails"
+                :hide="course.raw.hidden"
+                :hide-favorited-button="true"
+                @toggle-visibility="changeItemVisibility(index, course.raw.id)"
+                @configurations="navigate(course.raw.id, 'settings')"
+                @open="navigate(course.raw.id, 'page')"
+              />
+              <alex-learningplan-card
+                v-for="(course, index) in items"
+                v-show="!course.raw.hidden || professorMode"
+                :key="course.raw.title + index"
+                type="course"
+                :title="course.raw.title"
+                :options="course.raw.userIsFacilitator"
+                :description="course.raw.description"
+                :image="{
+                  url: course.raw.cover_image?.url,
+                }"
+                :facilitator="{
+                  name: course.raw.facilitatorName,
+                  imageURL: course.raw.facilitatorImage,
+                }"
+                class="flex-stretch w-100 h-100"
+                :trails-count="course.raw.trails"
+                :hide="course.raw.hidden"
+                :hide-favorited-button="true"
+                @toggle-visibility="changeItemVisibility(index, course.raw.id)"
+                @configurations="navigate(course.raw.id, 'settings')"
+                @open="navigate(course.raw.id, 'page')"
+              />
+              <alex-learningplan-card
+                v-for="(course, index) in items"
+                v-show="!course.raw.hidden || professorMode"
+                :key="course.raw.title + index"
+                type="course"
+                :title="course.raw.title"
+                :options="course.raw.userIsFacilitator"
+                :description="course.raw.description"
+                :image="{
+                  url: course.raw.cover_image?.url,
+                }"
+                :facilitator="{
+                  name: course.raw.facilitatorName,
+                  imageURL: course.raw.facilitatorImage,
+                }"
+                class="flex-stretch w-100 h-100"
+                :trails-count="course.raw.trails"
+                :hide="course.raw.hidden"
+                :hide-favorited-button="true"
+                @toggle-visibility="changeItemVisibility(index, course.raw.id)"
+                @configurations="navigate(course.raw.id, 'settings')"
+                @open="navigate(course.raw.id, 'page')"
+              />
             </div>
             <v-data-table
               v-else
@@ -245,7 +314,6 @@ definePageMeta({
 });
 const { find } = useStrapiUtils();
 const { update } = useStrapi();
-const learningPlanStore = useLearningPlanStore();
 const { t } = useI18n();
 
 const coursesView = ref('grid');
@@ -512,8 +580,9 @@ const navigate = (id: number, page) => {
   height: min-content;
   column-gap: 24px;
   row-gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
-  justify-content: center; /* Centers the grid items horizontally */
+  /* grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important; */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 375px)) !important;
+  justify-content: start; /* Centers the grid items horizontally */
 }
 
 .flex-stretch {

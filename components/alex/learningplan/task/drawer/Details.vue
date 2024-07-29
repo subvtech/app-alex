@@ -63,7 +63,11 @@
       </v-col>
     </v-row>
 
-    <alex-learningplan-task-description v-model="description" class="mt-4" />
+    <alex-learningplan-task-description
+      v-model="description"
+      class="mt-4"
+      :task-id="taskId"
+    />
 
     <div class="my-6">
       <p class="text-h4 text-gray-800">
@@ -80,11 +84,13 @@
           v-if="submissionDescription"
           v-model="submissionDescription"
           class="mt-4"
+          :submission="true"
           :title="
             $t(
               'components.learningPlan.drawer.task.description.submissionLabel',
             )
           "
+          :task-id="taskId"
         />
 
         <div class="mt-4">

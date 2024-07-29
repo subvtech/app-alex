@@ -46,7 +46,7 @@ import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
-import Mention from '@tiptap/extension-mention';
+import { Mention } from '@tiptap/extension-mention';
 import Commands from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
@@ -75,6 +75,10 @@ const props = defineProps({
   taskId: {
     type: Number,
     default: 0,
+  },
+  submission: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -132,7 +136,7 @@ onMounted(async () => {
   const user = useStrapiUser();
   const TipTapToken = await getTipTapToken(user.value?.id);
   const provider = new TiptapCollabProvider({
-    name: `task-${props.taskId}`, // Unique document identifier for syncing. This is your document name.
+    name: `task-${props.submission ? 'submission-' : ''}${props.taskId}`, // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token: TipTapToken, // Your JWT token
     document: doc,
@@ -613,7 +617,7 @@ watch(
     background-color: var(--purple-light);
     border-radius: 0.4rem;
     box-decoration-break: clone;
-    color: var(--purple);
+    color: purple;
     padding: 0.1rem 0.3rem;
   }
 
@@ -729,4 +733,3 @@ watch(
   pointer-events: none;
 }
 </style>
-./mentions/Suggestions

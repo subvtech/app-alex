@@ -15,13 +15,14 @@
         {{ title || '(' + $t('components.courses.tasks.noTitle') + ')' }}
       </p>
       <div>
-        <p
+        <!-- <p
           ref="descEl"
           class="text-body-3 text-gray-800"
           :class="!expanded ? 'ellipsis lines-2' : ''"
         >
           {{ description || `(${$t('components.courses.tasks.noDesc')})` }}
-        </p>
+        </p> -->
+        <TipTap v-model="descRef" class="pa-0" :edit="false" />
       </div>
       <div v-if="ellipsis" class="d-flex justify-end">
         <alex-custom-button
@@ -140,6 +141,15 @@ const handleEdit = () => {
   emit('edit-click');
 };
 
+const descRef = ref<string>(props.description);
+
+watch(
+  () => props.description,
+  (val) => {
+    descRef.value = val;
+  },
+);
+
 const statusCfg = {
   draft: {
     text: t('components.learningPlan.drawer.task.status.draft'),
@@ -182,6 +192,7 @@ const formatDate = (date: Date | string) => {
   }
   return format(date, 'dd/MM/yyyy');
 };
+
 const typeSubmission = computed(() => {
   if (props.sendSubmission && props.sendSubmissionAfterDeadline) {
     return t('components.courses.tasks.submission.sendAfterDeadline');

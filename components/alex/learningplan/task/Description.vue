@@ -9,6 +9,7 @@
       class="rounded-lg pa-0"
       :class="edit && 'border tw-min-h-[102px]'"
       :task-id="taskId"
+      :submission="submission"
       :edit="edit"
     />
   </div>
@@ -20,6 +21,7 @@ interface DescriptionProps {
   taskId?: number;
   edit?: boolean;
   title?: string;
+  submission?: boolean;
 }
 
 defineProps<DescriptionProps>();

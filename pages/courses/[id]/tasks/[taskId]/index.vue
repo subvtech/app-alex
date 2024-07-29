@@ -237,7 +237,7 @@ const handleChangeSendAfterDeadline = (memberID: number, value: boolean) => {
 
 const getClassesOfTaskMembers = (taskMembers: TaskMember[]) => {
   const classes = taskMembers.flatMap((taskMember) =>
-    taskMember.learning_plan_member.learning_class
+    taskMember.learning_plan_member?.learning_class
       ? taskMember.learning_plan_member.learning_class.name
       : [],
   );
