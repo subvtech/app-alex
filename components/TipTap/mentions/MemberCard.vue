@@ -9,7 +9,7 @@
       >
         <v-avatar
           :size="40"
-          :image="''"
+          :image="avatarUrl"
           class="alex-avatar-group-border alex-avatar-group-margin"
           color="gray-100"
         >
@@ -36,12 +36,18 @@
 import { NodeViewWrapper } from '@tiptap/vue-3';
 
 interface MemberCardProps {
-  fullname: string;
-  username: string;
+  fullname?: string;
+  username?: string;
   avatarUrl?: string;
 }
 
-defineProps<MemberCardProps>();
+const props = withDefaults(defineProps<MemberCardProps>(), {
+  avatarUrl: '',
+  fullname: 'Eliezir Teste',
+  username: 'eliezir',
+});
+
+console.log(props);
 </script>
 
 <style scoped>

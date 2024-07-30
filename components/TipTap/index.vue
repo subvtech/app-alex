@@ -46,7 +46,7 @@ import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
-import { Mention } from '@tiptap/extension-mention';
+import CustomMention from './mentions/Extension';
 import Commands from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
@@ -174,27 +174,33 @@ onMounted(async () => {
           return isTextSelected({ editor: editor.value });
         },
       }),
-      Mention.configure({
-        HTMLAttributes: {
-          class: 'mention',
-        },
-        renderHTML({ options, node }) {
-          return [
-            'a',
-            mergeAttributes(
-              {
-                href: `/users/${node.attrs.id.username}`,
-                alt: node.attrs.id.fullname,
-              },
-              options.HTMLAttributes,
-            ),
-            `${options.suggestion.char}${
-              node.attrs.id.username ?? node.attrs.id.id
-            }`,
-          ];
-        },
+      // Mention.configure({
+      //   HTMLAttributes: {
+      //     class: 'mention',
+      //   },
+      //   renderHTML({ options, node }) {
+      //     return [
+      //       'a',
+      //       mergeAttributes(
+      //         {
+      //           href: `/users/${node.attrs.id.username}`,
+      //           alt: node.attrs.id.fullname,
+      //         },
+      //         options.HTMLAttributes,
+      //       ),
+      //       `${options.suggestion.char}${
+      //         node.attrs.id.username ?? node.attrs.id.id
+      //       }`,
+      //     ];
+      //   },
+      //   suggestion: {
+      //     items: (editor) => mentionSuggestion.items(editor, props.taskId),
+      //     render: mentionSuggestion.render,
+      //   },
+      // }),
+      CustomMention.configure({
         suggestion: {
-          items: (editor) => mentionSuggestion.items(editor, props.taskId),
+          items: (editor) => mentionSuggestion.items(editor, 124),
           render: mentionSuggestion.render,
         },
       }),
@@ -427,9 +433,6 @@ watch(
 </script>
 
 <style lang="scss">
-.tippy-box {
-  background: white;
-}
 /* Basic editor styles */
 .tiptap {
   outline: none !important;
