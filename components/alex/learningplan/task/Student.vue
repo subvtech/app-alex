@@ -60,6 +60,7 @@
       :description="selectedTask.task.description || undefined"
       :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
       :task-member-id="selectedTask.id"
+      :contract-address="selectedTask.task?.contract_address || null"
       :submission="
         selectedTask.task?.submission_required
           ? {

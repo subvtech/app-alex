@@ -110,7 +110,6 @@ const {
   rewardStudents,
   getContractBalance,
   cancelContract,
-  weiToUsd,
   loading,
 } = useContracts();
 

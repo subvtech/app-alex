@@ -69,7 +69,7 @@ export const useMetamask = () => {
     };
   };
 
-  const linkWallet = async (userId = undefined) => {
+  const linkWallet = async (userId?) => {
     try {
       loading.value = true;
 
@@ -77,9 +77,8 @@ export const useMetamask = () => {
         throw new Error(i18n.t('pages.login.metamask.notFound'));
       }
 
-      console.log({ providers: window.ethereum.providers });
       const { address, signedMessage, provider, token } = await signMessage();
-      console.log({ address, signedMessage, token });
+
       let endpoint: string;
       let requestData: any;
 
@@ -99,7 +98,8 @@ export const useMetamask = () => {
 
       try {
         const response: any = await create(endpoint, requestData);
-        provider.destroy();
+
+        if (provider.destroy) provider.destroy();
         if (userId)
           userStore.setWallet({
             id: response.wallet.id,
@@ -142,7 +142,7 @@ export const useMetamask = () => {
   };
 
   const metalogin = async () => {
-    const { jwt, user, address } = await linkWallet(undefined);
+    const { jwt, user, address } = await linkWallet();
 
     if (jwt && user) {
       setToken(jwt);

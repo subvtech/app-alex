@@ -132,7 +132,18 @@
       :blocks="blocks"
       :task-member-id="taskMemberId"
     />
-
+    <div v-if="contractAddress" class="d-flex flex-column gap-8">
+      <div class="d-flex flex-column gap-6">
+        {{ contractAddress }}
+        <alex-learningplan-task-drawer-contracts-balance
+          :balance="contractBalance"
+          :text="$t('components.learningPlan.contract.reward.remaining')"
+        />
+        <alex-custom-button @click="fetchContractBalance">
+          fetchContractBalance
+        </alex-custom-button>
+      </div>
+    </div>
     <alex-learningplan-task-tabs
       v-model="activeTab"
       v-model:attached-message="attachedMessage"
@@ -219,6 +230,7 @@ interface DetailsDrawerProps {
   title?: string;
   description?: string;
   status?: TaskMemberStatus;
+  contractAddress: string | null;
   type?: string;
   startDate?: string;
   finalDate?: string;
@@ -239,6 +251,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   blocks: undefined,
   trail: undefined,
   group: undefined,
+  contractAddress: null,
   restrictions: '',
   taskEvents: () => [],
   submission: undefined,
@@ -254,6 +267,7 @@ const description = ref<string>(props.description);
 const restrictions = ref<string>(props.restrictions);
 const isGroup = toRef(props, 'group');
 const submissionDescription = ref<string>(props?.submission?.description || '');
+const { contractAddress } = toRefs(props);
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
@@ -274,6 +288,7 @@ type Emits = {
 };
 
 const emit = defineEmits<Emits>();
+const { hasTheStudentBeenPaid, getContractReward } = useContracts();
 
 // Get submissions
 const strapiUtils = useStrapiUtils();
@@ -430,10 +445,24 @@ const restrictionsValue = computed({
   },
 }) as WritableComputedRef<RestrictionValue[]>;
 
+const contractBalance = ref(0);
+const fetchContractBalance = async () => {
+  if (!contractAddress.value) return;
+  const balance = await getContractReward(contractAddress.value);
+  console.log({ balance });
+  if (!balance) return;
+  contractBalance.value = balance;
+};
+await fetchContractBalance();
+
 onMounted(() => {
   executeSubmissions().then(() => (loadingSubmission.value = false));
   executeEvents();
   executeMessages();
+});
+
+watch(contractAddress, async () => {
+  await fetchContractBalance();
 });
 
 watch(model, (value) => {

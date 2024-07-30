@@ -344,7 +344,6 @@ const {
   hasTheStudentBeenPaid,
   cancelContract,
   getContractBalance,
-  weiToUsd,
   loading: contractLoading,
 } = useContracts();
 
