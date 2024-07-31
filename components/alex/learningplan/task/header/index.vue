@@ -14,26 +14,33 @@
       >
         {{ title || '(' + $t('components.courses.tasks.noTitle') + ')' }}
       </p>
-      <div>
-        <!-- <p
+      <div
+        ref="descContainer"
+        class="tw-relative tw-max-h-[60px] overflow-hidden"
+      >
+        <TipTap
           ref="descEl"
-          class="text-body-3 text-gray-800"
-          :class="!expanded ? 'ellipsis lines-2' : ''"
-        >
-          {{ description || `(${$t('components.courses.tasks.noDesc')})` }}
-        </p> -->
-        <TipTap v-model="descRef" class="pa-0" :edit="false" />
+          v-model="descRef"
+          class="pa-0"
+          :class="ellipsis && 'tw-shadow-inner'"
+          :edit="false"
+        />
+
+        <!-- Sombra decorativa -->
+        <div
+          class="tw-absolute left-0 tw-top-[48px] tw-w-full tw-h-3 tw-z-10 tw-transition-[background]"
+          :class="
+            ellipsis &&
+            'tw-bg-gradient-to-b tw-from-transparent tw-to-gray-100 tw-rounded-b-sm'
+          "
+        ></div>
       </div>
       <div v-if="ellipsis" class="d-flex justify-end">
         <alex-custom-button
           variant="text"
           class="tw-mt-2 px-3 text-p6 text-gray-800"
-          @click="expanded = !expanded"
-          >{{
-            !expanded
-              ? $t('components.courses.tasks.expand')
-              : $t('components.courses.tasks.retract')
-          }}
+          @click="handleEdit"
+          >{{ $t('components.courses.tasks.expand') }}
         </alex-custom-button>
       </div>
     </div>
@@ -141,7 +148,7 @@ const handleEdit = () => {
   emit('edit-click');
 };
 
-const descRef = ref<string>(props.description);
+const descRef = ref(props.description);
 
 watch(
   () => props.description,
@@ -183,8 +190,9 @@ const statusCfg = {
 
 // Refs
 const { md } = useDisplay();
-const descEl = ref<HTMLParagraphElement | undefined>(undefined);
-const expanded = ref<boolean>(false);
+const descContainer = ref<HTMLDivElement | undefined>(undefined);
+const descEl = ref<any | undefined>(undefined);
+// const expanded = ref<boolean>(false);
 const ellipsis = ref<boolean>(false);
 const formatDate = (date: Date | string) => {
   if (typeof date === 'string') {
@@ -202,13 +210,18 @@ const typeSubmission = computed(() => {
   }
   return t('components.courses.tasks.submission.noSubmission');
 });
-function hasEllipsis() {
-  if (!descEl.value) return false;
 
-  ellipsis.value = descEl.value.offsetHeight < descEl.value.scrollHeight;
+function hasEllipsis() {
+  if (!descEl.value || !descContainer.value) return false;
+
+  ellipsis.value =
+    descContainer.value.getBoundingClientRect().height <
+    descEl.value.getHeight();
 }
 
-watch(descEl, () => hasEllipsis());
+watch(descRef, () => {
+  setTimeout(() => hasEllipsis(), 200);
+});
 
 onMounted(() => {
   hasEllipsis();

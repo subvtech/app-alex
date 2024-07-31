@@ -3,46 +3,9 @@ import tippy from 'tippy.js';
 
 import MentionList from './MentionList.vue';
 
-const strapi = useStrapiUtils();
-
 export default {
-  items: async (props, taskId = 0) => {
-    const task = await strapi.find<TaskSimple>('tasks', {
-      populate: [
-        'task_members',
-        'task_members.learning_plan_group.group_members.student_member.user.avatar',
-        'task_members.learning_plan_member',
-        'task_members.learning_plan_member.user',
-        'task_members.learning_plan_member.user.avatar',
-      ],
-      filters: {
-        id: taskId,
-      },
-    });
-
-    const taskMembers = task.data && task.data[0] && task.data[0].task_members;
-
-    if (!taskMembers) {
-      return [];
-    }
-
-    const users: (UserSimple | undefined)[] = [];
-
-    taskMembers.forEach((member) => {
-      if (member.learning_plan_member?.user) {
-        users.push(member.learning_plan_member?.user);
-      }
-
-      // Pegar membros dos grupos
-      else if (member.learning_plan_group?.group_members) {
-        member.learning_plan_group?.group_members.forEach((member) => {
-          users.push(member.student_member.user);
-        });
-      }
-    });
-
-    return [...new Set(users)]
-      .filter((user) => user !== undefined)
+  items: (props, taskUsers: UserSimple[] = []) => {
+    return taskUsers
       .filter(
         ({ fullname, username }) =>
           fullname.toLowerCase().startsWith(props.query.toLowerCase()) ||
@@ -58,10 +21,6 @@ export default {
     return {
       onStart: (props) => {
         component = new VueRenderer(MentionList, {
-          // using vue 2:
-          // parent: this,
-          // propsData: props,
-          // using vue 3:
           props,
           editor: props.editor,
         });

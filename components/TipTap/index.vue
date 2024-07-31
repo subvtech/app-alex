@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg">
+  <div ref="container" class="rounded-lg">
     <!-- <div class="control-group">
       <label>
         <input type="checkbox" :checked="isEditable" @change="toggleEditable" />
@@ -10,12 +10,12 @@
     <div class="bubble-menu-wrapper">
       <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
     </div>
-    <editor-content :editor="editor" />
+    <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Editor, EditorContent, mergeAttributes } from '@tiptap/vue-3';
+import { Editor, EditorContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/extension-bubble-menu';
 import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCursor } from '@tiptap/extension-collaboration-cursor';
@@ -46,7 +46,7 @@ import { common, createLowlight } from 'lowlight';
 
 import * as Y from 'yjs';
 
-import CustomMention from './mentions/Extension';
+import CustomMention from './custom-plugins/mentions/Extension';
 import Commands from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
@@ -54,10 +54,11 @@ import Carousel from './custom-plugins/carousel/Extension';
 import Image from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
 import { isTextSelected } from './menus/bubble/isTextSelected';
-import mentionSuggestion from './mentions/Suggestions';
+import mentionSuggestion from './custom-plugins/mentions/Suggestions';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
+const strapi = useStrapiUtils();
 const app = useNuxtApp();
 
 const { t } = useI18n();
@@ -87,6 +88,73 @@ const temporaryMedia = ref<number[]>([]);
 
 const editor = ref();
 const isEditable = ref(props.edit);
+
+const taskUsers = ref<UserSimple[]>([]);
+
+const container = ref<HTMLDivElement | null>(null);
+
+function getHeight() {
+  return container.value?.getBoundingClientRect().height;
+}
+
+async function getMentionMembers() {
+  if (!props.taskId) {
+    return [];
+  }
+
+  const task = await strapi.find<TaskSimple>('tasks', {
+    populate: [
+      'task_members',
+      'task_members.learning_plan_group.group_members.student_member.user.avatar',
+      'task_members.learning_plan_member',
+      'task_members.learning_plan_member.user',
+      'task_members.learning_plan_member.user.avatar',
+    ],
+    filters: {
+      id: props.taskId,
+    },
+  });
+
+  const taskMembers = task.data && task.data[0] && task.data[0].task_members;
+
+  if (!taskMembers) {
+    return [];
+  }
+
+  const users: (UserSimple | undefined)[] = [];
+
+  taskMembers.forEach((member) => {
+    if (member.learning_plan_member?.user) {
+      users.push(member.learning_plan_member?.user);
+    }
+
+    // Pegar membros dos grupos
+    else if (member.learning_plan_group?.group_members) {
+      member.learning_plan_group?.group_members.forEach((member) => {
+        users.push(member.student_member.user);
+      });
+    }
+  });
+
+  return [...new Set(users)].filter((user) => user !== undefined);
+}
+
+defineExpose({ getHeight });
+
+onMounted(async () => {
+  try {
+    taskUsers.value = await getMentionMembers();
+  } catch (e) {}
+});
+
+watch(
+  () => props.taskId,
+  async () => {
+    try {
+      taskUsers.value = await getMentionMembers();
+    } catch (e) {}
+  },
+);
 
 const collors = [
   '#f783ac',
@@ -174,33 +242,9 @@ onMounted(async () => {
           return isTextSelected({ editor: editor.value });
         },
       }),
-      // Mention.configure({
-      //   HTMLAttributes: {
-      //     class: 'mention',
-      //   },
-      //   renderHTML({ options, node }) {
-      //     return [
-      //       'a',
-      //       mergeAttributes(
-      //         {
-      //           href: `/users/${node.attrs.id.username}`,
-      //           alt: node.attrs.id.fullname,
-      //         },
-      //         options.HTMLAttributes,
-      //       ),
-      //       `${options.suggestion.char}${
-      //         node.attrs.id.username ?? node.attrs.id.id
-      //       }`,
-      //     ];
-      //   },
-      //   suggestion: {
-      //     items: (editor) => mentionSuggestion.items(editor, props.taskId),
-      //     render: mentionSuggestion.render,
-      //   },
-      // }),
       CustomMention.configure({
         suggestion: {
-          items: (editor) => mentionSuggestion.items(editor, 124),
+          items: (editor) => mentionSuggestion.items(editor, taskUsers.value),
           render: mentionSuggestion.render,
         },
       }),
@@ -433,6 +477,12 @@ watch(
 </script>
 
 <style lang="scss">
+.no-padding {
+  .tiptap.ProseMirror {
+    padding: 4px 0px;
+  }
+}
+
 /* Basic editor styles */
 .tiptap {
   outline: none !important;
@@ -614,14 +664,6 @@ watch(
     .hljs-strong {
       font-weight: 700;
     }
-  }
-
-  .mention {
-    background-color: var(--purple-light);
-    border-radius: 0.4rem;
-    box-decoration-break: clone;
-    color: purple;
-    padding: 0.1rem 0.3rem;
   }
 
   blockquote {

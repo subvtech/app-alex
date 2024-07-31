@@ -1,5 +1,5 @@
 <template>
-  <div class="dropdown-menu tw-rounded-sm tw-shadow ga-2 py-2 px-0">
+  <div class="dropdown-menu tw-rounded-sm tw-shadow ga-2 py-2 px-0 bg-white">
     <template v-if="items.length">
       <div
         v-for="(user, index) in items"
@@ -17,7 +17,7 @@
         >
           <template v-if="!user.avatar?.url" #default>
             <p class="text-gray-300 text-body-2">
-              {{ getInitials(name) }}
+              {{ getInitials(user.fullname) }}
             </p>
           </template>
         </v-avatar>
@@ -32,7 +32,7 @@
         </div>
       </div>
     </template>
-    <div v-else class="item">
+    <div v-else class="text-body-3 text-gray-800 pa-1 item">
       {{ $t('components.learningPlan.drawer.missing.members') }}
     </div>
   </div>
@@ -98,10 +98,15 @@ export default {
     },
 
     selectItem(index) {
-      const item = this.items[index];
+      const user = this.items[index];
 
-      if (item) {
-        this.command({ id: item });
+      if (user) {
+        this.command({
+          id: user.id,
+          username: user.username,
+          fullname: user.fullname,
+          avatarUrl: user.avatar?.url,
+        });
       }
     },
   },
