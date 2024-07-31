@@ -38,6 +38,7 @@ import useContentItemActions from './Actions';
 
 const props = defineProps<{
   editor: Editor;
+  defaultNodeType: string;
   currentNode: Ref<Node | null>;
   currentNodePos: Ref<number>;
   showDragHandle: Ref<boolean>;
@@ -58,7 +59,7 @@ const shouldShowDragHandle = computed(() => {
   return props.showDragHandle.value;
 });
 
-const actions = useContentItemActions(props.editor);
+const actions = useContentItemActions(props.editor, props.defaultNodeType);
 const getTranslation = (key: string) =>
   t(`components.tiptap.menus.dragMenu.${key}`);
 
