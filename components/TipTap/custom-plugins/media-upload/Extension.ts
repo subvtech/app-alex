@@ -20,6 +20,7 @@ interface MediaConfig {
   }>;
   deleteMedia: (src: string) => void;
   readOnly: () => boolean;
+  defaultFormat?: 'image' | 'video';
 }
 
 export default Node.create<MediaConfig>({
@@ -39,7 +40,7 @@ export default Node.create<MediaConfig>({
         } as MediaType,
       },
       format: {
-        default: 'image' as 'image' | 'video',
+        default: this.options.defaultFormat as 'image' | 'video',
       },
     };
   },
@@ -49,6 +50,7 @@ export default Node.create<MediaConfig>({
       readOnly: () => false,
       deleteMedia: () => {},
       uploadMedia: () => Promise.resolve({ success: 1 }),
+      defaultFormat: 'image' as 'image' | 'video',
     };
   },
 

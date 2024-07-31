@@ -28,6 +28,7 @@
             v-if="!readOnly"
             color="gray-500"
             icon="mdi-close"
+            variant="text"
             style="background-color: rgba(255, 255, 255, 0.25) !important"
             @click="removeMedia"
           />
