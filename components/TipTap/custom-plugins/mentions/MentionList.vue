@@ -11,11 +11,11 @@
       >
         <v-avatar
           :size="40"
-          :image="user.avatar?.url"
+          :image="user.avatarUrl"
           class="alex-avatar-group-border alex-avatar-group-margin"
           color="gray-100"
         >
-          <template v-if="!user.avatar?.url" #default>
+          <template v-if="!user.avatarUrl" #default>
             <p class="text-gray-300 text-body-2">
               {{ getInitials(user.fullname) }}
             </p>
@@ -102,10 +102,9 @@ export default {
 
       if (user) {
         this.command({
-          id: user.id,
           username: user.username,
           fullname: user.fullname,
-          avatarUrl: user.avatar?.url,
+          avatarUrl: user.avatarUrl,
         });
       }
     },

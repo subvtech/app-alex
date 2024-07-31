@@ -104,6 +104,7 @@
     :type="taskDetails?.type"
     :events="taskDetails?.task_events"
     :goals="taskDetails?.learning_goals"
+    :members="taskDetails?.task_members"
     :description="taskDetails?.description || undefined"
     :submission-description="taskDetails?.submission_description"
     :has-submission="taskDetails?.submission_required"
@@ -330,6 +331,7 @@ const tasksArray = computed(() => {
           });
         }
       });
+
       const taskItem = {
         id: task.id,
         title: task.title,

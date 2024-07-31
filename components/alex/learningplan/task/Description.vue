@@ -8,20 +8,21 @@
       v-model="model"
       class="rounded-lg pa-0"
       :class="edit && 'border tw-min-h-[102px]'"
-      :task-id="taskId"
-      :submission="submission"
+      :doc-name="docName"
+      :mention-users="mentionUsers"
       :edit="edit"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+
 interface DescriptionProps {
-  // Tipar certinho
-  taskId?: number;
   edit?: boolean;
   title?: string;
-  submission?: boolean;
+  docName?: string;
+  mentionUsers?: MentionUserPropsArray;
 }
 
 defineProps<DescriptionProps>();

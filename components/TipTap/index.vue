@@ -54,7 +54,6 @@ import mentionSuggestion from './custom-plugins/mentions/Suggestions';
 
 const doc = new Y.Doc();
 const strapiClient = useStrapiClient();
-const strapi = useStrapiUtils();
 const app = useNuxtApp();
 
 const { t } = useI18n();
@@ -62,6 +61,14 @@ const { setMessage } = useMessageStore();
 
 type AllowedBlockType = 'text' | 'image' | 'video' | 'media' | 'files' | 'link';
 type AllowedBlocksTypes = AllowedBlockType[];
+
+interface MentionUserProps {
+  username: String;
+  fullname: String;
+  avatarUrl: String;
+}
+
+export type MentionUserPropsArray = MentionUserProps[];
 
 const props = defineProps({
   modelValue: {
@@ -72,13 +79,13 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  taskId: {
-    type: Number,
-    default: 0,
+  docName: {
+    type: String,
+    default: '',
   },
-  submission: {
-    type: Boolean,
-    default: false,
+  mentionUsers: {
+    type: Array as PropType<MentionUserPropsArray>,
+    default: () => [],
   },
   allowedBlocks: {
     type: Array as PropType<AllowedBlocksTypes>,
@@ -96,72 +103,13 @@ const temporaryMedia = ref<number[]>([]);
 const editor = ref();
 const isEditable = ref(props.edit);
 
-const taskUsers = ref<UserSimple[]>([]);
-
 const container = ref<HTMLDivElement | null>(null);
 
 function getHeight() {
   return container.value?.getBoundingClientRect().height;
 }
 
-async function getMentionMembers() {
-  if (!props.taskId) {
-    return [];
-  }
-
-  const task = await strapi.find<TaskSimple>('tasks', {
-    populate: [
-      'task_members',
-      'task_members.learning_plan_group.group_members.student_member.user.avatar',
-      'task_members.learning_plan_member',
-      'task_members.learning_plan_member.user',
-      'task_members.learning_plan_member.user.avatar',
-    ],
-    filters: {
-      id: props.taskId,
-    },
-  });
-
-  const taskMembers = task.data && task.data[0] && task.data[0].task_members;
-
-  if (!taskMembers) {
-    return [];
-  }
-
-  const users: (UserSimple | undefined)[] = [];
-
-  taskMembers.forEach((member) => {
-    if (member.learning_plan_member?.user) {
-      users.push(member.learning_plan_member?.user);
-    }
-
-    // Pegar membros dos grupos
-    else if (member.learning_plan_group?.group_members) {
-      member.learning_plan_group?.group_members.forEach((member) => {
-        users.push(member.student_member.user);
-      });
-    }
-  });
-
-  return [...new Set(users)].filter((user) => user !== undefined);
-}
-
 defineExpose({ getHeight });
-
-onMounted(async () => {
-  try {
-    taskUsers.value = await getMentionMembers();
-  } catch (e) {}
-});
-
-watch(
-  () => props.taskId,
-  async () => {
-    try {
-      taskUsers.value = await getMentionMembers();
-    } catch (e) {}
-  },
-);
 
 const collors = [
   '#f783ac',
@@ -212,7 +160,7 @@ onMounted(async () => {
   const TipTapToken = await getTipTapToken(user.value?.id);
   setAvailableBlocks(props.allowedBlocks);
   const provider = new TiptapCollabProvider({
-    name: `task-${props.submission ? 'submission-' : ''}${props.taskId}`, // Unique document identifier for syncing. This is your document name.
+    name: props.docName, // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
     token: TipTapToken, // Your JWT token
     document: doc,
@@ -251,7 +199,8 @@ onMounted(async () => {
       }),
       CustomMention.configure({
         suggestion: {
-          items: (editor) => mentionSuggestion.items(editor, taskUsers.value),
+          items: (editor) =>
+            mentionSuggestion.items(editor, props.mentionUsers),
           render: mentionSuggestion.render,
         },
       }),
@@ -320,7 +269,7 @@ const blockToolsMap = {
   }),
   CustomMention: CustomMention.configure({
     suggestion: {
-      items: (editor) => mentionSuggestion.items(editor, taskUsers.value),
+      items: (editor) => mentionSuggestion.items(editor, props.mentionUsers),
       render: mentionSuggestion.render,
     },
   }),

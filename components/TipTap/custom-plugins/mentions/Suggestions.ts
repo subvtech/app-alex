@@ -1,10 +1,11 @@
 import { VueRenderer } from '@tiptap/vue-3';
 import tippy from 'tippy.js';
 
+import { MentionUserPropsArray } from '../../index.vue';
 import MentionList from './MentionList.vue';
 
 export default {
-  items: (props, taskUsers: UserSimple[] = []) => {
+  items: (props, taskUsers: MentionUserPropsArray = []) => {
     return taskUsers
       .filter(
         ({ fullname, username }) =>

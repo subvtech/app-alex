@@ -66,7 +66,7 @@
     <alex-learningplan-task-description
       v-model="description"
       class="mt-4"
-      :task-id="taskId"
+      :doc-name="`task-${taskId}`"
     />
 
     <div class="my-6">
@@ -84,13 +84,12 @@
           v-if="submissionDescription"
           v-model="submissionDescription"
           class="mt-4"
-          :submission="true"
+          :doc-name="`task-submission-${taskId}`"
           :title="
             $t(
               'components.learningPlan.drawer.task.description.submissionLabel',
             )
           "
-          :task-id="taskId"
         />
 
         <div class="mt-4">

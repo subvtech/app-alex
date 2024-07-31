@@ -103,8 +103,9 @@
 
       <alex-learningplan-task-description
         v-model="description"
+        :doc-name="`task-${props.taskId}`"
+        :mention-users="mentionUsers"
         :edit="editable"
-        :task-id="taskId"
       />
 
       <!-- Objetivos de aprendizagem -->
@@ -145,8 +146,8 @@
         v-model="submissionDescription"
         name="submissionDescription"
         :edit="editable"
-        :task-id="taskId"
-        :submission="true"
+        :doc-name="`task-submission-${props.taskId}`"
+        :mention-users="mentionUsers"
         :title="
           $t('components.learningPlan.drawer.task.submission.description.label')
         "
@@ -201,6 +202,7 @@ import {
 } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { orderEvents } from '~/utils';
+import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 
@@ -363,6 +365,32 @@ const restrictionsValue = computed({
     restrictions.value = newValue.join(',');
   },
 }) as WritableComputedRef<RestrictionValue[]>;
+
+const mentionUsers = computed(() => {
+  if (!props.members) {
+    return [];
+  }
+
+  const users: (UserSimple | undefined)[] = [];
+
+  props.members.forEach((member) => {
+    if (member.learning_plan_member?.user) {
+      users.push(member.learning_plan_member?.user);
+    } else if (member.learning_plan_group?.group_members) {
+      member.learning_plan_group?.group_members.forEach((member) =>
+        users.push(member.student_member.user),
+      );
+    }
+  });
+
+  return [...new Set(users)]
+    .filter((user) => user !== undefined)
+    .map(({ fullname, username, avatar }) => ({
+      fullname,
+      username,
+      avatarUrl: avatar?.url,
+    }));
+});
 
 // Tipos
 const type = ref<TaskType | null>(props.type);

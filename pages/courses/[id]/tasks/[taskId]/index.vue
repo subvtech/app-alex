@@ -9,6 +9,7 @@
     "
   >
     <alex-learningplan-task-header
+      :id="taskStore.task.id"
       :title="taskStore.task.title"
       :tags="headerTags"
       :type="taskStore.task.type"

@@ -23,17 +23,9 @@
           v-model="descRef"
           class="pa-0"
           :class="ellipsis && 'tw-shadow-inner'"
+          :doc-name="`task-${props.id}`"
           :edit="false"
         />
-
-        <!-- Sombra decorativa -->
-        <div
-          class="tw-absolute left-0 tw-top-[48px] tw-w-full tw-h-3 tw-z-10 tw-transition-[background]"
-          :class="
-            ellipsis &&
-            'tw-bg-gradient-to-b tw-from-transparent tw-to-gray-100 tw-rounded-b-sm'
-          "
-        ></div>
       </div>
       <div v-if="ellipsis" class="d-flex justify-end">
         <alex-custom-button
@@ -123,6 +115,7 @@ import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 
 interface HeaderProps {
+  id: number;
   title: string;
   status: TaskStatus | (string & {});
   description: string;

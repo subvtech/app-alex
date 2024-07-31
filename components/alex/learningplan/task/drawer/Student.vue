@@ -100,14 +100,12 @@
           <div class="d-flex flex-column gap-2 w-100">
             <alex-learningplan-task-description
               v-model="submissionDesc"
-              :task-id="taskId"
-              :submission="true"
+              :doc-name="`task-submission-${taskId}`"
               :title="
                 $t(
                   'components.learningPlan.drawer.task.description.submissionLabel',
                 )
               "
-              :edit="false"
             />
           </div>
           <div class="d-flex flex-column gap-2 tw-w-fit">
