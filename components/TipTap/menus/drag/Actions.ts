@@ -1,8 +1,11 @@
 import { Node } from '@tiptap/pm/model';
-import { NodeSelection } from '@tiptap/pm/state';
+import { NodeSelection, EditorState } from '@tiptap/pm/state';
 import { Editor } from '@tiptap/vue-3';
 
-export default function useContentItemActions(editor: Editor) {
+export default function useContentItemActions(
+  editor: Editor,
+  defaultNodeType?: string,
+) {
   const resetTextFormatting = (
     currentNode: Ref<Node | null>,
     currentNodePos: Ref<number>,
@@ -57,6 +60,25 @@ export default function useContentItemActions(editor: Editor) {
       .run();
   };
 
+  const insertNode = (state: EditorState) => {
+    switch (defaultNodeType) {
+      case 'image':
+        return state.schema.nodes.mediaUpload.create({ format: 'image' });
+      case 'media':
+        return state.schema.nodes.carousel.create();
+      case 'video':
+        return state.schema.nodes.mediaUpload.create({ format: 'video' });
+      case 'files':
+        return state.schema.nodes.fileSet.create();
+      case 'link':
+        return state.schema.nodes.link.create();
+      default:
+        return state.schema.nodes.paragraph.create(null, [
+          state.schema.text('/'),
+        ]);
+    }
+  };
+
   const handleAdd = (
     currentNode: Ref<Node | null>,
     currentNodePos: Ref<number>,
@@ -73,10 +95,7 @@ export default function useContentItemActions(editor: Editor) {
 
       const docSize = editor.state.doc.content.size;
 
-      // TODO: Fix position out of range, acredito que seja relacionado ao tamanho do bloco
-
       const validInsertPos = Math.min(insertPos, docSize);
-      // const validFocusPos = Math.min(focusPos, docSize);
 
       editor
         .chain()
@@ -89,12 +108,7 @@ export default function useContentItemActions(editor: Editor) {
                 currentNodePos.value + 1,
               );
             } else {
-              tr.insert(
-                validInsertPos,
-                state.schema.nodes.paragraph.create(null, [
-                  state.schema.text('/'),
-                ]),
-              );
+              tr.insert(validInsertPos, insertNode(state));
             }
 
             return dispatch(tr);

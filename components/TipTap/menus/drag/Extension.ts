@@ -12,6 +12,7 @@ import { vuetify } from '@/plugins/vuetify';
 interface VueDragHandleOptions extends Omit<DragHandleOptions, 'onNodeChange'> {
   editor: () => Editor | null;
   showDragHandle: () => boolean;
+  defaultNodeType: string;
   onNodeChange?: (data: {
     node: Node | null;
     editor: Editor;
@@ -28,8 +29,8 @@ const VueDragHandle = DragHandle.extend<VueDragHandleOptions>({
     return {
       ...this.parent?.(),
       editor: () => null,
+      defaultNodeType: 'paragraph',
       onNodeChange: (change) => data.handleNodeChange(change),
-
       render() {
         const wrapper = document.createElement('div');
         const showDragHandleRef = ref(this.showDragHandle());
@@ -48,6 +49,7 @@ const VueDragHandle = DragHandle.extend<VueDragHandleOptions>({
             currentNode: data.currentNode,
             currentNodePos: data.currentNodePos,
             showDragHandle: showDragHandleRef,
+            defaultNodeType: this.defaultNodeType,
           });
           app.use(vuetify);
           app.use(i18n);
