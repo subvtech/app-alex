@@ -187,7 +187,7 @@ onMounted(async () => {
           duration: 100,
           theme: 'transparent',
           maxWidth: 1500,
-          placement: 'auto-start',
+          placement: 'top-start',
         },
         updateDelay: 100,
         shouldShow: ({ view }) => {
@@ -195,13 +195,6 @@ onMounted(async () => {
             return false;
           }
           return isTextSelected({ editor: editor.value });
-        },
-      }),
-      CustomMention.configure({
-        suggestion: {
-          items: (editor) =>
-            mentionSuggestion.items(editor, props.mentionUsers),
-          render: mentionSuggestion.render,
         },
       }),
       Placeholder.configure({
@@ -225,7 +218,7 @@ onMounted(async () => {
       }),
       VueDragHandle.configure({
         editor: () => editor.value,
-        tippyOptions: { offset: [-2, 16], zIndex: 99 },
+        tippyOptions: { offset: [-2, 16] },
         showDragHandle: () => isEditable.value,
         defaultNodeType: defaultBlock.value,
       }),

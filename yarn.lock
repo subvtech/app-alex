@@ -10095,10 +10095,10 @@ prosemirror-menu@^1.2.4:
     prosemirror-history "^1.0.0"
     prosemirror-state "^1.0.0"
 
-prosemirror-model@1.21.3, prosemirror-model@^1.0.0, prosemirror-model@^1.19.0, prosemirror-model@^1.20.0, prosemirror-model@^1.21.0, prosemirror-model@^1.22.2, prosemirror-model@^1.8.1:
-  version "1.21.3"
-  resolved "https://registry.yarnpkg.com/prosemirror-model/-/prosemirror-model-1.21.3.tgz#97fa434d670331c1ab25f75964b1bcd7a948ce61"
-  integrity sha512-nt2Xs/RNGepD9hrrkzXvtCm1mpGJoQfFSPktGa0BF/aav6XsnmVGZ9sTXNWRLupAz5SCLa3EyKlFeK7zJWROKg==
+prosemirror-model@^1.0.0, prosemirror-model@^1.19.0, prosemirror-model@^1.20.0, prosemirror-model@^1.21.0, prosemirror-model@^1.22.2, prosemirror-model@^1.8.1:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/prosemirror-model/-/prosemirror-model-1.22.2.tgz#9bae923c4c4149eee59ff61a5b390c26011a26b4"
+  integrity sha512-I4lS7HHIW47D0Xv/gWmi4iUWcQIDYaJKd8Hk4+lcSps+553FlQrhmxtItpEvTr75iAruhzVShVp6WUwsT6Boww==
   dependencies:
     orderedmap "^2.0.0"
 
@@ -10153,7 +10153,7 @@ prosemirror-transform@^1.0.0, prosemirror-transform@^1.1.0, prosemirror-transfor
   dependencies:
     prosemirror-model "^1.21.0"
 
-prosemirror-view@1.33.9, prosemirror-view@^1.0.0, prosemirror-view@^1.1.0, prosemirror-view@^1.13.3, prosemirror-view@^1.27.0, prosemirror-view@^1.31.0, prosemirror-view@^1.33.9:
+prosemirror-view@^1.0.0, prosemirror-view@^1.1.0, prosemirror-view@^1.13.3, prosemirror-view@^1.27.0, prosemirror-view@^1.31.0, prosemirror-view@^1.33.9:
   version "1.33.9"
   resolved "https://registry.yarnpkg.com/prosemirror-view/-/prosemirror-view-1.33.9.tgz#0ed61ae42405cfc9799bde4db86badbb1ad99b08"
   integrity sha512-xV1A0Vz9cIcEnwmMhKKFAOkfIp8XmJRnaZoPqNXrPS7EK5n11Ov8V76KhR0RsfQd/SIzmWY+bg+M44A2Lx/Nnw==
