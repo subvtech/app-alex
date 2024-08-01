@@ -281,7 +281,8 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
 // TODO: Think about a better way to handle this
 const setDescription = () => {
   if (!props.description) {
-    return '';
+    description.value = '';
+    return;
   }
 
   if (typeof props.description === 'string') {
@@ -298,7 +299,8 @@ const setDescription = () => {
 
 const setSubmissionDescription = () => {
   if (!props.submissionDescription) {
-    return '';
+    submissionDescription.value = '';
+    return;
   }
 
   if (typeof props.submissionDescription === 'string') {

@@ -105,12 +105,6 @@ const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
 
-function getHeight() {
-  return container.value?.getBoundingClientRect().height;
-}
-
-defineExpose({ getHeight });
-
 const collors = [
   '#f783ac',
   '#f3a683',
@@ -522,7 +516,13 @@ onBeforeUnmount(() => {
   }
 });
 
-const emits = defineEmits(['update:modelValue']);
+const emits = defineEmits(['update:modelValue', 'change:height']);
+
+const emitHeight = () => {
+  emits('change:height', container.value?.clientHeight);
+};
+
+defineExpose({ emitHeight });
 
 watch(
   () => props.edit,
@@ -535,6 +535,8 @@ watch(
 watch(
   () => props.modelValue,
   (value) => {
+    emitHeight();
+
     if (!editor.value) {
       return;
     }

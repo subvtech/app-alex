@@ -262,7 +262,8 @@ const config: Record<string, string> = {
 
 const setSubmissionDescription = () => {
   if (!props.submission?.description) {
-    return '';
+    submissionDesc.value = '';
+    return;
   }
 
   if (typeof props.submission?.description === 'string') {

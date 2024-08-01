@@ -25,6 +25,7 @@
           :class="ellipsis && 'tw-shadow-inner'"
           :doc-name="`task-${props.id}`"
           :edit="false"
+          @change:height="(height) => hasEllipsis(height)"
         />
       </div>
       <div v-if="ellipsis" class="d-flex justify-end">
@@ -147,6 +148,7 @@ watch(
   () => props.description,
   (val) => {
     descRef.value = val;
+    descEl.value?.emitHeight();
   },
 );
 
@@ -204,27 +206,13 @@ const typeSubmission = computed(() => {
   return t('components.courses.tasks.submission.noSubmission');
 });
 
-function hasEllipsis() {
-  if (!descEl.value || !descContainer.value) return false;
+function hasEllipsis(height = descEl.value?.clientHeight) {
+  if (!descContainer.value || !height) return false;
 
-  ellipsis.value =
-    descContainer.value.getBoundingClientRect().height <
-    descEl.value.getHeight();
+  ellipsis.value = descContainer.value.getBoundingClientRect().height < height;
 }
 
-watch(descRef, () => {
-  setTimeout(() => hasEllipsis(), 200);
-});
-
-onMounted(() => {
-  hasEllipsis();
-
-  window.addEventListener('resize', hasEllipsis);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', hasEllipsis);
-});
+onMounted(() => descEl.value?.emitHeight());
 </script>
 
 <style scoped></style>
