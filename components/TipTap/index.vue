@@ -37,6 +37,7 @@ import { Subscript } from '@tiptap/extension-subscript';
 import { Document } from '@tiptap/extension-document';
 import { Text } from '@tiptap/extension-text';
 import { Dropcursor } from '@tiptap/extension-dropcursor';
+import { Paragraph } from '@tiptap/extension-paragraph';
 
 import { common, createLowlight } from 'lowlight';
 
@@ -58,9 +59,6 @@ const app = useNuxtApp();
 
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
-
-type AllowedBlockType = 'text' | 'image' | 'video' | 'media' | 'files' | 'link';
-type AllowedBlocksTypes = AllowedBlockType[];
 
 interface MentionUserProps {
   username: String;
@@ -88,7 +86,7 @@ const props = defineProps({
     default: () => [],
   },
   allowedBlocks: {
-    type: Array as PropType<AllowedBlocksTypes>,
+    type: Array as PropType<string[]>,
     default: () => [],
   },
 });
@@ -327,6 +325,7 @@ const blockToolsMap = {
   Typography,
   Superscript,
   Subscript,
+  Paragraph,
   Carousel: Carousel.configure({
     handleFileSelected: async (slides) => {
       const formData = new FormData();
@@ -466,6 +465,9 @@ const setAvailableBlocks = (blocks: string[]) => {
         break;
     }
   });
+  if (blocks.length > 1 && !availableBlocks.includes('starterKit')) {
+    availableBlocks.push('Paragraph');
+  }
   return availableBlocks;
 };
 

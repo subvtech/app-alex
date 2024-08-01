@@ -18,10 +18,15 @@
       </alex-custom-dialog-header>
     </template>
     <div class="mx-auto editor my-6 px-sm-6 px-1 px-md-0 w-100">
-      <app-editor
+      <!-- <app-editor
         ref="editor"
         :allowed-blocks="allowedBlocks"
         @change="() => (hasEditorChanges = true)"
+      /> -->
+      <tip-tap
+        :doc-name="`task-submission-${props.taskMemberId}`"
+        :edit="!props.readOnly"
+        :allowed-blocks="props.restrictions ? props.restrictions : ['']"
       />
     </div>
     <template v-if="!props.readOnly" #footer>
@@ -79,6 +84,7 @@ const props = withDefaults(defineProps<submissionProps>(), {
   lastSubmission: undefined,
   readOnly: false,
 });
+
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
 };
@@ -232,37 +238,37 @@ const sendSubmission = async () => {
   }
 };
 
-const allowedBlocks = computed(() => {
-  const restrictionMap = {
-    text: [
-      'Paragraph',
-      'header',
-      'delimiter',
-      'list',
-      'inlineCode',
-      'marker',
-      'quote',
-      'table',
-      'alert',
-      'warning',
-      'code',
-      'alignmentBlockTune',
-    ],
-    link: ['link'],
-    image: ['image'],
-    gallery: ['carousel', 'Paragraph'],
-    video: ['embed', 'Paragraph'],
-    document: ['fileSet', 'Paragraph'],
-  };
+// const allowedBlocks = computed(() => {
+//   const restrictionMap = {
+//     text: [
+//       'Paragraph',
+//       'header',
+//       'delimiter',
+//       'list',
+//       'inlineCode',
+//       'marker',
+//       'quote',
+//       'table',
+//       'alert',
+//       'warning',
+//       'code',
+//       'alignmentBlockTune',
+//     ],
+//     link: ['link'],
+//     image: ['image'],
+//     gallery: ['carousel', 'Paragraph'],
+//     video: ['embed', 'Paragraph'],
+//     document: ['fileSet', 'Paragraph'],
+//   };
 
-  const blocksSet = new Set();
-  props.restrictions?.forEach((restriction) => {
-    const blocksToAdd = restrictionMap[restriction];
-    blocksToAdd?.forEach((block: string) => blocksSet.add(block));
-  });
+//   const blocksSet = new Set();
+//   props.restrictions?.forEach((restriction) => {
+//     const blocksToAdd = restrictionMap[restriction];
+//     blocksToAdd?.forEach((block: string) => blocksSet.add(block));
+//   });
 
-  return Array.from(blocksSet) as string[];
-});
+//   return Array.from(blocksSet) as string[];
+// });
 
 watch(dialog, (value) => {
   if (!value) {
