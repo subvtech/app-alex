@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex rounded d-flex flex-wrap"
+    class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex rounded d-flex flex-wrap rounded-lg"
   >
     <menubar :editor="editor" />
     <v-divider

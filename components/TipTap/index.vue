@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="rounded-lg">
-    <div class="bubble-menu-wrapper">
+    <div :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
       <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
     </div>
     <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
@@ -88,6 +88,10 @@ const props = defineProps({
   allowedBlocks: {
     type: Array as PropType<string[]>,
     default: () => [],
+  },
+  fixedMenu: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -211,7 +215,7 @@ onMounted(async () => {
       VueDragHandle.configure({
         editor: () => editor.value,
         tippyOptions: { offset: [-2, 16] },
-        showDragHandle: () => isEditable.value,
+        showDragHandle: () => isEditable.value && !props.fixedMenu,
         defaultNodeType: defaultBlock.value,
       }),
       UniqueID.configure({

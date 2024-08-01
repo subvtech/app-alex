@@ -11,6 +11,7 @@
       :mention-users="mentionUsers"
       :edit="edit"
       :allowed-blocks="['text']"
+      :fixed-menu="true"
     />
   </div>
 </template>
