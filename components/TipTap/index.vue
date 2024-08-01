@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="rounded-lg">
-    <div :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+    <div v-if="!readonly" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
       <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
     </div>
     <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
