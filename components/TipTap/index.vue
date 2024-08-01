@@ -1,10 +1,16 @@
 <template>
-  <div ref="container" class="rounded-lg">
-    <div v-if="!readonly" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
-      <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
+  <client-only>
+    <div ref="container" class="rounded-lg w-100">
+      <div v-if="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+        <tip-tap-menus-bubble
+          :editor="editor"
+          :fixed-menu-bar="fixedMenu"
+          @click.stop.prevent
+        />
+      </div>
+      <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
     </div>
-    <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
-  </div>
+  </client-only>
 </template>
 
 <script setup lang="ts">
@@ -99,6 +105,12 @@ const defaultBlock = computed(() => {
   return props.allowedBlocks.length === 1 ? props.allowedBlocks[0] : '';
 });
 
+const showMenuBar = computed(() => {
+  return (
+    isEditable.value &&
+    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
+  );
+});
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 
@@ -441,6 +453,7 @@ const setAvailableBlocks = (blocks: string[]) => {
           'TableHeader',
           'TableCell',
           'CustomMention',
+          'TextStyle',
         );
         break;
       case 'image':

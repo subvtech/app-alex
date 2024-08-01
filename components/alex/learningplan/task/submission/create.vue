@@ -4,6 +4,8 @@
     :persistent="true"
     :max-width="1080"
     :no-footer="props.readOnly"
+    :retain-focus="false"
+    no-click-animation
   >
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">

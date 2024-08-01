@@ -8,7 +8,7 @@
       class="divider"
       :vertical="isVerticalDivider"
     ></v-divider>
-    <toggleGroup :editor="editor" />
+    <toggleGroup :editor="editor" :fixed-menu-bar="fixedMenuBar" />
   </div>
 </template>
 
@@ -22,6 +22,10 @@ defineProps({
   editor: {
     type: Editor,
     required: true,
+  },
+  fixedMenuBar: {
+    type: Boolean,
+    default: false,
   },
 });
 

@@ -4,15 +4,15 @@
       {{ title || $t('components.learningPlan.drawer.task.description.label') }}
     </p>
 
-    <TipTap
-      class="rounded-lg pa-0"
-      :class="edit && 'border tw-min-h-[102px]'"
-      :doc-name="docName"
-      :mention-users="mentionUsers"
-      :edit="edit"
-      :allowed-blocks="['text']"
-      :fixed-menu="true"
-    />
+    <div class="rounded-lg pa-0" :class="edit && 'border tw-min-h-[102px]'">
+      <TipTap
+        :doc-name="docName"
+        :mention-users="mentionUsers"
+        :edit="edit"
+        :allowed-blocks="['text']"
+        :fixed-menu="true"
+      />
+    </div>
   </div>
 </template>
 
