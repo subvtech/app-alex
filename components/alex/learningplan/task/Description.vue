@@ -5,12 +5,12 @@
     </p>
 
     <TipTap
-      v-model="model"
       class="rounded-lg pa-0"
       :class="edit && 'border tw-min-h-[102px]'"
       :doc-name="docName"
       :mention-users="mentionUsers"
       :edit="edit"
+      :allowed-blocks="['text']"
     />
   </div>
 </template>
@@ -26,6 +26,4 @@ interface DescriptionProps {
 }
 
 defineProps<DescriptionProps>();
-
-const model = defineModel<string>();
 </script>

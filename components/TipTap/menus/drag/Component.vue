@@ -3,7 +3,11 @@
     <alex-custom-button variant="text" icon="mdi-plus" @click="addNode">
       <v-icon icon="mdi-plus" size="small" />
     </alex-custom-button>
-    <Popover :open="menu" @update:open="(value: boolean) => (menu = value)">
+    <Popover
+      :open="menu"
+      :modal="true"
+      @update:open="(value: boolean) => (menu = value)"
+    >
       <PopoverTrigger>
         <alex-custom-button variant="text" icon="mdi-plus">
           <v-icon icon="alex:DragIndicator" size="small" />

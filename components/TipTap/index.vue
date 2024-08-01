@@ -37,6 +37,7 @@ import { Subscript } from '@tiptap/extension-subscript';
 import { Document } from '@tiptap/extension-document';
 import { Text } from '@tiptap/extension-text';
 import { Dropcursor } from '@tiptap/extension-dropcursor';
+import { Paragraph } from '@tiptap/extension-paragraph';
 
 import { common, createLowlight } from 'lowlight';
 
@@ -58,9 +59,6 @@ const app = useNuxtApp();
 
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
-
-type AllowedBlockType = 'text' | 'image' | 'video' | 'media' | 'files' | 'link';
-type AllowedBlocksTypes = AllowedBlockType[];
 
 interface MentionUserProps {
   username: String;
@@ -88,7 +86,7 @@ const props = defineProps({
     default: () => [],
   },
   allowedBlocks: {
-    type: Array as PropType<AllowedBlocksTypes>,
+    type: Array as PropType<string[]>,
     default: () => [],
   },
 });
@@ -181,7 +179,7 @@ onMounted(async () => {
           duration: 100,
           theme: 'transparent',
           maxWidth: 1500,
-          placement: 'auto-start',
+          placement: 'top-start',
         },
         updateDelay: 100,
         shouldShow: ({ view }) => {
@@ -189,13 +187,6 @@ onMounted(async () => {
             return false;
           }
           return isTextSelected({ editor: editor.value });
-        },
-      }),
-      CustomMention.configure({
-        suggestion: {
-          items: (editor) =>
-            mentionSuggestion.items(editor, props.mentionUsers),
-          render: mentionSuggestion.render,
         },
       }),
       Placeholder.configure({
@@ -219,7 +210,7 @@ onMounted(async () => {
       }),
       VueDragHandle.configure({
         editor: () => editor.value,
-        tippyOptions: { offset: [-2, 16], zIndex: 99 },
+        tippyOptions: { offset: [-2, 16] },
         showDragHandle: () => isEditable.value,
         defaultNodeType: defaultBlock.value,
       }),
@@ -328,6 +319,7 @@ const blockToolsMap = {
   Typography,
   Superscript,
   Subscript,
+  Paragraph,
   Carousel: Carousel.configure({
     handleFileSelected: async (slides) => {
       const formData = new FormData();
@@ -467,6 +459,9 @@ const setAvailableBlocks = (blocks: string[]) => {
         break;
     }
   });
+  if (blocks.length > 1 && !availableBlocks.includes('starterKit')) {
+    availableBlocks.push('Paragraph');
+  }
   return availableBlocks;
 };
 

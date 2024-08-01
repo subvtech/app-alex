@@ -100,9 +100,7 @@
           />
         </v-col>
       </v-row>
-
       <alex-learningplan-task-description
-        v-model="description"
         :doc-name="`task-${props.taskId}`"
         :mention-users="mentionUsers"
         :edit="editable"
@@ -368,7 +366,7 @@ const restrictionsValue = computed({
   },
 }) as WritableComputedRef<RestrictionValue[]>;
 
-const mentionUsers = computed(() => {
+const mentionUsers = computed<MentionUserPropsArray>(() => {
   if (!props.members) {
     return [];
   }
@@ -390,7 +388,7 @@ const mentionUsers = computed(() => {
     .map(({ fullname, username, avatar }) => ({
       fullname,
       username,
-      avatarUrl: avatar?.url,
+      avatarUrl: avatar?.url || '',
     }));
 });
 
