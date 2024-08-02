@@ -124,20 +124,24 @@ const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
 
-const colors = [
-  '#f783ac',
-  '#f3a683',
-  '#f3d683',
-  '#d9f683',
-  '#aef683',
-  '#83f6b4',
-  '#83f6f0',
-  '#83baf6',
-  '#838cf6',
-  '#c783f6',
-  '#f683e4',
-  '#f683a6',
-];
+const generateUserColor = (username: string): string => {
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash = username.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
+  const color = '#' + '00000'.substring(0, 6 - c.length) + c;
+  const rgb = parseInt(color.slice(1), 16);
+  const r = (rgb >> 16) & 0xff;
+  const g = (rgb >> 8) & 0xff;
+  const b = (rgb >> 0) & 0xff;
+  const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  if (luma < 140) {
+    return generateUserColor(username + 'a');
+  }
+
+  return color;
+};
 
 interface TipTapResponse {
   token: string;
@@ -192,8 +196,10 @@ onMounted(async () => {
           CollaborationCursor.configure({
             provider,
             user: {
-              name: user.value ? user.value.username : 'Anonymous',
-              color: colors[Math.floor(Math.random() * colors.length)],
+              name: user.value ? user.value.username : 'Usuário Anônimo',
+              color: generateUserColor(
+                user.value?.username ? user.value.username : 'Anonymous',
+              ),
             },
           }),
         ]
