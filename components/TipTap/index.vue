@@ -100,6 +100,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  collaboration: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const defaultBlock = computed(() => {
@@ -120,7 +124,7 @@ const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
 
-const collors = [
+const colors = [
   '#f783ac',
   '#f3a683',
   '#f3d683',
@@ -181,6 +185,20 @@ onMounted(async () => {
       }
     },
   });
+  const setCollaborationExtensions = (): AnyExtension[] => [
+    ...(props.collaboration
+      ? [
+          Collaboration.configure({ document: doc }),
+          CollaborationCursor.configure({
+            provider,
+            user: {
+              name: user.value ? user.value.username : 'Anonymous',
+              color: colors[Math.floor(Math.random() * colors.length)],
+            },
+          }),
+        ]
+      : []),
+  ];
 
   editor.value = new Editor({
     editable: isEditable.value,
@@ -217,14 +235,6 @@ onMounted(async () => {
       SlashMenu.configure({
         suggestion: suggestion(slashMenuBlocks(props.allowedBlocks)),
       }),
-      Collaboration.configure({ document: doc }),
-      CollaborationCursor.configure({
-        provider,
-        user: {
-          name: user.value ? user.value.username : 'Anonymous',
-          color: collors[Math.floor(Math.random() * collors.length)],
-        },
-      }),
       VueDragHandle.configure({
         editor: () => editor.value,
         showDragHandle: () => isEditable.value && !props.fixedMenu,
@@ -260,6 +270,7 @@ onMounted(async () => {
           'CodeBlockLowlight',
         ],
       }),
+      ...setCollaborationExtensions(),
       ...getSelectedBlockTools(),
     ],
     content: props.modelValue,
