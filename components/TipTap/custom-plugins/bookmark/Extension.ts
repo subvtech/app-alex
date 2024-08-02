@@ -11,7 +11,15 @@ export default Node.create({
   addAttributes() {
     return {
       url: {
-        default: null,
+        default: '',
+      },
+      meta: {
+        default: {
+          title: '',
+          description: '',
+          image: '',
+          domain: '',
+        },
       },
     };
   },

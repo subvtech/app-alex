@@ -3,7 +3,7 @@
     <alex-inputs-text-field
       v-if="!readOnly && !urlData.title"
       v-model="url"
-      class="mx-auto tw-w-[80%]"
+      class="mx-auto tw-w-100 sm:tw-w-[80%]"
       name="url"
       prepend-inner-icon="mdi-link"
       density="comfortable"
@@ -12,7 +12,8 @@
       :placeholder="t('components.tiptap.bookmark.placeholder')"
       :error-messages="fetchError ? t('components.tiptap.bookmark.error') : ''"
       @keydown.enter.stop="fetchData"
-      @paste.stop="fetchData"
+      @paste="fetchData($event.clipboardData.getData('text'))"
+      @input="updateAttributes({ url })"
     >
       <template #append-inner>
         <alex-custom-button
@@ -26,12 +27,14 @@
     </alex-inputs-text-field>
     <nuxt-link
       v-else-if="urlData.title"
-      :href="url"
+      :href="readOnly ? url : ''"
       target="_blank"
-      class="mx-auto tw-w-[80%] d-flex rounded-lg pa-5 text-break bookmark text-decoration-none"
+      class="mx-auto tw-w-100 sm:tw-w-[80%] d-flex rounded-lg pa-3 pa-sm-5 text-break bookmark text-decoration-none"
     >
       <div class="w-100">
-        <p class="text-h5 text-gray-800">{{ urlData.title }}</p>
+        <p class="text-h5 text-gray-800 ellipsis lines-3">
+          {{ urlData.title }}
+        </p>
         <p class="my-4 ellipsis lines-2 text-gray-600">
           {{ urlData.description }}
         </p>
@@ -40,9 +43,8 @@
       <v-img
         v-if="urlData.image?.url"
         :src="urlData.image.url"
-        class="tw-w-4/5 ml-5 rounded-lg"
-        max-width="100px"
-        cover
+        class="tw-w-4/5 ml-3 rounded-lg"
+        max-width="30%"
       />
     </nuxt-link>
   </node-view-wrapper>
@@ -82,14 +84,7 @@ const fetchError = ref(false);
 
 const url = ref<string>(props.node.attrs.url);
 
-const urlData = ref<urlRes>({
-  title: '',
-  domain: '',
-  description: '',
-  image: {
-    url: '',
-  },
-});
+const urlData = ref<urlRes>(props.node.attrs.meta);
 
 const readOnly = computed(() => props.extension.options.readOnly());
 
@@ -100,18 +95,27 @@ watch(
   },
 );
 
-const fetchData = async () => {
-  if (!url.value || isLoading.value) return;
+watch(
+  () => props.node.attrs.meta,
+  (value) => {
+    urlData.value = value;
+  },
+);
+
+const fetchData = async (pasteUrl: string) => {
+  const fetchUrl = pasteUrl || url.value;
+  if (!fetchUrl || isLoading.value) return;
   const endpoint = props.extension.options.endpoint;
   isLoading.value = true;
   fetchError.value = false;
   try {
-    const response = await fetch(`${endpoint}?url=${url.value}`);
+    const response = await fetch(`${endpoint}?url=${fetchUrl}`);
     const res = await response.json();
     if (res.success) {
       urlData.value = res.meta;
       props.updateAttributes({
-        url: url.value,
+        url: fetchUrl,
+        meta: urlData.value,
       });
     } else {
       throw new Error('Invalid URL');
@@ -122,12 +126,6 @@ const fetchData = async () => {
     isLoading.value = false;
   }
 };
-
-onBeforeMount(() => {
-  if (url.value) {
-    fetchData();
-  }
-});
 </script>
 
 <style scoped>
