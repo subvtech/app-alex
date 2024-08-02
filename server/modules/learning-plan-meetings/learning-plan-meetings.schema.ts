@@ -9,7 +9,7 @@ import {
 
 import { learningPlanMeetingSchedule } from './learning-plan-meeting-schedule.schema';
 
-export const learningPlanMeetings = pgTable('learning-plan-meeting', {
+export const learningPlanMeetings = pgTable('learning_plan_meeting', {
   id: serial('id').primaryKey(),
   meetingScheduleId: integer('meeting_schedule_id').references(
     () => learningPlanMeetingSchedule.id,

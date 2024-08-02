@@ -1,6 +1,6 @@
 import {
   boolean,
-  numeric,
+  integer,
   pgEnum,
   pgTable,
   serial,
@@ -20,7 +20,7 @@ export const medias = pgTable('medias', {
   id: serial('id').primaryKey(),
   filename: text('filename'),
   title: text('title'),
-  size: numeric('size'),
+  size: integer('size'),
   hash: text('hash'),
   ext: text('ext'),
   mime: text('ext'),
