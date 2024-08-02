@@ -280,7 +280,6 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
 
 watch(model, (value) => {
   if (value) {
-    console.log('Mudando', props);
     description.value = props.description;
     submissionDescription.value = props.submissionDescription;
     hasSubmission.value = props.hasSubmission;

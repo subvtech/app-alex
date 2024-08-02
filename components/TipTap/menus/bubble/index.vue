@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex rounded d-flex flex-wrap"
+    class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex rounded d-flex flex-wrap rounded-lg"
   >
     <menubar :editor="editor" />
     <v-divider
@@ -8,7 +8,7 @@
       class="divider"
       :vertical="isVerticalDivider"
     ></v-divider>
-    <toggleGroup :editor="editor" />
+    <toggleGroup :editor="editor" :fixed-menu-bar="fixedMenuBar" />
   </div>
 </template>
 
@@ -22,6 +22,10 @@ defineProps({
   editor: {
     type: Editor,
     required: true,
+  },
+  fixedMenuBar: {
+    type: Boolean,
+    default: false,
   },
 });
 

@@ -1,5 +1,5 @@
 <template>
-  <Menubar v-if="props.editor" class="border-0">
+  <Menubar v-if="props.editor" class="border-0 rounded-t-lg">
     <!-- Text Type -->
     <MenubarMenu>
       <MenubarTrigger>
@@ -30,25 +30,6 @@
         </template>
       </MenubarContent>
     </MenubarMenu>
-    <!-- Font Size -->
-    <!-- <MenubarMenu>
-      <MenubarTrigger>
-        <span>{{ activeFontSize?.name.split(' ', 1)[0] }}</span>
-        <v-icon icon="mdi-chevron-down" size="8px" class="tw-ml-0.5" />
-      </MenubarTrigger>
-      <MenubarContent class="menuContent">
-        <MenubarItem
-          v-for="item in fontSizeList"
-          :key="`${item.name}-item`"
-          :data-highlighted="activeFontSize?.value === item.value"
-          :style="{ fontSize: item?.value }"
-          @select="activeFontSize = item"
-        >
-          {{ item.name }}
-        </MenubarItem>
-      </MenubarContent>
-    </MenubarMenu> -->
-    <!-- Font Family -->
     <MenubarMenu>
       <MenubarTrigger>
         <span>{{ activeFontFamily }}</span>
@@ -215,29 +196,6 @@ const contentTypeList: menuItens[] = [
     isActive: () => props.editor.isActive('taskList'),
   },
 ];
-
-// const fontSizeList: menuItens[] = [
-//   {
-//     name: 'Smaller',
-//     value: '12px',
-//   },
-//   {
-//     name: 'Small',
-//     value: '14px',
-//   },
-//   {
-//     name: 'Medium',
-//     value: '16px',
-//   },
-//   {
-//     name: 'Large',
-//     value: '18px',
-//   },
-//   {
-//     name: 'Extra Large',
-//     value: '24px',
-//   },
-// ];
 
 const fontFamilyList: menuItens[] = [
   {

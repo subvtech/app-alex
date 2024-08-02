@@ -19,11 +19,15 @@
     </div>
     <div class="pa-4">
       <p class="text-primary text-h2 mb-2">TipTap Attaches</p>
-      <TipTap :doc-name="`task-5`" :allowed-blocks="['files']" />
+      <TipTap :doc-name="`task-5`" :allowed-blocks="['document']" />
     </div>
     <div class="pa-4">
       <p class="text-primary text-h2 mb-2">TipTap Media</p>
-      <TipTap :doc-name="`task-6`" :allowed-blocks="['media']" />
+      <TipTap :doc-name="`task-6`" :allowed-blocks="['gallery']" />
+    </div>
+    <div class="pa-4">
+      <p class="text-primary text-h2 mb-2">TipTap Link</p>
+      <TipTap :doc-name="`task-7`" :allowed-blocks="['link']" />
     </div>
 
     <alex-learningplan-task-description

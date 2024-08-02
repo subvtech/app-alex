@@ -167,6 +167,20 @@ export default function (allowedBlocks: string[]) {
               .run();
           },
         },
+        {
+          title: 'link',
+          icon: 'mdi-link',
+          command: ({ editor, range }) => {
+            editor
+              .chain()
+              .focus()
+              .deleteRange(range)
+              .insertContent({
+                type: 'bookmark',
+              })
+              .run();
+          },
+        },
       ]
         .filter((item) => {
           if (allowedBlocks.length === 0) {

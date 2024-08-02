@@ -1,10 +1,16 @@
 <template>
-  <div ref="container" class="rounded-lg">
-    <div class="bubble-menu-wrapper">
-      <tip-tap-menus-bubble :editor="editor" @click.stop.prevent />
+  <client-only>
+    <div ref="container" class="rounded-lg w-100">
+      <div v-if="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+        <tip-tap-menus-bubble
+          :editor="editor"
+          :fixed-menu-bar="fixedMenu"
+          @click.stop.prevent
+        />
+      </div>
+      <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
     </div>
-    <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
-  </div>
+  </client-only>
 </template>
 
 <script setup lang="ts">
@@ -47,6 +53,7 @@ import CustomMention from './custom-plugins/mentions/Extension';
 import SlashMenu from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
+import BookMark from './custom-plugins/bookmark/Extension';
 import Carousel from './custom-plugins/carousel/Extension';
 import MediaUpload from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
@@ -89,12 +96,26 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: () => [],
   },
+  fixedMenu: {
+    type: Boolean,
+    default: false,
+  },
+  collaboration: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const defaultBlock = computed(() => {
   return props.allowedBlocks.length === 1 ? props.allowedBlocks[0] : '';
 });
 
+const showMenuBar = computed(() => {
+  return (
+    isEditable.value &&
+    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
+  );
+});
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
 
@@ -103,7 +124,7 @@ const isEditable = ref(props.edit);
 
 const container = ref<HTMLDivElement | null>(null);
 
-const collors = [
+const colors = [
   '#f783ac',
   '#f3a683',
   '#f3d683',
@@ -164,6 +185,20 @@ onMounted(async () => {
       }
     },
   });
+  const setCollaborationExtensions = (): AnyExtension[] => [
+    ...(props.collaboration
+      ? [
+          Collaboration.configure({ document: doc }),
+          CollaborationCursor.configure({
+            provider,
+            user: {
+              name: user.value ? user.value.username : 'Anonymous',
+              color: colors[Math.floor(Math.random() * colors.length)],
+            },
+          }),
+        ]
+      : []),
+  ];
 
   editor.value = new Editor({
     editable: isEditable.value,
@@ -200,18 +235,24 @@ onMounted(async () => {
       SlashMenu.configure({
         suggestion: suggestion(slashMenuBlocks(props.allowedBlocks)),
       }),
-      Collaboration.configure({ document: doc }),
-      CollaborationCursor.configure({
-        provider,
-        user: {
-          name: user.value ? user.value.username : 'Anonymous',
-          color: collors[Math.floor(Math.random() * collors.length)],
-        },
-      }),
       VueDragHandle.configure({
         editor: () => editor.value,
-        tippyOptions: { offset: [-2, 16] },
-        showDragHandle: () => isEditable.value,
+        showDragHandle: () => isEditable.value && !props.fixedMenu,
+        tippyOptions: {
+          popperOptions: {
+            modifiers: [
+              {
+                name: 'flip',
+                options: {
+                  fallbackPlacements: ['bottom-start'],
+                },
+              },
+              {
+                name: 'preventOverflow',
+              },
+            ],
+          },
+        },
         defaultNodeType: defaultBlock.value,
       }),
       UniqueID.configure({
@@ -229,6 +270,7 @@ onMounted(async () => {
           'CodeBlockLowlight',
         ],
       }),
+      ...setCollaborationExtensions(),
       ...getSelectedBlockTools(),
     ],
     content: props.modelValue,
@@ -410,6 +452,10 @@ const blockToolsMap = {
       });
     },
   }),
+  Bookmark: BookMark.configure({
+    readOnly: () => !isEditable.value,
+    endpoint: '/api/fetch-url',
+  }),
 };
 
 const setAvailableBlocks = (blocks: string[]) => {
@@ -437,6 +483,7 @@ const setAvailableBlocks = (blocks: string[]) => {
           'TableHeader',
           'TableCell',
           'CustomMention',
+          'TextStyle',
         );
         break;
       case 'image':
@@ -445,14 +492,14 @@ const setAvailableBlocks = (blocks: string[]) => {
       case 'video':
         availableBlocks.push('MediaUpload');
         break;
-      case 'media':
+      case 'gallery':
         availableBlocks.push('Carousel');
         break;
-      case 'files':
+      case 'document':
         availableBlocks.push('FileSet');
         break;
       case 'link':
-        availableBlocks.push('Link');
+        availableBlocks.push('Bookmark');
         break;
       default:
         availableBlocks.push(block);
@@ -485,13 +532,12 @@ const slashMenuBlocks = (blocks: string[]): string[] => {
           return ['insert', 'image'];
         case 'video':
           return ['insert', 'video'];
-        case 'media':
+        case 'gallery':
           return ['insert', 'carousel'];
-        case 'files':
+        case 'document':
           return ['insert', 'attaches'];
         case 'link':
-          // TODO: Add link block
-          return ['link'];
+          return ['insert', 'bookmark'];
         default:
           return [];
       }

@@ -16,6 +16,7 @@
     "carousel": "Carousel",
     "image": "Image",
     "video": "Video",
+    "link": "Link",
     "noResults": "No results found"
   },
   "bubbleMenu": {
