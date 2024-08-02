@@ -101,7 +101,7 @@
         </v-col>
       </v-row>
       <alex-learningplan-task-description
-        :doc-name="`task-${props.taskId}`"
+        v-model="description"
         :mention-users="mentionUsers"
         :edit="editable"
       />
@@ -144,7 +144,6 @@
         v-model="submissionDescription"
         name="submissionDescription"
         :edit="editable"
-        :doc-name="`task-submission-${props.taskId}`"
         :mention-users="mentionUsers"
         :title="
           $t('components.learningPlan.drawer.task.submission.description.label')
@@ -206,6 +205,7 @@ const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
+  a?: string;
   taskId?: number;
   trail?: TrailSimple;
   title?: string;
@@ -229,6 +229,7 @@ interface TaskTeacherDrawerProps {
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
+  a: '',
   title: '',
   status: 'draft',
   blocks: undefined,
@@ -276,47 +277,11 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
   }
   return true;
 };
-// TODO: Think about a better way to handle this
-const setDescription = () => {
-  if (!props.description) {
-    description.value = '';
-    return;
-  }
-
-  if (typeof props.description === 'string') {
-    try {
-      const descriptionObj = JSON.parse(props.description);
-      description.value = descriptionObj;
-    } catch (e) {
-      description.value = props.description;
-    }
-  } else {
-    description.value = props.description;
-  }
-};
-
-const setSubmissionDescription = () => {
-  if (!props.submissionDescription) {
-    submissionDescription.value = '';
-    return;
-  }
-
-  if (typeof props.submissionDescription === 'string') {
-    try {
-      const descriptionObj = JSON.parse(props.submissionDescription);
-      submissionDescription.value = descriptionObj;
-    } catch (e) {
-      submissionDescription.value = props.submissionDescription;
-    }
-  } else {
-    submissionDescription.value = props.submissionDescription;
-  }
-};
 
 watch(model, (value) => {
   if (value) {
-    setDescription();
-    setSubmissionDescription();
+    description.value = props.description;
+    submissionDescription.value = props.submissionDescription;
     hasSubmission.value = props.hasSubmission;
     sendAfterDeadline.value = props.sendAfterDeadline;
     goals.value = props.goals;
@@ -490,15 +455,10 @@ useOnStopTyping(
         return;
       }
 
-      const value =
-        typeof description.value === 'object'
-          ? JSON.stringify(description.value)
-          : description.value;
-
       await strapi.update('tasks', props.taskId, {
-        description: value || '',
+        description: description.value,
       });
-      emit('change-description', description.value || '');
+      emit('change-description', description.value);
     } catch (error) {
       notifyFieldError('description');
     }
@@ -515,15 +475,10 @@ useOnStopTyping(
         return;
       }
 
-      const value =
-        typeof submissionDescription.value === 'object'
-          ? JSON.stringify(submissionDescription.value)
-          : submissionDescription.value;
-
       await strapi.update('tasks', props.taskId, {
-        submission_description: value || '',
+        submission_description: submissionDescription.value,
       });
-      emit('change-submission-description', submissionDescription.value || '');
+      emit('change-submission-description', submissionDescription.value);
     } catch (error) {
       notifyFieldError('submissionDescription');
     }

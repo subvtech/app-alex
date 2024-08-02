@@ -6,10 +6,11 @@
 
     <div class="rounded-lg pa-0" :class="edit && 'border tw-min-h-[102px]'">
       <TipTap
-        :doc-name="docName"
+        v-model="model"
         :mention-users="mentionUsers"
         :edit="edit"
         :allowed-blocks="['text']"
+        :collaboration="false"
         :fixed-menu="true"
       />
     </div>
@@ -22,9 +23,10 @@ import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 interface DescriptionProps {
   edit?: boolean;
   title?: string;
-  docName?: string;
   mentionUsers?: MentionUserPropsArray;
 }
 
 defineProps<DescriptionProps>();
+
+const model = defineModel({ required: true });
 </script>
