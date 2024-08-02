@@ -64,14 +64,14 @@ export default function useContentItemActions(
     switch (defaultNodeType) {
       case 'image':
         return state.schema.nodes.mediaUpload.create({ format: 'image' });
-      case 'media':
+      case 'gallery':
         return state.schema.nodes.carousel.create();
       case 'video':
         return state.schema.nodes.mediaUpload.create({ format: 'video' });
-      case 'files':
+      case 'document':
         return state.schema.nodes.fileSet.create();
       case 'link':
-        return state.schema.nodes.link.create();
+        return state.schema.nodes.bookmark.create();
       default:
         return state.schema.nodes.paragraph.create(null, [
           state.schema.text('/'),

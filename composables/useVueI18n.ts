@@ -121,6 +121,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tiptap/menus',
     'tiptap/messages',
     'tiptap/mediaUpload',
+    'tiptap/bookmark',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

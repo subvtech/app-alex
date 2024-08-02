@@ -53,6 +53,7 @@ import CustomMention from './custom-plugins/mentions/Extension';
 import SlashMenu from './menus/slash/commands';
 import suggestion from './menus/slash/suggestion';
 import FileSet from './custom-plugins/file-set/Extension';
+import BookMark from './custom-plugins/bookmark/Extension';
 import Carousel from './custom-plugins/carousel/Extension';
 import MediaUpload from './custom-plugins/media-upload/Extension';
 import VueDragHandle from './menus/drag/Extension.js';
@@ -426,6 +427,10 @@ const blockToolsMap = {
       });
     },
   }),
+  Bookmark: BookMark.configure({
+    readOnly: () => !isEditable.value,
+    endpoint: '/api/fetch-url',
+  }),
 };
 
 const setAvailableBlocks = (blocks: string[]) => {
@@ -462,14 +467,14 @@ const setAvailableBlocks = (blocks: string[]) => {
       case 'video':
         availableBlocks.push('MediaUpload');
         break;
-      case 'media':
+      case 'gallery':
         availableBlocks.push('Carousel');
         break;
-      case 'files':
+      case 'document':
         availableBlocks.push('FileSet');
         break;
       case 'link':
-        availableBlocks.push('Link');
+        availableBlocks.push('Bookmark');
         break;
       default:
         availableBlocks.push(block);
@@ -502,13 +507,12 @@ const slashMenuBlocks = (blocks: string[]): string[] => {
           return ['insert', 'image'];
         case 'video':
           return ['insert', 'video'];
-        case 'media':
+        case 'gallery':
           return ['insert', 'carousel'];
-        case 'files':
+        case 'document':
           return ['insert', 'attaches'];
         case 'link':
-          // TODO: Add link block
-          return ['link'];
+          return ['insert', 'bookmark'];
         default:
           return [];
       }
