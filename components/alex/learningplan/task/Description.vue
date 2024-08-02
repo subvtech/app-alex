@@ -5,6 +5,7 @@
     </p>
 
     <TipTap
+      v-model="model"
       class="rounded-lg pa-0"
       :class="edit && 'border tw-min-h-[102px]'"
       :doc-name="docName"
@@ -26,4 +27,6 @@ interface DescriptionProps {
 }
 
 defineProps<DescriptionProps>();
+
+const model = defineModel({ required: true });
 </script>

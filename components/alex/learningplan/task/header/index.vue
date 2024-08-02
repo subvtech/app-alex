@@ -23,7 +23,6 @@
           v-model="descRef"
           class="pa-0"
           :class="ellipsis && 'tw-shadow-inner'"
-          :doc-name="`task-${props.id}`"
           :edit="false"
           @change:height="(height) => hasEllipsis(height)"
         />
