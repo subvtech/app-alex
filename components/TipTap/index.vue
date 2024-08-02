@@ -227,8 +227,22 @@ onMounted(async () => {
       }),
       VueDragHandle.configure({
         editor: () => editor.value,
-        tippyOptions: { offset: [-2, 16] },
         showDragHandle: () => isEditable.value && !props.fixedMenu,
+        tippyOptions: {
+          popperOptions: {
+            modifiers: [
+              {
+                name: 'flip',
+                options: {
+                  fallbackPlacements: ['bottom-start'],
+                },
+              },
+              {
+                name: 'preventOverflow',
+              },
+            ],
+          },
+        },
         defaultNodeType: defaultBlock.value,
       }),
       UniqueID.configure({

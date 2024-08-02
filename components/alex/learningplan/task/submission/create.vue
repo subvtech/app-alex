@@ -19,7 +19,7 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="mx-auto editor my-6 px-sm-6 px-1 px-md-0 w-100">
+    <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
       <!-- <app-editor
         ref="editor"
         :allowed-blocks="allowedBlocks"

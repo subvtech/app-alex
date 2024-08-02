@@ -1,11 +1,20 @@
 <template>
   <div v-if="editor && shouldShowDragHandle" class="tw-flex">
-    <alex-custom-button variant="text" icon="mdi-plus" @click="addNode">
+    <alex-custom-button
+      :class="{ 'elevation-2 bg-white': isMobile }"
+      variant="text"
+      icon="mdi-plus"
+      @click="addNode"
+    >
       <v-icon icon="mdi-plus" size="small" />
     </alex-custom-button>
     <Popover :open="menu" @update:open="(value: boolean) => (menu = value)">
       <PopoverTrigger>
-        <alex-custom-button variant="text" icon="mdi-plus">
+        <alex-custom-button
+          variant="text"
+          icon="mdi-plus"
+          :class="{ 'elevation-2 bg-white ml-1': isMobile }"
+        >
           <v-icon icon="alex:DragIndicator" size="small" />
         </alex-custom-button>
       </PopoverTrigger>
@@ -110,6 +119,22 @@ const addNode = () => {
   actions.handleAdd(props.currentNode, props.currentNodePos);
   menu.value = false;
 };
+
+const screenWidth = ref(window.innerWidth);
+
+const updateScreenWidth = () => {
+  screenWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateScreenWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScreenWidth);
+});
+
+const isMobile = computed(() => screenWidth.value <= 768);
 </script>
 
 <style scoped>
