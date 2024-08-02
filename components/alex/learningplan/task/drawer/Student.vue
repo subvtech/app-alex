@@ -122,6 +122,7 @@
                 :task-member-id="taskMemberId"
                 :content="mostRecentSubmission"
                 :task-status="status"
+                :doc_name="docName"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -200,6 +201,7 @@ interface Submission {
 }
 interface TaskUserDrawerProps {
   student: Student;
+  docName: string;
   taskId: number;
   taskMemberId: number;
   status: TaskMemberStatus;

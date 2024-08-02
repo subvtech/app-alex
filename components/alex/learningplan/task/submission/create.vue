@@ -26,7 +26,7 @@
         @change="() => (hasEditorChanges = true)"
       /> -->
       <tip-tap
-        :doc-name="`task-submission-${props.taskMemberId}`"
+        :doc-name="docName"
         :edit="!props.readOnly"
         :allowed-blocks="props.restrictions ? props.restrictions : ['']"
       />
@@ -76,6 +76,7 @@ interface submissionProps {
   taskMemberId: number;
   restrictions?: string[];
   lastSubmission?: TaskSubmissionSimple;
+  docName?: string;
   readOnly?: boolean;
 }
 
@@ -84,6 +85,7 @@ const props = withDefaults(defineProps<submissionProps>(), {
   deadline: undefined,
   restrictions: undefined,
   lastSubmission: undefined,
+  docName: '',
   readOnly: false,
 });
 

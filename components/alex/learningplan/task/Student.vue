@@ -47,6 +47,7 @@
       v-if="selectedTask?.task"
       v-model="detailsDrawer"
       :task-id="selectedTask.task.id"
+      :doc_name="selectedTask.task.doc_name"
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
       :trail="selectedTask.task.trail"
@@ -128,10 +129,10 @@ const { data: tasks, execute } = await useAsyncData(
     default: () => ({ meta: 0, data: [] as TaskStudent[] }),
     transform: ({ data, meta }) => {
       const filteredData = data.filter((task) => task.task?.status !== 'draft');
-
       const dataValue = filteredData.map((task) => ({
         id: task.id,
         status: task.status,
+        doc_name: task.doc_name,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         title: task.task?.title,
         user: {

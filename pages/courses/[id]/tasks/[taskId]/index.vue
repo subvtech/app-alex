@@ -78,6 +78,7 @@
       :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
       :can-submit-after-deadline="studentDetails.can_submit_after_deadline"
       :task-member-id="studentDetails.id"
+      :doc_name="studentDetails.doc_name"
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
       :student="{
@@ -151,6 +152,7 @@ const studentDetails = computed(() => {
   const member = taskStore.task?.task_members.find(
     (member) => member.id === studentDetailsId.value,
   );
+
   return member || null;
 });
 

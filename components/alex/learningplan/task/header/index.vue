@@ -24,6 +24,7 @@
           class="pa-0"
           :class="ellipsis && 'tw-shadow-inner'"
           :edit="false"
+          :collaboration="false"
           @change:height="(height) => hasEllipsis(height)"
         />
       </div>

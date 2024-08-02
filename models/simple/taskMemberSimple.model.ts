@@ -7,6 +7,7 @@ export interface TaskMember {
   learning_plan_member?: LearningPlanMemberSimple;
   last_submission_at?: string | null;
   learning_plan_group?: LearningPlanGroupSimple;
+  doc_name?: string;
   task?: TaskSimple;
   task_submissions?: TaskSubmissionSimple[];
 }
