@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column">
+  <div class="d-flex flex-column w-100 flex-grow-1">
     <alex-custom-header
       class="mb-6 mt-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
@@ -502,7 +502,7 @@ const navigate = (id: number, page) => {
 }
 
 .wrapper {
-  min-height: calc(100vh - 130px);
+  /* min-height: calc(100vh - 130px); */
 }
 
 .grid-container {

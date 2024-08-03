@@ -68,6 +68,7 @@
     "@nuxtjs/strapi": "^1.9.3",
     "@pinia/nuxt": "^0.4.11",
     "@postlight/parser": "^2.2.3",
+    "@tanstack/vue-query": "^5.51.17",
     "@vee-validate/yup": "^4.11.1",
     "@vee-validate/zod": "^4.11.1",
     "@vueuse/core": "^10.10.0",

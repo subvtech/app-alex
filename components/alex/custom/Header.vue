@@ -74,7 +74,7 @@ export interface HeaderComponentType {
   secondaryButtonIcon?: string;
   secondaryButtonText?: string;
   noBackArrow: boolean;
-  loading: boolean;
+  loading?: boolean;
   items: itemType[];
 }
 
