@@ -4,6 +4,8 @@
     :persistent="true"
     :max-width="1080"
     :no-footer="props.readOnly"
+    :retain-focus="false"
+    no-click-animation
   >
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
@@ -17,11 +19,16 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="mx-auto editor my-6 px-sm-6 px-1 px-md-0 w-100">
-      <app-editor
+    <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
+      <!-- <app-editor
         ref="editor"
         :allowed-blocks="allowedBlocks"
         @change="() => (hasEditorChanges = true)"
+      /> -->
+      <tip-tap
+        :doc-name="docName"
+        :edit="!props.readOnly"
+        :allowed-blocks="props.restrictions ? props.restrictions : ['']"
       />
     </div>
     <template v-if="!props.readOnly" #footer>
@@ -59,6 +66,7 @@ interface submissionProps {
   taskMemberId: number;
   restrictions?: string[];
   lastSubmission?: TaskSubmissionSimple;
+  docName?: string;
   readOnly?: boolean;
 }
 
@@ -67,8 +75,10 @@ const props = withDefaults(defineProps<submissionProps>(), {
   deadline: undefined,
   restrictions: undefined,
   lastSubmission: undefined,
+  docName: '',
   readOnly: false,
 });
+
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
   'update-submission': [];
@@ -194,37 +204,70 @@ const saveSubmission = async () => {
   }
 };
 
-const allowedBlocks = computed(() => {
-  const restrictionMap = {
-    text: [
-      'Paragraph',
-      'header',
-      'delimiter',
-      'list',
-      'inlineCode',
-      'marker',
-      'quote',
-      'table',
-      'alert',
-      'warning',
-      'code',
-      'alignmentBlockTune',
-    ],
-    link: ['link'],
-    image: ['image'],
-    gallery: ['carousel', 'Paragraph'],
-    video: ['embed', 'Paragraph'],
-    document: ['fileSet', 'Paragraph'],
-  };
+// const sendSubmission = async () => {
+//   isLoading.value = true;
+//   try {
+//     if (!props.lastSubmission?.id) {
+//       return;
+//     }
+//     const time = new Date();
+//     await update('task-submissions', props.lastSubmission.id, {
+//       submitted_at: time,
+//     });
+//     await update('task-members', props.taskMemberId, {
+//       last_submission_at: time,
+//       status: 'in_review',
+//     });
+//     emit('update-task-status', 'in_review');
+//     executeSubmissions();
+//     setMessage(
+//       t('components.courses.tasks.submission_modal.deliver_success'),
+//       'success',
+//       true,
+//     );
+//     dialog.value = false;
+//   } catch (error) {
+//     setMessage(
+//       t('components.courses.tasks.submission_modal.deliver_error'),
+//       'error',
+//       true,
+//     );
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
 
-  const blocksSet = new Set();
-  props.restrictions?.forEach((restriction) => {
-    const blocksToAdd = restrictionMap[restriction];
-    blocksToAdd?.forEach((block: string) => blocksSet.add(block));
-  });
+// const allowedBlocks = computed(() => {
+//   const restrictionMap = {
+//     text: [
+//       'Paragraph',
+//       'header',
+//       'delimiter',
+//       'list',
+//       'inlineCode',
+//       'marker',
+//       'quote',
+//       'table',
+//       'alert',
+//       'warning',
+//       'code',
+//       'alignmentBlockTune',
+//     ],
+//     link: ['link'],
+//     image: ['image'],
+//     gallery: ['carousel', 'Paragraph'],
+//     video: ['embed', 'Paragraph'],
+//     document: ['fileSet', 'Paragraph'],
+//   };
 
-  return Array.from(blocksSet) as string[];
-});
+//   const blocksSet = new Set();
+//   props.restrictions?.forEach((restriction) => {
+//     const blocksToAdd = restrictionMap[restriction];
+//     blocksToAdd?.forEach((block: string) => blocksSet.add(block));
+//   });
+
+//   return Array.from(blocksSet) as string[];
+// });
 
 watch(dialog, (value) => {
   if (!value) {

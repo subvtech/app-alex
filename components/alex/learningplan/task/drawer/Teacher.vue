@@ -103,9 +103,9 @@
           />
         </v-col>
       </v-row>
-
       <alex-learningplan-task-description
         v-model="description"
+        :mention-users="mentionUsers"
         :edit="editable"
       />
 
@@ -152,25 +152,17 @@
         </v-col>
       </v-row>
 
-      <p v-if="hasSubmission" class="text-body-4 text-gray-800 mb-2">
-        {{
-          $t('components.learningPlan.drawer.task.submission.description.label')
-        }}
-      </p>
-
-      <alex-inputs-text-area
+      <alex-learningplan-task-description
         v-if="hasSubmission"
         v-model="submissionDescription"
         name="submissionDescription"
-        :placeholder="
-          $t(
-            'components.learningPlan.drawer.task.submission.description.placeHolder',
-          )
+        :edit="editable"
+        :mention-users="mentionUsers"
+        :title="
+          $t('components.learningPlan.drawer.task.submission.description.label')
         "
-        variant="outlined"
-        density="comfortable"
-        hide-details
       />
+
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
         <alex-learningplan-task-resources
@@ -220,11 +212,13 @@ import {
 } from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { orderEvents } from '~/utils';
+import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
+  a?: string;
   taskId?: number;
   trail?: TrailSimple;
   title?: string;
@@ -249,6 +243,7 @@ interface TaskTeacherDrawerProps {
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
+  a: '',
   title: '',
   status: 'draft',
   blocks: undefined,
@@ -270,7 +265,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   members: () => [],
 });
 
-const description = ref(props.description);
+const description = ref<string | any | undefined>(props.description);
 const submissionDescription = ref(props.submissionDescription);
 const hasSubmission = ref(props.hasSubmission);
 const canChangeFromReview = ref<boolean>(props.canChangeFromReview);
@@ -304,7 +299,6 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
   }
   return true;
 };
-// TODO: Think about a better way to handle this
 
 watch(model, (value) => {
   if (value) {
@@ -359,6 +353,32 @@ const restrictionsValue = computed({
     restrictions.value = newValue.join(',');
   },
 }) as WritableComputedRef<RestrictionValue[]>;
+
+const mentionUsers = computed<MentionUserPropsArray>(() => {
+  if (!props.members) {
+    return [];
+  }
+
+  const users: (UserSimple | undefined)[] = [];
+
+  props.members.forEach((member) => {
+    if (member.learning_plan_member?.user) {
+      users.push(member.learning_plan_member?.user);
+    } else if (member.learning_plan_group?.group_members) {
+      member.learning_plan_group?.group_members.forEach((member) =>
+        users.push(member.student_member.user),
+      );
+    }
+  });
+
+  return [...new Set(users)]
+    .filter((user) => user !== undefined)
+    .map(({ fullname, username, avatar }) => ({
+      fullname,
+      username,
+      avatarUrl: avatar?.url || '',
+    }));
+});
 
 // Tipos
 const type = ref<TaskType | null>(props.type);
@@ -457,10 +477,11 @@ useOnStopTyping(
       if (isFirstTimeOpened.value) {
         return;
       }
+
       await strapi.update('tasks', props.taskId, {
         description: description.value,
       });
-      emit('change-description', description.value || '');
+      emit('change-description', description.value);
     } catch (error) {
       notifyFieldError('description');
     }
@@ -476,10 +497,11 @@ useOnStopTyping(
       if (isFirstTimeOpened.value) {
         return;
       }
+
       await strapi.update('tasks', props.taskId, {
         submission_description: submissionDescription.value,
       });
-      emit('change-submission-description', submissionDescription.value || '');
+      emit('change-submission-description', submissionDescription.value);
     } catch (error) {
       notifyFieldError('submissionDescription');
     }

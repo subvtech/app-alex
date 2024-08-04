@@ -128,12 +128,14 @@
             </div>
           </div>
           <div class="d-flex flex-column gap-2 w-100">
-            <p class="text-body-4">
-              {{ $t('components.courses.tasks.submission.description') }}
-            </p>
-            <p class="text-body-3 text-gray-800">
-              {{ submission.description }}
-            </p>
+            <alex-learningplan-task-description
+              v-model="submissionDesc"
+              :title="
+                $t(
+                  'components.learningPlan.drawer.task.description.submissionLabel',
+                )
+              "
+            />
           </div>
           <div class="d-flex flex-column gap-2 tw-w-fit">
             <template v-if="!pending">
@@ -150,6 +152,7 @@
                 :task-member-id="taskMemberId"
                 :content="mostRecentSubmission"
                 :task-status="status"
+                :doc_name="docName"
               />
               <p v-else class="text-body-3 text-gray-400">
                 {{ $t('components.learningPlan.drawer.task.submission.empty') }}
@@ -258,6 +261,7 @@ interface TaskUserDrawerProps {
     endDate?: string | null;
     sendAfterDeadline?: boolean;
   };
+  docName: string;
   taskMemberId: number;
   student?: Student;
   group?: LearningPlanGroupSimple;
@@ -277,6 +281,7 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
 });
 const { t } = useI18n();
 const isSendingMessage = ref(false);
+const submissionDesc = ref<any | undefined>(props.submission?.description);
 const taskMemberId = toRef(props, 'taskMemberId');
 const model = defineModel({ default: false });
 type Emit = {
@@ -320,6 +325,24 @@ const config: Record<string, string> = {
   document: t('components.learningPlan.drawer.task.restrictions.document'),
   link: t('components.learningPlan.drawer.task.restrictions.link'),
   gallery: t('components.learningPlan.drawer.task.restrictions.gallery'),
+};
+
+const setSubmissionDescription = () => {
+  if (!props.submission?.description) {
+    submissionDesc.value = '';
+    return;
+  }
+
+  if (typeof props.submission?.description === 'string') {
+    try {
+      const descriptionObj = JSON.parse(props.submission?.description);
+      submissionDesc.value = descriptionObj;
+    } catch (e) {
+      submissionDesc.value = props.submission?.description;
+    }
+  } else {
+    submissionDesc.value = props.submission?.description;
+  }
 };
 
 // Get data
@@ -520,6 +543,7 @@ watch(model, (value) => {
     finishAt.value = props.finishAt;
     canSubmitAfterDeadline.value =
       props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
+    setSubmissionDescription();
     executeSubmissions();
     executeEvents();
     executeMessages();

@@ -9,6 +9,7 @@
     "
   >
     <alex-learningplan-task-header
+      :id="taskStore.task.id"
       :title="taskStore.task.title"
       :tags="headerTags"
       :type="taskStore.task.type"
@@ -67,6 +68,7 @@
     <alex-learningplan-task-drawer-student
       v-if="studentDetails"
       v-model="studentDrawer"
+      :task-id="taskId"
       :submission="{
         constraints: taskStore.task.allowed_editor_plugins
           ? taskStore.task.allowed_editor_plugins?.split(',')
@@ -85,6 +87,7 @@
       :can-submit-after-deadline-task="taskStore.task.can_submit_after_deadline"
       :can-submit-after-deadline="studentDetails.can_submit_after_deadline"
       :task-member-id="studentDetails.id"
+      :doc_name="studentDetails.doc_name"
       :finish-at="studentDetails.finished_at"
       :status="studentDetails.status"
       :task-title="taskStore.task.title"
@@ -169,6 +172,7 @@ const studentDetails = computed(() => {
   const member = taskStore.task?.task_members.find(
     (member) => member.id === studentDetailsId.value,
   );
+
   return member || null;
 });
 
