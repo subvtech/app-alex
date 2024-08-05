@@ -155,10 +155,13 @@
       </div>
 
       <div
-        class="d-flex gap-6 flex-wrap py-2"
-        :class="{ 'justify-space-between': members?.length }"
+        class="tw-w-full tw-flex gap-6 tw-flex-wrap py-2 tw-justify-start"
+        :class="{
+          'justify-space-between': !!members?.length,
+        }"
       >
         <alex-learningplan-card-info
+          class="!tw-w-full !tw-max-w-[52%]"
           :avatar="{
             url: facilitator.imageURL,
             name: facilitator.name,
@@ -172,6 +175,7 @@
         />
         <alex-learningplan-card-info
           v-if="type === 'course'"
+          class="!tw-w-full !tw-max-w-[40%]"
           icon="alex:trail"
           :title="$t('components.learningPlan.card.trails')"
           :subtitle="trailsCount"
@@ -179,6 +183,7 @@
 
         <alex-custom-avatar-group
           v-if="members && type !== 'course'"
+          class="tw-pl-2"
           :avatar-items="members"
           :size="36"
         />
@@ -276,7 +281,7 @@ const dropdownItems = (hidden: boolean) => {
   ];
 };
 const width = computed(() =>
-  isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 959 },
+  isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 1280 },
 );
 const isActiveTitleTooltip = computed(() => {
   if (isVertical.value) return props.title.length < 60;

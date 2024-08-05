@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { queryClient } from '~/plugins/query';
-export interface ProjectData {
-  project: LearningPlanSimple;
+export interface LearningPlanData {
+  learningPlan: LearningPlanSimple;
   facilitator?: LearningPlanMemberSimple;
 }
+type LearningPlanType = LearningPlanSimple['type'];
 
-const queryConfig = (userID: number) => ({
+const queryConfig = (userID: number, type: LearningPlanType) => ({
   filters: {
     members: {
       $and: [{ user: { id: { $eq: userID } } }, { status: { $eq: 'joined' } }],
@@ -23,7 +24,9 @@ const queryConfig = (userID: number) => ({
     ],
     archived_at: { $notNull: false },
     type: {
-      $in: ['project', 'course_project'],
+      ...(type !== 'course'
+        ? { $in: ['project', 'course_project'] }
+        : { $in: ['course'] }),
     },
   },
   populate: {
@@ -41,27 +44,29 @@ const queryConfig = (userID: number) => ({
   },
   sort: 'id:desc',
 });
-const getProjectsFn = (userID: number) => {
+const getLearningPlanFn = (type: LearningPlanType, userID: number) => {
   const { find } = useStrapiUtils();
-  return find<LearningPlanSimple>('learningplans', queryConfig(userID));
+  return find<LearningPlanSimple>('learningplans', queryConfig(userID, type));
 };
 export const getFacilitator = (members: LearningPlanMemberSimple[]) => {
   return members.find((m) => m.role === MemberRoles.FACILITATOR);
 };
 // Querys
-export const useGetMyProjects = (userId?: number) =>
+export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
   useQuery({
-    queryKey: ['my-projects'],
+    queryKey: [`my-${type}s`],
     queryFn: async () => {
       if (!userId) {
         return { meta: {}, data: [] };
       }
-      const projects = await getProjectsFn(userId);
-      const mappedProjects: ProjectData[] = projects.data.map((project) => ({
-        project,
-        facilitator: getFacilitator(project.members),
-      }));
-      return { meta: {}, data: mappedProjects };
+      const learningPlans = await getLearningPlanFn(type, userId);
+      const mappedLearningPlans: LearningPlanData[] = learningPlans.data.map(
+        (learningPlan) => ({
+          learningPlan,
+          facilitator: getFacilitator(learningPlan.members),
+        }),
+      );
+      return { meta: {}, data: mappedLearningPlans };
     },
     initialData: {
       meta: {},
@@ -75,17 +80,17 @@ export const useUpdateVisibility = () => {
     mutationFn: async (variables: {
       value: boolean;
       learninplanId: number;
+      type: LearningPlanType;
     }) => {
       const { update } = useStrapi();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
       await update('learningPlans', variables.learninplanId, {
         hidden: variables.value,
       });
     },
-    onMutate: ({ value, learninplanId }) => {
+    onMutate: ({ value, learninplanId, type }) => {
       queryClient.setQueryData(
-        ['my-projects'],
-        (projectValue: { meta: Object; data: ProjectData[] }) => {
+        [`my-${type}s`],
+        (projectValue: { meta: Object; data: LearningPlanData[] }) => {
           const updatedData = updateProjectVisibility(
             projectValue.data,
             learninplanId,
@@ -95,11 +100,11 @@ export const useUpdateVisibility = () => {
         },
       );
     },
-    onError: (_, { value, learninplanId }) => {
+    onError: (_, { value, learninplanId, type }) => {
       const { setMessage } = useMessageStore();
       queryClient.setQueryData(
-        ['my-projects'],
-        (projectValue: { meta: Object; data: ProjectData[] }) => {
+        [`my-${type}s`],
+        (projectValue: { meta: Object; data: LearningPlanData[] }) => {
           const updatedData = updateProjectVisibility(
             projectValue.data,
             learninplanId,
@@ -113,15 +118,15 @@ export const useUpdateVisibility = () => {
   });
 };
 const updateProjectVisibility = (
-  data: ProjectData[],
+  data: LearningPlanData[],
   learninplanId: number,
   value: boolean,
 ) => {
   return data.map((item) => {
-    if (item.project.id === learninplanId) {
+    if (item.learningPlan.id === learninplanId) {
       return {
         ...item,
-        project: { ...item.project, hidden: value },
+        learningPlan: { ...item.learningPlan, hidden: value },
       };
     }
     return item;
