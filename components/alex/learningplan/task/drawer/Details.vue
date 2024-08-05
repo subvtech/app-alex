@@ -134,14 +134,10 @@
     />
     <div v-if="contractAddress" class="d-flex flex-column gap-8">
       <div class="d-flex flex-column gap-6">
-        {{ contractAddress }}
         <alex-learningplan-task-drawer-contracts-balance
           :balance="contractBalance"
           :text="$t('components.learningPlan.contract.reward.remaining')"
         />
-        <alex-custom-button @click="fetchContractBalance">
-          fetchContractBalance
-        </alex-custom-button>
       </div>
     </div>
     <alex-learningplan-task-tabs
@@ -267,7 +263,7 @@ const description = ref<string>(props.description);
 const restrictions = ref<string>(props.restrictions);
 const isGroup = toRef(props, 'group');
 const submissionDescription = ref<string>(props?.submission?.description || '');
-const { contractAddress } = toRefs(props);
+
 const attachedMessage = ref<Message>();
 const attachedSubmission = ref<AttachedSubmission>();
 const isFirstTimeOpened = ref(true);
@@ -288,7 +284,10 @@ type Emits = {
 };
 
 const emit = defineEmits<Emits>();
-const { hasTheStudentBeenPaid, getContractReward } = useContracts();
+
+const { contractAddress } = toRefs(props);
+const { fetchContractReward, isThereAContract, contractBalance } =
+  useContracts(contractAddress);
 
 // Get submissions
 const strapiUtils = useStrapiUtils();
@@ -445,15 +444,7 @@ const restrictionsValue = computed({
   },
 }) as WritableComputedRef<RestrictionValue[]>;
 
-const contractBalance = ref(0);
-const fetchContractBalance = async () => {
-  if (!contractAddress.value) return;
-  const balance = await getContractReward(contractAddress.value);
-  console.log({ balance });
-  if (!balance) return;
-  contractBalance.value = balance;
-};
-await fetchContractBalance();
+await fetchContractReward();
 
 onMounted(() => {
   executeSubmissions().then(() => (loadingSubmission.value = false));
@@ -461,8 +452,8 @@ onMounted(() => {
   executeMessages();
 });
 
-watch(contractAddress, async () => {
-  await fetchContractBalance();
+watch([contractAddress, isThereAContract], async () => {
+  await fetchContractReward();
 });
 
 watch(model, (value) => {
@@ -517,7 +508,7 @@ const handleChangeStatus = (statusValue: TaskMemberStatus) => {
   status.value = statusValue;
 };
 
-watch(status, (newStatus, oldStatus) => {
+watch(status, async (newStatus, oldStatus) => {
   emit(
     'update-status',
     0,
@@ -529,6 +520,7 @@ watch(status, (newStatus, oldStatus) => {
     },
     newStatus,
   );
+  await fetchContractReward();
 });
 </script>
 

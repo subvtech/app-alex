@@ -105,13 +105,19 @@ const props = withDefaults(defineProps<ContractsProps>(), {
   edit: false,
 });
 
+const contractAddress = defineModel<string | null>('contractAddress', {
+  default: null,
+});
 const {
   createTaskContract,
   rewardStudents,
-  getContractBalance,
+  fetchContractBalance,
   cancelContract,
+  isThereBalance,
+  isThereAContract,
+  contractBalance,
   loading,
-} = useContracts();
+} = useContracts(contractAddress);
 
 const emit = defineEmits([
   'deploy:contract-draft',
@@ -121,19 +127,15 @@ const emit = defineEmits([
 ]);
 
 const status = defineModel<TaskStatus | TaskMemberStatus>('status');
-const contractAddress = defineModel<string | null>('contractAddress', {
-  default: null,
-});
+
 const isRewardCompleted = ref(false);
-const isUpdatingContract = ref(false);
 const displayDraftWarning = ref(false);
-const contractBalance = ref<number>(0);
+const isUpdatingContract = ref(false);
 
 // const editContract = computed(() => canEdit.value || !!contractAddress.value);
 
 const itsNotFinished = computed(() => status.value !== 'finished');
-const isThereAContract = computed(() => !!contractAddress.value);
-const isThereBalance = computed(() => contractBalance.value > 0);
+
 const isDraft = computed(() => status.value === 'draft');
 
 const canEdit = ref(isThereAContract.value || isUpdatingContract.value);
@@ -197,27 +199,10 @@ const taskGrades = computed(() => {
   return taskWallets.value.map(() => Math.floor(Math.random() * 11));
 });
 
-watch(isThereAContract, async () => {
-  canEdit.value = isThereAContract.value || isUpdatingContract.value;
-  await fetchContractBalance();
-});
-
-watch(isThereBalance, () => {
-  isUpdatingContract.value = isThereBalance.value;
-});
-
-const fetchContractBalance = async () => {
-  if (!contractAddress.value) return;
-  const balance = await getContractBalance(contractAddress.value);
-  if (balance === undefined) return;
-  contractBalance.value = weiToUsd(balance);
-};
 await fetchContractBalance();
 const handleCancelContract = async (isUpdating = false) => {
   if (!contractAddress.value) return;
-  const result = await cancelContract({
-    contractAddress: contractAddress.value,
-  });
+  const result = await cancelContract();
   if (!result) return;
 
   if (isUpdating) isUpdatingContract.value = true;
@@ -263,17 +248,18 @@ const handleAbortContract = async () => {
 const handleRewardStudents = async () => {
   if (!contractAddress.value) return;
 
-  const result = await rewardStudents(
-    contractAddress.value,
-    taskWallets.value,
-    taskGrades.value,
-  );
+  const result = await rewardStudents(taskWallets.value, taskGrades.value);
   isRewardCompleted.value = result;
   if (result) isUpdatingContract.value = false;
   await fetchContractBalance();
 };
 
-watch(status, async () => {
+watch([status, isThereAContract], async ([newStatus, newIsThereAContract]) => {
   await fetchContractBalance();
+  canEdit.value = newIsThereAContract || isUpdatingContract.value;
+});
+
+watch(isThereBalance, () => {
+  isUpdatingContract.value = isThereBalance.value;
 });
 </script>

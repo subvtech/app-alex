@@ -173,7 +173,7 @@ const props = defineProps<{
 const { create, delete: _delete, update, findOne } = useStrapi();
 const { find } = useStrapiUtils();
 const client = useStrapiClient();
-const { cancelContract, getContractBalance } = useContracts();
+
 const { t } = useI18n();
 const expand = ref([0, 0, 0, 0]);
 const isCreatingTask = ref(false);
@@ -196,12 +196,9 @@ groupsArray.forEach((group, index) => {
 const handlePendingContract = async () => {
   let isThereAPendingContract = !!taskDetails?.value?.contract_address;
   if (isThereAPendingContract) {
-    const contractAddress = taskDetails!.value!.contract_address!;
-    const balance = await getContractBalance(contractAddress);
+    const balance = await getContractBalance();
     if (balance && Number(balance) > 0) {
-      const result = await cancelContract({
-        contractAddress,
-      });
+      const result = await cancelContract();
       if (result) isThereAPendingContract = false;
     }
   }
@@ -281,6 +278,7 @@ const handleCreateTask = async () => {
         trail: undefined,
         task_events: undefined,
         task_members: undefined,
+
         tags: undefined,
         ...res.data.attributes,
       });
@@ -378,6 +376,9 @@ const taskDetails = computed(() => {
   }
   return null;
 });
+
+const contractAddress = ref(taskDetails.value?.contract_address || null);
+const { cancelContract, getContractBalance } = useContracts(contractAddress);
 
 const filteredTasks = computed(() => {
   const draft = tasksArray.value[0].filter((task) =>
@@ -562,10 +563,6 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     task.can_submit_after_deadline = values.can_submit_after_deadline!;
     task.allowed_editor_plugins = values.allowed_editor_plugins!;
   }
-
-  console.log({
-    values,
-  });
 };
 
 const handleChangeDescription = (description: string) => {

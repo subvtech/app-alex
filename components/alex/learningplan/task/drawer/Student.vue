@@ -343,32 +343,18 @@ const {
   rewardStudents,
   hasTheStudentBeenPaid,
   cancelContract,
-  getContractBalance,
+  fetchContractBalance,
   loading: contractLoading,
-} = useContracts();
+} = useContracts(contractAddress);
 
 const isRewarded = ref(false);
 const contractBalance = ref(0);
 
-const fetchContractBalance = async () => {
-  if (!contractAddress.value) return;
-  const balance = await getContractBalance(contractAddress.value);
-  if (!balance) return;
-  contractBalance.value = weiToUsd(balance);
-};
-
 const handleRewardSingleStudent = async () => {
   if (!props.student?.wallet) return;
   if (!contractAddress.value) return;
-  await rewardSingleStudent(
-    contractAddress.value,
-    props.student.wallet.address,
-    88,
-  );
-  const result = await hasTheStudentBeenPaid(
-    contractAddress.value,
-    props.student.wallet?.address,
-  );
+  await rewardSingleStudent(props.student.wallet.address, 88);
+  const result = await hasTheStudentBeenPaid(props.student.wallet?.address);
   isRewarded.value = result;
   await fetchContractBalance();
 };
@@ -384,7 +370,6 @@ const handleRewardGroup = async () => {
   if (!contractAddress.value) return;
 
   await rewardStudents(
-    contractAddress.value,
     wallets.value,
     wallets.value.map(() => 88),
     false,
@@ -403,10 +388,7 @@ const handleHasTheStudentBeenPaid = async () => {
         if (!walletAddress) {
           return false;
         }
-        const hasBeenPaid = await hasTheStudentBeenPaid(
-          contractAddress.value,
-          walletAddress,
-        );
+        const hasBeenPaid = await hasTheStudentBeenPaid(walletAddress);
         return hasBeenPaid;
       }),
     ).then((results) => results.some((result) => result));
@@ -415,9 +397,8 @@ const handleHasTheStudentBeenPaid = async () => {
     if (!walletAddress) {
       return false;
     }
-    temp = await hasTheStudentBeenPaid(contractAddress.value, walletAddress);
+    temp = await hasTheStudentBeenPaid(walletAddress);
   }
-  console.log({ temp, isRewarded: isRewarded.value });
 
   return temp;
 };
@@ -429,9 +410,7 @@ const isThereBalance = computed(() => contractBalance.value > 0);
 
 const handleCancelContract = async () => {
   if (!contractAddress.value) return;
-  const result = await cancelContract({
-    contractAddress: contractAddress.value,
-  });
+  const result = await cancelContract();
   if (!result) return;
 
   contractAddress.value = null;

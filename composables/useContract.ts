@@ -13,10 +13,6 @@ export interface CreateContractProps {
   totalNumberOfStudents: number;
 }
 
-export interface CancelledContractProps {
-  contractAddress: string;
-}
-
 const localGanacheChainId = 1337; // '0x1691';
 const sepoliaChainId = 11155111; // '0xaa36a7';
 const sepoliaNetworkUrl = 'https://rpc.sepolia.org';
@@ -38,8 +34,22 @@ const sepoliaTestnet = {
   blockExplorerUrls: ['https://sepolia.etherscan.io'], // Replace with actual block explorer URL(s)
 };
 
-export const useContracts = () => {
+export const useContracts = (
+  contractAddress: globalThis.Ref<string | null>,
+) => {
   const loading = ref(false);
+
+  const contractBalance = ref<number>(0);
+  const isThereBalance = computed(() => contractBalance.value > 0);
+  const isThereAContract = computed(() => !!contractAddress.value);
+
+  const fetchContractBalance = async () => {
+    if (!contractAddress.value) return;
+    const balance = await getContractBalance(contractAddress.value);
+
+    if (balance === undefined) return;
+    contractBalance.value = weiToUsd(balance);
+  };
 
   const getBrowserProvider = () => {
     return new ethers.BrowserProvider(window.ethereum);
@@ -56,9 +66,9 @@ export const useContracts = () => {
     };
   };
 
-  const getTaskContract = (contractAddress, provider) => {
+  const getTaskContract = (provider) => {
     const { contractABI } = getCompiledContract();
-    return new ethers.Contract(contractAddress, contractABI, provider);
+    return new ethers.Contract(contractAddress.value, contractABI, provider);
   };
 
   const getRedeemersArray = async (taskContract) => {
@@ -72,45 +82,36 @@ export const useContracts = () => {
           i++;
         }
       } catch (err) {}
-
-      console.log(`Redeemers: ${redeemers.join(', ')}`); // Assuming redeemers is an array
     } catch (error) {
       console.error('Error reading public variables:', error);
     }
     return redeemers;
   };
 
-  const getContractBalance = async (
-    contractAddress: string | null | undefined,
-  ) => {
-    console.log({ getContractBalance: contractAddress });
+  const getContractBalance = async () => {
     try {
-      if (!contractAddress) return;
-      const contractBalance = (await getBrowserProvider().getBalance(
-        contractAddress,
+      if (!contractAddress.value) return;
+      const provider = new ethers.JsonRpcProvider(networkUrl);
+      const contractBalance = (await provider.getBalance(
+        contractAddress.value,
       )) as BigNumberish;
+
       return contractBalance;
     } catch (err) {
       console.log(err);
     }
   };
 
-  const getContractReward = async (
-    contractAddress: string | null | undefined,
-  ) => {
-    console.log({ getContractReward: contractAddress });
+  const getContractReward = async () => {
     try {
-      if (!contractAddress) return;
-      const contractBalance = (await getBrowserProvider().getBalance(
-        contractAddress,
+      if (!contractAddress.value) return;
+      const provider = new ethers.JsonRpcProvider(networkUrl);
+      const contractBalance = (await provider.getBalance(
+        contractAddress.value,
       )) as BigNumberish;
 
-      const provider = await getDefaultProvider();
+      const redeemers = await getRedeemersArray(getTaskContract(provider));
 
-      const redeemers = await getRedeemersArray(
-        getTaskContract(contractAddress, provider),
-      );
-      console.log({ contractBalance, redeemers });
       return weiToUsd(contractBalance) / redeemers.length;
     } catch (err) {
       console.log(err);
@@ -177,19 +178,17 @@ export const useContracts = () => {
     }
   };
 
-  const cancelContract = async (props: CancelledContractProps) => {
-    const { contractAddress } = props;
-    console.log(props);
-
+  const cancelContract = async () => {
     loading.value = true;
 
     try {
-      if (!contractAddress) throw new Error('Contract address not provided');
+      if (!contractAddress.value)
+        throw new Error('Contract address not provided');
 
       // Replace with the actual freelancer address
       const browserProvider = getBrowserProvider();
       const signer = await withTimeout(12000, browserProvider.getSigner());
-      const taskContract = getTaskContract(contractAddress, signer);
+      const taskContract = getTaskContract(signer);
       const tx = await taskContract.cancelDeal();
       await tx.wait(); // Wait for the transaction to be mined
 
@@ -204,26 +203,24 @@ export const useContracts = () => {
     }
   };
 
-  const hasTheStudentBeenPaid = async (
-    contractAddress: string | undefined | null,
-    studentAddress: string | undefined,
-  ) => {
-    if (!contractAddress) throw new Error('Contract address not provided');
+  const hasTheStudentBeenPaid = async (studentAddress: string | undefined) => {
+    if (!contractAddress.value)
+      throw new Error('Contract address not provided');
     if (!studentAddress) throw new Error('Student address not provided');
     const provider = await getDefaultProvider();
 
-    const taskContract = getTaskContract(contractAddress, provider);
+    const taskContract = getTaskContract(provider);
     const redeemers = await getRedeemersArray(taskContract);
     return redeemers.includes(studentAddress);
   };
 
   const rewardStudents = async (
-    contractAddress: string | undefined | null,
     addressList: string[] = [],
     gradeList: number[] = [],
     redeemAll = true,
   ) => {
-    if (!contractAddress) throw new Error('Contract address not provided');
+    if (!contractAddress.value)
+      throw new Error('Contract address not provided');
     if (addressList.length === 0)
       throw new Error('Address list cannot be empty');
     if (addressList.length !== gradeList.length)
@@ -235,7 +232,7 @@ export const useContracts = () => {
 
       const browserProvider = getBrowserProvider();
       const signer = await withTimeout(12000, browserProvider.getSigner());
-      const taskContract = getTaskContract(contractAddress, signer);
+      const taskContract = getTaskContract(signer);
       const tx = await taskContract.redeemRewards(
         addressList,
         gradeList,
@@ -253,11 +250,11 @@ export const useContracts = () => {
   };
 
   const rewardSingleStudent = async (
-    contractAddress: string | undefined,
     studentAddress: string,
     studentGrade: number,
   ) => {
-    if (!contractAddress) throw new Error('Contract address not provided');
+    if (!contractAddress.value)
+      throw new Error('Contract address not provided');
 
     loading.value = true;
 
@@ -266,7 +263,7 @@ export const useContracts = () => {
 
       const browserProvider = getBrowserProvider();
       const signer = await withTimeout(12000, browserProvider.getSigner());
-      const taskContract = getTaskContract(contractAddress, signer);
+      const taskContract = getTaskContract(signer);
       const tx = await taskContract.redeemSingleReward(
         studentAddress,
         studentGrade,
@@ -283,11 +280,10 @@ export const useContracts = () => {
   };
 
   const getRewardStudentsFee = async (
-    contractAddress: string | null | undefined,
     addressList: string[] = [],
     gradeList: number[] = [],
   ) => {
-    if (!contractAddress) return;
+    if (!contractAddress.value) return;
 
     loading.value = true;
 
@@ -295,7 +291,7 @@ export const useContracts = () => {
       // Replace with the actual freelancer address
       const provider = await ethers.getDefaultProvider(networkUrl);
       const gasPrice = await provider.getFeeData();
-      const taskContract = getTaskContract(contractAddress, provider);
+      const taskContract = getTaskContract(provider);
       const estimatedGas = taskContract.estimateGas.redeemRewards(
         addressList,
         gradeList,
@@ -313,6 +309,13 @@ export const useContracts = () => {
     loading.value = false;
   };
 
+  const fetchContractReward = async () => {
+    if (!contractAddress.value) return;
+    const balance = await getContractReward();
+
+    if (balance === undefined) return;
+    contractBalance.value = balance;
+  };
   return {
     createTaskContract,
     rewardStudents,
@@ -320,8 +323,13 @@ export const useContracts = () => {
     getRewardStudentsFee,
     loading,
     getContractReward,
+    fetchContractReward,
     hasTheStudentBeenPaid,
     cancelContract,
+    isThereBalance,
+    isThereAContract,
+    contractBalance,
+    fetchContractBalance,
     rewardSingleStudent,
   };
 };

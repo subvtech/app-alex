@@ -60,7 +60,7 @@
       :description="selectedTask.task.description || undefined"
       :restrictions="selectedTask.task?.allowed_editor_plugins || ''"
       :task-member-id="selectedTask.id"
-      :contract-address="selectedTask.task?.contract_address || null"
+      :contract-address="contractAddress"
       :submission="
         selectedTask.task?.submission_required
           ? {
@@ -272,6 +272,10 @@ const openDrawer = (_index: number, card: TaskStudent) => {
   selectedTask.value = card;
   detailsDrawer.value = true;
 };
+
+const contractAddress = computed(
+  () => selectedTask.value?.task?.contract_address,
+);
 </script>
 
 <style scoped></style>
