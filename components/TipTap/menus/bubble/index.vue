@@ -1,6 +1,7 @@
 <template>
   <div
-    class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex rounded d-flex flex-wrap rounded-lg"
+    class="bubble-menu text-dark-gray text-body-3 pa-0 d-flex rounded d-flex flex-wrap rounded-lg w-100"
+    :class="fixedMenuBar ? 'fixed-menu-bar' : 'float-bubble-menu'"
   >
     <menubar :editor="editor" />
     <v-divider
@@ -18,7 +19,7 @@ import { Editor } from '@tiptap/vue-3';
 import menubar from './menubar.vue';
 import toggleGroup from './toggleGroup.vue';
 
-defineProps({
+const props = defineProps({
   editor: {
     type: Editor,
     required: true,
@@ -31,7 +32,9 @@ defineProps({
 
 const { width } = useWindowSize();
 
-const isVerticalDivider = computed(() => width.value > 850);
+const isVerticalDivider = computed(
+  () => width.value > 850 || (props.fixedMenuBar && width.value > 560),
+);
 
 const dividerClass = computed(() => ({
   'vertical-divider mx-1': isVerticalDivider.value,
@@ -70,8 +73,14 @@ const dividerClass = computed(() => ({
 }
 
 @media (max-width: 850px) {
-  .bubble-menu {
+  .float-bubble-menu {
     max-width: 235px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .fixed-menu-bar {
     justify-content: center;
   }
 }
