@@ -29,20 +29,19 @@
       <hr class="mb-2" />
 
       <div class="tw-flex tw-gap-4 tw-flex-col flex-fill px-4">
-        <alex-inputs-autocomplete
+        <alex-inputs-single-user-auto-complete
           v-model="filters.facilitator"
           name="facilitator"
-          :items="['facilitador 1']"
-          :placeholder="'Encontre um facilitador'"
           clearable
           density="comfortable"
           hide-details
+          facilitator
+          :placeholder="'Encontre um facilitador'"
           :label="'Facilitador'"
         />
-        <alex-inputs-autocomplete
+        <alex-inputs-institutions-auto-complete
           v-model="filters.institution"
           name="institution"
-          :items="['institution 1']"
           :placeholder="'Encontre a instituição'"
           clearable
           density="comfortable"
@@ -61,24 +60,52 @@
           :label="'Líder'"
         />
         <div v-if="type === 'course'" class="tw-flex tw-flex-col tw-gap-4">
-          <alex-inputs-autocomplete
+          <alex-inputs-tag-autocomplete
+            v-model="filters.technicalCompetences"
             name="technicalCompetence"
-            :items="['technicalCompetence 1']"
             :placeholder="'Encontre a competencia'"
             clearable
             density="comfortable"
             hide-details
             :label="'Competências técnicas'"
           />
-          <alex-inputs-autocomplete
+          <div
+            v-if="filters.technicalCompetences.length"
+            class="tw-flex tw-flex-wrap gap-2"
+          >
+            <template v-for="tag in filters.technicalCompetences" :key="tag.id">
+              <alex-custom-chip
+                :text="tag?.text"
+                status="primary"
+                clickable
+                closable
+                @click:close="handleRemoveTag(tag.text, 'technical')"
+              />
+            </template>
+          </div>
+          <alex-inputs-tag-autocomplete
+            v-model="filters.generalCompetences"
             name="generalCompetence"
-            :items="['generalCompetence 1']"
             :placeholder="'Encontre a competencia'"
             clearable
             density="comfortable"
             hide-details
             :label="'Competências gerais'"
           />
+          <div
+            v-if="filters.generalCompetences.length"
+            class="tw-flex tw-flex-wrap gap-2"
+          >
+            <template v-for="tag in filters.generalCompetences" :key="tag.id">
+              <alex-custom-chip
+                :text="tag?.text"
+                status="primary"
+                clickable
+                closable
+                @click:close="handleRemoveTag(tag.text, 'general')"
+              />
+            </template>
+          </div>
         </div>
         <div>
           <p class="text-p1 text-gray-800 mb-2">
@@ -157,17 +184,18 @@
 <script setup lang="ts">
 import * as yup from 'yup';
 import { useForm } from 'vee-validate';
+import { useQueryClient } from '@tanstack/vue-query';
 const { t } = useI18n();
 
 interface FilterProps {
   type: LearningPlanSimple['type'];
 }
 export type LearningPlanFilter = {
-  facilitator: User | null;
-  institution: Object | null;
-  generalCompetences: string[];
-  technicalCompetences: string[];
-  lider: User | null;
+  facilitator: UserSimple | null;
+  institution: InstitutionsType | null;
+  generalCompetences: Omit<TagSimple, 'learningplans'>[];
+  technicalCompetences: Omit<TagSimple, 'learningplans'>[];
+  lider: UserSimple | null;
   startDate: {
     start?: Date;
     end?: Date;
@@ -181,6 +209,7 @@ type Emits = {
   submit: [value: Partial<LearningPlanFilter>];
 };
 withDefaults(defineProps<FilterProps>(), {});
+const queryClient = useQueryClient();
 const model = defineModel({ default: false });
 const filters = ref<LearningPlanFilter>({
   facilitator: null,
@@ -256,7 +285,7 @@ const { handleSubmit, errors } = useForm({
 const onSubmit = handleSubmit(() => {
   const nonEmptyFilters: Partial<LearningPlanFilter> = Object.fromEntries(
     Object.entries(filters.value).filter(([_key, value]) => {
-      if (value === null || value === false || value === undefined) {
+      if (value === null || value === undefined) {
         return false;
       }
       if (
@@ -288,10 +317,6 @@ const removeFilter = (key: keyof typeof filters.value) => {
   onSubmit();
 };
 
-defineExpose({
-  removeFilter,
-});
-
 const clearFilters = () => {
   const cleanedFilters: LearningPlanFilter = {
     facilitator: null,
@@ -310,6 +335,24 @@ const clearFilters = () => {
   };
   emits('submit', cleanedFilters);
 };
+const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
+  if (type === 'technical') {
+    filters.value.technicalCompetences =
+      filters.value.technicalCompetences.filter((tag) => tag.text !== text);
+    return;
+  }
+  filters.value.generalCompetences = filters.value.generalCompetences.filter(
+    (tag) => tag.text !== text,
+  );
+};
+watch(model, () => {
+  if (model.value) {
+    queryClient.invalidateQueries({ queryKey: ['single-user-auto-complete'] });
+  }
+});
+defineExpose({
+  removeFilter,
+});
 </script>
 
 <style></style>
