@@ -73,10 +73,10 @@ import {
   Superscript,
   Subscript,
 } from 'lucide-vue-next';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Editor } from '@tiptap/vue-3';
-import colorSelector from './colorSelector.vue';
 import linkInput from './linkInput.vue';
+import colorSelector from './colorSelector.vue';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const props = defineProps({
   editor: {
