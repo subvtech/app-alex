@@ -53,6 +53,8 @@ const model = defineModel<TaskStatus | TaskMemberStatus>({
   required: true,
 });
 
+const emit = defineEmits(['change-status']);
+
 const { t } = useI18n();
 
 // Estilização e props
@@ -142,4 +144,8 @@ const filteredStudent = computed(() =>
     .filter((item) => item !== undefined)
     .filter((item) => item.text !== config[model.value]?.text),
 );
+
+watch(model, (val) => {
+  emit('change-status', val);
+});
 </script>

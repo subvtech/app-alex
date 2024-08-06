@@ -242,5 +242,7 @@
   "date": {
     "placeholder": "Choose a date"
   },
-  "students": "Students"
+  "students": "Students",
+  "savingIn": "Autosaved %{seconds} seconds ago",
+  "saving": "Saving..."
 }

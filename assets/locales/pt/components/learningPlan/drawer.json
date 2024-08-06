@@ -239,5 +239,7 @@
   "date": {
     "placeholder": "Selecione uma data"
   },
-  "students": "Alunos"
+  "students": "Alunos",
+  "savingIn": "Salvo automaticamente há %{seconds} segundos",
+  "saving": "Salvando..."
 }
