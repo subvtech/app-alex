@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from '@tanstack/vue-query';
-import { queryClient } from '~/plugins/query';
 export interface LearningPlanData {
   learningPlan: LearningPlanSimple;
   facilitator?: LearningPlanMemberSimple;
@@ -32,6 +31,8 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
   populate: {
     cover_image: true,
     tags: true,
+    product: true,
+    fields: true,
     learning_structures: {
       populate: ['trails'],
     },
@@ -88,7 +89,8 @@ export const useUpdateVisibility = () => {
       });
     },
     onMutate: ({ value, learninplanId, type }) => {
-      queryClient.setQueryData(
+      const { $queryClient } = useNuxtApp();
+      $queryClient.setQueryData(
         [`my-${type}s`],
         (projectValue: { meta: Object; data: LearningPlanData[] }) => {
           const updatedData = updateProjectVisibility(
@@ -101,8 +103,9 @@ export const useUpdateVisibility = () => {
       );
     },
     onError: (_, { value, learninplanId, type }) => {
+      const { $queryClient } = useNuxtApp();
       const { setMessage } = useMessageStore();
-      queryClient.setQueryData(
+      $queryClient.setQueryData(
         [`my-${type}s`],
         (projectValue: { meta: Object; data: LearningPlanData[] }) => {
           const updatedData = updateProjectVisibility(

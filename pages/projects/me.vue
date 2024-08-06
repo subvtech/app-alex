@@ -5,8 +5,8 @@
       :title="'Meus Projetos'"
       :items="breadcrumbs"
       :has-main-button="isProfessor"
-      :button-size="'large'"
       :main-button-text="'Novo Projeto'"
+      button-size="large"
       main-button-icon="mdi-plus"
       no-back-arrow
     />
@@ -15,8 +15,6 @@
 </template>
 
 <script setup lang="ts">
-// import { queryClient } from '~/plugins/query';
-
 const { t } = useI18n();
 const user = useStrapiUser<User>();
 

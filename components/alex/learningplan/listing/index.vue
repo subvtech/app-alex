@@ -1,11 +1,11 @@
 <template>
-  <div class="d-flex bg-white flex-grow-1 flex-column rounded-lg pa-6">
+  <div class="d-flex bg-white flex-grow-1 flex-column rounded-lg">
     <div
-      v-if="query.data?.value.data.length === 0"
-      class="tw-flex-1 d-flex align-center justify-center flex-column"
+      v-if="filteredByFacilitator.length === 0"
+      class="tw-flex-1 d-flex align-center justify-center flex-column pa-6"
     >
       <v-progress-circular
-        v-if="query.isFetching"
+        v-if="query.isFetching.value"
         color="accent"
         indeterminate
         :size="100"
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div v-else class="d-flex w-100 flex-column h-100 tw-flex-1">
-      <div class="d-flex justify-space-between flex-wrap w-100 mb-6">
+      <div class="d-flex justify-space-between flex-wrap w-100 pa-6 pb-0">
         <alex-inputs-text-field
           v-model="search"
           name="search"
@@ -74,15 +74,33 @@
                 icon="mdi-filter-variant"
                 size="large"
                 variant="secondary"
+                @click="filterDrawer = true"
               />
             </template>
           </v-tooltip>
         </div>
       </div>
+      <v-slide-y-transition>
+        <div
+          v-if="hasFilters"
+          class="tw-flex tw-flex-wrap gap-2 tw-pb-4 pa-6 pb-0"
+        >
+          <template v-for="(filter, key) in filters" :key="filter?.title">
+            <alex-custom-chip
+              v-if="checkValidFilters(key, filter)"
+              :text="filter?.title"
+              status="secondary"
+              clickable
+              closable
+              @click:close="handleRemoveFilter(key)"
+            />
+          </template>
+        </div>
+      </v-slide-y-transition>
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
-        :items="query.data?.value.data"
+        :items="filteredByFacilitator"
         :items-per-page="itemsPerPageValue"
         :filter-keys="[
           'learningPlan.title',
@@ -96,7 +114,7 @@
         <template #default="{ items }">
           <div
             v-if="learningPlanView === 'grid'"
-            class="learningPlan-container w-100"
+            class="learningPlan-container w-100 pa-6"
             :class="{ 'grid-none': isSingleColumn }"
           >
             <alex-learningplan-card
@@ -106,7 +124,7 @@
               class="tw-w-full"
               :type="type"
               :title="item.learningPlan.title"
-              :options="item.learningPlan.userIsFacilitator"
+              :options="item.facilitator?.user.id === user?.id"
               :description="item.learningPlan.description"
               :image="{
                 url: item.learningPlan.cover_image?.url || '',
@@ -117,8 +135,15 @@
               }"
               :members="getUrlNameMembers(item.learningPlan.members)"
               :hide="item.learningPlan.hidden"
+              :trails-count="
+                item.learningPlan.type === 'course'
+                  ? countTrails(item.learningPlan)
+                  : undefined
+              "
               :product="
-                item.learningPlan.type !== 'course' ? 'Software' : undefined
+                item.learningPlan.type !== 'course'
+                  ? item.learningPlan.product?.text
+                  : undefined
               "
               hide-favorited-button
               @toggle-visibility="
@@ -139,12 +164,12 @@
             :items-per-page="itemsPerPageValue"
             :items="setTableData(items)"
             :headers="headers"
-            class="tw-flex-1"
+            class="tw-flex-1 pa-6 pt-0"
           >
             <template #item="{ item }">
               <tr
                 v-show="!item.learningPlan.hidden || isProfessor"
-                class="table-row text-body-3 text-gray course-row"
+                class="table-row text-body-3 text-gray learning-row"
                 :class="{ hidden: item.learningPlan.hidden }"
                 @click="navigate(item.learningPlan.id, 'page')"
               >
@@ -171,7 +196,13 @@
                 <td class="text-overflow max-width-[150px]">
                   {{ item.facilitator.user.fullname }}
                 </td>
-                <td class="text-overflow max-width-[596px]">software</td>
+                <td class="text-overflow max-width-[596px]">
+                  {{
+                    item.learningPlan.type === 'course'
+                      ? countTrails(item.learningPlan)
+                      : 'software'
+                  }}
+                </td>
                 <td v-if="item.facilitator?.user.id === user.id">
                   <alex-custom-dropdown
                     :items="
@@ -206,12 +237,10 @@
         </template>
         <template #footer="{ pageCount, groupedItems }">
           <div
-            class="d-flex tw-h-min w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
+            v-if="groupedItems.length"
+            class="d-flex w-100 tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 tw-border-t-[1px] tw-border-gray-100"
           >
-            <p
-              v-if="groupedItems.length"
-              class="show-cardlist text-body-3 text-gray-600"
-            >
+            <p class="show-cardlist text-body-3 text-gray-600">
               {{ showingData(groupedItems) }}
             </p>
             <alex-custom-pagination
@@ -238,11 +267,18 @@
           </div></template
         >
       </v-data-iterator>
+      <alex-learningplan-filter
+        ref="filterRef"
+        v-model="filterDrawer"
+        :type="type"
+        @submit="mapFiltersValue"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { LearningPlanFilter } from '../Filter.vue';
 import {
   LearningPlanData,
   useGetMyLearningPlan,
@@ -260,7 +296,7 @@ interface Item {
 interface ListingProps {
   type: LearningPlanSimple['type'];
 }
-
+type FilterTitle<T> = { [P in keyof T]: { title: string; value?: T[P] } };
 const props = defineProps<ListingProps>();
 const { t } = useI18n();
 const user = useStrapiUser<User>();
@@ -268,9 +304,31 @@ const query = useGetMyLearningPlan(props.type, user.value?.id);
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
+
 const learningPlanView = ref('grid');
 const direction = useDirection();
-
+const filterDrawer = ref(false);
+const filters = ref<FilterTitle<LearningPlanFilter>>({
+  facilitator: {
+    title: 'Facilitador',
+    value: null,
+  },
+  generalCompetences: { title: 'Competências Gerais', value: [] },
+  technicalCompetences: { title: 'Competências Técnicas', value: [] },
+  institution: { title: 'Instituição', value: null },
+  lider: { title: 'Líder', value: null },
+  startDate: {
+    title: 'Data inicial',
+    value: undefined,
+  },
+  finalDate: {
+    title: 'Data Final',
+    value: undefined,
+  },
+});
+const filterRef = ref<null | {
+  removeFilter: (key: keyof typeof filters.value | (string & {})) => void;
+}>(null);
 const { mutateAsync: changeItemVisibility } = useUpdateVisibility();
 
 // Computed values
@@ -281,7 +339,23 @@ const isProfessor = computed(() => {
 const simplifiedType = computed(() =>
   props.type === 'course' ? 'course' : 'project',
 );
-
+const hasFilters = computed(() => {
+  let hasFilter = false;
+  Object.values(filters.value).forEach((filter) => {
+    if (filter.value && !Array.isArray(filter.value)) {
+      hasFilter = true;
+    }
+  });
+  return hasFilter;
+});
+const filteredByFacilitator = computed(
+  () =>
+    query.data?.value.data.filter((value) =>
+      filters.value.facilitator.value?.id
+        ? value.facilitator?.user.id === filters.value.facilitator.value?.id
+        : true,
+    ),
+);
 // Static Values
 const headers: DataTableHeader[] = [
   {
@@ -297,11 +371,15 @@ const headers: DataTableHeader[] = [
     key: 'facilitator?.user.fullname',
   },
   {
-    title: 'Produto',
-    key: 'learningPlan.product',
+    title: props.type === 'course' ? 'Trilhas' : 'Produto',
+    key:
+      props.type === 'course'
+        ? 'learningPlan.learning_structures'
+        : 'learningPlan.product',
   },
 ];
 const itemsPerPageValue = 12;
+
 // Functions
 const changeViewMode = () => {
   learningPlanView.value = learningPlanView.value === 'grid' ? 'table' : 'grid';
@@ -374,6 +452,55 @@ const getUrlNameMembers = (members: LearningPlanMemberSimple[]) =>
       image: { url: member.user.avatar?.url },
     }),
   }));
+const countTrails = (learningPlan: LearningPlanSimple) =>
+  learningPlan.learning_structures.flatMap((structure) => structure.trails)
+    .length;
+//    Filters
+const handleRemoveFilter = (key: string) => {
+  if (!filters.value || !filters.value[key]) {
+    return;
+  }
+  if (key === 'startDate' || key === 'finalDate') {
+    filters.value[key].value = undefined;
+  } else if (key === 'generalCompetences' || key === 'technicalCompetences') {
+    filters.value[key].value = [];
+  } else {
+    filters.value[key].value = null;
+  }
+  if (filterRef.value) {
+    filterRef.value.removeFilter(key);
+  }
+};
+const mapFiltersValue = (values: Partial<LearningPlanFilter>) => {
+  for (const key in values) {
+    filters.value[key].value = values[key];
+    if (
+      (key === 'startDate' || key === 'finalDate') &&
+      !values[key]?.start &&
+      !values[key]?.end
+    ) {
+      filters.value[key].value = undefined;
+    }
+  }
+};
+const checkValidFilters = (
+  key: keyof typeof filters.value,
+  filter: { title: string; value?: any },
+) => {
+  if (key === 'startDate' || key === 'finalDate') {
+    if (!filter.value?.start && !filter?.value?.end) {
+      return false;
+    }
+  }
+  if (key.includes('Competences') && !(filter.value as Array<string>)?.length) {
+    return false;
+  }
+  if (!filter?.value) {
+    return false;
+  }
+  return true;
+};
+// Actions
 onBeforeMount(() => {
   if (isProfessor.value) {
     headers.push({
@@ -409,13 +536,13 @@ defineExpose({ query });
 .hidden {
   opacity: 0.5;
 }
-@media screen and (max-width: 1280px) and (min-width: 960px) {
-  .project-container {
+@media screen and (min-width: 960px) and (max-width: 1280px) {
+  .learningPlan-container {
     flex-wrap: nowrap;
     flex-direction: column;
   }
 }
-.course-row:hover {
+.learning-row:hover {
   cursor: pointer;
   background-color: rgb(var(--v-theme-gray-100)) !important;
 }

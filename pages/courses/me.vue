@@ -5,9 +5,9 @@
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"
-      :button-size="'large'"
       :main-button-text="$t('pages.classes.newCourse')"
       main-button-icon="mdi-plus"
+      button-size="large"
       no-back-arrow
       @main-action="() => (createCourseDialog = true)"
     />
@@ -20,14 +20,14 @@
 </template>
 
 <script setup lang="ts">
-import { UseQueryDefinedReturnType } from '@tanstack/vue-query';
+import { useQueryClient, UseQueryDefinedReturnType } from '@tanstack/vue-query';
 import { LearningPlanData } from '~/components/alex/learningplan/listing/mutations';
-import { queryClient } from '~/plugins/query';
 definePageMeta({
   middleware: 'auth',
 });
 const { t } = useI18n();
 const createCourseDialog = ref(false);
+const queryClient = useQueryClient();
 const user = useStrapiUser<User>();
 const listing = ref<null | {
   query: UseQueryDefinedReturnType<
@@ -51,7 +51,7 @@ const breadcrumbs = [
   {
     title: t('pages.classes.breadcrumbs.myCourses'),
     to: '/courses/me',
-    disabled: false,
+    disabled: true,
   },
 ];
 
