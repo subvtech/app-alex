@@ -29,6 +29,7 @@
         v-model="editorContent"
         :doc-name="docName"
         :edit="!props.readOnly"
+        :collaboration="!!docName"
         :allowed-blocks="props.restrictions ? props.restrictions : ['']"
       />
     </div>
@@ -109,8 +110,8 @@ const currentData = ref<EditorSubmission>();
 const taskMemberId = toRef(props, 'taskMemberId');
 const hasEditorChanges = ref(false);
 const lastSaveDate = ref<Date | null>(null);
-const currentDate = ref<Date>(new Date());
-const docName = ref<string>('');
+// const currentDate = ref<Date>(new Date());
+const docName = ref<string | undefined>('');
 
 const saveCountDown = ref<number>(saveTime);
 
@@ -216,14 +217,6 @@ const checkDataChanges = async () => {
   }
 
   return false;
-
-  // await checkEditorReady();
-  // const editorData = await editor.value?.getData();
-  // const data1 = editorData?.data?.blocks;
-  // if (!data1 || !data1.length) return false;
-  // const data2 = toRaw(currentData.value?.blocks);
-  // const test = lodash.isEqual(data1, data2);
-  // return !test;
 };
 
 const openDialog = async () => {
@@ -233,7 +226,8 @@ const openDialog = async () => {
   // resume();
   // resumeCurrentDate();
   await executeSubmissions();
-  await setDocName();
+  // await setDocName();
+  await setEditorData();
   hasEditorChanges.value = await checkDataChanges();
 
   saveCountDown.value = saveTime;
@@ -272,7 +266,6 @@ const saveContent = async () => {
     });
     emit('update-task-status', 'in_progress');
   }
-  // hasEditorChanges.value = await checkDataChanges();
 };
 
 const { execute: executeSubmissions } = useTaskSubmission(taskMemberId);
@@ -298,70 +291,16 @@ const saveSubmission = async () => {
   }
 };
 
-// const sendSubmission = async () => {
-//   isLoading.value = true;
-//   try {
-//     if (!props.lastSubmission?.id) {
-//       return;
-//     }
-//     const time = new Date();
-//     await update('task-submissions', props.lastSubmission.id, {
-//       submitted_at: time,
-//     });
-//     await update('task-members', props.taskMemberId, {
-//       last_submission_at: time,
-//       status: 'in_review',
-//     });
-//     emit('update-task-status', 'in_review');
-//     executeSubmissions();
-//     setMessage(
-//       t('components.courses.tasks.submission_modal.deliver_success'),
-//       'success',
-//       true,
-//     );
-//     dialog.value = false;
-//   } catch (error) {
-//     setMessage(
-//       t('components.courses.tasks.submission_modal.deliver_error'),
-//       'error',
-//       true,
-//     );
-//   } finally {
-//     isLoading.value = false;
-//   }
-// };
+// Caso a tarefa esteja em avaliação ou enviada, pega o valor do banco
+const setEditorData = async () => {
+  editorContent.value = props.lastSubmission?.submission;
 
-// const allowedBlocks = computed(() => {
-//   const restrictionMap = {
-//     text: [
-//       'Paragraph',
-//       'header',
-//       'delimiter',
-//       'list',
-//       'inlineCode',
-//       'marker',
-//       'quote',
-//       'table',
-//       'alert',
-//       'warning',
-//       'code',
-//       'alignmentBlockTune',
-//     ],
-//     link: ['link'],
-//     image: ['image'],
-//     gallery: ['carousel', 'Paragraph'],
-//     video: ['embed', 'Paragraph'],
-//     document: ['fileSet', 'Paragraph'],
-//   };
-
-//   const blocksSet = new Set();
-//   props.restrictions?.forEach((restriction) => {
-//     const blocksToAdd = restrictionMap[restriction];
-//     blocksToAdd?.forEach((block: string) => blocksSet.add(block));
-//   });
-
-//   return Array.from(blocksSet) as string[];
-// });
+  if (props.taskStatus === 'in_review' || props.taskStatus === 'done') {
+    docName.value = undefined;
+  } else {
+    await setDocName();
+  }
+};
 
 watch(dialog, (value) => {
   if (!value) {
