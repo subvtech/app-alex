@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/vue-query';
 export interface LearningPlanData {
   learningPlan: LearningPlanSimple;
   facilitator?: LearningPlanMemberSimple;
+  leader?: LearningPlanMemberSimple;
 }
 type LearningPlanType = LearningPlanSimple['type'];
 
@@ -38,9 +39,6 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
     },
     members: {
       populate: ['user.institutions', 'user.avatar'],
-      filters: {
-        role: { $eq: 'facilitator' },
-      },
     },
     institutions: true,
   },
@@ -52,6 +50,9 @@ const getLearningPlanFn = (type: LearningPlanType, userID: number) => {
 };
 export const getFacilitator = (members: LearningPlanMemberSimple[]) => {
   return members.find((m) => m.role === MemberRoles.FACILITATOR);
+};
+export const getLeader = (members: LearningPlanMemberSimple[]) => {
+  return members.find((m) => m.role === MemberRoles.LEADER);
 };
 // Querys
 export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
@@ -66,6 +67,7 @@ export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
         (learningPlan) => ({
           learningPlan,
           facilitator: getFacilitator(learningPlan.members),
+          leader: getLeader(learningPlan.members),
         }),
       );
       return { meta: {}, data: mappedLearningPlans };

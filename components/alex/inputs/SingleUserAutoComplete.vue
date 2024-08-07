@@ -47,7 +47,7 @@ const { value: selectedUser } = useField<UserSimple | null>(
   },
 );
 const { data: items, refetch } = useQuery({
-  queryKey: ['single-user-auto-complete'],
+  queryKey: [`single-user-auto-complete-${props.name}`],
   queryFn: async () => {
     const response = await find<UserSimple>('users', {
       filters: {

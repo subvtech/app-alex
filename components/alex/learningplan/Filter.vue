@@ -45,15 +45,14 @@
           hide-details
           :label="'Instituição'"
         />
-        <alex-inputs-autocomplete
+        <alex-inputs-single-user-auto-complete
           v-if="type === 'project'"
-          v-model="filters.lider"
-          name="lider"
-          :items="['lider 1']"
-          :placeholder="'Encontre um líder'"
+          v-model="filters.leader"
+          name="leader"
           clearable
           density="comfortable"
           hide-details
+          :placeholder="'Encontre um líder'"
           :label="'Líder'"
         />
         <div v-if="type === 'course'" class="tw-flex tw-flex-col tw-gap-4">
@@ -197,7 +196,7 @@ export type LearningPlanFilter = {
   institution: Institution | null;
   generalCompetences: Array<Omit<TagSimple, 'learningplans'>>;
   technicalCompetences: Array<Omit<TagSimple, 'learningplans'>>;
-  lider: UserSimple | null;
+  leader: UserSimple | null;
   startDate: {
     start?: string;
     end?: string;
@@ -217,7 +216,7 @@ const filters = ref<LearningPlanFilter>({
   generalCompetences: [],
   technicalCompetences: [],
   institution: null,
-  lider: null,
+  leader: null,
   startDate: {
     start: undefined,
     end: undefined,
@@ -326,7 +325,7 @@ const clearFilters = () => {
     generalCompetences: [],
     technicalCompetences: [],
     institution: null,
-    lider: null,
+    leader: null,
     startDate: {
       start: undefined,
       end: undefined,
@@ -351,7 +350,12 @@ const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
 };
 watch(model, (value) => {
   if (value) {
-    queryClient.invalidateQueries({ queryKey: ['single-user-auto-complete'] });
+    queryClient.invalidateQueries({
+      queryKey: [
+        'single-user-auto-complete-facilitator',
+        'single-user-auto-complete-leader',
+      ],
+    });
   }
 });
 defineExpose({

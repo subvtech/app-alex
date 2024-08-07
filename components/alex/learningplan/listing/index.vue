@@ -100,7 +100,7 @@
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
-        :items="filteredByInstitutions"
+        :items="filteredByLeader"
         :items-per-page="itemsPerPageValue"
         :filter-keys="[
           'learningPlan.title',
@@ -132,6 +132,10 @@
               :facilitator="{
                 name: item.facilitator?.user.fullname || '',
                 imageURL: item.facilitator?.user.avatar?.url,
+              }"
+              :leader="{
+                name: item.leader?.user.fullname || '',
+                imageURL: item.leader?.user.avatar?.url,
               }"
               :members="getUrlNameMembers(item.learningPlan.members)"
               :hide="item.learningPlan.hidden"
@@ -316,7 +320,7 @@ const filters = ref<FilterTitle<LearningPlanFilter>>({
   generalCompetences: { title: 'Competências Gerais', value: [] },
   technicalCompetences: { title: 'Competências Técnicas', value: [] },
   institution: { title: 'Instituição', value: null },
-  lider: { title: 'Líder', value: null },
+  leader: { title: 'Líder', value: null },
   startDate: {
     title: 'Data inicial',
     value: undefined,
@@ -404,6 +408,17 @@ const filteredByInstitutions = computed(() =>
     );
   }),
 );
+const filteredByLeader = computed(() =>
+  filteredByInstitutions.value.filter((data) => {
+    if (props.type === 'course') {
+      return true;
+    }
+    if (!filters.value.leader.value) {
+      return true;
+    }
+    return data.leader?.user.id === filters.value.leader.value.id;
+  }),
+);
 // Static Values
 const headers: DataTableHeader[] = [
   {
@@ -426,7 +441,7 @@ const headers: DataTableHeader[] = [
         : 'learningPlan.product',
   },
 ];
-const itemsPerPageValue = 5;
+const itemsPerPageValue = 6;
 
 // Functions
 const changeViewMode = () => {

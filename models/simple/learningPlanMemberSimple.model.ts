@@ -4,6 +4,8 @@ export enum MemberRoles {
   STUDENT = 'student',
   PARTNER = 'partner',
   FACILITATOR = 'facilitator',
+  COLLABORATOR = 'collaborator',
+  LEADER = 'student_leader',
 }
 
 export enum MemberStatus {

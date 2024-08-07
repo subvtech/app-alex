@@ -161,21 +161,27 @@
         }"
       >
         <alex-learningplan-card-info
-          class="!tw-w-full !tw-max-w-[52%]"
+          class="flex-1-1"
           :avatar="{
-            url: facilitator.imageURL,
-            name: facilitator.name,
+            url:
+              type === 'project' && leader
+                ? leader?.imageURL
+                : facilitator.imageURL,
+            name:
+              type === 'project' && leader ? leader?.name : facilitator.name,
           }"
           :title="
             type === 'project'
               ? 'Líder'
               : $t('components.learningPlan.card.facilitator')
           "
-          :subtitle="facilitator.name"
+          :subtitle="
+            type === 'project' && leader ? leader?.name : facilitator.name
+          "
         />
         <alex-learningplan-card-info
           v-if="type === 'course'"
-          class="!tw-w-full !tw-max-w-[40%]"
+          class="flex-1-1"
           icon="alex:trail"
           :title="$t('components.learningPlan.card.trails')"
           :subtitle="trailsCount"
@@ -238,10 +244,11 @@ interface LearningPlanCardProps {
   hideFavoritedButton?: boolean;
   members?: member[];
   facilitator: { name: string; imageURL?: string };
+  leader?: { name: string; imageURL?: string };
   favorited?: boolean;
   options?: boolean;
   product?: string;
-  institution?: InstitutionsType;
+  institution?: Institution;
 }
 
 const props = withDefaults(defineProps<LearningPlanCardProps>(), {
@@ -253,6 +260,7 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   members: () => [],
   product: undefined,
   institution: undefined,
+  leader: undefined,
   options: true,
   trailsCount: 0,
 });
