@@ -12,7 +12,7 @@
     <form class="d-flex flex-column ga-4 tw-h-full tw-w-full bg-white">
       <div class="d-flex align-center ga-4 px-4">
         <p class="text-h4 flex-fill">
-          {{ 'Filtrar' }}
+          {{ $t('pages.classes.filter.title') }}
         </p>
         <alex-custom-button
           icon="mdi-close"
@@ -33,17 +33,17 @@
           density="comfortable"
           hide-details
           facilitator
-          :placeholder="'Encontre um facilitador'"
-          :label="'Facilitador'"
+          :placeholder="$t('pages.classes.filter.findFacilitator')"
+          :label="$t('pages.classes.filter.facilitator')"
         />
         <alex-inputs-institutions-auto-complete
           v-model="filters.institution"
           name="institution"
-          :placeholder="'Encontre a instituição'"
+          :placeholder="$t('pages.classes.filter.findInstitution')"
           clearable
           density="comfortable"
           hide-details
-          :label="'Instituição'"
+          :label="$t('pages.classes.filter.institution')"
         />
         <alex-inputs-single-user-auto-complete
           v-if="type === 'project'"
@@ -52,18 +52,18 @@
           clearable
           density="comfortable"
           hide-details
-          :placeholder="'Encontre um líder'"
-          :label="'Líder'"
+          :placeholder="$t('pages.classes.filter.findLeader')"
+          :label="$t('pages.classes.filter.leader')"
         />
         <div v-if="type === 'course'" class="tw-flex tw-flex-col tw-gap-4">
           <alex-inputs-tag-autocomplete
             v-model="filters.technicalCompetences"
             name="technicalCompetence"
-            :placeholder="'Encontre a competencia'"
+            :placeholder="$t('pages.classes.filter.findTechCompetences')"
             clearable
             density="comfortable"
             hide-details
-            :label="'Competências técnicas'"
+            :label="$t('pages.classes.filter.techCompetences')"
           />
           <div
             v-if="filters.technicalCompetences.length"
@@ -82,12 +82,12 @@
           <alex-inputs-tag-autocomplete
             v-model="filters.generalCompetences"
             name="generalCompetence"
-            :placeholder="'Encontre a competencia'"
+            :placeholder="$t('pages.classes.filter.findGeneralCompetences')"
             clearable
             density="comfortable"
             hide-details
             is-general
-            :label="'Competências gerais'"
+            :label="$t('pages.classes.filter.generalCompetences')"
           />
           <div
             v-if="filters.generalCompetences.length"
@@ -337,6 +337,7 @@ const clearFilters = () => {
   };
   emits('submit', cleanedFilters);
   resetForm();
+  filters.value = cleanedFilters;
 };
 const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
   if (type === 'technical') {

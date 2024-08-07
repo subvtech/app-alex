@@ -3,6 +3,9 @@ export interface LearningPlanData {
   learningPlan: LearningPlanSimple;
   facilitator?: LearningPlanMemberSimple;
   leader?: LearningPlanMemberSimple;
+  trails: {
+    count: number;
+  };
 }
 type LearningPlanType = LearningPlanSimple['type'];
 
@@ -15,7 +18,7 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
       {
         members: {
           user: { id: { $eq: userID } },
-          role: { $ne: 'student' },
+          role: { $eq: MemberRoles.FACILITATOR },
         },
       },
       {
@@ -56,6 +59,9 @@ export const getFacilitator = (members: LearningPlanMemberSimple[]) => {
 export const getLeader = (members: LearningPlanMemberSimple[]) => {
   return members.find((m) => m.role === MemberRoles.LEADER);
 };
+const countTrails = (learningPlan: LearningPlanSimple) =>
+  learningPlan.learning_structures.flatMap((structure) => structure.trails)
+    .length;
 // Querys
 export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
   useQuery({
@@ -70,6 +76,9 @@ export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
           learningPlan,
           facilitator: getFacilitator(learningPlan.members),
           leader: getLeader(learningPlan.members),
+          trails: {
+            count: countTrails(learningPlan),
+          },
         }),
       );
       return { meta: {}, data: mappedLearningPlans };

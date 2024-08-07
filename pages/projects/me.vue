@@ -1,7 +1,7 @@
 <template>
   <div class="flex-grow-1 d-flex flex-column">
     <alex-custom-header
-      class="mb-6 mt-6"
+      class="mb-6"
       :title="'Meus Projetos'"
       :items="breadcrumbs"
       :has-main-button="isProfessor"

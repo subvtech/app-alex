@@ -21,9 +21,12 @@
   "deleteClassSubtitle": "Ao desfazer essa turma todos os conteúdos e alunos vinculados à perderão esse vínculo.",
   "tableHeaders": {
     "course": "Curso",
+    "project": "Projeto",
     "description": "Descrição",
     "facilitator": "Facilitador",
-    "trails": "Trilhas"
+    "trails": "Trilhas",
+    "leader": "Líder",
+    "product": "Produto"
   },
   "breadcrumbs": {
     "classes": "Turmas",
@@ -40,9 +43,9 @@
   "removeGroup": "Excluir grupo",
   "editGroup": "Editar grupo",
   "sendMessage": "Enviar mensagem",
-  "responsibleIsRequired":"Responsável é obrigatório",
-  "participantsIsRequired":"É necessário ter integrantes",
-  "groupNameIsRequired":"Nome do grupo é obrigatório",
+  "responsibleIsRequired": "Responsável é obrigatório",
+  "participantsIsRequired": "É necessário ter integrantes",
+  "groupNameIsRequired": "Nome do grupo é obrigatório",
   "group": "Grupo",
   "groups": "Grupos",
   "emptyStateMemberClass": "Parece que ainda não há participantes nessa turma!",
@@ -63,10 +66,25 @@
   "deleteGroupSubtitle": "Ao desfazer esse grupo todos os conteúdos e alunos vinculados à perderão esse vínculo.",
   "deleteMemberSubtitle": "Ao remover o participante ele ficará impossibilitado de acessar os conteúdos desse curso.",
   "delete": "Excluir",
-  "wantDeleteMember":"Realmente deseja remover esse participante da turma?",
+  "wantDeleteMember": "Realmente deseja remover esse participante da turma?",
   "members": "Participantes",
   "findMember": "Encontrar participante",
   "courseInvites": "Convites do Curso",
   "invites": "Convites",
-  "cantRemoveResponsible":"Você não pode retirar o responsável dos integrantes"
+  "cantRemoveResponsible": "Você não pode retirar o responsável dos integrantes",
+  "filter": {
+    "title": "Filtrar",
+    "facilitator": "Facilitador",
+    "findFacilitator": "Buscar Facilitadores",
+    "institution": "Instituição",
+    "findInstitution": "Buscar Instituições",
+    "leader": "Líder",
+    "findLeader": "Buscar Líderes",
+    "techCompetences": "Competências Técnicas",
+    "findTechCompetences": "Buscar Competências",
+    "generalCompetences": "Competências Gerais",
+    "findGeneralCompetences": "Buscar Competências",
+    "startDate": "Data inicial",
+    "finalDate": "Data final"
+  }
 }

@@ -146,7 +146,7 @@
               :hide="item.learningPlan.hidden"
               :trails-count="
                 item.learningPlan.type === 'course'
-                  ? countTrails(item.learningPlan)
+                  ? item.trails.count
                   : undefined
               "
               :product="
@@ -177,7 +177,6 @@
           >
             <template #item="{ item }">
               <tr
-                v-show="!item.learningPlan.hidden || isProfessor"
                 class="table-row text-body-3 text-gray learning-row"
                 :class="{ hidden: item.learningPlan.hidden }"
                 @click="navigate(item.learningPlan.id, 'page')"
@@ -203,13 +202,17 @@
                   {{ item.learningPlan.description }}
                 </td>
                 <td class="text-overflow max-width-[150px]">
-                  {{ item.facilitator.user.fullname }}
+                  {{
+                    item.learningPlan.type === 'course'
+                      ? item.facilitator?.user.fullname
+                      : item.leader?.user.fullname
+                  }}
                 </td>
                 <td class="text-overflow max-width-[596px]">
                   {{
                     item.learningPlan.type === 'course'
-                      ? countTrails(item.learningPlan)
-                      : 'software'
+                      ? item.trails.count
+                      : item.learningPlan.product?.text
                   }}
                 </td>
                 <td v-if="item.facilitator?.user.id === user.id">
@@ -271,7 +274,11 @@
               alt="Empty Projects"
             />
             <p class="text-h3 text-gray-600 text-center">
-              {{ 'Nenhum projeto encontrado!' }}
+              {{
+                $t('pages.classes.noData', {
+                  object: $t(`pages.classes.tableHeaders.${simplifiedType}`),
+                })
+              }}
             </p>
           </div></template
         >
@@ -294,10 +301,11 @@ import {
   useUpdateVisibility,
 } from './mutations';
 
-interface DataTableHeader {
+interface DataTableHeader<T> {
   title: string;
   key: string;
   sortable?: boolean;
+  sortRaw?: (a: T, b: T) => number;
 }
 interface Item {
   raw: LearningPlanData;
@@ -319,19 +327,25 @@ const direction = useDirection();
 const filterDrawer = ref(false);
 const filters = ref<FilterTitle<LearningPlanFilter>>({
   facilitator: {
-    title: 'Facilitador',
+    title: t('pages.classes.filter.facilitator'),
     value: null,
   },
-  generalCompetences: { title: 'Competências Gerais', value: [] },
-  technicalCompetences: { title: 'Competências Técnicas', value: [] },
-  institution: { title: 'Instituição', value: null },
-  leader: { title: 'Líder', value: null },
+  generalCompetences: {
+    title: t('pages.classes.filter.generalCompetences'),
+    value: [],
+  },
+  technicalCompetences: {
+    title: t('pages.classes.filter.techCompetences'),
+    value: [],
+  },
+  institution: { title: t('pages.classes.filter.institution'), value: null },
+  leader: { title: t('pages.classes.filter.leader'), value: null },
   startDate: {
-    title: 'Data inicial',
+    title: t('pages.classes.filter.startDate'),
     value: undefined,
   },
   finalDate: {
-    title: 'Data Final',
+    title: t('pages.classes.filter.finalDate'),
     value: undefined,
   },
 });
@@ -381,8 +395,8 @@ const filteredByDate = computed(() =>
     );
     const isInFinalDateRange = checkIntervalOfDates(
       new Date(data.learningPlan.end_date),
-      filters.value.finalDate.value?.end,
       filters.value.finalDate.value?.start,
+      filters.value.finalDate.value?.end,
     );
     return isInStartDateRange && isInFinalDateRange;
   }),
@@ -424,8 +438,8 @@ const filteredByLeader = computed(() =>
     return data.leader?.user.id === filters.value.leader.value.id;
   }),
 );
-// Static Values
-const headers: DataTableHeader[] = [
+
+const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
   {
     title: t(`pages.courses.${simplifiedType.value}`),
     key: 'learningPlan.title',
@@ -435,18 +449,51 @@ const headers: DataTableHeader[] = [
     key: 'learningPlan.description',
   },
   {
-    title: t('pages.classes.tableHeaders.facilitator'),
-    key: 'facilitator?.user.fullname',
-  },
-  {
-    title: props.type === 'course' ? 'Trilhas' : 'Produto',
+    title:
+      props.type === 'course'
+        ? t('pages.classes.tableHeaders.facilitator')
+        : t('pages.classes.tableHeaders.leader'),
     key:
       props.type === 'course'
-        ? 'learningPlan.learning_structures'
-        : 'learningPlan.product',
+        ? 'facilitator?.user.fullname'
+        : 'leader?.user.fullname',
+    sortRaw(a, b) {
+      const hasBothFacilitators = b.facilitator && a.facilitator;
+      const hasBothLeaders = b.facilitator && a.facilitator;
+      if (props.type === 'course' && hasBothFacilitators) {
+        return a.facilitator!.user.fullname.localeCompare(
+          b.facilitator!.user.fullname,
+        );
+      }
+      if (props.type === 'project' && hasBothLeaders) {
+        return a.leader!.user.fullname.localeCompare(b.leader!.user.fullname);
+      }
+      return 1;
+    },
   },
-];
-const itemsPerPageValue = 6;
+  {
+    title:
+      props.type === 'course'
+        ? t('pages.classes.tableHeaders.trails')
+        : t('pages.classes.tableHeaders.product'),
+    key: props.type === 'course' ? 'trails.count' : 'learningPlan.product.text',
+    sortRaw(a, b) {
+      const hasBothProducts = b.learningPlan.product && a.learningPlan.product;
+      if (props.type === 'course') {
+        return b.trails.count - a.trails.count;
+      }
+      if (hasBothProducts) {
+        return a.learningPlan.product!.text.localeCompare(
+          b.learningPlan.product!.text,
+        );
+      }
+      return 1;
+    },
+  },
+]);
+
+// Static Values
+const itemsPerPageValue = 12;
 
 // Functions
 const changeViewMode = () => {
@@ -506,7 +553,10 @@ const showingData = (groupedItems: Array<any>, items: Array<any>) => {
     from,
     to,
     total,
-    entity: t('pages.courses.projects'),
+    entity:
+      props.type === 'course'
+        ? t('pages.courses.courses')
+        : t('pages.courses.projects'),
   });
   if (to === 0) {
     return t('pages.classes.noData');
@@ -520,9 +570,6 @@ const getUrlNameMembers = (members: LearningPlanMemberSimple[]) =>
       image: { url: member.user.avatar?.url },
     }),
   }));
-const countTrails = (learningPlan: LearningPlanSimple) =>
-  learningPlan.learning_structures.flatMap((structure) => structure.trails)
-    .length;
 //    Filters
 const handleRemoveFilter = (key: string) => {
   if (!filters.value || !filters.value[key]) {
@@ -572,7 +619,7 @@ const checkValidFilters = (
 // Actions
 onBeforeMount(() => {
   if (isProfessor.value) {
-    headers.push({
+    headers.value.push({
       title: '',
       key: '',
       sortable: false,
