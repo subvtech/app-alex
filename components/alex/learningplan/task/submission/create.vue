@@ -3,9 +3,9 @@
     v-model="dialog"
     :persistent="true"
     :max-width="1080"
-    :no-footer="props.readOnly"
     :retain-focus="false"
     no-click-animation
+    no-footer
   >
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
@@ -28,38 +28,6 @@
         :allowed-blocks="props.restrictions ? props.restrictions : ['']"
       />
     </div>
-    <template v-if="!props.readOnly" #footer>
-      <v-container
-        class="bg-white rounded-b-lg border-top-gray-100 d-flex justify-end ga-3 pa-6 align-center"
-      >
-        <p v-if="saveCountDown" class="text-body-4 text-gray-400">
-          {{
-            $t('components.learningPlan.drawer.savingIn', {
-              seconds: saveTime - saveCountDown,
-            })
-          }}
-        </p>
-        <p v-else class="text-body-4 text-gray-400">
-          {{ $t('components.learningPlan.drawer.saving') }}
-        </p>
-
-        <!-- <p v-if="lastSaveDate" class="text-body-4 text-gray-400">
-          {{
-            $t('components.courses.tasks.submission_modal.saved_at', {
-              time: differenceInMinutes(currentDate, lastSaveDate),
-            })
-          }}
-        </p> -->
-        <alex-custom-button
-          size="large"
-          variant="secondary"
-          :text="t('components.courses.tasks.submission_modal.save_btn')"
-          :loading="isLoading"
-          :disabled="!hasEditorChanges"
-          @click="saveSubmission"
-        />
-      </v-container>
-    </template>
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
@@ -254,6 +222,7 @@ watch(dialog, (value) => {
   if (!value) {
     lastSaveDate.value = null;
     clearInterval(saveInterval);
+    saveSubmission();
   }
 });
 defineExpose({

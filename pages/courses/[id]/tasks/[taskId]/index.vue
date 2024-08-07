@@ -249,7 +249,21 @@ const handleUpdateStatus = async (
         throw new Error('missingSubmission');
       }
       if (newStatus === 'in_review' && lastSubmission) {
+        const lastSubRes = await strapi.findOne('task-submissions', {
+          fields: ['submission'],
+          filters: {
+            id: lastSubmission.id,
+          },
+        });
+
+        // Valor atualizado da ultima submissão, caso tenha sido alterado
+        const lastSubVal =
+          lastSubRes.data && lastSubRes.data[0].attributes.submission;
+
         await strapi.update('task-submissions', lastSubmission.id, {
+          submission: lastSubVal
+            ? lastSubVal.submission
+            : lastSubmission.submission,
           submitted_at: time.toISOString(),
         });
       }
