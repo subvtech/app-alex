@@ -175,18 +175,20 @@ const checkDataChanges = async () => {
 };
 
 const openDialog = async () => {
+  if (!isReadOnly.value) {
+    hasEditorChanges.value = await checkDataChanges();
+    saveInterval = setInterval(async () => await saveSubmissionLoop(), 1000);
+  } else {
+    loadEditorData();
+  }
+
   dialog.value = true;
   isLoading.value = true;
   currentData.value = props.lastSubmission?.submission || undefined;
 
   await executeSubmissions();
-  // await setEditorData();
 
   saveCountDown.value = saveTime;
-  if (!isReadOnly.value) {
-    hasEditorChanges.value = await checkDataChanges();
-    saveInterval = setInterval(async () => await saveSubmissionLoop(), 1000);
-  }
 
   isLoading.value = false;
 };
@@ -236,7 +238,7 @@ const saveSubmission = async () => {
 };
 
 // Caso a tarefa esteja em avaliação ou enviada, pega o valor do banco
-const setEditorData = () => {
+const loadEditorData = () => {
   editorContent.value = props.lastSubmission?.submission;
 };
 

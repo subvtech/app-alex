@@ -36,7 +36,7 @@
     :last-submission="content"
     :task-status="taskStatus"
     :read-only="readOnly"
-    :doc-name="docName"
+    :doc-name="shouldBeCollaborative"
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
   />
@@ -93,6 +93,16 @@ const formattedMark = computed(() => {
     return `${props.mark}/${props.maxMark}`;
   }
   return `${props.mark}`;
+});
+
+const shouldBeCollaborative = computed(() => {
+  if (
+    ['to_do', 'in_progress'].includes(props.taskStatus) &&
+    props.type === 'student'
+  ) {
+    return props.docName;
+  }
+  return '';
 });
 
 const defaultChip = computed(
