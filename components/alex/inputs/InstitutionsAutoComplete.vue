@@ -25,13 +25,13 @@ import { useQuery } from '@tanstack/vue-query';
 import { useField } from 'vee-validate';
 interface InstitutionAutocompleteProps {
   name: string;
-  modelValue: InstitutionsType | null;
+  modelValue: Institution | null;
 }
 
 const props = withDefaults(defineProps<InstitutionAutocompleteProps>(), {});
 const { find } = useStrapiUtils();
 const search = ref('');
-const { value: selectedInstitution } = useField<InstitutionsType | null>(
+const { value: selectedInstitution } = useField<Institution | null>(
   () => props.name,
   undefined,
   {
@@ -42,7 +42,7 @@ const { value: selectedInstitution } = useField<InstitutionsType | null>(
 const { data: items, refetch } = useQuery({
   queryKey: ['users-single-autocomplete'],
   queryFn: async () => {
-    const response = await find<InstitutionsType>('institutions');
+    const response = await find<Institution>('institutions');
     return response.data;
   },
   initialData: [],
