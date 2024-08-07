@@ -25,7 +25,7 @@
         :doc-name="docName"
         :edit="!isReadOnly"
         :collaboration="!!docName"
-        :allowed-blocks="props.restrictions ? props.restrictions : ['']"
+        :allowed-blocks="props.restrictions ? props.restrictions : []"
       />
     </div>
     <template v-if="!isReadOnly" #footer>
