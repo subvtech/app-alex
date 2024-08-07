@@ -175,18 +175,18 @@ const checkDataChanges = async () => {
 };
 
 const openDialog = async () => {
+  dialog.value = true;
+  isLoading.value = true;
+  currentData.value = props.lastSubmission?.submission || undefined;
+
+  await executeSubmissions();
+
   if (!isReadOnly.value) {
     hasEditorChanges.value = await checkDataChanges();
     saveInterval = setInterval(async () => await saveSubmissionLoop(), 1000);
   } else {
     loadEditorData();
   }
-
-  dialog.value = true;
-  isLoading.value = true;
-  currentData.value = props.lastSubmission?.submission || undefined;
-
-  await executeSubmissions();
 
   saveCountDown.value = saveTime;
 
