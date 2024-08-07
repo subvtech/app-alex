@@ -20,10 +20,10 @@
     <div class="d-flex flex-column gap-6 w-100">
       <alex-profile-settings-security :id="id" :email="user.email" />
       <alex-profile-settings-wallet
-        :wallet="user.user_wallet"
+        :wallet="user.wallet"
         :is-loading="loading"
         full-width
-        @update:wallet="linkWallet(id)"
+        @update:wallet="linkWallet(id, false)"
         @remove:wallet="(walletId) => unlinkWallet(walletId)"
       />
     </div>

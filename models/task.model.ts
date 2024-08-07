@@ -26,6 +26,7 @@ export interface Task {
   learningplan: Strapi4ResponseSingle<LearningPlan>;
   start_at: Date;
   deadline_at: Date;
+  contract_address: string;
   tags: string;
   trail: Strapi4ResponseSingle<Trail>;
   assign_to: ValueOf<typeof TaskAssign>;

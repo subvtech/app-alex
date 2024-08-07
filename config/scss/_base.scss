@@ -184,3 +184,48 @@ $colors-scrollBar: ('white', 'gray-blue', 'gray-100');
     width: 100%;
   }
 }
+
+$side-border: ('left', 'right', 'top', 'bottom');
+
+@for $size from 1 through 64 {
+  .border-#{$size} {
+    border: ($size * 1px) solid rgb(var(--v-border-color));
+  }
+  @each $side in $side-border {
+    .border-#{$side}-#{$size} {
+      border-#{$side}: ($size * 1px) solid rgb(var(--v-border-color));
+    }
+  }
+}
+
+// override the tailwind preflight
+
+h1 {
+  font-size: 2em;
+  font-weight: bolder;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: bolder;
+}
+
+h3 {
+  font-size: 1.17em;
+  font-weight: bolder;
+}
+
+h4 {
+  font-size: 1em;
+  font-weight: bolder;
+}
+
+h5 {
+  font-size: 0.83em;
+  font-weight: bolder;
+}
+
+h6 {
+  font-size: 67em;
+  font-weight: bolder;
+}

@@ -7,7 +7,7 @@ type PopulateFields =
   | 'socials'
   | 'tags'
   | 'institutions.cover'
-  | 'user_wallet';
+  | 'wallet';
 
 export type UniquePopulateFieldsArray = Array<PopulateFields>;
 
@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
     'institutions.cover',
     'socials',
     'tags',
-    'user_wallet',
+    'wallet',
   ];
 
   async function updateUser(
@@ -188,7 +188,7 @@ export const useUserStore = defineStore('user', () => {
 
   const setWallet = (data?: Wallet) => {
     if (loadedUser.value)
-      loadedUser.value = { ...loadedUser.value, user_wallet: data };
+      loadedUser.value = { ...loadedUser.value, wallet: data };
   };
 
   return {

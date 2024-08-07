@@ -1,0 +1,229 @@
+{
+  "task": {
+    "type": {
+      "label": "Type",
+      "individual": "Individual",
+      "collective": "Group",
+      "select": "Select a type"
+    },
+    "status": {
+      "label": "Status",
+      "draft": "Draft",
+      "published": "Published",
+      "finished": "Finished",
+      "toDo": "To do",
+      "inProgress": "In progress",
+      "underReview": "Under review",
+      "done": "Done"
+    },
+    "date": {
+      "startLabel": "Start date",
+      "finalLabel": "Final date"
+    },
+    "postClosingSubmission": {
+      "label": "Submission after closing",
+      "accept": "Accept",
+      "deny": "Deny"
+    },
+    "submissions": {
+      "label": "Entregas"
+    },
+    "submissionDescription": {
+      "label": "Submission Description"
+    },
+    "description": {
+      "label": "Description",
+      "submissionLabel": "Submission description",
+      "placeHolder": "Enter description"
+    },
+    "dialog": {
+      "responsible": "Responsible",
+      "add": "Add",
+      "newGroup": "New group",
+      "newMembers": "Add members",
+      "searchMembers": "Search course members",
+      "noMembers": "No members",
+      "member": "Member",
+      "members": "Members",
+      "save": "Save changes",
+      "create": "Create new group",
+      "title": {
+        "edit": "Edit group",
+        "create": "Create group",
+        "add": "Add Group",
+        "members": "Group members"
+      },
+      "label": {
+        "class": "Which class does the group belong to?",
+        "name": "What is the name of the group?",
+        "responsible": "Who will be responsible for the group?",
+        "members": "Who will be the participants of the group?"
+      },
+      "select": {
+        "class": "Select the class of the group",
+        "name": "Enter the name of the group",
+        "responsible": "Select the group leader",
+        "members": "Select the group participants"
+      },
+      "message": {
+        "onlyMembers": "Only users who are participants of the course and who are not part of the group will be listed",
+        "onGroup": "This user already belongs to another group",
+        "missResponsible": "A group leader is required to save the group",
+        "missClass": "Select a class for the group",
+        "missName": "Enter a name for the group",
+        "updated": "Group updated successfully",
+        "created": "Group created successfully",
+        "hasSubmission": "Group cannot be edited as it already has submission",
+        "updateError": "Failed to update group",
+        "createError": "Failed to create group"
+      }
+    },
+    "submission": {
+      "label": "Submission",
+      "reqSubmission": "Request submission",
+      "aftrDeadline": "Allow submissions after deadline",
+      "description": {
+        "label": "Submission Description",
+        "placeHolder": "Enter description"
+      },
+      "empty": "No submission realized"
+    },
+    "memberAlreadyInTask": "{member} already in task",
+    "pleaseFillDates": "Please fill start and finish dates before add",
+    "pleaseFillType": "Please fill type before add",
+    "addMember": "{member} was added in task",
+    "removeMember": "{member} was removed of task",
+    "freeEditor": "Free editor",
+    "allowSendAfterSubmission": "Allow submission after deadline",
+    "restrictions": {
+      "label": "Restrictions",
+      "text": "Text",
+      "video": "Video",
+      "image": "Image",
+      "document": "Document",
+      "link": "Link",
+      "gallery": "Gallery"
+    },
+    "goals": {
+      "label": "Learning goals",
+      "select": "Select a goal",
+      "search": "Search a name"
+    },
+    "learningResources": {
+      "label": "Learning resources",
+      "noneSelected": "No trails selected",
+      "select": "Select a trail",
+      "selected": "Selected trail",
+      "new": "New trail",
+      "emptyTitle": "It looks like there are no trails created",
+      "emptySubtitle": "To select learning resources, you need to create and select a trail.",
+      "updateError": "Error updating learning resources, try again later",
+      "invalidTrail": "This trail has no content. Please select another trail or add content to this trail."
+    },
+    "tags": {
+      "subtitle": "Enter a tag",
+      "search": "Search a name",
+      "errors": {
+        "save": "Can't save tag"
+      }
+    },
+    "errors": {
+      "save": "Can't save the field {field}",
+      "genericSave": "Can't save the data",
+      "addMember": "Error when adding member",
+      "removeMember": "Error when removing member",
+      "addClass": "Error while trying to add class students from class {name}",
+      "sendMessage": "Error while trying send a message",
+      "endDateBeforeStartDate": "End date must be after start date",
+      "startDateAfterEndDate": "Start date must be before end date",
+      "cantChangeType": "You can't chage task type after add students",
+      "missingSubmission": "You must release a submission before change to in progress"
+    },
+    "members": {
+      "allClass": "The entire class {name} was added in task",
+      "allSelectedMembers": "All selected members already added in task",
+      "addMembers": "The selected members was added in task"
+    },
+    "events": {
+      "task_created": "Task was created",
+      "task_deadline": "{name} change task deadline",
+      "task_start_date": "{name} change task start date",
+      "task_submission": "{name} change task submission info",
+      "task_archived": "Task was archived",
+      "task_deadline_ended": "The task reached its end date and was automatically closed.",
+      "group_added": "added a group on task",
+      "group_removed": "removed a group of task",
+      "student_added": "{name} was added on task",
+      "student_removed": "{name} was removed of task",
+      "student_deadline": "{name} changed the end time of {name_two} task.",
+      "student_status": "{name} alterou o status da tarefa.",
+      "submission_send": "{name} changed the status of the task.",
+      "submission_denied": "Submission denied.",
+      "submission_evaluated": "Submission evaluated.",
+      "message": "{name} sent a message."
+    },
+    "chat": {
+      "you": "{name} (you)",
+      "reply": "Reply",
+      "audio": "Audio",
+      "error": {
+        "messages": "Error loading messages"
+      }
+    }
+  },
+  "goals": {
+    "select": "Enter a goal",
+    "search": "Write a name",
+    "label": "Learning goals"
+  },
+  "tags": {
+    "subtitle": "Enter a tag",
+    "placeholder": "Write a name"
+  },
+  "tabs": {
+    "events": {
+      "label": "Events"
+    },
+    "members": {
+      "label": "Members"
+    },
+    "assignments": {
+      "label": "Assignments"
+    },
+    "submissions": {
+      "label": "Submissions"
+    },
+    "comments": {
+      "label": "Comments"
+    }
+  },
+  "missing": {
+    "type": "No type",
+    "title": "No title",
+    "tags": "No tags",
+    "class": "No class",
+    "date": "No date",
+    "restrictions": "No restrictions",
+    "submissions": "It looks like we don't have any deliveries yet",
+    "description": "No description",
+    "groups": "There are no groups in this class",
+    "general": "It seems like there's nothing here"
+  },
+  "filter": "Filter",
+  "filterTasks": "Filter tasks",
+  "class": "Class",
+  "type": "Type",
+  "group": "Group",
+  "individual": "Individual",
+  "finalDate": "Final date",
+  "startDate": "Start date",
+  "clean": "Clean",
+  "archivedTasks": "Archived tasks",
+  "selectClassPlaceholder": "Select class",
+  "selectTypePlaceholder": "Select type",
+  "srchClass": "Search class",
+  "date": {
+    "placeholder": "Choose a date"
+  },
+  "students": "Students"
+}

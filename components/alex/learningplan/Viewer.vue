@@ -15,9 +15,11 @@
               color="primary"
               @click="emit('edit')"
             >
-             {{ $t('components.learningPlan.viewer.addContent') }}
+              {{ $t('components.learningPlan.viewer.addContent') }}
             </v-btn>
-            <span v-else>{{ $t('components.learningPlan.viewer.noContent') }}</span>
+            <span v-else>{{
+              $t('components.learningPlan.viewer.noContent')
+            }}</span>
           </v-col>
         </v-row>
         <div v-else>
@@ -113,12 +115,8 @@
                     </video>
                     <div
                       v-else
-                      :data-plyr-provider="
-                        getProvider(attributes.data.link)
-                      "
-                      :data-plyr-embed-id="
-                        getEmbedID(attributes.data.link)
-                      "
+                      :data-plyr-provider="getProvider(attributes.data.link)"
+                      :data-plyr-embed-id="getEmbedID(attributes.data.link)"
                     />
                   </vue-plyr>
 
@@ -228,7 +226,7 @@
         "
       >
         <v-btn text="" @click="onTabClick({ id: 'header-learning-plan-card' })">
-          {{$t('components.learningPlan.viewer.backToTop')}}
+          {{ $t('components.learningPlan.viewer.backToTop') }}
           <v-icon>mdi-arrow-up</v-icon>
         </v-btn>
         <v-tabs
@@ -312,7 +310,6 @@ onMounted(() => {
 });
 
 const blocks = computed(() => {
-  console.log(props.structure);
   return props.structure?.attributes?.blocks?.data || [];
 });
 

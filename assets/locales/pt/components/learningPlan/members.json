@@ -1,0 +1,29 @@
+{
+  "invite": {
+    "label": "Convidar",
+    "search": "Pesquise para adicionar",
+    "classes": "Turmas",
+    "members": "Pessoas"
+  },
+  "add": { "label": "Adicionar" },
+  "menu": {
+    "profile": "Ver perfil",
+    "invite": "Reenviar convite",
+    "remove": "Remover aluno"
+  },
+  "member": {
+    "label": "Integrante",
+    "pending": "Pendente"
+  },
+  "pagination": {
+    "main": "`Exibindo ${page} a ${page + members.length} de ${pages} resultados`"
+  },
+  "search": "Pesquisar",
+  "class": "Turma",
+  "missing": {
+    "member": "Nenhum integrante adicionado",
+    "name": "Sem nome",
+    "class": "Sem turma",
+    "email": "Sem email"
+  }
+}

@@ -51,7 +51,19 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['meetings'],
     },
     members: {
-      populate: ['user.avatar', 'user.cover'],
+      populate: ['user.avatar', 'user.wallet', 'user.cover'],
+    },
+    tasks: {
+      populate: [
+        'blocks',
+        'learning_goals',
+        'trail',
+        'tags',
+        'task_members.learning_plan_member.user.avatar',
+        'task_members.learning_plan_group.group_members.student_member.user.avatar',
+        'task_members.learning_plan_member.user.wallet',
+        'task_members.learning_plan_group.group_members.student_member.user.wallet',
+      ],
     },
   };
 
@@ -110,12 +122,24 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     );
   });
 
+  /*
++  const standardTrails = computed(() =>
++    learningPlan.value
++      ?.learning_structures
++      .find((structure) => structure.type === LearningPlanScructureSimpleType.STANDARD)
++      ?.trails.filter((trail) => !trail.hidden || userIsFacilitator.value)
++  );
+
+  */
+
   const standardTrails = computed(() => {
-    const trails =
+    const learningStructures =
       learningPlan.value?.learning_structures.filter(
         (structure) =>
           structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? [];
+      ) || [];
+    const trails =
+      learningStructures.length > 0 ? learningStructures[0].trails : [];
 
     if (userIsFacilitator.value) return trails;
     else return trails.filter((trail) => !trail.hidden);
@@ -176,9 +200,17 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const userClass = computed(() => {
-    return learningPlan.value?.classes.find(
-      (c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id),
-    );
+    const classes = learningPlan.value?.classes;
+    const userId = user.value?.id;
+    if (!classes || !userId) {
+      return undefined;
+    }
+
+    for (const c of classes) {
+      if (c.learning_plan_members?.some((m) => m.user.id === userId)) {
+        return c;
+      }
+    }
   });
 
   const schedules = computed<LearningPlanScheduleSimple[]>(() => {
@@ -200,6 +232,13 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const technicalTags = computed(
     () => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral),
   );
+  const userLearningMember = computed(
+    () =>
+      learningPlan.value?.members.find(
+        (member) => member.user.id === user.value.id,
+      ),
+  );
+
   return {
     learningPlan,
     loadLearningPlan,
@@ -221,5 +260,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     schedules,
     generalTags,
     technicalTags,
+    userLearningMember,
   };
 });

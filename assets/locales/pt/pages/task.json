@@ -1,0 +1,95 @@
+{
+  "searchPlaceholder": "Encontrar a tarefa",
+  "draft": "Rascunho",
+  "published": "Publicadas",
+  "done": "Encerradas",
+  "archived": "Arquivadas",
+  "emptyState": {
+    "draft": "Nenhuma tarefa em rascunho!",
+    "published": "Nenhuma tarefa publicada!",
+    "done": "Nenhuma tarefa encerrada!",
+    "archived": "Nenhuma tarefa arquivada!"
+  },
+  "submissions": {
+    "toDo": "A fazer",
+    "doing": "Fazendo",
+    "underReview": "Em avaliação",
+    "done": "Concluído",
+    "progress": "Progresso",
+    "deliveries": "Entregas",
+    "delivery": "Entrega",
+    "noSubmissions": "Sem entrega",
+    "student": "Aluno",
+    "students": "Alunos",
+    "group": "Grupo",
+    "groups": "Grupos"
+  },
+  "table": {
+    "header": {
+      "title": "Nome",
+      "deadline_at": "Prazo",
+      "type": "Tipo",
+      "students": "Integrantes",
+      "delivered": "Entrega"
+    },
+    "type": {
+      "individual": "Individual",
+      "group": "Grupo"
+    },
+    "placeholders": {
+      "undefined": "Indefinido",
+      "noMembers": "Nenhum",
+      "noTasks": "Nenhuma tarefa encontrada"
+    },
+    "dropdown": {
+      "kanban": "Ver Kanban",
+      "delete": "Excluir",
+      "publish": "Publicar",
+      "details": "Ver detalhes",
+      "draft": "Rascunho",
+      "close": "Encerrar",
+      "archive": "Arquivar",
+      "unarchive": "Desarquivar"
+    },
+    "tooltips": {
+      "options": "Opções",
+      "kanban": "Ver Kanban"
+    }
+  },
+  "crud": {
+    "addSuccess": "criada",
+    "editSuccess": "editada",
+    "deleteSuccess": "excluída",
+    "archiveSuccess": "arquivada",
+    "unarchiveSuccess": "desarquivada",
+    "addError": "criar",
+    "archiveError": "arquivar",
+    "unarchiveError": "desarquivar",
+    "editError": "editar",
+    "deleteError": "excluir",
+    "moveSuccess": "movida",
+    "moveError": "mover",
+    "errorMessage": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",
+    "successMessage": "Tarefa {action} com sucesso!",
+    "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
+    "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem estiver ativa",
+    "TASK_DATA_INCOMPLETE": "Você precisa preencher as informações da tarefa antes de defini-la como publicada",
+    "TASK_MOVE_HAS_DELIVERIES": "Não é possível mover a tarefa para rascunho porque ela possui entregas"
+  },
+  "deleteModal": {
+    "title": "Realmente deseja excluir essa Tarefa?",
+    "subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
+  },
+  "filterChip": {
+    "select": "Tipo",
+    "archivedTasks": "Tarefas arquivadas",
+    "startDate": "Data de início",
+    "finalDate": "Data de término"
+  },
+
+  "add": "Adicionar tarefa",
+  "addPlaceholder": "Digite o título da tarefa",
+  "addButton": "Adicionar"
+}

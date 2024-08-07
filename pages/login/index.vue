@@ -116,15 +116,21 @@
             ></v-divider>
           </div>
 
-          <v-btn
-            block
-            class="card-btn metamask d-flex"
-            :loading="logging2"
-            @click="metalogin"
+          <alex-custom-button
+            text="MetaMask"
+            :loading="metaLoading"
+            variant="secondary"
+            @click="metalogin()"
           >
-            <img src="/images/metamask.png" alt="" />
-            <span>{{ $t('pages.login.metamask.btn') }}</span>
-          </v-btn>
+            <template #default>
+              <div class="d-flex align-center tw-gap-2">
+                <img class="tw-w-8 tw-h-8" src="/images/metamask.png" alt="" />
+                <span class="tw-text-slate-950 tw-text-base">{{
+                  $t('pages.login.metamask.btn')
+                }}</span>
+              </div>
+            </template>
+          </alex-custom-button>
         </div>
       </v-card>
     </v-col>
@@ -162,10 +168,9 @@ const isValid = computed(
 );
 
 const logging = ref(false);
-const logging2 = ref(false);
 const checkbox = ref(false);
 const passwordVisible = ref(false);
-const { metalogin } = useMetamask(logging2);
+const { metalogin, loading: metaLoading } = useMetamask();
 
 const submit = handleSubmit(async () => {
   logging.value = true;

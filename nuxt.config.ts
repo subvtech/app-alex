@@ -15,6 +15,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/strapi',
     '@nuxt/test-utils/module',
+    "@nuxtjs/tailwindcss",
+    "shadcn-nuxt"
   ],
   testUtils: {},
   pinia: {
@@ -38,6 +40,14 @@ export default defineNuxtConfig({
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },
+  },
+  shadcn: {
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * @default "./components/ui"
+     */
+    componentDir: './components/ui',
   },
   imports: {
     dirs: ['stores', 'models', 'config', 'models/simple'],

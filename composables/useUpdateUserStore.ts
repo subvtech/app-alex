@@ -17,11 +17,10 @@ export const useUpdateUserStore = () => {
       'role',
       'tags',
       'user_descriptions',
-      'user_wallet',
+      'wallet',
     ];
     let user;
     const canEdit = username === route.params.username;
-
 
     if (canEdit) {
       user = await findOne<User>('users', id, {
@@ -49,7 +48,7 @@ export const useUpdateUserStore = () => {
         populate: ['learningplan.tasks'],
       })
     ).data;
-    
+
     const learningPlans = learningPlanMembers.length;
 
     const tasks = 0;
