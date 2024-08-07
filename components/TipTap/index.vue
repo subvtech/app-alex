@@ -207,6 +207,7 @@ onMounted(async () => {
   ];
 
   editor.value = new Editor({
+    enableContentCheck: true,
     editable: isEditable.value,
     extensions: [
       Document,
@@ -281,11 +282,17 @@ onMounted(async () => {
     ],
     content: props.modelValue,
     onUpdate: ({ editor }) => {
-      // HTML
-      //   emits('update:modelValue', editor.getHTML());
-
-      // JSON
       emits('update:modelValue', editor.getJSON());
+    },
+    onContentError({ editor, disableCollaboration }) {
+      disableCollaboration();
+      const emitUpdate = false;
+      editor.setEditable(false, emitUpdate);
+      setMessage(
+        t('components.tiptap.messages.error.contentError'),
+        'error',
+        true,
+      );
     },
   });
 });
