@@ -13,7 +13,6 @@
       ref="dialog"
       :title="task.title"
       :deadline="task.deadline"
-      :restrictions="task.restrictions"
       :task-member-id="task.taskMemberId"
       :last-submission="selectedSubmission?.submission"
       :task-status="task.status"

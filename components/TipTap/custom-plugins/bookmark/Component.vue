@@ -3,7 +3,7 @@
     <alex-inputs-text-field
       v-if="!readOnly && !urlData.title"
       v-model="url"
-      class="mx-auto tw-w-100 sm:tw-w-[80%]"
+      class="mx-auto tw-w-100"
       name="url"
       prepend-inner-icon="mdi-link"
       density="comfortable"

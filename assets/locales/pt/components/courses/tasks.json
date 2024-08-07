@@ -57,6 +57,7 @@
     "save_error": "Erro ao salvar submissão, tente novamente",
     "deliver_success": "Submissão enviada com sucesso",
     "deliver_error": "Erro ao enviar submissão, tente novamente",
+    "in_review": "A tarefa foi enviada para avaliação, não é possível editá-la.",
     "save_btn": "Salvar",
     "send_to_review_btn": "Enviar para avaliação"
   },

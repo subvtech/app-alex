@@ -48,7 +48,7 @@
       v-model="detailsDrawer"
       :task-id="selectedTask.task.id"
       :learningplan-id="learningplanId"
-      :doc_name="selectedTask.task.doc_name"
+      :doc-name="selectedTask.doc_name"
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
       :trail="selectedTask.task.trail"

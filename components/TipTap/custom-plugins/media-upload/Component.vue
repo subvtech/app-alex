@@ -5,7 +5,7 @@
     <v-expand-transition>
       <alex-custom-button
         v-if="!readOnly && !media.src"
-        class="tw-w-4/5"
+        class="w-100"
         variant="secondary"
         :loading="isLoading"
         :prepend-icon="
@@ -21,7 +21,7 @@
       >
       <div
         v-else-if="media.src"
-        class="tw-w-4/5 d-flex flex-column justify-center align-center position-relative"
+        class="w-100 d-flex flex-column justify-center align-center position-relative"
       >
         <div class="ma-2 delete-button">
           <alex-custom-button

@@ -103,7 +103,7 @@
             :task-member-id="taskMemberId"
             :content="submissions.data[0]"
             :task-status="status"
-            :doc_name="docName"
+            :doc-name="docName"
             @update-task-status="handleChangeStatus"
             @update-submission="$emit('update-submission')"
           />
