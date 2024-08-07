@@ -171,6 +171,7 @@
           :task-id="taskId"
           :trail-id="trail?.id"
           :blocks="blocks"
+          teacher
         />
       </div>
 

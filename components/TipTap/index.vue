@@ -1,7 +1,7 @@
 <template>
   <client-only>
     <v-fade-transition>
-      <TipTap-loader v-if="true" />
+      <TipTap-loader v-if="isLoading" />
     </v-fade-transition>
     <div
       ref="container"
