@@ -1,6 +1,13 @@
 <template>
   <client-only>
-    <div ref="container" class="rounded-lg w-100">
+    <v-fade-transition>
+      <TipTap-loader v-if="true" />
+    </v-fade-transition>
+    <div
+      ref="container"
+      class="rounded-lg w-100 tw-transition-opacity"
+      :class="{ 'tw-opacity-0': isLoading }"
+    >
       <div v-if="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
         <tip-tap-menus-bubble
           :editor="editor"
@@ -104,7 +111,13 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showLoader: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const isLoading = ref(false);
 
 const defaultBlock = computed(() => {
   return props.allowedBlocks.length === 1 ? props.allowedBlocks[0] : '';
@@ -173,6 +186,7 @@ const getTipTapToken = async (userID: number | undefined) => {
 };
 
 onMounted(async () => {
+  isLoading.value = props.showLoader;
   const user = useStrapiUser();
   const TipTapToken = await getTipTapToken(user.value?.id);
   setAvailableBlocks(props.allowedBlocks);
@@ -187,6 +201,7 @@ onMounted(async () => {
       if (!doc.getMap('config').get('initialContentLoaded') && editor) {
         doc.getMap('config').set('initialContentLoaded', true);
       }
+      isLoading.value = false;
     },
   });
   const setCollaborationExtensions = (): AnyExtension[] => [
@@ -296,11 +311,6 @@ onMounted(async () => {
     },
   });
 });
-
-// const toggleEditable = () => {
-//   isEditable.value = !isEditable.value;
-//   editor.value.setEditable(isEditable.value);
-// };
 
 const blockToolsMap = {
   starterKit: StarterKit.configure({

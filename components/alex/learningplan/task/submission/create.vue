@@ -26,6 +26,7 @@
         :edit="!isReadOnly"
         :collaboration="!!docName"
         :allowed-blocks="props.restrictions ? props.restrictions : []"
+        :show-loader="true"
       />
     </div>
     <template v-if="!isReadOnly" #footer>
