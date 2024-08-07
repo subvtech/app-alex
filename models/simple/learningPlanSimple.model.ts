@@ -42,7 +42,7 @@ export interface LearningPlanSimple {
   classes: ClassSimple[];
   facilitatorName?: string;
   facilitatorImage?: string;
-  institution?: string;
+  institutions?: Institution[];
   trails?: number;
   userIsFacilitator?: boolean;
 }

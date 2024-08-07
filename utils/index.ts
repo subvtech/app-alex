@@ -1,5 +1,12 @@
 // Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
-import { compareDesc, isSameDay } from 'date-fns';
+import {
+  compareDesc,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isEqual,
+  isWithinInterval,
+} from 'date-fns';
 export type ElementType<T extends ReadonlyArray<unknown>> =
   T extends ReadonlyArray<infer ElementType> ? ElementType : never;
 
@@ -118,4 +125,28 @@ export const orderEvents = (events: TaskEvent[]) => {
     });
 
   return eventsGroups;
+};
+
+export const checkIntervalOfDates = (
+  initial: Date,
+  first?: string,
+  second?: string,
+) => {
+  if (!first && !second) {
+    return true;
+  }
+  if (first && second) {
+    return isWithinInterval(initial, {
+      start: new Date(first),
+      end: new Date(second).setHours(23, 59, 59),
+    });
+  }
+  if (first) {
+    const firstDate = new Date(first);
+    return isAfter(initial, firstDate) || isEqual(initial, firstDate);
+  }
+  if (second) {
+    const secondDate = new Date(second).setHours(23, 59, 59);
+    return isBefore(initial, secondDate) || isEqual(initial, secondDate);
+  }
 };

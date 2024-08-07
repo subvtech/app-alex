@@ -42,6 +42,7 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
         role: { $eq: 'facilitator' },
       },
     },
+    institutions: true,
   },
   sort: 'id:desc',
 });

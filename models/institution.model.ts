@@ -1,4 +1,4 @@
-export interface InstitutionsType {
+export interface Institution {
   name: string;
   acronym: string;
   id: number;

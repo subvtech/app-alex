@@ -9,10 +9,7 @@
     :width="380"
     class="py-6 rounded-s-lg"
   >
-    <form
-      class="d-flex flex-column ga-4 tw-h-full tw-w-full bg-white"
-      @submit.stop="onSubmit"
-    >
+    <form class="d-flex flex-column ga-4 tw-h-full tw-w-full bg-white">
       <div class="d-flex align-center ga-4 px-4">
         <p class="text-h4 flex-fill">
           {{ 'Filtrar' }}
@@ -90,6 +87,7 @@
             clearable
             density="comfortable"
             hide-details
+            is-general
             :label="'Competências gerais'"
           />
           <div
@@ -173,9 +171,13 @@
           @click="clearFilters"
           >{{ $t('components.learningPlan.drawer.clean') }}</alex-custom-button
         >
-        <alex-custom-button class="flex-1-1" size="large" type="submit">{{
-          $t('components.learningPlan.drawer.filter')
-        }}</alex-custom-button>
+        <alex-custom-button
+          class="flex-1-1"
+          size="large"
+          type="button"
+          @click="onSubmit"
+          >{{ $t('components.learningPlan.drawer.filter') }}</alex-custom-button
+        >
       </div>
     </form>
   </v-navigation-drawer>
@@ -192,24 +194,23 @@ interface FilterProps {
 }
 export type LearningPlanFilter = {
   facilitator: UserSimple | null;
-  institution: InstitutionsType | null;
-  generalCompetences: Omit<TagSimple, 'learningplans'>[];
-  technicalCompetences: Omit<TagSimple, 'learningplans'>[];
+  institution: Institution | null;
+  generalCompetences: Array<Omit<TagSimple, 'learningplans'>>;
+  technicalCompetences: Array<Omit<TagSimple, 'learningplans'>>;
   lider: UserSimple | null;
   startDate: {
-    start?: Date;
-    end?: Date;
+    start?: string;
+    end?: string;
   };
   finalDate: {
-    start?: Date;
-    end?: Date;
+    start?: string;
+    end?: string;
   };
 };
 type Emits = {
   submit: [value: Partial<LearningPlanFilter>];
 };
 withDefaults(defineProps<FilterProps>(), {});
-const queryClient = useQueryClient();
 const model = defineModel({ default: false });
 const filters = ref<LearningPlanFilter>({
   facilitator: null,
@@ -226,10 +227,11 @@ const filters = ref<LearningPlanFilter>({
     end: undefined,
   },
 });
+const emits = defineEmits<Emits>();
+const queryClient = useQueryClient();
 const handleChange = (value: boolean) => {
   model.value = value;
 };
-const emits = defineEmits<Emits>();
 // const i18Texts = computed(() => {
 //   const drawer = 'components.learningPlan.drawer';
 //   return props.type === 'course'
@@ -277,7 +279,7 @@ const schema = yup.object().shape(
   ],
 );
 
-const { handleSubmit, errors } = useForm({
+const { handleSubmit, errors, resetForm } = useForm({
   validationSchema: schema,
   keepValuesOnUnmount: true,
 });
@@ -290,6 +292,7 @@ const onSubmit = handleSubmit(() => {
       }
       if (
         typeof value === 'object' &&
+        Object.hasOwn(value, 'start') &&
         !(value as LearningPlanFilter['startDate'])?.start &&
         !(value as LearningPlanFilter['finalDate'])?.end
       ) {
@@ -334,6 +337,7 @@ const clearFilters = () => {
     },
   };
   emits('submit', cleanedFilters);
+  resetForm();
 };
 const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
   if (type === 'technical') {
@@ -345,8 +349,8 @@ const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
     (tag) => tag.text !== text,
   );
 };
-watch(model, () => {
-  if (model.value) {
+watch(model, (value) => {
+  if (value) {
     queryClient.invalidateQueries({ queryKey: ['single-user-auto-complete'] });
   }
 });

@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex bg-white flex-grow-1 flex-column rounded-lg">
     <div
-      v-if="filteredByFacilitator.length === 0"
+      v-if="query.data?.value.data.length === 0"
       class="tw-flex-1 d-flex align-center justify-center flex-column pa-6"
     >
       <v-progress-circular
@@ -100,7 +100,7 @@
       <v-data-iterator
         v-model:search="search"
         v-model:page="page"
-        :items="filteredByFacilitator"
+        :items="filteredByInstitutions"
         :items-per-page="itemsPerPageValue"
         :filter-keys="[
           'learningPlan.title',
@@ -241,13 +241,13 @@
             class="d-flex w-100 tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 tw-border-t-[1px] tw-border-gray-100"
           >
             <p class="show-cardlist text-body-3 text-gray-600">
-              {{ showingData(groupedItems) }}
+              {{ showingData(groupedItems, query.data?.value?.data) }}
             </p>
             <alex-custom-pagination
               v-if="pageCount > 1"
               v-model="page"
               :length="pageCount"
-              :total-visible="5"
+              :total-visible="itemsPerPageValue"
               class="extra-mb"
             />
           </div>
@@ -342,19 +342,67 @@ const simplifiedType = computed(() =>
 const hasFilters = computed(() => {
   let hasFilter = false;
   Object.values(filters.value).forEach((filter) => {
-    if (filter.value && !Array.isArray(filter.value)) {
+    if (!filter.value) {
+      return;
+    }
+    if (!Array.isArray(filter.value)) {
+      hasFilter = true;
+    }
+    if (Array.isArray(filter.value) && filter.value.length) {
       hasFilter = true;
     }
   });
   return hasFilter;
 });
+//      Filters
 const filteredByFacilitator = computed(
   () =>
-    query.data?.value.data.filter((value) =>
+    query.data?.value.data.filter((data) =>
       filters.value.facilitator.value?.id
-        ? value.facilitator?.user.id === filters.value.facilitator.value?.id
+        ? data.facilitator?.user.id === filters.value.facilitator.value?.id
         : true,
     ),
+);
+const filteredByDate = computed(() =>
+  filteredByFacilitator.value.filter((data) => {
+    const isInStartDateRange = checkIntervalOfDates(
+      new Date(data.learningPlan.start_date),
+      filters.value.startDate.value?.start,
+      filters.value.startDate.value?.end,
+    );
+    const isInFinalDateRange = checkIntervalOfDates(
+      new Date(data.learningPlan.end_date),
+      filters.value.finalDate.value?.end,
+      filters.value.finalDate.value?.start,
+    );
+    return isInStartDateRange && isInFinalDateRange;
+  }),
+);
+const filteredByCompetences = computed(() =>
+  filteredByDate.value.filter((data) => {
+    const competences = [
+      ...filters.value.generalCompetences.value!,
+      ...filters.value.technicalCompetences.value!,
+    ];
+    if (!competences.length) {
+      return true;
+    }
+    const hasCompetence = competences.filter((competence) =>
+      data.learningPlan.tags.find((tag) => tag.text === competence.text),
+    ).length;
+    return hasCompetence;
+  }),
+);
+
+const filteredByInstitutions = computed(() =>
+  filteredByCompetences.value.filter((data) => {
+    if (!filters.value.institution.value) {
+      return true;
+    }
+    return !!data.learningPlan.institutions?.find(
+      (institution) => institution.id === filters.value.institution.value?.id,
+    );
+  }),
 );
 // Static Values
 const headers: DataTableHeader[] = [
@@ -378,7 +426,7 @@ const headers: DataTableHeader[] = [
         : 'learningPlan.product',
   },
 ];
-const itemsPerPageValue = 12;
+const itemsPerPageValue = 5;
 
 // Functions
 const changeViewMode = () => {
@@ -425,15 +473,15 @@ const navigate = (id: number, page: string) => {
     navigateTo(`/${listType}/${id}`);
   }
 };
-const showingData = (groupedItems: any) => {
+const showingData = (groupedItems: Array<any>, items: Array<any>) => {
   const itemsPerPage =
     search.value === '' ? itemsPerPageValue : groupedItems.length;
   const from = (page.value - 1) * itemsPerPage + 1;
   const to =
-    page.value * itemsPerPage > query.data?.value?.data.length
-      ? query.data?.value?.data.length
+    page.value * itemsPerPage > items.length
+      ? items.length
       : page.value * itemsPerPage;
-  const total = query.data?.value?.data.length;
+  const total = items.length;
   const message = t('pages.courses.showingData', {
     from,
     to,
@@ -500,6 +548,7 @@ const checkValidFilters = (
   }
   return true;
 };
+
 // Actions
 onBeforeMount(() => {
   if (isProfessor.value) {
