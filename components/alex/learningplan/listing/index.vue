@@ -245,7 +245,7 @@
             class="d-flex w-100 tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 tw-border-t-[1px] tw-border-gray-100"
           >
             <p class="show-cardlist text-body-3 text-gray-600">
-              {{ showingData(groupedItems, query.data?.value?.data) }}
+              {{ showingData(groupedItems, filteredByLeader) }}
             </p>
             <alex-custom-pagination
               v-if="pageCount > 1"

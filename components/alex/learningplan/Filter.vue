@@ -350,11 +350,15 @@ const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
 };
 watch(model, (value) => {
   if (value) {
+    const queriesToInvalidate = [
+      'single-user-auto-complete-facilitator',
+      'single-user-auto-complete-leader',
+      'institutions-auto-complete-institution',
+    ];
     queryClient.invalidateQueries({
-      queryKey: [
-        'single-user-auto-complete-facilitator',
-        'single-user-auto-complete-leader',
-      ],
+      predicate: (query) =>
+        typeof query.queryKey[0] === 'string' &&
+        queriesToInvalidate.includes(query.queryKey[0]),
     });
   }
 });

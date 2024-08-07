@@ -40,7 +40,7 @@ const { value: selectedInstitution } = useField<Institution | null>(
   },
 );
 const { data: items, refetch } = useQuery({
-  queryKey: ['users-single-autocomplete'],
+  queryKey: [`institutions-auto-complete-${props.name}`],
   queryFn: async () => {
     const response = await find<Institution>('institutions');
     return response.data;
