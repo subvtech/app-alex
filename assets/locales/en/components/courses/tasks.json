@@ -57,6 +57,7 @@
     "save_error": "Error saving submission, please try again",
     "deliver_success": "Submission sent successfully",
     "deliver_error": "Error sending submission, please try again",
+    "in_review": "This task has been sent for review, it is not possible to edit it.",
     "save_btn": "Save",
     "send_to_review_btn": "Send to review"
   },

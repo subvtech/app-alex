@@ -3,7 +3,7 @@
     v-model="dialog"
     :persistent="true"
     :max-width="1080"
-    :no-footer="props.readOnly"
+    :no-footer="isReadOnly"
     :retain-focus="false"
     no-click-animation
   >
@@ -23,12 +23,12 @@
       <tip-tap
         v-model="editorContent"
         :doc-name="docName"
-        :edit="!props.readOnly"
+        :edit="!isReadOnly"
         :collaboration="!!docName"
         :allowed-blocks="props.restrictions ? props.restrictions : ['']"
       />
     </div>
-    <template v-if="!props.readOnly" #footer>
+    <template v-if="!isReadOnly" #footer>
       <v-container
         class="bg-white rounded-b-lg border-top-gray-100 d-flex justify-end ga-3 pa-6 align-center"
       >
@@ -43,13 +43,6 @@
           {{ $t('components.learningPlan.drawer.saving') }}
         </p>
 
-        <!-- <p v-if="lastSaveDate" class="text-body-4 text-gray-400">
-          {{
-            $t('components.courses.tasks.submission_modal.saved_at', {
-              time: differenceInMinutes(currentDate, lastSaveDate),
-            })
-          }}
-        </p> -->
         <alex-custom-button
           size="large"
           variant="secondary"
@@ -72,6 +65,7 @@ interface submissionProps {
   taskMemberId: number;
   restrictions?: string[];
   lastSubmission?: TaskSubmissionSimple;
+  docName?: string;
   readOnly?: boolean;
 }
 
@@ -81,7 +75,10 @@ const props = withDefaults(defineProps<submissionProps>(), {
   restrictions: undefined,
   lastSubmission: undefined,
   readOnly: false,
+  docName: undefined,
 });
+
+const isReadOnly = ref(props.readOnly);
 
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
@@ -103,27 +100,12 @@ const currentData = ref<EditorSubmission>();
 const taskMemberId = toRef(props, 'taskMemberId');
 const hasEditorChanges = ref(false);
 const lastSaveDate = ref<Date | null>(null);
-const docName = ref<string | undefined>('');
 
 const saveCountDown = ref<number>(saveTime);
 
 watch(editorContent, (_, previous) => {
   prevEditorContent.value = previous;
 });
-
-const setDocName = async () => {
-  const taskMember = await findOne<TaskMember>('task-members', {
-    fields: ['doc_name'],
-    filters: {
-      id: props.taskMemberId,
-    },
-  });
-
-  const docNameVal =
-    taskMember.data && taskMember.data[0]?.attributes?.doc_name;
-
-  docName.value = docNameVal || '';
-};
 
 const saveSubmissionLoop = async () => {
   if (saveCountDown.value) {
@@ -143,11 +125,24 @@ const saveSubmissionLoop = async () => {
 
 const checkDataChanges = async () => {
   const taskSubmission = await findOne('task-submissions', {
-    fields: ['submission'],
     filters: {
       id: props.lastSubmission?.id || 0,
     },
   });
+  const submissionStatus = taskSubmission.data[0]?.attributes?.submitted_at;
+
+  if (submissionStatus) {
+    setMessage(
+      t('components.courses.tasks.submission_modal.in_review'),
+      'blue',
+      true,
+      false,
+      true,
+    );
+    isReadOnly.value = true;
+    clearInterval(saveInterval);
+    return false;
+  }
 
   const lastSubmission =
     taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
@@ -185,12 +180,13 @@ const openDialog = async () => {
   currentData.value = props.lastSubmission?.submission || undefined;
 
   await executeSubmissions();
-  // await setDocName();
-  await setEditorData();
-  hasEditorChanges.value = await checkDataChanges();
+  // await setEditorData();
 
   saveCountDown.value = saveTime;
-  saveInterval = setInterval(async () => await saveSubmissionLoop(), 1000);
+  if (!isReadOnly.value) {
+    hasEditorChanges.value = await checkDataChanges();
+    saveInterval = setInterval(async () => await saveSubmissionLoop(), 1000);
+  }
 
   isLoading.value = false;
 };
@@ -240,14 +236,8 @@ const saveSubmission = async () => {
 };
 
 // Caso a tarefa esteja em avaliação ou enviada, pega o valor do banco
-const setEditorData = async () => {
+const setEditorData = () => {
   editorContent.value = props.lastSubmission?.submission;
-
-  if (props.taskStatus === 'in_review' || props.taskStatus === 'done') {
-    docName.value = undefined;
-  } else {
-    await setDocName();
-  }
 };
 
 watch(dialog, (value) => {

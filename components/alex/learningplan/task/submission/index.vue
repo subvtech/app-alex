@@ -36,6 +36,7 @@
     :last-submission="content"
     :task-status="taskStatus"
     :read-only="readOnly"
+    :doc-name="docName"
     @update-task-status="(status) => $emit('update-task-status', status)"
     @update-submission="() => $emit('update-submission')"
   />
@@ -51,6 +52,7 @@ interface Submission {
   content?: TaskSubmissionSimple;
   taskMemberId: number;
   taskStatus: TaskMemberStatus;
+  docName?: string;
 }
 interface StudentSubimission {
   status: 'not_started' | 'started' | 'in_review' | 'reviewed' | 'denied';
@@ -71,6 +73,7 @@ const props = withDefaults(defineProps<SubimissionProps>(), {
   taskDeadline: undefined,
   restrictions: undefined,
   content: undefined,
+  docName: undefined,
 });
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
