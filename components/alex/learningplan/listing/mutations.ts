@@ -40,7 +40,9 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
     members: {
       populate: ['user.institutions', 'user.avatar'],
     },
-    institutions: true,
+    institutions: {
+      populate: ['cover'],
+    },
   },
   sort: 'id:desc',
 });

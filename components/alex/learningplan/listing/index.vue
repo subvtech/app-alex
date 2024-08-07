@@ -129,6 +129,11 @@
               :image="{
                 url: item.learningPlan.cover_image?.url || '',
               }"
+              :institution="
+                item.learningPlan.type === 'course'
+                  ? undefined
+                  : item.learningPlan.institutions![0]
+              "
               :facilitator="{
                 name: item.facilitator?.user.fullname || '',
                 imageURL: item.facilitator?.user.avatar?.url,

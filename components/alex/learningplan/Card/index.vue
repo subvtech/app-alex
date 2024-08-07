@@ -20,16 +20,13 @@
     <div class="header" :class="{ rounded: !isVertical }">
       <div
         v-if="institution"
-        class="tw-absolute tw-bottom-4 tw-left-4 tw-p-1 tw-w-40 tw-z-10 tw-bg-[#001a3395] tw-rounded-md"
+        class="tw-absolute tw-bottom-2 tw-left-2 tw-p-1 tw-z-10 tw-bg-[#001a3395] tw-rounded-md"
       >
-        <v-img
-          :src="
-            institution.cover ||
-            'https://www.larsaodomingos.com.br/static/media/logo.5f673bd4.png'
-          "
+        <img
+          :src="institution.cover.url"
           :alt="image.alt"
           :class="{ grayscale: hide }"
-          cover
+          class="tw-max-w-40 tw-h-10"
         />
       </div>
       <v-img

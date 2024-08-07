@@ -3,5 +3,5 @@ export interface Institution {
   acronym: string;
   id: number;
   sector: string;
-  cover: any;
+  cover: Upload;
 }
