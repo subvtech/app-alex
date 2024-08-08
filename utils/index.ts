@@ -132,21 +132,25 @@ export const checkIntervalOfDates = (
   first?: string,
   second?: string,
 ) => {
-  if (!first && !second) {
-    return true;
-  }
-  if (first && second) {
-    return isWithinInterval(initial, {
-      start: new Date(first),
-      end: new Date(second).setHours(23, 59, 59),
-    });
-  }
-  if (first) {
-    const firstDate = new Date(first);
-    return isAfter(initial, firstDate) || isEqual(initial, firstDate);
-  }
-  if (second) {
-    const secondDate = new Date(second).setHours(23, 59, 59);
-    return isBefore(initial, secondDate) || isEqual(initial, secondDate);
+  try {
+    if (!first && !second) {
+      return true;
+    }
+    if (first && second) {
+      return isWithinInterval(initial, {
+        start: new Date(first),
+        end: new Date(second).setHours(23, 59, 59),
+      });
+    }
+    if (first) {
+      const firstDate = new Date(first);
+      return isAfter(initial, firstDate) || isEqual(initial, firstDate);
+    }
+    if (second) {
+      const secondDate = new Date(second).setHours(23, 59, 59);
+      return isBefore(initial, secondDate) || isEqual(initial, secondDate);
+    }
+  } catch (error) {
+    return false;
   }
 };
