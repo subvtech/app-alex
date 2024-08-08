@@ -1,8 +1,6 @@
 <template>
   <client-only>
-    <v-fade-transition>
-      <TipTap-loader v-if="isLoading" />
-    </v-fade-transition>
+    <TipTap-loader v-if="isLoading" />
     <div
       ref="container"
       class="rounded-lg w-100 tw-transition-opacity"
