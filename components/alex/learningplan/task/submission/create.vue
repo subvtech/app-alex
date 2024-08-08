@@ -117,6 +117,7 @@ const checkDataChanges = async () => {
     );
     isReadOnly.value = true;
     clearInterval(saveInterval);
+    saveSubmission();
     return false;
   }
 
@@ -222,7 +223,10 @@ watch(dialog, (value) => {
   if (!value) {
     lastSaveDate.value = null;
     clearInterval(saveInterval);
-    saveSubmission();
+
+    if (!isReadOnly.value) {
+      saveSubmission();
+    }
   }
 });
 defineExpose({
