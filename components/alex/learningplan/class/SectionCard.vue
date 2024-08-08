@@ -64,6 +64,7 @@
                     :main-button-loading="dialogActionLoading"
                     :main-button-disabled="dialogActionDisabled"
                     @on-main-action="emit('action')"
+                    @on-secondary-action="dialogModelValue = false"
                   />
                 </template>
               </alex-custom-dialog> </alex-custom-button
