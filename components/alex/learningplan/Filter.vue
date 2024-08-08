@@ -231,20 +231,6 @@ const queryClient = useQueryClient();
 const handleChange = (value: boolean) => {
   model.value = value;
 };
-// const i18Texts = computed(() => {
-//   const drawer = 'components.learningPlan.drawer';
-//   return props.type === 'course'
-//     ? {
-//         title: t(`${drawer}.filter`),
-//         selectPlaceholder: t(`${drawer}.selectClassPlaceholder`),
-//         selectLabel: t(`${drawer}.class`),
-//       }
-//     : {
-//         title: t(`${drawer}.filterTasks`),
-//         selectPlaceholder: t(`${drawer}.selectTypePlaceholder`),
-//         selectLabel: t(`${drawer}.type`),
-//       };
-// });
 const schema = yup.object().shape(
   {
     finalDateStart: yup.date().optional(),
@@ -285,21 +271,23 @@ const { handleSubmit, errors, resetForm } = useForm({
 
 const onSubmit = handleSubmit(() => {
   const nonEmptyFilters: Partial<LearningPlanFilter> = Object.fromEntries(
-    Object.entries(filters.value).filter(([_key, value]) => {
-      if (value === null || value === undefined) {
-        return false;
-      }
-      if (
-        typeof value === 'object' &&
-        Object.hasOwn(value, 'start') &&
-        !(value as LearningPlanFilter['startDate'])?.start &&
-        !(value as LearningPlanFilter['finalDate'])?.end
-      ) {
-        return false;
-      }
-      if (Array.isArray(value) && !value.length) return false;
-      return true;
-    }),
+    Object.entries(filters.value)
+      .filter(([_key, value]) => {
+        if (value === null || value === undefined) {
+          return false;
+        }
+        if (
+          typeof value === 'object' &&
+          Object.hasOwn(value, 'start') &&
+          !(value as LearningPlanFilter['startDate'])?.start &&
+          !(value as LearningPlanFilter['finalDate'])?.end
+        ) {
+          return false;
+        }
+        if (Array.isArray(value) && !value.length) return false;
+        return true;
+      })
+      .map(([key, value]) => [key, toRaw(value)]),
   );
   emits('submit', nonEmptyFilters);
   handleChange(false);
