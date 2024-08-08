@@ -117,6 +117,7 @@ const checkDataChanges = async () => {
     );
     isReadOnly.value = true;
     clearInterval(saveInterval);
+    emit('update-task-status', 'in_review');
     return false;
   }
 
