@@ -3,11 +3,13 @@ import type { IconSet, IconProps } from 'vuetify';
 import trail from './Trail.vue';
 import DragIndicator from './DragIndicator.vue';
 import RoundAddPhoto from './RoundAddPhoto.vue';
+import Kanban from './Kanban.vue';
 
 const alexAliases = {
   trail,
   DragIndicator,
   RoundAddPhoto,
+  Kanban,
 };
 
 const alexIcons: IconSet = {

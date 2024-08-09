@@ -3,7 +3,13 @@
     <div
       :id="keyId"
       class="editorjs w-100 pa-0 show-drop-area"
-      :class="viewerId"
+      :class="[
+        viewerId,
+        {
+          'disabled-paragraph':
+            allowedBlocks !== undefined && allowedBlocks?.length <= 2,
+        },
+      ]"
       :is-editing="isEditing"
       v-bind="$attrs"
       :data-active="fileDrop && isEditing"
@@ -23,7 +29,7 @@
 <script setup lang="ts">
 import EditorJS from '@editorjs/editorjs';
 import Delimiter from '@editorjs/delimiter';
-import ImageUrl from '@editorjs/simple-image';
+// import ImageUrl from '@editorjs/simple-image';
 import InlineCode from '@editorjs/inline-code';
 import Link from '@editorjs/link';
 import List from '@editorjs/nested-list';
@@ -43,6 +49,7 @@ import Carousel from '../editor-js/plugins/carousel/CarouselBlock';
 import header from '../editor-js/plugins/header/HeaderBlock';
 import Fileset from '../editor-js/plugins/fileset/filesetBlock';
 import CustomImage from '../editor-js/plugins/image/ImageBlock';
+import Wrapper from '../editor-js/plugins/wrapper/tune';
 
 import { i18n } from '~/assets/editor-i18n';
 import { useMessageStore } from '~/stores/message';
@@ -50,7 +57,7 @@ import AIText from '~/editor-js/plugins/AiText';
 const messageStore = useMessageStore();
 const strapiClient = useStrapiClient();
 const isEditing = ref(true);
-const emit = defineEmits(['ready', 'change']);
+const emit = defineEmits(['ready', 'change', 'update:selectedBlocks']);
 const instance = ref();
 
 interface editorData {
@@ -61,6 +68,16 @@ interface editorData {
   }>;
   version: string;
 }
+
+interface propsType {
+  data?: editorData;
+  keyId?: string;
+  readOnly?: boolean;
+  selectedBlocks?: number[];
+  selectedBlocksMode?: boolean;
+  allowedBlocks?: string[];
+}
+
 const app = useNuxtApp();
 const viewerInstance = ref(null);
 const viewer = ref<null | {
@@ -71,6 +88,7 @@ const viewer = ref<null | {
 const viewerId = computed(() => `viewer-images-${crypto.randomUUID()}`);
 const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
+const selectedNewBlocks = ref<string[]>([]);
 const fileDrop = ref(false);
 
 const deletePendingMediaOnSave = async (mediaArray: Array<number>) => {
@@ -133,272 +151,15 @@ const handleDrop = (event: DragEvent) => {
 onMounted(() => {
   instance.value = new EditorJS({
     autofocus: false,
-    tools: {
-      delimiter: Delimiter,
-      embed: Embed,
-      header: {
-        class: header,
-        shortcut: 'CMD+SHIFT+H',
-        tunes: ['alignmentBlockTune'],
-        config: {
-          allowAnchor: true,
-          anchorLength: 100,
-        },
-      },
-      image: {
-        class: CustomImage,
-        config: {
-          uploader: {
-            uploadByFile: (file) => {
-              const formData = new FormData();
-
-              formData.append('files', file, file.name);
-
-              return strapiClient<Upload>('/upload', {
-                method: 'POST',
-                body: formData,
-              })
-                .then((res) => {
-                  const url = res[0].url;
-                  return { success: 1, file: { url } };
-                })
-                .catch((err) => {
-                  messageStore.message = err;
-                });
-            },
-          },
-        },
-      },
-      /* imageUrl: ImageUrl, */
-      aiText: {
-        class: AIText,
-        config: {
-          openAiKey: app.$config.public.openAiKey,
-        },
-      },
-      inlineCode: {
-        class: InlineCode,
-        shortcut: 'CMD+SHIFT+C',
-      },
-      link: {
-        class: Link,
-        config: {
-          endpoint: '/api/fetch-url',
-        },
-      },
-      list: {
-        class: List,
-        inlineToolbar: true,
-      },
-      marker: {
-        class: Marker,
-        shortcut: 'CMD+SHIFT+M',
-      },
-      quote: {
-        class: Quote,
-        inlineToolbar: true,
-        shortcut: 'CMD+SHIFT+O',
-        config: {
-          quotePlaceholder: 'Insira uma citação',
-          captionPlaceholder: 'Autor da citação',
-        },
-      },
-      table: {
-        class: Table,
-        inlineToolbar: true,
-        config: {
-          rows: 2,
-          cols: 3,
-        },
-      },
-      alignmentBlockTune: {
-        class: AlignmentBlockTune,
-        config: {
-          default: 'left',
-          blocks: {
-            header: 'center',
-            list: 'left',
-          },
-        },
-      },
-      hyperlink: {
-        class: Hyperlink,
-        config: {
-          shortcut: 'CMD+L',
-          target: '_blank',
-          rel: 'nofollow',
-          availableTargets: ['_blank', '_self'],
-          availableRels: ['author', 'noreferrer'],
-          validate: false,
-        },
-      },
-      code: {
-        class: Code,
-        config: {
-          placeholder: 'Escreva o código aqui...',
-        },
-      },
-      // code: require('editorjs-codemirror'),
-      alert: {
-        class: Alert,
-        inlineToolbar: true,
-        shortcut: 'CMD+SHIFT+A',
-        config: {
-          defaultType: 'info',
-          messagePlaceholder: 'Enter something',
-        },
-      },
-      paragraph: {
-        class: Paragraph,
-        inlineToolbar: true,
-        tunes: ['alignmentBlockTune'],
-      },
-      warning: {
-        class: Warning,
-        inlineToolbar: true,
-        shortcut: 'CMD+SHIFT+W',
-        config: {
-          titlePlaceholder: 'Título',
-          messagePlaceholder: 'Mensagem',
-        },
-      },
-      carousel: {
-        class: Carousel,
-        config: {
-          handleFileSelected: async (slides) => {
-            const formData = new FormData();
-            slides.forEach((slide) => {
-              if (slide.url instanceof File) {
-                formData.append('files', slide.url, slide.title);
-              } else if (
-                typeof slide.url === 'string' &&
-                slide.url.startsWith('data:')
-              ) {
-                const base64Data = slide.url.split(',')[1];
-                const binaryString = window.atob(base64Data);
-                const byteArray = new Uint8Array(binaryString.length);
-
-                for (let i = 0; i < binaryString.length; i++) {
-                  byteArray[i] = binaryString.charCodeAt(i);
-                }
-
-                let mimeType = 'image/png';
-                if (slide.url.startsWith('data:image/jpeg')) {
-                  mimeType = 'image/jpeg';
-                }
-
-                const blob = new Blob([byteArray], { type: mimeType });
-                const imageFile = new File([blob], slide.title, {
-                  type: mimeType,
-                });
-                formData.append('files', imageFile, imageFile.name);
-              }
-            });
-            const res = await strapiClient<Upload[]>('/upload', {
-              method: 'POST',
-              body: formData,
-            });
-            if (slides.length > 1) {
-              const url = res[0].url;
-              const videoId = res[0].id;
-              const thumbnail = res[1].url;
-              const imgId = res[1].id;
-              temporaryMedia.value.push(videoId);
-              temporaryMedia.value.push(imgId);
-              return { success: 1, url, thumbnail, videoId, imgId };
-            } else {
-              const { url, id } = res[0];
-              temporaryMedia.value.push(id);
-              return { success: 1, url, imgId: id };
-            }
-          },
-          handleDeletedFiles: (file) => {
-            if (file.videoId) mediaToDelete.value.push(file.videoId);
-            if (file.imgId) mediaToDelete.value.push(file.imgId);
-          },
-        },
-      },
-      fileset: {
-        class: Fileset,
-        config: {
-          uploadFiles: async (files) => {
-            const formData = new FormData();
-            const filesArray: File[] = Array.from(files);
-            filesArray.forEach((file: File) => {
-              formData.append('files', file, file.name);
-            });
-            try {
-              const res = await strapiClient<Upload[]>('/upload', {
-                method: 'POST',
-                body: formData,
-              });
-
-              return {
-                success: 1,
-                files: res.map((file) => {
-                  temporaryMedia.value.push(file.id);
-                  return {
-                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
-                    extension: file.ext?.slice(1),
-                    size: file.size,
-                    id: file.id,
-                    url: file.url,
-                  };
-                }),
-              };
-            } catch (error) {
-              return { success: 0, error };
-            }
-          },
-          handleDeletedFiles: (id: number) => {
-            mediaToDelete.value.push(id);
-          },
-        },
-      },
-      fileset: {
-        class: Fileset,
-        config: {
-          uploadFiles: async (files) => {
-            const formData = new FormData();
-            const filesArray: File[] = Array.from(files);
-            filesArray.forEach((file: File) => {
-              formData.append('files', file, file.name);
-            });
-            try {
-              const res = await strapiClient<Upload[]>('/upload', {
-                method: 'POST',
-                body: formData,
-              });
-
-              return {
-                success: 1,
-                files: res.map((file) => {
-                  temporaryMedia.value.push(file.id);
-                  return {
-                    title: file.name?.slice(0, file.name?.lastIndexOf('.')),
-                    extension: file.ext?.slice(1),
-                    size: file.size,
-                    id: file.id,
-                    url: file.url,
-                  };
-                }),
-              };
-            } catch (error) {
-              return { success: 0, error };
-            }
-          },
-          handleDeletedFiles: (id: number) => {
-            mediaToDelete.value.push(id);
-          },
-        },
-      },
-    },
+    tools: getSelectedBlockTools(),
+    tunes: props.selectedBlocks ? ['wrapper'] : [],
     i18n,
     minHeight: 400,
     data: props.data,
     holder: props.keyId,
+    defaultBlock: defaultBlock.value,
     // logLevel: 'ERROR',
-    placeholder: 'Clique para iniciar...',
+    placeholder: editorPlaceholder.value,
     onReady: async () => {
       const data = await instance.value.save();
       if (data.blocks.length > 0 && !props.keyId.includes('contribution')) {
@@ -415,20 +176,34 @@ onMounted(() => {
   });
 });
 
-const props = defineProps({
-  data: {
-    type: Object as PropType<editorData>,
-    default: () => ({ blocks: [] }),
-  },
-  keyId: {
-    type: String,
-    default: 'editor',
-  },
-  readOnly: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<propsType>(), {
+  keyId: 'editor',
+  readOnly: false,
+  data: undefined,
+  selectedBlocks: undefined,
+  selectedBlocksMode: false,
+  allowedBlocks: undefined,
 });
+
+const editorPlaceholder = computed(() => {
+  if (
+    props.allowedBlocks?.length === 2 &&
+    props.allowedBlocks.includes('embed') &&
+    props.allowedBlocks.includes('Paragraph')
+  ) {
+    return 'Cole o link do vídeo aqui...';
+  }
+  return 'Clique para iniciar...';
+});
+
+const defaultBlock = computed(() => {
+  if (props.allowedBlocks?.length === 1) {
+    return props.allowedBlocks[0];
+  }
+  return 'paragraph';
+});
+
+const editorBlocks = ref<string[]>(props.allowedBlocks || []);
 
 watch(isEditing, () => {
   if (!viewer.value) return;
@@ -490,12 +265,262 @@ const clearEditor = () => {
 const isReady = async () => {
   return await instance.value.isReady;
 };
+
+const getSelectedBlocks = () => {
+  return selectedNewBlocks.value;
+};
+
+const blockToolsMap = {
+  delimiter: Delimiter,
+  embed: Embed,
+  header: {
+    class: header,
+    shortcut: 'CMD+SHIFT+H',
+    tunes: ['alignmentBlockTune', ...(props.selectedBlocks ? ['wrapper'] : [])],
+    config: {
+      allowAnchor: true,
+      anchorLength: 100,
+    },
+  },
+  image: {
+    class: CustomImage,
+    config: {
+      uploader: {
+        uploadByFile: (file) => {
+          const formData = new FormData();
+          formData.append('files', file, file.name);
+          return strapiClient('/upload', {
+            method: 'POST',
+            body: formData,
+          })
+            .then((res) => {
+              const url = res[0].url;
+              return { success: 1, file: { url } };
+            })
+            .catch((err) => {
+              messageStore.message = err;
+            });
+        },
+      },
+    },
+  },
+  aiText: {
+    class: AIText,
+    config: {
+      openAiKey: app.$config.public.openAiKey,
+    },
+  },
+  inlineCode: {
+    class: InlineCode,
+    shortcut: 'CMD+SHIFT+C',
+  },
+  link: {
+    class: Link,
+    config: {
+      endpoint: '/api/fetch-url',
+    },
+  },
+  list: {
+    class: List,
+    inlineToolbar: true,
+  },
+  marker: {
+    class: Marker,
+    shortcut: 'CMD+SHIFT+M',
+  },
+  quote: {
+    class: Quote,
+    inlineToolbar: true,
+    shortcut: 'CMD+SHIFT+O',
+    config: {
+      quotePlaceholder: 'Insira uma citação',
+      captionPlaceholder: 'Autor da citação',
+    },
+  },
+  table: {
+    class: Table,
+    inlineToolbar: true,
+    config: {
+      rows: 2,
+      cols: 3,
+    },
+  },
+  alignmentBlockTune: {
+    class: AlignmentBlockTune,
+    config: {
+      default: 'left',
+      blocks: {
+        header: 'center',
+        list: 'left',
+      },
+    },
+  },
+  hyperlink: {
+    class: Hyperlink,
+    config: {
+      shortcut: 'CMD+L',
+      target: '_blank',
+      rel: 'nofollow',
+      availableTargets: ['_blank', '_self'],
+      availableRels: ['author', 'noreferrer'],
+      validate: false,
+    },
+  },
+  code: {
+    class: Code,
+    config: {
+      placeholder: 'Escreva o código aqui...',
+    },
+  },
+  alert: {
+    class: Alert,
+    inlineToolbar: true,
+    shortcut: 'CMD+SHIFT+A',
+    config: {
+      defaultType: 'info',
+      messagePlaceholder: 'Enter something',
+    },
+  },
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: true,
+    tunes: ['alignmentBlockTune', ...(props.selectedBlocks ? ['wrapper'] : [])],
+  },
+  warning: {
+    class: Warning,
+    inlineToolbar: true,
+    shortcut: 'CMD+SHIFT+W',
+    config: {
+      titlePlaceholder: 'Título',
+      messagePlaceholder: 'Mensagem',
+    },
+  },
+  carousel: {
+    class: Carousel,
+    config: {
+      handleFileSelected: async (slides) => {
+        const formData = new FormData();
+        slides.forEach((slide) => {
+          if (slide.url instanceof File) {
+            formData.append('files', slide.url, slide.title);
+          } else if (
+            typeof slide.url === 'string' &&
+            slide.url.startsWith('data:')
+          ) {
+            const base64Data = slide.url.split(',')[1];
+            const binaryString = window.atob(base64Data);
+            const byteArray = new Uint8Array(binaryString.length);
+
+            for (let i = 0; i < binaryString.length; i++) {
+              byteArray[i] = binaryString.charCodeAt(i);
+            }
+
+            let mimeType = 'image/png';
+            if (slide.url.startsWith('data:image/jpeg')) {
+              mimeType = 'image/jpeg';
+            }
+
+            const blob = new Blob([byteArray], { type: mimeType });
+            const imageFile = new File([blob], slide.title, {
+              type: mimeType,
+            });
+            formData.append('files', imageFile, imageFile.name);
+          }
+        });
+        const res = await strapiClient<Upload[]>('/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        if (slides.length > 1) {
+          const url = res[0].url;
+          const videoId = res[0].id;
+          const thumbnail = res[1].url;
+          const imgId = res[1].id;
+          temporaryMedia.value.push(videoId);
+          temporaryMedia.value.push(imgId);
+          return { success: 1, url, thumbnail, videoId, imgId };
+        } else {
+          const { url, id } = res[0];
+          temporaryMedia.value.push(id);
+          return { success: 1, url, imgId: id };
+        }
+      },
+      handleDeletedFiles: (file) => {
+        if (file.videoId) mediaToDelete.value.push(file.videoId);
+        if (file.imgId) mediaToDelete.value.push(file.imgId);
+      },
+    },
+  },
+  fileSet: {
+    class: Fileset,
+    config: {
+      uploadFiles: async (files) => {
+        const formData = new FormData();
+        const filesArray: File[] = Array.from(files);
+        filesArray.forEach((file: File) => {
+          formData.append('files', file, file.name);
+        });
+        try {
+          const res = await strapiClient<Upload[]>('/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          return {
+            success: 1,
+            files: res.map((file) => {
+              temporaryMedia.value.push(file.id);
+              return {
+                title: file.name?.slice(0, file.name?.lastIndexOf('.')),
+                extension: file.ext?.slice(1),
+                size: file.size,
+                id: file.id,
+                url: file.url,
+              };
+            }),
+          };
+        } catch (error) {
+          return { success: 0, error };
+        }
+      },
+      handleDeletedFiles: (id: number) => {
+        mediaToDelete.value.push(id);
+      },
+    },
+  },
+  wrapper: {
+    class: Wrapper,
+    config: {
+      toggleSelect: (value, block) => {
+        selectedNewBlocks.value = value
+          ? [...selectedNewBlocks.value, block.id]
+          : selectedNewBlocks.value.filter((id) => id !== block.id);
+        emit('update:selectedBlocks', selectedNewBlocks.value);
+      },
+      isSelected: (block) => props.selectedBlocks?.includes(block.id),
+    },
+  },
+};
+
+const getSelectedBlockTools = () => {
+  if (editorBlocks.value.length === 0) {
+    return blockToolsMap;
+  }
+  return editorBlocks.value.reduce((acc, name) => {
+    if (blockToolsMap[name]) {
+      acc[name] = blockToolsMap[name];
+    }
+    return acc;
+  }, {});
+};
+
 defineExpose({
   getData,
   loadEditor,
   toggleReadOnly,
   clearEditor,
   isReady,
+  getSelectedBlocks,
 });
 </script>
 
@@ -522,6 +547,12 @@ defineExpose({
   }
   .codex-editor--narrow {
     background-color: white !important;
+  }
+}
+
+.disabled-paragraph {
+  [data-item-name='paragraph'] {
+    display: none;
   }
 }
 

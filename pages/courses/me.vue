@@ -245,7 +245,6 @@ definePageMeta({
 });
 const { find } = useStrapiUtils();
 const { update } = useStrapi();
-const learningPlanStore = useLearningPlanStore();
 const { t } = useI18n();
 
 const coursesView = ref('grid');
@@ -512,8 +511,9 @@ const navigate = (id: number, page) => {
   height: min-content;
   column-gap: 24px;
   row-gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
-  justify-content: center; /* Centers the grid items horizontally */
+  /* grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important; */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 375px)) !important;
+  justify-content: start; /* Centers the grid items horizontally */
 }
 
 .flex-stretch {
