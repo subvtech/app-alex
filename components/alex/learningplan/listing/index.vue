@@ -138,10 +138,12 @@
                 name: item.facilitator?.user.fullname || '',
                 imageURL: item.facilitator?.user.avatar?.url,
               }"
-              :leader="{
-                name: item.leader?.user.fullname || '',
-                imageURL: item.leader?.user.avatar?.url,
-              }"
+              :leader="
+                item.leader && {
+                  name: item.leader?.user.fullname || '',
+                  imageURL: item.leader?.user.avatar?.url,
+                }
+              "
               :members="getUrlNameMembers(item.learningPlan.members)"
               :hide="item.learningPlan.hidden"
               :trails-count="
@@ -540,7 +542,7 @@ const navigate = (id: number, page: string) => {
     navigateTo(`/${listType}/${id}`);
   }
 };
-const showingData = (groupedItems: Array<any>, items: Array<any>) => {
+const showingData = (groupedItems: any, items: Array<any>) => {
   const itemsPerPage =
     search.value === '' ? itemsPerPageValue : groupedItems.length;
   const from = (page.value - 1) * itemsPerPage + 1;

@@ -158,6 +158,9 @@
         }"
       >
         <alex-learningplan-card-info
+          v-if="
+            (type === 'project' && leader) || (type === 'course' && facilitator)
+          "
           class="flex-1-1"
           :avatar="{
             url:
