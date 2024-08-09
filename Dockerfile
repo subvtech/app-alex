@@ -11,8 +11,8 @@ ARG components_page
 ARG matomo_app_id
 ARG matomo_url
 ARG open_ai_key
-ARG tip_tap_app_id
-ARG tip_tap_key
+ARG tiptap_app_id
+ARG tiptap_key
 
 WORKDIR /opt/app
 RUN addgroup -S alex && adduser -S alex -G alex
@@ -30,8 +30,8 @@ ENV COMPONENTS_PAGE=$components_page
 ENV MATOMO_APP_ID=$matomo_app_id
 ENV MATOMO_URL=$matomo_url
 ENV OPEN_AI_KEY=$open_ai_key
-ENV TIP_TAP_APP_ID=$tip_tap_app_id
-ENV TIP_TAP_KEY=$tip_tap_key
+ENV TIPTAP_APP_ID=$tiptap_app_id
+ENV TIPTAP_KEY=$tiptap_key
 
 RUN yarn build
 
