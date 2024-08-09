@@ -14,25 +14,26 @@
       >
         {{ title || '(' + $t('components.courses.tasks.noTitle') + ')' }}
       </p>
-      <div>
-        <p
+      <div
+        ref="descContainer"
+        class="tw-relative tw-max-h-[60px] overflow-hidden"
+      >
+        <TipTap
           ref="descEl"
-          class="text-body-3 text-gray-800"
-          :class="!expanded ? 'ellipsis lines-2' : ''"
-        >
-          {{ description || `(${$t('components.courses.tasks.noDesc')})` }}
-        </p>
+          v-model="descRef"
+          class="pa-0"
+          :class="ellipsis && 'tw-shadow-inner'"
+          :edit="false"
+          :collaboration="false"
+          @change:height="(height) => hasEllipsis(height)"
+        />
       </div>
       <div v-if="ellipsis" class="d-flex justify-end">
         <alex-custom-button
           variant="text"
           class="tw-mt-2 px-3 text-p6 text-gray-800"
-          @click="expanded = !expanded"
-          >{{
-            !expanded
-              ? $t('components.courses.tasks.expand')
-              : $t('components.courses.tasks.retract')
-          }}
+          @click="handleEdit"
+          >{{ $t('components.courses.tasks.expand') }}
         </alex-custom-button>
       </div>
     </div>
@@ -115,6 +116,7 @@ import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
 
 interface HeaderProps {
+  id: number;
   title: string;
   status: TaskStatus | (string & {});
   description: string;
@@ -139,6 +141,16 @@ const { t } = useI18n();
 const handleEdit = () => {
   emit('edit-click');
 };
+
+const descRef = ref(props.description);
+
+watch(
+  () => props.description,
+  (val) => {
+    descRef.value = val;
+    descEl.value?.emitHeight();
+  },
+);
 
 const statusCfg = {
   draft: {
@@ -173,8 +185,9 @@ const statusCfg = {
 
 // Refs
 const { md } = useDisplay();
-const descEl = ref<HTMLParagraphElement | undefined>(undefined);
-const expanded = ref<boolean>(false);
+const descContainer = ref<HTMLDivElement | undefined>(undefined);
+const descEl = ref<any | undefined>(undefined);
+// const expanded = ref<boolean>(false);
 const ellipsis = ref<boolean>(false);
 const formatDate = (date: Date | string) => {
   if (typeof date === 'string') {
@@ -191,23 +204,14 @@ const typeSubmission = computed(() => {
   }
   return t('components.courses.tasks.submission.noSubmission');
 });
-function hasEllipsis() {
-  if (!descEl.value) return false;
 
-  ellipsis.value = descEl.value.offsetHeight < descEl.value.scrollHeight;
+function hasEllipsis(height = descEl.value?.clientHeight) {
+  if (!descContainer.value || !height) return false;
+
+  ellipsis.value = descContainer.value.getBoundingClientRect().height < height;
 }
 
-watch(descEl, () => hasEllipsis());
-
-onMounted(() => {
-  hasEllipsis();
-
-  window.addEventListener('resize', hasEllipsis);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', hasEllipsis);
-});
+onMounted(() => descEl.value?.emitHeight());
 </script>
 
 <style scoped></style>

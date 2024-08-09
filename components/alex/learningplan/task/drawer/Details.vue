@@ -103,6 +103,7 @@
             :task-member-id="taskMemberId"
             :content="submissions.data[0]"
             :task-status="status"
+            :doc-name="docName"
             @update-task-status="handleChangeStatus"
             @update-submission="$emit('update-submission')"
           />
@@ -225,6 +226,7 @@ interface DetailsDrawerProps {
     }[];
   };
   title?: string;
+  docName?: string;
   description?: string;
   status?: TaskMemberStatus;
   type?: string;
@@ -240,6 +242,7 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   tags: () => [],
   title: '',
   description: '',
+  docName: '',
   status: 'to_do',
   type: undefined,
   startDate: undefined,

@@ -216,6 +216,7 @@
     "tags": "Sem marcações",
     "date": "Sem data",
     "class": "Sem turma",
+    "members": "Sem membros",
     "restrictions": "Sem restrições",
     "submissions": "Parece que ainda não temos entregas",
     "description": "Sem descrição",
@@ -238,5 +239,7 @@
   "date": {
     "placeholder": "Selecione uma data"
   },
-  "students": "Alunos"
+  "students": "Alunos",
+  "savingIn": "Salvo automaticamente há %{seconds} segundos",
+  "saving": "Salvando..."
 }

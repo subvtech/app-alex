@@ -48,6 +48,7 @@
       v-model="detailsDrawer"
       :task-id="selectedTask.task.id"
       :learningplan-id="learningplanId"
+      :doc-name="selectedTask.doc_name"
       :tags="selectedTask.task.tags"
       :title="selectedTask.task.title"
       :trail="selectedTask.task.trail"
@@ -168,6 +169,7 @@ const { data: tasks, execute } = await useAsyncData(
       const dataValue = filteredData.map((task) => ({
         id: task.id,
         status: task.status,
+        doc_name: task.doc_name,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         title: task.task?.title,
         user: {
@@ -234,7 +236,21 @@ const handleUpdateStatus = async (
         throw new Error('missingSubmission');
       }
       if (newStatus === 'in_review' && lastSubmission) {
+        const lastSubRes = await strapi.findOne('task-submissions', {
+          fields: ['submission'],
+          filters: {
+            id: lastSubmission.id,
+          },
+        });
+
+        // Valor atualizado da ultima submissão, caso tenha sido alterado
+        const lastSubVal =
+          lastSubRes.data && lastSubRes.data[0].attributes.submission;
+
         await strapi.update('task-submissions', lastSubmission.id, {
+          submission: lastSubVal
+            ? lastSubVal.submission
+            : lastSubmission.submission,
           submitted_at: time.toISOString(),
         });
       }

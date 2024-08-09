@@ -3,7 +3,9 @@
     v-model="dialog"
     :persistent="true"
     :max-width="1080"
-    :no-footer="props.readOnly"
+    :retain-focus="false"
+    no-click-animation
+    no-footer
   >
     <template #header>
       <alex-custom-dialog-header :title="title" @on-close="dialog = false">
@@ -17,39 +19,19 @@
         </template>
       </alex-custom-dialog-header>
     </template>
-    <div class="mx-auto editor my-6 px-sm-6 px-1 px-md-0 w-100">
-      <app-editor
-        ref="editor"
-        :allowed-blocks="allowedBlocks"
-        @change="() => (hasEditorChanges = true)"
+    <div class="mx-auto editor my-6 px-sm-6 px-md-0 w-100">
+      <tip-tap
+        v-model="editorContent"
+        :doc-name="docName"
+        :edit="!isReadOnly"
+        :collaboration="!!docName"
+        :allowed-blocks="props.restrictions ? props.restrictions : []"
+        :show-loader="true"
       />
     </div>
-    <template v-if="!props.readOnly" #footer>
-      <v-container
-        class="bg-white rounded-b-lg border-top-gray-100 d-flex justify-end ga-3 pa-6 align-center"
-      >
-        <p v-if="lastSaveDate" class="text-body-4 text-gray-400">
-          {{
-            $t('components.courses.tasks.submission_modal.saved_at', {
-              time: differenceInMinutes(currentDate, lastSaveDate),
-            })
-          }}
-        </p>
-        <alex-custom-button
-          size="large"
-          variant="secondary"
-          :text="t('components.courses.tasks.submission_modal.save_btn')"
-          :loading="isLoading"
-          :disabled="!hasEditorChanges"
-          @click="saveSubmission"
-        />
-      </v-container>
-    </template>
   </alex-custom-dialog>
 </template>
 <script setup lang="ts">
-import { differenceInMinutes } from 'date-fns';
-import { useIntervalFn } from '@vueuse/core';
 import lodash from 'lodash';
 import { EditorSubmission } from '~/models/simple/taskSubmissionSimples.model';
 interface submissionProps {
@@ -59,6 +41,7 @@ interface submissionProps {
   taskMemberId: number;
   restrictions?: string[];
   lastSubmission?: TaskSubmissionSimple;
+  docName?: string;
   readOnly?: boolean;
 }
 
@@ -68,97 +51,135 @@ const props = withDefaults(defineProps<submissionProps>(), {
   restrictions: undefined,
   lastSubmission: undefined,
   readOnly: false,
+  docName: undefined,
 });
+
+const isReadOnly = ref(props.readOnly);
+
 type Emits = {
   'update-task-status': [status: TaskMemberStatus];
   'update-submission': [];
 };
+
+const saveTime = 6; // Tempo em que a request vai ser repetida (em s)
+let saveInterval;
+
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const dialog = ref(false);
-const editor = ref();
+const prevEditorContent = ref('');
+const editorContent = ref<any | undefined>(undefined);
 const isLoading = ref(false);
-const { create, update } = useStrapi();
+const { create, update, findOne } = useStrapi();
 const currentData = ref<EditorSubmission>();
 const taskMemberId = toRef(props, 'taskMemberId');
 const hasEditorChanges = ref(false);
 const lastSaveDate = ref<Date | null>(null);
-const currentDate = ref<Date>(new Date());
-const { resume: resumeCurrentDate, pause: pauseCurrentDate } = useIntervalFn(
-  () => {
-    currentDate.value = new Date();
-  },
-  1000,
-  { immediate: false },
-);
-const { resume, pause } = useIntervalFn(
-  async () => {
-    hasEditorChanges.value = await checkDataChanges();
-    if (hasEditorChanges.value) {
-      await saveContent();
-      lastSaveDate.value = new Date();
-    }
-  },
-  6000,
-  { immediate: false },
-);
-const checkEditorReady = async () => {
-  let attempts = 0;
-  while (attempts < 10) {
-    try {
-      await editor.value.isReady;
-      return true;
-    } catch (error) {
-      await sleep(100);
-      attempts++;
-    }
+
+const saveCountDown = ref<number>(saveTime);
+
+watch(editorContent, (_, previous) => {
+  prevEditorContent.value = previous;
+});
+
+const saveSubmissionLoop = async () => {
+  if (saveCountDown.value) {
+    saveCountDown.value = saveCountDown.value - 1;
+    return;
   }
-  return false;
+
+  const changed = await checkDataChanges();
+
+  if (changed) {
+    hasEditorChanges.value = changed;
+    saveContent();
+  }
+
+  saveCountDown.value = saveTime;
 };
 
 const checkDataChanges = async () => {
-  await checkEditorReady();
-  const editorData = await editor.value?.getData();
-  const data1 = editorData?.data?.blocks;
-  if (!data1 || !data1.length) return false;
-  const data2 = toRaw(currentData.value?.blocks);
-  const test = lodash.isEqual(data1, data2);
-  return !test;
+  const taskSubmission = await findOne('task-submissions', {
+    filters: {
+      id: props.lastSubmission?.id || 0,
+    },
+  });
+  const submissionStatus = taskSubmission.data[0]?.attributes?.submitted_at;
+
+  if (submissionStatus) {
+    setMessage(
+      t('components.courses.tasks.submission_modal.in_review'),
+      'blue',
+      true,
+      false,
+      true,
+    );
+    isReadOnly.value = true;
+    clearInterval(saveInterval);
+    emit('update-task-status', 'in_review');
+    saveSubmission();
+    return false;
+  }
+
+  const lastSubmission =
+    taskSubmission.data && taskSubmission.data[0]?.attributes?.submission;
+
+  if (!lastSubmission) {
+    return editorContent.value !== undefined;
+  }
+
+  if (editorContent.value === undefined) {
+    return false;
+  }
+
+  // Compare nested arrays
+  if (lastSubmission.content.length !== editorContent.value?.content.length) {
+    return true;
+  }
+
+  for (let i = 0; i < lastSubmission.content.length; i++) {
+    if (
+      !lodash.isEqual(
+        lastSubmission.content[i].content,
+        toRaw(editorContent.value?.content[i].content),
+      )
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 };
 
 const openDialog = async () => {
   dialog.value = true;
   isLoading.value = true;
   currentData.value = props.lastSubmission?.submission || undefined;
-  resume();
-  resumeCurrentDate();
+
   await executeSubmissions();
-  hasEditorChanges.value = await checkDataChanges();
-  if (await checkEditorReady()) {
-    if (props.lastSubmission?.submission) {
-      await editor.value?.loadEditor(
-        JSON.parse(JSON.stringify(props.lastSubmission?.submission)),
-      );
-    }
-    if (props.readOnly) {
-      await editor.value?.toggleReadOnly();
-    }
+
+  if (!isReadOnly.value) {
+    hasEditorChanges.value = await checkDataChanges();
+    saveInterval = setInterval(async () => await saveSubmissionLoop(), 1000);
+  } else {
+    loadEditorData();
   }
+
+  saveCountDown.value = saveTime;
+
   isLoading.value = false;
 };
 const saveContent = async () => {
-  const content = await editor.value.getData();
-  currentData.value = content.data;
   if (props.lastSubmission?.id) {
     await update('task-submissions', props.lastSubmission.id, {
-      submission: content.data,
+      submission: editorContent.value,
     });
     emit('update-submission');
   } else {
     await create('task-submissions', {
       task_member: props.taskMemberId,
-      submission: content.data,
+      submission: editorContent.value,
     });
     emit('update-submission');
   }
@@ -174,7 +195,6 @@ const saveContent = async () => {
 const { execute: executeSubmissions } = useTaskSubmission(taskMemberId);
 const saveSubmission = async () => {
   isLoading.value = true;
-  await checkEditorReady();
   try {
     await saveContent();
     setMessage(
@@ -194,43 +214,19 @@ const saveSubmission = async () => {
   }
 };
 
-const allowedBlocks = computed(() => {
-  const restrictionMap = {
-    text: [
-      'Paragraph',
-      'header',
-      'delimiter',
-      'list',
-      'inlineCode',
-      'marker',
-      'quote',
-      'table',
-      'alert',
-      'warning',
-      'code',
-      'alignmentBlockTune',
-    ],
-    link: ['link'],
-    image: ['image'],
-    gallery: ['carousel', 'Paragraph'],
-    video: ['embed', 'Paragraph'],
-    document: ['fileSet', 'Paragraph'],
-  };
-
-  const blocksSet = new Set();
-  props.restrictions?.forEach((restriction) => {
-    const blocksToAdd = restrictionMap[restriction];
-    blocksToAdd?.forEach((block: string) => blocksSet.add(block));
-  });
-
-  return Array.from(blocksSet) as string[];
-});
+// Caso a tarefa esteja em avaliação ou enviada, pega o valor do banco
+const loadEditorData = () => {
+  editorContent.value = props.lastSubmission?.submission;
+};
 
 watch(dialog, (value) => {
   if (!value) {
     lastSaveDate.value = null;
-    pause();
-    pauseCurrentDate();
+    clearInterval(saveInterval);
+
+    if (!isReadOnly.value) {
+      saveSubmission();
+    }
   }
 });
 defineExpose({

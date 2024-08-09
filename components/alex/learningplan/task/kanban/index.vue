@@ -139,6 +139,7 @@ export interface TaskStudent {
   maxMark?: number;
   task?: TaskSimple;
   submissions?: TaskSubmissionSimple[];
+  doc_name?: string;
 }
 
 export interface InsertCardProps {

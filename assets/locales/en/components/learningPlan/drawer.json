@@ -219,6 +219,7 @@
     "tags": "No tags",
     "class": "No class",
     "date": "No date",
+    "members": "No members",
     "restrictions": "No restrictions",
     "submissions": "It looks like we don't have any deliveries yet",
     "description": "No description",
@@ -241,5 +242,7 @@
   "date": {
     "placeholder": "Choose a date"
   },
-  "students": "Students"
+  "students": "Students",
+  "savingIn": "Autosaved %{seconds} seconds ago",
+  "saving": "Saving..."
 }

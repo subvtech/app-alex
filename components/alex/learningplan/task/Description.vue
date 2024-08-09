@@ -4,35 +4,29 @@
       {{ title || $t('components.learningPlan.drawer.task.description.label') }}
     </p>
 
-    <alex-inputs-text-area
-      v-if="edit"
-      v-model="model"
-      name="description"
-      :placeholder="
-        $t('components.learningPlan.drawer.task.description.placeHolder')
-      "
-      variant="outlined"
-      density="comfortable"
-      hide-details
-    />
-    <p
-      v-else
-      class="text-body-3"
-      :class="model ? 'text-gray-800' : 'text-gray-400'"
-    >
-      {{ model || $t('components.learningPlan.drawer.missing.description') }}
-    </p>
+    <div class="rounded-lg pa-0" :class="edit && 'border tw-min-h-[102px]'">
+      <TipTap
+        v-model="model"
+        :mention-users="mentionUsers"
+        :edit="edit"
+        :allowed-blocks="['text']"
+        :collaboration="false"
+        :fixed-menu="true"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+
 interface DescriptionProps {
-  // Tipar certinho
   edit?: boolean;
   title?: string;
+  mentionUsers?: MentionUserPropsArray;
 }
 
 defineProps<DescriptionProps>();
 
-const model = defineModel<string>();
+const model = defineModel({ required: true });
 </script>

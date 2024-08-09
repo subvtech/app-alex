@@ -1,6 +1,7 @@
 <template>
   <alex-custom-dialog
     v-model="open"
+    persistent
     class="alex-trails-modal"
     body-classes="pa-0"
     :title="$t('components.learningPlan.drawer.task.learningResources.label')"
@@ -132,6 +133,7 @@ interface propsType {
   trailId?: number;
   blocks?: BlockSimple[] | number[];
   edit?: boolean;
+  teacher?: boolean;
 }
 
 const props = withDefaults(defineProps<propsType>(), {
@@ -139,6 +141,7 @@ const props = withDefaults(defineProps<propsType>(), {
   trailId: undefined,
   blocks: undefined,
   edit: false,
+  teacher: false,
 });
 
 const editMode = ref(props.edit);
@@ -153,7 +156,7 @@ const learningStructure = computed(() => {
 
 const hideFooter = computed(() => {
   if (selectedTrail.value) {
-    return !editMode.value;
+    return !props.teacher;
   }
 
   return paginationLength.value <= 1;
