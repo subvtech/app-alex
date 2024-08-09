@@ -4,7 +4,10 @@
     :class="{ 'flex-row-reverse': order === 'FIRST_ON_TOP' }"
     data-testid="alex-avatar-group"
   >
-    <template v-for="({ name, image }, index) in avatarsToShow" :key="index">
+    <template
+      v-for="({ name, image, className }, index) in avatarsToShow"
+      :key="index"
+    >
       <v-avatar
         data-testid="alex-avatar"
         :size="size"
@@ -12,8 +15,8 @@
         class="alex-avatar-group-border alex-avatar-group-margin"
         color="gray-100"
       >
-        <template v-if="!image" #default>
-          <p class="text-gray-600">
+        <template v-if="!image?.url" #default>
+          <p class="text-gray-600" :class="className">
             {{ getInitials(name) }}
           </p>
         </template>
@@ -39,6 +42,7 @@ interface AvatarImageType {
 interface avatar {
   name: string;
   image?: AvatarImageType;
+  className?: string;
 }
 interface AvatarGroupProps {
   avatarItems: avatar[];

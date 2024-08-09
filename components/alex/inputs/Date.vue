@@ -21,7 +21,7 @@
       clear-icon="mdi-close"
       class="w-100"
       type="date"
-      append-inner-icon="mdi-calendar"
+      :append-inner-icon="!hideIcon ? 'mdi-calendar' : ''"
       :error-messages="errorMessage"
       :disabled="disabled"
       :required="required"
@@ -63,6 +63,7 @@ interface DatePickerProps {
   label?: string;
   required?: boolean;
   disabled?: boolean;
+  hideIcon?: boolean;
   info?: string;
   theme?: 'light' | 'dark';
   allowedDates?: (value?: any) => boolean;
@@ -73,6 +74,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   modelValue: undefined,
   required: false,
   disabled: false,
+  hideIcon: false,
   info: undefined,
   theme: 'light',
   allowedDates: () => true,

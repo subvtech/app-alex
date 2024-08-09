@@ -1,0 +1,9 @@
+{
+  "notFound": "Tarefa não encontrada",
+  "cantUpdateMembers": "Não foi possível atualizar os members",
+  "errors": {
+    "updateStatusTask": "Erro ao atualizar o status da tarefa",
+    "updateDeadlineMember": "Erro ao atualizar o tempo de entrega do aluno",
+    "updateSendAfterDeadline": "Erro ao atualizar a entrega do aluno"
+  }
+}

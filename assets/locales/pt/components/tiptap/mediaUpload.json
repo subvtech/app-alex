@@ -1,0 +1,37 @@
+{
+  "image": {
+    "button": "Selecione uma imagem",
+    "title": "Adicione uma imagem",
+    "selectType": "Como você deseja adicionar a imagem?",
+    "filePlaceholder": "Arraste e Solte a imagem aqui ou ",
+    "action": "clique para buscar",
+    "urlPlaceholder": "Sua imagem aparecerá aqui",
+    "dropMessage": "Solte a imagem aqui para fazer o upload"
+  },
+  "video": {
+    "button": "Selecione um vídeo",
+    "title": "Adicione um vídeo",
+    "selectType": "Como você deseja adicionar o vídeo?",
+    "filePlaceholder": "Arraste e Solte  o vídeo aqui ou ",
+    "action": "clique para buscar",
+    "urlPlaceholder": "Seu vídeo será exibido aqui",
+    "dropMessage": "Solte o vídeo aqui para fazer o upload"
+  },
+  "errors": {
+    "fileType": "O tipo de arquivo é inválido.",
+    "fileSize": "O tamanho do arquivo é muito grande.",
+    "imageSelected": "A URL inserida é uma imagem. Por favor, selecione uma url para um vídeo.",
+    "videoSelected": "A URL inserida é um vídeo. Por favor, selecione uma url para uma imagem.",
+    "invalidVideo": "A URL do vídeo não é válida.",
+    "url": "Por favor, insira uma URL válida.",
+    "upload": "Ocorreu um erro ao fazer o upload do arquivo."
+  },
+  "tooltip": {
+    "center": "Alinhar ao Centro",
+    "start": "Alinhar à Esquerda",
+    "end": "Alinhar à Direita"
+  },
+  "inputPlaceholder": "Cole a URL aqui",
+  "fileButton": "Arquivo",
+  "urlButton": "URL"
+}

@@ -24,7 +24,7 @@
       clear-icon="mdi-close"
       variant="outlined"
       :error-messages="errorMessage"
-      :class="theme"
+      :class="[theme, density]"
       :disabled="disabled"
       v-bind="$attrs"
     >
@@ -52,6 +52,7 @@ interface TextFieldProps {
   theme?: 'light' | 'dark';
   schema?: YupSchema;
   class?: string;
+  density?: 'comfortable' | 'compact' | 'default';
 }
 
 const props = withDefaults(defineProps<TextFieldProps>(), {
@@ -62,6 +63,7 @@ const props = withDefaults(defineProps<TextFieldProps>(), {
   modelValue: undefined,
   schema: undefined,
   class: undefined,
+  density: 'default',
 });
 
 const { value, errorMessage } = useField(() => props.name, props.schema, {
@@ -98,6 +100,19 @@ const textColor = computed(() => {
     line-height: 135% !important;
     letter-spacing: 0.32px !important;
     border-width: 5px;
+    min-height: 30px !important;
+  }
+
+  .default .v-field__input {
+    height: 52px !important;
+  }
+
+  .comfortable .v-field__input {
+    height: 44px !important;
+  }
+
+  .compact .v-field__input {
+    height: 36px !important;
   }
 
   .v-field--disabled > div > i,
