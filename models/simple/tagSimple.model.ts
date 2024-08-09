@@ -7,4 +7,5 @@ export interface TagSimple {
   isPublic: boolean;
   isGeneral: boolean;
   learningplans: LearningPlanSimple;
+  tasks: TaskSimple;
 }

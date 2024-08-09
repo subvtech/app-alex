@@ -27,7 +27,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       populate: ['verb'],
     },
     groups: {
-      populate: ['group_members.student_member.user.avatar'],
+      populate: ['group_members.student_member.user.avatar', 'task_members'],
     },
     learning_structures: {
       populate: {
@@ -42,6 +42,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'in_charge_member.user.avatar',
         'learning_plan_members.user.avatar',
         'learning_plan_groups.group_members.student_member.user.avatar',
+        'learning_plan_groups.task_members',
         'invitation_links',
         'meeting_schedules.meetings',
       ],
@@ -52,6 +53,16 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     },
     members: {
       populate: ['user.avatar', 'user.cover'],
+    },
+    tasks: {
+      populate: [
+        'blocks',
+        'learning_goals',
+        'trail',
+        'tags',
+        'task_members.learning_plan_member.user.avatar',
+        'task_members.learning_plan_group.group_members.student_member.user.avatar',
+      ],
     },
   };
 
@@ -176,7 +187,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const userClass = computed(() => {
-    return learningPlan.value?.classes.find(
+    return learningPlan.value?.classes?.find(
       (c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id),
     );
   });
@@ -200,6 +211,13 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const technicalTags = computed(
     () => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral),
   );
+  const userLearningMember = computed(
+    () =>
+      learningPlan.value?.members.find(
+        (member) => member.user.id === user.value.id,
+      ),
+  );
+
   return {
     learningPlan,
     loadLearningPlan,
@@ -221,5 +239,6 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     schedules,
     generalTags,
     technicalTags,
+    userLearningMember,
   };
 });

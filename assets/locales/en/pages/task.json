@@ -1,0 +1,95 @@
+{
+  "searchPlaceholder": "Find task",
+  "draft": "Draft",
+  "published": "Published",
+  "done": "Closed",
+  "archived": "Archived",
+  "emptyState": {
+    "draft": "No tasks in draft!",
+    "published": "No published tasks!",
+    "done": "No closed tasks!",
+    "archived": "No archived tasks!"
+  },
+  "submissions": {
+    "toDo": "To Do",
+    "doing": "Doing",
+    "underReview": "Under Review",
+    "done": "Done",
+    "progress": "Progress",
+    "deliveries": "Deliveries",
+    "delivery": "Delivery",
+    "noSubmissions": "No submissions",
+    "student": "Student",
+    "students": "Students",
+    "group": "Group",
+    "groups": "Groups"
+  },
+  "table": {
+    "header": {
+      "title": "Name",
+      "deadline_at": "Deadline",
+      "type": "Type",
+      "students": "Members",
+      "delivered": "Delivery"
+    },
+    "type": {
+      "individual": "Individual",
+      "group": "Group"
+    },
+    "placeholders": {
+      "undefined": "Undefined",
+      "noMembers": "None",
+      "noTasks": "No tasks found"
+    },
+    "dropdown": {
+      "kanban": "View Kanban",
+      "delete": "Delete",
+      "publish": "Publish",
+      "details": "View details",
+      "draft": "Draft",
+      "close": "Close",
+      "archive": "Archive",
+      "unarchive": "Unarchive"
+    },
+    "tooltips": {
+      "options": "Options",
+      "kanban": "View Kanban"
+    },
+    "crud": {
+      "addSuccess": "created",
+      "editSuccess": "edited",
+      "deleteSuccess": "deleted",
+      "archiveSuccess": "archived",
+      "unarchiveSuccess": "unarchived",
+      "addError": "create",
+      "archiveError": "archive",
+      "unarchiveError": "unarchive",
+      "editError": "edit",
+      "deleteError": "delete",
+      "moveSuccess": "moved",
+      "moveError": "move",
+      "errorMessage": "Error while trying to {action} task, please try again!",
+      "successMessage": "Task {action} successfully!",
+      "dndSortError": "It is not possible to change the task position when sorting by {type} is active",
+      "dndFilterError": "It is not possible to change the task position when filtering is active",
+      "TASK_DATA_INCOMPLETE": "You need to fill in the task info before setting it as published",
+      "TASK_MOVE_HAS_DELIVERIES": "It is not possible to move the task to draft because it has deliveries"
+    },
+    "deleteModal": {
+      "title": "Do you really want to delete this Task?",
+      "subtitle": "When deleting a task, all content created within it will also be deleted.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "filterChip": {
+      "select": "Type",
+      "archivedTasks": "Archived Tasks",
+      "startDate": "Start Date",
+      "finalDate": "End Date"
+    },
+    "add": "Add task",
+    "addPlaceholder": "Enter the task title",
+    "addButton": "Add"
+  },
+  "add": "Add task"
+}

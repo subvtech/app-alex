@@ -1,0 +1,7 @@
+{
+  "error": {
+    "userNotLoggedIn": "You must be logged in to access the editor.",
+    "gettingToken": "Error while trying to connect to the server. Please try again later.",
+    "contentError": "An error occurred. Please refresh the page and try again."
+  }
+}

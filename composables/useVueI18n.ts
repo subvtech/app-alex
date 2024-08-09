@@ -5,8 +5,11 @@ import { useImportLanguages } from './useImportedLanguages';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
+export const defaultBrowserLanguage = navigator.language.startsWith('pt')
+  ? 'pt'
+  : 'en';
 export const i18n = createI18n({
-  locale: 'pt',
+  locale: defaultBrowserLanguage,
   legacy: false,
   missingWarn: false,
   globalInjection: true,
@@ -64,8 +67,10 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'trailId',
     'forgot',
     'classes',
+    'tasks',
     'emailConfirmation',
     'trails',
+    'task',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
@@ -94,9 +99,12 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'learningPlan/link',
     'learningPlan/dialogs',
     'learningPlan/list',
+    'learningPlan/members',
     'learningPlan/page',
     'learningPlan/viewer',
     'learningPlan/join',
+    'learningPlan/submissions',
+    'learningPlan/drawer',
     'forgot/sendResetPassword',
     'profile/about',
     'profile/courses',
@@ -113,6 +121,10 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'trails/tasks',
     'trails/contributions',
     'editorjs/fileSet',
+    'tiptap/menus',
+    'tiptap/messages',
+    'tiptap/mediaUpload',
+    'tiptap/bookmark',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

@@ -15,6 +15,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/strapi',
     '@nuxt/test-utils/module',
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
   ],
   testUtils: {},
   pinia: {
@@ -31,6 +33,8 @@ export default defineNuxtConfig({
       matomoUrl: process.env.MATOMO_URL,
       showComponentsPage: process.env.COMPONENTS_PAGE === 'on',
       openAiKey: process.env.OPEN_AI_KEY,
+      tipTapKey: process.env.TIPTAP_KEY,
+      tipTapAppId: process.env.TIPTAP_APP_ID,
     },
   },
   strapi: {
@@ -38,6 +42,14 @@ export default defineNuxtConfig({
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },
+  },
+  shadcn: {
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * @default "./components/ui"
+     */
+    componentDir: './components/ui',
   },
   imports: {
     dirs: ['stores', 'models', 'config', 'models/simple'],

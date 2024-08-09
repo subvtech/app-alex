@@ -33,10 +33,7 @@
   "weekly": "Weekly",
   "biweekly": "Biweekly",
   "monthly": "Monthly",
-  "empty": {
-    "facilitator": "It seems that there are no meetings available",
-    "student": "It seems that you don't have any meetings scheduled"
-  },
+  "empty": "It seems there are no synchronous meetings",
   "edit": "Edit",
   "add": "Add",
   "cancel": "Cancel",
