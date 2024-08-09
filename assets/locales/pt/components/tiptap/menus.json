@@ -1,0 +1,55 @@
+{
+  "slashMenu": {
+    "format": "Formatação",
+    "heading1": "Título 1",
+    "heading2": "Título 2",
+    "heading3": "Título 3",
+    "quote": "Citação",
+    "bulletList": "Lista não ordenada",
+    "orderedList": "Lista ordenada",
+    "todoList": "Lista de tarefas",
+    "codeBlock": "Bloco de código",
+    "insert": "Inserir",
+    "attaches": "Anexos",
+    "horizontalRule": "Linha horizontal",
+    "table": "Tabela",
+    "carousel": "Carrossel",
+    "image": "Imagem",
+    "video": "Vídeo",
+    "link": "Link",
+    "noResults": "Nenhum resultado encontrado"
+  },
+  "bubbleMenu": {
+    "blocks": {
+      "hierarchy": "Hierarquia",
+      "paragraph": "Parágrafo",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "lists": "Listas",
+      "bulletList": "Lista não ordenada",
+      "orderedList": "Lista ordenada",
+      "todoList": "Lista de tarefas"
+    },
+    "tooltip": {
+      "bold": "Negrito",
+      "italic": "Itálico",
+      "strike": "Riscado",
+      "underline": "Sublinhado",
+      "inlineCode": "Código em linha",
+      "link": "Inserir Link",
+      "highlightColor": "Cor de destaque",
+      "textColor": "Cor do texto",
+      "subscript": "Subscrito",
+      "superscript": "Sobrescrito"
+    },
+    "linkPlaceholder": "Insira um link"
+  },
+  "dragMenu": {
+    "clearFormatting": "Limpar formatação",
+    "copyToClipboard": "Copiar para o clipboard",
+    "duplicate": "Duplicar",
+    "delete": "Excluir"
+  },
+  "placeholder": "Insira / para escolher um bloco"
+}

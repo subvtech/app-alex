@@ -1,0 +1,245 @@
+{
+  "task": {
+    "type": {
+      "label": "Tipo",
+      "individual": "Individual",
+      "collective": "Grupo",
+      "select": "Selecione um tipo"
+    },
+    "status": {
+      "label": "Status",
+      "draft": "Rascunho",
+      "published": "Publicado",
+      "finished": "Fechado",
+      "toDo": "A fazer",
+      "inProgress": "Fazendo",
+      "underReview": "Em avaliação",
+      "done": "Concluído",
+      "canChangeFromReview": "Permitir voltar da avaliação",
+      "move": {
+        "cancel": "Cancelar",
+        "submit": "Mover",
+        "warning": "Esta tarefa não pode ser movida da avaliação"
+      },
+      "add": {
+        "title": "Adicionar tarefa à avaliação",
+        "subtitle": "Você deseja adicionar esta tarefa à avaliação?"
+      },
+      "remove": {
+        "title": "Remover tarefa da avaliação",
+        "subtitle": "Você deseja remover esta tarefa da avaliação?"
+      }
+    },
+    "date": {
+      "startLabel": "Data de início",
+      "finalLabel": "Data final"
+    },
+    "postClosingSubmission": {
+      "label": "Entrega após fechamento",
+      "accept": "Aceitar",
+      "deny": "Recusar"
+    },
+    "submissions": {
+      "label": "Entregas"
+    },
+    "description": {
+      "label": "Descrição",
+      "submissionLabel": "Descrição da entrega",
+      "placeHolder": "Digite a descrição"
+    },
+    "dialog": {
+      "responsible": "Responsável",
+      "add": "Adicionar",
+      "newGroup": "Novo grupo",
+      "newMembers": "Adicionar integrantes",
+      "searchMembers": "Buscar participantes do curso",
+      "noMembers": "Este grupo não possui membros",
+      "member": "Membro",
+      "members": "Membros",
+      "save": "Salvar alterações",
+      "create": "Criar novo grupo",
+      "title": {
+        "edit": "Editar grupo",
+        "create": "Criar grupo",
+        "add": "Adicionar Grupo",
+        "members": "Grupo de integrantes"
+      },
+      "label": {
+        "class": "A qual turma o grupo pertence?",
+        "name": "Qual o nome do grupo?",
+        "responsible": "Quem será o responsável pelo grupo?",
+        "members": "Quem serão os participantes do grupo?"
+      },
+      "select": {
+        "class": "Selecione a turma do grupo",
+        "name": "Digite o nome do grupo",
+        "responsible": "Selecione o responsável pelo grupo",
+        "members": "Selecione os participantes do grupo"
+      },
+      "message": {
+        "onlyMembers": "Só serão listados os usuários participantes do curso e que não façam parte do grupo",
+        "onGroup": "Esse usuário já pertence a outro grupo",
+        "missResponsible": "O grupo precisa de um responsável para ser salvo",
+        "oneGroupMemberBlocked": "Grupos de apenas um aluno não são permitidos",
+        "missClass": "Selecione uma turma pra o grupo",
+        "missName": "Informe o nome do grupo",
+        "updated": "Grupo atualizado com sucesso",
+        "created": "Grupo criado com sucesso",
+        "oneMember": "O grupo precisa de pelo menos 2 membros",
+        "hasSubmission": "O grupo não pode ser editado porque já possui submissão",
+        "updateError": "Falha ao atualizar grupo",
+        "createError": "Falha ao criar grupo"
+      }
+    },
+    "submission": {
+      "label": "Entrega",
+      "reqSubmission": "Solicitar entrega",
+      "aftrDeadline": "Envio após prazo",
+      "description": {
+        "label": "Descrição da entrega",
+        "placeHolder": "Digite a descrição"
+      },
+      "empty": "Nenhuma entrega realizada"
+    },
+    "memberAlreadyInTask": "{member} já está na tarefa",
+    "pleaseFillDates": "Por favor coloque uma data de inicio e término antes de adicionar",
+    "pleaseFillType": "Por favor coloque o tipo da tarefa antes de adicionar",
+    "addMember": "{member} foi adicionado a tarefa",
+    "removeMember": "{member} foi removido da tarefa",
+    "freeEditor": "Editor Livre",
+    "allowSendAfterSubmission": "Permitir envio após o prazo",
+    "restrictions": {
+      "label": "Restrições",
+      "text": "Texto",
+      "video": "Vídeo",
+      "image": "Imagem",
+      "document": "Documento",
+      "link": "Link",
+      "gallery": "Galeria"
+    },
+    "goals": {
+      "label": "Objetivos de aprendizagem",
+      "select": "Selecione um objetivo",
+      "search": "Digite um nome"
+    },
+    "learningResources": {
+      "label": "Recursos de aprendizagem",
+      "noneSelected": "Nenhuma trilha selecionada",
+      "select": "Selecione uma trilha",
+      "selected": "Trilha selecionada",
+      "new": "Nova trilha",
+      "emptyTitle": "Parece que não há trilhas criadas",
+      "emptySubtitle": "Para selecionar os recursos de aprendizagem é necessário criar e selecionar uma trilha.",
+      "updateError": "Erro ao atualizar os recursos de aprendizagem, tente novamente mais tarde.",
+      "invalidTrail": "Esta trilha não possui nenhum conteúdo. Selecione outra trilha ou adicione conteúdo a esta trilha."
+    },
+    "tags": {
+      "subtitle": "Informe um marcador",
+      "search": "Digite um nome",
+      "errors": {
+        "save": "Não foi possível salvar a tag"
+      }
+    },
+    "errors": {
+      "save": "Não foi possível salvar o campo {field}",
+      "genericSave": "Não foi possível salvar os dados",
+      "addMember": "Erro ao adicionar o membro",
+      "removeMember": "Erro ao remover o membro",
+      "addClass": "Erro ao adicionar os integrantes da turma {name}",
+      "sendMessage": "Erro ao enviar a mensagem",
+      "endDateBeforeStartDate": "Data de término deve ser maior que a data de início",
+      "startDateAfterEndDate": "Data de início deve ser menor que a data de término",
+      "cantChangeType": "Você não pode alterar o tipo da tarefa após adicionar alunos",
+      "missingSubmission": "É necessário realizar alguma entrega"
+    },
+    "members": {
+      "allClass": "A turma {name} já foi adicionada na tarefa",
+      "allSelectedMembers": "Todos os alunos selecionados já foram adicionados a tarefa",
+      "addMembers": "Os alunos selecionados foram adicionados a tarefa"
+    },
+    "events": {
+      "task_created": "Tarefa criada.",
+      "task_deadline": "{name} alterou o tempo final da tarefa.",
+      "task_start_date": "{name} alterou o tempo inicial da tarefa.",
+      "task_submission": "{name} alterou as informações da entrega.",
+      "task_archived": "A tarefa foi arquivada.",
+      "task_deadline_ended": "A tarefa atingiu a data final foi automaticamente fechada.",
+      "group_added": "adicionou um grupo na tarefa",
+      "group_removed": "removeu um grupo da tarefa.",
+      "student_added": "{name} foi adicionado a tarefa.",
+      "student_removed": "{name} foi removido a tarefa.",
+      "student_deadline": "{name} alterou o tempo final da tarefa.",
+      "student_status": "{name} alterou o status da tarefa.",
+      "submission_send": "{name} realizou uma entrega.",
+      "submission_denied": "Entrega recusada.",
+      "submission_evaluated": "Entrega avaliada.",
+      "message": "{name} enviou uma mensagem."
+    },
+    "chat": {
+      "you": "{name} (Você)",
+      "reply": "Responder",
+      "audio": "Áudio",
+      "error": {
+        "messages": "Erro ao carregar as mensagens"
+      }
+    }
+  },
+  "goals": {
+    "select": "Selecione um objetivo",
+    "search": "Digite um nome",
+    "label": "Objetivos de aprendizagem"
+  },
+  "tags": {
+    "subtitle": "Informe um marcardor",
+    "placeholder": "Digite um nome"
+  },
+  "tabs": {
+    "events": {
+      "label": "Eventos"
+    },
+    "members": {
+      "label": "Integrantes"
+    },
+    "assignments": {
+      "label": "Atribuições"
+    },
+    "submissions": {
+      "label": "Entregas"
+    },
+    "comments": {
+      "label": "Comentários"
+    }
+  },
+  "missing": {
+    "type": "Sem tipo",
+    "title": "Sem título",
+    "tags": "Sem marcações",
+    "date": "Sem data",
+    "class": "Sem turma",
+    "members": "Sem membros",
+    "restrictions": "Sem restrições",
+    "submissions": "Parece que ainda não temos entregas",
+    "description": "Sem descrição",
+    "groups": "Não há grupos nessa turma",
+    "general": "Parece que não tem nada por aqui"
+  },
+  "filter": "Filtrar",
+  "filterTasks": "Filtrar tarefas",
+  "class": "Turma",
+  "type": "Tipo",
+  "group": "Grupo",
+  "individual": "Individual",
+  "finalDate": "Data de término",
+  "startDate": "Data de início",
+  "clean": "Limpar",
+  "archivedTasks": "Tarefas arquivadas",
+  "selectClassPlaceholder": "Selecione a turma",
+  "selectTypePlaceholder": "Selecione o tipo",
+  "srchClass": "Buscar turma",
+  "date": {
+    "placeholder": "Selecione uma data"
+  },
+  "students": "Alunos",
+  "savingIn": "Salvo automaticamente há %{seconds} segundos",
+  "saving": "Salvando..."
+}

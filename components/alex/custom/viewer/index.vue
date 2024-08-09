@@ -44,7 +44,7 @@ const createInstance = () => {
     ],
     container: vContainer,
     className: `alex-viewer v-overlay__content`,
-    zIndex: 2000,
+    zIndex: 9999,
   }) as Viewer & { id: number; images: HTMLImageElement[] };
   viewer.value = viewerInstance;
 };

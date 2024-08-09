@@ -40,9 +40,9 @@
               :key="index"
               :text="tag.text"
               :closable="isEditing"
-              :uncloseable="isEditing"
+              :clickable="isEditing"
               variant="outlined"
-              color="#000"
+              status="secondary"
               @click:close="isEditing && onRemove(tag.text)"
             />
           </template>

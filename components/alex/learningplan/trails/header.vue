@@ -84,8 +84,9 @@ const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 
 const tab = {
-  firstTitle: t('components.trails.header.firstTab'),
-  secondTitle: t('components.trails.header.secondTab'),
+  firstTitle: t('components.trails.header.overview'),
+  secondTitle: t('components.trails.header.tasks'),
+  thirdTitle: t('components.trails.header.contributions'),
 };
 
 const showSkeleton = computed(() => trailStore.trail?.id !== props.trailId);
@@ -94,7 +95,7 @@ const tabs = computed(() => {
   const defaultTabs: TabType[] = [
     { label: tab.firstTitle, value: '0' },
     { label: tab.secondTitle, value: '1' },
-    { label: 'Contribuições', value: '2' },
+    { label: tab.thirdTitle, value: '2' },
   ];
 
   if (learningPlanStore.userIsFacilitator) {

@@ -19,7 +19,7 @@ import 'videojs-youtube';
 
 const props = defineProps({
   options: {
-    type: String,
+    type: Object,
     default() {
       return {};
     },
