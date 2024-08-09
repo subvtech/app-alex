@@ -47,16 +47,16 @@
               :key="index"
               :text="tag.text"
               variant="outlined"
-              color="#000"
+              status="secondary"
               :closable="isEditing"
-              :uncloseable="isEditing"
+              :clickable="isEditing"
               @click:close="isEditing ? removeItem(tag) : () => {}"
             />
           </div>
           <alex-custom-chip
             v-else
             variant="outlined"
-            color="#000"
+            status="secondary"
             :text="emptyMessage"
           />
         </div>

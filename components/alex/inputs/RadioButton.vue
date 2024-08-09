@@ -1,5 +1,5 @@
 <template>
-  <v-radio-group color="accent">
+  <v-radio-group color="accent" class="alex-radio-button">
     <div
       v-for="button in buttons"
       :key="button.value"
@@ -45,15 +45,17 @@ defineProps({
 </script>
 
 <style>
-.v-selection-control__wrapper,
-.v-selection-control__input {
-  height: 28px !important;
-  width: 28px !important;
-  margin: 0 8px !important;
-}
+.alex-radio-button {
+  .v-selection-control__wrapper,
+  .v-selection-control__input {
+    height: 28px !important;
+    width: 28px !important;
+    margin: 0 8px !important;
+  }
 
-.radio .v-label,
-.v-selection-control--disabled {
-  opacity: 1 !important;
+  .radio .v-label,
+  .v-selection-control--disabled {
+    opacity: 1 !important;
+  }
 }
 </style>

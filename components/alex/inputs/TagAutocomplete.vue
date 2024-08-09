@@ -23,12 +23,25 @@ type Tag = Partial<TagSimple> & {
 interface AutoCompleteUsersProps {
   name: string;
   modelValue: Tag[];
-  isGeneral: boolean;
+  isGeneral?: boolean;
+  all?: boolean;
 }
 
 const props = withDefaults(defineProps<AutoCompleteUsersProps>(), {
   isGeneral: false,
+  all: false,
 });
+type EmitTag = {
+  isPublic: boolean;
+  local?: boolean;
+  isGeneral?: boolean;
+  id?: number;
+  text: string;
+};
+type Emit = {
+  'add-tag': [tag: EmitTag | null];
+};
+const emit = defineEmits<Emit>();
 const { find } = useStrapiUtils();
 const search = ref('');
 const items = ref<Tag[]>([]);
@@ -51,7 +64,7 @@ useOnStopTyping(search, async () => {
     filters: {
       text: { $containsi: search.value },
       isPublic: true,
-      isGeneral: props.isGeneral,
+      ...(!props.all && { isGeneral: props.isGeneral }),
     },
   });
   if (tags.data.length) {
@@ -125,5 +138,17 @@ watch(
   { deep: true },
 );
 
-watch(selectedTag, updateModelValue);
+watch(selectedTag, (value) => {
+  updateModelValue();
+  if (!value) {
+    return;
+  }
+  emit('add-tag', {
+    id: value.id,
+    text: value.text,
+    isGeneral: value.isGeneral,
+    isPublic: true,
+    local: value.local,
+  });
+});
 </script>

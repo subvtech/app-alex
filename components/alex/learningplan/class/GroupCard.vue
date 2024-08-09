@@ -12,8 +12,8 @@
     <alex-custom-dropdown
       v-if="!noOptions"
       v-model="showOptions"
-      :close-on-content-click="false"
       :items="items"
+      close-on-content-click
     >
       <template #activator="{ props: propsMenu }">
         <v-tooltip
