@@ -21,6 +21,9 @@ USER alex
 
 ADD --chown=alex:alex ./package.json ./yarn.lock ./
 
+RUN npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
+RUN npm config set //registry.tiptap.dev/:_authToken $tiptap_key
+
 RUN yarn --ignore-scripts
 
 ADD --chown=alex:alex . .
