@@ -41,8 +41,10 @@
       @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
-    <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container class="pa-4 pa-sm-6 max-width-100">
+    <v-main class="d-flex bg-gray-blue pt-16" @click="onClickOutside">
+      <v-container
+        class="d-flex flex-column flex-1 w-100 pa-4 pa-sm-6 max-width-100 min-height-100"
+      >
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -210,9 +212,14 @@ const defaultMenus = [
         to: '/',
       },
       {
-        icon: 'mdi-book-outline',
+        icon: 'mdi-book-cog-outline',
         title: i18n.t('layouts.default.myClasses'),
         to: '/courses/me',
+      },
+      {
+        icon: 'alex:ProjectConfig',
+        title: 'Meus Projetos',
+        to: '/projects/me',
       },
       // {
       //   icon: 'mdi-clipboard-multiple-outline',
