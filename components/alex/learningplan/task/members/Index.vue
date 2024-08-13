@@ -2,7 +2,7 @@
   <v-data-iterator
     :search="search"
     :page="page"
-    :items="members.data"
+    :items="kind === 'project' ? projectStudents : members.data"
     :items-per-page="itemsPerPage"
     class="members"
     :filter-keys="[
@@ -10,6 +10,8 @@
       'student_member.user.name',
       'student_member.user.email',
       'student_member.learning_class.name',
+      'user.fullname',
+      'user.email',
     ]"
     :loading="true"
   >
@@ -22,22 +24,22 @@
           class="w-100 tw-mr-4"
           :placeholder="$t('components.learningPlan.members.search')"
           prepend-inner-icon="mdi-magnify"
-          density="compact"
+          :density="kind === 'project' ? 'comfortable' : 'compact'"
           clearable
         />
 
         <alex-learningplan-task-dialog-add-member
-          v-if="type === 'individual'"
+          v-if="type === 'individual' && kind === 'task'"
           v-model="addMemberDialog"
           :learningplan-id="props.learningplanId"
           :members="members.data"
           @add-click="addMember"
         />
         <alex-learningplan-task-dialog-add-group
-          v-else-if="type === 'group'"
+          v-else-if="type === 'group' && kind === 'task'"
           v-model="addGroupDialog"
           :learningplan-id="props.learningplanId"
-          :task-id="taskId"
+          :task-id="props.taskId"
           :start-at="startAt"
           :finish-at="finishAt"
           :can-submit-after="props.sendAfterDeadline"
@@ -45,13 +47,25 @@
           @add-group="handleAddGroup"
         />
 
-        <alex-custom-dropdown :items="typeOptions" :disabled="!!type">
+        <alex-learningplan-task-dialog-add-project-members
+          v-if="kind === 'project'"
+          v-model="addProjectMembersDialog"
+          :learningplan-ids="props.learningplanIds"
+          :selected-students="projectStudents"
+          @invite="(members) => (projectStudents = members)"
+        />
+
+        <alex-custom-dropdown
+          :items="typeOptions"
+          :disabled="!!type || kind === 'project'"
+        >
           <template #activator="{ props: propsDropdown }">
             <alex-custom-button
               v-bind="propsDropdown"
               class="tw-ml-auto"
               variant="secondary"
               prepend-icon="mdi-plus"
+              :size="kind === 'project' ? 'large' : 'default'"
               @click="handleAddMemberOrClass"
               >{{
                 $t('components.learningPlan.members.add.label')
@@ -61,6 +75,7 @@
         </alex-custom-dropdown>
       </div>
       <alex-learningplan-task-dialog-create-group
+        v-if="kind === 'task'"
         v-model="groupDialog"
         :learning-plan-id="props.learningplanId"
         :task-id="props.taskId"
@@ -83,17 +98,21 @@
           :member="{
             name:
               member.raw.learning_plan_member?.user.fullname ||
-              member.raw.learning_plan_group?.title,
+              member.raw.learning_plan_group?.title ||
+              member.raw.user.fullname,
             class:
               member.raw.learning_plan_member?.learning_class?.name ||
               member.raw.learning_plan_group?.learning_class.name,
-            avatarUrl: member.raw.learning_plan_member?.user.avatar?.url,
+            avatarUrl:
+              member.raw.learning_plan_member?.user.avatar?.url ||
+              member.raw.user.avatar?.formats.small.url,
             group: !!member.raw.learning_plan_group,
             participants: member.raw.learning_plan_group
               ? getMembersOfGroup(member.raw.learning_plan_group)
               : undefined,
           }"
           :edit="edit"
+          :clickable="kind !== 'project'"
           @remove-click="removeMember(member.raw)"
           @edit-click="
             () => handleEditClick(member.raw.learning_plan_group, items)
@@ -169,8 +188,6 @@
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 
 interface MembersProps {
-  learningplanId: number;
-  taskId: number;
   listGroupMembers?: boolean;
   type?: TaskType | null;
   startAt?: string | null;
@@ -179,7 +196,23 @@ interface MembersProps {
   blockDelete?: boolean;
   edit?: boolean;
 }
-const props = withDefaults(defineProps<MembersProps>(), {
+
+interface TaskMemberProps {
+  learningplanId: number;
+  taskId: number;
+  kind: 'task';
+}
+interface ProjectMemberProps {
+  learningplanIds: number[];
+  kind: 'project';
+}
+
+type TaskPropsType = MembersProps & TaskMemberProps;
+type ProjectPropsType = MembersProps & ProjectMemberProps;
+
+type PropsType = TaskPropsType | ProjectPropsType;
+
+const props = withDefaults(defineProps<PropsType>(), {
   sendAfterDeadline: false,
   startAt: null,
   finishAt: null,
@@ -187,7 +220,13 @@ const props = withDefaults(defineProps<MembersProps>(), {
   blockDelete: false,
   edit: true,
   listGroupMembers: false,
+  taskId: 0,
+  learningplanId: 0,
+  kind: 'task',
+  learningplanIds: () => [],
 });
+
+const projectStudents = ref<LearningPlanMemberSimple[]>([]);
 
 type Emits = {
   'change-members': [];
@@ -201,6 +240,7 @@ const { t } = useI18n();
 const emit = defineEmits<Emits>();
 const addMemberDialog = ref(false);
 const addGroupDialog = ref(false);
+const addProjectMembersDialog = ref(false);
 const groupDialog = ref<boolean>(false);
 const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const allGroups = ref<LearningPlanGroupSimple[]>([]);
@@ -339,34 +379,40 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
   }
 };
 const removeMember = async (member: TaskMember) => {
-  try {
-    if (props.blockDelete) {
+  if (props.kind === 'project') {
+    projectStudents.value = projectStudents.value.filter(
+      (student) => student.id !== member.id,
+    );
+  } else {
+    try {
+      if (props.blockDelete) {
+        setMessage(
+          t('Você não pode remover alunos após alguém ter feito uma entrega'),
+          'warning',
+          true,
+        );
+        return;
+      }
+      const memberName = member.learning_plan_member
+        ? member.learning_plan_member?.user?.fullname
+        : member.learning_plan_group?.title;
+      await strapi.delete('task-members', member.id);
+      setTimeout(refresh, 100);
       setMessage(
-        t('Você não pode remover alunos após alguém ter feito uma entrega'),
-        'warning',
+        t('components.learningPlan.drawer.task.removeMember', {
+          member: memberName,
+        }),
+        'success',
         true,
       );
-      return;
+      emit('change-members');
+    } catch (error) {
+      setMessage(
+        t('components.learningPlan.drawer.task.errors.removeMember'),
+        'error',
+        true,
+      );
     }
-    const memberName = member.learning_plan_member
-      ? member.learning_plan_member?.user?.fullname
-      : member.learning_plan_group?.title;
-    await strapi.delete('task-members', member.id);
-    setTimeout(refresh, 100);
-    setMessage(
-      t('components.learningPlan.drawer.task.removeMember', {
-        member: memberName,
-      }),
-      'success',
-      true,
-    );
-    emit('change-members');
-  } catch (error) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.removeMember'),
-      'error',
-      true,
-    );
   }
 };
 
@@ -403,7 +449,9 @@ const handleEditClick = (
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
-  if (props.type === 'individual') {
+  if (props.kind === 'project') {
+    addProjectMembersDialog.value = true;
+  } else if (props.type === 'individual') {
     addMemberDialog.value = true;
   } else if (props.type === 'group') {
     addGroupDialog.value = true;

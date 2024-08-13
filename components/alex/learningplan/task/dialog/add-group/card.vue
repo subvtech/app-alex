@@ -20,9 +20,10 @@
     <alex-custom-button
       size="small"
       variant="outlined"
+      :disabled="isAdded"
       @click="emit('add-members', group)"
       >{{
-        $t('components.learningPlan.drawer.task.dialog.add')
+        isAdded ? 'Added' : $t('components.learningPlan.drawer.task.dialog.add')
       }}</alex-custom-button
     >
   </div>
@@ -31,8 +32,12 @@
 <script setup lang="ts">
 interface GroupCard {
   group: LearningPlanGroupSimple;
+  isAdded?: boolean;
 }
-defineProps<GroupCard>();
+
+withDefaults(defineProps<GroupCard>(), {
+  isAdded: false,
+});
 
 type Emit = {
   'add-members': [group: LearningPlanGroupSimple];
