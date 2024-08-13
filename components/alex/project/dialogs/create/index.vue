@@ -82,7 +82,8 @@
         label="Qual será o Produto do seu Projeto?"
         placeholder="Selecione um tipo de produto"
         hide-details
-        :items="selectionProducts"
+        item-title="text"
+        :items="selectionProducts?.data || []"
       />
     </template>
     <template #step2>
@@ -178,12 +179,18 @@
       </TransitionGroup>
     </template>
     <template #step3>
-      <alex-learningplan-task-members kind="project" />
+      <alex-learningplan-task-members
+        kind="project"
+        :learningplan-ids="associatedCourses.map((course) => course.id)"
+        @invite="() => (e) => (students = e)"
+      />
     </template>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
+import { ProductSimple } from '~/models/simple/productSimple.model';
+
 interface ProjectType {
   title: string;
   description: string;
@@ -203,6 +210,8 @@ interface CoursesInfo {
     avatar?: string;
   };
 }
+
+const students = ref([]);
 
 const loading = ref(false);
 
@@ -277,6 +286,20 @@ const { data: availableCoursesData } = await useAsyncData(
   },
 );
 
+const { data: selectionProducts } = await useAsyncData(
+  'availableProductsTypes',
+  () =>
+    find<ProductSimple>('products', {
+      filters: {
+        $or: [{ isPublic: true }, { verified_by: user.value.id }],
+      },
+    }),
+  {
+    default: () => ({ meta: 0, data: [] as String[] }),
+    lazy: true,
+  },
+);
+
 const associatedCourses = ref<CoursesInfo[]>([]);
 
 const selectMenu = ref(false);
@@ -306,19 +329,6 @@ const selectionAreas = [
   'UI',
   'Redes',
   'Desenvolvimento de software',
-];
-
-const selectionProducts = [
-  'Aplicativo',
-  'Site',
-  'Sistema',
-  'Plataforma',
-  'Jogo',
-  'Robô',
-  'Inteligência Artificial',
-  'Chatbot',
-  'Rede Social',
-  'Software',
 ];
 
 const stepsConfig = {
