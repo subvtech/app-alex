@@ -41,7 +41,11 @@
       @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
-    <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
+    <v-main
+      class="bg-gray-blue pt-16"
+      :class="clipped ? 'clipped-sidebar' : 'sidebar'"
+      @click="onClickOutside"
+    >
       <v-container class="pa-4 pa-sm-6 max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
@@ -293,6 +297,12 @@ const menus = computed(() => {
 </script>
 
 <style lang="scss">
+.sidebar {
+  --v-layout-left: 256px !important;
+}
+.clipped-sidebar {
+  --v-layout-left: 56px !important;
+}
 .overflow-hidden {
   overflow-y: hidden;
 }
