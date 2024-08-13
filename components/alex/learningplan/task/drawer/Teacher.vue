@@ -548,6 +548,7 @@ watch(endDate, async (value) => {
   await updateTaskValues(taskId.value, {
     finish_at: value,
   });
+  emit('change-members');
 });
 watch(startDate, async (value) => {
   if (!value) return;
@@ -564,6 +565,7 @@ watch(startDate, async (value) => {
   await updateTaskValues(taskId.value, {
     start_at: value,
   });
+  emit('change-members');
 });
 watch(restrictions, async (value) => {
   await updateTaskValues(taskId.value, {
