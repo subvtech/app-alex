@@ -403,6 +403,14 @@ const handleEditClick = (
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
+  if (!props.finishAt || !props.startAt) {
+    setMessage(
+      t('components.learningPlan.drawer.task.pleaseFillDates'),
+      'warning',
+      true,
+    );
+    return;
+  }
   if (props.type === 'individual') {
     addMemberDialog.value = true;
   } else if (props.type === 'group') {
