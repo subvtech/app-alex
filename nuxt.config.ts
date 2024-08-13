@@ -2,6 +2,7 @@ export default defineNuxtConfig({
   pages: true,
   ssr: false,
   devtools: { enabled: true },
+  app: { pageTransition: { name: 'page', mode: 'out-in' } },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',

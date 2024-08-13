@@ -48,7 +48,14 @@ definePageMeta({
   pageTransition: true,
   validate: (route) => {
     // Check if the id is made up of digits
-    return typeof route.params.id === 'string' && /^\d+$/.test(route.params.id);
+    if (typeof route.params.id === 'string' && /^\D+$/.test(route.params.id)) {
+      return {
+        statusCode: 404,
+        cause: 'invalid_params',
+        message: 'Invalid params',
+      };
+    }
+    return true;
   },
 });
 
@@ -119,7 +126,7 @@ const fetchData = async () => {
   await learningPlanStore.loadLearningPlan(learningPlanId.value);
   headerStore.isLoading = false;
   if (!learningPlanStore.learningPlan) {
-    return navigateTo('/projects');
+    return navigateTo('/projects/me');
   }
 
   if (isSettingsRoutePath.value && !learningPlanStore.userIsFacilitator) {

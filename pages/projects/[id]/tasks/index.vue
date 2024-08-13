@@ -1,5 +1,5 @@
 <template>
-  <div v-if="learningPlanStore.loading" class="bg-white rounded wrapper">
+  <div class="bg-white rounded wrapper">
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
@@ -27,42 +27,55 @@
           name="search"
           hide-details
         />
-        <alex-custom-button
-          size="large"
-          icon="mdi-filter-variant"
-          variant="secondary"
-          @click="openFilterDrawer = true"
-        />
+        <div class="tw-flex tw-gap-2">
+          <alex-custom-button
+            size="large"
+            :prepend-icon="
+              mode === 'list' ? 'alex:Kanban' : 'mdi-clipboard-text-outline'
+            "
+            variant="secondary"
+            @click="toggleMode"
+            >{{
+              mode === 'list' ? 'Ver Kanban' : 'Ver Backlog'
+            }}</alex-custom-button
+          >
+          <alex-custom-button
+            size="large"
+            icon="mdi-filter-variant"
+            variant="secondary"
+            @click="openFilterDrawer = true"
+          />
+        </div>
       </div>
     </Transition>
 
     <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
-      <Transition name="fade" mode="out-in">
-        <div v-if="learningPlanStore.loading">
-          <alex-learningplan-task-table-skeleton />
-        </div>
-        <div v-else>
-          <TransitionGroup name="list">
-            <alex-custom-chip
-              v-for="chip in chips"
-              :key="chip"
-              :text="t(`pages.task.filterChip.${chip}`)"
-              status="secondary"
-              variant="outlined"
-              class="mr-2 bg-gray-blue text-gray-600 text-body-5"
-              append-icon="mdi-close"
-              clickable
-              @click="filterDrawer.removeFilter(chip)"
-            />
-          </TransitionGroup>
+      <alex-learningplan-task-table-skeleton v-if="learningPlanStore.loading" />
 
-          <alex-learningplan-task-container
-            ref="tasksContainer"
-            :search="search"
-            :filter="filter"
+      <div v-else>
+        <TransitionGroup name="list">
+          <alex-custom-chip
+            v-for="chip in chips"
+            :key="chip"
+            :text="t(`pages.task.filterChip.${chip}`)"
+            status="secondary"
+            variant="outlined"
+            class="mr-2 bg-gray-blue text-gray-600 text-body-5"
+            append-icon="mdi-close"
+            clickable
+            @click="filterDrawer.removeFilter(chip)"
           />
-        </div>
-      </Transition>
+        </TransitionGroup>
+        <Transition v-if="mode === 'kanban'" name="fade" mode="out-in">
+          <alex-learningplan-task-project-kanban />
+        </Transition>
+        <alex-learningplan-task-project-list
+          v-else
+          ref="taskList"
+          :search="search"
+          :filter="filter"
+        />
+      </div>
     </div>
     <alex-learningplan-task-drawer-filter
       ref="filterDrawer"
@@ -71,11 +84,6 @@
       @update:model-value="(value) => (openFilterDrawer = value)"
     />
   </div>
-  <alex-learningplan-task-student
-    v-else
-    :learningplan-id="learningPlanStore.learningPlan!.id!"
-    :student-id="learningPlanStore.userLearningMember!.id!"
-  />
 </template>
 <script setup lang="ts">
 export interface filterType {
@@ -97,14 +105,11 @@ const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 const { id } = route.params;
 const search = ref('');
+const mode = ref<'list' | 'kanban'>('list');
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
 const isProfessor = ref<boolean>(false);
 const classes = ref<string[]>([]);
-
-onBeforeMount(() => {
-  headerStore.showHeader = true;
-});
 
 const openFilterDrawer = ref(false);
 
@@ -119,7 +124,13 @@ const handleFilter = (newFilter: filterType) => {
     });
   }
 };
-
+const toggleMode = () => {
+  if (mode.value === 'kanban') {
+    mode.value = 'list';
+    return;
+  }
+  mode.value = 'kanban';
+};
 watch(
   () => [learningPlanStore.loading],
   () => {

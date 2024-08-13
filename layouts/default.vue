@@ -282,6 +282,7 @@ const defaultMenus = [
 const componentsMenu = [
   {
     title: 'Componentes',
+    dataTour: '',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
