@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = {
+export type User = {
   id?: string;
   email: string;
   fullname?: string;

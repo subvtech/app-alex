@@ -113,6 +113,7 @@
           }"
           :edit="edit"
           :clickable="kind !== 'project'"
+          :no-class="kind === 'project'"
           @remove-click="removeMember(member.raw)"
           @edit-click="
             () => handleEditClick(member.raw.learning_plan_group, items)
@@ -204,6 +205,7 @@ interface TaskMemberProps {
 }
 interface ProjectMemberProps {
   learningplanIds: number[];
+  students: LearningPlanMemberSimple[];
   kind: 'project';
 }
 
@@ -224,14 +226,23 @@ const props = withDefaults(defineProps<PropsType>(), {
   learningplanId: 0,
   kind: 'task',
   learningplanIds: () => [],
+  students: () => [],
 });
 
-const projectStudents = ref<LearningPlanMemberSimple[]>([]);
+const projectStudents = ref<LearningPlanMemberSimple[]>([...props.students]);
 
 type Emits = {
   'change-members': [];
+  'set-members': [value: LearningPlanMemberSimple[]];
   'set-type': [value: TaskType];
 };
+
+watch(
+  () => projectStudents.value,
+  () => {
+    emit('set-members', projectStudents.value);
+  },
+);
 
 const strapiUtils = useStrapiUtils();
 const strapi = useStrapi();

@@ -7,7 +7,11 @@
     @on-main-action="onInvite"
     @on-secondary-action="onCancel"
   >
-    <alex-custom-tabs v-model="activePage" :tabs="tabs" />
+    <alex-custom-tabs
+      v-if="learningplanIds.length"
+      v-model="activePage"
+      :tabs="tabs"
+    />
     <alex-inputs-text-field
       v-if="activePage === '1'"
       v-model="searchStudents"
@@ -148,11 +152,22 @@
           </v-expansion-panels>
         </v-expansion-panels>
       </v-window-item>
+      <v-window-item value="3">
+        <alex-inputs-users-autocomplete
+          v-model="autoCompleteUsers"
+          :ignore-user-ids="selectedUsers.map((user) => user.user.id)"
+          :ignore-emails="selectedUsers.map((user) => user.user.email)"
+          :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
+          name="selectUsers"
+        />
+      </v-window-item>
     </v-window>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
+import { User } from '@/components/alex/inputs/UsersAutocomplete.vue';
+
 interface classItem {
   id: number;
   name: string;
@@ -171,11 +186,16 @@ const props = defineProps<AddProjectMembers>();
 const { find } = useStrapiUtils();
 
 const activePage = ref('1');
-const tabs = [{ label: 'Participantes', value: '1' }];
+const tabs = [
+  { label: 'Participantes', value: '1' },
+  { label: 'Grupos', value: '2' },
+];
 const model = defineModel<boolean>({ required: true });
 const searchStudents = ref('');
 const searchGroups = ref('');
 const emit = defineEmits(['invite']);
+
+const autoCompleteUsers = ref<User[]>([]);
 
 const selectedUsers = ref<LearningPlanMemberSimple[]>([
   ...props.selectedStudents,
@@ -313,14 +333,27 @@ const onCancel = () => {
 };
 
 const onInvite = () => {
-  emit('invite', selectedUsers.value);
+  if (autoCompleteUsers.value.length) {
+    const users = autoCompleteUsers.value.map((user) => ({
+      user: {
+        id: user.id,
+        email: user.email,
+        fullname: user.fullname || user.email,
+        avatar: user.avatar,
+      },
+    }));
+
+    emit('invite', users);
+  } else {
+    emit('invite', selectedUsers.value);
+  }
   onCancel();
 };
 
 onBeforeMount(() => {
-  //   if (props.learningplanIds.length > 1) {
-  tabs.push({ label: 'Grupos', value: '2' });
-  //   }
+  if (!props.learningplanIds.length) {
+    activePage.value = '3';
+  }
 });
 
 watch(
