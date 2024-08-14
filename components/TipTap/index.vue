@@ -188,10 +188,6 @@ onMounted(async () => {
   const user = useStrapiUser();
   const TipTapToken = await getTipTapToken(user.value?.id);
   setAvailableBlocks(props.allowedBlocks);
-  console.log('doc', doc);
-  console.log('TipTapToken', TipTapToken);
-  console.log('docName', props.docName);
-  console.log('appId', app.$config.public.tipTapAppId);
   const provider = new TiptapCollabProvider({
     name: props.docName, // Unique document identifier for syncing. This is your document name.
     appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
@@ -199,12 +195,10 @@ onMounted(async () => {
     document: doc,
     // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
     onSynced() {
-      console.log('onSynced');
       if (!doc.getMap('config').get('initialContentLoaded') && editor) {
         doc.getMap('config').set('initialContentLoaded', true);
       }
       isLoading.value = false;
-      console.log('after loading');
     },
   });
   const setCollaborationExtensions = (): AnyExtension[] => [
