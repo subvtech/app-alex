@@ -33,9 +33,6 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
-      :class="
-        clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'
-      "
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
@@ -44,11 +41,7 @@
       @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
-    <v-main
-      class="bg-gray-blue pt-16"
-      :class="clipped ? 'clipped-sidebar' : 'sidebar'"
-      @click="onClickOutside"
-    >
+    <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
       <v-container class="pa-4 pa-sm-6 max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
@@ -300,18 +293,18 @@ const menus = computed(() => {
 </script>
 
 <style lang="scss">
-@media screen and (min-width: 959px) {
-  .sidebar {
-    --v-layout-left: 256px !important;
-  }
-  .clipped-sidebar {
-    --v-layout-left: 56px !important;
-  }
-  .main-header-app {
-    left: var(--v-layout-left) !important;
-    width: calc(100% - var(--v-layout-left)) !important;
-  }
-}
+// @media screen and (min-width: 959px) {
+//   .sidebar {
+//     --v-layout-left: 256px !important;
+//   }
+//   .clipped-sidebar {
+//     --v-layout-left: 56px !important;
+//   }
+//   .main-header-app {
+//     left: var(--v-layout-left) !important;
+//     width: calc(100% - var(--v-layout-left)) !important;
+//   }
+// }
 
 .overflow-hidden {
   overflow-y: hidden;

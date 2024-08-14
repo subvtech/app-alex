@@ -1,25 +1,16 @@
 <template>
-  <v-navigation-drawer
-    :id="drawerId"
-    v-model="model"
-    location="right"
-    temporary
-    floating
-    :width="640"
-    scrim="transparent"
-    sticky
-    class="pa-6 pt-2 rounded-s-lg"
-  >
-    <template #prepend>
-      <alex-custom-button
-        icon="mdi-close"
-        size="small"
-        variant="text"
-        @click="handleCloseModal"
-      />
+  <alex-custom-drawer v-model="model" side="right" class="rounded-s-lg">
+    <template #header>
+      <div class="d-flex align-center justify-end">
+        <alex-custom-button
+          icon="mdi-close"
+          size="small"
+          variant="text"
+          @click="handleCloseModal"
+        />
+      </div>
     </template>
-
-    <template #default>
+    <div class="tw-flex tw-flex-col tw-gap-4 pa-6 pt-2 pb-0 pr-3">
       <div v-if="student" class="user-info text-gray-800">
         <v-avatar
           :size="80"
@@ -218,27 +209,28 @@
           />
         </template>
       </alex-learningplan-task-tabs>
+    </div>
+    <template v-if="activePage === '3'" #footer>
+      <div class="tw-px-6">
+        <alex-learningplan-task-chat-input
+          v-model:attached-message="attachedMessage"
+          v-model:attached-submission="attachedSubmission"
+          class="border-top-1 border-gray-100 pt-3"
+          :submissions="evaluatedSubmissions"
+          @submit="
+            (data) =>
+              handleSubmitMessage(
+                data.text,
+                data.audio?.blob,
+                data.audio?.duration,
+                data.attachedMessage,
+                data.attachedSubmission,
+              )
+          "
+        />
+      </div>
     </template>
-
-    <template v-if="activePage === '3'" #append>
-      <alex-learningplan-task-chat-input
-        v-model:attached-message="attachedMessage"
-        v-model:attached-submission="attachedSubmission"
-        class="border-top-1 border-gray-100 pt-3"
-        :submissions="evaluatedSubmissions"
-        @submit="
-          (data) =>
-            handleSubmitMessage(
-              data.text,
-              data.audio?.blob,
-              data.audio?.duration,
-              data.attachedMessage,
-              data.attachedSubmission,
-            )
-        "
-      />
-    </template>
-  </v-navigation-drawer>
+  </alex-custom-drawer>
 </template>
 
 <script setup lang="ts">
@@ -538,22 +530,26 @@ const getInChargeMember = (group?: LearningPlanGroupSimple) =>
 const inChargeMember = computed(() => getInChargeMember(props.group));
 watch(finishAt, changeDeadline);
 watch(canSubmitAfterDeadline, changeSendAfterDeadline);
-watch(model, (value) => {
-  if (value) {
-    finishAt.value = props.finishAt;
-    canSubmitAfterDeadline.value =
-      props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
-    setSubmissionDescription();
-    executeSubmissions();
-    executeEvents();
-    executeMessages();
-    return;
-  }
-  submissions.value.data = [];
-  events.value.data = [];
-  messages.value.data = [];
-  activePage.value = props.group ? '0' : '1';
-});
+watch(
+  model,
+  (value) => {
+    if (value) {
+      finishAt.value = props.finishAt;
+      canSubmitAfterDeadline.value =
+        props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
+      setSubmissionDescription();
+      executeSubmissions();
+      executeEvents();
+      executeMessages();
+      return;
+    }
+    submissions.value.data = [];
+    events.value.data = [];
+    messages.value.data = [];
+    activePage.value = props.group ? '0' : '1';
+  },
+  { deep: true },
+);
 watch(activePage, (value) => {
   if (value === '3') {
     executeMessages();

@@ -1,126 +1,120 @@
 <template>
-  <v-navigation-drawer
-    :model-value="modelValue"
-    location="right"
-    temporary
-    floating
-    scrim="transparent"
-    sticky
-    :width="380"
-    class="py-6 rounded-s-lg"
-    @update:model-value="handleChange"
-  >
-    <form
-      class="d-flex flex-column ga-4 tw-h-full tw-w-full bg-white"
-      @submit="onSubmit"
-    >
-      <div class="d-flex align-center ga-4 px-4">
-        <p class="text-h4 flex-fill">
-          {{ i18Texts.title }}
-        </p>
-        <alex-custom-button
-          icon="mdi-close"
-          variant="text"
-          size="small"
-          flat
-          @click="handleChange(false)"
-        />
-      </div>
+  <Sheet v-model:open="model" side="right">
+    <SheetContent class="tw-rounded-tl-lg !tw-max-w-[380px]">
+      <form
+        class="d-flex flex-column ga-4 tw-h-full tw-w-full bg-white"
+        @submit="onSubmit"
+      >
+        <div class="d-flex align-center ga-4 px-4 pt-4">
+          <p class="text-h4 flex-fill">
+            {{ i18Texts.title }}
+          </p>
+          <alex-custom-button
+            icon="mdi-close"
+            variant="text"
+            size="small"
+            flat
+            @click="model = false"
+          />
+        </div>
 
-      <hr class="mb-2" />
+        <hr class="mb-2" />
 
-      <div class="flex-fill px-4">
-        <alex-inputs-select
-          v-model="filters.select"
-          name="select"
-          :items="classes.length ? classes : types"
-          :placeholder="i18Texts.selectPlaceholder"
-          clearable
-          density="comfortable"
-          hide-details
-          :label="i18Texts.selectLabel"
-        />
+        <div class="flex-fill px-4">
+          <alex-inputs-select
+            v-model="filters.select"
+            name="select"
+            :items="classes.length ? classes : types"
+            :placeholder="i18Texts.selectPlaceholder"
+            clearable
+            density="comfortable"
+            hide-details
+            :label="i18Texts.selectLabel"
+          />
 
-        <div v-if="!kanbanFilter">
+          <div v-if="!kanbanFilter">
+            <p class="text-p1 text-gray-800 mt-4 mb-2">
+              {{ $t('components.learningPlan.drawer.startDate') }}
+            </p>
+            <div class="d-flex align-center ga-1">
+              <alex-inputs-date
+                v-model="filters.startDate.start"
+                class="flex-1-1"
+                name="startDateStart"
+                hide-details
+                density="comfortable"
+              />
+              <alex-inputs-date
+                v-model="filters.startDate.end"
+                class="flex-1-1"
+                hide-details
+                name="startDateEnd"
+                density="comfortable"
+              />
+            </div>
+          </div>
+          <p
+            v-if="errors['startDateStart'] || errors['startDateEnd']"
+            class="text-error-0 text-body-3 mt-2"
+          >
+            {{ errors['startDateStart'] || errors['startDateEnd'] }}
+          </p>
           <p class="text-p1 text-gray-800 mt-4 mb-2">
-            {{ $t('components.learningPlan.drawer.startDate') }}
+            {{ $t('components.learningPlan.drawer.finalDate') }}
           </p>
           <div class="d-flex align-center ga-1">
             <alex-inputs-date
-              v-model="filters.startDate.start"
+              v-model="filters.finalDate.start"
+              name="finalDateStart"
               class="flex-1-1"
-              name="startDateStart"
               hide-details
               density="comfortable"
             />
             <alex-inputs-date
-              v-model="filters.startDate.end"
+              v-model="filters.finalDate.end"
+              name="finalDateEnd"
               class="flex-1-1"
               hide-details
-              name="startDateEnd"
               density="comfortable"
             />
           </div>
-        </div>
-        <p
-          v-if="errors['startDateStart'] || errors['startDateEnd']"
-          class="text-error-0 text-body-3 mt-2"
-        >
-          {{ errors['startDateStart'] || errors['startDateEnd'] }}
-        </p>
-        <p class="text-p1 text-gray-800 mt-4 mb-2">
-          {{ $t('components.learningPlan.drawer.finalDate') }}
-        </p>
-        <div class="d-flex align-center ga-1">
-          <alex-inputs-date
-            v-model="filters.finalDate.start"
-            name="finalDateStart"
-            class="flex-1-1"
-            hide-details
-            density="comfortable"
-          />
-          <alex-inputs-date
-            v-model="filters.finalDate.end"
-            name="finalDateEnd"
-            class="flex-1-1"
-            hide-details
-            density="comfortable"
-          />
-        </div>
-        <p
-          v-if="errors['finalDateStart'] || errors['finalDateEnd']"
-          class="text-error-0 text-body-3 mt-2"
-        >
-          {{ errors['finalDateStart'] || errors['finalDateEnd'] }}
-        </p>
-        <div v-if="!kanbanFilter" class="mt-4">
-          <p class="text-body-1 text-gray-800">
-            {{ $t('components.learningPlan.drawer.archivedTasks') }}
+          <p
+            v-if="errors['finalDateStart'] || errors['finalDateEnd']"
+            class="text-error-0 text-body-3 mt-2"
+          >
+            {{ errors['finalDateStart'] || errors['finalDateEnd'] }}
           </p>
-          <alex-custom-switch
-            v-model="filters.archivedTasks"
-            class="archived-switch"
-            inset
-            hide-details
-          ></alex-custom-switch>
+          <div v-if="!kanbanFilter" class="mt-4">
+            <p class="text-body-1 text-gray-800">
+              {{ $t('components.learningPlan.drawer.archivedTasks') }}
+            </p>
+            <alex-custom-switch
+              v-model="filters.archivedTasks"
+              class="archived-switch"
+              inset
+              hide-details
+            ></alex-custom-switch>
+          </div>
         </div>
-      </div>
-      <hr />
+        <hr />
 
-      <div class="d-flex ga-1 px-4">
-        <alex-custom-button
-          class="flex-1-1"
-          variant="secondary"
-          size="large"
-          @click="clearFilters"
-          >{{ $t('components.learningPlan.drawer.clean') }}</alex-custom-button
-        >
-        <alex-custom-button class="flex-1-1" size="large" type="submit">{{
-          $t('components.learningPlan.drawer.filter')
-        }}</alex-custom-button>
-      </div>
-    </form>
-  </v-navigation-drawer>
+        <div class="d-flex ga-1 pa-4 pt-0">
+          <alex-custom-button
+            class="flex-1-1"
+            variant="secondary"
+            size="large"
+            @click="clearFilters"
+            >{{
+              $t('components.learningPlan.drawer.clean')
+            }}</alex-custom-button
+          >
+          <alex-custom-button class="flex-1-1" size="large" type="submit">{{
+            $t('components.learningPlan.drawer.filter')
+          }}</alex-custom-button>
+        </div>
+      </form>
+    </SheetContent>
+  </Sheet>
 </template>
 
 <script setup lang="ts">
@@ -135,7 +129,6 @@ interface Filter {
 }
 
 const props = withDefaults(defineProps<Filter>(), {
-  modelValue: false,
   classes: () => [],
   kanbanFilter: false,
 });
@@ -214,10 +207,7 @@ const types = [
 ];
 
 const emits = defineEmits(['update:modelValue', 'filter']);
-
-const handleChange = (value: boolean) => {
-  emits('update:modelValue', value);
-};
+const model = defineModel({ default: false });
 
 const onSubmit = handleSubmit(() => {
   const nonEmptyFilters = Object.fromEntries(
@@ -232,7 +222,7 @@ const onSubmit = handleSubmit(() => {
     }),
   );
   emits('filter', nonEmptyFilters);
-  handleChange(false);
+  model.value = false;
 });
 
 const removeFilter = (key: string) => {

@@ -1,196 +1,192 @@
 <template>
-  <v-navigation-drawer
-    :id="drawerId"
-    v-model="model"
-    location="right"
-    temporary
-    floating
-    :width="640"
-    scrim="transparent"
-    sticky
-    class="task-details-drawer pa-6 pt-2 rounded-s-lg"
-  >
-    <template #prepend>
+  <alex-custom-drawer v-model="model" side="right">
+    <template #header>
       <div class="d-flex align-center justify-end">
         <alex-custom-button
           icon="mdi-close"
           size="small"
           variant="text"
-          @click="model = false"
+          @click="handleCloseModal"
         />
       </div>
     </template>
+    <div class="tw-flex tw-flex-col tw-p-6 tw-py-0">
+      <alex-learningplan-task-tags v-model="tags" :task-id="taskId" />
 
-    <alex-learningplan-task-tags v-model="tags" :task-id="taskId" />
-
-    <p class="mt-4 text-h2 ellipsis lines-2" :class="title || 'text-gray-400'">
-      {{ title || $t('components.learningPlan.drawer.missing.title') }}
-    </p>
-
-    <v-row class="mt-4 flex-0-0">
-      <v-col cols="6" class="pb-1">
-        <alex-learningplan-task-state v-model="status" mode="student" />
-      </v-col>
-      <v-col cols="6" class="pb-1"
-        ><p class="text-body-4 text-gray-800 mb-1">
-          {{ $t('components.learningPlan.drawer.task.type.label') }}
-        </p>
-
-        <alex-learningplan-task-options
-          v-model="type"
-          :config="{
-            group: $t('components.learningPlan.drawer.task.type.collective'),
-            individual: $t(
-              'components.learningPlan.drawer.task.type.individual',
-            ),
-          }"
-          :placeholder="$t('components.learningPlan.drawer.missing.type')"
-        />
-      </v-col>
-      <v-col cols="6"
-        ><p class="text-body-4 text-gray-800 mb-1">
-          {{ $t('components.learningPlan.drawer.task.date.startLabel') }}
-        </p>
-
-        <alex-learningplan-task-date v-model="startDate" />
-      </v-col>
-      <v-col cols="6"
-        ><p class="text-body-4 text-gray-800 mb-1">
-          {{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
-        </p>
-
-        <alex-learningplan-task-date v-model="finalDate" />
-      </v-col>
-    </v-row>
-
-    <alex-learningplan-task-description v-model="description" class="mt-4" />
-
-    <div class="my-6">
-      <p class="text-h4 text-gray-800">
-        {{ $t('components.learningPlan.drawer.task.submission.label') }}
+      <p
+        class="mt-4 text-h2 ellipsis lines-2"
+        :class="title || 'text-gray-400'"
+      >
+        {{ title || $t('components.learningPlan.drawer.missing.title') }}
       </p>
 
-      <template v-if="submission">
-        <alex-learningplan-task-restrictions
-          v-model="restrictionsValue"
-          class="mt-4"
-        />
-
-        <alex-learningplan-task-description
-          v-if="submissionDescription"
-          v-model="submissionDescription"
-          class="mt-4"
-          :title="
-            $t(
-              'components.learningPlan.drawer.task.description.submissionLabel',
-            )
-          "
-        />
-
-        <div class="mt-4">
-          <p class="text-body-4 mb-2">
-            {{ $t('components.courses.tasks.submission.last_submission') }}
+      <v-row class="mt-4 flex-0-0">
+        <v-col cols="6" class="pb-1">
+          <alex-learningplan-task-state v-model="status" mode="student" />
+        </v-col>
+        <v-col cols="6" class="pb-1"
+          ><p class="text-body-4 text-gray-800 mb-1">
+            {{ $t('components.learningPlan.drawer.task.type.label') }}
           </p>
-          <alex-learningplan-task-submission
-            v-if="!loadingSubmission"
-            type="student"
-            :status="getSubmissionStatus(submissions.data[0], status)"
-            :mark="mostRecentSubmission?.grade"
-            :max-mark="mostRecentSubmission?.grade"
-            :task-title="title"
-            :task-deadline="finalDate"
-            :restrictions="restrictionsValue"
-            :task-member-id="taskMemberId"
-            :content="submissions.data[0]"
-            :task-status="status"
-            :doc-name="docName"
-            @update-task-status="handleChangeStatus"
-            @update-submission="$emit('update-submission')"
+
+          <alex-learningplan-task-options
+            v-model="type"
+            :config="{
+              group: $t('components.learningPlan.drawer.task.type.collective'),
+              individual: $t(
+                'components.learningPlan.drawer.task.type.individual',
+              ),
+            }"
+            :placeholder="$t('components.learningPlan.drawer.missing.type')"
           />
-          <div v-if="loadingSubmission">
-            <alex-custom-skeleton
-              color="gray-blue"
-              class="tw-w-full tw-h-[61px]"
+        </v-col>
+        <v-col cols="6"
+          ><p class="text-body-4 text-gray-800 mb-1">
+            {{ $t('components.learningPlan.drawer.task.date.startLabel') }}
+          </p>
+
+          <alex-learningplan-task-date v-model="startDate" />
+        </v-col>
+        <v-col cols="6"
+          ><p class="text-body-4 text-gray-800 mb-1">
+            {{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
+          </p>
+
+          <alex-learningplan-task-date v-model="finalDate" />
+        </v-col>
+      </v-row>
+
+      <alex-learningplan-task-description v-model="description" class="mt-4" />
+
+      <div class="my-6">
+        <p class="text-h4 text-gray-800">
+          {{ $t('components.learningPlan.drawer.task.submission.label') }}
+        </p>
+
+        <template v-if="submission">
+          <alex-learningplan-task-restrictions
+            v-model="restrictionsValue"
+            class="mt-4"
+          />
+
+          <alex-learningplan-task-description
+            v-if="submissionDescription"
+            v-model="submissionDescription"
+            class="mt-4"
+            :title="
+              $t(
+                'components.learningPlan.drawer.task.description.submissionLabel',
+              )
+            "
+          />
+
+          <div class="mt-4">
+            <p class="text-body-4 mb-2">
+              {{ $t('components.courses.tasks.submission.last_submission') }}
+            </p>
+            <alex-learningplan-task-submission
+              v-if="!loadingSubmission"
+              type="student"
+              :status="getSubmissionStatus(submissions.data[0], status)"
+              :mark="mostRecentSubmission?.grade"
+              :max-mark="mostRecentSubmission?.grade"
+              :task-title="title"
+              :task-deadline="finalDate"
+              :restrictions="restrictionsValue"
+              :task-member-id="taskMemberId"
+              :content="submissions.data[0]"
+              :task-status="status"
+              :doc-name="docName"
+              @update-task-status="handleChangeStatus"
+              @update-submission="$emit('update-submission')"
             />
+            <div v-if="loadingSubmission">
+              <alex-custom-skeleton
+                color="gray-blue"
+                class="tw-w-full tw-h-[61px]"
+              />
+            </div>
           </div>
-        </div>
-      </template>
-      <alex-custom-chip
-        v-else
-        class="mt-2"
-        text="Sem entrega"
-        variant="outlined"
-        size="small"
-      />
-    </div>
-
-    <alex-learningplan-task-resources
-      v-if="blocks && blocks.length > 0 && trail"
-      v-model="resourcesOpen"
-      class="mt-6"
-      :edit="false"
-      :task-id="taskId"
-      :trail-id="trail?.id"
-      :blocks="blocks"
-      :task-member-id="taskMemberId"
-    />
-
-    <alex-learningplan-task-tabs
-      v-model="activeTab"
-      v-model:attached-message="attachedMessage"
-      v-model:attached-submission="attachedSubmission"
-      class="mt-6"
-      :task-member="{
-        id: taskMemberId,
-        status,
-      }"
-      :task="{
-        id: taskId,
-        title,
-        finalDate,
-        restrictions: submission?.constraints || [],
-      }"
-      :show-member-tab="!!group"
-      :is-sending-message="isSendingMessage"
-      :message="{ isLoading: pendingMessages }"
-      :event="{ events: events.data, isLoading: eventLoading }"
-      :submission="!!submission"
-      :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
-      :submissions="evaluatedSubmissions"
-    >
-      <template v-if="learningplanStore.learningPlan" #members>
-        <alex-learningplan-task-members-card
-          v-for="member in group?.participants"
-          :key="`group-member${member.name}`"
-          :member="{
-            name: member.name,
-            class: group?.name,
-            avatarUrl: member.image?.url,
-            responsable: member.role === 'in_charge',
-          }"
-          :edit="false"
+        </template>
+        <alex-custom-chip
+          v-else
+          class="mt-2"
+          text="Sem entrega"
+          variant="outlined"
+          size="small"
         />
-      </template>
-    </alex-learningplan-task-tabs>
-    <template v-if="activeTab === '3'" #append>
-      <alex-learningplan-task-chat-input
+      </div>
+
+      <alex-learningplan-task-resources
+        v-if="blocks && blocks.length > 0 && trail"
+        v-model="resourcesOpen"
+        class="mt-6"
+        :edit="false"
+        :task-id="taskId"
+        :trail-id="trail?.id"
+        :blocks="blocks"
+        :task-member-id="taskMemberId"
+      />
+
+      <alex-learningplan-task-tabs
+        v-model="activeTab"
         v-model:attached-message="attachedMessage"
         v-model:attached-submission="attachedSubmission"
-        class="border-top-1 border-gray-100 pt-3"
+        class="mt-6"
+        :task-member="{
+          id: taskMemberId,
+          status,
+        }"
+        :task="{
+          id: taskId,
+          title,
+          finalDate,
+          restrictions: submission?.constraints || [],
+        }"
+        :show-member-tab="!!group"
+        :is-sending-message="isSendingMessage"
+        :message="{ isLoading: pendingMessages }"
+        :event="{ events: events.data, isLoading: eventLoading }"
+        :submission="!!submission"
+        :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
         :submissions="evaluatedSubmissions"
-        @submit="
-          (data) =>
-            handleSubmitMessage(
-              data.text,
-              data.audio?.blob,
-              data.audio?.duration,
-              data.attachedMessage,
-              data.attachedSubmission,
-            )
-        "
-      />
+      >
+        <template v-if="learningplanStore.learningPlan" #members>
+          <alex-learningplan-task-members-card
+            v-for="member in group?.participants"
+            :key="`group-member${member.name}`"
+            :member="{
+              name: member.name,
+              class: group?.name,
+              avatarUrl: member.image?.url,
+              responsable: member.role === 'in_charge',
+            }"
+            :edit="false"
+          />
+        </template>
+      </alex-learningplan-task-tabs>
+    </div>
+    <template v-if="activeTab === '3'" #footer>
+      <div class="tw-px-6">
+        <alex-learningplan-task-chat-input
+          v-model:attached-message="attachedMessage"
+          v-model:attached-submission="attachedSubmission"
+          class="border-top-1 border-gray-100 pt-3"
+          :submissions="evaluatedSubmissions"
+          @submit="
+            (data) =>
+              handleSubmitMessage(
+                data.text,
+                data.audio?.blob,
+                data.audio?.duration,
+                data.attachedMessage,
+                data.attachedSubmission,
+              )
+          "
+        />
+      </div>
     </template>
-  </v-navigation-drawer>
+  </alex-custom-drawer>
 </template>
 
 <script setup lang="ts">
@@ -341,6 +337,9 @@ const mostRecentSubmission = computed(
   () =>
     submissions.value.data.filter((submission) => submission.evaluated_at)[0],
 );
+const handleCloseModal = () => {
+  model.value = false;
+};
 const getSubmissionStatus = (
   submission?: TaskSubmissionSimple,
   status?: TaskMemberStatus,

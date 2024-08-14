@@ -1,15 +1,6 @@
 <template>
-  <v-navigation-drawer
-    v-model="model"
-    location="right"
-    temporary
-    floating
-    :width="640"
-    scrim="transparent"
-    sticky
-    class="pa-6 pt-2 rounded-s-lg"
-  >
-    <template #prepend>
+  <alex-custom-drawer v-model="model" side="right" class="rounded-s-lg">
+    <template #header>
       <div class="d-flex align-center justify-end">
         <alex-custom-button
           v-if="kanbanButton"
@@ -27,7 +18,7 @@
       </div>
     </template>
 
-    <div>
+    <div class="tw-flex tw-flex-col tw-w-full pa-6 pt-2">
       <!-- Tags -->
       <alex-learningplan-task-tags
         v-model="tags"
@@ -199,7 +190,7 @@
         /></v-window-item>
       </v-window>
     </div>
-  </v-navigation-drawer>
+  </alex-custom-drawer>
 </template>
 
 <script setup lang="ts">
