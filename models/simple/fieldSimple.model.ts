@@ -1,4 +1,4 @@
-export interface ProductSimple {
+export interface FieldSimple {
   id: number;
   text: string;
   isPublic: boolean;

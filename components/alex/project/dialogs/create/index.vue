@@ -60,7 +60,8 @@
         label="Quais as áreas de atuação do Projeto?"
         placeholder="Selecione as áreas"
         hide-details
-        :items="selectionAreas"
+        item-title="text"
+        :items="selectionFields?.data || []"
       />
       <TransitionGroup
         name="list"
@@ -69,8 +70,8 @@
       >
         <alex-custom-chip
           v-for="(area, index) in projectInfo.areas"
-          :key="area"
-          :text="area"
+          :key="area.id"
+          :text="area.text"
           status="secondary"
           clickable
           @click="removeItem(index, 'area')"
@@ -182,22 +183,24 @@
       <alex-learningplan-task-members
         kind="project"
         :learningplan-ids="associatedCourses.map((course) => course.id)"
-        @invite="() => (e) => (students = e)"
+        :students="students"
+        @set-members="(e) => (students = e)"
       />
     </template>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
-import { ProductSimple } from '~/models/simple/productSimple.model';
+type FieldSimpleOptionalId = Omit<FieldSimple, 'id'> & { id?: number };
+type ProductSimpleOptionalId = Omit<ProductSimple, 'id'> & { id?: number };
 
 interface ProjectType {
   title: string;
   description: string;
   startDate: string;
   endDate: string;
-  areas: string[];
-  product: string | null;
+  areas: FieldSimpleOptionalId[];
+  product: ProductSimpleOptionalId | null;
 }
 
 interface CoursesInfo {
@@ -211,7 +214,7 @@ interface CoursesInfo {
   };
 }
 
-const students = ref([]);
+const students = ref<LearningPlanMemberSimple[]>([]);
 
 const loading = ref(false);
 
@@ -221,6 +224,7 @@ withDefaults(defineProps<{ modelValue?: boolean }>(), {
 const emit = defineEmits(['update:modelValue', 'submit']);
 const value = defineModel<boolean>({ required: true });
 const { find } = useStrapiUtils();
+const client = useStrapiClient();
 
 const projectInfo = ref<ProjectType>({
   title: '',
@@ -232,6 +236,7 @@ const projectInfo = ref<ProjectType>({
 });
 
 const user = useStrapiUser<User>();
+const { setMessage } = useMessageStore();
 
 const queryConfig = {
   filters: {
@@ -287,7 +292,7 @@ const { data: availableCoursesData } = await useAsyncData(
 );
 
 const { data: selectionProducts } = await useAsyncData(
-  'availableProductsTypes',
+  'availableProducts',
   () =>
     find<ProductSimple>('products', {
       filters: {
@@ -295,7 +300,21 @@ const { data: selectionProducts } = await useAsyncData(
       },
     }),
   {
-    default: () => ({ meta: 0, data: [] as String[] }),
+    default: () => ({ meta: 0, data: [] }),
+    lazy: true,
+  },
+);
+
+const { data: selectionFields } = await useAsyncData(
+  'availableFields',
+  () =>
+    find<ProductSimple>('fields', {
+      filters: {
+        $or: [{ isPublic: true }, { verified_by: user.value.id }],
+      },
+    }),
+  {
+    default: () => ({ meta: 0, data: [] }),
     lazy: true,
   },
 );
@@ -318,19 +337,6 @@ const removeItem = (index: number, type: string) => {
   }
 };
 
-// Testes
-const selectionAreas = [
-  'Web',
-  'Mobile',
-  'IA',
-  'BD',
-  'DevOps',
-  'UX',
-  'UI',
-  'Redes',
-  'Desenvolvimento de software',
-];
-
 const stepsConfig = {
   step1: {
     title: 'Informações',
@@ -347,6 +353,43 @@ const stepsConfig = {
   },
 };
 
+watch(
+  () => projectInfo.value.areas,
+  (newAreas) => {
+    const lastArea = newAreas[newAreas.length - 1];
+    if (typeof lastArea === 'string') {
+      newComboboxItem(lastArea, 'area');
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => projectInfo.value.product,
+  (newProduct) => {
+    if (typeof newProduct === 'string') {
+      newComboboxItem(newProduct, 'product');
+    }
+  },
+);
+
+const newComboboxItem = (text: string, type: 'area' | 'product') => {
+  const newItem = {
+    text,
+    isPublic: false,
+    verified_date: new Date(),
+    verified_by: user.value.id,
+  };
+
+  type === 'area'
+    ? projectInfo.value.areas.splice(
+        projectInfo.value.areas.length - 1,
+        1,
+        newItem,
+      )
+    : (projectInfo.value.product = newItem);
+};
+
 const disablePastDates = (date: Date) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -354,10 +397,32 @@ const disablePastDates = (date: Date) => {
   return passedDate >= today;
 };
 
-const createProject = () => {
-  console.log('Criando projeto');
-  emit('submit');
-  emit('update:modelValue', false);
+const createProject = async () => {
+  try {
+    loading.value = true;
+    await client('learningplans/create-project', {
+      method: 'POST',
+      body: {
+        title: projectInfo.value.title,
+        description: projectInfo.value.description,
+        start_date: projectInfo.value.startDate,
+        end_date: projectInfo.value.endDate,
+        slug: `project-${projectInfo.value.title}`,
+        type: 'project',
+        fields: projectInfo.value.areas,
+        product: projectInfo.value.product,
+        course: associatedCourses.value.map((course) => course.id),
+        users: students.value.map((student) => student.user?.id || student.id),
+      },
+    });
+    emit('submit');
+    emit('update:modelValue', false);
+    setMessage('Projeto Criado com sucesso', 'success', true);
+  } catch (error) {
+    setMessage('Erro ao criar o projeto, tente novamente', 'error', true);
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 
