@@ -10,20 +10,18 @@
       data-tour="step-user-area"
     >
       <template #header>
-        <div
-          class="my-4 w-100 d-flex"
-          :class="clipped ? '' : 'justify-center'"
-          style="max-height: 28px"
-        >
+        <div class="my-4 w-100 d-flex" :class="clipped ? '' : 'justify-center'">
           <div>
             <NuxtLink to="/">
-              <img
-                v-if="clipped"
-                src="/images/alex-mini.svg"
-                height="28"
-                width="43"
-              />
-              <img v-else src="/images/alex.svg" height="28" width="84" />
+              <v-fade-transition hide-on-leave>
+                <img
+                  v-if="clipped"
+                  src="/images/alex-mini.svg"
+                  width="43"
+                  class="tw-h-7"
+                />
+                <img v-else src="/images/alex.svg" class="tw-h-7" width="84" />
+              </v-fade-transition>
             </NuxtLink>
           </div>
         </div>
@@ -41,8 +39,10 @@
       @toggle:drawer="closeDrawable(!clipped)"
       @click="onClickOutside"
     />
-    <v-main class="bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container class="pa-4 pa-sm-6 max-width-100">
+    <v-main class="d-flex bg-gray-blue pt-16" @click="onClickOutside">
+      <v-container
+        class="d-flex flex-column flex-1 w-100 pa-4 pa-sm-6 max-width-100 min-height-100"
+      >
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -202,7 +202,6 @@ onBeforeMount(() => {
 const defaultMenus = [
   {
     title: i18n.t('layouts.default.userArea'),
-    dataTour: 'step-user-area',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
@@ -210,9 +209,14 @@ const defaultMenus = [
         to: '/',
       },
       {
-        icon: 'mdi-book-outline',
+        icon: 'mdi-book-cog-outline',
         title: i18n.t('layouts.default.myClasses'),
         to: '/courses/me',
+      },
+      {
+        icon: 'alex:ProjectConfig',
+        title: 'Meus Projetos',
+        to: '/projects/me',
       },
       // {
       //   icon: 'mdi-clipboard-multiple-outline',

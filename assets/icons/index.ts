@@ -4,12 +4,14 @@ import trail from './Trail.vue';
 import DragIndicator from './DragIndicator.vue';
 import RoundAddPhoto from './RoundAddPhoto.vue';
 import Kanban from './Kanban.vue';
+import ProjectConfig from './ProjectConfig.vue';
 
 const alexAliases = {
   trail,
   DragIndicator,
   RoundAddPhoto,
   Kanban,
+  ProjectConfig,
 };
 
 const alexIcons: IconSet = {
