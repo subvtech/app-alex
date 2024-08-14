@@ -33,6 +33,9 @@
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
+      :class="
+        clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'
+      "
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
@@ -303,6 +306,11 @@ const menus = computed(() => {
 .clipped-sidebar {
   --v-layout-left: 56px !important;
 }
+.main-header-app {
+  left: var(--v-layout-left) !important;
+  width: calc(100% - var(--v-layout-left)) !important;
+}
+
 .overflow-hidden {
   overflow-y: hidden;
 }
