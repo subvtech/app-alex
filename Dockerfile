@@ -21,13 +21,6 @@ USER alex
 
 ADD --chown=alex:alex ./package.json ./yarn.lock ./
 
-RUN npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
-RUN npm config set //registry.tiptap.dev/:_authToken $tiptap_key
-
-RUN yarn --ignore-scripts
-
-ADD --chown=alex:alex . .
-
 ENV STRAPI_URL=$strapi_url
 ENV COMPONENTS_PAGE=$components_page
 ENV MATOMO_APP_ID=$matomo_app_id
@@ -35,6 +28,10 @@ ENV MATOMO_URL=$matomo_url
 ENV OPEN_AI_KEY=$open_ai_key
 ENV TIPTAP_APP_ID=$tiptap_app_id
 ENV TIPTAP_KEY=$tiptap_key
+
+RUN yarn --ignore-scripts
+
+ADD --chown=alex:alex . .
 
 RUN yarn build
 
