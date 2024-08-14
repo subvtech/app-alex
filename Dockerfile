@@ -29,6 +29,9 @@ ENV OPEN_AI_KEY=$open_ai_key
 ENV TIPTAP_APP_ID=$tiptap_app_id
 ENV TIPTAP_KEY=$tiptap_key
 
+RUN npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
+RUN npm config set //registry.tiptap.dev/:_authToken $tiptap_key
+
 RUN yarn --ignore-scripts
 
 ADD --chown=alex:alex . .
