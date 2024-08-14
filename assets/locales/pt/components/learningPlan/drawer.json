@@ -85,6 +85,7 @@
         "missName": "Informe o nome do grupo",
         "updated": "Grupo atualizado com sucesso",
         "created": "Grupo criado com sucesso",
+        "added": "Grupo adicionado com sucesso",
         "oneMember": "O grupo precisa de pelo menos 2 membros",
         "hasSubmission": "O grupo não pode ser editado porque já possui submissão",
         "updateError": "Falha ao atualizar grupo",
