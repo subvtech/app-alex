@@ -399,6 +399,16 @@ const disablePastDates = (date: Date) => {
 
 const createProject = async () => {
   try {
+    const usersData = students.value.map((student) => ({
+      id: student.user?.id ?? student.id,
+      email: student.user?.email ?? student.email,
+    }));
+
+    const usersIds = usersData.filter((user) => user.id).map((user) => user.id);
+    const newUsersEmails = usersData
+      .filter((user) => !user.id)
+      .map((user) => user.email);
+
     loading.value = true;
     await client('learningplans/create-project', {
       method: 'POST',
@@ -412,7 +422,8 @@ const createProject = async () => {
         fields: projectInfo.value.areas,
         product: projectInfo.value.product,
         course: associatedCourses.value.map((course) => course.id),
-        users: students.value.map((student) => student.user?.id || student.id),
+        users: usersIds,
+        new_users: newUsersEmails,
       },
     });
     emit('submit');
