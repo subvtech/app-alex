@@ -300,15 +300,17 @@ const menus = computed(() => {
 </script>
 
 <style lang="scss">
-.sidebar {
-  --v-layout-left: 256px !important;
-}
-.clipped-sidebar {
-  --v-layout-left: 56px !important;
-}
-.main-header-app {
-  left: var(--v-layout-left) !important;
-  width: calc(100% - var(--v-layout-left)) !important;
+@media screen and (min-width: 959px) {
+  .sidebar {
+    --v-layout-left: 256px !important;
+  }
+  .clipped-sidebar {
+    --v-layout-left: 56px !important;
+  }
+  .main-header-app {
+    left: var(--v-layout-left) !important;
+    width: calc(100% - var(--v-layout-left)) !important;
+  }
 }
 
 .overflow-hidden {
