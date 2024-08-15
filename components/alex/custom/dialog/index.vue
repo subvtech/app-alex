@@ -6,6 +6,8 @@
     class="custom-alex-dialog"
     :model-value="modelValue"
     :activator="activator"
+    :retain-focus="false"
+    :attach="attach"
     @update:model-value="handleChange"
   >
     <template
@@ -120,9 +122,9 @@
 </template>
 
 <script setup lang="ts">
+import { type VDialog } from 'vuetify/components/VDialog';
 import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { StepsConfig } from '@/components/alex/inputs/stepper/index.vue';
-
 interface HeaderProps {
   modelValue: boolean;
   activator?: 'parent';
@@ -141,6 +143,7 @@ interface HeaderProps {
   stepsConfig?: Record<string, Partial<StepsConfig>>;
   loading?: boolean;
   maxWidth?: number;
+  attach?: VDialog['attach'];
 }
 const props = withDefaults(defineProps<HeaderProps>(), {
   activator: undefined,
@@ -159,6 +162,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   stepClass: undefined,
   loading: undefined,
   maxWidth: 720,
+  attach: true,
 });
 const { mobile } = useDisplay();
 const emits = defineEmits([

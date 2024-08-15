@@ -8,7 +8,7 @@
     <transition-group name="list">
       <v-expansion-panel
         v-for="(item, index) in list"
-        :key="`${item.id}-${item.title}`"
+        :key="`item-${item.id}`"
         role="listItem"
         :class="over == index && dragging && dragFrom != item ? 'over' : ''"
         @dragover="(e) => onDragOver(index, e)"
