@@ -8,44 +8,49 @@ export default function useNavigationDrawer(
   const drawer = ref(defaultDrawerValue);
   const currentWidth = ref(defaultWidth);
 
-  onMounted(() => {
+  const handleSetWidth = () => {
     currentWidth.value = window.innerWidth;
-
-    window.addEventListener('resize', () => {
-      currentWidth.value = window.innerWidth;
-    });
-  });
-  const onClickOutside = computed(() =>
-    drawer.value && !isPermanent.value ? closeDrawable : () => {},
-  );
-
-  const closeDrawable = (clippedValue = true) => {
-    if (isPermanent.value) {
-      if (!drawer.value) drawer.value = true;
-      clipped.value = clippedValue;
-    } else if (drawer.value) {
-      clipped.value = false;
-      drawer.value = false;
-    } else {
-      drawer.value = true;
-      clipped.value = false;
-    }
+  };
+  const onClickOutside = () => {
+    closeDrawable();
   };
 
-  const isPermanent = computed(() => currentWidth.value >= 959);
-
+  const closeDrawable = (clippedValue = true) => {
+    clipped.value = clippedValue;
+    if (isPermanent.value) {
+      if (!drawer.value) {
+        drawer.value = true;
+      }
+      clipped.value = clippedValue;
+      return;
+    }
+    if (drawer.value) {
+      clipped.value = false;
+      drawer.value = false;
+      return;
+    }
+    drawer.value = true;
+    clipped.value = false;
+  };
+  const isPermanent = computed(() => currentWidth.value >= 767);
   watch(isPermanent, () => {
     if (isPermanent.value && !drawer.value) {
       drawer.value = true;
     }
   });
-
+  onMounted(() => {
+    currentWidth.value = window.innerWidth;
+    window.addEventListener('resize', handleSetWidth);
+  });
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleSetWidth);
+  });
   return {
     clipped,
     drawer,
-    isPermanent,
     closeDrawable,
     onClickOutside,
     currentWidth,
+    isPermanent,
   };
 }
