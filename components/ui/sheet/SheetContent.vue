@@ -37,16 +37,6 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
     <DialogContent
       :class="cn(sheetVariants({ side }), props.class)"
       v-bind="{ ...forwarded, ...$attrs }"
-      disable-outside-pointer-events
-      @pointer-down-outside="
-        (event) => {
-          const originalEvent = event.detail.originalEvent;
-          const target = originalEvent.target as HTMLElement;
-          if (!target.getAttribute('lang')) {
-            event.preventDefault();
-          }
-        }
-      "
     >
       <div class="tw-flex tw-flex-col tw-h-[calc(100%-64px)]">
         <slot name="header" />

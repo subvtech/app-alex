@@ -5,7 +5,12 @@
     </p>
 
     <div class="d-flex align-center flex-wrap ga-2">
-      <v-menu v-if="props.edit" v-model="open" :close-on-content-click="false">
+      <v-menu
+        v-if="props.edit"
+        v-model="open"
+        :close-on-content-click="false"
+        attach
+      >
         <!-- Adicionar objetivo -->
         <template #activator="{ props: vMenuProps }">
           <alex-custom-button
@@ -72,11 +77,15 @@
 </template>
 
 <script setup lang="ts">
+import { type VMenu } from 'vuetify/components/VMenu';
 interface CompProps {
   edit?: boolean;
+  attach?: VMenu['attach'];
 }
 
-const props = defineProps<CompProps>();
+const props = withDefaults(defineProps<CompProps>(), {
+  attach: true,
+});
 const selectedGoals = defineModel<LearningPlanGoalSimple[]>({ default: [] });
 
 const open = ref<boolean>(false);
