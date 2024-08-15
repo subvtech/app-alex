@@ -50,6 +50,7 @@
     "dialog": {
       "responsible": "Responsável",
       "add": "Adicionar",
+      "added": "Adicionado",
       "newGroup": "Novo grupo",
       "newMembers": "Adicionar integrantes",
       "searchMembers": "Buscar participantes do curso",

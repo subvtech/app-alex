@@ -53,6 +53,7 @@
     "dialog": {
       "responsible": "Responsible",
       "add": "Add",
+      "added": "Added",
       "newGroup": "New group",
       "newMembers": "Add members",
       "searchMembers": "Search course members",

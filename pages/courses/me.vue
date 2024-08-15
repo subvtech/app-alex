@@ -304,6 +304,7 @@ const queryConfig = {
       },
     ],
     archived_at: { $notNull: false },
+    type: { $eq: 'course' },
   },
   populate: {
     cover_image: true,
