@@ -48,6 +48,7 @@
           :ignore-emails="ignoreUserEmails"
           :label="$t('components.learningPlan.dialogs.whoParticipate')"
           :placeholder="$t('components.learningPlan.dialogs.searchMember')"
+          :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
         />
         <p class="text-body-4 text-gray-900">
           {{ $t('components.learningPlan.dialogs.pendingInvites') }}

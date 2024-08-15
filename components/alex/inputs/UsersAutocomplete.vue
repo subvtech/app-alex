@@ -11,7 +11,6 @@
       :custom-filter="filterByFullnameAndEmail"
       :name="name"
       v-bind="$attrs"
-      :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
     >
       <template #item="{ props: propsItem, item, index }">
         <alex-custom-list-item-user
