@@ -1,7 +1,8 @@
 <template>
   <div
-    class="d-flex align-center ga-2 pa-2 list-card"
-    @click="$emit('to-profile')"
+    class="d-flex align-center ga-2 pa-2"
+    :class="{ 'list-card': clickable }"
+    @click="clickable && $emit('to-profile')"
   >
     <v-img
       v-if="!member.group"
@@ -80,11 +81,13 @@ interface CompProps {
   member: MemberProps;
   noClass?: boolean;
   edit?: boolean;
+  clickable?: boolean;
 }
 
 withDefaults(defineProps<CompProps>(), {
   noClass: false,
   edit: true,
+  clickable: true,
 });
 defineEmits(['remove-click', 'to-profile', 'edit-click']);
 </script>
