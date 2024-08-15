@@ -23,7 +23,9 @@
       :disabled="isAdded"
       @click="emit('add-members', group)"
       >{{
-        isAdded ? 'Added' : $t('components.learningPlan.drawer.task.dialog.add')
+        isAdded
+          ? $t('components.learningPlan.drawer.task.dialog.added')
+          : $t('components.learningPlan.drawer.task.dialog.add')
       }}</alex-custom-button
     >
   </div>

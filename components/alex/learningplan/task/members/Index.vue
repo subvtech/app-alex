@@ -46,7 +46,6 @@
           :task-members="members.data"
           @add-group="handleAddGroup"
         />
-
         <alex-learningplan-task-dialog-add-project-members
           v-if="kind === 'project'"
           v-model="addProjectMembersDialog"
@@ -389,11 +388,14 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
     );
   }
 };
-const removeMember = async (member: TaskMember) => {
+const removeMember = async (member) => {
   if (props.kind === 'project') {
-    projectStudents.value = projectStudents.value.filter(
-      (student) => student.id !== member.id,
+    const indexOf = projectStudents.value.findIndex(
+      (student) =>
+        student.user.id === member.user.id ||
+        student.user.email === member.user.email,
     );
+    projectStudents.value.splice(indexOf, 1);
   } else {
     try {
       if (props.blockDelete) {

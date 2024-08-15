@@ -1,9 +1,9 @@
 <template>
   <alex-custom-dialog
     v-model="value"
-    title="Criar novo projeto"
-    name-main-button="Criar"
-    name-second-button="Cancelar"
+    :title="$t('components.projects.create.title')"
+    name-main-button="$t('components.projects.create.mainAction')"
+    name-second-button="$t('components.projects.create.secondaryAction')"
     :steps-config="stepsConfig"
     :loading="loading"
     step-class="d-flex gap-1"
@@ -17,8 +17,10 @@
         v-model="projectInfo.title"
         density="comfortable"
         name="title"
-        label="Como vai se chamar seu Projeto?"
-        placeholder="Digite um nome"
+        :label="$t('components.projects.create.basicInfo.titleLabel')"
+        :placeholder="
+          $t('components.projects.create.basicInfo.titlePlaceholder')
+        "
         required
       />
 
@@ -26,8 +28,10 @@
         v-model="projectInfo.description"
         density="comfortable"
         name="description"
-        label="Do que se trata seu Projeto?"
-        placeholder="Digite uma descrição"
+        :label="$t('components.projects.create.basicInfo.descriptionLabel')"
+        :placeholder="
+          $t('components.projects.create.basicInfo.descriptionPlaceholder')
+        "
         theme="light"
         required
       />
@@ -37,7 +41,7 @@
           v-model="projectInfo.startDate"
           class="flex-grow-1 min-w-60"
           name="startDate"
-          label="Quando iniciará seu Projeto?"
+          :label="$t('components.projects.create.basicInfo.startDateLabel')"
           required
           density="comfortable"
           :allowed-dates="disablePastDates"
@@ -48,7 +52,7 @@
           density="comfortable"
           name="endDate"
           required
-          label="Quando terminará seu Projeto?"
+          :label="$t('components.projects.create.basicInfo.endDateLabel')"
           :allowed-dates="disablePastDates"
         />
       </div>
@@ -57,8 +61,10 @@
         name="areas"
         multiple
         clearable
-        label="Quais as áreas de atuação do Projeto?"
-        placeholder="Selecione as áreas"
+        :label="$t('components.projects.create.basicInfo.fieldLabel')"
+        :placeholder="
+          $t('components.projects.create.basicInfo.fieldPlaceholder')
+        "
         hide-details
         item-title="text"
         :items="selectionFields?.data || []"
@@ -80,8 +86,10 @@
       <alex-inputs-combobox
         v-model="projectInfo.product"
         name="product"
-        label="Qual será o Produto do seu Projeto?"
-        placeholder="Selecione um tipo de produto"
+        :label="$t('components.projects.create.basicInfo.projectTypeLabel')"
+        :placeholder="
+          $t('components.projects.create.basicInfo.projectTypePlaceholder')
+        "
         hide-details
         item-title="text"
         :items="selectionProducts?.data || []"
@@ -91,9 +99,13 @@
       <alex-inputs-select
         v-model="associatedCourses"
         name="associatedCourses"
-        label="Selecionar cursos"
-        placeholder="Selecione os cursos associados"
-        no-data-text="Você não possui cursos disponíveis"
+        :label="$t('components.projects.create.associatedCourses.titleLabel')"
+        :placeholder="
+          $t('components.projects.create.associatedCourses.titlePlaceholder')
+        "
+        :no-data-text="
+          $t('components.projects.create.associatedCourses.searchNoResults')
+        "
         class="position-relative"
         item-title="title"
         :items="availableCoursesData || []"
@@ -225,6 +237,7 @@ const emit = defineEmits(['update:modelValue', 'submit']);
 const value = defineModel<boolean>({ required: true });
 const { find } = useStrapiUtils();
 const client = useStrapiClient();
+const { t } = useI18n();
 
 const projectInfo = ref<ProjectType>({
   title: '',
@@ -258,6 +271,7 @@ const queryConfig = {
       },
     ],
     archived_at: { $notNull: false },
+    type: { $eq: 'course' },
   },
   populate: {
     cover_image: true,
@@ -339,17 +353,17 @@ const removeItem = (index: number, type: string) => {
 
 const stepsConfig = {
   step1: {
-    title: 'Informações',
-    subtitle: 'Básicas',
+    title: t('components.projects.create.steps.basicInfo.title'),
+    subtitle: t('components.projects.create.steps.basicInfo.subtitle'),
     scheme: createProjectRules,
   },
   step2: {
-    title: 'Cursos',
-    subtitle: 'Associados',
+    title: t('components.projects.create.steps.associatedCourses.title'),
+    subtitle: t('components.projects.create.steps.associatedCourses.subtitle'),
   },
   step3: {
-    title: 'Integrantes',
-    subtitle: 'Cadastrados',
+    title: t('components.projects.create.steps.members.title'),
+    subtitle: t('components.projects.create.steps.members.subtitle'),
   },
 };
 
@@ -428,9 +442,10 @@ const createProject = async () => {
     });
     emit('submit');
     emit('update:modelValue', false);
-    setMessage('Projeto Criado com sucesso', 'success', true);
+    setMessage(t('components.projects.create.successMessage'), 'success', true);
+    value.value = false;
   } catch (error) {
-    setMessage('Erro ao criar o projeto, tente novamente', 'error', true);
+    setMessage(t('components.projects.create.errorMessage'), 'error', true);
   } finally {
     loading.value = false;
   }

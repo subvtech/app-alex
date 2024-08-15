@@ -1,9 +1,11 @@
 <template>
   <alex-custom-dialog
     v-model="model"
-    title="Adicionar Participantes"
-    main-button-text="Convidar"
-    secondary-button-text="Cancelar"
+    :title="$t('components.projects.create.members.title')"
+    :main-button-text="$t('components.projects.create.members.mainAction')"
+    :secondary-button-text="
+      $t('components.projects.create.members.secondaryAction')
+    "
     @on-main-action="onInvite"
     @on-secondary-action="onCancel"
   >
@@ -16,7 +18,9 @@
       v-if="activePage === '1'"
       v-model="searchStudents"
       name="search"
-      placeholder="Buscar Participantes"
+      :placeholder="
+        $t('components.projects.create.members.searchPlaceholder.students')
+      "
       class="tw-w-full my-6"
       density="comfortable"
       prepend-inner-icon="mdi-magnify"
@@ -27,7 +31,9 @@
       v-if="activePage === '2'"
       v-model="searchGroups"
       name="search"
-      placeholder="Buscar Grupos"
+      :placeholder="
+        $t('components.projects.create.members.searchPlaceholder.groups')
+      "
       class="tw-w-full my-6"
       density="comfortable"
       prepend-inner-icon="mdi-magnify"
@@ -42,7 +48,7 @@
               v-if="!hasStudentsToAdd"
               class="text-body-1 text-gray-400 text-center"
             >
-              Não foram encontrados alunos para adicionar.
+              {{ $t('components.projects.create.emptyMessage.students') }}
             </p>
             <template
               v-for="classValue in filteredClasses"
@@ -119,7 +125,7 @@
               v-if="!hasGroupsToAdd"
               class="text-body-1 text-gray-400 text-center"
             >
-              Não foram encontrados grupos para adicionar.
+              {{ $t('components.projects.create.emptyMessage.students') }}
             </p>
             <template v-for="classValue in filteredGroups" :key="classValue.id">
               <v-expansion-panel v-if="classValue.groups?.length">
@@ -143,7 +149,9 @@
                       @add-members="addStudentsFromGroups"
                     />
                     <p v-if="!classValue.groups?.length" class="text-gray-500">
-                      Não foram encontrados grupos para adicionar.
+                      {{
+                        $t('components.projects.create.emptyMessage.students')
+                      }}
                     </p>
                   </div>
                 </v-expansion-panel-text>
@@ -155,9 +163,15 @@
       <v-window-item value="3">
         <alex-inputs-users-autocomplete
           v-model="autoCompleteUsers"
+          :label="$t('components.projects.create.members.generalSearch.label')"
+          :placeholder="
+            $t('components.projects.create.members.generalSearch.placeholder')
+          "
           :ignore-user-ids="selectedUsers.map((user) => user.user.id)"
           :ignore-emails="selectedUsers.map((user) => user.user.email)"
-          :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
+          :no-data-text="
+            $t('components.projects.create.members.generalSearch.noResults')
+          "
           name="selectUsers"
         />
       </v-window-item>
@@ -182,13 +196,13 @@ interface AddProjectMembers {
 }
 
 const props = defineProps<AddProjectMembers>();
-
 const { find } = useStrapiUtils();
+const { t } = useI18n();
 
 const activePage = ref('1');
 const tabs = [
-  { label: 'Participantes', value: '1' },
-  { label: 'Grupos', value: '2' },
+  { label: t('components.projects.create.members.tabs.students'), value: '1' },
+  { label: t('components.projects.create.members.tabs.groups'), value: '2' },
 ];
 const model = defineModel<boolean>({ required: true });
 const searchStudents = ref('');

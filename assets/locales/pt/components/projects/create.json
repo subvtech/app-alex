@@ -1,0 +1,61 @@
+{
+  "title": "Criar Projeto",
+  "mainAction": "Criar",
+  "secondaryAction": "Cancelar",
+  "successMessage": "Projeto criado com sucesso",
+  "errorMessage": "Erro ao criar projeto",
+
+  "steps": {
+    "basicInfo": {
+      "title": "Informações",
+      "subtitle": "Básicas"
+    },
+    "associatedCourses": {
+      "title": "Cursos",
+      "subtitle": "Associados"
+    },
+    "members": {
+      "title": "Integrantes",
+      "subtitle": "Cadastrados"
+    }
+  },
+  "basicInfo": {
+    "titleLabel": "Como vai se chamar seu projeto?",
+    "titlePlaceholder": "Insira o título do seu projeto",
+    "descriptionLabel": "Do que se trata seu projeto",
+    "descriptionPlaceholder": "Insira uma descrição do seu projeto",
+    "startDateLabel": "Quando iniciará seu projeto?",
+    "endDateLabel": "Quando terminará seu projeto?",
+    "fieldLabel": "Quais as áreas de atuação do seu projeto?",
+    "fieldPlaceholder": "Selecione as áreas",
+    "projectTypeLabel": "Qual será o Produto do seu Projeto?",
+    "projectTypePlaceholder": "Selecione um tipo de produto"
+  },
+  "associatedCourses": {
+    "titleLabel": "Selecionar Cursos",
+    "titlePlaceholder": "Selecione os cursos associados",
+    "searchNoResults": "Nenhum curso encontrado"
+  },
+  "members": {
+    "title": "Convidar participantes",
+    "mainAction": "Convidar",
+    "secondaryAction": "Cancelar",
+    "tabs": {
+      "students": "Estudantes",
+      "groups": "Grupos"
+    },
+    "searchPlaceholder": {
+      "students": "Pesquise pelo nome do estudante",
+      "groups": "Pesquise pelo nome do grupo"
+    },
+    "generalSearch": {
+      "label": "Convidar participantes",
+      "placeholder": "Selecione um participante",
+      "noResults": "Pesquise usuários para adicionar ao projeto"
+    },
+    "emptyMessage": {
+      "students": "Nenhum estudante encontrado",
+      "groups": "Nenhum grupo encontrado"
+    }
+  }
+}
