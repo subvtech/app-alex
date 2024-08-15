@@ -339,6 +339,11 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
       .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
       .trim(),
+    slug: yup
+      .string()
+      .required(i18n.t('rules.field.required'))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
+      .trim(),
     startDate: startDateCreationRules,
     endDate: endDateRules,
   });

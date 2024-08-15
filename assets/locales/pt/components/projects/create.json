@@ -4,6 +4,7 @@
   "secondaryAction": "Cancelar",
   "successMessage": "Projeto criado com sucesso",
   "errorMessage": "Erro ao criar projeto",
+  "slugUniqueError": "Esse identificador já está em uso. Por favor, escolha outro.",
 
   "steps": {
     "basicInfo": {
@@ -26,6 +27,9 @@
     "descriptionPlaceholder": "Insira uma descrição do seu projeto",
     "startDateLabel": "Quando iniciará seu projeto?",
     "endDateLabel": "Quando terminará seu projeto?",
+    "slugLabel": "Qual será o identificador do seu projeto?",
+    "slugPlaceholder": "Insira o identificador do seu projeto",
+    "slugInfo": "O identificador é uma palavra que diferencia seu projeto de outros e permite que ele seja acessado através da URL.",
     "fieldLabel": "Quais as áreas de atuação do seu projeto?",
     "fieldPlaceholder": "Selecione as áreas",
     "projectTypeLabel": "Qual será o Produto do seu Projeto?",

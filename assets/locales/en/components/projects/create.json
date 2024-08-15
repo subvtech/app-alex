@@ -4,6 +4,7 @@
   "secondaryAction": "Cancel",
   "successMessage": "Project created successfully",
   "errorMessage": "Error creating project",
+  "slugUniqueError": "This identifier is already in use. Please choose another one.",
 
   "steps": {
     "basicInfo": {
@@ -26,6 +27,9 @@
     "descriptionPlaceholder": "Enter a description of your project",
     "startDateLabel": "When will your project start?",
     "endDateLabel": "When will your project end?",
+    "slugLabel": "What will be your project identifier?",
+    "slugPlaceholder": "Enter your project identifier",
+    "slugInfo": "The project identifies is a name tha will differentiate your project from others and allow it to be accessed through the URL.",
     "fieldLabel": "What are the areas of focus for your project?",
     "fieldPlaceholder": "Select the areas",
     "projectTypeLabel": "What will be the Product of your Project?",

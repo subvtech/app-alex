@@ -56,6 +56,20 @@
           :allowed-dates="disablePastDates"
         />
       </div>
+      <alex-inputs-text-field
+        v-model="projectInfo.slug"
+        class="mb-4"
+        density="comfortable"
+        name="slug"
+        required
+        persistent-hint
+        :label="$t('components.projects.create.basicInfo.slugLabel')"
+        :placeholder="
+          $t('components.projects.create.basicInfo.slugPlaceholder')
+        "
+        :info="$t('components.projects.create.basicInfo.slugInfo')"
+        :hint="plataformUrl"
+      />
       <alex-inputs-combobox
         v-model="projectInfo.areas"
         name="areas"
@@ -211,6 +225,7 @@ interface ProjectType {
   description: string;
   startDate: string;
   endDate: string;
+  slug: string;
   areas: FieldSimpleOptionalId[];
   product: ProductSimpleOptionalId | null;
 }
@@ -244,12 +259,20 @@ const projectInfo = ref<ProjectType>({
   description: '',
   startDate: '',
   endDate: '',
+  slug: '',
   areas: [],
   product: null,
 });
 
 const user = useStrapiUser<User>();
 const { setMessage } = useMessageStore();
+
+const slugFormated = computed(() =>
+  projectInfo.value.slug.trim().toLowerCase().replaceAll(' ', '_'),
+);
+const plataformUrl = computed(
+  () => `${window.location.host}/projects/${slugFormated.value}`,
+);
 
 const queryConfig = {
   filters: {
@@ -431,8 +454,8 @@ const createProject = async () => {
         description: projectInfo.value.description,
         start_date: projectInfo.value.startDate,
         end_date: projectInfo.value.endDate,
-        slug: `project-${projectInfo.value.title}`,
         type: 'project',
+        slug: slugFormated.value.toLocaleLowerCase(),
         fields: projectInfo.value.areas,
         product: projectInfo.value.product,
         course: associatedCourses.value.map((course) => course.id),
@@ -444,8 +467,21 @@ const createProject = async () => {
     emit('update:modelValue', false);
     setMessage(t('components.projects.create.successMessage'), 'success', true);
     value.value = false;
-  } catch (error) {
-    setMessage(t('components.projects.create.errorMessage'), 'error', true);
+  } catch (error: any) {
+    if (
+      error.error?.details?.errors?.some(
+        (e: any) =>
+          e.path[0] === 'slug' && e.message === 'This attribute must be unique',
+      )
+    ) {
+      setMessage(
+        t('components.projects.create.slugUniqueError'),
+        'error',
+        true,
+      );
+    } else {
+      setMessage(t('components.projects.create.errorMessage'), 'error', true);
+    }
   } finally {
     loading.value = false;
   }
