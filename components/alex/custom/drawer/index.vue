@@ -1,6 +1,6 @@
 <template>
   <Sheet v-model:open="model" side="right">
-    <SheetContent :class="$attrs.class">
+    <SheetContent class="focus-visible:tw-outline-none" :class="$attrs.class">
       <template #header>
         <div class="tw-px-6 tw-pt-4">
           <slot name="header" />
