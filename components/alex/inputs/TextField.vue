@@ -139,7 +139,10 @@ const textColor = computed(() => {
     color: rgb(var(--v-theme-gray-300));
   }
 
-  .light .v-field--dirty > .v-field__field > .v-field__input {
+  .light
+    .v-field--dirty:not(.v-field--disabled)
+    > .v-field__field
+    > .v-field__input {
     color: rgb(var(--v-theme-gray-800)) !important;
   }
 
