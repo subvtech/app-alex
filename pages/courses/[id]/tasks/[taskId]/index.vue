@@ -172,7 +172,6 @@ const studentDetails = computed(() => {
   const member = taskStore.task?.task_members.find(
     (member) => member.id === studentDetailsId.value,
   );
-
   return member || null;
 });
 

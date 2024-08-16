@@ -106,7 +106,7 @@ export const useUserStore = defineStore('user', () => {
     if (!loadedUser.value) return;
     try {
       loading.value = true;
-      const result = await find<InstitutionsType>('institutions', {
+      const result = await find<Institution>('institutions', {
         filters: {
           users: { id: { $in: [loadedUser.value.id] } },
         },

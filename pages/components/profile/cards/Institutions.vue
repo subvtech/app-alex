@@ -73,7 +73,7 @@ const listProps: PlaygroundItemType[] = [
   },
   {
     name: 'institutions',
-    type: 'InstitutionsType[]',
+    type: 'Institution[]',
     required: true,
     description: 'A list with the institutions associated with the User',
     initialValue: institutionsProps.institutions,
