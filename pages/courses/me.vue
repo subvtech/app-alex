@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column">
     <alex-custom-header
-      class="mb-6 mt-6"
+      class="mb-6"
       :title="$t('pages.classes.breadcrumbs.myCourses')"
       :items="breadcrumbs"
       :has-main-button="professorMode"

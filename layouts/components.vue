@@ -1,48 +1,32 @@
 <template>
-  <v-app>
+  <v-app class="tw-relative">
     <AppSnackbar />
-    <alex-custom-drawable
+    <alex-custom-sidebar
       v-model="drawer"
+      v-model:clipped="clipped"
       :blocks="menus"
-      :clipped="clipped"
-      dark
-      :permanent="isPermanent"
-    >
-      <template #header>
-        <div
-          class="my-4 w-100 d-flex"
-          :class="clipped ? '' : 'justify-center'"
-          style="max-height: 28px"
-        >
-          <div>
-            <NuxtLink to="/">
-              <img
-                v-if="clipped"
-                src="/images/alex-mini.svg"
-                height="28"
-                width="43"
-              />
-              <img v-else src="/images/alex.svg" height="28" width="84" />
-            </NuxtLink>
-          </div>
-        </div>
-      </template>
-    </alex-custom-drawable>
+      :is-permanent="isPermanent"
+    />
 
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
+      :class="
+        clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'
+      "
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
       :track-current-user="userStore.isCurrentUser"
       show-picture
       @toggle:drawer="closeDrawable(!clipped)"
-      @click="onClickOutside"
     />
 
-    <v-main class="secondary bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container style="max-width: 100%" class="pa-4 pa-sm-6">
+    <v-main
+      class="bg-gray-blue pt-16"
+      :class="clipped ? 'clipped-sidebar' : 'sidebar'"
+    >
+      <v-container class="pa-4 pa-sm-6 max-width-100">
         <slot />
       </v-container>
     </v-main>
@@ -56,8 +40,7 @@ import vuefiles from '~/assets/vueFiles.json';
 
 const { profileMenuItems } = useMainHorizontalBar();
 
-const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
-  useNavigationDrawer();
+const { clipped, drawer, isPermanent, closeDrawable } = useNavigationDrawer();
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
 
