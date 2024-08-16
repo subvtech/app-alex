@@ -283,7 +283,7 @@ const menus = computed(() => {
 </script>
 
 <style lang="scss">
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 959px) {
   .sidebar {
     --v-layout-left: 256px !important;
   }

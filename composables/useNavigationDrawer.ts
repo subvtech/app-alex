@@ -32,14 +32,19 @@ export default function useNavigationDrawer(
     drawer.value = true;
     clipped.value = false;
   };
-  const isPermanent = computed(() => currentWidth.value >= 767);
+  const isPermanent = computed(() => currentWidth.value >= 959);
   watch(isPermanent, () => {
     if (isPermanent.value && !drawer.value) {
       drawer.value = true;
     }
   });
-  onMounted(() => {
+  onBeforeMount(() => {
     currentWidth.value = window.innerWidth;
+    if (!isPermanent.value) {
+      drawer.value = false;
+    }
+  });
+  onMounted(() => {
     window.addEventListener('resize', handleSetWidth);
   });
   onUnmounted(() => {

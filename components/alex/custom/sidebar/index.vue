@@ -1,6 +1,6 @@
 <template>
   <alex-custom-sidebar-bar
-    class="tw-hidden tw-fixed md:tw-flex tw-h-full"
+    class="tw-fixed desktop-sidebar tw-h-full"
     :clipped="clipped"
     :blocks="blocks"
   />
@@ -13,6 +13,8 @@
       <DialogContent
         class="tw-fixed tw-z-[1200] tw-gap-4 tw-shadow-lg tw-transition tw-ease-in-out data-[state=open]:tw-animate-in data-[state=closed]:tw-animate-out data-[state=closed]:tw-duration-200 data-[state=open]:tw-duration-200 tw-inset-y-0 tw-left-0 tw-h-full tw-w-[256px] data-[state=closed]:tw-slide-out-to-left data-[state=open]:tw-slide-in-from-left sm:tw-max-w-sm tw-flex"
       >
+        <DialogTitle class="tw-hidden"> sidebar</DialogTitle>
+        <DialogDescription class="tw-hidden">Menu de opções</DialogDescription>
         <alex-custom-sidebar-bar :clipped="false" :blocks="blocks" />
       </DialogContent>
     </DialogPortal>
@@ -25,6 +27,8 @@ import {
   DialogOverlay,
   DialogPortal,
   DialogRoot,
+  DialogTitle,
+  DialogDescription,
 } from 'radix-vue';
 type SidebarProps = {
   blocks: {
@@ -44,4 +48,13 @@ withDefaults(defineProps<SidebarProps>(), {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.desktop-sidebar {
+  display: none;
+}
+@media screen and (min-width: 959px) {
+  .desktop-sidebar {
+    display: flex;
+  }
+}
+</style>

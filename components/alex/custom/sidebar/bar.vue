@@ -72,7 +72,7 @@ defineProps<DrawableProps>();
 
 <style lang="scss" scoped>
 .sidebar {
-  z-index: 1000;
+  z-index: 2000;
   top: 0;
   left: 0;
   transition: all 140ms ease-in-out;
