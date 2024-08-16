@@ -3,6 +3,7 @@
     app
     color="white"
     class="px-4"
+    :class="[notFixed ? 'not-fixed' : '']"
     data-testid="horizontal-bar"
     style="min-width: max-content"
   >
@@ -42,11 +43,11 @@
       </div>
 
       <v-menu offset-y nudge-bottom="10">
-        <template #activator="{ props: VMenuProps }">
+        <template #activator="{ props }">
           <v-hover v-slot="{ isHovering }">
             <div
               v-if="avatar && showPicture"
-              v-bind="VMenuProps"
+              v-bind="props"
               class="user-block"
               :class="isHovering ? 'rounded-pill grey lighten-3' : ''"
             >
@@ -131,6 +132,7 @@ export interface HorizontalBarMenuItemType {
 export interface HorizontalBarComponentType {
   avatar?: ProfilePictureItemType;
   placeholder?: string;
+  notFixed?: boolean;
   menuItems: HorizontalBarMenuItemType[];
   isBellActive?: boolean;
   isChatActive?: boolean;

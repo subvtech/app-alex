@@ -9,7 +9,7 @@
     :tooltip-extra-class="isEditing ? 'mt-3' : ''"
     :tooltip="tooltip"
     :small-buttons="withinBreakpoint"
-    no-icon="canEdit"
+    :no-icon="canEdit"
     @click:save="onSave"
     @click:cancel="onCancel"
     @toggle:is-editing="toggleEditing"
