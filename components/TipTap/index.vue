@@ -13,7 +13,10 @@
           @click.stop.prevent
         />
       </div>
-      <editor-content :class="!props.edit && 'no-padding'" :editor="editor" />
+      <editor-content
+        :class="!props.edit || props.noPadding ? 'no-padding' : ''"
+        :editor="editor"
+      />
     </div>
   </client-only>
 </template>
@@ -110,6 +113,10 @@ const props = defineProps({
     default: true,
   },
   showLoader: {
+    type: Boolean,
+    default: false,
+  },
+  noPadding: {
     type: Boolean,
     default: false,
   },

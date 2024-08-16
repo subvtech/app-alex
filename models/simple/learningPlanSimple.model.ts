@@ -26,6 +26,7 @@ export interface LearningPlanSimple {
   class_name: string;
   projects: any[];
   courses: any[];
+  document_folders: DocumentFolder[];
   members: LearningPlanMemberSimple[];
   learning_structures: LearningPlanStructureSimple[];
   groups: LearningPlanGroupSimple[];
