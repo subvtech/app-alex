@@ -105,7 +105,7 @@
         :filter-keys="[
           'learningPlan.title',
           'learningPlan.description',
-          'facilitator?.user.fullname',
+          'facilitator?.user?.fullname',
           'learningPlan.start_date',
           'learningPlan.end_date',
         ]"
@@ -135,12 +135,12 @@
                   : item.learningPlan.institutions![0]
               "
               :facilitator="{
-                name: item.facilitator?.user.fullname || '',
+                name: item.facilitator?.user?.fullname || '',
                 imageURL: item.facilitator?.user.avatar?.url,
               }"
               :leader="
                 item.leader && {
-                  name: item.leader?.user.fullname || '',
+                  name: item.leader?.user?.fullname || '',
                   imageURL: item.leader?.user.avatar?.url,
                 }
               "
@@ -206,8 +206,8 @@
                 <td class="text-overflow max-width-[150px]">
                   {{
                     item.learningPlan.type === 'course'
-                      ? item.facilitator?.user.fullname
-                      : item.leader?.user.fullname
+                      ? item.facilitator?.user?.fullname
+                      : item.leader?.user?.fullname
                   }}
                 </td>
                 <td class="text-overflow max-width-[596px]">
@@ -457,18 +457,18 @@ const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
         : t('pages.classes.tableHeaders.leader'),
     key:
       props.type === 'course'
-        ? 'facilitator?.user.fullname'
-        : 'leader?.user.fullname',
+        ? 'facilitator?.user?.fullname'
+        : 'leader?.user?.fullname',
     sortRaw(a, b) {
-      const hasBothFacilitators = b.facilitator && a.facilitator;
-      const hasBothLeaders = b.facilitator && a.facilitator;
+      const hasBothFacilitators = b.facilitator?.user && a.facilitator?.user;
+      const hasBothLeaders = b.leader?.user && a.leader?.user;
       if (props.type === 'course' && hasBothFacilitators) {
-        return a.facilitator!.user.fullname.localeCompare(
-          b.facilitator!.user.fullname,
+        return a.facilitator!.user?.fullname.localeCompare(
+          b.facilitator!.user?.fullname,
         );
       }
       if (props.type === 'project' && hasBothLeaders) {
-        return a.leader!.user.fullname.localeCompare(b.leader!.user.fullname);
+        return a.leader!.user?.fullname.localeCompare(b.leader!.user?.fullname);
       }
       return 1;
     },
@@ -567,7 +567,7 @@ const showingData = (groupedItems: any, items: Array<any>) => {
 };
 const getUrlNameMembers = (members: LearningPlanMemberSimple[]) =>
   members.map((member) => ({
-    name: member.user.fullname,
+    name: member?.user?.fullname || 'Nome',
     ...(member.user.avatar?.url && {
       image: { url: member.user.avatar?.url },
     }),
