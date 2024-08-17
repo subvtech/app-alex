@@ -155,12 +155,6 @@ function openDialog(group: LearningPlanGroupSimple | undefined) {
 }
 
 const filteredClasses = computed(() => {
-  classes.value.data = classes.value.data.map((classValue) => ({
-    ...classValue,
-    learning_plan_groups: classValue.learning_plan_groups?.filter(
-      (group) => !group.task_members?.length,
-    ),
-  }));
   if (!search.value) return classes.value.data;
   const lowerCaseSearch = search.value.toLowerCase();
 

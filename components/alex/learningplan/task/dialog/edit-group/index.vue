@@ -103,10 +103,7 @@ const { setMessage } = useMessageStore();
 const { t } = useI18n();
 
 const otherGroupIds = computed<number[]>(() => {
-  const filteredGroups = props.allGroups.filter(
-    ({ id }) => id !== props.group?.id,
-  );
-  return filteredGroups.flatMap((group) =>
+  return props.allGroups.flatMap((group) =>
     group.group_members.map((groupMember) => groupMember.student_member.id),
   );
 });
@@ -163,21 +160,19 @@ async function updateGroup() {
     return;
   }
 
-  const membersData = [...members.value, responsible.value].map((member) => ({
-    member_id: member.student_member.id,
-    role: member.role,
-  }));
-
-  const groupInfo = {
-    title: props.group?.title || '',
-    learningplan: props.learningPlanId,
-    learning_class: props.group?.learning_class?.id || 0,
-    group_members: membersData,
-  };
+  const membersData = [...members.value, responsible.value].map((member) => {
+    return member.id;
+  });
 
   try {
-    const { data } = await strapi.create('learnin-plan-groups', groupInfo);
-
+    if (!props.group) {
+      return;
+    }
+    await strapi.update('learnin-plan-groups', props.group.id, {
+      group_members: {
+        set: membersData,
+      },
+    });
     await strapi.create('task-members', {
       status: 'to_do',
       can_submit_after_deadline:
@@ -185,12 +180,12 @@ async function updateGroup() {
       started_at: props.startAt || null,
       finished_at: props.finishAt || null,
       task: props.taskId,
-      learning_plan_group: data.id,
+      learning_plan_group: props.group.id,
     });
 
     emit('add-group');
     setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.created'),
+      t('components.learningPlan.drawer.task.dialog.message.added'),
       'success',
       true,
     );

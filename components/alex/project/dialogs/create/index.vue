@@ -248,7 +248,7 @@ const loading = ref(false);
 withDefaults(defineProps<{ modelValue?: boolean }>(), {
   modelValue: false,
 });
-const emit = defineEmits(['update:modelValue', 'submit']);
+const emit = defineEmits(['submit']);
 const value = defineModel<boolean>({ required: true });
 const { find } = useStrapiUtils();
 const client = useStrapiClient();
@@ -439,12 +439,19 @@ const createProject = async () => {
     const usersData = students.value.map((student) => ({
       id: student.user?.id ?? student.id,
       email: student.user?.email ?? student.email,
+      role: 'student',
     }));
 
-    const usersIds = usersData.filter((user) => user.id).map((user) => user.id);
+    const users = usersData.filter((user) => user.id);
     const newUsersEmails = usersData
       .filter((user) => !user.id)
       .map((user) => user.email);
+
+    users.push({
+      id: user.value.id,
+      email: user.value.email,
+      role: 'student_leader',
+    });
 
     loading.value = true;
     await client('learningplans/create-project', {
@@ -459,12 +466,11 @@ const createProject = async () => {
         fields: projectInfo.value.areas,
         product: projectInfo.value.product,
         course: associatedCourses.value.map((course) => course.id),
-        users: usersIds,
         new_users: newUsersEmails,
+        users,
       },
     });
     emit('submit');
-    emit('update:modelValue', false);
     setMessage(t('components.projects.create.successMessage'), 'success', true);
     value.value = false;
   } catch (error: any) {
