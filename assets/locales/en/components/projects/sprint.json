@@ -1,0 +1,32 @@
+{
+  "title": {
+    "create": "Create new sprint",
+    "edit": "Edit sprint"
+  },
+  "mainButtonText": {
+    "create": "Create sprint",
+    "edit": "Edit"
+  },
+  "secondaryButtonText": "Cancel",
+  "type": {
+    "multiple": "Multiple sprints (automatically)",
+    "single": "Single sprint (manually)",
+    "label": "Creation type"
+  },
+  "name": {
+    "label": "Sprint name",
+    "defaultPlaceholder": "Enter the sprint name",
+    "multiplePlaceholder": "Names generated automatically"
+  },
+  "duration": {
+    "label": "Duration",
+    "placeholder": "Select a duration",
+    "one-week": "1 week",
+    "two-weeks": "2 weeks",
+    "three-weeks": "3 weeks",
+    "four-weeks": "4 weeks",
+    "custom": "Custom"
+  },
+  "startDate": "Sprint start",
+  "endDate": "Sprint end"
+}

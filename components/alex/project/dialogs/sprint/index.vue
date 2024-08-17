@@ -1,14 +1,16 @@
 <template>
   <alex-custom-dialog
     v-model="value"
-    :title="taskId ? 'Editar sprint' : 'Criar nova sprint'"
-    :main-button-text="taskId ? 'Editar' : 'Criar sprint'"
+    :title="dialogTitle"
+    :main-button-text="dialogMainButtonText"
+    :secondary-button-text="t('components.projects.sprint.secondaryButtonText')"
   >
     <alex-inputs-select
+      v-if="!taskId"
       v-model="sprint.type"
       density="comfortable"
       name="type"
-      label="Tipo de criação"
+      :label="$t('components.projects.sprint.type.label')"
       item-title="label"
       item-value="value"
       :items="typeOptions"
@@ -18,12 +20,8 @@
       v-model="sprint.name"
       density="comfortable"
       name="title"
-      label="Nome da sprint"
-      :placeholder="
-        sprint.type === 'single'
-          ? 'Digite um nome para a sprint'
-          : 'Nomes gerados automaticamente'
-      "
+      :label="t('components.projects.sprint.name.label')"
+      :placeholder="namePlaceholder"
       :disabled="sprint.type === 'multiple'"
       :required="sprint.type === 'single'"
     />
@@ -31,8 +29,8 @@
       v-model="sprint.interval"
       density="comfortable"
       name="duration"
-      label="Duração"
-      placeholder="Selecione uma duração"
+      :label="$t('components.projects.sprint.duration.label')"
+      :placeholder="$t('components.projects.sprint.duration.placeholder')"
       item-title="label"
       item-value="value"
       :items="intervalOptions"
@@ -43,7 +41,7 @@
         v-model="sprint.startDate"
         class="flex-grow-1 min-w-60"
         name="startDate"
-        label="Início da sprint"
+        :label="$t('components.projects.sprint.startDate')"
         required
         density="comfortable"
         :allowed-dates="disablePastDates"
@@ -54,7 +52,7 @@
         density="comfortable"
         name="endDate"
         required
-        label="Término da sprint"
+        :label="$t('components.projects.sprint.endDate')"
         :disabled="!isEndDateEnabled"
         :allowed-dates="disablePastDates"
       />
@@ -66,7 +64,7 @@
 import { format, addWeeks, startOfDay } from 'date-fns';
 
 interface sprintType {
-  type: 'multiple' | 'single';
+  type?: 'multiple' | 'single';
   name?: string;
   startDate: string;
   endDate?: string;
@@ -78,6 +76,8 @@ interface sprintType {
     | 'custom'
     | null;
 }
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{ sprintData: sprintType; taskId: string }>(),
@@ -93,16 +93,15 @@ const props = withDefaults(
   },
 );
 
+const sprint = ref<sprintType>(props.sprintData);
+const value = defineModel<boolean>({ required: true });
+
 const disablePastDates = (date: Date) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const passedDate = new Date(date);
   return passedDate >= today;
 };
-
-const sprint = ref<sprintType>(props.sprintData);
-
-const value = defineModel<boolean>({ required: true });
 
 watch(
   () => sprint.value.type,
@@ -133,17 +132,48 @@ const isEndDateEnabled = computed(() => {
 });
 
 const typeOptions = [
-  { label: 'Múltiplas sprints (automático)', value: 'multiple' },
-  { label: 'Única sprint (manual)', value: 'single' },
+  { label: t('components.projects.sprint.type.multiple'), value: 'multiple' },
+  { label: t('components.projects.sprint.type.single'), value: 'single' },
 ];
 
+const getDurationLabel = (duration: string) => {
+  return t(`components.projects.sprint.duration.${duration}`);
+};
+
 const intervalOptions = [
-  { label: '1 semana', value: 'one-week' },
-  { label: '2 semanas', value: 'two-weeks' },
-  { label: '3 semanas', value: 'three-weeks' },
-  { label: '4 semanas', value: 'four-weeks' },
-  { label: 'Personalizado', value: 'custom' },
+  {
+    label: getDurationLabel('one-week'),
+    value: 'one-week',
+  },
+  {
+    label: getDurationLabel('two-weeks'),
+    value: 'two-weeks',
+  },
+  {
+    label: getDurationLabel('three-weeks'),
+    value: 'three-weeks',
+  },
+  { label: getDurationLabel('four-weeks'), value: 'four-weeks' },
+  { label: getDurationLabel('custom'), value: 'custom' },
 ];
+
+const dialogTitle = computed(() =>
+  props.taskId
+    ? t('components.projects.sprint.title.edit')
+    : t('components.projects.sprint.title.create'),
+);
+
+const dialogMainButtonText = computed(() =>
+  props.taskId
+    ? t('components.projects.sprint.mainButtonText.edit')
+    : t('components.projects.sprint.mainButtonText.create'),
+);
+
+const namePlaceholder = computed(() =>
+  props.taskId || sprint.value.type === 'single'
+    ? t('components.projects.sprint.name.defaultPlaceholder')
+    : t('components.projects.sprint.name.multiplePlaceholder'),
+);
 
 const weeks = {
   'one-week': 1,
