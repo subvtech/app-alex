@@ -264,14 +264,18 @@ const typeOptions: AlexDropdownItem[] = [
     text: t('components.learningPlan.drawer.task.type.individual'),
     onClick: () => {
       emit('set-type', 'individual');
-      addMemberDialog.value = true;
+      if (props.startAt && props.finishAt) {
+        addMemberDialog.value = true;
+      }
     },
   },
   {
     text: t('components.learningPlan.drawer.task.type.collective'),
     onClick: () => {
       emit('set-type', 'group');
-      addGroupDialog.value = true;
+      if (props.startAt && props.finishAt) {
+        addGroupDialog.value = true;
+      }
     },
   },
 ];
@@ -281,6 +285,17 @@ const handleAddGroup = () => {
   refresh();
 };
 
+const checkHasFilledDates = () => {
+  if (!props.startAt || !props.finishAt) {
+    setMessage(
+      t('components.learningPlan.drawer.task.pleaseFillDates'),
+      'warning',
+      true,
+    );
+    return false;
+  }
+  return true;
+};
 const getMembers = (taskId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
@@ -347,14 +362,7 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
     );
     return;
   }
-  if (!props.finishAt || !props.startAt) {
-    setMessage(
-      t('components.learningPlan.drawer.task.pleaseFillDates'),
-      'warning',
-      true,
-    );
-    return;
-  }
+  if (!checkHasFilledDates()) return;
   try {
     await client(`/tasks/${props.taskId}/add-students`, {
       method: 'PUT',
@@ -462,14 +470,14 @@ const handleEditClick = (
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
-  if (props.kind === 'project') {
-    addProjectMembersDialog.value = true;
-  } else if (props.type === 'individual') {
-    addMemberDialog.value = true;
-  } else if (props.type === 'group') {
+  if (!props.type || !checkHasFilledDates()) {
+    setTypeDropdown.value = true;
+    return;
+  }
+  if (props.type === 'group') {
     addGroupDialog.value = true;
   } else {
-    setTypeDropdown.value = true;
+    addMemberDialog.value = true;
   }
 };
 const getGroups = (learningplanId: number) =>

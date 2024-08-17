@@ -79,7 +79,7 @@ interface AddStudent {
   learningplanId: number;
   members: TaskMember[];
 }
-const model = defineModel<boolean>();
+const model = defineModel<boolean>({ required: true });
 const props = defineProps<AddStudent>();
 type Emits = {
   'add-click': [members: LearningPlanMemberSimple[]];
