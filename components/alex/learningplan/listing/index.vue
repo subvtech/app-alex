@@ -136,12 +136,12 @@
               "
               :facilitator="{
                 name: item.facilitator?.user?.fullname || '',
-                imageURL: item.facilitator?.user.avatar?.url,
+                imageURL: item.facilitator?.user?.avatar?.url,
               }"
               :leader="
                 item.leader && {
                   name: item.leader?.user?.fullname || '',
-                  imageURL: item.leader?.user.avatar?.url,
+                  imageURL: item.leader?.user?.avatar?.url,
                 }
               "
               :members="getUrlNameMembers(item.learningPlan.members)"
@@ -568,8 +568,8 @@ const showingData = (groupedItems: any, items: Array<any>) => {
 const getUrlNameMembers = (members: LearningPlanMemberSimple[]) =>
   members.map((member) => ({
     name: member?.user?.fullname || 'Nome',
-    ...(member.user.avatar?.url && {
-      image: { url: member.user.avatar?.url },
+    ...(member.user?.avatar?.url && {
+      image: { url: member.user?.avatar?.url },
     }),
   }));
 //    Filters
