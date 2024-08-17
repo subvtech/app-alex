@@ -1,8 +1,8 @@
 <template>
   <alex-custom-dialog
     v-model="value"
-    title="Criar nova sprint"
-    main-button-text="Criar sprint"
+    :title="taskId ? 'Editar sprint' : 'Criar nova sprint'"
+    :main-button-text="taskId ? 'Editar' : 'Criar sprint'"
   >
     <alex-inputs-select
       v-model="sprint.type"
@@ -69,7 +69,7 @@ interface sprintType {
   type: 'multiple' | 'single';
   name?: string;
   startDate: string;
-  endDate: string;
+  endDate?: string;
   interval:
     | 'one-week'
     | 'two-weeks'
@@ -79,6 +79,20 @@ interface sprintType {
     | null;
 }
 
+const props = withDefaults(
+  defineProps<{ sprintData: sprintType; taskId: string }>(),
+  {
+    sprintData: () => ({
+      type: 'single',
+      name: '',
+      startDate: '',
+      endDate: '',
+      interval: null,
+    }),
+    taskId: '',
+  },
+);
+
 const disablePastDates = (date: Date) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -86,15 +100,9 @@ const disablePastDates = (date: Date) => {
   return passedDate >= today;
 };
 
-const sprint = ref<sprintType>({
-  type: 'single',
-  name: '',
-  startDate: '',
-  endDate: '',
-  interval: null,
-});
+const sprint = ref<sprintType>(props.sprintData);
 
-const value = ref(false);
+const value = defineModel<boolean>({ required: true });
 
 watch(
   () => sprint.value.type,
