@@ -1,9 +1,11 @@
 <template>
   <alex-custom-dialog
-    v-model="value"
+    v-model="dialog"
     :title="dialogTitle"
     :main-button-text="dialogMainButtonText"
     :secondary-button-text="t('components.projects.sprint.secondaryButtonText')"
+    @on-secondary-action="dialog = false"
+    @on-main-action="onSubmit"
   >
     <alex-inputs-select
       v-if="!taskId"
@@ -19,7 +21,7 @@
     <alex-inputs-text-field
       v-model="sprint.name"
       density="comfortable"
-      name="title"
+      name="name"
       :label="t('components.projects.sprint.name.label')"
       :placeholder="namePlaceholder"
       :disabled="sprint.type === 'multiple'"
@@ -62,6 +64,7 @@
 
 <script setup lang="ts">
 import { format, addWeeks, startOfDay } from 'date-fns';
+import { useForm } from 'vee-validate';
 
 interface sprintType {
   type?: 'multiple' | 'single';
@@ -78,6 +81,7 @@ interface sprintType {
 }
 
 const { t } = useI18n();
+const { createSprintRules } = useFormRules();
 
 const props = withDefaults(
   defineProps<{ sprintData: sprintType; taskId: string }>(),
@@ -94,7 +98,15 @@ const props = withDefaults(
 );
 
 const sprint = ref<sprintType>(props.sprintData);
-const value = defineModel<boolean>({ required: true });
+const dialog = defineModel<boolean>({ required: true });
+
+const { handleSubmit } = useForm({
+  validationSchema: createSprintRules,
+});
+
+const onSubmit = handleSubmit((values) => {
+  console.log('Form submitted:', values);
+});
 
 const disablePastDates = (date: Date) => {
   const today = new Date();
