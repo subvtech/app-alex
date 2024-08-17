@@ -21,10 +21,12 @@
       @toggle:drawer="closeDrawable(!clipped)"
     />
     <v-main
-      class="bg-gray-blue pt-16"
+      class="bg-gray-blue pt-16 tw-flex tw-flex-col tw-grow"
       :class="clipped ? 'clipped-sidebar' : 'sidebar'"
     >
-      <v-container class="pa-4 pa-sm-6 max-width-100">
+      <v-container
+        class="tw-flex tw-flex-col tw-grow pa-4 pa-sm-6 max-width-100"
+      >
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
