@@ -3,5 +3,5 @@ export interface ProductSimple {
   text: string;
   verified_by?: number;
   isPublic: boolean;
-  learningplans: LearningPlanSimple;
+  learningplans?: LearningPlanSimple;
 }
