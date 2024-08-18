@@ -9,8 +9,8 @@
       <v-expansion-panels v-model="openFolders" class="!tw-block" multiple>
         <alex-project-folder
           v-for="folder in folders"
-          :id="folder.id || 0"
-          :key="folder.id || 0"
+          :id="folder.id"
+          :key="folder.id"
           :title="folder.title || ''"
           :documents="folder?.documents || []"
           :selected-id="selectedDoc?.id"
@@ -73,7 +73,7 @@
               variant="secondary"
               size="large"
               :disabled="!docSelected"
-              @click="revertChanges"
+              @click="editMode = false"
               >{{
                 $t('components.project.document.edit.cancel')
               }}</alex-custom-button
@@ -110,10 +110,14 @@
       <!-- Editor -->
       <div class="py-6 pr-6 !tw-pl-[84px]">
         <TipTap
-          v-model="editorContent"
-          :doc-name="selectedDoc?.doc_name"
+          v-if="!!selectedDoc"
+          :key="selectedDoc.id"
+          :doc-name="selectedDoc.doc_name"
+          :edit="editMode"
           :mention-users="mentionUsers"
+          hide-menu-bar
           no-padding
+          @update:model-value="(val) => (editorContent = val)"
         />
       </div>
     </div>
@@ -466,14 +470,14 @@ const deleteDoc = async () => {
   }
 };
 
-const revertChanges = () => {
-  if (titleRef.value) {
-    titleRef.value.innerHTML = selectedDoc.value?.title || '';
-  }
+// const revertChanges = () => {
+//   if (titleRef.value) {
+//     titleRef.value.innerHTML = selectedDoc.value?.title || '';
+//   }
 
-  editorContent.value = selectedDoc.value?.content || '';
-  editMode.value = false;
-};
+//   editorContent.value = selectedDoc.value?.content || '';
+//   editMode.value = false;
+// };
 
 const addFolder = async () => {
   const allIds: number[] = folders.value.map(({ id }) => id);
