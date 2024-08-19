@@ -596,7 +596,13 @@ const emitHeight = () => {
   emits('change:height', container.value?.clientHeight);
 };
 
-defineExpose({ emitHeight });
+const setContent = (content) => {
+  if (editor.value) {
+    editor.value.commands.setContent(content, false);
+  }
+};
+
+defineExpose({ emitHeight, setContent });
 
 watch(
   () => props.edit,

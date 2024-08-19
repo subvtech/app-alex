@@ -111,6 +111,7 @@
       <div class="py-6 pr-6 !tw-pl-[84px]">
         <TipTap
           v-if="!!selectedDoc"
+          ref="tiptap"
           :key="selectedDoc.id"
           :doc-name="selectedDoc.doc_name"
           :edit="editMode"
@@ -219,6 +220,8 @@ const titleRef = ref<HTMLParagraphElement | null>(null);
 const editorContent = ref<object | string | null>('');
 const editMode = ref<boolean>(false);
 
+const tiptap = ref<any | null>(null);
+
 const docSelected = computed(() => selectedDoc.value !== null);
 
 const mentionUsers = computed<MentionUserPropsArray>(() => {
@@ -314,6 +317,28 @@ const createDocument = async () => {
     selectedDoc.value = newDoc;
     addDocDialog.value = false;
     dialogFolderId.value = 0;
+
+    if (!template) {
+      return;
+    }
+
+    // Updates tiptap with content
+    await setTimeout(() => {}, 100);
+
+    let tryCount = 0;
+
+    const interval = setInterval(() => {
+      if (tiptap.value) {
+        tiptap.value.setContent(template.content);
+        clearInterval(interval);
+      } else {
+        tryCount++;
+      }
+
+      if (tryCount >= 10) {
+        clearInterval(interval);
+      }
+    }, 300);
   } catch (e) {
     setMessage(
       t('components.project.document.messages.error.createDoc'),
@@ -424,6 +449,16 @@ const deleteFolder = async (id: number) => {
       'success',
       true,
     );
+
+    // Null selected doc if it was inside the selected folder
+    const folder = folders.value.find((folder) => folder.id === id);
+    if (
+      selectedDoc.value &&
+      folder &&
+      folder.documents?.map(({ id }) => id).includes(selectedDoc.value.id)
+    ) {
+      selectedDoc.value = null;
+    }
 
     folders.value = folders.value.filter((folder) => folder.id !== id);
   } catch (e) {
