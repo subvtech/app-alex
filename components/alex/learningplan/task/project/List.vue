@@ -19,7 +19,7 @@
             <alex-custom-chip
               status="secondary"
               size="small"
-              :text="filteredTasks[backlogIndex - 1].length.toString()"
+              :text="filteredTasks.length.toString()"
             ></alex-custom-chip>
             <alex-custom-button
               class="ml-auto"
@@ -47,7 +47,7 @@
                   :tasks="backlogTasks"
                   :search="search"
                   :active-filter="isFilterActive"
-                  :over="setOver(backlogIndex - 1)"
+                  :over="setOver"
                   :drag-from="dragDrop.dragFrom.value"
                   :dragging="dragDrop.dragging.value"
                   @start-drag="dragDrop.startDrag"
@@ -233,7 +233,7 @@ const filteredTasks = computed(() => {
   const backlog = backlogTasks.value.filter((task) =>
     task.title.toLowerCase().includes(searchField.value.toLowerCase()),
   );
-  return [backlog];
+  return backlog;
 });
 
 const backlogTasks = computed(() => {
@@ -358,68 +358,14 @@ const handleMoveTask = async ({
   }
 };
 
-const handleToggleArchive = async (id: number) => {
-  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
-  if (!task) return;
-  try {
-    if (task) {
-      const newPosition = getHigherIndex();
-      task.position = newPosition;
-      task.archived_at = task.archived_at ? null : new Date().toISOString();
-      await update('tasks', id, {
-        archived_at: task.archived_at,
-        position: newPosition,
-      });
-      displaySuccess(task.archived_at ? 'archiveSuccess' : 'unarchiveSuccess');
-    }
-  } catch (e) {
-    displayError(task.archived_at ? 'archiveError' : 'unarchiveError');
-  }
-};
-
-const setOver = (groupIndex: number) => {
-  if (dragDrop.over.value.list === groups[groupIndex])
-    return dragDrop.over.value;
+const setOver = () => {
+  if (dragDrop.over.value.list === 'backlog') return dragDrop.over.value;
   return { ...dragDrop.over.value, id: -1 };
 };
 
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
   dragDrop.onDragOver('backlog', -index, -1, dragEvent);
 };
-
-// const updateTaskPositions = async (tasksStatus: TaskStatus, item: TaskItem) => {
-//   const groupIndex = groups[tasksStatus];
-
-//   const cloneArray = JSON.parse(JSON.stringify(backlogTasks.value[groupIndex]));
-
-//   const task = learningPlanStore.learningPlan?.tasks.find(
-//     (t) => t.id === item.id,
-//   );
-
-//   if (!task) return;
-
-//   if (task?.status === tasksStatus) {
-//     const removeIndex = cloneArray.findIndex((t: TaskItem) => t.id === task.id);
-//     cloneArray.splice(removeIndex, 1);
-//   }
-
-//   let targeIndex = cloneArray.findIndex((t) => t.id === dragDrop.over.value.id);
-//   targeIndex =
-//     dragDrop.over.value.position === 'top' ? targeIndex : targeIndex + 1;
-//   cloneArray.splice(targeIndex, 0, item);
-
-//   task.status = tasksStatus;
-//   item.status = tasksStatus;
-//   await update('tasks', task.id, { status: tasksStatus });
-//   await client('tasks/update-multiple', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: cloneArray,
-//   });
-//   backlogTasks.value[groupIndex] = cloneArray;
-// };
 
 const onDrop = (item: TaskItem, tableSort: string) => {
   if (dragDrop.over.value.list) {
