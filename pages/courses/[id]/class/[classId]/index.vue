@@ -82,11 +82,8 @@
       v-model:dialog-model="dialogGroup"
       :title="$t('pages.classes.membersGroup')"
       :loading="learningPlanStore.loading"
-      :items="getOriginalGroups(classStore.currentClass?.learning_plan_groups)"
-      :show-empty-state="
-        !getOriginalGroups(classStore.currentClass?.learning_plan_groups)
-          ?.length
-      "
+      :items="classStore.currentClass?.learning_plan_groups"
+      :show-empty-state="!classStore.currentClass?.learning_plan_groups?.length"
       empty-state-image="/svg/no-group-members.svg"
       image-height="200px"
       image-width="250px"
@@ -294,10 +291,6 @@ const ignoreUserEmails = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
 });
 
-function getOriginalGroups(groups?: LearningPlanGroupSimple[]) {
-  return groups?.filter((group) => !group.task_members?.length);
-}
-
 function removeSelectedGroupMember(id: number) {
   if (selectedInChargeGroupMember?.value?.id === id) {
     formAddGroup.setFieldError(
@@ -402,29 +395,24 @@ async function onUpdateGroup(id: number) {
     return;
   }
   try {
-    const group =
-      learningPlanStore.learningPlan?.groups.filter(
-        (group) => group.id === id,
-      ) || [];
-    const groupMembers = group[0]?.group_members
-      ?.filter((groupMember) => {
-        return selectedGroupMembers.value
-          .map((member) => member.id)
-          .includes(groupMember.student_member.id);
-      })
-      .map((member) => {
-        const role =
-          member.student_member.id === selectedInChargeGroupMember.value?.id
-            ? 'in_charge'
-            : 'standard';
-        return { id: member.id, role };
-      });
+    const group = learningPlanStore.learningPlan?.groups.find(
+      (group) => group.id === id,
+    );
+    if (!group) {
+      return;
+    }
+    const groupMembers = selectedGroupMembers.value.map((member) => {
+      const role =
+        member.id === selectedInChargeGroupMember.value?.id
+          ? 'in_charge'
+          : 'standard';
+      return { member_id: member.id, role };
+    });
     const data = {
       title: groupTitle.value,
       learningplan: learningPlanId.value,
-      group_members: groupMembers,
+      members: groupMembers,
     };
-
     await strapi.update('learnin-plan-groups', id, data);
     setMessage('Grupo atualizado com sucesso!', 'green', true);
     await classStore.reloadClass();

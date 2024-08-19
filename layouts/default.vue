@@ -1,50 +1,30 @@
 <template>
-  <v-app>
+  <v-app class="tw-relative">
     <AppSnackbar />
-    <alex-custom-drawable
+    <alex-custom-sidebar
       v-model="drawer"
+      v-model:clipped="clipped"
       :blocks="menus"
-      :clipped="clipped"
-      dark
-      :permanent="isPermanent"
-      data-tour="step-user-area"
-    >
-      <template #header>
-        <div
-          class="my-4 w-100 d-flex"
-          :class="clipped ? '' : 'justify-center'"
-          style="max-height: 28px"
-        >
-          <div>
-            <NuxtLink to="/">
-              <img
-                v-if="clipped"
-                src="/images/alex-mini.svg"
-                height="28"
-                width="43"
-              />
-              <img v-else src="/images/alex.svg" height="28" width="84" />
-            </NuxtLink>
-          </div>
-        </div>
-      </template>
-    </alex-custom-drawable>
-
+      :is-permanent="isPermanent"
+    />
     <alex-custom-horizontal-bar
       :drawer="drawer"
       fixed
+      :class="
+        clipped ? 'clipped-sidebar main-header-app' : 'sidebar main-header-app'
+      "
       :avatar="user?.avatar"
       :placeholder="user?.fullname"
       :menu-items="profileMenuItems"
       :track-current-user="userStore.isCurrentUser"
       show-picture
       @toggle:drawer="closeDrawable(!clipped)"
-      @click="onClickOutside"
     />
-    <v-main class="d-flex bg-gray-blue pt-16" @click="onClickOutside">
-      <v-container
-        class="d-flex flex-column flex-1 w-100 pa-4 pa-sm-6 max-width-100 min-height-100"
-      >
+    <v-main
+      class="bg-gray-blue pt-16"
+      :class="clipped ? 'clipped-sidebar' : 'sidebar'"
+    >
+      <v-container class="pa-4 pa-sm-6 max-width-100">
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -73,8 +53,7 @@ router.beforeEach(() => {
 
 const user = useStrapiUser<User>();
 const userStore = useUserStore();
-const { clipped, drawer, isPermanent, closeDrawable, onClickOutside } =
-  useNavigationDrawer();
+const { clipped, drawer, closeDrawable, isPermanent } = useNavigationDrawer();
 
 const headerStore = usePageHeaderStore();
 
@@ -200,8 +179,17 @@ onBeforeMount(() => {
 // ];
 
 // const { tour, activeTour } = useOnBoarding(steps);
+interface Menu {
+  dataTour?: string;
+  title: string;
+  items: {
+    icon: string;
+    title: string;
+    to: string;
+  }[];
+}
 
-const defaultMenus = [
+const defaultMenus: Menu[] = [
   {
     title: i18n.t('layouts.default.userArea'),
     dataTour: 'step-user-area',
@@ -279,7 +267,7 @@ const defaultMenus = [
   // },
 ];
 
-const componentsMenu = [
+const componentsMenu: Menu[] = [
   {
     title: 'Componentes',
     dataTour: '',
@@ -301,6 +289,19 @@ const menus = computed(() => {
 </script>
 
 <style lang="scss">
+@media screen and (min-width: 959px) {
+  .sidebar {
+    --v-layout-left: 256px !important;
+  }
+  .clipped-sidebar {
+    --v-layout-left: 56px !important;
+  }
+  .main-header-app {
+    left: var(--v-layout-left) !important;
+    width: calc(100% - var(--v-layout-left)) !important;
+  }
+}
+
 .overflow-hidden {
   overflow-y: hidden;
 }
