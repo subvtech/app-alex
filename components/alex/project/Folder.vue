@@ -26,7 +26,7 @@
         size="small"
         icon="mdi-plus"
         color="gray-400"
-        @click="emit('add-doc')"
+        @click.stop="emit('add-doc')"
       />
       <alex-custom-dropdown :items="options" class="!tw-z-[10000]"
         ><template #activator="activate">
