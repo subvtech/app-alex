@@ -334,6 +334,7 @@ const tasksArray = computed(() => {
           });
         }
       });
+
       const taskItem = {
         id: task.id,
         title: task.title,
