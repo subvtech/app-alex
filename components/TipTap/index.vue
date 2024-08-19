@@ -135,7 +135,8 @@ const defaultBlock = computed(() => {
 const showMenuBar = computed(() => {
   return (
     !props.hideMenuBar &&
-    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text')))
+    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
+  );
 });
 // const mediaToDelete = ref<number[]>([]);
 const temporaryMedia = ref<number[]>([]);
@@ -211,6 +212,13 @@ onMounted(async () => {
       isLoading.value = false;
     },
   });
+
+  console.log('Montou');
+  console.log(`Docname: ${props.docName}`);
+  console.log(`Appid: ${app.$config.public.tipTapAppId}`);
+  console.log(`Token: ${TipTapToken}`);
+  console.log('Doc:', doc);
+
   const setCollaborationExtensions = (): AnyExtension[] => [
     ...(props.collaboration
       ? [
