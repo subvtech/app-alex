@@ -211,6 +211,13 @@ onMounted(async () => {
       isLoading.value = false;
     },
   });
+
+  console.log('Montou');
+  console.log(`Docname: ${props.docName}`);
+  console.log(`Appid: ${app.$config.public.tipTapAppId}`);
+  console.log(`Token: ${TipTapToken}`);
+  console.log('Doc:', doc);
+
   const setCollaborationExtensions = (): AnyExtension[] => [
     ...(props.collaboration
       ? [
