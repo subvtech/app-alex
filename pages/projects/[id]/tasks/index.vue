@@ -76,14 +76,7 @@
           />
         </TransitionGroup>
         <Transition v-if="mode === 'kanban'" name="fade" mode="out-in">
-          <alex-learningplan-task-project-kanban
-            :columns="[
-              { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
-              { title: 'Frontend', group: 'frontend', color: 'gray' },
-              { title: 'Backend', group: 'backend', color: 'gray' },
-              { title: 'Testing', group: 'testing', color: 'gray' },
-            ]"
-          />
+          <alex-learningplan-task-project-kanban v-model="columns" />
         </Transition>
         <alex-learningplan-task-project-list
           v-else
@@ -102,6 +95,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { Colors } from '~/components/alex/learningplan/task/project/kanban/column/Header.vue';
+
 export interface filterType {
   select?: string | null;
   archivedTasks?: boolean;
@@ -125,6 +120,12 @@ const mode = ref<'list' | 'kanban'>('kanban');
 const search = ref('');
 const selectedSprint = ref('sprint 1');
 const sprints = ref(['sprint 1', 'sprint 2', 'sprint 3']);
+const columns = ref<{ title: string; group: string; color: Colors }[]>([
+  { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
+  { title: 'Frontend', group: 'frontend', color: 'gray' },
+  { title: 'Backend', group: 'backend', color: 'gray' },
+  { title: 'Testing', group: 'testing', color: 'gray' },
+]);
 const { id } = route.params;
 const filter = ref<filterType>();
 const filterDrawer = ref();
@@ -149,6 +150,9 @@ const toggleMode = () => {
   }
   mode.value = 'kanban';
 };
+watch(columns, () => {
+  console.log(columns.value);
+});
 watch(
   () => [learningPlanStore.loading],
   () => {

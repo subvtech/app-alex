@@ -1,10 +1,13 @@
 <template>
   <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
-    <alex-learningplan-task-project-kanban-column-header
-      :title="title"
-      :quantity="items.length"
-      :color="color"
-    />
+    <DragHandle>
+      <alex-learningplan-task-project-kanban-column-header
+        :title="title"
+        :quantity="items.length"
+        :color="color"
+        @title-change="$emit('title-column-change', group, $event)"
+      />
+    </DragHandle>
     <SlickList
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
@@ -23,19 +26,23 @@
         class="kanban-card-item"
         :disabled="disabled"
       >
-        <slot name="card" :item="item" :index="i" :status="status" />
+        <slot name="card" :item="item" :index="i" />
       </SlickItem>
     </SlickList>
+    <div
+      v-if="addButton"
+      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button"
+      @click="$emit('add-item', group)"
+    >
+      <v-icon size="20px">mdi-plus</v-icon>
+      <span class="text-body-4">{{ addButtonText }}</span>
+    </div>
   </div>
 </template>
 
-<script
-  setup
-  lang="ts"
-  generic="T extends { id: number; status: string; raw: T }"
->
-import { SlickList, SlickItem } from 'vue-slicksort';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+<script setup lang="ts" generic="T extends { id: number }">
+import { SlickList, SlickItem, DragHandle } from 'vue-slicksort';
+import { Colors } from './Header.vue';
 export type Accept<T> =
   | true
   | string[]
@@ -51,16 +58,21 @@ export type Accept<T> =
 interface ColumnProps {
   title: string;
   group: string;
-  color?: 'orange' | 'green' | 'blue' | 'gray';
+  color?: Colors;
   accept?: Accept<T> | null;
   disabled?: boolean;
+  addButton?: boolean;
+  addButtonText?: string;
+  items: T[];
 }
-const props = withDefaults(defineProps<ColumnProps>(), {
+withDefaults(defineProps<ColumnProps>(), {
   accept: null,
   disable: false,
   color: 'gray',
+  addButtonText: 'Adicionar',
+  addButton: true,
+  items: () => [],
 });
-const items = defineModel<T[]>({ default: [] });
 const emit = defineEmits<{
   'insert-card': [
     values: {
@@ -76,6 +88,8 @@ const emit = defineEmits<{
       event: MouseEvent;
     },
   ];
+  'title-column-change': [group: string, title: string];
+  'add-item': [group: string];
 }>();
 
 const isDragging = () => {
@@ -92,13 +106,6 @@ const handleInsertCard = (values: {
   if (isDragging()) return;
   emit('insert-card', values);
 };
-const mappedStatus = {
-  gray: 'to_do',
-  blue: 'in_progress',
-  orange: 'in_review',
-  green: 'done',
-};
-const status = computed(() => mappedStatus[props.color] as TaskStatus);
 </script>
 
 <style lang="scss" scoped>
@@ -115,5 +122,12 @@ const status = computed(() => mappedStatus[props.color] as TaskStatus);
 }
 :global(.kanban-card-dragging .kanban-card-item-inner) {
   margin-top: 0px;
+}
+.add-button:hover {
+  cursor: pointer;
+  background-color: rgb(var(--v-theme-gray-100));
+}
+.add-button:active {
+  background-color: rgb(var(--v-theme-gray-200));
 }
 </style>
