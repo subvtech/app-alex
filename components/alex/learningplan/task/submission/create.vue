@@ -189,6 +189,7 @@ const saveContent = async () => {
     });
     emit('update-task-status', 'in_progress');
   }
+
   hasEditorChanges.value = await checkDataChanges();
 };
 

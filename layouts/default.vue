@@ -271,6 +271,7 @@ const defaultMenus: Menu[] = [
 const componentsMenu: Menu[] = [
   {
     title: 'Componentes',
+    dataTour: '',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',

@@ -195,6 +195,7 @@ const formatDate = (date: Date | string) => {
   }
   return format(date, 'dd/MM/yyyy');
 };
+
 const typeSubmission = computed(() => {
   if (props.sendSubmission && props.sendSubmissionAfterDeadline) {
     return t('components.courses.tasks.submission.sendAfterDeadline');

@@ -231,6 +231,7 @@ const handleUpdateStatus = async (
     const lastSubmission = taskMember.submissions?.length
       ? taskMember?.submissions[0]
       : undefined;
+
     if (taskMember?.task?.submission_required) {
       if (newStatus === 'in_review' && !lastSubmission) {
         throw new Error('missingSubmission');

@@ -83,8 +83,11 @@
       v-model:dialog-model="dialogGroup"
       :title="$t('pages.classes.membersGroup')"
       :loading="learningPlanStore.loading"
-      :items="classStore.currentClass?.learning_plan_groups"
-      :show-empty-state="!classStore.currentClass?.learning_plan_groups?.length"
+      :items="getOriginalGroups(classStore.currentClass?.learning_plan_groups)"
+      :show-empty-state="
+        !getOriginalGroups(classStore.currentClass?.learning_plan_groups)
+          ?.length
+      "
       empty-state-image="/svg/no-group-members.svg"
       image-height="200px"
       image-width="250px"
@@ -291,6 +294,10 @@ const ignoreUserIds = computed(() => {
 const ignoreUserEmails = computed(() => {
   return learningPlanStore.learningPlan?.members?.map((m) => m.email) || [];
 });
+
+function getOriginalGroups(groups?: LearningPlanGroupSimple[]) {
+  return groups?.filter((group) => !group.task_members?.length);
+}
 
 function removeSelectedGroupMember(id: number) {
   if (selectedInChargeGroupMember?.value?.id === id) {
