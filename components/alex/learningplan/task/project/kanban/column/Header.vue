@@ -37,6 +37,7 @@ interface ColumnHeader {
 }
 type Emit = {
   'title-change': [title: string];
+  'empty-title': [];
 };
 const props = withDefaults(defineProps<ColumnHeader>(), {
   edit: false,
@@ -58,10 +59,17 @@ const toggleEdit = () => {
   isEditing.value = !isEditing.value;
 };
 const handleTitleChange = () => {
-  if (titleValue.value !== props.title) {
-    emit('title-change', titleValue.value);
+  if (props.title === '' && titleValue.value === '') {
+    emit('empty-title');
+    isEditing.value = false;
+    return;
   }
-  isEditing.value = false;
+  if (titleValue.value !== props.title && titleValue.value !== '') {
+    emit('title-change', titleValue.value);
+    isEditing.value = false;
+    return;
+  }
+  titleValue.value = props.title;
 };
 </script>
 

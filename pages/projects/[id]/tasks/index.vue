@@ -123,8 +123,6 @@ const sprints = ref(['sprint 1', 'sprint 2', 'sprint 3']);
 const columns = ref<{ title: string; group: string; color: Colors }[]>([
   { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
   { title: 'Frontend', group: 'frontend', color: 'gray' },
-  { title: 'Backend', group: 'backend', color: 'gray' },
-  { title: 'Testing', group: 'testing', color: 'gray' },
 ]);
 const { id } = route.params;
 const filter = ref<filterType>();
