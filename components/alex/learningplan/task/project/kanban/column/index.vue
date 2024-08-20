@@ -1,11 +1,15 @@
 <template>
-  <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
+  <div
+    :id="group"
+    class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none"
+  >
     <DragHandle>
       <alex-learningplan-task-project-kanban-column-header
         :title="title"
         :quantity="items.length"
         :color="color"
         @title-change="$emit('title-column-change', group, $event)"
+        @empty-title="$emit('cancel-column', group)"
       />
     </DragHandle>
     <SlickList
@@ -31,7 +35,7 @@
     </SlickList>
     <div
       v-if="addButton"
-      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button"
+      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button bg-white"
       @click="$emit('add-item', group)"
     >
       <v-icon size="20px">mdi-plus</v-icon>
@@ -90,6 +94,7 @@ const emit = defineEmits<{
   ];
   'title-column-change': [group: string, title: string];
   'add-item': [group: string];
+  'cancel-column': [group: string];
 }>();
 
 const isDragging = () => {

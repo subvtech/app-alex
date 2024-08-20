@@ -17,6 +17,7 @@
           :accept="column.accept"
           class="tw-mr-2"
           @title-column-change="handleTitleChange"
+          @cancel-column="handleCancelColumn"
           @add-item="console.log($event)"
         >
           <template #card="{ item }">
@@ -29,6 +30,7 @@
 
       <div
         class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[63px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 add-button"
+        @click="handleAddColumn"
       >
         <v-icon size="20px">mdi-plus</v-icon>
         <span class="text-body-4 text-gray-800">Adicionar coluna</span>
@@ -74,6 +76,24 @@ const handleTitleChange = (group: string, value: string) => {
     }
     return column;
   });
+};
+const handleAddColumn = () => {
+  columns.value.push({
+    title: '',
+    group: `column-${columns.value.length + 1}`,
+    color: 'gray',
+  });
+  setTimeout(() => {
+    const input = document.querySelector<HTMLInputElement>(
+      `#${columns.value[columns.value.length - 1].group} input`,
+    );
+    if (input) {
+      input.focus();
+    }
+  }, 100);
+};
+const handleCancelColumn = (group: string) => {
+  columns.value = columns.value.filter((column) => column.group !== group);
 };
 </script>
 
