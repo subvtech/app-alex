@@ -56,7 +56,6 @@
                   @drag-leave="dragDrop.onDragLeave"
                   @delete-task="handleDeleteTask"
                   @move-task="handleMoveTask"
-                  @toggle-archive="handleToggleArchive"
                   @edit-task="openDrawer"
                 />
               </div>

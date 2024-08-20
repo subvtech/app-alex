@@ -67,7 +67,8 @@
           />
         </TransitionGroup>
         <Transition v-if="mode === 'kanban'" name="fade" mode="out-in">
-          <alex-learningplan-task-project-kanban />
+          <!-- <alex-learningplan-task-project-kanban /> -->
+          <div>kanban</div>
         </Transition>
         <alex-learningplan-task-project-list
           v-else
