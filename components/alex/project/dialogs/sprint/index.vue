@@ -4,11 +4,12 @@
     :title="dialogTitle"
     :main-button-text="dialogMainButtonText"
     :secondary-button-text="t('components.projects.sprint.secondaryButtonText')"
+    :loading="isLoading"
     @on-secondary-action="dialog = false"
     @on-main-action="onSubmit"
   >
     <alex-inputs-select
-      v-if="!taskId"
+      v-if="!sprintId"
       v-model="sprint.type"
       density="comfortable"
       name="type"
@@ -80,32 +81,87 @@ interface sprintType {
     | null;
 }
 
+interface propsType {
+  sprintData: sprintType;
+  projectId: string;
+  sprintId?: string;
+  projectEndDate: string;
+}
+
 const { t } = useI18n();
 const { createSprintRules } = useFormRules();
+const client = useStrapiClient();
+const { update } = useStrapi();
+const { setMessage } = useMessageStore();
 
-const props = withDefaults(
-  defineProps<{ sprintData: sprintType; taskId: string }>(),
-  {
-    sprintData: () => ({
-      type: 'single',
-      name: '',
-      startDate: '',
-      endDate: '',
-      interval: null,
-    }),
-    taskId: '',
-  },
-);
+const props = withDefaults(defineProps<propsType>(), {
+  sprintData: () => ({
+    type: 'single',
+    name: '',
+    startDate: '',
+    endDate: '',
+    interval: null,
+  }),
+  sprintId: '',
+});
 
 const sprint = ref<sprintType>(props.sprintData);
 const dialog = defineModel<boolean>({ required: true });
+const isLoading = ref(false);
+const currentProjectId = ref(props.projectId);
+const currentSprintId = ref(props.sprintId);
+const currentProjectEndDate = ref(props.projectEndDate);
 
 const { handleSubmit } = useForm({
   validationSchema: createSprintRules,
 });
 
-const onSubmit = handleSubmit((values) => {
-  console.log('Form submitted:', values);
+const onSubmit = handleSubmit(async (values) => {
+  isLoading.value = true;
+  try {
+    if (!currentSprintId.value) {
+      await client('sprints/create-multiple', {
+        method: 'POST',
+        body: {
+          sprints: {
+            startDate: values.startDate,
+            endDate: values.endDate,
+            type: values.type,
+            title: values.name,
+          },
+          projectId: currentProjectId.value,
+          projectEndDate: currentProjectEndDate.value,
+        },
+      });
+    } else {
+      await update('sprints', currentSprintId.value, {
+        title: values.name,
+        startDate: values.startDate,
+        endDate: values.endDate,
+      });
+    }
+    setMessage(
+      t(
+        `components.projects.sprint.successMessage.${
+          currentSprintId.value ? 'edit' : 'create'
+        }`,
+      ),
+      'success',
+      true,
+    );
+  } catch (error) {
+    setMessage(
+      t(
+        `components.projects.sprint.errorMessage.${
+          currentSprintId.value ? 'edit' : 'create'
+        }`,
+      ),
+      'error',
+      true,
+    );
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 const disablePastDates = (date: Date) => {
@@ -114,6 +170,18 @@ const disablePastDates = (date: Date) => {
   const passedDate = new Date(date);
   return passedDate >= today;
 };
+
+watch(dialog, (newValue) => {
+  if (newValue) {
+    sprint.value = {
+      ...props.sprintData,
+    };
+    currentSprintId.value = props.sprintId;
+    currentProjectId.value = props.projectId;
+    currentProjectEndDate.value = props.projectEndDate;
+    isLoading.value = false;
+  }
+});
 
 watch(
   () => sprint.value.type,
@@ -170,19 +238,19 @@ const intervalOptions = [
 ];
 
 const dialogTitle = computed(() =>
-  props.taskId
+  currentSprintId.value
     ? t('components.projects.sprint.title.edit')
     : t('components.projects.sprint.title.create'),
 );
 
 const dialogMainButtonText = computed(() =>
-  props.taskId
+  currentSprintId.value
     ? t('components.projects.sprint.mainButtonText.edit')
     : t('components.projects.sprint.mainButtonText.create'),
 );
 
 const namePlaceholder = computed(() =>
-  props.taskId || sprint.value.type === 'single'
+  currentSprintId.value || sprint.value.type === 'single'
     ? t('components.projects.sprint.name.defaultPlaceholder')
     : t('components.projects.sprint.name.multiplePlaceholder'),
 );

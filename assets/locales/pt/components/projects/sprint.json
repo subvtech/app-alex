@@ -28,5 +28,13 @@
     "custom": "Personalizado"
   },
   "startDate": "Início da sprint",
-  "endDate": "Término da sprint"
+  "endDate": "Término da sprint",
+  "successMessage": {
+    "create": "Sprint(s) criada(s) com sucesso",
+    "edit": "Sprint editada com sucesso"
+  },
+  "errorMessage": {
+    "create": "Erro ao criar sprint(s)",
+    "edit": "Erro ao editar sprint"
+  }
 }

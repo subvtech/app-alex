@@ -28,5 +28,13 @@
     "custom": "Custom"
   },
   "startDate": "Sprint start",
-  "endDate": "Sprint end"
+  "endDate": "Sprint end",
+  "successMessage": {
+    "create": "Sprint(s) created successfully",
+    "edit": "Sprint edited successfully"
+  },
+  "errorMessage": {
+    "create": "Error creating sprint(s)",
+    "edit": "Error editing sprint"
+  }
 }

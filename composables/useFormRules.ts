@@ -349,10 +349,7 @@ export const useFormRules = () => {
   });
 
   const createSprintRules = yup.object({
-    type: yup
-      .string()
-      .required(i18n.t('rules.field.required'))
-      .oneOf(['multiple', 'single']),
+    type: yup.string().oneOf(['multiple', 'single']),
     name: yup.string().when('type', {
       is: 'single',
       then: () =>
