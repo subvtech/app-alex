@@ -470,11 +470,12 @@ const handleEditClick = (
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
+  if (props.kind === 'project') {
+    addProjectMembersDialog.value = true;
+  }
   if (!props.type || !checkHasFilledDates()) {
     setTypeDropdown.value = true;
-    return;
-  }
-  if (props.type === 'group') {
+  } else if (props.type === 'group') {
     addGroupDialog.value = true;
   } else {
     addMemberDialog.value = true;
