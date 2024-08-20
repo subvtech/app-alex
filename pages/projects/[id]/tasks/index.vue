@@ -16,13 +16,22 @@
       </div>
       <div
         v-else
-        class="w-100 d-flex justify-space-between align-center height-18 header px-6"
+        class="w-100 d-flex justify-space-between align-center height-18 header px-6 gap-2"
       >
         <alex-inputs-text-field
           v-model="search"
           :placeholder="t('pages.task.searchPlaceholder')"
           prepend-inner-icon="mdi-magnify"
-          class="w-100 max-w-80 mr-6 min-w-60"
+          class="tw-w-[300px]"
+          density="comfortable"
+          name="search"
+          hide-details
+        />
+        <alex-inputs-select
+          v-model="selectedSprint"
+          :items="sprints"
+          :placeholder="t('pages.task.searchPlaceholder')"
+          class="tw-w-[300px] tw-mr-auto"
           density="comfortable"
           name="search"
           hide-details
@@ -67,8 +76,14 @@
           />
         </TransitionGroup>
         <Transition v-if="mode === 'kanban'" name="fade" mode="out-in">
-          <!-- <alex-learningplan-task-project-kanban /> -->
-          <div>kanban</div>
+          <alex-learningplan-task-project-kanban
+            :columns="[
+              { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
+              { title: 'Frontend', group: 'frontend', color: 'gray' },
+              { title: 'Backend', group: 'backend', color: 'gray' },
+              { title: 'Testing', group: 'testing', color: 'gray' },
+            ]"
+          />
         </Transition>
         <alex-learningplan-task-project-list
           v-else
@@ -99,22 +114,24 @@ export interface filterType {
     end: string | null;
   };
 }
-
+// Composables
 const route = useRoute();
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
-const { id } = route.params;
+
+// refs
+const mode = ref<'list' | 'kanban'>('kanban');
 const search = ref('');
-const mode = ref<'list' | 'kanban'>('list');
+const selectedSprint = ref('sprint 1');
+const sprints = ref(['sprint 1', 'sprint 2', 'sprint 3']);
+const { id } = route.params;
+const filter = ref<filterType>();
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
 const isProfessor = ref<boolean>(false);
 const classes = ref<string[]>([]);
-
 const openFilterDrawer = ref(false);
-
-const filter = ref<filterType>();
 
 const handleFilter = (newFilter: filterType) => {
   filter.value = newFilter;

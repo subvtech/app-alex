@@ -1,6 +1,6 @@
 <template>
   <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
-    <alex-learningplan-task-kanban-column-header
+    <alex-learningplan-task-project-kanban-column-header
       :title="title"
       :quantity="items.length"
       :color="color"
@@ -50,16 +50,17 @@ export type Accept<T> =
     }) => boolean);
 interface ColumnProps {
   title: string;
-  color: 'orange' | 'green' | 'blue' | 'gray';
-  accept?: Accept<T> | null;
   group: string;
+  color?: 'orange' | 'green' | 'blue' | 'gray';
+  accept?: Accept<T> | null;
   disabled?: boolean;
 }
 const props = withDefaults(defineProps<ColumnProps>(), {
   accept: null,
   disable: false,
+  color: 'gray',
 });
-const items = defineModel<T[]>({ required: true });
+const items = defineModel<T[]>({ default: [] });
 const emit = defineEmits<{
   'insert-card': [
     values: {
