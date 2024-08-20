@@ -2420,29 +2420,29 @@
     tslib "^2.4.0"
 
 "@tanstack/match-sorter-utils@^8.15.1":
-  version "8.15.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/match-sorter-utils/-/match-sorter-utils-8.15.1.tgz#715e028ff43cf79ece10bd5a757047a1016c3bba"
-  integrity sha512-PnVV3d2poenUM31ZbZi/yXkBu3J7kd5k2u51CGwwNojag451AjTH9N6n41yjXz2fpLeewleyLBmNS6+HcGDlXw==
+  version "8.19.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/match-sorter-utils/-/match-sorter-utils-8.19.4.tgz#dacf772b5d94f4684f10dbeb2518cf72dccab8a5"
+  integrity sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==
   dependencies:
     remove-accents "0.5.0"
 
-"@tanstack/query-core@5.51.17":
-  version "5.51.17"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.51.17.tgz#f2ebad3f8511ebe5fecbd5d9b6b105471ed248d4"
-  integrity sha512-AtVNOgVrZNz4C7RzMfx7sCn1/gf0Ype4nX8UP2BOh0C2tTMszwXk98iCLRacTn5vTRNJCZxz3fgEcTJq0uv8GQ==
+"@tanstack/query-core@5.51.21":
+  version "5.51.21"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.51.21.tgz#a510469c6c30d3de2a8b8798e340169a4b0fd08f"
+  integrity sha512-POQxm42IUp6n89kKWF4IZi18v3fxQWFRolvBA6phNVmA8psdfB1MvDnGacCJdS+EOX12w/CyHM62z//rHmYmvw==
 
 "@tanstack/virtual-core@3.5.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.5.0.tgz#108208d0f1d75271300bc5560cf9a85a1fa01e89"
   integrity sha512-KnPRCkQTyqhanNC0K63GBG3wA8I+D1fQuVnAvcBF8f13akOKeQp1gSbu6f77zCxhEk727iV5oQnbHLYzHrECLg==
 
-"@tanstack/vue-query@^5.51.17":
-  version "5.51.17"
-  resolved "https://registry.yarnpkg.com/@tanstack/vue-query/-/vue-query-5.51.17.tgz#359f5b408cdbc1d11a00816d6b98e376c2d5193c"
-  integrity sha512-7c8s0YJsggDhSNrFuPPJXpRiCNZ6KXJXyQvqk+forouNjnVBq0WQDoeDMicPnHeHdO68Vq/VtzB4qQKJEW3DNg==
+"@tanstack/vue-query@^5.51.21":
+  version "5.51.21"
+  resolved "https://registry.yarnpkg.com/@tanstack/vue-query/-/vue-query-5.51.21.tgz#c1a8f8ffe7ee1f4a2b18aea3a4f1d9b27c284bc2"
+  integrity sha512-gXAMq90TTepqmBCuVqRxEO/vsuhEkvllCTrlsvZRuPROyV7IroJHmDfuz87KRSACCFTuiy65Mbtk/pg++NIkVg==
   dependencies:
     "@tanstack/match-sorter-utils" "^8.15.1"
-    "@tanstack/query-core" "5.51.17"
+    "@tanstack/query-core" "5.51.21"
     "@vue/devtools-api" "^6.6.3"
     vue-demi "^0.14.10"
 

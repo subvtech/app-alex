@@ -70,7 +70,7 @@
     "@nuxtjs/strapi": "^1.9.3",
     "@pinia/nuxt": "^0.4.11",
     "@postlight/parser": "^2.2.3",
-    "@tanstack/vue-query": "^5.51.17",
+    "@tanstack/vue-query": "^5.51.21",
     "@tiptap-pro/extension-drag-handle": "^2.10.5",
     "@tiptap-pro/extension-node-range": "^2.10.5",
     "@tiptap/extension-bubble-menu": "^2.5.7",

@@ -25,6 +25,7 @@
               <div v-if="!tasksArray[i - 1].length && i">
                 <alex-learningplan-task-empty-state
                   key="empty-state"
+                  :type="taskSectionsValue[i]"
                   :index="i"
                   :drop-area="over.list === groups[i - 1]"
                   @drag-over="handleEmptyStateOver"
@@ -290,6 +291,14 @@ const taskSections = [
   t('pages.task.done'),
   t('pages.task.archived'),
 ];
+const taskSectionsValue: (
+  | 'backlog'
+  | 'draft'
+  | 'published'
+  | 'done'
+  | 'archived'
+  | 'sprint'
+)[] = ['draft', 'published', 'done', 'archived'];
 
 const tasksArray = computed(() => {
   const draft: TaskItem[] = [];
