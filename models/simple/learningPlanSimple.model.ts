@@ -26,6 +26,7 @@ export interface LearningPlanSimple {
   class_name: string;
   projects: any[];
   courses: any[];
+  document_folders: DocumentFolder[];
   members: LearningPlanMemberSimple[];
   learning_structures: LearningPlanStructureSimple[];
   groups: LearningPlanGroupSimple[];
@@ -37,10 +38,12 @@ export interface LearningPlanSimple {
   learning_goals: any;
   schedules: LearningPlanScheduleSimple[];
   hidden: boolean;
+  product?: ProductSimple;
+  fields?: FieldSimple[];
   classes: ClassSimple[];
   facilitatorName?: string;
   facilitatorImage?: string;
-  institution?: string;
+  institutions?: Institution[];
   trails?: number;
   userIsFacilitator?: boolean;
 }

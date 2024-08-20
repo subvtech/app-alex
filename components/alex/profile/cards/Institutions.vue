@@ -85,7 +85,7 @@ const props = withDefaults(defineProps<InstitutionsComponentType>(), {
 
 const { canEdit } = toRefs(props);
 
-const searchInstitutions = ref<InstitutionsType[]>([]);
+const searchInstitutions = ref<Institution[]>([]);
 const search = ref('');
 const isEditing = ref(false);
 const componentKey = ref(0);

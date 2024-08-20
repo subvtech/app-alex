@@ -107,6 +107,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'learningPlan/submissions',
     'learningPlan/drawer',
     'forgot/sendResetPassword',
+    'project/document',
     'profile/about',
     'profile/courses',
     'profile/events',
@@ -126,6 +127,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tiptap/messages',
     'tiptap/mediaUpload',
     'tiptap/bookmark',
+    'projects/create',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

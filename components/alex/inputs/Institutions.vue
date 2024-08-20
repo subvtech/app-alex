@@ -26,7 +26,7 @@ import { useField } from 'vee-validate';
 
 export type InstitutionProps = {
   search: string;
-  institutions: InstitutionsType[];
+  institutions: Institution[];
   filterIds?: number[];
   name?: string;
   color?: string;
@@ -71,7 +71,7 @@ const fetchInstitutions = async (institution: string) => {
       pagination: { start: 0, limit: 10 }, // limit per page
     });
     if (result.data.length > 0) {
-      const dataInstitutions: InstitutionsType[] = result.data.map(
+      const dataInstitutions: Institution[] = result.data.map(
         (institution: any) => {
           return {
             ...institution,
@@ -102,7 +102,7 @@ watchEffect((onInvalidate) => {
   }
 });
 
-const getItemTitle = (item: InstitutionsType) => {
+const getItemTitle = (item: Institution) => {
   return `${item.acronym} - ${item.name}`;
 };
 </script>

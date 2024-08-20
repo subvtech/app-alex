@@ -11,7 +11,6 @@
       :custom-filter="filterByFullnameAndEmail"
       :name="name"
       v-bind="$attrs"
-      :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
     >
       <template #item="{ props: propsItem, item, index }">
         <alex-custom-list-item-user
@@ -47,7 +46,7 @@
 
 <script setup lang="ts">
 import { useField } from 'vee-validate';
-type User = {
+export type User = {
   id?: string;
   email: string;
   fullname?: string;
