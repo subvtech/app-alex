@@ -17,7 +17,9 @@
         :user="{
           id: message.learning_plan_member.user.id,
           name: getCurrentUserName(user.id, message.learning_plan_member),
-          avatar: message.learning_plan_member.user?.avatar?.formats.small.url,
+          avatar:
+            message.learning_plan_member.user?.avatar?.formats?.small?.url ||
+            message.learning_plan_member.user?.avatar?.url,
         }"
         :message="message.message"
         :align="
