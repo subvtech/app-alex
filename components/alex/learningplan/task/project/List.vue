@@ -101,9 +101,12 @@
     </Transition>
     <div class="tw-flex tw-w-full tw-justify-between">
       <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
-      <alex-custom-button size="large" prepend-icon="alex:Sprint">{{
-        'Nova Sprint'
-      }}</alex-custom-button>
+      <alex-custom-button
+        size="large"
+        prepend-icon="alex:Sprint"
+        @click="createSprintDialog = true"
+        >{{ 'Nova Sprint' }}</alex-custom-button
+      >
     </div>
     <alex-learningplan-task-project-sprints
       v-model="sprints"
@@ -111,6 +114,11 @@
       :search="search"
       :learning-plan-id="learningPlanStore.learningPlan.id"
       @drag-end="onDrop"
+    />
+    <alex-project-dialogs-sprint
+      v-model="createSprintDialog"
+      :project-id="learningPlanStore.learningPlan.id"
+      :project-end-date="learningPlanStore.learningPlan.end_date"
     />
   </div>
 </template>
@@ -149,6 +157,7 @@ const { create, delete: _delete, update } = useStrapi();
 // const client = useStrapiClient();
 const { t } = useI18n();
 const expandBacklog = ref(0);
+const createSprintDialog = ref(false);
 const sprints = ref<PanelItem<Sprint>[]>([
   {
     expanded: 0,
