@@ -1,6 +1,6 @@
 <template>
   <div
-    class="d-flex tw-flex-col-reverse md:tw-flex-row ga-4 !tw-max-w-[100vw] tw-h-[90vh]"
+    class="d-flex tw-flex-col-reverse md:tw-flex-row ga-4 tw-h-[90vh] tw-w-full"
   >
     <!-- Side bar -->
     <div
@@ -8,9 +8,9 @@
     >
       <v-expansion-panels v-model="openFolders" class="!tw-block" multiple>
         <alex-project-folder
-          v-for="folder in folders"
+          v-for="(folder, index) in folders"
           :id="folder.id"
-          :key="folder.id"
+          :key="folder.id + index"
           :title="folder.title || ''"
           :documents="folder?.documents || []"
           :selected-id="selectedDoc?.id"
@@ -19,7 +19,7 @@
           :focus="folder.id === newFolderId"
           @add-doc="
             addDocDialog = true;
-            dialogFolderId = folder.id || 0;
+            dialogFolderId = folder.id;
           "
           @change-name="
             (name) => updateFolderTitle(name, folder.title, folder.id)
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="wrapper tw-flex-1 tw-overflow-x-hidden">
+    <div class="wrapper editor-container tw-flex-1">
       <!-- Header -->
       <div
         class="d-flex ga-4 align-center py-4 px-6 border-b-sm tw-border-[#EBEDEF]"
@@ -108,7 +108,7 @@
       </div>
 
       <!-- Editor -->
-      <div class="py-6 pr-6 !tw-pl-[84px]">
+      <div class="tw-block py-6 pr-6 !tw-pl-[84px]">
         <TipTap
           v-if="!!selectedDoc"
           ref="tiptap"
@@ -116,7 +116,6 @@
           :doc-name="selectedDoc.doc_name"
           :edit="editMode"
           :mention-users="mentionUsers"
-          hide-menu-bar
           no-padding
           @update:model-value="(val) => (editorContent = val)"
         />
@@ -210,9 +209,13 @@ const selectedTemplate = ref<number>(0); // Mudar pra template objeto
 const name = ref<string>(''); // Input value
 
 // Folders
-const folders = ref<DocumentFolder[]>([]);
 const openFolders = ref<number[]>([]);
 const newFolderId = ref<number>(0); // Used to set focus aftercreate
+const folders = ref<DocumentFolder[]>([
+  { id: -1, title: '' },
+  { id: -1, title: '' },
+  { id: -1, title: '' },
+]);
 
 // Document
 const selectedDoc = ref<Document | null>(null);
@@ -633,5 +636,16 @@ watch(folders, (val, oldVal) => {
   border-radius: 8px;
   box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
   background: white;
+}
+
+.editor-container {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .editor-container {
+    /* 100% - folders - gap */
+    width: calc(100% - 270px - 16px);
+  }
 }
 </style>

@@ -76,6 +76,10 @@ export default defineNuxtConfig({
         from: 'vue-i18n',
         imports: ['useI18n'],
       },
+      {
+        from: 'vue-slicksort',
+        imports: ['SlickList', 'SlickItem'],
+      },
     ],
   },
 });

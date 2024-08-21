@@ -51,7 +51,11 @@
       />
     </v-expansion-panel-text>
   </v-expansion-panel>
-  <alex-custom-skeleton v-else class="tw-h-[52px] tw-w-full" rounded="lg" />
+  <alex-custom-skeleton
+    v-else
+    class="tw-h-[52px] tw-w-full mb-2"
+    rounded="lg"
+  />
 
   <alex-custom-confirm-dialog
     v-model="deleteDialog"
