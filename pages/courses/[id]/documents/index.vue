@@ -4,7 +4,7 @@
   >
     <!-- Side bar -->
     <div
-      class="d-flex flex-column wrapper py-4 px-2 tw-flex-[0_0_270px] tw-overflow-y-auto"
+      class="d-flex flex-column wrapper py-4 px-2 tw-flex-[0_0_35%] md:tw-flex-[0_0_270px] tw-overflow-y-auto"
     >
       <v-expansion-panels v-model="openFolders" class="!tw-block" multiple>
         <alex-project-folder
@@ -43,7 +43,9 @@
       </div>
     </div>
 
-    <div class="wrapper editor-container tw-flex-1">
+    <div
+      class="wrapper editor-container tw-flex-[0_0_63%] tw-max-h-[63%] md:tw-max-h-full md:tw-flex-1 d-flex flex-column"
+    >
       <!-- Header -->
       <div
         class="d-flex ga-4 align-center py-4 px-6 border-b-sm tw-border-[#EBEDEF]"
@@ -108,17 +110,18 @@
       </div>
 
       <!-- Editor -->
-      <div class="tw-block py-6 pr-6 !tw-pl-[84px]">
-        <TipTap
-          v-if="!!selectedDoc"
-          ref="tiptap"
-          :key="selectedDoc.id"
-          :doc-name="selectedDoc.doc_name"
-          :edit="editMode"
-          :mention-users="mentionUsers"
-          no-padding
-          @update:model-value="(val) => (editorContent = val)"
-        />
+      <div class="content tw-overflow-y-auto tw-relative">
+        <div class="tw-block tw-py-[6px] pr-6 !tw-pl-[84px] tw-h-full">
+          <TipTap
+            v-if="!!selectedDoc"
+            ref="tiptap"
+            :key="selectedDoc.id"
+            :doc-name="selectedDoc.doc_name"
+            :edit="editMode"
+            :mention-users="mentionUsers"
+            @update:model-value="(val) => (editorContent = val)"
+          />
+        </div>
       </div>
     </div>
 
@@ -304,6 +307,15 @@ const createDocument = async () => {
       }
 
       const documents = folder.documents || [];
+
+      // Opens parent folder
+      // console.log(Object.values(openFolders.value));
+      // if (!Object.values(openFolders.value).includes(folder.id)) {
+      //   openFolders.value = {
+      //     ...openFolders.value,
+      //     [openFolders.value.length]: folder.id,
+      //   };
+      // }
 
       folder.documents = [...documents, newDoc];
 
@@ -640,6 +652,10 @@ watch(folders, (val, oldVal) => {
 
 .editor-container {
   width: 100%;
+}
+
+.editor-container .content {
+  max-height: 100%;
 }
 
 @media (min-width: 768px) {
