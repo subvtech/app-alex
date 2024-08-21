@@ -8,6 +8,7 @@
         :title="title"
         :quantity="items.length"
         :color="color"
+        class="tw-max-w-[280px]"
         @title-change="$emit('title-column-change', group, $event)"
         @empty-title="$emit('cancel-column', group)"
       />

@@ -7,8 +7,9 @@
       axis="x"
       use-drag-handle
     >
-      <SlickItem v-for="(column, i) in columns" :key="column.title" :index="i">
+      <SlickItem v-for="(column, i) in columns" :key="column.group" :index="i">
         <alex-learningplan-task-project-kanban-column
+          :key="column.group"
           :column="column"
           :items="items"
           :title="column.title"
@@ -73,6 +74,7 @@ const handleTitleChange = (group: string, value: string) => {
   columns.value = columns.value.map((column) => {
     if (column.group === group) {
       column.title = value;
+      column.group = value.trim().toLowerCase().replace(/ /g, '_');
     }
     return column;
   });
@@ -104,5 +106,19 @@ const handleCancelColumn = (group: string) => {
 }
 .add-button:active {
   background-color: rgb(var(--v-theme-gray-200));
+}
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.slide-fade-move {
+  transition: transform 0.3s ease;
 }
 </style>
