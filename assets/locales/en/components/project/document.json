@@ -30,6 +30,12 @@
         "delete": "Delete",
         "save": "Save"
     },
+    "saving": {
+        "select": "Select a document",
+        "loading": "Loading",
+        "saved": "Saved",
+        "error": "Error when saving"
+    },
     "messages": {
     "success": {
         "folderName": "Folder name updated successfully",
