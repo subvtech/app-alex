@@ -30,6 +30,12 @@
         "delete": "Excluir",
         "save": "Salvar"
     },
+    "saving": {
+        "select": "Selecione um documento",
+        "loading": "Carregando",
+        "saved": "Salvo",
+        "error": "Erro ao salvar"
+    },
     "messages": {
         "success": {
             "folderName": "Nome da pasta atualizado com sucesso",
