@@ -21,11 +21,14 @@
               size="small"
               :text="filteredTasks.length.toString()"
             ></alex-custom-chip>
-            <alex-custom-button
-              class="ml-auto"
-              icon="mdi-plus"
-              variant="text"
-            />
+
+            <div class="ml-auto">
+              <alex-custom-dropdown
+                variant="text"
+                icon="mdi-plus"
+                :items="editSprints"
+              />
+            </div>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
             <Transition :name="slideTransition()" mode="out-in">
@@ -48,11 +51,11 @@
                   :search="search"
                   :active-filter="isFilterActive"
                   :over="setOver"
+                  :is-project="true"
                   :drag-from="dragDrop.dragFrom.value"
                   :dragging="dragDrop.dragging.value"
                   @start-drag="dragDrop.startDrag"
                   @drag-over="dragDrop.onDragOver"
-                  @drag-end="onDrop"
                   @drag-leave="dragDrop.onDragLeave"
                   @delete-task="handleDeleteTask"
                   @move-task="handleMoveTask"
@@ -113,7 +116,7 @@
       v-model:drag-drop="dragDrop"
       :search="search"
       :learning-plan-id="learningPlanStore.learningPlan.id"
-      @drag-end="onDrop"
+      :edit-sprints="editSprints"
     />
     <alex-project-dialogs-sprint
       v-model="createSprintDialog"
@@ -374,13 +377,20 @@ const setOver = () => {
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
   dragDrop.onDragOver('backlog', -index, -1, dragEvent);
 };
-
-const onDrop = (item: TaskItem, tableSort: string) => {
-  if (dragDrop.over.value.list) {
-    console.log('a', item, tableSort);
-  }
-  dragDrop.dragEnd();
-};
+const editSprints = [
+  {
+    text: 'Adicionar épico',
+    action: () => {
+      console.log('Adicionar épico');
+    },
+  },
+  {
+    text: 'Adicionar tarefa',
+    action: () => {
+      console.log('Adicionar tarefa');
+    },
+  },
+];
 
 const openDrawer = (id: number) => {
   editTaskId.value = id;

@@ -116,7 +116,7 @@ const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 
 // refs
-const mode = ref<'list' | 'kanban'>('kanban');
+const mode = ref<'list' | 'kanban'>('list');
 const search = ref('');
 const selectedSprint = ref('sprint 1');
 const sprints = ref(['sprint 1', 'sprint 2', 'sprint 3']);
