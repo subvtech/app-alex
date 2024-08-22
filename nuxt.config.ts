@@ -2,14 +2,12 @@ const {
   COMPONENTS_PAGE,
   MATOMO_APP_ID,
   MATOMO_URL,
-  NODE_ENV,
   OPEN_AI_KEY,
   STRAPI_URL = 'http://localhost:1337',
   TIPTAP_APP_ID,
   TIPTAP_KEY,
+  USE_MOCK,
 } = process.env;
-
-const DEV = NODE_ENV === 'development';
 
 export default defineNuxtConfig({
   pages: true,
@@ -53,12 +51,12 @@ export default defineNuxtConfig({
     },
   },
   strapi: {
-    url: DEV ? '/_' : STRAPI_URL,
+    url: USE_MOCK ? '/_' : STRAPI_URL,
     auth: {
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
-  routeRules: DEV
+  routeRules: USE_MOCK
     ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } }
     : undefined,
   shadcn: {

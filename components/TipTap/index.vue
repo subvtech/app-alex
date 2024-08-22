@@ -130,7 +130,8 @@ const defaultBlock = computed(() => {
 
 const showMenuBar = computed(() => {
   return (
-    props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text')
+    isEditable.value &&
+    (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
   );
 });
 // const mediaToDelete = ref<number[]>([]);

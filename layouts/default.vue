@@ -282,10 +282,24 @@ const componentsMenu: Menu[] = [
   },
 ];
 
+const adminMenus = [
+  {
+    title: 'Administrador',
+    items: [
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Menu Admin',
+        to: '/admin',
+      },
+    ],
+  },
+];
+
 const menus = computed(() => {
+  const newMenus = defaultMenus.concat(adminMenus);
   return config.public.showComponentsPage
-    ? defaultMenus.concat(componentsMenu)
-    : defaultMenus;
+    ? newMenus.concat(componentsMenu)
+    : newMenus;
 });
 </script>
 

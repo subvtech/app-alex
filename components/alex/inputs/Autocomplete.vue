@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { YupSchema, useField } from 'vee-validate';
+import { type YupSchema, useField } from 'vee-validate';
 
 interface AutoCompleteProps {
   name: string;
