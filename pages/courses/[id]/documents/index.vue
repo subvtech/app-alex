@@ -53,7 +53,7 @@
         <!-- Ver focus border -->
         <input
           v-model="title"
-          class="tw-flex-1 text-h4 px-4 py-2 rounded-lg tw-truncate"
+          class="tw-flex-1 text-h4 px-4 py-2 rounded-lg tw-truncate tw-w-0"
           :class="
             docSelected
               ? `hover:tw-bg-[#F1F5F9] tw-transition tw-duration-200 tw-cursor-pointer
