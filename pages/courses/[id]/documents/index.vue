@@ -229,7 +229,7 @@ const docState = computed<{
   if (!savingDoc.value) {
     return {
       text: t('components.project.document.saving.select'),
-      icon: 'mdi-check',
+      icon: 'mdi-content-save',
       color: 'gray-500',
       styles: '',
     };
@@ -247,7 +247,7 @@ const docState = computed<{
   if (savingDoc.value === 'saved') {
     return {
       text: t('components.project.document.saving.saved'),
-      icon: 'mdi-check',
+      icon: 'mdi-content-save-check',
       color: 'success-1',
       styles: '',
     };
@@ -687,12 +687,14 @@ watch(selectedDoc, async (doc) => {
   }
 
   title.value = doc.title;
-  editorContent.value = doc?.content || '';
+  editorContent.value = doc.content || '';
 
   await saveDocument();
 
   saveInterval = setInterval(async () => {
-    await saveDocument();
+    if (editorContent.value !== doc.content) {
+      await saveDocument();
+    }
   }, 4000);
 });
 
