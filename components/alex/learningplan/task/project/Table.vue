@@ -3,115 +3,80 @@
     sort-asc-icon="mdi-arrow-up-thin"
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
-    :class="
-      over.list === group && (tableSortBy.length || activeFilter)
-        ? 'table-drop'
-        : ''
-    "
     :items="tasksArray"
     :headers="header"
     :search="searchFilter"
     @update:sort-by="(e) => (tableSortBy = e)"
-    @dragleave="(e) => emit('dragLeave', e)"
   >
     <template #body="{ items, columns }">
       <transition-group :name="transitionName">
         <tr
           v-for="item in items"
           :key="item.id"
-          :draggable="isTaskMovable(item)"
           class="text-5 text-no-wrap staggered-fade-item bg-white"
-          :class="[
-            isArchived ? 'text-gray-400' : 'text-gray-600',
-            dragging && dragFrom == item.id ? 'dragging' : '',
-            isTaskMovable(item) ? 'draggable-row' : '',
-          ]"
-          @dragend="emit('dragEnd', item, tableSortBy[0]?.key)"
-          @dragstart="(e) => setDragStart(item, e)"
-          @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
         >
-          <template v-if="!previewRow(item.id)">
-            <td
-              class="text-body-4 text-overflow text-left"
-              :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
+          <td class="text-body-4 text-overflow text-left">
+            {{ item.title }}
+          </td>
+          <td>
+            <alex-learningplan-task-date-chip
+              v-if="item.finish_at"
+              :date="item.finish_at"
+              :is-published="item.status === 'published' && !isArchived"
+            />
+            <span v-else>{{
+              $t('pages.task.table.placeholders.undefined')
+            }}</span>
+          </td>
+          <td>
+            <div
+              v-if="item.students?.length"
+              class="ml-2"
+              :class="{ 'gray-filter': isArchived }"
             >
-              {{ item.title }}
-            </td>
-            <td>
-              <alex-learningplan-task-date-chip
-                v-if="item.finish_at"
-                :date="item.finish_at"
-                :is-published="item.status === 'published' && !isArchived"
+              <alex-custom-avatar-group
+                :avatar-items="item.students || []"
+                :max="3"
               />
-              <span v-else>{{
-                $t('pages.task.table.placeholders.undefined')
-              }}</span>
-            </td>
-            <td>
-              <div
-                v-if="item.students?.length"
-                class="ml-2"
-                :class="{ 'gray-filter': isArchived }"
-              >
-                <alex-custom-avatar-group
-                  :avatar-items="item.students || []"
-                  :max="3"
-                />
-              </div>
-              <span v-else>{{
-                $t('pages.task.table.placeholders.noMembers')
-              }}</span>
-            </td>
-            <td>
-              <alex-learningplan-task-submissions-status
-                v-if="item.delivered"
-                :submitted="item.delivered"
-                :type="item.type"
-              />
-              <div v-else>
-                <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
-                <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
-              </div>
-            </td>
-            <td>
-              <v-tooltip
-                :text="t('pages.task.table.tooltips.kanban')"
-                location="bottom center"
-              >
-                <template #activator="{ props: tooltipKanban }">
-                  <alex-custom-button
-                    v-bind="tooltipKanban"
-                    icon="alex:Kanban"
-                    variant="text"
-                    color="gray-600"
-                    @click="navigateTo(`tasks/${item.id}`)"
-                  />
-                </template>
-              </v-tooltip>
-              <alex-custom-dropdown
-                :items="dropDownItems(item)"
-                variant="text"
-                prepend-icon="mdi-dots-vertical"
-              >
-                <template #activator="{ props: propsMenu }">
-                  <v-tooltip
-                    :text="t('pages.task.table.tooltips.options')"
-                    location="bottom center"
-                  >
-                    <template #activator="{ props: optionsTooltipProps }">
-                      <alex-custom-button
-                        variant="text"
-                        color="gray-600"
-                        v-bind="{ ...propsMenu, ...optionsTooltipProps }"
-                        icon="mdi-dots-vertical"
-                      />
-                    </template>
-                  </v-tooltip>
-                </template>
-              </alex-custom-dropdown>
-            </td>
-          </template>
-          <td v-else :colspan="columns.length" class="row-drop"></td>
+            </div>
+            <span v-else>{{
+              $t('pages.task.table.placeholders.noMembers')
+            }}</span>
+          </td>
+          <td>
+            <alex-learningplan-task-submissions-status
+              v-if="item.delivered"
+              :submitted="item.delivered"
+              :type="item.type"
+            />
+            <div v-else>
+              <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
+              <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
+            </div>
+          </td>
+          <td>
+            <alex-custom-dropdown
+              :items="dropDownItems(item)"
+              variant="text"
+              prepend-icon="mdi-dots-vertical"
+            >
+              <template #activator="{ props: propsMenu }">
+                <v-tooltip
+                  :text="t('pages.task.table.tooltips.options')"
+                  location="bottom center"
+                >
+                  <template #activator="{ props: optionsTooltipProps }">
+                    <alex-custom-button
+                      variant="text"
+                      color="gray-600"
+                      v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                      icon="mdi-dots-vertical"
+                    />
+                  </template>
+                </v-tooltip>
+              </template>
+            </alex-custom-dropdown>
+          </td>
         </tr>
       </transition-group>
       <tr v-if="!items.length">
@@ -145,21 +110,30 @@ interface sortType {
   order: string;
 }
 
-const props = defineProps<{
-  tasks: TaskItem[];
-  sprints: string[];
-  search: string;
-  activeFilter: boolean;
-  group: string;
-  dragging: boolean;
-  over: {
-    id: number;
-    index?: number;
-    position?: 'top' | 'bottom';
-    list?: string;
-  };
-  dragFrom: number;
-}>();
+const props = withDefaults(
+  defineProps<{
+    tasks: TaskItem[];
+    sprints: string[];
+    search: string;
+    activeFilter: boolean;
+    group: string;
+    dragging?: boolean;
+    over?: {
+      id: number;
+      index?: number;
+      position?: 'top' | 'bottom';
+      list?: string;
+    };
+    dragFrom?: number;
+    isProject?: boolean;
+  }>(),
+  {
+    isProject: false,
+    dragFrom: -1,
+    dragging: false,
+    over: undefined,
+  },
+);
 
 const { t } = useI18n();
 const isArchived = computed(() => props.group === 'archived');
@@ -175,7 +149,6 @@ watch(searchFilter, () => {
 });
 
 const transitionName = computed(() => {
-  if (props.dragging) return 'dnd-list';
   return typing.value ? 'staggered-fade' : 'list';
 });
 const emit = defineEmits([
@@ -194,10 +167,10 @@ const deleteModal = ref(false);
 const taskToDelete = ref(-1);
 const tasksArray = computed(() => {
   const array = [...props.tasks];
-  const index = array.findIndex((task) => task.id === props.over.id);
+  const index = array.findIndex((task) => task.id === props.over?.id);
   const oldIndex = array.findIndex((task) => task.id === -1);
   if (
-    oldIndex === props.over.id ||
+    oldIndex === props.over?.id ||
     tableSortBy.value.length ||
     props.activeFilter
   )
@@ -208,7 +181,7 @@ const tasksArray = computed(() => {
   const item = {
     id: -1,
     title: '',
-    status: props.over.list as TaskStatus,
+    status: props.over?.list as TaskStatus,
     position: index,
     delivered: {
       toDo: 0,
@@ -218,7 +191,7 @@ const tasksArray = computed(() => {
     },
   };
   if (index !== -1) {
-    props.over.position === 'top'
+    props.over?.position === 'top'
       ? array.splice(index, 0, item)
       : array.splice(index + 1, 0, item);
   }
@@ -238,44 +211,10 @@ const dropDownItems = (task: TaskItem) => {
   const deliveredTotal = task.delivered
     ? task.delivered.underReview + task.delivered.completed
     : 0;
-  const items = [
-    getDropDownAction('details', task.id),
-    getDropDownAction('kanban', task.id),
-  ];
-  switch (task.status) {
-    case 'draft':
-      if (isTaskMovable(task)) {
-        items.push(getDropDownAction('publish', task.id));
-        items.push(getDropDownAction('close', task.id));
-      }
-      items.push(getDropDownAction('delete', task.id));
-      break;
-    case 'published':
-      if (deliveredTotal === 0) {
-        items.push(getDropDownAction('draft', task.id));
-        items.push(getDropDownAction('close', task.id));
-        items.push(getDropDownAction('delete', task.id));
-      } else if (task.archived_at) {
-        items.push(getDropDownAction('unarchive', task.id));
-      } else {
-        items.push(getDropDownAction('close', task.id));
-        items.push(getDropDownAction('archive', task.id));
-      }
-      break;
-    case 'finished':
-      if (deliveredTotal === 0) {
-        items.push(getDropDownAction('draft', task.id));
-        items.push(getDropDownAction('publish', task.id));
-        items.push(getDropDownAction('delete', task.id));
-      } else if (task.archived_at) {
-        items.push(getDropDownAction('unarchive', task.id));
-      } else {
-        items.push(getDropDownAction('publish', task.id));
-        items.push(getDropDownAction('archive', task.id));
-      }
-      break;
-    default:
-      break;
+
+  const items = [getDropDownAction('details', task.id)];
+  if (deliveredTotal === 0) {
+    items.push(getDropDownAction('delete', task.id));
   }
   return items;
 };
@@ -290,37 +229,9 @@ const getDropDownAction = (action: string, id: number) => {
         deleteModal.value = true;
       },
     },
-    publish: {
-      text: t('pages.task.table.dropdown.publish'),
-      onClick: () =>
-        emit('moveTask', {
-          id,
-          status: 'published',
-        }),
-    },
     details: {
       text: t('pages.task.table.dropdown.details'),
       onClick: () => emit('editTask', id),
-    },
-    kanban: {
-      text: t('pages.task.table.dropdown.kanban'),
-      onClick: () => navigateTo(`tasks/${id}`),
-    },
-    draft: {
-      text: t('pages.task.table.dropdown.draft'),
-      onClick: () => emit('moveTask', { id, status: 'draft' }),
-    },
-    close: {
-      text: t('pages.task.table.dropdown.close'),
-      onClick: () => emit('moveTask', { id, status: 'finished' }),
-    },
-    archive: {
-      text: t('pages.task.table.dropdown.archive'),
-      onClick: () => emit('toggleArchive', id),
-    },
-    unarchive: {
-      text: t('pages.task.table.dropdown.unarchive'),
-      onClick: () => emit('toggleArchive', id),
     },
   };
 
@@ -349,52 +260,6 @@ const header = [
   },
   { title: '', key: 'actions', sortable: false },
 ];
-
-const setAcceptedGroups = (task: TaskItem) => {
-  const deliveredTotal = task.delivered
-    ? task.delivered.underReview + task.delivered.completed
-    : 0;
-
-  const withDeliveries = computed(() => {
-    return deliveredTotal > 0 ? [] : ['backlog', ...props.sprints];
-  });
-  return withDeliveries.value;
-};
-
-const isTaskMovable = (task: TaskItem) => {
-  return (
-    (task.title &&
-      task.finish_at &&
-      task.type &&
-      task.start_at &&
-      !task.archived_at) ||
-    false
-  );
-};
-
-const setDragStart = (task: TaskItem, e: DragEvent) => {
-  if (previewRow(task.id) || !isTaskMovable(task)) return;
-  const acceptedGroups = setAcceptedGroups(task);
-  if (!isArchived.value) {
-    setTimeout(() => {
-      emit('startDrag', task.id, e, acceptedGroups);
-    }, 0);
-  }
-};
-
-const setDragOver = (id: number, position: number, e: DragEvent) => {
-  if (previewRow(id)) {
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-    return;
-  }
-  const newIndex =
-    tableSortBy.value.length || props.activeFilter ? -1 : position;
-  if (!isArchived.value) emit('dragOver', props.group, id, newIndex, e);
-};
-
-const previewRow = (id: number) => {
-  return id === -1;
-};
 </script>
 
 <style scoped>
@@ -462,13 +327,6 @@ const previewRow = (id: number) => {
   transform: translateY(-30px);
 }
 
-.dnd-list-enter-active,
-.dnd-list-leave-active,
-.dnd-list-move {
-  transition: all 0.125s linear;
-}
-
-.dnd-list-leave-active,
 .list-leave-active {
   position: absolute;
   width: 80%;
