@@ -15,6 +15,7 @@
         type="text"
         class="tw-w-full text-h5 tw-text-gray-800 tw-border-none tw-outline-none tw-min-h-[30px]"
         @focus="toggleEdit"
+        @keydown.enter="handleKeyEnter"
         @blur="handleTitleChange"
       />
 
@@ -29,6 +30,7 @@
           icon="mdi-plus"
           variant="text"
           size="small"
+          @click="$emit('add')"
         />
         <alex-custom-dropdown
           v-model="showOptions"
@@ -65,6 +67,7 @@ type Emit = {
   'title-change': [title: string];
   'empty-title': [];
   delete: [];
+  add: [];
 };
 const props = withDefaults(defineProps<ColumnHeader>(), {
   edit: false,
@@ -101,6 +104,12 @@ const selectedColor = computed(() => colors[props.color] || colors.gray);
 // methods
 const toggleEdit = () => {
   isEditing.value = !isEditing.value;
+};
+const handleKeyEnter = () => {
+  if (input.value) {
+    input.value.blur();
+    toggleEdit();
+  }
 };
 const handleTitleChange = () => {
   if (props.title === '' && titleValue.value === '') {

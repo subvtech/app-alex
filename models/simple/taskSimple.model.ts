@@ -1,6 +1,6 @@
 import { LearningPlanGoalSimple } from './learningPlanGoalSimple.model';
 
-export type TaskStatus = 'published' | 'draft' | 'finished';
+export type TaskStatus = 'published' | 'draft' | 'finished' | (string & {});
 export type TaskType = 'individual' | 'group';
 export type TaskMemberStatus = 'to_do' | 'in_progress' | 'in_review' | 'done';
 export interface TaskSimple {
