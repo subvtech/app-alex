@@ -6,6 +6,6 @@ export interface TagSimple {
   verified_by?: number;
   isPublic: boolean;
   isGeneral: boolean;
-  learningplans: LearningPlanSimple;
-  tasks: TaskSimple;
+  learningplans?: LearningPlanSimple;
+  tasks?: TaskSimple;
 }

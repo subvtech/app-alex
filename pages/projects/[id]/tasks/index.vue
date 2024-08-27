@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded wrapper">
+  <div class="tw-flex tw-flex-col bg-white rounded tw-flex-grow">
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
@@ -58,10 +58,10 @@
       </div>
     </Transition>
 
-    <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
+    <div class="w-100 px-6 py-4 ga-6 d-flex flex-column tw-flex-grow">
       <alex-learningplan-task-table-skeleton v-if="learningPlanStore.loading" />
 
-      <div v-else>
+      <template v-else>
         <TransitionGroup name="list">
           <alex-custom-chip
             v-for="chip in chips"
@@ -75,16 +75,28 @@
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>
-        <Transition v-if="mode === 'kanban'" name="fade" mode="out-in">
-          <alex-learningplan-task-project-kanban v-model="columns" />
-        </Transition>
+
+        <alex-learningplan-task-project-kanban
+          v-if="mode === 'kanban'"
+          v-model="columns"
+          :items="items"
+        >
+          <template #card="{ item }">
+            <alex-learningplan-task-project-card
+              :date="item.finish_at ? new Date(item.finish_at) : undefined"
+              :name="item.title"
+              :tags="item.tags"
+              :participants="getMembers(item?.task_members)"
+            />
+          </template>
+        </alex-learningplan-task-project-kanban>
         <alex-learningplan-task-project-list
           v-else
           ref="taskList"
           :search="search"
           :filter="filter"
         />
-      </div>
+      </template>
     </div>
     <alex-learningplan-task-drawer-filter
       ref="filterDrawer"
@@ -124,6 +136,52 @@ const columns = ref<{ title: string; group: string; color: Colors }[]>([
   { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
   { title: 'Frontend', group: 'frontend', color: 'gray' },
 ]);
+const items = ref<{ group: string; raw: TaskSimple }[]>([
+  {
+    group: 'ux_ui',
+    raw: {
+      title: 'UX/UI',
+      finish_at: '2024-08-22',
+      id: 1,
+      status: 'ux_ui',
+      position: 0,
+      task_members: [],
+      allowed_editor_plugins: '',
+      submission_required: false,
+      learning_plan_id: 1,
+      can_submit_after_deadline: false,
+      can_change_from_review: false,
+      submission_description: '',
+      tags: [
+        {
+          id: 12,
+          isGeneral: false,
+          text: 'UX UI',
+          verified: false,
+          isPublic: false,
+          verified_date: new Date(),
+        },
+      ],
+    },
+  },
+  {
+    group: 'ux_ui',
+    raw: {
+      title: 'Design',
+      finish_at: '2024-08-22',
+      id: 2,
+      status: 'ux_ui',
+      position: 1,
+      task_members: [],
+      allowed_editor_plugins: '',
+      submission_required: false,
+      learning_plan_id: 1,
+      can_submit_after_deadline: false,
+      can_change_from_review: false,
+      submission_description: '',
+    },
+  },
+]);
 const { id } = route.params;
 const filter = ref<filterType>();
 const filterDrawer = ref();
@@ -147,6 +205,18 @@ const toggleMode = () => {
     return;
   }
   mode.value = 'kanban';
+};
+const getMembers = (taskMembers?: TaskMember[]) => {
+  return (
+    taskMembers?.map((member) => ({
+      name: member.learning_plan_member?.user?.fullname || '',
+      ...(member.learning_plan_member?.user?.avatar?.url && {
+        image: {
+          url: member.learning_plan_member?.user?.avatar?.url,
+        },
+      }),
+    })) || []
+  );
 };
 watch(columns, () => {
   console.log(columns.value);
@@ -191,10 +261,6 @@ watch(
 <style scoped>
 .header {
   border-bottom: 1px solid rgb(var(--v-theme-gray-100));
-}
-
-.wrapper {
-  min-height: calc(100vh - 548px);
 }
 
 .fade-enter-active,

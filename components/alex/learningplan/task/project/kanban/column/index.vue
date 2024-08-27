@@ -11,24 +11,36 @@
         class="tw-max-w-[280px]"
         @title-change="$emit('title-column-change', group, $event)"
         @empty-title="$emit('cancel-column', group)"
+        @add="$emit('add-item', group)"
+        @delete="$emit('delete', group)"
       />
     </DragHandle>
     <SlickList
+      v-model:list="items"
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
-      :list="items"
       :group="group"
       :accept="accept"
       :distance="15"
       @sort-insert="
         ({ newIndex, value }) => handleInsertCard({ newIndex, value, group })
       "
+      @sort-end="
+        ({ newIndex, oldIndex }) =>
+          $emit('sort-end', {
+            newIndex,
+            oldIndex,
+            group,
+            id: items[newIndex].raw.id,
+          })
+      "
+      @update:list="(list) => $emit('update-list', list)"
     >
       <SlickItem
         v-for="(item, i) in items"
-        :key="item.id"
+        :key="item.raw.id"
         :index="i"
-        class="kanban-card-item"
+        class="kanban-card-item tw-mb-2"
         :disabled="disabled"
       >
         <slot name="card" :item="item" :index="i" />
@@ -45,7 +57,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends { id: number }">
+<script setup lang="ts" generic="T extends { raw: { id: number } }">
 import { SlickList, SlickItem, DragHandle } from 'vue-slicksort';
 import { Colors } from './Header.vue';
 export type Accept<T> =
@@ -68,16 +80,19 @@ interface ColumnProps {
   disabled?: boolean;
   addButton?: boolean;
   addButtonText?: string;
-  items: T[];
 }
+type Slot = {
+  card(props: { item: T; index: number }): any;
+};
+defineSlots<Slot>();
 withDefaults(defineProps<ColumnProps>(), {
-  accept: null,
+  accept: true,
   disable: false,
   color: 'gray',
   addButtonText: 'Adicionar',
   addButton: true,
-  items: () => [],
 });
+const items = defineModel<T[]>({ default: () => [] });
 const emit = defineEmits<{
   'insert-card': [
     values: {
@@ -86,16 +101,14 @@ const emit = defineEmits<{
       group: string;
     },
   ];
-  'move-card': [
-    values: {
-      oldIndex: number;
-      newIndex: number;
-      event: MouseEvent;
-    },
+  'sort-end': [
+    values: { oldIndex: number; newIndex: number; group: string; id: number },
   ];
   'title-column-change': [group: string, title: string];
   'add-item': [group: string];
   'cancel-column': [group: string];
+  'update-list': [list: T[]];
+  delete: [group: string];
 }>();
 
 const isDragging = () => {

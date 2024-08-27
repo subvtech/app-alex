@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="tw-flex tw-flex-col tw-flex-grow">
     <alex-custom-banner
       v-if="!route.meta?.hideLearningPlanBanner"
       :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
