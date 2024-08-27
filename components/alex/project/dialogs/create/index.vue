@@ -254,7 +254,7 @@ const { find } = useStrapiUtils();
 const client = useStrapiClient();
 const { t } = useI18n();
 
-const projectInfo = ref<ProjectType>({
+const emptyProject = {
   title: '',
   description: '',
   startDate: '',
@@ -262,7 +262,9 @@ const projectInfo = ref<ProjectType>({
   slug: '',
   areas: [],
   product: null,
-});
+};
+
+const projectInfo = ref<ProjectType>({ ...emptyProject });
 
 const user = useStrapiUser<User>();
 const { setMessage } = useMessageStore();
@@ -406,6 +408,17 @@ watch(
   (newProduct) => {
     if (typeof newProduct === 'string') {
       newComboboxItem(newProduct, 'product');
+    }
+  },
+);
+
+watch(
+  () => value.value,
+  (newVal) => {
+    if (!newVal) {
+      projectInfo.value = { ...emptyProject };
+      associatedCourses.value = [];
+      students.value = [];
     }
   },
 );
