@@ -12648,10 +12648,10 @@ vueperslides@^3.5.1:
   resolved "https://registry.yarnpkg.com/vueperslides/-/vueperslides-3.5.1.tgz#b1a04ffbf3e1ceb48f32cd69b55a7d83def1a8e9"
   integrity sha512-g/Lauv1svlSaERzLNeys0oeLmpDFiXkIa+lxg+lJma6m6wXqJKzKKVIi8Kvc95XPnl42n7PYYJyr0+FMV6WZGw==
 
-vuetify@^3.4.5:
-  version "3.4.5"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.4.5.tgz#4911fab6b478676897746c090dec16d4ca198cd0"
-  integrity sha512-JptPH5iTCTrAyiI65Av8zCB6oZT0JUqMjlAF/1wPE2Rse3xoMSej/BpwI7+iXKSX6endExZCItrPp1oor4a65w==
+vuetify@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.7.0.tgz#1230e97330b9112492aa25183809e483477b2c36"
+  integrity sha512-x+UaU4SPYNcJSE/voCTBFrNn0q9Spzx2EMfDdUj0NYgHGKb59OqnZte+AjaJaoOXy1AHYIGEpm5Ryk2BEfgWuw==
 
 w3c-keyname@^2.2.0:
   version "2.2.8"
