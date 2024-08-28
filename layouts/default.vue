@@ -296,7 +296,11 @@ const adminMenus = [
 ];
 
 const menus = computed(() => {
-  const newMenus = defaultMenus.concat(adminMenus);
+  const newMenus =
+    user.value.role.name === 'ADMIN'
+      ? defaultMenus.concat(adminMenus)
+      : defaultMenus;
+
   return config.public.showComponentsPage
     ? newMenus.concat(componentsMenu)
     : newMenus;
