@@ -90,12 +90,12 @@ const adminMenus = [
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Usuários',
-        to: 'admin/users',
+        to: '/admin/users',
       },
       {
         icon: 'mdi-view-dashboard-outline',
         title: 'Lista de instituições',
-        to: 'admin/institutions',
+        to: '/admin/institutions',
       },
     ],
   },

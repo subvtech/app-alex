@@ -10,7 +10,7 @@
         ]"
       />
       <v-col cols="3" class="d-flex justify-end">
-        <alex-custom-button @click="openModalForCreation" variant="primary">
+        <alex-custom-button variant="primary" @click="openModalForCreation">
           <v-icon>mdi-plus</v-icon>
           {{ $t('pages.users.new_user') }}
         </alex-custom-button>
@@ -60,9 +60,9 @@
               <template #items>
                 <v-list class="d-flex flex-column gap-1 max-h-120">
                   <v-list-item
-                    class="pa-1"
                     v-for="(item, index) in itemsDisplayedFields"
                     :key="index"
+                    class="pa-1"
                     height="30"
                   >
                     <v-list-item-content>
@@ -119,6 +119,7 @@
     </v-data-table>
 
     <v-dialog v-model="openModal" width="60%" persistent>
+      {{ formValid }}
       <v-form ref="createForm" v-model="formValid" @submit.prevent="submit">
         <v-card width="100%" class="pa-3">
           <v-card-title
@@ -552,17 +553,17 @@ const schemaStep1 = (isEdit: boolean) =>
       otherwise: (schema) => schema.notRequired(),
       then: (schema) => schema.required('Senha obrigatória'),
     }),
-    phone: yup.string(),
+    phone: yup.string().notRequired(),
     confirmed: yup.boolean(),
     blocked: yup.boolean(),
     isProfessor: yup.boolean(),
     role: yup.string(),
   });
 
-const avatarPreview = computed(() => {
-  if (!avatar.value) return '';
-  return URL.createObjectURL(avatar.value);
-});
+// const avatarPreview = computed(() => {
+//   if (!avatar.value) return '';
+//   return URL.createObjectURL(avatar.value);
+// });
 const coverPreview = computed(() => {
   if (!cover.value) return '';
   return URL.createObjectURL(cover.value);
@@ -850,7 +851,7 @@ const submit = async () => {
 
   try {
     if (isEdit.value) {
-      await update(`users/${creationForm.value.id}`, payload);
+      await update(`admin/users/${creationForm.value.id}`, payload);
     } else {
       await create(`admin/users`, payload);
     }
