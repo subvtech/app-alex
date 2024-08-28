@@ -10,6 +10,7 @@
       :close-icon="closeIcon"
       :transition-component="transition"
       :custom-slot="customSlot"
+      :default-expand="defaultExpand"
     >
       <template #default="{ item }">
         <slot :item="item"></slot>
@@ -35,6 +36,7 @@ interface TreeViewProps {
    */
   transition?: string;
   customSlot?: boolean;
+  defaultExpand?: boolean;
 }
 
 withDefaults(defineProps<TreeViewProps>(), {
@@ -43,5 +45,6 @@ withDefaults(defineProps<TreeViewProps>(), {
   openIcon: 'mdi-chevron-right',
   closeIcon: 'mdi-chevron-down',
   transition: 'v-slide-x-transition',
+  defaultExpand: false,
 });
 </script>

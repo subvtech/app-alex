@@ -81,6 +81,14 @@
               <td>none</td>
             </tr>
             <tr>
+              <td>defaultExpand</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-close-box" color="error" />
+              </td>
+              <td>false</td>
+            </tr>
+            <tr>
               <td>transition</td>
               <td>String</td>
               <td class="text-center">
@@ -106,7 +114,7 @@
       </div>
     </div>
     <div>
-      <alex-custom-treeview :items="usageItems" />
+      <alex-custom-treeview :default-expand="true" :items="usageItems" />
     </div>
     <div class="w-100">
       <div
@@ -517,7 +525,8 @@ const items = [
 ];
 `;
 const firstExampleTemplate = ref(`
-     <alex-custom-treeview :items="usageItems" />
+     <alex-custom-treeview :items="usageItems" :default-expand="true"  />
+     
 `);
 const firstExampleScript = ref(`
 const usageItems = [

@@ -46,6 +46,7 @@ interface TreeItemProps {
   nodeClasses: string;
   transitionComponent: string;
   customSlot: boolean;
+  defaultExpand: boolean;
 }
 const props = withDefaults(defineProps<TreeItemProps>(), {
   openIcon: 'mdi-chevron-down',
@@ -54,6 +55,7 @@ const props = withDefaults(defineProps<TreeItemProps>(), {
   nodeClasses: '',
   transitionComponent: 'v-slide-x-transition',
   customSlot: false,
+  defaultExpand: false,
 });
 
 const childProps = computed(() => {
@@ -62,7 +64,7 @@ const childProps = computed(() => {
   return rest;
 });
 
-const isOpen = ref(false);
+const isOpen = ref(props.defaultExpand);
 
 const toggle = () => {
   isOpen.value = !isOpen.value;
