@@ -8,7 +8,7 @@
         :title="title"
         :quantity="items.length"
         :color="color"
-        class="tw-max-w-[280px]"
+        class="tw-max-w-[280px] tw-cursor-grab"
         @title-change="$emit('title-column-change', group, $event)"
         @empty-title="$emit('cancel-column', group)"
         @add="$emit('add-item', group)"
@@ -22,6 +22,7 @@
       :group="group"
       :accept="accept"
       :distance="15"
+      @sort-start="$emit('sort-start', group)"
       @sort-insert="
         ({ newIndex, value }) => handleInsertCard({ newIndex, value, group })
       "
@@ -109,6 +110,7 @@ const emit = defineEmits<{
   'cancel-column': [group: string];
   'update-list': [list: T[]];
   delete: [group: string];
+  'sort-start': [group: string];
 }>();
 
 const isDragging = () => {
