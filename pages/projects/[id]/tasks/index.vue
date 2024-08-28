@@ -28,12 +28,15 @@
           hide-details
         />
         <alex-inputs-select
+          v-if="mode === 'kanban'"
           v-model="selectedSprint"
           :items="sprints"
           :placeholder="t('pages.task.searchPlaceholder')"
           class="tw-w-[300px] tw-mr-auto"
           density="comfortable"
           name="search"
+          item-title="sprint"
+          return-object
           hide-details
         />
         <div class="tw-flex tw-gap-2">
@@ -79,7 +82,7 @@
         <alex-learningplan-task-project-kanban
           v-if="mode === 'kanban'"
           v-model="columns"
-          :items="items"
+          :items="filteredItemsBySprint"
         >
           <template #card="{ item }">
             <alex-learningplan-task-project-card
@@ -107,8 +110,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Colors } from '~/components/alex/learningplan/task/project/kanban/column/Header.vue';
-
 export interface filterType {
   select?: string | null;
   archivedTasks?: boolean;
@@ -130,14 +131,33 @@ const headerStore = usePageHeaderStore();
 // refs
 const mode = ref<'list' | 'kanban'>('list');
 const search = ref('');
-const selectedSprint = ref('sprint 1');
-const sprints = ref(['sprint 1', 'sprint 2', 'sprint 3']);
-const columns = ref<{ title: string; group: string; color: Colors }[]>([
-  { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
-  { title: 'Frontend', group: 'frontend', color: 'gray' },
-]);
-const items = ref<{ group: string; raw: TaskSimple }[]>([
+const sprints = ref([
   {
+    id: 0,
+    sprint: 'sprint 1',
+    columns: [
+      { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
+      { title: 'Frontend', group: 'frontend', color: 'gray' },
+    ],
+  },
+  {
+    id: 1,
+    sprint: 'Sprint 2',
+    columns: [{ title: 'BackEnd', group: 'BackEnd', color: 'gray' }],
+  },
+]);
+const columns = computed({
+  get: () => {
+    return selectedSprint.value.columns;
+  },
+  set: (value) => {
+    selectedSprint.value.columns = value;
+  },
+});
+const selectedSprint = ref(sprints.value[0]);
+const items = ref<{ sprint_id: number; group: string; raw: TaskSimple }[]>([
+  {
+    sprint_id: 1,
     group: 'ux_ui',
     raw: {
       title: 'UX/UI',
@@ -165,6 +185,7 @@ const items = ref<{ group: string; raw: TaskSimple }[]>([
     },
   },
   {
+    sprint_id: 0,
     group: 'ux_ui',
     raw: {
       title: 'Design',
@@ -172,16 +193,79 @@ const items = ref<{ group: string; raw: TaskSimple }[]>([
       id: 2,
       status: 'ux_ui',
       position: 1,
-      task_members: [],
+      task_members: [
+        {
+          id: 1,
+          status: 'in_progress',
+          can_submit_after_deadline: false,
+          started_at: new Date().toISOString(),
+          finished_at: new Date().toISOString(),
+          learning_plan_member: {
+            user: {
+              fullname: 'John Doe',
+              avatar: {
+                url: 'https://thispersondoesnotexist.com/',
+                id: 1,
+              },
+            },
+          },
+        },
+        {
+          id: 2,
+          status: 'in_progress',
+          can_submit_after_deadline: false,
+          started_at: new Date().toISOString(),
+          finished_at: new Date().toISOString(),
+          learning_plan_member: {
+            user: {
+              fullname: 'John Doe',
+              avatar: {
+                url: 'https://thispersondoesnotexist.com/',
+                id: 1,
+              },
+            },
+          },
+        },
+      ],
       allowed_editor_plugins: '',
       submission_required: false,
       learning_plan_id: 1,
       can_submit_after_deadline: false,
       can_change_from_review: false,
       submission_description: '',
+      tags: [
+        {
+          id: 1,
+          text: 'UX UI',
+          verified: false,
+          verified_date: new Date(),
+          isGeneral: false,
+          isPublic: false,
+        },
+      ],
     },
   },
 ]);
+const filteredItems = computed({
+  get: () => {
+    return items.value.filter(
+      (item) =>
+        item.raw.title.toLowerCase().includes(search.value.toLowerCase()) ||
+        item.raw.tags?.some((tag) =>
+          tag.text.toLowerCase().includes(search.value.toLowerCase()),
+        ),
+    );
+  },
+  set: (value) => {
+    items.value = value;
+  },
+});
+
+const filteredItemsBySprint = computed(() => {
+  return filteredItems.value.filter(
+    (item) => item.sprint_id === selectedSprint.value.id,
+  );
+});
 const { id } = route.params;
 const filter = ref<filterType>();
 const filterDrawer = ref();
@@ -218,9 +302,6 @@ const getMembers = (taskMembers?: TaskMember[]) => {
     })) || []
   );
 };
-watch(columns, () => {
-  console.log(columns.value);
-});
 watch(
   () => [learningPlanStore.loading],
   () => {

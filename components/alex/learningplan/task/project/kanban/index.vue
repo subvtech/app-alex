@@ -5,6 +5,7 @@
     :distance="15"
     axis="x"
     use-drag-handle
+    :disabled="!canDrag || isDraggingItems"
   >
     <SlickItem v-for="(column, i) in columns" :key="column.group" :index="i">
       <alex-learningplan-task-project-kanban-column
@@ -20,6 +21,8 @@
         @delete="handleDeleteColumn"
         @update-list="handleUpdateList"
         @insert-card="handleInsertCard"
+        @sort-start="handleSortStart"
+        @sort-end="handleSortEnd"
       >
         <template #card="{ item }">
           <slot name="card" :item="item.raw" />
@@ -70,7 +73,7 @@ const items = defineModel<GenericItem<T>[]>('items', {
 });
 const columnItems = ref<Record<string, GenericItem<T>[]>>({});
 const canDrag = ref(true);
-
+const isDraggingItems = ref(false);
 // Methods
 const setCanDrag = (value: boolean) => {
   canDrag.value = value;
@@ -140,6 +143,12 @@ const setColumnItems = () => {
       .filter((item) => item.group === column.group)
       .sort((a, b) => a.raw.position - b.raw.position);
   });
+};
+const handleSortStart = () => {
+  isDraggingItems.value = true;
+};
+const handleSortEnd = () => {
+  isDraggingItems.value = false;
 };
 setColumnItems();
 watch(items, setColumnItems, { deep: true });
