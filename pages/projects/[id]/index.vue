@@ -93,7 +93,9 @@
         class="flex-1"
       >
         <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
+          <div
+            class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2 tw-w-full"
+          >
             <alex-profile-institution-item
               v-for="institution in institutions"
               :id="institution.id"
