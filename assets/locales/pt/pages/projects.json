@@ -1,3 +1,14 @@
 {
-    "myProjects": "Meus Projetos"
+  "completed": "Finalizados",
+  "days": "dias",
+  "empty_events": "Não há eventos cadastrados",
+  "empty_institutions": "Nenhuma instituição parceira aqui",
+  "empty_meetings": "Nada marcado hoje!",
+  "empty_task_progress": "0% das tarefas foram concluídas",
+  "last_update": "Última atualização",
+  "myProjects": "Meus Projetos",
+  "remaining_time": "Tempo restante",
+  "total_epics": "Total de épicos",
+  "total_sprints": "Total de sprints",
+  "total_story": "Total de histórias"
 }
