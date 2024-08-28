@@ -100,7 +100,9 @@
                       :user="{
                         name: member.user.fullname,
                         email: member.user.email,
-                        image: member.user.avatar?.formats.small.url,
+                        image:
+                          member.user?.avatar?.formats?.small?.url ||
+                          member.user?.avatar?.url,
                       }"
                       no-chip
                       :is-selected-value="
@@ -353,7 +355,7 @@ const onInvite = () => {
         id: user.id,
         email: user.email,
         fullname: user.fullname || user.email,
-        avatar: user.avatar,
+        avatar: user?.avatar,
       },
     }));
 
