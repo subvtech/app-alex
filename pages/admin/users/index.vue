@@ -119,7 +119,6 @@
     </v-data-table>
 
     <v-dialog v-model="openModal" width="60%" persistent>
-      {{ formValid }}
       <v-form ref="createForm" v-model="formValid" @submit.prevent="submit">
         <v-card width="100%" class="pa-3">
           <v-card-title
