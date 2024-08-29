@@ -10,5 +10,6 @@
   "remaining_time": "Remaining time",
   "total_epics": "Total of epics",
   "total_sprints": "Total of sprints",
-  "total_story": "Total of Story"
+  "total_story": "Total of Story",
+  "empty_journey": "No learning journey found!"
 }

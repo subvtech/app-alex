@@ -10,5 +10,6 @@
   "remaining_time": "Tempo restante",
   "total_epics": "Total de épicos",
   "total_sprints": "Total de sprints",
-  "total_story": "Total de histórias"
+  "total_story": "Total de histórias",
+  "empty_journey": "Nenhuma jornada de aprendizagem encontrada!"
 }

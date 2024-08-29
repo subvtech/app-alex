@@ -101,6 +101,8 @@
     "@tiptap/starter-kit": "^2.5.7",
     "@tiptap/suggestion": "^2.5.7",
     "@tiptap/vue-3": "^2.5.7",
+    "@unovis/ts": "^1.4.3-beta.0",
+    "@unovis/vue": "^1.4.3-beta.0",
     "@vee-validate/yup": "^4.11.1",
     "@vee-validate/zod": "^4.11.1",
     "@vueuse/core": "^10.10.0",
