@@ -1,11 +1,11 @@
 <template>
-  <div class="d-flex gap-2 align-center justify-center width">
+  <div class="d-flex gap-2 align-center justify-start width">
     <alex-custom-chip
       v-if="!avatar"
       size="large"
       :icon="icon"
       variant="outlined"
-      color="#6E7A87"
+      status="secondary"
     />
     <v-avatar
       v-else

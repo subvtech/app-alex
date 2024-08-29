@@ -51,6 +51,7 @@
           :placeholder="
             $t('components.learningPlan.dialogs.selectClassPartipant')
           "
+          :no-data-text="$t('components.usersAutocomplete.searchUserToCourse')"
           :ignore-user-ids="ignoreUserIds"
           :ignore-emails="ignoreUserEmails"
         />
