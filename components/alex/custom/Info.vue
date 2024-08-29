@@ -130,7 +130,7 @@
         <div v-if="!descriptionAbove" class="description-block">
           <span
             v-if="description"
-            class="mt-0 font-weight-bold text-h4 text-md-h3 text-lg-h2"
+            class="mt-0 font-weight-bold text-sm-h2 text-h3"
             :class="[floatBeneath ? 'ml-2' : '']"
             :style="titleStyle ?? 'color: white;'"
             role="below"
@@ -239,148 +239,86 @@
 import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
 
 const emit = defineEmits(['display:settings']);
-const props = defineProps({
-  profilePicture: {
-    type: Object as PropType<ProfilePictureItemType | null>,
-  },
-
-  userId: {
-    type: Number,
-  },
-
-  showProfilePicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  showBorder: {
-    type: Boolean,
-    default: false,
-  },
-
-  showSettings: { type: Boolean, default: false },
-
-  floatBeneath: {
-    type: Boolean,
-    default: false,
-  },
-
-  resize: {
-    type: Boolean,
-    default: false,
-  },
-
-  profilePictureSize: {
-    type: Number,
-    default: 160,
-  },
-
-  showRole: {
-    type: Boolean,
-    default: false,
-  },
-  settingsIcon: {
-    type: String,
-    default: 'mdi-cog-outline',
-  },
-
-  descriptionAbove: {
-    type: Boolean,
-    default: false,
-  },
-  darkerBackground: {
-    type: Boolean,
-    default: false,
-  },
-
-  distribution: {
-    type: String as PropType<
-      | 'single-row'
-      | 'single-column'
-      | 'fullname-username-role'
-      | 'fullname-role-username'
-      | 'username-fullname-role'
-      | 'username-role-fullname'
-    >,
-    default: 'fullname-username-role',
-  },
-
-  wrap: {
-    type: Boolean,
-    default: true,
-  },
-
-  updateProfilePicture: {
-    type: Boolean,
-    default: false,
-  },
-
-  fullname: {
-    type: String,
-  },
-
-  description: {
-    type: String,
-  },
-  codeStyle: {
-    type: String,
-  },
-
-  avatarStyle: {
-    type: String,
-  },
-
-  startDateStyle: {
-    type: String,
-  },
-  endDateStyle: {
-    type: String,
-  },
-  fullnameStyle: {
-    type: String,
-  },
-
-  usernameStyle: {
-    type: String,
-  },
-
-  titleStyle: {
-    type: String,
-  },
-
-  subtitleStyle: {
-    type: String,
-  },
-
-  roleStyle: {
-    type: String,
-  },
-
-  title: {
-    type: String,
-  },
-  subtitle: {
-    type: String,
-  },
-  startDate: {
-    type: String,
-  },
-  endDate: {
-    type: String,
-  },
-
-  copyObject: {
-    type: Object as PropType<{ label: string; copyText: string }>,
-  },
-  username: {
-    type: String,
-  },
-
-  isProfessor: { type: Boolean, default: false },
-  canEdit: { type: Boolean, default: false },
-  canDelete: { type: Boolean, default: false },
+interface MyProps {
+  profilePicture?: ProfilePictureItemType | null;
+  userId: number;
+  showProfilePicture: boolean;
+  showBorder: boolean;
+  showSettings: boolean;
+  floatBeneath: boolean;
+  resize: boolean;
+  profilePictureSize: number;
+  showRole: boolean;
+  settingsIcon: string;
+  descriptionAbove: boolean;
+  darkerBackground: boolean;
+  distribution:
+    | 'single-row'
+    | 'single-column'
+    | 'fullname-username-role'
+    | 'fullname-role-username'
+    | 'username-fullname-role'
+    | 'username-role-fullname';
+  wrap?: boolean;
+  updateProfilePicture: boolean;
+  fullname?: string;
+  description?: string;
+  codeStyle?: string;
+  avatarStyle?: string;
+  startDateStyle?: string;
+  endDateStyle?: string;
+  fullnameStyle?: string;
+  usernameStyle?: string;
+  titleStyle?: string;
+  subtitleStyle?: string;
+  roleStyle?: string;
+  title?: string;
+  subtitle?: string;
+  startDate?: string;
+  endDate?: string;
+  copyObject?: { label: string; copyText: string };
+  username?: string;
+  isProfessor: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+const props = withDefaults(defineProps<MyProps>(), {
+  profilePicture: null,
+  showProfilePicture: false,
+  showBorder: false,
+  showSettings: false,
+  floatBeneath: false,
+  resize: false,
+  profilePictureSize: 160,
+  showRole: false,
+  settingsIcon: 'mdi-cog-outline',
+  descriptionAbove: false,
+  darkerBackground: false,
+  distribution: 'fullname-username-role',
+  wrap: true,
+  updateProfilePicture: false,
+  isProfessor: false,
+  canEdit: false,
+  canDelete: false,
+  fullname: undefined,
+  description: undefined,
+  codeStyle: undefined,
+  avatarStyle: undefined,
+  startDateStyle: undefined,
+  endDateStyle: undefined,
+  fullnameStyle: undefined,
+  usernameStyle: undefined,
+  titleStyle: undefined,
+  subtitleStyle: undefined,
+  roleStyle: undefined,
+  title: undefined,
+  subtitle: undefined,
+  startDate: undefined,
+  endDate: undefined,
+  copyObject: undefined,
+  username: undefined,
 });
-const { copyToClipboard } = useCopyText();
+// const { copyToClipboard } = useCopyText();
 const biggerImage = computed(() => {
   return props.resize && props.profilePictureSize > 100;
 });
@@ -477,7 +415,6 @@ const startDateOrEndDate = computed(() => {
   width: 100%;
   display: flex;
   flex-direction: row;
-  transition: all ease-in-out 1s;
   gap: 8px;
   .darker-bg {
     padding-inline: 16px;
@@ -526,7 +463,6 @@ const startDateOrEndDate = computed(() => {
 .info-block {
   display: flex;
   flex-direction: row;
-  transition: all ease-in-out 1s;
   .card {
     position: relative;
     background-color: transparent;
@@ -604,7 +540,6 @@ const startDateOrEndDate = computed(() => {
       display: flex;
 
       padding-left: 8px;
-      transition: all ease-in-out 1s;
 
       .d-flex {
         .fullname {

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="breadcrumb-block d-flex align-center flex-wrap ga-2 mt-2"
+    class="breadcrumb-block d-flex align-center flex-wrap ga-2"
     :style="
       backgroundColor
         ? `background-color: ${backgroundColor}`

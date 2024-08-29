@@ -105,6 +105,19 @@ const textColor = computed(() => {
     line-height: 135% !important;
     letter-spacing: 0.32px !important;
     border-width: 5px !important;
+    min-height: 30px !important;
+  }
+
+  .v-input--density-default .v-field__field {
+    height: 52px !important;
+  }
+
+  .v-input--density-comfortable .v-field__field {
+    height: 44px !important;
+  }
+
+  .v-input--density-compact .v-field__field {
+    height: 36px !important;
   }
 
   .v-field--disabled > div > i,

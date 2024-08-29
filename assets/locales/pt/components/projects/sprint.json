@@ -1,0 +1,40 @@
+{
+  "title": {
+    "create": "Criar nova sprint",
+    "edit": "Editar sprint"
+  },
+  "mainButtonText": {
+    "create": "Criar sprint",
+    "edit": "Editar"
+  },
+  "secondaryButtonText": "Cancelar",
+  "type": {
+    "multiple": "Múltiplas sprints (automaticamente)",
+    "single": "Única sprint (manual)",
+    "label": "Tipo de criação"
+  },
+  "name": {
+    "label": "Nome da sprint",
+    "defaultPlaceholder": "Digite o nome da sprint",
+    "multiplePlaceholder": "Nomes gerados automaticamente"
+  },
+  "duration": {
+    "label": "Duração",
+    "placeholder": "Selecione uma duração",
+    "one-week": "1 semana",
+    "two-weeks": "2 semanas",
+    "three-weeks": "3 semanas",
+    "four-weeks": "4 semanas",
+    "custom": "Personalizado"
+  },
+  "startDate": "Início da sprint",
+  "endDate": "Término da sprint",
+  "successMessage": {
+    "create": "Sprint(s) criada(s) com sucesso",
+    "edit": "Sprint editada com sucesso"
+  },
+  "errorMessage": {
+    "create": "Erro ao criar sprint(s)",
+    "edit": "Erro ao editar sprint"
+  }
+}

@@ -5,6 +5,7 @@ export enum MemberRoles {
   PARTNER = 'partner',
   FACILITATOR = 'facilitator',
   COLLABORATOR = 'collaborator',
+  LEADER = 'student_leader',
 }
 
 export enum MemberStatus {
