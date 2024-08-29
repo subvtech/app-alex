@@ -2,6 +2,7 @@ export default defineNuxtConfig({
   pages: true,
   ssr: false,
   devtools: { enabled: true },
+  app: { pageTransition: { name: 'page', mode: 'out-in' } },
   css: [
     'vuetify/lib/styles/main.sass',
     'plyr/dist/plyr.css',
@@ -57,6 +58,10 @@ export default defineNuxtConfig({
       {
         from: 'vue-i18n',
         imports: ['useI18n'],
+      },
+      {
+        from: 'vue-slicksort',
+        imports: ['SlickList', 'SlickItem'],
       },
     ],
   },

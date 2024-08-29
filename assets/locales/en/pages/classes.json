@@ -21,9 +21,12 @@
   "deleteClassSubtitle": "By removing this class, all content and students linked to it will lose this connection.",
   "tableHeaders": {
     "course": "Course",
+    "project": "Project",
     "description": "Description",
     "facilitator": "Facilitator",
-    "trails": "Trails"
+    "trails": "Trails",
+    "leader": "Leader",
+    "product": "Product"
   },
   "breadcrumbs": {
     "classes": "Classes",
@@ -68,5 +71,20 @@
   "findMember": "Find Member",
   "courseInvites": "Course invites",
   "invites": "Invites",
-  "cantRemoveResponsible":"You cannot remove the person responsible from the members"
+  "cantRemoveResponsible": "You cannot remove the person responsible from the members",
+  "filter": {
+    "title": "Filtering",
+    "facilitator": "Facilitator",
+    "findFacilitator": "Search for Facilitators",
+    "institution": "Institution",
+    "findInstitution": "Search for Institutions",
+    "leader": "Leader",
+    "findLeader": "Search for Leaders",
+    "techCompetences": "Technical competences",
+    "findTechCompetences": "Search for competences",
+    "generalCompetences": "General competences",
+    "findGeneralCompetences": "Search for competences",
+    "startDate": "Start Date",
+    "finalDate": "End Date"
+  }
 }

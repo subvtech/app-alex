@@ -1,5 +1,5 @@
 import { UserRoles } from '@/models/user.model';
-import { InstitutionsType } from '@/models/institution.model';
+import { Institution } from '@/models/institution.model';
 import { Upload } from '@/models/upload.model';
 
 export interface UserSimple {
@@ -8,7 +8,7 @@ export interface UserSimple {
   email: string;
   fullname: string;
   password: string;
-  institutions: InstitutionsType[];
+  institutions: Institution[];
   resetPasswordToken: string;
   confirmationToken: string;
   cpf: string;

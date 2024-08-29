@@ -3,6 +3,7 @@
     :title="$t(`components.${namespace}.settings.delete.title`)"
     full-width
     show-footer-divider
+    outline
   >
     <template #content>
       <p class="text">

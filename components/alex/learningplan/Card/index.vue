@@ -11,12 +11,24 @@
       'vertical-grid card': isVertical,
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
+      project: type === 'project',
     }"
     @click="() => emits('open')"
     @mouseover="isHovering = true"
     @mouseleave="isHovering = false"
   >
-    <div :class="{ rounded: !isVertical }" class="header">
+    <div class="header" :class="{ rounded: !isVertical }">
+      <div
+        v-if="institution"
+        class="tw-absolute tw-bottom-2 tw-left-2 tw-p-1 tw-z-10 tw-bg-[#001a3395] tw-rounded-md"
+      >
+        <img
+          :src="institution.cover.url"
+          :alt="image.alt"
+          :class="{ grayscale: hide }"
+          class="tw-max-w-40 tw-h-10"
+        />
+      </div>
       <v-img
         :src="image.url || '/images/cover_image_course.svg'"
         :alt="image.alt"
@@ -27,13 +39,8 @@
       />
 
       <alex-custom-chip
-        :text="
-          $t(
-            `components.learningPlan.card.type.${
-              type === 'course_project' ? 'project' : type
-            }`,
-          )
-        "
+        v-if="type === 'course'"
+        :text="$t(`components.learningPlan.card.type.${type}`)"
         size="small"
         status="primary"
         class="type"
@@ -104,6 +111,7 @@
         </alex-custom-dropdown>
       </div>
     </div>
+
     <div
       class="d-flex flex-column gap-4 justify-space-between overflow-auto"
       data-testid="alex-learningplan-card-content-area"
@@ -114,15 +122,13 @@
       }"
     >
       <alex-custom-chip
-        v-if="type !== 'course'"
-        data-testid="alex-learningplan-card-status-chip"
-        size="small"
-        variant="flat"
-        :status="statusConfig.variant"
-        :text="$t(`components.learningPlan.card.status.${status}`)"
-        :prepend-icon="statusConfig.icon"
+        v-if="product"
+        :text="product"
+        status="primary"
+        variant="elevated"
+        class="tw-w-fit"
       />
-      <div class="d-flex flex-column pa-0 gap-2">
+      <div class="d-flex flex-column tw-flex-grow pa-0 gap-2">
         <v-tooltip
           :text="title"
           :location="isVertical ? 'top center' : 'top left'"
@@ -146,26 +152,44 @@
       </div>
 
       <div
-        class="d-flex gap-6 flex-wrap py-2"
-        :class="{ 'justify-space-between': members?.length }"
+        class="tw-w-full tw-flex gap-6 tw-flex-wrap py-2 tw-justify-start"
+        :class="{
+          'justify-space-between': !!members?.length,
+        }"
       >
         <alex-learningplan-card-info
+          v-if="
+            (type === 'project' && leader) || (type === 'course' && facilitator)
+          "
+          class="flex-1-1"
           :avatar="{
-            url: facilitator.imageURL,
-            name: facilitator.name,
+            url:
+              type === 'project' && leader
+                ? leader?.imageURL
+                : facilitator.imageURL,
+            name:
+              type === 'project' && leader ? leader?.name : facilitator.name,
           }"
-          :title="$t('components.learningPlan.card.facilitator')"
-          :subtitle="facilitator.name"
+          :title="
+            type === 'project'
+              ? 'Líder'
+              : $t('components.learningPlan.card.facilitator')
+          "
+          :subtitle="
+            type === 'project' && leader ? leader?.name : facilitator.name
+          "
         />
         <alex-learningplan-card-info
-          v-if="type !== 'course_project'"
+          v-if="type === 'course'"
+          class="flex-1-1"
           icon="alex:trail"
           :title="$t('components.learningPlan.card.trails')"
           :subtitle="trailsCount"
         />
 
         <alex-custom-avatar-group
-          v-else-if="members && type === 'course_project'"
+          v-if="members && type !== 'course'"
+          class="tw-pl-2"
           :avatar-items="members"
           :size="36"
         />
@@ -212,17 +236,19 @@ interface member {
 
 interface LearningPlanCardProps {
   type?: 'project' | 'course' | 'course_project';
-  image: { url: string; alt?: string };
   title: string;
+  image: { url: string; alt?: string };
   description: string;
-  facilitator: { name: string; imageURL?: string };
-  trailsCount: number;
+  trailsCount?: number;
   hide?: boolean;
   hideFavoritedButton?: boolean;
-  favorited?: boolean;
-  status?: 'start' | 'in_progress' | 'done';
   members?: member[];
+  facilitator: { name: string; imageURL?: string };
+  leader?: { name: string; imageURL?: string };
+  favorited?: boolean;
   options?: boolean;
+  product?: string;
+  institution?: Institution;
 }
 
 const props = withDefaults(defineProps<LearningPlanCardProps>(), {
@@ -231,8 +257,12 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   hide: false,
   type: 'course',
   status: 'start',
-  members: undefined,
+  members: () => [],
+  product: undefined,
+  institution: undefined,
+  leader: undefined,
   options: true,
+  trailsCount: 0,
 });
 
 const { t } = useI18n();
@@ -259,29 +289,8 @@ const dropdownItems = (hidden: boolean) => {
   ];
 };
 const width = computed(() =>
-  isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 959 },
+  isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 1280 },
 );
-const statusConfig = computed<{ icon: string; variant: any }>(() => {
-  switch (props.status) {
-    // eslint-disable-next-line default-case-last
-    default:
-    case 'start':
-      return {
-        icon: 'mdi-clock',
-        variant: 'blue',
-      };
-    case 'in_progress':
-      return {
-        icon: 'mdi-clock',
-        variant: 'warning',
-      };
-    case 'done':
-      return {
-        icon: 'mdi-check',
-        variant: 'success',
-      };
-  }
-});
 const isActiveTitleTooltip = computed(() => {
   if (isVertical.value) return props.title.length < 60;
   else return props.title.length < 84;
@@ -298,7 +307,9 @@ const emits = defineEmits([
 .card {
   min-height: 460px !important;
 }
-
+.card.project {
+  min-height: 340px !important;
+}
 .grid {
   display: grid;
   align-content: stretch;
@@ -309,7 +320,9 @@ const emits = defineEmits([
   grid-template-rows: 250px 1fr;
   grid-template-columns: 1fr;
 }
-
+.vertical-grid.project {
+  grid-template-rows: 80px 1fr;
+}
 .horizontal-grid {
   grid-template-columns: minmax(220px, 300px) minmax(370px, 1fr) auto;
   grid-template-rows: 1fr;
@@ -339,7 +352,9 @@ const emits = defineEmits([
   right: 16px;
   z-index: 1;
 }
-
+.card.project .hidden-icon {
+  z-index: 0;
+}
 .favorite {
   bottom: 16px;
   left: 16px;

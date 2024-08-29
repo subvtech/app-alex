@@ -2,6 +2,7 @@
   <alex-custom-card
     :title="$t(`components.${variant}.settings.general.title`)"
     show-footer-divider
+    outline
   >
     <template #content>
       <div class="d-flex flex-column w-100">
@@ -111,7 +112,7 @@ const { generalCourseSchema, generalTrailSchema } = useFormRules();
 
 const learningPlanStore = useLearningPlanStore();
 const { title, startDate, endDate, slug } = toRefs(props);
-const myTitle = learningPlanStore.learningPlan?.title || title.value;
+const myTitle = title.value || learningPlanStore.learningPlan?.title;
 const myStartDate = ref(
   learningPlanStore.learningPlan?.start_date || startDate.value,
 );

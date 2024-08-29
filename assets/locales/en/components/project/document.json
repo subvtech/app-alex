@@ -1,0 +1,61 @@
+{
+    "selectTitle": "Select a document",
+    "newFolder": "New folder",
+    "dialog": {
+        "create": {
+            "document": {
+                "title": "Create new document",
+                "submit": "Create document"
+            },
+            "label": "What will your document be called?",
+            "placeholder": "Example: Schedule"
+        },
+        "del": {
+            "folder": {
+                "title": "Are you sure you want to delete this folder?",
+                "subtitle": "Deleting this folder will make it inaccessible."
+            },
+            "document": {
+                "title": "Are you sure you want to delete this document?",
+                "subtitle": "Deleting this document will make it inaccessible."
+            },
+            "type": "Type the word:",
+            "word": "Delete",
+            "placeholder": "Enter the phrase"
+        }
+    },
+    "edit": {
+        "edit": "Edit",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "save": "Save"
+    },
+    "saving": {
+        "select": "Select a document",
+        "loading": "Loading",
+        "saved": "Saved",
+        "error": "Error when saving"
+    },
+    "messages": {
+    "success": {
+        "folderName": "Folder name updated successfully",
+        "updateDoc": "Document updated successfully",
+        "createFolder": "Folder created successfully",
+        "createDoc": "Document created successfully",
+        "delFolder": "Folder deleted successfully"
+    },
+    "warning": {
+        "missName": "Name is required to create a document",
+        "creatingFolder": "Folder is already being created",
+        "folderName": "Failed to update folder name"
+    },
+    "error": {
+        "getTemplate": "Failed to get templates",
+        "createDoc": "Error creating document",
+        "updateDoc": "Error updating document",
+        "delFolder": "Error deleting folder",
+        "delDoc": "Error deleting document",
+        "folderName": "Error updating folder name"
+    }
+}
+}
