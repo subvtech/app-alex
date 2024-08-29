@@ -21,10 +21,12 @@
       @toggle:drawer="closeDrawable(!clipped)"
     />
     <v-main
-      class="bg-gray-blue pt-16"
+      class="bg-gray-blue pt-16 tw-flex tw-flex-col tw-grow"
       :class="clipped ? 'clipped-sidebar' : 'sidebar'"
     >
-      <v-container class="pa-4 pa-sm-6 max-width-100">
+      <v-container
+        class="tw-flex tw-flex-col tw-grow pa-4 pa-sm-6 max-width-100"
+      >
         <alex-custom-header
           v-if="headerStore.showHeader"
           v-bind="headerStore.headerOptions"
@@ -192,7 +194,6 @@ interface Menu {
 const defaultMenus: Menu[] = [
   {
     title: i18n.t('layouts.default.userArea'),
-    dataTour: 'step-user-area',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',
@@ -200,9 +201,14 @@ const defaultMenus: Menu[] = [
         to: '/',
       },
       {
-        icon: 'mdi-book-outline',
+        icon: 'mdi-book-cog-outline',
         title: i18n.t('layouts.default.myClasses'),
         to: '/courses/me',
+      },
+      {
+        icon: 'alex:ProjectConfig',
+        title: 'Meus Projetos',
+        to: '/projects/me',
       },
       // {
       //   icon: 'mdi-clipboard-multiple-outline',
@@ -265,6 +271,7 @@ const defaultMenus: Menu[] = [
 const componentsMenu: Menu[] = [
   {
     title: 'Componentes',
+    dataTour: '',
     items: [
       {
         icon: 'mdi-view-dashboard-outline',

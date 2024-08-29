@@ -1,10 +1,12 @@
 {
   "searchPlaceholder": "Encontrar a tarefa",
   "draft": "Rascunho",
+  "backlog": "Backlog de Tarefas",
   "published": "Publicadas",
   "done": "Encerradas",
   "archived": "Arquivadas",
   "emptyState": {
+    "backlog": "Nenhuma tarefa na Backlog!",
     "draft": "Nenhuma tarefa em rascunho!",
     "published": "Nenhuma tarefa publicada!",
     "done": "Nenhuma tarefa encerrada!",

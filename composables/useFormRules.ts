@@ -131,7 +131,7 @@ export const useFormRules = () => {
     .date()
     .required(i18n.t('rules.endDate.required'))
     .min(yup.ref('startDate'), i18n.t('rules.endDate.beforeStartDate'))
-    .typeError('A data precisa ser válida');
+    .typeError(i18n.t('rules.endDate.typeError'));
 
   const descriptionRules = {
     description: yup
@@ -325,6 +325,46 @@ export const useFormRules = () => {
       .trim(),
     responsible: yup.mixed().required(i18n.t('rules.field.required')),
   };
+
+  const createProjectRules = yup.object({
+    title: yup
+      .string()
+      .required(i18n.t('rules.title.required'))
+      .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
+      .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
+      .trim(),
+    description: yup
+      .string()
+      .required(i18n.t('rules.description.required'))
+      .min(4, ({ min }) => i18n.t('rules.description.min', { min }))
+      .max(256, ({ max }) => i18n.t('rules.description.max', { max }))
+      .trim(),
+    slug: yup
+      .string()
+      .required(i18n.t('rules.field.required'))
+      .min(4, ({ min }) => i18n.t('rules.slug.min', { min }))
+      .trim(),
+    startDate: startDateCreationRules,
+    endDate: endDateRules,
+  });
+
+  const createSprintRules = yup.object({
+    type: yup.string().oneOf(['multiple', 'single']),
+    name: yup.string().when('type', {
+      is: 'single',
+      then: () =>
+        yup
+          .string()
+          .required(i18n.t('rules.field.required'))
+          .min(4, ({ min }) => i18n.t('rules.name.min', { min }))
+          .max(64, ({ max }) => i18n.t('rules.name.max', { max })),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    duration: yup.string().required(i18n.t('rules.field.required')),
+    startDate: startDateCreationRules,
+    endDate: endDateRules,
+  });
+
   return {
     registerSchemas: { registerStep1, registerStep2, registerStep3 },
     schema4: yup.object(passwordRules),
@@ -361,5 +401,7 @@ export const useFormRules = () => {
     createTrailsRules,
     createEditClassRules,
     classRules,
+    createProjectRules,
+    createSprintRules,
   };
 };

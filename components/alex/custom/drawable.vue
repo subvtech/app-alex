@@ -36,7 +36,6 @@
           class="rounded-lg"
           :class="clipped ? '' : 'px-4'"
           router
-          exact
           density="compact"
           nav
           role="list-item"
