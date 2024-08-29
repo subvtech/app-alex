@@ -37,6 +37,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         },
       },
     },
+    document_folders: {
+      populate: ['documents'],
+    },
     classes: {
       populate: [
         'in_charge_member.user.avatar',

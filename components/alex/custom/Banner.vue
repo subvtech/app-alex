@@ -102,6 +102,7 @@
       :start-date-style="startDateStyle"
       :end-date-style="endDateStyle"
       resize
+      :update-profile-picture="updateProfilePicture"
       :user-id="userId"
       :profile-picture="profilePicture"
       :is-professor="isProfessor"
@@ -219,21 +220,17 @@ const props = withDefaults(defineProps<BannerProps>(), {
   showMenu: false,
   showSettings: false,
   settings: undefined,
+  updateProfilePicture: false,
   loading: false,
 });
 
 const { coverPicture, fullname, username, canEdit, userId } = toRefs(props);
 const selectedOption = toRef(props.selectedOption);
-const onSelectSettings = (to?: string) => {
-  emit('select:option', null);
-  selectedOption.value = null;
-  navigateTo(to);
-};
 const cover = ref<Partial<Upload> | null | undefined>(props.coverPicture);
 
 async function uploadCoverPicture(event: any) {
   if (cover.value && props.imgFromStrapi) {
-    const { updatedAt } = await updateImage(event, cover.value.id);
+    const { updatedAt } = await updateImage(event, String(cover.value.id));
     const url = cover.value.url?.split('?');
     if (url) cover.value.url = url[0] + '?' + updatedAt;
   } else {
@@ -274,7 +271,6 @@ watch(coverPicture!, () => {
     display: flex;
     flex-direction: column;
     gap: 0px;
-    transition: all ease-in-out 1s;
     overflow: hidden;
 
     .cover-block {
@@ -354,7 +350,6 @@ watch(coverPicture!, () => {
       border-top: 1px solid #eaeef1;
       height: 46px;
       padding-inline: 24px;
-      transition: all ease-in-out 1s;
       overflow-x: auto;
       overflow-y: hidden;
       -ms-overflow-style: none; /* IE and Edge */
@@ -403,9 +398,6 @@ watch(coverPicture!, () => {
       position: relative;
       border-radius: 100%;
 
-      i {
-        transition: all ease-in-out 0.7s;
-      }
       .img {
         aspect-ratio: 1 / 1; /* defining the aspect ratio of the image */
         object-fit: cover;
@@ -414,11 +406,8 @@ watch(coverPicture!, () => {
       .img {
         max-width: 160px;
         max-height: 160px;
-
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
-
-        transition: all ease-in-out 0.4s;
         border-radius: 100%;
       }
       div.img {

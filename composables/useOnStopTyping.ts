@@ -1,6 +1,6 @@
-export const useOnStopTyping = (
-  search: Ref<string | undefined>,
-  callback: (value?: string) => Promise<unknown> | unknown,
+export const useOnStopTyping = <T = string>(
+  search: Ref<T | undefined>,
+  callback: (value?: T) => Promise<unknown> | unknown,
   ms: number = 500,
   first: boolean = true,
   whenEmpty: boolean = true,

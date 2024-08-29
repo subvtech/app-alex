@@ -1,11 +1,13 @@
 {
   "searchPlaceholder": "Find task",
+  "backlog": "Backlog",
   "draft": "Draft",
   "published": "Published",
   "done": "Closed",
   "archived": "Archived",
   "emptyState": {
     "draft": "No tasks in draft!",
+    "backlog": "No tasks in Backlog!",
     "published": "No published tasks!",
     "done": "No closed tasks!",
     "archived": "No archived tasks!"

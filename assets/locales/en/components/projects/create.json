@@ -1,0 +1,64 @@
+{
+  "title": "Create Project",
+  "mainAction": "Create",
+  "secondaryAction": "Cancel",
+  "successMessage": "Project created successfully",
+  "errorMessage": "Error creating project",
+  "slugUniqueError": "This identifier is already in use. Please choose another one.",
+
+  "steps": {
+    "basicInfo": {
+      "title": "Basic",
+      "subtitle": "Information"
+    },
+    "associatedCourses": {
+      "title": "Associated",
+      "subtitle": "Courses"
+    },
+    "members": {
+      "title": "Registered",
+      "subtitle": "Members"
+    }
+  },
+  "basicInfo": {
+    "titleLabel": "What will your project be called?",
+    "titlePlaceholder": "Enter your project title",
+    "descriptionLabel": "What is your project about?",
+    "descriptionPlaceholder": "Enter a description of your project",
+    "startDateLabel": "When will your project start?",
+    "endDateLabel": "When will your project end?",
+    "slugLabel": "What will be your project identifier?",
+    "slugPlaceholder": "Enter your project identifier",
+    "slugInfo": "The project identifies is a name tha will differentiate your project from others and allow it to be accessed through the URL.",
+    "fieldLabel": "What are the areas of focus for your project?",
+    "fieldPlaceholder": "Select the areas",
+    "projectTypeLabel": "What will be the Product of your Project?",
+    "projectTypePlaceholder": "Select a product type"
+  },
+  "associatedCourses": {
+    "titleLabel": "Select Courses",
+    "titlePlaceholder": "Select associated courses"
+  },
+  "members": {
+    "title": "Invite participants",
+    "mainAction": "Invite",
+    "secondaryAction": "Cancel",
+    "tabs": {
+      "students": "Students",
+      "groups": "Groups"
+    },
+    "searchPlaceholder": {
+      "students": "Search by student name",
+      "groups": "Search by group name"
+    },
+    "generalSearch": {
+      "label": "Invite participants",
+      "placeholder": "Select a participant",
+      "noResults": "Search users to add to the project"
+    },
+    "emptyMessage": {
+      "students": "No students found",
+      "groups": "No groups found"
+    }
+  }
+}
