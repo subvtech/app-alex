@@ -1,54 +1,44 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TrailSimple } from '@/models/simple/trailSimple.model';
+// import { Input } from '@/components/ui/input';
 
-const { t } = useI18n();
-const { update } = useStrapi();
+// const { t } = useI18n();
 const route = useRoute();
-const headerStore = usePageHeaderStore();
-const learningPlanStore = useLearningPlanStore();
-const search = ref('');
-const page = ref(1);
+const { findOne } = useStrapi();
 
-const trails = computed<TrailSimple[]>(() => {
-  return (
-    learningPlanStore.studentTrails?.map((trail) => {
-      const lastStructure =
-        trail.structures[trail.structures?.length - 1] || {};
-      return { ...trail, blocks: lastStructure.blocks || [] };
-    }) || []
-  );
+const hasError = ref(false);
+const loading = ref(false);
+const members = ref<User[]>([]);
+const search = ref('');
+
+const filteredMembers = computed(() => {
+  const res = members.value.filter((member) => {
+    return (
+      contains(member.email, search.value) ||
+      contains(member.fullname, search.value)
+    );
+  });
+
+  return res;
 });
 
-const showingData = (groupedItems) => {
-  const itemsPerPage = search.value === '' ? 12 : groupedItems.length;
-  const to =
-    page.value * itemsPerPage > trails.value.length
-      ? trails.value.length
-      : page.value * itemsPerPage;
-
-  return to === 0
-    ? t('pages.trails.empty_journey')
-    : t('pages.trails.showingData', {
-        from: (page.value - 1) * itemsPerPage + 1,
-        to,
-        total: trails.value.length,
-      });
-};
-
-const changeItemVisibility = (index: number, id: number) => {
-  const status = !trails.value[index].hidden;
+onMounted(async () => {
+  loading.value = true;
 
   try {
-    learningPlanStore.studentTrails[index].hidden = status;
-    update('trails', id, { hidden: status });
-  } catch (error) {
-    learningPlanStore.studentTrails[index].hidden = !status;
-  }
-};
+    const learnPlan = await findOne<LearningPlan>(
+      `learningplans/${route.params.id}`,
+      { populate: ['members.user'] },
+    );
 
-onBeforeMount(() => {
-  headerStore.showHeader = true;
+    members.value = learnPlan.data.attributes.members.data.map(
+      get('attributes.user.data.attributes'),
+    );
+  } catch (_) {
+    hasError.value = true;
+  } finally {
+    loading.value = false;
+  }
 });
 </script>
 
@@ -59,33 +49,28 @@ onBeforeMount(() => {
   >
     <div
       class="d-flex flex-wrap w-100 gap-4 gap-sm-1"
-      :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
+      :class="!members.length ? 'justify-end' : 'justify-space-between mb-6'"
     >
       <alex-inputs-text-field
-        v-show="trails.length"
+        v-show="members.length"
         v-model="search"
-        name="search"
-        :placeholder="$t('pages.trails.searchPlaceholder')"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
         hide-details
+        name="search"
         class="w-50"
-        size="default"
-        style="min-width: 160px; max-width: 320px"
         density="comfortable"
+        variant="outlined"
+        prepend-inner-icon="mdi-magnify"
+        style="min-width: 160px; max-width: 320px"
+        :placeholder="$t('pages.projects.search_member')"
       />
     </div>
     <div
-      v-if="!trails.length"
+      v-if="!members.length"
       style="flex: 1"
       class="d-flex"
-      :class="
-        learningPlanStore.loading
-          ? ''
-          : 'align-center justify-center flex-column'
-      "
+      :class="loading && 'align-center justify-center flex-column'"
     >
-      <div v-if="learningPlanStore.loading">
+      <div v-if="loading">
         <alex-custom-skeleton
           color="gray-200"
           class="width-80 height-10 mb-6"
@@ -105,63 +90,58 @@ onBeforeMount(() => {
         <img
           class="emptyProjects-img tw-w-[240px]"
           src="@/assets/svg/empty-journey.svg"
-          :alt="$t('pages.projects.empty_journey')"
+          :alt="
+            $t(hasError ? 'errors.default' : 'pages.projects.empty_members')
+          "
         />
         <p class="text-h3 text-gray-400 mt-4">
-          {{ $t('pages.projects.empty_journey') }}
+          {{ $t(hasError ? 'errors.default' : 'pages.projects.empty_members') }}
         </p>
       </div>
     </div>
-    <div v-else class="d-flex w-100 flex-column h-100" style="flex: 1">
-      <v-data-iterator
-        v-model:search="search"
-        v-model:page="page"
-        class="d-flex flex-column justify-space-between flex-start flex-grow-1 flex-shrink-1 position-relative"
-        :items="trails ?? []"
-        :items-per-page="12"
-        :filter-keys="['name', 'description', 'blocks']"
-        style="flex-basis: 0"
-      >
-        <template #default="{ items }">
-          <div class="card-container w-100">
-            <alex-learningplan-trails-card
-              v-for="(item, index) in items"
-              :key="item.raw.title + index"
-              :hide="item.raw.hidden"
-              :name="item.raw.title"
-              :can-edit="learningPlanStore.userIsFacilitator"
-              :description="item.raw.description"
-              :image="{
-                url: item.raw?.cover_image?.url,
-              }"
-              :blocks="item.raw.blocks ?? []"
-              class="flex-stretch"
-              @toggle-visibility="changeItemVisibility(index, item.raw.id)"
-              @open="
-                navigateTo(
-                  `/projects/${route.params.id}/individual_learning/${item.raw.id}`,
-                )
-              "
-            />
+    <div v-else class="tw-flex tw-flex-wrap tw-gap-4">
+      <Card v-for="user in filteredMembers" :key="user.id" class="tw-w-1/3">
+        <CardContent
+          class="tw-flex tw-flex-col tw-gap-4 tw-pt-6 tw-text-slate-600"
+        >
+          <div class="tw-flex tw-items-center tw-gap-4">
+            <v-avatar
+              :size="48"
+              class="alex-avatar-group-border alex-avatar-group-margin"
+              color="gray-100"
+            >
+              <template #default>
+                <span>
+                  {{ getInitials(user.fullname) }}
+                </span>
+              </template>
+            </v-avatar>
+            <div class="tw-flex tw-flex-col tw-overflow-hidden">
+              <span
+                class="tw-text-ellipsis tw-font-bold tw-overflow-hidden tw-whitespace-nowrap"
+                :title="user.fullname"
+              >
+                {{ user.fullname }}
+              </span>
+              <span :title="user.email">
+                {{ user.email }}
+              </span>
+            </div>
           </div>
-        </template>
-        <template #footer="{ pageCount, groupedItems }">
-          <div
-            class="d-flex w-100 justify-space-between align-center pa-6 pb-0 flex-column flex-sm-row ga-3 footer mt-6"
-          >
-            <p class="show-cardlist text-body-3 text-gray-600">
-              {{ showingData(groupedItems) }}
-            </p>
-            <alex-custom-pagination
-              v-if="pageCount > 1"
-              v-model="page"
-              :length="pageCount"
-              :total-visible="5"
-              class="extra-mb"
+          <div class="tw-flex tw-flex-col">
+            <v-progress-linear
+              rounded
+              class="mb-1"
+              color="accent"
+              :height="6"
             />
+            <div class="tw-flex tw-justify-between tw-items-center tw-text-sm">
+              <span class="tw-opacity-65">Meus Objetivos</span>
+              <span class="tw-opacity-65">10%</span>
+            </div>
           </div>
-        </template>
-      </v-data-iterator>
+        </CardContent>
+      </Card>
     </div>
   </div>
 </template>

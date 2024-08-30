@@ -3,13 +3,15 @@
   "days": "days",
   "empty_events": "No events have been registered",
   "empty_institutions": "No partner institutions here",
+  "empty_journey": "No learning journey found",
   "empty_meetings": "Nothing scheduled today!",
+  "empty_members": "No members found",
   "empty_task_progress": "0% of tasks have been completed",
   "last_update": "Last update",
   "myProjects": "My Projects",
   "remaining_time": "Remaining time",
+  "search_member": "Search member",
   "total_epics": "Total of epics",
   "total_sprints": "Total of sprints",
-  "total_story": "Total of Story",
-  "empty_journey": "No learning journey found!"
+  "total_story": "Total of stories"
 }
