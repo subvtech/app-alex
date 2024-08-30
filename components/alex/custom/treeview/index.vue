@@ -12,8 +12,8 @@
       :custom-slot="customSlot"
       :default-expand="defaultExpand"
     >
-      <template #default="{ item }">
-        <slot :item="item"></slot>
+      <template #default="{ item, level }">
+        <slot :item="item" :level="level"></slot>
       </template>
     </tree-item>
   </div>

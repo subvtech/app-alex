@@ -11,71 +11,88 @@
     <template #body="{ items, columns }">
       <transition-group :name="transitionName">
         <tr
-          v-for="item in items"
-          :key="item.id"
-          class="text-5 text-no-wrap staggered-fade-item bg-white"
+          v-for="task in items"
+          :key="task.id"
+          class="text-5 text-no-wrap staggered-fade-item"
         >
-          <td class="text-body-4 text-overflow text-left">
-            {{ item.title }}
-          </td>
-          <td>
-            <alex-learningplan-task-date-chip
-              v-if="item.finish_at"
-              :date="item.finish_at"
-              :is-published="item.status === 'published' && !isArchived"
-            />
-            <span v-else>{{
-              $t('pages.task.table.placeholders.undefined')
-            }}</span>
-          </td>
-          <td>
-            <div
-              v-if="item.students?.length"
-              class="ml-2"
-              :class="{ 'gray-filter': isArchived }"
+          <td :colspan="columns.length" class="pa-0">
+            <alex-custom-treeview
+              node-classes="px-4 text-gray-800 text-body-4 tw-border-b tw-border-gray-200 tw-h-[52px] d-flex align-center ga-1"
+              :items="[task]"
+              :custom-slot="true"
             >
-              <alex-custom-avatar-group
-                :avatar-items="item.students || []"
-                :max="3"
-              />
-            </div>
-            <span v-else>{{
-              $t('pages.task.table.placeholders.noMembers')
-            }}</span>
-          </td>
-          <td>
-            <alex-learningplan-task-submissions-status
-              v-if="item.delivered"
-              :submitted="item.delivered"
-              :type="item.type"
-            />
-            <div v-else>
-              <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
-              <span>{{ $t('pages.task.submissions.noSubmissions') }}</span>
-            </div>
-          </td>
-          <td>
-            <alex-custom-dropdown
-              :items="dropDownItems(item)"
-              variant="text"
-              prepend-icon="mdi-dots-vertical"
-            >
-              <template #activator="{ props: propsMenu }">
-                <v-tooltip
-                  :text="t('pages.task.table.tooltips.options')"
-                  location="bottom center"
-                >
-                  <template #activator="{ props: optionsTooltipProps }">
-                    <alex-custom-button
-                      variant="text"
-                      color="gray-600"
-                      v-bind="{ ...propsMenu, ...optionsTooltipProps }"
-                      icon="mdi-dots-vertical"
+              <template #default="{ item, level }">
+                <tr class="d-flex align-center py-2">
+                  <td class="text-body-4 text-overflow text-left mr-auto">
+                    {{ item.title }}
+                  </td>
+                  <td class="mr-auto max-w-">
+                    <alex-learningplan-task-date-chip
+                      v-if="item.finish_at"
+                      :date="item.finish_at"
+                      :is-published="item.status === 'published' && !isArchived"
                     />
-                  </template>
-                </v-tooltip>
+                    <span v-else>{{
+                      $t('pages.task.table.placeholders.undefined')
+                    }}</span>
+                  </td>
+                  <td class="mr-auto">
+                    <div
+                      v-if="item.students?.length"
+                      class="ml-2"
+                      :class="{ 'gray-filter': isArchived }"
+                    >
+                      <alex-custom-avatar-group
+                        :avatar-items="item.students || []"
+                        :max="3"
+                      />
+                    </div>
+                    <span v-else>{{
+                      $t('pages.task.table.placeholders.noMembers')
+                    }}</span>
+                  </td>
+                  <td class="mr-auto">
+                    <alex-learningplan-task-submissions-status
+                      v-if="item.delivered"
+                      :submitted="item.delivered"
+                      :type="item.type"
+                    />
+                    <div v-else>
+                      <v-icon
+                        class="mr-1"
+                        icon="mdi-close-circle-outline "
+                      ></v-icon>
+                      <span>{{
+                        $t('pages.task.submissions.noSubmissions')
+                      }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <alex-custom-dropdown
+                      :items="dropDownItems(item)"
+                      variant="text"
+                      prepend-icon="mdi-dots-vertical"
+                    >
+                      <template #activator="{ props: propsMenu }">
+                        <v-tooltip
+                          :text="t('pages.task.table.tooltips.options')"
+                          location="bottom center"
+                        >
+                          <template #activator="{ props: optionsTooltipProps }">
+                            <alex-custom-button
+                              variant="text"
+                              color="gray-600"
+                              v-bind="{ ...propsMenu, ...optionsTooltipProps }"
+                              icon="mdi-dots-vertical"
+                            />
+                          </template>
+                        </v-tooltip>
+                      </template>
+                    </alex-custom-dropdown>
+                  </td>
+                </tr>
               </template>
-            </alex-custom-dropdown>
+            </alex-custom-treeview>
           </td>
         </tr>
       </transition-group>
@@ -243,12 +260,12 @@ const header = [
     title: t('pages.task.table.header.title'),
     key: 'title',
     sortable: true,
-    width: 680,
+    // width: 680,
   },
   {
     title: t('pages.task.table.header.deadline_at'),
     key: 'deadline_at',
-    width: 140,
+    // width: 140,
   },
   {
     title: t('pages.task.table.header.students'),

@@ -1,33 +1,45 @@
 <template>
-  <div class="tree-item">
+  <div>
     <div
       v-if="hasChildren"
-      class="item-content"
-      :class="nodeClasses"
+      :class="[nodeClasses, `pl-${level * 5}`]"
       @click="toggle"
     >
       <v-icon color="gray-600">{{ !isOpen ? openIcon : closeIcon }}</v-icon>
       {{ item.name }}
     </div>
-    <div v-else class="item-content" :class="leafClasses">
-      <slot v-if="customSlot" name="default" :item="item"></slot>
+    <div
+      v-else
+      :class="leafClasses"
+      :style="{ paddingLeft: `${(level + 1) * 20}px` }"
+    >
+      <slot
+        v-if="customSlot"
+        name="default"
+        :item="item"
+        :level="props.level + 1"
+      ></slot>
       <div v-else>{{ item.name }}</div>
     </div>
     <component :is="transitionComponent">
-      <div v-if="isOpen && hasChildren" class="item-children">
+      <div v-if="isOpen && hasChildren">
         <alex-custom-treeview-item
           v-for="child in children"
           :key="child.id"
           :item="child"
+          :level="level + 1"
           v-bind="childProps"
         >
-          <template #default="slotProps">
+          <template #default="{ item, level = props.level }">
             <slot
               v-if="customSlot"
               name="default"
-              :item="slotProps.item"
+              :item="item"
+              :level="level"
             ></slot>
-            <div v-else>{{ slotProps.item.name }}</div>
+            <div v-else>
+              {{ item.title }}
+            </div>
           </template>
         </alex-custom-treeview-item>
       </div>
@@ -47,6 +59,7 @@ interface TreeItemProps {
   transitionComponent: string;
   customSlot: boolean;
   defaultExpand: boolean;
+  level: number;
 }
 const props = withDefaults(defineProps<TreeItemProps>(), {
   openIcon: 'mdi-chevron-down',
@@ -56,11 +69,12 @@ const props = withDefaults(defineProps<TreeItemProps>(), {
   transitionComponent: 'v-slide-x-transition',
   customSlot: false,
   defaultExpand: false,
+  level: 1,
 });
 
 const childProps = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { item, ...rest } = props;
+  const { item, level, ...rest } = props;
   return rest;
 });
 
@@ -100,7 +114,7 @@ const children = computed(() => {
 
 <style scoped>
 .tree-item {
-  margin-left: 20px;
+  padding-left: 20px;
 }
 
 .item-content {
@@ -114,6 +128,6 @@ const children = computed(() => {
 }
 
 .item-children {
-  margin-left: 20px;
+  padding-left: 20px;
 }
 </style>
