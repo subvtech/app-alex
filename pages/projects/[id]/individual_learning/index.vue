@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const route = useRoute();
 const { findOne } = useStrapi();
@@ -8,6 +9,15 @@ const hasError = ref(false);
 const loading = ref(false);
 const members = ref<User[]>([]);
 const search = ref('');
+
+const cardClass = ref(
+  [
+    'card tw-w-full tw-ml-0 tw-mt-4',
+    'sm:tw-w-[calc(50.00%-0.50rem-3px)] sm:tw-ml-4',
+    'lg:tw-w-[calc(33.33%-0.66rem-3px)]',
+    'xl:tw-w-[calc(25.00%-0.75rem-3px)]',
+  ].join(' '),
+);
 
 const filteredMembers = computed(() => {
   return members.value.filter((member) => {
@@ -43,7 +53,7 @@ onMounted(async () => {
     class="tw-bg-white tw-flex tw-flex-col tw-rounded-lg tw-p-6 tw-min-h-[500px] !tw-text-slate-500"
   >
     <div
-      class="tw-flex tw-flex-1 tw-flex-wrap tw-mb-6 tw-w-full tw-gap-6 tw-gap-sm-1"
+      class="tw-flex tw-flex-1 tw-flex-col tw-mb-6 tw-w-full tw-gap-6 tw-gap-sm-1"
     >
       <template v-if="members.length">
         <alex-inputs-text-field
@@ -58,8 +68,12 @@ onMounted(async () => {
           style="min-width: 160px; max-width: 320px"
           :placeholder="$t('pages.projects.search_member')"
         />
-        <div class="tw-flex tw-flex-wrap tw-gap-6">
-          <Card v-for="user in filteredMembers" :key="user.id" class="tw-w-1/3">
+        <div class="tw-flex tw-flex-wrap">
+          <Card
+            v-for="user in filteredMembers"
+            :key="user.id"
+            :class="cardClass"
+          >
             <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6">
               <div class="tw-flex tw-items-center tw-gap-6">
                 <v-avatar
@@ -105,15 +119,12 @@ onMounted(async () => {
       </template>
       <template v-else>
         <div v-if="loading">
-          <alex-custom-skeleton
-            color="gray-200"
-            class="tw-w-1/3 tw-h-[44px] tw-mb-6"
-            rounded="lg"
-          />
-          <div class="tw-flex tw-gap-6">
-            <alex-learningplan-skeleton-trail-card
-              v-for="index in 3"
+          <Skeleton class="tw-w-[320px] tw-h-[44px] tw-mb-6 tw-rounded-xl" />
+          <div class="tw-flex tw-flex-wrap">
+            <Skeleton
+              v-for="index in 8"
               :key="index"
+              :class="[cardClass, 'tw-h-[150px] tw-w-[250px] tw-rounded-xl']"
             />
           </div>
         </div>
@@ -138,3 +149,22 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+<style scoped>
+@media (min-width: 640px) and (max-width: 1023px) {
+  .card:nth-child(odd) {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .card:nth-child(3n + 1) {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  .card:nth-child(4n + 1) {
+    margin-left: 0;
+  }
+}
+</style>
