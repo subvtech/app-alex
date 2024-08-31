@@ -1,6 +1,7 @@
 <script setup lang="tsx">
 import { ref } from 'vue';
 import { Skeleton } from '@/components/ui/skeleton';
+import { get } from '@/utils/get';
 import emptyImage from '@/assets/svg/empty-journey.svg';
 
 const { t } = useI18n();
@@ -12,14 +13,15 @@ const loading = ref(false);
 const members = ref<User[]>([]);
 const search = ref('');
 
-const cardClass = ref(
-  [
-    'card tw-w-full tw-ml-0 tw-mt-4',
-    'sm:tw-w-[calc(50.00%-0.50rem-3px)] sm:tw-ml-4',
-    'lg:tw-w-[calc(33.33%-0.66rem-3px)]',
-    'xl:tw-w-[calc(25.00%-0.75rem-3px)]',
-  ].join(' '),
-);
+const cardClass = computed(() => {
+  return [
+    !loading.value && 'tw-cursor-pointer tw-transition-all hover:tw-shadow-md',
+    'tw-w-full tw-mt-4 tw-ml-0 sm:tw-ml-4',
+    'sm:tw-w-[calc(50.00%-0.50rem-3px)] f-sm:[&:nth-child(odd)]:tw-ml-0 f-md:[&:nth-child(odd)]:tw-ml-0',
+    'lg:tw-w-[calc(33.33%-0.66rem-3px)] f-lg:[&:nth-child(3n+1)]:tw-ml-0',
+    'xl:tw-w-[calc(25.00%-0.75rem-3px)] xl:[&:nth-child(4n+1)]:tw-ml-0',
+  ].join(' ');
+});
 
 const filteredMembers = computed(() => {
   return members.value.filter((member) => {
@@ -88,7 +90,7 @@ onMounted(fetchMembers);
           :placeholder="$t('pages.projects.search_member')"
         />
         <div class="tw-flex tw-flex-wrap">
-          <EmptyState v-if="!filteredMembers.length" />
+          <EmptyState v-if="!filteredMembers.length" class="tw-mt-6" />
           <Card
             v-for="user in filteredMembers"
             :key="user.id"
@@ -147,27 +149,3 @@ onMounted(fetchMembers);
     </div>
   </div>
 </template>
-
-<style scoped>
-/**
- * Ao alterar, levar em consideração os breakpoints do tailwind.config.js
- */
-
-@media (min-width: 640px) and (max-width: 1023px) {
-  .card:nth-child(odd) {
-    margin-left: 0;
-  }
-}
-
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .card:nth-child(3n + 1) {
-    margin-left: 0;
-  }
-}
-
-@media (min-width: 1280px) {
-  .card:nth-child(4n + 1) {
-    margin-left: 0;
-  }
-}
-</style>
