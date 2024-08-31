@@ -1,9 +1,11 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref } from 'vue';
 import { Skeleton } from '@/components/ui/skeleton';
+import emptyImage from '@/assets/svg/empty-journey.svg';
 
-const route = useRoute();
+const { t } = useI18n();
 const { findOne } = useStrapi();
+const route = useRoute();
 
 const hasError = ref(false);
 const loading = ref(false);
@@ -28,7 +30,7 @@ const filteredMembers = computed(() => {
   });
 });
 
-onMounted(async () => {
+const fetchMembers = async () => {
   loading.value = true;
 
   try {
@@ -45,16 +47,33 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+};
+
+const EmptyState = () => {
+  const emptyMessage = t(
+    hasError.value ? 'errors.default' : 'pages.projects.empty_members',
+  );
+
+  return (
+    <div class="tw-flex tw-flex-col tw-m-auto tw-items-center tw-justify-center tw-gap-6">
+      <img
+        class="tw-max-h-[360px] tw-max-w-[400px] tw-w-[240px]"
+        src={emptyImage}
+        alt={emptyMessage}
+      />
+      <p class="tw-text-xl tw-opacity-45 tw-mt-4">{emptyMessage}</p>
+    </div>
+  );
+};
+
+onMounted(fetchMembers);
 </script>
 
 <template>
   <div
     class="tw-bg-white tw-flex tw-flex-col tw-rounded-lg tw-p-6 tw-min-h-[500px] !tw-text-slate-500"
   >
-    <div
-      class="tw-flex tw-flex-1 tw-flex-col tw-mb-6 tw-w-full tw-gap-6 tw-gap-sm-1"
-    >
+    <div class="tw-flex tw-flex-1 tw-flex-col tw-mb-6 tw-w-full tw-gap-6">
       <template v-if="members.length">
         <alex-inputs-text-field
           v-show="members.length"
@@ -69,6 +88,7 @@ onMounted(async () => {
           :placeholder="$t('pages.projects.search_member')"
         />
         <div class="tw-flex tw-flex-wrap">
+          <EmptyState v-if="!filteredMembers.length" />
           <Card
             v-for="user in filteredMembers"
             :key="user.id"
@@ -76,15 +96,9 @@ onMounted(async () => {
           >
             <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6">
               <div class="tw-flex tw-items-center tw-gap-6">
-                <v-avatar
-                  :size="48"
-                  class="alex-avatar-group-border alex-avatar-group-margin"
-                  color="gray-100"
-                >
+                <v-avatar :size="48" color="gray-100">
                   <template #default>
-                    <span>
-                      {{ getInitials(user.fullname) }}
-                    </span>
+                    {{ getInitials(user.fullname) }}
                   </template>
                 </v-avatar>
                 <div class="tw-flex tw-flex-col tw-overflow-hidden">
@@ -109,7 +123,7 @@ onMounted(async () => {
                 <div
                   class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45"
                 >
-                  <span>Meus Objetivos</span>
+                  <span>{{ $t('pages.projects.my_goals') }}</span>
                   <span>10%</span>
                 </div>
               </div>
@@ -128,28 +142,17 @@ onMounted(async () => {
             />
           </div>
         </div>
-        <div
-          v-else
-          class="tw-flex tw-flex-col tw-m-auto tw-items-center tw-justify-center tw-gap-6"
-        >
-          <img
-            class="tw-max-h-[360px] tw-max-w-[400px] tw-w-[240px]"
-            src="@/assets/svg/empty-journey.svg"
-            :alt="
-              $t(hasError ? 'errors.default' : 'pages.projects.empty_members')
-            "
-          />
-          <p class="tw-text-xl tw-opacity-45 tw-mt-4">
-            {{
-              $t(hasError ? 'errors.default' : 'pages.projects.empty_members')
-            }}
-          </p>
-        </div>
+        <EmptyState v-else />
       </template>
     </div>
   </div>
 </template>
+
 <style scoped>
+/**
+ * Ao alterar, levar em consideração os breakpoints do tailwind.config.js
+ */
+
 @media (min-width: 640px) and (max-width: 1023px) {
   .card:nth-child(odd) {
     margin-left: 0;
