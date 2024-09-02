@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-white rounded wrapper">
+  <div>Tarefas</div>
+  <!-- <div class="bg-white rounded wrapper">
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
@@ -92,7 +93,7 @@
       @filter="handleFilter"
       @update:model-value="(value) => (openFilterDrawer = value)"
     />
-  </div>
+  </div> -->
 </template>
 <script setup lang="ts">
 import { Colors } from '~/components/alex/learningplan/task/project/kanban/column/Header.vue';
@@ -162,7 +163,7 @@ watch(
       classes.value =
         learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
         [];
-      headerStore.title = t('pages.projects.myProjects');
+      headerStore.title = t('pages.projects.my_projects');
       headerStore.items = [
         {
           title: t('components.courses.settings.home'),
@@ -170,7 +171,7 @@ watch(
           to: '/',
         },
         {
-          title: t('pages.projects.myProjects'),
+          title: t('pages.projects.my_projects'),
           disabled: false,
           to: '/projects/me',
         },

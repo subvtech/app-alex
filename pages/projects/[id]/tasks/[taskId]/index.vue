@@ -1,5 +1,5 @@
 <template>
-  <div>tasks 1</div>
+  <div>Tarefas</div>
 </template>
 
 <script setup lang="ts"></script>

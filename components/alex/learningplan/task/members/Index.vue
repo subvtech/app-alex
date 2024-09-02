@@ -103,8 +103,8 @@
               member.raw.learning_plan_member?.learning_class?.name ||
               member.raw.learning_plan_group?.learning_class.name,
             avatarUrl:
-              member.raw.learning_plan_member?.user.avatar?.url ||
-              member.raw.user.avatar?.formats.small.url,
+              member.raw.learning_plan_member?.user?.avatar?.url ||
+              member.raw.user?.avatar?.url,
             group: !!member.raw.learning_plan_group,
             participants: member.raw.learning_plan_group
               ? getMembersOfGroup(member.raw.learning_plan_group)
@@ -137,7 +137,7 @@
             :member="{
               name: groupMember.student_member.user.fullname,
               class: member.raw.learning_plan_group?.learning_class.name,
-              avatarUrl: groupMember.student_member.user.avatar?.url,
+              avatarUrl: groupMember.student_member.user?.avatar?.url,
               responsable: groupMember.role === 'in_charge',
             }"
             :edit="false"

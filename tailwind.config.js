@@ -1,5 +1,7 @@
 const animate = require('tailwindcss-animate');
 
+const breakpoints = [640, 768, 1024, 1280, 1400];
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
@@ -11,8 +13,19 @@ module.exports = {
       center: true,
       padding: '2rem',
       screens: {
-        '2xl': '1400px',
+        '2xl': `${breakpoints[4]}px`,
       },
+    },
+    screens: {
+      sm: `${breakpoints[0]}px`,
+      md: `${breakpoints[1]}px`,
+      lg: `${breakpoints[2]}px`,
+      xl: `${breakpoints[3]}px`,
+      '2xl': `${breakpoints[4]}px`,
+      'f-sm': { min: `${breakpoints[0]}px`, max: `${breakpoints[1] - 1}px` },
+      'f-md': { min: `${breakpoints[1]}px`, max: `${breakpoints[2] - 1}px` },
+      'f-lg': { min: `${breakpoints[2]}px`, max: `${breakpoints[3] - 1}px` },
+      'f-xl': { min: `${breakpoints[3]}px`, max: `${breakpoints[4] - 1}px` },
     },
     extend: {
       colors: {

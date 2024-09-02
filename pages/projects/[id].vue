@@ -181,15 +181,15 @@ watch(
   () => learningPlanStore.loading,
   () => {
     if (!learningPlanStore.loading) {
-      headerStore.title = t('pages.projects.myProjects');
+      headerStore.title = t('pages.projects.my_projects');
       headerStore.items = [
         {
-          title: t('pages.projects.myProjects'),
+          title: t('pages.projects.my_projects'),
           to: '/',
           disabled: true,
         },
         {
-          title: t('pages.projects.myProjects'),
+          title: t('pages.projects.my_projects'),
           to: '/projects/me',
           disabled: false,
         },
