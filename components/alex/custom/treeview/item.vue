@@ -3,21 +3,23 @@
     <div
       v-if="hasChildren"
       :class="[nodeClasses, `pl-${level * 5}`]"
-      @click="toggle"
+      class="d-flex align-center item-content"
     >
-      <v-icon color="gray-600">{{ !isOpen ? openIcon : closeIcon }}</v-icon>
-      {{ item.name }}
+      <v-icon
+        class="cursor-pointer toggle-icon"
+        color="gray-600"
+        @click="toggle"
+        >{{ !isOpen ? openIcon : closeIcon }}</v-icon
+      >
+      <slot v-if="customHeader" name="header" :header="item"></slot>
+      <span v-else>{{ item.name }}</span>
     </div>
-    <div
-      v-else
-      :class="leafClasses"
-      :style="{ paddingLeft: `${(level + 1) * 20}px` }"
-    >
+    <div v-else :class="leafClasses" :style="{ paddingLeft: itemPadding }">
       <slot
         v-if="customSlot"
         name="default"
         :item="item"
-        :level="props.level + 1"
+        :level="level === 1 ? 0 : level + 1"
       ></slot>
       <div v-else>{{ item.name }}</div>
     </div>
@@ -30,6 +32,9 @@
           :level="level + 1"
           v-bind="childProps"
         >
+          <template #header="{ header = child }">
+            <slot name="header" :header="header" />
+          </template>
           <template #default="{ item, level = props.level }">
             <slot
               v-if="customSlot"
@@ -58,8 +63,10 @@ interface TreeItemProps {
   nodeClasses: string;
   transitionComponent: string;
   customSlot: boolean;
+  customHeader: boolean;
   defaultExpand: boolean;
   level: number;
+  flat?: boolean;
 }
 const props = withDefaults(defineProps<TreeItemProps>(), {
   openIcon: 'mdi-chevron-down',
@@ -68,6 +75,7 @@ const props = withDefaults(defineProps<TreeItemProps>(), {
   nodeClasses: '',
   transitionComponent: 'v-slide-x-transition',
   customSlot: false,
+  customHeader: false,
   defaultExpand: false,
   level: 1,
 });
@@ -110,21 +118,20 @@ const children = computed(() => {
   );
   return arrayProp ? props.item[arrayProp] : [];
 });
+
+const itemPadding = computed(() => {
+  if (props.level === 1) {
+    return '16px';
+  } else if (!props.customSlot) {
+    return `${(props.level + 1) * 20}px`;
+  }
+  return '0';
+});
 </script>
 
 <style scoped>
 .tree-item {
   padding-left: 20px;
-}
-
-.item-content {
-  cursor: pointer;
-  padding: 5px 0;
-}
-
-.toggle-icon {
-  display: inline-block;
-  width: 20px;
 }
 
 .item-children {
