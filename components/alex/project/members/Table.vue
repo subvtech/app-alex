@@ -28,7 +28,6 @@
       />
     </div>
     <v-data-iterator
-      v-model:search="searchModel"
       v-model:page="page"
       :items="data"
       :items-per-page="12"
@@ -74,7 +73,7 @@
               </td>
 
               <td>
-                <alex-custom-dropdown :items="items">
+                <alex-custom-dropdown :items="items(item.user.username)">
                   <template #activator="{ props: activeProps }">
                     <alex-custom-button
                       v-bind="activeProps"
@@ -138,14 +137,12 @@ const headers = computed(() => {
   ];
 });
 
-const items = computed(() => {
+const items = (username) => {
   const temp = [
     {
       text: t('components.learningPlan.projects.profile'),
       icon: 'mdi-account-outline',
-      onClick: () => {
-        console.log('see profile');
-      },
+      onClick: () => navigateTo(`/users/${username}`),
     },
   ];
   if (props.canEdit)
@@ -158,7 +155,7 @@ const items = computed(() => {
     });
 
   return temp;
-});
+};
 
 const dialogModelValue = ref(false);
 

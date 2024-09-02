@@ -9,6 +9,7 @@
         :active-filters="selectedFilters"
         @toggle:drawer="handleToggleDrawer"
         @remove:filter="removeFilter"
+        @update:search="updateSearch"
       />
 
       <alex-project-members-drawer
@@ -21,13 +22,22 @@
     </template>
     <template #footer>
       <pre>{{
-        { userIsFacilitator: learningPlanStore.userIsFacilitator }
+        {
+          selectedFilters,
+          userIsFacilitator: learningPlanStore.userIsFacilitator,
+          members: learningPlanStore.activeMembers.map(
+            (member) => member.email,
+          ),
+          activeMembers: activeMembers.map((member) => member.email),
+        }
       }}</pre>
     </template>
   </alex-custom-card>
 </template>
 <script setup lang="ts">
+import { LearningPlanMemberSimple, MemberRoles } from '#imports';
 import { FilterItemProps } from '~/components/alex/project/members/Drawer.vue';
+import { isEnumValue } from '~/utils';
 const { t } = useI18n();
 definePageMeta({
   middleware: 'auth',
@@ -37,7 +47,15 @@ const search = ref('');
 const filterDrawer = ref(false);
 
 const learningPlanStore = useLearningPlanStore();
-const activeMembers = ref(learningPlanStore.activeMembers);
+const activeMembers = ref<LearningPlanMemberSimple[]>([]);
+
+// Watch for changes in the store's activeMembers
+watch(
+  () => learningPlanStore.activeMembers,
+  (newActiveMembers) => {
+    activeMembers.value = newActiveMembers;
+  },
+);
 
 const filters: FilterItemProps[] = [
   {
@@ -60,21 +78,16 @@ const filters: FilterItemProps[] = [
 const selectedFilters = ref<string[]>([]);
 
 const filterMembers = (values) => {
-  const roleValue = values['0'];
-  const statusValue = values['1'];
   selectedFilters.value = [];
-  if (roleValue) {
-    selectedFilters.value.push(roleValue);
-    activeMembers.value = learningPlanStore.activeMembers.filter(
-      (member) => member.role === roleValue,
-    );
-  }
-  if (statusValue) {
-    selectedFilters.value.push(statusValue);
-    activeMembers.value = learningPlanStore.activeMembers.filter(
-      (member) => member.status === statusValue,
-    );
-  }
+  const isThereRole = !!values['0'];
+  const isThereStatus = !!values['1'];
+  if (isThereRole) selectedFilters.value.push(values['0']);
+  if (isThereStatus) selectedFilters.value.push(values['1']);
+  activeMembers.value = learningPlanStore.activeMembers.filter(
+    (member) =>
+      (!isThereRole || member.role === values['0']) &&
+      (!isThereStatus || member.status === values['1']),
+  );
   handleToggleDrawer();
 };
 
@@ -82,15 +95,45 @@ const removeFilter = (key: string) => {
   selectedFilters.value = selectedFilters.value.filter(
     (filter) => filter !== key,
   );
+
+  if (selectedFilters.value.length === 0) {
+    activeMembers.value = learningPlanStore.activeMembers;
+    return;
+  }
   selectedFilters.value.forEach((filter) => {
-    if (filter in MemberStatus)
+    if (isEnumValue(MemberStatus, filter))
       activeMembers.value = learningPlanStore.activeMembers.filter(
         (member) => member.status === filter,
+      );
+    else if (isEnumValue(MemberRoles, filter))
+      activeMembers.value = learningPlanStore.activeMembers.filter(
+        (member) => member.role === filter,
       );
   });
 };
 
 const handleToggleDrawer = () => {
   filterDrawer.value = !filterDrawer.value;
+};
+
+const updateSearch = (value: string) => {
+  const isThereRole =
+    selectedFilters.value.findIndex((filter) =>
+      isEnumValue(MemberRoles, filter),
+    ) !== -1;
+
+  const isThereStatus =
+    selectedFilters.value.findIndex((filter) =>
+      isEnumValue(MemberStatus, filter),
+    ) !== -1;
+  const lowercaseValue = value.toLowerCase();
+  activeMembers.value = learningPlanStore.activeMembers.filter((member) => {
+    return (
+      (!isThereRole || member.role === selectedFilters.value[0]) &&
+      (!isThereStatus || member.status === selectedFilters.value[1]) &&
+      (member.email.toLowerCase().includes(lowercaseValue) ||
+        member.user.fullname.toLowerCase().includes(lowercaseValue))
+    );
+  });
 };
 </script>

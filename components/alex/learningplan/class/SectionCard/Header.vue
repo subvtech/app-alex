@@ -9,6 +9,7 @@
         hide-details
         prepend-inner-icon="mdi-magnify"
         class="max-width-320"
+        @update:model-value="emit('update:search', $event)"
       />
     </v-col>
     <v-col cols="auto" class="d-flex gap-2">
@@ -66,7 +67,7 @@ export interface SectionCardHeaderProps {
   hideSecondaryAction?: boolean;
 }
 
-const emit = defineEmits(['action', 'click:filter']);
+const emit = defineEmits(['action', 'click:filter', 'update:search']);
 const props = withDefaults(defineProps<SectionCardHeaderProps>(), {
   mobileBreakpoint: 600,
 });
