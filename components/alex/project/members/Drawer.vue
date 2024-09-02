@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<Filter>(), {
   kanbanFilter: false,
 });
 
-const selected = ref<string | null[]>(props.filters.map(() => null));
+const selected = ref<(string | null)[]>(props.filters.map(() => null));
 
 const emits = defineEmits(['update:modelValue', 'filter']);
 
@@ -87,7 +87,13 @@ const handleChange = (value: boolean) => {
 };
 
 const filterOut = () => {
-  emits('filter', selected.value);
+  emits(
+    'filter',
+    selected.value.reduce((acc, value, index) => {
+      acc[index] = value;
+      return acc;
+    }, {}),
+  );
 };
 
 const clearFilters = () => {

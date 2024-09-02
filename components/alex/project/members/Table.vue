@@ -15,7 +15,18 @@
       use-mobile-breakpoint
       @click:filter="emit('toggle:drawer')"
     />
-
+    <div v-if="activeFilters.length > 0" class="d-flex gap-2">
+      <alex-custom-chip
+        v-for="(filter, index) in activeFilters"
+        :key="index"
+        :text="filter"
+        status="secondary"
+        variant="outlined"
+        clickable
+        closable
+        @click:close="emit('remove:filter', filter)"
+      />
+    </div>
     <v-data-iterator
       v-model:search="searchModel"
       v-model:page="page"
@@ -62,9 +73,7 @@
                 <alex-custom-chip :text="item.status" :status="'blue'" />
               </td>
 
-              <div
-                class="d-flex flex-grow-1 h-100 w-100 justify-center align-center mt-2"
-              >
+              <td>
                 <alex-custom-dropdown :items="items">
                   <template #activator="{ props: activeProps }">
                     <alex-custom-button
@@ -74,7 +83,7 @@
                     />
                   </template>
                 </alex-custom-dropdown>
-              </div>
+              </td>
             </tr>
           </template>
           <template #bottom="{ pageCount, groupedItems }">
@@ -105,10 +114,13 @@ export interface TableCardProps {
   data: LearningPlanMemberSimple[];
   search: string;
   canEdit?: boolean;
+  activeFilters?: string[];
 }
 
-const props = withDefaults(defineProps<TableCardProps>(), {});
-const emit = defineEmits(['update:search', 'toggle:drawer']);
+const props = withDefaults(defineProps<TableCardProps>(), {
+  activeFilters: () => [],
+});
+const emit = defineEmits(['update:search', 'toggle:drawer', 'remove:filter']);
 const { t } = useI18n();
 const page = ref(1);
 

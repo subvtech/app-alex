@@ -2,11 +2,13 @@
   <alex-custom-card :title="$t('components.profile.projects.title')">
     <template #content>
       <alex-project-members-table
-        :data="learningPlanStore.activeMembers"
+        :data="activeMembers"
         :search="search"
         :title="$t('components.learningPlan.drawer.filter')"
         :can-edit="learningPlanStore.userIsFacilitator"
+        :active-filters="selectedFilters"
         @toggle:drawer="handleToggleDrawer"
+        @remove:filter="removeFilter"
       />
 
       <alex-project-members-drawer
@@ -14,7 +16,7 @@
         v-model="filterDrawer"
         :title="$t('components.learningPlan.drawer.filter')"
         :filters="filters"
-        @filter="(e) => console.log(e)"
+        @filter="filterMembers"
       />
     </template>
     <template #footer>
@@ -33,7 +35,9 @@ definePageMeta({
 
 const search = ref('');
 const filterDrawer = ref(false);
+
 const learningPlanStore = useLearningPlanStore();
+const activeMembers = ref(learningPlanStore.activeMembers);
 
 const filters: FilterItemProps[] = [
   {
@@ -52,6 +56,39 @@ const filters: FilterItemProps[] = [
     items: [MemberStatus.PENDING_INVITATION, MemberStatus.JOINED],
   },
 ];
+
+const selectedFilters = ref<string[]>([]);
+
+const filterMembers = (values) => {
+  const roleValue = values['0'];
+  const statusValue = values['1'];
+  selectedFilters.value = [];
+  if (roleValue) {
+    selectedFilters.value.push(roleValue);
+    activeMembers.value = learningPlanStore.activeMembers.filter(
+      (member) => member.role === roleValue,
+    );
+  }
+  if (statusValue) {
+    selectedFilters.value.push(statusValue);
+    activeMembers.value = learningPlanStore.activeMembers.filter(
+      (member) => member.status === statusValue,
+    );
+  }
+  handleToggleDrawer();
+};
+
+const removeFilter = (key: string) => {
+  selectedFilters.value = selectedFilters.value.filter(
+    (filter) => filter !== key,
+  );
+  selectedFilters.value.forEach((filter) => {
+    if (filter in MemberStatus)
+      activeMembers.value = learningPlanStore.activeMembers.filter(
+        (member) => member.status === filter,
+      );
+  });
+};
 
 const handleToggleDrawer = () => {
   filterDrawer.value = !filterDrawer.value;
