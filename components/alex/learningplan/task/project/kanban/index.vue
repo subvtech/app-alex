@@ -18,7 +18,7 @@
         @title-column-change="handleTitleChange"
         @cancel-column="handleCancelColumn"
         @add-item="console.log($event)"
-        @delete="handleDeleteColumn"
+        @delete="handleConfirmDeleteColumn(column.group)"
         @update-list="handleUpdateList"
         @insert-card="handleInsertCard"
         @sort-start="handleSortStart"
@@ -38,6 +38,19 @@
       <span class="text-body-4 text-gray-800">Adicionar coluna</span>
     </div>
   </SlickList>
+  <alex-custom-confirm-dialog
+    v-model="modalDeleteColumn"
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    :title="confirmDeleteI18.title"
+    :subtitle="confirmDeleteI18.subtitle"
+    variant="error"
+    submit-button-text="Excluir"
+    no-input-confirmation
+    :cancel-button-text="confirmDeleteI18.cancel"
+    :no-submit-button="!!selectedDeleteGroup?.lenght"
+    @submit="handleDeleteColumn"
+    @cancel="modalDeleteColumn = false"
+  />
 </template>
 
 <script
@@ -74,6 +87,20 @@ const items = defineModel<GenericItem<T>[]>('items', {
 const columnItems = ref<Record<string, GenericItem<T>[]>>({});
 const canDrag = ref(true);
 const isDraggingItems = ref(false);
+const modalDeleteColumn = ref(false);
+const selectedDeleteGroup = ref<{ group: string; lenght: number } | null>(null);
+
+// computed
+const confirmDeleteI18 = computed(() => ({
+  title: selectedDeleteGroup.value?.lenght
+    ? 'No momento não é possível excluir esta coluna!'
+    : 'Deseja realmente excluir essa coluna?',
+  subtitle: selectedDeleteGroup.value?.lenght
+    ? 'Para remover esta coluna é necessário que ela esteja vazia. Mova todas as tarefas para outra coluna para realizar essa ação.'
+    : 'Esse processo é irreversível',
+  cancel: selectedDeleteGroup.value?.lenght ? 'Entendi' : 'Cancelar',
+}));
+
 // Methods
 const setCanDrag = (value: boolean) => {
   canDrag.value = value;
@@ -111,9 +138,23 @@ const handleAddColumn = () => {
 const handleCancelColumn = (group: string) => {
   columns.value = columns.value.filter((column) => column.group !== group);
 };
-const handleDeleteColumn = (group: string) => {
-  if (columnItems.value[group].length) return;
-  columns.value = columns.value.filter((column) => column.group !== group);
+const handleConfirmDeleteColumn = (group: string) => {
+  selectedDeleteGroup.value = {
+    group,
+    lenght: columnItems.value[group].length,
+  };
+  modalDeleteColumn.value = true;
+};
+const handleDeleteColumn = () => {
+  if (!selectedDeleteGroup.value) {
+    return;
+  }
+  if (columnItems.value[selectedDeleteGroup.value.group].length) return;
+  columns.value = columns.value.filter(
+    (column) => column.group !== selectedDeleteGroup.value?.group,
+  );
+  selectedDeleteGroup.value = null;
+  modalDeleteColumn.value = false;
 };
 const handleInsertCard = (values: {
   newIndex: number;

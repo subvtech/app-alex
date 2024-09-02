@@ -65,14 +65,19 @@
       <alex-learningplan-task-table-skeleton v-if="learningPlanStore.loading" />
 
       <template v-else>
-        <TransitionGroup name="list">
+        <TransitionGroup
+          v-if="chips.length"
+          name="list"
+          tag="div"
+          class="tw-flex tw-gap-2"
+        >
           <alex-custom-chip
             v-for="chip in chips"
             :key="chip"
             :text="t(`pages.task.filterChip.${chip}`)"
             status="secondary"
             variant="outlined"
-            class="mr-2 bg-gray-blue text-gray-600 text-body-5"
+            class="mr-2 bg-gray-blue text-gray-600 text-body-5 tw-w-fit"
             append-icon="mdi-close"
             clickable
             @click="filterDrawer.removeFilter(chip)"
@@ -101,7 +106,7 @@
         />
       </template>
     </div>
-    <alex-learningplan-task-drawer-filter
+    <alex-learningplan-task-project-filter-tasks
       ref="filterDrawer"
       :model-value="openFilterDrawer"
       @filter="handleFilter"
@@ -111,8 +116,7 @@
 </template>
 <script setup lang="ts">
 export interface filterType {
-  select?: string | null;
-  archivedTasks?: boolean;
+  members?: any[];
   startDate?: {
     start: string | null;
     end: string | null;
@@ -260,7 +264,6 @@ const filteredItems = computed({
     items.value = value;
   },
 });
-
 const filteredItemsBySprint = computed(() => {
   return filteredItems.value.filter(
     (item) => item.sprint_id === selectedSprint.value.id,
