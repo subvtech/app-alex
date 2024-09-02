@@ -80,10 +80,22 @@
       <alex-custom-card title="Encontros" full-width class="flex-1">
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
-            <alex-custom-empty-placeholder
-              :empty-text-message="$t('pages.projects.empty_meetings')"
-              empty-text-image="/svg/EmptyAbout.svg"
-            />
+            <div class="tw-flex tw-gap-1">
+              <div v-for="day in currentWeek" :key="day.value">
+                <alex-custom-button
+                  :variant="
+                    day.value === today.toISOString().split('T')[0]
+                      ? 'primary'
+                      : 'text'
+                  "
+                >
+                  <div class="tw-flex tw-flex-col tw-h-10">
+                    <span>{{ day.name }}</span>
+                    <span>{{ day.date }}</span>
+                  </div>
+                </alex-custom-button>
+              </div>
+            </div>
           </div>
         </template>
       </alex-custom-card>
@@ -115,11 +127,7 @@
       </alex-custom-card>
       <alex-custom-card title="Eventos" full-width class="flex-1">
         <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
-            <alex-custom-empty-placeholder
-              :empty-text-message="$t('pages.projects.empty_events')"
-            />
-          </div>
+          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full"></div>
         </template>
       </alex-custom-card>
     </div>
@@ -159,9 +167,54 @@ const totalizers = ref({
   remainingTime: {
     title: t('pages.projects.remaining_time'),
     icon: 'mdi-calendar-check',
-    value: 0,
+    value: '0 dias',
     percentage: 0,
   },
+});
+
+const steps = ref([
+  {
+    step: 1,
+    title: 'Address',
+    description: 'Add your address here',
+    icon: 'mdi-calendar-check',
+  },
+  {
+    step: 2,
+    title: 'Shipping',
+    description: 'Set your preferred shipping method',
+    icon: 'mdi-calendar-check',
+  },
+  {
+    step: 3,
+    title: 'Payment',
+    description: 'Add any payment information you have',
+    icon: 'mdi-calendar-check',
+  },
+  {
+    step: 4,
+    title: 'Checkout',
+    description: 'Confirm your order',
+    icon: 'mdi-calendar-check',
+  },
+]);
+
+const daysOfWeek = ['Seg', 'Ter', 'Quar', 'Quin', 'Sex', 'Sab', 'Dom'];
+const today = new Date();
+
+const firstDayOfWeek = today.getDate() - today.getDay() + 1;
+
+const currentWeek = Array.from({ length: daysOfWeek.length }, (v, i) => {
+  const date = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    firstDayOfWeek + i,
+  );
+  return {
+    name: daysOfWeek[i],
+    date: date.getDate(),
+    value: date.toISOString().split('T')[0],
+  };
 });
 
 const remainingDays = computed(() => {
@@ -169,7 +222,7 @@ const remainingDays = computed(() => {
   const endDate = new Date(learningPlan.value.end_date);
   const today = new Date();
   const timeDiff = endDate.getTime() - today.getTime();
-  return Math.ceil(timeDiff / (1000 * 3600 * 24));
+  return Math.max(0, Math.ceil(timeDiff / (1000 * 3600 * 24)));
 });
 
 const percentageComplete = computed(() => {
@@ -185,7 +238,7 @@ const percentageComplete = computed(() => {
   const daysRemaining =
     (endDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
 
-  return Math.round((daysRemaining / totalDays) * 100);
+  return Math.max(0, Math.round((daysRemaining / totalDays) * 100));
 });
 
 const fetchData = async () => {
@@ -196,7 +249,7 @@ const fetchData = async () => {
     return navigateTo('/projects/me');
   }
   learningPlan.value = response.data as unknown as LearningPlan;
-  totalizers.value.remainingTime.value = remainingDays.value;
+  totalizers.value.remainingTime.value = `${remainingDays.value} dias`;
   totalizers.value.remainingTime.percentage = percentageComplete.value;
 };
 
