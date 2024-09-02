@@ -1,3 +1,20 @@
 {
-    "myProjects": "Meus Projetos"
-}
+    "projects": "projects",
+    "members": "members",
+    "searchPlaceholder": "Search by Name/Email",
+    "role": "Role",
+    "user": "User",
+    "status": "Status",
+    "collaborator": "Collaborator",
+    "pending": "Pending",
+    "profile": "See profile",
+    "delete": "Delete",
+   "showingData": "Showing %{from} to %{to} of %{total} %{entity}",
+    "invite": {
+      "label": "Invite",
+      "title": "Invite to the Project",
+      "people": "Invite people"
+    }
+  }
+  
+  
