@@ -176,19 +176,40 @@ const sprints = ref([
           position: 0,
           title: 'Task 1',
           start_at: '2024-07-22',
-          finish_at: '2024-08-01',
+          finish_at: '2024-10-01',
           type: 'individual',
           status: 'draft',
           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
         },
         {
-          id: 2,
+          id: 18,
           position: 1,
-          name: 'Story 1',
+          name: 'Epic 1',
           epics: [
             {
-              id: 1,
-              name: 'Epic 1',
+              id: 123,
+              name: 'Story 1',
+              tasks: [
+                {
+                  id: 3,
+                  position: 0,
+                  title: 'Task 2',
+                  start_at: '2024-07-22',
+                  finish_at: '2024-08-01',
+                  type: 'individual',
+                  status: 'draft',
+                  delivered: {
+                    toDo: 1,
+                    completed: 0,
+                    doing: 0,
+                    underReview: 0,
+                  },
+                },
+              ],
+            },
+            {
+              id: 123,
+              name: 'Story 2',
               tasks: [
                 {
                   id: 3,
@@ -234,23 +255,45 @@ const sprints = ref([
         {
           id: 5,
           position: 1,
-          name: 'Story 2',
-          epic: {
-            id: 2,
-            name: 'Epic 2',
-            tasks: [
-              {
-                id: 6,
-                position: 0,
-                title: 'Task 4',
-                start_at: '2024-09-22',
-                finish_at: '2024-11-22',
-                type: 'individual',
-                status: 'draft',
-                delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
+          name: 'Epic 2',
+          epic: [
+            {
+              id: 2,
+              name: 'Story 2',
+              tasks: [
+                {
+                  id: 6,
+                  position: 0,
+                  title: 'Task 4',
+                  start_at: '2024-09-22',
+                  finish_at: '2024-11-22',
+                  type: 'individual',
+                  status: 'draft',
+                  delivered: {
+                    toDo: 1,
+                    completed: 0,
+                    doing: 0,
+                    underReview: 0,
+                  },
+                },
+              ],
+            },
+            {
+              id: 6,
+              position: 1,
+              title: 'Task 23',
+              start_at: '2024-09-01',
+              finish_at: '2024-09-05',
+              type: 'group',
+              status: 'draft',
+              delivered: {
+                toDo: 12,
+                completed: 10,
+                doing: 20,
+                underReview: 30,
               },
-            ],
-          },
+            },
+          ],
         },
       ],
     },
