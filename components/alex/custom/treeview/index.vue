@@ -10,10 +10,14 @@
       :close-icon="closeIcon"
       :transition-component="transition"
       :custom-slot="customSlot"
+      :custom-header="customHeader"
       :default-expand="defaultExpand"
     >
-      <template #default="{ item }">
-        <slot :item="item"></slot>
+      <template #header="{ header }">
+        <slot name="header" :header="header" />
+      </template>
+      <template #default="{ item, level }">
+        <slot :item="item" :level="level"></slot>
       </template>
     </tree-item>
   </div>
@@ -36,6 +40,7 @@ interface TreeViewProps {
    */
   transition?: string;
   customSlot?: boolean;
+  customHeader?: boolean;
   defaultExpand?: boolean;
 }
 

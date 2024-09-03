@@ -49,6 +49,14 @@
               <td>false</td>
             </tr>
             <tr>
+              <td>customHeader</td>
+              <td>Boolean</td>
+              <td class="text-center">
+                <v-icon icon="mdi-checkbox-marked" color="error" />
+              </td>
+              <td>false</td>
+            </tr>
+            <tr>
               <td>closeIcon</td>
               <td>String</td>
               <td class="text-center">
@@ -277,11 +285,7 @@ ${firstExampleScript}
       <strong>default</strong>
     </p>
     <div class="w-100 d-flex">
-      <alex-custom-treeview
-        class="w-100"
-        custom-slot="true"
-        :items="usageItems"
-      >
+      <alex-custom-treeview class="w-100" custom-slot :items="usageItems">
         <template #default="{ item }">
           <div
             class="pa-2 rounded font-weight-bold"
@@ -356,6 +360,92 @@ ${thirdExampleScript}
         </v-window-item>
       </v-window>
     </div>
+    <h2 class="text-h3 text-gray-800">Slots: header</h2>
+    <p class="text-subtitle-2 text-gray-500">
+      Você pode alterar também o conteúdo do header de um item (nó) utilizando o
+      <strong>header</strong>
+    </p>
+    <div class="w-100 d-flex">
+      <alex-custom-treeview
+        class="w-100"
+        default-expand
+        custom-header
+        :items="headerSlotsItems"
+      >
+        <template #header="{ header }">
+          <div
+            class="pa-2 rounded font-weight-bold"
+            :class="`bg-${header.background} text-${header.color} `"
+          >
+            {{
+              `Name: ${header.name} - Color: ${header.color} - Background: ${header.background}`
+            }}
+          </div>
+        </template>
+      </alex-custom-treeview>
+    </div>
+    <div class="w-100">
+      <div
+        class="d-flex align-center justify-space-between w-100 px-3 bg-gray-100 rounded-t"
+      >
+        <alex-custom-tabs
+          v-model="fourthExampleActivePage"
+          :tabs="exampleTabs"
+          color="black"
+        ></alex-custom-tabs>
+        <v-icon icon=" mdi-code-tags" color="gray-600" />
+      </div>
+      <v-window v-model="fourthExampleActivePage" class="w-100">
+        <v-window-item value="1">
+          <div class="bg-grey-lighten-5 pa-3" style="position: relative">
+            <prism class="bg-grey-lighten-5">
+              {{ fourthExampleTemplate }}
+            </prism>
+            <v-btn
+              class="copy-icon"
+              variant="text"
+              color="gray-400"
+              @click="copyToClipboard(fourthExampleTemplate, 'fourthTemplate')"
+            >
+              <v-icon
+                v-if="copiedValue == 'fourthTemplate'"
+                size="x-large"
+                icon="mdi-clipboard-check-multiple-outline"
+                color="green-lighten-1"
+              />
+              <v-icon v-else size="x-large" icon="mdi-content-copy" />
+            </v-btn>
+          </div>
+        </v-window-item>
+        <v-window-item value="2">
+          <div class="bg-grey-lighten-5 pa-3" style="position: relative">
+            <prism class="bg-grey-lighten-5">
+              {{
+                ` 
+&lt;script setup&gt;
+${fourthExampleScript}
+&lt;/script&gt;
+            `
+              }}
+            </prism>
+            <v-btn
+              class="copy-icon"
+              variant="text"
+              color="gray-400"
+              @click="copyToClipboard(fourthExampleScript, 'fourthScript')"
+            >
+              <v-icon
+                v-if="copiedValue == 'fourthScript'"
+                size="x-large"
+                icon="mdi-clipboard-check-multiple-outline"
+                color="green-lighten-1"
+              />
+              <v-icon v-else size="x-large" icon="mdi-content-copy" />
+            </v-btn>
+          </div>
+        </v-window-item>
+      </v-window>
+    </div>
   </v-container>
 </template>
 
@@ -374,6 +464,7 @@ const copiedValue = ref('');
 const firstExampleActivePage = ref('1');
 const secondExampleActivePage = ref('1');
 const thirdExampleActivePage = ref('1');
+const fourthExampleActivePage = ref('1');
 
 const usageItems = [
   {
@@ -472,6 +563,79 @@ const itemsExemplo2 = [
       {
         id: 4,
         name: 'Item 5',
+      },
+    ],
+  },
+];
+
+const headerSlotsItems = [
+  {
+    id: 1,
+    name: 'Item 1',
+    color: 'black',
+    background: 'red',
+    children: [
+      {
+        id: 2,
+        name: 'Item 2',
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Item 3',
+  },
+  {
+    id: 4,
+    name: 'Item 4',
+    color: 'yellow',
+    background: 'purple',
+    someArray: [
+      {
+        id: 5,
+        name: 'Item 5',
+        color: 'purple',
+        background: 'yellow',
+        anotherArray: [
+          {
+            id: 6,
+            name: 'Item 6',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'Item 7',
+    color: 'purple',
+    background: 'white',
+    arrayAleatorio: [
+      {
+        id: 8,
+        name: 'Item 8',
+        color: 'white',
+        background: 'green',
+        maisUmaArray: [
+          {
+            id: 9,
+            name: 'Item 9',
+            color: 'white',
+            background: 'blue',
+            maisUmaArray: [
+              {
+                id: 10,
+                name: 'Item 10',
+              },
+            ],
+            children: [
+              {
+                id: 11,
+                name: 'Item 11',
+              },
+            ],
+          },
+        ],
       },
     ],
   },
@@ -606,7 +770,7 @@ const secondExampleTemplate = ref(
 const thirdExampleTemplate = ref(`
       <alex-custom-treeview
         class="w-100"
-        custom-slot="true"
+        custom-slot
         :items="usageItems"
       >
         <template #default="{ item }">
@@ -690,6 +854,98 @@ const thirdExampleScript = ref(`
   },
 ];
        `);
+
+const fourthExampleTemplate = ref(`
+      <alex-custom-treeview
+        class="w-100"
+        default-expand
+        custom-header
+        :items="item"
+      >
+        <template #header="{ header }">
+          <div
+            class="pa-2 rounded font-weight-bold"
+            :class="bg-item{{ header.background }} text-item{{ header.color }}"
+          >
+            Name: {{ header.name }} - Color: {{ header.color }} - Background: {{ header.background }}
+          </div>
+        </template>
+      </alex-custom-treeview>
+    `);
+
+const fourthExampleScript = ref(`
+const items = [
+  {
+    id: 1,
+    name: 'Item 1',
+    color: 'black',
+    background: 'red',
+    children: [
+      {
+        id: 2,
+        name: 'Item 2',
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Item 3',
+  },
+  {
+    id: 4,
+    name: 'Item 4',
+    color: 'yellow',
+    background: 'purple',
+    someArray: [
+      {
+        id: 5,
+        name: 'Item 5',
+        color: 'purple',
+        background: 'yellow',
+        anotherArray: [
+          {
+            id: 6,
+            name: 'Item 6',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'Item 7',
+    color: 'purple',
+    background: 'white',
+    arrayAleatorio: [
+      {
+        id: 8,
+        name: 'Item 8',
+        color: 'white',
+        background: 'green',
+        maisUmaArray: [
+          {
+            id: 9,
+            name: 'Item 9',
+            color: 'white',
+            background: 'blue',
+            maisUmaArray: [
+              {
+                id: 10,
+                name: 'Item 10',
+              },
+            ],
+            children: [
+              {
+                id: 11,
+                name: 'Item 11',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];`);
 
 const copyToClipboard = async (message, item) => {
   try {
