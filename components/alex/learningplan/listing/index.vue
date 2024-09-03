@@ -193,8 +193,17 @@
             <template #item="{ item }">
               <tr
                 class="table-row text-body-3 text-gray learning-row"
-                :class="{ hidden: item.learningPlan.hidden }"
-                @click="navigate(item.learningPlan.id, 'page')"
+                :class="{
+                  hidden: item.learningPlan.hidden,
+                  'tw-grayscale tw-opacity-40': !isAvailable(
+                    item.learningPlan.id,
+                  ),
+                }"
+                @click="
+                  isAvailable(item.learningPlan.id)
+                    ? navigate(item.learningPlan.id, 'page')
+                    : displayUnavailable()
+                "
               >
                 <td class="max-width-[596px]">
                   <div class="d-flex align-center">
