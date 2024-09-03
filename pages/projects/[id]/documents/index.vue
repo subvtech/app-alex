@@ -660,6 +660,7 @@ watch(
       {
         title: 'Home',
         disabled: true,
+        to: '/',
       },
       {
         title: 'Projetos',
