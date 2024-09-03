@@ -1,8 +1,10 @@
 <script setup lang="tsx">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { get } from '@/utils/get';
+import { Card, CardContent } from '@/components/ui/card';
 import emptyImage from '@/assets/svg/empty-journey.svg';
+import { get } from '@/utils/get';
 
 const { t } = useI18n();
 const { findOne } = useStrapi();
@@ -41,9 +43,11 @@ const fetchMembers = async () => {
       { populate: ['members.user'] },
     );
 
-    members.value = res.data.attributes.members.data.map(
-      get('attributes.user.data.attributes'),
-    );
+    const getUser = get<Strapi4ResponseData<User>>('attributes.user.data');
+    members.value = res.data.attributes.members.data.map((r) => {
+      const { id, attributes: user } = getUser(r);
+      return { ...user, id };
+    });
   } catch (_) {
     hasError.value = true;
   } finally {
@@ -96,7 +100,14 @@ onMounted(fetchMembers);
             :key="user.id"
             :class="cardClass"
           >
-            <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6">
+            <CardContent
+              class="tw-flex tw-flex-col tw-gap-6 tw-pt-6"
+              @click="
+                navigateTo(
+                  `/projects/${route.params.id}/individual_learning/${user.id}`,
+                )
+              "
+            >
               <div class="tw-flex tw-items-center tw-gap-6">
                 <v-avatar :size="48" color="gray-100">
                   <template #default>
