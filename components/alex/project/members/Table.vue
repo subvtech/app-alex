@@ -1,20 +1,27 @@
 <template>
   <div class="d-flex flex-column w-100">
     <alex-learningplan-class-section-card-header
-      v-model:dialog-model="dialogModelValue"
       v-model:search-model="searchModel"
       action-icon="mdi-account"
       :action-text="$t('components.learningPlan.projects.invite.label')"
-      :dialog-title="$t('components.learningPlan.projects.invite.title')"
-      :dialog-action-text="$t('components.learningPlan.projects.invite.label')"
-      :dialog-action-disabled="false"
-      :dialog-action-loading="false"
       :search-placeholder="
         $t('components.learningPlan.projects.searchPlaceholder')
       "
       use-mobile-breakpoint
+      use-custom-dialog
       @click:filter="emit('toggle:drawer')"
-    />
+    >
+      <template #custom-dialog
+        ><alex-project-members-invite-dialog
+          v-model:dialog-model="dialogModelValue"
+          :dialog-title="$t('components.learningPlan.projects.invite.title')"
+          :dialog-action-text="
+            $t('components.learningPlan.projects.invite.label')
+          "
+          :dialog-action-disabled="false"
+          :dialog-action-loading="false"
+      /></template>
+    </alex-learningplan-class-section-card-header>
     <div v-if="activeFilters.length > 0" class="d-flex gap-2">
       <alex-custom-chip
         v-for="(filter, index) in activeFilters"

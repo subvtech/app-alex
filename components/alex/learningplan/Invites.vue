@@ -1,5 +1,5 @@
 <template>
-  <div class="relative mt-4">
+  <div class="relative">
     <p class="text-body-1 text-gray-800">{{ className }}</p>
     <div
       class="invite justify-space-between my-2"
@@ -58,14 +58,14 @@
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
 
-type InviteProps = {
+export interface InviteProps {
   duration: number;
   classId: number;
   courseId: number;
   data?: InvitationLinkSimple | null;
   dark?: boolean;
   className: string;
-};
+}
 
 const props = withDefaults(defineProps<InviteProps>(), {
   dark: false,

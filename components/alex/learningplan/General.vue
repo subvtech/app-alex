@@ -106,7 +106,7 @@
             <p class="text-gray-800 text-h5 pb-6">
               {{ $t('components.courses.invites.title') }}
             </p>
-            <div v-if="learningPlan.invite_enabled">
+            <div v-if="learningPlan.invite_enabled" class="mt-4">
               <alex-learningplan-invites
                 v-for="classItem in learningPlanClasses"
                 :key="classItem.id"

@@ -1,20 +1,23 @@
 {
-    "projects": "projetos",
-    "members": "membros",
-    "searchPlaceholder": "Pesquisar por Nome/Email",
-    "role": "Papel",
-    "user": "Usuário",
-    "status": "Status",
-    "collaborator": "Colaborador",
-    "pending": "Pendente",
-    "profile": "Ver perfil",
-    "delete": "Deletar",
-    "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
-    "invite": {
-      "label": "Convidar",
-      "title": "Convidar para o Projeto",
-      "people": "Convidar pessoas"
-    }
+  "projects": "projetos",
+  "members": "membros",
+  "searchPlaceholder": "Pesquisar por Nome/Email",
+  "role": "Papel",
+  "user": "Usuário",
+  "status": "Status",
+  "collaborator": "Colaborador",
+  "pending": "Pendente",
+  "profile": "Ver perfil",
+  "delete": "Deletar",
+  "showingData": "Mostrando do %{from} ao %{to} de um total de %{total} %{entity}",
+  "invite": {
+    "label": "Convidar",
+    "title": "Convidar para o Projeto",
+    "people": "Convidar pessoas",
+    "search": "Buscar pessoas",
+    "subtitle": "Papel ao entrar na plataforma",
+    "description": "Configuração de papéis por convite",
+    "noData": "Busque usuários para adicionar ao projeto.",
+    "submit": "Enviar"
   }
-  
-  
+}

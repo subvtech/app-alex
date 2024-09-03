@@ -2,7 +2,11 @@
   <div class="alex-autocomplete" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
-      <p class="text-body-1" :class="`text-${textColor}`">
+      <p
+        :class="`${
+          thickerLabel ? 'text-body-2' : 'text-body-1'
+        } text-${textColor}`"
+      >
         {{ label }}
       </p>
       <v-icon
@@ -53,6 +57,7 @@ import { YupSchema, useField } from 'vee-validate';
 interface AutoCompleteProps {
   name: string;
   label?: string;
+  thickerLabel?: boolean;
   required?: boolean;
   info?: string;
   disabled?: boolean;
