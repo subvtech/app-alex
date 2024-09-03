@@ -108,9 +108,8 @@
     </div>
     <alex-learningplan-task-project-filter-tasks
       ref="filterDrawer"
-      :model-value="openFilterDrawer"
+      v-model="openFilterDrawer"
       @filter="handleFilter"
-      @update:model-value="(value) => (openFilterDrawer = value)"
     />
   </div>
 </template>
