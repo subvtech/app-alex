@@ -366,9 +366,11 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
     if (member.learning_plan_member?.user) {
       users.push(member.learning_plan_member?.user);
     } else if (member.learning_plan_group?.group_members) {
-      member.learning_plan_group?.group_members.forEach((member) =>
-        users.push(member.student_member.user),
-      );
+      member.learning_plan_group?.group_members.forEach((member) => {
+        if (member.student_member?.user) {
+          users.push(member.student_member.user);
+        }
+      });
     }
   });
 
