@@ -187,7 +187,7 @@ import { Document } from '@/models/document';
 import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 
 const learningPlanStore = useLearningPlanStore();
-const headerStore = usePageHeaderStore();
+// const headerStore = usePageHeaderStore();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
@@ -646,8 +646,8 @@ const getFolders = () => {
 
   folders.value = learningPlanStore.learningPlan?.document_folders || [];
 
-  headerStore.title = 'Projetos';
-  headerStore.items = [
+  // headerStore.title = 'Projetos';
+  // headerStore.items = [
     // {
     //   title: 'Home',
     //   disabled: true,
@@ -660,11 +660,11 @@ const getFolders = () => {
     //   title: learningPlanStore.learningPlan.title,
     //   to: `/courses/${learningPlanStore.learningPlan.id}`,
     // },
-  ];
+  // ];
 };
 
 onBeforeMount(() => {
-  headerStore.showHeader = true;
+  // headerStore.showHeader = true;
 });
 
 onMounted(() => {
