@@ -1,11 +1,19 @@
 <template>
   <div class="d-flex bg-white flex-grow-1 flex-column rounded-lg">
     <div
-      v-if="query.data?.value.data.length === 0"
+      v-if="
+        customDataLoading !== undefined
+          ? customDataRef?.courseProjects?.length === 0
+          : query.data?.value.data.length === 0
+      "
       class="tw-flex-1 d-flex align-center justify-center flex-column pa-6"
     >
       <v-progress-circular
-        v-if="query.isFetching.value"
+        v-if="
+          customDataLoading !== undefined
+            ? customDataLoading
+            : query.isFetching.value
+        "
         color="accent"
         indeterminate
         :size="100"
@@ -132,7 +140,7 @@
               :institution="
                 item.learningPlan.type === 'course'
                   ? undefined
-                  : item.learningPlan.institutions![0]
+                  : item.learningPlan.institutions?.[0]
               "
               :facilitator="{
                 name: item.facilitator?.user?.fullname || '',
@@ -146,6 +154,7 @@
               "
               :members="getUrlNameMembers(item.learningPlan.members)"
               :hide="item.learningPlan.hidden"
+              :unavailable="!isAvailable(item.learningPlan.id)"
               :trails-count="
                 item.learningPlan.type === 'course'
                   ? item.trails.count
@@ -165,7 +174,11 @@
                 })
               "
               @configurations="navigate(item.learningPlan.id, 'settings')"
-              @open="navigate(item.learningPlan.id, 'page')"
+              @open="
+                isAvailable(item.learningPlan.id)
+                  ? navigate(item.learningPlan.id, 'page')
+                  : displayUnavailable()
+              "
             />
           </div>
           <v-data-table
@@ -180,8 +193,17 @@
             <template #item="{ item }">
               <tr
                 class="table-row text-body-3 text-gray learning-row"
-                :class="{ hidden: item.learningPlan.hidden }"
-                @click="navigate(item.learningPlan.id, 'page')"
+                :class="{
+                  hidden: item.learningPlan.hidden,
+                  'tw-grayscale tw-opacity-40': !isAvailable(
+                    item.learningPlan.id,
+                  ),
+                }"
+                @click="
+                  isAvailable(item.learningPlan.id)
+                    ? navigate(item.learningPlan.id, 'page')
+                    : displayUnavailable()
+                "
               >
                 <td class="max-width-[596px]">
                   <div class="d-flex align-center">
@@ -314,19 +336,23 @@ interface Item {
 }
 interface ListingProps {
   type: LearningPlanSimple['type'];
+  // For custom listing
+  customData?: LearningPlanData[];
+  customDataLoading?: boolean;
 }
 type FilterTitle<T> = { [P in keyof T]: { title: string; value?: T[P] } };
 const props = defineProps<ListingProps>();
 const { t } = useI18n();
+const { setMessage } = useMessageStore();
 const user = useStrapiUser<User>();
 const query = useGetMyLearningPlan(props.type, user.value?.id);
 const search = ref('');
 const page = ref(1);
 const tableRef = ref(null);
-
 const learningPlanView = ref('grid');
 const direction = useDirection();
 const filterDrawer = ref(false);
+const customDataRef = ref<undefined | any>(undefined);
 const filters = ref<FilterTitle<LearningPlanFilter>>({
   facilitator: {
     title: t('pages.classes.filter.facilitator'),
@@ -356,7 +382,6 @@ const filterRef = ref<null | {
 }>(null);
 const { mutateAsync: changeItemVisibility } = useUpdateVisibility();
 
-// Computed values
 const isSingleColumn = computed(() => direction.value !== 'VERTICAL');
 const isProfessor = computed(() => {
   return user.value?.role?.type === UserRoles.PROFESSOR;
@@ -380,14 +405,19 @@ const hasFilters = computed(() => {
   return hasFilter;
 });
 //      Filters
-const filteredByFacilitator = computed(
-  () =>
-    query.data?.value.data.filter((data) =>
+const filteredByFacilitator = computed(() => {
+  const data = customDataRef.value
+    ? customDataRef.value?.courseProjects
+    : query.data?.value.data || [];
+
+  return (
+    data?.filter((data) =>
       filters.value.facilitator.value?.id
-        ? data.facilitator?.user.id === filters.value.facilitator.value?.id
+        ? data?.facilitator?.user.id === filters.value.facilitator.value?.id
         : true,
-    ),
-);
+    ) || []
+  );
+});
 const filteredByDate = computed(() =>
   filteredByFacilitator.value.filter((data) => {
     const isInStartDateRange = checkIntervalOfDates(
@@ -418,7 +448,6 @@ const filteredByCompetences = computed(() =>
     return hasCompetence;
   }),
 );
-
 const filteredByInstitutions = computed(() =>
   filteredByCompetences.value.filter((data) => {
     if (!filters.value.institution.value) {
@@ -498,6 +527,20 @@ const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
 const itemsPerPageValue = 12;
 
 // Functions
+const isAvailable = (id: number) => {
+  return customDataRef.value?.yourProjects
+    ? customDataRef.value.yourProjects.includes(id)
+    : true;
+};
+
+const displayUnavailable = () => {
+  setMessage(
+    t('components.learningPlan.card.notProjectMember'),
+    'warning',
+    true,
+  );
+};
+
 const changeViewMode = () => {
   learningPlanView.value = learningPlanView.value === 'grid' ? 'table' : 'grid';
 };
@@ -628,6 +671,14 @@ onBeforeMount(() => {
     });
   }
 });
+
+watch(
+  () => props.customData,
+  (value) => {
+    customDataRef.value = value;
+  },
+);
+
 defineExpose({ query });
 </script>
 

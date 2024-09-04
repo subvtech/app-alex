@@ -50,6 +50,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'meeting_schedules.meetings',
       ],
     },
+    projects: {
+        populate: ['members', 'members.user.avatar', 'members.user.cover'],
+    },
     tags: true,
     schedules: {
       populate: ['meetings'],

@@ -164,6 +164,11 @@ const generalLinks = computed<TabType[]>(() => [
     value: 3,
     to: `/courses/${learningPlanId.value}/class`,
   },
+  {
+    label: i18n.t('pages.courses.projects'),
+    value: 4,
+    to: `/courses/${learningPlanId.value}/projects`,
+  },
   ...(learningPlanStore.userIsFacilitator
     ? [
         {
