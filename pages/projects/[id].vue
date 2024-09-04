@@ -81,29 +81,30 @@ const isSettingsRoutePath = computed(() => {
 });
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const pageRoute = computed(() => route.name);
+
 const generalLinks = computed<TabType[]>(() => [
   {
-    label: 'Painel',
+    label: t('pages.projects.overview'),
     value: 0,
     to: `/projects/${learningPlanId.value}`,
   },
   {
-    label: 'Documentos',
+    label: t('pages.projects.documents'),
     value: 1,
     to: `/projects/${learningPlanId.value}/documents`,
   },
   {
-    label: 'Tarefas',
+    label: t('pages.projects.tasks'),
     value: 2,
     to: `/projects/${learningPlanId.value}/tasks`,
   },
   {
-    label: 'Integrantes',
+    label: t('pages.projects.members'),
     value: 3,
     to: `/projects/${learningPlanId.value}/members`,
   },
   {
-    label: 'Jornada Individual',
+    label: t('pages.projects.individual_learning'),
     value: 4,
     to: `/projects/${learningPlanId.value}/individual_learning`,
   },
@@ -183,11 +184,6 @@ watch(
     if (!learningPlanStore.loading) {
       headerStore.title = t('pages.projects.my_projects');
       headerStore.items = [
-        {
-          title: t('pages.projects.my_projects'),
-          to: '/',
-          disabled: true,
-        },
         {
           title: t('pages.projects.my_projects'),
           to: '/projects/me',

@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from 'vue';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import emptyImage from '@/assets/svg/empty-journey.svg';
 import { get } from '@/utils/get';
 
 const { t } = useI18n();
@@ -11,7 +10,7 @@ const { findOne } = useStrapi();
 const route = useRoute();
 
 const hasError = ref(false);
-const loading = ref(false);
+const loading = ref(true);
 const members = ref<User[]>([]);
 const search = ref('');
 
@@ -34,6 +33,12 @@ const filteredMembers = computed(() => {
   });
 });
 
+const emptyMessage = computed(() => {
+  return hasError.value
+    ? t('errors.default')
+    : t('pages.projects.empty_members');
+});
+
 const fetchMembers = async () => {
   loading.value = true;
 
@@ -53,23 +58,6 @@ const fetchMembers = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const EmptyState = () => {
-  const emptyMessage = t(
-    hasError.value ? 'errors.default' : 'pages.projects.empty_members',
-  );
-
-  return (
-    <div class="tw-flex tw-flex-col tw-m-auto tw-items-center tw-justify-center tw-gap-6">
-      <img
-        class="tw-max-h-[360px] tw-max-w-[400px] tw-w-[240px]"
-        src={emptyImage}
-        alt={emptyMessage}
-      />
-      <p class="tw-text-xl tw-opacity-45 tw-mt-4">{emptyMessage}</p>
-    </div>
-  );
 };
 
 onMounted(fetchMembers);
@@ -94,7 +82,11 @@ onMounted(fetchMembers);
           :placeholder="$t('pages.projects.search_member')"
         />
         <div class="tw-flex tw-flex-wrap">
-          <EmptyState v-if="!filteredMembers.length" class="tw-mt-6" />
+          <EmptyState
+            v-if="!filteredMembers.length"
+            :empty-message="emptyMessage"
+            class="tw-mt-6"
+          />
           <Card
             v-for="user in filteredMembers"
             :key="user.id"
@@ -155,7 +147,7 @@ onMounted(fetchMembers);
             />
           </div>
         </div>
-        <EmptyState v-else />
+        <EmptyState v-else :empty-message="emptyMessage" />
       </template>
     </div>
   </div>
