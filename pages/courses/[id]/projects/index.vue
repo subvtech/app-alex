@@ -17,8 +17,39 @@ const { find } = useStrapiUtils();
 const learningPlanData = ref<any | undefined>(undefined);
 const yourProjects = ref<number[]>([]);
 
+const setProjects = () => {
+  if (learningPlanStore.loading) {
+    return;
+  }
+
+  const data =
+    learningPlanStore.learningPlan?.projects.map(
+      (project: LearningPlanSimple) => ({
+        learningPlan: project,
+        facilitator: project.members?.find(
+          (m) => m.role === MemberRoles.FACILITATOR,
+        ),
+        leader: project.members?.find((m) => m.role === MemberRoles.LEADER),
+        trails: {
+          count:
+            project.learning_structures?.flatMap(
+              (structure) => structure.trails,
+            ).length || 0,
+        },
+      }),
+    ) || [];
+
+  learningPlanData.value = {
+    courseProjects: data,
+    yourProjects: yourProjects.value,
+  };
+};
+
 onBeforeMount(async () => {
+  setProjects();
+
   const id = userStore.value?.id;
+
   if (!id) {
     return;
   }
@@ -42,33 +73,7 @@ onBeforeMount(async () => {
 
 watch(
   () => learningPlanStore.loading,
-  () => {
-    if (learningPlanStore.loading) {
-      return;
-    }
-
-    const data =
-      learningPlanStore.learningPlan?.projects.map(
-        (project: LearningPlanSimple) => ({
-          learningPlan: project,
-          facilitator: project.members?.find(
-            (m) => m.role === MemberRoles.FACILITATOR,
-          ),
-          leader: project.members?.find((m) => m.role === MemberRoles.LEADER),
-          trails: {
-            count:
-              project.learning_structures?.flatMap(
-                (structure) => structure.trails,
-              ).length || 0,
-          },
-        }),
-      ) || [];
-
-    learningPlanData.value = {
-      courseProjects: data,
-      yourProjects: yourProjects.value,
-    };
-  },
+  () => setProjects(),
 );
 
 watch(yourProjects, (val) => {
