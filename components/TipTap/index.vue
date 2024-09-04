@@ -6,7 +6,10 @@
       class="rounded-lg w-100 tw-transition-opacity"
       :class="{ 'tw-opacity-0': isLoading }"
     >
-      <div v-if="showMenuBar" :class="!fixedMenu ? 'bubble-menu-wrapper' : ''">
+      <div
+        v-if="showMenuBar && edit"
+        :class="!fixedMenu ? 'bubble-menu-wrapper' : ''"
+      >
         <tip-tap-menus-bubble
           :editor="editor"
           :fixed-menu-bar="fixedMenu"
@@ -190,23 +193,26 @@ const getTipTapToken = async (userID: number | undefined) => {
 };
 
 onMounted(async () => {
-  isLoading.value = props.showLoader;
   const user = useStrapiUser();
-  const TipTapToken = await getTipTapToken(user.value?.id);
-  setAvailableBlocks(props.allowedBlocks);
-  const provider = new TiptapCollabProvider({
-    name: props.docName, // Unique document identifier for syncing. This is your document name.
-    appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
-    token: TipTapToken, // Your JWT token
-    document: doc,
-    // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
-    onSynced() {
-      if (!doc.getMap('config').get('initialContentLoaded') && editor) {
-        doc.getMap('config').set('initialContentLoaded', true);
-      }
-      isLoading.value = false;
-    },
-  });
+  let provider;
+  if (props.collaboration) {
+    isLoading.value = props.showLoader;
+    const TipTapToken = await getTipTapToken(user.value?.id);
+    setAvailableBlocks(props.allowedBlocks);
+    provider = new TiptapCollabProvider({
+      name: props.docName, // Unique document identifier for syncing. This is your document name.
+      appId: app.$config.public.tipTapAppId, // Your Cloud Dashboard AppID or `baseURL` for on-premises
+      token: TipTapToken, // Your JWT token
+      document: doc,
+      // The onSynced callback ensures initial content is set only once using editor.setContent(), preventing repetitive content loading on editor syncs.
+      onSynced() {
+        if (!doc.getMap('config').get('initialContentLoaded') && editor) {
+          doc.getMap('config').set('initialContentLoaded', true);
+        }
+        isLoading.value = false;
+      },
+    });
+  }
 
   const setCollaborationExtensions = (): AnyExtension[] => [
     ...(props.collaboration

@@ -108,6 +108,8 @@ const confirmData = ref<any | undefined>(undefined);
 
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
+const learningPlanStore = useLearningPlanStore();
+const isFacilitator = computed(() => learningPlanStore.userIsFacilitator);
 
 const isDragging = () => {
   const isDraggingCard = document.querySelector(
@@ -125,7 +127,11 @@ const handleInsertCard = (values: {
   const cameFrom = values.value.status;
   const to = values.group;
 
-  if (cameFrom === 'in_review' && !values.value.task?.can_change_from_review) {
+  if (
+    cameFrom === 'in_review' &&
+    !values.value.task?.can_change_from_review &&
+    !isFacilitator.value
+  ) {
     setMessage(
       t('components.learningPlan.drawer.task.status.move.warning'),
       'warning',
