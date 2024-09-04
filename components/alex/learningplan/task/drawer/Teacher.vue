@@ -316,7 +316,9 @@ watch(model, (value) => {
     startDate.value = props.startDate;
     endDate.value = props.endDate;
     restrictions.value = props.restrictions;
-    isFirstTimeOpened.value = false;
+    setTimeout(() => {
+      isFirstTimeOpened.value = false;
+    }, 200);
     return;
   }
   isFirstTimeOpened.value = true;
