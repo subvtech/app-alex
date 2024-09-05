@@ -78,6 +78,10 @@ export default defineNuxtConfig({
         from: 'vue-slicksort',
         imports: ['SlickList', 'SlickItem'],
       },
+      {
+        from: '@infectoone/vue-ganttastic',
+        imports: ['GGanttChart', 'GGanttRow'],
+      },
     ],
   },
 });

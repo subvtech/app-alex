@@ -41,39 +41,19 @@
     </div>
 
     <div class="tw-flex tw-space-x-4 tw-mb-5">
-      <alex-custom-card title="Linha temporal" class="!tw-w-2/3">
-        <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
-            <alex-custom-empty-placeholder />
-          </div>
-        </template>
-      </alex-custom-card>
-      <alex-custom-card title="Progresso de tarefas" class="!tw-w-1/3">
-        <template #content>
-          <div class="tw-flex tw-flex-col tw-items-center">
-            <BarChart
-              class="!tw-w-full"
-              index="name"
-              :data="data"
-              :categories="['total', 'predicted']"
-              :colors="['#B9BFC6', '#F1F1F1']"
-              :y-formatter="
-                (tick, i) => {
-                  return typeof tick === 'number'
-                    ? `$ ${new Intl.NumberFormat('us').format(tick).toString()}`
-                    : '';
-                }
-              "
-              :type="'stacked'"
-            />
-            <span>{{ $t('pages.projects.empty_task_progress') }}</span>
-            <span class="tw-text-sm tw-text-gray-500">
-              {{ $t('pages.projects.last_update') }}
-              {{ learningPlan?.start_date ?? 'N/A' }}
-            </span>
-          </div>
-        </template>
-      </alex-custom-card>
+      <alex-learningplan-charts-gantt
+        class="!tw-w-2/3"
+        :precision="precision"
+        start-date="2024-07-11 12:00"
+        end-date="2024-11-30 12:00"
+        :sprints="sprints"
+      />
+      <alex-learningplan-charts-task-progress
+        class="!tw-w-1/3"
+        :categories="['total', 'predicted']"
+        last-update="2024-07-11 12:00"
+        :data="data"
+      />
     </div>
 
     <div class="tw-flex tw-space-x-4">
@@ -81,7 +61,7 @@
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <div class="tw-flex tw-gap-1">
-              <div v-for="day in currentWeek" :key="day.value">
+              <div v-for="day in currentWeek" :key="day.value" class="">
                 <alex-custom-button
                   :variant="
                     day.value === today.toISOString().split('T')[0]
@@ -96,6 +76,10 @@
                 </alex-custom-button>
               </div>
             </div>
+            <alex-custom-empty-placeholder
+              :empty-text-message="$t('pages.projects.empty_meetings')"
+              empty-text-image="/svg/EmptyInstitutional.svg"
+            />
           </div>
         </template>
       </alex-custom-card>
@@ -113,9 +97,9 @@
               :id="institution.id"
               :key="institution.id"
               class="tw-cursor-pointer"
-              :name="institution.name"
-              :acronym="institution.acronym"
-              :sector="institution.sector"
+              :name="institution.attributes.name"
+              :acronym="institution.attributes.acronym"
+              :sector="institution.attributes.sector"
             />
             <alex-custom-empty-placeholder
               v-if="institutions.length === 0"
@@ -127,7 +111,12 @@
       </alex-custom-card>
       <alex-custom-card title="Eventos" full-width class="flex-1">
         <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full"></div>
+          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
+            <alex-custom-empty-placeholder
+              :empty-text-message="$t('pages.projects.empty_meetings')"
+              empty-text-image="/svg/EmptyInstitutional.svg"
+            />
+          </div>
         </template>
       </alex-custom-card>
     </div>
@@ -136,14 +125,53 @@
 
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart } from '@/components/ui/chart-bar';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+import {
+  Sprint,
+  PrecisionGantt,
+} from '~/components/alex/learningplan/charts/Gantt.vue';
+
+interface Data {
+  sprints: Sprint[];
+  counters: {
+    epicCount: number;
+    storyCount: number;
+    totalSprints: number;
+    remainingDays: number;
+  };
+  tasksSprint: Task[];
+}
+
 const { t } = useI18n();
-const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
+const { findOne, find } = useStrapi();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const learningPlan = ref<LearningPlan>();
-const institutions = ref<Institution[]>([]);
-const data = ref([]);
+const institutions = ref<Strapi4ResponseData<Institution>[]>([]);
+const precision = ref<PrecisionGantt>('week');
+const sprints = ref<Sprint[]>([]);
+const data = ref([
+  {
+    name: 'Jan',
+    total: Math.floor(Math.random() * 2000) + 500,
+    predicted: Math.floor(Math.random() * 2000) + 500,
+  },
+  {
+    name: 'Feb',
+    total: Math.floor(Math.random() * 2000) + 500,
+    predicted: Math.floor(Math.random() * 2000) + 500,
+  },
+  {
+    name: 'Mar',
+    total: Math.floor(Math.random() * 2000) + 500,
+    predicted: Math.floor(Math.random() * 2000) + 500,
+  },
+  {
+    name: 'Apr',
+    total: Math.floor(Math.random() * 2000) + 500,
+    predicted: Math.floor(Math.random() * 2000) + 500,
+  },
+]);
 
 const totalizers = ref({
   sprints: {
@@ -172,39 +200,12 @@ const totalizers = ref({
   },
 });
 
-const steps = ref([
-  {
-    step: 1,
-    title: 'Address',
-    description: 'Add your address here',
-    icon: 'mdi-calendar-check',
-  },
-  {
-    step: 2,
-    title: 'Shipping',
-    description: 'Set your preferred shipping method',
-    icon: 'mdi-calendar-check',
-  },
-  {
-    step: 3,
-    title: 'Payment',
-    description: 'Add any payment information you have',
-    icon: 'mdi-calendar-check',
-  },
-  {
-    step: 4,
-    title: 'Checkout',
-    description: 'Confirm your order',
-    icon: 'mdi-calendar-check',
-  },
-]);
-
 const daysOfWeek = ['Seg', 'Ter', 'Quar', 'Quin', 'Sex', 'Sab', 'Dom'];
 const today = new Date();
 
 const firstDayOfWeek = today.getDate() - today.getDay() + 1;
 
-const currentWeek = Array.from({ length: daysOfWeek.length }, (v, i) => {
+const currentWeek = Array.from({ length: daysOfWeek.length }, (_, i) => {
   const date = new Date(
     today.getFullYear(),
     today.getMonth(),
@@ -217,43 +218,36 @@ const currentWeek = Array.from({ length: daysOfWeek.length }, (v, i) => {
   };
 });
 
-const remainingDays = computed(() => {
-  if (!learningPlan.value?.end_date) return 0;
-  const endDate = new Date(learningPlan.value.end_date);
-  const today = new Date();
-  const timeDiff = endDate.getTime() - today.getTime();
-  return Math.max(0, Math.ceil(timeDiff / (1000 * 3600 * 24)));
-});
-
-const percentageComplete = computed(() => {
-  if (!learningPlan.value?.end_date || !learningPlan.value?.start_date)
-    return 0;
-
-  const endDate = new Date(learningPlan.value.end_date);
-  const startDate = new Date(learningPlan.value.start_date);
-  const today = new Date();
-
-  const totalDays =
-    (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
-  const daysRemaining =
-    (endDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
-
-  return Math.max(0, Math.round((daysRemaining / totalDays) * 100));
-});
-
-const fetchData = async () => {
-  const response = await learningPlanStore.loadLearningPlan(
+const getLearningPlan = async () => {
+  const response = await findOne<LearningPlan>(
+    'learningplans',
     learningPlanId.value,
+    {
+      populate: '*',
+    },
   );
   if (!response?.data) {
     return navigateTo('/projects/me');
   }
-  learningPlan.value = response.data as unknown as LearningPlan;
-  totalizers.value.remainingTime.value = `${remainingDays.value} dias`;
-  totalizers.value.remainingTime.percentage = percentageComplete.value;
+  console.log(response);
+  learningPlan.value = response.data.attributes as never;
+  institutions.value = response.data.attributes.institutions.data as never;
+};
+const fetchData = async () => {
+  const response = (await find<Data>(
+    `sprints/project/${learningPlanId.value}`,
+  )) as unknown as Data;
+
+  console.log(response);
+  totalizers.value.epics.value = response.counters.epicCount;
+  totalizers.value.sprints.value = response.counters.totalSprints;
+  totalizers.value.stories.value = response.counters.storyCount;
+  totalizers.value.remainingTime.value = `${response.counters.remainingDays} dias`;
+  sprints.value = response.sprints;
 };
 
 onBeforeMount(async () => {
+  await getLearningPlan();
   await fetchData();
 });
 </script>
