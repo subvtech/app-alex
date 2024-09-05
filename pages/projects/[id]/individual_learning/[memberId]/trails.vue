@@ -14,12 +14,6 @@ const showAddTrailDialog = ref(false);
 
 const ITEMS_PER_PAGE = 12;
 
-const learningStructureId = computed(() => {
-  const structures = learningPlanStore.learningPlan?.learning_structures || [];
-  const structure = structures.find((v) => v.type === 'standard');
-  return structure?.id || 0;
-});
-
 const trails = computed<TrailSimple[]>(() => {
   return (
     learningPlanStore.standardTrails?.map((trail) => {
@@ -65,22 +59,21 @@ const navigate = (trailId: number, page?: string) => {
   );
 };
 
-const handleCreatedTrail = async (id: number) => {
-  const newTrail = await findOne('trails', id, {
-    populate: ['cover_image', 'structures.blocks'],
-  });
-  learningPlanStore.standardTrails.unshift(newTrail.data as TrailSimple);
+const handleTrailCreate = async (trailId: number) => {
+  const populate = ['cover_image', 'structures.blocks'];
+  const trail = await findOne('trails', trailId, { populate });
+  learningPlanStore.standardTrails.unshift(trail.data as TrailSimple);
   showAddTrailDialog.value = false;
 };
 </script>
 
 <template>
   <div
-    class="tw-flex tw-flex-1 tw-flex-col tw-bg-white tw-rounded-lg tw-p-6 wrapper"
+    class="tw-flex tw-flex-1 tw-flex-col tw-bg-white tw-rounded-lg tw-p-6 tw-min-h-[500px]"
   >
     <div
-      class="d-flex flex-wrap w-100 gap-4 gap-sm-1"
-      :class="!trails.length ? 'justify-end' : 'justify-space-between mb-6'"
+      class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1"
+      :class="!trails.length ? 'tw-justify-end' : 'tw-justify-between tw-mb-6'"
     >
       <alex-inputs-text-field
         v-show="trails.length"
@@ -96,8 +89,6 @@ const handleCreatedTrail = async (id: number) => {
         hide-details
       />
       <alex-custom-button
-        v-if="learningPlanStore.userIsFacilitator"
-        :disabled="!learningStructureId"
         prepend-icon="mdi-plus"
         size="large"
         @click="showAddTrailDialog = true"
@@ -109,9 +100,7 @@ const handleCreatedTrail = async (id: number) => {
       v-if="!trails.length"
       class="tw-flex tw-flex-1"
       :class="
-        learningPlanStore.loading
-          ? ''
-          : 'align-center justify-center flex-column'
+        !learningPlanStore.loading && 'align-center justify-center flex-column'
       "
     >
       <div v-if="learningPlanStore.loading">
@@ -185,21 +174,16 @@ const handleCreatedTrail = async (id: number) => {
         </template>
       </v-data-iterator>
     </div>
-
     <alex-learningplan-trails-dialogs-create
-      v-if="learningPlanStore.userIsFacilitator && !!learningStructureId"
       :model-value="showAddTrailDialog"
-      :learning-structure="learningStructureId"
-      @course-created="handleCreatedTrail"
-      @update:model-value="(e) => (showAddTrailDialog = e)"
+      :learning-structure="+route.params.id"
+      @course-created="handleTrailCreate"
+      @update:model-value="(open) => (showAddTrailDialog = open)"
     />
   </div>
 </template>
 
 <style scoped>
-.wrapper {
-  min-height: 500px !important;
-}
 .emptyProjects-img {
   max-width: 400px;
   max-height: 360px;
@@ -216,7 +200,6 @@ const handleCreatedTrail = async (id: number) => {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
   justify-content: center; /* Centers the grid items horizontally */
   align-items: center;
-
   display: grid !important;
 }
 
