@@ -187,7 +187,7 @@ import { Document } from '@/models/document';
 import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 
 const learningPlanStore = useLearningPlanStore();
-const headerStore = usePageHeaderStore();
+// const headerStore = usePageHeaderStore();
 const strapi = useStrapi();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
@@ -639,40 +639,43 @@ const addFolder = async () => {
   }
 };
 
+const getFolders = () => {
+  if (learningPlanStore.loading || !learningPlanStore.learningPlan) {
+    return;
+  }
+
+  folders.value = learningPlanStore.learningPlan?.document_folders || [];
+
+  // headerStore.title = 'Projetos';
+  // headerStore.items = [
+    // {
+    //   title: 'Home',
+    //   disabled: true,
+    // },
+    // {
+    //   title: 'Projetos',
+    //   to: '/projects/me',
+    // },
+    // {
+    //   title: learningPlanStore.learningPlan.title,
+    //   to: `/courses/${learningPlanStore.learningPlan.id}`,
+    // },
+  // ];
+};
+
+onBeforeMount(() => {
+  // headerStore.showHeader = true;
+});
+
 onMounted(() => {
   getTemplates();
-
-  headerStore.showHeader = true;
-  headerStore.title = 'Projetos';
+  getFolders();
 });
 
 // Get data from store
 watch(
   () => learningPlanStore.loading,
-  () => {
-    if (learningPlanStore.loading || !learningPlanStore.learningPlan) {
-      return;
-    }
-
-    folders.value = learningPlanStore.learningPlan?.document_folders || [];
-
-    headerStore.items = [
-      {
-        title: 'Home',
-        disabled: true,
-      },
-      {
-        title: 'Projetos',
-        disabled: false,
-        to: '/projects/me',
-      },
-      {
-        title: learningPlanStore.learningPlan.title,
-        disabled: false,
-        to: `/courses/${learningPlanStore.learningPlan.id}`,
-      },
-    ];
-  },
+  () => getFolders(),
 );
 
 watch(selectedDoc, async (doc) => {
@@ -709,6 +712,10 @@ watch(addDocDialog, (open) => {
 
 // Starts new folder with focus on title
 watch(folders, (val, oldVal) => {
+  if (oldVal.length === 3 && oldVal[0].id === -1) {
+    return;
+  }
+
   if (val.length !== oldVal.length || !val.length) {
     newFolderId.value = 0;
     return;
