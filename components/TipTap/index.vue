@@ -320,8 +320,11 @@ onMounted(async () => {
       );
     },
   });
-});
 
+  setTimeout(() => {
+    emitHeight();
+  }, 300);
+});
 const blockToolsMap = {
   starterKit: StarterKit.configure({
     history: false,
@@ -602,7 +605,7 @@ const setContent = (content) => {
   }
 };
 
-defineExpose({ emitHeight, setContent });
+defineExpose({ emitHeight, setContent, container: container.value });
 
 watch(
   () => props.edit,
@@ -615,8 +618,9 @@ watch(
 watch(
   () => props.modelValue,
   (value) => {
-    emitHeight();
-
+    setTimeout(() => {
+      emitHeight();
+    }, 300);
     if (!editor.value) {
       return;
     }
