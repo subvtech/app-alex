@@ -1,17 +1,16 @@
 <script setup lang="tsx">
 import { ref, computed, onMounted } from 'vue';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { get } from '@/utils/get';
+const user = useStrapiUser();
 
 const { t } = useI18n();
-const { findOne } = useStrapi();
+const { findOne } = useStrapiUtils();
 const route = useRoute();
 
 const hasError = ref(false);
 const loading = ref(true);
-const members = ref<User[]>([]);
+const members = ref<UserSimple[]>([]);
 const search = ref('');
 
 const cardClass = computed(() => {
@@ -43,15 +42,16 @@ const fetchMembers = async () => {
   loading.value = true;
 
   try {
-    const res = await findOne<LearningPlan>(
-      `learningplans/${route.params.id}`,
-      { populate: ['members.user'] },
+    const res = await findOne<LearningPlanSimple>(
+      'learningplans',
+      Number(route.params.id),
+      {
+        populate: ['members.user.avatar'],
+      },
     );
-
-    const getUser = get<Strapi4ResponseData<User>>('attributes.user.data');
-    members.value = res.data.attributes.members.data.map((r) => {
-      const { id, attributes: user } = getUser(r);
-      return { ...user, id };
+    members.value = res.data.members.map((r) => {
+      const user = r.user;
+      return { ...user };
     });
   } catch (_) {
     hasError.value = true;
@@ -82,68 +82,100 @@ onMounted(fetchMembers);
           :placeholder="$t('pages.projects.search_member')"
         />
         <div class="tw-flex tw-flex-wrap">
-          <EmptyState
-            v-if="!filteredMembers.length"
-            :empty-message="emptyMessage"
-            class="tw-mt-6"
-          />
-          <Card
-            v-for="user in filteredMembers"
-            :key="user.id"
-            :class="cardClass"
-          >
-            <CardContent
-              class="tw-flex tw-flex-col tw-gap-6 tw-pt-6"
-              @click="
-                navigateTo(
-                  `/projects/${route.params.id}/individual_learning/${user.id}`,
-                )
-              "
-            >
-              <div class="tw-flex tw-items-center tw-gap-6">
-                <v-avatar :size="48" color="gray-100">
-                  <template #default>
-                    {{ getInitials(user.fullname) }}
-                  </template>
-                </v-avatar>
-                <div class="tw-flex tw-flex-col tw-overflow-hidden">
-                  <span
-                    class="tw-text-ellipsis tw-font-bold tw-overflow-hidden tw-whitespace-nowrap"
-                    :title="user.fullname"
-                  >
-                    {{ user.fullname }}
-                  </span>
-                  <span :title="user.email">
-                    {{ user.email }}
-                  </span>
-                </div>
-              </div>
-              <div class="tw-flex tw-flex-col">
-                <v-progress-linear
-                  rounded
-                  color="accent"
-                  class="tw-mb-2"
-                  :height="6"
-                />
-                <div
-                  class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45"
+          <Transition name="slide-up">
+            <EmptyState
+              v-if="!filteredMembers.length"
+              :empty-message="emptyMessage"
+              class="tw-mt-6"
+            />
+            <div v-else class="w-100 tw-flex tw-flex-wrap">
+              <TransitionGroup name="list">
+                <Card
+                  v-for="member in filteredMembers"
+                  :key="member.id"
+                  :class="cardClass"
                 >
-                  <span>{{ $t('pages.projects.my_goals') }}</span>
-                  <span>10%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                  <CardContent
+                    class="tw-flex tw-flex-col tw-gap-6 tw-pt-6"
+                    @click="
+                      navigateTo(
+                        `/projects/${route.params.id}/individual_learning/${member.id}`,
+                      )
+                    "
+                  >
+                    <div
+                      class="tw-flex tw-items-center tw-gap-6 tw-flex-col align-start"
+                    >
+                      <div class="w-100 d-flex justify-space-between">
+                        <v-avatar
+                          :size="64"
+                          color="gray-100"
+                          class="rounded-16px"
+                        >
+                          <v-img
+                            v-if="member.avatar?.url"
+                            :src="member.avatar?.url"
+                            alt="avatar"
+                            class="rounded-16px"
+                            cover
+                          />
+                          <span v-else class="text-gray-800 text-h2">
+                            {{ getInitials(member.fullname) }}
+                          </span>
+                        </v-avatar>
+                        <alex-custom-chip
+                          v-if="member.id == user?.id"
+                          text="Minha jornada"
+                          size="small"
+                          class="bg-info--2 text-body-5 text-secondary-2"
+                          variant="text"
+                        />
+                      </div>
+                      <div class="tw-flex tw-flex-col tw-overflow-hidden">
+                        <span
+                          class="text-gray-800 text-h5 tw-text-ellipsis tw-overflow-hidden tw-whitespace-nowrap"
+                          :title="member.fullname"
+                        >
+                          {{ member.fullname }}
+                        </span>
+                        <span
+                          class="text-gray-600 text-body-3"
+                          :title="member.email"
+                        >
+                          {{ member.email }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="tw-flex tw-flex-col">
+                      <v-progress-linear
+                        rounded
+                        color="accent"
+                        class="tw-mb-2"
+                        :height="8"
+                        model-value="50"
+                      />
+                      <div
+                        class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45"
+                      >
+                        <span>{{ $t('pages.projects.my_goals') }}</span>
+                        <span>50%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TransitionGroup>
+            </div>
+          </Transition>
         </div>
       </template>
       <template v-else>
-        <div v-if="loading">
+        <div v-if="true">
           <Skeleton class="tw-w-[320px] tw-h-[44px] tw-mb-6 tw-rounded-xl" />
           <div class="tw-flex tw-flex-wrap">
             <Skeleton
               v-for="index in 8"
               :key="index"
-              :class="[cardClass, 'tw-h-[150px] tw-w-[250px] tw-rounded-xl']"
+              :class="[cardClass, 'tw-h-[230px] tw-w-[300px] tw-rounded-xl']"
             />
           </div>
         </div>
@@ -152,3 +184,38 @@ onMounted(fetchMembers);
     </div>
   </div>
 </template>
+
+<style scoped>
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.25s ease-out;
+}
+
+.slide-up-enter-active {
+  transition-delay: 0.5s;
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.rounded-16px {
+  border-radius: 16px !important;
+}
+</style>
