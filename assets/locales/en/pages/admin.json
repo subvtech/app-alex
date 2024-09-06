@@ -1,0 +1,70 @@
+{
+    "field": {
+        "required": "This field is required",
+        "min": "Minimum {min} characters",
+        "max": "Maximum {max} characters"
+    },
+    "nameFantasy": {
+        "label": "Fantasy Name",
+        "required": "Complete Fantasy Name is required",
+        "min": "Minimum of 6 characters",
+        "max": "Maximum of 64 characters",
+        "onlyLetters": "Must contain only letters"
+    },
+    "emailField": {
+        "required": "Email is required",
+        "invalid": "Invalid email."
+    },
+    "cnpjField": {
+        "required": "CNPJ is required",
+        "length": "CNPJ must contain 14 characters",
+        "invalid": "Invalid CNPJ."
+    },
+    "phoneField": {
+        "required": "Phone number is required",
+        "length": "Must have 11 characters",
+        "invalid": "Invalid phone number"
+    },
+    "usersField": {
+        "required": "Representative is required.",
+        "placeholder": "Select the institution representative",
+        "label": "Select representative"
+    },
+    "companynameField": {
+        "label": "Company Name",
+        "required": "Company Name is required",
+        "min": "Minimum of 3 characters",
+        "max": "Maximum of 64 characters",
+        "onlyLetters": "Must contain only letters and numbers"
+    },
+    "sectorField": {
+        "required": "Sector is required"
+    },
+    "addressField": {
+        "required": "Address is required",
+        "min": "Minimum of 3 characters",
+        "max": "Maximum of 64 characters",
+        "onlyLetters": "Must contain only letters and numbers"
+    },
+    "title": "Institutions",
+    "title2": "Partner Institution",
+    "home": "Home",
+    "edit": "Edit",
+    "name": "Name",
+    "socialName": "Social Name",
+    "cnpj": "CNPJ",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "sector": "Sector",
+    "users": "Representatives",
+    "cover": "Cover",
+    "admin": "Administrator",
+    "cancel": "Cancel",
+    "add": "Add",
+    "searchPlaceholder": "Search institution",
+    "company": "Company",
+    "informations": "Informations",
+    "representative": "Representative",
+    "newInstitution": "New Institution"
+}

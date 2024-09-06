@@ -467,6 +467,7 @@ const createProject = async () => {
     });
 
     loading.value = true;
+
     await client('learningplans/create-project', {
       method: 'POST',
       body: {
@@ -476,7 +477,7 @@ const createProject = async () => {
         end_date: projectInfo.value.endDate,
         type: 'project',
         slug: slugFormated.value.toLocaleLowerCase(),
-        fields: projectInfo.value.areas,
+        fields: projectInfo.value.areas.length ? projectInfo.value.areas : [],
         product: projectInfo.value.product,
         course: associatedCourses.value.map((course) => course.id),
         new_users: newUsersEmails,

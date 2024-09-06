@@ -58,7 +58,9 @@
                 :user="{
                   name: member.user.fullname,
                   email: member.email,
-                  image: member.user?.avatar?.formats.small.url,
+                  image:
+                    member.user?.avatar?.formats?.small?.url ||
+                    member.user?.avatar?.url,
                 }"
                 no-chip
                 :is-selected-value="

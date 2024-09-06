@@ -411,8 +411,11 @@ watch(coverPicture!, () => {
       .img {
         max-width: 160px;
         max-height: 160px;
+
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
+
+        transition: all ease-in-out 0.4s;
         border-radius: 100%;
         transition: all ease-in-out 0.4s;
       }

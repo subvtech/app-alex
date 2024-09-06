@@ -34,6 +34,7 @@
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
     "happy-dom": "^13.3.8",
+    "msw": "^2.3.5",
     "nuxt": "3.9.1",
     "nuxt-vitest": "^0.10.4",
     "playwright-core": "^1.41.2",
@@ -100,6 +101,8 @@
     "@tiptap/starter-kit": "^2.5.7",
     "@tiptap/suggestion": "^2.5.7",
     "@tiptap/vue-3": "^2.5.7",
+    "@unovis/ts": "^1.4.3-beta.0",
+    "@unovis/vue": "^1.4.3-beta.0",
     "@vee-validate/yup": "^4.11.1",
     "@vee-validate/zod": "^4.11.1",
     "@vueuse/core": "^10.10.0",
@@ -151,5 +154,10 @@
     "y-webrtc": "^10.3.0",
     "yjs": "^13.6.18",
     "yup": "^1.2.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

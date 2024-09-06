@@ -1,16 +1,16 @@
 <template>
   <div
-    class="d-flex tw-flex-col-reverse md:tw-flex-row ga-4 !tw-max-w-[100vw] tw-h-[90vh]"
+    class="d-flex tw-flex-col-reverse md:tw-flex-row ga-4 tw-h-[90vh] tw-w-full"
   >
     <!-- Side bar -->
     <div
-      class="d-flex flex-column wrapper py-4 px-2 tw-flex-[0_0_270px] tw-overflow-y-auto"
+      class="d-flex flex-column wrapper py-4 px-2 tw-flex-[0_0_35%] md:tw-flex-[0_0_270px] tw-overflow-y-auto"
     >
       <v-expansion-panels v-model="openFolders" class="!tw-block" multiple>
         <alex-project-folder
-          v-for="folder in folders"
+          v-for="(folder, index) in folders"
           :id="folder.id"
-          :key="folder.id"
+          :key="folder.id + index"
           :title="folder.title || ''"
           :documents="folder?.documents || []"
           :selected-id="selectedDoc?.id"
@@ -19,7 +19,7 @@
           :focus="folder.id === newFolderId"
           @add-doc="
             addDocDialog = true;
-            dialogFolderId = folder.id || 0;
+            dialogFolderId = folder.id;
           "
           @change-name="
             (name) => updateFolderTitle(name, folder.title, folder.id)
@@ -43,83 +43,75 @@
       </div>
     </div>
 
-    <div class="wrapper tw-flex-1 tw-overflow-x-hidden">
+    <div
+      class="wrapper editor-container tw-flex-[0_0_63%] tw-max-h-[63%] md:tw-max-h-full md:tw-flex-1 d-flex flex-column"
+    >
       <!-- Header -->
       <div
         class="d-flex ga-4 align-center py-4 px-6 border-b-sm tw-border-[#EBEDEF]"
       >
         <!-- Ver focus border -->
-        <p
-          ref="titleRef"
-          class="tw-flex-1 text-h4 px-4 py-2 rounded-lg tw-truncate"
+        <input
+          v-model="title"
+          class="tw-flex-1 text-h4 px-4 py-2 rounded-lg tw-truncate tw-w-0"
           :class="
-            docSelected && editMode
+            docSelected
               ? `hover:tw-bg-[#F1F5F9] tw-transition tw-duration-200 tw-cursor-pointer
           focus:tw-bg-white focus:tw-border-2 tw-outline-[#2E74B8] text-gray-800`
               : 'text-gray-500'
           "
-          :contenteditable="docSelected && editMode"
-          @keydown.enter.prevent="titleRef?.blur()"
-        >
-          {{
-            !docSelected
-              ? $t('components.project.document.selectTitle')
-              : selectedDoc?.title || ''
-          }}
-        </p>
+          :disabled="!docSelected"
+          @keydown.enter.prevent="
+            (e) => {
+              if (e) {
+                e.target.blur();
+              }
+            }
+          "
+          @blur="
+            if (!title.length) {
+              title = selectedDoc?.title || '';
+            } else if (title !== selectedDoc?.title) {
+              saveTitle();
+            }
+          "
+        />
         <div class="d-flex align-center justify-center ga-2">
-          <template v-if="editMode"
-            ><alex-custom-button
-              variant="secondary"
-              size="large"
-              :disabled="!docSelected"
-              @click="editMode = false"
-              >{{
-                $t('components.project.document.edit.cancel')
-              }}</alex-custom-button
+          <alex-custom-tooltip v-if="docState" :text="docState.text">
+            <template #content
+              ><v-icon :color="docState.color" :class="docState.styles">{{
+                docState.icon
+              }}</v-icon></template
             >
-            <alex-custom-button
-              size="large"
-              :disabled="!docSelected"
-              @click="saveDocument"
-              >{{
-                $t('components.project.document.edit.save')
-              }}</alex-custom-button
-            ></template
-          >
-          <template v-else>
-            <alex-custom-button
-              icon="mdi-pencil-outline"
-              size="large"
-              variant="text"
-              :disabled="!docSelected"
-              @click="editMode = true"
-            />
-            <alex-custom-button
-              icon="mdi-trash-can-outline"
-              size="large"
-              variant="text"
-              color="error-0"
-              :disabled="!docSelected"
-              @click="delDocDialog = true"
-            />
-          </template>
+          </alex-custom-tooltip>
+
+          <alex-custom-button
+            icon="mdi-trash-can-outline"
+            size="large"
+            variant="text"
+            color="error-0"
+            :disabled="!docSelected"
+            @click="delDocDialog = true"
+          />
         </div>
       </div>
 
       <!-- Editor -->
-      <div class="py-6 pr-6 !tw-pl-[84px]">
-        <TipTap
-          v-if="!!selectedDoc"
-          ref="tiptap"
-          :key="selectedDoc.id"
-          :doc-name="selectedDoc.doc_name"
-          :edit="editMode"
-          :mention-users="mentionUsers"
-          hide-menu-bar
-          no-padding
-          @update:model-value="(val) => (editorContent = val)"
-        />
+      <div class="content tw-overflow-y-auto">
+        <div class="tw-block tw-py-[6px] pr-6 !tw-pl-[84px] tw-h-full">
+          <TipTap
+            v-if="!!selectedDoc"
+            ref="tiptap"
+            :key="selectedDoc.id"
+            :doc-name="selectedDoc.doc_name"
+            :mention-users="mentionUsers"
+            @update:model-value="
+              (val) => {
+                editorContent = val;
+              }
+            "
+          />
+        </div>
       </div>
     </div>
 
@@ -210,19 +202,70 @@ const selectedTemplate = ref<number>(0); // Mudar pra template objeto
 const name = ref<string>(''); // Input value
 
 // Folders
-const folders = ref<DocumentFolder[]>([]);
 const openFolders = ref<number[]>([]);
 const newFolderId = ref<number>(0); // Used to set focus aftercreate
+const folders = ref<DocumentFolder[]>([
+  { id: -1, title: '' },
+  { id: -1, title: '' },
+  { id: -1, title: '' },
+]);
 
 // Document
 const selectedDoc = ref<Document | null>(null);
-const titleRef = ref<HTMLParagraphElement | null>(null);
+const title = ref<string>(t('components.project.document.selectTitle'));
+const savingDoc = ref<null | 'loading' | 'saved' | 'error'>(null);
 const editorContent = ref<object | string | null>('');
-const editMode = ref<boolean>(false);
 
 const tiptap = ref<any | null>(null);
 
 const docSelected = computed(() => selectedDoc.value !== null);
+
+const docState = computed<{
+  styles: string;
+  icon: string;
+  text: string;
+  color: string;
+} | null>(() => {
+  if (!savingDoc.value) {
+    return {
+      text: t('components.project.document.saving.select'),
+      icon: 'mdi-content-save',
+      color: 'gray-500',
+      styles: '',
+    };
+  }
+
+  if (savingDoc.value === 'loading') {
+    return {
+      text: t('components.project.document.saving.loading'),
+      icon: 'mdi-loading',
+      color: 'gray-600',
+      styles: 'loading',
+    };
+  }
+
+  if (savingDoc.value === 'saved') {
+    return {
+      text: t('components.project.document.saving.saved'),
+      icon: 'mdi-content-save-check',
+      color: 'success-1',
+      styles: '',
+    };
+  }
+
+  if (savingDoc.value === 'error') {
+    return {
+      text: t('components.project.document.saving.error'),
+      icon: 'mdi-alert-circle-outline',
+      color: 'error-0',
+      styles: 'text-error-0',
+    };
+  }
+
+  return null;
+});
+
+let saveInterval;
 
 const mentionUsers = computed<MentionUserPropsArray>(() => {
   if (learningPlanStore.loading || !learningPlanStore.learningPlan?.members) {
@@ -302,6 +345,8 @@ const createDocument = async () => {
 
       const documents = folder.documents || [];
 
+      // Opens parent folder
+      openFolders.value = [...Object.values(openFolders.value), folder.id];
       folder.documents = [...documents, newDoc];
 
       return folder;
@@ -349,10 +394,58 @@ const createDocument = async () => {
 };
 
 // Fazer alteração em documento existente
-const saveDocument = async () => {
+const saveTitle = async () => {
+  if (!selectedDoc.value) {
+    return;
+  }
+
   try {
-    await strapi.update('documents', selectedDoc.value?.id || 0, {
-      title: titleRef?.value?.innerHTML || selectedDoc.value?.title || '',
+    await strapi.update('documents', selectedDoc.value.id, {
+      title: title.value || selectedDoc.value.title,
+    });
+
+    folders.value =
+      folders.value.map((folder) => {
+        folder.documents = folder.documents?.map((doc) => {
+          if (doc.id !== selectedDoc.value?.id) {
+            return doc;
+          }
+
+          doc.title = title.value || selectedDoc.value?.title || '';
+
+          return doc;
+        });
+
+        return folder;
+      }) || [];
+
+    const updatedDoc: Document = selectedDoc.value;
+
+    updatedDoc.title = title.value;
+    selectedDoc.value = updatedDoc;
+
+    setMessage(
+      t('components.project.document.messages.success.updateDoc'),
+      'success',
+      true,
+    );
+  } catch (e) {
+    setMessage(
+      t('components.project.document.messages.error.updateDoc'),
+      'error',
+      true,
+    );
+  }
+};
+
+const saveDocument = async () => {
+  if (!selectedDoc.value) {
+    return;
+  }
+
+  try {
+    savingDoc.value = 'loading';
+    await strapi.update('documents', selectedDoc.value.id, {
       content: toRaw(editorContent.value),
     });
 
@@ -363,8 +456,6 @@ const saveDocument = async () => {
             return doc;
           }
 
-          doc.title =
-            titleRef?.value?.innerHTML || selectedDoc.value?.title || '';
           doc.content = toRaw(editorContent.value);
 
           return doc;
@@ -373,19 +464,15 @@ const saveDocument = async () => {
         return folder;
       }) || [];
 
-    setMessage(
-      t('components.project.document.messages.success.updateDoc'),
-      'success',
-      true,
-    );
-    editMode.value = false;
-    // Atualizar selecteddoc
+    const updatedDoc: Document = selectedDoc.value;
+
+    updatedDoc.content = editorContent.value;
+
+    selectedDoc.value = updatedDoc;
+
+    savingDoc.value = 'saved';
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.updateDoc'),
-      'error',
-      true,
-    );
+    savingDoc.value = 'error';
   }
 };
 
@@ -505,15 +592,6 @@ const deleteDoc = async () => {
   }
 };
 
-// const revertChanges = () => {
-//   if (titleRef.value) {
-//     titleRef.value.innerHTML = selectedDoc.value?.title || '';
-//   }
-
-//   editorContent.value = selectedDoc.value?.content || '';
-//   editMode.value = false;
-// };
-
 const addFolder = async () => {
   const allIds: number[] = folders.value.map(({ id }) => id);
 
@@ -566,44 +644,58 @@ onMounted(() => {
 
   headerStore.showHeader = true;
   headerStore.title = 'Projetos';
-
-  headerStore.items = [
-    {
-      title: 'Home',
-      disabled: true,
-    },
-    {
-      title: 'Projetos',
-      disabled: false,
-      to: '/projects',
-    },
-    {
-      title: 'Nome do projeto',
-      disabled: false,
-      to: `/projects`,
-    },
-  ];
 });
 
 // Get data from store
 watch(
   () => learningPlanStore.loading,
   () => {
-    if (learningPlanStore.loading) {
+    if (learningPlanStore.loading || !learningPlanStore.learningPlan) {
       return;
     }
 
     folders.value = learningPlanStore.learningPlan?.document_folders || [];
+
+    headerStore.items = [
+      {
+        title: 'Home',
+        disabled: true,
+      },
+      {
+        title: 'Projetos',
+        disabled: false,
+        to: '/projects/me',
+      },
+      {
+        title: learningPlanStore.learningPlan.title,
+        disabled: false,
+        to: `/courses/${learningPlanStore.learningPlan.id}`,
+      },
+    ];
   },
 );
 
-watch(selectedDoc, (doc) => {
+watch(selectedDoc, async (doc) => {
+  if (saveInterval) {
+    clearInterval(saveInterval);
+  }
+
   if (!doc) {
-    editMode.value = false;
+    savingDoc.value = null;
+    title.value = t('components.project.document.selectTitle');
     return;
   }
 
-  editorContent.value = doc?.content || '';
+  title.value = doc.title;
+  editorContent.value = doc.content || '';
+
+  await saveDocument();
+
+  saveInterval = setInterval(async () => {
+    if (editorContent.value !== doc.content) {
+      await saveDocument();
+    }
+  }, 4000);
 });
 
 // Erase input data from dialog when closed
@@ -633,5 +725,34 @@ watch(folders, (val, oldVal) => {
   border-radius: 8px;
   box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.08);
   background: white;
+}
+
+.loading {
+  transform-origin: center center;
+  animation: loading 1s ease-out infinite;
+}
+
+@keyframes loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.editor-container {
+  width: 100%;
+}
+
+.editor-container .content {
+  max-height: 100%;
+}
+
+@media (min-width: 768px) {
+  .editor-container {
+    /* 100% - folders - gap */
+    width: calc(100% - 270px - 16px);
+  }
 }
 </style>

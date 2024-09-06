@@ -313,7 +313,7 @@ watch(
       classes.value =
         learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
         [];
-      headerStore.title = t('pages.projects.myProjects');
+      headerStore.title = t('pages.projects.my_projects');
       headerStore.items = [
         {
           title: t('components.courses.settings.home'),
@@ -321,7 +321,7 @@ watch(
           to: '/',
         },
         {
-          title: t('pages.projects.myProjects'),
+          title: t('pages.projects.my_projects'),
           disabled: false,
           to: '/projects/me',
         },

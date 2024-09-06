@@ -120,10 +120,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  hideMenuBar: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 const isLoading = ref(false);
@@ -134,7 +130,7 @@ const defaultBlock = computed(() => {
 
 const showMenuBar = computed(() => {
   return (
-    !props.hideMenuBar &&
+    isEditable.value &&
     (props.allowedBlocks.length === 0 || props.allowedBlocks.includes('text'))
   );
 });
@@ -212,12 +208,6 @@ onMounted(async () => {
       isLoading.value = false;
     },
   });
-
-  console.log('Montou');
-  console.log(`Docname: ${props.docName}`);
-  console.log(`Appid: ${app.$config.public.tipTapAppId}`);
-  console.log(`Token: ${TipTapToken}`);
-  console.log('Doc:', doc);
 
   const setCollaborationExtensions = (): AnyExtension[] => [
     ...(props.collaboration
