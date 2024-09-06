@@ -1,133 +1,5 @@
-<template>
-  <div v-if="learningPlanStore.learningPlan">
-    <Transition name="slide">
-      <v-expansion-panels
-        v-model="expandBacklog"
-        class="task-accordion my-6 rounded-lg"
-      >
-        <v-expansion-panel class="rounded-lg">
-          <v-expansion-panel-title class="cursor-default" disabled hide-actions>
-            <v-icon
-              :icon="
-                expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
-              "
-              @click="toggleExpand"
-            />
-            <span class="text-h5 text-gray-800">{{
-              taskSections[backlogIndex - 1]
-            }}</span>
-            <alex-custom-chip
-              status="secondary"
-              size="small"
-              :text="filteredTasks.length.toString()"
-            ></alex-custom-chip>
-
-            <div class="ml-auto">
-              <alex-custom-dropdown
-                variant="text"
-                icon="mdi-plus"
-                :items="editSprints"
-              />
-            </div>
-          </v-expansion-panel-title>
-          <v-expansion-panel-text>
-            <Transition :name="slideTransition()" mode="out-in">
-              <div v-if="!backlogTasks.length && backlogIndex">
-                <alex-learningplan-task-empty-state
-                  key="empty-state"
-                  type="backlog"
-                  :index="backlogIndex"
-                  :drop-area="dragDrop.over.value.list === 'backlog'"
-                  @drag-over="handleEmptyStateOver"
-                  @drag-leave="dragDrop.onDragLeave"
-                />
-              </div>
-              <div v-else>
-                <alex-learningplan-task-project-table
-                  key="table"
-                  group="backlog"
-                  :sprints="sprintGroups"
-                  :tasks="backlogTasks"
-                  :search="search"
-                  :active-filter="isFilterActive"
-                  :over="setOver"
-                  :is-project="true"
-                  :drag-from="dragDrop.dragFrom.value"
-                  :dragging="dragDrop.dragging.value"
-                  @start-drag="dragDrop.startDrag"
-                  @drag-over="dragDrop.onDragOver"
-                  @drag-leave="dragDrop.onDragLeave"
-                  @delete-task="handleDeleteTask"
-                  @move-task="handleMoveTask"
-                  @edit-task="openDrawer"
-                />
-              </div>
-            </Transition>
-            <div v-if="backlogIndex === 1" class="mb-4">
-              <Transition mode="out-in" name="add-task">
-                <alex-custom-button
-                  v-if="!isCreatingTask"
-                  size="large"
-                  variant="text"
-                  prepend-icon="mdi-plus"
-                  class="w-100 create-task-btn"
-                  :loading="loader"
-                  @click="isCreatingTask = true"
-                >
-                  {{ $t('pages.task.add') }}
-                </alex-custom-button>
-                <div v-else class="d-flex ga-2">
-                  <alex-inputs-text-field
-                    v-model="taskTitle"
-                    autofocus
-                    :placeholder="t('pages.task.addPlaceholder')"
-                    class="w-100"
-                    density="comfortable"
-                    name="taskTitle"
-                    hide-details
-                    :disabled="loader"
-                    @keyup.enter="handleCreateTask"
-                  />
-                  <alex-custom-button
-                    size="large"
-                    :loading="loader"
-                    @click="handleCreateTask"
-                  >
-                    {{ $t('pages.task.addButton') }}
-                  </alex-custom-button>
-                </div>
-              </Transition>
-            </div>
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </Transition>
-    <div class="tw-flex tw-w-full tw-justify-between">
-      <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
-      <alex-custom-button
-        size="large"
-        prepend-icon="alex:Sprint"
-        @click="createSprintDialog = true"
-        >{{ 'Nova Sprint' }}</alex-custom-button
-      >
-    </div>
-    <alex-learningplan-task-project-sprints
-      v-model="sprints"
-      v-model:drag-drop="dragDrop"
-      :search="search"
-      :learning-plan-id="learningPlanStore.learningPlan.id"
-      :edit-sprints="editSprints"
-    />
-    <alex-project-dialogs-sprint
-      v-model="createSprintDialog"
-      :project-id="learningPlanStore.learningPlan.id"
-      :project-end-date="learningPlanStore.learningPlan.end_date"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { PanelItem, Sprint } from './Sprints.vue';
+// import { PanelItem, Sprint } from './Sprints.vue';
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
 import { ApplicationError } from '~/models/simple/applicationError.model';
@@ -157,10 +29,12 @@ const props = defineProps<{
 }>();
 
 const { create, delete: _delete, update } = useStrapi();
-// const client = useStrapiClient();
+const strapiClient = useStrapiClient();
 const { t } = useI18n();
 const expandBacklog = ref(0);
 const createSprintDialog = ref(false);
+const backlogTasks = ref<TaskItem[]>([]);
+const sprintTasks = ref<TaskItem[]>([]);
 const sprints = ref([
   {
     expanded: 0,
@@ -299,62 +173,6 @@ const sprints = ref([
     },
   },
 ]);
-// const sprints = ref<PanelItem<Sprint>[]>([
-//   {
-//     expanded: 0,
-//     group: `sprint-${1}`,
-//     raw: {
-//       id: 1,
-//       name: 'Sprint 1',
-//       startDate: new Date(),
-//       endDate: new Date(),
-//       tasks: [
-//         {
-//           id: 4,
-//           position: 0,
-//           title: 'test',
-//           start_at: '2024-07-22',
-//           finish_at: '2024-08-01',
-//           type: 'individual',
-//           status: 'draft',
-//           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-//         },
-//       ],
-//     },
-//   },
-//   {
-//     expanded: 0,
-//     group: `sprint-${2}`,
-//     raw: {
-//       id: 2,
-//       name: 'Sprint 2',
-//       startDate: new Date(),
-//       endDate: new Date(),
-//       tasks: [
-//         {
-//           id: 1,
-//           position: 0,
-//           title: 'test',
-//           start_at: '2024-09-22',
-//           finish_at: '2024-11-22',
-//           type: 'individual',
-//           status: 'draft',
-//           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-//         },
-//         {
-//           id: 2,
-//           position: 2,
-//           title: 'tes2',
-//           start_at: '2024-09-22',
-//           finish_at: '2024-11-22',
-//           type: 'individual',
-//           status: 'draft',
-//           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-//         },
-//       ],
-//     },
-//   },
-// ]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
@@ -385,36 +203,25 @@ const filteredTasks = computed(() => {
   return backlog;
 });
 
-const backlogTasks = computed(() => {
-  const backlog: TaskItem[] = [
-    // {
-    //   id: 7,
-    //   position: 0,
-    //   title: 'test',
-    //   start_at: '2024-09-22',
-    //   finish_at: '2024-11-22',
-    //   type: 'individual',
-    //   status: 'draft',
-    //   delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-    // },
-  ];
-  return backlog;
-});
-
-const slideTransition = () =>
-  backlogTasks.value.length ? 'slide-down' : 'slide-up';
-const displayError = (message: string, e?: ApplicationError) => {
-  let displayMessage = t('pages.task.crud.errorMessage', {
-    action: t(`pages.task.crud.${message}`),
-  });
-  const error = e?.error;
-  if (error?.name === 'ApplicationError' && error?.details) {
-    displayMessage = t(`pages.task.crud.${error.details.errCode}`);
-  }
-  setMessage(displayMessage, 'error', true);
-  if (learningPlanStore.learningPlan)
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
+const slideTransition = () => {
+  return backlogTasks.value.length ? 'slide-down' : 'slide-up';
 };
+
+const displayError = (message: string, err?: ApplicationError) => {
+  const displayMessage =
+    err?.error?.name === 'ApplicationError' && err?.error?.details
+      ? t(`pages.task.crud.${err.error.details.errCode}`)
+      : t('pages.task.crud.errorMessage', {
+          action: t(`pages.task.crud.${message}`),
+        });
+
+  setMessage(displayMessage, 'error', true);
+
+  if (learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
+  }
+};
+
 const displaySuccess = (message: string) => {
   setMessage(
     t('pages.task.crud.successMessage', {
@@ -424,6 +231,7 @@ const displaySuccess = (message: string) => {
     true,
   );
 };
+
 const getHigherIndex = () => {
   const tasks = backlogTasks.value;
   return tasks[tasks.length - 1]?.position + 1 || 0;
@@ -515,6 +323,7 @@ const setOver = () => {
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
   dragDrop.onDragOver('backlog', -index, -1, dragEvent);
 };
+
 const editSprints = [
   {
     text: 'Adicionar épico',
@@ -540,7 +349,148 @@ groupsArray.forEach((group, index) => {
   groups[group] = index;
   groups[index] = group;
 });
+
+onMounted(async () => {
+  try {
+    const res = await strapiClient<{
+      backlog: TaskItem[];
+      sprints: TaskItem[];
+    }>(`/learningplans/${learningPlanStore.learningPlan?.id}/sprint-backlog`);
+
+    backlogTasks.value = res.backlog;
+    sprintTasks.value = res.sprints;
+  } catch (_) {}
+});
 </script>
+
+<template>
+  <div v-if="learningPlanStore.learningPlan">
+    <Transition name="slide">
+      <v-expansion-panels
+        v-model="expandBacklog"
+        class="task-accordion my-6 rounded-lg"
+      >
+        <v-expansion-panel class="rounded-lg">
+          <v-expansion-panel-title class="cursor-default" disabled hide-actions>
+            <v-icon
+              :icon="
+                expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
+              "
+              @click="toggleExpand"
+            />
+            <span class="text-h5 text-gray-800">{{
+              taskSections[backlogIndex - 1]
+            }}</span>
+            <alex-custom-chip
+              status="secondary"
+              size="small"
+              :text="filteredTasks.length.toString()"
+            ></alex-custom-chip>
+
+            <div class="ml-auto">
+              <alex-custom-dropdown
+                variant="text"
+                icon="mdi-plus"
+                :items="editSprints"
+              />
+            </div>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <Transition :name="slideTransition()" mode="out-in">
+              <div v-if="!backlogTasks.length && backlogIndex">
+                <alex-learningplan-task-empty-state
+                  key="empty-state"
+                  type="backlog"
+                  :index="backlogIndex"
+                  :drop-area="dragDrop.over.value.list === 'backlog'"
+                  @drag-over="handleEmptyStateOver"
+                  @drag-leave="dragDrop.onDragLeave"
+                />
+              </div>
+              <div v-else>
+                <alex-learningplan-task-project-table
+                  key="table"
+                  group="backlog"
+                  :sprints="sprintGroups"
+                  :tasks="backlogTasks"
+                  :search="search"
+                  :active-filter="isFilterActive"
+                  :over="setOver"
+                  :is-project="true"
+                  :drag-from="dragDrop.dragFrom.value"
+                  :dragging="dragDrop.dragging.value"
+                  @start-drag="dragDrop.startDrag"
+                  @drag-over="dragDrop.onDragOver"
+                  @drag-leave="dragDrop.onDragLeave"
+                  @delete-task="handleDeleteTask"
+                  @move-task="handleMoveTask"
+                  @edit-task="openDrawer"
+                />
+              </div>
+            </Transition>
+            <div v-if="backlogIndex === 1" class="mb-4">
+              <Transition mode="out-in" name="add-task">
+                <alex-custom-button
+                  v-if="!isCreatingTask"
+                  size="large"
+                  variant="text"
+                  prepend-icon="mdi-plus"
+                  class="w-100 create-task-btn"
+                  :loading="loader"
+                  @click="isCreatingTask = true"
+                >
+                  {{ $t('pages.task.add') }}
+                </alex-custom-button>
+                <div v-else class="d-flex ga-2">
+                  <alex-inputs-text-field
+                    v-model="taskTitle"
+                    autofocus
+                    :placeholder="t('pages.task.addPlaceholder')"
+                    class="w-100"
+                    density="comfortable"
+                    name="taskTitle"
+                    hide-details
+                    :disabled="loader"
+                    @keyup.esc="isCreatingTask = false"
+                    @keyup.enter="handleCreateTask"
+                  />
+                  <alex-custom-button
+                    size="large"
+                    :loading="loader"
+                    @click="handleCreateTask"
+                  >
+                    {{ $t('pages.task.addButton') }}
+                  </alex-custom-button>
+                </div>
+              </Transition>
+            </div>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </Transition>
+    <div class="tw-flex tw-w-full tw-justify-between">
+      <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
+      <alex-custom-button
+        size="large"
+        prepend-icon="alex:Sprint"
+        @click="createSprintDialog = true"
+        >{{ 'Nova Sprint' }}</alex-custom-button
+      >
+    </div>
+    <alex-learningplan-task-project-sprints
+      v-model="sprints"
+      v-model:drag-drop="dragDrop"
+      :search="search"
+      :learning-plan-id="learningPlanStore.learningPlan.id"
+      :edit-sprints="editSprints"
+    />
+    <alex-project-dialogs-sprint
+      v-model="createSprintDialog"
+      :project-id="learningPlanStore.learningPlan.id"
+      :project-end-date="learningPlanStore.learningPlan.end_date"
+    />
+  </div>
+</template>
 
 <style>
 .cursor-default {

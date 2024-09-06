@@ -6,8 +6,8 @@
   "done": "Encerradas",
   "archived": "Arquivadas",
   "emptyState": {
-    "backlog": "Nenhuma tarefa na Backlog!",
     "draft": "Nenhuma tarefa em rascunho!",
+    "backlog": "Nenhuma tarefa na Backlog!",
     "published": "Nenhuma tarefa publicada!",
     "done": "Nenhuma tarefa encerrada!",
     "archived": "Nenhuma tarefa arquivada!"
@@ -90,7 +90,6 @@
     "startDate": "Data de início",
     "finalDate": "Data de término"
   },
-
   "add": "Adicionar tarefa",
   "addPlaceholder": "Digite o título da tarefa",
   "addButton": "Adicionar"
