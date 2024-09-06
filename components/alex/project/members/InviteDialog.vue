@@ -38,12 +38,10 @@
       </div>
       <alex-learningplan-invites
         full-width
-        :duration="invitationDuration"
-        @update:link="
-          (data) => {
-            plainLink = data.url;
-          }
-        "
+        :duration="5000"
+        :data="activeLink"
+        :url="plainLink"
+        @update:link="updateLink"
         @link:expired="plainLink = null"
       />
       <div class="d-flex w-100 tw-justify-between align-center gap-4">
@@ -92,21 +90,29 @@ export interface InviteDialogProps {
   dialogActionDisabled?: boolean;
   invitationDuration: number;
 
+  learningPlanId: number;
+  activeInviteId?: number | null;
   noSelectUsers?: boolean;
   ignoreUserIds?: number[];
   ignoreUserEmails?: string[];
 }
 const { t } = useI18n();
+const { generateUrl, generateNewInvite, calcRemainingTime } =
+  useInvitationLink();
 
 const plainLink = ref<string | null>(null);
+const activeLink = ref(null);
 const emit = defineEmits(['action', 'click:filter', 'update:search']);
 const props = withDefaults(defineProps<InviteDialogProps>(), {
   ignoreUserEmails: () => [],
   ignoreUserIds: () => [],
+  activeInviteId: null,
 });
+
 const members = ref([]);
 const dialogModel = defineModel<boolean>({ required: true });
 
+const duration = ref(0);
 const dropdownItems: AlexDropdownItem[] = [
   {
     text: t('components.appGeneralBoxes.students.singular'),
@@ -119,4 +125,20 @@ const dropdownItems: AlexDropdownItem[] = [
       console.log(t('components.learningPlan.projects.collaborator')),
   },
 ];
+
+const updateLink = async (classId) => {
+  const result = await generateNewInvite(
+    props.activeInviteId,
+    props.invitationDuration,
+    props.learningPlanId,
+    classId,
+  );
+
+  const url = generateUrl(result.data.attributes.hash);
+  plainLink.value = url;
+  activeLink.value = result.data.attributes;
+
+  duration.value = calcRemainingTime(result.data.attributes.expires_at);
+  console.log({ result, url, duration: duration.value });
+};
 </script>

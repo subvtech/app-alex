@@ -4,6 +4,14 @@
       <alex-project-members-table
         :data="activeMembers"
         :search="search"
+        :learning-plan-id="learningPlanStore.learningPlan?.id"
+        :invitation-duration="
+          learningPlanStore.learningPlan?.invitation_duration
+        "
+        :active-invite-id="
+          learningPlanStore.learningPlan?.invitation_links[0]?.id
+        "
+        :disable-invite="!learningPlanStore.learningPlan?.invite_enabled"
         :title="$t('components.learningPlan.drawer.filter')"
         :can-edit="learningPlanStore.userIsFacilitator"
         :active-filters="selectedFilters"
@@ -24,7 +32,7 @@
       <pre>{{
         {
           selectedFilters,
-          userIsFacilitator: learningPlanStore.userIsFacilitator,
+
           members: learningPlanStore.activeMembers.map(
             (member) => member.email,
           ),

@@ -10,8 +10,8 @@ export const useInvitationLink = () => {
   }
   const fullPath = removeAfterLastSlash(window.location.href);
 
-  const generateUrl = (hash, learningPlanId = 0) =>
-    `${fullPath}/${learningPlanId}/join/${hash}`;
+  const generateUrl = (hash, learningPlanId?) =>
+    `${fullPath}/${learningPlanId ? learningPlanId + '/' : ''}join/${hash}`;
 
   function msToHHMMSS(ms) {
     const totalSeconds = Math.floor(ms / 1000);
@@ -37,12 +37,13 @@ export const useInvitationLink = () => {
     inviteId: number | string | null,
     duration: number,
     learningplanId: number | string,
-    classId: number | string,
+    classId: number | string | null,
   ) => {
     try {
       if (inviteId) await _delete('invitation-links', inviteId);
     } catch {}
 
+    console.log({ inviteId, duration, learningplanId, classId });
     const result: any = await create('invitation-links', {
       duration,
       learningplan: learningplanId,
@@ -52,5 +53,10 @@ export const useInvitationLink = () => {
     return result;
   };
 
-  return { generateUrl, msToHHMMSS, calcRemainingTime, generateNewInvite };
+  return {
+    generateUrl,
+    msToHHMMSS,
+    calcRemainingTime,
+    generateNewInvite,
+  };
 };

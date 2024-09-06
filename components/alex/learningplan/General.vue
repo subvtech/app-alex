@@ -112,14 +112,10 @@
                 :key="classItem.id"
                 full-width
                 :class-name="classItem.name"
-                :duration="learningPlan.invitation_duration"
-                :course-id="learningPlan.id"
-                :class-id="classItem.id"
                 :data="classItem.activeLink"
+                :duration="duration"
                 @update:link="
-                  (data) => {
-                    plainLink = data.url;
-                  }
+                  updateLink(classItem.id, classItem.activeLink?.id)
                 "
                 @link:expired="plainLink = null"
               />
@@ -197,8 +193,13 @@ const props = withDefaults(defineProps<GeneralProps>(), {
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
+
+const { generateUrl, generateNewInvite, calcRemainingTime } =
+  useInvitationLink();
+
 const emit = defineEmits(['update']);
 const plainLink = ref<string | null>(null);
+const duration = ref(0);
 const user = useStrapiUser<User>();
 
 const updateAbout = async (text) => {
@@ -234,6 +235,22 @@ const learningGoals = computed(
       },
     })),
 );
+
+const updateLink = async (classId, activeInviteId?) => {
+  const result = await generateNewInvite(
+    activeInviteId,
+    props.learningPlan.invitation_duration,
+    props.learningPlan.id,
+    classId,
+  );
+
+  plainLink.value = generateUrl(
+    result.data.attributes.hash,
+    props.learningPlan.id,
+  );
+
+  duration.value = calcRemainingTime(result.data.attributes.expires_at);
+};
 
 const getActiveLink = (classItem: ClassSimple) => {
   const activeLinks = classItem?.invitation_links?.filter(

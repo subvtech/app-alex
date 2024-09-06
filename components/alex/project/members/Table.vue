@@ -18,6 +18,9 @@
           :dialog-action-text="
             $t('components.learningPlan.projects.invite.label')
           "
+          :learning-plan-id="learningPlanId"
+          :invitation-duration="invitationDuration"
+          :disable-invite="disableInvite"
           :dialog-action-disabled="false"
           :dialog-action-loading="false"
       /></template>
@@ -118,13 +121,18 @@
 export interface TableCardProps {
   showPositions?: boolean;
   data: LearningPlanMemberSimple[];
+  learningPlanId: string;
+  activeInviteId?: number | null;
+  invitationDuration: number;
   search: string;
   canEdit?: boolean;
+  disableInvite?: boolean;
   activeFilters?: string[];
 }
 
 const props = withDefaults(defineProps<TableCardProps>(), {
   activeFilters: () => [],
+  activeInviteId: null,
 });
 const emit = defineEmits(['update:search', 'toggle:drawer', 'remove:filter']);
 const { t } = useI18n();

@@ -126,10 +126,10 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
 
   const standardTrails = computed(() => {
     const trails =
-      learningPlan.value?.learning_structures.filter(
+      learningPlan.value?.learning_structures?.filter(
         (structure) =>
           structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? [];
+      )[0]?.trails ?? [];
 
     if (userIsFacilitator.value) return trails;
     else return trails.filter((trail) => !trail.hidden);

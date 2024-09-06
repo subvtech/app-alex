@@ -1,16 +1,27 @@
 export const useTimeout = (milliseconds: number) => {
-  const timeSpan = milliseconds < 1 ? 500 : milliseconds;
+  const timeSpan = milliseconds < 0 ? 0 : milliseconds;
+  const timeEllapsed = ref(0);
+
   const timeoutId = ref<NodeJS.Timeout | null>(null);
-  const startTimer = ref(false)
+  const timeRunning = ref(false);
+
   const stopTimeout = () => {
     if (timeoutId.value) clearTimeout(timeoutId.value);
     else timeoutId.value = null;
-    startTimer.value = false;
+    timeRunning.value = false;
+    timeEllapsed.value = 0;
   };
 
-  const setStartTimer = (value: boolean) => startTimer.value = value;
+  const setTimeRunning = (value: boolean) => (timeRunning.value = value);
 
-
-
-  return { timeSpan, timeoutId, stopTimeout, setStartTimer, startTimer };
+  watch(timeRunning, () => {
+    if (!timeRunning.value) {
+      stopTimeout();
+      return;
+    }
+    timeoutId.value = setTimeout(() => {
+      timeEllapsed.value++;
+    }, timeSpan);
+  });
+  return { timeSpan, timeoutId, stopTimeout, setTimeRunning, timeRunning };
 };
