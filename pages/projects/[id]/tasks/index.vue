@@ -1,6 +1,5 @@
 <template>
-  <div>Tarefas</div>
-  <!-- <div class="bg-white rounded wrapper">
+  <div class="tw-flex tw-flex-col bg-white rounded tw-flex-grow">
     <Transition name="fade" mode="out-in">
       <div
         v-if="learningPlanStore.loading"
@@ -29,12 +28,15 @@
           hide-details
         />
         <alex-inputs-select
+          v-if="mode === 'kanban'"
           v-model="selectedSprint"
           :items="sprints"
           :placeholder="t('pages.task.searchPlaceholder')"
           class="tw-w-[300px] tw-mr-auto"
           density="comfortable"
           name="search"
+          item-title="sprint"
+          return-object
           hide-details
         />
         <div class="tw-flex tw-gap-2">
@@ -59,48 +61,62 @@
       </div>
     </Transition>
 
-    <div class="w-100 px-6 py-4 ga-6 d-flex flex-column">
+    <div class="w-100 px-6 py-4 ga-6 d-flex flex-column tw-flex-grow">
       <alex-learningplan-task-table-skeleton v-if="learningPlanStore.loading" />
 
-      <div v-else>
-        <TransitionGroup name="list">
+      <template v-else>
+        <TransitionGroup
+          v-if="chips.length"
+          name="list"
+          tag="div"
+          class="tw-flex tw-gap-2"
+        >
           <alex-custom-chip
             v-for="chip in chips"
             :key="chip"
             :text="t(`pages.task.filterChip.${chip}`)"
             status="secondary"
             variant="outlined"
-            class="mr-2 bg-gray-blue text-gray-600 text-body-5"
+            class="mr-2 bg-gray-blue text-gray-600 text-body-5 tw-w-fit"
             append-icon="mdi-close"
             clickable
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>
-        <Transition v-if="mode === 'kanban'" name="fade" mode="out-in">
-          <alex-learningplan-task-project-kanban v-model="columns" />
-        </Transition>
+
+        <alex-learningplan-task-project-kanban
+          v-if="mode === 'kanban'"
+          v-model="columns"
+          :items="filteredItemsBySprint"
+        >
+          <template #card="{ item }">
+            <alex-learningplan-task-project-card
+              :date="item.finish_at ? new Date(item.finish_at) : undefined"
+              :name="item.title"
+              :tags="item.tags"
+              :participants="getMembers(item?.task_members)"
+            />
+          </template>
+        </alex-learningplan-task-project-kanban>
         <alex-learningplan-task-project-list
           v-else
           ref="taskList"
           :search="search"
           :filter="filter"
         />
-      </div>
+      </template>
     </div>
-    <alex-learningplan-task-drawer-filter
+    <alex-learningplan-task-project-filter-tasks
       ref="filterDrawer"
-      :model-value="openFilterDrawer"
+      v-model="openFilterDrawer"
       @filter="handleFilter"
-      @update:model-value="(value) => (openFilterDrawer = value)"
     />
-  </div> -->
+  </div>
+  -->
 </template>
 <script setup lang="ts">
-import { Colors } from '~/components/alex/learningplan/task/project/kanban/column/Header.vue';
-
 export interface filterType {
-  select?: string | null;
-  archivedTasks?: boolean;
+  members?: any[];
   startDate?: {
     start: string | null;
     end: string | null;
@@ -117,16 +133,142 @@ const learningPlanStore = useLearningPlanStore();
 const headerStore = usePageHeaderStore();
 
 // refs
-const mode = ref<'list' | 'kanban'>('kanban');
+const mode = ref<'list' | 'kanban'>('list');
 const search = ref('');
-const selectedSprint = ref('sprint 1');
-const sprints = ref(['sprint 1', 'sprint 2', 'sprint 3']);
-const columns = ref<{ title: string; group: string; color: Colors }[]>([
-  { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
-  { title: 'Frontend', group: 'frontend', color: 'gray' },
-  { title: 'Backend', group: 'backend', color: 'gray' },
-  { title: 'Testing', group: 'testing', color: 'gray' },
+const sprints = ref([
+  {
+    id: 0,
+    sprint: 'sprint 1',
+    columns: [
+      { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
+      { title: 'Frontend', group: 'frontend', color: 'gray' },
+    ],
+  },
+  {
+    id: 1,
+    sprint: 'Sprint 2',
+    columns: [{ title: 'BackEnd', group: 'BackEnd', color: 'gray' }],
+  },
 ]);
+const columns = computed({
+  get: () => {
+    return selectedSprint.value.columns;
+  },
+  set: (value) => {
+    selectedSprint.value.columns = value;
+  },
+});
+const selectedSprint = ref(sprints.value[0]);
+const items = ref<{ sprint_id: number; group: string; raw: TaskSimple }[]>([
+  {
+    sprint_id: 1,
+    group: 'ux_ui',
+    raw: {
+      title: 'UX/UI',
+      finish_at: '2024-08-22',
+      id: 1,
+      status: 'ux_ui',
+      position: 0,
+      task_members: [],
+      allowed_editor_plugins: '',
+      submission_required: false,
+      learning_plan_id: 1,
+      can_submit_after_deadline: false,
+      can_change_from_review: false,
+      submission_description: '',
+      tags: [
+        {
+          id: 12,
+          isGeneral: false,
+          text: 'UX UI',
+          verified: false,
+          isPublic: false,
+          verified_date: new Date(),
+        },
+      ],
+    },
+  },
+  {
+    sprint_id: 0,
+    group: 'ux_ui',
+    raw: {
+      title: 'Design',
+      finish_at: '2024-08-22',
+      id: 2,
+      status: 'ux_ui',
+      position: 1,
+      task_members: [
+        {
+          id: 1,
+          status: 'in_progress',
+          can_submit_after_deadline: false,
+          started_at: new Date().toISOString(),
+          finished_at: new Date().toISOString(),
+          learning_plan_member: {
+            user: {
+              fullname: 'John Doe',
+              avatar: {
+                url: 'https://thispersondoesnotexist.com/',
+                id: 1,
+              },
+            },
+          },
+        },
+        {
+          id: 2,
+          status: 'in_progress',
+          can_submit_after_deadline: false,
+          started_at: new Date().toISOString(),
+          finished_at: new Date().toISOString(),
+          learning_plan_member: {
+            user: {
+              fullname: 'John Doe',
+              avatar: {
+                url: 'https://thispersondoesnotexist.com/',
+                id: 1,
+              },
+            },
+          },
+        },
+      ],
+      allowed_editor_plugins: '',
+      submission_required: false,
+      learning_plan_id: 1,
+      can_submit_after_deadline: false,
+      can_change_from_review: false,
+      submission_description: '',
+      tags: [
+        {
+          id: 1,
+          text: 'UX UI',
+          verified: false,
+          verified_date: new Date(),
+          isGeneral: false,
+          isPublic: false,
+        },
+      ],
+    },
+  },
+]);
+const filteredItems = computed({
+  get: () => {
+    return items.value.filter(
+      (item) =>
+        item.raw.title.toLowerCase().includes(search.value.toLowerCase()) ||
+        item.raw.tags?.some((tag) =>
+          tag.text.toLowerCase().includes(search.value.toLowerCase()),
+        ),
+    );
+  },
+  set: (value) => {
+    items.value = value;
+  },
+});
+const filteredItemsBySprint = computed(() => {
+  return filteredItems.value.filter(
+    (item) => item.sprint_id === selectedSprint.value.id,
+  );
+});
 const { id } = route.params;
 const filter = ref<filterType>();
 const filterDrawer = ref();
@@ -151,9 +293,18 @@ const toggleMode = () => {
   }
   mode.value = 'kanban';
 };
-watch(columns, () => {
-  console.log(columns.value);
-});
+const getMembers = (taskMembers?: TaskMember[]) => {
+  return (
+    taskMembers?.map((member) => ({
+      name: member.learning_plan_member?.user?.fullname || '',
+      ...(member.learning_plan_member?.user?.avatar?.url && {
+        image: {
+          url: member.learning_plan_member?.user?.avatar?.url,
+        },
+      }),
+    })) || []
+  );
+};
 watch(
   () => [learningPlanStore.loading],
   () => {
@@ -194,10 +345,6 @@ watch(
 <style scoped>
 .header {
   border-bottom: 1px solid rgb(var(--v-theme-gray-100));
-}
-
-.wrapper {
-  min-height: calc(100vh - 548px);
 }
 
 .fade-enter-active,
