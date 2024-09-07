@@ -54,7 +54,7 @@ interface TaskProgressProps {
 
 const props = defineProps<TaskProgressProps>();
 
-const selectedSprint = ref(props.data[0].sprint);
+const selectedSprint = ref(props.data[0]?.sprint);
 
 const colorsMapping = {
   to_do: '#F1416C',
@@ -63,10 +63,11 @@ const colorsMapping = {
   default: '#E4E6EF',
 };
 
-const colors = computed(() =>
-  props.data[0].columns.map(
-    (item) => colorsMapping[item.status] || colorsMapping.default,
-  ),
+const colors = computed(
+  () =>
+    props.data[0]?.columns.map(
+      (item) => colorsMapping[item.status] || colorsMapping.default,
+    ),
 );
 
 const options = props.data.map((sprint) => sprint.sprint);
