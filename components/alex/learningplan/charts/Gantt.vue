@@ -106,10 +106,11 @@ export type History = {
   type: string;
   updateAt: Date | string;
 };
-type Epic = {
+export type Epic = {
   id: number;
   title: string;
   tasks?: History[];
+  status_type: string;
 };
 
 export type Sprint = {
@@ -118,6 +119,17 @@ export type Sprint = {
   start_at: Date | string;
   end_at: Date | string;
   epics?: Epic[];
+  kanban: {
+    kanban_columns: {
+      title: string;
+      id: string;
+      position: string;
+      status_type: string;
+      kanban_column_tasks: {
+        tasks: History[];
+      }[];
+    }[];
+  };
 };
 
 interface GanttChartProps {
@@ -154,8 +166,8 @@ const rows = computed(() => {
       });
       epics.tasks?.forEach((story) => {
         rows.push({
-          barBeginDate: sprint.start_at,
-          barEndDate: sprint.end_at,
+          barBeginDate: story.start_at,
+          barEndDate: story.finish_at,
           labelColumn: story.title,
           ganttBarConfig: {
             id: `sprint-${sprint.id}-history-${story.id}-epic-${story.id}`,
@@ -233,9 +245,9 @@ const rows = computed(() => {
 //   props.sprints.forEach((sprint) => {
 //     result.push(
 //       createRow(
-//         sprint.startDate,
-//         sprint.finalDate,
-//         sprint.name,
+//         sprint.start_at,
+//         sprint.end_at,
+//         sprint.title,
 //         `sprint-${sprint.id}`,
 //       ),
 //     );

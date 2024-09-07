@@ -50,9 +50,9 @@
       />
       <alex-learningplan-charts-task-progress
         class="!tw-w-1/3"
-        :categories="['total', 'predicted']"
+        :categories="'total'"
         last-update="2024-07-11 12:00"
-        :data="data"
+        :data="taskProgress"
       />
     </div>
 
@@ -139,7 +139,6 @@ interface Data {
     totalSprints: number;
     remainingDays: number;
   };
-  tasksSprint: Task[];
 }
 
 const { t } = useI18n();
@@ -150,28 +149,7 @@ const learningPlan = ref<LearningPlan>();
 const institutions = ref<Strapi4ResponseData<Institution>[]>([]);
 const precision = ref<PrecisionGantt>('week');
 const sprints = ref<Sprint[]>([]);
-const data = ref([
-  {
-    name: 'Jan',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500,
-  },
-  {
-    name: 'Feb',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500,
-  },
-  {
-    name: 'Mar',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500,
-  },
-  {
-    name: 'Apr',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500,
-  },
-]);
+const taskProgress = ref<{ sprint: string; columns: any }[]>([]);
 
 const totalizers = ref({
   sprints: {
@@ -229,26 +207,38 @@ const getLearningPlan = async () => {
   if (!response?.data) {
     return navigateTo('/projects/me');
   }
-  console.log(response);
   learningPlan.value = response.data.attributes as never;
   institutions.value = response.data.attributes.institutions.data as never;
 };
+
 const fetchData = async () => {
   const response = (await find<Data>(
     `sprints/project/${learningPlanId.value}`,
   )) as unknown as Data;
 
-  console.log(response);
   totalizers.value.epics.value = response.counters.epicCount;
   totalizers.value.sprints.value = response.counters.totalSprints;
   totalizers.value.stories.value = response.counters.storyCount;
   totalizers.value.remainingTime.value = `${response.counters.remainingDays} dias`;
   sprints.value = response.sprints;
+
+  const process = response.sprints.map((sprint) => ({
+    sprint: sprint.title,
+    columns: sprint.kanban.kanban_columns.map((column) => ({
+      status: column.status_type,
+      name: column.title,
+      total: column.kanban_column_tasks.reduce((count, taskGroup) => {
+        return count + taskGroup.tasks.length;
+      }, 0),
+    })),
+  }));
+
+  taskProgress.value = process;
 };
 
-onBeforeMount(async () => {
-  await getLearningPlan();
-  await fetchData();
+onMounted(() => {
+  getLearningPlan();
+  fetchData();
 });
 </script>
 

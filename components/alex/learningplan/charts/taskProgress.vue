@@ -1,45 +1,82 @@
 <template>
-  <div class="tw-w-full">
-    <alex-custom-card title="Progresso de tarefas">
-      <template #content>
-        <div class="tw-flex tw-flex-col tw-items-center">
-          <DonutChart
-            class="!tw-w-full"
-            index="name"
-            :data="data"
-            :category="'total'"
-            :colors="['#F1416C', '#50CD89', '#00A3FF', '#E4E6EF']"
-            :value-formatter="(tick: number | Date) => `${data.length} Tarefas`"
-          />
-          <span>{{ $t('pages.projects.empty_task_progress') }}</span>
-          <span class="tw-text-sm tw-text-gray-500">
-            {{ $t('pages.projects.last_update') }}
-            {{ lastUpdate }}
-          </span>
-        </div>
-      </template>
-    </alex-custom-card>
+  <div class="tw-w-full tw-bg-white">
+    <div class="tw-border-b tw-p-2 tw-flex tw-justify-between tw-items-center">
+      <h3>{{ $t('pages.projects.task_progress') }}</h3>
+      <alex-inputs-select
+        v-model="selectedSprint"
+        class="!tw-p-0 !tw-h-14"
+        name="sprints"
+        :items="options"
+      />
+    </div>
+    <div class="tw-flex tw-flex-col tw-items-center tw-p-4">
+      <DonutChart
+        class="!tw-w-full"
+        index="name"
+        :data="taskData"
+        :category="props.categories"
+        :colors="colors"
+        :value-formatter="
+          (tick: number | Date) =>
+            typeof tick === 'number'
+              ? `${new Intl.NumberFormat('us').format(tick).toString()} ${$t(
+                  'task',
+                )}`
+              : ''
+        "
+      />
+      <span>{{ $t('pages.projects.empty_task_progress') }}</span>
+      <span class="tw-text-sm tw-text-gray-500">
+        {{ $t('pages.projects.last_update') }}
+        {{ lastUpdate }}
+      </span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { DonutChart } from '~/components/ui/chart-donut';
 
-interface Data {
-  name: String;
-  total: number;
-  predicted: number;
+interface sprintData {
+  sprint: string;
+  columns: {
+    status: string;
+    name: string;
+    total: number;
+  }[];
 }
 
 interface TaskProgressProps {
-  categories: string[];
-  data: Data[];
+  categories: 'name' | 'total';
+  data: sprintData[];
   lastUpdate: Date | string;
 }
 
 const props = defineProps<TaskProgressProps>();
 
-const data = computed(() => props.data);
+const selectedSprint = ref(props.data[0].sprint);
+
+const colorsMapping = {
+  to_do: '#F1416C',
+  doing: '#50CD89',
+  done: '#00A3FF',
+  default: '#E4E6EF',
+};
+
+const colors = computed(() =>
+  props.data[0].columns.map(
+    (item) => colorsMapping[item.status] || colorsMapping.default,
+  ),
+);
+
+const options = props.data.map((sprint) => sprint.sprint);
+
+const taskData = computed(() => {
+  const selectedColumns =
+    props.data.find((sprint) => sprint.sprint === selectedSprint.value)
+      ?.columns || [];
+  return selectedColumns.map(({ name, total }) => ({ name, total }));
+});
 const lastUpdate = computed(() => props.lastUpdate);
 </script>
 
