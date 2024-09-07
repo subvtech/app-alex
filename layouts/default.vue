@@ -297,7 +297,7 @@ const adminMenus = [
 
 const menus = computed(() => {
   const newMenus =
-    user.value.role.name === 'ADMIN'
+    user.value?.role?.name === 'ADMIN'
       ? defaultMenus.concat(adminMenus)
       : defaultMenus;
 
