@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Card, CardContent } from '@/components/ui/card';
 import { BarChart } from '@/components/ui/chart-bar';
+import CardTotalizer from './-components/CardTotalizer.vue';
 
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
@@ -13,25 +13,25 @@ const data = ref([]);
 const totalizers = ref({
   sprints: {
     title: t('pages.projects.overview.total_sprints'),
-    icon: 'mdi-calendar-check',
-    value: 0,
+    icon: 'alex:Sprint',
+    value: '0',
     percentage: 0,
   },
   epics: {
     title: t('pages.projects.overview.total_epics'),
-    icon: 'mdi-calendar-check',
-    value: 0,
-    percentage: 0,
+    icon: 'alex:ManageHistory',
+    value: '0',
+    percentage: 50,
   },
   stories: {
     title: t('pages.projects.overview.total_story'),
-    icon: 'mdi-calendar-check',
-    value: 0,
+    icon: 'alex:HistoryEdu',
+    value: '0',
     percentage: 0,
   },
   remainingTime: {
     title: t('pages.projects.overview.remaining_time'),
-    icon: 'mdi-calendar-check',
+    icon: 'mdi-calendar-clock',
     value: '0 dias',
     percentage: 0,
   },
@@ -86,31 +86,8 @@ onBeforeMount(async () => {
 
 <template>
   <div>
-    <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5">
-      <Card
-        v-for="totalizer in Object.values(totalizers)"
-        :key="totalizer.title"
-        class="tw-flex-1 tw-gap-2 bg-white tw-w-full sm:tw-w-1/2 lg:tw-w-1/3"
-      >
-        <CardContent class="!tw-p-0">
-          <div class="tw-flex py-2 gap-4 overflow-hidden">
-            <div class="tw-bg-[#00B7CC] h-full tw-w-2 tw-rounded-r-xl"></div>
-            <div class="tw-py-4 tw-flex tw-flex-col tw-gap-1">
-              <div class="tw-flex tw-items-center tw-mb-1 tw-gap-1">
-                <div class="tw-bg-slate-200 tw-p-3 tw-rounded tw-h-4 tw-w-4 tw-flex tw-items-center tw-justify-center">
-                  <v-icon icon="mdi-camera-timer" size="14px" />
-                </div>
-                <span class="tw-font-bold tw-text-gray-600">{{ totalizer.title }}</span>
-              </div>
-              <span class="tw-text-4xl tw-font-bold tw-mb-1">{{ totalizer.value }}</span>
-              <div class="tw-flex tw-items-center tw-gap-1">
-                <alex-custom-chip size="small" variant="flat" :text="`${totalizer.percentage}%`" :status="'blue'" />
-                <span class="tw-text-sm tw-text-gray-500">{{ $t('pages.projects.overview.completed') }}</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5 tw-flex-wrap">
+      <CardTotalizer v-for="totalizer in Object.values(totalizers)" :key="totalizer.title" :totalizer="totalizer" />
     </div>
 
     <div class="tw-flex tw-space-x-4 tw-mb-5">

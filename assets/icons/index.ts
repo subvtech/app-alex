@@ -1,11 +1,13 @@
 import { h } from 'vue';
-import type { IconSet, IconProps } from 'vuetify';
-import trail from './Trail.vue';
+import type { IconProps, IconSet } from 'vuetify';
 import DragIndicator from './DragIndicator.vue';
-import RoundAddPhoto from './RoundAddPhoto.vue';
+import HistoryEdu from './HistoryEdu.vue';
 import Kanban from './Kanban.vue';
+import ManageHistory from './ManageHistory.vue';
 import ProjectConfig from './ProjectConfig.vue';
+import RoundAddPhoto from './RoundAddPhoto.vue';
 import Sprint from './Sprint.vue';
+import trail from './Trail.vue';
 
 const alexAliases = {
   trail,
@@ -14,6 +16,8 @@ const alexAliases = {
   Kanban,
   ProjectConfig,
   Sprint,
+  ManageHistory,
+  HistoryEdu,
 };
 
 const alexIcons: IconSet = {
