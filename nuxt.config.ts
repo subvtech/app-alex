@@ -16,11 +16,7 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   app: { pageTransition: { name: 'page', mode: 'out-in' } },
-  css: [
-    'vuetify/lib/styles/main.sass',
-    'plyr/dist/plyr.css',
-    '@mdi/font/css/materialdesignicons.min.css',
-  ],
+  css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
   build: {
     transpile: ['vuetify'],
   },

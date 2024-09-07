@@ -47,22 +47,12 @@ const columns = computed<SprintItem['columns']>({
   set: (value) => (selectedSprint.value.columns = value),
 });
 
-const filteredItems = computed({
-  get() {
-    return items.value.filter((item) => {
-      return (
-        contains(item.raw.title, search.value) ||
-        item.raw.tags?.some((tag) => contains(tag.text, search.value))
-      );
-    });
-  },
-  set(value) {
-    items.value = value;
-  },
-});
+const filteredItems = computed(() => {
+  const res = items.value.filter(({ raw: { tags, title } }) => {
+    return contains(title, search.value) || tags?.some((tag) => contains(tag.text, search.value));
+  });
 
-const filteredItemsBySprint = computed(() => {
-  return filteredItems.value.filter((item) => item.sprint_id === selectedSprint.value.id);
+  return selectedSprint.value.id ? res.filter((item) => item.sprint_id === selectedSprint.value.id) : res;
 });
 
 const handleFilter = (value: FilterType) => {
@@ -91,9 +81,8 @@ watch(
   () => [learningPlanStore.loading],
   () => {
     if (learningPlanStore.loading) return;
-    const { learningPlan, userIsFacilitator } = learningPlanStore;
-    isProfessor.value = userIsFacilitator || false;
-    classes.value = learningPlan?.classes?.map(get('name')) || [];
+    classes.value = learningPlanStore.learningPlan?.classes?.map(get('name')) || [];
+    isProfessor.value = !!learningPlanStore.userIsFacilitator;
   },
 );
 </script>
@@ -105,33 +94,30 @@ watch(
         v-if="learningPlanStore.loading"
         class="w-100 d-flex justify-space-between align-center height-18 header px-6"
       >
-        <alex-custom-skeleton color="gray-300" class="w-100 max-w-80 mr-6 min-w-60 height-11" />
-        <alex-custom-skeleton color="gray-300" class="w-100 max-w-11 height-11" />
+        <alex-custom-skeleton class="w-100 max-w-80 mr-6 min-w-60 height-11" color="gray-300" />
+        <alex-custom-skeleton class="w-100 max-w-11 height-11" color="gray-300" />
       </div>
-      <div
-        v-else
-        class="w-100 d-flex justify-space-between align-center height-18 header px-6 gap-2"
-      >
+      <div v-else class="w-100 d-flex justify-space-between align-center height-18 header px-6 gap-2">
         <alex-inputs-text-field
           v-model="search"
-          :placeholder="t('pages.task.searchPlaceholder')"
-          prepend-inner-icon="mdi-magnify"
+          hide-details
           class="tw-w-[300px]"
           density="comfortable"
           name="search"
-          hide-details
+          prepend-inner-icon="mdi-magnify"
+          :placeholder="t('pages.projects.find_task')"
         />
         <alex-inputs-select
           v-if="mode === 'kanban'"
           v-model="selectedSprint"
-          :items="sprints"
-          :placeholder="t('pages.task.searchPlaceholder')"
+          hide-details
+          return-object
           class="tw-w-[300px] tw-mr-auto"
           density="comfortable"
-          name="search"
           item-title="sprint"
-          return-object
-          hide-details
+          name="search"
+          :items="sprints"
+          :placeholder="t('pages.projects.find_task')"
         />
         <div class="tw-flex tw-gap-2">
           <alex-custom-button
@@ -139,16 +125,14 @@ watch(
             variant="secondary"
             :disabled="!sprints.length"
             :prepend-icon="mode === Mode.List ? 'alex:Kanban' : 'mdi-clipboard-text-outline'"
-            :title="
-              sprints.length ? '' : 'É necessário ter pelo menos uma Sprint para ver o modo Kanban'
-            "
+            :title="sprints.length ? '' : t('pages.projects.kanban_sprint_required')"
             @click="toggleMode"
           >
-            {{ mode === Mode.List ? 'Ver Kanban' : 'Ver Backlog' }}
+            {{ mode === Mode.List ? t('pages.projects.see_kanban') : t('pages.projects.see_backlog') }}
           </alex-custom-button>
           <alex-custom-button
-            size="large"
             icon="mdi-filter-variant"
+            size="large"
             variant="secondary"
             @click="openFilterDrawer = true"
           />
@@ -162,16 +146,16 @@ watch(
           <alex-custom-chip
             v-for="chip in chips"
             :key="chip"
-            :text="t(`pages.task.filterChip.${chip}`)"
+            clickable
+            append-icon="mdi-close"
+            class="mr-2 bg-gray-blue text-gray-600 text-body-5 tw-w-fit"
             status="secondary"
             variant="outlined"
-            class="mr-2 bg-gray-blue text-gray-600 text-body-5 tw-w-fit"
-            append-icon="mdi-close"
-            clickable
+            :text="t(`pages.projects.tasks.filters.${chip}`)"
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>
-        <Kanban v-if="mode === Mode.Kanban" v-model="columns" :items="filteredItemsBySprint">
+        <Kanban v-if="mode === Mode.Kanban" v-model="columns" :items="filteredItems">
           <template #card="{ item }">
             <TaskCard
               :date="item.finish_at ? new Date(item.finish_at) : undefined"

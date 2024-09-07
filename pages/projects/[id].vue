@@ -29,27 +29,27 @@ const isSettingsRoute = computed(() => route.name === 'projects-id-settings');
 
 const generalLinks = computed<TabType[]>(() => [
   {
-    label: t('pages.projects.overview'),
+    label: t('pages.projects.common.overview'),
     value: 'overview',
     to: `/projects/${projectId}/overview`,
   },
   {
-    label: t('pages.projects.documents'),
+    label: t('pages.projects.common.documents'),
     value: 'documents',
     to: `/projects/${projectId}/documents`,
   },
   {
-    label: t('pages.projects.tasks'),
+    label: t('pages.projects.common.tasks'),
     value: 'tasks',
     to: `/projects/${projectId}/tasks`,
   },
   {
-    label: t('pages.projects.members'),
+    label: t('pages.projects.common.members'),
     value: 'members',
     to: `/projects/${projectId}/members`,
   },
   {
-    label: t('pages.projects.individual_learning'),
+    label: t('pages.projects.common.individual_learning'),
     value: 'individual_learning',
     to: `/projects/${projectId}/individual_learning`,
   },
@@ -117,10 +117,10 @@ watch(
     if (learningPlanStore.loading) return;
     const slug = route.name?.toString()?.split('-').at(-1);
 
-    headerStore.title = t('pages.projects.my_projects');
+    headerStore.title = t('pages.projects.common.my_projects');
     headerStore.items = [
       {
-        title: t('pages.projects.my_projects'),
+        title: t('pages.projects.common.my_projects'),
         to: '/projects/me',
       },
       {
@@ -140,15 +140,15 @@ watch(
 
     if (route.path.includes('/individual_learning')) {
       headerStore.items.push({
-        title: t('pages.projects.individual_learning'),
+        title: t('pages.projects.common.individual_learning'),
         to: `/projects/${projectId}/individual_learning`,
         disabled: !memberId,
       });
 
       if (memberId) {
-        headerStore.title = t('pages.projects.individual_learning');
+        headerStore.title = t('pages.projects.common.individual_learning');
         headerStore.items.push({
-          title: t(`pages.projects.${slug}`),
+          title: t(`pages.projects.common.${slug}`),
           disabled: true,
           to: `/projects/${projectId}/individual_learning/${memberId}/${slug}`,
         });
@@ -173,39 +173,30 @@ onBeforeUnmount(() => {
   <section class="tw-flex tw-flex-col tw-flex-grow">
     <alex-custom-banner
       v-if="!route.meta?.hideLearningPlanBanner"
-      :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
-      :cover-picture="learningPlanStore.learningPlan?.cover_image"
-      :profile-picture-size="24"
-      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
-      :user-id="user.id"
-      :show-settings="learningPlanStore.userIsFacilitator"
+      darker-background
+      is-professor
+      show-menu
+      show-profile-picture
+      show-shade
       distribution="fullname-username-role"
-      :fullname="learningPlanStore.facilitator?.user?.fullname"
-      :description="learningPlanStore.learningPlan?.title"
-      :start-date="learningPlanStore.startDateFormated"
-      :end-date="learningPlanStore.endDateFormated"
-      :links="isJoinRoute ? [] : generalLinks"
-      :selected-option="activeTab"
       :copy-object="
-        learningPlanStore.activeInvitationLinkUrl &&
-        learningPlanStore.userIsFacilitator
-          ? {
-              copyText: learningPlanStore.activeInvitationLinkUrl,
-              label: $t('pages.courses.invite'),
-            }
+        learningPlanStore.activeInvitationLinkUrl && learningPlanStore.userIsFacilitator
+          ? { copyText: learningPlanStore.activeInvitationLinkUrl, label: $t('pages.courses.invite') }
           : undefined
       "
-      :settings="{
-        label: '',
-        icon: 'mdi-cog-outline',
-        value: 5,
-        to: `/projects/${projectId}/settings`,
-      }"
-      show-profile-picture
-      darker-background
-      show-shade
-      show-menu
-      is-professor
+      :cover-picture="learningPlanStore.learningPlan?.cover_image"
+      :description="learningPlanStore.learningPlan?.title"
+      :end-date="learningPlanStore.endDateFormated"
+      :fullname="learningPlanStore.facilitator?.user?.fullname"
+      :links="isJoinRoute ? [] : generalLinks"
+      :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
+      :profile-picture-size="24"
+      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
+      :selected-option="activeTab"
+      :settings="{ label: '', icon: 'mdi-cog-outline', value: 5, to: `/projects/${projectId}/settings` }"
+      :show-settings="learningPlanStore.userIsFacilitator"
+      :start-date="learningPlanStore.startDateFormated"
+      :user-id="user.id"
       @select:option="changeRoute"
     />
     <NuxtPage @update="fetchData" />

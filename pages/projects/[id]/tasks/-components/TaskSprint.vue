@@ -144,23 +144,11 @@ const handleStartCreateTask = (index: number) => {
             <div class="tw-flex tw-gap-2 text-gray-600">
               <p>{{ getSprintDates(sprint.raw) }}</p>
             </div>
-            <alex-custom-chip
-              status="secondary"
-              size="small"
-              :text="sprint.raw.tasks.length.toString()"
-            />
+            <alex-custom-chip status="secondary" size="small" :text="sprint.raw.tasks.length.toString()" />
             <div class="ml-auto">
-              <alex-custom-dropdown
-                :items="getDropdownItems(index)"
-                icon="mdi-plus"
-                variant="text"
-              />
+              <alex-custom-dropdown :items="getDropdownItems(index)" icon="mdi-plus" variant="text" />
             </div>
-            <alex-custom-dropdown
-              :items="getDropdownItems(index)"
-              icon="mdi-dots-vertical"
-              variant="text"
-            />
+            <alex-custom-dropdown :items="getDropdownItems(index)" icon="mdi-dots-vertical" variant="text" />
           </v-expansion-panel-title>
           <v-expansion-panel-text>
             <Transition :name="getSlideTransition(index)" mode="out-in">
@@ -201,7 +189,7 @@ const handleStartCreateTask = (index: number) => {
                   :loading="isPending && index === isCreatingTask"
                   @click="handleStartCreateTask(index)"
                 >
-                  {{ $t('pages.task.add') }}
+                  {{ $t('pages.projects.tasks.add') }}
                 </alex-custom-button>
                 <div v-else class="d-flex ga-2">
                   <alex-inputs-text-field
@@ -212,15 +200,11 @@ const handleStartCreateTask = (index: number) => {
                     density="comfortable"
                     name="taskTitle"
                     :disabled="isPending"
-                    :placeholder="$t('pages.task.addPlaceholder')"
+                    :placeholder="$t('pages.projects.tasks.add_placeholder')"
                     @keyup.enter="handleAddTask(sprint.raw)"
                   />
-                  <alex-custom-button
-                    size="large"
-                    :loading="isPending"
-                    @click="handleAddTask(sprint.raw)"
-                  >
-                    {{ $t('pages.task.addButton') }}
+                  <alex-custom-button size="large" :loading="isPending" @click="handleAddTask(sprint.raw)">
+                    {{ $t('pages.projects.tasks.add_button') }}
                   </alex-custom-button>
                 </div>
               </Transition>

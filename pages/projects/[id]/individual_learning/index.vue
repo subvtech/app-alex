@@ -1,7 +1,8 @@
 <script setup lang="tsx">
-import { ref, computed, onMounted } from 'vue';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { computed, onMounted, ref } from 'vue';
+
 const user = useStrapiUser();
 
 const { t } = useI18n();
@@ -25,28 +26,21 @@ const cardClass = computed(() => {
 
 const filteredMembers = computed(() => {
   return members.value.filter((member) => {
-    return (
-      contains(member.email, search.value) ||
-      contains(member.fullname, search.value)
-    );
+    return contains(member.email, search.value) || contains(member.fullname, search.value);
   });
 });
 
 const emptyMessage = computed(() => {
-  return hasError.value
-    ? t('errors.default')
-    : t('pages.projects.empty_members');
+  return hasError.value ? t('errors.default') : t('pages.projects.empty_members');
 });
 
 const fetchMembers = async () => {
   loading.value = true;
 
   try {
-    const res = await findOne<LearningPlanSimple>(
-      'learningplans',
-      Number(route.params.id),
-      { populate: ['members.user.avatar'] },
-    );
+    const res = await findOne<LearningPlanSimple>('learningplans', Number(route.params.id), {
+      populate: ['members.user.avatar'],
+    });
 
     members.value = res.data.members.map((r) => ({ ...r.user }));
   } catch (_) {
@@ -60,9 +54,7 @@ onMounted(fetchMembers);
 </script>
 
 <template>
-  <div
-    class="tw-bg-white tw-flex tw-flex-col tw-rounded-lg tw-p-6 tw-min-h-[500px] !tw-text-slate-500"
-  >
+  <div class="tw-bg-white tw-flex tw-flex-col tw-rounded-lg tw-p-6 tw-min-h-[500px] !tw-text-slate-500">
     <div class="tw-flex tw-flex-1 tw-flex-col tw-mb-6 tw-w-full tw-gap-6">
       <template v-if="members.length">
         <alex-inputs-text-field
@@ -79,35 +71,17 @@ onMounted(fetchMembers);
         />
         <div class="tw-flex tw-flex-wrap">
           <Transition name="slide-up">
-            <EmptyState
-              v-if="!filteredMembers.length"
-              :empty-message="emptyMessage"
-              class="tw-mt-6"
-            />
+            <EmptyState v-if="!filteredMembers.length" :empty-message="emptyMessage" class="tw-mt-6" />
             <div v-else class="w-100 tw-flex tw-flex-wrap">
               <TransitionGroup name="list">
-                <Card
-                  v-for="member in filteredMembers"
-                  :key="member.id"
-                  :class="cardClass"
-                >
+                <Card v-for="member in filteredMembers" :key="member.id" :class="cardClass">
                   <CardContent
                     class="tw-flex tw-flex-col tw-gap-6 tw-pt-6"
-                    @click="
-                      navigateTo(
-                        `/projects/${route.params.id}/individual_learning/${member.id}`,
-                      )
-                    "
+                    @click="navigateTo(`/projects/${route.params.id}/individual_learning/${member.id}`)"
                   >
-                    <div
-                      class="tw-flex tw-items-center tw-gap-6 tw-flex-col align-start"
-                    >
+                    <div class="tw-flex tw-items-center tw-gap-6 tw-flex-col align-start">
                       <div class="w-100 d-flex justify-space-between">
-                        <v-avatar
-                          :size="64"
-                          color="gray-100"
-                          class="rounded-16px"
-                        >
+                        <v-avatar :size="64" color="gray-100" class="rounded-16px">
                           <v-img
                             v-if="member.avatar?.url"
                             :src="member.avatar?.url"
@@ -134,25 +108,14 @@ onMounted(fetchMembers);
                         >
                           {{ member.fullname }}
                         </span>
-                        <span
-                          class="text-gray-600 text-body-3"
-                          :title="member.email"
-                        >
+                        <span class="text-gray-600 text-body-3" :title="member.email">
                           {{ member.email }}
                         </span>
                       </div>
                     </div>
                     <div class="tw-flex tw-flex-col">
-                      <v-progress-linear
-                        rounded
-                        color="accent"
-                        class="tw-mb-2"
-                        :height="8"
-                        model-value="50"
-                      />
-                      <div
-                        class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45"
-                      >
+                      <v-progress-linear rounded color="accent" class="tw-mb-2" :height="8" model-value="50" />
+                      <div class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45">
                         <span>{{ $t('pages.projects.my_goals') }}</span>
                         <span>50%</span>
                       </div>
@@ -168,11 +131,7 @@ onMounted(fetchMembers);
         <div v-if="true">
           <Skeleton class="tw-w-[320px] tw-h-[44px] tw-mb-6 tw-rounded-xl" />
           <div class="tw-flex tw-flex-wrap">
-            <Skeleton
-              v-for="index in 8"
-              :key="index"
-              :class="[cardClass, 'tw-h-[230px] tw-w-[300px] tw-rounded-xl']"
-            />
+            <Skeleton v-for="index in 8" :key="index" :class="[cardClass, 'tw-h-[230px] tw-w-[300px] tw-rounded-xl']" />
           </div>
         </div>
         <EmptyState v-else :empty-message="emptyMessage" />

@@ -13,9 +13,13 @@ const props = defineProps<{
   search: string;
 }>();
 
-const { create, delete: _delete, update } = useStrapi();
-const strapiClient = useStrapiClient();
 const { t } = useI18n();
+const { create, delete: _delete, update } = useStrapi();
+const { setMessage } = useMessageStore();
+const strapiClient = useStrapiClient();
+const learningPlanStore = useLearningPlanStore();
+const dragDrop = useMultipleDragDrop();
+
 const expandBacklog = ref(0);
 const createSprintDialog = ref(false);
 const backlogTasks = ref<SprintTask[]>([]);
@@ -25,17 +29,26 @@ const sprints = ref<Droppable<Sprint>[]>([]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
-const { setMessage } = useMessageStore();
-const learningPlanStore = useLearningPlanStore();
 const editTask = ref<SprintTask | null>(null);
-const dragDrop = useMultipleDragDrop();
 
 const backlogIndex = 1;
-const groupsArray = ['backlog'];
-const groups = {};
-const taskSections = [t('pages.task.backlog')];
+const taskSections = [t('pages.projects.backlog')];
 
-const searchField = computed(() => props.search.toLowerCase());
+const editSprints = [
+  {
+    text: t('pages.projects.add_epic'),
+    onClick: () => {
+      console.log(t('pages.projects.add_epic'));
+    },
+  },
+  {
+    text: t('pages.projects.add_task'),
+    onClick: () => {
+      console.log(t('pages.projects.add_task'));
+    },
+  },
+];
+
 const sprintGroups = computed(() => sprints.value.map((s) => s.group));
 const isFilterActive = computed(() => !isEmpty(props.filter));
 
@@ -49,34 +62,11 @@ const teacherDrawer = computed({
 });
 
 const filteredTasks = computed(() => {
-  return backlogTasks.value.filter((task) =>
-    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
-  );
+  return backlogTasks.value.filter((task) => contains(task.title, props.search));
 });
 
-const slideTransition = () => {
+const getSlideTransition = () => {
   return backlogTasks.value.length ? 'slide-down' : 'slide-up';
-};
-
-const displayError = (message: string, err?: ApplicationError) => {
-  const displayMessage =
-    err?.error?.name === 'ApplicationError' && err?.error?.details
-      ? t(`pages.task.crud.${err.error.details.errCode}`)
-      : t('pages.task.crud.errorMessage', { action: t(`pages.task.crud.${message}`) });
-
-  setMessage(displayMessage, 'error', true);
-
-  if (learningPlanStore.learningPlan) {
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
-  }
-};
-
-const displaySuccess = (message: string) => {
-  setMessage(
-    t('pages.task.crud.successMessage', { action: t(`pages.task.crud.${message}`) }),
-    'success',
-    true,
-  );
 };
 
 const getHigherIndex = () => {
@@ -117,9 +107,9 @@ const handleCreateTask = async () => {
         ...res.data.attributes,
       });
 
-      displaySuccess('addSuccess');
+      showSuccessMessage('addSuccess');
     } catch (e) {
-      displayError('addError');
+      showErrorMessage('addError');
     }
   }
 
@@ -128,10 +118,17 @@ const handleCreateTask = async () => {
   isCreatingTask.value = false;
 };
 
-const toggleExpand = () => {
-  isCreatingTask.value = false;
-  taskTitle.value = '';
-  expandBacklog.value = !expandBacklog.value ? 1 : 0;
+const showErrorMessage = (message: string, err?: ApplicationError) => {
+  const displayMessage =
+    err?.error?.name === 'ApplicationError' && err?.error?.details
+      ? t(`pages.projects.tasks.crud.${err.error.details.errCode}`)
+      : t('pages.projects.tasks.crud.errorMessage', { action: t(`pages.projects.tasks.crud.${message}`) });
+
+  setMessage(displayMessage, 'error', true);
+
+  if (learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
+  }
 };
 
 const handleChangeValues = (values: Partial<TaskSimple>) => {
@@ -171,10 +168,14 @@ const handleDeleteTask = async (id: number) => {
     }
 
     await _delete('tasks', id);
-    displaySuccess('deleteSuccess');
+    showSuccessMessage('deleteSuccess');
   } catch (e) {
-    displayError('deleteError');
+    showErrorMessage('deleteError');
   }
+};
+
+const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
+  dragDrop.onDragOver('backlog', -index, -1, dragEvent);
 };
 
 const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
@@ -186,11 +187,19 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
       task.status = status;
       task.position = taskPosition;
       await update('tasks', id, { status, position: taskPosition });
-      displaySuccess('moveSuccess');
+      showSuccessMessage('moveSuccess');
     }
   } catch (err: any) {
-    displayError('moveError', err);
+    showErrorMessage('moveError', err);
   }
+};
+
+const showSuccessMessage = (message: string) => {
+  setMessage(
+    t('pages.projects.tasks.crud.successMessage', { action: t(`pages.projects.tasks.crud.${message}`) }),
+    'success',
+    true,
+  );
 };
 
 const setOver = () => {
@@ -198,29 +207,11 @@ const setOver = () => {
   return { ...dragDrop.over.value, id: -1 };
 };
 
-const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
-  dragDrop.onDragOver('backlog', -index, -1, dragEvent);
+const toggleExpand = () => {
+  isCreatingTask.value = false;
+  taskTitle.value = '';
+  expandBacklog.value = !expandBacklog.value ? 1 : 0;
 };
-
-const editSprints = [
-  {
-    text: 'Adicionar épico',
-    onClick: () => {
-      console.log('Adicionar épico');
-    },
-  },
-  {
-    text: 'Adicionar tarefa',
-    onClick: () => {
-      console.log('Adicionar tarefa');
-    },
-  },
-];
-
-groupsArray.forEach((group, index) => {
-  groups[group] = index;
-  groups[index] = group;
-});
 
 onMounted(async () => {
   try {
@@ -241,25 +232,18 @@ onMounted(async () => {
       <Transition name="slide">
         <v-expansion-panels v-model="expandBacklog" class="task-accordion my-6 rounded-lg">
           <v-expansion-panel class="rounded-lg">
-            <v-expansion-panel-title class="tw-cursor-default" disabled hide-actions>
-              <v-icon
-                :icon="expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
-                @click="toggleExpand"
-              />
+            <v-expansion-panel-title disabled hide-actions class="tw-cursor-default">
+              <v-icon :icon="expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="toggleExpand" />
               <span class="text-h5 text-gray-800">
                 {{ taskSections[backlogIndex - 1] }}
               </span>
-              <alex-custom-chip
-                status="secondary"
-                size="small"
-                :text="filteredTasks.length.toString()"
-              />
+              <alex-custom-chip size="small" status="secondary" :text="filteredTasks.length" />
               <div class="ml-auto">
-                <alex-custom-dropdown variant="text" icon="mdi-plus" :items="editSprints" />
+                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints" />
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              <Transition :name="slideTransition()" mode="out-in">
+              <Transition mode="out-in" :name="getSlideTransition()">
                 <div v-if="!backlogTasks.length && backlogIndex">
                   <alex-learningplan-task-empty-state
                     key="empty-state"
@@ -274,14 +258,14 @@ onMounted(async () => {
                   <TaskTable
                     key="table"
                     group="backlog"
-                    :sprints="sprintGroups"
-                    :tasks="backlogTasks"
-                    :search="search"
                     :active-filter="isFilterActive"
-                    :over="setOver"
-                    :is-project="true"
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
+                    :is-project="true"
+                    :over="setOver"
+                    :search="search"
+                    :sprints="sprintGroups"
+                    :tasks="backlogTasks"
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"
                     @drag-leave="dragDrop.onDragLeave"
@@ -295,30 +279,30 @@ onMounted(async () => {
                 <Transition mode="out-in" name="add-task">
                   <alex-custom-button
                     v-if="!isCreatingTask"
+                    class="w-100 create-task-btn"
+                    prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
-                    prepend-icon="mdi-plus"
-                    class="w-100 create-task-btn"
                     :loading="loader"
                     @click="isCreatingTask = true"
                   >
-                    {{ $t('pages.task.add') }}
+                    {{ $t('pages.projects.tasks.add') }}
                   </alex-custom-button>
                   <div v-else class="d-flex ga-2">
                     <alex-inputs-text-field
                       v-model="taskTitle"
                       autofocus
-                      :placeholder="t('pages.task.addPlaceholder')"
+                      hide-details
                       class="w-100"
                       density="comfortable"
                       name="taskTitle"
-                      hide-details
                       :disabled="loader"
-                      @keyup.esc="isCreatingTask = false"
+                      :placeholder="t('pages.projects.tasks.add_placeholder')"
                       @keyup.enter="handleCreateTask"
+                      @keyup.esc="isCreatingTask = false"
                     />
                     <alex-custom-button size="large" :loading="loader" @click="handleCreateTask">
-                      {{ $t('pages.task.addButton') }}
+                      {{ $t('pages.projects.tasks.add_button') }}
                     </alex-custom-button>
                   </div>
                 </Transition>
@@ -329,25 +313,21 @@ onMounted(async () => {
       </Transition>
       <div class="tw-flex tw-w-full tw-justify-between">
         <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
-        <alex-custom-button
-          size="large"
-          prepend-icon="alex:Sprint"
-          @click="createSprintDialog = true"
-        >
+        <alex-custom-button prepend-icon="alex:Sprint" size="large" @click="createSprintDialog = true">
           {{ 'Nova Sprint' }}
         </alex-custom-button>
       </div>
       <TaskSprint
         v-model="sprints"
         v-model:drag-drop="dragDrop"
-        :search="search"
-        :learning-plan-id="learningPlanStore.learningPlan.id"
         :edit-sprints="editSprints"
+        :learning-plan-id="learningPlanStore.learningPlan.id"
+        :search="search"
       />
       <alex-project-dialogs-sprint
         v-model="createSprintDialog"
-        :project-id="learningPlanStore.learningPlan.id"
         :project-end-date="learningPlanStore.learningPlan.end_date"
+        :project-id="learningPlanStore.learningPlan.id"
       />
     </div>
     <alex-learningplan-task-drawer-teacher

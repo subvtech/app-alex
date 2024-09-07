@@ -7,25 +7,25 @@ const { t } = useI18n();
 
 const header = [
   {
-    title: t('pages.task.table.header.title'),
+    title: t('pages.projects.tasks.table.header.title'),
     key: 'title',
     sortable: false,
     width: 356,
   },
   {
-    title: t('pages.task.table.header.deadline_at'),
+    title: t('pages.projects.tasks.table.header.deadline_at'),
     key: 'deadline_at',
     sortable: false,
     width: 192,
   },
   {
-    title: t('pages.task.table.header.students'),
+    title: t('pages.projects.tasks.table.header.students'),
     key: 'students',
     sortable: false,
     width: 192,
   },
   {
-    title: t('pages.task.table.header.delivered'),
+    title: t('pages.projects.tasks.table.header.delivered'),
     key: 'delivered',
     sortable: false,
 
@@ -96,9 +96,7 @@ const tasksArray = computed(() => {
   };
 
   if (index !== -1) {
-    props.over?.position === 'top'
-      ? array.splice(index, 0, item)
-      : array.splice(index + 1, 0, item);
+    props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
   }
 
   return array;
@@ -123,7 +121,7 @@ const dropDownItems = (task: SprintTask) => {
 const getDropDownAction = (action: string, id: number, task: SprintTask) => {
   return {
     delete: {
-      text: t('pages.task.table.dropdown.delete'),
+      text: t('pages.projects.tasks.table.dropdown.delete'),
       warning: true,
       onClick: () => {
         taskToDelete.value = id;
@@ -131,7 +129,7 @@ const getDropDownAction = (action: string, id: number, task: SprintTask) => {
       },
     },
     details: {
-      text: t('pages.task.table.dropdown.details'),
+      text: t('pages.projects.tasks.table.dropdown.details'),
       onClick: () => emit('editTask', id, task),
     },
   }[action];
@@ -196,18 +194,14 @@ watch(searchFilter, () => {
                         :is-published="item.status === 'published' && !isArchived"
                       />
                       <span v-else class="tw-text-black/30">
-                        {{ $t('pages.task.table.placeholders.not_informed') }}
+                        {{ $t('pages.projects.tasks.table.placeholders.not_informed') }}
                       </span>
                     </td>
                     <td class="width-40">
-                      <div
-                        v-if="item.students?.length"
-                        class="ml-2"
-                        :class="{ 'gray-filter': isArchived }"
-                      >
+                      <div v-if="item.students?.length" class="ml-2" :class="{ 'gray-filter': isArchived }">
                         <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
                       </div>
-                      <span v-else>{{ $t('pages.task.table.placeholders.noMembers') }}</span>
+                      <span v-else>{{ $t('pages.projects.tasks.table.placeholders.noMembers') }}</span>
                     </td>
                     <td class="width-40">
                       <alex-learningplan-task-submissions-status
@@ -218,7 +212,7 @@ watch(searchFilter, () => {
                       <div v-else>
                         <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
                         <span>
-                          {{ $t('pages.task.submissions.noSubmissions') }}
+                          {{ $t('pages.projects.tasks.submissions.noSubmissions') }}
                         </span>
                       </div>
                     </td>
@@ -229,10 +223,7 @@ watch(searchFilter, () => {
                         :items="dropDownItems(item)"
                       >
                         <template #activator="{ props: propsMenu }">
-                          <v-tooltip
-                            location="bottom center"
-                            :text="t('pages.task.table.tooltips.options')"
-                          >
+                          <v-tooltip location="bottom center" :text="t('pages.projects.tasks.table.tooltips.options')">
                             <template #activator="{ props: optionsTooltipProps }">
                               <alex-custom-button
                                 v-bind="{ ...propsMenu, ...optionsTooltipProps }"
@@ -253,7 +244,7 @@ watch(searchFilter, () => {
         </transition-group>
         <tr v-if="!items.length">
           <td class="text-center" :colspan="columns.length">
-            {{ $t('pages.task.table.placeholders.noTasks') }}
+            {{ $t('pages.projects.tasks.table.placeholders.noTasks') }}
           </td>
         </tr>
       </template>
@@ -263,11 +254,11 @@ watch(searchFilter, () => {
       v-model="deleteModal"
       no-input-confirmation
       variant="error"
-      :cancel-button-text="t('pages.task.deleteModal.cancel')"
+      :cancel-button-text="t('pages.projects.tasks.deleteModal.cancel')"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-      :submit-button-text="t('pages.task.deleteModal.delete')"
-      :subtitle="t('pages.task.deleteModal.subtitle')"
-      :title="t('pages.task.deleteModal.title')"
+      :submit-button-text="t('pages.projects.tasks.deleteModal.delete')"
+      :subtitle="t('pages.projects.tasks.deleteModal.subtitle')"
+      :title="t('pages.projects.tasks.deleteModal.title')"
       @cancel="cancelDelete"
       @submit="confirmDelete"
     />

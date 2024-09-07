@@ -1,4 +1,7 @@
 {
+  "add_epic": "Add epic",
+  "add_task": "Add task",
+  "backlog": "Backlog",
   "completed": "Completed",
   "days": "days",
   "documents": "Documents",
@@ -8,8 +11,16 @@
   "empty_meetings": "Nothing scheduled today!",
   "empty_members": "No members found",
   "empty_task_progress": "0% of tasks have been completed",
+  "filters": {
+    "archivedTasks": "Archived Tasks",
+    "finalDate": "End Date",
+    "select": "Type",
+    "startDate": "Start Date"
+  },
+  "find_task": "Find task",
   "home": "Home",
   "individual_learning": "Individual Learning",
+  "kanban_sprint_required": "It is necessary to have at least one Sprint to see the Kanban mode",
   "last_update": "Last update",
   "members": "Members",
   "my_goals": "My goals",
@@ -19,6 +30,8 @@
   "projects": "Projects",
   "remaining_time": "Remaining time",
   "search_member": "Search member",
+  "see_backlog": "See Backlog",
+  "see_kanban": "See Kanban",
   "tasks": "Tasks",
   "total_epics": "Total of epics",
   "total_sprints": "Total of sprints",
