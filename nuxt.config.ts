@@ -1,3 +1,5 @@
+import type { NuxtPage } from 'nuxt/schema';
+
 const {
   COMPONENTS_PAGE,
   MATOMO_APP_ID,
@@ -56,9 +58,7 @@ export default defineNuxtConfig({
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
-  routeRules: USE_MOCK
-    ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } }
-    : undefined,
+  routeRules: USE_MOCK ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } } : undefined,
   shadcn: {
     prefix: '',
     /**
@@ -79,5 +79,14 @@ export default defineNuxtConfig({
         imports: ['SlickList', 'SlickItem'],
       },
     ],
+  },
+  hooks: {
+    'pages:extend'(pages) {
+      const removePage = (page: NuxtPage, index: number, items: NuxtPage[]) => {
+        if (/^-\w|\/-\w/.test(page.path)) items.splice(index, 1);
+        page.children?.forEach(removePage);
+      };
+      pages.forEach(removePage);
+    },
   },
 });

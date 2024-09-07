@@ -16,3 +16,10 @@ type ValueOf<T, K = keyof T> = K extends keyof T & (string | number)
   : never;
 
 type ValuesOf<T extends unknown[]> = [...T][number];
+
+// https://stackoverflow.com/a/78826978
+type ComponentProps<T> = T extends new (...args: any) => { $props: infer P }
+  ? NonNullable<P>
+  : T extends (props: infer P, ...args: any) => any
+  ? P
+  : {};
