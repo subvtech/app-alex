@@ -18,18 +18,15 @@ const updateProjects = () => {
   <div class="flex-grow-1 d-flex flex-column">
     <alex-custom-header
       class="mb-6"
-      :title="$t('pages.projects.my_projects')"
+      :title="$t('pages.projects.common.my_projects')"
       :has-main-button="isProfessor"
-      :main-button-text="$t('pages.projects.new_project')"
+      :main-button-text="$t('pages.projects.common.new_project')"
       button-size="large"
       main-button-icon="mdi-plus"
       no-back-arrow
       @main-action="() => (createProjectDialog = true)"
     />
     <alex-learningplan-listing type="project" />
-    <alex-project-dialogs-create
-      v-model="createProjectDialog"
-      @submit="updateProjects"
-    />
+    <alex-project-dialogs-create v-model="createProjectDialog" @submit="updateProjects" />
   </div>
 </template>

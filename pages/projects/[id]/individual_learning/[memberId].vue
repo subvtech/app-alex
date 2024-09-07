@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Card, CardContent } from '@/components/ui/card';
 import EmptyState from '@/components/EmptyState.vue';
+import { Card, CardContent } from '@/components/ui/card';
 
 definePageMeta({
   hideLearningPlanBanner: true,
@@ -14,9 +14,9 @@ const loading = ref(true);
 const activeTab = ref(route.path.split('/').pop());
 
 const tabs = [
-  { label: t('pages.projects.overview'), value: 'overview' },
-  { label: t('pages.projects.trails'), value: 'trails' },
-  { label: t('pages.projects.tasks'), value: 'tasks' },
+  { label: t('pages.projects.individual_learning.common.overview'), value: 'overview' },
+  { label: t('pages.projects.individual_learning.common.trails'), value: 'trails' },
+  { label: t('pages.projects.individual_learning.common.tasks'), value: 'tasks' },
 ];
 
 const user = ref<User | null>(null);

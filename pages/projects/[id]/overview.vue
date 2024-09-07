@@ -12,25 +12,25 @@ const data = ref([]);
 
 const totalizers = ref({
   sprints: {
-    title: t('pages.projects.total_sprints'),
+    title: t('pages.projects.overview.total_sprints'),
     icon: 'mdi-calendar-check',
     value: 0,
     percentage: 0,
   },
   epics: {
-    title: t('pages.projects.total_epics'),
+    title: t('pages.projects.overview.total_epics'),
     icon: 'mdi-calendar-check',
     value: 0,
     percentage: 0,
   },
   stories: {
-    title: t('pages.projects.total_story'),
+    title: t('pages.projects.overview.total_story'),
     icon: 'mdi-calendar-check',
     value: 0,
     percentage: 0,
   },
   remainingTime: {
-    title: t('pages.projects.remaining_time'),
+    title: t('pages.projects.overview.remaining_time'),
     icon: 'mdi-calendar-check',
     value: '0 dias',
     percentage: 0,
@@ -97,24 +97,15 @@ onBeforeMount(async () => {
             <div class="tw-bg-[#00B7CC] h-full tw-w-2 tw-rounded-r-xl"></div>
             <div class="tw-py-4 tw-flex tw-flex-col tw-gap-1">
               <div class="tw-flex tw-items-center tw-mb-1 tw-gap-1">
-                <div
-                  class="tw-bg-slate-200 tw-p-3 tw-rounded tw-h-4 tw-w-4 tw-flex tw-items-center tw-justify-center"
-                >
+                <div class="tw-bg-slate-200 tw-p-3 tw-rounded tw-h-4 tw-w-4 tw-flex tw-items-center tw-justify-center">
                   <v-icon icon="mdi-camera-timer" size="14px" />
                 </div>
                 <span class="tw-font-bold tw-text-gray-600">{{ totalizer.title }}</span>
               </div>
               <span class="tw-text-4xl tw-font-bold tw-mb-1">{{ totalizer.value }}</span>
               <div class="tw-flex tw-items-center tw-gap-1">
-                <alex-custom-chip
-                  size="small"
-                  variant="flat"
-                  :text="`${totalizer.percentage}%`"
-                  :status="'blue'"
-                />
-                <span class="tw-text-sm tw-text-gray-500">{{
-                  $t('pages.projects.completed')
-                }}</span>
+                <alex-custom-chip size="small" variant="flat" :text="`${totalizer.percentage}%`" :status="'blue'" />
+                <span class="tw-text-sm tw-text-gray-500">{{ $t('pages.projects.overview.completed') }}</span>
               </div>
             </div>
           </div>
@@ -141,16 +132,14 @@ onBeforeMount(async () => {
               :colors="['#B9BFC6', '#F1F1F1']"
               :y-formatter="
                 (tick, i) => {
-                  return typeof tick === 'number'
-                    ? `$ ${new Intl.NumberFormat('us').format(tick).toString()}`
-                    : '';
+                  return typeof tick === 'number' ? `$ ${new Intl.NumberFormat('us').format(tick).toString()}` : '';
                 }
               "
               :type="'stacked'"
             />
-            <span>{{ $t('pages.projects.empty_task_progress') }}</span>
+            <span>{{ $t('pages.projects.overview.empty_task_progress') }}</span>
             <span class="tw-text-sm tw-text-gray-500">
-              {{ $t('pages.projects.last_update') }}
+              {{ $t('pages.projects.overview.last_update') }}
               {{ learningPlan?.start_date ?? 'N/A' }}
             </span>
           </div>
@@ -164,9 +153,7 @@ onBeforeMount(async () => {
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <div class="tw-flex tw-gap-1">
               <div v-for="day in currentWeek" :key="day.value">
-                <alex-custom-button
-                  :variant="day.value === today.toISOString().split('T')[0] ? 'primary' : 'text'"
-                >
+                <alex-custom-button :variant="day.value === today.toISOString().split('T')[0] ? 'primary' : 'text'">
                   <div class="tw-flex tw-flex-col tw-h-10">
                     <span>{{ day.name }}</span>
                     <span>{{ day.date }}</span>
@@ -191,7 +178,7 @@ onBeforeMount(async () => {
             />
             <alex-custom-empty-placeholder
               v-if="institutions.length === 0"
-              :empty-text-message="$t('pages.projects.empty_institutions')"
+              :empty-text-message="$t('pages.projects.overview.empty_institutions')"
               empty-text-image="/svg/EmptyInstitutional.svg"
             />
           </div>

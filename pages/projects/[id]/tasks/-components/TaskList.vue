@@ -32,19 +32,19 @@ const loader = ref(false);
 const editTask = ref<SprintTask | null>(null);
 
 const backlogIndex = 1;
-const taskSections = [t('pages.projects.backlog')];
+const taskSections = [t('pages.projects.tasks.common.backlog')];
 
 const editSprints = [
   {
-    text: t('pages.projects.add_epic'),
+    text: t('pages.projects.tasks.common.add_epic'),
     onClick: () => {
-      console.log(t('pages.projects.add_epic'));
+      console.log(t('pages.projects.tasks.common.add_epic'));
     },
   },
   {
-    text: t('pages.projects.add_task'),
+    text: t('pages.projects.tasks.common.add_task'),
     onClick: () => {
-      console.log(t('pages.projects.add_task'));
+      console.log(t('pages.projects.tasks.common.add_task'));
     },
   },
 ];
@@ -286,7 +286,7 @@ onMounted(async () => {
                     :loading="loader"
                     @click="isCreatingTask = true"
                   >
-                    {{ $t('pages.projects.tasks.add') }}
+                    {{ $t('pages.projects.tasks.common.add') }}
                   </alex-custom-button>
                   <div v-else class="d-flex ga-2">
                     <alex-inputs-text-field
@@ -297,12 +297,12 @@ onMounted(async () => {
                       density="comfortable"
                       name="taskTitle"
                       :disabled="loader"
-                      :placeholder="t('pages.projects.tasks.add_placeholder')"
+                      :placeholder="t('pages.projects.tasks.common.add_placeholder')"
                       @keyup.enter="handleCreateTask"
                       @keyup.esc="isCreatingTask = false"
                     />
                     <alex-custom-button size="large" :loading="loader" @click="handleCreateTask">
-                      {{ $t('pages.projects.tasks.add_button') }}
+                      {{ $t('pages.projects.tasks.common.add_button') }}
                     </alex-custom-button>
                   </div>
                 </Transition>

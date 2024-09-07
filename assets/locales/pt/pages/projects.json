@@ -1,40 +1,56 @@
 {
-  "add_epic": "Adicionar épico",
-  "add_task": "Adicionar tarefa",
-  "backlog": "Backlog",
-  "completed": "Finalizados",
-  "days": "dias",
-  "empty_events": "Não há eventos cadastrados",
-  "empty_institutions": "Nenhuma instituição parceira aqui",
-  "empty_journey": "Nenhuma jornada de aprendizagem encontrada!",
-  "empty_meetings": "Nada marcado hoje!",
-  "empty_members": "Nenhum membro encontrado",
-  "empty_task_progress": "0% das tarefas foram concluídas",
-  "find_task": "Encontrar tarefa",
-  "kanban_sprint_required": "É necessário ter pelo menos uma Sprint para ver o modo Kanban",
-  "last_update": "Última atualização",
-  "my_goals": "Meus objetivos",
-  "new_project": "Novo projeto",
-  "projects": "Projetos",
-  "remaining_time": "Tempo restante",
-  "search_member": "Pesquisar membro",
-  "see_backlog": "Ver Backlog",
-  "see_kanban": "Ver Kanban",
   "common": {
     "documents": "Documentos",
     "home": "Início",
     "individual_learning": "Jornada Individual",
     "members": "Integrantes",
     "my_projects": "Meus projetos",
+    "new_project": "Novo projeto",
     "overview": "Visão geral",
-    "tasks": "Tarefas"
+    "projects": "Projetos",
+    "tasks": "Tarefas",
+    "trails": "Trilhas"
   },
   "errors": {
     "404": "Página não encontrada",
     "403": "Acesso negado",
     "500": "Erro interno do servidor"
   },
+  "individual_learning": {
+    "common": {
+      "empty_events": "Não há eventos cadastrados",
+      "my_goals": "Meus objetivos",
+      "overview": "Visão geral",
+      "search_member": "Pesquisar membro",
+      "tasks": "Tarefas",
+      "trails": "Trilhas"
+    }
+  },
+  "overview": {
+    "completed": "Finalizados",
+    "empty_institutions": "Nenhuma instituição parceira aqui",
+    "empty_journey": "Nenhuma jornada de aprendizagem encontrada!",
+    "empty_meetings": "Nada marcado hoje!",
+    "empty_members": "Nenhum membro encontrado",
+    "empty_task_progress": "0% das tarefas foram concluídas",
+    "last_update": "Última atualização",
+    "remaining_time": "Tempo restante",
+    "total_epics": "Total de épicos",
+    "total_sprints": "Total de sprints",
+    "total_story": "Total de histórias"
+  },
   "tasks": {
+    "common": {
+      "add_epic": "Adicionar épico",
+      "add_placeholder": "Adicionar tarefa",
+      "add_task": "Adicionar tarefa",
+      "add": "Adicionar",
+      "backlog": "Backlog",
+      "find_task": "Encontrar tarefa",
+      "kanban_sprint_required": "Necessário selecionar uma sprint",
+      "see_backlog": "Ver Backlog",
+      "see_kanban": "Ver Kanban"
+    },
     "crud": {
       "addSuccess": "criada",
       "editSuccess": "editada",
@@ -61,9 +77,5 @@
       "select": "Tipo",
       "startDate": "Data inicial"
     }
-  },
-  "total_epics": "Total de épicos",
-  "total_sprints": "Total de sprints",
-  "total_story": "Total de histórias",
-  "trails": "Trilhas"
+  }
 }
