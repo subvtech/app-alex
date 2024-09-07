@@ -153,6 +153,7 @@ onMounted(fetchMembers);
                         class="tw-mb-2"
                         :height="8"
                         model-value="50"
+                        bg-color="gray-600"
                       />
                       <div
                         class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45"
