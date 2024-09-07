@@ -14,9 +14,9 @@ const loading = ref(true);
 const activeTab = ref(route.path.split('/').pop());
 
 const tabs = [
-  { label: t('pages.projects.individual_learning.common.overview'), value: 'overview' },
-  { label: t('pages.projects.individual_learning.common.trails'), value: 'trails' },
-  { label: t('pages.projects.individual_learning.common.tasks'), value: 'tasks' },
+  { label: t('pages.projects.individual_learning.overview'), value: 'overview' },
+  { label: t('pages.projects.individual_learning.trails'), value: 'trails' },
+  { label: t('pages.projects.individual_learning.tasks'), value: 'tasks' },
 ];
 
 const user = ref<User | null>(null);

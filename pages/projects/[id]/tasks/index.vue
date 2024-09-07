@@ -105,7 +105,7 @@ watch(
           density="comfortable"
           name="search"
           prepend-inner-icon="mdi-magnify"
-          :placeholder="t('pages.projects.tasks.common.find_task')"
+          :placeholder="t('pages.projects.tasks.find_task')"
         />
         <alex-inputs-select
           v-if="mode === 'kanban'"
@@ -117,7 +117,7 @@ watch(
           item-title="sprint"
           name="search"
           :items="sprints"
-          :placeholder="t('pages.projects.tasks.common.find_task')"
+          :placeholder="t('pages.projects.tasks.find_task')"
         />
         <div class="tw-flex tw-gap-2">
           <alex-custom-button
@@ -125,14 +125,10 @@ watch(
             variant="secondary"
             :disabled="!sprints.length"
             :prepend-icon="mode === Mode.List ? 'alex:Kanban' : 'mdi-clipboard-text-outline'"
-            :title="sprints.length ? '' : t('pages.projects.tasks.common.kanban_sprint_required')"
+            :title="sprints.length ? '' : t('pages.projects.tasks.kanban_sprint_required')"
             @click="toggleMode"
           >
-            {{
-              mode === Mode.List
-                ? t('pages.projects.tasks.common.see_kanban')
-                : t('pages.projects.tasks.common.see_backlog')
-            }}
+            {{ mode === Mode.List ? t('pages.projects.tasks.see_kanban') : t('pages.projects.tasks.see_backlog') }}
           </alex-custom-button>
           <alex-custom-button
             icon="mdi-filter-variant"
@@ -155,7 +151,7 @@ watch(
             class="mr-2 bg-gray-blue text-gray-600 text-body-5 tw-w-fit"
             status="secondary"
             variant="outlined"
-            :text="t(`pages.projects.tasks.filters.${chip}`)"
+            :text="t(`pages.projects.tasks.${chip}`)"
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>

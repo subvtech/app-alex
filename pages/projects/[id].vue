@@ -21,7 +21,7 @@ const route = useRoute();
 const headerStore = usePageHeaderStore();
 const learningPlanStore = useLearningPlanStore();
 
-const { id: projectId, memberId } = route.params;
+const { id: projectId } = route.params;
 
 const activeTab = computed(() => route.path.split('/').pop());
 const isJoinRoute = computed(() => route.name === 'projects-id-join-hash');
@@ -112,10 +112,11 @@ watch(
 );
 
 watch(
-  () => learningPlanStore.loading,
+  () => `${learningPlanStore.loading}-${route.path}`,
   () => {
     if (learningPlanStore.loading) return;
     const slug = route.name?.toString()?.split('-').at(-1);
+    const { memberId } = route.params; // Need to be here to get the updated memberId
 
     headerStore.title = t('pages.projects.common.my_projects');
     headerStore.items = [
@@ -125,34 +126,28 @@ watch(
       },
       {
         title: learningPlanStore.learningPlan?.title || '',
-        to: `/projects/${projectId}`,
-        disabled: !memberId,
+        to: `/projects/${projectId}/overview`,
+        disabled: /projects\/[0-9]+\/overview/.test(route.path),
       },
     ];
 
-    if (route.path.includes('/tasks')) {
-      headerStore.items.push({
-        title: t('components.courses.tasks.title'),
-        to: `/projects/${projectId}/tasks`,
-        disabled: !memberId,
-      });
-    }
-
-    if (route.path.includes('/individual_learning')) {
-      headerStore.items.push({
-        title: t('pages.projects.common.individual_learning'),
-        to: `/projects/${projectId}/individual_learning`,
-        disabled: !memberId,
-      });
-
-      if (memberId) {
-        headerStore.title = t('pages.projects.common.individual_learning');
+    ['documents', 'members', 'individual_learning', 'tasks'].forEach((path) => {
+      if (new RegExp(`projects/[0-9]+/${path}`).test(route.path)) {
         headerStore.items.push({
-          title: t(`pages.projects.common.${slug}`),
-          disabled: true,
-          to: `/projects/${projectId}/individual_learning/${memberId}/${slug}`,
+          title: t(`pages.projects.common.${path}`),
+          to: `/projects/${projectId}/${path}`,
+          disabled: !memberId,
         });
       }
+    });
+
+    if (new RegExp(`projects/[0-9]+/individual_learning/[0-9]+/${slug}`).test(route.path)) {
+      headerStore.title = t('pages.projects.common.individual_learning');
+      headerStore.items.push({
+        title: t(`pages.projects.individual_learning.${slug}`),
+        disabled: true,
+        to: `/projects/${projectId}/individual_learning/${memberId}/${slug}`,
+      });
     }
   },
 );

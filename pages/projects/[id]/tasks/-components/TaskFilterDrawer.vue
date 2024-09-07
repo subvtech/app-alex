@@ -137,13 +137,7 @@ const clearFilters = () => {
         <p class="text-h4 flex-fill">
           {{ i18Texts.title }}
         </p>
-        <alex-custom-button
-          icon="mdi-close"
-          variant="text"
-          size="small"
-          flat
-          @click="handleChange(false)"
-        />
+        <alex-custom-button icon="mdi-close" variant="text" size="small" flat @click="handleChange(false)" />
       </div>
       <hr class="mb-2" />
       <div class="flex-fill px-4">
@@ -177,10 +171,7 @@ const clearFilters = () => {
             density="comfortable"
           />
         </div>
-        <p
-          v-if="errors['startDateStart'] || errors['startDateEnd']"
-          class="text-error-0 text-body-3 mt-2"
-        >
+        <p v-if="errors['startDateStart'] || errors['startDateEnd']" class="text-error-0 text-body-3 mt-2">
           {{ errors['startDateStart'] || errors['startDateEnd'] }}
         </p>
         <p class="text-p1 text-gray-800 mt-4 mb-2">
@@ -202,10 +193,7 @@ const clearFilters = () => {
             density="comfortable"
           />
         </div>
-        <p
-          v-if="errors['finalDateStart'] || errors['finalDateEnd']"
-          class="text-error-0 text-body-3 mt-2"
-        >
+        <p v-if="errors['finalDateStart'] || errors['finalDateEnd']" class="text-error-0 text-body-3 mt-2">
           {{ errors['finalDateStart'] || errors['finalDateEnd'] }}
         </p>
       </div>

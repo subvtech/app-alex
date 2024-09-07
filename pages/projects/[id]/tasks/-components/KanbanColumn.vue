@@ -3,11 +3,7 @@ import { DragHandle, SlickItem, SlickList } from 'vue-slicksort';
 import { Droppable } from '../-types';
 import KanbanColumnHeader, { Colors } from './KanbanColumnHeader.vue';
 
-type AcceptFunction<T> = (params: {
-  dest: HTMLElement;
-  payload: T;
-  source: HTMLElement;
-}) => boolean;
+type AcceptFunction<T> = (params: { dest: HTMLElement; payload: T; source: HTMLElement }) => boolean;
 
 type Props<T> = {
   accept?: true | string[] | AcceptFunction<T> | null;

@@ -26,29 +26,16 @@ const formattedDate = computed(() =>
 </script>
 
 <template>
-  <div
-    class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white"
-  >
+  <div class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white">
     <div v-if="tags.length > 0" class="tw-flex tw-flex-wrap tw-gap-2 tw-mb-2">
-      <alex-custom-chip
-        v-for="tag in tags"
-        :key="tag.id"
-        :text="tag.text"
-        size="small"
-        class="tw-w-fit"
-      />
+      <alex-custom-chip v-for="tag in tags" :key="tag.id" :text="tag.text" size="small" class="tw-w-fit" />
     </div>
     <p class="text-body-2 ellipsis lines-1 w-100">
       {{ name }}
     </p>
     <div class="d-flex tw-gap-2 align-center tw-mt-2">
       <alex-custom-avatar-group :avatar-items="participants" :size="34" class="ml-2 tw-mr-auto" />
-      <alex-custom-chip
-        v-if="date"
-        :text="formattedDate"
-        size="small"
-        prepend-icon="mdi-calendar-range"
-      />
+      <alex-custom-chip v-if="date" :text="formattedDate" size="small" prepend-icon="mdi-calendar-range" />
     </div>
   </div>
 </template>

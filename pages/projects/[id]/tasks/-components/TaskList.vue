@@ -32,19 +32,19 @@ const loader = ref(false);
 const editTask = ref<SprintTask | null>(null);
 
 const backlogIndex = 1;
-const taskSections = [t('pages.projects.tasks.common.backlog')];
+const taskSections = [t('pages.projects.tasks.backlog')];
 
 const editSprints = [
   {
-    text: t('pages.projects.tasks.common.add_epic'),
+    text: t('pages.projects.tasks.add_epic'),
     onClick: () => {
-      console.log(t('pages.projects.tasks.common.add_epic'));
+      console.log(t('pages.projects.tasks.add_epic'));
     },
   },
   {
-    text: t('pages.projects.tasks.common.add_task'),
+    text: t('pages.projects.tasks.add_task'),
     onClick: () => {
-      console.log(t('pages.projects.tasks.common.add_task'));
+      console.log(t('pages.projects.tasks.add_task'));
     },
   },
 ];
@@ -121,8 +121,8 @@ const handleCreateTask = async () => {
 const showErrorMessage = (message: string, err?: ApplicationError) => {
   const displayMessage =
     err?.error?.name === 'ApplicationError' && err?.error?.details
-      ? t(`pages.projects.tasks.crud.${err.error.details.errCode}`)
-      : t('pages.projects.tasks.crud.errorMessage', { action: t(`pages.projects.tasks.crud.${message}`) });
+      ? t(`pages.projects.tasks.${err.error.details.errCode}`)
+      : t('pages.projects.tasks.error_message', { action: t(`pages.projects.tasks.${message}`) });
 
   setMessage(displayMessage, 'error', true);
 
@@ -180,13 +180,13 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
 
 const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
   try {
-    const taskPosition = getHigherIndex();
     const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
 
     if (task) {
+      const position = getHigherIndex();
       task.status = status;
-      task.position = taskPosition;
-      await update('tasks', id, { status, position: taskPosition });
+      task.position = position;
+      await update('tasks', id, { status, position });
       showSuccessMessage('moveSuccess');
     }
   } catch (err: any) {
@@ -196,7 +196,7 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
 
 const showSuccessMessage = (message: string) => {
   setMessage(
-    t('pages.projects.tasks.crud.successMessage', { action: t(`pages.projects.tasks.crud.${message}`) }),
+    t('pages.projects.tasks.successMessage', { action: t(`pages.projects.tasks.${message}`) }),
     'success',
     true,
   );
@@ -286,7 +286,7 @@ onMounted(async () => {
                     :loading="loader"
                     @click="isCreatingTask = true"
                   >
-                    {{ $t('pages.projects.tasks.common.add') }}
+                    {{ $t('pages.projects.tasks.add') }}
                   </alex-custom-button>
                   <div v-else class="d-flex ga-2">
                     <alex-inputs-text-field
@@ -297,12 +297,12 @@ onMounted(async () => {
                       density="comfortable"
                       name="taskTitle"
                       :disabled="loader"
-                      :placeholder="t('pages.projects.tasks.common.add_placeholder')"
+                      :placeholder="t('pages.projects.tasks.add_placeholder')"
                       @keyup.enter="handleCreateTask"
                       @keyup.esc="isCreatingTask = false"
                     />
                     <alex-custom-button size="large" :loading="loader" @click="handleCreateTask">
-                      {{ $t('pages.projects.tasks.common.add_button') }}
+                      {{ $t('pages.projects.tasks.add_button') }}
                     </alex-custom-button>
                   </div>
                 </Transition>

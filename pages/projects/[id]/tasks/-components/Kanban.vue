@@ -70,9 +70,7 @@ const handleAddColumn = () => {
   });
 
   setTimeout(() => {
-    const input = document.querySelector<HTMLInputElement>(
-      `#${columns.value[columns.value.length - 1].group} input`,
-    );
+    const input = document.querySelector<HTMLInputElement>(`#${columns.value[columns.value.length - 1].group} input`);
     if (input) {
       input.focus();
     }
