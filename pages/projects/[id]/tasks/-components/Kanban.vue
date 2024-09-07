@@ -32,7 +32,7 @@ const isDraggingItems = ref(false);
 const modalDeleteColumn = ref(false);
 const selectedDeleteGroup = ref<{ group: string; lenght: number } | null>(null);
 
-const confirmDeleteI18 = computed(() => ({
+const confirmDeleteI18n = computed(() => ({
   title: selectedDeleteGroup.value?.lenght
     ? 'No momento não é possível excluir esta coluna!'
     : 'Deseja realmente excluir essa coluna?',
@@ -64,18 +64,13 @@ const handleTitleChange = (group: string, value: string) => {
 
 const handleAddColumn = () => {
   columns.value.push({
-    title: '',
-    group: `column-${columns.value.length + 1}`,
     color: 'gray',
+    group: `column-${columns.value.length + 1}`,
+    title: '',
   });
 
   setTimeout(() => {
-    const input = document.querySelector<HTMLInputElement>(
-      `#${columns.value[columns.value.length - 1].group} input`,
-    );
-    if (input) {
-      input.focus();
-    }
+    document.querySelector<HTMLInputElement>(`#${columns.value.at(-1)?.group} input`)?.focus();
   }, 100);
 };
 
@@ -102,7 +97,6 @@ const handleInsertCard = (values: { newIndex: number; value: Droppable<T>; group
       item.group = values.group;
       item.raw.status = values.group;
     }
-
     return item;
   });
 };
@@ -152,10 +146,10 @@ watch(items, setColumnItems, { deep: true });
         <KanbanColumn
           :key="column.group"
           v-model="columnItems[column.group]"
+          class="tw-mr-2"
           :color="column.color"
           :group="column.group"
           :title="column.title"
-          class="tw-mr-2"
           @add-item="console.log($event)"
           @cancel-column="handleCancelColumn"
           @delete="handleConfirmDeleteColumn(column.group)"
@@ -183,11 +177,11 @@ watch(items, setColumnItems, { deep: true });
       no-input-confirmation
       submit-button-text="Excluir"
       variant="error"
-      :cancel-button-text="confirmDeleteI18.cancel"
+      :cancel-button-text="confirmDeleteI18n.cancel"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       :no-submit-button="!!selectedDeleteGroup?.lenght"
-      :subtitle="confirmDeleteI18.subtitle"
-      :title="confirmDeleteI18.title"
+      :subtitle="confirmDeleteI18n.subtitle"
+      :title="confirmDeleteI18n.title"
       @cancel="modalDeleteColumn = false"
       @submit="handleDeleteColumn"
     />

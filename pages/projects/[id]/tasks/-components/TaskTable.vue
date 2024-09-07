@@ -7,25 +7,25 @@ const { t } = useI18n();
 
 const header = [
   {
-    title: t('pages.projects.tasks.table.header.title'),
+    title: t('pages.projects.tasks.header_title'),
     key: 'title',
     sortable: false,
     width: 356,
   },
   {
-    title: t('pages.projects.tasks.table.header.deadline_at'),
+    title: t('pages.projects.tasks.header_deadline_at'),
     key: 'deadline_at',
     sortable: false,
     width: 192,
   },
   {
-    title: t('pages.projects.tasks.table.header.students'),
+    title: t('pages.projects.tasks.header_students'),
     key: 'students',
     sortable: false,
     width: 192,
   },
   {
-    title: t('pages.projects.tasks.table.header.delivered'),
+    title: t('pages.projects.tasks.header_delivered'),
     key: 'delivered',
     sortable: false,
 
@@ -121,7 +121,7 @@ const dropDownItems = (task: SprintTask) => {
 const getDropDownAction = (action: string, id: number, task: SprintTask) => {
   return {
     delete: {
-      text: t('pages.projects.tasks.table.dropdown.delete'),
+      text: t('pages.projects.tasks.dropdown_delete'),
       warning: true,
       onClick: () => {
         taskToDelete.value = id;
@@ -129,7 +129,7 @@ const getDropDownAction = (action: string, id: number, task: SprintTask) => {
       },
     },
     details: {
-      text: t('pages.projects.tasks.table.dropdown.details'),
+      text: t('pages.projects.tasks.dropdown_details'),
       onClick: () => emit('editTask', id, task),
     },
   }[action];
@@ -194,14 +194,14 @@ watch(searchFilter, () => {
                         :is-published="item.status === 'published' && !isArchived"
                       />
                       <span v-else class="tw-text-black/30">
-                        {{ $t('pages.projects.tasks.table.placeholders.not_informed') }}
+                        {{ $t('pages.projects.tasks.not_informed') }}
                       </span>
                     </td>
                     <td class="width-40">
                       <div v-if="item.students?.length" class="ml-2" :class="{ 'gray-filter': isArchived }">
                         <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
                       </div>
-                      <span v-else>{{ $t('pages.projects.tasks.table.placeholders.noMembers') }}</span>
+                      <span v-else>{{ $t('pages.projects.tasks.no_members') }}</span>
                     </td>
                     <td class="width-40">
                       <alex-learningplan-task-submissions-status
@@ -212,7 +212,7 @@ watch(searchFilter, () => {
                       <div v-else>
                         <v-icon class="mr-1" icon="mdi-close-circle-outline "></v-icon>
                         <span>
-                          {{ $t('pages.projects.tasks.submissions.noSubmissions') }}
+                          {{ $t('pages.projects.tasks.no_submissions') }}
                         </span>
                       </div>
                     </td>
@@ -223,7 +223,7 @@ watch(searchFilter, () => {
                         :items="dropDownItems(item)"
                       >
                         <template #activator="{ props: propsMenu }">
-                          <v-tooltip location="bottom center" :text="t('pages.projects.tasks.table.tooltips.options')">
+                          <v-tooltip location="bottom center" :text="t('pages.projects.tasks.tooltip_options')">
                             <template #activator="{ props: optionsTooltipProps }">
                               <alex-custom-button
                                 v-bind="{ ...propsMenu, ...optionsTooltipProps }"
@@ -244,7 +244,7 @@ watch(searchFilter, () => {
         </transition-group>
         <tr v-if="!items.length">
           <td class="text-center" :colspan="columns.length">
-            {{ $t('pages.projects.tasks.table.placeholders.noTasks') }}
+            {{ $t('pages.projects.tasks.no_tasks') }}
           </td>
         </tr>
       </template>
@@ -254,11 +254,11 @@ watch(searchFilter, () => {
       v-model="deleteModal"
       no-input-confirmation
       variant="error"
-      :cancel-button-text="t('pages.projects.tasks.deleteModal.cancel')"
+      :cancel-button-text="t('pages.projects.tasks.delete_cancel_text')"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-      :submit-button-text="t('pages.projects.tasks.deleteModal.delete')"
-      :subtitle="t('pages.projects.tasks.deleteModal.subtitle')"
-      :title="t('pages.projects.tasks.deleteModal.title')"
+      :submit-button-text="t('pages.projects.tasks.delete_confirm_text')"
+      :subtitle="t('pages.projects.tasks.delete_subtitle')"
+      :title="t('pages.projects.tasks.delete_title')"
       @cancel="cancelDelete"
       @submit="confirmDelete"
     />

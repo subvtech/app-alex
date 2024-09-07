@@ -31,7 +31,7 @@ const filteredMembers = computed(() => {
 });
 
 const emptyMessage = computed(() => {
-  return hasError.value ? t('errors.default') : t('pages.projects.individual_learning.common.empty_members');
+  return hasError.value ? t('errors.default') : t('pages.projects.individual_learning.empty_members');
 });
 
 const fetchMembers = async () => {
@@ -67,7 +67,7 @@ onMounted(fetchMembers);
           variant="outlined"
           prepend-inner-icon="mdi-magnify"
           style="min-width: 160px; max-width: 320px"
-          :placeholder="$t('pages.projects.individual_learning.common.search_member')"
+          :placeholder="$t('pages.projects.individual_learning.search_member')"
         />
         <div class="tw-flex tw-flex-wrap">
           <Transition name="slide-up">
@@ -123,7 +123,7 @@ onMounted(fetchMembers);
                         bg-color="gray-600"
                       />
                       <div class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45">
-                        <span>{{ $t('pages.projects.individual_learning.common.my_goals') }}</span>
+                        <span>{{ $t('pages.projects.individual_learning.my_goals') }}</span>
                         <span>50%</span>
                       </div>
                     </div>
