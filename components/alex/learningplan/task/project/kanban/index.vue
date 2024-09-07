@@ -59,19 +59,8 @@
   generic="T extends { id: number; position: number; status: string }"
 >
 import { SlickList, SlickItem } from 'vue-slicksort';
-import { Colors } from './column/Header.vue';
-import { Accept } from './column/index.vue';
-interface GenericItem<U> {
-  group: string;
-  raw: U;
-}
-interface Column<U> {
-  title: string;
-  group: string;
-  color: Colors;
-  accept?: Accept<GenericItem<U>> | null;
-  disable?: boolean;
-}
+import { Column, GenericItem } from './types';
+
 type Slot<U> = {
   card(props: { item: U }): any;
 };

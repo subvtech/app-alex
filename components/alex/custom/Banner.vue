@@ -144,7 +144,7 @@ type BannerProps = {
     | 'username-fullname-role'
     | 'username-role-fullname';
   settingsIcon?: string;
-  selectedOption?: number | null;
+  selectedOption?: string | number | null;
   isProfessor?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
@@ -417,6 +417,7 @@ watch(coverPicture!, () => {
 
         transition: all ease-in-out 0.4s;
         border-radius: 100%;
+        transition: all ease-in-out 0.4s;
       }
       div.img {
         position: relative;

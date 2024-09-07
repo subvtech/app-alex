@@ -5,7 +5,6 @@
   "successMessage": "Projeto criado com sucesso",
   "errorMessage": "Erro ao criar projeto",
   "slugUniqueError": "Esse identificador já está em uso. Por favor, escolha outro.",
-
   "steps": {
     "basicInfo": {
       "title": "Informações",

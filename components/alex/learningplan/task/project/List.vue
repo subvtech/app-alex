@@ -1,3 +1,248 @@
+<script setup lang="ts">
+import { useMultipleDragDrop } from '@/composables/useMultipleDragDrop';
+import { ApplicationError } from '@/models/simple/applicationError.model';
+import { TaskStatus, TaskType } from '@/models/simple/taskSimple.model';
+import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
+import { isEmpty } from '@/utils/is-empty';
+
+export interface TaskItem {
+  id: number;
+  title: string;
+  status: TaskStatus;
+  finish_at?: string | null;
+  start_at?: string | null;
+  position: number;
+  type?: TaskType | null;
+  archived_at?: string | null;
+  students?: { name: string; image?: { url: string } }[];
+  delivered: {
+    toDo: number;
+    doing: number;
+    underReview: number;
+    completed: number;
+  };
+}
+
+interface Sprint {
+  expanded: number;
+  group: string;
+  raw: {
+    id: number;
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    tasks: TaskItem[];
+  };
+}
+
+const props = defineProps<{
+  search: string;
+  filter: filterType | undefined;
+}>();
+
+const { create, delete: _delete, update } = useStrapi();
+const strapiClient = useStrapiClient();
+const { t } = useI18n();
+const expandBacklog = ref(0);
+const createSprintDialog = ref(false);
+const backlogTasks = ref<TaskItem[]>([]);
+const sprintTasks = ref<TaskItem[]>([]);
+const sprints = ref<Sprint[]>([]);
+
+const isCreatingTask = ref(false);
+const taskTitle = ref('');
+const loader = ref(false);
+const { setMessage } = useMessageStore();
+const learningPlanStore = useLearningPlanStore();
+const teacherDrawer = ref(false);
+const editTaskId = ref(-1);
+const dragDrop = useMultipleDragDrop();
+
+const backlogIndex = 1;
+const groupsArray = ['backlog'];
+const groups = {};
+const taskSections = [t('pages.task.backlog')];
+
+const searchField = computed(() => props.search.toLowerCase());
+const sprintGroups = computed(() => sprints.value.map((s) => s.group));
+const isFilterActive = computed(() => !isEmpty(props.filter));
+
+const filteredTasks = computed(() => {
+  return backlogTasks.value.filter((task) =>
+    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
+  );
+});
+
+const slideTransition = () => {
+  return backlogTasks.value.length ? 'slide-down' : 'slide-up';
+};
+
+const displayError = (message: string, err?: ApplicationError) => {
+  const displayMessage =
+    err?.error?.name === 'ApplicationError' && err?.error?.details
+      ? t(`pages.task.crud.${err.error.details.errCode}`)
+      : t('pages.task.crud.errorMessage', {
+          action: t(`pages.task.crud.${message}`),
+        });
+
+  setMessage(displayMessage, 'error', true);
+
+  if (learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
+  }
+};
+
+const displaySuccess = (message: string) => {
+  setMessage(
+    t('pages.task.crud.successMessage', {
+      action: t(`pages.task.crud.${message}`),
+    }),
+    'success',
+    true,
+  );
+};
+
+const getHigherIndex = () => {
+  const tasks = backlogTasks.value;
+  return tasks[tasks.length - 1]?.position + 1 || 0;
+};
+
+const handleCreateTask = async () => {
+  if (taskTitle.value) {
+    loader.value = true;
+
+    const learningPlanId = learningPlanStore.learningPlan?.id;
+    if (!learningPlanId) return;
+
+    const higherIndex = getHigherIndex();
+
+    try {
+      const res = await create('tasks', {
+        title: taskTitle.value,
+        status: 'draft' as TaskStatus,
+        learningplan: learningPlanId,
+        position: higherIndex,
+        allowed_editor_plugins: '',
+        submission_description: '',
+        submission_required: false,
+        can_submit_after_deadline: false,
+        can_change_from_review: false,
+      });
+
+      learningPlanStore.learningPlan?.tasks.push({
+        id: res.data.id,
+        learning_plan_id: learningPlanId,
+        learning_goals: [],
+        trail: undefined,
+        task_events: undefined,
+        task_members: undefined,
+        tags: undefined,
+        ...res.data.attributes,
+      });
+
+      displaySuccess('addSuccess');
+    } catch (e) {
+      displayError('addError');
+    }
+  }
+
+  loader.value = false;
+  taskTitle.value = '';
+  isCreatingTask.value = false;
+};
+
+const toggleExpand = () => {
+  isCreatingTask.value = false;
+  taskTitle.value = '';
+  expandBacklog.value = !expandBacklog.value ? 1 : 0;
+};
+
+const handleDeleteTask = async (id: number) => {
+  try {
+    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex(
+      (task) => task.id === id,
+    );
+
+    if (+deleteIndex! > -1) {
+      learningPlanStore.learningPlan?.tasks.splice(deleteIndex!, 1);
+    }
+
+    await _delete('tasks', id);
+    displaySuccess('deleteSuccess');
+  } catch (e) {
+    displayError('deleteError');
+  }
+};
+
+const handleMoveTask = async ({
+  id,
+  status,
+}: {
+  id: number;
+  status: TaskStatus;
+}) => {
+  try {
+    const taskPosition = getHigherIndex();
+    const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
+
+    if (task) {
+      task.status = status;
+      task.position = taskPosition;
+      await update('tasks', id, { status, position: taskPosition });
+      displaySuccess('moveSuccess');
+    }
+  } catch (err: any) {
+    displayError('moveError', err);
+  }
+};
+
+const setOver = () => {
+  if (dragDrop.over.value.list === 'backlog') return dragDrop.over.value;
+  return { ...dragDrop.over.value, id: -1 };
+};
+
+const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
+  dragDrop.onDragOver('backlog', -index, -1, dragEvent);
+};
+
+const editSprints = [
+  {
+    text: 'Adicionar épico',
+    action: () => {
+      console.log('Adicionar épico');
+    },
+  },
+  {
+    text: 'Adicionar tarefa',
+    action: () => {
+      console.log('Adicionar tarefa');
+    },
+  },
+];
+
+const openDrawer = (id: number) => {
+  editTaskId.value = id;
+  teacherDrawer.value = true;
+};
+
+groupsArray.forEach((group, index) => {
+  groups[group] = index;
+  groups[index] = group;
+});
+
+onMounted(async () => {
+  try {
+    const res = await strapiClient<{
+      backlog: TaskItem[];
+      sprints: TaskItem[];
+    }>(`/learningplans/${learningPlanStore.learningPlan?.id}/sprint-backlog`);
+
+    backlogTasks.value = res.backlog;
+    sprintTasks.value = res.sprints;
+  } catch (_) {}
+});
+</script>
+
 <template>
   <div v-if="learningPlanStore.learningPlan">
     <Transition name="slide">
@@ -6,22 +251,25 @@
         class="task-accordion my-6 rounded-lg"
       >
         <v-expansion-panel class="rounded-lg">
-          <v-expansion-panel-title class="cursor-default" disabled hide-actions>
+          <v-expansion-panel-title
+            class="tw-cursor-default"
+            disabled
+            hide-actions
+          >
             <v-icon
               :icon="
                 expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
               "
               @click="toggleExpand"
             />
-            <span class="text-h5 text-gray-800">{{
-              taskSections[backlogIndex - 1]
-            }}</span>
+            <span class="text-h5 text-gray-800">
+              {{ taskSections[backlogIndex - 1] }}
+            </span>
             <alex-custom-chip
               status="secondary"
               size="small"
               :text="filteredTasks.length.toString()"
-            ></alex-custom-chip>
-
+            />
             <div class="ml-auto">
               <alex-custom-dropdown
                 variant="text"
@@ -86,6 +334,7 @@
                     name="taskTitle"
                     hide-details
                     :disabled="loader"
+                    @keyup.esc="isCreatingTask = false"
                     @keyup.enter="handleCreateTask"
                   />
                   <alex-custom-button
@@ -108,8 +357,9 @@
         size="large"
         prepend-icon="alex:Sprint"
         @click="createSprintDialog = true"
-        >{{ 'Nova Sprint' }}</alex-custom-button
       >
+        {{ 'Nova Sprint' }}
+      </alex-custom-button>
     </div>
     <alex-learningplan-task-project-sprints
       v-model="sprints"
@@ -126,427 +376,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { PanelItem, Sprint } from './Sprints.vue';
-import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
-import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import { ApplicationError } from '~/models/simple/applicationError.model';
-import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
-
-export interface TaskItem {
-  id: number;
-  title: string;
-  status: TaskStatus;
-  finish_at?: string | null;
-  start_at?: string | null;
-  position: number;
-  type?: TaskType | null;
-  archived_at?: string | null;
-  students?: { name: string; image?: { url: string } }[];
-  delivered: {
-    toDo: number;
-    doing: number;
-    underReview: number;
-    completed: number;
-  };
-}
-
-const props = defineProps<{
-  search: string;
-  filter: filterType | undefined;
-}>();
-
-const { create, delete: _delete, update } = useStrapi();
-// const client = useStrapiClient();
-const { t } = useI18n();
-const expandBacklog = ref(0);
-const createSprintDialog = ref(false);
-const sprints = ref([
-  {
-    expanded: 0,
-    group: `sprint-1`,
-    raw: {
-      id: 1,
-      name: 'Sprint 1',
-      startDate: new Date(),
-      endDate: new Date(),
-      tasks: [
-        {
-          id: 1,
-          position: 0,
-          title: 'Task 1',
-          start_at: '2024-07-22',
-          finish_at: '2024-10-01',
-          type: 'individual',
-          status: 'draft',
-          delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-        },
-        {
-          id: 18,
-          position: 1,
-          name: 'Epic 1',
-          epics: [
-            {
-              id: 123,
-              name: 'Story 1',
-              tasks: [
-                {
-                  id: 3,
-                  position: 0,
-                  title: 'Task 2',
-                  start_at: '2024-07-22',
-                  finish_at: '2024-08-01',
-                  type: 'individual',
-                  status: 'draft',
-                  delivered: {
-                    toDo: 1,
-                    completed: 0,
-                    doing: 0,
-                    underReview: 0,
-                  },
-                },
-              ],
-            },
-            {
-              id: 123,
-              name: 'Story 2',
-              tasks: [
-                {
-                  id: 3,
-                  position: 0,
-                  title: 'Task 2',
-                  start_at: '2024-07-22',
-                  finish_at: '2024-08-01',
-                  type: 'individual',
-                  status: 'draft',
-                  delivered: {
-                    toDo: 1,
-                    completed: 0,
-                    doing: 0,
-                    underReview: 0,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    expanded: 0,
-    group: `sprint-2`,
-    raw: {
-      id: 2,
-      name: 'Sprint 2',
-      startDate: new Date(),
-      endDate: new Date(),
-      tasks: [
-        {
-          id: 4,
-          position: 0,
-          title: 'Task 3',
-          start_at: '2024-09-22',
-          finish_at: '2024-11-22',
-          type: 'individual',
-          status: 'draft',
-          delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-        },
-        {
-          id: 5,
-          position: 1,
-          name: 'Epic 2',
-          epic: [
-            {
-              id: 2,
-              name: 'Story 2',
-              tasks: [
-                {
-                  id: 6,
-                  position: 0,
-                  title: 'Task 4',
-                  start_at: '2024-09-22',
-                  finish_at: '2024-11-22',
-                  type: 'individual',
-                  status: 'draft',
-                  delivered: {
-                    toDo: 1,
-                    completed: 0,
-                    doing: 0,
-                    underReview: 0,
-                  },
-                },
-              ],
-            },
-            {
-              id: 6,
-              position: 1,
-              title: 'Task 23',
-              start_at: '2024-09-01',
-              finish_at: '2024-09-05',
-              type: 'group',
-              status: 'draft',
-              delivered: {
-                toDo: 12,
-                completed: 10,
-                doing: 20,
-                underReview: 30,
-              },
-            },
-          ],
-        },
-      ],
-    },
-  },
-]);
-// const sprints = ref<PanelItem<Sprint>[]>([
-//   {
-//     expanded: 0,
-//     group: `sprint-${1}`,
-//     raw: {
-//       id: 1,
-//       name: 'Sprint 1',
-//       startDate: new Date(),
-//       endDate: new Date(),
-//       tasks: [
-//         {
-//           id: 4,
-//           position: 0,
-//           title: 'test',
-//           start_at: '2024-07-22',
-//           finish_at: '2024-08-01',
-//           type: 'individual',
-//           status: 'draft',
-//           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-//         },
-//       ],
-//     },
-//   },
-//   {
-//     expanded: 0,
-//     group: `sprint-${2}`,
-//     raw: {
-//       id: 2,
-//       name: 'Sprint 2',
-//       startDate: new Date(),
-//       endDate: new Date(),
-//       tasks: [
-//         {
-//           id: 1,
-//           position: 0,
-//           title: 'test',
-//           start_at: '2024-09-22',
-//           finish_at: '2024-11-22',
-//           type: 'individual',
-//           status: 'draft',
-//           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-//         },
-//         {
-//           id: 2,
-//           position: 2,
-//           title: 'tes2',
-//           start_at: '2024-09-22',
-//           finish_at: '2024-11-22',
-//           type: 'individual',
-//           status: 'draft',
-//           delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-//         },
-//       ],
-//     },
-//   },
-// ]);
-const isCreatingTask = ref(false);
-const taskTitle = ref('');
-const loader = ref(false);
-const { setMessage } = useMessageStore();
-const learningPlanStore = useLearningPlanStore();
-const teacherDrawer = ref(false);
-const editTaskId = ref<number>(-1);
-const dragDrop = useMultipleDragDrop();
-
-// Static variables
-const backlogIndex: number = 1;
-const groupsArray = ['backlog'];
-const groups = {};
-const taskSections = [t('pages.task.backlog')];
-const searchField = computed(() => props.search.toLowerCase());
-const sprintGroups = computed(() =>
-  sprints.value.map((sprint) => sprint.group),
-);
-const tasksFilter = computed(() => props.filter);
-const isFilterActive = computed(() => {
-  if (tasksFilter.value) return Object.keys(tasksFilter.value).length !== 0;
-  return false;
-});
-const filteredTasks = computed(() => {
-  const backlog = backlogTasks.value.filter((task) =>
-    task.title.toLowerCase().includes(searchField.value.toLowerCase()),
-  );
-  return backlog;
-});
-
-const backlogTasks = computed(() => {
-  const backlog: TaskItem[] = [
-    // {
-    //   id: 7,
-    //   position: 0,
-    //   title: 'test',
-    //   start_at: '2024-09-22',
-    //   finish_at: '2024-11-22',
-    //   type: 'individual',
-    //   status: 'draft',
-    //   delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-    // },
-  ];
-  return backlog;
-});
-
-const slideTransition = () =>
-  backlogTasks.value.length ? 'slide-down' : 'slide-up';
-const displayError = (message: string, e?: ApplicationError) => {
-  let displayMessage = t('pages.task.crud.errorMessage', {
-    action: t(`pages.task.crud.${message}`),
-  });
-  const error = e?.error;
-  if (error?.name === 'ApplicationError' && error?.details) {
-    displayMessage = t(`pages.task.crud.${error.details.errCode}`);
-  }
-  setMessage(displayMessage, 'error', true);
-  if (learningPlanStore.learningPlan)
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
-};
-const displaySuccess = (message: string) => {
-  setMessage(
-    t('pages.task.crud.successMessage', {
-      action: t(`pages.task.crud.${message}`),
-    }),
-    'success',
-    true,
-  );
-};
-const getHigherIndex = () => {
-  const tasks = backlogTasks.value;
-  return tasks[tasks.length - 1]?.position + 1 || 0;
-};
-const handleCreateTask = async () => {
-  if (taskTitle.value) {
-    loader.value = true;
-    const learningPlanId = learningPlanStore.learningPlan?.id;
-    if (!learningPlanId) return;
-    const higherIndex = getHigherIndex();
-    try {
-      const res = await create('tasks', {
-        title: taskTitle.value,
-        status: 'draft' as TaskStatus,
-        learningplan: learningPlanId,
-        position: higherIndex,
-        allowed_editor_plugins: '',
-        submission_description: '',
-        submission_required: false,
-        can_submit_after_deadline: false,
-        can_change_from_review: false,
-      });
-      learningPlanStore.learningPlan?.tasks.push({
-        id: res.data.id,
-        learning_plan_id: learningPlanId,
-        learning_goals: [],
-        trail: undefined,
-        task_events: undefined,
-        task_members: undefined,
-        tags: undefined,
-        ...res.data.attributes,
-      });
-      displaySuccess('addSuccess');
-    } catch (e) {
-      displayError('addError');
-    }
-  }
-  loader.value = false;
-  taskTitle.value = '';
-  isCreatingTask.value = false;
-};
-const toggleExpand = () => {
-  isCreatingTask.value = false;
-  taskTitle.value = '';
-  expandBacklog.value = !expandBacklog.value ? 1 : 0;
-};
-
-const handleDeleteTask = async (id: number) => {
-  try {
-    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex(
-      (task) => task.id === id,
-    );
-    if (typeof deleteIndex === 'number' && deleteIndex > -1) {
-      learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
-    }
-    await _delete('tasks', id);
-    displaySuccess('deleteSuccess');
-  } catch (e) {
-    displayError('deleteError');
-  }
-};
-
-const handleMoveTask = async ({
-  id,
-  status,
-}: {
-  id: number;
-  status: TaskStatus;
-}) => {
-  try {
-    const taskPosition = getHigherIndex();
-    const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
-    if (task) {
-      task.status = status;
-      task.position = taskPosition;
-      await update('tasks', id, { status, position: taskPosition });
-      displaySuccess('moveSuccess');
-    }
-  } catch (e: any) {
-    displayError('moveError', e);
-  }
-};
-
-const setOver = () => {
-  if (dragDrop.over.value.list === 'backlog') return dragDrop.over.value;
-  return { ...dragDrop.over.value, id: -1 };
-};
-
-const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
-  dragDrop.onDragOver('backlog', -index, -1, dragEvent);
-};
-const editSprints = [
-  {
-    text: 'Adicionar épico',
-    action: () => {
-      console.log('Adicionar épico');
-    },
-  },
-  {
-    text: 'Adicionar tarefa',
-    action: () => {
-      console.log('Adicionar tarefa');
-    },
-  },
-];
-
-const openDrawer = (id: number) => {
-  editTaskId.value = id;
-  teacherDrawer.value = true;
-};
-
-// lifeCycles
-groupsArray.forEach((group, index) => {
-  groups[group] = index;
-  groups[index] = group;
-});
-</script>
-
 <style>
-.cursor-default {
-  cursor: default;
-}
-
 .create-task-btn {
   border: 1px dashed rgb(var(--v-theme-gray-200));
 }
@@ -554,6 +384,7 @@ groupsArray.forEach((group, index) => {
 .task-accordion {
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   border: solid 1px rgb(var(--v-theme-gray-200));
+
   .v-theme--mainTheme {
     --v-border-opacity: unset !important;
   }

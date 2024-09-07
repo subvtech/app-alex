@@ -11,7 +11,7 @@
         :edit="edit"
         :allowed-blocks="['text']"
         :collaboration="false"
-        :fixed-menu="true"
+        :fixed-menu="edit"
       />
     </div>
   </div>

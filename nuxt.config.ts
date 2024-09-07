@@ -1,3 +1,5 @@
+import type { NuxtPage } from 'nuxt/schema';
+
 const {
   COMPONENTS_PAGE,
   MATOMO_APP_ID,
@@ -14,11 +16,7 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   app: { pageTransition: { name: 'page', mode: 'out-in' } },
-  css: [
-    'vuetify/lib/styles/main.sass',
-    'plyr/dist/plyr.css',
-    '@mdi/font/css/materialdesignicons.min.css',
-  ],
+  css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
   build: {
     transpile: ['vuetify'],
   },
@@ -56,9 +54,7 @@ export default defineNuxtConfig({
       populate: ['role', 'learningplans', 'favorites'],
     },
   },
-  routeRules: USE_MOCK
-    ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } }
-    : undefined,
+  routeRules: USE_MOCK ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } } : undefined,
   shadcn: {
     prefix: '',
     /**
@@ -83,5 +79,14 @@ export default defineNuxtConfig({
         imports: ['GGanttChart', 'GGanttRow'],
       },
     ],
+  },
+  hooks: {
+    'pages:extend'(pages) {
+      const removePage = (page: NuxtPage, index: number, items: NuxtPage[]) => {
+        if (/^-\w|\/-\w/.test(page.path)) items.splice(index, 1);
+        page.children?.forEach(removePage);
+      };
+      pages.forEach(removePage);
+    },
   },
 });

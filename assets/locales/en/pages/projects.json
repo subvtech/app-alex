@@ -1,28 +1,81 @@
 {
-  "completed": "Completed",
-  "days": "days",
-  "documents": "Documents",
-  "empty_events": "No events have been registered",
-  "empty_institutions": "No partner institutions here",
-  "empty_journey": "No learning journey found",
-  "empty_meetings": "Nothing scheduled today!",
-  "empty_members": "No members found",
-  "empty_task_progress": "0% of tasks have been completed",
-  "home": "Home",
-  "individual_learning": "Individual Learning",
-  "last_update": "Last update",
-  "members": "Members",
-  "my_goals": "My goals",
-  "my_projects": "My projects",
-  "new_project": "New project",
-  "overview": "Overview",
-  "projects": "Projects",
-  "remaining_time": "Remaining time",
-  "search_member": "Search member",
-  "task_progress": "Task progress",
-  "trails": "Trails",
-  "tasks": "Tasks",
-  "total_epics": "Total of epics",
-  "total_sprints": "Total of sprints",
-  "total_story": "Total of stories"
+  "common": {
+    "documents": "Documents",
+    "home": "Home",
+    "individual_learning": "Individual Learning",
+    "members": "Members",
+    "my_projects": "My Projects",
+    "new_project": "New Project",
+    "overview": "Overview",
+    "projects": "Projects",
+    "tasks": "Tasks",
+    "trails": "Trails"
+  },
+  "errors": {
+    "404": "Page not found",
+    "403": "Access denied",
+    "500": "Internal server error"
+  },
+  "individual_learning": {
+    "common": {
+      "empty_events": "No events registered",
+      "my_goals": "My goals",
+      "overview": "Overview",
+      "search_member": "Search member",
+      "tasks": "Tasks",
+      "trails": "Trails"
+    }
+  },
+  "overview": {
+    "completed": "Completed",
+    "empty_institutions": "No institutions found",
+    "empty_journey": "No learning journey found!",
+    "empty_meetings": "Nothing scheduled today!",
+    "empty_members": "No members found",
+    "empty_task_progress": "0% of tasks have been completed",
+    "last_update": "Last update",
+    "remaining_time": "Remaining time",
+    "total_epics": "Total epics",
+    "total_sprints": "Total sprints",
+    "total_story": "Total stories"
+  },
+  "tasks": {
+    "common": {
+      "add_epic": "Add epic",
+      "add_placeholder": "Add task",
+      "add_task": "Add task",
+      "add": "Add",
+      "backlog": "Backlog",
+      "find_task": "Find task",
+      "kanban_sprint_required": "Required select a sprint",
+      "see_backlog": "See Backlog",
+      "see_kanban": "See Kanban"
+    },
+    "crud": {
+      "addSuccess": "created",
+      "editSuccess": "edited",
+      "deleteSuccess": "deleted",
+      "archiveSuccess": "archived",
+      "unarchiveSuccess": "unarchived",
+      "addError": "create",
+      "archiveError": "archive",
+      "unarchiveError": "unarchive",
+      "editError": "edit",
+      "deleteError": "delete",
+      "moveSuccess": "moved",
+      "moveError": "move",
+      "errorMessage": "An error occurred while trying to {action} the task, try again!",
+      "successMessage": "Task {action} successfully!",
+      "dndSortError": "It is not possible to change the task position when the {type} sorting is active",
+      "dndFilterError": "It is not possible to change the task position when the filtering is active",
+      "TASK_DATA_INCOMPLETE": "You need to fill in the task information before setting it as published",
+      "TASK_MOVE_HAS_DELIVERIES": "It is not possible to move the task to draft because it has deliveries"
+    },
+    "filters": {
+      "archivedTasks": "Archived tasks",
+      "finalDate": "Final date",
+      "select": "Type",
+      "startDate": "Start date"
+    }
+  }
 }
