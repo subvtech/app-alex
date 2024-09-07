@@ -1,3 +1,110 @@
+<script setup lang="ts">
+import { contains } from '@/utils/contains';
+import { get } from '@/utils/get';
+import { Column } from '~/components/alex/learningplan/task/project/kanban/types';
+
+type FilterType = {
+  members?: any[];
+  startDate?: {
+    start: string | null;
+    end: string | null;
+  };
+  finalDate?: {
+    start: string | null;
+    end: string | null;
+  };
+};
+
+type Item = {
+  sprint_id: number;
+  group: string;
+  raw: TaskSimple;
+};
+
+type Sprint = {
+  id: number;
+  sprint: string;
+  columns: Column[];
+};
+
+enum Mode {
+  List = 'list',
+  Kanban = 'kanban',
+}
+
+const { t } = useI18n();
+const learningPlanStore = useLearningPlanStore();
+
+const mode = ref<Mode>(Mode.List);
+const search = ref('');
+const sprints = ref<Sprint[]>([]);
+const items = ref<Item[]>([]);
+const selectedSprint = ref(sprints.value[0] || {});
+const filter = ref<FilterType>();
+const filterDrawer = ref();
+const chips = ref<string[]>([]);
+const isProfessor = ref<boolean>(false);
+const classes = ref<string[]>([]);
+const openFilterDrawer = ref(false);
+
+const columns = computed<Column[]>({
+  get: () => selectedSprint.value?.columns || [],
+  set: (value) => (selectedSprint.value.columns = value),
+});
+
+const filteredItems = computed({
+  get() {
+    return items.value.filter((item) => {
+      return (
+        contains(item.raw.title, search.value) ||
+        item.raw.tags?.some((tag) => contains(tag.text, search.value))
+      );
+    });
+  },
+  set(value) {
+    items.value = value;
+  },
+});
+
+const filteredItemsBySprint = computed(() => {
+  return filteredItems.value.filter(
+    (item) => item.sprint_id === selectedSprint.value.id,
+  );
+});
+
+const handleFilter = (value: FilterType) => {
+  filter.value = value;
+  chips.value = Object.keys(filter.value || {});
+};
+
+const toggleMode = () => {
+  mode.value = mode.value === Mode.Kanban ? Mode.List : Mode.Kanban;
+};
+
+const getMembers = (taskMembers?: TaskMember[]) => {
+  return (
+    taskMembers?.map((member) => ({
+      name: member.learning_plan_member?.user?.fullname || '',
+      ...(member.learning_plan_member?.user?.avatar?.url && {
+        image: {
+          url: member.learning_plan_member?.user?.avatar?.url,
+        },
+      }),
+    })) || []
+  );
+};
+
+watch(
+  () => [learningPlanStore.loading],
+  () => {
+    if (learningPlanStore.loading) return;
+    const { learningPlan, userIsFacilitator } = learningPlanStore;
+    isProfessor.value = userIsFacilitator || false;
+    classes.value = learningPlan?.classes?.map(get('name')) || [];
+  },
+);
+</script>
+
 <template>
   <div class="tw-flex tw-flex-col bg-white rounded tw-flex-grow">
     <Transition name="fade" mode="out-in">
@@ -42,15 +149,20 @@
         <div class="tw-flex tw-gap-2">
           <alex-custom-button
             size="large"
-            :prepend-icon="
-              mode === 'list' ? 'alex:Kanban' : 'mdi-clipboard-text-outline'
-            "
             variant="secondary"
+            :disabled="!sprints.length"
+            :prepend-icon="
+              mode === Mode.List ? 'alex:Kanban' : 'mdi-clipboard-text-outline'
+            "
+            :title="
+              sprints.length
+                ? ''
+                : 'É necessário ter pelo menos uma Sprint para ver o modo Kanban'
+            "
             @click="toggleMode"
-            >{{
-              mode === 'list' ? 'Ver Kanban' : 'Ver Backlog'
-            }}</alex-custom-button
           >
+            {{ mode === Mode.List ? 'Ver Kanban' : 'Ver Backlog' }}
+          </alex-custom-button>
           <alex-custom-button
             size="large"
             icon="mdi-filter-variant"
@@ -60,10 +172,8 @@
         </div>
       </div>
     </Transition>
-
     <div class="w-100 px-6 py-4 ga-6 d-flex flex-column tw-flex-grow">
       <alex-learningplan-task-table-skeleton v-if="learningPlanStore.loading" />
-
       <template v-else>
         <TransitionGroup
           v-if="chips.length"
@@ -83,9 +193,8 @@
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>
-
         <alex-learningplan-task-project-kanban
-          v-if="mode === 'kanban'"
+          v-if="mode === Mode.Kanban"
           v-model="columns"
           :items="filteredItemsBySprint"
         >
@@ -113,233 +222,6 @@
     />
   </div>
 </template>
-<script setup lang="ts">
-export interface filterType {
-  members?: any[];
-  startDate?: {
-    start: string | null;
-    end: string | null;
-  };
-  finalDate?: {
-    start: string | null;
-    end: string | null;
-  };
-}
-// Composables
-const route = useRoute();
-const { t } = useI18n();
-const learningPlanStore = useLearningPlanStore();
-const headerStore = usePageHeaderStore();
-
-// refs
-const mode = ref<'list' | 'kanban'>('list');
-const search = ref('');
-const sprints = ref([
-  {
-    id: 0,
-    sprint: 'sprint 1',
-    columns: [
-      { title: 'UX/UI', group: 'ux_ui', color: 'gray' },
-      { title: 'Frontend', group: 'frontend', color: 'gray' },
-    ],
-  },
-  {
-    id: 1,
-    sprint: 'Sprint 2',
-    columns: [{ title: 'BackEnd', group: 'BackEnd', color: 'gray' }],
-  },
-]);
-const columns = computed({
-  get: () => {
-    return selectedSprint.value.columns;
-  },
-  set: (value) => {
-    selectedSprint.value.columns = value;
-  },
-});
-const selectedSprint = ref(sprints.value[0]);
-const items = ref<{ sprint_id: number; group: string; raw: TaskSimple }[]>([
-  {
-    sprint_id: 1,
-    group: 'ux_ui',
-    raw: {
-      title: 'UX/UI',
-      finish_at: '2024-08-22',
-      id: 1,
-      status: 'ux_ui',
-      position: 0,
-      task_members: [],
-      allowed_editor_plugins: '',
-      submission_required: false,
-      learning_plan_id: 1,
-      can_submit_after_deadline: false,
-      can_change_from_review: false,
-      submission_description: '',
-      tags: [
-        {
-          id: 12,
-          isGeneral: false,
-          text: 'UX UI',
-          verified: false,
-          isPublic: false,
-          verified_date: new Date(),
-        },
-      ],
-    },
-  },
-  {
-    sprint_id: 0,
-    group: 'ux_ui',
-    raw: {
-      title: 'Design',
-      finish_at: '2024-08-22',
-      id: 2,
-      status: 'ux_ui',
-      position: 1,
-      task_members: [
-        {
-          id: 1,
-          status: 'in_progress',
-          can_submit_after_deadline: false,
-          started_at: new Date().toISOString(),
-          finished_at: new Date().toISOString(),
-          learning_plan_member: {
-            user: {
-              fullname: 'John Doe',
-              avatar: {
-                url: 'https://thispersondoesnotexist.com/',
-                id: 1,
-              },
-            },
-          },
-        },
-        {
-          id: 2,
-          status: 'in_progress',
-          can_submit_after_deadline: false,
-          started_at: new Date().toISOString(),
-          finished_at: new Date().toISOString(),
-          learning_plan_member: {
-            user: {
-              fullname: 'John Doe',
-              avatar: {
-                url: 'https://thispersondoesnotexist.com/',
-                id: 1,
-              },
-            },
-          },
-        },
-      ],
-      allowed_editor_plugins: '',
-      submission_required: false,
-      learning_plan_id: 1,
-      can_submit_after_deadline: false,
-      can_change_from_review: false,
-      submission_description: '',
-      tags: [
-        {
-          id: 1,
-          text: 'UX UI',
-          verified: false,
-          verified_date: new Date(),
-          isGeneral: false,
-          isPublic: false,
-        },
-      ],
-    },
-  },
-]);
-const filteredItems = computed({
-  get: () => {
-    return items.value.filter(
-      (item) =>
-        item.raw.title.toLowerCase().includes(search.value.toLowerCase()) ||
-        item.raw.tags?.some((tag) =>
-          tag.text.toLowerCase().includes(search.value.toLowerCase()),
-        ),
-    );
-  },
-  set: (value) => {
-    items.value = value;
-  },
-});
-const filteredItemsBySprint = computed(() => {
-  return filteredItems.value.filter(
-    (item) => item.sprint_id === selectedSprint.value.id,
-  );
-});
-const { id } = route.params;
-const filter = ref<filterType>();
-const filterDrawer = ref();
-const chips = ref<string[]>([]);
-const isProfessor = ref<boolean>(false);
-const classes = ref<string[]>([]);
-const openFilterDrawer = ref(false);
-
-const handleFilter = (newFilter: filterType) => {
-  filter.value = newFilter;
-  chips.value = [];
-  if (filter) {
-    Object.keys(filter.value).forEach((key) => {
-      chips.value.push(key);
-    });
-  }
-};
-const toggleMode = () => {
-  if (mode.value === 'kanban') {
-    mode.value = 'list';
-    return;
-  }
-  mode.value = 'kanban';
-};
-const getMembers = (taskMembers?: TaskMember[]) => {
-  return (
-    taskMembers?.map((member) => ({
-      name: member.learning_plan_member?.user?.fullname || '',
-      ...(member.learning_plan_member?.user?.avatar?.url && {
-        image: {
-          url: member.learning_plan_member?.user?.avatar?.url,
-        },
-      }),
-    })) || []
-  );
-};
-watch(
-  () => [learningPlanStore.loading],
-  () => {
-    if (!learningPlanStore.loading) {
-      isProfessor.value = learningPlanStore.userIsFacilitator || false;
-      // Kanban
-      classes.value =
-        learningPlanStore.learningPlan?.classes?.map((group) => group.name) ||
-        [];
-      headerStore.title = t('pages.projects.my_projects');
-      headerStore.items = [
-        {
-          title: t('components.courses.settings.home'),
-          disabled: false,
-          to: '/',
-        },
-        {
-          title: t('pages.projects.my_projects'),
-          disabled: false,
-          to: '/projects/me',
-        },
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          disabled: false,
-          to: `/projects/${id}`,
-        },
-        {
-          title: t('components.courses.tasks.title'),
-          disabled: true,
-          to: `/projects/${id}/tasks`,
-        },
-      ];
-    }
-  },
-);
-</script>
 
 <style scoped>
 .header {

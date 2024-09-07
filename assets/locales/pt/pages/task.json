@@ -39,9 +39,10 @@
       "group": "Grupo"
     },
     "placeholders": {
-      "undefined": "Indefinido",
       "noMembers": "Nenhum",
-      "noTasks": "Nenhuma tarefa encontrada"
+      "not_informed": "Não informado",
+      "noTasks": "Nenhuma tarefa encontrada",
+      "undefined": "Indefinido"
     },
     "dropdown": {
       "kanban": "Ver Kanban",

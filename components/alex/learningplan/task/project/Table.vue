@@ -38,7 +38,7 @@
                 <tr class="d-flex align-center py-2 tasks-items outline-bottom">
                   <td
                     class="text-body-4 text-overflow text-left task-title"
-                    :class="`width-${205 - level * 4}`"
+                    :class="`width-${85 - level * 4}`"
                     :style="taskItemMargin(level)"
                   >
                     {{ item.title }}
@@ -49,9 +49,9 @@
                       :date="item.finish_at"
                       :is-published="item.status === 'published' && !isArchived"
                     />
-                    <span v-else>{{
-                      $t('pages.task.table.placeholders.undefined')
-                    }}</span>
+                    <span v-else class="tw-text-black/30">
+                      {{ $t('pages.task.table.placeholders.not_informed') }}
+                    </span>
                   </td>
                   <td class="width-40">
                     <div
@@ -79,9 +79,9 @@
                         class="mr-1"
                         icon="mdi-close-circle-outline "
                       ></v-icon>
-                      <span>{{
-                        $t('pages.task.submissions.noSubmissions')
-                      }}</span>
+                      <span>
+                        {{ $t('pages.task.submissions.noSubmissions') }}
+                      </span>
                     </div>
                   </td>
                   <td class="ml-auto">
@@ -278,13 +278,12 @@ const header = [
     title: t('pages.task.table.header.title'),
     key: 'title',
     sortable: false,
-    width: 836,
+    width: 356,
   },
   {
     title: t('pages.task.table.header.deadline_at'),
     key: 'deadline_at',
     sortable: false,
-
     width: 192,
   },
   {

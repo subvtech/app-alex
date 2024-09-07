@@ -39,9 +39,10 @@
       "group": "Group"
     },
     "placeholders": {
-      "undefined": "Undefined",
       "noMembers": "None",
-      "noTasks": "No tasks found"
+      "not_informed": "Not informed",
+      "noTasks": "No tasks found",
+      "undefined": "Undefined"
     },
     "dropdown": {
       "kanban": "View Kanban",

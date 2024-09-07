@@ -144,7 +144,7 @@ type BannerProps = {
     | 'username-fullname-role'
     | 'username-role-fullname';
   settingsIcon?: string;
-  selectedOption?: number | null;
+  selectedOption?: string | number | null;
   isProfessor?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;

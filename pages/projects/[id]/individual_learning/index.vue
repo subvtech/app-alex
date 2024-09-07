@@ -45,14 +45,10 @@ const fetchMembers = async () => {
     const res = await findOne<LearningPlanSimple>(
       'learningplans',
       Number(route.params.id),
-      {
-        populate: ['members.user.avatar'],
-      },
+      { populate: ['members.user.avatar'] },
     );
-    members.value = res.data.members.map((r) => {
-      const user = r.user;
-      return { ...user };
-    });
+
+    members.value = res.data.members.map((r) => ({ ...r.user }));
   } catch (_) {
     hasError.value = true;
   } finally {

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// import { PanelItem, Sprint } from './Sprints.vue';
+import { useMultipleDragDrop } from '@/composables/useMultipleDragDrop';
+import { ApplicationError } from '@/models/simple/applicationError.model';
+import { TaskStatus, TaskType } from '@/models/simple/taskSimple.model';
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
-import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import { ApplicationError } from '~/models/simple/applicationError.model';
-import { TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import { isEmpty } from '@/utils/is-empty';
 
 export interface TaskItem {
   id: number;
@@ -23,6 +23,18 @@ export interface TaskItem {
   };
 }
 
+interface Sprint {
+  expanded: number;
+  group: string;
+  raw: {
+    id: number;
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    tasks: TaskItem[];
+  };
+}
+
 const props = defineProps<{
   search: string;
   filter: filterType | undefined;
@@ -35,172 +47,30 @@ const expandBacklog = ref(0);
 const createSprintDialog = ref(false);
 const backlogTasks = ref<TaskItem[]>([]);
 const sprintTasks = ref<TaskItem[]>([]);
-const sprints = ref([
-  {
-    expanded: 0,
-    group: `sprint-1`,
-    raw: {
-      id: 1,
-      name: 'Sprint 1',
-      startDate: new Date(),
-      endDate: new Date(),
-      tasks: [
-        {
-          id: 1,
-          position: 0,
-          title: 'Task 1',
-          start_at: '2024-07-22',
-          finish_at: '2024-10-01',
-          type: 'individual',
-          status: 'draft',
-          delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-        },
-        {
-          id: 18,
-          position: 1,
-          name: 'Epic 1',
-          epics: [
-            {
-              id: 123,
-              name: 'Story 1',
-              tasks: [
-                {
-                  id: 3,
-                  position: 0,
-                  title: 'Task 2',
-                  start_at: '2024-07-22',
-                  finish_at: '2024-08-01',
-                  type: 'individual',
-                  status: 'draft',
-                  delivered: {
-                    toDo: 1,
-                    completed: 0,
-                    doing: 0,
-                    underReview: 0,
-                  },
-                },
-              ],
-            },
-            {
-              id: 123,
-              name: 'Story 2',
-              tasks: [
-                {
-                  id: 3,
-                  position: 0,
-                  title: 'Task 2',
-                  start_at: '2024-07-22',
-                  finish_at: '2024-08-01',
-                  type: 'individual',
-                  status: 'draft',
-                  delivered: {
-                    toDo: 1,
-                    completed: 0,
-                    doing: 0,
-                    underReview: 0,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    expanded: 0,
-    group: `sprint-2`,
-    raw: {
-      id: 2,
-      name: 'Sprint 2',
-      startDate: new Date(),
-      endDate: new Date(),
-      tasks: [
-        {
-          id: 4,
-          position: 0,
-          title: 'Task 3',
-          start_at: '2024-09-22',
-          finish_at: '2024-11-22',
-          type: 'individual',
-          status: 'draft',
-          delivered: { toDo: 1, completed: 0, doing: 0, underReview: 0 },
-        },
-        {
-          id: 5,
-          position: 1,
-          name: 'Epic 2',
-          epic: [
-            {
-              id: 2,
-              name: 'Story 2',
-              tasks: [
-                {
-                  id: 6,
-                  position: 0,
-                  title: 'Task 4',
-                  start_at: '2024-09-22',
-                  finish_at: '2024-11-22',
-                  type: 'individual',
-                  status: 'draft',
-                  delivered: {
-                    toDo: 1,
-                    completed: 0,
-                    doing: 0,
-                    underReview: 0,
-                  },
-                },
-              ],
-            },
-            {
-              id: 6,
-              position: 1,
-              title: 'Task 23',
-              start_at: '2024-09-01',
-              finish_at: '2024-09-05',
-              type: 'group',
-              status: 'draft',
-              delivered: {
-                toDo: 12,
-                completed: 10,
-                doing: 20,
-                underReview: 30,
-              },
-            },
-          ],
-        },
-      ],
-    },
-  },
-]);
+const sprints = ref<Sprint[]>([]);
+
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const loader = ref(false);
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const teacherDrawer = ref(false);
-const editTaskId = ref<number>(-1);
+const editTaskId = ref(-1);
 const dragDrop = useMultipleDragDrop();
 
-// Static variables
-const backlogIndex: number = 1;
+const backlogIndex = 1;
 const groupsArray = ['backlog'];
 const groups = {};
 const taskSections = [t('pages.task.backlog')];
+
 const searchField = computed(() => props.search.toLowerCase());
-const sprintGroups = computed(() =>
-  sprints.value.map((sprint) => sprint.group),
-);
-const tasksFilter = computed(() => props.filter);
-const isFilterActive = computed(() => {
-  if (tasksFilter.value) return Object.keys(tasksFilter.value).length !== 0;
-  return false;
-});
+const sprintGroups = computed(() => sprints.value.map((s) => s.group));
+const isFilterActive = computed(() => !isEmpty(props.filter));
+
 const filteredTasks = computed(() => {
-  const backlog = backlogTasks.value.filter((task) =>
+  return backlogTasks.value.filter((task) =>
     task.title.toLowerCase().includes(searchField.value.toLowerCase()),
   );
-  return backlog;
 });
 
 const slideTransition = () => {
@@ -236,12 +106,16 @@ const getHigherIndex = () => {
   const tasks = backlogTasks.value;
   return tasks[tasks.length - 1]?.position + 1 || 0;
 };
+
 const handleCreateTask = async () => {
   if (taskTitle.value) {
     loader.value = true;
+
     const learningPlanId = learningPlanStore.learningPlan?.id;
     if (!learningPlanId) return;
+
     const higherIndex = getHigherIndex();
+
     try {
       const res = await create('tasks', {
         title: taskTitle.value,
@@ -254,6 +128,7 @@ const handleCreateTask = async () => {
         can_submit_after_deadline: false,
         can_change_from_review: false,
       });
+
       learningPlanStore.learningPlan?.tasks.push({
         id: res.data.id,
         learning_plan_id: learningPlanId,
@@ -264,15 +139,18 @@ const handleCreateTask = async () => {
         tags: undefined,
         ...res.data.attributes,
       });
+
       displaySuccess('addSuccess');
     } catch (e) {
       displayError('addError');
     }
   }
+
   loader.value = false;
   taskTitle.value = '';
   isCreatingTask.value = false;
 };
+
 const toggleExpand = () => {
   isCreatingTask.value = false;
   taskTitle.value = '';
@@ -284,9 +162,11 @@ const handleDeleteTask = async (id: number) => {
     const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex(
       (task) => task.id === id,
     );
-    if (typeof deleteIndex === 'number' && deleteIndex > -1) {
-      learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
+
+    if (+deleteIndex! > -1) {
+      learningPlanStore.learningPlan?.tasks.splice(deleteIndex!, 1);
     }
+
     await _delete('tasks', id);
     displaySuccess('deleteSuccess');
   } catch (e) {
@@ -304,14 +184,15 @@ const handleMoveTask = async ({
   try {
     const taskPosition = getHigherIndex();
     const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
+
     if (task) {
       task.status = status;
       task.position = taskPosition;
       await update('tasks', id, { status, position: taskPosition });
       displaySuccess('moveSuccess');
     }
-  } catch (e: any) {
-    displayError('moveError', e);
+  } catch (err: any) {
+    displayError('moveError', err);
   }
 };
 
@@ -344,7 +225,6 @@ const openDrawer = (id: number) => {
   teacherDrawer.value = true;
 };
 
-// lifeCycles
 groupsArray.forEach((group, index) => {
   groups[group] = index;
   groups[index] = group;
@@ -371,22 +251,25 @@ onMounted(async () => {
         class="task-accordion my-6 rounded-lg"
       >
         <v-expansion-panel class="rounded-lg">
-          <v-expansion-panel-title class="cursor-default" disabled hide-actions>
+          <v-expansion-panel-title
+            class="tw-cursor-default"
+            disabled
+            hide-actions
+          >
             <v-icon
               :icon="
                 expandBacklog === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
               "
               @click="toggleExpand"
             />
-            <span class="text-h5 text-gray-800">{{
-              taskSections[backlogIndex - 1]
-            }}</span>
+            <span class="text-h5 text-gray-800">
+              {{ taskSections[backlogIndex - 1] }}
+            </span>
             <alex-custom-chip
               status="secondary"
               size="small"
               :text="filteredTasks.length.toString()"
-            ></alex-custom-chip>
-
+            />
             <div class="ml-auto">
               <alex-custom-dropdown
                 variant="text"
@@ -474,8 +357,9 @@ onMounted(async () => {
         size="large"
         prepend-icon="alex:Sprint"
         @click="createSprintDialog = true"
-        >{{ 'Nova Sprint' }}</alex-custom-button
       >
+        {{ 'Nova Sprint' }}
+      </alex-custom-button>
     </div>
     <alex-learningplan-task-project-sprints
       v-model="sprints"
@@ -493,10 +377,6 @@ onMounted(async () => {
 </template>
 
 <style>
-.cursor-default {
-  cursor: default;
-}
-
 .create-task-btn {
   border: 1px dashed rgb(var(--v-theme-gray-200));
 }
@@ -504,6 +384,7 @@ onMounted(async () => {
 .task-accordion {
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   border: solid 1px rgb(var(--v-theme-gray-200));
+
   .v-theme--mainTheme {
     --v-border-opacity: unset !important;
   }
