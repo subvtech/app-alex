@@ -1,13 +1,15 @@
-<script setup lang="ts" generic="T extends { id: number; position: number; status: string }">
+<script setup lang="ts" generic="T extends { id: number; position: number; title: string; status: string }">
 import { SlickItem, SlickList } from 'vue-slicksort';
 import { Droppable } from '../-types';
 import KanbanColumn from './KanbanColumn.vue';
 import { Colors } from './KanbanColumnHeader.vue';
 
-export interface Column {
+export interface Column<U extends { id: number }> {
+  id: number;
   title: string;
   group: string;
   color: Colors;
+  items: Droppable<U>[];
   accept?: ComponentProps<typeof KanbanColumn>['accept'];
   disable?: boolean;
 }
@@ -16,30 +18,25 @@ type Slot<U> = {
   card(props: { item: U }): any;
 };
 
-defineSlots<Slot<T>>();
+defineSlots<Slot<Droppable<T>>>();
 
-const columns = defineModel<Column[]>({
+const columns = defineModel<Column<T>[]>({
   default: () => [],
 });
 
-const items = defineModel<Droppable<T>[]>('items', {
-  default: () => [],
-});
-
-const columnItems = ref<Record<string, Droppable<T>[]>>({});
 const canDrag = ref(true);
 const isDraggingItems = ref(false);
 const modalDeleteColumn = ref(false);
-const selectedDeleteGroup = ref<{ group: string; lenght: number } | null>(null);
+const selectedDeleteGroup = ref<{ group: string; length: number } | null>(null);
 
 const confirmDeleteI18n = computed(() => ({
-  title: selectedDeleteGroup.value?.lenght
+  title: selectedDeleteGroup.value?.length
     ? 'No momento não é possível excluir esta coluna!'
     : 'Deseja realmente excluir essa coluna?',
-  subtitle: selectedDeleteGroup.value?.lenght
+  subtitle: selectedDeleteGroup.value?.length
     ? 'Para remover esta coluna é necessário que ela esteja vazia. Mova todas as tarefas para outra coluna para realizar essa ação.'
     : 'Esse processo é irreversível',
-  cancel: selectedDeleteGroup.value?.lenght ? 'Entendi' : 'Cancelar',
+  cancel: selectedDeleteGroup.value?.length ? 'Entendi' : 'Cancelar',
 }));
 
 const setCanDrag = (value: boolean) => {
@@ -50,24 +47,22 @@ const handleTitleChange = (group: string, value: string) => {
   columns.value = columns.value.map((column) => {
     if (column.group === group) {
       column.title = value;
-      column.group = value.trim().toLowerCase().replace(/ /g, '_');
+      column.group = `${value.trim().toLowerCase().replace(/ /g, '_')}_${column.id}`;
     }
     return column;
-  });
-  items.value = items.value.map((item) => {
-    if (item.group === group) {
-      item.group = value.trim().toLowerCase().replace(/ /g, '_');
-    }
-    return item;
   });
 };
 
 const handleAddColumn = () => {
-  columns.value.push({
+  const newId = Math.round(Math.random() * 10000);
+  const emptyColumn: Column<T> = {
+    id: newId,
     color: 'gray',
-    group: `column-${columns.value.length + 1}`,
+    group: `column-${newId}`,
     title: '',
-  });
+    items: [],
+  };
+  columns.value = [...columns.value, emptyColumn];
 
   setTimeout(() => {
     document.querySelector<HTMLInputElement>(`#${columns.value.at(-1)?.group} input`)?.focus();
@@ -79,41 +74,72 @@ const handleCancelColumn = (group: string) => {
 };
 
 const handleConfirmDeleteColumn = (group: string) => {
-  selectedDeleteGroup.value = { group, lenght: columnItems.value[group].length };
-  modalDeleteColumn.value = true;
+  const deletedColumn = columns.value.find((column) => column.group === group);
+  if (deletedColumn) {
+    selectedDeleteGroup.value = {
+      group,
+      length: deletedColumn.items.length,
+    };
+    modalDeleteColumn.value = true;
+  }
 };
 
 const handleDeleteColumn = () => {
   const group = selectedDeleteGroup.value?.group;
-  if (!group || columnItems.value[group].length) return;
+  const deletedColumn = columns.value.find((column) => column.group === group);
+  if (!group || deletedColumn?.items.length) return;
   columns.value = columns.value.filter((v) => v.group !== group);
   selectedDeleteGroup.value = null;
   modalDeleteColumn.value = false;
 };
 
-const handleInsertCard = (values: { newIndex: number; value: Droppable<T>; group: string }) => {
-  items.value = items.value.map((item) => {
-    if (item.raw.id === values.value.raw.id) {
-      item.group = values.group;
-      item.raw.status = values.group;
+const handleInsertCard = ({ group, newIndex }: { newIndex: number; value: Droppable<T>; group: string }) => {
+  columns.value = columns.value.map((column) => {
+    if (column.group === group) {
+      return toRaw({
+        ...column,
+        items: column.items.map((item) => ({
+          ...item,
+          raw: {
+            ...item.raw,
+            position: newIndex,
+            status: group,
+          },
+          group,
+        })),
+      });
     }
-    return item;
+    return toRaw(column);
   });
 };
 
-const handleUpdateList = (list: Droppable<T>[]) => {
-  items.value = items.value.map((item) => {
-    const index = list.findIndex((i) => i.raw.id === item.raw.id);
-    if (index !== -1) item.raw.position = index;
-    return item;
+const handleUpdateList = (items: Droppable<T>[], group: string) => {
+  const updatedItems: Droppable<T>[] = items.map((item, index) => ({ ...item, raw: { ...item.raw, position: index } }));
+  columns.value = columns.value.map((column) => {
+    if (column.group === group) {
+      return { ...column, items: updatedItems };
+    }
+    return column;
   });
 };
 
-const setColumnItems = () => {
-  columns.value.forEach((column) => {
-    columnItems.value[column.group] = items.value
-      .filter((item) => item.group === column.group)
-      .sort((a, b) => a.raw.position - b.raw.position);
+const handleAddItem = (group: string, title: string) => {
+  const newId = Math.round(Math.random() * 10000);
+  const emptyItem = {
+    id: newId,
+    title,
+    position: 0,
+    status: group,
+  } as T;
+  const column = columns.value.find((column) => column.group === group);
+  if (!column) {
+    return;
+  }
+  columns.value = columns.value.map((oldColumn) => {
+    if (column.id === oldColumn.id) {
+      return { ...oldColumn, items: [...oldColumn.items, { group, raw: emptyItem }] };
+    }
+    return oldColumn;
   });
 };
 
@@ -125,11 +151,8 @@ const handleSortEnd = () => {
   isDraggingItems.value = false;
 };
 
-setColumnItems();
-
 defineExpose({ canDrag, setCanDrag });
-
-watch(items, setColumnItems, { deep: true });
+// watch(columns, (value) => console.log(value));
 </script>
 
 <template>
@@ -145,22 +168,23 @@ watch(items, setColumnItems, { deep: true });
       <SlickItem v-for="(column, i) in columns" :key="column.group" :index="i">
         <KanbanColumn
           :key="column.group"
-          v-model="columnItems[column.group]"
+          v-model="column['items']"
           class="tw-mr-2"
           :color="column.color"
           :group="column.group"
           :title="column.title"
-          @add-item="console.log($event)"
+          @add-item="(group, title) => handleAddItem(group, title)"
           @cancel-column="handleCancelColumn"
           @delete="handleConfirmDeleteColumn(column.group)"
           @insert-card="handleInsertCard"
           @sort-end="handleSortEnd"
           @sort-start="handleSortStart"
+          @sort-move="canDrag = false"
           @title-column-change="handleTitleChange"
           @update-list="handleUpdateList"
         >
           <template #card="{ item }">
-            <slot name="card" :item="item.raw"></slot>
+            <slot name="card" :item="item"></slot>
           </template>
         </KanbanColumn>
       </SlickItem>
@@ -179,7 +203,7 @@ watch(items, setColumnItems, { deep: true });
       variant="error"
       :cancel-button-text="confirmDeleteI18n.cancel"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
-      :no-submit-button="!!selectedDeleteGroup?.lenght"
+      :no-submit-button="!!selectedDeleteGroup?.length"
       :subtitle="confirmDeleteI18n.subtitle"
       :title="confirmDeleteI18n.title"
       @cancel="modalDeleteColumn = false"

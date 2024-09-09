@@ -18,9 +18,7 @@
         density="comfortable"
         name="title"
         :label="$t('components.projects.create.basicInfo.titleLabel')"
-        :placeholder="
-          $t('components.projects.create.basicInfo.titlePlaceholder')
-        "
+        :placeholder="$t('components.projects.create.basicInfo.titlePlaceholder')"
         required
       />
 
@@ -29,9 +27,7 @@
         density="comfortable"
         name="description"
         :label="$t('components.projects.create.basicInfo.descriptionLabel')"
-        :placeholder="
-          $t('components.projects.create.basicInfo.descriptionPlaceholder')
-        "
+        :placeholder="$t('components.projects.create.basicInfo.descriptionPlaceholder')"
         theme="light"
         required
       />
@@ -64,9 +60,7 @@
         required
         persistent-hint
         :label="$t('components.projects.create.basicInfo.slugLabel')"
-        :placeholder="
-          $t('components.projects.create.basicInfo.slugPlaceholder')
-        "
+        :placeholder="$t('components.projects.create.basicInfo.slugPlaceholder')"
         :info="$t('components.projects.create.basicInfo.slugInfo')"
         :hint="plataformUrl"
       />
@@ -76,18 +70,12 @@
         multiple
         clearable
         :label="$t('components.projects.create.basicInfo.fieldLabel')"
-        :placeholder="
-          $t('components.projects.create.basicInfo.fieldPlaceholder')
-        "
+        :placeholder="$t('components.projects.create.basicInfo.fieldPlaceholder')"
         hide-details
         item-title="text"
         :items="selectionFields?.data || []"
       />
-      <TransitionGroup
-        name="list"
-        tag="div"
-        class="w-100 d-flex gap-2 flex-wrap py-2 position-relative"
-      >
+      <TransitionGroup name="list" tag="div" class="w-100 d-flex gap-2 flex-wrap py-2 position-relative">
         <alex-custom-chip
           v-for="(area, index) in projectInfo.areas"
           :key="area.id"
@@ -101,9 +89,7 @@
         v-model="projectInfo.product"
         name="product"
         :label="$t('components.projects.create.basicInfo.projectTypeLabel')"
-        :placeholder="
-          $t('components.projects.create.basicInfo.projectTypePlaceholder')
-        "
+        :placeholder="$t('components.projects.create.basicInfo.projectTypePlaceholder')"
         hide-details
         item-title="text"
         :items="selectionProducts?.data || []"
@@ -114,12 +100,8 @@
         v-model="associatedCourses"
         name="associatedCourses"
         :label="$t('components.projects.create.associatedCourses.titleLabel')"
-        :placeholder="
-          $t('components.projects.create.associatedCourses.titlePlaceholder')
-        "
-        :no-data-text="
-          $t('components.projects.create.associatedCourses.searchNoResults')
-        "
+        :placeholder="$t('components.projects.create.associatedCourses.titlePlaceholder')"
+        :no-data-text="$t('components.projects.create.associatedCourses.searchNoResults')"
         class="position-relative"
         item-title="title"
         :items="availableCoursesData || []"
@@ -134,15 +116,11 @@
         <template #item="{ props: courses, item }">
           <v-list-item class="pa-1" v-bind="courses" title="">
             <template #default>
-              <div
-                class="d-flex align-end pa-2 tw-flex-row ga-4 tw-cursor-pointer w-100"
-              >
+              <div class="d-flex align-end pa-2 tw-flex-row ga-4 tw-cursor-pointer w-100">
                 <div
                   class="tw-w-[120px] tw-h-[80px] rounded-lg tw-bg-cover elevation-1 tw-bg-center"
                   :style="`background-image: url('${
-                    item.raw.cover_image
-                      ? item.raw.cover_image
-                      : '/images/cover_image_course.svg'
+                    item.raw.cover_image ? item.raw.cover_image : '/images/cover_image_course.svg'
                   }')`"
                 />
                 <div class="d-flex flex-column gap-1 align-start">
@@ -151,9 +129,7 @@
                   </p>
                   <div class="d-flex gap-2 align-center justify-center width">
                     <v-avatar
-                      :variant="
-                        item.raw.facilitator.avatar ? 'flat' : 'outlined'
-                      "
+                      :variant="item.raw.facilitator.avatar ? 'flat' : 'outlined'"
                       :image="item.raw.facilitator.avatar"
                       :alt="item.raw.facilitator.name"
                       size="36"
@@ -185,9 +161,7 @@
           :key="course.id"
           class="tw-w-[150px] tw-h-[100px] rounded-lg tw-bg-cover card tw-overflow-hidden d-flex align-end elevation-1"
           :style="`background-image: url('${
-            course.cover_image
-              ? course.cover_image
-              : '/images/cover_image_course.svg'
+            course.cover_image ? course.cover_image : '/images/cover_image_course.svg'
           }')`"
         >
           <alex-custom-button
@@ -269,25 +243,18 @@ const projectInfo = ref<ProjectType>({ ...emptyProject });
 const user = useStrapiUser<User>();
 const { setMessage } = useMessageStore();
 
-const slugFormated = computed(() =>
-  projectInfo.value.slug.trim().toLowerCase().replaceAll(' ', '_'),
-);
-const plataformUrl = computed(
-  () => `${window.location.host}/projects/${slugFormated.value}`,
-);
+const slugFormated = computed(() => projectInfo.value.slug.trim().toLowerCase().replaceAll(' ', '_'));
+const plataformUrl = computed(() => `${window.location.host}/projects/${slugFormated.value}`);
 
 const queryConfig = {
   filters: {
     members: {
-      $and: [
-        { user: { id: { $eq: user.value.id } } },
-        { status: { $eq: 'joined' } },
-      ],
+      $and: [{ user: { id: { $eq: user.value?.id } } }, { status: { $eq: 'joined' } }],
     },
     $or: [
       {
         members: {
-          user: { id: { $eq: user.value.id } },
+          user: { id: { $eq: user.value?.id } },
           role: { $ne: 'student' },
         },
       },
@@ -432,11 +399,7 @@ const newComboboxItem = (text: string, type: 'area' | 'product') => {
   };
 
   type === 'area'
-    ? projectInfo.value.areas.splice(
-        projectInfo.value.areas.length - 1,
-        1,
-        newItem,
-      )
+    ? projectInfo.value.areas.splice(projectInfo.value.areas.length - 1, 1, newItem)
     : (projectInfo.value.product = newItem);
 };
 
@@ -456,9 +419,7 @@ const createProject = async () => {
     }));
 
     const users = usersData.filter((user) => user.id);
-    const newUsersEmails = usersData
-      .filter((user) => !user.id)
-      .map((user) => user.email);
+    const newUsersEmails = usersData.filter((user) => !user.id).map((user) => user.email);
 
     users.push({
       id: user.value.id,
@@ -490,15 +451,10 @@ const createProject = async () => {
   } catch (error: any) {
     if (
       error.error?.details?.errors?.some(
-        (e: any) =>
-          e.path[0] === 'slug' && e.message === 'This attribute must be unique',
+        (e: any) => e.path[0] === 'slug' && e.message === 'This attribute must be unique',
       )
     ) {
-      setMessage(
-        t('components.projects.create.slugUniqueError'),
-        'error',
-        true,
-      );
+      setMessage(t('components.projects.create.slugUniqueError'), 'error', true);
     } else {
       setMessage(t('components.projects.create.errorMessage'), 'error', true);
     }
@@ -519,12 +475,7 @@ const createProject = async () => {
 }
 
 .text-shadow {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0) 10.81%,
-    rgba(0, 0, 0, 0.37) 48.72%,
-    rgba(0, 0, 0, 0.7) 100%
-  );
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 10.81%, rgba(0, 0, 0, 0.37) 48.72%, rgba(0, 0, 0, 0.7) 100%);
 }
 
 .delete-btn {

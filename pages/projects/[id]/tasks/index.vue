@@ -6,7 +6,7 @@ import Kanban, { Column } from './-components/Kanban.vue';
 import TaskCard from './-components/TaskCard.vue';
 import TaskFilterDrawer from './-components/TaskFilterDrawer.vue';
 import TaskList from './-components/TaskList.vue';
-import { Droppable } from './-types';
+// import { Droppable } from './-types';
 
 type FilterType = {
   finalDate?: { start: string | null; end: string | null };
@@ -14,11 +14,9 @@ type FilterType = {
   members?: any[];
 };
 
-type KanbanItem = Droppable<TaskSimple> & { sprint_id: number };
-
 type SprintItem = {
   id: number;
-  columns: Column[];
+  columns: Column<TaskSimple>[];
   sprint: string;
 };
 
@@ -30,10 +28,9 @@ enum Mode {
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
 
-const mode = ref<Mode>(Mode.List);
+const mode = ref<Mode>(Mode.Kanban);
 const search = ref('');
 const sprints = ref<SprintItem[]>([]);
-const items = ref<KanbanItem[]>([]);
 const selectedSprint = ref(sprints.value[0] || {});
 const filter = ref<FilterType>();
 const filterDrawer = ref();
@@ -41,18 +38,21 @@ const chips = ref<string[]>([]);
 const isProfessor = ref<boolean>(false);
 const classes = ref<string[]>([]);
 const openFilterDrawer = ref(false);
-
 const columns = computed<SprintItem['columns']>({
   get: () => selectedSprint.value?.columns || [],
   set: (value) => (selectedSprint.value.columns = value),
 });
 
 const filteredItems = computed(() => {
-  const res = items.value.filter(({ raw: { tags, title } }) => {
-    return contains(title, search.value) || tags?.some((tag) => contains(tag.text, search.value));
-  });
+  const res = columns.value.map((column) => ({
+    ...column,
+    items: column.items.filter((item) => ({
+      ...item,
+      items: contains(item.raw.title, search.value) || item.raw.tags?.some((tag) => contains(tag.text, search.value)),
+    })),
+  }));
 
-  return selectedSprint.value.id ? res.filter((item) => item.sprint_id === selectedSprint.value.id) : res;
+  return selectedSprint.value.id ? res.filter((item) => item.id === selectedSprint.value.id) : res;
 });
 
 const handleFilter = (value: FilterType) => {
@@ -107,7 +107,7 @@ watch(
           prepend-inner-icon="mdi-magnify"
           :placeholder="t('pages.projects.tasks.find_task')"
         />
-        <alex-inputs-select
+        <!-- <alex-inputs-select
           v-if="mode === 'kanban'"
           v-model="selectedSprint"
           hide-details
@@ -118,12 +118,11 @@ watch(
           name="search"
           :items="sprints"
           :placeholder="t('pages.projects.tasks.find_task')"
-        />
+        /> -->
         <div class="tw-flex tw-gap-2">
           <alex-custom-button
             size="large"
             variant="secondary"
-            :disabled="!sprints.length"
             :prepend-icon="mode === Mode.List ? 'alex:Kanban' : 'mdi-clipboard-text-outline'"
             :title="sprints.length ? '' : t('pages.projects.tasks.kanban_sprint_required')"
             @click="toggleMode"
@@ -158,10 +157,10 @@ watch(
         <Kanban v-if="mode === Mode.Kanban" v-model="columns" :items="filteredItems">
           <template #card="{ item }">
             <TaskCard
-              :date="item.finish_at ? new Date(item.finish_at) : undefined"
-              :name="item.title"
-              :tags="item.tags"
-              :participants="getMembers(item?.task_members)"
+              :date="item.raw.finish_at ? new Date(item.raw.finish_at) : undefined"
+              :name="item.raw.title"
+              :tags="item.raw.tags"
+              :participants="getMembers(item.raw?.task_members)"
             />
           </template>
         </Kanban>

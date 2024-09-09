@@ -16,13 +16,15 @@ type Props<T> = {
 };
 
 type Events<T> = {
-  'add-item': [group: string];
+  'add-item': [group: string, title: string];
+  'add-column': [title: string];
   'cancel-column': [group: string];
   'insert-card': [values: { newIndex: number; value: T; group: string }];
   'sort-end': [values: { oldIndex: number; newIndex: number; group: string; id: number }];
   'sort-start': [group: string];
+  'sort-move': [group: string];
   'title-column-change': [group: string, title: string];
-  'update-list': [list: T[]];
+  'update-list': [list: T[], group: string];
   delete: [group: string];
 };
 
@@ -43,19 +45,41 @@ const props = withDefaults(defineProps<Props<T>>(), {
 const items = defineModel<T[]>({ default: () => [] });
 
 const emit = defineEmits<Events<T>>();
-
+const isAddingItem = ref(false);
+const titleNewItem = ref('');
 const isDragging = () => {
   const isDraggingCard = document.querySelector('.kanban-card-item.kanban-card-dragging');
   return !!isDraggingCard;
 };
 
 const handleSortEnd = (values: { newIndex: number; oldIndex: number }) => {
-  emit('sort-end', { ...values, group: props.group, id: items.value[values.newIndex].raw.id });
+  emit('sort-end', {
+    ...values,
+    group: props.group,
+    id: items.value[values.newIndex].raw.id,
+  });
 };
 
 const handleSortInsert = (values: { newIndex: number; value: T }) => {
   if (isDragging()) return;
   emit('insert-card', { ...values, group: props.group });
+};
+const handleAddItem = (group: string) => {
+  isAddingItem.value = true;
+  emit('add-item', group, titleNewItem.value);
+  isAddingItem.value = false;
+  titleNewItem.value = '';
+};
+const handleStartAddItem = () => {
+  isAddingItem.value = true;
+};
+
+const handleBlurAddItem = (group: string) => {
+  if (!titleNewItem.value) {
+    isAddingItem.value = false;
+    return;
+  }
+  handleAddItem(group);
 };
 </script>
 
@@ -67,7 +91,7 @@ const handleSortInsert = (values: { newIndex: number; value: T }) => {
         :color="color"
         :quantity="items.length"
         :title="title"
-        @add="$emit('add-item', group)"
+        @add="handleStartAddItem"
         @delete="$emit('delete', group)"
         @empty-title="$emit('cancel-column', group)"
         @title-change="$emit('title-column-change', group, $event)"
@@ -83,7 +107,8 @@ const handleSortInsert = (values: { newIndex: number; value: T }) => {
       @sort-end="handleSortEnd"
       @sort-insert="handleSortInsert"
       @sort-start="$emit('sort-start', group)"
-      @update:list="$emit('update-list', $event)"
+      @sort-move="$emit('sort-move', group)"
+      @update:list="$emit('update-list', $event, group)"
     >
       <SlickItem
         v-for="(item, i) in items"
@@ -96,12 +121,21 @@ const handleSortInsert = (values: { newIndex: number; value: T }) => {
       </SlickItem>
     </SlickList>
     <div
-      v-if="addButton"
+      v-if="addButton && !isAddingItem"
       class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button bg-white"
-      @click="$emit('add-item', group)"
+      @click="handleStartAddItem"
     >
       <v-icon size="20px">mdi-plus</v-icon>
       <span class="text-body-4">{{ addButtonText }}</span>
+    </div>
+    <div v-if="isAddingItem" class="border-1 border-gray-100 rounded-lg pa-4">
+      <AlexInputsTextField
+        v-model="titleNewItem"
+        name="adding-item"
+        autofocus
+        @blur="handleBlurAddItem(group)"
+        @keydown.enter="handleAddItem(group)"
+      />
     </div>
   </div>
 </template>
