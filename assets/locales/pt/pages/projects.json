@@ -22,7 +22,9 @@
     "overview": "Visão geral",
     "search_member": "Pesquisar membro",
     "tasks": "Tarefas",
-    "trails": "Trilhas"
+    "trails": "Trilhas",
+    "myJourney": "Minha Jornada",
+    "empty_members": "Jornada não encontrada"
   },
   "overview": {
     "completed": "Finalizados",

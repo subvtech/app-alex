@@ -95,7 +95,7 @@ onMounted(fetchMembers);
                         </v-avatar>
                         <alex-custom-chip
                           v-if="member.id == user?.id"
-                          text="Minha jornada"
+                          :text="t('pages.projects.individual_learning.myJourney')"
                           size="small"
                           class="bg-info--2 text-body-5 text-secondary-2"
                           variant="text"

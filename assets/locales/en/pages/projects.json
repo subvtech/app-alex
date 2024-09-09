@@ -22,7 +22,9 @@
     "overview": "Overview",
     "search_member": "Search member",
     "tasks": "Tasks",
-    "trails": "Trails"
+    "trails": "Trails",
+    "myJourney": "My Journey",
+    "empty_members": "No learning journey found"
   },
   "overview": {
     "completed": "Completed",
