@@ -50,7 +50,6 @@
     >
       <span>{{ $t('components.courses.invites.countdown') }}</span>
       <p>{{ msToHHMMSS(remainingTime) }}</p>
-      <pre>{{ { duration, remainingTime } }}</pre>
     </div>
   </div>
 </template>
@@ -74,16 +73,13 @@ const props = withDefaults(defineProps<InviteProps>(), {
   url: null,
 });
 
-const { startTimer, setStartTimer, stopTimeout, timeoutId } = useTimeout(
-  props.duration,
+const { remainingTime, theresTime, setTimeRunning, stopTimeout } = useTimeout(
+  props.duration * 1000,
 );
-
-const { duration } = toRefs(props);
 
 const { msToHHMMSS } = useInvitationLink();
 
 const inviteId = ref<number | null>(null);
-const remainingTime = ref<number>(props.duration);
 
 const handleUpdateLink = () => {
   emit('update:link');
@@ -93,45 +89,20 @@ const handleUpdateLink = () => {
 const theresTimeAndUrl = computed(() => theresTime.value && props.url);
 
 const resetTimeout = () => {
-  stopTimeout();
-  setStartTimer(true);
-  remainingTime.value = props.duration;
-  timeoutId.value = setTimeout(() => {
-    remainingTime.value = remainingTime.value - 1000;
-  }, 1000);
+  stopTimeout(true);
+  setTimeRunning(true);
 };
-
-const theresTime = computed(() => remainingTime.value > 0);
 
 onBeforeMount(() => {
   if (!props.data) return;
-  // if (props.data.hash) url.value = generateUrl(props.data.hash, props.courseId);
+
   if (props.data.id) inviteId.value = props.data.id;
 });
 
-watch(remainingTime, () => {
-  console.log({
-    remainingTime: remainingTime.value,
-    theresTime: theresTime.value,
-  });
-  if (theresTime.value) {
-    resetTimeout();
-  }
-});
-
 watch(theresTimeAndUrl, () => {
-  console.log({
-    timeoutId: timeoutId.value,
-    theresTimeAndUrl: theresTimeAndUrl.value,
-  });
   if (theresTimeAndUrl.value) return;
-  if (timeoutId.value) stopTimeout();
 
   emit('link:expired');
-});
-
-watch(duration, () => {
-  remainingTime.value = props.duration;
 });
 </script>
 

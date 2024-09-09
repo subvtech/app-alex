@@ -38,7 +38,7 @@
       </div>
       <alex-learningplan-invites
         full-width
-        :duration="5000"
+        :duration="invitationDuration"
         :data="activeLink"
         :url="plainLink"
         @update:link="updateLink"

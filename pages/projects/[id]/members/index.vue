@@ -32,7 +32,8 @@
       <pre>{{
         {
           selectedFilters,
-
+          invitationDuration:
+            learningPlanStore.learningPlan?.invitation_duration,
           members: learningPlanStore.activeMembers.map(
             (member) => member.email,
           ),
