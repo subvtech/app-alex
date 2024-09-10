@@ -16,7 +16,8 @@
       </p>
       <div
         ref="descContainer"
-        class="tw-relative tw-max-h-[60px] overflow-hidden"
+        class="tw-relative overflow-hidden"
+        :class="{ 'tw-max-h-[60px]': collapsed }"
       >
         <TipTap
           ref="descEl"
@@ -28,12 +29,14 @@
           @change:height="(height) => hasEllipsis(height)"
         />
       </div>
-      <div v-if="ellipsis" class="d-flex justify-end">
+      <div v-if="ellipsis" class="d-flex tw-justify-end">
         <alex-custom-button
           variant="text"
           class="tw-mt-2 px-3 text-p6 text-gray-800"
-          @click="handleEdit"
-          >{{ $t('components.courses.tasks.expand') }}
+          @click="collapsed = !collapsed"
+          >{{
+            $t(`components.courses.tasks.${collapsed ? 'expand' : 'retract'}`)
+          }}
         </alex-custom-button>
       </div>
     </div>
@@ -187,7 +190,7 @@ const statusCfg = {
 const { md } = useDisplay();
 const descContainer = ref<HTMLDivElement | undefined>(undefined);
 const descEl = ref<any | undefined>(undefined);
-// const expanded = ref<boolean>(false);
+const collapsed = ref<boolean>(true);
 const ellipsis = ref<boolean>(false);
 const formatDate = (date: Date | string) => {
   if (typeof date === 'string') {
@@ -206,13 +209,9 @@ const typeSubmission = computed(() => {
   return t('components.courses.tasks.submission.noSubmission');
 });
 
-function hasEllipsis(height = descEl.value?.clientHeight) {
-  if (!descContainer.value || !height) return false;
-
-  ellipsis.value = descContainer.value.getBoundingClientRect().height < height;
+function hasEllipsis(height = 0) {
+  ellipsis.value = height > 60;
 }
-
-onMounted(() => descEl.value?.emitHeight());
 </script>
 
 <style scoped></style>

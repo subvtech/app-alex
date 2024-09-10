@@ -135,6 +135,12 @@
   },
   {
     "namespaces": [
+      "custom",
+      "TreeView"
+    ]
+  },
+  {
+    "namespaces": [
       "documentation",
       "accordions",
       "PropsList"
@@ -369,6 +375,27 @@
     "namespaces": [
       "learning-plans",
       "Card"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "task",
+      "chat"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "task",
+      "Drawers"
+    ]
+  },
+  {
+    "namespaces": [
+      "learning-plans",
+      "task",
+      "events"
     ]
   },
   {

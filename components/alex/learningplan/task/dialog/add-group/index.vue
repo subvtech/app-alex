@@ -36,6 +36,7 @@
             v-for="group in classValue.learning_plan_groups"
             :key="group.id"
             :group="group"
+            :unavailable="isUnvailable(group)"
             @add-members="(member) => openDialog(member)"
           />
           <p
@@ -93,8 +94,8 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 const strapi = useStrapiUtils();
-const { setMessage } = useMessageStore();
-const { t } = useI18n();
+// const { setMessage } = useMessageStore();
+// const { t } = useI18n();
 
 // Dialog
 const groupDialog = ref<boolean>(false);
@@ -103,6 +104,44 @@ const groupInfo = ref<LearningPlanGroupSimple | undefined>(undefined);
 const allGroups = ref<LearningPlanGroupSimple[]>([]);
 
 const search = ref('');
+
+const allMembers = computed(() => {
+  const membersIds: number[] = [];
+
+  allGroups.value.forEach((group) => {
+    group?.group_members?.forEach((member) => {
+      const id = member?.student_member?.user?.id;
+
+      if (id) {
+        membersIds.push(id);
+      }
+    });
+  });
+
+  return membersIds;
+});
+
+function isUnvailable(group: LearningPlanGroupSimple) {
+  const groupUsersId: number[] = [];
+
+  group.group_members.forEach((member) => {
+    const id = member?.student_member?.user?.id;
+
+    if (id) {
+      groupUsersId.push(id);
+    }
+  });
+
+  const hasRepeatedMember = groupUsersId.reduce((acc, groupId) => {
+    if (allMembers.value.includes(groupId)) {
+      return true;
+    }
+
+    return acc;
+  }, false);
+
+  return hasRepeatedMember;
+}
 
 function handleOpenCreateGroup() {
   addGroupDialog.value = true;
@@ -136,16 +175,16 @@ const { data: classes, execute } = await useAsyncData(
   },
 );
 function openDialog(group: LearningPlanGroupSimple | undefined) {
-  const taskMember = group?.task_members;
+  // const taskMember = group?.task_members;
 
-  if (taskMember && taskMember[0]?.task_submissions?.length) {
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
-      'warning',
-      true,
-    );
-    return;
-  }
+  // if (taskMember?.[0]?.task_submissions?.length) {
+  //   setMessage(
+  //     t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
+  //     'warning',
+  //     true,
+  //   );
+  //   return;
+  // }
 
   groupDialog.value = true;
   groupInfo.value = group;
@@ -169,8 +208,21 @@ const filteredClasses = computed(() => {
 watch(model, (value) => {
   if (value) {
     execute();
+
+    allGroups.value = props.taskMembers.flatMap((taskMember) =>
+      taskMember.learning_plan_group ? [taskMember.learning_plan_group] : [],
+    );
   }
 });
+
+watch(
+  () => props.taskMembers,
+  (members) => {
+    allGroups.value = members.flatMap((taskMember) =>
+      taskMember.learning_plan_group ? [taskMember.learning_plan_group] : [],
+    );
+  },
+);
 </script>
 
 <style lang="scss">
