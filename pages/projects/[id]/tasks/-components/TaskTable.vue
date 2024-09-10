@@ -3,6 +3,8 @@ import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { TaskStatus } from '@/models/simple/taskSimple.model';
 import { SprintTask } from '../-types';
 
+const newGroup = ref('');
+
 const { t } = useI18n();
 
 const header = [
@@ -73,6 +75,8 @@ const taskToDelete = ref(-1);
 const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
+
+const isEditing = ref<number>(143);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
@@ -167,16 +171,32 @@ watch(searchFilter, () => {
                 :custom-slot="true"
                 :default-expand="true"
                 :items="[task]"
+                :selected-node="isEditing"
               >
                 <template #header="{ header }">
-                  <div class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.name }}</p>
+                  <div v-if="isEditing !== header.id" class="d-flex w-100 justify-space-between align-center">
+                    <p>{{ header.title }} - {{ header.id }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
                       :items="dropDownItems(header)"
                     />
                   </div>
+                  <v-text-field
+                    v-else
+                    v-model="newGroup"
+                    name="edit"
+                    can-edit
+                    class="w-100 text-gray-800 text-body-2 mb-2 editing-input"
+                    density="compact"
+                    variant="plain"
+                    hide-details
+                    maxlength="64"
+                    autofocus
+                    autocomplete="off"
+                    @blur="console.log('blur')"
+                    @keydown.enter="console.log('enter')"
+                  ></v-text-field>
                 </template>
                 <template #default="{ item, level }">
                   <tr class="d-flex align-center py-2 tasks-items outline-bottom">
@@ -187,6 +207,7 @@ watch(searchFilter, () => {
                     >
                       {{ item.title }}
                     </td>
+
                     <td class="width-40">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
@@ -358,5 +379,18 @@ watch(searchFilter, () => {
   right: 0;
   height: 1px;
   background-color: #e0e0e0;
+}
+</style>
+
+<style>
+.editing-input {
+  .v-field__input {
+    font-family: Sen !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 135% !important; /* 18.9px */
+    letter-spacing: 0.28px !important;
+  }
 }
 </style>
