@@ -2,25 +2,17 @@
   <div>
     <div
       v-if="hasChildren"
-      :class="[nodeClasses, `pl-${level * 5}`]"
+      :class="[nodeClasses, `pl-${level * 5}`, selectedNode === item.id ? 'bg-gray-100' : 'bg-white']"
       class="d-flex align-center item-content"
     >
-      <v-icon
-        class="cursor-pointer toggle-icon"
-        color="gray-600"
-        @click="toggle"
-        >{{ !isOpen ? openIcon : closeIcon }}</v-icon
-      >
+      <v-icon class="cursor-pointer toggle-icon" color="gray-600" @click="toggle">{{
+        !isOpen ? openIcon : closeIcon
+      }}</v-icon>
       <slot v-if="customHeader" name="header" :header="item"></slot>
       <span v-else>{{ item.name }}</span>
     </div>
     <div v-else :class="leafClasses" :style="{ paddingLeft: itemPadding }">
-      <slot
-        v-if="customSlot"
-        name="default"
-        :item="item"
-        :level="level === 1 ? 0 : level + 1"
-      ></slot>
+      <slot v-if="customSlot" name="default" :item="item" :level="level === 1 ? 0 : level + 1"></slot>
       <div v-else>{{ item.name }}</div>
     </div>
     <component :is="transitionComponent">
@@ -36,12 +28,7 @@
             <slot name="header" :header="header" />
           </template>
           <template #default="{ item, level = props.level }">
-            <slot
-              v-if="customSlot"
-              name="default"
-              :item="item"
-              :level="level"
-            ></slot>
+            <slot v-if="customSlot" name="default" :item="item" :level="level"></slot>
             <div v-else>
               {{ item.title }}
             </div>
@@ -65,6 +52,7 @@ interface TreeItemProps {
   customSlot: boolean;
   customHeader: boolean;
   defaultExpand: boolean;
+  selectedNode: number;
   level: number;
   flat?: boolean;
 }
@@ -96,15 +84,9 @@ const hasChildren = computed(() => {
   if (props.item.children && Array.isArray(props.item.children)) {
     return props.item.children.length > 0;
   }
-  const arrayProps = Object.keys(props.item).filter((key) =>
-    Array.isArray(props.item[key]),
-  );
+  const arrayProps = Object.keys(props.item).filter((key) => Array.isArray(props.item[key]));
   if (arrayProps.length > 1) {
-    throw new Error(
-      `Item ${
-        props.item.name || props.item.id
-      } has multiple array properties: ${arrayProps.join(', ')}`,
-    );
+    throw new Error(`Item ${props.item.name || props.item.id} has multiple array properties: ${arrayProps.join(', ')}`);
   }
   return arrayProps.length === 1;
 });
@@ -113,9 +95,7 @@ const children = computed(() => {
   if (props.item.children && Array.isArray(props.item.children)) {
     return props.item.children;
   }
-  const arrayProp = Object.keys(props.item).find((key) =>
-    Array.isArray(props.item[key]),
-  );
+  const arrayProp = Object.keys(props.item).find((key) => Array.isArray(props.item[key]));
   return arrayProp ? props.item[arrayProp] : [];
 });
 
