@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import { AlexDropdownItem as DropdownItem } from '@/components/alex/custom/Dropdown.vue';
-
-const colors = {
-  'gray-600': ' bg-gray-600',
-  blue: ' bg-info-0',
-  gray: ' bg-gray-300',
-  green: ' bg-success-0',
-  orange: ' bg-warning-0',
-} as const;
-
-export type Colors = keyof typeof colors;
+import { AlexThemeColors } from '@/config/themes';
+export type Colors = keyof typeof AlexThemeColors;
 
 interface Props {
   color?: Colors;
   edit?: boolean;
   quantity?: number;
   title: string;
+  disabledInterations?: boolean;
+  loading?: boolean;
 }
 
 type Events = {
@@ -29,6 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
   color: 'gray-600',
   edit: false,
   quantity: 0,
+  disabledInterations: false,
+  loading: false,
 });
 
 const emit = defineEmits<Events>();
@@ -53,7 +49,7 @@ const isEditing = ref(props.edit);
 const titleValue = ref(props.title);
 const input = ref<HTMLInputElement | null>(null);
 
-const selectedColor = computed(() => colors[props.color] || colors.gray);
+const selectedColor = computed(() => props.color || AlexThemeColors['gray-300']);
 
 const toggleEdit = () => {
   isEditing.value = !isEditing.value;
@@ -75,6 +71,7 @@ const handleTitleChange = () => {
 
   if (titleValue.value !== props.title && titleValue.value !== '') {
     emit('title-change', titleValue.value);
+    titleValue.value = titleValue.value.trim();
     isEditing.value = false;
     return;
   }
@@ -97,7 +94,7 @@ const handleInput = () => {
     @mouseover="isHovering = true"
     @mouseleave="isHovering = false"
   >
-    <div class="tw-flex-fill tw-h-1 tw-rounded-t-xl" :class="selectedColor"></div>
+    <v-progress-linear class="tw-rounded-t-xl" model-value="100" :indeterminate="loading" :color="selectedColor" />
     <div class="tw-flex tw-align-center tw-mt-1 tw-py-3 tw-px-4">
       <input
         ref="input"
@@ -108,7 +105,7 @@ const handleInput = () => {
         @keydown.enter="handleKeyEnter"
         @blur="handleTitleChange"
       />
-      <div v-if="!isEditing" key="options" class="tw-flex tw-gap-1">
+      <div v-if="!isEditing && !disabledInterations" key="options" class="tw-flex tw-gap-1">
         <span
           v-if="!isHovering && !showOptions"
           class="tw-flex tw-items-center tw-justify-center tw-pt-[1px] tw-bg-gray-100 tw-rounded-lg tw-min-h-6 tw-min-w-6"

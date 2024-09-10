@@ -34,18 +34,21 @@ export interface Droppable<T extends { id: number }> {
   raw: T;
 }
 
-const KanbanStatusType = {
+export const KanbanStatusType = {
   TO_DO: 'to_do',
   DOING: 'doing',
   DONE: 'done',
 } as const;
 export interface KanbanColumn {
+  id: number;
   position: number;
   status_type: ValueOf<typeof KanbanStatusType>;
   title: string;
+  tasks: TaskSimple[];
 }
 export interface Kanban {
+  id: number;
   isDefault: boolean;
   version: number;
-  Kanban_columns: KanbanColumn;
+  Kanban_columns: KanbanColumn[];
 }

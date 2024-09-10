@@ -37,7 +37,7 @@ defineSlots<Slots<T>>();
 const props = withDefaults(defineProps<Props<T>>(), {
   accept: true,
   disable: false,
-  color: 'gray',
+  color: 'gray-300',
   addButtonText: 'Adicionar',
   addButton: true,
 });
@@ -101,6 +101,7 @@ const handleBlurAddItem = (group: string) => {
       v-model:list="items"
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
+      use-window-as-scroll-container
       :accept="accept"
       :distance="15"
       :group="group"
