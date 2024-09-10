@@ -50,5 +50,5 @@ export interface Kanban {
   id: number;
   isDefault: boolean;
   version: number;
-  Kanban_columns: KanbanColumn[];
+  kanban_columns: KanbanColumn[];
 }

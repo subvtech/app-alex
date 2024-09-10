@@ -7,6 +7,7 @@ import {
   useCreateKanban,
   useDeleteColumn,
   useGetKanban,
+  useReorderColumns,
   useUpdateColumn,
 } from '../-composables/useKanban';
 import { Droppable, KanbanStatusType, SprintTask } from '../-types';
@@ -21,7 +22,7 @@ export interface Column<U extends { id: number }> {
   group: string;
   position: number;
   items: Droppable<U>[];
-  status_type: string;
+  status_type: ValueOf<typeof KanbanStatusType>;
   color?: Colors;
   disable?: boolean;
 }
@@ -41,6 +42,7 @@ const { data: kanban, isLoading, refetch: refetchKanban } = useGetKanban(learnin
 const { mutateAsync: createKanban } = useCreateKanban();
 const { mutateAsync: updateColumn } = useUpdateColumn();
 const { mutateAsync: deleteColumn } = useDeleteColumn();
+const { mutateAsync: reorderColumns } = useReorderColumns();
 
 //  Refs
 const canDrag = ref(true);
@@ -75,14 +77,16 @@ const getDeleteColumnTexts = (column: Column<TaskSimple> | null) => {
 const confirmDeleteI18n = computed(() => getDeleteColumnTexts(selectedColumnToDelete.value));
 const columns = computed<Column<TaskSimple>[]>({
   get: () =>
-    kanban.value?.boards.map((column) => ({
-      id: column.id,
-      title: column.title,
-      group: generateGroup(column.status_type, column.id),
-      position: column.position,
-      status_type: column.status_type,
-      items: column.tasks.map((task) => ({ group: `${column.status_type}_${column.id}`, raw: task })),
-    })) as Column<TaskSimple>[],
+    kanban.value?.boards
+      .map((column) => ({
+        id: column.id,
+        title: column.title,
+        group: generateGroup(column.status_type, column.id),
+        position: column.position,
+        status_type: column.status_type,
+        items: column.tasks.map((task) => ({ group: `${column.status_type}_${column.id}`, raw: task })),
+      }))
+      .sort((a, b) => a.position - b.position) as Column<TaskSimple>[],
   set: (value) => {
     queryClient.setQueryData<BoardsResponse>(['kanban', learninplanId, sprintValue], (oldData) => {
       if (!oldData) {
@@ -92,7 +96,6 @@ const columns = computed<Column<TaskSimple>[]>({
         ...oldData,
         boards: value.map(({ items, ...item }) => ({
           ...item,
-          status_type: item.status_type as ValueOf<typeof KanbanStatusType>,
           tasks: items.map((item) => item.raw),
         })),
       };
@@ -116,7 +119,7 @@ const createNewKanbanVersion = async () => {
 };
 const handleTitleChange = async (group: string, value: string) => {
   const column = columns.value.find((column) => column.group === group);
-  if (!column || column?.title === value.trim() || column.status_type === 'doing_local') {
+  if (!column || column?.title === value.trim()) {
     return;
   }
   columns.value = columns.value.map((column) => {
@@ -169,7 +172,7 @@ const handleInsertCard = ({ group, newIndex }: { newIndex: number; value: Droppa
     return toRaw(column);
   });
 };
-const handleUpdateList = (items: Item[], group: string) => {
+const handleUpdateListItems = (items: Item[], group: string) => {
   const updatedItems: Item[] = items.map((item, index) => ({ ...item, raw: { ...item.raw, position: index } }));
   columns.value = columns.value.map((column) => {
     if (column.group === group) {
@@ -178,6 +181,21 @@ const handleUpdateList = (items: Item[], group: string) => {
     return column;
   });
 };
+const handleUpdateList = async (updatedColumns: Column<TaskSimple>[]) => {
+  const updated = updatedColumns.map((column, index) => {
+    if (requiredStatusColumn.includes(column.status_type)) {
+      return column;
+    }
+    return { ...column, position: index === 0 ? 1 : index + 1 };
+  });
+  columns.value = updated.sort((a, b) => a.position - b.position);
+  if (!kanban.value) return;
+  await reorderColumns({
+    kanbanId: kanban.value.id,
+    columns: columns.value,
+  });
+};
+
 const handleAddItem = (group: string, title: string) => {
   const newId = Math.round(Math.random() * 10000);
   const emptyItem = {
@@ -216,7 +234,6 @@ const getMembers = (taskMembers?: TaskMember[]) => {
   );
 };
 defineExpose({ canDrag, setCanDrag });
-// watch(columns, (value) => console.log(value));
 </script>
 
 <template>
@@ -234,6 +251,7 @@ defineExpose({ canDrag, setCanDrag });
         axis="x"
         class="tw-w-full tw-flex tw-flex-grow tw-overflow-x-auto tw-overflow-y-hidden bg-white tw-rounded-lg tw-relative tw-select-none"
         :distance="15"
+        @update:list="handleUpdateList"
       >
         <!-- :disabled="fixedColumns.includes(column.status_type)" erro na biblioteca -->
         <SlickItem v-for="(column, i) in columns" :key="column.id" :index="i">
@@ -251,7 +269,7 @@ defineExpose({ canDrag, setCanDrag });
             @sort-start="handleSortStart"
             @sort-move="canDrag = false"
             @title-column-change="handleTitleChange"
-            @update-list="handleUpdateList"
+            @update-list="handleUpdateListItems"
           >
             <template #card="{ item }">
               <TaskCard

@@ -95,3 +95,21 @@ export const useDeleteColumn = () =>
       return strapi.delete('kanban-columns', id);
     },
   });
+
+type ReorderColumnsPayload = {
+  kanbanId: number;
+  columns: Pick<KanbanColumn, 'id' | 'position' | 'status_type'>[];
+};
+export const useReorderColumns = () =>
+  useMutation({
+    mutationFn({ columns, kanbanId }: ReorderColumnsPayload) {
+      return strapiClient(`/kanbans/${kanbanId}/reorder-columns`, {
+        method: 'PUT',
+        body: {
+          data: {
+            columns,
+          },
+        },
+      });
+    },
+  });
