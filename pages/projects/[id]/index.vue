@@ -48,12 +48,12 @@
         end-date="2024-11-30 12:00"
         :sprints="sprints"
       />
-      <alex-learningplan-charts-task-progress
+      <!-- <alex-learningplan-charts-task-progress
         class="!tw-w-1/3"
         :categories="'total'"
         last-update="2024-07-11 12:00"
         :data="taskProgress"
-      />
+      /> -->
     </div>
 
     <div class="tw-flex tw-space-x-4">
@@ -178,7 +178,7 @@ const totalizers = ref({
   },
 });
 
-const daysOfWeek = ['Seg', 'Ter', 'Quar', 'Quin', 'Sex', 'Sab', 'Dom'];
+const daysOfWeek = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
 const today = new Date();
 
 const firstDayOfWeek = today.getDate() - today.getDay() + 1;
