@@ -87,7 +87,7 @@ const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
 
-const isEditing = ref<LocalSprintTask>();
+const isEditing = ref<LocalSprintTask | null>(null);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
@@ -133,7 +133,7 @@ const handleFieldEdit = () => {
     }
   }
 
-  isEditing.value = undefined;
+  isEditing.value = null;
   newGroup.value = '';
 };
 
@@ -222,6 +222,7 @@ watch(
   (value) => {
     isEditing.value = value;
   },
+  { immediate: true },
 );
 </script>
 
@@ -251,7 +252,7 @@ watch(
               >
                 <template #header="{ header }">
                   <div v-if="isEditing?.id !== header.id" class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.title }}</p>
+                    <p>{{ header.title }} - Header {{ header.id }} - isEditing {{ isEditing?.id }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
