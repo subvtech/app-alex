@@ -3,7 +3,10 @@ import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { TaskStatus } from '@/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { SprintTask } from '../-types';
-import { create } from 'lodash';
+
+interface LocalSprintTask extends SprintTask {
+  local?: boolean;
+}
 
 const newGroup = ref('');
 
@@ -51,6 +54,7 @@ const emit = defineEmits([
   'addTask',
   'handleBlur',
   'createItem',
+  'editItem',
 ]);
 
 const props = withDefaults(
@@ -64,7 +68,7 @@ const props = withDefaults(
     search: string;
     sprints: string[];
     tasks: SprintTask[];
-    isEditingTaskId: SprintTask;
+    isEditingTask: SprintTask;
   }>(),
   {
     dragFrom: -1,
@@ -83,7 +87,7 @@ const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
 
-const isEditing = ref<SprintTask>();
+const isEditing = ref<LocalSprintTask>();
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
@@ -114,13 +118,19 @@ const tasksArray = computed(() => {
 });
 
 const handleFieldEdit = () => {
-  if (newGroup.value === '') {
-    emit('handleBlur', isEditing.value);
-  } else if (isEditing.value) {
-    isEditing.value.title = newGroup.value;
-    emit('createItem', isEditing.value);
-  } else {
-    console.error('Task not found');
+  if (!isEditing.value) return;
+  if (!isEditing.value.local) {
+    if (newGroup.value !== '') {
+      isEditing.value.title = newGroup.value;
+      emit('editItem', isEditing.value);
+    }
+  } else if (isEditing.value.local) {
+    if (newGroup.value === '') {
+      emit('handleBlur', isEditing.value);
+    } else {
+      isEditing.value.title = newGroup.value;
+      emit('createItem', { ...isEditing.value });
+    }
   }
 
   isEditing.value = undefined;
@@ -208,7 +218,7 @@ watch(searchFilter, () => {
 });
 
 watch(
-  () => props.isEditingTaskId,
+  () => props.isEditingTask,
   (value) => {
     isEditing.value = value;
   },
@@ -241,7 +251,7 @@ watch(
               >
                 <template #header="{ header }">
                   <div v-if="isEditing?.id !== header.id" class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.title }} -</p>
+                    <p>{{ header.title }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
@@ -274,7 +284,7 @@ watch(
                       :class="`width-${85 - level * 4}`"
                       :style="taskItemMargin(level)"
                     >
-                      {{ item.title }} - {{ item.id }}
+                      {{ item.title }}
                     </td>
 
                     <td class="width-40">
