@@ -6,7 +6,7 @@ import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
-import { useGetSprints } from '../-composables/useSprints';
+import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
@@ -47,7 +47,7 @@ const editSprints = [
   {
     text: t('pages.projects.tasks.add_epic'),
     onClick: () => {
-      console.log(t('pages.projects.tasks.add_epic'));
+      handleAddEpic();
     },
   },
   {
@@ -74,6 +74,28 @@ const filteredTasks = computed(() => {
 });
 
 // Methods
+
+const handleAddEpic = () => {
+  queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
+    if (!oldData) {
+      return oldData;
+    }
+    return {
+      ...oldData,
+      backlog: [
+        ...oldData.backlog,
+        {
+          id: Math.round(Math.random() * 123456),
+          position: getHigherIndex(),
+          status: 'draft',
+          title: '',
+          children: [],
+          organization: 'epic',
+        },
+      ],
+    };
+  });
+};
 const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
@@ -92,7 +114,6 @@ const handleCreateTask = async () => {
       learningPlanId,
       position: higherIndex,
     });
-    // await refetchSprints();
   }
   taskTitle.value = '';
   isCreatingTask.value = false;
