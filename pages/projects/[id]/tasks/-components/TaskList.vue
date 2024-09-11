@@ -126,6 +126,37 @@ const handleAddTask = () => {
   });
   isEditingTask.value = newTask;
 };
+const handleAddStory = (id: number) => {
+  const newTask = {
+    id: Math.round(Math.random() * 123456),
+    position: getHigherIndex(),
+    status: 'draft',
+    title: '',
+    children: [],
+    organization: 'story',
+    local: true,
+  } as SprintTask;
+  queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
+    if (!oldData) {
+      return oldData;
+    }
+    const updatedBacklog = oldData.backlog.map((task) => {
+      if (task.id === id) {
+        return {
+          ...task,
+          children: [newTask],
+        };
+      }
+      return task;
+    });
+    return {
+      ...oldData,
+      backlog: updatedBacklog,
+    };
+  });
+  isEditingTask.value = newTask;
+};
+
 const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
@@ -282,6 +313,7 @@ const toggleExpand = () => {
                     :search="search"
                     :sprints="sprintGroups"
                     :tasks="sprintsValue.backlog"
+                    @add-story="handleAddStory"
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"
                     @drag-leave="dragDrop.onDragLeave"
