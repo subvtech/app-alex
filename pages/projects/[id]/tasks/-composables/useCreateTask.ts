@@ -7,13 +7,14 @@ type CreateTaskPayload = {
   position: number;
   title: string;
   organization: TaskSimple['organization'];
+  parentTask?: number;
 };
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();
 export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
   useMutation({
-    async mutationFn({ learningPlanId, position, title, organization }: CreateTaskPayload) {
+    async mutationFn({ learningPlanId, position, title, organization, parentTask }: CreateTaskPayload) {
       const task = await create<TaskSimple & { learningplan: number }>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
@@ -24,6 +25,7 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
         submission_description: '',
         submission_required: false,
         title,
+        parent_task: parentTask,
         organization,
       });
       return task.data as TaskSimple;
@@ -56,7 +58,9 @@ export const useDeleteTask = (learninplanId: Ref<number>, queryClient: QueryClie
         }
         return {
           ...oldData,
-          backlog: oldData.backlog.filter((task) => task.id !== variables.id),
+          backlog: oldData.backlog
+            .filter((task) => task.id !== variables.id)
+            .map((task) => ({ ...task, tasks: task.tasks?.filter((task) => task.id !== variables.id) })),
         };
       });
     },
