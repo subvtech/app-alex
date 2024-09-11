@@ -81,7 +81,7 @@ const handleAddEpic = () => {
     position: getHigherIndex(),
     status: 'draft',
     title: '',
-    tasaks: [],
+    tasks: [],
     organization: 'epic',
     local: true,
   } as any;
@@ -96,19 +96,30 @@ const handleAddEpic = () => {
   });
   isEditingTask.value = newTask;
 };
-const handleAddTask = () => {
+const handleAddTask = (id?: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
     position: getHigherIndex(),
     status: 'draft',
     title: '',
-    tasks: [],
     organization: 'standard',
     local: true,
+    epic: id,
   } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
+    }
+    if (id) {
+      return {
+        ...oldData,
+        backlog: oldData.backlog.map((epic) => {
+          if (epic.id === id) {
+            return { ...epic, tasks: epic.tasks ? [...epic.tasks, newTask] : [newTask] };
+          }
+          return epic;
+        }),
+      };
     }
     return {
       ...oldData,
@@ -165,6 +176,7 @@ const handleCreateTask = async () => {
       title: taskTitle.value,
       learningPlanId,
       position: higherIndex,
+      organization: 'standard',
     });
   }
   taskTitle.value = '';
@@ -189,10 +201,10 @@ const handleDelete = () => {
     if (!oldData) {
       return oldData;
     }
-    let updatedBacklog = oldData.backlog.filter((task) => task.title.length);
-    updatedBacklog = oldData.backlog.map((task) => ({
+    let updatedBacklog = oldData.backlog.filter((task) => task.title);
+    updatedBacklog = updatedBacklog.map((task) => ({
       ...task,
-      tasks: task.tasks?.filter((task1) => task1.title.length),
+      tasks: task.tasks?.filter((task1) => task1.title),
     }));
     return {
       ...oldData,
@@ -212,6 +224,16 @@ const handleDeleteTask = async (id: number) => {
   } catch (e) {
     showErrorMessage('deleteError');
   }
+};
+
+const createItem = async (task: SprintTask) => {
+  console.log(task);
+  // await createTask({
+  //   title: task.title,
+  //   learningPlanId: learninplanId.value,
+  //   organization: 'standard',
+  //   position: task.position,
+  // });
 };
 
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
@@ -295,6 +317,7 @@ const toggleExpand = () => {
                     :tasks="sprintsValue.backlog"
                     @add-story="handleAddStory"
                     @add-task="handleAddTask"
+                    @create-item="createItem"
                     @handle-blur="handleDelete"
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"

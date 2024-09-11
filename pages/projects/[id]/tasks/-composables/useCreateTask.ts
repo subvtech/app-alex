@@ -6,13 +6,14 @@ type CreateTaskPayload = {
   learningPlanId: number;
   position: number;
   title: string;
+  organization: TaskSimple['organization'];
 };
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();
 export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
   useMutation({
-    async mutationFn({ learningPlanId, position, title }: CreateTaskPayload) {
+    async mutationFn({ learningPlanId, position, title, organization }: CreateTaskPayload) {
       const task = await create<TaskSimple & { learningplan: number }>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
@@ -23,6 +24,7 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
         submission_description: '',
         submission_required: false,
         title,
+        organization,
       });
       return task.data as TaskSimple;
     },
