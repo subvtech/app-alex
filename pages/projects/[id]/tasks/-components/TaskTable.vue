@@ -252,7 +252,7 @@ watch(
               >
                 <template #header="{ header }">
                   <div v-if="isEditing?.id !== header.id" class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.title }} - Header {{ header.id }} - isEditing {{ isEditing?.id }}</p>
+                    <p>{{ header.title }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
