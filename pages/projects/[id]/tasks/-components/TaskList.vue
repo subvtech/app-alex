@@ -378,7 +378,7 @@ const toggleExpand = () => {
         :project-id="learningPlanStore.learningPlan.id"
       />
     </div>
-    <alex-learningplan-task-drawer-teacher
+    <alex-learningplan-task-drawer-project
       v-model="teacherDrawer"
       editable
       :end-date="editTask?.finish_at"
