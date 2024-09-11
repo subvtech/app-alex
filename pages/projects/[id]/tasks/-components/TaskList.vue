@@ -228,14 +228,6 @@ const handleDeleteTask = async (id: number) => {
 };
 
 const createItem = async (task: SprintTask & { epic?: number; story?: number }) => {
-  console.log('aaaaaaaaa', task);
-  console.log('bbbb', {
-    title: task.title,
-    learningPlanId: learninplanId.value,
-    organization: task.organization || 'standard',
-    position: task.position,
-    parentTask: task.epic,
-  });
   await createTask({
     title: task.title,
     learningPlanId: learninplanId.value,
@@ -243,6 +235,11 @@ const createItem = async (task: SprintTask & { epic?: number; story?: number }) 
     position: task.position,
     parentTask: task.epic,
   });
+  await refetchSprints();
+};
+
+const handleEdit = async (task: SprintTask) => {
+  await updateTask(task);
   await refetchSprints();
 };
 
@@ -338,6 +335,7 @@ const toggleExpand = () => {
                     @add-story="handleAddStory"
                     @add-task="handleAddTask"
                     @create-item="createItem"
+                    @edit-item="handleEdit"
                     @handle-blur="handleDelete"
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"

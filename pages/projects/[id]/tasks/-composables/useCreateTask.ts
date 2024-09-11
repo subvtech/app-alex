@@ -70,11 +70,13 @@ type UpdateTaskPayload = {
   id: number;
   status: TaskSimple['status'];
   position: number;
+  title?: string;
 };
 export const useUpdateTask = () =>
   useMutation({
-    mutationFn({ id, position, status }: UpdateTaskPayload) {
+    mutationFn({ id, position, status, title }: UpdateTaskPayload) {
       return strapi.update('tasks', id, {
+        title,
         status,
         position,
       });
