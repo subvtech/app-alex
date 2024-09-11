@@ -25,4 +25,5 @@ export interface TaskSimple {
   learning_goals?: LearningPlanGoalSimple[];
   task_members?: TaskMember[];
   task_events?: TaskEvent[];
+  tasks?: TaskSimple[];
 }

@@ -39,7 +39,7 @@ const sprints = ref<Droppable<Sprint>[]>([]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const editTask = ref<SprintTask | null>(null);
-const isEditingTask = ref<null | SprintTask>(null);
+const isEditingTask = ref<null | TaskSimple>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
 
@@ -81,10 +81,10 @@ const handleAddEpic = () => {
     position: getHigherIndex(),
     status: 'draft',
     title: '',
-    children: [],
+    tasaks: [],
     organization: 'epic',
     local: true,
-  } as SprintTask;
+  } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -102,26 +102,17 @@ const handleAddTask = () => {
     position: getHigherIndex(),
     status: 'draft',
     title: '',
-    children: [],
-    organization: 'epic',
+    tasks: [],
+    organization: 'standard',
     local: true,
-  } as SprintTask;
+  } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
     }
     return {
       ...oldData,
-      backlog: [
-        ...oldData.backlog,
-        {
-          id: Math.round(Math.random() * 123456),
-          position: getHigherIndex(),
-          status: 'draft',
-          title: '',
-          organization: 'standard',
-        },
-      ],
+      backlog: [...oldData.backlog, newTask],
     };
   });
   isEditingTask.value = newTask;
@@ -132,10 +123,10 @@ const handleAddStory = (id: number) => {
     position: getHigherIndex(),
     status: 'draft',
     title: '',
-    children: [],
+    tasks: [],
     organization: 'story',
     local: true,
-  } as SprintTask;
+  } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -144,7 +135,7 @@ const handleAddStory = (id: number) => {
       if (task.id === id) {
         return {
           ...task,
-          children: task.children?.length ? [...task.children, newTask] : [newTask],
+          tasks: task.tasks?.length ? [...task.tasks, newTask] : [newTask],
         };
       }
       return task;
@@ -193,33 +184,33 @@ const showErrorMessage = (message: string, err?: ApplicationError) => {
   }
 };
 
-const handleChangeValues = (values: Partial<TaskSimple>) => {
-  const editTaskId = editTask.value!.id;
+// const handleChangeValues = (values: Partial<TaskSimple>) => {
+//   const editTaskId = editTask.value!.id;
 
-  const updateTaskList = (tasks: SprintTask[]) => {
-    for (const task of tasks) {
-      if (task.id === editTaskId) {
-        for (const key in values) {
-          if (values[key] !== undefined) task[key] = values[key];
-        }
-      }
+//   const updateTaskList = (tasks: SprintTask[]) => {
+//     for (const task of tasks) {
+//       if (task.id === editTaskId) {
+//         for (const key in values) {
+//           if (values[key] !== undefined) task[key] = values[key];
+//         }
+//       }
 
-      if (task.children) updateTaskList(task.children);
-    }
-  };
+//       if (task.children) updateTaskList(task.children);
+//     }
+//   };
 
-  sprintsValue.value.backlog = sprintsValue.value.backlog.map((task) => {
-    if (task.id === editTask.value?.id) {
-      return Object.keys(editTask.value).reduce((acc, key) => {
-        return values[key] ? { ...acc, [key]: values[key] } : acc;
-      }, editTask.value);
-    }
+//   sprintsValue.value.backlog = sprintsValue.value.backlog.map((task) => {
+//     if (task.id === editTask.value?.id) {
+//       return Object.keys(editTask.value).reduce((acc, key) => {
+//         return values[key] ? { ...acc, [key]: values[key] } : acc;
+//       }, editTask.value);
+//     }
 
-    if (task.children) updateTaskList(task.children);
+//     if (task.children) updateTaskList(task.children);
 
-    return task;
-  });
-};
+//     return task;
+//   });
+// };
 
 const handleDeleteTask = async (id: number) => {
   try {
@@ -388,7 +379,6 @@ const toggleExpand = () => {
       :task-id="editTask?.id"
       :title="editTask?.title"
       :type="editTask?.type"
-      @change-values="handleChangeValues"
     />
   </div>
 </template>

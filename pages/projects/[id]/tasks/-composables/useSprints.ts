@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { SprintTask } from '../-types';
 const strapiClient = useStrapiClient();
 export type SprintsResponse = {
-  backlog: SprintTask[];
+  backlog: TaskSimple[];
   sprints: SprintTask[];
 };
 export const useGetSprints = (learninplanId: Ref<number>) =>
