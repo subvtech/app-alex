@@ -3,6 +3,7 @@ import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { TaskStatus } from '@/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { SprintTask } from '../-types';
+import { create } from 'lodash';
 
 const newGroup = ref('');
 
@@ -48,6 +49,8 @@ const emit = defineEmits([
   'toggleArchive',
   'addStory',
   'addTask',
+  'handleBlur',
+  'createItem',
 ]);
 
 const props = withDefaults(
@@ -61,6 +64,7 @@ const props = withDefaults(
     search: string;
     sprints: string[];
     tasks: SprintTask[];
+    isEditingTaskId: SprintTask;
   }>(),
   {
     dragFrom: -1,
@@ -79,7 +83,7 @@ const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
 
-const isEditing = ref<number>(-1);
+const isEditing = ref<SprintTask>();
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
@@ -110,11 +114,16 @@ const tasksArray = computed(() => {
 });
 
 const handleFieldEdit = () => {
-  if (newGroup.value !== '') {
-    console.log(newGroup.value);
-    console.log(isEditing.value);
+  if (newGroup.value === '') {
+    emit('handleBlur', isEditing.value);
+  } else if (isEditing.value) {
+    isEditing.value.title = newGroup.value;
+    emit('createItem', isEditing.value);
+  } else {
+    console.error('Task not found');
   }
-  isEditing.value = -1;
+
+  isEditing.value = undefined;
   newGroup.value = '';
 };
 
@@ -168,7 +177,7 @@ const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDr
     rename: {
       text: t('pages.projects.tasks.dropdown_rename'),
       onClick: () => {
-        isEditing.value = id;
+        isEditing.value = task;
         newGroup.value = task.title;
       },
     },
@@ -197,6 +206,13 @@ watch(searchFilter, () => {
   typing.value = true;
   setTimeout(() => (typing.value = false), 1000);
 });
+
+watch(
+  () => props.isEditingTaskId,
+  (value) => {
+    isEditing.value = value;
+  },
+);
 </script>
 
 <template>
@@ -221,11 +237,11 @@ watch(searchFilter, () => {
                 :custom-slot="true"
                 :default-expand="true"
                 :items="[task]"
-                :selected-node="isEditing"
+                :selected-node="isEditing?.id"
               >
                 <template #header="{ header }">
-                  <div v-if="isEditing !== header.id" class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.title }}</p>
+                  <div v-if="isEditing?.id !== header.id" class="d-flex w-100 justify-space-between align-center">
+                    <p>{{ header.title }} -</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
@@ -250,8 +266,8 @@ watch(searchFilter, () => {
                 </template>
                 <template #default="{ item, level }">
                   <tr
-                    v-if="isEditing !== item.id"
-                    class="d-flex align-center py-2 tasks-items outline-botto text-gray-800"
+                    v-if="isEditing?.id !== item.id"
+                    class="d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
                   >
                     <td
                       class="text-body-4 text-overflow text-left task-title"
