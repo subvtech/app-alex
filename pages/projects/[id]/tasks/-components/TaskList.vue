@@ -184,33 +184,22 @@ const showErrorMessage = (message: string, err?: ApplicationError) => {
   }
 };
 
-// const handleChangeValues = (values: Partial<TaskSimple>) => {
-//   const editTaskId = editTask.value!.id;
-
-//   const updateTaskList = (tasks: SprintTask[]) => {
-//     for (const task of tasks) {
-//       if (task.id === editTaskId) {
-//         for (const key in values) {
-//           if (values[key] !== undefined) task[key] = values[key];
-//         }
-//       }
-
-//       if (task.children) updateTaskList(task.children);
-//     }
-//   };
-
-//   sprintsValue.value.backlog = sprintsValue.value.backlog.map((task) => {
-//     if (task.id === editTask.value?.id) {
-//       return Object.keys(editTask.value).reduce((acc, key) => {
-//         return values[key] ? { ...acc, [key]: values[key] } : acc;
-//       }, editTask.value);
-//     }
-
-//     if (task.children) updateTaskList(task.children);
-
-//     return task;
-//   });
-// };
+const handleDelete = () => {
+  queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
+    if (!oldData) {
+      return oldData;
+    }
+    let updatedBacklog = oldData.backlog.filter((task) => task.title.length);
+    updatedBacklog = oldData.backlog.map((task) => ({
+      ...task,
+      tasks: task.tasks?.filter((task1) => task1.title.length),
+    }));
+    return {
+      ...oldData,
+      backlog: updatedBacklog,
+    };
+  });
+};
 
 const handleDeleteTask = async (id: number) => {
   try {
@@ -305,6 +294,8 @@ const toggleExpand = () => {
                     :sprints="sprintGroups"
                     :tasks="sprintsValue.backlog"
                     @add-story="handleAddStory"
+                    @add-task="handleAddTask"
+                    @handle-blur="handleDelete"
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"
                     @drag-leave="dragDrop.onDragLeave"
