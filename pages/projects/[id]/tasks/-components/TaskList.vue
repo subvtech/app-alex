@@ -144,7 +144,7 @@ const handleAddStory = (id: number) => {
       if (task.id === id) {
         return {
           ...task,
-          children: [newTask],
+          children: task.children?.length ? [...task.children, newTask] : [newTask],
         };
       }
       return task;
