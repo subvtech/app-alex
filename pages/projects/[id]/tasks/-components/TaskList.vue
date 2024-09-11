@@ -53,7 +53,7 @@ const editSprints = [
   {
     text: t('pages.projects.tasks.add_task'),
     onClick: () => {
-      console.log(t('pages.projects.tasks.add_task'));
+      handleAddTask();
     },
   },
 ];
@@ -91,6 +91,26 @@ const handleAddEpic = () => {
           title: '',
           children: [],
           organization: 'epic',
+        },
+      ],
+    };
+  });
+};
+const handleAddTask = () => {
+  queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
+    if (!oldData) {
+      return oldData;
+    }
+    return {
+      ...oldData,
+      backlog: [
+        ...oldData.backlog,
+        {
+          id: Math.round(Math.random() * 123456),
+          position: getHigherIndex(),
+          status: 'draft',
+          title: '',
+          organization: 'standard',
         },
       ],
     };
