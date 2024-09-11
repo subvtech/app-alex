@@ -91,6 +91,8 @@
     "tooltip_options": "Opções",
     "unarchive": "Desarquivar",
     "unarchiveError": "desarquivar",
-    "unarchiveSuccess": "unarchived"
+    "unarchiveSuccess": "unarchived",
+    "delete_confirm_text": "Apagar",
+    "delete_cancel_text": "Cancelar"
   }
 }

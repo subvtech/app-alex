@@ -18,7 +18,7 @@ export interface SprintTask {
   id: number;
   archived_at?: string | null;
   children?: SprintTask[];
-  delivered: Deliverable;
+  delivered?: Deliverable;
   finish_at?: string | null;
   position: number;
   start_at?: string | null;
