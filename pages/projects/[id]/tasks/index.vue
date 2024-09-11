@@ -20,7 +20,7 @@ enum Mode {
 const { t } = useI18n();
 const learningPlanStore = useLearningPlanStore();
 
-const mode = ref<Mode>(Mode.Kanban);
+const mode = ref<Mode>(Mode.List);
 const search = ref('');
 const route = useRoute();
 const learninplanId = computed(() => parseInt(route.params.id.toString()));

@@ -88,6 +88,8 @@
     "tooltip_options": "Options",
     "unarchive": "Unarchive",
     "unarchiveError": "unarchive",
-    "unarchiveSuccess": "unarchived"
+    "unarchiveSuccess": "unarchived",
+    "delete_confirm_text": "Apagar",
+    "delete_cancel_text": "Cancelar"
   }
 }

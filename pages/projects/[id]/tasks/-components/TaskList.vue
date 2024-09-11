@@ -4,6 +4,9 @@ import { ApplicationError } from '@/models/simple/applicationError.model';
 import { TaskStatus } from '@/models/simple/taskSimple.model';
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
+import { useQueryClient } from '@tanstack/vue-query';
+import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
+import { useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
@@ -14,21 +17,27 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { create, delete: _delete, update } = useStrapi();
+
 const { setMessage } = useMessageStore();
-const strapiClient = useStrapiClient();
+const route = useRoute();
+const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const learningPlanStore = useLearningPlanStore();
 const dragDrop = useMultipleDragDrop();
 
 const expandBacklog = ref(0);
 const createSprintDialog = ref(false);
-const backlogTasks = ref<SprintTask[]>([]);
-const sprintTasks = ref<SprintTask[]>([]);
+
+// Querys
+const queryClient = useQueryClient();
+const { data: sprintsValue, refetch: refetchSprints } = useGetSprints(learninplanId);
+const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateTask(learninplanId, queryClient);
+const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient);
+const { mutateAsync: updateTask } = useUpdateTask();
 const sprints = ref<Droppable<Sprint>[]>([]);
 
+// refs
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
-const loader = ref(false);
 const editTask = ref<SprintTask | null>(null);
 
 const backlogIndex = 1;
@@ -49,9 +58,9 @@ const editSprints = [
   },
 ];
 
+// Computed
 const sprintGroups = computed(() => sprints.value.map((s) => s.group));
 const isFilterActive = computed(() => !isEmpty(props.filter));
-
 const teacherDrawer = computed({
   get() {
     return !!editTask.value;
@@ -60,60 +69,31 @@ const teacherDrawer = computed({
     editTask.value = !value ? null : editTask.value;
   },
 });
-
 const filteredTasks = computed(() => {
-  return backlogTasks.value.filter((task) => contains(task.title, props.search));
+  return sprintsValue.value.backlog.filter((task) => contains(task.title, props.search));
 });
 
+// Methods
 const getSlideTransition = () => {
-  return backlogTasks.value.length ? 'slide-down' : 'slide-up';
+  return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
 
 const getHigherIndex = () => {
-  const tasks = backlogTasks.value;
+  const tasks = sprintsValue.value.backlog;
   return tasks[tasks.length - 1]?.position + 1 || 0;
 };
 
 const handleCreateTask = async () => {
-  if (taskTitle.value) {
-    loader.value = true;
-
-    const learningPlanId = learningPlanStore.learningPlan?.id;
-    if (!learningPlanId) return;
-
+  if (taskTitle.value && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
+    const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
-
-    try {
-      const res = await create('tasks', {
-        title: taskTitle.value,
-        status: 'draft' as TaskStatus,
-        learningplan: learningPlanId,
-        position: higherIndex,
-        allowed_editor_plugins: '',
-        submission_description: '',
-        submission_required: false,
-        can_submit_after_deadline: false,
-        can_change_from_review: false,
-      });
-
-      learningPlanStore.learningPlan?.tasks.push({
-        id: res.data.id,
-        learning_plan_id: learningPlanId,
-        learning_goals: [],
-        trail: undefined,
-        task_events: undefined,
-        task_members: undefined,
-        tags: undefined,
-        ...res.data.attributes,
-      });
-
-      showSuccessMessage('addSuccess');
-    } catch (e) {
-      showErrorMessage('addError');
-    }
+    await createTask({
+      title: taskTitle.value,
+      learningPlanId,
+      position: higherIndex,
+    });
+    // await refetchSprints();
   }
-
-  loader.value = false;
   taskTitle.value = '';
   isCreatingTask.value = false;
 };
@@ -146,7 +126,7 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
     }
   };
 
-  backlogTasks.value = backlogTasks.value.map((task) => {
+  sprintsValue.value.backlog = sprintsValue.value.backlog.map((task) => {
     if (task.id === editTask.value?.id) {
       return Object.keys(editTask.value).reduce((acc, key) => {
         return values[key] ? { ...acc, [key]: values[key] } : acc;
@@ -162,12 +142,10 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
 const handleDeleteTask = async (id: number) => {
   try {
     const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex((task) => task.id === id);
-
     if (+deleteIndex! > -1) {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex!, 1);
     }
-
-    await _delete('tasks', id);
+    await deleteTask({ id });
     showSuccessMessage('deleteSuccess');
   } catch (e) {
     showErrorMessage('deleteError');
@@ -180,13 +158,11 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
 
 const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
   try {
-    const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
-
+    const task = sprintsValue.value.backlog.find((t) => t.id === id);
     if (task) {
       const position = getHigherIndex();
-      task.status = status;
-      task.position = position;
-      await update('tasks', id, { status, position });
+      await updateTask({ id, status, position });
+      await refetchSprints();
       showSuccessMessage('moveSuccess');
     }
   } catch (err: any) {
@@ -212,18 +188,6 @@ const toggleExpand = () => {
   taskTitle.value = '';
   expandBacklog.value = !expandBacklog.value ? 1 : 0;
 };
-
-onMounted(async () => {
-  try {
-    const res = await strapiClient<{
-      backlog: SprintTask[];
-      sprints: SprintTask[];
-    }>(`/learningplans/${learningPlanStore.learningPlan?.id}/sprint-backlog`);
-
-    backlogTasks.value = res.backlog;
-    sprintTasks.value = res.sprints;
-  } catch (_) {}
-});
 </script>
 
 <template>
@@ -244,7 +208,7 @@ onMounted(async () => {
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <Transition mode="out-in" :name="getSlideTransition()">
-                <div v-if="!backlogTasks.length && backlogIndex">
+                <div v-if="!sprintsValue.backlog.length && backlogIndex">
                   <alex-learningplan-task-empty-state
                     key="empty-state"
                     type="backlog"
@@ -265,7 +229,7 @@ onMounted(async () => {
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
-                    :tasks="backlogTasks"
+                    :tasks="sprintsValue.backlog"
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"
                     @drag-leave="dragDrop.onDragLeave"
@@ -283,7 +247,7 @@ onMounted(async () => {
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
-                    :loading="loader"
+                    :loading="isCreatingTaskRequest"
                     @click="isCreatingTask = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
@@ -296,13 +260,13 @@ onMounted(async () => {
                       class="w-100"
                       density="comfortable"
                       name="taskTitle"
-                      :disabled="loader"
+                      :disabled="isCreatingTaskRequest"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
                       @keyup.enter="handleCreateTask"
                       @keyup.esc="isCreatingTask = false"
                     />
-                    <alex-custom-button size="large" :loading="loader" @click="handleCreateTask">
-                      {{ $t('pages.projects.tasks.add_button') }}
+                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask">
+                      {{ $t('pages.projects.tasks.add_task') }}
                     </alex-custom-button>
                   </div>
                 </Transition>
