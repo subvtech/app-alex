@@ -77,7 +77,7 @@ const filteredTasks = computed(() => {
 
 const handleAddEpic = () => {
   const newTask = {
-    id: Math.round(Math.random() * 123456),
+    id: Math.round(Math.random() * 1234526),
     position: getHigherIndex(),
     status: 'draft',
     title: '',
@@ -137,6 +137,7 @@ const handleAddStory = (id: number) => {
     tasks: [],
     organization: 'story',
     local: true,
+    epic: id,
   } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
@@ -226,14 +227,23 @@ const handleDeleteTask = async (id: number) => {
   }
 };
 
-const createItem = async (task: SprintTask) => {
-  console.log(task);
-  // await createTask({
-  //   title: task.title,
-  //   learningPlanId: learninplanId.value,
-  //   organization: 'standard',
-  //   position: task.position,
-  // });
+const createItem = async (task: SprintTask & { epic?: number; story?: number }) => {
+  console.log('aaaaaaaaa', task);
+  console.log('bbbb', {
+    title: task.title,
+    learningPlanId: learninplanId.value,
+    organization: task.organization || 'standard',
+    position: task.position,
+    parentTask: task.epic,
+  });
+  await createTask({
+    title: task.title,
+    learningPlanId: learninplanId.value,
+    organization: task.organization || 'standard',
+    position: task.position,
+    parentTask: task.epic,
+  });
+  await refetchSprints();
 };
 
 const handleEmptyStateOver = (index: number, dragEvent: DragEvent) => {
@@ -314,7 +324,17 @@ const toggleExpand = () => {
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
-                    :tasks="sprintsValue.backlog"
+                    :tasks="
+                      sprintsValue.backlog.map((task) => {
+                        if (task.organization === 'epic' || task.organization === 'story') {
+                          return {
+                            ...task,
+                            tasks: task.tasks ? [...task.tasks] : [],
+                          };
+                        }
+                        return task;
+                      })
+                    "
                     @add-story="handleAddStory"
                     @add-task="handleAddTask"
                     @create-item="createItem"
