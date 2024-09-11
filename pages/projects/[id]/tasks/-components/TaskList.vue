@@ -39,7 +39,7 @@ const sprints = ref<Droppable<Sprint>[]>([]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const editTask = ref<SprintTask | null>(null);
-
+const isEditingTaskID = ref<null | number>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
 
@@ -76,6 +76,7 @@ const filteredTasks = computed(() => {
 // Methods
 
 const handleAddEpic = () => {
+  const taskId = Math.round(Math.random() * 123456);
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -85,18 +86,21 @@ const handleAddEpic = () => {
       backlog: [
         ...oldData.backlog,
         {
-          id: Math.round(Math.random() * 123456),
+          id: taskId,
           position: getHigherIndex(),
           status: 'draft',
           title: '',
           children: [],
           organization: 'epic',
+          local: true,
         },
       ],
     };
   });
+  isEditingTaskID.value = taskId;
 };
 const handleAddTask = () => {
+  const taskId = Math.round(Math.random() * 123456);
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -115,6 +119,7 @@ const handleAddTask = () => {
       ],
     };
   });
+  isEditingTaskID.value = taskId;
 };
 const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
@@ -267,6 +272,7 @@ const toggleExpand = () => {
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
                     :is-project="true"
+                    :is-editing-task-id="isEditingTaskID"
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
