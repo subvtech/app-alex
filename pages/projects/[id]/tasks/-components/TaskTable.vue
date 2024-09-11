@@ -64,7 +64,7 @@ const props = withDefaults(
     search: string;
     sprints: string[];
     tasks: SprintTask[];
-    isEditingTaskId: SprintTask;
+    isEditingTask: SprintTask;
   }>(),
   {
     dragFrom: -1,
@@ -208,7 +208,7 @@ watch(searchFilter, () => {
 });
 
 watch(
-  () => props.isEditingTaskId,
+  () => props.isEditingTask,
   (value) => {
     isEditing.value = value;
   },

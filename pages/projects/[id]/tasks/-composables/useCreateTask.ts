@@ -33,15 +33,7 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
         }
         return {
           ...oldData,
-          backlog: [
-            ...oldData.backlog,
-            {
-              id: data.id,
-              position: data.position,
-              status: data.status,
-              title: data.title,
-            },
-          ],
+          backlog: [...oldData.backlog, data],
         };
       });
     },
