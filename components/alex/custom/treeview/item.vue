@@ -86,7 +86,7 @@ const toggle = () => {
 
 const hasChildren = computed(() => {
   if (props.item.children && Array.isArray(props.item.children)) {
-    return props.item.children.length > 0;
+    return true;
   }
   const arrayProps = Object.keys(props.item).filter((key) => Array.isArray(props.item[key]));
   if (arrayProps.length > 1) {
