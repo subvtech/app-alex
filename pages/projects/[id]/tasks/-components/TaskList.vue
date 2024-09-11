@@ -308,7 +308,7 @@ const toggleExpand = () => {
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
                     :is-project="true"
-                    :is-editing-task-id="isEditingTask"
+                    :is-editing-task="isEditingTask"
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
