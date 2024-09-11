@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { TaskStatus } from '@/models/simple/taskSimple.model';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { SprintTask } from '../-types';
 
 const newGroup = ref('');
@@ -45,6 +46,8 @@ const emit = defineEmits([
   'moveTask',
   'startDrag',
   'toggleArchive',
+  'addStory',
+  'addTask',
 ]);
 
 const props = withDefaults(
@@ -76,7 +79,7 @@ const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
 
-const isEditing = ref<number>(143);
+const isEditing = ref<number>(-1);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
@@ -106,6 +109,15 @@ const tasksArray = computed(() => {
   return array;
 });
 
+const handleFieldEdit = () => {
+  if (newGroup.value !== '') {
+    console.log(newGroup.value);
+    console.log(isEditing.value);
+  }
+  isEditing.value = -1;
+  newGroup.value = '';
+};
+
 const cancelDelete = () => {
   deleteModal.value = false;
   taskToDelete.value = -1;
@@ -116,14 +128,31 @@ const confirmDelete = () => {
   cancelDelete();
 };
 
-const dropDownItems = (task: SprintTask) => {
-  const total = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;
-  const items = [getDropDownAction('details', task.id, task)];
-  return total ? items : items.concat(getDropDownAction('delete', task.id, task));
+const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
+  const actions = {
+    rename: getDropDownAction('rename', task.id, task),
+    addStory: getDropDownAction('addStory', task.id, task),
+    addTask: getDropDownAction('addTask', task.id, task),
+    delete: getDropDownAction('delete', task.id, task),
+    details: getDropDownAction('details', task.id, task),
+  };
+
+  switch (task.organization) {
+    case 'epic':
+      return [actions.rename, actions.addStory, actions.addTask, actions.delete].filter(
+        (action): action is AlexDropdownItem => action !== undefined,
+      );
+    case 'story':
+      return [actions.rename, actions.addTask, actions.delete].filter(
+        (action): action is AlexDropdownItem => action !== undefined,
+      );
+    default:
+      return [actions.details, actions.delete].filter((action): action is AlexDropdownItem => action !== undefined);
+  }
 };
 
-const getDropDownAction = (action: string, id: number, task: SprintTask) => {
-  return {
+const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDropdownItem | undefined => {
+  const actions: { [key: string]: AlexDropdownItem } = {
     delete: {
       text: t('pages.projects.tasks.dropdown_delete'),
       warning: true,
@@ -136,7 +165,28 @@ const getDropDownAction = (action: string, id: number, task: SprintTask) => {
       text: t('pages.projects.tasks.dropdown_details'),
       onClick: () => emit('editTask', id, task),
     },
-  }[action];
+    rename: {
+      text: t('pages.projects.tasks.dropdown_rename'),
+      onClick: () => {
+        isEditing.value = id;
+        newGroup.value = task.title;
+      },
+    },
+    addStory: {
+      text: t('pages.projects.tasks.dropdown_add_story'),
+      onClick: () => {
+        emit('addStory', id);
+      },
+    },
+    addTask: {
+      text: t('pages.projects.tasks.dropdown_add_task'),
+      onClick: () => {
+        emit('addTask', id);
+      },
+    },
+  };
+
+  return actions[action];
 };
 
 const taskItemMargin = (level: number) => {
@@ -175,7 +225,7 @@ watch(searchFilter, () => {
               >
                 <template #header="{ header }">
                   <div v-if="isEditing !== header.id" class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.title }} - {{ header.id }}</p>
+                    <p>{{ header.title }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
@@ -194,18 +244,21 @@ watch(searchFilter, () => {
                     maxlength="64"
                     autofocus
                     autocomplete="off"
-                    @blur="console.log('blur')"
-                    @keydown.enter="console.log('enter')"
+                    @blur="handleFieldEdit"
+                    @keydown.enter="handleFieldEdit"
                   ></v-text-field>
                 </template>
                 <template #default="{ item, level }">
-                  <tr class="d-flex align-center py-2 tasks-items outline-bottom">
+                  <tr
+                    v-if="isEditing !== item.id"
+                    class="d-flex align-center py-2 tasks-items outline-botto text-gray-800"
+                  >
                     <td
                       class="text-body-4 text-overflow text-left task-title"
                       :class="`width-${85 - level * 4}`"
                       :style="taskItemMargin(level)"
                     >
-                      {{ item.title }}
+                      {{ item.title }} - {{ item.id }}
                     </td>
 
                     <td class="width-40">
@@ -257,6 +310,22 @@ watch(searchFilter, () => {
                         </template>
                       </alex-custom-dropdown>
                     </td>
+                  </tr>
+                  <tr v-else class="tw-h-[52px] d-flex align-center">
+                    <v-text-field
+                      v-model="newGroup"
+                      name="edit"
+                      can-edit
+                      class="w-100 text-gray-800 text-body-2 editing-input w-100 tw-ml-[60px]"
+                      density="compact"
+                      variant="plain"
+                      hide-details
+                      maxlength="64"
+                      autofocus
+                      autocomplete="off"
+                      @blur="handleFieldEdit"
+                      @keydown.enter="handleFieldEdit"
+                    ></v-text-field>
                   </tr>
                 </template>
               </TreeView>

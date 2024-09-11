@@ -26,6 +26,7 @@ export interface SprintTask {
   students?: Student[];
   title: string;
   type?: TaskType | null;
+  organization?: string;
 }
 
 export interface Droppable<T extends { id: number }> {

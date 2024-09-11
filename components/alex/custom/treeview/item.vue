@@ -11,7 +11,11 @@
       <slot v-if="customHeader" name="header" :header="item"></slot>
       <span v-else>{{ item.name }}</span>
     </div>
-    <div v-else :class="leafClasses" :style="{ paddingLeft: itemPadding }">
+    <div
+      v-else
+      :class="[leafClasses, selectedNode === item.id ? 'bg-gray-100' : 'bg-white']"
+      :style="{ paddingLeft: itemPadding }"
+    >
       <slot v-if="customSlot" name="default" :item="item" :level="level === 1 ? 0 : level + 1"></slot>
       <div v-else>{{ item.name }}</div>
     </div>
