@@ -51,6 +51,12 @@
       <span>{{ $t('components.courses.invites.countdown') }}</span>
       <p>{{ msToHHMMSS(remainingTime) }}</p>
     </div>
+    <pre>{{
+      {
+        duration,
+        inviteLinkExpiresAt,
+      }
+    }}</pre>
   </div>
 </template>
 
@@ -60,7 +66,7 @@ const emit = defineEmits(['update:link', 'link:expired']);
 
 export interface InviteProps {
   duration: number;
-  data?: InvitationLinkSimple | null;
+  inviteLinkExpiresAt?: Date | null;
   url?: string | null;
   dark?: boolean;
   className: string;
@@ -68,41 +74,60 @@ export interface InviteProps {
 
 const props = withDefaults(defineProps<InviteProps>(), {
   dark: false,
-  data: null,
+
   className: '',
   url: null,
+  inviteLinkExpiresAt: null,
 });
 
-const { remainingTime, theresTime, setTimeRunning, stopTimeout } = useTimeout(
-  props.duration * 1000,
-);
+const { inviteLinkExpiresAt, duration } = toRefs(props);
 
-const { msToHHMMSS } = useInvitationLink();
+const { msToHHMMSS, calcRemainingTime } = useInvitationLink();
 
-const inviteId = ref<number | null>(null);
+const {
+  remainingTime,
+  timeSpan,
+  timeRunning,
+  theresTime,
+  setTimeSpan,
+  setTimeRunning,
+  stopTimeout,
+} = useTimeout(props.duration * 1000);
 
 const handleUpdateLink = () => {
   emit('update:link');
+
   resetTimeout();
 };
 
-const theresTimeAndUrl = computed(() => theresTime.value && props.url);
+const theresTimeAndUrl = computed(() => theresTime.value && !!props.url);
 
 const resetTimeout = () => {
+  console.log('reset timeout');
+  if (inviteLinkExpiresAt.value) {
+    setTimeSpan(calcRemainingTime(inviteLinkExpiresAt.value));
+  } else setTimeSpan(props.duration * 1000);
+
   stopTimeout(true);
   setTimeRunning(true);
 };
 
 onBeforeMount(() => {
-  if (!props.data) return;
-
-  if (props.data.id) inviteId.value = props.data.id;
+  console.log('onBeforeMount', props);
+  if (props.url) resetTimeout();
 });
 
 watch(theresTimeAndUrl, () => {
-  if (theresTimeAndUrl.value) return;
+  if (theresTimeAndUrl.value) {
+    if (!timeRunning.value) resetTimeout();
+    return;
+  }
 
   emit('link:expired');
+});
+
+watch(inviteLinkExpiresAt, () => {
+  resetTimeout();
 });
 </script>
 

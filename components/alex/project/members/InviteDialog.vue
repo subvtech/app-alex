@@ -39,8 +39,8 @@
       <alex-learningplan-invites
         full-width
         :duration="invitationDuration"
-        :data="activeLink"
         :url="plainLink"
+        :invite-link-expires-at="inviteLinkExpiresAtRef"
         @update:link="updateLink"
         @link:expired="plainLink = null"
       />
@@ -76,6 +76,14 @@
           $t('components.appGeneralBoxes.students.singular')
         }}</alex-custom-button>
       </div>
+      <pre>{{
+        {
+          plainLink,
+          invitationDuration,
+          inviteLinkHash,
+          inviteLinkExpiresAtRef,
+        }
+      }}</pre>
     </div>
   </alex-custom-dialog>
 </template>
@@ -89,6 +97,8 @@ export interface InviteDialogProps {
   dialogActionLoading?: boolean;
   dialogActionDisabled?: boolean;
   invitationDuration: number;
+  inviteLinkHash?: string | null;
+  inviteLinkExpiresAt?: Date | null;
 
   learningPlanId: number;
   activeInviteId?: number | null;
@@ -100,19 +110,26 @@ const { t } = useI18n();
 const { generateUrl, generateNewInvite, calcRemainingTime } =
   useInvitationLink();
 
-const plainLink = ref<string | null>(null);
-const activeLink = ref(null);
 const emit = defineEmits(['action', 'click:filter', 'update:search']);
 const props = withDefaults(defineProps<InviteDialogProps>(), {
   ignoreUserEmails: () => [],
   ignoreUserIds: () => [],
   activeInviteId: null,
+  inviteLinkHash: null,
+  inviteLinkExpiresAt: null,
 });
+
+const { inviteLinkHash, inviteLinkExpiresAt } = toRefs(props);
+
+const inviteLinkExpiresAtRef = ref<Date | null>(props.inviteLinkExpiresAt);
+
+const plainLink = ref<string | null>(
+  props.inviteLinkHash ? generateUrl(props.inviteLinkHash) : null,
+);
 
 const members = ref([]);
 const dialogModel = defineModel<boolean>({ required: true });
 
-const duration = ref(0);
 const dropdownItems: AlexDropdownItem[] = [
   {
     text: t('components.appGeneralBoxes.students.singular'),
@@ -133,12 +150,23 @@ const updateLink = async (classId) => {
     props.learningPlanId,
     classId,
   );
+  console.log('updateLink');
 
-  const url = generateUrl(result.data.attributes.hash);
-  plainLink.value = url;
-  activeLink.value = result.data.attributes;
-
-  duration.value = calcRemainingTime(result.data.attributes.expires_at);
-  console.log({ result, url, duration: duration.value });
+  plainLink.value = generateUrl(result.data.attributes.hash);
+  inviteLinkExpiresAtRef.value = result.data.attributes.expires_at;
 };
+
+watch([inviteLinkHash], () => {
+  if (inviteLinkHash.value) {
+    plainLink.value = generateUrl(inviteLinkHash.value);
+  }
+});
+
+watch([inviteLinkExpiresAt], () => {
+  console.log({
+    inviteLinkExpiresAt: inviteLinkExpiresAt.value,
+    inviteLinkExpiresAtRef: inviteLinkExpiresAtRef.value,
+  });
+  inviteLinkExpiresAtRef.value = inviteLinkExpiresAt.value;
+});
 </script>

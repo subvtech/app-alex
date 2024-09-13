@@ -8,9 +8,9 @@
         :invitation-duration="
           learningPlanStore.learningPlan?.invitation_duration
         "
-        :active-invite-id="
-          learningPlanStore.learningPlan?.invitation_links[0]?.id
-        "
+        :active-invite-id="learningPlanStore.learningPlan?.id"
+        :invite-link-hash="learningPlanStore.invitationLink?.hash"
+        :invite-link-expires-at="expiresAtDate"
         :disable-invite="!learningPlanStore.learningPlan?.invite_enabled"
         :title="$t('components.learningPlan.drawer.filter')"
         :can-edit="learningPlanStore.userIsFacilitator"
@@ -32,6 +32,7 @@
       <pre>{{
         {
           selectedFilters,
+          invitationLink: learningPlanStore.invitationLink,
           invitationDuration:
             learningPlanStore.learningPlan?.invitation_duration,
           members: learningPlanStore.activeMembers.map(
@@ -99,6 +100,16 @@ const filterMembers = (values) => {
   );
   handleToggleDrawer();
 };
+
+const expiresAtDate = computed(() => {
+  if (
+    !learningPlanStore.invitationLink ||
+    learningPlanStore.invitationLink.is_expired
+  )
+    return null;
+
+  return new Date(learningPlanStore.invitationLink?.expires_at);
+});
 
 const removeFilter = (key: string) => {
   selectedFilters.value = selectedFilters.value.filter(
