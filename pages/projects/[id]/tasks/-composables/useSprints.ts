@@ -10,6 +10,7 @@ export interface Sprint {
   tasks: TaskSimple[];
   start_at: string;
   end_at: string;
+  expanded?: any;
 }
 
 export type SprintsResponse = {

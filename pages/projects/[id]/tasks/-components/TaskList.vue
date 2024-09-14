@@ -73,6 +73,28 @@ const filteredTasks = computed(() => {
   return sprintsValue.value.backlog.filter((task) => contains(task.title, props.search));
 });
 
+const backlogTasks = computed(() => sprintsValue.value.backlog.map(formatTasks));
+const sprintBacklog = computed(() => {
+  return sprintsValue.value.sprints.map((s) => {
+    s.tasks = s.tasks.map(formatTasks);
+    return s;
+  });
+});
+
+const expandSprints = computed(() => {
+  return sprintBacklog.value.map(() => 'panel');
+});
+
+const formatTasks = (task) => {
+  if (task.organization === 'epic' || task.organization === 'story') {
+    return {
+      ...task,
+      tasks: task.tasks ? [...task.tasks] : [],
+    };
+  }
+  return task;
+};
+
 // Methods
 
 const handleAddEpic = () => {
@@ -335,17 +357,7 @@ const toggleExpand = () => {
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
-                    :tasks="
-                      sprintsValue.backlog.map((task) => {
-                        if (task.organization === 'epic' || task.organization === 'story') {
-                          return {
-                            ...task,
-                            tasks: task.tasks ? [...task.tasks] : [],
-                          };
-                        }
-                        return task;
-                      })
-                    "
+                    :tasks="backlogTasks"
                     @add-story="handleAddStory"
                     @add-task="handleAddTask"
                     @create-item="createItem"
@@ -396,12 +408,108 @@ const toggleExpand = () => {
           </v-expansion-panel>
         </v-expansion-panels>
       </Transition>
+
       <div class="tw-flex tw-w-full tw-justify-between">
         <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
         <alex-custom-button prepend-icon="alex:Sprint" size="large" @click="createSprintDialog = true">
           {{ 'Nova Sprint' }}
         </alex-custom-button>
       </div>
+      <Transition v-for="(sprint, i) in sprintBacklog" :key="`sprint-backlog-${i}`" name="slide">
+        <v-expansion-panels
+          v-if="sprintBacklog.length"
+          v-model="expandSprints[i]"
+          class="task-accordion my-6 rounded-lg"
+        >
+          <v-expansion-panel class="rounded-lg" value="panel">
+            <v-expansion-panel-title disabled hide-actions class="tw-cursor-default">
+              <v-icon
+                :icon="sprint.expanded === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
+                @click="sprint.expanded = sprint.expanded === 0 ? 1 : 0"
+              />
+              <span class="text-h5 text-gray-800">
+                {{ sprint.title }} {{ sprint.start_at }} - {{ sprint.end_at }}
+              </span>
+              <alex-custom-chip size="small" status="secondary" :text="filteredTasks.length" />
+              <div class="ml-auto">
+                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints" />
+              </div>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <Transition mode="out-in" :name="getSlideTransition()">
+                <div v-if="!sprintsValue.backlog.length && backlogIndex">
+                  <alex-learningplan-task-empty-state
+                    key="empty-state"
+                    type="backlog"
+                    :index="backlogIndex"
+                    :drop-area="dragDrop.over.value.list === 'backlog'"
+                    @drag-over="handleEmptyStateOver"
+                    @drag-leave="dragDrop.onDragLeave"
+                  />
+                </div>
+                <div v-else>
+                  <TaskTable
+                    key="table"
+                    group="backlog"
+                    :active-filter="isFilterActive"
+                    :drag-from="dragDrop.dragFrom.value"
+                    :dragging="dragDrop.dragging.value"
+                    :is-project="true"
+                    :is-editing-task="isEditingTask"
+                    :over="setOver"
+                    :search="search"
+                    :sprints="sprintGroups"
+                    :tasks="sprint.tasks"
+                    @add-story="handleAddStory"
+                    @add-task="handleAddTask"
+                    @create-item="createItem"
+                    @edit-item="handleEdit"
+                    @handle-blur="handleDelete"
+                    @start-drag="dragDrop.startDrag"
+                    @drag-over="dragDrop.onDragOver"
+                    @drag-leave="dragDrop.onDragLeave"
+                    @delete-task="handleDeleteTask"
+                    @move-task="handleMoveTask"
+                    @edit-task="(_id, task: SprintTask) => (editTask = task)"
+                  />
+                </div>
+              </Transition>
+              <div v-if="backlogIndex === 1" class="mb-4">
+                <Transition mode="out-in" name="add-task">
+                  <alex-custom-button
+                    v-if="!isCreatingTask"
+                    class="w-100 create-task-btn"
+                    prepend-icon="mdi-plus"
+                    size="large"
+                    variant="text"
+                    :loading="isCreatingTaskRequest"
+                    @click="isCreatingTask = true"
+                  >
+                    {{ $t('pages.projects.tasks.add') }}
+                  </alex-custom-button>
+                  <div v-else class="d-flex ga-2">
+                    <alex-inputs-text-field
+                      v-model="taskTitle"
+                      autofocus
+                      hide-details
+                      class="w-100"
+                      density="comfortable"
+                      name="taskTitle"
+                      :disabled="isCreatingTaskRequest"
+                      :placeholder="t('pages.projects.tasks.add_placeholder')"
+                      @keyup.enter="handleCreateTask"
+                      @keyup.esc="isCreatingTask = false"
+                    />
+                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask">
+                      {{ $t('pages.projects.tasks.add_task') }}
+                    </alex-custom-button>
+                  </div>
+                </Transition>
+              </div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </Transition>
       <TaskSprint
         v-model="sprints"
         v-model:drag-drop="dragDrop"
