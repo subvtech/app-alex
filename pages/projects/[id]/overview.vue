@@ -75,10 +75,10 @@
             :id="institution.id"
             :key="institution.id"
             class="tw-cursor-pointer"
-            :url="institution.attributes.cover.data?.attributes.url"
-            :name="institution.attributes.name"
-            :acronym="institution.attributes.acronym"
-            :sector="institution.attributes.sector"
+            :url="institution.cover.url"
+            :name="institution.name"
+            :acronym="institution.acronym"
+            :sector="institution.sector"
           />
           <alex-custom-empty-placeholder
             v-if="institutions.length === 0"
@@ -103,7 +103,6 @@
 
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card';
-import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { PrecisionGantt, Sprint } from '~/components/alex/learningplan/charts/Gantt.vue';
 
 export interface Data {
@@ -155,9 +154,7 @@ export type Cover = {
 };
 
 export type CompletedInstitution = Institution & {
-  cover: {
-    data: Strapi4ResponseData<Cover>;
-  };
+  cover: Cover;
 };
 
 const { t } = useI18n();
@@ -167,7 +164,7 @@ const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 const learningPlanStore = useLearningPlanStore();
 
 const { id: projectId } = route.params;
-const institutions = ref<Strapi4ResponseData<CompletedInstitution>[]>([]);
+const institutions = ref<CompletedInstitution[]>([]);
 const precision = ref<PrecisionGantt>('week');
 const sprints = ref<Sprint[]>([]);
 const taskProgress = ref<{ sprint: string; columns: any }[]>([]);
