@@ -113,3 +113,21 @@ export const useReorderColumns = () =>
       });
     },
   });
+// kanban_column_tasks
+type ReorderKanbanTasksPayload = {
+  kanbanId: number;
+  columns: { id: number; tasks: { id: number; vertical_position: number }[] }[];
+};
+export const useReorderColumnTasks = () =>
+  useMutation({
+    mutationFn({ kanbanId, columns }: ReorderKanbanTasksPayload) {
+      return strapiClient(`/kanbans/${kanbanId}/reorder-tasks`, {
+        method: 'PUT',
+        body: {
+          data: {
+            columns,
+          },
+        },
+      });
+    },
+  });
