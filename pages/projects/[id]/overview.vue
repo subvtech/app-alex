@@ -19,7 +19,7 @@
               <span class="tw-text-4xl tw-font-bold tw-mb-1">{{ totalizer.value }}</span>
               <div class="tw-flex tw-items-center tw-gap-1">
                 <alex-custom-chip size="small" variant="flat" :text="`${totalizer.percentage}%`" :status="'blue'" />
-                <span class="tw-text-sm tw-text-gray-500">{{ $t('pages.projects.completed') }}</span>
+                <span class="tw-text-sm tw-text-gray-500">{{ $t('pages.projects.overview.completed') }}</span>
               </div>
             </div>
           </div>
@@ -58,37 +58,40 @@
               </div>
             </div>
             <alex-custom-empty-placeholder
-              :empty-text-message="$t('pages.projects.empty_meetings')"
+              :empty-text-message="$t('pages.projects.overview.empty_meetings')"
               empty-text-image="/svg/EmptyInstitutional.svg"
             />
           </div>
         </template>
       </alex-custom-card>
-      <alex-custom-card title="Instituições parceiras" full-width class="flex-1">
-        <template #content>
-          <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2 tw-w-full">
-            <alex-profile-institution-item
-              v-for="institution in institutions"
-              :id="institution.id"
-              :key="institution.id"
-              class="tw-cursor-pointer"
-              :name="institution.attributes.name"
-              :acronym="institution.attributes.acronym"
-              :sector="institution.attributes.sector"
-            />
-            <alex-custom-empty-placeholder
-              v-if="institutions.length === 0"
-              :empty-text-message="$t('pages.projects.empty_institutions')"
-              empty-text-image="/svg/EmptyInstitutional.svg"
-            />
-          </div>
-        </template>
-      </alex-custom-card>
+      <div class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4">
+        <div class="tw-border-b tw-p-5 tw-flex tw-justify-between tw-items-center">
+          <h3>{{ $t('pages.projects.overview.institutions') }}</h3>
+          <alex-project-dialogs-institution :institutions="institutions" />
+        </div>
+        <div class="tw-flex tw-flex-col tw-px-4 tw-items-center tw-justify-center tw-gap-2 tw-w-full">
+          <alex-profile-institution-item
+            v-for="institution in institutions"
+            :id="institution.id"
+            :key="institution.id"
+            class="tw-cursor-pointer"
+            :url="institution.attributes.cover.data?.attributes.url"
+            :name="institution.attributes.name"
+            :acronym="institution.attributes.acronym"
+            :sector="institution.attributes.sector"
+          />
+          <alex-custom-empty-placeholder
+            v-if="institutions.length === 0"
+            :empty-text-message="$t('pages.projects.overview.empty_institutions')"
+            empty-text-image="/svg/EmptyInstitutional.svg"
+          />
+        </div>
+      </div>
       <alex-custom-card title="Eventos" full-width class="flex-1">
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <alex-custom-empty-placeholder
-              :empty-text-message="$t('pages.projects.empty_meetings')"
+              :empty-text-message="$t('pages.projects.overview.empty_meetings')"
               empty-text-image="/svg/EmptyInstitutional.svg"
             />
           </div>
@@ -103,47 +106,93 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
 import { PrecisionGantt, Sprint } from '~/components/alex/learningplan/charts/Gantt.vue';
 
-interface Data {
+export interface Data {
   sprints: Sprint[];
   counters: {
-    epicCount: number;
-    storyCount: number;
+    finishedEpicsPercent: number;
+    finishedSprintsPercent: number;
+    finishedStoriesPercent: number;
+    totalEpics: number;
+    totalStories: number;
     totalSprints: number;
     remainingDays: number;
   };
 }
 
+type CoverFormat = {
+  ext: string;
+  url: string;
+  hash: string;
+  mime: string;
+  name: string;
+  path: string | null;
+  size: number;
+  width: number;
+  height: number;
+};
+
+export type Cover = {
+  name: string;
+  alternativeText: string | null;
+  caption: string | null;
+  width: number;
+  height: number;
+  formats: {
+    small: CoverFormat;
+    medium: CoverFormat;
+    thumbnail: CoverFormat;
+  };
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string;
+  previewUrl: string | null;
+  provider: string;
+  provider_metadata: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CompletedInstitution = Institution & {
+  cover: {
+    data: Strapi4ResponseData<Cover>;
+  };
+};
+
 const { t } = useI18n();
 const route = useRoute();
-const { findOne, find } = useStrapi();
+const { find } = useStrapi();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const learningPlan = ref<LearningPlan>();
-const institutions = ref<Strapi4ResponseData<Institution>[]>([]);
+const learningPlanStore = useLearningPlanStore();
+
+const { id: projectId } = route.params;
+const institutions = ref<Strapi4ResponseData<CompletedInstitution>[]>([]);
 const precision = ref<PrecisionGantt>('week');
 const sprints = ref<Sprint[]>([]);
 const taskProgress = ref<{ sprint: string; columns: any }[]>([]);
 
 const totalizers = ref({
   sprints: {
-    title: t('pages.projects.total_sprints'),
+    title: t('pages.projects.overview.total_sprints'),
     icon: 'mdi-calendar-check',
     value: 0,
     percentage: 0,
   },
   epics: {
-    title: t('pages.projects.total_epics'),
+    title: t('pages.projects.overview.total_epics'),
     icon: 'mdi-calendar-check',
     value: 0,
     percentage: 0,
   },
   stories: {
-    title: t('pages.projects.total_story'),
+    title: t('pages.projects.overview.total_story'),
     icon: 'mdi-calendar-check',
     value: 0,
     percentage: 0,
   },
   remainingTime: {
-    title: t('pages.projects.remaining_time'),
+    title: t('pages.projects.overview.remaining_time'),
     icon: 'mdi-calendar-check',
     value: '0 dias',
     percentage: 0,
@@ -165,32 +214,34 @@ const currentWeek = Array.from({ length: daysOfWeek.length }, (_, i) => {
 });
 
 const getLearningPlan = async () => {
-  const response = await findOne<LearningPlan>('learningplans', learningPlanId.value, {
-    populate: '*',
-  });
+  const response = await learningPlanStore.loadLearningPlan(+projectId);
+
   if (!response?.data) {
     return navigateTo('/projects/me');
   }
-  learningPlan.value = response.data.attributes as never;
-  institutions.value = response.data.attributes.institutions.data as never;
+  console.log(response);
+  institutions.value = response.data.institutions as never;
 };
 
 const fetchData = async () => {
-  const response = (await find<Data>(`sprints/project/${learningPlanId.value}`)) as unknown as Data;
+  const response = (await find<Data>(`learningplans/${learningPlanId.value}/project-dashboard`)) as unknown as Data;
 
-  totalizers.value.epics.value = response.counters.epicCount;
+  totalizers.value.epics.value = response.counters.totalEpics;
+  totalizers.value.epics.percentage = response.counters.finishedEpicsPercent || 0;
   totalizers.value.sprints.value = response.counters.totalSprints;
-  totalizers.value.stories.value = response.counters.storyCount;
+  totalizers.value.sprints.percentage = response.counters.finishedSprintsPercent || 0;
+  totalizers.value.stories.value = response.counters.totalStories;
+  totalizers.value.stories.percentage = response.counters.finishedStoriesPercent || 0;
   totalizers.value.remainingTime.value = `${response.counters.remainingDays} dias`;
   sprints.value = response.sprints;
 
   const process = response.sprints.map((sprint) => ({
     sprint: sprint.title,
-    columns: sprint.kanban.kanban_columns.map((column) => ({
+    columns: sprint.kanban?.kanban_columns?.map((column) => ({
       status: column.status_type,
       name: column.title,
-      total: column.kanban_column_tasks.reduce((count, taskGroup) => {
-        return count + taskGroup.tasks.length;
+      total: column.kanban_column_tasks?.reduce((count, taskGroup) => {
+        return count + (taskGroup.task ? 1 : 0);
       }, 0),
     })),
   }));
@@ -199,8 +250,8 @@ const fetchData = async () => {
 };
 
 onMounted(() => {
-  getLearningPlan();
   fetchData();
+  getLearningPlan();
 });
 </script>
 

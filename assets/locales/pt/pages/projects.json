@@ -32,9 +32,11 @@
     "empty_journey": "Nenhuma jornada de aprendizagem encontrada!",
     "empty_meetings": "Nada marcado hoje!",
     "empty_members": "Nenhum membro encontrado",
-    "empty_task_progress": "0% das tarefas foram concluídas",
+    "institutions": "Instituições",
+    "empty_task_progress": "%{percentage}% das tarefas foram concluídas",
     "last_update": "Última atualização",
     "remaining_time": "Tempo restante",
+    "task_progress": "Progresso de tarefas",
     "total_epics": "Total de épicos",
     "total_sprints": "Total de sprints",
     "total_story": "Total de histórias"

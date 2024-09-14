@@ -1,15 +1,9 @@
 <template>
-  <div
-    class="tw-relative tw-grid tw-grid-cols-[auto_1fr] tw-w-full tw-overflow-x-scroll"
-  >
+  <div class="tw-relative tw-grid tw-grid-cols-[auto_1fr] tw-w-full tw-overflow-x-scroll">
     <div
       class="flex tw-flex-col items-center tw-min-w-48 tw-sticky tw-top-0 tw-left-0 tw-z-10 bg-white tw-border-r-[1px] tw-border-b-[1px] tw-border-gray-100"
     >
-      <div
-        class="tw-h-[91px] tw-p-2 tw-border-b-[1px] tw-border-gray-10 tw-grid tw-place-items-center"
-      >
-        Tópicos
-      </div>
+      <div class="tw-h-[91px] tw-p-2 tw-border-b-[1px] tw-border-gray-10 tw-grid tw-place-items-center">Tópicos</div>
     </div>
     <g-gantt-chart
       :chart-start="startDate"
@@ -81,13 +75,7 @@ type Row = GanttBarObject & {
   barEndDate: Date | string;
   labelColumn: string;
 };
-export type PrecisionGantt =
-  | 'hour'
-  | 'day'
-  | 'date'
-  | 'week'
-  | 'month'
-  | undefined;
+export type PrecisionGantt = 'hour' | 'day' | 'date' | 'week' | 'month' | undefined;
 export type TaskTest = {
   id: number;
   name: string;
@@ -126,7 +114,7 @@ export type Sprint = {
       position: string;
       status_type: string;
       kanban_column_tasks: {
-        tasks: History[];
+        task: History;
       }[];
     }[];
   };
