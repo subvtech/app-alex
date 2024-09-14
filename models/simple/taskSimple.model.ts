@@ -27,5 +27,5 @@ export interface TaskSimple {
   task_members?: TaskMember[];
   task_events?: TaskEvent[];
   tasks?: TaskSimple[];
-  parent_task?: number;
+  parent_task?: TaskSimple;
 }

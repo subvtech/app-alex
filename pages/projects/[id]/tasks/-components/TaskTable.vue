@@ -200,7 +200,7 @@ const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDr
     addTask: {
       text: t('pages.projects.tasks.dropdown_add_task'),
       onClick: () => {
-        emit('addTask', id);
+        emit('addTask', task);
       },
     },
   };

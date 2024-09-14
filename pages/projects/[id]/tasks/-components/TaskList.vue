@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMultipleDragDrop } from '@/composables/useMultipleDragDrop';
 import { ApplicationError } from '@/models/simple/applicationError.model';
-import { TaskStatus } from '@/models/simple/taskSimple.model';
+import { TaskSimple, TaskStatus } from '@/models/simple/taskSimple.model';
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -96,7 +96,7 @@ const handleAddEpic = () => {
   });
   isEditingTask.value = newTask;
 };
-const handleAddTask = (id?: number) => {
+const handleAddTask = (task?: TaskSimple) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
     position: getHigherIndex(),
@@ -104,18 +104,32 @@ const handleAddTask = (id?: number) => {
     title: '',
     organization: 'standard',
     local: true,
-    epic: id,
+    epic: task?.parent_task ? task?.parent_task.id : task?.id,
+    story: task?.parent_task ? task?.id : undefined,
   } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
     }
-    if (id) {
+    if (task) {
       return {
         ...oldData,
         backlog: oldData.backlog.map((epic) => {
-          if (epic.id === id) {
-            return { ...epic, tasks: epic.tasks ? [...epic.tasks, newTask] : [newTask] };
+          if (epic.id === newTask.epic) {
+            if (newTask.story) {
+              return {
+                ...epic,
+                tasks: epic.tasks?.map((story) => {
+                  if (story.id === newTask.story) {
+                    return {
+                      ...story,
+                      tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
+                    };
+                  }
+                  return story;
+                }),
+              };
+            }
           }
           return epic;
         }),
@@ -233,7 +247,7 @@ const createItem = async (task: SprintTask & { epic?: number; story?: number }) 
     learningPlanId: learninplanId.value,
     organization: task.organization || 'standard',
     position: task.position,
-    parentTask: task.epic,
+    parentTask: task.story ? task.story : task.epic,
   });
   await refetchSprints();
 };
@@ -292,7 +306,7 @@ const toggleExpand = () => {
               <span class="text-h5 text-gray-800">
                 {{ taskSections[backlogIndex - 1] }}
               </span>
-              <alex-custom-chip size="small" status="secondary" :text="filteredTasks.length" />
+              <alex-custom-chip size="small" status="secondary" :text="`${filteredTasks.length}`" />
               <div class="ml-auto">
                 <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints" />
               </div>
