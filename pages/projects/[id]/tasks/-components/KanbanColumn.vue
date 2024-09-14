@@ -11,6 +11,7 @@ type Props<T> = {
   addButtonText?: string;
   color?: Colors;
   disabled?: boolean;
+  isCreatingTask?: boolean;
   group: string;
   title: string;
   columnId: number;
@@ -41,6 +42,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   color: 'gray-300',
   addButtonText: 'Adicionar',
   addButton: true,
+  isCreatingTask: false,
 });
 
 const items = defineModel<T[]>({ default: () => [] });
@@ -122,14 +124,16 @@ const handleBlurAddItem = (group: string) => {
         <slot name="card" :item="item" :index="i" />
       </SlickItem>
     </SlickList>
-    <div
+    <alex-custom-button
       v-if="addButton && !isAddingItem"
-      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button bg-white"
+      variant="outlined"
+      class="tw-w-full !tw-border-dashed !tw-border"
+      :loading="isCreatingTask"
       @click="handleStartAddItem"
     >
       <v-icon size="20px">mdi-plus</v-icon>
       <span class="text-body-4">{{ addButtonText }}</span>
-    </div>
+    </alex-custom-button>
     <div v-if="isAddingItem" class="border-1 border-gray-100 rounded-lg pa-4">
       <AlexInputsTextField
         v-model="titleNewItem"

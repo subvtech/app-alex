@@ -46,14 +46,14 @@ const { mutateAsync: createKanban } = useCreateKanban();
 const { mutateAsync: updateColumn } = useUpdateColumn();
 const { mutateAsync: deleteColumn } = useDeleteColumn();
 const { mutateAsync: reorderColumns } = useReorderColumns();
-const { mutateAsync: createTask } = useCreateKanbanTask(learninplanId, queryClient);
+const { mutateAsync: createTask, isPending: isCreatingTask } = useCreateKanbanTask(learninplanId, queryClient);
 const { mutateAsync: reorderTasks } = useReorderColumnTasks();
 //  Refs
 const canDrag = ref(true);
 const isDraggingItems = ref(false);
 const modalDeleteColumn = ref(false);
 const selectedColumnToDelete = ref<Column<KanbanColumnTask> | null>(null);
-
+const isCreatingTaskColumnId = ref<number | null>(null);
 const getDeleteColumnTexts = (column: Column<KanbanColumnTask> | null) => {
   if (requiredStatusColumn.includes(column?.status_type || '')) {
     return {
@@ -221,6 +221,7 @@ const handleUpdateList = async (updatedColumns: Column<KanbanColumnTask>[]) => {
 };
 
 const handleAddItem = async (columnId: number, _group: string, title: string) => {
+  isCreatingTaskColumnId.value = columnId;
   if (!selectedSprint.value) {
     return;
   }
@@ -233,6 +234,8 @@ const handleAddItem = async (columnId: number, _group: string, title: string) =>
     sprintId: selectedSprint.value?.id,
     title,
   });
+  refetchKanban();
+  isCreatingTaskColumnId.value = null;
 };
 const handleSortStart = () => {
   isDraggingItems.value = true;
@@ -257,7 +260,10 @@ defineExpose({ canDrag, setCanDrag });
 
 <template>
   <div class="tw-flex-grow">
-    <div v-if="!sprint">Nenhuma sprint selecionada</div>
+    <div v-if="!sprint" class="tw-flex tw-items-center tw-justify-center tw-h-full tw-flex-col">
+      <img src="/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
+      <span class="text-gray-400">Nenhuma sprint selecionada</span>
+    </div>
     <template v-else>
       <div v-if="isLoading" class="tw-flex tw-h-full tw-items-center tw-justify-center">
         <v-progress-circular color="accent" indeterminate :size="40" :width="6"></v-progress-circular>
@@ -280,6 +286,7 @@ defineExpose({ canDrag, setCanDrag });
             :color="column.color"
             :group="column.group"
             :title="column.title"
+            :is-creating-task="isCreatingTask && isCreatingTaskColumnId === column.id"
             @delete="handleConfirmDeleteColumn(column.group)"
             @insert-card="handleInsertCard"
             @sort-end="handleSortEnd"
