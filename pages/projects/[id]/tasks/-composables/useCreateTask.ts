@@ -1,6 +1,10 @@
 import { QueryClient, useMutation } from '@tanstack/vue-query';
 import { TaskSimple } from '~/models/simple/taskSimple.model';
+import { KanbanColumnTask } from '../-types';
 import { SprintsResponse } from './useSprints';
+
+const { create } = useStrapiUtils();
+const strapi = useStrapi();
 
 type CreateTaskPayload = {
   learningPlanId: number;
@@ -10,8 +14,6 @@ type CreateTaskPayload = {
   parentTask?: number;
 };
 
-const { create } = useStrapiUtils();
-const strapi = useStrapi();
 export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
   useMutation({
     async mutationFn({ learningPlanId, position, title, organization, parentTask }: CreateTaskPayload) {
@@ -80,5 +82,52 @@ export const useUpdateTask = () =>
         status,
         position,
       });
+    },
+  });
+
+type CreateSprintTaskPayload = {
+  learningPlanId: number;
+  position: number;
+  title: string;
+  organization: TaskSimple['organization'];
+  parentTask?: number;
+  sprintId: number;
+  kanbanColumnId: number;
+};
+export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
+  useMutation({
+    async mutationFn({
+      learningPlanId,
+      position,
+      title,
+      organization,
+      parentTask,
+      sprintId,
+      kanbanColumnId,
+    }: CreateSprintTaskPayload) {
+      const task = await create<TaskSimple & { learningplan: number; sprint: number }>('tasks', {
+        allowed_editor_plugins: '',
+        can_change_from_review: false,
+        can_submit_after_deadline: false,
+        learningplan: learningPlanId,
+        position,
+        status: 'draft',
+        submission_description: '',
+        submission_required: false,
+        title,
+        parent_task: parentTask,
+        organization,
+        sprint: sprintId,
+      });
+      const kanbanColumnTask = await create('kanban-column-tasks', {
+        sprint: sprintId,
+        task: task.data.id,
+        kanban_column: kanbanColumnId,
+        vertical_position: position,
+      });
+      return kanbanColumnTask.data as unknown as KanbanColumnTask;
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
     },
   });

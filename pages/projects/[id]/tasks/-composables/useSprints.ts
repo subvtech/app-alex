@@ -1,9 +1,20 @@
 import { useQuery } from '@tanstack/vue-query';
-import { SprintTask } from '../-types';
+import { Kanban } from '../-types';
 const strapiClient = useStrapiClient();
+
+export interface Sprint {
+  id: number;
+  kanban: Kanban;
+  order: number;
+  title: string;
+  tasks: TaskSimple[];
+  start_at: string;
+  end_at: string;
+}
+
 export type SprintsResponse = {
   backlog: TaskSimple[];
-  sprints: SprintTask[];
+  sprints: Sprint[];
 };
 export const useGetSprints = (learninplanId: Ref<number>) =>
   useQuery({

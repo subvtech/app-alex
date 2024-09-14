@@ -13,10 +13,11 @@ type Props<T> = {
   disabled?: boolean;
   group: string;
   title: string;
+  columnId: number;
 };
 
 type Events<T> = {
-  'add-item': [group: string, title: string];
+  'add-item': [id: number, group: string, title: string];
   'add-column': [title: string];
   'cancel-column': [group: string];
   'insert-card': [values: { newIndex: number; value: T; group: string }];
@@ -24,7 +25,7 @@ type Events<T> = {
   'sort-start': [group: string];
   'sort-move': [group: string];
   'title-column-change': [group: string, title: string];
-  'update-list': [list: T[], group: string];
+  'update-list': [list: T[], id: number, group: string];
   delete: [group: string];
 };
 
@@ -66,7 +67,7 @@ const handleSortInsert = (values: { newIndex: number; value: T }) => {
 };
 const handleAddItem = (group: string) => {
   isAddingItem.value = true;
-  emit('add-item', group, titleNewItem.value);
+  emit('add-item', props.columnId, group, titleNewItem.value);
   isAddingItem.value = false;
   titleNewItem.value = '';
 };
@@ -109,7 +110,7 @@ const handleBlurAddItem = (group: string) => {
       @sort-insert="handleSortInsert"
       @sort-start="$emit('sort-start', group)"
       @sort-move="$emit('sort-move', group)"
-      @update:list="$emit('update-list', $event, group)"
+      @update:list="$emit('update-list', $event, columnId, group)"
     >
       <SlickItem
         v-for="(item, i) in items"

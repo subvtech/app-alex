@@ -2,15 +2,17 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { SlickItem, SlickList } from 'vue-slicksort';
 import { generateGroup } from '~/utils';
+import { useCreateKanbanTask } from '../-composables/useCreateTask';
 import {
   BoardsResponse,
   useCreateKanban,
   useDeleteColumn,
   useGetKanban,
   useReorderColumns,
+  useReorderColumnTasks,
   useUpdateColumn,
 } from '../-composables/useKanban';
-import { Droppable, KanbanStatusType, SprintTask } from '../-types';
+import { Droppable, KanbanColumnTask, KanbanStatusType, SprintTask } from '../-types';
 import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
 import { Colors } from './KanbanColumnHeader.vue';
@@ -26,31 +28,33 @@ export interface Column<U extends { id: number }> {
   color?: Colors;
   disable?: boolean;
 }
-type Item = Droppable<TaskSimple>;
+type Item = Droppable<KanbanColumnTask>;
 type KanbanProps = {
   sprint?: SprintTask;
 };
 const props = defineProps<KanbanProps>();
-const sprintValue = toRef(props, 'sprint');
+const selectedSprint = toRef(props, 'sprint');
 const route = useRoute();
 const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const requiredStatusColumn = ['to_do', 'done'];
 // Querys
 const queryClient = useQueryClient();
-const enabledKanban = computed(() => !!sprintValue.value);
-const { data: kanban, isLoading, refetch: refetchKanban } = useGetKanban(learninplanId, sprintValue, enabledKanban);
+const enabledKanban = computed(() => !!selectedSprint.value);
+const { data: kanban, isLoading, refetch: refetchKanban } = useGetKanban(learninplanId, selectedSprint, enabledKanban);
 const { mutateAsync: createKanban } = useCreateKanban();
 const { mutateAsync: updateColumn } = useUpdateColumn();
 const { mutateAsync: deleteColumn } = useDeleteColumn();
 const { mutateAsync: reorderColumns } = useReorderColumns();
-
+const { mutateAsync: createTask } = useCreateKanbanTask(learninplanId, queryClient);
+const { mutateAsync: reorderTasks } = useReorderColumnTasks();
+// const fixedColumns = ['to_do', 'done'];
 //  Refs
 const canDrag = ref(true);
 const isDraggingItems = ref(false);
 const modalDeleteColumn = ref(false);
-const selectedColumnToDelete = ref<Column<TaskSimple> | null>(null);
+const selectedColumnToDelete = ref<Column<KanbanColumnTask> | null>(null);
 
-const getDeleteColumnTexts = (column: Column<TaskSimple> | null) => {
+const getDeleteColumnTexts = (column: Column<KanbanColumnTask> | null) => {
   if (requiredStatusColumn.includes(column?.status_type || '')) {
     return {
       title: 'No momento não é possível excluir esta coluna!',
@@ -75,7 +79,7 @@ const getDeleteColumnTexts = (column: Column<TaskSimple> | null) => {
 };
 // Computed
 const confirmDeleteI18n = computed(() => getDeleteColumnTexts(selectedColumnToDelete.value));
-const columns = computed<Column<TaskSimple>[]>({
+const columns = computed<Column<KanbanColumnTask>[]>({
   get: () =>
     kanban.value?.boards
       .map((column) => ({
@@ -84,11 +88,15 @@ const columns = computed<Column<TaskSimple>[]>({
         group: generateGroup(column.status_type, column.id),
         position: column.position,
         status_type: column.status_type,
-        items: column.tasks.map((task) => ({ group: `${column.status_type}_${column.id}`, raw: task })),
+        items: column.tasks.map((task) => ({
+          id: task.id,
+          group: `${column.status_type}_${column.id}`,
+          raw: task,
+        })),
       }))
-      .sort((a, b) => a.position - b.position) as Column<TaskSimple>[],
+      .sort((a, b) => a.position - b.position) || [],
   set: (value) => {
-    queryClient.setQueryData<BoardsResponse>(['kanban', learninplanId, sprintValue], (oldData) => {
+    queryClient.setQueryData<BoardsResponse>(['kanban', learninplanId, selectedSprint], (oldData) => {
       if (!oldData) {
         return;
       }
@@ -108,12 +116,12 @@ const setCanDrag = (value: boolean) => {
   canDrag.value = value;
 };
 const createNewKanbanVersion = async () => {
-  if (!kanban.value?.isDefault || !sprintValue.value) {
+  if (!kanban.value?.isDefault || !selectedSprint.value) {
     return;
   }
   await createKanban({
     columns: columns.value.map((column) => ({ title: column.title, position: column.position })),
-    sprintId: sprintValue.value.id,
+    sprintId: selectedSprint.value.id,
   });
   refetchKanban();
 };
@@ -153,7 +161,14 @@ const handleDeleteColumn = async () => {
   modalDeleteColumn.value = false;
   refetchKanban();
 };
-const handleInsertCard = ({ group, newIndex }: { newIndex: number; value: Droppable<TaskSimple>; group: string }) => {
+const handleInsertCard = ({
+  group,
+  newIndex,
+}: {
+  newIndex: number;
+  value: Droppable<KanbanColumnTask>;
+  group: string;
+}) => {
   columns.value = columns.value.map((column) => {
     if (column.group === group) {
       return toRaw({
@@ -162,7 +177,7 @@ const handleInsertCard = ({ group, newIndex }: { newIndex: number; value: Droppa
           ...item,
           raw: {
             ...item.raw,
-            position: newIndex,
+            vertical_position: newIndex,
             status: group,
           },
           group,
@@ -172,16 +187,26 @@ const handleInsertCard = ({ group, newIndex }: { newIndex: number; value: Droppa
     return toRaw(column);
   });
 };
-const handleUpdateListItems = (items: Item[], group: string) => {
-  const updatedItems: Item[] = items.map((item, index) => ({ ...item, raw: { ...item.raw, position: index } }));
+const handleUpdateListItems = async (items: Item[], columnId: number, group: string) => {
+  if (!kanban.value) {
+    return;
+  }
+  const updatedItems: Item[] = items.map((item, index) => ({
+    ...item,
+    raw: { ...item.raw, vertical_position: index },
+  }));
   columns.value = columns.value.map((column) => {
     if (column.group === group) {
       return { ...column, items: updatedItems };
     }
     return column;
   });
+
+  const tasks = updatedItems.map((item) => ({ id: item.raw.id, vertical_position: item.raw.vertical_position }));
+  await reorderTasks({ kanbanId: kanban.value.id, columns: [{ id: columnId, tasks }] });
+  refetchKanban();
 };
-const handleUpdateList = async (updatedColumns: Column<TaskSimple>[]) => {
+const handleUpdateList = async (updatedColumns: Column<KanbanColumnTask>[]) => {
   const updated = updatedColumns.map((column, index) => {
     if (requiredStatusColumn.includes(column.status_type)) {
       return column;
@@ -196,23 +221,18 @@ const handleUpdateList = async (updatedColumns: Column<TaskSimple>[]) => {
   });
 };
 
-const handleAddItem = (group: string, title: string) => {
-  const newId = Math.round(Math.random() * 10000);
-  const emptyItem = {
-    id: newId,
-    title,
-    position: 0,
-    status: group,
-  } as TaskSimple;
-  const column = columns.value.find((column) => column.group === group);
-  if (!column) {
+const handleAddItem = async (columnId: number, _group: string, title: string) => {
+  if (!selectedSprint.value) {
     return;
   }
-  columns.value = columns.value.map((oldColumn) => {
-    if (column.id === oldColumn.id) {
-      return { ...oldColumn, items: [...oldColumn.items, { group, raw: emptyItem }] };
-    }
-    return oldColumn;
+  const lastIndex = columns.value.find((column) => column.id === columnId)?.items.length || 0;
+  await createTask({
+    kanbanColumnId: columnId,
+    learningPlanId: learninplanId.value,
+    organization: 'standard',
+    position: lastIndex,
+    sprintId: selectedSprint.value?.id,
+    title,
   });
 };
 const handleSortStart = () => {
@@ -253,34 +273,34 @@ defineExpose({ canDrag, setCanDrag });
         :distance="15"
         @update:list="handleUpdateList"
       >
-        <!-- :disabled="fixedColumns.includes(column.status_type)" erro na biblioteca -->
         <SlickItem v-for="(column, i) in columns" :key="column.id" :index="i">
           <KanbanColumn
-            :key="column.group"
             v-model="column['items']"
             class="tw-mr-2"
+            :column-id="column.id"
             :color="column.color"
             :group="column.group"
             :title="column.title"
-            @add-item="(group, title) => handleAddItem(group, title)"
             @delete="handleConfirmDeleteColumn(column.group)"
             @insert-card="handleInsertCard"
             @sort-end="handleSortEnd"
             @sort-start="handleSortStart"
             @sort-move="canDrag = false"
+            @add-item="handleAddItem"
             @title-column-change="handleTitleChange"
             @update-list="handleUpdateListItems"
           >
             <template #card="{ item }">
               <TaskCard
-                :date="item.raw.finish_at ? new Date(item.raw.finish_at) : undefined"
-                :name="item.raw.title"
-                :tags="item.raw.tags"
-                :participants="getMembers(item.raw?.task_members)"
+                :date="item.raw.task.finish_at ? new Date(item.raw.task.finish_at) : undefined"
+                :name="item.raw.task.title"
+                :tags="item.raw.task.tags"
+                :participants="getMembers(item.raw?.task.task_members)"
               />
             </template>
           </KanbanColumn>
         </SlickItem>
+
         <KanbanAddColumn :kanban="kanban" :columns-length="columns.length" @add-column="refetchKanban()" />
       </SlickList>
       <alex-custom-confirm-dialog
