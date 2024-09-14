@@ -18,6 +18,7 @@
     "subtitle": "Papel ao entrar na plataforma",
     "description": "Configuração de papéis por convite",
     "noData": "Busque usuários para adicionar ao projeto.",
-    "submit": "Enviar"
+    "submit": "Enviar",
+     "disabled": "Os convites estão desativados, no momento só será possível adicionar pessoas manualmente."
   }
 }

@@ -18,36 +18,45 @@
         >mdi-information-outline</v-icon
       >
     </div>
-    <v-autocomplete
-      v-model="value"
-      color="primary--2"
-      rounded="lg"
-      variant="outlined"
-      clear-icon="mdi-close"
-      role="select"
-      :error-messages="errorMessage"
-      :class="theme"
-      :disabled="disabled"
-      :menu-props="{
-        class: theme,
-      }"
-      v-bind="$attrs"
-    >
-      <!-- Bind all slots  -->
-      <template v-for="(_, slot) in $slots" #[slot]="scope">
-        <slot :name="slot" v-bind="scope" />
-      </template>
-      <!-- Default item slot -->
-      <template #item="{ props: propsItem, item, index }">
-        <alex-custom-list-item
-          :key="index"
-          :text="item.title"
-          v-bind="propsItem"
-          :theme="theme"
-          :selected="value === item.title"
-        />
-      </template>
-    </v-autocomplete>
+    <div class="d-flex gap-4">
+      <v-autocomplete
+        v-model="value"
+        color="primary--2"
+        rounded="lg"
+        variant="outlined"
+        clear-icon="mdi-close"
+        role="select"
+        :error-messages="errorMessage"
+        :class="theme"
+        :disabled="disabled"
+        :menu-props="{
+          class: theme,
+        }"
+        v-bind="$attrs"
+      >
+        <!-- Bind all slots  -->
+        <template v-for="(_, slot) in $slots" #[slot]="scope">
+          <slot :name="slot" v-bind="scope" />
+        </template>
+        <!-- Default item slot -->
+        <template #item="{ props: propsItem, item, index }">
+          <alex-custom-list-item
+            :key="index"
+            :text="item.title"
+            v-bind="propsItem"
+            :theme="theme"
+            :selected="value === item.title"
+          />
+        </template>
+      </v-autocomplete>
+      <alex-custom-button
+        v-if="showSubmitButton"
+        size="large"
+        :loading="submitButtonLoading"
+        @click="emit('click:button')"
+        >{{ submitButtonText }}</alex-custom-button
+      >
+    </div>
   </div>
 </template>
 
@@ -61,6 +70,9 @@ interface AutoCompleteProps {
   required?: boolean;
   info?: string;
   disabled?: boolean;
+  showSubmitButton?: boolean;
+  submitButtonLoading?: boolean;
+  submitButtonText?: string;
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
@@ -72,7 +84,12 @@ const props = withDefaults(defineProps<AutoCompleteProps>(), {
   info: undefined,
   label: undefined,
   schema: undefined,
+  submitButtonText: 'Submit',
+  showSubmitButton: false,
+  submitButtonLoading: false,
 });
+
+const emit = defineEmits(['click:button']);
 
 const { value, errorMessage } = useField(() => props.name, props.schema, {
   syncVModel: true,

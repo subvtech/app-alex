@@ -3,7 +3,9 @@
     :loading="learningPlanStore.loading"
     :learning-plan="learningPlanStore.learningPlan!"
     :owner="learningPlanStore.facilitator!"
-    :invitation-link="learningPlanStore.invitationLink"
+    :invite-link-hash="learningPlanStore.invitationLink?.hash"
+    :invite-link-expires-at="expiresAtDate"
+    :invitation-duration="learningPlanStore.learningPlan?.invitation_duration"
     :can-edit="learningPlanStore.userIsFacilitator"
     :schedules="schedules"
     @update="(message) => updateCourse(true, message)"
@@ -39,6 +41,17 @@ const schedules = computed(
 );
 const headerStore = usePageHeaderStore();
 onBeforeMount(() => (headerStore.showHeader = true));
+
+const expiresAtDate = computed(() => {
+  if (
+    !learningPlanStore.invitationLink ||
+    learningPlanStore.invitationLink.is_expired
+  )
+    return null;
+
+  return new Date(learningPlanStore.invitationLink?.expires_at);
+});
+
 watch(
   () => learningPlanStore.loading,
   () => {

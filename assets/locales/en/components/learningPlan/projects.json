@@ -18,6 +18,8 @@
     "subtitle": "Role when joining the platform",
     "description": "Roles settings per invite",
     "noData": "Search users to add to the project",
-    "submit": "Send"
+    "submit": "Send",
+    "disabled": "Invites are disabled, at the moment you can only add people manually."
+   
   }
 }

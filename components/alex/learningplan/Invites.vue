@@ -1,16 +1,17 @@
 <template>
   <div class="relative">
+    <p v-if="className" class="text-body-1 text-gray-800">{{ className }}</p>
     <div
       class="invite justify-space-between my-2"
       :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
     >
-      <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
+      <alex-custom-tooltip v-if="theresTimeAndUrl" :text="urlRef" class="url">
         <template #content>
           <p
             class="cursor-pointer ellipsis break-word lines-1 w-100 text-decoration-none text-secondary-0"
-            @click="copyToClipboard(url)"
+            @click="copyToClipboard(urlRef)"
           >
-            {{ url }}
+            {{ urlRef }}
           </p>
         </template>
       </alex-custom-tooltip>
@@ -36,7 +37,7 @@
               class="pointer"
               :color="dark ? '#6E7A87' : '#00B7CC'"
               size="small"
-              @click="copyToClipboard(url)"
+              @click="copyToClipboard(urlRef)"
               >mdi-content-copy</v-icon
             >
           </template>
@@ -51,12 +52,6 @@
       <span>{{ $t('components.courses.invites.countdown') }}</span>
       <p>{{ msToHHMMSS(remainingTime) }}</p>
     </div>
-    <pre>{{
-      {
-        duration,
-        inviteLinkExpiresAt,
-      }
-    }}</pre>
   </div>
 </template>
 
@@ -67,9 +62,12 @@ const emit = defineEmits(['update:link', 'link:expired']);
 export interface InviteProps {
   duration: number;
   inviteLinkExpiresAt?: Date | null;
+  inviteId?: string | null;
+  courseId: number | string;
+  classId?: number | null;
   url?: string | null;
   dark?: boolean;
-  className: string;
+  className?: string;
 }
 
 const props = withDefaults(defineProps<InviteProps>(), {
@@ -77,13 +75,18 @@ const props = withDefaults(defineProps<InviteProps>(), {
 
   className: '',
   url: null,
+  inviteId: null,
+  classId: null,
   inviteLinkExpiresAt: null,
 });
 
-const { inviteLinkExpiresAt, duration } = toRefs(props);
+const { inviteLinkExpiresAt, url } = toRefs(props);
 
-const { msToHHMMSS, calcRemainingTime } = useInvitationLink();
-
+const { msToHHMMSS, generateNewInvite, calcRemainingTime, generateUrl } =
+  useInvitationLink();
+const inviteId = ref<string | null>(props.inviteId);
+const urlRef = ref<string | null>(props.url);
+const inviteLinkExpiresAtRef = ref<Date | null>(props.inviteLinkExpiresAt);
 const {
   remainingTime,
   timeSpan,
@@ -94,18 +97,37 @@ const {
   stopTimeout,
 } = useTimeout(props.duration * 1000);
 
-const handleUpdateLink = () => {
-  emit('update:link');
+const handleUpdateLink = async () => {
+  const result = await generateNewInvite(
+    inviteId.value,
+    props.duration,
+    props.courseId,
+    props.classId,
+  );
+  console.log({ result: result.data.attributes, courseId: props.courseId });
+  const newLink = generateUrl(result.data.attributes.hash, props.courseId);
+
+  urlRef.value = newLink;
+  inviteId.value = result.data.id;
+  inviteLinkExpiresAtRef.value = result.data.attributes.expires_at;
+
+  emit('update:link', {
+    expiresAt: result.data.attributes.expires_at,
+    url: newLink,
+    inviteId: result.data.id,
+  });
 
   resetTimeout();
 };
 
-const theresTimeAndUrl = computed(() => theresTime.value && !!props.url);
+const theresTimeAndUrl = computed(
+  () => theresTime.value && !!urlRef.value && !!props.courseId,
+);
 
 const resetTimeout = () => {
   console.log('reset timeout');
-  if (inviteLinkExpiresAt.value) {
-    setTimeSpan(calcRemainingTime(inviteLinkExpiresAt.value));
+  if (inviteLinkExpiresAtRef.value) {
+    setTimeSpan(calcRemainingTime(inviteLinkExpiresAtRef.value));
   } else setTimeSpan(props.duration * 1000);
 
   stopTimeout(true);
@@ -126,7 +148,11 @@ watch(theresTimeAndUrl, () => {
   emit('link:expired');
 });
 
+watch(url, () => {
+  urlRef.value = url.value;
+});
 watch(inviteLinkExpiresAt, () => {
+  inviteLinkExpiresAtRef.value = inviteLinkExpiresAt.value;
   resetTimeout();
 });
 </script>
