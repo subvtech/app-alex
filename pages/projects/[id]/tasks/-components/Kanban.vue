@@ -32,6 +32,7 @@ type Item = Droppable<KanbanColumnTask>;
 type KanbanProps = {
   sprint?: SprintTask;
 };
+const { t } = useI18n();
 const props = defineProps<KanbanProps>();
 const selectedSprint = toRef(props, 'sprint');
 const route = useRoute();
@@ -47,7 +48,6 @@ const { mutateAsync: deleteColumn } = useDeleteColumn();
 const { mutateAsync: reorderColumns } = useReorderColumns();
 const { mutateAsync: createTask } = useCreateKanbanTask(learninplanId, queryClient);
 const { mutateAsync: reorderTasks } = useReorderColumnTasks();
-// const fixedColumns = ['to_do', 'done'];
 //  Refs
 const canDrag = ref(true);
 const isDraggingItems = ref(false);
@@ -57,24 +57,23 @@ const selectedColumnToDelete = ref<Column<KanbanColumnTask> | null>(null);
 const getDeleteColumnTexts = (column: Column<KanbanColumnTask> | null) => {
   if (requiredStatusColumn.includes(column?.status_type || '')) {
     return {
-      title: 'No momento não é possível excluir esta coluna!',
-      subtitle: 'Essa coluna é obrigatória, sendo assin só é possível editar sua posição e título.',
-      cancel: 'Entendi',
+      title: t('pages.projects.tasks.column_move_has_tasks'),
+      subtitle: t('pages.projects.tasks.required_column'),
+      cancel: t('pages.projects.tasks.delete_column_cancel_text'),
     };
   }
   if (selectedColumnToDelete.value?.items.length) {
     return {
-      title: 'No momento não é possível excluir esta coluna!',
-      subtitle:
-        'Para remover esta coluna é necessário que ela esteja vazia. Mova todas as tarefas para outra coluna para realizar essa ação.',
-      cancel: 'Entendi',
+      title: t('pages.projects.tasks.column_move_has_tasks'),
+      subtitle: t('pages.projects.tasks.delete_column_has_tasks_subtitle'),
+      cancel: t('pages.projects.tasks.delete_column_cancel_text'),
     };
   }
 
   return {
-    title: 'Realmente deseja excluir essa Coluna?',
-    subtitle: 'Esse processo é irreversível.',
-    cancel: 'Cancelar',
+    title: t('pages.projects.tasks.confirm_delete_column'),
+    subtitle: t('pages.projects.tasks.irreversible_process'),
+    cancel: t('pages.projects.tasks.cancel'),
   };
 };
 // Computed
