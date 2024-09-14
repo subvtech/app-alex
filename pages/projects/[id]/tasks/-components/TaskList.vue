@@ -118,7 +118,7 @@ const handleAddEpic = () => {
   });
   isEditingTask.value = newTask;
 };
-const handleAddTask = (task?: TaskSimple) => {
+const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
     position: getHigherIndex(),
@@ -128,39 +128,88 @@ const handleAddTask = (task?: TaskSimple) => {
     local: true,
     epic: task?.parent_task ? task?.parent_task.id : task?.id,
     story: task?.parent_task ? task?.id : undefined,
+    sprint: sprintId,
   } as any;
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
     }
     if (task) {
-      return {
-        ...oldData,
-        backlog: oldData.backlog.map((epic) => {
-          if (epic.id === newTask.epic) {
-            if (newTask.story) {
-              return {
-                ...epic,
-                tasks: epic.tasks?.map((story) => {
-                  if (story.id === newTask.story) {
+      if (!sprintId) {
+        return {
+          ...oldData,
+          backlog: oldData.backlog.map((epic) => {
+            if (epic.id === newTask.epic) {
+              if (newTask.story) {
+                return {
+                  ...epic,
+                  tasks: epic.tasks?.map((story) => {
+                    if (story.id === newTask.story) {
+                      return {
+                        ...story,
+                        tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
+                      };
+                    }
+                    return story;
+                  }),
+                };
+              }
+            }
+            return epic;
+          }),
+        };
+      } else {
+        return {
+          ...oldData,
+          sprints: oldData.sprints.map((sprint) => {
+            if (sprint.id === sprintId) {
+              sprint.tasks = sprint.tasks.map((epic) => {
+                if (epic.id === newTask.epic) {
+                  if (newTask.story) {
                     return {
-                      ...story,
-                      tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
+                      ...epic,
+                      tasks: epic.tasks?.map((story) => {
+                        if (story.id === newTask.story) {
+                          return {
+                            ...story,
+                            tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
+                          };
+                        }
+                        return story;
+                      }),
                     };
                   }
-                  return story;
-                }),
-              };
+                }
+                return epic;
+              });
+
+              return sprint;
+            } else {
+              return sprint;
             }
+          }),
+        };
+      }
+    }
+
+    if (!sprintId) {
+      return {
+        ...oldData,
+        backlog: [...oldData.backlog, newTask],
+      };
+    } else {
+      return {
+        ...oldData,
+        sprints: oldData.sprints.map((sprint) => {
+          if (sprint.id === sprintId) {
+            sprint.tasks.push(newTask);
+            return sprint;
+          } else {
+            return sprint;
           }
-          return epic;
         }),
       };
     }
-    return {
-      ...oldData,
-      backlog: [...oldData.backlog, newTask],
-    };
   });
   isEditingTask.value = newTask;
 };
@@ -461,7 +510,7 @@ const toggleExpand = () => {
                     :sprints="sprintGroups"
                     :tasks="sprint.tasks"
                     @add-story="handleAddStory"
-                    @add-task="handleAddTask"
+                    @add-task="(task) => handleAddTask(task, sprint.id)"
                     @create-item="createItem"
                     @edit-item="handleEdit"
                     @handle-blur="handleDelete"
