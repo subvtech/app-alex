@@ -14,6 +14,7 @@ import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
+import { tasks } from '~/assets/queries';
 
 const props = defineProps<{
   filter?: filterType;
@@ -104,6 +105,13 @@ const formatTasks = (task) => {
   return task;
 };
 
+const getHigherIndex = (sprintId?: number) => {
+  const tasks = sprintId
+    ? sprintsValue.value.sprints.filter((s) => s.id === sprintId)[0]?.tasks
+    : sprintsValue.value.backlog;
+  return tasks[tasks.length - 1]?.position + 1 || 0;
+};
+
 // Methods
 // TODO: Logica de adicionar em uma sprint
 const handleAddEpic = () => {
@@ -127,101 +135,79 @@ const handleAddEpic = () => {
   });
   isEditingTask.value = newTask;
 };
+
 const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
-    position: getHigherIndex(),
+    position: getHigherIndex(sprintId),
     status: 'draft',
     title: '',
     organization: 'standard',
     local: true,
-    epic: task?.parent_task ? task?.parent_task.id : task?.id,
-    story: task?.parent_task ? task?.id : undefined,
+    epic: task?.organization === 'story' ? task?.parent_task?.id : task?.id,
+    story: task?.organization === 'story' ? task?.id : undefined,
     sprint: sprintId,
   } as any;
+
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
-      return oldData;
+      return {
+        backlog: [],
+        sprints: [],
+      };
     }
-    if (task) {
-      if (!sprintId) {
-        return {
-          ...oldData,
-          backlog: oldData.backlog.map((epic) => {
-            if (epic.id === newTask.epic) {
-              if (newTask.story) {
-                return {
-                  ...epic,
-                  tasks: epic.tasks?.map((story) => {
-                    if (story.id === newTask.story) {
-                      return {
-                        ...story,
-                        tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
-                      };
-                    }
-                    return story;
-                  }),
-                };
-              }
+
+    const data = structuredClone(oldData);
+
+    const isSprint = !!sprintId;
+    const sprintIdx = isSprint ? data.sprints.findIndex((s) => s.id === sprintId) : 0;
+    const oldTasks = isSprint ? [...data.sprints[sprintIdx].tasks] : [...data.backlog];
+    let newTasks: TaskSimple[] = [];
+    if (!newTask.story && !newTask.epic) {
+      newTasks = [...oldTasks, newTask];
+    } else {
+      const epicId = newTask.epic;
+      const storyId = newTask.story;
+      newTasks = oldTasks.map((epic) => {
+        if (epic.id !== epicId) {
+          return epic;
+        }
+        if (!storyId) {
+          epic.tasks = [...epic.tasks, newTask];
+        } else {
+          epic.tasks = epic.tasks?.map((story) => {
+            if (story.id === storyId) {
+              story.tasks = [...story.tasks, newTask];
             }
-            return epic;
-          }),
+            return story;
+          });
+        }
+        return epic;
+      });
+
+      if (isSprint) {
+        const sprints = data.sprints;
+        sprints[sprintIdx].tasks = newTasks;
+        return {
+          ...data,
+          sprints,
         };
       } else {
         return {
-          ...oldData,
-          sprints: oldData.sprints.map((sprint) => {
-            if (sprint.id === sprintId) {
-              sprint.tasks = sprint.tasks.map((epic) => {
-                if (epic.id === newTask.epic) {
-                  if (newTask.story) {
-                    return {
-                      ...epic,
-                      tasks: epic.tasks?.map((story) => {
-                        if (story.id === newTask.story) {
-                          return {
-                            ...story,
-                            tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
-                          };
-                        }
-                        return story;
-                      }),
-                    };
-                  }
-                }
-                return epic;
-              });
-
-              return sprint;
-            } else {
-              return sprint;
-            }
-          }),
+          ...data,
+          backlog: newTasks,
         };
       }
     }
 
-    if (!sprintId) {
-      return {
-        ...oldData,
-        backlog: [...oldData.backlog, newTask],
-      };
-    } else {
-      return {
-        ...oldData,
-        sprints: oldData.sprints.map((sprint) => {
-          if (sprint.id === sprintId) {
-            sprint.tasks.push(newTask);
-            return sprint;
-          } else {
-            return sprint;
-          }
-        }),
-      };
-    }
+    // return {
+    //   ...oldData,
+    //   backlog: [...oldData.backlog, newTask],
+    // };
   });
   isEditingTask.value = newTask;
 };
+
 const handleAddStory = (id: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
@@ -256,11 +242,6 @@ const handleAddStory = (id: number) => {
 
 const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
-};
-
-const getHigherIndex = () => {
-  const tasks = sprintsValue.value.backlog;
-  return tasks[tasks.length - 1]?.position + 1 || 0;
 };
 
 const handleCreateTask = async () => {
@@ -499,7 +480,7 @@ const formattedDate = (strDate: string) => {
               <span class="text-gray-600 text-body-1">
                 {{ formattedDate(sprint.start_at) }} - {{ formattedDate(sprint.end_at) }}
               </span>
-              <alex-custom-chip size="small" status="secondary" :text="`${filteredTasks.length}`" />
+              <alex-custom-chip size="small" status="secondary" :text="`${sprint.tasks.length}`" />
               <!-- TODO: Habilitar os botões depois de adaptar as funções para funcionar dentro de sprints -->
               <!-- <div class="ml-auto d-flex ga-2">
                 <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints()" />
@@ -508,7 +489,7 @@ const formattedDate = (strDate: string) => {
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <Transition mode="out-in" :name="getSlideTransition()">
-                <div v-if="!sprintsValue.backlog.length && backlogIndex">
+                <div v-if="!sprint.tasks.length">
                   <alex-learningplan-task-empty-state
                     key="empty-state"
                     type="backlog"
