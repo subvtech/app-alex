@@ -180,44 +180,31 @@ onUnmounted(() => {
   <div ref="timelineRef"></div>
 </template>
 
-<style>
+<style lang="scss">
 .vis-item {
   border-radius: 5px;
   font-size: 12px;
 }
 
-.vis-item.epic {
-  background-color: #f0f0f0;
-}
-
-.vis-item.story {
-  background-color: #e6f3ff;
-}
-
-.vis-item.task {
-  background-color: #ffe6e6;
-}
-
 .vis-item.sprint {
   background-color: #ffeb3b;
-  color: #000;
-  font-weight: bold;
+  font-weight: 600;
   text-align: center;
-}
-
-.vis-timeline {
-  border: 1px solid #bfbfbf;
-  font-family: Arial, sans-serif;
-  overflow: hidden; /* Prevent scrollbars */
 }
 
 .vis-panel.vis-center,
 .vis-panel.vis-left,
 .vis-panel.vis-right {
-  overflow: hidden; /* Prevent scrollbars in panels */
+  overflow: hidden;
 }
 
-.vis-labelset .vis-label {
-  white-space: nowrap; /* Prevent line breaks in labels */
+.vis-label {
+  background-color: #fff !important;
+  border-color: #bfbfbf !important;
+
+  &.vis-nested-group,
+  & .vis-inner {
+    padding-left: 16px !important;
+  }
 }
 </style>
