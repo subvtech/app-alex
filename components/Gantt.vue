@@ -1,16 +1,28 @@
-<script setup lang="ts">
+<script setup lang="tsx">
+import { DataSet } from 'vis-data/peer';
+import { Timeline, type TimelineGroup, type TimelineItem } from 'vis-timeline/peer';
 import { onMounted, onUnmounted, ref } from 'vue';
 
-type Item = {
+enum GroupType {
+  Sprint = 'sprint',
+}
+
+enum ItemType {
+  Epic = 'epic',
+  Story = 'story',
+  Task = 'task',
+}
+
+export type Item = {
   id: string;
-  type: 'epic' | 'story' | 'task';
+  type: ItemType;
   label: string;
   startDate: Date | string;
   endDate: Date | string;
   children?: Item[];
 };
 
-type Sprint = {
+export type Sprint = {
   id: string;
   label: string;
   startDate: Date | string;
@@ -24,32 +36,30 @@ const props = withDefaults(defineProps<{ items: Item[]; sprints: Sprint[] }>(), 
 
 const timelineRef = ref<HTMLElement | null>(null);
 
-let timeline: vis.Timeline | null = null;
+let timeline: Timeline | null = null;
 
-const isEpic = (item: Item) => item.type === 'epic';
-const isStory = (item: Item) => item.type === 'story';
-const toString = (date: Date | string) => (typeof date === 'string' ? date : date.toISOString());
+const isEpic = (item: Item) => item.type === ItemType.Epic;
+const isStory = (item: Item) => item.type === ItemType.Story;
+const toDateStr = (date: Date | string) => (typeof date === 'string' ? date : date.toISOString());
 
-const initGroups: vis.TimelineGroup[] = [{ id: 'sprints', content: 'Sprints' }];
+const initGroups: TimelineGroup[] = [{ id: GroupType.Sprint, content: 'Sprints' }];
 
-const initItems = computed<vis.TimelineItem[]>(() => {
+const initItems = computed<TimelineItem[]>(() => {
   return props.sprints.map((sprint) => ({
     id: sprint.id,
     type: 'range',
-    group: 'sprints',
+    group: GroupType.Sprint,
     className: 'sprint',
     content: sprint.label,
-    start: toString(sprint.startDate),
-    end: toString(sprint.endDate),
+    title: sprint.label,
+    start: toDateStr(sprint.startDate),
+    end: toDateStr(sprint.endDate),
   }));
 });
 
-const [groups, items] = (function parseItems(
-  arr: Item[],
-  parentId?: string,
-): [vis.TimelineGroup[], vis.TimelineItem[]] {
-  const groups: vis.TimelineGroup[] = [];
-  const items: vis.TimelineItem[] = [];
+const [groups, items] = (function parseItems(arr: Item[], parentId?: string) {
+  const groups: TimelineGroup[] = [];
+  const items: TimelineItem[] = [];
 
   for (const item of arr) {
     const isGroup = isEpic(item) || isStory(item);
@@ -68,8 +78,9 @@ const [groups, items] = (function parseItems(
       group: isGroup ? item.id : parentId!,
       className: item.type,
       content: item.label,
-      start: toString(item.startDate),
-      end: toString(item.endDate),
+      title: item.label,
+      start: toDateStr(item.startDate),
+      end: toDateStr(item.endDate),
     });
 
     if (item.children?.length) {
@@ -91,7 +102,7 @@ const resize = () => {
   }
 };
 
-const getMinMaxDates = (items: vis.TimelineItem[]) => {
+const getMinMaxDates = (items: TimelineItem[]) => {
   const dates = items.flatMap((item) => {
     const start = item.start ? new Date(item.start).getTime() : null;
     const end = item.end ? new Date(item.end).getTime() : null;
@@ -109,46 +120,32 @@ const { minDate, maxDate } = getMinMaxDates([...initItems.value, ...items]);
 const initialize = () => {
   if (!timelineRef.value) return;
 
-  timeline = new vis.Timeline(
+  timeline = new Timeline(
     timelineRef.value,
-    new vis.DataSet([...initItems.value, ...items]),
-    new vis.DataSet([...initGroups, ...groups]),
+    new DataSet([...initItems.value, ...items] as never),
+    new DataSet([...initGroups, ...groups]),
     {
-      stack: true,
-      start: minDate,
-      end: maxDate,
-      groupHeightMode: 'fixed',
-      editable: {
-        add: false, // don't allow adding new items
-        updateTime: false, // don't allow changing item duration
-        updateGroup: false, // don't allow changing item's group
-        remove: false, // don't allow removing items
-        overrideItems: false,
-      },
-      margin: {
-        item: 10,
-        axis: 5,
-      },
-      orientation: 'top',
-      format: {
-        minorLabels: {
-          day: 'D',
-          month: 'MMM',
-        },
-        majorLabels: {
-          day: 'MMMM YYYY',
-          month: 'YYYY',
-        },
-      },
-      height: '100%',
       autoResize: false,
-      verticalScroll: true,
+      end: maxDate,
+      start: minDate,
+      groupHeightMode: 'fixed',
       horizontalScroll: true,
-      zoomKey: 'ctrlKey',
-      moveable: true,
-      zoomable: true,
-      maxHeight: 600,
+      // margin: { axis: 5, item: 10 },
+      maxHeight: 500,
       minHeight: 300,
+      moveable: true,
+      orientation: 'top',
+      stack: true,
+      verticalScroll: true,
+      zoomable: true,
+      zoomKey: 'ctrlKey',
+      editable: {
+        add: false,
+        overrideItems: false,
+        remove: false,
+        updateGroup: false,
+        updateTime: false,
+      },
     },
   );
 
@@ -181,15 +178,21 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss">
+@import 'vis-timeline/styles/vis-timeline-graph2d.css';
+
+// .vis-label:first-child,
+// .vis-group:first-child {
+//   @apply tw-h-[40px] #{!important};
+// }
+
 .vis-item {
+  @apply tw-border-slate-300;
   border-radius: 5px;
   font-size: 12px;
 }
 
 .vis-item.sprint {
-  background-color: #ffeb3b;
-  font-weight: 600;
-  text-align: center;
+  @apply tw-bg-yellow-300 tw-font-semibold #{!important};
 }
 
 .vis-panel.vis-center,
@@ -198,13 +201,27 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
+.vis-group,
 .vis-label {
-  background-color: #fff !important;
-  border-color: #bfbfbf !important;
+  @apply tw-border-slate-300 #{!important};
+}
 
-  &.vis-nested-group,
-  & .vis-inner {
-    padding-left: 16px !important;
-  }
+.vis-group-level-0,
+.vis-nested-group {
+  @apply tw-border-none;
+}
+
+.vis-nested-group,
+.vis-inner {
+  @apply tw-pl-4 #{!important};
+}
+
+.vis-item-overflow {
+  @apply tw-flex;
+}
+
+.vis-item-content-sprint,
+.vis-item-content {
+  @apply tw-truncate tw-whitespace-nowrap tw-overflow-hidden tw-w-full;
 }
 </style>

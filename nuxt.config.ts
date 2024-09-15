@@ -18,10 +18,6 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   app: {
-    head: {
-      link: [{ rel: 'stylesheet', href: 'https://visjs.github.io/vis-timeline/styles/vis-timeline-graph2d.min.css' }],
-      script: [{ src: 'https://visjs.github.io/vis-timeline/standalone/umd/vis-timeline-graph2d.min.js' }],
-    },
     pageTransition: {
       name: 'page',
       mode: 'out-in',

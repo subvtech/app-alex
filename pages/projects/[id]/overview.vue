@@ -1,23 +1,7 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart } from '@/components/ui/chart-bar';
-
-type GanttResponse = {
-  items: {
-    id: string;
-    type: string;
-    label: string;
-    startDate: Date;
-    endDate: Date;
-    children: GanttResponse[];
-  }[];
-  sprints: {
-    id: string;
-    label: string;
-    startDate: Date;
-    endDate: Date;
-  }[];
-};
+import { Item as GanttItem, Sprint as GanttSprint } from '~/components/Gantt.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -29,8 +13,8 @@ const data = ref([]);
 const learningPlan = ref<LearningPlan>();
 const institutions = ref<Institution[]>([]);
 
-const itemsGantt = ref<GanttResponse['items']>([]);
-const sprintsGantt = ref<GanttResponse['sprints']>([]);
+const itemsGantt = ref<GanttItem[]>([]);
+const sprintsGantt = ref<GanttSprint[]>([]);
 const loadingGantt = ref(true);
 
 const totalizers = ref({
@@ -60,8 +44,8 @@ const totalizers = ref({
   },
 });
 
-const daysOfWeek = ['Seg', 'Ter', 'Quar', 'Quin', 'Sex', 'Sab', 'Dom'];
 const today = new Date();
+const daysOfWeek = ['Seg', 'Ter', 'Quar', 'Quin', 'Sex', 'Sab', 'Dom'];
 const firstDayOfWeek = today.getDate() - today.getDay() + 1;
 
 const currentWeek = Array.from({ length: daysOfWeek.length }, (_v, i) => {
@@ -105,13 +89,17 @@ const fetchData = async () => {
 const fetchGanttData = async () => {
   try {
     loadingGantt.value = true;
-    const res = await strapi<GanttResponse>('/projects/gantt');
+    const res = await strapi<{ items: GanttItem[]; sprints: GanttSprint[] }>('/projects/gantt');
     itemsGantt.value = res.items;
     sprintsGantt.value = res.sprints;
   } catch (_) {
   } finally {
     loadingGantt.value = false;
   }
+};
+
+const formatCurrency = (tick: number | Date): string => {
+  return typeof tick === 'number' ? `$ ${new Intl.NumberFormat('us').format(tick)}` : '';
 };
 
 onBeforeMount(async () => {
@@ -149,13 +137,13 @@ onBeforeMount(async () => {
       </Card>
     </div>
     <div class="tw-flex tw-space-x-4 tw-mb-5">
-      <alex-custom-card title="Linha temporal" class="!tw-w-2/3">
+      <alex-custom-card no-footer title="Linha temporal" class="!tw-w-2/3" content-class-name="tw-flex-1">
         <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
+          <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full">
             <div v-if="loadingGantt" class="tw-flex tw-justify-center tw-items-center tw-w-full">
               <v-progress-circular indeterminate />
             </div>
-            <Gantt v-else-if="itemsGantt.length" class="tw-w-full" :items="itemsGantt" :sprints="sprintsGantt" />
+            <Gantt v-else-if="itemsGantt.length" class="tw-flex-1" :items="itemsGantt" :sprints="sprintsGantt" />
             <alex-custom-empty-placeholder v-else />
           </div>
         </template>
@@ -167,14 +155,10 @@ onBeforeMount(async () => {
               class="!tw-w-full"
               index="name"
               :data="data"
-              :categories="['total', 'predicted']"
-              :colors="['#B9BFC6', '#F1F1F1']"
-              :y-formatter="
-                (tick, i) => {
-                  return typeof tick === 'number' ? `$ ${new Intl.NumberFormat('us').format(tick).toString()}` : '';
-                }
-              "
               :type="'stacked'"
+              :colors="['#B9BFC6', '#F1F1F1']"
+              :categories="['total', 'predicted']"
+              :y-formatter="formatCurrency"
             />
             <span>{{ $t('pages.projects.overview.empty_task_progress') }}</span>
             <span class="tw-text-sm tw-text-gray-500">

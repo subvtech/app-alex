@@ -2,11 +2,7 @@
   <div
     id="Card"
     class="d-flex flex-column rounded-lg bg-white"
-    :class="[
-      fullWidth ? 'w-100' : '',
-      isNested ? '' : 'float',
-      outline ? 'outline' : '',
-    ]"
+    :class="[fullWidth ? 'w-100' : '', isNested ? '' : 'float', outline ? 'outline' : '']"
   >
     <alex-custom-card-header
       v-if="!noHeader"
@@ -30,15 +26,11 @@
 
     <div
       class="d-flex flex-column w-100"
-      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent]"
+      :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent, contentClassName]"
     >
       <slot name="content" />
     </div>
-    <v-divider
-      v-if="showFooterDivider && !noFooter"
-      class="w-100"
-      :thickness="1"
-    />
+    <v-divider v-if="showFooterDivider && !noFooter" class="w-100" :thickness="1" />
     <div
       v-if="!noFooter"
       class="d-flex flex-column w-100"
@@ -53,33 +45,35 @@
 import { CardHeaderProps } from './Header.vue';
 
 export interface CardComponentType extends CardHeaderProps {
+  alignContent?: 'align-center' | 'align-start' | 'align-end';
+  contentClassName?: string;
   fullWidth?: boolean;
-  noHeader?: boolean;
   noFooter?: boolean;
+  noHeader?: boolean;
   outline?: boolean;
   showFooterDivider?: boolean;
-  alignContent?: 'align-center' | 'align-start' | 'align-end';
 }
 
 withDefaults(defineProps<CardComponentType>(), {
   alignContent: 'align-start',
-  noIcon: false,
-  hideDividers: false,
-  noFooter: false,
-  fullWidth: false,
-  isNested: false,
-  disableSave: false,
-  smallButtons: false,
-  isEditing: false,
-  noHeader: false,
-  outline: false,
-  showTooltip: false,
-  showFooterDivider: false,
+  contentClassName: '',
   controlsLoading: false,
+  disableSave: false,
+  fullWidth: false,
+  hideDividers: false,
   href: undefined,
-  tooltipExtraClass: undefined,
+  isEditing: false,
+  isNested: false,
+  noFooter: false,
+  noHeader: false,
+  noIcon: false,
+  outline: false,
+  showFooterDivider: false,
+  showTooltip: false,
   sizingClass: undefined,
+  smallButtons: false,
   tooltip: undefined,
+  tooltipExtraClass: undefined,
 });
 
 const emit = defineEmits(['toggle:isEditing', 'click:save', 'click:cancel']);
