@@ -4,24 +4,24 @@
       <CardTotalizer v-for="totalizer in Object.values(totalizers)" :key="totalizer.title" :totalizer="totalizer" />
     </div>
 
-    <div class="tw-flex tw-space-x-4 tw-mb-5 tw-flex-wrap">
-      <alex-learningplan-charts-gantt
-        class="!tw-w-2/3"
+    <div class="tw-grid tw-grid-cols-12 tw-gap-4">
+      <overview-task-gantt
+        class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8"
         :precision="precision"
         start-date="2024-07-11 12:00"
         end-date="2024-11-30 12:00"
         :sprints="sprints"
       />
-      <alex-learningplan-charts-task-progress
-        class="!tw-w-1/3"
+      <overview-task-progress
+        class="tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
         :categories="'total'"
         last-update="2024-07-11 12:00"
         :data="taskProgress"
       />
-    </div>
+      <!-- </div>
 
-    <div class="tw-flex tw-space-x-4">
-      <alex-custom-card title="Encontros" full-width class="flex-1">
+    <div class="tw-flex tw-space-x-4"> -->
+      <alex-custom-card title="Encontros" full-width class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <div class="tw-flex tw-gap-1">
@@ -41,7 +41,7 @@
           </div>
         </template>
       </alex-custom-card>
-      <div class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4">
+      <div class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
         <div class="tw-border-b tw-p-5 tw-flex tw-justify-between tw-items-center">
           <h3>{{ $t('pages.projects.overview.institutions') }}</h3>
           <alex-project-dialogs-institution :institutions="institutions" />
@@ -64,7 +64,7 @@
           />
         </div>
       </div>
-      <alex-custom-card title="Eventos" full-width class="flex-1">
+      <alex-custom-card title="Eventos" full-width class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <alex-custom-empty-placeholder
@@ -79,8 +79,11 @@
 </template>
 
 <script setup lang="ts">
-import { PrecisionGantt, Sprint } from '~/components/alex/learningplan/charts/Gantt.vue';
+import { Strapi4ResponseData } from '@nuxtjs/strapi/dist/runtime/types';
+// import { PrecisionGantt, Sprint } from '~/components/alex/learningplan/charts/Gantt.vue';
 import CardTotalizer from './-components/CardTotalizer.vue';
+import OverviewTaskGantt, { PrecisionGantt, Sprint } from './-components/overview/gantt.vue';
+import OverviewTaskProgress from './-components/overview/taskProgress.vue';
 
 export interface Data {
   sprints: Sprint[];

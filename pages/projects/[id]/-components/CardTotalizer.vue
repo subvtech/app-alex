@@ -29,7 +29,7 @@
 <script setup lang="ts">
 interface TotalizerType {
   title: string;
-  value: string;
+  value: string | number;
   percentage: number;
   icon: string;
   color?: string;
