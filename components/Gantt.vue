@@ -130,7 +130,6 @@ const initialize = () => {
       start: minDate,
       groupHeightMode: 'fixed',
       horizontalScroll: true,
-      // margin: { axis: 5, item: 10 },
       maxHeight: 500,
       minHeight: 300,
       moveable: true,
@@ -180,10 +179,10 @@ onUnmounted(() => {
 <style lang="scss">
 @import 'vis-timeline/styles/vis-timeline-graph2d.css';
 
-// .vis-label:first-child,
-// .vis-group:first-child {
-//   @apply tw-h-[40px] #{!important};
-// }
+.vis-label:first-child,
+.vis-group:first-child {
+  @apply tw-h-[40px] #{!important};
+}
 
 .vis-item {
   @apply tw-border-slate-300;
@@ -192,7 +191,7 @@ onUnmounted(() => {
 }
 
 .vis-item.sprint {
-  @apply tw-bg-yellow-300 tw-font-semibold #{!important};
+  @apply tw-bg-yellow-300 tw-font-semibold tw-top-[5px] #{!important};
 }
 
 .vis-panel.vis-center,
