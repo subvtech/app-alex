@@ -2,13 +2,36 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart } from '@/components/ui/chart-bar';
 
+type GanttResponse = {
+  items: {
+    id: string;
+    type: string;
+    label: string;
+    startDate: Date;
+    endDate: Date;
+    children: GanttResponse[];
+  }[];
+  sprints: {
+    id: string;
+    label: string;
+    startDate: Date;
+    endDate: Date;
+  }[];
+};
+
 const { t } = useI18n();
-const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
+const strapi = useStrapiClient();
+const learningPlanStore = useLearningPlanStore();
 const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
+
+const data = ref([]);
 const learningPlan = ref<LearningPlan>();
 const institutions = ref<Institution[]>([]);
-const data = ref([]);
+
+const itemsGantt = ref<GanttResponse['items']>([]);
+const sprintsGantt = ref<GanttResponse['sprints']>([]);
+const loadingGantt = ref(true);
 
 const totalizers = ref({
   sprints: {
@@ -79,8 +102,21 @@ const fetchData = async () => {
   totalizers.value.remainingTime.percentage = percentageComplete.value;
 };
 
+const fetchGanttData = async () => {
+  try {
+    loadingGantt.value = true;
+    const res = await strapi<GanttResponse>('/projects/gantt');
+    itemsGantt.value = res.items;
+    sprintsGantt.value = res.sprints;
+  } catch (_) {
+  } finally {
+    loadingGantt.value = false;
+  }
+};
+
 onBeforeMount(async () => {
   await fetchData();
+  await fetchGanttData();
 });
 </script>
 
@@ -112,12 +148,15 @@ onBeforeMount(async () => {
         </CardContent>
       </Card>
     </div>
-
     <div class="tw-flex tw-space-x-4 tw-mb-5">
       <alex-custom-card title="Linha temporal" class="!tw-w-2/3">
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
-            <alex-custom-empty-placeholder />
+            <div v-if="loadingGantt" class="tw-flex tw-justify-center tw-items-center tw-w-full">
+              <v-progress-circular indeterminate />
+            </div>
+            <Gantt v-else-if="itemsGantt.length" class="tw-w-full" :items="itemsGantt" :sprints="sprintsGantt" />
+            <alex-custom-empty-placeholder v-else />
           </div>
         </template>
       </alex-custom-card>
@@ -146,7 +185,6 @@ onBeforeMount(async () => {
         </template>
       </alex-custom-card>
     </div>
-
     <div class="tw-flex tw-space-x-4">
       <alex-custom-card title="Encontros" full-width class="flex-1">
         <template #content>
