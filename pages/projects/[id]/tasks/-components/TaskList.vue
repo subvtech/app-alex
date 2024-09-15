@@ -45,6 +45,7 @@ const sprints = ref<Droppable<Sprint>[]>([]);
 // refs
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
+const createTaskSprintId = ref<number>();
 const editTask = ref<SprintTask | null>(null);
 const isEditingTask = ref<null | TaskSimple>(null);
 const backlogIndex = 1;
@@ -206,6 +207,9 @@ const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
     // };
   });
   isEditingTask.value = newTask;
+  if (sprintId) {
+    createTaskSprintId.value = sprintId;
+  }
 };
 
 const handleAddStory = (id: number) => {
@@ -245,17 +249,22 @@ const getSlideTransition = () => {
 };
 
 const handleCreateTask = async () => {
+  console.log('entrou');
   if (taskTitle.value && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
     const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
+    console.log('entrou2');
+    console.log(createTaskSprintId.value);
     await createTask({
       title: taskTitle.value,
       learningPlanId,
       position: higherIndex,
       organization: 'standard',
+      sprint: createTaskSprintId.value,
     });
   }
   taskTitle.value = '';
+  createTaskSprintId.value = undefined;
   isCreatingTask.value = false;
 };
 
@@ -302,13 +311,14 @@ const handleDeleteTask = async (id: number) => {
   }
 };
 
-const createItem = async (task: SprintTask & { epic?: number; story?: number }) => {
+const createItem = async (task: SprintTask & { epic?: number; story?: number; sprint?: number }) => {
   await createTask({
     title: task.title,
     learningPlanId: learninplanId.value,
     organization: task.organization || 'standard',
     position: task.position,
     parentTask: task.story ? task.story : task.epic,
+    sprint: task.sprint,
   });
   await refetchSprints();
 };
