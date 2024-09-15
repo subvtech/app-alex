@@ -215,6 +215,10 @@ onUnmounted(() => {
   @apply tw-pl-4 #{!important};
 }
 
+.vis-inner {
+  @apply tw-max-w-[250px] tw-text-sm #{!important};
+}
+
 .vis-item-overflow {
   @apply tw-flex;
 }
