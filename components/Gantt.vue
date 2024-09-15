@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import { DataSet } from 'vis-data/peer';
-import { Timeline, type TimelineGroup, type TimelineItem } from 'vis-timeline/peer';
+import { Timeline, type TimelineTimeAxisScaleType, type TimelineGroup, type TimelineItem } from 'vis-timeline/peer';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 enum GroupType {
@@ -11,6 +11,12 @@ enum ItemType {
   Epic = 'epic',
   Story = 'story',
   Task = 'task',
+}
+
+enum ViewType {
+  Day = 'day',
+  Week = 'week',
+  Month = 'month',
 }
 
 export type Item = {
@@ -35,6 +41,7 @@ const props = withDefaults(defineProps<{ items: Item[]; sprints: Sprint[] }>(), 
 });
 
 const timelineRef = ref<HTMLElement | null>(null);
+const currentView = ref(ViewType.Month);
 
 let timeline: Timeline | null = null;
 
@@ -117,6 +124,62 @@ const getMinMaxDates = (items: TimelineItem[]) => {
 
 const { minDate, maxDate } = getMinMaxDates([...initItems.value, ...items]);
 
+const changeView = (view: ViewType) => {
+  if (!timeline) return;
+
+  currentView.value = view;
+
+  let zoomMin: number;
+  let zoomMax: number;
+  let timeAxis: { scale: TimelineTimeAxisScaleType; step: number };
+
+  switch (view) {
+    case 'day':
+      zoomMin = 24 * 60 * 60 * 1000; // 1 day
+      zoomMax = 7 * 24 * 60 * 60 * 1000; // 7 days
+      timeAxis = { scale: 'day', step: 1 };
+      break;
+    case 'week':
+      zoomMin = 7 * 24 * 60 * 60 * 1000; // 1 week
+      zoomMax = 4 * 7 * 24 * 60 * 60 * 1000; // 4 weeks
+      timeAxis = { scale: 'week', step: 1 };
+      break;
+    case 'month':
+      zoomMin = 30 * 24 * 60 * 60 * 1000; // ~1 month
+      zoomMax = 4 * 30 * 24 * 60 * 60 * 1000; // ~4 months
+      timeAxis = { scale: 'month', step: 1 };
+      break;
+    default:
+      throw new Error(`Invalid view type: ${view}`);
+  }
+
+  const currentRange = timeline.getWindow();
+  const centerDate = new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2);
+
+  timeline.setOptions({ zoomMin, zoomMax, timeAxis });
+
+  let range: number;
+
+  switch (view) {
+    case 'day':
+      range = 7 * 24 * 60 * 60 * 1000; // 1 week
+      break;
+    case 'week':
+      range = 30 * 24 * 60 * 60 * 1000; // ~1 month
+      break;
+    case 'month':
+      range = 3 * 30 * 24 * 60 * 60 * 1000; // ~3 months (quarter)
+      break;
+    default:
+      throw new Error(`Invalid view type: ${view}`);
+  }
+
+  const start = new Date(centerDate.getTime() - range / 2);
+  const end = new Date(centerDate.getTime() + range / 2);
+
+  timeline.setWindow(start, end, { animation: true });
+};
+
 const initialize = () => {
   if (!timelineRef.value) return;
 
@@ -145,8 +208,28 @@ const initialize = () => {
         updateGroup: false,
         updateTime: false,
       },
+      zoomMin: 30 * 24 * 60 * 60 * 1000, // ~1 month (default view)
+      zoomMax: 4 * 30 * 24 * 60 * 60 * 1000, // ~4 months (default view)
+      timeAxis: {
+        scale: 'month',
+        step: 1,
+      },
+      format: {
+        minorLabels: {
+          day: 'D',
+          week: 'W',
+          month: 'MMM',
+        },
+        majorLabels: {
+          day: 'MMMM YYYY',
+          week: 'MMMM YYYY',
+          month: 'YYYY',
+        },
+      },
     },
   );
+
+  changeView(ViewType.Month);
 
   timeline.on('remove', (event) => {
     event.preventDefault();
@@ -173,7 +256,22 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="timelineRef"></div>
+  <div>
+    <div class="tw-mb-4 tw-flex tw-gap-2">
+      <button
+        v-for="view in ['day', 'week', 'month']"
+        :key="view"
+        :class="[
+          'tw-px-4 tw-py-2 tw-rounded',
+          currentView === view ? 'tw-bg-blue-500 tw-text-white' : 'tw-bg-gray-200',
+        ]"
+        @click="changeView(view as ViewType)"
+      >
+        {{ view.charAt(0).toUpperCase() + view.slice(1) }}
+      </button>
+    </div>
+    <div ref="timelineRef"></div>
+  </div>
 </template>
 
 <style lang="scss">
