@@ -34,12 +34,13 @@
     "empty_members": "No members found",
     "empty_task_progress": "%{percentage}% of tasks have been completed",
     "intitutions": "Institutions",
-    "last_update": "Last update",
+    "last_update": "Last update:",
     "remaining_time": "Remaining time",
     "task_progress": "Task progress",
     "total_epics": "Total epics",
     "total_sprints": "Total sprints",
-    "total_story": "Total stories"
+    "total_story": "Total stories",
+    "total_tasks": "Total tasks"
   },
   "tasks": {
     "add_epic": "Add epic",

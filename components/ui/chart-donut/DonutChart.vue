@@ -1,26 +1,17 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { VisDonut, VisSingleContainer } from '@unovis/vue';
-import { Donut } from '@unovis/ts';
-import { type Component, computed, ref } from 'vue';
-import { useMounted } from '@vueuse/core';
 import { ChartSingleTooltip, defaultColors } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
+import { Donut } from '@unovis/ts';
+import { VisDonut, VisSingleContainer } from '@unovis/vue';
+import { useMounted } from '@vueuse/core';
+import { type Component, computed, ref } from 'vue';
 import type { BaseChartProps } from '.';
 
 type KeyOfT = Extract<keyof T, string>;
 
 const props = withDefaults(
   defineProps<
-    Pick<
-      BaseChartProps<T>,
-      | 'data'
-      | 'colors'
-      | 'index'
-      | 'margin'
-      | 'showLegend'
-      | 'showTooltip'
-      | 'filterOpacity'
-    > & {
+    Pick<BaseChartProps<T>, 'data' | 'colors' | 'index' | 'margin' | 'showLegend' | 'showTooltip' | 'filterOpacity'> & {
       /**
        * Sets the name of the key containing the quantitative chart values.
        */
@@ -39,6 +30,10 @@ const props = withDefaults(
        */
       valueFormatter?: (tick: number, i?: number, ticks?: number[]) => string;
       /**
+       * The text displayed in the sub label.
+       */
+      subLabel?: string;
+      /**
        * Render custom tooltip component.
        */
       customTooltip?: Component;
@@ -52,6 +47,7 @@ const props = withDefaults(
     filterOpacity: 0.2,
     showTooltip: true,
     showLegend: true,
+    subLabel: '',
   },
 );
 
@@ -65,9 +61,7 @@ const activeSegmentKey = ref<string>();
 const colors = computed(() =>
   props.colors?.length
     ? props.colors
-    : defaultColors(
-        props.data.filter((d) => d[props.category]).filter(Boolean).length,
-      ),
+    : defaultColors(props.data.filter((d) => d[props.category]).filter(Boolean).length),
 );
 const legendItems = computed(() =>
   props.data.map((item, i) => ({
@@ -86,18 +80,10 @@ const totalValue = computed(() =>
 
 <template>
   <div
-    :class="
-      cn(
-        'tw-w-full tw-h-48 tw-flex tw-flex-col tw-items-end',
-        $attrs.class ?? '',
-      )
-    "
+    class="tw-max-w-[200px] tw-max-h-[200px]"
+    :class="cn('tw-w-full tw-h-48 tw-flex tw-flex-col tw-items-end', $attrs.class ?? '')"
   >
-    <VisSingleContainer
-      :style="{ height: isMounted ? '100%' : 'auto' }"
-      :margin="{ left: 20, right: 20 }"
-      :data="data"
-    >
+    <VisSingleContainer :style="{ height: isMounted ? '100%' : 'auto' }" :margin="{ left: 20, right: 20 }" :data="data">
       <ChartSingleTooltip
         :selector="Donut.selectors.segment"
         :index="category"
@@ -111,24 +97,18 @@ const totalValue = computed(() =>
         :sort-function="sortFunction"
         :color="colors"
         :arc-width="type === 'donut' ? 20 : 0"
-        :show-background="false"
+        :show-background="true"
         :central-label="type === 'donut' ? valueFormatter(totalValue) : ''"
+        :central-sub-label="subLabel"
         :events="{
           [Donut.selectors.segment]: {
-            click: (
-              d: Data,
-              ev: PointerEvent,
-              i: number,
-              elements: HTMLElement[],
-            ) => {
+            click: (d: Data, ev: PointerEvent, i: number, elements: HTMLElement[]) => {
               if (d?.data?.[index] === activeSegmentKey) {
                 activeSegmentKey = undefined;
                 elements.forEach((el) => (el.style.opacity = '1'));
               } else {
                 activeSegmentKey = d?.data?.[index];
-                elements.forEach(
-                  (el) => (el.style.opacity = `${filterOpacity}`),
-                );
+                elements.forEach((el) => (el.style.opacity = `${filterOpacity}`));
                 elements[i].style.opacity = '1';
               }
             },
@@ -140,3 +120,27 @@ const totalValue = computed(() =>
     </VisSingleContainer>
   </div>
 </template>
+
+<style>
+.css-xwzpmf-central-label {
+  fill: rgb(var(--v-theme-gray-800)) !important;
+  /* Header/H4 */
+  font-family: Sen !important;
+  font-size: 20px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: normal !important;
+  letter-spacing: 0.2px !important;
+}
+
+.css-45cw5m-central-label {
+  fill: rgb(var(--v-theme-gray-800)) !important;
+  /* Body/P6 */
+  font-family: Sen !important;
+  font-size: 12px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  line-height: 135% !important; /* 16.2px */
+  letter-spacing: 0.24px !important;
+}
+</style>
