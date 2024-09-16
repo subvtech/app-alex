@@ -1,5 +1,5 @@
 export const useTimeout = (milliseconds: number = 1000) => {
-  const timeSpan = milliseconds < 0 ? 0 : milliseconds;
+  const timeSpan = ref(milliseconds < 0 ? 0 : milliseconds);
 
   const remainingTime = ref(0);
   const timeEllapsed = ref(0);
@@ -15,12 +15,16 @@ export const useTimeout = (milliseconds: number = 1000) => {
     timeRunning.value = false;
 
     timeEllapsed.value = 0;
-    remainingTime.value = resetTime ? timeSpan : 0;
+    remainingTime.value = resetTime ? timeSpan.value : 0;
   };
 
   const setTimeRunning = (value: boolean) => {
     timeRunning.value = value;
-    if (value) remainingTime.value = timeSpan;
+    if (value) remainingTime.value = timeSpan.value;
+  };
+
+  const setTimeSpan = (value: number) => {
+    timeSpan.value = value;
   };
 
   watch(
@@ -45,6 +49,7 @@ export const useTimeout = (milliseconds: number = 1000) => {
     timeEllapsed,
     stopTimeout,
     setTimeRunning,
+    setTimeSpan,
     theresTime,
     timeRunning,
   };

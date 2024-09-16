@@ -104,7 +104,6 @@ const handleUpdateLink = async () => {
     props.courseId,
     props.classId,
   );
-  console.log({ result: result.data.attributes, courseId: props.courseId });
   const newLink = generateUrl(result.data.attributes.hash, props.courseId);
 
   urlRef.value = newLink;
@@ -125,7 +124,6 @@ const theresTimeAndUrl = computed(
 );
 
 const resetTimeout = () => {
-  console.log('reset timeout');
   if (inviteLinkExpiresAtRef.value) {
     setTimeSpan(calcRemainingTime(inviteLinkExpiresAtRef.value));
   } else setTimeSpan(props.duration * 1000);
@@ -135,7 +133,6 @@ const resetTimeout = () => {
 };
 
 onBeforeMount(() => {
-  console.log('onBeforeMount', props);
   if (props.url) resetTimeout();
 });
 

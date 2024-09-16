@@ -159,8 +159,6 @@ const inviteMembers = () => {
 const updateLink = (data) => {
   const { url, expiresAt } = data;
 
-  console.log('updateLink', data);
-
   plainLink.value = url;
   inviteLinkExpiresAtRef.value = expiresAt;
 };
@@ -172,10 +170,6 @@ watch([inviteLinkHash], () => {
 });
 
 watch([inviteLinkExpiresAt], () => {
-  console.log({
-    inviteLinkExpiresAt: inviteLinkExpiresAt.value,
-    inviteLinkExpiresAtRef: inviteLinkExpiresAtRef.value,
-  });
   inviteLinkExpiresAtRef.value = inviteLinkExpiresAt.value;
 });
 </script>

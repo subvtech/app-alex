@@ -28,20 +28,6 @@
         @filter="filterMembers"
       />
     </template>
-    <template #footer>
-      <pre>{{
-        {
-          selectedFilters,
-          invitationLink: learningPlanStore.invitationLink,
-          invitationDuration:
-            learningPlanStore.learningPlan?.invitation_duration,
-          members: learningPlanStore.activeMembers.map(
-            (member) => member.email,
-          ),
-          activeMembers: activeMembers.map((member) => member.email),
-        }
-      }}</pre>
-    </template>
   </alex-custom-card>
 </template>
 <script setup lang="ts">
@@ -61,7 +47,7 @@ const activeMembers = ref<LearningPlanMemberSimple[]>([]);
 
 // Watch for changes in the store's activeMembers
 watch(
-  () => learningPlanStore.activeMembers,
+  () => learningPlanStore.activeProjectMembers,
   (newActiveMembers) => {
     activeMembers.value = newActiveMembers;
   },
@@ -93,7 +79,7 @@ const filterMembers = (values) => {
   const isThereStatus = !!values['1'];
   if (isThereRole) selectedFilters.value.push(values['0']);
   if (isThereStatus) selectedFilters.value.push(values['1']);
-  activeMembers.value = learningPlanStore.activeMembers.filter(
+  activeMembers.value = learningPlanStore.activeProjectMembers.filter(
     (member) =>
       (!isThereRole || member.role === values['0']) &&
       (!isThereStatus || member.status === values['1']),
@@ -117,16 +103,16 @@ const removeFilter = (key: string) => {
   );
 
   if (selectedFilters.value.length === 0) {
-    activeMembers.value = learningPlanStore.activeMembers;
+    activeMembers.value = learningPlanStore.activeProjectMembers;
     return;
   }
   selectedFilters.value.forEach((filter) => {
     if (isEnumValue(MemberStatus, filter))
-      activeMembers.value = learningPlanStore.activeMembers.filter(
+      activeMembers.value = learningPlanStore.activeProjectMembers.filter(
         (member) => member.status === filter,
       );
     else if (isEnumValue(MemberRoles, filter))
-      activeMembers.value = learningPlanStore.activeMembers.filter(
+      activeMembers.value = learningPlanStore.activeProjectMembers.filter(
         (member) => member.role === filter,
       );
   });
@@ -147,13 +133,15 @@ const updateSearch = (value: string) => {
       isEnumValue(MemberStatus, filter),
     ) !== -1;
   const lowercaseValue = value.toLowerCase();
-  activeMembers.value = learningPlanStore.activeMembers.filter((member) => {
-    return (
-      (!isThereRole || member.role === selectedFilters.value[0]) &&
-      (!isThereStatus || member.status === selectedFilters.value[1]) &&
-      (member.email.toLowerCase().includes(lowercaseValue) ||
-        member.user.fullname.toLowerCase().includes(lowercaseValue))
-    );
-  });
+  activeMembers.value = learningPlanStore.activeProjectMembers.filter(
+    (member) => {
+      return (
+        (!isThereRole || member.role === selectedFilters.value[0]) &&
+        (!isThereStatus || member.status === selectedFilters.value[1]) &&
+        (member.email.toLowerCase().includes(lowercaseValue) ||
+          member.user.fullname.toLowerCase().includes(lowercaseValue))
+      );
+    },
+  );
 };
 </script>

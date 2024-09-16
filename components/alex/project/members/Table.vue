@@ -7,6 +7,7 @@
       :search-placeholder="
         $t('components.learningPlan.projects.searchPlaceholder')
       "
+      :hide-action="canEdit"
       use-mobile-breakpoint
       use-custom-dialog
       @click:filter="emit('toggle:drawer')"

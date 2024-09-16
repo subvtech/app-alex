@@ -246,7 +246,6 @@ const learningGoals = computed(
 const updateLink = (data) => {
   const { url, expiresAt } = data;
 
-  console.log('updateLink', data);
 
   plainLink.value = url;
   // inviteLinkExpiresAtRef.value = expiresAt;
