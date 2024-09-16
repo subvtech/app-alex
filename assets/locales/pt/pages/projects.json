@@ -36,6 +36,7 @@
     "timeline_day": "Dia",
     "timeline_week": "Semana",
     "timeline_month": "Mês",
+    "timeline_today": "Hoje",
     "timeline": "Linha temporal",
     "total_epics": "Total de épicos",
     "total_sprints": "Total de sprints",

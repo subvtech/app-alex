@@ -224,6 +224,13 @@ watch(
   },
   { immediate: true },
 );
+
+const setDragStart = (id: number, e: DragEvent) => {
+  // TODO: definir accepted groups
+  setTimeout(() => {
+    emit('startDrag', id, e);
+  }, 0);
+};
 </script>
 
 <template>
@@ -278,7 +285,15 @@ watch(
                 <template #default="{ item, level }">
                   <tr
                     v-if="isEditing?.id !== item.id"
+                    :key="item.id"
                     class="d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
+                    :class="[
+                      dragging && dragFrom == item.id ? 'dragging' : '',
+                      group === 'backlog' ? 'draggable-row' : '',
+                    ]"
+                    :draggable="group === 'backlog'"
+                    @dragstart="(e) => setDragStart(item.id, e)"
+                    @dragend="(e) => emit('dragEnd', item.id, e)"
                   >
                     <td
                       class="text-body-4 text-overflow text-left task-title"

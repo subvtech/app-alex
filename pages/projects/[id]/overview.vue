@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { GanttInstance, Item as GanttItem, Sprint as GanttSprint } from '@/components/Gantt.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart } from '@/components/ui/chart-bar';
-import { Item as GanttItem, Sprint as GanttSprint } from '~/components/Gantt.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -13,6 +13,7 @@ const data = ref([]);
 const learningPlan = ref<LearningPlan>();
 const institutions = ref<Institution[]>([]);
 
+const ganttRef = ref<GanttInstance | null>(null);
 const ganttItems = ref<GanttItem[]>([]);
 const ganttSprints = ref<GanttSprint[]>([]);
 const ganttLoading = ref(true);
@@ -90,8 +91,9 @@ const fetchData = async () => {
 const fetchGanttData = async () => {
   try {
     ganttLoading.value = true;
-    const res = await strapi<{ items: GanttItem[]; sprints: GanttSprint[] }>('/projects/gantt');
-    ganttItems.value = res.items;
+    const url = `/learningplans/${learningPlanId.value}/project-dashboard`;
+    const res = await strapi<{ tasks: GanttItem[]; sprints: GanttSprint[] }>(url);
+    ganttItems.value = res.tasks;
     ganttSprints.value = res.sprints;
   } catch (_) {
   } finally {
@@ -141,9 +143,14 @@ onBeforeMount(async () => {
       <alex-custom-card no-footer no-header title="Linha temporal" class="!tw-w-2/3" content-class-name="tw-flex-1">
         <template #header>
           <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-px-6 tw-py-4 tw-border-b">
-            <span class="tw-text-gray-600 tw-font-bold tw-text-xl tw-leading-8">
-              {{ $t('pages.projects.overview.timeline') }}
-            </span>
+            <div class="tw-flex tw-items-center tw-gap-4">
+              <span class="tw-text-gray-600 tw-font-bold tw-text-xl tw-leading-8">
+                {{ $t('pages.projects.overview.timeline') }}
+              </span>
+              <alex-custom-button size="small" @click="ganttRef?.changeToCurrentDate()">
+                {{ $t('pages.projects.overview.timeline_today') }}
+              </alex-custom-button>
+            </div>
             <div class="tw-flex tw-gap-1">
               <alex-custom-button
                 v-for="view in ['day', 'week', 'month']"
@@ -163,6 +170,7 @@ onBeforeMount(async () => {
             </div>
             <Gantt
               v-else-if="ganttItems.length"
+              ref="ganttRef"
               class="tw-flex-1"
               :max-height="475"
               :items="ganttItems"

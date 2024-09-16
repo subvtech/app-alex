@@ -1,7 +1,16 @@
 <script setup lang="tsx">
 import { DataSet } from 'vis-data/peer';
-import { Timeline, type TimelineTimeAxisScaleType, type TimelineGroup, type TimelineItem } from 'vis-timeline/peer';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import {
+  Timeline,
+  type TimelineItem,
+  type TimelineTimeAxisScaleType,
+  type TimelineGroup as VisTimelineGroup,
+} from 'vis-timeline/peer';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+
+interface TimelineGroup extends VisTimelineGroup {
+  treeLevel?: number;
+}
 
 enum GroupType {
   Sprint = 'sprint',
@@ -10,7 +19,7 @@ enum GroupType {
 enum ItemType {
   Epic = 'epic',
   Story = 'story',
-  Task = 'task',
+  Task = 'standard',
 }
 
 enum ViewType {
@@ -19,20 +28,25 @@ enum ViewType {
   Month = 'month',
 }
 
+export interface GanttInstance extends ComponentPublicInstance {
+  changeView(view: ViewType): void;
+  changeToCurrentDate(): void;
+}
+
 export type Item = {
   id: string;
-  type: ItemType;
-  label: string;
-  startDate: Date | string;
-  endDate: Date | string;
-  children?: Item[];
+  title: string;
+  organization: ItemType;
+  start_at: Date | string;
+  finish_at: Date | string;
+  tasks?: Item[];
 };
 
 export type Sprint = {
   id: string;
-  label: string;
-  startDate: Date | string;
-  endDate: Date | string;
+  title: string;
+  start_at: Date | string;
+  end_at: Date | string;
 };
 
 type Props = {
@@ -53,9 +67,7 @@ const timelineRef = ref<HTMLElement | null>(null);
 
 let timeline: Timeline | null = null;
 
-const isEpic = (item: Item) => item.type === ItemType.Epic;
-const isStory = (item: Item) => item.type === ItemType.Story;
-const toDateStr = (date: Date | string) => (typeof date === 'string' ? date : date.toISOString());
+const toDateStr = (date?: Date | string | null) => (typeof date === 'string' ? date : date?.toISOString() || '');
 
 const initGroups: TimelineGroup[] = [{ id: GroupType.Sprint, content: 'Sprints' }];
 
@@ -65,50 +77,54 @@ const initItems = computed<TimelineItem[]>(() => {
     type: 'range',
     group: GroupType.Sprint,
     className: 'sprint',
-    content: sprint.label,
-    title: sprint.label,
-    start: toDateStr(sprint.startDate),
-    end: toDateStr(sprint.endDate),
+    content: sprint.title,
+    title: sprint.title,
+    start: toDateStr(sprint.start_at),
+    end: toDateStr(sprint.end_at),
   }));
 });
 
-const [groups, items] = (function parseItems(arr: Item[], parentId?: string) {
-  const groups: TimelineGroup[] = [];
-  const items: TimelineItem[] = [];
+const dataSet = computed(() => {
+  function parse(arr: Item[], level = 0): [TimelineGroup[], TimelineItem[]] {
+    const groups: TimelineGroup[] = [];
+    const items: TimelineItem[] = [];
 
-  const getId = (item: Item) => `${item.type}-${item.id}`;
+    const getId = (item: Item) => `${item.organization}-${item.id}`;
 
-  for (const item of arr) {
-    const isGroup = isEpic(item) || isStory(item);
-    const itemId = getId(item);
+    for (const item of arr) {
+      const itemId = getId(item);
 
-    if (isGroup) {
-      const nestedGroups = isEpic(item) ? item.children?.filter(isStory).map(getId) : undefined;
-      groups.push({ id: itemId, content: item.label, nestedGroups });
-    } else if (!parentId) {
-      groups.push({ id: itemId, content: item.label });
+      groups.push({
+        id: itemId,
+        content: item.title,
+        className: item.organization,
+        nestedGroups: item.tasks?.length ? item.tasks.map(getId) : undefined,
+        treeLevel: level,
+      });
+
+      items.push({
+        id: itemId,
+        type: 'range',
+        group: itemId,
+        className: item.organization,
+        content: item.title,
+        title: item.title,
+        start: toDateStr(item.start_at),
+        end: toDateStr(item.finish_at),
+      });
+
+      if (item.tasks?.length) {
+        const [childGroups, childItems] = parse(item.tasks, level + 1);
+        groups.push(...childGroups);
+        items.push(...childItems);
+      }
     }
 
-    items.push({
-      id: itemId,
-      type: isGroup ? 'background' : undefined,
-      group: isGroup || !parentId ? itemId : parentId,
-      className: item.type,
-      content: item.label,
-      title: item.label,
-      start: toDateStr(item.startDate),
-      end: toDateStr(item.endDate),
-    });
-
-    if (item.children?.length) {
-      const [childGroups, childItems] = parseItems(item.children, itemId);
-      groups.push(...childGroups);
-      items.push(...childItems);
-    }
+    return [groups, items];
   }
 
-  return [groups, items];
-})(props.items);
+  return parse(props.items);
+});
 
 const resize = () => {
   if (timeline && timelineRef.value) {
@@ -132,74 +148,76 @@ const getMinMaxDates = (items: TimelineItem[]) => {
   };
 };
 
-const { minDate, maxDate } = getMinMaxDates([...initItems.value, ...items]);
+const { minDate, maxDate } = getMinMaxDates([...initItems.value, ...dataSet.value[1]]);
+
+const daysToMs = (days: number) => days * 24 * 60 * 60 * 1000;
+
+const getViewSettings = (view: ViewType) => {
+  switch (view) {
+    case ViewType.Day:
+      return {
+        zoomMin: daysToMs(1), // 1 day
+        zoomMax: daysToMs(7), // 1 week
+        timeAxis: { scale: 'day' as TimelineTimeAxisScaleType, step: 1 },
+        range: daysToMs(7), // 1 week
+      };
+    case ViewType.Week:
+      return {
+        zoomMin: daysToMs(7), // 1 week
+        zoomMax: daysToMs(28), // 4 weeks
+        timeAxis: { scale: 'week' as TimelineTimeAxisScaleType, step: 1 },
+        range: daysToMs(30), // ~1 month
+      };
+    case ViewType.Month:
+      return {
+        zoomMin: daysToMs(30), // ~1 month
+        zoomMax: daysToMs(120), // ~4 months
+        timeAxis: { scale: 'month' as TimelineTimeAxisScaleType, step: 1 },
+        range: daysToMs(90), // ~3 months (quarter)
+      };
+    default:
+      throw new Error(`Invalid view type: ${view}`);
+  }
+};
 
 const changeView = (view: ViewType) => {
   if (!timeline) return;
 
-  let zoomMin: number;
-  let zoomMax: number;
-  let timeAxis: { scale: TimelineTimeAxisScaleType; step: number };
-
-  switch (view) {
-    case 'day':
-      zoomMin = 24 * 60 * 60 * 1000; // 1 day
-      zoomMax = 7 * 24 * 60 * 60 * 1000; // 7 days
-      timeAxis = { scale: 'day', step: 1 };
-      break;
-    case 'week':
-      zoomMin = 7 * 24 * 60 * 60 * 1000; // 1 week
-      zoomMax = 4 * 7 * 24 * 60 * 60 * 1000; // 4 weeks
-      timeAxis = { scale: 'week', step: 1 };
-      break;
-    case 'month':
-      zoomMin = 30 * 24 * 60 * 60 * 1000; // ~1 month
-      zoomMax = 4 * 30 * 24 * 60 * 60 * 1000; // ~4 months
-      timeAxis = { scale: 'month', step: 1 };
-      break;
-    default:
-      throw new Error(`Invalid view type: ${view}`);
-  }
+  const { range, ...options } = getViewSettings(view);
+  timeline.setOptions(options);
 
   const currentRange = timeline.getWindow();
   const centerDate = new Date((currentRange.start.getTime() + currentRange.end.getTime()) / 2);
-
-  timeline.setOptions({ zoomMin, zoomMax, timeAxis });
-
-  let range: number;
-
-  switch (view) {
-    case 'day':
-      range = 7 * 24 * 60 * 60 * 1000; // 1 week
-      break;
-    case 'week':
-      range = 30 * 24 * 60 * 60 * 1000; // ~1 month
-      break;
-    case 'month':
-      range = 3 * 30 * 24 * 60 * 60 * 1000; // ~3 months (quarter)
-      break;
-    default:
-      throw new Error(`Invalid view type: ${view}`);
-  }
-
   const start = new Date(centerDate.getTime() - range / 2);
   const end = new Date(centerDate.getTime() + range / 2);
-
   timeline.setWindow(start, end, { animation: true });
 };
 
-const initialize = () => {
+const changeToCurrentDate = () => {
+  if (!timeline) return;
+
+  const currentDate = new Date();
+  const { range } = getViewSettings(props.view);
+  const start = new Date(currentDate.getTime() - range / 2);
+  const end = new Date(currentDate.getTime() + range / 2);
+  timeline.setWindow(start, end, { animation: true });
+};
+
+watch(() => props.view, changeView);
+
+onMounted(() => {
   if (!timelineRef.value) return;
 
   timeline = new Timeline(
     timelineRef.value,
-    new DataSet([...initItems.value, ...items] as never),
-    new DataSet([...initGroups, ...groups]),
+    new DataSet([...initItems.value, ...dataSet.value[1]] as never),
+    new DataSet([...initGroups, ...dataSet.value[0]]),
     {
       end: maxDate,
       start: minDate,
       groupHeightMode: 'fixed',
       horizontalScroll: true,
+      verticalScroll: true,
       maxHeight: props.maxHeight,
       minHeight: 300,
       moveable: true,
@@ -235,28 +253,20 @@ const initialize = () => {
     },
   );
 
-  timeline.on('remove', (event) => {
-    event.preventDefault();
-  });
-
-  timeline.on('move', (event) => {
-    if (event.oldGroup !== event.newGroup) {
-      event.preventDefault();
-    }
-  });
-
+  timeline.on('remove', (evt) => evt.preventDefault());
+  timeline.on('move', (evt) => evt.oldGroup !== evt.newGroup && evt.preventDefault());
+  timelineRef.value.addEventListener('wheel', (evt) => evt.preventDefault(), { passive: false }); // https://stackoverflow.com/a/70581384/2528550
   window.addEventListener('resize', resize);
   setTimeout(resize, 300);
-};
-
-watch(() => props.view, changeView);
-
-onMounted(initialize);
+});
 
 onUnmounted(() => {
   window.removeEventListener('resize', resize);
+  timelineRef.value?.removeEventListener('wheel', (evt) => evt.stopPropagation());
   timeline?.destroy();
 });
+
+defineExpose({ changeView, changeToCurrentDate });
 </script>
 
 <template>
@@ -287,33 +297,54 @@ onUnmounted(() => {
   @apply tw-bg-blue-100/80 tw-border-blue-200 #{!important};
 }
 
-.vis-item.task {
-  @apply tw-bg-rose-100 tw-border-rose-200 #{!important};
+.vis-item.standard {
+  @apply tw-bg-cyan-100 tw-border-cyan-200 #{!important};
 }
 
 .vis-panel.vis-center,
 .vis-panel.vis-left,
 .vis-panel.vis-right {
   @apply tw-overflow-hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .vis-group,
-.vis-label {
-  @apply tw-border-slate-300 #{!important};
+.vis-label,
+.vis-panel,
+.vis-timeline {
+  @apply tw-border-slate-200 #{!important};
 }
 
-.vis-group-level-0,
-.vis-nested-group {
-  @apply tw-border-none;
+.vis-nesting-group::before {
+  @apply tw-content-['\203A'] tw-w-auto #{!important};
+
+  &.expanded {
+    @apply tw-rotate-90 #{!important};
+  }
 }
 
-.vis-nested-group,
-.vis-inner {
+.vis-group-level-0 {
   @apply tw-pl-4 #{!important};
+
+  &.vis-nesting-group {
+    @apply tw-pl-2 #{!important};
+  }
+}
+
+.vis-group-level-1 {
+  @apply tw-bg-slate-50 tw-pl-8 #{!important};
+
+  &.vis-nesting-group {
+    @apply tw-pl-6 #{!important};
+  }
+}
+
+.vis-group-level-2 {
+  @apply tw-bg-slate-200/70 tw-pl-12 #{!important};
 }
 
 .vis-inner {
-  @apply tw-max-w-[250px] tw-text-sm #{!important};
+  @apply tw-max-w-[250px] tw-pl-2 tw-text-sm #{!important};
 }
 
 .vis-item-overflow {

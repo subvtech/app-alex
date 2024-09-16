@@ -11,8 +11,6 @@ const {
   USE_MOCK,
 } = process.env;
 
-const useMock = USE_MOCK === 'true';
-
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
@@ -53,14 +51,13 @@ export default defineNuxtConfig({
       strapiUrl: STRAPI_URL,
       tipTapAppId: TIPTAP_APP_ID,
       tipTapKey: TIPTAP_KEY,
-      useMock,
+      useMock: USE_MOCK === 'true',
     },
   },
   strapi: {
-    url: useMock ? '/_' : STRAPI_URL,
+    url: STRAPI_URL,
     auth: { populate: ['role', 'learningplans', 'favorites'] },
   },
-  routeRules: useMock ? { '/_/**': { proxy: `${STRAPI_URL}/**` } } : undefined,
   shadcn: {
     prefix: '',
     /**
