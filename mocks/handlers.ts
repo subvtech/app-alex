@@ -1,3 +1,3 @@
-import ganttHandler from './handlers/gantt';
+import projectDashboardHandler from './handlers/project-dashboard';
 
-export const handlers = [ganttHandler];
+export const handlers = [projectDashboardHandler];
