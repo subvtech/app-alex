@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { DataSet } from 'vis-data/peer';
 import { Timeline, type TimelineTimeAxisScaleType, type TimelineGroup, type TimelineItem } from 'vis-timeline/peer';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 enum GroupType {
   Sprint = 'sprint',
@@ -35,13 +35,21 @@ export type Sprint = {
   endDate: Date | string;
 };
 
-const props = withDefaults(defineProps<{ items: Item[]; sprints: Sprint[] }>(), {
+type Props = {
+  view?: ViewType;
+  items?: Item[];
+  sprints?: Sprint[];
+  maxHeight?: number;
+};
+
+const props = withDefaults(defineProps<Props>(), {
+  maxHeight: 450,
+  view: ViewType.Month,
   items: () => [],
   sprints: () => [],
 });
 
 const timelineRef = ref<HTMLElement | null>(null);
-const currentView = ref(ViewType.Month);
 
 let timeline: Timeline | null = null;
 
@@ -53,7 +61,7 @@ const initGroups: TimelineGroup[] = [{ id: GroupType.Sprint, content: 'Sprints' 
 
 const initItems = computed<TimelineItem[]>(() => {
   return props.sprints.map((sprint) => ({
-    id: sprint.id,
+    id: `sprint-${sprint.id}`,
     type: 'range',
     group: GroupType.Sprint,
     className: 'sprint',
@@ -68,21 +76,23 @@ const [groups, items] = (function parseItems(arr: Item[], parentId?: string) {
   const groups: TimelineGroup[] = [];
   const items: TimelineItem[] = [];
 
+  const getId = (item: Item) => `${item.type}-${item.id}`;
+
   for (const item of arr) {
     const isGroup = isEpic(item) || isStory(item);
+    const itemId = getId(item);
 
     if (isGroup) {
-      groups.push({
-        id: item.id,
-        content: item.label,
-        nestedGroups: isEpic(item) ? item.children?.filter(isStory).map((v) => v.id) : undefined,
-      });
+      const nestedGroups = isEpic(item) ? item.children?.filter(isStory).map(getId) : undefined;
+      groups.push({ id: itemId, content: item.label, nestedGroups });
+    } else if (!parentId) {
+      groups.push({ id: itemId, content: item.label });
     }
 
     items.push({
-      id: item.id,
+      id: itemId,
       type: isGroup ? 'background' : undefined,
-      group: isGroup ? item.id : parentId!,
+      group: isGroup || !parentId ? itemId : parentId,
       className: item.type,
       content: item.label,
       title: item.label,
@@ -91,7 +101,7 @@ const [groups, items] = (function parseItems(arr: Item[], parentId?: string) {
     });
 
     if (item.children?.length) {
-      const [childGroups, childItems] = parseItems(item.children, item.id);
+      const [childGroups, childItems] = parseItems(item.children, itemId);
       groups.push(...childGroups);
       items.push(...childItems);
     }
@@ -126,8 +136,6 @@ const { minDate, maxDate } = getMinMaxDates([...initItems.value, ...items]);
 
 const changeView = (view: ViewType) => {
   if (!timeline) return;
-
-  currentView.value = view;
 
   let zoomMin: number;
   let zoomMax: number;
@@ -188,17 +196,15 @@ const initialize = () => {
     new DataSet([...initItems.value, ...items] as never),
     new DataSet([...initGroups, ...groups]),
     {
-      autoResize: false,
       end: maxDate,
       start: minDate,
       groupHeightMode: 'fixed',
       horizontalScroll: true,
-      maxHeight: 500,
+      maxHeight: props.maxHeight,
       minHeight: 300,
       moveable: true,
       orientation: 'top',
       stack: true,
-      verticalScroll: true,
       zoomable: true,
       zoomKey: 'ctrlKey',
       editable: {
@@ -229,8 +235,6 @@ const initialize = () => {
     },
   );
 
-  changeView(ViewType.Month);
-
   timeline.on('remove', (event) => {
     event.preventDefault();
   });
@@ -245,9 +249,9 @@ const initialize = () => {
   setTimeout(resize, 300);
 };
 
-onMounted(() => {
-  initialize();
-});
+watch(() => props.view, changeView);
+
+onMounted(initialize);
 
 onUnmounted(() => {
   window.removeEventListener('resize', resize);
@@ -256,22 +260,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="tw-mb-4 tw-flex tw-gap-2">
-      <button
-        v-for="view in ['day', 'week', 'month']"
-        :key="view"
-        :class="[
-          'tw-px-4 tw-py-2 tw-rounded',
-          currentView === view ? 'tw-bg-blue-500 tw-text-white' : 'tw-bg-gray-200',
-        ]"
-        @click="changeView(view as ViewType)"
-      >
-        {{ view.charAt(0).toUpperCase() + view.slice(1) }}
-      </button>
-    </div>
-    <div ref="timelineRef"></div>
-  </div>
+  <div ref="timelineRef"></div>
 </template>
 
 <style lang="scss">
@@ -283,19 +272,29 @@ onUnmounted(() => {
 }
 
 .vis-item {
-  @apply tw-border-slate-300;
-  border-radius: 5px;
-  font-size: 12px;
+  @apply tw-rounded-md tw-text-sm tw-border-[1px] tw-border-solid #{!important};
 }
 
 .vis-item.sprint {
-  @apply tw-bg-yellow-300 tw-font-semibold tw-top-[5px] #{!important};
+  @apply tw-bg-amber-100 tw-border-amber-300 tw-font-semibold tw-top-[5px] #{!important};
+}
+
+.vis-item.epic {
+  @apply tw-bg-purple-100/80 tw-border-purple-200 #{!important};
+}
+
+.vis-item.story {
+  @apply tw-bg-blue-100/80 tw-border-blue-200 #{!important};
+}
+
+.vis-item.task {
+  @apply tw-bg-rose-100 tw-border-rose-200 #{!important};
 }
 
 .vis-panel.vis-center,
 .vis-panel.vis-left,
 .vis-panel.vis-right {
-  overflow: hidden;
+  @apply tw-overflow-hidden;
 }
 
 .vis-group,

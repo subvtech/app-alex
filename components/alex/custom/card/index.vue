@@ -23,7 +23,7 @@
       @click:save="emit('click:save')"
       @toggle:is-editing="emit('toggle:isEditing')"
     />
-
+    <slot name="header" />
     <div
       class="d-flex flex-column w-100"
       :class="[sizingClass ?? (noHeader ? 'px-6' : 'pa-6'), alignContent, contentClassName]"

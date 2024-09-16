@@ -33,6 +33,10 @@
     "empty_task_progress": "0% of tasks have been completed",
     "last_update": "Last update",
     "remaining_time": "Remaining time",
+    "timeline_day": "Day",
+    "timeline_month": "Month",
+    "timeline_week": "Week",
+    "timeline": "Timeline",
     "total_epics": "Total epics",
     "total_sprints": "Total sprints",
     "total_story": "Total stories"

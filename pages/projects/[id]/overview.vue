@@ -13,9 +13,10 @@ const data = ref([]);
 const learningPlan = ref<LearningPlan>();
 const institutions = ref<Institution[]>([]);
 
-const itemsGantt = ref<GanttItem[]>([]);
-const sprintsGantt = ref<GanttSprint[]>([]);
-const loadingGantt = ref(true);
+const ganttItems = ref<GanttItem[]>([]);
+const ganttSprints = ref<GanttSprint[]>([]);
+const ganttLoading = ref(true);
+const ganttView = ref('month');
 
 const totalizers = ref({
   sprints: {
@@ -45,7 +46,7 @@ const totalizers = ref({
 });
 
 const today = new Date();
-const daysOfWeek = ['Seg', 'Ter', 'Quar', 'Quin', 'Sex', 'Sab', 'Dom'];
+const daysOfWeek = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
 const firstDayOfWeek = today.getDate() - today.getDay() + 1;
 
 const currentWeek = Array.from({ length: daysOfWeek.length }, (_v, i) => {
@@ -88,13 +89,13 @@ const fetchData = async () => {
 
 const fetchGanttData = async () => {
   try {
-    loadingGantt.value = true;
+    ganttLoading.value = true;
     const res = await strapi<{ items: GanttItem[]; sprints: GanttSprint[] }>('/projects/gantt');
-    itemsGantt.value = res.items;
-    sprintsGantt.value = res.sprints;
+    ganttItems.value = res.items;
+    ganttSprints.value = res.sprints;
   } catch (_) {
   } finally {
-    loadingGantt.value = false;
+    ganttLoading.value = false;
   }
 };
 
@@ -137,13 +138,37 @@ onBeforeMount(async () => {
       </Card>
     </div>
     <div class="tw-flex tw-space-x-4 tw-mb-5">
-      <alex-custom-card no-footer title="Linha temporal" class="!tw-w-2/3" content-class-name="tw-flex-1">
+      <alex-custom-card no-footer no-header title="Linha temporal" class="!tw-w-2/3" content-class-name="tw-flex-1">
+        <template #header>
+          <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-px-6 tw-py-4 tw-border-b">
+            <span class="tw-text-gray-600 tw-font-bold tw-text-xl tw-leading-8">
+              {{ $t('pages.projects.overview.timeline') }}
+            </span>
+            <div class="tw-flex tw-gap-1">
+              <alex-custom-button
+                v-for="view in ['day', 'week', 'month']"
+                :key="view"
+                :variant="ganttView === view ? 'secondary' : 'text'"
+                @click="ganttView = view"
+              >
+                {{ $t(`pages.projects.overview.timeline_${view}`) }}
+              </alex-custom-button>
+            </div>
+          </div>
+        </template>
         <template #content>
-          <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full">
-            <div v-if="loadingGantt" class="tw-flex tw-justify-center tw-items-center tw-w-full">
+          <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full tw-pt-6">
+            <div v-if="ganttLoading" class="tw-flex tw-justify-center tw-items-center tw-w-full">
               <v-progress-circular indeterminate />
             </div>
-            <Gantt v-else-if="itemsGantt.length" class="tw-flex-1" :items="itemsGantt" :sprints="sprintsGantt" />
+            <Gantt
+              v-else-if="ganttItems.length"
+              class="tw-flex-1"
+              :max-height="475"
+              :items="ganttItems"
+              :sprints="ganttSprints"
+              :view="ganttView"
+            />
             <alex-custom-empty-placeholder v-else />
           </div>
         </template>
