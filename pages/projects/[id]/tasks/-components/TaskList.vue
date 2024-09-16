@@ -249,12 +249,9 @@ const getSlideTransition = () => {
 };
 
 const handleCreateTask = async () => {
-  console.log('entrou');
   if (taskTitle.value && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
     const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
-    console.log('entrou2');
-    console.log(createTaskSprintId.value);
     await createTask({
       title: taskTitle.value,
       learningPlanId,
@@ -346,6 +343,12 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
   }
 };
 
+const onDrop = (task: SprintTask) => {
+  console.log(dragDrop.over.value);
+  console.log(task);
+  dragDrop.dragEnd();
+};
+
 const showSuccessMessage = (message: string) => {
   setMessage(
     t('pages.projects.tasks.successMessage', { action: t(`pages.projects.tasks.${message}`) }),
@@ -423,6 +426,7 @@ const formattedDate = (strDate: string) => {
                     @start-drag="dragDrop.startDrag"
                     @drag-over="dragDrop.onDragOver"
                     @drag-leave="dragDrop.onDragLeave"
+                    @drag-end="onDrop"
                     @delete-task="handleDeleteTask"
                     @move-task="handleMoveTask"
                     @edit-task="(_id, task: SprintTask) => (editTask = task)"
@@ -484,9 +488,7 @@ const formattedDate = (strDate: string) => {
                 :icon="expandSprints[i] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
                 @click="expandSprints[i] = expandSprints[i] === 0 ? 1 : 0"
               />
-              <span class="text-h5 text-gray-800">
-                {{ sprint.title }}
-              </span>
+              <span class="text-h5 text-gray-800"> {{ sprint.title }} </span>
               <span class="text-gray-600 text-body-1">
                 {{ formattedDate(sprint.start_at) }} - {{ formattedDate(sprint.end_at) }}
               </span>
