@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { DataSet } from 'vis-data/peer';
-import { Timeline, type TimelineTimeAxisScaleType, type TimelineGroup, type TimelineItem } from 'vis-timeline/peer';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { Timeline, type TimelineGroup, type TimelineItem, type TimelineTimeAxisScaleType } from 'vis-timeline/peer';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 enum GroupType {
   Sprint = 'sprint',
@@ -53,8 +53,6 @@ const timelineRef = ref<HTMLElement | null>(null);
 
 let timeline: Timeline | null = null;
 
-const isEpic = (item: Item) => item.type === ItemType.Epic;
-const isStory = (item: Item) => item.type === ItemType.Story;
 const toDateStr = (date: Date | string) => (typeof date === 'string' ? date : date.toISOString());
 
 const initGroups: TimelineGroup[] = [{ id: GroupType.Sprint, content: 'Sprints' }];
@@ -72,27 +70,25 @@ const initItems = computed<TimelineItem[]>(() => {
   }));
 });
 
-const [groups, items] = (function parseItems(arr: Item[], parentId?: string) {
+const [groups, items] = (function parseItems(arr: Item[]) {
   const groups: TimelineGroup[] = [];
   const items: TimelineItem[] = [];
 
   const getId = (item: Item) => `${item.type}-${item.id}`;
 
   for (const item of arr) {
-    const isGroup = isEpic(item) || isStory(item);
     const itemId = getId(item);
 
-    if (isGroup) {
-      const nestedGroups = isEpic(item) ? item.children?.filter(isStory).map(getId) : undefined;
-      groups.push({ id: itemId, content: item.label, nestedGroups });
-    } else if (!parentId) {
-      groups.push({ id: itemId, content: item.label });
-    }
+    groups.push({
+      id: itemId,
+      content: item.label,
+      nestedGroups: item.children?.length ? item.children.map(getId) : undefined,
+    });
 
     items.push({
       id: itemId,
-      type: isGroup ? 'background' : undefined,
-      group: isGroup || !parentId ? itemId : parentId,
+      type: 'range',
+      group: itemId,
       className: item.type,
       content: item.label,
       title: item.label,
@@ -101,7 +97,7 @@ const [groups, items] = (function parseItems(arr: Item[], parentId?: string) {
     });
 
     if (item.children?.length) {
-      const [childGroups, childItems] = parseItems(item.children, itemId);
+      const [childGroups, childItems] = parseItems(item.children);
       groups.push(...childGroups);
       items.push(...childItems);
     }
