@@ -1,6 +1,5 @@
 import { QueryClient, useMutation } from '@tanstack/vue-query';
 import { TaskSimple } from '~/models/simple/taskSimple.model';
-import { KanbanColumnTask } from '../-types';
 import { SprintsResponse } from './useSprints';
 
 const { create } = useStrapiUtils();
@@ -15,11 +14,17 @@ type CreateTaskPayload = {
   sprint?: number;
 };
 
+type CreateTaskResponse = Omit<TaskSimple, 'parent_task'> & {
+  learningplan: number;
+  sprint: number;
+  kanban_column: number;
+  parent_task?: number;
+};
+
 export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
   useMutation({
     async mutationFn({ learningPlanId, position, title, organization, parentTask, sprint }: CreateTaskPayload) {
-      console.log(sprint);
-      const task = await create<TaskSimple & { learningplan: number }>('tasks', {
+      const task = await create<CreateTaskResponse>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
         can_submit_after_deadline: false,
@@ -108,7 +113,7 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
       sprintId,
       kanbanColumnId,
     }: CreateSprintTaskPayload) {
-      const task = await create<TaskSimple & { learningplan: number; sprint: number }>('tasks', {
+      const task = await create<CreateTaskResponse>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
         can_submit_after_deadline: false,
@@ -121,14 +126,9 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
         parent_task: parentTask,
         organization,
         sprint: sprintId,
-      });
-      const kanbanColumnTask = await create('kanban-column-tasks', {
-        sprint: sprintId,
-        task: task.data.id,
         kanban_column: kanbanColumnId,
-        vertical_position: position,
       });
-      return kanbanColumnTask.data as unknown as KanbanColumnTask;
+      return task.data.kanban_column;
     },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
