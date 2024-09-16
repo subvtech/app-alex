@@ -2,11 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 import { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
-import {
-  LearningPlanMemberSimple,
-  MemberStatus,
-  MemberRoles,
-} from '@/models/simple/learningPlanMemberSimple.model';
+import { LearningPlanMemberSimple, MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
 import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
@@ -50,8 +46,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'meeting_schedules.meetings',
       ],
     },
+    institutions: {
+      populate: ['cover'],
+    },
     projects: {
-        populate: ['members', 'members.user.avatar', 'members.user.cover'],
+      populate: ['members', 'members.user.avatar', 'members.user.cover'],
     },
     tags: true,
     schedules: {
@@ -91,17 +90,13 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   }
 
   const facilitator = computed<LearningPlanMemberSimple | undefined>(() => {
-    return learningPlan.value?.members.find(
-      (m: LearningPlanMemberSimple) => m.role === MemberRoles.FACILITATOR,
-    );
+    return learningPlan.value?.members.find((m: LearningPlanMemberSimple) => m.role === MemberRoles.FACILITATOR);
   });
 
   const userIsFacilitator = computed(() => {
     return learningPlan.value?.members.some(
       (m: LearningPlanMemberSimple) =>
-        (m.role === MemberRoles.FACILITATOR ||
-          m.role === MemberRoles.COLLABORATOR) &&
-        m.user?.id === user.value.id,
+        (m.role === MemberRoles.FACILITATOR || m.role === MemberRoles.COLLABORATOR) && m.user?.id === user.value.id,
     );
   });
 
@@ -115,31 +110,28 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
 
   const activeInviteLinks = computed(() => {
     return (
-      learningPlan.value?.invitation_links?.filter(
-        (invite: InvitationLinkSimple) => {
-          return (
-            !invite.is_expired &&
-            (invite.emails_to_send ||
-              new Date(invite.expires_at).getTime() > new Date().getTime())
-          );
-        },
-      ) || []
+      learningPlan.value?.invitation_links?.filter((invite: InvitationLinkSimple) => {
+        return (
+          !invite.is_expired && (invite.emails_to_send || new Date(invite.expires_at).getTime() > new Date().getTime())
+        );
+      }) || []
     );
   });
 
   const standardTrails = computed(() => {
-    const trails =
-      learningPlan.value?.learning_structures.filter(
-        (structure) =>
-          structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? [];
+    const { trails = [] } =
+      learningPlan.value?.learning_structures.filter((v) => v.type === LearningPlanScructureSimpleType.STANDARD)[0] ??
+      {};
 
-    if (userIsFacilitator.value) return trails;
-    else return trails.filter((trail) => !trail.hidden);
+    return userIsFacilitator.value ? trails : trails.filter((trail) => !trail.hidden);
   });
 
-  const standardTrailsCount = computed(() => {
-    return standardTrails.value.length;
+  const studentTrails = computed(() => {
+    const { trails = [] } =
+      learningPlan.value?.learning_structures.filter((v) => v.type === LearningPlanScructureSimpleType.STUDENT)[0] ??
+      {};
+
+    return trails.filter((trail) => !trail.hidden);
   });
 
   const invitationLink = computed(() => {
@@ -148,10 +140,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         .filter((invite: InvitationLinkSimple) => {
           return !invite.emails_to_send && invite.role === 'student';
         })
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
-        );
+        .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
 
       return sortedLinks[0];
     }
@@ -166,9 +155,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const activeMembers = computed(() => {
     return (
       learningPlan.value?.members.filter(
-        (m: LearningPlanMemberSimple) =>
-          m.status === MemberStatus.JOINED &&
-          m.role !== MemberRoles.FACILITATOR,
+        (m: LearningPlanMemberSimple) => m.status === MemberStatus.JOINED && m.role !== MemberRoles.FACILITATOR,
       ) || []
     );
   });
@@ -176,8 +163,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   const pendingMembers = computed(() => {
     return (
       learningPlan.value?.members.filter(
-        (m: LearningPlanMemberSimple) =>
-          m.status === MemberStatus.PENDING_INVITATION,
+        (m: LearningPlanMemberSimple) => m.status === MemberStatus.PENDING_INVITATION,
       ) || []
     );
   });
@@ -187,23 +173,17 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const userIsPendingMember = computed(() => {
-    return pendingMembers.value.some(
-      (m) => m.user?.id === user.value.id || m.email === user.value.email,
-    );
+    return pendingMembers.value.some((m) => m.user?.id === user.value.id || m.email === user.value.email);
   });
 
   const userClass = computed(() => {
-    return learningPlan.value?.classes?.find(
-      (c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id),
-    );
+    return learningPlan.value?.classes?.find((c) => c.learning_plan_members?.some((m) => m.user.id === user.value.id));
   });
 
   const schedules = computed<LearningPlanScheduleSimple[]>(() => {
     return (
       learningPlan.value?.schedules.map((schedule) => {
-        const earliestMeeting: LearningPlanMeetingSimple[] = sortByDate(
-          schedule.meetings,
-        );
+        const earliestMeeting: LearningPlanMeetingSimple[] = sortByDate(schedule.meetings);
         if (earliestMeeting[0]) {
           earliestMeeting[0].earliest = true;
         }
@@ -211,17 +191,10 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       }) || []
     );
   });
-  const generalTags = computed(
-    () => learningPlan.value?.tags?.filter((tag) => tag.isGeneral),
-  );
-  const technicalTags = computed(
-    () => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral),
-  );
+  const generalTags = computed(() => learningPlan.value?.tags?.filter((tag) => tag.isGeneral));
+  const technicalTags = computed(() => learningPlan.value?.tags?.filter((tag) => !tag.isGeneral));
   const userLearningMember = computed(
-    () =>
-      learningPlan.value?.members.find(
-        (member) => member.user.id === user.value.id,
-      ),
+    () => learningPlan.value?.members.find((member) => member.user.id === user.value.id),
   );
 
   return {
@@ -240,8 +213,8 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     userIsPendingMember,
     userClass,
     activeInviteLinks,
-    standardTrailsCount,
     standardTrails,
+    studentTrails,
     schedules,
     generalTags,
     technicalTags,

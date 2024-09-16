@@ -1,164 +1,157 @@
-<template>
-  <section>
-    <alex-custom-banner
-      v-if="!route.meta?.hideLearningPlanBanner"
-      :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
-      :cover-picture="learningPlanStore.learningPlan?.cover_image"
-      :profile-picture-size="24"
-      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
-      :user-id="user.id"
-      :show-settings="learningPlanStore.userIsFacilitator"
-      distribution="fullname-username-role"
-      :fullname="learningPlanStore.facilitator?.user?.fullname"
-      :description="learningPlanStore.learningPlan?.title"
-      :start-date="learningPlanStore.startDateFormated"
-      :end-date="learningPlanStore.endDateFormated"
-      :links="isJoinRoutePath ? [] : generalLinks"
-      :selected-option="currentRouteTab"
-      :copy-object="
-        learningPlanStore.activeInvitationLinkUrl &&
-        learningPlanStore.userIsFacilitator
-          ? {
-              label: $t('pages.courses.invite'),
-              copyText: learningPlanStore.activeInvitationLinkUrl,
-            }
-          : undefined
-      "
-      :settings="{
-        label: '',
-        icon: 'mdi-cog-outline',
-        value: 5,
-        to: `/projects/${learningPlanId}/settings`,
-      }"
-      show-profile-picture
-      darker-background
-      show-shade
-      show-menu
-      is-professor
-      @select:option="selectRouteTab"
-    />
-    <NuxtPage @update="fetchData" />
-  </section>
-</template>
 <script setup lang="ts">
 import { TabType } from '~/components/alex/custom/Tabs.vue';
 
 definePageMeta({
   middleware: ['auth'],
   pageTransition: true,
-  validate: (route) => {
-    // Check if the id is made up of digits
-    if (typeof route.params.id === 'string' && /^\D+$/.test(route.params.id)) {
-      return {
-        statusCode: 404,
-        cause: 'invalid_params',
-        message: 'Invalid params',
-      };
-    }
-    return true;
+  validate({ params: { id } }) {
+    return id && Number.isNaN(+id)
+      ? {
+          statusCode: 404,
+          cause: 'invalid_params',
+          message: 'Invalid params',
+        }
+      : true;
   },
 });
 
 const { t } = useI18n();
 const user = useStrapiUser<User>();
 const route = useRoute();
-const { id } = route.params;
 const headerStore = usePageHeaderStore();
-const currentRouteTab = ref<number | null>(null);
 const learningPlanStore = useLearningPlanStore();
-const isJoinRoutePath = computed(() => {
-  if (!route?.name) {
-    return false;
-  }
-  const isRoute = route.name === 'projects-id-join-hash';
 
-  return isRoute;
-});
+const { id: projectId } = route.params;
 
-// Computed
-const isSettingsRoutePath = computed(() => {
-  return route.name === 'projects-id-settings';
-});
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
-const pageRoute = computed(() => route.name);
+const activeTab = computed(() => route.path.split('/').pop());
+const isJoinRoute = computed(() => route.name === 'projects-id-join-hash');
+const isSettingsRoute = computed(() => route.name === 'projects-id-settings');
+
 const generalLinks = computed<TabType[]>(() => [
   {
-    label: 'Painel',
-    value: 0,
-    to: `/projects/${learningPlanId.value}`,
+    label: t('pages.projects.common.overview'),
+    value: 'overview',
+    to: `/projects/${projectId}/overview`,
   },
   {
-    label: 'Documentos',
-    value: 1,
-    to: `/projects/${learningPlanId.value}/documents`,
+    label: t('pages.projects.common.documents'),
+    value: 'documents',
+    to: `/projects/${projectId}/documents`,
   },
   {
-    label: 'Tarefas',
-    value: 2,
-    to: `/projects/${learningPlanId.value}/tasks`,
+    label: t('pages.projects.common.tasks'),
+    value: 'tasks',
+    to: `/projects/${projectId}/tasks`,
   },
   {
-    label: 'Integrantes',
-    value: 3,
-    to: `/projects/${learningPlanId.value}/members`,
+    label: t('pages.projects.common.members'),
+    value: 'members',
+    to: `/projects/${projectId}/members`,
   },
   {
-    label: 'Jornada Individual',
-    value: 4,
-    to: `/projects/${learningPlanId.value}/individual_learning`,
+    label: t('pages.projects.common.individual_learning'),
+    value: 'individual_learning',
+    to: `/projects/${projectId}/individual_learning`,
   },
   ...(learningPlanStore.userIsFacilitator
     ? [
         {
           label: '',
           icon: 'mdi-cog-outline',
-          value: 5,
-          to: `/projects/${learningPlanId.value}/settings`,
+          value: 'settings',
+          to: `/projects/${projectId}/settings`,
           classes: 'ml-auto',
         },
       ]
     : []),
 ]);
 
-// Functions
 const fetchData = async () => {
   headerStore.showHeader = true;
-  await learningPlanStore.loadLearningPlan(learningPlanId.value);
+  await learningPlanStore.loadLearningPlan(+projectId);
   headerStore.isLoading = false;
+
   if (!learningPlanStore.learningPlan) {
     return navigateTo('/projects/me');
   }
 
-  if (isSettingsRoutePath.value && !learningPlanStore.userIsFacilitator) {
-    return navigateTo(`/projects/${learningPlanId.value}`);
+  if (isSettingsRoute.value && !learningPlanStore.userIsFacilitator) {
+    return navigateTo(`/projects/${projectId}`);
   }
 
   if (
     !learningPlanStore.userIsFacilitator &&
     !learningPlanStore.userIsActiveMember &&
     !learningPlanStore.userIsPendingMember &&
-    !isJoinRoutePath.value
+    !isJoinRoute.value
   ) {
     return navigateTo('/projects/me');
   }
 
-  if (learningPlanStore.userIsPendingMember && !isJoinRoutePath.value) {
+  if (learningPlanStore.userIsPendingMember && !isJoinRoute.value) {
     const invite = learningPlanStore.learningPlan?.invitation_links.find(
-      (i) => i.emails_to_send?.includes(user?.value?.email),
+      (v) => v.emails_to_send?.includes(user?.value?.email),
     );
 
     if (invite) {
-      return navigateTo(
-        `/projects/${learningPlanId.value}/join/${invite.hash}`,
-      );
+      return navigateTo(`/projects/${projectId}/join/${invite.hash}`);
     }
   }
 };
-const selectRouteTab = (index: number | null) => {
-  currentRouteTab.value = index;
+
+const changeRoute = (slug: string) => {
+  navigateTo(`${route.path.split('/').slice(0, -1).join('/')}/${slug}`);
 };
 
-// LifeCycle
+watch(
+  () => route.name,
+  () => {
+    const page = route.name?.toString() || '';
+    if (page.includes('projects-id')) fetchData();
+  },
+);
+
+watch(
+  () => `${learningPlanStore.loading}-${route.path}`,
+  () => {
+    if (learningPlanStore.loading) return;
+    const slug = route.name?.toString()?.split('-').at(-1);
+    const { memberId } = route.params; // Need to be here to get the updated memberId
+
+    headerStore.title = t('pages.projects.common.my_projects');
+    headerStore.items = [
+      {
+        title: t('pages.projects.common.my_projects'),
+        to: '/projects/me',
+      },
+      {
+        title: learningPlanStore.learningPlan?.title || '',
+        to: `/projects/${projectId}/overview`,
+        disabled: /projects\/[0-9]+\/overview/.test(route.path),
+      },
+    ];
+
+    ['documents', 'members', 'individual_learning', 'tasks'].forEach((path) => {
+      if (new RegExp(`projects/[0-9]+/${path}`).test(route.path)) {
+        headerStore.items.push({
+          title: t(`pages.projects.common.${path}`),
+          to: `/projects/${projectId}/${path}`,
+          disabled: !memberId,
+        });
+      }
+    });
+
+    if (new RegExp(`projects/[0-9]+/individual_learning/[0-9]+/${slug}`).test(route.path)) {
+      headerStore.title = t('pages.projects.common.individual_learning');
+      headerStore.items.push({
+        title: t(`pages.projects.individual_learning.${slug}`),
+        disabled: true,
+        to: `/projects/${projectId}/individual_learning/${memberId}/${slug}`,
+      });
+    }
+  },
+);
+
 onBeforeMount(async () => {
   headerStore.isLoading = true;
   await fetchData();
@@ -169,37 +162,38 @@ onBeforeUnmount(() => {
   learningPlanStore.loading = true;
   headerStore.isLoading = true;
 });
-
-watch(pageRoute, async () => {
-  const page = pageRoute.value?.toString() || '';
-  if (page.includes('projects-id')) {
-    await fetchData();
-  }
-});
-
-watch(
-  () => learningPlanStore.loading,
-  () => {
-    if (!learningPlanStore.loading) {
-      headerStore.title = t('pages.projects.myProjects');
-      headerStore.items = [
-        {
-          title: t('pages.projects.myProjects'),
-          to: '/',
-          disabled: true,
-        },
-        {
-          title: t('pages.projects.myProjects'),
-          to: '/projects/me',
-          disabled: false,
-        },
-        {
-          title: learningPlanStore.learningPlan?.title || '',
-          to: `/projects/${id}`,
-          disabled: true,
-        },
-      ];
-    }
-  },
-);
 </script>
+
+<template>
+  <section class="tw-flex tw-flex-col tw-flex-grow">
+    <alex-custom-banner
+      v-if="!route.meta?.hideLearningPlanBanner"
+      darker-background
+      is-professor
+      show-menu
+      show-profile-picture
+      show-shade
+      distribution="fullname-username-role"
+      :copy-object="
+        learningPlanStore.activeInvitationLinkUrl && learningPlanStore.userIsFacilitator
+          ? { copyText: learningPlanStore.activeInvitationLinkUrl, label: $t('pages.courses.invite') }
+          : undefined
+      "
+      :cover-picture="learningPlanStore.learningPlan?.cover_image"
+      :description="learningPlanStore.learningPlan?.title"
+      :end-date="learningPlanStore.endDateFormated"
+      :fullname="learningPlanStore.facilitator?.user?.fullname"
+      :links="isJoinRoute ? [] : generalLinks"
+      :loading="learningPlanStore.loading && !learningPlanStore.learningPlan"
+      :profile-picture-size="24"
+      :profile-picture="learningPlanStore.facilitator?.user?.avatar"
+      :selected-option="activeTab"
+      :settings="{ label: '', icon: 'mdi-cog-outline', value: 5, to: `/projects/${projectId}/settings` }"
+      :show-settings="learningPlanStore.userIsFacilitator"
+      :start-date="learningPlanStore.startDateFormated"
+      :user-id="user.id"
+      @select:option="changeRoute"
+    />
+    <NuxtPage @update="fetchData" />
+  </section>
+</template>

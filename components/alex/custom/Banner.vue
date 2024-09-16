@@ -144,7 +144,7 @@ type BannerProps = {
     | 'username-fullname-role'
     | 'username-role-fullname';
   settingsIcon?: string;
-  selectedOption?: number | null;
+  selectedOption?: string | number | null;
   isProfessor?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
@@ -271,6 +271,7 @@ watch(coverPicture!, () => {
     display: flex;
     flex-direction: column;
     gap: 0px;
+    transition: all ease-in-out 1s;
     overflow: hidden;
 
     .cover-block {
@@ -350,6 +351,7 @@ watch(coverPicture!, () => {
       border-top: 1px solid #eaeef1;
       height: 46px;
       padding-inline: 24px;
+      transition: all ease-in-out 1s;
       overflow-x: auto;
       overflow-y: hidden;
       -ms-overflow-style: none; /* IE and Edge */
@@ -398,6 +400,9 @@ watch(coverPicture!, () => {
       position: relative;
       border-radius: 100%;
 
+      i {
+        transition: all ease-in-out 0.7s;
+      }
       .img {
         aspect-ratio: 1 / 1; /* defining the aspect ratio of the image */
         object-fit: cover;
@@ -406,9 +411,13 @@ watch(coverPicture!, () => {
       .img {
         max-width: 160px;
         max-height: 160px;
+
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
+
+        transition: all ease-in-out 0.4s;
         border-radius: 100%;
+        transition: all ease-in-out 0.4s;
       }
       div.img {
         position: relative;

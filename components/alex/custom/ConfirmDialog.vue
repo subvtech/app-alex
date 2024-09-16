@@ -57,6 +57,7 @@
       <alex-custom-dialog-footer class="ml-0" justify="center">
         <template #mainSlotButton
           ><alex-custom-button
+            v-if="!noSubmitButton"
             size="large"
             :text="submitButtonText"
             :variant="variant"
@@ -100,11 +101,10 @@
   This component standardises usages of alex-custom-dialog, mostly used on /courses
 */
 import * as yup from 'yup';
-import { ButtonSizeType, VariantType } from './Button.vue';
+import { ButtonProps } from './Button.vue';
 
 const emit = defineEmits(['submit', 'cancel']);
 interface AlertDialogProps {
-  modelValue?: boolean;
   variant?: 'primary' | 'success' | 'error' | 'info';
   title: string;
   subtitle?: string;
@@ -117,18 +117,18 @@ interface AlertDialogProps {
   hideCancelButton?: boolean;
   noInputConfirmation?: boolean;
   loading?: boolean;
+  noSubmitButton?: boolean;
   errorMessageText?: string;
   imageClass?: string;
   innerActivator?: {
     text: string;
     prependIcon?: string;
-    variant: VariantType;
-    size?: ButtonSizeType;
+    variant: ButtonProps['variant'];
+    size?: ButtonProps['size'];
   };
 }
 const props = withDefaults(defineProps<AlertDialogProps>(), {
   noInputConfirmation: true,
-  modelValue: false,
   variant: 'primary',
   innerActivator: undefined,
   image: undefined,
@@ -138,14 +138,13 @@ const props = withDefaults(defineProps<AlertDialogProps>(), {
   loading: false,
   errorMessageText: undefined,
   hideCancelButton: false,
+  noSubmitButton: false,
   subtitle: '',
   imageClass: '',
 });
 const inputValue = ref('');
 
-const { modelValue } = toRefs(props);
-
-const openDialog = ref(props.modelValue);
+const openDialog = defineModel({ default: false });
 
 const errorMessage = computed(() => {
   if (
@@ -155,9 +154,5 @@ const errorMessage = computed(() => {
     return props.errorMessageText;
   }
   return '';
-});
-
-watch(modelValue, () => {
-  openDialog.value = modelValue.value;
 });
 </script>
