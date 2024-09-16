@@ -5,11 +5,16 @@ import { TaskSimple, TaskStatus } from '@/models/simple/taskSimple.model';
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
 import { useQueryClient } from '@tanstack/vue-query';
+// eslint-disable-next-line import/no-duplicates
+import { format } from 'date-fns';
+// eslint-disable-next-line import/no-duplicates
+import { ptBR, enIN } from 'date-fns/locale';
 import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
 import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
+import { tasks } from '~/assets/queries';
 
 const props = defineProps<{
   filter?: filterType;
@@ -17,6 +22,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+const i18n = useI18n();
 
 const { setMessage } = useMessageStore();
 const route = useRoute();
@@ -25,6 +31,7 @@ const learningPlanStore = useLearningPlanStore();
 const dragDrop = useMultipleDragDrop();
 
 const expandBacklog = ref(0);
+const expandSprints = ref<number[]>([]);
 const createSprintDialog = ref(false);
 
 // Querys
@@ -38,25 +45,28 @@ const sprints = ref<Droppable<Sprint>[]>([]);
 // refs
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
+const createTaskSprintId = ref<number>();
 const editTask = ref<SprintTask | null>(null);
 const isEditingTask = ref<null | TaskSimple>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
 
-const editSprints = [
-  {
-    text: t('pages.projects.tasks.add_epic'),
-    onClick: () => {
-      handleAddEpic();
+const editSprints = () => {
+  return [
+    {
+      text: t('pages.projects.tasks.add_epic'),
+      onClick: () => {
+        handleAddEpic();
+      },
     },
-  },
-  {
-    text: t('pages.projects.tasks.add_task'),
-    onClick: () => {
-      handleAddTask();
+    {
+      text: t('pages.projects.tasks.add_task'),
+      onClick: () => {
+        handleAddTask();
+      },
     },
-  },
-];
+  ];
+};
 
 // Computed
 const sprintGroups = computed(() => sprints.value.map((s) => s.group));
@@ -75,15 +85,16 @@ const filteredTasks = computed(() => {
 
 const backlogTasks = computed(() => sprintsValue.value.backlog.map(formatTasks));
 const sprintBacklog = computed(() => {
-  return sprintsValue.value.sprints.map((s) => {
-    s.tasks = s.tasks.map(formatTasks);
-    return s;
-  });
+  expandSprints.value = new Array(sprintsValue.value.sprints.length).fill(0);
+  return sprintsValue.value.sprints.map((sprint) => ({
+    ...sprint,
+    tasks: sprint.tasks.map(formatTasks),
+  }));
 });
 
-const expandSprints = computed(() => {
-  return sprintBacklog.value.map(() => 'panel');
-});
+// const expandSprints = computed(() => {
+//   return sprintBacklog.value.map(() => 'panel');
+// });
 
 const formatTasks = (task) => {
   if (task.organization === 'epic' || task.organization === 'story') {
@@ -95,8 +106,15 @@ const formatTasks = (task) => {
   return task;
 };
 
-// Methods
+const getHigherIndex = (sprintId?: number) => {
+  const tasks = sprintId
+    ? sprintsValue.value.sprints.filter((s) => s.id === sprintId)[0]?.tasks
+    : sprintsValue.value.backlog;
+  return tasks[tasks.length - 1]?.position + 1 || 0;
+};
 
+// Methods
+// TODO: Logica de adicionar em uma sprint
 const handleAddEpic = () => {
   const newTask = {
     id: Math.round(Math.random() * 1234526),
@@ -118,101 +136,82 @@ const handleAddEpic = () => {
   });
   isEditingTask.value = newTask;
 };
+
 const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
-    position: getHigherIndex(),
+    position: getHigherIndex(sprintId),
     status: 'draft',
     title: '',
     organization: 'standard',
     local: true,
-    epic: task?.parent_task ? task?.parent_task.id : task?.id,
-    story: task?.parent_task ? task?.id : undefined,
+    epic: task?.organization === 'story' ? task?.parent_task?.id : task?.id,
+    story: task?.organization === 'story' ? task?.id : undefined,
     sprint: sprintId,
   } as any;
+
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
-      return oldData;
+      return {
+        backlog: [],
+        sprints: [],
+      };
     }
-    if (task) {
-      if (!sprintId) {
-        return {
-          ...oldData,
-          backlog: oldData.backlog.map((epic) => {
-            if (epic.id === newTask.epic) {
-              if (newTask.story) {
-                return {
-                  ...epic,
-                  tasks: epic.tasks?.map((story) => {
-                    if (story.id === newTask.story) {
-                      return {
-                        ...story,
-                        tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
-                      };
-                    }
-                    return story;
-                  }),
-                };
-              }
+
+    const data = structuredClone(oldData);
+
+    const isSprint = !!sprintId;
+    const sprintIdx = isSprint ? data.sprints.findIndex((s) => s.id === sprintId) : 0;
+    const oldTasks = isSprint ? [...data.sprints[sprintIdx].tasks] : [...data.backlog];
+    let newTasks: TaskSimple[] = [];
+    if (!newTask.story && !newTask.epic) {
+      newTasks = [...oldTasks, newTask];
+    } else {
+      const epicId = newTask.epic;
+      const storyId = newTask.story;
+      newTasks = oldTasks.map((epic) => {
+        if (epic.id !== epicId) {
+          return epic;
+        }
+        if (!storyId) {
+          epic.tasks = [...epic.tasks, newTask];
+        } else {
+          epic.tasks = epic.tasks?.map((story) => {
+            if (story.id === storyId) {
+              story.tasks = [...story.tasks, newTask];
             }
-            return epic;
-          }),
+            return story;
+          });
+        }
+        return epic;
+      });
+
+      if (isSprint) {
+        const sprints = data.sprints;
+        sprints[sprintIdx].tasks = newTasks;
+        return {
+          ...data,
+          sprints,
         };
       } else {
         return {
-          ...oldData,
-          sprints: oldData.sprints.map((sprint) => {
-            if (sprint.id === sprintId) {
-              sprint.tasks = sprint.tasks.map((epic) => {
-                if (epic.id === newTask.epic) {
-                  if (newTask.story) {
-                    return {
-                      ...epic,
-                      tasks: epic.tasks?.map((story) => {
-                        if (story.id === newTask.story) {
-                          return {
-                            ...story,
-                            tasks: story.tasks ? [...story.tasks, newTask] : [newTask],
-                          };
-                        }
-                        return story;
-                      }),
-                    };
-                  }
-                }
-                return epic;
-              });
-
-              return sprint;
-            } else {
-              return sprint;
-            }
-          }),
+          ...data,
+          backlog: newTasks,
         };
       }
     }
 
-    if (!sprintId) {
-      return {
-        ...oldData,
-        backlog: [...oldData.backlog, newTask],
-      };
-    } else {
-      return {
-        ...oldData,
-        sprints: oldData.sprints.map((sprint) => {
-          if (sprint.id === sprintId) {
-            sprint.tasks.push(newTask);
-            return sprint;
-          } else {
-            return sprint;
-          }
-        }),
-      };
-    }
+    // return {
+    //   ...oldData,
+    //   backlog: [...oldData.backlog, newTask],
+    // };
   });
   isEditingTask.value = newTask;
+  if (sprintId) {
+    createTaskSprintId.value = sprintId;
+  }
 };
+
 const handleAddStory = (id: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
@@ -249,23 +248,23 @@ const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
 
-const getHigherIndex = () => {
-  const tasks = sprintsValue.value.backlog;
-  return tasks[tasks.length - 1]?.position + 1 || 0;
-};
-
 const handleCreateTask = async () => {
+  console.log('entrou');
   if (taskTitle.value && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
     const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
+    console.log('entrou2');
+    console.log(createTaskSprintId.value);
     await createTask({
       title: taskTitle.value,
       learningPlanId,
       position: higherIndex,
       organization: 'standard',
+      sprint: createTaskSprintId.value,
     });
   }
   taskTitle.value = '';
+  createTaskSprintId.value = undefined;
   isCreatingTask.value = false;
 };
 
@@ -312,13 +311,14 @@ const handleDeleteTask = async (id: number) => {
   }
 };
 
-const createItem = async (task: SprintTask & { epic?: number; story?: number }) => {
+const createItem = async (task: SprintTask & { epic?: number; story?: number; sprint?: number }) => {
   await createTask({
     title: task.title,
     learningPlanId: learninplanId.value,
     organization: task.organization || 'standard',
     position: task.position,
     parentTask: task.story ? task.story : task.epic,
+    sprint: task.sprint,
   });
   await refetchSprints();
 };
@@ -364,6 +364,14 @@ const toggleExpand = () => {
   taskTitle.value = '';
   expandBacklog.value = !expandBacklog.value ? 1 : 0;
 };
+
+const formattedDate = (strDate: string) => {
+  const date = new Date(strDate);
+  const dateFormat = date.getFullYear() === new Date().getFullYear() ? `d MMM` : `d MMM y`;
+  return format(date, dateFormat, {
+    locale: i18n.locale.value === 'pt' ? ptBR : enIN,
+  });
+};
 </script>
 
 <template>
@@ -379,7 +387,7 @@ const toggleExpand = () => {
               </span>
               <alex-custom-chip size="small" status="secondary" :text="`${filteredTasks.length}`" />
               <div class="ml-auto">
-                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints" />
+                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints()" />
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
@@ -458,7 +466,7 @@ const toggleExpand = () => {
         </v-expansion-panels>
       </Transition>
 
-      <div class="tw-flex tw-w-full tw-justify-between">
+      <div class="tw-flex tw-w-full tw-justify-between align-center">
         <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
         <alex-custom-button prepend-icon="alex:Sprint" size="large" @click="createSprintDialog = true">
           {{ 'Nova Sprint' }}
@@ -473,20 +481,25 @@ const toggleExpand = () => {
           <v-expansion-panel class="rounded-lg" value="panel">
             <v-expansion-panel-title disabled hide-actions class="tw-cursor-default">
               <v-icon
-                :icon="sprint.expanded === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
-                @click="sprint.expanded = sprint.expanded === 0 ? 1 : 0"
+                :icon="expandSprints[i] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'"
+                @click="expandSprints[i] = expandSprints[i] === 0 ? 1 : 0"
               />
               <span class="text-h5 text-gray-800">
-                {{ sprint.title }} {{ sprint.start_at }} - {{ sprint.end_at }}
+                {{ sprint.title }}
               </span>
-              <alex-custom-chip size="small" status="secondary" :text="filteredTasks.length" />
-              <div class="ml-auto">
-                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints" />
-              </div>
+              <span class="text-gray-600 text-body-1">
+                {{ formattedDate(sprint.start_at) }} - {{ formattedDate(sprint.end_at) }}
+              </span>
+              <alex-custom-chip size="small" status="secondary" :text="`${sprint.tasks.length}`" />
+              <!-- TODO: Habilitar os botões depois de adaptar as funções para funcionar dentro de sprints -->
+              <!-- <div class="ml-auto d-flex ga-2">
+                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints()" />
+                <alex-custom-dropdown icon="mdi-dots-vertical" variant="text" :items="editSprints()" />
+              </div> -->
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <Transition mode="out-in" :name="getSlideTransition()">
-                <div v-if="!sprintsValue.backlog.length && backlogIndex">
+                <div v-if="!sprint.tasks.length">
                   <alex-learningplan-task-empty-state
                     key="empty-state"
                     type="backlog"
@@ -499,7 +512,7 @@ const toggleExpand = () => {
                 <div v-else>
                   <TaskTable
                     key="table"
-                    group="backlog"
+                    :group="sprint.title"
                     :active-filter="isFilterActive"
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"

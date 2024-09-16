@@ -12,11 +12,13 @@ type CreateTaskPayload = {
   title: string;
   organization: TaskSimple['organization'];
   parentTask?: number;
+  sprint?: number;
 };
 
 export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
   useMutation({
-    async mutationFn({ learningPlanId, position, title, organization, parentTask }: CreateTaskPayload) {
+    async mutationFn({ learningPlanId, position, title, organization, parentTask, sprint }: CreateTaskPayload) {
+      console.log(sprint);
       const task = await create<TaskSimple & { learningplan: number }>('tasks', {
         allowed_editor_plugins: '',
         can_change_from_review: false,
@@ -28,6 +30,7 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
         submission_required: false,
         title,
         parent_task: parentTask,
+        sprint,
         organization,
       });
       return task.data as TaskSimple;
