@@ -129,10 +129,10 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
 
   const standardTrails = computed(() => {
     const trails =
-      learningPlan.value?.learning_structures.filter(
+      learningPlan.value?.learning_structures?.filter(
         (structure) =>
           structure.type === LearningPlanScructureSimpleType.STANDARD,
-      )[0].trails ?? [];
+      )[0]?.trails ?? [];
 
     if (userIsFacilitator.value) return trails;
     else return trails.filter((trail) => !trail.hidden);
@@ -169,6 +169,14 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         (m: LearningPlanMemberSimple) =>
           m.status === MemberStatus.JOINED &&
           m.role !== MemberRoles.FACILITATOR,
+      ) || []
+    );
+  });
+
+  const activeProjectMembers = computed(() => {
+    return (
+      learningPlan.value?.members.filter(
+        (m: LearningPlanMemberSimple) => m.status === MemberStatus.JOINED,
       ) || []
     );
   });
@@ -235,6 +243,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
     loading,
     pendingMembers,
     activeMembers,
+    activeProjectMembers,
     userIsFacilitator,
     userIsActiveMember,
     userIsPendingMember,
