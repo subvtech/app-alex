@@ -648,6 +648,25 @@ const getFolders = () => {
 
   // headerStore.title = 'Projetos';
   // headerStore.items = [
+    // {
+    //   title: 'Home',
+    //   disabled: true,
+    // },
+    // {
+    //   title: 'Projetos',
+    //   to: '/projects/me',
+    // },
+    // {
+    //   title: learningPlanStore.learningPlan.title,
+    //   to: `/courses/${learningPlanStore.learningPlan.id}`,
+    // },
+  // ];
+};
+
+// onBeforeMount(() => {
+  // headerStore.showHeader = true;
+// });
+
   // {
   //   title: 'Home',
   //   disabled: true,
@@ -661,7 +680,7 @@ const getFolders = () => {
   //   to: `/courses/${learningPlanStore.learningPlan.id}`,
   // },
   // ];
-};
+//};
 
 onBeforeMount(() => {
   // headerStore.showHeader = true;
