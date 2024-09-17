@@ -1,46 +1,113 @@
 <script setup lang="ts">
-import { GanttInstance, Item as GanttItem, Sprint as GanttSprint } from '@/components/Gantt.vue';
-import { Card, CardContent } from '@/components/ui/card';
+import { GanttInstance, Item as Task, Sprint as GanttSprint } from '@/components/Gantt.vue';
 import { BarChart } from '@/components/ui/chart-bar';
+import CardTotalizer from './-components/CardTotalizer.vue';
+
+interface Sprint extends GanttSprint {
+  kanban: {
+    kanban_columns: {
+      title: string;
+      id: string;
+      position: string;
+      status_type: string;
+      kanban_column_tasks: {
+        task: History;
+      }[];
+    }[];
+  };
+}
+
+export interface Data {
+  counters: {
+    finishedEpicsPercent: number;
+    finishedSprintsPercent: number;
+    finishedStoriesPercent: number;
+    totalEpics: number;
+    totalStories: number;
+    totalSprints: number;
+    remainingDays: number;
+  };
+  sprints: Sprint[];
+  tasks: Task[];
+}
+
+type CoverFormat = {
+  ext: string;
+  url: string;
+  hash: string;
+  mime: string;
+  name: string;
+  path: string | null;
+  size: number;
+  width: number;
+  height: number;
+};
+
+export type Cover = {
+  name: string;
+  alternativeText: string | null;
+  caption: string | null;
+  width: number;
+  height: number;
+  formats: {
+    small: CoverFormat;
+    medium: CoverFormat;
+    thumbnail: CoverFormat;
+  };
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string;
+  previewUrl: string | null;
+  provider: string;
+  provider_metadata: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CompletedInstitution = Institution & {
+  cover: Cover;
+};
 
 const { t } = useI18n();
 const route = useRoute();
 const strapi = useStrapiClient();
 const learningPlanStore = useLearningPlanStore();
-const learningPlanId = computed(() => parseInt(route.params?.id.toString()));
 
 const data = ref([]);
+const loading = ref(true);
 const learningPlan = ref<LearningPlan>();
 const institutions = ref<Institution[]>([]);
+const taskProgress = ref<{ sprint: string; columns: any }[]>([]);
 
 const ganttRef = ref<GanttInstance | null>(null);
-const ganttItems = ref<GanttItem[]>([]);
+const ganttItems = ref<Task[]>([]);
 const ganttSprints = ref<GanttSprint[]>([]);
-const ganttLoading = ref(true);
 const ganttView = ref('month');
 
 const totalizers = ref({
   sprints: {
     title: t('pages.projects.overview.total_sprints'),
-    icon: 'mdi-calendar-check',
+    icon: 'alex:Sprint',
     value: 0,
     percentage: 0,
   },
   epics: {
     title: t('pages.projects.overview.total_epics'),
-    icon: 'mdi-calendar-check',
+    icon: 'alex:ManageHistory',
     value: 0,
-    percentage: 0,
+    percentage: 50,
   },
   stories: {
     title: t('pages.projects.overview.total_story'),
-    icon: 'mdi-calendar-check',
+    icon: 'alex:HistoryEdu',
     value: 0,
     percentage: 0,
   },
   remainingTime: {
     title: t('pages.projects.overview.remaining_time'),
-    icon: 'mdi-calendar-check',
+    icon: 'mdi-calendar-clock',
     value: '0 dias',
     percentage: 0,
   },
@@ -59,85 +126,56 @@ const currentWeek = Array.from({ length: daysOfWeek.length }, (_v, i) => {
   };
 });
 
-const remainingDays = computed(() => {
-  if (!learningPlan.value?.end_date) return 0;
-  const endDate = new Date(learningPlan.value.end_date);
-  const today = new Date();
-  const timeDiff = endDate.getTime() - today.getTime();
-  return Math.max(0, Math.ceil(timeDiff / (1000 * 3600 * 24)));
-});
-
-const percentageComplete = computed(() => {
-  if (!learningPlan.value?.end_date || !learningPlan.value?.start_date) return 0;
-
-  const endDate = new Date(learningPlan.value.end_date);
-  const startDate = new Date(learningPlan.value.start_date);
-  const today = new Date();
-
-  const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
-  const daysRemaining = (endDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
-
-  return Math.max(0, Math.round((daysRemaining / totalDays) * 100));
-});
-
-const fetchData = async () => {
-  const response = await learningPlanStore.loadLearningPlan(learningPlanId.value);
-  if (!response?.data) return navigateTo('/projects/me');
-  learningPlan.value = response.data as unknown as LearningPlan;
-  totalizers.value.remainingTime.value = `${remainingDays.value} dias`;
-  totalizers.value.remainingTime.percentage = percentageComplete.value;
-};
-
-const fetchGanttData = async () => {
-  try {
-    ganttLoading.value = true;
-    const url = `/learningplans/${learningPlanId.value}/project-dashboard`;
-    const res = await strapi<{ tasks: GanttItem[]; sprints: GanttSprint[] }>(url);
-    ganttItems.value = res.tasks;
-    ganttSprints.value = res.sprints;
-  } catch (_) {
-  } finally {
-    ganttLoading.value = false;
-  }
-};
-
 const formatCurrency = (tick: number | Date): string => {
   return typeof tick === 'number' ? `$ ${new Intl.NumberFormat('us').format(tick)}` : '';
 };
 
 onBeforeMount(async () => {
-  await fetchData();
-  await fetchGanttData();
+  try {
+    const response = await learningPlanStore.loadLearningPlan(+route.params.id);
+
+    if (!response?.data) {
+      return navigateTo('/projects/me');
+    }
+
+    institutions.value = response.data.institutions as never;
+
+    const res = await strapi<Data>(`learningplans/${route.params.id}/project-dashboard`);
+
+    totalizers.value.epics.value = res.counters.totalEpics;
+    totalizers.value.epics.percentage = res.counters.finishedEpicsPercent || 0;
+    totalizers.value.sprints.value = res.counters.totalSprints;
+    totalizers.value.sprints.percentage = res.counters.finishedSprintsPercent || 0;
+    totalizers.value.stories.value = res.counters.totalStories;
+    totalizers.value.stories.percentage = res.counters.finishedStoriesPercent || 0;
+    totalizers.value.remainingTime.value = `${res.counters.remainingDays} dias`;
+
+    ganttItems.value = res.tasks;
+    ganttSprints.value = res.sprints;
+
+    const process = res.sprints.map((sprint) => ({
+      sprint: sprint.title,
+      columns: sprint.kanban?.kanban_columns?.map((column) => ({
+        status: column.status_type,
+        name: column.title,
+        total: column.kanban_column_tasks?.reduce((count, taskGroup) => {
+          return count + (taskGroup.task ? 1 : 0);
+        }, 0),
+      })),
+    }));
+
+    taskProgress.value = process;
+  } catch (_) {
+  } finally {
+    loading.value = false;
+  }
 });
 </script>
 
 <template>
   <div>
     <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5">
-      <Card
-        v-for="totalizer in Object.values(totalizers)"
-        :key="totalizer.title"
-        class="tw-flex-1 tw-gap-2 bg-white tw-w-full sm:tw-w-1/2 lg:tw-w-1/3"
-      >
-        <CardContent class="!tw-p-0">
-          <div class="tw-flex py-2 gap-4 overflow-hidden">
-            <div class="tw-bg-[#00B7CC] h-full tw-w-2 tw-rounded-r-xl"></div>
-            <div class="tw-py-4 tw-flex tw-flex-col tw-gap-1">
-              <div class="tw-flex tw-items-center tw-mb-1 tw-gap-1">
-                <div class="tw-bg-slate-200 tw-p-3 tw-rounded tw-h-4 tw-w-4 tw-flex tw-items-center tw-justify-center">
-                  <v-icon icon="mdi-camera-timer" size="14px" />
-                </div>
-                <span class="tw-font-bold tw-text-gray-600">{{ totalizer.title }}</span>
-              </div>
-              <span class="tw-text-4xl tw-font-bold tw-mb-1">{{ totalizer.value }}</span>
-              <div class="tw-flex tw-items-center tw-gap-1">
-                <alex-custom-chip size="small" variant="flat" :text="`${totalizer.percentage}%`" :status="'blue'" />
-                <span class="tw-text-sm tw-text-gray-500">{{ $t('pages.projects.overview.completed') }}</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <CardTotalizer v-for="totalizer in Object.values(totalizers)" :key="totalizer.title" :totalizer="totalizer" />
     </div>
     <div class="tw-flex tw-space-x-4 tw-mb-5">
       <alex-custom-card no-footer no-header title="Linha temporal" class="!tw-w-2/3" content-class-name="tw-flex-1">
@@ -165,7 +203,7 @@ onBeforeMount(async () => {
         </template>
         <template #content>
           <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full tw-pt-6">
-            <div v-if="ganttLoading" class="tw-flex tw-justify-center tw-items-center tw-w-full">
+            <div v-if="loading" class="tw-flex tw-justify-center tw-items-center tw-w-full">
               <v-progress-circular indeterminate />
             </div>
             <Gantt
@@ -203,11 +241,11 @@ onBeforeMount(async () => {
       </alex-custom-card>
     </div>
     <div class="tw-flex tw-space-x-4">
-      <alex-custom-card title="Encontros" full-width class="flex-1">
+      <alex-custom-card title="Encontros" full-width class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <div class="tw-flex tw-gap-1">
-              <div v-for="day in currentWeek" :key="day.value">
+              <div v-for="day in currentWeek" :key="day.value" class="">
                 <alex-custom-button :variant="day.value === today.toISOString().split('T')[0] ? 'primary' : 'text'">
                   <div class="tw-flex tw-flex-col tw-h-10">
                     <span>{{ day.name }}</span>
@@ -216,32 +254,44 @@ onBeforeMount(async () => {
                 </alex-custom-button>
               </div>
             </div>
-          </div>
-        </template>
-      </alex-custom-card>
-      <alex-custom-card title="Instituições parceiras" full-width class="flex-1">
-        <template #content>
-          <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2 tw-w-full">
-            <alex-profile-institution-item
-              v-for="institution in institutions"
-              :id="institution.id"
-              :key="institution.id"
-              class="tw-cursor-pointer"
-              :name="institution.name"
-              :acronym="institution.acronym"
-              :sector="institution.sector"
-            />
             <alex-custom-empty-placeholder
-              v-if="institutions.length === 0"
-              :empty-text-message="$t('pages.projects.overview.empty_institutions')"
+              :empty-text-message="$t('pages.projects.overview.empty_meetings')"
               empty-text-image="/svg/EmptyInstitutional.svg"
             />
           </div>
         </template>
       </alex-custom-card>
-      <alex-custom-card title="Eventos" full-width class="flex-1">
+      <div class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
+        <div class="tw-border-b tw-p-5 tw-flex tw-justify-between tw-items-center">
+          <h3>{{ $t('pages.projects.overview.institutions') }}</h3>
+          <alex-project-dialogs-institution :institutions="institutions" />
+        </div>
+        <div class="tw-flex tw-flex-col tw-px-4 tw-items-center tw-justify-center tw-gap-2 tw-w-full">
+          <alex-profile-institution-item
+            v-for="institution in institutions"
+            :id="institution.id"
+            :key="institution.id"
+            class="tw-cursor-pointer"
+            :url="institution.cover.url"
+            :name="institution.name"
+            :acronym="institution.acronym"
+            :sector="institution.sector"
+          />
+          <alex-custom-empty-placeholder
+            v-if="institutions.length === 0"
+            :empty-text-message="$t('pages.projects.overview.empty_institutions')"
+            empty-text-image="/svg/EmptyInstitutional.svg"
+          />
+        </div>
+      </div>
+      <alex-custom-card title="Eventos" full-width class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
         <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full"></div>
+          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
+            <alex-custom-empty-placeholder
+              :empty-text-message="$t('pages.projects.overview.empty_meetings')"
+              empty-text-image="/svg/EmptyInstitutional.svg"
+            />
+          </div>
         </template>
       </alex-custom-card>
     </div>

@@ -22,7 +22,9 @@
     "overview": "Visão geral",
     "search_member": "Pesquisar membro",
     "tasks": "Tarefas",
-    "trails": "Trilhas"
+    "trails": "Trilhas",
+    "myJourney": "Minha Jornada",
+    "empty_members": "Jornada não encontrada"
   },
   "overview": {
     "completed": "Finalizados",
@@ -30,17 +32,20 @@
     "empty_journey": "Nenhuma jornada de aprendizagem encontrada!",
     "empty_meetings": "Nada marcado hoje!",
     "empty_members": "Nenhum membro encontrado",
-    "empty_task_progress": "0% das tarefas foram concluídas",
-    "last_update": "Última atualização",
+    "empty_task_progress": "%{percentage}% das tarefas foram concluídas",
+    "institutions": "Instituições",
+    "last_update": "Última atualização:",
     "remaining_time": "Tempo restante",
+    "task_progress": "Progresso de tarefas",
     "timeline_day": "Dia",
-    "timeline_week": "Semana",
     "timeline_month": "Mês",
     "timeline_today": "Hoje",
+    "timeline_week": "Semana",
     "timeline": "Linha temporal",
     "total_epics": "Total de épicos",
     "total_sprints": "Total de sprints",
-    "total_story": "Total de histórias"
+    "total_story": "Total de histórias",
+    "total_tasks": "Total de tarefas"
   },
   "tasks": {
     "add_epic": "Adicionar épico",

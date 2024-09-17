@@ -59,18 +59,9 @@
               </template>
               <template #items>
                 <v-list class="d-flex flex-column gap-1 max-h-100">
-                  <v-list-item
-                    v-for="(field, index) in itemsDisplayedFields"
-                    :key="index"
-                    class="pa-1"
-                    height="30px"
-                  >
+                  <v-list-item v-for="(field, index) in itemsDisplayedFields" :key="index" class="pa-1" height="30px">
                     <v-list-item-content>
-                      <v-checkbox
-                        v-model="field.selected"
-                        :label="field.text"
-                        dense
-                      ></v-checkbox>
+                      <v-checkbox v-model="field.selected" :label="field.text" dense></v-checkbox>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list>
@@ -96,10 +87,7 @@
           <td v-if="isFieldVisible('updatedAt')">{{ item.updatedAt }}</td>
           <td v-if="isFieldVisible('updatedBy')">{{ item.updatedBy }}</td>
           <td>
-            <alex-custom-dropdown
-              :items="getDropdownItems(item)"
-              variant="text"
-            />
+            <alex-custom-dropdown :items="getDropdownItems(item)" variant="text" />
           </td>
         </tr>
       </template>
@@ -107,30 +95,18 @@
         <v-col class="d-flex justify-space-between align-center" cols="12">
           <v-text
             >Mostrando do {{ (activePage - 1) * itemsPerPage + 1 }} a
-            {{ Math.min(activePage * itemsPerPage, dataWithIndex.length) }} de
-            {{ dataWithIndex.length }}</v-text
+            {{ Math.min(activePage * itemsPerPage, dataWithIndex.length) }} de {{ dataWithIndex.length }}</v-text
           >
-          <alex-custom-pagination
-            v-model="activePage"
-            :length="totalPages"
-            :total-visible="3"
-          />
+          <alex-custom-pagination v-model="activePage" :length="totalPages" :total-visible="3" />
         </v-col>
       </template>
     </v-data-table>
     <v-dialog v-model="openModal" width="50%" persistent>
       <v-form ref="createForm" v-model="formValid" @submit.prevent="submit">
         <v-card width="100%" class="pa-3">
-          <v-card-title
-            class="d-flex justify-space-between align-center font-weight-700"
-          >
+          <v-card-title class="d-flex justify-space-between align-center font-weight-700">
             {{ $t('pages.admin.title2') }}
-            <alex-custom-button
-              variant="text"
-              icon="mdi-plus"
-              size="default"
-              @click="closeForm()"
-            >
+            <alex-custom-button variant="text" icon="mdi-plus" size="default" @click="closeForm()">
               <v-icon>mdi-close</v-icon>
             </alex-custom-button>
           </v-card-title>
@@ -162,34 +138,11 @@
             }"
             @submit="submit"
           >
-            <template
-              #controls="{
-                isFirstStep,
-                onPrevStep,
-                isValid,
-                loading,
-                isLastStep,
-              }"
-            >
+            <template #controls="{ isFirstStep, onPrevStep, isValid, loading, isLastStep }">
               <div class="d-flex justify-end gap 4">
-                <alex-custom-button
-                  text="Cancelar"
-                  @click="closeForm()"
-                  variant="secondary"
-                  class="mr-3"
-                />
-                <alex-custom-button
-                  v-if="!isFirstStep"
-                  class="mr-3"
-                  text="Voltar"
-                  @click="onPrevStep"
-                />
-                <alex-custom-button
-                  v-if="!isLastStep"
-                  class="mr-3"
-                  text="Próximo"
-                  :disabled="!isValid"
-                />
+                <alex-custom-button text="Cancelar" @click="closeForm()" variant="secondary" class="mr-3" />
+                <alex-custom-button v-if="!isFirstStep" class="mr-3" text="Voltar" @click="onPrevStep" />
+                <alex-custom-button v-if="!isLastStep" class="mr-3" text="Próximo" :disabled="!isValid" />
                 <alex-custom-button
                   v-if="isLastStep"
                   type="submit"
@@ -202,10 +155,7 @@
             <template #step1>
               <v-row justify="start" class="pa-5" dense>
                 <v-col cols="12" class="d-flex">
-                  <v-col
-                    cols="4"
-                    class="d-flex flex-column justify-center align-center"
-                  >
+                  <v-col cols="4" class="d-flex flex-column justify-center align-center">
                     <app-user-avatar
                       :userId="formData.id || undefined"
                       can-edit
@@ -305,9 +255,7 @@
             <template #step2>
               <v-row justify="start" class="pa-5" dense>
                 <v-col cols="12" class="d-flex justify-center align-center">
-                  <div
-                    class="rounded-circle w-130 h-130 d-flex justify-center align-center upload-container"
-                  >
+                  <div class="rounded-circle w-130 h-130 d-flex justify-center align-center upload-container">
                     <app-user-avatar
                       :userId="formData.id || undefined"
                       can-edit
@@ -379,7 +327,7 @@ interface Institution {
   updatedBy: string;
 }
 
-interface CreationForm {
+export interface CreationForm {
   id: number | null;
   cnpj: string;
   users: User[];
@@ -522,9 +470,7 @@ const dataWithIndex = computed(() => {
     });
   }
 
-  return props.showPositions
-    ? data.map((item, index) => ({ index: index + 1, ...item }))
-    : data;
+  return props.showPositions ? data.map((item, index) => ({ index: index + 1, ...item })) : data;
 });
 
 const headers = computed(() => {
@@ -541,9 +487,7 @@ const headers = computed(() => {
 });
 
 const isFieldVisible = (field) => {
-  return itemsDisplayedFields.value.find(
-    (item) => item.text.toLowerCase() === field.toLowerCase(),
-  )?.selected;
+  return itemsDisplayedFields.value.find((item) => item.text.toLowerCase() === field.toLowerCase())?.selected;
 };
 
 const getInitForm = () => ({
@@ -595,10 +539,7 @@ function formatCNPJ() {
   let documentId = formData.value.cnpj.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
   if (documentId.length === 14) {
     documentId = documentId.padStart(14, '0');
-    documentId = documentId.replace(
-      /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-      '$1.$2.$3/$4-$5',
-    );
+    documentId = documentId.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
     formData.value.cnpj = documentId;
     fetchCNPJ();
   }

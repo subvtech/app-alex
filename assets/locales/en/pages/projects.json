@@ -22,7 +22,9 @@
     "overview": "Overview",
     "search_member": "Search member",
     "tasks": "Tasks",
-    "trails": "Trails"
+    "trails": "Trails",
+    "myJourney": "My Journey",
+    "empty_members": "No learning journey found"
   },
   "overview": {
     "completed": "Completed",
@@ -30,9 +32,11 @@
     "empty_journey": "No learning journey found!",
     "empty_meetings": "Nothing scheduled today!",
     "empty_members": "No members found",
-    "empty_task_progress": "0% of tasks have been completed",
-    "last_update": "Last update",
+    "empty_task_progress": "%{percentage}% of tasks have been completed",
+    "institutions": "Institutions",
+    "last_update": "Last update:",
     "remaining_time": "Remaining time",
+    "task_progress": "Task progress",
     "timeline_day": "Day",
     "timeline_month": "Month",
     "timeline_today": "Today",
@@ -40,7 +44,8 @@
     "timeline": "Timeline",
     "total_epics": "Total epics",
     "total_sprints": "Total sprints",
-    "total_story": "Total stories"
+    "total_story": "Total stories",
+    "total_tasks": "Total tasks"
   },
   "tasks": {
     "add_epic": "Add epic",
