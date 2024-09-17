@@ -474,7 +474,9 @@ watch(
       startDate.value = props.startDate;
       finalDate.value = props.finalDate;
       restrictions.value = props.restrictions;
-      isFirstTimeOpened.value = false;
+      setTimeout(() => {
+        isFirstTimeOpened.value = false;
+      }, 200);
       return;
     }
     isFirstTimeOpened.value = true;

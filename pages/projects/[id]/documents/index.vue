@@ -31,8 +31,8 @@
 
       <div
         :class="`
-          d-flex align-center ga-4 px-4 py-2 
-          rounded-lg border border-dashed 
+          d-flex align-center ga-4 px-4 py-2
+          rounded-lg border border-dashed
           tw-cursor-pointer hover:tw-bg-gray-100 tw-transition`"
         @click="addFolder()"
       >
@@ -666,6 +666,25 @@ const getFolders = () => {
 // onBeforeMount(() => {
   // headerStore.showHeader = true;
 // });
+
+  // {
+  //   title: 'Home',
+  //   disabled: true,
+  // },
+  // {
+  //   title: 'Projetos',
+  //   to: '/projects/me',
+  // },
+  // {
+  //   title: learningPlanStore.learningPlan.title,
+  //   to: `/courses/${learningPlanStore.learningPlan.id}`,
+  // },
+  // ];
+//};
+
+onBeforeMount(() => {
+  // headerStore.showHeader = true;
+});
 
 onMounted(() => {
   getTemplates();

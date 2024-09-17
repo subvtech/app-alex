@@ -1,17 +1,17 @@
 <template>
-  <div class="relative mt-4">
-    <p class="text-body-1 text-gray-800">{{ className }}</p>
+  <div class="relative">
+    <p v-if="className" class="text-body-1 text-gray-800">{{ className }}</p>
     <div
       class="invite justify-space-between my-2"
       :class="[theresTimeAndUrl ? '' : 'disabled', dark ? 'dark' : '']"
     >
-      <alex-custom-tooltip v-if="theresTimeAndUrl" :text="url!" class="url">
+      <alex-custom-tooltip v-if="theresTimeAndUrl" :text="urlRef" class="url">
         <template #content>
           <p
             class="cursor-pointer ellipsis break-word lines-1 w-100 text-decoration-none text-secondary-0"
-            @click="copyToClipboard(url)"
+            @click="copyToClipboard(urlRef)"
           >
-            {{ url }}
+            {{ urlRef }}
           </p>
         </template>
       </alex-custom-tooltip>
@@ -25,10 +25,11 @@
               :src="dark ? '/svg/refresh-dark.svg' : '/svg/refresh.svg'"
               width="20"
               height="20"
-              @click="updateLink"
+              @click="handleUpdateLink"
             />
           </template>
         </alex-custom-tooltip>
+
         <alex-custom-tooltip :text="$t('components.courses.invites.copy')">
           <template #content>
             <v-icon
@@ -36,7 +37,7 @@
               class="pointer"
               :color="dark ? '#6E7A87' : '#00B7CC'"
               size="small"
-              @click="copyToClipboard(url)"
+              @click="copyToClipboard(urlRef)"
               >mdi-content-copy</v-icon
             >
           </template>
@@ -55,78 +56,104 @@
 </template>
 
 <script setup lang="ts">
+import { MemberRoles } from '#imports';
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
 
-type InviteProps = {
+export interface InviteProps {
   duration: number;
-  classId: number;
-  courseId: number;
-  data?: InvitationLinkSimple | null;
+  inviteLinkExpiresAt?: Date | null;
+  inviteId?: string | null;
+  courseId: number | string;
+  classId?: number | null;
+  url?: string | null;
   dark?: boolean;
-  className: string;
-};
+  className?: string;
+  role?: MemberRoles;
+}
 
 const props = withDefaults(defineProps<InviteProps>(), {
   dark: false,
-  data: null,
   className: '',
+  url: null,
+  inviteId: null,
+  classId: null,
+  inviteLinkExpiresAt: null,
+  role: MemberRoles.STUDENT,
 });
 
-const { generateUrl, generateNewInvite, calcRemainingTime, msToHHMMSS } =
+const { inviteLinkExpiresAt, url } = toRefs(props);
+
+const { msToHHMMSS, generateNewInvite, calcRemainingTime, generateUrl } =
   useInvitationLink();
+const inviteId = ref<string | null>(props.inviteId);
+const urlRef = ref<string | null>(props.url);
+const inviteLinkExpiresAtRef = ref<Date | null>(props.inviteLinkExpiresAt);
+const {
+  remainingTime,
+  timeSpan,
+  timeRunning,
+  theresTime,
+  setTimeSpan,
+  setTimeRunning,
+  stopTimeout,
+} = useTimeout(props.duration * 1000);
 
-const inviteId = ref<number | null>(null);
-const url = toRef<string | null>(null);
-const remainingTime = toRef<number>(-5);
-
-const updateLink = async () => {
+const handleUpdateLink = async () => {
   const result = await generateNewInvite(
     inviteId.value,
     props.duration,
     props.courseId,
     props.classId,
+    props.role || MemberRoles.STUDENT,
   );
-  stopTimeout();
+  const newLink = generateUrl(result.data.attributes.hash, props.courseId);
 
-  url.value = generateUrl(result.data.attributes.hash, props.courseId);
+  urlRef.value = newLink;
+  inviteId.value = result.data.id;
+  inviteLinkExpiresAtRef.value = result.data.attributes.expires_at;
 
-  emit('update:link', { url: url.value });
-  remainingTime.value = calcRemainingTime(result.data.attributes.expires_at);
+  emit('update:link', {
+    expiresAt: result.data.attributes.expires_at,
+    url: newLink,
+    inviteId: result.data.id,
+  });
+
+  resetTimeout();
 };
 
-const theresTimeAndUrl = computed(() => theresTime.value && url.value);
-const theresTime = computed(() => remainingTime.value > 0);
-const timeoutId = ref<NodeJS.Timeout | null>(null);
-const stopTimeout = () => {
-  if (timeoutId.value) clearTimeout(timeoutId.value);
-  else timeoutId.value = null;
+const theresTimeAndUrl = computed(
+  () => theresTime.value && !!urlRef.value && !!props.courseId,
+);
+
+const resetTimeout = () => {
+  if (inviteLinkExpiresAtRef.value) {
+    setTimeSpan(calcRemainingTime(inviteLinkExpiresAtRef.value));
+  } else setTimeSpan(props.duration * 1000);
+
+  stopTimeout(true);
+  setTimeRunning(true);
 };
+
 onBeforeMount(() => {
-  if (!props.data) return;
-  if (props.data.hash) url.value = generateUrl(props.data.hash, props.courseId);
-  if (props.data.id) inviteId.value = props.data.id;
-  if (props.data.expires_at) {
-    remainingTime.value = calcRemainingTime(props.data.expires_at);
-  }
-});
-onUnmounted(() => {
-  stopTimeout();
-});
-
-watch(remainingTime, () => {
-  if (theresTime.value) {
-    timeoutId.value = setTimeout(() => {
-      remainingTime.value = remainingTime.value - 1000;
-    }, 1000);
-  }
+  if (props.url) resetTimeout();
 });
 
 watch(theresTimeAndUrl, () => {
-  if (theresTimeAndUrl.value) return;
-  if (timeoutId.value) stopTimeout();
+  if (theresTimeAndUrl.value) {
+    if (!timeRunning.value) resetTimeout();
+    return;
+  }
 
   emit('link:expired');
+});
+
+watch(url, () => {
+  urlRef.value = url.value;
+});
+watch(inviteLinkExpiresAt, () => {
+  inviteLinkExpiresAtRef.value = inviteLinkExpiresAt.value;
+  resetTimeout();
 });
 </script>
 

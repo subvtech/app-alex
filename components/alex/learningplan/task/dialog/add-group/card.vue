@@ -17,10 +17,22 @@
         :avatar-items="getGroupMemberAvatars(group.group_members)"
       />
     </div>
+
+    <alex-documentation-buttons-tooltip
+      v-if="unavailable"
+      icon="mdi-alert-circle-outline"
+      icon-size="small"
+      variant="text"
+      tooltip-location="bottom"
+      color="warning-0"
+      tooltip-text="Membro já está na atividade"
+      rounded
+    />
+
     <alex-custom-button
       size="small"
       variant="outlined"
-      :disabled="isAdded"
+      :disabled="isAdded || unavailable"
       @click="emit('add-members', group)"
       >{{
         isAdded
@@ -35,6 +47,7 @@
 interface GroupCard {
   group: LearningPlanGroupSimple;
   isAdded?: boolean;
+  unavailable?: boolean;
 }
 
 withDefaults(defineProps<GroupCard>(), {

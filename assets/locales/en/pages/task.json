@@ -1,7 +1,7 @@
 {
   "searchPlaceholder": "Find task",
-  "backlog": "Backlog",
   "draft": "Draft",
+  "backlog": "Backlog",
   "published": "Published",
   "done": "Closed",
   "archived": "Archived",
@@ -39,9 +39,10 @@
       "group": "Group"
     },
     "placeholders": {
-      "undefined": "Undefined",
       "noMembers": "None",
-      "noTasks": "No tasks found"
+      "not_informed": "Not informed",
+      "noTasks": "No tasks found",
+      "undefined": "Undefined"
     },
     "dropdown": {
       "kanban": "View Kanban",
@@ -56,42 +57,41 @@
     "tooltips": {
       "options": "Options",
       "kanban": "View Kanban"
-    },
-    "crud": {
-      "addSuccess": "created",
-      "editSuccess": "edited",
-      "deleteSuccess": "deleted",
-      "archiveSuccess": "archived",
-      "unarchiveSuccess": "unarchived",
-      "addError": "create",
-      "archiveError": "archive",
-      "unarchiveError": "unarchive",
-      "editError": "edit",
-      "deleteError": "delete",
-      "moveSuccess": "moved",
-      "moveError": "move",
-      "errorMessage": "Error while trying to {action} task, please try again!",
-      "successMessage": "Task {action} successfully!",
-      "dndSortError": "It is not possible to change the task position when sorting by {type} is active",
-      "dndFilterError": "It is not possible to change the task position when filtering is active",
-      "TASK_DATA_INCOMPLETE": "You need to fill in the task info before setting it as published",
-      "TASK_MOVE_HAS_DELIVERIES": "It is not possible to move the task to draft because it has deliveries"
-    },
-    "deleteModal": {
-      "title": "Do you really want to delete this Task?",
-      "subtitle": "When deleting a task, all content created within it will also be deleted.",
-      "cancel": "Cancel",
-      "delete": "Delete"
-    },
-    "filterChip": {
-      "select": "Type",
-      "archivedTasks": "Archived Tasks",
-      "startDate": "Start Date",
-      "finalDate": "End Date"
-    },
-    "add": "Add task",
-    "addPlaceholder": "Enter the task title",
-    "addButton": "Add"
+    }
   },
-  "add": "Add task"
+  "crud": {
+    "addSuccess": "created",
+    "editSuccess": "edited",
+    "deleteSuccess": "deleted",
+    "archiveSuccess": "archived",
+    "unarchiveSuccess": "unarchived",
+    "addError": "create",
+    "archiveError": "archive",
+    "unarchiveError": "unarchive",
+    "editError": "edit",
+    "deleteError": "delete",
+    "moveSuccess": "moved",
+    "moveError": "move",
+    "errorMessage": "Error while trying to {action} task, please try again!",
+    "successMessage": "Task {action} successfully!",
+    "dndSortError": "It is not possible to change the task position when sorting by {type} is active",
+    "dndFilterError": "It is not possible to change the task position when filtering is active",
+    "TASK_DATA_INCOMPLETE": "You need to fill in the task info before setting it as published",
+    "TASK_MOVE_HAS_DELIVERIES": "It is not possible to move the task to draft because it has deliveries"
+  },
+  "deleteModal": {
+    "title": "Do you really want to delete this Task?",
+    "subtitle": "When deleting a task, all content created within it will also be deleted.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "filterChip": {
+    "select": "Type",
+    "archivedTasks": "Archived Tasks",
+    "startDate": "Start Date",
+    "finalDate": "End Date"
+  },
+  "add": "Add task",
+  "addPlaceholder": "Enter the task title",
+  "addButton": "Add"
 }

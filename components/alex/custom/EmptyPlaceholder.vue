@@ -1,24 +1,15 @@
 <template>
-  <div
-    class="d-flex flex-column align-center justify-center align-center gap-6"
-  >
-    <img
-      class="img-size"
-      :class="hideImage ? 'd-none' : ''"
-      :src="emptyTextImage"
-    />
+  <div class="d-flex flex-column align-center justify-center align-center gap-6">
+    <img class="img-size" :class="[hideImage ? 'd-none' : '', grayscale ? 'tw-grayscale' : '']" :src="emptyTextImage" />
 
-    <span
-      class="info max-width align-self-center text-center text-color"
-      style="text-wrap: pretty"
-    >
+    <span class="info max-width align-self-center text-center text-color" style="text-wrap: pretty">
       {{ emptyTextMessage }}
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   emptyTextImage: {
     type: String,
     default: '/svg/EmptyAbout.svg',
@@ -28,6 +19,10 @@ const props = defineProps({
     default: '',
   },
   hideImage: {
+    type: Boolean,
+    default: false,
+  },
+  grayscale: {
     type: Boolean,
     default: false,
   },

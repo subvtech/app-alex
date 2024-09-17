@@ -4,7 +4,7 @@
       <alex-custom-button
         v-if="!hasActivatorSlot"
         v-bind="propsActivator"
-        icon="mdi-dots-vertical"
+        :icon="icon"
         :variant="props.variant"
         :size="props.buttonSize"
       />
@@ -48,6 +48,7 @@ interface DropdownProps {
   theme?: 'light' | 'dark';
   variant?: ButtonProps['variant'];
   buttonSize?: ButtonProps['size'];
+  icon?: string;
 }
 
 const props = withDefaults(defineProps<DropdownProps>(), {
@@ -55,6 +56,7 @@ const props = withDefaults(defineProps<DropdownProps>(), {
   warning: false,
   variant: 'primary',
   buttonSize: 'default',
+  icon: 'mdi-dots-vertical',
 });
 
 const slots = useSlots();
