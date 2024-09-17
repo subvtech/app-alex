@@ -1,80 +1,191 @@
 <template>
-  <div class="bg-white tw-rounded-lg tw-relative">
-    <SlickList
-      v-model:list="columns"
-      class="tw-w-full tw-flex tw-overflow-x-auto tw-overflow-y-hidden"
-      :distance="15"
-      axis="x"
-      use-drag-handle
-    >
-      <SlickItem v-for="(column, i) in columns" :key="column.title" :index="i">
-        <alex-learningplan-task-project-kanban-column
-          :column="column"
-          :items="items"
-          :title="column.title"
-          :group="column.group"
-          :color="column.color"
-          :accept="column.accept"
-          class="tw-mr-2"
-          @title-column-change="handleTitleChange"
-          @add-item="console.log($event)"
-        >
-          <template #card="{ item }">
-            <div>
-              {{ item.id }}
-            </div>
-          </template>
-        </alex-learningplan-task-project-kanban-column>
-      </SlickItem>
-
-      <div
-        class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[63px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 add-button"
+  <SlickList
+    v-model:list="columns"
+    class="tw-w-full tw-flex tw-flex-grow tw-overflow-x-auto tw-overflow-y-hidden bg-white tw-rounded-lg tw-relative tw-select-none"
+    :distance="15"
+    axis="x"
+    use-drag-handle
+    :disabled="!canDrag || isDraggingItems"
+  >
+    <SlickItem v-for="(column, i) in columns" :key="column.group" :index="i">
+      <alex-learningplan-task-project-kanban-column
+        :key="column.group"
+        v-model="columnItems[column.group]"
+        :title="column.title"
+        :group="column.group"
+        :color="column.color"
+        class="tw-mr-2"
+        @title-column-change="handleTitleChange"
+        @cancel-column="handleCancelColumn"
+        @add-item="console.log($event)"
+        @delete="handleConfirmDeleteColumn(column.group)"
+        @update-list="handleUpdateList"
+        @insert-card="handleInsertCard"
+        @sort-start="handleSortStart"
+        @sort-end="handleSortEnd"
       >
-        <v-icon size="20px">mdi-plus</v-icon>
-        <span class="text-body-4 text-gray-800">Adicionar coluna</span>
-      </div>
-    </SlickList>
-  </div>
+        <template #card="{ item }">
+          <slot name="card" :item="item.raw" />
+        </template>
+      </alex-learningplan-task-project-kanban-column>
+    </SlickItem>
+
+    <div
+      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[63px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 add-button"
+      @click="handleAddColumn"
+    >
+      <v-icon size="20px">mdi-plus</v-icon>
+      <span class="text-body-4 text-gray-800">Adicionar coluna</span>
+    </div>
+  </SlickList>
+  <alex-custom-confirm-dialog
+    v-model="modalDeleteColumn"
+    :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+    :title="confirmDeleteI18.title"
+    :subtitle="confirmDeleteI18.subtitle"
+    variant="error"
+    submit-button-text="Excluir"
+    no-input-confirmation
+    :cancel-button-text="confirmDeleteI18.cancel"
+    :no-submit-button="!!selectedDeleteGroup?.lenght"
+    @submit="handleDeleteColumn"
+    @cancel="modalDeleteColumn = false"
+  />
 </template>
 
-<script setup lang="ts">
+<script
+  setup
+  lang="ts"
+  generic="T extends { id: number; position: number; status: string }"
+>
 import { SlickList, SlickItem } from 'vue-slicksort';
-import { Colors } from './column/Header.vue';
-import { Accept } from './column/index.vue';
-interface Column {
-  title: string;
-  group: string;
-  color: Colors;
-  accept?: Accept<any> | null;
-  disable?: boolean;
-}
-// interface KanbanProps {
-//   columns?: Column[];
-// }
-// withDefaults(defineProps<KanbanProps>(), {
-//   columns: () => [],
-// });
+import { Column, GenericItem } from './types';
+
+type Slot<U> = {
+  card(props: { item: U }): any;
+};
+
 // refs
-const columns = defineModel<Column[]>({
+defineSlots<Slot<T>>();
+const columns = defineModel<Column<T>[]>({
   default: () => [],
 });
-const items = ref<{ id: number }[]>([]);
+const items = defineModel<GenericItem<T>[]>('items', {
+  default: () => [],
+});
+const columnItems = ref<Record<string, GenericItem<T>[]>>({});
 const canDrag = ref(true);
+const isDraggingItems = ref(false);
+const modalDeleteColumn = ref(false);
+const selectedDeleteGroup = ref<{ group: string; lenght: number } | null>(null);
+
+// computed
+const confirmDeleteI18 = computed(() => ({
+  title: selectedDeleteGroup.value?.lenght
+    ? 'No momento não é possível excluir esta coluna!'
+    : 'Deseja realmente excluir essa coluna?',
+  subtitle: selectedDeleteGroup.value?.lenght
+    ? 'Para remover esta coluna é necessário que ela esteja vazia. Mova todas as tarefas para outra coluna para realizar essa ação.'
+    : 'Esse processo é irreversível',
+  cancel: selectedDeleteGroup.value?.lenght ? 'Entendi' : 'Cancelar',
+}));
+
+// Methods
 const setCanDrag = (value: boolean) => {
   canDrag.value = value;
 };
-defineExpose({
-  canDrag,
-  setCanDrag,
-});
 const handleTitleChange = (group: string, value: string) => {
   columns.value = columns.value.map((column) => {
     if (column.group === group) {
       column.title = value;
+      column.group = value.trim().toLowerCase().replace(/ /g, '_');
     }
     return column;
   });
+  items.value = items.value.map((item) => {
+    if (item.group === group) {
+      item.group = value.trim().toLowerCase().replace(/ /g, '_');
+    }
+    return item;
+  });
 };
+const handleAddColumn = () => {
+  columns.value.push({
+    title: '',
+    group: `column-${columns.value.length + 1}`,
+    color: 'gray',
+  });
+  setTimeout(() => {
+    const input = document.querySelector<HTMLInputElement>(
+      `#${columns.value[columns.value.length - 1].group} input`,
+    );
+    if (input) {
+      input.focus();
+    }
+  }, 100);
+};
+const handleCancelColumn = (group: string) => {
+  columns.value = columns.value.filter((column) => column.group !== group);
+};
+const handleConfirmDeleteColumn = (group: string) => {
+  selectedDeleteGroup.value = {
+    group,
+    lenght: columnItems.value[group].length,
+  };
+  modalDeleteColumn.value = true;
+};
+const handleDeleteColumn = () => {
+  if (!selectedDeleteGroup.value) {
+    return;
+  }
+  if (columnItems.value[selectedDeleteGroup.value.group].length) return;
+  columns.value = columns.value.filter(
+    (column) => column.group !== selectedDeleteGroup.value?.group,
+  );
+  selectedDeleteGroup.value = null;
+  modalDeleteColumn.value = false;
+};
+const handleInsertCard = (values: {
+  newIndex: number;
+  value: GenericItem<T>;
+  group: string;
+}) => {
+  items.value = items.value.map((item) => {
+    if (item.raw.id === values.value.raw.id) {
+      item.group = values.group;
+      item.raw.status = values.group;
+    }
+    return item;
+  });
+};
+const handleUpdateList = (list: GenericItem<T>[]) => {
+  items.value = items.value.map((item) => {
+    const updatedItemIndex = list.findIndex((i) => i.raw.id === item.raw.id);
+    if (updatedItemIndex !== -1) {
+      item.raw.position = updatedItemIndex;
+    }
+    return item;
+  });
+};
+const setColumnItems = () => {
+  columns.value.forEach((column) => {
+    columnItems.value[column.group] = items.value
+      .filter((item) => item.group === column.group)
+      .sort((a, b) => a.raw.position - b.raw.position);
+  });
+};
+const handleSortStart = () => {
+  isDraggingItems.value = true;
+};
+const handleSortEnd = () => {
+  isDraggingItems.value = false;
+};
+setColumnItems();
+watch(items, setColumnItems, { deep: true });
+defineExpose({
+  canDrag,
+  setCanDrag,
+});
 </script>
 
 <style scoped lang="scss">
@@ -84,5 +195,19 @@ const handleTitleChange = (group: string, value: string) => {
 }
 .add-button:active {
   background-color: rgb(var(--v-theme-gray-200));
+}
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.slide-fade-move {
+  transition: transform 0.3s ease;
 }
 </style>

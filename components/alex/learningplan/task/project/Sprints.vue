@@ -23,8 +23,18 @@
             size="small"
             :text="sprint.raw.tasks.length.toString()"
           />
-          <alex-custom-button class="ml-auto" icon="mdi-plus" variant="text" />
-          <alex-custom-button icon="mdi-dots-vertical" variant="text" />
+          <div class="ml-auto">
+            <alex-custom-dropdown
+              :items="dropdownItems(index)"
+              icon="mdi-plus"
+              variant="text"
+            />
+          </div>
+          <alex-custom-dropdown
+            :items="dropdownItems(index)"
+            icon="mdi-dots-vertical"
+            variant="text"
+          />
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <Transition :name="slideTransition(index)" mode="out-in">
@@ -49,13 +59,7 @@
                 :search="search"
                 :active-filter="activeFilter"
                 :group="sprint.group"
-                :over="setOver(sprint.group)"
-                :drag-from="dragDrop.dragFrom.value"
-                :dragging="dragDrop.dragging.value"
-                @start-drag="dragDrop.startDrag"
-                @drag-over="dragDrop.onDragOver"
-                @drag-leave="dragDrop.onDragLeave"
-                @drag-end="(item, sort) => $emit('drag-end', item, sort)"
+                :is-project="true"
                 @delete-task="(item) => $emit('delete-task', item)"
                 @move-task="(item) => $emit('move-task', item)"
                 @edit-task="(item) => $emit('edit-task', item)"
@@ -136,6 +140,12 @@ export interface Sprint {
   endDate: Date | string;
   tasks: TaskItem[];
 }
+
+interface DropdownItem {
+  text: string;
+  warning?: boolean;
+  onClick: () => void;
+}
 interface DragDrop {
   over: Ref<{
     list: string;
@@ -159,6 +169,7 @@ interface SprintProps {
   learningPlanId: number;
   search: string;
   activeFilter?: boolean;
+  editSprints: DropdownItem[];
 }
 withDefaults(defineProps<SprintProps>(), { activeFilter: false });
 type Emit = {
@@ -195,18 +206,14 @@ const toggleExpandSprint = (id: number) => {
 };
 const slideTransition = (i: number) =>
   sprints.value[i].raw.tasks.length ? 'slide-down' : 'slide-up';
-const setOver = (group: string) => {
-  if (dragDrop.value.over.value.list === group)
-    return dragDrop.value.over.value;
-  return { ...dragDrop.value.over.value, id: -1 };
-};
-const formattDate = (date: Date) =>
+
+const formatDate = (date: Date) =>
   format(date, 'dd MMM', { locale: locale.value === 'pt' ? ptBR : enUS });
 const getHigherIndex = (sprint: Sprint) => {
   return sprint[sprint.tasks.length - 1].position + 1;
 };
 const getSprintDates = (sprint: Sprint) => {
-  return `${formattDate(new Date(sprint.startDate))} - ${formattDate(
+  return `${formatDate(new Date(sprint.startDate))} - ${formatDate(
     new Date(sprint.startDate),
   )}`;
 };
@@ -220,6 +227,48 @@ const handleEmptyStateOver = (
 const handleStartCreateTask = (index: number) => {
   taskTitle.value = '';
   isCreatingTask.value = index;
+};
+
+const moveSprint = (index: number, position: 'up' | 'down') => {
+  console.log(index, position);
+};
+
+const dropdownItems = (index: number): DropdownItem[] => {
+  const items: DropdownItem[] = [];
+
+  const moveActions = [
+    { condition: true, text: 'Editar', action: () => console.log('Editar') },
+    {
+      condition: index !== 0,
+      text: 'Mover para cima',
+      action: () => moveSprint(index, 'up'),
+    },
+    {
+      condition: index !== sprints.value.length - 1,
+      text: 'Mover para baixo',
+      action: () => moveSprint(index, 'down'),
+    },
+
+    // TODO: Alterar a condição para verificar se tem entregas ou não
+    {
+      condition: true,
+      text: 'Excluir',
+      warning: true,
+      action: () => console.log('Excluir'),
+    },
+  ];
+
+  moveActions.forEach(({ condition, text, action, warning }) => {
+    if (condition) {
+      items.push({
+        text,
+        warning,
+        onClick: action,
+      });
+    }
+  });
+
+  return items;
 };
 </script>
 

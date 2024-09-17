@@ -76,8 +76,8 @@ const currentData = ref<EditorSubmission>();
 const taskMemberId = toRef(props, 'taskMemberId');
 const hasEditorChanges = ref(false);
 const lastSaveDate = ref<Date | null>(null);
-
 const saveCountDown = ref<number>(saveTime);
+const submissionId = ref<number>(props.lastSubmission?.id || 0);
 
 watch(editorContent, (_, previous) => {
   prevEditorContent.value = previous;
@@ -89,12 +89,7 @@ const saveSubmissionLoop = async () => {
     return;
   }
 
-  const changed = await checkDataChanges();
-
-  if (changed) {
-    hasEditorChanges.value = changed;
-    saveContent();
-  }
+  await checkDataChanges();
 
   saveCountDown.value = saveTime;
 };
@@ -102,7 +97,7 @@ const saveSubmissionLoop = async () => {
 const checkDataChanges = async () => {
   const taskSubmission = await findOne('task-submissions', {
     filters: {
-      id: props.lastSubmission?.id || 0,
+      id: submissionId.value || 0,
     },
   });
   const submissionStatus = taskSubmission.data[0]?.attributes?.submitted_at;
@@ -171,16 +166,17 @@ const openDialog = async () => {
   isLoading.value = false;
 };
 const saveContent = async () => {
-  if (props.lastSubmission?.id) {
-    await update('task-submissions', props.lastSubmission.id, {
+  if (submissionId.value) {
+    await update('task-submissions', submissionId.value, {
       submission: editorContent.value,
     });
     emit('update-submission');
   } else {
-    await create('task-submissions', {
+    const submission = await create('task-submissions', {
       task_member: props.taskMemberId,
       submission: editorContent.value,
     });
+    submissionId.value = submission.data.id;
     emit('update-submission');
   }
   if (props.taskStatus === 'to_do') {
