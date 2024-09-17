@@ -7,6 +7,7 @@ import { isEmpty } from '@/utils/is-empty';
 import { Droppable, SprintTask } from '../-types';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
+import { Field } from 'vee-validate';
 
 const props = defineProps<{
   filter?: filterType;
@@ -14,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { create, delete: _delete, update } = useStrapi();
+const { create, delete: _delete, update, find } = useStrapi();
 const { setMessage } = useMessageStore();
 const strapiClient = useStrapiClient();
 const learningPlanStore = useLearningPlanStore();
@@ -222,8 +223,24 @@ onMounted(async () => {
 
     backlogTasks.value = res.backlog;
     sprintTasks.value = res.sprints;
+
+    console.log('Backlog | Sprint', res.backlog, res.sprints);
   } catch (_) {}
 });
+
+const handleUpdateTask = (taskId, field, value) => {
+  if (!taskId || !field) {
+    return;
+  }
+
+  backlogTasks.value = backlogTasks.value.map((task) => {
+    if (task.id === taskId) {
+      task[field] = value;
+    }
+
+    return task;
+  });
+};
 </script>
 
 <template>
@@ -330,9 +347,10 @@ onMounted(async () => {
         :project-id="learningPlanStore.learningPlan.id"
       />
     </div>
-    <alex-learningplan-task-drawer-teacher
+    <!-- <alex-learningplan-task-drawer-teacher
       v-model="teacherDrawer"
       editable
+      project
       :end-date="editTask?.finish_at"
       :learningplan-id="learningPlanStore.learningPlan?.id || 0"
       :start-date="editTask?.start_at"
@@ -341,6 +359,17 @@ onMounted(async () => {
       :title="editTask?.title"
       :type="editTask?.type"
       @change-values="handleChangeValues"
+    /> -->
+    <alex-learningplan-task-drawer-project
+      v-model="teacherDrawer"
+      :task-id="editTask?.id || 0"
+      :task="editTask"
+      :sprints="sprintTasks"
+      @update-value="
+        (field, value) => {
+          handleUpdateTask(editTask?.id ?? 0, field, value);
+        }
+      "
     />
   </div>
 </template>
