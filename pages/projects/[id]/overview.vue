@@ -175,25 +175,53 @@ onBeforeMount(async () => {
     </div>
 
     <div class="tw-grid tw-grid-cols-12 tw-gap-4">
-      <div class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8 bg-white rounded">
-        <div class="pl-6 py-4 tw-h-[72px]" :class="!ganttItems.length ? 'tw-border-b tw-border-gray-200' : ''">
-          <h4 class="text-gray-800 text-h4">{{ $t('pages.projects.overview.timeline') }}</h4>
-        </div>
-        <div v-if="loading" class="tw-flex tw-justify-center tw-items-center tw-w-full">
-          <v-progress-circular indeterminate />
-        </div>
-        <div v-else-if="ganttItems.length">
-          <Gantt
-            ref="ganttRef"
-            class="tw-flex-1"
-            :max-height="475"
-            :items="ganttItems"
-            :sprints="ganttSprints"
-            :view="ganttView"
-          />
-        </div>
-        <alex-custom-empty-placeholder v-else />
-      </div>
+      <alex-custom-card
+        no-footer
+        no-header
+        title="Linha temporal"
+        class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8"
+        content-class-name="tw-flex-1"
+      >
+        <template #header>
+          <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-px-6 tw-py-4 tw-border-b">
+            <div class="tw-flex tw-items-center tw-gap-4">
+              <span class="tw-text-gray-600 tw-font-bold tw-text-xl tw-leading-8">
+                {{ $t('pages.projects.overview.timeline') }}
+              </span>
+              <alex-custom-button size="small" @click="ganttRef?.changeToCurrentDate()">
+                {{ $t('pages.projects.overview.timeline_today') }}
+              </alex-custom-button>
+            </div>
+            <div class="tw-flex tw-gap-1 tw-overflow-auto">
+              <alex-custom-button
+                v-for="view in ['day', 'week', 'month']"
+                :key="view"
+                :variant="ganttView === view ? 'secondary' : 'text'"
+                @click="ganttView = view"
+              >
+                {{ $t(`pages.projects.overview.timeline_${view}`) }}
+              </alex-custom-button>
+            </div>
+          </div>
+        </template>
+        <template #content>
+          <div class="tw-flex tw-flex-col tw-flex-1 tw-gap-2 tw-w-full tw-pt-6">
+            <div v-if="loading" class="tw-flex tw-justify-center tw-items-center tw-w-full">
+              <v-progress-circular indeterminate />
+            </div>
+            <Gantt
+              v-else-if="ganttItems.length"
+              ref="ganttRef"
+              class="tw-flex-1"
+              :max-height="475"
+              :items="ganttItems"
+              :sprints="ganttSprints"
+              :view="ganttView"
+            />
+            <alex-custom-empty-placeholder v-else />
+          </div>
+        </template>
+      </alex-custom-card>
       <overview-task-progress
         class="tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
         :categories="'total'"
@@ -204,13 +232,13 @@ onBeforeMount(async () => {
         title="Encontros"
         full-width
         class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
-        content-class-name="d-flex justify-center align-center h-100"
+        content-class-name="justify-center align-center h-100"
         no-footer
       >
         <template #content>
           <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
             <!-- TODO: Trocar isso aqui por tabs -->
-            <div class="tw-flex tw-gap-1 tw-overflow-auto ga-6 justify-center tw-items-center tw-self-center mb-4">
+            <div class="tw-flex tw-gap-1 ga-6 tw-items-center mb-4 tw-overflow-auto">
               <div v-for="day in currentWeek" :key="day.value">
                 <div
                   class="tw-h-[57px] tw-w-[41px] pa-2 rounded-lg"
@@ -238,12 +266,14 @@ onBeforeMount(async () => {
           </div>
         </template>
       </alex-custom-card>
-      <div class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4">
+      <div
+        class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4 rounded-lg"
+      >
         <div class="tw-border-b tw-p-5 tw-flex tw-justify-between tw-items-center">
           <h3>{{ $t('pages.projects.overview.institutions') }}</h3>
           <alex-project-dialogs-institution :institutions="institutions" />
         </div>
-        <div class="tw-flex tw-flex-col tw-px-4 tw-items-center tw-justify-center tw-gap-2 tw-w-full my-auto">
+        <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2 tw-w-full my-auto pa-6">
           <alex-profile-institution-item
             v-for="institution in institutions"
             :id="institution.id"
