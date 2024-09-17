@@ -43,7 +43,6 @@
             :selected-val="selectedSprint"
             :options="sprints"
             @select="(sprint) => (selectedSprint = sprint)"
-            @create="handleCreateSprint"
           />
         </v-col>
 
@@ -230,94 +229,29 @@ watch(tags, (tags) => {
 const status = ref<string | number>(0);
 const statusConfig = ref<any>(undefined);
 
-watch(status, (status) => {
-  if (isFirstTimeOpened.value) {
-    return;
-  }
-
-  update('tasks', props.taskId, { status });
-});
+// watch(status, (status) => {
+//   // if (isFirstTimeOpened.value) {
+//   //   return;
+//   // }
+//   // strapiClient(`/tasks/${props.taskId}/update-task-kanban-status`, {
+//   //   body: {
+//   //     data: {
+//   //       sprint: currSprint.id,
+//   //       kanban_column: status,
+//   //     },
+//   //   },
+//   // });
+// });
 
 // Epic
 const epicOpen = ref<boolean>(false);
 const selectedEpic = ref<string | null>(null);
 const epics = ref([]);
 
-const handleCreateEpic = (title) => {
-  if (!title || !props.task?.id) {
-    selectedEpic.value = null;
-    return;
-  }
-
-  if (!selectedSprint.value) {
-    setMessage('Por favor selecione uma sprint', 'warning', true);
-    return;
-  }
-
-  epicOpen.value = false;
-
-  const found = epics.value.find((epic) => epic.title === title);
-
-  if (found) {
-    setTimeout(() => (selectedEpic.value = found.title), 100);
-    return;
-  }
-
-  create('tasks', {
-    title,
-    organization: 'epic',
-    learningplan: learningPlanStore.learningPlan?.id ?? 0,
-    sprint: sprints.value.find(({ title }) => selectedSprint.value === title)?.id ?? 0,
-    // kanban_column_task: status.value,
-  })
-    .then(({ data }) => {
-      setMessage('Épico criado com sucesso', 'success', true);
-      console.log(data);
-      selectedEpic.value = title;
-      epics.value = [...epics.value, { id: data.id, ...data.attributes }];
-    })
-    .catch((error) => {
-      setMessage('Falha ao criar épico', 'error', true);
-      console.log(error);
-    });
-};
-
 // Sprint
 const sprintOpen = ref<boolean>(false);
 const selectedSprint = ref<string | null>(null);
 const sprints = ref([{ title: 'Backlog' }, ...props.sprints]);
-
-const handleCreateSprint = (title: string) => {
-  if (!title || !props.task?.id) {
-    selectedSprint.value = null;
-    return;
-  }
-
-  sprintOpen.value = false;
-
-  const found = sprints.value.find((sprint) => sprint.title === title);
-
-  if (found) {
-    selectedSprint.value = found.title;
-    return;
-  }
-
-  create('sprints', {
-    title,
-    start_at: new Date(),
-    project: learningPlanStore.learningPlan?.id,
-    tasks: [props.task.id],
-  })
-    .then(({ data }) => {
-      selectedSprint.value = title;
-      sprints.value = [...sprints.value, { id: data.id, ...data.attributes }];
-      setMessage('Sprint criada com sucesso', 'success', true);
-    })
-    .catch(() => {
-      selectedSprint.value = 'Backlog';
-      setMessage('Falha ao criar sprint', 'error', true);
-    });
-};
 
 watch(
   () => props.sprints,
@@ -436,45 +370,6 @@ watch(endDate, (date) => {
 const historyOpen = ref<boolean>(false);
 const selectedHistory = ref<string | null>(null);
 const histories = ref<TaskSimple[]>([]);
-
-const handleCreateStory = (title) => {
-  if (!title || !props.task?.id) {
-    selectedHistory.value = null;
-    return;
-  }
-
-  if (!selectedSprint.value) {
-    setMessage('Por favor selecione uma sprint', 'warning', true);
-    return;
-  }
-
-  historyOpen.value = false;
-
-  const found = histories.value.find((story) => story.title === title);
-
-  if (found) {
-    setTimeout(() => (selectedHistory.value = found.title), 100);
-    return;
-  }
-
-  create('tasks', {
-    title,
-    organization: 'story',
-    learningplan: learningPlanStore.learningPlan?.id ?? 0,
-    sprint: sprints.value.find(({ title }) => selectedSprint.value === title)?.id ?? 0,
-    // kanban_column_task: status.value,
-  })
-    .then(({ data }) => {
-      setMessage('História criado com sucesso', 'success', true);
-      console.log(data);
-      selectedHistory.value = title;
-      histories.value = [...histories.value, { id: data.id, ...data.attributes }];
-    })
-    .catch((error) => {
-      setMessage('Falha ao criar história', 'error', true);
-      console.log(error);
-    });
-};
 
 // Description
 const description = ref<string>('');
