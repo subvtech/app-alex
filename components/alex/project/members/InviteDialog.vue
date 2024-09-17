@@ -112,6 +112,7 @@ export interface InviteDialogProps {
   ignoreUserEmails?: string[];
 }
 const { t } = useI18n();
+const { setMessage } = useMessageStore();
 const { generateUrl } = useInvitationLink();
 const { create } = useStrapi();
 const emit = defineEmits([
@@ -159,6 +160,8 @@ const inviteTypeCapitalised = computed(() => capitalize(inviteType.value));
 const disableSubmit = computed(() => membersToInvite.value.length === 0);
 
 const inviteMembers = async () => {
+  const successfulInvitations: number[] = [];
+  const failedInvitations: { id: number; error: any }[] = [];
   try {
     await Promise.all(
       membersToInvite.value.map(async (member) => {
@@ -173,8 +176,10 @@ const inviteMembers = async () => {
 
         try {
           await create('learning-plan-members', data);
-        } catch (error) {
+          successfulInvitations.push(member.id);
+        } catch (error: any) {
           console.error(`Error inviting member ${member.id}:`, error);
+          failedInvitations.push({ id: member.id, error: error.message });
         }
       }),
     );
@@ -183,6 +188,18 @@ const inviteMembers = async () => {
   } finally {
     dialogModel.value = false;
     membersToInvite.value = [];
+    if (successfulInvitations.length > 0) {
+      setMessage(
+        t('components.learningPlan.projects.invite.added'),
+        'green',
+        true,
+      );
+    } else
+      setMessage(
+        t('components.learningPlan.projects.invite.duplicated'),
+        'red',
+        true,
+      );
     emit('update:members');
   }
 };

@@ -56,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import { MemberRoles } from '#imports';
 const { copyToClipboard } = useCopyText();
 const emit = defineEmits(['update:link', 'link:expired']);
 
@@ -68,16 +69,17 @@ export interface InviteProps {
   url?: string | null;
   dark?: boolean;
   className?: string;
+  role?: MemberRoles;
 }
 
 const props = withDefaults(defineProps<InviteProps>(), {
   dark: false,
-
   className: '',
   url: null,
   inviteId: null,
   classId: null,
   inviteLinkExpiresAt: null,
+  role: MemberRoles.STUDENT,
 });
 
 const { inviteLinkExpiresAt, url } = toRefs(props);
@@ -103,6 +105,7 @@ const handleUpdateLink = async () => {
     props.duration,
     props.courseId,
     props.classId,
+    props.role || MemberRoles.STUDENT,
   );
   const newLink = generateUrl(result.data.attributes.hash, props.courseId);
 

@@ -48,7 +48,7 @@ export const useInvitationLink = () => {
     duration: number,
     learningplanId: number | string,
     classId: number | string | null,
-    role: MemberRoles.STUDENT | MemberRoles.PARTNER = MemberRoles.STUDENT,
+    role: MemberRoles = MemberRoles.STUDENT,
   ) => {
     try {
       if (inviteId) await _delete('invitation-links', inviteId);

@@ -143,7 +143,6 @@ const updateSearch = (value: string) => {
 watch(
   () => learningPlanStore.learningPlan,
   () => {
-    console.log('changed');
     activeMembers.value = learningPlanStore.learningPlan?.members || [];
   },
 );
