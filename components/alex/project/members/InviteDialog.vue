@@ -54,7 +54,7 @@
       <div class="d-flex w-100 tw-justify-between align-center gap-4">
         <alex-inputs-users-autocomplete
           v-if="!noSelectUsers"
-          v-model="members"
+          v-model="membersToInvite"
           class="w-100"
           name="members"
           :label="$t('components.learningPlan.projects.invite.people')"
@@ -65,6 +65,7 @@
           :submit-button-text="
             $t('components.learningPlan.projects.invite.submit')
           "
+          :disable-submit-button="disableSubmit"
           show-submit-button
           required
           thicker-label
@@ -91,7 +92,7 @@
 
 <script setup lang="ts">
 import { AlexDropdownItem } from '../../custom/Dropdown.vue';
-import { MemberRoles } from '#imports';
+import { MemberRoles, UserSimple } from '#imports';
 
 export interface InviteDialogProps {
   dialogTitle: string;
@@ -112,8 +113,13 @@ export interface InviteDialogProps {
 }
 const { t } = useI18n();
 const { generateUrl } = useInvitationLink();
-
-const emit = defineEmits(['action', 'click:filter', 'update:search']);
+const { create } = useStrapi();
+const emit = defineEmits([
+  'action',
+  'click:filter',
+  'update:search',
+  'update:members',
+]);
 const props = withDefaults(defineProps<InviteDialogProps>(), {
   ignoreUserEmails: () => [],
   ignoreUserIds: () => [],
@@ -130,7 +136,7 @@ const plainLink = ref<string | null>(
   props.inviteLinkHash ? generateUrl(props.inviteLinkHash) : null,
 );
 
-const members = ref([]);
+const membersToInvite = ref<UserSimple[]>([]);
 const dialogModel = defineModel<boolean>({ required: true });
 
 const inviteType = ref<MemberRoles.COLLABORATOR | MemberRoles.STUDENT>(
@@ -148,12 +154,37 @@ const dropdownItems: AlexDropdownItem[] = [
   },
 ];
 
-const inviteTypeCapitalised = computed(
-  () => inviteType.value.charAt(0).toUpperCase() + inviteType.value.slice(1),
-);
+const inviteTypeCapitalised = computed(() => capitalize(inviteType.value));
 
-const inviteMembers = () => {
-  console.log({ members: members.value });
+const disableSubmit = computed(() => membersToInvite.value.length === 0);
+
+const inviteMembers = async () => {
+  try {
+    await Promise.all(
+      membersToInvite.value.map(async (member) => {
+        const data = {
+          user: member.id,
+          email: member.email,
+          status: MemberStatus.PENDING_INVITATION,
+          joined_at: new Date(),
+          learningplan: props.learningPlanId,
+          role: inviteType.value,
+        };
+
+        try {
+          await create('learning-plan-members', data);
+        } catch (error) {
+          console.error(`Error inviting member ${member.id}:`, error);
+        }
+      }),
+    );
+  } catch (error) {
+    console.error('Error during bulk invitation:', error);
+  } finally {
+    dialogModel.value = false;
+    membersToInvite.value = [];
+    emit('update:members');
+  }
 };
 
 const updateLink = (data) => {

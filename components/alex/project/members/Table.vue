@@ -7,7 +7,7 @@
       :search-placeholder="
         $t('components.learningPlan.projects.searchPlaceholder')
       "
-      :hide-action="canEdit"
+      :hide-action="!canEdit"
       use-mobile-breakpoint
       use-custom-dialog
       @click:filter="emit('toggle:drawer')"
@@ -26,8 +26,10 @@
           :disable-invite="disableInvite"
           :dialog-action-disabled="false"
           :dialog-action-loading="false"
+          @update:members="updateMembers"
       /></template>
     </alex-learningplan-class-section-card-header>
+
     <div v-if="activeFilters.length > 0" class="d-flex gap-2">
       <alex-custom-chip
         v-for="(filter, index) in activeFilters"
@@ -42,7 +44,7 @@
     </div>
     <v-data-iterator
       v-model:page="page"
-      :items="data"
+      :items="dataRef"
       :items-per-page="12"
       :filter-keys="['name', 'email']"
       class="position-relative w-100"
@@ -75,18 +77,25 @@
               </td>
               <td>
                 <alex-custom-chip
-                  :text="item.role"
+                  :text="capitalize(item.role)"
                   :status="
                     item.role === MemberRoles.STUDENT ? 'secondary' : 'primary'
                   "
                 />
               </td>
               <td>
-                <alex-custom-chip :text="item.status" :status="'blue'" />
+                <alex-custom-chip
+                  :text="capitalize(item.status)"
+                  :status="
+                    item.status === MemberStatus.JOINED ? 'green' : 'secondary'
+                  "
+                />
               </td>
 
               <td>
-                <alex-custom-dropdown :items="items(item.user.username)">
+                <alex-custom-dropdown
+                  :items="dropdownItems(item.user.username, item.id, item.role)"
+                >
                   <template #activator="{ props: activeProps }">
                     <alex-custom-button
                       v-bind="activeProps"
@@ -121,6 +130,9 @@
 </template>
 
 <script setup lang="ts">
+import { AlexDropdownItem } from '../../custom/Dropdown.vue';
+import { MemberRoles } from '#imports';
+
 export interface TableCardProps {
   showPositions?: boolean;
   data: LearningPlanMemberSimple[];
@@ -134,15 +146,22 @@ export interface TableCardProps {
   disableInvite?: boolean;
   activeFilters?: string[];
 }
-
+const { delete: _delete } = useStrapi();
+const { find } = useStrapiUtils();
 const props = withDefaults(defineProps<TableCardProps>(), {
   activeFilters: () => [],
   activeInviteId: null,
   inviteLinkHash: null,
   inviteLinkExpiresAt: null,
 });
+
+const { data } = toRefs(props);
+const dataRef = ref(props.data);
+
 const emit = defineEmits(['update:search', 'toggle:drawer', 'remove:filter']);
 const { t } = useI18n();
+const { setMessage } = useMessageStore();
+
 const page = ref(1);
 
 const headers = computed(() => {
@@ -159,20 +178,27 @@ const headers = computed(() => {
   ];
 });
 
-const items = (username) => {
-  const temp = [
+const dropdownItems = (username, id, role: MemberRoles) => {
+  const temp: AlexDropdownItem[] = [
     {
       text: t('components.learningPlan.projects.profile'),
       icon: 'mdi-account-outline',
       onClick: () => navigateTo(`/users/${username}`),
     },
   ];
-  if (props.canEdit)
+  if (props.canEdit && role !== MemberRoles.FACILITATOR)
     temp.push({
       text: t('components.learningPlan.projects.delete'),
       icon: 'mdi-trash-can-outline',
-      onClick: () => {
-        console.log('delete ');
+      warning: true,
+      onClick: async () => {
+        await _delete('learning-plan-members', id);
+        dataRef.value = dataRef.value.filter((item) => item.id !== id);
+        setMessage(
+          t('components.learningPlan.projects.invite.deleted'),
+          'green',
+          true,
+        );
       },
     });
 
@@ -189,6 +215,22 @@ const searchModel = computed({
     emit('update:search', value);
   },
 });
+
+const updateMembers = async () => {
+  const newMembers = (
+    await find<LearningPlanMemberSimple>('learning-plan-members', {
+      filters: {
+        learningplan: props.learningPlanId,
+      },
+      populate: ['user'],
+    })
+  ).data;
+
+  dataRef.value = newMembers;
+
+  // dataRef.value = data.value.concat(newMembers.data);
+};
+
 const setTableData = (items): readonly LearningPlanMemberSimple[] =>
   items.map((item) => item.raw);
 
@@ -212,4 +254,8 @@ const showingData = (groupedItems) => {
   }
   return message;
 };
+
+watch(data, () => {
+  dataRef.value = data.value;
+});
 </script>

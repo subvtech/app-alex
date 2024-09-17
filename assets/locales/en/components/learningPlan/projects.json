@@ -19,6 +19,7 @@
     "description": "Roles settings per invite",
     "noData": "Search users to add to the project",
     "submit": "Send",
+    "deleted": "The selected member was removed from the project.",
     "disabled": "Invites are disabled, at the moment you can only add people manually."
    
   }

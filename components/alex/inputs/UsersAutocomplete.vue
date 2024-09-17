@@ -13,6 +13,7 @@
       :show-submit-button="showSubmitButton"
       :submit-button-text="submitButtonText"
       :submit-button-loading="submitButtonLoading"
+      :disable-submit-button="disableSubmitButton"
       v-bind="$attrs"
       @click:button="emit('click:button')"
     >
@@ -63,6 +64,7 @@ interface AutoCompleteUsersProps {
   ignoreUserIds?: number[];
   ignoreEmails?: string[];
   submitButtonText?: string;
+  disableSubmitButton?: boolean;
   showSubmitButton?: boolean;
   submitButtonLoading?: boolean;
 }

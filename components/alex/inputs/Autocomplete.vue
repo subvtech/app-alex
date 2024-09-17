@@ -53,6 +53,7 @@
         v-if="showSubmitButton"
         size="large"
         :loading="submitButtonLoading"
+        :disabled="disableSubmitButton"
         @click="emit('click:button')"
         >{{ submitButtonText }}</alex-custom-button
       >
@@ -71,6 +72,7 @@ interface AutoCompleteProps {
   info?: string;
   disabled?: boolean;
   showSubmitButton?: boolean;
+  disableSubmitButton?: boolean;
   submitButtonLoading?: boolean;
   submitButtonText?: string;
   theme?: 'light' | 'dark';
@@ -87,6 +89,7 @@ const props = withDefaults(defineProps<AutoCompleteProps>(), {
   submitButtonText: 'Submit',
   showSubmitButton: false,
   submitButtonLoading: false,
+  disableSubmitButton: false,
 });
 
 const emit = defineEmits(['click:button']);

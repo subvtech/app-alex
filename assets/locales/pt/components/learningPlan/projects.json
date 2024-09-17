@@ -19,6 +19,7 @@
     "description": "Configuração de papéis por convite",
     "noData": "Busque usuários para adicionar ao projeto.",
     "submit": "Enviar",
-     "disabled": "Os convites estão desativados, no momento só será possível adicionar pessoas manualmente."
+    "deleted": "O membro foi removido do projeto.",
+    "disabled": "Os convites estão desativados, no momento só será possível adicionar pessoas manualmente."
   }
 }

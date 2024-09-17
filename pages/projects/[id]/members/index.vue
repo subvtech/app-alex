@@ -43,15 +43,6 @@ const search = ref('');
 const filterDrawer = ref(false);
 
 const learningPlanStore = useLearningPlanStore();
-const activeMembers = ref<LearningPlanMemberSimple[]>([]);
-
-// Watch for changes in the store's activeMembers
-watch(
-  () => learningPlanStore.activeProjectMembers,
-  (newActiveMembers) => {
-    activeMembers.value = newActiveMembers;
-  },
-);
 
 const filters: FilterItemProps[] = [
   {
@@ -71,6 +62,12 @@ const filters: FilterItemProps[] = [
   },
 ];
 
+// Watch for changes in the store's activeMembers
+
+const projectMembers = computed(
+  () => learningPlanStore.learningPlan?.members || [],
+);
+const activeMembers = ref<LearningPlanMemberSimple[]>(projectMembers.value);
 const selectedFilters = ref<string[]>([]);
 
 const filterMembers = (values) => {
@@ -79,7 +76,7 @@ const filterMembers = (values) => {
   const isThereStatus = !!values['1'];
   if (isThereRole) selectedFilters.value.push(values['0']);
   if (isThereStatus) selectedFilters.value.push(values['1']);
-  activeMembers.value = learningPlanStore.activeProjectMembers.filter(
+  activeMembers.value = projectMembers.value.filter(
     (member) =>
       (!isThereRole || member.role === values['0']) &&
       (!isThereStatus || member.status === values['1']),
@@ -103,16 +100,16 @@ const removeFilter = (key: string) => {
   );
 
   if (selectedFilters.value.length === 0) {
-    activeMembers.value = learningPlanStore.activeProjectMembers;
+    activeMembers.value = projectMembers.value;
     return;
   }
   selectedFilters.value.forEach((filter) => {
     if (isEnumValue(MemberStatus, filter))
-      activeMembers.value = learningPlanStore.activeProjectMembers.filter(
+      activeMembers.value = projectMembers.value.filter(
         (member) => member.status === filter,
       );
     else if (isEnumValue(MemberRoles, filter))
-      activeMembers.value = learningPlanStore.activeProjectMembers.filter(
+      activeMembers.value = projectMembers.value.filter(
         (member) => member.role === filter,
       );
   });
@@ -133,15 +130,21 @@ const updateSearch = (value: string) => {
       isEnumValue(MemberStatus, filter),
     ) !== -1;
   const lowercaseValue = value.toLowerCase();
-  activeMembers.value = learningPlanStore.activeProjectMembers.filter(
-    (member) => {
-      return (
-        (!isThereRole || member.role === selectedFilters.value[0]) &&
-        (!isThereStatus || member.status === selectedFilters.value[1]) &&
-        (member.email.toLowerCase().includes(lowercaseValue) ||
-          member.user.fullname.toLowerCase().includes(lowercaseValue))
-      );
-    },
-  );
+  activeMembers.value = projectMembers.value.filter((member) => {
+    return (
+      (!isThereRole || member.role === selectedFilters.value[0]) &&
+      (!isThereStatus || member.status === selectedFilters.value[1]) &&
+      (member.email.toLowerCase().includes(lowercaseValue) ||
+        member.user.fullname.toLowerCase().includes(lowercaseValue))
+    );
+  });
 };
+
+watch(
+  () => learningPlanStore.learningPlan,
+  () => {
+    console.log('changed');
+    activeMembers.value = learningPlanStore.learningPlan?.members || [];
+  },
+);
 </script>
