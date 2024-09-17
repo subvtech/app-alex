@@ -50,7 +50,7 @@ onMounted(fetchUser);
   <div v-else-if="user">
     <div class="tw-flex tw-flex-col tw-gap-6 tw-mt-6">
       <Card>
-        <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6 tw-pb-0">
+        <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6 tw-pb-0 px-6">
           <div class="tw-flex tw-items-center tw-gap-6">
             <v-avatar :size="104" color="gray-100">
               <v-img v-if="user.avatar?.url" :src="user.avatar?.url" alt="avatar" class="rounded-16px" cover />
