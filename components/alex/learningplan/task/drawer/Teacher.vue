@@ -18,22 +18,13 @@
           variant="text"
           @click="$emit('kanban-click')"
         />
-        <alex-custom-button
-          icon="mdi-close"
-          size="small"
-          variant="text"
-          @click="handleCloseModal"
-        />
+        <alex-custom-button icon="mdi-close" size="small" variant="text" @click="handleCloseModal" />
       </div>
     </template>
 
     <div>
       <!-- Tags -->
-      <alex-learningplan-task-tags
-        v-model="tags"
-        :edit="editable"
-        :task-id="taskId"
-      />
+      <alex-learningplan-task-tags v-model="tags" :edit="editable" :task-id="taskId" />
 
       <!-- Informações -->
       <alex-inputs-editable-text
@@ -41,17 +32,12 @@
         tag="h1"
         class="mt-4 text-h2 ellipsis lines-2"
         :cant-edit="editable"
-        :placeholder="
-          '(' + $t('components.learningPlan.drawer.missing.title') + ')'
-        "
+        :placeholder="'(' + $t('components.learningPlan.drawer.missing.title') + ')'"
       ></alex-inputs-editable-text>
 
       <v-row class="my-5">
         <v-col cols="6">
-          <alex-learningplan-task-state
-            v-model="status"
-            :edit="editable && wasFilledMainInfo"
-          />
+          <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -64,17 +50,9 @@
             :edit="editable"
             :config="{
               group: $t('components.learningPlan.drawer.task.type.collective'),
-              individual: $t(
-                'components.learningPlan.drawer.task.type.individual',
-              ),
+              individual: $t('components.learningPlan.drawer.task.type.individual'),
             }"
-            :placeholder="
-              $t(
-                `components.learningPlan.drawer.${
-                  editable ? 'task.type.select' : 'missing.type'
-                }`,
-              )
-            "
+            :placeholder="$t(`components.learningPlan.drawer.${editable ? 'task.type.select' : 'missing.type'}`)"
           />
         </v-col>
         <v-col cols="6"
@@ -83,11 +61,7 @@
             >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
-          <alex-learningplan-task-date
-            ref="startDateComp"
-            v-model="startDate"
-            :edit="editable"
-          />
+          <alex-learningplan-task-date ref="startDateComp" v-model="startDate" :edit="editable" />
         </v-col>
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
@@ -103,11 +77,7 @@
           />
         </v-col>
       </v-row>
-      <alex-learningplan-task-description
-        v-model="description"
-        :mention-users="mentionUsers"
-        :edit="editable"
-      />
+      <alex-learningplan-task-description v-model="description" :mention-users="mentionUsers" :edit="editable" />
 
       <!-- Objetivos de aprendizagem -->
       <alex-learningplan-task-goals v-model="goals" :edit="editable" />
@@ -120,35 +90,24 @@
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="hasSubmission"
-            :label="
-              $t('components.learningPlan.drawer.task.submission.reqSubmission')
-            "
+            :label="$t('components.learningPlan.drawer.task.submission.reqSubmission')"
             :disabled="hasAtLeastSubmission"
           />
         </v-col>
         <v-col v-if="hasSubmission" class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="sendAfterDeadline"
-            :label="
-              $t('components.learningPlan.drawer.task.submission.aftrDeadline')
-            "
+            :label="$t('components.learningPlan.drawer.task.submission.aftrDeadline')"
           />
         </v-col>
         <v-col class="pa-0 d-flex align-center" cols="6">
           <alex-custom-switch
             v-model="canChangeFromReview"
-            :label="
-              $t(
-                'components.learningPlan.drawer.task.status.canChangeFromReview',
-              )
-            "
+            :label="$t('components.learningPlan.drawer.task.status.canChangeFromReview')"
           />
         </v-col>
         <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
-          <alex-learningplan-task-restrictions
-            v-model="restrictionsValue"
-            :edit="editable"
-          />
+          <alex-learningplan-task-restrictions v-model="restrictionsValue" :edit="editable" />
         </v-col>
       </v-row>
 
@@ -158,9 +117,7 @@
         name="submissionDescription"
         :edit="editable"
         :mention-users="mentionUsers"
-        :title="
-          $t('components.learningPlan.drawer.task.submission.description.label')
-        "
+        :title="$t('components.learningPlan.drawer.task.submission.description.label')"
       />
 
       <!-- Recursos de aprendizagem -->
@@ -176,15 +133,9 @@
       </div>
 
       <!-- Eventos e atribuições -->
-      <alex-custom-tabs
-        v-model="activePage"
-        :tabs="tabs"
-        class="border-bottom-1 border-gray-100"
-      />
+      <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
-        <v-window-item value="1">
-          <alex-learningplan-task-events v-model="taskEvents"
-        /></v-window-item>
+        <v-window-item value="1"> <alex-learningplan-task-events v-model="taskEvents" /></v-window-item>
         <v-window-item value="2">
           <alex-learningplan-task-members
             :learningplan-id="learningplanId"
@@ -205,15 +156,11 @@
 <script setup lang="ts">
 import { isAfter, isBefore } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
-import { RestrictionValue } from '../Restrictions.vue';
-import {
-  TaskSimple,
-  TaskStatus,
-  TaskType,
-} from '~/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { orderEvents } from '~/utils';
 import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import { orderEvents } from '~/utils';
+import { RestrictionValue } from '../Restrictions.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 
@@ -278,9 +225,7 @@ const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
 const members = toRef(props, 'members');
-const hasAtLeastSubmission = computed(
-  () => !!members.value.filter((member) => member.last_submission_at).length,
-);
+const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
 const wasFilledMainInfo = computed(() => {
   if (!startDate.value || !endDate.value || !type.value) {
     return false;
@@ -316,7 +261,9 @@ watch(model, (value) => {
     startDate.value = props.startDate;
     endDate.value = props.endDate;
     restrictions.value = props.restrictions;
-    isFirstTimeOpened.value = false;
+    setTimeout(() => {
+      isFirstTimeOpened.value = false;
+    }, 200);
     return;
   }
   isFirstTimeOpened.value = true;
@@ -366,9 +313,11 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
     if (member.learning_plan_member?.user) {
       users.push(member.learning_plan_member?.user);
     } else if (member.learning_plan_group?.group_members) {
-      member.learning_plan_group?.group_members.forEach((member) =>
-        users.push(member.student_member.user),
-      );
+      member.learning_plan_group?.group_members.forEach((member) => {
+        if (member.student_member?.user) {
+          users.push(member.student_member.user);
+        }
+      });
     }
   });
 
@@ -388,11 +337,7 @@ const types = ref<AlexDropdownItem[]>([
     text: t('components.learningPlan.drawer.task.type.individual'),
     onClick: () => {
       if (members.value.length) {
-        setMessage(
-          t('components.learningPlan.drawer.task.errors.cantChangeType'),
-          'warning',
-          true,
-        );
+        setMessage(t('components.learningPlan.drawer.task.errors.cantChangeType'), 'warning', true);
         return;
       }
       type.value = 'individual';
@@ -402,11 +347,7 @@ const types = ref<AlexDropdownItem[]>([
     text: t('components.learningPlan.drawer.task.type.collective'),
     onClick: () => {
       if (members.value.length) {
-        setMessage(
-          t('components.learningPlan.drawer.task.errors.cantChangeType'),
-          'warning',
-          true,
-        );
+        setMessage(t('components.learningPlan.drawer.task.errors.cantChangeType'), 'warning', true);
         return;
       }
       type.value = 'group';
@@ -434,21 +375,12 @@ const notifyFieldError = (field: string) => {
   );
 };
 const notifyError = () => {
-  setMessage(
-    t('components.learningPlan.drawer.task.errors.genericSave'),
-    'error',
-    true,
-  );
+  setMessage(t('components.learningPlan.drawer.task.errors.genericSave'), 'error', true);
 };
 const strapi = useStrapi();
 const updateTaskValues = async (
   taskId: number,
-  values: Partial<
-    Record<
-      keyof TaskSimple,
-      string | number | boolean | null | undefined | Object
-    >
-  >,
+  values: Partial<Record<keyof TaskSimple, string | number | boolean | null | undefined | Object>>,
 ) => {
   try {
     if (isFirstTimeOpened.value) {
@@ -532,15 +464,8 @@ useOnStopTyping(
 );
 watch(endDate, async (value) => {
   if (!value) return;
-  if (
-    startDate.value &&
-    isBefore(Date.parse(value), Date.parse(startDate.value))
-  ) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.endDateBeforeStartDate'),
-      'warning',
-      true,
-    );
+  if (startDate.value && isBefore(Date.parse(value), Date.parse(startDate.value))) {
+    setMessage(t('components.learningPlan.drawer.task.errors.endDateBeforeStartDate'), 'warning', true);
     return;
   }
 
@@ -553,11 +478,7 @@ watch(endDate, async (value) => {
 watch(startDate, async (value) => {
   if (!value) return;
   if (endDate.value && isAfter(Date.parse(value), Date.parse(endDate.value))) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.startDateAfterEndDate'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.errors.startDateAfterEndDate'), 'warning', true);
     return;
   }
 

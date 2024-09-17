@@ -1,0 +1,70 @@
+{
+  "field": {
+    "required": "Esse campo é obrigatório",
+    "min": "Mínimo {min} caracteres ",
+    "max": "Máximo {max} caracteres "
+  },
+  "nameFantasy": {
+    "label": "Nome Fantasia",
+    "required": "Nome Fantasia completo é necessário",
+    "min": "Mínimo de 6 caracteres",
+    "max": "Máximo de 64 caracteres",
+    "onlyLetters": "Deve conter apenas letras"
+  },
+  "emailField": {
+    "required": "E-mail é necessário",
+    "invalid": "E-mail inválido."
+  },
+  "cnpjField": {
+    "required": "CNPJ é necessário",
+    "length": "CNPJ contém 14 caracteres",
+    "invalid": "CNPJ inválido."
+  },
+  "phoneField": {
+    "required": "Telefone é necessário",
+    "length": "Tem que ter 11 caracteres",
+    "invalid": "Telefone inválido"
+  },
+  "usersField": {
+    "required": "Representante é necessário.",
+    "placeholder": "Selecione o representante da instituição",
+    "label": "Selecionar representante"
+  },
+  "companynameField": {
+    "label": "Razão Social",
+    "required": "Razão Social é necessário",
+    "min": "Mínimo de 3 caracteres",
+    "max": "Máximo de 64 caracteres",
+    "onlyLetters": "Deve conter apenas letras e números"
+  },
+  "sectorField": {
+    "required": "Setor é necessário"
+  },
+  "addressField": {
+    "required": "Endereço é necessário",
+    "min": "Mínimo de 3 caracteres",
+    "max": "Máximo de 64 caracteres",
+    "onlyLetters": "Deve conter apenas letras e números"
+  },
+  "title": "Instituições",
+  "title2": "Instituição Parceira",
+  "home": "Home",
+  "edit": "Editar",
+  "name": "Nome",
+  "socialName": "Nome Social",
+  "cnpj": "CNPJ",
+  "phone": "Telefone",
+  "email": "E-mail",
+  "address": "Endereço",
+  "sector": "Setor",
+  "users": "Representantes",
+  "cover": "Capa",
+  "admin": "Administrador",
+  "cancel": "Cancelar",
+  "add": "Adicionar",
+  "searchPlaceholder": "Procure instituição",
+  "company": "Empresa",
+  "informations": "Informações",
+  "representative": "Representante",
+  "newInstitution": "Nova instituição"
+}
