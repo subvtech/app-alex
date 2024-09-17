@@ -1,3 +1,5 @@
+import { MemberRoles } from '#imports';
+
 export const useInvitationLink = () => {
   const { create, delete: _delete } = useStrapi();
   function removeAfterLastSlash(url) {
@@ -10,8 +12,16 @@ export const useInvitationLink = () => {
   }
   const fullPath = removeAfterLastSlash(window.location.href);
 
-  const generateUrl = (hash, learningPlanId = 0) =>
-    `${fullPath}/${learningPlanId}/join/${hash}`;
+  const generateUrl = (hash, learningPlanId?) => {
+    const fullPathWithoutLastThreeChars =
+      /\/\d+\d$/.test(fullPath) && learningPlanId
+        ? fullPath.substring(0, fullPath.length - 3)
+        : fullPath;
+
+    return `${fullPathWithoutLastThreeChars}/${
+      learningPlanId ? learningPlanId + '/' : ''
+    }join/${hash}`;
+  };
 
   function msToHHMMSS(ms) {
     const totalSeconds = Math.floor(ms / 1000);
@@ -37,7 +47,8 @@ export const useInvitationLink = () => {
     inviteId: number | string | null,
     duration: number,
     learningplanId: number | string,
-    classId: number | string,
+    classId: number | string | null,
+    role: MemberRoles = MemberRoles.STUDENT,
   ) => {
     try {
       if (inviteId) await _delete('invitation-links', inviteId);
@@ -47,10 +58,16 @@ export const useInvitationLink = () => {
       duration,
       learningplan: learningplanId,
       learning_class: classId,
+      role,
     });
 
     return result;
   };
 
-  return { generateUrl, msToHHMMSS, calcRemainingTime, generateNewInvite };
+  return {
+    generateUrl,
+    msToHHMMSS,
+    calcRemainingTime,
+    generateNewInvite,
+  };
 };

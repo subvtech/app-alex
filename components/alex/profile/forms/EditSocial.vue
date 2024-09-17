@@ -76,7 +76,7 @@ onMounted(() => {
   urlValidate();
 });
 
-watchEffect(() => {
+watch([nameErrorMsg, urlErrorMsg], () => {
   if (nameErrorMsg.value || urlErrorMsg.value) {
     emit('error');
   } else {

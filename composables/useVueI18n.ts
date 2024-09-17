@@ -102,6 +102,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'learningPlan/list',
     'learningPlan/members',
     'learningPlan/page',
+    'learningPlan/projects',
     'learningPlan/viewer',
     'learningPlan/join',
     'learningPlan/submissions',

@@ -1,6 +1,6 @@
 <template>
   <v-app class="tw-relative">
-    <AppSnackbar />
+    <app-snackbar />
     <alex-custom-sidebar
       v-model="drawer"
       v-model:clipped="clipped"
