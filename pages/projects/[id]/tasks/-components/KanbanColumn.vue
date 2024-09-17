@@ -124,25 +124,28 @@ const handleBlurAddItem = (group: string) => {
         <slot name="card" :item="item" :index="i" />
       </SlickItem>
     </SlickList>
-    <alex-custom-button
-      v-if="addButton && !isAddingItem"
-      variant="outlined"
-      class="tw-w-full !tw-border-dashed !tw-border"
-      :loading="isCreatingTask"
-      @click="handleStartAddItem"
-    >
-      <v-icon size="20px">mdi-plus</v-icon>
-      <span class="text-body-4">{{ addButtonText }}</span>
-    </alex-custom-button>
-    <div v-if="isAddingItem" class="border-1 border-gray-100 rounded-lg pa-4">
-      <AlexInputsTextField
-        v-model="titleNewItem"
-        name="adding-item"
-        autofocus
-        @blur="handleBlurAddItem(group)"
-        @keydown.enter="handleAddItem(group)"
-      />
-    </div>
+    <VScaleTransition group>
+      <alex-custom-button
+        v-if="addButton && !isAddingItem"
+        :key="`addButton-${group}`"
+        variant="outlined"
+        class="tw-w-full !tw-border-dashed !tw-border"
+        :loading="isCreatingTask"
+        @click="handleStartAddItem"
+      >
+        <v-icon size="20px">mdi-plus</v-icon>
+        <span class="text-body-4">{{ addButtonText }}</span>
+      </alex-custom-button>
+      <div v-if="isAddingItem" :key="`inputAdd-${group}`" class="border-1 border-gray-100 rounded-lg pa-4">
+        <AlexInputsTextField
+          v-model="titleNewItem"
+          name="adding-item"
+          autofocus
+          @blur="handleBlurAddItem(group)"
+          @keydown.enter="handleAddItem(group)"
+        />
+      </div>
+    </VScaleTransition>
   </div>
 </template>
 
