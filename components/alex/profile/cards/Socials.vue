@@ -6,7 +6,7 @@
     :is-editing="canEditAndIsEditing"
     full-width
     no-footer
-    @click:cancel="cancel"
+    @click:cancel="onCancel"
     @click:save="onSave"
     @toggle:is-editing="toggleIsEditing"
   >
@@ -28,27 +28,29 @@
               show-positions
               @deleted:item="updateDeleteArray"
             >
-              <template #content="{ index, id }">
+              <template #content="{ index, id, title, url }">
                 <alex-profile-forms-edit-social
-                  v-model:name="sortedSocials[index].contentData!.title"
-                  v-model:url="sortedSocials[index].contentData!.url"
+                  :name="title"
+                  :url="url"
                   :social-id="id"
                   :show-name="sortedSocials[index].icon === '/svg/website.svg'"
                   :index="index"
                   @update:name="
                     (e) =>
-                      updateItemName({
+                      updateItem({
                         socialId: id,
                         index,
                         value: e,
+                        key: 'name',
                       })
                   "
                   @update:url="
                     (e) =>
-                      updateItemUrl({
+                      updateItem({
                         socialId: id,
                         index,
                         value: e,
+                        key: 'url',
                       })
                   "
                   @error="addError(index)"
@@ -85,12 +87,7 @@
 <script setup lang="ts">
 import { SocialItemType } from '~/models/social.model';
 import { AccordionItemType } from '~/components/alex/custom/Accordion.vue';
-const i18n = useI18n();
 
-const isEditing = ref(false);
-const isAdding = ref(false);
-
-const componentKey = ref(0);
 export interface SocialsEmits {
   (e: 'update'): void;
 }
@@ -109,9 +106,23 @@ interface SocialFormUpdateValuePayload {
   index: number;
   socialId?: number;
   value: string;
+  key: 'name' | 'url';
+}
+interface UpdateItem {
+  socialId?: number;
+  url: string;
+  name: string;
 }
 
-const errors = ref<number[]>([]);
+interface ConnectArrayInput {
+  id: number;
+  position: {
+    end?: boolean;
+    start?: boolean;
+    before?: number;
+    after?: number;
+  };
+}
 
 const emit = defineEmits<SocialsEmits>();
 
@@ -121,11 +132,23 @@ const props = withDefaults(defineProps<SocialsComponentType>(), {
 
 const { userId, socials, canEdit } = toRefs(props);
 
+const i18n = useI18n();
 const { create, update, delete: _delete } = useStrapi();
 const { arraysAreEqual } = useArrays();
+
+const isEditing = ref(false);
+const isAdding = ref(false);
+
+const deleteArray = ref<number[]>([]);
+const updateArray = ref<UpdateItem[]>([]);
+const errorsArray = ref<number[]>([]);
+
+const componentKey = ref(0);
+
 const supported = ['youtube', 'linkedin', 'instagram'];
 
 const client = useStrapiClient();
+
 const socialToAccordionItem = (social) => {
   const { name, url, id } = social;
   const lowerCaseName = name.toLocaleLowerCase();
@@ -166,28 +189,24 @@ const disableSave = computed(() => {
     arraysAreEqual(
       initialState.value.map((item) => ({ ...item.contentData })),
       sortedSocials.value.map((item) => ({ ...item.contentData })),
-    ) || errors.value.length !== 0
+    ) || errorsArray.value.length !== 0
   );
 });
 
 const addError = (index) => {
-  if (!errors.value.includes(sortedSocials.value[index].contentData!.id))
-    errors.value.push(sortedSocials.value[index].contentData!.id);
+  if (!errorsArray.value.includes(sortedSocials.value[index].contentData!.id))
+    errorsArray.value.push(sortedSocials.value[index].contentData!.id);
 };
 
 const removeError = (index) => {
-  if (errors.value.length === 0) return;
-  errors.value = errors.value.filter((item) => {
-    return item !== sortedSocials.value[index].contentData!.id;
+  errorsArray.value = errorsArray.value.filter((id) => {
+    return id !== sortedSocials.value[index].contentData!.id;
   });
 };
 
 const addSocial = ({ name, url, selectedSocial }) => {
-  const selectedSocialLowerCase = selectedSocial.toLowerCase();
-  const title = name === '' ? selectedSocialLowerCase : name;
-
   const addedSocial = socialToAccordionItem({
-    name: title,
+    name: name || selectedSocial.toLowerCase(),
     url,
   });
 
@@ -197,102 +216,56 @@ const addSocial = ({ name, url, selectedSocial }) => {
   componentKey.value += 1;
 };
 
-const deleteArray = ref<number[]>([]);
-const updateArray = ref<{ socialId?: number; url: string; name: string }[]>([]);
-
-const updateDeleteArray = ({ contentData }: AccordionItemType) => {
-  if (contentData) {
-    deleteArray.value.push(contentData.id);
-  }
-};
-
-const updateItemName = (props: SocialFormUpdateValuePayload) => {
-  const { socialId, index, value: name } = props;
+const updateItem = (props: SocialFormUpdateValuePayload) => {
+  const { socialId, index, value, key } = props;
 
   const validIndex = socialId
     ? sortedSocials.value.findIndex((item) => item.contentData!.id === socialId)
     : index;
 
-  sortedSocials.value[validIndex].title = name.toUpperCase();
+  if (key === 'name') {
+    sortedSocials.value[validIndex].title = value.toUpperCase();
+    sortedSocials.value[validIndex].contentData!.title = value;
+  } else sortedSocials.value[validIndex].contentData!.url = value;
 
   const updateArrayIndex = updateArray.value.findIndex(
     (item) => item.socialId === socialId,
   );
-  if (updateArrayIndex !== -1) updateArray.value[updateArrayIndex].name = name;
+
+  if (updateArrayIndex !== -1) updateArray.value[updateArrayIndex][key] = value;
   else {
     updateArray.value.push({
       url: sortedSocials.value[validIndex].contentData!.url,
-      name,
+      name: sortedSocials.value[validIndex].title,
+      [key]: value,
       socialId,
     });
   }
 };
 
-const updateItemUrl = (props: SocialFormUpdateValuePayload) => {
-  const { socialId, index, value: url } = props;
-
-  const socialIdIndex = sortedSocials.value.findIndex(
-    (item) => item.id === socialId,
-  );
-  const validIndex = socialIdIndex === -1 ? index : socialIdIndex;
-
-  sortedSocials.value[validIndex].contentData!.url = url;
-  const updateArrayIndex = updateArray.value.findIndex(
-    (item) => item.socialId === socialId,
-  );
-  if (updateArrayIndex !== 1) updateArray.value[updateArrayIndex].url = url;
-  else {
-    updateArray.value.push({
-      name: sortedSocials.value[validIndex].title!,
-      socialId,
-      url,
-    });
-  }
+const updateDeleteArray = ({ contentData }: AccordionItemType) => {
+  if (!contentData) return;
+  deleteArray.value.push(contentData.id);
 };
 
 const resetArrays = (updateSocials = true) => {
   deleteArray.value = [];
   updateArray.value = [];
 
-  if (updateSocials) sortedSocials.value = [...initialState.value];
+  if (updateSocials)
+    sortedSocials.value = JSON.parse(JSON.stringify(initialState.value));
 };
 
 const updatedMissingSocials = computed(() => {
-  const missingSocials: string[] = [];
-  if (
-    !sortedSocials.value.find(
-      (element) => element.title?.toLowerCase() === supported[2],
-    )
-  )
-    missingSocials.push(supported[2]);
-  if (
-    !sortedSocials.value.find(
-      (element) => element.title?.toLowerCase() === supported[0],
-    )
-  )
-    missingSocials.push(supported[0]);
-  if (
-    !sortedSocials.value.find(
-      (element) => element.title?.toLowerCase() === supported[1],
-    )
-  )
-    missingSocials.push(supported[1]);
-  missingSocials.push(i18n.t('components.profile.socials.otherSocial'));
-  return [...missingSocials];
+  const existing = sortedSocials.value.map((item) => item.title?.toLowerCase());
+  const missing = supported.filter((s) => !existing.includes(s));
+  return [...missing, i18n.t('components.profile.socials.otherSocial')];
 });
 
 const onSave = async () => {
   const promises: Promise<any>[] = [];
 
-  const connectArray: {
-    id: number;
-    position: {
-      end?: boolean;
-      start?: boolean;
-      before?: number;
-      after?: number;
-    };
-  }[] = [];
+  const connectArray: ConnectArrayInput[] = [];
 
   if (sortedSocials.value.length !== 0) {
     sortedSocials.value.forEach((item, index) => {
@@ -359,12 +332,13 @@ const onSave = async () => {
   toggleIsEditing();
   await Promise.all(promises);
 
-  initialState.value = [...sortedSocials.value];
+  initialState.value = JSON.parse(JSON.stringify(sortedSocials.value));
+
   resetArrays(false);
   emit('update');
 };
 
-const cancel = () => {
+const onCancel = () => {
   componentKey.value += 1;
 
   toggleIsEditing();

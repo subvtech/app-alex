@@ -32,6 +32,13 @@ export function withTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   return Promise.race([promise, timeout]);
 }
 
+export function isEnumValue<T>(
+  enumObject: Record<string, T>,
+  value: string,
+): boolean {
+  return Object.values(enumObject).includes(value as T);
+}
+
 // Iinstead return of string[], gonna return a type of each element of array ex:
 // ['goiaba' | 'maconha'] =>  type = ('goiaba' | 'maconha')[]
 export function literalArray<T extends string>(...args: T[]): T[] {

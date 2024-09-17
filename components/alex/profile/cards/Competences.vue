@@ -125,7 +125,7 @@ const handleInput = (input: any) => {
 
   timeoutId.value = setTimeout(() => {
     fetchTags();
-  }, timeSpan);
+  }, timeSpan.value);
 };
 
 const toggleIsEditing = () => {
