@@ -236,11 +236,11 @@
 </template>
 
 <script setup lang="ts">
-import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+import { Upload } from '~/models/upload.model';
 
 const emit = defineEmits(['display:settings']);
 interface MyProps {
-  profilePicture?: ProfilePictureItemType | null;
+  profilePicture?: Upload | null;
   userId: number;
   showProfilePicture: boolean;
   showBorder: boolean;
