@@ -46,6 +46,9 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
         'meeting_schedules.meetings',
       ],
     },
+    institutions: {
+      populate: ['cover'],
+    },
     projects: {
       populate: ['members', 'members.user.avatar', 'members.user.cover'],
     },

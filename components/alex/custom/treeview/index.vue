@@ -12,6 +12,7 @@
       :custom-slot="customSlot"
       :custom-header="customHeader"
       :default-expand="defaultExpand"
+      :selected-node="selectedNode"
     >
       <template #header="{ header }">
         <slot name="header" :header="header" />
@@ -42,6 +43,7 @@ interface TreeViewProps {
   customSlot?: boolean;
   customHeader?: boolean;
   defaultExpand?: boolean;
+  selectedNode?: number;
 }
 
 withDefaults(defineProps<TreeViewProps>(), {
@@ -51,5 +53,6 @@ withDefaults(defineProps<TreeViewProps>(), {
   closeIcon: 'mdi-chevron-down',
   transition: 'v-slide-x-transition',
   defaultExpand: false,
+  selectedNode: -1,
 });
 </script>

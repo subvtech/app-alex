@@ -39,7 +39,10 @@
         <v-col cols="6">
           <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" />
         </v-col>
-        <v-col cols="6"
+        <v-col cols="6">
+          <!-- <state v-model="status" :edit="editable && wasFilledMainInfo" /> -->
+        </v-col>
+        <!-- <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
             <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.type.label') }}
@@ -54,7 +57,7 @@
             }"
             :placeholder="$t(`components.learningPlan.drawer.${editable ? 'task.type.select' : 'missing.type'}`)"
           />
-        </v-col>
+        </v-col> -->
         <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
             <span v-if="editable" class="text-tag-orange-light">* </span

@@ -22,7 +22,9 @@
     "overview": "Overview",
     "search_member": "Search member",
     "tasks": "Tasks",
-    "trails": "Trails"
+    "trails": "Trails",
+    "myJourney": "My Journey",
+    "empty_members": "No learning journey found"
   },
   "overview": {
     "completed": "Completed",
@@ -30,12 +32,20 @@
     "empty_journey": "No learning journey found!",
     "empty_meetings": "Nothing scheduled today!",
     "empty_members": "No members found",
-    "empty_task_progress": "0% of tasks have been completed",
-    "last_update": "Last update",
+    "empty_task_progress": "%{percentage}% of tasks have been completed",
+    "institutions": "Institutions",
+    "last_update": "Last update:",
     "remaining_time": "Remaining time",
+    "task_progress": "Task progress",
+    "timeline_day": "Day",
+    "timeline_month": "Month",
+    "timeline_today": "Today",
+    "timeline_week": "Week",
+    "timeline": "Timeline",
     "total_epics": "Total epics",
     "total_sprints": "Total sprints",
-    "total_story": "Total stories"
+    "total_story": "Total stories",
+    "total_tasks": "Total tasks"
   },
   "tasks": {
     "add_epic": "Add epic",
@@ -61,6 +71,9 @@
     "draft": "Draft",
     "dropdown_delete": "Delete",
     "dropdown_details": "Details",
+    "dropdown_rename": "Rename",
+    "dropdown_add_story": "Add story",
+    "dropdown_add_task": "Add task",
     "editError": "edit",
     "editSuccess": "edited",
     "error_message": "An error occurred while trying to {action} the task, please try again!",
@@ -85,9 +98,17 @@
     "successMessage": "Task successfully {action}!",
     "TASK_DATA_INCOMPLETE": "You need to fill in the task information before setting it as published",
     "TASK_MOVE_HAS_DELIVERIES": "Cannot move the task to draft because it has deliveries",
+    "irreversible_process": "This process is irreversible.",
+    "column_move_has_tasks": "It is not possible to delete this column at the moment!",
+    "delete_column_has_tasks_subtitle": "To remove this column, it must be empty. Move all tasks to another column to perform this action.",
+    "required_column": "This column is mandatory, so it's only possible to edit its position and title.",
+    "delete_column_cancel_text": "Got it",
+    "confirm_delete_column": "Are you sure you want to delete this column?",
     "tooltip_options": "Options",
     "unarchive": "Unarchive",
     "unarchiveError": "unarchive",
-    "unarchiveSuccess": "unarchived"
+    "unarchiveSuccess": "unarchived",
+    "delete_confirm_text": "Apagar",
+    "delete_cancel_text": "Cancelar"
   }
 }

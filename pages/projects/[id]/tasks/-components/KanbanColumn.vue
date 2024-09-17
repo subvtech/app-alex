@@ -11,12 +11,14 @@ type Props<T> = {
   addButtonText?: string;
   color?: Colors;
   disabled?: boolean;
+  isCreatingTask?: boolean;
   group: string;
   title: string;
+  columnId: number;
 };
 
 type Events<T> = {
-  'add-item': [group: string, title: string];
+  'add-item': [id: number, group: string, title: string];
   'add-column': [title: string];
   'cancel-column': [group: string];
   'insert-card': [values: { newIndex: number; value: T; group: string }];
@@ -24,7 +26,7 @@ type Events<T> = {
   'sort-start': [group: string];
   'sort-move': [group: string];
   'title-column-change': [group: string, title: string];
-  'update-list': [list: T[], group: string];
+  'update-list': [list: T[], id: number, group: string];
   delete: [group: string];
 };
 
@@ -37,9 +39,10 @@ defineSlots<Slots<T>>();
 const props = withDefaults(defineProps<Props<T>>(), {
   accept: true,
   disable: false,
-  color: 'gray',
+  color: 'gray-300',
   addButtonText: 'Adicionar',
   addButton: true,
+  isCreatingTask: false,
 });
 
 const items = defineModel<T[]>({ default: () => [] });
@@ -66,7 +69,7 @@ const handleSortInsert = (values: { newIndex: number; value: T }) => {
 };
 const handleAddItem = (group: string) => {
   isAddingItem.value = true;
-  emit('add-item', group, titleNewItem.value);
+  emit('add-item', props.columnId, group, titleNewItem.value);
   isAddingItem.value = false;
   titleNewItem.value = '';
 };
@@ -101,6 +104,7 @@ const handleBlurAddItem = (group: string) => {
       v-model:list="items"
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
+      use-window-as-scroll-container
       :accept="accept"
       :distance="15"
       :group="group"
@@ -108,7 +112,7 @@ const handleBlurAddItem = (group: string) => {
       @sort-insert="handleSortInsert"
       @sort-start="$emit('sort-start', group)"
       @sort-move="$emit('sort-move', group)"
-      @update:list="$emit('update-list', $event, group)"
+      @update:list="$emit('update-list', $event, columnId, group)"
     >
       <SlickItem
         v-for="(item, i) in items"
@@ -120,23 +124,28 @@ const handleBlurAddItem = (group: string) => {
         <slot name="card" :item="item" :index="i" />
       </SlickItem>
     </SlickList>
-    <div
-      v-if="addButton && !isAddingItem"
-      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button bg-white"
-      @click="handleStartAddItem"
-    >
-      <v-icon size="20px">mdi-plus</v-icon>
-      <span class="text-body-4">{{ addButtonText }}</span>
-    </div>
-    <div v-if="isAddingItem" class="border-1 border-gray-100 rounded-lg pa-4">
-      <AlexInputsTextField
-        v-model="titleNewItem"
-        name="adding-item"
-        autofocus
-        @blur="handleBlurAddItem(group)"
-        @keydown.enter="handleAddItem(group)"
-      />
-    </div>
+    <VScaleTransition group>
+      <alex-custom-button
+        v-if="addButton && !isAddingItem"
+        :key="`addButton-${group}`"
+        variant="outlined"
+        class="tw-w-full !tw-border-dashed !tw-border"
+        :loading="isCreatingTask"
+        @click="handleStartAddItem"
+      >
+        <v-icon size="20px">mdi-plus</v-icon>
+        <span class="text-body-4">{{ addButtonText }}</span>
+      </alex-custom-button>
+      <div v-if="isAddingItem" :key="`inputAdd-${group}`" class="border-1 border-gray-100 rounded-lg pa-4">
+        <AlexInputsTextField
+          v-model="titleNewItem"
+          name="adding-item"
+          autofocus
+          @blur="handleBlurAddItem(group)"
+          @keydown.enter="handleAddItem(group)"
+        />
+      </div>
+    </VScaleTransition>
   </div>
 </template>
 

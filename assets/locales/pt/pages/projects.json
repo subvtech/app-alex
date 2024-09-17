@@ -22,7 +22,9 @@
     "overview": "Visão geral",
     "search_member": "Pesquisar membro",
     "tasks": "Tarefas",
-    "trails": "Trilhas"
+    "trails": "Trilhas",
+    "myJourney": "Minha Jornada",
+    "empty_members": "Jornada não encontrada"
   },
   "overview": {
     "completed": "Finalizados",
@@ -30,12 +32,20 @@
     "empty_journey": "Nenhuma jornada de aprendizagem encontrada!",
     "empty_meetings": "Nada marcado hoje!",
     "empty_members": "Nenhum membro encontrado",
-    "empty_task_progress": "0% das tarefas foram concluídas",
-    "last_update": "Última atualização",
+    "empty_task_progress": "%{percentage}% das tarefas foram concluídas",
+    "institutions": "Instituições",
+    "last_update": "Última atualização:",
     "remaining_time": "Tempo restante",
+    "task_progress": "Progresso de tarefas",
+    "timeline_day": "Dia",
+    "timeline_month": "Mês",
+    "timeline_today": "Hoje",
+    "timeline_week": "Semana",
+    "timeline": "Linha temporal",
     "total_epics": "Total de épicos",
     "total_sprints": "Total de sprints",
-    "total_story": "Total de histórias"
+    "total_story": "Total de histórias",
+    "total_tasks": "Total de tarefas"
   },
   "tasks": {
     "add_epic": "Adicionar épico",
@@ -61,6 +71,9 @@
     "draft": "Rascunho",
     "dropdown_delete": "Excluir",
     "dropdown_details": "Detalhes",
+    "dropdown_rename": "Renomear",
+    "dropdown_add_story": "Adicionar história",
+    "dropdown_add_task": "Adicionar tarefa",
     "editError": "editar",
     "editSuccess": "editada",
     "error_message": "Ocorreu um erro ao tentar {action} a tarefa, tente novamente!",
@@ -85,9 +98,17 @@
     "successMessage": "Tarefa {action} com sucesso!",
     "TASK_DATA_INCOMPLETE": "Você precisa preencher as informações da tarefa antes de defini-la como publicada",
     "TASK_MOVE_HAS_DELIVERIES": "Não é possível mover a tarefa para rascunho porque ela possui entregas",
+    "irreversible_process": "Esse processo é irreversível.",
+    "column_move_has_tasks": "No momento não é possível excluir esta coluna!",
+    "delete_column_has_tasks_subtitle": "Para remover esta coluna é necessário que ela esteja vazia. Mova todas as tarefas para outra coluna para realizar essa ação.",
+    "required_column": "Essa coluna é obrigatória, sendo assim só é possível editar sua posição e título.",
+    "delete_column_cancel_text": "Entendi",
+    "confirm_delete_column": "Realmente deseja excluir essa Coluna?",
     "tooltip_options": "Opções",
     "unarchive": "Desarquivar",
     "unarchiveError": "desarquivar",
-    "unarchiveSuccess": "unarchived"
+    "unarchiveSuccess": "unarchived",
+    "delete_confirm_text": "Apagar",
+    "delete_cancel_text": "Cancelar"
   }
 }

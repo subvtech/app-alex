@@ -1,9 +1,7 @@
 type Fn<A extends unknown[], R> = (...args: A) => R;
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type Obj<T = any> = Record<PropertyKey, T>;
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type Constructor<T> = new (...args: any[]) => T;
 
 // https://dev.to/dzey/comment/268bd

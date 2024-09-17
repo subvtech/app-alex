@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { TaskStatus } from '@/models/simple/taskSimple.model';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { SprintTask } from '../-types';
+
+interface LocalSprintTask extends SprintTask {
+  local?: boolean;
+}
+
+const newGroup = ref('');
 
 const { t } = useI18n();
 
@@ -43,6 +50,11 @@ const emit = defineEmits([
   'moveTask',
   'startDrag',
   'toggleArchive',
+  'addStory',
+  'addTask',
+  'handleBlur',
+  'createItem',
+  'editItem',
 ]);
 
 const props = withDefaults(
@@ -56,6 +68,7 @@ const props = withDefaults(
     search: string;
     sprints: string[];
     tasks: SprintTask[];
+    isEditingTask: SprintTask;
   }>(),
   {
     dragFrom: -1,
@@ -73,6 +86,8 @@ const taskToDelete = ref(-1);
 const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
+
+const isEditing = ref<LocalSprintTask | null>(null);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
@@ -102,6 +117,26 @@ const tasksArray = computed(() => {
   return array;
 });
 
+const handleFieldEdit = () => {
+  if (!isEditing.value) return;
+  if (!isEditing.value.local) {
+    if (newGroup.value !== '') {
+      isEditing.value.title = newGroup.value;
+      emit('editItem', isEditing.value);
+    }
+  } else if (isEditing.value.local) {
+    if (newGroup.value === '') {
+      emit('handleBlur', isEditing.value);
+    } else {
+      isEditing.value.title = newGroup.value;
+      emit('createItem', { ...isEditing.value });
+    }
+  }
+
+  isEditing.value = null;
+  newGroup.value = '';
+};
+
 const cancelDelete = () => {
   deleteModal.value = false;
   taskToDelete.value = -1;
@@ -112,14 +147,31 @@ const confirmDelete = () => {
   cancelDelete();
 };
 
-const dropDownItems = (task: SprintTask) => {
-  const total = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;
-  const items = [getDropDownAction('details', task.id, task)];
-  return total ? items : items.concat(getDropDownAction('delete', task.id, task));
+const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
+  const actions = {
+    rename: getDropDownAction('rename', task.id, task),
+    addStory: getDropDownAction('addStory', task.id, task),
+    addTask: getDropDownAction('addTask', task.id, task),
+    delete: getDropDownAction('delete', task.id, task),
+    details: getDropDownAction('details', task.id, task),
+  };
+
+  switch (task.organization) {
+    case 'epic':
+      return [actions.rename, actions.addStory, actions.addTask, actions.delete].filter(
+        (action): action is AlexDropdownItem => action !== undefined,
+      );
+    case 'story':
+      return [actions.rename, actions.addTask, actions.delete].filter(
+        (action): action is AlexDropdownItem => action !== undefined,
+      );
+    default:
+      return [actions.details, actions.delete].filter((action): action is AlexDropdownItem => action !== undefined);
+  }
 };
 
-const getDropDownAction = (action: string, id: number, task: SprintTask) => {
-  return {
+const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDropdownItem | undefined => {
+  const actions: { [key: string]: AlexDropdownItem } = {
     delete: {
       text: t('pages.projects.tasks.dropdown_delete'),
       warning: true,
@@ -132,7 +184,28 @@ const getDropDownAction = (action: string, id: number, task: SprintTask) => {
       text: t('pages.projects.tasks.dropdown_details'),
       onClick: () => emit('editTask', id, task),
     },
-  }[action];
+    rename: {
+      text: t('pages.projects.tasks.dropdown_rename'),
+      onClick: () => {
+        isEditing.value = task;
+        newGroup.value = task.title;
+      },
+    },
+    addStory: {
+      text: t('pages.projects.tasks.dropdown_add_story'),
+      onClick: () => {
+        emit('addStory', id);
+      },
+    },
+    addTask: {
+      text: t('pages.projects.tasks.dropdown_add_task'),
+      onClick: () => {
+        emit('addTask', task);
+      },
+    },
+  };
+
+  return actions[action];
 };
 
 const taskItemMargin = (level: number) => {
@@ -143,6 +216,21 @@ watch(searchFilter, () => {
   typing.value = true;
   setTimeout(() => (typing.value = false), 1000);
 });
+
+watch(
+  () => props.isEditingTask,
+  (value) => {
+    isEditing.value = value;
+  },
+  { immediate: true },
+);
+
+const setDragStart = (id: number, e: DragEvent) => {
+  // TODO: definir accepted groups
+  setTimeout(() => {
+    emit('startDrag', id, e);
+  }, 0);
+};
 </script>
 
 <template>
@@ -167,19 +255,46 @@ watch(searchFilter, () => {
                 :custom-slot="true"
                 :default-expand="true"
                 :items="[task]"
+                :selected-node="isEditing?.id"
               >
                 <template #header="{ header }">
-                  <div class="d-flex w-100 justify-space-between align-center">
-                    <p>{{ header.name }}</p>
+                  <div v-if="isEditing?.id !== header.id" class="d-flex w-100 justify-space-between align-center">
+                    <p>{{ header.title }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
                       variant="text"
                       :items="dropDownItems(header)"
                     />
                   </div>
+                  <v-text-field
+                    v-else
+                    v-model="newGroup"
+                    name="edit"
+                    can-edit
+                    class="w-100 text-gray-800 text-body-2 mb-2 editing-input"
+                    density="compact"
+                    variant="plain"
+                    hide-details
+                    maxlength="64"
+                    autofocus
+                    autocomplete="off"
+                    @blur="handleFieldEdit"
+                    @keydown.enter="handleFieldEdit"
+                  ></v-text-field>
                 </template>
                 <template #default="{ item, level }">
-                  <tr class="d-flex align-center py-2 tasks-items outline-bottom">
+                  <tr
+                    v-if="isEditing?.id !== item.id"
+                    :key="item.id"
+                    class="d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
+                    :class="[
+                      dragging && dragFrom == item.id ? 'dragging' : '',
+                      group === 'backlog' ? 'draggable-row' : '',
+                    ]"
+                    :draggable="group === 'backlog'"
+                    @dragstart="(e) => setDragStart(item.id, e)"
+                    @dragend="(e) => emit('dragEnd', item.id, e)"
+                  >
                     <td
                       class="text-body-4 text-overflow text-left task-title"
                       :class="`width-${85 - level * 4}`"
@@ -187,6 +302,7 @@ watch(searchFilter, () => {
                     >
                       {{ item.title }}
                     </td>
+
                     <td class="width-40">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
@@ -236,6 +352,22 @@ watch(searchFilter, () => {
                         </template>
                       </alex-custom-dropdown>
                     </td>
+                  </tr>
+                  <tr v-else class="tw-h-[52px] d-flex align-center">
+                    <v-text-field
+                      v-model="newGroup"
+                      name="edit"
+                      can-edit
+                      class="w-100 text-gray-800 text-body-2 editing-input w-100 tw-ml-[60px]"
+                      density="compact"
+                      variant="plain"
+                      hide-details
+                      maxlength="64"
+                      autofocus
+                      autocomplete="off"
+                      @blur="handleFieldEdit"
+                      @keydown.enter="handleFieldEdit"
+                    ></v-text-field>
                   </tr>
                 </template>
               </TreeView>
@@ -358,5 +490,18 @@ watch(searchFilter, () => {
   right: 0;
   height: 1px;
   background-color: #e0e0e0;
+}
+</style>
+
+<style>
+.editing-input {
+  .v-field__input {
+    font-family: Sen !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 135% !important; /* 18.9px */
+    letter-spacing: 0.28px !important;
+  }
 }
 </style>

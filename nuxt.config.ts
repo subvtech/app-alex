@@ -15,7 +15,12 @@ export default defineNuxtConfig({
   pages: true,
   ssr: false,
   devtools: { enabled: true },
-  app: { pageTransition: { name: 'page', mode: 'out-in' } },
+  app: {
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in',
+    },
+  },
   css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
   build: {
     transpile: ['vuetify'],
@@ -46,15 +51,13 @@ export default defineNuxtConfig({
       strapiUrl: STRAPI_URL,
       tipTapAppId: TIPTAP_APP_ID,
       tipTapKey: TIPTAP_KEY,
+      useMock: USE_MOCK === 'true',
     },
   },
   strapi: {
-    url: USE_MOCK ? '/_' : STRAPI_URL,
-    auth: {
-      populate: ['role', 'learningplans', 'favorites'],
-    },
+    url: STRAPI_URL,
+    auth: { populate: ['role', 'learningplans', 'favorites'] },
   },
-  routeRules: USE_MOCK ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } } : undefined,
   shadcn: {
     prefix: '',
     /**

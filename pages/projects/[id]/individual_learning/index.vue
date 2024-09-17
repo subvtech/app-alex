@@ -95,7 +95,7 @@ onMounted(fetchMembers);
                         </v-avatar>
                         <alex-custom-chip
                           v-if="member.id == user?.id"
-                          text="Minha jornada"
+                          :text="t('pages.projects.individual_learning.myJourney')"
                           size="small"
                           class="bg-info--2 text-body-5 text-secondary-2"
                           variant="text"
@@ -114,7 +114,14 @@ onMounted(fetchMembers);
                       </div>
                     </div>
                     <div class="tw-flex tw-flex-col">
-                      <v-progress-linear rounded color="accent" class="tw-mb-2" :height="8" model-value="50" />
+                      <v-progress-linear
+                        rounded
+                        color="accent"
+                        class="tw-mb-2"
+                        :height="8"
+                        model-value="50"
+                        bg-color="gray-600"
+                      />
                       <div class="tw-flex tw-justify-between tw-items-center tw-text-sm tw-opacity-45">
                         <span>{{ $t('pages.projects.individual_learning.my_goals') }}</span>
                         <span>50%</span>
