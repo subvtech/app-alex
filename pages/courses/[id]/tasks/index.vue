@@ -127,7 +127,7 @@ watch(
   () => [learningPlanStore.loading],
   () => {
     if (!learningPlanStore.loading) {
-      isProfessor.value = learningPlanStore.userIsFacilitator;
+      isProfessor.value = learningPlanStore.userIsFacilitator || false;
 
       // Kanban
       classes.value =

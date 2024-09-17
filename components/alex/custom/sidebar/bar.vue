@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex-column pb-2 px-2 bg-primary sidebar"
+    class="flex-column pb-2 px-2 bg-primary sidebar overflow-y-auto"
     :class="[!clipped ? 'sidebar-visible' : 'sidebar-hidden']"
   >
     <div class="my-4 w-100 d-flex" :class="clipped ? '' : 'justify-center'">

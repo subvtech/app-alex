@@ -1,13 +1,10 @@
 <template>
   <div
     class="d-flex align-center"
-    :class="{ 'flex-row-reverse': order === 'FIRST_ON_TOP' }"
+    :class="{ 'flex-row-reverse': order === 'FIRST_ON_TOP', 'tw-pl-3': !!avatarsToShow.length }"
     data-testid="alex-avatar-group"
   >
-    <template
-      v-for="({ name, image, className }, index) in avatarsToShow"
-      :key="index"
-    >
+    <template v-for="({ name, image, className }, index) in avatarsToShow" :key="index">
       <v-avatar
         data-testid="alex-avatar"
         :size="size"

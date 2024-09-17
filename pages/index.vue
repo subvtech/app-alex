@@ -1,8 +1,3 @@
-<template>
-  <v-row justify="center">
-    <v-col cols="12"> Bem vindo ao Alex </v-col>
-  </v-row>
-</template>
 <script setup lang="ts">
 definePageMeta({
   middleware: 'auth',
@@ -10,8 +5,8 @@ definePageMeta({
 });
 </script>
 
-<style scoped lang="scss">
-.max-w-200 {
-  max-width: 200px;
-}
-</style>
+<template>
+  <v-row justify="center">
+    <v-col cols="12">Bem vindo ao Alex</v-col>
+  </v-row>
+</template>
