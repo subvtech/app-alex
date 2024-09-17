@@ -76,7 +76,7 @@ onMounted(fetchMembers);
               <TransitionGroup name="list">
                 <Card v-for="member in filteredMembers" :key="member.id" :class="cardClass">
                   <CardContent
-                    class="tw-flex tw-flex-col tw-gap-6 tw-pt-6"
+                    class="tw-flex tw-flex-col tw-gap-6 tw-pt-6 pa-6"
                     @click="navigateTo(`/projects/${route.params.id}/individual_learning/${member.id}`)"
                   >
                     <div class="tw-flex tw-items-center tw-gap-6 tw-flex-col align-start">
