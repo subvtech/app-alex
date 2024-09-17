@@ -159,17 +159,16 @@
 <script setup lang="ts">
 import { isAfter, isBefore } from 'date-fns';
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+// import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { orderEvents } from '~/utils';
-import { RestrictionValue } from '../Restrictions.vue';
+import { RestrictionValue } from '../../Restrictions.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
-  a?: string;
   taskId?: number;
   trail?: TrailSimple;
   title?: string;
@@ -194,7 +193,6 @@ interface TaskTeacherDrawerProps {
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
-  a: '',
   title: '',
   status: 'draft',
   blocks: undefined,
@@ -216,6 +214,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   members: () => [],
 });
 
+// TODO: Refactor to on-change values and remove refs;
 const description = ref<string | any | undefined>(props.description);
 const submissionDescription = ref(props.submissionDescription);
 const hasSubmission = ref(props.hasSubmission);
@@ -250,6 +249,7 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
 };
 
 watch(model, (value) => {
+  isFirstTimeOpened.value = true;
   if (value) {
     description.value = props.description;
     submissionDescription.value = props.submissionDescription;
@@ -266,10 +266,8 @@ watch(model, (value) => {
     restrictions.value = props.restrictions;
     setTimeout(() => {
       isFirstTimeOpened.value = false;
-    }, 200);
-    return;
+    }, 2000);
   }
-  isFirstTimeOpened.value = true;
 });
 
 type Emits = {
@@ -335,28 +333,28 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
 
 // Tipos
 const type = ref<TaskType | null>(props.type);
-const types = ref<AlexDropdownItem[]>([
-  {
-    text: t('components.learningPlan.drawer.task.type.individual'),
-    onClick: () => {
-      if (members.value.length) {
-        setMessage(t('components.learningPlan.drawer.task.errors.cantChangeType'), 'warning', true);
-        return;
-      }
-      type.value = 'individual';
-    },
-  },
-  {
-    text: t('components.learningPlan.drawer.task.type.collective'),
-    onClick: () => {
-      if (members.value.length) {
-        setMessage(t('components.learningPlan.drawer.task.errors.cantChangeType'), 'warning', true);
-        return;
-      }
-      type.value = 'group';
-    },
-  },
-]);
+// const types = ref<AlexDropdownItem[]>([
+//   {
+//     text: t('components.learningPlan.drawer.task.type.individual'),
+//     onClick: () => {
+//       if (members.value.length) {
+//         setMessage(t('components.learningPlan.drawer.task.errors.cantChangeType'), 'warning', true);
+//         return;
+//       }
+//       type.value = 'individual';
+//     },
+//   },
+//   {
+//     text: t('components.learningPlan.drawer.task.type.collective'),
+//     onClick: () => {
+//       if (members.value.length) {
+//         setMessage(t('components.learningPlan.drawer.task.errors.cantChangeType'), 'warning', true);
+//         return;
+//       }
+//       type.value = 'group';
+//     },
+//   },
+// ]);
 
 // Tabs
 const activePage = ref('1');

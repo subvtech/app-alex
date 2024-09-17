@@ -14,11 +14,6 @@ import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
-<<<<<<< HEAD
-import { Field } from 'vee-validate';
-=======
-import { tasks } from '~/assets/queries';
->>>>>>> 99596d667e1cd75c70a721355b9dac29fd88fae7
 
 const props = defineProps<{
   filter?: filterType;
@@ -26,12 +21,8 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-<<<<<<< HEAD
-const { create, delete: _delete, update, find } = useStrapi();
-=======
 const i18n = useI18n();
 
->>>>>>> 99596d667e1cd75c70a721355b9dac29fd88fae7
 const { setMessage } = useMessageStore();
 const route = useRoute();
 const learninplanId = computed(() => parseInt(route.params.id.toString()));
@@ -54,7 +45,7 @@ const sprints = ref<Droppable<Sprint>[]>([]);
 const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const createTaskSprintId = ref<number>();
-const editTask = ref<SprintTask | null>(null);
+const editTask = ref<SprintTask>();
 const isEditingTask = ref<null | TaskSimple>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
@@ -84,7 +75,7 @@ const teacherDrawer = computed({
     return !!editTask.value;
   },
   set(value: boolean) {
-    editTask.value = !value ? null : editTask.value;
+    editTask.value = !value ? undefined : editTask.value;
   },
 });
 const filteredTasks = computed(() => {
@@ -99,10 +90,6 @@ const sprintBacklog = computed(() => {
     tasks: sprint.tasks.map(formatTasks),
   }));
 });
-
-// const expandSprints = computed(() => {
-//   return sprintBacklog.value.map(() => 'panel');
-// });
 
 const formatTasks = (task) => {
   if (task.organization === 'epic' || task.organization === 'story') {
@@ -181,11 +168,11 @@ const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
         if (epic.id !== epicId) {
           return epic;
         }
-        if (!storyId) {
+        if (!storyId && epic.tasks) {
           epic.tasks = [...epic.tasks, newTask];
         } else {
           epic.tasks = epic.tasks?.map((story) => {
-            if (story.id === storyId) {
+            if (story.id === storyId && story.tasks) {
               story.tasks = [...story.tasks, newTask];
             }
             return story;
@@ -351,9 +338,7 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
   }
 };
 
-const onDrop = (task: SprintTask) => {
-  console.log(dragDrop.over.value);
-  console.log(task);
+const onDrop = () => {
   dragDrop.dragEnd();
 };
 
@@ -376,31 +361,12 @@ const toggleExpand = () => {
   expandBacklog.value = !expandBacklog.value ? 1 : 0;
 };
 
-onMounted(async () => {
-  try {
-    const res = await strapiClient<{
-      backlog: SprintTask[];
-      sprints: SprintTask[];
-    }>(`/learningplans/${learningPlanStore.learningPlan?.id}/sprint-backlog`);
-
-    backlogTasks.value = res.backlog;
-    sprintTasks.value = res.sprints;
-
-    console.log('Backlog | Sprint', res.backlog, res.sprints);
-  } catch (_) {}
-});
-
-const handleUpdateTask = (taskId, field, value) => {
+const handleUpdateTask = (taskId, field) => {
   if (!taskId || !field) {
     return;
   }
-
-  backlogTasks.value = backlogTasks.value.map((task) => {
-    if (task.id === taskId) {
-      task[field] = value;
-    }
-
-    return task;
+  queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
+};
 const formattedDate = (strDate: string) => {
   const date = new Date(strDate);
   const dateFormat = date.getFullYear() === new Date().getFullYear() ? `d MMM` : `d MMM y`;
@@ -552,7 +518,7 @@ const formattedDate = (strDate: string) => {
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
                     :is-project="true"
-                    :is-editing-task="isEditingTask"
+                    :is-editing-task="!!isEditingTask"
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
@@ -620,36 +586,16 @@ const formattedDate = (strDate: string) => {
         :project-id="learningPlanStore.learningPlan.id"
       />
     </div>
-<<<<<<< HEAD
-    <!-- <alex-learningplan-task-drawer-teacher
-=======
-    <alex-learningplan-task-drawer-project
->>>>>>> 99596d667e1cd75c70a721355b9dac29fd88fae7
-      v-model="teacherDrawer"
-      editable
-      project
-      :end-date="editTask?.finish_at"
-      :learningplan-id="learningPlanStore.learningPlan?.id || 0"
-      :start-date="editTask?.start_at"
-      :status="editTask?.status"
-      :task-id="editTask?.id"
-      :title="editTask?.title"
-      :type="editTask?.type"
-<<<<<<< HEAD
-      @change-values="handleChangeValues"
-    /> -->
     <alex-learningplan-task-drawer-project
       v-model="teacherDrawer"
       :task-id="editTask?.id || 0"
       :task="editTask"
-      :sprints="sprintTasks"
+      :sprints="sprintsValue.sprints"
       @update-value="
         (field, value) => {
           handleUpdateTask(editTask?.id ?? 0, field, value);
         }
       "
-=======
->>>>>>> 99596d667e1cd75c70a721355b9dac29fd88fae7
     />
   </div>
 </template>

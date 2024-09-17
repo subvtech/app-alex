@@ -5,6 +5,7 @@ import { generateGroup } from '~/utils';
 import { useCreateKanbanTask } from '../-composables/useCreateTask';
 import {
   BoardsResponse,
+  useCreateColumn,
   useCreateKanban,
   useDeleteColumn,
   useGetKanban,
@@ -12,6 +13,7 @@ import {
   useReorderColumnTasks,
   useUpdateColumn,
 } from '../-composables/useKanban';
+import { useGetSprints } from '../-composables/useSprints';
 import { Droppable, KanbanColumnTask, KanbanStatusType, SprintTask } from '../-types';
 import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
@@ -41,7 +43,9 @@ const requiredStatusColumn = ['to_do', 'done'];
 // Querys
 const queryClient = useQueryClient();
 const enabledKanban = computed(() => !!selectedSprint.value);
+const { data: sprints } = useGetSprints(learninplanId);
 const { data: kanban, isLoading, refetch: refetchKanban } = useGetKanban(learninplanId, selectedSprint, enabledKanban);
+const { mutateAsync: createColumn, isPending: isCreatingColumn } = useCreateColumn();
 const { mutateAsync: createKanban } = useCreateKanban();
 const { mutateAsync: updateColumn } = useUpdateColumn();
 const { mutateAsync: deleteColumn } = useDeleteColumn();
@@ -50,8 +54,10 @@ const { mutateAsync: createTask, isPending: isCreatingTask } = useCreateKanbanTa
 const { mutateAsync: reorderTasks } = useReorderColumnTasks();
 //  Refs
 const canDrag = ref(true);
+const addColumnRef = ref<{ isAddingColumn: boolean; setAddingColumn: (value: boolean) => void } | null>(null);
 const isDraggingItems = ref(false);
 const modalDeleteColumn = ref(false);
+const editTask = ref<TaskSimple>();
 const selectedColumnToDelete = ref<Column<KanbanColumnTask> | null>(null);
 const isCreatingTaskColumnId = ref<number | null>(null);
 const getDeleteColumnTexts = (column: Column<KanbanColumnTask> | null) => {
@@ -109,7 +115,14 @@ const columns = computed<Column<KanbanColumnTask>[]>({
     });
   },
 });
-
+const teacherDrawer = computed({
+  get() {
+    return !!editTask.value;
+  },
+  set(value: boolean) {
+    editTask.value = !value ? undefined : editTask.value;
+  },
+});
 // Methods
 const setCanDrag = (value: boolean) => {
   canDrag.value = value;
@@ -122,7 +135,7 @@ const createNewKanbanVersion = async () => {
     columns: columns.value.map((column) => ({ title: column.title, position: column.position })),
     sprintId: selectedSprint.value.id,
   });
-  refetchKanban();
+  await refetchKanban();
 };
 const handleTitleChange = async (group: string, value: string) => {
   const column = columns.value.find((column) => column.group === group);
@@ -138,7 +151,6 @@ const handleTitleChange = async (group: string, value: string) => {
   await createNewKanbanVersion();
   updateColumn({ id: column.id, position: column.position, title: value });
 };
-
 const handleConfirmDeleteColumn = (group: string) => {
   const deletedColumn = columns.value.find((column) => column.group === group);
   if (deletedColumn) {
@@ -219,7 +231,6 @@ const handleUpdateList = async (updatedColumns: Column<KanbanColumnTask>[]) => {
     columns: columns.value,
   });
 };
-
 const handleAddItem = async (columnId: number, _group: string, title: string) => {
   isCreatingTaskColumnId.value = columnId;
   if (!selectedSprint.value) {
@@ -254,6 +265,19 @@ const getMembers = (taskMembers?: TaskMember[]) => {
       }),
     })) || []
   );
+};
+const handleAddColumn = async (title: string) => {
+  if (!kanban.value) {
+    return;
+  }
+  try {
+    await createNewKanbanVersion();
+    await createColumn({ kanbanId: kanban.value.id, position: columns.value.length, title, statusType: 'doing' });
+    refetchKanban();
+  } catch (error) {
+  } finally {
+    addColumnRef.value?.setAddingColumn(false);
+  }
 };
 defineExpose({ canDrag, setCanDrag });
 </script>
@@ -298,16 +322,23 @@ defineExpose({ canDrag, setCanDrag });
           >
             <template #card="{ item }">
               <TaskCard
-                :date="item.raw.task.finish_at ? new Date(item.raw.task.finish_at) : undefined"
+                :date="item.raw.task.finish_at ? new Date(item.raw.task.finish_at.replaceAll('-', '/')) : undefined"
                 :name="item.raw.task.title"
                 :tags="item.raw.task.tags"
                 :participants="getMembers(item.raw?.task.task_members)"
+                @click="editTask = item.raw.task"
               />
             </template>
           </KanbanColumn>
         </SlickItem>
 
-        <KanbanAddColumn :kanban="kanban" :columns-length="columns.length" @add-column="refetchKanban()" />
+        <KanbanAddColumn
+          ref="addColumnRef"
+          :is-loading="isCreatingColumn"
+          :kanban="kanban"
+          :columns-length="columns.length"
+          @add-column="handleAddColumn"
+        />
       </SlickList>
       <alex-custom-confirm-dialog
         v-model="modalDeleteColumn"
@@ -324,6 +355,13 @@ defineExpose({ canDrag, setCanDrag });
         :title="confirmDeleteI18n.title"
         @cancel="modalDeleteColumn = false"
         @submit="handleDeleteColumn"
+      />
+      <alex-learningplan-task-drawer-project
+        v-model="teacherDrawer"
+        :task-id="editTask?.id || 0"
+        :task="editTask"
+        :sprints="sprints.sprints"
+        @update-value="refetchKanban"
       />
     </template>
   </div>
