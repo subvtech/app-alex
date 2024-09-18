@@ -667,25 +667,6 @@ const getFolders = () => {
   // headerStore.showHeader = true;
 // });
 
-  // {
-  //   title: 'Home',
-  //   disabled: true,
-  // },
-  // {
-  //   title: 'Projetos',
-  //   to: '/projects/me',
-  // },
-  // {
-  //   title: learningPlanStore.learningPlan.title,
-  //   to: `/courses/${learningPlanStore.learningPlan.id}`,
-  // },
-  // ];
-//};
-
-onBeforeMount(() => {
-  // headerStore.showHeader = true;
-});
-
 onMounted(() => {
   getTemplates();
   getFolders();
