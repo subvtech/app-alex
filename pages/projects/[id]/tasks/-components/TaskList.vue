@@ -646,7 +646,7 @@ const handleInputCancel = (index: number) => {
                     type="backlog"
                     :index="backlogIndex"
                     :drop-area="dragDrop.over.value.list === 'backlog'"
-                    @drag-over="(index, event) => handleEmptyStateOver(index, event)"
+                    @drag-over="(index, event) => handleEmptyStateOver(index, event, sprint)"
                     @drag-leave="dragDrop.onDragLeave"
                   />
                 </div>

@@ -317,7 +317,11 @@ const setDragStart = (id: number, e: DragEvent) => {
                   <div
                     v-if="isEditing?.id !== header.id"
                     class="d-flex w-100 justify-space-between align-center"
-                    :class="header.id === hoveredTree?.id && 'bg-gray-blue tw-transition'"
+                    :class="
+                      header.id === hoveredTree?.id &&
+                      header.organization !== 'standard' &&
+                      'bg-gray-blue tw-transition'
+                    "
                     @dragenter="
                       (e) => {
                         e.stopPropagation();
@@ -326,7 +330,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     "
                     @dragend="handleNullTree"
                     @drop.prevent="
-                      emit('moveToParent', header);
+                      emit('moveToParent', hoveredTree);
                       hoveredTree = null;
                     "
                   >
@@ -358,7 +362,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="tw-bg-red-500 d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
+                    class="d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
                     :class="[
                       dragging && dragFrom == item.id ? 'dragging' : '',
                       group === 'backlog' ? 'draggable-row' : '',
