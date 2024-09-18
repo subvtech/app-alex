@@ -9,6 +9,7 @@ interface LocalSprintTask extends SprintTask {
 }
 
 const newGroup = ref('');
+const hoveredTree = ref<any | null>(null);
 
 const { t } = useI18n();
 
@@ -56,6 +57,7 @@ const emit = defineEmits([
   'handleBlur',
   'createItem',
   'editItem',
+  'moveToParent',
 ]);
 
 const props = withDefaults(
@@ -140,6 +142,12 @@ const handleFieldEdit = () => {
 const cancelDelete = () => {
   deleteModal.value = false;
   taskToDelete.value = -1;
+};
+
+const handleNullTree = () => {
+  setTimeout(() => {
+    hoveredTree.value = null;
+  }, 100);
 };
 
 const confirmDelete = () => {
@@ -258,15 +266,43 @@ const setDragStart = (id: number, e: DragEvent) => {
             <td class="pa-0" :colspan="columns.length">
               <TreeView
                 leaf-classes="outline-bottom"
-                node-classes="px-4 text-gray-800 text-body-4 tw-border-b tw-border-[#e0e0e0] tw-h-[52px] d-flex align-center ga-1"
+                :node-classes="`${
+                  task.id === hoveredTree?.id && 'bg-gray-blue'
+                } tw-bg-red-500 tw-transition px-4 text-gray-800 text-body-4 tw-border-b
+                tw-border-[#e0e0e0] tw-h-[52px] d-flex align-center ga-1`"
                 :custom-header="true"
                 :custom-slot="true"
                 :default-expand="true"
                 :items="[task]"
                 :selected-node="isEditing?.id"
+                @dragenter.prevent="
+                  () => {
+                    hoveredTree = task;
+                  }
+                "
+                @dragend="handleNullTree"
+                @drop.prevent="
+                  emit('moveToParent', task);
+                  hoveredTree = null;
+                "
               >
                 <template #header="{ header }">
-                  <div v-if="isEditing?.id !== header.id" class="d-flex w-100 justify-space-between align-center">
+                  <div
+                    v-if="isEditing?.id !== header.id"
+                    class="d-flex w-100 justify-space-between align-center"
+                    :class="header.id === hoveredTree?.id && 'bg-gray-blue tw-transition'"
+                    @dragenter="
+                      (e) => {
+                        e.stopPropagation();
+                        hoveredTree = header;
+                      }
+                    "
+                    @dragend="handleNullTree"
+                    @drop.prevent="
+                      emit('moveToParent', header);
+                      hoveredTree = null;
+                    "
+                  >
                     <p>{{ header.title }}</p>
                     <alex-custom-dropdown
                       prepend-icon="mdi-dots-vertical"
@@ -295,7 +331,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
+                    class="tw-bg-red-500 d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
                     :class="[
                       dragging && dragFrom == item.id ? 'dragging' : '',
                       group === 'backlog' ? 'draggable-row' : '',
@@ -308,6 +344,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       class="text-body-4 text-overflow text-left task-title"
                       :class="`width-${85 - level * 4}`"
                       :style="taskItemMargin(level)"
+                      @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
                     >
                       {{ item.title }}
                     </td>

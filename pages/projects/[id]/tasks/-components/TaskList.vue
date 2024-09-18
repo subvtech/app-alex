@@ -39,6 +39,7 @@ const createSprintDialog = ref(false);
 // Drag and drop
 const hoveredSprint = ref<any | null>(0);
 const hoveredTask = ref<any | null>(null);
+const draggedTask = ref<any | null>(null);
 
 // Querys
 const queryClient = useQueryClient();
@@ -339,6 +340,25 @@ const handleEmptyStateLeave = () => {
   }, 300);
 };
 
+const handleMoveToParent = (parentTask) => {
+  if (!draggedTask.value || !parentTask || parentTask?.organization === 'standard') {
+    return;
+  }
+
+  if (parentTask?.tasks?.some((task) => Number(task.id) === Number(draggedTask.value.id))) {
+    return;
+  }
+
+  update('tasks', draggedTask.value.id, {
+    parent_task: parentTask.id,
+  })
+    .then(() => {
+      setMessage(`Tarefa movida para ${parentTask.title}`, 'success', true);
+      refetchSprints();
+    })
+    .catch(() => setMessage('Falha ao mover task', 'error', true));
+};
+
 const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
   try {
     const task = sprintsValue.value.backlog.find((t) => t.id === id);
@@ -355,7 +375,6 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
 
 // OnDrop
 const onDrop = (_, __, e) => {
-  console.log('Hovered sprint no drop', hoveredSprint.value);
   const data = e?.target?.attributes?.id?.value;
 
   if (!data) {
@@ -364,7 +383,11 @@ const onDrop = (_, __, e) => {
 
   const [id, name] = data.split(':');
 
-  // Movendo tarefa pra uma sprint vazia
+  if (!hoveredSprint.value) {
+    const name = setOver.value.list;
+    hoveredSprint.value = sprintsValue.value.sprints.find(({ title }) => title === name) ?? null;
+  }
+
   if (!hoveredSprint.value || !id) {
     hoveredSprint.value = null;
     dragDrop.dragEnd();
@@ -495,7 +518,20 @@ const handleInputCancel = (index: number) => {
                     @create-item="createItem"
                     @edit-item="handleEdit"
                     @handle-blur="handleDelete"
-                    @start-drag="dragDrop.startDrag"
+                    @start-drag="
+                      (idVal, e, dropTo, dragGhost) => {
+                        dragDrop.startDrag(idVal, e, dropTo, dragGhost);
+
+                        const data = e?.target?.attributes?.id?.value;
+
+                        if (!data) {
+                          return;
+                        }
+
+                        const [id, title] = data.split(':');
+                        draggedTask = { id, title };
+                      }
+                    "
                     @drag-over="
                       (sprint, idVal, index, e) => {
                         dragDrop.onDragOver(sprint, idVal, index, e);
@@ -512,9 +548,15 @@ const handleInputCancel = (index: number) => {
                       }
                     "
                     @drag-leave="dragDrop.onDragLeave"
-                    @drag-end="onDrop"
+                    @drag-end="
+                      (_, __, e) => {
+                        onDrop(_, __, e);
+                        draggedTask = null;
+                      }
+                    "
                     @delete-task="handleDeleteTask"
                     @move-task="handleMoveTask"
+                    @move-to-parent="handleMoveToParent"
                     @edit-task="(_id, task: SprintTask) => (editTask = task)"
                   />
                 </div>
