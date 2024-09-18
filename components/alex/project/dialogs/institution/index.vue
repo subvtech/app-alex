@@ -266,7 +266,6 @@ const fetchUsers = async () => {
       throw new Error('Error fetching users');
     }
     users.value = response as unknown as User[];
-    console.log('Fetched Users:', users.value);
   } catch (error) {
     console.error('Error fetching users:', error);
   }
