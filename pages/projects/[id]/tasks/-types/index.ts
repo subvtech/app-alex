@@ -14,7 +14,7 @@ interface Student {
   };
 }
 
-export interface SprintTask {
+export type SprintTask = {
   id: number;
   archived_at?: string | null;
   children?: SprintTask[];
@@ -27,7 +27,7 @@ export interface SprintTask {
   title: string;
   type?: TaskType | null;
   organization?: 'epic' | 'standard' | 'story';
-}
+} & Partial<TaskSimple>;
 
 export interface Droppable<T extends { id: number }> {
   expanded?: 0 | 1;

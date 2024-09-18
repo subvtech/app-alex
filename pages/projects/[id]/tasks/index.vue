@@ -4,7 +4,7 @@ import Kanban from './-components/Kanban.vue';
 import TaskFilterDrawer from './-components/TaskFilterDrawer.vue';
 import TaskList from './-components/TaskList.vue';
 import { useGetSprints } from './-composables/useKanban';
-import { SprintTask } from './-types';
+import { SprintSimple } from '#imports';
 
 type FilterType = {
   finalDate?: { start: string | null; end: string | null };
@@ -25,7 +25,7 @@ const search = ref('');
 const route = useRoute();
 const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const { data: sprints } = useGetSprints(learninplanId);
-const selectedSprint = ref<SprintTask | undefined>(sprints.value?.sprints[0]);
+const selectedSprint = ref<SprintSimple | undefined>(sprints.value?.sprints[0]);
 const filter = ref<FilterType>();
 const filterDrawer = ref();
 const chips = ref<string[]>([]);
