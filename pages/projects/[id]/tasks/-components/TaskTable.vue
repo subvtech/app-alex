@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TreeView from '@/components/alex/custom/treeview/index.vue';
-import { TaskStatus } from '@/models/simple/taskSimple.model';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { TaskStatus } from '~/models/simple/taskSimple.model';
 import { SprintTask } from '../-types';
 
 interface LocalSprintTask extends SprintTask {
@@ -41,6 +41,31 @@ const header = [
   },
   { title: '', key: 'actions', sortable: false },
 ];
+type CreateItemPayload = {
+  epic: number;
+  id: number;
+  local: boolean;
+  organization: 'standard' | 'story' | 'epic';
+  position: number;
+  sprint: number;
+  story: number;
+  title: string;
+};
+type Emit = {
+  'delete-task': [id: number];
+  'drag-end': [item: any, level: string, event: DragEvent];
+  'drag-leave': [event: DragEvent];
+  'drag-over': [list: string, id: number, index: number, event: DragEvent];
+  'edit-task': [id: number, task: SprintTask];
+  'move-task': [];
+  'start-drag': [id: number, event: DragEvent];
+  'toggle-archive': [];
+  'add-story': [id: number];
+  'add-task': [task: SprintTask];
+  'handle-blur': [task: SprintTask];
+  'create-item': [task: CreateItemPayload];
+  'edit-item': [task: SprintTask];
+};
 
 const emit = defineEmits([
   'deleteTask',
@@ -71,13 +96,14 @@ const props = withDefaults(
     search: string;
     sprints: string[];
     tasks: SprintTask[];
-    isEditingTask: SprintTask;
+    editingTask?: SprintTask | null;
   }>(),
   {
     dragFrom: -1,
     dragging: false,
     isProject: false,
     over: undefined,
+    editingTask: null,
   },
 );
 
@@ -124,14 +150,15 @@ const handleFieldEdit = () => {
   if (!isEditing.value) return;
   if (!isEditing.value.local) {
     if (newGroup.value !== '') {
-      emit('editItem', { ...isEditing.value, title: newGroup.value });
+      isEditing.value.title = newGroup.value;
+      emit('edit-item', { ...isEditing.value, title: newGroup.value });
     }
   } else if (isEditing.value.local) {
     if (newGroup.value === '') {
-      emit('handleBlur', isEditing.value);
+      emit('handle-blur', isEditing.value);
     } else {
       isEditing.value.title = newGroup.value;
-      emit('createItem', { ...isEditing.value });
+      emit('create-item', { ...isEditing.value } as unknown as CreateItemPayload);
     }
   }
 
@@ -151,7 +178,7 @@ const handleNullTree = () => {
 };
 
 const confirmDelete = () => {
-  emit('deleteTask', taskToDelete.value);
+  emit('delete-task', taskToDelete.value);
   cancelDelete();
 };
 
@@ -190,7 +217,7 @@ const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDr
     },
     details: {
       text: t('pages.projects.tasks.dropdown_details'),
-      onClick: () => emit('editTask', id, task),
+      onClick: () => emit('edit-task', id, task),
     },
     rename: {
       text: t('pages.projects.tasks.dropdown_rename'),
@@ -202,13 +229,13 @@ const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDr
     addStory: {
       text: t('pages.projects.tasks.dropdown_add_story'),
       onClick: () => {
-        emit('addStory', id);
+        emit('add-story', id);
       },
     },
     addTask: {
       text: t('pages.projects.tasks.dropdown_add_task'),
       onClick: () => {
-        emit('addTask', task);
+        emit('add-task', task);
       },
     },
   };
@@ -226,7 +253,7 @@ watch(searchFilter, () => {
 });
 
 watch(
-  () => props.isEditingTask,
+  () => props.editingTask,
   (value) => {
     isEditing.value = value;
   },
@@ -236,7 +263,7 @@ watch(
 const setDragStart = (id: number, e: DragEvent) => {
   // TODO: definir accepted groups
   setTimeout(() => {
-    emit('startDrag', id, e);
+    emit('start-drag', id, e);
   }, 0);
 };
 </script>
@@ -338,7 +365,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     ]"
                     :draggable="group === 'backlog'"
                     @dragstart="(e) => setDragStart(item.id, e)"
-                    @dragend="(e) => emit('dragEnd', item, level, e)"
+                    @dragend="(e) => emit('drag-end', item, level, e)"
                   >
                     <td
                       class="text-body-4 text-overflow text-left task-title"

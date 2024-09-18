@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { Kanban, KanbanColumn, KanbanStatusType, SprintTask } from '../-types';
+import { SprintSimple } from '#imports';
 
 export type BoardsResponse = {
   boards: KanbanColumn[];
@@ -15,12 +16,16 @@ export const useGetSprints = (learninplanId: Ref<number>) =>
     queryFn: async ({ queryKey }) =>
       await strapiClient<{
         backlog: SprintTask[];
-        sprints: SprintTask[];
+        sprints: SprintSimple[];
       }>(`/learningplans/${queryKey[1]}/sprint-backlog`),
     initialData: { backlog: [], sprints: [] },
   });
 
-export const useGetKanban = (learninplanId: Ref<number>, sprint: Ref<SprintTask | undefined>, enabled: Ref<boolean>) =>
+export const useGetKanban = (
+  learninplanId: Ref<number>,
+  sprint: Ref<SprintSimple | undefined>,
+  enabled?: Ref<boolean>,
+) =>
   useQuery({
     queryKey: ['kanban', learninplanId, sprint],
     queryFn: async ({ queryKey }) => {
