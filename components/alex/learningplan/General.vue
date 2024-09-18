@@ -106,21 +106,23 @@
             <p class="text-gray-800 text-h5 pb-6">
               {{ $t('components.courses.invites.title') }}
             </p>
-            <div v-if="learningPlan.invite_enabled">
+            <div v-if="learningPlan.invite_enabled" class="mt-4">
               <alex-learningplan-invites
                 v-for="classItem in learningPlanClasses"
                 :key="classItem.id"
                 full-width
                 :class-name="classItem.name"
-                :duration="learningPlan.invitation_duration"
-                :course-id="learningPlan.id"
-                :class-id="classItem.id"
-                :data="classItem.activeLink"
-                @update:link="
-                  (data) => {
-                    plainLink = data.url;
-                  }
+                :url="
+                  classItem.activeLink?.hash
+                    ? generateUrl(classItem.activeLink?.hash, learningPlan.id)
+                    : null
                 "
+                :course-id="learningPlan.id"
+                :invite-id="classItem.activeLink?.id"
+                :class-id="classItem.id"
+                :duration="invitationDuration"
+                :invite-link-expires-at="classItem.activeLink?.expires_at"
+                @update:link="updateLink"
                 @link:expired="plainLink = null"
               />
             </div>
@@ -183,23 +185,29 @@ import { ClassSimple } from '@/models/simple/classSimple.model';
 type GeneralProps = {
   learningPlan: LearningPlanSimple;
   owner: LearningPlanMemberSimple;
-  invitationLink?: InvitationLinkSimple | null;
+  invitationDuration?: number;
   canEdit?: boolean;
   schedules?: MeetingPropsType[];
   loading?: boolean;
 };
 const props = withDefaults(defineProps<GeneralProps>(), {
-  invitationLink: null,
   schedules: () => [],
   loading: false,
+  invitationDuration: 0,
 });
 
 const { update } = useStrapi();
 const learningPlanStore = useLearningPlanStore();
 const i18n = useI18n();
+
+const { generateUrl, generateNewInvite, calcRemainingTime } =
+  useInvitationLink();
+
 const emit = defineEmits(['update']);
-const plainLink = ref<string | null>(null);
+
 const user = useStrapiUser<User>();
+
+const plainLink = ref<string | null>(null);
 
 const updateAbout = async (text) => {
   await update('/learningplans', props.learningPlan.id, {
@@ -234,6 +242,14 @@ const learningGoals = computed(
       },
     })),
 );
+
+const updateLink = (data) => {
+  const { url, expiresAt } = data;
+
+
+  plainLink.value = url;
+  // inviteLinkExpiresAtRef.value = expiresAt;
+};
 
 const getActiveLink = (classItem: ClassSimple) => {
   const activeLinks = classItem?.invitation_links?.filter(

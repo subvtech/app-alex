@@ -193,8 +193,17 @@
             <template #item="{ item }">
               <tr
                 class="table-row text-body-3 text-gray learning-row"
-                :class="{ hidden: item.learningPlan.hidden }"
-                @click="navigate(item.learningPlan.id, 'page')"
+                :class="{
+                  hidden: item.learningPlan.hidden,
+                  'tw-grayscale tw-opacity-40': !isAvailable(
+                    item.learningPlan.id,
+                  ),
+                }"
+                @click="
+                  isAvailable(item.learningPlan.id)
+                    ? navigate(item.learningPlan.id, 'page')
+                    : displayUnavailable()
+                "
               >
                 <td class="max-width-[596px]">
                   <div class="d-flex align-center">
@@ -265,7 +274,7 @@
         <template #footer="{ pageCount, groupedItems }">
           <div
             v-if="groupedItems.length"
-            class="d-flex w-100 tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 tw-border-t-[1px] tw-border-gray-100"
+            class="d-flex w-100 tw-h-[92px] justify-space-between align-center px-6 flex-column flex-sm-row ga-3 tw-border-t-[1px] tw-border-gray-100 tw-mt-auto"
           >
             <p class="show-cardlist text-body-3 text-gray-600">
               {{ showingData(groupedItems, filteredByLeader) }}

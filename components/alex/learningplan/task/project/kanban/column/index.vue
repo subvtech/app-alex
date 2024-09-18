@@ -1,29 +1,47 @@
 <template>
-  <div class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
+  <div
+    :id="group"
+    class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none"
+  >
     <DragHandle>
       <alex-learningplan-task-project-kanban-column-header
         :title="title"
         :quantity="items.length"
         :color="color"
+        class="tw-max-w-[280px] tw-cursor-grab"
         @title-change="$emit('title-column-change', group, $event)"
+        @empty-title="$emit('cancel-column', group)"
+        @add="$emit('add-item', group)"
+        @delete="$emit('delete', group)"
       />
     </DragHandle>
     <SlickList
+      v-model:list="items"
       class="tw-flex tw-flex-col tw-py-2"
       helper-class="kanban-card-dragging"
-      :list="items"
       :group="group"
       :accept="accept"
       :distance="15"
+      @sort-start="$emit('sort-start', group)"
       @sort-insert="
         ({ newIndex, value }) => handleInsertCard({ newIndex, value, group })
       "
+      @sort-end="
+        ({ newIndex, oldIndex }) =>
+          $emit('sort-end', {
+            newIndex,
+            oldIndex,
+            group,
+            id: items[newIndex].raw.id,
+          })
+      "
+      @update:list="(list) => $emit('update-list', list)"
     >
       <SlickItem
         v-for="(item, i) in items"
-        :key="item.id"
+        :key="item.raw.id"
         :index="i"
-        class="kanban-card-item"
+        class="kanban-card-item tw-mb-2"
         :disabled="disabled"
       >
         <slot name="card" :item="item" :index="i" />
@@ -31,7 +49,7 @@
     </SlickList>
     <div
       v-if="addButton"
-      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button"
+      class="tw-flex tw-items-center tw-justify-center tw-min-w-[280px] tw-h-[44px] tw-rounded-lg tw-gap-2 tw-border-dashed tw-border tw-border-gray-400 text-gray-800 add-button bg-white"
       @click="$emit('add-item', group)"
     >
       <v-icon size="20px">mdi-plus</v-icon>
@@ -40,7 +58,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends { id: number }">
+<script setup lang="ts" generic="T extends { raw: { id: number } }">
 import { SlickList, SlickItem, DragHandle } from 'vue-slicksort';
 import { Colors } from './Header.vue';
 export type Accept<T> =
@@ -63,16 +81,19 @@ interface ColumnProps {
   disabled?: boolean;
   addButton?: boolean;
   addButtonText?: string;
-  items: T[];
 }
+type Slot = {
+  card(props: { item: T; index: number }): any;
+};
+defineSlots<Slot>();
 withDefaults(defineProps<ColumnProps>(), {
-  accept: null,
+  accept: true,
   disable: false,
   color: 'gray',
   addButtonText: 'Adicionar',
   addButton: true,
-  items: () => [],
 });
+const items = defineModel<T[]>({ default: () => [] });
 const emit = defineEmits<{
   'insert-card': [
     values: {
@@ -81,15 +102,15 @@ const emit = defineEmits<{
       group: string;
     },
   ];
-  'move-card': [
-    values: {
-      oldIndex: number;
-      newIndex: number;
-      event: MouseEvent;
-    },
+  'sort-end': [
+    values: { oldIndex: number; newIndex: number; group: string; id: number },
   ];
   'title-column-change': [group: string, title: string];
   'add-item': [group: string];
+  'cancel-column': [group: string];
+  'update-list': [list: T[]];
+  delete: [group: string];
+  'sort-start': [group: string];
 }>();
 
 const isDragging = () => {

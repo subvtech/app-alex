@@ -1,6 +1,6 @@
 import { LearningPlanGoalSimple } from './learningPlanGoalSimple.model';
 
-export type TaskStatus = 'published' | 'draft' | 'finished';
+export type TaskStatus = 'published' | 'draft' | 'finished' | (string & {});
 export type TaskType = 'individual' | 'group';
 export type TaskMemberStatus = 'to_do' | 'in_progress' | 'in_review' | 'done';
 export interface TaskSimple {
@@ -9,7 +9,8 @@ export interface TaskSimple {
   submission_required: boolean;
   status: TaskStatus;
   title: string;
-  learning_plan_id: number;
+  learning_plan_id?: number;
+  organization: 'standard' | 'story' | 'epic';
   trail?: TrailSimple;
   description?: string | null;
   type?: TaskType | null;
@@ -25,4 +26,6 @@ export interface TaskSimple {
   learning_goals?: LearningPlanGoalSimple[];
   task_members?: TaskMember[];
   task_events?: TaskEvent[];
+  tasks?: TaskSimple[];
+  parent_task?: TaskSimple;
 }

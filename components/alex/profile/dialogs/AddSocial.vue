@@ -113,9 +113,7 @@ const supported = ['youtube', 'linkedin', 'instagram'];
 const { nameRules, urlRules } = useFormRules();
 
 const formattedSocials = computed(() =>
-  props.socials.map(
-    (item) => item.charAt(0).toUpperCase() + item.toLowerCase().slice(1),
-  ),
+  props.socials.map((item) => capitalize(item)),
 );
 const selectedSocial = ref<string | null>(null);
 const dialog = ref(false);

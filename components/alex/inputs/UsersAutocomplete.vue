@@ -10,7 +10,12 @@
       :items="filteredItems"
       :custom-filter="filterByFullnameAndEmail"
       :name="name"
+      :show-submit-button="showSubmitButton"
+      :submit-button-text="submitButtonText"
+      :submit-button-loading="submitButtonLoading"
+      :disable-submit-button="disableSubmitButton"
       v-bind="$attrs"
+      @click:button="emit('click:button')"
     >
       <template #item="{ props: propsItem, item, index }">
         <alex-custom-list-item-user
@@ -58,12 +63,17 @@ interface AutoCompleteUsersProps {
   modelValue: User[];
   ignoreUserIds?: number[];
   ignoreEmails?: string[];
+  submitButtonText?: string;
+  disableSubmitButton?: boolean;
+  showSubmitButton?: boolean;
+  submitButtonLoading?: boolean;
 }
 const props = defineProps<AutoCompleteUsersProps>();
 const emit = defineEmits([
   'update:modelValue',
   'refresh:invite',
   'remove:invite',
+  'click:button',
 ]);
 const { find } = useStrapi();
 const { emailRegex } = useFormRules();
