@@ -191,13 +191,14 @@ const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
     details: getDropDownAction('details', task.id, task),
   };
 
+  // TODO: Fazer a lógica de verificar se os itens tem filhos e exibir uma mensagem de warning caso tenham
   switch (task.organization) {
     case 'epic':
-      return [actions.rename, actions.addStory, actions.addTask, actions.delete].filter(
+      return [actions.rename, actions.addStory, actions.addTask /* actions.delete */].filter(
         (action): action is AlexDropdownItem => action !== undefined,
       );
     case 'story':
-      return [actions.rename, actions.addTask, actions.delete].filter(
+      return [actions.rename, actions.addTask /* actions.delete */].filter(
         (action): action is AlexDropdownItem => action !== undefined,
       );
     default:
@@ -279,7 +280,7 @@ const setDragStart = (id: number, e: DragEvent) => {
       :items="tasksArray"
       :search="searchFilter"
       @update:sort-by="(e) => (tableSortBy = e)"
-      @dragleave="(e) => emit('dragLeave', e)"
+      @dragleave="(e) => emit('drag-leave', e)"
     >
       <template #body="{ items, columns }">
         <transition-group :name="transitionName">
@@ -287,7 +288,7 @@ const setDragStart = (id: number, e: DragEvent) => {
             v-for="task in items"
             :key="task.id"
             class="text-5 text-no-wrap staggered-fade-item"
-            @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
+            @dragover.prevent="(e) => emit('drag-over', props.group, task.id, task.position, e)"
             @drop="(_) => emit('drop', props.group)"
           >
             <td class="pa-0" :colspan="columns.length">

@@ -45,8 +45,13 @@ const draggedTask = ref<any | null>(null);
 // Querys
 const queryClient = useQueryClient();
 const { data: sprintsValue, refetch: refetchSprints } = useGetSprints(learninplanId);
-const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateTask(learninplanId, queryClient);
-const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient);
+const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateTask(
+  learninplanId,
+  queryClient,
+  setMessage,
+  t,
+);
+const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient, setMessage, t);
 const { mutateAsync: updateTask } = useUpdateTask();
 const sprints = ref<Droppable<Sprint>[]>([]);
 
@@ -323,6 +328,7 @@ const createItem = async (task: {
     parentTask: task.story ? task.story : task.epic,
     sprint: task.sprint,
   });
+  queryClient.invalidateQueries({ queryKey: ['groupings', learninplanId] });
   await refetchSprints();
 };
 
@@ -471,6 +477,10 @@ const handleInputBlur = (index: number) => {
 const handleInputCancel = (index: number) => {
   tasksTitles.value[index] = '';
   showInputs.value[index] = false;
+};
+
+const updateSprints = () => {
+  queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
 };
 </script>
 
@@ -754,6 +764,7 @@ const handleInputCancel = (index: number) => {
         v-model="createSprintDialog"
         :project-end-date="learningPlanStore.learningPlan.end_date"
         :project-id="learningPlanStore.learningPlan.id"
+        @create="updateSprints"
       />
     </div>
     <DrawerTaskDetails

@@ -15,6 +15,7 @@ import {
 } from '../-composables/useKanban';
 import { useGetSprints } from '../-composables/useSprints';
 import { Droppable, KanbanColumnTask, KanbanStatusType } from '../-types';
+import DrawerTaskDetails from './DrawerTaskDetails.vue';
 import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
 import { Colors } from './KanbanColumnHeader.vue';
@@ -356,9 +357,8 @@ defineExpose({ canDrag, setCanDrag });
         @cancel="modalDeleteColumn = false"
         @submit="handleDeleteColumn"
       />
-      <alex-learningplan-task-drawer-project
+      <DrawerTaskDetails
         v-model="teacherDrawer"
-        :task-id="editTask?.id || 0"
         :task="editTask"
         :sprints="sprints.sprints"
         @update-value="refetchKanban"

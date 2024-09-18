@@ -9,7 +9,8 @@
     "overview": "Overview",
     "projects": "Projects",
     "tasks": "Tasks",
-    "trails": "Trails"
+    "trails": "Trails",
+    "task": "Task"
   },
   "errors": {
     "404": "Page not found",
@@ -109,6 +110,14 @@
     "unarchiveError": "unarchive",
     "unarchiveSuccess": "unarchived",
     "delete_confirm_text": "Apagar",
-    "delete_cancel_text": "Cancelar"
+    "delete_cancel_text": "Cancelar",
+    "actions": {
+      "created_success": "{item} was created successfully!",
+      "created_error": "An error occurred while trying to create the {item}, please try again!",
+      "edited_success": "{item} was edited successfully!",
+      "edited_error": "An error occurred while trying to edit the {item}, please try again!",
+      "deleted_success": "{item} was deleted successfully!",
+      "deleted_error": "An error occurred while trying to delete the {item}, please try again!"
+    }
   }
 }

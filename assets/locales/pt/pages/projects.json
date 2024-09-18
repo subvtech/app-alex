@@ -9,7 +9,8 @@
     "overview": "Visão geral",
     "projects": "Projetos",
     "tasks": "Tarefas",
-    "trails": "Trilhas"
+    "trails": "Trilhas",
+    "task": "Tarefa"
   },
   "errors": {
     "404": "Página não encontrada",
@@ -109,6 +110,14 @@
     "unarchiveError": "desarquivar",
     "unarchiveSuccess": "unarchived",
     "delete_confirm_text": "Apagar",
-    "delete_cancel_text": "Cancelar"
+    "delete_cancel_text": "Cancelar",
+    "actions": {
+      "created_success": "{item} foi criado com sucesso!",
+      "created_error": "Ocorreu um erro ao tentar criar {item}, por favor, tente novamente!",
+      "edited_success": "{item} foi editado com sucesso!",
+      "edited_error": "Ocorreu um erro ao tentar editar {item}, por favor, tente novamente!",
+      "deleted_success": "{item} foi deletado com sucesso!",
+      "deleted_error": "Ocorreu um erro ao tentar deletar {item}, por favor, tente novamente!"
+    }
   }
 }
