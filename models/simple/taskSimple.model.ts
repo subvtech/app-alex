@@ -28,4 +28,5 @@ export interface TaskSimple {
   task_events?: TaskEvent[];
   tasks?: TaskSimple[];
   parent_task?: TaskSimple;
+  sprint_id?: number;
 }
