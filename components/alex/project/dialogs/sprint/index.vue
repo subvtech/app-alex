@@ -83,7 +83,7 @@ interface sprintType {
 
 interface propsType {
   sprintData: sprintType;
-  projectId: string;
+  projectId: number;
   sprintId?: string;
   projectEndDate: string;
 }
@@ -93,6 +93,7 @@ const { createSprintRules } = useFormRules();
 const client = useStrapiClient();
 const { update } = useStrapi();
 const { setMessage } = useMessageStore();
+const emit = defineEmits(['create', 'update']);
 
 const props = withDefaults(defineProps<propsType>(), {
   sprintData: () => ({
@@ -133,12 +134,14 @@ const onSubmit = handleSubmit(async (values) => {
           projectEndDate: currentProjectEndDate.value,
         },
       });
+      emit('create');
     } else {
       await update('sprints', currentSprintId.value, {
         title: values.name,
         startDate: values.startDate,
         endDate: values.endDate,
       });
+      emit('update');
     }
     setMessage(
       t(
@@ -149,6 +152,7 @@ const onSubmit = handleSubmit(async (values) => {
       'success',
       true,
     );
+    dialog.value = false;
   } catch (error) {
     setMessage(
       t(

@@ -37,7 +37,7 @@
         :class="[
           currentFill ? 'opacity-80' : '',
           `bg-${currentColor}`,
-          startTimer ? 'w-100' : '',
+          timeRunning ? 'w-100' : '',
         ]"
         :style="`transition: width ${timeSpan}ms linear; background-color: ${currentColor}`"
       />
@@ -50,8 +50,7 @@ const messageStore = useMessageStore();
 
 const { show, message, color, fill, showCountdown } = storeToRefs(messageStore);
 
-const { timeoutId, stopTimeout, timeSpan, startTimer, setStartTimer } =
-  useTimeout(5000);
+const { stopTimeout, timeSpan, timeRunning } = useTimeout(5000);
 
 const props = defineProps({
   data: {
@@ -99,12 +98,10 @@ const iconName = computed(() => {
 const updateModelValue = (newValue) => {
   if (data?.value) data.value.show = newValue;
   show.value = newValue;
-  setStartTimer(true);
+  timeRunning.value = true;
 };
 
-const currentShow = computed(() =>
-  data?.value?.show ? data.value.show : show.value,
-);
+const currentShow = computed(() => data?.value?.show || show.value);
 
 const currentColor = computed(() =>
   data?.value?.color ? data.value.color : color.value ? color.value : 'green',
@@ -143,12 +140,6 @@ const onClose = () => {
   show.value = false;
   stopTimeout();
 };
-
-watch(currentShow, () => {
-  timeoutId.value = setTimeout(() => {
-    setStartTimer(!startTimer.value);
-  }, 10);
-});
 </script>
 <style scoped lang="scss">
 .lowbar {
@@ -160,10 +151,6 @@ watch(currentShow, () => {
   position: absolute;
 }
 
-.relative {
-  position: relative;
-}
-
 .bar {
   width: 0%;
 }
@@ -172,7 +159,7 @@ watch(currentShow, () => {
   min-width: 300px;
   padding: 16px !important;
   flex-direction: column-reverse;
-  justify-content: center;
+  justify-content: end;
   align-items: flex-start;
   border-radius: 8px;
 

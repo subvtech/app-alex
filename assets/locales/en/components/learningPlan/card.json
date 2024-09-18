@@ -10,6 +10,7 @@
         "hide": "hide"
     },
     "trails": "Trails",
+    "notProjectMember": "You do not belong to this project",
     "facilitator": "Facilitator",
     "hidden": "Hidden",
     "options": "Options",

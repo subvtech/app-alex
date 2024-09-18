@@ -1,0 +1,28 @@
+{
+  "projects": "projects",
+  "members": "members",
+  "searchPlaceholder": "Search by Name/Email",
+  "role": "Role",
+  "user": "User",
+  "status": "Status",
+  "collaborator": "Collaborator",
+  "pending": "Pending",
+  "profile": "See profile",
+  "delete": "Delete",
+  "showingData": "Showing %{from} to %{to} of %{total} %{entity}",
+  "invite": {
+    "label": "Invite",
+    "title": "Invite to the Project",
+    "people": "Invite people",
+    "search": "Search people",
+    "subtitle": "Role when joining the platform",
+    "description": "Roles settings per invite",
+    "noData": "Search users to add to the project",
+    "submit": "Send",
+    "added": "The selected members were invited to the project.",
+    "duplicated": "The selected are already part of this project.",
+    "deleted": "The selected member was removed from the project.",
+    "disabled": "Invites are disabled, at the moment you can only add people manually."
+   
+  }
+}
