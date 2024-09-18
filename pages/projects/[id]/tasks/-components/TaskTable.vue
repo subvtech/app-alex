@@ -239,14 +239,21 @@ const setDragStart = (id: number, e: DragEvent) => {
       class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
       sort-asc-icon="mdi-arrow-up-thin"
       sort-desc-icon="mdi-arrow-down-thin"
+      :class="over?.list === group ? 'table-drop' : ''"
       :headers="header"
       :items="tasksArray"
       :search="searchFilter"
       @update:sort-by="(e) => (tableSortBy = e)"
+      @dragleave="(e) => emit('dragLeave', e)"
     >
       <template #body="{ items, columns }">
         <transition-group :name="transitionName">
-          <tr v-for="task in items" :key="task.id" class="text-5 text-no-wrap staggered-fade-item">
+          <tr
+            v-for="task in items"
+            :key="task.id"
+            class="text-5 text-no-wrap staggered-fade-item"
+            @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
+          >
             <td class="pa-0" :colspan="columns.length">
               <TreeView
                 leaf-classes="outline-bottom"
