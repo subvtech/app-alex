@@ -323,14 +323,13 @@ const setDragStart = (id: number, e: DragEvent) => {
                       header.organization !== 'standard' &&
                       'bg-gray-blue tw-transition'
                     "
-                    @dragenter="
+                    @dragenter.stop="
                       (e) => {
-                        e.stopPropagation();
                         hoveredTree = header;
                       }
                     "
                     @dragend="handleNullTree"
-                    @drop.prevent="
+                    @drop.stop="
                       emit('moveToParent', hoveredTree);
                       hoveredTree = null;
                     "
