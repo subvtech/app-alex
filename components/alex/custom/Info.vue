@@ -130,7 +130,7 @@
         <div v-if="!descriptionAbove" class="description-block">
           <span
             v-if="description"
-            class="mt-0 font-weight-bold text-sm-h2 text-h3"
+            class="mt-0 font-weight-bold text-h4 text-md-h3 text-lg-h2"
             :class="[floatBeneath ? 'ml-2' : '']"
             :style="titleStyle ?? 'color: white;'"
             role="below"
@@ -236,11 +236,11 @@
 </template>
 
 <script setup lang="ts">
-import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+import { Upload } from '~/models/upload.model';
 
 const emit = defineEmits(['display:settings']);
 interface MyProps {
-  profilePicture?: ProfilePictureItemType | null;
+  profilePicture?: Upload | null;
   userId: number;
   showProfilePicture: boolean;
   showBorder: boolean;
@@ -415,6 +415,7 @@ const startDateOrEndDate = computed(() => {
   width: 100%;
   display: flex;
   flex-direction: row;
+  transition: all ease-in-out 1s;
   gap: 8px;
   .darker-bg {
     padding-inline: 16px;
@@ -463,6 +464,7 @@ const startDateOrEndDate = computed(() => {
 .info-block {
   display: flex;
   flex-direction: row;
+  transition: all ease-in-out 1s;
   .card {
     position: relative;
     background-color: transparent;
@@ -540,6 +542,7 @@ const startDateOrEndDate = computed(() => {
       display: flex;
 
       padding-left: 8px;
+      transition: all ease-in-out 1s;
 
       .d-flex {
         .fullname {

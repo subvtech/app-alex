@@ -12,5 +12,19 @@ module.exports = {
   plugins: [],
   rules: {
     'vue/multi-word-component-names': 0,
+    'import/order': [
+      'error',
+      {
+        alphabetize: {
+          caseInsensitive: true,
+          order: 'asc',
+        },
+        pathGroups: [
+          { pattern: '@/**', group: 'external' },
+          { pattern: '~/**', group: 'external' },
+        ],
+        warnOnUnassignedImports: true,
+      },
+    ],
   },
 };

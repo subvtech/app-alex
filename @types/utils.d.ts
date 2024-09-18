@@ -1,0 +1,23 @@
+type Fn<A extends unknown[], R> = (...args: A) => R;
+
+type Obj<T = any> = Record<PropertyKey, T>;
+
+type Constructor<T> = new (...args: any[]) => T;
+
+// https://dev.to/dzey/comment/268bd
+type KeyOf<T, K = keyof T> = K extends keyof T & (string | number)
+  ? `${K}` | (T[K] extends object ? `${K}.${KeyOf<T[K]>}` : never)
+  : never;
+
+type ValueOf<T, K = keyof T> = K extends keyof T & (string | number)
+  ? T[K] | (T[K] extends object ? ValueOf<T[K]> : never)
+  : never;
+
+type ValuesOf<T extends unknown[]> = [...T][number];
+
+// https://stackoverflow.com/a/78826978
+type ComponentProps<T> = T extends new (...args: any) => { $props: infer P }
+  ? NonNullable<P>
+  : T extends (props: infer P, ...args: any) => any
+  ? P
+  : {};
