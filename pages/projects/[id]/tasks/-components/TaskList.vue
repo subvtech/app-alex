@@ -298,17 +298,9 @@ const handleDelete = () => {
   });
 };
 
-const handleDeleteTask = async (id: number) => {
-  try {
-    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex((task) => task.id === id);
-    if (+deleteIndex! > -1) {
-      learningPlanStore.learningPlan?.tasks.splice(deleteIndex!, 1);
-    }
-    await deleteTask({ id });
-    showSuccessMessage('deleteSuccess');
-  } catch (e) {
-    showErrorMessage('deleteError');
-  }
+const handleDeleteTask = async (id: number, sprintId: number) => {
+  await deleteTask({ id, sprintId });
+  await refetchSprints();
 };
 
 const createItem = async (task: SprintTask & { epic?: number; story?: number; sprint?: number }) => {
@@ -649,7 +641,7 @@ const handleInputCancel = (index: number) => {
                       }
                     "
                     @drop="(sprint) => {}"
-                    @delete-task="handleDeleteTask"
+                    @delete-task="(index) => handleDeleteTask(index, i)"
                     @move-task="handleMoveTask"
                     @edit-task="(_id, task: SprintTask) => (editTask = task)"
                   />

@@ -72,6 +72,7 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
 
 type DeleteTaskPayload = {
   id: number;
+  sprintId?: number;
 };
 export const useDeleteTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
   useMutation({
@@ -85,9 +86,16 @@ export const useDeleteTask = (learninplanId: Ref<number>, queryClient: QueryClie
         }
         return {
           ...oldData,
-          backlog: oldData.backlog
-            .filter((task) => task.id !== variables.id)
-            .map((task) => ({ ...task, tasks: task.tasks?.filter((task) => task.id !== variables.id) })),
+          sprints: oldData.sprints.map((sprint) => {
+            if (sprint.id === variables.sprintId) {
+              return {
+                ...sprint,
+                tasks: sprint.tasks.filter((task) => task.id !== variables.id),
+              };
+            }
+            return sprint;
+          }),
+          backlog: oldData.backlog.filter((task) => task.id !== variables.id),
         };
       });
     },
