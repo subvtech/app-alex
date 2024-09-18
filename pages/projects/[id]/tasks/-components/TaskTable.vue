@@ -121,8 +121,7 @@ const handleFieldEdit = () => {
   if (!isEditing.value) return;
   if (!isEditing.value.local) {
     if (newGroup.value !== '') {
-      isEditing.value.title = newGroup.value;
-      emit('editItem', isEditing.value);
+      emit('editItem', { ...isEditing.value, title: newGroup.value });
     }
   } else if (isEditing.value.local) {
     if (newGroup.value === '') {
