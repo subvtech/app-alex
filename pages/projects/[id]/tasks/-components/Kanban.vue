@@ -14,7 +14,7 @@ import {
   useUpdateColumn,
 } from '../-composables/useKanban';
 import { useGetSprints } from '../-composables/useSprints';
-import { Droppable, KanbanColumnTask, KanbanStatusType, SprintTask } from '../-types';
+import { Droppable, KanbanColumnTask, KanbanStatusType } from '../-types';
 import KanbanAddColumn from './KanbanAddColumn.vue';
 import KanbanColumn from './KanbanColumn.vue';
 import { Colors } from './KanbanColumnHeader.vue';
@@ -32,7 +32,7 @@ export interface Column<U extends { id: number }> {
 }
 type Item = Droppable<KanbanColumnTask>;
 type KanbanProps = {
-  sprint?: SprintTask;
+  sprint?: SprintSimple;
 };
 const { t } = useI18n();
 const props = defineProps<KanbanProps>();

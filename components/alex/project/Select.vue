@@ -6,10 +6,10 @@
         <p
           v-bind="vMenuProps"
           class="py-1 text-body-3 tw-rounded-md px-1 output tw-cursor-pointer"
-          :class="!props.selectedVal && 'text-gray-400'"
+          :class="!props.defaultValue && 'text-gray-400'"
           @click="if (!!disabledMessage) setMessage(disabledMessage, 'warning', true);"
         >
-          {{ props.selectedVal || placeholder }}
+          {{ props.defaultValue?.title || placeholder }}
         </p>
       </template>
 
@@ -20,12 +20,12 @@
         <alex-inputs-autocomplete
           v-model="selected"
           v-model:search="search"
-          item-title="text"
+          item-title="title"
           variant="outlined"
           density="comfortable"
           return-object
           :placeholder="placeholder"
-          :items="filteredItems.map(({ title }) => title)"
+          :items="filteredItems"
           :name="name"
           v-bind="$attrs"
           hide-no-data
@@ -43,13 +43,13 @@ interface SelectProps {
   placeholder: string;
   options: TaskSimple[];
   name?: string;
-  selectedVal?: string;
+  defaultValue?: TaskSimple;
   disabledMessage?: string;
 }
 
 const props = withDefaults(defineProps<SelectProps>(), {
   name: '',
-  selectedVal: '',
+  defaultValue: undefined,
   disabledMessage: undefined,
 });
 
@@ -58,23 +58,23 @@ const emit = defineEmits(['select', 'create']);
 const open = defineModel<boolean>({
   required: true,
 });
+const selected = ref<TaskSimple | null>(null);
 
 const { setMessage } = useMessageStore();
 
 const search = ref<string>('');
-const selected = ref<string | null>(null);
 
 watch(open, (open) => {
   if (!open) {
     search.value = '';
     selected.value = null;
   } else {
-    selected.value = props.selectedVal || null;
+    selected.value = props.defaultValue || null;
   }
 });
 
 watch(selected, (val) => {
-  if (open.value && props.selectedVal !== val) {
+  if (open.value && props.defaultValue !== val) {
     open.value = !val;
     emit('select', val);
   }

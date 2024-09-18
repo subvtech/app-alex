@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMultipleDragDrop } from '@/composables/useMultipleDragDrop';
 import { ApplicationError } from '@/models/simple/applicationError.model';
-import { TaskSimple, TaskStatus } from '@/models/simple/taskSimple.model';
+import { TaskSimple } from '@/models/simple/taskSimple.model';
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { isEmpty } from '@/utils/is-empty';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -12,6 +12,7 @@ import { ptBR, enIN } from 'date-fns/locale';
 import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
 import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
+import DrawerTaskDetails from './DrawerTaskDetails.vue';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
 
@@ -53,7 +54,7 @@ const isCreatingTask = ref(false);
 const taskTitle = ref('');
 const createTaskSprintId = ref<number>();
 const editTask = ref<SprintTask>();
-const isEditingTask = ref<null | TaskSimple>(null);
+const editingTask = ref<null | SprintTask>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
 
@@ -138,10 +139,10 @@ const handleAddEpic = () => {
       backlog: [...oldData.backlog, newTask],
     };
   });
-  isEditingTask.value = newTask;
+  editingTask.value = newTask;
 };
 
-const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
+const handleAddTask = (task?: SprintTask, sprintId?: number) => {
   const newTask = {
     id: Math.round(Math.random() * 123456),
     position: getHigherIndex(sprintId),
@@ -210,7 +211,7 @@ const handleAddTask = (task?: TaskSimple, sprintId?: number) => {
     //   backlog: [...oldData.backlog, newTask],
     // };
   });
-  isEditingTask.value = newTask;
+  editingTask.value = newTask;
   if (sprintId) {
     createTaskSprintId.value = sprintId;
   }
@@ -245,7 +246,7 @@ const handleAddStory = (id: number) => {
       backlog: updatedBacklog,
     };
   });
-  isEditingTask.value = newTask;
+  editingTask.value = newTask;
 };
 
 const getSlideTransition = () => {
@@ -303,7 +304,16 @@ const handleDeleteTask = async (id: number, sprintId: number) => {
   await refetchSprints();
 };
 
-const createItem = async (task: SprintTask & { epic?: number; story?: number; sprint?: number }) => {
+const createItem = async (task: {
+  epic: number;
+  id: number;
+  local: boolean;
+  organization: 'standard' | 'story' | 'epic';
+  position: number;
+  sprint: number;
+  story: number;
+  title: string;
+}) => {
   await createTask({
     title: task.title,
     learningPlanId: learninplanId.value,
@@ -325,18 +335,19 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null
   dragDrop.onDragOver('backlog', -index, -1, dragEvent);
 };
 
-const handleEmptyStateLeave = () => {
-  setTimeout(() => {
-    hoveredSprint.value = null;
-  }, 300);
-};
+// const handleEmptyStateLeave = () => {
+//   setTimeout(() => {
+//     console.log('Nulando hovered sprint');
+//     hoveredSprint.value = null;
+//   }, 300);
+// };
 
-const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
+const handleMoveTask = async () => {
   try {
-    const task = sprintsValue.value.backlog.find((t) => t.id === id);
+    const task = sprintsValue.value.backlog.find((t) => t.id === 0);
     if (task) {
-      const position = getHigherIndex();
-      await updateTask({ id, status, position });
+      // const position = getHigherIndex();
+      // await updateTask({ id, status, position });
       await refetchSprints();
       showSuccessMessage('moveSuccess');
     }
@@ -346,9 +357,8 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
 };
 
 // OnDrop
-const onDrop = (_, __, e) => {
-  console.log('Hovered sprint no drop', hoveredSprint.value);
-  const data = e?.target?.attributes?.id?.value;
+const onDrop = (_task, _tableKey, e) => {
+  const data = e.target?.attributes?.id?.value;
 
   if (!data) {
     return;
@@ -371,7 +381,6 @@ const onDrop = (_, __, e) => {
       setMessage(`Tarefa ${name} para ${hoveredSprint.value.title}`, 'success', true);
       refetchSprints();
     })
-    .catch(console.log)
     .finally(() => {
       hoveredSprint.value = null;
     });
@@ -477,7 +486,7 @@ const handleInputCancel = (index: number) => {
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
                     :is-project="true"
-                    :is-editing-task="isEditingTask"
+                    :editing-task="editingTask"
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
@@ -507,7 +516,7 @@ const handleInputCancel = (index: number) => {
                     @drag-end="onDrop"
                     @delete-task="handleDeleteTask"
                     @move-task="handleMoveTask"
-                    @edit-task="(_id, task: SprintTask) => (editTask = task)"
+                    @edit-task="(_id, task) => (editTask = task)"
                   />
                 </div>
               </Transition>
@@ -594,13 +603,8 @@ const handleInputCancel = (index: number) => {
                     type="backlog"
                     :index="backlogIndex"
                     :drop-area="dragDrop.over.value.list === 'backlog'"
-                    @drag-over="(index, event) => handleEmptyStateOver(index, event, sprint)"
-                    @drag-leave="
-                      (e) => {
-                        dragDrop.onDragLeave(e);
-                        hoveredSprint = null;
-                      }
-                    "
+                    @drag-over="(index, event) => handleEmptyStateOver(index, event)"
+                    @drag-leave="dragDrop.onDragLeave"
                   />
                 </div>
                 <div v-else>
@@ -611,7 +615,7 @@ const handleInputCancel = (index: number) => {
                     :drag-from="dragDrop.dragFrom.value"
                     :dragging="dragDrop.dragging.value"
                     :is-project="true"
-                    :is-editing-task="!!isEditingTask"
+                    :editing-task="editingTask"
                     :over="setOver"
                     :search="search"
                     :sprints="sprintGroups"
@@ -643,7 +647,7 @@ const handleInputCancel = (index: number) => {
                     @drop="(sprint) => {}"
                     @delete-task="(index) => handleDeleteTask(index, i)"
                     @move-task="handleMoveTask"
-                    @edit-task="(_id, task: SprintTask) => (editTask = task)"
+                    @edit-task="(_id, task) => (editTask = task)"
                   />
                 </div>
               </Transition>
@@ -709,14 +713,13 @@ const handleInputCancel = (index: number) => {
         :project-id="learningPlanStore.learningPlan.id"
       />
     </div>
-    <alex-learningplan-task-drawer-project
+    <DrawerTaskDetails
       v-model="teacherDrawer"
-      :task-id="editTask?.id || 0"
       :task="editTask"
       :sprints="sprintsValue.sprints"
       @update-value="
-        (field, value) => {
-          handleUpdateTask(editTask?.id ?? 0, field, value);
+        (field) => {
+          handleUpdateTask(editTask?.id ?? 0, field);
         }
       "
       @moved="updateTable"
