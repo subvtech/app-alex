@@ -91,28 +91,28 @@ const isEditing = ref<LocalSprintTask | null>(null);
 
 const tasksArray = computed(() => {
   const array = [...props.tasks];
-  const index = array.findIndex((task) => task.id === props.over?.id);
-  const oldIndex = array.findIndex((task) => task.id === -1);
+  // const index = array.findIndex((task) => task.id === props.over?.id);
+  // const oldIndex = array.findIndex((task) => task.id === -1);
 
-  if (oldIndex === props.over?.id || tableSortBy.value.length || props.activeFilter) return array;
-  if (oldIndex !== -1) array.splice(oldIndex, 1);
+  // if (oldIndex === props.over?.id || tableSortBy.value.length || props.activeFilter) return array;
+  // if (oldIndex !== -1) array.splice(oldIndex, 1);
 
-  const item = {
-    id: -1,
-    title: '',
-    status: props.over?.list as TaskStatus,
-    position: index,
-    delivered: {
-      toDo: 0,
-      doing: 0,
-      underReview: 0,
-      completed: 0,
-    },
-  };
+  // const item = {
+  //   id: -1,
+  //   title: '',
+  //   status: props.over?.list as TaskStatus,
+  //   position: index,
+  //   delivered: {
+  //     toDo: 0,
+  //     doing: 0,
+  //     underReview: 0,
+  //     completed: 0,
+  //   },
+  // };
 
-  if (index !== -1) {
-    props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
-  }
+  // if (index !== -1) {
+  //   props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
+  // }
 
   return array;
 });
@@ -235,10 +235,10 @@ const setDragStart = (id: number, e: DragEvent) => {
 <template>
   <div>
     <v-data-table
-      class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
+      class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table mt-1"
       sort-asc-icon="mdi-arrow-up-thin"
       sort-desc-icon="mdi-arrow-down-thin"
-      :class="over?.list === group ? 'table-drop' : ''"
+      :class="over?.list === group && group !== 'backlog' ? 'table-drop' : ''"
       :headers="header"
       :items="tasksArray"
       :search="searchFilter"
@@ -419,7 +419,12 @@ const setDragStart = (id: number, e: DragEvent) => {
 }
 
 .table-drop {
-  border: 1.5px dashed rgb(var(--v-theme-gray-400)) !important;
+  outline: 2px dashed rgb(var(--v-theme-gray-400)) !important;
+  border-color: transparent !important;
+}
+
+.table {
+  transition: border outline 0.3s ease;
 }
 
 :global(.table table) {
