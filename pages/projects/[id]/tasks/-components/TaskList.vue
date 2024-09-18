@@ -327,6 +327,7 @@ const createItem = async (task: {
     parentTask: task.story ? task.story : task.epic,
     sprint: task.sprint,
   });
+  queryClient.invalidateQueries({ queryKey: ['groupings', learninplanId] });
   await refetchSprints();
 };
 
