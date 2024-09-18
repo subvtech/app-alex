@@ -36,6 +36,7 @@ const createSprintDialog = ref(false);
 
 // Drag and drop
 const hoveredSprint = ref<any | null>(0);
+const hoveredTask = ref<any | null>(null);
 
 // Querys
 const queryClient = useQueryClient();
@@ -331,7 +332,6 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null
 
 const handleEmptyStateLeave = () => {
   setTimeout(() => {
-    console.log('Nulando hovered sprint');
     hoveredSprint.value = null;
   }, 300);
 };
@@ -351,8 +351,9 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
 };
 
 // OnDrop
-const onDrop = (task, tableKey, e) => {
-  const data = e.target?.attributes?.id?.value;
+const onDrop = (_, __, e) => {
+  console.log('Hovered sprint no drop', hoveredSprint.value);
+  const data = e?.target?.attributes?.id?.value;
 
   if (!data) {
     return;
@@ -408,10 +409,14 @@ const showSuccessMessage = (message: string) => {
   );
 };
 
-const setOver = () => {
+const setOver = computed(() => {
   if (dragDrop.over.value.list === 'backlog') return dragDrop.over.value;
   return { ...dragDrop.over.value, id: -1 };
-};
+});
+
+watch(hoveredSprint, (sprint) => {
+  console.log('Hovered sprint mudou:' + sprint?.title ?? '', sprint);
+});
 
 const toggleExpand = () => {
   isCreatingTask.value = false;
@@ -459,7 +464,7 @@ const formattedDate = (strDate: string) => {
                     :index="backlogIndex"
                     :drop-area="dragDrop.over.value.list === 'backlog'"
                     @drag-over="handleEmptyStateOver"
-                    @drag-leave="dragDrop.onDragLeave"
+                    @drag-leave="(e) => dragDrop.onDragLeave(e)"
                   />
                 </div>
                 <div v-else>
@@ -481,7 +486,21 @@ const formattedDate = (strDate: string) => {
                     @edit-item="handleEdit"
                     @handle-blur="handleDelete"
                     @start-drag="dragDrop.startDrag"
-                    @drag-over="dragDrop.onDragOver"
+                    @drag-over="
+                      (sprint, idVal, index, e) => {
+                        dragDrop.onDragOver(sprint, idVal, index, e);
+
+                        const data = e?.target?.attributes?.id?.value;
+
+                        if (!data) {
+                          return;
+                        }
+
+                        const [id, title] = data.split(':');
+
+                        hoveredTask = { id, title };
+                      }
+                    "
                     @drag-leave="dragDrop.onDragLeave"
                     @drag-end="onDrop"
                     @delete-task="handleDeleteTask"
@@ -565,7 +584,12 @@ const formattedDate = (strDate: string) => {
                     :index="backlogIndex"
                     :drop-area="dragDrop.over.value.list === 'backlog'"
                     @drag-over="(index, event) => handleEmptyStateOver(index, event, sprint)"
-                    @drag-leave="dragDrop.onDragLeave"
+                    @drag-leave="
+                      (e) => {
+                        dragDrop.onDragLeave(e);
+                        hoveredSprint = null;
+                      }
+                    "
                   />
                 </div>
                 <div v-else>
@@ -592,11 +616,20 @@ const formattedDate = (strDate: string) => {
                       }
                     "
                     @drag-over="
-                      (list, id, index, e) => {
-                        dragDrop.onDragOver(list, id, index, e);
+                      (sprint, id, index, e) => {
+                        const selectedSprint = sprintsValue.sprints.find(({ title }) => title === sprint);
+                        hoveredSprint = selectedSprint ?? null;
+
+                        dragDrop.onDragOver(sprint, id, index, e);
                       }
                     "
-                    @drag-leave="dragDrop.onDragLeave"
+                    @drag-leave="
+                      (e) => {
+                        hoveredSprint = null;
+                        dragDrop.onDragLeave(e);
+                      }
+                    "
+                    @drop="(sprint) => {}"
                     @delete-task="handleDeleteTask"
                     @move-task="handleMoveTask"
                     @edit-task="(_id, task: SprintTask) => (editTask = task)"

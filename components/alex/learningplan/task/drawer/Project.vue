@@ -191,8 +191,6 @@ watch(open, (open) => {
       selectedHistory.value = null;
     }
   }, 100);
-
-  console.log('Open task', props.task, epics.value, histories.value);
 });
 
 // Title
@@ -247,8 +245,6 @@ const statusConfig = ref<any>(undefined);
 const epicOpen = ref<boolean>(false);
 const selectedEpic = ref<string | null>(null);
 const epics = ref([]);
-
-watch(epics, (val) => console.log('Epics:', val));
 
 watch(selectedEpic, (epic) => {
   if (isFirstTimeOpened.value || !props.taskId) {
@@ -432,7 +428,6 @@ const selectedHistory = ref<string | null>(null);
 const histories = ref<TaskSimple[]>([]);
 
 watch(selectedHistory, (story) => {
-  console.log('Historia para', story);
   if (isFirstTimeOpened.value || !props.taskId) {
     return;
   }

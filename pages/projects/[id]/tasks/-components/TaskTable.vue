@@ -46,6 +46,7 @@ const emit = defineEmits([
   'dragEnd',
   'dragLeave',
   'dragOver',
+  'drop',
   'editTask',
   'moveTask',
   'startDrag',
@@ -242,11 +243,19 @@ const setDragStart = (id: number, e: DragEvent) => {
       :headers="header"
       :items="tasksArray"
       :search="searchFilter"
+      :class="over?.list === group ? 'table-drop' : ''"
       @update:sort-by="(e) => (tableSortBy = e)"
+      @dragleave="(e) => emit('dragLeave', e)"
     >
       <template #body="{ items, columns }">
         <transition-group :name="transitionName">
-          <tr v-for="task in items" :key="task.id" class="text-5 text-no-wrap staggered-fade-item">
+          <tr
+            v-for="task in items"
+            :key="task.id"
+            class="text-5 text-no-wrap staggered-fade-item"
+            @dragover.prevent="(e) => emit('dragOver', props.group, task.id, task.position, e)"
+            @drop="(_) => emit('drop', props.group)"
+          >
             <td class="pa-0" :colspan="columns.length">
               <TreeView
                 leaf-classes="outline-bottom"
