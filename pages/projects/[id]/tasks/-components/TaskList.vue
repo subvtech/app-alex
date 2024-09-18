@@ -454,6 +454,10 @@ const handleInputCancel = (index: number) => {
   tasksTitles.value[index] = '';
   showInputs.value[index] = false;
 };
+
+const updateSprints = () => {
+  queryClient.invalidateQueries({ queryKey: ['sprints', learninplanId] });
+};
 </script>
 
 <template>
@@ -717,6 +721,7 @@ const handleInputCancel = (index: number) => {
         v-model="createSprintDialog"
         :project-end-date="learningPlanStore.learningPlan.end_date"
         :project-id="learningPlanStore.learningPlan.id"
+        @create="updateSprints"
       />
     </div>
     <DrawerTaskDetails
