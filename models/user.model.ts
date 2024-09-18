@@ -12,6 +12,7 @@ interface Role {
   name: string;
   type: UserRoles;
 }
+
 export interface User {
   id: number;
   username: string;

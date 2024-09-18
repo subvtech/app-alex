@@ -1,22 +1,36 @@
+import type { NuxtPage } from 'nuxt/schema';
+
+const {
+  COMPONENTS_PAGE,
+  MATOMO_APP_ID,
+  MATOMO_URL,
+  OPEN_AI_KEY,
+  STRAPI_URL = 'http://localhost:1337',
+  TIPTAP_APP_ID,
+  TIPTAP_KEY,
+  USE_MOCK,
+} = process.env;
+
 export default defineNuxtConfig({
   pages: true,
   ssr: false,
   devtools: { enabled: true },
-  app: { pageTransition: { name: 'page', mode: 'out-in' } },
-  css: [
-    'vuetify/lib/styles/main.sass',
-    'plyr/dist/plyr.css',
-    '@mdi/font/css/materialdesignicons.min.css',
-  ],
+  app: {
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in',
+    },
+  },
+  css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
   build: {
     transpile: ['vuetify'],
   },
   modules: [
-    '@pinia/nuxt',
     '@nuxt/image',
-    '@nuxtjs/strapi',
     '@nuxt/test-utils/module',
+    '@nuxtjs/strapi',
     '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
     'shadcn-nuxt',
   ],
   testUtils: {},
@@ -25,24 +39,24 @@ export default defineNuxtConfig({
   },
   image: {
     strapi: {
-      baseURL: process.env.STRAPI_URL || 'http://localhost:1337',
+      baseURL: STRAPI_URL,
     },
   },
   runtimeConfig: {
     public: {
-      matomoAppId: process.env.MATOMO_APP_ID,
-      matomoUrl: process.env.MATOMO_URL,
-      showComponentsPage: process.env.COMPONENTS_PAGE === 'on',
-      openAiKey: process.env.OPEN_AI_KEY,
-      tipTapKey: process.env.TIPTAP_KEY,
-      tipTapAppId: process.env.TIPTAP_APP_ID,
+      matomoAppId: MATOMO_APP_ID,
+      matomoUrl: MATOMO_URL,
+      openAiKey: OPEN_AI_KEY,
+      showComponentsPage: COMPONENTS_PAGE === 'on',
+      strapiUrl: STRAPI_URL,
+      tipTapAppId: TIPTAP_APP_ID,
+      tipTapKey: TIPTAP_KEY,
+      useMock: USE_MOCK === 'true',
     },
   },
   strapi: {
-    url: process.env.STRAPI_URL || 'http://localhost:1337',
-    auth: {
-      populate: ['role', 'learningplans', 'favorites'],
-    },
+    url: STRAPI_URL,
+    auth: { populate: ['role', 'learningplans', 'favorites'] },
   },
   shadcn: {
     prefix: '',
@@ -64,5 +78,14 @@ export default defineNuxtConfig({
         imports: ['SlickList', 'SlickItem'],
       },
     ],
+  },
+  hooks: {
+    'pages:extend'(pages) {
+      const removePage = (page: NuxtPage, index: number, items: NuxtPage[]) => {
+        if (/^-\w|\/-\w/.test(page.path)) items.splice(index, 1);
+        page.children?.forEach(removePage);
+      };
+      pages.forEach(removePage);
+    },
   },
 });

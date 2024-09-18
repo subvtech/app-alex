@@ -1,0 +1,35 @@
+{
+  "admin": "Admin",
+  "cancel": "Cancelar",
+  "create_user": "Criar Usuário",
+  "edit_user": "Editar Usuário",
+  "fields": {
+    "blocked": "Bloqueado",
+    "confirmed": "Confirmado",
+    "cpf": "CPF",
+    "email": "Email",
+    "fullname": "Nome Completo",
+    "info": "Informações",
+    "institutions": "Instituições",
+    "isProfessor": "É professor",
+    "password": "Senha",
+    "password_confirmation": "Confirmação de Senha",
+    "phone": "Celular",
+    "provider": "Provedor",
+    "role": "Role",
+    "socials": "Redes Sociais",
+    "tags": "Tags",
+    "user_wallet": "Carteira do Usuário",
+    "username": "Nome de Usuário"
+  },
+  "new_user": "Novo Usuário",
+  "pagination": {
+    "display_offset": "Exibindo %{from} a %{to} de %{total} itens",
+    "next_page": "Proxima Pagina",
+    "previous_page": "Pagina Anterior"
+  },
+  "personal_data": "Dados Pessoais",
+  "save": "Salvar",
+  "search_users": "Pesquisar Usuários",
+  "users": "Usuários"
+}

@@ -1,6 +1,6 @@
 <template>
   <v-app class="tw-relative">
-    <AppSnackbar />
+    <app-snackbar />
     <alex-custom-sidebar
       v-model="drawer"
       v-model:clipped="clipped"
@@ -282,10 +282,28 @@ const componentsMenu: Menu[] = [
   },
 ];
 
+const adminMenus = [
+  {
+    title: 'Administrador',
+    items: [
+      {
+        icon: 'mdi-view-dashboard-outline',
+        title: 'Menu Admin',
+        to: '/admin',
+      },
+    ],
+  },
+];
+
 const menus = computed(() => {
+  const newMenus =
+    user.value?.role?.name === 'ADMIN'
+      ? defaultMenus.concat(adminMenus)
+      : defaultMenus;
+
   return config.public.showComponentsPage
-    ? defaultMenus.concat(componentsMenu)
-    : defaultMenus;
+    ? newMenus.concat(componentsMenu)
+    : newMenus;
 });
 </script>
 

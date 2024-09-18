@@ -5,7 +5,6 @@
   "successMessage": "Project created successfully",
   "errorMessage": "Error creating project",
   "slugUniqueError": "This identifier is already in use. Please choose another one.",
-
   "steps": {
     "basicInfo": {
       "title": "Basic",
@@ -37,7 +36,8 @@
   },
   "associatedCourses": {
     "titleLabel": "Select Courses",
-    "titlePlaceholder": "Select associated courses"
+    "titlePlaceholder": "Select associated courses",
+    "searchNoResults": "No courses found"
   },
   "members": {
     "title": "Invite participants",
