@@ -43,8 +43,13 @@ const hoveredTask = ref<any | null>(null);
 // Querys
 const queryClient = useQueryClient();
 const { data: sprintsValue, refetch: refetchSprints } = useGetSprints(learninplanId);
-const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateTask(learninplanId, queryClient);
-const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient);
+const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateTask(
+  learninplanId,
+  queryClient,
+  setMessage,
+  t,
+);
+const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient, setMessage, t);
 const { mutateAsync: updateTask } = useUpdateTask();
 const sprints = ref<Droppable<Sprint>[]>([]);
 

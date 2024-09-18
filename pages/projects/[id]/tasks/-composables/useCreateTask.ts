@@ -21,7 +21,12 @@ type CreateTaskResponse = Omit<TaskSimple, 'parent_task'> & {
   parent_task?: number;
 };
 
-export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
+export const useCreateTask = (
+  learninplanId: Ref<number>,
+  queryClient: QueryClient,
+  setMessage: Function,
+  t: Function,
+) =>
   useMutation({
     async mutationFn({ learningPlanId, position, title, organization, parentTask, sprint }: CreateTaskPayload) {
       const task = await create<CreateTaskResponse>('tasks', {
@@ -67,6 +72,18 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
           };
         }
       });
+      setMessage(
+        t('pages.projects.tasks.actions.created_success', { item: t('pages.projects.common.task') }),
+        'success',
+        true,
+      );
+    },
+    onError() {
+      setMessage(
+        t('pages.projects.tasks.actions.created_error', { item: t('pages.projects.common.task') }),
+        'error',
+        true,
+      );
     },
   });
 
@@ -74,7 +91,12 @@ type DeleteTaskPayload = {
   id: number;
   sprintId?: number;
 };
-export const useDeleteTask = (learninplanId: Ref<number>, queryClient: QueryClient) =>
+export const useDeleteTask = (
+  learninplanId: Ref<number>,
+  queryClient: QueryClient,
+  setMessage: Function,
+  t: Function,
+) =>
   useMutation({
     mutationFn({ id }: DeleteTaskPayload) {
       return strapi.delete('tasks', id);
@@ -98,6 +120,18 @@ export const useDeleteTask = (learninplanId: Ref<number>, queryClient: QueryClie
           backlog: oldData.backlog.filter((task) => task.id !== variables.id),
         };
       });
+      setMessage(
+        t('pages.projects.tasks.actions.deleted_success', { item: t('pages.projects.common.task') }),
+        'error',
+        true,
+      );
+    },
+    onError() {
+      setMessage(
+        t('pages.projects.tasks.actions.deleted_error', { item: t('pages.projects.common.task') }),
+        'error',
+        true,
+      );
     },
   });
 
