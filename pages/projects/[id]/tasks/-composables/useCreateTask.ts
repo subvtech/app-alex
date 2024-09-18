@@ -38,6 +38,7 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
         sprint,
         organization,
       });
+      task.data.sprint_id = sprint || 0;
       return task.data as TaskSimple;
     },
     onSuccess(data) {
@@ -45,10 +46,26 @@ export const useCreateTask = (learninplanId: Ref<number>, queryClient: QueryClie
         if (!oldData) {
           return oldData;
         }
-        return {
-          ...oldData,
-          backlog: [...oldData.backlog, data],
-        };
+
+        if (data.sprint_id) {
+          return {
+            ...oldData,
+            sprints: oldData.sprints.map((sprint) => {
+              if (sprint.id === data.sprint_id) {
+                return {
+                  ...sprint,
+                  tasks: [...sprint.tasks, data],
+                };
+              }
+              return sprint;
+            }),
+          };
+        } else {
+          return {
+            ...oldData,
+            backlog: [...oldData.backlog, data],
+          };
+        }
       });
     },
   });

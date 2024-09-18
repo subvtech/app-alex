@@ -32,6 +32,8 @@ const dragDrop = useMultipleDragDrop();
 
 const expandBacklog = ref(0);
 const expandSprints = ref<number[]>([]);
+const showInputs = ref<boolean[]>([false]);
+const tasksTitles = ref<string[]>([]);
 const createSprintDialog = ref(false);
 
 // Drag and drop
@@ -90,6 +92,8 @@ const filteredTasks = computed(() => {
 const backlogTasks = computed(() => sprintsValue.value.backlog.map(formatTasks));
 const sprintBacklog = computed(() => {
   expandSprints.value = new Array(sprintsValue.value.sprints.length).fill(0);
+  showInputs.value = new Array(sprintsValue.value.sprints.length + 1).fill(false);
+  tasksTitles.value = new Array(sprintsValue.value.sprints.length + 1).fill('');
   return sprintsValue.value.sprints.map((sprint) => ({
     ...sprint,
     tasks: sprint.tasks.map(formatTasks),
@@ -248,20 +252,19 @@ const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
 
-const handleCreateTask = async () => {
-  if (taskTitle.value && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
+const handleCreateTask = async (index: number, sprintId?: number) => {
+  if (tasksTitles.value[index] && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
     const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
     await createTask({
-      title: taskTitle.value,
+      title: tasksTitles.value[index],
       learningPlanId,
       position: higherIndex,
       organization: 'standard',
-      sprint: createTaskSprintId.value,
+      sprint: sprintId,
     });
   }
-  taskTitle.value = '';
-  createTaskSprintId.value = undefined;
+  tasksTitles.value[index] = '';
   isCreatingTask.value = false;
 };
 
@@ -414,10 +417,6 @@ const setOver = computed(() => {
   return { ...dragDrop.over.value, id: -1 };
 });
 
-watch(hoveredSprint, (sprint) => {
-  console.log('Hovered sprint mudou:' + sprint?.title ?? '', sprint);
-});
-
 const toggleExpand = () => {
   isCreatingTask.value = false;
   taskTitle.value = '';
@@ -436,6 +435,17 @@ const formattedDate = (strDate: string) => {
   return format(date, dateFormat, {
     locale: i18n.locale.value === 'pt' ? ptBR : enIN,
   });
+};
+
+const handleInputBlur = (index: number) => {
+  if (tasksTitles.value[index] === '') {
+    showInputs.value[index] = false;
+  }
+};
+
+const handleInputCancel = (index: number) => {
+  tasksTitles.value[index] = '';
+  showInputs.value[index] = false;
 };
 </script>
 
@@ -512,19 +522,19 @@ const formattedDate = (strDate: string) => {
               <div v-if="backlogIndex === 1" class="mb-4">
                 <Transition mode="out-in" name="add-task">
                   <alex-custom-button
-                    v-if="!isCreatingTask"
+                    v-if="!showInputs[0]"
                     class="w-100 create-task-btn"
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
                     :loading="isCreatingTaskRequest"
-                    @click="isCreatingTask = true"
+                    @click="showInputs[0] = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
                   </alex-custom-button>
                   <div v-else class="d-flex ga-2">
                     <alex-inputs-text-field
-                      v-model="taskTitle"
+                      v-model="tasksTitles[0]"
                       autofocus
                       hide-details
                       class="w-100"
@@ -532,11 +542,20 @@ const formattedDate = (strDate: string) => {
                       name="taskTitle"
                       :disabled="isCreatingTaskRequest"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
-                      @keyup.enter="handleCreateTask"
-                      @keyup.esc="isCreatingTask = false"
+                      @keyup.enter="handleCreateTask(0)"
+                      @keyup.esc="!showInputs[0]"
+                      @blur="handleInputBlur(0)"
                     />
-                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask">
+                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask(0)">
                       {{ $t('pages.projects.tasks.add_task') }}
+                    </alex-custom-button>
+                    <alex-custom-button
+                      size="large"
+                      variant="tertiary"
+                      :loading="isCreatingTaskRequest"
+                      @click="handleInputCancel(0)"
+                    >
+                      {{ $t('pages.projects.tasks.delete_cancel_text') }}
                     </alex-custom-button>
                   </div>
                 </Transition>
@@ -639,19 +658,19 @@ const formattedDate = (strDate: string) => {
               <div v-if="backlogIndex === 1" class="mb-4">
                 <Transition mode="out-in" name="add-task">
                   <alex-custom-button
-                    v-if="!isCreatingTask"
+                    v-if="!showInputs[i + 1]"
                     class="w-100 create-task-btn"
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
                     :loading="isCreatingTaskRequest"
-                    @click="isCreatingTask = true"
+                    @click="showInputs[i + 1] = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
                   </alex-custom-button>
                   <div v-else class="d-flex ga-2">
                     <alex-inputs-text-field
-                      v-model="taskTitle"
+                      v-model="tasksTitles[i + 1]"
                       autofocus
                       hide-details
                       class="w-100"
@@ -659,11 +678,24 @@ const formattedDate = (strDate: string) => {
                       name="taskTitle"
                       :disabled="isCreatingTaskRequest"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
-                      @keyup.enter="handleCreateTask"
-                      @keyup.esc="isCreatingTask = false"
+                      @keyup.enter="handleCreateTask(i + 1, sprint.id)"
+                      @keyup.esc="!showInputs[i + 1]"
+                      @blur="handleInputBlur(i + 1)"
                     />
-                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask">
+                    <alex-custom-button
+                      size="large"
+                      :loading="isCreatingTaskRequest"
+                      @click="handleCreateTask(i + 1, sprint.id)"
+                    >
                       {{ $t('pages.projects.tasks.add_task') }}
+                    </alex-custom-button>
+                    <alex-custom-button
+                      size="large"
+                      variant="tertiary"
+                      :loading="isCreatingTaskRequest"
+                      @click="handleInputCancel(i + 1)"
+                    >
+                      {{ $t('pages.projects.tasks.delete_cancel_text') }}
                     </alex-custom-button>
                   </div>
                 </Transition>
