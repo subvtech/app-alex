@@ -89,6 +89,9 @@ const hasChildren = computed(() => {
     return true;
   }
   const arrayProps = Object.keys(props.item).filter((key) => Array.isArray(props.item[key]));
+  if (arrayProps.includes('tags')) {
+    return false;
+  }
   if (arrayProps.length > 1) {
     throw new Error(`Item ${props.item.name || props.item.id} has multiple array properties: ${arrayProps.join(', ')}`);
   }
