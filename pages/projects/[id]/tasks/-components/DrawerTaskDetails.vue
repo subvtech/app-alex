@@ -205,7 +205,7 @@ watch(selectedEpic, (epic) => {
   update('tasks', props.task?.id, {
     parent_task: epic?.id ?? null,
   })
-    .then(() => emit('moved', epic?.id ? `Tarefa movida para ${epic}` : ''))
+    .then(() => emit('moved', epic?.id ? `Tarefa movida para ${epic.title}` : ''))
     .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
 });
 watch(open, () => {
@@ -230,7 +230,6 @@ watch(open, () => {
       break;
     case 'story':
       selectedHistory.value = props.task?.parent_task ?? null;
-
       groupings.value.histories.forEach((story) => {
         if (story?.parent_task?.organization === 'epic') {
           selectedEpic.value = story?.parent_task ?? null;
@@ -256,8 +255,6 @@ watch(selectedSprint, (sprint, oldSprint) => {
   if (isFirstTimeOpened.value || !props.task?.id || !selectedSprint.value) {
     return;
   }
-  selectedHistory.value = null;
-  selectedEpic.value = null;
   status.value = props.task.kanban_column_task?.kanban_column ?? null;
   strapiClient(`/tasks/${props.task.id}/update-kanban-task`, {
     method: 'PUT',
@@ -298,11 +295,11 @@ watch(selectedHistory, (story) => {
     return;
   }
 
-  const currStory = groupings.value.histories.find((storyOld) => storyOld.id === story?.id);
-  selectedEpic.value = currStory?.parent_task ?? null;
-  // update('tasks', props.task?.id)
-  //   .then(() => emit('moved', currStory?.id ? `Tarefa movida para ${story}` : ''))
-  //   .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
+  update('tasks', props.task?.id, {
+    parent_task: story?.id,
+  })
+    .then(() => emit('moved', story?.id ? `Tarefa movida para ${story.title}` : ''))
+    .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
 });
 useOnStopTyping(
   description,
