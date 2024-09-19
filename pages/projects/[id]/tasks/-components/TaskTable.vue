@@ -295,7 +295,7 @@ const setDragStart = (id: number, e: DragEvent) => {
               <TreeView
                 leaf-classes="outline-bottom"
                 :node-classes="`${
-                  task.id === hoveredTree?.id && 'bg-gray-blue'
+                  task.id === hoveredTree?.id && props.group === 'backlog' && 'bg-gray-blue'
                 } tw-bg-red-500 tw-transition px-4 text-gray-800 text-body-4 tw-border-b
                 tw-border-[#e0e0e0] tw-h-[52px] d-flex align-center ga-1`"
                 :custom-header="true"
@@ -321,6 +321,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     :class="
                       header.id === hoveredTree?.id &&
                       header.organization !== 'standard' &&
+                      props.group === 'backlog' &&
                       'bg-gray-blue tw-transition'
                     "
                     @dragenter.stop="

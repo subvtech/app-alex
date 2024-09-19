@@ -66,7 +66,17 @@
           />
         </v-col>
 
-        <v-col cols="6"
+        <v-col cols="6">
+          <p class="text-body-4 text-gray-800 mb-1">Grupo</p>
+          <Options
+            v-model="selectedParent"
+            placeholder="Escolha um grupo"
+            :items="groupOptions ?? []"
+            item-title="title"
+            edit
+          />
+        </v-col>
+        <!-- <v-col cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">Épico</p>
           <alex-project-select
             v-model="epicOpen"
@@ -87,7 +97,7 @@
             placeholder="Escolha uma história"
             :options="groupings.histories"
             @select="(history) => (selectedHistory = history)"
-        /></v-col>
+        /></v-col> -->
       </v-row>
 
       <alex-learningplan-task-description v-model="description" class="my-4" :mention-users="mentionUsers" edit />
@@ -101,6 +111,8 @@ import { isBefore } from 'date-fns';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { AlexLearningplanTrailsDialogsCopyTrail } from '#build/components';
 
 interface DrawerProjectProps {
   task?: SprintTask;
@@ -113,6 +125,7 @@ const emit = defineEmits(['kanban-click', 'change-description', 'update-value', 
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
 const { update } = useStrapi();
+const { find } = useStrapiUtils();
 
 const isFirstTimeOpened = ref(true);
 const title = ref<string>('');
@@ -127,6 +140,7 @@ const historyOpen = ref<boolean>(false);
 const selectedEpic = ref<TaskSimple | null>(null);
 const selectedSprint = ref<SprintSimple>();
 const selectedHistory = ref<TaskSimple | null>(null);
+const selectedParent = ref<TaskSimple | null>(null);
 const description = ref<string>('');
 const mentionUsers = computed(() => []);
 const trailId = ref<number | null>(null);
@@ -138,16 +152,86 @@ const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const enabledKanban = computed(() => !!selectedSprint.value);
 const { data: groupings } = useGetSprintGroupings(learninplanId);
 const { data: kanban } = useGetKanban(learninplanId, selectedSprint, enabledKanban);
+
+const allGroups = ref<any>([]);
+
+const getParentOptions = () => {
+  // const hasSprint = !!selectedSprint.value;
+
+  find('tasks', {
+    filters: {
+      learningplan: learninplanId.value,
+      sprint: {
+        id: selectedSprint.value?.id ?? {
+          $null: true,
+        },
+      },
+      parent_task: {
+        id: selectedSprint.value?.id ?? {
+          $null: true,
+        },
+      },
+      organization: {
+        $in: ['epic', 'story'],
+      },
+    },
+    populate: {
+      tasks: {
+        filters: {
+          organization: 'story',
+        },
+      },
+    },
+  }).then(({ data }) => (allGroups.value = data ?? []));
+};
+
+const groupOptions = computed(() => {
+  const options: AlexDropdownItem[] = [];
+
+  allGroups.value.forEach((task) => {
+    // First layer (Epics)
+    options.push({
+      text: task.title,
+      onClick: () => (selectedParent.value = task),
+    });
+
+    // Second layer (Stories)
+    task.tasks?.forEach((subTask) => {
+      options.push({
+        text: subTask.title,
+        onClick: () => (selectedParent.value = subTask),
+        icon: 'mdi-chevron-right',
+      });
+    });
+  });
+
+  return options;
+});
+
+watch(selectedParent, (parent) => {
+  if (!parent || !props.task?.id || isFirstTimeOpened.value) {
+    return;
+  }
+
+  update('tasks', props.task.id, {
+    parent_task: parent.id,
+  })
+    .then(() => {
+      emit('moved', `Tarefa movida para ${parent.title}`);
+    })
+    .catch(console.log);
+});
+
 const statusOptions = computed(
   () =>
-    kanban.value?.kanban_columns.map((column) => ({
+    kanban.value?.kanban_columns?.map((column) => ({
       id: column.id,
       text: column.title,
       onClick: () => {
         status.value = column;
         handleChangeColumn(selectedSprint.value, column);
       },
-    })),
+    })) ?? [],
 );
 
 const startDateComp = ref<{
@@ -196,8 +280,6 @@ const handleChangeColumn = (sprint?: SprintSimple, column?: KanbanColumn) => {
 };
 // lifecycles
 
-// watch(epics, (val) => console.log('Epics:', val));
-
 watch(selectedEpic, (epic) => {
   if (isFirstTimeOpened.value || !props.task?.id) {
     return;
@@ -205,7 +287,7 @@ watch(selectedEpic, (epic) => {
   update('tasks', props.task?.id, {
     parent_task: epic?.id ?? null,
   })
-    .then(() => emit('moved', epic?.id ? `Tarefa movida para ${epic}` : ''))
+    .then(() => emit('moved', epic?.id ? `Tarefa movida para ${epic.title}` : ''))
     .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
 });
 watch(open, () => {
@@ -221,6 +303,8 @@ watch(open, () => {
   status.value = props.task?.kanban_column_task?.kanban_column ?? null;
   trailId.value = props.task?.trail?.id ?? null;
   blocks.value = props.task?.blocks ?? [];
+
+  selectedParent.value = props.task?.parent_task ?? null;
 
   // Sprint, epic and story data
   selectedSprint.value = props.task?.sprint ?? undefined;
@@ -245,6 +329,11 @@ watch(open, () => {
   setTimeout(() => {
     isFirstTimeOpened.value = false;
   }, 2000);
+
+  if (open) {
+    getParentOptions();
+    console.log('Task:', props.task);
+  }
 });
 watch(tags, (tags) => {
   if (!isFirstTimeOpened.value && open.value) {

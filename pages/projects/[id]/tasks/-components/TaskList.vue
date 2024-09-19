@@ -405,7 +405,6 @@ const onDrop = (_, __, e) => {
 
   update('tasks', Number(id), {
     sprint: hoveredSprint.value.id,
-    parent_task: null,
   })
     .then(() => {
       setMessage(`Tarefa ${name} para ${hoveredSprint.value.title}`, 'success', true);
@@ -417,15 +416,6 @@ const onDrop = (_, __, e) => {
 
   dragDrop.dragEnd();
 };
-
-// OnDropUtils;
-// const getTaskGroup = (droppedTask: TaskSimple) => {
-//   sprintsValue.value?.backlog?.forEach((task) => {
-//     if (task.id === droppedTask.id) {
-//       console.log('Ta no backlog');
-//     }
-//   });
-// };
 
 const updateTable = async (message) => {
   await refetchSprints();
