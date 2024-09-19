@@ -32,7 +32,13 @@
       <v-row class="my-4">
         <v-col cols="6">
           <p class="text-body-4 text-gray-800 mb-1">Status</p>
-          <Options v-model="status" placeholder="Selecionar status" :items="statusOptions" item-title="title" edit />
+          <Options
+            v-model="status"
+            :placeholder="selectedSprint ? 'Selecionar status' : 'Não iniciado'"
+            :items="statusOptions"
+            item-title="title"
+            :edit="selectedSprint"
+          />
         </v-col>
         <v-col v-if="task?.organization === 'standard'" cols="6">
           <p class="text-body-4 text-gray-800 mb-1">Sprint</p>
@@ -66,11 +72,11 @@
           />
         </v-col>
 
-        <v-col cols="6">
-          <p class="text-body-4 text-gray-800 mb-1">Grupo</p>
+        <v-col cols="12">
+          <p class="text-body-4 text-gray-800 mb-1">Épico ou história</p>
           <Options
             v-model="selectedParent"
-            placeholder="Escolha um grupo"
+            placeholder="Escolha um épico ou história"
             :items="groupOptions ?? []"
             item-title="title"
             edit
@@ -156,33 +162,66 @@ const { data: kanban } = useGetKanban(learninplanId, selectedSprint, enabledKanb
 const allGroups = ref<any>([]);
 
 const getParentOptions = () => {
-  // const hasSprint = !!selectedSprint.value;
+  const hasSprint = !!selectedSprint.value;
+
+  const filters = hasSprint
+    ? {
+        sprint: selectedSprint.value?.id ?? 0,
+        organization: 'standard',
+      }
+    : {
+        learningplan: learninplanId.value,
+        sprint: {
+          id: selectedSprint.value?.id ?? {
+            $null: true,
+          },
+        },
+        parent_task: {
+          id: selectedSprint.value?.id ?? {
+            $null: true,
+          },
+        },
+        organization: {
+          $in: ['epic', 'story'],
+        },
+      };
+
+  const populate = hasSprint
+    ? [
+        'parent_task.tasks',
+        'parent_task.tasks.sprint',
+        'parent_task.parent_task.tasks',
+        'parent_task.parent_task.tasks.sprint',
+      ]
+    : {
+        tasks: {
+          filters: {
+            organization: 'story',
+          },
+        },
+      };
 
   find('tasks', {
-    filters: {
-      learningplan: learninplanId.value,
-      sprint: {
-        id: selectedSprint.value?.id ?? {
-          $null: true,
-        },
-      },
-      parent_task: {
-        id: selectedSprint.value?.id ?? {
-          $null: true,
-        },
-      },
-      organization: {
-        $in: ['epic', 'story'],
-      },
-    },
-    populate: {
-      tasks: {
-        filters: {
-          organization: 'story',
-        },
-      },
-    },
-  }).then(({ data }) => (allGroups.value = data ?? []));
+    filters,
+    populate,
+  }).then(({ data }) => {
+    if (!hasSprint) {
+      allGroups.value = data ?? [];
+      return;
+    }
+
+    const allEpics = data.reduce((acc: TaskSimple[], task) => {
+      const epic = task?.parent_task?.organization === 'epic' ? task?.parent_task : task?.parent_task?.parent_task;
+
+      if (!epic || acc.some(({ id }) => id === epic.id)) {
+        return acc;
+      }
+
+      return [...acc, epic];
+    }, []);
+
+    allGroups.value = allEpics;
+  });
 };
 
 const groupOptions = computed(() => {
@@ -197,11 +236,15 @@ const groupOptions = computed(() => {
 
     // Second layer (Stories)
     task.tasks?.forEach((subTask) => {
+      //
+      // if (!selectedSprint.value || subTask.tasks.some(({ sprint }) => sprint.id === selectedSprint.value?.id ?? 0)) {
       options.push({
         text: subTask.title,
         onClick: () => (selectedParent.value = subTask),
-        icon: 'mdi-chevron-right',
+        icon: 'mdi-circle-small',
+        notBold: true,
       });
+      // }
     });
   });
 
@@ -356,7 +399,10 @@ watch(selectedSprint, (sprint, oldSprint) => {
       },
     },
   })
-    .then(() => emit('moved', `Tarefa movida de ${oldSprint?.title || 'backlog'} para ${sprint?.title}`))
+    .then(() => {
+      emit('moved', `Tarefa movida de ${oldSprint?.title || 'backlog'} para ${sprint?.title}`);
+      getParentOptions();
+    })
     .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
 });
 

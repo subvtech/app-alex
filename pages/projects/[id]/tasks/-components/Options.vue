@@ -5,6 +5,7 @@
         v-bind="dropdownProps"
         class="py-1 text-body-3 tw-rounded-md"
         :class="[
+          !edit && 'tw-select-none',
           edit && 'px-1 output tw-cursor-pointer',
           !model && !emptyValue && 'text-gray-400',
           model && 'text-gray-800',
