@@ -288,7 +288,7 @@ const showErrorMessage = (message: string, err?: ApplicationError) => {
   }
 };
 
-const handleDelete = () => {
+const handleBlur = () => {
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -305,8 +305,14 @@ const handleDelete = () => {
   });
 };
 
-const handleDeleteTask = async (id: number, sprintId: number) => {
-  await deleteTask({ id, sprintId });
+const handleDeleteTask = async (task: {
+  title: string;
+  id: number;
+  sprintId: number;
+  hasChildren: boolean;
+  organization: 'standard' | 'story' | 'epic';
+}) => {
+  await deleteTask(task);
   await refetchSprints();
 };
 
@@ -519,7 +525,7 @@ const updateSprints = () => {
                     @add-task="handleAddTask"
                     @create-item="createItem"
                     @edit-item="handleEdit"
-                    @handle-blur="handleDelete"
+                    @handle-blur="handleBlur"
                     @start-drag="
                       (idVal, e, dropTo, dragGhost) => {
                         dragDrop.startDrag(idVal, e, dropTo, dragGhost);
@@ -667,7 +673,7 @@ const updateSprints = () => {
                     @add-task="(task) => handleAddTask(task, sprint.id)"
                     @create-item="createItem"
                     @edit-item="handleEdit"
-                    @handle-blur="handleDelete"
+                    @handle-blur="handleBlur"
                     @start-drag="
                       (id, e) => {
                         dragDrop.startDrag(id, e);

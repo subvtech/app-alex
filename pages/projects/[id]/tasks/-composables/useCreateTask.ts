@@ -88,9 +88,13 @@ export const useCreateTask = (
   });
 
 type DeleteTaskPayload = {
+  title: string;
   id: number;
   sprintId?: number;
+  hasChildren?: boolean;
+  organization: TaskSimple['organization'];
 };
+
 export const useDeleteTask = (
   learninplanId: Ref<number>,
   queryClient: QueryClient,
@@ -98,7 +102,11 @@ export const useDeleteTask = (
   t: Function,
 ) =>
   useMutation({
-    mutationFn({ id }: DeleteTaskPayload) {
+    mutationFn({ id, organization, hasChildren }: DeleteTaskPayload) {
+      if (hasChildren) {
+        setMessage(t(`pages.projects.tasks.actions.delete_${organization}_has_children`), 'warning', true, false, true);
+        return Promise.reject(new Error('Item has children'));
+      }
       return strapi.delete('tasks', id);
     },
     onSuccess(_, variables) {
@@ -120,18 +128,13 @@ export const useDeleteTask = (
           backlog: oldData.backlog.filter((task) => task.id !== variables.id),
         };
       });
-      setMessage(
-        t('pages.projects.tasks.actions.deleted_success', { item: t('pages.projects.common.task') }),
-        'error',
-        true,
-      );
+      setMessage(t('pages.projects.tasks.actions.deleted_success', { item: variables.title }), 'success', true);
     },
-    onError() {
-      setMessage(
-        t('pages.projects.tasks.actions.deleted_error', { item: t('pages.projects.common.task') }),
-        'error',
-        true,
-      );
+    onError(error, variables) {
+      if (error.message === 'Item has children') {
+        throw error;
+      }
+      setMessage(t('pages.projects.tasks.actions.deleted_error', { item: variables.title }), 'error', true);
     },
   });
 

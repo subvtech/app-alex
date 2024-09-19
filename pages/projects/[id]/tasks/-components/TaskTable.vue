@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TreeView from '@/components/alex/custom/treeview/index.vue';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { TaskStatus } from '~/models/simple/taskSimple.model';
+// import { TaskStatus } from '~/models/simple/taskSimple.model';
 import { SprintTask } from '../-types';
 
 interface LocalSprintTask extends SprintTask {
@@ -51,39 +51,31 @@ type CreateItemPayload = {
   story: number;
   title: string;
 };
-type Emit = {
-  'delete-task': [id: number];
-  'drag-end': [item: any, level: string, event: DragEvent];
-  'drag-leave': [event: DragEvent];
-  'drag-over': [list: string, id: number, index: number, event: DragEvent];
-  'edit-task': [id: number, task: SprintTask];
-  'move-task': [];
-  'start-drag': [id: number, event: DragEvent];
-  'toggle-archive': [];
-  'add-story': [id: number];
-  'add-task': [task: SprintTask];
-  'handle-blur': [task: SprintTask];
-  'create-item': [task: CreateItemPayload];
-  'edit-item': [task: SprintTask];
+
+type DeleteItemPayload = {
+  title: string;
+  id: number;
+  hasChildren: boolean;
+  organization: 'standard' | 'story' | 'epic';
+  sprint_id?: number;
 };
 
-const emit = defineEmits([
-  'deleteTask',
-  'dragEnd',
-  'dragLeave',
-  'dragOver',
-  'drop',
-  'editTask',
-  'moveTask',
-  'startDrag',
-  'toggleArchive',
-  'addStory',
-  'addTask',
-  'handleBlur',
-  'createItem',
-  'editItem',
-  'moveToParent',
-]);
+const emit = defineEmits<{
+  'delete-task': [DeleteItemPayload];
+  'drag-end': [any, string, DragEvent];
+  'drag-leave': [DragEvent];
+  'drag-over': [string, number, number, DragEvent];
+  'edit-task': [number, SprintTask];
+  'move-task': [];
+  'start-drag': [number, DragEvent];
+  'toggle-archive': [];
+  'add-story': [number];
+  'add-task': [SprintTask];
+  'handle-blur': [SprintTask];
+  'create-item': [CreateItemPayload];
+  'edit-item': [SprintTask];
+  'move-to-parent': [];
+}>();
 
 const props = withDefaults(
   defineProps<{
@@ -110,7 +102,7 @@ const props = withDefaults(
 const typing = ref(false);
 const tableSortBy = ref<{ key: string; order: string }[]>([]);
 const deleteModal = ref(false);
-const taskToDelete = ref(-1);
+const taskToDelete = ref<LocalSprintTask | null>(null);
 
 const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
@@ -166,19 +158,34 @@ const handleFieldEdit = () => {
   newGroup.value = '';
 };
 
-const cancelDelete = () => {
-  deleteModal.value = false;
-  taskToDelete.value = -1;
-};
-
 const handleNullTree = () => {
   setTimeout(() => {
     hoveredTree.value = null;
   }, 100);
 };
 
+const deleteDialogText = computed(() => {
+  return {
+    title: t('pages.projects.tasks.delete_title', {
+      item: taskToDelete.value?.title,
+    }),
+    subtitle: t(`pages.projects.tasks.delete_${taskToDelete.value?.organization}_subtitle`),
+  };
+});
+
+const cancelDelete = () => {
+  deleteModal.value = false;
+  taskToDelete.value = null;
+};
+
 const confirmDelete = () => {
-  emit('delete-task', taskToDelete.value);
+  emit('delete-task', {
+    title: taskToDelete.value?.title || '',
+    id: taskToDelete.value?.id || 0,
+    sprint: taskToDelete.value?.sprint,
+    hasChildren: !!taskToDelete.value?.tasks?.length,
+    organization: taskToDelete.value?.organization || 'standard',
+  } as DeleteItemPayload);
   cancelDelete();
 };
 
@@ -191,14 +198,13 @@ const dropDownItems = (task: SprintTask): AlexDropdownItem[] => {
     details: getDropDownAction('details', task.id, task),
   };
 
-  // TODO: Fazer a lógica de verificar se os itens tem filhos e exibir uma mensagem de warning caso tenham
   switch (task.organization) {
     case 'epic':
-      return [actions.rename, actions.addStory, actions.addTask /* actions.delete */].filter(
+      return [actions.rename, actions.addStory, actions.addTask, actions.delete].filter(
         (action): action is AlexDropdownItem => action !== undefined,
       );
     case 'story':
-      return [actions.rename, actions.addTask /* actions.delete */].filter(
+      return [actions.rename, actions.addTask, actions.delete].filter(
         (action): action is AlexDropdownItem => action !== undefined,
       );
     default:
@@ -212,7 +218,7 @@ const getDropDownAction = (action: string, id: number, task: SprintTask): AlexDr
       text: t('pages.projects.tasks.dropdown_delete'),
       warning: true,
       onClick: () => {
-        taskToDelete.value = id;
+        taskToDelete.value = task;
         deleteModal.value = true;
       },
     },
@@ -293,7 +299,6 @@ const setDragStart = (id: number, e: DragEvent) => {
           >
             <td class="pa-0" :colspan="columns.length">
               <TreeView
-                leaf-classes="outline-bottom"
                 :node-classes="`${
                   task.id === hoveredTree?.id && props.group === 'backlog' && 'bg-gray-blue'
                 } tw-bg-red-500 tw-transition px-4 text-gray-800 text-body-4 tw-border-b
@@ -363,10 +368,11 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items outline-bottom text-gray-800"
+                    class="d-flex align-center py-2 tasks-items text-gray-800"
                     :class="[
                       dragging && dragFrom == item.id ? 'dragging' : '',
                       group === 'backlog' ? 'draggable-row' : '',
+                      item.parent_task ? 'border-bottom' : '',
                     ]"
                     :draggable="group === 'backlog'"
                     @dragstart="(e) => setDragStart(item.id, e)"
@@ -467,8 +473,8 @@ const setDragStart = (id: number, e: DragEvent) => {
       :cancel-button-text="t('pages.projects.tasks.delete_cancel_text')"
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       :submit-button-text="t('pages.projects.tasks.delete_confirm_text')"
-      :subtitle="t('pages.projects.tasks.delete_subtitle')"
-      :title="t('pages.projects.tasks.delete_title')"
+      :subtitle="deleteDialogText.subtitle"
+      :title="deleteDialogText.title"
       @cancel="cancelDelete"
       @submit="confirmDelete"
     />
@@ -557,22 +563,11 @@ const setDragStart = (id: number, e: DragEvent) => {
 }
 
 .tasks-items td:has(:not(.task-title)) {
-  margin: 0 16px;
+  padding: 0 16px;
 }
 
-.outline-bottom {
-  outline: none;
-  position: relative;
-}
-
-.outline-bottom::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background-color: #e0e0e0;
+.border-bottom {
+  border-bottom: 1px solid #e0e0e0;
 }
 </style>
 
