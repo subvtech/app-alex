@@ -1,11 +1,7 @@
 <template>
-  <div
-    class="d-flex tw-flex-col-reverse md:tw-flex-row ga-4 tw-h-[90vh] tw-w-full"
-  >
+  <div class="d-flex tw-flex-col-reverse md:tw-flex-row ga-4 tw-h-[90vh] tw-w-full">
     <!-- Side bar -->
-    <div
-      class="d-flex flex-column wrapper py-4 px-2 tw-flex-[0_0_35%] md:tw-flex-[0_0_270px] tw-overflow-y-auto"
-    >
+    <div class="d-flex flex-column wrapper py-4 px-2 tw-flex-[0_0_35%] md:tw-flex-[0_0_270px] tw-overflow-y-auto">
       <v-expansion-panels v-model="openFolders" class="!tw-block" multiple>
         <alex-project-folder
           v-for="(folder, index) in folders"
@@ -21,9 +17,7 @@
             addDocDialog = true;
             dialogFolderId = folder.id;
           "
-          @change-name="
-            (name) => updateFolderTitle(name, folder.title, folder.id)
-          "
+          @change-name="(name) => updateFolderTitle(name, folder.title, folder.id)"
           @set-doc="(doc) => (selectedDoc = doc)"
           @delete="deleteFolder(folder.id)"
         />
@@ -47,9 +41,7 @@
       class="wrapper editor-container tw-flex-[0_0_63%] tw-max-h-[63%] md:tw-max-h-full md:tw-flex-1 d-flex flex-column"
     >
       <!-- Header -->
-      <div
-        class="d-flex ga-4 align-center py-4 px-6 border-b-sm tw-border-[#EBEDEF]"
-      >
+      <div class="d-flex ga-4 align-center py-4 px-6 border-b-sm tw-border-[#EBEDEF]">
         <!-- Ver focus border -->
         <input
           v-model="title"
@@ -79,9 +71,7 @@
         <div class="d-flex align-center justify-center ga-2">
           <alex-custom-tooltip v-if="docState" :text="docState.text">
             <template #content
-              ><v-icon :color="docState.color" :class="docState.styles">{{
-                docState.icon
-              }}</v-icon></template
+              ><v-icon :color="docState.color" :class="docState.styles">{{ docState.icon }}</v-icon></template
             >
           </alex-custom-tooltip>
 
@@ -119,9 +109,7 @@
     <alex-custom-dialog
       v-model="addDocDialog"
       :title="$t('components.project.document.dialog.create.document.title')"
-      :main-button-text="
-        $t('components.project.document.dialog.create.document.submit')
-      "
+      :main-button-text="$t('components.project.document.dialog.create.document.submit')"
       @on-main-action="createDocument"
       @on-secondary-action="addDocDialog = false"
     >
@@ -138,9 +126,7 @@
             :title="template.title"
             :cover-url="template.image?.data?.attributes.url"
             :selected="selectedTemplate === template.id"
-            @select="
-              (id) => (selectedTemplate = selectedTemplate !== id ? id : 0)
-            "
+            @select="(id) => (selectedTemplate = selectedTemplate !== id ? id : 0)"
           />
         </div>
       </template>
@@ -149,9 +135,7 @@
         v-model="name"
         class="w-100"
         :label="$t('components.project.document.dialog.create.label')"
-        :placeholder="
-          $t('components.project.document.dialog.create.placeholder')
-        "
+        :placeholder="$t('components.project.document.dialog.create.placeholder')"
         name="doc"
         required
       />
@@ -164,15 +148,9 @@
       :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
       :title="$t('components.project.document.dialog.del.document.title')"
       :subtitle="$t('components.project.document.dialog.del.document.subtitle')"
-      :input-label-confirmation="
-        $t('components.project.document.dialog.del.type')
-      "
-      :input-word-confirmation="
-        $t('components.project.document.dialog.del.word')
-      "
-      :input-placeholder-confirmation="
-        $t('components.project.document.dialog.del.placeholder')
-      "
+      :input-label-confirmation="$t('components.project.document.dialog.del.type')"
+      :input-word-confirmation="$t('components.project.document.dialog.del.word')"
+      :input-placeholder-confirmation="$t('components.project.document.dialog.del.placeholder')"
       :no-input-confirmation="false"
       :submit-button-text="$t('components.project.document.edit.delete')"
       :cancel-button-text="$t('components.project.document.edit.cancel')"
@@ -228,7 +206,7 @@ const docState = computed<{
 } | null>(() => {
   if (!savingDoc.value) {
     return {
-      text: t('components.project.document.saving.select'),
+      text: t('components.project.document.saving.idle'),
       icon: 'mdi-content-save',
       color: 'gray-500',
       styles: '',
@@ -272,8 +250,7 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
     return [];
   }
 
-  const users: (UserSimple | undefined)[] =
-    learningPlanStore.learningPlan.members.map((member) => member.user);
+  const users: (UserSimple | undefined)[] = learningPlanStore.learningPlan.members.map((member) => member.user);
 
   return [...new Set(users)]
     .filter((user) => user !== undefined)
@@ -287,42 +264,29 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
 // Get data
 const getTemplates = async () => {
   try {
-    const templatesRes = await strapi.find<DocumentTemplate>(
-      'document-templates',
-      {
-        populate: {
-          image: true,
-        },
+    const templatesRes = await strapi.find<DocumentTemplate>('document-templates', {
+      populate: {
+        image: true,
       },
-    );
+    });
 
     templates.value = templatesRes.data.map((template) => ({
       ...template.attributes,
       id: template.id,
     }));
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.getTemplate'),
-      'error',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.getTemplate'), 'error', true);
   }
 };
 
 // Criar um novo documento
 const createDocument = async () => {
   if (!name.value) {
-    setMessage(
-      t('components.project.document.messages.warning.missName'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.project.document.messages.warning.missName'), 'warning', true);
     return;
   }
 
-  const template = templates.value.find(
-    ({ id }) => id === selectedTemplate.value,
-  );
+  const template = templates.value.find(({ id }) => id === selectedTemplate.value);
 
   try {
     const docRes = await strapi.create('documents', {
@@ -353,11 +317,7 @@ const createDocument = async () => {
     });
 
     // Fecha o modal após sucesso da operação
-    setMessage(
-      t('components.project.document.messages.success.createDoc'),
-      'success',
-      true,
-    );
+    setMessage(t('components.project.document.messages.success.createDoc'), 'success', true);
 
     selectedDoc.value = newDoc;
     addDocDialog.value = false;
@@ -385,11 +345,7 @@ const createDocument = async () => {
       }
     }, 300);
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.createDoc'),
-      'error',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.createDoc'), 'error', true);
   }
 };
 
@@ -424,17 +380,9 @@ const saveTitle = async () => {
     updatedDoc.title = title.value;
     selectedDoc.value = updatedDoc;
 
-    setMessage(
-      t('components.project.document.messages.success.updateDoc'),
-      'success',
-      true,
-    );
+    setMessage(t('components.project.document.messages.success.updateDoc'), 'success', true);
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.updateDoc'),
-      'error',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.updateDoc'), 'error', true);
   }
 };
 
@@ -477,17 +425,9 @@ const saveDocument = async () => {
 };
 
 // Atualizar nome da pasta no banco quando tiver blur do contenteditable
-const updateFolderTitle = async (
-  title: string,
-  oldTitle: string,
-  id: number | undefined,
-) => {
+const updateFolderTitle = async (title: string, oldTitle: string, id: number | undefined) => {
   if (!id) {
-    setMessage(
-      t('components.project.document.messages.error.folderName'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.folderName'), 'warning', true);
     return;
   }
 
@@ -501,18 +441,10 @@ const updateFolderTitle = async (
       title,
     });
 
-    setMessage(
-      t('components.project.document.messages.success.folderName'),
-      'success',
-      true,
-    );
+    setMessage(t('components.project.document.messages.success.folderName'), 'success', true);
     alterFolderTitle(id, title);
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.folderName'),
-      'error',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.folderName'), 'error', true);
     alterFolderTitle(id, oldTitle);
   }
 };
@@ -531,29 +463,17 @@ const alterFolderTitle = (id: number, title: string) => {
 const deleteFolder = async (id: number) => {
   try {
     await strapi.delete('document-folders', id);
-    setMessage(
-      t('components.project.document.messages.success.delFolder'),
-      'success',
-      true,
-    );
+    setMessage(t('components.project.document.messages.success.delFolder'), 'success', true);
 
     // Null selected doc if it was inside the selected folder
     const folder = folders.value.find((folder) => folder.id === id);
-    if (
-      selectedDoc.value &&
-      folder &&
-      folder.documents?.map(({ id }) => id).includes(selectedDoc.value.id)
-    ) {
+    if (selectedDoc.value && folder && folder.documents?.map(({ id }) => id).includes(selectedDoc.value.id)) {
       selectedDoc.value = null;
     }
 
     folders.value = folders.value.filter((folder) => folder.id !== id);
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.delFolder'),
-      'error',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.delFolder'), 'error', true);
   }
 };
 
@@ -567,9 +487,7 @@ const deleteDoc = async () => {
     await strapi.delete('documents', selectedDoc.value.id || 0);
 
     folders.value = folders.value.map((folder) => {
-      folder.documents =
-        folder.documents?.filter(({ id }) => id !== selectedDoc.value?.id) ||
-        [];
+      folder.documents = folder.documents?.filter(({ id }) => id !== selectedDoc.value?.id) || [];
 
       return folder;
     });
@@ -578,17 +496,9 @@ const deleteDoc = async () => {
     selectedDoc.value = null;
     delDocDialog.value = false;
 
-    setMessage(
-      t('components.project.document.messages.success.delFolder'),
-      'success',
-      true,
-    );
+    setMessage(t('components.project.document.messages.success.delFolder'), 'success', true);
   } catch (e) {
-    setMessage(
-      t('components.project.document.messages.error.delFolder'),
-      'error',
-      true,
-    );
+    setMessage(t('components.project.document.messages.error.delFolder'), 'error', true);
   }
 };
 
@@ -596,11 +506,7 @@ const addFolder = async () => {
   const allIds: number[] = folders.value.map(({ id }) => id);
 
   if (allIds.includes(-1)) {
-    setMessage(
-      t('components.project.document.messages.warning.creatingFolder'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.project.document.messages.warning.creatingFolder'), 'warning', true);
     return;
   }
 
@@ -629,11 +535,7 @@ const addFolder = async () => {
       return folder;
     });
 
-    setMessage(
-      t('components.project.document.messages.success.createFolder'),
-      'success',
-      true,
-    );
+    setMessage(t('components.project.document.messages.success.createFolder'), 'success', true);
   } catch (e) {
     folders.value = folders.value.filter(({ id }) => id !== -1);
   }
@@ -648,25 +550,6 @@ const getFolders = () => {
 
   // headerStore.title = 'Projetos';
   // headerStore.items = [
-    // {
-    //   title: 'Home',
-    //   disabled: true,
-    // },
-    // {
-    //   title: 'Projetos',
-    //   to: '/projects/me',
-    // },
-    // {
-    //   title: learningPlanStore.learningPlan.title,
-    //   to: `/courses/${learningPlanStore.learningPlan.id}`,
-    // },
-  // ];
-};
-
-// onBeforeMount(() => {
-  // headerStore.showHeader = true;
-// });
-
   // {
   //   title: 'Home',
   //   disabled: true,
@@ -680,6 +563,25 @@ const getFolders = () => {
   //   to: `/courses/${learningPlanStore.learningPlan.id}`,
   // },
   // ];
+};
+
+// onBeforeMount(() => {
+// headerStore.showHeader = true;
+// });
+
+// {
+//   title: 'Home',
+//   disabled: true,
+// },
+// {
+//   title: 'Projetos',
+//   to: '/projects/me',
+// },
+// {
+//   title: learningPlanStore.learningPlan.title,
+//   to: `/courses/${learningPlanStore.learningPlan.id}`,
+// },
+// ];
 //};
 
 onBeforeMount(() => {

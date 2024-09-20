@@ -1,61 +1,61 @@
 {
-    "selectTitle": "Selecione um documento",
-    "newFolder": "Nova pasta",
-    "dialog": {
-        "create": {
-            "document": {
-                "title": "Criar novo documento",
-                "submit": "Criar documento"
-            },
-            "label": "Como vai se chamar seu documento?",
-            "placeholder": "Ex: Cronograma"
-        },
-        "del": {
-            "folder": {
-                "title": "Realmente deseja excluir esta pasta?",
-                "subtitle": "Ao excluir esta pasta você não poderá acessá-la novamente."
-            },
-            "document": {
-                "title": "Realmente deseja excluir este documento?",
-                "subtitle": "Ao excluir este documento você não poderá acessá-lo novamente."
-            },
-            "type": "Digite a palavra:",
-            "word": "Excluir",
-            "placeholder": "Digite a frase"
-        }
+  "selectTitle": "Selecione um documento",
+  "newFolder": "Nova pasta",
+  "dialog": {
+    "create": {
+      "document": {
+        "title": "Criar novo documento",
+        "submit": "Criar documento"
+      },
+      "label": "Como vai se chamar seu documento?",
+      "placeholder": "Ex: Cronograma"
     },
-    "edit": {
-        "edit": "Editar",
-        "cancel": "Cancelar",
-        "delete": "Excluir",
-        "save": "Salvar"
-    },
-    "saving": {
-        "select": "Selecione um documento",
-        "loading": "Carregando",
-        "saved": "Salvo",
-        "error": "Erro ao salvar"
-    },
-    "messages": {
-        "success": {
-            "folderName": "Nome da pasta atualizado com sucesso",
-            "updateDoc": "Documento atualizado com sucesso",
-            "createFolder": "Pasta criada com sucesso",
-            "createDoc": "Documento criado com sucesso",
-            "delFolder": "Pasta deletada com sucesso"
-        },
-        "warning": {
-            "missName": "Nome é necessário para criar documento",
-            "creatingFolder": "Pasta já está sendo criada",
-            "folderName": "Falha ao atualizar nome da pasta"
-        },
-        "error": {
-            "getTemplate": "Falha ao obter templates",
-            "createDoc": "Erro ao criar documento",
-            "updateDoc": "Erro ao atualizar documento",
-            "delFolder": "Erro ao excluir pasta",
-            "delDoc": "Erro ao deletar documento",
-            "folderName": "Erro ao atualizar nome da pasta"
-        }
+    "del": {
+      "folder": {
+        "title": "Realmente deseja excluir esta pasta?",
+        "subtitle": "Ao excluir esta pasta você não poderá acessá-la novamente."
+      },
+      "document": {
+        "title": "Realmente deseja excluir este documento?",
+        "subtitle": "Ao excluir este documento você não poderá acessá-lo novamente."
+      },
+      "type": "Digite a palavra:",
+      "word": "Excluir",
+      "placeholder": "Digite a frase"
     }
+  },
+  "edit": {
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "save": "Salvar"
+  },
+  "saving": {
+    "idle": "Salvo automaticamente",
+    "loading": "Carregando",
+    "saved": "Salvo",
+    "error": "Erro ao salvar"
+  },
+  "messages": {
+    "success": {
+      "folderName": "Nome da pasta atualizado com sucesso",
+      "updateDoc": "Documento atualizado com sucesso",
+      "createFolder": "Pasta criada com sucesso",
+      "createDoc": "Documento criado com sucesso",
+      "delFolder": "Pasta deletada com sucesso"
+    },
+    "warning": {
+      "missName": "Nome é necessário para criar documento",
+      "creatingFolder": "Pasta já está sendo criada",
+      "folderName": "Falha ao atualizar nome da pasta"
+    },
+    "error": {
+      "getTemplate": "Falha ao obter templates",
+      "createDoc": "Erro ao criar documento",
+      "updateDoc": "Erro ao atualizar documento",
+      "delFolder": "Erro ao excluir pasta",
+      "delDoc": "Erro ao deletar documento",
+      "folderName": "Erro ao atualizar nome da pasta"
+    }
+  }
 }
