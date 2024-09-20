@@ -37,7 +37,7 @@
             :placeholder="selectedSprint ? 'Selecionar status' : 'Não iniciado'"
             :items="statusOptions"
             item-title="title"
-            :edit="selectedSprint"
+            :edit="!!selectedSprint"
           />
         </v-col>
         <v-col v-if="task?.organization === 'standard'" cols="6">
@@ -82,31 +82,18 @@
             edit
           />
         </v-col>
-        <!-- <v-col cols="6"
-          ><p class="text-body-4 text-gray-800 mb-1">Épico</p>
-          <alex-project-select
-            v-model="epicOpen"
-            :default-value="selectedEpic"
-            title="Selecione um épico"
-            placeholder="Escolha um épico"
-            :disabled-message="!!selectedHistory && 'A tarefa já está em uma história'"
-            :options="groupings.epics"
-            @select="(epic) => (selectedEpic = epic)"
-        /></v-col>
-
-        <v-col cols="6"
-          ><p class="text-body-4 text-gray-800 mb-1">História</p>
-          <alex-project-select
-            v-model="historyOpen"
-            :default-value="selectedHistory"
-            title="Selecione uma história"
-            placeholder="Escolha uma história"
-            :options="groupings.histories"
-            @select="(history) => (selectedHistory = history)"
-        /></v-col> -->
       </v-row>
 
       <alex-learningplan-task-description v-model="description" class="my-4" :mention-users="mentionUsers" edit />
+      <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
+      <v-window v-model="activePage">
+        <v-window-item value="1">
+          <alex-learningplan-task-events v-model="taskEvents" />
+        </v-window-item>
+        <v-window-item value="2">
+          <Members :learningplan-id="learningplanId" :task-id="task?.id" :start-at="startDate" :finish-at="endDate" />
+        </v-window-item>
+      </v-window>
     </div>
   </v-navigation-drawer>
 </template>
@@ -114,11 +101,11 @@
 <script setup lang="ts">
 import Options from '@/pages/projects/[id]/tasks/-components/Options.vue';
 import { isBefore } from 'date-fns';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { AlexLearningplanTrailsDialogsCopyTrail } from '#build/components';
+import Members from './members/Index.vue';
 
 interface DrawerProjectProps {
   task?: SprintTask;
@@ -139,9 +126,13 @@ const tags = ref<TagSimple[]>([]);
 const status = ref<KanbanColumn | null>(null);
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
+const activePage = ref<number>(1);
+const taskEvents = ref<TaskEvent[]>([]);
 
-const epicOpen = ref<boolean>(false);
-const historyOpen = ref<boolean>(false);
+const tabs = [
+  { label: t('components.learningPlan.drawer.tabs.events.label'), value: '1' },
+  { label: t('components.learningPlan.drawer.tabs.members.label'), value: '2' },
+];
 
 const selectedEpic = ref<TaskSimple | null>(null);
 const selectedSprint = ref<SprintSimple>();
@@ -153,11 +144,11 @@ const trailId = ref<number | null>(null);
 const blocks = ref<BlockSimple[]>([]);
 const route = useRoute();
 const strapiClient = useStrapiClient();
-const learninplanId = computed(() => parseInt(route.params.id.toString()));
+const learningplanId = computed(() => parseInt(route.params.id.toString()));
 // querys
 const enabledKanban = computed(() => !!selectedSprint.value);
-const { data: groupings } = useGetSprintGroupings(learninplanId);
-const { data: kanban } = useGetKanban(learninplanId, selectedSprint, enabledKanban);
+const { data: groupings } = useGetSprintGroupings(learningplanId);
+const { data: kanban } = useGetKanban(learningplanId, selectedSprint, enabledKanban);
 
 const allGroups = ref<any>([]);
 
@@ -170,7 +161,7 @@ const getParentOptions = () => {
         organization: 'standard',
       }
     : {
-        learningplan: learninplanId.value,
+        learningplan: learningplanId.value,
         sprint: {
           id: selectedSprint.value?.id ?? {
             $null: true,
@@ -210,8 +201,11 @@ const getParentOptions = () => {
       return;
     }
 
-    const allEpics = data.reduce((acc: TaskSimple[], task) => {
-      const epic = task?.parent_task?.organization === 'epic' ? task?.parent_task : task?.parent_task?.parent_task;
+    const allEpics = data.reduce<TaskSimple[]>((acc, task) => {
+      const epic =
+        (task as TaskSimple)?.parent_task?.organization === 'epic'
+          ? (task as TaskSimple)?.parent_task
+          : (task as TaskSimple)?.parent_task?.parent_task;
 
       if (!epic || acc.some(({ id }) => id === epic.id)) {
         return acc;
@@ -258,11 +252,9 @@ watch(selectedParent, (parent) => {
 
   update('tasks', props.task.id, {
     parent_task: parent.id,
-  })
-    .then(() => {
-      emit('moved', `Tarefa movida para ${parent.title}`);
-    })
-    .catch(console.log);
+  }).then(() => {
+    emit('moved', `Tarefa movida para ${parent.title}`);
+  });
 });
 
 const statusOptions = computed(
@@ -374,7 +366,6 @@ watch(open, () => {
 
   if (open) {
     getParentOptions();
-    console.log('Task:', props.task);
   }
 });
 watch(tags, (tags) => {
