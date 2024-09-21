@@ -19,11 +19,7 @@ interface GetFn {
  * get(['a', 'b', 'c'], obj); // Returns 1
  * get('a.b.d', obj); // Returns undefined
  */
-export const get = curry(
-  <R = never>(path: string | string[], data: unknown): R => {
-    const keys = Array.isArray(path)
-      ? path
-      : path.split(/[\].[]/).filter(Boolean);
-    return keys.reduce((acc, key) => acc?.[key as keyof typeof acc], data) as R;
-  },
-) as GetFn;
+export const get = curry(<R = never>(path: string | string[], data: unknown): R => {
+  const keys = Array.isArray(path) ? path : path.split(/[\].[]/).filter(Boolean);
+  return keys.reduce((acc, key) => acc?.[key as keyof typeof acc], data) as R;
+}) as GetFn;

@@ -1,13 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-type PopulateFields =
-  | 'avatar'
-  | 'cover'
-  | 'socials'
-  | 'tags'
-  | 'institutions.cover'
-  | 'user_wallet';
+type PopulateFields = 'avatar' | 'cover' | 'socials' | 'tags' | 'institutions.cover' | 'user_wallet';
 
 export type UniquePopulateFieldsArray = Array<PopulateFields>;
 
@@ -32,22 +26,14 @@ export const useUserStore = defineStore('user', () => {
     'user_wallet',
   ];
 
-  async function updateUser(
-    data,
-    populateArray: UniquePopulateFieldsArray = [],
-    message,
-    showMessage = true,
-  ) {
+  async function updateUser(data, populate: UniquePopulateFieldsArray = [], message, showMessage = true) {
     if (!loadedUser.value) return;
+
     try {
       const result: User = await client(`/users/${loadedUser.value.id}`, {
         method: 'PUT',
-        body: {
-          ...data,
-        },
-        params: {
-          _populate: populateArray,
-        },
+        body: data,
+        params: { _populate: populate },
       });
 
       if (showMessage) setMessage(message, 'green', true);
@@ -65,12 +51,8 @@ export const useUserStore = defineStore('user', () => {
     if (!loadedUser.value) return;
     try {
       loading.value = true;
-      const result = await find<Tag>('tags', {
-        filters: {
-          verified_by: loadedUser.value.id,
-        },
-      });
-      loadedUser.value = { ...loadedUser.value, tags: result.data };
+      const res = await find<Tag>('tags', { filters: { verified_by: loadedUser.value.id } });
+      loadedUser.value = { ...loadedUser.value, tags: res.data };
       loading.value = false;
       if (message) setMessage(message, 'green', true);
     } catch (e: any) {
@@ -92,8 +74,7 @@ export const useUserStore = defineStore('user', () => {
       });
       loadedUser.value = { ...loadedUser.value, socials: result.data };
       loading.value = false;
-      if (showMessage)
-        setMessage(i18n.t('components.profile.socials.update'), 'green', true);
+      if (showMessage) setMessage(i18n.t('components.profile.socials.update'), 'green', true);
     } catch (e: any) {
       loading.value = false;
       if (e?.error?.name === 'NotFoundError' && showMessage) {
@@ -114,20 +95,11 @@ export const useUserStore = defineStore('user', () => {
       });
       loadedUser.value = { ...loadedUser.value, institutions: result.data };
       loading.value = false;
-      if (showMessage)
-        setMessage(
-          i18n.t('components.profile.institutional.update'),
-          'green',
-          true,
-        );
+      if (showMessage) setMessage(i18n.t('components.profile.institutional.update'), 'green', true);
     } catch (e: any) {
       loading.value = false;
       if (e?.error?.name === 'NotFoundError' && showMessage) {
-        setMessage(
-          i18n.t('components.profile.institutional.emptyInstitutional'),
-          'red',
-          true,
-        );
+        setMessage(i18n.t('components.profile.institutional.emptyInstitutional'), 'red', true);
       }
     }
   }
@@ -187,21 +159,20 @@ export const useUserStore = defineStore('user', () => {
   });
 
   const setWallet = (data?: Wallet) => {
-    if (loadedUser.value)
-      loadedUser.value = { ...loadedUser.value, user_wallet: data };
+    if (loadedUser.value) loadedUser.value = { ...loadedUser.value, user_wallet: data };
   };
 
   return {
+    activeLearningPlans,
     activeTasks,
     isCurrentUser,
     loading,
-    activeLearningPlans,
-    updateUser,
     user: loadedUser,
     loadUser,
-    setWallet,
+    loadUserInstitutions,
     loadUserSocials,
     loadUserTags,
-    loadUserInstitutions,
+    setWallet,
+    updateUser,
   };
 });

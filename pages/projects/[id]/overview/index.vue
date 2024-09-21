@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { GanttInstance, Sprint as GanttSprint, Item as Task } from '@/components/Gantt.vue';
+import { GanttInstance, GanttItem, GanttSprint } from '@/components/Gantt.vue';
 import CardTotalizer from './-components/CardTotalizer.vue';
-import OverviewTaskProgress from './-components/overview/taskProgress.vue';
+import InstitutionDialog from './-components/InstitutionDialog.vue';
+import TaskProgress from './-components/TaskProgress.vue';
 
-interface Sprint extends GanttSprint {
+interface DashboardSprint extends GanttSprint {
   kanban: {
     kanban_columns: {
       title: string;
@@ -17,7 +18,7 @@ interface Sprint extends GanttSprint {
   };
 }
 
-export interface Data {
+interface DashboardResponse {
   counters: {
     finishedEpicsPercent: number;
     finishedSprintsPercent: number;
@@ -27,48 +28,9 @@ export interface Data {
     totalSprints: number;
     remainingDays: number;
   };
-  sprints: Sprint[];
-  tasks: Task[];
+  sprints: DashboardSprint[];
+  tasks: GanttItem[];
 }
-
-type CoverFormat = {
-  ext: string;
-  url: string;
-  hash: string;
-  mime: string;
-  name: string;
-  path: string | null;
-  size: number;
-  width: number;
-  height: number;
-};
-
-export type Cover = {
-  name: string;
-  alternativeText: string | null;
-  caption: string | null;
-  width: number;
-  height: number;
-  formats: {
-    small: CoverFormat;
-    medium: CoverFormat;
-    thumbnail: CoverFormat;
-  };
-  hash: string;
-  ext: string;
-  mime: string;
-  size: number;
-  url: string;
-  previewUrl: string | null;
-  provider: string;
-  provider_metadata: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type CompletedInstitution = Institution & {
-  cover: Cover;
-};
 
 const { t } = useI18n();
 const route = useRoute();
@@ -82,7 +44,7 @@ const institutions = ref<Institution[]>([]);
 const taskProgress = ref<{ sprint: string; columns: any }[]>([]);
 
 const ganttRef = ref<GanttInstance | null>(null);
-const ganttItems = ref<Task[]>([]);
+const ganttItems = ref<GanttItem[]>([]);
 const ganttSprints = ref<GanttSprint[]>([]);
 const ganttView = ref('month');
 
@@ -134,9 +96,9 @@ onBeforeMount(async () => {
       return navigateTo('/projects/me');
     }
 
-    institutions.value = response.data.institutions as never;
+    institutions.value = response.data.institutions as Institution[];
 
-    const res = await strapi<Data>(`learningplans/${route.params.id}/project-dashboard`);
+    const res = await strapi<DashboardResponse>(`learningplans/${route.params.id}/project-dashboard`);
 
     totalizers.value.epics.value = res.counters.totalEpics;
     totalizers.value.epics.percentage = res.counters.finishedEpicsPercent || 0;
@@ -213,7 +175,7 @@ onBeforeMount(async () => {
               v-else-if="ganttItems.length"
               ref="ganttRef"
               class="tw-flex-1"
-              :max-height="475"
+              :max-height="375"
               :items="ganttItems"
               :sprints="ganttSprints"
               :view="ganttView"
@@ -222,7 +184,7 @@ onBeforeMount(async () => {
           </div>
         </template>
       </alex-custom-card>
-      <overview-task-progress
+      <TaskProgress
         class="tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
         :categories="'total'"
         last-update="2024-07-11 12:00"
@@ -267,24 +229,25 @@ onBeforeMount(async () => {
         </template>
       </alex-custom-card>
       <div
-        class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4 rounded-lg"
+        class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4 rounded-lg"
       >
         <div class="tw-border-b tw-p-5 tw-flex tw-justify-between tw-items-center">
           <h3>{{ $t('pages.projects.overview.institutions') }}</h3>
-          <alex-project-dialogs-institution :institutions="institutions" />
+          <InstitutionDialog :institutions="institutions" />
         </div>
-        <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2 tw-w-full my-auto pa-6">
-          <alex-profile-institution-item
-            v-for="institution in institutions"
-            :id="institution.id"
-            :key="institution.id"
-            class="tw-cursor-pointer"
-            :url="institution.cover.url"
-            :name="institution.name"
-            :acronym="institution.acronym"
-            :sector="institution.sector"
-          />
-          <div v-if="institutions.length === 0">
+        <div class="tw-flex tw-flex-1 tw-flex-col tw-gap-4 tw-p-4">
+          <template v-if="institutions.length">
+            <alex-profile-institution-item
+              v-for="institution in institutions"
+              :id="institution.id"
+              :key="institution.id"
+              :url="institution.cover?.url"
+              :name="institution.name"
+              :acronym="institution.acronym"
+              :sector="institution.sector"
+            />
+          </template>
+          <div v-else class="tw-m-auto">
             <alex-custom-empty-placeholder
               :empty-text-message="t('pages.projects.overview.empty_institutions')"
               empty-text-image="/svg/OverviewEmptyInstitution.svg"

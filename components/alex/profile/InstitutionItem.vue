@@ -1,31 +1,3 @@
-<template>
-  <div
-    :class="[
-      isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item',
-      backgroundColor,
-    ]"
-  >
-    <div class="d-flex gap-3">
-      <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
-      <div class="d-flex flex-column justify-center">
-        <span>{{ acronym + ' - ' + name }}</span>
-        <p>{{ sector }}</p>
-      </div>
-    </div>
-    <div v-if="canEdit" class="d-flex align-center mr-3 options">
-      <img class="handle" src="/svg/menu.svg" />
-      <alex-custom-button
-        variant="text"
-        class="remove"
-        color="error-0"
-        icon="mdi-trash-can-outline"
-        size="small"
-        @click="removeInstitution"
-      />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 export interface InstitutionItemEmits {
   (e: 'delete:institution', value: number): void; // triggers when the user clicks on the delete button
@@ -58,6 +30,29 @@ const removeInstitution = () => {
   emit('delete:institution', props.id);
 };
 </script>
+
+<template>
+  <div :class="[isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item', backgroundColor]">
+    <div class="d-flex gap-3">
+      <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
+      <div class="d-flex flex-column justify-center">
+        <span>{{ acronym ? `${acronym} - ${name}` : name }}</span>
+        <p>{{ sector }}</p>
+      </div>
+    </div>
+    <div v-if="canEdit" class="d-flex align-center mr-3 options">
+      <img class="handle" src="/svg/menu.svg" />
+      <alex-custom-button
+        variant="text"
+        class="remove"
+        color="error-0"
+        icon="mdi-trash-can-outline"
+        size="small"
+        @click="removeInstitution"
+      />
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .gap-3 {

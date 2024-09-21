@@ -33,16 +33,16 @@ export interface GanttInstance extends ComponentPublicInstance {
   changeToCurrentDate(): void;
 }
 
-export type Item = {
+export type GanttItem = {
   id: string;
   title: string;
   organization: ItemType;
   start_at: Date | string;
   finish_at: Date | string;
-  tasks?: Item[];
+  tasks?: GanttItem[];
 };
 
-export type Sprint = {
+export type GanttSprint = {
   id: string;
   title: string;
   start_at: Date | string;
@@ -51,8 +51,8 @@ export type Sprint = {
 
 type Props = {
   view?: ViewType;
-  items?: Item[];
-  sprints?: Sprint[];
+  items?: GanttItem[];
+  sprints?: GanttSprint[];
   maxHeight?: number;
 };
 
@@ -85,11 +85,11 @@ const initItems = computed<TimelineItem[]>(() => {
 });
 
 const dataSet = computed(() => {
-  function parse(arr: Item[], level = 0): [TimelineGroup[], TimelineItem[]] {
+  function parse(arr: GanttItem[], level = 0): [TimelineGroup[], TimelineItem[]] {
     const groups: TimelineGroup[] = [];
     const items: TimelineItem[] = [];
 
-    const getId = (item: Item) => `${item.organization}-${item.id}`;
+    const getId = (item: GanttItem) => `${item.organization}-${item.id}`;
 
     for (const item of arr) {
       const itemId = getId(item);
@@ -255,14 +255,12 @@ onMounted(() => {
 
   timeline.on('remove', (evt) => evt.preventDefault());
   timeline.on('move', (evt) => evt.oldGroup !== evt.newGroup && evt.preventDefault());
-  timelineRef.value.addEventListener('wheel', (evt) => evt.preventDefault(), { passive: false }); // https://stackoverflow.com/a/70581384/2528550
   window.addEventListener('resize', resize);
   setTimeout(resize, 300);
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', resize);
-  timelineRef.value?.removeEventListener('wheel', (evt) => evt.stopPropagation());
   timeline?.destroy();
 });
 
@@ -300,6 +298,10 @@ defineExpose({ changeView, changeToCurrentDate });
 .vis-item.standard {
   @apply tw-bg-cyan-100 tw-border-cyan-200 #{!important};
 }
+
+// .vis-item.vis-selected {
+//   @apply tw-bg-yellow-200 tw-border-yellow-400 #{!important};
+// }
 
 .vis-panel.vis-center,
 .vis-panel.vis-left,
