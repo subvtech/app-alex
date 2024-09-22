@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import * as yup from 'yup';
+import { formatCNPJ } from '~/utils/format-cnpj';
+import { formatPhone } from '~/utils/format-phone';
 import { get } from '~/utils/get';
 import { omit } from '~/utils/omit';
 import { onlyNumbers } from '~/utils/only-numbers';
@@ -44,6 +46,13 @@ const stepsConfig = {
         .email(t('pages.projects.overview.institution_dialog.errors.email_invalid'))
         .required(t('pages.projects.overview.institution_dialog.errors.email_required')),
       nomeFantasia: yup.string().required(t('pages.projects.overview.institution_dialog.errors.trade_name_required')),
+      phone: yup
+        .string()
+        .test('phone-length', t('pages.projects.overview.institution_dialog.errors.phone_invalid'), (_, item) => {
+          if (!item.parent.telefone) return true;
+          const { length } = onlyNumbers(item.parent.telefone);
+          return length >= 10 && length <= 11; // TODO: Colocar indicação visual no erro da validação do telefone
+        }),
       razaoSocial: yup
         .string()
         .required(t('pages.projects.overview.institution_dialog.errors.registered_name_required')),
@@ -61,22 +70,6 @@ const stepsConfig = {
   },
 };
 
-const rules = {
-  cnpj: [(v: string) => !!v || t('pages.projects.overview.institution_dialog.errors.cnpj_required')],
-  email: [(v: string) => !!v || t('pages.projects.overview.institution_dialog.errors.email_required')],
-  sector: [(v: string) => !!v || t('pages.projects.overview.institution_dialog.errors.sector_required')],
-  socialName: [(v: string) => !!v || t('pages.projects.overview.institution_dialog.errors.registered_name_required')],
-  tradeName: [(v: string) => !!v || t('pages.projects.overview.institution_dialog.errors.trade_name_required')],
-};
-
-const formatCNPJ = () => {
-  const parsed = onlyNumbers(formData.value.cnpj);
-  const formatted = parsed.padStart(14, '0').replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-
-  formData.value.cnpj = formatted;
-  if (parsed.length === 14) fetchCNPJ(parsed);
-};
-
 const fetchCNPJ = async (value: string) => {
   try {
     const res = await fetch(`https://api-publica.speedio.com.br/buscarcnpj?cnpj=${onlyNumbers(value)}`);
@@ -88,7 +81,7 @@ const fetchCNPJ = async (value: string) => {
         address: data.address || `${data['TIPO LOGRADOURO']} ${data.LOGRADOURO}, ${data.BAIRRO}, ${data.MUNICIPIO} - ${data.UF}, ${data.CEP}`, // prettier-ignore
         email: data.EMAIL || data.email,
         name: data['NOME FANTASIA'] || data.nomeFantasia,
-        phone: `${data.DDD} ${data.TELEFONE}` || data.phone,
+        phone: formatPhone(`(${data.DDD}) ${data.TELEFONE}` || data.phone),
         sector: data.SETOR || data.sector,
         socialName: data['RAZAO SOCIAL'] || data.razaoSocial,
       };
@@ -112,7 +105,11 @@ const handleSubmit = async () => {
     // TODO: Criar endpoint de criação de instituição que vincule com o learning plan
     // para garantir que os dados estejam consistentes (adicionar transaction)... Além disso,
     // validar os atributos que podem ser criados/alterados pelo usuário.
-    const data = { ...omit('userId', formData.value), users: [formData.value.userId] };
+    const data = {
+      ...omit('userId', formData.value),
+      phone: onlyNumbers(formData.value.phone),
+      users: [formData.value.userId],
+    };
     const res = formData.value.id
       ? await update(`institutions/${formData.value.id}`, data)
       : await create('institutions', data);
@@ -135,9 +132,19 @@ const handleSubmit = async () => {
 
 watchEffect(() => {
   if (props.institution) {
-    formData.value = { ...props.institution, userId: props.institution.users?.[0]?.id };
+    formData.value = {
+      ...props.institution,
+      cnpj: formatCNPJ(props.institution.cnpj),
+      phone: formatPhone(props.institution.phone),
+      userId: props.institution.users?.[0]?.id,
+    };
     openModal.value = true;
   }
+});
+
+watchEffect(() => {
+  const cnpj = onlyNumbers(formData.value.cnpj);
+  if (cnpj.length === 14 && formData.value.cnpj !== props.institution?.cnpj) fetchCNPJ(cnpj);
 });
 </script>
 
@@ -184,9 +191,8 @@ watchEffect(() => {
                       minlength="14"
                       name="cnpj"
                       :label="$t('pages.projects.overview.institution_dialog.cnpj')"
-                      :placeholder="'Ex: 01.234.567/0001-89'"
-                      :rules="rules.cnpj"
-                      @change="formatCNPJ"
+                      :placeholder="'01.234.567/0001-89'"
+                      @input="formData.cnpj = formatCNPJ(formData.cnpj)"
                     />
                     <alex-inputs-text-field
                       v-model="formData.name"
@@ -194,7 +200,6 @@ watchEffect(() => {
                       name="nomeFantasia"
                       :label="$t('pages.projects.overview.institution_dialog.trade_name')"
                       :placeholder="'Instituto Federal de Alagoas'"
-                      :rules="rules.tradeName"
                     />
                   </v-col>
                 </v-col>
@@ -205,7 +210,6 @@ watchEffect(() => {
                     name="razaoSocial"
                     :label="$t('pages.projects.overview.institution_dialog.registered_name')"
                     :placeholder="'Ex: Instituto Federal de Alagoas'"
-                    :rules="rules.socialName"
                   />
                 </v-col>
                 <v-col cols="12">
@@ -215,7 +219,6 @@ watchEffect(() => {
                     name="email"
                     :label="$t('pages.projects.overview.institution_dialog.email')"
                     :placeholder="'Ex: ifal@ifal.edu.br'"
-                    :rules="rules.email"
                   />
                 </v-col>
                 <v-col cols="6">
@@ -225,17 +228,15 @@ watchEffect(() => {
                     required
                     :label="$t('pages.projects.overview.institution_dialog.sector')"
                     :placeholder="'Ex: Educação'"
-                    :rules="rules.sector"
                   />
                 </v-col>
                 <v-col cols="6">
                   <alex-inputs-text-field
                     v-model="formData.phone"
-                    minlength="10"
                     name="telefone"
-                    maxlength="11"
                     :label="$t('pages.projects.overview.institution_dialog.phone')"
-                    :placeholder="'Ex: 3355-7722'"
+                    :placeholder="'(12) 3456-7890'"
+                    @input="(formData.phone = formatPhone(formData.phone)), console.log(formData.phone)"
                   />
                 </v-col>
                 <v-col cols="12">

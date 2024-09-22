@@ -1,3 +1,3 @@
-export const onlyNumbers = (value: string) => {
+export const onlyNumbers = (value = '') => {
   return value.replace(/\D/g, '');
 };
