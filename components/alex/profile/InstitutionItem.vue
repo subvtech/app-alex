@@ -19,7 +19,7 @@ export interface InstitutionComponentType {
 const props = withDefaults(defineProps<InstitutionComponentType>(), {
   isDeleted: false,
   canEdit: false,
-  backgroundColor: 'bg-white',
+  backgroundColor: '',
   url: undefined,
 });
 
@@ -32,7 +32,7 @@ const removeInstitution = () => {
 </script>
 
 <template>
-  <div :class="[isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item', backgroundColor]">
+  <div :class="[isDeleted ? 'd-none' : 'tw-bg-white tw-flex justify-space-between pa-4 w-100 item', backgroundColor]">
     <div class="d-flex gap-3">
       <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
       <div class="d-flex flex-column justify-center">

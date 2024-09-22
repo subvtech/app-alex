@@ -47,7 +47,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       ],
     },
     institutions: {
-      populate: ['cover'],
+      populate: ['cover', 'users'],
     },
     projects: {
       populate: ['members', 'members.user.avatar', 'members.user.cover'],
@@ -161,11 +161,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const activeProjectMembers = computed(() => {
-    return (
-      learningPlan.value?.members.filter(
-        (m: LearningPlanMemberSimple) => m.status === MemberStatus.JOINED,
-      ) || []
-    );
+    return learningPlan.value?.members.filter((v: LearningPlanMemberSimple) => v.status === MemberStatus.JOINED) || [];
   });
 
   const pendingMembers = computed(() => {

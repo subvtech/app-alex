@@ -26,7 +26,7 @@ export const omit = curry(function <T extends object>(path: string | string[], t
     if (rest.length === 0) {
       return (
         Array.isArray(data)
-          ? data.filter((_, idx) => idx !== key)
+          ? data.filter((_, idx) => idx !== +key)
           : Object.fromEntries(Object.entries(data).filter(([k]) => k !== key))
       ) as T;
     }
@@ -42,13 +42,16 @@ export const omit = curry(function <T extends object>(path: string | string[], t
     return data;
   };
 
-  return keys.reduce((acc, key) => {
-    return _omit(
-      acc,
-      key.split('.').map((att) => {
-        const arr = att.match(/^\[?(\d+)\]?$/);
-        return arr ? parseInt(arr[1], 10) : att;
-      }),
-    );
-  }, structuredClone(target));
+  return keys.reduce(
+    (acc, key) => {
+      return _omit(
+        acc as T,
+        key.split('.').map((att) => {
+          const arr = att.match(/^\[?(\d+)\]?$/);
+          return arr ? parseInt(arr[1], 10) : att;
+        }),
+      );
+    },
+    Array.isArray(target) ? [...target] : { ...target },
+  );
 });

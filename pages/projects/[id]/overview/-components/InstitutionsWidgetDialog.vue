@@ -1,46 +1,36 @@
 <script setup lang="ts">
 import * as yup from 'yup';
-import { useUserPermissions } from '~/composables/useUserPermissions';
 import { get } from '~/utils/get';
+import { omit } from '~/utils/omit';
 import { onlyNumbers } from '~/utils/only-numbers';
 
-interface InstitutionForm {
-  address: string;
-  cnpj: string;
-  cover: Upload | null;
-  email: string;
-  legalRepresentativeId: number | null;
-  name: string;
-  phone: string;
-  sector: string;
-  socialName: string;
+interface InstitutionForm extends Institution {
+  userId?: number;
 }
 
 interface InstitutionsProps {
+  canCreateInstitution: boolean;
+  canUpdateInstitution: boolean;
+  institution?: Institution | null;
   institutions: Institution[];
+  users: StrapiUser[];
 }
 
+const emit = defineEmits(['close', 'success']);
 const props = defineProps<InstitutionsProps>();
 
 const { t } = useI18n();
 const { create, update } = useStrapi();
 const { setMessage } = useMessageStore();
-const strapiClient = useStrapiClient();
 const route = useRoute();
-const userPermissions = useUserPermissions();
 
 const formValid = ref(false);
 const openModal = ref(false);
 const saving = ref(false);
-const users = ref<StrapiUser[]>([]);
-const formData = ref<InstitutionForm>({} as InstitutionForm);
+const formData = ref({} as InstitutionForm);
 
 const learningPlanId = computed(() => {
   return parseInt(route.params?.id.toString());
-});
-
-const canCreateInstitution = computed(() => {
-  return userPermissions.value.includes('api::institution.institution:create');
 });
 
 const stepsConfig = {
@@ -110,32 +100,32 @@ const fetchCNPJ = async (value: string) => {
   }
 };
 
-const fetchUsers = async () => {
-  try {
-    const res = await strapiClient<StrapiUser[]>('users');
-    if (!res) throw new Error(t('pages.projects.overview.institution_dialog.errors.fetch_users'));
-    users.value = res;
-  } catch (err) {
-    setMessage((err as Error).message, 'red');
-  }
-};
-
-const closeDialog = () => {
-  openModal.value = false;
+const handleAfterClose = () => {
   formData.value = {} as InstitutionForm;
+  emit('close');
 };
 
-const submit = async () => {
+const handleSubmit = async () => {
   saving.value = true;
 
   try {
     // TODO: Criar endpoint de criação de instituição que vincule com o learning plan
-    // para garantir que os dados estejam consistentes (adicionar transaction)
-    const res = await create('institutions', formData.value);
+    // para garantir que os dados estejam consistentes (adicionar transaction)... Além disso,
+    // validar os atributos que podem ser criados/alterados pelo usuário.
+    const data = { ...omit('userId', formData.value), users: [formData.value.userId] };
+    const res = formData.value.id
+      ? await update(`institutions/${formData.value.id}`, data)
+      : await create('institutions', data);
     const ids = props.institutions.map(get('id')).concat(res.data.id);
-    await update(`learningplans/${learningPlanId.value}`, { institutions: ids });
 
-    closeDialog();
+    await update(`learningplans/${learningPlanId.value}`, { institutions: ids });
+    openModal.value = false;
+
+    emit('success', {
+      ...res.data.attributes,
+      id: res.data.id,
+      users: props.users.filter((user) => user.id === formData.value.userId),
+    });
   } catch (err) {
     setMessage((err as Error).message, 'red');
   } finally {
@@ -144,56 +134,34 @@ const submit = async () => {
 };
 
 watchEffect(() => {
-  try {
-    if (canCreateInstitution.value && !users.value.length) fetchUsers();
-  } catch (err) {
-    setMessage((err as Error).message, 'red');
+  if (props.institution) {
+    formData.value = { ...props.institution, userId: props.institution.users?.[0]?.id };
+    openModal.value = true;
   }
 });
 </script>
 
 <template>
   <div>
-    <alex-custom-button v-if="canCreateInstitution" :variant="'text'" @click="openModal = true">
+    <alex-custom-button v-if="canCreateInstitution" class="!tw-min-w-fit" :variant="'text'" @click="openModal = true">
       <v-icon>mdi-plus</v-icon>
     </alex-custom-button>
-    <v-dialog v-model="openModal" width="50%" persistent>
-      <v-form v-model="formValid" @submit.prevent="submit">
+    <v-dialog v-model="openModal" persistent width="50%" @after-leave="handleAfterClose">
+      <v-form v-model="formValid" @submit.prevent="handleSubmit">
         <v-card width="100%" class="pa-3">
           <v-card-title class="d-flex justify-space-between align-center font-weight-700">
-            {{ $t('pages.projects.overview.institution_dialog.title') }}
-            <alex-custom-button variant="text" icon="mdi-plus" size="default" @click="closeDialog">
+            {{
+              $t('pages.projects.overview.institution_dialog.title', [
+                formData.id
+                  ? $t('pages.projects.overview.institution_dialog.update')
+                  : $t('pages.projects.overview.institution_dialog.add'),
+              ])
+            }}
+            <alex-custom-button class="!tw-min-w-fit" size="default" variant="text" @click="openModal = false">
               <v-icon>mdi-close</v-icon>
             </alex-custom-button>
           </v-card-title>
-          <alex-inputs-stepper :loading="saving" :steps-config="stepsConfig" @on-success="submit">
-            <template #controls="{ isFirstStep, isValid, loading, onPrevStep }">
-              <div class="tw-flex tw-justify-between tw-gap-4 tw-px-5 tw-pb-4">
-                <alex-custom-button
-                  variant="secondary"
-                  :text="t('pages.projects.overview.institution_dialog.cancel')"
-                  @click="closeDialog"
-                />
-                <div class="tw-flex tw-gap-4">
-                  <alex-custom-button
-                    variant="secondary"
-                    :disabled="isFirstStep"
-                    :text="t('pages.projects.overview.institution_dialog.back')"
-                    @click="onPrevStep"
-                  />
-                  <alex-custom-button
-                    type="submit"
-                    :disabled="!isValid || !formData.cnpj || (!isFirstStep && !formData.legalRepresentativeId)"
-                    :loading="loading"
-                    :text="
-                      isFirstStep
-                        ? t('pages.projects.overview.institution_dialog.next')
-                        : $t('pages.projects.overview.institution_dialog.add')
-                    "
-                  />
-                </div>
-              </div>
-            </template>
+          <alex-inputs-stepper :loading="saving" :steps-config="stepsConfig" @on-success="handleSubmit">
             <template #step1>
               <v-row justify="start" class="pa-5" dense>
                 <v-col cols="12" class="d-flex">
@@ -290,13 +258,13 @@ watchEffect(() => {
                       avatar-style="border-radius: 10%"
                       :size="180"
                       :profile-picture="formData.cover ? { id: formData.cover.id, url: formData.cover.url } : null"
-                      :user-id="formData.legalRepresentativeId"
+                      :user-id="formData.userId"
                     />
                   </div>
                 </v-col>
                 <v-col cols="12">
                   <alex-inputs-select
-                    v-model="formData.legalRepresentativeId"
+                    v-model="formData.userId"
                     required
                     name="legalRepresentativeId"
                     :items="users.map((user) => ({ title: user.fullname, value: user.id }))"
@@ -305,6 +273,35 @@ watchEffect(() => {
                   />
                 </v-col>
               </v-row>
+            </template>
+            <template #controls="{ isFirstStep, isValid, loading, onPrevStep }">
+              <div class="tw-flex tw-justify-between tw-gap-4 tw-px-5 tw-pb-4">
+                <alex-custom-button
+                  variant="secondary"
+                  :text="t('pages.projects.overview.institution_dialog.cancel')"
+                  @click="openModal = false"
+                />
+                <div class="tw-flex tw-gap-4">
+                  <alex-custom-button
+                    variant="secondary"
+                    :disabled="isFirstStep"
+                    :text="t('pages.projects.overview.institution_dialog.back')"
+                    @click="onPrevStep"
+                  />
+                  <alex-custom-button
+                    type="submit"
+                    :disabled="!isValid || !formData.cnpj || (!isFirstStep && !formData.userId)"
+                    :loading="loading"
+                    :text="
+                      isFirstStep
+                        ? $t('pages.projects.overview.institution_dialog.next')
+                        : formData.id
+                        ? $t('pages.projects.overview.institution_dialog.update')
+                        : $t('pages.projects.overview.institution_dialog.add')
+                    "
+                  />
+                </div>
+              </div>
             </template>
           </alex-inputs-stepper>
         </v-card>

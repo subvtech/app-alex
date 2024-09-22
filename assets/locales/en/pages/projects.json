@@ -59,7 +59,7 @@
       "registered_name": "Registered name",
       "search_member": "Search member",
       "sector": "Sector",
-      "title": "Add institution",
+      "title": "{0} institution",
       "trade_name": "Trade name",
       "update": "Update"
     },
