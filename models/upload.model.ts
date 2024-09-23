@@ -11,25 +11,25 @@ type Format = {
 };
 
 export interface Upload {
-  alternativeText: string | null;
-  caption: string | null;
-  createdAt: string;
+  alternativeText?: string | null;
+  caption?: string | null;
+  createdAt?: string;
   ext?: string;
   formats?: {
     medium: Format;
     small: Format;
     thumbnail: Format;
   };
-  hash: string;
-  height: number;
-  id: number;
-  mime: string;
+  hash?: string;
+  height?: number;
+  id?: number;
+  mime?: string;
   name?: string;
-  previewUrl: string | null;
-  provider_metadata: string | null;
-  provider: string;
+  previewUrl?: string | null;
+  provider_metadata?: string | null;
+  provider?: string;
   size?: number;
-  updatedAt: string;
+  updatedAt?: string;
   url: string;
-  width: number;
+  width?: number;
 }

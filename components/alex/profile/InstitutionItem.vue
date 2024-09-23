@@ -6,20 +6,22 @@ export interface InstitutionItemEmits {
 const emit = defineEmits<InstitutionItemEmits>();
 
 export interface InstitutionComponentType {
-  url?: string;
-  name: string;
   acronym: string;
-  sector: string;
-  canEdit: boolean;
-  isDeleted: boolean;
   backgroundColor?: string;
+  canEdit: boolean;
+  fallback?: string;
   id: number;
+  isDeleted: boolean;
+  name: string;
+  sector: string;
+  url?: string;
 }
 
 const props = withDefaults(defineProps<InstitutionComponentType>(), {
-  isDeleted: false,
-  canEdit: false,
   backgroundColor: '',
+  canEdit: false,
+  fallback: undefined,
+  isDeleted: false,
   url: undefined,
 });
 
@@ -35,7 +37,13 @@ const removeInstitution = () => {
   <div :class="[isDeleted ? 'd-none' : 'tw-bg-white tw-flex justify-space-between pa-4 w-100 item', backgroundColor]">
     <div class="d-flex gap-3">
       <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
-      <div class="d-flex flex-column justify-center">
+      <div
+        v-else-if="fallback"
+        class="tw-bg-slate-200 tw-rounded-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-size-[80px]"
+      >
+        {{ fallback }}
+      </div>
+      <div class="tw-flex tw-flex-col tw-justify-center">
         <span>{{ acronym ? `${acronym} - ${name}` : name }}</span>
         <p>{{ sector }}</p>
       </div>

@@ -1,6 +1,8 @@
 type DefaultStrapiUser = import('@nuxtjs/strapi/dist/runtime/types').StrapiUser;
+type Upload = import('@/models/upload.model').Upload;
 
 interface StrapiUser extends NonNullable<DefaultStrapiUser> {
+  avatar?: Upload;
   fullname?: string;
   permissions: string[];
   role: {

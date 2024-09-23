@@ -1,9 +1,7 @@
 const client = useStrapiClient();
 export const useUploadedImage = () => {
-  const updateImage = async (event: Event, imageId: string): Promise<any> => {
-    const files: FileList | null | undefined = event.target
-      ? (event.target as HTMLInputElement).files
-      : null;
+  const updateImage = async (event: Event, imageId: number | string): Promise<any> => {
+    const files: FileList | null | undefined = event.target ? (event.target as HTMLInputElement).files : null;
 
     if (!files) return;
 
@@ -21,10 +19,8 @@ export const useUploadedImage = () => {
     }
   };
 
-  const uploadImage = async (event) => {
-    const files: FileList | null | undefined = event.target
-      ? (event.target as HTMLInputElement).files
-      : null;
+  const uploadImage = async (event: Event) => {
+    const files: FileList | null | undefined = event.target ? (event.target as HTMLInputElement).files : null;
 
     if (!files) return;
 

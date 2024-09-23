@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GanttInstance, GanttItem, GanttSprint } from '@/components/Gantt.vue';
+import Gantt, { GanttInstance, GanttItem, GanttSprint, GanttViewType } from '@/components/Gantt.vue';
 
 export interface GanttWidgetProps {
   items: GanttItem[];
@@ -13,7 +13,8 @@ withDefaults(defineProps<GanttWidgetProps>(), {
 });
 
 const ganttRef = ref<GanttInstance | null>(null);
-const ganttView = ref('month');
+const ganttView = ref(GanttViewType.Month);
+const viewTypes = [GanttViewType.Day, GanttViewType.Week, GanttViewType.Month];
 </script>
 
 <template>
@@ -36,7 +37,7 @@ const ganttView = ref('month');
         </div>
         <div class="tw-flex tw-gap-1 tw-overflow-auto">
           <alex-custom-button
-            v-for="view in ['day', 'week', 'month']"
+            v-for="view in viewTypes"
             :key="view"
             :variant="ganttView === view ? 'secondary' : 'text'"
             @click="ganttView = view"
@@ -55,7 +56,7 @@ const ganttView = ref('month');
           v-else-if="items.length"
           ref="ganttRef"
           class="tw-flex-1"
-          :max-height="375"
+          :max-height="380"
           :items="items"
           :sprints="sprints"
           :view="ganttView"

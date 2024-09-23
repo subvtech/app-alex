@@ -34,7 +34,7 @@ const canUpdateInstitution = computed(() => {
 
 const fetchUsers = async () => {
   try {
-    const res = await strapiClient<StrapiUser[]>('users');
+    const res = await strapiClient<StrapiUser[]>('users?populate=avatar');
     if (!res) throw new Error(t('pages.projects.overview.institution_dialog.errors.fetch_users'));
     users.value = res;
   } catch (err) {
@@ -73,11 +73,12 @@ watchEffect(() => {
           v-for="institution in institutions"
           :id="institution.id"
           :key="institution.id"
-          :url="institution.cover?.url"
-          :name="institution.name"
           :acronym="institution.acronym"
+          :class="canUpdateInstitution ? 'tw-cursor-pointer hover:tw-bg-slate-50' : ''"
+          :fallback="getInitials(institution.name)"
+          :name="institution.name"
           :sector="institution.sector"
-          :class="canUpdateInstitution ? 'tw-cursor-pointer hover:tw-bg-slate-100' : ''"
+          :url="institution.cover?.url"
           @click="canUpdateInstitution ? (selectedInstitution = institution) : null"
         />
       </template>

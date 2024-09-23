@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import * as yup from 'yup';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { formatCNPJ } from '~/utils/format-cnpj';
 import { formatPhone } from '~/utils/format-phone';
 import { get } from '~/utils/get';
-import { omit } from '~/utils/omit';
 import { onlyNumbers } from '~/utils/only-numbers';
 
 interface InstitutionForm extends Institution {
+  files?: FileList | null;
   userId?: number;
 }
 
@@ -24,15 +25,21 @@ const props = defineProps<InstitutionsProps>();
 const { t } = useI18n();
 const { create, update } = useStrapi();
 const { setMessage } = useMessageStore();
+const { removeImage, updateImage, uploadImage } = useUploadedImage();
 const route = useRoute();
 
 const formValid = ref(false);
 const openModal = ref(false);
 const saving = ref(false);
 const formData = ref({} as InstitutionForm);
+const instImgInput = ref<HTMLInputElement | null>(null);
 
 const learningPlanId = computed(() => {
-  return parseInt(route.params?.id.toString());
+  return +route.params?.id;
+});
+
+const selectedUser = computed(() => {
+  return props.users.find((user) => user.id === formData.value.userId);
 });
 
 const stepsConfig = {
@@ -98,28 +105,61 @@ const handleAfterClose = () => {
   emit('close');
 };
 
+const handleFileUpload = (event: Event) => {
+  const { files } = event.target as HTMLInputElement;
+
+  if (files?.length) {
+    const reader = new FileReader();
+    formData.value.files = files;
+    reader.onload = () => {
+      formData.value.cover = {
+        name: files[0].name,
+        url: reader.result as string,
+      };
+    };
+    reader.readAsDataURL(files[0]);
+  }
+};
+
+// TODO: Criar endpoint de criação de instituição que vincule com o learning plan e trate
+// o upload de imagem para garantir que os dados estejam consistentes (adicionar transaction).
+// Além disso, validar os atributos que podem ser criados/alterados pelo usuário.
 const handleSubmit = async () => {
   saving.value = true;
 
   try {
-    // TODO: Criar endpoint de criação de instituição que vincule com o learning plan
-    // para garantir que os dados estejam consistentes (adicionar transaction)... Além disso,
-    // validar os atributos que podem ser criados/alterados pelo usuário.
-    const data = {
-      ...omit('userId', formData.value),
-      phone: onlyNumbers(formData.value.phone),
-      users: [formData.value.userId],
-    };
-    const res = formData.value.id
-      ? await update(`institutions/${formData.value.id}`, data)
-      : await create('institutions', data);
-    const ids = props.institutions.map(get('id')).concat(res.data.id);
+    const { cover: prevCover } = props.institution || {};
+    const { files, userId, ...value } = formData.value;
 
-    await update(`learningplans/${learningPlanId.value}`, { institutions: ids });
+    const image = await (async (): Promise<Upload | null | void> => {
+      if (value.cover && !prevCover?.id) {
+        return (await uploadImage({ target: { files } } as never))[0];
+      } else if (value.cover && prevCover?.id) {
+        return await updateImage({ target: { files } } as never, prevCover!.id!);
+      } else if (!value.cover && prevCover?.id) {
+        await removeImage(prevCover.id);
+        return null;
+      }
+    })();
+
+    value.cover = image?.id as never;
+    value.phone = onlyNumbers(value.phone);
+    value.users = [userId] as never;
+
+    const res = formData.value.id
+      ? await update(`institutions/${formData.value.id}`, value)
+      : await create('institutions', value);
+
+    if (!props.institutions.find((v) => v.id === res.data.id)) {
+      const ids = props.institutions.map(get('id')).concat(res.data.id);
+      await update(`learningplans/${learningPlanId.value}`, { institutions: ids });
+    }
+
     openModal.value = false;
 
     emit('success', {
       ...res.data.attributes,
+      cover: image,
       id: res.data.id,
       users: props.users.filter((user) => user.id === formData.value.userId),
     });
@@ -172,16 +212,54 @@ watchEffect(() => {
             <template #step1>
               <v-row justify="start" class="pa-5" dense>
                 <v-col cols="12" class="d-flex">
-                  <v-col cols="4" class="d-flex flex-column justify-center align-center">
-                    <app-user-avatar
-                      can-edit
-                      can-delete
-                      avatar-style="border-radius:10px;"
-                      :placeholder="formData.socialName"
-                      :profile-picture="formData.cover ? { id: formData.cover.id, url: formData.cover.url } : null"
-                      :size="180"
-                      :user-id="-1"
-                    />
+                  <v-col cols="4" class="tw-flex tw-p-4 tw-items-center tw-justify-center">
+                    <div class="tw-relative tw-flex tw-overflow-hidden tw-size-[175px] tw-text-center">
+                      <input
+                        ref="instImgInput"
+                        type="file"
+                        accept="image/*"
+                        class="tw-hidden"
+                        @change="handleFileUpload"
+                      />
+                      <img
+                        v-if="formData.cover"
+                        class="tw-border-[1px] tw-border-solid tw-flex-1 tw-object-cover tw-rounded-full"
+                        :src="formData.cover.url"
+                      />
+                      <div
+                        v-else
+                        :class="[
+                          'tw-border-2 tw-border-dashed tw-cursor-pointer tw-rounded-full',
+                          'tw-flex tw-flex-1 tw-flex-col tw-items-center tw-justify-center',
+                        ]"
+                        @click="!formData.cover && instImgInput?.click()"
+                      >
+                        <v-icon class="tw-text-slate-300" size="64">mdi-image</v-icon>
+                        <span class="tw-mx-4 tw-text-sm tw-text-slate-400">
+                          Clique aqui para adicionar uma imagem
+                        </span>
+                      </div>
+                      <div
+                        v-if="formData.cover"
+                        :class="[
+                          'tw-absolute tw-inset-0 tw-cursor-pointer tw-flex tw-items-center tw-justify-center tw-rounded-full',
+                          'tw-bg-black/50 tw-opacity-0 hover:tw-opacity-100 tw-transition-opacity !tw-duration-500',
+                        ]"
+                        @click.stop="instImgInput?.click()"
+                      >
+                        <v-icon class="tw-text-white tw-mr-1 tw-mt-[1px]" size="small">mdi-pencil</v-icon>
+                      </div>
+                      <alex-custom-button
+                        v-if="formData.cover"
+                        class="!tw-absolute !tw-bottom-2 !tw-right-2 !tw-min-w-fit !tw-min-h-fit"
+                        size="small"
+                        variant="error"
+                        style="padding: 6px 6px !important"
+                        @click.stop="formData.cover = null"
+                      >
+                        <img src="/svg/trash.svg" width="20" height="20" />
+                      </alex-custom-button>
+                    </div>
                   </v-col>
                   <v-col cols="8" class="d-flex flex-column">
                     <alex-inputs-text-field
@@ -252,16 +330,12 @@ watchEffect(() => {
             <template #step2>
               <v-row justify="start" class="pa-5" dense>
                 <v-col cols="12" class="d-flex justify-center align-center">
-                  <div class="rounded-circle w-130 h-130 d-flex justify-center align-center upload-container">
-                    <app-user-avatar
-                      can-edit
-                      can-delete
-                      avatar-style="border-radius: 10%"
-                      :size="180"
-                      :profile-picture="formData.cover ? { id: formData.cover.id, url: formData.cover.url } : null"
-                      :user-id="formData.userId"
-                    />
-                  </div>
+                  <Avatar size="lg">
+                    <AvatarImage :src="selectedUser?.avatar?.url || ''" :alt="selectedUser?.fullname" />
+                    <AvatarFallback class="tw-text-2xl tw-text-slate-500">
+                      {{ getInitials(selectedUser?.fullname || '') }}
+                    </AvatarFallback>
+                  </Avatar>
                 </v-col>
                 <v-col cols="12">
                   <alex-inputs-select
