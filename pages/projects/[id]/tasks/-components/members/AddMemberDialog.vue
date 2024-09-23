@@ -19,218 +19,87 @@
       density="comfortable"
       hide-details
     />
-    <p v-if="!hasStudentsToAdd" class="text-body-1 text-gray-400 text-center">
+    <p v-if="false" class="text-body-1 text-gray-400 text-center">
       Parece que todos os alunos foram adicionados a esta tarefa.
     </p>
-    <!-- <v-expansion-panel-title
-      ><alex-inputs-checkbox
-        :model-value="!!getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers)"
-        :indeterminate="getSelectedUsersStatus(classValue.id, filteredClasses, selectedUsers) === -1"
-        class="checkbox"
-        @click.stop="selectAllUsers(classValue.id, classes.data)"
-      />
-      <p class="text-body-2 tw-w-full text-gray-900">
-        {{ classValue.name }}
-      </p></v-expansion-panel-title
-    >
-    <alex-custom-list-item-user
-      v-for="member in classValue.learning_plan_members"
+    <Card
+      v-for="member in filteredMembers"
       :key="member.id"
-      :user="{
+      v-model="selectedMembers"
+      :member="{
         name: member.user.fullname,
-        email: member.email,
         image: member.user?.avatar?.formats?.small?.url || member.user?.avatar?.url,
+        responsable: member.responsable,
+        email: member.email,
       }"
-      no-chip
-      :is-selected-value="!!selectedUsers.find((user) => user.id === member.id)"
-      @click.stop="selectUser(member)"
-    /> -->
+      :raw="member"
+      no-delete
+      @toggle-responsable-click="handleUpdateResponsible"
+    />
+    <template #footer>
+      <alex-custom-dialog-footer
+        no-secondary-button
+        :main-button-text="'Adicionar'"
+        :main-button-disabled="!hasSelectedMembers || !hasResponsable"
+        @on-main-action="handleSubmit"
+      />
+    </template>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query';
+import { Member, useGetProjectMembers } from '../../-composables/useMember';
+import Card from './Card.vue';
+
 interface AddStudent {
   learningplanId: number;
-  members: TaskMember[];
 }
 const model = defineModel<boolean>({ required: true });
 const props = defineProps<AddStudent>();
 type Emits = {
   'add-click': [members: LearningPlanMemberSimple[]];
 };
-const emit = defineEmits<Emits>();
+defineEmits<Emits>();
+// refs
+// const { setMessage } = useMessageStore();
 const search = ref('');
 const loadingAdd = ref(false);
-const strapi = useStrapiUtils();
-const membersID = computed(() => props.members.map((member) => member.learning_plan_member?.id));
-const getMembers = (learningplanId: number) =>
-  strapi.find<ClassSimple>('classes', {
-    populate: {
-      learning_plan_members: {
-        populate: {
-          user: {
-            populate: ['avatar'],
-          },
-          learning_class: {
-            fields: ['id'],
-          },
-        },
-        filters: {
-          id: {
-            $notIn: membersID.value,
-          },
-        },
-      },
-    },
-    filters: { learningplan: learningplanId },
-  });
-const {
-  data: classes,
-  execute,
-  refresh,
-} = await useAsyncData('classes-member-invite', () => getMembers(props.learningplanId), {
-  default: () => ({ meta: 0, data: [] as ClassSimple[] }),
-  lazy: true,
-});
-const selectedUsers = ref<LearningPlanMemberSimple[]>([]);
-const filteredClasses = computed(() => {
-  if (!search.value) return classes.value.data;
-  const lowerCaseSearch = search.value.toLowerCase();
-  return classes.value.data.map((classValue) => ({
-    ...classValue,
-    learning_plan_members: classValue.learning_plan_members?.filter(
-      (member) =>
-        member.user.fullname.toLowerCase().includes(lowerCaseSearch) ||
-        member.user.email.toLowerCase().includes(lowerCaseSearch) ||
-        member.user.username.toLowerCase().includes(lowerCaseSearch),
-    ),
-  }));
-});
-const hasStudentsToAdd = computed(
-  () => filteredClasses.value.filter((studentClass) => !!studentClass.learning_plan_members?.length).length > 0,
-);
+const learningplanValue = toRef(props, 'learningplanId');
+const selectedMembers = ref<Member[]>([]);
 
-const handleSubmit = async () => {
-  try {
-    loadingAdd.value = true;
-    emit('add-click', selectedUsers.value);
-    await setTimeout(async () => {
-      await refresh();
-      loadingAdd.value = false;
-    }, 1000);
-  } catch (error) {}
+// computed
+const enabledGetMembers = computed(() => !!learningplanValue.value);
+const hasSelectedMembers = computed(() => !!selectedMembers.value.length);
+const hasResponsable = computed(() => !!selectedMembers.value.find((member) => member.responsable));
+const filteredMembers = computed(() => members.value.filter((member) => contains(member.user.fullname, search.value)));
+//
+const { data: members } = useGetProjectMembers(learningplanValue, enabledGetMembers);
+const queryClient = useQueryClient();
+
+// Methods
+const handleSubmit = () => {
+  console.log(selectedMembers.value);
 };
-watch(model, (value) => {
-  if (value) {
-    selectedUsers.value = [];
-    execute();
-  }
-});
+const handleUpdateResponsible = (member: Member | null) => {
+  selectedMembers.value = selectedMembers.value.map((oldMember) => {
+    if (member?.id === oldMember.id) {
+      return { ...oldMember, responsable: true };
+    }
+    return { ...oldMember, responsable: false };
+  });
+  queryClient.setQueryData<Member[]>(['project-members', learningplanValue], (oldData) => {
+    if (!oldData) {
+      return oldData;
+    }
+    return oldData.map((oldMember) => {
+      if (member?.id === oldMember.id) {
+        return { ...oldMember, responsable: true };
+      }
+      return { ...oldMember, responsable: false };
+    });
+  });
+};
 </script>
 
-<style lang="scss">
-.checkbox input,
-.checkbox .v-selection-control__input,
-.checkbox .v-selection-control__wrapper {
-  height: 30px !important;
-  width: 30px !important;
-}
-
-.checkbox,
-.checkbox .v-input,
-.checkbox .v-input__control,
-.checkbox .v-selection-control {
-  height: 30px !important;
-  width: 30px !important;
-  min-height: 30px;
-  justify-content: center;
-  margin-bottom: 0 !important;
-}
-.task-student-card {
-  box-shadow: none !important;
-  border-radius: 8px;
-  .v-theme--mainTheme {
-    --v-border-opacity: unset !important;
-  }
-
-  .v-expansion-panel,
-  .v-expansion-panel .v-expansion-panel--active {
-    padding: 0 !important;
-    margin-top: 8px;
-    border: solid 1px rgb(var(--v-theme-gray-100)) !important;
-    border-top-left-radius: 8px !important;
-    border-top-right-radius: 8px !important;
-    border-bottom-left-radius: 8px !important;
-    border-bottom-right-radius: 8px !important;
-  }
-  .v-expansion-panel:not(.v-expansion-panel--active):hover {
-    border: solid 1px rgb(var(--v-theme-gray-500)) !important;
-  }
-  .v-expansion-panel:not(:first-child)::after {
-    display: none !important;
-  }
-
-  &.group .v-expansion-panel-text__wrapper {
-    background-color: rgb(var(--v-theme-gray-blue));
-    padding: 8px !important;
-  }
-  .v-expansion-panel-text__wrapper {
-    padding: 0px !important;
-  }
-
-  .v-expansion-panel-title {
-    display: flex;
-    transition: all 0.3s ease;
-    height: 56px !important;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 16px;
-    background-color: transparent !important;
-    border-radius: 8px !important;
-  }
-
-  .v-expansion-panel-title__overlay {
-    display: none;
-  }
-
-  // .v-expansion-panel-title {
-  //   // display: flex !important;
-  //   // justify-content: space-between !important;
-  // }
-
-  .v-expansion-panel-title--active {
-    background-color: #fff !important;
-    height: 60px !important;
-    min-height: 60px !important;
-  }
-
-  .v-expansion-panel-title:hover:not(:has(.delete-btn:hover)) {
-    background-color: #fff !important;
-    border-radius: 8px;
-  }
-
-  .v-expansion-panel__shadow {
-    display: none !important;
-  }
-
-  .v-expansion-panel-title__icon {
-    margin-inline-start: 0 !important;
-  }
-
-  .v-expansion-panel__shadow {
-    display: none !important;
-  }
-  &.v-expansion-panels:not(.v-expansion-panels--variant-accordion)
-    > :last-child:not(:first-child):not(.v-expansion-panel--active),
-  &.v-expansion-panels:not(.v-expansion-panels--variant-accordion)
-    > :first-child:not(:last-child):not(.v-expansion-panel--active),
-  &.v-expansion-panels:not(.v-expansion-panels--variant-accordion)
-    > :not(:first-child):not(:last-child):not(.v-expansion-panel--active) {
-    border-top-left-radius: 8px !important;
-    border-top-right-radius: 8px !important;
-    border-bottom-left-radius: 8px !important;
-    border-bottom-right-radius: 8px !important;
-  }
-}
-</style>
+<style lang="scss"></style>

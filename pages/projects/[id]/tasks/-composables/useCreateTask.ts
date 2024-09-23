@@ -12,9 +12,10 @@ type CreateTaskPayload = {
   organization: TaskSimple['organization'];
   parentTask?: number;
   sprint?: number;
+  group?: boolean;
 };
 
-type CreateTaskResponse = Omit<TaskSimple, 'parent_task'> & {
+type CreateTaskResponse = Omit<TaskSimple, 'parent_task' | 'sprint'> & {
   learningplan: number;
   sprint: number;
   kanban_column: number;
@@ -41,6 +42,8 @@ export const useCreateTask = (
         title,
         parent_task: parentTask,
         sprint,
+        // @ts-ignore
+        group: true,
         organization,
       });
       task.data.sprint_id = sprint || 0;

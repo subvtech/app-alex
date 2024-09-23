@@ -1,90 +1,97 @@
-<template>
-  <div
-    class="d-flex align-center ga-2 pa-2"
-    :class="{ 'list-card': clickable }"
-    @click="clickable && $emit('to-profile')"
-  >
-    <v-img
-      v-if="!member.group"
-      class="avatar flex-0-0 rounded-circle"
-      :src="
-        member.avatarUrl || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
-      "
-      :alt="$t('components.learningPlan.members.member.label')"
-      aspect-ratio="1"
-      cover
-    />
-    <div v-else class="avatar bg-gray-blue tw-grid tw-place-items-center tw-rounded-full">
-      <v-icon class="text-gray-600" size="small">mdi-account-group-outline</v-icon>
-    </div>
-
-    <div class="flex-1-1">
-      <span class="text-body-4 text-gray-800">{{
-        member.name || '(' + $t('components.learningPlan.members.missing.name') + ')'
-      }}</span>
-
-      <span v-if="!noClass" class="text-body-3 text-gray-400 tw-ml-2">{{
-        `(${member.class || $t('components.learningPlan.members.missing.class')})`
-      }}</span>
-    </div>
-
-    <alex-custom-avatar-group v-if="member.participants" :avatar-items="member.participants" class="tw-ml-2" />
-    <alex-custom-chip v-if="member.responsable" status="primary" text="Responsável" size="x-small" />
-    <alex-custom-button
-      v-if="edit && member.group"
-      icon="mdi-pencil-outline"
-      size="small"
-      variant="text"
-      @click.stop="$emit('edit-click')"
-    />
-    <alex-custom-button
-      v-if="edit && !member.responsable"
-      icon="mdi-trash-can-outline"
-      size="small"
-      variant="text"
-      @click.stop="$emit('remove-click')"
-    />
-  </div>
-</template>
-
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 interface MemberProps {
   name?: string;
-  avatarUrl?: string;
+  image?: string;
+  email?: string;
   responsable?: boolean;
-  class?: string;
-  group?: boolean;
-  participants?: { name: string; image: { url: string } }[];
 }
 
 interface CompProps {
   member: MemberProps;
-  noClass?: boolean;
-  edit?: boolean;
   clickable?: boolean;
+  noDelete?: boolean;
+  noCheckbox?: boolean;
+  raw: T;
 }
-
+const selectedModel = defineModel<MemberProps[] | boolean>({ default: false });
 withDefaults(defineProps<CompProps>(), {
-  noClass: false,
   edit: true,
   clickable: true,
+  noDelete: false,
+  noCheckbox: false,
 });
-defineEmits(['remove-click', 'to-profile', 'edit-click']);
+type Emit = {
+  'remove-click': [];
+  'toggle-responsable-click': [value: null | T];
+};
+defineEmits<Emit>();
 </script>
+
+<template>
+  <v-hover v-slot="{ isHovering: isHoveringCard, props: propsHover }">
+    <div v-bind="propsHover" class="d-flex tw-items-center ga-2 pa-2" :class="{ 'list-card': clickable }">
+      <v-checkbox
+        v-model="selectedModel"
+        class="checkbox"
+        :value="raw"
+        color="secondary-0"
+        density="compact"
+        hide-details
+      />
+      <v-img
+        class="avatar flex-0-0 rounded-circle"
+        :src="member.image || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'"
+        :alt="$t('components.learningPlan.members.member.label')"
+        aspect-ratio="1"
+        cover
+      />
+      <div class="flex-1-1 tw-flex tw-flex-col tw-ml-2">
+        <span class="text-body-4 text-gray-800">{{
+          member.name || '(' + $t('components.learningPlan.members.missing.name') + ')'
+        }}</span>
+        <span class="text-body-3 text-gray-400">{{ member.email }}</span>
+      </div>
+      <v-hover v-if="member.responsable" v-slot="{ props: propsHoverIcon, isHovering }">
+        <div
+          v-bind="propsHoverIcon"
+          class="tw-flex gap-1 items-center bg-primary-2 tw-text-xs tw-p-1 tw-px-2 tw-rounded-lg"
+        >
+          <span>Responsável</span>
+          <v-icon v-if="isHovering" size="small" @click="$emit('toggle-responsable-click', null)">mdi-close</v-icon>
+        </div>
+      </v-hover>
+      <alex-custom-button
+        v-else-if="!member?.responsable && isHoveringCard"
+        prepend-icon="mdi-cached"
+        size="small"
+        variant="secondary"
+        text="Tornar Responsável"
+        @click="$emit('toggle-responsable-click', raw)"
+      />
+      <alex-custom-button
+        v-if="!noDelete"
+        icon="mdi-trash-can-outline"
+        size="small"
+        variant="text"
+        @click.stop="$emit('remove-click')"
+      />
+    </div>
+  </v-hover>
+</template>
 
 <style scoped>
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
 }
 .list-card {
   cursor: pointer;
   border-radius: 8px;
 }
-.list-card:hover {
+/* .list-card:hover {
   background: rgb(var(--v-theme-gray-blue)) !important;
-}
-.list-card:active {
+} */
+/* .list-card:active {
   background: rgb(var(--v-theme-gray-100)) !important;
-}
+} */
 </style>

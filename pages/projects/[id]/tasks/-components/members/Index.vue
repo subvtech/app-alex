@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useGetTaskMembers } from '../../-composables/useMember';
 import AddMemberDialog from './AddMemberDialog.vue';
 interface MembersProps {
   startAt?: string | null;
   finishAt?: string | null;
   blockDelete?: boolean;
   edit?: boolean;
+  taskId?: number;
+  learningplanId?: number;
 }
 
 const props = withDefaults(defineProps<MembersProps>(), {
@@ -17,21 +20,14 @@ const props = withDefaults(defineProps<MembersProps>(), {
   students: () => [],
 });
 
-const projectStudents = ref<LearningPlanMemberSimple[]>([]);
-
+const taskIdValue = toRef(props, 'taskId');
+const enabledGetMembers = computed(() => !!taskIdValue.value);
+const { data: members } = useGetTaskMembers(taskIdValue, enabledGetMembers);
 type Emits = {
   'change-members': [];
   'set-members': [value: LearningPlanMemberSimple[]];
 };
 
-watch(
-  () => projectStudents.value,
-  () => {
-    emit('set-members', projectStudents.value);
-  },
-);
-
-// const strapiUtils = useStrapiUtils();
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
 const emit = defineEmits<Emits>();
@@ -40,7 +36,6 @@ const page = ref<number>(1);
 const itemsPerPage = 12;
 const search = ref('');
 const client = useStrapiClient();
-const members = [];
 const checkHasFilledDates = () => {
   if (!props.startAt || !props.finishAt) {
     setMessage(t('components.learningPlan.drawer.task.pleaseFillDates'), 'warning', true);
@@ -48,28 +43,7 @@ const checkHasFilledDates = () => {
   }
   return true;
 };
-// const getMembers = (taskId: number) =>
-//   strapiUtils.find<TaskMember>('task-members', {
-//     populate: {
-//       task_submissions: {
-//         populate: ['justification'],
-//       },
-//       learning_plan_member: {
-//         populate: ['user.avatar', 'learning_class'],
-//       },
-//       learning_plan_group: {
-//         populate: {
-//           group_members: {
-//             populate: ['student_member.user.avatar'],
-//           },
-//           learning_class: true,
-//         },
-//       },
-//     },
-//     filters: {
-//       task: taskId,
-//     },
-//   });
+
 const showingData = (items: any[], pageItems: any[], search: string, pageCount: number) => {
   const itemsPerPageCalc = search ? itemsPerPage : pageItems.length;
   const range = pageItems.length < itemsPerPage ? 2 : 1;
@@ -130,8 +104,9 @@ const handleAddMember = () => {
         />
 
         <AddMemberDialog
+          v-if="learningplanId"
           v-model="addMemberDialog"
-          :learningplan-id="props.learningplanId"
+          :learningplan-id="learningplanId"
           :members="members"
           @add-click="addMember"
         />
@@ -142,9 +117,9 @@ const handleAddMember = () => {
       </div>
     </template>
     <!-- Cards -->
-    <!-- <template #default="{ items }">
-      <alex-learningplan-task-members-card v-for="member in items" :member="{}" :edit="edit" />
-    </template> -->
+    <template #default="{ items }">
+      <div v-for="member in items" :key="member.raw.id" />
+    </template>
     <template #no-data>
       <div class="d-flex align-center justify-center flex-column ga-4 text-center">
         <img
