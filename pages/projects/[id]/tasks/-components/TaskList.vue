@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 // eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
-import { ptBR, enIN } from 'date-fns/locale';
+import { enIN, ptBR } from 'date-fns/locale';
 import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
 import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
@@ -30,12 +30,6 @@ const learninplanId = computed(() => parseInt(route.params.id.toString()));
 const learningPlanStore = useLearningPlanStore();
 const { update } = useStrapi();
 const dragDrop = useMultipleDragDrop();
-
-const expandBacklog = ref(0);
-const expandSprints = ref<number[]>([]);
-const showInputs = ref<boolean[]>([false]);
-const tasksTitles = ref<string[]>([]);
-const createSprintDialog = ref(false);
 
 // Drag and drop
 const hoveredSprint = ref<any | null>(0);
@@ -63,6 +57,18 @@ const editTask = ref<SprintTask>();
 const editingTask = ref<null | SprintTask>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
+const expandBacklog = ref(0);
+const expandSprints = ref<number[]>([]);
+const showInputs = ref<boolean[]>([false]);
+const tasksTitles = ref<string[]>([]);
+const createSprintDialog = ref(false);
+const createdIndex = ref<number>();
+
+const isLoading = computed(() => {
+  return (index) => {
+    return isCreatingTaskRequest.value && createdIndex.value === index;
+  };
+});
 
 const editSprints = () => {
   return [
@@ -259,8 +265,9 @@ const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
 
-const handleCreateTask = async (index: number, sprintId?: number) => {
+const handleCreateTask = async (index: number, sprint?: SprintSimple) => {
   if (tasksTitles.value[index] && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
+    createdIndex.value = index;
     const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
     await createTask({
@@ -268,7 +275,7 @@ const handleCreateTask = async (index: number, sprintId?: number) => {
       learningPlanId,
       position: higherIndex,
       organization: 'standard',
-      sprint: sprintId,
+      sprint,
     });
   }
   tasksTitles.value[index] = '';
@@ -322,7 +329,7 @@ const createItem = async (task: {
   local: boolean;
   organization: 'standard' | 'story' | 'epic';
   position: number;
-  sprint: number;
+  sprint: SprintSimple;
   story: number;
   title: string;
 }) => {
@@ -577,7 +584,7 @@ const updateSprints = () => {
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
-                    :loading="isCreatingTaskRequest"
+                    :loading="isLoading(0)"
                     @click="showInputs[0] = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
@@ -590,19 +597,19 @@ const updateSprints = () => {
                       class="w-100"
                       density="comfortable"
                       name="taskTitle"
-                      :disabled="isCreatingTaskRequest"
+                      :loading="isLoading(0)"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
                       @keyup.enter="handleCreateTask(0)"
                       @keyup.esc="!showInputs[0]"
                       @blur="handleInputBlur(0)"
                     />
-                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask(0)">
+                    <alex-custom-button size="large" :loading="isLoading(0)" @click="handleCreateTask(0)">
                       {{ $t('pages.projects.tasks.add_task') }}
                     </alex-custom-button>
                     <alex-custom-button
                       size="large"
                       variant="tertiary"
-                      :loading="isCreatingTaskRequest"
+                      :loading="isLoading(0)"
                       @click="handleInputCancel(0)"
                     >
                       {{ $t('pages.projects.tasks.delete_cancel_text') }}
@@ -708,7 +715,7 @@ const updateSprints = () => {
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
-                    :loading="isCreatingTaskRequest"
+                    :loading="isLoading(i + 1)"
                     @click="showInputs[i + 1] = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
@@ -721,23 +728,23 @@ const updateSprints = () => {
                       class="w-100"
                       density="comfortable"
                       name="taskTitle"
-                      :disabled="isCreatingTaskRequest"
+                      :disabled="isLoading(i + 1)"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
-                      @keyup.enter="handleCreateTask(i + 1, sprint.id)"
+                      @keyup.enter="handleCreateTask(i + 1, sprint)"
                       @keyup.esc="!showInputs[i + 1]"
                       @blur="handleInputBlur(i + 1)"
                     />
                     <alex-custom-button
                       size="large"
-                      :loading="isCreatingTaskRequest"
-                      @click="handleCreateTask(i + 1, sprint.id)"
+                      :loading="isLoading(i + 1)"
+                      @click="handleCreateTask(i + 1, sprint)"
                     >
                       {{ $t('pages.projects.tasks.add_task') }}
                     </alex-custom-button>
                     <alex-custom-button
                       size="large"
                       variant="tertiary"
-                      :loading="isCreatingTaskRequest"
+                      :loading="isLoading(i + 1)"
                       @click="handleInputCancel(i + 1)"
                     >
                       {{ $t('pages.projects.tasks.delete_cancel_text') }}
