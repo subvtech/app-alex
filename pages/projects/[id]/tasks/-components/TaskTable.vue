@@ -368,7 +368,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items text-gray-800"
+                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none"
                     :class="[
                       dragging && dragFrom == item.id ? 'dragging' : '',
                       group === 'backlog' ? 'draggable-row' : '',
@@ -387,7 +387,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                       {{ item.title }}
                     </td>
 
-                    <td class="width-40">
+                    <td class="min-w-48">
                       <alex-learningplan-task-date-chip
                         v-if="item.finish_at"
                         :date="item.finish_at"
@@ -397,13 +397,13 @@ const setDragStart = (id: number, e: DragEvent) => {
                         {{ $t('pages.projects.tasks.not_informed') }}
                       </span>
                     </td>
-                    <td class="width-40">
+                    <td class="min-w-48">
                       <div v-if="item.students?.length" class="ml-2" :class="{ 'gray-filter': isArchived }">
                         <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
                       </div>
                       <span v-else>{{ $t('pages.projects.tasks.no_members') }}</span>
                     </td>
-                    <td class="width-40">
+                    <td class="min-w-48">
                       <alex-learningplan-task-submissions-status
                         v-if="item.delivered"
                         :submitted="item.delivered"

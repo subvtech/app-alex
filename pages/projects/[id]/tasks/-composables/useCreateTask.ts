@@ -11,14 +11,14 @@ type CreateTaskPayload = {
   title: string;
   organization: TaskSimple['organization'];
   parentTask?: number;
-  sprint?: number;
+  sprint?: SprintSimple;
 };
 
-type CreateTaskResponse = Omit<TaskSimple, 'parent_task'> & {
+type CreateTaskResponse = Omit<TaskSimple, 'parent_task' | 'sprint'> & {
   learningplan: number;
-  sprint: number;
   kanban_column: number;
   parent_task?: number;
+  sprint?: number;
 };
 
 export const useCreateTask = (
@@ -40,11 +40,16 @@ export const useCreateTask = (
         submission_required: false,
         title,
         parent_task: parentTask,
-        sprint,
+        sprint: sprint?.id || undefined,
         organization,
       });
-      task.data.sprint_id = sprint || 0;
-      return task.data as TaskSimple;
+
+      const taskWithSprintId = {
+        ...task.data,
+        sprint_id: sprint?.id || undefined,
+      };
+
+      return taskWithSprintId as TaskSimple & { sprint_id?: number };
     },
     onSuccess(data) {
       queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
@@ -72,18 +77,10 @@ export const useCreateTask = (
           };
         }
       });
-      setMessage(
-        t('pages.projects.tasks.actions.created_success', { item: t('pages.projects.common.task') }),
-        'success',
-        true,
-      );
+      setMessage(t('pages.projects.tasks.actions.created_success', { item: data.title }), 'success', true);
     },
-    onError() {
-      setMessage(
-        t('pages.projects.tasks.actions.created_error', { item: t('pages.projects.common.task') }),
-        'error',
-        true,
-      );
+    onError(_, variables) {
+      setMessage(t('pages.projects.tasks.actions.created_error', { item: variables.title }), 'error', true);
     },
   });
 
