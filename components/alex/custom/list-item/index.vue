@@ -15,13 +15,8 @@
   >
     <template #title></template>
     <div class="d-flex gap-4 text-body-4 align-center justify-center">
-      <v-icon
-        v-if="icon"
-        data-testid="testint-dropdown-item-icon"
-        :icon="icon"
-        :size="24"
-      />
-      <span class="v-list-item-text"> {{ text }} </span>
+      <v-icon v-if="icon" data-testid="testint-dropdown-item-icon" :icon="icon" :size="24" />
+      <span class="v-list-item-text" :class="notBold && '!tw-font-normal'"> {{ text }} </span>
     </div>
   </v-list-item>
 </template>
@@ -34,6 +29,7 @@ export interface AlexListItem {
   selected?: boolean;
   link?: string;
   theme?: 'light' | 'dark';
+  notBold?: boolean;
 }
 const props = withDefaults(defineProps<AlexListItem>(), {
   icon: undefined,
@@ -41,6 +37,7 @@ const props = withDefaults(defineProps<AlexListItem>(), {
   checkbox: false,
   selected: false,
   theme: 'light',
+  notBold: false,
 });
 const emit = defineEmits(['click']);
 const { push } = useRouter();
@@ -103,25 +100,19 @@ $variants: (
   @each $component, $status in $value {
     .v-list-item-#{$mode} {
       @if $component == 'background' {
-        background-color: rgb(
-          var(--v-theme-#{map-deep-get($status, 'default')})
-        ) !important;
+        background-color: rgb(var(--v-theme-#{map-deep-get($status, 'default')})) !important;
       }
       color: rgb(var(--v-theme-#{map-deep-get($status, 'default')})) !important;
     }
     .v-list-item-#{$mode}:hover {
       @if $component == 'background' {
-        background-color: rgb(
-          var(--v-theme-#{map-deep-get($status, 'hover')})
-        ) !important;
+        background-color: rgb(var(--v-theme-#{map-deep-get($status, 'hover')})) !important;
       }
       color: rgb(var(--v-theme-#{map-deep-get($status, 'hover')})) !important;
     }
     .v-list-item-#{$mode}:active {
       @if $component == 'background' {
-        background-color: rgb(
-          var(--v-theme-#{map-deep-get($status, 'active')})
-        ) !important;
+        background-color: rgb(var(--v-theme-#{map-deep-get($status, 'active')})) !important;
       }
       color: rgb(var(--v-theme-#{map-deep-get($status, 'active')})) !important;
     }
@@ -135,28 +126,20 @@ $variants: (
     .v-list-item-#{$mode}-selected,
     .v-list-item--active.v-list-item-#{$mode} {
       @if $component == 'background' {
-        background-color: rgb(
-          var(--v-theme-#{map-deep-get($status, 'selected')})
-        ) !important;
+        background-color: rgb(var(--v-theme-#{map-deep-get($status, 'selected')})) !important;
       }
     }
     .v-list-item-#{$mode}-selected,
     .v-list-item--active.v-list-item-#{$mode} .v-list-item-text {
-      color: rgb(
-        var(--v-theme-#{map-deep-get($status, 'selected')})
-      ) !important;
+      color: rgb(var(--v-theme-#{map-deep-get($status, 'selected')})) !important;
     }
 
     .v-list-item-#{$mode}-selected:hover,
     .v-list-item--active.v-list-item-#{$mode}:hover {
       @if $component == 'background' {
-        background-color: rgb(
-          var(--v-theme-#{map-deep-get($status, 'selected')})
-        ) !important;
+        background-color: rgb(var(--v-theme-#{map-deep-get($status, 'selected')})) !important;
       }
-      color: rgb(
-        var(--v-theme-#{map-deep-get($status, 'selected')})
-      ) !important;
+      color: rgb(var(--v-theme-#{map-deep-get($status, 'selected')})) !important;
     }
   }
 }
