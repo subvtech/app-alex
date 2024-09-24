@@ -91,7 +91,7 @@ const columns = computed<Column<KanbanColumnTask>[]>({
       .map((column) => ({
         id: column.id,
         title: column.title,
-        group: generateGroup(column.status_type, column.id),
+        group: generateGroup(column.status_type || 'custom', column.id),
         position: column.position,
         status_type: column.status_type,
         items: column.tasks.map((task) => ({
@@ -133,7 +133,11 @@ const createNewKanbanVersion = async () => {
     return;
   }
   await createKanban({
-    columns: columns.value.map((column) => ({ title: column.title, position: column.position })),
+    columns: columns.value.map((column) => ({
+      title: column.title,
+      position: column.position,
+      status_type: column.status_type,
+    })),
     sprintId: selectedSprint.value.id,
   });
   await refetchKanban();
@@ -273,7 +277,12 @@ const handleAddColumn = async (title: string) => {
   }
   try {
     await createNewKanbanVersion();
-    await createColumn({ kanbanId: kanban.value.id, position: columns.value.length, title, statusType: 'doing' });
+    await createColumn({
+      kanbanId: kanban.value.id,
+      position: columns.value.length,
+      title,
+      statusType: undefined,
+    });
     refetchKanban();
   } catch (error) {
   } finally {
