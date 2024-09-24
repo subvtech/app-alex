@@ -61,7 +61,7 @@ export const useCreateKanban = () =>
 type CreateColumnPayload = {
   title: string;
   position: number;
-  statusType: ValueOf<typeof KanbanStatusType>;
+  statusType?: ValueOf<typeof KanbanStatusType>;
   kanbanId: number;
 };
 export const useCreateColumn = () =>

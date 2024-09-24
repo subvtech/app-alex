@@ -31,7 +31,9 @@
           class="d-flex tw-w-[160px] rounded border align-center pa-1 pr-2 ga-2"
         >
           <div class="tw-h-[16px] tw-w-[16px] rounded" :style="{ backgroundColor: colors[index] }" />
-          <span class="text-gray-400 text-body-6 tw-overflow tw-w-[102px]"> {{ categoriesLabel.name }}</span>
+          <span class="text-gray-400 text-body-6 tw-overflow tw-w-[102px] ellipsis lines-1">
+            {{ categoriesLabel.name }}</span
+          >
           <span class="text-gray-800 text-body-6">{{ categoriesLabel.total }}</span>
         </div>
       </div>
@@ -148,10 +150,11 @@ const colors = computed(() => {
   const sprint = props.data.find((sprint) => sprint.sprint === selectedSprint.value);
   return (
     sprint?.columns?.map((item) => {
-      if (!colorsMapping[item.status]) {
-        colorsMapping[item.status] = generateRandomColor();
+      const status = item.status || generateRandomColor();
+      if (!colorsMapping[status]) {
+        colorsMapping[status] = generateRandomColor();
       }
-      return colorsMapping[item.status];
+      return colorsMapping[status];
     }) || []
   );
 });
