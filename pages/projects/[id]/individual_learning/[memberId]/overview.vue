@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import CardTotalizer from '../../-components/CardTotalizer.vue';
 
-const { t } = useI18n();
-
 // TODO @Eliezir - Add custom icons & i18n
 const totalizers = ref({
   tasks: {

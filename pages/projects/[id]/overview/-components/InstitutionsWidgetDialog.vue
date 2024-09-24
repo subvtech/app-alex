@@ -314,7 +314,7 @@ watchEffect(() => {
                     name="telefone"
                     :label="$t('pages.projects.overview.institution_dialog.phone')"
                     :placeholder="'(12) 3456-7890'"
-                    @input="(formData.phone = formatPhone(formData.phone)), console.log(formData.phone)"
+                    @input="formData.phone = formatPhone(formData.phone)"
                   />
                 </v-col>
                 <v-col cols="12">
