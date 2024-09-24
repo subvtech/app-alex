@@ -9,7 +9,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
-import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
+import { useCreateTask, useDeleteTask, useUpdateTask, useUpdateTaskStatus } from '../-composables/useCreateTask';
 import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
@@ -47,6 +47,7 @@ const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateT
 );
 const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient, setMessage, t);
 const { mutateAsync: updateTask } = useUpdateTask();
+const { mutateAsync: updateStatusTask } = useUpdateTaskStatus();
 const sprints = ref<Droppable<Sprint>[]>([]);
 
 // refs
@@ -415,7 +416,7 @@ const onDrop = (_, __, e) => {
     dragDrop.dragEnd();
     return;
   }
-
+  updateStatusTask({ id, sprint: hoveredSprint.value.id });
   update('tasks', Number(id), {
     sprint: hoveredSprint.value.id,
   })
