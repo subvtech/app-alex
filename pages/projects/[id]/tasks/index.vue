@@ -81,7 +81,7 @@ watch(
           item-title="title"
           name="search"
           :items="sprints.sprints"
-          :placeholder="t('pages.projects.tasks.find_task')"
+          :placeholder="t('pages.projects.tasks.select_sprint')"
         />
         <div class="tw-flex tw-gap-2">
           <alex-custom-button
