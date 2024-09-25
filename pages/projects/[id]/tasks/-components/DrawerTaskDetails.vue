@@ -114,11 +114,10 @@
 <script setup lang="ts">
 import Options from '@/pages/projects/[id]/tasks/-components/Options.vue';
 import { isBefore } from 'date-fns';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { AlexLearningplanTrailsDialogsCopyTrail } from '#build/components';
 
 interface DrawerProjectProps {
   task?: SprintTask;
