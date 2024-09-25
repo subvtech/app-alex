@@ -118,6 +118,8 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
+import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { AlexLearningplanTrailsDialogsCopyTrail } from '#build/components';
 
 interface DrawerProjectProps {
   task?: SprintTask;
