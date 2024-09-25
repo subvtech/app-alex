@@ -139,13 +139,13 @@ const status = ref<KanbanColumn | null>(null);
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
 
-const epicOpen = ref<boolean>(false);
-const historyOpen = ref<boolean>(false);
+// const epicOpen = ref<boolean>(false);
+// const historyOpen = ref<boolean>(false);
 
 const selectedEpic = ref<TaskSimple | null>(null);
 const selectedSprint = ref<SprintSimple>();
 const selectedHistory = ref<TaskSimple | null>(null);
-const selectedParent = ref<TaskSimple | null>(null);
+const selectedParent = ref<TaskSimple | null | undefined>(undefined);
 const description = ref<string>('');
 const mentionUsers = computed(() => []);
 const trailId = ref<number | null>(null);
@@ -247,19 +247,27 @@ const groupOptions = computed(() => {
     });
   });
 
-  return options;
+  return [
+    ...options,
+    {
+      text: 'Sem épico ou história',
+      onClick: () => (selectedParent.value = null),
+      icon: 'mdi-close',
+      notBold: true,
+    },
+  ];
 });
 
 watch(selectedParent, (parent) => {
-  if (!parent || !props.task?.id || isFirstTimeOpened.value) {
+  if (parent === undefined || !props.task?.id || isFirstTimeOpened.value) {
     return;
   }
 
   update('tasks', props.task.id, {
-    parent_task: parent.id,
+    parent_task: parent?.id ?? null,
   })
     .then(() => {
-      emit('moved', `Tarefa movida para ${parent.title}`);
+      emit('moved', parent !== null ? `Tarefa movida para ${parent.title}` : 'Épico ou história removido');
     })
     .catch(console.log);
 });
@@ -346,7 +354,7 @@ watch(open, () => {
   trailId.value = props.task?.trail?.id ?? null;
   blocks.value = props.task?.blocks ?? [];
 
-  selectedParent.value = props.task?.parent_task ?? null;
+  selectedParent.value = props.task?.parent_task ?? open ? null : undefined;
 
   // Sprint, epic and story data
   selectedSprint.value = props.task?.sprint ?? undefined;
