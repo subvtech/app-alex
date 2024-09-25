@@ -4,7 +4,7 @@ import { SprintsResponse } from './useSprints';
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();
-
+const strapiClient = useStrapiClient();
 type CreateTaskPayload = {
   learningPlanId: number;
   position: number;
@@ -148,6 +148,23 @@ export const useUpdateTask = () =>
         title,
         status,
         position,
+      });
+    },
+  });
+type UpdateTaskStatusPayload = {
+  id: number;
+  sprint: number;
+};
+export const useUpdateTaskStatus = () =>
+  useMutation({
+    mutationFn({ id, sprint }: UpdateTaskStatusPayload) {
+      return strapiClient(`/tasks/${id}/update-kanban-task`, {
+        method: 'PUT',
+        body: {
+          data: {
+            sprint,
+          },
+        },
       });
     },
   });
