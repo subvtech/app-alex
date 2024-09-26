@@ -285,6 +285,7 @@ const setDragStart = (id: number, e: DragEvent) => {
       :headers="header"
       :items="tasksArray"
       :search="searchFilter"
+      items-per-page="-1"
       @update:sort-by="(e) => (tableSortBy = e)"
       @dragleave="(e) => emit('drag-leave', e)"
     >
