@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column align-center justify-center ga-1 text-center">
-    <img class="tw-mb-[6px]" src="/svg/NoTrails.svg" alt="No trails" />
+    <img class="tw-mb-[6px]" src="public/svg/NoTrails.svg" alt="No trails" />
     <p class="tw-max-w-[250px] text-body-2 text-gray-800">
       {{
         $t('components.learningPlan.drawer.task.learningResources.emptyTitle')

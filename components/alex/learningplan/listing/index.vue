@@ -22,7 +22,7 @@
       <div v-else>
         <img
           class="emptyProjects-img"
-          src="/images/emptyCourses.svg"
+          src="public/images/emptyCourses.svg"
           alt="Empty Projects"
         />
         <p class="text-h3 text-gray-600 text-center">
@@ -294,7 +294,7 @@
           >
             <img
               class="emptyProjects-img"
-              src="/images/emptyCourses.svg"
+              src="public/images/emptyCourses.svg"
               alt="Empty Projects"
             />
             <p class="text-h3 text-gray-600 text-center">

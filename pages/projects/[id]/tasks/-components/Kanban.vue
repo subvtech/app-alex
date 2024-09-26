@@ -295,7 +295,7 @@ defineExpose({ canDrag, setCanDrag });
 <template>
   <div class="tw-flex-grow">
     <div v-if="!sprint" class="tw-flex tw-items-center tw-justify-center tw-h-full tw-flex-col">
-      <img src="/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
+      <img src="public/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
       <span class="text-gray-400">Nenhuma sprint selecionada</span>
     </div>
     <template v-else>
