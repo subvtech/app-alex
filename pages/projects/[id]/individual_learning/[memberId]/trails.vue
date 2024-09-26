@@ -119,7 +119,7 @@ const handleTrailCreate = async (trailId: number) => {
       <div v-else class="tw-flex tw-items-center tw-justify-center tw-flex-col">
         <img
           class="emptyProjects-img"
-          src="/images/emptyTrails.svg"
+          src="public/images/emptyTrails.svg"
           :alt="$t('pages.trails.emptyStateText')"
         />
         <p class="text-h3 text-gray-400 mt-4">

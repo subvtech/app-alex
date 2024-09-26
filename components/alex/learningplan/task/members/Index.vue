@@ -153,7 +153,7 @@
       >
         <img
           class="no-members-svg"
-          src="/svg/no-members.svg"
+          src="public/svg/no-members.svg"
           :alt="$t('components.learningPlan.members.missing.member')"
           role="no-members"
         />

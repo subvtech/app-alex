@@ -33,7 +33,7 @@
         <v-btn icon color="grey" @click="emit('alert')">
           <img
             v-if="isBellActive"
-            src="/svg/bell.svg"
+            src="public/svg/bell.svg"
             width="24"
             height="24"
             role="bell-active"
