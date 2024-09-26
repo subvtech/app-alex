@@ -1,7 +1,7 @@
 <template>
   <v-container id="register" class="pa-0 container-grid overflow-hidden" fluid>
     <div class="image justify-center align-center d-none d-md-flex pa-0">
-      <img class="signUp" src="/images/signUp.svg" />
+      <img class="signUp" src="public/images/signUp.svg" />
     </div>
 
     <div class="bg-primary-0 pa-0 content-field">

@@ -1,7 +1,7 @@
 <template>
   <v-container class="pa-0 container-grid" fluid>
     <div class="image justify-center align-center d-none d-md-flex pa-0">
-      <img class="left-image" src="/images/imagem_forgot.png" />
+      <img class="left-image" src="public/images/imagem_forgot.png" />
     </div>
     <div class="bg-primary-0 pa-0 content-field">
       <div class="mt-0 mt-sm-0" align="center" style="align-self: flex-end" />
