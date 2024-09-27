@@ -44,6 +44,7 @@
     <alex-learningplan-task-kanban
       v-if="isKanban"
       ref="kanban"
+      :key="tasks.length"
       v-model="tasks"
       type="professor"
       :classes="taskMemberClasses"
@@ -118,7 +119,7 @@
 
             <v-expansion-panel-text>
               <alex-learningplan-task-table
-                key="table"
+                :key="tasks.length"
                 :tasks="listTasks"
                 :search="filter"
                 :active-filter="false"
