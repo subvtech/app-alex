@@ -382,7 +382,6 @@ watch(open, () => {
 
   if (open) {
     getParentOptions();
-    console.log('Task:', props.task);
   }
 });
 watch(tags, (tags) => {

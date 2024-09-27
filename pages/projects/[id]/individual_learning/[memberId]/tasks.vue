@@ -16,6 +16,7 @@
       <alex-custom-button
         :text="isKanban ? $t(`${i18Dir}.seeList`) : $t(`${i18Dir}.seeKanban`)"
         :prepend-icon="isKanban ? 'mdi-format-list-bulleted' : 'alex:Kanban'"
+        :icon="!isMobile ? undefined : isKanban ? 'mdi-format-list-bulleted' : 'alex:Kanban'"
         variant="secondary"
         size="large"
         @click="isKanban = !isKanban"
@@ -270,6 +271,7 @@ const kanban = ref<{
 const isKanban = ref<boolean>(true); // or list
 const tasks = ref<VNode | any>([]);
 const expanded = ref<string>('tasks');
+const isMobile = ref<boolean>(false);
 
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
@@ -342,6 +344,10 @@ const openDrawer = (taskMember) => {
   };
 
   teacherDrawer.value = true;
+};
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 500;
 };
 
 // - Get data
@@ -697,6 +703,16 @@ onBeforeMount(() => {
   headerStore.showHeader = false;
 
   getStudentTasks();
+});
+
+onMounted(() => {
+  checkMobile();
+
+  window.addEventListener('resize', () => checkMobile());
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', () => checkMobile());
 });
 
 watch(teacherDrawer, (open) => {
