@@ -33,7 +33,7 @@
         <v-btn icon color="grey" @click="emit('alert')">
           <img
             v-if="isBellActive"
-            src="/svg/bell.svg"
+            src="public/svg/bell.svg"
             width="24"
             height="24"
             role="bell-active"
@@ -115,7 +115,7 @@
   This component is meant to be used on the main screen as a horizontal Menu,
    it's also suitable for use inside smaller components.
 */
-import { ProfilePictureItemType } from '~/components/AppUserAvatar.vue';
+import { Upload } from '~/models/upload.model';
 
 export interface HorizontalBarEmits {
   (e: 'alert'): void; // click on the alert button
@@ -130,7 +130,7 @@ export interface HorizontalBarMenuItemType {
 }
 
 export interface HorizontalBarComponentType {
-  avatar?: ProfilePictureItemType;
+  avatar?: Upload;
   placeholder?: string;
   notFixed?: boolean;
   menuItems: HorizontalBarMenuItemType[];

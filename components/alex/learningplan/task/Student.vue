@@ -101,7 +101,6 @@ const kanban = ref<{
   handleInsertCard: (data: InsertCardProps) => void;
 } | null>(null);
 const { t } = useI18n();
-
 const getStudentTasks = (learningplanId: number, memberId: number) =>
   strapiUtils.find<TaskMember>('task-members', {
     populate: {
@@ -169,7 +168,7 @@ const { data: tasks, execute } = await useAsyncData(
       const dataValue = filteredData.map((task) => ({
         id: task.id,
         status: task.status,
-        doc_name: task.doc_name,
+        doc_name: task?.doc_name,
         date: new Date(task.finished_at?.replaceAll('-', '/')),
         title: task.task?.title,
         user: {
@@ -179,7 +178,7 @@ const { data: tasks, execute } = await useAsyncData(
         ...(task.learning_plan_group?.learning_class?.name && {
           group: {
             name: task.learning_plan_group?.learning_class?.name || '',
-            participants: task.learning_plan_group?.group_members.map(
+            participants: task.learning_plan_group?.group_members?.map(
               (member) => ({
                 name: member.student_member.user.fullname,
                 ...(member.student_member.user.avatar?.url && {
@@ -197,8 +196,8 @@ const { data: tasks, execute } = await useAsyncData(
           task?.learning_plan_member?.learning_class?.name ||
           task.learning_plan_group?.learning_class?.name ||
           '',
-        task: task.task,
-        submissions: task.task_submissions,
+        task: task?.task,
+        submissions: task?.task_submissions,
       })) as TaskStudent[];
       return {
         meta,

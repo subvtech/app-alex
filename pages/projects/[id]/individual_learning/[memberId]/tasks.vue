@@ -1,9 +1,7 @@
 <template>
   <div class="wrapper bg-white">
     <!-- Inputs -->
-    <div
-      class="d-flex tw-align-center px-6 py-4 tw-px-6 ga-3 border-bottom-1 border-gray-100"
-    >
+    <div class="d-flex tw-align-center px-6 py-4 tw-px-6 ga-3 border-bottom-1 border-gray-100">
       <alex-inputs-text-field
         v-model="filter"
         name="task"
@@ -79,10 +77,7 @@
       no-header
       @create-task="(title, column) => handleCreateTask(title, column)"
       @card-click="(_, taskMember) => openDrawer(taskMember)"
-      @card-insert="
-        (newIndex, value, newStatus) =>
-          handleUpdateStatus(newIndex, value, newStatus)
-      "
+      @card-insert="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus)"
     />
     <div v-else class="px-6 py-4">
       <Transition name="slide">
@@ -112,24 +107,12 @@
       </Transition>
 
       <Transition name="slide">
-        <v-expansion-panels
-          v-model="expanded"
-          class="task-accordion my-6 rounded-lg"
-        >
+        <v-expansion-panels v-model="expanded" class="task-accordion my-6 rounded-lg">
           <v-expansion-panel class="rounded-lg" value="tasks">
             <v-expansion-panel-title hide-actions class="tw-cursor-default">
-              <v-icon
-                :icon="
-                  expanded !== 'tasks' ? 'mdi-chevron-down' : 'mdi-chevron-up'
-                "
-                @click="() => {}"
-              />
+              <v-icon :icon="expanded !== 'tasks' ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="() => {}" />
               <span class="text-h5 text-gray-800"> Tarefas </span>
-              <alex-custom-chip
-                size="small"
-                status="secondary"
-                :text="listTasks.length"
-              />
+              <alex-custom-chip size="small" status="secondary" :text="listTasks.length" />
             </v-expansion-panel-title>
 
             <v-expansion-panel-text>
@@ -155,9 +138,7 @@
               />
 
               <div
-                :class="`${
-                  !isAddingTask && 'pa-4 tw-border-dashed'
-                } d-flex align-center justify-center ga-2 tw-border
+                :class="`${!isAddingTask && 'pa-4 tw-border-dashed'} d-flex align-center justify-center ga-2 tw-border
                   tw-rounded-[8px] tw-cursor-pointer tw-transition
                 hover:tw-bg-gray-50 mb-4`"
                 @click="isAddingTask = true"
@@ -165,11 +146,7 @@
                 <template v-if="!isAddingTask">
                   <v-icon color="gray-800">mdi-plus</v-icon>
                   <p class="text-body-4 text-gray-800 tw-leading-none">
-                    {{
-                      $t(
-                        'components.projects.individual_learning.tasks.addTask',
-                      )
-                    }}
+                    {{ $t('components.projects.individual_learning.tasks.addTask') }}
                   </p>
                 </template>
                 <template v-else>
@@ -177,11 +154,7 @@
                     ref="addTaskInput"
                     v-model="newTaskTitle"
                     name="task"
-                    :placeholder="
-                      $t(
-                        'components.projects.individual_learning.tasks.inputs.taskTitle',
-                      )
-                    "
+                    :placeholder="$t('components.projects.individual_learning.tasks.inputs.taskTitle')"
                     variant="outlined"
                     hide-details
                     class="tw-w-full px-4 py-2"
@@ -321,9 +294,7 @@ const handleCreateTask = async (title: string, column) => {
   }
 
   const memberId = learningPlanStore.learningPlan?.members.find(
-    (member) =>
-      member?.user?.id &&
-      member?.user?.id.toString() === route.params?.memberId,
+    (member) => member?.user?.id && member?.user?.id.toString() === route.params?.memberId,
   );
 
   if (!memberId) {
@@ -437,18 +408,16 @@ const getStudentTasks = async () => {
       ...(taskMember.learning_plan_group?.learning_class?.name && {
         group: {
           name: taskMember.learning_plan_group?.learning_class?.name || '',
-          participants: taskMember.learning_plan_group?.group_members.map(
-            (member) => ({
-              name: member.student_member.user.fullname,
-              ...(member.student_member.user.avatar?.url && {
-                image: {
-                  url: member.student_member.user.avatar?.url,
-                },
-                learning_class: member.student_member.learning_class?.name,
-                role: member.role,
-              }),
+          participants: taskMember.learning_plan_group?.group_members.map((member) => ({
+            name: member.student_member.user.fullname,
+            ...(member.student_member.user.avatar?.url && {
+              image: {
+                url: member.student_member.user.avatar?.url,
+              },
+              learning_class: member.student_member.learning_class?.name,
+              role: member.role,
             }),
-          ),
+          })),
         },
       }),
       studentClass:
@@ -494,10 +463,7 @@ const listTasks = computed(() => {
         return true;
       }
 
-      if (
-        startFilter?.value &&
-        taskMember.task.start_at !== startFilter.value
-      ) {
+      if (startFilter?.value && taskMember.task.start_at !== startFilter.value) {
         return false;
       }
 
@@ -533,11 +499,7 @@ const listTasks = computed(() => {
 });
 
 // - Update kanban
-const handleUpdateStatus = async (
-  _: number,
-  item: TaskStudent,
-  newStatus: string,
-) => {
+const handleUpdateStatus = async (_: number, item: TaskStudent, newStatus: string) => {
   if (!kanban.value) {
     return;
   }
@@ -552,9 +514,7 @@ const handleUpdateStatus = async (
     kanban.value.setCanDrag(false);
     const submissionValidationStatus = ['in_review', 'in_progress'];
     const time = new Date();
-    const lastSubmission = taskMember.submissions?.length
-      ? taskMember?.submissions[0]
-      : undefined;
+    const lastSubmission = taskMember.submissions?.length ? taskMember?.submissions[0] : undefined;
 
     if (taskMember?.task?.submission_required) {
       if (newStatus === 'in_review' && !lastSubmission) {
@@ -572,9 +532,7 @@ const handleUpdateStatus = async (
         const lastSubVal = lastSubRes.data?.[0].attributes.submission;
 
         await strapi.update('task-submissions', lastSubmission.id, {
-          submission: lastSubVal
-            ? lastSubVal.submission
-            : lastSubmission.submission,
+          submission: lastSubVal ? lastSubVal.submission : lastSubmission.submission,
           submitted_at: time.toISOString(),
         });
       }
@@ -588,10 +546,7 @@ const handleUpdateStatus = async (
     await strapi.update<TaskMember>('task-members', taskMember.id, {
       status: newStatus as TaskMemberStatus,
       ...(submissionValidationStatus.includes(newStatus) && {
-        last_submission_at:
-          newStatus === 'in_progress' && taskMember.submissions
-            ? null
-            : time.toISOString(),
+        last_submission_at: newStatus === 'in_progress' && taskMember.submissions ? null : time.toISOString(),
       }),
     });
   } catch (error) {
@@ -602,11 +557,7 @@ const handleUpdateStatus = async (
       return task;
     });
     if ((error as any)?.message === 'missingSubmission') {
-      setMessage(
-        t('components.learningPlan.drawer.task.errors.missingSubmission'),
-        'error',
-        true,
-      );
+      setMessage(t('components.learningPlan.drawer.task.errors.missingSubmission'), 'error', true);
       return;
     }
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
@@ -618,9 +569,7 @@ const handleUpdateStatus = async (
 
 const taskMemberClasses = computed(() => {
   const classes: string[] = tasks.value.flatMap((taskMember) =>
-    taskMember.learning_plan_member?.learning_class
-      ? taskMember.learning_plan_member?.learning_class.name
-      : [],
+    taskMember.learning_plan_member?.learning_class ? taskMember.learning_plan_member?.learning_class.name : [],
   );
 
   return Array.from(new Set(classes));
@@ -632,9 +581,7 @@ const handleUpdateDrawerStatus = async (status) => {
     return;
   }
 
-  const taskMember = tasks.value.find(
-    ({ task }) => task.id === taskDetails.value.id,
-  );
+  const taskMember = tasks.value.find(({ task }) => task.id === taskDetails.value.id);
 
   if (!taskMember) {
     return;

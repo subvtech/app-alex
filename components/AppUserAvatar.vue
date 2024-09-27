@@ -61,7 +61,7 @@
       ]"
       @click="removeProfilePicture"
     >
-      <img src="/svg/trash.svg" width="20" height="20" />
+      <img src="public/svg/trash.svg" width="20" height="20" />
     </alex-custom-button>
   </div>
 </template>
@@ -69,10 +69,6 @@
 /*
   This is a description
 */
-export interface ProfilePictureItemType {
-  url: string;
-  id: number;
-}
 
 export interface AppUserAvatarComponentType {
   userId?: number; // user id
@@ -83,7 +79,7 @@ export interface AppUserAvatarComponentType {
   trackCurrentUser?: boolean;
   canDelete?: boolean;
   size?: number;
-  profilePicture?: ProfilePictureItemType | null;
+  profilePicture?: Upload | null;
 }
 const userStore = useUserStore();
 
@@ -98,7 +94,7 @@ const props = withDefaults(defineProps<AppUserAvatarComponentType>(), {
   profilePicture: null,
 });
 
-const avatar = computed<ProfilePictureItemType | null | undefined>(() =>
+const avatar = computed<Upload | null | undefined>(() =>
   props.trackCurrentUser && userStore.user
     ? userStore.user?.avatar
     : props.profilePicture,

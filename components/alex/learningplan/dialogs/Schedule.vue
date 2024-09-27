@@ -2,13 +2,7 @@
   <alex-custom-dialog
     v-model="modal"
     activator="parent"
-    :title="
-      $t(
-        `components.courses.meeting.course.${
-          data ? 'editMeeting' : 'addMeeting'
-        }`,
-      )
-    "
+    :title="$t(`components.courses.meeting.course.${data ? 'editMeeting' : 'addMeeting'}`)"
     body-classes="pa-0 bg-white"
   >
     <v-form @reset="handleReset">
@@ -16,9 +10,7 @@
         <alex-inputs-select
           name="className"
           :label="$t('components.learningPlan.dialogs.class')"
-          :placeholder="
-            $t('components.learningPlan.dialogs.selectClassToMeeting')
-          "
+          :placeholder="$t('components.learningPlan.dialogs.selectClassToMeeting')"
           :items="classes"
           density="comfortable"
           required
@@ -41,9 +33,7 @@
           name="interval"
           :label="$t('components.courses.meeting.course.meetingFrequency')"
           :items="items"
-          :placeholder="
-            $t('components.learningPlan.dialogs.selectFrequencyMeeting')
-          "
+          :placeholder="$t('components.learningPlan.dialogs.selectFrequencyMeeting')"
           density="comfortable"
           required
         />
@@ -129,36 +119,19 @@ interface ScheduleProps {
   endDate?: Date | string;
   classes?: LearningClassType[];
 }
-const {
-  startDate = undefined,
-  endDate = undefined,
-  classes = [],
-} = defineProps<ScheduleProps>();
+const { startDate = undefined, endDate = undefined, classes = [] } = defineProps<ScheduleProps>();
 const emit = defineEmits(['update', 'create']);
 const { scheduleRules } = useFormRules();
 const modal = defineModel<boolean>({ required: true });
-const data = defineModel<(MeetingPropsType & { className: string }) | null>(
-  'data',
-);
+const data = defineModel<(MeetingPropsType & { className: string }) | null>('data');
 const rules = computed(() => {
-  const startDateValue = startDate
-    ? new Date(startDate.toString().replaceAll(/-/g, '/'))
-    : new Date();
-  const endDateValue = endDate
-    ? new Date(endDate.toString().replaceAll(/-/g, '/'))
-    : new Date();
+  const startDateValue = startDate ? new Date(startDate.toString().replaceAll(/-/g, '/')) : new Date();
+  const endDateValue = endDate ? new Date(endDate.toString().replaceAll(/-/g, '/')) : new Date();
   startDateValue.setHours(0, 0, 0, 0);
   endDateValue.setHours(23, 59, 59, 59);
   return scheduleRules(startDateValue, endDateValue);
 });
-const {
-  handleSubmit,
-  setValues,
-  values,
-  handleReset,
-  useFieldModel,
-  resetForm,
-} = useForm({
+const { handleSubmit, setValues, values, handleReset, useFieldModel, resetForm } = useForm({
   validationSchema: rules.value,
   keepValuesOnUnmount: false,
 });

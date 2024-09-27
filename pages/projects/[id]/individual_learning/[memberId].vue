@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Card, CardContent } from '@/components/ui/card';
 import EmptyState from '@/components/EmptyState.vue';
+import { Card, CardContent } from '@/components/ui/card';
 
 definePageMeta({
   hideLearningPlanBanner: true,
@@ -14,9 +14,9 @@ const loading = ref(true);
 const activeTab = ref(route.path.split('/').pop());
 
 const tabs = [
-  { label: t('pages.projects.overview'), value: 'overview' },
-  { label: t('pages.projects.trails'), value: 'trails' },
-  { label: t('pages.projects.tasks'), value: 'tasks' },
+  { label: t('pages.projects.individual_learning.overview'), value: 'overview' },
+  { label: t('pages.projects.individual_learning.trails'), value: 'trails' },
+  { label: t('pages.projects.individual_learning.tasks'), value: 'tasks' },
 ];
 
 const user = ref<User | null>(null);
@@ -50,16 +50,19 @@ onMounted(fetchUser);
   <div v-else-if="user">
     <div class="tw-flex tw-flex-col tw-gap-6 tw-mt-6">
       <Card>
-        <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6 tw-pb-0">
+        <CardContent class="tw-flex tw-flex-col tw-gap-6 tw-pt-6 tw-pb-0 px-6">
           <div class="tw-flex tw-items-center tw-gap-6">
-            <v-avatar :size="64" color="gray-100">
-              <template #default>
+            <v-avatar :size="104" color="gray-100">
+              <v-img v-if="user.avatar?.url" :src="user.avatar?.url" alt="avatar" class="rounded-16px" cover />
+              <span v-else class="text-gray-800 text-h2">
                 {{ getInitials(user.fullname) }}
-              </template>
+              </span>
             </v-avatar>
             <div class="tw-flex tw-flex-col">
-              <h1 class="tw-text-2xl tw-font-bold">{{ user.fullname }}</h1>
-              <h2 class="tw-text-lg tw-font-medium">{{ user.username }}</h2>
+              <h1 class="text-gray-800 text-h2 ellipsis lines-2">
+                {{ user.fullname }}
+              </h1>
+              <h2 class="text-subtitle-2 text-gray-600 ellipsis lines-1">{{ user.email }}</h2>
             </div>
           </div>
           <alex-custom-tabs v-model="activeTab" :tabs="tabs" />

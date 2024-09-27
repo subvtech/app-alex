@@ -1,14 +1,8 @@
 // Gets the return of stringLiterals and convert this => ('goiaba' | 'maconha')[] to 'goiaba' | 'maconha'
-import {
-  compareDesc,
-  isAfter,
-  isBefore,
-  isSameDay,
-  isEqual,
-  isWithinInterval,
-} from 'date-fns';
-export type ElementType<T extends ReadonlyArray<unknown>> =
-  T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+import { compareDesc, isAfter, isBefore, isSameDay, isEqual, isWithinInterval } from 'date-fns';
+export type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer ElementType>
+  ? ElementType
+  : never;
 
 const extensions = literalArray('.jpeg', '.jpg', '.png', '.webp');
 
@@ -38,6 +32,13 @@ export function withTimeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   return Promise.race([promise, timeout]);
 }
 
+export function isEnumValue<T>(
+  enumObject: Record<string, T>,
+  value: string,
+): boolean {
+  return Object.values(enumObject).includes(value as T);
+}
+
 // Iinstead return of string[], gonna return a type of each element of array ex:
 // ['goiaba' | 'maconha'] =>  type = ('goiaba' | 'maconha')[]
 export function literalArray<T extends string>(...args: T[]): T[] {
@@ -46,8 +47,7 @@ export function literalArray<T extends string>(...args: T[]): T[] {
 
 export const formRules = {
   requiredRule: (val: string) => !!val || 'Campo obrigatório',
-  min5CharactersRule: (val: string) =>
-    (val && val.length >= 5) || 'Mínimo de 5 caracteres',
+  min5CharactersRule: (val: string) => (val && val.length >= 5) || 'Mínimo de 5 caracteres',
 };
 
 export const getInitials = (name: string) => {
@@ -63,8 +63,7 @@ export const getInitials = (name: string) => {
 export const sortByDate = <T extends { date: string | Date }>(array: T[]) =>
   array.sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
 
-export const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const capitalize = (value: string) => {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -76,17 +75,12 @@ export function wait(ms: number): Promise<void> {
   });
 }
 
-export const isMessage = (
-  response?: Message | AttachedSubmission,
-): response is Message => {
+export const isMessage = (response?: Message | AttachedSubmission): response is Message => {
   if (!response) return false;
   return 'user' in response;
 };
 
-export const scrollAndHighlightElement = (
-  querySelector: string,
-  highlightClass: string,
-) => {
+export const scrollAndHighlightElement = (querySelector: string, highlightClass: string) => {
   const element = document.querySelector(querySelector);
   if (!element) return;
   element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -112,9 +106,7 @@ export const orderEvents = (events: TaskEvent[]) => {
         time: current.updatedAt,
         user: current.learning_plan_member.user.fullname,
       };
-      const group = eventsGroups.find((group) =>
-        isSameDay(currentDate, new Date(group.date)),
-      );
+      const group = eventsGroups.find((group) => isSameDay(currentDate, new Date(group.date)));
       if (group) {
         group.events.push(currentElement);
         return;
@@ -128,11 +120,7 @@ export const orderEvents = (events: TaskEvent[]) => {
   return eventsGroups;
 };
 
-export const checkIntervalOfDates = (
-  initial: Date,
-  first?: string,
-  second?: string,
-) => {
+export const checkIntervalOfDates = (initial: Date, first?: string, second?: string) => {
   try {
     if (!first && !second) {
       return true;
@@ -155,3 +143,5 @@ export const checkIntervalOfDates = (
     return false;
   }
 };
+
+export const generateGroup = (value: string, id: number) => `${value.trim().toLowerCase().replace(/ /g, '_')}_${id}`;

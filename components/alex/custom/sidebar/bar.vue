@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex-column pb-2 px-2 bg-primary sidebar"
+    class="flex-column pb-2 px-2 bg-primary sidebar overflow-y-auto"
     :class="[!clipped ? 'sidebar-visible' : 'sidebar-hidden']"
   >
     <div class="my-4 w-100 d-flex" :class="clipped ? '' : 'justify-center'">
@@ -8,11 +8,11 @@
         <NuxtLink to="/">
           <img
             v-if="clipped"
-            src="/images/alex-mini.svg"
+            src="public/images/alex-mini.svg"
             height="28"
             width="43"
           />
-          <img v-else src="/images/alex.svg" height="28" width="84" />
+          <img v-else src="public/images/alex.svg" height="28" width="84" />
         </NuxtLink>
       </div>
     </div>

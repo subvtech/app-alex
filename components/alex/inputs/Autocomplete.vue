@@ -2,7 +2,11 @@
   <div class="alex-autocomplete" :class="$attrs.class">
     <div v-if="label" class="d-flex mb-2 text-blue">
       <p v-if="required" class="mr-1 text-body-1 text-error">*</p>
-      <p class="text-body-1" :class="`text-${textColor}`">
+      <p
+        :class="`${
+          thickerLabel ? 'text-body-2' : 'text-body-1'
+        } text-${textColor}`"
+      >
         {{ label }}
       </p>
       <v-icon
@@ -14,36 +18,46 @@
         >mdi-information-outline</v-icon
       >
     </div>
-    <v-autocomplete
-      v-model="value"
-      color="primary--2"
-      rounded="lg"
-      variant="outlined"
-      clear-icon="mdi-close"
-      role="select"
-      :error-messages="errorMessage"
-      :class="theme"
-      :disabled="disabled"
-      :menu-props="{
-        class: theme,
-      }"
-      v-bind="$attrs"
-    >
-      <!-- Bind all slots  -->
-      <template v-for="(_, slot) in $slots" #[slot]="scope">
-        <slot :name="slot" v-bind="scope" />
-      </template>
-      <!-- Default item slot -->
-      <template #item="{ props: propsItem, item, index }">
-        <alex-custom-list-item
-          :key="index"
-          :text="item.title"
-          v-bind="propsItem"
-          :theme="theme"
-          :selected="value === item.title"
-        />
-      </template>
-    </v-autocomplete>
+    <div class="d-flex gap-4">
+      <v-autocomplete
+        v-model="value"
+        color="primary--2"
+        rounded="lg"
+        variant="outlined"
+        clear-icon="mdi-close"
+        role="select"
+        :error-messages="errorMessage"
+        :class="theme"
+        :disabled="disabled"
+        :menu-props="{
+          class: theme,
+        }"
+        v-bind="$attrs"
+      >
+        <!-- Bind all slots  -->
+        <template v-for="(_, slot) in $slots" #[slot]="scope">
+          <slot :name="slot" v-bind="scope" />
+        </template>
+        <!-- Default item slot -->
+        <template #item="{ props: propsItem, item, index }">
+          <alex-custom-list-item
+            :key="index"
+            :text="item.title"
+            v-bind="propsItem"
+            :theme="theme"
+            :selected="value === item.title"
+          />
+        </template>
+      </v-autocomplete>
+      <alex-custom-button
+        v-if="showSubmitButton"
+        size="large"
+        :loading="submitButtonLoading"
+        :disabled="disableSubmitButton"
+        @click="emit('click:button')"
+        >{{ submitButtonText }}</alex-custom-button
+      >
+    </div>
   </div>
 </template>
 
@@ -53,9 +67,14 @@ import { type YupSchema, useField } from 'vee-validate';
 interface AutoCompleteProps {
   name: string;
   label?: string;
+  thickerLabel?: boolean;
   required?: boolean;
   info?: string;
   disabled?: boolean;
+  showSubmitButton?: boolean;
+  disableSubmitButton?: boolean;
+  submitButtonLoading?: boolean;
+  submitButtonText?: string;
   theme?: 'light' | 'dark';
   schema?: YupSchema;
 }
@@ -67,7 +86,13 @@ const props = withDefaults(defineProps<AutoCompleteProps>(), {
   info: undefined,
   label: undefined,
   schema: undefined,
+  submitButtonText: 'Submit',
+  showSubmitButton: false,
+  submitButtonLoading: false,
+  disableSubmitButton: false,
 });
+
+const emit = defineEmits(['click:button']);
 
 const { value, errorMessage } = useField(() => props.name, props.schema, {
   syncVModel: true,

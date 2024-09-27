@@ -8,6 +8,7 @@
     :min-width="width.min"
     :max-width="width.max"
     :class="{
+      'tw-opacity-40': unavailable,
       'vertical-grid card': isVertical,
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
@@ -25,14 +26,14 @@
         <img
           :src="institution.cover.url"
           :alt="image.alt"
-          :class="{ grayscale: hide }"
+          :class="{ grayscale: hide || unavailable }"
           class="tw-max-w-40 tw-h-10"
         />
       </div>
       <v-img
         :src="image.url || '/images/cover_image_course.svg'"
         :alt="image.alt"
-        :class="{ grayscale: hide }"
+        :class="{ grayscale: hide || unavailable }"
         cover
         height="100%"
         aspect-ratio="2.5"
@@ -116,7 +117,7 @@
       class="d-flex flex-column gap-4 justify-space-between overflow-auto"
       data-testid="alex-learningplan-card-content-area"
       :class="{
-        'grayscale-2': hide,
+        'grayscale-2': hide || unavailable,
         'py-2': !isVertical,
         'pa-4': isVertical,
       }"
@@ -249,6 +250,7 @@ interface LearningPlanCardProps {
   options?: boolean;
   product?: string;
   institution?: Institution;
+  unavailable?: boolean;
 }
 
 const props = withDefaults(defineProps<LearningPlanCardProps>(), {
@@ -263,6 +265,7 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   leader: undefined,
   options: true,
   trailsCount: 0,
+  unavailable: false,
 });
 
 const { t } = useI18n();
@@ -389,3 +392,4 @@ const emits = defineEmits([
   box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
 }
 </style>
+

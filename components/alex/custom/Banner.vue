@@ -14,7 +14,7 @@
         <img
           v-else
           class="cover"
-          src="/images/alex-banner.svg"
+          src="public/images/alex-banner.svg"
           role="default-cover"
         />
       </template>
@@ -30,7 +30,7 @@
           @click="removeCoverPicture"
         >
           <img
-            src="/svg/trash-dark.svg"
+            src="public/svg/trash-dark.svg"
             style="color: #6e7a87"
             width="24"
             height="24"
@@ -144,7 +144,7 @@ type BannerProps = {
     | 'username-fullname-role'
     | 'username-role-fullname';
   settingsIcon?: string;
-  selectedOption?: number | null;
+  selectedOption?: string | number | null;
   isProfessor?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
@@ -417,6 +417,7 @@ watch(coverPicture!, () => {
 
         transition: all ease-in-out 0.4s;
         border-radius: 100%;
+        transition: all ease-in-out 0.4s;
       }
       div.img {
         position: relative;

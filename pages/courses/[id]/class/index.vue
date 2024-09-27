@@ -11,14 +11,17 @@
       image-width="250px"
       :empty-state-message="$t('pages.classes.emptyClasses')"
       :search-placeholder="$t('pages.classes.findClasses')"
+      :dialog-action-text="$t('pages.classes.createClass')"
+      :dialog-title="$t('pages.classes.createClass')"
       :action-text="$t('pages.classes.createClass')"
       action-icon="mdi-account-multiple-plus-outline"
-      colored-background
       :filter-keys="['name']"
-      :show-action="learningPlanStore.userIsFacilitator"
+      :hide-action="!learningPlanStore.userIsFacilitator"
       empty-state-object-name="pages.classes.participant"
-      :use-custom-dialog="true"
       entity="class"
+      hide-secondary-action
+      colored-background
+      use-custom-dialog
     >
       <template #item="{ item }">
         <alex-learningplan-class-card

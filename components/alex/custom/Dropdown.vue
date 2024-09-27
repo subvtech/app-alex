@@ -4,16 +4,11 @@
       <alex-custom-button
         v-if="!hasActivatorSlot"
         v-bind="propsActivator"
-        icon="mdi-dots-vertical"
+        :icon="icon"
         :variant="props.variant"
         :size="props.buttonSize"
       />
-      <slot
-        v-else
-        name="activator"
-        :props="propsActivator"
-        :is-active="isActive"
-      />
+      <slot v-else name="activator" :props="propsActivator" :is-active="isActive" />
     </template>
 
     <v-list
@@ -22,13 +17,14 @@
       :class="{ 'bg-primary-2': isDarkMode, 'bg-white': !isDarkMode }"
     >
       <alex-custom-list-item
-        v-for="({ text, icon, link, warning, onClick }, index) in items"
+        v-for="({ text, icon, link, warning, onClick, notBold }, index) in items"
         :key="index"
         :text="text"
         :icon="icon"
         :link="link"
         :warning="warning"
         :theme="theme"
+        :not-bold="notBold"
         @click="onClick"
       />
     </v-list>
@@ -48,6 +44,8 @@ interface DropdownProps {
   theme?: 'light' | 'dark';
   variant?: ButtonProps['variant'];
   buttonSize?: ButtonProps['size'];
+  icon?: string;
+  notBold?: boolean;
 }
 
 const props = withDefaults(defineProps<DropdownProps>(), {
@@ -55,6 +53,8 @@ const props = withDefaults(defineProps<DropdownProps>(), {
   warning: false,
   variant: 'primary',
   buttonSize: 'default',
+  icon: 'mdi-dots-vertical',
+  notBold: false,
 });
 
 const slots = useSlots();

@@ -1,7 +1,7 @@
 <template>
   <alex-custom-dropdown
-    :disabled="config[model]?.immutable"
-    :items="mode == 'teacher' ? filteredTeacher : filteredStudent"
+    :disabled="config[model]?.immutable || props.config === undefined"
+    :items="props.config ? configOptions : mode == 'teacher' ? filteredTeacher : filteredStudent"
   >
     <template #activator="{ props: vMenuProps }">
       <p class="text-body-4 text-gray-800 mb-2">
@@ -9,10 +9,10 @@
       </p>
       <alex-custom-chip
         v-bind="vMenuProps"
-        :text="config[model]?.text"
-        :status="config[model]?.status"
-        :prepend-icon="!config[model]?.immutable ? 'mdi-chevron-down' : ''"
-        :clickable="!config[model]?.immutable"
+        :text="props.config || !props.config?.length ? customState?.title ?? '(No state)' : config[model]?.text"
+        :status="props.config ? customState?.status ?? 'secondary' : config[model]?.status"
+        :prepend-icon="config[model]?.immutable || props.config === undefined ? '' : 'mdi-chevron-down'"
+        :clickable="!config[model]?.immutable || props.config"
         :size="size"
         variant="tonal"
       />
@@ -41,6 +41,7 @@ interface StateProps {
   size?: 'x-small' | 'small' | 'large' | 'medium';
   readonly?: boolean;
   individualJourney?: boolean;
+  config?: any;
 }
 
 const props = withDefaults(defineProps<StateProps>(), {
@@ -49,18 +50,25 @@ const props = withDefaults(defineProps<StateProps>(), {
   size: 'x-small',
   readonly: false,
   individualJourney: false,
+  config: undefined,
 });
 
-const model = defineModel<TaskStatus | TaskMemberStatus>({
+const model = defineModel<TaskStatus | TaskMemberStatus | string>({
   required: true,
 });
 
-const emit = defineEmits(['change-status']);
+const emit = defineEmits(['change-status', 'change-kanban-col']);
 
 const { t } = useI18n();
 
+const customState = ref<any>(null);
+
 // Estilização e props
 const config = computed(() => {
+  if (props.config) {
+    return props.config;
+  }
+
   const value: Record<TaskStatus | TaskMemberStatus, StateConfig> = {
     // Professor
     draft: {
@@ -106,15 +114,15 @@ const config = computed(() => {
 // Professor (Items do dropdown)
 const teacherOptions: AlexDropdownItem[] = [
   {
-    text: config.value.draft.text,
+    text: config.value.draft?.text,
     onClick: () => (model.value = 'draft'),
   },
   {
-    text: config.value.published.text,
+    text: config.value.published?.text,
     onClick: () => (model.value = 'published'),
   },
   {
-    text: config.value.finished.text,
+    text: config.value.finished?.text,
     onClick: () => (model.value = 'finished'),
   },
 ];
@@ -122,15 +130,15 @@ const teacherOptions: AlexDropdownItem[] = [
 // Aluno (Opções do dropdown)
 const studentOptions: AlexDropdownItem[] = [
   {
-    text: config.value.to_do.text,
+    text: config.value.to_do?.text,
     onClick: () => (model.value = 'to_do'),
   },
   {
-    text: config.value.in_progress.text,
+    text: config.value.in_progress?.text,
     onClick: () => (model.value = 'in_progress'),
   },
   {
-    text: config.value.in_review.text,
+    text: config.value.in_review?.text,
     onClick: () => (model.value = 'in_review'),
   },
   {
@@ -145,19 +153,47 @@ const studentOptions: AlexDropdownItem[] = [
   return true;
 });
 
+const configOptions = computed<AlexDropdownItem[]>(() =>
+  props.config.map((state) => ({
+    text: state.title,
+    onClick: () => (model.value = state.title),
+  })),
+);
+
+const themes = {
+  to_do: 'secondary',
+  doing: 'blue',
+  done: 'green',
+};
+
 const filteredTeacher = computed(() =>
-  teacherOptions
-    .filter((item) => item !== undefined)
-    .filter((item) => item.text !== config[model.value]?.text),
+  teacherOptions.filter((item) => item !== undefined).filter((item) => item.text !== config[model.value]?.text),
 );
 
 const filteredStudent = computed(() =>
-  studentOptions
-    .filter((item) => item !== undefined)
-    .filter((item) => item.text !== config[model.value]?.text),
+  studentOptions.filter((item) => item !== undefined).filter((item) => item.text !== config[model.value]?.text),
 );
 
 watch(model, (val) => {
-  emit('change-status', val);
+  if (!val) {
+    customState.value = null;
+    return;
+  }
+
+  if (props.config) {
+    const newState = props.config.find(({ title }) => title === val);
+    val = newState.title;
+
+    customState.value = {
+      ...newState,
+      status: themes?.[newState.status_type] ?? 'secondary',
+    };
+
+    emit('change-kanban-col', newState);
+  } else if (customState.value) {
+    customState.value = null;
+  } else {
+    emit('change-status', val);
+  }
 });
 </script>

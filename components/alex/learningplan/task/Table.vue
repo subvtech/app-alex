@@ -3,11 +3,7 @@
     sort-asc-icon="mdi-arrow-up-thin"
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
-    :class="
-      over.list === group && (tableSortBy.length || activeFilter)
-        ? 'table-drop'
-        : ''
-    "
+    :class="over.list === group && (tableSortBy.length || activeFilter) ? 'table-drop' : ''"
     :items="tasksArray"
     :headers="header"
     :search="searchFilter"
@@ -31,10 +27,7 @@
           @dragover.prevent="(e) => setDragOver(item.id, item.position, e)"
         >
           <template v-if="!previewRow(item.id)">
-            <td
-              class="text-body-4 text-overflow text-left"
-              :class="isArchived ? 'text-gray-400' : 'text-gray-800'"
-            >
+            <td class="text-body-4 text-overflow text-left" :class="isArchived ? 'text-gray-400' : 'text-gray-800'">
               {{ item.title }}
             </td>
             <td>
@@ -43,44 +36,25 @@
                 :date="item.finish_at"
                 :is-published="item.status === 'published' && !isArchived"
               />
-              <span v-else>{{
-                $t('pages.task.table.placeholders.undefined')
-              }}</span>
+              <span v-else>{{ $t('pages.task.table.placeholders.undefined') }}</span>
             </td>
             <td v-if="!individualJourney">
               <div v-if="item.type">
                 <v-icon
                   class="mr-1"
-                  :icon="
-                    item.type === 'group'
-                      ? 'mdi-account-multiple-outline'
-                      : 'mdi-account-outline'
-                  "
+                  :icon="item.type === 'group' ? 'mdi-account-multiple-outline' : 'mdi-account-outline'"
                 />
                 <span>{{
-                  item.type === 'group'
-                    ? $t('pages.task.table.type.group')
-                    : $t('pages.task.table.type.individual')
+                  item.type === 'group' ? $t('pages.task.table.type.group') : $t('pages.task.table.type.individual')
                 }}</span>
               </div>
-              <span v-else>{{
-                $t('pages.task.table.placeholders.undefined')
-              }}</span>
+              <span v-else>{{ $t('pages.task.table.placeholders.undefined') }}</span>
             </td>
             <td v-if="!individualJourney">
-              <div
-                v-if="item.students?.length"
-                class="ml-2"
-                :class="{ 'gray-filter': isArchived }"
-              >
-                <alex-custom-avatar-group
-                  :avatar-items="item.students || []"
-                  :max="3"
-                />
+              <div v-if="item.students?.length" class="ml-2" :class="{ 'gray-filter': isArchived }">
+                <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
               </div>
-              <span v-else>{{
-                $t('pages.task.table.placeholders.noMembers')
-              }}</span>
+              <span v-else>{{ $t('pages.task.table.placeholders.noMembers') }}</span>
             </td>
             <td>
               <alex-learningplan-task-submissions-status
@@ -94,10 +68,7 @@
               </div>
             </td>
             <td>
-              <v-tooltip
-                :text="t('pages.task.table.tooltips.kanban')"
-                location="bottom center"
-              >
+              <v-tooltip :text="t('pages.task.table.tooltips.kanban')" location="bottom center">
                 <template #activator="{ props: tooltipKanban }">
                   <alex-custom-button
                     v-bind="tooltipKanban"
@@ -116,16 +87,9 @@
                   />
                 </template>
               </v-tooltip>
-              <alex-custom-dropdown
-                :items="dropDownItems(item)"
-                variant="text"
-                prepend-icon="mdi-dots-vertical"
-              >
+              <alex-custom-dropdown :items="dropDownItems(item)" variant="text" prepend-icon="mdi-dots-vertical">
                 <template #activator="{ props: propsMenu }">
-                  <v-tooltip
-                    :text="t('pages.task.table.tooltips.options')"
-                    location="bottom center"
-                  >
+                  <v-tooltip :text="t('pages.task.table.tooltips.options')" location="bottom center">
                     <template #activator="{ props: optionsTooltipProps }">
                       <alex-custom-button
                         variant="text"
@@ -225,12 +189,7 @@ const tasksArray = computed(() => {
   const array = [...props.tasks];
   const index = array.findIndex((task) => task.id === props.over.id);
   const oldIndex = array.findIndex((task) => task.id === -1);
-  if (
-    oldIndex === props.over.id ||
-    tableSortBy.value.length ||
-    props.activeFilter
-  )
-    return array;
+  if (oldIndex === props.over.id || tableSortBy.value.length || props.activeFilter) return array;
   if (oldIndex !== -1) {
     array.splice(oldIndex, 1);
   }
@@ -247,9 +206,7 @@ const tasksArray = computed(() => {
     },
   };
   if (index !== -1) {
-    props.over.position === 'top'
-      ? array.splice(index, 0, item)
-      : array.splice(index + 1, 0, item);
+    props.over.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
   }
   return array;
 });
@@ -264,13 +221,8 @@ const confirmDelete = () => {
 };
 
 const dropDownItems = (task: TaskItem) => {
-  const deliveredTotal = task.delivered
-    ? task.delivered.underReview + task.delivered.completed
-    : 0;
-  const items = [
-    getDropDownAction('details', task.id),
-    getDropDownAction('kanban', task.id),
-  ];
+  const deliveredTotal = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;
+  const items = [getDropDownAction('details', task.id), getDropDownAction('kanban', task.id)];
 
   if (props.individualJourney) {
     return items;
@@ -399,14 +351,10 @@ const header = [
 });
 
 const setAcceptedGroups = (task: TaskItem) => {
-  const deliveredTotal = task.delivered
-    ? task.delivered.underReview + task.delivered.completed
-    : 0;
+  const deliveredTotal = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;
 
   const withDeliveries = computed(() => {
-    return deliveredTotal > 0
-      ? ['published', 'finished']
-      : ['draft', 'published', 'finished'];
+    return deliveredTotal > 0 ? ['published', 'finished'] : ['draft', 'published', 'finished'];
   });
 
   const statusMap: { [key: string]: string[] } = {
@@ -419,14 +367,7 @@ const setAcceptedGroups = (task: TaskItem) => {
 };
 
 const isTaskMovable = (task: TaskItem) => {
-  return (
-    (task.title &&
-      task.finish_at &&
-      task.type &&
-      task.start_at &&
-      !task.archived_at) ||
-    false
-  );
+  return (task.title && task.finish_at && task.type && task.start_at && !task.archived_at) || false;
 };
 
 const setDragStart = (task: TaskItem, e: DragEvent) => {
@@ -444,8 +385,7 @@ const setDragOver = (id: number, position: number, e: DragEvent) => {
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
     return;
   }
-  const newIndex =
-    tableSortBy.value.length || props.activeFilter ? -1 : position;
+  const newIndex = tableSortBy.value.length || props.activeFilter ? -1 : position;
   if (!isArchived.value) emit('dragOver', props.group, id, newIndex, e);
 };
 

@@ -129,6 +129,7 @@
           </div>
           <div class="d-flex flex-column gap-2 w-100">
             <alex-learningplan-task-description
+              v-if="submissionDesc"
               v-model="submissionDesc"
               :title="
                 $t(

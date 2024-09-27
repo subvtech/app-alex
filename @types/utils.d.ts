@@ -1,9 +1,7 @@
 type Fn<A extends unknown[], R> = (...args: A) => R;
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type Obj<T = any> = Record<PropertyKey, T>;
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type Constructor<T> = new (...args: any[]) => T;
 
 // https://dev.to/dzey/comment/268bd
@@ -16,3 +14,10 @@ type ValueOf<T, K = keyof T> = K extends keyof T & (string | number)
   : never;
 
 type ValuesOf<T extends unknown[]> = [...T][number];
+
+// https://stackoverflow.com/a/78826978
+type ComponentProps<T> = T extends new (...args: any) => { $props: infer P }
+  ? NonNullable<P>
+  : T extends (props: infer P, ...args: any) => any
+  ? P
+  : {};
