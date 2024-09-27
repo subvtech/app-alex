@@ -364,26 +364,15 @@ const getStudentTasks = async () => {
       'learning_plan_group.learning_class',
     ],
     filters: {
-      $or: [
-        {
-          learning_plan_member: {
-            user: memberId,
-          },
-        },
-        {
-          learning_plan_group: {
-            group_members: {
-              student_member: {
-                user: memberId,
-              },
-            },
-          },
-        },
-      ],
+      learning_plan_member: {
+        user: memberId,
+      },
+
       task: {
         status: {
           $not: 'draft',
         },
+        type: 'individual',
       },
     },
   });
