@@ -26,6 +26,48 @@
         <slot name="card" :item="item" :index="i" :status="status" />
       </SlickItem>
     </SlickList>
+
+    <div
+      v-if="add"
+      :class="`${
+        !isAddingTask && 'pa-4 tw-border-dashed'
+      } d-flex align-center justify-center ga-2 tw-border
+      tw-rounded-[8px] tw-cursor-pointer tw-transition
+    hover:tw-bg-gray-50`"
+      @click="isAddingTask = true"
+    >
+      <template v-if="!isAddingTask">
+        <v-icon color="gray-800">mdi-plus</v-icon>
+        <p class="text-body-4 text-gray-800 tw-leading-none">
+          {{ $t('components.projects.individual_learning.tasks.addTask') }}
+        </p>
+      </template>
+      <template v-else>
+        <alex-inputs-text-field
+          ref="addTaskInput"
+          v-model="taskTitle"
+          name="task"
+          :placeholder="
+            $t('components.projects.individual_learning.tasks.inputs.taskTitle')
+          "
+          variant="outlined"
+          hide-details
+          class="tw-w-full px-4 py-2"
+          density="comfortable"
+          auto-focus
+          @keydown.enter.prevent="(e) => e.target.blur()"
+          @blur="
+            () => {
+              if (taskTitle) {
+                emit('create-task', taskTitle);
+              }
+              isAddingTask = false;
+              taskTitle = '';
+            }
+          "
+        />
+      </template>
+    </div>
   </div>
   <alex-custom-confirm-dialog
     v-model="confirm"
@@ -77,6 +119,7 @@ interface ColumnProps {
   title: string;
   color: 'orange' | 'green' | 'blue' | 'gray';
   accept?: Accept<T> | null;
+  add?: boolean;
   group: string;
   disabled?: boolean;
 }
@@ -100,11 +143,17 @@ const emit = defineEmits<{
       event: MouseEvent;
     },
   ];
+  'create-task': [title: string];
 }>();
 
 // Confirm dialog
 const confirm = ref<boolean>(false);
 const confirmData = ref<any | undefined>(undefined);
+
+// Add Task
+const isAddingTask = ref<boolean>(false);
+const addTaskInput = ref<any | null>(null);
+const taskTitle = ref<string>('');
 
 const { setMessage } = useMessageStore();
 const { t } = useI18n();

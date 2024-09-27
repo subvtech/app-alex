@@ -40,6 +40,7 @@ interface StateProps {
   mode?: 'teacher' | 'student';
   size?: 'x-small' | 'small' | 'large' | 'medium';
   readonly?: boolean;
+  individualJourney?: boolean;
 }
 
 const props = withDefaults(defineProps<StateProps>(), {
@@ -47,6 +48,7 @@ const props = withDefaults(defineProps<StateProps>(), {
   mode: 'teacher',
   size: 'x-small',
   readonly: false,
+  individualJourney: false,
 });
 
 const model = defineModel<TaskStatus | TaskMemberStatus>({
@@ -64,38 +66,38 @@ const config = computed(() => {
     draft: {
       text: t('components.learningPlan.drawer.task.status.draft'),
       status: 'secondary',
-      immutable: !props.edit,
+      immutable: !props.edit && !props.individualJourney,
     },
     published: {
       text: t('components.learningPlan.drawer.task.status.published'),
       status: 'blue',
-      immutable: !props.edit,
+      immutable: !props.edit && !props.individualJourney,
     },
     finished: {
       text: t('components.learningPlan.drawer.task.status.finished'),
       status: 'red',
-      immutable: !props.edit,
+      immutable: !props.edit && !props.individualJourney,
     },
     // Aluno
     to_do: {
       text: t('components.learningPlan.drawer.task.status.toDo'),
       status: 'secondary',
-      immutable: props.edit,
+      immutable: props.edit && !props.individualJourney,
     },
     in_progress: {
       text: t('components.learningPlan.drawer.task.status.inProgress'),
       status: 'blue',
-      immutable: props.edit,
+      immutable: props.edit && !props.individualJourney,
     },
     in_review: {
       text: t('components.learningPlan.drawer.task.status.underReview'),
       status: 'orange',
-      immutable: !props.edit,
+      immutable: !props.edit && !props.individualJourney,
     },
     done: {
       text: t('components.learningPlan.drawer.task.status.finished'),
       status: 'green',
-      immutable: true,
+      immutable: !props.individualJourney,
     },
   };
   return value;
@@ -131,7 +133,17 @@ const studentOptions: AlexDropdownItem[] = [
     text: config.value.in_review.text,
     onClick: () => (model.value = 'in_review'),
   },
-];
+  {
+    text: config.value.done.text,
+    onClick: () => (model.value = 'done'),
+  },
+].filter(({ text }) => {
+  if (!props.individualJourney && text === config.value.done.text) {
+    return false;
+  }
+
+  return true;
+});
 
 const filteredTeacher = computed(() =>
   teacherOptions
