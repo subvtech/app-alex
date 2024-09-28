@@ -4,20 +4,14 @@ type SameLength<T extends any[]> = Extract<{ [K in keyof T]: any }, any[]>;
 
 export type Curried<A extends any[], R> = <P extends Partial<A>>(
   ...args: P
-) => P extends A
-  ? R
-  : A extends [...SameLength<P>, ...infer S]
-  ? S extends any[]
-    ? Curried<S, R>
-    : never
-  : never;
+) => P extends A ? R : A extends [...SameLength<P>, ...infer S] ? (S extends any[] ? Curried<S, R> : never) : never;
 
 const cat = (prev: unknown[], next: unknown[]) => {
   const arr = prev.reduce((res: unknown[], arg) => {
-    return res.concat(arg === __ ? next.shift() : arg);
+    return [...res, arg === __ ? next.shift() : arg];
   }, []);
 
-  return [...arr, ...next];
+  return [...(arr as unknown[]), ...next];
 };
 
 /**

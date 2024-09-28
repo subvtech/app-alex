@@ -66,7 +66,7 @@ watchEffect(() => {
         @success="$emit('success', $event)"
       />
     </div>
-    <div class="tw-flex tw-flex-1 tw-flex-col tw-gap-4 tw-p-4">
+    <div class="tw-flex tw-flex-1 tw-flex-col tw-gap-4 tw-p-4 tw-max-h-[420px] tw-overflow-auto">
       <template v-if="institutions.length">
         <alex-profile-institution-item
           v-for="institution in institutions"

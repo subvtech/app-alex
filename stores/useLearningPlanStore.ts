@@ -51,7 +51,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       ],
     },
     institutions: {
-      populate: ['cover', 'users', 'institution_users', 'institution_users.user', 'institution_users.user.avatar'],
+      populate: ['cover', 'institution_users.user.avatar'],
     },
     projects: {
       populate: ['members', 'members.user.avatar', 'members.user.cover'],

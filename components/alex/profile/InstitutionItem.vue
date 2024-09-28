@@ -39,7 +39,7 @@ const removeInstitution = () => {
       <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
       <div
         v-else-if="fallback"
-        class="tw-bg-slate-200 tw-rounded-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-size-[80px]"
+        class="tw-bg-slate-200 tw-rounded-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-min-w-[80px] tw-size-[80px]"
       >
         {{ fallback }}
       </div>

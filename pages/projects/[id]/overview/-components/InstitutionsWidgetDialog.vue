@@ -3,7 +3,6 @@ import * as yup from 'yup';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { formatCNPJ } from '~/utils/format-cnpj';
 import { formatPhone } from '~/utils/format-phone';
-import { get } from '~/utils/get';
 import { onlyNumbers } from '~/utils/only-numbers';
 
 interface InstitutionForm extends Institution {
@@ -23,16 +22,14 @@ const emit = defineEmits(['close', 'success']);
 const props = defineProps<InstitutionsProps>();
 
 const { t } = useI18n();
-const { create, update } = useStrapi();
-const { findOne } = useStrapiUtils();
 const { setMessage } = useMessageStore();
-const { removeImage, updateImage, uploadImage } = useUploadedImage();
+const client = useStrapiClient();
 const route = useRoute();
 
 const formValid = ref(false);
 const openModal = ref(false);
 const saving = ref(false);
-const formData = ref({} as InstitutionForm);
+const form = ref({} as InstitutionForm);
 const instImgInput = ref<HTMLInputElement | null>(null);
 
 const learningPlanId = computed(() => {
@@ -40,7 +37,7 @@ const learningPlanId = computed(() => {
 });
 
 const selectedUser = computed(() => {
-  return props.users.find((user) => user.id === formData.value.userId);
+  return props.users.find((user) => user.id === form.value.userId);
 });
 
 const stepsConfig = {
@@ -53,7 +50,7 @@ const stepsConfig = {
         .string()
         .email(t('pages.projects.overview.institution_dialog.errors.email_invalid'))
         .required(t('pages.projects.overview.institution_dialog.errors.email_required')),
-      nomeFantasia: yup.string().required(t('pages.projects.overview.institution_dialog.errors.trade_name_required')),
+      name: yup.string().required(t('pages.projects.overview.institution_dialog.errors.trade_name_required')),
       phone: yup
         .string()
         .test('phone-length', t('pages.projects.overview.institution_dialog.errors.phone_invalid'), (_, item) => {
@@ -61,17 +58,17 @@ const stepsConfig = {
           const { length } = onlyNumbers(item.parent.telefone);
           return length >= 10 && length <= 11; // TODO: Colocar indicação visual no erro da validação do telefone
         }),
-      razaoSocial: yup
+      socialName: yup
         .string()
         .required(t('pages.projects.overview.institution_dialog.errors.registered_name_required')),
-      setor: yup.string().required(t('pages.projects.overview.institution_dialog.errors.sector_required')),
+      sector: yup.string().required(t('pages.projects.overview.institution_dialog.errors.sector_required')),
     }),
   },
   step2: {
     title: t('pages.projects.overview.institution_dialog.legal_representative'),
     subtitle: t('pages.projects.overview.institution_dialog.information'),
     scheme: yup.object().shape({
-      legalRepresentativeId: yup
+      userId: yup
         .number()
         .required(t('pages.projects.overview.institution_dialog.errors.legal_representative_required')),
     }),
@@ -84,8 +81,8 @@ const fetchCNPJ = async (value: string) => {
     const data = await res.json();
 
     if (data?.CNPJ) {
-      formData.value = {
-        ...formData.value,
+      form.value = {
+        ...form.value,
         address: data.address || `${data['TIPO LOGRADOURO']} ${data.LOGRADOURO}, ${data.BAIRRO}, ${data.MUNICIPIO} - ${data.UF}, ${data.CEP}`, // prettier-ignore
         email: data.EMAIL || data.email,
         name: data['NOME FANTASIA'] || data.nomeFantasia,
@@ -102,18 +99,18 @@ const fetchCNPJ = async (value: string) => {
 };
 
 const handleAfterClose = () => {
-  formData.value = {} as InstitutionForm;
+  form.value = {} as InstitutionForm;
   emit('close');
 };
 
-const handleFileUpload = (event: Event) => {
+const handleFilePick = (event: Event) => {
   const { files } = event.target as HTMLInputElement;
 
   if (files?.length) {
     const reader = new FileReader();
-    formData.value.files = files;
+    form.value.files = files;
     reader.onload = () => {
-      formData.value.cover = {
+      form.value.cover = {
         name: files[0].name,
         url: reader.result as string,
       };
@@ -130,46 +127,26 @@ const handleSubmit = async () => {
 
   try {
     const { cover: prevCover } = props.institution || {};
-    const { files, userId, ...value } = formData.value;
+    const { files, userId, ...value } = form.value;
+    const formData = new FormData();
 
-    const image = await (async (): Promise<Upload | null | undefined> => {
-      if (value.cover && !prevCover?.id) {
-        return (await uploadImage({ target: { files } } as never))[0];
-      }
-
-      if (value.cover && prevCover?.id) {
-        return await updateImage({ target: { files } } as never, prevCover.id);
-      }
-
-      if (!value.cover && prevCover?.id) {
-        await removeImage(prevCover.id);
-        return null; // null remove a imagem, undefined ignora qualquer ação.
-      }
-    })();
-
-    value.cover = image?.id as never;
     value.phone = onlyNumbers(value.phone);
+    formData.append('userId', String(userId));
+    for (const key in value) formData.append(key, value[key]);
 
-    const res = formData.value.id
-      ? await update(`institutions/${formData.value.id}`, value)
-      : await create('institutions', value);
-
-    if (props.institution) {
-      const { id, user } = props.institution.institution_users.find((v) => v.role === 'representative') || {};
-      user
-        ? await update(`institution-users/${id}?user=${user.id}`, { user: [userId] })
-        : await create('institution-users', { institution: [res.data.id], user: [userId], role: 'representative' });
-    } else {
-      const ids = props.institutions.map(get('id')).concat(res.data.id);
-      await update(`learningplans/${learningPlanId.value}`, { institutions: ids });
-      await create('institution-users', { institution: [res.data.id], user: [userId], role: 'representative' });
+    if (files?.[0]) {
+      formData.append('cover', files[0]);
+      formData.append('action', prevCover ? 'update-cover' : 'create-cover');
+    } else if (!value.cover && prevCover) {
+      formData.append('action', 'remove-cover');
     }
 
-    const institution = await findOne('institutions', res.data.id, {
-      populate: ['cover', 'users', 'institution_users', 'institution_users.user', 'institution_users.user.avatar'],
-    });
+    const url = `learningplans/${learningPlanId.value}/institutions`;
+    const res = form.value.id
+      ? await client<Institution>(`${url}/${form.value.id}`, { method: 'PUT', body: formData })
+      : await client<Institution>(url, { method: 'POST', body: formData });
 
-    emit('success', institution.data);
+    emit('success', res);
     openModal.value = false;
   } catch (err) {
     setMessage((err as Error).message, 'red');
@@ -180,7 +157,7 @@ const handleSubmit = async () => {
 
 watchEffect(() => {
   if (props.institution) {
-    formData.value = {
+    form.value = {
       ...props.institution,
       cnpj: formatCNPJ(props.institution.cnpj),
       phone: formatPhone(props.institution.phone),
@@ -191,8 +168,8 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
-  const cnpj = onlyNumbers(formData.value.cnpj);
-  if (cnpj.length === 14 && formData.value.cnpj !== props.institution?.cnpj) fetchCNPJ(cnpj);
+  const cnpj = onlyNumbers(form.value.cnpj);
+  if (cnpj.length === 14 && form.value.cnpj !== props.institution?.cnpj) fetchCNPJ(cnpj);
 });
 </script>
 
@@ -207,7 +184,7 @@ watchEffect(() => {
           <v-card-title class="d-flex justify-space-between align-center font-weight-700">
             {{
               $t('pages.projects.overview.institution_dialog.title', [
-                formData.id
+                form.id
                   ? $t('pages.projects.overview.institution_dialog.update')
                   : $t('pages.projects.overview.institution_dialog.add'),
               ])
@@ -227,12 +204,12 @@ watchEffect(() => {
                         type="file"
                         accept="image/*"
                         class="tw-hidden"
-                        @change="handleFileUpload"
+                        @change="handleFilePick"
                       />
                       <img
-                        v-if="formData.cover"
+                        v-if="form.cover"
                         class="tw-border-[1px] tw-border-solid tw-flex-1 tw-object-cover tw-rounded-full"
-                        :src="formData.cover.url"
+                        :src="form.cover.url"
                       />
                       <div
                         v-else
@@ -240,7 +217,7 @@ watchEffect(() => {
                           'tw-border-2 tw-border-dashed tw-cursor-pointer tw-rounded-full',
                           'tw-flex tw-flex-1 tw-flex-col tw-items-center tw-justify-center',
                         ]"
-                        @click="!formData.cover && instImgInput?.click()"
+                        @click="!form.cover && instImgInput?.click()"
                       >
                         <v-icon class="tw-text-slate-300" size="64">mdi-image</v-icon>
                         <span class="tw-mx-4 tw-text-sm tw-text-slate-400">
@@ -248,7 +225,7 @@ watchEffect(() => {
                         </span>
                       </div>
                       <div
-                        v-if="formData.cover"
+                        v-if="form.cover"
                         :class="[
                           'tw-absolute tw-inset-0 tw-cursor-pointer tw-flex tw-items-center tw-justify-center tw-rounded-full',
                           'tw-bg-black/50 tw-opacity-0 hover:tw-opacity-100 tw-transition-opacity !tw-duration-500',
@@ -258,12 +235,12 @@ watchEffect(() => {
                         <v-icon class="tw-text-white tw-mr-1 tw-mt-[1px]" size="small">mdi-pencil</v-icon>
                       </div>
                       <alex-custom-button
-                        v-if="formData.cover"
+                        v-if="form.cover"
                         class="!tw-absolute !tw-bottom-2 !tw-right-2 !tw-min-w-fit !tw-min-h-fit"
                         size="small"
                         variant="error"
                         style="padding: 6px 6px !important"
-                        @click.stop="formData.cover = null"
+                        @click.stop="form.cover = null"
                       >
                         <img src="/svg/trash.svg" width="20" height="20" />
                       </alex-custom-button>
@@ -271,19 +248,19 @@ watchEffect(() => {
                   </v-col>
                   <v-col cols="8" class="d-flex flex-column">
                     <alex-inputs-text-field
-                      v-model="formData.cnpj"
+                      v-model="form.cnpj"
                       required
                       maxlength="18"
                       minlength="14"
                       name="cnpj"
                       :label="$t('pages.projects.overview.institution_dialog.cnpj')"
                       :placeholder="'01.234.567/0001-89'"
-                      @input="formData.cnpj = formatCNPJ(formData.cnpj)"
+                      @input="form.cnpj = formatCNPJ(form.cnpj)"
                     />
                     <alex-inputs-text-field
-                      v-model="formData.name"
+                      v-model="form.name"
                       required
-                      name="nomeFantasia"
+                      name="name"
                       :label="$t('pages.projects.overview.institution_dialog.trade_name')"
                       :placeholder="'Instituto Federal de Alagoas'"
                     />
@@ -291,16 +268,16 @@ watchEffect(() => {
                 </v-col>
                 <v-col cols="12">
                   <alex-inputs-text-field
-                    v-model="formData.socialName"
+                    v-model="form.socialName"
                     required
-                    name="razaoSocial"
+                    name="socialName"
                     :label="$t('pages.projects.overview.institution_dialog.registered_name')"
                     :placeholder="'Ex: Instituto Federal de Alagoas'"
                   />
                 </v-col>
                 <v-col cols="12">
                   <alex-inputs-text-field
-                    v-model="formData.email"
+                    v-model="form.email"
                     required
                     name="email"
                     :label="$t('pages.projects.overview.institution_dialog.email')"
@@ -309,26 +286,26 @@ watchEffect(() => {
                 </v-col>
                 <v-col cols="6">
                   <alex-inputs-text-field
-                    v-model="formData.sector"
-                    name="setor"
+                    v-model="form.sector"
                     required
+                    name="sector"
                     :label="$t('pages.projects.overview.institution_dialog.sector')"
                     :placeholder="'Ex: Educação'"
                   />
                 </v-col>
                 <v-col cols="6">
                   <alex-inputs-text-field
-                    v-model="formData.phone"
-                    name="telefone"
+                    v-model="form.phone"
+                    name="phone"
                     :label="$t('pages.projects.overview.institution_dialog.phone')"
                     :placeholder="'(12) 3456-7890'"
-                    @input="formData.phone = formatPhone(formData.phone)"
+                    @input="form.phone = formatPhone(form.phone)"
                   />
                 </v-col>
                 <v-col cols="12">
                   <alex-inputs-text-field
-                    v-model="formData.address"
-                    name="endereco"
+                    v-model="form.address"
+                    name="address"
                     :label="$t('pages.projects.overview.institution_dialog.address')"
                     :placeholder="'Ex: R. Mizael Domingues, 530 - Centro, Maceió - AL, 57020-600'"
                   />
@@ -347,9 +324,9 @@ watchEffect(() => {
                 </v-col>
                 <v-col cols="12">
                   <alex-inputs-select
-                    v-model="formData.userId"
+                    v-model="form.userId"
                     required
-                    name="legalRepresentativeId"
+                    name="userId"
                     :items="users.map((user) => ({ title: user.fullname, value: user.id }))"
                     :label="$t('pages.projects.overview.institution_dialog.legal_representative')"
                     :placeholder="$t('pages.projects.overview.institution_dialog.search_member')"
@@ -373,12 +350,12 @@ watchEffect(() => {
                   />
                   <alex-custom-button
                     type="submit"
-                    :disabled="!isValid || !formData.cnpj || (!isFirstStep && !formData.userId)"
+                    :disabled="!isValid || !form.cnpj || (!isFirstStep && !form.userId)"
                     :loading="loading"
                     :text="
                       isFirstStep
                         ? $t('pages.projects.overview.institution_dialog.next')
-                        : formData.id
+                        : form.id
                         ? $t('pages.projects.overview.institution_dialog.update')
                         : $t('pages.projects.overview.institution_dialog.add')
                     "
