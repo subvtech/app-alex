@@ -1,3 +1,5 @@
+import type { InstitutionUser } from './institution-user.model';
+
 export interface Institution {
   acronym: string;
   address: string;
@@ -5,6 +7,7 @@ export interface Institution {
   cover?: Upload | null;
   email: string;
   id: number;
+  institution_users: InstitutionUser[];
   name: string;
   phone: string;
   sector: string;

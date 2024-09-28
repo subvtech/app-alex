@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { useUserPermissions } from '~/composables/useUserPermissions';
 import InstitutionsWidgetDialog from './InstitutionsWidgetDialog.vue';
 
-interface InstitutionWidgetEvents {
-  (event: 'success', institution: Institution): void;
-}
+type InstitutionWidgetEvents = (event: 'success', institution: Institution) => void;
 
 export interface InstitutionsWidgetProps {
   institutions: Institution[];

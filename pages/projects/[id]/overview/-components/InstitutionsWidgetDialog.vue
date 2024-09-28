@@ -24,6 +24,7 @@ const props = defineProps<InstitutionsProps>();
 
 const { t } = useI18n();
 const { create, update } = useStrapi();
+const { findOne } = useStrapiUtils();
 const { setMessage } = useMessageStore();
 const { removeImage, updateImage, uploadImage } = useUploadedImage();
 const route = useRoute();
@@ -131,38 +132,45 @@ const handleSubmit = async () => {
     const { cover: prevCover } = props.institution || {};
     const { files, userId, ...value } = formData.value;
 
-    const image = await (async (): Promise<Upload | null | void> => {
+    const image = await (async (): Promise<Upload | null | undefined> => {
       if (value.cover && !prevCover?.id) {
         return (await uploadImage({ target: { files } } as never))[0];
-      } else if (value.cover && prevCover?.id) {
-        return await updateImage({ target: { files } } as never, prevCover!.id!);
-      } else if (!value.cover && prevCover?.id) {
+      }
+
+      if (value.cover && prevCover?.id) {
+        return await updateImage({ target: { files } } as never, prevCover.id);
+      }
+
+      if (!value.cover && prevCover?.id) {
         await removeImage(prevCover.id);
-        return null;
+        return null; // null remove a imagem, undefined ignora qualquer ação.
       }
     })();
 
     value.cover = image?.id as never;
     value.phone = onlyNumbers(value.phone);
-    value.users = [userId] as never;
 
     const res = formData.value.id
       ? await update(`institutions/${formData.value.id}`, value)
       : await create('institutions', value);
 
-    if (!props.institutions.find((v) => v.id === res.data.id)) {
+    if (props.institution) {
+      const { id, user } = props.institution.institution_users.find((v) => v.role === 'representative') || {};
+      user
+        ? await update(`institution-users/${id}?user=${user.id}`, { user: [userId] })
+        : await create('institution-users', { institution: [res.data.id], user: [userId], role: 'representative' });
+    } else {
       const ids = props.institutions.map(get('id')).concat(res.data.id);
       await update(`learningplans/${learningPlanId.value}`, { institutions: ids });
+      await create('institution-users', { institution: [res.data.id], user: [userId], role: 'representative' });
     }
 
-    openModal.value = false;
-
-    emit('success', {
-      ...res.data.attributes,
-      cover: image,
-      id: res.data.id,
-      users: props.users.filter((user) => user.id === formData.value.userId),
+    const institution = await findOne('institutions', res.data.id, {
+      populate: ['cover', 'users', 'institution_users', 'institution_users.user', 'institution_users.user.avatar'],
     });
+
+    emit('success', institution.data);
+    openModal.value = false;
   } catch (err) {
     setMessage((err as Error).message, 'red');
   } finally {
@@ -176,7 +184,7 @@ watchEffect(() => {
       ...props.institution,
       cnpj: formatCNPJ(props.institution.cnpj),
       phone: formatPhone(props.institution.phone),
-      userId: props.institution.users?.[0]?.id,
+      userId: props.institution.institution_users.find((v) => v.role === 'representative')?.user.id,
     };
     openModal.value = true;
   }

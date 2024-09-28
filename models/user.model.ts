@@ -1,5 +1,5 @@
-import { Tag } from './tag.model';
-import { Institution } from './institution.model';
+import type { Institution } from './institution.model';
+import type { Tag } from './tag.model';
 
 export enum UserRoles {
   PROFESSOR = 'professor',

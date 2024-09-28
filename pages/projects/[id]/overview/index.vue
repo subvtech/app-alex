@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import EventsWidget from './-components/EventsWidget.vue';
-import GanttWidget, { GanttWidgetProps } from './-components/GanttWidget.vue';
+import GanttWidget, { type GanttWidgetProps } from './-components/GanttWidget.vue';
 import InstitutionsWidget from './-components/InstitutionsWidget.vue';
 import MeetupWidget from './-components/MeetupWidget.vue';
-import StatisticsWidget, { StatisticsWidgetProps } from './-components/StatisticsWidget.vue';
-import TaskProgressWidget, { TaskProgressProps } from './-components/TaskProgressWidget.vue';
+import StatisticsWidget, { type StatisticsWidgetProps } from './-components/StatisticsWidget.vue';
+import TaskProgressWidget, { type TaskProgressProps } from './-components/TaskProgressWidget.vue';
 
 interface DataStore {
   counters: StatisticsWidgetProps['counters'];
@@ -21,12 +21,14 @@ const dataStore = ref<DataStore>();
 const loading = ref(true);
 
 const handleInstitutionSuccess = (value: Institution) => {
-  const index = dataStore.value!.institutions.findIndex((v) => v.id === value.id);
+  if (!dataStore.value) return;
+
+  const index = dataStore.value.institutions.findIndex((v) => v.id === value.id);
 
   if (index !== -1) {
-    dataStore.value!.institutions[index] = { ...dataStore.value!.institutions[index], ...value };
+    dataStore.value.institutions[index] = { ...dataStore.value.institutions[index], ...value };
   } else {
-    dataStore.value!.institutions.push(value);
+    dataStore.value.institutions.push(value);
   }
 };
 

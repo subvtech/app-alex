@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
-import { LearningPlanMemberSimple, MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
-import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
+import type { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
+import {
+  type LearningPlanMemberSimple,
+  MemberRoles,
+  MemberStatus,
+} from '@/models/simple/learningPlanMemberSimple.model';
+import type { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
@@ -47,7 +51,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
       ],
     },
     institutions: {
-      populate: ['cover', 'users'],
+      populate: ['cover', 'users', 'institution_users', 'institution_users.user', 'institution_users.user.avatar'],
     },
     projects: {
       populate: ['members', 'members.user.avatar', 'members.user.cover'],
