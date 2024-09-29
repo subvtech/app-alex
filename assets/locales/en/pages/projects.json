@@ -63,9 +63,12 @@
       "trade_name": "Trade name",
       "update": "Update"
     },
+    "institution_remove_title": "Confirm removal?!",
+    "institution_remove_message": "Confirm the removal of \"{0}\"?! This operation cannot be undone.",
     "institutions": "Institutions",
     "last_update": "Last update:",
     "remaining_time": "Remaining time",
+    "remove": "Remove",
     "task_progress": "Task progress",
     "timeline_day": "Day",
     "timeline_month": "Month",

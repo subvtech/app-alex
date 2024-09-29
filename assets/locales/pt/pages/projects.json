@@ -63,9 +63,12 @@
       "trade_name": "Nome fantasia",
       "update": "Atualizar"
     },
+    "institution_remove_title": "Confirmar remoção?!",
+    "institution_remove_message": "Confirmar a remoção de \"{0}\"?! Esta operação não poderá ser desfeita.",
     "institutions": "Instituições",
     "last_update": "Última atualização:",
     "remaining_time": "Tempo restante",
+    "remove": "Remover",
     "task_progress": "Progresso de tarefas",
     "timeline_day": "Dia",
     "timeline_month": "Mês",

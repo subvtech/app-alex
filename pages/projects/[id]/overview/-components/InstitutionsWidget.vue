@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useMutation } from '@tanstack/vue-query';
 import { useI18n } from 'vue-i18n';
 import Let from '~/components/Let.vue';
+import Button from '~/components/ui/button/Button.vue';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { useUserPermissions } from '~/composables/useUserPermissions';
 import InstitutionsWidgetDialog from './InstitutionsWidgetDialog.vue';
 
@@ -26,6 +29,7 @@ const userPermissions = useUserPermissions();
 const route = useRoute();
 
 const users = ref<StrapiUser[]>([]);
+const removedInstitution = ref<Institution | null>(null);
 const selectedInstitution = ref<Institution | null>(null);
 
 const canCreateInstitution = computed(() => {
@@ -38,6 +42,25 @@ const canUpdateInstitution = computed(() => {
 
 const canRemoveInstitution = computed(() => {
   return userPermissions.value.includes('api::learningplan.learningplan:removeInstitution');
+});
+
+const removeInstitution = useMutation({
+  async mutationFn(institution: Institution) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await strapiClient(`learningplans/${+route.params?.id}/institutions/${institution.id}`, { method: 'DELETE' });
+  },
+  onMutate(institution) {
+    removedInstitution.value = institution;
+  },
+  onError(error) {
+    console.log(error);
+  },
+  onSuccess() {
+    emit('remove', removedInstitution.value!);
+  },
+  onSettled() {
+    removedInstitution.value = null;
+  },
 });
 
 const fetchUsers = async () => {
@@ -55,16 +78,9 @@ const getRepresentative = (institution: Institution) => {
   return institution.institution_users.find((v) => v.role === 'representative')!.user;
 };
 
-const handleRemoveInstitution = async (institution: Institution) => {
-  // TODO: Checar porque não funciona
-  setMessage(`Removing ${institution.name}...`, 'info');
-
-  try {
-    await strapiClient(`learningplans/${+route.params?.id}/institutions/${institution.id}`, { method: 'DELETE' });
-    emit('remove', institution);
-  } catch (err) {
-    // TODO: Checar porque não funciona
-    setMessage((err as Error).message, 'red');
+const handleInstitutionClick = (institution: Institution) => {
+  if (canUpdateInstitution && removedInstitution.value !== institution) {
+    selectedInstitution.value = institution;
   }
 };
 
@@ -99,9 +115,9 @@ watchEffect(() => {
         <div
           v-for="institution in institutions"
           :key="institution.id"
-          class="tw-bg-white tw-flex tw-items-center tw-p-1"
+          class="tw-bg-white tw-flex tw-items-center tw-rounded-sm tw-p-1"
           :class="canUpdateInstitution && 'tw-cursor-pointer hover:tw-bg-slate-50'"
-          @click="canUpdateInstitution ? (selectedInstitution = institution) : null"
+          @click="handleInstitutionClick(institution)"
         >
           <div class="tw-flex tw-flex-1 tw-items-center tw-gap-3">
             <NuxtImg
@@ -154,15 +170,54 @@ watchEffect(() => {
               </div>
             </Let>
           </div>
-          <!-- TODO: Exibir popup de confirmação -->
-          <alex-custom-button
-            v-if="canRemoveInstitution"
-            color="gray-500"
-            icon="mdi-trash-can-outline"
-            size="small"
-            variant="icon"
-            @click.stop="handleRemoveInstitution(institution)"
-          />
+          <Popover v-if="canRemoveInstitution">
+            <PopoverTrigger as-child>
+              <Button
+                variant="ghost"
+                class="!tw-p-1 !tw-h-auto"
+                :class="!removeInstitution.isPending.value && 'hover:tw-bg-slate-200'"
+                :disabled="removeInstitution.isPending.value"
+                @click.stop
+              >
+                <v-icon
+                  v-if="removeInstitution.isPending.value && removedInstitution === institution"
+                  class="tw-animate-spin"
+                  :class="removeInstitution.isPending.value ? 'tw-text-slate-300' : 'tw-text-slate-500'"
+                  icon="mdi-loading"
+                  size="small"
+                />
+                <v-icon
+                  v-else
+                  :class="removeInstitution.isPending.value ? 'tw-text-slate-300' : 'tw-text-slate-500'"
+                  icon="mdi-trash-can-outline"
+                  size="small"
+                />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent class="tw-flex tw-flex-col tw-w-[400px]">
+              <h3>{{ $t('pages.projects.overview.institution_remove_title') }}</h3>
+              <div class="tw-mb-2">
+                {{ $t('pages.projects.overview.institution_remove_message', [institution.name]) }}
+              </div>
+              <div class="tw-flex tw-justify-end">
+                <Button
+                  variant="destructive"
+                  :class="removeInstitution.isPending.value && 'tw-opacity-60'"
+                  :disabled="removeInstitution.isPending.value"
+                  @click.stop="removeInstitution.mutate(institution)"
+                >
+                  <v-icon
+                    v-if="removeInstitution.isPending.value && removedInstitution === institution"
+                    class="tw-animate-spin"
+                    icon="mdi-loading"
+                    size="x-small"
+                  />
+                  <v-icon v-else icon="mdi-trash-can-outline" size="x-small" />
+                  <span class="tw-ml-2">{{ $t('pages.projects.overview.remove') }}</span>
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </template>
       <div v-else class="tw-m-auto">
