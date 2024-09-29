@@ -274,6 +274,8 @@ const tasks = ref<VNode | any>([]);
 const expanded = ref<string>('tasks');
 const isMobile = ref<boolean>(false);
 
+watch(tasks, (tasks) => console.log('tasks:', tasks));
+
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
 const taskDetails = ref<TaskSimple | null>(null);
