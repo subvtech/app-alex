@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useMutation } from '@tanstack/vue-query';
 import * as yup from 'yup';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { formatCNPJ } from '~/utils/format-cnpj';
 import { formatPhone } from '~/utils/format-phone';
 import { onlyNumbers } from '~/utils/only-numbers';
+import { validateCNPJ } from '~/utils/validate-cnpj';
 
 interface InstitutionForm extends Institution {
   files?: FileList | null;
@@ -22,7 +24,7 @@ const emit = defineEmits(['close', 'update']);
 const props = defineProps<InstitutionsProps>();
 
 const { t } = useI18n();
-const { setMessage } = useMessageStore();
+const { $toast } = useNuxtApp();
 const strapiClient = useStrapiClient();
 const route = useRoute();
 
@@ -75,15 +77,13 @@ const stepsConfig = {
   },
 };
 
-const fetchCNPJ = async (value: string) => {
-  try {
-    // TODO: Procurar outro serviço de CNPJ
-    const res = await fetch(`https://api-publica.speedio.com.br/buscarcnpj?cnpj=${onlyNumbers(value)}`);
+const fetchCNPJ = useMutation({
+  async mutationFn(cnpj: string) {
+    const res = await fetch(`https://api-publica.speedio.com.br/buscarcnpj?cnpj=${onlyNumbers(cnpj)}`);
     const data = await res.json();
 
     if (data?.CNPJ) {
-      form.value = {
-        ...form.value,
+      return {
         address: data.address || `${data['TIPO LOGRADOURO']} ${data.LOGRADOURO}, ${data.BAIRRO}, ${data.MUNICIPIO} - ${data.UF}, ${data.CEP}`, // prettier-ignore
         email: data.EMAIL || data.email,
         name: data['NOME FANTASIA'] || data.nomeFantasia,
@@ -94,11 +94,14 @@ const fetchCNPJ = async (value: string) => {
     } else {
       throw new Error(t('pages.projects.overview.institution_dialog.errors.cnpj_not_found'));
     }
-  } catch (err) {
-    // TODO: Checar porque não funciona
-    setMessage((err as Error).message, 'red');
-  }
-};
+  },
+  onSuccess(data: Obj) {
+    form.value = { ...form.value, ...data };
+  },
+  onError(err) {
+    $toast.error(err.message || t('pages.projects.errors.unknown'), { class: '[&_[data-icon]]:tw-text-red-500' });
+  },
+});
 
 const handleAfterClose = () => {
   form.value = {} as InstitutionForm;
@@ -121,9 +124,6 @@ const handleFilePick = (event: Event) => {
   }
 };
 
-// TODO: Criar endpoint de criação de instituição que vincule com o learning plan e trate
-// o upload de imagem para garantir que os dados estejam consistentes (adicionar transaction).
-// Além disso, validar os atributos que podem ser criados/alterados pelo usuário.
 const handleSubmit = async () => {
   saving.value = true;
 
@@ -151,8 +151,9 @@ const handleSubmit = async () => {
     emit('update', res);
     openModal.value = false;
   } catch (err) {
-    // TODO: Checar porque não funciona
-    setMessage((err as Error).message, 'red');
+    $toast.error((err as Error).message || t('pages.projects.errors.unknown'), {
+      class: '[&_[data-icon]]:tw-text-red-500',
+    });
   } finally {
     saving.value = false;
   }
@@ -170,10 +171,16 @@ watchEffect(() => {
   }
 });
 
-watchEffect(() => {
-  const cnpj = onlyNumbers(form.value.cnpj);
-  if (cnpj.length === 14 && form.value.cnpj !== props.institution?.cnpj) fetchCNPJ(cnpj);
-});
+watch(
+  () => form.value.cnpj,
+  (cnpj) => {
+    const isChanged = cnpj !== props.institution?.cnpj;
+    const isPending = fetchCNPJ.isPending.value;
+    const isValid = validateCNPJ(cnpj);
+
+    if (isChanged && isValid && !isPending) fetchCNPJ.mutate(form.value.cnpj);
+  },
+);
 </script>
 
 <template>

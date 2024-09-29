@@ -23,7 +23,6 @@ withDefaults(defineProps<InstitutionsWidgetProps>(), {
 });
 
 const { t } = useI18n();
-const { setMessage } = useMessageStore();
 const { $toast } = useNuxtApp();
 const strapiClient = useStrapiClient();
 const userPermissions = useUserPermissions();
@@ -72,8 +71,9 @@ const fetchUsers = async () => {
     if (!res) throw new Error(t('pages.projects.overview.institution_dialog.errors.fetch_users'));
     users.value = res;
   } catch (err) {
-    // TODO: Checar porque não funciona
-    setMessage((err as Error).message, 'red');
+    $toast.error((err as Error).message || t('pages.projects.errors.unknown'), {
+      class: '[&_[data-icon]]:tw-text-red-500',
+    });
   }
 };
 
@@ -93,8 +93,9 @@ watchEffect(() => {
       fetchUsers();
     }
   } catch (err) {
-    // TODO: Checar porque não funciona
-    setMessage((err as Error).message, 'red');
+    $toast.error((err as Error).message || t('pages.projects.errors.unknown'), {
+      class: '[&_[data-icon]]:tw-text-red-500',
+    });
   }
 });
 </script>
