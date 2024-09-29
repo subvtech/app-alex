@@ -3,19 +3,25 @@
     "documents": "Documents",
     "home": "Home",
     "individual_learning": "Individual Journey",
+    "loading": "Loading",
     "members": "Members",
     "my_projects": "My projects",
     "new_project": "New project",
     "overview": "Overview",
     "projects": "Projects",
+    "removing_tmpl": "Removing {0}",
+    "removing": "Removing",
+    "saving_tmpl": "Saving {0}",
+    "saving": "Saving",
     "tasks": "Tasks",
     "trails": "Trails",
     "task": "Task"
   },
   "errors": {
-    "404": "Page not found",
     "403": "Access denied",
-    "500": "Internal server error"
+    "404": "Page not found",
+    "500": "Internal server error",
+    "unknown": "An error occurred while trying to perform the requested action. Please try again."
   },
   "individual_learning": {
     "empty_events": "No events registered",
@@ -63,8 +69,9 @@
       "trade_name": "Trade name",
       "update": "Update"
     },
-    "institution_remove_title": "Confirm removal?!",
     "institution_remove_message": "Confirm the removal of \"{0}\"?! This operation cannot be undone.",
+    "institution_remove_success": "Institution successfully removed.",
+    "institution_remove_title": "Confirm removal?!",
     "institutions": "Institutions",
     "last_update": "Last update:",
     "remaining_time": "Remaining time",

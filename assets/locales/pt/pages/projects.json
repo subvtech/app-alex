@@ -3,19 +3,25 @@
     "documents": "Documentos",
     "home": "Início",
     "individual_learning": "Jornada Individual",
+    "loading": "Carregando",
     "members": "Integrantes",
     "my_projects": "Meus projetos",
     "new_project": "Novo projeto",
     "overview": "Visão geral",
     "projects": "Projetos",
+    "removing_tmpl": "Removendo {0}",
+    "removing": "Removendo",
+    "saving_tmpl": "Salvando {0}",
+    "saving": "Salvando",
     "tasks": "Tarefas",
     "trails": "Trilhas",
     "task": "Tarefa"
   },
   "errors": {
-    "404": "Página não encontrada",
     "403": "Acesso negado",
-    "500": "Erro interno do servidor"
+    "404": "Página não encontrada",
+    "500": "Erro interno do servidor",
+    "unknown": "Ocorreu um erro ao tentar executar a ação solicitada. Por favor, tente novamente."
   },
   "individual_learning": {
     "empty_events": "Não há eventos cadastrados",
@@ -63,8 +69,9 @@
       "trade_name": "Nome fantasia",
       "update": "Atualizar"
     },
-    "institution_remove_title": "Confirmar remoção?!",
     "institution_remove_message": "Confirmar a remoção de \"{0}\"?! Esta operação não poderá ser desfeita.",
+    "institution_remove_success": "Instituição removida com sucesso.",
+    "institution_remove_title": "Confirmar remoção?!",
     "institutions": "Instituições",
     "last_update": "Última atualização:",
     "remaining_time": "Tempo restante",

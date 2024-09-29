@@ -24,6 +24,7 @@ withDefaults(defineProps<InstitutionsWidgetProps>(), {
 
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
+const { $toast } = useNuxtApp();
 const strapiClient = useStrapiClient();
 const userPermissions = useUserPermissions();
 const route = useRoute();
@@ -52,10 +53,12 @@ const removeInstitution = useMutation({
   onMutate(institution) {
     removedInstitution.value = institution;
   },
-  onError(error) {
-    console.log(error);
+  onError(err) {
+    $toast.error(err.message || t('pages.projects.errors.unknown'), { class: '[&_[data-icon]]:tw-text-red-500' });
   },
   onSuccess() {
+    const options = { class: '[&_[data-icon]]:tw-text-green-500' };
+    $toast.success(t('pages.projects.overview.institution_remove_success'), options);
     emit('remove', removedInstitution.value!);
   },
   onSettled() {
@@ -119,7 +122,7 @@ watchEffect(() => {
           :class="canUpdateInstitution && 'tw-cursor-pointer hover:tw-bg-slate-50'"
           @click="handleInstitutionClick(institution)"
         >
-          <div class="tw-flex tw-flex-1 tw-items-center tw-gap-3">
+          <div class="tw-flex tw-flex-1 tw-items-center tw-gap-3 tw-overflow-hidden">
             <NuxtImg
               v-if="institution.cover?.url"
               class="tw-rounded-sm tw-size-[80px]"
@@ -174,7 +177,7 @@ watchEffect(() => {
             <PopoverTrigger as-child>
               <Button
                 variant="ghost"
-                class="!tw-p-1 !tw-h-auto"
+                class="!tw-p-1 !tw-h-auto !tw-w-[25px]"
                 :class="!removeInstitution.isPending.value && 'hover:tw-bg-slate-200'"
                 :disabled="removeInstitution.isPending.value"
                 @click.stop
