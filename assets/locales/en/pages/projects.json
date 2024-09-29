@@ -14,8 +14,7 @@
     "saving_tmpl": "Saving {0}",
     "saving": "Saving",
     "tasks": "Tasks",
-    "trails": "Trails",
-    "task": "Task"
+    "trails": "Trails"
   },
   "errors": {
     "403": "Access denied",

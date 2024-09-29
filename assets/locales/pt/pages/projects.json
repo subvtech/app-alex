@@ -14,8 +14,7 @@
     "saving_tmpl": "Salvando {0}",
     "saving": "Salvando",
     "tasks": "Tarefas",
-    "trails": "Trilhas",
-    "task": "Tarefa"
+    "trails": "Trilhas"
   },
   "errors": {
     "403": "Acesso negado",
