@@ -18,12 +18,12 @@ interface InstitutionsProps {
   users: StrapiUser[];
 }
 
-const emit = defineEmits(['close', 'success']);
+const emit = defineEmits(['close', 'update']);
 const props = defineProps<InstitutionsProps>();
 
 const { t } = useI18n();
 const { setMessage } = useMessageStore();
-const client = useStrapiClient();
+const strapiClient = useStrapiClient();
 const route = useRoute();
 
 const formValid = ref(false);
@@ -77,6 +77,7 @@ const stepsConfig = {
 
 const fetchCNPJ = async (value: string) => {
   try {
+    // TODO: Procurar outro serviço de CNPJ
     const res = await fetch(`https://api-publica.speedio.com.br/buscarcnpj?cnpj=${onlyNumbers(value)}`);
     const data = await res.json();
 
@@ -94,6 +95,7 @@ const fetchCNPJ = async (value: string) => {
       throw new Error(t('pages.projects.overview.institution_dialog.errors.cnpj_not_found'));
     }
   } catch (err) {
+    // TODO: Checar porque não funciona
     setMessage((err as Error).message, 'red');
   }
 };
@@ -143,12 +145,13 @@ const handleSubmit = async () => {
 
     const url = `learningplans/${learningPlanId.value}/institutions`;
     const res = form.value.id
-      ? await client<Institution>(`${url}/${form.value.id}`, { method: 'PUT', body: formData })
-      : await client<Institution>(url, { method: 'POST', body: formData });
+      ? await strapiClient<Institution>(`${url}/${form.value.id}`, { method: 'PUT', body: formData })
+      : await strapiClient<Institution>(url, { method: 'POST', body: formData });
 
-    emit('success', res);
+    emit('update', res);
     openModal.value = false;
   } catch (err) {
+    // TODO: Checar porque não funciona
     setMessage((err as Error).message, 'red');
   } finally {
     saving.value = false;

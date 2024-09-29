@@ -20,15 +20,17 @@ const learningPlanStore = useLearningPlanStore();
 const dataStore = ref<DataStore>();
 const loading = ref(true);
 
-const handleInstitutionSuccess = (value: Institution) => {
-  if (!dataStore.value) return;
+const handleRemoveInstitution = (value: Institution) => {
+  dataStore.value!.institutions = dataStore.value!.institutions.filter((v) => v.id !== value.id);
+};
 
-  const index = dataStore.value.institutions.findIndex((v) => v.id === value.id);
+const handleUpdateInstitution = (value: Institution) => {
+  const index = dataStore.value!.institutions.findIndex((v) => v.id === value.id);
 
   if (index !== -1) {
-    dataStore.value.institutions[index] = { ...dataStore.value.institutions[index], ...value };
+    dataStore.value!.institutions[index] = { ...dataStore.value!.institutions[index], ...value };
   } else {
-    dataStore.value.institutions.push(value);
+    dataStore.value!.institutions.push(value);
   }
 };
 
@@ -58,7 +60,11 @@ onBeforeMount(async () => {
         :sprints="dataStore?.sprints"
       />
       <MeetupWidget />
-      <InstitutionsWidget :institutions="dataStore?.institutions" @success="handleInstitutionSuccess" />
+      <InstitutionsWidget
+        :institutions="dataStore?.institutions"
+        @remove="handleRemoveInstitution"
+        @update="handleUpdateInstitution"
+      />
       <EventsWidget />
     </div>
   </div>
