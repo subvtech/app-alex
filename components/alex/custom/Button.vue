@@ -27,7 +27,6 @@ export interface ButtonProps {
     | 'tertiary'
     | 'outlined'
     | 'text'
-    | 'icon'
     | 'error'
     | 'success'
     | 'warning'
@@ -59,7 +58,6 @@ const variants = {
   },
   outlined: { textColor: 'gray-800', bgColor: '' },
   text: { textColor: 'gray-800', bgColor: '' },
-  icon: { textColor: 'gray-500', bgColor: 'transparent' },
   error: { textColor: 'white', bgColor: 'error-0' },
   success: { textColor: 'white', bgColor: 'success-0' },
   warning: { textColor: 'white', bgColor: 'warning-0' },
@@ -87,7 +85,6 @@ $otherVariants:
   'secondary' 'gray-100' 'gray-200',
   'tertiary' 'gray-200' 'gray-300',
   'text' 'gray-blue' 'gray-100',
-  'icon' 'gray-100' 'gray-100',
   'outlined' 'gray-100' 'gray-200';
 
 .alex-button {

@@ -1,24 +1,52 @@
 <script setup lang="ts">
+import StatisticCard from '../-components/StatisticCard.vue';
 import EventsWidget from './-components/EventsWidget.vue';
 import GanttWidget, { type GanttWidgetProps } from './-components/GanttWidget.vue';
 import InstitutionsWidget from './-components/InstitutionsWidget.vue';
 import MeetupWidget from './-components/MeetupWidget.vue';
-import StatisticsWidget, { type StatisticsWidgetProps } from './-components/StatisticsWidget.vue';
 import TaskProgressWidget, { type TaskProgressProps } from './-components/TaskProgressWidget.vue';
 
 interface DataStore {
-  counters: StatisticsWidgetProps['counters'];
+  counters: Record<string, number>;
   institutions: Institution[];
   sprints: TaskProgressProps['sprints'];
   tasks: GanttWidgetProps['items'];
 }
 
+const { t } = useI18n();
 const route = useRoute();
 const strapi = useStrapiClient();
 const learningPlanStore = useLearningPlanStore();
 
 const dataStore = ref<DataStore>();
 const loading = ref(true);
+
+const statistics = computed(() => ({
+  epics: {
+    icon: 'alex:ManageHistory',
+    percentage: dataStore.value?.counters?.finishedEpicsPercent || 0,
+    title: t('pages.projects.overview.total_epics'),
+    value: dataStore.value?.counters?.totalEpics || 0,
+  },
+  sprints: {
+    icon: 'alex:Sprint',
+    percentage: dataStore.value?.counters?.finishedSprintsPercent || 0,
+    title: t('pages.projects.overview.total_sprints'),
+    value: dataStore.value?.counters?.totalSprints || 0,
+  },
+  stories: {
+    icon: 'alex:HistoryEdu',
+    percentage: dataStore.value?.counters?.finishedStoriesPercent || 0,
+    title: t('pages.projects.overview.total_story'),
+    value: dataStore.value?.counters?.totalStories || 0,
+  },
+  remainingTime: {
+    icon: 'mdi-calendar-clock',
+    percentage: 0,
+    title: t('pages.projects.overview.remaining_time'),
+    value: `${dataStore.value?.counters?.remainingDays || 0} dias`,
+  },
+}));
 
 const handleRemoveInstitution = (value: Institution) => {
   dataStore.value!.institutions = dataStore.value!.institutions.filter((v) => v.id !== value.id);
@@ -50,7 +78,9 @@ onBeforeMount(async () => {
 
 <template>
   <div>
-    <StatisticsWidget :counters="dataStore?.counters" />
+    <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5">
+      <StatisticCard v-for="item in Object.values(statistics)" :key="item.title" v-bind="item" />
+    </div>
     <div class="tw-grid tw-grid-cols-12 tw-gap-4">
       <GanttWidget :items="dataStore?.tasks" :sprints="dataStore?.sprints" :loading="loading" />
       <TaskProgressWidget

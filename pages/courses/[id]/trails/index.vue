@@ -57,7 +57,7 @@
       <div v-else class="d-flex align-center justify-center flex-column">
         <img
           class="emptyProjects-img"
-          src="/images/emptyTrails.svg"
+          src="public/images/emptyTrails.svg"
           :alt="$t('pages.trails.emptyStateText')"
         />
         <p class="text-h3 text-gray-400 mt-4">

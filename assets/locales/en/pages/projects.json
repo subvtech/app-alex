@@ -101,8 +101,10 @@
     "backlog": "Backlog",
     "cancel": "Cancel",
     "close": "Close",
-    "delete_subtitle": "When deleting a task, all content created within it will also be deleted.",
-    "delete_title": "Do you really want to delete the task?",
+    "delete_standard_subtitle": "When deleting a task, all content created within it will also be deleted.",
+    "delete_story_subtitle": "Make sure there are no tasks linked to it.",
+    "delete_epic_subtitle": "Make sure there are no stories or tasks linked to it.",
+    "delete_title": "Do you really want to delete the {item}?",
     "delete": "Delete",
     "deleteError": "delete",
     "deleteSuccess": "deleted",
@@ -134,6 +136,7 @@
     "see_details": "View details",
     "see_kanban": "View Kanban",
     "select": "Type",
+    "select_sprint": "Select a sprint",
     "startDate": "Start date",
     "successMessage": "Task successfully {action}!",
     "TASK_DATA_INCOMPLETE": "You need to fill in the task information before setting it as published",
@@ -156,7 +159,9 @@
       "edited_success": "{item} was edited successfully!",
       "edited_error": "An error occurred while trying to edit the {item}, please try again!",
       "deleted_success": "{item} was deleted successfully!",
-      "deleted_error": "An error occurred while trying to delete the {item}, please try again!"
+      "deleted_error": "An error occurred while trying to delete the {item}, please try again!",
+      "delete_story_has_children": "It is not possible to delete a story that has linked tasks",
+      "delete_epic_has_children": "It is not possible to delete an epic that has linked stories or tasks"
     }
   }
 }

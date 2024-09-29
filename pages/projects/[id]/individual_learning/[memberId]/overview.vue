@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CardTotalizer from '../../-components/CardTotalizer.vue';
+import StatisticCard from '../../-components/StatisticCard.vue';
 
 // TODO @Eliezir - Add custom icons & i18n
 const totalizers = ref({
@@ -28,8 +28,8 @@ const totalizers = ref({
 
 <template>
   <div>
-    <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5 tw-flex-wrap">
-      <CardTotalizer v-for="totalizer in Object.values(totalizers)" :key="totalizer.title" :totalizer="totalizer" />
+    <div class="tw-flex tw-flex-wrap gap-4 tw-mb-5">
+      <StatisticCard v-for="item in Object.values(totalizers)" :key="item.title" v-bind="item" />
     </div>
     <v-row class="mb-6">
       <v-col cols="12" lg="8">

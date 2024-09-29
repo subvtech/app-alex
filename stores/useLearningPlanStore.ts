@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import type { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
-import {
-  type LearningPlanMemberSimple,
-  MemberRoles,
-  MemberStatus,
-} from '@/models/simple/learningPlanMemberSimple.model';
-import type { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
+import { LearningPlanSimple } from '@/models/simple/learningPlanSimple.model';
+import { LearningPlanMemberSimple, MemberStatus, MemberRoles } from '@/models/simple/learningPlanMemberSimple.model';
+import { InvitationLinkSimple } from '@/models/simple/InvitationLinkSimple.model';
 
 export const useLearningPlanStore = defineStore('learning-plan', () => {
   const { findOne } = useStrapiUtils();
@@ -165,7 +161,11 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const activeProjectMembers = computed(() => {
-    return learningPlan.value?.members.filter((v: LearningPlanMemberSimple) => v.status === MemberStatus.JOINED) || [];
+    return (
+      learningPlan.value?.members.filter(
+        (m: LearningPlanMemberSimple) => m.status === MemberStatus.JOINED,
+      ) || []
+    );
   });
 
   const pendingMembers = computed(() => {

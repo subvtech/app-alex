@@ -1,55 +1,19 @@
-<script setup lang="ts">
-export interface InstitutionItemEmits {
-  (e: 'delete:institution', value: number): void; // triggers when the user clicks on the delete button
-}
-
-const emit = defineEmits<InstitutionItemEmits>();
-
-export interface InstitutionComponentType {
-  acronym: string;
-  backgroundColor?: string;
-  canEdit: boolean;
-  fallback?: string;
-  id: number;
-  isDeleted: boolean;
-  name: string;
-  sector: string;
-  url?: string;
-}
-
-const props = withDefaults(defineProps<InstitutionComponentType>(), {
-  backgroundColor: '',
-  canEdit: false,
-  fallback: undefined,
-  isDeleted: false,
-  url: undefined,
-});
-
-const { isDeleted } = toRefs(props);
-
-const removeInstitution = () => {
-  isDeleted.value = true;
-  emit('delete:institution', props.id);
-};
-</script>
-
 <template>
-  <div :class="[isDeleted ? 'd-none' : 'tw-bg-white tw-flex justify-space-between pa-4 w-100 item', backgroundColor]">
+  <div
+    :class="[
+      isDeleted ? 'd-none' : 'd-flex justify-space-between pa-4 w-100 item',
+      backgroundColor,
+    ]"
+  >
     <div class="d-flex gap-3">
       <NuxtImg v-if="url" provider="strapi" :src="url" placeholder />
-      <div
-        v-else-if="fallback"
-        class="tw-bg-slate-200 tw-rounded-sm tw-flex tw-flex-col tw-items-center tw-justify-center tw-min-w-[80px] tw-size-[80px]"
-      >
-        {{ fallback }}
-      </div>
-      <div class="tw-flex tw-flex-col tw-justify-center">
-        <span>{{ acronym ? `${acronym} - ${name}` : name }}</span>
+      <div class="d-flex flex-column justify-center">
+        <span>{{ acronym + ' - ' + name }}</span>
         <p>{{ sector }}</p>
       </div>
     </div>
     <div v-if="canEdit" class="d-flex align-center mr-3 options">
-      <img class="handle" src="/svg/menu.svg" />
+      <img class="handle" src="public/svg/menu.svg" />
       <alex-custom-button
         variant="text"
         class="remove"
@@ -61,6 +25,39 @@ const removeInstitution = () => {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+export interface InstitutionItemEmits {
+  (e: 'delete:institution', value: number): void; // triggers when the user clicks on the delete button
+}
+
+const emit = defineEmits<InstitutionItemEmits>();
+
+export interface InstitutionComponentType {
+  url?: string;
+  name: string;
+  acronym: string;
+  sector: string;
+  canEdit: boolean;
+  isDeleted: boolean;
+  backgroundColor?: string;
+  id: number;
+}
+
+const props = withDefaults(defineProps<InstitutionComponentType>(), {
+  isDeleted: false,
+  canEdit: false,
+  backgroundColor: 'bg-white',
+  url: undefined,
+});
+
+const { isDeleted } = toRefs(props);
+
+const removeInstitution = () => {
+  isDeleted.value = true;
+  emit('delete:institution', props.id);
+};
+</script>
 
 <style scoped lang="scss">
 .gap-3 {
