@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { useGetTaskMembers } from '../../-composables/useMember';
+import { useQueryClient } from '@tanstack/vue-query';
+import { MemberItem, useGetLearningGroup, useRemoveMember } from '../../-composables/useMember';
 import AddMemberDialog from './AddMemberDialog.vue';
+import Card from './Card.vue';
 interface MembersProps {
   startAt?: string | null;
   finishAt?: string | null;
@@ -20,30 +22,28 @@ const props = withDefaults(defineProps<MembersProps>(), {
   students: () => [],
 });
 
-const taskIdValue = toRef(props, 'taskId');
-const enabledGetMembers = computed(() => !!taskIdValue.value);
-const { data: members } = useGetTaskMembers(taskIdValue, enabledGetMembers);
 type Emits = {
   'change-members': [];
   'set-members': [value: LearningPlanMemberSimple[]];
 };
+defineEmits<Emits>();
+// refs
+const itemsPerPage = 12;
+const addMemberDialog = ref(false);
+const page = ref<number>(1);
+const search = ref('');
+const strapi = useStrapi();
 
 const { setMessage } = useMessageStore();
 const { t } = useI18n();
-const emit = defineEmits<Emits>();
-const addMemberDialog = ref(false);
-const page = ref<number>(1);
-const itemsPerPage = 12;
-const search = ref('');
-const client = useStrapiClient();
-const checkHasFilledDates = () => {
-  if (!props.startAt || !props.finishAt) {
-    setMessage(t('components.learningPlan.drawer.task.pleaseFillDates'), 'warning', true);
-    return false;
-  }
-  return true;
-};
 
+const taskIdValue = toRef(props, 'taskId');
+const enabledGetMembers = computed(() => !!taskIdValue.value);
+const { data: group, isPending: loadingGroup } = useGetLearningGroup(taskIdValue, enabledGetMembers);
+const { mutateAsync } = useRemoveMember();
+const members = computed(() => group.value?.group_members || []);
+const queryClient = useQueryClient();
+// methods
 const showingData = (items: any[], pageItems: any[], search: string, pageCount: number) => {
   const itemsPerPageCalc = search ? itemsPerPage : pageItems.length;
   const range = pageItems.length < itemsPerPage ? 2 : 1;
@@ -60,24 +60,12 @@ const showingData = (items: any[], pageItems: any[], search: string, pageCount: 
   return message;
 };
 
-const addMember = async (members: LearningPlanMemberSimple[]) => {
-  if (!checkHasFilledDates()) return;
+const addMember = async (groupId: number, newMembers: MemberItem[]) => {
   try {
-    await client(`/tasks/${props.taskId}/add-students`, {
-      method: 'PUT',
-      body: {
-        students: members,
-      },
-      onResponse(context) {
-        const data: TaskMemberStudent[] = context.response._data;
-        if (!data.length) {
-          setMessage(t('components.learningPlan.drawer.task.members.allSelectedMembers'), 'warning', true);
-          return;
-        }
-        setMessage(t('components.learningPlan.drawer.task.members.addMembers'), 'success', true);
-        emit('change-members');
-      },
-    });
+    const oldMembers = members.value.map((member) => ({ member_id: member.student_member.id, role: 'standard' }));
+    const newMembersValue = newMembers.map((member) => ({ member_id: member.id, role: member.role }));
+    await strapi.update('/learnin-plan-groups', groupId, { members: oldMembers.concat(newMembersValue) });
+    queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
   } catch (error) {
     setMessage(t('components.learningPlan.drawer.task.errors.addMember'), 'error', true);
   }
@@ -86,10 +74,26 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
 const handleAddMember = () => {
   addMemberDialog.value = true;
 };
+const removeMember = async (member: LearningPlanGroupMemberSimple) => {
+  if (member.role === 'in_charge') {
+    setMessage(t('pages.projects.tasks.cant_remove_in_charge'), 'error', true);
+    return;
+  }
+  await mutateAsync({ id: member.id });
+  queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
+};
 </script>
 
 <template>
-  <v-data-iterator :search="search" :page="page" :items="members" :items-per-page="itemsPerPage" class="members">
+  <v-data-iterator
+    :search="search"
+    :page="page"
+    :items="members"
+    :items-per-page="itemsPerPage"
+    class="members"
+    :loading="loadingGroup"
+    :filter-keys="['student_member.user.email', 'student_member.user.username', 'student_member.user.fullname']"
+  >
     <!-- Header -->
     <template #header>
       <div class="header d-flex tw-align-center py-4 px-2">
@@ -104,10 +108,10 @@ const handleAddMember = () => {
         />
 
         <AddMemberDialog
-          v-if="learningplanId"
           v-model="addMemberDialog"
           :learningplan-id="learningplanId"
-          :members="members"
+          :default-members="members"
+          :group-id="group?.id"
           @add-click="addMember"
         />
 
@@ -118,7 +122,20 @@ const handleAddMember = () => {
     </template>
     <!-- Cards -->
     <template #default="{ items }">
-      <div v-for="member in items" :key="member.raw.id" />
+      <Card
+        v-for="member in items"
+        :key="member.raw.id"
+        :member="{
+          name: member.raw.student_member.user.fullname,
+          image:
+            member.raw.student_member.user?.avatar?.formats?.small?.url || member.raw.student_member.user?.avatar?.url,
+          responsable: member.raw.role === learningPlanGroupMemberRolesSimple.IN_CHARGE,
+          email: member.raw.student_member.user.email,
+        }"
+        :raw="member"
+        no-checkbox
+        @remove-click="(value) => removeMember(value.raw)"
+      />
     </template>
     <template #no-data>
       <div class="d-flex align-center justify-center flex-column ga-4 text-center">
@@ -133,7 +150,11 @@ const handleAddMember = () => {
         </p>
       </div>
     </template>
-
+    <template #loader>
+      <div class="tw-flex tw-items-center tw-justify-center">
+        <v-progress-circular color="secondary-0" indeterminate></v-progress-circular>
+      </div>
+    </template>
     <template #footer="{ pageCount, groupedItems }">
       <div v-if="groupedItems.length && members.length > itemsPerPage" class="d-flex align-center ga-2 pa-6">
         <span class="flex-1-1">

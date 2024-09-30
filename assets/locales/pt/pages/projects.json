@@ -69,6 +69,8 @@
     "deleteSuccess": "excluída",
     "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem está ativa",
     "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
+    "cant_remove_in_charge": "Você não pode remover o líder da tarefa",
+    "all_members_added": "Todos os membros foram adicionados!",
     "draft": "Rascunho",
     "dropdown_delete": "Excluir",
     "dropdown_details": "Detalhes",

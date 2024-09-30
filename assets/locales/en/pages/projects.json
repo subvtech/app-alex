@@ -69,6 +69,8 @@
     "deleteSuccess": "deleted",
     "dndFilterError": "Cannot change task position when filtering is active",
     "dndSortError": "Cannot change task position when sorting by {type} is active",
+    "cant_remove_in_charge": "Cannot remove task in charge member",
+    "all_members_added": "All members added",
     "draft": "Draft",
     "dropdown_delete": "Delete",
     "dropdown_details": "Details",

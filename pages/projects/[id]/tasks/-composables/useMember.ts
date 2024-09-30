@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/vue-query';
+import { useMutation, useQuery } from '@tanstack/vue-query';
 
-const strapi = useStrapiUtils();
-
-export const useGetTaskMembers = (taskId: Ref<number | undefined>, enabled?: Ref<boolean>) =>
+const strapiUtils = useStrapiUtils();
+const strapi = useStrapi();
+export const useGetLearningGroup = (taskId: Ref<number | undefined>, enabled?: Ref<boolean>) =>
   useQuery({
-    queryKey: ['task-members', taskId],
+    queryKey: ['learning-group', taskId],
     queryFn: async () => {
-      const res = await strapi.find<LearningPlanGroupSimple>(`learnin-plan-groups`, {
+      const res = await strapiUtils.find<LearningPlanGroupSimple>(`learnin-plan-groups`, {
         filters: {
           task_members: {
             task: {
@@ -14,21 +14,19 @@ export const useGetTaskMembers = (taskId: Ref<number | undefined>, enabled?: Ref
             },
           },
         },
-        populate: {
-          group_members: true,
-        },
+        populate: ['group_members.student_member.user.avatar', 'task_members'],
       });
-      return res.data[0].group_members || [];
+      return res.data[0];
     },
     enabled,
-    initialData: [],
   });
-export type Member = LearningPlanMemberSimple & { responsable: boolean };
+export type Member = LearningPlanMemberSimple;
+export type MemberItem = { id: number; raw: Member; role: string };
 export const useGetProjectMembers = (projectId: Ref<number | undefined>, enabled?: Ref<boolean>) =>
   useQuery({
     queryKey: ['project-members', projectId],
     queryFn: async () => {
-      const res = await strapi.find<Member>('learning-plan-members', {
+      const res = await strapiUtils.find<Member>('learning-plan-members', {
         filters: {
           learningplan: projectId.value,
         },
@@ -40,8 +38,16 @@ export const useGetProjectMembers = (projectId: Ref<number | undefined>, enabled
           },
         },
       });
-      return res.data.map((item) => ({ ...item, responsible: false }));
+      return res.data.map((item) => ({ id: item.id, raw: item, role: 'standard' })) as MemberItem[];
     },
     enabled,
-    initialData: [],
+    initialData: [] as MemberItem[],
+  });
+
+type RemoveMemberPayload = { id: number };
+export const useRemoveMember = () =>
+  useMutation({
+    mutationFn({ id }: RemoveMemberPayload) {
+      return strapi.delete('learning-plan-group-members', id);
+    },
   });

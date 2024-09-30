@@ -13,7 +13,7 @@ interface CompProps {
   noCheckbox?: boolean;
   raw: T;
 }
-const selectedModel = defineModel<MemberProps[] | boolean>({ default: false });
+const selectedModel = defineModel<Omit<MemberProps, 'reponsable'>[] | boolean>({ default: false });
 withDefaults(defineProps<CompProps>(), {
   edit: true,
   clickable: true,
@@ -21,8 +21,8 @@ withDefaults(defineProps<CompProps>(), {
   noCheckbox: false,
 });
 type Emit = {
-  'remove-click': [];
-  'toggle-responsable-click': [value: null | T];
+  'remove-click': [value: T];
+  'toggle-responsible-click': [value: null | T];
 };
 defineEmits<Emit>();
 </script>
@@ -31,6 +31,7 @@ defineEmits<Emit>();
   <v-hover v-slot="{ isHovering: isHoveringCard, props: propsHover }">
     <div v-bind="propsHover" class="d-flex tw-items-center ga-2 pa-2" :class="{ 'list-card': clickable }">
       <v-checkbox
+        v-if="!noCheckbox"
         v-model="selectedModel"
         class="checkbox"
         :value="raw"
@@ -57,7 +58,7 @@ defineEmits<Emit>();
           class="tw-flex gap-1 items-center bg-primary-2 tw-text-xs tw-p-1 tw-px-2 tw-rounded-lg"
         >
           <span>Responsável</span>
-          <v-icon v-if="isHovering" size="small" @click="$emit('toggle-responsable-click', null)">mdi-close</v-icon>
+          <v-icon v-if="isHovering" size="small" @click="$emit('toggle-responsible-click', null)">mdi-close</v-icon>
         </div>
       </v-hover>
       <alex-custom-button
@@ -66,14 +67,14 @@ defineEmits<Emit>();
         size="small"
         variant="secondary"
         text="Tornar Responsável"
-        @click="$emit('toggle-responsable-click', raw)"
+        @click="$emit('toggle-responsible-click', raw)"
       />
       <alex-custom-button
         v-if="!noDelete"
         icon="mdi-trash-can-outline"
         size="small"
         variant="text"
-        @click.stop="$emit('remove-click')"
+        @click.stop="$emit('remove-click', raw)"
       />
     </div>
   </v-hover>
