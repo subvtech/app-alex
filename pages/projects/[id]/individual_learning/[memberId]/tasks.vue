@@ -205,6 +205,7 @@
       @change-submission-description="handleChangeSubmissionDescription"
       @change-tags="handleChangeTags"
       @change-title="handleChangeTitle"
+      @change-date="handleChangeDate"
       @change-can-alter-from-review="handleChangeAlterFromReview"
       @change-kanban-status="(group) => handleUpdateDrawerStatus(group)"
     />
@@ -267,10 +268,9 @@ const tasks = ref<VNode | any>([]);
 const expanded = ref<string>('tasks');
 const isMobile = ref<boolean>(false);
 
-// watch(tasks, (tasks) => {
-//   console.log('tasks:', tasks);
-//   console.log('New tasks id', tasks.reduce((acc, { id }) => `${acc}${id}`, '') + isAddingTask.value);
-// });
+watch(tasks, (tasks) => {
+  console.log('tasks:', tasks);
+});
 
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
@@ -685,6 +685,45 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
 
   // Ver atualizar task member
   updateTaskFields();
+};
+
+const handleChangeDate = async (id, _, endDate) => {
+  if (!id) {
+    return;
+  }
+
+  let oldDate;
+
+  const taskMember = tasks.value.find(({ task }) => task.id === id);
+
+  if (!taskMember.id) {
+    return;
+  }
+
+  try {
+    tasks.value = tasks.value.map((taskMember) => {
+      if (taskMember.task.id === id) {
+        oldDate = taskMember.date;
+        taskMember.date = endDate;
+      }
+
+      return taskMember;
+    });
+
+    await strapi.update('task-members', taskMember.id, {
+      finished_at: endDate,
+    });
+  } catch (_) {
+    tasks.value = tasks.value.map((taskMember) => {
+      if (taskMember.task.id === id) {
+        taskMember.date = oldDate;
+      }
+
+      return taskMember;
+    });
+
+    setMessage('Falha ao atualizar data final', 'error', true);
+  }
 };
 
 const handleChangeDescription = (description: string) => {

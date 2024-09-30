@@ -292,6 +292,7 @@ type Emits = {
   'change-can-alter-from-review': [value: boolean];
   'change-members': [];
   'change-kanban-status': [value: string];
+  'change-date': [id: number | undefined, startDate: any, endDate: any];
 };
 const emit = defineEmits<Emits>();
 
@@ -487,6 +488,7 @@ watch(endDate, async (value) => {
     finish_at: value,
   });
   emit('change-members');
+  emit('change-date', props.taskId, startDate.value, endDate.value);
 });
 watch(startDate, async (value) => {
   if (!value) return;
@@ -500,6 +502,7 @@ watch(startDate, async (value) => {
     start_at: value,
   });
   emit('change-members');
+  emit('change-date', props.taskId, startDate.value, endDate.value);
 });
 watch(restrictions, async (value) => {
   await updateTaskValues(taskId.value, {
