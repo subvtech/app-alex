@@ -37,7 +37,7 @@
 
       <v-row class="my-5">
         <v-col cols="6">
-          <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" />
+          <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" :config="{title: status}" />
         </v-col>
         <v-col cols="6">
           <!-- <state v-model="status" :edit="editable && wasFilledMainInfo" /> -->

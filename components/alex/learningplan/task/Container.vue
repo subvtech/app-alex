@@ -42,6 +42,7 @@
                   :over="setOver(i - 1)"
                   :drag-from="dragFrom"
                   :dragging="dragging"
+                  :handle-pending-contract="handlePendingContract"
                   @start-drag="startDrag"
                   @drag-over="onDragOver"
                   @drag-end="onDrop"
@@ -114,8 +115,9 @@
     :start-date="taskDetails?.start_at"
     :end-date="taskDetails?.finish_at"
     :restrictions="taskDetails?.allowed_editor_plugins"
-    :editable="true"
-    :kanban-button="true"
+    :contract-address="taskDetails?.contract_address"
+    editable
+    kanban-button
     @change-goals="handleChangeGoals"
     @change-values="handleChangeValues"
     @change-description="handleChangeDescription"
@@ -126,6 +128,7 @@
     @change-can-alter-from-review="handleChangeAlterFromReview"
     @kanban-click="navigateTo(`tasks/${taskDetails?.id}`)"
   />
+
 </template>
 
 <script setup lang="ts">
@@ -228,6 +231,8 @@ const displaySuccess = (message: string) => {
     true,
   );
 };
+
+
 
 const isDateInRange = (range, date?: string | null) => {
   if (!range) return true;
@@ -374,6 +379,23 @@ const taskDetails = computed(() => {
   }
   return null;
 });
+
+const contractAddress = ref(taskDetails.value?.contract_address || null);
+const { cancelContract, getContractBalance } = useContracts(contractAddress);
+
+const handlePendingContract = async () => {
+  let isThereAPendingContract = !!taskDetails?.value?.contract_address;
+  if (isThereAPendingContract) {
+    const balance = await getContractBalance();
+    if (balance && Number(balance) > 0) {
+      const result = await cancelContract();
+      if (result) isThereAPendingContract = false;
+    }
+  }
+
+  return isThereAPendingContract;
+};
+
 
 const filteredTasks = computed(() => {
   const draft = tasksArray.value[0].filter((task) =>

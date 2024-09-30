@@ -1,6 +1,7 @@
 import { BigNumberish, ethers } from 'ethers';
 
 import TaskOwnerSingleRedeem2 from '@/build/contracts/TaskOwnerSingleRedeem2.json';
+import { usdToEth, weiToUsd } from '~/utils/ethers';
 
 declare global {
   interface Window {
@@ -45,7 +46,7 @@ export const useContracts = (
 
   const fetchContractBalance = async () => {
     if (!contractAddress.value) return;
-    const balance = await getContractBalance(contractAddress.value);
+    const balance = await getContractBalance();
 
     if (balance === undefined) return;
     contractBalance.value = weiToUsd(balance);
@@ -68,6 +69,7 @@ export const useContracts = (
 
   const getTaskContract = (provider) => {
     const { contractABI } = getCompiledContract();
+    if (!contractAddress.value) throw new Error('taskContract not provided');
     return new ethers.Contract(contractAddress.value, contractABI, provider);
   };
 
@@ -143,9 +145,10 @@ export const useContracts = (
       await contract.waitForDeployment();
 
       if (!contract) throw new Error('failed to create contract');
-      const balance = await getContractBalance(
+      /* const balance = await getContractBalance(
         contract.target as string | null,
       );
+      */
       loading.value = false;
       return contract.target;
     } catch (err) {

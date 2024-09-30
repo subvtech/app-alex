@@ -20,6 +20,7 @@ export interface UserSimple {
   avatar: Upload | null;
   cover: Upload | null;
   role: UserRoles;
+  wallet: Wallet | null;
   phone: string | null;
   info?: null;
 }

@@ -182,7 +182,69 @@
           </div>
         </template>
       </div>
+      <div v-if="contractAddress" class="d-flex flex-column gap-8">
+        <div v-if="disablePayment" class="d-flex flex-column gap-3">
+          <span class="text-h5 text-gray-800">
+            {{ $t('components.learningPlan.contract.reward.studentRewarded') }}
+          </span>
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+        </div>
 
+        <div v-else class="d-flex flex-column gap-6">
+          <alex-learningplan-task-drawer-contracts-balance
+            :balance="contractBalance"
+            :text="$t('components.learningPlan.contract.reward.remaining')"
+          />
+
+          <alex-learningplan-task-drawer-contracts-button
+            v-if="student"
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.once')
+            "
+            :text="
+              $t('components.learningPlan.contract.reward.rewardSingleStudent')
+            "
+            variant="warning"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="handleRewardSingleStudent"
+          />
+          <alex-learningplan-task-drawer-contracts-button
+            v-else-if="group"
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.once')
+            "
+            :text="$t('components.learningPlan.contract.reward.rewardStudents')"
+            variant="warning"
+            :loading="contractLoading"
+            :disabled="status !== 'done'"
+            @click="handleRewardGroup"
+          />
+        </div>
+        <div v-if="isThereBalance" class="d-flex flex-column items-start gap-3">
+          <p class="text-h5 text-gray-800">
+            {{ $t('components.learningPlan.contract.warning.secondThoughts') }}
+          </p>
+          <p class="text-body-4 text-gray-500">
+            {{
+              $t('components.learningPlan.contract.warning.abortConsequences')
+            }}
+          </p>
+
+          <alex-learningplan-task-drawer-contracts-button
+            :tooltip-text="
+              $t('components.learningPlan.contract.warning.tooltip.fee')
+            "
+            :text="$t('components.learningPlan.contract.warning.finish')"
+            variant="error"
+            :loading="contractLoading"
+            @click:button="handleCancelContract"
+          />
+        </div>
+      </div>
       <alex-learningplan-task-tabs
         v-model="activePage"
         v-model:attached-message="attachedMessage"
@@ -248,6 +310,7 @@ import { TaskSubmissionSimple } from '~/models/simple/taskSubmissionSimples.mode
 interface Student {
   name: string;
   avatar?: string | null;
+  wallet?: { address: string };
 }
 interface Submission {
   description: string;
@@ -270,6 +333,7 @@ interface TaskUserDrawerProps {
   finishAt?: string | null;
   submission?: Submission;
   studentClass: string;
+  contractAddress: string | null;
   canSubmitAfterDeadline: boolean;
   canSubmitAfterDeadlineTask?: boolean;
 }
@@ -281,6 +345,94 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
   group: undefined,
 });
 const { t } = useI18n();
+
+
+const { contractAddress } = toRefs(props);
+
+const {
+  rewardSingleStudent,
+  rewardStudents,
+  hasTheStudentBeenPaid,
+  cancelContract,
+  fetchContractBalance,
+  loading: contractLoading,
+} = useContracts(contractAddress);
+
+const isRewarded = ref(false);
+const contractBalance = ref(0);
+
+const handleRewardSingleStudent = async () => {
+  if (!props.student?.wallet) return;
+  if (!contractAddress.value) return;
+  await rewardSingleStudent(props.student.wallet.address, 88);
+  const result = await hasTheStudentBeenPaid(props.student.wallet?.address);
+  isRewarded.value = result;
+  await fetchContractBalance();
+};
+
+const wallets = computed(
+  () =>
+    (props.group?.group_members
+      .map((m) => m.student_member.user.wallet?.address)
+      .filter(Boolean) || []) as string[],
+);
+
+const handleRewardGroup = async () => {
+  if (!contractAddress.value) return;
+
+  await rewardStudents(
+    wallets.value,
+    wallets.value.map(() => 88),
+    false,
+  );
+  const result = await handleHasTheStudentBeenPaid();
+  isRewarded.value = result;
+  await fetchContractBalance();
+};
+
+const handleHasTheStudentBeenPaid = async () => {
+  let temp = false;
+  if (props.group) {
+    temp = await Promise.all(
+      props.group.group_members.map(async (member, index) => {
+        const walletAddress = member.student_member.user.wallet?.address;
+        if (!walletAddress) {
+          return false;
+        }
+        const hasBeenPaid = await hasTheStudentBeenPaid(walletAddress);
+        return hasBeenPaid;
+      }),
+    ).then((results) => results.some((result) => result));
+  } else {
+    const walletAddress = props.student?.wallet?.address;
+    if (!walletAddress) {
+      return false;
+    }
+    temp = await hasTheStudentBeenPaid(walletAddress);
+  }
+
+  return temp;
+};
+
+if (contractAddress.value)
+  isRewarded.value = await handleHasTheStudentBeenPaid();
+
+const isThereBalance = computed(() => contractBalance.value > 0);
+
+const handleCancelContract = async () => {
+  if (!contractAddress.value) return;
+  const result = await cancelContract();
+  if (!result) return;
+
+  contractAddress.value = null;
+  await fetchContractBalance();
+  emit('update:contract-address', null);
+};
+
+const disablePayment = computed(
+  () => isRewarded.value && props.status === 'done',
+);
+
 const isSendingMessage = ref(false);
 const submissionDesc = ref<any | undefined>(props.submission?.description);
 const taskMemberId = toRef(props, 'taskMemberId');
@@ -288,6 +440,7 @@ const model = defineModel({ default: false });
 type Emit = {
   'change-finish-at': [taskId: number, value: string];
   'change-submit-after-deadline': [taskId: number, value: boolean];
+  'update:contract-address': [value: string | null];
 };
 const emit = defineEmits<Emit>();
 const canSubmitAfterDeadline = toRef(
@@ -431,6 +584,8 @@ const {
   watch: [taskMemberId],
   dedupe: 'cancel',
 });
+
+await fetchContractBalance();
 
 const handleSubmitMessage = async (
   text: string,

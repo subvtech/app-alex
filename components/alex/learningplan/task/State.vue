@@ -1,23 +1,18 @@
 <template>
-  <alex-custom-dropdown
-    :disabled="config[model]?.immutable || props.config === undefined"
-    :items="props.config ? configOptions : mode == 'teacher' ? filteredTeacher : filteredStudent"
-  >
+  <alex-custom-dropdown :disabled="config[model]?.immutable || props.config === undefined"
+    :items="props.config ? configOptions : mode == 'teacher' ? filteredTeacher : filteredStudent">
     <template #activator="{ props: vMenuProps }">
       <p class="text-body-4 text-gray-800 mb-2">
         {{ $t('components.learningPlan.drawer.task.status.label') }}
       </p>
-      <alex-custom-chip
-        v-bind="vMenuProps"
-        :text="props.config || !props.config?.length ? customState?.title ?? '(No state)' : config[model]?.text"
+      <alex-custom-chip v-bind="vMenuProps"
+        :text="props.config || props.config?.length ? customState?.title ?? '(No state)' : config[model]?.text"
         :status="props.config ? customState?.status ?? 'secondary' : config[model]?.status"
         :prepend-icon="config[model]?.immutable || props.config === undefined ? '' : 'mdi-chevron-down'"
-        :clickable="!config[model]?.immutable || props.config"
-        :size="size"
-        variant="tonal"
-      />
+        :clickable="!config[model]?.immutable || props.config" :size="size" variant="tonal" />
     </template>
   </alex-custom-dropdown>
+
 </template>
 
 <script setup lang="ts">
@@ -59,7 +54,7 @@ const emit = defineEmits(['change-status', 'change-kanban-col']);
 
 const { t } = useI18n();
 
-const customState = ref<any>(null);
+const customState = ref<any>(model.value);
 
 // Estilização e props
 const config = computed(() => {

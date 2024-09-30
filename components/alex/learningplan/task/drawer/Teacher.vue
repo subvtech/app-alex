@@ -19,7 +19,7 @@
 
       <v-row class="my-5">
         <v-col cols="6">
-          <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" />
+          <alex-learningplan-task-state v-model="statusRef" :edit="editable && wasFilledMainInfo" />
         </v-col>
         <v-col cols="6">
           <p class="text-body-4 text-gray-800 mb-1">
@@ -87,7 +87,7 @@
           :trail-id="trail?.id" :blocks="blocks" teacher />
       </div>
 
-      <alex-learningplan-task-drawer-contracts v-model:status="status" v-model:contract-address="contractAddress"
+      <alex-learningplan-task-drawer-contracts v-model:status="statusRef" v-model:contract-address="contractAddress"
         :edit="editable" :task-members="members || []" @deploy:contract-draft="(cb) => (deployContract = cb)"
         @cancel:contract-draft="deployContract = null" @update:contract-address="handleUpdateContract" />
 
@@ -214,7 +214,7 @@ watch(model, (value) => {
     goals.value = props.goals;
     title.value = props.title;
     tags.value = props.tags;
-    status.value = props.status;
+    statusRef.value = props.status;
     type.value = props.type || null;
     startDate.value = props.startDate;
     endDate.value = props.endDate;
@@ -245,7 +245,7 @@ const emit = defineEmits<Emits>();
 
 const { setMessage } = useMessageStore();
 // Status
-const status = ref<TaskStatus | TaskMemberStatus>(props.status);
+const statusRef = ref<TaskStatus | TaskMemberStatus>(props.status);
 
 // Date picker
 const startDate = ref(props.startDate);
@@ -353,7 +353,7 @@ const updateTaskValues = async (
     const valuesEmit = {
       type: type.value,
       title: title.value,
-      status: status.value,
+      status: statusRef.value,
       start_at: startDate.value,
       finish_at: endDate.value,
       can_submit_after_deadline: sendAfterDeadline.value,
@@ -362,7 +362,7 @@ const updateTaskValues = async (
       allowed_editor_plugins: restrictions.value,
     } as Partial<TaskSimple>;
 
-    if (deployContract.value && status.value !== 'draft') {
+    if (deployContract.value && statusRef.value !== 'draft') {
       const newContractAddress = await deployContract.value();
       if (!newContractAddress) return;
       await updateTaskContractAddress(
@@ -475,9 +475,9 @@ watch(type, async (value) => {
     type: value,
   });
 });
-watch(status, async (value) => {
+watch(statusRef, async (value) => {
   if (!value) return;
-  if (deployContract.value && status.value !== 'draft') {
+  if (deployContract.value && statusRef.value !== 'draft') {
     const newContractAddress = await deployContract.value();
     if (!newContractAddress) return;
     await updateTaskContractAddress(props.taskId, newContractAddress as string);
