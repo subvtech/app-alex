@@ -20,6 +20,7 @@ type CreateTaskResponse = Omit<TaskSimple, 'parent_task' | 'sprint'> & {
   kanban_column: number;
   parent_task?: number;
   sprint?: number;
+  group?: boolean;
 };
 
 export const useCreateTask = (
@@ -44,6 +45,7 @@ export const useCreateTask = (
         parent_task: parentTask,
         sprint: sprint?.id || undefined,
         organization,
+        group: true,
       });
 
       const taskWithSprintId = {

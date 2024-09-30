@@ -26,7 +26,7 @@ type Emits = {
   'change-members': [];
   'set-members': [value: LearningPlanMemberSimple[]];
 };
-defineEmits<Emits>();
+const emit = defineEmits<Emits>();
 // refs
 const itemsPerPage = 12;
 const addMemberDialog = ref(false);
@@ -71,6 +71,7 @@ const addMember = async (groupId: number, newMembers: MemberItem[]) => {
     }));
     await strapi.update('/learnin-plan-groups', groupId, { members: oldMembers.concat(newMembersValue) });
     queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
+    emit('change-members');
   } catch (error) {
     setMessage(t('components.learningPlan.drawer.task.errors.addMember'), 'error', true);
   }
@@ -86,6 +87,7 @@ const handleRemoveMember = async (member: LearningPlanGroupMemberSimple) => {
   }
   await removeMember({ id: member.id });
   queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
+  emit('change-members');
 };
 const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inCharge?: boolean) => {
   if (!member) {

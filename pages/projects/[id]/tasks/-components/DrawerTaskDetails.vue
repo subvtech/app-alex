@@ -91,7 +91,13 @@
           <alex-learningplan-task-events v-model="taskEvents" />
         </v-window-item>
         <v-window-item value="2">
-          <Members :learningplan-id="learningplanId" :task-id="task?.id" :start-at="startDate" :finish-at="endDate" />
+          <Members
+            :learningplan-id="learningplanId"
+            :task-id="task?.id"
+            :start-at="startDate"
+            :finish-at="endDate"
+            @change-members="$emit('update-value')"
+          />
         </v-window-item>
       </v-window>
     </div>
