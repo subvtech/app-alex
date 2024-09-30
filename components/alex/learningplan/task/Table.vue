@@ -225,6 +225,7 @@ const dropDownItems = (task: TaskItem) => {
   const items = [getDropDownAction('details', task.id), getDropDownAction('kanban', task.id)];
 
   if (props.individualJourney) {
+    items.push(getDropDownAction('delete', task.id));
     return items;
   }
 

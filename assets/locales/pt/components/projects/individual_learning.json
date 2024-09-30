@@ -3,6 +3,8 @@
     "seeKanban": "Ver Kanban",
     "seeList": "Ver Lista",
 
+    "tasks": "Tarefas",
+
     "addTask": "Adicionar tarefa",
 
     "inputs": {
@@ -13,8 +15,9 @@
 
     "messages": {
       "noTaskSelected": "Sem tarefa selecionada",
-      "taskCreated": "Tarefa criada com sucesso"
-    },
-    "teste": "Funcionando"
+      "taskCreated": "Tarefa criada com sucesso",
+      "taskDeleted": "Tarefa deletada com sucesso",
+      "failDeleteTask": "Falha ao deletar tarefa"
+    }
   }
 }

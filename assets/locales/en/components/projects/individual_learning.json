@@ -3,6 +3,8 @@
     "seeKanban": "See Kanban",
     "seeList": "See List",
 
+    "tasks": "Tasks",
+
     "addTask": "Add Task",
 
     "inputs": {
@@ -13,8 +15,9 @@
 
     "messages": {
       "noTaskSelected": "No task selected",
-      "taskCreated": "Task created successfully"
-    },
-    "teste": "Funcionando"
+      "taskCreated": "Task created successfully",
+      "taskDeleted": "Task deleted successfully",
+      "failDeleteTask": "Failure to delete task"
+    }
   }
 }

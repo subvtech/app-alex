@@ -44,7 +44,7 @@
     <alex-learningplan-task-kanban
       v-if="isKanban"
       ref="kanban"
-      :key="tasks.length"
+      :key="tasks.reduce((acc, { id }) => `${acc}${id}`, '') + isAddingTask"
       v-model="tasks"
       type="professor"
       :classes="taskMemberClasses"
@@ -113,13 +113,13 @@
           <v-expansion-panel class="rounded-lg" value="tasks">
             <v-expansion-panel-title hide-actions class="tw-cursor-default">
               <v-icon :icon="expanded !== 'tasks' ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="() => {}" />
-              <span class="text-h5 text-gray-800"> Tarefas </span>
+              <span class="text-h5 text-gray-800"> {{ $t(`${i18Dir}.tasks`) }} </span>
               <alex-custom-chip size="small" status="secondary" :text="listTasks.length" />
             </v-expansion-panel-title>
 
             <v-expansion-panel-text>
               <alex-learningplan-task-table
-                :key="tasks.length"
+                :key="tasks.reduce((acc, { id }) => `${acc}${id}`, '') + isAddingTask"
                 :tasks="listTasks"
                 :search="filter"
                 :active-filter="false"
@@ -128,13 +128,7 @@
                 :drag-from="0"
                 :dragging="false"
                 individual-journey
-                @start-drag="() => {}"
-                @drag-over="() => {}"
-                @drag-end="() => {}"
-                @drag-leave="() => {}"
-                @delete-task="() => {}"
-                @move-task="() => {}"
-                @toggle-archive="() => {}"
+                @delete-task="handleDeleteTask"
                 @edit-task="openDrawer"
                 @kanban="isKanban = true"
               />
@@ -212,7 +206,6 @@
       @change-tags="handleChangeTags"
       @change-title="handleChangeTitle"
       @change-can-alter-from-review="handleChangeAlterFromReview"
-      @change-members="getStudentTasks()"
       @change-kanban-status="(group) => handleUpdateDrawerStatus(group)"
     />
 
@@ -274,7 +267,10 @@ const tasks = ref<VNode | any>([]);
 const expanded = ref<string>('tasks');
 const isMobile = ref<boolean>(false);
 
-watch(tasks, (tasks) => console.log('tasks:', tasks));
+// watch(tasks, (tasks) => {
+//   console.log('tasks:', tasks);
+//   console.log('New tasks id', tasks.reduce((acc, { id }) => `${acc}${id}`, '') + isAddingTask.value);
+// });
 
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
@@ -320,15 +316,44 @@ const handleCreateTask = async (title: string, column) => {
     type: 'individual',
   });
 
-  await strapi.create('task-members', {
+  const newTaskMember = await strapi.create('task-members', {
     task: newTask.data.id,
     status: column.group,
     start_at: new Date(),
     learning_plan_member: memberId,
   });
 
-  await getStudentTasks();
+  const taskMember = {
+    id: newTaskMember.data.id,
+    ...newTaskMember.data.attributes,
+
+    task: {
+      id: newTask.data.id,
+      ...newTask.data.attributes,
+    },
+  };
+
+  tasks.value = [...tasks.value, formatTaskMember(taskMember)];
   setMessage(t(`${i18Dir}.messages.taskCreated`), 'success', true);
+};
+
+const handleDeleteTask = (id) => {
+  const taskMember = tasks.value.find(({ task }) => task.id === id);
+
+  if (!taskMember) {
+    return;
+  }
+
+  strapi
+    .delete('task-members', taskMember.id)
+    .then(() => {
+      tasks.value = tasks.value.filter(({ task }) => task.id !== id);
+      setMessage(t(`${i18Dir}.messages.taskDeleted`), 'success', true);
+    })
+    .catch(() => {
+      setMessage(t(`${i18Dir}.messages.failDeleteTask`), 'error', true);
+    })
+    .finally(() => strapi.delete('tasks', id));
 };
 
 const openDrawer = (taskMember) => {
@@ -378,6 +403,11 @@ const getStudentTasks = async () => {
       },
 
       task: {
+        task_members: {
+          learning_plan_member: {
+            user: memberId,
+          },
+        },
         status: {
           $not: 'draft',
         },
@@ -391,41 +421,43 @@ const getStudentTasks = async () => {
   }
 
   // Formatado para kanban
-  tasks.value =
-    (res.data as TaskMember[])?.map((taskMember) => ({
-      id: taskMember.id,
-      status: taskMember.status,
-      doc_name: taskMember.doc_name,
-      date: new Date(taskMember.finished_at?.replaceAll('-', '/')),
-      title: taskMember.task?.title,
-      learning_plan_member: taskMember.learning_plan_member,
-      user: {
-        name: taskMember?.learning_plan_member?.user.fullname || '',
-        avatar: taskMember?.learning_plan_member?.user.avatar?.url || undefined,
-      },
-      ...(taskMember.learning_plan_group?.learning_class?.name && {
-        group: {
-          name: taskMember.learning_plan_group?.learning_class?.name || '',
-          participants: taskMember.learning_plan_group?.group_members.map((member) => ({
-            name: member.student_member.user.fullname,
-            ...(member.student_member.user.avatar?.url && {
-              image: {
-                url: member.student_member.user.avatar?.url,
-              },
-              learning_class: member.student_member.learning_class?.name,
-              role: member.role,
-            }),
-          })),
-        },
-      }),
-      studentClass:
-        taskMember?.learning_plan_member?.learning_class?.name ||
-        taskMember.learning_plan_group?.learning_class?.name ||
-        '',
-      task: taskMember.task,
-      submissions: taskMember.task_submissions,
-    })) || [];
+  tasks.value = (res.data as TaskMember[])?.map(formatTaskMember) || [];
 };
+
+// Util
+const formatTaskMember = (taskMember) => ({
+  id: taskMember.id,
+  status: taskMember.status,
+  doc_name: taskMember.doc_name,
+  date: new Date(taskMember.finished_at?.replaceAll('-', '/')),
+  title: taskMember.task?.title,
+  learning_plan_member: taskMember.learning_plan_member,
+  user: {
+    name: taskMember?.learning_plan_member?.user.fullname || '',
+    avatar: taskMember?.learning_plan_member?.user.avatar?.url || undefined,
+  },
+  ...(taskMember.learning_plan_group?.learning_class?.name && {
+    group: {
+      name: taskMember.learning_plan_group?.learning_class?.name || '',
+      participants: taskMember.learning_plan_group?.group_members.map((member) => ({
+        name: member.student_member.user.fullname,
+        ...(member.student_member.user.avatar?.url && {
+          image: {
+            url: member.student_member.user.avatar?.url,
+          },
+          learning_class: member.student_member.learning_class?.name,
+          role: member.role,
+        }),
+      })),
+    },
+  }),
+  studentClass:
+    taskMember?.learning_plan_member?.learning_class?.name ||
+    taskMember.learning_plan_group?.learning_class?.name ||
+    '',
+  task: taskMember.task,
+  submissions: taskMember.task_submissions,
+});
 
 const getTaskMembers = (taskMembers) => {
   const members: {
@@ -514,6 +546,14 @@ const handleUpdateStatus = async (_: number, item: TaskStudent, newStatus: strin
     const time = new Date();
     const lastSubmission = taskMember.submissions?.length ? taskMember?.submissions[0] : undefined;
 
+    tasks.value.map((taskStudent) => {
+      if (taskMember.id === taskStudent.id) {
+        taskStudent.status = newStatus;
+      }
+
+      return taskStudent;
+    });
+
     if (taskMember?.task?.submission_required) {
       if (newStatus === 'in_review' && !lastSubmission) {
         throw new Error('missingSubmission');
@@ -548,19 +588,27 @@ const handleUpdateStatus = async (_: number, item: TaskStudent, newStatus: strin
       }),
     });
   } catch (error) {
-    tasks.value.data = tasks.value.data.map((task) => {
-      if (task.id === item.id) {
-        return { ...task, status: item.status };
+    // tasks.value.data = tasks.value.data.map((task) => {
+    //   if (task.id === item.id) {
+    //     return { ...task, status: item.status };
+    //   }
+    //   return task;
+    // });
+
+    tasks.value.map((taskStudent) => {
+      if (taskMember.id === taskStudent.id) {
+        taskStudent.status = taskMember.status; // Old status
       }
-      return task;
+
+      return taskStudent;
     });
+
     if ((error as any)?.message === 'missingSubmission') {
       setMessage(t('components.learningPlan.drawer.task.errors.missingSubmission'), 'error', true);
       return;
     }
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
   } finally {
-    await getStudentTasks();
     kanban.value.setCanDrag(true);
   }
 };
