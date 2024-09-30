@@ -118,6 +118,14 @@ const handleSubmit = () => {
   }
   emit('add-click', props.groupId, selectedMembers.value);
   selectedMembers.value = [];
+  queryClient.setQueryData<MemberItem[]>(['project-members', learningplanValue], (oldData) => {
+    if (!oldData) {
+      return oldData;
+    }
+    return oldData.map((oldMember) => {
+      return { ...oldMember, role: 'standard' };
+    });
+  });
 };
 const handleUpdateResponsible = (member: MemberItem | null, inCharge: boolean) => {
   selectedMembers.value = selectedMembers.value.map((oldMember) => {

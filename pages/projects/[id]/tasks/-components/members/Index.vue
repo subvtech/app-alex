@@ -91,6 +91,10 @@ const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inChar
   if (!member) {
     return;
   }
+  const oldInCharge = members.value.find((oldMember) => oldMember.role === 'in_charge');
+  if (oldInCharge) {
+    await updateMember({ id: oldInCharge.id, role: 'standard' });
+  }
   await updateMember({ id: member.id, role: inCharge ? 'in_charge' : 'standard' });
   queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
 };
