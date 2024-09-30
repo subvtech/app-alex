@@ -119,9 +119,9 @@ const handleSubmit = () => {
   emit('add-click', props.groupId, selectedMembers.value);
   selectedMembers.value = [];
 };
-const handleUpdateResponsible = (member: MemberItem | null) => {
+const handleUpdateResponsible = (member: MemberItem | null, inCharge: boolean) => {
   selectedMembers.value = selectedMembers.value.map((oldMember) => {
-    if (member?.id === oldMember.id) {
+    if (member?.id === oldMember.id && inCharge) {
       return { ...oldMember, role: 'in_charge' };
     }
     return { ...oldMember, role: 'standard' };
@@ -131,7 +131,7 @@ const handleUpdateResponsible = (member: MemberItem | null) => {
       return oldData;
     }
     return oldData.map((oldMember) => {
-      if (member?.id === oldMember.id) {
+      if (member?.id === oldMember.id && inCharge) {
         return { ...oldMember, role: 'in_charge' };
       }
       return { ...oldMember, role: 'standard' };

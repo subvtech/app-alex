@@ -63,8 +63,12 @@ const showingData = (items: any[], pageItems: any[], search: string, pageCount: 
 
 const addMember = async (groupId: number, newMembers: MemberItem[]) => {
   try {
-    const oldMembers = members.value.map((member) => ({ member_id: member.student_member.id, role: 'standard' }));
     const newMembersValue = newMembers.map((member) => ({ member_id: member.id, role: member.role }));
+    const newResponsable = newMembersValue.find((member) => member.role === 'in_charge');
+    const oldMembers = members.value.map((member) => ({
+      member_id: member.student_member.id,
+      role: !newResponsable ? member.role : 'standard',
+    }));
     await strapi.update('/learnin-plan-groups', groupId, { members: oldMembers.concat(newMembersValue) });
     queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
   } catch (error) {
