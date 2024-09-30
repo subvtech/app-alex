@@ -8,8 +8,8 @@ import { useQueryClient } from '@tanstack/vue-query';
 // eslint-disable-next-line import/no-duplicates
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
-import { ptBR, enIN } from 'date-fns/locale';
-import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
+import { enIN, ptBR } from 'date-fns/locale';
+import { useCreateTask, useDeleteTask, useUpdateTask, useUpdateTaskStatus } from '../-composables/useCreateTask';
 import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
@@ -31,12 +31,6 @@ const learningPlanStore = useLearningPlanStore();
 const { update } = useStrapi();
 const dragDrop = useMultipleDragDrop();
 
-const expandBacklog = ref(0);
-const expandSprints = ref<number[]>([]);
-const showInputs = ref<boolean[]>([false]);
-const tasksTitles = ref<string[]>([]);
-const createSprintDialog = ref(false);
-
 // Drag and drop
 const hoveredSprint = ref<any | null>(0);
 const hoveredTask = ref<any | null>(null);
@@ -53,6 +47,7 @@ const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateT
 );
 const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient, setMessage, t);
 const { mutateAsync: updateTask } = useUpdateTask();
+const { mutateAsync: updateStatusTask } = useUpdateTaskStatus();
 const sprints = ref<Droppable<Sprint>[]>([]);
 
 // refs
@@ -63,6 +58,18 @@ const editTask = ref<SprintTask>();
 const editingTask = ref<null | SprintTask>(null);
 const backlogIndex = 1;
 const taskSections = [t('pages.projects.tasks.backlog')];
+const expandBacklog = ref(0);
+const expandSprints = ref<number[]>([]);
+const showInputs = ref<boolean[]>([false]);
+const tasksTitles = ref<string[]>([]);
+const createSprintDialog = ref(false);
+const createdIndex = ref<number>();
+
+const isLoading = computed(() => {
+  return (index) => {
+    return isCreatingTaskRequest.value && createdIndex.value === index;
+  };
+});
 
 const editSprints = () => {
   return [
@@ -259,8 +266,9 @@ const getSlideTransition = () => {
   return sprintsValue.value.backlog.length ? 'slide-down' : 'slide-up';
 };
 
-const handleCreateTask = async (index: number, sprintId?: number) => {
+const handleCreateTask = async (index: number, sprint?: SprintSimple) => {
   if (tasksTitles.value[index] && learningPlanStore.learningPlan && learningPlanStore.learningPlan.id) {
+    createdIndex.value = index;
     const learningPlanId = learningPlanStore.learningPlan.id;
     const higherIndex = getHigherIndex();
     await createTask({
@@ -268,7 +276,7 @@ const handleCreateTask = async (index: number, sprintId?: number) => {
       learningPlanId,
       position: higherIndex,
       organization: 'standard',
-      sprint: sprintId,
+      sprint,
     });
   }
   tasksTitles.value[index] = '';
@@ -288,7 +296,7 @@ const showErrorMessage = (message: string, err?: ApplicationError) => {
   }
 };
 
-const handleDelete = () => {
+const handleBlur = () => {
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return oldData;
@@ -305,8 +313,14 @@ const handleDelete = () => {
   });
 };
 
-const handleDeleteTask = async (id: number, sprintId: number) => {
-  await deleteTask({ id, sprintId });
+const handleDeleteTask = async (task: {
+  title: string;
+  id: number;
+  sprintId: number;
+  hasChildren: boolean;
+  organization: 'standard' | 'story' | 'epic';
+}) => {
+  await deleteTask(task);
   await refetchSprints();
 };
 
@@ -316,7 +330,7 @@ const createItem = async (task: {
   local: boolean;
   organization: 'standard' | 'story' | 'epic';
   position: number;
-  sprint: number;
+  sprint: SprintSimple;
   story: number;
   title: string;
 }) => {
@@ -402,7 +416,7 @@ const onDrop = (_, __, e) => {
     dragDrop.dragEnd();
     return;
   }
-
+  updateStatusTask({ id, sprint: hoveredSprint.value.id });
   update('tasks', Number(id), {
     sprint: hoveredSprint.value.id,
   })
@@ -519,7 +533,7 @@ const updateSprints = () => {
                     @add-task="handleAddTask"
                     @create-item="createItem"
                     @edit-item="handleEdit"
-                    @handle-blur="handleDelete"
+                    @handle-blur="handleBlur"
                     @start-drag="
                       (idVal, e, dropTo, dragGhost) => {
                         dragDrop.startDrag(idVal, e, dropTo, dragGhost);
@@ -571,7 +585,7 @@ const updateSprints = () => {
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
-                    :loading="isCreatingTaskRequest"
+                    :loading="isLoading(0)"
                     @click="showInputs[0] = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
@@ -584,19 +598,19 @@ const updateSprints = () => {
                       class="w-100"
                       density="comfortable"
                       name="taskTitle"
-                      :disabled="isCreatingTaskRequest"
+                      :loading="isLoading(0)"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
                       @keyup.enter="handleCreateTask(0)"
                       @keyup.esc="!showInputs[0]"
                       @blur="handleInputBlur(0)"
                     />
-                    <alex-custom-button size="large" :loading="isCreatingTaskRequest" @click="handleCreateTask(0)">
+                    <alex-custom-button size="large" :loading="isLoading(0)" @click="handleCreateTask(0)">
                       {{ $t('pages.projects.tasks.add_task') }}
                     </alex-custom-button>
                     <alex-custom-button
                       size="large"
                       variant="tertiary"
-                      :loading="isCreatingTaskRequest"
+                      :loading="isLoading(0)"
                       @click="handleInputCancel(0)"
                     >
                       {{ $t('pages.projects.tasks.delete_cancel_text') }}
@@ -667,7 +681,7 @@ const updateSprints = () => {
                     @add-task="(task) => handleAddTask(task, sprint.id)"
                     @create-item="createItem"
                     @edit-item="handleEdit"
-                    @handle-blur="handleDelete"
+                    @handle-blur="handleBlur"
                     @start-drag="
                       (id, e) => {
                         dragDrop.startDrag(id, e);
@@ -702,7 +716,7 @@ const updateSprints = () => {
                     prepend-icon="mdi-plus"
                     size="large"
                     variant="text"
-                    :loading="isCreatingTaskRequest"
+                    :loading="isLoading(i + 1)"
                     @click="showInputs[i + 1] = true"
                   >
                     {{ $t('pages.projects.tasks.add') }}
@@ -715,23 +729,23 @@ const updateSprints = () => {
                       class="w-100"
                       density="comfortable"
                       name="taskTitle"
-                      :disabled="isCreatingTaskRequest"
+                      :disabled="isLoading(i + 1)"
                       :placeholder="t('pages.projects.tasks.add_placeholder')"
-                      @keyup.enter="handleCreateTask(i + 1, sprint.id)"
+                      @keyup.enter="handleCreateTask(i + 1, sprint)"
                       @keyup.esc="!showInputs[i + 1]"
                       @blur="handleInputBlur(i + 1)"
                     />
                     <alex-custom-button
                       size="large"
-                      :loading="isCreatingTaskRequest"
-                      @click="handleCreateTask(i + 1, sprint.id)"
+                      :loading="isLoading(i + 1)"
+                      @click="handleCreateTask(i + 1, sprint)"
                     >
                       {{ $t('pages.projects.tasks.add_task') }}
                     </alex-custom-button>
                     <alex-custom-button
                       size="large"
                       variant="tertiary"
-                      :loading="isCreatingTaskRequest"
+                      :loading="isLoading(i + 1)"
                       @click="handleInputCancel(i + 1)"
                     >
                       {{ $t('pages.projects.tasks.delete_cancel_text') }}

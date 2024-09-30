@@ -9,8 +9,7 @@
     "overview": "Visão geral",
     "projects": "Projetos",
     "tasks": "Tarefas",
-    "trails": "Trilhas",
-    "task": "Tarefa"
+    "trails": "Trilhas"
   },
   "errors": {
     "404": "Página não encontrada",
@@ -62,8 +61,10 @@
     "backlog": "Backlog",
     "cancel": "Cancelar",
     "close": "Encerrar",
-    "delete_subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
-    "delete_title": "Deseja mesmo excluir a tarefa?",
+    "delete_standard_subtitle": "Ao excluir uma tarefa todo o conteúdo criado dentro dela também será excluído.",
+    "delete_story_subtitle": "Certifique-se de que não há tarefas vinculadas",
+    "delete_epic_subtitle": "Certifique-se de que não há histórias ou tarefas vinculados.",
+    "delete_title": "Deseja mesmo excluir {item}?",
     "delete": "Excluir",
     "deleteError": "excluir",
     "deleteSuccess": "excluída",
@@ -97,6 +98,7 @@
     "see_details": "Ver detalhes",
     "see_kanban": "Ver Kanban",
     "select": "Tipo",
+    "select_sprint": "Selecione uma sprint",
     "startDate": "Data inicial",
     "successMessage": "Tarefa {action} com sucesso!",
     "TASK_DATA_INCOMPLETE": "Você precisa preencher as informações da tarefa antes de defini-la como publicada",
@@ -119,7 +121,9 @@
       "edited_success": "{item} foi editado com sucesso!",
       "edited_error": "Ocorreu um erro ao tentar editar {item}, por favor, tente novamente!",
       "deleted_success": "{item} foi deletado com sucesso!",
-      "deleted_error": "Ocorreu um erro ao tentar deletar {item}, por favor, tente novamente!"
+      "deleted_error": "Ocorreu um erro ao tentar deletar {item}, por favor, tente novamente!",
+      "delete_story_has_children": "Não é possível excluir uma história que possui tarefas vinculadas",
+      "delete_epic_has_children": "Não é possível excluir um épico que possui histórias ou tarefas vinculadas"
     }
   }
 }

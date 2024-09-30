@@ -4,22 +4,22 @@ import { SprintsResponse } from './useSprints';
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();
-
+const strapiClient = useStrapiClient();
 type CreateTaskPayload = {
   learningPlanId: number;
   position: number;
   title: string;
   organization: TaskSimple['organization'];
   parentTask?: number;
-  sprint?: number;
+  sprint?: SprintSimple;
   group?: boolean;
 };
 
 type CreateTaskResponse = Omit<TaskSimple, 'parent_task' | 'sprint'> & {
   learningplan: number;
-  sprint: number;
   kanban_column: number;
   parent_task?: number;
+  sprint?: number;
 };
 
 export const useCreateTask = (
@@ -42,13 +42,16 @@ export const useCreateTask = (
         submission_required: false,
         title,
         parent_task: parentTask,
-        sprint,
-        // @ts-ignore
-        group: true,
+        sprint: sprint?.id || undefined,
         organization,
       });
-      task.data.sprint_id = sprint || 0;
-      return task.data as TaskSimple;
+
+      const taskWithSprintId = {
+        ...task.data,
+        sprint_id: sprint?.id || undefined,
+      };
+
+      return taskWithSprintId as TaskSimple & { sprint_id?: number };
     },
     onSuccess(data) {
       queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
@@ -76,25 +79,21 @@ export const useCreateTask = (
           };
         }
       });
-      setMessage(
-        t('pages.projects.tasks.actions.created_success', { item: t('pages.projects.common.task') }),
-        'success',
-        true,
-      );
+      setMessage(t('pages.projects.tasks.actions.created_success', { item: data.title }), 'success', true);
     },
-    onError() {
-      setMessage(
-        t('pages.projects.tasks.actions.created_error', { item: t('pages.projects.common.task') }),
-        'error',
-        true,
-      );
+    onError(_, variables) {
+      setMessage(t('pages.projects.tasks.actions.created_error', { item: variables.title }), 'error', true);
     },
   });
 
 type DeleteTaskPayload = {
+  title: string;
   id: number;
   sprintId?: number;
+  hasChildren?: boolean;
+  organization: TaskSimple['organization'];
 };
+
 export const useDeleteTask = (
   learninplanId: Ref<number>,
   queryClient: QueryClient,
@@ -102,7 +101,11 @@ export const useDeleteTask = (
   t: Function,
 ) =>
   useMutation({
-    mutationFn({ id }: DeleteTaskPayload) {
+    mutationFn({ id, organization, hasChildren }: DeleteTaskPayload) {
+      if (hasChildren) {
+        setMessage(t(`pages.projects.tasks.actions.delete_${organization}_has_children`), 'warning', true, false, true);
+        return Promise.reject(new Error('Item has children'));
+      }
       return strapi.delete('tasks', id);
     },
     onSuccess(_, variables) {
@@ -124,18 +127,13 @@ export const useDeleteTask = (
           backlog: oldData.backlog.filter((task) => task.id !== variables.id),
         };
       });
-      setMessage(
-        t('pages.projects.tasks.actions.deleted_success', { item: t('pages.projects.common.task') }),
-        'error',
-        true,
-      );
+      setMessage(t('pages.projects.tasks.actions.deleted_success', { item: variables.title }), 'success', true);
     },
-    onError() {
-      setMessage(
-        t('pages.projects.tasks.actions.deleted_error', { item: t('pages.projects.common.task') }),
-        'error',
-        true,
-      );
+    onError(error, variables) {
+      if (error.message === 'Item has children') {
+        throw error;
+      }
+      setMessage(t('pages.projects.tasks.actions.deleted_error', { item: variables.title }), 'error', true);
     },
   });
 
@@ -152,6 +150,23 @@ export const useUpdateTask = () =>
         title,
         status,
         position,
+      });
+    },
+  });
+type UpdateTaskStatusPayload = {
+  id: number;
+  sprint: number;
+};
+export const useUpdateTaskStatus = () =>
+  useMutation({
+    mutationFn({ id, sprint }: UpdateTaskStatusPayload) {
+      return strapiClient(`/tasks/${id}/update-kanban-task`, {
+        method: 'PUT',
+        body: {
+          data: {
+            sprint,
+          },
+        },
       });
     },
   });

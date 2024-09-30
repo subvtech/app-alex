@@ -37,7 +37,7 @@
             :placeholder="selectedSprint ? 'Selecionar status' : 'Não iniciado'"
             :items="statusOptions"
             item-title="title"
-            :edit="!!selectedSprint"
+            :edit="selectedSprint"
           />
         </v-col>
         <v-col v-if="task?.organization === 'standard'" cols="6">
@@ -105,7 +105,6 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
-import Members from './members/Index.vue';
 
 interface DrawerProjectProps {
   task?: SprintTask;
@@ -126,6 +125,7 @@ const tags = ref<TagSimple[]>([]);
 const status = ref<KanbanColumn | null>(null);
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
+
 const activePage = ref<number>(1);
 const taskEvents = ref<TaskEvent[]>([]);
 
@@ -137,18 +137,18 @@ const tabs = [
 const selectedEpic = ref<TaskSimple | null>(null);
 const selectedSprint = ref<SprintSimple>();
 const selectedHistory = ref<TaskSimple | null>(null);
-const selectedParent = ref<TaskSimple | null>(null);
+const selectedParent = ref<TaskSimple | null | undefined>(undefined);
 const description = ref<string>('');
 const mentionUsers = computed(() => []);
 const trailId = ref<number | null>(null);
 const blocks = ref<BlockSimple[]>([]);
 const route = useRoute();
 const strapiClient = useStrapiClient();
-const learningplanId = computed(() => parseInt(route.params.id.toString()));
+const learninplanId = computed(() => parseInt(route.params.id.toString()));
 // querys
 const enabledKanban = computed(() => !!selectedSprint.value);
-const { data: groupings } = useGetSprintGroupings(learningplanId);
-const { data: kanban } = useGetKanban(learningplanId, selectedSprint, enabledKanban);
+const { data: groupings } = useGetSprintGroupings(learninplanId);
+const { data: kanban } = useGetKanban(learninplanId, selectedSprint, enabledKanban);
 
 const allGroups = ref<any>([]);
 
@@ -161,7 +161,7 @@ const getParentOptions = () => {
         organization: 'standard',
       }
     : {
-        learningplan: learningplanId.value,
+        learningplan: learninplanId.value,
         sprint: {
           id: selectedSprint.value?.id ?? {
             $null: true,
@@ -201,11 +201,8 @@ const getParentOptions = () => {
       return;
     }
 
-    const allEpics = data.reduce<TaskSimple[]>((acc, task) => {
-      const epic =
-        (task as TaskSimple)?.parent_task?.organization === 'epic'
-          ? (task as TaskSimple)?.parent_task
-          : (task as TaskSimple)?.parent_task?.parent_task;
+    const allEpics = data.reduce((acc: TaskSimple[], task) => {
+      const epic = task?.parent_task?.organization === 'epic' ? task?.parent_task : task?.parent_task?.parent_task;
 
       if (!epic || acc.some(({ id }) => id === epic.id)) {
         return acc;
@@ -242,19 +239,29 @@ const groupOptions = computed(() => {
     });
   });
 
-  return options;
+  return [
+    ...options,
+    {
+      text: 'Sem épico ou história',
+      onClick: () => (selectedParent.value = null),
+      icon: 'mdi-close',
+      notBold: true,
+    },
+  ];
 });
 
 watch(selectedParent, (parent) => {
-  if (!parent || !props.task?.id || isFirstTimeOpened.value) {
+  if (parent === undefined || !props.task?.id || isFirstTimeOpened.value) {
     return;
   }
 
   update('tasks', props.task.id, {
-    parent_task: parent.id,
-  }).then(() => {
-    emit('moved', `Tarefa movida para ${parent.title}`);
-  });
+    parent_task: parent?.id ?? null,
+  })
+    .then(() => {
+      emit('moved', parent !== null ? `Tarefa movida para ${parent.title}` : 'Épico ou história removido');
+    })
+    .catch(console.log);
 });
 
 const statusOptions = computed(
@@ -339,7 +346,7 @@ watch(open, () => {
   trailId.value = props.task?.trail?.id ?? null;
   blocks.value = props.task?.blocks ?? [];
 
-  selectedParent.value = props.task?.parent_task ?? null;
+  selectedParent.value = props.task?.parent_task ?? open ? null : undefined;
 
   // Sprint, epic and story data
   selectedSprint.value = props.task?.sprint ?? undefined;
@@ -366,6 +373,7 @@ watch(open, () => {
 
   if (open) {
     getParentOptions();
+    console.log('Task:', props.task);
   }
 });
 watch(tags, (tags) => {

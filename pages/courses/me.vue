@@ -11,10 +11,7 @@
       no-back-arrow
       @main-action="() => (createCourseDialog = true)"
     />
-    <alex-learningplan-dialogs-create
-      v-model="createCourseDialog"
-      @submit="updateCourses"
-    />
+    <alex-learningplan-dialogs-create v-model="createCourseDialog" @submit="updateCourses" />
     <alex-learningplan-listing ref="listing" type="course" />
   </div>
 </template>

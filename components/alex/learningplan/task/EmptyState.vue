@@ -56,7 +56,7 @@ const taskSections = {
   },
   sprint: {
     text: props.message,
-    image: '/svg/emptySprint.svg',
+    image: 'public/svg/emptySprint.svg',
   },
 };
 </script>
