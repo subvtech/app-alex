@@ -36,6 +36,7 @@ export const useCreateTask = (
         can_submit_after_deadline: false,
         learningplan: learningPlanId,
         position,
+        type: 'group',
         status: 'draft',
         submission_description: '',
         submission_required: false,
