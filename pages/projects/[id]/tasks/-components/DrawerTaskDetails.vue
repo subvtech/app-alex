@@ -105,7 +105,7 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
-
+import Members from './members/Index.vue';
 interface DrawerProjectProps {
   task?: SprintTask;
   sprints?: SprintSimple[];
@@ -144,12 +144,11 @@ const trailId = ref<number | null>(null);
 const blocks = ref<BlockSimple[]>([]);
 const route = useRoute();
 const strapiClient = useStrapiClient();
-const learninplanId = computed(() => parseInt(route.params.id.toString()));
+const learningplanId = computed(() => parseInt(route.params.id.toString()));
 // querys
 const enabledKanban = computed(() => !!selectedSprint.value);
-const { data: groupings } = useGetSprintGroupings(learninplanId);
-const { data: kanban } = useGetKanban(learninplanId, selectedSprint, enabledKanban);
-
+const { data: groupings } = useGetSprintGroupings(learningplanId);
+const { data: kanban } = useGetKanban(learningplanId, selectedSprint, enabledKanban);
 const allGroups = ref<any>([]);
 
 const getParentOptions = () => {
@@ -161,7 +160,7 @@ const getParentOptions = () => {
         organization: 'standard',
       }
     : {
-        learningplan: learninplanId.value,
+        learningplan: learningplanId.value,
         sprint: {
           id: selectedSprint.value?.id ?? {
             $null: true,
