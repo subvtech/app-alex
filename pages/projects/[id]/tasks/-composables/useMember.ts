@@ -51,3 +51,10 @@ export const useRemoveMember = () =>
       return strapi.delete('learning-plan-group-members', id);
     },
   });
+type UpdateMemberPayload = { id: number; role: string };
+export const useUpdateMember = () =>
+  useMutation({
+    mutationFn({ id, role }: UpdateMemberPayload) {
+      return strapi.update('learning-plan-group-members', id, { role });
+    },
+  });

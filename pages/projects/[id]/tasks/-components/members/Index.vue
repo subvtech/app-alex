@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { MemberItem, useGetLearningGroup, useRemoveMember } from '../../-composables/useMember';
+import { MemberItem, useGetLearningGroup, useRemoveMember, useUpdateMember } from '../../-composables/useMember';
 import AddMemberDialog from './AddMemberDialog.vue';
 import Card from './Card.vue';
 interface MembersProps {
@@ -40,7 +40,8 @@ const { t } = useI18n();
 const taskIdValue = toRef(props, 'taskId');
 const enabledGetMembers = computed(() => !!taskIdValue.value);
 const { data: group, isPending: loadingGroup } = useGetLearningGroup(taskIdValue, enabledGetMembers);
-const { mutateAsync } = useRemoveMember();
+const { mutateAsync: removeMember } = useRemoveMember();
+const { mutateAsync: updateMember } = useUpdateMember();
 const members = computed(() => group.value?.group_members || []);
 const queryClient = useQueryClient();
 // methods
@@ -74,12 +75,19 @@ const addMember = async (groupId: number, newMembers: MemberItem[]) => {
 const handleAddMember = () => {
   addMemberDialog.value = true;
 };
-const removeMember = async (member: LearningPlanGroupMemberSimple) => {
+const handleRemoveMember = async (member: LearningPlanGroupMemberSimple) => {
   if (member.role === 'in_charge') {
     setMessage(t('pages.projects.tasks.cant_remove_in_charge'), 'error', true);
     return;
   }
-  await mutateAsync({ id: member.id });
+  await removeMember({ id: member.id });
+  queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
+};
+const handleUpdateMember = async (member?: LearningPlanGroupMemberSimple, inCharge?: boolean) => {
+  if (!member) {
+    return;
+  }
+  await updateMember({ id: member.id, role: inCharge ? 'in_charge' : 'standard' });
   queryClient.invalidateQueries({ queryKey: ['learning-group', taskIdValue.value] });
 };
 </script>
@@ -134,7 +142,8 @@ const removeMember = async (member: LearningPlanGroupMemberSimple) => {
         }"
         :raw="member"
         no-checkbox
-        @remove-click="(value) => removeMember(value.raw)"
+        @toggle-responsible-click="(value, inCharge) => handleUpdateMember(value?.raw, inCharge)"
+        @remove-click="(value) => handleRemoveMember(value.raw)"
       />
     </template>
     <template #no-data>

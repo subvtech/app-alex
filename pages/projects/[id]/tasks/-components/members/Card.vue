@@ -22,7 +22,7 @@ withDefaults(defineProps<CompProps>(), {
 });
 type Emit = {
   'remove-click': [value: T];
-  'toggle-responsible-click': [value: null | T];
+  'toggle-responsible-click': [value: null | T, inCharge: boolean];
 };
 defineEmits<Emit>();
 </script>
@@ -58,7 +58,9 @@ defineEmits<Emit>();
           class="tw-flex gap-1 items-center bg-primary-2 tw-text-xs tw-p-1 tw-px-2 tw-rounded-lg"
         >
           <span>Responsável</span>
-          <v-icon v-if="isHovering" size="small" @click="$emit('toggle-responsible-click', null)">mdi-close</v-icon>
+          <v-icon v-if="isHovering" size="small" @click="$emit('toggle-responsible-click', raw as T, false)"
+            >mdi-close</v-icon
+          >
         </div>
       </v-hover>
       <alex-custom-button
@@ -67,14 +69,14 @@ defineEmits<Emit>();
         size="small"
         variant="secondary"
         text="Tornar Responsável"
-        @click="$emit('toggle-responsible-click', raw)"
+        @click="$emit('toggle-responsible-click', raw as T, true)"
       />
       <alex-custom-button
         v-if="!noDelete"
         icon="mdi-trash-can-outline"
         size="small"
         variant="text"
-        @click.stop="$emit('remove-click', raw)"
+        @click.stop="$emit('remove-click', raw as T)"
       />
     </div>
   </v-hover>
