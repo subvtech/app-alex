@@ -123,5 +123,27 @@
       "delete_story_has_children": "It is not possible to delete a story that has linked tasks",
       "delete_epic_has_children": "It is not possible to delete an epic that has linked stories or tasks"
     }
+  },
+  "sprints": {
+    "new_sprint": "New sprint",
+    "sprint_list": "Sprint list",
+    "move_down": "Move down",
+    "move_up": "Move up",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": {
+      "deleted_success": "Sprint successfully deleted!",
+      "deleted_error": "An error occurred while trying to delete the sprint, please try again!",
+      "moved_success": "Sprint successfully moved!",
+      "moved_error": "An error occurred while trying to move the sprint, please try again!"
+    },
+    "delete_modal": {
+      "title_confirm": "Do you really want to delete {sprint}?",
+      "subtitle_confirm": "By deleting a sprint, all tasks linked to it will be moved to the backlog.",
+      "title_unique": "You cannot delete {sprint}",
+      "subtitle_unique": "The project must contain at least one sprint, so it is not possible to delete this one.",
+      "title_completed_tasks": "You cannot delete {sprint}",
+      "subtitle_completed_tasks": "The sprint has completed tasks. Move the tasks to another sprint before deleting this one."
+    }
   }
 }
