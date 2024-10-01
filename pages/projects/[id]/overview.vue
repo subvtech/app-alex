@@ -2,6 +2,7 @@
 import { GanttInstance, Sprint as GanttSprint, Item as Task } from '@/components/Gantt.vue';
 import CardTotalizer from './-components/CardTotalizer.vue';
 import OverviewTaskProgress from './-components/overview/taskProgress.vue';
+import OverviewEncounters from './-components/overview/encounters.vue'
 
 interface Sprint extends GanttSprint {
   kanban: {
@@ -74,12 +75,15 @@ const { t } = useI18n();
 const route = useRoute();
 const strapi = useStrapiClient();
 const learningPlanStore = useLearningPlanStore();
+const learningPlanId = ref<string>(route.params.id as string)
 
 // const data = ref([]);
 const loading = ref(true);
 // const learningPlan = ref<LearningPlan>();
 const institutions = ref<Institution[]>([]);
 const taskProgress = ref<{ sprint: string; columns: any }[]>([]);
+
+const schedules = ref<LearningPlanScheduleSimple[]>([])
 
 const ganttRef = ref<GanttInstance | null>(null);
 const ganttItems = ref<Task[]>([]);
@@ -113,19 +117,6 @@ const totalizers = ref({
   },
 });
 
-const today = new Date();
-const daysOfWeek = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
-const firstDayOfWeek = today.getDate() - today.getDay() + 1;
-
-const currentWeek = Array.from({ length: daysOfWeek.length }, (_v, i) => {
-  const date = new Date(today.getFullYear(), today.getMonth(), firstDayOfWeek + i);
-  return {
-    name: daysOfWeek[i],
-    date: date.getDate(),
-    value: date.toISOString().split('T')[0],
-  };
-});
-
 onBeforeMount(async () => {
   try {
     const response = await learningPlanStore.loadLearningPlan(+route.params.id);
@@ -136,6 +127,8 @@ onBeforeMount(async () => {
 
     institutions.value = response.data.institutions as never;
 
+    schedules.value = response.data.schedules
+
     const res = await strapi<Data>(`learningplans/${route.params.id}/project-dashboard`);
 
     totalizers.value.epics.value = res.counters.totalEpics;
@@ -145,6 +138,7 @@ onBeforeMount(async () => {
     totalizers.value.stories.value = res.counters.totalStories;
     totalizers.value.stories.percentage = res.counters.finishedStoriesPercent || 0;
     totalizers.value.remainingTime.value = `${res.counters.remainingDays} dias`;
+
 
     ganttItems.value = res.tasks;
     ganttSprints.value = res.sprints;
@@ -228,44 +222,11 @@ onBeforeMount(async () => {
         last-update="2024-07-11 12:00"
         :data="taskProgress"
       />
-      <alex-custom-card
-        title="Encontros"
-        full-width
-        class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
-        content-class-name="justify-center align-center h-100"
-        no-footer
-      >
-        <template #content>
-          <div class="tw-flex tw-flex-col tw-gap-2 tw-w-full">
-            <!-- TODO: Trocar isso aqui por tabs -->
-            <div class="tw-flex tw-gap-1 ga-6 tw-items-center mb-4 tw-overflow-auto">
-              <div v-for="day in currentWeek" :key="day.value">
-                <div
-                  class="tw-h-[57px] tw-w-[41px] pa-2 rounded-lg"
-                  variant="text"
-                  :class="
-                    day.value === today.toISOString().split('T')[0] ? 'bg-secondary-0 tw-text-white' : 'tw-bg-white'
-                  "
-                >
-                  <div class="tw-flex tw-flex-col text-center">
-                    <span class="text-body-3">{{ day.name }}</span>
-                    <span
-                      class="text-body-2"
-                      :class="day.value === today.toISOString().split('T')[0] ? 'tw-text-white' : ' text-secondary-0'"
-                      >{{ day.date }}</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-            <alex-custom-empty-placeholder
-              :empty-text-message="$t('pages.projects.overview.empty_meetings')"
-              empty-text-image="/svg/OverviewEmptyMeetings.svg"
-              grayscale
-            />
-          </div>
-        </template>
-      </alex-custom-card>
+      <overview-encounters
+       class="flex-1 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4"
+       :schedules="schedules"
+       :learningPlanId="learningPlanId"
+      />
       <div
         class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4 rounded-lg"
       >
@@ -312,6 +273,7 @@ onBeforeMount(async () => {
           </div>
         </template>
       </alex-custom-card>
+
     </div>
   </div>
 </template>

@@ -61,7 +61,6 @@ import { format, isValid } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { AlexDropdownItem } from '../custom/Dropdown.vue';
 import { capitalize } from '@/utils';
-import date from '~/pages/components/inputs/date.vue';
 export type MeetingVariantType = 'editing' | 'default';
 export type MeetingType = 'onsite' | 'online';
 export interface MeetingPropsType {
