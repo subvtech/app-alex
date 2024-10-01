@@ -9,7 +9,7 @@
     @on-main-action="onSubmit"
   >
     <alex-inputs-select
-      v-if="!sprintId"
+      v-if="!sprintData?.id"
       v-model="sprint.type"
       density="comfortable"
       name="type"
@@ -20,7 +20,7 @@
       required
     />
     <alex-inputs-text-field
-      v-model="sprint.name"
+      v-model="sprint.title"
       density="comfortable"
       name="name"
       :label="t('components.projects.sprint.name.label')"
@@ -41,7 +41,7 @@
     />
     <div class="w-100 d-flex gap-4 flex-wrap">
       <alex-inputs-date
-        v-model="sprint.startDate"
+        v-model="sprint.start_at"
         class="flex-grow-1 min-w-60"
         name="startDate"
         :label="$t('components.projects.sprint.startDate')"
@@ -50,7 +50,7 @@
         :allowed-dates="disablePastDates"
       />
       <alex-inputs-date
-        v-model="sprint.endDate"
+        v-model="sprint.end_at"
         class="flex-grow-1 min-w-60"
         density="comfortable"
         name="endDate"
@@ -69,23 +69,23 @@ import { useForm } from 'vee-validate';
 
 interface sprintType {
   type?: 'multiple' | 'single';
-  name?: string;
-  startDate: string;
-  endDate?: string;
-  interval:
-    | 'one-week'
-    | 'two-weeks'
-    | 'three-weeks'
-    | 'four-weeks'
-    | 'custom'
-    | null;
+  title?: string;
+  start_at: string;
+  end_at: string;
+  interval: 'one-week' | 'two-weeks' | 'three-weeks' | 'four-weeks' | 'custom' | null;
+  id?: number;
+}
+
+interface sprintProps extends Omit<sprintType, 'interval' | 'start_at' | 'end_at'> {
+  start_at: Date | string;
+  end_at: Date | string;
 }
 
 interface propsType {
-  sprintData: sprintType;
+  sprintData: sprintProps;
   projectId: number;
-  sprintId?: string;
   projectEndDate: string;
+  sprintsLength: number;
 }
 
 const { t } = useI18n();
@@ -99,18 +99,24 @@ const props = withDefaults(defineProps<propsType>(), {
   sprintData: () => ({
     type: 'single',
     name: '',
-    startDate: '',
-    endDate: '',
+    start_at: '',
+    end_at: '',
     interval: null,
+    id: 0,
   }),
-  sprintId: '',
 });
 
-const sprint = ref<sprintType>(props.sprintData);
+const sprint = ref<sprintType>({
+  type: 'single',
+  title: '',
+  start_at: '',
+  end_at: '',
+  interval: null,
+});
 const dialog = defineModel<boolean>({ required: true });
 const isLoading = ref(false);
 const currentProjectId = ref(props.projectId);
-const currentSprintId = ref(props.sprintId);
+const currentSprintId = ref(props.sprintData?.id);
 const currentProjectEndDate = ref(props.projectEndDate);
 
 const { handleSubmit } = useForm({
@@ -120,46 +126,49 @@ const { handleSubmit } = useForm({
 const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true;
   try {
+    const adjustToUserTimeZone = (dateStr: string) => {
+      const date = new Date(dateStr);
+      const userOffset = date.getTimezoneOffset() * 60000; // Offset in milliseconds
+      const adjustedDate = new Date(date.getTime() + userOffset);
+      return adjustedDate.toISOString();
+    };
+
+    const startDate = adjustToUserTimeZone(values.startDate);
+    const endDate = adjustToUserTimeZone(values.endDate);
+
     if (!currentSprintId.value) {
       await client('sprints/create-multiple', {
         method: 'POST',
         body: {
           sprints: {
-            startDate: values.startDate,
-            endDate: values.endDate,
+            start_at: startDate,
+            end_at: endDate,
             type: values.type,
             title: values.name,
           },
           projectId: currentProjectId.value,
           projectEndDate: currentProjectEndDate.value,
+          sprintsLength: props.sprintsLength,
         },
       });
       emit('create');
     } else {
       await update('sprints', currentSprintId.value, {
         title: values.name,
-        startDate: values.startDate,
-        endDate: values.endDate,
+        start_at: startDate,
+        end_at: endDate,
       });
       emit('update');
     }
     setMessage(
-      t(
-        `components.projects.sprint.successMessage.${
-          currentSprintId.value ? 'edit' : 'create'
-        }`,
-      ),
+      t(`components.projects.sprint.successMessage.${currentSprintId.value ? 'edit' : 'create'}`),
       'success',
       true,
     );
     dialog.value = false;
   } catch (error) {
     setMessage(
-      t(
-        `components.projects.sprint.errorMessage.${
-          currentSprintId.value ? 'edit' : 'create'
-        }`,
-      ),
+      t(`components.projects.sprint.errorMessage.${currentSprintId.value ? 'edit' : 'create'}`),
       'error',
       true,
     );
@@ -175,12 +184,31 @@ const disablePastDates = (date: Date) => {
   return passedDate >= today;
 };
 
+const dateToString = (date: Date) => {
+  return format(date, 'yyyy-MM-dd');
+};
+
 watch(dialog, (newValue) => {
   if (newValue) {
-    sprint.value = {
-      ...props.sprintData,
-    };
-    currentSprintId.value = props.sprintId;
+    if (props.sprintData?.id) {
+      const startDate = dateToString(new Date(props.sprintData.start_at));
+      const endDate = dateToString(new Date(props.sprintData.end_at));
+      sprint.value = {
+        ...props.sprintData,
+        interval: getDurationInterval(startDate, endDate),
+        start_at: startDate,
+        end_at: endDate,
+      };
+    } else {
+      sprint.value = {
+        type: 'single',
+        title: '',
+        start_at: '',
+        end_at: '',
+        interval: null,
+      };
+    }
+    currentSprintId.value = props.sprintData?.id;
     currentProjectId.value = props.projectId;
     currentProjectEndDate.value = props.projectEndDate;
     isLoading.value = false;
@@ -191,23 +219,21 @@ watch(
   () => sprint.value.type,
   (newType) => {
     if (newType === 'multiple') {
-      sprint.value.name = '';
+      sprint.value.title = '';
     }
   },
 );
 
 watch(
-  () => [sprint.value.interval, sprint.value.startDate],
+  () => [sprint.value.interval, sprint.value.start_at],
   ([newInterval, newStartDate]) => {
     if (newInterval === null || newInterval === 'custom' || !newStartDate) {
       return;
     }
-
     const [year, month, day] = newStartDate.split('-').map(Number);
     const startDate = new Date(year, month - 1, day);
     const endDate = addWeeks(startOfDay(startDate), weeks[newInterval]);
-
-    sprint.value.endDate = format(endDate, 'yyyy-MM-dd');
+    sprint.value.end_at = dateToString(endDate);
   },
 );
 
@@ -242,9 +268,7 @@ const intervalOptions = [
 ];
 
 const dialogTitle = computed(() =>
-  currentSprintId.value
-    ? t('components.projects.sprint.title.edit')
-    : t('components.projects.sprint.title.create'),
+  currentSprintId.value ? t('components.projects.sprint.title.edit') : t('components.projects.sprint.title.create'),
 );
 
 const dialogMainButtonText = computed(() =>
@@ -264,5 +288,13 @@ const weeks = {
   'two-weeks': 2,
   'three-weeks': 3,
   'four-weeks': 4,
+};
+
+const getDurationInterval = (startDate: string, endDate: string) => {
+  const defaultInterval = ['one-week', 'two-weeks', 'three-weeks', 'four-weeks'];
+  const diff = Math.abs(new Date(endDate).getTime() - new Date(startDate).getTime());
+  const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const calcWeeks = diffDays / 7;
+  return defaultInterval.length - 1 < calcWeeks ? 'custom' : (defaultInterval[calcWeeks - 1] as sprintType['interval']);
 };
 </script>

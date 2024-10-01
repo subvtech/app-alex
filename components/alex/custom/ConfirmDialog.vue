@@ -43,7 +43,7 @@
             :text="submitButtonText"
             :variant="variant"
             :loading="loading"
-            :disabled="inputWordConfirmation ? inputValue !== inputWordConfirmation : false"
+            :disabled="(inputWordConfirmation ? inputValue !== inputWordConfirmation : false) || disableSubmitButton"
             @click="emit('submit')"
         /></template>
         <template #secondarySlotButton
@@ -97,6 +97,7 @@ interface AlertDialogProps {
   noSubmitButton?: boolean;
   errorMessageText?: string;
   imageClass?: string;
+  disableSubmitButton?: boolean;
   innerActivator?: {
     text: string;
     prependIcon?: string;
