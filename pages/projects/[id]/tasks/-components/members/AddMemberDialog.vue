@@ -98,14 +98,17 @@ const hasResponsable = computed(
     !!selectedMembers.value.find((member) => member.role === 'in_charge') ||
     !!props.defaultMembers.find((member) => member.role === 'in_charge'),
 );
-const filteredAlreadyMembers = computed(() =>
-  members.value.filter((member) => {
-    const alreadyMember = props.defaultMembers?.find((alreadyMember) => alreadyMember.student_member.id === member.id);
-    return !alreadyMember;
-  }),
+const filteredAlreadyMembers = computed(
+  () =>
+    members.value?.filter((member) => {
+      const alreadyMember = props.defaultMembers?.find(
+        (alreadyMember) => alreadyMember.student_member.id === member.id,
+      );
+      return !alreadyMember;
+    }),
 );
-const filteredMembers = computed(() =>
-  filteredAlreadyMembers.value.filter((member) => contains(member.raw.user.fullname, search.value)),
+const filteredMembers = computed(
+  () => filteredAlreadyMembers.value?.filter((member) => contains(member.raw.user.fullname, search.value)),
 );
 //
 const { data: members } = useGetProjectMembers(learningplanValue, enabledGetMembers);
@@ -146,6 +149,9 @@ const handleUpdateResponsible = (member: MemberItem | null, inCharge: boolean) =
     });
   });
 };
+watch(model, () => {
+  selectedMembers.value = [];
+});
 </script>
 
 <style lang="scss"></style>

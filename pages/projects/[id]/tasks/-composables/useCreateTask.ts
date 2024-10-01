@@ -207,6 +207,8 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
         organization,
         sprint: sprintId,
         kanban_column: kanbanColumnId,
+        type: 'group',
+        group: true,
       });
       return task.data.kanban_column;
     },
