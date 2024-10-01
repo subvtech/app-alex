@@ -84,7 +84,8 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 // refs
-// const { setMessage } = useMessageStore();
+const { setMessage } = useMessageStore();
+const { t } = useI18n();
 const search = ref('');
 const loadingAdd = ref(false);
 const learningplanValue = toRef(props, 'learningplanId');
@@ -117,6 +118,7 @@ const queryClient = useQueryClient();
 // Methods
 const handleSubmit = () => {
   if (!props.groupId) {
+    setMessage(t('components.learningPlan.drawer.task.errors.missingDefaultGroup'), 'error', true);
     return;
   }
   emit('add-click', props.groupId, selectedMembers.value);
