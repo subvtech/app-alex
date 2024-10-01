@@ -10,14 +10,14 @@ export interface StatisticCardProps {
   value: number | string;
 }
 
-defineProps<StatisticCardProps>();
+const props = defineProps<StatisticCardProps>();
 
-const getAccentColor = (counter: StatisticCardProps) => {
-  return counter.color ? `${counter.color}` : 'secondary-0';
+const getAccentColor = () => {
+  return props.color ? `${props.color}` : 'secondary-0';
 };
 
-const getChipTextColor = (counter: StatisticCardProps) => {
-  return counter.chipColor ? `bg-${counter.chipColor}` : 'bg-secondary--2';
+const getChipTextColor = () => {
+  return props.chipColor ? `bg-${props.chipColor}` : 'bg-secondary--2';
 };
 </script>
 
@@ -25,7 +25,7 @@ const getChipTextColor = (counter: StatisticCardProps) => {
   <Card class="tw-flex-1 tw-gap-2 bg-white tw-w-full sm:tw-w-1/2 lg:tw-w-1/3 tw-min-w-72">
     <CardContent class="!tw-p-0">
       <div class="tw-flex py-2 gap-4 overflow-hidden">
-        <div class="h-full tw-w-2 tw-rounded-r-xl" :class="`bg-${getAccentColor}`"></div>
+        <div class="h-full tw-w-2 tw-rounded-r-xl" :class="`bg-${getAccentColor()}`"></div>
         <div class="tw-py-4 tw-flex tw-flex-col tw-gap-1">
           <div class="tw-flex tw-items-center tw-mb-1 tw-gap-2">
             <div class="bg-gray-blue rounded">
@@ -37,9 +37,9 @@ const getChipTextColor = (counter: StatisticCardProps) => {
           <div class="tw-flex tw-items-center tw-gap-2">
             <div
               class="tw-w-[40px] tw-h-[30px] d-flex tw-justify-center align-center rounded gap-1 text-body-1"
-              :class="`text-${getAccentColor} ${getChipTextColor}`"
+              :class="`text-${getAccentColor()} ${getChipTextColor()}`"
             >
-              {{ `${percentage}%` }}
+              {{ `${percentage.toFixed(0)}%` }}
             </div>
             <span class="text-body-1 tw-text-gray-400">{{ $t('pages.projects.overview.completed') }}</span>
           </div>
