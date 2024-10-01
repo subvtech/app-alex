@@ -44,37 +44,11 @@
     <alex-learningplan-task-kanban
       v-if="isKanban"
       ref="kanban"
-      :key="tasks.reduce((acc, { id }) => `${acc}${id}`, '') + isAddingTask"
+      :key="tasks.length"
       v-model="tasks"
+      v-model:columns="columns"
       type="professor"
       :classes="taskMemberClasses"
-      :columns="[
-        {
-          title: $t('components.learningPlan.drawer.task.status.toDo'),
-          color: 'gray',
-          group: 'to_do',
-          accept: true,
-          add: true,
-        },
-        {
-          title: $t('components.learningPlan.drawer.task.status.inProgress'),
-          color: 'blue',
-          group: 'in_progress',
-          accept: true,
-        },
-        {
-          title: $t('components.learningPlan.drawer.task.status.underReview'),
-          color: 'orange',
-          group: 'in_review',
-          accept: true,
-        },
-        {
-          title: $t('components.learningPlan.drawer.task.status.done'),
-          color: 'green',
-          group: 'done',
-          accept: true,
-        },
-      ]"
       :filter="filter"
       no-header
       @create-task="(title, column) => handleCreateTask(title, column)"
@@ -267,6 +241,33 @@ const isKanban = ref<boolean>(true); // or list
 const tasks = ref<VNode | any>([]);
 const expanded = ref<string>('tasks');
 const isMobile = ref<boolean>(false);
+const columns = ref<any>([
+  {
+    title: t('components.learningPlan.drawer.task.status.toDo'),
+    color: 'gray',
+    group: 'to_do',
+    accept: true,
+    add: true,
+  },
+  {
+    title: t('components.learningPlan.drawer.task.status.inProgress'),
+    color: 'blue',
+    group: 'in_progress',
+    accept: true,
+  },
+  {
+    title: t('components.learningPlan.drawer.task.status.underReview'),
+    color: 'orange',
+    group: 'in_review',
+    accept: true,
+  },
+  {
+    title: t('components.learningPlan.drawer.task.status.done'),
+    color: 'green',
+    group: 'done',
+    accept: true,
+  },
+]);
 
 watch(tasks, (tasks) => {
   console.log('tasks:', tasks);
