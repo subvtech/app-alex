@@ -48,8 +48,8 @@
     >
       <KanbanColumn
         v-for="(column, index) in columns"
-        :key="index + columnsTasks[column.group].length"
-        v-model="columnsTasks[column.group]"
+        :key="index"
+        v-model="columnTasks[column.group]"
         :title="column.title"
         :color="column.color"
         :group="column.group"
@@ -211,14 +211,7 @@ const columns = defineModel<Column<typeof props.type>[]>('columns', {
   required: true,
 });
 
-const columnsTasks = computed(() =>
-  columns.value.reduce((acc, item) => {
-    if (!acc[item.group]) {
-      acc[item.group] = filteredByFinalDate.value.filter((task) => item.group === task.status);
-    }
-    return acc;
-  }, {}),
-);
+const columnTasks = ref({});
 
 type Emits = {
   (e: 'filter-click'): void;
@@ -248,6 +241,17 @@ const handleInsertCard = ({ newIndex, value, group }: InsertCardProps) => {
 };
 const isTaskStudent = (card: Task | TaskStudent): card is TaskStudent => {
   return 'title' in card;
+};
+
+const getColumnTasks = () => {
+  const tasks = filteredByFinalDate.value;
+
+  return columns.value.reduce((acc, item) => {
+    if (!acc[item.group]) {
+      acc[item.group] = tasks.filter((task) => item.group === task.status);
+    }
+    return acc;
+  }, {});
 };
 
 // Filter
@@ -393,8 +397,17 @@ const moveViewY = () => {
     html.scrollTop += 8;
   }
 };
+
+watch(filteredByFinalDate, () => {
+  columnTasks.value = getColumnTasks();
+});
+
 watch(mouseX, moveViewX);
 watch(mouseY, moveViewY);
+
+onMounted(() => {
+  columnTasks.value = getColumnTasks();
+});
 
 const setCanDrag = (value: boolean) => {
   canDrag.value = value;
