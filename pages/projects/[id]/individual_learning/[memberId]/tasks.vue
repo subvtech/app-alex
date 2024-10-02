@@ -292,6 +292,7 @@ const newTaskTitle = ref<string>('');
 
 // Function
 const handleCreateTask = async (title: string, column) => {
+  // console.log(learningPlanStore.learningPlan?.end_date);
   if (!title || !column) {
     return;
   }
@@ -315,6 +316,7 @@ const handleCreateTask = async (title: string, column) => {
     can_submit_after_deadline: true,
     can_change_from_review: true,
     start_at: new Date(),
+    finish_at: learningPlanStore.learningPlan?.end_date ?? null,
     type: 'individual',
   });
 
@@ -322,6 +324,7 @@ const handleCreateTask = async (title: string, column) => {
     task: newTask.data.id,
     status: column.group,
     start_at: new Date(),
+    finished_at: learningPlanStore.learningPlan?.end_date ?? null,
     learning_plan_member: memberId,
   });
 
