@@ -41,7 +41,7 @@
         </template>
       </alex-custom-tooltip>
     </div>
-    <alex-learningplan-task-kanban
+    <Kanban
       v-if="isKanban"
       ref="kanban"
       :key="tasks.length"
@@ -217,6 +217,7 @@
 
 <script setup lang="ts">
 import { type TaskStudent } from '@/components/alex/learningplan/task/kanban/index.vue';
+import Kanban from '../-components/Kanban.vue';
 
 // Const
 const i18Dir = 'components.projects.individual_learning.tasks';
