@@ -415,7 +415,7 @@ const createProject = async () => {
     const usersData = students.value.map((student) => ({
       id: student.user?.id ?? student.id,
       email: student.user?.email ?? student.email,
-      role: 'student',
+      role: MemberRoles.STUDENT,
     }));
 
     const users = usersData.filter((user) => user.id);
@@ -424,7 +424,7 @@ const createProject = async () => {
     users.push({
       id: user.value.id,
       email: user.value.email,
-      role: 'student_leader',
+      role: MemberRoles.FACILITATOR,
     });
 
     loading.value = true;
@@ -436,7 +436,7 @@ const createProject = async () => {
         description: projectInfo.value.description,
         start_date: projectInfo.value.startDate,
         end_date: projectInfo.value.endDate,
-        type: 'project',
+        type: LearningPlanType.PROJECT,
         slug: slugFormated.value.toLocaleLowerCase(),
         fields: projectInfo.value.areas.length ? projectInfo.value.areas : [],
         product: projectInfo.value.product,

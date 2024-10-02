@@ -28,7 +28,7 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
     archived_at: { $notNull: false },
     type: {
       ...(type !== 'course'
-        ? { $in: ['project', 'course_project'] }
+        ? { $in: [LearningPlanType.PROJECT, 'course_project'] }
         : { $in: ['course'] }),
     },
   },

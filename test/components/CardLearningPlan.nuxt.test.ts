@@ -80,7 +80,7 @@ describe('Card of Project and Courses', () => {
     const { unmount } = await renderSuspended(Card, {
       props: {
         ...props,
-        type: 'project',
+        type: LearningPlanType.PROJECT,
       },
       global,
     });

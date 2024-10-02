@@ -46,7 +46,7 @@
           :label="$t('pages.classes.filter.institution')"
         />
         <alex-inputs-single-user-auto-complete
-          v-if="type === 'project'"
+          v-if="type === LearningPlanType.PROJECT"
           v-model="filters.leader"
           name="leader"
           clearable

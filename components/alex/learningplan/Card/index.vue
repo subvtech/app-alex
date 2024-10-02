@@ -12,7 +12,7 @@
       'vertical-grid card': isVertical,
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
-      project: type === 'project',
+      project: type === LearningPlanType.PROJECT,
     }"
     @click="() => emits('open')"
     @mouseover="isHovering = true"
@@ -160,24 +160,24 @@
       >
         <alex-learningplan-card-info
           v-if="
-            (type === 'project' && leader) || (type === 'course' && facilitator)
+            (type === LearningPlanType.PROJECT && leader) || (type === 'course' && facilitator)
           "
           class="flex-1-1"
           :avatar="{
             url:
-              type === 'project' && leader
+              type === LearningPlanType.PROJECT && leader
                 ? leader?.imageURL
                 : facilitator.imageURL,
             name:
-              type === 'project' && leader ? leader?.name : facilitator.name,
+              type === LearningPlanType.PROJECT && leader ? leader?.name : facilitator.name,
           }"
           :title="
-            type === 'project'
+            type === LearningPlanType.PROJECT
               ? 'Líder'
               : $t('components.learningPlan.card.facilitator')
           "
           :subtitle="
-            type === 'project' && leader ? leader?.name : facilitator.name
+            type === LearningPlanType.PROJECT && leader ? leader?.name : facilitator.name
           "
         />
         <alex-learningplan-card-info
@@ -236,7 +236,7 @@ interface member {
 }
 
 interface LearningPlanCardProps {
-  type?: 'project' | 'course' | 'course_project';
+  type?: LearningPlanType.PROJECT | 'course' | 'course_project';
   title: string;
   image: { url: string; alt?: string };
   description: string;

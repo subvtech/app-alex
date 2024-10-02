@@ -387,7 +387,7 @@ const isProfessor = computed(() => {
   return user.value?.role?.type === UserRoles.PROFESSOR;
 });
 const simplifiedType = computed(() =>
-  props.type === 'course' ? 'course' : 'project',
+  props.type === 'course' ? 'course' : LearningPlanType.PROJECT,
 );
 const hasFilters = computed(() => {
   let hasFilter = false;
@@ -496,7 +496,7 @@ const headers = computed<DataTableHeader<LearningPlanData>[]>(() => [
           b.facilitator!.user?.fullname,
         );
       }
-      if (props.type === 'project' && hasBothLeaders) {
+      if (props.type === LearningPlanType.PROJECT && hasBothLeaders) {
         return a.leader!.user?.fullname.localeCompare(b.leader!.user?.fullname);
       }
       return 1;

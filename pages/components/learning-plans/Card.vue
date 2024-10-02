@@ -1,7 +1,5 @@
 <template>
-  <v-container
-    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
-  >
+  <v-container class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15">
     <h1 class="text-h2 text-gray-800">Card de Cursos e Projetos</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
@@ -24,54 +22,36 @@
       <div class="d-flex flex-column" style="gap: 8px">
         <h2 class="text-h4 text-gray-800">Variant: <strong>courses</strong></h2>
         <alex-learningplan-card
-          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
-          type="course"
+          title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer" type="course"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
-          }"
-          :trails-count="40"
-          :image="{
+          }" :trails-count="40" :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
-          }"
-          favorited
-          @favorite="() => console.log('favoritei')"
-          @open="() => console.log('abri')"
-        />
+          }" favorited @favorite="() => console.log('favoritei')" @open="() => console.log('abri')" />
         <h2 class="text-h4 text-gray-800">Variant: <strong>project</strong></h2>
-        <alex-learningplan-card
-          type="project"
+        <alex-learningplan-card type="project"
           title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
-          }"
-          :trails-count="40"
-          :image="{
+          }" :trails-count="40" :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
-          }"
-          @favorite="() => console.log('favoritei')"
-          @open="() => console.log('abri')"
-        />
+          }" @favorite="() => console.log('favoritei')" @open="() => console.log('abri')" />
         <h2 class="text-h4 text-gray-800">
           Variant: <strong>course_project</strong>
         </h2>
-        <alex-learningplan-card
-          type="course_project"
+        <alex-learningplan-card type="course_project"
           title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :facilitator="{
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
-          }"
-          :trails-count="99"
-          :image="{
+          }" :trails-count="99" :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
-          }"
-          hide-favorited-button
-          :members="[
+          }" hide-favorited-button :members="[
             {
               name: 'Edvaldo',
               image: {
@@ -90,25 +70,13 @@
             {
               name: 'Marcos Santos',
             },
-          ]"
-          @favorite="() => console.log('favoritei')"
-          @open="() => console.log('abri')"
-        />
+          ]" @favorite="() => console.log('favoritei')" @open="() => console.log('abri')" />
       </div>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(0)"
-        >
-          <v-icon
-            v-if="copiedIndex === 0"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
+        <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(0)">
+          <v-icon v-if="copiedIndex === 0" size="x-large" icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1" />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
         </v-btn>
       </div>
@@ -170,7 +138,7 @@
             </tr>
             <tr>
               <td>type</td>
-              <td>'project' | 'course' | 'course_project'</td>
+              <td>'{{ LearningPlanType.PROJECT }}' | 'course' | 'course_project'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -275,28 +243,15 @@
           :facilitator="{
             name: 'Carlos Andrade',
             imageURL: 'https://thispersondoesnotexist.com/',
-          }"
-          :trails-count="40"
-          :image="{
+          }" :trails-count="40" :image="{
             url: 'https://miro.medium.com/v2/resize:fit:1058/1*ci1A2ErPJuUdYUqfa45r0Q.png',
-          }"
-          hide
-        />
+          }" hide />
       </div>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[1] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(1)"
-        >
-          <v-icon
-            v-if="copiedIndex === 1"
-            size="x-large"
-            icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1"
-          />
+        <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(1)">
+          <v-icon v-if="copiedIndex === 1" size="x-large" icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1" />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
         </v-btn>
       </div>
@@ -370,13 +325,18 @@ const copyToClipboard = async (index) => {
 <style>
 .language-markup {
   overflow-x: auto;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+
+  /* Firefox */
   &::-webkit-scrollbar {
     display: none;
   }
+
   border-radius: 8px;
 }
+
 .container {
   border: 1px solid #a0a8b1;
   gap: 16px;

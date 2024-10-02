@@ -2,7 +2,7 @@
   <v-data-iterator
     :search="search"
     :page="page"
-    :items="kind === 'project' ? projectStudents : members.data"
+    :items="kind === LearningPlanType.PROJECT ? projectStudents : members.data"
     :items-per-page="itemsPerPage"
     class="members"
     :filter-keys="[
@@ -24,7 +24,7 @@
           class="w-100 tw-mr-4"
           :placeholder="$t('components.learningPlan.members.search')"
           prepend-inner-icon="mdi-magnify"
-          :density="kind === 'project' ? 'comfortable' : 'compact'"
+          :density="kind === LearningPlanType.PROJECT ? 'comfortable' : 'compact'"
           clearable
         />
 
@@ -47,7 +47,7 @@
           @add-group="handleAddGroup"
         />
         <alex-learningplan-task-dialog-add-project-members
-          v-if="kind === 'project'"
+          v-if="kind === LearningPlanType.PROJECT"
           v-model="addProjectMembersDialog"
           :learningplan-ids="props.learningplanIds"
           :selected-students="projectStudents"
@@ -56,7 +56,7 @@
 
         <alex-custom-dropdown
           :items="typeOptions"
-          :disabled="!!type || kind === 'project'"
+          :disabled="!!type || kind === LearningPlanType.PROJECT"
         >
           <template #activator="{ props: propsDropdown }">
             <alex-custom-button
@@ -64,7 +64,7 @@
               class="tw-ml-auto"
               variant="secondary"
               prepend-icon="mdi-plus"
-              :size="kind === 'project' ? 'large' : 'default'"
+              :size="kind === LearningPlanType.PROJECT ? 'large' : 'default'"
               @click="handleAddMemberOrClass"
               >{{
                 $t('components.learningPlan.members.add.label')
@@ -111,8 +111,8 @@
               : undefined,
           }"
           :edit="edit"
-          :clickable="kind !== 'project'"
-          :no-class="kind === 'project'"
+          :clickable="kind !== LearningPlanType.PROJECT"
+          :no-class="kind === LearningPlanType.PROJECT"
           @remove-click="removeMember(member.raw)"
           @edit-click="
             () => handleEditClick(member.raw.learning_plan_group, items)
@@ -205,7 +205,7 @@ interface TaskMemberProps {
 interface ProjectMemberProps {
   learningplanIds: number[];
   students: LearningPlanMemberSimple[];
-  kind: 'project';
+  kind: LearningPlanType.PROJECT;
 }
 
 type TaskPropsType = MembersProps & TaskMemberProps;
@@ -397,7 +397,7 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
   }
 };
 const removeMember = async (member) => {
-  if (props.kind === 'project') {
+  if (props.kind === LearningPlanType.PROJECT) {
     const indexOf = projectStudents.value.findIndex(
       (student) =>
         student.user.id === member.user.id ||
@@ -470,7 +470,7 @@ const handleEditClick = (
   groupDialog.value = true;
 };
 const handleAddMemberOrClass = () => {
-  if (props.kind === 'project') {
+  if (props.kind === LearningPlanType.PROJECT) {
     addProjectMembersDialog.value = true;
   }
   if (!props.type || !checkHasFilledDates()) {
