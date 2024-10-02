@@ -48,7 +48,7 @@
     >
       <KanbanColumn
         v-for="(column, index) in columns"
-        :key="index"
+        :key="index + columnsTasks[column.group].length"
         v-model="columnsTasks[column.group]"
         :title="column.title"
         :color="column.color"
