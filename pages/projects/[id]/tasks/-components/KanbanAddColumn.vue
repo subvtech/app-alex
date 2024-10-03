@@ -10,7 +10,7 @@
   <KanbanColumnHeader
     v-else
     id="adding-column"
-    class="tw-h-[64px] tw-w-[280px]"
+    class="tw-h-[64px] tw-w-[280px] tw-min-w-[280px]"
     :quantity="0"
     edit
     :color="!isLoading ? 'gray-300' : 'secondary-0'"

@@ -3,18 +3,24 @@
     "documents": "Documentos",
     "home": "Início",
     "individual_learning": "Jornada Individual",
+    "loading": "Carregando",
     "members": "Integrantes",
     "my_projects": "Meus projetos",
     "new_project": "Novo projeto",
     "overview": "Visão geral",
     "projects": "Projetos",
+    "removing_tmpl": "Removendo {0}",
+    "removing": "Removendo",
+    "saving_tmpl": "Salvando {0}",
+    "saving": "Salvando",
     "tasks": "Tarefas",
     "trails": "Trilhas"
   },
   "errors": {
-    "404": "Página não encontrada",
     "403": "Acesso negado",
-    "500": "Erro interno do servidor"
+    "404": "Página não encontrada",
+    "500": "Erro interno do servidor",
+    "unknown": "Ocorreu um erro ao tentar executar a ação solicitada. Por favor, tente novamente."
   },
   "individual_learning": {
     "empty_events": "Não há eventos cadastrados",
@@ -33,9 +39,42 @@
     "empty_meetings": "Nada marcado hoje!",
     "empty_members": "Nenhum membro encontrado",
     "empty_task_progress": "%{percentage}% das tarefas foram concluídas",
+    "institution_dialog": {
+      "add": "Adicionar",
+      "address": "Endereço",
+      "back": "Voltar",
+      "cancel": "Cancelar",
+      "cnpj": "CNPJ",
+      "email": "Email",
+      "errors": {
+        "cnpj_not_found": "CNPJ não encontrado",
+        "cnpj_required": "CNPJ é obrigatório",
+        "email_invalid": "Email inválido",
+        "email_required": "Email é obrigatório",
+        "fetch_users": "Erro ao buscar usuários",
+        "legal_representative_required": "Representante é obrigatório",
+        "registered_name_required": "Razão social é obrigatória",
+        "sector_required": "Setor é obrigatório",
+        "trade_name_required": "Nome fantasia é obrigatório"
+      },
+      "information": "Informações",
+      "legal_representative": "Representante legal",
+      "next": "Próximo",
+      "phone": "Telefone",
+      "registered_name": "Razão social",
+      "search_member": "Pesquisar membro",
+      "sector": "Setor",
+      "title": "Adicionar instituição",
+      "trade_name": "Nome fantasia",
+      "update": "Atualizar"
+    },
+    "institution_remove_message": "Confirmar a remoção de \"{0}\"?! Esta operação não poderá ser desfeita.",
+    "institution_remove_success": "Instituição removida com sucesso.",
+    "institution_remove_title": "Confirmar remoção?!",
     "institutions": "Instituições",
     "last_update": "Última atualização:",
     "remaining_time": "Tempo restante",
+    "remove": "Remover",
     "task_progress": "Progresso de tarefas",
     "timeline_day": "Dia",
     "timeline_month": "Mês",
@@ -70,6 +109,8 @@
     "deleteSuccess": "excluída",
     "dndFilterError": "Não é possível alterar a posição da tarefa quando a filtragem está ativa",
     "dndSortError": "Não é possível alterar a posição da tarefa quando a ordenação por {type} está ativa",
+    "cant_remove_in_charge": "Você não pode remover o líder da tarefa",
+    "all_members_added": "Todos os membros foram adicionados!",
     "draft": "Rascunho",
     "dropdown_delete": "Excluir",
     "dropdown_details": "Detalhes",
@@ -122,6 +163,28 @@
       "deleted_error": "Ocorreu um erro ao tentar deletar {item}, por favor, tente novamente!",
       "delete_story_has_children": "Não é possível excluir uma história que possui tarefas vinculadas",
       "delete_epic_has_children": "Não é possível excluir um épico que possui histórias ou tarefas vinculadas"
+    }
+  },
+  "sprints": {
+    "new_sprint": "Nova sprint",
+    "sprint_list": "Lista de sprints",
+    "move_down": "Mover para baixo",
+    "move_up": "Mover para cima",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "actions": {
+      "deleted_success": "Sprint excluída com sucesso!",
+      "deleted_error": "Ocorreu um erro ao tentar excluir a sprint, por favor, tente novamente!",
+      "moved_success": "Sprint movida com sucesso!",
+      "moved_error": "Ocorreu um erro ao tentar mover a sprint, por favor, tente novamente!"
+    },
+    "delete_modal": {
+      "title_confirm": "Realmente deseja excluir {sprint}?",
+      "subtitle_confirm": "Ao excluir uma sprint, todas as tasks vinculadas a ela serão movidas para o backlog.",
+      "title_unique": "Você não pode excluir {sprint}",
+      "subtitle_unique": "O projeto deve conter pelo menos uma sprint, por isso não é possível excluir esta.",
+      "title_completed_tasks": "Você não pode excluir {sprint}",
+      "subtitle_completed_tasks": "A sprint possui tarefas concluídas. Mova as tarefas para outra sprint antes de excluir esta."
     }
   }
 }
