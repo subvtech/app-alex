@@ -1,7 +1,4 @@
-import {
-  Strapi4ResponseMany,
-  Strapi4ResponseSingle,
-} from '@nuxtjs/strapi/dist/runtime/types';
+import { Strapi4ResponseMany, Strapi4ResponseSingle } from '@nuxtjs/strapi/dist/runtime/types';
 
 export const LearningPlanType = {
   COURSE: 'course',

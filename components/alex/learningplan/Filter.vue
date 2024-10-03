@@ -14,13 +14,7 @@
         <p class="text-h4 flex-fill">
           {{ $t('pages.classes.filter.title') }}
         </p>
-        <alex-custom-button
-          icon="mdi-close"
-          variant="text"
-          size="small"
-          flat
-          @click="handleChange(false)"
-        />
+        <alex-custom-button icon="mdi-close" variant="text" size="small" flat @click="handleChange(false)" />
       </div>
 
       <hr class="mb-2" />
@@ -55,7 +49,7 @@
           :placeholder="$t('pages.classes.filter.findLeader')"
           :label="$t('pages.classes.filter.leader')"
         />
-        <div v-if="type === 'course'" class="tw-flex tw-flex-col tw-gap-4">
+        <div v-if="type === LearningPlanType.COURSE" class="tw-flex tw-flex-col tw-gap-4">
           <alex-inputs-tag-autocomplete
             v-model="filters.technicalCompetences"
             name="technicalCompetence"
@@ -65,10 +59,7 @@
             hide-details
             :label="$t('pages.classes.filter.techCompetences')"
           />
-          <div
-            v-if="filters.technicalCompetences.length"
-            class="tw-flex tw-flex-wrap gap-2"
-          >
+          <div v-if="filters.technicalCompetences.length" class="tw-flex tw-flex-wrap gap-2">
             <template v-for="tag in filters.technicalCompetences" :key="tag.id">
               <alex-custom-chip
                 :text="tag?.text"
@@ -89,10 +80,7 @@
             is-general
             :label="$t('pages.classes.filter.generalCompetences')"
           />
-          <div
-            v-if="filters.generalCompetences.length"
-            class="tw-flex tw-flex-wrap gap-2"
-          >
+          <div v-if="filters.generalCompetences.length" class="tw-flex tw-flex-wrap gap-2">
             <template v-for="tag in filters.generalCompetences" :key="tag.id">
               <alex-custom-chip
                 :text="tag?.text"
@@ -126,10 +114,7 @@
           </div>
         </div>
 
-        <p
-          v-if="errors['startDateStart'] || errors['startDateEnd']"
-          class="text-error-0 text-body-3 mt-2"
-        >
+        <p v-if="errors['startDateStart'] || errors['startDateEnd']" class="text-error-0 text-body-3 mt-2">
           {{ errors['startDateStart'] || errors['startDateEnd'] }}
         </p>
         <div>
@@ -153,30 +138,19 @@
             />
           </div>
         </div>
-        <p
-          v-if="errors['finalDateStart'] || errors['finalDateEnd']"
-          class="text-error-0 text-body-3 mt-2"
-        >
+        <p v-if="errors['finalDateStart'] || errors['finalDateEnd']" class="text-error-0 text-body-3 mt-2">
           {{ errors['finalDateStart'] || errors['finalDateEnd'] }}
         </p>
       </div>
       <hr />
 
       <div class="d-flex ga-2 px-4">
-        <alex-custom-button
-          class="flex-1-1"
-          variant="secondary"
-          size="large"
-          @click="clearFilters"
-          >{{ $t('components.learningPlan.drawer.clean') }}</alex-custom-button
-        >
-        <alex-custom-button
-          class="flex-1-1"
-          size="large"
-          type="button"
-          @click="onSubmit"
-          >{{ $t('components.learningPlan.drawer.filter') }}</alex-custom-button
-        >
+        <alex-custom-button class="flex-1-1" variant="secondary" size="large" @click="clearFilters">{{
+          $t('components.learningPlan.drawer.clean')
+        }}</alex-custom-button>
+        <alex-custom-button class="flex-1-1" size="large" type="button" @click="onSubmit">{{
+          $t('components.learningPlan.drawer.filter')
+        }}</alex-custom-button>
       </div>
     </form>
   </v-navigation-drawer>
@@ -241,9 +215,7 @@ const schema = yup.object().shape(
         if (!value[0]) {
           return scheme;
         }
-        return scheme
-          .optional()
-          .min(yup.ref('finalDateStart'), t('rules.endDate.beforeStartDate'));
+        return scheme.optional().min(yup.ref('finalDateStart'), t('rules.endDate.beforeStartDate'));
       }),
     startDateStart: yup.date().optional(),
     startDateEnd: yup
@@ -253,9 +225,7 @@ const schema = yup.object().shape(
         if (!value[0]) {
           return scheme;
         }
-        return scheme
-          .optional()
-          .min(yup.ref('startDateStart'), t('rules.endDate.beforeStartDate'));
+        return scheme.optional().min(yup.ref('startDateStart'), t('rules.endDate.beforeStartDate'));
       }),
   },
   [
@@ -329,13 +299,10 @@ const clearFilters = () => {
 };
 const handleRemoveTag = (text: string, type: 'technical' | 'general') => {
   if (type === 'technical') {
-    filters.value.technicalCompetences =
-      filters.value.technicalCompetences.filter((tag) => tag.text !== text);
+    filters.value.technicalCompetences = filters.value.technicalCompetences.filter((tag) => tag.text !== text);
     return;
   }
-  filters.value.generalCompetences = filters.value.generalCompetences.filter(
-    (tag) => tag.text !== text,
-  );
+  filters.value.generalCompetences = filters.value.generalCompetences.filter((tag) => tag.text !== text);
 };
 watch(model, (value) => {
   if (value) {
@@ -345,9 +312,7 @@ watch(model, (value) => {
       'institutions-auto-complete-institution',
     ];
     queryClient.invalidateQueries({
-      predicate: (query) =>
-        typeof query.queryKey[0] === 'string' &&
-        queriesToInvalidate.includes(query.queryKey[0]),
+      predicate: (query) => typeof query.queryKey[0] === 'string' && queriesToInvalidate.includes(query.queryKey[0]),
     });
   }
 });

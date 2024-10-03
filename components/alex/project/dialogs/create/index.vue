@@ -169,7 +169,7 @@
             variant="secondary"
             size="small"
             icon="mdi-trash-can-outline"
-            @click.stop="removeItem(index, 'course')"
+            @click.stop="removeItem(index, LearningPlanType.COURSE)"
           />
           <div class="text-shadow height-15 w-100 d-flex align-end">
             <p class="ellipsis lines-2 text-body-6 text-white mx-2 my-4">
@@ -263,7 +263,7 @@ const queryConfig = {
       },
     ],
     archived_at: { $notNull: false },
-    type: { $eq: 'course' },
+    type: { $eq: LearningPlanType.COURSE },
   },
   populate: {
     cover_image: true,
@@ -336,7 +336,7 @@ const removeItem = (index: number, type: string) => {
     const newAreas = [...projectInfo.value.areas];
     newAreas.splice(index, 1);
     projectInfo.value.areas = newAreas;
-  } else if (type === 'course') {
+  } else if (type === LearningPlanType.COURSE) {
     const newCourses = [...associatedCourses.value];
     newCourses.splice(index, 1);
     associatedCourses.value = newCourses;

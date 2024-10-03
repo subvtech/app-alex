@@ -4,18 +4,16 @@
     <p class="text-subtitle-2 text-gray-500">
       O
       <strong class="bg-accent pa-1 rounded">alex-learningplan-trails-card</strong>
-      é um componente que tem como principal objetivo representar e organizar
-      informações de forma compacta e acessível no contexto de trilhas.
+      é um componente que tem como principal objetivo representar e organizar informações de forma compacta e acessível
+      no contexto de trilhas.
     </p>
     <h2 class="text-h2 text-gray-800">Uso Básico</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Tem como propriedades obrigatórias o <strong>image</strong>,
-      <strong>name</strong>, <strong>description</strong>,
+      Tem como propriedades obrigatórias o <strong>image</strong>, <strong>name</strong>, <strong>description</strong>,
     </p>
     <p class="text-subtitle-2 text-gray-500">
-      Há duas formas de visualizações do <strong>Card de Trilhas</strong>. Se a
-      tela for menor que 600px o card ficará na vertical ( redimensione a tela
-      para poder visualizar), caso seja maior ela permanece na horizontal
+      Há duas formas de visualizações do <strong>Card de Trilhas</strong>. Se a tela for menor que 600px o card ficará
+      na vertical ( redimensione a tela para poder visualizar), caso seja maior ela permanece na horizontal
     </p>
 
     <div class="w-100 flex-column d-flex gap-4">
@@ -25,13 +23,18 @@
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
-          }" />
+          }"
+        />
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
         <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(0)">
-          <v-icon v-if="copiedIndex === 0" size="x-large" icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1" />
+          <v-icon
+            v-if="copiedIndex === 0"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
         </v-btn>
       </div>
@@ -79,7 +82,7 @@
             </tr>
             <tr>
               <td>type</td>
-              <td>'{{ LearningPlanType.PROJECT }}' | 'course'</td>
+              <td>'{{ LearningPlanType.PROJECT }}' | '{{ LearningPlanType.COURSE }}'</td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -150,8 +153,7 @@
     </div>
     <h2 class="text-h2 text-gray-800">Variante: Oculto</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Modo de visualização do card sinalizando que o card não está visível para
-      todos.
+      Modo de visualização do card sinalizando que o card não está visível para todos.
     </p>
 
     <div class="w-100 flex-column d-flex gap-4">
@@ -161,13 +163,19 @@
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
-          }" hide />
+          }"
+          hide
+        />
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[1] }}</prism>
         <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(1)">
-          <v-icon v-if="copiedIndex === 1" size="x-large" icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1" />
+          <v-icon
+            v-if="copiedIndex === 1"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
         </v-btn>
       </div>
@@ -175,9 +183,8 @@
 
     <h2 class="text-h2 text-gray-800">Variante: Blocos</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Poderá ser passado um array de blocos que representaram uma síntese dos
-      tipos de conteúdo da trilha. Apenas dando um hover no ícone com número
-      abaixo da descrição.
+      Poderá ser passado um array de blocos que representaram uma síntese dos tipos de conteúdo da trilha. Apenas dando
+      um hover no ícone com número abaixo da descrição.
     </p>
     <v-table variant="outline" class="w-full">
       <thead>
@@ -204,18 +211,19 @@
           description="Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem"
           :image="{
             url: 'https://segwitz.com/wp-content/uploads/2021/06/vuejs-development-malaysia.jpeg',
-          }" :blocks="[
-            { type: 'video' },
-            { type: 'article' },
-            { type: 'article' },
-            { type: 'video' },
-          ]" />
+          }"
+          :blocks="[{ type: 'video' }, { type: 'article' }, { type: 'article' }, { type: 'video' }]"
+        />
       </div>
       <div class="a w-100" style="position: relative">
         <prism> {{ examples[3] }}</prism>
         <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(3)">
-          <v-icon v-if="copiedIndex === 3" size="x-large" icon="mdi-clipboard-check-multiple-outline"
-            color="green-lighten-1" />
+          <v-icon
+            v-if="copiedIndex === 3"
+            size="x-large"
+            icon="mdi-clipboard-check-multiple-outline"
+            color="green-lighten-1"
+          />
           <v-icon v-else size="x-large" icon="mdi-content-copy" />
         </v-btn>
       </div>

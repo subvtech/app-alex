@@ -19,8 +19,7 @@ describe('Card of Project and Courses', () => {
   });
 
   const props = {
-    title:
-      'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
+    title: 'Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer',
     description:
       'Fala pessoal, tudo bem? Sejam bem vindos ao Plano de Aprendizagem sobre Gerenciamento de Projetos e aprendizagem',
     facilitator: {
@@ -52,9 +51,7 @@ describe('Card of Project and Courses', () => {
       props,
       global,
     });
-    const hoverComponent = screen.getByTestId(
-      'alex-learningplan-card-hover-area',
-    );
+    const hoverComponent = screen.getByTestId('alex-learningplan-card-hover-area');
     await fireEvent.mouseOver(hoverComponent);
     const hasHoverClass = hoverComponent.classList.contains('hover');
     expect(hasHoverClass).toBeTruthy();
@@ -65,13 +62,11 @@ describe('Card of Project and Courses', () => {
     const { unmount } = await renderSuspended(Card, {
       props: {
         ...props,
-        type: 'course_project',
+        type: LearningPlanType.COURSE_PROJECT,
       },
       global,
     });
-    const cardComponent = screen.queryByTestId(
-      'alex-learningplan-card-status-chip',
-    );
+    const cardComponent = screen.queryByTestId('alex-learningplan-card-status-chip');
     expect(cardComponent).not.toBeNull();
     unmount();
   });
@@ -84,9 +79,7 @@ describe('Card of Project and Courses', () => {
       },
       global,
     });
-    const cardComponent = screen.queryByTestId(
-      'alex-learningplan-card-status-chip',
-    );
+    const cardComponent = screen.queryByTestId('alex-learningplan-card-status-chip');
     expect(cardComponent).not.toBeNull();
     unmount();
   });
@@ -96,13 +89,11 @@ describe('Card of Project and Courses', () => {
       props: {
         ...props,
 
-        type: 'course',
+        type: LearningPlanType.COURSE,
       },
       global,
     });
-    const cardComponent = screen.queryByTestId(
-      'alex-learningplan-card-status-chip',
-    );
+    const cardComponent = screen.queryByTestId('alex-learningplan-card-status-chip');
     expect(cardComponent).toBeNull();
     unmount();
   });

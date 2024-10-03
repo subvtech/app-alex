@@ -54,10 +54,7 @@
           @invite="(members) => (projectStudents = members)"
         />
 
-        <alex-custom-dropdown
-          :items="typeOptions"
-          :disabled="!!type || kind === LearningPlanType.PROJECT"
-        >
+        <alex-custom-dropdown :items="typeOptions" :disabled="!!type || kind === LearningPlanType.PROJECT">
           <template #activator="{ props: propsDropdown }">
             <alex-custom-button
               v-bind="propsDropdown"
@@ -66,9 +63,7 @@
               prepend-icon="mdi-plus"
               :size="kind === LearningPlanType.PROJECT ? 'large' : 'default'"
               @click="handleAddMemberOrClass"
-              >{{
-                $t('components.learningPlan.members.add.label')
-              }}</alex-custom-button
+              >{{ $t('components.learningPlan.members.add.label') }}</alex-custom-button
             >
           </template>
         </alex-custom-dropdown>
@@ -102,9 +97,7 @@
             class:
               member.raw.learning_plan_member?.learning_class?.name ||
               member.raw.learning_plan_group?.learning_class.name,
-            avatarUrl:
-              member.raw.learning_plan_member?.user?.avatar?.url ||
-              member.raw.user?.avatar?.url,
+            avatarUrl: member.raw.learning_plan_member?.user?.avatar?.url || member.raw.user?.avatar?.url,
             group: !!member.raw.learning_plan_group,
             participants: member.raw.learning_plan_group
               ? getMembersOfGroup(member.raw.learning_plan_group)
@@ -114,23 +107,16 @@
           :clickable="kind !== LearningPlanType.PROJECT"
           :no-class="kind === LearningPlanType.PROJECT"
           @remove-click="removeMember(member.raw)"
-          @edit-click="
-            () => handleEditClick(member.raw.learning_plan_group, items)
-          "
+          @edit-click="() => handleEditClick(member.raw.learning_plan_group, items)"
           @to-profile="
             member.raw.learning_plan_member
-              ? navigateTo(
-                  `/users/${member.raw.learning_plan_member.user.username}`,
-                )
+              ? navigateTo(`/users/${member.raw.learning_plan_member.user.username}`)
               : undefined
           "
         />
       </template>
       <template v-else>
-        <template
-          v-for="member in items"
-          :key="`student-member${member.raw.id}`"
-        >
+        <template v-for="member in items" :key="`student-member${member.raw.id}`">
           <alex-learningplan-task-members-card
             v-for="groupMember in member.raw.learning_plan_group.group_members"
             :key="`group-member${groupMember.id}`"
@@ -141,16 +127,12 @@
               responsable: groupMember.role === 'in_charge',
             }"
             :edit="false"
-            @to-profile="
-              navigateTo(`/users/${groupMember.student_member.user.username}`)
-            "
+            @to-profile="navigateTo(`/users/${groupMember.student_member.user.username}`)"
         /></template>
       </template>
     </template>
     <template #no-data>
-      <div
-        class="d-flex align-center justify-center flex-column ga-4 text-center"
-      >
+      <div class="d-flex align-center justify-center flex-column ga-4 text-center">
         <img
           class="no-members-svg"
           src="public/svg/no-members.svg"
@@ -164,21 +146,11 @@
     </template>
 
     <template #footer="{ pageCount, groupedItems }">
-      <div
-        v-if="groupedItems.length && members.data.length > itemsPerPage"
-        class="d-flex align-center ga-2 pa-6"
-      >
+      <div v-if="groupedItems.length && members.data.length > itemsPerPage" class="d-flex align-center ga-2 pa-6">
         <span class="flex-1-1">
-          {{
-            showingData(members.data, groupedItems as any[], search, pageCount)
-          }}
+          {{ showingData(members.data, groupedItems as any[], search, pageCount) }}
         </span>
-        <alex-custom-pagination
-          v-model="page"
-          :length="pageCount"
-          :total-visible="3"
-          class="extra-mb"
-        />
+        <alex-custom-pagination v-model="page" :length="pageCount" :total-visible="3" class="extra-mb" />
       </div>
     </template>
   </v-data-iterator>
@@ -287,11 +259,7 @@ const handleAddGroup = () => {
 
 const checkHasFilledDates = () => {
   if (!props.startAt || !props.finishAt) {
-    setMessage(
-      t('components.learningPlan.drawer.task.pleaseFillDates'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.pleaseFillDates'), 'warning', true);
     return false;
   }
   return true;
@@ -318,20 +286,11 @@ const getMembers = (taskId: number) =>
       task: taskId,
     },
   });
-const showingData = (
-  items: any[],
-  pageItems: any[],
-  search: string,
-  pageCount: number,
-) => {
+const showingData = (items: any[], pageItems: any[], search: string, pageCount: number) => {
   const itemsPerPageCalc = search ? itemsPerPage : pageItems.length;
   const range = pageItems.length < itemsPerPage ? 2 : 1;
-  const from =
-    itemsPerPageCalc === 1
-      ? items.length
-      : (page.value - 1) * itemsPerPageCalc + range;
-  const to =
-    page.value === pageCount ? items.length : page.value * itemsPerPageCalc;
+  const from = itemsPerPageCalc === 1 ? items.length : (page.value - 1) * itemsPerPageCalc + range;
+  const to = page.value === pageCount ? items.length : page.value * itemsPerPageCalc;
   const total = items.length;
   const message = t('pages.courses.showingData', {
     from,
@@ -343,23 +302,15 @@ const showingData = (
   return message;
 };
 
-const { data: members, refresh } = await useAsyncData(
-  'task-members',
-  () => getMembers(props.taskId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskMember[],
-    }),
-  },
-);
+const { data: members, refresh } = await useAsyncData('task-members', () => getMembers(props.taskId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskMember[],
+  }),
+});
 const addMember = async (members: LearningPlanMemberSimple[]) => {
   if (!props.type) {
-    setMessage(
-      t('components.learningPlan.drawer.task.pleaseFillType'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.pleaseFillType'), 'warning', true);
     return;
   }
   if (!checkHasFilledDates()) return;
@@ -372,46 +323,28 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
       onResponse(context) {
         const data: TaskMemberStudent[] = context.response._data;
         if (!data.length) {
-          setMessage(
-            t('components.learningPlan.drawer.task.members.allSelectedMembers'),
-            'warning',
-            true,
-          );
+          setMessage(t('components.learningPlan.drawer.task.members.allSelectedMembers'), 'warning', true);
           return;
         }
-        setMessage(
-          t('components.learningPlan.drawer.task.members.addMembers'),
-          'success',
-          true,
-        );
+        setMessage(t('components.learningPlan.drawer.task.members.addMembers'), 'success', true);
         setTimeout(refresh, 100);
         emit('change-members');
       },
     });
   } catch (error) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.addMember'),
-      'error',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.errors.addMember'), 'error', true);
   }
 };
 const removeMember = async (member) => {
   if (props.kind === LearningPlanType.PROJECT) {
     const indexOf = projectStudents.value.findIndex(
-      (student) =>
-        student.user.id === member.user.id ||
-        student.user.email === member.user.email,
+      (student) => student.user.id === member.user.id || student.user.email === member.user.email,
     );
     projectStudents.value.splice(indexOf, 1);
   } else {
     try {
       if (props.blockDelete) {
-        setMessage(
-          t('Você não pode remover alunos após alguém ter feito uma entrega'),
-          'warning',
-          true,
-        );
+        setMessage(t('Você não pode remover alunos após alguém ter feito uma entrega'), 'warning', true);
         return;
       }
       const memberName = member.learning_plan_member
@@ -428,11 +361,7 @@ const removeMember = async (member) => {
       );
       emit('change-members');
     } catch (error) {
-      setMessage(
-        t('components.learningPlan.drawer.task.errors.removeMember'),
-        'error',
-        true,
-      );
+      setMessage(t('components.learningPlan.drawer.task.errors.removeMember'), 'error', true);
     }
   }
 };
@@ -443,29 +372,18 @@ const getMembersOfGroup = (group: LearningPlanGroupSimple) =>
     image: { url: member.student_member.user?.avatar?.url || '' },
     className: 'text-body-3',
   }));
-const handleEditClick = (
-  selectedGroup: LearningPlanGroupSimple,
-  taskMembers: { raw: TaskMember }[] | any,
-) => {
+const handleEditClick = (selectedGroup: LearningPlanGroupSimple, taskMembers: { raw: TaskMember }[] | any) => {
   // Checa se o grupo tem submissões
-  const selectedTaskMember = taskMembers.find(
-    (member) => member.raw.learning_plan_group?.id === selectedGroup.id,
-  );
+  const selectedTaskMember = taskMembers.find((member) => member.raw.learning_plan_group?.id === selectedGroup.id);
 
   if (selectedTaskMember?.raw.task_submissions?.length) {
-    setMessage(
-      t('components.learningPlan.drawer.task.dialog.message.hasSubmission'),
-      'warning',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.dialog.message.hasSubmission'), 'warning', true);
     return;
   }
 
   // Atualiza os dados para abrir o modal
   groupInfo.value = selectedGroup;
-  allGroups.value = taskMembers.map(
-    (member) => member.raw.learning_plan_group!,
-  );
+  allGroups.value = taskMembers.map((member) => member.raw.learning_plan_group!);
 
   groupDialog.value = true;
 };
@@ -494,13 +412,9 @@ const getGroups = (learningplanId: number) =>
       learningplan: learningplanId,
     },
   });
-const { data: classes } = await useAsyncData(
-  'classes-member-invite',
-  () => getGroups(props.learningplanId),
-  {
-    default: () => ({ meta: 0, data: [] as ClassSimple[] }),
-  },
-);
+const { data: classes } = await useAsyncData('classes-member-invite', () => getGroups(props.learningplanId), {
+  default: () => ({ meta: 0, data: [] as ClassSimple[] }),
+});
 
 watch(
   () => props.taskId,
