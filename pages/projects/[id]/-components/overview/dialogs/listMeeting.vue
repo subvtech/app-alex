@@ -10,16 +10,32 @@
     <div v-for="meeting in meetings" :key="meeting.schedule.id">
       <scheduleItem
         :meeting="meeting"
-
+        :onEdit="()=>onEdit(meeting.schedule)"
       />
     </div>
+    <alex-custom-button @click="onCreate" >
+      teste
+    </alex-custom-button>
+    <createMeeting
+      ref="createMeetingRef"
+    />
   </div>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
-import scheduleItem from './schedule.vue'
+import scheduleItem from '../schedule.vue'
+import createMeeting from './createMeeting.vue';
+const createMeetingRef = ref(createMeeting)
 const value = defineModel<boolean>({required:true})
+
+const onCreate = ()=>{
+  createMeetingRef?.value.openDialog()
+}
+
+const onEdit = (meeting)=>{
+  createMeetingRef?.value.openDialog(meeting)
+}
 
 interface meetingProps {
   schedule:LearningPlanScheduleSimple,

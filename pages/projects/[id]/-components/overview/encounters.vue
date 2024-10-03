@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import { format } from 'date-fns';
-import dialogList from './dialogEncountersList.vue';
+import dialogList from './dialogs/listMeeting.vue';
 const { t } = useI18n();
 const editMeetings = ref(false)
 const classModel = ref();

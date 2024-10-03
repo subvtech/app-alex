@@ -15,7 +15,7 @@
       <p class="text-body-1 text-gray-800" >
         {{ meeting.formattedDate }} às {{ formatDateToHours(meeting.schedule.endDate) }}
       </p>
-      <alex-custom-button variant="text" icon="mdi-pencil-outline" />
+      <alex-custom-button variant="text" icon="mdi-pencil-outline" @click="onEdit" />
     </div>
 
   </div>
@@ -68,7 +68,12 @@ const props = defineProps({
     type: Object as PropType<meetingProps>,
     required: true,
   },
+  onEdit:{
+    type: Function as PropType<(meeting:meetingProps)=> void>,
+    required:true,
+  }
 })
+
 
 </script>
 
