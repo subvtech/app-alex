@@ -425,7 +425,7 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null
 const handleMoveToParent = (parentTask) => {
   const remove = parentTask.organization === 'standard' && !parentTask.parent_task && draggedTask.value.parent_task;
 
-  if (!draggedTask.value || !parentTask) {
+  if (!draggedTask.value || !parentTask || (parentTask.organization === 'standard' && !remove)) {
     return;
   }
 
