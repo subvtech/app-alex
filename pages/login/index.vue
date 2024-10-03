@@ -5,7 +5,7 @@
         <div align="center">
           <img
             :alt="$t('pages.login.alt')"
-            src="/images/imagem_login.png"
+            src="public/images/imagem_login.png"
             class="card-imagem-imagem my-5"
           />
         </div>
@@ -82,14 +82,7 @@
               </nuxt-link>
             </div>
 
-            <alex-custom-button
-              block
-              size="large"
-              type="submit"
-              theme="dark"
-              :disabled="!isValid"
-              :loading="logging"
-            >
+            <alex-custom-button block size="large" type="submit" theme="dark" :disabled="!isValid" :loading="logging">
               {{ $t('pages.login.submit') }}
             </alex-custom-button>
           </v-form>
@@ -122,7 +115,7 @@
             :loading="logging2"
             @click="metalogin"
           >
-            <img src="/images/metamask.png" alt="" />
+            <img src="public/images/metamask.png" alt="" />
             <span>{{ $t('pages.login.metamask.btn') }}</span>
           </v-btn>
         </div>
@@ -375,12 +368,14 @@ const submit = handleSubmit(async () => {
       .form {
         gap: 22px;
 
-        ::v-deep .smaller-text {
+        :deep(.smaller-text) {
           font-size: 12px !important;
-          .v-selection-control__wrapper {
+
+          :deep(.v-selection-control__wrapper) {
             font-size: 12px !important;
           }
-          .v-label {
+
+          :deep(.v-label) {
             font-size: 12px !important;
           }
         }

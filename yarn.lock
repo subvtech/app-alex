@@ -14032,6 +14032,11 @@ vue-slicksort@^2.0.5:
   resolved "https://registry.yarnpkg.com/vue-slicksort/-/vue-slicksort-2.0.5.tgz#d080829de9d04b16e8d194ed8b4e219a501091a2"
   integrity sha512-fXz1YrNjhUbJK7o0tMk27mIr4pMAZYLSYvtmLazCtfpvz+zafPCn34ILDL8B7hT7WLVZKreYs6JVe5VWymqmzA==
 
+vue-sonner@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/vue-sonner/-/vue-sonner-1.2.1.tgz#78d48bf138219a839c0d55f4f6c572797d06c25c"
+  integrity sha512-J5+TwkayiBkieYBG8PGk5PMys8+UZxDmT/CCaX9otDzRONRr5hgTgo2Fha2krUFnUw1d576jsNGXhmAL06ixfA==
+
 vue@^2.6.12:
   version "2.7.14"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.7.14.tgz#3743dcd248fd3a34d421ae456b864a0246bafb17"

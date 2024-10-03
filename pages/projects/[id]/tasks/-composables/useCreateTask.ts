@@ -4,7 +4,7 @@ import { SprintsResponse } from './useSprints';
 
 const { create } = useStrapiUtils();
 const strapi = useStrapi();
-
+const strapiClient = useStrapiClient();
 type CreateTaskPayload = {
   learningPlanId: number;
   position: number;
@@ -12,6 +12,7 @@ type CreateTaskPayload = {
   organization: TaskSimple['organization'];
   parentTask?: number;
   sprint?: SprintSimple;
+  group?: boolean;
 };
 
 type CreateTaskResponse = Omit<TaskSimple, 'parent_task' | 'sprint'> & {
@@ -19,6 +20,7 @@ type CreateTaskResponse = Omit<TaskSimple, 'parent_task' | 'sprint'> & {
   kanban_column: number;
   parent_task?: number;
   sprint?: number;
+  group?: boolean;
 };
 
 export const useCreateTask = (
@@ -35,6 +37,7 @@ export const useCreateTask = (
         can_submit_after_deadline: false,
         learningplan: learningPlanId,
         position,
+        type: 'group',
         status: 'draft',
         submission_description: '',
         submission_required: false,
@@ -42,6 +45,7 @@ export const useCreateTask = (
         parent_task: parentTask,
         sprint: sprint?.id || undefined,
         organization,
+        group: true,
       });
 
       const taskWithSprintId = {
@@ -151,6 +155,23 @@ export const useUpdateTask = () =>
       });
     },
   });
+type UpdateTaskStatusPayload = {
+  id: number;
+  sprint: number;
+};
+export const useUpdateTaskStatus = () =>
+  useMutation({
+    mutationFn({ id, sprint }: UpdateTaskStatusPayload) {
+      return strapiClient(`/tasks/${id}/update-kanban-task`, {
+        method: 'PUT',
+        body: {
+          data: {
+            sprint,
+          },
+        },
+      });
+    },
+  });
 
 type CreateSprintTaskPayload = {
   learningPlanId: number;
@@ -186,6 +207,8 @@ export const useCreateKanbanTask = (learninplanId: Ref<number>, queryClient: Que
         organization,
         sprint: sprintId,
         kanban_column: kanbanColumnId,
+        type: 'group',
+        group: true,
       });
       return task.data.kanban_column;
     },

@@ -261,11 +261,11 @@ const handleSortEnd = () => {
 };
 const getMembers = (taskMembers?: TaskMember[]) => {
   return (
-    taskMembers?.map((member) => ({
-      name: member.learning_plan_member?.user?.fullname || '',
-      ...(member.learning_plan_member?.user?.avatar?.url && {
+    taskMembers?.[0].learning_plan_group?.group_members.map((groupMember) => ({
+      name: groupMember.student_member.user.fullname,
+      ...(groupMember.student_member?.user?.avatar && {
         image: {
-          url: member.learning_plan_member?.user?.avatar?.url,
+          url: groupMember.student_member.user.avatar.url,
         },
       }),
     })) || []
@@ -295,7 +295,7 @@ defineExpose({ canDrag, setCanDrag });
 <template>
   <div class="tw-flex-grow">
     <div v-if="!sprint" class="tw-flex tw-items-center tw-justify-center tw-h-full tw-flex-col">
-      <img src="/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
+      <img src="public/svg/emptySprint.svg" class="mb-4 tw-h-40 tw-w-40" />
       <span class="text-gray-400">Nenhuma sprint selecionada</span>
     </div>
     <template v-else>
@@ -332,6 +332,7 @@ defineExpose({ canDrag, setCanDrag });
           >
             <template #card="{ item }">
               <TaskCard
+                v-if="item.raw.task"
                 :date="item.raw.task.finish_at ? new Date(item.raw.task.finish_at.replaceAll('-', '/')) : undefined"
                 :name="item.raw.task.title"
                 :tags="item.raw.task.tags"

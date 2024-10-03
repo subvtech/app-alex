@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   },
   css: ['vuetify/lib/styles/main.sass', 'plyr/dist/plyr.css', '@mdi/font/css/materialdesignicons.min.css'],
   build: {
-    transpile: ['vuetify'],
+    transpile: ['vue-sonner', 'vuetify'],
   },
   modules: [
     '@nuxt/image',

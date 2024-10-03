@@ -14,10 +14,10 @@ export type Curried<A extends any[], R> = <P extends Partial<A>>(
 
 const cat = (prev: unknown[], next: unknown[]) => {
   const arr = prev.reduce((res: unknown[], arg) => {
-    return res.concat(arg === __ ? next.shift() : arg);
+    return [...res, arg === __ ? next.shift() : arg];
   }, []);
 
-  return [...arr, ...next];
+  return [...(arr as unknown[]), ...next];
 };
 
 /**

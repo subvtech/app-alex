@@ -9,12 +9,19 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
-import { useCreateTask, useDeleteTask, useUpdateTask } from '../-composables/useCreateTask';
-import { SprintsResponse, useGetSprints } from '../-composables/useSprints';
+import { useCreateTask, useDeleteTask, useUpdateTask, useUpdateTaskStatus } from '../-composables/useCreateTask';
+import { SprintsResponse, useGetSprints, useDeleteSprint, useMoveSprint } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
+import { s } from 'vitest/dist/reporters-1evA5lom';
+
+interface DropdownItem {
+  text: string;
+  warning?: boolean;
+  onClick: () => void;
+}
 
 const props = defineProps<{
   filter?: filterType;
@@ -47,6 +54,14 @@ const { mutateAsync: createTask, isPending: isCreatingTaskRequest } = useCreateT
 );
 const { mutateAsync: deleteTask } = useDeleteTask(learninplanId, queryClient, setMessage, t);
 const { mutateAsync: updateTask } = useUpdateTask();
+const { mutateAsync: updateStatusTask } = useUpdateTaskStatus();
+const { mutateAsync: deleteSprint, isPending: deletingTask } = useDeleteSprint(
+  learninplanId,
+  queryClient,
+  setMessage,
+  t,
+);
+const { mutateAsync: moveSprint } = useMoveSprint(learninplanId, queryClient, setMessage, t);
 const sprints = ref<Droppable<Sprint>[]>([]);
 
 // refs
@@ -63,6 +78,9 @@ const showInputs = ref<boolean[]>([false]);
 const tasksTitles = ref<string[]>([]);
 const createSprintDialog = ref(false);
 const createdIndex = ref<number>();
+const editableSprint = ref<Sprint | null>();
+const deleteModal = ref(false);
+const sprintToDelete = ref<Sprint | null>(null);
 
 const isLoading = computed(() => {
   return (index) => {
@@ -70,7 +88,7 @@ const isLoading = computed(() => {
   };
 });
 
-const editSprints = () => {
+const addToSprint = () => {
   return [
     {
       text: t('pages.projects.tasks.add_epic'),
@@ -85,6 +103,66 @@ const editSprints = () => {
       },
     },
   ];
+};
+
+const editSprint = (sprint: Sprint, index: number): DropdownItem[] => {
+  const items: DropdownItem[] = [];
+
+  const moveActions = [
+    {
+      condition: true,
+      text: t('pages.projects.sprints.edit'),
+      action: () => {
+        editableSprint.value = sprint;
+        createSprintDialog.value = true;
+      },
+    },
+    {
+      condition: index !== 0,
+      text: t('pages.projects.sprints.move_up'),
+      action: () =>
+        moveSprint({
+          sprints: sprintBacklog.value,
+          editingSprint: {
+            id: sprint.id,
+            move: 'up',
+          },
+        }),
+    },
+    {
+      condition: index !== sprints.value.length - 1,
+      text: t('pages.projects.sprints.move_down'),
+      action: () =>
+        moveSprint({
+          sprints: sprintBacklog.value,
+          editingSprint: {
+            id: sprint.id,
+            move: 'down',
+          },
+        }),
+    },
+    {
+      condition: true,
+      text: t('pages.projects.sprints.delete'),
+      warning: true,
+      action: () => {
+        sprintToDelete.value = sprint;
+        deleteModal.value = true;
+      },
+    },
+  ];
+
+  moveActions.forEach(({ condition, text, action, warning }) => {
+    if (condition) {
+      items.push({
+        text,
+        warning,
+        onClick: action,
+      });
+    }
+  });
+
+  return items;
 };
 
 // Computed
@@ -107,10 +185,40 @@ const sprintBacklog = computed(() => {
   expandSprints.value = new Array(sprintsValue.value.sprints.length).fill(0);
   showInputs.value = new Array(sprintsValue.value.sprints.length + 1).fill(false);
   tasksTitles.value = new Array(sprintsValue.value.sprints.length + 1).fill('');
-  return sprintsValue.value.sprints.map((sprint) => ({
-    ...sprint,
-    tasks: sprint.tasks.map(formatTasks),
-  }));
+
+  return sprintsValue.value.sprints
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .map((sprint) => ({
+      ...sprint,
+      tasks: sprint.tasks.map(formatTasks),
+    }));
+});
+
+const checkForCompletedTasks = (sprint: Sprint) => {
+  return sprint.tasks.some((task) => task.kanban_column_task?.kanban_column.status_type === 'done');
+};
+
+const deleteDialogText = computed(() => {
+  if (sprintBacklog.value.length === 1) {
+    return {
+      title: t('pages.projects.sprints.delete_modal.title_unique', { sprint: sprintToDelete.value?.title }),
+      subtitle: t('pages.projects.sprints.delete_modal.subtitle_unique'),
+      disableDelete: true,
+    };
+  }
+  if (sprintToDelete.value && checkForCompletedTasks(sprintToDelete.value)) {
+    return {
+      title: t('pages.projects.sprints.delete_modal.title_completed_tasks', { sprint: sprintToDelete.value?.title }),
+      subtitle: t('pages.projects.sprints.delete_modal.subtitle_completed_tasks'),
+      disableDelete: true,
+    };
+  }
+  return {
+    title: t('pages.projects.sprints.delete_modal.title_confirm', { sprint: sprintToDelete.value?.title }),
+    subtitle: t('pages.projects.sprints.delete_modal.subtitle_confirm'),
+    disableDelete: false,
+  };
 });
 
 const formatTasks = (task) => {
@@ -131,7 +239,6 @@ const getHigherIndex = (sprintId?: number) => {
 };
 
 // Methods
-// TODO: Logica de adicionar em uma sprint
 const handleAddEpic = () => {
   const newTask = {
     id: Math.round(Math.random() * 1234526),
@@ -395,6 +502,12 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
   }
 };
 
+const handleDeleteSprint = async (sprintId?: number) => {
+  if (!sprintId) return;
+  await deleteSprint(sprintId);
+  deleteModal.value = false;
+};
+
 // OnDrop
 const onDrop = (_, __, e) => {
   const data = e?.target?.attributes?.id?.value;
@@ -415,7 +528,7 @@ const onDrop = (_, __, e) => {
     dragDrop.dragEnd();
     return;
   }
-
+  updateStatusTask({ id, sprint: hoveredSprint.value.id });
   update('tasks', Number(id), {
     sprint: hoveredSprint.value.id,
   })
@@ -500,7 +613,7 @@ const updateSprints = () => {
               </span>
               <alex-custom-chip size="small" status="secondary" :text="`${filteredTasks.length}`" />
               <div class="ml-auto">
-                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints()" />
+                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="addToSprint()" />
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
@@ -624,8 +737,17 @@ const updateSprints = () => {
 
       <div class="tw-flex tw-w-full tw-justify-between align-center">
         <h5 class="text-h5 text-gray-800">Lista de Sprints</h5>
-        <alex-custom-button prepend-icon="alex:Sprint" size="large" @click="createSprintDialog = true">
-          {{ 'Nova Sprint' }}
+        <alex-custom-button
+          prepend-icon="alex:Sprint"
+          size="large"
+          @click="
+            () => {
+              createSprintDialog = true;
+              editableSprint = null;
+            }
+          "
+        >
+          {{ t('pages.projects.sprints.new_sprint') }}
         </alex-custom-button>
       </div>
       <Transition v-for="(sprint, i) in sprintBacklog" :key="`sprint-backlog-${i}`" name="slide">
@@ -645,11 +767,9 @@ const updateSprints = () => {
                 {{ formattedDate(sprint.start_at) }} - {{ formattedDate(sprint.end_at) }}
               </span>
               <alex-custom-chip size="small" status="secondary" :text="`${sprint.tasks.length}`" />
-              <!-- TODO: Habilitar os botões depois de adaptar as funções para funcionar dentro de sprints -->
-              <!-- <div class="ml-auto d-flex ga-2">
-                <alex-custom-dropdown icon="mdi-plus" variant="text" :items="editSprints()" />
-                <alex-custom-dropdown icon="mdi-dots-vertical" variant="text" :items="editSprints()" />
-              </div> -->
+              <div class="ml-auto d-flex ga-2">
+                <alex-custom-dropdown icon="mdi-dots-vertical" variant="text" :items="editSprint(sprint, i)" />
+              </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <Transition mode="out-in" :name="getSlideTransition()">
@@ -759,15 +879,32 @@ const updateSprints = () => {
       <TaskSprint
         v-model="sprints"
         v-model:drag-drop="dragDrop"
-        :edit-sprints="editSprints"
+        :edit-sprints="addToSprint"
         :learning-plan-id="learningPlanStore.learningPlan.id"
         :search="search"
       />
       <alex-project-dialogs-sprint
         v-model="createSprintDialog"
+        :sprint-data="editableSprint"
         :project-end-date="learningPlanStore.learningPlan.end_date"
         :project-id="learningPlanStore.learningPlan.id"
+        :sprints-length="sprintsValue.sprints.length"
         @create="updateSprints"
+        @update="updateSprints"
+      />
+      <alex-custom-confirm-dialog
+        v-model="deleteModal"
+        no-input-confirmation
+        variant="error"
+        :cancel-button-text="t('pages.projects.tasks.delete_cancel_text')"
+        :image="{ src: '/svg/exclusionImage.svg', width: 120, height: 100 }"
+        :submit-button-text="t('pages.projects.tasks.delete_confirm_text')"
+        :subtitle="deleteDialogText.subtitle"
+        :title="deleteDialogText.title"
+        :disable-submit-button="deleteDialogText.disableDelete"
+        :loading="deletingTask"
+        @cancel="deleteModal = false"
+        @submit="handleDeleteSprint(sprintToDelete?.id)"
       />
     </div>
     <DrawerTaskDetails
