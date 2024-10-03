@@ -18,9 +18,7 @@
         density="comfortable"
         name="title"
         :label="$t('components.learningPlan.dialogs.titleCourseLabel')"
-        :placeholder="
-          $t('components.learningPlan.dialogs.titleCoursePlaceholder')
-        "
+        :placeholder="$t('components.learningPlan.dialogs.titleCoursePlaceholder')"
         required
       />
       <alex-inputs-text-area
@@ -28,9 +26,7 @@
         density="comfortable"
         name="description"
         :label="$t('components.learningPlan.dialogs.aboutCourseLabel')"
-        :placeholder="
-          $t('components.learningPlan.dialogs.aboutCoursePlaceholder')
-        "
+        :placeholder="$t('components.learningPlan.dialogs.aboutCoursePlaceholder')"
         theme="light"
         required
       />
@@ -42,9 +38,7 @@
         required
         persistent-hint
         :label="$t('components.learningPlan.dialogs.whatIsYourCourseSlug')"
-        :placeholder="
-          $t('components.learningPlan.dialogs.writeYourCourseIdentifier')
-        "
+        :placeholder="$t('components.learningPlan.dialogs.writeYourCourseIdentifier')"
         :info="$t('components.learningPlan.dialogs.infoSlug')"
         :hint="plataformUrl"
       />
@@ -69,27 +63,19 @@
         />
       </div>
     </template>
-    <template #step2>
-      <alex-custom-carousel ref="carousel" v-model="slides"
-    /></template>
+    <template #step2> <alex-custom-carousel ref="carousel" v-model="slides" /></template>
     <template #step3>
       <alex-learningplan-dialogs-create-class-schedule-manager
         v-model="classes"
         v-model:classData="classData"
         :title="$t('components.learningPlan.dialogs.manageClasses')"
-        :subtitle="
-          $t('components.learningPlan.dialogs.addNameResponsibleToClass')
-        "
+        :subtitle="$t('components.learningPlan.dialogs.addNameResponsibleToClass')"
         img="/svg/class.svg"
         :title-header="$t('components.learningPlan.dialogs.taughtClasses')"
         :show-itens="!!classes.length"
       >
         <template #action-button="{ onActionButton, onSubmit }">
-          <alex-custom-button
-            append-icon="mdi-plus"
-            variant="secondary"
-            @click="onActionButton"
-          >
+          <alex-custom-button append-icon="mdi-plus" variant="secondary" @click="onActionButton">
             <alex-learningplan-dialogs-class
               v-model="classModal"
               v-model:classes="classes"
@@ -121,10 +107,7 @@
         img="/images/schedule-empty.svg"
       >
         <template #action-button="{ addMeeting, editMeeting, onActionButton }">
-          <alex-custom-button
-            append-icon="mdi-plus"
-            variant="secondary"
-            @click="() => onActionButton()"
+          <alex-custom-button append-icon="mdi-plus" variant="secondary" @click="() => onActionButton()"
             ><alex-learningplan-dialogs-schedule
               v-model="createScheduleModal"
               v-model:data="scheduleData"
@@ -133,9 +116,7 @@
               :start-date="startDate"
               @create="addMeeting"
               @update="(values) => editMeeting(values)"
-            />{{
-              $t('components.learningPlan.dialogs.newMeeting')
-            }}</alex-custom-button
+            />{{ $t('components.learningPlan.dialogs.newMeeting') }}</alex-custom-button
           >
         </template>
         <template #items="{ removeMeeting }">
@@ -220,25 +201,17 @@ const classModal = ref(false);
 const title = ref('');
 const description = ref('');
 const slug = ref('');
-const scheduleData = ref<(MeetingPropsType & { className: string }) | null>(
-  null,
-);
+const scheduleData = ref<(MeetingPropsType & { className: string }) | null>(null);
 const carousel = ref<{ clearSlides: () => unknown } | null>(null);
-const slugFormated = computed(() =>
-  slug.value.trim().toLowerCase().replaceAll(' ', '_'),
-);
-const plataformUrl = computed(
-  () => `${window.location.host}/courses/${slugFormated.value}`,
-);
+const slugFormated = computed(() => slug.value.trim().toLowerCase().replaceAll(' ', '_'));
+const plataformUrl = computed(() => `${window.location.host}/courses/${slugFormated.value}`);
 const disablePastDates = (date: Date) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const passedDate = new Date(date);
   return passedDate >= today;
 };
-const hasSchedules = computed(() =>
-  classes.value.some((item) => item.schedules.length),
-);
+const hasSchedules = computed(() => classes.value.some((item) => item.schedules.length));
 const cleanFields = () => {
   classData.value = null;
   classes.value = [];
@@ -262,7 +235,7 @@ const createCourse = async () => {
       description: description.value,
       start_date: startDate.value,
       end_date: endDate.value,
-      type: 'course',
+      type: LearningPlanType.COURSE,
       slug: slugFormated.value.toLocaleLowerCase(),
       invitation_enabled: true,
       invitation_duration: 3600,
