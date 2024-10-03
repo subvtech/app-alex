@@ -123,5 +123,27 @@
       "delete_story_has_children": "Não é possível excluir uma história que possui tarefas vinculadas",
       "delete_epic_has_children": "Não é possível excluir um épico que possui histórias ou tarefas vinculadas"
     }
+  },
+  "sprints": {
+    "new_sprint": "Nova sprint",
+    "sprint_list": "Lista de sprints",
+    "move_down": "Mover para baixo",
+    "move_up": "Mover para cima",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "actions": {
+      "deleted_success": "Sprint excluída com sucesso!",
+      "deleted_error": "Ocorreu um erro ao tentar excluir a sprint, por favor, tente novamente!",
+      "moved_success": "Sprint movida com sucesso!",
+      "moved_error": "Ocorreu um erro ao tentar mover a sprint, por favor, tente novamente!"
+    },
+    "delete_modal": {
+      "title_confirm": "Realmente deseja excluir {sprint}?",
+      "subtitle_confirm": "Ao excluir uma sprint, todas as tasks vinculadas a ela serão movidas para o backlog.",
+      "title_unique": "Você não pode excluir {sprint}",
+      "subtitle_unique": "O projeto deve conter pelo menos uma sprint, por isso não é possível excluir esta.",
+      "title_completed_tasks": "Você não pode excluir {sprint}",
+      "subtitle_completed_tasks": "A sprint possui tarefas concluídas. Mova as tarefas para outra sprint antes de excluir esta."
+    }
   }
 }
