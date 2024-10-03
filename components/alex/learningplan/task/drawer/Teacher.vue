@@ -1,10 +1,23 @@
 <template>
-  <v-navigation-drawer v-model="model" location="right" temporary floating :width="640" scrim="transparent" sticky
-    class="pa-6 pt-2 rounded-s-lg">
+  <v-navigation-drawer
+    v-model="model"
+    location="right"
+    temporary
+    floating
+    :width="640"
+    scrim="transparent"
+    sticky
+    class="pa-6 pt-2 rounded-s-lg"
+  >
     <template #prepend>
       <div class="d-flex align-center justify-end">
-        <alex-custom-button v-if="kanbanButton" icon="alex:Kanban" size="small" variant="text"
-          @click="$emit('kanban-click')" />
+        <alex-custom-button
+          v-if="kanbanButton"
+          icon="alex:Kanban"
+          size="small"
+          variant="text"
+          @click="$emit('kanban-click')"
+        />
         <alex-custom-button icon="mdi-close" size="small" variant="text" @click="handleCloseModal" />
       </div>
     </template>
@@ -14,8 +27,13 @@
       <alex-learningplan-task-tags v-model="tags" :edit="editable" :task-id="taskId" />
 
       <!-- Informações -->
-      <alex-inputs-editable-text v-model="title" tag="h1" class="mt-4 text-h2 ellipsis lines-2" :cant-edit="editable"
-        :placeholder="'(' + $t('components.learningPlan.drawer.missing.title') + ')'"></alex-inputs-editable-text>
+      <alex-inputs-editable-text
+        v-model="title"
+        tag="h1"
+        class="mt-4 text-h2 ellipsis lines-2"
+        :cant-edit="editable"
+        :placeholder="'(' + $t('components.learningPlan.drawer.missing.title') + ')'"
+      ></alex-inputs-editable-text>
 
       <v-row class="my-5">
         <v-col cols="6">
@@ -23,30 +41,40 @@
         </v-col>
         <v-col cols="6">
           <p class="text-body-4 text-gray-800 mb-1">
-            <span v-if="editable" class="text-tag-orange-light">* </span>{{
-              $t('components.learningPlan.drawer.task.type.label') }}
+            <span v-if="editable" class="text-tag-orange-light">* </span
+            >{{ $t('components.learningPlan.drawer.task.type.label') }}
           </p>
-          <alex-learningplan-task-options v-model="type" :items="types" :edit="editable" :config="{
-            group: $t('components.learningPlan.drawer.task.type.collective'),
-            individual: $t('components.learningPlan.drawer.task.type.individual'),
-          }" :placeholder="$t(`components.learningPlan.drawer.${editable ? 'task.type.select' : 'missing.type'}`)" />
+          <alex-learningplan-task-options
+            v-model="type"
+            :items="types"
+            :edit="editable"
+            :config="{
+              group: $t('components.learningPlan.drawer.task.type.collective'),
+              individual: $t('components.learningPlan.drawer.task.type.individual'),
+            }"
+            :placeholder="$t(`components.learningPlan.drawer.${editable ? 'task.type.select' : 'missing.type'}`)"
+          />
         </v-col>
         <v-col cols="6">
           <p class="text-body-4 text-gray-800 mb-1">
-            <span v-if="editable" class="text-tag-orange-light">* </span>{{
-              $t('components.learningPlan.drawer.task.date.startLabel') }}
+            <span v-if="editable" class="text-tag-orange-light">* </span
+            >{{ $t('components.learningPlan.drawer.task.date.startLabel') }}
           </p>
 
           <alex-learningplan-task-date ref="startDateComp" v-model="startDate" :edit="editable" />
         </v-col>
         <v-col cols="6">
           <p class="text-body-4 text-gray-800 mb-1">
-            <span v-if="editable" class="text-tag-orange-light">* </span>{{
-              $t('components.learningPlan.drawer.task.date.finalLabel') }}
+            <span v-if="editable" class="text-tag-orange-light">* </span
+            >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
-          <alex-learningplan-task-date ref="endDateComp" v-model="endDate" :edit="editable"
-            :can-set-value="checkEndDate(startDate, endDate)" />
+          <alex-learningplan-task-date
+            ref="endDateComp"
+            v-model="endDate"
+            :edit="editable"
+            :can-set-value="checkEndDate(startDate, endDate)"
+          />
         </v-col>
       </v-row>
       <alex-learningplan-task-description v-model="description" :mention-users="mentionUsers" :edit="editable" />
@@ -60,46 +88,76 @@
       </p>
       <v-row class="mx-0 mt-3 mb-4">
         <v-col class="pa-0 d-flex align-center" cols="6">
-          <alex-custom-switch v-model="hasSubmission"
+          <alex-custom-switch
+            v-model="hasSubmission"
             :label="$t('components.learningPlan.drawer.task.submission.reqSubmission')"
-            :disabled="hasAtLeastSubmission" />
+            :disabled="hasAtLeastSubmission"
+          />
         </v-col>
         <v-col v-if="hasSubmission" class="pa-0 d-flex align-center" cols="6">
-          <alex-custom-switch v-model="sendAfterDeadline"
-            :label="$t('components.learningPlan.drawer.task.submission.aftrDeadline')" />
+          <alex-custom-switch
+            v-model="sendAfterDeadline"
+            :label="$t('components.learningPlan.drawer.task.submission.aftrDeadline')"
+          />
         </v-col>
         <v-col class="pa-0 d-flex align-center" cols="6">
-          <alex-custom-switch v-model="canChangeFromReview"
-            :label="$t('components.learningPlan.drawer.task.status.canChangeFromReview')" />
+          <alex-custom-switch
+            v-model="canChangeFromReview"
+            :label="$t('components.learningPlan.drawer.task.status.canChangeFromReview')"
+          />
         </v-col>
         <v-col v-if="hasSubmission" class="mt-4 pa-0" cols="12">
           <alex-learningplan-task-restrictions v-model="restrictionsValue" :edit="editable" />
         </v-col>
       </v-row>
 
-      <alex-learningplan-task-description v-if="hasSubmission" v-model="submissionDescription"
-        name="submissionDescription" :edit="editable" :mention-users="mentionUsers"
-        :title="$t('components.learningPlan.drawer.task.submission.description.label')" />
+      <alex-learningplan-task-description
+        v-if="hasSubmission"
+        v-model="submissionDescription"
+        name="submissionDescription"
+        :edit="editable"
+        :mention-users="mentionUsers"
+        :title="$t('components.learningPlan.drawer.task.submission.description.label')"
+      />
 
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
-        <alex-learningplan-task-resources v-model="openResources" :edit="editable" :task-id="taskId"
-          :trail-id="trail?.id" :blocks="blocks" teacher />
+        <alex-learningplan-task-resources
+          v-model="openResources"
+          :edit="editable"
+          :task-id="taskId"
+          :trail-id="trail?.id"
+          :blocks="blocks"
+          teacher
+        />
       </div>
 
-      <alex-learningplan-task-drawer-contracts v-model:status="statusRef" v-model:contract-address="contractAddress"
-        :edit="editable" :task-members="members || []" @deploy:contract-draft="(cb) => (deployContract = cb)"
-        @cancel:contract-draft="deployContract = null" @update:contract-address="handleUpdateContract" />
+      <alex-learningplan-task-drawer-contracts
+        v-model:status="statusRef"
+        v-model:contract-address="contractAddress"
+        :edit="editable"
+        :task-members="members || []"
+        @deploy:contract-draft="(cb) => (deployContract = cb)"
+        @cancel:contract-draft="deployContract = null"
+        @update:contract-address="handleUpdateContract"
+      />
 
       <!-- Eventos e atribuições -->
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
         <v-window-item value="1"> <alex-learningplan-task-events v-model="taskEvents" /></v-window-item>
         <v-window-item value="2">
-          <alex-learningplan-task-members :learningplan-id="learningplanId" :task-id="taskId" :type="type"
-            :start-at="startDate" :finish-at="endDate" :submit-after-deadline="sendAfterDeadline"
-            :block-delete="hasAtLeastSubmission" @change-members="$emit('change-members')"
-            @set-type="(value: TaskType) => (type = value)" /></v-window-item>
+          <alex-learningplan-task-members
+            :learningplan-id="learningplanId"
+            :task-id="taskId"
+            :type="type"
+            :start-at="startDate"
+            :finish-at="endDate"
+            :submit-after-deadline="sendAfterDeadline"
+            :block-delete="hasAtLeastSubmission"
+            @change-members="$emit('change-members')"
+            @set-type="(value: TaskType) => (type = value)"
+        /></v-window-item>
       </v-window>
     </div>
   </v-navigation-drawer>
@@ -180,15 +238,13 @@ const sendAfterDeadline = ref(props.sendAfterDeadline);
 const goals = ref(props.goals);
 const tags = ref(props.tags);
 const title = ref(props.title);
-const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
-const members = toRef(props, 'members');
+const { members, taskId } = toRefs(props);
+
 const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
 
-const wasFilledMainInfo = computed(() =>
-  !!startDate.value && !!endDate.value && !!type.value
-);
+const wasFilledMainInfo = computed(() => !!startDate.value && !!endDate.value && !!type.value);
 
 const startDateComp = ref<{
   close: () => void;
@@ -340,8 +396,6 @@ const notifyError = () => {
 
 const deployContract = ref<(() => Promise<string | undefined>) | null>(null);
 
-
-
 const updateTaskValues = async (
   taskId: number,
   values: Partial<Record<keyof TaskSimple, string | number | boolean | null | undefined | Object>>,
@@ -365,10 +419,7 @@ const updateTaskValues = async (
     if (deployContract.value && statusRef.value !== 'draft') {
       const newContractAddress = await deployContract.value();
       if (!newContractAddress) return;
-      await updateTaskContractAddress(
-        props.taskId,
-        newContractAddress as string,
-      );
+      await updateTaskContractAddress(props.taskId, newContractAddress as string);
       deployContract.value = null;
       contractAddress.value = newContractAddress;
     }
