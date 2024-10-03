@@ -34,7 +34,7 @@ const formattedDate = computed(() =>
       {{ name }}
     </p>
     <div class="d-flex tw-gap-2 align-center tw-mt-2">
-      <alex-custom-avatar-group :avatar-items="participants" :size="34" class="ml-2 tw-mr-auto" />
+      <alex-custom-avatar-group :avatar-items="participants" :size="34" class="tw-mr-auto" />
       <alex-custom-chip v-if="date" :text="formattedDate" size="small" prepend-icon="mdi-calendar-range" />
     </div>
   </div>
