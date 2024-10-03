@@ -27,7 +27,9 @@
     "empty_members": "Jornada não encontrada"
   },
   "overview": {
+    "biweekly":"Quinzenal",
     "completed": "Finalizados",
+    "daily":"Diário",
     "empty_institutions": "Nenhuma instituição parceira aqui",
     "empty_journey": "Nenhuma jornada de aprendizagem encontrada!",
     "empty_meetings": "Nada marcado hoje!",
@@ -35,6 +37,8 @@
     "empty_task_progress": "%{percentage}% das tarefas foram concluídas",
     "institutions": "Instituições",
     "last_update": "Última atualização:",
+    "monthly":"Mensal",
+    "no_repeat":"Não se repete",
     "remaining_time": "Tempo restante",
     "task_progress": "Progresso de tarefas",
     "timeline_day": "Dia",
@@ -45,7 +49,8 @@
     "total_epics": "Total de épicos",
     "total_sprints": "Total de sprints",
     "total_story": "Total de histórias",
-    "total_tasks": "Total de tarefas"
+    "total_tasks": "Total de tarefas",
+    "weekly":"Semanal"
   },
   "tasks": {
     "add_epic": "Adicionar épico",

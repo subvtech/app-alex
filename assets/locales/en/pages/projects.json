@@ -27,7 +27,9 @@
     "empty_members": "No learning journey found"
   },
   "overview": {
+    "biweekly":"Biweekly",
     "completed": "Completed",
+    "daily":"Daily",
     "empty_institutions": "No partner institutions here",
     "empty_journey": "No learning journey found!",
     "empty_meetings": "Nothing scheduled today!",
@@ -35,6 +37,8 @@
     "empty_task_progress": "%{percentage}% of tasks have been completed",
     "institutions": "Institutions",
     "last_update": "Last update:",
+    "monthly":"Monthly",
+    "no_repeat":"No repeat",
     "remaining_time": "Remaining time",
     "task_progress": "Task progress",
     "timeline_day": "Day",
@@ -45,7 +49,8 @@
     "total_epics": "Total epics",
     "total_sprints": "Total sprints",
     "total_story": "Total stories",
-    "total_tasks": "Total tasks"
+    "total_tasks": "Total tasks",
+    "weekly":"Weekly"
   },
   "tasks": {
     "add_epic": "Add epic",
