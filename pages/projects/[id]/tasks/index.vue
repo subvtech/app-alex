@@ -49,6 +49,11 @@ watch(
     isProfessor.value = !!learningPlanStore.userIsFacilitator;
   },
 );
+watch(sprints, (value) => {
+  if (!selectedSprint.value) {
+    selectedSprint.value = value.sprints[0];
+  }
+});
 </script>
 
 <template>
@@ -72,7 +77,7 @@ watch(
           :placeholder="t('pages.projects.tasks.find_task')"
         />
         <alex-inputs-select
-          v-if="mode === 'kanban'"
+          v-show="mode === 'kanban'"
           v-model="selectedSprint"
           hide-details
           return-object
@@ -83,6 +88,7 @@ watch(
           :items="sprints.sprints"
           :placeholder="t('pages.projects.tasks.select_sprint')"
         />
+
         <div class="tw-flex tw-gap-2">
           <alex-custom-button
             size="large"
@@ -118,8 +124,8 @@ watch(
             @click="filterDrawer.removeFilter(chip)"
           />
         </TransitionGroup>
-        <Kanban v-if="mode === Mode.Kanban" :sprint="selectedSprint" />
-        <TaskList v-else ref="taskList" :search="search" :filter="filter" />
+        <Kanban v-if="mode === Mode.Kanban" key="kanban" :sprint="selectedSprint" />
+        <TaskList v-else key="taskList" ref="taskList" :search="search" :filter="filter" />
       </template>
     </div>
     <TaskFilterDrawer ref="filterDrawer" v-model="openFilterDrawer" @filter="handleFilter" />

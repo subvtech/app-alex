@@ -2,6 +2,7 @@
   <NuxtLayout>
     <NuxtLoadingIndicator />
     <NuxtPage />
+    <Toaster position="top-center" />
   </NuxtLayout>
 </template>
 

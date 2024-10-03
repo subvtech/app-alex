@@ -82,14 +82,7 @@
               </nuxt-link>
             </div>
 
-            <alex-custom-button
-              block
-              size="large"
-              type="submit"
-              theme="dark"
-              :disabled="!isValid"
-              :loading="logging"
-            >
+            <alex-custom-button block size="large" type="submit" theme="dark" :disabled="!isValid" :loading="logging">
               {{ $t('pages.login.submit') }}
             </alex-custom-button>
           </v-form>
@@ -375,12 +368,14 @@ const submit = handleSubmit(async () => {
       .form {
         gap: 22px;
 
-        ::v-deep .smaller-text {
+        :deep(.smaller-text) {
           font-size: 12px !important;
-          .v-selection-control__wrapper {
+
+          :deep(.v-selection-control__wrapper) {
             font-size: 12px !important;
           }
-          .v-label {
+
+          :deep(.v-label) {
             font-size: 12px !important;
           }
         }
