@@ -164,63 +164,29 @@ const allGroups = ref<any>([]);
 const getParentOptions = () => {
   const hasSprint = !!selectedSprint.value;
 
-  const filters = hasSprint
-    ? {
-        sprint: selectedSprint.value?.id ?? 0,
-        organization: 'standard',
-      }
-    : {
-        learningplan: learninplanId.value,
-        sprint: {
-          id: selectedSprint.value?.id ?? {
-            $null: true,
-          },
-        },
-        parent_task: {
-          id: selectedSprint.value?.id ?? {
-            $null: true,
-          },
-        },
-        organization: {
-          $in: ['epic', 'story'],
-        },
-      };
+  const filters = {
+    learningplan: learninplanId.value,
+    parent_task: {
+      $null: true,
+    },
+    organization: {
+      $in: ['epic', 'story'],
+    },
+  };
 
-  const populate = hasSprint
-    ? [
-        'parent_task.tasks',
-        'parent_task.tasks.sprint',
-        'parent_task.parent_task.tasks',
-        'parent_task.parent_task.tasks.sprint',
-      ]
-    : {
-        tasks: {
-          filters: {
-            organization: 'story',
-          },
-        },
-      };
+  const populate = {
+    tasks: {
+      filters: {
+        organization: 'story',
+      },
+    },
+  };
 
   find('tasks', {
     filters,
     populate,
   }).then(({ data }) => {
-    if (!hasSprint) {
-      allGroups.value = data ?? [];
-      return;
-    }
-
-    const allEpics = data.reduce((acc: TaskSimple[], task) => {
-      const epic = task?.parent_task?.organization === 'epic' ? task?.parent_task : task?.parent_task?.parent_task;
-
-      if (!epic || acc.some(({ id }) => id === epic.id)) {
-        return acc;
-      }
-
-      return [...acc, epic];
-    }, []);
-
-    allGroups.value = allEpics;
+    allGroups.value = data;
   });
 };
 
@@ -228,35 +194,37 @@ const groupOptions = computed(() => {
   const options: AlexDropdownItem[] = [];
 
   allGroups.value.forEach((task) => {
-    // First layer (Epics)
-    options.push({
-      text: task.title,
-      onClick: () => (selectedParent.value = task),
-    });
+    // First layer (Epics or Stories)
+    if (selectedParent.value?.id !== task.id) {
+      options.push({
+        text: task.title,
+        onClick: () => (selectedParent.value = task),
+      });
+    }
 
     // Second layer (Stories)
     task.tasks?.forEach((subTask) => {
-      //
-      // if (!selectedSprint.value || subTask.tasks.some(({ sprint }) => sprint.id === selectedSprint.value?.id ?? 0)) {
-      options.push({
-        text: subTask.title,
-        onClick: () => (selectedParent.value = subTask),
-        icon: 'mdi-circle-small',
-        notBold: true,
-      });
-      // }
+      if (selectedParent.value?.id !== subTask.id) {
+        options.push({
+          text: subTask.title,
+          onClick: () => (selectedParent.value = subTask),
+          icon: 'mdi-circle-small',
+          notBold: true,
+        });
+      }
     });
   });
 
-  return [
-    ...options,
-    {
+  if (selectedParent.value) {
+    options.push({
       text: 'Sem épico ou história',
       onClick: () => (selectedParent.value = null),
       icon: 'mdi-close',
       notBold: true,
-    },
-  ];
+    });
+  }
+
+  return options;
 });
 
 watch(selectedParent, (parent) => {
@@ -268,7 +236,12 @@ watch(selectedParent, (parent) => {
     parent_task: parent?.id ?? null,
   })
     .then(() => {
-      emit('moved', parent !== null ? `Tarefa movida para ${parent.title}` : 'Épico ou história removido');
+      emit(
+        'moved',
+        parent !== null
+          ? t('pages.projects.tasks.actions.moved', { item: parent.title })
+          : t('pages.projects.tasks.actions.parent_removed'),
+      );
     })
     .catch(console.log);
 });
@@ -338,8 +311,8 @@ watch(selectedEpic, (epic) => {
   update('tasks', props.task?.id, {
     parent_task: epic?.id ?? null,
   })
-    .then(() => emit('moved', epic?.id ? `Tarefa movida para ${epic.title}` : ''))
-    .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
+    .then(() => emit('moved', epic?.id ? t('pages.projects.tasks.actions.moved', { item: epic.title }) : ''))
+    .catch(() => setMessage('pages.projects.tasks.actions.moved_fail', 'error', true));
 });
 watch(open, () => {
   // Update data when drawer is opened | closed
@@ -355,7 +328,7 @@ watch(open, () => {
   trailId.value = props.task?.trail?.id ?? null;
   blocks.value = props.task?.blocks ?? [];
 
-  selectedParent.value = props.task?.parent_task ?? open ? null : undefined;
+  selectedParent.value = props.task?.parent_task ?? null;
 
   // Sprint, epic and story data
   selectedSprint.value = props.task?.sprint ?? undefined;
@@ -404,10 +377,10 @@ watch(selectedSprint, (sprint, oldSprint) => {
     },
   })
     .then(() => {
-      emit('moved', `Tarefa movida de ${oldSprint?.title || 'backlog'} para ${sprint?.title}`);
-      getParentOptions();
+      emit('moved', t('pages.projects.tasks.actions.moved', { item: sprint?.title }));
+      // getParentOptions();
     })
-    .catch(() => setMessage('Falha ao mover tarefa', 'error', true));
+    .catch(() => setMessage(t('pages.projects.tasks.actions.moved_fail'), 'error', true));
 });
 
 watch(startDate, (date) => {

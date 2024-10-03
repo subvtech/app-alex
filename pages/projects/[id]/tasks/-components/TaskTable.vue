@@ -89,6 +89,7 @@ const props = withDefaults(
     sprints: string[];
     tasks: SprintTask[];
     editingTask?: SprintTask | null;
+    draggedTask: any;
   }>(),
   {
     dragFrom: -1,
@@ -96,6 +97,7 @@ const props = withDefaults(
     isProject: false,
     over: undefined,
     editingTask: null,
+    draggedTask: null,
   },
 );
 
@@ -107,6 +109,13 @@ const taskToDelete = ref<LocalSprintTask | null>(null);
 const isArchived = computed(() => props.group === 'archived');
 const searchFilter = computed(() => props.search);
 const transitionName = computed(() => (typing.value ? 'staggered-fade' : 'list'));
+const draggedTaskSprintTitle = computed(() => {
+  if (props.draggedTask) {
+    return props.draggedTask?.sprint?.title ?? 'backlog';
+  }
+
+  return undefined;
+});
 
 const isEditing = ref<LocalSprintTask | null>(null);
 
@@ -281,7 +290,11 @@ const setDragStart = (id: number, e: DragEvent) => {
       class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table mt-1"
       sort-asc-icon="mdi-arrow-up-thin"
       sort-desc-icon="mdi-arrow-down-thin"
-      :class="over?.list === group && group !== 'backlog' ? 'table-drop' : ''"
+      :class="
+        over?.list === group && (draggedTaskSprintTitle !== group || hoveredTree?.organization === 'standard')
+          ? 'table-drop'
+          : ''
+      "
       :headers="header"
       :items="tasksArray"
       :search="searchFilter"
@@ -296,12 +309,19 @@ const setDragStart = (id: number, e: DragEvent) => {
             :key="task.id"
             class="text-5 text-no-wrap staggered-fade-item"
             @dragover.prevent="(e) => emit('drag-over', props.group, task.id, task.position, e)"
-            @drop="(_) => emit('drop', props.group)"
+            @drop="
+              (_) => {
+                emit('drop', props.group);
+              }
+            "
           >
             <td class="pa-0" :colspan="columns.length">
               <TreeView
                 :node-classes="`${
-                  task.id === hoveredTree?.id && props.group === 'backlog' && 'bg-gray-blue'
+                  task.id === hoveredTree?.id &&
+                  draggedTaskSprintTitle === over?.list &&
+                  group === over?.list &&
+                  'bg-gray-blue'
                 } tw-bg-red-500 tw-transition px-4 text-gray-800 text-body-4 tw-border-b
                 tw-border-[#e0e0e0] tw-h-[52px] d-flex align-center ga-1`"
                 :custom-header="true"
@@ -316,7 +336,11 @@ const setDragStart = (id: number, e: DragEvent) => {
                 "
                 @dragend="handleNullTree"
                 @drop.prevent="
-                  emit('moveToParent', task);
+                  if ((props.draggedTask?.sprint?.title || 'backlog') === group) {
+                    emit('move-to-parent', task);
+                  } else {
+                    emit('drop', props.group);
+                  }
                   hoveredTree = null;
                 "
               >
@@ -327,7 +351,8 @@ const setDragStart = (id: number, e: DragEvent) => {
                     :class="
                       header.id === hoveredTree?.id &&
                       header.organization !== 'standard' &&
-                      props.group === 'backlog' &&
+                      draggedTaskSprintTitle === over?.list &&
+                      group === over?.list &&
                       'bg-gray-blue tw-transition'
                     "
                     @dragenter.stop="
@@ -337,7 +362,12 @@ const setDragStart = (id: number, e: DragEvent) => {
                     "
                     @dragend="handleNullTree"
                     @drop.stop="
-                      emit('moveToParent', hoveredTree);
+                      if ((props.draggedTask?.sprint?.title || 'backlog') === group) {
+                        emit('move-to-parent', hoveredTree);
+                      } else {
+                        emit('drop', props.group);
+                      }
+
                       hoveredTree = null;
                     "
                   >
@@ -369,15 +399,18 @@ const setDragStart = (id: number, e: DragEvent) => {
                     v-if="isEditing?.id !== item.id"
                     :id="`${item.id}:${item.title}`"
                     :key="item.id"
-                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none"
+                    class="d-flex align-center py-2 tasks-items text-gray-800 tw-select-none draggable-row"
                     :class="[
                       dragging && dragFrom == item.id ? 'dragging' : '',
-                      group === 'backlog' ? 'draggable-row' : '',
                       item.parent_task ? 'border-bottom' : '',
                     ]"
-                    :draggable="group === 'backlog'"
+                    :draggable="true"
                     @dragstart="(e) => setDragStart(item.id, e)"
-                    @dragend="(e) => emit('drag-end', item, level, e)"
+                    @dragend="
+                      (e) => {
+                        emit('drag-end', over?.list !== group ? item : null, level, e);
+                      }
+                    "
                   >
                     <td
                       class="text-body-4 text-overflow text-left task-title"

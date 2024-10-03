@@ -21,6 +21,8 @@ const props = defineProps<{
   search: string;
 }>();
 
+const i18dir = 'pages.projects.tasks.actions';
+
 const { t } = useI18n();
 const i18n = useI18n();
 
@@ -35,6 +37,8 @@ const dragDrop = useMultipleDragDrop();
 const hoveredSprint = ref<any | null>(0);
 const hoveredTask = ref<any | null>(null);
 const draggedTask = ref<any | null>(null);
+
+// watch(hoveredSprint, (val) => console.log('Hovered sprint', val));
 
 // Querys
 const queryClient = useQueryClient();
@@ -153,6 +157,61 @@ const handleAddEpic = () => {
     };
   });
   editingTask.value = newTask;
+};
+
+// Otimizar isso
+const findTaskById = (id) => {
+  if (!id) {
+    return null;
+  }
+
+  id = Number(id);
+
+  let foundTask;
+
+  sprintsValue.value.backlog.forEach((task) => {
+    if (task.id === id) {
+      foundTask = task;
+    }
+
+    task.tasks?.forEach((subTask) => {
+      if (subTask.id === id) {
+        foundTask = subTask;
+      }
+
+      subTask.tasks?.forEach((subSubTask) => {
+        if (subSubTask.id === id) {
+          foundTask = subSubTask;
+        }
+      });
+    });
+  });
+
+  if (foundTask) {
+    return foundTask;
+  }
+
+  sprintsValue.value.sprints?.forEach((sprint) => {
+    sprint.tasks?.forEach((task) => {
+      if (task.id === id) {
+        foundTask = task;
+      }
+
+      task.tasks?.forEach((subTask) => {
+        if (subTask.id === id) {
+          foundTask = subTask;
+        }
+
+        subTask.tasks?.forEach((subSubTask) => {
+          if (subSubTask.id === id) {
+            foundTask = subSubTask;
+          }
+        });
+      });
+    });
+  });
+
+  return foundTask ?? null;
 };
 
 const handleAddTask = (task?: SprintTask, sprintId?: number) => {
@@ -364,7 +423,9 @@ const handleEmptyStateOver = (index: number, dragEvent: DragEvent, sprint = null
 // };
 
 const handleMoveToParent = (parentTask) => {
-  if (!draggedTask.value || !parentTask || parentTask?.organization === 'standard') {
+  const remove = parentTask.organization === 'standard' && !parentTask.parent_task && draggedTask.value.parent_task;
+
+  if (!draggedTask.value || !parentTask) {
     return;
   }
 
@@ -373,13 +434,17 @@ const handleMoveToParent = (parentTask) => {
   }
 
   update('tasks', draggedTask.value.id, {
-    parent_task: parentTask.id,
+    parent_task: remove ? null : parentTask.id,
   })
     .then(() => {
-      setMessage(`Tarefa movida para ${parentTask.title}`, 'success', true);
+      setMessage(
+        remove ? t(`${i18dir}.parent_removed`) : t(`${i18dir}.moved`, { item: parentTask.title }),
+        'success',
+        true,
+      );
       refetchSprints();
     })
-    .catch(() => setMessage('Falha ao mover task', 'error', true));
+    .catch(() => setMessage(t(`${i18dir}.moved_fail`), 'error', true));
 };
 
 const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
@@ -397,31 +462,28 @@ const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }
 };
 
 // OnDrop
-const onDrop = (_, __, e) => {
-  const data = e?.target?.attributes?.id?.value;
-
-  if (!data) {
-    return;
-  }
-
-  const [id, name] = data.split(':');
-
+const onDrop = (item, __, e) => {
   if (!hoveredSprint.value) {
-    const name = setOver.value.list;
-    hoveredSprint.value = sprintsValue.value.sprints.find(({ title }) => title === name) ?? null;
+    hoveredSprint.value = sprintsValue.value.sprints.find(({ title }) => title === item?.title) ?? null;
   }
 
-  if (!hoveredSprint.value || !id) {
+  if (draggedTask.value?.kanban_column_task?.kanban_column?.status_type === 'done' && !hoveredSprint.value?.id) {
+    setMessage(t(`${i18dir}.already_done`), 'warning', true);
+    hoveredSprint.value = null; // So sprint is not updated
+  }
+
+  if (!hoveredSprint.value || !item?.id) {
     hoveredSprint.value = null;
     dragDrop.dragEnd();
     return;
   }
-  updateStatusTask({ id, sprint: hoveredSprint.value.id });
-  update('tasks', Number(id), {
-    sprint: hoveredSprint.value.id,
+
+  updateStatusTask({ id: item.id, sprint: hoveredSprint.value.id });
+  update('tasks', Number(item.id), {
+    sprint: hoveredSprint.value?.id ?? null,
   })
     .then(() => {
-      setMessage(`Tarefa ${name} para ${hoveredSprint.value.title}`, 'success', true);
+      setMessage(t(`${i18dir}.moved`, { item: hoveredSprint.value.title }), 'success', true);
       refetchSprints();
     })
     .finally(() => {
@@ -529,6 +591,7 @@ const updateSprints = () => {
                     :search="search"
                     :sprints="sprintGroups"
                     :tasks="backlogTasks"
+                    :dragged-task="draggedTask"
                     @add-story="handleAddStory"
                     @add-task="handleAddTask"
                     @create-item="createItem"
@@ -545,11 +608,12 @@ const updateSprints = () => {
                         }
 
                         const [id, title] = data.split(':');
-                        draggedTask = { id, title };
+                        draggedTask = findTaskById(id);
                       }
                     "
                     @drag-over="
                       (sprint, idVal, index, e) => {
+                        hoveredSprint = { title: 'backlog' };
                         dragDrop.onDragOver(sprint, idVal, index, e);
 
                         const data = e?.target?.attributes?.id?.value;
@@ -563,10 +627,15 @@ const updateSprints = () => {
                         hoveredTask = { id, title };
                       }
                     "
-                    @drag-leave="dragDrop.onDragLeave"
+                    @drag-leave="
+                      (e) => {
+                        dragDrop.onDragLeave(e);
+                        hoveredSprint = null;
+                      }
+                    "
                     @drag-end="
-                      (_, __, e) => {
-                        onDrop(_, __, e);
+                      (item, __, e) => {
+                        onDrop(item, __, e);
                         draggedTask = null;
                       }
                     "
@@ -677,14 +746,24 @@ const updateSprints = () => {
                     :search="search"
                     :sprints="sprintGroups"
                     :tasks="sprint.tasks"
+                    :dragged-task="draggedTask"
                     @add-story="handleAddStory"
                     @add-task="(task) => handleAddTask(task, sprint.id)"
                     @create-item="createItem"
                     @edit-item="handleEdit"
                     @handle-blur="handleBlur"
                     @start-drag="
-                      (id, e) => {
-                        dragDrop.startDrag(id, e);
+                      (idVal, e, dropTo, dragGhost) => {
+                        dragDrop.startDrag(idVal, e, dropTo, dragGhost);
+
+                        const data = e?.target?.attributes?.id?.value;
+
+                        if (!data) {
+                          return;
+                        }
+
+                        const [id, title] = data.split(':');
+                        draggedTask = findTaskById(id);
                       }
                     "
                     @drag-over="
@@ -701,9 +780,16 @@ const updateSprints = () => {
                         dragDrop.onDragLeave(e);
                       }
                     "
+                    @drag-end="
+                      (item, __, e) => {
+                        onDrop(item, __, e);
+                        draggedTask = null;
+                      }
+                    "
                     @drop="(sprint) => {}"
                     @delete-task="(index) => handleDeleteTask(index, i)"
                     @move-task="handleMoveTask"
+                    @move-to-parent="handleMoveToParent"
                     @edit-task="(_id, task) => (editTask = task)"
                   />
                 </div>
