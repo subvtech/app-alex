@@ -47,7 +47,7 @@
         :label="$t('components.projects.sprint.startDate')"
         required
         density="comfortable"
-        :allowed-dates="disablePastDates"
+        :allowed-dates="projectRange"
       />
       <alex-inputs-date
         v-model="sprint.end_at"
@@ -57,14 +57,14 @@
         required
         :label="$t('components.projects.sprint.endDate')"
         :disabled="!isEndDateEnabled"
-        :allowed-dates="disablePastDates"
+        :allowed-dates="projectRange"
       />
     </div>
   </alex-custom-dialog>
 </template>
 
 <script setup lang="ts">
-import { format, addWeeks, startOfDay } from 'date-fns';
+import { addWeeks, format, startOfDay } from 'date-fns';
 import { useForm } from 'vee-validate';
 
 interface sprintType {
@@ -85,6 +85,7 @@ interface propsType {
   sprintData: sprintProps;
   projectId: number;
   projectEndDate: string;
+  projectStartDate: string;
   sprintsLength: number;
 }
 
@@ -177,11 +178,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
 });
 
-const disablePastDates = (date: Date) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const passedDate = new Date(date);
-  return passedDate >= today;
+const projectRange = (date: Date) => {
+  const projectStartDate = new Date(props.projectStartDate);
+  const projectEndDate = new Date(props.projectEndDate);
+  return date >= projectStartDate && date <= projectEndDate;
 };
 
 const dateToString = (date: Date) => {
