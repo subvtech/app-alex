@@ -134,7 +134,6 @@ const tasksArray = computed(() => {
   // if (index !== -1) {
   //   props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
   // }
-
   return array;
 });
 
@@ -321,6 +320,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                 :default-expand="true"
                 :items="[task]"
                 :selected-node="isEditing?.id"
+                child-array-name="tasks"
                 @dragenter.prevent="
                   () => {
                     hoveredTree = task;
