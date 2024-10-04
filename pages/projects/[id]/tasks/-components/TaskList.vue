@@ -888,6 +888,7 @@ const updateSprints = () => {
         v-model="createSprintDialog"
         :sprint-data="editableSprint"
         :project-end-date="learningPlanStore.learningPlan.end_date"
+        :project-start-date="learningPlanStore.learningPlan.start_date"
         :project-id="learningPlanStore.learningPlan.id"
         :sprints-length="sprintsValue.sprints.length"
         @create="updateSprints"
