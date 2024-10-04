@@ -138,6 +138,13 @@ const tasksArray = computed(() => {
   return array;
 });
 
+const scrollToNewTask = () => {
+  const newTask = document.getElementById('localTask');
+  if (newTask) {
+    newTask.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+
 const handleFieldEdit = () => {
   if (!isEditing.value) return;
   if (!isEditing.value.local) {
@@ -263,6 +270,11 @@ watch(
   () => props.editingTask,
   (value) => {
     isEditing.value = value;
+    setTimeout(() => {
+      if (isEditing.value?.local) {
+        scrollToNewTask();
+      }
+    }, 10);
   },
   { immediate: true },
 );
@@ -350,6 +362,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                   </div>
                   <v-text-field
                     v-else
+                    id="localTask"
                     v-model="newGroup"
                     name="edit"
                     can-edit
