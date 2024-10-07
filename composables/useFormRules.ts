@@ -8,16 +8,14 @@ export function isValidCpf(val: string) {
   let left: number;
   sum = 0;
 
-  for (let i = 1; i <= 9; i++)
-    sum = sum + parseInt(val.substring(i - 1, i)) * (11 - i);
+  for (let i = 1; i <= 9; i++) sum = sum + parseInt(val.substring(i - 1, i)) * (11 - i);
   left = (sum * 10) % 11;
 
   if (left === 10 || left === 11) left = 0;
   if (left !== parseInt(val.substring(9, 10))) return false;
 
   sum = 0;
-  for (let i = 1; i <= 10; i++)
-    sum = sum + parseInt(val.substring(i - 1, i)) * (12 - i);
+  for (let i = 1; i <= 10; i++) sum = sum + parseInt(val.substring(i - 1, i)) * (12 - i);
   left = (sum * 10) % 11;
 
   if (left === 10 || left === 11) left = 0;
@@ -78,10 +76,7 @@ export const useFormRules = () => {
       .required(i18n.t('rules.fullName.required'))
       .min(6, i18n.t('rules.fullName.min'))
       .max(64, i18n.t('rules.fullName.max'))
-      .matches(
-        /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm,
-        i18n.t('rules.fullName.onlyLetters'),
-      )
+      .matches(/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]+$/gm, i18n.t('rules.fullName.onlyLetters'))
       .trim(),
   };
 
@@ -90,9 +85,7 @@ export const useFormRules = () => {
       .string()
       .required(i18n.t('rules.cpf.required'))
       .length(14, i18n.t('rules.cpf.length'))
-      .test('test-invalid-cpf', i18n.t('rules.cpf.invalid'), (cpf) =>
-        isValidCpf(cpf),
-      ),
+      .test('test-invalid-cpf', i18n.t('rules.cpf.invalid'), (cpf) => isValidCpf(cpf)),
   };
   const goalRules = {
     verb: yup.lazy((value) =>
@@ -274,20 +267,14 @@ export const useFormRules = () => {
             max: max.toLocaleString(i18n.locale.value).split(',')[0],
           }),
         ),
-      startHour: yup
-        .string()
-        .required(i18n.t('rules.meeting.startHour.required')),
+      startHour: yup.string().required(i18n.t('rules.meeting.startHour.required')),
       endHour: yup
         .string()
         .required(i18n.t('rules.meeting.endHour.required'))
-        .test(
-          'endHourTest',
-          i18n.t('rules.meeting.endHour.beforeStartHour'),
-          (value, ctx) => {
-            const { startHour } = ctx.parent;
-            return isSameOrBeforeHour(value, startHour) === 1;
-          },
-        ),
+        .test('endHourTest', i18n.t('rules.meeting.endHour.beforeStartHour'), (value, ctx) => {
+          const { startHour } = ctx.parent;
+          return isSameOrBeforeHour(value, startHour) === 1;
+        }),
     });
 
   const createTrailsRules = {
@@ -361,8 +348,8 @@ export const useFormRules = () => {
       otherwise: () => yup.string().notRequired(),
     }),
     duration: yup.string().required(i18n.t('rules.field.required')),
-    startDate: startDateCreationRules,
-    endDate: endDateRules,
+    startDate: yup.date().required(i18n.t('rules.startDate.required')),
+    endDate: yup.date().required(i18n.t('rules.endDate.required')),
   });
 
   return {
