@@ -10,12 +10,11 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
 import { useCreateTask, useDeleteTask, useUpdateTask, useUpdateTaskStatus } from '../-composables/useCreateTask';
-import { SprintsResponse, useGetSprints, useDeleteSprint, useMoveSprint } from '../-composables/useSprints';
+import { SprintsResponse, useDeleteSprint, useGetSprints, useMoveSprint } from '../-composables/useSprints';
 import { Droppable, SprintTask } from '../-types';
 import DrawerTaskDetails from './DrawerTaskDetails.vue';
 import TaskSprint, { Sprint } from './TaskSprint.vue';
 import TaskTable from './TaskTable.vue';
-import { s } from 'vitest/dist/reporters-1evA5lom';
 
 interface DropdownItem {
   text: string;
@@ -273,7 +272,6 @@ const handleAddTask = (task?: SprintTask, sprintId?: number) => {
     story: task?.organization === 'story' ? task?.id : undefined,
     sprint: sprintId,
   } as any;
-
   queryClient.setQueryData<SprintsResponse>(['sprints', learninplanId], (oldData) => {
     if (!oldData) {
       return {
@@ -290,6 +288,10 @@ const handleAddTask = (task?: SprintTask, sprintId?: number) => {
     let newTasks: TaskSimple[] = [];
     if (!newTask.story && !newTask.epic) {
       newTasks = [...oldTasks, newTask];
+      return {
+        ...data,
+        backlog: newTasks,
+      };
     } else {
       const epicId = newTask.epic;
       const storyId = newTask.story;
@@ -309,7 +311,6 @@ const handleAddTask = (task?: SprintTask, sprintId?: number) => {
         }
         return epic;
       });
-
       if (isSprint) {
         const sprints = data.sprints;
         sprints[sprintIdx].tasks = newTasks;
@@ -887,6 +888,7 @@ const updateSprints = () => {
         v-model="createSprintDialog"
         :sprint-data="editableSprint"
         :project-end-date="learningPlanStore.learningPlan.end_date"
+        :project-start-date="learningPlanStore.learningPlan.start_date"
         :project-id="learningPlanStore.learningPlan.id"
         :sprints-length="sprintsValue.sprints.length"
         @create="updateSprints"
