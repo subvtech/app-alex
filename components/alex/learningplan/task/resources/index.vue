@@ -164,8 +164,6 @@ const structures = ref<LearningPlanStructureSimple[]>(learningPlanStore.learning
 
 structures.value = learningPlanStore.learningPlan?.learning_structures || [];
 
-const trail = computed(() => trails.value.find((trail) => trail.id === props.trailId));
-
 const trails = computed(() => {
   const trailsList: TrailSimple[] = [];
 
@@ -177,6 +175,19 @@ const trails = computed(() => {
     });
   });
   return trailsList;
+});
+
+watch(
+  () => props.taskId,
+  (id) => {
+    if (props.taskId !== -1 && learningPlanStore.learningPlan) {
+      taskStore.loadTaskData(id, learningPlanStore.learningPlan.id);
+    }
+  },
+);
+
+const trail = computed(() => {
+  return trails.value?.find((trail) => trail.id === taskStore.task?.trail?.id);
 });
 
 const isValidTrail = (trail: TrailSimple) => {
@@ -237,6 +248,10 @@ const updateTask = async (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
     blocks: type === 'ADD' ? blocks : [],
     trail: type === 'ADD' ? selectedTrail.value?.id : null,
   });
+
+  if (learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
+  }
 };
 
 const updateLearningplanStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
@@ -262,6 +277,11 @@ const updateTaskStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
   if (taskStore.task?.id === props.taskId && selectedTrail.value) {
     taskStore.task.blocks = type === 'ADD' ? blocks : [];
     taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
+  }
+
+  if (props.taskId !== -1 && learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
+    taskStore.loadTaskData(props.taskId, learningPlanStore.learningPlan.id);
   }
 };
 
