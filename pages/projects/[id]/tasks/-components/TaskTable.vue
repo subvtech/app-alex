@@ -134,9 +134,15 @@ const tasksArray = computed(() => {
   // if (index !== -1) {
   //   props.over?.position === 'top' ? array.splice(index, 0, item) : array.splice(index + 1, 0, item);
   // }
-
   return array;
 });
+
+const scrollToNewTask = () => {
+  const newTask = document.getElementById('localTask');
+  if (newTask) {
+    newTask.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
 
 const handleFieldEdit = () => {
   if (!isEditing.value) return;
@@ -263,6 +269,11 @@ watch(
   () => props.editingTask,
   (value) => {
     isEditing.value = value;
+    setTimeout(() => {
+      if (isEditing.value?.local) {
+        scrollToNewTask();
+      }
+    }, 10);
   },
   { immediate: true },
 );
@@ -309,6 +320,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                 :default-expand="true"
                 :items="[task]"
                 :selected-node="isEditing?.id"
+                child-array-name="tasks"
                 @dragenter.prevent="
                   () => {
                     hoveredTree = task;
@@ -350,6 +362,7 @@ const setDragStart = (id: number, e: DragEvent) => {
                   </div>
                   <v-text-field
                     v-else
+                    id="localTask"
                     v-model="newGroup"
                     name="edit"
                     can-edit
