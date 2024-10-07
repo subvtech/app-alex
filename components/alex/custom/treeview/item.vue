@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 interface TreeItemProps {
   item: any;
@@ -59,6 +59,7 @@ interface TreeItemProps {
   selectedNode: number;
   level: number;
   flat?: boolean;
+  childArrayName?: string;
 }
 const props = withDefaults(defineProps<TreeItemProps>(), {
   openIcon: 'mdi-chevron-down',
@@ -70,6 +71,7 @@ const props = withDefaults(defineProps<TreeItemProps>(), {
   customHeader: false,
   defaultExpand: false,
   level: 1,
+  childArrayName: '',
 });
 
 const childProps = computed(() => {
@@ -89,10 +91,13 @@ const hasChildren = computed(() => {
     return true;
   }
   const arrayProps = Object.keys(props.item).filter((key) => Array.isArray(props.item[key]));
-  if (arrayProps.includes('tags')) {
+  if (props.childArrayName) {
+    if (arrayProps.includes(props.childArrayName)) {
+      return true;
+    }
     return false;
   }
-  if (arrayProps.length > 1) {
+  if (arrayProps.length > 1 && !props.childArrayName) {
     throw new Error(`Item ${props.item.name || props.item.id} has multiple array properties: ${arrayProps.join(', ')}`);
   }
   return arrayProps.length === 1;
@@ -102,7 +107,13 @@ const children = computed(() => {
   if (props.item.children && Array.isArray(props.item.children)) {
     return props.item.children;
   }
+
+  if (props.childArrayName) {
+    return props.item[props.childArrayName];
+  }
+
   const arrayProp = Object.keys(props.item).find((key) => Array.isArray(props.item[key]));
+
   return arrayProp ? props.item[arrayProp] : [];
 });
 

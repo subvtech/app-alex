@@ -13,6 +13,7 @@
       :custom-header="customHeader"
       :default-expand="defaultExpand"
       :selected-node="selectedNode"
+      :child-array-name="childArrayName"
     >
       <template #header="{ header }">
         <slot name="header" :header="header" />
@@ -44,6 +45,7 @@ interface TreeViewProps {
   customHeader?: boolean;
   defaultExpand?: boolean;
   selectedNode?: number;
+  childArrayName?: string;
 }
 
 withDefaults(defineProps<TreeViewProps>(), {
@@ -54,5 +56,6 @@ withDefaults(defineProps<TreeViewProps>(), {
   transition: 'v-slide-x-transition',
   defaultExpand: false,
   selectedNode: -1,
+  childArrayName: '',
 });
 </script>
