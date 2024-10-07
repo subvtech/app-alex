@@ -39,11 +39,7 @@
           size="large"
           prepend-icon="alex:trail"
           append-icon="mdi-chevron-right"
-          :text="
-            $t(
-              'components.learningPlan.drawer.task.learningResources.noneSelected',
-            )
-          "
+          :text="$t('components.learningPlan.drawer.task.learningResources.noneSelected')"
           variant="secondary"
           @click="
             () => {
@@ -56,26 +52,15 @@
       </v-scroll-x-transition>
     </template>
     <!-- Content -->
-    <div
-      v-if="!selectedTrail"
-      class="pa-6 bg-white"
-      :class="{ 'rounded-b-lg': paginationLength <= 1 }"
-    >
+    <div v-if="!selectedTrail" class="pa-6 bg-white" :class="{ 'rounded-b-lg': paginationLength <= 1 }">
       <div class="d-flex align-center mb-4">
         <p class="flex-1-1 text-h5 text-gray-800 lines-1 ellipsis">
-          {{
-            $t('components.learningPlan.drawer.task.learningResources.select')
-          }}
+          {{ $t('components.learningPlan.drawer.task.learningResources.select') }}
         </p>
 
-        <alex-custom-button
-          variant="secondary"
-          append-icon="mdi-plus"
-          @click="createTrailDialog = true"
-          >{{
-            $t('components.learningPlan.drawer.task.learningResources.new')
-          }}</alex-custom-button
-        >
+        <alex-custom-button variant="secondary" append-icon="mdi-plus" @click="createTrailDialog = true">{{
+          $t('components.learningPlan.drawer.task.learningResources.new')
+        }}</alex-custom-button>
       </div>
 
       <div v-if="trails.length" class="d-flex ga-4 flex-wrap">
@@ -100,12 +85,7 @@
     />
     <template v-if="paginationLength > 1 && !selectedTrail" #footer
       ><div class="border-top-gray-100 rounded-b-lg bg-white">
-        <alex-custom-pagination
-          v-model="activePage"
-          class="py-6"
-          :length="paginationLength"
-          :total-visible="4"
-        /></div
+        <alex-custom-pagination v-model="activePage" class="py-6" :length="paginationLength" :total-visible="4" /></div
     ></template>
   </alex-custom-dialog>
   <alex-learningplan-trails-dialogs-create
@@ -148,9 +128,7 @@ const editMode = ref(props.edit);
 
 const learningStructure = computed(() => {
   return (
-    learningPlanStore.learningPlan?.learning_structures.find(
-      (structure) => structure.type === 'standard',
-    )?.id || 0
+    learningPlanStore.learningPlan?.learning_structures.find((structure) => structure.type === 'standard')?.id || 0
   );
 });
 
@@ -170,6 +148,11 @@ const handleCreatedTrail = async (id) => {
   learningPlanStore.standardTrails.unshift({
     ...trail,
   });
+
+  if (learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan?.id);
+  }
+
   selectedTrail.value = trail;
   editMode.value = false;
   createTrailDialog.value = false;
@@ -177,13 +160,11 @@ const handleCreatedTrail = async (id) => {
 
 const editor = ref();
 const activePage = ref<number>(1);
-const structures = ref<LearningPlanStructureSimple[]>([]);
+const structures = ref<LearningPlanStructureSimple[]>(learningPlanStore.learningPlan?.learning_structures || []);
 
 structures.value = learningPlanStore.learningPlan?.learning_structures || [];
 
-const trail = computed(() =>
-  trails.value.find((trail) => trail.id === props.trailId),
-);
+const trail = computed(() => trails.value.find((trail) => trail.id === props.trailId));
 
 const trails = computed(() => {
   const trailsList: TrailSimple[] = [];
@@ -200,8 +181,7 @@ const trails = computed(() => {
 
 const isValidTrail = (trail: TrailSimple) => {
   if (!trail.structures.length) return false;
-  if (!trail.structures[trail.structures.length - 1].blocks.length)
-    return false;
+  if (!trail.structures[trail.structures.length - 1].blocks.length) return false;
   return true;
 };
 
@@ -209,13 +189,7 @@ const handleTrailClick = (trail: TrailSimple) => {
   if (isValidTrail(trail)) {
     selectedTrail.value = trail;
   } else {
-    setMessage(
-      t('components.learningPlan.drawer.task.learningResources.invalidTrail'),
-      'warning',
-      true,
-      false,
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.learningResources.invalidTrail'), 'warning', true, false, true);
   }
 };
 
@@ -225,8 +199,7 @@ const trailsView = computed(() => {
   const length = trails.value.length;
 
   const start = (activePage.value - 1) * paginationBlock;
-  const end =
-    start + paginationBlock > length ? length : start + paginationBlock;
+  const end = start + paginationBlock > length ? length : start + paginationBlock;
 
   return trails.value.slice(start, end);
 });
@@ -238,15 +211,10 @@ const paginationLength = computed(() => {
 
   const length: number = trails.value.length;
 
-  return (
-    Math.floor(length / paginationBlock) + (length % paginationBlock ? 1 : 0)
-  );
+  return Math.floor(length / paginationBlock) + (length % paginationBlock ? 1 : 0);
 });
 
-const updateBlocks = async (
-  type: 'ADD' | 'REMOVE',
-  selectedBlocks?: number[],
-) => {
+const updateBlocks = async (type: 'ADD' | 'REMOVE', selectedBlocks?: number[]) => {
   try {
     isLoading.value = true;
     const blocks = selectedBlocks || editor.value?.getSelectedBlocks() || [];
@@ -255,15 +223,9 @@ const updateBlocks = async (
     }
     if ((!blocks.length || props.taskId === -1) && type === 'ADD') return;
     await updateTask(blocks, type);
-    taskStore.task?.id === props.taskId
-      ? updateTaskStore(blocks, type)
-      : updateLearningplanStore(blocks, type);
+    taskStore.task?.id === props.taskId ? updateTaskStore(blocks, type) : updateLearningplanStore(blocks, type);
   } catch (e) {
-    setMessage(
-      t('components.learningPlan.drawer.task.learningResources.updateError'),
-      'red',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.learningResources.updateError'), 'red', true);
   } finally {
     isLoading.value = false;
     open.value = false;
@@ -277,14 +239,9 @@ const updateTask = async (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
   });
 };
 
-const updateLearningplanStore = (
-  blocks: BlockSimple[],
-  type: 'ADD' | 'REMOVE',
-) => {
+const updateLearningplanStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
   if (learningPlanStore.learningPlan?.tasks) {
-    const taskIndex = learningPlanStore.learningPlan?.tasks.findIndex(
-      (task) => task.id === props.taskId,
-    );
+    const taskIndex = learningPlanStore.learningPlan?.tasks.findIndex((task) => task.id === props.taskId);
     const taskToUpdate = learningPlanStore.learningPlan.tasks[taskIndex];
     if (taskIndex !== -1) {
       const updatedTask = {
@@ -324,17 +281,12 @@ const handleNewTrail = async () => {
       blocks: res.data.blocks,
     });
 
-    const StructureBlocks = await findOne<StructureSimple>(
-      'structures',
-      structureData.data.id,
-      {
-        populate: ['blocks'],
-      },
+    const StructureBlocks = await findOne<StructureSimple>('structures', structureData.data.id, {
+      populate: ['blocks'],
+    });
+    const localTrail = learningPlanStore.learningPlan?.learning_structures[0].trails.find(
+      (trail) => trail.id === selectedTrail.value?.id,
     );
-    const localTrail =
-      learningPlanStore.learningPlan?.learning_structures[0].trails.find(
-        (trail) => trail.id === selectedTrail.value?.id,
-      );
     localTrail?.structures.push({
       id: StructureBlocks.data.id,
       time: Date.now(),
@@ -352,11 +304,10 @@ const handleNewTrail = async () => {
 };
 
 watch(
-  () => [learningPlanStore.loading],
+  () => learningPlanStore.loading,
   () => {
     if (!learningPlanStore.loading) {
-      structures.value =
-        learningPlanStore.learningPlan?.learning_structures || [];
+      structures.value = learningPlanStore.learningPlan?.learning_structures || [];
     }
   },
 );
