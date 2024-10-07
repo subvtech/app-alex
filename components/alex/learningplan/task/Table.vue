@@ -4,6 +4,7 @@
     sort-desc-icon="mdi-arrow-down-thin"
     class="rounded-lg border-sm mb-4 text-gray-800 text-body-3 table"
     :class="over.list === group && (tableSortBy.length || activeFilter) ? 'table-drop' : ''"
+    items-per-page="-1"
     :items="tasksArray"
     :headers="header"
     :search="searchFilter"

@@ -3,18 +3,24 @@
     "documents": "Documents",
     "home": "Home",
     "individual_learning": "Individual Journey",
+    "loading": "Loading",
     "members": "Members",
     "my_projects": "My projects",
     "new_project": "New project",
     "overview": "Overview",
     "projects": "Projects",
+    "removing_tmpl": "Removing {0}",
+    "removing": "Removing",
+    "saving_tmpl": "Saving {0}",
+    "saving": "Saving",
     "tasks": "Tasks",
     "trails": "Trails"
   },
   "errors": {
-    "404": "Page not found",
     "403": "Access denied",
-    "500": "Internal server error"
+    "404": "Page not found",
+    "500": "Internal server error",
+    "unknown": "An error occurred while trying to perform the requested action. Please try again."
   },
   "individual_learning": {
     "empty_events": "No events registered",
@@ -33,9 +39,42 @@
     "empty_meetings": "Nothing scheduled today!",
     "empty_members": "No members found",
     "empty_task_progress": "%{percentage}% of tasks have been completed",
+    "institution_dialog": {
+      "add": "Add",
+      "address": "Address",
+      "back": "Back",
+      "cancel": "Cancel",
+      "cnpj": "CNPJ",
+      "email": "Email",
+      "errors": {
+        "cnpj_not_found": "CNPJ not found",
+        "cnpj_required": "CNPJ is required",
+        "email_invalid": "Invalid email",
+        "email_required": "Email is required",
+        "fetch_users": "Error fetching users",
+        "legal_representative_required": "Legal representative is required",
+        "registered_name_required": "Registered name is required",
+        "sector_required": "Sector is required",
+        "trade_name_required": "Trade name is required"
+      },
+      "information": "Information",
+      "legal_representative": "Legal representative",
+      "next": "Next",
+      "phone": "Phone",
+      "registered_name": "Registered name",
+      "search_member": "Search member",
+      "sector": "Sector",
+      "title": "{0} institution",
+      "trade_name": "Trade name",
+      "update": "Update"
+    },
+    "institution_remove_message": "Confirm the removal of \"{0}\"?! This operation cannot be undone.",
+    "institution_remove_success": "Institution successfully removed.",
+    "institution_remove_title": "Confirm removal?!",
     "institutions": "Institutions",
     "last_update": "Last update:",
     "remaining_time": "Remaining time",
+    "remove": "Remove",
     "task_progress": "Task progress",
     "timeline_day": "Day",
     "timeline_month": "Month",
@@ -70,6 +109,8 @@
     "deleteSuccess": "deleted",
     "dndFilterError": "Cannot change task position when filtering is active",
     "dndSortError": "Cannot change task position when sorting by {type} is active",
+    "cant_remove_in_charge": "Cannot remove task in charge member",
+    "all_members_added": "All members added",
     "draft": "Draft",
     "dropdown_delete": "Delete",
     "dropdown_details": "Details",
@@ -126,6 +167,28 @@
       "deleted_error": "An error occurred while trying to delete the {item}, please try again!",
       "delete_story_has_children": "It is not possible to delete a story that has linked tasks",
       "delete_epic_has_children": "It is not possible to delete an epic that has linked stories or tasks"
+    }
+  },
+  "sprints": {
+    "new_sprint": "New sprint",
+    "sprint_list": "Sprint list",
+    "move_down": "Move down",
+    "move_up": "Move up",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": {
+      "deleted_success": "Sprint successfully deleted!",
+      "deleted_error": "An error occurred while trying to delete the sprint, please try again!",
+      "moved_success": "Sprint successfully moved!",
+      "moved_error": "An error occurred while trying to move the sprint, please try again!"
+    },
+    "delete_modal": {
+      "title_confirm": "Do you really want to delete {sprint}?",
+      "subtitle_confirm": "By deleting a sprint, all tasks linked to it will be moved to the backlog.",
+      "title_unique": "You cannot delete {sprint}",
+      "subtitle_unique": "The project must contain at least one sprint, so it is not possible to delete this one.",
+      "title_completed_tasks": "You cannot delete {sprint}",
+      "subtitle_completed_tasks": "The sprint has completed tasks. Move the tasks to another sprint before deleting this one."
     }
   }
 }

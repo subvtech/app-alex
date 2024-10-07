@@ -155,7 +155,8 @@
       "endDateBeforeStartDate": "End date must be after start date",
       "startDateAfterEndDate": "Start date must be before end date",
       "cantChangeType": "You can't chage task type after add students",
-      "missingSubmission": "You must release a submission before change to in progress"
+      "missingSubmission": "You must release a submission before change to in progress",
+      "missingDefaultGroup": "It looks like the task group hasn't been created!"
     },
     "members": {
       "allClass": "The entire class {name} was added in task",

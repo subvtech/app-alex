@@ -1,4 +1,4 @@
-<script setup lang="tsx">
+<script lang="ts">
 import { DataSet } from 'vis-data/peer';
 import {
   Timeline,
@@ -22,43 +22,45 @@ enum ItemType {
   Task = 'standard',
 }
 
-enum ViewType {
+export enum GanttViewType {
   Day = 'day',
   Week = 'week',
   Month = 'month',
 }
 
 export interface GanttInstance extends ComponentPublicInstance {
-  changeView(view: ViewType): void;
+  changeView(view: GanttViewType): void;
   changeToCurrentDate(): void;
 }
 
-export type Item = {
+export interface GanttItem {
   id: string;
   title: string;
   organization: ItemType;
   start_at: Date | string;
   finish_at: Date | string;
-  tasks?: Item[];
-};
+  tasks?: GanttItem[];
+}
 
-export type Sprint = {
+export interface GanttSprint {
   id: string;
   title: string;
   start_at: Date | string;
   end_at: Date | string;
-};
+}
 
-type Props = {
-  view?: ViewType;
-  items?: Item[];
-  sprints?: Sprint[];
+export interface GanttProps {
+  view?: GanttViewType;
+  items?: GanttItem[];
+  sprints?: GanttSprint[];
   maxHeight?: number;
-};
+}
+</script>
 
-const props = withDefaults(defineProps<Props>(), {
+<script setup lang="ts">
+const props = withDefaults(defineProps<GanttProps>(), {
   maxHeight: 450,
-  view: ViewType.Month,
+  view: GanttViewType.Month,
   items: () => [],
   sprints: () => [],
 });
@@ -85,11 +87,11 @@ const initItems = computed<TimelineItem[]>(() => {
 });
 
 const dataSet = computed(() => {
-  function parse(arr: Item[], level = 0): [TimelineGroup[], TimelineItem[]] {
+  function parse(arr: GanttItem[], level = 0): [TimelineGroup[], TimelineItem[]] {
     const groups: TimelineGroup[] = [];
     const items: TimelineItem[] = [];
 
-    const getId = (item: Item) => `${item.organization}-${item.id}`;
+    const getId = (item: GanttItem) => `${item.organization}-${item.id}`;
 
     for (const item of arr) {
       const itemId = getId(item);
@@ -152,23 +154,23 @@ const { minDate, maxDate } = getMinMaxDates([...initItems.value, ...dataSet.valu
 
 const daysToMs = (days: number) => days * 24 * 60 * 60 * 1000;
 
-const getViewSettings = (view: ViewType) => {
+const getViewSettings = (view: GanttViewType) => {
   switch (view) {
-    case ViewType.Day:
+    case GanttViewType.Day:
       return {
         zoomMin: daysToMs(1), // 1 day
         zoomMax: daysToMs(7), // 1 week
         timeAxis: { scale: 'day' as TimelineTimeAxisScaleType, step: 1 },
         range: daysToMs(7), // 1 week
       };
-    case ViewType.Week:
+    case GanttViewType.Week:
       return {
         zoomMin: daysToMs(7), // 1 week
         zoomMax: daysToMs(28), // 4 weeks
         timeAxis: { scale: 'week' as TimelineTimeAxisScaleType, step: 1 },
         range: daysToMs(30), // ~1 month
       };
-    case ViewType.Month:
+    case GanttViewType.Month:
       return {
         zoomMin: daysToMs(30), // ~1 month
         zoomMax: daysToMs(120), // ~4 months
@@ -180,7 +182,7 @@ const getViewSettings = (view: ViewType) => {
   }
 };
 
-const changeView = (view: ViewType) => {
+const changeView = (view: GanttViewType) => {
   if (!timeline) return;
 
   const { range, ...options } = getViewSettings(view);
@@ -255,14 +257,12 @@ onMounted(() => {
 
   timeline.on('remove', (evt) => evt.preventDefault());
   timeline.on('move', (evt) => evt.oldGroup !== evt.newGroup && evt.preventDefault());
-  timelineRef.value.addEventListener('wheel', (evt) => evt.preventDefault(), { passive: false }); // https://stackoverflow.com/a/70581384/2528550
   window.addEventListener('resize', resize);
   setTimeout(resize, 300);
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', resize);
-  timelineRef.value?.removeEventListener('wheel', (evt) => evt.stopPropagation());
   timeline?.destroy();
 });
 
@@ -300,6 +300,10 @@ defineExpose({ changeView, changeToCurrentDate });
 .vis-item.standard {
   @apply tw-bg-cyan-100 tw-border-cyan-200 #{!important};
 }
+
+// .vis-item.vis-selected {
+//   @apply tw-bg-yellow-200 tw-border-yellow-400 #{!important};
+// }
 
 .vis-panel.vis-center,
 .vis-panel.vis-left,
