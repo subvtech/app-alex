@@ -18,6 +18,7 @@
       </alex-custom-tooltip>
     </div>
     <v-text-field
+      ref="textField"
       v-model="value"
       color="primary--2"
       rounded="lg"
@@ -53,6 +54,7 @@ interface TextFieldProps {
   schema?: YupSchema;
   class?: string;
   density?: 'comfortable' | 'compact' | 'default';
+  autoFocus?: boolean;
 }
 
 const props = withDefaults(defineProps<TextFieldProps>(), {
@@ -64,11 +66,14 @@ const props = withDefaults(defineProps<TextFieldProps>(), {
   schema: undefined,
   class: undefined,
   density: 'default',
+  autoFocus: false,
 });
 
 const { value, errorMessage } = useField(() => props.name, props.schema, {
   syncVModel: true,
 });
+
+const textField = ref(null);
 
 const textColor = computed(() => {
   if (props.theme === 'light') {
@@ -76,6 +81,12 @@ const textColor = computed(() => {
   }
   if (props.theme === 'dark') {
     return props.disabled ? 'gray-300' : 'white';
+  }
+});
+
+onMounted(() => {
+  if (props.autoFocus) {
+    textField.value?.focus();
   }
 });
 </script>

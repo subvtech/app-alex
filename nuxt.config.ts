@@ -58,6 +58,7 @@ export default defineNuxtConfig({
     url: STRAPI_URL,
     auth: { populate: ['role', 'learningplans', 'favorites'] },
   },
+  routeRules: USE_MOCK ? { '/_/api/**': { proxy: `${STRAPI_URL}/api/**` } } : undefined,
   shadcn: {
     prefix: '',
     /**
