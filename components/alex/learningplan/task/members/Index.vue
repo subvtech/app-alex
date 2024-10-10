@@ -196,8 +196,7 @@ const props = withDefaults(defineProps<MembersProps>(), {
   learningplanIds: () => [0],
   members: () => [],
 });
-
-const membersRef = ref<TaskMember[]>([...props.members]);
+const { members: membersRef } = toRefs(props);
 
 type Emits = {
   'change-members': [];

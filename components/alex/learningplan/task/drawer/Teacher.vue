@@ -158,7 +158,8 @@
             :block-delete="hasAtLeastSubmission"
             @change-members="$emit('change-members')"
             @set-type="(value: TaskType) => (type = value)"
-        /></v-window-item>
+          />
+        </v-window-item>
       </v-window>
     </div>
   </v-navigation-drawer>
@@ -241,8 +242,7 @@ const tags = ref(props.tags);
 const title = ref(props.title);
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
-
-const members = toRef(props.members);
+const { members } = toRefs(props);
 
 const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
 
