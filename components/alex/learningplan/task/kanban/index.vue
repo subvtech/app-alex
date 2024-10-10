@@ -1,7 +1,11 @@
 <template>
-  <div class="tw-mt-8 bg-white tw-rounded-lg tw-relative">
+  <div
+    class="bg-white tw-rounded-lg tw-relative"
+    :class="noHeader || 'tw-mt-8'"
+  >
     <!-- Inputs -->
     <div
+      v-if="!noHeader"
       class="d-flex tw-align-center pa-3 tw-px-6 ga-3 border-bottom-1 border-gray-100"
     >
       <alex-inputs-text-field
@@ -49,6 +53,7 @@
     <div
       ref="kanban"
       class="tw-w-full tw-flex tw-gap-4 pa-6 tw-overflow-x-auto tw-overflow-y-hidden"
+      :class="'!tw-p-0'"
     >
       <alex-learningplan-task-kanban-column
         v-for="(column, index) in columns"
@@ -58,8 +63,10 @@
         :color="column.color"
         :group="column.group"
         :accept="column.accept"
+        :add="column.add"
         :disabled="!canDrag || column.disable"
         @insert-card="handleInsertCard"
+        @create-task="(title) => emit('create-task', title, column)"
       >
         <template #card="{ item, status, index: itemIndex }">
           <alex-learningplan-task-card
@@ -157,10 +164,13 @@ interface Column<T extends KanbanType> {
   color: Colors;
   accept?: Accept<Card<T>> | null;
   disable?: boolean;
+  add?: boolean;
 }
 interface KanbanProps {
   type: T;
   classes?: string[];
+  noHeader?: boolean;
+  filter?: string;
 }
 
 const { t } = useI18n();
@@ -174,6 +184,7 @@ const tasks = defineModel<Card<typeof props.type>[]>({
 const columns = defineModel<Column<typeof props.type>[]>('columns', {
   required: true,
 });
+
 const columnsTasks = computed(() =>
   columns.value.reduce((acc, item) => {
     if (!acc[item.group]) {
@@ -188,6 +199,7 @@ const columnsTasks = computed(() =>
 type Emits = {
   (e: 'filter-click'): void;
   (e: 'card-click', index: number, item: Card<T>): void;
+  (e: 'create-task', title: string, column: Column<T>);
   (
     e: 'card-insert',
     newIndex: number,
@@ -266,7 +278,11 @@ const applyFilters = (values: Filters) => {
   }
 };
 const filteredBySearch = computed(() => {
-  const searchValue = search.value.toLowerCase();
+  const searchValue =
+    props.filter === undefined
+      ? search.value.toLowerCase()
+      : props.filter.toLowerCase();
+
   return tasks.value.filter((task) => {
     if (!searchValue) return true;
     if (isTaskStudent(task)) {
@@ -393,6 +409,7 @@ defineExpose({
   canDrag,
   setCanDrag,
   handleInsertCard,
+  handleFilter,
 });
 </script>
 
