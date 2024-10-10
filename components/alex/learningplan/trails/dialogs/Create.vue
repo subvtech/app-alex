@@ -6,19 +6,9 @@
     body-classes="bg-white px-6 pt-3 rounded-b-lg"
     @update:model-value="(event) => $emit('update:modelValue', event)"
   >
-    <div
-      class="bg-gray-blue d-flex flex-column justify-center align-center ga-2 image-container rounded"
-    >
-      <div
-        v-if="image"
-        class="w-100 h-100 d-flex justify-end pa-3"
-        style="position: relative"
-      >
-        <img
-          :src="image"
-          class="rounded-lg w-100 h-100 position-absolute top-0 left-0"
-          style="object-fit: cover"
-        />
+    <div class="bg-gray-blue d-flex flex-column justify-center align-center ga-2 image-container rounded">
+      <div v-if="image" class="w-100 h-100 d-flex justify-end pa-3" style="position: relative">
+        <img :src="image" class="rounded-lg w-100 h-100 position-absolute top-0 left-0" style="object-fit: cover" />
         <alex-custom-button
           aria-label="edit"
           elevation="0"
@@ -39,11 +29,7 @@
           class="bg-gray-blue rounded-lg"
           @click="clearImage"
         >
-          <v-icon
-            size="small"
-            color="red"
-            icon="mdi-trash-can-outline"
-          ></v-icon>
+          <v-icon size="small" color="red" icon="mdi-trash-can-outline"></v-icon>
         </alex-custom-button>
       </div>
       <div v-else class="d-flex flex-column align-center ga-2">
@@ -169,11 +155,7 @@ const handleFileChange = () => {
 };
 
 const disabledButton = computed(
-  () =>
-    !!descriptionErrorMsg.value ||
-    !!titleErrorMsg.value ||
-    !titleValue.value ||
-    !descriptionValue.value,
+  () => !!descriptionErrorMsg.value || !!titleErrorMsg.value || !titleValue.value || !descriptionValue.value,
 );
 
 const createTrail = async () => {
@@ -194,9 +176,10 @@ const createTrail = async () => {
       title: titleValue.value,
       description: descriptionValue.value,
       cover_image: imageData,
-      learning_structure: props.learningStructure,
+      learning_structure: props.learningStructure || null,
     };
 
+    console.log('Data:', data);
     const trailData = await create('trails', data);
     resetTitleField();
     resetDescriptionField();
@@ -213,12 +196,7 @@ const createTrail = async () => {
 };
 
 const disableSave = computed(() => {
-  return (
-    !!descriptionErrorMsg.value ||
-    !!titleErrorMsg.value ||
-    !titleValue.value ||
-    !descriptionValue.value
-  );
+  return !!descriptionErrorMsg.value || !!titleErrorMsg.value || !titleValue.value || !descriptionValue.value;
 });
 </script>
 

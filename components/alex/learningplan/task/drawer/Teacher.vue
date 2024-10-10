@@ -36,10 +36,15 @@
       ></alex-inputs-editable-text>
 
       <v-row class="my-5">
-        <v-col cols="6">
-          <alex-learningplan-task-state v-model="status" :edit="editable && wasFilledMainInfo" />
+        <v-col :cols="!individualJourney ? 6 : 12">
+          <alex-learningplan-task-state
+            v-model="status"
+            :mode="individualJourney ? 'student' : 'teacher'"
+            :edit="(editable || individualJourney) && wasFilledMainInfo"
+            :individual-journey="individualJourney"
+          />
         </v-col>
-        <v-col cols="6"
+        <v-col v-if="!individualJourney" cols="6"
           ><p class="text-body-4 text-gray-800 mb-1">
             <span v-if="editable" class="text-tag-orange-light">* </span
             >{{ $t('components.learningPlan.drawer.task.type.label') }}
@@ -136,7 +141,7 @@
       <alex-custom-tabs v-model="activePage" :tabs="tabs" class="border-bottom-1 border-gray-100" />
       <v-window v-model="activePage">
         <v-window-item value="1"> <alex-learningplan-task-events v-model="taskEvents" /></v-window-item>
-        <v-window-item value="2">
+        <v-window-item v-if="!individualJourney" value="2">
           <alex-learningplan-task-members
             :learningplan-id="learningplanId"
             :task-id="taskId"
@@ -187,6 +192,7 @@ interface TaskTeacherDrawerProps {
   startDate?: string | null;
   endDate?: string | null;
   members?: TaskMember[];
+  individualJourney?: boolean;
 }
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
@@ -211,6 +217,7 @@ const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   type: null,
   submissionDescription: '',
   members: () => [],
+  individualJourney: false,
 });
 
 const description = ref<string | any | undefined>(props.description);
@@ -225,6 +232,10 @@ const taskId = toRef(props, 'taskId');
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
 const members = toRef(props, 'members');
+const type = ref<TaskType | null>(props.type);
+const startDate = ref(props.startDate);
+const endDate = ref(props.endDate);
+
 const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
 const wasFilledMainInfo = computed(() => {
   if (!startDate.value || !endDate.value || !type.value) {
@@ -280,16 +291,14 @@ type Emits = {
   'change-goals': [value: LearningPlanGoalSimple[]];
   'change-can-alter-from-review': [value: boolean];
   'change-members': [];
+  'change-kanban-status': [value: string];
+  'change-date': [id: number | undefined, startDate: any, endDate: any];
 };
 const emit = defineEmits<Emits>();
 
 const { setMessage } = useMessageStore();
 // Status
 const status = ref<TaskStatus | TaskMemberStatus>(props.status);
-
-// Date picker
-const startDate = ref(props.startDate);
-const endDate = ref(props.endDate);
 
 // Restrições
 const restrictions = ref(props.restrictions);
@@ -331,7 +340,6 @@ const mentionUsers = computed<MentionUserPropsArray>(() => {
 });
 
 // Tipos
-const type = ref<TaskType | null>(props.type);
 const types = ref<AlexDropdownItem[]>([
   {
     text: t('components.learningPlan.drawer.task.type.individual'),
@@ -360,7 +368,13 @@ const activePage = ref('1');
 const tabs = [
   { label: t('components.learningPlan.drawer.tabs.events.label'), value: '1' },
   { label: t('components.learningPlan.drawer.tabs.members.label'), value: '2' },
-];
+].filter(({ value }) => {
+  if (!props.individualJourney) {
+    return true;
+  }
+
+  return value !== '2';
+});
 
 // Events
 const taskEvents = computed(() => orderEvents(props.events));
@@ -474,6 +488,7 @@ watch(endDate, async (value) => {
     finish_at: value,
   });
   emit('change-members');
+  emit('change-date', props.taskId, startDate.value, endDate.value);
 });
 watch(startDate, async (value) => {
   if (!value) return;
@@ -487,6 +502,7 @@ watch(startDate, async (value) => {
     start_at: value,
   });
   emit('change-members');
+  emit('change-date', props.taskId, startDate.value, endDate.value);
 });
 watch(restrictions, async (value) => {
   await updateTaskValues(taskId.value, {
@@ -501,6 +517,12 @@ watch(type, async (value) => {
 });
 watch(status, async (value) => {
   if (!value) return;
+
+  if (props.individualJourney) {
+    emit('change-kanban-status', value);
+    return;
+  }
+
   await updateTaskValues(taskId.value, {
     status: value,
   });

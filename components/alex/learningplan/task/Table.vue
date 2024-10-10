@@ -39,7 +39,7 @@
               />
               <span v-else>{{ $t('pages.task.table.placeholders.undefined') }}</span>
             </td>
-            <td>
+            <td v-if="!individualJourney">
               <div v-if="item.type">
                 <v-icon
                   class="mr-1"
@@ -51,7 +51,7 @@
               </div>
               <span v-else>{{ $t('pages.task.table.placeholders.undefined') }}</span>
             </td>
-            <td>
+            <td v-if="!individualJourney">
               <div v-if="item.students?.length" class="ml-2" :class="{ 'gray-filter': isArchived }">
                 <alex-custom-avatar-group :avatar-items="item.students || []" :max="3" />
               </div>
@@ -76,7 +76,15 @@
                     icon="alex:Kanban"
                     variant="text"
                     color="gray-600"
-                    @click="navigateTo(`tasks/${item.id}`)"
+                    @click="
+                      () => {
+                        if (props.individualJourney) {
+                          emit('kanban');
+                        } else {
+                          navigateTo(`tasks/${item.id}`);
+                        }
+                      }
+                    "
                   />
                 </template>
               </v-tooltip>
@@ -143,6 +151,7 @@ const props = defineProps<{
     list?: string;
   };
   dragFrom: number;
+  individualJourney?: boolean;
 }>();
 
 const { t } = useI18n();
@@ -171,6 +180,7 @@ const emit = defineEmits([
   'startDrag',
   'dragLeave',
   'editTask',
+  'kanban',
 ]);
 
 const tableSortBy = ref<sortType[]>([]);
@@ -214,6 +224,12 @@ const confirmDelete = () => {
 const dropDownItems = (task: TaskItem) => {
   const deliveredTotal = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;
   const items = [getDropDownAction('details', task.id), getDropDownAction('kanban', task.id)];
+
+  if (props.individualJourney) {
+    items.push(getDropDownAction('delete', task.id));
+    return items;
+  }
+
   switch (task.status) {
     case 'draft':
       if (isTaskMovable(task)) {
@@ -276,7 +292,13 @@ const getDropDownAction = (action: string, id: number) => {
     },
     kanban: {
       text: t('pages.task.table.dropdown.kanban'),
-      onClick: () => navigateTo(`tasks/${id}`),
+      onClick: () => {
+        if (props.individualJourney) {
+          emit('kanban');
+        } else {
+          navigateTo(`tasks/${id}`);
+        }
+      },
     },
     draft: {
       text: t('pages.task.table.dropdown.draft'),
@@ -319,9 +341,16 @@ const header = [
   {
     title: t('pages.task.table.header.delivered'),
     key: 'delivered',
+    width: 140,
   },
-  { title: '', key: 'actions', sortable: false },
-];
+  { title: '', key: 'actions', sortable: false, width: 100 },
+].filter(({ key }) => {
+  if (!props.individualJourney) {
+    return true;
+  }
+
+  return key !== 'students' && key !== 'type';
+});
 
 const setAcceptedGroups = (task: TaskItem) => {
   const deliveredTotal = task.delivered ? task.delivered.underReview + task.delivered.completed : 0;

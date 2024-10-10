@@ -26,10 +26,7 @@ const trails = computed<TrailSimple[]>(() => {
 const getShowingMessage = (total: number) => {
   const itemsPerPage = search.value === '' ? ITEMS_PER_PAGE : total;
 
-  const to =
-    page.value * itemsPerPage > trails.value.length
-      ? trails.value.length
-      : page.value * itemsPerPage;
+  const to = page.value * itemsPerPage > trails.value.length ? trails.value.length : page.value * itemsPerPage;
 
   return to === 0
     ? t('pages.trails.noData')
@@ -54,9 +51,7 @@ const toggleVisibility = (index: number, id: number) => {
 const navigate = (trailId: number, page?: string) => {
   const { id, memberId } = route.params;
   const slug = page === 'settings' ? '/settings' : '';
-  navigateTo(
-    `/projects/${id}/individual_learning/${memberId}/trails/${trailId}${slug}`,
-  );
+  navigateTo(`/projects/${id}/individual_learning/${memberId}/trails/${trailId}${slug}`);
 };
 
 const handleTrailCreate = async (trailId: number) => {
@@ -68,9 +63,7 @@ const handleTrailCreate = async (trailId: number) => {
 </script>
 
 <template>
-  <div
-    class="tw-flex tw-flex-1 tw-flex-col tw-bg-white tw-rounded-lg tw-p-6 tw-min-h-[500px]"
-  >
+  <div class="tw-flex tw-flex-1 tw-flex-col tw-bg-white tw-rounded-lg tw-p-6 tw-min-h-[500px]">
     <div
       class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1"
       :class="!trails.length ? 'tw-justify-end' : 'tw-justify-between tw-mb-6'"
@@ -88,40 +81,23 @@ const handleTrailCreate = async (trailId: number) => {
         density="comfortable"
         hide-details
       />
-      <alex-custom-button
-        prepend-icon="mdi-plus"
-        size="large"
-        @click="showAddTrailDialog = true"
-      >
+      <alex-custom-button prepend-icon="mdi-plus" size="large" @click="showAddTrailDialog = true">
         {{ $t('pages.trails.newTrail') }}
       </alex-custom-button>
     </div>
     <div
       v-if="!trails.length"
       class="tw-flex tw-flex-1"
-      :class="
-        !learningPlanStore.loading && 'align-center justify-center flex-column'
-      "
+      :class="!learningPlanStore.loading && 'align-center justify-center flex-column'"
     >
       <div v-if="learningPlanStore.loading">
-        <alex-custom-skeleton
-          color="gray-200"
-          class="width-80 height-10 mb-6"
-          rounded="lg"
-        />
+        <alex-custom-skeleton color="gray-200" class="width-80 height-10 mb-6" rounded="lg" />
         <div class="tw-flex tw-gap-6">
-          <alex-learningplan-skeleton-trail-card
-            v-for="index in 3"
-            :key="index"
-          />
+          <alex-learningplan-skeleton-trail-card v-for="index in 3" :key="index" />
         </div>
       </div>
       <div v-else class="tw-flex tw-items-center tw-justify-center tw-flex-col">
-        <img
-          class="emptyProjects-img"
-          src="public/images/emptyTrails.svg"
-          :alt="$t('pages.trails.emptyStateText')"
-        />
+        <img class="emptyProjects-img" src="public/images/emptyTrails.svg" :alt="$t('pages.trails.emptyStateText')" />
         <p class="text-h3 text-gray-400 mt-4">
           {{ $t('pages.trails.emptyStateText') }}
         </p>
