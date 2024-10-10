@@ -12,33 +12,19 @@
   >
     <div>
       <v-row justify="start" align="center" class="ga-5">
-        <v-icon :color="countdown || !currentFill ? currentColor : 'white'">{{
-          iconName
-        }}</v-icon>
-        <p
-          class="text-body-4 max-w-138"
-          :class="currentFill ? 'text-white' : 'text-gray-800'"
-        >
+        <v-icon :color="countdown || !currentFill ? currentColor : 'white'">{{ iconName }}</v-icon>
+        <p class="text-body-4 max-w-138" :class="currentFill ? 'text-white' : 'text-gray-800'">
           {{ currentMessage }}
         </p>
       </v-row>
-      <v-icon
-        :color="currentFill ? 'white' : 'gray-600'"
-        class="close"
-        size="16px"
-        role="close-btn"
-        @click="onClose"
+      <v-icon :color="currentFill ? 'white' : 'gray-600'" class="close" size="16px" role="close-btn" @click="onClose"
         >mdi-close</v-icon
       >
     </div>
     <div v-if="currentCountdown" class="w-100 lowbar">
       <div
         class="bar h-100"
-        :class="[
-          currentFill ? 'opacity-80' : '',
-          `bg-${currentColor}`,
-          timeRunning ? 'w-100' : '',
-        ]"
+        :class="[currentFill ? 'opacity-80' : '', `bg-${currentColor}`, timeRunning ? 'w-100' : '']"
         :style="`transition: width ${timeSpan}ms linear; background-color: ${currentColor}`"
       />
     </div>
@@ -103,32 +89,18 @@ const updateModelValue = (newValue) => {
 
 const currentShow = computed(() => data?.value?.show || show.value);
 
-const currentColor = computed(() =>
-  data?.value?.color ? data.value.color : color.value ? color.value : 'green',
-);
+const currentColor = computed(() => (data?.value?.color ? data.value.color : color.value ? color.value : 'green'));
 
 const currentCountdown = computed(() =>
-  props.countdown
-    ? props.countdown
-    : showCountdown.value !== undefined
-    ? showCountdown.value
-    : false,
+  props.countdown ? props.countdown : showCountdown.value !== undefined ? showCountdown.value : false,
 );
 
 const currentFill = computed(() =>
-  data?.value?.fill
-    ? data.value.fill
-    : fill.value !== undefined
-    ? fill.value
-    : true,
+  data?.value?.fill ? data.value.fill : fill.value !== undefined ? fill.value : true,
 );
 
 const currentMessage = computed(() =>
-  data?.value?.message
-    ? data.value.message
-    : message.value
-    ? message.value
-    : 'done',
+  data?.value?.message ? data.value.message : message.value ? message.value : 'done',
 );
 
 onUnmounted(() => {
@@ -159,7 +131,7 @@ const onClose = () => {
   min-width: 300px;
   padding: 16px !important;
   flex-direction: column-reverse;
-  justify-content: end;
+  justify-content: flex-end;
   align-items: flex-start;
   border-radius: 8px;
 

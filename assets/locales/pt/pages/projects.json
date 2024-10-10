@@ -155,6 +155,10 @@
     "delete_confirm_text": "Apagar",
     "delete_cancel_text": "Cancelar",
     "actions": {
+      "moved": "Tarefa movida para {item}",
+      "moved_fail": "Falha ao mover tarefa",
+      "parent_removed": "Épico ou história removida",
+      "already_done": "A tarefa não pode ser movida para o backlog porque já foi concluída",
       "created_success": "{item} foi criado com sucesso!",
       "created_error": "Ocorreu um erro ao tentar criar {item}, por favor, tente novamente!",
       "edited_success": "{item} foi editado com sucesso!",

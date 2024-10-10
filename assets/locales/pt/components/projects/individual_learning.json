@@ -1,0 +1,23 @@
+{
+  "tasks": {
+    "seeKanban": "Ver Kanban",
+    "seeList": "Ver Lista",
+
+    "tasks": "Tarefas",
+
+    "addTask": "Adicionar tarefa",
+
+    "inputs": {
+      "search": "Encontrar tarefa",
+      "filter": "Filtrar",
+      "taskTitle": "Nome da tarefa"
+    },
+
+    "messages": {
+      "noTaskSelected": "Sem tarefa selecionada",
+      "taskCreated": "Tarefa criada com sucesso",
+      "taskDeleted": "Tarefa deletada com sucesso",
+      "failDeleteTask": "Falha ao deletar tarefa"
+    }
+  }
+}
