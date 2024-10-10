@@ -27,6 +27,7 @@
     "empty_members": "Jornada não encontrada"
   },
   "overview": {
+    "add_meeting":"Adicionar encontro",
     "biweekly":"Quinzenal",
     "completed": "Finalizados",
     "daily":"Diário",
@@ -37,6 +38,8 @@
     "empty_task_progress": "%{percentage}% das tarefas foram concluídas",
     "institutions": "Instituições",
     "last_update": "Última atualização:",
+    "manage_meetings":"Gerenciar encontros",
+    "meetings":"Encontros",
     "monthly":"Mensal",
     "no_repeat":"Não se repete",
     "remaining_time": "Tempo restante",

@@ -27,6 +27,7 @@
     "empty_members": "No learning journey found"
   },
   "overview": {
+    "add_meeting":"Add meeting",
     "biweekly":"Biweekly",
     "completed": "Completed",
     "daily":"Daily",
@@ -37,6 +38,8 @@
     "empty_task_progress": "%{percentage}% of tasks have been completed",
     "institutions": "Institutions",
     "last_update": "Last update:",
+    "manage_meetings":"Manage meetings",
+    "meetings":"Meetings",
     "monthly":"Monthly",
     "no_repeat":"No repeat",
     "remaining_time": "Remaining time",

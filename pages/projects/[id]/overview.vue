@@ -125,6 +125,7 @@ onBeforeMount(async () => {
       return navigateTo('/projects/me');
     }
 
+    console.log(response)
     institutions.value = response.data.institutions as never;
 
     schedules.value = response.data.schedules
@@ -172,7 +173,7 @@ onBeforeMount(async () => {
       <alex-custom-card
         no-footer
         no-header
-        title="Linha temporal"
+        :title="$t('pages.projects.overview.timeline')"
         class="tw-col-span-12 md:tw-col-span-12 lg:tw-col-span-8"
         content-class-name="tw-flex-1"
       >
@@ -231,7 +232,7 @@ onBeforeMount(async () => {
         class="tw-bg-white tw-w-full tw-flex tw-flex-col tw-gap-4 tw-col-span-12 md:tw-col-span-6 lg:tw-col-span-4 rounded-lg"
       >
         <div class="tw-border-b tw-p-5 tw-flex tw-justify-between tw-items-center">
-          <h3>{{ $t('pages.projects.overview.institutions') }}</h3>
+          <p class="text-h4 text-gray-800">{{ $t('pages.projects.overview.institutions') }}</p>
           <alex-project-dialogs-institution :institutions="institutions" />
         </div>
         <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-gap-2 tw-w-full my-auto pa-6">

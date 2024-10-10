@@ -1,7 +1,7 @@
 <template>
   <div>
     <alex-custom-card
-        title="Encontros"
+        :title="$t('pages.projects.overview.meetings')"
         full-width
         :no-icon="true"
         class="tw-w-full tw-h-full"
@@ -43,21 +43,24 @@
               </div>
             </div>
             <div
-             class="tw-overflow-auto tw-h-full tw-w-full"
+             class="tw-overflow-auto tw-w-full"
              >
             <div
               v-for="(meeting, index) in todayMeetings"
               :key="index"
               class=" tw-p-3 rounded-lg hover:bg-gray-blue"
             >
-              <div class="tw-flex tw-justify-between">
+              <div class="tw-flex tw-items-center tw-justify-between">
                 <div class="tw-flex tw-items-center gap-2">
                   <div class="text-body-2">{{ meeting.scheduleName }}</div>
                   <alex-custom-chip :size="'small'" :text="meeting.interval" :status="'blue'"/>
                 </div>
-                <div class="text-body-3 ">{{ meeting.formattedDate }}</div>
+                <div class="text-body-3 ">{{ format(parseISO(meeting.schedule.startDate), 'HH:mm')  }}</div>
               </div>
-
+              <div class="tw-flex tw-items-center gap-2">
+                <app-user-avatar :size="24" :placeholder="'Jamerson Rodrigo'"/>
+                <p class="text-body-3 text-gray-500">Jamerson Rodrigo</p>
+              </div>
             </div>
           </div>
           <div class="tw-flex tw-flex-col tw-gap-2 ">
@@ -78,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import dialogList from './dialogs/listMeeting.vue';
 const { t } = useI18n();
 const editMeetings = ref(false)
@@ -156,7 +159,6 @@ const todayMeetings = computed(() => (props.schedules.flatMap(schedule =>
   )
 ))
 
-console.log(todayMeetings)
 
 const selectDay = (dayValue:string)=>{
   selectedDay.value = dayValue

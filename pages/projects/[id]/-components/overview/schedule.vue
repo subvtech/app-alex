@@ -6,19 +6,18 @@
     rounded="lg"
     elevation="0"
   >
-  <div class="tw-flex tw-w-full tw-items-center justify-space-between">
-    <div>
-      <p class="text-body-1 text-gray-800">{{ formatDate(meeting.date) }}</p>
-      <p class="text-body-1 text-gray-500" >{{ getIntervalName(meeting.schedule.interval) }}: cada Quarta-feira</p>
+    <div class="tw-flex tw-w-full tw-items-center justify-space-between">
+      <div>
+        <p class="text-body-1 text-gray-800">{{ formatDate(meeting.date) }}</p>
+        <p class="text-body-1 text-gray-500" >{{ getIntervalName(meeting.schedule.interval) }}: cada Quarta-feira</p>
+      </div>
+      <div class="tw-flex tw-items-center gap-2" >
+        <p class="text-body-1 text-gray-800" >
+          {{ formatDateToHours(meeting.schedule.startDate) }} às {{ formatDateToHours(meeting.schedule.endDate) }}
+        </p>
+        <alex-custom-button variant="text" icon="mdi-pencil-outline" @click="onEdit" />
+      </div>
     </div>
-    <div class="tw-flex tw-items-center gap-2" >
-      <p class="text-body-1 text-gray-800" >
-        {{ meeting.formattedDate }} às {{ formatDateToHours(meeting.schedule.endDate) }}
-      </p>
-      <alex-custom-button variant="text" icon="mdi-pencil-outline" @click="onEdit" />
-    </div>
-
-  </div>
   </v-card>
 </template>
 

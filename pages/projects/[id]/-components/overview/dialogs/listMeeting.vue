@@ -2,6 +2,7 @@
   <alex-custom-dialog
     v-model="value"
     no-footer
+    :title="$t('pages.projects.overview.manage_meetings')"
   >
   <div
     v-if="meetings && meetings.length"
@@ -13,9 +14,11 @@
         :onEdit="()=>onEdit(meeting.schedule)"
       />
     </div>
-    <alex-custom-button @click="onCreate" >
-      teste
-    </alex-custom-button>
+    <div @click="onCreate" class="tw-flex tw-w-full tw-items-center justify-center tw-cursor-pointer tw-p-4 tw-rounded tw-border tw-border-dashed :tw-hover:bg-gray-blue">
+      <p class="text-body-1 text-gray-400" >
+        {{ $t('pages.projects.overview.add_meeting') }} +
+      </p>
+    </div>
     <createMeeting
       ref="createMeetingRef"
     />
