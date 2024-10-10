@@ -1001,7 +1001,9 @@ const updateSprints = () => {
       :sprints="sprintsValue.sprints"
       @update-value="
         (field) => {
-          handleUpdateTask(editTask?.id ?? 0, field);
+          if (editTask) {
+            handleUpdateTask(editTask?.id ?? 0, field);
+          }
         }
       "
       @moved="updateTable"

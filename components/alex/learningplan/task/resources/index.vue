@@ -180,8 +180,10 @@ const trails = computed(() => {
 watch(
   () => props.taskId,
   (id) => {
-    if (props.taskId !== -1 && learningPlanStore.learningPlan) {
+    if (![0, -1].includes(id) && learningPlanStore.learningPlan) {
       taskStore.loadTaskData(id, learningPlanStore.learningPlan.id);
+    } else {
+      taskStore.task = undefined;
     }
   },
 );
@@ -279,7 +281,7 @@ const updateTaskStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
     taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
   }
 
-  if (props.taskId !== -1 && learningPlanStore.learningPlan) {
+  if (![-1, 0].includes(props.taskId) && learningPlanStore.learningPlan) {
     learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
     taskStore.loadTaskData(props.taskId, learningPlanStore.learningPlan.id);
   }
