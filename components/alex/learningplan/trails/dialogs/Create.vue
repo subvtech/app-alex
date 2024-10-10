@@ -179,7 +179,6 @@ const createTrail = async () => {
       learning_structure: props.learningStructure || null,
     };
 
-    console.log('Data:', data);
     const trailData = await create('trails', data);
     resetTitleField();
     resetDescriptionField();
