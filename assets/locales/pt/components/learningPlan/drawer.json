@@ -27,7 +27,8 @@
       },
       "remove": {
         "title": "Remover tarefa da avaliação",
-        "subtitle": "Você deseja remover esta tarefa da avaliação?"
+        "subtitle": "Você deseja remover esta tarefa da avaliação?",
+        "forbidden": "Você não pode remover alunos após alguém ter feito uma entrega"
       }
     },
     "date": {

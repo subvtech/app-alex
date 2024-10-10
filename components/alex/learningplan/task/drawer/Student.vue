@@ -11,12 +11,7 @@
     class="pa-6 pt-2 rounded-s-lg"
   >
     <template #prepend>
-      <alex-custom-button
-        icon="mdi-close"
-        size="small"
-        variant="text"
-        @click="handleCloseModal"
-      />
+      <alex-custom-button icon="mdi-close" size="small" variant="text" @click="handleCloseModal" />
     </template>
 
     <template #default>
@@ -44,22 +39,13 @@
         <div class="tw-flex tw-items-center tw-gap-2">
           <v-avatar
             :size="40"
-            :image="
-              inChargeMember?.student_member.user.avatar?.url || undefined
-            "
+            :image="inChargeMember?.student_member.user.avatar?.url || undefined"
             class="alex-avatar-group-border alex-avatar-group-margin"
             color="gray-100"
           >
-            <template
-              v-if="!inChargeMember?.student_member.user.avatar?.url"
-              #default
-            >
+            <template v-if="!inChargeMember?.student_member.user.avatar?.url" #default>
               <p class="text-gray-300 text-h4">
-                {{
-                  getInitials(
-                    inChargeMember?.student_member.user.fullname || '',
-                  )
-                }}
+                {{ getInitials(inChargeMember?.student_member.user.fullname || '') }}
               </p>
             </template>
           </v-avatar>
@@ -77,15 +63,12 @@
           <alex-custom-chip
             class="tw-w-fit"
             :status="statusColor"
-            :text="
-              $t(`components.courses.tasks.task.status.${status || 'draft'}`)
-            "
+            :text="$t(`components.courses.tasks.task.status.${status || 'draft'}`)"
           />
         </div>
         <div class="d-flex flex-column gap-2 tw-w-full">
           <p class="text-body-4 text-gray-800 mb-1">
-            <span class="text-tag-orange-light">* </span
-            >{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
+            <span class="text-tag-orange-light">* </span>{{ $t('components.learningPlan.drawer.task.date.finalLabel') }}
           </p>
 
           <alex-learningplan-task-date v-model="finishAt" edit />
@@ -101,11 +84,7 @@
             <div class="d-flex gap-2">
               <alex-custom-switch
                 v-model="canSubmitAfterDeadline"
-                :label="
-                  $t(
-                    'components.learningPlan.drawer.task.allowSendAfterSubmission',
-                  )
-                "
+                :label="$t('components.learningPlan.drawer.task.allowSendAfterSubmission')"
                 :disabled="canSubmitAfterDeadlineTask"
               />
             </div>
@@ -131,11 +110,7 @@
             <alex-learningplan-task-description
               v-if="submissionDesc"
               v-model="submissionDesc"
-              :title="
-                $t(
-                  'components.learningPlan.drawer.task.description.submissionLabel',
-                )
-              "
+              :title="$t('components.learningPlan.drawer.task.description.submissionLabel')"
             />
           </div>
           <div class="d-flex flex-column gap-2 tw-w-fit">
@@ -160,12 +135,8 @@
               </p>
             </template>
             <template v-else>
-              <alex-custom-skeleton
-                color="gray-blue"
-                class="tw-w-[96px] tw-h-[19px]" />
-              <alex-custom-skeleton
-                color="gray-blue"
-                class="tw-w-[256px] tw-h-[64px]"
+              <alex-custom-skeleton color="gray-blue" class="tw-w-[96px] tw-h-[19px]" />
+              <alex-custom-skeleton color="gray-blue" class="tw-w-[256px] tw-h-[64px]"
             /></template>
           </div>
         </template>
@@ -201,12 +172,8 @@
 
           <alex-learningplan-task-drawer-contracts-button
             v-if="student"
-            :tooltip-text="
-              $t('components.learningPlan.contract.warning.tooltip.once')
-            "
-            :text="
-              $t('components.learningPlan.contract.reward.rewardSingleStudent')
-            "
+            :tooltip-text="$t('components.learningPlan.contract.warning.tooltip.once')"
+            :text="$t('components.learningPlan.contract.reward.rewardSingleStudent')"
             variant="warning"
             :loading="contractLoading"
             :disabled="status !== 'done'"
@@ -214,9 +181,7 @@
           />
           <alex-learningplan-task-drawer-contracts-button
             v-else-if="group"
-            :tooltip-text="
-              $t('components.learningPlan.contract.warning.tooltip.once')
-            "
+            :tooltip-text="$t('components.learningPlan.contract.warning.tooltip.once')"
             :text="$t('components.learningPlan.contract.reward.rewardStudents')"
             variant="warning"
             :loading="contractLoading"
@@ -229,15 +194,11 @@
             {{ $t('components.learningPlan.contract.warning.secondThoughts') }}
           </p>
           <p class="text-body-4 text-gray-500">
-            {{
-              $t('components.learningPlan.contract.warning.abortConsequences')
-            }}
+            {{ $t('components.learningPlan.contract.warning.abortConsequences') }}
           </p>
 
           <alex-learningplan-task-drawer-contracts-button
-            :tooltip-text="
-              $t('components.learningPlan.contract.warning.tooltip.fee')
-            "
+            :tooltip-text="$t('components.learningPlan.contract.warning.tooltip.fee')"
             :text="$t('components.learningPlan.contract.warning.finish')"
             variant="error"
             :loading="contractLoading"
@@ -277,7 +238,6 @@
               avatarUrl: member.student_member.user?.avatar?.url,
               responsable: member.role === 'in_charge',
             }"
-            :edit="false"
           />
         </template>
       </alex-learningplan-task-tabs>
@@ -346,7 +306,6 @@ const props = withDefaults(defineProps<TaskUserDrawerProps>(), {
 });
 const { t } = useI18n();
 
-
 const { contractAddress } = toRefs(props);
 
 const {
@@ -372,9 +331,7 @@ const handleRewardSingleStudent = async () => {
 
 const wallets = computed(
   () =>
-    (props.group?.group_members
-      .map((m) => m.student_member.user.wallet?.address)
-      .filter(Boolean) || []) as string[],
+    (props.group?.group_members.map((m) => m.student_member.user.wallet?.address).filter(Boolean) || []) as string[],
 );
 
 const handleRewardGroup = async () => {
@@ -414,8 +371,7 @@ const handleHasTheStudentBeenPaid = async () => {
   return temp;
 };
 
-if (contractAddress.value)
-  isRewarded.value = await handleHasTheStudentBeenPaid();
+if (contractAddress.value) isRewarded.value = await handleHasTheStudentBeenPaid();
 
 const isThereBalance = computed(() => contractBalance.value > 0);
 
@@ -429,9 +385,7 @@ const handleCancelContract = async () => {
   emit('update:contract-address', null);
 };
 
-const disablePayment = computed(
-  () => isRewarded.value && props.status === 'done',
-);
+const disablePayment = computed(() => isRewarded.value && props.status === 'done');
 
 const isSendingMessage = ref(false);
 const submissionDesc = ref<any | undefined>(props.submission?.description);
@@ -443,9 +397,7 @@ type Emit = {
   'update:contract-address': [value: string | null];
 };
 const emit = defineEmits<Emit>();
-const canSubmitAfterDeadline = toRef(
-  props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask,
-);
+const canSubmitAfterDeadline = toRef(props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask);
 const finishAt = toRef(props.finishAt);
 const activePage = ref(props.group ? '0' : '1');
 const initials = computed(() => {
@@ -522,17 +474,13 @@ const {
   data: submissions,
   execute: executeSubmissions,
   pending,
-} = await useAsyncData(
-  'task-submissions',
-  () => getSubmissions(props.taskMemberId),
-  {
-    default: () => ({
-      meta: { total: 0 },
-      data: [] as TaskSubmissionSimple[],
-    }),
-    lazy: true,
-  },
-);
+} = await useAsyncData('task-submissions', () => getSubmissions(props.taskMemberId), {
+  default: () => ({
+    meta: { total: 0 },
+    data: [] as TaskSubmissionSimple[],
+  }),
+  lazy: true,
+});
 
 const {
   data: events,
@@ -565,10 +513,7 @@ const evaluatedSubmissions = computed(() =>
   ),
 );
 
-const mostRecentSubmission = computed(
-  () =>
-    submissions.value.data.filter((submission) => submission.submitted_at)[0],
-);
+const mostRecentSubmission = computed(() => submissions.value.data.filter((submission) => submission.submitted_at)[0]);
 const getSubmissionStatus = (submission?: TaskSubmissionSimple) => {
   if (submission?.evaluated_at) {
     return 'reviewed';
@@ -596,9 +541,7 @@ const handleSubmitMessage = async (
 ) => {
   try {
     if ((!text && !audio) || !user.value) return;
-    let learningMember = learningplanStore.activeMembers.find(
-      (member) => member.user.id === user?.value?.id,
-    );
+    let learningMember = learningplanStore.activeMembers.find((member) => member.user.id === user?.value?.id);
     if (learningplanStore.facilitator?.user.id === user.value.id) {
       learningMember = learningplanStore.facilitator;
     }
@@ -646,11 +589,7 @@ const handleSubmitMessage = async (
     });
     messages.value.data = [...messages.value.data, message];
   } catch (error) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.sendMessage'),
-      'error',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.errors.sendMessage'), 'error', true);
   } finally {
     isSendingMessage.value = false;
   }
@@ -667,11 +606,7 @@ const changeDeadline = async (value?: string | null) => {
       emit('change-finish-at', props.taskMemberId, value);
       return;
     }
-    emit(
-      'change-finish-at',
-      props.taskMemberId,
-      (value as Date).toISOString().split('T')[0],
-    );
+    emit('change-finish-at', props.taskMemberId, (value as Date).toISOString().split('T')[0]);
   } catch (error) {
     setMessage(t('pages.tasks.errors.updateDeadlineMember'), 'error', true);
   }
@@ -697,8 +632,7 @@ watch(canSubmitAfterDeadline, changeSendAfterDeadline);
 watch(model, (value) => {
   if (value) {
     finishAt.value = props.finishAt;
-    canSubmitAfterDeadline.value =
-      props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
+    canSubmitAfterDeadline.value = props.canSubmitAfterDeadline || props.canSubmitAfterDeadlineTask;
     setSubmissionDescription();
     executeSubmissions();
     executeEvents();

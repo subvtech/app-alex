@@ -148,11 +148,12 @@
         <v-window-item value="1"> <alex-learningplan-task-events v-model="taskEvents" /></v-window-item>
         <v-window-item value="2">
           <alex-learningplan-task-members
-            :learningplan-id="learningplanId"
+            :learningplan-ids="[learningplanId]"
             :task-id="taskId"
             :type="type"
             :start-at="startDate"
             :finish-at="endDate"
+            :members="members || []"
             :submit-after-deadline="sendAfterDeadline"
             :block-delete="hasAtLeastSubmission"
             @change-members="$emit('change-members')"
@@ -240,7 +241,8 @@ const tags = ref(props.tags);
 const title = ref(props.title);
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
-const { members, taskId } = toRefs(props);
+
+const members = toRef(props.members);
 
 const hasAtLeastSubmission = computed(() => !!members.value.filter((member) => member.last_submission_at).length);
 
@@ -497,7 +499,7 @@ watch(endDate, async (value) => {
   }
 
   endDateComp.value?.close();
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     finish_at: value,
   });
   emit('change-members');
@@ -510,19 +512,19 @@ watch(startDate, async (value) => {
   }
 
   startDateComp.value?.close();
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     start_at: value,
   });
   emit('change-members');
 });
 watch(restrictions, async (value) => {
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     allowed_editor_plugins: value,
   });
 });
 watch(type, async (value) => {
   if (!value) return;
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     type: value,
   });
 });
@@ -535,7 +537,7 @@ watch(statusRef, async (value) => {
     deployContract.value = null;
     contractAddress.value = newContractAddress;
   }
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     status: value,
   });
 });
@@ -543,7 +545,7 @@ watch(goals, async (value) => {
   if (!value) return;
   const goalsId = goals.value.map((goal) => goal.id);
   // if (!goalsId.length) return;
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     learning_goals: {
       set: goalsId,
     },
@@ -551,12 +553,12 @@ watch(goals, async (value) => {
   emit('change-goals', value);
 });
 watch(sendAfterDeadline, async (value) => {
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     can_submit_after_deadline: value,
   });
 });
 watch(hasSubmission, async (value) => {
-  await updateTaskValues(taskId.value, {
+  await updateTaskValues(props.taskId, {
     submission_required: value,
   });
 });

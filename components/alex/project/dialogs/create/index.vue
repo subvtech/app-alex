@@ -181,9 +181,9 @@
     </template>
     <template #step3>
       <alex-learningplan-task-members
-        kind="project"
         :learningplan-ids="associatedCourses.map((course) => course.id)"
-        :students="students"
+        :members="students"
+        is-project
         @set-members="(e) => (students = e)"
       />
     </template>

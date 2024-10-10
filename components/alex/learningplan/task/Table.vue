@@ -122,8 +122,8 @@
 </template>
 
 <script setup lang="ts">
-import { TaskItem } from './Container.vue';
 import { TaskStatus } from '~/models/simple/taskSimple.model';
+import { TaskItem } from './Container.vue';
 
 interface sortType {
   key: string;

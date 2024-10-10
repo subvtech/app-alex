@@ -1,6 +1,15 @@
 <template>
-  <v-navigation-drawer :id="drawerId" v-model="model" location="right" temporary floating :width="640"
-    scrim="transparent" sticky class="task-details-drawer pa-6 pt-2 rounded-s-lg">
+  <v-navigation-drawer
+    :id="drawerId"
+    v-model="model"
+    location="right"
+    temporary
+    floating
+    :width="640"
+    scrim="transparent"
+    sticky
+    class="task-details-drawer pa-6 pt-2 rounded-s-lg"
+  >
     <template #prepend>
       <div class="d-flex align-center justify-end">
         <alex-custom-button icon="mdi-close" size="small" variant="text" @click="model = false" />
@@ -22,12 +31,14 @@
           {{ $t('components.learningPlan.drawer.task.type.label') }}
         </p>
 
-        <alex-learningplan-task-options v-model="type" :config="{
-          group: $t('components.learningPlan.drawer.task.type.collective'),
-          individual: $t(
-            'components.learningPlan.drawer.task.type.individual',
-          ),
-        }" :placeholder="$t('components.learningPlan.drawer.missing.type')" />
+        <alex-learningplan-task-options
+          v-model="type"
+          :config="{
+            group: $t('components.learningPlan.drawer.task.type.collective'),
+            individual: $t('components.learningPlan.drawer.task.type.individual'),
+          }"
+          :placeholder="$t('components.learningPlan.drawer.missing.type')"
+        />
       </v-col>
       <v-col cols="6">
         <p class="text-body-4 text-gray-800 mb-1">
@@ -55,22 +66,33 @@
       <template v-if="submission">
         <alex-learningplan-task-restrictions v-model="restrictionsValue" class="mt-4" />
 
-        <alex-learningplan-task-description v-if="submissionDescription" v-model="submissionDescription" class="mt-4"
-          :title="$t(
-            'components.learningPlan.drawer.task.description.submissionLabel',
-          )
-            " />
+        <alex-learningplan-task-description
+          v-if="submissionDescription"
+          v-model="submissionDescription"
+          class="mt-4"
+          :title="$t('components.learningPlan.drawer.task.description.submissionLabel')"
+        />
 
         <div class="mt-4">
           <p class="text-body-4 mb-2">
             {{ $t('components.courses.tasks.submission.last_submission') }}
           </p>
-          <alex-learningplan-task-submission v-if="!loadingSubmission" type="student"
-            :status="getSubmissionStatus(submissions.data[0], status)" :mark="mostRecentSubmission?.grade"
-            :max-mark="mostRecentSubmission?.grade" :task-title="title" :task-deadline="finalDate"
-            :restrictions="restrictionsValue" :task-member-id="taskMemberId" :content="submissions.data[0]"
-            :task-status="status" :doc-name="docName" @update-task-status="handleChangeStatus"
-            @update-submission="$emit('update-submission')" />
+          <alex-learningplan-task-submission
+            v-if="!loadingSubmission"
+            type="student"
+            :status="getSubmissionStatus(submissions.data[0], status)"
+            :mark="mostRecentSubmission?.grade"
+            :max-mark="mostRecentSubmission?.grade"
+            :task-title="title"
+            :task-deadline="finalDate"
+            :restrictions="restrictionsValue"
+            :task-member-id="taskMemberId"
+            :content="submissions.data[0]"
+            :task-status="status"
+            :doc-name="docName"
+            @update-task-status="handleChangeStatus"
+            @update-submission="$emit('update-submission')"
+          />
           <div v-if="loadingSubmission">
             <alex-custom-skeleton color="gray-blue" class="tw-w-full tw-h-[61px]" />
           </div>
@@ -79,35 +101,60 @@
       <alex-custom-chip v-else class="mt-2" text="Sem entrega" variant="outlined" size="small" />
     </div>
 
-    <alex-learningplan-task-resources v-if="blocks && blocks.length > 0 && trail" v-model="resourcesOpen" class="mt-6"
-      :edit="false" :task-id="taskId" :trail-id="trail?.id" :blocks="blocks" :task-member-id="taskMemberId" />
+    <alex-learningplan-task-resources
+      v-if="blocks && blocks.length > 0 && trail"
+      v-model="resourcesOpen"
+      class="mt-6"
+      :task-id="taskId"
+      :trail-id="trail?.id"
+      :blocks="blocks"
+      :task-member-id="taskMemberId"
+    />
 
-    <alex-learningplan-task-tabs v-model="activeTab" v-model:attached-message="attachedMessage"
-      v-model:attached-submission="attachedSubmission" class="mt-6" :task-member="{
+    <alex-learningplan-task-tabs
+      v-model="activeTab"
+      v-model:attached-message="attachedMessage"
+      v-model:attached-submission="attachedSubmission"
+      class="mt-6"
+      :task-member="{
         id: taskMemberId,
         status,
-      }" :task="{
+      }"
+      :task="{
         id: taskId,
         title,
         finalDate,
         restrictions: submission?.constraints || [],
-      }" :show-member-tab="!!group" :is-sending-message="isSendingMessage" :message="{ isLoading: pendingMessages }"
-      :event="{ events: events.data, isLoading: eventLoading }" :submission="!!submission"
-      :selector-parent="`#${drawerId} .v-navigation-drawer__content`" :submissions="evaluatedSubmissions">
+      }"
+      :show-member-tab="!!group"
+      :is-sending-message="isSendingMessage"
+      :message="{ isLoading: pendingMessages }"
+      :event="{ events: events.data, isLoading: eventLoading }"
+      :submission="!!submission"
+      :selector-parent="`#${drawerId} .v-navigation-drawer__content`"
+      :submissions="evaluatedSubmissions"
+    >
       <template v-if="learningplanStore.learningPlan" #members>
-        <alex-learningplan-task-members-card v-for="member in group?.participants" :key="`group-member${member.name}`"
+        <alex-learningplan-task-members-card
+          v-for="member in group?.participants"
+          :key="`group-member${member.name}`"
           :member="{
             name: member.name,
             class: group?.name,
             avatarUrl: member.image?.url,
             responsable: member.role === 'in_charge',
-          }" :edit="false" />
+          }"
+        />
       </template>
     </alex-learningplan-task-tabs>
     <template v-if="activeTab === '3'" #append>
-      <alex-learningplan-task-chat-input v-model:attached-message="attachedMessage"
-        v-model:attached-submission="attachedSubmission" class="border-top-1 border-gray-100 pt-3"
-        :submissions="evaluatedSubmissions" @submit="(data) =>
+      <alex-learningplan-task-chat-input
+        v-model:attached-message="attachedMessage"
+        v-model:attached-submission="attachedSubmission"
+        class="border-top-1 border-gray-100 pt-3"
+        :submissions="evaluatedSubmissions"
+        @submit="
+          (data) =>
             handleSubmitMessage(
               data.text,
               data.audio?.blob,
@@ -115,16 +162,17 @@
               data.attachedMessage,
               data.attachedSubmission,
             )
-          " />
+        "
+      />
     </template>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
 import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
-import { RestrictionValue } from '../Restrictions.vue';
-import { TaskStudent } from '../kanban/index.vue';
 import { TaskMemberStatus } from '~/models/simple/taskSimple.model';
+import { TaskStudent } from '../kanban/index.vue';
+import { RestrictionValue } from '../Restrictions.vue';
 import { learningPlanGroupMemberRoles } from '#imports';
 
 const model = defineModel<boolean>({ required: true });
@@ -143,10 +191,10 @@ interface DetailsDrawerProps {
     name: string;
     participants: {
       image?:
-      | {
-        url: string;
-      }
-      | undefined;
+        | {
+            url: string;
+          }
+        | undefined;
       name: string;
       learning_class?: string;
       role?: learningPlanGroupMemberRoles;
@@ -229,12 +277,11 @@ const getEvents = (memberID: number) =>
     },
   });
 
-const { data: submissions, execute: executeSubmissions } =
-  await useTaskSubmission(taskMemberId, {
-    lazy: true,
-    watch: [taskMemberId],
-    dedupe: 'cancel',
-  });
+const { data: submissions, execute: executeSubmissions } = await useTaskSubmission(taskMemberId, {
+  lazy: true,
+  watch: [taskMemberId],
+  dedupe: 'cancel',
+});
 const {
   data: events,
   execute: executeEvents,
@@ -250,28 +297,22 @@ const evaluatedSubmissions = computed(() =>
   submissions.value.data.flatMap((submission) =>
     submission.submitted_at
       ? [
-        {
-          id: submission.id,
-          justification: {
-            text: submission.justification,
-          },
-          mark: submission.grade,
-          time: new Date(submission.evaluated_at || submission.createdAt),
-          status: submission.evaluated_at ? 'reviewed' : 'in_review',
-          submission,
-        } as AttachedSubmission,
-      ]
+          {
+            id: submission.id,
+            justification: {
+              text: submission.justification,
+            },
+            mark: submission.grade,
+            time: new Date(submission.evaluated_at || submission.createdAt),
+            status: submission.evaluated_at ? 'reviewed' : 'in_review',
+            submission,
+          } as AttachedSubmission,
+        ]
       : [],
   ),
 );
-const mostRecentSubmission = computed(
-  () =>
-    submissions.value.data.filter((submission) => submission.evaluated_at)[0],
-);
-const getSubmissionStatus = (
-  submission?: TaskSubmissionSimple,
-  status?: TaskMemberStatus,
-) => {
+const mostRecentSubmission = computed(() => submissions.value.data.filter((submission) => submission.evaluated_at)[0]);
+const getSubmissionStatus = (submission?: TaskSubmissionSimple, status?: TaskMemberStatus) => {
   if (!submission) {
     return 'not_started';
   }
@@ -302,9 +343,7 @@ const handleSubmitMessage = async (
 ) => {
   try {
     if ((!text && !audio) || !user.value) return;
-    let learningMember = learningplanStore.activeMembers.find(
-      (member) => member.user.id === user?.value?.id,
-    );
+    let learningMember = learningplanStore.activeMembers.find((member) => member.user.id === user?.value?.id);
     if (learningplanStore.facilitator?.user.id === user.value.id) {
       learningMember = learningplanStore.facilitator;
     }
@@ -352,11 +391,7 @@ const handleSubmitMessage = async (
     });
     messages.value.data = [...messages.value.data, message];
   } catch (error) {
-    setMessage(
-      t('components.learningPlan.drawer.task.errors.sendMessage'),
-      'error',
-      true,
-    );
+    setMessage(t('components.learningPlan.drawer.task.errors.sendMessage'), 'error', true);
   } finally {
     isSendingMessage.value = false;
   }
@@ -387,8 +422,7 @@ watch(model, (value) => {
   }
   submissions.value = { data: [], meta: { total: 0 } };
   events.value = { data: [], meta: { total: 0 } };
-  if (messages.value)
-    messages.value.data = [];
+  if (messages.value) messages.value.data = [];
 });
 
 watch(
