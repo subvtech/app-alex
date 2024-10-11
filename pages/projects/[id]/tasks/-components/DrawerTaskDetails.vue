@@ -128,6 +128,7 @@
           :trail-id="props.task?.trail?.id"
           :blocks="blocks"
           teacher
+          project
           edit
         />
 
