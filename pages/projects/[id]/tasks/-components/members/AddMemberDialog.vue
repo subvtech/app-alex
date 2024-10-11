@@ -117,6 +117,7 @@ const queryClient = useQueryClient();
 
 // Methods
 const handleSubmit = () => {
+  console.log({ props });
   if (!props.groupId) {
     setMessage(t('components.learningPlan.drawer.task.errors.missingDefaultGroup'), 'error', true);
     return;

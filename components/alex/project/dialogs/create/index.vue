@@ -183,7 +183,6 @@
       <alex-learningplan-task-members
         :learningplan-ids="associatedCourses.map((course) => course.id)"
         :members="students"
-        is-project
         @set-members="(e) => (students = e)"
       />
     </template>

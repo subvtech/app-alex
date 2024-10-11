@@ -37,7 +37,7 @@
             :placeholder="selectedSprint ? 'Selecionar status' : 'Não iniciado'"
             :items="statusOptions"
             item-title="title"
-            :edit="selectedSprint"
+            :edit="!!selectedSprint"
           />
         </v-col>
         <v-col v-if="task?.organization === 'standard'" cols="6">
@@ -111,7 +111,7 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
-import Members from './members/Index.vue';
+import Members from './members/index.vue';
 interface DrawerProjectProps {
   task?: SprintTask;
   sprints?: SprintSimple[];

@@ -29,7 +29,7 @@
         />
 
         <alex-learningplan-task-dialog-add-member
-          v-if="!isGroup && isTask"
+          v-if="!isGroup && isTypeDefined && isTask"
           v-model="addMemberDialog"
           :learningplan-id="props.learningplanIds[0]"
           :members="membersRef"
@@ -54,7 +54,7 @@
           @invite="(members) => (membersRef = members)"
         />
 
-        <alex-custom-dropdown :items="typeOptions" :disabled="!!type || isProject">
+        <alex-custom-dropdown :items="typeOptions" :disabled="isTypeDefined || isProject">
           <template #activator="{ props: propsDropdown }">
             <alex-custom-button
               v-bind="propsDropdown"
@@ -149,11 +149,9 @@
       </div>
     </template>
     <template #loader>
-      <v-row>
-        <v-col v-for="(_, k) in [0, 1, 2, 3]" :key="k" cols="12" sm="6" xl="3">
-          <v-skeleton-loader class="border" type="image, article"></v-skeleton-loader>
-        </v-col>
-      </v-row>
+      <div class="tw-flex tw-items-center tw-justify-center">
+        <v-progress-circular color="secondary-0" indeterminate></v-progress-circular>
+      </div>
     </template>
     <template #footer="{ pageCount, groupedItems }">
       <div v-if="groupedItems.length && membersRef.length > itemsPerPage" class="d-flex align-center ga-2 pa-6">
@@ -257,6 +255,7 @@ const checkHasFilledDates = computed(() => {
 
 const isTask = computed(() => !props.isProject);
 const isGroup = computed(() => props.type === 'group');
+const isTypeDefined = computed(() => props.type !== null);
 
 const getMembers = () =>
   strapiUtils.find<TaskMember>('task-members', {
@@ -299,8 +298,6 @@ const showingData = (items: any[], pageItems: any[], search: string, pageCount: 
 
 const fetchTaskMembers = async () => {
   const temp = await getMembers();
-  console.log('fetchTaskMembers');
-  console.log({ temp, membersRef: membersRef.value });
   membersRef.value = temp.data;
 };
 const addMember = async (members: LearningPlanMemberSimple[]) => {
@@ -343,16 +340,8 @@ const removeMember = async (memberEmail: string | undefined, memberId: number, m
     isLoading.value = true;
 
     await strapi.delete('task-members', memberId);
-    console.log({
-      typeofMembersRef: typeof membersRef.value,
-      membersRef: membersRef.value,
-      memberEmail,
-      memberId,
-      memberName,
-    });
     membersRef.value = [
       ...membersRef.value.filter((student) => {
-        console.log({ student, learning_plan_member: student.learning_plan_member });
         return (
           student.learning_plan_member &&
           (student.learning_plan_member?.user.id !== memberId ||
@@ -370,7 +359,6 @@ const removeMember = async (memberEmail: string | undefined, memberId: number, m
     );
     emit('change-members');
   } catch (error) {
-    console.log(error);
     setMessage(t('components.learningPlan.drawer.task.errors.removeMember'), 'error', true);
   } finally {
     isLoading.value = false;
