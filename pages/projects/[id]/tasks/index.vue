@@ -66,11 +66,14 @@ watch(sprints, (value) => {
         <alex-custom-skeleton class="w-100 max-w-80 mr-6 min-w-60 height-11" color="gray-300" />
         <alex-custom-skeleton class="w-100 max-w-11 height-11" color="gray-300" />
       </div>
-      <div v-else class="w-100 d-flex justify-space-between align-center height-18 header px-6 gap-2">
+      <div
+        v-else
+        class="w-100 d-flex justify-space-between align-center min-height-18 pt-6 pb-4 header px-6 gap-2 flex-wrap"
+      >
         <alex-inputs-text-field
           v-model="search"
           hide-details
-          class="tw-w-[300px]"
+          class="tw-w-full sm:tw-w-[300px]"
           density="comfortable"
           name="search"
           prepend-inner-icon="mdi-magnify"
