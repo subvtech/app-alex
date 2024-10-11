@@ -156,13 +156,13 @@
 <script setup lang="ts">
 import Options from '@/pages/projects/[id]/tasks/-components/Options.vue';
 import { isBefore } from 'date-fns';
+import { WritableComputedRef } from 'vue';
 import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import { RestrictionValue } from '~/components/alex/learningplan/task/Restrictions.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
 import Members from './members/Index.vue';
-import { RestrictionValue } from '~/components/alex/learningplan/task/Restrictions.vue';
-import { WritableComputedRef } from 'vue';
 
 interface DrawerProjectProps {
   task?: SprintTask;
@@ -203,7 +203,12 @@ const selectedSprint = ref<SprintSimple>();
 const selectedHistory = ref<TaskSimple | null>(null);
 const selectedParent = ref<TaskSimple | null | undefined>(undefined);
 const description = ref<string>('');
-const mentionUsers = computed(() => []);
+const mentionUsers = computed(() => {
+  if (!props.task?.task_members?.[0]) return [];
+  return (
+    props.task.task_members[0].learning_plan_group?.group_members.map((member) => member.student_member.user) || []
+  );
+});
 const hasAtLeastSubmission = computed(
   () => !!props.task?.task_members?.filter((member) => member.last_submission_at).length,
 );
