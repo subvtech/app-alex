@@ -359,7 +359,7 @@ export const useFormRules = () => {
       .min(4, ({ min }) => i18n.t('rules.title.min', { min }))
       .max(64, ({ max }) => i18n.t('rules.title.max', { max }))
       .trim(),
-    date: yup
+    startDate: yup
       .date()
       .required(i18n.t('rules.meeting.date.required'))
       .min(currentDate, ({ min }) => {
@@ -367,13 +367,13 @@ export const useFormRules = () => {
           min: min.toLocaleString(i18n.locale.value).split(',')[0],
         });
       }),
-    startHour: yup.string().required(i18n.t('rules.meeting.startHour.required')),
-    endHour: yup
+    startTime: yup.string().required(i18n.t('rules.meeting.startHour.required')),
+    endDate: yup
       .string()
       .required(i18n.t('rules.meeting.endHour.required'))
       .test('endHourTest', i18n.t('rules.meeting.endHour.beforeStartHour'), (value, ctx) => {
-        const { startHour } = ctx.parent;
-        return isSameOrBeforeHour(value, startHour) === 1;
+        const { startTime } = ctx.parent;
+        return isSameOrBeforeHour(value, startTime) === 1;
       }),
   });
 
