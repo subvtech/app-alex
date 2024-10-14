@@ -11,14 +11,11 @@ const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
 
-// const page = ref(1);
 const search = ref('');
 const showAddTrailDialog = ref(false);
 
 const myCollabs = ref<TrailSimple[] | undefined>(undefined);
 const myTrails = ref<TrailSimple[] | undefined>(undefined);
-
-// const ITEMS_PER_PAGE = 12;
 
 const trails = computed<TrailSimple[]>(() => {
   return (
@@ -51,42 +48,64 @@ const filteredMyCollabs = computed<TrailSimple[]>(
     ) ?? [],
 );
 
-// const getShowingMessage = (total: number) => {
-//   const itemsPerPage = search.value === '' ? ITEMS_PER_PAGE : total;
+const formattedCount = (count: number | undefined) => {
+  if (count === undefined) {
+    count = 0;
+  }
 
-//   const to = page.value * itemsPerPage > trails.value.length ? trails.value.length : page.value * itemsPerPage;
+  return count.toString().padStart(2, '0');
+};
 
-//   return to === 0
-//     ? t('pages.trails.noData')
-//     : t('pages.trails.showingData', {
-//         to,
-//         from: (page.value - 1) * itemsPerPage + 1,
-//         total: trails.value.length,
-//       });
-// };
+const formatTrail = (trail: TrailSimple) => {
+  const blocks = trail.structures ?? [];
+  return { ...trail, blocks };
+};
 
-const toggleVisibility = (index: number, id: number) => {
-  const hidden = !trails.value[index].hidden;
+// Toggle visibility
+const updateTrailHidden = (trail: TrailSimple, id: number, hidden: boolean) => {
+  if (trail.id === id) {
+    trail.hidden = hidden;
+  }
+
+  return trail;
+};
+
+const toggleVisibility = async (id: number, hidden: boolean) => {
+  hidden = !hidden;
 
   try {
-    learningPlanStore.standardTrails[index].hidden = hidden;
-    update('trails', id, { hidden });
+    learningPlanStore.standardTrails.map((trail) => updateTrailHidden(trail, id, hidden));
+
+    myCollabs.value?.map((trail) => updateTrailHidden(trail, id, hidden));
+    myTrails.value?.map((trail) => updateTrailHidden(trail, id, hidden));
+
+    await update('trails', id, { hidden });
   } catch (error) {
-    learningPlanStore.standardTrails[index].hidden = !hidden;
+    learningPlanStore.standardTrails.map((trail) => updateTrailHidden(trail, id, !hidden));
+
+    myCollabs.value?.map((trail) => updateTrailHidden(trail, id, !hidden));
+    myTrails.value?.map((trail) => updateTrailHidden(trail, id, !hidden));
+
+    setMessage('Falha ao alterar visibilidade', 'error', true);
   }
 };
 
 const navigate = (trailId: number, page?: string) => {
-  const { id, memberId } = route.params;
+  const { id } = route.params;
   const slug = page === 'settings' ? '/settings' : '';
-  navigateTo(`/projects/${id}/individual_learning/${memberId}/trails/${trailId}${slug}`);
+  navigateTo(`/projects/${id}/trails/${trailId}${slug}`);
 };
 
-const handleTrailCreate = async (trailId: number) => {
+const handleTrailCreate = async (trailId: number, learningStructure) => {
+  console.log('Learning structure', learningStructure);
   const populate = ['cover_image', 'structures.blocks'];
   const trail = await findOne('trails', trailId, { populate });
   learningPlanStore.standardTrails.unshift(trail.data as TrailSimple);
   showAddTrailDialog.value = false;
+
+  if (myTrails.value) {
+    myTrails.value = [...myTrails.value, formatTrail(trail.data as TrailSimple)];
+  }
 };
 
 onBeforeMount(() => {
@@ -104,10 +123,7 @@ onBeforeMount(() => {
     },
   })
     .then(({ data }) => {
-      myTrails.value = (data as TrailSimple[]).map((trail) => {
-        const { blocks = [] } = trail.structures.at(-1) || {};
-        return { ...trail, blocks };
-      });
+      myTrails.value = (data as TrailSimple[]).map(formatTrail);
     })
     .catch(() => setMessage('Falha ao carregar suas colaborações', 'error', true));
 
@@ -121,32 +137,16 @@ onBeforeMount(() => {
     },
   })
     .then(({ data }) => {
-      myCollabs.value = (data as TrailSimple[]).map((trail) => {
-        const { blocks = [] } = trail.structures.at(-1) || {};
-        return { ...trail, blocks };
-      });
-      console.log(data);
+      myCollabs.value = (data as TrailSimple[]).map(formatTrail);
     })
     .catch(() => setMessage('Falha ao carregar suas colaborações', 'error', true));
 });
-
-watch(
-  () => learningPlanStore.loading,
-  (loading) => {
-    if (!loading) {
-      console.log(learningPlanStore.standardTrails);
-    }
-  },
-);
 </script>
 
 <template>
   <div class="tw-flex tw-flex-1 tw-flex-col tw-bg-white tw-rounded-lg tw-p-6 tw-min-h-[500px]">
     <!-- Inputs -->
-    <div
-      class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1"
-      :class="!trails.length ? 'tw-justify-end' : 'tw-justify-between tw-mb-6'"
-    >
+    <div class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1 tw-justify-between tw-mb-6">
       <alex-inputs-text-field
         v-model="search"
         :placeholder="$t('pages.trails.searchPlaceholder')"
@@ -168,13 +168,13 @@ watch(
     <div class="mb-2">
       <div class="d-flex align-center ga-4 mb-4">
         <p class="text-gray-800 text-h5">Minhas Trilhas</p>
-        <p class="text-gray-400 text-body-2">{{ myTrails?.length ?? 0 }}</p>
+        <p class="text-gray-400 text-body-2">{{ formattedCount(myTrails?.length) }}</p>
       </div>
       <Loader v-if="myTrails === undefined" />
       <EmptyState v-else-if="!myTrails.length" />
       <div v-else class="tw-flex tw-flex-wrap tw-gap-6 mb-4">
         <alex-learningplan-trails-card
-          v-for="(item, index) in filteredMyTrails"
+          v-for="item in filteredMyTrails"
           :key="item.id"
           :hide="item.hidden"
           :name="item.title"
@@ -183,10 +183,10 @@ watch(
           :blocks="item?.blocks ?? []"
           class="flex-stretch"
           can-edit
-          @toggle-visibility="toggleVisibility(index, item.id)"
+          hide-copy
+          @toggle-visibility="toggleVisibility(item.id, item.hidden)"
           @configurations="navigate(item.id, 'settings')"
           @open="navigate(item.id)"
-          @copy="console.log(item.id)"
         />
       </div>
     </div>
@@ -195,13 +195,13 @@ watch(
     <div>
       <div class="d-flex align-center ga-4 mb-4">
         <p class="text-gray-800 text-h5">Minhas Colaborações</p>
-        <p class="text-gray-400 text-body-2">{{ myCollabs?.length ?? 0 }}</p>
+        <p class="text-gray-400 text-body-2">{{ formattedCount(myCollabs?.length) }}</p>
       </div>
       <Loader v-if="myCollabs === undefined" />
       <EmptyState v-else-if="!myCollabs.length" />
       <div v-else class="tw-flex tw-flex-wrap tw-gap-6 mb-4">
         <alex-learningplan-trails-card
-          v-for="(item, index) in filteredMyCollabs"
+          v-for="item in filteredMyCollabs"
           :key="item.id"
           :hide="item.hidden"
           :name="item.title"
@@ -210,10 +210,10 @@ watch(
           :blocks="item?.blocks ?? []"
           class="flex-stretch"
           can-edit
-          @toggle-visibility="toggleVisibility(index, item.id)"
+          hide-copy
+          @toggle-visibility="toggleVisibility(item.id, item.hidden)"
           @configurations="navigate(item.id, 'settings')"
           @open="navigate(item.id)"
-          @copy="console.log(item.id)"
         />
       </div>
     </div>

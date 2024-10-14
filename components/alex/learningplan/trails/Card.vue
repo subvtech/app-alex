@@ -26,10 +26,7 @@
         aspect-ratio="2.5"
       />
 
-      <v-tooltip
-        :text="$t('components.learningPlan.cardTrails.hidden')"
-        location="bottom center"
-      >
+      <v-tooltip :text="$t('components.learningPlan.cardTrails.hidden')" location="bottom center">
         <template #activator="{ props: propsTooltip }">
           <alex-custom-chip
             v-if="hide"
@@ -52,10 +49,7 @@
           :items="dropdownItems(hide)"
         >
           <template #activator="{ props: propsMenu, isActive }">
-            <v-tooltip
-              :text="$t('components.learningPlan.cardTrails.options')"
-              location="bottom center"
-            >
+            <v-tooltip :text="$t('components.learningPlan.cardTrails.options')" location="bottom center">
               <template #activator="{ props: optionsTooltipProps }">
                 <alex-custom-button
                   v-if="isHovering || isActive"
@@ -105,10 +99,7 @@
             :items="dropdownItems(hide)"
           >
             <template #activator="{ props: propsMenu }">
-              <v-tooltip
-                :text="$t('components.learningPlan.cardTrails.options')"
-                location="bottom center"
-              >
+              <v-tooltip :text="$t('components.learningPlan.cardTrails.options')" location="bottom center">
                 <template #activator="{ props: optionsTooltipProps }">
                   <alex-custom-button
                     variant="text"
@@ -138,17 +129,9 @@
           data-testid="trails-documents-tooltip"
         >
           <template #activator="{ props: propsTooltip }">
-            <div
-              class="documents"
-              v-bind="propsTooltip"
-              data-testid="trails-documents-icon"
-            >
-              <v-icon size="20" color="gray-600"
-                >mdi-text-box-multiple-outline</v-icon
-              >
-              <span data-testid="trails-documents-icon-counter-type">{{
-                blocks?.length || 0
-              }}</span>
+            <div class="documents" v-bind="propsTooltip" data-testid="trails-documents-icon">
+              <v-icon size="20" color="gray-600">mdi-text-box-multiple-outline</v-icon>
+              <span data-testid="trails-documents-icon-counter-type">{{ blocks?.length || 0 }}</span>
             </div>
           </template>
         </v-tooltip>
@@ -168,6 +151,7 @@ interface LearningPlanCard {
   hide?: boolean;
   blocks?: Block[];
   canEdit: boolean;
+  hideCopy?: boolean;
 }
 const { t } = useI18n();
 const props = withDefaults(defineProps<LearningPlanCard>(), {
@@ -175,14 +159,13 @@ const props = withDefaults(defineProps<LearningPlanCard>(), {
   hide: false,
   blocks: undefined,
   canEdit: false,
+  hideCopy: false,
 });
 const isHovering = ref(false);
 const direction = useDirection('mobile');
 const showOptions = ref(false);
 const isVertical = computed(() => direction.value === 'VERTICAL');
-const width = computed(() =>
-  isVertical.value ? { min: 240, max: 260 } : { min: 300, max: 350 },
-);
+const width = computed(() => (isVertical.value ? { min: 240, max: 260 } : { min: 300, max: 350 }));
 const isActiveTitleTooltip = computed(() => {
   if (isVertical.value) return props.name.length < 30;
   else return props.name.length < 30;
@@ -205,9 +188,7 @@ const listBlocks = computed(() => {
   let stringBlocks = '';
   if (blocksInfo.value) {
     for (const [key, value] of Object.entries(blocksInfo.value)) {
-      stringBlocks += `${value} ${t(
-        `components.learningPlan.cardTrails.${key + isPlural(value)}`,
-      )}; `;
+      stringBlocks += `${value} ${t(`components.learningPlan.cardTrails.${key + isPlural(value)}`)}; `;
     }
   }
   return stringBlocks;
@@ -241,15 +222,10 @@ const dropdownItems = (hidden: boolean) => {
       icon: 'mdi-content-copy',
       onClick: () => emits('copy'),
     },
-  ];
+  ].filter(({ icon }) => icon !== 'mdi-content-copy' || !props.hideCopy);
 };
 
-const emits = defineEmits([
-  'open',
-  'configurations',
-  'toggleVisibility',
-  'copy',
-]);
+const emits = defineEmits(['open', 'configurations', 'toggleVisibility', 'copy']);
 </script>
 
 <style scoped lang="scss">
