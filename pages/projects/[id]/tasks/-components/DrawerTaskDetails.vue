@@ -111,7 +111,7 @@ import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
 import { useGetKanban } from '../-composables/useKanban';
 import { useGetSprintGroupings } from '../-composables/useSprints';
 import { SprintTask } from '../-types';
-import Members from './members/index.vue';
+import Members from './members/Index.vue';
 interface DrawerProjectProps {
   task?: SprintTask;
   sprints?: SprintSimple[];
