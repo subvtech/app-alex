@@ -169,7 +169,7 @@
             variant="secondary"
             size="small"
             icon="mdi-trash-can-outline"
-            @click.stop="removeItem(index, 'course')"
+            @click.stop="removeItem(index, LearningPlanType.COURSE)"
           />
           <div class="text-shadow height-15 w-100 d-flex align-end">
             <p class="ellipsis lines-2 text-body-6 text-white mx-2 my-4">
@@ -263,7 +263,7 @@ const queryConfig = {
       },
     ],
     archived_at: { $notNull: false },
-    type: { $eq: 'course' },
+    type: { $eq: LearningPlanType.COURSE },
   },
   populate: {
     cover_image: true,
@@ -336,7 +336,7 @@ const removeItem = (index: number, type: string) => {
     const newAreas = [...projectInfo.value.areas];
     newAreas.splice(index, 1);
     projectInfo.value.areas = newAreas;
-  } else if (type === 'course') {
+  } else if (type === LearningPlanType.COURSE) {
     const newCourses = [...associatedCourses.value];
     newCourses.splice(index, 1);
     associatedCourses.value = newCourses;
@@ -415,7 +415,7 @@ const createProject = async () => {
     const usersData = students.value.map((student) => ({
       id: student.user?.id ?? student.id,
       email: student.user?.email ?? student.email,
-      role: 'student',
+      role: MemberRoles.STUDENT,
     }));
 
     const users = usersData.filter((user) => user.id);
@@ -424,7 +424,7 @@ const createProject = async () => {
     users.push({
       id: user.value.id,
       email: user.value.email,
-      role: 'student_leader',
+      role: MemberRoles.FACILITATOR,
     });
 
     loading.value = true;
@@ -436,7 +436,7 @@ const createProject = async () => {
         description: projectInfo.value.description,
         start_date: projectInfo.value.startDate,
         end_date: projectInfo.value.endDate,
-        type: 'project',
+        type: LearningPlanType.PROJECT,
         slug: slugFormated.value.toLocaleLowerCase(),
         fields: projectInfo.value.areas.length ? projectInfo.value.areas : [],
         product: projectInfo.value.product,

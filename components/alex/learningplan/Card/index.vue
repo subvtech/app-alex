@@ -12,17 +12,14 @@
       'vertical-grid card': isVertical,
       'horizontal-grid pa-2 column-gap-4': !isVertical,
       'hover-shadow': isHovering,
-      project: type === 'project',
+      project: type === LearningPlanType.PROJECT,
     }"
     @click="() => emits('open')"
     @mouseover="isHovering = true"
     @mouseleave="isHovering = false"
   >
     <div class="header" :class="{ rounded: !isVertical }">
-      <div
-        v-if="institution"
-        class="tw-absolute tw-bottom-2 tw-left-2 tw-p-1 tw-z-10 tw-bg-[#001a3395] tw-rounded-md"
-      >
+      <div v-if="institution" class="tw-absolute tw-bottom-2 tw-left-2 tw-p-1 tw-z-10 tw-bg-[#001a3395] tw-rounded-md">
         <img
           :src="institution.cover.url"
           :alt="image.alt"
@@ -40,17 +37,14 @@
       />
 
       <alex-custom-chip
-        v-if="type === 'course'"
+        v-if="type === LearningPlanType.COURSE"
         :text="$t(`components.learningPlan.card.type.${type}`)"
         size="small"
         status="primary"
         class="type"
         variant="elevated"
       />
-      <v-tooltip
-        :text="$t('components.learningPlan.card.hidden')"
-        location="bottom center"
-      >
+      <v-tooltip :text="$t('components.learningPlan.card.hidden')" location="bottom center">
         <template #activator="{ props: hiddenTooltipProps }">
           <alex-custom-chip
             v-if="hide"
@@ -65,14 +59,8 @@
         </template>
       </v-tooltip>
 
-      <div
-        data-testid="alex-learningplan-card-hover-area"
-        :class="{ hover: isHovering }"
-      >
-        <v-tooltip
-          :text="$t('components.learningPlan.card.favorite')"
-          location="bottom center"
-        >
+      <div data-testid="alex-learningplan-card-hover-area" :class="{ hover: isHovering }">
+        <v-tooltip :text="$t('components.learningPlan.card.favorite')" location="bottom center">
           <template #activator="{ props: favoritedTooltipProps }">
             <alex-custom-button
               v-if="isHovering && !hideFavoritedButton"
@@ -93,10 +81,7 @@
           :items="dropdownItems(hide)"
         >
           <template #activator="{ props: propsMenu, isActive }">
-            <v-tooltip
-              :text="$t('components.learningPlan.card.options')"
-              location="bottom center"
-            >
+            <v-tooltip :text="$t('components.learningPlan.card.options')" location="bottom center">
               <template #activator="{ props: optionsTooltipProps }">
                 <alex-custom-button
                   v-if="isHovering || isActive"
@@ -122,13 +107,7 @@
         'pa-4': isVertical,
       }"
     >
-      <alex-custom-chip
-        v-if="product"
-        :text="product"
-        status="primary"
-        variant="elevated"
-        class="tw-w-fit"
-      />
+      <alex-custom-chip v-if="product" :text="product" status="primary" variant="elevated" class="tw-w-fit" />
       <div class="d-flex flex-column tw-flex-grow pa-0 gap-2">
         <v-tooltip
           :text="title"
@@ -137,19 +116,14 @@
           :disabled="isActiveTitleTooltip"
         >
           <template #activator="{ props: nameTooltipProps }">
-            <h5
-              v-bind="nameTooltipProps"
-              class="text-h5 text-gray-900 ellipsis lines-2"
-            >
+            <h5 v-bind="nameTooltipProps" class="text-h5 text-gray-900 ellipsis lines-2">
               {{ title }}
             </h5>
           </template>
         </v-tooltip>
-        <v-card-subtitle
-          class="text-body-3 text-gray-600 ellipsis lines-3"
-          lines="three"
-          >{{ description }}</v-card-subtitle
-        >
+        <v-card-subtitle class="text-body-3 text-gray-600 ellipsis lines-3" lines="three">{{
+          description
+        }}</v-card-subtitle>
       </div>
 
       <div
@@ -159,29 +133,17 @@
         }"
       >
         <alex-learningplan-card-info
-          v-if="
-            (type === 'project' && leader) || (type === 'course' && facilitator)
-          "
+          v-if="(type === LearningPlanType.PROJECT && leader) || (type === LearningPlanType.COURSE && facilitator)"
           class="flex-1-1"
           :avatar="{
-            url:
-              type === 'project' && leader
-                ? leader?.imageURL
-                : facilitator.imageURL,
-            name:
-              type === 'project' && leader ? leader?.name : facilitator.name,
+            url: type === LearningPlanType.PROJECT && leader ? leader?.imageURL : facilitator.imageURL,
+            name: type === LearningPlanType.PROJECT && leader ? leader?.name : facilitator.name,
           }"
-          :title="
-            type === 'project'
-              ? 'Líder'
-              : $t('components.learningPlan.card.facilitator')
-          "
-          :subtitle="
-            type === 'project' && leader ? leader?.name : facilitator.name
-          "
+          :title="type === LearningPlanType.PROJECT ? 'Líder' : $t('components.learningPlan.card.facilitator')"
+          :subtitle="type === LearningPlanType.PROJECT && leader ? leader?.name : facilitator.name"
         />
         <alex-learningplan-card-info
-          v-if="type === 'course'"
+          v-if="type === LearningPlanType.COURSE"
           class="flex-1-1"
           icon="alex:trail"
           :title="$t('components.learningPlan.card.trails')"
@@ -189,18 +151,14 @@
         />
 
         <alex-custom-avatar-group
-          v-if="members && type !== 'course'"
+          v-if="members && type !== LearningPlanType.COURSE"
           class="tw-pl-2"
           :avatar-items="members"
           :size="36"
         />
       </div>
     </div>
-    <div
-      v-if="!isVertical && options"
-      class="h-full position-absolute"
-      style="right: 9px; top: 9px"
-    >
+    <div v-if="!isVertical && options" class="h-full position-absolute" style="right: 9px; top: 9px">
       <alex-inputs-dropdown
         v-model="showOptions"
         :close-on-content-click="false"
@@ -208,10 +166,7 @@
         :items="dropdownItems(hide)"
       >
         <template #activator="{ props: propsMenu }">
-          <v-tooltip
-            :text="$t('components.learningPlan.card.options')"
-            location="bottom center"
-          >
+          <v-tooltip :text="$t('components.learningPlan.card.options')" location="bottom center">
             <template #activator="{ props: optionsTooltipProps }">
               <alex-custom-button
                 variant="text"
@@ -236,7 +191,7 @@ interface member {
 }
 
 interface LearningPlanCardProps {
-  type?: 'project' | 'course' | 'course_project';
+  type?: LearningPlanType.PROJECT | LearningPlanType.COURSE | LearningPlanType.COURSE_PROJECT;
   title: string;
   image: { url: string; alt?: string };
   description: string;
@@ -257,7 +212,7 @@ const props = withDefaults(defineProps<LearningPlanCardProps>(), {
   hideFavoritedButton: false,
   favorited: false,
   hide: false,
-  type: 'course',
+  type: LearningPlanType.COURSE,
   status: 'start',
   members: () => [],
   product: undefined,
@@ -291,19 +246,12 @@ const dropdownItems = (hidden: boolean) => {
     },
   ];
 };
-const width = computed(() =>
-  isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 1280 },
-);
+const width = computed(() => (isVertical.value ? { min: 300, max: 375 } : { min: 300, max: 1280 }));
 const isActiveTitleTooltip = computed(() => {
   if (isVertical.value) return props.title.length < 60;
   else return props.title.length < 84;
 });
-const emits = defineEmits([
-  'open',
-  'favorite',
-  'configurations',
-  'toggleVisibility',
-]);
+const emits = defineEmits(['open', 'favorite', 'configurations', 'toggleVisibility']);
 </script>
 
 <style scoped lang="scss">
@@ -392,4 +340,3 @@ const emits = defineEmits([
   box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.1);
 }
 </style>
-

@@ -1,5 +1,5 @@
-import { InvitationLinkSimple } from './InvitationLinkSimple.model';
 import { ClassSimple } from './classSimple.model';
+import { InvitationLinkSimple } from './InvitationLinkSimple.model';
 
 const LearningPlanType = {
   COURSE: 'course',

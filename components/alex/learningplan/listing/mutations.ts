@@ -27,9 +27,9 @@ const queryConfig = (userID: number, type: LearningPlanType) => ({
     ],
     archived_at: { $notNull: false },
     type: {
-      ...(type !== 'course'
-        ? { $in: ['project', 'course_project'] }
-        : { $in: ['course'] }),
+      ...(type !== LearningPlanType.COURSE
+        ? { $in: [LearningPlanType.PROJECT, LearningPlanType.COURSE_PROJECT] }
+        : { $in: [LearningPlanType.COURSE] }),
     },
   },
   populate: {
@@ -60,8 +60,7 @@ export const getLeader = (members: LearningPlanMemberSimple[]) => {
   return members.find((m) => m.role === MemberRoles.LEADER);
 };
 const countTrails = (learningPlan: LearningPlanSimple) =>
-  learningPlan.learning_structures.flatMap((structure) => structure.trails)
-    .length;
+  learningPlan.learning_structures.flatMap((structure) => structure.trails).length;
 // Querys
 export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
   useQuery({
@@ -71,16 +70,14 @@ export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
         return { meta: {}, data: [] };
       }
       const learningPlans = await getLearningPlanFn(type, userId);
-      const mappedLearningPlans: LearningPlanData[] = learningPlans.data.map(
-        (learningPlan) => ({
-          learningPlan,
-          facilitator: getFacilitator(learningPlan.members),
-          leader: getLeader(learningPlan.members),
-          trails: {
-            count: countTrails(learningPlan),
-          },
-        }),
-      );
+      const mappedLearningPlans: LearningPlanData[] = learningPlans.data.map((learningPlan) => ({
+        learningPlan,
+        facilitator: getFacilitator(learningPlan.members),
+        leader: getLeader(learningPlan.members),
+        trails: {
+          count: countTrails(learningPlan),
+        },
+      }));
       return { meta: {}, data: mappedLearningPlans };
     },
     initialData: {
@@ -92,11 +89,7 @@ export const useGetMyLearningPlan = (type: LearningPlanType, userId: number) =>
 // Mutations
 export const useUpdateVisibility = () => {
   return useMutation({
-    mutationFn: async (variables: {
-      value: boolean;
-      learninplanId: number;
-      type: LearningPlanType;
-    }) => {
+    mutationFn: async (variables: { value: boolean; learninplanId: number; type: LearningPlanType }) => {
       const { update } = useStrapi();
       await update('learningPlans', variables.learninplanId, {
         hidden: variables.value,
@@ -104,41 +97,23 @@ export const useUpdateVisibility = () => {
     },
     onMutate: ({ value, learninplanId, type }) => {
       const { $queryClient } = useNuxtApp();
-      $queryClient.setQueryData(
-        [`my-${type}s`],
-        (projectValue: { meta: Object; data: LearningPlanData[] }) => {
-          const updatedData = updateProjectVisibility(
-            projectValue.data,
-            learninplanId,
-            value,
-          );
-          return { ...projectValue, data: updatedData };
-        },
-      );
+      $queryClient.setQueryData([`my-${type}s`], (projectValue: { meta: Object; data: LearningPlanData[] }) => {
+        const updatedData = updateProjectVisibility(projectValue.data, learninplanId, value);
+        return { ...projectValue, data: updatedData };
+      });
     },
     onError: (_, { value, learninplanId, type }) => {
       const { $queryClient } = useNuxtApp();
       const { setMessage } = useMessageStore();
-      $queryClient.setQueryData(
-        [`my-${type}s`],
-        (projectValue: { meta: Object; data: LearningPlanData[] }) => {
-          const updatedData = updateProjectVisibility(
-            projectValue.data,
-            learninplanId,
-            !value,
-          );
-          return { ...projectValue, data: updatedData };
-        },
-      );
+      $queryClient.setQueryData([`my-${type}s`], (projectValue: { meta: Object; data: LearningPlanData[] }) => {
+        const updatedData = updateProjectVisibility(projectValue.data, learninplanId, !value);
+        return { ...projectValue, data: updatedData };
+      });
       setMessage('Erro ao atualizar a visibilidade do projeto', 'error', true);
     },
   });
 };
-const updateProjectVisibility = (
-  data: LearningPlanData[],
-  learninplanId: number,
-  value: boolean,
-) => {
+const updateProjectVisibility = (data: LearningPlanData[], learninplanId: number, value: boolean) => {
   return data.map((item) => {
     if (item.learningPlan.id === learninplanId) {
       return {

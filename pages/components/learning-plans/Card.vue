@@ -1,23 +1,19 @@
 <template>
-  <v-container
-    class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15"
-  >
+  <v-container class="page rounded-lg bg-white pa-6 d-flex flex-column align-start pb-15">
     <h1 class="text-h2 text-gray-800">Card de Cursos e Projetos</h1>
     <p class="text-subtitle-2 text-gray-500">
       O
       <strong class="bg-accent pa-1 rounded">alex-learningplan-card</strong>
-      é um componente que tem como principal objetivo representar e organizar
-      informações de forma compacta e acessível.
+      é um componente que tem como principal objetivo representar e organizar informações de forma compacta e acessível.
     </p>
     <h2 class="text-h2 text-gray-800">Uso Básico</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Tem como propriedades obrigatórias o <strong>image</strong>,
-      <strong>name</strong>, <strong>description</strong>,
+      Tem como propriedades obrigatórias o <strong>image</strong>, <strong>name</strong>, <strong>description</strong>,
       <strong>facilitator</strong>, <strong>trailsCount</strong>.
     </p>
     <p class="text-subtitle-2 text-gray-500">
-      Existem 3 variantes do deste card que são <strong>courses</strong>,
-      <strong>project</strong>, <strong>course_project</strong>
+      Existem 3 variantes do deste card que são <strong>courses</strong>, <strong>project</strong>,
+      <strong>course_project</strong>
     </p>
 
     <div class="w-100 flex-column d-flex">
@@ -55,9 +51,7 @@
           @favorite="() => console.log('favoritei')"
           @open="() => console.log('abri')"
         />
-        <h2 class="text-h4 text-gray-800">
-          Variant: <strong>course_project</strong>
-        </h2>
+        <h2 class="text-h4 text-gray-800">Variant: <strong>course_project</strong></h2>
         <alex-learningplan-card
           type="course_project"
           title="Gerenciamento de sistemas operacionais e projeto de redes utilizando o packet tracer"
@@ -97,12 +91,7 @@
       </div>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[0] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(0)"
-        >
+        <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(0)">
           <v-icon
             v-if="copiedIndex === 0"
             size="x-large"
@@ -170,7 +159,11 @@
             </tr>
             <tr>
               <td>type</td>
-              <td>'project' | 'course' | 'course_project'</td>
+              <td>
+                '{{ LearningPlanType.PROJECT }}' | '{{ LearningPlanType.COURSE }}' | '{{
+                  LearningPlanType.COURSE_PROJECT
+                }}'
+              </td>
               <td class="text-center">
                 <v-icon icon="mdi-close-box" color="error" />
               </td>
@@ -263,8 +256,7 @@
 
     <h2 class="text-h2 text-gray-800">Variante: Oculto</h2>
     <p class="text-subtitle-2 text-gray-500">
-      Modo de visualização do card sinalizando que o card não está visível para
-      todos.
+      Modo de visualização do card sinalizando que o card não está visível para todos.
     </p>
 
     <div class="w-100 flex-column d-flex">
@@ -285,12 +277,7 @@
       </div>
       <div class="px-3 w-100" style="position: relative">
         <prism> {{ examples[1] }}</prism>
-        <v-btn
-          class="copy-icon"
-          variant="text"
-          color="gray-400"
-          @click="copyToClipboard(1)"
-        >
+        <v-btn class="copy-icon" variant="text" color="gray-400" @click="copyToClipboard(1)">
           <v-icon
             v-if="copiedIndex === 1"
             size="x-large"
@@ -370,13 +357,18 @@ const copyToClipboard = async (index) => {
 <style>
 .language-markup {
   overflow-x: auto;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+
+  /* Firefox */
   &::-webkit-scrollbar {
     display: none;
   }
+
   border-radius: 8px;
 }
+
 .container {
   border: 1px solid #a0a8b1;
   gap: 16px;
