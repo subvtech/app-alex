@@ -26,9 +26,9 @@ const trailStore = useTrailStore();
 const learningPlanStore = useLearningPlanStore();
 
 const getTrailData = async () => {
+  headerStore.noBackArrow = true;
   await trailStore.loadTrailData(trailId.value);
   headerStore.isLoading = false;
-  headerStore.noBackArrow = true;
   if (!trailStore.trail) {
     navigateTo(`/projects/${learningPlanId.value}`);
   }

@@ -4,6 +4,8 @@ import { TrailSimple } from '@/models/simple/trailSimple.model';
 import EmptyState from './-components/EmptyState.vue';
 import Loader from './-components/Loader.vue';
 
+const i18dir = 'components.projects.individual_learning.trails';
+
 const { t } = useI18n();
 const { update } = useStrapi();
 const { findOne, find } = useStrapiUtils();
@@ -81,7 +83,7 @@ const toggleVisibility = async (id: number, hidden: boolean) => {
     myCollabs.value?.map((trail) => updateTrailHidden(trail, id, !hidden));
     myTrails.value?.map((trail) => updateTrailHidden(trail, id, !hidden));
 
-    setMessage('Falha ao alterar visibilidade', 'error', true);
+    setMessage(t(`${i18dir}.messages.failHidden`), 'error', true);
   }
 };
 
@@ -126,7 +128,7 @@ onBeforeMount(() => {
     .then(({ data }) => {
       myTrails.value = (data as TrailSimple[]).map(formatTrail);
     })
-    .catch(() => setMessage('Falha ao carregar suas colaborações', 'error', true));
+    .catch(() => setMessage(t(`${i18dir}.messages.failMyTrails`), 'error', true));
 
   // My collabs
   find('trails', {
@@ -140,7 +142,7 @@ onBeforeMount(() => {
     .then(({ data }) => {
       myCollabs.value = (data as TrailSimple[]).map(formatTrail);
     })
-    .catch(() => setMessage('Falha ao carregar suas colaborações', 'error', true));
+    .catch(() => setMessage(t(`${i18dir}.messages.failMyCollabs`), 'error', true));
 });
 </script>
 
@@ -150,7 +152,7 @@ onBeforeMount(() => {
     <div class="tw-flex tw-flex-wrap tw-w-full tw-gap-6 tw-gap-sm-1 tw-justify-between tw-mb-6">
       <alex-inputs-text-field
         v-model="search"
-        :placeholder="$t('pages.trails.searchPlaceholder')"
+        :placeholder="$t(`${i18dir}.search`)"
         prepend-inner-icon="mdi-magnify"
         variant="outlined"
         name="search"
@@ -168,7 +170,7 @@ onBeforeMount(() => {
     <!-- Minhas trilhas -->
     <div class="mb-2">
       <div class="d-flex align-center ga-4 mb-4">
-        <p class="text-gray-800 text-h5 tw-leading-[100%]">Minhas Trilhas</p>
+        <p class="text-gray-800 text-h5 tw-leading-[100%]">{{ $t(`${i18dir}.myTrails`) }}</p>
         <p class="text-gray-400 text-body-2 tw-leading-[100%]">{{ formattedCount(myTrails?.length) }}</p>
       </div>
       <Loader v-if="myTrails === undefined" />
@@ -195,7 +197,7 @@ onBeforeMount(() => {
     <!-- Minhas colaborações -->
     <div>
       <div class="d-flex align-center ga-4 mb-4">
-        <p class="text-gray-800 text-h5 tw-leading-[100%]">Minhas Colaborações</p>
+        <p class="text-gray-800 text-h5 tw-leading-[100%]">{{ $t(`${i18dir}.myCollabs`) }}</p>
         <p class="text-gray-400 text-body-2 tw-leading-[100%]">{{ formattedCount(myCollabs?.length) }}</p>
       </div>
       <Loader v-if="myCollabs === undefined" />

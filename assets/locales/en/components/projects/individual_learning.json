@@ -19,5 +19,15 @@
       "taskDeleted": "Task deleted successfully",
       "failDeleteTask": "Failure to delete task"
     }
+  },
+  "trails": {
+    "myTrails": "My Trails",
+    "myCollabs": "My Collaborations",
+    "search": "Search trail",
+    "messages": {
+      "failHidden": "Failed to change visibility",
+      "failMyCollabs": "Failed to load your collaborations",
+      "failMyTrails": "Failed to load your trails"
+    }
   }
 }
