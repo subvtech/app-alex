@@ -25,7 +25,6 @@ export interface TaskProgressProps {
   }[];
 }
 
-// TODO: As cores deveriam ser definidas ao criar as colunas
 const statusColors = {
   default: '#E4E6EF',
   doing: '#50CD89',
