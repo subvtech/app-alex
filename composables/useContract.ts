@@ -35,9 +35,7 @@ const sepoliaTestnet = {
   blockExplorerUrls: ['https://sepolia.etherscan.io'], // Replace with actual block explorer URL(s)
 };
 
-export const useContracts = (
-  contractAddress: globalThis.Ref<string | null>,
-) => {
+export const useContracts = (contractAddress: globalThis.Ref<string | null>) => {
   const loading = ref(false);
 
   const contractBalance = ref<number>(0);
@@ -47,7 +45,6 @@ export const useContracts = (
   const fetchContractBalance = async () => {
     if (!contractAddress.value) return;
     const balance = await getContractBalance();
-
     if (balance === undefined) return;
     contractBalance.value = weiToUsd(balance);
   };
@@ -94,9 +91,7 @@ export const useContracts = (
     try {
       if (!contractAddress.value) return;
       const provider = new ethers.JsonRpcProvider(networkUrl);
-      const contractBalance = (await provider.getBalance(
-        contractAddress.value,
-      )) as BigNumberish;
+      const contractBalance = (await provider.getBalance(contractAddress.value)) as BigNumberish;
 
       return contractBalance;
     } catch (err) {
@@ -108,9 +103,7 @@ export const useContracts = (
     try {
       if (!contractAddress.value) return;
       const provider = new ethers.JsonRpcProvider(networkUrl);
-      const contractBalance = (await provider.getBalance(
-        contractAddress.value,
-      )) as BigNumberish;
+      const contractBalance = (await provider.getBalance(contractAddress.value)) as BigNumberish;
 
       const redeemers = await getRedeemersArray(getTaskContract(provider));
 
@@ -133,11 +126,7 @@ export const useContracts = (
 
       const { contractABI, contractBinary } = getCompiledContract();
 
-      const contractFactory = new ethers.ContractFactory(
-        contractABI,
-        contractBinary,
-        wallet,
-      );
+      const contractFactory = new ethers.ContractFactory(contractABI, contractBinary, wallet);
 
       const contract = await contractFactory.deploy(totalNumberOfStudents, {
         value: budgetInWei,
@@ -158,9 +147,7 @@ export const useContracts = (
     loading.value = false;
   };
   const switchNetwork = async (targetedNetwork: number) => {
-    const currentChainId =
-      '0x' +
-      (await window.ethereum.request({ method: 'eth_chainId' })).slice(2);
+    const currentChainId = '0x' + (await window.ethereum.request({ method: 'eth_chainId' })).slice(2);
     const chainConfig =
       targetedNetwork === sepoliaChainId
         ? sepoliaTestnet
@@ -185,8 +172,7 @@ export const useContracts = (
     loading.value = true;
 
     try {
-      if (!contractAddress.value)
-        throw new Error('Contract address not provided');
+      if (!contractAddress.value) throw new Error('Contract address not provided');
 
       // Replace with the actual freelancer address
       const browserProvider = getBrowserProvider();
@@ -207,8 +193,7 @@ export const useContracts = (
   };
 
   const hasTheStudentBeenPaid = async (studentAddress: string | undefined) => {
-    if (!contractAddress.value)
-      throw new Error('Contract address not provided');
+    if (!contractAddress.value) throw new Error('Contract address not provided');
     if (!studentAddress) throw new Error('Student address not provided');
     const provider = await getDefaultProvider();
 
@@ -217,15 +202,9 @@ export const useContracts = (
     return redeemers.includes(studentAddress);
   };
 
-  const rewardStudents = async (
-    addressList: string[] = [],
-    gradeList: number[] = [],
-    redeemAll = true,
-  ) => {
-    if (!contractAddress.value)
-      throw new Error('Contract address not provided');
-    if (addressList.length === 0)
-      throw new Error('Address list cannot be empty');
+  const rewardStudents = async (addressList: string[] = [], gradeList: number[] = [], redeemAll = true) => {
+    if (!contractAddress.value) throw new Error('Contract address not provided');
+    if (addressList.length === 0) throw new Error('Address list cannot be empty');
     if (addressList.length !== gradeList.length)
       throw new Error('Address list and gradeList must have the same length');
     loading.value = true;
@@ -236,11 +215,7 @@ export const useContracts = (
       const browserProvider = getBrowserProvider();
       const signer = await withTimeout(12000, browserProvider.getSigner());
       const taskContract = getTaskContract(signer);
-      const tx = await taskContract.redeemRewards(
-        addressList,
-        gradeList,
-        redeemAll,
-      );
+      const tx = await taskContract.redeemRewards(addressList, gradeList, redeemAll);
       await tx.wait(); // Wait for the transaction to be mined
       console.log('Students paid successfully!');
       return true;
@@ -252,12 +227,8 @@ export const useContracts = (
     }
   };
 
-  const rewardSingleStudent = async (
-    studentAddress: string,
-    studentGrade: number,
-  ) => {
-    if (!contractAddress.value)
-      throw new Error('Contract address not provided');
+  const rewardSingleStudent = async (studentAddress: string, studentGrade: number) => {
+    if (!contractAddress.value) throw new Error('Contract address not provided');
 
     loading.value = true;
 
@@ -267,10 +238,7 @@ export const useContracts = (
       const browserProvider = getBrowserProvider();
       const signer = await withTimeout(12000, browserProvider.getSigner());
       const taskContract = getTaskContract(signer);
-      const tx = await taskContract.redeemSingleReward(
-        studentAddress,
-        studentGrade,
-      );
+      const tx = await taskContract.redeemSingleReward(studentAddress, studentGrade);
       await tx.wait(); // Wait for the transaction to be mined
       console.log('Student paid successfully!');
       return true;
@@ -282,10 +250,7 @@ export const useContracts = (
     }
   };
 
-  const getRewardStudentsFee = async (
-    addressList: string[] = [],
-    gradeList: number[] = [],
-  ) => {
+  const getRewardStudentsFee = async (addressList: string[] = [], gradeList: number[] = []) => {
     if (!contractAddress.value) return;
 
     loading.value = true;
@@ -295,15 +260,9 @@ export const useContracts = (
       const provider = await ethers.getDefaultProvider(networkUrl);
       const gasPrice = await provider.getFeeData();
       const taskContract = getTaskContract(provider);
-      const estimatedGas = taskContract.estimateGas.redeemRewards(
-        addressList,
-        gradeList,
-      );
+      const estimatedGas = taskContract.estimateGas.redeemRewards(addressList, gradeList);
 
-      console.log(
-        `Estimated gas cost: ${ethers.formatEther(estimatedGas)} ETH`,
-        gasPrice,
-      );
+      console.log(`Estimated gas cost: ${ethers.formatEther(estimatedGas)} ETH`, gasPrice);
       return estimatedGas;
     } catch (error) {
       console.error('Error:', error);

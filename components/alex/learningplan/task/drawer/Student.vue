@@ -171,7 +171,7 @@
           />
 
           <alex-learningplan-task-drawer-contracts-button
-            v-if="student"
+            v-if="student && isThereBalance"
             :tooltip-text="$t('components.learningPlan.contract.warning.tooltip.once')"
             :text="$t('components.learningPlan.contract.reward.rewardSingleStudent')"
             variant="warning"
@@ -313,12 +313,14 @@ const {
   rewardStudents,
   hasTheStudentBeenPaid,
   cancelContract,
+  isThereAContract,
+  fetchContractReward,
   fetchContractBalance,
+  contractBalance,
   loading: contractLoading,
 } = useContracts(contractAddress);
 
 const isRewarded = ref(false);
-const contractBalance = ref(0);
 
 const handleRewardSingleStudent = async () => {
   if (!props.student?.wallet) return;
@@ -530,7 +532,7 @@ const {
   dedupe: 'cancel',
 });
 
-await fetchContractBalance();
+await fetchContractReward();
 
 const handleSubmitMessage = async (
   text: string,
@@ -648,6 +650,9 @@ watch(activePage, (value) => {
   if (value === '3') {
     executeMessages();
   }
+});
+watch([contractAddress, isThereAContract], async () => {
+  await fetchContractReward();
 });
 </script>
 

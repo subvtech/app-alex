@@ -323,6 +323,7 @@ const evaluatedSubmissions = computed(() =>
       : [],
   ),
 );
+await fetchContractReward();
 const mostRecentSubmission = computed(() => submissions.value.data.filter((submission) => submission.evaluated_at)[0]);
 const getSubmissionStatus = (submission?: TaskSubmissionSimple, status?: TaskMemberStatus) => {
   if (!submission) {
