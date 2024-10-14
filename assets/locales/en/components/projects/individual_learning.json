@@ -1,0 +1,23 @@
+{
+  "tasks": {
+    "seeKanban": "See Kanban",
+    "seeList": "See List",
+
+    "tasks": "Tasks",
+
+    "addTask": "Add Task",
+
+    "inputs": {
+      "search": "Search task",
+      "filter": "Filter",
+      "taskTitle": "Task title"
+    },
+
+    "messages": {
+      "noTaskSelected": "No task selected",
+      "taskCreated": "Task created successfully",
+      "taskDeleted": "Task deleted successfully",
+      "failDeleteTask": "Failure to delete task"
+    }
+  }
+}

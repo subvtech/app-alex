@@ -31,9 +31,7 @@
       ></alex-inputs-editable-text>
 
       <v-row class="my-4">
-        <v-col cols="6"
-          ><alex-learningplan-task-state v-model="status" :config="statusConfig" edit @change-kanban-col="console.log"
-        /></v-col>
+        <v-col cols="6"><alex-learningplan-task-state v-model="status" :config="statusConfig" edit /></v-col>
         <v-col v-if="task?.organization === 'standard'" cols="6">
           <p class="text-body-4 text-gray-800 mb-1">Sprint</p>
           <alex-learningplan-task-options

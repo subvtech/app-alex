@@ -133,6 +133,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'tiptap/bookmark',
     'projects/create',
     'projects/sprint',
+    'projects/individual_learning',
   ]);
   const layouts = await useImportLanguages('layouts', lang, [
     'default',

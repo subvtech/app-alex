@@ -161,11 +161,7 @@ export const useLearningPlanStore = defineStore('learning-plan', () => {
   });
 
   const activeProjectMembers = computed(() => {
-    return (
-      learningPlan.value?.members.filter(
-        (m: LearningPlanMemberSimple) => m.status === MemberStatus.JOINED,
-      ) || []
-    );
+    return learningPlan.value?.members.filter((m: LearningPlanMemberSimple) => m.status === MemberStatus.JOINED) || [];
   });
 
   const pendingMembers = computed(() => {
