@@ -153,7 +153,7 @@
           </div>
         </template>
       </div>
-      <div v-if="contractAddress" class="d-flex flex-column gap-8">
+      <div v-if="contractAddress" class="d-flex flex-column gap-8 mt-1">
         <div v-if="disablePayment" class="d-flex flex-column gap-3">
           <span class="text-h5 text-gray-800">
             {{ $t('components.learningPlan.contract.reward.studentRewarded') }}

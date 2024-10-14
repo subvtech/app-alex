@@ -1,13 +1,7 @@
 <template>
-  <v-container
-    class="page rounded-lg bg-white pa-6 gap-6 d-flex flex-column align-start pb-15"
-  >
+  <v-container class="page rounded-lg bg-white pa-6 gap-6 d-flex flex-column align-start pb-15">
     <alex-documentation-header :title="title" :description="description" />
-    <alex-documentation-accordions-props-list
-      :data="listProps"
-      title="Props"
-      show-positions
-    />
+    <alex-documentation-accordions-props-list :data="listProps" title="Props" show-positions />
     <alex-documentation-example
       v-for="item in examples"
       :key="item.title"
@@ -18,12 +12,8 @@
     >
       <template #component>
         <div class="flex gap-2 p-2">
-          <alex-custom-button @click="studentDrawer = true">
-            Student Drawer
-          </alex-custom-button>
-          <alex-custom-button variant="secondary" @click="teacherDrawer = true">
-            Teacher Drawer
-          </alex-custom-button>
+          <alex-custom-button @click="studentDrawer = true"> Student Drawer </alex-custom-button>
+          <alex-custom-button variant="secondary" @click="teacherDrawer = true"> Teacher Drawer </alex-custom-button>
         </div>
       </template>
     </alex-documentation-example>
@@ -69,8 +59,7 @@ const listProps: PlaygroundItemType[] = [
     name: 'icon',
     type: 'string',
     required: true,
-    description:
-      'A valid mdi icon, such as mdi-alert-circle that will be displayed on the box',
+    description: 'A valid mdi icon, such as mdi-alert-circle that will be displayed on the box',
     initialValue: undefined,
   },
 ];

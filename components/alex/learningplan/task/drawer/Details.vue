@@ -110,7 +110,14 @@
       :blocks="blocks"
       :task-member-id="taskMemberId"
     />
-
+    <div v-if="contractAddress" class="d-flex flex-column gap-8 mt-2">
+      <div class="d-flex flex-column gap-6">
+        <alex-learningplan-task-drawer-contracts-balance
+          :balance="contractBalance"
+          :text="$t('components.learningPlan.contract.reward.remaining')"
+        />
+      </div>
+    </div>
     <alex-learningplan-task-tabs
       v-model="activeTab"
       v-model:attached-message="attachedMessage"
@@ -211,6 +218,7 @@ interface DetailsDrawerProps {
   trail?: TrailSimple;
   restrictions?: string;
   taskEvents?: TaskEvent[];
+  contractAddress: string | null;
 }
 
 const props = withDefaults(defineProps<DetailsDrawerProps>(), {
@@ -227,8 +235,12 @@ const props = withDefaults(defineProps<DetailsDrawerProps>(), {
   group: undefined,
   restrictions: '',
   taskEvents: () => [],
+  contractAddress: null,
   submission: undefined,
 });
+
+const { contractAddress } = toRefs(props);
+const { fetchContractReward, isThereAContract, contractBalance } = useContracts(contractAddress);
 
 // Pegar esses dados
 const tags = ref<TagSimple[]>(props.tags);
@@ -482,6 +494,10 @@ watch(status, (newStatus, oldStatus) => {
       newStatus,
     );
   }
+});
+
+watch([contractAddress, isThereAContract], async () => {
+  await fetchContractReward();
 });
 </script>
 

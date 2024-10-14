@@ -334,7 +334,7 @@ const addMember = async (members: LearningPlanMemberSimple[]) => {
 const removeMember = async (memberEmail: string | undefined, memberId: number, memberName?: string) => {
   try {
     if (props.blockDelete && isTask.value) {
-      setMessage(t('components.learningPlan.drawer.task.remove.forbidden'), 'warning', true);
+      setMessage(t('components.learningPlan.drawer.task.status.remove.forbidden'), 'warning', true);
       return;
     }
     isLoading.value = true;

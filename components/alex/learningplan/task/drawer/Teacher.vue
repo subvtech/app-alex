@@ -38,7 +38,7 @@
       <v-row class="my-5">
         <v-col :cols="!individualJourney ? 6 : 12">
           <alex-learningplan-task-state
-            v-model="status"
+            v-model="statusRef"
             :mode="individualJourney ? 'student' : 'teacher'"
             :edit="(editable || individualJourney) && wasFilledMainInfo"
             :individual-journey="individualJourney"
@@ -317,10 +317,6 @@ const emit = defineEmits<Emits>();
 const { setMessage } = useMessageStore();
 // Status
 const statusRef = ref<TaskStatus | TaskMemberStatus>(props.status);
-
-// Date picker
-const startDate = ref(props.startDate);
-const endDate = ref(props.endDate);
 
 // Restrições
 const restrictions = ref(props.restrictions);

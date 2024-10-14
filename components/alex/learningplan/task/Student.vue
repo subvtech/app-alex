@@ -9,25 +9,19 @@
           title: $t('components.learningPlan.drawer.task.status.toDo'),
           color: 'gray',
           group: 'to_do',
-          accept: selectedTask?.task?.submission_required
-            ? ['in_progress', 'in_review']
-            : true,
+          accept: selectedTask?.task?.submission_required ? ['in_progress', 'in_review'] : true,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.inProgress'),
           color: 'blue',
           group: 'in_progress',
-          accept: selectedTask?.task?.submission_required
-            ? ['to_do', 'in_review']
-            : true,
+          accept: selectedTask?.task?.submission_required ? ['to_do', 'in_review'] : true,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.underReview'),
           color: 'orange',
           group: 'in_review',
-          accept: selectedTask?.task?.submission_required
-            ? ['to_do', 'in_progress']
-            : true,
+          accept: selectedTask?.task?.submission_required ? ['to_do', 'in_progress'] : true,
         },
         {
           title: $t('components.learningPlan.drawer.task.status.done'),
@@ -36,16 +30,14 @@
           disable: true,
         },
       ]"
-      @card-insert="
-        (newIndex, value, newStatus) =>
-          handleUpdateStatus(newIndex, value, newStatus)
-      "
+      @card-insert="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus)"
       @card-click="openDrawer"
     />
 
     <alex-learningplan-task-drawer-details
       v-if="selectedTask?.task"
       v-model="detailsDrawer"
+      v-model:contract-address="selectedTask.task.contract_address"
       :task-id="selectedTask.task.id"
       :learningplan-id="learningplanId"
       :doc-name="selectedTask.doc_name"
@@ -64,16 +56,12 @@
       :submission="
         selectedTask.task?.submission_required
           ? {
-              constraints:
-                selectedTask.task?.allowed_editor_plugins?.split(',') || [],
+              constraints: selectedTask.task?.allowed_editor_plugins?.split(',') || [],
               description: selectedTask.task?.submission_description || '',
             }
           : undefined
       "
-      @update-status="
-        (newIndex, value, newStatus) =>
-          handleUpdateStatus(newIndex, value, newStatus, true)
-      "
+      @update-status="(newIndex, value, newStatus) => handleUpdateStatus(newIndex, value, newStatus, true)"
       @update-submission="execute()"
     />
   </div>
@@ -123,10 +111,7 @@ const getStudentTasks = (learningplanId: number, memberId: number) =>
       learning_plan_group: {
         populate: {
           group_members: {
-            populate: [
-              'student_member.user.avatar',
-              'student_member.learning_class',
-            ],
+            populate: ['student_member.user.avatar', 'student_member.learning_class'],
           },
           learning_class: true,
         },
@@ -178,24 +163,20 @@ const { data: tasks, execute } = await useAsyncData(
         ...(task.learning_plan_group?.learning_class?.name && {
           group: {
             name: task.learning_plan_group?.learning_class?.name || '',
-            participants: task.learning_plan_group?.group_members?.map(
-              (member) => ({
-                name: member.student_member.user.fullname,
-                ...(member.student_member.user.avatar?.url && {
-                  image: {
-                    url: member.student_member.user.avatar?.url,
-                  },
-                  learning_class: member.student_member.learning_class?.name,
-                  role: member.role,
-                }),
+            participants: task.learning_plan_group?.group_members?.map((member) => ({
+              name: member.student_member.user.fullname,
+              ...(member.student_member.user.avatar?.url && {
+                image: {
+                  url: member.student_member.user.avatar?.url,
+                },
+                learning_class: member.student_member.learning_class?.name,
+                role: member.role,
               }),
-            ),
+            })),
           },
         }),
         studentClass:
-          task?.learning_plan_member?.learning_class?.name ||
-          task.learning_plan_group?.learning_class?.name ||
-          '',
+          task?.learning_plan_member?.learning_class?.name || task.learning_plan_group?.learning_class?.name || '',
         task: task?.task,
         submissions: task?.task_submissions,
       })) as TaskStudent[];
@@ -206,12 +187,7 @@ const { data: tasks, execute } = await useAsyncData(
     },
   },
 );
-const handleUpdateStatus = async (
-  newIndex: number,
-  item: TaskStudent,
-  newStatus: string,
-  emitEvt: boolean = false,
-) => {
+const handleUpdateStatus = async (newIndex: number, item: TaskStudent, newStatus: string, emitEvt: boolean = false) => {
   if (!kanban.value) {
     return;
   }
@@ -227,9 +203,7 @@ const handleUpdateStatus = async (
     kanban.value.setCanDrag(false);
     const submissionValidationStatus = ['in_review', 'in_progress'];
     const time = new Date();
-    const lastSubmission = taskMember.submissions?.length
-      ? taskMember?.submissions[0]
-      : undefined;
+    const lastSubmission = taskMember.submissions?.length ? taskMember?.submissions[0] : undefined;
 
     if (taskMember?.task?.submission_required) {
       if (newStatus === 'in_review' && !lastSubmission) {
@@ -244,13 +218,10 @@ const handleUpdateStatus = async (
         });
 
         // Valor atualizado da ultima submissão, caso tenha sido alterado
-        const lastSubVal =
-          lastSubRes.data && lastSubRes.data[0].attributes.submission;
+        const lastSubVal = lastSubRes.data && lastSubRes.data[0].attributes.submission;
 
         await strapi.update('task-submissions', lastSubmission.id, {
-          submission: lastSubVal
-            ? lastSubVal.submission
-            : lastSubmission.submission,
+          submission: lastSubVal ? lastSubVal.submission : lastSubmission.submission,
           submitted_at: time.toISOString(),
         });
       }
@@ -264,10 +235,7 @@ const handleUpdateStatus = async (
     await strapi.update<TaskMember>('task-members', taskMember.id, {
       status: newStatus as TaskMemberStatus,
       ...(submissionValidationStatus.includes(newStatus) && {
-        last_submission_at:
-          newStatus === 'in_progress' && taskMember.submissions
-            ? null
-            : time.toISOString(),
+        last_submission_at: newStatus === 'in_progress' && taskMember.submissions ? null : time.toISOString(),
       }),
     });
   } catch (error) {
@@ -278,11 +246,7 @@ const handleUpdateStatus = async (
       return task;
     });
     if ((error as any)?.message === 'missingSubmission') {
-      setMessage(
-        t('components.learningPlan.drawer.task.errors.missingSubmission'),
-        'error',
-        true,
-      );
+      setMessage(t('components.learningPlan.drawer.task.errors.missingSubmission'), 'error', true);
       return;
     }
     setMessage(t('pages.tasks.errors.updateStatusTask'), 'error', true);
