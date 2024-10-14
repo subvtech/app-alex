@@ -87,7 +87,7 @@ const handleBlurAddItem = (group: string) => {
 </script>
 
 <template>
-  <div :id="group" class="tw-flex-1 tw-scroll-snap tw-min-w-[280px] tw-select-none">
+  <div :id="group" class="tw-flex-1 tw-scroll-snap tw-w-[280px] tw-select-none">
     <DragHandle>
       <KanbanColumnHeader
         class="tw-max-w-[280px] tw-cursor-grab"
