@@ -1,15 +1,9 @@
 <template>
   <div v-if="trailStore.trail" class="container-min-height bg-white">
-    <alex-custom-card
-      :title="$t('components.trails.settings.title')"
-      :align-content="'align-center'"
-    >
+    <alex-custom-card :title="$t('components.trails.settings.title')" :align-content="'align-center'">
       <template #content>
         <div class="d-flex flex-column w-100 gap-6 justify-center w-201">
-          <alex-learningplan-trails-settings-cover
-            namespace="trails"
-            full-width
-          />
+          <alex-learningplan-trails-settings-cover namespace="trails" full-width />
           <alex-learningplan-settings-general
             :title="trailStore.trail.title"
             :description="trailStore.trail.description"
@@ -23,10 +17,7 @@
             @update="updateVisibility"
           />
 
-          <alex-learningplan-settings-delete
-            namespace="trails"
-            @update="removeTrail"
-          />
+          <alex-learningplan-settings-delete namespace="trails" @update="removeTrail" />
         </div>
       </template>
     </alex-custom-card>
@@ -71,7 +62,7 @@ const updateVisibility = async (data) => {
 const removeTrail = async () => {
   await _delete('trails', parseInt(trailId.toString()));
 
-  router.push(`/courses/me`);
+  router.push(`/projects/me`);
   setMessage(t('components.trails.settings.delete.update'), 'green', true);
 };
 </script>

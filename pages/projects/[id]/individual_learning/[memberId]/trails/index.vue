@@ -8,6 +8,7 @@ const { t } = useI18n();
 const { update } = useStrapi();
 const { findOne, find } = useStrapiUtils();
 const { setMessage } = useMessageStore();
+const user = useStrapiUser();
 const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
 
@@ -17,18 +18,12 @@ const showAddTrailDialog = ref(false);
 const myCollabs = ref<TrailSimple[] | undefined>(undefined);
 const myTrails = ref<TrailSimple[] | undefined>(undefined);
 
-const trails = computed<TrailSimple[]>(() => {
-  return (
-    learningPlanStore.standardTrails?.map((trail) => {
-      const { blocks = [] } = trail.structures.at(-1) || {};
-      return { ...trail, blocks };
-    }) || []
-  );
-});
-
-const learningStructure = computed<number>(() => {
-  return learningPlanStore.learningPlan?.learning_structures?.[0]?.id ?? 0;
-});
+const learningStructure = computed<number | null>(
+  () =>
+    learningPlanStore.learningPlan?.learning_structures?.find(
+      (structure) => structure.type === 'standard' && structure.author_member?.user?.id === user.value?.id,
+    )?.id ?? null,
+);
 
 const filteredMyTrails = computed<TrailSimple[]>(
   () =>
@@ -57,7 +52,7 @@ const formattedCount = (count: number | undefined) => {
 };
 
 const formatTrail = (trail: TrailSimple) => {
-  const blocks = trail.structures ?? [];
+  const { blocks = [] } = trail.structures?.at(-1) ?? {};
   return { ...trail, blocks };
 };
 
@@ -96,8 +91,7 @@ const navigate = (trailId: number, page?: string) => {
   navigateTo(`/projects/${id}/trails/${trailId}${slug}`);
 };
 
-const handleTrailCreate = async (trailId: number, learningStructure) => {
-  console.log('Learning structure', learningStructure);
+const handleTrailCreate = async (trailId: number, newStructure) => {
   const populate = ['cover_image', 'structures.blocks'];
   const trail = await findOne('trails', trailId, { populate });
   learningPlanStore.standardTrails.unshift(trail.data as TrailSimple);
@@ -106,6 +100,13 @@ const handleTrailCreate = async (trailId: number, learningStructure) => {
   if (myTrails.value) {
     myTrails.value = [...myTrails.value, formatTrail(trail.data as TrailSimple)];
   }
+
+  if (newStructure && learningPlanStore.learningPlan) {
+    learningPlanStore.learningPlan.learning_structures = [
+      ...learningPlanStore.learningPlan.learning_structures,
+      newStructure,
+    ];
+  }
 };
 
 onBeforeMount(() => {
@@ -113,7 +114,7 @@ onBeforeMount(() => {
 
   // My trails
   find('trails', {
-    populate: ['structures', 'cover_image'],
+    populate: ['structures.blocks', 'cover_image'],
     filters: {
       learning_structure: {
         author_member: {
@@ -129,7 +130,7 @@ onBeforeMount(() => {
 
   // My collabs
   find('trails', {
-    populate: ['structures', 'cover_image'],
+    populate: ['structures.blocks', 'cover_image'],
     filters: {
       partners: {
         user,
@@ -167,8 +168,8 @@ onBeforeMount(() => {
     <!-- Minhas trilhas -->
     <div class="mb-2">
       <div class="d-flex align-center ga-4 mb-4">
-        <p class="text-gray-800 text-h5">Minhas Trilhas</p>
-        <p class="text-gray-400 text-body-2">{{ formattedCount(myTrails?.length) }}</p>
+        <p class="text-gray-800 text-h5 tw-leading-[100%]">Minhas Trilhas</p>
+        <p class="text-gray-400 text-body-2 tw-leading-[100%]">{{ formattedCount(myTrails?.length) }}</p>
       </div>
       <Loader v-if="myTrails === undefined" />
       <EmptyState v-else-if="!myTrails.length" />
@@ -194,8 +195,8 @@ onBeforeMount(() => {
     <!-- Minhas colaborações -->
     <div>
       <div class="d-flex align-center ga-4 mb-4">
-        <p class="text-gray-800 text-h5">Minhas Colaborações</p>
-        <p class="text-gray-400 text-body-2">{{ formattedCount(myCollabs?.length) }}</p>
+        <p class="text-gray-800 text-h5 tw-leading-[100%]">Minhas Colaborações</p>
+        <p class="text-gray-400 text-body-2 tw-leading-[100%]">{{ formattedCount(myCollabs?.length) }}</p>
       </div>
       <Loader v-if="myCollabs === undefined" />
       <EmptyState v-else-if="!myCollabs.length" />

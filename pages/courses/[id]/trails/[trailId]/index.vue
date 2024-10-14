@@ -9,32 +9,17 @@
       @update:model-value="(value) => (sidebar = value)"
       @dragged:items="(value) => handlePositions(value)"
     />
-    <div
-      id="editor-container"
-      class="bg-white rounded w-100 container-min-height"
-    >
-      <div
-        section="0"
-        class="d-flex justify-end px-6 pt-6"
-        :class="!readOnly ? 'sticky-buttons' : ''"
-      >
+    <div id="editor-container" class="bg-white rounded w-100 container-min-height">
+      <div section="0" class="d-flex justify-end px-6 pt-6" :class="!readOnly ? 'sticky-buttons' : ''">
         <alex-custom-button
-          v-if="
-            readOnly &&
-            !trailStore.loading &&
-            highlightedContributionsSimple.length
-          "
+          v-if="readOnly && !trailStore.loading && highlightedContributionsSimple.length"
           icon="mdi-text-box-outline"
           variant="secondary"
           size="large"
           @click="sidebar = !sidebar"
         />
         <alex-custom-button
-          v-if="
-            readOnly &&
-            learningPlanStore.userIsFacilitator &&
-            !trailStore.loading
-          "
+          v-if="readOnly && learningPlanStore.userIsFacilitator && !trailStore.loading"
           variant="primary"
           size="large"
           class="ml-2"
@@ -61,14 +46,8 @@
           >
         </div>
       </div>
-      <div
-        v-if="!showEditor && readOnly"
-        class="d-flex fill-height align-center justify-center container-min-height"
-      >
-        <div
-          v-if="trailStore.loading || isLoading"
-          class="w-100 max-w-175 min-h-125"
-        >
+      <div v-if="!showEditor && readOnly" class="d-flex fill-height align-center justify-center container-min-height">
+        <div v-if="trailStore.loading || isLoading" class="w-100 max-w-175 min-h-125">
           <alex-custom-skeleton
             color="gray-200"
             type="list-item"
@@ -100,12 +79,7 @@
               class="w-75 height-3 mt-3"
               rounded="lg"
             ></alex-custom-skeleton>
-            <alex-custom-skeleton
-              color="gray-300"
-              type="list-item"
-              class="w-100 height-80 mt-10"
-              rounded="lg"
-            />
+            <alex-custom-skeleton color="gray-300" type="list-item" class="w-100 height-80 mt-10" rounded="lg" />
           </div>
         </div>
         <div v-else>
@@ -115,15 +89,9 @@
           </p>
         </div>
       </div>
-      <div
-        v-else
-        class="container-min-height justify-center ma-6 align-start d-flex"
-      >
+      <div v-else class="container-min-height justify-center ma-6 align-start d-flex">
         <div style="width: 800px">
-          <p
-            v-show="readOnly && editorData.time"
-            class="text-gray-500 text-body-3 mb-4 mx-auto max-width-187"
-          >
+          <p v-show="readOnly && editorData.time" class="text-gray-500 text-body-3 mb-4 mx-auto max-width-187">
             {{ $t('pages.trailId.overview.lastUpdated') }}
             {{ timeStampToDate(editorData.time) }}
           </p>
@@ -176,12 +144,7 @@
               v-if="!learningPlanStore.userIsFacilitator"
               class="w-100 pt-12 d-flex justify-center align-center contributions-container"
             >
-              <alex-custom-button
-                class="ma-auto"
-                prepend-icon="mdi-plus"
-                size="large"
-                @click="goToContributions()"
-              >
+              <alex-custom-button class="ma-auto" prepend-icon="mdi-plus" size="large" @click="goToContributions()">
                 {{ t('pages.trailId.overview.contribute') }}
               </alex-custom-button>
             </div>
@@ -205,9 +168,7 @@
                     v-bind="propsTooltip"
                     class="section-text pr-4 text-body-3 align-center py-2 text-truncate"
                     :class="[
-                      activeSection == index
-                        ? 'text-accent bg-gray-blue'
-                        : 'text-gray-600 section-text-default',
+                      activeSection == index ? 'text-accent bg-gray-blue' : 'text-gray-600 section-text-default',
                       calculateMargin(section.type),
                     ]"
                     @click="navigateToSection(index)"
@@ -251,14 +212,11 @@ const sidebar = ref(false);
 
 const backUpEditorData = ref({ blocks: [] });
 const showEditor = computed(() => {
-  return (
-    !trailStore.loading && (editorData.value.blocks.length || !readOnly.value)
-  );
+  return !trailStore.loading && (editorData.value.blocks.length || !readOnly.value);
 });
 const { t } = useI18n();
 const editorData = computed(() => {
-  const data =
-    trailStore.trail?.structures[trailStore.trail?.structures.length - 1];
+  const data = trailStore.trail?.structures[trailStore.trail?.structures.length - 1];
   return {
     time: data && data.time ? parseInt(data.time.toString()) : 0,
     version: data?.version || '',
@@ -387,14 +345,9 @@ const setSections = () => {
       type: 3,
       active: false,
     });
-    const contributionSection = document.getElementById(
-      `${contribution.title}-${contribution.id}`,
-    );
+    const contributionSection = document.getElementById(`${contribution.title}-${contribution.id}`);
     if (contributionSection) {
-      contributionSection.setAttribute(
-        'section',
-        String(newSections.length - 1),
-      );
+      contributionSection.setAttribute('section', String(newSections.length - 1));
     }
   });
 
@@ -414,9 +367,7 @@ const navigateToSection = (index: number) => {
 
 const removeContributionHighlight = async (id: number) => {
   try {
-    const contribution = trailStore.trail?.contributions.find(
-      (contribution) => contribution.id === id,
-    );
+    const contribution = trailStore.trail?.contributions.find((contribution) => contribution.id === id);
     if (!contribution) throw new Error('Contribution not found');
     contribution.highlighted = false;
     await update('trail-contributions', contribution.id, {
@@ -424,20 +375,13 @@ const removeContributionHighlight = async (id: number) => {
       blocked: false,
     });
   } catch (e) {
-    setMessage(
-      t('components.trails.contributions.error.updateHighlight'),
-      'red',
-      true,
-    );
-    if (trailStore.trail?.id !== undefined)
-      trailStore.loadTrailData(trailStore.trail.id);
+    setMessage(t('components.trails.contributions.error.updateHighlight'), 'red', true);
+    if (trailStore.trail?.id !== undefined) trailStore.loadTrailData(trailStore.trail.id);
   }
 };
 
 const showContribution = (contribution: contributionType) => {
-  const element = document.getElementById(
-    `${contribution.title}-${contribution.id}`,
-  );
+  const element = document.getElementById(`${contribution.title}-${contribution.id}`);
   const section = element?.getAttribute('section');
   if (section) {
     navigateToSection(parseInt(section));
@@ -453,9 +397,7 @@ const goToContributions = () => {
 
 const handlePositions = (contributions) => {
   contributions.forEach(async (contribution, index) => {
-    const contributionData = trailStore.trail?.contributions.find(
-      (c) => c.id === contribution.id,
-    );
+    const contributionData = trailStore.trail?.contributions.find((c) => c.id === contribution.id);
     if (!contributionData) return;
     contributionData.highlighted_order = index + 1;
     await update('trail-contributions', contribution.id, {
@@ -567,9 +509,7 @@ const setObserver = () => {
   const observerMargin = Math.floor(pageHeight.value / 2);
 
   const observerConfig = {
-    rootMargin: `-${
-      pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin
-    }px 0px -${observerMargin}px 0px`,
+    rootMargin: `-${pageHeight.value % 2 === 0 ? observerMargin - 1 : observerMargin}px 0px -${observerMargin}px 0px`,
   };
 
   observer = new IntersectionObserver(handleIntersection, observerConfig);
