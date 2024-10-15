@@ -9,7 +9,8 @@ const i18n = useI18n();
 
 const data = [
   {
-    name: 'OA1',
+    id: 123,
+    name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
     percentage: 100,
     tasks: [
       { id: 1, name: 'Consertar a Sidebar da plataforma ALEX', endDate: '09-03-2024', status: 'done' },
@@ -24,9 +25,24 @@ const data = [
       { id: 5, name: 'Tarefa 5', endDate: '02-18-2025', status: 'doing' },
     ],
   },
-  { name: 'OA2', percentage: 0, tasks: [] },
-  { name: 'OA3', percentage: 80, tasks: [] },
-  { name: 'OA4', percentage: 50, tasks: [] },
+  {
+    id: 124,
+    name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
+    percentage: 0,
+    tasks: [],
+  },
+  {
+    id: 125,
+    name: 'Apender sobre a vida a verdade e o universo',
+    percentage: 80,
+    tasks: [],
+  },
+  {
+    id: 200,
+    name: 'Vital, adanava a pé e achava que assim estava mal',
+    percentage: 50,
+    tasks: [],
+  },
 ];
 const processedData = computed(() => {
   return data.map((item) => ({
@@ -36,8 +52,8 @@ const processedData = computed(() => {
 });
 
 const tabs = computed(() =>
-  data.map((item, index) => ({
-    label: item.name,
+  data.map((_item, index) => ({
+    label: `OA${index}`,
     value: index,
   })),
 );
@@ -67,7 +83,7 @@ const chipStatus = (status: string) => {
           class="lg:tw-w-1/2 tw-w-full lg:tw-border-r-[1px] tw-border-b-[1px] lg:tw-border-b-0 tw-border-gray-100 d-flex justify-center tw-flex-col align-center pa-6"
         >
           <BarChart
-            class="tw-h-[270px] mb-4"
+            class="!tw-h-[270px] mb-4"
             index="name"
             :data="processedData"
             :categories="['percentage', 'total']"
@@ -76,6 +92,11 @@ const chipStatus = (status: string) => {
             :colors="['#00b7cc', '#e1f9fc']"
             :bar-width="65"
             :custom-tooltip="Tooltip"
+            :x-formatter="
+              (tick) => {
+                return `OA${processedData[tick].id}`;
+              }
+            "
           />
           <div class="footer mt-4">
             <div class="text-body-1 text-gray-900 d-flex align-center ga-2 mb-1">
@@ -130,7 +151,7 @@ const chipStatus = (status: string) => {
   </alex-custom-card>
 </template>
 
-<style scoped>
+<style>
 .minimalist-scrollbar::-webkit-scrollbar {
   width: 10px;
 }
