@@ -37,13 +37,6 @@ const processedData = computed(() => {
   }));
 });
 
-const tabs = computed(() =>
-  props.data.map((_item, index) => ({
-    label: `OA${index}`,
-    value: index,
-  })),
-);
-
 const formattedDate = (strDate: string) => {
   const date = new Date(strDate);
   return format(date, `d MMM y`, {
@@ -80,7 +73,7 @@ const chipStatus = (status: string) => {
             :custom-tooltip="Tooltip"
             :x-formatter="
               (tick) => {
-                return processedData.length ? `OA${tick}` : '';
+                return processedData.length ? `OA${processedData[tick]?.id}` : '';
               }
             "
           />
@@ -97,10 +90,28 @@ const chipStatus = (status: string) => {
           </div>
         </div>
         <div class="lg:tw-w-1/2 tw-w-full pb-6 pl-6 tw-max-h-[400px]">
-          <alex-custom-tabs v-model="activePage" :tabs="tabs" />
-          <v-window v-if="tabs.length" v-model="activePage" class="tw-h-[90%]">
-            <v-window-item v-for="(OA, index) in data" :key="OA.name" :value="index" class="tw-h-full">
-              <div v-if="!OA.tasks.length" class="tw-flex justify-center align-center tw-h-full">
+          <!-- <alex-custom-tabs v-model="activePage" :tabs="tabs" /> -->
+          <v-tabs class="text-gray-800 w-100">
+            <v-tooltip
+              v-for="(tab, index) in processedData"
+              :key="index"
+              :text="tab.name"
+              location="top"
+              content-class="px-4 py-2 bg-gray-800 text-white rounded-lg"
+              max-width="300"
+              open-delay="450"
+            >
+              <template #activator="{ props: tooltip }">
+                <v-tab :value="tab.id" v-bind="tooltip" color="accent" @click="activePage = tab.id">
+                  <span>OA{{ tab.id }}</span>
+                </v-tab>
+              </template>
+            </v-tooltip>
+          </v-tabs>
+
+          <v-window v-if="processedData.length" v-model="activePage" class="tw-h-[90%]">
+            <v-window-item v-for="objective in data" :key="objective.name" :value="objective.id" class="tw-h-full">
+              <div v-if="!objective.tasks.length" class="tw-flex justify-center align-center tw-h-full">
                 <span>
                   <v-img src="/svg/emptyOAProgress.svg" class="tw-h-[120px] my-4" />
                   <p class="text-gray-400 text-body-3">Nenhuma tarefa associada a este objetivo</p></span
@@ -108,7 +119,7 @@ const chipStatus = (status: string) => {
               </div>
               <div v-else class="tw-overflow-y-auto tw-h-full mt-4 minimalist-scrollbar">
                 <div
-                  v-for="task in OA.tasks"
+                  v-for="task in objective.tasks"
                   :key="task.id"
                   class="w-100 tw-h-[80px] pa-3 rounded-lg tw-border tw-flex align-center justify-space-between my-1"
                 >
