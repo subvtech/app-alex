@@ -1,20 +1,11 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import type { BulletLegendItemInterface } from '@unovis/ts';
-import {
-  VisAxis,
-  VisGroupedBar,
-  VisStackedBar,
-  VisXYContainer,
-} from '@unovis/vue';
-import { Axis, GroupedBar, StackedBar } from '@unovis/ts';
-import { type Component, computed, ref } from 'vue';
-import { useMounted } from '@vueuse/core';
-import {
-  ChartCrosshair,
-  ChartLegend,
-  defaultColors,
-} from '@/components/ui/chart';
+import { ChartCrosshair, ChartLegend, defaultColors } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
+import type { BulletLegendItemInterface } from '@unovis/ts';
+import { Axis, GroupedBar, StackedBar } from '@unovis/ts';
+import { VisAxis, VisGroupedBar, VisStackedBar, VisXYContainer } from '@unovis/vue';
+import { useMounted } from '@vueuse/core';
+import { type Component, computed, ref } from 'vue';
 import type { BaseChartProps } from '.';
 
 const props = withDefaults(
@@ -34,6 +25,8 @@ const props = withDefaults(
        * @default 0
        */
       roundedCorners?: number;
+      orientation?: 'horizontal' | 'vertical';
+      barWidth?: number;
     }
   >(),
   {
@@ -46,6 +39,8 @@ const props = withDefaults(
     showTooltip: true,
     showLegend: true,
     showGridLine: true,
+    orientation: 'vertical',
+    barWidth: undefined,
   },
 );
 const emits = defineEmits<{
@@ -56,9 +51,7 @@ type KeyOfT = Extract<keyof T, string>;
 type Data = (typeof props.data)[number];
 
 const index = computed(() => props.index as KeyOfT);
-const colors = computed(() =>
-  props.colors?.length ? props.colors : defaultColors(props.categories.length),
-);
+const colors = computed(() => (props.colors?.length ? props.colors : defaultColors(props.categories.length)));
 const legendItems = ref<BulletLegendItemInterface[]>(
   props.categories.map((category, i) => ({
     name: category,
@@ -73,36 +66,15 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
   emits('legendItemClick', d, i);
 }
 
-const VisBarComponent = computed(() =>
-  props.type === 'grouped' ? VisGroupedBar : VisStackedBar,
-);
-const selectorsBar = computed(() =>
-  props.type === 'grouped'
-    ? GroupedBar.selectors.bar
-    : StackedBar.selectors.bar,
-);
+const VisBarComponent = computed(() => (props.type === 'grouped' ? VisGroupedBar : VisStackedBar));
+const selectorsBar = computed(() => (props.type === 'grouped' ? GroupedBar.selectors.bar : StackedBar.selectors.bar));
 </script>
 
 <template>
-  <div
-    :class="
-      cn(
-        'tw-w-full tw-h-[400px] tw-flex tw-flex-col tw-items-end',
-        $attrs.class ?? '',
-      )
-    "
-  >
-    <ChartLegend
-      v-if="showLegend"
-      v-model:items="legendItems"
-      @legend-item-click="handleLegendItemClick"
-    />
+  <div :class="cn('tw-w-full tw-h-[400px] tw-flex tw-flex-col tw-items-end', $attrs.class ?? '')">
+    <ChartLegend v-if="showLegend" v-model:items="legendItems" @legend-item-click="handleLegendItemClick" />
 
-    <VisXYContainer
-      :data="data"
-      :style="{ height: isMounted ? '100%' : 'auto' }"
-      :margin="margin"
-    >
+    <VisXYContainer :data="data" :style="{ height: isMounted ? '100%' : 'auto' }" :margin="margin">
       <ChartCrosshair
         v-if="showTooltip"
         :colors="colors"
@@ -117,6 +89,8 @@ const selectorsBar = computed(() =>
         :color="colors"
         :rounded-corners="roundedCorners"
         :bar-padding="0.05"
+        :orientation="props.orientation"
+        :bar-width="props.barWidth"
         :attributes="{
           [selectorsBar]: {
             opacity: (d: Data, i: number) => {
