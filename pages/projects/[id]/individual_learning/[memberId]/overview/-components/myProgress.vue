@@ -7,52 +7,38 @@ import Tooltip from './tooltip.vue';
 const activePage = ref(0);
 const i18n = useI18n();
 
-const data = [
+type Task = {
+  id: number;
+  name: string;
+  endDate: string;
+  status: string;
+};
+
+type Objective = {
+  id: number;
+  name: string;
+  percentage: number;
+  tasks: Task[] | [];
+};
+
+const props = withDefaults(
+  defineProps<{
+    data: Objective[];
+  }>(),
   {
-    id: 123,
-    name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
-    percentage: 100,
-    tasks: [
-      { id: 1, name: 'Consertar a Sidebar da plataforma ALEX', endDate: '09-03-2024', status: 'done' },
-      {
-        id: 2,
-        name: 'Fazer algo muito importante que tem uma importância extrema',
-        endDate: '01-29-2025',
-        status: 'to_do',
-      },
-      { id: 3, name: 'Tarefa 3', endDate: '02-18-2025', status: 'doing' },
-      { id: 4, name: 'Tarefa 4', endDate: '02-18-2025', status: 'doing' },
-      { id: 5, name: 'Tarefa 5', endDate: '02-18-2025', status: 'doing' },
-    ],
+    data: () => [],
   },
-  {
-    id: 124,
-    name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
-    percentage: 0,
-    tasks: [],
-  },
-  {
-    id: 125,
-    name: 'Apender sobre a vida a verdade e o universo',
-    percentage: 80,
-    tasks: [],
-  },
-  {
-    id: 200,
-    name: 'Vital, adanava a pé e achava que assim estava mal',
-    percentage: 50,
-    tasks: [],
-  },
-];
+);
+
 const processedData = computed(() => {
-  return data.map((item) => ({
+  return props.data?.map((item) => ({
     ...item,
     total: 100 - item.percentage,
   }));
 });
 
 const tabs = computed(() =>
-  data.map((_item, index) => ({
+  props.data.map((_item, index) => ({
     label: `OA${index}`,
     value: index,
   })),
@@ -94,7 +80,7 @@ const chipStatus = (status: string) => {
             :custom-tooltip="Tooltip"
             :x-formatter="
               (tick) => {
-                return `OA${processedData[tick].id}`;
+                return processedData.length ? `OA${tick}` : '';
               }
             "
           />
@@ -112,7 +98,7 @@ const chipStatus = (status: string) => {
         </div>
         <div class="lg:tw-w-1/2 tw-w-full pb-6 pl-6 tw-max-h-[400px]">
           <alex-custom-tabs v-model="activePage" :tabs="tabs" />
-          <v-window v-model="activePage" class="tw-h-[90%]">
+          <v-window v-if="tabs.length" v-model="activePage" class="tw-h-[90%]">
             <v-window-item v-for="(OA, index) in data" :key="OA.name" :value="index" class="tw-h-full">
               <div v-if="!OA.tasks.length" class="tw-flex justify-center align-center tw-h-full">
                 <span>
@@ -145,6 +131,12 @@ const chipStatus = (status: string) => {
               </div>
             </v-window-item>
           </v-window>
+          <div v-else class="tw-flex justify-center align-center tw-h-[90%]">
+            <span>
+              <v-img src="/svg/emptyOAProgress.svg" class="tw-h-[120px] my-4" />
+              <p class="text-gray-400 text-body-3">Nenhum objetivo cadastrado</p></span
+            >
+          </div>
         </div>
       </div>
     </template>

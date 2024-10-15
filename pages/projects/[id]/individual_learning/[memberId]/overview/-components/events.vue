@@ -30,18 +30,16 @@ import { enIN, ptBR } from 'date-fns/locale';
 
 const i18n = useI18n();
 
-const items = [
-  { id: 1, title: 'Fazer um vídeo sobre algo', event: 'Tarefa criada', date: '10/15/2024 10:00 AM' },
-  { id: 2, title: 'Reunião com a equipe', event: 'Status alterado', date: '10/15/2024 11:00 AM' },
-  { id: 3, title: 'Entrega do projeto', event: 'Tarefa entregue', date: '10/15/2024 02:00 PM' },
-  { id: 4, title: 'Planejamento do próximo mês', event: 'Tarefa criada', date: '10/10/2024 09:00 AM' },
-  { id: 5, title: 'Revisão de código', event: 'Status alterado', date: '10/05/2024 03:00 PM' },
-  { id: 6, title: 'Apresentação do produto', event: 'Tarefa entregue', date: '09/03/2024 01:00 PM' },
-  { id: 7, title: 'Treinamento da equipe', event: 'Tarefa criada', date: '08/30/2024 10:00 AM' },
-  { id: 8, title: 'Atualização do sistema', event: 'Status alterado', date: '07/15/2024 04:00 PM' },
-  { id: 9, title: 'Reunião anual', event: 'Tarefa entregue', date: '12/10/2023 11:00 AM' },
-  { id: 10, title: 'Avaliação de desempenho', event: 'Tarefa criada', date: '11/05/2023 09:00 AM' },
-];
+type EventType = {
+  id: number;
+  title: string;
+  event: string;
+  date: string;
+};
+
+defineProps<{
+  items: EventType[];
+}>();
 
 const formattedDate = (strDate: string) => {
   const date = new Date(strDate);
