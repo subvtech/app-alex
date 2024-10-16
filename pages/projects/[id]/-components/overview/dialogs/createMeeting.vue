@@ -29,7 +29,7 @@
       <alex-inputs-text-field
         v-model="meeting.endTime"
         type="time"
-        name="endDate"
+        name="endTime"
         label="Termino"
         required
         class="flex-sm-grow-0 w-100"
@@ -43,7 +43,7 @@
       :items="[
         { title: 'Diário', value: 1 },
         { title: 'Semanal', value: 7 },
-        { title: 'Quinzenal', value: 15 },
+        { title: 'Quinzenal', value: 14 },
         { title: 'Mensal', value: 30 },
         { title: 'Único', value: 0 },
       ]"
@@ -55,6 +55,11 @@
 <script setup lang="ts">
 import { format, parseISO } from 'date-fns';
 import { useForm } from 'vee-validate';
+
+const route = useRoute();
+const learningPlanStore = useLearningPlanStore();
+const learningPlanId = ref<string>(route.params.id as string)
+
 interface meetingType {
   name: string;
   startDate: string;
@@ -107,28 +112,30 @@ const openDialog = (newMeeting?: LearningPlanScheduleSimple) => {
 };
 
 const onSubmit = handleSubmit(async () => {
-  console.log(meeting);
   isLoading.value = true;
+  const learningPlan = await learningPlanStore.loadLearningPlan(+route.params.id)
   const endpoint = 'learning-plan-meeting-schedules';
 
-  const startDateTime = `${meeting.value.startDate}T${meeting.value.startTime}:00.000Z`;
+  const startDateTime = `${meeting.value.startDate}T${meeting.value.startTime}:00`;
   let endDateTime = meeting.value.endDate
-    ? `${meeting.value.endDate}T${meeting.value.endTime}:00.000Z`
-    : `${meeting.value.startDate}T${meeting.value.endTime}:00.000Z`;
+    ? `${meeting.value.endDate}T${meeting.value.endTime}:00`
+    : `${format(parseISO(learningPlan?.data.end_date as never), "yyy-MM-dd")}T${meeting.value.endTime}:00`;
+
+  const { endTime, startTime, ...rest} = meeting.value
 
   const payload = {
-    ...meeting.value,
+    ...rest,
     startDate: startDateTime,
     endDate: endDateTime,
+    learningplan:learningPlanId.value
   };
 
   if (meeting.value.id) {
-    strapi.update(endpoint, payload);
+    const schedule = await strapi.update(endpoint, payload);
+    // learningPlan?.data.schedules.push(schedule.data.attributes)
   } else {
     strapi.create(endpoint, payload);
   }
-
-  emit(meeting.value.id ? 'update' : 'create', meeting.value);
 
   isLoading.value = false;
   showDialog.value = false;

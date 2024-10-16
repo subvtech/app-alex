@@ -12,6 +12,7 @@ interface DefaultLearningPlanScheduleSimple {
   name: string;
   learningplan: LearningPlanSimple;
   meetings: LearningPlanMeetingSimple[];
+  user?:User
   learning_class?: ClassSimple;
   type: 'onsite' | 'online';
 }

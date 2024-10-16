@@ -55,7 +55,7 @@ const formatDateToHours = (dateString: string) => {
 interface meetingProps {
   schedule:LearningPlanScheduleSimple,
   scheduleName: string;
-  interval: string | undefined;
+  interval: 0 | 1 | 7 | 14 | 30;
   formattedDate: string;
   date: string;
   is_expired: boolean;

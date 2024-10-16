@@ -368,7 +368,7 @@ export const useFormRules = () => {
         });
       }),
     startTime: yup.string().required(i18n.t('rules.meeting.startHour.required')),
-    endDate: yup
+    endTime: yup
       .string()
       .required(i18n.t('rules.meeting.endHour.required'))
       .test('endHourTest', i18n.t('rules.meeting.endHour.beforeStartHour'), (value, ctx) => {

@@ -53,13 +53,13 @@
               <div class="tw-flex tw-items-center tw-justify-between">
                 <div class="tw-flex tw-items-center gap-2">
                   <div class="text-body-2">{{ meeting.scheduleName }}</div>
-                  <alex-custom-chip :size="'small'" :text="meeting.interval" :status="'blue'"/>
+                  <alex-custom-chip :size="'small'" :text="getIntervalName(meeting.interval)" :status="'blue'"/>
                 </div>
                 <div class="text-body-3 ">{{ format(parseISO(meeting.schedule.startDate), 'HH:mm')  }}</div>
               </div>
               <div class="tw-flex tw-items-center gap-2">
-                <app-user-avatar :size="24" :placeholder="'Jamerson Rodrigo'"/>
-                <p class="text-body-3 text-gray-500">Jamerson Rodrigo</p>
+                <app-user-avatar :profile-picture="meeting.schedule.user?.avatar" :size="24" :placeholder="meeting.schedule.user?.fullname"/>
+                <p class="text-body-3 text-gray-500">{{ meeting.schedule.user?.fullname }}</p>
               </div>
             </div>
           </div>
@@ -148,12 +148,12 @@ const formatMeetingDate = (dateString: string) => {
 
 const todayMeetings = computed(() => (props.schedules.flatMap(schedule =>
   schedule.meetings
-//    .filter(meeting => meeting.date.split('T')[0] === selectedDay.value)
+   .filter(meeting => meeting.date.split('T')[0] === selectedDay.value)
     .map(meeting => ({
       ...meeting,
       schedule:schedule,
       scheduleName: schedule.name,
-      interval: getIntervalName(schedule.interval),
+      interval: schedule.interval,
       formattedDate: formatMeetingDate(meeting.date)
     }))
   )
