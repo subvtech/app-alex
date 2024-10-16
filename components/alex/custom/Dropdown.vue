@@ -25,15 +25,15 @@
         :warning="warning"
         :theme="theme"
         :not-bold="notBold"
-        @click="onClick"
+        @click="!onClick ? onItemSelect(index) : onClick?.()"
       />
     </v-list>
   </v-menu>
 </template>
 
 <script setup lang="ts">
-import { AlexListItem } from '@/components/alex/custom/list-item/index.vue';
-import { ButtonProps } from '@/components/alex/custom/Button.vue';
+import type { ButtonProps } from '@/components/alex/custom/Button.vue';
+import type { AlexListItem } from '@/components/alex/custom/list-item/index.vue';
 
 export interface AlexDropdownItem extends Omit<AlexListItem, 'theme'> {
   onClick?: () => unknown;
@@ -46,6 +46,7 @@ interface DropdownProps {
   buttonSize?: ButtonProps['size'];
   icon?: string;
   notBold?: boolean;
+  onItemSelect?: (index: number) => unknown;
 }
 
 const props = withDefaults(defineProps<DropdownProps>(), {
@@ -55,6 +56,7 @@ const props = withDefaults(defineProps<DropdownProps>(), {
   buttonSize: 'default',
   icon: 'mdi-dots-vertical',
   notBold: false,
+  onItemSelect: () => {},
 });
 
 const slots = useSlots();
