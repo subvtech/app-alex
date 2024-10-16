@@ -13,12 +13,11 @@ type rubricRow = {
 };
 
 const props = defineProps<{
-  isEditable: boolean;
+  editable: boolean;
   criteria: criterionType[];
   data: rubricRow[];
 }>();
 
-const editable = ref(props.isEditable || false);
 const dropdownItems = ref<criterionType[]>([...(props.criteria || [])]);
 
 const defaultRow = {
@@ -52,16 +51,22 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
     <tbody>
       <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
         <td>
-          <alex-custom-dropdown :items="dropdownItems" :on-item-select="(item) => onCriteriaSelect(item, index)">
-            <template #activator="{ props }">
-              <alex-custom-chip
-                v-bind="props"
-                variant="outlined"
-                status="secondary"
-                :text="content[index].criterion.text || 'Selecione um critério'"
-              />
-            </template>
-          </alex-custom-dropdown>
+          <div class="w-100 h-100 pt-2">
+            <alex-custom-dropdown
+              :items="dropdownItems"
+              :on-item-select="(item) => onCriteriaSelect(item, index)"
+              :disabled="!editable"
+            >
+              <template #activator="{ props }">
+                <alex-custom-chip
+                  v-bind="props"
+                  variant="outlined"
+                  status="secondary"
+                  :text="content[index].criterion.text || 'Selecione um critério'"
+                />
+              </template>
+            </alex-custom-dropdown>
+          </div>
         </td>
         <td>
           <alex-inputs-editable-text
@@ -118,9 +123,13 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
     background-color: transparent !important;
   }
   & td {
-    max-width: 220px !important;
+    max-width: 240px !important;
     text-wrap: wrap;
     word-wrap: break-word;
+    padding: 16px 8px !important;
+  }
+  & td:first-child,
+  td:last-child {
     padding: 16px !important;
   }
 }
