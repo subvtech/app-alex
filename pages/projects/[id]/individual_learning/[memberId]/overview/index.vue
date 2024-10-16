@@ -1,28 +1,41 @@
 <script setup lang="ts">
+import { GalleryHorizontal } from 'lucide-vue-next';
 import StatisticCard from '../../../-components/StatisticCard.vue';
 import Events from './-components/events.vue';
 import Progress from './-components/myProgress.vue';
 import Performance from './-components/performance.vue';
+
+const learningPlanStore = useLearningPlanStore();
+const { setMessage } = useMessageStore();
+const { find } = useStrapiUtils();
+const route = useRoute();
+
+interface FormattedEvent {
+  id: Number;
+  title: string;
+  event: string;
+  date: string;
+}
 
 // TODO @Eliezir - Add custom icons & i18n
 const totalizers = ref({
   tasks: {
     title: 'Total de tarefas',
     icon: 'alex:Sprint',
-    value: '02',
-    percentage: 50,
+    value: '00',
+    percentage: 0,
   },
   objectives: {
     title: 'Total de objetivos',
     icon: 'alex:ManageHistory',
-    value: '03',
-    percentage: 33,
+    value: '0',
+    percentage: 0,
   },
   contributions: {
     title: 'Total de contribuições',
     icon: 'alex:HistoryEdu',
-    value: '21',
-    percentage: 10, // TODO @Eliezir - Add custom percentage label
+    value: '00',
+    percentage: 0, // TODO @Eliezir - Add custom percentage label
     color: 'warning-0',
     chipColor: 'warning--2',
   },
@@ -34,18 +47,7 @@ const grades = [
   { name: 'AV1', grade: 8 },
 ];
 
-const events = [
-  { id: 1, title: 'Fazer um vídeo sobre algo', event: 'Tarefa criada', date: '10/15/2024 10:00 AM' },
-  { id: 2, title: 'Reunião com a equipe', event: 'Status alterado', date: '10/15/2024 11:00 AM' },
-  { id: 3, title: 'Entrega do projeto', event: 'Tarefa entregue', date: '10/15/2024 02:00 PM' },
-  { id: 4, title: 'Planejamento do próximo mês', event: 'Tarefa criada', date: '10/10/2024 09:00 AM' },
-  { id: 5, title: 'Revisão de código', event: 'Status alterado', date: '10/05/2024 03:00 PM' },
-  { id: 6, title: 'Apresentação do produto', event: 'Tarefa entregue', date: '09/03/2024 01:00 PM' },
-  { id: 7, title: 'Treinamento da equipe', event: 'Tarefa criada', date: '08/30/2024 10:00 AM' },
-  { id: 8, title: 'Atualização do sistema', event: 'Status alterado', date: '07/15/2024 04:00 PM' },
-  { id: 9, title: 'Reunião anual', event: 'Tarefa entregue', date: '12/10/2023 11:00 AM' },
-  { id: 10, title: 'Avaliação de desempenho', event: 'Tarefa criada', date: '11/05/2023 09:00 AM' },
-];
+const events = ref<FormattedEvent[]>([]);
 
 const progress = [
   {
@@ -84,6 +86,181 @@ const progress = [
     tasks: [],
   },
 ];
+
+const getPercentage = (amount: number, total: number): number => parseInt((amount / total) * 100);
+
+onBeforeMount(() => {
+  // learningPlanStore.loadLearningPlan(+route.params.id); // Tirar dps
+});
+
+watch(
+  () => learningPlanStore.loading,
+  (loading) => {
+    if (loading) {
+      return;
+    }
+
+    const member = learningPlanStore.learningPlan?.members.find(({ user }) => user.id === +route.params.memberId);
+
+    if (!member) {
+      return;
+    }
+
+    // Get tasks, contributions and goals data
+    find('task-members', {
+      filters: {
+        task: {
+          learningplan: learningPlanStore.learningPlan?.id,
+        },
+        learning_plan_member: member.id,
+      },
+      populate: ['task.trail.contributions.student_member', 'task.learning_goals'],
+    })
+      .then((res) => {
+        const data = res.data as TaskMember[];
+
+        // Calculate completed tasks
+        const total = data.length;
+        const completed = data.filter(({ status }) => status === 'done').length;
+        const percentage = getPercentage(completed, total);
+
+        const newTotalizers = totalizers.value;
+
+        newTotalizers.tasks = {
+          ...newTotalizers.tasks,
+          value: total.toString().padStart(2, '0'),
+          percentage,
+        };
+
+        // Calculate learning goals
+        const completedGoals: LearningPlanGoalSimple[] = [];
+
+        const allGoals = data.reduce((acc: LearningPlanGoalSimple[], taskMember: TaskMember) => {
+          const newGoals: LearningPlanGoalSimple[] = [];
+
+          taskMember.task?.learning_goals?.forEach((goal) => {
+            if (acc.every(({ id }) => id !== goal.id)) {
+              newGoals.push(goal);
+            }
+
+            if (taskMember?.status === 'done') {
+              completedGoals.push(goal);
+            }
+          });
+
+          return [...acc, ...newGoals];
+        }, []);
+
+        const totalGoals = allGoals.length;
+        const filteredCompletedGoals = completedGoals.reduce(
+          (acc: LearningPlanGoalSimple[], goal: LearningPlanGoalSimple) =>
+            acc.every(({ id }) => id !== goal.id) ? [...acc, goal] : acc,
+          [],
+        ).length;
+
+        newTotalizers.objectives = {
+          ...newTotalizers.objectives,
+          value: totalGoals.toString().padStart(2, '0'),
+          percentage: getPercentage(filteredCompletedGoals, totalGoals),
+        };
+
+        // Calculate contributions
+        const completedContributions: TrailContribuition[] = [];
+
+        const totalContributions = data.reduce((acc: TrailContribuition[], taskMember: TaskMember) => {
+          const newContributions: TrailContribuition[] = [];
+
+          taskMember.task?.trail?.contributions?.forEach((contribution: TrailContribuition) => {
+            if (acc.every(({ id }) => id !== contribution.id) && contribution.student_member.id === member.id) {
+              newContributions.push(contribution);
+            }
+
+            if (taskMember?.status === 'done') {
+              completedContributions.push(contribution);
+            }
+          });
+
+          return [...acc, ...newContributions];
+        }, []).length;
+
+        const filteredCompletedContributions = completedContributions.reduce(
+          (acc: TrailContribuition[], contribution: TrailContribuition) =>
+            acc.every(({ id }) => id !== contribution.id) ? [...acc, contribution] : acc,
+          [],
+        ).length;
+
+        newTotalizers.contributions = {
+          ...newTotalizers.contributions,
+          value: totalContributions.toString().padStart(2, '0'),
+          percentage: getPercentage(filteredCompletedContributions, totalContributions),
+        };
+
+        // Update all cards
+        totalizers.value = newTotalizers;
+      })
+      .catch((e) => {
+        setMessage('Falha ao carregar atividades do aluno', 'error', true);
+        console.error(e);
+      });
+
+    find('task-events', {
+      filters: {
+        learning_plan_member: member.id,
+      },
+      populate: {
+        task: true,
+      },
+    }).then(({ data }) => {
+      events.value = (data as TaskEvent[]).map(({ id, event, createdAt, task }) => ({
+        id,
+        event,
+        title: task?.title ?? '',
+        date: createdAt,
+      }));
+    });
+
+    // Get progress
+    // find('learning-goals', {
+    //   filters: {
+    //     learningplan: learningPlanStore.learningPlan?.id,
+    //   },
+    //   populate: {
+    //     tasks: {
+    //       task_members: {
+    //         populate: true,
+    //         filters: {
+    //           learning_plan_member: member.id,
+    //         },
+    //       },
+    //     },
+    //   },
+    // }).then(({ data }) => {
+    //   // {
+    //   //   id: 123,
+    //   //   name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
+    //   //   percentage: 100,
+    //   //   tasks: [
+    //   //     { id: 1, name: 'Consertar a Sidebar da plataforma ALEX', endDate: '09-03-2024', status: 'done' },
+    //   //     {
+    //   //       id: 2,
+    //   //       name: 'Fazer algo muito importante que tem uma importância extrema',
+    //   //       endDate: '01-29-2025',
+    //   //       status: 'to_do',
+    //   //     },
+    //   //     { id: 3, name: 'Tarefa 3', endDate: '02-18-2025', status: 'doing' },
+    //   //     { id: 4, name: 'Tarefa 4', endDate: '02-18-2025', status: 'doing' },
+    //   //     { id: 5, name: 'Tarefa 5', endDate: '02-18-2025', status: 'doing' },
+    //   //   ],
+    //   // },
+    //   const newProgress = (data as LearningPlanGoalSimple[]).map((goal) => {
+    //     return {
+    //       id: goal.id,
+    //     };
+    //   });
+    //   console.log(data);
+    // });
+  },
+);
 </script>
 
 <template>

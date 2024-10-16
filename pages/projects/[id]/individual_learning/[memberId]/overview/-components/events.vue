@@ -15,7 +15,7 @@
             </div>
           </template>
           <p class="text-body-2 text-gray-800">{{ item.title }}</p>
-          <p class="text-body-3 text-gray-600">{{ item.event }}</p>
+          <p class="text-body-3 text-gray-600">{{ eventMessages?.[item.event] ?? '' }}</p>
         </v-timeline-item>
       </v-timeline>
     </template>
@@ -40,6 +40,25 @@ type EventType = {
 defineProps<{
   items: EventType[];
 }>();
+
+const eventMessages = {
+  task_created: 'Task created',
+  task_start_date: 'Task start date',
+  task_deadline: 'Task deadline',
+  task_submission: 'Task submission',
+  task_archived: 'Task archived',
+  task_deadline_ended: 'Task deadline ended',
+  student_deadline: 'Student deadline',
+  student_status: 'Student status',
+  student_added: 'Student added',
+  student_removed: 'Student removed',
+  group_added: 'Group added',
+  group_removed: 'Group removed',
+  submission_send: 'Submission send',
+  submission_denied: 'Submission denied',
+  submission_evaluated: 'Submission evaluated',
+  message: 'Message',
+};
 
 const formattedDate = (strDate: string) => {
   const date = new Date(strDate);
