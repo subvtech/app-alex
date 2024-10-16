@@ -10,6 +10,7 @@ type rubricRow = {
   good: string;
   reasonable: string;
   bad: string;
+  selected?: 'excellent' | 'good' | 'reasonable' | 'bad';
 };
 
 const props = defineProps<{
@@ -68,45 +69,30 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
             </alex-custom-dropdown>
           </div>
         </td>
-        <td>
-          <alex-inputs-editable-text
-            v-model="content[index].excellent"
-            tag="p"
-            class="text-body-1 h-100 pa-2"
-            :class="content[index].excellent ? 'text-gray-800' : 'text-gray-300'"
-            :cant-edit="editable"
-            placeholder="Digite uma descrição"
-          />
-        </td>
-        <td>
-          <alex-inputs-editable-text
-            v-model="content[index].good"
-            tag="p"
-            class="text-body-1 h-100 pa-2"
-            :class="content[index].good ? 'text-gray-800' : 'text-gray-300'"
-            :cant-edit="editable"
-            placeholder="Digite uma descrição"
-          />
-        </td>
-        <td>
-          <alex-inputs-editable-text
-            v-model="content[index].reasonable"
-            tag="p"
-            class="text-body-1 h-100 pa-2"
-            :class="content[index].reasonable ? 'text-gray-800' : 'text-gray-300'"
-            :cant-edit="editable"
-            placeholder="Digite uma descrição"
-          />
-        </td>
-        <td>
-          <alex-inputs-editable-text
-            v-model="content[index].bad"
-            tag="p"
-            class="text-body-1 h-100 pa-2"
-            :class="content[index].bad ? 'text-gray-800' : 'text-gray-300'"
-            :cant-edit="editable"
-            placeholder="Digite uma descrição"
-          />
+        <td v-for="(rating, key) in ['excellent', 'good', 'reasonable', 'bad']" :key="key">
+          <div
+            class="tw-border tw-border-transparent rounded-lg tw-transition-all"
+            :class="[
+              content[index].selected === rating && 'selected-border',
+              !editable && 'cursor-pointer tw-select-none rubric-card',
+            ]"
+            @click="content[index].selected = rating as 'excellent' | 'good' | 'reasonable' | 'bad'"
+          >
+            <alex-inputs-radio-button
+              v-if="!editable"
+              v-model="content[index].selected"
+              :buttons="[{ value: rating }]"
+              hide-details
+            />
+            <alex-inputs-editable-text
+              v-model="content[index][rating]"
+              tag="p"
+              class="text-body-1 h-100 pa-2"
+              :class="[content[index][rating] ? 'text-gray-800' : 'text-gray-300', !editable && 'cursor-pointer']"
+              :cant-edit="editable"
+              placeholder="Digite uma descrição"
+            />
+          </div>
         </td>
       </tr>
     </tbody>
@@ -131,6 +117,12 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
   & td:first-child,
   td:last-child {
     padding: 16px !important;
+  }
+  & .selected-border {
+    border-color: rgb(var(--v-theme-secondary-0)) !important;
+  }
+  & .rubric-card:not(.selected-border):hover {
+    background-color: rgb(var(--v-theme-gray-100));
   }
 }
 </style>
