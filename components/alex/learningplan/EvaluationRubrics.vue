@@ -57,11 +57,14 @@ const removeRow = (index: number) => {
       <v-slide-y-transition group mode="out-in">
         <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
           <td>
-            <div class="w-100 h-100 pt-2">
+            <div class="w-100 h-100 pt-2" :class="editable && 'edit-chip'">
               <alex-custom-dropdown
                 :items="dropdownItems"
                 :on-item-select="(item) => onCriteriaSelect(item, index)"
                 :disabled="!editable || !!content[index].criterion.text"
+                :show-search="true"
+                search-placeholder="Encontrar critérios"
+                max-height="308"
               >
                 <template #activator="{ props }">
                   <v-chip
@@ -69,13 +72,13 @@ const removeRow = (index: number) => {
                     variant="outlined"
                     color="gray-600"
                     class="criteria-chip"
-                    @click="rows.criterion.text ? removeRow(index) : null"
+                    @click="rows.criterion.text && editable ? removeRow(index) : null"
                   >
                     <span class="text-wrap ellipsis lines-1">
                       {{ content[index].criterion.text || 'Selecione um critério' }}
                     </span>
                     <v-icon v-if="editable && !content[index].criterion.text">mdi-chevron-down</v-icon>
-                    <v-icon v-else class="ml-1 delete-icon" size="15">mdi-trash-can-outline</v-icon>
+                    <v-icon v-else-if="editable" class="ml-1 delete-icon" size="15">mdi-trash-can-outline</v-icon>
                   </v-chip>
                 </template>
               </alex-custom-dropdown>
@@ -122,8 +125,8 @@ const removeRow = (index: number) => {
     background-color: transparent !important;
   }
   & td {
-    max-width: 220px !important;
-    min-width: 200px !important;
+    max-width: 240px !important;
+    min-width: 220px !important;
     text-wrap: wrap;
     word-wrap: break-word;
     padding: 16px 8px !important;
@@ -139,7 +142,7 @@ const removeRow = (index: number) => {
     background-color: rgb(var(--v-theme-gray-100));
   }
 
-  & .criteria-chip {
+  & .edit-chip .criteria-chip {
     padding: 0 4px 0 15px;
     &:hover .delete-icon {
       visibility: visible !important;
@@ -151,7 +154,7 @@ const removeRow = (index: number) => {
 }
 
 @media (min-width: 768px) {
-  .criteria-chip {
+  .edit-chip .criteria-chip {
     visibility: visible !important;
   }
 }
