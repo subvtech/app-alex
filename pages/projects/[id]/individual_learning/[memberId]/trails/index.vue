@@ -111,8 +111,12 @@ const handleTrailCreate = async (trailId: number, newStructure) => {
   }
 };
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
   const user = +route.params.memberId;
+
+  if (!learningPlanStore.learningPlan) {
+    await learningPlanStore.loadLearningPlan(+route.params.id);
+  }
 
   // My trails
   find('trails', {
@@ -122,6 +126,7 @@ onBeforeMount(() => {
         author_member: {
           user,
         },
+        learningplan: learningPlanStore.learningPlan?.id,
       },
     },
   })
@@ -136,6 +141,9 @@ onBeforeMount(() => {
     filters: {
       partners: {
         user,
+      },
+      learning_structure: {
+        learningplan: learningPlanStore.learningPlan?.id,
       },
     },
   })
@@ -184,7 +192,7 @@ onBeforeMount(() => {
           :description="item.description"
           :image="{ url: item?.cover_image?.url }"
           :blocks="item?.blocks ?? []"
-          class="flex-stretch"
+          class="flex-stretch tw-flex-[0_0_316px]"
           can-edit
           hide-copy
           @toggle-visibility="toggleVisibility(item.id, item.hidden)"
@@ -211,7 +219,7 @@ onBeforeMount(() => {
           :description="item.description"
           :image="{ url: item?.cover_image?.url }"
           :blocks="item?.blocks ?? []"
-          class="flex-stretch"
+          class="flex-stretch tw-flex-[0_0_316px]"
           can-edit
           hide-copy
           @toggle-visibility="toggleVisibility(item.id, item.hidden)"
