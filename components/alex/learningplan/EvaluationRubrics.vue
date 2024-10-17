@@ -86,7 +86,7 @@ const removeRow = (index: number) => {
           </td>
           <td v-for="(rating, key) in ['excellent', 'good', 'reasonable', 'bad']" :key="key">
             <div
-              class="tw-border tw-border-transparent rounded-lg tw-transition-all"
+              class="tw-border tw-border-transparent rounded-lg tw-transition-all h-100"
               :class="[
                 content[index].selected === rating && !editable && 'selected-border',
                 !editable && 'cursor-pointer tw-select-none rubric-card',
