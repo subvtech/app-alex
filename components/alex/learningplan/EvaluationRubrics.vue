@@ -28,7 +28,7 @@ const defaultRow = {
   reasonable: '',
   bad: '',
 };
-const content = ref<rubricRow[]>(props.data ? [...props.data] : [{ ...defaultRow }]);
+const content = ref<rubricRow[]>([...props.data, ...(props.editable ? [{ ...defaultRow }] : [])]);
 
 const onCriteriaSelect = (criteriaIndex: number, index: number) => {
   content.value[index].criterion = dropdownItems.value[criteriaIndex];
@@ -36,10 +36,14 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
     content.value.push({ ...defaultRow });
   }
 };
+
+const removeRow = (index: number) => {
+  content.value.splice(index, 1);
+};
 </script>
 
 <template>
-  <v-table fixed-header class="rubrics-table mx-auto">
+  <v-table fixed-header :height="500" class="rubrics-table overflow-auto tw-an">
     <thead class="rounded-t-lg bg-gray-800">
       <tr class="text-gray-100 text-h5">
         <th class="text-left">Critério</th>
@@ -50,51 +54,60 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
-        <td>
-          <div class="w-100 h-100 pt-2">
-            <alex-custom-dropdown
-              :items="dropdownItems"
-              :on-item-select="(item) => onCriteriaSelect(item, index)"
-              :disabled="!editable"
+      <v-slide-y-transition group mode="out-in">
+        <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
+          <td>
+            <div class="w-100 h-100 pt-2">
+              <alex-custom-dropdown
+                :items="dropdownItems"
+                :on-item-select="(item) => onCriteriaSelect(item, index)"
+                :disabled="!editable || !!content[index].criterion.text"
+              >
+                <template #activator="{ props }">
+                  <v-chip
+                    v-bind="props"
+                    variant="outlined"
+                    color="gray-600"
+                    class="criteria-chip"
+                    @click="rows.criterion.text ? removeRow(index) : null"
+                  >
+                    <span class="text-wrap ellipsis lines-1">
+                      {{ content[index].criterion.text || 'Selecione um critério' }}
+                    </span>
+                    <v-icon v-if="editable && !content[index].criterion.text">mdi-chevron-down</v-icon>
+                    <v-icon v-else class="ml-1 delete-icon" size="15">mdi-trash-can-outline</v-icon>
+                  </v-chip>
+                </template>
+              </alex-custom-dropdown>
+            </div>
+          </td>
+          <td v-for="(rating, key) in ['excellent', 'good', 'reasonable', 'bad']" :key="key">
+            <div
+              class="tw-border tw-border-transparent rounded-lg tw-transition-all"
+              :class="[
+                content[index].selected === rating && !editable && 'selected-border',
+                !editable && 'cursor-pointer tw-select-none rubric-card',
+              ]"
+              @click="content[index].selected = rating as 'excellent' | 'good' | 'reasonable' | 'bad'"
             >
-              <template #activator="{ props }">
-                <alex-custom-chip
-                  v-bind="props"
-                  variant="outlined"
-                  status="secondary"
-                  :text="content[index].criterion.text || 'Selecione um critério'"
-                />
-              </template>
-            </alex-custom-dropdown>
-          </div>
-        </td>
-        <td v-for="(rating, key) in ['excellent', 'good', 'reasonable', 'bad']" :key="key">
-          <div
-            class="tw-border tw-border-transparent rounded-lg tw-transition-all"
-            :class="[
-              content[index].selected === rating && 'selected-border',
-              !editable && 'cursor-pointer tw-select-none rubric-card',
-            ]"
-            @click="content[index].selected = rating as 'excellent' | 'good' | 'reasonable' | 'bad'"
-          >
-            <alex-inputs-radio-button
-              v-if="!editable"
-              v-model="content[index].selected"
-              :buttons="[{ value: rating }]"
-              hide-details
-            />
-            <alex-inputs-editable-text
-              v-model="content[index][rating]"
-              tag="p"
-              class="text-body-1 h-100 pa-2"
-              :class="[content[index][rating] ? 'text-gray-800' : 'text-gray-300', !editable && 'cursor-pointer']"
-              :cant-edit="editable"
-              placeholder="Digite uma descrição"
-            />
-          </div>
-        </td>
-      </tr>
+              <alex-inputs-radio-button
+                v-if="!editable"
+                v-model="content[index].selected"
+                :buttons="[{ value: rating }]"
+                hide-details
+              />
+              <alex-inputs-editable-text
+                v-model="content[index][rating]"
+                tag="p"
+                class="text-body-1 h-100 pa-2"
+                :class="[content[index][rating] ? 'text-gray-800' : 'text-gray-300', !editable && 'cursor-pointer']"
+                :cant-edit="editable"
+                placeholder="Digite uma descrição"
+              />
+            </div>
+          </td>
+        </tr>
+      </v-slide-y-transition>
     </tbody>
   </v-table>
 </template>
@@ -109,7 +122,8 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
     background-color: transparent !important;
   }
   & td {
-    max-width: 240px !important;
+    max-width: 220px !important;
+    min-width: 200px !important;
     text-wrap: wrap;
     word-wrap: break-word;
     padding: 16px 8px !important;
@@ -123,6 +137,22 @@ const onCriteriaSelect = (criteriaIndex: number, index: number) => {
   }
   & .rubric-card:not(.selected-border):hover {
     background-color: rgb(var(--v-theme-gray-100));
+  }
+
+  & .criteria-chip {
+    padding: 0 4px 0 15px;
+    &:hover .delete-icon {
+      visibility: visible !important;
+    }
+  }
+  & .delete-icon {
+    visibility: hidden;
+  }
+}
+
+@media (min-width: 768px) {
+  .criteria-chip {
+    visibility: visible !important;
   }
 }
 </style>
