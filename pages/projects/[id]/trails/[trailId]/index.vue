@@ -3,7 +3,7 @@
     <alex-learningplan-trails-contributions-side-bar
       :model-value="sidebar"
       :contributions="highlightedContributionsSimple"
-      :is-professor="learningPlanStore.userIsFacilitator"
+      :is-professor="canEdit"
       @show-contribution="showContribution"
       @remove-highlight="removeContributionHighlight"
       @update:model-value="(value) => (sidebar = value)"
@@ -19,7 +19,7 @@
           @click="sidebar = !sidebar"
         />
         <alex-custom-button
-          v-if="readOnly && learningPlanStore.userIsFacilitator && !trailStore.loading"
+          v-if="readOnly && canEdit && !trailStore.loading"
           variant="primary"
           size="large"
           class="ml-2"
@@ -27,7 +27,7 @@
           @click="toggleReadOnly"
           >{{ $t('pages.trailId.overview.editBtn') }}</alex-custom-button
         >
-        <div v-else-if="learningPlanStore.userIsFacilitator && !isLoading">
+        <div v-else-if="canEdit && !isLoading">
           <alex-custom-button
             variant="secondary"
             size="large"
@@ -140,10 +140,7 @@
                 />
               </div>
             </div>
-            <div
-              v-if="!learningPlanStore.userIsFacilitator"
-              class="w-100 pt-12 d-flex justify-center align-center contributions-container"
-            >
+            <div v-if="!canEdit" class="w-100 pt-12 d-flex justify-center align-center contributions-container">
               <alex-custom-button class="ma-auto" prepend-icon="mdi-plus" size="large" @click="goToContributions()">
                 {{ t('pages.trailId.overview.contribute') }}
               </alex-custom-button>
@@ -192,6 +189,7 @@ definePageMeta({
   hideLearningPlanBanner: true,
 });
 const { update, create } = useStrapi();
+const user = useStrapiUser();
 const route = useRoute();
 const { setMessage } = useMessageStore();
 const trailStore = useTrailStore();
@@ -230,6 +228,17 @@ const editorData = computed(() => {
         };
       }) || [],
   };
+});
+const canEdit = computed<boolean>(() => {
+  const isAuthor = trailStore.trail?.learning_structure?.author_member?.user?.id === (user.value?.id ?? null);
+
+  if (isAuthor) {
+    return true;
+  }
+
+  const isPartner = trailStore.trail?.partners.some((partner) => partner.user.id === (user.value?.id ?? null));
+
+  return !!isPartner;
 });
 
 const highlightedContributions = computed(() => {
@@ -390,7 +399,7 @@ const showContribution = (contribution: contributionType) => {
 
 const goToContributions = () => {
   navigateTo({
-    path: `/courses/${learningPlanId.value}/trails/${trailId.value}/contributions`,
+    path: `/projects/${learningPlanId.value}/trails/${trailId.value}/contributions`,
     query: { openModal: 'true' },
   });
 };
