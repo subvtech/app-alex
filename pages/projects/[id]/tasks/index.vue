@@ -5,6 +5,7 @@ import TaskFilterDrawer from './-components/TaskFilterDrawer.vue';
 import TaskList from './-components/TaskList.vue';
 import { useGetSprints } from './-composables/useKanban';
 import { SprintSimple } from '#imports';
+import { Sprint } from './-composables/useSprints';
 
 type FilterType = {
   finalDate?: { start: string | null; end: string | null };
@@ -84,7 +85,7 @@ watch(sprints, (value) => {
           v-model="selectedSprint"
           hide-details
           return-object
-          class="tw-w-[300px] tw-mr-auto"
+          class="tw-w-full sm:tw-w-[300px] tw-mr-auto"
           density="comfortable"
           item-title="title"
           name="search"

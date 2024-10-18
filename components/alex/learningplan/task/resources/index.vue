@@ -99,6 +99,7 @@
 <script setup lang="ts">
 const { update, create } = useStrapi();
 const { findOne } = useStrapiUtils();
+const user = useStrapiUser();
 const learningPlanStore = useLearningPlanStore();
 const taskStore = useTaskStore();
 const isLoading = ref(false);
@@ -114,6 +115,7 @@ interface propsType {
   blocks?: BlockSimple[] | number[];
   edit?: boolean;
   teacher?: boolean;
+  project?: boolean;
 }
 
 const props = withDefaults(defineProps<propsType>(), {
@@ -122,11 +124,20 @@ const props = withDefaults(defineProps<propsType>(), {
   blocks: undefined,
   edit: false,
   teacher: false,
+  project: false,
 });
 
 const editMode = ref(props.edit);
 
 const learningStructure = computed(() => {
+  if (props.project) {
+    return (
+      learningPlanStore.learningPlan?.learning_structures?.find(
+        (structure) => structure.type === 'standard' && structure.author_member?.user?.id === user.value?.id,
+      )?.id ?? null
+    );
+  }
+
   return (
     learningPlanStore.learningPlan?.learning_structures.find((structure) => structure.type === 'standard')?.id || 0
   );
@@ -140,22 +151,38 @@ const hideFooter = computed(() => {
   return paginationLength.value <= 1;
 });
 
-const handleCreatedTrail = async (id) => {
+const handleCreatedTrail = async (id, newStructure) => {
   const newTrail = await findOne('trails', id, {
     populate: ['cover_image', 'structures.blocks'],
   });
+
   const trail: TrailSimple = newTrail.data as TrailSimple;
   learningPlanStore.standardTrails.unshift({
     ...trail,
   });
 
-  if (learningPlanStore.learningPlan) {
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan?.id);
+  // Adiciona a nova trilha à lista de learningStructures para ser listada em trails
+  if (learningStructure.value && learningPlanStore.learningPlan) {
+    learningPlanStore.learningPlan.learning_structures =
+      learningPlanStore.learningPlan?.learning_structures?.map((structure) => {
+        if (structure.id === learningStructure.value) {
+          structure.trails = [...structure.trails, { ...trail }];
+        }
+
+        return structure;
+      }) ?? [];
+
+    structures.value = learningPlanStore.learningPlan.learning_structures;
   }
 
   selectedTrail.value = trail;
   editMode.value = false;
   createTrailDialog.value = false;
+
+  if (newStructure && learningPlanStore.learningPlan) {
+    learningPlanStore.learningPlan.learning_structures = [...structures.value, newStructure];
+    structures.value = [...structures.value, newStructure];
+  }
 };
 
 const editor = ref();
@@ -251,9 +278,16 @@ const updateTask = async (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
     trail: type === 'ADD' ? selectedTrail.value?.id : null,
   });
 
-  if (learningPlanStore.learningPlan) {
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
+  if (taskStore.task) {
+    taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
   }
+  // if (taskStore.task && learningPlanStore.learningPlan) {
+  //   taskStore.loadTaskData(taskStore.task.id, learningPlanStore.learningPlan.id);
+  //   learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
+  // }
+  // if (learningPlanStore.learningPlan) {
+  //   learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
+  // }
 };
 
 const updateLearningplanStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
@@ -280,11 +314,10 @@ const updateTaskStore = (blocks: BlockSimple[], type: 'ADD' | 'REMOVE') => {
     taskStore.task.blocks = type === 'ADD' ? blocks : [];
     taskStore.task.trail = type === 'ADD' ? selectedTrail.value : undefined;
   }
-
-  if (![-1, 0].includes(props.taskId) && learningPlanStore.learningPlan) {
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
-    taskStore.loadTaskData(props.taskId, learningPlanStore.learningPlan.id);
-  }
+  // if (![-1, 0].includes(props.taskId) && learningPlanStore.learningPlan) {
+  //   learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id);
+  //   taskStore.loadTaskData(props.taskId, learningPlanStore.learningPlan.id);
+  // }
 };
 
 const handleNewTrail = async () => {
@@ -306,9 +339,13 @@ const handleNewTrail = async () => {
     const StructureBlocks = await findOne<StructureSimple>('structures', structureData.data.id, {
       populate: ['blocks'],
     });
-    const localTrail = learningPlanStore.learningPlan?.learning_structures[0].trails.find(
-      (trail) => trail.id === selectedTrail.value?.id,
-    );
+
+    // Testar
+    const structure = !props.project
+      ? learningPlanStore.learningPlan?.learning_structures[0]
+      : learningPlanStore.learningPlan?.learning_structures.find(({ id }) => id === learningStructure.value);
+
+    const localTrail = structure?.trails.find((trail) => trail.id === selectedTrail.value?.id);
     localTrail?.structures.push({
       id: StructureBlocks.data.id,
       time: Date.now(),
@@ -333,6 +370,12 @@ watch(
     }
   },
 );
+
+watch(trail, (trail) => {
+  if (trail && props.edit) {
+    editMode.value = true;
+  }
+});
 </script>
 
 <style>
