@@ -51,7 +51,7 @@ const events = ref<FormattedEvent[]>([]);
 
 const progress = ref([]);
 
-const getPercentage = (amount: number, total: number): number => parseInt((amount / total) * 100);
+const getPercentage = (amount: number, total: number): number => parseInt((amount / total) * 100) || 100;
 
 onBeforeMount(() => {
   if (!learningPlanStore.loading && learningPlanStore.learningPlan) {

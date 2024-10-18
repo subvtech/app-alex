@@ -10,7 +10,6 @@ const { t } = useI18n();
 const { update } = useStrapi();
 const { findOne, find } = useStrapiUtils();
 const { setMessage } = useMessageStore();
-const user = useStrapiUser();
 const learningPlanStore = useLearningPlanStore();
 const route = useRoute();
 
@@ -23,7 +22,7 @@ const myTrails = ref<TrailSimple[] | undefined>(undefined);
 const learningStructure = computed<number | null>(
   () =>
     learningPlanStore.learningPlan?.learning_structures?.find(
-      (structure) => structure.type === 'standard' && structure.author_member?.user?.id === user.value?.id,
+      (structure) => structure.type === 'standard' && structure.author_member?.user?.id === +route.params.memberId,
     )?.id ?? null,
 );
 
@@ -232,6 +231,7 @@ onBeforeMount(async () => {
     <alex-learningplan-trails-dialogs-create
       :model-value="showAddTrailDialog"
       :learning-structure="learningStructure"
+      :user-id="+route.params.memberId"
       @course-created="handleTrailCreate"
       @update:model-value="(open) => (showAddTrailDialog = open)"
     />
