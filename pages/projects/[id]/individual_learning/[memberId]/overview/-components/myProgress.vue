@@ -6,6 +6,7 @@ import { enIN, ptBR } from 'date-fns/locale';
 import Tooltip from './tooltip.vue';
 
 const i18Dir = 'components.projects.individual_learning.overview.myProgress';
+const lastUpdate = new Date();
 
 const activePage = ref(0);
 const i18n = useI18n();
@@ -40,6 +41,10 @@ const processedData = computed(() => {
   }));
 });
 
+const selectedGoal = computed(() => {
+  return props.data?.find(({ id }) => id === activePage.value);
+});
+
 const formattedDate = (strDate: string) => {
   const date = new Date(strDate);
   return format(date, `d MMM y`, {
@@ -55,6 +60,15 @@ const chipStatus = (status: string) => {
   };
   return mapedColors[status] as 'secondary' | 'blue' | 'orange' | 'green';
 };
+
+watch(
+  () => props.data,
+  (data, oldData) => {
+    if (!oldData.length && data.length) {
+      setTimeout(() => (activePage.value = data[0].id), 300);
+    }
+  },
+);
 </script>
 
 <template>
@@ -76,28 +90,30 @@ const chipStatus = (status: string) => {
             :custom-tooltip="Tooltip"
             :x-formatter="
               (tick) => {
-                return processedData.length ? `OA${processedData[tick]?.id}` : '';
+                return processedData.length ? `${$t(`${i18Dir}.goalAcronym`)}${processedData[tick]?.id}` : '';
               }
             "
           />
-          <div class="footer mt-4">
+          <div v-if="selectedGoal" class="footer mt-4">
             <div class="text-body-1 text-gray-900 d-flex align-center ga-2 mb-1">
               <span
                 class="tw-w-[40px] tw-h-[30px] d-flex tw-justify-center align-center rounded gap-1 text-body-1 bg-secondary--2 text-secondary-0"
               >
-                50%
+                {{ `${selectedGoal?.percentage ?? 100}%` }}
               </span>
               {{ $t(`${i18Dir}.finishedTasks`) }}
             </div>
-            <p class="text-gray-600 text-body-3">{{ $t(`${i18Dir}.lastUpdate`) }}: 19 de setembro de 2024</p>
+            <p class="text-gray-600 text-body-3">
+              {{ $t(`${i18Dir}.lastUpdate`) }}: {{ formattedDate(lastUpdate.toString()) }}
+            </p>
           </div>
         </div>
         <div class="lg:tw-w-1/2 tw-w-full pb-6 pl-6 tw-max-h-[400px]">
           <!-- <alex-custom-tabs v-model="activePage" :tabs="tabs" /> -->
           <v-tabs class="text-gray-800 w-100">
             <v-tooltip
-              v-for="(tab, index) in processedData"
-              :key="index"
+              v-for="tab in processedData"
+              :key="tab.id"
               :text="tab.name"
               location="top"
               content-class="px-4 py-2 bg-gray-800 text-white rounded-lg"

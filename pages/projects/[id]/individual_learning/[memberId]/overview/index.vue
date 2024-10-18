@@ -187,51 +187,41 @@ watch(
     });
 
     // Get progress
-    // find('learning-goals', {
-    //   filters: {
-    //     learningplan: learningPlanStore.learningPlan?.id,
-    //   },
-    //   populate: {
-    //     tasks: {
-    //       task_members: {
-    //         populate: true,
-    //         filters: {
-    //           learning_plan_member: member.id,
-    //         },
-    //       },
-    //     },
-    //   },
-    // }).then(({ data }) => {
-    //   // {
-    //   //   id: 123,
-    //   //   name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
-    //   //   percentage: 100,
-    //   //   tasks: [
-    //   //     { id: 1, name: 'Consertar a Sidebar da plataforma ALEX', endDate: '09-03-2024', status: 'done' },
-    //   //     {
-    //   //       id: 2,
-    //   //       name: 'Fazer algo muito importante que tem uma importância extrema',
-    //   //       endDate: '01-29-2025',
-    //   //       status: 'to_do',
-    //   //     },
-    //   //     { id: 3, name: 'Tarefa 3', endDate: '02-18-2025', status: 'doing' },
-    //   //     { id: 4, name: 'Tarefa 4', endDate: '02-18-2025', status: 'doing' },
-    //   //     { id: 5, name: 'Tarefa 5', endDate: '02-18-2025', status: 'doing' },
-    //   //   ],
-    //   // },
-    //   // const newProgress = (data as LearningPlanGoalSimple[]).map((goal) => {
-    //   //   return {
-    //   //     id: goal.id,
-    //   //   };
-    //   // });
-    //   // const newProgress = (data as LearningPlanGoal[]).map((goal) => ({
-    //   //   id: goal.id,
-    //   //   name: goal.description,
-    //   //   percentage: 0,
-    //   //   tasks:
-    //   // }))
-    //   console.log(data);
-    // });
+    find('learning-goals', {
+      filters: {
+        learningplan: learningPlanStore.learningPlan?.id,
+      },
+      populate: {
+        tasks: {
+          populate: {
+            task_members: true,
+          },
+          filters: {
+            task_members: {
+              learning_plan_member: member.id,
+            },
+          },
+        },
+      },
+    }).then(({ data }) => {
+      progress.value = (data as LearningPlanGoalSimple[]).map((goal) => {
+        const taskMemberStatus = goal?.tasks?.map((task) => task?.task_members?.[0]?.status) ?? [];
+        const completedTasks = taskMemberStatus?.filter((status) => status === 'done');
+        const tasks =
+          goal?.tasks?.map((task) => ({
+            id: task.id,
+            name: task.title,
+            endDate: task.finish_at,
+            status: task?.task_members?.[0]?.status,
+          })) ?? [];
+        return {
+          id: goal.id,
+          name: goal.description,
+          percentage: getPercentage(completedTasks.length, taskMemberStatus.length),
+          tasks,
+        };
+      });
+    });
   },
 );
 </script>

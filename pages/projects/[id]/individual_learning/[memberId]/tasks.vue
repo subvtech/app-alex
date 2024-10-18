@@ -270,10 +270,6 @@ const columns = ref<any>([
   },
 ]);
 
-watch(tasks, (tasks) => {
-  console.log('tasks:', tasks);
-});
-
 // Edit drawer
 const teacherDrawer = ref<boolean>(false);
 const taskDetails = ref<TaskSimple | null>(null);
