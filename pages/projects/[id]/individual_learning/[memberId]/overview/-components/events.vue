@@ -1,5 +1,5 @@
 <template>
-  <alex-custom-card id="overview-events" title="Eventos" no-footer>
+  <alex-custom-card id="overview-events" :title="$t(`${i18Dir}.title`)" no-footer>
     <template #content>
       <v-timeline
         side="end"
@@ -15,7 +15,9 @@
             </div>
           </template>
           <p class="text-body-2 text-gray-800">{{ item.title }}</p>
-          <p class="text-body-3 text-gray-600">{{ eventMessages?.[item.event] ?? '' }}</p>
+          <p class="text-body-3 text-gray-600">
+            {{ eventMessages?.[item.event] ? $t(`${i18Dir}.${item.event}`) : '' }}
+          </p>
         </v-timeline-item>
       </v-timeline>
     </template>
@@ -27,6 +29,8 @@
 import { format, isSameDay, isSameMonth, isSameYear } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
+
+const i18Dir = 'components.projects.individual_learning.overview.events';
 
 const i18n = useI18n();
 

@@ -4,6 +4,9 @@ import { format } from 'date-fns';
 // eslint-disable-next-line import/no-duplicates
 import { enIN, ptBR } from 'date-fns/locale';
 import Tooltip from './tooltip.vue';
+
+const i18Dir = 'components.projects.individual_learning.overview.myProgress';
+
 const activePage = ref(0);
 const i18n = useI18n();
 
@@ -55,7 +58,7 @@ const chipStatus = (status: string) => {
 </script>
 
 <template>
-  <alex-custom-card title="Meu Progresso" no-footer sizing-class="py-0 px-6" class="tw-min-h-[400px]">
+  <alex-custom-card :title="$t(`${i18Dir}.title`)" no-footer sizing-class="py-0 px-6" class="tw-min-h-[400px]">
     <template #content>
       <div class="d-flex flex-wrap w-100">
         <div
@@ -84,9 +87,9 @@ const chipStatus = (status: string) => {
               >
                 50%
               </span>
-              das tarefas foram terminadas
+              {{ $t(`${i18Dir}.finishedTasks`) }}
             </div>
-            <p class="text-gray-600 text-body-3">Ultima atualização: 19 de setembro de 2024</p>
+            <p class="text-gray-600 text-body-3">{{ $t(`${i18Dir}.lastUpdate`) }}: 19 de setembro de 2024</p>
           </div>
         </div>
         <div class="lg:tw-w-1/2 tw-w-full pb-6 pl-6 tw-max-h-[400px]">
@@ -103,7 +106,7 @@ const chipStatus = (status: string) => {
             >
               <template #activator="{ props: tooltip }">
                 <v-tab :value="tab.id" v-bind="tooltip" color="accent" @click="activePage = tab.id">
-                  <span>OA{{ tab.id }}</span>
+                  <span>{{ $t(`${i18Dir}.goalAcronym`) }}{{ tab.id }}</span>
                 </v-tab>
               </template>
             </v-tooltip>
@@ -114,7 +117,7 @@ const chipStatus = (status: string) => {
               <div v-if="!objective.tasks.length" class="tw-flex justify-center align-center tw-h-full">
                 <span>
                   <v-img src="/svg/emptyOAProgress.svg" class="tw-h-[120px] my-4" />
-                  <p class="text-gray-400 text-body-3">Nenhuma tarefa associada a este objetivo</p></span
+                  <p class="text-gray-400 text-body-3">{{ $t(`${i18Dir}.noTaskAttached`) }}</p></span
                 >
               </div>
               <div v-else class="tw-overflow-y-auto tw-h-full mt-4 minimalist-scrollbar">
@@ -131,7 +134,7 @@ const chipStatus = (status: string) => {
                         size="small"
                         class="width-20 mr-2"
                       ></alex-custom-chip>
-                      Término {{ formattedDate(task.endDate) }}
+                      {{ $t(`${i18Dir}.deadline`) }} {{ formattedDate(task.endDate) }}
                     </p>
                     <p class="text-body-2 text-gray-800 ellipsis lines-1">{{ task.name }}</p>
                   </div>
@@ -145,7 +148,7 @@ const chipStatus = (status: string) => {
           <div v-else class="tw-flex justify-center align-center tw-h-[90%]">
             <span>
               <v-img src="/svg/emptyOAProgress.svg" class="tw-h-[120px] my-4" />
-              <p class="text-gray-400 text-body-3">Nenhum objetivo cadastrado</p></span
+              <p class="text-gray-400 text-body-3">{{ $t(`${i18Dir}.noGoalRegistered`) }}</p></span
             >
           </div>
         </div>

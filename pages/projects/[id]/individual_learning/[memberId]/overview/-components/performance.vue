@@ -1,5 +1,10 @@
 <template>
-  <alex-custom-card title="Desempenho" no-footer sizing-class="py-0 px-6" class="tw-min-h-[470px]">
+  <alex-custom-card
+    :title="$t('components.projects.individual_learning.overview.performance')"
+    no-footer
+    sizing-class="py-0 px-6"
+    class="tw-min-h-[470px]"
+  >
     <template #content>
       <BarChart
         class="pa-5"

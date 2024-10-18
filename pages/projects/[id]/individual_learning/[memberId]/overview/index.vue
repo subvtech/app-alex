@@ -8,6 +8,7 @@ import Performance from './-components/performance.vue';
 const learningPlanStore = useLearningPlanStore();
 const { setMessage } = useMessageStore();
 const { find } = useStrapiUtils();
+const { t } = useI18n();
 const route = useRoute();
 
 interface FormattedEvent {
@@ -165,7 +166,7 @@ watch(
         totalizers.value = newTotalizers;
       })
       .catch((e) => {
-        setMessage('Falha ao carregar atividades do aluno', 'error', true);
+        setMessage(t('components.projects.individual_learning.overview.message.failTasks'), 'error', true);
         console.error(e);
       });
 

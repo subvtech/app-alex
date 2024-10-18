@@ -16,7 +16,9 @@ defineProps<{
         <div v-if="item.name === 'percentage'" class="d-lex align-center justify-center">
           <div class="d-flex align-center justify-center pa-2">
             <div class="tw-h-2 tw-w-2 tw-mr-[5px] bg-secondary-0 tw-rounded-[3px]" />
-            <span class="text-body-5"> OA{{ data[0].value }} </span>
+            <span class="text-body-5">
+              {{ $t('components.projects.individual_learning.overview.myProgress.goalAcronym') }}{{ data[0].value }}
+            </span>
             <span class="text-body-5 ml-1 font-weight-bold">{{ item.value }}%</span>
           </div>
         </div>

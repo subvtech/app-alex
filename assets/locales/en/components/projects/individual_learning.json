@@ -1,4 +1,38 @@
 {
+  "overview": {
+    "events": {
+      "title": "Events",
+      "task_created": "Task created",
+      "task_start_date": "Start date changed",
+      "task_deadline": "Deadline changed",
+      "task_submission": "Submission",
+      "task_archived": "Task archived",
+      "task_deadline_ended": "Deadline ended",
+      "student_deadline": "Student deadline",
+      "student_status": "Student status",
+      "student_added": "Student added",
+      "student_removed": "Student removed",
+      "group_added": "Group added",
+      "group_removed": "Group removed",
+      "submission_send": "Submission sent",
+      "submission_denied": "Submission denied",
+      "submission_evaluated": "Submission evaluated",
+      "message": "Message sent"
+    },
+    "myProgress": {
+      "title": "My progress",
+      "finishedTasks": "of tasks completed",
+      "deadline": "Deadline",
+      "lastUpdate": "Last update",
+      "goalAcronym": "LG",
+      "noTaskAttached": "No tasks associated with this project",
+      "noGoalRegistered": "No objectives registered"
+    },
+    "performance": "Performance",
+    "message": {
+      "failTasks": "Failed to load tasks"
+    }
+  },
   "tasks": {
     "seeKanban": "See Kanban",
     "seeList": "See List",
