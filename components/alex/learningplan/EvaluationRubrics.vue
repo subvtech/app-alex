@@ -46,24 +46,24 @@ const removeRow = (index: number) => {
   <v-table fixed-header :height="500" class="rubrics-table overflow-auto tw-an">
     <thead class="rounded-t-lg bg-gray-800">
       <tr class="text-gray-100 text-h5">
-        <th class="text-left">Critério</th>
-        <th class="text-left">Excelente (10)</th>
-        <th class="text-left">Bom (7.5)</th>
-        <th class="text-left">Razoável (5)</th>
-        <th class="text-left">Ruim (2.5)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.criterion') }}</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.excellent') }} (10)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.good') }} (7.5)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.reasonable') }} (5)</th>
+        <th class="text-left">{{ $t('components.learningPlan.evaluationRubrics.headers.poor') }} (2.5)</th>
       </tr>
     </thead>
     <tbody>
       <v-slide-y-transition group mode="out-in">
         <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
-          <td class="tw-w-[240px]">
+          <td>
             <div class="w-100 h-100 pt-2" :class="editable && 'edit-chip'">
               <alex-custom-dropdown
                 :items="dropdownItems"
                 :on-item-select="(item) => onCriteriaSelect(item, index)"
                 :disabled="!editable || !!content[index].criterion.text"
                 :show-search="true"
-                search-placeholder="Encontrar critérios"
+                :search-placeholder="$t('components.learningPlan.evaluationRubrics.findCriteria')"
                 max-height="308"
               >
                 <template #activator="{ props }">
@@ -75,9 +75,13 @@ const removeRow = (index: number) => {
                     @click="rows.criterion.text && editable ? removeRow(index) : null"
                   >
                     <span class="text-wrap ellipsis lines-1">
-                      {{ content[index].criterion.text || 'Selecione um critério' }}
+                      {{
+                        content[index].criterion.text || $t('components.learningPlan.evaluationRubrics.selectCriterion')
+                      }}
                     </span>
-                    <v-icon v-if="editable && !content[index].criterion.text">mdi-chevron-down</v-icon>
+                    <v-icon v-if="editable && !content[index].criterion.text" class="ml-2 mr-1"
+                      >mdi-chevron-down</v-icon
+                    >
                     <v-icon v-else-if="editable" class="delete-icon" size="15">mdi-trash-can-outline</v-icon>
                   </v-chip>
                 </template>
@@ -105,7 +109,7 @@ const removeRow = (index: number) => {
                 class="text-body-1 h-100 pa-2"
                 :class="[content[index][rating] ? 'text-gray-800' : 'text-gray-300', !editable && 'cursor-pointer']"
                 :cant-edit="editable"
-                placeholder="Digite uma descrição"
+                :placeholder="$t('components.learningPlan.evaluationRubrics.descriptionPlaceholder')"
               />
             </div>
           </td>
@@ -125,6 +129,7 @@ const removeRow = (index: number) => {
     background-color: transparent !important;
   }
   & td {
+    min-width: 240px;
     text-wrap: wrap;
     word-wrap: break-word;
     padding: 16px 8px !important;
