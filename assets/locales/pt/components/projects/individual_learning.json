@@ -19,5 +19,15 @@
       "taskDeleted": "Tarefa deletada com sucesso",
       "failDeleteTask": "Falha ao deletar tarefa"
     }
+  },
+  "trails": {
+    "myTrails": "Minhas Trilhas",
+    "myCollabs": "Minhas Colaborações",
+    "search": "Encontrar trilha",
+    "messages": {
+      "failHidden": "Falha ao alterar visibilidade",
+      "failMyCollabs": "Falha ao carregar suas colaborações",
+      "failMyTrails": "Falha ao carregar suas trilhas"
+    }
   }
 }
