@@ -56,7 +56,7 @@ const removeRow = (index: number) => {
     <tbody>
       <v-slide-y-transition group mode="out-in">
         <tr v-for="(rows, index) in content" :key="rows.criterion.id" class="rubric-row pa-4">
-          <td>
+          <td class="tw-w-[240px]">
             <div class="w-100 h-100 pt-2" :class="editable && 'edit-chip'">
               <alex-custom-dropdown
                 :items="dropdownItems"
@@ -78,7 +78,7 @@ const removeRow = (index: number) => {
                       {{ content[index].criterion.text || 'Selecione um critério' }}
                     </span>
                     <v-icon v-if="editable && !content[index].criterion.text">mdi-chevron-down</v-icon>
-                    <v-icon v-else-if="editable" class="ml-1 delete-icon" size="15">mdi-trash-can-outline</v-icon>
+                    <v-icon v-else-if="editable" class="delete-icon" size="15">mdi-trash-can-outline</v-icon>
                   </v-chip>
                 </template>
               </alex-custom-dropdown>
@@ -125,8 +125,6 @@ const removeRow = (index: number) => {
     background-color: transparent !important;
   }
   & td {
-    max-width: 240px !important;
-    min-width: 220px !important;
     text-wrap: wrap;
     word-wrap: break-word;
     padding: 16px 8px !important;
@@ -143,19 +141,23 @@ const removeRow = (index: number) => {
   }
 
   & .edit-chip .criteria-chip {
-    padding: 0 4px 0 15px;
+    padding: 0 4px 0 16px;
+    transition: all 0.3s;
     &:hover .delete-icon {
-      visibility: visible !important;
+      opacity: 1;
+      margin: 0 8px 0 4px;
     }
   }
   & .delete-icon {
-    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s;
   }
 }
 
-@media (min-width: 768px) {
-  .edit-chip .criteria-chip {
-    visibility: visible !important;
+@media (max-width: 768px) {
+  .criteria-chip .delete-icon {
+    opacity: 1 !important;
+    margin: 0 4px;
   }
 }
 </style>
