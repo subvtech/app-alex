@@ -28,7 +28,7 @@ const totalizers = ref({
   objectives: {
     title: 'Total de objetivos',
     icon: 'alex:ManageHistory',
-    value: '0',
+    value: '00',
     percentage: 0,
   },
   contributions: {
@@ -42,55 +42,21 @@ const totalizers = ref({
 });
 
 const grades = [
-  { name: 'Média', grade: 10 },
-  { name: 'AV2', grade: 2 },
-  { name: 'AV1', grade: 8 },
+  // { name: 'Média', grade: 10 },
+  // { name: 'AV2', grade: 2 },
+  // { name: 'AV1', grade: 8 },
 ];
 
 const events = ref<FormattedEvent[]>([]);
 
-const progress = [
-  {
-    id: 123,
-    name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
-    percentage: 100,
-    tasks: [
-      { id: 1, name: 'Consertar a Sidebar da plataforma ALEX', endDate: '09-03-2024', status: 'done' },
-      {
-        id: 2,
-        name: 'Fazer algo muito importante que tem uma importância extrema',
-        endDate: '01-29-2025',
-        status: 'to_do',
-      },
-      { id: 3, name: 'Tarefa 3', endDate: '02-18-2025', status: 'doing' },
-      { id: 4, name: 'Tarefa 4', endDate: '02-18-2025', status: 'doing' },
-      { id: 5, name: 'Tarefa 5', endDate: '02-18-2025', status: 'doing' },
-    ],
-  },
-  {
-    id: 124,
-    name: 'Pesquisar o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais. o aprendizado do aluno por meio de metodologias funcionais.',
-    percentage: 0,
-    tasks: [],
-  },
-  {
-    id: 125,
-    name: 'Apender sobre a vida a verdade e o universo',
-    percentage: 80,
-    tasks: [],
-  },
-  {
-    id: 200,
-    name: 'Vital, adanava a pé e achava que assim estava mal',
-    percentage: 50,
-    tasks: [],
-  },
-];
+const progress = ref([]);
 
 const getPercentage = (amount: number, total: number): number => parseInt((amount / total) * 100);
 
 onBeforeMount(() => {
-  // learningPlanStore.loadLearningPlan(+route.params.id); // Tirar dps
+  if (!learningPlanStore.loading && learningPlanStore.learningPlan) {
+    learningPlanStore.loadLearningPlan(+route.params.id);
+  }
 });
 
 watch(
@@ -252,11 +218,17 @@ watch(
     //   //     { id: 5, name: 'Tarefa 5', endDate: '02-18-2025', status: 'doing' },
     //   //   ],
     //   // },
-    //   const newProgress = (data as LearningPlanGoalSimple[]).map((goal) => {
-    //     return {
-    //       id: goal.id,
-    //     };
-    //   });
+    //   // const newProgress = (data as LearningPlanGoalSimple[]).map((goal) => {
+    //   //   return {
+    //   //     id: goal.id,
+    //   //   };
+    //   // });
+    //   // const newProgress = (data as LearningPlanGoal[]).map((goal) => ({
+    //   //   id: goal.id,
+    //   //   name: goal.description,
+    //   //   percentage: 0,
+    //   //   tasks:
+    //   // }))
     //   console.log(data);
     // });
   },
