@@ -1,13 +1,11 @@
-import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
 import { createI18n } from 'vue-i18n';
-import { ElementType, literalArray } from '../utils';
+import { type ElementType, literalArray } from '../utils';
 import { useImportLanguages } from './useImportedLanguages';
 
 export const SUPPORT_LOCALES = literalArray('en', 'pt');
 export type SUPPORT_LOCALES_TYPE = ElementType<typeof SUPPORT_LOCALES>;
-export const defaultBrowserLanguage = navigator.language.startsWith('pt')
-  ? 'pt'
-  : 'en';
+export const defaultBrowserLanguage = navigator.language.startsWith('pt') ? 'pt' : 'en';
 export const i18n = createI18n({
   locale: defaultBrowserLanguage,
   legacy: false,
@@ -41,10 +39,7 @@ export function setI18nLanguage(locale) {
 
 export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
   // If the same language
-  if (
-    i18n.global.locale ===
-    (lang as unknown as WritableComputedRef<SUPPORT_LOCALES_TYPE>)
-  ) {
+  if (i18n.global.locale === (lang as unknown as WritableComputedRef<SUPPORT_LOCALES_TYPE>)) {
     return Promise.resolve(setI18nLanguage(lang));
   }
 
@@ -55,8 +50,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
 
   // If the language hasn't been loaded yet
   const rules = (await import(`../assets/locales/${lang}/rules.json`)).default;
-  const errors = (await import(`../assets/locales/${lang}/errors.json`))
-    .default;
+  const errors = (await import(`../assets/locales/${lang}/errors.json`)).default;
   const pages = await useImportLanguages('pages', lang, [
     'login',
     'register',
@@ -74,6 +68,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'task',
     'admin',
     'users',
+    'assessments',
   ]);
   const components = await useImportLanguages('components', lang, [
     'appLearningPlanCard',
@@ -134,10 +129,7 @@ export async function loadLanguageAsync(lang: SUPPORT_LOCALES_TYPE) {
     'projects/sprint',
     'projects/individual_learning',
   ]);
-  const layouts = await useImportLanguages('layouts', lang, [
-    'default',
-    'error',
-  ]);
+  const layouts = await useImportLanguages('layouts', lang, ['default', 'error']);
   i18n.global.setLocaleMessage(lang, {
     pages,
     errors,
