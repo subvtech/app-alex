@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<DropdownProps>(), {
 
 const search = ref('');
 const filteredItems = computed(() => {
-  return props.items.filter((item) => item.text.toLowerCase().includes(search.value.toLowerCase()));
+  return props.items?.filter((item) => item.text.toLowerCase().includes(search.value.toLowerCase()));
 });
 const slots = useSlots();
 const isDarkMode = computed(() => props.theme === 'dark');
