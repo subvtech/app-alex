@@ -128,7 +128,7 @@
       <p class="text-h3 mt-6">Avaliação</p>
       <v-row class="mx-0 mt-3 mb-4 gap-3">
         <div
-          class="pa-0 rounded-lg tw-border tw-w-[288px] d-flex cursor-pointer"
+          class="pa-0 rounded-lg tw-border tw-min-w-[288px] sm:tw-w-[288px] tw-w-full d-flex cursor-pointer"
           @click="openGradeCompositionDialog = true"
         >
           <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
@@ -141,7 +141,7 @@
           </div>
         </div>
 
-        <div class="pa-0 rounded-lg tw-border tw-w-[288px] d-flex cursor-pointer">
+        <div class="pa-0 rounded-lg tw-border tw-min-w-[288px] sm:tw-w-[288px] tw-w-full d-flex cursor-pointer">
           <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
             <v-icon size="32" icon="alex:FactCheck" color="secondary-0"></v-icon>
           </div>
@@ -210,14 +210,14 @@
 </template>
 
 <script setup lang="ts">
-import { isAfter, isBefore } from 'date-fns';
-import { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
-import { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
-import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
-import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
-import { orderEvents } from '~/utils';
-import { RestrictionValue } from '../Restrictions.vue';
 import { useQuery } from '@tanstack/vue-query';
+import { isAfter, isBefore } from 'date-fns';
+import type { WritableComputedRef } from 'nuxt/dist/app/compat/capi';
+import type { MentionUserPropsArray } from '~/components/TipTap/index.vue';
+import type { AlexDropdownItem } from '~/components/alex/custom/Dropdown.vue';
+import type { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
+import { orderEvents } from '~/utils';
+import type { RestrictionValue } from '../Restrictions.vue';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
 const openGradeCompositionDialog = ref(false);
