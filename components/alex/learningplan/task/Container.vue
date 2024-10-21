@@ -1,24 +1,12 @@
 <template>
   <div v-for="i in 4" :key="i">
     <Transition name="slide">
-      <v-expansion-panels
-        v-if="shouldDisplay(i)"
-        v-model="expand[i - 1]"
-        class="task-accordion my-6 rounded-lg"
-      >
+      <v-expansion-panels v-if="shouldDisplay(i)" v-model="expand[i - 1]" class="task-accordion my-6 rounded-lg">
         <v-expansion-panel class="rounded-lg">
           <v-expansion-panel-title class="cursor-default" disabled hide-actions>
-            <v-icon
-              :icon="
-                expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'
-              "
-              @click="toggleExpand(i)"
-            />
+            <v-icon :icon="expand[i - 1] === 0 ? 'mdi-chevron-down' : 'mdi-chevron-up'" @click="toggleExpand(i)" />
             <span class="text-h5 text-gray-800">{{ taskSections[i - 1] }}</span>
-            <alex-custom-chip
-              status="secondary"
-              :text="filteredTasks[i - 1].toString()"
-            ></alex-custom-chip>
+            <alex-custom-chip status="secondary" :text="filteredTasks[i - 1].toString()"></alex-custom-chip>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
             <Transition :name="slideTransition(i)" mode="out-in">
@@ -78,11 +66,7 @@
                     :disabled="loader"
                     @keyup.enter="handleCreateTask"
                   />
-                  <alex-custom-button
-                    size="large"
-                    :loading="loader"
-                    @click="handleCreateTask"
-                  >
+                  <alex-custom-button size="large" :loading="loader" @click="handleCreateTask">
                     {{ $t('pages.task.addButton') }}
                   </alex-custom-button>
                 </div>
@@ -96,6 +80,7 @@
   <alex-learningplan-task-drawer-teacher
     v-model="teacherDrawer"
     :task-id="taskDetails?.id"
+    :learning-plan-id="learningPlanStore.learningPlan?.id"
     :title="taskDetails?.title"
     :status="taskDetails?.status"
     :blocks="taskDetails?.blocks"
@@ -131,11 +116,7 @@
 <script setup lang="ts">
 import { filterType } from '@/pages/courses/[id]/tasks/index.vue';
 import { useMultipleDragDrop } from '~/composables/useMultipleDragDrop';
-import {
-  TaskSimple,
-  TaskStatus,
-  TaskType,
-} from '~/models/simple/taskSimple.model';
+import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 
 export interface TaskItem {
   id: number;
@@ -184,8 +165,7 @@ const loader = ref(false);
 const { setMessage } = useMessageStore();
 const learningPlanStore = useLearningPlanStore();
 const teacherDrawer = ref(false);
-const slideTransition = (i: number) =>
-  tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up';
+const slideTransition = (i: number) => (tasksArray.value[i - 1].length ? 'slide-down' : 'slide-up');
 
 const groupsArray = ['draft', 'published', 'finished', 'archived'];
 const groups = {};
@@ -215,8 +195,7 @@ const displayError = (message: string, e?: ApplicationError) => {
     displayMessage = t(`pages.task.crud.${error.details.errCode}`);
   }
   setMessage(displayMessage, 'error', true);
-  if (learningPlanStore.learningPlan)
-    learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
+  if (learningPlanStore.learningPlan) learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
 };
 
 const displaySuccess = (message: string) => {
@@ -285,20 +264,13 @@ const toggleExpand = (index: number) => {
   taskTitle.value = '';
   expand.value[index - 1] = !expand.value[index - 1] ? -1 : 0;
 };
-const taskSections = [
-  t('pages.task.draft'),
-  t('pages.task.published'),
-  t('pages.task.done'),
-  t('pages.task.archived'),
+const taskSections = [t('pages.task.draft'), t('pages.task.published'), t('pages.task.done'), t('pages.task.archived')];
+const taskSectionsValue: ('backlog' | 'draft' | 'published' | 'done' | 'archived' | 'sprint')[] = [
+  'draft',
+  'published',
+  'done',
+  'archived',
 ];
-const taskSectionsValue: (
-  | 'backlog'
-  | 'draft'
-  | 'published'
-  | 'done'
-  | 'archived'
-  | 'sprint'
-)[] = ['draft', 'published', 'done', 'archived'];
 
 const tasksArray = computed(() => {
   const draft: TaskItem[] = [];
@@ -314,8 +286,7 @@ const tasksArray = computed(() => {
         underReview: 0,
         completed: 0,
       };
-      if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select)
-        return;
+      if (tasksFilter.value?.select && task.type !== tasksFilter.value?.select) return;
       if (!isDateInRange(tasksFilter.value?.startDate, task.start_at)) return;
       if (!isDateInRange(tasksFilter.value?.finalDate, task.finish_at)) return;
       const students: TaskItem['students'] = [];
@@ -328,9 +299,7 @@ const tasksArray = computed(() => {
           const studentUser = student.student_member?.user;
           students.push({
             name: studentUser?.fullname,
-            image: studentUser?.avatar?.url
-              ? { url: studentUser.avatar.url }
-              : undefined,
+            image: studentUser?.avatar?.url ? { url: studentUser.avatar.url } : undefined,
           });
         });
 
@@ -368,9 +337,7 @@ const editTaskId = ref<number>(-1);
 
 const taskDetails = computed(() => {
   if (editTaskId.value) {
-    return learningPlanStore.learningPlan?.tasks.find(
-      (t) => t.id === editTaskId.value,
-    );
+    return learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   }
   return null;
 });
@@ -394,9 +361,7 @@ const filteredTasks = computed(() => {
 
 const handleDeleteTask = async (id: number) => {
   try {
-    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex(
-      (task) => task.id === id,
-    );
+    const deleteIndex = learningPlanStore.learningPlan?.tasks.findIndex((task) => task.id === id);
     if (typeof deleteIndex === 'number' && deleteIndex > -1) {
       learningPlanStore.learningPlan?.tasks.splice(deleteIndex, 1);
     }
@@ -407,13 +372,7 @@ const handleDeleteTask = async (id: number) => {
   }
 };
 
-const handleMoveTask = async ({
-  id,
-  status,
-}: {
-  id: number;
-  status: TaskStatus;
-}) => {
+const handleMoveTask = async ({ id, status }: { id: number; status: TaskStatus }) => {
   try {
     const taskPosition = getHigherIndex(status);
     const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === id);
@@ -433,9 +392,7 @@ const handleToggleArchive = async (id: number) => {
   if (!task) return;
   try {
     if (task) {
-      const newPosition = getHigherIndex(
-        !task.archived_at ? 'archived' : task.status,
-      );
+      const newPosition = getHigherIndex(!task.archived_at ? 'archived' : task.status);
       task.position = newPosition;
       task.archived_at = task.archived_at ? null : new Date().toISOString();
       await update('tasks', id, {
@@ -449,15 +406,7 @@ const handleToggleArchive = async (id: number) => {
   }
 };
 
-const {
-  over,
-  dragFrom,
-  dragging,
-  startDrag,
-  dragEnd,
-  onDragOver,
-  onDragLeave,
-} = useMultipleDragDrop();
+const { over, dragFrom, dragging, startDrag, dragEnd, onDragOver, onDragLeave } = useMultipleDragDrop();
 
 const setOver = (groupIndex: number) => {
   if (over.value.list === groups[groupIndex]) return over.value;
@@ -473,9 +422,7 @@ const updateTaskPositions = async (tasksStatus: TaskStatus, item: TaskItem) => {
 
   const cloneArray = JSON.parse(JSON.stringify(tasksArray.value[groupIndex]));
 
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === item.id,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === item.id);
 
   if (!task) return;
 
@@ -503,13 +450,8 @@ const updateTaskPositions = async (tasksStatus: TaskStatus, item: TaskItem) => {
 
 const onDrop = async (item: TaskItem, tableSort: string) => {
   if (over.value.list) {
-    const task = learningPlanStore.learningPlan?.tasks.find(
-      (t) => t.id === item.id,
-    );
-    if (
-      task?.status === over.value.list &&
-      (over.value.index === -1 || isFilterActive.value)
-    ) {
+    const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === item.id);
+    if (task?.status === over.value.list && (over.value.index === -1 || isFilterActive.value)) {
       const message = isFilterActive.value
         ? t('pages.task.crud.dndFilterError')
         : t('pages.task.crud.dndSortError', {
@@ -543,9 +485,7 @@ const openDrawer = (id: number) => {
 };
 
 const handleChangeValues = (values: Partial<TaskSimple>) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   if (task) {
     task.status = values.status!;
     task.type = values.type;
@@ -558,18 +498,14 @@ const handleChangeValues = (values: Partial<TaskSimple>) => {
 };
 
 const handleChangeDescription = (description: string) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   if (task) {
     task.description = description;
   }
 };
 
 const handleChangeAlterFromReview = (val: boolean) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
 
   if (task) {
     task.can_change_from_review = val;
@@ -577,18 +513,14 @@ const handleChangeAlterFromReview = (val: boolean) => {
 };
 
 const handleChangeTitle = (title: string) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   if (task) {
     task.title = title;
   }
 };
 
 const handleChangeGoals = (learningGoals: LearningPlanGoalSimple[]) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
 
   if (task) {
     task.learning_goals = learningGoals;
@@ -596,27 +528,21 @@ const handleChangeGoals = (learningGoals: LearningPlanGoalSimple[]) => {
 };
 
 const handleChangeSubmissionDescription = (description: string) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   if (task) {
     task.submission_description = description;
   }
 };
 
 const handleChangeTags = (tags: TagSimple[]) => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   if (task) {
     task.tags = tags;
   }
 };
 
 const handleChangeMembers = async () => {
-  const task = learningPlanStore.learningPlan?.tasks.find(
-    (t) => t.id === editTaskId.value,
-  );
+  const task = learningPlanStore.learningPlan?.tasks.find((t) => t.id === editTaskId.value);
   try {
     const response = await find<TaskMember>('task-members', {
       populate: [
@@ -637,11 +563,7 @@ const handleChangeMembers = async () => {
     return response;
   } catch (e: any) {
     setMessage(t('pages.tasks.cantUpdateMembers'), 'red', true);
-    if (learningPlanStore.learningPlan)
-      learningPlanStore.loadLearningPlan(
-        learningPlanStore.learningPlan.id,
-        true,
-      );
+    if (learningPlanStore.learningPlan) learningPlanStore.loadLearningPlan(learningPlanStore.learningPlan.id, true);
   }
 };
 </script>

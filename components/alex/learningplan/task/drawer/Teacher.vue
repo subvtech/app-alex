@@ -125,6 +125,57 @@
         :title="$t('components.learningPlan.drawer.task.submission.description.label')"
       />
 
+      <p class="text-h3 mt-6">Avaliação</p>
+      <v-row class="mx-0 mt-3 mb-4 gap-3">
+        <div
+          class="pa-0 rounded-lg tw-border tw-w-[288px] d-flex cursor-pointer"
+          @click="openGradeCompositionDialog = true"
+        >
+          <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
+            <v-icon size="32" icon="alex:FactCheck" color="secondary-0"></v-icon>
+          </div>
+          <div class="pa-3">
+            <h5 class="text-h5 text-secondary-0 mb-2">Composição da Nota</h5>
+            <span v-if="!gradeTaskComposition" class="text-body-4 text-gray-500">Selecione uma avaliação</span>
+            <alex-custom-chip v-else :text="gradeTaskComposition?.gradeComposition?.grade?.title"></alex-custom-chip>
+          </div>
+        </div>
+
+        <div class="pa-0 rounded-lg tw-border tw-w-[288px] d-flex cursor-pointer">
+          <div class="px-3 py-3 bg-gray-blue tw-border-r d-flex align-center">
+            <v-icon size="32" icon="alex:FactCheck" color="secondary-0"></v-icon>
+          </div>
+          <div class="pa-3">
+            <h5 class="text-h5 text-secondary-0 mb-2">Tipo avaliativo</h5>
+            <span class="text-body-4 text-gray-500">Selecione os critérios</span>
+          </div>
+        </div>
+
+        <alex-custom-dialog
+          v-model="openGradeCompositionDialog"
+          title="Composição avaliativa"
+          main-button-text="Associar"
+          :main-button-disabled="!gradeAssociatonData.gradeId || gradeAssociatonData.weight < 1"
+          @on-secondary-action="openGradeCompositionDialog = false"
+        >
+          <alex-inputs-select
+            v-model="gradeAssociatonData.gradeId"
+            name="grade"
+            label="Qual avaliação deseja associar ?"
+            required
+            :items="grades"
+            item-title="title"
+            item-value="id"
+          />
+          <alex-inputs-text-field
+            v-model="gradeAssociatonData.weight"
+            name="weight"
+            label="Qual o peso dessa tarefa?"
+            required
+            type="number"
+          />
+        </alex-custom-dialog>
+      </v-row>
       <!-- Recursos de aprendizagem -->
       <div class="my-6">
         <alex-learningplan-task-resources
@@ -166,13 +217,17 @@ import { MentionUserPropsArray } from '~/components/TipTap/index.vue';
 import { TaskSimple, TaskStatus, TaskType } from '~/models/simple/taskSimple.model';
 import { orderEvents } from '~/utils';
 import { RestrictionValue } from '../Restrictions.vue';
+import { useQuery } from '@tanstack/vue-query';
 const { t } = useI18n();
 const isFirstTimeOpened = ref(true);
+const openGradeCompositionDialog = ref(false);
+const { find } = useStrapiUtils();
 
 interface TaskTeacherDrawerProps {
   learningplanId: number;
   a?: string;
   taskId?: number;
+  learningPlanId?: number;
   trail?: TrailSimple;
   title?: string;
   status?: TaskStatus;
@@ -197,6 +252,7 @@ interface TaskTeacherDrawerProps {
 
 const props = withDefaults(defineProps<TaskTeacherDrawerProps>(), {
   taskId: -1,
+  learningPlanId: -1,
   a: '',
   title: '',
   status: 'draft',
@@ -256,6 +312,34 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
   }
   return true;
 };
+
+const { data: grades } = useQuery({
+  queryKey: ['grades', props.learningPlanId],
+  queryFn: async () => {
+    const { data } = await find('grades', { filters: { learningplan: { id: props.learningPlanId } } });
+    return data;
+  },
+});
+
+const { data: gradeTaskCompositions } = useQuery({
+  queryKey: ['gradeTaskComposition', props.taskId],
+  queryFn: async () => {
+    const composition = await find('grade-composition-tasks', {
+      filters: {
+        task: { id: props.taskId },
+      },
+      populate: ['grade_composition.grade'],
+    });
+
+    return composition.data;
+  },
+});
+
+const gradeTaskComposition = computed(() => {
+  return gradeTaskCompositions.value ? gradeTaskComposition.value : null;
+});
+
+const gradeAssociatonData = ref({ gradeId: null, weight: 1 });
 
 watch(model, (value) => {
   if (value) {
