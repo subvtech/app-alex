@@ -52,7 +52,10 @@ const events = ref<FormattedEvent[]>([]);
 
 const progress = ref([]);
 
-const getPercentage = (amount: number, total: number): number => parseInt((amount / total) * 100) || 100;
+const getPercentage = (amount: number, total: number): number => {
+  const result = Math.floor((amount / total) * 100);
+  return !isNaN(result) ? result : 100;
+};
 
 const getData = () => {
   if (learningPlanStore.loading) {
