@@ -138,6 +138,7 @@
             <h5 class="text-h5 text-secondary-0 mb-2">Composição da Nota</h5>
             <span v-if="!gradeTaskComposition" class="text-body-4 text-gray-500">Selecione uma avaliação</span>
             <alex-custom-chip v-else :text="gradeTaskComposition?.gradeComposition?.grade?.title"></alex-custom-chip>
+            {{ gradeTaskCompositions }}
           </div>
         </div>
 
@@ -285,6 +286,7 @@ const goals = ref(props.goals);
 const tags = ref(props.tags);
 const title = ref(props.title);
 const taskId = toRef(props, 'taskId');
+const learningPlanId = toRef(props, 'learningPlanId');
 const model = defineModel({ default: false });
 const openResources = ref<boolean>(false);
 const members = toRef(props, 'members');
@@ -314,19 +316,19 @@ const checkEndDate = (startDate?: string | null, endDate?: string | null) => {
 };
 
 const { data: grades } = useQuery({
-  queryKey: ['grades', props.learningPlanId],
+  queryKey: ['grades', learningPlanId],
   queryFn: async () => {
-    const { data } = await find('grades', { filters: { learningplan: { id: props.learningPlanId } } });
+    const { data } = await find('grades', { filters: { learningplan: { id: learningPlanId.value } } });
     return data;
   },
 });
 
 const { data: gradeTaskCompositions } = useQuery({
-  queryKey: ['gradeTaskComposition', props.taskId],
+  queryKey: ['gradeTaskComposition', taskId],
   queryFn: async () => {
     const composition = await find('grade-composition-tasks', {
       filters: {
-        task: { id: props.taskId },
+        task: { id: taskId.value },
       },
       populate: ['grade_composition.grade'],
     });
@@ -336,7 +338,7 @@ const { data: gradeTaskCompositions } = useQuery({
 });
 
 const gradeTaskComposition = computed(() => {
-  return gradeTaskCompositions.value ? gradeTaskComposition.value : null;
+  return gradeTaskCompositions.value ? gradeTaskCompositions.value[0] : null;
 });
 
 const gradeAssociatonData = ref({ gradeId: null, weight: 1 });
