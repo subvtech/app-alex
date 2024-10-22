@@ -26,11 +26,11 @@ const formattedDate = computed(() =>
 </script>
 
 <template>
-  <div class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white">
+  <div class="d-flex flex-column border-1 border-gray-100 rounded-lg pa-4 text-gray-800 card-kanban bg-white tw-w-full">
     <div v-if="tags.length > 0" class="tw-flex tw-flex-wrap tw-gap-2 tw-mb-2">
       <alex-custom-chip v-for="tag in tags" :key="tag.id" :text="tag.text" size="small" class="tw-w-fit" />
     </div>
-    <p class="text-body-2 ellipsis lines-1 w-100">
+    <p class="text-body-2 ellipsis lines-1 w-100 tw-truncate">
       {{ name }}
     </p>
     <div class="d-flex tw-gap-2 align-center tw-mt-2">
